@@ -19,6 +19,8 @@
 #ifndef _SCREENS_H_
 #define _SCREENS_H_
 
+#include "timefuncs.h"
+
 void usb_display_info(void);
 void usb_screen(void);
 int charging_screen(void);
@@ -35,5 +37,9 @@ void splash(int ticks,  /* how long */
             char *fmt,  /* what to say *printf style */
             ...);
 
+#ifdef HAVE_RTC
+bool set_time_screen(char* string, struct tm *tm);
+#endif
+    
 #endif
 

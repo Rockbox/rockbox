@@ -38,6 +38,7 @@
 #include "powermgmt.h"
 #include "adc.h"
 #include "action.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -809,3 +810,289 @@ void charging_splash(void)
     splash(2*HZ, true, str(LANG_BATTERY_CHARGE));
     while (button_get(false));
 }
+
+
+#ifdef HAVE_LCD_BITMAP
+
+/* little helper function for voice output */
+static void say_time(int cursorpos, struct tm *tm)
+{
+    const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
+    int value = 0;
+
+    if (!global_settings.talk_menu)
+        return;
+
+    switch(cursorpos)
+    {
+    case 0:
+        value = tm->tm_hour;
+        break;
+    case 1:
+        value = tm->tm_min;
+        break;
+    case 2:
+        value = tm->tm_sec;
+        break;
+    case 3:
+        value = tm->tm_year + 1900;
+        break;
+    case 5:
+        value = tm->tm_mday;
+        break;
+    }
+    
+    if (cursorpos == 4) /* month */
+        talk_id(LANG_MONTH_JANUARY + value - 1, false);
+    else
+        talk_value(value, unit[cursorpos], false);
+}
+
+
+#define INDEX_X 0
+#define INDEX_Y 1
+#define INDEX_WIDTH 2
+bool set_time_screen(char* string, struct tm *tm)
+{
+    bool done = false;
+    int button;
+    int min = 0, steps = 0;
+    int cursorpos = 0;
+    int lastcursorpos = !cursorpos;
+    unsigned char buffer[19];
+    int realyear;
+    int julianday;
+    int i;
+    unsigned char reffub[5];
+    unsigned int width, height;
+    unsigned int separator_width, weekday_width;
+    unsigned int line_height, prev_line_height;
+    const int dayname[] = {LANG_WEEKDAY_SUNDAY,
+                           LANG_WEEKDAY_MONDAY,
+                           LANG_WEEKDAY_TUESDAY,
+                           LANG_WEEKDAY_WEDNESDAY,
+                           LANG_WEEKDAY_THURSDAY,
+                           LANG_WEEKDAY_FRIDAY,
+                           LANG_WEEKDAY_SATURDAY};
+    const int monthname[] = {LANG_MONTH_JANUARY,
+                             LANG_MONTH_FEBRUARY,
+                             LANG_MONTH_MARCH,
+                             LANG_MONTH_APRIL,
+                             LANG_MONTH_MAY,
+                             LANG_MONTH_JUNE,
+                             LANG_MONTH_JULY,
+                             LANG_MONTH_AUGUST,
+                             LANG_MONTH_SEPTEMBER,
+                             LANG_MONTH_OCTOBER,
+                             LANG_MONTH_NOVEMBER,
+                             LANG_MONTH_DECEMBER};
+    char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
+                        {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
+    char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    
+    int monthname_len = 0, dayname_len = 0;
+
+    int *valptr = NULL;
+
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, string);
+
+    while ( !done ) {
+        /* calculate the number of days in febuary */
+        realyear = tm->tm_year + 1900;
+        if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
+            daysinmonth[1] = 29;
+        else
+            daysinmonth[1] = 28;
+
+        /* fix day if month or year changed */
+        if (tm->tm_mday > daysinmonth[tm->tm_mon])
+            tm->tm_mday = daysinmonth[tm->tm_mon];
+
+        /* calculate day of week */
+        julianday = 0;
+        for(i = 0; i < tm->tm_mon; i++) {
+           julianday += daysinmonth[i];
+        }
+        julianday += tm->tm_mday;
+        tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
+                       (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
+
+        snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d ",
+                 tm->tm_hour, tm->tm_min, tm->tm_sec);
+        lcd_puts(0, 1, buffer);
+
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(string, &width, &prev_line_height);
+        lcd_getstringsize(buffer, &width, &line_height);
+        lcd_getstringsize(":", &separator_width, &height);
+
+        /* hour */
+        strncpy(reffub, buffer, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[0][INDEX_X] = 0;
+        cursor[0][INDEX_Y] = prev_line_height;
+        cursor[0][INDEX_WIDTH] = width;
+
+        /* minute */
+        strncpy(reffub, buffer + 3, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
+        cursor[1][INDEX_Y] = prev_line_height;
+        cursor[1][INDEX_WIDTH] = width;
+
+        /* second */
+        strncpy(reffub, buffer + 6, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
+                             cursor[1][INDEX_WIDTH] + separator_width;
+        cursor[2][INDEX_Y] = prev_line_height;
+        cursor[2][INDEX_WIDTH] = width;
+
+        lcd_getstringsize(buffer, &width, &prev_line_height);
+
+        snprintf(buffer, sizeof(buffer), "%s %04d %s %02d ",
+                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
+                 str(monthname[tm->tm_mon]), tm->tm_mday);
+        lcd_puts(0, 2, buffer);
+
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(buffer, &width, &line_height);
+
+        /* store these 2 to prevent _repeated_ strlen calls */
+        monthname_len = strlen(str(monthname[tm->tm_mon]));
+        dayname_len = strlen(str(dayname[tm->tm_wday]));
+
+        /* weekday */
+        strncpy(reffub, buffer, dayname_len);
+        reffub[dayname_len] = '\0';
+        lcd_getstringsize(reffub, &weekday_width, &height);
+        lcd_getstringsize(" ", &separator_width, &height);
+
+        /* year */
+        strncpy(reffub, buffer + dayname_len + 1, 4);
+        reffub[4] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[3][INDEX_X] = weekday_width + separator_width;
+        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[3][INDEX_WIDTH] = width;
+
+        /* month */
+        strncpy(reffub, buffer + dayname_len + 6, monthname_len);
+        reffub[monthname_len] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[4][INDEX_X] = weekday_width + separator_width +
+                             cursor[3][INDEX_WIDTH] + separator_width;
+        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[4][INDEX_WIDTH] = width;
+
+        /* day */
+        strncpy(reffub, buffer + dayname_len + monthname_len + 7, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, &width, &height);
+        cursor[5][INDEX_X] = weekday_width + separator_width +
+                             cursor[3][INDEX_WIDTH] + separator_width +
+                             cursor[4][INDEX_WIDTH] + separator_width;
+        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[5][INDEX_WIDTH] = width;
+
+        lcd_invertrect(cursor[cursorpos][INDEX_X],
+                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
+                       cursor[cursorpos][INDEX_WIDTH],
+                       line_height);
+
+        lcd_puts(0, 4, str(LANG_TIME_SET));
+        lcd_puts(0, 5, str(LANG_TIME_REVERT));
+#ifdef HAVE_LCD_BITMAP
+        status_draw(true);
+#endif
+        lcd_update();
+
+        /* calculate the minimum and maximum for the number under cursor */
+        if(cursorpos!=lastcursorpos) {
+            lastcursorpos=cursorpos;
+            switch(cursorpos) {
+                case 0: /* hour */
+                    min = 0;
+                    steps = 24;
+                    valptr = &tm->tm_hour;
+                    break;
+                case 1: /* minute */
+                    min = 0;
+                    steps = 60;
+                    valptr = &tm->tm_min;
+                    break;
+                case 2: /* second */
+                    min = 0;
+                    steps = 60;
+                    valptr = &tm->tm_sec;
+                    break;
+                case 3: /* year */
+                    min = 1;
+                    steps = 200;
+                    valptr = &tm->tm_year;
+                    break;
+                case 4: /* month */
+                    min = 0;
+                    steps = 12;
+                    valptr = &tm->tm_mon;
+                    break;
+                case 5: /* day */
+                    min = 1;
+                    steps = daysinmonth[tm->tm_mon];
+                    valptr = &tm->tm_mday;
+                    break;
+            }
+            say_time(cursorpos, tm);
+        }
+
+        button = button_get_w_tmo(HZ/2);
+        switch ( button ) {
+            case BUTTON_LEFT:
+                cursorpos = (cursorpos + 6 - 1) % 6;
+                break;
+            case BUTTON_RIGHT:
+                cursorpos = (cursorpos + 6 + 1) % 6;
+                break;
+            case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
+                *valptr = (*valptr + steps - min + 1) %
+                    steps + min;
+                if(*valptr == 0)
+                    *valptr = min;
+                say_time(cursorpos, tm);
+                break;
+            case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
+                *valptr = (*valptr + steps - min - 1) % 
+                    steps + min;
+                if(*valptr == 0)
+                    *valptr = min;
+                say_time(cursorpos, tm);
+                break;
+            case BUTTON_ON:
+                done = true;
+                break;
+            case BUTTON_OFF:
+                done = true;
+                tm->tm_year = -1;
+                break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
+        }
+    }
+
+    return false;
+}
+#endif
