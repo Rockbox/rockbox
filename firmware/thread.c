@@ -49,8 +49,8 @@ static inline void stctx(void* addr)
     unsigned int tmp;
     
     asm volatile ("mov.l r8, @(0, %1)\n\t"
-		  "mov.l r9, @(4, %1)\n\t"
-		  "mov.l r10, @(8, %1)\n\t"
+                  "mov.l r9, @(4, %1)\n\t"
+                  "mov.l r10, @(8, %1)\n\t"
                   "mov.l r11, @(12, %1)\n\t"
                   "mov.l r12, @(16, %1)\n\t"
                   "mov.l r13, @(20, %1)\n\t"
