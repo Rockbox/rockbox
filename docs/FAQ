@@ -634,3 +634,11 @@ A70: We have no way of knowing the correct contrast setting from start and the
 Q71: Where are the FM controls for the FM Recorder?
 A71: There aren't any.  This is not yet implemented under Rockbox.  FM Recorder
      support in general is new.  Be patient.
+
+Q72: I installed/renamed ajbrec.ajz (or archos.mod) but I am still booting
+     with another version of firmware.
+A72: When looking on the hard disk the Archos firmware only matches the first
+     ten characters of the file name.  Because of this files like 
+     ajbrec.ajz.bak or ajbrec.ajz-20030404 match and are loaded.  To 
+     prevent this from happening, give the it a file name that differs in 
+     the first 10 characters, e.g., ajbrec.bak.ajz. 
