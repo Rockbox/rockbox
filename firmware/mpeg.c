@@ -1617,7 +1617,9 @@ static void mpeg_thread(void)
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
 
                     if(id3tags[tag_read_idx]->id3.vbr)
-                        recalculate_watermark(320);
+                        /* Average bitrate * 1.5 */
+                        recalculate_watermark(
+                            (id3tags[tag_read_idx]->id3.bitrate * 3) / 2);
                     else
                         recalculate_watermark(
                             id3tags[tag_read_idx]->id3.bitrate);
