@@ -633,7 +633,7 @@ tags:
 	\$(MAKE) -C \$(APPSDIR)/plugins tags
 	\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
-zip: all
+zip:
 	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 EOF
 
