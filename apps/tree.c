@@ -1063,7 +1063,6 @@ bool dirbrowse(char *root)
                               tree_max_on_screen))
                 {
                     /* start scroll */
-                    reload_dir = true;
                     restore = true;
                 }
                 else
