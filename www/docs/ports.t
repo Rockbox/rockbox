@@ -224,7 +224,7 @@
 <tr><th><b>PC7/AN7</b></th>
     <td>DC input voltage</td>
     <td>DC input voltage</td>
-    <td>DC input voltage</td>
+    <td>Charge current?</td>
 </tr>
 </table>
 #include "foot.t"
