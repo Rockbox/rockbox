@@ -82,5 +82,11 @@ struct dirent *readdir (
     if (_findnext (dir->handle, &fd) == -1)
         return 0;
     memcpy (dir->fd.d_name, fd.name, 256);
+    
+    dir->fd.attribute = fd.attrib ;
+    dir->fd.size = fd.size;
+    dir->fd.startcluster = 0 ;
+
+    
     return &dir->fd;
 }
