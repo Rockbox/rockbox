@@ -415,6 +415,8 @@ void randomise_playlist( unsigned int seed )
         playlist.indices[candidate] = playlist.indices[count];
         playlist.indices[count] = store;
     }
+
+    mpeg_flush_and_reload_tracks();
 }
 
 static int compare(const void* p1, const void* p2)
@@ -451,6 +453,8 @@ void sort_playlist(bool start_current)
             }
         }
     }
+
+    mpeg_flush_and_reload_tracks();
 }
 
 /* -----------------------------------------------------------------

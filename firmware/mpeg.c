@@ -50,6 +50,7 @@ extern void bitswap(unsigned short *data, int length);
 #define MPEG_NEXT         5
 #define MPEG_PREV         6
 #define MPEG_FF_REWIND    7
+#define MPEG_FLUSH_RELOAD 8
 #define MPEG_NEED_DATA    100
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
@@ -662,11 +663,15 @@ static int add_track_to_tag_list(char *filename)
 /* If next_track is true, opens the next track, if false, opens prev track */
 static int new_file(int steps)
 {
+    int start = num_tracks_in_memory() - 1;
+
+    if (start < 0)
+        start = 0;
+
     do {
         char *trackname;
-        int index;
 
-        trackname = playlist_peek( steps );
+        trackname = playlist_peek( start + steps );
         if ( !trackname )
             return -1;
         
@@ -690,13 +695,11 @@ static int new_file(int steps)
             }
             else
             {
-                index = playlist_next(steps);
-            
                 /* skip past id3v2 tag (to an even byte) */
                 lseek(mpeg_file, 
                       id3tags[new_tag_idx]->id3.id3v2len & ~1, 
                       SEEK_SET);
-                id3tags[new_tag_idx]->id3.index = index;
+                id3tags[new_tag_idx]->id3.index = steps;
                 id3tags[new_tag_idx]->id3.offset = 0;
             }
         }
@@ -717,6 +720,14 @@ static void stop_playing(void)
     remove_all_tags();
 }
 
+static void update_playlist(void)
+{
+    int index;
+
+    index = playlist_next(id3tags[tag_read_idx]->id3.index);
+    id3tags[tag_read_idx]->id3.index = index;
+}
+
 static void track_change(void)
 {
     DEBUGF("Track change\n");
@@ -728,6 +739,8 @@ static void track_change(void)
     remove_current_tag();
 
     current_track_counter++;
+
+    update_playlist();
 }
 
 static void mpeg_thread(void)
@@ -876,7 +889,7 @@ static void mpeg_thread(void)
                 else {
                     reset_mp3_buffer();
                     remove_all_tags();
-                
+
                     /* Open the next file */
                     if (mpeg_file >= 0)
                         close(mpeg_file);
@@ -894,6 +907,7 @@ static void mpeg_thread(void)
                         play_pending = true;
 
                         current_track_counter++;
+                        update_playlist();
                     }
                 }
                 break;
@@ -926,6 +940,7 @@ static void mpeg_thread(void)
                     play_pending = true;
 
                     current_track_counter++;
+                    update_playlist();
                 }
                 break;
             }
@@ -1065,6 +1080,38 @@ static void mpeg_thread(void)
                 }
 
                 id3->offset = newpos;
+
+                break;
+            }
+
+            case MPEG_FLUSH_RELOAD: {
+                int  numtracks    = num_tracks_in_memory();
+                bool reload_track = false;
+
+                if (numtracks > 1)
+                {
+                    /* Reload songs */
+                    int next = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+
+                    /* Reset the buffer */
+                    mp3buf_write = mp3buf_swapwrite = id3tags[next]->mempos;
+
+                    close(mpeg_file);
+                    remove_all_non_current_tags();
+                    mpeg_file = -1;
+                    reload_track = true;
+                }
+                else if (numtracks == 1 && mpeg_file < 0)
+                {
+                    reload_track = true;
+                }
+
+                if(reload_track && new_file(1) >= 0)
+                {
+                    /* Tell ourselves that we want more data */
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                    filling = true;
+                }
 
                 break;
             }
@@ -1439,6 +1486,13 @@ void mpeg_ff_rewind(int change)
     queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)change);
 #else
     (void)change;
+#endif
+}
+
+void mpeg_flush_and_reload_tracks(void)
+{
+#ifndef SIMULATOR
+    queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, NULL);
 #endif
 }
 
