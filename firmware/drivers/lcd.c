@@ -550,7 +550,7 @@ void lcd_set_contrast(int val)
  *
  * Memory copy of display bitmap
  */
-unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8] __attribute__ ((section (".idata")));
+unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
 static int font=0;
 static int xmargin=0;

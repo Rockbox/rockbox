@@ -96,7 +96,7 @@ extern void lcd_double_height (bool on);
 /*
  * Memory copy of display bitmap
  */
-extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8] __attribute__ ((section (".idata")));
+extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
 extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
 extern void lcd_setfont(int font);
