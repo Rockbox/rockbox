@@ -166,10 +166,10 @@ sub runone {
 
 my $target = $ARGV[0];
 
-my $exe = "";
+my $exe = $ARGV[1];
 
-if($target !~ /sim/i) {
-    # not a simulator
+if(!$exe) {
+    # not specified, guess!
     if($target =~ /(recorder|ondio)/i) {
         $exe = "ajbrec.ajz";
     }

@@ -1,0 +1,8 @@
+fmradio.c
+font-player.c
+io.c
+lcd-common.c
+lcd-playersim.c
+mpegplay.c
+sim_icons.c
+stubs.c

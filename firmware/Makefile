@@ -11,7 +11,7 @@ INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers
 
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS2 := $(patsubst %.c, $(OBJDIR)/%.o, $(SRC)) $(OBJDIR)/sysfont.o
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
@@ -29,6 +29,7 @@ $(TOOLSDIR)/convbdf:
 $(OUTPUT): $(OBJS) $(DEPFILE)
 	@echo "AR $@"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	@$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 

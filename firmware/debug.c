@@ -222,6 +222,7 @@ void debugf(const char *fmt, ...)
 void debug_init(void)
 {
 }
+extern void *stderr;
 
 void debugf(const char *fmt, ...)
 {

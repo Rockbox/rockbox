@@ -211,9 +211,7 @@ struct plugin_api {
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
-#ifndef SIMULATOR
     const char *_ctype_;
-#endif
     int (*atoi)(const char *str);
 
     /* sound */

@@ -14,11 +14,22 @@ ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA -DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer -funroll-loops -finline-functions -Wall -W -Winline -DFLaC__INLINE=__inline__ --param large-function-insns=10000
+NEWGCC=$(shell expr $(GCCNUM) ">" 303)
+
+FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA			      \
+-DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer	      \
+-funroll-loops -finline-functions -Wall -W -Winline -DFLaC__INLINE=__inline__
+
+ifeq ($(NEWGCC), 1)
+  # this is 3.4.X options:
+  FLACOPTS += --param large-function-insns=10000
+endif
+
 CFLAGS = $(GCCOPTS) $(FLACOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+$(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/libFLAC/%.o)
 DEPFILE = $(OBJDIR)/dep-libFLAC

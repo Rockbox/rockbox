@@ -2485,9 +2485,12 @@ unsigned long mpeg_num_recorded_bytes(void)
         return 0;
 }
 
-#elif CONFIG_HWCODEC == MASNONE
+#elif (CONFIG_HWCODEC == MASNONE) || defined(SIMULATOR)
 
-/* dummies coming up */
+/* dummies coming up
+
+NOTE: when we implment these functions for real for software coded targets,
+these dummies shall remain for the simulator */
 
 void bitswap(unsigned char *data, int length)
 {

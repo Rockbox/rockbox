@@ -19,7 +19,9 @@ settings_menu.c
 sleeptimer.c
 sound_menu.c
 status.c
+#ifndef SIMULATOR
 talk.c
+#endif
 tree.c
 dbtree.c
 filetree.c

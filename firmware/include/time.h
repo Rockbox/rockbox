@@ -20,5 +20,16 @@ struct tm
   int	tm_isdst;
 };
 
+#if defined(SIMULATOR) && !defined(_TIME_T_DEFINED)
+/* for non-win32 simulators */
+typedef long time_t;
+
+/* this define below is used by the mingw headers to prevent duplicate
+   typedefs */
+#define _TIME_T_DEFINED
+time_t time(time_t *t);
+
+#endif
+
 #endif /* _TIME_H_ */
 

@@ -274,13 +274,6 @@ static bool plugin_browse(void)
 }
 
 #ifdef HAVE_RECORDING
-#ifdef SIMULATOR
-bool recording_screen(void)
-{
-    /* a dummy */
-    return false;
-}
-#endif
 
 static bool recording_settings(void)
 {

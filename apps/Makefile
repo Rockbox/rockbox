@@ -13,11 +13,6 @@ DEPFILE = $(OBJDIR)/dep-apps
 LDS := $(FIRMDIR)/app.lds
 ROMLDS := $(FIRMDIR)/rom.lds
 
-ifdef DEBUG
-    DEFINES := -DDEBUG
-    CFLAGS += -g
-endif
-
 ifdef ENABLEDPLUGINS
 ROCKS=rocks
 endif
@@ -26,7 +21,8 @@ ifdef SOFTWARECODECS
 CODECS=build-codecs
 endif
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
 ifdef APPEXTRA
@@ -44,9 +40,11 @@ LINKROM = $(OBJDIR)/linkrom.lds
 MAXINFILE = $(OBJDIR)/romstart.temp
 MAXOUTFILE = $(OBJDIR)/romstart
 
-ifdef DEBUG
-all: $(OBJDIR)/rockbox.elf $(CODECS) $(ROCKS)
+ifdef SIMVER
+# this is a sim build
+all: $(OBJDIR)/$(BINARY) $(CODECS) $(ROCKS)
 else
+# regular target build
 all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
@@ -80,9 +78,11 @@ $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rombox.elf"
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
+ifndef SIMVER
+
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rockbox.elf"
-	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
 	@echo "OBJCOPY $<"
@@ -98,6 +98,16 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 $(OBJDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
 	@echo "Build firmware file"
 	@$(MKFIRMWARE) $< $@
+
+else
+# this is a simulator build
+$(OBJDIR)/$(BINARY) : $(OBJS) $(OBJDIR)/librockbox.a $(DEPFILE) $(OBJDIR)/libsim.a
+	@echo "LD $(BINARY)"
+	$(CC) $(GCCOPTS) -o $@ $(OBJS) $(LDOPTS) -L$(OBJDIR) -lrockbox -lsim -Wl,-Map,$(OBJDIR)/rockbox.map
+
+$(OBJDIR)/libsim.a:
+	@$(MAKE) -C $(SIMDIR)
+endif
 
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	@a=`uclpack -h 2>/dev/null`; \
@@ -160,5 +170,8 @@ clean:
 	@$(MAKE) -C plugins clean
 	@$(MAKE) -C codecs clean
 	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
+ifdef SIMVER
+	@$(MAKE) -C $(SIMDIR) clean
+endif
 
 -include $(DEPFILE)

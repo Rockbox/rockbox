@@ -1,0 +1,10 @@
+button-x11.c
+lcd-x11.c
+#if 0 /* if sound is enabled */
+oss_sound.c
+#endif
+resources.c
+screenhack.c
+thread.c
+uibasic.c
+visual.c

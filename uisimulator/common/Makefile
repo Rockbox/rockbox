@@ -17,57 +17,40 @@
 #
 ############################################################################
 
-SIMCOMMON = ../common
-
-DEPFILE = $(OBJDIR)/dep-simwin
+DEPFILE = $(OBJDIR)/dep-commonsim
 
 RM = rm -f
 DEBUG = -g
 
-INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
-
-DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
-$(TARGET) -DAPPSVERSION=\"$(VERSION)\" -DMEM=${MEMORYSIZE} $(EXTRA_DEFINES)
-
-LDFLAGS =  -lgdi32 -luser32
+# Use this for simulator-only files
+INCLUDES = -I. -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
 
 SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
  $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
+DEFINES := -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
+$(TARGET) -DAPPSVERSION=\"$(VERSION)\" -DMEM=${MEMORYSIZE} $(EXTRA_DEFINES) 
+
 SOURCES = $(SRC)
+
 DIRS = .
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
-
-DLLTOOLFLAGS = --export-all
-DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
 
 OUTFILE = $(OBJDIR)/libsim.a
 
 all: $(OUTFILE)
-	@echo "MAKE in common sim"
-	$(MAKE) -C $(SIMCOMMON)
 
 include $(TOOLSDIR)/make.inc
+
+clean:
+	@echo "cleaning commonsim"
+	@$(RM) $(OBJS) *~ core $(DEPFILE)
 
 $(OUTFILE): $(OBJS)
 	@echo "AR+RANLIB $@"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	@$(RANLIB) $@
-
-clean:
-	@echo "cleaning simwin"
-	@$(RM) $(OBJS) *~ core $(OUTFILE) $(OBJDIR)/uisw32-res.o \
-	$(OBJDIR)/UI256.bmp $(DEPFILE)
-	@$(MAKE) -C $(SIMCOMMON) clean
-
-################## Specific dependencies ##################
-$(OBJDIR)/UI256.bmp: UI-$(ARCHOS).bmp
-	@echo UI
-	@cp $< $@
-
-$(OBJDIR)/uisw32-res.o: uisw32.rc $(OBJDIR)/UI256.bmp
-	$(WINDRES) -I$(OBJDIR) -i $< -o $@
 
 -include $(DEPFILE)

@@ -36,4 +36,13 @@
 int snprintf (char *buf, size_t size, const char *fmt, ...);
 int vsnprintf (char *buf, int size, const char *fmt, __VALIST ap);
 
+#ifdef SIMULATOR
+typedef void FILE;
+int vfprintf(FILE *stream, const char *format, __VALIST ap);
+#ifdef WIN32
+#define FILENAME_MAX 260 /* ugly hard-coded value of a limit that is set
+                            in file.h */
+#endif
+#endif
+
 #endif /* _STDIO_H_ */

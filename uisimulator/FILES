@@ -14,3 +14,6 @@ win32/rockbox.ico
 x11/*.[ch]
 x11/Makefile
 x11/archos/rockbox112.bmp
+common/SOURCES
+win32/SOURCES
+x11/SOURCES

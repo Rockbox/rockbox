@@ -18,9 +18,9 @@ INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
 CFLAGS = $(GCCOPTS) \
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DPLUGIN
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-pluginlib
@@ -31,8 +31,9 @@ OUTPUT = $(OBJDIR)/libplugin.a
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR $@"
+	@echo "AR+RANLIB $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
+	@$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 

@@ -1,11 +1,15 @@
+#ifndef SIMULATOR
 backlight.c
+#endif
 buffer.c
 common/atoi.c
 common/ctype.c
+#ifndef SIMULATOR
 common/dir.c
+common/file.c
+#endif
 common/disk.c
 common/errno.c
-common/file.c
 common/memcmp.c
 common/qsort.c
 common/random.c
@@ -16,7 +20,7 @@ common/strcat.c
 common/strchr.c
 common/strcmp.c
 common/strcpy.c
-#if CONFIG_CPU == SH7034
+#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
 common/strlen_a.S
 #else
 common/strlen.c
@@ -33,7 +37,20 @@ common/memset_a.S
 common/memcpy.c
 common/memset.c
 #endif
-debug.c
+#ifdef HAVE_LCD_CHARCELLS
+drivers/lcd-player-charset.c
+drivers/lcd-player.c
+#endif
+#ifdef HAVE_LCD_BITMAP
+#if CONFIG_LCD == LCD_S1D15E06
+drivers/lcd-h100.c
+#else
+drivers/lcd-recorder.c
+#endif
+#endif
+drivers/power.c
+drivers/led.c
+#ifndef SIMULATOR
 drivers/adc.c
 #ifdef HAVE_MMC
 drivers/ata_mmc.c
@@ -54,42 +71,35 @@ tuner_philips.c
 #endif
 #endif
 drivers/i2c.c
-#ifdef HAVE_LCD_CHARCELLS
-drivers/lcd-player-charset.c
-drivers/lcd-player.c
-#endif
-#ifdef HAVE_LCD_BITMAP
-#if CONFIG_LCD == LCD_S1D15E06
-drivers/lcd-h100.c
-#else
-drivers/lcd-recorder.c
-#endif
-#endif
-drivers/led.c
 #if CONFIG_HWCODEC != MASNONE
 drivers/mas.c
 #endif
-drivers/power.c
 #ifdef HAVE_RTC
 drivers/rtc.c
 #endif
 drivers/serial.c
+#endif /* !SIMULATOR */
 #ifdef HAVE_LCD_BITMAP
 font.c
 #endif
 hwcompat.c
 id3.c
+#ifndef SIMULATOR
 kernel.c
+rolo.c
+thread.c
+crt0.S
+#endif
 mp3_playback.c
 mp3data.c
 mpeg.c
+#ifndef WIN32 /* the win32 sim has its own versin of these: */
 panic.c
+debug.c
+#endif
 powermgmt.c
-rolo.c
 system.c
-thread.c
 usb.c
-crt0.S
 #if CONFIG_CPU == SH7034
 bitswap.S
 descramble.S

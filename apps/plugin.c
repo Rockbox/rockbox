@@ -187,9 +187,7 @@ static const struct plugin_api rockbox_api = {
     strncasecmp,
     memset,
     memcpy,
-#ifndef SIMULATOR
     _ctype_,
-#endif
     atoi,
 
     /* sound */

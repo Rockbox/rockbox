@@ -19,32 +19,83 @@ input() {
     echo $response
 }
 
+prefixtools () {
+ prefix="$1"
+ CC=${prefix}gcc
+ WINDRES=${prefix}windres
+ DLLTOOL=${prefix}dlltool
+ DLLWRAP=${prefix}dllwrap
+ RANLIB=${prefix}ranlib
+ LD=${prefix}ld
+ AR=${prefix}ar
+ AS=${prefix}as
+ OC=${prefix}objcopy
+}
+
+crosswincc () {
+ # naive approach to selecting a mingw cross-compiler on linux/*nix
+ echo "Enabling win32 crosscompiling"
+
+ prefixtools i386-mingw32msvc-
+
+ LDOPTS="-lgdi32 -luser32 -mwindows"
+ # add cross-compiler option(s)
+ GCCOPTS="$GCCOPTS -mno-cygwin"
+}
+
+simcc () {
+
+ # default tool setup for native building
+ prefixtools ""
+
+ GCCOPTS='-W -Wall -g -fno-builtin -I$(ROOTDIR)/uisimulator/common -I$(ROOTDIR)/uisimulator/$(SIMVER)'
+
+ output="rockboxui" # use this as default output binary name
+
+ case $uname in
+   CYGWIN*)
+   echo "Cygwin host detected"
+   LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
+   output="rockboxui.exe" # use this as output binary name
+   ;;
+
+   Linux)
+   echo "Linux host detected"
+   LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
+   if [ "$simver" = "win32" ]; then
+     crosswincc # setup cross-compiler
+   fi
+   ;;
+
+   FreeBSD)
+   echo "FreeBSD host detected"
+   LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -dl -lpthread'
+   if [ "$simver" = "win32" ]; then
+     crosswincc # setup cross-compiler
+   fi
+   ;;
+
+   *)
+   echo "Unsupported system: $uname, fix configure and retry"
+   exit
+   ;;
+ esac
+}
+
 shcc () {
- CC=sh-elf-gcc
- LD=sh-elf-ld
- AR=sh-elf-ar
- AS=sh-elf-as
- OC=sh-elf-objcopy
+ prefixtools sh-elf-
  GCCOPTS="$CCOPTS -m1"
  GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
 }
 
 calmrisccc () {
- CC=calmrisc16-unknown-elf-gcc
- LD=calmrisc16-unknown-elf-ld
- AR=calmrisc16-unknown-elf-ar
- AS=calmrisc16-unknown-elf-as
- OC=calmrisc16-unknown-elf-objcopy
+ prefixtools calmrisc16-unknown-elf-
  GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
 coldfirecc () {
- CC=m68k-elf-gcc
- LD=m68k-elf-ld
- AR=m68k-elf-ar
- AS=m68k-elf-as
- OC=m68k-elf-objcopy
+ prefixtools m68k-elf-
  GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
@@ -86,6 +137,13 @@ if [ -z "$simver" ]; then
   case $option in
    [Ww])
      simver="win32"
+
+     WINDRES=windres
+     DLLTOOL=dlltool
+     DLLWRAP=dllwrap
+
+     # make sure the code knows this is for win32
+     extradefines="$extradefines -DWIN32"
      ;;
    *)
      simver="x11"
@@ -93,77 +151,6 @@ if [ -z "$simver" ]; then
    esac
    echo "Selected $simver simulator"
 fi
-}
-
-
-simul () {
-
-sed > Makefile \
- -e "s,@ROOTDIR@,${rootdir},g" \
- -e "s,@ARCHOS@,${archos},g" \
- -e "s,@DEBUG@,${debug},g" \
- -e "s,@KEYPAD@,${keypad},g" \
- -e "s,@PWD@,${pwd},g" \
- -e "s,@LANGUAGE@,${language},g" \
- -e "s,@TARGET@,${target},g" \
- -e "s,@PLUGINS@,${plugins},g" \
- -e "s,@CODECS@,${codecs},g" \
- -e "s,@SIMVER@,${simver},g" \
- -e "s,@MEMORY@,${memory},g" \
-<<EOF 
-## Automaticly generated. http://rockbox.haxx.se
-
-export ARCHOS=@ARCHOS@
-export ROOTDIR=@ROOTDIR@
-export FIRMDIR=\$(ROOTDIR)/firmware
-export APPSDIR=\$(ROOTDIR)/apps
-export TOOLSDIR=\$(ROOTDIR)/tools
-export DOCSDIR=\$(ROOTDIR)/docs
-export APPSDIR=@ROOTDIR@/apps
-export SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
-export DEBUG=@DEBUG@
-export KEYPAD=@KEYPAD@
-export OBJDIR=@PWD@
-export SIMVER=@SIMVER@
-export TARGET=@TARGET@
-export LANGUAGE=@LANGUAGE@
-export VERSION=\$(shell date +%y%m%d-%H%M)
-export ENABLEDPLUGINS=@PLUGINS@
-export SOFTWARECODECS=@CODECS@
-export MEMORYSIZE=@MEMORY@
-
-.PHONY: 
-
-all: sim
-
-sim:
-	\$(MAKE) -C \$(SIMDIR)
-
-clean:
-	\$(MAKE) -C \$(SIMDIR) clean
-	rm -rf rockbox.zip
-
-tags:
-	@rm -f TAGS
-	make -C \$(SIMDIR) tags
-
-zip:
-	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" sim\$(TARGET)
-
-install:
-	@echo "installing a full setup in your archos dir"
-	@(make zip && cd archos && unzip -oq ../rockbox.zip)
-EOF
-
-  echo "Created Makefile"
-
-  if [ -d "archos" ]; then
-    echo "sub directory archos already present"
-  else
-    mkdir archos
-    echo "created an archos subdirectory for simulating the hard disk"
-  fi
-
 }
 
 picklang() {
@@ -238,7 +225,7 @@ if [ "$target" = "update" ]; then
 else
 
 echo "This script will setup your Rockbox build environment."
-echo "Further docs here: http://rockbox.haxx.se/docs/"
+echo "Further docs here: http://www.rockbox.org/"
 echo ""
 
 fi
@@ -471,6 +458,7 @@ if [ -z "$debug" ]; then
     [Ss])
       debug="1"
       simulator="yes"
+      extradefines="-DSIMULATOR"
       echo "Simulator build selected"
       whichsim
       ;;
@@ -504,10 +492,43 @@ if [ -z "$language" ]; then
     echo "Language set to $language"
 fi
 
+uname=`uname`
+
 if [ "yes" = "$simulator" ]; then
-    # we have already dealt with the simulator Makefile separately
-    simul
-    exit
+  # setup compiler and things for simulator
+  simcc
+
+  if [ -d "archos" ]; then
+    echo "sub directory archos already present"
+  else
+    mkdir archos
+    echo "created an archos subdirectory for simulating the hard disk"
+  fi
+fi
+
+# Now, figure out version number of the (gcc) compiler we are about to use
+gccver=`$CC -dumpversion`;
+
+if [ -z "$gccver" ]; then
+  echo "WARNING: The compiler you must use ($CC) is not in your path!"
+  echo "WARNING: this may cause your build to fail since we cannot do the"
+  echo "WARNING: checks we want now."
+else
+
+  # gccver should now be "3.3.5", "3.4.3", "2.95.3-6" and similar, but don't
+  # DEPEND on it
+
+ num1=`echo $gccver | cut -d . -f1`
+ num2=`echo $gccver | cut -d . -f2`
+ gccnum=`(expr $num1 "*" 100 + $num2) 2>/dev/null`
+
+ # This makes:
+ # 3.3.X  => 303
+ # 3.4.X  => 304
+ # 2.95.3 => 295
+
+ echo "Using $CC $gccver ($gccnum)"
+
 fi
 
 sed > Makefile \
@@ -523,6 +544,10 @@ sed > Makefile \
  -e "s,@AR@,${AR},g" \
  -e "s,@AS@,${AS},g" \
  -e "s,@OC@,${OC},g" \
+ -e "s,@WINDRES@,${WINDRES},g" \
+ -e "s,@DLLTOOL@,${DLLTOOL},g" \
+ -e "s,@DLLWRAP@,${DLLWRAP},g" \
+ -e "s,@RANLIB@,${RANLIB},g" \
  -e "s,@TOOL@,${tool},g" \
  -e "s,@OUTPUT@,${output},g" \
  -e "s,@APPEXTRA@,${appextra},g" \
@@ -531,11 +556,15 @@ sed > Makefile \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@CODECS@,${codecs},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
+ -e "s,@LDOPTS@,${LDOPTS},g" \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
+ -e "s,@SIMVER@,${simver},g" \
+ -e "s,@GCCVER@,${gccver},g" \
+ -e "s,@GCCNUM@,${gccnum},g" \
 <<EOF 
-## Automaticly generated. http://rockbox.haxx.se
+## Automaticly generated. http://www.rockbox.org/
 
 export ROOTDIR=@ROOTDIR@
 export FIRMDIR=\$(ROOTDIR)/firmware
@@ -562,8 +591,17 @@ export LD=@LD@
 export AR=@AR@
 export AS=@AS@
 export OC=@OC@
+export WINDRES=@WINDRES@
+export DLLTOOL=@DLLTOOL@
+export DLLWRAP=@DLLWRAP@
+export RANLIB=@RANLIB@
 export GCCOPTS=@GCCOPTS@
 export LOADADDRESS=@LOADADDRESS@
+export SIMVER=@SIMVER@
+export SIMDIR=\$(ROOTDIR)/uisimulator/\$(SIMVER)
+export LDOPTS=@LDOPTS@
+export GCCVER=@GCCVER@
+export GCCNUM=@GCCNUM@
 
 .PHONY: all clean tags zip
 
@@ -583,8 +621,19 @@ tags:
 	\$(MAKE) -C \$(APPSDIR)/plugins tags
 	\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
-zip:
-	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET)
+zip: all
+	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 EOF
+
+if [ "yes" = "$simulator" ]; then
+
+ cat >> Makefile <<EOF
+
+install:
+	@echo "installing a full setup in your archos dir"
+	@(make zip && cd archos && unzip -oq ../rockbox.zip)
+EOF
+
+fi
 
 echo "Created Makefile"
