@@ -305,13 +305,13 @@ int menu_show(int m)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F2:
                 if (f2_screen())
-                    return true;
+                    return MENU_ATTACHED_USB;
                 menu_draw(m);
                 break;
 
             case BUTTON_F3:
                 if (f3_screen())
-                    return true;
+                    return MENU_ATTACHED_USB;
                 menu_draw(m);
                 break;
 #endif
