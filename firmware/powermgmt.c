@@ -79,10 +79,8 @@ static int percent_to_volt_decharge[11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
 #ifdef HAVE_LIION
-    /* values guessed, see
-       http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
-       measures voltages over a decharging cycle */
-    260, 280, 300, 320, 340, 350, 360, 370, 380, 390, 400
+    /* measured values */
+    260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
