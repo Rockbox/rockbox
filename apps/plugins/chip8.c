@@ -23,6 +23,27 @@
 #ifdef HAVE_LCD_BITMAP 
 #ifndef SIMULATOR /* not unless lcd_blit() is implemented and mp3_xx stubbed */
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD /* only 9 out of 16 chip8 buttons */
+#define CHIP8_KEY1 BUTTON_F1
+#define CHIP8_KEY2 BUTTON_UP
+#define CHIP8_KEY3 BUTTON_F3
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_PLAY
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY7 BUTTON_F2
+#define CHIP8_KEY8 BUTTON_DOWN
+#define CHIP8_KEY9 BUTTON_ON
+
+#elif CONFIG_KEYPAD == ONDIO_PAD /* even more limited */
+#define CHIP8_KEY2 BUTTON_UP
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_MENU
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY8 BUTTON_DOWN
+
+#endif
+
 static struct plugin_api* rb; /* here is a global api struct pointer */
 unsigned char lcd_framebuf[8][64]; /* frame buffer in hardware fomat */
 
@@ -407,33 +428,43 @@ static void chip8_update_display(void)
 
 static void chip8_keyboard(void)
 {
-  switch (rb->button_get(false))
+  int button = rb->button_get(false);
+  switch (button)
   {
     case BUTTON_OFF:                                      /* Abort Emulator */
-        chip8_running = false;
+        chip8_running = 0;
       break;
 
-    case BUTTON_UP:                 chip8_keys[2] = 1; break;
-    case BUTTON_UP | BUTTON_REL:    chip8_keys[2] = 0; break;
-    case BUTTON_LEFT:               chip8_keys[4] = 1; break;
-    case BUTTON_LEFT | BUTTON_REL:  chip8_keys[4] = 0; break;
-    case BUTTON_RIGHT:              chip8_keys[6] = 1; break;
-    case BUTTON_RIGHT | BUTTON_REL: chip8_keys[6] = 0; break;
-    case BUTTON_DOWN:               chip8_keys[8] = 1; break;
-    case BUTTON_DOWN | BUTTON_REL:  chip8_keys[8] = 0; break;
-    case BUTTON_PLAY:               chip8_keys[5] = 1; break;
-    case BUTTON_PLAY | BUTTON_REL:  chip8_keys[5] = 0; break;
-    case BUTTON_F1:                 chip8_keys[1] = 1; break;
-    case BUTTON_F1 | BUTTON_REL:    chip8_keys[1] = 0; break;
-    case BUTTON_F2:                 chip8_keys[7] = 1; break;
-    case BUTTON_F2 | BUTTON_REL:    chip8_keys[7] = 0; break;
-    case BUTTON_F3:                 chip8_keys[3] = 1; break;
-    case BUTTON_F3 | BUTTON_REL:    chip8_keys[3] = 0; break;
-    case BUTTON_ON:                 chip8_keys[9] = 1; break;
-    case BUTTON_ON | BUTTON_REL:    chip8_keys[9] = 0; break;
+    case CHIP8_KEY2:                chip8_keys[2] = 1; break;
+    case CHIP8_KEY2 | BUTTON_REL:   chip8_keys[2] = 0; break;
+    case CHIP8_KEY4:                chip8_keys[4] = 1; break;
+    case CHIP8_KEY4 | BUTTON_REL:   chip8_keys[4] = 0; break;
+    case CHIP8_KEY6:                chip8_keys[6] = 1; break;
+    case CHIP8_KEY6 | BUTTON_REL:   chip8_keys[6] = 0; break;
+    case CHIP8_KEY8:                chip8_keys[8] = 1; break;
+    case CHIP8_KEY8 | BUTTON_REL:   chip8_keys[8] = 0; break;
+    case CHIP8_KEY5:                chip8_keys[5] = 1; break;
+    case CHIP8_KEY5 | BUTTON_REL:   chip8_keys[5] = 0; break;
+#ifdef CHIP8_KEY1
+    case CHIP8_KEY1:                chip8_keys[1] = 1; break;
+    case CHIP8_KEY1 | BUTTON_REL:   chip8_keys[1] = 0; break;
+#endif
+#ifdef CHIP8_KEY3
+    case CHIP8_KEY3:                chip8_keys[3] = 1; break;
+    case CHIP8_KEY3 | BUTTON_REL:   chip8_keys[3] = 0; break;
+#endif
+#ifdef CHIP8_KEY7
+    case CHIP8_KEY7:                chip8_keys[7] = 1; break;
+    case CHIP8_KEY7 | BUTTON_REL:   chip8_keys[7] = 0; break;
+#endif
+#ifdef CHIP8_KEY9
+    case CHIP8_KEY9:                chip8_keys[9] = 1; break;
+    case CHIP8_KEY9 | BUTTON_REL:   chip8_keys[9] = 0; break;
+#endif
 
-    case SYS_USB_CONNECTED:
-      chip8_running = false;
+    default:
+      if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+        chip8_running = 2; /* indicates stopped because of USB */
       break;
   }
 }
@@ -556,7 +587,7 @@ bool chip8_run(char* file)
     }
 
     chip8_reset();
-    while (chip8_running) chip8_execute();
+    while (chip8_running == 1) chip8_execute();
 
     if (!is_playing)
     {   /* stop it if we used audio */
@@ -592,7 +623,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* now go ahead and have fun! */
-    return chip8_run(filename) ? PLUGIN_OK : PLUGIN_ERROR;
+    if (chip8_run(filename))
+        if (chip8_running == 0)
+            return PLUGIN_OK;
+        else
+            return PLUGIN_USB_CONNECTED;
+    else
+        return PLUGIN_ERROR;
 }
 
 #endif /* #ifndef SIMULATOR */

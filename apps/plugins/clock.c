@@ -1276,11 +1276,27 @@ bool show_credits(void)
     return false;
 }
 
+/**********************************************************************
+ * Cleanup on plugin return
+ **********************************************************************/
+ 
+void cleanup(void *parameter)
+{
+    (void)parameter;  /* unused */
+
+    if(settings.save_mode == 1)
+        save_settings(true);
+
+    /* restore set backlight timeout */
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+}
+
 /******************
  * F1 Screen - HELP
  *****************/
 bool f1_screen(void)
 {
+    int button;
     int screen = 1;
     done = false;
 
@@ -1401,7 +1417,8 @@ bool f1_screen(void)
 
         rb->lcd_update();
 
-        switch(rb->button_get_w_tmo(HZ/4))
+        button = rb->button_get_w_tmo(HZ/4);
+        switch(button)
         {
             case BUTTON_F1: /* exit */
             case BUTTON_OFF:
@@ -1418,9 +1435,10 @@ bool f1_screen(void)
                     screen++;
                 break;
 
-            case SYS_USB_CONNECTED: /* leave for usb */
-                return PLUGIN_USB_CONNECTED;
-                rb->usb_screen();
+            default:
+                if(rb->default_event_handler_ex(button, cleanup, NULL) 
+                   == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
         }
     }
@@ -2546,6 +2564,8 @@ void counter_options(void)
  **********************************************************************/
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int button;
+
     /* time ints */
     int i;
     int hour;
@@ -2802,16 +2822,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         /*************************
          * Scan for button presses
          ************************/
-        switch (rb->button_get_w_tmo(HZ/10))
+        button = rb->button_get_w_tmo(HZ/10);
+        switch (button)
         {
             case BUTTON_OFF: /* save and exit */
-                if(settings.save_mode == 1)
-                    save_settings(true);
-
-                /* restore set backlight timeout */
-                rb->backlight_set_timeout(
-                    rb->global_settings->backlight_timeout);
-
+                cleanup(NULL);
                 return PLUGIN_OK;
 
             case BUTTON_ON | BUTTON_REL: /* credit roll */
@@ -2889,9 +2904,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 select_mode();
                 break;
 
-            case SYS_USB_CONNECTED: /* usb plugged? */
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if(rb->default_event_handler_ex(button, cleanup, NULL) 
+                   == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
         }
     }

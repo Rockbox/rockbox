@@ -30,6 +30,17 @@
 #define XSPEED 3
 #define YADD -4
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define BOUNCE_MODE (BUTTON_ON | BUTTON_REL)
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define BOUNCE_MODE (BUTTON_MENU | BUTTON_REL)
+
+#endif
+
 static struct plugin_api* rb;
 
 static unsigned char table[]={
@@ -172,6 +183,7 @@ struct counter values[]={
   {"ydistt", -6},
 };
 
+#ifdef HAVE_RTC
 static unsigned char yminute[]={
 53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
 };
@@ -218,6 +230,7 @@ static void addclock(void)
                       yminute[(i+1)%60]);
     }
 }
+#endif /* HAVE_RTC */
 
 static int scrollit(void)
 {
@@ -236,10 +249,10 @@ static int scrollit(void)
     while(1)
     {
         b = rb->button_get_w_tmo(HZ/10);
-        if ( b == (BUTTON_OFF|BUTTON_REL) )
+        if ( b == BOUNCE_QUIT )
             return 0;
 
-        if ( b == (BUTTON_ON|BUTTON_REL) )
+        if ( b == BOUNCE_MODE )
             return 1;
 
         if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
@@ -256,7 +269,9 @@ static int scrollit(void)
             yy += YADD;
             xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
         }
+#ifdef HAVE_RTC
         addclock();
+#endif
         rb->lcd_update();
 
         x-= XSPEED;
@@ -293,10 +308,10 @@ static int loopit(void)
     while(1)
     {
         b = rb->button_get_w_tmo(HZ/10);
-        if ( b == (BUTTON_OFF|BUTTON_REL) )
+        if ( b == BOUNCE_QUIT )
             return 0;
 
-        if ( b == (BUTTON_ON|BUTTON_REL) )
+        if ( b == BOUNCE_MODE )
             return 1;        
 
         if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
@@ -309,7 +324,9 @@ static int loopit(void)
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
         rb->lcd_clear_display();
+#ifdef HAVE_RTC
         addclock();
+#endif
         if(timeout) {
             switch(b) {
                 case BUTTON_LEFT:
@@ -402,7 +419,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     rb->lcd_setfont(FONT_UI);
     
-    return h = 0 ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
+    return (h == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
 
 #endif

@@ -24,6 +24,30 @@
 /* Loops that the values are displayed */
 #define DISP_TIME 30
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define CUBE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define CUBE_X_INC BUTTON_RIGHT
+#define CUBE_X_DEC BUTTON_LEFT
+#define CUBE_Y_INC BUTTON_UP
+#define CUBE_Y_DEC BUTTON_DOWN
+#define CUBE_Z_INC BUTTON_F2
+#define CUBE_Z_DEC BUTTON_F1
+#define CUBE_HIGHSPEED BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define CUBE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define CUBE_X_INC BUTTON_RIGHT
+#define CUBE_X_DEC BUTTON_LEFT
+#define CUBE_Y_INC BUTTON_UP
+#define CUBE_Y_DEC BUTTON_DOWN
+#define CUBE_Z_INC (BUTTON_MENU | BUTTON_UP)
+#define CUBE_Z_DEC (BUTTON_MENU | BUTTON_DOWN)
+#define CUBE_HIGHSPEED_PRE BUTTON_MENU
+#define CUBE_HIGHSPEED (BUTTON_MENU | BUTTON_REL)
+
+#endif
+
 struct point_3D {
     long x, y, z;
 };
@@ -230,6 +254,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int t_disp=0;
     char buffer[30];
 
+    int button;
+    int lastbutton=0;
     int xa=0;
     int ya=0;
     int za=0;
@@ -282,56 +308,64 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (za<0)
             za+=360;
 
-        switch(rb->button_get(false)) 
+        button = rb->button_get(false);
+        switch(button)
         {
-            case BUTTON_RIGHT:
+            case CUBE_X_INC:
                 xs+=1;
                 if (xs>10)
                     xs=10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_LEFT:
+            case CUBE_X_DEC:
                 xs-=1;
                 if (xs<-10)
                     xs=-10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_UP:
+            case CUBE_Y_INC:
                 ys+=1;
                 if (ys>10)
                     ys=10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_DOWN:
+            case CUBE_Y_DEC:
                 ys-=1;
                 if (ys<-10)
                     ys=-10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_F2:
+            case CUBE_Z_INC:
                 zs+=1;
                 if (zs>10)
                     zs=10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_F1:
+            case CUBE_Z_DEC:
                 zs-=1;
                 if (zs<-10)
                     zs=-10;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_PLAY:
+            case CUBE_HIGHSPEED:
+#ifdef CUBE_HIGHSPEED_PRE
+                if (lastbutton!=CUBE_HIGHSPEED_PRE)
+                    break;
+#endif
                 highspeed=!highspeed;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_OFF|BUTTON_REL:
+            case CUBE_QUIT:
                 exit=1;
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
+        if (button!=BUTTON_NONE)
+            lastbutton=button;
     }
 
     return PLUGIN_OK;

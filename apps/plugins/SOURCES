@@ -1,4 +1,4 @@
-/* plugins common to both Player+Recorder model */
+/* plugins common to all models */
 battery_test.c
 favorites.c
 firmware_flash.c
@@ -11,20 +11,24 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
-#ifdef HAVE_LCD_BITMAP /* recorder model only */
+#ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
+bounce.c
+calculator.c
+chip8.c
+cube.c
 grayscale.c
 jpeg.c
 rockblox.c
 snow.c
-video.c                
+video.c
+
+#ifdef HAVE_RTC /* Recorder models only */
+calendar.c
+clock.c
+#endif
+
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */
-bounce.c
-calculator.c
-calendar.c
-chip8.c
-clock.c
-cube.c
 flipit.c
 mandelbrot.c
 minesweeper.c

@@ -592,6 +592,7 @@ static bool any_events(struct shown *shown, bool force)
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     been_in_usb_mode = true;
                 show_lines(lines_displayed,shown);
+                rb->lcd_update();
                 break;
         }
     }
@@ -707,8 +708,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case BUTTON_PLAY:
-                if (any_events(&shown, true))
-                    rb->usb_screen();
+                any_events(&shown, true);
                 draw_calendar(&shown);
                 break;
 

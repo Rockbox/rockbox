@@ -104,6 +104,22 @@ F3: equal to "="
 #define SIGN(x) ((x)<0?-1:1)
 #define ABS(x) ((x)<0?-(x):(x))
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define CALCULATOR_QUIT BUTTON_OFF
+#define CALCULATOR_INPUT BUTTON_PLAY
+#define CALCULATOR_CALC BUTTON_F3
+#define CALCULATOR_OPERATORS BUTTON_F2
+#define CALCULATOR_CLEAR BUTTON_F1
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define CALCULATOR_QUIT BUTTON_OFF
+#define CALCULATOR_INPUT_CALC_PRE BUTTON_MENU
+#define CALCULATOR_INPUT (BUTTON_MENU | BUTTON_REL)
+#define CALCULATOR_CALC (BUTTON_MENU | BUTTON_REPEAT)
+
+#endif
+
 static struct plugin_api* rb;
 
 enum {
@@ -187,6 +203,7 @@ int m, n, prev_m, prev_n;   /* position index for button         */
 #define CAL_BUTTON (m*5+n)
 
 int btn = BUTTON_NONE;
+int lastbtn = BUTTON_NONE;
 
 /* Status of calculator */
 enum {cal_normal,  /* 0, normal status, display result */
@@ -1090,7 +1107,7 @@ Handle buttons on basic screen
 ----------------------------------------------------------------------- */
 void basicButtonsProcess(void){
     switch (btn) {
-        case BUTTON_PLAY:
+        case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != btn_C) ) break;
             flashButton(CAL_BUTTON);
             switch( CAL_BUTTON ){
@@ -1143,7 +1160,9 @@ void basicButtonsProcess(void){
                 case btn_add:
                     if(!operInputted) {twoOperands(); operInputted = true;}
                     oper = buttonChar[basicButtons][m][n][0];
-                    case_BUTTON_F2:  /* F2 shortkey entrance */
+#ifdef CALCULATOR_OPERATORS
+                    case_cycle_operators:  /* F2 shortkey entrance */
+#endif
                     calStatus = cal_normal;
                     formatResult();
                     operand = result;
@@ -1159,7 +1178,8 @@ void basicButtonsProcess(void){
             } /* switch (CAL_BUTTON) */
             break;
 
-        case BUTTON_F2:
+#ifdef CALCULATOR_OPERATORS
+        case CALCULATOR_OPERATORS:
             if (calStatus == cal_error) break;
             if (!operInputted) {twoOperands(); operInputted = true;}
             switch (oper){
@@ -1169,9 +1189,11 @@ void basicButtonsProcess(void){
                 case '-':  oper = '*';  flashButton(btn_time);   break;
                 case '*':  oper = '/';  flashButton(btn_div);    break;
             }
-            goto case_BUTTON_F2;
+            goto case_cycle_operators;
             break;
-        case BUTTON_F3:
+#endif
+
+        case CALCULATOR_CALC:
             if (calStatus == cal_error) break;
             flashButton(btn_equal);
             goto case_btn_equal;
@@ -1186,7 +1208,7 @@ Handle buttons on scientific screen
 ----------------------------------------------------------------------- */
 void sciButtonsProcess(void){
     switch (btn) {
-        case BUTTON_PLAY:
+        case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != sci_sci) ) break;
             flashButton(CAL_BUTTON);
             switch( CAL_BUTTON ){
@@ -1225,7 +1247,8 @@ void sciButtonsProcess(void){
             } /* switch (CAL_BUTTON) */
             break;
 
-        case BUTTON_F2:
+#ifdef CALCULATOR_OPERATORS
+        case CALCULATOR_OPERATORS:
             if (calStatus == cal_error) break;
             if (!operInputted) {twoOperands(); operInputted = true;}
             switch (oper){
@@ -1240,7 +1263,9 @@ void sciButtonsProcess(void){
             operand = result;
             operandPower = power;
             break;
-        case BUTTON_F3:
+#endif
+
+        case CALCULATOR_CALC:
             if (calStatus == cal_error) break;
             formatResult();
             calStatus = cal_normal;
@@ -1268,9 +1293,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     while (calStatus != cal_exit ) {
         btn = rb->button_get_w_tmo(HZ/2);
         switch (btn) {
-            case BUTTON_PLAY:
-            case BUTTON_F2:
-            case BUTTON_F3:
+            case CALCULATOR_INPUT:
+            case CALCULATOR_CALC:
+#ifdef CALCULATOR_INPUT_CALC_PRE
+                if (lastbtn != CALCULATOR_INPUT_CALC_PRE)
+                    break;
+                /* no unconditional break; here! */
+#endif
+#ifdef CALCULATOR_OPERATORS
+            case CALCULATOR_OPERATORS:
+#endif
                 switch(buttonGroup){
                     case basicButtons:
                         basicButtonsProcess();
@@ -1281,18 +1313,20 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
                 break;
 
-        case BUTTON_F1:
-            switch(calStatus){
-                case cal_typing:
-                case cal_dotted:
-                    doDelete();
-                    break;
-                default: /* cal_normal, cal_error, cal_exit */
-                    clearMem();
-                    break;
-            }
-            printResult();
-            break;
+#ifdef CALCULATOR_CLEAR
+            case CALCULATOR_CLEAR:
+                switch(calStatus){
+                    case cal_typing:
+                    case cal_dotted:
+                        doDelete();
+                        break;
+                    default: /* cal_normal, cal_error, cal_exit */
+                        clearMem();
+                        break;
+                }
+                printResult();
+                break;
+#endif
 
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
@@ -1304,7 +1338,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case BUTTON_DOWN | BUTTON_REPEAT:
                 moveButton();
                 break;
-            case BUTTON_OFF:
+            case CALCULATOR_QUIT:
                 calStatus = cal_exit;
                 printResult();
                 break;
@@ -1313,6 +1347,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }  /* switch (btn) */
+        if (btn != BUTTON_NONE)
+            lastbtn = btn;
     } /* while (calStatus != cal_exit ) */
 
     /*  rb->splash(HZ*2, true, "Hello world!"); */
