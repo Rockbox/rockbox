@@ -478,6 +478,9 @@ tags-apps:
 tags:
 	@rm -f TAGS
 	\$(MAKE) tags-firmware tags-apps
+
+zip:
+	\$(TOOLSDIR)/buildzip.pl \$(TARGET)
 EOF
 
 echo "Created Makefile"
