@@ -24,22 +24,31 @@ int main (int argc, char** argv)
 {
     unsigned long length,i,slen;
     unsigned char *inbuf,*outbuf;
+    unsigned char *iname = argv[1];
+    unsigned char *oname = argv[2];
+    int headerlen = 6;
     FILE* file;
 
     if (argc < 3) {
-       printf("usage: %s <input file> <output file>\n",argv[0]);
+       printf("usage: %s [-fm] <input file> <output file>\n",argv[0]);
        return -1;
+    }
+
+    if (argv[1][0] == '-') { /* assume any parameter is -fm :-) */
+        headerlen = 24;
+        iname = argv[2];
+        oname = argv[3];
     }
     
     /* open file and check size */
-    file = fopen(argv[1],"rb");
+    file = fopen(iname,"rb");
     if (!file) {
-       perror(argv[1]);
+       perror(oname);
        return -1;
     }
     fseek(file,0,SEEK_END);
-    length = ftell(file) - 6; /* skip 6-byte header */
-    fseek(file,6,SEEK_SET); 
+    length = ftell(file) - headerlen; /* skip header */
+    fseek(file,headerlen,SEEK_SET); 
     inbuf = malloc(length);
     outbuf = malloc(length);
     if ( !inbuf || !outbuf ) {
@@ -50,7 +59,7 @@ int main (int argc, char** argv)
     /* read file */
     i=fread(inbuf,1,length,file);
     if ( !i ) {
-       perror(argv[1]);
+       perror(iname);
        return -1;
     }
     fclose(file);
@@ -65,7 +74,7 @@ int main (int argc, char** argv)
     }
     
     /* write file */
-    file = fopen(argv[2],"wb");
+    file = fopen(oname,"wb");
     if ( !file ) {
        perror(argv[2]);
        return -1;
