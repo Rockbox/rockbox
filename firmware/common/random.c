@@ -56,11 +56,11 @@
 #define mixBits(u, v) (hiBit(u)|loBits(v)) /* move highest bit of u to
                                               highest bit of v */
 
-static unsigned int state[N+1]; /* state vector + 1 to not violate ANSI C */
-static unsigned int *next;     /* next random value is computed from here */
+static unsigned long state[N+1]; /* state vector + 1 to not violate ANSI C */
+static unsigned long *next;     /* next random value is computed from here */
 static int left = -1;     /* can *next++ this many times before reloading */
 
-void srand(unsigned int seed)
+void srand(unsigned long seed)
 {
     /*
      * We initialize state[0..(N-1)] via the generator
@@ -108,16 +108,16 @@ void srand(unsigned int seed)
      * so-- that's why the only change I made is to restrict to odd seeds.
      */
 
-    unsigned int x = (seed | 1U) & 0xFFFFFFFFU, *s = state;
+    unsigned long x = (seed | 1U) & 0xFFFFFFFFU, *s = state;
     int j;
 
     for(left=0, *s++=x, j=N; --j;
         *s++ = (x*=69069U) & 0xFFFFFFFFU);
 }
 
-static int rand_reload(void)
+static long rand_reload(void)
 {
-    unsigned int *p0=state, *p2=state+2, *pM=state+M, s0, s1;
+    unsigned long *p0=state, *p2=state+2, *pM=state+M, s0, s1;
     int j;
   
     if(left < -1)
@@ -135,12 +135,12 @@ static int rand_reload(void)
     s1 ^= (s1 >> 11);
     s1 ^= (s1 <<  7) & 0x9D2C5680U;
     s1 ^= (s1 << 15) & 0xEFC60000U;
-    return (int)s1 ^ (s1 >> 18);
+    return (long)s1 ^ (s1 >> 18);
 }
 
-int rand(void)
+long rand(void)
 {
-    unsigned int y;
+    unsigned long y;
   
     if(--left < 0) {
         y = rand_reload();
