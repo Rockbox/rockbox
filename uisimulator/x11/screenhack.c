@@ -108,7 +108,7 @@
   "., INS     MODE\n" \
   "/, (1)     RECORD\n"
 
-#elif CONFIG_KEYPAD == GMINI_PAD
+#elif CONFIG_KEYPAD == GMINI100_PAD
 #define KEYBOARD_SPECIFIC \
   "8, Up      UP\n" \
   "2, Down    DOWN\n" \
