@@ -41,7 +41,7 @@ SRC := $(wildcard *.c)
 ifeq ($(TARGET),-DARCHOS_RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
-   OUTNAME = archos.ajz
+   OUTNAME = ajbrec.ajz
 else
    OUTNAME = archos.mod
 endif
