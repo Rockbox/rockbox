@@ -41,11 +41,14 @@ SRC := $(wildcard *.c)
 ifeq ($(TARGET),-DARCHOS_RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
+   OUTNAME = archos.ajz
+else
+   OUTNAME = archos.mod
 endif
 
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
-all : $(OBJDIR)/archos.mod # archos.asm 
+all : $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
@@ -59,8 +62,8 @@ $(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
 $(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
 	../tools/sh2d -sh1 $(OBJDIR)/archos.bin > $(OBJDIR)/archos.asm
 
-$(OBJDIR)/archos.mod : $(OBJDIR)/archos.bin
-	../tools/scramble $(OBJDIR)/archos.bin $(OBJDIR)/archos.mod
+$(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
+	../tools/scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
@@ -70,7 +73,7 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f $(OBJS) $(OBJDIR)/archos.mod $(OBJDIR)/archos.asm \
+	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
 	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
