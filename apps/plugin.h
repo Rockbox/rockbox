@@ -325,6 +325,7 @@ struct plugin_api {
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
     void (*pcm_set_volume)(int volume);
+    void (*pcm_play_pause)(bool play);
 #endif
 };
 
