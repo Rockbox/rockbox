@@ -86,9 +86,9 @@ Most of the developing effort went into this tooling. So people skilled to do
 these mods don't need to worry. The others may feel unpleasant using the first
 tool for reflashing the firmware.
 <p>
-To comfort you a bit again: The flash tools are stable since a while. I use
-them a lot and quite careless meanwhile, even reflashed while playing. However,
-I don't generally recommend that.  ;-)
+To comfort you a bit again: The flash tools are stable since quite a while. 
+I use them a lot and quite careless meanwhile, even reflashed while playing. 
+However, I don't generally recommend that.  ;-)
 <p>
 About the safety of operation: Since we have dual boot, you're not giving up
 the Archos firmware. It's still there when you hold F1 during startup. So even
@@ -103,9 +103,9 @@ one hundred thousand), so you don't need to worry about that wearing out.
 You need three things:
 <ul>
 <li> The first is a Recorder or FM model. Be sure you're using the correct
-package, Recorder and FM are different! In principle, the technology works for
-the Player models, too. It's just that no work has been spent on this
-(developers welcome).
+package, Recorder and FM are different! The technology works for
+the Player models, too. Players can also be flashed, but Rockbox does not
+run cold-started on those, yet.
 
 <li> Second, you need an in-circuit programmable flash. Chances are about 85%
 that you have, but Archos also used an older flash chip which can't do the
@@ -114,19 +114,15 @@ flash info gives you question marks, you're out of luck. The only chance then
 is to solder in the right chip (SST39VF020), at best with the firmware already
 in. If the chip is blank, you'll need the UART boot mod as well.
 
-<li> Third, your boot ROM (within the CPU) has to contain the right stuff.
-The vast majority of the Player/Recorder/FM all have the same boot ROM content, 
-differenciation comes later by flash content. So far very few people had a 
-different, presumable later boot ROM. It uses a different flash layout.
-The Hardware Info screen tells the boot ROM version in the ROM CRC line.
-You need a value marked with "V1".
-For V2 boxes the tools will refuse to work for the time being. 
-Flashing these is not impossible, but the firmware authoring has to be 
-different. It takes a developer with the serial mod to go ahead with it.
 </ul>
 
 <h2>5. How do I flash the firmware?</h2>
 <p>
+Short explaination: copy the firmware_*.bin files for your model from my distribution 
+to the root directory of your box, then run the "firmware_flash.rock" plugin.
+Long version:
+<p>
+
 I'm using the new plugin feature to run the flasher code. There's not really a
 wrong path to take, however here's a suggested step by step procedure:
 <ul>
@@ -139,16 +135,16 @@ wrong path to take, however here's a suggested step by step procedure:
   <li> "ajbrec.ajz" into the root directory (the version of Rockbox we're going to use and have in the
 firmware file)<br>
   <li> firmware_rec.bin or firmware_fm.bin into the root directory (the complete firmware for your model,
-with my bootloader and the two images)
+with my bootloader and the two images). There now is also a _norom variant, copy both, 
+the plugin will decide which one is required for your box.
   <li> the .rockbox subdirectory with all the plugins for Rockbox<br>
  </ol>
 <li> Restart the box so that the new ajbrec.ajz gets started.
 
 <li> Enter the debug menu and select the hardware info screen. Check you flash
-IDs and ROM CRC (bottom two lines), and please make a note about your hardware 
+IDs (bottom line), and please make a note about your hardware 
 mask value (second line). The latter is just for my curiosity, not needed for the
-flow. If the flash info shows question marks or you have ROM V2, you can stop 
-here, sorry.
+flow. If the flash info shows question marks, you can stop here, sorry.
 
 <li> Backup the current firmware, using the first option of the debug menu
 (Dump ROM contents). This creates 2 files in the root directory, which you may
@@ -197,15 +193,15 @@ box this time. Keep the Rockbox copy and the plugins of this package for that
 job, because that's the one it was tested with.
 
 <h2>6. How do I bring in a current / my personal build of Rockbox?</h2>
-<p> Short explaination: very easy, just play "rockbox.ucl" from the download 
-or build. Long version:
+<p> Short explaination: very easy, just play a .ucl file like "rockbox.ucl" 
+from the download or build. Long version:
 
 <p>
 The second image is the working copy, the "rockbox_flash.rock" plugin from this
 package reprograms it. The plugins needs to be consistant with the Rockbox
 plugin API version, otherwise it will detect mismatch and won't run.
 
-<p> It currently requires an exotic input, a UCL-compressed image, because
+<p> It requires an exotic input, a UCL-compressed image, because
 that's my internal format. UCL is a nice open-source compression library I
 found and use. The decompression is very fast and less than a page of
 C-code. The efficiency is even better than Zip with maximum compression, cooks
@@ -271,17 +267,6 @@ for the latest Recorder and FM firmware.
 
 <h2>7. Known issues, limitations</h2>
 <p>
-The latest ATA init fixes seemed to have solved early adopter's problems.
-However, the wait for the harddisk is longer, you're unlikely to reach the 3
-seconds boot time. I hope it will improve one day again.
-
-<p>
-Loading the original Archos firmware via rolo may hang, if Rockbox is started
-from flash. This is some initialization problem which I hope to fix, rolo-ing
-Rockbox versions works OK. If you feel homesick, move away ajbrec.ajz and hold 
-F1 during powerup.
-
-<p>
 Latest Rockbox now has a charging screen, but it is in an early stage. You'll 
 get it when the unit is off and you plug in the charger. The Rockbox charging
 algorithm is first measuring the battery voltage for about 40 seconds, after
@@ -291,13 +276,21 @@ while plugging in. Some FM users reported charging problems even with F1,
 they had to revert to the original flash content.
 
 <p>
-The plugin API is currently changed often, new builds may render the plugins 
+If the plugin API is changed, new builds may render the plugins 
 incompatible. When updating, make sure you grab those too, and rolo into
 the new version before flashing it.
 
 <p>
-Two people have an issue with recording, it freezes after a few minutes or so 
-(statistically). They use F1 to record with Archos software as a workaround.
+There are two variants of how the boxes starts, therefore the normal and the _norom
+firmware files. The vast majority of the Player/Recorder/FM all have the same boot 
+ROM content, differenciation comes later by flash content. Rockbox identifies this
+boot ROM with a CRC value of 0x222F in the hardware info screen. Some recorders 
+have the boot ROM disabled (it might be unprogrammed) and start directly from a
+flash mirror at address zero. They need the new _norom firmware, it has a slightly
+different bootloader. Without a boot ROM there is no UART boot safety net. To 
+compensate for that as much as possible I have included my MiniMon monitor, 
+it starts with F3+On. Using that the box can be reprogrammed via serial if the 
+first ~2000 bytes of the flash are OK.
 
 <h2>8. Movies and images</h2>
 <p>
