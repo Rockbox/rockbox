@@ -511,21 +511,8 @@ bool ask_resume(void)
 #endif
     lcd_update();
 
-#ifdef SIMULATOR
-    {
-        /* Special code for SIMULATOR because it might return the 
-           "enter"-keyrelease of the shell when starting the simulator. */
-        unsigned short key;
-        do  {
-            key=button_get(true);
-            if (key == BUTTON_PLAY)
-                return true;
-        } while (key & BUTTON_REL);
-    }
-#else
     if (button_get(true) == BUTTON_PLAY)
         return true;
-#endif
     return false;
 }
 

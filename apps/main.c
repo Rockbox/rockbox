@@ -77,6 +77,8 @@ void init(void)
                global_settings.loudness,
                global_settings.bass_boost,
                global_settings.avc );
+    while (button_get(false) != 0)
+      ; /* Empty the keyboard buffer */
 }
 
 #else
