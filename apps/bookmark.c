@@ -343,6 +343,7 @@ static bool add_bookmark(char* bookmark_file_name, char* bookmark)
     int    bookmark_count = 0;
     char*  playlist = NULL;
     char*  cp;
+    char*  tmp;
     int    len = 0;
     bool   unique = false;
 
@@ -383,27 +384,15 @@ static bool add_bookmark(char* bookmark_file_name, char* bookmark)
                 break;
             }
                         
-            if (unique)
+            cp  = strchr(global_read_buffer,'/');
+            tmp = strrchr(global_read_buffer,';');
+            if (check_bookmark(global_read_buffer) &&
+               (!unique || len != tmp -cp || strncmp(playlist,cp,len)))
             {
-                cp=strchr(global_read_buffer,'/');
-                if (check_bookmark(global_read_buffer) &&
-                    strncmp(playlist,cp,len))
-                {
-                    bookmark_count++;
-                    write(temp_bookmark_file, global_read_buffer,
-                          strlen(global_read_buffer));
-                    write(temp_bookmark_file, "\n", 1);
-                }
-            }
-            else
-            {
-                if (check_bookmark(global_read_buffer))
-                {
-                    bookmark_count++;
-                    write(temp_bookmark_file, global_read_buffer,
-                          strlen(global_read_buffer));
-                    write(temp_bookmark_file, "\n", 1);
-                }
+                bookmark_count++;
+                write(temp_bookmark_file, global_read_buffer,
+                      strlen(global_read_buffer));
+                write(temp_bookmark_file, "\n", 1);
             }
         }
         close(bookmark_file);
