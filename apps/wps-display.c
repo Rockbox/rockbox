@@ -68,11 +68,7 @@ static bool load_custom_wps(void)
     int fd;
     int l = 0;
     int numread = 1;
-#ifdef SIMULATOR
-    char *cchr;
-#else
     char cchr[0];
-#endif
 
     for (l=0;l<=5;l++)
          custom_wps[l][0] = 0;
