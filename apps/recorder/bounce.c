@@ -28,6 +28,8 @@
 #include "menu.h"
 #include "sprintf.h"
 #include "rtc.h"
+#include "font.h"
+#include "screens.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -36,6 +38,13 @@
 
 #define SS_TITLE       "Bouncer"
 #define SS_TITLE_FONT  2
+
+#define LETTERS_ON_SCREEN 12
+
+#define YSPEED 2
+#define XSPEED 3
+#define YADD -4
+
 
 static unsigned char table[]={
 26,28,30,33,35,37,39,40,42,43,45,46,46,47,47,47,47,47,46,46,45,43,42,40,39,37,35,33,30,28,26,24,21,19,17,14,12,10,8,7,5,4,2,1,1,0,0,0,0,0,1,1,2,4,5,7,8,10,12,14,17,19,21,23,
@@ -225,12 +234,6 @@ static void addclock(void)
     }
 }
 
-#define LETTERS_ON_SCREEN 12
-
-#define YSPEED 2
-#define XSPEED 3
-#define YADD -4
-
 static int scrollit(void)
 {
     int b;
@@ -301,6 +304,12 @@ static int loopit(void)
         b = button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
+        
+        if ( b == SYS_USB_CONNECTED) {
+            usb_screen();
+            return 0;
+        }
+
         if ( b == (BUTTON_ON|BUTTON_REL) )
             return 1;
         else if(b != BUTTON_NONE)
@@ -355,6 +364,8 @@ bool bounce(void)
     char *off = "[Off] to stop";
     int len = strlen(SS_TITLE);
 
+    lcd_setfont(FONT_SYSFIXED);
+
     lcd_getstringsize(SS_TITLE,&w, &h);
 
     /* Get horizontel centering for text */
@@ -363,40 +374,42 @@ bool bounce(void)
         len = ((len+1)/2)+(w/2);
     else
         len /= 2;
-
+    
     if (h%2 != 0)
         h = (h/2)+1;
     else
         h /= 2;
-
+    
     lcd_clear_display();
     lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE);
-
+    
     len = 1;
     lcd_getstringsize(off, &w, &h);
-
+    
     /* Get horizontel centering for text */
     len *= w;
     if (len%2 != 0)
         len = ((len+1)/2)+(w/2);
     else
         len /= 2;
-
+    
     if (h%2 != 0)
         h = (h/2)+1;
     else
         h /= 2;
-
+    
     lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
-
+    
     lcd_update();
     sleep(HZ);
-
+    
     do {
         h= loopit();
         if(h)
-            h= scrollit();
+            h = scrollit();
     } while(h);
+    
+    lcd_setfont(FONT_UI);
     
     return false;
 }

@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "options.h"
+
 #ifdef USE_GAMES
 
 #include <sprintf.h>
@@ -28,6 +29,7 @@
 #include "kernel.h"
 #include "menu.h"
 #include "screens.h"
+#include "font.h"
 
 #include "sokoban_levels.h"
 
@@ -503,6 +505,8 @@ bool sokoban(void)
     int w, h;
     int len;
 
+    lcd_setfont(FONT_SYSFIXED);
+
     lcd_getstringsize(SOKOBAN_TITLE, &w, &h);
 
     /* Get horizontel centering for text */
@@ -535,10 +539,9 @@ bool sokoban(void)
     lcd_clear_display();
     result = sokoban_loop();
 
+    lcd_setfont(FONT_UI);
+
     return result;
 }
 
 #endif
-
-
-

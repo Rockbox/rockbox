@@ -35,6 +35,7 @@
 #include "rtc.h"
 #include "lang.h"
 #include "screens.h"
+#include "font.h"
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
@@ -1891,8 +1892,11 @@ extern bool use_old_rect;
  */
 bool wormlet(void)
 {
-    bool wormDead = false;
+    bool worm_dead = false;
     int button;
+    
+    lcd_setfont(FONT_SYSFIXED);
+
 #ifdef DEBUG_WORMLET
     testline_in_rect();
     test_worm_argh_collision_in_moves();
@@ -1978,6 +1982,7 @@ bool wormlet(void)
 
             case SYS_USB_CONNECTED:
                 usb_screen();
+                lcd_setfont(FONT_UI);
                 return true;
         }
     } while (button != BUTTON_PLAY && 
@@ -1997,11 +2002,11 @@ bool wormlet(void)
         button  = BUTTON_OFF;
 
         /* start the game */
-        wormDead = run();
+        worm_dead = run();
 
         /* if worm isn't dead the game was quit
            via BUTTON_OFF -> no need to wait for buttons. */
-        if (wormDead) {
+        if (worm_dead) {
             do {
                 button = button_get(true);
             }
@@ -2012,8 +2017,20 @@ bool wormlet(void)
     }
     while (button != BUTTON_OFF);
 
+    lcd_setfont(FONT_UI);
+
     return false;
 }
 
 
 #endif /* USE_GAMES */
+
+
+
+
+
+
+
+
+
+

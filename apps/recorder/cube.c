@@ -31,25 +31,33 @@
 #include "button.h"
 #include "sprintf.h"
 #include "screens.h"
+#include "font.h"
 
-typedef struct
-{long x,y,z;} point3D;
+/* Loops that the values are displayed */
+#define DISP_TIME 30
 
-typedef struct
-{long x,y;}   point2D;
+struct point_3D {
+    long x, y, z;
+};
 
-static point3D Sommet[8];
-static point3D Point3D[8];
-static point2D Point2D[8];
+struct point_2D {
+    long x, y;
+};
 
-static int Nb_points = 8;
+static struct point_3D sommet[8];
+static struct point_3D point3D[8];
+static struct point_2D point2D[8];
 
-static int Xoff = 56;
-static int Yoff = 95;
-static int Zoff = 600;
+static long matrice[3][3];
+
+static int nb_points = 8;
+
+static int x_off = 56;
+static int y_off = 95;
+static int z_off = 600;
 
 /* Precalculated sine and cosine * 10000 (four digit fixed point math) */
-static int SinTable[91] = 
+static int sin_table[91] = 
 {
     0, 174, 348, 523, 697,
     871,1045,1218,1391,1564,
@@ -72,76 +80,83 @@ static int SinTable[91] =
     10000
 };
 
-static long Sin(int val)
+static long sin(int val)
 {
     /* Speed improvement through sukzessive lookup */
     if (val<181)
     {
-        if (val<91)/* phase 0-90 degree */
+        if (val<91)
         {
-            return (long)SinTable[val];
+            /* phase 0-90 degree */
+            return (long)sin_table[val];
         }
-        else/* phase 91-180 degree */
+        else
         {
-            return (long)SinTable[180-val];
+            /* phase 91-180 degree */
+            return (long)sin_table[180-val];
         }
     }
     else
     {
-        if (val<271)/* phase 181-270 degree */
+        if (val<271)
         {
-            return (-1L)*(long)SinTable[val-180];
+            /* phase 181-270 degree */
+            return (-1L)*(long)sin_table[val-180];
         }
-        else/* phase 270-359 degree */
+        else
         {
-            return (-1L)*(long)SinTable[360-val];
+            /* phase 270-359 degree */
+            return (-1L)*(long)sin_table[360-val];
         }
     }
     return 0;
 }
 
-static long Cos(int val)
+static long cos(int val)
 {
     /* Speed improvement through sukzessive lookup */
     if (val<181)
     {
-        if (val<91)/* phase 0-90 degree */
+        if (val<91)
         {
-            return (long)SinTable[90-val];
+            /* phase 0-90 degree */
+            return (long)sin_table[90-val];
         }
-        else/* phase 91-180 degree */
+        else
         {
-            return (-1L)*(long)SinTable[val-90];
+            /* phase 91-180 degree */
+            return (-1L)*(long)sin_table[val-90];
         }
     }
     else
     {
-        if (val<271)/* phase 181-270 degree */
+        if (val<271)
         {
-            return (-1L)*(long)SinTable[270-val];
+            /* phase 181-270 degree */
+            return (-1L)*(long)sin_table[270-val];
         }
-        else/* phase 270-359 degree */
+        else
         {
-            return (long)SinTable[val-270];
+            /* phase 270-359 degree */
+            return (long)sin_table[val-270];
         }
     }
     return 0;
 }
 
-static long matrice[3][3];
 
-static void cube_rotate(int Xa, int Ya, int Za)
+static void cube_rotate(int xa, int ya, int za)
 {
     int i;
 
     /* Just to prevent unnecessary lookups */
     long sxa,cxa,sya,cya,sza,cza;
-    sxa=Sin(Xa);
-    cxa=Cos(Xa);
-    sya=Sin(Ya);
-    cya=Cos(Ya);
-    sza=Sin(Za);
-    cza=Cos(Za);
+    sxa=sin(xa);
+    cxa=cos(xa);
+    sya=sin(ya);
+    cya=cos(ya);
+    sza=sin(za);
+    cza=cos(za);
 
     /* calculate overall translation matrix */
     matrice[0][0] = cza*cya/10000L;
@@ -157,19 +172,16 @@ static void cube_rotate(int Xa, int Ya, int Za)
     matrice[2][2] = cxa*cya/10000L;
 
     /* apply translation matrix to all points */
-    for(i=0;i<Nb_points;i++)
+    for(i=0;i<nb_points;i++)
     {
-        Point3D[i].x = matrice[0][0]*Sommet[i].x
-		     + matrice[1][0]*Sommet[i].y
-		     + matrice[2][0]*Sommet[i].z;
-
-        Point3D[i].y = matrice[0][1]*Sommet[i].x
-		     + matrice[1][1]*Sommet[i].y
-		     + matrice[2][1]*Sommet[i].z;
-
-        Point3D[i].z = matrice[0][2]*Sommet[i].x
-		     + matrice[1][2]*Sommet[i].y
-		     + matrice[2][2]*Sommet[i].z;
+        point3D[i].x = matrice[0][0]*sommet[i].x + matrice[1][0]*sommet[i].y
+            + matrice[2][0]*sommet[i].z;
+        
+        point3D[i].y = matrice[0][1]*sommet[i].x + matrice[1][1]*sommet[i].y
+            + matrice[2][1]*sommet[i].z;
+        
+        point3D[i].z = matrice[0][2]*sommet[i].x + matrice[1][2]*sommet[i].y
+            + matrice[2][2]*sommet[i].z;
     }
 }
 
@@ -178,31 +190,31 @@ static void cube_viewport(void)
     int i;
 
     /* Do viewport transformation for all points */
-    for(i=0;i<Nb_points;i++)
+    for(i=0;i<nb_points;i++)
     {
-        Point2D[i].x=(((Point3D[i].x)<<8)/10000L)/
-          (Point3D[i].z/10000L+Zoff)+Xoff;
-        Point2D[i].y=(((Point3D[i].y)<<8)/10000L)/
-          (Point3D[i].z/10000L+Zoff)+Yoff;
+        point2D[i].x=(((point3D[i].x)<<8)/10000L)/
+          (point3D[i].z/10000L+z_off)+x_off;
+        point2D[i].y=(((point3D[i].y)<<8)/10000L)/
+          (point3D[i].z/10000L+z_off)+y_off;
     }
 }
 
 static void cube_init(void)
 {
     /* Original 3D-position of cube's corners */
-    Sommet[0].x = -40;  Sommet[0].y = -40;  Sommet[0].z = -40;
-    Sommet[1].x =  40;  Sommet[1].y = -40;  Sommet[1].z = -40;
-    Sommet[2].x =  40;  Sommet[2].y =  40;  Sommet[2].z = -40;
-    Sommet[3].x = -40;  Sommet[3].y =  40;  Sommet[3].z = -40;
-    Sommet[4].x =  40;  Sommet[4].y = -40;  Sommet[4].z =  40;
-    Sommet[5].x = -40;  Sommet[5].y = -40;  Sommet[5].z =  40;
-    Sommet[6].x = -40;  Sommet[6].y =  40;  Sommet[6].z =  40;
-    Sommet[7].x =  40;  Sommet[7].y =  40;  Sommet[7].z =  40;
+    sommet[0].x = -40;  sommet[0].y = -40;  sommet[0].z = -40;
+    sommet[1].x =  40;  sommet[1].y = -40;  sommet[1].z = -40;
+    sommet[2].x =  40;  sommet[2].y =  40;  sommet[2].z = -40;
+    sommet[3].x = -40;  sommet[3].y =  40;  sommet[3].z = -40;
+    sommet[4].x =  40;  sommet[4].y = -40;  sommet[4].z =  40;
+    sommet[5].x = -40;  sommet[5].y = -40;  sommet[5].z =  40;
+    sommet[6].x = -40;  sommet[6].y =  40;  sommet[6].z =  40;
+    sommet[7].x =  40;  sommet[7].y =  40;  sommet[7].z =  40;
 }
 
 static void line(int a, int b)
 {
-    lcd_drawline(Point2D[a].x,Point2D[a].y,Point2D[b].x,Point2D[b].y);
+    lcd_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
 }
 
 static void cube_draw(void)
@@ -222,10 +234,6 @@ static void cube_draw(void)
     line(3,6);
 }
 
-
-/* Loops that the values are displayed */
-#define DISP_TIME 30
-
 bool cube(void)
 {
     int t_disp=0;
@@ -240,11 +248,14 @@ bool cube(void)
     bool highspeed=0;
     bool exit=0;
     
+    lcd_setfont(FONT_SYSFIXED);
+
     cube_init();
 
     while(!exit)
     {
-        if (!highspeed) sleep(4);
+        if (!highspeed) 
+            sleep(4);
         
         lcd_clear_display();
         cube_rotate(xa,ya,za);
@@ -255,7 +266,7 @@ bool cube(void)
             t_disp--;
             snprintf(buffer, 30, "x:%d y:%d z:%d h:%d",xs,ys,zs,highspeed);
             lcd_putsxy(0, 56, buffer);
-         }
+        }
         lcd_update();
         
         xa+=xs;
@@ -322,10 +333,13 @@ bool cube(void)
 
             case SYS_USB_CONNECTED:
                 usb_screen();
+                lcd_setfont(FONT_UI);
                 return true;
-
         }
     }
+
+    lcd_setfont(FONT_UI);
+
     return false;
 }
 
@@ -337,4 +351,6 @@ bool cube(void)
  * end:
  * vim: et sw=4 ts=8 sts=4 tw=78
  */
+
+
 

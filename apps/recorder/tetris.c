@@ -25,12 +25,13 @@
 #ifdef USE_GAMES
 
 #include <stdbool.h>
+#include <string.h>
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
-#include <string.h>
 #include "menu.h"
 #include "screens.h"
+#include "font.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -46,7 +47,9 @@ static const int start_x = 5;
 static const int start_y = 5;
 static const int max_x = 4 * 17;
 static const int max_y = 3 * 10;
-static const short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
+static const short level_speeds[10] = {
+    1000, 900, 800, 700, 600, 500, 400, 300, 250, 200
+};
 static const int blocks = 7;
 static const int block_frames[7] = {1,2,2,2,4,4,4};
 
@@ -147,14 +150,15 @@ static void draw_block(int x, int y, int block, int frame, bool clear)
 
 static void to_virtual(void)
 {
-    int i,a,b;
+    int i, a, b;
 
     for(i = 0; i < 4; i++)
         for (a = 0; a < 3; a++)
             for (b = 0; b < 4; b++)
                 *(virtual + 
-                (current_y + block_data[current_b][current_f][0][i] * 3 + a) * max_x +
-                current_x + block_data[current_b][current_f][1][i] * 4 - b) = current_b + 1;
+                (current_y + block_data[current_b][current_f][0][i] * 3 + a) * 
+                  max_x + current_x + block_data[current_b][current_f][1][i] * 
+                  4 - b) = current_b + 1;
 }
 
 static bool block_touch (int x, int y)
@@ -179,7 +183,8 @@ static bool gameover(void)
 
     for(i = 0; i < 4; i++){
         /* Do we have blocks touching? */
-        if(block_touch(x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 3)) 
+        if(block_touch(x + block_data[block][frame][1][i] * 4, 
+                       y + block_data[block][frame][0][i] * 3)) 
         {
             /* Are we at the top of the frame? */
             if(x + block_data[block][frame][1][i] * 4 >= max_x - 16)
@@ -200,8 +205,11 @@ static bool valid_position(int x, int y, int block, int frame)
             (x + block_data[block][frame][1][i] * 4 > max_x - 4) ||
             (y + block_data[block][frame][0][i] * 3 < 0) ||
             (x + block_data[block][frame][1][i] * 4 < 4) ||
-            block_touch (x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 3))
+            block_touch (x + block_data[block][frame][1][i] * 4, 
+                         y + block_data[block][frame][0][i] * 3))
+        {
             return false;
+        }
     return true;
 }
 
@@ -290,7 +298,7 @@ static int check_lines(void)
             /* move rows down */
             for(i = x; i < max_x - 1; i++)
                 for (j = 0; j < max_y; j++)
-		            *(virtual + j * max_x + i) = *(virtual + j * max_x + (i + 1));
+		            *(virtual + j * max_x + i)=*(virtual + j * max_x + (i + 1));
 
             x--; /* re-check this line */
         }
@@ -402,6 +410,10 @@ static void init_tetris(void)
 bool tetris(void)
 {
     char buf[20];
+    bool val;
+
+    /* Lets use the default font */
+    lcd_setfont(FONT_SYSFIXED);
 
     init_tetris();
 
@@ -413,7 +425,14 @@ bool tetris(void)
     next_b = t_rand(blocks);
     next_f = t_rand(block_frames[next_b]);
     new_block();
-    return game_loop();
+    val = game_loop();
+
+    lcd_setfont(FONT_UI);
+
+    return val;
 }
 
 #endif
+
+
+
