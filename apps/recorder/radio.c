@@ -33,6 +33,7 @@
 
 #define MAX_FREQ (110000000)
 #define MIN_FREQ (80000000)
+#define PLL_FREQ_STEP 10000
 #define FREQ_STEP 100000
 
 static int curr_freq = 99400000;
@@ -46,7 +47,7 @@ void fm_set_frequency(int freq)
     ** by 2.
     */
     
-    pll_cnt = (freq + 10700000) / 50000 / 2;
+    pll_cnt = (freq + 10700000) / (PLL_FREQ_STEP/2) / 2;
 
     /* 0x100000 == FM mode
     ** 0x000002 == Microprocessor controlled Mute
@@ -76,7 +77,7 @@ bool radio_screen(void)
 
     mas_codec_writereg(6, 0x4000);
 
-    fmradio_set(2, 0x108884); /* 50kHz, 7.2MHz crystal */
+    fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
     fm_set_frequency(curr_freq);
     
     while(!done)
@@ -133,7 +134,7 @@ bool radio_screen(void)
                 break;
                 
             case BUTTON_LEFT:
-                curr_freq -= 100000;
+                curr_freq -= FREQ_STEP;
                 if(curr_freq < MIN_FREQ)
                     curr_freq = MIN_FREQ;
 
@@ -142,7 +143,7 @@ bool radio_screen(void)
                 break;
 
             case BUTTON_RIGHT:
-                curr_freq += 100000;
+                curr_freq += FREQ_STEP;
                 if(curr_freq > MAX_FREQ)
                     curr_freq = MAX_FREQ;
                 
