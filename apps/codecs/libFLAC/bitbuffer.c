@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h> /* for malloc() */
+#include "global.h" /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
 #include "private/bitbuffer.h"
 #include "private/bitmath.h"

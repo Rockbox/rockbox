@@ -18,7 +18,7 @@
 /* general handling of the header and the vorbis_info structure (and
    substructures) */
 
-#include <stdlib.h>
+#include "config-tremor.h"
 #include <string.h>
 #include <ctype.h>
 #include "ogg.h"

@@ -42,10 +42,11 @@ extern unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 extern unsigned char* filebuf;    // The rest of the MP3 buffer
 
-void* malloc(size_t size);
-void* calloc(size_t nmemb, size_t size);
-void free(void* ptr);
-void* realloc(void* ptr, size_t size);
+void* codec_malloc(size_t size);
+void* codec_calloc(size_t nmemb, size_t size);
+void* codec_alloca(size_t size);
+void* codec_realloc(void* ptr, size_t size);
+void codec_free(void* ptr);
 void *memcpy(void *dest, const void *src, size_t n);
 void *memset(void *s, int c, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);

@@ -19,6 +19,8 @@
  * $Id$
  */
 
+#include "../codec.h"
+
 # ifndef LIBMAD_GLOBAL_H
 # define LIBMAD_GLOBAL_H
 

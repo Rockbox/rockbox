@@ -25,8 +25,6 @@
 
 # include "global.h"
 
-# include <stdlib.h>
-
 # include "bit.h"
 # include "stream.h"
 

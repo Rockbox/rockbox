@@ -31,7 +31,7 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include "global.h"
 #include <string.h>
 
 #if defined _MSC_VER || defined __MINGW32__

@@ -36,7 +36,7 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h> /* for size_t */
+#include <sys/types.h> /* for size_t */
 
 #include "private/float.h"
 #include "FLAC/ordinals.h" /* for FLAC__bool */

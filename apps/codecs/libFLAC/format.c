@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* for qsort() */
+#include "global.h" /* for qsort() */
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
 #include "private/format.h"

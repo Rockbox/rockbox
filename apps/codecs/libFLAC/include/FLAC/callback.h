@@ -33,7 +33,7 @@
 #define FLAC__CALLBACK_H
 
 #include "ordinals.h"
-#include <stdlib.h> /* for size_t */
+#include <sys/types.h> /* for size_t */
 
 /** \file include/FLAC/callback.h
  *

@@ -33,7 +33,7 @@ unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 unsigned char* filebuf;    // The rest of the MP3 buffer
 
-void* malloc(size_t size) {
+void* codec_malloc(size_t size) {
   void* x;
   char s[32];
 
@@ -46,27 +46,27 @@ void* malloc(size_t size) {
   return(x);
 }
 
-void* calloc(size_t nmemb, size_t size) {
+void* codec_calloc(size_t nmemb, size_t size) {
   void* x;
-  x=malloc(nmemb*size);
+  x = codec_malloc(nmemb*size);
   local_rb->memset(x,0,nmemb*size);
   return(x);
 }
 
-void* alloca(size_t size) {
+void* codec_alloca(size_t size) {
   void* x;
-  x=malloc(size);
+  x = codec_malloc(size);
   return(x);
 }
 
-void free(void* ptr) {
+void codec_free(void* ptr) {
   (void)ptr;
 }
 
-void* realloc(void* ptr, size_t size) {
+void* codec_realloc(void* ptr, size_t size) {
   void* x;
   (void)ptr;
-  x=malloc(size);
+  x = codec_malloc(size);
   return(x);
 }
 

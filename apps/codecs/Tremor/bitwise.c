@@ -18,8 +18,8 @@
 /* We're 'LSb' endian; if we write a word but read individual bits,
    then we'll read the lsb first */
 
+#include "config-tremor.h"
 #include <string.h>
-#include <stdlib.h>
 #include "ogg.h"
 
 static unsigned long mask[]=

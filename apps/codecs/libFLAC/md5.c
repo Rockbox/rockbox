@@ -23,7 +23,7 @@
  * Still in the public domain.
  */
 
-#include <stdlib.h>		/* for malloc() */
+#include "global.h"		/* for malloc() */
 #include <string.h>		/* for memcpy() */
 
 #include "private/md5.h"

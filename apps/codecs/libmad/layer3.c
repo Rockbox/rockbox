@@ -25,7 +25,6 @@
 
 # include "global.h"
 
-# include <stdlib.h>
 # include <string.h>
 
 # ifdef HAVE_ASSERT_H

@@ -19,8 +19,8 @@
    stdout using vorbisfile. Using vorbisfile is much simpler than
    dealing with libvorbis. */
 
+#include "config-tremor.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <vorbis/ivorbiscodec.h>
 #include <vorbis/ivorbisfile.h>
 

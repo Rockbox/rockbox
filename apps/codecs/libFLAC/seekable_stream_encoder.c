@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* for calloc() */
+#include "global.h" /* for calloc() */
 #include <string.h> /* for memcpy() */
 #include "FLAC/assert.h"
 #include "protected/seekable_stream_encoder.h"

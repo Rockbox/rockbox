@@ -31,7 +31,7 @@
 
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h> /* for malloc() */
+#include "global.h" /* for malloc() */
 #include <string.h> /* for memcpy() */
 #include "FLAC/assert.h"
 #include "FLAC/stream_decoder.h"

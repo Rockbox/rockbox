@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* for malloc() */
+#include "global.h" /* for malloc() */
 #include <string.h> /* for memset/memcpy() */
 #include "FLAC/assert.h"
 #include "protected/stream_decoder.h"

@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h> /* for malloc() */
+#include "global.h" /* for malloc() */
 #include <string.h> /* for strcmp() */
 #include <sys/stat.h> /* for stat() */
 #if defined _MSC_VER || defined __MINGW32__

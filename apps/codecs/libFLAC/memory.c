@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "global.h" /* for malloc() */
 #include "private/memory.h"
 #include "FLAC/assert.h"
 

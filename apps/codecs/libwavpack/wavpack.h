@@ -8,6 +8,8 @@
 
 // wavpack.h
 
+#include "../codec.h"
+
 #include <inttypes.h>
 
 // This header file contains all the definitions required by WavPack.

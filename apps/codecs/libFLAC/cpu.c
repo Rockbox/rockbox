@@ -30,7 +30,7 @@
  */
 
 #include "private/cpu.h"
-#include <stdlib.h>
+#include "global.h"
 #include <stdio.h>
 
 #ifdef HAVE_CONFIG_H

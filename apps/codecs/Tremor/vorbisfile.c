@@ -16,7 +16,7 @@
 
  ********************************************************************/
 
-#include <stdlib.h>
+#include "config-tremor.h"
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>

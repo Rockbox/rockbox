@@ -15,7 +15,7 @@
 
  ********************************************************************/
 
-#include <stdlib.h>
+#include "config-tremor.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
