@@ -8,6 +8,8 @@
  * $Id$
  *
  * Copyright (C) 2002 Eric Linenberg
+ * February 2003: Robert Hak performs a cleanup/rewrite/feature addition.
+ *                Eric smiles.  Bjorn cris.  Linus say 'huh?'.
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -30,7 +32,9 @@
 #include "menu.h"
 #include "screens.h"
 #include "font.h"
+#include "file.h"
 
+#include "debug.h"
 #include "sokoban_levels.h"
 
 #ifdef SIMULATOR
@@ -38,524 +42,676 @@
 #endif
 #include <string.h>
 #include "lang.h"
-#define SOKOBAN_TITLE   "Sokoban"
+#define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
-#define NUM_LEVELS  sizeof(levels)/320
+#define LEVELS_FILE         "/sokoban.levels"
+#define NUM_LEVELS          sizeof(levels)/320
 
-static void load_level(int);
+#define ROWS                16
+#define COLS                20
+#define MAX_UNDOS           5
+
+static void init_undo();
+static void undo();
+static void add_undo(int button);
+
+static void init_boards();
+static void load_level(short level);
+static void draw_level(short level);
 static void update_screen(void);
 static bool sokoban_loop(void);
-static void copy_current_state_to_undo(void);
-static void copy_current_undo_to_state(void);
 
-static char board[16][20];
-static char undo_board[16][20];
-static int current_level=0;
-static int undo_current_level=0;
-static int moves=0;
-static int undo_moves=0;
-static int row=0;
-static int undo_row=0;
-static int col=0;
-static int undo_col=0;
-static int boxes_to_go=0;
-static int undo_boxes_to_go=0;
-static char current_spot= ' ';
-static char undo_current_spot=' ';
+/* The Location, Undo and LevelInfo structs are OO-flavored.  
+ * (oooh!-flavored as Schnueff puts it.)  It makes more you have to know, 
+ * but the overall data layout becomes more manageable. */
+
+/* We use the same three values in 2 structs.  Makeing them a struct
+ * hopefully ensures that if you change things in one, the other changes
+ * as well. */
+struct LevelInfo {
+    short level;
+    short moves;
+    short boxes_to_go;
+};
+
+/* What a given location on the board looks like at a given time */
+struct Location {
+    char spot;
+    short row;
+    short col;
+};
+
+/* A single level of undo.  Each undo move can affect upto,
+ * but not more then, 3 spots on the board */
+struct Undo {
+    struct LevelInfo level;
+    struct Location location[3];
+};
+
+/* Our full undo history */
+static struct UndoInfo {
+    short count;    /* How many undos are there in history */
+    short current;  /* Which history is the current undo */
+    struct Undo history[MAX_UNDOS];
+} undo_info;
+
+/* Our playing board */
+static struct BoardInfo {
+    char board[ROWS][COLS];
+    struct LevelInfo level;
+    struct Location player;
+} current_info;
 
 
-static void copy_current_state_to_undo(void) {
-    int a = 0;
-    int b = 0;
+static void init_undo()
+{
+    undo_info.count = 0;
+    undo_info.current = 0;
+}
+
+static void undo()
+{
+    struct Undo *undo;
+    int i = 0;
+    short row, col;
+
+    if (undo_info.count == 0)
+        return;
+
+    /* Update board info */
+    undo = &undo_info.history[undo_info.current];
     
-    for (a=0 ; a<16 ; a++) {
-        for (b=0; b<16 ; b++) {
-            undo_board[a][b] = board[a][b];
+    current_info.level = undo->level;
+    current_info.player = undo->location[0];
+
+    row = undo->location[0].row;
+    col = undo->location[0].col;
+    current_info.board[row][col] = '@';
+
+    /* Update the two other possible spots */
+    for (i = 1; i < 3; i++) {
+        if (undo->location[i].spot != '\0') {
+            row = undo->location[i].row;
+            col = undo->location[i].col;
+            current_info.board[row][col] = undo->location[i].spot;
+            undo->location[i].spot = '\0';
         }
     }
-    undo_current_level = current_level;
-    undo_moves = moves;
-    undo_row = row;
-    undo_col = col;
-    undo_boxes_to_go = boxes_to_go;
-    undo_current_spot = current_spot;
+
+    /* Remove this undo from the list */
+    if (undo_info.current == 0) {
+        if (undo_info.count > 1)
+            undo_info.current = MAX_UNDOS - 1;
+    } else {
+        undo_info.current--;
+    }
+    
+    undo_info.count--;
 
     return;
 }
 
-static void copy_current_undo_to_state(void) {
-    int a = 0;
-    int b = 0;
-    
-    for (a=0 ; a<16 ; a++) {
-        for (b=0; b<16 ; b++) {
-            board[a][b] = undo_board[a][b];
+static void add_undo(int button)
+{
+    struct Undo *undo;
+    int row, col, i;
+    bool storable;
+
+    if ((button != BUTTON_LEFT) && (button != BUTTON_RIGHT) &&
+        (button != BUTTON_UP) && (button != BUTTON_DOWN))
+        return;
+
+    if (undo_info.count != 0) {
+        if (undo_info.current < (MAX_UNDOS - 1)) 
+            undo_info.current++;
+        else
+            undo_info.current = 0;
+    }
+
+    /* Make what follows more readable */
+    undo = &undo_info.history[undo_info.current];
+
+    /* Store our level info */
+    undo->level = current_info.level;
+
+    /* Store our player info */
+    undo->location[0] = current_info.player;
+
+    /* Now we need to store upto 2 blocks that may be affected.  
+     * If player.spot is NULL, then there is no info stored 
+     * for that block */
+
+    row = current_info.player.row;
+    col = current_info.player.col;
+
+    /* This must stay as _1_ because the first block (0) is the player */
+    for (i = 1; i < 3; i++) {
+        storable = true;
+
+        switch (button) {
+        case BUTTON_LEFT:
+            col--;
+            if (col < 0) 
+                storable = false;
+            break;
+
+        case BUTTON_RIGHT:
+            col++;
+            if (col >= COLS) 
+                storable = false;
+            break;
+
+        case BUTTON_UP:
+            row--;
+            if (row < 0)
+                storable = false;
+            break;
+            
+        case BUTTON_DOWN:
+            row++;
+            if (row >= ROWS)
+                storable = false;
+            break;
+
+        default:
+            return;
+        }
+
+        if (storable) {
+            undo->location[i].col = col;
+            undo->location[i].row = row;
+            undo->location[i].spot = current_info.board[row][col];
+        } else {
+            undo->location[i].spot = '\0';
         }
     }
-    current_level = undo_current_level;
-    moves = undo_moves-1;
-    row = undo_row;
-    col = undo_col;
-    boxes_to_go = undo_boxes_to_go;
-    current_spot = undo_current_spot;
-    return;
+
+    if (undo_info.count < MAX_UNDOS) 
+        undo_info.count++;
 }
 
-static void load_level (int level_to_load) {
-    int a = 0;
-    int b = 0;
-    int c = 0;
-    current_spot=' ';
-    boxes_to_go = 0;
-    /* load level into board */
-    /* get to the current level in the level array */
-    
-    for(b=0 ; b<16 ; b++) {
-        for (c=0 ; c<20 ; c++) {
-            board[b][c] = levels[level_to_load][a]/* - '0'*/;
+static void init_boards()
+{
+    current_info.level.level = 0;
+    current_info.level.moves = 0;
+    current_info.level.boxes_to_go = 0;
+    current_info.player.row = 0;
+    current_info.player.col = 0;
+    current_info.player.spot = ' ';
+
+    init_undo();
+}
+
+static void load_level(short level_to_load) 
+{
+    short a = 0, b = 0, c = 0;
+
+    current_info.player.spot=' ';
+    current_info.level.boxes_to_go = 0;
+    current_info.level.moves = 0;
+
+    for (b = 0; b < ROWS; b++) {
+        for (c = 0; c < COLS; c++) {
+            current_info.board[b][c] = levels[level_to_load][a];
             a++;
-            if (board[b][c]=='@') {
-                row = b;
-                col = c;
+
+            if (current_info.board[b][c] == '@') {
+                current_info.player.row = b;
+                current_info.player.col = c;
             }
-            if (board[b][c]=='.')
-                boxes_to_go++;        
+
+            if (current_info.board[b][c] == '.')
+                current_info.level.boxes_to_go++;        
         }
     }
+
     return;
 }
 
-static void update_screen(void) {
-    int b = 0;
-    int c = 0;
+static void update_screen(void) 
+{
+    short b = 0, c = 0;
+    short rows = 0, cols = 0;
     char s[25];
+    
+    short magnify = 4;
 
     /* load the board to the screen */
-    for(b=0 ; b<16 ; b++) {
-        for (c=0 ; c<20 ; c++) {
-            switch ( board[b][c] ) {
-                case 'X': /* this is a black space */
-                    lcd_drawrect (c*4, b*4, 4, 4);
-                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
-                    break;
+    for (rows=0 ; rows < ROWS ; rows++) {
+        for (cols = 0 ; cols < COLS ; cols++) {
+            c = cols * magnify;
+            b = rows * magnify;
 
-                case '#': /* this is a wall */
-                    lcd_drawpixel (c*4, b*4);
-                    lcd_drawpixel (c*4+2, b*4);
-                    lcd_drawpixel (c*4+1, b*4+1);
-                    lcd_drawpixel (c*4+3, b*4+1);
-                    lcd_drawpixel (c*4,   b*4+2);
-                    lcd_drawpixel (c*4+2, b*4+2);
-                    lcd_drawpixel (c*4+1, b*4+3);
-                    lcd_drawpixel (c*4+3, b*4+3);
-                    break;
+            switch(current_info.board[rows][cols]) {
+            case 'X': /* black space */
+                lcd_drawrect(c, b, magnify, magnify);
+                lcd_drawrect(c+1, b+1, 2, 2);
+                break;
+                
+            case '#': /* this is a wall */
+                lcd_drawpixel(c, b);
+                lcd_drawpixel(c+2, b);
+                lcd_drawpixel(c+1, b+1);
+                lcd_drawpixel(c+3, b+1);
+                lcd_drawpixel(c, b+2);
+                lcd_drawpixel(c+2, b+2);
+                lcd_drawpixel(c+1, b+3);
+                lcd_drawpixel(c+3, b+3);
+                break;
 
-                case '.': /* this is a home location */
-                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
-                    break;
+            case '.': /* this is a home location */
+                lcd_drawrect(c+1, b+1, 2, 2);
+                break;
 
-                case '$': /* this is a box */
-                    lcd_drawrect (c*4, b*4, 4, 4);
-                    break;
+            case '$': /* this is a box */
+                lcd_drawrect(c, b, magnify, magnify);
+                break;
 
-                case '@': /* this is you */
-                    lcd_drawline (c*4+1, b*4, c*4+2, b*4);
-                    lcd_drawline (c*4, b*4+1, c*4+3, b*4+1);
-                    lcd_drawline (c*4+1, b*4+2, c*4+2, b*4+2);
-                    lcd_drawpixel (c*4, b*4+3);
-                    lcd_drawpixel (c*4+3, b*4+3);
-                    break;
+            case '@': /* this is you */
+                lcd_drawline(c+1, b, c+2, b);
+                lcd_drawline(c, b+1, c+3, b+1);
+                lcd_drawline(c+1, b+2, c+2, b+2);
 
-                case '%': /* this is a box on a home spot */ 
-                    lcd_drawrect (c*4, b*4, 4, 4);
-                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
-                    break;
+                lcd_drawpixel(c, b+3);
+                lcd_drawpixel(c+3, b+3);
+                break;
+
+            case '%': /* this is a box on a home spot */ 
+                lcd_drawrect(c, b, magnify, magnify);
+                lcd_drawrect(c+1, b+1, 2, 2);
+                break;
             }
         }
     }
     
 
-    snprintf (s, sizeof(s), "%d", current_level+1);
-    lcd_putsxy (86, 22, s);
-    snprintf (s, sizeof(s), "%d", moves);
-    lcd_putsxy (86, 54, s);
+    snprintf(s, sizeof(s), "%d", current_info.level.level+1);
+    lcd_putsxy(86, 22, s);
+    snprintf(s, sizeof(s), "%d", current_info.level.moves);
+    lcd_putsxy(86, 54, s);
 
-    lcd_drawrect (80,0,32,32);
-    lcd_drawrect (80,32,32,64);
-    lcd_putsxy (81, 10, str(LANG_SOKOBAN_LEVEL));
-    lcd_putsxy (81, 42, str(LANG_SOKOBAN_MOVE));
+    lcd_drawrect(80,0,32,32);
+    lcd_drawrect(80,32,32,64);
+    lcd_putsxy(81, 10, str(LANG_SOKOBAN_LEVEL));
+    lcd_putsxy(81, 42, str(LANG_SOKOBAN_MOVE));
+
     /* print out the screen */
     lcd_update();
 }
 
-
+static void draw_level(short level)
+{
+    load_level(level);
+    lcd_clear_display();
+    update_screen();
+}
 
 static bool sokoban_loop(void)
 {
-    int ii = 0;
-    moves = 0;
-    current_level = 0;
-    load_level(current_level);
-    update_screen();
+    char new_spot;
+    bool moved = true;
+    int i = 0, button = 0;
+    short r = 0, c = 0;
 
-    while(1) {
-       
-        bool idle = false;
-        switch ( button_get(true) ) {
-            case BUTTON_OFF:
-                /* get out of here */
-                return false; 
+    current_info.level.level = 0;
 
-            case BUTTON_F3:
-                /* increase level */
-                boxes_to_go=0;
-                idle=true;
+    load_level(current_info.level.level);
+    update_screen(); 
+
+    while (1) {
+        moved = true;
+
+        r = current_info.player.row;
+        c = current_info.player.col;
+
+        button = button_get(true);
+
+        add_undo(button);
+
+        switch(button) 
+        {
+        case BUTTON_OFF:
+            /* get out of here */
+            return false; 
+
+        case BUTTON_ON:
+        case BUTTON_ON | BUTTON_REPEAT:
+            /* this is UNDO */
+            undo();
+            lcd_clear_display();
+            update_screen(); 
+            moved = false;
+            break;
+
+        case BUTTON_F3:
+        case BUTTON_F3 | BUTTON_REPEAT:
+            /* increase level */
+            init_undo();
+            current_info.level.boxes_to_go=0;
+            moved = true;
+            break;
+
+        case BUTTON_F1:
+        case BUTTON_F1 | BUTTON_REPEAT:
+            /* previous level */
+            init_undo();
+            if (current_info.level.level)
+                current_info.level.level--;
+
+            draw_level(current_info.level.level);
+            moved = false;
+            break;
+
+        case BUTTON_F2:
+        case BUTTON_F2 | BUTTON_REPEAT:
+            /* same level */
+            init_undo();
+            draw_level(current_info.level.level);
+            moved = false;
+            break;
+
+        case BUTTON_LEFT:
+            switch(current_info.board[r][c-1]) 
+            {
+            case ' ': /* if it is a blank spot */
+            case '.': /* if it is a home spot */
+                new_spot = current_info.board[r][c-1];
+                current_info.board[r][c-1] = '@';
+                current_info.board[r][c] = current_info.player.spot;
+                current_info.player.spot = new_spot;
                 break;
 
-            case BUTTON_ON:
-                /* this is UNDO */
-                copy_current_undo_to_state();
-                break;
+            case '$':
+                switch(current_info.board[r][c-2])
+                {
+                case ' ': /* going from blank to blank */
+                    current_info.board[r][c-2] = current_info.board[r][c-1];
+                    current_info.board[r][c-1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = ' ';
+                    break;
 
-            case BUTTON_F2:
-                /* same level */
-                load_level(current_level);
-                moves=0;
-                idle=true;
-                load_level(current_level);
-                lcd_clear_display();
-                update_screen();
-                copy_current_state_to_undo();
-                copy_current_undo_to_state();
-                break;
-            
-            case BUTTON_F1:
+                case '.': /* going from a blank to home */
+                    current_info.board[r][c-2] = '%';
+                    current_info.board[r][c-1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = ' ';
+                    current_info.level.boxes_to_go--;
+                    break;
 
-                /* previous level */
-                if (current_level)
-                    current_level--;
-                load_level(current_level);
-                moves=0;
-                idle=true;
-                load_level(current_level);
-                lcd_clear_display();
-                update_screen();
-                copy_current_state_to_undo();
-                copy_current_undo_to_state();
-                break;
-
-            case BUTTON_LEFT:
-                copy_current_state_to_undo();
-                switch ( board[row][col-1] ) {
-                    case ' ': /* if it is a blank spot */
-                        board[row][col-1]='@';
-                        board[row][col]=current_spot;
-                        current_spot=' ';
-                        break;
-
-                    case '.': /* if it is a home spot */
-                        board[row][col-1]='@';
-                        board[row][col]=current_spot;
-                        current_spot='.';
-                        break;
-
-                    case '$':
-                        switch ( board[row][col-2] ) {
-                            case ' ': /* if we are going from blank to blank */
-                                board[row][col-2]=board[row][col-1];
-                                board[row][col-1]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot=' ';
-                                break;
-
-                            case '.': /* if we are going from a blank to home */
-                                board[row][col-2]='%';
-                                board[row][col-1]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot=' ';
-                                boxes_to_go--;
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    case '%':
-                        switch ( board[row][col-2] ) {
-                            case ' ': /* we are going from a home to a blank */
-                                board[row][col-2]='$';
-                                board[row][col-1]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot='.';
-                                boxes_to_go++;
-                                break;
-
-                            case '.': /* if we are going from a home to home */
-                                board[row][col-2]='%';
-                                board[row][col-1]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot='.';
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    default:
-                        idle = true;
-                        break;
+                default:
+                    moved = false;
+                    break;
                 }
-                if (!idle)
-                    col--;
                 break;
 
-            case BUTTON_RIGHT: /* if it is a blank spot */
-                copy_current_state_to_undo();
-                switch ( board[row][col+1] ) {
-                    case ' ':
-                        board[row][col+1]='@';
-                        board[row][col]=current_spot;
-                        current_spot=' ';
-                        break;
+            case '%':
+                switch(current_info.board[r][c-2]) {
+                case ' ': /* we are going from a home to a blank */
+                    current_info.board[r][c-2] = '$';
+                    current_info.board[r][c-1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = '.';
+                    current_info.level.boxes_to_go++;
+                    break;
 
-                    case '.': /* if it is a home spot */
-                        board[row][col+1]='@';
-                        board[row][col]=current_spot;
-                        current_spot='.';
-                        break;
+                case '.': /* if we are going from a home to home */
+                    current_info.board[r][c-2] = '%';
+                    current_info.board[r][c-1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = '.';
+                    break;
 
-                    case '$': 
-                        switch ( board[row][col+2] ) {
-                            case ' ': /* if we are going from blank to blank */
-                                board[row][col+2]=board[row][col+1];
-                                board[row][col+1]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot=' ';
-                                break;
-
-                            case '.': /* if we are going from a blank to home */
-                                board[row][col+2]='%';
-                                board[row][col+1]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot=' ';
-                                boxes_to_go--;
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    case '%':
-                        switch ( board[row][col+2] ) {
-                            case ' ': /* we are going from a home to a blank */
-                                board[row][col+2]='$';
-                                board[row][col+1]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot='.';
-                                boxes_to_go++;
-                                break;
-
-                            case '.':
-                                board[row][col+2]='%';
-                                board[row][col+1]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot='.';
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    default:
-                        idle = true;
-                        break;
+                default:
+                    moved = false;
+                    break;
                 }
-                if (!idle)
-                    col++;
                 break;
-
-            case BUTTON_UP:
-                copy_current_state_to_undo();
-                switch ( board[row-1][col] ) {
-                    case ' ': /* if it is a blank spot */
-                        board[row-1][col]='@';
-                        board[row][col]=current_spot;
-                        current_spot=' ';
-                        break;
-
-                    case '.': /* if it is a home spot */
-                        board[row-1][col]='@';
-                        board[row][col]=current_spot;
-                        current_spot='.';
-                        break;
-
-                    case '$':
-                        switch ( board[row-2][col] ) {
-                            case ' ': /* if we are going from blank to blank */
-                                board[row-2][col]=board[row-1][col];
-                                board[row-1][col]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot=' ';
-                                break;
-
-                            case '.': /* if we are going from a blank to home */
-                                board[row-2][col]='%';
-                                board[row-1][col]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot=' ';
-                                boxes_to_go--;
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    case '%':
-                        switch ( board[row-2][col] ) {
-                            case ' ': /* we are going from a home to a blank */
-                                board[row-2][col]='$';
-                                board[row-1][col]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot='.';
-                                boxes_to_go++;
-                                break;
-
-                            case '.': /* if we are going from a home to home */
-                                board[row-2][col]='%';
-                                board[row-1][col]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot='.';
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    default:
-                        idle = true;
-                        break;
-                }
-                if (!idle)
-                    row--;
-                break;
-
-            case BUTTON_DOWN:
-                copy_current_state_to_undo();
-                switch ( board[row+1][col] ) {
-                    case ' ': /* if it is a blank spot */
-                        board[row+1][col]='@';
-                        board[row][col]=current_spot;
-                        current_spot=' ';
-                        break;
-
-                    case '.': /* if it is a home spot */
-                        board[row+1][col]='@';
-                        board[row][col]=current_spot;
-                        current_spot='.';
-                        break;
-
-                    case '$':
-                        switch ( board[row+2][col] ) {
-                            case ' ': /* if we are going from blank to blank */
-                                board[row+2][col]=board[row+1][col];
-                                board[row+1][col]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot=' ';
-                                break;
-
-                            case '.': /* if we are going from a blank to home */
-                                board[row+2][col]='%';
-                                board[row+1][col]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot=' ';
-                                boxes_to_go--;
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    case '%':
-                        switch ( board[row+2][col] ) {
-                            case ' ': /* we are going from a home to a blank */
-                                board[row+2][col]='$';
-                                board[row+1][col]=board[row][col];
-                                board[row][col]=current_spot;
-                                current_spot='.';
-                                boxes_to_go++;
-                                break;
-
-                            case '.': /* if we are going from a home to home */
-                                board[row+2][col]='%';
-                                board[row+1][col]=board[row][col];
-                                board[row][col]=current_spot; 
-                                current_spot='.';
-                                break;
-
-                            default:
-                                idle = true;
-                                break;
-                        }
-                        break;
-
-                    default:
-                        idle = true;
-                        break;
-                }
-                if (!idle)
-                    row++;
-                break;
-
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
 
             default:
-                idle = true;
+                moved = false;
                 break;
+            }
+
+            if (moved)
+                current_info.player.col--;
+            break;
+
+        case BUTTON_RIGHT: /* if it is a blank spot */
+            switch(current_info.board[r][c+1]) {
+            case ' ':
+            case '.': /* if it is a home spot */
+                new_spot = current_info.board[r][c+1];
+                current_info.board[r][c+1] = '@';
+                current_info.board[r][c] = current_info.player.spot;
+                current_info.player.spot = new_spot;
+                break;
+
+            case '$': 
+                switch(current_info.board[r][c+2]) {
+                case ' ': /* going from blank to blank */
+                    current_info.board[r][c+2] = current_info.board[r][c+1];
+                    current_info.board[r][c+1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = ' ';
+                    break;
+
+                case '.': /* going from a blank to home */
+                    current_info.board[r][c+2] = '%';
+                    current_info.board[r][c+1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = ' ';
+                    current_info.level.boxes_to_go--;
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            case '%':
+                switch(current_info.board[r][c+2]) {
+                case ' ': /* going from a home to a blank */
+                    current_info.board[r][c+2] = '$';
+                    current_info.board[r][c+1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = '.';
+                    current_info.level.boxes_to_go++;
+                    break;
+
+                case '.':
+                    current_info.board[r][c+2] = '%';
+                    current_info.board[r][c+1] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = '.';
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            default:
+                moved = false;
+                break;
+            }
+
+            if (moved)
+                current_info.player.col++;
+            break;
+
+        case BUTTON_UP:
+            switch(current_info.board[r-1][c]) {
+            case ' ': /* if it is a blank spot */
+            case '.': /* if it is a home spot */
+                new_spot = current_info.board[r-1][c];
+                current_info.board[r-1][c] = '@';
+                current_info.board[r][c] = current_info.player.spot;
+                current_info.player.spot = new_spot;
+                break;
+
+            case '$':
+                switch(current_info.board[r-2][c]) {
+                case ' ': /* going from blank to blank */
+                    current_info.board[r-2][c] = current_info.board[r-1][c];
+                    current_info.board[r-1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = ' ';
+                    break;
+
+                case '.': /* going from a blank to home */
+                    current_info.board[r-2][c] = '%';
+                    current_info.board[r-1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = ' ';
+                    current_info.level.boxes_to_go--;
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            case '%':
+                switch(current_info.board[r-2][c]) {
+                case ' ': /* we are going from a home to a blank */
+                    current_info.board[r-2][c] = '$';
+                    current_info.board[r-1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = '.';
+                    current_info.level.boxes_to_go++;
+                    break;
+
+                case '.': /* if we are going from a home to home */
+                    current_info.board[r-2][c] = '%';
+                    current_info.board[r-1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = '.';
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            default:
+                moved = false;
+                break;
+            }
+
+            if (moved)
+                current_info.player.row--;
+            break;
+
+        case BUTTON_DOWN:
+            switch(current_info.board[r+1][c]) {
+            case ' ': /* if it is a blank spot */
+            case '.': /* if it is a home spot */
+                new_spot = current_info.board[r+1][c];
+                current_info.board[r+1][c] = '@';
+                current_info.board[r][c] = current_info.player.spot;
+                current_info.player.spot = new_spot;
+                break;
+
+            case '$':
+                switch(current_info.board[r+2][c]) {
+                case ' ': /* going from blank to blank */
+                    current_info.board[r+2][c] = current_info.board[r+1][c];
+                    current_info.board[r+1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = ' ';
+                    break;
+
+                case '.': /* going from a blank to home */
+                    current_info.board[r+2][c] = '%';
+                    current_info.board[r+1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = ' ';
+                    current_info.level.boxes_to_go--;
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            case '%':
+                switch(current_info.board[r+2][c]) {
+                case ' ': /* going from a home to a blank */
+                    current_info.board[r+2][c] = '$';
+                    current_info.board[r+1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot;
+                    current_info.player.spot = '.';
+                    current_info.level.boxes_to_go++;
+                    break;
+
+                case '.': /* going from a home to home */
+                    current_info.board[r+2][c] = '%';
+                    current_info.board[r+1][c] = current_info.board[r][c];
+                    current_info.board[r][c] = current_info.player.spot; 
+                    current_info.player.spot = '.';
+                    break;
+
+                default:
+                    moved = false;
+                    break;
+                }
+                break;
+
+            default:
+                moved = false;
+                break;
+            }
+
+            if (moved)
+                current_info.player.row++;
+            break;
+
+        case SYS_USB_CONNECTED:
+            usb_screen();
+            return true;
+
+        default:
+            moved = false;
+            break;
         }
         
-        if (!idle) {
-            moves++;
+        if (moved) {
+            current_info.level.moves++;
             lcd_clear_display();
+            update_screen(); 
+        }
+
+        /* We have completed this level */
+        if (current_info.level.boxes_to_go == 0) {
+            current_info.level.level++;
+
+            lcd_clear_display();
+
+            if (current_info.level.level == NUM_LEVELS) {
+                lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
+
+                for (i = 0; i < 30000 ; i++) {
+                    lcd_invertrect(0, 0, 111, 63);
+                    lcd_update();
+
+                    if (button_get(false))
+                        break;
+                }
+
+                return false;
+            }
+
+            load_level(current_info.level.level);
             update_screen();
         }
 
-        if (boxes_to_go==0) {
-            moves=0;
-            current_level++;
-            if (current_level == NUM_LEVELS) {
-                lcd_clear_display();
-                lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
-                for(ii=0; ii<30000 ; ii++) {
-                    lcd_invertrect(0,0,111,63);
-                    lcd_update();
-                    if ( button_get(false) )
-                        return false;
-                }
-                return false;
-            }
-            load_level(current_level);
-            lcd_clear_display();
-            update_screen();
-            copy_current_state_to_undo();
-            copy_current_undo_to_state();
-        }
-    }
+    } /* end while */
 
     return false;
 }
@@ -574,7 +730,7 @@ bool sokoban(void)
     /* Get horizontel centering for text */
     len = w;
     if (len%2 != 0)
-        len = ((len+1)/2)+(w/2);
+        len =((len+1)/2)+(w/2);
     else
         len /= 2;
 
@@ -584,7 +740,7 @@ bool sokoban(void)
         h /= 2;
 
     lcd_clear_display();
-    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SOKOBAN_TITLE);
+    lcd_putsxy(LCD_WIDTH/2-len,(LCD_HEIGHT/2)-h, SOKOBAN_TITLE);
 
     lcd_update();
     sleep(HZ*2);
@@ -600,6 +756,8 @@ bool sokoban(void)
     lcd_update();
     sleep(HZ*2);
     lcd_clear_display();
+
+    init_boards();
     result = sokoban_loop();
 
     lcd_setfont(FONT_UI);
@@ -608,3 +766,7 @@ bool sokoban(void)
 }
 
 #endif
+
+
+
+
