@@ -109,3 +109,8 @@ void lcd_update (void)
 /*    Logf("lcd_update: Draws %d pixels, clears %d pixels", p, cp);*/
     XSync(dpy,False);
 }
+
+void backlight_on(void)
+{
+  /* we could do something better here! */
+}
