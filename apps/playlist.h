@@ -29,20 +29,24 @@
 typedef struct 
 {
     char filename[MAX_PATH];  /* path name of m3u playlist on disk       */
+    int  dirlen;         /* Length of the path to the playlist file */
     int  indices[MAX_PLAYLIST_SIZE]; /* array of indices            */
     int  index;          /* index of *NEXT* track to play           */
     int  seed;           /* random seed                             */
     int  amount;         /* number of tracks in the index           */
+    bool in_ram;         /* True if the playlist is RAM-based       */
 } playlist_info_t;
 
-extern playlist_info_t playlist;
+//extern playlist_info_t playlist;
 extern bool playlist_shuffle;
 
 void play_list(char *dir, char *file);
-char* playlist_next(int steps, char *dirname);
-void randomise_playlist( playlist_info_t *playlist, unsigned int seed );
-void sort_playlist( playlist_info_t *playlist );
-void empty_playlist( playlist_info_t *playlist );
-void add_indices_to_playlist( playlist_info_t *playlist );
+char* playlist_next(int steps);
+void randomise_playlist( unsigned int seed );
+void sort_playlist(void);
+void empty_playlist(void);
+void add_indices_to_playlist(void);
+void playlist_clear(void);
+int playlist_add(char *filename);
 
 #endif /* __PLAYLIST_H__ */

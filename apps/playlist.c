@@ -33,157 +33,224 @@
 
 playlist_info_t playlist;
 
+#define PLAYLIST_BUFFER_SIZE (MAX_PATH*200)
+
+unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
+static int playlist_end_pos = 0;
+
 char now_playing[MAX_PATH+1];
 
-char* playlist_next(int steps, char *dirname)
+void playlist_clear(void)
+{
+    playlist_end_pos = 0;
+    playlist_buffer[0] = 0;
+}
+
+int playlist_add(char *filename)
+{
+    int len = strlen(filename);
+
+    if(len+2 > PLAYLIST_BUFFER_SIZE - playlist_end_pos)
+        return -1;
+
+    strcpy(&playlist_buffer[playlist_end_pos], filename);
+    playlist_end_pos += len;
+    playlist_buffer[playlist_end_pos++] = '\n';
+    playlist_buffer[playlist_end_pos] = '\0';
+    return 0;
+}
+
+char* playlist_next(int steps)
 {
     int seek;
     int max;
     int fd;
     int i;
-    char buf[MAX_PATH+1];
+    char *buf;
     char dir_buf[MAX_PATH+1];
     char *dir_end;
 
     playlist.index = (playlist.index+steps) % playlist.amount;
     seek = playlist.indices[playlist.index];
 
-    fd = open(playlist.filename, O_RDONLY);
-    if(-1 != fd) {
-      lseek(fd, seek, SEEK_SET);
-      max = read(fd, buf, sizeof(buf)-1);
-      close(fd);
-
-      /* Zero-terminate the file name */
-      seek=0;
-      while((buf[seek] != '\n') &&
-            (buf[seek] != '\r') &&
-            (seek < max))
-        seek++;
-
-      /* Now work back killing white space */
-      while((buf[seek-1] == ' ') || 
-            (buf[seek-1] == '\t'))
-          seek--;
-
-      buf[seek]=0;
-      
-      /* replace backslashes with forward slashes */
-      for ( i=0; i<seek; i++ )
-          if ( buf[i] == '\\' )
-              buf[i] = '/';
-
-      if('/' == buf[0]) {
-          strcpy(now_playing, &buf[0]);
-          return now_playing;
-      }
-      else {
-          /* handle dos style drive letter */
-          if ( ':' == buf[1] ) {
-              strcpy(now_playing, &buf[2]);
-              return now_playing;
-          }
-          else if ( '.' == buf[0] && '.' == buf[1] && '/' == buf[2] ) {
-              /* handle relative paths */
-              seek=3;
-              while(buf[seek] == '.' &&
-                    buf[seek+1] == '.' &&
-                    buf[seek+2] == '/')
-                  seek += 3;
-              strcpy(dir_buf, dirname);
-              for (i=0; i<seek/3; i++) {
-                  dir_end = strrchr(dir_buf, '/');
-                  if (dir_end)
-                      *dir_end = '\0';
-                  else
-                      break;
-              }
-              snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[seek]);
-              return now_playing;
-          }
-          else if ( '.' == buf[0] && '/' == buf[1] ) {
-              snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, &buf[2]);
-              return now_playing;
-          }
-	  else {
-	      snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, buf);
-	      return now_playing;
-	  }
-      }
+    if(playlist.in_ram)
+    {
+        buf = playlist_buffer + seek;
+        max = playlist_end_pos - seek;
     }
     else
-        return NULL;
+    {
+        fd = open(playlist.filename, O_RDONLY);
+        if(-1 != fd)
+        {
+            buf = playlist_buffer;
+            lseek(fd, seek, SEEK_SET);
+            max = read(fd, buf, MAX_PATH);
+            close(fd);
+        }
+        else
+            return NULL;
+    }
+    
+
+    /* Zero-terminate the file name */
+    seek=0;
+    while((buf[seek] != '\n') &&
+          (buf[seek] != '\r') &&
+          (seek < max))
+        seek++;
+
+    /* Now work back killing white space */
+    while((buf[seek-1] == ' ') || 
+          (buf[seek-1] == '\t'))
+        seek--;
+
+    buf[seek]=0;
+      
+    /* replace backslashes with forward slashes */
+    for ( i=0; i<seek; i++ )
+        if ( buf[i] == '\\' )
+            buf[i] = '/';
+
+    if('/' == buf[0]) {
+        strcpy(now_playing, &buf[0]);
+        return now_playing;
+    }
+    else {
+        strncpy(dir_buf, playlist.filename, playlist.dirlen);
+        dir_buf[playlist.dirlen] = 0;
+
+        /* handle dos style drive letter */
+        if ( ':' == buf[1] ) {
+            strcpy(now_playing, &buf[2]);
+            return now_playing;
+        }
+        else if ( '.' == buf[0] && '.' == buf[1] && '/' == buf[2] ) {
+            /* handle relative paths */
+            seek=3;
+            while(buf[seek] == '.' &&
+                  buf[seek+1] == '.' &&
+                  buf[seek+2] == '/')
+                seek += 3;
+            for (i=0; i<seek/3; i++) {
+                dir_end = strrchr(dir_buf, '/');
+                if (dir_end)
+                    *dir_end = '\0';
+                else
+                    break;
+            }
+            snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[seek]);
+            return now_playing;
+        }
+        else if ( '.' == buf[0] && '/' == buf[1] ) {
+            snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[2]);
+            return now_playing;
+        }
+        else {
+            snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, buf);
+            return now_playing;
+        }
+    }
 }
 
 void play_list(char *dir, char *file)
 {
     char *sep="";
+    int dirlen;
 
-    lcd_clear_display();
-    lcd_puts(0,0,"Loading...");
-    lcd_update();
-    empty_playlist(&playlist);
+    empty_playlist();
 
-    /* If the dir does not end in trailing new line, we use a separator.
+    /* If file is NULL, the list is in RAM */
+    if(file) {
+        lcd_clear_display();
+        lcd_puts(0,0,"Loading...");
+        lcd_update();
+        playlist.in_ram = false;
+    } else {
+        /* Assign a dummy filename */
+        file = "";
+        playlist.in_ram = true;
+    }
+
+    dirlen = strlen(dir);
+
+    /* If the dir does not end in trailing slash, we use a separator.
        Otherwise we don't. */
-    if('/' != dir[strlen(dir)-1])
+    if('/' != dir[dirlen-1]) {
         sep="/";
+        dirlen++;
+    }
+    
+    playlist.dirlen = dirlen;
 
     snprintf(playlist.filename, sizeof(playlist.filename),
              "%s%s%s", 
              dir, sep, file);
 
     /* add track indices to playlist data structure */
-    add_indices_to_playlist(&playlist);
-
+    add_indices_to_playlist();
+    
     if(global_settings.playlist_shuffle) {
-        lcd_puts(0,0,"Shuffling...");
-        lcd_update();
-        randomise_playlist( &playlist, current_tick );
+        if(!playlist.in_ram) {
+            lcd_puts(0,0,"Shuffling...");
+            lcd_update();
+        }
+        randomise_playlist( current_tick );
     }
 
-    lcd_puts(0,0,"Playing...  ");
-    lcd_update();
+    if(!playlist.in_ram) {
+        lcd_puts(0,0,"Playing...  ");
+        lcd_update();
+    }
     /* also make the first song get playing */
-    mpeg_play(playlist_next(0, dir));
-    sleep(HZ);
+    mpeg_play(playlist_next(0));
 }
 
 /*
  * remove any filename and indices associated with the playlist
  */
-void empty_playlist( playlist_info_t *playlist )
+void empty_playlist(void)
 {
-    playlist->filename[0] = '\0';
-    playlist->index = 0;
-    playlist->amount = 0;
+    playlist.filename[0] = '\0';
+    playlist.index = 0;
+    playlist.amount = 0;
 }
 
 /*
  * calculate track offsets within a playlist file
  */
-void add_indices_to_playlist( playlist_info_t *playlist )
+void add_indices_to_playlist(void)
 {
     int nread;
-    int fd;
+    int fd = -1;
     int i = 0;
     int store_index = 0;
     int count = 0;
     int next_tick = current_tick + HZ;
 
-    unsigned char *p;
-    unsigned char buf[512];
+    unsigned char *p = playlist_buffer;
     char line[16];
 
-    fd = open(playlist->filename, O_RDONLY);
-    if(-1 == fd)
-        return; /* failure */
+    if(!playlist.in_ram) {
+        fd = open(playlist.filename, O_RDONLY);
+        if(-1 == fd)
+            return; /* failure */
+    }
 
     store_index = 1;
 
-    while((nread = read(fd, &buf, sizeof(buf))) != 0)
+    while(1)
     {
-        p = buf;
+        if(playlist.in_ram) {
+            nread = playlist_end_pos;
+        } else {
+            nread = read(fd, playlist_buffer, PLAYLIST_BUFFER_SIZE);
+            /* Terminate on EOF */
+            if(nread <= 0)
+                break;
+        }
+        
+        p = playlist_buffer;
 
         for(count=0; count < nread; count++,p++) {
 
@@ -203,36 +270,45 @@ void add_indices_to_playlist( playlist_info_t *playlist )
             {
                 
                 /* Store a new entry */
-                playlist->indices[ playlist->amount ] = i+count;
-                playlist->amount++;
-                if ( playlist->amount >= MAX_PLAYLIST_SIZE ) {
-                    close(fd);
+                playlist.indices[ playlist.amount ] = i+count;
+                playlist.amount++;
+                if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
+                    if(!playlist.in_ram)
+                        close(fd);
                     return;
                 }
 
                 store_index = 0;
-                if ( current_tick >= next_tick ) {
-                    next_tick = current_tick + HZ;
-                    snprintf(line, sizeof line, "%d files", playlist->amount);
-                    lcd_puts(0,1,line);
-                    lcd_update();
+                /* Update the screen if it takes very long */
+                if(!playlist.in_ram) {
+                    if ( current_tick >= next_tick ) {
+                        next_tick = current_tick + HZ;
+                        snprintf(line, sizeof line, "%d files",
+                                 playlist.amount);
+                        lcd_puts(0,1,line);
+                        lcd_update();
+                    }
                 }
             }
         }
 
         i+= count;
-    }
-    snprintf(line, sizeof line, "%d files", playlist->amount);
-    lcd_puts(0,1,line);
-    lcd_update();
 
-    close(fd);
+        if(playlist.in_ram)
+            break;
+    }
+    if(!playlist.in_ram) {
+        snprintf(line, sizeof line, "%d files", playlist.amount);
+        lcd_puts(0,1,line);
+        lcd_update();
+        close(fd);
+    }
 }
 
 /*
  * randomly rearrange the array of indices for the playlist
  */
-void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
+void randomise_playlist( unsigned int seed )
 {
     int count;
     int candidate;
@@ -242,15 +318,15 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
     srand( seed );
 
     /* randomise entire indices list */
-    for(count = playlist->amount - 1; count >= 0; count--)
+    for(count = playlist.amount - 1; count >= 0; count--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
         candidate = rand() % (count + 1);
 
         /* now swap the values at the 'count' and 'candidate' positions */
-        store = playlist->indices[candidate];
-        playlist->indices[candidate] = playlist->indices[count];
-        playlist->indices[count] = store;
+        store = playlist.indices[candidate];
+        playlist.indices[candidate] = playlist.indices[count];
+        playlist.indices[count] = store;
     }
 }
 
@@ -265,11 +341,11 @@ static int compare(const void* p1, const void* p2)
 /*
  * sort the array of indices for the playlist
  */
-void sort_playlist( playlist_info_t *playlist )
+void sort_playlist(void)
 {
-    if (playlist->amount > 0)
+    if (playlist.amount > 0)
     {
-        qsort(&playlist->indices, playlist->amount, sizeof(playlist->indices[0]), compare);
+        qsort(&playlist.indices, playlist.amount, sizeof(playlist.indices[0]), compare);
     }
 }
 
