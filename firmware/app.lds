@@ -24,15 +24,39 @@ SECTIONS
     {
         *(.rodata)
     }
+
     .bss :
     {
-       _end = .;
-       _stack = . + 0x1000;
        _edata = .;
+        *(.bss)
+        *(COMMON)
+       _end = .;
+    }
+
+    .stack :
+    {
+       *(.stack)
+       _stack = . + 0x8000;
+    }
+
+    .heap :
+    {
+        _poolstart = .;
+        _poolend = . + 0x20000;
+    }
+
+    .mp3buf :
+    {
+        _mp3buf = .;
+    }
+
+    .mp3end 0x09200000 :
+    {
+        _mp3end = .;
     }
 
     .pad 0x0900C800 :
     {
         LONG(0);
     }
-  }
+}
