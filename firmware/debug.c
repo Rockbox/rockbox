@@ -167,7 +167,7 @@ static char *mem2hex (char *mem, char *buf, int count)
     return (buf);
 }
 
-void debug(char *msg)
+static void debug(char *msg)
 {
     debugbuf[0] = 'O';
     
@@ -177,29 +177,27 @@ void debug(char *msg)
 
 void debugf(char *fmt, ...)
 {
+#ifdef DEBUG
     va_list ap;
     
     va_start(ap, fmt);
     vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
     debug(debugmembuf);
+#endif
 }
 
 #else
 
-void debug( const char *message )
-{
-    printf( message );
-}
-
 void debugf(char *fmt, ...)
 {
+#ifdef DEBUG
     va_list ap;
     
     va_start( ap, fmt );
     vsnprintf( debugmembuf, sizeof(debugmembuf), fmt, ap );
     va_end( ap );
     printf( debugmembuf );
+#endif
 }
 #endif
-

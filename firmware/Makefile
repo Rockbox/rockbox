@@ -20,15 +20,11 @@ TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -Os -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET)
+CFLAGS = -Os -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
-OBJS := $(SRC:%.c=%.o)
-
-%.o: %.s
-	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
-
+OBJS := $(SRC:%.c=%.o) crt0.o
 
 all : archos.mod # archos.asm 
 

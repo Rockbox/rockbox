@@ -1,4 +1,4 @@
-ENTRY(_start)
+ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 SECTIONS
 {
@@ -6,14 +6,28 @@ SECTIONS
     {
         *(.vectors);
         . = ALIGN(0x200);
-        *(.text.start)
-        *(.text)
-        *(.rodata)
+        *(.init.text)
     }
 
+    .text :
+    {
+        *(.text)
+    }
+
+    .data :
+    {
+        *(.data)
+    }
+
+    .rodata :
+    {
+        *(.rodata)
+    }
     .bss :
     {
+       _end = .;
        _stack = . + 0x1000;
+       _edata = .;
     }
 
     .pad 0x0900C800 :

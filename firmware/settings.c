@@ -31,57 +31,57 @@ int persist_all_settings( void )
 {
     if( ! persist_volume_setting() )
     {
-        panic( "failed to persist volume setting" );
+        panicf( "failed to persist volume setting" );
     }
     
     if( ! persist_balance_setting() )
     {
-        panic( "failed to persist balance setting" );
+        panicf( "failed to persist balance setting" );
     }
     
     if( ! persist_bass_setting() )
     {
-        panic( "failed to persist bass setting" );
+        panicf( "failed to persist bass setting" );
     }
     
     if( ! persist_treble_setting() )
     {
-        panic( "failed to persist treble setting" );
+        panicf( "failed to persist treble setting" );
     }
     
     if( ! persist_loudness_setting() )
     {
-        panic( "failed to persist loudness setting" );
+        panicf( "failed to persist loudness setting" );
     }
     
     if( ! persist_bass_boost_setting() )
     {
-        panic( "failed to persist bass boost setting" );
+        panicf( "failed to persist bass boost setting" );
     }
     
     if( ! persist_contrast_setting() )
     {
-        panic( "failed to persist contrast setting" );
+        panicf( "failed to persist contrast setting" );
     }
     
     if( ! persist_poweroff_setting() )
     {
-        panic( "failed to persist poweroff setting" );
+        panicf( "failed to persist poweroff setting" );
     }
     
     if( ! persist_backlight_setting() )
     {
-        panic( "failed to persist backlight setting" );
+        panicf( "failed to persist backlight setting" );
     }
     
     if( ! persist_poweroff_setting() )
     {
-        panic( "failed to persist poweroff setting" );
+        panicf( "failed to persist poweroff setting" );
     }
     
     if( ! persist_resume_setting() )
     {
-        panic( "failed to persist resume setting" );
+        panicf( "failed to persist resume setting" );
     }
     
     /* by getting here, we had no problems */
@@ -96,22 +96,22 @@ int persist_all_playlist_info( void )
 {
     if( ! persist_playlist_filename() )
     {
-        panic( "failed to persist playlist filename" );
+        panicf( "failed to persist playlist filename" );
     }
     
     if( ! persist_playlist_indices() )
     {
-        panic( "failed to persist playlist indices" );
+        panicf( "failed to persist playlist indices" );
     }
     
     if( ! persist_playlist_index() )
     {
-        panic( "failed to persist playlist index" );
+        panicf( "failed to persist playlist index" );
     }
     
     if( ! persist_resume_track_time() )
     {
-        panic( "failed to persist resume track time" );
+        panicf( "failed to persist resume track time" );
     }
 
     /* by getting here, we had no problems */
@@ -124,7 +124,7 @@ int persist_all_playlist_info( void )
  */
 void reload_all_settings( user_settings_t *settings )
 {
-    debug( "reload_all_settings()\n" );
+    DEBUGF( "reload_all_settings()\n" );
 
     /* this is a TEMP stub version */
     
@@ -138,7 +138,7 @@ void reload_all_settings( user_settings_t *settings )
  */
 void reset_settings( user_settings_t *settings ) {
         
-    debug( "reset_settings()\n" );
+    DEBUGF( "reset_settings()\n" );
 
     settings->volume     = DEFAULT_VOLUME_SETTING;
     settings->balance    = DEFAULT_BALANCE_SETTING;
@@ -156,9 +156,9 @@ void reset_settings( user_settings_t *settings ) {
  */
 void display_current_settings( user_settings_t *settings )
 {
-    debug( "\ndisplay_current_settings()\n" );
+    DEBUGF( "\ndisplay_current_settings()\n" );
 
-    debugf( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\nloudness:\t%d\nbass boost:\t%d\n",
+    DEBUGF( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\nloudness:\t%d\nbass boost:\t%d\n",
             settings->volume,
             settings->balance,
             settings->bass,
@@ -166,7 +166,7 @@ void display_current_settings( user_settings_t *settings )
             settings->loudness,
             settings->bass_boost );
 
-    debugf( "contrast:\t%d\npoweroff:\t%d\nbacklight:\t%d\n",
+    DEBUGF( "contrast:\t%d\npoweroff:\t%d\nbacklight:\t%d\n",
             settings->contrast,
             settings->poweroff,
             settings->backlight );

@@ -31,7 +31,7 @@
  */
 int reload_playlist_info( playlist_info_t *playlist )
 {
-    debug( "reload_playlist_info()\n" );
+    DEBUGF( "reload_playlist_info()\n" );
 
     /* this is a TEMP stub version */
 
@@ -60,22 +60,16 @@ int reload_playlist_info( playlist_info_t *playlist )
 void load_playlist( playlist_info_t *playlist, const char *filename ) {
 
     char *m3u_buf = NULL;
-    char debug_message[128];
     
-    snprintf( debug_message, sizeof(debug_message),
-              "load_playlist( %s )\n", filename );
-    debug( debug_message );
+    DEBUGF( "load_playlist( %s )\n", filename );
     
     /* read file */
-    
     read_file_into_buffer( &m3u_buf, filename );
 
     /* store playlist filename */
-    
     strncpy( playlist->filename, filename, sizeof(playlist->filename) );
     
     /* add track indices to playlist data structure */
-    
     add_indices_to_playlist( m3u_buf, playlist );
 }
 
@@ -84,7 +78,7 @@ void load_playlist( playlist_info_t *playlist, const char *filename ) {
  */
 void empty_playlist( playlist_info_t *playlist ) {
 
-    debug( "empty_playlist()\n" );
+    DEBUGF( "empty_playlist()\n" );
     
     playlist->filename[0] = '\0';
     playlist->indices_count = 0;
@@ -101,7 +95,7 @@ void add_indices_to_playlist( char *buf, playlist_info_t *playlist )
     char *p;
     int   i = 0;
     
-    /*debug( "add_indices_to_playlist()\n" ); */
+    /*DEBUGF( "add_indices_to_playlist()\n" ); */
     
     p = buf;
     
@@ -141,8 +135,7 @@ void add_indices_to_playlist( char *buf, playlist_info_t *playlist )
  */
 void extend_indices( playlist_info_t *playlist, int new_index )
 {
-    /*sprintf( debug_message, "extend_indices(%d)\n", new_index ); 
-      debug( debug_message );*/
+    /*DEBUGF( "extend_indices(%d)\n", new_index ); */
 
     /* increase array size count */
     
@@ -157,8 +150,8 @@ void extend_indices( playlist_info_t *playlist, int new_index )
     playlist->indices[ playlist->indices_count - 1 ] = new_index;
 }
 
-track_t next_playlist_track( playlist_info_t *playlist ) {
-
+track_t next_playlist_track( playlist_info_t *playlist )
+{
     track_t track;
     strncpy( track.filename, "boogie", sizeof(track.filename) );
     return track;
@@ -167,8 +160,8 @@ track_t next_playlist_track( playlist_info_t *playlist ) {
 /*
  * randomly rearrange the array of indices for the playlist
  */
-void randomise_playlist( playlist_info_t *playlist ) {
-
+void randomise_playlist( playlist_info_t *playlist )
+{
     unsigned seed;
     int count = 0;
     int candidate;
@@ -178,7 +171,7 @@ void randomise_playlist( playlist_info_t *playlist ) {
     int *randomised_list;
     int i;
     
-    debug( "randomise_playlist()\n" );
+    DEBUGF( "randomise_playlist()\n" );
 
     /* create dynamic storage for randomised list so it can be freed later */
 
@@ -279,7 +272,7 @@ int is_unused_random_in_list( int number, int *new_list, int count )
  */
 void display_playlist_track( track_t *track )
 {
-    debugf( "track: %s\n", track->filename );
+    DEBUGF( "track: %s\n", track->filename );
 }
 
 /*
@@ -290,14 +283,14 @@ void display_current_playlist( playlist_info_t *playlist )
     char indices[2048];
     indices[0]='\0';
 
-    /*debug( "\ndisplay_current_playlist()\n" );  */
+    /*DEBUGF( "\ndisplay_current_playlist()\n" );  */
     
     if( playlist->indices_count != 0 )
     {
         get_indices_as_string( indices, playlist );
     }
     
-    debugf( "\nfilename:\t%s\ntotal:\t\t%d\nindices:\t%s\ncurrent index:\t%d\n\n",
+    DEBUGF( "\nfilename:\t%s\ntotal:\t\t%d\nindices:\t%s\ncurrent index:\t%d\n\n",
             playlist->filename,
             playlist->indices_count,
             indices,
@@ -313,7 +306,7 @@ void get_indices_as_string( char *string, playlist_info_t *playlist )
     int count = 0;
     int *p = playlist->indices;
     
-    /*debug( "get_indices_as_string()\n" );  */
+    /*DEBUGF( "get_indices_as_string()\n" );  */
 
     while( count < playlist->indices_count ) {
 

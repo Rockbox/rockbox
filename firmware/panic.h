@@ -20,7 +20,6 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
-void panic( char *message );
 void panicf( char *fmt, ... );
 
 #endif /* __PANIC_H__ */

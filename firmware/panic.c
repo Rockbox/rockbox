@@ -20,22 +20,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "panic.h"
-#include "drivers/lcd.h"
+#include "lcd.h"
 #include "debug.h"
 
 char panic_buf[128];
-
-/*
- * "Dude. This is pretty fucked-up, right here." 
- */
-void panic( char *message )
-{
-    debug( message );
-    
-    /*lcd_string( message ); */ 
-    
-    while( 1 );
-}
 
 /*
  * "Dude. This is pretty fucked-up, right here." 
@@ -48,5 +36,7 @@ void panicf( char *fmt, ...)
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
 
-    panic( panic_buf );
+    lcd_puts(0,0,panic_buf);
+    DEBUGF(panic_buf);
+    while(1);
 }

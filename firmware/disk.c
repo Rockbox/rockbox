@@ -25,13 +25,11 @@
 
 void read_file_into_buffer( char **buf, const char *filename )
 {
-    /*char debug_message[128];  */
     int i;
     FILE *fp;
     int count = 0;
    
-    /*sprintf( debug_message, "read_file_into_buffer( %s, %s )\n", *buf, filename );
-      debug( debug_message );*/
+    /*DEBUG( "read_file_into_buffer( %s, %s )\n", *buf, filename ); */
     
     fp = fopen( filename, "r" );
 

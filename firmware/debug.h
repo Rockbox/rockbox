@@ -19,7 +19,23 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-void debug(char *msg);
-void debugf(char *fmt, ...);
+extern void debugf(char* fmt,...);
+
+#ifdef __GNUC__
+
+/* GCC handles ellipses in macros, which 
+   means we can avoid the call completely */
+#ifdef DEBUG
+#define DEBUGF(fmt,args...) debugf(fmt, ## args)
+#else
+#define DEBUGF(fmt,args...)
+#endif
+
+#else
+
+void DEBUGF debugf
+
+#endif /* GCC */
+
 
 #endif
