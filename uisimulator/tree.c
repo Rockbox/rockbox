@@ -50,9 +50,11 @@ struct entry {
 
 #ifdef HAVE_LCD_BITMAP
 
-bool is_dir(char* path) {
+bool is_dir(char* path)
+{
   DIR* dir = opendir(path);
-  return(dir!=0);
+  closedir(dir);
+  return (dir!=0);
 }
 
 int static
