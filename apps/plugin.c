@@ -49,7 +49,7 @@
 #define PREFIX(_x_) _x_
 #endif
 
-static int plugin_test(int api_version, int model);
+static int plugin_test(int api_version, int model, int memsize);
 
 static struct plugin_api rockbox_api = {
     PLUGIN_API_VERSION,
@@ -230,7 +230,7 @@ int plugin_load(char* plugin, void* parameter)
     return PLUGIN_OK;
 }
 
-int plugin_test(int api_version, int model)
+int plugin_test(int api_version, int model, int memsize)
 {
     if (api_version != PLUGIN_API_VERSION)
         return PLUGIN_WRONG_API_VERSION;
@@ -238,5 +238,8 @@ int plugin_test(int api_version, int model)
     if (model != MODEL)
         return PLUGIN_WRONG_MODEL;
 
+    if (memsize != MEM)
+        return PLUGIN_WRONG_MODEL;
+    
     return PLUGIN_OK;
 }

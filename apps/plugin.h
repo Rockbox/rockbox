@@ -25,6 +25,10 @@
 #define NO_REDEFINES_PLEASE
 #endif
 
+#ifndef MEM
+#define MEM 2
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +41,7 @@
 #include "lcd.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 3
+#define PLUGIN_API_VERSION 4
 
 /* plugin return codes */
 enum plugin_status {
@@ -64,7 +68,7 @@ enum model {
 /* compatibility test macro */
 #define TEST_PLUGIN_API(_api_) \
 do { \
- int _rc_ = _api_->plugin_test(PLUGIN_API_VERSION, MODEL); \
+ int _rc_ = _api_->plugin_test(PLUGIN_API_VERSION, MODEL, MEM); \
  if (_rc_<0) \
      return _rc_; \
 } while(0)
@@ -73,7 +77,7 @@ struct plugin_api {
     /* these two fields must always be first, to ensure
        TEST_PLUGIN_API will always work */
     int version;
-    int (*plugin_test)(int api_version, int model);
+    int (*plugin_test)(int api_version, int model, int memsize);
 
     /* lcd */
     void (*lcd_clear_display)(void);

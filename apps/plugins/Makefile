@@ -13,9 +13,10 @@ OC    = sh-elf-objcopy
 FIRMWARE = ../../firmware
 
 INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I..
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
+CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
 
-LINKFILE = plugin.lds
+LDS := plugin.lds
+LINKFILE := $(OBJDIR)/pluginlink.lds
 
 SRC := $(wildcard *.c)
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
@@ -40,6 +41,11 @@ $(OBJDIR)/%.o: %.c  ../plugin.h Makefile
 
 all: $(ROCKS)
 	@echo done
+
+# MEM should be passed on to this makefile with the chosen memory size given
+# in number of MB
+$(LINKFILE): $(LDS)
+	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
 
 clean:
 	-rm -f $(ROCKS)
