@@ -27,6 +27,7 @@
 #include "panic.h"
 #include "usb.h"
 #include "power.h"
+#include "string.h"
 
 /* Define one of USE_STANDBY, USE_SLEEP or USE_POWEROFF */
 #define USE_STANDBY
