@@ -84,7 +84,7 @@ static int wait_for_end_of_transfer(void)
 
 int ata_read_sectors(unsigned long start,
                      unsigned char count,
-                     unsigned short* buf)
+                     void* buf)
 {
     int i;
 
@@ -106,7 +106,7 @@ int ata_read_sectors(unsigned long start,
             return 0;
 
         for (j=0; j<256; j++)
-            buf[j] = SWAB16(ATA_DATA);
+            ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
     }
 
     led_turn_off();
@@ -116,7 +116,7 @@ int ata_read_sectors(unsigned long start,
 
 int ata_write_sectors(unsigned long start,
                       unsigned char count,
-                      unsigned short* buf)
+                      void* buf)
 {
     int i;
 
@@ -138,7 +138,7 @@ int ata_write_sectors(unsigned long start,
             return 0;
 
         for (j=0; j<256; j++)
-            ATA_DATA = SWAB16(buf[j]);
+            ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
     }
 
     led_turn_off ();

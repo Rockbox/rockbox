@@ -24,9 +24,9 @@ extern int ata_soft_reset(void);
 extern int ata_init(void);
 extern int ata_read_sectors(unsigned long start,
                             unsigned char count,
-                            unsigned short* buf);
+                            void* buf);
 extern int ata_write_sectors(unsigned long start,
                              unsigned char count,
-                             unsigned short* buf);
+                             void* buf);
 
 #endif
