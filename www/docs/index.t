@@ -45,7 +45,7 @@ Archos. (Jean Boullier)
 <h3>Specs and Papers</h3>
 <ul>
 <li><a href="/notes.html">Research notes (old, deprecated stuff)</a>
-<li><a href="/ports.html">CPU port pin assignments</a>
+<li><a href="ports.html">CPU port pin assignments</a>
 <li><a href="datasheets.html">Data sheets</a>
 <li><a href="/schematics/">Schematics</a>
 <li><a href="mpeghdr.html">MPEG frame header info</a> (and ID3 v1 info)
