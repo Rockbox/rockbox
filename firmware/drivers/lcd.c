@@ -496,6 +496,14 @@ void lcd_icon(int icon, bool enable)
 
 #endif /* HAVE_LCD_CHARCELLS */
 
+#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
+void lcd_icon(int icon, bool enable)
+{
+    icon = icon;
+    enable = enable;
+}
+#endif
+
 #if defined(HAVE_LCD_CHARCELLS) || defined(SIMULATOR) /* not BITMAP */
 void lcd_init (void)
 {
