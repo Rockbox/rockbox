@@ -829,8 +829,12 @@ bool dbg_cpufreq(void)
         case BUTTON_DOWN:
             cpu_boost(false);
             break;
-            
+
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
         case BUTTON_SELECT:
+#else
+        case BUTTON_PLAY:
+#endif
             set_cpu_frequency(CPUFREQ_DEFAULT);
             boost_counter = 0;
             break;
