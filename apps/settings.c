@@ -249,7 +249,7 @@ static struct bit_entry hd_bits[] =
     /* more playback */
     {1, S_O(play_selected), true, "play selected", off_on },
     {1, S_O(fade_on_stop), true, "volume fade", off_on },
-    {4, S_O(ff_rewind_min_step), 1000, 
+    {4, S_O(ff_rewind_min_step), FF_REWIND_1000, 
         "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60" },
     {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
     {3, S_O(buffer_margin), 0, "antiskip", NULL },
@@ -1109,6 +1109,8 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
             }
 
             fprintf(fd, "\r\n");
+            if (p_run->cfg_val != off_on) /* explaination for non-bool */
+                fprintf(fd, "# (possible values: %s)\r\n", p_run->cfg_val);
         }
     }
 }
