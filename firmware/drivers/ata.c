@@ -117,7 +117,7 @@ static int set_features(void);
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
-    int timeout = current_tick + HZ*10;
+    int timeout = current_tick + HZ*30;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
         last_disk_activity = current_tick;
         yield();
@@ -375,6 +375,15 @@ int ata_read_sectors(unsigned long start,
             int status;
 
             if (!wait_for_start_of_transfer()) {
+                /* We have timed out waiting for RDY and/or DRQ, possibly
+                   because the hard drive is shaking and has problems reading
+                   the data. We have two options:
+                   1) Wait some more
+                   2) Perform a soft reset and try again.
+
+                   We choose alternative 2.
+                */
+                ata_soft_reset();
                 ret = -4;
                 goto retry;
             }
@@ -409,6 +418,7 @@ int ata_read_sectors(unsigned long start,
                 -- ATA specification
             */
             if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
+                ata_soft_reset();
                 ret = -5;
                 goto retry;
             }
@@ -420,6 +430,7 @@ int ata_read_sectors(unsigned long start,
         }
 
         if(!ret && !wait_for_end_of_transfer()) {
+            ata_soft_reset();
             ret = -3;
             goto retry;
         }
