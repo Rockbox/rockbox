@@ -49,12 +49,12 @@ Buttons
 
   #include <button.h>
 
-  These functions work the same unregarding of which keypad you have, but they
-  return a different set of values. Note that the Recorder keypad have 10
+  These functions work the same regardless of which keypad you have, but they
+  return a different set of values. Note that the Recorder keypad has 10
   keys, while the Player keypad only features 6.
 
   button_init() init button functions
-  button_get() returns a bitmask for which keys that were pressed
+  button_get() returns a bitmask for which keys were pressed
 
 Files
 
