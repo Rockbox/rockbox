@@ -125,22 +125,10 @@ void app_main(void)
         case BUTTON_PLAY:      
             /* Erase current display state */
             lcd_clear_display();
-            
-            switch(cursor) {
-            case Tetris:
-                tetris();
-                break;
-            case Browse:
-                printf("at browse\n");
-                browse_root();
-                break;
-            case Screen_Saver:
-                screensaver();
-                break;
-            default:
-                continue;
-            }
 
+            /* call the proper function for this line */
+            items[cursor].function();
+            
             /* Return to previous display state */
             lcd_clear_display();
             menu_init();
