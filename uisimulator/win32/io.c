@@ -47,7 +47,7 @@ int win32_filesize(int fd)
     return(size);
 }
 
-extern (mkdir)(const char *name);
+extern int (mkdir)(const char *name);
 
 int win32_mkdir(const char *name, int mode)
 {
