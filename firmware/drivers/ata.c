@@ -32,7 +32,7 @@
 #define ATA_HCYL        (*((volatile unsigned char*)0x06100105))
 #define ATA_SELECT      (*((volatile unsigned char*)0x06100106))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
-#define ATA_STATUS      ATA_COMMAND
+#define ATA_STATUS      (*((volatile unsigned char*)0x06100107))
 #define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
 #define ATA_ALT_STATUS  ATA_CONTROL
 
@@ -55,7 +55,7 @@
 
 static int wait_for_bsy(void)
 {
-    char timeout = current_tick + HZ;
+    int timeout = current_tick + HZ*4;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
         yield();
 
@@ -96,9 +96,12 @@ int ata_read_sectors(unsigned long start,
 {
     int i;
 
-    if (!wait_for_rdy())
-        return 0;
+    DEBUGF("ata: ata_read_sectors(%d, %d)\n", start, count);
 
+    if (!wait_for_rdy())
+        return -1;
+
+    DEBUGF("ata: reading sector %d\n", start);
     led(TRUE);
 
     ATA_NSECTOR = count;
@@ -111,7 +114,7 @@ int ata_read_sectors(unsigned long start,
     for (i=0; i<count; i++) {
         int j;
         if (!wait_for_start_of_transfer())
-            return 0;
+            return -1;
 
         for (j=0; j<256; j++)
             ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
@@ -124,7 +127,10 @@ int ata_read_sectors(unsigned long start,
 
     led(FALSE);
 
-    return wait_for_end_of_transfer();
+    if(!wait_for_end_of_transfer())
+        return -1;
+    else
+        return 0;
 }
 
 #ifdef DISK_WRITE
