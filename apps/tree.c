@@ -524,8 +524,8 @@ bool ask_resume(void)
     status_draw(false);
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #else
-    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_RECORDER));
-    lcd_puts(0,2,str(LANG_RESUME_CANCEL_RECORDER));
+    lcd_puts(0,1,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+    lcd_puts(0,2,str(LANG_CANCEL_WITH_ANY_RECORDER));
 #endif
     lcd_update();
 

@@ -443,14 +443,16 @@ desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new:
 
+# depreciated
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "PLAY = Yes"
+eng: ""
 new:
 
+# depreciated
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-eng: "Any Other = No"
+eng: ""
 new:
 
 id: LANG_KEYLOCK_ON_PLAYER
@@ -1556,4 +1558,14 @@ new:
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
+new:
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new:
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
 new:

@@ -55,6 +55,12 @@ static bool delete_file(void)
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_REALLY_DELETE));
     lcd_puts_scroll(0,1,selected_file);
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+    lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER)); 
+#endif
+
     lcd_update();
 
     while (!exit) {
