@@ -655,9 +655,6 @@ static void format_display(char* buf,
         *flags = WPS_REFRESH_STATIC;
 }
 
-char dbuf[32];
-extern int diffpos, dbval;
-
 bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode)
 {
     char buf[MAX_PATH];
@@ -771,8 +768,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     peak_meter_enabled = enable_pm;
 #endif
 
-    snprintf(dbuf, 32, "%x/%x", diffpos, dbval);
-    lcd_puts(0, 1, dbuf);
     return true;
 }
 
