@@ -223,7 +223,7 @@ new: "Aan"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "LCD verlichting"
+new: "Verlichting"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -368,7 +368,7 @@ new: "Bas Boost"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV decay time"
-new: "AV regeltijd"
+new: "AV terugloop"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -809,3 +809,38 @@ id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
 new: "Nee"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Clip vasthouden" 
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "altijd" 
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Piek meter" 
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Pieken vasthouden" 
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Piek terugloop"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Eenheden per keer"  
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Verlichting tijdens opladen"
