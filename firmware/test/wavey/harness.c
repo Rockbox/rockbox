@@ -41,7 +41,7 @@ int main( int argc, char **args )
     user_settings_t settings;
     playlist_info_t playlist;
 
-    debug( "\nrockbox test harness started.\n" );
+    debugf( "\nrockbox test harness started.\n" );
 
     /* populate runtime data structures */
     
@@ -59,7 +59,7 @@ int main( int argc, char **args )
  */
 void initialise( user_settings_t *settings, playlist_info_t *playlist )
 {
-    debug( "init()\n" );
+    debugf( "init()\n" );
 
     reload_all_settings( settings );
     reload_playlist_info( playlist );
@@ -72,7 +72,7 @@ void start( user_settings_t *settings, playlist_info_t *playlist )
 {
     track_t track;
 
-    debug( "start()\n" );
+    debugf( "start()\n" );
 
     /* show current values */
     
@@ -86,12 +86,12 @@ void start( user_settings_t *settings, playlist_info_t *playlist )
     
     /* user selects a new playlist */
     
-    load_playlist( playlist, "\\playlists\\2.m3u" );
+    load_playlist( playlist, "test2.m3u" );
     display_current_playlist( playlist );
 
     /* randomise playlist */
     
-    randomise_playlist( playlist );
+    randomise_playlist( playlist, 45678 );
     display_current_playlist( playlist );
 
     /* get next track in playlist */
@@ -104,10 +104,9 @@ void start( user_settings_t *settings, playlist_info_t *playlist )
     track = next_playlist_track( playlist );
     display_playlist_track( &track );
 }
-
 #ifdef SIMULATOR
 void app_main ()
 {
     main (0, NULL);
 }
-#endif // SIMULATOR
+#endif
