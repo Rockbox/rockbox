@@ -409,7 +409,7 @@ void lcd_write(int byte, int data)
 bytes to be loaded by newer firmware ROMs. 
 So my "first program" only works on players with older firmware in ROM
 (my has 3.18). Joachim posted a
-<a href="mail/jukebox-archive-2001-12/att-0087/01-AJBREC.ajz">padded version</a> that works everywhere.
+<a href="mail/archive/rockbox-archive-2001-12/att-0087/01-AJBREC.ajz">padded version</a> that works everywhere.
 
 <p>Tests have shown that firmware sizes above 200K won't load.
 

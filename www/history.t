@@ -18,7 +18,7 @@ If you like living on the edge, <a href="daily.shtml">here are daily builds</a>.
 <p><i>2002-05-26</i>: New web design. First player release drawing closer.
 
 <p><i>2002-05-03</i>: <b>SOUND!</b> Linus' experimental MAS code has 
-<a href="http://bjorn.haxx.se/rockbox/mail/rockbox-archive-2002-05/0016.shtml">played our first 4 seconds of music</a>.
+<a href="http://bjorn.haxx.se/rockbox/mail/archive/rockbox-archive-2002-05/0016.shtml">played our first 4 seconds of music</a>.
 
 <p><i>2002-04-27</i>: Julien Labruyére has generously donated an Archos Jukebox 6000 to the project. Thank you!
 
@@ -67,30 +67,30 @@ Logos are welcome! :-)
 for how to get sh-gcc running under windows.
 
 <p><i>2002-01-09</i>: Nicolas Sauzede 
-<a href="mail/rockbox-archive-2002-01/0096.shtml">found out</a>
+<a href="mail/archive/rockbox-archive-2002-01/0096.shtml">found out</a>
 how to 
-<a href="mail/rockbox-archive-2002-01/0099.shtml">display icons and custom characters</a> on the Jukebox LCD.
+<a href="mail/archive/rockbox-archive-2002-01/0099.shtml">display icons and custom characters</a> on the Jukebox LCD.
 
 <p><i>2002-01-08</i>: The two LCD charsets have been 
 <a href="notes.html#charsets">mapped and drawn</a>.
 
 <p><i>2002-01-07</i>:
-<a href="mail/rockbox-archive-2002-01/0026.shtml">Jukebox LCD code</a>.
+<a href="mail/archive/rockbox-archive-2002-01/0026.shtml">Jukebox LCD code</a>.
 I have written a small test program that scrolls some text on the display.
 You need
-<a href="mail/rockbox-archive-2002-01/att-0026/01-archos.mod.gz">this file</a>
+<a href="mail/archive/rockbox-archive-2002-01/att-0026/01-archos.mod.gz">this file</a>
 for units with ROM earlier than 4.50 and
-<a href="mail/rockbox-archive-2002-01/att-0050/02-archos.mod.gz">this file</a>
+<a href="mail/archive/rockbox-archive-2002-01/att-0050/02-archos.mod.gz">this file</a>
 for all others. (The files are gzipped, you need to unzip them before they will work.)
 
 <p><i>2001-12-29</i>: Recorder LCD code. Gary Czvitkovicz knew the Recorder LCD controller since before and wrote some
-<a href="mail/rockbox-archive-2001-12/att-0145/01-ajbr_lcd.zip">code</a>
+<a href="mail/archive/rockbox-archive-2001-12/att-0145/01-ajbr_lcd.zip">code</a>
 that writes text on the Recorder screen.
 
 <p><i>2001-12-13</i>: First program 
-<a href="mail/rockbox-archive-2001-12/0070.shtml">released</a>!
+<a href="mail/archive/rockbox-archive-2001-12/0070.shtml">released</a>!
 A 550 bytes long 
-<a href="mail/rockbox-archive-2001-12/att-0070/01-archos.mod">archos.mod</a>
+<a href="mail/archive/rockbox-archive-2001-12/att-0070/01-archos.mod">archos.mod</a>
 that performs the amazing magic of flashing the red LED. :-)
 
 <p><i>2001-12-11</i>: Checksum algorithm solved, thanks to Andy Choi. A new "scramble" utility is available.

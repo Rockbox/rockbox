@@ -38,7 +38,7 @@ us developers.
 <h2>Linux unlock</h2>
 
 <p>For those of us using Linux, we have written 
-<a href="mail/rockbox-archive-2002-03/att-0010/01-isd200.diff">an isd200 driver patch for unlocking the disk</a>.
+<a href="mail/archive/rockbox-archive-2002-03/att-0010/01-isd200.diff">an isd200 driver patch for unlocking the disk</a>.
 This modified driver will automatically unlock the disk when you connect your Archos via USB, so you don't have to do anything special. Apply the patch to a 2.4.18 linux kernel tree.
 
 #include "foot.t"
