@@ -112,16 +112,18 @@ void switch_thread(void)
     
 #endif
     next = current = current_thread;
+
     if (++next >= num_threads)
         next = 0;
     current_thread = next;
     store_context(&thread_contexts[current]);
-    load_context(&thread_contexts[next]);
-
-    stackptr = thread_stack[next];
     
+    /* Check if the current thread stack is overflown */
+    stackptr = thread_stack[current];
     if(stackptr[0] != 0xdeadbeef)
-       panicf("Stkov %s", thread_name[next]);
+       panicf("Stkov %s", thread_name[current]);
+       
+    load_context(&thread_contexts[next]);
 }
 
 void sleep_thread(void)
@@ -142,36 +144,36 @@ void wake_up_thread(void)
  */
 int create_thread(void* function, void* stack, int stack_size, char *name)
 {
-    unsigned int i;
-    unsigned int stacklen;
-    unsigned int *stackptr;
-    struct regs *regs;
+   unsigned int i;
+   unsigned int stacklen;
+   unsigned int *stackptr;
+   struct regs *regs;
         
-    if (num_threads >= MAXTHREADS)
-        return -1;
+   if (num_threads >= MAXTHREADS)
+      return -1;
 
-    /* Munge the stack to make it easy to spot stack overflows */
-	stacklen = stack_size / 4;
-	stackptr = stack;
-	for(i = 0;i < stacklen;i++)
-	{
-	    stackptr[i] = 0xdeadbeef;
-	}
+   /* Munge the stack to make it easy to spot stack overflows */
+   stacklen = stack_size / 4;
+   stackptr = stack;
+   for(i = 0;i < stacklen;i++)
+   {
+      stackptr[i] = 0xdeadbeef;
+   }
 
-	/* Store interesting information */
-	thread_name[num_threads] = name;
-	thread_stack[num_threads] = stack;
-	thread_stack_size[num_threads] = stack_size;
-    regs = &thread_contexts[num_threads];
-    store_context(regs);
-    /* Subtract 4 to leave room for the PR push in load_context()
-       Align it on an even 32 bit boundary */
-    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
-    regs->sr = 0;
-    regs->pr = function;
+   /* Store interesting information */
+   thread_name[num_threads] = name;
+   thread_stack[num_threads] = stack;
+   thread_stack_size[num_threads] = stack_size;
+   regs = &thread_contexts[num_threads];
+   store_context(regs);
+   /* Subtract 4 to leave room for the PR push in load_context()
+      Align it on an even 32 bit boundary */
+   regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
+   regs->sr = 0;
+   regs->pr = function;
 
-    wake_up_thread();
-    return num_threads++; /* return the current ID, e.g for remove_thread() */
+   wake_up_thread();
+   return num_threads++; /* return the current ID, e.g for remove_thread() */
 }
 
 /*--------------------------------------------------------------------------- 
@@ -222,7 +224,7 @@ int thread_stack_usage(int threadnum)
    for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
    {
       if(stackptr[i] != 0xdeadbeef)
-	 break;
+         break;
    }
    
    return ((thread_stack_size[threadnum] - i * 4) * 100) /
