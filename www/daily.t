@@ -9,7 +9,7 @@
 <ul>
 <li><a href="cross-gcc.html">Building the SH1 cross compiler</a>
 <li><a href="sh-win/">Setting up an SH1 cross compiler for Windows</a>
-<li><a href="firmware/README">README from the firmware directory</a>,
+<li><a href="docs/how_to_compile.html">README from the docs directory</a>,
 describing how to compile Rockbox
 <lI><a href="manual/">The Rockbox Manual</a>
 </ul>
