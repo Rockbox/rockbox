@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS := -O -s -ansi
+CFLAGS := -O -ansi
 
 TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
 
