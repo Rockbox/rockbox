@@ -356,9 +356,11 @@ bool main_menu(void)
     items[i].desc = ID2P(LANG_INFO);
     items[i++].function = info_menu;
 
+#ifdef HAVE_LCD_CHARCELLS
     items[i].desc = ID2P(LANG_SHUTDOWN);
     items[i++].function = clean_shutdown;
-
+#endif
+    
     m=menu_init( items, i, NULL, NULL, NULL, NULL );
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
