@@ -416,13 +416,30 @@ static int compare(const void* p1, const void* p2)
 }
 
 /*
- * sort the array of indices for the playlist
+ * Sort the array of indices for the playlist. If start_current is true then
+ * set the index to the new index of the current song.
  */
-void sort_playlist(void)
+void sort_playlist(bool start_current)
 {
+    int i;
+    int current = playlist.indices[playlist.index];
+
     if (playlist.amount > 0)
     {
         qsort(&playlist.indices, playlist.amount, sizeof(playlist.indices[0]), compare);
+    }
+
+    if (start_current)
+    {
+        /* Set the index to the current song */
+        for (i=0; i<playlist.amount; i++)
+        {
+            if (playlist.indices[i] == current)
+            {
+                playlist.index = i;
+                break;
+            }
+        }
     }
 }
 

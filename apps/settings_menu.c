@@ -208,7 +208,7 @@ Menu settings_menu(void)
         }
         else
         {
-            sort_playlist();
+            sort_playlist(true);
         }
     }
     return result;

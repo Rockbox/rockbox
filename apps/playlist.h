@@ -44,7 +44,7 @@ int play_list(char *dir, char *file, int start_index,
               bool shuffled_index, int start_offset, int random_seed );
 char* playlist_next(int steps, int* id);
 void randomise_playlist( unsigned int seed );
-void sort_playlist(void);
+void sort_playlist(bool start_current);
 void empty_playlist(void);
 void add_indices_to_playlist(void);
 void playlist_clear(void);
