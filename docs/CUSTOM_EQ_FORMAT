@@ -25,9 +25,13 @@ Format Rules
 
 Example File
 ------------
-[volume]70#(0 to 100)
-[bass]11#(-15 to 15 [Range depends on MAS])
-[treble]12#(-15 to 15 [Range depends on MAS])
-[balance]0#(-100 to 100)
+[volume]70# 0 to 100
+[bass]11# player: -15 to 15, recorder: -12 to 12
+[treble]12# player: -15 to 15, recorder: -12 to 12
+[balance]0# -100 to 100
+[channels]0# 0=Stereo, 1=Mono, 2=Mono Left, 3=Mono Right
+[loudness]5# 0 to 17, recorder only!
+[bass boost]30# 0 to 100, recorder only!
+[auto volume]0# 0=off, 1=2s, 2=4s, 3=8s, recorder only!
 
 This sets each line to the respective values after it. Notice that you can put comments after the #
