@@ -68,15 +68,16 @@ bool dma_on;
 
 void setup_sci0(void)
 {
-    PBCR1 = (PBCR1 & 0xccff) | 0x1200;
+    /* PB15 is I/O, PB14 is IRQ6, PB12 is SCK0 */
+    PBCR1 = (PBCR1 & 0x0cff) | 0x1200;
     
-    /* set PB12 to output */
+    /* Set PB12 to output */
     PBIOR |= 0x1000;
 
     /* Disable serial port */
     SCR0 = 0x00;
 
-    /* Syncronous, 8N1, no prescale */
+    /* Synchronous, no prescale */
     SMR0 = 0x80;
 
     /* Set baudrate 1Mbit/s */
@@ -225,7 +226,7 @@ int main(void)
         
         dma_on = TRUE;
         
-        /* Enable Tx (only!) */
+        /* Enable Tx & TXIE */
         SCR0 |= 0xa0;
         
         CHCR3 |= 1;
