@@ -407,7 +407,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libFLAC libTremor libwavpack"
+    codecs="libmad liba52 libFLAC libTremor libwavpack dumb"
     ;;
 
    *)
