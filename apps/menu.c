@@ -55,8 +55,6 @@ static void menu_draw(int m)
          i++) {
         lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
     }
-
-    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
     lcd_update();
 }
 
@@ -72,7 +70,7 @@ static void put_cursor(int m, int target)
         menus[m].top--;
         menu_draw(m);
     }
-    else if ( target > MENU_LINES-1 ) {
+    else if ( target-menus[m].top > MENU_LINES-1 ) {
         menus[m].top++;
         menu_draw(m);
     }
@@ -110,6 +108,7 @@ void menu_exit(int m)
 void menu_run(int m)
 {
     menu_draw(m);
+    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
     
     while(1) {
         switch( button_get(true) ) {
@@ -118,10 +117,7 @@ void menu_run(int m)
 #else
             case BUTTON_LEFT:
 #endif
-                if (menus[m].cursor == 0) {
-                    /* wrap around to menu bottom */
-                    put_cursor(m, menus[m].itemcount-1);
-                } else {
+                if (menus[m].cursor) {
                     /* move up */
                     put_cursor(m, menus[m].cursor-1);
                 }
@@ -132,10 +128,7 @@ void menu_run(int m)
 #else
             case BUTTON_RIGHT:
 #endif
-                if (menus[m].cursor == menus[m].itemcount-1) {
-                    /* wrap around to menu top */
-                    put_cursor(m, 0);
-                } else {
+                if (menus[m].cursor < menus[m].itemcount-1) {
                     /* move down */
                     put_cursor(m, menus[m].cursor+1);
                 }
@@ -152,6 +145,7 @@ void menu_run(int m)
             
                 /* Return to previous display state */
                 menu_draw(m);
+                lcd_puts(0, menus[m].cursor - menus[m].top, "-");
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
