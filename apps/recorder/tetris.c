@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "features.h"
+#include "options.h"
 
 #ifdef USE_GAMES
 
