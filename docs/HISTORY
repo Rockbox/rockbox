@@ -174,9 +174,6 @@ Rockbox History
   On July 9th, Jörg Hohensohn announced the first official release of Rockbox
   in flash! It only works on the Recorders and the FM Recorders.
 
-  Jens made it possible to run Rockbox entirely from ROM, thus making another
-  150-170KB free for mp3 buffering.
-
 * December 2003
 
   Rockbox 2.1 is released
@@ -196,7 +193,13 @@ Rockbox History
 
   We start providing Windows installer packages
 
+  Jens made it possible to run Rockbox entirely from ROM, thus making another
+  150-170KB free for mp3 buffering.
+
 * September 2004
+
+  Jens and Jörg started porting Rockbox to the Archos Ondio, Archos' flash
+  memory based player series.
 
   The work on a iRiver port starts for real. We buy one working and one broken
   one to the project. Another article (about the porting) appears on slashdot.
