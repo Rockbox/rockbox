@@ -268,32 +268,6 @@ SOURCE=..\..\apps\recorder\bmp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\apps\recorder\bounce.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\apps\recorder\cube.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\apps\recorder\icons.c
 
 !IF  "$(CFG)" == "rockbox - Win32 Recorder"
@@ -333,59 +307,7 @@ SOURCE=..\..\apps\recorder\peakmeter.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\apps\recorder\snow.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\apps\recorder\sokoban.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\apps\recorder\tetris.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\apps\recorder\widgets.c
-
-!IF  "$(CFG)" == "rockbox - Win32 Recorder"
-
-!ELSEIF  "$(CFG)" == "rockbox - Win32 Player"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\apps\recorder\wormlet.c
 
 !IF  "$(CFG)" == "rockbox - Win32 Recorder"
 
@@ -475,10 +397,6 @@ SOURCE=..\..\apps\tree.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\apps\viewer.c
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\apps\wps-display.c"
 # End Source File
 # Begin Source File
@@ -557,6 +475,10 @@ SOURCE=".\mpeg-win32.c"
 # Begin Source File
 
 SOURCE=".\panic-win32.c"
+# End Source File
+# Begin Source File
+
+SOURCE=".\plugin-win32.c"
 # End Source File
 # Begin Source File
 

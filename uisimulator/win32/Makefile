@@ -93,19 +93,18 @@ FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c \
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
-	screens.c peakmeter.c viewer.c sleeptimer.c keyboard.c onplay.c\
+	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
 	misc.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c bounce.c snow.c bmp.c \
-	widgets.c wormlet.c cube.c
+   APPS += bmp.c widgets.c
 endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c io.c
+	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c io.c plugin-win32.c
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
