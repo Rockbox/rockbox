@@ -28,12 +28,12 @@ struct credit {
 };
 
 struct credit credits[] = {
-    { "Bjorn Stenberg",          "Originator, project manager, code" },
-    { "Linus Nielsen Feltzing",  "Electronics, code"                 },
+    { "Bjorn Stenberg",          "Originator, Project manager, Code" },
+    { "Linus Nielsen Feltzing",  "Electronics, Code"                 },
     { "Andy Choi",               "Checksums"                         },
-    { "Andrew Jamieson",         "Schematics, electronics"           },
+    { "Andrew Jamieson",         "Schematics, Electronics"           },
     { "Paul Suade",              "Serial port setup"                 },
-    { "Joachim Schiffer",        "Schematics, electronics"           },
+    { "Joachim Schiffer",        "Schematics, Electronics"           },
     { "Daniel Stenberg",         "Code"                              },
     { "Alan Korr",               "Code"                              },
     { "Gary Czvitkovicz",        "Code"                              },
@@ -48,7 +48,7 @@ struct credit credits[] = {
     { "Robert Hak",              "Code, FAQ, Sarcasm"                },
     { "Dave Chapman",            "Code"                              },
     { "Stefan Meyer",            "Code"                              },
-	{ "Eric Linenberg",          "Sokoban"                           },
+    { "Eric Linenberg",          "Sokoban"                           },
 };
 
 #ifdef HAVE_LCD_BITMAP
