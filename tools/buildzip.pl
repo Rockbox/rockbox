@@ -188,6 +188,10 @@ if(!$exe) {
         $exe = "archos.mod";
     }
 }
+elsif($exe =~ /rockboxui/) {
+    # simulator, exclude the exe file
+    $exe = "";
+}
 
 if($target =~ /player/i) {
     runone("player", $exe);
