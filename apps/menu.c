@@ -184,6 +184,7 @@ static void put_cursor(int m, int target)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
+    lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
     if (global_settings.statusbar)
         menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
@@ -245,6 +246,18 @@ void menu_exit(int m)
 int menu_show(int m)
 {
     bool exit = false;
+#ifdef HAVE_LCD_BITMAP
+    int fw, fh;
+    int menu_lines;
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("A", &fw, &fh);
+    if (global_settings.statusbar)
+        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
+    else
+        menu_lines = LCD_HEIGHT/fh;
+#else
+    int menu_lines = MENU_LINES;
+#endif
 
     menu_draw(m);
 
@@ -264,7 +277,7 @@ int menu_show(int m)
                 else {
                     /* move to bottom */
 #ifdef HAVE_RECORDER_KEYPAD
-                    menus[m].top = menus[m].itemcount-9;
+                    menus[m].top = menus[m].itemcount-(menu_lines+1);
 #else
                     menus[m].top = menus[m].itemcount-3;
 #endif
