@@ -166,8 +166,11 @@
 
 #include "sh7034.h"
 #include <string.h>
-#include <setjmp.h>
-#include <signal.h>
+
+typedef int jmp_buf[20];
+
+void longjmp(jmp_buf __jmpb, int __retval);
+int setjmp(jmp_buf __jmpb);
 
 /* We need to undefine this from the sh7034.h file */
 #undef GBR
@@ -411,7 +414,12 @@ static char remcomOutBuffer[BUFMAX];
 
 #define ATA_NSECTOR     (*((volatile unsigned char*)0x06100102))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
+
+#ifdef RECORDER
+#define ATA_CONTROL     (*((volatile unsigned char*)0x06200206))
+#else
 #define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
+#endif
 #define ATA_ALT_STATUS  ATA_CONTROL
 
 #define STATUS_BSY      0x80
@@ -689,6 +697,12 @@ void handle_buserror (void)
 {
     longjmp (remcomEnv, 1);
 }
+
+#define	SIGINT	2	/* interrupt */
+#define	SIGILL	4	/* illegal instruction (not reset when caught) */
+#define	SIGTRAP	5	/* trace trap (not reset when caught) */
+#define	SIGEMT	7	/* EMT instruction */
+#define	SIGBUS	10	/* bus error */
 
 /*
  * this function takes the SH-1 exception number and attempts to
@@ -1509,8 +1523,13 @@ void init_serial (void)
     /* Set communication to be async, 8-bit data,
        no parity, 1 stop bit and use internal clock */
     SMR1 = 0;
-/*    BRR1 = SYSCLOCK / (9600 * 32) - 1;*/
+
+#ifdef RECORDER
+    #warning 115200
+    BRR1 = 2; /* 115200 */
+#else
     BRR1 = 9; /* 38400 */
+#endif
 
     SCR1 &= ~(SCI_CKE1 | SCI_CKE0);
 
@@ -1574,4 +1593,19 @@ void handleError (char theSSR)
 {
     /* Clear all error bits, otherwise the receiver will stop */
     SSR1 &= ~(SCI_ORER | SCI_PER | SCI_FER);
+}
+
+void *memcpy(void *dest, const void *src0, size_t n)
+{
+    char *dst = (char *) dest;
+    char *src = (char *) src0;
+    
+    void *save = dest;
+    
+    while(n--)
+    {
+        *dst++ = *src++;
+    }
+    
+    return save;
 }

@@ -23,13 +23,22 @@ To debug using the serial port on the Jukebox, you need to do the following:
 2) Build or download a GDB SH1 cross debugger
 
 3) Compile the GDB stub from the CVS "gdb" archive
+   For Player models, just type:
+   # make
+
+   For Recorder, type
+   #make RECORDER=1
 
 4) Copy the newly built ARCHOS.MOD to the Jukebox.
 
 5) Start the Jukebox and fire up the GDB with the elf file you want to debug
    as an argument along with the baud rate:
 
+   For Player:
    # sh-elf-gdb -b 38400 test.elf
+
+   For Recorder:
+   # sh-elf-gdb -b 115200 test.elf
 
 6) In GDB, type:
 
@@ -58,13 +67,13 @@ To debug using the serial port on the Jukebox, you need to do the following:
 
 8) You're set. Now try to set a breakpoint and run:
 
-   (gdb) b 22
-   Breakpoint 1 at 0x90182c6: file led.c, line 14.
+   (gdb) b main
+   Breakpoint 1 at 0x9011b2a: file main.c, line 192.
    (gdb) c
    Continuing.
 
-   Breakpoint 2, main () at led.c:15
-   15       SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
+   Breakpoint 1, main () at main.c:192
+   192         app_main();
    (gdb)
 
    Good luck!
@@ -73,8 +82,14 @@ To debug using the serial port on the Jukebox, you need to do the following:
 Technical details:
 
    As for now, the GDB stub occupies the memory from 0x900000 up to
-   0x9018000. This will change.
+   0x9018000.
 
    Compile and link your test program at 0x9018000 and up, and it will work.
 
-   The baud rate is 38400, and the settings are 8N1.
+   The baud rate is 38400 for Player, 115200 for Recorder, and the settings
+   are 8N1.
+
+   Note that you may have to change the ATA I/O address in the ATA_CONTROL
+   macro in sh-stub.c. go to Menu->Debug (keep out)->View HW info to find out.
+
+   Linus Nielsen Feltzing
