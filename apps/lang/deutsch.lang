@@ -2962,9 +2962,9 @@ new: "GB"
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
-eng: "HDD:"
+eng: "Disk:"
 voice: ""
-new: "Disk:"
+new: "HDD:"
 
 id: LANG_DISK_FREE_INFO
 desc: disk size info
