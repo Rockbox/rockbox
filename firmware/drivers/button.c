@@ -179,14 +179,17 @@ static int button_read(void)
 
 #elif HAVE_PLAYER_KEYPAD
 
-/* The player has all buttons on port pins:
+/* The player has two buttons on port pins:
 
-   LEFT:  PC0
-   RIGHT: PC2
-   PLAY:  PC3
    STOP:  PA11
    ON:    PA5
-   MENU:  PC1
+
+   The rest are on analog inputs:
+   
+   LEFT:  AN0
+   MENU:  AN1
+   RIGHT: AN2
+   PLAY:  AN3
 */
 
 void button_init(void)
@@ -200,18 +203,18 @@ void button_init(void)
 static int button_read(void)
 {
     int porta = PADR;
-    int portc = PCDR;
     int btn = 0;
-    
+
     /* buttons are active low */
-    if ( !(portc & 1) )
+    if(adc_read(0) < 0x180)
         btn |= BUTTON_LEFT;
-    if ( !(portc & 2) )
+    if(adc_read(1) < 0x180)
         btn |= BUTTON_MENU;
-    if ( !(portc & 4) )
+    if(adc_read(2) < 0x180)
         btn |= BUTTON_RIGHT;
-    if ( !(portc & 8) )
+    if(adc_read(3) < 0x180)
         btn |= BUTTON_PLAY | BUTTON_UP;
+
     if ( !(porta & 0x20) )
         btn |= BUTTON_ON;
     if ( !(porta & 0x800) )
