@@ -509,26 +509,26 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               break;
           case 0x53: /* LD D,E */
 #ifdef DYNA_DEBUG 
-	      fdprintf(fd,"LD B,A\n"); 
+	      fdprintf(fd,"LD D,E\n"); 
 #endif
 	      DYNA_MOVE_b_r_to_r(5,4);
               break;
           case 0x54: /* LD D,H */
 #ifdef DYNA_DEBUG 
-	      fdprintf(fd,"LD B,A\n"); 
+	      fdprintf(fd,"LD D,H\n"); 
 #endif
 	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,4);
               break;
           case 0x55: /* LD D,L */
 #ifdef DYNA_DEBUG 
-	      fdprintf(fd,"LD B,A\n"); 
+	      fdprintf(fd,"LD D,L\n"); 
 #endif
 	      DYNA_MOVE_b_r_to_r(6,4);
               break;
           case 0x57: /* LD D,A */
 #ifdef DYNA_DEBUG 
-	      fdprintf(fd,"LD B,A\n"); 
+	      fdprintf(fd,"LD D,A\n"); 
 #endif
 	      DYNA_MOVE_b_r_to_r(1,4);
               break;
@@ -717,11 +717,11 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 #ifdef DYNA_DEBUG
 	      fdprintf(fd,"LDI (HL),A\n");
 #endif
-              DYNA_PUSH_l_r(1,0);
+/*              DYNA_PUSH_l_r(1,0);
               DYNA_PUSH_l_r(6,0);
               CALL_NATIVE(&writeb);
               DYNA_ADDQ_l_i_to_r(0,7,1);
-	      DYNA_INC_l_r(6,0);
+	      DYNA_INC_l_r(6,0);*/
 	      break;
           case 0x31: /* LD SP,imm */
 #ifdef DYNA_DEBUG
