@@ -29,6 +29,7 @@
 #include "panic.h"
 #include "menu.h"
 #include "system.h"
+#include "usb.h"
 #ifndef SIMULATOR
 #include "dmalloc.h"
 #include "bmalloc.h"
@@ -41,9 +42,39 @@
 
 #include "version.h"
 
+#include "sh7034.h"
+#include "sprintf.h"
+
 char appsversion[]=APPSVERSION;
 
 void init(void);
+
+/* Test code!!! */
+void dbg_ports(void)
+{
+   unsigned short porta;
+   unsigned short portb;
+   unsigned char portc;
+   char buf[32];
+
+   lcd_clear_display();
+
+   while(1)
+   {
+      porta = PADR;
+      portb = PBDR;
+      portc = PCDR;
+      
+      snprintf(buf, 32, "PCDR: %04x", porta);
+      lcd_puts(0, 0, buf);
+      snprintf(buf, 32, "PCDR: %04x", portb);
+      lcd_puts(0, 1, buf);
+      snprintf(buf, 32, "PCDR: %02x", portc);
+      lcd_puts(0, 2, buf);
+      lcd_update();
+      sleep(HZ/10);
+   }
+}
 
 void app_main(void)
 {
@@ -89,6 +120,8 @@ void init(void)
 #endif
     set_irq_level(0);
 
+    usb_init();
+    
     rc = ata_init();
     if(rc)
         panicf("ata: %d",rc);
@@ -107,6 +140,8 @@ void init(void)
     mpeg_init( global_settings.volume,
                global_settings.bass,
                global_settings.treble );
+
+    usb_start_monitoring();
 }
 
 int main(void)
