@@ -174,7 +174,7 @@ EFEAT
 
 NAME Max number of files in a dir ENAME
 TD 400 ETD
-UNKNOWN
+TD 999 ETD
 EFEAT
 
 NAME Adjustable scroll speed ENAME
