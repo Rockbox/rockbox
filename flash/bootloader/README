@@ -1,4 +1,0 @@
-(c) 2003 by Jörg Hohensohn
-
-This is the source code for the flash bootloader.
-It give the dual boot feature, decompresses one of two software images.

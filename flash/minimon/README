@@ -1,6 +1,0 @@
-(c) 2003 by Jörg Hohensohn
-
-MiniMon is the tiny but powerful-enough piece of code that can be loaded
-with the UART boot mod. 
-It allows to read and write memory, flash program, execute code.
-This is suitable to reflash the box, load Rockbox or the gdb stub, etc.

@@ -1,7 +1,0 @@
-Rockbox example build
----------------------
-
-These files are meant to show how to build a simple program for the Archos.
-
-Note that the display code only works on older machines (<4.50) so don't
-look too hard on that. 
