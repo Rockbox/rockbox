@@ -99,9 +99,15 @@
 #define FATDIR_FSTCLUSLO     26
 #define FATDIR_FILESIZE      28
 
+#define FATLONG_ORDER        0
+#define FATLONG_ATTR         11
+#define FATLONG_TYPE         12
+#define FATLONG_CHKSUM       13
+
 #define CLUSTERS_PER_FAT_SECTOR (SECTOR_SIZE / 4)
 #define DIR_ENTRIES_PER_SECTOR  (SECTOR_SIZE / DIR_ENTRY_SIZE)
 #define DIR_ENTRY_SIZE       32
+#define NAME_BYTES_PER_ENTRY 13
 #define FAT_BAD_MARK         0x0ffffff7
 #define FAT_EOF_MARK         0x0ffffff8
 
@@ -162,13 +168,8 @@ static struct bpb fat_bpb;
 static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
-#ifdef DISK_WRITE
-static unsigned int getcurrdostime(unsigned short *dosdate,
-                                   unsigned short *dostime,
-                                   unsigned char *dostenth);
 static int create_dos_name(unsigned char *name, unsigned char *newname);
 static unsigned int find_free_cluster(unsigned int start);
-#endif
 
 #define FAT_CACHE_SIZE 0x20
 #define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
@@ -637,45 +638,134 @@ static int flush_fat(void)
     return 0;
 }
 
-static unsigned int getcurrdostime(unsigned short *dosdate,
-                                   unsigned short *dostime,
-                                   unsigned char *dostenth)
+static int write_long_name(struct fat_file* file,
+                           unsigned int firstentry,
+                           unsigned int numentries,
+                           unsigned char* name,
+                           unsigned char* shortname)
 {
-#if 0
-    struct tm *tm;
-    unsigned long now = time();
-    tm = localtime(&tb.time);
+    unsigned char buf[SECTOR_SIZE];
+    unsigned char* entry;
+    unsigned int idx = firstentry % DIR_ENTRIES_PER_SECTOR;
+    unsigned int sector = firstentry / DIR_ENTRIES_PER_SECTOR;
+    unsigned int i, j=0, nameidx;
+    unsigned char chksum = 0;
+    unsigned int namelen = strlen(name);
+    int rc;
 
-    *dosdate = ((tm->tm_year - 80) << 9) |
-        ((tm->tm_mon + 1)  << 5) |
-        (tm->tm_mday);
+    LDEBUGF("write_long_name(file:%x, first:%d, num:%d, name:%s)\n",
+            file->firstcluster, firstentry, numentries, name);
 
-    *dostime = (tm->tm_hour << 11) |
-        (tm->tm_min << 5) |
-        (tm->tm_sec >> 1);
+    rc = fat_seek(file, sector);
+    if (rc<0)
+        return -1;
 
-    *dostenth = (tm->tm_sec & 1) * 100 + tb.millitm / 10;
-#else
-    *dosdate = 0;
-    *dostime = 0;
-    *dostenth = 0;
-#endif
+    rc = fat_readwrite(file, 1, buf, false);
+    if (rc<1)
+        return -2;
+
+    /* calculate shortname checksum */
+    for (i=11; i>0; i--)
+        chksum = ((chksum & 1) ? 0x80 : 0) + (chksum >> 1) + shortname[j++];
+
+    /* calc position of last name segment */
+    for (nameidx=0;
+         nameidx < (namelen - NAME_BYTES_PER_ENTRY);
+         nameidx += NAME_BYTES_PER_ENTRY);
+
+    for (i=0; i < numentries; i++) {
+        /* new sector? */
+        if ( idx >= DIR_ENTRIES_PER_SECTOR ) {
+            /* update current sector */
+            rc = fat_seek(file, sector);
+            if (rc<0)
+                return -3;
+
+            rc = fat_readwrite(file, 1, buf, true);
+            if (rc<1)
+                return -4;
+
+            /* grab next sector */
+            rc = fat_readwrite(file, 1, buf, false);
+            if (rc<1)
+                return -5;
+
+            sector++;
+            idx = 0;
+        }
+
+        entry = buf + idx * DIR_ENTRY_SIZE;
+
+        /* verify this entry is free */
+        if (entry[0] && entry[0] != 0xe5 )
+            panicf("Dir entry %d in sector %x is not free! "
+                   "%02x %02x %02x %02x",
+                   idx, sector,
+                   entry[0], entry[1], entry[2], entry[3]);
+
+        memset(entry, 0, DIR_ENTRY_SIZE);
+        if ( i+1 < numentries ) {
+            /* longname entry */
+            int k, l = nameidx;
+            entry[FATLONG_ORDER] = numentries-i-1;
+            if (i==0)
+                entry[FATLONG_ORDER] |= 0x40;
+            for (k=0; k<5 && name[l]; k++) entry[k*2 + 1] = name[l++];
+            for (k=0; k<6 && name[l]; k++) entry[k*2 + 14] = name[l++];
+            for (k=0; k<2 && name[l]; k++) entry[k*2 + 28] = name[l++];
+            entry[FATLONG_ATTR] = FAT_ATTR_LONG_NAME;
+            entry[FATLONG_CHKSUM] = chksum;
+            LDEBUGF("Longname entry %d: %.13s\n", idx, name+nameidx);
+        }
+        else {
+            /* shortname entry */
+            LDEBUGF("Shortname entry: %.13s\n", shortname);
+            strncpy(entry + FATDIR_NAME, shortname, 11);
+            entry[FATDIR_ATTR] = 0;
+            entry[FATDIR_NTRES] = 0;
+        }
+        idx++;
+        nameidx -= NAME_BYTES_PER_ENTRY;
+        //dbg_dump_buffer(buf, SECTOR_SIZE, 0);
+    }
+
+    /* update last sector */
+    rc = fat_seek(file, sector);
+    if (rc<0)
+        return -5;
+    
+    rc = fat_readwrite(file, 1, buf, true);
+    if (rc<1)
+        return -6;
+    
     return 0;
 }
 
 static int add_dir_entry(struct fat_dir* dir,
-                         struct fat_direntry* de,
-                         struct fat_file* file)
+                         struct fat_file* file,
+                         char* name)
 {
     unsigned char buf[SECTOR_SIZE];
+    unsigned char shortname[16];
     int err;
     unsigned int sector;
-    bool update_last = false;
     bool done = false;
     bool eof = false;
+    int entries_needed, entries_found = 0;
+    int namelen = strlen(name);
 
     LDEBUGF( "add_dir_entry(%s,%x)\n",
-             de->name, file->firstcluster);
+             name, file->firstcluster);
+
+    /* create dos name */
+    if (create_dos_name(name, shortname) < 0)
+        return -1;
+
+    /* one dir entry needed for every 13 bytes of filename,
+       plus one entry for the short name */
+    entries_needed = namelen / NAME_BYTES_PER_ENTRY + 1;
+    if (namelen % NAME_BYTES_PER_ENTRY)
+        entries_needed++;
 
     err=fat_seek(&dir->file, 0);
     if (err<0)
@@ -683,6 +773,8 @@ static int add_dir_entry(struct fat_dir* dir,
 
     for (sector=0; !done; sector++)
     {
+        unsigned int i;
+
         err = 0;
         if (!eof) {
             err = fat_readwrite(&dir->file, 1, buf, false);
@@ -695,7 +787,7 @@ static int add_dir_entry(struct fat_dir* dir,
             LDEBUGF("Adding new sector to dir\n");
             err=fat_seek(&dir->file, sector);
             if (err<0)
-                return -5;
+                return -2;
 
             /* add sectors (we must clear the whole cluster) */
             do {
@@ -703,73 +795,82 @@ static int add_dir_entry(struct fat_dir* dir,
                 if (err<1)
                     return -3;
             } while (dir->file.sectornum < (int)fat_bpb.bpb_secperclus);
-         }
+        }
         if (err<0) {
             DEBUGF( "add_dir_entry() - Couldn't read dir"
                     " (error code %d)\n", err);
             return -4;
         }
 
-        if (update_last)
+        /* look for free slots */
+        for (i=0; i < DIR_ENTRIES_PER_SECTOR; i++)
         {
-            /* buffer is already cleared,
-               we just need to flag for sector update */
-            done = true;
-        }
-        else
-        {
-            unsigned int i;
-            /* Look for a free slot */
-            for (i = 0; i < DIR_ENTRIES_PER_SECTOR; i++)
-            {
-                unsigned char firstbyte = buf[i*DIR_ENTRY_SIZE];
-                if (firstbyte == 0xe5 || firstbyte == 0)
-                {
-                    unsigned char* eptr;
-                    LDEBUGF("Found free entry %d in sector %d (%x)\n",
-                            i, sector, dir->file.lastsector);
-                    eptr = &buf[i*DIR_ENTRY_SIZE];
-                    memset(eptr, 0, DIR_ENTRY_SIZE);
-                    strncpy(&eptr[FATDIR_NAME], de->name, 11);
-                    eptr[FATDIR_ATTR] = de->attr;
-                    eptr[FATDIR_NTRES] = 0;
-                    
-                    /* remember where the dir entry is located */
-                    file->dirsector = dir->file.lastsector;
-                    file->direntry = i;
+            unsigned char firstbyte = buf[i * DIR_ENTRY_SIZE];
+            switch (firstbyte) {
+            case 0: /* end of dir */
+                entries_found = entries_needed;
+                LDEBUGF("Found last entry %d\n", 
+                        sector * DIR_ENTRIES_PER_SECTOR + i);
+                break;
 
-                    /* advance the last_empty_entry marker? */
-                    if (firstbyte == 0)
+            case 0xe5: /* free entry */
+                entries_found++;
+                LDEBUGF("Found free entry %d (%d/%d)\n",
+                        sector * DIR_ENTRIES_PER_SECTOR + i,
+                        entries_found, entries_needed);
+                break;
+
+            default:
+                entries_found = 0;
+                break;
+            }
+
+            if (entries_found == entries_needed)
+            {
+                int firstentry = sector * DIR_ENTRIES_PER_SECTOR + i;
+
+                /* if we're not extending the dir, we must go back to first
+                   free entry */
+                if (firstbyte)
+                    firstentry -= (entries_needed - 1);
+
+                LDEBUGF("Adding longname to entry %d in sector %d\n",
+                        i, sector);
+
+                err = write_long_name(&dir->file, firstentry, 
+                                      entries_needed, name, shortname);
+                if (err < 0)
+                    return -5;
+
+                /* remember where the shortname dir entry is located */
+                file->dirsector = dir->file.lastsector;
+                file->direntry = 
+                    (i + entries_needed - 1) % DIR_ENTRIES_PER_SECTOR;
+
+                /* advance the last_empty_entry marker? */
+                if (firstbyte == 0)
+                {
+                    i++;
+                    if (i < DIR_ENTRIES_PER_SECTOR)
                     {
-                        i++;
-                        if (i < DIR_ENTRIES_PER_SECTOR)
-                        {
-                            /* next entry is now last */
-                            buf[i*DIR_ENTRY_SIZE] = 0;
-                            done = true;
-                        }
-                        else
-                        {
-                            /* We must fill in the first entry
-                               in the next sector */
-                            update_last = true;
-                            LDEBUGF("update_last = true\n");
-                        }
+                        /* next entry is now last */
+                        buf[i*DIR_ENTRY_SIZE] = 0;
                     }
                     else
-                        done = true;
-                    break;
+                    {
+                        /* add a new sector/cluster for last entry */
+                        memset(buf, 0, sizeof buf);
+                        do {
+                            err = fat_readwrite(&dir->file, 1, buf, true);
+                            if (err<1)
+                                return -6;
+                        } while (dir->file.sectornum <
+                                 (int)fat_bpb.bpb_secperclus);
+                    }
                 }
+                done = true;
+                break;
             }
-        }
-        if (done || update_last) {
-            /* update sector */
-            err=fat_seek(&dir->file, sector);
-            if (err<0)
-                return -5;
-            err = fat_readwrite(&dir->file, 1, buf, true);
-            if (err<1)
-                return -6;
         }
     }
 
@@ -820,7 +921,7 @@ static int create_dos_name(unsigned char *name, unsigned char *newname)
     int i;
     char *ext;
 
-    strcpy(n, name);
+    strncpy(n, name, sizeof n);
     
     ext = strchr(n, '.');
     if(ext)
@@ -862,6 +963,8 @@ static int create_dos_name(unsigned char *name, unsigned char *newname)
     {
         newname[8+i++] = ' ';
     }
+
+    newname[11] = 0;
     return 0;
 }
 
@@ -965,22 +1068,10 @@ int fat_create_file(char* name,
                     struct fat_file* file,
                     struct fat_dir* dir)
 {
-    struct fat_direntry de;
     int err;
 
     LDEBUGF("fat_create_file(\"%s\",%x,%x)\n",name,file,dir);
-    memset(&de, 0, sizeof(struct fat_direntry));
-    if (create_dos_name(name, de.name) < 0)
-    {
-        DEBUGF( "fat_create_file() - Illegal file name (%s)\n", name);
-        return -1;
-    }
-    getcurrdostime(&de.crtdate, &de.crttime, &de.crttimetenth);
-    de.wrtdate = de.crtdate;
-    de.wrttime = de.crttime;
-    de.filesize = 0;
-    
-    err = add_dir_entry(dir, &de, file);
+    err = add_dir_entry(dir, file, name);
     if (!err) {
         file->firstcluster = 0;
         file->lastcluster = 0;
@@ -1145,7 +1236,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     int i;
 
     LDEBUGF( "fat_readwrite(file:%x,count:0x%x,buf:%x,%s)\n",
-             cluster,sectorcount,buf,write?"write":"read");
+             file->firstcluster,sectorcount,buf,write?"write":"read");
     LDEBUGF( "fat_readwrite: sec=%x numsec=%d eof=%d\n",
              sector,numsec, eof?1:0);
 
