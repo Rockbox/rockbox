@@ -188,6 +188,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case BUTTON_F3:
+            case BUTTON_F3 | BUTTON_REPEAT:
                 /* backspace */
                 if (len)
                     text[len-1] = 0;
