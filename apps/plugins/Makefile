@@ -24,8 +24,9 @@ LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
- $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
 SOURCES = $(SRC)
 ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
