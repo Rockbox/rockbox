@@ -295,6 +295,27 @@ static char* get_tag(struct mp3entry* id3,
                     else
                         return NULL;
                     break;
+
+                case 'v': /* id3 version */
+                    switch (id3->id3version) {
+                        case ID3_VER_1_0:
+                            return "1";
+
+                        case ID3_VER_1_1:
+                            return "1.1";
+
+                        case ID3_VER_2_2:
+                            return "2.2";
+
+                        case ID3_VER_2_3:
+                            return "2.3";
+
+                        case ID3_VER_2_4:
+                            return "2.4";
+
+                        default:
+                            return NULL;
+                    }
             }
             break;
 

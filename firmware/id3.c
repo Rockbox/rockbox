@@ -168,6 +168,8 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     if (strncmp(buffer, "TAG", 3))
         return false;
 
+    entry->id3version = ID3_VER_1_0;
+
     for (i=0; i < (int)sizeof offsets; i++) {
         char* ptr = buffer + offsets[i];
         
@@ -179,17 +181,17 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
 
         switch(i) {
             case 0:
-                strcpy(entry->id3v1buf[2], ptr);
+                strncpy(entry->id3v1buf[2], ptr, 30);
                 entry->title = entry->id3v1buf[2];
                 break;
 
             case 1:
-                strcpy(entry->id3v1buf[0], ptr);
+                strncpy(entry->id3v1buf[0], ptr, 30);
                 entry->artist = entry->id3v1buf[0];
                 break;
 
             case 2:
-                strcpy(entry->id3v1buf[1], ptr);
+                strncpy(entry->id3v1buf[1], ptr, 30);
                 entry->album = entry->id3v1buf[1];
                 break;
 
@@ -201,8 +203,10 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
             case 4:
                 /* id3v1.1 uses last two bytes of comment field for track
                    number: first must be 0 and second is track num */
-                if (*ptr == 0)
+                if (!ptr[0] && ptr[1]) {
                     entry->tracknum = ptr[1];
+                    entry->id3version = ID3_VER_1_1;
+                }
                 break;
 
             case 5:
@@ -230,7 +234,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     int size;
     int bufferpos = 0, totframelen, framelen;
     char header[10];
-    unsigned short int version;
+    unsigned char version;
     char *buffer = entry->id3v2buf;
     char *tracknum = NULL;
     int bytesread = 0;
@@ -245,16 +249,30 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     if(10 != read(fd, header, 10))
         return;
 
-    version = (unsigned short int)header[3];
-    
     /* Get the total ID3 tag size */
     size = entry->id3v2len - 10;
 
-    /* Set minimum frame size according to ID3v2 version */
-    if(version > 2)
-        minframesize = 12;
-    else
-        minframesize = 8;
+    version = header[3];
+    switch ( version ) {
+        case 2:
+            entry->id3version = ID3_VER_2_2;
+            minframesize = 8;
+            break;
+
+        case 3:
+            entry->id3version = ID3_VER_2_3;
+            minframesize = 12;
+            break;
+
+        case 4:
+            entry->id3version = ID3_VER_2_4;
+            minframesize = 12;
+            break;
+
+        default:
+            /* unsupported id3 version */
+            return;
+    }
 
     /* 
      * We must have at least minframesize bytes left for the 

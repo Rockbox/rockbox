@@ -30,6 +30,7 @@ struct mp3entry {
     int version;
     int layer;
     int year;
+    unsigned char id3version;
     unsigned char genre;
     unsigned int bitrate;
     unsigned int frequency;
@@ -61,6 +62,14 @@ struct mp3entry {
 #define VBR_FRAMES_FLAG 0x01
 #define VBR_BYTES_FLAG  0x02
 #define VBR_TOC_FLAG    0x04
+
+enum {
+    ID3_VER_1_0 = 1,
+    ID3_VER_1_1,
+    ID3_VER_2_2,
+    ID3_VER_2_3,
+    ID3_VER_2_4
+};
 
 bool mp3info(struct mp3entry *entry, char *filename);
 
