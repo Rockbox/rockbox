@@ -107,33 +107,33 @@ int rand(int range)
 
 void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
 {
-    int i;
-    for (i=0; fstart_x+i-1 < fstop_x; i++)
-    {
-        lcd_drawpixel(fstart_x+i,fstart_y);
-        lcd_drawpixel(fstart_x+i,fstop_y);
-    }
-    for (i=1; fstart_y+i < fstop_y; i++)
-    {
-        lcd_drawpixel(fstart_x,fstart_y+i);
-        lcd_drawpixel(fstop_x,fstart_y+i);
-    }
-    lcd_drawpixel(fstart_x,fstart_y);
-    lcd_drawpixel(fstop_x,fstart_y);
-    lcd_drawpixel(fstart_x,fstop_y);
-    lcd_drawpixel(fstop_x,fstop_y);
+	lcd_drawline(fstart_x, fstart_y, fstop_x, fstart_y);
+	lcd_drawline(fstart_x, fstop_y, fstop_x, fstop_y);
+
+	lcd_drawline(fstart_x, fstart_y, fstart_x, fstop_y);
+	lcd_drawline(fstop_x, fstart_y, fstop_x, fstop_y);
 }
 
 void draw_block(int x,int y,int block,int frame,int clear)
 {
     int i;
-    for(i=0;i < 4;i++)
+    for(i=0;i < 4;i++) {
+		if (clear) 
+            lcd_clearpixel(start_x+x+block_data[block][frame][0][i],
+                           start_y+y+block_data[block][frame][1][i]);
+		else
+            lcd_drawpixel(start_x+x+block_data[block][frame][0][i],
+                          start_y+y+block_data[block][frame][1][i]);
+	}
+
+/*
         if ( (clear ? 0 : block+1) ) 
             lcd_drawpixel(start_x+x+block_data[block][frame][0][i],
                           start_y+y+block_data[block][frame][1][i]);
         else
             lcd_clearpixel(start_x+x+block_data[block][frame][0][i],
                            start_y+y+block_data[block][frame][1][i]);
+*/
 }
 
 void to_virtual()
