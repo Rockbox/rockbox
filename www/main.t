@@ -26,7 +26,6 @@
 <h2>Open bug reports</h2>
 <p>
 <!--#include file="bugs.txt" -->
-<small><b>Note:</b> Don't file bug reports on daily builds. They are work in progress.</small>
 
 <h2>Roadmap</h2>
 <p>This is a rough indication of which features we plan/expect/hope to be
