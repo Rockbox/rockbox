@@ -31,15 +31,11 @@ new: "Version"
 
 id: LANG_DEBUG
 desc: in the main menu
-### English phrase was changed! Previous translation was made on:
-### "Debug (keep out!)"
 eng: "Debug (Keep Out!)"
 new: "Entwicklerbereich"
 
 id: LANG_USB
 desc: in the main menu
-### English phrase was changed! Previous translation was made on:
-### "USB (sim)"
 eng: "USB (Sim)"
 new: "USB (sim)"
 
@@ -70,8 +66,6 @@ new: "Akku: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-### English phrase was changed! Previous translation was made on:
-### "Battery: charging"
 eng: "Battery: Charging"
 new: "Akku: lädt"
 
@@ -127,59 +121,41 @@ new: "Playliste"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-### English phrase was changed! Previous translation was made on:
-### "buffer full"
 eng: "Buffer Full"
 new: "Puffer voll"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
-### English phrase was changed! Previous translation was made on:
-### "%d files"
 eng: "%d Files"
 new: "%d Dateien"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Save failed"
 eng: "Save Failed"
 new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Batt. low?"
 eng: "Batt. Low?"
 new: "Akku leer?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Save failed"
 eng: "Save Failed"
 new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Is battery low?"
 eng: "Is Battery Low?"
 new: "Akku leer?"
 
 id: LANG_TIME_SET
-### Description changed! Previous description was:
-### ""
 desc: used in set_time()
-### English phrase was changed! Previous translation was made on:
-### "ON to set"
 eng: "ON To Set"
 new: "ON = speichern"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-### English phrase was changed! Previous translation was made on:
-### "OFF to revert"
 eng: "OFF To Revert"
 new: "OFF = abbrechen"
 
@@ -295,8 +271,6 @@ new: "Wiedergabe/Stop"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-### English phrase was changed! Previous translation was made on:
-### "Are you sure?"
 eng: "Are You Sure?"
 new: "Sind Sie sicher?"
 
@@ -337,8 +311,6 @@ new: "Scroll-Einstellungen"
 
 id: LANG_RESET
 desc: in system_settings_menu()
-### English phrase was changed! Previous translation was made on:
-### "Reset settings"
 eng: "Reset Settings"
 new: "Einstellungen zurücksetzen"
 
@@ -439,8 +411,6 @@ new: "Verzeichnispuffer"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-### English phrase was changed! Previous translation was made on:
-### "is full!"
 eng: "Is Full!"
 new: "ist voll!"
 
@@ -466,29 +436,21 @@ new: "Sonstige = Nein"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-### English phrase was changed! Previous translation was made on:
-### "Keylock ON"
 eng: "Key Lock ON"
 new: "Tastensperre AN"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-### English phrase was changed! Previous translation was made on:
-### "Keylock OFF"
 eng: "Key Lock OFF"
 new: "Tastensperre AUS"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-### English phrase was changed! Previous translation was made on:
-### "Key lock is ON"
 eng: "Key Lock Is ON"
 new: "Tastensperre ist AN"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-### English phrase was changed! Previous translation was made on:
-### "Key lock is OFF"
 eng: "Key Lock Is OFF"
 new: "Tastensperre ist AUS"
 
@@ -504,15 +466,11 @@ new: "Stumm AUS"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-### English phrase was changed! Previous translation was made on:
-### "Mute is ON"
 eng: "Mute Is ON"
 new: "Stummschaltung ist AN"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-### English phrase was changed! Previous translation was made on:
-### "Mute is OFF"
 eng: "Mute Is OFF"
 new: "Stummschaltung ist AUS"
 
@@ -533,8 +491,6 @@ new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-### English phrase was changed! Previous translation was made on:
-### "<no title>"
 eng: "<No Title>"
 new: "<unbekannt>"
 
@@ -545,8 +501,6 @@ new: "[Künstler]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-### English phrase was changed! Previous translation was made on:
-### "<no artist>"
 eng: "<No Artist>"
 new: "<unbekannt>"
 
@@ -557,8 +511,6 @@ new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-### English phrase was changed! Previous translation was made on:
-### "<no album>"
 eng: "<No Album>"
 new: "<unbekannt>"
 
@@ -569,8 +521,6 @@ new: "[Song Nr.]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-### English phrase was changed! Previous translation was made on:
-### "<no tracknum>"
 eng: "<No Tracknum>"
 new: "<unbekannt>"
 
@@ -601,15 +551,11 @@ new: "[Pfad]"
 
 id: LANG_PITCH_UP
 desc: in wps
-### English phrase was changed! Previous translation was made on:
-### "Pitch up"
 eng: "Pitch Up"
 new: "schneller"
 
 id: LANG_PITCH_DOWN
 desc: in wps
-### English phrase was changed! Previous translation was made on:
-### "Pitch down"
 eng: "Pitch Down"
 new: "langsamer"
 
@@ -620,8 +566,6 @@ new: "Pause"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-### English phrase was changed! Previous translation was made on:
-### "mode:"
 eng: "Mode:"
 new: "modus:"
 
@@ -642,15 +586,11 @@ new: "Scroll-"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-### English phrase was changed! Previous translation was made on:
-### "bar"
 eng: "Bar"
 new: "leiste"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-### English phrase was changed! Previous translation was made on:
-### "End of list"
 eng: "End Of List"
 new: "Listenende"
 
@@ -661,8 +601,6 @@ new: "<Drücke ON>"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-### English phrase was changed! Previous translation was made on:
-### "End of song list"
 eng: "End Of Song List"
 new: "Playlist zu Ende"
 
@@ -693,15 +631,11 @@ new: "Spiel pausiert"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-### English phrase was changed! Previous translation was made on:
-### "[PLAY] to resume"
 eng: "[PLAY] To Resume"
 new: "[PLAY] um fortzusetzen"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-### English phrase was changed! Previous translation was made on:
-### "[OFF] to quit"
 eng: "[OFF] To Quit"
 new: "[OFF] zum Beenden"
 
@@ -712,15 +646,11 @@ new: "Level - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
-### English phrase was changed! Previous translation was made on:
-### "(1 - slow, 9 - fast)"
 eng: "(1 - Slow, 9 - Fast)"
 new: "(1 - langsam, 9 - schnell)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-### English phrase was changed! Previous translation was made on:
-### "[PLAY] to start/pause"
 eng: "[PLAY] To Start/Pause"
 new: "[PLAY] Start/Pause"
 
@@ -741,29 +671,21 @@ new: "GEWONNEN!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-### English phrase was changed! Previous translation was made on:
-### "[OFF] to stop"
 eng: "[OFF] To Stop"
 new: "[OFF] beenden"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-### English phrase was changed! Previous translation was made on:
-### "[F1] - level"
 eng: "[F1] - Level"
 new: "[F1] - Level"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-### English phrase was changed! Previous translation was made on:
-### "[F2] same level"
 eng: "[F2] Same Level"
 new: "[F2] gl. Level"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-### English phrase was changed! Previous translation was made on:
-### "[F3] + level"
 eng: "[F3] + Level"
 new: "[F3] + Level"
 
@@ -814,43 +736,31 @@ new: "%d Würmer       L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Remote control F1"
 eng: "Remote Control F1"
 new: "Fernsteuerung  F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "No rem. control F1"
 eng: "No Rem. Control F1"
 new: "Keine Fernst.   F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "2 key control   F1"
 eng: "2 Key Control   F1"
 new: "2 Tastenkontr.  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "4 key control   F1"
 eng: "4 Key Control   F1"
 new: "4 Tastenkontr.  F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Out of control"
 eng: "Out Of Control"
 new: "Ohne Kontrolle"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-### English phrase was changed! Previous translation was made on:
-### "You lose!"
 eng: "You Lose!"
 new: "Verloren!"
 
@@ -866,8 +776,6 @@ new: "automatisches Ausschalten"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-### English phrase was changed! Previous translation was made on:
-### "new language"
 eng: "New Language"
 new: "neue Sprache"
 
@@ -958,15 +866,11 @@ new: "Do"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-### English phrase was changed! Previous translation was made on:
-### "12 hour clock"
 eng: "12 Hour Clock"
 new: "12 Std. Uhr"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-### English phrase was changed! Previous translation was made on:
-### "24 hour clock"
 eng: "24 Hour Clock"
 new: "24 Std. Uhr"
 
@@ -1127,8 +1031,6 @@ new: "Playlisten"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-### English phrase was changed! Previous translation was made on:
-### "Anti-skip buffer"
 eng: "Anti-Skip Buffer"
 new: "Puffer vorzeitig füllen"
 
@@ -1139,8 +1041,6 @@ new: "dBfs"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-### English phrase was changed! Previous translation was made on:
-### "Save energy"
 eng: "Save Energy"
 new: "Energie sparen"
 
@@ -1151,22 +1051,16 @@ new: "genauere Anzeige"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-### English phrase was changed! Previous translation was made on:
-### "linear"
 eng: "Linear"
 new: "linear"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-### English phrase was changed! Previous translation was made on:
-### "Maximum of range"
 eng: "Maximum Of Range"
 new: "größter Wert"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-### English phrase was changed! Previous translation was made on:
-### "Minimum of range"
 eng: "Minimum Of Range"
 new: "kleinster Wert"
 
@@ -1177,8 +1071,6 @@ new: "Genauigkeit"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-### English phrase was changed! Previous translation was made on:
-### "dBfs <-> linear"
 eng: "dBfs <-> Linear"
 new: "dBfs <-> linear"
 
@@ -1224,8 +1116,6 @@ new: "Rechts"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-### English phrase was changed! Previous translation was made on:
-### "Recording settings"
 eng: "Recording Settings"
 new: "Aufnahmeeinstellungen"
 
@@ -1251,8 +1141,6 @@ new: "Mikrofon"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-### English phrase was changed! Previous translation was made on:
-### "Sleep timer"
 eng: "Sleep Timer"
 new: "Einschlaftimer"
 
@@ -1308,8 +1196,6 @@ new: "Akkukapazität"
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full
-### English phrase was changed! Previous translation was made on:
-### "Queue buffer full"
 eng: "Queue Buffer Full"
 new: "Warteschlange voll"
 
@@ -1320,8 +1206,6 @@ new: "Vorgemerkt: %s"
 
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
-### English phrase was changed! Previous translation was made on:
-### "Total queued: %d"
 eng: "Total Queued: %d"
 new: "Anzahl: %d"
 
@@ -1332,8 +1216,6 @@ new: "Wecker"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-### English phrase was changed! Previous translation was made on:
-### "Alarm time is too soon!"
 eng: "Alarm Time Is Too Soon!"
 new: "Weckzeit ist zu früh!"
 
@@ -1344,22 +1226,16 @@ new: "PLAY=OK OFF=Abbruch"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-### English phrase was changed! Previous translation was made on:
-### "Shutting down..."
 eng: "Shutting Down..."
 new: "Schalte aus..."
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-### English phrase was changed! Previous translation was made on:
-### "Alarm time: %02d:%02d"
 eng: "Alarm Time: %02d:%02d"
 new: "Weckzeit: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-### English phrase was changed! Previous translation was made on:
-### "Waking up in %d:%02d"
 eng: "Waking Up In %d:%02d"
 new: "Einschalten in %d:%02d"
 
@@ -1375,8 +1251,6 @@ new: "Gelöscht"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-### English phrase was changed! Previous translation was made on:
-### "failed"
 eng: "Failed"
 new: "fehlgeschlagen"
 
@@ -1452,8 +1326,6 @@ new: "[Genre]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
-### English phrase was changed! Previous translation was made on:
-### "<no info>"
 eng: "<No Info>"
 new: "<keine Info>"
 
@@ -1488,9 +1360,9 @@ eng: "Stereo Wide"
 new: "Stereo breit"
 
 id: LANG_CPU_SLEEP
-desc: in system_settings_menu()
-eng: "Power Saving"
-new: "CPU Stromsparmodus"
+desc: in system_settings_menu() (removed)
+eng: ""
+new: ""
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1528,7 +1400,7 @@ eng: "[ON] To Undo"
 new: "[ON] = Rückgängig"
 
 id: LANG_SAVE_SETTINGS
-desc:  in system_settings_menu()
+desc: in system_settings_menu()
 eng: "Write .cfg file"
 new: "Schreibe .cfg-Datei"
 
@@ -1541,3 +1413,13 @@ id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 new: "gespeichert"
+
+id: LANG_VBRFIX_NOT_VBR
+desc: Tells the user that the selected file is not a VBR file
+eng: "Not a VBR file"
+new: "Keine VBR-Datei"
+
+id: LANG_VBRFIX_STOP_PLAY
+desc: Tells the user to stop the playback
+eng: "Stop the playback first"
+new: "Vorher Wiedergabe beenden!"
