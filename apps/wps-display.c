@@ -549,7 +549,7 @@ static char* get_tag(struct mp3entry* id3,
                 {
                     int l = battery_level();
                     if (l > -1)
-                        snprintf(buf, buf_size, "%d%%");
+                        snprintf(buf, buf_size, "%d%%", l);
                     else
                         return "?%";
                     return buf;
