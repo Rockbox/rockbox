@@ -39,6 +39,7 @@
 #include "applimits.h"
 #include "dbtree.h"
 #include "icons.h"
+#include "lang.h"
 
 #ifdef LITTLE_ENDIAN
 #include <netinet/in.h>
@@ -148,11 +149,29 @@ int db_load(struct tree_context* c)
     DEBUGF("db_load(%d, %x, %d)\n", table, extra, c->firstpos);
 
     if (!table) {
-        table = allartists;
+        table = root;
         c->currtable = table;
     }
     
     switch (table) {
+        case root: {
+            static const int tables[] = {allartists, allalbums, allsongs};
+            char* nbuf = (char*)nptr;
+            char* labels[3] = { str(LANG_ID3DB_ARTISTS),
+                                str(LANG_ID3DB_ALBUMS),
+                                str(LANG_ID3DB_SONGS)};
+
+            for (i=0; i < 3; i++) {
+                strcpy(nbuf, labels[i]);
+                dptr[0] = (unsigned int)nbuf;
+                dptr[1] = tables[i];
+                nbuf += strlen(nbuf) + 1;
+                dptr += 2;
+            }
+            c->dirlength = c->filesindir = i;
+            return i;
+        }
+            
         case allsongs:
             offset = songstart + c->firstpos * (songlen + 12);
             itemcount = songcount;
@@ -303,34 +322,36 @@ int db_load(struct tree_context* c)
 
 void db_enter(struct tree_context* c)
 {
-    switch (c->currtable) {
-        case allartists:
-        case albums4artist:
-            c->dirpos[c->dirlevel] = c->dirstart;
-            c->cursorpos[c->dirlevel] = c->dircursor;
-            c->table_history[c->dirlevel] = c->currtable;
-            c->extra_history[c->dirlevel] = c->currextra;
-            c->pos_history[c->dirlevel] = c->firstpos;
-            c->dirlevel++;
-            break;
+    int newextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
 
-        default:
-            break;
-    }
-
+    c->dirpos[c->dirlevel] = c->dirstart;
+    c->cursorpos[c->dirlevel] = c->dircursor;
+    c->table_history[c->dirlevel] = c->currtable;
+    c->extra_history[c->dirlevel] = c->currextra;
+    c->pos_history[c->dirlevel] = c->firstpos;
+    c->dirlevel++;
+    
     switch (c->currtable) {
+        case root:
+            c->currtable = newextra;
+            c->currextra = newextra;
+            break;
+            
         case allartists:
             c->currtable = albums4artist;
-            c->currextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
+            c->currextra = newextra;
             break;
 
+        case allalbums:
         case albums4artist:
             c->currtable = songs4album;
-            c->currextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
+            c->currextra = newextra;
             break;
 
         case songs4album:
+        case allsongs:
             splash(HZ,true,"No playing implemented yet");
+            c->dirlevel--;
 #if 0
             /* find filenames, build playlist, play */
             playlist_create(NULL,NULL);

@@ -1389,7 +1389,7 @@ void tree_init(void)
     /* We copy the settings value in case it is changed by the user. We can't
        use it until the next reboot. */
     max_files = global_settings.max_files_in_dir;
-
+    
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;

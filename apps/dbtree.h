@@ -21,7 +21,7 @@
 
 #include "tree.h"
 
-enum table { invalid, allsongs, allalbums, allartists,
+enum table { invalid, root, allsongs, allalbums, allartists,
              albums4artist, songs4album };
 
 int db_init(void);
