@@ -4,12 +4,12 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I../../
+INCLUDES=-I../.. -I../../drivers
 
 CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
 
-OBJS= crt0.o main.o ../../i2c.o ../../mas.o ../../debug.o
+OBJS= crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o ../../debug.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
