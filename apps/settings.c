@@ -265,7 +265,7 @@ int settings_save( void )
     /* update the config block buffer with current
        settings and save the block in the RTC */
     config_block[0x4] = (unsigned char)global_settings.volume;
-    config_block[0x5] = (unsigned char)global_settings.balance;
+    config_block[0x5] = (char)global_settings.balance;
     config_block[0x6] = (unsigned char)global_settings.bass;
     config_block[0x7] = (unsigned char)global_settings.treble;
     config_block[0x8] = (unsigned char)global_settings.loudness;
@@ -362,7 +362,7 @@ void settings_load(void)
         if (config_block[0x4] != 0xFF)
             global_settings.volume = config_block[0x4];
         if (config_block[0x5] != 0xFF)
-            global_settings.balance = config_block[0x5];
+            global_settings.balance = (char)config_block[0x5];
         if (config_block[0x6] != 0xFF)
             global_settings.bass = config_block[0x6];
         if (config_block[0x7] != 0xFF)
