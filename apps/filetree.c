@@ -39,8 +39,10 @@
 #include "rolo.h"
 #include "sprintf.h"
 
+#ifndef SIMULATOR
 static int boot_size = 0;
 static int boot_cluster;
+#endif
 extern bool boot_changed;
 
 int ft_build_playlist(struct tree_context* c, int start_index)
@@ -241,6 +243,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) )
            dptr->attr |= filetype_get_attr(entry->d_name);
 
+#ifndef SIMULATOR
         /* memorize/compare details about the boot file */
         if ((c->currdir[1] == 0) && !strcasecmp(entry->d_name, BOOTFILE)) {
             if (boot_size) {
@@ -251,7 +254,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
             boot_size = entry->size;
             boot_cluster = entry->startcluster;
         }
-
+#endif
+        
         /* filter out non-visible files */
         if (!(dptr->attr & ATTR_DIRECTORY) && (
             (*c->dirfilter == SHOW_PLAYLIST &&

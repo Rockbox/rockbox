@@ -139,6 +139,8 @@ SECTIONS
 {
     .vectors :
     {
+        loadaddress = .;
+        _loadaddress = .;
         *(.resetvectors);
         *(.vectors);
     } > DRAM

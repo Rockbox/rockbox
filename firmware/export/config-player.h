@@ -68,4 +68,7 @@
 
 #define CONFIG_LCD LCD_SSD1801
 
+#define BOOTFILE_EXT ".mod"
+#define BOOTFILE "archos" BOOTFILE_EXT
+
 #endif /* SIMULATOR */

@@ -113,12 +113,6 @@
 
 #endif
 
-#ifdef HAVE_LCD_BITMAP
-#define BOOTFILE "ajbrec.ajz"
-#else
-#define BOOTFILE "archos.mod"
-#endif
-
 struct entry {
     short attr; /* FAT attributes + file type flags */
     unsigned long time_write; /* Last write time */

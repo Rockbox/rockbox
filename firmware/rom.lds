@@ -47,6 +47,8 @@ SECTIONS
 
     .data : AT ( _datacopy )
     {
+        loadaddress = .;
+        _loadaddress = .;
         _datastart = .;
         *(.resetvectors);
         *(.vectors);

@@ -87,4 +87,7 @@
 
 #define CONFIG_LCD LCD_SSD1815
 
+#define BOOTFILE_EXT ".ajz"
+#define BOOTFILE "ajbrec" BOOTFILE_EXT
+
 #endif /* SIMULATOR */

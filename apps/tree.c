@@ -81,11 +81,7 @@ const struct filetype filetypes[] = {
 #endif
     { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
 #ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
-    { ".ajz", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
-#else
-    { ".mod", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
-#endif
+    { BOOTFILE_EXT, TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */
 };
 
