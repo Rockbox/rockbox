@@ -493,6 +493,8 @@ void lcd_set_contrast(int val)
 void lcd_init (void)
 {
     unsigned char data_vector[64];
+    
+    (void)data_vector;
 
     new_lcd = has_new_lcd();
     memset(extended_chars_mapped, NO_CHAR, sizeof(extended_chars_mapped));
@@ -507,6 +509,7 @@ void lcd_init (void)
         lcd_iram = NEW_LCD_IRAM;
         pattern_size=7; /* Last pattern, 7 for new LCD */
 
+#ifndef SIMULATOR
         /* LCD init for cold start */
         PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
         or_b(0x0f, &PBIORL);             /* ... output */
@@ -532,6 +535,7 @@ void lcd_init (void)
         lcd_write_data(data_vector, 16); /* zero out */
 
         lcd_write_command(NEW_LCD_DISPLAY_CONTROL_SET + 1); /* display on */
+#endif /* !SIMULATOR */
     }
     else {
         lcd_ascii = old_lcd_rocklatin1_to_xlcd;
@@ -540,7 +544,8 @@ void lcd_init (void)
         lcd_pram = OLD_LCD_PRAM;
         lcd_iram = OLD_LCD_IRAM;
         pattern_size=3; /* Last pattern, 3 for old LCD */
-        
+
+#ifndef SIMULATOR
 #if 1
         /* LCD init for cold start */
         PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
@@ -615,6 +620,7 @@ void lcd_init (void)
         lcd_write_data(&lcd_data_byte, 1); /* 0 */
         }
 #endif
+#endif /* !SIMULATOR */
     }
     
     lcd_set_contrast(lcd_default_contrast());
