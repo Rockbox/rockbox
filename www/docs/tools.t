@@ -307,6 +307,13 @@
   <th width="100">Freeware</th>
 </tr>
 <tr>
+  <td><a href="http://www.paulgeluid.nl/tools/VBRfix/">VBRfix</a></td>
+  <td align="center">X</td>
+  <td align="center">X</td>
+  <td align="center">X</td>
+  <td align="center">&nbsp;</td>
+</tr>
+<tr>
   <td><a href="http://hem.bredband.net/isrmat/mp3page.htm">MP3Fixer</a></td>
   <td align="center">X</td>
   <td align="center">X</td>
