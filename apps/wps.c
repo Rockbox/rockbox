@@ -934,7 +934,7 @@ int wps_show(void)
 
                 /* screen settings */
             case BUTTON_F3:
-                if (quick_screen(CONTEXT_WPS, BUTTON_F2))
+                if (quick_screen(CONTEXT_WPS, BUTTON_F3))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
