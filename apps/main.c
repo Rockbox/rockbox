@@ -36,7 +36,6 @@
 
 void app_main(void)
 {
-    show_splash();
     browse_root();
 }
 
@@ -50,6 +49,10 @@ int init(void)
 {
     int rc;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_init();
+#endif
+    show_splash();
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
 

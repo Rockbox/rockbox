@@ -97,11 +97,6 @@ void show_splash(void)
 #endif
 
     lcd_update();
-    for ( i=0;i<10;i++) {
-        sleep(HZ/10);
-        if (button_get(false))
-            break;
-    }
 }
 
 void main_menu(void)
