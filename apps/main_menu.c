@@ -139,7 +139,7 @@ bool show_info(void)
 {
     char s[32], s2[32];
     /* avoid overflow for 8MB mod :) was: ((mp3end - mp3buf) * 1000) / 0x100000; */
-    int buflen = ((mp3end - mp3buf) * 100) / 0x19999;
+    long buflen = ((mp3end - mp3buf) * 100) / 0x19999;
     int integer, decimal;
     bool done = false;
     int key;

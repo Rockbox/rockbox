@@ -326,9 +326,9 @@ static bool is_playing; /* We are (attempting to) playing MP3 files */
 static bool filling; /* We are filling the buffer with data from disk */
 static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
-static int low_watermark; /* Dynamic low watermark level */
-static int low_watermark_margin; /* Extra time in seconds for watermark */
-static int lowest_watermark_level; /* Debug value to observe the buffer
+static long low_watermark; /* Dynamic low watermark level */
+static long low_watermark_margin; /* Extra time in seconds for watermark */
+static long lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
 #if CONFIG_HWCODEC == MAS3587F
 static bool is_recording; /* We are recording */

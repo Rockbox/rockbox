@@ -82,7 +82,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #endif
 
 long lasttime = 0;
-static int config_sector = 0;  /* mark uninitialized */
+static long config_sector = 0;  /* mark uninitialized */
 static unsigned char config_block[CONFIG_BLOCK_SIZE];
 
 
@@ -629,8 +629,9 @@ void settings_calc_config_sector(void)
 #ifdef SIMULATOR
     config_sector = 61;
 #else
-    int i, partition_start;
-    int sector = 0;
+    int i;
+    long partition_start;
+    long sector = 0;
 
     if (fat_startsector(IF_MV(0)) != 0)    /* There is a partition table */
     {
@@ -1333,7 +1334,7 @@ bool set_int(const char* string,
     bool done = false;
     int button;
     int org_value=*variable;
-    int last_value = 0x7FFFFFFF; /* out of range init */
+    int last_value = __INT_MAX__; /* out of range init */
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -1538,7 +1539,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
 /* This array holds the record timer interval lengths, in seconds */
 static const unsigned long rec_timer_seconds[] =
 {
-    24*60*60, /* OFF really means 24 hours, to avoid >2Gbyte files */
+    24L*60*60, /* OFF really means 24 hours, to avoid >2Gbyte files */
     5*60,     /* 00:05 */
     10*60,    /* 00:10 */
     15*60,    /* 00:15 */
@@ -1550,10 +1551,10 @@ static const unsigned long rec_timer_seconds[] =
     4*60*60,  /* 04:00 */
     6*60*60,  /* 06:00 */
     8*60*60,  /* 08:00 */
-    10*60*60, /* 10:00 */
-    12*60*60, /* 12:00 */
-    18*60*60, /* 18:00 */
-    24*60*60  /* 24:00 */
+    10L*60*60, /* 10:00 */
+    12L*60*60, /* 12:00 */
+    18L*60*60, /* 18:00 */
+    24L*60*60  /* 24:00 */
 };
 
 unsigned int rec_timesplit_seconds(void)
