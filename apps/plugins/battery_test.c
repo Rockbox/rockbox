@@ -107,7 +107,7 @@ enum plugin_status loop(void)
         
         /* simulate 128 kbit/s (16000 byte/s) playback duration */
         rb->button_clear_queue();
-        button = rb->button_get_w_tmo(HZ * buffersize / 16000) - HZ*10);
+        button = rb->button_get_w_tmo(HZ * buffersize / 16000 - HZ*10);
 
         if (button == BATTERY_TEST_QUIT)
             return PLUGIN_OK;
