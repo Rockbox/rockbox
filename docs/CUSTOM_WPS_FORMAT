@@ -8,6 +8,7 @@ Description / General Info
 * After editing the .wps file, "play" it to make it take effect.
 * The file may be 2 lines long for the Player, and 10 lines for the Recorder.
 * All characters not preceded by % are displayed as typed.
+* A line beginning with # is a comment
 
 File Location
 -------------
@@ -100,11 +101,13 @@ Default
 If you haven't selected a .wps file in the .rockbox directory, you get the
 hardcoded wps layout. The default WPS screen is for player:
 
+# Default WPS for Player
 %s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>
 %pc%?ps<*|/>%pt
 
 and for recorder:
 
+# Default WPS for Recorder
 %s%?it<%?in<%in. |>%it|%fn>
 %s%?ia<%ia|%?d2<%d2|(root)>>
 %s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>

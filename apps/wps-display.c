@@ -113,6 +113,7 @@ char* wps_get_genre(unsigned int genre)
 static void wps_format(char* fmt)
 {
     char* buf = format_buffer;
+    char* start_of_line = format_buffer;
     int line = 0;
     
     strncpy(format_buffer, fmt, sizeof(format_buffer));
@@ -129,11 +130,15 @@ static void wps_format(char* fmt)
 
             case '\n': /* LF */
                 *buf = 0;
+
+                if(*start_of_line != '#') /* A comment? */
+                    line++;
                 
-                if (++line < MAX_LINES)
+                if (line <= MAX_LINES)
                 {
                     /* the next line starts on the next byte */
                     format_lines[line] = buf+1;
+                    start_of_line = format_lines[line];
                 }
                 break;
         }
