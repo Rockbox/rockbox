@@ -200,7 +200,7 @@ void statusbar_icon_battery(int percent, bool charging)
     if (charging)
         lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
                    STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
-};
+}
 
 /*
  * Print volume gauge to status bar

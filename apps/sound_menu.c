@@ -162,7 +162,7 @@ static bool balance(void)
 static bool bass(void)
 {
     return set_sound(str(LANG_BASS), &global_settings.bass, SOUND_BASS);
-};
+}
 
 static bool treble(void)
 {
@@ -174,13 +174,13 @@ static bool loudness(void)
 {
     return set_sound(str(LANG_LOUDNESS), &global_settings.loudness, 
                      SOUND_LOUDNESS);
-};
+}
 
 static bool bass_boost(void)
 {
     return set_sound(str(LANG_BBOOST), &global_settings.bass_boost, 
                      SOUND_SUPERBASS);
-};
+}
 
 static void set_avc(int val)
 {
