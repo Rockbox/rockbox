@@ -1533,7 +1533,8 @@ static void mpeg_thread(void)
                     else
                     {
                         /* No TOC exists, estimate the new position */
-                        newpos = (id3->filesize/id3->length)*newtime;
+                        newpos = (id3->filesize / (id3->length / 1000)) *
+                            (newtime / 1000);
                     }
                 }
                 else if (id3->bpf && id3->tpf)
