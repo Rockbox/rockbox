@@ -26,21 +26,27 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include <stdbool.h>
+
+#include "file.h" /* for write(), used in fprintf() */
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
-int vsnprintf (char *buf, int size, const char *fmt, va_list ap)
+static int format(
+    /* call 'push()' for each output letter */
+    int (*push)(void *userp, unsigned char data),
+    void *userp,
+    const char *fmt,
+    va_list ap)
 {
-    char *bp = buf;
-    char *end = buf + size - 1;
-
     char *str;
     char tmpbuf[12], pad;
     int ch, width, val, sign;
+    bool ok = true;
 
     tmpbuf[sizeof tmpbuf - 1] = '\0';
 
-    while ((ch = *fmt++) != '\0' && bp < end)
+    while ((ch = *fmt++) != '\0' && ok)
     {
 	if (ch == '%')
 	{
@@ -100,28 +106,105 @@ int vsnprintf (char *buf, int size, const char *fmt, va_list ap)
 	    if (width > 0)
 	    {
 		width -= strlen (str);
-		while (width-- > 0 && bp < end)
-		    *bp++ = pad;
+		while (width-- > 0 && ok)
+		    ok=push(userp, pad);
 	    }
-	    while (*str != '\0' && bp < end)
-		*bp++ = *str++;
+	    while (*str != '\0' && ok)
+                ok=push(userp, *str++);
 	}
 	else
-	    *bp++ = ch;
+	    ok=push(userp, ch);
     }
-
-    *bp++ = '\0';
-    return bp - buf - 1;
+    return ok; /* true means good */
 }
 
-int snprintf (char *buf, int size, const char *fmt, ...)
+struct for_snprintf {
+    unsigned char *ptr; /* where to store it */
+    int bytes; /* amount already stored */
+    int max;   /* max amount to store */
+};
+
+static int sprfunc(void *ptr, unsigned char letter)
 {
-    int n;
+    struct for_snprintf *pr = (struct for_snprintf *)ptr;
+    if(pr->bytes < pr->max) {
+        *pr->ptr = letter;
+        pr->ptr++;
+        pr->bytes++;
+        return true;
+    }
+    return false; /* filled buffer */
+}
+
+
+int snprintf(char *buf, int size, const char *fmt, ...)
+{
+    bool ok;
     va_list ap;
+    struct for_snprintf pr;
 
-    va_start (ap, fmt);
-    n = vsnprintf (buf, size, fmt, ap);
-    va_end (ap);
+    pr.ptr = buf;
+    pr.bytes = 0;
+    pr.max = size;
 
-    return n;
+    va_start(ap, fmt);
+    ok = format(sprfunc, &pr, fmt, ap);
+    va_end(ap);
+
+    /* make sure it ends with a trailing zero */
+    pr.ptr[ok?0:-1]='\0';
+    
+    return pr.bytes;
+}
+
+int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
+{
+    bool ok;
+    struct for_snprintf pr;
+
+    pr.ptr = buf;
+    pr.bytes = 0;
+    pr.max = size;
+
+    ok = format(sprfunc, &pr, fmt, ap);
+
+    /* make sure it ends with a trailing zero */
+    pr.ptr[ok?0:-1]='\0';
+    
+    return pr.bytes;
+}
+
+struct for_fprintf {
+    int fd;    /* where to store it */
+    int bytes; /* amount stored */
+};
+
+static int fprfunc(void *pr, unsigned char letter)
+{
+    struct for_fprintf *fpr  = (struct for_fprintf *)pr;
+    int rc = write(fpr->fd, &letter, 1);
+    
+    if(rc > 0) {
+        fpr->bytes++; /* count them */
+        return true;  /* we are ok */
+    }
+
+    return false; /* failure */
+}
+
+
+int fprintf(int fd, const char *fmt, ...)
+{
+    bool ok;
+    va_list ap;
+    struct for_fprintf fpr;
+
+    fpr.fd=fd;
+    fpr.bytes=0;
+
+    va_start(ap, fmt);
+    ok = format(fprfunc, &fpr, fmt, ap);
+    va_end(ap);
+
+    return fpr.bytes; /* return 0 on error */
 }
