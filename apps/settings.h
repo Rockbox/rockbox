@@ -78,7 +78,7 @@ struct user_settings
     int loop_playlist; /* do we return to top of playlist at end?  */
     bool mp3filter;    /* only display mp3/m3u files and dirs in directory? */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
-    int scroll_speed;  /* long texts scrolling speed: 1-20 */
+    int scroll_speed;  /* long texts scrolling speed: 1-30 */
     bool playlist_shuffle;
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
