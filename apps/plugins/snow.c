@@ -107,7 +107,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(false);
 
         if (button == BUTTON_OFF)
-            return false;
+            return PLUGIN_OK;
         else
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 return PLUGIN_USB_CONNECTED;
