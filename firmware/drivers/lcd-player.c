@@ -69,6 +69,7 @@ static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
+static char scroll_delay = HZ/2; /* delay before starting scroll */
 static char scroll_spacing = 3; /* spaces between end and start of text */
 static long scroll_start_tick;
 
@@ -282,7 +283,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
+    scroll_start_tick = current_tick + scroll_delay;
 
     /* search for the next free entry */
     for (index = 0; index < SCROLLABLE_LINES; index++) {
@@ -381,7 +382,7 @@ void lcd_scroll_resume(void)
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
+    scroll_start_tick = current_tick + scroll_delay;
 
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
@@ -396,7 +397,7 @@ void lcd_scroll_resume_line(int line)
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
+    scroll_start_tick = current_tick + scroll_delay;
 
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
@@ -412,6 +413,10 @@ void lcd_scroll_speed(int speed)
     scroll_speed = speed;
 }
 
+void lcd_scroll_delay(int ms)
+{
+    scroll_delay = ms / (HZ / 10);
+}
 static void scroll_thread(void)
 {
     struct scrollinfo* s;

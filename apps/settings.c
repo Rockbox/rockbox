@@ -125,6 +125,9 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 
+0xB5  scroll step in pixels
+0xB6  scroll start and endpoint delay
+0xB7  bidir scroll setting (bidi if 0-200% longer than screen width)
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
@@ -363,6 +366,10 @@ int settings_save( void )
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
 
+    config_block[0xb5]=(unsigned char)global_settings.scroll_step;
+    config_block[0xb6]=(unsigned char)global_settings.scroll_delay;
+    config_block[0xb7]=(unsigned char)global_settings.bidir_limit;
+
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
@@ -481,7 +488,11 @@ void settings_apply(void)
     }
     else
         font_reset();
+
+    lcd_bidir_scroll(global_settings.bidir_limit);
+    lcd_scroll_step(global_settings.scroll_step);
 #endif
+    lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
 
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) {
@@ -489,6 +500,8 @@ void settings_apply(void)
                  global_settings.lang_file);
         lang_load(buf);
     }
+
+
 }
 
 /*
@@ -632,6 +645,15 @@ void settings_load(void)
         if (config_block[0x29] != 0xff)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
+
+        if (config_block[0xb5] != 0xff)
+            global_settings.scroll_step = config_block[0xb5];
+
+        if (config_block[0xb6] != 0xff)
+            global_settings.scroll_delay = config_block[0xb6];
+
+        if (config_block[0xb7] != 0xff)
+            global_settings.bidir_limit = config_block[0xb7];
 
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
@@ -818,6 +840,9 @@ void settings_reset(void) {
     global_settings.volume_type  = 0;
     global_settings.battery_type = 0;
     global_settings.scroll_speed = 8;
+    global_settings.bidir_limit  = 50;
+    global_settings.scroll_delay = 500;
+    global_settings.scroll_step  = 6;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;

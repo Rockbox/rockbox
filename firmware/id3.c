@@ -255,17 +255,17 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     version = header[3];
     switch ( version ) {
         case 2:
-            entry->id3version = ID3_VER_2_2;
+            version = ID3_VER_2_2;
             minframesize = 8;
             break;
 
         case 3:
-            entry->id3version = ID3_VER_2_3;
+            version = ID3_VER_2_3;
             minframesize = 12;
             break;
 
         case 4:
-            entry->id3version = ID3_VER_2_4;
+            version = ID3_VER_2_4;
             minframesize = 12;
             break;
 
@@ -273,6 +273,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             /* unsupported id3 version */
             return;
     }
+    entry->id3version = version;
 
     /* 
      * We must have at least minframesize bytes left for the 
@@ -280,13 +281,13 @@ static void setid3v2title(int fd, struct mp3entry *entry)
      */
     while(size > minframesize) {
         /* Read frame header and check length */
-        if(version > 2) {
+        if(version >= ID3_VER_2_3) {
             if(10 != read(fd, header, 10))
                 return;
             /* Adjust for the 10 bytes we read */
             size -= 10;
             
-            if (version > 3) {
+            if (version >= ID3_VER_2_4) {
                 framelen = UNSYNC(header[4], header[5], 
                                   header[6], header[7]);
             } else {

@@ -399,9 +399,35 @@ static bool poweroff_idle_timer(void)
 
 static bool scroll_speed(void)
 {
-    return set_int(str(LANG_SCROLL), "", &global_settings.scroll_speed, 
-                   &lcd_scroll_speed, 1, 1, 30 );
+    return set_int(str(LANG_SCROLL), "Hz", &global_settings.scroll_speed, 
+                   &lcd_scroll_speed, 1, 1, 10 );
 }
+
+#ifdef HAVE_LCD_BITMAP
+static bool scroll_step(void)
+{
+    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels",
+                   &global_settings.scroll_step,
+                   &lcd_scroll_step, 1, 1, LCD_WIDTH );
+}
+#endif
+
+static bool scroll_delay(void)
+{
+    int dummy = global_settings.scroll_delay * (HZ/10);
+    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", &dummy, 
+                     &lcd_scroll_delay, 100, 0, 2500 );
+    global_settings.scroll_delay = dummy / (HZ/10);
+    return rc;
+}
+
+#ifdef HAVE_LCD_BITMAP
+static bool bidir_limit(void)
+{
+    return set_int(str(LANG_BIDIR_SCROLL), "%", &global_settings.bidir_limit, 
+                   &lcd_bidir_scroll, 25, 0, 200 );
+}
+#endif
 
 #ifdef HAVE_CHARGE_CTRL
 static bool deep_discharge(void)
@@ -636,7 +662,14 @@ static bool display_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SCROLL_MENU),     scroll_speed    },  
+        { str(LANG_SCROLL_MENU),     scroll_speed    },
+#ifdef HAVE_LCD_BITMAP
+        { str(LANG_SCROLL_STEP),     scroll_step     },  
+#endif
+        { str(LANG_SCROLL_DELAY),    scroll_delay    },  
+#ifdef HAVE_LCD_BITMAP
+        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
+#endif
         { str(LANG_BACKLIGHT),       backlight_timer },
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { str(LANG_CONTRAST),        contrast        },  

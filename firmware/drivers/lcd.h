@@ -39,6 +39,7 @@ extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);
 extern void lcd_stop_scroll_line(int line);
 extern void lcd_scroll_speed( int speed );
+extern void lcd_scroll_delay( int ms );
 extern void lcd_set_contrast(int val);
 extern void lcd_write( bool command, int byte );
 
@@ -121,8 +122,11 @@ extern void lcd_clearpixel(int x, int y);
 extern void lcd_invertpixel(int x, int y);
 extern void lcd_roll(int pixels);
 
+extern void lcd_bidir_scroll(int threshold);
+extern void lcd_scroll_step(int pixels);
 extern void lcd_setfont(int font);
 extern void lcd_putsxy(int x, int y, unsigned char *string);
+extern int  lcd_getstringsize(unsigned char *str, int *w, int *h);
 extern int  lcd_getstringsize(unsigned char *str, int *w, int *h);
 
 #endif /* CHARCELLS / BITMAP */

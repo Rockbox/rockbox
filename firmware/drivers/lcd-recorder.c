@@ -84,14 +84,18 @@ struct scrollinfo {
     int offset;
     int startx;
     int starty;
+    bool backward; /* scroll presently forward or backward? */
+    bool bidir;
+    long start_tick;
 };
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
+static int scroll_delay = HZ/2; /* ticks delay before start */
 static char scroll_step = 6;  /* pixels per scroll step */
-static long scroll_start_tick;
+static int bidir_limit = 50;  /* percent */
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 static int xmargin = 0;
 static int ymargin = 0;
@@ -669,8 +673,6 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
     int w, h;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
-
     /* search for the next free entry */
     for (index = 0; index < SCROLLABLE_LINES; index++) {
         s = &scroll[index];
@@ -678,6 +680,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
             break;
         }
     }
+    s->start_tick = current_tick + scroll_delay;
 
     lcd_puts(x,y,string);
     lcd_getstringsize(string, &w, &h);
@@ -688,9 +691,23 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
 
         memset(s->line, 0, sizeof s->line);
         strcpy(s->line, string);
-        strcat(s->line, "   ");
-        /* get new width incl. spaces */
+
+        /* get width */
         s->width = lcd_getstringsize(s->line, &w, &h);
+
+        /* scroll bidirectional or forward only depending on the string width */
+        if ( bidir_limit ) {
+            s->bidir = s->width < (LCD_WIDTH - xmargin) *
+                (100 + bidir_limit) / 100;
+        }
+        else
+            s->bidir = false;
+
+        if (!s->bidir) { /* add spaces if scrolling in the round */
+            strcat(s->line, "   ");
+            /* get new width incl. spaces */
+            s->width = lcd_getstringsize(s->line, &w, &h);
+        }
 
         for (end = s->line; *end; end++);
         strncpy(end, string, LCD_WIDTH/2);
@@ -700,6 +717,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
         s->offset = 0;
         s->startx = x;
         s->starty = y;
+        s->backward = false;
     }
 }
 
@@ -786,8 +804,6 @@ void lcd_scroll_resume(void)
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
-
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
         if ( s->mode == SCROLL_MODE_PAUSE ) {
@@ -801,8 +817,6 @@ void lcd_scroll_resume_line(int line)
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + HZ/2;
-
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
         if ( s->startx == line &&
@@ -814,9 +828,23 @@ void lcd_scroll_resume_line(int line)
 
 void lcd_scroll_speed(int speed)
 {
-    scroll_step = speed;
+    scroll_speed = speed;
 }
 
+void lcd_scroll_step(int step)
+{
+    scroll_step = step;
+}
+
+void lcd_scroll_delay(int ms)
+{
+    scroll_delay = ms / (HZ / 10);
+}
+
+void lcd_bidir_scroll(int percent)
+{
+    bidir_limit = percent;
+}
 static void scroll_thread(void)
 {
     struct scrollinfo* s;
@@ -829,31 +857,50 @@ static void scroll_thread(void)
         scroll[index].mode = SCROLL_MODE_OFF;
     }
 
-    scroll_start_tick = current_tick;
-
     while ( 1 ) {
+        for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
+            s = &scroll[index];
 
-        /* wait 0.5s before starting scroll */
-        if ( TIME_AFTER(current_tick, scroll_start_tick) ) {
+            /* really scroll? */
+            if ( s->mode != SCROLL_MODE_RUN )
+                continue;
 
-            for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-                s = &scroll[index];
-                if ( s->mode == SCROLL_MODE_RUN ) {
+            /* check pause */
+            if (TIME_BEFORE(current_tick, s->start_tick))
+                continue;
 
-                    s->offset += scroll_step;
+            if (s->backward)
+                s->offset -= scroll_step;
+            else
+                s->offset += scroll_step;
 
-                    if (s->offset >= s->width)
-                        s->offset %= s->width;
-
-                    lcd_getstringsize(s->line, &w, &h);
-                    xpos = xmargin + s->startx * w / s->len;
-                    ypos = ymargin + s->starty * h;
-
-                    lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
-                    lcd_putsxyofs(xpos, ypos, s->offset, s->line);
-                    lcd_update_rect(xpos, ypos, LCD_WIDTH - xmargin, h);
+            if (s->bidir) { /* scroll bidirectional */
+                if (s->offset <= 0) {
+                    /* at beginning of line */
+                    s->offset = 0;
+                    s->backward = false;
+                    s->start_tick = current_tick + scroll_delay * 2;
+                }
+                if (s->offset >= s->width - (LCD_WIDTH - xmargin)) {
+                    /* at end of line */
+                    s->offset = s->width - (LCD_WIDTH - xmargin);
+                    s->backward = true;
+                    s->start_tick = current_tick + scroll_delay * 2;
                 }
             }
+            else {
+                /* scroll forward the whole time */
+                if (s->offset >= s->width)
+                    s->offset %= s->width;
+            }
+
+            lcd_getstringsize(s->line, &w, &h);
+            xpos = xmargin + s->startx * w / s->len;
+            ypos = ymargin + s->starty * h;
+
+            lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
+            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+            lcd_update_rect(xpos, ypos, LCD_WIDTH - xmargin, h);
         }
 
         sleep(HZ/scroll_speed);

@@ -134,6 +134,10 @@ struct user_settings
 
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */
+
+    int bidir_limit;   /* bidir scroll length limit */
+    int scroll_delay;  /* delay (in 1/10s) before starting scroll */
+    int scroll_step;   /* pixels to advance per update */
 };
 
 /* prototypes */
