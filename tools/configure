@@ -9,6 +9,7 @@
 #
 
 target=$1
+debug=$2
 
 input() {
     read response
@@ -18,6 +19,17 @@ input() {
 echo "Setup your Rockbox build environment."
 echo "http://bjorn.haxx.se/rockbox/"
 echo ""
+
+if [ "$target" = "update" ]; then
+  target=""
+  if [ -f Makefile ]; then
+    if { grep "^## Auto" Makefile >/dev/null 2>&1 ; } then
+      echo "Existing generated Makefile found. Getting defaults from it."
+      target=`grep "^TARGET=" Makefile | cut -d= -f2-`
+      debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
+    fi
+  fi
+fi
 
 if [ -z "$target" ]; then
 
@@ -53,23 +65,26 @@ if [ -z "$target" ]; then
 fi
 
 
-##################################################################
-# Figure out debug on/off
-#
-echo ""
-echo "Build DEBUG version? (y/N)"
+if [ -z "$debug" ]; then
+  ##################################################################
+  # Figure out debug on/off
+  #
+  echo ""
+  echo "Build DEBUG version? (y/N)"
 
-option=`input`;
+  option=`input`;
 
-case $option in
-  [Yy])
-    debug="DEBUG=1"
-    ;;
-  *)
-    debug=""
-    ;;
+  case $option in
+    [Yy])
+      debug="DEBUG=1"
+      ;;
+    *)
+      debug=""
+      ;;
 
-esac
+  esac
+fi
+
 
 ##################################################################
 # Figure out where the firmware code is!
@@ -120,6 +135,8 @@ sed > Makefile \
  -e "s,@TARGET@,${target},g" \
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
+## Automaticly generated. http://bjorn.haxx.se/rockbox/
+
 FIRMDIR=@FIRMDIR@
 APPSDIR=@APPSDIR@
 DEBUG=@DEBUG@
@@ -127,8 +144,8 @@ TARGET=@TARGET@
 THISDIR="@PWD@"
 
 all:
-	make -C \$(FIRMDIR) TARGET=\$(TARGET) $(DEBUG) OBJDIR=\$(THISDIR)
-	make -C \$(APPSDIR) TARGET=\$(TARGET) $(DEBUG) OBJDIR=\$(THISDIR)
+	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
 
 EOF
 
