@@ -12,7 +12,7 @@ extern int ata_init(char*);
 extern void ata_read_sectors(int, int, char*);
 
 void dbg_dump_sector(int sec);
-void dbg_dump_buffer(unsigned char *buf, int len);
+void dbg_dump_buffer(unsigned char *buf, int len, int offset);
 void dbg_console(void);
 
 void panicf( char *fmt, ...)
@@ -31,10 +31,10 @@ void dbg_dump_sector(int sec)
 
     ata_read_sectors(sec,1,buf);
     DEBUGF("---< Sector %d >-----------------------------------------\n", sec);
-    dbg_dump_buffer(buf, 512);
+    dbg_dump_buffer(buf, 512, 0);
 }
 
-void dbg_dump_buffer(unsigned char *buf, int len)
+void dbg_dump_buffer(unsigned char *buf, int len, int offset)
 {
     int i, j;
     unsigned char c;
@@ -42,7 +42,7 @@ void dbg_dump_buffer(unsigned char *buf, int len)
 
     for(i = 0;i < len/16;i++)
     {
-        DEBUGF("%03x: ", i*16);
+        DEBUGF("%03x: ", i*16 + offset);
         for(j = 0;j < 16;j++)
         {
             c = buf[i*16+j];
@@ -102,7 +102,7 @@ int dbg_mkfile(char* name, int num)
         int len = num > sizeof text ? sizeof text : num;
 
         for (i=0; i<len/CHUNKSIZE; i++ )
-            sprintf(text+i*CHUNKSIZE,"%07x,",x++);
+            sprintf(text+i*CHUNKSIZE,"%c%06x,",name[1],x++);
 
         if (write(fd, text, len) < 0) {
             DEBUGF("Failed writing data\n");
@@ -139,12 +139,15 @@ int dbg_chkfile(char* name)
             if (!rc)
                 break;
             for (i=0; i<rc/CHUNKSIZE; i++ ) {
-                sprintf(tmp,"%07x,",x++);
+                sprintf(tmp,"%c%06x,",name[1],x++);
                 if (strncmp(text+i*CHUNKSIZE,tmp,CHUNKSIZE)) {
-                    DEBUGF("Mismatch in byte %d (%.4s != %.4s)\n",
-                           block*sizeof(text)+i*CHUNKSIZE, tmp,
+                    DEBUGF("Mismatch in byte %x (sector %d). Expected %.8s found %.8s\n",
+                           block*sizeof(text)+i*CHUNKSIZE,
+                           (block*sizeof(text)+i*CHUNKSIZE) / SECTOR_SIZE,
+                           tmp,
                            text+i*CHUNKSIZE);
-                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40);
+                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40, 
+                                    block*sizeof(text)+i*CHUNKSIZE - 0x20);
                     return -1;
                 }
             }

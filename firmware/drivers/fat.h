@@ -46,15 +46,6 @@ struct fat_direntry
 #define FAT_ATTR_DIRECTORY   0x10
 #define FAT_ATTR_ARCHIVE     0x20
 
-struct fat_dir
-{
-    int entry;
-    int cached_sec;
-    int num_sec;
-    unsigned char cached_buf[SECTOR_SIZE];
-    int startcluster;
-};
-
 struct fat_file
 {
     int firstcluster;    /* first cluster in file */
@@ -64,6 +55,16 @@ struct fat_file
     int dirsector;       /* sector where the dir entry is located */
     int direntry;        /* dir entry index in sector */
 };
+
+struct fat_dir
+{
+    int entry;
+    int cached_sec;
+    int num_sec;
+    unsigned char cached_buf[SECTOR_SIZE];
+    int startcluster;
+};
+
 
 extern int fat_mount(int startsector);
 
