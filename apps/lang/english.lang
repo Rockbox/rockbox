@@ -1174,5 +1174,5 @@ new:
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "MP3 buffer margin"
+eng: "Anti-skip buffer"
 new:
