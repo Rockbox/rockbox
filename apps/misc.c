@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <ctype.h>
 #include "string.h"
 #include "config.h"
 #include "file.h"
@@ -170,3 +171,36 @@ void screen_dump(void)
     }
 }
 #endif
+
+/* parse a line from a configuration file. the line format is: 
+
+   name: value
+
+   Any whitespace before setting name or value (after ':') is ignored.
+   A # as first non-whitespace character discards the whole line.
+   Function sets pointers to null-terminated setting name and value.
+   Returns false if no valid config entry was found.
+*/
+
+bool settings_parseline(char* line, char** name, char** value)
+{
+    char* ptr;
+
+    while ( isspace(*line) )
+        line++;
+
+    if ( *line == '#' )
+        return false;
+
+    ptr = strchr(line, ':');
+    if ( !ptr )
+        return false;
+
+    *name = line;
+    *ptr = 0;
+    ptr++;
+    while (isspace(*ptr))
+        ptr++;
+    *value = ptr;
+    return true;
+}

@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef MISC_H
+#define MISC_H
 
 /* The point of this function would be to return a string of the input data,
    but never longer than 5 columns. Add suffix k and M when suitable...
@@ -34,4 +36,8 @@ int read_line(int fd, char* buffer, int buffer_size);
 #ifdef HAVE_LCD_BITMAP
 /* Save a .BMP file containing the current screen contents. */
 void screen_dump(void);
+#endif
+
+bool settings_parseline(char* line, char** name, char** value);
+
 #endif
