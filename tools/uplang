@@ -8,7 +8,7 @@ MOO
     exit;
 }
 
-my %ids;
+my %ids, @ids;
 open(ENG, "<$ARGV[0]");
 while(<ENG>) {
     if($_ =~ /^ *\#/) {
@@ -29,6 +29,7 @@ while(<ENG>) {
             $all{$set{'id'}, 'voice'}=$set{'voice'};
 
             $ids{$set{'id'}}=1;
+            push @ids, $set{'id'};
             undef %set;
         }
     }
@@ -62,21 +63,37 @@ while(<NEW>) {
             if($set{'desc'} ne $all{$set{'id'}, 'desc'}) {
                 print "### Description changed! Previous description was:\n",
                 "### \"".$set{'desc'}."\"\n";
-                $set{'desc'} = $all{$set{'id'}, 'desc'};
+                print "desc: ".$all{$set{'id'}, 'desc'}."\n";
             }
-            print "desc: ".$set{'desc'}."\n";
+            else {
+                print "desc: ".$set{'desc'}."\n";
+            }
 
             if($set{'eng'} ne $all{$set{'id'}, 'eng'}) {
                 print "### English phrase was changed! Previous translation was made on:\n",
                 "### ".$set{'eng'}."\n";
-                $set{'eng'} = $all{$set{'id'}, 'eng'};
+                print "eng: ".$all{$set{'id'}, 'eng'}."\n";
             }
-            print "eng: ".$set{'eng'}."\n";
+            else {
+                print "eng: ".$set{'eng'}."\n";
+            }
 
-            if($set{'voice'} ne $all{$set{'id'}, 'voice'}) {
-                print "### Voice string was changed! Previous version was:\n",
-                "### ".$set{'voice'}."\n";
-                $set{'voice'} = $all{$set{'id'}, 'voice'};
+            if($set{'id'} =~ /^VOICE_/) { # voice only, compare desc:
+                if($set{'desc'} ne $all{$set{'id'}, 'desc'}) {
+                    print "### Voice only: description changed! Voice set to english. Previous voice was:\n",
+                    "### ".$set{'voice'}."\n";
+                    $set{'voice'} = $all{$set{'id'}, 'voice'};
+                }
+            }
+            else { # standard entry, compare eng:
+                if($set{'eng'} ne $all{$set{'id'}, 'eng'}
+                   #only if either original or translated voice: is non-empty
+                   and ($set{'voice'} !~ /^(\"\")? *$/
+                        or $all{$set{'id'}, 'voice'} !~ /^(\"\")? *$/)) {
+                    print "### English phrase was changed! Voice set to english. Previous voice was:\n",
+                    "### ".$set{'voice'}."\n";
+                    $set{'voice'} = $all{$set{'id'}, 'voice'};
+                }
             }
             print "voice: ".$set{'voice'}."\n";
 
@@ -88,14 +105,15 @@ while(<NEW>) {
 }
 close(NEW);
 
-# output new phrases not already translated
-for(sort keys %ids) {
+# output new phrases not already translated , in english.lang order
+for(@ids) {
     if($ids{$_}) {
         my $id=$_;
         print "\nid: $_\n";
         print "desc: ".$all{$id, 'desc'}."\n";
         print "eng: ".$all{$id, 'eng'}."\n";
         print "### Not previously translated\n";
+        print "voice: ".$all{$id, 'voice'}."\n";
         print "new: \n";
     }
 }
