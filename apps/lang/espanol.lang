@@ -243,7 +243,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""  
+new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -315,7 +315,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "" 
+new:  
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -414,64 +414,40 @@ voice: ""
 new: "Teclado Desbloqueado"
 
 id: LANG_MUTE_ON_PLAYER
-### Description changed! Previous description was:
-### "displayed when mute is on"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Mute ON"
 eng: ""
 voice: ""
-new: "Silencio ON"
+new:
 
 id: LANG_MUTE_OFF_PLAYER
-### Description changed! Previous description was:
-### "displayed when mute is off"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Mute OFF"
 eng: ""
 voice: ""
-new: "Silencio OFF"
+new:
 
 id: LANG_MUTE_ON_RECORDER
-### Description changed! Previous description was:
-### "displayed when mute is on"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Mute Is ON"
 eng: ""
 voice: ""
-new: "Silencio ON"
+new:
 
 id: LANG_MUTE_OFF_RECORDER
-### Description changed! Previous description was:
-### "displayed when mute is off"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Mute Is OFF"
 eng: ""
 voice: ""
-new: "Silencio OFF"
+new:
 
 id: LANG_ID3_INFO
-### Description changed! Previous description was:
-### "in the browse_id3() function"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "-ID3 Info- "
 eng: ""
 voice: ""
-new: "-Pantalla- "
+new:
 
 id: LANG_ID3_SCREEN
-### Description changed! Previous description was:
-### "in the browse_id3() function"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "--Screen-- "
 eng: ""
 voice: ""
-new: "-Info ID3- "
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -828,24 +804,16 @@ voice: ""
 new: "Borrado"
 
 id: LANG_DISK_FREE_STAT
-### Description changed! Previous description was:
-### "disk size info"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Free: %d.%dGB"
-eng: ""
-voice: "Espacio libre en disco"
-new: "Libre: %d.%dGB"
-
-id: LANG_DISK_STAT
-### Description changed! Previous description was:
-### "disk size info"
-desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Disk: %d.%dGB"
 eng: ""
 voice: ""
-new: "Disco: %d.%dGB"
+new:
+
+id: LANG_DISK_STAT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -1259,19 +1227,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: 
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1331,25 +1299,25 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1652,14 +1620,10 @@ voice: ""
 new: "Lista de Sintonias llena"
 
 id: LANG_FM_NO_PRESETS
-### Description changed! Previous description was:
-### "in radio screen"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "The preset list is empty"
 eng: ""
 voice: ""
-new: "Lista de Sintonias vacia"
+new:
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
@@ -1674,14 +1638,10 @@ voice: "Radio FM"
 new: "Radio FM"
 
 id: LANG_FM_SAVE_PRESET
-### Description changed! Previous description was:
-### "in radio screen"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Save preset"
 eng: ""
 voice: ""
-new: "Guardar Sintonia"
+new: 
 
 id: LANG_FM_STATION
 desc: in radio screen
@@ -2146,12 +2106,10 @@ voice: "14"
 new: ""
 
 id: VOICE_GIGABYTE
-### Description changed! Previous description was:
-### "spoken only, a unit postfix"
 desc: DEPRECATED
 eng: ""
-voice: "gigabyte"
-new: ""
+voice: ""
+new: 
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
@@ -2178,12 +2136,10 @@ voice: "kilohercio"
 new: ""
 
 id: VOICE_MEGABYTE
-### Description changed! Previous description was:
-### "spoken only, a unit postfix, currently not used"
 desc: DEPRECATED
 eng: ""
-voice: "megabyte"
-new: ""
+voice: ""
+new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
@@ -2252,12 +2208,10 @@ voice: "más"
 new: ""
 
 id: VOICE_POINT
-### Description changed! Previous description was:
-### "spoken only, decimal separator for composing numbers"
 desc: DEPRECATED
 eng: ""
-voice: "coma"
-new: ""
+voice: ""
+new: 
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
@@ -2446,14 +2400,10 @@ voice: ""
 new: "Añadir"
 
 id: LANG_FM_BUTTONBAR_EDIT
-### Description changed! Previous description was:
-### "in radio screen"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Edit"
 eng: ""
 voice: ""
-new: "Editar"
+new: 
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
@@ -2621,7 +2571,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "" 
+new:  
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
