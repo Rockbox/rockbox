@@ -542,8 +542,8 @@ static bool timedate_set(void)
         timedate[1] < 0 || timedate[1] > 59 || 
         timedate[2] < 0 || timedate[2] > 59 ||
         timedate[3] < 0 || timedate[3] > 99 ||
-        timedate[4] < 0 || timedate[4] > 12 ||
-        timedate[5] < 0 || timedate[5] > 31)
+        timedate[4] < 1 || timedate[4] > 12 ||
+        timedate[5] < 1 || timedate[5] > 31)
     {
         /* hour   */
         timedate[0] = 0;
