@@ -26,7 +26,7 @@
 
 /* playlist data */
 
-typedef struct 
+struct playlist_info
 {
     char filename[MAX_PATH];  /* path name of m3u playlist on disk       */
     int  dirlen;         /* Length of the path to the playlist file */
@@ -35,9 +35,9 @@ typedef struct
     int  seed;           /* random seed                             */
     int  amount;         /* number of tracks in the index           */
     bool in_ram;         /* True if the playlist is RAM-based       */
-} playlist_info_t;
+};
 
-extern playlist_info_t playlist;
+extern struct playlist_info playlist;
 extern bool playlist_shuffle;
 
 int play_list(char *dir, char *file, int start_index, 

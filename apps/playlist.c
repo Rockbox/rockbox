@@ -35,7 +35,7 @@
 #include "widgets.h"
 #endif
 
-playlist_info_t playlist;
+struct playlist_info playlist;
 
 #define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
 
