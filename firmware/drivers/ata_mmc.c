@@ -198,32 +198,40 @@ static void setup_sci1(int bitrate_register)
 static void write_transfer(const unsigned char *buf, int len)
 {
     const unsigned char *buf_end = buf + len;
+    register unsigned char data;
 
     /* TODO: DMA */
     
     while (buf < buf_end)
     {
+        data = fliptable[(signed char)(*buf++)]; /* bitswap */
         while (!(SSR1 & SCI_TEND));              /* wait for end of transfer */
-        TDR1 = fliptable[(signed char)(*buf++)]; /* write byte */
+        TDR1 = data;                             /* write byte */
         SSR1 = 0;                                /* start transmitting */
     }
 }
 
+/* don't call this with len == 0 */
 static void read_transfer(unsigned char *buf, int len)
 {
-    unsigned char *buf_end = buf + len;
+    unsigned char *buf_end = buf + len - 1;
+    register signed char data;
 
     /* TODO: DMA */
 
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     TDR1 = 0xFF;                  /* send do-nothing data in parallel */
     
+    SSR1 = 0;                     /* start receiving first byte */
     while (buf < buf_end)
     {
-        SSR1 = 0;                                /* start receiving */
-        while (!(SSR1 & SCI_RDRF));              /* wait for data */
-        *buf++ = fliptable[(signed char)(RDR1)]; /* read byte */
+        while (!(SSR1 & SCI_RDRF)); /* wait for data */
+        data = RDR1;                /* read byte */
+        SSR1 = 0;                   /* start receiving */
+        *buf++ = fliptable[data];   /* bitswap */
     }
+    while (!(SSR1 & SCI_RDRF));     /* wait for last byte */
+    *buf = fliptable[(signed char)(RDR1)]; /* read & bitswap */
 }
 
 /* timeout is in bytes */
