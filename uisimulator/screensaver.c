@@ -57,11 +57,11 @@ void ss_loop(void)
     else
         center = LCD_WIDTH/2;
 
-    i = center;
+    i = center+1;
     while(1)
     {
         /* Grow */
-        if ( i <= 0 ) {
+        if ( i < 0 ) {
             factor = 1;
             i = 1;
         }
