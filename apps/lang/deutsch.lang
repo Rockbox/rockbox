@@ -1530,7 +1530,7 @@ new: "[ON] = Rückgängig"
 id: LANG_SAVE_SETTINGS
 desc:  in system_settings_menu()
 eng: "Write .cfg file"
-new: "Einstellungen speichern"
+new: "Schreibe .cfg-Datei"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
