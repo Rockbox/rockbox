@@ -54,7 +54,8 @@ extern void bitswap(unsigned short *data, int length);
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
 
-extern char* playlist_next(int steps, int* id);
+extern char* playlist_peek(int steps);
+extern int playlist_next(int steps);
 extern void update_file_pos( int id, int pos );
 
 static char *units[] =
@@ -418,6 +419,7 @@ static int last_dma_chunk_size;
 static bool dma_on;  /* The DMA is active */
 static bool playing; /* We are playing an MP3 stream */
 static bool play_pending; /* We are about to start playing */
+static bool is_playing; /* We are (attempting to) playing MP3 files */
 static bool filling; /* We are filling the buffer with data from disk */
 
 static int mpeg_file;
@@ -599,6 +601,7 @@ void DEI3(void)
             queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
             CHCR3 = 0; /* Stop DMA interrupt */
             playing = false;
+            is_playing = false;
         }
     }
 
@@ -652,7 +655,7 @@ static int new_file(int steps)
         char *trackname;
         int index;
 
-        trackname = playlist_next( steps, &index );
+        trackname = playlist_peek( steps );
         if ( !trackname )
             return -1;
         
@@ -661,10 +664,14 @@ static int new_file(int steps)
         mpeg_file = open(trackname, O_RDONLY);
         if(mpeg_file < 0) {
             DEBUGF("Couldn't open file: %s\n",trackname);
+            steps++;
         }
         else
         {
             int new_tag_idx = tag_write_idx;
+
+            index = playlist_next(steps);
+            
             add_track_to_tag_list(trackname);
             /* skip past id3v2 tag (to an even byte) */
             lseek(mpeg_file, 
@@ -716,6 +723,7 @@ static void mpeg_thread(void)
     int t1, t2;
     int start_offset;
 
+    is_playing = false;
     play_pending = false;
     playing = false;
     mpeg_file = -1;
@@ -742,7 +750,10 @@ static void mpeg_thread(void)
                     close(mpeg_file);
 
                 if ( new_file(0) == -1 )
-                    return;
+                {
+                    is_playing = false;
+                    break;
+                }
 
                 start_offset = (int)ev.data;
 
@@ -775,6 +786,7 @@ static void mpeg_thread(void)
 
             case MPEG_STOP:
                 DEBUGF("MPEG_STOP\n");
+                is_playing = false;
                 stop_playing();
                 break;
 
@@ -1284,6 +1296,8 @@ bool mpeg_has_changed_track(void)
 
 void mpeg_play(int offset)
 {
+    is_playing = true;
+    
 #ifdef SIMULATOR
     char* trackname;
     int steps=0;
@@ -1397,7 +1411,7 @@ void mpeg_ff_rewind(int change)
 
 bool mpeg_is_playing(void)
 {
-    return playing || play_pending || paused;
+    return is_playing;
 }
 
 #ifndef SIMULATOR

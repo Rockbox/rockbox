@@ -722,7 +722,8 @@ int wps_show(void)
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
-        draw_screen(id3);
+//        draw_screen(id3);
+        restore = true;
     }
 
     while ( 1 )
@@ -1216,7 +1217,10 @@ int wps_show(void)
             }
 #endif
             case BUTTON_NONE: /* Timeout */
-                if (mpeg_is_playing() && id3)
+                if(!mpeg_is_playing())
+                    restore = true;
+                
+                if (id3)
                     display_file_time(id3->elapsed, id3->length);
                 
                 /* save resume data */
