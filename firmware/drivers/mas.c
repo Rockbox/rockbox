@@ -68,7 +68,7 @@ int mas_run(unsigned short address)
     i2c_begin();
     
     buf[0] = MAS_DATA_WRITE;
-    buf[1] = address << 8;
+    buf[1] = address >> 8;
     buf[2] = address & 0xff;
 
     /* send run command */
