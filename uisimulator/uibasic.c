@@ -30,7 +30,6 @@
 #include <time.h>
 
 #include "screenhack.h"
-#include "alpha.h"
 
 #include "version.h"
 
