@@ -1,0 +1,886 @@
+# $Id$
+#
+# This is the master of the language files. This is the original, the one with
+# all the existing strings Rockbox features.
+#
+# *WARNING*
+#
+# If you want to add a new string, add it to the end of this file!
+# If you want to remove a string, just blank it, don't actually remove it!
+#
+# If you re-order things or remove entries, you must bump the binary language
+# file version number in both the 'binlang' tool and the language loader code.
+#
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+new: "אפשרויות צליל"
+
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+new: "אפשרויות כלליות"
+
+id: LANG_GAMES
+desc: in the main menu
+eng: "Games"
+new: "משחקים"
+
+id: LANG_DEMOS
+desc: in the main menu
+eng: "Demos"
+new: "הדגמות"
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+new: "מידע"
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+new: "גרסא"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+new: "חומרה (לא להשתמש("
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (sim)"
+new: "USB (הדגמה)"
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox Info:"
+new: "מידע על ה-Rockbox"
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%02dMB"
+new:
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%02dMB"
+new: "זכרון: %d.%02dMB"
+
+id: LANG_BATTERY_LEVEL_PLAYER
+desc: the battery level in percentage
+eng: "Batt: %d%%%s"
+new: 
+
+id: LANG_BATTERY_LEVEL_RECORDER
+desc: the battery level in percentage
+eng: "Battery: %d%%%s"
+new: "סוללה: %d%%%s"
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: charging"
+new: "סוללה: בטעינה"
+
+id: LANG_BOUNCE
+desc: in the demos menu
+eng: "Bounce"
+new: "קיפצות"
+
+id: LANG_SNOW
+desc: in the demos menu
+eng: "Snow"
+new: "שלג"
+
+id: LANG_TETRIS
+desc: in the games menu
+eng: "Tetris"
+new: "טטריס"
+
+id: LANG_SOKOBAN
+desc: in the games menu
+eng: "Sokoban"
+new: 
+
+id: LANG_WORMLET
+desc: in the games menu
+eng: "Wormlet"
+new: "תולעת"
+
+id: LANG_SNAKE
+desc: in the games menu
+eng: "Snake"
+new: "סנייק"
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
+new:
+
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
+new: "מערבב"
+
+id: LANG_PLAYLIST_PLAY
+desc: displayed on screen when start playing a playlist
+eng: "Playing..."
+new: "מנגן"
+
+id: LANG_PLAYINDICES_PLAYLIST
+desc: in playlist.indices() when playlist is full
+eng: "Playlist"
+new: "רשימת שירים"
+
+id: LANG_PLAYINDICES_BUFFER
+desc: in playlist.indices() when playlist is full
+eng: "buffer full"
+new: "זכרון מלא"
+
+id: LANG_PLAYINDICES_AMOUNT
+desc: number of files in playlist
+eng: "%d files"
+new: "%d קבצים"
+
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save failed"
+new: "שמירה נכשלה"
+
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. low?"
+new: "סוללה חלשה?"
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save failed"
+new: "שמירה נכשלה"
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is battery low?"
+new: "האם הסוללה טעונה?"
+
+id: LANG_TIME_SET
+dec: used in set_time()
+eng: "ON to set"
+new: "ON כדי לכוון"
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF to revert"
+new: "OFF כדי לחזור"
+
+id: LANG_HIDDEN
+desc: in settings_menu
+eng: ""
+new:
+
+id: LANG_HIDDEN_SHOW
+desc: in settings_menu 
+eng: ""
+new:
+
+id: LANG_HIDDEN_HIDE
+desc: in settings_menu
+eng: ""
+new:
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+new: "קונטרסט"
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+new: "ערבוב"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play Selected First"
+new: "נגן מסומנים קודם"
+
+id: LANG_MP3FILTER
+desc: in settings_menu
+eng: ""
+new:
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+new: "מיין לפי גודל אות"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+new: "זכרית מקום"
+
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+new: "כיבוי"
+
+id: LANG_RESUME_SETTING_ASK
+desc: in settings_menu
+eng: "Ask"
+new: "שאל"
+
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+new: "פועל"
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+new: "תאורה"
+
+id: LANG_BACKLIGHT_ON
+desc: in settings_menu, 
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+new: "דוגמה למהירות החלקה"
+
+id: LANG_DISCHARGE
+desc: in settings_menu
+eng: "Deep Discharge"
+new: "פירוק הסוללה"
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+new: "כוון שעון/תאריך"
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+new: "הורד מהירות דיסק"
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+new: "צעד מינימלי בהעברה מהירה"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+new: " תאוצת העברה קדימה/אחורה"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+new: "עקוב אחר רשימת שירים"
+
+id: LANG_RESET_ASK_PLAYER
+desc: confirm to reset settings
+eng: "Really?"
+new: "בטוח?"
+
+id: LANG_RESET_CONFIRM_PLAYER
+desc: confirm to reset settings
+eng: "Play/Stop"
+new: "נגן/הפסק"
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are you sure?"
+new: "האם אתה בטוח"
+
+id: LANG_RESET_CONFIRM_RECORDER
+desc: confirm to reset settings
+eng: "PLAY = Yes"
+new: "PLAY=כן"
+
+id: LANG_RESET_CANCEL_RECORDER
+desc: confirm to reset settings
+eng: "Any Other = No"
+new: "אחר=לא"
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+new: "אפשרויות"
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+new: "נמחק"
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+new: "בוטל"
+
+id: LANG_CASE_MENU
+desc: in fileview_settings_menu()
+eng: "Sort Mode"
+new: "מצב סידור"
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "מהירות החלקה"
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset settings"
+new: "אפס אפשרויות"
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+new: "ניגון"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+new: "צפיית קבצים"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+new: "תצוגה"
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+new: "מערכת"
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+new: "עוצמה"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+new: "באלאנס"
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+new: "בס"
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+new: "טרבל"
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+new: "עוצמה חזקה"
+
+id: LANG_BBOOST
+desc: in sound settings
+eng: "Bass Boost"
+new: "הגבר בס"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV Decay Time"
+new: "זמן דעיכת AV"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+new: "ערוצים"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel Configuration"
+new: "כיוון ערוצים"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+new: "סטריאו"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+new: "מונו"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+new: "מונו שמאלי"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+new: "מונו ימני"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+new: "עוצמה אוטומטית"
+
+id: LANG_SHOWDIR_ERROR_BUFFER
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer"
+new: "זכרון ספריות"
+
+id: LANG_SHOWDIR_ERROR_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "is full!"
+new: "מלא!"
+
+id: LANG_RESUME_ASK
+desc: question asked at the begining when resume is on
+eng: "Resume?"
+new: "להמשיך?"
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: posible answers to resume question
+eng: "(PLAY/STOP)"
+new: "נגן/הפסק"
+
+id: LANG_RESUME_CONFIRM_RECORDER
+desc: posible answer to resume question
+eng: "PLAY = Yes"
+new: "PLAY=כן"
+
+id: LANG_RESUME_CANCEL_RECORDER
+desc: posible answer to resume question
+eng: "Any Other = No"
+new: "אחר=לא"
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Keylock ON"
+new: "נעילת מקשים פועלת"
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Keylock OFF"
+new: "נעילת מקשים מבוטלת"
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key lock is ON"
+new: "נעילת מקשים פועלת"
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key lock is OFF"
+new: "נעילת מקשים מבוטלת"
+
+id: LANG_MUTE_ON_PLAYER
+desc: displayed when mute is on
+eng: "Mute ON"
+new:
+
+id: LANG_MUTE_OFF_PLAYER
+desc: displayed when mute is off
+eng: "Mute OFF"
+new:
+
+id: LANG_MUTE_ON_RECORDER
+desc: displayed when mute is on
+eng: "Mute is ON"
+new: "מושתק"
+
+id: LANG_MUTE_OFF_RECORDER
+desc: displayed when mute is off
+eng: "Mute is OFF"
+new: "השתקה בוטלה"
+
+id: LANG_ID3_INFO
+desc: in the browse_id3() function
+eng: "-ID3 Info- "
+new:
+
+id: LANG_ID3_SCREEN
+desc: in the browse_id3() function
+eng: "--Screen-- "
+new:
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+new: "[כותרת]"
+
+id: LANG_ID3_NO_TITLE
+desc: in wps when no title is avaible
+eng: "<no title>"
+new: "<אין כותרת>"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+new: "[אמן]"
+
+id: LANG_ID3_NO_ARTIST
+desc: in wps when no artist is avaible
+eng: "<no artist>"
+new: "<אין אמן>"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+new: "[אלבום]"
+
+id: LANG_ID3_NO_ALBUM
+desc: in wps when no album is avaible
+eng: "<no album>"
+new: "<אין אלבום>"
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+new: "[מספר]"
+
+id: LANG_ID3_NO_TRACKNUM
+desc: in wps if no track number is avaible
+eng: "<no tracknum>"
+new: "<אין מספר>"
+
+id: LANG_ID3_LENGHT
+desc: in wps
+eng: "[Length]"
+new: "[אורך]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+new: "[מיקום]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+new: "[איכות]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+new: "[תדר]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[Path]"
+new: "[ספרייה]"
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch up"
+new: "העלאת קצב"
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch down"
+new: "הורדת קצב"
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+new: "הפסקה"
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "mode:"
+new: "מצב:"
+
+id: LANG_DIR_FILTER
+desc: in wps F2 pressed
+eng: ""
+new:
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+new: "סטטוס"
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+new: "החלקה"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "bar"
+new: "קו"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End of list"
+new: "סוף רשימה"
+
+id: LANG_END_CONFIRM_PLAYER
+desc: when playlist has finished
+eng: ""
+new:
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "End of song list"
+new: "סוף רשימת שירים"
+
+id: LANG_END_CONFIRM_RECORDER
+desc: when playlist has finished
+eng: ""
+new:
+
+id: LANG_SNAKE_SCORE
+desc: when you die in snake game
+eng: "Your score:"
+new: "ניקוד:"
+
+id: LANG_SNAKE_HISCORE
+desc: high score in snake game
+eng: "High Score: %d"
+new: "ניקוד שיא: %d"
+
+id: LANG_SNAKE_HISCORE_NEW
+desc: new high score in snake game
+eng: "New High Score!"
+new: "ניקוד שיא חדש!"
+
+id: LANG_SNAKE_PAUSE
+desc: displayed when game is paused
+eng: "Game Paused"
+new: "משחק הופסק"
+
+id: LANG_SNAKE_RESUME
+desc: what to do to resume game
+eng: "[PLAY] to resume"
+new: "[PLAY] כדי להמשיך"
+
+id: LANG_SNAKE_QUIT
+desc: how to quit game
+eng: "[OFF] to quit"
+new: "[OFF] כדי לצאת"
+
+id: LANG_SNAKE_LEVEL
+desc: level of difficulty
+eng: "Level - %d"
+new:
+
+id: LANG_SNAKE_RANGE
+desc: range of levels
+eng: "(1 - slow, 9 - fast)"
+new: ")1 - לאט, 9- מהר)"
+
+id: LANG_SNAKE_START
+desc: how to start or pause the game
+eng: "[PLAY] to start/pause"
+new: "[PLAY] כדי להתחיל/להפסיק"
+
+id: LANG_SOKOBAN_LEVEL
+desc: must be smaller than 6 characters
+eng: "Level"
+new: "רמה"
+
+id: LANG_SOKOBAN_MOVE
+desc: must be smaller than 6 characters
+eng: "Moves"
+new: "מהלכים"
+
+id: LANG_SOKOBAN_WIN
+desc: displayed when you win 
+eng: "YOU WIN!!"
+new: "ניצחת!!!"
+
+id: LANG_SOKOBAN_QUIT
+desc: how to quit game
+eng: "[OFF] to stop"
+new: "[OFF] כדי לצאת"
+
+id: LANG_SOKOBAN_F1
+desc: what does F1 do
+eng: "[F1] - level"
+new: "[F1] - רמה"
+
+id: LANG_SOKOBAN_F2
+desc: what does F2 do
+eng: "[F2] same level"
+new: "[F2] - אותה רמה"
+
+id: LANG_SOKOBAN_F3
+desc: what does F3 do
+eng: "[F3] + level"
+new: "[F3] + רמה"
+
+# Next ids are for Worlmet Game.
+# Lenght restrictions for score board strings (LANG_SB_XXX):
+# LCD_PROPFONTS: max 43 pixel
+# fix font: max 7 characters
+
+id: LANG_WORMLET_LENGTH
+desc: wormlet game
+eng: "Len:%d"
+new:
+
+id: LANG_WORMLET_GROWING
+desc: wormlet game 
+eng: "Growing"
+new:
+
+id: LANG_WORMLET_HUNGRY
+desc: wormlet game
+eng: "Hungry"
+new:
+
+id: LANG_WORMLET_WORMED
+desc: wormlet game
+eng: "Wormed"
+new:
+
+id: LANG_WORMLET_ARGH
+desc: wormlet game
+eng: "Argh"
+new:
+
+id: LANG_WORMLET_CRASHED
+desc: wormlet game
+eng: "Crashed"
+new:
+
+id: LANG_WORMLET_HIGHSCORE
+desc: wormlet game
+eng: "Hs: %d"
+new:
+
+# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
+# They must fit on the entire screen - preferably with the
+# key names aligned right
+
+id: LANG_WORMLET_PLAYERS
+desc: wormlet game
+eng: "%d Players    UP/DN"
+new:
+
+id: LANG_WORMLET_WORMS
+desc: wormlet game
+eng: "%d Worms        L/R"
+new:
+
+id: LANG_WORMLET_REMOTE_CTRL
+desc: wormlet game
+eng: "Remote control F1"
+new:
+
+id: LANG_WORMLET_NO_REM_CTRL
+desc: wormlet game
+eng: "No rem. control F1"
+new:
+
+id: LANG_WORMLET_2_KEY_CTRL
+desc: wormlet game
+eng: "2 key control   F1"
+new:
+
+id: LANG_WORMLET_4_KEY_CTRL
+desc: wormlet game
+eng: "4 key control   F1"
+new:
+
+id: LANG_WORMLET_NO_CONTROL
+desc: wormlet game
+eng: "Out of control"
+new:
+
+# Wormlet game ids ended
+
+id: LANG_TETRIS_LOSE
+desc: tetris game
+eng: "You lose!"
+new:
+
+id: LANG_TETRIS_LEVEL
+desc: tetris game
+eng: "0 Rows - Level 0"
+new:
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "כיבוי אוטומטי"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "שפה חדשה"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show Files"
+new: "הראה קבצים"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "מוסיקה"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "נתמכים"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "כולם"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "כן"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "לא"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak Meter"
+new: "מד עוצמה"
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak Release"
+new: "שחרור מד עוצמה"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak Hold Time"
+new: "זמן החזקה למד עוצמה"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip Hold Time"
+new: "זמן חיתוך"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "Eternal"
+new: "לעולם"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units Per Read"
+new: "יחידות לקריאה"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight On When Plugged"
+new: "תאורה כאשר בטעינה"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "חזרה"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "הכל"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "אחד"
