@@ -28,6 +28,11 @@
 #include <stdio.h>
 #endif
 
+#define TETRIS_TITLE       "Tetris!"
+#define TETRIS_TITLE_FONT  2
+#define TETRIS_TITLE_XLOC  10
+#define TETRIS_TITLE_YLOC  32
+
 int start_x = 1;
 int start_y = 1;
 int max_x = 14;
@@ -98,7 +103,7 @@ int block_data[7][4][2][4] =
 };
 
 /* not even pseudo random :) */
-int rand(int range)
+int t_rand(int range)
 {
     static int count;
     count++;
@@ -125,15 +130,6 @@ void draw_block(int x,int y,int block,int frame,int clear)
             lcd_drawpixel(start_x+x+block_data[block][frame][0][i],
                           start_y+y+block_data[block][frame][1][i]);
     }
-
-/*
-  if ( (clear ? 0 : block+1) ) 
-  lcd_drawpixel(start_x+x+block_data[block][frame][0][i],
-  start_y+y+block_data[block][frame][1][i]);
-  else
-  lcd_clearpixel(start_x+x+block_data[block][frame][0][i],
-  start_y+y+block_data[block][frame][1][i]);
-*/
 }
 
 void to_virtual()
@@ -143,6 +139,32 @@ void to_virtual()
         *(virtual+
           ((current_y+block_data[current_b][current_f][1][i])*max_x)+
           (current_x+block_data[current_b][current_f][0][i])) = current_b+1;
+}
+
+int gameover()
+{
+    int i;
+    int frame, block, y, x;
+
+    x = current_x;
+    y = current_y;
+    block = current_b;
+    frame = current_f;
+
+    for(i=0;i < 4; i++){
+        /* Do we have blocks touching? */
+        if(*(virtual+((y+block_data[block][frame][1][i])*max_x)+x+
+             block_data[block][frame][0][i]) != 0) 
+        {
+            /* Are we at the top of the frame? */
+            if(y+block_data[block][frame][1][i] < start_y)
+            {
+                /* Game over ;) */
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 int valid_position(int x,int y,int block,int frame)
@@ -199,8 +221,8 @@ void new_block()
     current_f = next_f;
     current_x = (int)((max_x)/2)-1;
     current_y = 0;
-    next_b = rand(blocks);
-    next_f = rand(block_frames[next_b]);
+    next_b = t_rand(blocks);
+    next_f = t_rand(block_frames[next_b]);
     draw_block(max_x+2,start_y-1,current_b,current_f,TRUE);
     draw_block(max_x+2,start_y-1,next_b,next_f,FALSE);
     if(!valid_position(current_x,current_y,current_b,current_f))
@@ -285,6 +307,19 @@ void game_loop(void)
 	    count++;
 	    sleep(1);
 	}
+    if(gameover()) {
+        char w, h;
+
+        lcd_fontsize(TETRIS_TITLE_FONT, &w, &h);
+        lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
+                      TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
+                      TETRIS_TITLE_YLOC-h);
+        lcd_puts(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
+                 "You lose!", TETRIS_TITLE_FONT);
+        lcd_update();
+        sleep(2);
+        return;
+    }
 	move_down();
     }
 }
@@ -292,11 +327,12 @@ void game_loop(void)
 void tetris(void)
 {
     draw_frame(start_x-1,start_x+max_x,start_y-1,start_y+max_y);
-    lcd_puts(10, 32, "Tetris!", 2);
+    lcd_puts(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
+             TETRIS_TITLE, TETRIS_TITLE_FONT);
     lcd_update();
 
-    next_b = rand(blocks);
-    next_f = rand(block_frames[next_b]);
+    next_b = t_rand(blocks);
+    next_f = t_rand(block_frames[next_b]);
     new_block();
     game_loop();
 }
