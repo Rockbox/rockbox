@@ -6,34 +6,39 @@ BODY {
 
 H1 {
  text-decoration:  none;
- font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-family:      sans-serif;
  font-style:       normal;
  font-weight:      bold;
- font-size:        20pt;
+ font-size:        150%;
 }
 
 H2 {
  text-decoration:  none;
- font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-family:      sans-serif;
  font-style:       normal;
  font-weight:      bold;
- font-size:        14pt;
+ font-size:        130%;
 }
 
 H3, div.h5, .newsdate {
  text-decoration:  none;
- font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-family:      sans-serif;
  font-style:       normal;
  font-weight:      bold;
- font-size:        12pt;
+ font-size:        110%;
 }
 
 BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT
 {
  text-decoration:  none;
- font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-family:      sans-serif;
  font-style:       normal;
- font-size:        10pt;
+# font-size:        95%;
+ font-size:        13px;
+}
+
+LI {
+ margin-top: 3px;
 }
 
 P.ind {

@@ -25,3 +25,4 @@ Quelsaruk   => Jose Maria Garcia-Valdecasas Bernal
 amiconn     => Jens Arnold
 mattzz      => Matthias Wientapper
 pfavr       => Peter Favrholdt
+[av]bani    => Dan Hollis

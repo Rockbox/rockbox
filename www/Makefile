@@ -13,7 +13,7 @@ OBJS := $(SRC:%.t=%.html) $(SOBJS)
 %.shtml : %.t
 	$(ACTION) $<
 
-all: $(OBJS)
+all: $(OBJS) head.tmpl
 	@(cd schematics; $(MAKE))
 	@(cd docs; $(MAKE))
 	@(cd mods; $(MAKE))
@@ -29,6 +29,9 @@ all: $(OBJS)
 	@(cd tshirt-contest; $(MAKE))
 	@(cd screenshots; $(MAKE))
 	@(cd digest; $(MAKE))
+
+head.tmpl: head.t
+	$(ACTION) -DTWIKI $<
 
 main.html: main.t activity.html
 

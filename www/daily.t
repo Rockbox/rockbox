@@ -3,24 +3,16 @@
 
 <h2>Daily builds for different models</h2>
 
-<p>These are automated daily builds of the code in CVS. They contain all the latest features. They may also contain bugs and/or undocumented changes... :-)
-The top line is the latest.
+<p>These are automated daily builds of the code in CVS. They contain all the
+latest features. They may also contain bugs and/or undocumented changes... <a href="/docs/devicechart.html">identify your model</a>
 
 <p>
 <!--#exec cmd="./dailymod.pl" -->
-#if 0
-<p>
-<b>mod</b> - The file you should name "archos.mod" before copying it to the root of your archos.<br>
-<b>ajz</b> - The file you should name "ajbrec.ajz" before copying it to the root of your archos.<br>
-<b>rocks</b> - All plugins for this particular release of Rockbox.<br>
-<b>full</b> - Full zip archive, with rockbox, plugins, languages, docs, fonts, ucl etc.<br>
-<b>ucl</b> - File to use when <a href="/docs/flash.html">flashing Rockbox</a>
-#endif
 <h2>Source tarballs</h2>
 
 <!--#exec cmd="./dailysrc.pl" -->
 
-<p>Please also look at the <a href="docs/">documentation</a> for do-it-yourselfers.
+<p>Please also look at the <a href="/twiki/bin/view/Main/DocsIndex">documentation</a> for do-it-yourselfers.
 
 <a name="target_builds"></a>
 <a name="daily_builds"></a>
@@ -46,10 +38,6 @@ The batch timestamp is GMT.
 <a href="auto/build-playerdebug/archos.mod">Player debug</a>
 (<a href="auto/build-playerdebug/rocks.zip">rocks</a>)<br>
 
-<a href="auto/build-playersim/rockboxui">Player simulator (linux)</a>
-(<a href="auto/build-playersim/rocks.zip">rocks</a>)<br>
-<a href="auto/build-playersimwin32/uisw32.exe">Player simulator (win32)</a>
-(<a href="auto/build-playersimwin32/rocks.zip">rocks</a>)<br>
 </td>
 <td>
 <a href="auto/build-recorder/ajbrec.ajz">Recorder</a>
@@ -58,10 +46,9 @@ The batch timestamp is GMT.
 <a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a>
 (<a href="auto/build-recorderdebug/rocks.zip">rocks</a>)<br>
 
-<a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a>
-(<a href="auto/build-recordersim/rocks.zip">rocks</a>)<br>
-<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
-(<a href="auto/build-recordersimwin32/rocks.zip">rocks</a>)<br>
+<a href="auto/build-ondiosp/ajbrec.ajz">Ondio SP</a>
+<a href="auto/build-ondiofm/ajbrec.ajz">Ondio FM</a>
+
 </td>
 <td>
 <a href="auto/build-fmrecorder/ajbrec.ajz">FM Recorder</a>
@@ -74,6 +61,6 @@ The batch timestamp is GMT.
 </tr></table>
 
 <p>
-<a href="/cvs.html">How to use CVS</a>.
+<a href="/twiki/bin/view/Main/UsingCVS">How to use CVS</a>.
 
 #include "foot.t"

@@ -20,6 +20,8 @@ for ( sort {$b <=> $a} @tarballs ) {
         }
     }
     print "<li><a href=\"daily/$_\">$_</a> <small>($size bytes)</small> $log\n";
+    print "<li><a href=\"dl.cgi?bin=source\">old versions</a>\n";
+    last;
 }
 
 print "</ul>\n";
