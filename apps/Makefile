@@ -7,6 +7,9 @@
 # $Id$
 #
 
+# $< is the name to the left of the colon
+# $@ is the first name to the right of the colon
+
 CC    = sh-elf-gcc 
 LD    = sh-elf-ld
 AR    = sh-elf-ar
@@ -87,22 +90,22 @@ $(LINKFILE): $(LDS)
 	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/rockbox.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(CC) -Os -nostdlib -o $< $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	$(OC) -O binary $(OBJDIR)/rockbox.elf $(OBJDIR)/rockbox.bin
+	$(OC) -O binary $@ $<
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
-	$(TOOLSDIR)/sh2d -sh1 $(OBJDIR)/rockbox.bin > $(OBJDIR)/rockbox.asm
+	$(TOOLSDIR)/sh2d -sh1 $@ > $<
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
-	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
+	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $@ $<
 
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
-	@a=`2uclpack -h 2>/dev/null`; \
+	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "runs uclpack"; \
-	  uclpack --best --2e $(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.ucl >/dev/null 2>&1; \
+	  uclpack --best --2e $< $@ >/dev/null 2>&1; \
 	else \
 	  echo "no uclpack command found, makes a fake UCL file"; \
 	  echo "fake" > $@; \
