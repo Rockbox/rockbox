@@ -257,10 +257,7 @@ static int remove_dir(char* dirname, int len)
     {   /* remove the now empty directory */
         dirname[dirlen] = '\0'; /* terminate to original length */
         
-        /* FIXME: It's not working like below, 
-            we need a way to delete a directory */
-
-        /* result = remove(dirname); */
+        result = rmdir(dirname);
     }
 
     return result;
