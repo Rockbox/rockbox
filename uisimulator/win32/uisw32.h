@@ -33,6 +33,7 @@
 #define UI_LCD_POSY                 95 // y position of lcd
 
 #define TM_YIELD                    WM_USER + 101 // thread message for yield
+#define TIMER_EVENT                 0x34928340
 
 extern HWND                         hGUIWnd; // the GUI window handle
 extern unsigned int                 uThreadID; // id of mod thread

@@ -23,6 +23,7 @@
 HANDLE              lpThreads[256];
 int                 nThreads = 0,
                     nPos = 0;
+long                current_tick = 0;
 
 
 DWORD WINAPI runthread (LPVOID lpParameter)

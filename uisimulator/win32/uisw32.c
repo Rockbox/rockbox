@@ -24,6 +24,7 @@
 #include "button.h"
 #include "thread.h"
 #include "thread-win32.h"
+#include "kernel.h"
 
 // extern functions
 extern void                 app_main (void *); // mod entry point
@@ -51,6 +52,9 @@ LRESULT GUIWndProc (
 
     switch (uMsg)
     {
+    case WM_TIMER:
+        current_tick++;
+        return TRUE;
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE)
             bActive = true;
@@ -58,6 +62,7 @@ LRESULT GUIWndProc (
             bActive = false;
         return TRUE;
     case WM_CREATE:
+        SetTimer (hWnd, TIMER_EVENT, 50, NULL);
         // load background image
         hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL), MAKEINTRESOURCE(IDB_UI),
             IMAGE_BITMAP, 0, 0, LR_VGACOLOR);
@@ -186,6 +191,7 @@ LRESULT GUIWndProc (
         }
     case WM_CLOSE:
         // close simulator
+        KillTimer (hWnd, TIMER_EVENT);
         hGUIWnd = NULL;
         PostQuitMessage (0);
         break;
