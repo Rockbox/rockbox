@@ -76,4 +76,6 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+#define CONFIG_LCD LCD_SSD1815
+
 #endif /* SIMULATOR */

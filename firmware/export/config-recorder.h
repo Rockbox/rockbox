@@ -70,4 +70,6 @@
 /* Define this for S/PDIF output available */
 #define HAVE_SPDIF_OUT
 
+#define CONFIG_LCD LCD_SSD1815
+
 #endif /* SIMULATOR */

@@ -51,6 +51,8 @@
 /* CONFIG_LCD */
 #define LCD_GMINI100 0
 #define LCD_SSD1815  1 /* as used by Archos Recorders and Ondios */
+#define LCD_SSD1801  2 /* as used by Archos Player/Studio */
+#define LCD_S1D15E06 3 /* as used by iRiver H100 series */
 
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO  0 /* Player, PA14 low active */

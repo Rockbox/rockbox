@@ -70,4 +70,6 @@
 /* define this if more than one device/partition can be used */
 #define HAVE_MULTIVOLUME
 
+#define CONFIG_LCD LCD_SSD1815
+
 #endif /* SIMULATOR */

@@ -66,4 +66,6 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
 
+#define CONFIG_LCD LCD_SSD1801
+
 #endif /* SIMULATOR */

@@ -33,4 +33,6 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
+#define CONFIG_LCD LCD_S1D15E06
+
 #endif
