@@ -61,19 +61,19 @@ struct MemTop {
 
 /* Each BLOCK takes care of an amount of FRAGMENTS */
 struct MemBlock {
-  struct MemTop *top;     /* our TOP struct */
-  struct MemBlock *next;  /* next BLOCK */
-  struct MemBlock *prev;  /* prev BLOCK */
+    struct MemTop *top;     /* our TOP struct */
+    struct MemBlock *next;  /* next BLOCK */
+    struct MemBlock *prev;  /* prev BLOCK */
   
-  struct MemFrag *first;  /* the first free FRAGMENT in this block */
+    struct MemFrag *first;  /* the first free FRAGMENT in this block */
 
-  short nfree;            /* number of free FRAGMENTS in this BLOCK */
+    short nfree;            /* number of free FRAGMENTS in this BLOCK */
 };
 
 /* This is the data kept in all _free_ FRAGMENTS */
 struct MemFrag {
-  struct MemFrag *next;   /* next free FRAGMENT */
-  struct MemFrag *prev;   /* prev free FRAGMENT */
+    struct MemFrag *next;   /* next free FRAGMENT */
+    struct MemFrag *prev;   /* prev free FRAGMENT */
 };
 
 /* This is the data kept in all _allocated_ FRAGMENTS and BLOCKS. We add this
@@ -81,10 +81,10 @@ struct MemFrag {
    this smoothly. */
 
 struct MemInfo {
-  void *block;
-  /* which BLOCK is our father, if BLOCK_BIT is set it means this is a
-     stand-alone, large allocation and then the rest of the bits should be
-     treated as the size of the block */
+    void *block;
+    /* which BLOCK is our father, if BLOCK_BIT is set it means this is a
+       stand-alone, large allocation and then the rest of the bits should be
+       treated as the size of the block */
 #define BLOCK_BIT 1
 };
 
@@ -160,7 +160,7 @@ struct MemInfo {
    happy with us.
    */
 
-const static short qinfo[]= {
+static const unsigned short qinfo[]= {
   20, 28, 52, 116, 312, 580, 1016, 2032
 };
 
@@ -185,26 +185,26 @@ static struct MemTop top[ sizeof(qinfo)/sizeof(qinfo[0]) ];
 
 void dmalloc_status(void)
 {
-  int i;
-  int used;
-  int num;
-  int totalfree=0;
-  struct MemBlock *block;
-  for(i=0; i<sizeof(qinfo)/sizeof(qinfo[0]);i++) {
-    block = top[i].chain;
-    used = 0;
-    num = 0;
-    while(block) {
-      used += top[i].nmax-block->nfree;
-      num++;
-      block = block->next;
+    unsigned int i;
+    int used;
+    int num;
+    int totalfree=0;
+    struct MemBlock *block;
+    for(i=0; i<sizeof(qinfo)/sizeof(qinfo[0]);i++) {
+        block = top[i].chain;
+        used = 0;
+        num = 0;
+        while(block) {
+            used += top[i].nmax-block->nfree;
+            num++;
+            block = block->next;
+        }
+        printf("Q %d (FRAG %4d), USED %4d FREE %4ld (SIZE %4ld) BLOCKS %d\n",
+               i, top[i].fragsize, used, top[i].nfree,
+               top[i].nfree*top[i].fragsize, num);
+        totalfree += top[i].nfree*top[i].fragsize;
     }
-    printf("Q %d (FRAG %4d), USED %4d FREE %4ld (SIZE %4ld) BLOCKS %d\n",
-	   i, top[i].fragsize, used, top[i].nfree,
-	   top[i].nfree*top[i].fragsize, num);
-    totalfree += top[i].nfree*top[i].fragsize;
-  }
-  printf("Total unused memory stolen by dmalloc: %d\n", totalfree);
+    printf("Total unused memory stolen by dmalloc: %d\n", totalfree);
 }
 #endif
 
@@ -224,21 +224,21 @@ static void dmalloc_failed(size_t size)
 
 void syslog(char *fmt, ...)
 {
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stdout, fmt, ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stdout, fmt, ap);
+    va_end(ap);
 }
 
 void memchange(void *a, int x)
 {
-  static int memory=0;
-  static int count=0;
-  static int max=0;
-  if(memory > max)
-    max = memory;
-  memory += x;
-  DBG(("%d. PTR %p / %d TOTAL %d MAX %d\n", ++count, a, x, memory, max));
+    static int memory=0;
+    static int count=0;
+    static int max=0;
+    if(memory > max)
+        max = memory;
+    memory += x;
+    DBG(("%d. PTR %p / %d TOTAL %d MAX %d\n", ++count, a, x, memory, max));
 }
 #else
 #define DBG(x)
@@ -254,17 +254,17 @@ void memchange(void *a, int x)
 
 static void FragBlock(char *memp, int size)
 {
-  struct MemFrag *frag=(struct MemFrag *)memp;
-  struct MemFrag *prev=NULL; /* no previous in the first round */
-  int count=0;
-  while((count+size) <= DMEM_BLOCKSIZE) {
-    frag->next = (struct MemFrag *)((char *)frag + size);
-    frag->prev = prev;
-    prev = frag;
-    (char *)frag += size;
-    count += size;
-  }
-  prev->next = NULL; /* the last one has no next struct */
+    struct MemFrag *frag=(struct MemFrag *)memp;
+    struct MemFrag *prev=NULL; /* no previous in the first round */
+    int count=0;
+    while((count+size) <= DMEM_BLOCKSIZE) {
+        frag->next = (struct MemFrag *)((char *)frag + size);
+        frag->prev = prev;
+        prev = frag;
+        (char *)frag += size;
+        count += size;
+    }
+    prev->next = NULL; /* the last one has no next struct */
 }
 
 /***************************************************************************
@@ -276,26 +276,26 @@ static void FragBlock(char *memp, int size)
  **************************************************************************/
 void dmalloc_initialize(void)
 {
-  int i;
-  /* Setup the nmax and fragsize fields of the top structs */
-  for(i=0; i< sizeof(qinfo)/sizeof(qinfo[0]); i++) {
-    top[i].fragsize = qinfo[i];
-    top[i].nmax = DMEM_BLOCKSIZE/qinfo[i];
+    unsigned int i;
+    /* Setup the nmax and fragsize fields of the top structs */
+    for(i=0; i< sizeof(qinfo)/sizeof(qinfo[0]); i++) {
+        top[i].fragsize = qinfo[i];
+        top[i].nmax = DMEM_BLOCKSIZE/qinfo[i];
 
 #ifdef PSOS
-    /* for some reason, these aren't nulled from start: */
-    top[i].chain = NULL; /* no BLOCKS */
-    top[i].nfree = 0;    /* no FRAGMENTS */
+        /* for some reason, these aren't nulled from start: */
+        top[i].chain = NULL; /* no BLOCKS */
+        top[i].nfree = 0;    /* no FRAGMENTS */
 #endif
 #ifdef SEMAPHORE
-    {
-      char name[7];
-      sprintf(name, "MEM%d", i);
-      SEMAPHORECREATE(name, top[i].semaphore_id);
-      /* doesn't matter if it failed, we continue anyway ;-( */
-    }
+        {
+            char name[7];
+            sprintf(name, "MEM%d", i);
+            SEMAPHORECREATE(name, top[i].semaphore_id);
+            /* doesn't matter if it failed, we continue anyway ;-( */
+        }
 #endif
-  }
+    }
 }
 
 /****************************************************************************
@@ -309,28 +309,28 @@ void dmalloc_initialize(void)
 
 static void *fragfromblock(struct MemBlock *block)
 {
-  /* make frag point to the first free FRAGMENT */
-  struct MemFrag *frag = block->first;
-  struct MemInfo *mem = (struct MemInfo *)frag;
+    /* make frag point to the first free FRAGMENT */
+    struct MemFrag *frag = block->first;
+    struct MemInfo *mem = (struct MemInfo *)frag;
 
-  /*
-   * Remove the FRAGMENT from the list and decrease the free counters.
-   */
-  block->first = frag->next; /* new first free FRAGMENT */
-
-  block->nfree--; /* BLOCK counter */
-  block->top->nfree--; /* TOP counter */
-      
-  /* heal the FRAGMENT list */
-  if(frag->prev) {
-    frag->prev->next = frag->next;
-  }
-  if(frag->next) {
-    frag->next->prev = frag->prev;
-  }
-  mem->block = block; /* no block bit set here */
+    /*
+     * Remove the FRAGMENT from the list and decrease the free counters.
+     */
+    block->first = frag->next; /* new first free FRAGMENT */
     
-  return ((char *)mem)+sizeof(struct MemInfo);
+    block->nfree--; /* BLOCK counter */
+    block->top->nfree--; /* TOP counter */
+      
+    /* heal the FRAGMENT list */
+    if(frag->prev) {
+        frag->prev->next = frag->next;
+    }
+    if(frag->next) {
+        frag->next->prev = frag->prev;
+    }
+    mem->block = block; /* no block bit set here */
+    
+    return ((char *)mem)+sizeof(struct MemInfo);
 }
 
 /***************************************************************************
@@ -343,133 +343,138 @@ static void *fragfromblock(struct MemBlock *block)
 
 void *dmalloc(size_t size)
 {
-  void *mem;
+    void *mem;
 
-  DBG(("dmalloc(%d)\n", size));
+    DBG(("dmalloc(%d)\n", size));
 
-  /* First, we make room for the space needed in every allocation */
-  size += sizeof(struct MemInfo);
+    /* First, we make room for the space needed in every allocation */
+    size += sizeof(struct MemInfo);
 
-  if(size < DMEM_LARGESTSIZE) {
-    /* get a FRAGMENT */
+    if(size < DMEM_LARGESTSIZE) {
+        /* get a FRAGMENT */
 
-    struct MemBlock *block=NULL; /* SAFE */
-    struct MemBlock *newblock=NULL; /* SAFE */
-    struct MemTop *memtop=NULL; /* SAFE */
+        struct MemBlock *block=NULL; /* SAFE */
+        struct MemBlock *newblock=NULL; /* SAFE */
+        struct MemTop *memtop=NULL; /* SAFE */
 
-    /* Determine which queue to use */
-    int queue;
-    for(queue=0; size > qinfo[queue]; queue++)
-      ;
-    do {
-      /* This is the head master of our chain: */
-      memtop = &top[queue];
+        /* Determine which queue to use */
+        unsigned int queue;
+        for(queue=0; size > qinfo[queue]; queue++)
+            ;
+        do {
+            /* This is the head master of our chain: */
+            memtop = &top[queue];
 
-      DBG(("Top info: CHAIN %p FREE %d MAX %d FRAGSIZE %d\n",
-	   memtop->chain,
-	   memtop->nfree,
-	   memtop->nmax,
-	   memtop->fragsize));
+            DBG(("Top info: CHAIN %p FREE %d MAX %d FRAGSIZE %d\n",
+                 memtop->chain,
+                 memtop->nfree,
+                 memtop->nmax,
+                 memtop->fragsize));
 
 #ifdef SEMAPHORE
-      if(SEMAPHOREOBTAIN(memtop->semaphore_id))
-	return NULL; /* failed somehow */
+            if(SEMAPHOREOBTAIN(memtop->semaphore_id))
+                return NULL; /* failed somehow */
 #endif
 
-      /* get the first BLOCK in the chain */
-      block = memtop->chain;
+            /* get the first BLOCK in the chain */
+            block = memtop->chain;
 
-      /* check if we have a free FRAGMENT */
-      if(memtop->nfree) {
-	/* there exists a free FRAGMENT in this chain */
+            /* check if we have a free FRAGMENT */
+            if(memtop->nfree) {
+                /* there exists a free FRAGMENT in this chain */
 
-	/* I WANT THIS LOOP OUT OF HERE! */
+                /**** We'd prefer to not have this loop here! ****/
 
-	/* search for the free FRAGMENT */
-	while(!block->nfree)
-	  block = block->next; /* check next BLOCK */
+                /* search for the free FRAGMENT */
+                while(!block->nfree)
+                    block = block->next; /* check next BLOCK */
 
-	/*
-	 * Now 'block' is the first BLOCK with a free FRAGMENT
-	 */
+                /*
+                 * Now 'block' is the first BLOCK with a free FRAGMENT
+                 */
 
-	mem = fragfromblock(block);
+                mem = fragfromblock(block);
       
-      }
-      else {
-	/* we do *not* have a free FRAGMENT but need to get us a new BLOCK */
+            }
+            else {
+                /* we do *not* have a free FRAGMENT but need to get us a new
+                 * BLOCK */
 
-	DMEM_OSALLOCMEM(DMEM_BLOCKSIZE + sizeof(struct MemBlock),
-			newblock,
-			struct MemBlock *);
-	if(!newblock) {
-	  if(++queue < sizeof(qinfo)/sizeof(qinfo[0])) {
-	    /* There are queues for bigger FRAGMENTS that we should check
-	       before we fail this for real */
+                DMEM_OSALLOCMEM(DMEM_BLOCKSIZE + sizeof(struct MemBlock),
+                                newblock,
+                                struct MemBlock *);
+                if(!newblock) {
+                    if(++queue < sizeof(qinfo)/sizeof(qinfo[0])) {
+                        /* There are queues for bigger FRAGMENTS that we
+                         * should check before we fail this for real */
 #ifdef DEBUG_VERBOSE
-	    printf("*** " __FILE__ " Trying a bigger Q: %d\n", queue);
+                        printf("*** " __FILE__ " Trying a bigger Q: %d\n",
+                               queue);
 #endif
-	    mem = NULL;
-	  }
-	  else {
-	    dmalloc_failed(size- sizeof(struct MemInfo));
-	    return NULL; /* not enough memory */
-	  }
-	}
-	else {
-	  /* allocation of big BLOCK was successful */
+                        mem = NULL;
+                    }
+                    else {
+                        dmalloc_failed(size- sizeof(struct MemInfo));
+                        return NULL; /* not enough memory */
+                    }
+                }
+                else {
+                    /* allocation of big BLOCK was successful */
+                    MEMINCR(newblock, DMEM_BLOCKSIZE +
+                            sizeof(struct MemBlock));
 
-	  MEMINCR(newblock, DMEM_BLOCKSIZE + sizeof(struct MemBlock));
-
-	  memtop->chain = newblock; /* attach this BLOCK to the chain */
-	  newblock->next = block;   /* point to the previous first BLOCK */
-	  if(block)
-	    block->prev = newblock; /* point back on this new BLOCK */
-	  newblock->prev = NULL;    /* no previous */
-	  newblock->top  = memtop;  /* our head master */
+                    memtop->chain = newblock; /* attach this BLOCK to the
+                                                 chain */
+                    newblock->next = block;   /* point to the previous first
+                                                 BLOCK */
+                    if(block)
+                        block->prev = newblock; /* point back on this new 
+                                                   BLOCK */
+                    newblock->prev = NULL;    /* no previous */
+                    newblock->top  = memtop;  /* our head master */
 	
-	  /* point to the new first FRAGMENT */
-	  newblock->first = (struct MemFrag *)
-	    ((char *)newblock+sizeof(struct MemBlock));
+                    /* point to the new first FRAGMENT */
+                    newblock->first = (struct MemFrag *)
+                        ((char *)newblock+sizeof(struct MemBlock));
 
-	  /* create FRAGMENTS of the BLOCK: */
-	  FragBlock((char *)newblock->first, memtop->fragsize);
+                    /* create FRAGMENTS of the BLOCK: */
+                    FragBlock((char *)newblock->first, memtop->fragsize);
 
-	  /* fix the nfree counters */
-	  newblock->nfree = memtop->nmax;
-	  memtop->nfree += memtop->nmax;
+                    /* fix the nfree counters */
+                    newblock->nfree = memtop->nmax;
+                    memtop->nfree += memtop->nmax;
 
-	  /* get a FRAGMENT from the BLOCK */
-	  mem = fragfromblock(newblock);
-	}
-      }
+                    /* get a FRAGMENT from the BLOCK */
+                    mem = fragfromblock(newblock);
+                }
+            }
 #ifdef SEMAPHORE
-      SEMAPHORERETURN(memtop->semaphore_id); /* let it go */
+            SEMAPHORERETURN(memtop->semaphore_id); /* let it go */
 #endif
-    } while(NULL == mem); /* if we should retry a larger FRAGMENT */
-  }
-  else {
-    /* get a stand-alone BLOCK */
-    struct MemInfo *meminfo;
-
-    if(size&1)
-      /* don't leave this with an odd size since we'll use that bit for
-	 information */
-      size++;
-
-    DMEM_OSALLOCMEM(size, meminfo, struct MemInfo *);
-
-    if(meminfo) {
-      MEMINCR(meminfo, size);
-      meminfo->block = (void *)(size|BLOCK_BIT);
-      mem = (char *)meminfo + sizeof(struct MemInfo);
+        } while(NULL == mem); /* if we should retry a larger FRAGMENT */
     }
     else {
-      dmalloc_failed(size);
-      mem = NULL;
+        /* get a stand-alone BLOCK */
+        struct MemInfo *meminfo;
+
+        if(size&1)
+            /* don't leave this with an odd size since we'll use that bit for
+               information */
+            size++;
+
+        DMEM_OSALLOCMEM(size, meminfo, struct MemInfo *);
+
+        if(meminfo) {
+            MEMINCR(meminfo, size);
+            meminfo->block = (void *)(size|BLOCK_BIT);
+            mem = (char *)meminfo + sizeof(struct MemInfo);
+        }
+        else {
+            dmalloc_failed(size);
+            mem = NULL;
+        }
     }
-  }
-  return (void *)mem;
+    return (void *)mem;
 }
 
 /***************************************************************************
@@ -482,58 +487,60 @@ void *dmalloc(size_t size)
 
 void dfree(void *memp)
 {
-  struct MemInfo *meminfo = (struct MemInfo *)
-    ((char *)memp- sizeof(struct MemInfo));
+    struct MemInfo *meminfo = (struct MemInfo *)
+        ((char *)memp- sizeof(struct MemInfo));
 
-  DBG(("dfree(%p)\n", memp));
+    DBG(("dfree(%p)\n", memp));
 
-  if(!((size_t)meminfo->block&BLOCK_BIT)) {
-    /* this is a FRAGMENT we have to deal with */
+    if(!((size_t)meminfo->block&BLOCK_BIT)) {
+        /* this is a FRAGMENT we have to deal with */
 
-    struct MemBlock *block=meminfo->block;
-    struct MemTop *memtop = block->top;
+        struct MemBlock *block=meminfo->block;
+        struct MemTop *memtop = block->top;
 
 #ifdef SEMAPHORE
-    SEMAPHOREOBTAIN(memtop->semaphore_id);
+        SEMAPHOREOBTAIN(memtop->semaphore_id);
 #endif
 
-    /* increase counters */
-    block->nfree++;
-    memtop->nfree++;
+        /* increase counters */
+        block->nfree++;
+        memtop->nfree++;
 
-    /* is this BLOCK completely empty now? */
-    if(block->nfree == memtop->nmax) {
-      /* yes, return the BLOCK to the system */
-      if(block->prev)
-        block->prev->next = block->next;
-      else
-	memtop->chain = block->next;
-      if(block->next)
-        block->next->prev = block->prev;
-
-      memtop->nfree -= memtop->nmax; /* total counter subtraction */
-      MEMDECR(block, DMEM_BLOCKSIZE + sizeof(struct MemBlock));
-      DMEM_OSFREEMEM((void *)block); /* return the whole block */
+        /* is this BLOCK completely empty now? */
+        if(block->nfree == memtop->nmax) {
+            /* yes, return the BLOCK to the system */
+            if(block->prev)
+                block->prev->next = block->next;
+            else
+                memtop->chain = block->next;
+            if(block->next)
+                block->next->prev = block->prev;
+            
+            memtop->nfree -= memtop->nmax; /* total counter subtraction */
+            MEMDECR(block, DMEM_BLOCKSIZE + sizeof(struct MemBlock));
+            DMEM_OSFREEMEM((void *)block); /* return the whole block */
+        }
+        else {
+            /* there are still used FRAGMENTS in the BLOCK, link this one
+               into the chain of free ones */
+            struct MemFrag *frag = (struct MemFrag *)meminfo;
+            frag->prev = NULL;
+            frag->next = block->first;
+            if(block->first)
+                block->first->prev = frag;
+            block->first = frag;
+        }
+#ifdef SEMAPHORE
+        SEMAPHORERETURN(memtop->semaphore_id);
+#endif
     }
     else {
-      /* there are still used FRAGMENTS in the BLOCK, link this one
-         into the chain of free ones */
-      struct MemFrag *frag = (struct MemFrag *)meminfo;
-      frag->prev = NULL;
-      frag->next = block->first;
-      if(block->first)
-	block->first->prev = frag;
-      block->first = frag;
+        /* big stand-alone block, just give it back to the OS: */
+
+        /* clean BLOCK_BIT */
+        MEMDECR(meminfo->block, (size_t)meminfo->block&~BLOCK_BIT);
+        DMEM_OSFREEMEM((void *)meminfo);
     }
-#ifdef SEMAPHORE
-    SEMAPHORERETURN(memtop->semaphore_id);
-#endif
-  }
-  else {
-    /* big stand-alone block, just give it back to the OS: */
-    MEMDECR(meminfo->block, (size_t)meminfo->block&~BLOCK_BIT); /* clean BLOCK_BIT */
-    DMEM_OSFREEMEM((void *)meminfo);
-  }
 }
 
 /***************************************************************************
@@ -546,60 +553,64 @@ void dfree(void *memp)
 
 void *drealloc(char *ptr, size_t size)
 {
-  struct MemInfo *meminfo = (struct MemInfo *)
-    ((char *)ptr- sizeof(struct MemInfo));
-  /*
-   * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   * NOTE: the ->size field of the meminfo will now contain the MemInfo
-   * struct size too!
-   * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   */
-  void *mem=NULL; /* SAFE */
-  size_t prevsize;
+    struct MemInfo *meminfo = (struct MemInfo *)
+        ((char *)ptr- sizeof(struct MemInfo));
+    /*
+     * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     * NOTE: the ->size field of the meminfo will now contain the MemInfo
+     * struct size too!
+     * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     */
+    void *mem=NULL; /* SAFE */
+    size_t prevsize;
 
-  /* NOTE that this is only valid if BLOCK_BIT isn't set: */
-  struct MemBlock *block;
+    /* NOTE that this is only valid if BLOCK_BIT isn't set: */
+    struct MemBlock *block;
 
-  DBG(("drealloc(%p, %d)\n", ptr, size));
+    DBG(("drealloc(%p, %d)\n", ptr, size));
 
-  if(NULL == ptr)
-    return dmalloc( size );
+    if(NULL == ptr)
+        return dmalloc( size );
 
-  block = meminfo->block;
+    block = meminfo->block;
 
-  if(!((size_t)meminfo->block&BLOCK_BIT) &&
-     (size + sizeof(struct MemInfo) <
-      (prevsize = block->top->fragsize) )) {
-    /* This is a FRAGMENT and new size is possible to retain within the same
-       FRAGMENT */
-    if((prevsize > qinfo[0]) &&
-       /* this is not the smallest memory Q */
-       (size < (block->top-1)->fragsize))
-      /* this fits in a smaller Q */
-      ;
-    else
-      mem = ptr; /* Just return the same pointer as we got in. */
-  }
-  if(!mem) {
-    /* This is a stand-alone BLOCK or a realloc that no longer fits within
-       the same FRAGMENT */
+    /* Here we check if this is a FRAGMENT and if the new size is
+       still smaller than the fragsize for this block. */
+    if(!((size_t)block&BLOCK_BIT) &&
+       (size + sizeof(struct MemInfo) < block->top->fragsize )) {
 
-    if((size_t)meminfo->block&BLOCK_BIT) {
-      prevsize = ((size_t)meminfo->block&~BLOCK_BIT) -
-	sizeof(struct MemInfo);
+        prevsize = block->top->fragsize;
+        /* This is a FRAGMENT and new size is possible to retain within the
+           same FRAGMENT */
+        if((prevsize > qinfo[0]) &&
+           /* this is not the smallest memory Q */
+           (size < (block->top-1)->fragsize))
+            /* This fits in a smaller fragment, so we will make a realloc
+               here */
+            ;
+        else
+            mem = ptr; /* Just return the same pointer as we got in. */
     }
-    else
-      prevsize -= sizeof(struct MemInfo);
+    if(!mem) {
+        if((size_t)meminfo->block&BLOCK_BIT) {
+            /* This is a stand-alone BLOCK */
+            prevsize = ((size_t)meminfo->block&~BLOCK_BIT) -
+                sizeof(struct MemInfo);
+        }
+        else
+            /* a FRAGMENT realloc that no longer fits within the same FRAGMENT
+             * or one that fits in a smaller */
+            prevsize = block->top->fragsize;
 
-    /* No tricks involved here, just grab a new bite of memory, copy the data
-     * from the old place and free the old memory again. */
-    mem = dmalloc(size);
-    if(mem) {
-      memcpy(mem, ptr, MIN(size, prevsize) );
-      dfree(ptr);
+        /* No tricks involved here, just grab a new bite of memory, copy the
+         * data from the old place and free the old memory again. */
+        mem = dmalloc(size);
+        if(mem) {
+            memcpy(mem, ptr, MIN(size, prevsize) );
+            dfree(ptr);
+        }
     }
-  }
-  return mem;
+    return mem;
 }
 
 /***************************************************************************
@@ -614,10 +625,16 @@ void *drealloc(char *ptr, size_t size)
 void *
 dcalloc (size_t nmemb, size_t size)
 {
-  void *result = dmalloc (nmemb * size);
-
-  if (result != NULL)
-    memset (result, 0, nmemb * size);
-
-  return result;
+    void *result = dmalloc (nmemb * size);
+    
+    if (result != NULL)
+        memset (result, 0, nmemb * size);
+  
+    return result;
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../rockbox-mode.el")
+ * end:
+ */
