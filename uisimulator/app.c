@@ -24,10 +24,6 @@
 
 #include "tree.h"
 
-#ifdef SIMULATOR
-#include <stdio.h>
-#endif
-
 extern void tetris(void);
 
 #define LINE_HEIGHT 8
