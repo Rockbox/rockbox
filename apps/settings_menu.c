@@ -101,11 +101,11 @@ void settings_menu(void)
     {
         if (global_settings.playlist_shuffle)
         {
-            randomise_playlist(&playlist, current_tick);
+            randomise_playlist(current_tick);
         }
         else
         {
-            sort_playlist(&playlist);
+            sort_playlist();
         }
     }
 }
