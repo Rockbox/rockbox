@@ -112,7 +112,7 @@ fi
 
 appsfile="credits.c" # a file to check for in the apps root dir
 
-for dir in apps $firmdir/apps $firmdir/../apps . .. ../apps ../../apps; do
+for dir in apps . .. ../apps ../../apps $firmdir/apps $firmdir/../apps; do
   if [ -f $dir/$appsfile ]; then
     appsdir=$dir
     break
