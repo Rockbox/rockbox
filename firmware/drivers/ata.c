@@ -81,6 +81,7 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 int ata_spinup_time = 0;
+static bool spinup = false;
 static bool sleeping = false;
 static int sleep_timeout = 5*HZ;
 static bool poweroff = false;
@@ -165,7 +166,6 @@ int ata_read_sectors(unsigned long start,
     int timeout;
     int count;
     void* buf;
-    bool spinup = false;
 
     mutex_lock(&ata_mtx);
 
@@ -174,6 +174,7 @@ int ata_read_sectors(unsigned long start,
     led(true);
 
     if ( sleeping ) {
+        spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
@@ -186,7 +187,6 @@ int ata_read_sectors(unsigned long start,
                 return -1;
             }
         }
-        spinup = true;
     }
 
     ATA_SELECT = ata_device;
@@ -292,7 +292,6 @@ int ata_write_sectors(unsigned long start,
 {
     int i;
     int ret = 0;
-    bool spinup = false;
 
     if (start == 0)
         panicf("Writing on sector 0\n");
@@ -302,6 +301,7 @@ int ata_write_sectors(unsigned long start,
     last_disk_activity = current_tick;
 
     if ( sleeping ) {
+        spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
@@ -314,7 +314,6 @@ int ata_write_sectors(unsigned long start,
                 return -1;
             }
         }
-        spinup = true;
     }
     
     ATA_SELECT = ata_device;
@@ -493,8 +492,7 @@ static void ata_thread(void)
     
     while (1) {
         while ( queue_empty( &ata_queue ) ) {
-            if ( sleep_timeout &&
-                 !sleeping &&
+            if ( !spinup && sleep_timeout && !sleeping &&
                  TIME_AFTER( current_tick, 
                              last_user_activity + sleep_timeout ) &&
                  TIME_AFTER( current_tick, 
@@ -505,7 +503,7 @@ static void ata_thread(void)
             }
 
 #ifdef HAVE_ATA_POWER_OFF
-            if ( sleeping && poweroff_timeout && !poweroff &&
+            if ( !spinup && sleeping && poweroff_timeout && !poweroff &&
                  TIME_AFTER( current_tick, last_sleep + poweroff_timeout ))
             {
                 mutex_lock(&ata_mtx);
