@@ -145,7 +145,9 @@ eng: "Is battery low?"
 new: "Batterie faible ?"
 
 id: LANG_TIME_SET
-desc: if save settings has failed
+### Description changed! Previous description was:
+### "if save settings has failed"
+desc: 
 eng: "ON to set"
 new: "ON pour valider"
 
@@ -415,17 +417,23 @@ eng: "Resume?"
 new: "Reprendre ?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
+### Description changed! Previous description was:
+### "posible answers to resume question"
+desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(LECT/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
-desc: posible answer to resume question
+### Description changed! Previous description was:
+### "posible answer to resume question"
+desc: possible answer to resume question
 eng: "PLAY = Yes"
 new: "Lecture = Oui"
 
 id: LANG_RESUME_CANCEL_RECORDER
-desc: posible answer to resume question
+### Description changed! Previous description was:
+### "posible answer to resume question"
+desc: possible answer to resume question
 eng: "Any Other = No"
 new: "les autres = Non"
 
@@ -860,7 +868,7 @@ eng: "One"
 new: "Une"
 
 id: LANF_WEEKDAY_THURSDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Mar"
 
@@ -880,62 +888,62 @@ eng: "Cube"
 new: "Cube"
 
 id: LANG_MONTH_APRIL
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
 new: "avr"
 
 id: LANG_MONTH_AUGUST
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
 new: "aou"
 
 id: LANG_MONTH_DECEMBER
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 new: "déc"
 
 id: LANG_MONTH_FEBRUARY
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
 new: "fév"
 
 id: LANG_MONTH_JANUARY
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
 new: "jan" 
 
 id: LANG_MONTH_JULY
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
 new: "jul"
 
 id: LANG_MONTH_JUNE
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
 new: "jui" 
 
 id: LANG_MONTH_MARCH
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
 new: "mar"
 
 id: LANG_MONTH_MAY
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
 new: "mai"
 
 id: LANG_MONTH_NOVEMBER
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
 new: "nov"
 
 id: LANG_MONTH_OCTOBER
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
 new: "oct"
 
 id: LANG_MONTH_SEPTEMBER
-desc: abbreviation for monthname
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 new: "sep"
 
@@ -955,31 +963,36 @@ eng: "Time Format"
 new: "Format Horloge"
 
 id: LANG_WEEKDAY_FRIDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
 new: "ven"
 
 id: LANG_WEEKDAY_MONDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
 new: "lun"
 
 id: LANG_WEEKDAY_SATURDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 new: "sam"
 
 id: LANG_WEEKDAY_SUNDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 new: "dim"
 
 id: LANG_WEEKDAY_TUESDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
 new: "mar"
 
 id: LANG_WEEKDAY_WEDNESDAY
-desc: abbreviation for weekday
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new: "mer"
+
+id: LANG_OSCILLOGRAPH
+desc: the name of the oscillograph demo in the demo menu
+eng: "Oscillograph"
+new: "Oscillographe"
