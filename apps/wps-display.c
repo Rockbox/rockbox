@@ -442,6 +442,12 @@ static char* get_tag(struct mp3entry* id3,
                     else
                         return NULL;
                     break;
+
+                case 'v': /* volume */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    snprintf(buf, buf_size, "%d%%", global_settings.volume);
+                    return buf;
+
             }
             break;
 
