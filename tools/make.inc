@@ -13,8 +13,8 @@ $(OBJDIR)/%.o: %.S
 $(DEPFILE): $(SOURCES)
 	@rm -f $(DEPFILE)
 	@(for each in $(SOURCES); do \
-	  obj=`echo $$each | sed -e 's/\.c/.o/'`; \
-	  $(CC) -MM -MT "$(OBJDIR)/$$obj.o" $(CFLAGS) $$each >> $(DEPFILE) 2>/dev/null; \
+	  obj=`echo $$each | sed -e 's/\.[cS]/.o/'`; \
+	  $(CC) -MM -MT "$(OBJDIR)/$$obj" $(CFLAGS) $$each >> $(DEPFILE) 2>/dev/null; \
 	done; \
 	echo "oo" >/dev/null )
 
