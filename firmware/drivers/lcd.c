@@ -1051,6 +1051,144 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
     }
 }
 
+/*
+ * Print a progress bar
+ */
+void lcd_progressbar(int x, int y, int width, int height, int percent, int direction)
+{
+    int pos;
+    int i,j;
+
+    /* draw horizontal lines */
+    for(i=x+1;i<=x+width-2;i++) {
+        DRAW_PIXEL(i,y);
+        DRAW_PIXEL(i,(y+height-1));
+    }
+
+    /* draw vertical lines */
+    for(i=1;i<height;i++) {
+        DRAW_PIXEL(x,(y+i));
+        DRAW_PIXEL((x+width-1),(y+i));
+    }
+
+    /* clear edge pixels */
+    CLEAR_PIXEL(x,y);
+    CLEAR_PIXEL((x+width-1),y);
+    CLEAR_PIXEL(x,(y+height-1));
+    CLEAR_PIXEL((x+width-1),(y+height-1));
+
+    /* clear pixels in progress bar */
+    for(i=1;i<=width-2;i++) {
+        for(j=1;j<=height-2;j++) {
+            CLEAR_PIXEL((x+i),(y+j));
+            CLEAR_PIXEL((x+i),(y+j));
+        }
+    }
+
+    /* draw bar */
+    pos=percent;
+    if(pos<0)
+        pos=0;
+    if(pos>100)
+        pos=100;
+
+    switch (direction)
+    {
+        case BAR_RIGHT:
+            pos=(width-2)*pos/100;
+            for(i=1;i<=pos;i++)
+                for(j=1;j<height-1;j++)
+                    DRAW_PIXEL((x+i),(y+j));
+            break;
+        case BAR_LEFT:
+            pos=(width-2)*(100-pos)/100;
+            for(i=pos+1;i<=width-2;i++)
+                for(j=1;j<height-1;j++)
+                    DRAW_PIXEL((x+i),(y+j));
+            break;
+        case BAR_DOWN:
+            pos=(height-2)*pos/100;
+            for(i=1;i<=pos;i++)
+                for(j=1;j<width-1;j++)
+                    DRAW_PIXEL((x+j),(y+i));
+            break;
+        case BAR_UP:
+            pos=(height-2)*(100-pos)/100;
+            for(i=pos+1;i<=height-2;i++)
+                for(j=1;j<width-1;j++)
+                    DRAW_PIXEL((x+j),(y+i));
+            break;
+    }
+
+}
+
+
+/*
+ * Print a slidebar bar
+ */
+void lcd_slidebar(int x, int y, int width, int height, int percent, int direction)
+{
+    int pos;
+    int i,j;
+
+    /* draw horizontal lines */
+    for(i=x+1;i<=x+width-2;i++) {
+        DRAW_PIXEL(i,y);
+        DRAW_PIXEL(i,(y+height-1));
+    }
+
+    /* draw vertical lines */
+    for(i=1;i<height;i++) {
+        DRAW_PIXEL(x,(y+i));
+        DRAW_PIXEL((x+width-1),(y+i));
+    }
+
+    /* clear edge pixels */
+    CLEAR_PIXEL(x,y);
+    CLEAR_PIXEL((x+width-1),y);
+    CLEAR_PIXEL(x,(y+height-1));
+    CLEAR_PIXEL((x+width-1),(y+height-1));
+
+    /* clear pixels in progress bar */
+    for(i=1;i<=width-2;i++)
+        for(j=1;j<=height-2;j++) {
+            CLEAR_PIXEL((x+i),(y+j));
+            CLEAR_PIXEL((x+i),(y+j));
+        }
+
+    /* draw point */
+    pos=percent;
+    if(pos<0)
+        pos=0;
+    if(pos>100)
+        pos=100;
+
+    switch (direction)
+    {
+        case BAR_RIGHT:
+            pos=(width-height-1)*pos/100;
+            break;
+        case BAR_LEFT:
+            pos=(width-height-1)*(100-pos)/100;
+            break;
+        case BAR_DOWN:
+            pos=(height-width-1)*pos/100;
+            break;
+        case BAR_UP:
+            pos=(height-width-1)*(100-pos)/100;
+            break;
+    }
+
+    if(direction == BAR_LEFT || direction == BAR_RIGHT)
+        for(i=1;i<height;i++)
+            for(j=1;j<height;j++)
+                DRAW_PIXEL((x+pos+i),(y+j));
+    else
+        for(i=1;i<width;i++)
+            for(j=1;j<width;j++)
+                DRAW_PIXEL((x+i),(y+pos+j));
+}
+
 #else
 /* no LCD defined, no code to use */
 #endif
