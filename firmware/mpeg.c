@@ -605,8 +605,7 @@ void mpeg_init(void)
         DEBUGF("dac_config() failed\n");
     }
 
-    mpeg_volume(70);
-    mpeg_bass(50);
-    mpeg_treble(50);
-
+    mpeg_volume(DEFAULT_VOLUME_SETTING);
+    mpeg_bass(DEFAULT_BASS_SETTING);
+    mpeg_treble(DEFAULT_TREBLE_SETTING);
 }
