@@ -384,15 +384,20 @@ static int load_level(void)
 
     return 0;
 }
+#define STAT_WIDTH (LCD_WIDTH-(COLS * magnify))
 
 static void update_screen(void) 
 {
-    short b = 0, c = 0;
+    short b = 0, c = 0,x,y;
     short rows = 0, cols = 0;
     char s[25];
     
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    short magnify = 6;
+#else
     short magnify = 4;
-
+#endif
+    
     /* load the board to the screen */
     for (rows=0 ; rows < ROWS ; rows++) {
         for (cols = 0 ; cols < COLS ; cols++) {
@@ -401,23 +406,14 @@ static void update_screen(void)
 
             switch(current_info.board[rows][cols]) {
             case 'X': /* black space */
-                rb->lcd_drawrect(c, b, magnify, magnify);
-                rb->lcd_drawrect(c+1, b+1, 2, 2);
                 break;
                 
-            case '#': /* this is a wall */
-                rb->lcd_drawpixel(c, b);
-                rb->lcd_drawpixel(c+2, b);
-                rb->lcd_drawpixel(c+1, b+1);
-                rb->lcd_drawpixel(c+3, b+1);
-                rb->lcd_drawpixel(c, b+2);
-                rb->lcd_drawpixel(c+2, b+2);
-                rb->lcd_drawpixel(c+1, b+3);
-                rb->lcd_drawpixel(c+3, b+3);
+            case '#': /* this is a wall */ 
+		rb->lcd_fillrect(c, b, magnify, magnify);
                 break;
 
             case '.': /* this is a home location */
-                rb->lcd_drawrect(c+1, b+1, 2, 2);
+                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, magnify/2);
                 break;
 
             case '$': /* this is a box */
@@ -434,8 +430,8 @@ static void update_screen(void)
                 break;
 
             case '%': /* this is a box on a home spot */ 
-                rb->lcd_drawrect(c, b, magnify, magnify);
-                rb->lcd_drawrect(c+1, b+1, 2, 2);
+		rb->lcd_drawrect(c, b, magnify, magnify);
+		rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, magnify/2);	
                 break;
             }
         }
@@ -443,14 +439,14 @@ static void update_screen(void)
     
 
     rb->snprintf(s, sizeof(s), "%d", current_info.level.level);
-    rb->lcd_putsxy(86, 22, s);
+    rb->lcd_putsxy(LCD_WIDTH-STAT_WIDTH+4, 22, s);
     rb->snprintf(s, sizeof(s), "%d", current_info.level.moves);
-    rb->lcd_putsxy(86, 54, s);
+    rb->lcd_putsxy(LCD_WIDTH-STAT_WIDTH+4, 54, s);
 
-    rb->lcd_drawrect(80,0,32,32);
-    rb->lcd_drawrect(80,32,32,64);
-    rb->lcd_putsxy(81, 10, "Level");
-    rb->lcd_putsxy(81, 42, "Moves");
+    rb->lcd_drawrect(LCD_WIDTH-STAT_WIDTH,0,STAT_WIDTH,32);
+    rb->lcd_drawrect(LCD_WIDTH-STAT_WIDTH,32,STAT_WIDTH,LCD_HEIGHT-32);
+    rb->lcd_putsxy(LCD_WIDTH-STAT_WIDTH+1, 10, "Level");
+    rb->lcd_putsxy(LCD_WIDTH-STAT_WIDTH+1, 42, "Moves");
 
     /* print out the screen */
     rb->lcd_update();
