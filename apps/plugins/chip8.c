@@ -433,9 +433,6 @@ static void chip8_keyboard(void)
     case BUTTON_ON | BUTTON_REL:    chip8_keys[9] = 0; break;
 
     case SYS_USB_CONNECTED:
-#ifdef HAVE_LCD_CHARCELLS
-      status_set_param(false);
-#endif
       chip8_running = false;
       break;
   }
