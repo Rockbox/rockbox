@@ -176,6 +176,9 @@ if($target !~ /sim/i) {
     elsif($target =~ /iriver/i) {
         $exe = "rockbox.iriver";
     }
+    elsif($target =~ /gmini/i) {
+        $exe = "rockbox.gmini";
+    }
     else {
         $exe = "archos.mod";
     }
