@@ -73,7 +73,7 @@ A {
  background-color: #ff8080;
 }
 
-.changetable, .bugs, .dailymod, .buildstatus {
+.changetable, .bugs, .dailymod, .buildstatus, .archive {
  border: outset 2px #ffffff;
 }
 
@@ -81,7 +81,7 @@ A {
  vertical-align: top;
 }
 
-.changetable td, .bugs td {
+.changetable td, .bugs td, .archive td {
  background-color: #c6d6f5;
  padding: 4px;
 }
