@@ -638,7 +638,7 @@ void settings_display(void)
 
 bool set_bool(char* string, bool* variable )
 {
-    return set_bool_options(string, variable, "yes", "no ");
+    return set_bool_options(string, variable, str(LANG_SET_BOOL_YES), str(LANG_SET_BOOL_NO));
 }
 
 bool set_bool_options(char* string, bool* variable,
