@@ -129,22 +129,4 @@ when working with source code.
  <b>Note</b> that this may cause quite a few mails to get sent during periods
 of intense development.
 
-<h2>Getting rid of the password prompts</h2>
-
-<p>Each cvs operation has to be authenticated with ssh. This is normally done
-by you entering your password. This gets boring fast.
-Instead, you can register your public ssh key with your SourceForge account. This way, your connection is authenticated automatically.
-
-<p><a href="http://sourceforge.net/account/login.php">Log in</a>
-to your SourceForge account and go to your
-<a href="https://sourceforge.net/account/">account options</a>.
-On the bottom of the page, there is a link to
-<a href="https://sourceforge.net/account/editsshkeys.php">edit your ssh keys</a>.
-Copy the contents of your local <tt>.ssh/identity.pub</tt> or
-<tt>.ssh/id_rsa.pub</tt> there.
-
-<p>Like many things on SourceForge, the key change doesn't take effect immediately. You'll have to wait a few hours until some magic batch job kicks in and puts your keys where they should be. Then you can use cvs without entering your password.
-
-<p>If you work from several different computers/accounts, you must add the key for each account you are using.
-
 #include "foot.t"
