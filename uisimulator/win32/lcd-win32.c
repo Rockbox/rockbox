@@ -58,6 +58,8 @@ void lcd_set_invert_display(bool invert)
 void lcd_update()
 {
     int x, y;
+    RECT r;
+
     if (hGUIWnd == NULL)
         _endthread ();
 
@@ -82,10 +84,13 @@ void lcd_update()
         for (y = 0; y < LCD_HEIGHT; y++)
             bitmap[y][x] = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 
-    InvalidateRect (hGUIWnd, NULL, FALSE);
-
-    /* natural sleep :) Bagder: why is this here? */
-    //Sleep (50);
+    /* Invalidate only the window part that actually did change */
+    GetClientRect (hGUIWnd, &r);
+    r.left = UI_LCD_POSX * r.right / UI_WIDTH;
+    r.top = UI_LCD_POSY * r.bottom / UI_HEIGHT;
+    r.right = (UI_LCD_POSX + UI_LCD_WIDTH) * r.right / UI_WIDTH;
+    r.bottom = (UI_LCD_POSY + UI_LCD_HEIGHT) * r.bottom / UI_HEIGHT;
+    InvalidateRect (hGUIWnd, &r, FALSE);
 }
 
 void lcd_update_rect(int x_start, int y_start,
@@ -93,6 +98,7 @@ void lcd_update_rect(int x_start, int y_start,
 {
     int x, y;
     int xmax, ymax;
+    RECT r;
 
     ymax = y_start + height;
     xmax = x_start + width;
@@ -109,10 +115,17 @@ void lcd_update_rect(int x_start, int y_start,
         for (y = y_start; y < ymax; y++)
             bitmap[y][x] = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 
-    /* Bagder: If I only knew how, I would make this call only invalidate
-       the actual rectangle we want updated here, this NULL thing here will
-       make the full rectangle updated! */
-    InvalidateRect (hGUIWnd, NULL, FALSE);
+    /* Invalidate only the window part that actually did change */
+    GetClientRect (hGUIWnd, &r);
+    r.left   = (UI_LCD_POSX + (UI_LCD_WIDTH * x_start / LCD_WIDTH)) 
+               * r.right / UI_WIDTH;
+    r.top    = (UI_LCD_POSY + (UI_LCD_HEIGHT * y_start / LCD_HEIGHT))
+               * r.bottom / UI_HEIGHT;
+    r.right  = (UI_LCD_POSX + (UI_LCD_WIDTH * xmax / LCD_WIDTH))
+               * r.right / UI_WIDTH;
+    r.bottom = (UI_LCD_POSY + (UI_LCD_HEIGHT * ymax / LCD_HEIGHT))
+               * r.bottom / UI_HEIGHT;
+    InvalidateRect (hGUIWnd, &r, FALSE);
 }
 
 /* lcd_backlight()
