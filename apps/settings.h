@@ -131,6 +131,8 @@ struct user_settings
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
 
+    int runtime;       /* current runtime since last charge */
+    int topruntime;    /* top known runtime */
 };
 
 /* prototypes */

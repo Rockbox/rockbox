@@ -51,6 +51,7 @@
 #include "lang.h"
 #include "language.h"
 #include "wps-display.h"
+#include "powermgmt.h"
 
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
@@ -105,8 +106,10 @@ offset  abs
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
 0x25    0x39    <disk_spindown flag>
-
-        <all unused space filled with 0xff>
+0x26    0x40    <runtime low byte>
+0x27    0x41    <runtime high byte>
+0x28    0x42    <topruntime low byte>
+0x29    0x43    <topruntime high byte>
 
 0x2a    <checksum 2 bytes: xor of 0x0-0x29>
 
@@ -342,6 +345,26 @@ int settings_save( void )
     config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
     config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
     config_block[0x25] = (unsigned char)global_settings.disk_poweroff & 1;
+
+    {
+        static long lasttime = 0;
+
+        /* reset counter if charger is inserted */
+        if ( charger_inserted() ) {
+            global_settings.runtime = 0;
+        }
+        else {
+            global_settings.runtime += (current_tick - lasttime) / HZ;
+            lasttime = current_tick;
+        }
+        if ( global_settings.runtime > global_settings.topruntime )
+            global_settings.topruntime = global_settings.runtime;
+
+        config_block[0x26]=(unsigned char)(global_settings.runtime & 0xff);
+        config_block[0x27]=(unsigned char)(global_settings.runtime >> 8);
+        config_block[0x28]=(unsigned char)(global_settings.topruntime & 0xff);
+        config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
+    }
 
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
@@ -602,6 +625,14 @@ void settings_load(void)
         if (config_block[0x25] != 0xFF)
             global_settings.disk_poweroff = config_block[0x25] & 1;
 
+        if (config_block[0x27] != 0xff)
+            global_settings.runtime = 
+                config_block[0x26] | (config_block[0x27] << 8);
+
+        if (config_block[0x29] != 0xff)
+            global_settings.topruntime =
+                config_block[0x28] | (config_block[0x29] << 8);
+
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -805,6 +836,8 @@ void settings_reset(void) {
     global_settings.wps_file[0] = 0;
     global_settings.font_file[0] = 0;
     global_settings.lang_file[0] = 0;
+    global_settings.runtime = 0;
+    global_settings.topruntime = 0;
 }
 
 

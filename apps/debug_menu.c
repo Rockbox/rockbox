@@ -38,6 +38,7 @@
 #include "font.h"
 #include "disk.h"
 #include "mpeg.h"
+#include "settings.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1005,6 +1006,80 @@ bool dbg_mas_info(void)
 }
 #endif
 
+static bool view_runtime(void)
+{
+    char s[32];
+    bool done = false;
+    int state = 1;
+
+    while(!done)
+    {
+        int y=0;
+        int t;
+        int key;
+        lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+        lcd_puts(0, y++, "Running time:");
+        y++;
+#endif
+
+        if (state & 1) {
+            t = global_settings.runtime;
+            lcd_puts(0, y++, "Current time");
+        }
+        else {
+            t = global_settings.topruntime;
+            lcd_puts(0, y++, "Top time");
+        }
+    
+        snprintf(s, sizeof(s), "%dh %dm %ds",
+                 t / 3600, (t % 3600) / 60, t % 60);
+        lcd_puts(0, y++, s);
+        lcd_update();
+
+        /* Wait for a key to be pushed */
+        key = button_get_w_tmo(HZ*5);
+        switch(key) {
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_STOP | BUTTON_REL:
+#else
+            case BUTTON_OFF | BUTTON_REL:
+#endif
+                done = true;
+                break;
+
+            case BUTTON_LEFT:
+            case BUTTON_RIGHT:
+                if (state == 1)
+                    state = 2;
+                else
+                    state = 1;
+                break;
+                
+            case BUTTON_PLAY:
+                lcd_clear_display();
+                lcd_puts(0,0,"Clear time?");
+                lcd_puts(0,1,"PLAY = Yes");
+                lcd_update();
+                while (1) {
+                    key = button_get_w_tmo(HZ*10);
+                    if ( key & BUTTON_REL )
+                        continue;
+                    if ( key == BUTTON_PLAY ) {
+                        if ( state == 1 )
+                            global_settings.runtime = 0;
+                        else
+                            global_settings.topruntime = 0;
+                    }
+                    break;
+                }
+                break;
+        }
+    }
+
+    return false;
+}
+
 bool debug_menu(void)
 {
     int m;
@@ -1036,6 +1111,7 @@ bool debug_menu(void)
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
+        { "View runtime", view_runtime },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
