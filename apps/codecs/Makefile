@@ -16,7 +16,7 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-all: $(OBJDIR)/libmad.a
+all: $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a
 
 include $(TOOLSDIR)/make.inc
 
@@ -25,7 +25,13 @@ $(OBJDIR)/libmad.a:
 	@mkdir -p $(OBJDIR)/libmad
 	@$(MAKE) -C libmad TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
 
+$(OBJDIR)/liba52.a:
+	@echo "MAKE in liba52"
+	@mkdir -p $(OBJDIR)/liba52
+	@$(MAKE) -C liba52 TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52
 	@$(MAKE) -C libmad clean
+	@$(MAKE) -C liba52 clean
