@@ -164,7 +164,7 @@ void enable_trickle_charge(bool on)
 }
 #endif /* HAVE_CHARGE_CTRL */
 
-static char power_stack[DEFAULT_STACK_SIZE];
+static long power_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;

@@ -91,7 +91,7 @@ long last_disk_activity = -1;
 static struct mutex mmc_mutex;
 
 #ifdef HAVE_HOTSWAP
-static char mmc_stack[DEFAULT_STACK_SIZE];
+static long mmc_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
 #endif
