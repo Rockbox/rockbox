@@ -1026,7 +1026,7 @@ static void mpeg_thread(void)
     unsigned long saved_header = 0;
     int startpos;
     int rc;
-    int offset;
+    long offset;
     int countdown;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
     

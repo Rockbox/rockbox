@@ -284,8 +284,8 @@ struct plugin_api {
                               unsigned char *buf, int num_frames,
                               unsigned long header_template,
                               void (*progressfunc)(int), bool generate_toc);
-    unsigned long (*find_next_frame)(int fd, int *offset,
-                                     int max_offset, unsigned long last_header);
+    unsigned long (*find_next_frame)(int fd, long *offset,
+                                     long max_offset, unsigned long last_header);
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
