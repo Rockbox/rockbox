@@ -318,13 +318,12 @@ bool dirbrowse(char *root)
                         play_mode = 2;
                         play_list(currdir, dircacheptr[dircursor+start]->name);
                     }
-                    
                     else {
                         play_mode = 1;
                         mpeg_play(buf);
-                        lcd_stop_scroll();
-                        wps_show();
                     }
+                    lcd_stop_scroll();
+                    wps_show();
                 }
                 restore = true;
                 break;
