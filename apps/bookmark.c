@@ -1,4 +1,4 @@
- /***************************************************************************
+/***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2003 by Benjamin Metzler
+ * Copyright (C)2003 by Benjamin Metzler
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -70,7 +70,7 @@ static bool  parse_bookmark(const char *bookmark,
                             int *resume_first_index,
                             char* resume_file,
                             unsigned int resume_file_size,
-                            int* ms,
+                            long* ms,
                             int * repeat_mode,
                             bool *shuffle,
                             char* file_name);
@@ -778,7 +778,7 @@ static void display_bookmark(const char* bookmark,
                              int bookmark_count)
 {
     int  resume_index = 0;
-    int  ms = 0;
+    long  ms = 0;
     int  repeat_mode = 0;
     bool playlist_shuffle = false;
     int  len;
@@ -834,19 +834,20 @@ static void display_bookmark(const char* bookmark,
     /* elapsed time*/
     if ( ms < 3600000 )
     {
-        snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d:%02d",
+        snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %ld:%02d",
                  str(LANG_BOOKMARK_SELECT_TIME_TEXT),
                  ms / 60000,
-                 ms % 60000 / 1000);
+                 (unsigned int)(ms % 60000) / 1000);
+        /* unsigned int: hinting for 16bits archs */
     }
     else
     {
         snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-             "%s: %d:%02d:%02d",
-             str(LANG_BOOKMARK_SELECT_TIME_TEXT),
-             ms / 3600000,
-             ms % 3600000 / 60000,
-             ms % 60000 / 1000);
+                 "%s: %ld:%02ld:%02d",
+                 str(LANG_BOOKMARK_SELECT_TIME_TEXT),
+                 ms / 3600000,
+                 ms % 3600000 / 60000,
+                 (unsigned int)(ms % 60000) / 1000);
     }
     lcd_puts_scroll(0, 3, global_temp_buffer);
 
@@ -900,7 +901,7 @@ static void say_bookmark(const char* bookmark,
                          int bookmark_id)
 {
     int resume_index;
-    int ms;
+    long ms;
     char dir[MAX_PATH];
     bool enqueue = false; /* only the first voice is not queued */
 
@@ -987,7 +988,7 @@ static bool parse_bookmark(const char *bookmark,
                            int *resume_first_index,
                            char* resume_file,
                            unsigned int resume_file_size,
-                           int* ms,
+                           long* ms,
                            int * repeat_mode, bool *shuffle,
                            char* file_name)
 {

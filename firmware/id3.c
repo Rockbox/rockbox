@@ -41,15 +41,15 @@
 #include "mp3data.h"
 #include "system.h"
 
-#define UNSYNC(b0,b1,b2,b3) (((b0 & 0x7F) << (3*7)) | \
-                             ((b1 & 0x7F) << (2*7)) | \
-                             ((b2 & 0x7F) << (1*7)) | \
-                             ((b3 & 0x7F) << (0*7)))
+#define UNSYNC(b0,b1,b2,b3) (((long)(b0 & 0x7F) << (3*7)) | \
+                             ((long)(b1 & 0x7F) << (2*7)) | \
+                             ((long)(b2 & 0x7F) << (1*7)) | \
+                             ((long)(b3 & 0x7F) << (0*7)))
 
-#define BYTES2INT(b0,b1,b2,b3) (((b0 & 0xFF) << (3*8)) | \
-                                ((b1 & 0xFF) << (2*8)) | \
-                                ((b2 & 0xFF) << (1*8)) | \
-                                ((b3 & 0xFF) << (0*8)))
+#define BYTES2INT(b0,b1,b2,b3) (((long)(b0 & 0xFF) << (3*8)) |  \
+                                ((long)(b1 & 0xFF) << (2*8)) |  \
+                                ((long)(b2 & 0xFF) << (1*8)) |  \
+                                ((long)(b3 & 0xFF) << (0*8)))
 
 static const char* const genres[] = {
     "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge",
@@ -171,7 +171,7 @@ static int unsynchronize(char* tag, int len, bool *ff_found)
             wp++;
         }
     }
-    return (int)wp - (int)tag;
+    return (long)wp - (long)tag;
 }
 
 static int unsynchronize_frame(char* tag, int len)
@@ -292,7 +292,7 @@ static const struct tag_resolver taglist[] = {
    (for valid 8-bit ASCII characters).  If it's not unicode, we leave
    it alone.  At some point we should fully support unicode strings */
 static int unicode_munge(char** string, int *len) {
-   int tmp;
+   long tmp;
    bool le = false;
    int i;
    char *str = *string;
@@ -460,7 +460,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 {
     int minframesize;
     int size;
-    int bufferpos = 0, totframelen, framelen;
+    long bufferpos = 0, totframelen, framelen;
     char header[10];
     char tmp[4];
     unsigned char version;

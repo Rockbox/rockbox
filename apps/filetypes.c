@@ -209,8 +209,8 @@ int filetype_get_attr(const char* name)
                                  strlen(exttypes[i].extension)],
                             exttypes[i].extension))
             {
-                return ((((unsigned int)exttypes[i].type -
-                          (unsigned int)&filetypes[0]) /
+                return ((((unsigned long)exttypes[i].type -
+                          (unsigned long)&filetypes[0]) /
                          sizeof(struct file_type)) << 8);
             }
         }
@@ -594,8 +594,8 @@ static char* string2icon(const char* str)
         return NULL;
 
     if ((sizeof(string_buffer) +
-         (unsigned int) string_buffer -
-         (unsigned int) next_free_string) < ICON_LENGTH)
+         (unsigned long) string_buffer -
+         (unsigned long) next_free_string) < ICON_LENGTH)
     {
         splash(HZ,true,str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
         return NULL;
@@ -643,8 +643,8 @@ static char* get_string(const char* str)
         return NULL;
 
     if (l <= (sizeof(string_buffer) +
-             (unsigned int) string_buffer -
-             (unsigned int) next_free_string))
+             (unsigned long) string_buffer -
+             (unsigned long) next_free_string))
     {
         strcpy(next_free_string,str);
         cp=next_free_string;
