@@ -199,10 +199,9 @@ int main (int argc, char** argv)
     switch (method)
     {
         case add:
-            for (i = 0; i < length/2; i++) {
-                unsigned short *inbuf16 = (unsigned short *)inbuf;
-                /* add 16 unsigned bits but keep a 32 bit sum */
-                chksum += inbuf16[i];
+            for (i = 0; i < length; i++) {
+                /* add 8 unsigned bits but keep a 32 bit sum */
+                chksum += inbuf[i];
             }
             break;
         case scramble:
