@@ -29,11 +29,14 @@ unsigned int s2[256];
 void t1(void);
 void t2(void);
 
+struct event_queue main_q;
+
 int main(void)
 {
     char buf[40];
     char str[32];
     int i=0;
+    struct event *ev;
 
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
@@ -49,13 +52,15 @@ int main(void)
 
     tick_start(10);
 
+    queue_init(&main_q);
+    
     create_thread(t1, s1, 1024);
     create_thread(t2, s2, 1024);
 
     while(1)
     {
-        sleep(100);
-        debugf("Thread 0 awakened\n");
+        ev = queue_wait(&main_q);
+        debugf("Thread 0 got an event. ID: %d\n", ev->id);
     }
 }
 
@@ -64,8 +69,10 @@ void t1(void)
     debugf("Thread 1 started\n");
     while(1)
     {
-        sleep(200);
-        debugf("Thread 1 awakened\n");
+        sleep(100);
+        debugf("Thread 1 posting an event\n");
+        queue_post(&main_q, 1234, 0);
+        queue_post(&main_q, 5678, 0);
     }
 }
 
