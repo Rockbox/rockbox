@@ -23,6 +23,7 @@ PLUGINDIR = $(APPSDIR)/plugins
 SIMCOMMON = ../common
 
 ISONDIO := $(findstring ONDIO, $(TARGET))
+ISIRIVER := $(findstring IRIVER, $(TARGET))
 ISPLAYER := $(findstring PLAYER, $(TARGET))
 ifeq ($(ISPLAYER), PLAYER)
      MACHINEDIR = $(PLAYDIR)
@@ -111,7 +112,11 @@ endif
 ifeq ($(ISPLAYER), PLAYER)
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 else
+ifeq ($(ISIRIVER),IRIVER)
+	LCDSRSC = lcd-h100.c sysfont.c font.c
+else
 	LCDSRSC = lcd-recorder.c sysfont.c font.c
+endif
 endif
 COMMONSRCS = io.c stubs.c lcd-common.c sim_icons.c fmradio.c
 
