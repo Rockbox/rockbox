@@ -46,7 +46,8 @@ struct entry {
   char name[TREE_MAX_FILENAMELEN];
 };
 
-static struct entry buffer[MAX_FILES_IN_DIR];
+static struct entry dircache[MAX_FILES_IN_DIR];
+static struct entry* dircacheptr[MAX_FILES_IN_DIR];
 static int filesindir;
 
 void browse_root(void)
@@ -77,6 +78,12 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
 #endif /* HAVE_LCD_BITMAP */
 
+static int compare(const void* e1, const void* e2)
+{
+    return strncmp((*(struct entry**)e1)->name, (*(struct entry**)e2)->name,
+                   TREE_MAX_FILENAMELEN);
+}
+
 static int showdir(char *path, int start)
 {
     static char lastdir[256] = {0};
@@ -91,6 +98,7 @@ static int showdir(char *path, int start)
         DIR *dir = opendir(path);
         if(!dir)
             return -1; /* not a directory */
+        memset(dircacheptr,0,sizeof(dircacheptr));
         for ( i=0; i<MAX_FILES_IN_DIR; i++ ) {
             struct dirent *entry = readdir(dir);
             if (!entry)
@@ -100,14 +108,16 @@ static int showdir(char *path, int start)
                 i--;
                 continue;
             }
-            buffer[i].file = !(entry->attribute & ATTR_DIRECTORY);
-            strncpy(buffer[i].name,entry->d_name,TREE_MAX_FILENAMELEN);
-            buffer[i].name[TREE_MAX_FILENAMELEN-1]=0;
+            dircache[i].file = !(entry->attribute & ATTR_DIRECTORY);
+            strncpy(dircache[i].name,entry->d_name,TREE_MAX_FILENAMELEN);
+            dircache[i].name[TREE_MAX_FILENAMELEN-1]=0;
+            dircacheptr[i] = &dircache[i];
         }
         filesindir = i;
         closedir(dir);
         strncpy(lastdir,path,sizeof(lastdir));
         lastdir[sizeof(lastdir)-1] = 0;
+        qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
     }
 
     lcd_clear_display();
@@ -122,10 +132,10 @@ static int showdir(char *path, int start)
         if ( i >= filesindir )
             break;
 
-        len = strlen(buffer[i].name);
+        len = strlen(dircacheptr[i]->name);
 
 #ifdef HAVE_LCD_BITMAP
-        if ( buffer[i].file )
+        if ( dircacheptr[i]->file )
             icon_type=File;
         else
             icon_type=Folder;
@@ -134,12 +144,12 @@ static int showdir(char *path, int start)
 #endif
 
         if(len < TREE_MAX_LEN_DISPLAY)
-            lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
+            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
         else {
-            char storage = buffer[i].name[TREE_MAX_LEN_DISPLAY];
-            buffer[i].name[TREE_MAX_LEN_DISPLAY]=0;
-            lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
-            buffer[i].name[TREE_MAX_LEN_DISPLAY]=storage;
+            char storage = dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY];
+            dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY]=0;
+            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
+            dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY]=storage;
         }
     }
 
@@ -205,8 +215,8 @@ bool dirbrowse(char *root)
                         start = 0;
                     numentries = showdir(currdir, start);
                     dircursor=0;
-                    while ( (dircursor < TREE_MAX_ON_SCREEN) && 
-                            (strcmp(buffer[dircursor+start].name,buf)!=0)) 
+                    while ( (dircursor < TREE_MAX_ON_SCREEN) &&
+                            (strcmp(dircacheptr[dircursor+start]->name,buf)))
                         dircursor++;
                     if (dircursor==TREE_MAX_ON_SCREEN)
                         dircursor=0;
@@ -222,12 +232,14 @@ bool dirbrowse(char *root)
 #endif
             case BUTTON_PLAY:
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
-                    snprintf(buf,sizeof(buf),"%s%s",currdir,buffer[dircursor+start].name);
+                    snprintf(buf,sizeof(buf),"%s%s",currdir,
+                             dircacheptr[dircursor+start]->name);
                 } else {
-                    snprintf(buf,sizeof(buf),"%s/%s",currdir,buffer[dircursor+start].name);
+                    snprintf(buf,sizeof(buf),"%s/%s",currdir,
+                             dircacheptr[dircursor+start]->name);
                 }
 
-                if (!buffer[dircursor+start].file) {
+                if (!dircacheptr[dircursor+start]->file) {
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS )
                         dirpos[dirlevel] = start+dircursor;
@@ -235,7 +247,7 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
-                    playtune(currdir, buffer[dircursor+start].name);
+                    playtune(currdir, dircacheptr[dircursor+start]->name);
 #ifdef HAVE_LCD_BITMAP
                     lcd_setmargins(0, MARGIN_Y);
                     lcd_setfont(0);
@@ -305,7 +317,7 @@ bool dirbrowse(char *root)
                 numentries = showdir(currdir, start);
                 dircursor=0;
                 while ( (dircursor < TREE_MAX_ON_SCREEN) && 
-                        (strcmp(buffer[dircursor+start].name,buf)!=0)) 
+                        (strcmp(dircacheptr[dircursor+start]->name,buf))) 
                     dircursor++;
                 if (dircursor==TREE_MAX_ON_SCREEN)
                     dircursor=0;
