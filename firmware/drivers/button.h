@@ -28,8 +28,6 @@ extern long last_keypress;
 void button_init (void);
 int button_get (bool block);
 int button_get_w_tmo(int ticks);
-int button_set_repeat(int newmask);
-int button_set_release(int newmask);
 
 /* Shared button codes */
 #define	BUTTON_NONE		0x0000
@@ -59,9 +57,6 @@ int button_set_release(int newmask);
 #define	BUTTON_F2		0x0200
 #define	BUTTON_F3		0x0400
 
-#define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT | \
-                             BUTTON_UP | BUTTON_DOWN)
-
 #define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
                      BUTTON_RIGHT | BUTTON_OFF | BUTTON_PLAY | BUTTON_F1 | \
                      BUTTON_F2 | BUTTON_F3)
@@ -73,14 +68,10 @@ int button_set_release(int newmask);
 #define	BUTTON_PLAY		BUTTON_UP
 #define	BUTTON_STOP		BUTTON_DOWN
 
-#define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT)
-
 #define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
                      BUTTON_RIGHT | BUTTON_MENU)
 
 #endif /* HAVE_PLAYER_KEYPAD */
-
-#define DEFAULT_RELEASE_MASK ALL_BUTTONS
 
 #endif
 

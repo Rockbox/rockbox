@@ -334,14 +334,11 @@ bool viewer_run(char* file)
     int button;
     int col = 0;
     int ok;
-    int oldmask;
 
 #ifdef HAVE_LCD_BITMAP
     /* no margins */
     lcd_setmargins(0, 0);
 #endif
-
-    oldmask = button_set_release(~0);
 
     ok = viewer_init(file);
     if (!ok) {
@@ -431,7 +428,5 @@ bool viewer_run(char* file)
                 return true;
         }
     }
-    button_set_release(oldmask);
     return false;
 }
-

@@ -47,9 +47,6 @@ long last_keypress;
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
 
-static int repeat_mask = DEFAULT_REPEAT_MASK;
-static int release_mask = DEFAULT_RELEASE_MASK;
-
 static int button_read(void);
 
 static void button_tick(void)
@@ -79,10 +76,9 @@ static void button_tick(void)
         
         /* Find out if a key has been released */
         diff = btn ^ lastbtn;
-        if((btn & diff) == 0)
+        if(diff && (btn & diff) == 0)
         {
-            if(diff & release_mask)
-                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+            queue_post(&button_queue, BUTTON_REL | diff, NULL);
         }
         
         if ( btn )
@@ -111,36 +107,21 @@ static void button_tick(void)
                 }
                 else
                 {
-                    if(btn & repeat_mask ||
-#ifdef HAVE_RECORDER_KEYPAD
-                     btn == BUTTON_OFF)
-#else
-                     btn == BUTTON_STOP)
-#endif
+                    if (count++ > REPEAT_START)
                     {
-                        if (count++ > REPEAT_START)
-                        {
-                            /* Only repeat if a repeatable key is pressed */
-                            if(btn & repeat_mask)
-                            {
-                                post = true;
-                                repeat = true;
-                                /* initial repeat */
-                                count = REPEAT_INTERVAL_START; 
-                            }
-                            /* Reboot if the OFF button is pressed long enough
-                               and we are connected to a charger. */
+                        post = true;
+                        repeat = true;
+                        /* initial repeat */
+                        count = REPEAT_INTERVAL_START; 
+
+                        /* Reboot if the OFF button is pressed long enough
+                           and we are connected to a charger. */
 #ifdef HAVE_RECORDER_KEYPAD
-                            if(btn == BUTTON_OFF && charger_inserted())
+                        if(btn == BUTTON_OFF && charger_inserted())
 #elif HAVE_PLAYER_KEYPAD
-                            if(btn == BUTTON_STOP && charger_inserted())
+                        if(btn == BUTTON_STOP && charger_inserted())
 #endif
-                                system_reboot();
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
+                            system_reboot();
                     }
                 }
             }
@@ -195,20 +176,6 @@ int button_get_w_tmo(int ticks)
     }
 
     return BUTTON_NONE;
-}
-
-int button_set_repeat(int newmask)
-{
-    int oldmask = repeat_mask;
-    repeat_mask = newmask;
-    return oldmask;
-}
-
-int button_set_release(int newmask)
-{
-    int oldmask = release_mask;
-    release_mask = newmask;
-    return oldmask;
 }
 
 #ifdef HAVE_RECORDER_KEYPAD
