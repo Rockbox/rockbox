@@ -182,7 +182,7 @@ void ide_power_enable(bool on)
 bool ide_powered(void)
 {
 #ifdef IRIVER_H100
-    return (GPIO_OUT & 0x80000000)?true:false;
+    return (GPIO_OUT & 0x80000000)?false:true;
 #else
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
