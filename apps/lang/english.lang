@@ -1750,7 +1750,7 @@ new:
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Profiles"
+eng: "Configurations"
 new:
 
 id: LANG_PLUGINS
