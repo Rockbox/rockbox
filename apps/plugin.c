@@ -177,10 +177,15 @@ int plugin_load(char* plugin, void* parameter)
     int fd;
 #endif
 
-    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
+    int xm,ym;
+    lcd_clear_display();
+    xm = lcd_getxmargin();
+    ym = lcd_getymargin();
     lcd_setmargins(0,0);
     lcd_update();
+#else
+    lcd_clear_display();
 #endif
 #ifdef SIMULATOR
 #ifdef WIN32
@@ -257,7 +262,12 @@ int plugin_load(char* plugin, void* parameter)
 #ifdef SIMULATOR
     dlclose(pd);
 #endif
-    
+
+#ifdef HAVE_LCD_BITMAP
+    /* restore margins */
+    lcd_setmargins(xm,ym);
+#endif
+
     return PLUGIN_OK;
 }
 
