@@ -78,8 +78,12 @@ char* playlist_next(int steps)
     char *dir_end;
 
     playlist.index = (playlist.index+steps) % playlist.amount;
-    if ( playlist.index < 0 )
-        playlist.index = 0;
+    if ( playlist.index < 0 ) {
+        if ( global_settings.loop_playlist )
+            playlist.index += playlist.amount;
+        else
+            playlist.index = 0;
+    }
     seek = playlist.indices[playlist.index];
 
     if(playlist.in_ram)
