@@ -255,7 +255,7 @@ void new_block(void)
 
 int check_lines(void)
 {
-    int x,y,i,j,a,b;
+    int x,y,i,j;
     bool line;
     int lines = 0;
     for(x = 0; x < max_x; x++)
