@@ -45,6 +45,7 @@ int open(const char* pathname, int flags);
 int close(int fd);
 int printf(const char *format, ...);
 int ftruncate(int fd, off_t length);
+int fsync(int fd);
 
 off_t lseek(int fildes, off_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
