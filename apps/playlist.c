@@ -253,7 +253,7 @@ int play_list(char *dir,         /* "current directory" */
             /* now shuffle around the indices */
             randomise_playlist( random_seed );
 
-            if(!shuffled_index) {
+            if(!shuffled_index && global_settings.play_selected) {
                 /* The given index was for the unshuffled list, so we need
                    to figure out the index AFTER the shuffle has been made.
                    We scan for the seek position we remmber from before. */

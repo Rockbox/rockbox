@@ -59,6 +59,12 @@ static Menu shuffle(void)
 }
 #endif
 
+static Menu play_selected(void)
+{
+    set_bool( "Play Selected", &global_settings.play_selected );
+    return MENU_OK;
+}
+
 static Menu mp3_filter(void)
 {
     set_bool( "Music Filter", &global_settings.mp3filter );
@@ -206,6 +212,7 @@ Menu playback_settings_menu(void)
 #ifndef HAVE_RECORDER_KEYPAD
         { "Shuffle",        shuffle            },
 #endif
+        { "Play Selected",  play_selected      },
         { "Resume",         resume             },
         { "FF/RW Min Step", ff_rewind_min_step },
         { "FF/RW Accel",    ff_rewind_accel    },
@@ -336,4 +343,3 @@ Menu settings_menu(void)
     menu_exit(m);
     return result;
 }
-
