@@ -247,8 +247,8 @@ BOOL GUIStartup ()
         "RockBoxUISimulator", "ARCHOS JukeBox",
         WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        UI_WIDTH + GetSystemMetrics (SM_CXSIZEFRAME) * 2,
-        UI_HEIGHT + GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION),
+        UI_WIDTH + GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4,
+        UI_HEIGHT + GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION) +4,
         NULL, NULL, GetModuleHandle (NULL), NULL);
 
     if (hGUIWnd == NULL)
