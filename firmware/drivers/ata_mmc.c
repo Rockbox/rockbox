@@ -42,16 +42,14 @@
 #define CMD_GO_IDLE_STATE        0x40  /* R1 */
 #define CMD_SEND_OP_COND         0x41  /* R1 */
 #define CMD_SEND_CSD             0x49  /* R1 */
-#define CMD_SEND_CID             0x4A  /* R1 */
-#define CMD_STOP_TRANSMISSION    0x4C  /* R1 */
-#define CMD_SEND_STATUS          0x4D  /* R2 */
-#define CMD_SET_BLOCKLEN         0x50  /* R1 */
+#define CMD_SEND_CID             0x4a  /* R1 */
+#define CMD_STOP_TRANSMISSION    0x4c  /* R1 */
+#define CMD_SEND_STATUS          0x4d  /* R2 */
 #define CMD_READ_SINGLE_BLOCK    0x51  /* R1 */
 #define CMD_READ_MULTIPLE_BLOCK  0x52  /* R1 */
-#define CMD_SET_BLOCK_COUNT      0x57  /* R1 */
 #define CMD_WRITE_BLOCK          0x58  /* R1b */
 #define CMD_WRITE_MULTIPLE_BLOCK 0x59  /* R1b */
-#define CMD_READ_OCR             0x7A  /* R3 */
+#define CMD_READ_OCR             0x7a  /* R3 */
 
 /* Response formats:
    R1  = single byte, msb=0, various error flags
@@ -77,6 +75,12 @@
 #define R2_ERASE_SKIP    0x02
 #define R2_CARD_LOCKED   0x01
 
+/* Data start tokens */
+
+#define DT_START_BLOCK          0xfe
+#define DT_START_WRITE_MULTIPLE 0xfc
+#define DT_STOP_TRAN            0xfd
+
 // DEBUG
 #include "../../apps/screens.h"
 
@@ -89,7 +93,7 @@ long last_disk_activity = -1;
 
 /* private variables */
 
-static struct mutex ata_mtx;
+static struct mutex mmc_mutex;
 
 static char mmc_stack[DEFAULT_STACK_SIZE];
 static const char mmc_thread_name[] = "mmc";
@@ -129,8 +133,11 @@ static void write_transfer(const unsigned char *buf, int len)
 static void read_transfer(unsigned char *buf, int len)
             __attribute__ ((section(".icode")));
 static unsigned char poll_byte(int timeout);
+static unsigned char poll_busy(int timeout);
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
 static int receive_data(unsigned char *buf, int len, int timeout);
+static int send_data(char start_token, const unsigned char *buf, int len,
+                     int timeout);
 static int initialize_card(int card_no);
 
 /* implementation */
@@ -264,7 +271,7 @@ static unsigned char poll_busy(int timeout)
 
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
 {
-    unsigned char command[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95 };
+    unsigned char command[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95, 0xFF};
 
     command[0] = cmd;
     
@@ -276,7 +283,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
         command[4] = parameter & 0xFF;
     }
     
-    write_transfer(command, 6);
+    write_transfer(command, 7);
 
     response[0] = poll_byte(20);
     
@@ -291,7 +298,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
         case CMD_SEND_CSD:        /* R1 response, leave open */
         case CMD_SEND_CID:
         case CMD_READ_SINGLE_BLOCK:
-     // case READ_MULTIPLE_BLOCK:
+        case CMD_READ_MULTIPLE_BLOCK:
             break;
             
         case CMD_SEND_STATUS:     /* R2 response, close with dummy */
@@ -316,7 +323,7 @@ static int receive_data(unsigned char *buf, int len, int timeout)
 {
     unsigned char crc[2];         /* unused */
 
-    if (poll_byte(timeout) != 0xFE)
+    if (poll_byte(timeout) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
         return -1;                /* not start of data */
@@ -329,12 +336,12 @@ static int receive_data(unsigned char *buf, int len, int timeout)
     return 0;
 }
 
-static int send_data(const unsigned char *buf, int len, int timeout)
+static int send_data(char start_token, const unsigned char *buf, int len,
+                     int timeout)
 {
-    static const unsigned char start_data = 0xFE;
     int ret = 0;
 
-    write_transfer(&start_data, 1);
+    write_transfer(&start_token, 1);
     write_transfer(buf, len);
     write_transfer(dummy, 2);     /* crc - dontcare */
 
@@ -441,6 +448,7 @@ static int initialize_card(int card_no)
     return 0;
 }
 
+#if 0 /* old implementation */
 int ata_read_sectors(unsigned long start,
                      int incount,
                      void* inbuf)
@@ -453,7 +461,7 @@ int ata_read_sectors(unsigned long start,
     
     addr = start * SECTOR_SIZE;
     
-    mutex_lock(&ata_mtx);
+    mutex_lock(&mmc_mutex);
     ret = select_card(current_card);
 
     for (i = 0; (i < incount) && (ret == 0); i++)
@@ -467,11 +475,56 @@ int ata_read_sectors(unsigned long start,
     }
     
     deselect_card();
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&mmc_mutex);
 
     return ret;
 }
+#endif
 
+int ata_read_sectors(unsigned long start,
+                     int incount,
+                     void* inbuf)
+{
+    int ret = 0;
+    int i;
+    unsigned long addr;
+    unsigned char response;
+    tCardInfo *card = &card_info[current_card];
+    
+    if (incount <= 0)
+        return ret;
+    
+    addr = start * SECTOR_SIZE;
+
+    mutex_lock(&mmc_mutex);
+    ret = select_card(current_card);
+
+    if (ret == 0)
+    {
+        if (incount == 1)
+        {   
+            ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
+            if (ret == 0)
+                ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
+        }
+        else
+        {
+            ret = send_cmd(CMD_READ_MULTIPLE_BLOCK, addr, &response);
+            for (i = 0; (i < incount) && (ret == 0); i++)
+            {
+                ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
+                inbuf += SECTOR_SIZE;
+            }
+            if (ret == 0)
+                ret = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
+        }
+    }
+
+    deselect_card();
+    mutex_unlock(&mmc_mutex);
+
+    return ret;
+}
 
 int ata_write_sectors(unsigned long start,
                       int count,
@@ -486,24 +539,44 @@ int ata_write_sectors(unsigned long start,
     if (start == 0)
         panicf("Writing on sector 0\n");
 
-    addr = start * SECTOR_SIZE;
+    if (count <= 0)
+        return ret;
 
-    mutex_lock(&ata_mtx);
+    addr = start * SECTOR_SIZE;
+    
+    mutex_lock(&mmc_mutex);
     ret = select_card(current_card);
 
-    for (i = 0; (i < count) && (ret == 0); i++)
+    if (ret == 0)
     {
-        if ((ret = send_cmd(CMD_WRITE_BLOCK, addr, &response)))
-            break;
-        ret = send_data(buf, SECTOR_SIZE, card->write_timeout);
-
-        addr += SECTOR_SIZE;
-        buf += SECTOR_SIZE;
+        if (count == 1)
+        {
+            ret = send_cmd(CMD_WRITE_BLOCK, addr, &response);
+            if (ret == 0)
+                ret = send_data(DT_START_BLOCK, buf, SECTOR_SIZE,
+                                card->write_timeout);
+        }
+        else
+        {
+            ret = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, addr, &response);
+            for (i = 0; (i < count) && (ret == 0); i++)
+            {
+                ret = send_data(DT_START_WRITE_MULTIPLE, buf, SECTOR_SIZE,
+                                card->write_timeout);
+                buf += SECTOR_SIZE;
+            }
+            if (ret == 0)
+            {
+                response = DT_STOP_TRAN;
+                write_transfer(&response, 1);
+                poll_busy(card->write_timeout);
+            }
+        }
     }
 
     deselect_card();
-    mutex_unlock(&ata_mtx);
-    
+    mutex_unlock(&mmc_mutex);
+
     return ret;
 }
 
@@ -523,8 +596,9 @@ void ata_spindown(int seconds)
 }
 
 bool ata_disk_is_active(void)
-{
-    return false;    /* FIXME: dirty, but makes idle poweroff work */
+{   
+    /* this is correct unless early return from write gets implemented */
+    return mmc_mutex.locked;
 }
 
 int ata_standby(int time)
@@ -596,7 +670,7 @@ int ata_init(void)
 {
     int rc = 0;
 
-    mutex_init(&ata_mtx);
+    mutex_init(&mmc_mutex);
 
     led(false);
 
