@@ -349,6 +349,11 @@ void lcd_define_pattern (int which,char *pattern,int length)
 	lcd_write(false,pattern[i]);
 }
 
+void lcd_double_height(bool on)
+{
+    lcd_write(true,on?9:8);
+}
+
 #endif
 
 #endif

@@ -68,6 +68,7 @@ extern void lcd_puts(int x, int y, char *string);
 #      define LCD_PARAM_SYMBOL    0xF0
 
 extern void lcd_define_pattern (int which,char *pattern,int length);
+extern void lcd_double_height (bool on);
 
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
