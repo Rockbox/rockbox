@@ -220,6 +220,7 @@ static struct bit_entry rtc_bits[] =
 
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
+    {1, S_O(fm_force_mono), false, "force fm mono", off_on },
 
     /* Current sum of bits: 271 (worst case) */
     /* Sum of all bit sizes must not grow beyond 288! */
