@@ -12,10 +12,17 @@ OC    = sh-elf-objcopy
 
 FIRMWARE = ../../firmware
 
+# Check if this is a kind of Recorder
+ANYREC = $(findstring RECORDER, $(TARGET))
+
 INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common \
 -I$(FIRMWARE)/drivers -I.. -Ilib
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN
+
+ifeq ($(ANYREC), RECORDER)
+INCLUDES += -I../recorder
+endif
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds

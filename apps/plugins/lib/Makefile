@@ -23,11 +23,18 @@ endif
 
 FIRMWARE = ../../../firmware
 
+# Check if this is a kind of Recorder
+ANYREC = $(findstring RECORDER, $(TARGET))
+
 # ../.. for the plugin.h in the apps dir
 # .. for stuff in the plugins dir
 # . for stuff in the pluginlib dir
 INCLUDES=-I../.. -I.. -I. -I$(FIRMWARE)/include -I$(FIRMWARE)/export	\
  -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
+
+ifeq ($(ANYREC), RECORDER)
+INCLUDES += -I../../recorder
+endif
 
 ifdef SIMULATOR
 CFLAGS = -W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes	\
