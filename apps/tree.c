@@ -266,6 +266,8 @@ bool dirbrowse(char *root)
     int i;
     int rc;
     int button;
+    int browse_speed = 0;
+
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -335,6 +337,7 @@ bool dirbrowse(char *root)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
 #endif
+                browse_speed = 0;
                 if ( !numentries )
                     break;
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
@@ -386,11 +389,63 @@ bool dirbrowse(char *root)
                 }
                 restore = true;
                 break;
-                
-            case TREE_PREV:
+
             case TREE_PREV | BUTTON_REPEAT:
-                if(filesindir)
-                {
+                browse_speed++;  /* increase the browse speed every time we get here */
+                if(filesindir) {
+                    if(dircursor) {
+                        if (browse_speed < 7) {
+                            /* moving the cursor up through a full screen */
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                        false);
+                            dircursor--;
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                        else {
+                            /* if we have wrapped from the bottom we want to keep up the speed */
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                         false);
+                            dircursor=0;
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                    }
+                    else {
+                        if (start) {
+                            /* leaving the cursor at top line and moving screen down */
+                            if (browse_speed >=7)
+                                start = start - 7;
+                            else
+                                start--;
+                            if (start<0)
+                                start=0;
+                            numentries = showdir(currdir, start);
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                        else {
+                            /* wrapping to the top in a directory that is not full */
+                            if (numentries < TREE_MAX_ON_SCREEN) {
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                             false);
+                                dircursor = numentries - 1;
+                                browse_speed=0;
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                             true);
+                            }
+                            else {
+                                /* starting at the very bottom after a wrap */
+                                start = numentries - TREE_MAX_ON_SCREEN;
+                                dircursor = TREE_MAX_ON_SCREEN - 1;
+                                numentries = showdir(currdir, start);
+                                put_cursorxy(0, CURSOR_Y + LINE_Y +
+                                             TREE_MAX_ON_SCREEN - 1, true);
+                            }
+                        }
+                    }
+                }                
+                break;
+            case TREE_PREV:
+                browse_speed = 0;
+                if(filesindir) {
                     if(dircursor) {
                         put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
                         dircursor--;
@@ -422,9 +477,63 @@ bool dirbrowse(char *root)
                     lcd_update();
                 }
                 break;
+            case TREE_NEXT | BUTTON_REPEAT:
+                browse_speed++;  /* increase the browse speed every time we get here */
+                if(filesindir)
+                {
+                    if (dircursor + start + 1 < numentries ) {
+                        if(dircursor+1 < TREE_MAX_ON_SCREEN) {
+                            if (browse_speed < 7) {
+                                /* moving the cursor down through a full screen */
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                             false);
+                                dircursor++;
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            }
+                            else {
+                                /* if we have wrapped from the bottom we want to keep up the speed */
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                             false);
+                                dircursor=7;
+                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            }
+                            
+                        } 
+                        else {
+                            /* leaving the cursor at bottom line and moving screen up */
+                            if (browse_speed >= TREE_MAX_ON_SCREEN-1)
+                                /* make sure we do not go past the end of the directory */
+                                if (start + TREE_MAX_ON_SCREEN - 1  < numentries-TREE_MAX_ON_SCREEN)
+                                    start = start + TREE_MAX_ON_SCREEN -1;
+                                else
+                                    start = numentries-TREE_MAX_ON_SCREEN;
+                            else
+                                start++;
+                            numentries = showdir(currdir, start);
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                    }
+                    else {
+                        /* restarting at the top when there is less than 7 files */
+                        if(numentries < TREE_MAX_ON_SCREEN) {
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                         false);
+                            start = dircursor = browse_speed = 0;
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        } 
+                        else {
+                            /* restarting at the top when the screen scrolls */
+                            start = dircursor = 0 ;
+                            numentries = showdir(currdir, start);
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                    }
+                    lcd_update();
+                }
+                break;
 
             case TREE_NEXT:
-            case TREE_NEXT | BUTTON_REPEAT:
+                browse_speed = 0;
                 if(filesindir)
                 {
                     if (dircursor + start + 1 < numentries ) {
@@ -458,6 +567,7 @@ bool dirbrowse(char *root)
                 break;
 
             case TREE_MENU: {
+                browse_speed = 0;
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
                 lcd_stop_scroll();
@@ -471,6 +581,7 @@ bool dirbrowse(char *root)
             }
 
             case BUTTON_ON:
+                browse_speed = 0;
                 /* The mpeg thread may have stopped playing, so we'd
                    better update our status */
                 if(!mpeg_is_playing())
