@@ -2823,6 +2823,7 @@ void mpeg_sound_channel_config(int configuration)
             val_rl = 0x40000;
             val_rr = 0x80000;
             break;
+
         case MPEG_SOUND_KARAOKE:
             val_ll = 0x80001;
             val_lr = 0x7ffff;
@@ -2916,11 +2917,19 @@ void mpeg_set_recording_options(int frequency, int quality,
     {
         /* Copy left channel to right (mono mode) */
         mas_codec_writereg(8, 0x8000);
+
+        /* We set the channel config to stereo to get a clean left channel */
+        mpeg_sound_channel_config(MPEG_SOUND_STEREO);
     }
     else
     {
         /* Stereo input mode */
         mas_codec_writereg(8, 0);
+
+        if(channel_mode == 1) /* Mono */
+            mpeg_sound_channel_config(MPEG_SOUND_MONO);
+        else
+            mpeg_sound_channel_config(MPEG_SOUND_STEREO);
     }
 }
 
