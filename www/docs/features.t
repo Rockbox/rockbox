@@ -72,9 +72,9 @@ YES
 NO
 EFEAT
 
-NAME Fast playlist loading ENAME
-YES
-NO
+NAME Playlist load speed, songs/sec ENAME
+TD 2000 - 3500 ETD
+TD 15 - 20 ETD
 EFEAT
 
 NAME Max number of songs in a playlist ENAME
@@ -132,7 +132,7 @@ TD Soon ETD
 NO
 EFEAT
 
-NAME Low volume support ENAME
+NAME Supports Very Low Volume ENAME
 YES
 NO
 EFEAT
@@ -202,9 +202,14 @@ YES
 NO
 EFEAT
 
-NAME Intuitive User Interface ENAME
+NAME Easy User Interface ENAME
 YES
 NO
+EFEAT
+
+NAME Remote Control Controllable ENAME
+YES
+YES
 EFEAT
 
 </table>
