@@ -1396,3 +1396,8 @@ id: LANG_FADE_ON_STOP
 decs: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 new:
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] to undo"
+new:
