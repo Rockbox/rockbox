@@ -416,7 +416,8 @@ bool f3_screen(void)
         /* Invert */
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_INVERT));
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, 
-                   global_settings.invert ? str(LANG_ON) : str(LANG_OFF));
+                   global_settings.invert ?
+                   str(LANG_INVERT_LCD_INVERSE) : str(LANG_INVERT_LCD_NORMAL));
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
