@@ -158,9 +158,12 @@ int mkdir(char *name)
         if ( !strcasecmp(basename, entry->d_name) ) {
             DEBUGF("mkdir error: file exists\n");
             errno = EEXIST;
+            closedir(dir);
             return - 3;
         }
     }
+
+    closedir(dir);
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
     
