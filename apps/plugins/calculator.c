@@ -85,7 +85,7 @@ Limitations:
 - Right now, only accept "num, operator (+,-,*,/), num, =" input sequence.
   Input "3, +, 5, -, 2, =", the calculator will only do 5-2 and result = 3
   You have to input "3, +, 5, =, -, 2, =" to get 3+5-2 = 6
-  
+
 - "*,/" have no priority.  Actually you can't input 3+5*2 yet.
 
 User Instructions:
@@ -120,8 +120,8 @@ F3: equal to "="
 #define X_3_POS (X_2_POS + REC_WIDTH)  /* x3 = 66 */
 #define X_4_POS (X_3_POS + REC_WIDTH)  /* x4 = 88 */
 #define X_5_POS (X_4_POS + REC_WIDTH)  /* x5 = 110, column 111 left blank */
-  
-#define TEXT_1_POS (Y_1_POS-10)  /* y1 = 2  */   /* blank height = 12 */ 
+
+#define TEXT_1_POS (Y_1_POS-10)  /* y1 = 2  */   /* blank height = 12 */
 #define TEXT_2_POS (Y_2_POS-8)   /* y2 = 15 */   /* blank height = 9  */
 #define TEXT_3_POS (Y_3_POS-8)   /* y3 = 25 */
 #define TEXT_4_POS (Y_4_POS-8)   /* y4 = 35 */
@@ -130,23 +130,26 @@ F3: equal to "="
 
 #define SIGN(x) ((x)<0?-1:1)
 #define ABS(x) ((x)<0?-(x):(x))
-  
+
 static struct plugin_api* rb;
 
-enum {basicButtons, sciButtons} buttonGroup;
+enum {
+    basicButtons,
+    sciButtons
+} buttonGroup;
 unsigned char* buttonChar[2][5][5] = {
-                         { { "MR" , "M+" , "2nd" , "CE"   , "C"   },
-                           { "7"  , "8"  , "9"   , "/"    , "sqr" },
-                           { "4"  , "5"  , "6"   , "*"    , "x^2" },
-                           { "1"  , "2"  , "3"   , "-"    , "1/x" },
-                           { "0"  , "+/-", "."   , "+"    , "="   }  },
-
-                         { { "n!" , "PI" , "1st" , "sin"  , "asi" },
-                           { "7"  , "8"  , "9"   , "cos"  , "aco" },
-                           { "4"  , "5"  , "6"   , "tan"  , "ata" },
-                           { "1"  , "2"  , "3"   , "ln"   , "e^x" },
-                           { "0"  , "+/-", "."   , "log"  , "x^y" }  }
-                                     };
+    { { "MR" , "M+" , "2nd" , "CE"   , "C"   },
+      { "7"  , "8"  , "9"   , "/"    , "sqr" },
+      { "4"  , "5"  , "6"   , "*"    , "x^2" },
+      { "1"  , "2"  , "3"   , "-"    , "1/x" },
+      { "0"  , "+/-", "."   , "+"    , "="   }  },
+    
+    { { "n!" , "PI" , "1st" , "sin"  , "asi" },
+      { "7"  , "8"  , "9"   , "cos"  , "aco" },
+      { "4"  , "5"  , "6"   , "tan"  , "ata" },
+      { "1"  , "2"  , "3"   , "ln"   , "e^x" },
+      { "0"  , "+/-", "."   , "log"  , "x^y" }  }
+};
 enum { btn_MR , btn_M    , btn_bas , btn_CE    , btn_C      ,
        btn_7  , btn_8    , btn_9   , btn_div   , btn_sqr    ,
        btn_4  , btn_5    , btn_6   , btn_time  , btn_square ,
@@ -177,7 +180,7 @@ unsigned char buf[19];/* 18 bytes of output line,
                          buf[0] is operator
                          buf[1] = 'M' if memTemp is not 0
                          buf[2] = ' '
-                         
+
                          if SCIENTIFIC_FORMAT
                              buf[2]-buf[12] or buf[3]-buf[13] = result;
                              format X.XXXXXXXX
@@ -324,7 +327,7 @@ double cordicTable[51][2]= {
   3.552713678800501e-15},
     {1.7763568394002504646778106689453125e-15,
  1.776356839400250e-15},
-    {8.8817841970012523233890533447265625e-16, 8.881784197001252e-16} 
+    {8.8817841970012523233890533447265625e-16, 8.881784197001252e-16}
 };
 
 void doMultiple(double* operandOne, int* powerOne,
@@ -338,41 +341,55 @@ void oneOperand(void);
 /* -----------------------------------------------------------------------
 Handy funtions
 ----------------------------------------------------------------------- */
-void cleartypingbuf(void){
+void cleartypingbuf(void)
+{
     int k;
     for( k=1; k<=(DIGITLEN+1); k++)
         typingbuf[k] = 0;
     typingbuf[0] = ' ';
     typingbufPointer = typingbuf+1;
 }
-void clearbuf(void){
+void clearbuf(void)
+{
     int k;
-    for(k=0;k<18;k++) buf[k]=' ';
+    for(k=0;k<18;k++)
+        buf[k]=' ';
     buf[18] = 0;
 }
-void clearResult(void){
+void clearResult(void)
+{
     result = 0;
     power = 0;
     modifier = 0.1;
 }
-void clearInput(void){
+
+void clearInput(void)
+{
     calStatus = cal_normal;
     clearResult();
     cleartypingbuf();
 }
-void clearOperand(void){
+
+void clearOperand(void)
+{
     operand = 0;
     operandPower = 0;
 }
-void clearMemTemp(void){
+
+void clearMemTemp(void)
+{
     memTemp = 0;
     memTempPower = 0;
 }
-void clearOper(void){
+
+void clearOper(void)
+{
     oper = ' ';
-    operInputted = false;    
+    operInputted = false;
 }
-void clearMem(void){
+
+void clearMem(void)
+{
     clearInput();
     clearMemTemp();
     clearOperand();
@@ -380,7 +397,8 @@ void clearMem(void){
     btn = BUTTON_NONE;
 }
 
-void switchOperands(void){
+void switchOperands(void)
+{
     double tempr = operand;
     int tempp = operandPower;
     operand = result;
@@ -392,7 +410,8 @@ void switchOperands(void){
 /* -----------------------------------------------------------------------
 Initiate calculator
 ----------------------------------------------------------------------- */
-void cal_initial (void){
+void cal_initial (void)
+{
     int i,j,w,h;
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
@@ -419,8 +438,10 @@ void cal_initial (void){
     }
 
     /* initially, invert button "5" */
-    m = 2; n = 1;
-    prev_m = m; prev_n = n;
+    m = 2;
+    n = 1;
+    prev_m = m;
+    prev_n = n;
     rb->lcd_invertrect( X_0_POS + n*REC_WIDTH + 1,
                         Y_1_POS + m*REC_HEIGHT + 1,
                         REC_WIDTH - 1, REC_HEIGHT - 1);
@@ -435,14 +456,15 @@ void cal_initial (void){
 }
 
 /* -----------------------------------------------------------------------
-mySqrt uses Heron's algorithm, which is the Newtone-Raphson algorhitm
-in it's private case for sqrt.
-Thanks BlueChip for his intro text and Dave Straayer for the actual name.
------------------------------------------------------------------------ */
-double mySqrt(double square){
+   mySqrt uses Heron's algorithm, which is the Newtone-Raphson algorhitm
+   in it's private case for sqrt.
+   Thanks BlueChip for his intro text and Dave Straayer for the actual name.
+   ----------------------------------------------------------------------- */
+double mySqrt(double square)
+{
     int k = 0;
     double temp = 0;
-    double root= ABS(square+1)/2; 
+    double root= ABS(square+1)/2;
 
     while( ABS(root - temp) > MINIMUM ){
         temp = root;
@@ -454,56 +476,81 @@ double mySqrt(double square){
     return root;
 }
 /* -----------------------------------------------------------------------
-transcendFunc uses CORDIC (COordinate Rotation DIgital Computer) method
-transcendFunc can do sin,cos,log,exp
-input parameter is angle
+   transcendFunc uses CORDIC (COordinate Rotation DIgital Computer) method
+   transcendFunc can do sin,cos,log,exp
+   input parameter is angle
 ----------------------------------------------------------------------- */
-void transcendFunc(char* func, double* tt, int* ttPower){
+void transcendFunc(char* func, double* tt, int* ttPower)
+{
     double t = (*tt)*PI/180; int tPower = *ttPower;
-
-    if (tPower < -998) {calStatus = cal_normal; return;}
-    if (tPower > 8) {calStatus = cal_error; return;}
-    *ttPower = 0;
-    calStatus = cal_normal;
-
     int sign = 1;
     int n = 50; /* n <=50, tables are all <= 50 */
     int j;
     double x,y,z,xt,yt,zt;
 
-    if( func[0] =='s' || func[0] =='S') sign = SIGN(t);
-    else { /* if( func[0] =='c' || func[0] =='C') */ sign = 1; }
+    if (tPower < -998) {
+        calStatus = cal_normal;
+        return;
+    }
+    if (tPower > 8) {
+        calStatus = cal_error;
+        return;
+    }
+    *ttPower = 0;
+    calStatus = cal_normal;
+
+    if( func[0] =='s' || func[0] =='S')
+        sign = SIGN(t);
+    else {
+        /* if( func[0] =='c' || func[0] =='C') */
+        sign = 1;
+    }
     t = ABS(t);
 
-    while (tPower > 0){ t *= 10; tPower--; }
-    while (tPower < 0){ t /= 10; tPower++; }
+    while (tPower > 0){
+        t *= 10;
+        tPower--;
+    }
+    while (tPower < 0) {
+        t /= 10;
+        tPower++;
+    }
     j = 0;
     while (t > j*2*PI) {j++;}
     t -= (j-1)*2*PI;
     if (PI/2 < t && t < 3*PI/2){
         t = PI - t;
-        if (func[0] =='c' || func[0] =='C') sign = -1;
+        if (func[0] =='c' || func[0] =='C')
+            sign = -1;
     }
-    else if ( 3*PI/2 <= t && t <= 2*PI) t -= 2*PI; 
+    else if ( 3*PI/2 <= t && t <= 2*PI)
+        t -= 2*PI;
 
     x = 0.60725293500888;  y = 0;  z = t;
     for (j=1;j<n+2;j++){
         xt = x - SIGN(z) * y*cordicTable[j-1][0];
         yt = y + SIGN(z) * x*cordicTable[j-1][0];
-    
         zt = z - SIGN(z) * cordicTable[j-1][1];
-        x = xt;y=yt;z=zt;
+        x = xt;
+        y=yt;
+        z=zt;
     }
-    if( func[0] =='s' || func[0] =='S') {*tt = sign*y; return;}
-    else /* if( func[0] =='c' || func[0] =='C')*/ {*tt = sign*x; return;}
-    
+    if( func[0] =='s' || func[0] =='S') {
+        *tt = sign*y;
+        return;
+    }
+    else /* if( func[0] =='c' || func[0] =='C')*/ {
+        *tt = sign*x;
+        return;
+    }
+
 }
 /* -----------------------------------------------------------------------
-add in scientific number format
+   add in scientific number format
 ----------------------------------------------------------------------- */
 void doAdd (double* operandOne, int* powerOne,
-            double  operandTwo, int  powerTwo){
-
+            double  operandTwo, int  powerTwo)
+{
     if ( *powerOne >= powerTwo ){
         if (*powerOne - powerTwo <= DIGITLEN+1){
             while (powerTwo < *powerOne){
@@ -532,20 +579,23 @@ void doAdd (double* operandOne, int* powerOne,
 multiple in scientific number format
 ----------------------------------------------------------------------- */
 void doMultiple(double* operandOne, int* powerOne,
-                double  operandTwo, int  powerTwo){
-(*operandOne) *= operandTwo;
-(*powerOne) += powerTwo;
+                double  operandTwo, int  powerTwo)
+{
+    (*operandOne) *= operandTwo;
+    (*powerOne) += powerTwo;
 }
 
 /* -----------------------------------------------------------------------
 Handles all one operand calculations
 ----------------------------------------------------------------------- */
-void oneOperand(void){
+void oneOperand(void)
+{
     int k = 0;
     if (buttonGroup == basicButtons){
         switch(CAL_BUTTON){
             case btn_sqr:
-                if (result<0) calStatus = cal_error;
+                if (result<0)
+                    calStatus = cal_error;
                 else{
                     if (power%2 == 1){
                         result = (mySqrt(result*10))/10;
@@ -563,9 +613,10 @@ void oneOperand(void){
                 result *= result;
                 calStatus = cal_normal;
                 break;
-    
+
             case btn_rec:
-                if (result==0) calStatus = cal_error;
+                if (result==0)
+                    calStatus = cal_error;
                 else{
                     power = -power;
                     result = 1/result;
@@ -586,10 +637,17 @@ void oneOperand(void){
                 transcendFunc("cos", &result, &power);
                 break;
             case sci_fac:
-                if (power<0 || power>8 || result<0 ) calStatus = cal_error;
-                else if(result == 0) {result = 1; power = 0; }
+                if (power<0 || power>8 || result<0 )
+                    calStatus = cal_error;
+                else if(result == 0) {
+                    result = 1;
+                    power = 0;
+                }
                 else{
-                    while(power > 0) {result *= 10; power--;}
+                    while(power > 0) {
+                        result *= 10;
+                        power--;
+                    }
                     if ( ( result - (int)result) > MINIMUM )
                         calStatus = cal_error;
                     else {
@@ -614,7 +672,8 @@ void oneOperand(void){
 /* -----------------------------------------------------------------------
 Handles all two operands calculations
 ----------------------------------------------------------------------- */
-void twoOperands(void){
+void twoOperands(void)
+{
     switch(oper){
         case '-':
             doAdd(&operand, &operandPower, -result, power);
@@ -629,7 +688,8 @@ void twoOperands(void){
             if ( ABS(result) > MINIMUM ){
                 doMultiple(&operand, &operandPower, 1/result, -power);
             }
-            else calStatus = cal_error;
+            else
+                calStatus = cal_error;
             break;
         default: /* ' ' */
             switchOperands(); /* counter switchOperands() below */
@@ -646,26 +706,34 @@ void moveButton(void){
     switch(btn){
         case BUTTON_LEFT:
         case BUTTON_LEFT | BUTTON_REPEAT:
-            if (n == 0) n = 4;
-            else n--;
+            if (n == 0)
+                n = 4;
+            else
+                n--;
             break;
-        
+
         case BUTTON_RIGHT:
         case BUTTON_RIGHT | BUTTON_REPEAT:
-            if (n == 4) n = 0;
-            else n++;
+            if (n == 4)
+                n = 0;
+            else
+                n++;
             break;
-        
+
         case BUTTON_UP:
         case BUTTON_UP | BUTTON_REPEAT:
-            if (m == 0) m = 4;
-            else m--;
+            if (m == 0)
+                m = 4;
+            else
+                m--;
             break;
-        
+
         case BUTTON_DOWN:
         case BUTTON_DOWN | BUTTON_REPEAT:
-            if (m == 4) m = 0;
-            else m++;
+            if (m == 4)
+                m = 0;
+            else
+                m++;
             break;
     }
 
@@ -685,14 +753,15 @@ void moveButton(void){
                         Y_1_POS + m*REC_HEIGHT + 1,
                         REC_WIDTH - 1, REC_HEIGHT - 1);
 
-    prev_m = m; prev_n = n;
-
+    prev_m = m;
+    prev_n = n;
 }
 /* -----------------------------------------------------------------------
 Print buttons when switching 1st and 2nd
 int group = {basicButtons, sciButtons}
 ----------------------------------------------------------------------- */
-void printButtonGroups(int group){
+void printButtonGroups(int group)
+{
     int i,j,w,h;
     for (i = 0; i < 5; i++){
         for (j = 3; j <= 4; j++){
@@ -725,7 +794,8 @@ void printButtonGroups(int group){
 /* -----------------------------------------------------------------------
 flash the button pressed
 ----------------------------------------------------------------------- */
-void flashButton(int b){
+void flashButton(int b)
+{
     int i = b/5; int j = b - i*5;
     int k;
     for (k=1*2;k>0;k--){
@@ -745,13 +815,15 @@ void flashButton(int b){
 /* -----------------------------------------------------------------------
 pos is the position that needs animation. pos = [1~18]
 ----------------------------------------------------------------------- */
-void deleteAnimation(int pos){
+void deleteAnimation(int pos)
+{
     int k;
-    if (pos<1 || pos >18) return;
+    if (pos<1 || pos >18)
+        return;
     pos--;
     rb->lcd_fillrect(1+pos*6, TEXT_1_POS, 6, 8);
     rb->lcd_update_rect(1+pos*6, TEXT_1_POS, 6, 8);
-    
+
     for (k=1;k<=4;k++){
         rb->sleep(HZ/32);
         rb->lcd_clearrect(1+pos*6, TEXT_1_POS, 6, 8);
@@ -773,7 +845,8 @@ formatResult() change result to standard format: 0.xxxx
 if result is close to 0, let it be 0;
 if result is close to 1, let it be 0.1 and power++;
 ----------------------------------------------------------------------- */
-void formatResult(void){
+void formatResult(void)
+{
     int resultsign = SIGN(result);
     result = ABS(result);
     if(result > MINIMUM ){ /* doesn't check power, might have problem
@@ -785,21 +858,31 @@ void formatResult(void){
 
         if (result<1){
             while( (int)(result*10) == 0 ){
-                result *= 10; power--; modifier *= 10;
+                result *= 10;
+                power--;
+                modifier *= 10;
             }
         }
         else{ /* result >= 1 */
             while( (int)result != 0 ){
-                result /= 10; power++; modifier /= 10;
+                result /= 10;
+                power++;
+                modifier /= 10;
             }
         } /* if result<1 */
 
         if (result > (1-MINIMUM)){
-            result = 0.1; power++; modifier /= 10;
+            result = 0.1;
+            power++;
+            modifier /= 10;
         }
         result *= resultsign;
     }
-    else{ result = 0; power = 0; modifier = 0.1;  }
+    else {
+        result = 0;
+        power = 0;
+        modifier = 0.1;
+    }
 }
 
 /* -----------------------------------------------------------------------
@@ -808,15 +891,18 @@ case SCIENTIFIC_FORMAT, let temppower = 1;
 case temppower >  0:  print '.' in the middle
 case temppower <= 0:  print '.' in the begining
 ----------------------------------------------------------------------- */
-void result2typingbuf(void){
+void result2typingbuf(void)
+{
     bool haveDot = false;
     char tempchar = 0;
     int k;
     double tempresult = ABS(result); /* positive num makes things simple */
 
     int temppower;
-    if(SCIENTIFIC_FORMAT) temppower = 1; /* output x.xxxx format */
-    else temppower = power;
+    if(SCIENTIFIC_FORMAT)
+        temppower = 1; /* output x.xxxx format */
+    else
+        temppower = power;
 
     double tempmodifier = 1;
     int count;
@@ -862,7 +948,7 @@ void result2typingbuf(void){
                     tempmodifier = tempmodifier/10;
                     while((tempresult-tempmodifier*count)>(tempmodifier-MINIMUM)){
                         count++;
-                    
+
                     }
                     tempresult -= tempmodifier*count;
                     tempresult = ABS(tempresult);
@@ -919,7 +1005,7 @@ void printResult(void){
 
             result2typingbuf();
             clearbuf();
-            
+
             buf[0] = oper;
             buf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
             buf[2] = ' ';
@@ -1012,18 +1098,18 @@ void typingProcess(void){
                     }
                     if (typingbufPointer!=typingbuf+DIGITLEN+1){
                         typingbufPointer++;
-        
+
                         {/* result processing */
                          if (calStatus == cal_typing) power++;
                          if (CAL_BUTTON != btn_0)
                              result= result +
                                      SIGN(result)*
                                      (7+n-3*(m-1))*modifier;
-                         modifier /= 10;    
-                        } 
+                         modifier /= 10;
+                        }
                     }
                     else /* last byte always '\0' */
-                        *typingbufPointer = 0; 
+                        *typingbufPointer = 0;
                     break;
                 default: /* cal_error, cal_exit */
                     break;
@@ -1051,7 +1137,7 @@ void doDelete(void){
             }
         case cal_typing:
             typingbufPointer--;
-    
+
             {/* result processing */   /* 0-9, '.' */
              /* if deleting '.', do nothing */
              if ( *typingbufPointer != '.'){
@@ -1061,16 +1147,16 @@ void doDelete(void){
                     ((*typingbufPointer)- '0')*modifier;
              }
             }
-    
+
             *typingbufPointer = 0;
-    
+
             /* if (only one digit left and it's 0)
-               or  no digit left, change status*/ 
+               or  no digit left, change status*/
             if ( typingbufPointer == typingbuf+1 ||
                  ( typingbufPointer == typingbuf+2 &&
                    *(typingbufPointer-1) == '0' ))
                 calStatus = cal_normal;
-            break; 
+            break;
         default: /* normal, error, exit */
             break;
     }
@@ -1099,7 +1185,7 @@ void basicButtonsProcess(void){
                         memTemp = result; memTempPower = power;
                     calStatus = cal_normal;
                     break;
-            
+
                 case btn_C:    clearMem();        break;
                 case btn_CE:   clearInput();      break;
 
@@ -1107,7 +1193,7 @@ void basicButtonsProcess(void){
                     buttonGroup = sciButtons;
                     printButtonGroups(buttonGroup);
                     break;
-            
+
                 /* one operand calculation, may be changed to
                    like sin, cos, log, etc */
                 case btn_sqr:
@@ -1116,7 +1202,7 @@ void basicButtonsProcess(void){
                     formatResult(); /* not necessary, just for safty */
                     oneOperand();
                     break;
-            
+
                 case_btn_equal:  /* F3 shortkey entrance */
                 case btn_equal:
                     formatResult();
@@ -1124,7 +1210,7 @@ void basicButtonsProcess(void){
                     operInputted = false;
                     if (oper != ' ') twoOperands();
                     break;
-            
+
                 case btn_div:
                 case btn_time:
                 case btn_minus:
@@ -1136,7 +1222,7 @@ void basicButtonsProcess(void){
                     formatResult();
                     operand = result;
                     operandPower = power;
-            
+
                     break;
 
                 case btn_sign:
@@ -1150,7 +1236,7 @@ void basicButtonsProcess(void){
         case BUTTON_F2:
             if (calStatus == cal_error) break;
             if (!operInputted) {twoOperands(); operInputted = true;}
-            switch (oper){ 
+            switch (oper){
                 case ' ':
                 case '/':  oper = '+';  flashButton(btn_add);    break;
                 case '+':  oper = '-';  flashButton(btn_minus);  break;
@@ -1216,7 +1302,7 @@ void sciButtonsProcess(void){
         case BUTTON_F2:
             if (calStatus == cal_error) break;
             if (!operInputted) {twoOperands(); operInputted = true;}
-            switch (oper){ 
+            switch (oper){
                 case ' ':  oper = '+'; break;
                 case '/':  oper = '+'; deleteAnimation(1);  break;
                 case '+':  oper = '-'; deleteAnimation(1);  break;
@@ -1244,7 +1330,7 @@ void sciButtonsProcess(void){
 Main();
 ----------------------------------------------------------------------- */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
-{ 
+{
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
