@@ -31,7 +31,7 @@ INCLUDES=-I../.. -I.. -I. -I$(FIRMWARE)/include -I$(FIRMWARE)/export	\
 
 ifdef SIMULATOR
 CFLAGS = -W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DSIMULATOR
 else
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
