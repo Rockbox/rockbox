@@ -35,3 +35,14 @@ codecs/libFLAC/include/*.h
 codecs/libmad/*
 codecs/libwavpack/*
 codecs/Tremor/*
+codecs/dumb/*
+codecs/dumb/docs/*
+codecs/dumb/examples/*
+codecs/dumb/include/*
+codecs/dumb/include/internal/*
+codecs/dumb/make/*
+codecs/dumb/src/*
+codecs/dumb/src/allegro/*
+codecs/dumb/src/core/*
+codecs/dumb/src/helpers/*
+codecs/dumb/src/it/*
