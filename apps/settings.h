@@ -64,9 +64,7 @@ struct user_settings
     int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
     int poweroff;   /* power off timer */
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,1=always,then according to timeout_values[] */
-#ifdef HAVE_CHARGE_CTRL
     bool backlight_on_when_charging;
-#endif
     bool discharge; /* maintain charge of at least: false = 90%, true = 10%  */
 
     /* resume settings */

@@ -144,7 +144,6 @@ static bool resume(void)
                        names, 3, NULL );
 }
 
-#ifdef HAVE_CHARGE_CTRL
 static bool backlight_on_when_charging(void)
 {
     bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
@@ -152,7 +151,6 @@ static bool backlight_on_when_charging(void)
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     return result;
 }
-#endif
 
 static bool backlight_timer(void)
 {
@@ -387,9 +385,7 @@ static bool display_settings_menu(void)
     struct menu_items items[] = {
         { str(LANG_SCROLL_MENU),     scroll_speed    },  
         { str(LANG_BACKLIGHT),       backlight_timer },
-#ifdef HAVE_CHARGE_CTRL
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
-#endif
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_PM_MENU),         peak_meter_menu },  

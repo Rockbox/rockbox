@@ -128,3 +128,8 @@ void backlight_set_timeout(int seconds)
 {
   (void)seconds;
 }
+
+void backlight_set_on_when_charging(bool beep)
+{
+  (void)beep;
+}
