@@ -209,6 +209,10 @@ void statusbar_icon_volume(int percent)
     int volume;
     int step=0;
     char buffer[4];
+    unsigned int width, height;
+#if defined(LOADABLE_FONTS)
+    unsigned char *font;
+#endif
     static long switch_tick;
     static int last_volume;
 
@@ -231,8 +235,19 @@ void statusbar_icon_volume(int percent)
         /* display volume lever numerical? */
         if (TIME_BEFORE(current_tick,switch_tick)) { 
             snprintf(buffer, sizeof(buffer), "%2d", percent);
-            lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
-                       6*strlen(buffer)/2, STATUSBAR_Y_POS, buffer, 0);
+#if defined(LCD_PROPFONTS)
+            lcd_getstringsize(buffer, 0, &width, &height);
+            width += strlen(buffer) - 1;
+#elif defined(LOADABLE_FONTS)
+            font = lcd_getcurrentldfont();
+            lcd_getstringsize(buffer, font, &width, &height);
+#else
+            width = 6*strlen(buffer);
+            height = 8;
+#endif
+            if (height <= STATUSBAR_HEIGHT)
+                lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
+                           width/2, STATUSBAR_Y_POS, buffer, 0);
         }
         else { /* display volume bar */
             volume = volume * 14 / 100;
@@ -290,6 +305,10 @@ void statusbar_time(void)
 {
     int hour,minute;
     unsigned char buffer[6];
+    unsigned int width, height;
+#if defined(LOADABLE_FONTS)
+    unsigned char *font;
+#endif
 
     hour = rtc_read(0x03);
     minute = rtc_read(0x02);
@@ -299,6 +318,17 @@ void statusbar_time(void)
              hour & 0x0f,
              (minute & 0xf0) >> 4,
              minute & 0x0f);
-    lcd_putsxy(TIME_X_POS, STATUSBAR_Y_POS, buffer, 0);
+#if defined(LCD_PROPFONTS)
+    lcd_getstringsize(buffer, 0, &width, &height);
+    width += strlen(buffer) - 1;
+#elif defined(LOADABLE_FONTS)
+    font = lcd_getcurrentldfont();
+    lcd_getstringsize(buffer, font, &width, &height);
+#else
+    width = 6*strlen(buffer);
+    height = 8;
+#endif
+    if (height <= STATUSBAR_HEIGHT)
+        lcd_putsxy(TIME_X_END - width, STATUSBAR_Y_POS, buffer, 0);
 }
 #endif
