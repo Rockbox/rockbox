@@ -30,6 +30,8 @@ void *calloc (size_t nmemb, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
 
+#define RAND_MAX 0x7fffffff
+
 void srand(unsigned int seed);
 int rand(void);
 
