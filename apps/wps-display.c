@@ -39,6 +39,7 @@
 #include "debug.h"
 #include "mas.h"
 #include "lang.h"
+#include "powermgmt.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -384,9 +385,29 @@ static char* get_tag(struct mp3entry* id3,
                     *flags |= WPS_REFRESH_PEAK_METER;
                     return "\x01";
 #endif
+                case 's': /* shuffle */
+                    if ( global_settings.playlist_shuffle )
+                        return "s";
+                    else
+                        return NULL;
+                    break;
             }
             break;
-    
+
+        case 'b': /* battery info */
+            switch (tag[1]) {
+                case 'l': /* battery level */
+                    snprintf(buf, buf_size, "%d%%", battery_level());
+                    return buf;
+
+                case 't': /* estimated battery time */
+                    snprintf(buf, buf_size, "%dh %dm",
+                             battery_time() / 60,
+                             battery_time() % 60);
+                    return buf;
+            }
+            break;
+
         case 'd': /* Directory path information */
             {
                 int level = tag[1] - '0';
