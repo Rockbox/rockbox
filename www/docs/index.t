@@ -102,7 +102,7 @@ PC can talk to your Archos
 
 <h2>External Pages</h2>
 <ul>
-<li><a href="http://waechter.wiz.at/~matthias/Rockbox/HW-Mod/8MB/">Matthias Wächter 8BM RAM mod</a>
+<li><a href="http://waechter.wiz.at/~matthias/Rockbox/HW-Mod/8MB/">Matthias Wächter 8MB RAM mod</a>
 <li><a href="http://www.uwe-freese.de/rockbox/8mb_ram_en.html">Uwe Freese's 8MB RAM mod for Recorders</a>
 <li><a href="http://www.geocities.com/notching/Sony-archos-remote.html">Nick Robinson's Sony Remote Joystick RM-X4S interface</a>
 <li><a href="http://mywebpages.comcast.net/jstewart228368/archos-modification.html">James Stewart's Jukebox 6000 Bass and Volume improvement</a>
