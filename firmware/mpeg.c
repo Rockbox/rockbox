@@ -228,7 +228,6 @@ static void remove_all_tags(void)
 #endif
 
 #ifndef SIMULATOR
-static int last_tag = 0;
 static int last_dma_tick = 0;
 static int pause_tick = 0;
 
@@ -710,11 +709,12 @@ static void mpeg_thread(void)
                 stop_dma();
 
                 reset_mp3_buffer();
+                remove_all_tags();
                 
                 /* Open the next file */
                 if (mpeg_file >= 0)
                     close(mpeg_file);
-                last_tag=0;
+
                 if (new_file(true) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
@@ -739,10 +739,12 @@ static void mpeg_thread(void)
                 stop_dma();
 
                 reset_mp3_buffer();
+                remove_all_tags();
+
                 /* Open the next file */
                 if (mpeg_file >= 0)
                     close(mpeg_file);
-                last_tag=0;
+
                 if (new_file(false) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
