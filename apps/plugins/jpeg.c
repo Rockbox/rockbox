@@ -606,6 +606,7 @@ struct jpeg
     int y_mbl; /* y dimension of MBL */
     int blocks; /* blocks per MBL */
     int restart_interval; /* number of MCUs between RSTm markers */
+    int store_pos[4]; /* for Y block ordering */
 
     unsigned char* p_entropy_data;
     unsigned char* p_entropy_end;
@@ -688,67 +689,11 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                     p_jpeg->frameheader[i].horizontal_sampling = *p_src >> 4;
                     p_jpeg->frameheader[i].vertical_sampling = *p_src++ & 0x0F;
                     p_jpeg->frameheader[i].quanttable_select = *p_src++;
+                    if (p_jpeg->frameheader[i].horizontal_sampling > 2
+                     || p_jpeg->frameheader[i].vertical_sampling > 2)
+                    return -3; /* Unsupported SOF0 subsampling */
                 }
-
-                /* assignments for the decoding of blocks */
-                if (p_jpeg->frameheader[0].horizontal_sampling == 2
-                    && p_jpeg->frameheader[0].vertical_sampling == 1)
-                {   /* 4:2:2 */
-                    p_jpeg->blocks = 4;
-                    p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
-                    p_jpeg->x_phys = p_jpeg->x_mbl * 16;
-                    p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
-                    p_jpeg->y_phys = p_jpeg->y_mbl * 8;
-                    p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=2, V=3 */
-                    p_jpeg->mcu_membership[1] = 0;
-                    p_jpeg->mcu_membership[2] = 2;
-                    p_jpeg->mcu_membership[3] = 3;
-                    p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
-                    p_jpeg->tab_membership[1] = 0;
-                    p_jpeg->tab_membership[2] = 1;
-                    p_jpeg->tab_membership[3] = 1;
-                }
-                else if (p_jpeg->frameheader[0].horizontal_sampling == 2
-                    && p_jpeg->frameheader[0].vertical_sampling == 2)
-                {   /* 4:2:0 */
-                    p_jpeg->blocks = 6;
-                    p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
-                    p_jpeg->x_phys = p_jpeg->x_mbl * 16;
-                    p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
-                    p_jpeg->y_phys = p_jpeg->y_mbl * 16;
-                    p_jpeg->mcu_membership[0] = 0;
-                    p_jpeg->mcu_membership[1] = 0;
-                    p_jpeg->mcu_membership[2] = 0;
-                    p_jpeg->mcu_membership[3] = 0;
-                    p_jpeg->mcu_membership[4] = 2;
-                    p_jpeg->mcu_membership[5] = 3;
-                    p_jpeg->tab_membership[0] = 0;
-                    p_jpeg->tab_membership[1] = 0;
-                    p_jpeg->tab_membership[2] = 0;
-                    p_jpeg->tab_membership[3] = 0;
-                    p_jpeg->tab_membership[4] = 1;
-                    p_jpeg->tab_membership[5] = 1;
-                }
-                else if (p_jpeg->frameheader[0].horizontal_sampling == 1
-                    && p_jpeg->frameheader[0].vertical_sampling == 1)
-                {   /* 4:4:4 */
-                    p_jpeg->blocks = n;
-                    p_jpeg->x_mbl = (p_jpeg->x_size+7) / 8;
-                    p_jpeg->x_phys = p_jpeg->x_mbl * 8;
-                    p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
-                    p_jpeg->y_phys = p_jpeg->y_mbl * 8;
-                    p_jpeg->mcu_membership[0] = 0;
-                    p_jpeg->mcu_membership[1] = 2;
-                    p_jpeg->mcu_membership[2] = 3;
-                    p_jpeg->tab_membership[0] = 0;
-                    p_jpeg->tab_membership[1] = 1;
-                    p_jpeg->tab_membership[2] = 1;
-                }
-                else
-                {
-                    return(-3); /* Unsupported SOF0 subsampling */
-                }
-
+                p_jpeg->blocks = n;
             }
             break;
 
@@ -1103,6 +1048,84 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->qt_idct[0][zag[i]] = p_jpeg->quanttable[0][i];
         p_jpeg->qt_idct[1][zag[i]] = p_jpeg->quanttable[1][i];
     }
+
+    for (i=0; i<4; i++)
+        p_jpeg->store_pos[i] = i; /* default ordering */
+    
+    /* assignments for the decoding of blocks */
+    if (p_jpeg->frameheader[0].horizontal_sampling == 2
+        && p_jpeg->frameheader[0].vertical_sampling == 1)
+    {   /* 4:2:2 */
+        p_jpeg->blocks = 4;
+        p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
+        p_jpeg->x_phys = p_jpeg->x_mbl * 16;
+        p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
+        p_jpeg->y_phys = p_jpeg->y_mbl * 8;
+        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=2, V=3 */
+        p_jpeg->mcu_membership[1] = 0;
+        p_jpeg->mcu_membership[2] = 2;
+        p_jpeg->mcu_membership[3] = 3;
+        p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
+        p_jpeg->tab_membership[1] = 0;
+        p_jpeg->tab_membership[2] = 1;
+        p_jpeg->tab_membership[3] = 1;
+    }
+    if (p_jpeg->frameheader[0].horizontal_sampling == 1
+        && p_jpeg->frameheader[0].vertical_sampling == 2)
+    {   /* 4:2:2 vertically subsampled */
+        p_jpeg->store_pos[1] = 2; /* block positions are mirrored */
+        p_jpeg->store_pos[2] = 1;
+        p_jpeg->blocks = 4;
+        p_jpeg->x_mbl = (p_jpeg->x_size+7) / 8;
+        p_jpeg->x_phys = p_jpeg->x_mbl * 8;
+        p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
+        p_jpeg->y_phys = p_jpeg->y_mbl * 16;
+        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=2, V=3 */
+        p_jpeg->mcu_membership[1] = 0;
+        p_jpeg->mcu_membership[2] = 2;
+        p_jpeg->mcu_membership[3] = 3;
+        p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
+        p_jpeg->tab_membership[1] = 0;
+        p_jpeg->tab_membership[2] = 1;
+        p_jpeg->tab_membership[3] = 1;
+    }
+    else if (p_jpeg->frameheader[0].horizontal_sampling == 2
+        && p_jpeg->frameheader[0].vertical_sampling == 2)
+    {   /* 4:2:0 */
+        p_jpeg->blocks = 6;
+        p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
+        p_jpeg->x_phys = p_jpeg->x_mbl * 16;
+        p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
+        p_jpeg->y_phys = p_jpeg->y_mbl * 16;
+        p_jpeg->mcu_membership[0] = 0;
+        p_jpeg->mcu_membership[1] = 0;
+        p_jpeg->mcu_membership[2] = 0;
+        p_jpeg->mcu_membership[3] = 0;
+        p_jpeg->mcu_membership[4] = 2;
+        p_jpeg->mcu_membership[5] = 3;
+        p_jpeg->tab_membership[0] = 0;
+        p_jpeg->tab_membership[1] = 0;
+        p_jpeg->tab_membership[2] = 0;
+        p_jpeg->tab_membership[3] = 0;
+        p_jpeg->tab_membership[4] = 1;
+        p_jpeg->tab_membership[5] = 1;
+    }
+    else if (p_jpeg->frameheader[0].horizontal_sampling == 1
+        && p_jpeg->frameheader[0].vertical_sampling == 1)
+    {   /* 4:4:4 */
+        /* don't overwrite p_jpeg->blocks */
+        p_jpeg->x_mbl = (p_jpeg->x_size+7) / 8;
+        p_jpeg->x_phys = p_jpeg->x_mbl * 8;
+        p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
+        p_jpeg->y_phys = p_jpeg->y_mbl * 8;
+        p_jpeg->mcu_membership[0] = 0;
+        p_jpeg->mcu_membership[1] = 2;
+        p_jpeg->mcu_membership[2] = 3;
+        p_jpeg->tab_membership[0] = 0;
+        p_jpeg->tab_membership[1] = 1;
+        p_jpeg->tab_membership[2] = 1;
+    }
+
 }
 
 
@@ -1333,10 +1356,10 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     skip_mcu = (width/p_jpeg->x_mbl);
 
     /* prepare offsets about where to store the different blocks */
-    store_offs[0] = 0;
-    store_offs[1] = 8 / downscale; /* to the right */
-    store_offs[2] = width * 8 / downscale; /* below */
-    store_offs[3] = store_offs[1] + store_offs[2]; /* right+below */
+    store_offs[p_jpeg->store_pos[0]] = 0;
+    store_offs[p_jpeg->store_pos[1]] = 8 / downscale; /* to the right */
+    store_offs[p_jpeg->store_pos[2]] = width * 8 / downscale; /* below */
+    store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2]; /* r+b */
 
     for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
     {
