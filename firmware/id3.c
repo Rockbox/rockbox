@@ -366,8 +366,12 @@ getid3v1len(int fd)
 static int 
 getsonglength(int fd, struct mp3entry *entry)
 {
+    unsigned int filetime = 0;
     unsigned long header=0;
     unsigned char tmp;
+    unsigned char frame[200];
+    unsigned int framecount;
+    
     int version;
     int layer;
     int bitindex;
@@ -402,7 +406,7 @@ getsonglength(int fd, struct mp3entry *entry)
     /* 
      * Some files are filled with garbage in the beginning, 
      * if the bitrate index of the header is binary 1111 
-     * that is a good is a good indicator
+     * that is a good indicator
      */
     if((header & 0xF000) == 0xF000)
         goto restart;
@@ -481,12 +485,39 @@ getsonglength(int fd, struct mp3entry *entry)
 	
     /* Calculate time per frame */
     tpf = bs[layer] / freqtab[version-1][freqindex] << (version - 1);
+        
+    /* OK, we have found a frame. Let's see if it has a Xing header */
+    if(read(fd, frame, 200) < 0)
+        return -1;
 
-    /* 
-     * Now song length is 
-     * ((filesize)/(bytes per frame))*(time per frame) 
-     */
-    return entry->filesize/bpf*tpf;
+    if(frame[32] == 'X' &&
+       frame[33] == 'i' &&
+       frame[34] == 'n' &&
+       frame[35] == 'g')
+    {
+        if(frame[39] & 0x01) /* Is the frame count there? */
+        {
+            framecount = (frame[40] << 24) | (frame[41] << 16) |
+                (frame[42] << 8) | frame[43];
+
+            filetime = framecount * tpf;
+        }
+        /* We don't care about the file size and the TOC just yet. Maybe
+           another time. */
+    }
+
+    /* If the file time hasn't been established, this may be a fixed
+       rate MP3, so just use the default formula */
+    if(filetime == 0)
+    {
+        /* 
+         * Now song length is 
+         * ((filesize)/(bytes per frame))*(time per frame) 
+         */
+        filetime = entry->filesize/bpf*tpf;
+    }
+
+    return filetime;
 }
 
 
