@@ -120,10 +120,20 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
+int backlight_get_timeout(void)
+{
+    return backlight_timeout;
+}
+
 void backlight_set_timeout(int seconds)
 {
     backlight_timeout = seconds;
     backlight_on();
+}
+
+bool backlight_get_on_when_charging(void)
+{
+    return backlight_on_when_charging;
 }
 
 void backlight_set_on_when_charging(bool yesno)
