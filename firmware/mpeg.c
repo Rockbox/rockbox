@@ -841,40 +841,9 @@ void hexdump(unsigned char *buf, int len)
 }
 #endif
 
-static void swap_one_chunk(void)
+static void start_playback_if_ready(void)
 {
-    int free_space_left;
-    int amount_to_swap;
-
-    free_space_left = get_unswapped_space();
-
-    if(free_space_left == 0 && !play_pending)
-        return;
-
-    /* Swap in larger chunks when the user is waiting for the playback
-       to start */
-    if(play_pending)
-        amount_to_swap = MIN(MPEG_LOW_WATER_CHUNKSIZE, free_space_left);
-    else
-        amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
-    
-    if(mp3buf_write < mp3buf_swapwrite)
-        amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
-                             amount_to_swap);
-    else
-        amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
-                             amount_to_swap);
-                
-    bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
-
-    mp3buf_swapwrite += amount_to_swap;
-    if(mp3buf_swapwrite >= mp3buflen)
-    {
-        mp3buf_swapwrite = 0;
-    }
-
-    /* And while we're at it, see if we have started
-       playing yet. If not, do it. */
+    /* See if we have started playing yet. If not, do it. */
     if(play_pending || dma_underrun)
     {
         /* If the filling has stopped, and we still haven't reached
@@ -900,6 +869,41 @@ static void swap_one_chunk(void)
     }
 }
 
+static bool swap_one_chunk(void)
+{
+    int free_space_left;
+    int amount_to_swap;
+
+    free_space_left = get_unswapped_space();
+
+    if(free_space_left == 0 && !play_pending)
+        return false;
+
+    /* Swap in larger chunks when the user is waiting for the playback
+       to start */
+    if(play_pending)
+        amount_to_swap = MIN(MPEG_LOW_WATER_CHUNKSIZE, free_space_left);
+    else
+        amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+    
+    if(mp3buf_write < mp3buf_swapwrite)
+        amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+                             amount_to_swap);
+    else
+        amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
+                             amount_to_swap);
+                
+    bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
+
+    mp3buf_swapwrite += amount_to_swap;
+    if(mp3buf_swapwrite >= mp3buflen)
+    {
+        mp3buf_swapwrite = 0;
+    }
+
+    return true;
+}
+
 static void mpeg_thread(void)
 {
     static int pause_tick = 0;
@@ -922,9 +926,8 @@ static void mpeg_thread(void)
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
-        if(get_unswapped_space())
+        if(swap_one_chunk())
         {
-            swap_one_chunk();
             queue_wait_w_tmo(&mpeg_queue, &ev, 0);
         }
         else
@@ -933,6 +936,8 @@ static void mpeg_thread(void)
                    mp3buf_read, mp3buf_write, mp3buf_swapwrite);
             queue_wait(&mpeg_queue, &ev);
         }
+
+        start_playback_if_ready();
         
         switch(ev.id)
         {
