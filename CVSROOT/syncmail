@@ -71,7 +71,7 @@ import time
 import getopt
 
 # Notification command
-MAILCMD = '/bin/mail -s "%(username): %(SUBJECT)s" %(PEOPLE)s 2>&1 > /dev/null'
+MAILCMD = '/bin/mail -s "%(username)s: %(SUBJECT)s" %(PEOPLE)s 2>&1 > /dev/null'
 
 # Diff trimming stuff
 DIFF_HEAD_LINES = 20
