@@ -59,18 +59,22 @@ if(! -d $dir or $help) {
 sub getdir {
     my ($dir) = @_;
 
-    opendir(DIR, $dir) || die "can't opendir $dir: $!";
-    #   my @mp3 = grep { /\.mp3$/ && -f "$dir/$_" } readdir(DIR);
-    my @all = readdir(DIR);
-    closedir DIR;
-    return @all;
+    if (opendir(DIR, $dir)) {
+        #   my @mp3 = grep { /\.mp3$/ && -f "$dir/$_" } readdir(DIR);
+        my @all = readdir(DIR);
+        closedir DIR;
+        return @all;
+    }
+    else {
+        warn "can't opendir $dir: $!\n";
+    }
 }
 
 sub extractmp3 {
     my ($dir, @files) = @_;
     my @mp3;
     for(@files) {
-        if( /\.mp3$/ && -f "$dir/$_" ) {
+        if( /\.mp[23]$/ && -f "$dir/$_" ) {
             push @mp3, $_;
         }
     }
