@@ -111,58 +111,6 @@ bool simulate_usb(void)
     return false;
 }
 
-static char patterns[8][7];
-
-void lcd_define_pattern(int which, char *pattern, int length)
-{
-    int i, j;
-    int pat = which / 8;
-    char icon[8];
-    memset(icon, 0, sizeof icon);
-    
-    DEBUGF("Defining pattern %d\n", pat);
-    for (j = 0; j <= 5; j++) {
-        for (i = 0; i < length; i++) {
-            if ((pattern[i])&(1<<(j)))
-                icon[5-j] |= (1<<(i));
-        }
-    }
-    for (i = 0; i <= 5; i++)
-    {
-        patterns[pat][i] = icon[i];
-    }
-}
-
-char* get_lcd_pattern(int which)
-{
-    DEBUGF("Get pattern %d\n", which);
-    return patterns[which];
-}
-
-extern void lcd_puts(int x, int y, unsigned char *str);
-
-void lcd_putc(int x, int y, unsigned char ch)
-{
-    static char str[2] = "x";
-    if (ch <= 8)
-    {
-        char* bm = get_lcd_pattern(ch);
-        lcd_bitmap(bm, x * 6, (y * 8) + 8, 6, 8, true);
-        return;
-    }
-    if (ch == 137) {
-        /* Have no good font yet. Simulate the cursor character. */
-        ch = '>';
-    }
-    str[0] = ch;
-    lcd_puts(x, y, str);
-}
-
-void lcd_set_contrast( int x )
-{
-    (void)x;
-}
-
 void backlight_set_timeout(int seconds)
 {
   (void)seconds;
@@ -213,12 +161,12 @@ bool oscillograph(void)
   return false;
 }
 
-void lcd_double_height(bool onoff)
-{
-    (void)onoff;
-}
-
 bool has_new_lcd(void)
 {
     return false;
+}
+
+void lcd_set_contrast( int x )
+{
+    (void)x;
 }
