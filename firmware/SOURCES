@@ -23,9 +23,10 @@ common/strtok.c
 common/timefuncs.c
 debug.c
 drivers/adc.c
-drivers/ata.c
 #ifdef HAVE_MMC
 drivers/ata_mmc.c
+#else
+drivers/ata.c
 #endif
 drivers/button.c
 drivers/dac.c

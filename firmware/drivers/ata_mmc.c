@@ -33,9 +33,6 @@
 
 #include "bitswap.h"
 
-/* use file for an MMC-based system, FIXME in makefile */
-#ifdef HAVE_MMC
-
 #define SECTOR_SIZE     512
 
 /* Command definitions */
@@ -701,6 +698,4 @@ int ata_init(void)
 
     return rc;
 }
-
-#endif /* #ifdef HAVE_MMC */
 

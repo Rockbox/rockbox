@@ -30,9 +30,6 @@
 #include "string.h"
 #include "hwcompat.h"
 
-/* skip whole file for an MMC-based system, FIXME in makefile */
-#ifndef HAVE_MMC 
-
 #if CONFIG_CPU == SCF5249
 
 /* don't use sh7034 assembler routines */
@@ -1202,5 +1199,3 @@ int ata_init(void)
 
     return 0;
 }
-
-#endif /* #ifndef HAVE_MMC */
