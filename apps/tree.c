@@ -1425,7 +1425,8 @@ static bool add_dir(char* dirname, int fd)
 {
     bool abort = false;
     char buf[MAX_PATH/2]; /* saving a little stack... */
-
+    DIR* dir;
+    
     /* check for user abort */
 #ifdef HAVE_PLAYER_KEYPAD
     if (button_get(false) == BUTTON_STOP)
@@ -1434,7 +1435,7 @@ static bool add_dir(char* dirname, int fd)
 #endif
         return true;
     
-    DIR* dir = opendir(dirname);
+    dir = opendir(dirname);
     if(!dir)
         return true;
 
