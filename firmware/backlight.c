@@ -186,6 +186,11 @@ void backlight_init(void)
     queue_init(&backlight_queue);
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
+                  
+#ifdef HAVE_LCD_CHARCELLS 
+    PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
+    or_b(0x40, &PAIORH); /* ..and output */
+#endif    
 
 #ifdef IRIVER_H100
     GPIO1_ENABLE  |= 0x00020000;
