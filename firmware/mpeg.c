@@ -1497,7 +1497,7 @@ static void mpeg_thread(void)
             case MPEG_FF_REWIND: {
                 struct mp3entry *id3  = mpeg_current_track();
                 unsigned int oldtime  = id3->elapsed;
-                unsigned int newtime  = oldtime + (int)ev.data;
+                unsigned int newtime  = (unsigned int)ev.data;
                 int curpos, newpos, diffpos;
                 DEBUGF("MPEG_FF_REWIND\n");
 
@@ -2450,12 +2450,12 @@ void mpeg_prev(void)
 #endif
 }
 
-void mpeg_ff_rewind(int change)
+void mpeg_ff_rewind(int newtime)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)change);
+    queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);
 #else
-    (void)change;
+    (void)newtime;
 #endif
 }
 

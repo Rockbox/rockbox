@@ -391,7 +391,7 @@ static bool ffwd_rew(int button)
 
             case BUTTON_LEFT | BUTTON_REL:
             case BUTTON_RIGHT | BUTTON_REL: 
-                mpeg_ff_rewind(ff_rewind_count);
+                mpeg_ff_rewind(id3->elapsed+ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;
                 if (paused)
@@ -855,7 +855,7 @@ int wps_show(void)
                     if (!paused)
                         mpeg_pause();
 
-                    mpeg_ff_rewind(-(id3->elapsed));
+                    mpeg_ff_rewind(0);
 
                     if (!paused)
                         mpeg_resume();

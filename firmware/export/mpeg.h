@@ -67,7 +67,7 @@ void mpeg_pause(void);
 void mpeg_resume(void);
 void mpeg_next(void);
 void mpeg_prev(void);
-void mpeg_ff_rewind(int change);
+void mpeg_ff_rewind(int newtime);
 void mpeg_flush_and_reload_tracks(void);
 void mpeg_sound_set(int setting, int value);
 int mpeg_sound_min(int setting);
