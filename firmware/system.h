@@ -38,14 +38,20 @@
 #define SWAB32(x) (x)
 #else
 #define SWAB16(x) \
-         (((x & 0x00ff) << 8) | \
-	  ((x & 0xff00) >> 8))
+({ \
+        unsigned short __x = x; \
+        (((__x & 0x00ff) << 8) | \
+         ((__x & 0xff00) >> 8)); \
+})
 
 #define SWAB32(x) \
-         (((x & 0x000000ff) << 24) | \
-	  ((x & 0x0000ff00) << 8) | \
-	  ((x & 0x00ff0000) >> 8) | \
-	  ((x & 0xff000000) >> 24))
+({ \
+        unsigned long __x = x; \
+        (((__x & 0x000000ff) << 24) | \
+         ((__x & 0x0000ff00) << 8) | \
+         ((__x & 0x00ff0000) >> 8) | \
+         ((__x & 0xff000000) >> 24)); \
+})
 #endif
 
 #define nop \
