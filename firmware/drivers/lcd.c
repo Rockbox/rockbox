@@ -358,10 +358,6 @@ void lcd_double_height(bool on)
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR) /* not CHARCELLS */
 
-#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
-#include <chardef.h>
-#endif
-
 /*
  * All bitmaps have this format:
  * Bits within a byte are arranged veritcally, LSB at top.
@@ -732,10 +728,6 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
         *height = fontheight[font];
     }
 }
-
-#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
-#include <charundef.h>
-#endif
 
 #else
 /* no LCD defined, no code to use */
