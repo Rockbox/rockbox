@@ -1242,7 +1242,7 @@ static bool dbg_disk_info(void)
     bool done = false;
     int i;
     int page = 0;
-    const int max_page = 4;
+    const int max_page = 7;
     unsigned short* identify_info = ata_get_identify();
 
     while(!done)
@@ -1296,6 +1296,24 @@ static bool dbg_disk_info(void)
                 snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
                 lcd_puts(0, y++, "Spinup time");
                 lcd_puts(0, y++, buf);
+                break;
+
+            case 5:
+                i = identify_info[83] & (1<<3);
+                lcd_puts(0, y++, "Power mgmt:");
+                lcd_puts(0, y++, i ? "enabled" : "unsupported");
+                break;
+
+            case 6:
+                i = identify_info[83] & (1<<9);
+                lcd_puts(0, y++, "Noise mgmt:");
+                lcd_puts(0, y++, i ? "enabled" : "unsupported");
+                break;
+
+            case 7:
+                i = identify_info[82] & (6<<3);
+                lcd_puts(0, y++, "Read-ahead:");
+                lcd_puts(0, y++, i ? "enabled" : "unsupported");
                 break;
         }
         lcd_update();
