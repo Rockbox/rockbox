@@ -697,7 +697,7 @@ static int new_file(int steps)
             {
                 /* skip past id3v2 tag (to an even byte) */
                 lseek(mpeg_file, 
-                      id3tags[new_tag_idx]->id3.id3v2len & ~1, 
+                      id3tags[new_tag_idx]->id3.id3v2len,
                       SEEK_SET);
                 id3tags[new_tag_idx]->id3.index = steps;
                 id3tags[new_tag_idx]->id3.offset = 0;
@@ -742,6 +742,23 @@ static void track_change(void)
 
     update_playlist();
 }
+
+#ifdef DEBUG
+void hexdump(unsigned char *buf, int len)
+{
+    int i;
+
+    for(i = 0;i < len;i++)
+    {
+        if(i && (i & 15) == 0)
+        {
+            DEBUGF("\n");
+        }
+        DEBUGF("%02x ", buf[i]);
+    }
+    DEBUGF("\n");
+}
+#endif
 
 static void mpeg_thread(void)
 {
@@ -1239,13 +1256,17 @@ static void mpeg_thread(void)
                            boundary when we reach the end of the file */
                         if (len < amount_to_read) {
                             /* Skip id3v1 tag */
+                            DEBUGF("Skipping ID3v1 tag\n");
                             len -= id3tags[tag_read_idx]->id3.id3v1len;
+                            /* The very rare case when the buffer wrapped
+                               inside the tag must be taken care of */
                             if(len < 0)
                                 len = 0;
                             len = (len + 1) & 0xfffffffe;
                         }
-                        
+
                         mp3buf_write += len;
+                        
                         if(mp3buf_write >= mp3buflen)
                         {
                             mp3buf_write = 0;
