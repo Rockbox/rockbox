@@ -123,3 +123,39 @@ int create_thread(void* fp, void* sp, int stk_size)
     }
     return 0;
 }
+
+struct event
+{
+    int id;
+    void *data;
+};
+
+struct event_queue
+{
+    struct event events[16];
+    unsigned int read;
+    unsigned int write;
+};
+
+void queue_init(struct event_queue *q)
+{
+    q->read = 0;
+    q->write = 0;
+}
+
+struct event *wait_queue(struct event_queue *q)
+{
+    while(q->read == q->write)
+    {
+	switch_thread();
+    }
+
+    return &q->events[q->read++];
+}
+
+void post_queue(struct event_queue *q, int id, void *data)
+{
+    q->events[q->write].id = id;
+    q->events[q->write].data = data;
+    q->write++;
+}
