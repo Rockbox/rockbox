@@ -1,3 +1,4 @@
+# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -136,8 +137,6 @@ new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Batt. Low?"
 eng: "Partition?"
 new: "Akku leer?"
 
@@ -148,8 +147,6 @@ new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-### English phrase was changed! Previous translation was made on:
-### "Is Battery Low?"
 eng: "No partition?"
 new: "Akku leer?"
 
@@ -430,15 +427,11 @@ new: "(PLAY/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-### English phrase was changed! Previous translation was made on:
-### "PLAY = Yes"
 eng: ""
 new: "PLAY = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-### English phrase was changed! Previous translation was made on:
-### "Any Other = No"
 eng: ""
 new: "Sonstige = Nein"
 
@@ -664,162 +657,116 @@ new: "[PLAY] Start/Pause"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-### English phrase was changed! Previous translation was made on:
-### "Level"
 eng: ""
 new: "Level"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-### English phrase was changed! Previous translation was made on:
-### "Moves"
 eng: ""
 new: "Bewg."
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-### English phrase was changed! Previous translation was made on:
-### "YOU WIN!!"
 eng: ""
 new: "GEWONNEN!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-### English phrase was changed! Previous translation was made on:
-### "[OFF] To Stop"
 eng: ""
 new: "[OFF] beenden"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-### English phrase was changed! Previous translation was made on:
-### "[F1] - Level"
 eng: ""
 new: "[F1] - Level"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-### English phrase was changed! Previous translation was made on:
-### "[F2] Same Level"
 eng: ""
 new: "[F2] gl. Level"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-### English phrase was changed! Previous translation was made on:
-### "[F3] + Level"
 eng: ""
 new: "[F3] + Level"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Len:%d"
 eng: ""
 new: "Län:%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-### English phrase was changed! Previous translation was made on:
-### "Growing"
 eng: ""
 new: "Wachse"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Hungry"
 eng: ""
 new: "Hungrig"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Wormed"
 eng: ""
 new: "Gewurmt"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Argh"
 eng: ""
 new: "Argh"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Crashed"
 eng: ""
 new: "Unfall!"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Hs: %d"
 eng: ""
 new: "Hs: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "%d Players    UP/DN"
 eng: ""
 new: "%d Spieler    UP/DN"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "%d Worms        L/R"
 eng: ""
 new: "%d Würmer       L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Remote Control F1"
 eng: ""
 new: "Fernsteuerung  F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "No Rem. Control F1"
 eng: ""
 new: "Keine Fernst.   F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "2 Key Control   F1"
 eng: ""
 new: "2 Tastenkontr.  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "4 Key Control   F1"
 eng: ""
 new: "4 Tastenkontr.  F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-### English phrase was changed! Previous translation was made on:
-### "Out Of Control"
 eng: ""
 new: "Ohne Kontrolle"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-### English phrase was changed! Previous translation was made on:
-### "You Lose!"
 eng: ""
 new: "Verloren!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-### English phrase was changed! Previous translation was made on:
-### "Rows - Level"
 eng: ""
 new: "Reihen - Level"
 
@@ -1319,15 +1266,11 @@ eng: "OK"
 new: "OK"
 
 id: LANG_PLAYER_ONPLAY_1
-### Description changed! Previous description was:
-### ""
 desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
 new: "\x81 Warteschlange"
 
 id: LANG_PLAYER_ONPLAY_2
-### Description changed! Previous description was:
-### ""
 desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
 new: "- Umb + Ent"
@@ -1542,121 +1485,6 @@ desc: (player) the jump scroll shall be done "always"
 eng: "Always"
 new: "Immer"
 
-id: LANG_AUTO_BOOKMARK_QUERY
-desc: prompt for user to decide to create an bookmark
-eng: "Create a Bookmark?"
-new: "Lesezeichen erstellen?"
-
-id: LANG_BOOKMARK_AUTOLOAD_QUERY
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark?"
-new: "Letztes Lesezeichen laden?"
-
-id: LANG_BOOKMARK_CREATE_FAILURE
-desc: Indicates bookmark was not created
-eng: "Bookmark Failed!"
-new: "Lesezeichen Fehler!"
-
-id: LANG_BOOKMARK_CREATE_SUCCESS
-desc: Indicates bookmark was successfully created
-eng: "Bookmark Created"
-new: "Lesezeichen angelegt"
-
-id: LANG_BOOKMARK_LOAD_EMPTY
-desc: Indicates bookmark was empty
-eng: "Bookmark Empty"
-new: "Lesezeichen leer"
-
-id: LANG_BOOKMARK_MENU
-desc: Text on main menu to get to bookmark commands
-eng: "Bookmarks"
-new: "Lesezeichen"
-
-id: LANG_BOOKMARK_MENU_CREATE
-desc: Used off of the bookmark menu to create a bookmark
-eng: "Create Bookmark"
-new: "Lesezeichen anlegen"
-
-id: LANG_BOOKMARK_MENU_LIST
-desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
-eng: "List Bookmarks"
-new: "Lesezeichen auflisten"
-
-id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-desc: Text for the menu text to access the most recent bookmarks list
-eng: "Recent Bookmarks"
-new: "Letzte Lesezeichen"
-
-id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-desc: Used on the bookmark select window to label bookmark number
-eng: "Bookmark"
-new: "Lesezeichen"
-
-id: LANG_BOOKMARK_SELECT_DELETE
-desc: Used on the bookmark select window to indicated the bookmark delete option
-eng: "ON+Play to Delete"
-new: "ON+PLAY = Löschen"
-
-id: LANG_BOOKMARK_SELECT_EXIT
-desc: From the bookmark list screen, allows user to exit
-eng: "LEFT = Exit"
-new: "LINKS = Verlassen"
-
-id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-desc: Used on the bookmark select window to label index number
-eng: "Index"
-new: "Index"
-
-id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-desc: From the auto-load screen, allows user to list all bookmarks
-eng: "Down = List"
-new: "UNTEN = Liste"
-
-id: LANG_BOOKMARK_SELECT_PLAY
-desc: Used on the bookmark select window to indicated the play option
-eng: "PLAY to Select"
-new: "PLAY = Auswählen"
-
-id: LANG_BOOKMARK_SELECT_TIME_TEXT
-desc: Used on the bookmark select window to label elapsed time
-eng: "Time"
-new: "Zeit"
-
-id: LANG_BOOKMARK_SETTINGS
-desc: in general settings
-eng: "Bookmarking"
-new: "Lesezeichen"
-
-id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
-desc: prompt for user to decide to create an bookmark
-eng: "Bookmark on Stop"
-new: "Lesezeichen beim Stoppen"
-
-id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark"
-new: "Letztes Lesezeichen laden"
-
-id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
-desc: Configuration option to maintain a list of recent bookmarks
-eng: "Maintain a List of Recent Bookmarks?"
-new: "Liste mit zuletzt benutzten Lesezeichen verwalten?"
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
-desc: Save in recent bookmarks only
-eng: "Recent only - Ask"
-new: "Nur letzte - Fragen"
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
-desc: Save in recent bookmarks only
-eng: "Recent only - Yes"
-new: "Nur letzte - Ja"
-
-id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-desc: Save only on bookmark for each playlist in recent bookmarks
-eng: "Unique only"
-new: "Nur einmalig"
-
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
@@ -1856,3 +1684,103 @@ id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 new: "STOP zum Abbrechen"
+
+id: LANG_BUTTONBAR_MENU
+desc: in button bar
+eng: "Menu"
+new: "Menü"
+
+id: LANG_BUTTONBAR_OPTIONS
+desc: in button bar
+eng: "Option"
+new: "Option"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Kfz-Adapter Modus"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Einstellungen"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Zeichensätze"
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Firmware"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc: in button bar
+eng: "Preset"
+new: "Sender"
+
+id: LANG_FM_DELETE_PRESET
+desc: in radio screen
+eng: "Remove preset"
+new: "Sender entfernen"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc: in radio screen
+eng: "The preset list is full"
+new: "Die Senderliste ist voll"
+
+id: LANG_FM_NO_PRESETS
+desc: in radio screen
+eng: "The preset list is empty"
+new: "Die Senderliste ist leer"
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc: in radio screen
+eng: "Preset save failed"
+new: "Sender speichern fehlgeschlagen"
+
+id: LANG_FM_SAVE_PRESET
+desc: in radio screen
+eng: "Save preset"
+new: "Sender speichern"
+
+id: LANG_FM_STATION
+desc: in radio screen
+eng: "Station: %d.%dMHz"
+new: "Sender: %d.%dMHz"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Sprache"
+
+id: LANG_LINE_IN
+desc: in settings_menu
+eng: "Line In"
+new: "Line In"
+
+id: LANG_NO_FILES
+desc: in settings_menu
+eng: "No files"
+new: "Keine Dateien"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Plugins"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "While Playing Screen"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc: in main menu
+eng: "Record"
+new: "Aufnehmen"
+
+id: LANG_FM_RADIO
+desc: in main menu
+eng: "FM Radio"
+new: "FM Radio"

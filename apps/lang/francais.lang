@@ -1,6 +1,6 @@
-# francais.lang 2003/11/05
+# $Id$
 #
-# Based on file english.lang,v 1.91 2003/11/04 16:47:05 linusnielsen Exp $
+# Based on file english.lang,v 1.92 2003/11/20 00:33:43 linusnielsen
 #
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -1183,7 +1183,7 @@ new: "Limite de défilement bidirectionnel"
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-new: "Délai avant début du défilement"
+new: "Délai avant défilement"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
@@ -1218,7 +1218,7 @@ new: "Batterie: Charge persistante"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "Capacité de la batterie"
+new: "Capacité de batterie"
 
 id: LANG_QUEUE_QUEUED
 desc: queued track name %s
@@ -1808,3 +1808,13 @@ id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
 eng: "The preset list is full"
 new: "liste de pré-selections pleine"
+
+id: LANG_FM_RADIO
+desc:  in main menu
+eng: "FM Radio"
+new: "Radio FM"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc:  in main menu
+eng: "Record"
+new: "Enreg."
