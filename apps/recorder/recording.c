@@ -471,6 +471,7 @@ bool recording_screen(void)
             case REC_F2:
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
+                    invert_led(false);
                     if (f2_rec_screen())
                     {
                         have_recorded = true;
@@ -493,6 +494,7 @@ bool recording_screen(void)
                 {
                     if(mpeg_status() != MPEG_STATUS_RECORD)
                     {
+                        invert_led(false);
                         if (f3_rec_screen())
                         {
                             have_recorded = true;
