@@ -128,6 +128,7 @@ static int showdir(char *path, int start)
         qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
     }
 
+    lcd_stop_scroll();
 #ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(false);
 #endif
@@ -266,7 +267,6 @@ bool dirbrowse(char *root)
                     }
                     else
                         start = dircursor = 0;
-                    lcd_stop_scroll();
                     numentries = showdir(currdir, start);
                     lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 }
