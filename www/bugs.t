@@ -23,6 +23,8 @@
 <li>If you don't have a SF account, sign the report with your email.
 </ol>
 
+<p><b>Don't file "bug reports" that really are support questions!</b> Ask on <a href="/mail/">the mailing list</a> or in <a href="/irc/">IRC</a> instead.
+
 <p><a href="http://sourceforge.net/tracker/?func=add&group_id=44306&atid=439118">Click here to submit a new bug report</a>.
 
 #include "foot.t"
