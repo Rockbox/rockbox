@@ -31,9 +31,12 @@ extern long cpu_frequency;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define FREQ cpu_frequency
+void set_cpu_frequency(long frequency);
+void cpu_boost(bool on_off);
 #else
 #define FREQ CPU_FREQ
 #endif
+
 #define BAUDRATE 9600
 
 #ifndef NULL
@@ -199,9 +202,6 @@ static inline void invalidate_icache(void)
 #define CPUFREQ_NORMAL 47980800
 #define CPUFREQ_MAX 95961600
 
-void set_cpu_frequency(long frequency);
-void cpu_boost(bool on_off);
-
 #elif CONFIG_CPU == TCC730
 
 extern int smsc_version(void);
@@ -253,6 +253,18 @@ static inline unsigned long SWAB32(unsigned long value)
     unsigned long lo = SWAB16(value & 0xffff);
     return (lo << 16) | hi;
 }
+
+/* Archos uses:
+
+22MHz: busy wait on dma
+32MHz: normal
+80Mhz: heavy load
+
+*/
+
+#define CPUFREQ_DEFAULT CPU_FREQ
+#define CPUFREQ_NORMAL (32000000)
+#define CPUFREQ_MAX    (80000000)
 
 #define invalidate_icache()
 

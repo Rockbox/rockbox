@@ -28,13 +28,43 @@
 long cpu_frequency = CPU_FREQ;
 #endif
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void cpu_boost(bool on_off)
+{
+    static int counter = 0;
+    if(on_off)
+    {
+        /* Boost the frequency if not already boosted */
+        if(counter++ == 0)
+        {
+            set_cpu_frequency(CPUFREQ_MAX);
+        }
+    }
+    else
+    {
+        /* Lower the frequency if the counter reaches 0 */
+        if(--counter == 0)
+        {
+            set_cpu_frequency(CPUFREQ_NORMAL);
+        }
+
+        /* Safety measure */
+        if(counter < 0)
+            counter = 0;
+    }
+}
+#endif
+
 #if CONFIG_CPU == TCC730
 
 void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
 
-void ddma_wait_idle(void)  __attribute__ ((section (".icode")));
-void ddma_wait_idle(void)
+static void ddma_wait_idle(void)  __attribute__ ((section (".icode")));
+static void ddma_wait_idle(void)
 {
+    /* TODO: power saving trick: set the CPU freq to 22MHz
+       while doing the busy wait after a disk dma access.
+       (Used by Archos) */
     do {
     } while ((DDMACOM & 3) != 0);
 }
@@ -90,7 +120,7 @@ extern int icodecopy;
 extern int icodesize;
 extern int icodestart;
 
-/* change the CPU frequency */
+/* change the a PLL frequency */
 void set_pll_freq(int pll_index, long freq_out) {
     volatile unsigned int* plldata;
     volatile unsigned char* pllcon;
@@ -127,7 +157,7 @@ int smsc_version(void) {
 void smsc_delay() {
     int i;
     /* FIXME: tune the delay.
-       !!! Delay should depend on CPU speed !!!
+       Delay doesn't depend on CPU speed in Archos' firmware.
     */
     for (i = 0; i < 100; i++) {
         
@@ -162,6 +192,24 @@ static void extra_init(void) {
     }
 }
 
+void set_cpu_frequency(long frequency) {
+    /* Enable SDRAM refresh, at least 15MHz */
+    if (frequency < cpu_frequency)
+        MIUDCNT = 0x800 | (frequency * 15/1000000L - 1);
+
+    set_pll_freq(0, frequency);
+    PLL0CON |= 0x4; /* use as CPU clock */
+
+    cpu_frequency = frequency;
+    /* wait states and such not changed by Archos. (!?) */
+
+    /* Enable SDRAM refresh, 15MHz. */
+    MIUDCNT = 0x800 | (frequency * 15/1000000L - 1);
+
+    tick_start(1000/HZ);
+    /* TODO: when uart is done; sync uart freq */
+}
+
 /* called by crt0 */
 void system_init(void)
 {
@@ -189,12 +237,8 @@ void system_init(void)
     
     
     /* PLL0 (cpu osc. frequency) */
-    
-#if 0
-    set_pll_freq(0, CPU_FREQ);
-    PLL0CON |= 0x4; /* use as CPU clock */
+    /* set_cpu_frequency(CPU_FREQ); */
 
-#endif
 
     /*******************
      * configure S(D)RAM 
@@ -236,6 +280,8 @@ void system_init(void)
 
     extra_init();
 }
+
+
 
 #elif CONFIG_CPU == MCF5249
 
@@ -478,30 +524,6 @@ void set_cpu_frequency(long frequency)
     }
 }
 
-void cpu_boost(bool on_off)
-{
-    static int counter = 0;
-    if(on_off)
-    {
-        /* Boost the frequency if not already boosted */
-        if(counter++ == 0)
-        {
-            set_cpu_frequency(CPUFREQ_MAX);
-        }
-    }
-    else
-    {
-        /* Lower the frequency if the counter reaches 0 */
-        if(--counter == 0)
-        {
-            set_cpu_frequency(CPUFREQ_NORMAL);
-        }
-
-        /* Safety measure */
-        if(counter < 0)
-            counter = 0;
-    }
-}
 
 #elif CONFIG_CPU == SH7034
 #include "led.h"
