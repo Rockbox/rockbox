@@ -1598,13 +1598,13 @@ static void mpeg_thread(void)
                 {
                     case MPEG_RECORD:
                         DEBUGF("Recording...\n");
+                        reset_mp3_buffer();
+                        start_recording();
+                        demand_irq_enable(true);
                         mpeg_file = open((char *)ev.data,
                                          O_WRONLY | O_TRUNC | O_CREAT);
                         if(mpeg_file < 0)
                             panicf("recfile: %d", mpeg_file);
-                        reset_mp3_buffer();
-                        start_recording();
-                        demand_irq_enable(true);
                         break;
 
                     case MPEG_STOP:
@@ -1648,7 +1648,9 @@ static void mpeg_thread(void)
                         {
                             amount_to_save += mp3buflen;
                         }
-                        
+
+                        DEBUGF("r: %x w: %x\n", mp3buf_read, mp3buf_write);
+                        DEBUGF("ats: %x\n", amount_to_save);
                         /* Save data only if the buffer is getting full,
                            or if we should stop recording */
                         if(amount_to_save)
@@ -1656,12 +1658,16 @@ static void mpeg_thread(void)
                             if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
                                stop_pending)
                             {
+                                int rc;
+                                
                                 /* Only save up to the end of the buffer */
                                 writelen = MIN(amount_to_save,
                                                mp3buflen - mp3buf_read);
-                                
-                                write(mpeg_file, mp3buf + mp3buf_read,
-                                      writelen);
+
+                                DEBUGF("wrl: %x\n", writelen);
+                                rc = write(mpeg_file, mp3buf + mp3buf_read,
+                                           writelen);
+                                DEBUGF("rc: %x\n", rc);
                                 
                                 mp3buf_read += amount_to_save;
                                 if(mp3buf_read >= mp3buflen)
