@@ -145,8 +145,6 @@ eng: "Is battery low?"
 new: "Batterie faible ?"
 
 id: LANG_TIME_SET
-### Description changed! Previous description was:
-### "if save settings has failed"
 desc: 
 eng: "ON to set"
 new: "ON pour valider"
@@ -417,22 +415,16 @@ eng: "Resume?"
 new: "Reprendre ?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
-### Description changed! Previous description was:
-### "posible answers to resume question"
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(LECT/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
-### Description changed! Previous description was:
-### "posible answer to resume question"
 desc: possible answer to resume question
 eng: "PLAY = Yes"
 new: "Lecture = Oui"
 
 id: LANG_RESUME_CANCEL_RECORDER
-### Description changed! Previous description was:
-### "posible answer to resume question"
 desc: possible answer to resume question
 eng: "Any Other = No"
 new: "les autres = Non"
@@ -996,3 +988,13 @@ id: LANG_OSCILLOGRAPH
 desc: the name of the oscillograph demo in the demo menu
 eng: "Oscillograph"
 new: "Oscillographe"
+
+id: LANG_BACKLIGHT_ON
+desc: in settings_menu
+eng: ""
+new: ""
+
+id: LANG_RESUME_SETTING_ASK_ONCE
+desc: in settings_menu
+eng: "Ask Once"
+new: "demander une fois"
