@@ -259,6 +259,73 @@ tImageHeader* GetSecondImage(void)
 }
 
 
+/* Tool function to calculate a CRC32 across some buffer */
+/* third argument is either 0xFFFFFFFF to start or value from last piece */
+UINT32 crc_32(unsigned char* buf, unsigned len, unsigned crc32)
+{
+    /* CCITT standard polynomial 0x04C11DB7 */
+    static const UINT32 crc32_lookup[16] = 
+    {   /* lookup table for 4 bits at a time is affordable */
+        0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 
+        0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005, 
+        0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61, 
+        0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD
+    };
+    
+    unsigned char byte;
+    UINT32 t;
+
+    while (len--)
+    {   
+        byte = *buf++; /* get one byte of data */
+
+        /* upper nibble of our data */
+        t = crc32 >> 28; /* extract the 4 most significant bits */
+        t ^= byte >> 4; /* XOR in 4 bits of data into the extracted bits */
+        crc32 <<= 4; /* shift the CRC register left 4 bits */     
+        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
+
+        /* lower nibble of our data */
+        t = crc32 >> 28; /* extract the 4 most significant bits */
+        t ^= byte & 0x0F; /* XOR in 4 bits of data into the extracted bits */
+        crc32 <<= 4; /* shift the CRC register left 4 bits */     
+        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
+    }
+    
+    return crc32;
+}
+
+
+/* test if the bootloader is up-to-date, returns 0 if yes, else CRC */
+unsigned CheckBootloader(void)
+{
+    unsigned crc;
+    UINT32* pFlash = (UINT32*)FB;
+
+    /* checksum the bootloader, unfortunately I have no version info yet */
+    crc = crc_32((unsigned char*)pFlash[2], pFlash[3], -1);
+
+    /* Here I have to check for ARCHOS_* defines in source code, which is 
+       generally strongly discouraged. But here I'm not checking for a certain 
+       feature, I'm checking for the model itself. */
+#if defined(ARCHOS_PLAYER)
+    if (crc == 0x78DAC94A)
+        return 0;
+#elif defined(ARCHOS_RECORDER)
+    if (crc == 0xE968702E || crc == 0x7C3D93B4) /* normal or ROMless each */
+        return 0;
+#elif defined(ARCHOS_RECORDERV2)
+    if (crc == 0x4511E9B5 || crc == 0x3A93DBDF)
+        return 0;
+#elif defined(ARCHOS_FMRECORDER)
+    if (crc == 0x4511E9B5 || crc == 0x3A93DBDF)
+        return 0;
+#endif
+
+    return crc;
+}
+
+
 /*********** Image File Functions ************/
 
 /* so far, only compressed images in UCL NRV algorithm 2e supported */
@@ -532,6 +599,7 @@ void DoUserDialog(char* filename, bool show_greet)
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
     int memleft;
+    UINT32 crc;
     
     rb->lcd_setfont(FONT_SYSFIXED);
 
@@ -558,6 +626,27 @@ void DoUserDialog(char* filename, bool show_greet)
     {
         rb->splash(HZ*3, true, "No image");
         return; /* exit */
+    }
+
+    crc = CheckBootloader();
+    if (crc) /* outdated version found */
+    {
+        rb->snprintf(buf, sizeof(buf), " (CRC=0x%08x) ", crc);
+        rb->lcd_puts(0, 0, buf);
+        rb->lcd_puts(0, 1, "Hint: You're not  ");
+        rb->lcd_puts(0, 2, "using the latest  ");
+        rb->lcd_puts(0, 3, "bootloader.       ");
+        rb->lcd_puts(0, 4, "A full reflash is ");
+        rb->lcd_puts(0, 5, "recommended, but  ");
+        rb->lcd_puts(0, 6, "not required.     ");
+        rb->lcd_puts(0, 7, "Press F1 to ignore");
+        rb->lcd_update();
+
+        if (WaitForButton() != BUTTON_F1)
+        {
+            return;
+        }
+        rb->lcd_clear_display();
     }
     
     if (show_greet)
@@ -710,6 +799,7 @@ void DoUserDialog(char* filename, bool show_greet)
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
     int memleft;
+    UINT32 crc;
 
     /* "allocate" memory */
     sector = rb->plugin_get_buffer(&memleft);
@@ -739,6 +829,19 @@ void DoUserDialog(char* filename, bool show_greet)
         return; /* exit */
     }
     
+    crc = CheckBootloader();
+    if (crc) /* outdated version found */
+    {
+        rb->lcd_puts_scroll(0, 0, "Hint: You're not using the latest bootloader. A full reflash is recommended, but not required.");
+        rb->lcd_puts_scroll(0, 1, "Press [Menu] to ignore");
+
+        if (WaitForButton() != BUTTON_MENU)
+        {
+            return;
+        }
+        rb->lcd_clear_display();
+    }
+
     if (show_greet)
     {
         rb->snprintf(buf, sizeof(buf), "File: %s", filename);
