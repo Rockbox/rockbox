@@ -2858,10 +2858,10 @@ eng: "Custom"
 voice: "Angepasst"
 new: "Angepasst"
 
- id: LANG_FILTER_ID3DB
+id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
-voice: "ID3 database"
+voice: "ID3-Datenbank"
 new: "ID3-Datenbank"
 
 id: LANG_ID3DB_ARTISTS
