@@ -410,10 +410,10 @@ int fat_mount(int startsector)
     }
 
     LDEBUGF("Freecount: %d\n",fat_bpb.fsinfo.freecount);
-    LDEBUGF("Nextfree: %x\n",fat_bpb.fsinfo.nextfree);
-    LDEBUGF("Cluster count: %x\n",fat_bpb.dataclusters);
+    LDEBUGF("Nextfree: 0x%x\n",fat_bpb.fsinfo.nextfree);
+    LDEBUGF("Cluster count: 0x%x\n",fat_bpb.dataclusters);
     LDEBUGF("Sectors per cluster: %d\n",fat_bpb.bpb_secperclus);
-    LDEBUGF("FAT sectors: %x\n",fat_bpb.fatsize);
+    LDEBUGF("FAT sectors: 0x%x\n",fat_bpb.fatsize);
 
     return 0;
 }
@@ -550,10 +550,6 @@ static unsigned int find_free_cluster(unsigned int startcluster)
     unsigned int offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
     unsigned int i;
 
-    /* don't waste time scanning if the disk is already full */
-    if (!fat_bpb.fsinfo.freecount)
-        return 0;
-
     for (i = 0; i<fat_bpb.fatsize; i++) {
         unsigned int j;
         unsigned int nr = (i + sector) % fat_bpb.fatsize;
@@ -600,7 +596,8 @@ static int update_fat_entry(unsigned int entry, unsigned int val)
     fat_cache[(sector + fat_bpb.bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
 
     if ( val ) {
-        if (!(SWAB32(sec[offset]) & 0x0fffffff))
+        if (!(SWAB32(sec[offset]) & 0x0fffffff) &&
+            fat_bpb.fsinfo.freecount > 0)
             fat_bpb.fsinfo.freecount--;
     }
     else {
@@ -1547,6 +1544,8 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
                        we want to append to the file */
                     cluster = oldcluster;
                     clusternum--;
+                    i = -1; /* Error code */
+                    break;
                 }
             }
             else
@@ -1598,6 +1597,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     if (eof)
         i--;
 
+    DEBUGF("Sectors written: %d\n", i);
     return i;
 }
 
