@@ -30,6 +30,7 @@
 #define TREE_ATTR_TXT 0x500 /* text file */
 #define TREE_ATTR_FONT 0x800 /* font file */
 #define TREE_ATTR_LNG  0x1000 /* binary lang file */
+#define TREE_ATTR_ROCK 0x2000 /* binary rockbox plugin */
 #define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 void tree_init(void);

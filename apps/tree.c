@@ -46,12 +46,12 @@
 #include "rolo.h"
 #include "icons.h"
 #include "lang.h"
-#include "viewer.h"
 #include "language.h"
 #include "screens.h"
 #include "keyboard.h"
 #include "onplay.h"
 #include "buffer.h"
+#include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -318,6 +318,8 @@ static int showdir(char *path, int start)
                 else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
 #endif
                     dptr->attr |= TREE_ATTR_MOD;
+                else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
+                    dptr->attr |= TREE_ATTR_ROCK;
             }
 
             /* filter out all non-playlist files */
@@ -466,6 +468,10 @@ static int showdir(char *path, int start)
 
             case TREE_ATTR_MOD:
                 icon_type = Mod_Ajz;
+                break;
+
+            case TREE_ATTR_ROCK:
+                icon_type = Plugin;
                 break;
 
 #ifdef HAVE_LCD_BITMAP
@@ -962,7 +968,7 @@ bool dirbrowse(char *root)
                             break;
 
                         case TREE_ATTR_TXT:
-                            viewer_run(buf);
+                            plugin_load("/.rockbox/rocks/viewer.rock",buf);
                             restore = true;
                             break;
 
@@ -998,6 +1004,14 @@ bool dirbrowse(char *root)
                             rolo_load(buf);
                             break;
 #endif
+
+                            /* plugin file */
+                        case TREE_ATTR_ROCK:
+                            if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
+                                reload_root = true;
+                            else
+                                restore = true;
+                            break;
                     }
 
                     if ( play ) {
@@ -1194,6 +1208,7 @@ bool dirbrowse(char *root)
             /* the sub-screen might've ruined the margins */
             lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and
                                                   icon */
+            lcd_setfont(FONT_UI);
 #endif
             numentries = showdir(currdir, dirstart);
             update_all = true;

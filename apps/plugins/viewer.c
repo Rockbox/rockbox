@@ -17,24 +17,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-#include "file.h"
-#include "lcd.h"
-#include "button.h"
-#include "kernel.h"
-#include "font.h"
-#include "settings.h"
-#include "icons.h"
-#include "screens.h"
-#include "status.h"
-
+#include "plugin.h"
 
 #define BUFFER_SIZE 1024
-
 #define OUTSIDE_BUFFER -10
 #define OUTSIDE_FILE   -11
 
@@ -50,6 +35,7 @@ static int begin_line; /* Index of the first line displayed on the lcd */
 static int end_line;   /* Index of the last line displayed on the lcd */
 static int begin_line_pos; /* Position of the first_line in the bufffer */
 static int end_line_pos; /* Position of the last_line in the buffer */
+static struct plugin_api* rb;
 
 /*
  * Known issue: The caching algorithm will fail (display incoherent data) if
@@ -61,7 +47,7 @@ static void display_line_count(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int w,h;
-    lcd_getstringsize("M", &w, &h);
+    rb->lcd_getstringsize("M", &w, &h);
     display_lines = LCD_HEIGHT / h;
     display_columns = LCD_WIDTH / w;
 #else
@@ -126,7 +112,7 @@ static void viewer_draw(int col)
     char* str;
     int line_pos;
 
-    lcd_clear_display();
+    rb->lcd_clear_display();
 
     line_pos = begin_line_pos;
 
@@ -137,11 +123,12 @@ static void viewer_draw(int col)
         str = buffer + line_pos + 1;
         for (j=0; j<col && *str!=0; ++j)
             str++;
-        lcd_puts(0, i, str);
+        rb->lcd_puts(0, i, str);
         line_pos = find_next_line(line_pos);
     }
-
-    lcd_update();
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_update();
+#endif
 }
 
 static void fill_buffer(int pos)
@@ -154,8 +141,8 @@ static void fill_buffer(int pos)
     if (pos<0)
         pos = 0;
 
-    lseek(fd, pos, SEEK_SET);
-    numread = read(fd, buffer, BUFFER_SIZE);
+    rb->lseek(fd, pos, SEEK_SET);
+    numread = rb->read(fd, buffer, BUFFER_SIZE);
 
     begin_line_pos -= pos - buffer_pos;
     end_line_pos -= pos - buffer_pos;
@@ -181,11 +168,11 @@ static bool viewer_init(char* file)
     int i;
     int ret;
 
-    fd = open(file, O_RDONLY);
+    fd = rb->open(file, O_RDONLY);
     if (fd==-1)
         return false;
 
-    file_size = lseek(fd, 0, SEEK_END);
+    file_size = rb->lseek(fd, 0, SEEK_END);
 
     buffer_pos = 0;
     begin_line = 0;
@@ -207,7 +194,7 @@ static bool viewer_init(char* file)
 
 static void viewer_exit(void)
 {
-    close(fd);
+    rb->close(fd);
 }
 
 static void viewer_scroll_down(void)
@@ -264,7 +251,7 @@ static int pagescroll(int col)
     int i;
 
     while (!exit) {
-        switch (button_get(true)) {
+        switch (rb->button_get(true)) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
@@ -328,31 +315,30 @@ static int pagescroll(int col)
 
     return col;
 }
-bool viewer_run(char* file)
+
+enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
     bool exit=false;
     int button;
     int col = 0;
     int ok;
 
-#ifdef HAVE_LCD_BITMAP
-    /* no margins */
-    lcd_setmargins(0, 0);
-#endif
+    TEST_PLUGIN_API(api);
+    rb = api;
+
+    if (!file)
+        return PLUGIN_ERROR;
 
     ok = viewer_init(file);
     if (!ok) {
-        lcd_clear_display();
-        lcd_puts(0, 0, "Error");
-        lcd_update();
-        sleep(HZ);
+        rb->splash(HZ, 0, false, "Error");
         viewer_exit();
-        return false;
+        return PLUGIN_OK;
     }
 
     viewer_draw(col);
     while (!exit) {
-        button = button_get(true);
+        button = rb->button_get(true);
 
         switch ( button ) {
 
@@ -420,13 +406,10 @@ bool viewer_run(char* file)
                 break;
 
             case SYS_USB_CONNECTED:
-                usb_screen();
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(false);
-#endif
+                rb->usb_screen();
                 viewer_exit();
-                return true;
+                return PLUGIN_USB_CONNECTED;
         }
     }
-    return false;
+    return PLUGIN_OK;
 }

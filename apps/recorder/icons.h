@@ -29,6 +29,7 @@ enum icons_6x8 {
     Folder,     Directory, Playlist,          Repeat,
     Selected,   Cursor,    Wps,               Mod_Ajz, 
     Font,       Language,  Text,              Config,
+    Plugin,
     LastIcon
 };
 

@@ -24,19 +24,38 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "lcd.h"
 #include "menu.h"
 #include "demo_menu.h"
-#include "button.h"
-#include "kernel.h"
-#include "sprintf.h"
-
 #include "lang.h"
+#include "plugin.h"
 
-extern bool bounce(void);
-extern bool snow(void);
-extern bool cube(void);
-extern bool oscillograph(void);
+static bool bounce(void)
+{
+    if (plugin_load("/.rockbox/rocks/bounce.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool snow(void)
+{
+    if (plugin_load("/.rockbox/rocks/snow.rock",NULL) == PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool cube(void)
+{
+    if (plugin_load("/.rockbox/rocks/cube.rock",NULL) == PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool oscillograph(void)
+{
+    if (plugin_load("/.rockbox/rocks/oscillograph.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
 
 bool demo_menu(void)
 {

@@ -16,16 +16,10 @@
  * KIND, either express or implied. 
  *
  ****************************************************************************/
+#include "plugin.h"
 
+#ifdef HAVE_LCD_BITMAP
 #ifndef SIMULATOR /* don't want this code in the simulator */
-
-#include <stdlib.h>
-#include <sprintf.h>
-#include "menu.h"
-#include "lcd.h"
-#include "button.h"
-#include "mas.h"
-#include "system.h"
 
 /* The different drawing modes */
 #define DRAW_MODE_FILLED  0
@@ -47,7 +41,7 @@ static int  drawMode = DRAW_MODE_FILLED;
  * hardware scrolling of the display. The user can change
  * speed
  */
-bool oscillograph(void)
+enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
 {
     /* stores current volume value left */
     int  left;
@@ -63,22 +57,25 @@ bool oscillograph(void)
 
     bool exit = false;
 
+    TEST_PLUGIN_API(rb);
+    (void)parameter;
+
     /* the main loop */
     while (!exit) {
 
         /* read the volume info from MAS */
-        left = mas_codec_readreg(0xC) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
-        right = mas_codec_readreg(0xD) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
+        left = rb->mas_codec_readreg(0xC) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
+        right = rb->mas_codec_readreg(0xD) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
 
         /* delete current line */
-        lcd_clearline(0, y, LCD_WIDTH-1, y);
+        rb->lcd_clearline(0, y, LCD_WIDTH-1, y);
 
         switch (drawMode) {
             case DRAW_MODE_FILLED:
-                lcd_drawline(LCD_WIDTH / 2 + 1        , y, 
-                             LCD_WIDTH / 2 + 1 + right, y);
-                lcd_drawline(LCD_WIDTH / 2 - 1        , y,
-                             LCD_WIDTH / 2 - 1 -left  , y);
+                rb->lcd_drawline(LCD_WIDTH / 2 + 1        , y, 
+                                 LCD_WIDTH / 2 + 1 + right, y);
+                rb->lcd_drawline(LCD_WIDTH / 2 - 1        , y,
+                                 LCD_WIDTH / 2 - 1 -left  , y);
                 break;
 
             case DRAW_MODE_OUTLINE:
@@ -87,10 +84,10 @@ bool oscillograph(void)
 
                 /* Here real lines were neccessary because 
                    anything else was ugly. */
-                lcd_drawline(LCD_WIDTH / 2 + right     , y, 
-                             LCD_WIDTH / 2 + lastRight , lasty);
-                lcd_drawline(LCD_WIDTH / 2 - left    , y,
-                             LCD_WIDTH / 2 - lastLeft, lasty);
+                rb->lcd_drawline(LCD_WIDTH / 2 + right     , y, 
+                                 LCD_WIDTH / 2 + lastRight , lasty);
+                rb->lcd_drawline(LCD_WIDTH / 2 - left    , y,
+                                 LCD_WIDTH / 2 - lastLeft, lasty);
 
                 /* have to store the old values for drawing lines
                    the next time */
@@ -100,8 +97,8 @@ bool oscillograph(void)
 
             case DRAW_MODE_PIXEL:
                 /* straight and simple */
-                lcd_drawpixel(LCD_WIDTH / 2 + right, y);
-                lcd_drawpixel(LCD_WIDTH / 2 - left, y);
+                rb->lcd_drawpixel(LCD_WIDTH / 2 + right, y);
+                rb->lcd_drawpixel(LCD_WIDTH / 2 - left, y);
                 break;
         }
 
@@ -114,19 +111,19 @@ bool oscillograph(void)
         /* I roll before update because otherwise the new
            line would appear at the wrong end of the display */
         if (roll)
-            lcd_roll(y);
+            rb->lcd_roll(y);
 
         /* now finally make the new sample visible */
-        lcd_update_rect(0, MAX(y-1, 0), LCD_WIDTH, 2);
+        rb->lcd_update_rect(0, MAX(y-1, 0), LCD_WIDTH, 2);
 
         /* There are two mechanisms to alter speed:
            1.) slowing down is achieved by increasing
-               the time waiting for user input. This
-               mechanism uses positive values.
+           the time waiting for user input. This
+           mechanism uses positive values.
            2.) speeding up is achieved by leaving out
-               the user input check for (-speed) volume
-               samples. For this mechanism negative values
-               are used.
+           the user input check for (-speed) volume
+           samples. For this mechanism negative values
+           are used.
         */
                
         if (speed >= 0 || ((speed < 0) && (y % (-speed) == 0))) {
@@ -138,7 +135,7 @@ bool oscillograph(void)
                it must be ensured that at least 1 is passed. */
 
             /* react to user input */
-            switch (button_get_w_tmo(MAX(speed, 1))) {
+            switch (rb->button_get_w_tmo(MAX(speed, 1))) {
                 case BUTTON_UP:
                     speed++;
                     draw = true;
@@ -151,7 +148,7 @@ bool oscillograph(void)
 
                 case BUTTON_PLAY:
                     /* pause the demo */
-                    button_get(true);
+                    rb->button_get(true);
                     break;
 
                 case BUTTON_F1:
@@ -170,7 +167,7 @@ bool oscillograph(void)
                        That produces ugly results in DRAW_MODE_OUTLINE
                        mode. If rolling is enabled this change will
                        be reverted before the next update anyway.*/
-                    lcd_roll(0);
+                    rb->lcd_roll(0);
                     break;
 
                 case BUTTON_F3:
@@ -181,27 +178,30 @@ bool oscillograph(void)
                 case BUTTON_OFF:
                     exit = true;
                     break;
+
+                case SYS_USB_CONNECTED:
+                    rb->usb_screen();
+                    return PLUGIN_USB_CONNECTED;
             }
 
             if (draw) {
                 char buf[16];
-                snprintf(buf, sizeof buf, "Speed: %d", -speed);
-                lcd_putsxy(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, buf);
-                lcd_update_rect(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, 
-                                LCD_WIDTH, 8);
+                rb->snprintf(buf, sizeof buf, "Speed: %d", -speed);
+                rb->lcd_putsxy(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, buf);
+                rb->lcd_update_rect(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, 
+                                    LCD_WIDTH, 8);
             }
         }    
     }
 
     /* restore to default roll position. 
        Looks funny if you forget to do this... */
-    lcd_roll(0);
-    lcd_update();
+    rb->lcd_roll(0);
+    rb->lcd_update();
 
     /* standard return */
-    return false;
+    return PLUGIN_OK;
 }
 
 #endif /* #ifndef SIMULATOR */
-
-
+#endif

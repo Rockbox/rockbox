@@ -2,15 +2,17 @@ ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
 
+#define PLUGINSIZE 0x8000
+
 #ifdef DEBUG
-#define DRAMSIZE 0x1f0000
+#define DRAMSIZE 0x1f0000 - PLUGINSIZE
 #define ORIGADDR 0x09010000
-#define ENDADDR  0x09200000
+
 #else
-#define DRAMSIZE (MEMORYSIZE * 0x100000)
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
 #define ORIGADDR 0x09000000
-#define ENDADDR  (ORIGADDR + DRAMSIZE)
 #endif
+#define ENDADDR  (ORIGADDR + DRAMSIZE)
 
 MEMORY
 {
@@ -90,6 +92,11 @@ SECTIONS
         *(.topcode)
         _topramend = .;
     } > DRAM
+
+    .plugin ENDADDR:
+    {
+        _pluginbuf = .;
+    }
 
     .iram 0xf000000 : AT ( _iramcopy )
     {

@@ -25,18 +25,31 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "lcd.h"
 #include "menu.h"
 #include "games_menu.h"
-#include "button.h"
-#include "kernel.h"
-#include "sprintf.h"
-
-#include "sokoban.h"
-#include "wormlet.h"
 #include "lang.h"
+#include "plugin.h"
 
-extern bool tetris(void);
+static bool tetris(void)
+{
+    if (plugin_load("/.rockbox/rocks/tetris.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool sokoban(void)
+{
+    if (plugin_load("/.rockbox/rocks/sokoban.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool wormlet(void)
+{
+    if (plugin_load("/.rockbox/rocks/wormlet.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
 
 bool games_menu(void)
 {

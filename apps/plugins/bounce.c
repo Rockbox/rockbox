@@ -15,26 +15,10 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/
+ **************************************************************************/
+#include "plugin.h"
 
-#include "config.h"
-#include "options.h"
-
-#ifdef USE_DEMOS
-
-#include "lcd.h"
-#include "button.h"
-#include "kernel.h"
-#include "menu.h"
-#include "sprintf.h"
-#include "rtc.h"
-#include "font.h"
-#include "screens.h"
-
-#ifdef SIMULATOR
-#include <stdio.h>
-#endif
-#include <string.h>
+#ifdef HAVE_LCD_BITMAP
 
 #define SS_TITLE       "Bouncer"
 #define SS_TITLE_FONT  2
@@ -45,6 +29,7 @@
 #define XSPEED 3
 #define YADD -4
 
+static struct plugin_api* rb;
 
 static unsigned char table[]={
 26,28,30,33,35,37,39,40,42,43,45,46,46,47,47,47,47,47,46,46,45,43,42,40,39,37,35,33,30,28,26,24,21,19,17,14,12,10,8,7,5,4,2,1,1,0,0,0,0,0,1,1,2,4,5,7,8,10,12,14,17,19,21,23,
@@ -186,6 +171,7 @@ struct counter values[]={
   {"ydistt", -6},
 };
 
+#ifdef USE_CLOCK
 static unsigned char yminute[]={
 53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
 };
@@ -216,23 +202,24 @@ static void addclock(void)
     if(pos >= 60)
         pos -= 60;
 
-    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xminute[pos], yminute[pos]);
+    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xminute[pos], yminute[pos]);
 
     hour = hour*5 + minute/12;
     pos = 90-hour;
     if(pos >= 60)
         pos -= 60;
 
-    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[pos], yhour[pos]);
+    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[pos], yhour[pos]);
 
     /* draw a circle */
     for(i=0; i < 60; i+=3) {
-        lcd_drawline( xminute[i],
+        rb->lcd_drawline( xminute[i],
                       yminute[i],
                       xminute[(i+1)%60],
                       yminute[(i+1)%60]);
     }
 }
+#endif
 
 static int scrollit(void)
 {
@@ -243,31 +230,33 @@ static int scrollit(void)
     unsigned int i;
     int textpos=0;
 
-    char rock[]="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
+    char* rock="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
     int letter;
 
-    lcd_clear_display();
+    rb->lcd_clear_display();
     while(1)
     {
-        b = button_get_w_tmo(HZ/10);
+        b = rb->button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
         else if ( b == (BUTTON_ON|BUTTON_REL) )
             return 1;
 
-        lcd_clear_display();
+        rb->lcd_clear_display();
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
             letter = rock[(i+textpos) % (sizeof(rock)-1) ];
 
-            lcd_bitmap((char *)char_gen_12x16[letter-0x20],
+            rb->lcd_bitmap((char *)char_gen_12x16[letter-0x20],
                        xx, table[yy&63],
                        11, 16, false);
             yy += YADD;
             xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
         }
+#ifdef USE_CLOCK
         addclock();
-        lcd_update();
+#endif
+        rb->lcd_update();
 
         x-= XSPEED;
         
@@ -292,21 +281,21 @@ static int loopit(void)
     unsigned int ysanke=0;
     unsigned int xsanke=0;
 
-    char rock[]="ROCKbox";
+    char* rock="ROCKbox";
 
     int show=0;
     int timeout=0;
     char buffer[30];
 
-    lcd_clear_display();
+    rb->lcd_clear_display();
     while(1)
     {
-        b = button_get_w_tmo(HZ/10);
+        b = rb->button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
         
         if ( b == SYS_USB_CONNECTED) {
-            usb_screen();
+            rb->usb_screen();
             return 0;
         }
 
@@ -318,10 +307,10 @@ static int loopit(void)
         y+= speed[ysanke&15] + values[NUM_YADD].num;
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
-        lcd_clear_display();
-
+        rb->lcd_clear_display();
+#ifdef USE_CLOCK
         addclock();
-
+#endif
         if(timeout) {
             switch(b) {
                 case BUTTON_LEFT:
@@ -339,18 +328,18 @@ static int loopit(void)
                       show=NUM_LAST-1;
                   break;
             }
-            snprintf(buffer, 30, "%s: %d",
-                     values[show].what, values[show].num);
-            lcd_putsxy(0, 56, buffer);
+            rb->snprintf(buffer, 30, "%s: %d",
+                         values[show].what, values[show].num);
+            rb->lcd_putsxy(0, 56, buffer);
             timeout--;
         }
         for(i=0, yy=y, xx=x;
             i<sizeof(rock)-1;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
-          lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
+          rb->lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
                      xtable[xx%71], table[yy&63],
                      11, 16, false);
-        lcd_update();
+        rb->lcd_update();
 
         ysanke+= values[NUM_YSANKE].num;
         xsanke+= values[NUM_XSANKE].num;
@@ -358,15 +347,19 @@ static int loopit(void)
 }
 
 
-bool bounce(void)
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int w, h;
     char *off = "[Off] to stop";
-    int len = strlen(SS_TITLE);
+    int len;
 
-    lcd_setfont(FONT_SYSFIXED);
+    TEST_PLUGIN_API(api);
+    (void)(parameter);
+    rb = api;
 
-    lcd_getstringsize(SS_TITLE,&w, &h);
+    len = rb->strlen(SS_TITLE);
+    rb->lcd_setfont(FONT_SYSFIXED);
+    rb->lcd_getstringsize(SS_TITLE,&w, &h);
 
     /* Get horizontel centering for text */
     len *= w;
@@ -380,11 +373,11 @@ bool bounce(void)
     else
         h /= 2;
     
-    lcd_clear_display();
-    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE);
+    rb->lcd_clear_display();
+    rb->lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE);
     
     len = 1;
-    lcd_getstringsize(off, &w, &h);
+    rb->lcd_getstringsize(off, &w, &h);
     
     /* Get horizontel centering for text */
     len *= w;
@@ -398,10 +391,9 @@ bool bounce(void)
     else
         h /= 2;
     
-    lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
-    
-    lcd_update();
-    sleep(HZ);
+    rb->lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
+    rb->lcd_update();
+    rb->sleep(HZ);
     
     do {
         h= loopit();
@@ -409,7 +401,7 @@ bool bounce(void)
             h = scrollit();
     } while(h);
     
-    lcd_setfont(FONT_UI);
+    rb->lcd_setfont(FONT_UI);
     
     return false;
 }

@@ -20,7 +20,7 @@ DOCSDIR := ../docs
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I. -I$(OBJDIR)
 
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEM}
+CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN=1
 AFLAGS += -small -relax
 
 # Check if this is a kind of Recorder
@@ -71,7 +71,10 @@ ifndef TOOLSDIR
 	TOOLSDIR=../tools
 endif
 
-all : $(OBJDIR)/$(OUTNAME)
+all : $(OBJDIR)/$(OUTNAME) rocks
+
+rocks:
+	$(MAKE) -C plugins TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)"
 
 $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
@@ -117,6 +120,7 @@ clean:
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch] \
 	$(OBJDIR)/credits.raw $(LINKFILE)
 	-$(RM) -r $(OBJDIR)/$(DEPS)
+	$(MAKE) -C plugins clean
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS)

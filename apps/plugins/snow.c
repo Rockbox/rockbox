@@ -15,17 +15,15 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/
-#include <stdlib.h>
-#include "lcd.h"
-#include "config.h"
-#include "kernel.h"
-#include "menu.h"
-#include "button.h"
+ **************************************************************************/
+#include "plugin.h"
+
+#ifdef HAVE_LCD_BITMAP
 
 #define NUM_PARTICLES 100
 
 static short particles[NUM_PARTICLES][2];
+static struct plugin_api* rb;
 
 static bool particle_exists(int particle)
 {
@@ -42,7 +40,7 @@ static int create_particle(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (!particle_exists(i)) {
-            particles[i][0]=(rand()%112);
+            particles[i][0]=(rb->rand()%112);
             particles[i][1]=0;
             return i;
         }
@@ -54,13 +52,13 @@ static void snow_move(void)
 {
     int i;
 
-    if (!(rand()%2))
+    if (!(rb->rand()%2))
         create_particle();
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
-            lcd_clearpixel(particles[i][0],particles[i][1]);
-            switch ((rand()%7)) {
+            rb->lcd_clearpixel(particles[i][0],particles[i][1]);
+            switch ((rb->rand()%7)) {
                 case 0:
                     particles[i][0]++;
                     break;
@@ -77,7 +75,7 @@ static void snow_move(void)
                     break;
             }
             if (particle_exists(i))
-                lcd_drawpixel(particles[i][0],particles[i][1]);
+                rb->lcd_drawpixel(particles[i][0],particles[i][1]);
         }
     }
 }
@@ -90,28 +88,24 @@ static void snow_init(void)
         particles[i][0]=-1;
         particles[i][1]=-1;
     }        
-    lcd_clear_display();
+    rb->lcd_clear_display();
 }
 
-bool snow(void)
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    snow_init();
+    TEST_PLUGIN_API(api);
+    (void)(parameter);
+    rb = api;
 
+    snow_init();
     while (1) {
         snow_move();
-        lcd_update();
-        sleep(HZ/20);
+        rb->lcd_update();
+        rb->sleep(HZ/20);
         
-        if (button_get(false) == BUTTON_OFF)
+        if (rb->button_get(false) == BUTTON_OFF)
             return false;
     }
 }
 
-
-
-
-
-
-
-
-
+#endif

@@ -677,37 +677,37 @@ new:
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-eng: "Level"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-eng: "Moves"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-eng: "YOU WIN!!"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] To Stop"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - Level"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] Same Level"
+eng: ""
 new:
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + Level"
+eng: ""
 new:
 
 # Next ids are for Worlmet Game.
@@ -717,37 +717,37 @@ new:
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "Len:%d"
+eng: ""
 new:
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-eng: "Growing"
+eng: ""
 new:
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "Hungry"
+eng: ""
 new:
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-eng: "Wormed"
+eng: ""
 new:
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-eng: "Argh"
+eng: ""
 new:
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-eng: "Crashed"
+eng: ""
 new:
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-eng: "Hs: %d"
+eng: ""
 new:
 
 # Length restrictions for wormlet config screen strings (LANG_CS_XXX)
@@ -756,49 +756,49 @@ new:
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    UP/DN"
+eng: ""
 new:
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        L/R"
+eng: ""
 new:
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote Control F1"
+eng: ""
 new:
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No Rem. Control F1"
+eng: ""
 new:
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 Key Control   F1"
+eng: ""
 new:
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 Key Control   F1"
+eng: ""
 new:
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out Of Control"
+eng: ""
 new:
 
 # Wormlet game ids ended
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You Lose!"
+eng: ""
 new:
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "Rows - Level"
+eng: ""
 new:
 
 id: LANG_POWEROFF_IDLE
@@ -1569,3 +1569,33 @@ id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
 new:
+
+##
+## Strings used in the plugin loader:
+##
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new:
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new:
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new:
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new:
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new:
+

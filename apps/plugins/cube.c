@@ -16,22 +16,10 @@
 * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 * KIND, either express or implied.
 *
-****************************************************************************/
+***************************************************************************/
+#include "plugin.h"
 
-#include "config.h"
-#include "options.h"
-
-#ifdef USE_DEMOS
-
-#include <stdlib.h>
-#include "lcd.h"
-#include "config.h"
-#include "kernel.h"
-#include "menu.h"
-#include "button.h"
-#include "sprintf.h"
-#include "screens.h"
-#include "font.h"
+#ifdef HAVE_LCD_BITMAP
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30
@@ -79,6 +67,8 @@ static int sin_table[91] =
     9961,9975,9986,9993,9998,
     10000
 };
+
+static struct plugin_api* rb;
 
 static long sin(int val)
 {
@@ -214,7 +204,7 @@ static void cube_init(void)
 
 static void line(int a, int b)
 {
-    lcd_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
+    rb->lcd_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
 }
 
 static void cube_draw(void)
@@ -234,7 +224,8 @@ static void cube_draw(void)
     line(3,6);
 }
 
-bool cube(void)
+
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int t_disp=0;
     char buffer[30];
@@ -247,27 +238,31 @@ bool cube(void)
     int zs=1;
     bool highspeed=0;
     bool exit=0;
-    
-    lcd_setfont(FONT_SYSFIXED);
+
+    TEST_PLUGIN_API(api);
+    (void)(parameter);
+    rb = api;
+
+    rb->lcd_setfont(FONT_SYSFIXED);
 
     cube_init();
 
     while(!exit)
     {
         if (!highspeed) 
-            sleep(4);
+            rb->sleep(4);
         
-        lcd_clear_display();
+        rb->lcd_clear_display();
         cube_rotate(xa,ya,za);
         cube_viewport();
         cube_draw();
         if (t_disp>0)
         {
             t_disp--;
-            snprintf(buffer, 30, "x:%d y:%d z:%d h:%d",xs,ys,zs,highspeed);
-            lcd_putsxy(0, 56, buffer);
+            rb->snprintf(buffer, 30, "x:%d y:%d z:%d h:%d",xs,ys,zs,highspeed);
+            rb->lcd_putsxy(0, 56, buffer);
         }
-        lcd_update();
+        rb->lcd_update();
         
         xa+=xs;
         if (xa>359)
@@ -285,7 +280,7 @@ bool cube(void)
         if (za<0)
             za+=360;
 
-        switch(button_get(false)) 
+        switch(rb->button_get(false)) 
         {
             case BUTTON_RIGHT:
                 xs+=1;
@@ -332,22 +327,12 @@ bool cube(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                usb_screen();
-                lcd_setfont(FONT_UI);
-                return true;
+                rb->usb_screen();
+                return PLUGIN_USB_CONNECTED;
         }
     }
 
-    lcd_setfont(FONT_UI);
-
-    return false;
+    return PLUGIN_OK;
 }
 
-#endif /* USE_DEMOS */
-
-/* -----------------------------------------------------------------
- * vim: et sw=4 ts=8 sts=4 tw=78
- */
-
-
-
+#endif

@@ -31,6 +31,7 @@
 #include "status.h"
 #include "playlist.h"
 #include "sprintf.h"
+#include "kernel.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
