@@ -19,7 +19,9 @@
 ***************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_CHARCELLS
+#include "playergfx.h"
+#endif
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30
@@ -33,6 +35,16 @@
 #define CUBE_Y_DEC BUTTON_DOWN
 #define CUBE_Z_INC BUTTON_F2
 #define CUBE_Z_DEC BUTTON_F1
+#define CUBE_HIGHSPEED BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define CUBE_QUIT (BUTTON_STOP | BUTTON_REL)
+#define CUBE_X_INC BUTTON_RIGHT
+#define CUBE_X_DEC BUTTON_LEFT
+#define CUBE_Y_INC (BUTTON_ON | BUTTON_RIGHT)
+#define CUBE_Y_DEC (BUTTON_ON | BUTTON_LEFT)
+#define CUBE_Z_INC (BUTTON_MENU | BUTTON_RIGHT)
+#define CUBE_Z_DEC (BUTTON_MENU | BUTTON_LEFT)
 #define CUBE_HIGHSPEED BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -75,8 +87,13 @@ static long matrice[3][3];
 
 static int nb_points = 8;
 
+#ifdef HAVE_LCD_BITMAP
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
+#else
+static int x_off = 10;
+static int y_off = 7;
+#endif
 static int z_off = 600;
 
 /* Precalculated sine and cosine * 10000 (four digit fixed point math) */
@@ -224,10 +241,10 @@ static void cube_viewport(void)
     }
 }
 
-#if LCD_HEIGHT > 100
-#define DIST 80
+#ifdef HAVE_LCD_BITMAP
+#define DIST (10*LCD_HEIGHT/16)
 #else
-#define DIST 40
+#define DIST 9
 #endif
 
 static void cube_init(void)
@@ -245,7 +262,11 @@ static void cube_init(void)
 
 static void line(int a, int b)
 {
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
+#else
+    pgfx_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
+#endif
 }
 
 static void cube_draw(void)
@@ -286,7 +307,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)(parameter);
     rb = api;
 
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
+#else
+    if (!pgfx_init(rb, 4, 2))
+    {
+        rb->splash(HZ*2, true, "Old LCD :(");
+        return PLUGIN_OK;
+    }
+#endif
 
     cube_init();
 
@@ -296,11 +325,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             rb->yield();
         else
             rb->sleep(4);
-        
+
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_clear_display();
+#else
+        pgfx_clear_display();
+#endif
         cube_rotate(xa,ya,za);
         cube_viewport();
         cube_draw();
+#ifdef HAVE_LCD_BITMAP
         if (t_disp>0)
         {
             t_disp--;
@@ -308,6 +342,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
         }
         rb->lcd_update();
+#else
+        rb->lcd_clear_display();
+        if (t_disp>0)
+        {
+            t_disp--;
+            rb->snprintf(buffer, 30, "x%d     y%d", xs, ys);
+            rb->lcd_puts(0, 0, buffer);
+            rb->snprintf(buffer, 30, "z%d     h%d", zs, highspeed);
+            rb->lcd_puts(0, 1, buffer);
+        }
+        pgfx_display(3, 0);
+#endif
 
         xa+=xs;
         if (xa>359)
@@ -384,8 +430,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (button!=BUTTON_NONE)
             lastbutton=button;
     }
+    
+#ifdef HAVE_LCD_CHARCELLS
+    pgfx_release();
+#endif
 
     return PLUGIN_OK;
 }
 
-#endif

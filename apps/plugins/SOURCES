@@ -1,6 +1,7 @@
 /* plugins common to all models */
 battery_test.c
 chessclock.c
+cube.c
 favorites.c
 firmware_flash.c
 helloworld.c
@@ -16,7 +17,6 @@ viewer.c
 bounce.c
 calculator.c
 chip8.c
-cube.c
 flipit.c
 grayscale.c
 jpeg.c
@@ -57,7 +57,7 @@ wormlet.c
 #ifdef HAVE_LCD_CHARCELLS /* Player model only */
 euroconverter.c
 jackpot.c
-nim.c
+nim.c    
 #endif /* #ifdef HAVE_LCD_CHARCELLS */
 
 #ifndef HAVE_MMC
