@@ -2858,4 +2858,9 @@ eng: "Custom"
 voice: "Angepasst"
 new: "Angepasst"
 
+ id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+voice: "ID3 database"
+new: "ID3-Datenbank"
 
