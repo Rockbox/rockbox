@@ -718,8 +718,8 @@ A78: Linus Nielsen Feltzing replied to a similar question on April 17th 2004,
 
      SAMPLE RATE
 
-     Controls the amount of samples per secod, basically which frequencies
-     that can accurately be reproduced buring playback. Lower frequencies
+     Controls the amount of samples per second, basically which frequencies
+     that can accurately be reproduced during playback. Lower frequencies
      produce smaller files, for two reasons: 1) The amount of data to be
      compressed is smaller and 2) the data is easier to compress, since higher
      frequencies are not present.
