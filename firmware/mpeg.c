@@ -671,8 +671,6 @@ static int new_file(int steps)
         {
             int new_tag_idx = tag_write_idx;
 
-            index = playlist_next(steps);
-            
             if(add_track_to_tag_list(trackname))
             {
                 /* Bad mp3 file */
@@ -682,6 +680,8 @@ static int new_file(int steps)
             }
             else
             {
+                index = playlist_next(steps);
+            
                 /* skip past id3v2 tag (to an even byte) */
                 lseek(mpeg_file, 
                       id3tags[new_tag_idx]->id3.id3v2len & ~1, 
