@@ -117,6 +117,10 @@ SECTIONS
     .data :
     {
         *(.data)
+        . = ALIGN(0x4);
+        _datacopy = .; /* dummy here, only for ROM based */
+        _datastart = .;
+        _dataend  = .;
     } > DRAM
 
     .rodata :
