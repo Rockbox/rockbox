@@ -78,7 +78,7 @@ NO
 EFEAT
 
 NAME Playlist load speed, songs/sec ENAME
-TD 2000 - 3500 ETD
+TD 3000 - 4000 ETD
 TD 15 - 20 ETD
 EFEAT
 
