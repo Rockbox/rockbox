@@ -1478,6 +1478,10 @@ static bool dbg_sound(void)
     bool set = true;
     long ll, lr, rr, rl;
     int d, i;
+#ifdef HAVE_MAS3587F
+    long superbass;
+    long val;
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
@@ -1492,6 +1496,11 @@ static bool dbg_sound(void)
     while(!done)
     {
         int button;
+
+#ifdef HAVE_MAS3587F
+        superbass = mas_codec_readreg(MAS_REG_KLOUDNESS) & 0x0004;
+#endif
+
         lcd_clear_display();
         d = 200 - ll * 100 / 0x80000;
         i = d / 100;
@@ -1503,6 +1512,10 @@ static bool dbg_sound(void)
         snprintf(buf, sizeof buf, "LR: -%d.%02d (%05x)", i, d % 100, lr);
         lcd_puts(0, 1, buf);
         
+#ifdef HAVE_MAS3587F
+        if(superbass)
+            lcd_puts(0, 2, "Super Bass");
+#endif
         lcd_update();
 
         /* Wait for a key to be pushed */
@@ -1547,6 +1560,14 @@ static bool dbg_sound(void)
 
                 set = !set;
                 break;
+
+#ifdef HAVE_MAS3587F
+            case BUTTON_ON:
+                val = mas_codec_readreg(MAS_REG_KLOUDNESS);
+                val ^= 0x0004;
+                mas_codec_writereg(MAS_REG_KLOUDNESS, val);
+                break;
+#endif
         }
         if(set)
         {
