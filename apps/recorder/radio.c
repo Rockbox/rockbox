@@ -341,7 +341,7 @@ bool radio_screen(void)
             case BUTTON_PLAY:
                 if(!screen_freeze)
                 {
-                    splash(0, 0, true, "Screen frozen");
+                    splash(0, true, "Screen frozen");
                     lcd_update();
                     screen_freeze = true;
                 }
@@ -456,7 +456,7 @@ bool radio_screen(void)
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
         status_set_playmode(STATUS_STOP);
-        splash(0, 0, true, str(LANG_DISK_FULL));
+        splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
         mpeg_error_clear();
@@ -531,7 +531,7 @@ void radio_save_presets(void)
     }
     else
     {
-        splash(HZ*2, 0, true, str(LANG_FM_PRESET_SAVE_FAILED));
+        splash(HZ*2, true, str(LANG_FM_PRESET_SAVE_FAILED));
     }
 }
 
@@ -621,7 +621,7 @@ bool radio_preset_select(void)
         }
         else
         {
-            splash(HZ*2, 0, true, str(LANG_FM_NO_PRESETS));
+            splash(HZ*2, true, str(LANG_FM_NO_PRESETS));
         }
     }
 
@@ -647,7 +647,7 @@ static bool radio_add_preset(void)
     }
     else
     {
-        splash(HZ*2, 0, true, str(LANG_FM_NO_FREE_PRESETS));
+        splash(HZ*2, true, str(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }
