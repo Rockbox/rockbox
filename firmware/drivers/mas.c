@@ -20,10 +20,14 @@
 #include "debug.h"
 #include "mas.h"
 
+static int mas_devread(unsigned long *dest, int len);
+
 int mas_default_read(unsigned short *buf)
 {
     unsigned char *dest = (unsigned char *)buf;
     int ret = 0;
+
+    i2c_begin();
     
     i2c_start();
     i2c_outb(MAS_DEV_WRITE);
@@ -47,58 +51,68 @@ int mas_default_read(unsigned short *buf)
     
     i2c_stop();
 
+    i2c_end();
     return ret;
 }
 
 int mas_run(unsigned short address)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[3];
 
-    i=0;
-    buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = address << 8;
-    buf[i++] = address & 0xff;
+    i2c_begin();
+    
+    buf[0] = MAS_DATA_WRITE;
+    buf[1] = address << 8;
+    buf[2] = address & 0xff;
 
     /* send run command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,3))
     {
-        return -1;
+        ret = -1;
     }
 
-    return 0;
+    i2c_end();
+    return ret;
 }
 
 /* note: 'len' is number of 32-bit words, not number of bytes! */
 int mas_readmem(int bank, int addr, unsigned long* dest, int len)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[7];
 
-    i=0;
-    buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = bank?MAS_CMD_READ_D1_MEM:MAS_CMD_READ_D0_MEM;
-    buf[i++] = 0x00;
-    buf[i++] = (len & 0xff00) >> 8;
-    buf[i++] = len & 0xff;
-    buf[i++] = (addr & 0xff00) >> 8;
-    buf[i++] = addr & 0xff;
+    i2c_begin();
+
+    buf[0] = MAS_DATA_WRITE;
+    buf[1] = bank?MAS_CMD_READ_D1_MEM:MAS_CMD_READ_D0_MEM;
+    buf[2] = 0x00;
+    buf[3] = (len & 0xff00) >> 8;
+    buf[4] = len & 0xff;
+    buf[5] = (addr & 0xff00) >> 8;
+    buf[6] = addr & 0xff;
 
     /* send read command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,7))
     {
-        return -1;
+        ret = -1;
     }
 
-    return mas_devread(dest, len);
+    ret = mas_devread(dest, len);
+
+    i2c_end();
+    return ret;
 }
 
 /* note: 'len' is number of 32-bit words, not number of bytes! */
 int mas_writemem(int bank, int addr, unsigned long* src, int len)
 {
+    int ret = 0;
     int i, j;
     unsigned char buf[60];
     unsigned char* ptr = (unsigned char*)src;
+
+    i2c_begin();
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
@@ -128,62 +142,74 @@ int mas_writemem(int bank, int addr, unsigned long* src, int len)
     /* send write command */
     if (i2c_write(MAS_DEV_WRITE,buf,i))
     {
-        return -1;
+        ret = -1;
     }
 
-    return 0;
+    i2c_end();
+    return ret;
 }
 
 int mas_readreg(int reg)
 {
-    int i;
+    int ret = 0;
     unsigned char buf[16];
     unsigned long value;
 
-    i=0;
-    buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = MAS_CMD_READ_REG | (reg >> 4);
-    buf[i++] = (reg & 0x0f) << 4;
+    i2c_begin();
+
+    buf[0] = MAS_DATA_WRITE;
+    buf[1] = MAS_CMD_READ_REG | (reg >> 4);
+    buf[2] = (reg & 0x0f) << 4;
 
     /* send read command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,3))
     {
-        return -1;
+        ret = -1;
+    }
+    else
+    {
+        if(mas_devread(&value, 1))
+        {
+            ret = -2;
+        }
+        else
+        {
+            ret = value;
+        }
     }
 
-    if(mas_devread(&value, 1))
-    {
-        return -2;
-    }
-
-    return value;
+    i2c_end();
+    return ret;
 }
 
 int mas_writereg(int reg, unsigned int val)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[5];
 
-    i=0;
-    buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = MAS_CMD_WRITE_REG | (reg >> 4);
-    buf[i++] = ((reg & 0x0f) << 4) | (val & 0x0f);
-    buf[i++] = (val >> 12) & 0xff;
-    buf[i++] = (val >> 4) & 0xff;
+    i2c_begin();
+
+    buf[0] = MAS_DATA_WRITE;
+    buf[1] = MAS_CMD_WRITE_REG | (reg >> 4);
+    buf[2] = ((reg & 0x0f) << 4) | (val & 0x0f);
+    buf[3] = (val >> 12) & 0xff;
+    buf[4] = (val >> 4) & 0xff;
 
     /* send write command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,5))
     {
-        return -1;
+        ret = -1;
     }
-    return 0;
+
+    i2c_end();
+    return ret;
 }
 
 /* note: 'len' is number of 32-bit words, not number of bytes! */
-int mas_devread(unsigned long *dest, int len)
+static int mas_devread(unsigned long *dest, int len)
 {
-    unsigned char* ptr = (unsigned char*)dest;
     int ret = 0;
+    unsigned char* ptr = (unsigned char*)dest;
     int i;
     
     /* handle read-back */
@@ -236,9 +262,11 @@ int mas_devread(unsigned long *dest, int len)
 #ifdef ARCHOS_RECORDER
 int mas_direct_config_read(unsigned char reg)
 {
-    unsigned char tmp[2];
     int ret = 0;
+    unsigned char tmp[2];
     
+    i2c_begin();
+
     i2c_start();
     i2c_outb(MAS_DEV_WRITE);
     if (i2c_getack()) {
@@ -262,12 +290,16 @@ int mas_direct_config_read(unsigned char reg)
     
     i2c_stop();
 
+    i2c_end();
     return ret;
 }
 
 int mas_direct_config_write(unsigned char reg, unsigned int val)
 {
+    int ret = 0;
     unsigned char buf[3];
+
+    i2c_begin();
 
     buf[0] = reg;
     buf[1] = (val >> 8) & 0xff;
@@ -276,45 +308,50 @@ int mas_direct_config_write(unsigned char reg, unsigned int val)
     /* send write command */
     if (i2c_write(MAS_DEV_WRITE,buf,3))
     {
-        return -1;
+        ret = -1;
     }
+
+    i2c_end();
     return 0;
 }
 
 int mas_codec_writereg(int reg, unsigned int val)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[5];
 
-    i=0;
-    buf[i++] = MAS_CODEC_WRITE;
-    buf[i++] = (reg >> 8) & 0xff;
-    buf[i++] = reg & 0xff;
-    buf[i++] = (val >> 8) & 0xff;
-    buf[i++] = val & 0xff;
+    i2c_begin();
+
+    buf[0] = MAS_CODEC_WRITE;
+    buf[1] = (reg >> 8) & 0xff;
+    buf[2] = reg & 0xff;
+    buf[3] = (val >> 8) & 0xff;
+    buf[4] = val & 0xff;
 
     /* send write command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,5))
     {
-        return -1;
+        ret = -1;
     }
-    return 0;
+    
+    i2c_end();
+    return ret;
 }
 
 int mas_codec_readreg(int reg)
 {
-    int i;
     int ret = 0;
     unsigned char buf[16];
     unsigned char tmp[2];
 
-    i=0;
-    buf[i++] = MAS_CODEC_WRITE;
-    buf[i++] = (reg >> 8) & 0xff;
-    buf[i++] = reg & 0xff;
+    i2c_begin();
+
+    buf[0] = MAS_CODEC_WRITE;
+    buf[1] = (reg >> 8) & 0xff;
+    buf[2] = reg & 0xff;
 
     /* send read command */
-    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    if (i2c_write(MAS_DEV_WRITE,buf,3))
     {
         return -1;
     }
@@ -342,6 +379,7 @@ int mas_codec_readreg(int reg)
     
     i2c_stop();
 
+    i2c_end();
     return ret;
 }
 #endif

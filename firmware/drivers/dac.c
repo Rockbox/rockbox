@@ -22,23 +22,26 @@
 
 int dac_volume(unsigned int volume)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[3];
+
+    i2c_begin();
 
     if(volume > 0x38)
         volume = 0x38;
 
-    i=0;
-    buf[i++] = DAC_REG_WRITE | DAC_AVOL;
-    buf[i++] = (volume & 0x3f) | 0x40; /* Deemphasis ON */
-    buf[i++] = volume & 0x3f;
+    buf[0] = DAC_REG_WRITE | DAC_AVOL;
+    buf[1] = (volume & 0x3f) | 0x40; /* Deemphasis ON */
+    buf[2] = volume & 0x3f;
 
     /* send read command */
-    if (i2c_write(DAC_DEV_WRITE,buf,i))
+    if (i2c_write(DAC_DEV_WRITE,buf,3))
     {
-        return -1;
+        ret = -1;
     }
-    return 0;
+
+    i2c_end();
+    return ret;
 }
 
 /******************************************************************
@@ -52,17 +55,20 @@ int dac_volume(unsigned int volume)
 ******************************************************************/
 int dac_config(int value)
 {
-    int i;
-    unsigned char buf[16];
+    int ret = 0;
+    unsigned char buf[2];
 
-    i=0;
-    buf[i++] = DAC_REG_WRITE | DAC_GCFG;
-    buf[i++] = value;
+    i2c_begin();
+
+    buf[0] = DAC_REG_WRITE | DAC_GCFG;
+    buf[1] = value;
 
     /* send read command */
-    if (i2c_write(DAC_DEV_WRITE,buf,i))
+    if (i2c_write(DAC_DEV_WRITE,buf,2))
     {
-        return -1;
+        ret = -1;
     }
+
+    i2c_end();
     return 0;
 }
