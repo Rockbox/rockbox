@@ -91,7 +91,9 @@ $(OBJDIR)/uisw32-res.o: uisw32.rc
 	$(WINDRES) -i $< -o $@
 
 clean:
-	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o
+	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
+	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
+	$(OBJDIR)/sysfont.c
 	$(RM) -r $(DEPS)
 
 distclean: clean
@@ -163,8 +165,11 @@ $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
 $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
-	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+$(OBJDIR)/build.lang: $(APPDIR)/lang/$(LANGUAGE).lang
+	perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
+
+$(OBJDIR)/lang.o: $(OBJDIR)/build.lang
+	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 $(OBJDIR)/lcd-recorder.o: $(DRIVERS)/lcd-recorder.c
