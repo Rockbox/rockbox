@@ -72,7 +72,15 @@ int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
 bool mpeg_has_changed_track(void);
 int mpeg_status(void);
+#ifdef HAVE_MAS3587F
 void mpeg_set_pitch(int percent);
+void mpeg_init_recording(void);
+void mpeg_init_playback(void);
+void mpeg_record(char *filename);
+void mpeg_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode);
+void mpeg_set_recording_gain(int left, int right, int mic);
+#endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 
 #define SOUND_VOLUME 0
@@ -83,7 +91,10 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 #define SOUND_SUPERBASS 5
 #define SOUND_AVC 6
 #define SOUND_CHANNELS 7
-#define SOUND_NUMSETTINGS 8
+#define SOUND_LEFT_GAIN 8
+#define SOUND_RIGHT_GAIN 9
+#define SOUND_MIC_GAIN 10
+#define SOUND_NUMSETTINGS 11
 
 #define MPEG_SOUND_STEREO 0
 #define MPEG_SOUND_MONO 1

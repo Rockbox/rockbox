@@ -37,6 +37,12 @@
 
 extern void bitswap(unsigned char *data, int length);
 
+#ifdef HAVE_MAS3587F
+static void init_recording(void);
+static void init_playback(void);
+static void start_recording(void);
+#endif
+
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
 static int get_unswapped_space(void);
@@ -50,8 +56,19 @@ static int get_unswapped_space(void);
 #define MPEG_PREV         6
 #define MPEG_FF_REWIND    7
 #define MPEG_FLUSH_RELOAD 8
+#define MPEG_RECORD 9
+#define MPEG_INIT_RECORDING 10
+#define MPEG_INIT_PLAYBACK 11
 #define MPEG_NEED_DATA    100
 #define MPEG_TRACK_CHANGE 101
+#define MPEG_SAVE_DATA    102
+#define MPEG_STOP_DONE    103
+
+enum
+{
+    MPEG_DECODER,
+    MPEG_ENCODER
+} mpeg_mode;
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
@@ -67,7 +84,10 @@ static char *units[] =
     "dB",   /* Loudness */
     "%",    /* Bass boost */
     "",     /* AVC */
-    ""      /* Channels */
+    "",     /* Channels */
+    "dB",   /* Left gain */
+    "dB",   /* Right gain */
+    "dB",   /* Mic gain */
 };
 
 static int numdecimals[] =
@@ -79,7 +99,10 @@ static int numdecimals[] =
     0,    /* Loudness */
     0,    /* Bass boost */
     0,    /* AVC */
-    0     /* Channels */
+    0,    /* Channels */
+    1,    /* Left gain */
+    1,    /* Right gain */
+    1,    /* Mic gain */
 };
 
 static int minval[] =
@@ -91,41 +114,50 @@ static int minval[] =
     0,    /* Loudness */
     0,    /* Bass boost */
     -1,   /* AVC */
-    0     /* Channels */
+    0,    /* Channels */
+    0,    /* Left gain */
+    0,    /* Right gain */
+    0,    /* Mic gain */
 };
 
 static int maxval[] =
 {
-    100,   /* Volume */
+    100,  /* Volume */
 #ifdef HAVE_MAS3587F
-    24,    /* Bass */
-    24,    /* Treble */
+    24,   /* Bass */
+    24,   /* Treble */
 #else
-    30,    /* Bass */
-    30,    /* Treble */
+    30,   /* Bass */
+    30,   /* Treble */
 #endif
-    50,    /* Balance */
-    17,    /* Loudness */
-    10,    /* Bass boost */
-    3,     /* AVC */
-    3      /* Channels */
+    50,   /* Balance */
+    17,   /* Loudness */
+    10,   /* Bass boost */
+    3,    /* AVC */
+    3,    /* Channels */
+    15,   /* Left gain */
+    15,   /* Right gain */
+    15,   /* Mic gain */
 };
 
 static int defaultval[] =
 {
-    70,      /* Volume */
+    70,   /* Volume */
 #ifdef HAVE_MAS3587F
-    12+6,    /* Bass */
-    12+6,    /* Treble */
+    12+6, /* Bass */
+    12+6, /* Treble */
 #else
-    15+7,    /* Bass */
-    15+7,    /* Treble */
+    15+7, /* Bass */
+    15+7, /* Treble */
 #endif
-    0,       /* Balance */
-    0,       /* Loudness */
-    0,       /* Bass boost */
-    0,       /* AVC */
-    0        /* Channels */
+    0,    /* Balance */
+    0,    /* Loudness */
+    0,    /* Bass boost */
+    0,    /* AVC */
+    0,    /* Channels */
+    8,    /* Left gain */
+    2,    /* Right gain */
+    2,    /* Mic gain */
 };
 
 char *mpeg_sound_unit(int setting)
@@ -421,9 +453,9 @@ extern unsigned char mp3buf[];
 extern unsigned char mp3end[];
 
 static int mp3buflen;
-static int mp3buf_write;
+int mp3buf_write;
 static int mp3buf_swapwrite;
-static int mp3buf_read;
+int mp3buf_read;
 
 static int last_dma_chunk_size;
 
@@ -436,6 +468,12 @@ static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
 static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
+#ifdef HAVE_MAS3587F
+bool recording; /* We are recording */
+static bool is_recording; /* We are (attempting to) record */
+bool stop_pending;
+#endif
+
 static int mpeg_file;
 
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
@@ -575,20 +613,69 @@ static void stop_dma(void)
     dma_on = false;
 }
 
+long current_dma_tick = 0;
+long timing_info_index = 0;
+long timing_info[1024];
+
 static void dma_tick(void)
 {
-    if(playing && !paused)
+    current_dma_tick++;
+
+#ifdef HAVE_MAS3587F
+    if(mpeg_mode == MPEG_DECODER)
     {
-        /* Start DMA if it is disabled and the DEMAND pin is high */
-        if(!dma_on && (PBDR & 0x4000))
+#endif
+        if(playing && !paused)
         {
-            if(!(SCR0 & 0x80))
-                start_dma();
+            /* Start DMA if it is disabled and the DEMAND pin is high */
+            if(!dma_on && (PBDR & 0x4000))
+            {
+                if(!(SCR0 & 0x80))
+                    start_dma();
+            }
+            id3tags[tag_read_idx]->id3.elapsed +=
+                (current_tick - last_dma_tick) * 1000 / HZ;
+            last_dma_tick = current_tick;
         }
-        id3tags[tag_read_idx]->id3.elapsed +=
-            (current_tick - last_dma_tick) * 1000 / HZ;
-        last_dma_tick = current_tick;
+#ifdef HAVE_MAS3587F
     }
+    else
+    {
+        int i;
+        int num_bytes = 0;
+        if(recording && (PBDR & 0x4000))
+        {
+            timing_info[timing_info_index++] = current_dma_tick;
+            TCNT2 = 0;
+            for(i = 0;i < 30;i++)
+            {
+                PADR |= 0x800;
+                while(PBDR & 0x8000) {};
+                mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
+                PADR &= ~0x800;
+                
+                mp3buf_write++;
+                if(mp3buf_write >= mp3buflen)
+                    mp3buf_write = 0;
+                
+                num_bytes++;
+                while(!(PBDR & 0x8000)) {};
+            }
+            timing_info[timing_info_index++] = TCNT2 + (num_bytes << 16);
+
+            timing_info_index &= 0x3ff;
+
+            /* Signal to save the data if we are running out of buffer
+               space */
+            num_bytes = mp3buf_write - mp3buf_read;
+            if(num_bytes < 0)
+                num_bytes += mp3buflen;
+
+            if(mp3buflen - num_bytes < MPEG_LOW_WATER)
+                queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+        }
+    }
+#endif
 }
 
 static void reset_mp3_buffer(void)
@@ -915,7 +1002,10 @@ static void mpeg_thread(void)
     int amount_to_read;
     int t1, t2;
     int start_offset;
-
+#ifdef HAVE_MAS3587F
+    int amount_to_save;
+#endif
+    
     is_playing = false;
     play_pending = false;
     playing = false;
@@ -923,6 +1013,10 @@ static void mpeg_thread(void)
 
     while(1)
     {
+#ifdef HAVE_MAS3587F
+        if(mpeg_mode == MPEG_DECODER)
+        {
+#endif
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -1429,7 +1523,101 @@ static void mpeg_thread(void)
                 usb_wait_for_disconnect(&mpeg_queue);
 #endif
                 break;
+                
+#ifdef HAVE_MAS3587F
+            case MPEG_INIT_RECORDING:
+                init_recording();
+                break;
+#endif
+            }
+#ifdef HAVE_MAS3587F
         }
+        else
+        {
+            int i;
+
+            yield();
+            if(!queue_empty(&mpeg_queue))
+            {
+                queue_wait(&mpeg_queue, &ev);
+                switch(ev.id)
+                {
+                    case MPEG_RECORD:
+                        DEBUGF("Recording...\n");
+                        mpeg_file = open("/RECORD.MP3", O_WRONLY);
+                        if(mpeg_file < 0)
+                            panicf("recfile: %d", mpeg_file);
+                        reset_mp3_buffer();
+                        start_recording();
+                        break;
+
+                    case MPEG_STOP:
+                        DEBUGF("MPEG_STOP\n");
+                        is_recording = false;
+                        recording = false;
+
+                        /* Save the remaining data in the buffer */
+                        stop_pending = true;
+                        queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                        break;
+                        
+                    case MPEG_STOP_DONE:
+                        DEBUGF("MPEG_STOP_DONE\n");
+
+                        if(mpeg_file >= 0)
+                            close(mpeg_file);
+
+                        for(i = 0;i < 512;i++)
+                        {
+                            DEBUGF("%d - %d us (%d bytes)\n", timing_info[i*2],
+                                   (timing_info[i*2+1] & 0xffff) *
+                                   10000 / 13824,
+                                   timing_info[i*2+1] >> 16);
+                        }
+                        break;
+
+                    case MPEG_SAVE_DATA:
+                        amount_to_save = mp3buf_write - mp3buf_read;
+
+                        /* If the result is negative, the write index has
+                           wrapped */
+                        if(amount_to_save < 0)
+                        {
+                            amount_to_save = mp3buflen - mp3buf_read;
+                        }
+
+                        /* Save data only if the buffer is getting full,
+                           or if we should stop recording */
+                        if(amount_to_save)
+                        {
+                            if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
+                               stop_pending)
+                            {
+                                write(mpeg_file, mp3buf + mp3buf_read,
+                                      amount_to_save);
+                                
+                                mp3buf_read += amount_to_save;
+                                if(mp3buf_read >= mp3buflen)
+                                    mp3buf_read = 0;
+                                
+                                queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                            }
+                        }
+                        else
+                        {
+                            /* We have saved all data, time to stop for real */
+                            if(stop_pending)
+                                queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                        }
+                        break;
+                        
+                    case MPEG_INIT_PLAYBACK:
+                        init_playback();
+                        break;
+                }
+            }
+        }
+#endif
     }
 }
 
@@ -1502,6 +1690,127 @@ bool mpeg_has_changed_track(void)
     }
     return false;
 }
+
+#ifdef HAVE_MAS3587F
+void mpeg_init_recording(void)
+{
+    queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
+    yield();
+}
+
+void mpeg_init_playback(void)
+{
+    queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
+    yield();
+}
+
+static void init_recording(void)
+{
+    unsigned long val;
+
+    /* Stop the current stream */
+    play_pending = false;
+    playing = false;
+    stop_dma();
+    
+    reset_mp3_buffer();
+    remove_all_tags();
+    
+    if(mpeg_file >= 0)
+        close(mpeg_file);
+
+    /* Init the recording variables */
+    recording = false;
+    is_recording = false;
+    
+    /* Stop the current application */
+    val = 0;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+    } while(val);
+    
+    /* Enable the Left A/D Converter */
+    mas_codec_writereg(0x0, 0xcccd);
+
+    /* Copy left channel to right (mono mode) */
+    mas_codec_writereg(8, 0x8000);
+    
+    /* ADC scale 100%, DSP scale 0% */
+    mas_codec_writereg(6, 0x4000);
+    mas_codec_writereg(7, 0x0000);
+
+    /* No mute */
+    val = 0;
+    mas_writemem(MAS_BANK_D0,0x7f9,&val,1);    
+    
+    /* Set Demand mode and validate all settings */
+    val = 0x25;
+    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+
+    /* Start the encoder application */
+    val = 0x40;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+    } while(!(val & 0x40));
+
+    mpeg_mode = MPEG_ENCODER;
+
+    DEBUGF("MAS Recording application started\n");
+}
+
+static void init_playback(void)
+{
+    unsigned long val;
+    
+    mpeg_mode = MPEG_DECODER;
+
+    /* Stop the current application */
+    val = 0;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+    } while(val);
+    
+    /* Enable the D/A Converter */
+    mas_codec_writereg(0x0, 0x0001);
+
+    /* ADC scale 0%, DSP scale 100% */
+    mas_codec_writereg(6, 0x0000);
+    mas_codec_writereg(7, 0x4000);
+
+    /* Disable SDO and SDI */
+    val = 0x0d;
+    mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
+
+    /* Set Demand mode and validate all settings */
+    val = 0x25;
+    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+
+    /* Start the Layer2/3 decoder applications */
+    val = 0x0c;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
+
+    DEBUGF("MAS Decoding application started\n");
+}
+
+void mpeg_record(char *filename)
+{
+    is_recording = true;
+    queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
+}
+
+static void start_recording(void)
+{
+    recording = true;
+    stop_pending = false;
+}
+
+#endif
 
 void mpeg_play(int offset)
 {
@@ -1647,7 +1956,11 @@ int mpeg_status(void)
 
     if(paused)
         ret |= MPEG_STATUS_PAUSE;
-
+    
+#ifdef HAVE_MAS3587F
+    if(is_recording)
+        ret |= MPEG_STATUS_RECORD;
+#endif
     return ret;
 }
 
@@ -1863,6 +2176,15 @@ int mpeg_val2phys(int setting, int value)
         case SOUND_SUPERBASS:
             result = value * 10;
             break;
+
+        case SOUND_LEFT_GAIN:
+        case SOUND_RIGHT_GAIN:
+            result = (value - 2) * 15;
+            break;
+
+        case SOUND_MIC_GAIN:
+            result = value * 15 + 210;
+            break;
 #endif
     }
     return result;
@@ -2013,15 +2335,63 @@ void mpeg_set_pitch(int pitch)
 }
 #endif
 
+#ifdef HAVE_MAS3587F
+void mpeg_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode)
+{
+    bool is_mpeg1;
+    unsigned long val;
+
+    is_mpeg1 = (frequency < 3)?true:false;
+    
+    val = (quality << 17) |
+        ((frequency % 3) << 11) |
+        ((is_mpeg1?1:0) << 9) |
+        ((channel_mode * 2 + 1) << 6) |
+        (1 << 5) /* MS-stereo */ |
+        (1 << 2) /* Is an original */;
+    mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
+
+    val = (((source < 2)?1:2) << 8) | /* Input select */
+        (1 << 5) | /* SDO strobe invert */
+        ((is_mpeg1?0:1) << 3) |
+        (1 << 2) | /* Inverted SIBC clock signal */
+        1; /* Validate */
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
+
+    if(source == 0) /* Mic */
+    {
+        /* Copy left channel to right (mono mode) */
+        mas_codec_writereg(8, 0x8000);
+    }
+    else
+    {
+        /* Stereo input mode */
+        mas_codec_writereg(8, 0);
+    }
+}
+
+void mpeg_set_recording_gain(int left, int right, int mic)
+{
+    /* Enable both left and right A/D */
+    mas_codec_writereg(0x0,
+                       (left << 12) |
+                       (right << 8) |
+                       (mic << 4) |
+                       (mic?0x0008:0) | /* Connect left A/D to mic */
+                       0x0007);
+}
+#endif
+
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
     volume = bass = treble = balance = loudness = bass_boost = avc;
 #else
-    unsigned long val;
 #ifdef HAVE_MAS3587F
     int rc;
 #else
+    unsigned long val;
     loudness = bass_boost = avc;
 #endif
 
@@ -2039,25 +2409,10 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     if(rc < 0)
         panicf("mas_ctrl_r: %d", rc);
 
+    init_playback();
+    
     mpeg_sound_channel_config(MPEG_SOUND_STEREO);
 
-    /* Enable the D/A Converter */
-    mas_codec_writereg(0x0, 0x0001);
-
-    /* DSP scale 100% */
-    mas_codec_writereg(7, 0x4000);
-
-    /* Disable SDO and SDI */
-    val = 0x0d;
-    mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
-
-    /* Set Demand mode and validate all settings */
-    val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
-
-    /* Start the Layer2/3 decoder applications */
-    val = 0x0c;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
 #endif
 
 #ifdef HAVE_DAC3550A
