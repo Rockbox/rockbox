@@ -125,6 +125,8 @@ char having_new_lcd=True;
 char *progname;
 XrmDatabase db;
 XtAppContext app;
+Display* dpy;
+Window window;
 Bool mono_p;
 
 static XrmOptionDescRec default_options [] = {
@@ -155,8 +157,8 @@ static char *default_defaults[] = {
     0
 };
 
-extern Display* dpy;
 extern int display_zoom;
+extern long current_tick;
 
 static XrmOptionDescRec *merged_options;
 static int merged_options_size;
@@ -238,27 +240,23 @@ static Bool MapNotify_event_p (Display *dpy, XEvent *event, XPointer window)
 
 static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 
-static Bool checkrepeat(time_t prev,
-                       time_t now)
+
+void kb_disable_auto_repeat(bool on)
 {
-    if(now-prev < 50) {
-        return true;
-    }
-    return false;
+    XKeyboardControl kb;
+
+    kb.auto_repeat_mode = on ? AutoRepeatModeOff : AutoRepeatModeDefault;
+    XChangeKeyboardControl(dpy, KBAutoRepeatMode, &kb);
 }
 
 /* Dead-trivial event handling.
    Exit if the WM_PROTOCOLS WM_DELETE_WINDOW ClientMessage is received.
  */
-int screenhack_handle_event(Display *dpy, XEvent *event,
-                            bool *release, bool *repeat)
+int screenhack_handle_event(XEvent *event, bool *release)
 {
     int key=0;
-    static time_t lasttime;
-    static unsigned int lastkeycode;
 
     *release = FALSE;
-    *repeat = false;
 
     switch (event->xany.type) {
         case KeyPress:
@@ -268,14 +266,9 @@ int screenhack_handle_event(Display *dpy, XEvent *event,
                 XLookupString (&event->xkey, &c, 1, &keysym, 0);
                 key = keysym;
 #if 0
-                DEBUGF("Got keypress: %02x %x, time %lx\n", c,
-                       event->xkey.keycode,
-                       event->xkey.time);
+                DEBUGF("Got keypress: %c (%02x) %x, tick %ld\n", c, c,
+                       event->xkey.keycode, current_tick);
 #endif
-                if(lastkeycode == event->xkey.keycode)
-                    *repeat = checkrepeat(lasttime, event->xkey.time);
-                lasttime = event->xkey.time;
-                lastkeycode = event->xkey.keycode;
             }
             break;
         case KeyRelease:
@@ -285,21 +278,20 @@ int screenhack_handle_event(Display *dpy, XEvent *event,
                 XLookupString (&event->xkey, &c, 1, &keysym, 0);
                 key = keysym;
 #if 0
-                DEBUGF("Got keyrelease: %c (%02x) %x\n", c, c,
-                       event->xkey.keycode);
+                DEBUGF("Got keyrelease: %c (%02x) %x, tick %ld\n", c, c,
+                       event->xkey.keycode, current_tick);
 #endif
-                if(lastkeycode == event->xkey.keycode)
-                    *repeat = checkrepeat(lasttime, event->xkey.time);
-                lasttime = event->xkey.time;
-                lastkeycode = event->xkey.keycode;
-                if(*repeat)
-                    return 0; /* on repeats, return nothing on release */
-              
                 *release = TRUE;
             }
             break;
         case Expose:
             screen_redraw();
+            break;
+        case FocusIn:
+            kb_disable_auto_repeat(true);
+            break;
+        case FocusOut:
+            kb_disable_auto_repeat(false);
             break;
         case ClientMessage:
             if (event->xclient.message_type != XA_WM_PROTOCOLS) {
@@ -320,6 +312,8 @@ int screenhack_handle_event(Display *dpy, XEvent *event,
                          progname, s1, s2);
             }
             else {
+                kb_disable_auto_repeat(false);
+                XSync(dpy, false); /* force the X server to process that */
                 exit (0);
             }
             break;
@@ -330,15 +324,17 @@ int screenhack_handle_event(Display *dpy, XEvent *event,
 }
 
 
-int screenhack_handle_events(bool *release, bool *repeat)
+int screenhack_handle_events(bool *release)
 {
     int key=0;
+    XtAppLock(app);
     if(XPending(dpy))
     {
         XEvent event;
         XNextEvent(dpy, &event);
-        key=screenhack_handle_event(dpy, &event, release, repeat);
+        key=screenhack_handle_event(&event, release);
     }
+    XtAppUnlock(app);
     return key;
 }
 
@@ -347,7 +343,7 @@ static Visual *pick_visual (Screen *screen)
 {
 #ifdef USE_GL
     /* If we're linking against GL (that is, this is the version of 
-       screenhack.o that the GL hacks will use, which is different from the 
+       screenhack.o that the GL hacks will use, which is different from the
        one that the non-GL hacks will use) then try to pick the "best" visual 
        by interrogating the GL library instead of by asking Xlib.  GL knows 
        better.
@@ -379,8 +375,6 @@ static Visual *pick_visual (Screen *screen)
 int main (int argc, char **argv)
 {
     Widget toplevel;
-    Display *dpy;
-    Window window;
     Screen *screen;
     Visual *visual;
     Colormap cmap;
@@ -460,8 +454,10 @@ int main (int argc, char **argv)
        does work when passed as an -xrm arg on the command line.  So screw it,
        turn them off from C instead.
     */
-    SgiUseSchemes ("none"); 
+    SgiUseSchemes ("none");
 #endif /* __sgi */
+
+    XtToolkitThreadInitialize();
 
     toplevel = XtAppInitialize (&app, progclass, merged_options,
                                 merged_options_size, &argc, argv,
@@ -556,7 +552,7 @@ int main (int argc, char **argv)
             XGetWindowAttributes (dpy, window, &xgwa);
             XSelectInput (dpy, window, 
                           xgwa.your_event_mask | KeyPressMask | KeyRelease |
-                          ButtonPressMask | ExposureMask);
+                          ButtonPressMask | ExposureMask | FocusChangeMask );
             XChangeProperty (dpy, window, XA_WM_PROTOCOLS, XA_ATOM, 32,
                              PropModeReplace,
                              (unsigned char *) &XA_WM_DELETE_WINDOW, 1);
@@ -573,6 +569,7 @@ int main (int argc, char **argv)
 
     XSync (dpy, False);
 
-    screenhack (dpy, window); /* doesn't return */
+    kb_disable_auto_repeat(true);
+    screenhack(); /* doesn't return */
     return 0;
 }

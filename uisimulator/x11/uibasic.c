@@ -48,9 +48,6 @@ GC draw_gc;
 static Colormap cmap;
 
 int display_zoom=1;
-
-Display *dpy;
-Window window;
 bool lcd_display_redraw=true;
 
 XrmOptionDescRec options [] = {
@@ -96,16 +93,19 @@ void screen_resized(int width, int height)
     maxx = width;
     maxy = height;
 
+    XtAppLock(app);
     XSetForeground(dpy, draw_gc,
                    get_pixel_resource("background", "Background", dpy, cmap));
     XFillRectangle(dpy, window, draw_gc, 0, 0, width*display_zoom,
                    height*display_zoom);
+    XtAppUnlock(app);
     lcd_display_redraw=true;
     screen_redraw();
 }
 
 void drawrect(int color, int x1, int y1, int x2, int y2)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -115,6 +115,7 @@ void drawrect(int color, int x1, int y1, int x2, int y2)
 
     XFillRectangle(dpy, window, draw_gc, x1*display_zoom, y1*display_zoom,
                    x2*display_zoom, y2*display_zoom);
+    XtAppUnlock(app);
 }
 
 static void help(void)
@@ -125,6 +126,7 @@ static void help(void)
 
 void drawline(int color, int x1, int y1, int x2, int y2)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -137,10 +139,12 @@ void drawline(int color, int x1, int y1, int x2, int y2)
               (int)(y1*display_zoom),
               (int)(x2*display_zoom),
               (int)(y2*display_zoom));
+    XtAppUnlock(app);
 }
 
 void drawdot(int color, int x, int y)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -150,10 +154,12 @@ void drawdot(int color, int x, int y)
 
     XFillRectangle(dpy, window, draw_gc, x*display_zoom, y*display_zoom,
                    display_zoom, display_zoom);
+    XtAppUnlock(app);
 }
 
 void drawdots(int color, struct coordinate *points, int count)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -168,10 +174,12 @@ void drawdots(int color, struct coordinate *points, int count)
                        display_zoom,
                        display_zoom);
     }
+    XtAppUnlock(app);
 }
 
 void drawrectangles(int color, struct rectangle *points, int count)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -186,10 +194,12 @@ void drawrectangles(int color, struct rectangle *points, int count)
                        points[count].width*display_zoom,
                        points[count].height*display_zoom);
     }
+    XtAppUnlock(app);
 }
 
 void drawtext(int color, int x, int y, char *text)
 {
+    XtAppLock(app);
     if (color==0)
         XSetForeground(dpy, draw_gc,
                        get_pixel_resource("background", "Background", dpy, cmap));
@@ -199,13 +209,13 @@ void drawtext(int color, int x, int y, char *text)
 
     XDrawString(dpy, window, draw_gc, x*display_zoom, y*display_zoom, text,
                 strlen(text));
+    XtAppUnlock(app);
 }
 
 /* this is where the applicaton starts */
 extern void app_main(void);
 
-void
-screenhack (Display *the_dpy, Window the_window)
+void screenhack()
 {
     Bool helpme;
 
@@ -215,9 +225,6 @@ screenhack (Display *the_dpy, Window the_window)
         help();
 
     printf(PROGNAME " " ROCKBOXUI_VERSION " (" __DATE__ ")\n");
-
-    dpy=the_dpy;
-    window=the_window;
 
     init_window();
 

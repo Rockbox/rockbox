@@ -28,6 +28,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Xos.h>
+#include <X11/Intrinsic.h>
 
 #include "resources.h"
 #include "visual.h"
@@ -38,10 +39,13 @@ extern char *progclass;
 extern XrmDatabase db;
 extern XrmOptionDescRec options [];
 extern char *defaults [];
+extern XtAppContext app;
+extern Display* dpy;
+extern Window window;
 
-extern void screenhack (Display*,Window);
-extern int screenhack_handle_event(Display*, XEvent*, bool *, bool *);
-extern int screenhack_handle_events(bool *, bool *);
+extern void screenhack();
+extern int screenhack_handle_event(XEvent*, bool *);
+extern int screenhack_handle_events(bool *);
 extern void screen_redraw();
 extern void screen_resized();
 

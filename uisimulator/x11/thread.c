@@ -24,6 +24,16 @@
 #include <sys/time.h>
 
 long current_tick = 0;
+extern void button_tick(void);
+
+static void msleep(int msec)
+{
+    struct timeval delay;
+    
+    delay.tv_sec = msec / 1000;
+    delay.tv_usec = (msec - 1000 * delay.tv_sec) * 1000;
+    select(0, NULL, NULL, NULL, &delay); /* portable sub-second sleep */
+}
 
 /*
  * This is not a target thread, so it does not fall under the 1 thread at a
@@ -31,17 +41,23 @@ long current_tick = 0;
  */
 static void update_tick_thread()
 {
-    struct timeval start, now, delay;
+    struct timeval start, now;
+    long new_tick;
 
     gettimeofday(&start, NULL);
     while (1)
     {
-        delay.tv_sec = 0;
-        delay.tv_usec = (1000000/HZ/4);  /* check 4 times per target tick */
-        select(0, NULL, NULL, NULL, &delay); /* portable sub-second sleep */
+        msleep(5); /* check twice per simulated target tick */
         gettimeofday(&now, NULL);
-        current_tick = (now.tv_sec - start.tv_sec) * HZ
-                     + (now.tv_usec - start.tv_usec) * HZ / 1000000;
+        new_tick = (now.tv_sec - start.tv_sec) * HZ
+                   + (now.tv_usec - start.tv_usec) / (1000000/HZ);
+        if (new_tick > current_tick)
+        {
+            current_tick = new_tick;
+            button_tick();  /* Dirty call to button.c. This should probably
+                             * be implemented as a tick task the same way 
+                             * as on the target. */
+        }
     }
 }
 
@@ -73,7 +89,8 @@ void init_threads(void)
 void yield(void)
 {
     pthread_mutex_unlock(&mp); /* return */
-    pthread_mutex_lock(&mp); /* get it again */
+    msleep(1);                 /* prevent busy loop */
+    pthread_mutex_lock(&mp);   /* get it again */
 }
 
 void newfunc(void (*func)(void))
@@ -109,26 +126,8 @@ int create_thread(void* fp, void* sp, int stk_size)
 
 void sim_sleep(int ticks)
 {
-    struct timeval delay;
-
     pthread_mutex_unlock(&mp); /* return */
-    delay.tv_sec = ticks / HZ;
-    delay.tv_usec = (ticks - HZ * delay.tv_sec) * (1000000/HZ);
-    select(0, NULL, NULL, NULL, &delay);   /* portable subsecond sleep */
-    pthread_mutex_lock(&mp); /* get it again */
+    msleep((1000/HZ) * ticks);
+    pthread_mutex_lock(&mp);   /* get it again */
 }
 
-void mutex_init(struct mutex *m)
-{
-    (void)m;
-}
-
-void mutex_lock(struct mutex *m)
-{
-    (void)m;
-}
-
-void mutex_unlock(struct mutex *m)
-{
-    (void)m;
-}

@@ -42,7 +42,6 @@
 
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 extern void screen_resized(int width, int height);
-extern Display *dpy;
 
 #ifdef HAVE_LCD_BITMAP
 unsigned char lcd_framebuffer_copy[LCD_HEIGHT/8][LCD_WIDTH];
@@ -91,9 +90,11 @@ void lcd_update (void)
 
     drawdots(0, &clearpoints[0], cp);
     drawdots(1, &points[0], p);
-/* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n", 
+    /* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n",
        p, cp, p+cp, LCD_HEIGHT*LCD_WIDTH); */
+    XtAppLock(app);
     XSync(dpy,False);
+    XtAppUnlock(app);
 }
 
 void lcd_update_rect(int x_start, int y_start,
@@ -117,7 +118,7 @@ void lcd_update_rect(int x_start, int y_start,
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (yline + height)/8;
     yline /= 8;
- 
+
     xmax = x_start + width;
 
     if(xmax > LCD_WIDTH)
@@ -156,8 +157,10 @@ void lcd_update_rect(int x_start, int y_start,
 
     drawdots(0, &clearpoints[0], cp);
     drawdots(1, &points[0], p);
-   /* printf("lcd_update_rect: Draws %d pixels, clears %d pixels\n", p, cp);*/
+    /* printf("lcd_update_rect: Draws %d pixels, clears %d pixels\n", p, cp);*/
+    XtAppLock(app);
     XSync(dpy,False);
+    XtAppUnlock(app);
 }
 #endif
 #ifdef HAVE_LCD_CHARCELLS
@@ -186,7 +189,11 @@ void lcd_update (void)
         }
     }
     if (changed)
+    {
+        XtAppLock(app);
         XSync(dpy,False);
+        XtAppUnlock(app);
+    }
     lcd_display_redraw=false;
 }
 

@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdlib.h>
 #include "config.h"
 #include "button.h"
 #include "kernel.h"
@@ -24,41 +25,122 @@
 
 #include "X11/keysym.h"
 
-/*
- *Initialize buttons
- */
-void button_init()
+extern int screenhack_handle_events(bool *release);
+
+struct event_queue button_queue;
+
+static int button_state = 0; /* keeps track of pressed keys */
+static long lastbtn;   /* Last valid button status */
+
+/* how often we check to see if a button is pressed */
+#define POLL_FREQUENCY    HZ/25
+
+/* how long until repeat kicks in */
+#define REPEAT_START      8
+
+/* the speed repeat starts at */
+#define REPEAT_INTERVAL_START   4
+
+/* speed repeat finishes at */
+#define REPEAT_INTERVAL_FINISH  2
+
+/* mostly copied from real button.c */
+void button_read (void);
+
+void button_tick(void)
 {
+    static int tick = 0;
+    static int count = 0;
+    static int repeat_speed = REPEAT_INTERVAL_START;
+    static int repeat_count = 0;
+    static bool repeat = false;
+    int diff;
+    int btn;
+
+    /* only poll every X ticks */
+    if ( ++tick >= POLL_FREQUENCY )
+    {
+        bool post = false;
+        button_read();
+        btn = button_state;
+
+        /* Find out if a key has been released */
+        diff = btn ^ lastbtn;
+        if(diff && (btn & diff) == 0)
+        {
+            queue_post(&button_queue, BUTTON_REL | diff, NULL);
+        }
+        else
+        {
+            if ( btn )
+            {
+                /* normal keypress */
+                if ( btn != lastbtn )
+                {
+                    post = true;
+                    repeat = false;
+                    repeat_speed = REPEAT_INTERVAL_START;
+
+                }
+                else /* repeat? */
+                {
+                    if ( repeat )
+                    {
+                        count--;
+                        if (count == 0) {
+                            post = true;
+                            /* yes we have repeat */
+                            repeat_speed--;
+                            if (repeat_speed < REPEAT_INTERVAL_FINISH)
+                                repeat_speed = REPEAT_INTERVAL_FINISH;
+                            count = repeat_speed;
+
+                            repeat_count++;
+
+                        }
+                    }
+                    else
+                    {
+                        if (count++ > REPEAT_START)
+                        {
+                            post = true;
+                            repeat = true;
+                            repeat_count = 0;
+                            /* initial repeat */
+                            count = REPEAT_INTERVAL_START;
+                        }
+                    }
+                }
+                if ( post )
+                {
+                    if (repeat)
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                    else
+                        queue_post(&button_queue, btn, NULL);
+                }
+            }
+            else
+            {
+                repeat = false;
+                count = 0;
+            }
+        }
+        lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
+        tick = 0;
+    }
 }
 
 /*
- * Translate X keys to Recorder keys
- *
- * We simulate recorder keys on the numeric keypad:
- *
- * 4,6,8,2 = Left, Right, Up, Down
- * 5 = Play/pause
- * Div,Mul,Sub = The tree menu keys
- * +,Enter = On, Off
- *
- * Alternative Keys For Laptop or VNC Users
- * Recorder:
- * Space=Play Q=On A=Off 1,2,3 = F1,F2,F3
- * Player:
- * Q=On Return=Menu
+ * Read X keys and translate to rockbox buttons
  */
 
-extern int screenhack_handle_events(bool *release, bool *repeat);
-
-int button_state = 0;
-
-static int get_raw_button (void)
+void button_read (void)
 {
     int k;
-    bool release=false; /* is this a release event */
-    bool repeat=false;  /* is the key a repeated one */
-    int ev=screenhack_handle_events(&release, &repeat);
-    switch(ev)
+    bool release = false; /* is this a release event */
+    int ev = screenhack_handle_events(&release);
+
+    switch (ev)
     {
         case XK_KP_Left:
         case XK_Left:
@@ -144,10 +226,7 @@ static int get_raw_button (void)
 #ifdef HAVE_LCD_BITMAP
         case XK_5:
             if(!release)
-            {
                 screen_dump();
-                return 0;
-            }
             break;
 #endif
 
@@ -168,75 +247,45 @@ static int get_raw_button (void)
             break;
     }
 
-    if(release) {
-        /* return a release event */
+    if (release)
         button_state &= ~k;
-        k |= BUTTON_REL;
-    } 
-    else {
-        if(k) {
-            button_state |= k;
-            k = button_state;
-        }
-    }
-
-    if(repeat)
-        k |= BUTTON_REPEAT;
-    return k;
+    else
+        button_state |= k;
 }
 
-/*
- * Timeout after TICKS unless a key is pressed.
- */
-long button_get_w_tmo(int ticks)
-{
-    int bits;
-    int i=0;
+/* Again copied from real button.c... */
 
-    for(i=0; i< ticks; i++) {
-        bits = get_raw_button();
-        if(!bits)
-            sim_sleep(1);
-        else
-            break;
-    }
-
-    return bits;
-}
-
-/*
- * Get the currently pressed button.
- * Returns one of BUTTON_xxx codes, with possibly a modifier bit set.
- * No modifier bits are set when the button is first pressed.
- * BUTTON_HELD bit is while the button is being held.
- * BUTTON_REL bit is set when button has been released.
- */
 long button_get(bool block)
 {
-    int bits;
-    do {
-        bits = get_raw_button();
-        if(block && !bits)
-            sim_sleep(HZ/10);
-        else
-            break;
-    } while(1);
+    struct event ev;
 
-    if(!block)
-        /* delay a bit */
-        sim_sleep(1);
+    if ( block || !queue_empty(&button_queue) ) 
+    {
+        queue_wait(&button_queue, &ev);
+        return ev.id;
+    }
+    return BUTTON_NONE;
+}
 
-    return bits;
+long button_get_w_tmo(int ticks)
+{
+    struct event ev;
+    queue_wait_w_tmo(&button_queue, &ev, ticks);
+    return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
+} 
+
+void button_init(void)
+{
 }
 
 int button_status(void)
 {
-    return get_raw_button();
+    return lastbtn;
 }
 
 void button_clear_queue(void)
 {
-    while (get_raw_button());
+    queue_clear(&button_queue);
 }
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD

@@ -1,4 +1,5 @@
 button-x11.c
+kernel.c
 lcd-x11.c
 #if 0 /* if sound is enabled */
 oss_sound.c
