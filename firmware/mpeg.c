@@ -2481,6 +2481,7 @@ void mpeg_new_file(char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 
+    num_rec_bytes = 0;
     disable_xing_header = true;
 
     /* Store the current time */
