@@ -614,7 +614,7 @@ static int save(
     {
         int close_stat = 0;
         int x, y;
-        int offset;
+        long offset;
         unsigned long last_header = rb->mpeg_get_last_header();
 
         rb->lcd_getstringsize("M", &x, &y);
