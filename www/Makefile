@@ -1,7 +1,9 @@
 ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -Uunix -H -C -V -LL >$@
 
 SRC := $(wildcard *.t)
-OBJS := $(SRC:%.t=%.html) daily.shtml main.shtml index.shtml bugs.html status.shtml
+SOBJS := daily.shtml main.shtml index.shtml status.shtml \
+	bugs.shtml requests.shtml
+OBJS := $(SRC:%.t=%.html) $(SOBJS)
 
 .SUFFIXES: .t .html
 
@@ -32,9 +34,6 @@ index.shtml: main.shtml
 	ln -s main.shtml index.shtml
 
 daily.shtml: daily.t
-
-bugs.html:
-	perl getbugs.pl > bugs.html
 
 clean:
 	find . -name "*html" | xargs rm

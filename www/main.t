@@ -10,6 +10,9 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-09-19</i>: We now support multiple languages. You can help by translating Rockbox to your language. No programming skills required.
+<a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-09/0856.shtml">See instructions here</a>
+
 <p><i>2002-09-13</i>: We took a big step and converted to an entirely new font system for the Recorder. Please bear with us as we smoothen out the initial quirks.
 
 <p><i>2002-09-03</i>: ROLO, the Rockbox Loader has been integrated into the CVS, allowing Archos or other Rockbox firmware being loaded by simply selecting the file!
@@ -17,12 +20,6 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 <p><i>2002-09-02</i>: <a href="http://rockbox.haxx.se/tshirt-contest/vote.html">Vote for your favourite tshirt designs!</a>
 
 <p><i>2002-08-28</i>: Version 1.3 is released. <a href="download/">Go fetch</a>.
-
-<p><i>2002-08-09</i>: Version 1.2 is released. <a href="download/">Download it here</a>.
-
-<p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>.
-
-<p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
@@ -33,7 +30,7 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>Open bug reports</h2>
 <p>
-<!--#include file="bugs.html" -->
+<!--#include file="bugs.txt" -->
 <small><b>Note:</b> Don't file bug reports on daily builds. They are work in progress.</small>
 
 <h2>Roadmap</h2>
@@ -43,9 +40,9 @@ notice.
 
 <dl>
 <dt><b>Version 1.4</b>
-<dd> Autobuild playlists, Recording, Loadable fonts, Customizable WPS, Firmware loading (ROLO)
-<dt><b>Version 1.5</b>
-<dd> File/directory management
+<dd> Loadable fonts, Customizable WPS, Firmware loading (ROLO)
+<dt><b>Version 2.0</b>
+<dd> Recording, Autobuild playlists, File/directory management
 </dl>
 
 <h2>About the hardware</h2>

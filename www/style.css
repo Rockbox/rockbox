@@ -86,7 +86,7 @@ PRE {
 }
 
 
-.changetable, .bugs, .dailymod, .buildstatus, .archive {
+.changetable, .bugs, .requests, .dailymod, .buildstatus, .archive, .buttontable {
  border: outset 2px #ffffff;
 }
 
@@ -94,7 +94,7 @@ PRE {
  vertical-align: top;
 }
 
-.changetable td, .bugs td, .archive td {
+.changetable td, .bugs td, .requests td, .archive td, .buttontable td {
  background-color: #c6d6f5;
  padding: 4px;
 }

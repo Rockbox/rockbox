@@ -11,6 +11,7 @@ print "<table class=archive>\n";
 
 $lasty = 0;
 $lastm = 0;
+$count = 0;
 
 for ( @logs ) {
     $size = (stat("$_"))[7];
@@ -23,6 +24,7 @@ for ( @logs ) {
             $d = $3;
             $mname = ucfirst MonthNameEng($m);
             if ( $m != $lastm ) {
+                $count=0;
                 print "</tr><tr>\n" if $lastm != 0;
 #                if ( $m % 6 == 0 ) {
 #                    print "</tr><tr valign=top>\n";
@@ -33,6 +35,10 @@ for ( @logs ) {
 #            $lines = `wc -l $file` + 0;
 #            print "<li><a test href=\"$file\">$mname $d</a> <small>($lines lines)</small>\n";
             print "<td><a test href=\"$file\">$d</a></td>\n";
+            if ( ++$count > 15 ) {
+                print "</tr><tr><th></th>\n";
+                $count=0;
+            }
         }
     }
     #print "<li><a href=\"daily/$_\">$_</a> ($size bytes) $log\n";

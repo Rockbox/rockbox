@@ -2,6 +2,12 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-08-09</i>: Version 1.2 is released. <a href="download/">Download it here</a>.
+
+<p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>.
+
+<p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
+
 <p><i>2002-08-02</i>: <a href="tshirt-contest">Rockbox T-Shirt Design Contest</a>
 
 <p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk

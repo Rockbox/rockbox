@@ -80,3 +80,21 @@ Example File
 That is, "tracknum - title [artist, album]", where most fields are only
 displayed if available. Could also be rendered as "filename" or
 "tracknum - title [artist]".
+
+Default
+-------
+If you don't use a default.wps file, you get the hardcoded wps layout.
+The default WPS screen is for player:
+
+%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>
+%pc/%pt
+
+and for recorder:
+
+%s%fp
+%it
+%id
+%ia
+%fb kbit %fv
+Time: %pc / %pt
+%pb
