@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "config.h"
 
-#ifdef IRIVER_H100
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
 #include "thread.h"
 #include "cpu.h"
 
