@@ -36,7 +36,7 @@
 struct event_queue button_queue;
 
 static int lastbtn;
-#ifdef HAVE_RECORDER_KEYPAD
+#if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
 
@@ -337,7 +337,7 @@ static int button_read(void)
     return btn;
 }
 
-#elif HAVE_PLAYER_KEYPAD
+#elif defined(HAVE_PLAYER_KEYPAD)
 
 /* The player has two buttons on port pins:
 
@@ -386,7 +386,7 @@ static int button_read(void)
     return btn;
 }
 
-#elif HAVE_NEO_KEYPAD
+#elif defined(HAVE_NEO_KEYPAD)
 static bool mStation = false;
 void button_init(void)
 {
@@ -421,6 +421,90 @@ int button_add(unsigned int button)
     queue_post(&button_queue,button,NULL);
     return 1;
 }
+
+#elif defined HAVE_ONDIO_KEYPAD
+
+/*
+ * helper function to swap UP/DOWN, LEFT/RIGHT
+ */
+static int button_flip(int button)
+{
+    int newbutton;
+
+    newbutton = button & 
+        ~(BUTTON_UP | BUTTON_DOWN
+        | BUTTON_LEFT | BUTTON_RIGHT);
+
+    if (button & BUTTON_UP)
+        newbutton |= BUTTON_DOWN;
+    if (button & BUTTON_DOWN)
+        newbutton |= BUTTON_UP;
+    if (button & BUTTON_LEFT)
+        newbutton |= BUTTON_RIGHT;
+    if (button & BUTTON_RIGHT)
+        newbutton |= BUTTON_LEFT;
+
+    return newbutton;
+}
+
+
+/*
+ * set the flip attribute
+ * better only call this when the queue is empty
+ */
+void button_set_flip(bool flip)
+{
+    if (flip != flipped) /* not the current setting */
+    {
+        /* avoid race condition with the button_tick() */
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        lastbtn = button_flip(lastbtn); 
+        flipped = flip;
+        set_irq_level(oldlevel);
+    }
+}
+
+
+/* The Ondio its 6 buttons on analog inputs:
+   OPTION: AN2 (used as MENU for now)
+   ON/OFF: AN3
+   LEFT/RIGHT/UP/DOWN: AN4
+   We map them like the player keys for now, although this is far from optimal.
+*/
+void button_init(void)
+{
+    queue_init(&button_queue);
+    lastbtn = 0;
+    tick_add_task(button_tick);
+
+    reset_poweroff_timer();
+}
+
+static int button_read(void)
+{
+    int btn = BUTTON_NONE;
+    int data = adc_read(4);
+
+    if(adc_read(2) > 0x180) /* active high */
+        btn |= BUTTON_MENU;
+    if(adc_read(3) < 0x180) /* active low */
+        btn |= BUTTON_ON;
+    if(adc_read(3) < 0x180)
+        btn |= BUTTON_PLAY | BUTTON_UP;
+
+    /* Check the 4 direction keys, hard-coded analog limits for now */
+    if (data >= 0x2E5)
+        btn |= BUTTON_LEFT;
+    else if (data >= 0x23F)
+        btn |= BUTTON_RIGHT;
+    else if (data >= 0x197)
+        btn |= BUTTON_PLAY | BUTTON_UP;
+    else if (data >= 0x0A1)
+        btn |= BUTTON_STOP | BUTTON_DOWN;
+
+    return btn;
+}
+
 #endif
 
 int button_status(void)

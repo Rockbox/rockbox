@@ -1266,7 +1266,7 @@ static bool disk_settings_menu(void)
     return result;
 }
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_RTC
 static bool time_settings_menu(void)
 {
     int m;

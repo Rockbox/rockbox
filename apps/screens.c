@@ -1085,10 +1085,12 @@ bool set_time_screen(const char* string, struct tm *tm)
             case BUTTON_ON:
                 done = true;
                 break;
+#if (BUTTON_ON != BUTTON_OFF)
             case BUTTON_OFF:
                 done = true;
                 tm->tm_year = -1;
                 break;
+#endif
 
             default:
                 if (default_event_handler(button) == SYS_USB_CONNECTED)

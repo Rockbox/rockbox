@@ -61,7 +61,7 @@ static struct mp3entry* id3 = NULL;
 static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
 void player_change_volume(int button)
 {
     bool exit = false;
@@ -577,8 +577,10 @@ static bool menu(void)
                 /* show id3 tags */
 #ifdef BUTTON_ON
             case BUTTON_MENU | BUTTON_ON:
+#ifdef HAVE_LCD_CHARCELLS
                 status_set_param(true);
                 status_set_audio(true);
+#endif
 #endif
 #else
             case BUTTON_F1 | BUTTON_ON:
@@ -811,8 +813,10 @@ int wps_show(void)
                     case 0:
                         /* otherwise, exit to browser */
 #else
+#ifdef HAVE_LCD_CHARCELLS
                         status_set_record(false);
                         status_set_audio(false);
+#endif
 #endif
                         lcd_stop_scroll();
 

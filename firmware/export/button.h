@@ -30,7 +30,7 @@ int button_get (bool block);
 int button_get_w_tmo(int ticks);
 int button_status(void);
 void button_clear_queue(void);
-#ifdef HAVE_RECORDER_KEYPAD
+#if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 
@@ -108,14 +108,23 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define	BUTTON_F2		0x0200
 #define	BUTTON_F3		0x0400
 
-#elif HAVE_PLAYER_KEYPAD
+#elif defined(HAVE_PLAYER_KEYPAD)
 
 /* Jukebox 6000 and Studio specific button codes */
 #define	BUTTON_MENU		0x0002
 #define	BUTTON_PLAY		BUTTON_UP
 #define	BUTTON_STOP		BUTTON_DOWN
 
-#endif /* HAVE_PLAYER_KEYPAD */
+#elif defined HAVE_ONDIO_KEYPAD
+
+/* Ondio specific button codes */
+#define	BUTTON_MENU		0x0002
+#define	BUTTON_PLAY		BUTTON_UP
+#define	BUTTON_STOP		BUTTON_DOWN
+/* ON is also interpreted as OFF, let's see if that helps a bit */
+#define BUTTON_OFF      BUTTON_ON
+
+#endif /* HAVE_RECORDER/PLAYER/ONDIO_KEYPAD */
 
 #endif /* HAVE_NEO_KEYPAD */
 

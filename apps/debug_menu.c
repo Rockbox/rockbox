@@ -1233,7 +1233,7 @@ static bool view_runtime(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ);
         switch(key) {
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
             case BUTTON_STOP | BUTTON_REL:
 #elif HAVE_RECORDER_KEYPAD
             case BUTTON_OFF | BUTTON_REL:
@@ -1412,7 +1412,7 @@ static bool dbg_disk_info(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
             case BUTTON_STOP | BUTTON_REL:
 #else
             case BUTTON_OFF | BUTTON_REL:

@@ -94,7 +94,7 @@ bool sleeptimer_screen(void)
           done = true;
           break;
 
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
         case BUTTON_RIGHT:
 #else
         case BUTTON_UP:
@@ -113,7 +113,7 @@ bool sleeptimer_screen(void)
             set_sleep_timer(newtime);
             break;
                 
-#ifdef HAVE_PLAYER_KEYPAD
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
         case BUTTON_LEFT:
 #else
         case BUTTON_DOWN:

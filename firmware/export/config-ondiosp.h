@@ -4,11 +4,8 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
-/* define this if you have a Recorder style 10-key keyboard */
-#define HAVE_RECORDER_KEYPAD 0
-
-/* define this if you have a real-time clock */
-#define HAVE_RTC 0
+/* define this if you have an Ondio style 6-key keyboard */
+#define HAVE_ONDIO_KEYPAD
 
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F

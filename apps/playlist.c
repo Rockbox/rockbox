@@ -557,7 +557,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     for (i=0; i<num_files; i++)
     {
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
         if (button_get(false) == BUTTON_STOP)
 #else
         if (button_get(false) == BUTTON_OFF)
@@ -2009,7 +2009,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
         if (button_get(false) == BUTTON_STOP)
 #else
         if (button_get(false) == BUTTON_OFF)
@@ -2377,7 +2377,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         int seek;
 
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
         if (button_get(false) == BUTTON_STOP)
 #else
         if (button_get(false) == BUTTON_OFF)
