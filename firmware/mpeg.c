@@ -288,7 +288,8 @@ static bool stop_pending;
 unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
 static bool saving; /* We are saving the buffer to disk */
-static char recording_filename[MAX_PATH];
+static char recording_filename[MAX_PATH]; /* argument to thread */
+static char delayed_filename[MAX_PATH]; /* internal copy of above */
 static int rec_frequency_index; /* For create_xing_header() calls */
 static int rec_version_index;   /* For create_xing_header() calls */
 static bool disable_xing_header; /* When splitting files */
@@ -1649,11 +1650,10 @@ static void mpeg_thread(void)
                     }
 
                     start_recording();
-
-                    mpeg_file = open(recording_filename, O_WRONLY|O_CREAT);
                     
-                    if(mpeg_file < 0)
-                        panicf("recfile: %d", mpeg_file);
+                    /* delayed until buffer is saved, don't open yet */
+                    strcpy(delayed_filename, recording_filename);
+                    mpeg_file = -1; 
 
                     break;
 
@@ -1783,6 +1783,14 @@ static void mpeg_thread(void)
                     writelen = MIN(amount_to_save,
                                    mp3buflen - mp3buf_read);
                     
+                    if (mpeg_file < 0) /* delayed file opening */
+                    {
+                        mpeg_file = open(delayed_filename, O_WRONLY|O_CREAT);
+                    
+                        if(mpeg_file < 0)
+                            panicf("recfile: %d", mpeg_file);
+                    }
+
                     if(writelen)
                     {
                         rc = write(mpeg_file, mp3buf + mp3buf_read, writelen);
@@ -1867,6 +1875,15 @@ static void mpeg_thread(void)
                             
                             DEBUGF("wrl: %x\n", writelen);
                             
+                            if (mpeg_file < 0) /* delayed file opening */
+                            {
+                                mpeg_file = open(delayed_filename,
+                                    O_WRONLY|O_CREAT);
+                    
+                                if(mpeg_file < 0)
+                                    panicf("recfile: %d", mpeg_file);
+                            }
+
                             rc = write(mpeg_file, mp3buf + mp3buf_read,
                                        writelen);
                             
