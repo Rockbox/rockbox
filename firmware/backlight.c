@@ -40,7 +40,6 @@ static int backlight_timeout = 5;
 void backlight_thread(void)
 {
     struct event ev;
-    int tmp;
     
     while(1)
     {
@@ -52,8 +51,8 @@ void backlight_thread(void)
                 if(backlight_timer)
                 {
 #ifdef HAVE_RTC
-                    tmp = rtc_read(0x0a);
-                    rtc_write(0x0a, tmp | 0x40); /* Enable square wave */
+                    /* Enable square wave */
+                    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 #else
                     PADR &= ~0x4000;
 #endif
@@ -62,8 +61,8 @@ void backlight_thread(void)
                 
             case BACKLIGHT_OFF:
 #ifdef HAVE_RTC
-                tmp = rtc_read(0x0a);
-                rtc_write(0x0a, tmp & ~0x40); /* Disable square wave */
+                /* Disable square wave */
+                rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
                 PADR |= 0x4000;
 #endif                
