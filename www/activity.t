@@ -26,14 +26,12 @@ STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net
 STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Written; untested)
 STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/system.c", Linus,In progress)
 STATUS(YELLOW,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Final touches)
+STATUS(YELLOW,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn & Linus,In progress)
 STATUS(YELLOW,Playlist handling,-,"", Stuart,Planning)
 STATUS(YELLOW,X11 simulator,uisimulator/, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/", Daniel,Progressing)
-STATUS(YELLOW,Win32 simulator,uisimulator/win32,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
+STATUS(YELLOW,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
 STATUS(RED,Newlib port,-,"", -,-)
-STATUS(RED,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn & Linus,Fat16 code exists)
 STATUS(RED,Directory browser UI,-,"", -,-)
 STATUS(RED,Application...,-,"",-,-)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
-
-
