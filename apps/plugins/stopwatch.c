@@ -191,7 +191,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
         }
 
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
+#endif
     }
     return true;
 }
