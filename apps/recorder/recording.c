@@ -243,7 +243,7 @@ bool recording_screen(void)
                     else
                     {
                         mpeg_pause_recording();
-                        status_set_playmode(STATUS_PAUSE);
+                        status_set_playmode(STATUS_RECORD_PAUSE);
                     }
                     update_countdown = 1; /* Update immediately */
                 }
