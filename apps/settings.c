@@ -1039,9 +1039,11 @@ bool settings_load_config(char* file)
             set_cfg_int(&global_settings.rec_quality, value, 0, 7);
         else if (!strcasecmp(name, "rec timesplit")){
             static char* options[] = {"off", "00:05","00:10","00:15",
-                                      "00:30","01:00","02:00","04:00"};
+                                      "00:30","01:00","02:00","04:00",
+                                      "06:00","08:00","10:00","12:00",
+                                      "18:00","24:00"};
             set_cfg_option(&global_settings.rec_timesplit, value, 
-                           options, 8); 
+                           options, 14);
         }
         else if (!strcasecmp(name, "rec source")) {
             static char* options[] = {"mic", "line", "spdif"};
