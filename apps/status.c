@@ -34,10 +34,15 @@ static enum playmode current_mode = STATUS_STOP;
 
 #ifdef HAVE_LCD_BITMAP
 bool statusbar_enabled = true;
+long last_tick;
+bool plug_state;
 #endif
 
 void status_init(void)
 {
+#ifdef HAVE_LCD_BITMAP
+    last_tick = current_tick;
+#endif
     status_set_playmode(STATUS_STOP);
 }
 
@@ -130,7 +135,17 @@ void status_draw(void)
     if(global_settings.statusbar && statusbar_enabled) {
         statusbar_wipe();
 #ifdef HAVE_CHARGE_CTRL
-        statusbar_icon_battery(battlevel,charger_enabled);
+        if(charger_inserted()) {
+            if(!charger_enabled)
+                plug_state=true;
+            else if(current_tick-last_tick>HZ) {
+                plug_state=!plug_state;
+                last_tick=current_tick;
+            }
+        }
+        else
+            plug_state=false;
+        statusbar_icon_battery(battlevel,plug_state);
 #else
         statusbar_icon_battery(battlevel,false);
 #endif
