@@ -68,7 +68,11 @@ static bool load_custom_wps(void)
     int fd;
     int l = 0;
     int numread = 1;
+#ifdef SIMULATOR
+    char *cchr;
+#else
     char cchr[0];
+#endif
 
     for (l=0;l<=5;l++)
          custom_wps[l][0] = 0;
@@ -550,9 +554,9 @@ void wps_display(struct mp3entry* id3)
 #ifdef HAVE_LCD_CHARCELLS
 bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
+#ifndef SIMULATOR
     if(!id3)
         return(false);
-    char player_progressbar[7];
     char binline[36];
     int songpos = 0;
     int i,j;
@@ -574,5 +578,6 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
     }
     lcd_define_pattern(8,player_progressbar,7);
     return(true);
+#endif
 }
 #endif
