@@ -73,6 +73,8 @@ void roll_credits(void)
     int height;
     int width;
 
+    lcd_setfont(FONT_UI);
+
     lcd_getstringsize("A", &width, &height);
 
     while(1) {
