@@ -31,7 +31,6 @@
 #include "string.h"
 #include "hwcompat.h"
 #include "adc.h"
-
 #include "bitswap.h"
 
 #define SECTOR_SIZE     512
@@ -90,9 +89,6 @@ long last_disk_activity = -1;
 
 static struct mutex mmc_mutex;
 
-static char mmc_stack[DEFAULT_STACK_SIZE];
-static const char mmc_thread_name[] = "mmc";
-static struct event_queue mmc_queue;
 static bool initialized = false;
 static bool delayed_write = false;
 static unsigned char delayed_sector[SECTOR_SIZE];
@@ -115,6 +111,8 @@ static int current_buffer = 0;
 
 static tCardInfo card_info[2];
 static int current_card = 0;
+static bool last_mmc_status = false;
+static int countdown;  /* for mmc switch debouncing */
 
 /* private function declarations */
 
@@ -136,6 +134,9 @@ static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
 static void swapcopy_sector(const unsigned char *buf);
 static int send_sector(const unsigned char *nextbuf, int timeout);
 static int send_single_sector(const unsigned char *buf, int timeout);
+
+static bool mmc_detect(void);
+static void mmc_tick(void);
 
 /* implementation */
 
@@ -475,10 +476,12 @@ tCardInfo *mmc_card_info(int card_no)
 {
     tCardInfo *card = &card_info[card_no];
     
-    if (!card->initialized)
+    if (!card->initialized && ((card_no == 0) || mmc_detect()))
     {
+        mutex_lock(&mmc_mutex);
         select_card(card_no);
         deselect_card();
+        mutex_unlock(&mmc_mutex);
     }
     return card;
 }
@@ -757,27 +760,42 @@ void ata_spin(void)
 {
 }
 
-static void mmc_thread(void)
+static bool mmc_detect(void)
 {
-    struct event ev;
+    return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
+}
 
-    while (1) {
-        while ( queue_empty( &mmc_queue ) ) {
+static void mmc_tick(void)
+{
+    bool current_status;
 
-            sleep(HZ/4);
-        }
-        queue_wait(&mmc_queue, &ev);
-        switch ( ev.id ) {
-#ifndef USB_NONE
-            case SYS_USB_CONNECTED:
-                /* Tell the USB thread that we are safe */
-                DEBUGF("mmc_thread got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    current_status = mmc_detect();
+    
+    /* Only report when the status has changed */
+    if (current_status != last_mmc_status)
+    {
+        last_mmc_status = current_status;
+        countdown = 30;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
 
-                /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&mmc_queue);
-                break;
-#endif
+        /* Report to the thread if we have had 3 identical status
+           readings in a row */
+        if (countdown == 0)
+        {
+            if (current_status)
+            {
+                queue_broadcast(SYS_MMC_INSERTED, NULL);
+            }
+            else
+            {
+                queue_broadcast(SYS_MMC_EXTRACTED, NULL);
+                card_info[1].initialized = false;
+            }
         }
     }
 }
@@ -822,7 +840,8 @@ int ata_init(void)
     PBIOR |= 0x2000;  /* SCK1 output */
     PBIOR &= ~0x0C00; /* TxD1, RxD1 input */
 
-    if(adc_read(ADC_MMC_SWITCH) < 0x200)
+    last_mmc_status = mmc_detect();
+    if (last_mmc_status)
     {   /* MMC inserted */
         current_card = 1;
     }
@@ -833,12 +852,9 @@ int ata_init(void)
 
     ata_enable(true);
     
-    if ( !initialized ) {
-
-        queue_init(&mmc_queue);
-
-        create_thread(mmc_thread, mmc_stack,
-                      sizeof(mmc_stack), mmc_thread_name);
+    if ( !initialized ) 
+    {
+        tick_add_task(mmc_tick);
         initialized = true;
     }
 

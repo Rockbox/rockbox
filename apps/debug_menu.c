@@ -1371,7 +1371,7 @@ bool dbg_mmc_info(void)
 
         lcd_update();
 
-        switch (button_get(true))
+        switch (button_get_w_tmo(HZ/2))
         {
             case SETTINGS_OK:
             case SETTINGS_CANCEL:

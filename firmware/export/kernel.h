@@ -39,6 +39,10 @@
 #define SYS_USB_DISCONNECTED_ACK  -4
 #define SYS_TIMEOUT               -5
 
+/* MMC based systems only */
+#define SYS_MMC_INSERTED          -6
+#define SYS_MMC_EXTRACTED         -7
+
 struct event
 {
     int id;
