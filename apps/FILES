@@ -5,3 +5,4 @@ recorder/*.[ch]
 player/*.[ch]
 win32.mak
 lang/*.lang
+*.pl
