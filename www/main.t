@@ -9,6 +9,8 @@
 
 <h2>News</h2>
 
+<p><i>2002-10-15</i>: Now the Player/Studio models run the same firmware. No more Old and New player firmware.
+
 <p><i>2002-10-11</i>: Version 1.4 is released. <a href="download/">Grab it</a>.
 
 <p><i>2002-09-19</i>: We now support multiple languages. You can help by translating Rockbox to your language. No programming skills required.
