@@ -152,8 +152,6 @@ static void lcd_write(bool command, int byte)
 
 #ifdef ASM_IMPLEMENTATION
 {
-    lcd_start();
-
     asm("and.b %0, @(r0,gbr)"
          :
          : /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
