@@ -68,7 +68,9 @@ extern void bitswap(unsigned char *data, int length);
 
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
+#ifndef SIMULATOR
 static void (*pfn_timer)(void) = NULL; /* user timer handler */
+#endif
 static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
 
 static int plugin_test(int api_version, int model, int memsize);
