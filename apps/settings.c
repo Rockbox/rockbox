@@ -93,14 +93,14 @@ struct bit_entry
     /* how many bits within the bitfield (1-32), MSB set if value is signed */
     unsigned char bit_size; /* min 6+1 bit */
     /* how many bytes in the global_settings struct (1,2,4) */
-    unsigned char byte_size; /* min 2 bits */
+    unsigned char byte_size; /* min 3 bits */
     /* store position in global_settings struct */
     short settings_offset; /* min 9 bit, better 10 */
     /* default value */
     int default_val; /* min 15 bit */ 
-     /* variable name in a .cfg file, NULL if not to be saved */
+    /* variable name in a .cfg file, NULL if not to be saved */
     const char* cfg_name;
-     /* set of values, or NULL for a numerical value */
+    /* set of values, or NULL for a numerical value */
     const char* cfg_val;
 };
 
@@ -1227,9 +1227,6 @@ bool settings_save_config(void)
     /* allow user to modify filename */
     while (!done) {
         if (!kbd_input(filename, sizeof filename)) {
-#ifdef WIN32 /* test hack !!! */
-            strcpy(filename, "C:/test.cfg");
-#endif
             fd = creat(filename,0);
             if (fd < 0) {
                 lcd_clear_display();
