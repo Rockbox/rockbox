@@ -47,7 +47,97 @@
 #define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
 #define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
 #define ATA_CONTROL     (*ata_control)
+
 #endif
+
+#if CONFIG_CPU == TCC730
+
+#define PREFER_C_READING
+#define PREFER_C_WRITING
+
+#define ATA_DATA_IDX        (0xD0)
+#define ATA_ERROR_IDX       (0xD2) 
+#define ATA_NSECTOR_IDX     (0xD4)
+#define ATA_SECTOR_IDX      (0xD6)
+#define ATA_LCYL_IDX        (0xD8)
+#define ATA_HCYL_IDX        (0xDA)
+#define ATA_SELECT_IDX      (0xDC)
+#define ATA_COMMAND_IDX     (0xDE)
+#define ATA_CONTROL_IDX     (0xEC)
+
+#define ATA_FEATURE_IDX     ATA_ERROR_IDX
+#define ATA_STATUS_IDX      ATA_COMMAND_IDX
+#define ATA_ALT_STATUS_IDX  ATA_CONTROL_IDX
+
+#define SET_REG(reg, value) (ide_write_register(reg, value))
+#define GET_REG(reg) (ide_read_register(reg))
+
+#define ATA_DATA        (GET_REG(ATA_DATA_IDX))
+#define ATA_ERROR       (GET_REG(ATA_ERROR_IDX))
+#define ATA_NSECTOR     (GET_REG(ATA_NSECTOR_IDX))
+#define ATA_SECTOR      (GET_REG(ATA_SECTOR_IDX))
+#define ATA_LCYL        (GET_REG(ATA_LCYL_IDX))
+#define ATA_HCYL        (GET_REG(ATA_HCYL_IDX))
+#define ATA_SELECT      (GET_REG(ATA_SELECT_IDX))
+#define ATA_COMMAND     (GET_REG(ATA_COMMAND_IDX))
+
+#define ATA_STATUS      (GET_REG(ATA_STATUS_IDX))
+#define ATA_ALT_STATUS  (GET_REG(ATA_ALT_STATUS_IDX))
+#define ATA_FEATURE     (GET_REG(ATA_FEATURE_IDX))
+
+
+#define SET_ATA_DATA(v)        (SET_REG(ATA_DATA_IDX,v))
+#define SET_ATA_SELECT(v)      (SET_REG(ATA_SELECT_IDX,v))
+#define SET_ATA_NSECTOR(v)     (SET_REG(ATA_NSECTOR_IDX,v))
+#define SET_ATA_SECTOR(v)      (SET_REG(ATA_SECTOR_IDX,v))
+#define SET_ATA_LCYL(v)        (SET_REG(ATA_LCYL_IDX,v))
+#define SET_ATA_HCYL(v)        (SET_REG(ATA_HCYL_IDX,v))
+#define SET_ATA_COMMAND(v)     (SET_REG(ATA_COMMAND_IDX,v))
+#define SET_ATA_CONTROL(v)     (SET_REG(ATA_CONTROL_IDX,v))
+#define SET_ATA_FEATURE(v)     (SET_REG(ATA_FEATURE_IDX, v))
+
+
+extern int idatastart __attribute__ ((section(".idata")));
+
+static unsigned ide_reg_temp __attribute__ ((section(".idata")));
+
+void ide_write_register(int reg, int value) {
+    /* Archos firmware code does (sometimes!) this:
+       set the RAM speed to 8 cycles. 
+       MIUSCFG |= 0x7;
+    */
+
+    ide_reg_temp = value;
+
+    long extAddr = (long)reg << 16;
+    ddma_transfer(1, 1, (char*)&ide_reg_temp - (char*)&idatastart, extAddr, 2);  
+
+    /* set the RAM speed to 6 cycles.
+    unsigned char miuscfg = MIUSCFG;
+    miuscfg = (miuscfg & ~7) | 5;
+    */
+}
+
+int ide_read_register(int reg) {
+    /* set the RAM speed to 6 cycles. 
+       unsigned char miuscfg = MIUSCFG;
+       miuscfg = (miuscfg & ~7) | 5;
+       MIUSCFG = miuscfg; */
+  
+    long extAddr = (long)reg << 16;
+    ddma_transfer(0, 1, (char*)&ide_reg_temp - (char*)&idatastart, extAddr, 2);
+  
+    /* This is done like this in the archos firmware... 
+       miuscfg = MIUSCFG;
+       miuscfg = (miuscfg & ~7) | 5;
+       MIUSCFG = miuscfg;
+       Though I'd expect MIUSCFG &= ~0x7; (1 cycle) */
+  
+    return ide_reg_temp;
+}
+
+
+#else
 
 /* generic registers */
 #define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))
@@ -60,6 +150,20 @@
 #define ATA_FEATURE     ATA_ERROR
 #define ATA_STATUS      ATA_COMMAND
 #define ATA_ALT_STATUS  ATA_CONTROL
+
+#define SET_REG(reg, value) ((reg) = (value))
+
+#define SET_ATA_DATA(v)        (SET_REG(ATA_DATA,v))
+#define SET_ATA_SELECT(v)      (SET_REG(ATA_SELECT,v))
+#define SET_ATA_NSECTOR(v)     (SET_REG(ATA_NSECTOR,v))
+#define SET_ATA_SECTOR(v)      (SET_REG(ATA_SECTOR,v))
+#define SET_ATA_LCYL(v)        (SET_REG(ATA_LCYL,v))
+#define SET_ATA_HCYL(v)        (SET_REG(ATA_HCYL,v))
+#define SET_ATA_COMMAND(v)     (SET_REG(ATA_COMMAND,v))
+#define SET_ATA_CONTROL(v)     (SET_REG(ATA_CONTROL,v))
+#define SET_ATA_FEATURE(v)     (SET_REG(ATA_FEATURE, v))
+
+#endif
 
 
 
@@ -147,7 +251,7 @@ static int wait_for_rdy(void) __attribute__ ((section (".icode")));
 static int wait_for_rdy(void)
 {
     int timeout;
-    
+
     if (!wait_for_bsy())
         return 0;
 
@@ -181,7 +285,11 @@ static int wait_for_end_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
 }    
 
-
+/* Optimization: don't do 256 calls to ddma_transfer; fuse with it
+ * as in the Archos firmware.
+ * It actually possible to do a single dma transfer to copy a whole sector between ATA
+ * controller & cpu internal memory.
+ */
 /* the tight loop of ata_read_sectors(), to avoid the whole in IRAM */
 static void copy_read_sectors(unsigned char* buf,
                          int wordcount)
@@ -351,7 +459,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 
     timeout = current_tick + READ_TIMEOUT;
 
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT(ata_device);
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -367,22 +475,22 @@ int ata_read_sectors(IF_MV2(int drive,)
         last_disk_activity = current_tick;
 
         if ( count == 256 )
-            ATA_NSECTOR = 0; /* 0 means 256 sectors */
+	  SET_ATA_NSECTOR(0); /* 0 means 256 sectors */
         else
-            ATA_NSECTOR = (unsigned char)count;
+	  SET_ATA_NSECTOR((unsigned char)count);
 
-        ATA_SECTOR  = start & 0xff;
-        ATA_LCYL    = (start >> 8) & 0xff;
-        ATA_HCYL    = (start >> 16) & 0xff;
-        ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
-        ATA_COMMAND = CMD_READ_MULTIPLE;
+        SET_ATA_SECTOR(start & 0xff);
+        SET_ATA_LCYL((start >> 8) & 0xff);
+	SET_ATA_HCYL((start >> 16) & 0xff);
+	SET_ATA_SELECT(((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+	SET_ATA_COMMAND(CMD_READ_MULTIPLE);
 
         /* wait at least 400ns between writing command and reading status */
-        asm volatile ("nop");
-        asm volatile ("nop");
-        asm volatile ("nop");
-        asm volatile ("nop");
-        asm volatile ("nop");
+        __asm__ volatile ("nop");
+        __asm__ volatile ("nop");
+        __asm__ volatile ("nop");
+        __asm__ volatile ("nop");
+        __asm__ volatile ("nop");
 
         while (count) {
             int sectors;
@@ -480,7 +588,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
             /* takes 13 clock cycles (2 pipeline stalls) */
             tmp = (unsigned short) *buf++;
             tmp |= (unsigned short) *buf++ << 8; /* I assume big endian */
-            ATA_DATA = tmp;           /* and don't use the SWAB16 macro */
+            SET_ATA_DATA(tmp);           /* and don't use the SWAB16 macro */
         } while (buf < bufend); /* tail loop is faster */
     }
     else
@@ -490,7 +598,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         do
         {   /* loop compiles to 6 assembler instructions */
             /* takes 10 clock cycles (2 pipeline stalls) */
-            ATA_DATA = SWAB16(*wbuf);
+	  SET_ATA_DATA(SWAB16(*wbuf));
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 #else
@@ -620,7 +728,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         }
     }
     
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT(ata_device);
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -629,14 +737,14 @@ int ata_write_sectors(IF_MV2(int drive,)
     }
 
     if ( count == 256 )
-        ATA_NSECTOR = 0; /* 0 means 256 sectors */
+      SET_ATA_NSECTOR(0); /* 0 means 256 sectors */
     else
-        ATA_NSECTOR = (unsigned char)count;
-    ATA_SECTOR  = start & 0xff;
-    ATA_LCYL    = (start >> 8) & 0xff;
-    ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
-    ATA_COMMAND = CMD_WRITE_SECTORS;
+      SET_ATA_NSECTOR((unsigned char)count);
+    SET_ATA_SECTOR(start & 0xff);
+    SET_ATA_LCYL((start >> 8) & 0xff);
+    SET_ATA_HCYL((start >> 16) & 0xff);
+    SET_ATA_SELECT(((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+    SET_ATA_COMMAND(CMD_WRITE_SECTORS);
 
     for (i=0; i<count; i++) {
 
@@ -663,8 +771,10 @@ int ata_write_sectors(IF_MV2(int drive,)
         last_disk_activity = current_tick;
     }
 
-    if(!ret && !wait_for_end_of_transfer())
+    if(!ret && !wait_for_end_of_transfer()) {
+        DEBUGF("End on transfer failed. -- jyp");
         ret = -4;
+    }
 
     led(false);
 
@@ -700,19 +810,22 @@ extern void ata_flush(void)
 
 static int check_registers(void)
 {
+    int i;
     if ( ATA_STATUS & STATUS_BSY )
             return -1;
 
-    ATA_NSECTOR = 0xa5;
-    ATA_SECTOR  = 0x5a;
-    ATA_LCYL    = 0xaa;
-    ATA_HCYL    = 0x55;
-
-    if ((ATA_NSECTOR == 0xa5) &&
-        (ATA_SECTOR  == 0x5a) &&
-        (ATA_LCYL    == 0xaa) &&
-        (ATA_HCYL    == 0x55))
+    for (i = 0; i<64; i++) {
+      SET_ATA_NSECTOR ( 0xa5);
+      SET_ATA_SECTOR  ( 0x5a);
+      SET_ATA_LCYL    ( 0xaa);
+      SET_ATA_HCYL    ( 0x55);
+      
+      if ((ATA_NSECTOR == 0xa5) &&
+	  (ATA_SECTOR  == 0x5a) &&
+	  (ATA_LCYL    == 0xaa) &&
+	  (ATA_HCYL    == 0x55))
         return 0;
+    }
 
     return -2;
 }
@@ -722,12 +835,12 @@ static int freeze_lock(void)
     /* does the disk support Security Mode feature set? */
     if (identify_info[82] & 2)
     {
-        ATA_SELECT = ata_device;
+      SET_ATA_SELECT (ata_device);
 
         if (!wait_for_rdy())
             return -1;
 
-        ATA_COMMAND = CMD_SECURITY_FREEZE_LOCK;
+        SET_ATA_COMMAND(CMD_SECURITY_FREEZE_LOCK);
 
         if (!wait_for_rdy())
             return -2;
@@ -762,7 +875,7 @@ static int ata_perform_sleep(void)
 
     mutex_lock(&ata_mtx);
 
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT(ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
@@ -770,7 +883,7 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-    ATA_COMMAND = CMD_SLEEP;
+    SET_ATA_COMMAND(CMD_SLEEP);
 
     if (!wait_for_rdy())
     {
@@ -789,7 +902,7 @@ int ata_standby(int time)
 
     mutex_lock(&ata_mtx);
 
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT(ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_standby() - not RDY\n");
@@ -798,11 +911,11 @@ int ata_standby(int time)
     }
 
     if(time)
-        ATA_NSECTOR = ((time + 5) / 5) & 0xff; /* Round up to nearest 5 secs */
+        SET_ATA_NSECTOR ( ((time + 5) / 5) & 0xff); /* Round up to nearest 5 secs */
     else
-        ATA_NSECTOR = 0; /* Disable standby */
+        SET_ATA_NSECTOR ( 0); /* Disable standby */
         
-    ATA_COMMAND = CMD_STANDBY;
+    SET_ATA_COMMAND(CMD_STANDBY);
 
     if (!wait_for_rdy())
     {
@@ -899,7 +1012,7 @@ int ata_hard_reset(void)
 #endif
 
     /* state HRR2 */
-    ATA_SELECT = ata_device; /* select the right device */
+    SET_ATA_SELECT(ata_device); /* select the right device */
     ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
@@ -913,11 +1026,11 @@ static int perform_soft_reset(void)
     int ret;
     int retry_count;
     
-    ATA_SELECT = SELECT_LBA | ata_device;
-    ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
+    SET_ATA_SELECT ( SELECT_LBA | ata_device );
+    SET_ATA_CONTROL ( CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
 
-    ATA_CONTROL = CONTROL_nIEN;
+    SET_ATA_CONTROL (CONTROL_nIEN);
     sleep(1); /* >2ms */
 
     /* This little sucker can take up to 30 seconds */
@@ -969,14 +1082,14 @@ static int ata_power_on(void)
 static int master_slave_detect(void)
 {
     /* master? */
-    ATA_SELECT = 0;
+  SET_ATA_SELECT( 0 );
     if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
         ata_device = 0;
         DEBUGF("Found master harddisk\n");
     }
     else {
         /* slave? */
-        ATA_SELECT = SELECT_DEVICE1;
+      SET_ATA_SELECT( SELECT_DEVICE1 );
         if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
             ata_device = SELECT_DEVICE1;
             DEBUGF("Found slave harddisk\n");
@@ -1022,20 +1135,22 @@ static int identify(void)
 {
     int i;
 
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT ( ata_device );
 
     if(!wait_for_rdy()) {
         DEBUGF("identify() - not RDY\n");
         return -1;
     }
 
-    ATA_COMMAND = CMD_IDENTIFY;
+
+    SET_ATA_COMMAND ( CMD_IDENTIFY );
 
     if (!wait_for_start_of_transfer())
     {
         DEBUGF("identify() - CMD failed\n");
         return -2;
     }
+
 
     for (i=0; i<SECTOR_SIZE/2; i++)
         /* the IDENTIFY words are already swapped */
@@ -1046,15 +1161,15 @@ static int identify(void)
 
 static int set_multiple_mode(int sectors)
 {
-    ATA_SELECT = ata_device;
+  SET_ATA_SELECT ( ata_device );
 
     if(!wait_for_rdy()) {
         DEBUGF("set_multiple_mode() - not RDY\n");
         return -1;
     }
 
-    ATA_NSECTOR = sectors;
-    ATA_COMMAND = CMD_SET_MULTIPLE_MODE;
+    SET_ATA_NSECTOR ( sectors );
+    SET_ATA_COMMAND ( CMD_SET_MULTIPLE_MODE );
 
     if (!wait_for_rdy())
     {
@@ -1092,7 +1207,7 @@ static int set_features(void)
     /* Update the table */
     features[3].parameter = 8 + pio_mode;
     
-    ATA_SELECT = ata_device;
+    SET_ATA_SELECT( ata_device );
 
     if (!wait_for_rdy()) {
         DEBUGF("set_features() - not RDY\n");
@@ -1101,9 +1216,9 @@ static int set_features(void)
 
     for (i=0; features[i].id_word; i++) {
         if (identify_info[features[i].id_word] & (1 << features[i].id_bit)) {
-            ATA_FEATURE = features[i].subcommand;
-            ATA_NSECTOR = features[i].parameter;
-            ATA_COMMAND = CMD_SET_FEATURES;
+            SET_ATA_FEATURE ( features[i].subcommand );
+            SET_ATA_NSECTOR ( features[i].parameter );
+            SET_ATA_COMMAND ( CMD_SET_FEATURES );
 
             if (!wait_for_rdy()) {
                 DEBUGF("set_features() - CMD failed\n");
@@ -1156,7 +1271,12 @@ static int init_and_check(bool hard_reset)
 int ata_init(void)
 {
     int rc;
+#if CONFIG_CPU == TCC730
+    /* TODO: check for cold start (never happenning now) */
+    bool coldstart = false;
+#else
     bool coldstart = (PACR2 & 0x4000) != 0;
+#endif
 
     mutex_init(&ata_mtx);
 
@@ -1199,7 +1319,7 @@ int ata_init(void)
             return -40 + rc;
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
-        
+
         rc = freeze_lock();
         if (rc)
             return -50 + rc;
@@ -1214,6 +1334,8 @@ int ata_init(void)
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
+
+
     }
     rc = set_multiple_mode(multisectors);
     if (rc)
