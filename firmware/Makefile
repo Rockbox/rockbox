@@ -13,7 +13,7 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I.
+INCLUDES=-I. -Icommon
 
 # Pick a target to build for
 TARGET = -DARCHOS_PLAYER=1
@@ -23,7 +23,7 @@ TARGET = -DARCHOS_PLAYER=1
 CFLAGS = -Os -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET)
 AFLAGS += -small -relax
 
-SRC := $(wildcard *.c)
+SRC := $(wildcard *.c) $(wildcard common/*.c)
 OBJS := $(SRC:%.c=%.o)
 
 %.o: %.s
