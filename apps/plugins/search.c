@@ -55,7 +55,7 @@ static void fill_buffer(int pos)
     int numread;
     int i;
     int found = false ;
-    char crlf[2] = "\n\0"; 
+    const char crlf = '\n'; 
 
     if (pos>=file_size-BUFFER_SIZE)
         pos = file_size-BUFFER_SIZE;
@@ -82,7 +82,7 @@ static void fill_buffer(int pos)
 		    /* write to playlist */
 		    rb->write(fdw, &buffer[line_end],
                               rb->strlen( &buffer[line_end] ));
-		    rb->write(fdw, &crlf,1);
+		    rb->write(fdw, &crlf, 1);
 		    
 		    found = false ;
 		    results++ ;
