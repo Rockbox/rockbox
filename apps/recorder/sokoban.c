@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "features.h"
 #ifdef USE_GAMES
 
 #include <sprintf.h>
