@@ -1017,10 +1017,10 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 else {
                     if (!charger_inserted()) {
                         shutdown_screen();
-                        restore = true;
                     } else {
-                       charging_splash();
+                        charging_splash();
                     }
+                    restore = true;
                 }
                 break;
 #endif
