@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR)
 /* only do this for targets with MAS */
 
 /* variable button definitions */
@@ -47,6 +47,14 @@
 #define METRONOME_VOL_DOWN (BUTTON_ON | BUTTON_LEFT)
 #define METRONOME_TAP BUTTON_ON
 
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define METRONOME_QUIT BUTTON_OFF
+#define METRONOME_PLAYPAUSE BUTTON_ON
+#define METRONOME_VOL_UP BUTTON_UP
+#define METRONOME_VOL_DOWN BUTTON_DOWN
+#define METRONOME_TAP BUTTON_SELECT
+#define METRONOME_MSG_START "press play"
+#define METRONOME_MSG_STOP "press pause"
 #endif
 static struct plugin_api* rb;
 
@@ -122,11 +130,16 @@ static unsigned char sound[]={
 
 
 
-void led(bool on){
+void led(bool on)
+{
+#if CONFIG_CPU == SH7034
     if(on)
-    or_b(0x40, &PBDRL);
+        or_b(0x40, &PBDRL);
     else
-    and_b(~0x40, &PBDRL);
+        and_b(~0x40, &PBDRL);
+#else
+    (void)on;
+#endif
 }
 
 void calc_period(void){
