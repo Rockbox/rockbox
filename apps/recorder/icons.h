@@ -25,7 +25,7 @@
 #ifdef HAVE_LCD_BITMAP
 
 enum icons_6x8 {
-    Box_Filled, Box_Empty, Slider_Horizontal, File, 
+    Test, Box_Filled, Box_Empty, Slider_Horizontal, File, 
     Folder,     Directory, Playlist,          Repeat,
     Selected,   Cursor,    LastIcon
 };
@@ -34,5 +34,11 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
 extern unsigned char rockbox112x37[];
 
+extern unsigned char slider_bar[];
+
 #endif /* End HAVE_LCD_BITMAP */
+
+
+
+
 
