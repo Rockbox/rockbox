@@ -156,24 +156,20 @@ new: "OFF pour annuler"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
-new: "Fichiers cachés"
+new: ""
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-### English phrase was changed! Previous translation was made on:
-### ""
+
+
 eng: ""
-new: "Afficher"
+new: ""
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
-new: "Cacher"
+new: ""
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -192,10 +188,8 @@ new: "Lire fichier selectionné en 1er"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
-new: "Filtre musical"
+new: ""
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -576,10 +570,8 @@ new: "Mode:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
-new: "Filtre répertoire: %s"
+new: ""
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -774,7 +766,7 @@ new: "PERDU !"
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
-new: "0 Ligne - Niveau 0"
+new: "0 Lignes - Niveau 0"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -784,7 +776,7 @@ new: "Montrer fichiers"
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
-new: " tous" 
+new: " Tous" 
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -804,7 +796,6 @@ new: "nouvelle langue"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-### Not previously translated
 new: "Arrêt suite à inactivité"
 
 id: LANG_SETTINGS_SAVE_RECORDER
@@ -820,4 +811,4 @@ new: "Non"
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
-new: "oui"
+new: "Oui"
