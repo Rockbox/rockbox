@@ -613,7 +613,7 @@ static void format_display(char* buf,
                     fmt++;
             
                 /* No value, so skip to else part */
-                if (NULL == value)
+                if ((!value) || (!strlen(value)))
                     fmt = skip_conditional(fmt, true);
 
                 level++;
