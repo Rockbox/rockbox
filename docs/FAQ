@@ -296,6 +296,15 @@ A38: It is very good if you want information about the current item playing ;)
      http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
 
 Q39: Can the Player LCD font be modified?
-A39: The simple answer is no.  The more detailed answer is that we have
-     the ability to change/create up to 4 chars on one model and 8 on another.
-     We currently use several of this 'letters' to store icons for the player.
+A39: The simple answer is no.  This is because the Player font is character
+     cell based (as opposed to the Recorder's bitmap based display).  This
+     means that we are able to choose what characters to display, but not how
+     to display them.  We do have the ability to change/create up to 4 chars 
+     on one model and 8 on another, however we are currently using several of 
+     these 'letters' to store icons for the player.
+
+Q40: Why don't you have any games available for the Players?
+A40: The display on the Players is character cell and not bitmap based.  
+     This means we can only control what characters get displayed, not
+     what pixels are shown.  This makes the prospect of game play very 
+     slim (atleast for anything graphic involved).
