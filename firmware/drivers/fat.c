@@ -1010,6 +1010,10 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
             else {
                 if ( parse_direntry(entry, &dir->cached_buf[i*32]) ) {
 
+                    /* don't return volume id entry */
+                    if ( entry->attr == FAT_ATTR_VOLUME_ID )
+                        continue;
+
                     /* replace shortname with longname? */
                     if ( longs ) {
                         int j,k,l=0;
@@ -1115,3 +1119,9 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     }
     return 0;
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../rockbox-mode.el")
+ * end:
+ */
