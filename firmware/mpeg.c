@@ -285,7 +285,6 @@ static bool playing = false;
 static bool play_pending = false;
 #else
 static int last_dma_tick = 0;
-static int pause_tick = 0;
 
 #ifdef HAVE_MAS3507D
 
@@ -683,6 +682,8 @@ static void track_change(void)
 
 static void mpeg_thread(void)
 {
+    static int pause_tick = 0;
+    static unsigned int pause_track = 0;
     struct event ev;
     int len;
     int free_space_left;
@@ -760,6 +761,7 @@ static void mpeg_thread(void)
                 paused = true;
                 playing = false;
                 pause_tick = current_tick;
+                pause_track = current_track_counter;
                 stop_dma();
                 break;
 
@@ -769,10 +771,13 @@ static void mpeg_thread(void)
                 paused = false;
                 if (!play_pending)
                 {
-                playing = true;
-                last_dma_tick += current_tick - pause_tick;
-                pause_tick = 0;
-                start_dma();
+                    playing = true;
+                    if ( current_track_counter == pause_track )
+                        last_dma_tick += current_tick - pause_tick;
+                    else
+                        last_dma_tick = current_tick;                        
+                    pause_tick = 0;
+                    start_dma();
                 }
                 break;
 
@@ -1276,7 +1281,7 @@ void mpeg_prev(void)
 #else
     char* file = playlist_next(-1,NULL);
     mp3info(&taginfo, file);
-    current_track_counter--;
+    current_track_counter++;
     playing = true;
 #endif
 }

@@ -597,7 +597,8 @@ int wps_show(void)
                     {
                         if ( mpeg_is_playing() && id3 && id3->length )
                         {
-                            mpeg_pause();
+                            if (!paused)
+                                mpeg_pause();
 #ifdef HAVE_PLAYER_KEYPAD
                             lcd_stop_scroll();
 #endif
@@ -629,7 +630,8 @@ int wps_show(void)
                     {
                         if ( mpeg_is_playing() && id3 && id3->length )
                         {
-                            mpeg_pause();
+                            if (!paused)
+                                mpeg_pause();
 #ifdef HAVE_PLAYER_KEYPAD
                             lcd_stop_scroll();
 #endif
@@ -664,8 +666,12 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
-                        mpeg_resume();
-                        status_set_playmode(STATUS_PLAY);
+                        if (paused)
+                            status_set_playmode(STATUS_PAUSE);
+                        else {
+                            mpeg_resume();
+                            status_set_playmode(STATUS_PLAY);
+                        }
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
@@ -710,8 +716,12 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
-                        mpeg_resume();
-                        status_set_playmode(STATUS_PLAY);
+                        if (paused)
+                            status_set_playmode(STATUS_PAUSE);
+                        else {
+                            mpeg_resume();
+                            status_set_playmode(STATUS_PLAY);
+                        }
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
