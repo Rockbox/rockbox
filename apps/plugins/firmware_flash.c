@@ -283,6 +283,10 @@ bool CheckPlatform(int platform_id, UINT16 version)
     {   /* it can be a FM or V2 recorder */
         return (platform_id == ID_FM || platform_id == ID_REC_V2);
     }
+    else if (version == 132)
+    {   /* seen on a V2 recorder */
+        return (platform_id == ID_REC_V2);
+    }
     else if (version >= 115 && version <= 129)
     {   /* the range of Recorders seen so far */
         return (platform_id == ID_RECORDER);
