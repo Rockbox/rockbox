@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
+#define BOOL win32_BOOL /* Avoid conflicts with BOOL/INT defined as */
+#define INT win32_INT   /*  enum values in settings.h */
+
 #include <windows.h>
 #include "plugin.h"
 #include "file.h"
