@@ -329,24 +329,24 @@ static const unsigned char lcd_ascii[] = {
 void lcd_clear_display(void)
 {
     int i;
-    lcd_write(TRUE,LCD_CURSOR(0,0));
+    lcd_write(true,LCD_CURSOR(0,0));
     for (i=0;i<24;i++)
-        lcd_write(FALSE,0);
+        lcd_write(false,0);
 }
 
 void lcd_puts(int x, int y, char *string)
 {
-    lcd_write(TRUE,LCD_CURSOR(x,y));
+    lcd_write(true,LCD_CURSOR(x,y));
     while (*string)
-        lcd_write(FALSE,LCD_ASCII(*string++));
+        lcd_write(false,LCD_ASCII(*string++));
 }
 
 void lcd_define_pattern (int which,char *pattern,int length)
 {
     int i;
-    lcd_write(TRUE,LCD_PRAM|which);
+    lcd_write(true,LCD_PRAM|which);
     for (i=0;i<length;i++)
-	lcd_write(FALSE,pattern[i]);
+	lcd_write(false,pattern[i]);
 }
 #endif
 
@@ -407,13 +407,13 @@ void lcd_init (void)
     PBIOR |= 0x000f; /* IOR = 1 */
 
     /* Initialize LCD */
-    lcd_write (TRUE, LCD_CNTL_RESET);
-    lcd_write (TRUE, LCD_CNTL_POWER);
-    lcd_write (TRUE, LCD_CNTL_SEGREMAP);
-    lcd_write (TRUE, LCD_CNTL_OUTSCAN);
-    lcd_write (TRUE, LCD_CNTL_CONTRAST);
-    lcd_write (TRUE, 0x30); /* Contrast parameter */
-    lcd_write (TRUE, LCD_CNTL_DISPON);
+    lcd_write (true, LCD_CNTL_RESET);
+    lcd_write (true, LCD_CNTL_POWER);
+    lcd_write (true, LCD_CNTL_SEGREMAP);
+    lcd_write (true, LCD_CNTL_OUTSCAN);
+    lcd_write (true, LCD_CNTL_CONTRAST);
+    lcd_write (true, 0x30); /* Contrast parameter */
+    lcd_write (true, LCD_CNTL_DISPON);
 
     lcd_clear_display();
     lcd_update();
@@ -430,12 +430,12 @@ void lcd_update (void)
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
-        lcd_write (TRUE, LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write (TRUE, LCD_CNTL_HIGHCOL);
-        lcd_write (TRUE, LCD_CNTL_LOWCOL);
+        lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
+        lcd_write (true, LCD_CNTL_HIGHCOL);
+        lcd_write (true, LCD_CNTL_LOWCOL);
 
         for (x = 0; x < LCD_WIDTH; x++)
-            lcd_write (FALSE, display[x][y]);
+            lcd_write (false, display[x][y]);
     }
 }
 
@@ -505,8 +505,8 @@ void lcd_putsxy(int x, int y, char *str, int thisfont)
             else
                 src = char_gen_6x8[ch-ASCII_MIN][0];
 
-            lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, TRUE);
-            lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, TRUE);
+            lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, true);
+            lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, true);
 
             lcd_x += nx;
         }
@@ -515,7 +515,7 @@ void lcd_putsxy(int x, int y, char *str, int thisfont)
 
 /*
  * Display a bitmap at (x, y), size (nx, ny)
- * clear is TRUE to clear destination area first
+ * clear is true to clear destination area first
  */
 void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
@@ -593,7 +593,7 @@ void lcd_clearrect (int x, int y, int nx, int ny)
 {
     int i;
     for (i = 0; i < nx; i++)
-        lcd_bitmap (zeros, x+i, y, 1, ny, TRUE);
+        lcd_bitmap (zeros, x+i, y, 1, ny, true);
 }
 
 /*
@@ -603,7 +603,7 @@ void lcd_fillrect (int x, int y, int nx, int ny)
 {
     int i;
     for (i = 0; i < nx; i++)
-        lcd_bitmap (ones, x+i, y, 1, ny, TRUE);
+        lcd_bitmap (ones, x+i, y, 1, ny, true);
 }
 
 /* Invert a rectangular area at (x, y), size (nx, ny) */
@@ -611,7 +611,7 @@ void lcd_invertrect (int x, int y, int nx, int ny)
 {
     int i;
     for (i = 0; i < nx; i++)
-        lcd_bitmap (ones, x+i, y, 1, ny, FALSE);
+        lcd_bitmap (ones, x+i, y, 1, ny, false);
 }
 
 #define DRAW_PIXEL(x,y) display[x][y/8] |= (1<<(y&7))

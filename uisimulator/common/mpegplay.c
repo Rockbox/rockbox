@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <file.h>
-#include <types.h>
 #include <lcd.h>
 #include <button.h>
 #include "id3.h"

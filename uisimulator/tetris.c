@@ -20,8 +20,7 @@
  ****************************************************************************/
 
 #ifdef HAVE_LCD_BITMAP
-
-#include "types.h"
+#include <stdbool.h>
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
@@ -121,7 +120,7 @@ void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
     lcd_drawline(fstop_x, fstart_y, fstop_x, fstop_y);
 }
 
-void draw_block(int x,int y,int block,int frame,int clear)
+void draw_block(int x,int y,int block,int frame,bool clear)
 {
     int i;
     for(i=0;i < 4;i++) {
@@ -143,7 +142,7 @@ void to_virtual()
           (current_x+block_data[current_b][current_f][0][i])) = current_b+1;
 }
 
-int gameover()
+bool gameover()
 {
     int i;
     int frame, block, y, x;
@@ -162,14 +161,14 @@ int gameover()
             if(y+block_data[block][frame][1][i] < start_y)
             {
                 /* Game over ;) */
-                return TRUE;
+                return true;
             }
         }
     }
-    return FALSE;
+    return false;
 }
 
-int valid_position(int x,int y,int block,int frame)
+bool valid_position(int x,int y,int block,int frame)
 {
     int i;
     for(i=0;i < 4;i++)
@@ -179,8 +178,8 @@ int valid_position(int x,int y,int block,int frame)
             (x+block_data[block][frame][0][i] > max_x-1) ||
             (y+block_data[block][frame][1][i] < 0) || 
             (y+block_data[block][frame][1][i] > max_y-1))
-            return FALSE;
-    return TRUE;
+            return false;
+    return true;
 }
 
 void from_virtual()
@@ -207,10 +206,10 @@ void move_block(int x,int y,int f)
     }        
     if(valid_position(current_x+x,current_y+y,current_b,current_f))
     {
-        draw_block(current_x,current_y,current_b,last_frame,TRUE);
+        draw_block(current_x,current_y,current_b,last_frame,true);
         current_x += x;
         current_y += y;
-        draw_block(current_x,current_y,current_b,current_f,FALSE);
+        draw_block(current_x,current_y,current_b,current_f,false);
         lcd_update();
     }
     else
@@ -225,27 +224,28 @@ void new_block()
     current_y = 0;
     next_b = t_rand(blocks);
     next_f = t_rand(block_frames[next_b]);
-    draw_block(max_x+2,start_y-1,current_b,current_f,TRUE);
-    draw_block(max_x+2,start_y-1,next_b,next_f,FALSE);
+    draw_block(max_x+2,start_y-1,current_b,current_f,true);
+    draw_block(max_x+2,start_y-1,next_b,next_f,false);
     if(!valid_position(current_x,current_y,current_b,current_f))
     {
-        draw_block(current_x,current_y,current_b,current_f,FALSE);
+        draw_block(current_x,current_y,current_b,current_f,false);
         lcd_update();
     }
     else
-        draw_block(current_x,current_y,current_b,current_f,FALSE);
+        draw_block(current_x,current_y,current_b,current_f,false);
 }
 
 int check_lines()
 {
-    int x,y,line,i;
+    int x,y,i;
+    bool line;
     int lines = 0;
     for(y=0;y < max_y;y++)
     {
-        line = TRUE;
+        line = true;
         for(x=0;x < max_x;x++)
             if(virtual[y*max_x+x] == 0)
-                line = FALSE;
+                line = false;
         if(line)
         {
             lines++;

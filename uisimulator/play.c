@@ -20,10 +20,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <file.h>
-#include <types.h>
-#include <lcd.h>
-#include <button.h>
+#include "file.h"
+#include "lcd.h"
+#include "button.h"
 #include "kernel.h"
 #include "tree.h"
 #include "debug.h"

@@ -19,24 +19,22 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-#include <dir.h>
-#include <file.h>
-#include <types.h>
-#include <lcd.h>
-#include <button.h>
+#include "dir.h"
+#include "file.h"
+#include "lcd.h"
+#include "button.h"
 #include "kernel.h"
 #include "tree.h"
-
 #include "icons.h"
-
 #include "play.h"
 
 
 #define TREE_MAX_FILENAMELEN 128
 
 struct entry {
-  int file; /* TRUE if file, FALSE if dir */
+  int file; /* true if file, false if dir */
   char name[TREE_MAX_FILENAMELEN];
   int namelen;
 };
@@ -110,7 +108,7 @@ int static showdir(char *path, struct entry *buffer, int start,
         else
             icon_type=Folder;
         lcd_bitmap(bitmap_icons_6x8[icon_type], 6, MARGIN_Y+i*LINE_HEIGTH, 6, 
-                   8, TRUE);
+                   8, true);
 #endif
 
         if(len < TREE_MAX_LEN_DISPLAY)
@@ -177,13 +175,13 @@ bool dirbrowse(char *root)
         }
         switch(key) {
             case BUTTON_OFF:
-                return FALSE;
+                return false;
                 break;
 
             case BUTTON_LEFT:
                 i=strlen(currdir);
                 if (i==1) {
-                    return FALSE;
+                    return false;
                 }
                 else {
                     while (currdir[i-1]!='/')
@@ -286,5 +284,5 @@ bool dirbrowse(char *root)
         }
     }
 
-    return FALSE;
+    return false;
 }

@@ -20,7 +20,6 @@
 #ifdef HAVE_LCD_BITMAP
 
 #include "screensaver.h"
-#include "types.h"
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"

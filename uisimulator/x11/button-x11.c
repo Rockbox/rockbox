@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "types.h"
 #include "button.h"
 
 #include "X11/keysym.h"
