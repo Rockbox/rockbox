@@ -226,4 +226,41 @@
 
 #define DEVICE_ID (*(volatile unsigned long *)(MBAR2 + 0x0ac))
 
+/* DMA Registers ... */
+
+#define O_SAR   0x00        /* Source Address                       */
+#define O_DAR   0x04        /* Destination Address                  */
+#define O_DCR   0x08        /* DMA Control Register                 */
+#define O_BCR   0x0C        /* 16 or 24 bits depending on BCR24BIT  */
+#define O_DSR   0x10        /* DMA Status Register                  */
+#define O_IVR   0x14        /* Interrupt Vector Register            */ 
+
+/* DMA Control Register bits */
+#define DMA_INT         (1 << 31)       /* Enable Interrupts            */
+#define DMA_EEXT        (1 << 30)       /* Enable peripherial request   */
+#define DMA_CS          (1 << 29)       /* Cycle Steal                  */
+#define DMA_AA          (1 << 28)       /* Auto-Align                   */
+#define DMA_SINC        (1 << 22)       /* Source Increment             */
+#define DMA_SSIZE(x)    (((x)&3) << 20) /* Size of source data          */
+#define DMA_DINC        (1 << 19)       /* Destination Increment        */
+#define DMA_DSIZE(x)    (((x)&3) << 17) /* Size of destination data     */
+#define DMA_START       (1 << 16)       /* Start DMA transfer           */
+
+#define DMA_SIZE_DWORD  0               /* 4 bytes  */
+#define DMA_SIZE_BYTE   1               /* 1 byte   */
+#define DMA_SIZE_WORD   2               /* 2 bytes  */
+#define DMA_SIZE_LINE   3               /* 16 bytes */
+
+/* DMA Status Register bits */
+#define DMA_CE          (1 << 6)        /* Configuration Error          */
+#define DMA_BES         (1 << 5)        /* Bus error on source          */
+#define DMA_BED         (1 << 4)        /* Bus error on destination     */
+#define DMA_REQ         (1 << 2)        /* Request pending              */
+#define DMA_BSY         (1 << 1)        /* DMA channel busy             */
+#define DMA_DONE        (1 << 0)        /* Transfer has completed       */
+
+/* DMAROUTE config */
+#define DMA0_REQ_AUDIO_1     0x80
+#define DMA0_REQ_AUDIO_2     0x81
+
 #endif
