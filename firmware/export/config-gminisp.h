@@ -1,14 +1,8 @@
 /* Note: this is just a basic early version that needs attention and
    corrections! */
 
-/* define this if you have recording possibility */
-#define HAVE_RECORDING 1
-
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
-
-/* define this if you have a real-time clock */
-#define HAVE_RTC 1
 
 /* LCD dimensions */
 #define LCD_WIDTH  128
