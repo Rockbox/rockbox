@@ -1239,14 +1239,16 @@ int mpeg_val2phys(int setting, int value)
     return result;
 }
 
+static unsigned long mas_version_code;
+
 void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
     volume = bass = treble = loudness = bass_boost = avc;
 #else
+    unsigned long val;
 #ifdef ARCHOS_RECORDER
     int rc;
-    unsigned long val;
 #else
     loudness = bass_boost = avc;
 #endif
@@ -1292,7 +1294,35 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 #ifndef ARCHOS_RECORDER
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
     mas_run(1);
-    sleep(HZ/10);
+    sleep(HZ);
+
+    mas_readmem(MAS_BANK_D1, 0xff7, &mas_version_code, 1);
+
+    /* Clear the upper 12 bits of the 32-bit samples */
+    mas_writereg(0xc5, 0);
+    mas_writereg(0xc6, 0);
+    
+    /* We need to set the PLL for a 14.1318MHz crystal */
+    if(mas_version_code == 0x0601) /* Version F10? */
+    {
+        val = 0x5d9e8;
+        mas_writemem(MAS_BANK_D0, 0x32d, &val, 1);
+        val = 0xfffceb8d;
+        mas_writemem(MAS_BANK_D0, 0x32e, &val, 1);
+        val = 0x0;
+        mas_writemem(MAS_BANK_D0, 0x32f, &val, 1);
+        mas_run(0x475);
+    }
+    else
+    {
+        val = 0x5d9e8;
+        mas_writemem(MAS_BANK_D0, 0x36d, &val, 1);
+        val = 0xfffceb8d;
+        mas_writemem(MAS_BANK_D0, 0x36e, &val, 1);
+        val = 0x0;
+        mas_writemem(MAS_BANK_D0, 0x36f, &val, 1);
+        mas_run(0xfcb);
+    }
 #endif
     
     mp3buflen = mp3end - mp3buf;
@@ -1307,6 +1337,10 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 #ifndef ARCHOS_RECORDER
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_config(0x04); /* DAC on, all else off */
+
+    val = 0x80000;
+    mas_writemem(MAS_BANK_D1, 0x7f8, &val, 1);
+    mas_writemem(MAS_BANK_D1, 0x7fb, &val, 1);
 #endif
     
     mpeg_sound_set(SOUND_BASS, bass);
