@@ -115,32 +115,38 @@ stripspaces(char *buffer)
  */
 static bool setid3v1title(int fd, struct mp3entry *entry) 
 {
-    char buffer[31];
-    int offsets[3] = {-95,-65,-125};
+    unsigned char buffer[31];
+    int offsets[4] = {-95,-65,-125,-31};
     int i;
 
-    for(i=0;i<3;i++) {
-        if(-1 == lseek(fd, offsets[i], SEEK_END))
+    for (i=0;i<4;i++) {
+        if (-1 == lseek(fd, offsets[i], SEEK_END))
             return false;
 
         buffer[30]=0;
         read(fd, buffer, 30);
         stripspaces(buffer);
         
-        if(buffer[0]) {
+        if (buffer[0] || i == 3) {
             switch(i) {
-            case 0:
-                strcpy(entry->id3v1buf[0], buffer);
-                entry->artist = entry->id3v1buf[0];
-                break;
-            case 1:
-                strcpy(entry->id3v1buf[1], buffer);
-                entry->album = entry->id3v1buf[1];
-                break;
-            case 2:
-                strcpy(entry->id3v1buf[2], buffer);
-                entry->title = entry->id3v1buf[2];
-                break;
+                case 0:
+                    strcpy(entry->id3v1buf[0], buffer);
+                    entry->artist = entry->id3v1buf[0];
+                    break;
+                case 1:
+                    strcpy(entry->id3v1buf[1], buffer);
+                    entry->album = entry->id3v1buf[1];
+                    break;
+                case 2:
+                    strcpy(entry->id3v1buf[2], buffer);
+                    entry->title = entry->id3v1buf[2];
+                    break;
+                case 3:
+                    /* id3v1.1 uses last two bytes of comment field for track
+                       number: first must be 0 and second is track num */
+                    if (buffer[28] == 0)
+                        entry->tracknum = buffer[29];
+                    break;
             }
         }
     }
