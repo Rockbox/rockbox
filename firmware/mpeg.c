@@ -468,6 +468,7 @@ static void dma_tick(void)
     }
 }
 
+static void bitswap(unsigned short *data, int length) __attribute__ ((section (".icode")));
 static void bitswap(unsigned short *data, int length)
 {
     int i = length;
@@ -636,6 +637,7 @@ static void mpeg_thread(void)
     int unplayed_space_left;
     int amount_to_read;
     int amount_to_swap;
+    int t1, t2;
     
     play_pending = false;
     playing = false;
@@ -782,8 +784,11 @@ static void mpeg_thread(void)
                                          amount_to_swap);
                 
                 DEBUGF("B %x\n", amount_to_swap);
+                t1 = current_tick;
                 bitswap((unsigned short *)(mp3buf + mp3buf_swapwrite),
                         (amount_to_swap+1)/2);
+                t2 = current_tick;
+                DEBUGF("time: %d\n", t2 - t1);
 
                 mp3buf_swapwrite += amount_to_swap;
                 if(mp3buf_swapwrite >= mp3buflen)
@@ -858,9 +863,12 @@ static void mpeg_thread(void)
                 if(mpeg_file >= 0)
                 {
                     DEBUGF("R\n");
+                    t1 = current_tick;
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
                     if(len > 0)
                     {
+                        t2 = current_tick;
+                        DEBUGF("time: %d\n", t2 - t1);
                         DEBUGF("R: %x\n", len);
                         /* Tell ourselves that we need to swap some data */
                         queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
