@@ -71,8 +71,10 @@ void set_sound(char* string,
         switch( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
 #else
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
                 (*variable)++;
                 if(*variable > max )
@@ -81,8 +83,10 @@ void set_sound(char* string,
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
 #else
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
                 (*variable)--;
                 if(*variable < min )
