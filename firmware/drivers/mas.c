@@ -20,6 +20,25 @@
 #include "debug.h"
 #include "mas.h"
 
+int mas_run(int prognum)
+{
+    int i;
+    unsigned char buf[16];
+
+    i=0;
+    buf[i++] = MAS_DATA_WRITE;
+    buf[i++] = 0x00;
+    buf[i++] = prognum;
+
+    /* send run command */
+    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 /* note: 'len' is number of 32-bit words, not number of bytes! */
 int mas_readmem(int bank, int addr, unsigned long* dest, int len)
 {

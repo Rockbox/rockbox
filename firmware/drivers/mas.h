@@ -45,6 +45,7 @@
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
 
+int mas_run(int prognum);
 int mas_readmem(int bank, int addr, unsigned long* dest, int len);
 int mas_writemem(int bank, int addr, unsigned long* src, int len);
 int mas_devread(unsigned long *buf, int len);
