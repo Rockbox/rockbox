@@ -349,14 +349,9 @@ int settings_save( void )
     {
         static long lasttime = 0;
 
-        /* reset counter if charger is inserted */
-        if ( charger_inserted() ) {
-            global_settings.runtime = 0;
-        }
-        else {
-            global_settings.runtime += (current_tick - lasttime) / HZ;
-            lasttime = current_tick;
-        }
+        global_settings.runtime += (current_tick - lasttime) / HZ;
+        lasttime = current_tick;
+
         if ( global_settings.runtime > global_settings.topruntime )
             global_settings.topruntime = global_settings.runtime;
 

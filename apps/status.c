@@ -137,6 +137,7 @@ void status_draw(void)
     }
     if(charger_inserted())
     {
+        global_settings.runtime = 0;
         if(TIME_AFTER(current_tick, switch_tick))
         {
             lcd_icon(ICON_BATTERY, true);
@@ -202,6 +203,7 @@ void status_draw(void)
             battery_state = true;
             plug_state = true;
             if(charger_enabled) { /* animate battery if charging */
+                global_settings.runtime = 0;
                 battlevel = battery_charge_step * 34; /* 34 for a better look */
                 battlevel = battlevel > 100 ? 100 : battlevel;
                 if(TIME_AFTER(current_tick, switch_tick)) {
