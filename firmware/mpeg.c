@@ -1251,6 +1251,12 @@ static bool swap_one_chunk(void)
     return true;
 }
 
+static const unsigned char empty_id3_header[] =
+{
+    'I', 'D', '3', 0x04, 0x00, 0x00,
+    0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
+};
+
 static void mpeg_thread(void)
 {
     static int pause_tick = 0;
@@ -1844,6 +1850,9 @@ static void mpeg_thread(void)
                        room for an ID3 tag plus a VBR header */
                     mp3buf_write = 4096+417;
                     memset(mp3buf, 0, 4096+417);
+
+                    /* Insert the ID3 header */
+                    memcpy(mp3buf, empty_id3_header, sizeof(empty_id3_header));
 
                     start_recording();
                     demand_irq_enable(true);
