@@ -118,10 +118,14 @@ void ev_poll(void)
             ev_postevent(&ev);
         }
         if(pressed & ROCKBOY_MENU) {
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
           if (do_user_menu() == USER_MENU_QUIT) {
+#endif
             die("");
             cleanshut=1;
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
           }
+#endif
         }
     }
     
