@@ -26,6 +26,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "sprintf.h"
+#include "settings.h"
 
 typedef void (*settingfunc)(int);
 enum { Volume, Bass, Treble, numsettings };
