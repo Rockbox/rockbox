@@ -107,7 +107,9 @@ void backlight_tick(void)
 
 void backlight_init(void)
 {
+#ifdef HAVE_RTC
     rtc_write(0x0a, 0x40); /* Enable square wave */
+#endif
     queue_init(&backlight_queue);
     create_thread(backlight_thread, backlight_stack, sizeof(backlight_stack));
     backlight_on();
