@@ -66,9 +66,8 @@ static void draw_screen(struct mp3entry* id3)
 
             // removes the .mp3 from the end of the display buffer
             szPeriod = strrchr(szDelimit, '.');
-            if (szPeriod != NULL) {
-                memset(szPeriod, 0, 3);           
-            }
+            if (szPeriod != NULL)
+                *szPeriod = 0;
 
             lcd_puts_scroll(0,LINE_Y,(++szDelimit));
             break;
@@ -91,11 +90,14 @@ static void draw_screen(struct mp3entry* id3)
 #ifdef HAVE_LCD_BITMAP
             char buffer[64];
 
+            lcd_puts_scroll(0, l++, id3->path);
             lcd_puts(0, l++, id3->title?id3->title:"");
             lcd_puts(0, l++, id3->album?id3->album:"");
             lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-            snprintf(buffer,sizeof(buffer), "%d ms", id3->length);
+            snprintf(buffer,sizeof(buffer), "Time: %d:%d",
+                     id3->length / 60000,
+                     id3->length % 60000 / 1000 );
             lcd_puts(0, l++, buffer);
 
             snprintf(buffer,sizeof(buffer), "%d kbits", id3->bitrate);
