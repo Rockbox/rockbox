@@ -143,7 +143,7 @@ void main(void)
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
     if(button_status() & BUTTON_REC ||
-        button_status() & BUTTON_RC_ON) {
+        (button_status() & BUTTON_RC_ON) == BUTTON_RC_ON) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         start_iriver_fw();
@@ -153,6 +153,9 @@ void main(void)
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
         sleep(HZ/2);
+        /* Reset the cookie for the crt0 crash check */
+        asm(" move.l #0,%d0");
+        asm(" move.l %d0,0x10017ffc");
         power_off();
     }
 #if 0
