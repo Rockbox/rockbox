@@ -955,6 +955,8 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "invert cursor"))
             set_cfg_bool(&global_settings.invert_cursor, value);
 #endif
+        else if (!strcasecmp(name, "caption backlight"))
+            set_cfg_bool(&global_settings.caption_backlight, value);
         else if (!strcasecmp(name, "shuffle"))
             set_cfg_bool(&global_settings.playlist_shuffle, value);
         else if (!strcasecmp(name, "repeat")) {
@@ -1309,6 +1311,13 @@ bool settings_save_config(void)
         static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "backlight when plugged: %s\r\n",
                  options[global_settings.backlight_on_when_charging]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "caption backlight: %s\r\n",
+                 options[global_settings.caption_backlight]);
         write(fd, buf, strlen(buf));
     }
 
