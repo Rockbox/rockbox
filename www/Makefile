@@ -20,6 +20,7 @@ all: $(OBJS)
 	@(cd devcon; $(MAKE))
 	@(cd sh-win; $(MAKE))
 	@(cd download; $(MAKE))
+	@(cd manual; $(MAKE))
 
 main.html: main.t activity.html
 
