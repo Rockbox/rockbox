@@ -44,7 +44,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 #SRCS = $(wildcard *.c)
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd.c lcd-x11.c \
-        button-x11.c chartables.c tetris.c app.c tree.c io.c
+        button-x11.c chartables.c tetris.c app.c tree.c io.c sleep.c
 
 OBJS := $(SRCS:c=o)
 
