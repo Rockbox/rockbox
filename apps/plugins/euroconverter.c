@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "configfile.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 
@@ -43,7 +44,7 @@ To do:
 */
 
 /* Name and path of the config file*/
-#define CFGFILE "/.rockbox/euroconverter.cfg"
+#define CFGFILE "euroconverter.cfg"
 
 /*Pattern for the converter*/
 static unsigned char pattern_euro[]={0x07, 0x08, 0x1E, 0x10, 0x1E, 0x08, 0x07};    /* € */
@@ -134,9 +135,29 @@ static unsigned char heuro,hhome; /*Handles for the new patterns*/
 
 static struct plugin_api* rb;
 
+static char *currency_str[12] = {
+   "France",
+   "Germany",
+   "Austria",
+   "Belgium",
+   "Spain",
+   "Finland",
+   "Irland",
+   "Italy",
+   "Luxemburg",
+   "Netherlands",
+   "Portugal",
+   "Greece"
+};
+
 static int country;     /*Country selected*/
 static int cur_pos;     /*Cursor position*/
 static long long inc;   
+
+/* Persistent settings */
+static struct configdata config[] = {
+   { TYPE_ENUM, 0, 12, &country, "country", currency_str, NULL }
+};
 
 
 /* 64bits*64 bits with 5 digits after the . */
@@ -278,66 +299,20 @@ static void show_abbrev(void)
 /* Save the config to disk */
 static void save_config(void)
 {
-    int fd;
-
-    fd = rb->creat(CFGFILE,0);
-    if (fd < 0)
-    {
-        rb->lcd_clear_display();
-        rb->splash(HZ, false, "Failed to save config");
-        rb->sleep(HZ);
-    }
-    else
-    {
-        rb->fprintf(fd, "last currency: %d\n", country);
-        rb->close(fd);
-    }
-    return;
+    configfile_save(CFGFILE, config, 1);
 }
 
 
 /* Load the config from disk */
 static void load_config(void)
 {
-    int fd;
-    char line[128];
-    char *name, *value;
-
-    fd = rb->open(CFGFILE, O_RDONLY);
-    if (fd < 0)
-        return;
-
-    rb->read_line(fd, line, 128);
-    rb->settings_parseline(line, &name, &value);
-
-    if(!rb->strcmp("last currency", name))
-       country = rb->atoi(value);
-
-    if ((country>11)|| (country<0))
-        country=0;
-    
-    rb->close(fd);
-    return;
+    configfile_load(CFGFILE, config, 1);
 }
 
 
 /*Currency choice*/
 static void currency_menu(void)
 {
-    unsigned char *currency_str[12] = {
-                                          "France",
-                                          "Germany",
-                                          "Austria",
-                                          "Belgium",
-                                          "Spain",
-                                          "Finland",
-                                          "Irland",
-                                          "Italy",
-                                          "Luxemburg",
-                                          "Netherlands",
-                                          "Portugal",
-                                          "Greece"
-                                      };
     int c=country;
 
     rb->lcd_clear_display();
@@ -448,6 +423,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     cur_pos=3;
     inc=100000;
 
+    configfile_init(rb);
+    
     load_config();
 
     /*Empty the event queue*/
