@@ -96,12 +96,9 @@ int ata_read_sectors(unsigned long start,
 {
     int i;
 
-    DEBUGF("ata: ata_read_sectors(%d, %d)\n", start, count);
-
     if (!wait_for_rdy())
         return -1;
 
-    DEBUGF("ata: reading sector %d\n", start);
     led(TRUE);
 
     ATA_NSECTOR = count;
