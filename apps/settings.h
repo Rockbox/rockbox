@@ -25,6 +25,7 @@
 #include "file.h"
 
 #define ROCKBOX_DIR "/.rockbox"
+#define PLUGIN_DIR ROCKBOX_DIR"/rocks"
 
 #define MAX_FILENAME 20
 
@@ -49,6 +50,7 @@
 #define FF_REWIND_30000 11
 #define FF_REWIND_45000 12
 #define FF_REWIND_60000 13
+
 
 struct user_settings
 {
@@ -222,7 +224,11 @@ extern char rockboxdir[];
 enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 
 /* dir filter options */
-enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES };
+/* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
+ *       Any new rockbox browse filter modes (accessible through the menu)
+ *       must be added after NUM_FILTER_MODES. */
+enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES, 
+SHOW_WPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };

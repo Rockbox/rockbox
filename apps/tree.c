@@ -78,19 +78,20 @@ static int cursorpos[MAX_DIR_LEVELS];
 static char lastdir[MAX_PATH];
 static char lastfile[MAX_PATH];
 static char currdir[MAX_PATH];
+static char currdir_save[MAX_PATH];
 static bool reload_dir = false;
 static int boot_size = 0;
 static int boot_cluster;
 static bool boot_changed = false;
 
-static bool dirbrowse(char *root);
+static bool dirbrowse(char *root, int *dirfilter);
 
 void browse_root(void)
 {
 #ifndef SIMULATOR
-    dirbrowse("/");
+    dirbrowse("/", &global_settings.dirfilter);
 #else
-    if (!dirbrowse("/")) {
+    if (!dirbrowse("/", &global_settings.dirfilter)) {
         DEBUGF("No filesystem found. Have you forgotten to create it?\n");
     }
 #endif
@@ -189,7 +190,7 @@ static int compare(const void* p1, const void* p2)
         return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }
 
-static void showfileline(int line, int direntry, bool scroll)
+static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
 {
     char* name = dircache[direntry].name;
     int xpos = LINE_X;
@@ -200,7 +201,7 @@ static void showfileline(int line, int direntry, bool scroll)
 #endif
 
     /* if any file filter is on, strip the extension */
-    if (global_settings.dirfilter != SHOW_ALL && 
+    if (*dirfilter != SHOW_ALL && 
         !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
         char* dotpos = strrchr(name, '.');
@@ -235,7 +236,7 @@ static void showfileline(int line, int direntry, bool scroll)
 }
 
 /* load sorted directory into dircache.  returns NULL on failure. */
-struct entry* load_and_sort_directory(char *dirname, int dirfilter,
+struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
                                       int *num_files, bool *buffer_full)
 {
     int i;
@@ -273,7 +274,7 @@ struct entry* load_and_sort_directory(char *dirname, int dirfilter,
         }
         
         /* filter out dotfiles and hidden files */
-        if (dirfilter != SHOW_ALL &&
+        if (*dirfilter != SHOW_ALL &&
             ((entry->d_name[0]=='.') ||
             (entry->attribute & ATTR_HIDDEN))) {
             i--;
@@ -322,25 +323,19 @@ struct entry* load_and_sort_directory(char *dirname, int dirfilter,
             boot_cluster = entry->startcluster;
         }
 
-        /* filter out all non-playlist files */
-        if ( dirfilter == SHOW_PLAYLIST &&
-            (!(dptr->attr &
-            (ATTR_DIRECTORY|TREE_ATTR_M3U))) ) {
-            i--;
-            continue;
-        }
-        
-        /* filter out non-music files */
-        if ( dirfilter == SHOW_MUSIC &&
-            (!(dptr->attr &
-            (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ) {
-            i--;
-            continue;
-        }
-        
-        /* filter out non-supported files */
-        if ( dirfilter == SHOW_SUPPORTED &&
-            (!(dptr->attr & TREE_ATTR_MASK)) ) {
+        /* filter out non-visible files */
+        if ((*dirfilter == SHOW_PLAYLIST &&
+             !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_M3U))) ||
+            (*dirfilter == SHOW_MUSIC &&
+             !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ||
+            (*dirfilter == SHOW_SUPPORTED && !(dptr->attr & TREE_ATTR_MASK)) ||
+            (*dirfilter == SHOW_WPS && !(dptr->attr & TREE_ATTR_WPS)) ||
+            (*dirfilter == SHOW_CFG && !(dptr->attr & TREE_ATTR_CFG)) ||
+            (*dirfilter == SHOW_LNG && !(dptr->attr & TREE_ATTR_LNG)) ||
+            (*dirfilter == SHOW_MOD && !(dptr->attr & TREE_ATTR_MOD)) ||
+            (*dirfilter == SHOW_FONT && !(dptr->attr & TREE_ATTR_FONT)) ||
+            (*dirfilter == SHOW_PLUGINS && !(dptr->attr & TREE_ATTR_ROCK)))
+        {
             i--;
             continue;
         }
@@ -363,7 +358,7 @@ struct entry* load_and_sort_directory(char *dirname, int dirfilter,
     return dircache;
 }
 
-static int showdir(char *path, int start)
+static int showdir(char *path, int start, int *dirfilter)
 {
     int icon_type = 0;
     int i;
@@ -383,7 +378,7 @@ static int showdir(char *path, int start)
 
     /* new dir? cache it */
     if (strncmp(path,lastdir,sizeof(lastdir)) || reload_dir) {
-        if (!load_and_sort_directory(path, global_settings.dirfilter,
+        if (!load_and_sort_directory(path, dirfilter,
                 &filesindir, &dir_buffer_full))
             return -1;
 
@@ -534,7 +529,7 @@ static int showdir(char *path, int start)
 #endif
         }
 
-        showfileline(i-start, i, false); /* no scroll */
+        showfileline(i-start, i, false, dirfilter); /* no scroll */
     }
 
 #ifdef HAVE_LCD_BITMAP
@@ -606,7 +601,7 @@ void resume_directory(char *dir)
 {
     bool buffer_full;
 
-    if (!load_and_sort_directory(dir, global_settings.dirfilter, &filesindir,
+    if (!load_and_sort_directory(dir, &global_settings.dirfilter, &filesindir,
             &buffer_full))
         return;
     lastdir[0] = 0;
@@ -704,7 +699,7 @@ void set_current_file(char *path)
     }
 }
 
-static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
+static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, int *dirfilter)
 {
     bool exit = false;
     bool used = false;
@@ -789,7 +784,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 #ifdef HAVE_LCD_BITMAP
             int xpos,ypos;
 #endif
-            showdir(currdir, dirstart);
+            showdir(currdir, dirstart, dirfilter);
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor) {
                 xpos = lcd_getxmargin();
@@ -808,7 +803,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
     return used;
 }
 
-static bool dirbrowse(char *root)
+static bool dirbrowse(char *root, int *dirfilter)
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -817,11 +812,11 @@ static bool dirbrowse(char *root)
     int button;
     int tree_max_on_screen;
     bool reload_root = false;
-    int lastfilter = global_settings.dirfilter;
+    int lastfilter = *dirfilter;
     bool lastsortcase = global_settings.sort_case;
     int lastdircursor=-1;
     bool need_update = true;
-
+    bool exit_func = false;
     bool update_all = false; /* set this to true when the whole file list
                                 has been refreshed on screen */
 
@@ -839,9 +834,10 @@ static bool dirbrowse(char *root)
 
     memcpy(currdir,root,sizeof(currdir));
 
+    if (*dirfilter < NUM_FILTER_MODES)
     start_resume(true);
 
-    numentries = showdir(currdir, dirstart);
+    numentries = showdir(currdir, dirstart, dirfilter);
     if (numentries == -1) 
         return false;  /* currdir is not a directory */
     update_all = true;
@@ -899,6 +895,8 @@ static bool dirbrowse(char *root)
 
                     restore = true;
                 }
+                if (*dirfilter > NUM_FILTER_MODES)
+                    exit_func = true;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -1083,6 +1081,8 @@ static bool dirbrowse(char *root)
                         tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #endif
                     }
+                    else if (*dirfilter > NUM_FILTER_MODES)
+                        exit_func = true;
                 }
                 restore = true;
                 break;
@@ -1099,7 +1099,7 @@ static bool dirbrowse(char *root)
                     else {
                         if (dirstart) {
                             dirstart--;
-                            numentries = showdir(currdir, dirstart);
+                            numentries = showdir(currdir, dirstart, dirfilter);
                             update_all=true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
@@ -1114,7 +1114,7 @@ static bool dirbrowse(char *root)
                             else {
                                 dirstart = numentries - tree_max_on_screen;
                                 dircursor = tree_max_on_screen - 1;
-                                numentries = showdir(currdir, dirstart);
+                                numentries = showdir(currdir, dirstart, dirfilter);
                                 update_all = true;
                                 put_cursorxy(CURSOR_X, CURSOR_Y +
                                              tree_max_on_screen - 1, true);
@@ -1138,7 +1138,7 @@ static bool dirbrowse(char *root)
                         } 
                         else {
                             dirstart++;
-                            numentries = showdir(currdir, dirstart);
+                            numentries = showdir(currdir, dirstart, dirfilter);
                             update_all = true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
@@ -1151,7 +1151,7 @@ static bool dirbrowse(char *root)
                         } 
                         else {
                             dirstart = dircursor = 0;
-                            numentries = showdir(currdir, dirstart);
+                            numentries = showdir(currdir, dirstart, dirfilter);
                             update_all=true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
@@ -1169,7 +1169,7 @@ static bool dirbrowse(char *root)
 
             case BUTTON_ON:
                 if (handle_on(&dirstart, &dircursor, numentries,
-                              tree_max_on_screen))
+                              tree_max_on_screen, dirfilter))
                 {
                     /* start scroll */
                     restore = true;
@@ -1228,7 +1228,7 @@ static bool dirbrowse(char *root)
         
         /* do we need to rescan dir? */
         if (reload_dir || reload_root ||
-            lastfilter != global_settings.dirfilter ||
+            lastfilter != *dirfilter ||
             lastsortcase != global_settings.sort_case)
         {
             if ( reload_root ) {
@@ -1242,10 +1242,14 @@ static bool dirbrowse(char *root)
                 dirstart = 0;
                 lastdir[0] = 0;
             }
-            lastfilter = global_settings.dirfilter;
+
+            lastfilter = *dirfilter;
             lastsortcase = global_settings.sort_case;
             restore = true;
         }
+
+        if (exit_func)
+            break;
 
         if (restore || reload_dir) {
             /* restore display */
@@ -1262,7 +1266,7 @@ static bool dirbrowse(char *root)
                                                   icon */
             lcd_setfont(FONT_UI);
 #endif
-            numentries = showdir(currdir, dirstart);
+            numentries = showdir(currdir, dirstart, dirfilter);
             update_all = true;
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
             
@@ -1280,12 +1284,12 @@ static bool dirbrowse(char *root)
                 /* So if lastdircursor and dircursor differ, and then full
                    screen was not refreshed, restore the previous line */
                 if ((lastdircursor != dircursor) && !update_all ) {
-                    showfileline(lastdircursor, lasti, false); /* no scroll */
+                    showfileline(lastdircursor, lasti, false, dirfilter); /* no scroll */
                 }
                 lasti=i;
                 lastdircursor=dircursor;
 
-                showfileline(dircursor, i, true); /* scroll please */
+                showfileline(dircursor, i, true, dirfilter); /* scroll please */
                 need_update = true;
             }
         }
@@ -1400,6 +1404,29 @@ bool create_playlist(void)
     sleep(HZ);
     
     return true;
+}
+
+bool rockbox_browse(char *root, int dirfilter)
+{
+    bool rc;
+    int dircursor_save = dircursor;
+    int dirstart_save = dirstart;
+    int dirlevel_save = dirlevel;
+    int dirpos_save = dirpos[0];
+    int cursorpos_save = cursorpos[0];
+
+    memcpy(currdir_save, currdir, sizeof(currdir));
+    rc = dirbrowse(root, &dirfilter);
+    memcpy(currdir, currdir_save, sizeof(currdir));
+
+    reload_dir = true;
+    dirstart = dirstart_save;
+    cursorpos[0] = cursorpos_save;
+    dirlevel = dirlevel_save;
+    dircursor = dircursor_save;
+    dirpos[0] = dirpos_save;
+
+    return false;
 }
 
 void tree_init(void)

@@ -410,10 +410,11 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
     int num_files = 0;
     bool buffer_full = false;
     int i;
+    int dirfilter = SHOW_ALL;
     struct entry *files;
 
     /* use the tree browser dircache to load files */
-    files = load_and_sort_directory(dirname, SHOW_ALL, &num_files,
+    files = load_and_sort_directory(dirname, &dirfilter, &num_files,
         &buffer_full);
 
     if(!files)
@@ -456,7 +457,7 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
                     break;
 
                 /* we now need to reload our current directory */
-                files = load_and_sort_directory(dirname, SHOW_ALL, &num_files,
+                files = load_and_sort_directory(dirname, &dirfilter, &num_files,
                     &buffer_full);
                 if (!files)
                 {

@@ -1727,3 +1727,33 @@ id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 new:
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new:
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new:
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new:
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new:
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Profiles"
+new:
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new:

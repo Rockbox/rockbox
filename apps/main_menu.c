@@ -251,6 +251,16 @@ bool show_info(void)
     return false;
 }
 
+static bool firmware_browse(void)
+{
+    return rockbox_browse(ROCKBOX_DIR, SHOW_MOD);
+}
+
+static bool plugin_browse(void)
+{
+    return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
+}
+
 bool main_menu(void)
 {
     int m;
@@ -273,14 +283,8 @@ bool main_menu(void)
 #ifdef HAVE_ALARM_MOD
         { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen    },
 #endif
-#ifdef HAVE_LCD_BITMAP
-#ifdef USE_GAMES
-        { str(LANG_GAMES),              games_menu        },
-#endif
-#ifdef USE_DEMOS
-        { str(LANG_DEMOS),              demo_menu },
-#endif /* end USE_DEMOS */
-#endif
+        { str(LANG_PLUGINS),            plugin_browse     },
+        { str(LANG_FIRMWARE),           firmware_browse   },
         { str(LANG_INFO),               show_info         },
         { str(LANG_VERSION),            show_credits      },
 #ifndef SIMULATOR

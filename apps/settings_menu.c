@@ -37,6 +37,7 @@
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
+#include "tree.h"
 #include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -683,6 +684,28 @@ static bool browse_current(void)
     return set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
 }
 
+static bool custom_wps_browse(void)
+{
+    return rockbox_browse(ROCKBOX_DIR, SHOW_WPS);
+}
+
+static bool custom_cfg_browse(void)
+{
+    return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
+}
+
+static bool language_browse(void)
+{
+    return rockbox_browse(ROCKBOX_DIR, SHOW_LNG);
+}
+
+#ifdef HAVE_RECORDER_KEYPAD
+static bool font_browse(void)
+{
+    return rockbox_browse(ROCKBOX_DIR, SHOW_FONT);
+}
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 static bool scroll_bar(void)
 {
@@ -894,8 +917,14 @@ bool settings_menu(void)
 
     struct menu_items items[] = {
         { str(LANG_PLAYBACK),        playback_settings_menu },
+        { str(LANG_CUSTOM_CFG),      custom_cfg_browse      },
+        { str(LANG_WHILE_PLAYING),   custom_wps_browse      },
+        { str(LANG_LANGUAGE),        language_browse        },
         { str(LANG_FILE),            fileview_settings_menu },
         { str(LANG_DISPLAY),         display_settings_menu  },
+#ifdef HAVE_RECORDER_KEYPAD
+        { str(LANG_CUSTOM_FONT),     font_browse            },
+#endif
         { str(LANG_SYSTEM),          system_settings_menu   },
         { str(LANG_SAVE_SETTINGS),   settings_save_config   },
     };
