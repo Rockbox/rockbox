@@ -22,6 +22,11 @@
 #include "sh7034.h"
 #include "debug.h"
 #include "kernel.h"
+#include "ata.h"
+#include "disk.h"
+#include "fat.h"
+#include "file.h"
+#include "dir.h"
 
 unsigned char fliptable[] =
 {
@@ -59,8 +64,11 @@ unsigned char fliptable[] =
     0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
 
-extern unsigned char mp3data[];
-extern int mp3datalen;
+extern unsigned int stack[];
+/* Place the MP3 data right after the stack */
+unsigned char *mp3buf = (unsigned char *)stack;
+int mp3datalen;
+
 unsigned char *mp3dataptr;
 int mp3_transmitted;
 
@@ -116,7 +124,7 @@ int mas_tx_ready(void)
 
 void init_dma(void)
 {
-    SAR3 = (unsigned int) mp3data;
+    SAR3 = (unsigned int) mp3buf;
     DAR3 = 0x5FFFEC3;
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
@@ -153,7 +161,10 @@ int main(void)
     char buf[40];
     char str[32];
     int i=0;
-
+    DIR *d;
+    struct dirent *dent;
+    int f;
+    
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
 
@@ -210,10 +221,42 @@ int main(void)
         while(1);
     }
 
-   
+    i = ata_init();
+    debugf("ata_init() returned %d\n", i);
+
+    i = disk_init();
+    debugf("disk_init() returned %d\n", i);
+
+    debugf("part[0] starts at sector %d\n", part[0].start);
+    
+    i = fat_mount(part[0].start);
+    debugf("fat_mount() returned %d\n", i);
+    
+    if((d = opendir("/")))
+    {
+        while((dent = readdir(d)))
+        {
+            debugf("%s\n", dent->d_name);
+        }
+        closedir(d);
+    }
+
+    f = open("/machinae_supremacy_-_arcade.mp3", O_RDONLY);
+    if(f < 0)
+    {
+        debugf("Couldn't open file\n");
+    }
+
+    i = read(f, mp3buf, 200000);
+    debugf("Read %d bytes\n", i);
+
+    mp3datalen = i;
+    
+    ata_spindown(-1);
+    
     for(i = 0;i < mp3datalen;i++)
     {
-        mp3data[i] = fliptable[mp3data[i]];
+        mp3buf[i] = fliptable[mp3buf[i]];
     }
 
     while(1)
@@ -221,7 +264,7 @@ int main(void)
         debugf("let's play...\n");
         init_dma();
     
-        mp3dataptr = mp3data;
+        mp3dataptr = mp3buf;
         mp3_transmitted = 0;
         
         dma_on = TRUE;
@@ -232,7 +275,7 @@ int main(void)
         CHCR3 |= 1;
 
         debugf("sleeping...\n");
-        sleep(10000);
+        sleep(1000000);
     }
 }
 
