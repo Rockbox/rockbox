@@ -53,9 +53,13 @@ int kbd_input(char* text, int buflen)
         lcd_clear_display();
 
         /* draw chars */
-        for (i=0; i < 11; i++)
-            lcd_putc(i, 1, line[i+x]);
-
+        for (i=0; i < 11; i++) {
+            if (line[i+x])
+                lcd_putc(i, 1, line[i+x]);
+            else
+                break;
+        }
+        
         /* write out the text */
         if (len <= 11) {
             /* if we have enough room */
@@ -70,47 +74,49 @@ int kbd_input(char* text, int buflen)
 
         switch ( button_get(true) ) {
 
-        case BUTTON_MENU:
-            /* Page */
-            if (++page == KEYBOARD_PAGES)
-                page = 0;
-            line = kbd_setupkeys(page);
-            linelen = strlen(line);
-            break;
+            case BUTTON_MENU:
+                /* shift */
+                if (++page == KEYBOARD_PAGES)
+                    page = 0;
+                line = kbd_setupkeys(page);
+                linelen = strlen(line);
+                break;
 
-        case BUTTON_RIGHT:
-            if (x < linelen - 1) 
-                x++; 
-            else 
-                x = 0;
-            break;
+            case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if (x < linelen - 1) 
+                    x++; 
+                else 
+                    x = 0;
+                break;
 
-        case BUTTON_LEFT:
-            if (x)
-                x--;
-            else
-                x = linelen - 1;
-            break;
+            case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if (x)
+                    x--;
+                else
+                    x = linelen - 1;
+                break;
 
-        case BUTTON_STOP:
-            /* backspace */
-            if (len)
-                text[len-1] = 0;
-            break;
+            case BUTTON_STOP:
+                /* backspace */
+                if (len)
+                    text[len-1] = 0;
+                break;
 
-        case BUTTON_ON:
-            /* F2 accepts what was entered and continues */
-            done = true;
-            break;
+            case BUTTON_ON:
+                /* ON accepts what was entered and continues */
+                done = true;
+                break;
 
-        case BUTTON_PLAY:
-            /* PLAY inserts the selected char */
-            if (len<buflen)
-            {
-                text[len] = line[x];
-                text[len+1] = 0;
-            }
-            break;
+            case BUTTON_PLAY:
+                /* PLAY inserts the selected char */
+                if (len<buflen)
+                {
+                    text[len] = line[x];
+                    text[len+1] = 0;
+                }
+                break;
         }
     }
     return 0;

@@ -84,6 +84,7 @@ int kbd_input(char* text, int buflen)
     char c = 0;
     struct font* font = font_get(FONT_SYSFIXED);
 
+    lcd_setfont(FONT_SYSFIXED);
     font_w = font->maxwidth;
     font_h = font->height;
 
@@ -131,7 +132,7 @@ int kbd_input(char* text, int buflen)
 
         /* draw the status bar */
         kbd_draw_statusbar_button(0, "Shift", status_y1, font_w);
-        kbd_draw_statusbar_button(1, "Done", status_y1, font_w);
+        kbd_draw_statusbar_button(1, "Cancl", status_y1, font_w);
         kbd_draw_statusbar_button(2, "Del", status_y1, font_w);
 		
         /* highlight the key that has focus */		
@@ -140,67 +141,74 @@ int kbd_input(char* text, int buflen)
 
         switch ( button_get(true) ) {
 
-        case BUTTON_OFF:
-            /* abort */
-            return -1;
-            break;
+            case BUTTON_OFF:
+            case BUTTON_F2:
+                /* abort */
+                lcd_setfont(FONT_UI);
+                return -1;
+                break;
 
-        case BUTTON_F1:
-            /* Page */
-            if (++page == KEYBOARD_PAGES)
-                page = 0;
-            kbd_setupkeys(line, page);
-            break;
+            case BUTTON_F1:
+                /* Page */
+                if (++page == KEYBOARD_PAGES)
+                    page = 0;
+                kbd_setupkeys(line, page);
+                break;
 
-        case BUTTON_RIGHT:
-            if (x < (int)strlen(line[y]) - 1) 
-                x++; 
-            else 
-                x = 0;
-            break;
+            case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if (x < (int)strlen(line[y]) - 1) 
+                    x++; 
+                else 
+                    x = 0;
+                break;
 
-        case BUTTON_LEFT:
-            if (x)
-                x--;
-            else
-                x = strlen(line[y]) - 1;
-            break;
+            case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if (x)
+                    x--;
+                else
+                    x = strlen(line[y]) - 1;
+                break;
 
-        case BUTTON_DOWN:
-            if (y < KEYBOARD_LINES - 1)
-                y++;
-            else
-                y=0;
-            break;
+            case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
+                if (y < KEYBOARD_LINES - 1)
+                    y++;
+                else
+                    y=0;
+                break;
 
-        case BUTTON_UP:
-            if (y)
-                y--;
-            else
-                y = KEYBOARD_LINES - 1;
-            break;
+            case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
+                if (y)
+                    y--;
+                else
+                    y = KEYBOARD_LINES - 1;
+                break;
 
-        case BUTTON_F3:
-            /* backspace */
-            if (len)
-                text[len-1] = 0;
-            break;
+            case BUTTON_F3:
+                /* backspace */
+                if (len)
+                    text[len-1] = 0;
+                break;
 
-        case BUTTON_F2:
-            /* F2 accepts what was entered and continues */
-            done = true;
-            break;
+            case BUTTON_ON:
+                /* ON accepts what was entered and continues */
+                done = true;
+                break;
 
-        case BUTTON_PLAY:
-            /* PLAY inserts the selected char */
-            if (len<buflen)
-            {
-                c = line[y][x];
-                text[len] = c;
-                text[len+1] = 0;
-            }
-            break;
+            case BUTTON_PLAY:
+                /* PLAY inserts the selected char */
+                if (len<buflen)
+                {
+                    c = line[y][x];
+                    text[len] = c;
+                    text[len+1] = 0;
+                }
+                break;
         }
     }
+    lcd_setfont(FONT_UI);
     return 0;
 }
