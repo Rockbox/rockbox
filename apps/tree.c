@@ -807,12 +807,14 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
+#ifndef IRIVER_H100
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();
                     restore = true;
                 }
                 break;
+#endif
 #endif
 
             case TREE_PREV:

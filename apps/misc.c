@@ -229,7 +229,9 @@ bool clean_shutdown(void)
 #ifdef SIMULATOR
     exit(0);
 #else
+#ifndef IRIVER_H100
     if(!charger_inserted())
+#endif
     {
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
