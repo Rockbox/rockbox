@@ -53,6 +53,7 @@ int button_set_release(int newmask)
 static int real_button_get(void)
 {
     int btn = 0;
+    Sleep (25);
 
     if (bActive)
     {
@@ -111,10 +112,7 @@ int button_get(bool block)
 
         btn = real_button_get();
 
-        if(!btn)
-            /* prevent busy-looping */
-            Sleep (50); /* ms */
-        else
+        if (btn)
             break;
         
     } while (block);
@@ -130,9 +128,9 @@ int button_get_w_tmo(int ticks)
 
         if(!btn)
             /* prevent busy-looping */
-            sleep(1); /* one tick! */
+            sleep(10); /* one tick! */
         else
-            break;
+            return btn;
         
     } while (--ticks);
 

@@ -31,6 +31,7 @@ void sleep(int ticks)
 
 void yield (void)
 {
+    Sleep (1); /* prevent busy loop */
     PostThreadMessage (GetWindowThreadProcessId (hGUIWnd,NULL), TM_YIELD, 0, 0);
 }
 
