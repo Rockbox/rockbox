@@ -29,21 +29,22 @@ void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 static void tick_start(unsigned int interval_in_ms);
 
+/* This array holds all queues that are initiated. It is used for broadcast. */
+static struct event_queue *all_queues[32];
+static int num_queues;
+
 /****************************************************************************
  * Standard kernel stuff
  ****************************************************************************/
 void kernel_init(void)
 {
-    int i;
-
     /* Init the threading API */
     init_threads();
     
-    /* Clear the tick task array */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        tick_funcs[i] = NULL;
-    }
+    memset(tick_funcs, 0, sizeof(tick_funcs));
+
+    num_queues = 0;
+    memset(all_queues, 0, sizeof(all_queues));
     
     tick_start(1000/HZ);
 }
@@ -82,6 +83,9 @@ void queue_init(struct event_queue *q)
 {
     q->read = 0;
     q->write = 0;
+
+    /* Add it to the all_queues array */
+    all_queues[num_queues++] = q;
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
@@ -112,6 +116,17 @@ bool queue_empty(struct event_queue* q)
     return ( q->read == q->write );
 }
 
+int queue_broadcast(int id, void *data)
+{
+   int i;
+
+   for(i = 0;i < num_queues;i++)
+   {
+      queue_post(all_queues[i], id, data);
+   }
+   
+   return num_queues;
+}
 
 /****************************************************************************
  * Timer tick

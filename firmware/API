@@ -238,6 +238,11 @@ Various
 
      Returns true if the queue is empty.
 
+  int queue_broadcast(int id, void *data)
+
+     Posts an event in all queues that has been initiated with queue_init().
+     Returns the number of queues that were posted to.
+
   int tick_add_task(void (*f)(void))
 
      Add a task to the tick task queue. The argument is a pointer to a
