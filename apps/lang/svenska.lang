@@ -1717,7 +1717,7 @@ new: "STANNA för avbryt"
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "While Playing Screen"
-new: "Under spel menyn"
+new: "Skärm vid spel"
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
@@ -1773,3 +1773,14 @@ id: LANG_NO_FILES
 desc: in settings_menu
 eng: "No files"
 new: "Inga filer"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc: in main menu
+eng: "Record"
+new: "Spela in"
+
+id: LANG_FM_RADIO
+desc: in main menu
+eng: "FM Radio"
+new: "FM Radio"
+
