@@ -365,7 +365,7 @@ static int showdir(void)
         int attr = 0;
 
         if (id3db) {
-            name = ((char**)tc.dircache)[i * 2];
+            name = ((char**)tc.dircache)[i * tc.dentry_size];
             icon = db_get_icon(&tc);
         }
         else { 
@@ -717,23 +717,23 @@ static bool dirbrowse(void)
                     break;
 
                 if (id3db)
-                    db_enter(&tc);
-                else {
-                    switch (ft_enter(&tc))
-                    {
-                        case 1: reload_dir = true; break;
-                        case 2: reload_root = true; break;
-                        case 3: start_wps = true; break;
-                        case 4: exit_func = true; break;
-                        default: break;
-                    }
-
-#ifdef HAVE_LCD_BITMAP
-                    /* maybe we have a new font */
-                    tree_max_on_screen = recalc_screen_height();
-#endif
+                    i = db_enter(&tc);
+                else
+                    i = ft_enter(&tc);
+                    
+                switch (i)
+                {
+                    case 1: reload_dir = true; break;
+                    case 2: reload_root = true; break;
+                    case 3: start_wps = true; break;
+                    case 4: exit_func = true; break;
+                    default: break;
                 }
 
+#ifdef HAVE_LCD_BITMAP
+                /* maybe we have a new font */
+                tree_max_on_screen = recalc_screen_height();
+#endif
                 /* make sure cursor is on screen */
                 while ( tc.dircursor > tree_max_on_screen )
                 {
@@ -1013,6 +1013,7 @@ static bool dirbrowse(void)
 #endif
             {
                 int onplay_result;
+                int attr = 0;
 
                 if(!numentries)
                     onplay_result = onplay(NULL, 0);
@@ -1023,8 +1024,9 @@ static bool dirbrowse(void)
                     else
                         snprintf(buf, sizeof buf, "/%s",
                                  dircache[tc.dircursor+tc.dirstart].name);
-                    onplay_result = onplay(buf,
-                                           dircache[tc.dircursor+tc.dirstart].attr);
+                    if (!id3db)
+                        attr = dircache[tc.dircursor+tc.dirstart].attr;
+                    onplay_result = onplay(buf, attr);
                 }
                 
                 switch (onplay_result)
@@ -1166,7 +1168,7 @@ static bool dirbrowse(void)
                 int attr = 0;
                 
                 if (id3db)
-                    name = ((char**)tc.dircache)[lasti * 2];
+                    name = ((char**)tc.dircache)[lasti * tc.dentry_size];
                 else {
                     struct entry* dc = tc.dircache;
                     struct entry* e = &dc[lasti];
@@ -1186,7 +1188,7 @@ static bool dirbrowse(void)
                 thumbnail_time = -1; /* cancel whatever we were about to say */
 
                 if (id3db)
-                    name = ((char**)tc.dircache)[lasti * 2];
+                    name = ((char**)tc.dircache)[lasti * tc.dentry_size];
                 else {
                     struct entry* dc = tc.dircache;
                     struct entry* e = &dc[lasti];

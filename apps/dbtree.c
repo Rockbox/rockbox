@@ -59,6 +59,8 @@ static int
     albumlen, albumarraylen,
     artistlen, initialized = 0;
 
+static int db_play_folder(struct tree_context* c);
+
 int db_init(void)
 {
     unsigned int version;
@@ -143,7 +145,7 @@ int db_load(struct tree_context* c)
         return 0;
     }
     
-    c->dentry_size = 2 * sizeof(int);
+    c->dentry_size = 2;
     c->dirfull = false;
 
     DEBUGF("db_load(%d, %x, %d)\n", table, extra, c->firstpos);
@@ -157,9 +159,9 @@ int db_load(struct tree_context* c)
         case root: {
             static const int tables[] = {allartists, allalbums, allsongs};
             char* nbuf = (char*)nptr;
-            char* labels[3] = { str(LANG_ID3DB_ARTISTS),
-                                str(LANG_ID3DB_ALBUMS),
-                                str(LANG_ID3DB_SONGS)};
+            char* labels[] = { str(LANG_ID3DB_ARTISTS),
+                               str(LANG_ID3DB_ALBUMS),
+                               str(LANG_ID3DB_SONGS)};
 
             for (i=0; i < 3; i++) {
                 strcpy(nbuf, labels[i]);
@@ -176,6 +178,7 @@ int db_load(struct tree_context* c)
             offset = songstart + c->firstpos * (songlen + 12);
             itemcount = songcount;
             stringlen = songlen;
+            c->dentry_size = 3;
             break;
 
         case allalbums:
@@ -226,13 +229,14 @@ int db_load(struct tree_context* c)
             offset = safeplace[0];
             itemcount = songarraylen;
             stringlen = songlen;
+            c->dentry_size = 3;
             break;
 
         default:
             DEBUGF("Unsupported table %d\n", table);
             return -1;
     }
-    max_items = dcachesize / c->dentry_size;
+    max_items = dcachesize / (c->dentry_size * sizeof(int));
     end_of_nbuf -= safeplacelen;
 
     c->dirlength = itemcount;
@@ -256,6 +260,7 @@ int db_load(struct tree_context* c)
 
     for ( i=0; i < max_items; i++ ) {
         int rc, skip=0;
+        int intbuf[4];
 
         if (safeplace) {
             if (!safeplace[i]) {
@@ -282,8 +287,15 @@ int db_load(struct tree_context* c)
             case allsongs:
             case songs4album:
                 /* save offset of this song */
-                skip = 12;
                 dptr[1] = offset;
+
+                rc = read(fd, intbuf, 12);
+                if (rc < 12) {
+                    DEBUGF("%d read(%d) returned %d\n", i, 12, rc);
+                    return -1;
+                }
+                /* save offset of filename */
+                dptr[2] = BE32(intbuf[2]);
                 break;
 
             case allalbums:
@@ -309,7 +321,7 @@ int db_load(struct tree_context* c)
             c->dirfull = true;
             break;
         }
-        dptr = (void*)dptr + c->dentry_size;
+        dptr = (void*)dptr + c->dentry_size * sizeof(int);
 
         if (!safeplace)
             offset += stringlen + skip;
@@ -320,8 +332,9 @@ int db_load(struct tree_context* c)
     return i;
 }
 
-void db_enter(struct tree_context* c)
+int db_enter(struct tree_context* c)
 {
+    int rc = 0;
     int newextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
 
     c->dirpos[c->dirlevel] = c->dirstart;
@@ -348,14 +361,11 @@ void db_enter(struct tree_context* c)
             c->currextra = newextra;
             break;
 
-        case songs4album:
         case allsongs:
-            splash(HZ,true,"No playing implemented yet");
+        case songs4album:
             c->dirlevel--;
-#if 0
-            /* find filenames, build playlist, play */
-            playlist_create(NULL,NULL);
-#endif       
+            if (db_play_folder(c) >= 0)
+                rc = 3;
             break;
             
         default:
@@ -363,6 +373,8 @@ void db_enter(struct tree_context* c)
     }
 
     c->dirstart = c->dircursor = c->firstpos = 0;
+
+    return rc;
 }
 
 void db_exit(struct tree_context* c)
@@ -373,6 +385,41 @@ void db_exit(struct tree_context* c)
     c->currtable = c->table_history[c->dirlevel];
     c->currextra = c->extra_history[c->dirlevel];
     c->firstpos  = c->pos_history[c->dirlevel];
+}
+
+static int db_play_folder(struct tree_context* c)
+{
+    char buf[MAX_PATH];
+    int rc, i;
+    int filenum = c->dircursor + c->dirstart;
+
+    if (playlist_create(NULL, NULL) < 0) {
+        DEBUGF("Failed creating playlist\n");
+        return -1;
+    }
+
+    /* TODO: add support for very long tables */
+    
+    for (i=0; i < c->filesindir; i++) {
+        int pathoffset = ((int*)c->dircache)[i * c->dentry_size + 2];
+        lseek(fd, pathoffset, SEEK_SET);
+        rc = read(fd, buf, sizeof(buf));
+        if (rc < songlen) {
+            DEBUGF("short path read(%d) = %d\n", sizeof(buf), rc);
+            return -2;
+        }
+
+        playlist_insert_track(NULL, buf, PLAYLIST_INSERT, false);
+    }
+
+    if (global_settings.playlist_shuffle)
+        filenum = playlist_shuffle(current_tick, filenum);
+    if (!global_settings.play_selected)
+        filenum = 0;
+
+    playlist_start(filenum,0);
+
+    return 0;
 }
 
 #ifdef HAVE_LCD_BITMAP

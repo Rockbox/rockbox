@@ -244,7 +244,8 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
  */
 static void create_control(struct playlist_info* playlist)
 {
-    playlist->control_fd = creat(playlist->control_filename, 0000200);
+    playlist->control_fd = open(playlist->control_filename,
+                                O_CREAT|O_RDWR|O_TRUNC);
     if (playlist->control_fd < 0)
     {
         if (check_rockboxdir())
@@ -950,18 +951,19 @@ static int get_filename(struct playlist_info* playlist, int seek,
             if (control_file)
                 mutex_lock(&playlist->control_mutex);
             
-            lseek(fd, seek, SEEK_SET);
-            max = read(fd, tmp_buf, buf_length);
+            if (lseek(fd, seek, SEEK_SET) != seek)
+                max = -1;
+            else
+                max = read(fd, tmp_buf, buf_length);
             
             if (control_file)
-                mutex_unlock(&playlist->control_mutex);            
+                mutex_unlock(&playlist->control_mutex);
         }
 
         if (max < 0)
         {
             if (control_file)
-                splash(HZ*2, true,
-                    str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+                splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
             else
                 splash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
 

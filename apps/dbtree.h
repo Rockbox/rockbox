@@ -25,7 +25,7 @@ enum table { invalid, root, allsongs, allalbums, allartists,
              albums4artist, songs4album };
 
 int db_init(void);
-void db_enter(struct tree_context* c);
+int db_enter(struct tree_context* c);
 void db_exit(struct tree_context* c);
 int db_load(struct tree_context* c);
 #ifdef HAVE_LCD_BITMAP
