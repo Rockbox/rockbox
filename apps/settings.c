@@ -334,7 +334,7 @@ int settings_save( void )
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
          ((global_settings.rec_channels & 1) << 2) |
-         ((global_settings.rec_mic_gain & 0x0f) << 3));
+         ((global_settings.rec_mic_gain & 0x0f) << 4));
     config_block[0x22] = (unsigned char)
         ((global_settings.rec_quality & 7) |
          ((global_settings.rec_source & 1) << 3) |
