@@ -1087,12 +1087,12 @@ new: "Numerisk"
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
 eng: "Performance"
-new: "Norm. ydelse"
+new: "Ydelse"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
 eng: "High performance"
-new: "Høj ydelse"
+new: "Højtydende"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
@@ -1102,7 +1102,7 @@ new: "Energispar"
 id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "dBfs <-> linear"
-new: "log. <-> linær"
+new: "log. <-> lineær"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -1112,7 +1112,7 @@ new: "logaritmisk"
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "linear"
-new: "linær"
+new: "lineær"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -1123,6 +1123,99 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum of range"
 new: "Maks. råderum"
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new: "Indspilning"
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+### Not previously translated
+new: 
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new: "Venstre"
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new: "Højre"
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new: "Kvalitet"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new: "Frekvens"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new: "Lydkilde"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+new: "Kanaler"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new: "Mikrofon"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new: "Linje-indgang"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new: "Digital-indgang"
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
+new: "Indspilnings-indstillinger"
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+### Not previously translated
+new:
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new: "Ledigt: %d.%dGB"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new: "Diskafbrydelse"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+new: "Playlister"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+### Not previously translated
+new:
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep timer"
+new: "Søvntimer"
 
 
 
