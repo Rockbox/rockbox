@@ -27,11 +27,13 @@ APPDIR = ../../apps/
 RECDIR = $(APPDIR)recorder/
 RM = del
 
+!IF ("$(TARGET)" == "RECORDER")
+DISPLAY = -DHAVE_LCD_BITMAP
+KEYPAD = -DHAVE_RECORDER_KEYPAD
+!ELSE
 DISPLAY = -DHAVE_LCD_CHARCELLS
-#DISPLAY = -DHAVE_LCD_BITMAP
-
 KEYPAD = -DHAVE_PLAYER_KEYPAD
-#KEYPAD = -DHAVE_RECORDER_KEYPAD
+!ENDIF
 
 CC = cl
 RC = rc
@@ -63,3 +65,4 @@ uisw32.exe: $(SRCS:.c=.obj)
 clean:
  $(RM) *.obj
  $(RM) uisw32.res
+ $(RM) uisw32.exe
