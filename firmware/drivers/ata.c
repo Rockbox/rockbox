@@ -1347,7 +1347,7 @@ int ata_init(void)
     /* TODO: check for cold start (never happenning now) */
     bool coldstart = false;
 #elif CONFIG_CPU == MCF5249
-    bool coldstart = true; /* FIXME */
+    bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif
