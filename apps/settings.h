@@ -153,6 +153,7 @@ struct user_settings
     int scroll_step;   /* pixels to advance per update */
 
     bool fade_on_stop; /* fade on pause/unpause/stop */
+    bool caption_backlight; /* turn on backlight at end and start of track */
 };
 
 /* prototypes */

@@ -125,6 +125,7 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 0xAE  fade on pause/unpause/stop setting (bit 0)
+      caption backlight (bit 1)
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
 0xB2  peak meter min either in -db or in percent
@@ -376,7 +377,9 @@ int settings_save( void )
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
     
-    config_block[0xae] = (unsigned char)global_settings.fade_on_stop;
+    config_block[0xae] = (unsigned char)
+        ((global_settings.fade_on_stop & 1) |
+         ((global_settings.caption_backlight & 1) << 1));
     config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
         (global_settings.peak_meter_performance ? 0x80 : 0);
     config_block[0xb1] = global_settings.peak_meter_release |
@@ -663,7 +666,8 @@ void settings_load(void)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
 
-        global_settings.fade_on_stop=config_block[0xae];
+        global_settings.fade_on_stop = config_block[0xae] & 1;
+        global_settings.caption_backlight = config_block[0xae] & 2;
 
         global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
         global_settings.peak_meter_performance = 

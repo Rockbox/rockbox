@@ -67,6 +67,13 @@ static bool invert_cursor(void)
     return rc;
 }
 
+static bool caption_backlight(void)
+{
+    bool rc = set_bool( str(LANG_CAPTION_BACKLIGHT),
+                        &global_settings.caption_backlight);
+
+    return rc;
+}
 /**
  * Menu to configure the battery display on status bar
  */
@@ -752,6 +759,7 @@ static bool display_settings_menu(void)
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },
+        { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
 #endif
     };
     

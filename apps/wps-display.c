@@ -42,6 +42,7 @@
 #include "lang.h"
 #include "powermgmt.h"
 #include "sprintf.h"
+#include "backlight.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -768,6 +769,21 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     peak_meter_enabled = enable_pm;
 #endif
 
+#ifndef SIMULATOR
+    if (global_settings.caption_backlight && id3) {
+        /* turn on backlight n seconds before track ends, and turn it off n
+           seconds into the new track. n == backlight_timeout, or 5s */
+        int n = 
+            backlight_timeout_value[global_settings.backlight_timeout] * 1000;
+
+        if ( n < 1000 )
+            n = 5000; /* use 5s if backlight is always on or off */
+ 
+        if ((id3->elapsed < 1000) ||
+            ((id3->length - id3->elapsed) < (unsigned)n))
+            backlight_on();
+    }
+#endif
     return true;
 }
 

@@ -41,7 +41,7 @@ static bool backlight_on_when_charging = 0;
 static int backlight_timer;
 static int backlight_timeout = 5;
 
-static char timeout_value[19] =
+const char backlight_timeout_value[19] =
 {
     -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
 };
@@ -63,7 +63,7 @@ void backlight_thread(void)
                 }
                 else
                 {
-                    backlight_timer = HZ*timeout_value[backlight_timeout];
+                    backlight_timer = HZ*backlight_timeout_value[backlight_timeout];
                 }
 
                 if(backlight_timer < 0)
