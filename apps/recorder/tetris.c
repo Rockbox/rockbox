@@ -30,6 +30,8 @@
 
 #ifdef SIMULATOR
 #include <stdio.h>
+#else
+#include "sprintf.h"
 #endif
 
 #define TETRIS_TITLE       "Tetris!"
