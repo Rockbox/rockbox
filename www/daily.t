@@ -8,12 +8,11 @@
 <p>Please also look at our a useful <a href="docs/">documentation</a> for do-it-yourselfers.
 
 <a name="target_builds"></a>
-<h2>Target builds</h2>
+<a name="daily_builds"></a>
+<h2>Daily builds for different models</h2>
 
 <p>These are automated daily builds of the CVS code.
 They are <i>not</i> official releases and are in fact almost guaranteed to contain bugs!
-
-<p><b>New:</b> We now accept bug reports for daily builds too. Just make sure you mark the report with the exact version you were running.
 
 <p>
 <!--#exec cmd="./dailymod.pl" -->
