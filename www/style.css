@@ -66,15 +66,19 @@ A {
 }
 
 .gccwarn {
- color: #ff4040;
+ background-color: #ffff00;
 }
 
 .gccerror {
- color: #ff0000;
+ background-color: #ff8080;
 }
 
-.changetable, .bugs, .dailymod {
+.changetable, .bugs, .dailymod, .buildstatus {
  border: outset 2px #ffffff;
+}
+
+.listtable tr {
+ vertical-align: top;
 }
 
 .changetable td, .bugs td {
