@@ -43,6 +43,7 @@
 #include "talk.h"
 #include "mp3data.h"
 #include "powermgmt.h"
+#include "system.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"

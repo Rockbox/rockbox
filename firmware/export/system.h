@@ -234,6 +234,10 @@ static inline unsigned long SWAB32(unsigned long value)
 #define invalidate_icache()
 
 #endif
+#else
+
+#define invalidate_icache()
+
 #endif
 
 #endif
