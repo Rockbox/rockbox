@@ -28,8 +28,9 @@ typedef long time_t;
    typedefs */
 #define _TIME_T_DEFINED
 time_t time(time_t *t);
+struct tm *localtime(const time_t *timep);
 
-#endif
+#endif /* SIMULATOR */
 
 #endif /* _TIME_H_ */
 
