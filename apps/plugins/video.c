@@ -7,10 +7,10 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Experimental plugin for halftoning
-* Reads raw image data from a file
+* Plugin for video playback
+* Reads raw image data + audio data from a file
 *
-* Copyright (C) 2003 Jörg Hohensohn [IDC]Dragon
+* Copyright (C) 2003-2004 Jörg Hohensohn aka [IDC]Dragon
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -20,6 +20,8 @@
 *
 ****************************************************************************/
 #include "plugin.h"
+#include "sh7034.h"
+#include "system.h"
 #include "../apps/recorder/widgets.h" /* not in search path, booh */
 
 #ifndef SIMULATOR /* not for simulator by now */
@@ -27,9 +29,10 @@
 
 #define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
 #define FILEBUFSIZE (SCREENSIZE*4) /* must result in a multiple of 512 */
+#define FPS 71 /* desired framerate */
+#define WIND_MAX 9 /* max FF/FR speed */
 
-#define WIND_MAX 9
-
+#define FRAMETIME (FREQ/8/FPS) /* internal timer4 value */
 
 /* globals */
 static struct plugin_api* rb; /* here is a global api struct pointer */
@@ -168,9 +171,13 @@ int show_buffer(unsigned char* p_start, int frames)
 
     do
     {
+        /* wait for frame to be due */
+        while (TCNT4 < FRAMETIME) /* use our timer 4 */
+            rb->yield(); /* yield to the other treads */
+        TCNT4 -= FRAMETIME;
+        
         rb->lcd_blit(p_current, 0, 0, LCD_WIDTH, LCD_HEIGHT/8, LCD_WIDTH);
 
-        rb->yield(); /* yield to the other treads */
         shown++;
 
         delta = check_button();
@@ -241,8 +248,10 @@ int show_file(unsigned char* p_buffer, int fd)
         else
             read = 0;
 
-        if (read < SCREENSIZE) /* below average? */
-            rb->yield(); /* time to do something else */
+        /* wait for frame to be due */
+        while (TCNT4 < FRAMETIME) /* use our timer 4 */
+            rb->yield(); /* yield to the other treads */
+        TCNT4 -= FRAMETIME;
 
         /* display OSD if FF/FR */
         if (playstep != 1 && playstep != -1)
@@ -322,18 +331,28 @@ int main(char* filename)
     if (fd < 0)
         return PLUGIN_ERROR;
 
+    /* init timer 4, crude code */
+    IPRD = (IPRD & 0xFF0F); // disable interrupt
+    and_b(~0x10, &TSTR); // Stop the timer 4
+    and_b(~0x10, &TSNC); // No synchronization
+    and_b(~0x10, &TMDR); // Operate normally
+    TCR4 = 0x03; // no clear at GRA match, sysclock/8
+    TCNT4 = 0; // start counting at 0
+
     file_size =  rb->filesize(fd);
     if (file_size <= buffer_size)
     {   /* we can read the whole file in advance */
         got_now = rb->read(fd, p_buffer, file_size);
         rb->close(fd);
         frames = got_now / (LCD_WIDTH*LCD_HEIGHT/8);
+        or_b(0x10, &TSTR); // start timer 4
         time = *rb->current_tick;
         shown = show_buffer(p_buffer, frames);
         time = *rb->current_tick - time;
     }
     else
     {   /* we need to stream */
+        or_b(0x10, &TSTR); // start timer 4
         time = *rb->current_tick;
         shown = show_file(p_buffer, fd);
         time = *rb->current_tick - time;
