@@ -3,6 +3,9 @@
 # this is really a faq2html and should only be used for this purpose
 
 sub fixline {
+    # change blank lines to &nbsp
+    $_ =~ s/^\s*$/\&nbsp;\n/g;
+
     $_ =~ s/\</&lt;/g;
     $_ =~ s/\>/&gt;/g;
 
