@@ -1,0 +1,137 @@
+#!/bin/sh
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+
+target=$1
+
+input() {
+    read response
+    echo $response
+}
+
+echo "Setup your Rockbox build environment."
+echo "http://bjorn.haxx.se/rockbox/"
+echo ""
+
+if [ -z "$target" ]; then
+
+##################################################################
+# Figure out target platform
+#
+
+  echo "Enter target platform: (defaults to Recorder)"
+
+  echo "1 - Archos Player old LCD"
+  echo "2 - Archos Player/Studio new LCD"
+  echo "3 - Archos Recorder"
+
+  getit=`input`;
+
+  case $getit in
+
+   1)
+    target="-DARCHOS_PLAYER_OLD"
+    ;;
+   2)
+    target="-DARCHOS_PLAYER"
+    ;;
+
+   3)
+    target="-DARCHOS_RECORDER"
+    ;;
+
+   *)
+    target="-DARCHOS_RECORDER"
+    ;;
+  esac
+fi
+
+
+##################################################################
+# Figure out debug on/off
+#
+echo ""
+echo "Build DEBUG version? (y/N)"
+
+option=`input`;
+
+case $option in
+  [Yy])
+    debug="-DDEBUG"
+    ;;
+  *)
+    debug=""
+    ;;
+
+esac
+
+##################################################################
+# Figure out where the firmware code is!
+#
+
+firmfile="start.s" # a file to check for in the firmware root dir
+
+for dir in . .. ../firmware ../../firmware; do
+  if [ -f $dir/$firmfile ]; then
+    firmdir=$dir
+  fi
+done
+
+if [ -z "$firmdir" ]; then
+  echo "This script couldn't find your firmware directory. Please enter the"
+  echo "full path to the firmware directory here:"
+
+  firmdir=`input`
+fi
+
+##################################################################
+# Figure out where the apps code is!
+#
+
+appsfile="credits.c" # a file to check for in the apps root dir
+
+for dir in $firmdir/apps $firmdir/../apps . .. ../apps ../../apps; do
+  if [ -f $dir/$appsfile ]; then
+    appsdir=$dir
+  fi
+done
+
+if [ -z "$appsdir" ]; then
+  echo "This script couldn't find your apps directory. Please enter the"
+  echo "full path to the apps directory here:"
+
+  appsdir=`input`
+fi
+
+echo "Firmware directory: $firmdir"
+echo "Apps directory: $appsdir"
+echo "CFLAGS=\"$debug $target\""
+
+pwd=`pwd`;
+
+sed \
+ -e "s,@FIRMDIR@,$firmdir,g" \
+ -e "s,@APPSDIR@,$appsdir,g" \
+ -e "s,@DEBUG@,$debug,g" \
+ -e "s,@TARGET@,$target,g" \
+ -e "s,@PWD@,$pwd,g" \
+<<EOF > Makefile
+FIRMDIR=@FIRMDIR@
+APPSDIR=@APPSDIR@
+DEBUG=@DEBUG@
+TARGET=@TARGET@
+THISDIR=@PWD@
+
+CFLAGS=$(DEBUG) $(TARGET)
+
+all:
+	make -C $(FIRMDIR) CFLAGS=$(CFLAGS) OBJDIR=$(THISDIR)
+	make -C $(APPSDIR) CFLAGS=$(CFLAGS) OBJDIR=$(THISDIR)
+
+EOF
