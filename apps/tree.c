@@ -232,6 +232,7 @@ bool dirbrowse(char *root)
 {
     char buf[255];
     int i;
+    int button;
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -245,7 +246,20 @@ bool dirbrowse(char *root)
     lcd_update();
 
     while(1) {
-        switch(button_get(true)) {
+        button = button_get(true);
+        if(!numentries) {
+          switch(button) {
+          case TREE_MENU:
+          case TREE_PREV:
+            /* let it go */
+            break; 
+          default:
+            continue;
+          }
+        }
+
+
+        switch(button) {
             case TREE_EXIT:
                 i=strlen(currdir);
                 if (i>1) {
