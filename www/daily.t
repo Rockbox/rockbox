@@ -1,4 +1,4 @@
-#define _PAGE_ Daily snapshots
+#define _PAGE_ Daily builds
 #include "head.t"
 
 <h2>Source tarballs</h2>
