@@ -2,6 +2,9 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-09-19</i>: We now support multiple languages. You can help by translating Rockbox to your language. No programming skills required.
+<a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-09/0856.shtml">See instructions here</a>
+
 <p><i>2002-09-13</i>: We took a big step and converted to an entirely new font system for the Recorder. Please bear with us as we smoothen out the initial quirks.
 
 <p><i>2002-09-03</i>: ROLO, the Rockbox Loader has been integrated into the CVS, allowing Archos or other Rockbox firmware being loaded by simply selecting the file!

@@ -1,9 +1,7 @@
-#define _PAGE_ Rocklatin
+#define _PAGE_ Rocklatin1
 #include "head.t"
 
-<h1>Rocklatin1</h1>
-
-Only for developers...
+<p>Only for developers...
 
 <h2>Background</h2>
 The Archos player comes in two models. One with old LCD and one with new LCD.
