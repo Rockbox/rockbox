@@ -4,12 +4,12 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Lydindstillinger"
+new: "Lyd"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Almeneindstillinger"
+new: "Indstillinger"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -76,7 +76,7 @@ new: "Batteri: %d%%%s"
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: charging"
-new: "Batteri: oplader"
+new: "Batteri: lader"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -137,7 +137,7 @@ new: "Playliste"
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "buffer full"
-new: "buffer er fuld"
+new: "bufferen er fuld"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
@@ -197,7 +197,7 @@ new: "Kontrast"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Blanding"
+new: "'Shuffle'"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -217,7 +217,7 @@ new: "Sorter versal-sensetivt"
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-new: "Forsæt"
+new: "Forsæt e. genstart"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -227,7 +227,7 @@ new: "Fra"
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "ask"
-new: "spørg"
+new: "Spørg"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -250,7 +250,7 @@ new: "Eksempel på scroll-hastighed"
 id: LANG_DISCHARGE
 desc: in settings_menu
 eng: "Deep discharge"
-new: "Dybde afladning"
+new: "Dyb afladning"
 
 id: LANG_TIME
 desc: in settings_menu
@@ -276,7 +276,7 @@ new:
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Følg Playlist"
+new: "Følg Playliste"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
@@ -322,7 +322,7 @@ new: "Annulleret"
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Sorteringsform"
+new: "Sorteringsmåde"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -358,7 +358,7 @@ new:
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-new: "Styrke"
+new: "Lydstyrke"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -368,7 +368,7 @@ new:
 
 id: LANG_BASS
 desc: in sound_settings
-eng: "Bass"
+eng: "Bas"
 ### Not previously translated
 new:
 
@@ -429,7 +429,7 @@ new: "Mono højre"
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-new: "Auto styrke"
+new: "Auto. lydstyrke"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -440,7 +440,7 @@ new:
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "Er fuld!"
+new: "er fuld!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
@@ -564,7 +564,7 @@ new: "[Længde]"
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-new: "[Afspilningsliste]"
+new: "[Playliste]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -661,12 +661,12 @@ new:
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "Ny High Score!"
+new: "Ny 'High Score'!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
 eng: "Game Paused"
-new: "Spillet er sat på pause"
+new: "Pause!"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
@@ -696,7 +696,7 @@ new: "[Play] for start/pause"
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new: "Niveau"
+new: "Bane"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
@@ -820,4 +820,35 @@ new: "Du har tabt!"
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
-new: "0 Rækker - Niveau 0"
+new: "0 Rækker-Niveau 0"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "Auto. sluk"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "Nyt sprog"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Vis filtyper"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Musik"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Understøttede"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "Alle"
+
