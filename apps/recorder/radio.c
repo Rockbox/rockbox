@@ -92,13 +92,13 @@ void radio_load_presets(void);
 bool handle_radio_presets(void);
 bool radio_menu(void);
 
-#if CONFIG_TUNER == S1A0903X01
+#if CONFIG_TUNER == S1A0903X01 /* FM recorder */
 #define radio_set samsung_set
 #define radio_get samsung_get
-#elif CONFIG_TUNER == TEA5767
+#elif CONFIG_TUNER == TEA5767 /* Iriver */
 #define radio_set philips_set
 #define radio_get philips_get
-#elif CONFIG_TUNER == (S1A0903X01 | TEA5767)
+#elif CONFIG_TUNER == (S1A0903X01 | TEA5767) /* OndioFM */
 void (*radio_set)(int setting, int value);
 int (*radio_get)(int setting);
 #endif
@@ -460,7 +460,6 @@ bool radio_screen(void)
 #ifndef SIMULATOR
             seconds = mpeg_recorded_time() / HZ;
 #endif
-            
             if(update_screen || seconds > last_seconds)
             {
                 last_seconds = seconds;
@@ -634,7 +633,6 @@ static void rebuild_preset_menu(void)
     }
 }
 
-#ifdef FM_PRESET /* FIXME: that was just to kill a warning */
 static bool radio_add_preset(void)
 {
     char buf[27];
@@ -663,12 +661,11 @@ static bool radio_add_preset(void)
     }
     return true;
 }
-#endif /* #ifdef FM_PRESET */
 
 static int handle_radio_presets_menu_cb(int key, int m)
 {
     (void)m;
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef FM_PRESET_ACTION
     switch(key)
     {
         case FM_PRESET_ACTION:
@@ -737,27 +734,26 @@ bool handle_radio_presets_menu(void)
 
 int handle_radio_presets_cb(int key, int m)
 {
-#if CONFIG_KEYPAD == ONDIO_PAD
-    (void)key;
     (void)m;
-    return BUTTON_NONE;
-#else
-    bool ret;
-    
     switch(key)
     {
+#ifdef FM_PRESET_ADD
         case FM_PRESET_ADD:
             radio_add_preset();
             menu_draw(m);
             key = BUTTON_NONE;
             break;
-            
+#endif            
+#ifdef FM_PRESET
         case FM_PRESET:
             menu_draw(m);
             key = MENU_EXIT; /* Fake an exit */
             break;
-            
+#endif
+#ifdef FM_PRESET_ACTION
         case FM_PRESET_ACTION:
+        {
+            bool ret;
             ret = handle_radio_presets_menu();
             menu_draw(m);
             if(ret)
@@ -765,15 +761,18 @@ int handle_radio_presets_cb(int key, int m)
             else
                 key = BUTTON_NONE;
             break;
+        }
+#endif
 
+            /* Ignore the release events */
+#if defined (FM_PRESET_ADD) || defined (FM_PRESET_ACTION)
         case FM_PRESET_ADD | BUTTON_REL:
         case FM_PRESET_ACTION | BUTTON_REL:
-            /* Ignore the release events */
             key = BUTTON_NONE;
             break;
+#endif
     }
     return key;
-#endif
 }
 
 bool handle_radio_presets(void)
@@ -853,20 +852,20 @@ static bool toggle_mono_mode(void)
 
 bool radio_menu(void)
 {
-    struct menu_item items[4];
+    struct menu_item items[5];
     int m;
     bool result;
 
     m = menu_init(items, 0, NULL, NULL, NULL, NULL);
 
 #if CONFIG_KEYPAD == ONDIO_PAD /* Ondio has no key for presets, put it in menu */
-    /* fixme: make a real string table entry */
-    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets_menu);
+    /* fixme: make real string table entries */
+    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets);
+    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_ADD), radio_add_preset);
 #endif
     create_monomode_menu();
     menu_insert(m, -1, monomode_menu_string, toggle_mono_mode);
     menu_insert(m, -1, ID2P(LANG_SOUND_SETTINGS), sound_menu);
-    
 #ifndef SIMULATOR
     menu_insert(m, -1, ID2P(LANG_RECORDING_SETTINGS), fm_recording_settings);
 #endif
