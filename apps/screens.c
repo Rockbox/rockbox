@@ -1115,8 +1115,10 @@ bool shutdown_screen(void)
                 /* Return if any other button was pushed, or if there
                    was a timeout. We ignore RELEASE events, since we may
                    have been called by a button down event, and the user might
-                   not have released the button yet. */
-                if(!(button & BUTTON_REL))
+                   not have released the button yet.
+                   We also ignore REPEAT events, since we don't want to
+                   remove the splash when the user holds OFF to shut down. */
+                if(!(button & (BUTTON_REL | BUTTON_REPEAT)))
                    done = true;
                 break;
         }
