@@ -27,6 +27,7 @@
 #include "panic.h"
 #include "system.h"
 #include "timefuncs.h"
+#include "kernel.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
@@ -230,7 +231,7 @@ static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
-static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int secnum);
+static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int secnum, bool dirty);
 static int create_dos_name(const unsigned char *name, unsigned char *newname);
 static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int start);
 static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned int start, int count, char* buf, bool write );
@@ -250,6 +251,7 @@ struct fat_cache_entry
 
 static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
+static struct mutex cache_mutex;
 
 static int cluster2sec(IF_MV2(struct bpb* fat_bpb,) int cluster)
 {
@@ -299,6 +301,9 @@ void fat_size(IF_MV2(int volume,) unsigned int* size, unsigned int* free)
 void fat_init(void)
 {
     unsigned int i;
+
+    mutex_init(&cache_mutex);
+
     /* mark the FAT cache as unused */
     for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
@@ -488,7 +493,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     {
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) i);
+            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
             for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
                 unsigned int c = i * CLUSTERS_PER_FAT16_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
@@ -507,7 +512,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     {
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) i);
+            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
                 unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
@@ -621,7 +626,10 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
     fce->dirty = false;
 }
 
-static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int fatsector)
+/* Note: The returned pointer is only safely valid until the next 
+         task switch! (Any subsequent ata read/write may yield.) */
+static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
+                              int fatsector, bool dirty)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -631,6 +639,8 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int fatsector)
     struct fat_cache_entry *fce = &fat_cache[cache_index];
     unsigned char *sectorbuf = &fat_cache_sectors[cache_index][0];
     int rc;
+
+    mutex_lock(&cache_mutex); /* make changes atomic */
 
     /* Delete the cache entry if it isn't the sector we want */
     if(fce->inuse && (fce->secnum != secnum
@@ -657,6 +667,7 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int fatsector)
         {
             DEBUGF( "cache_fat_sector() - Could not read sector %d"
                     " (error %d)\n", secnum, rc);
+            mutex_unlock(&cache_mutex);
             return NULL;
         }
         fce->inuse = true;
@@ -665,6 +676,9 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int fatsector)
         fce->fat_vol = fat_bpb;
 #endif
     }
+    if (dirty)
+        fce->dirty = true; /* dirt remains, sticky until flushed */
+    mutex_unlock(&cache_mutex);
     return sectorbuf;
 }
 
@@ -686,7 +700,7 @@ static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int 
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned int nr = (i + sector) % fat_bpb->fatsize;
-            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr);
+            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
             if ( !fat )
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
@@ -714,7 +728,7 @@ static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int 
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned int nr = (i + sector) % fat_bpb->fatsize;
-            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr);
+            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
             if ( !fat )
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
@@ -760,13 +774,12 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
         if ( entry < 2 )
             panicf("Updating reserved FAT entry %d.\n",entry);
 
-        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
+        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
         {
             DEBUGF( "update_fat_entry() - Could not cache sector %d\n", sector);
             return -1;
         }
-        fat_cache[(sector + fat_bpb->bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
 
         if ( val ) {
             if (SWAB16(sec[offset]) == 0x0000 && fat_bpb->fsinfo.freecount > 0)
@@ -796,13 +809,12 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
         if ( entry < 2 )
             panicf("Updating reserved FAT entry %d.\n",entry);
 
-        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
+        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
         {
             DEBUGF( "update_fat_entry() - Could not cache sector %d\n", sector);
             return -1;
         }
-        fat_cache[(sector + fat_bpb->bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
 
         if ( val ) {
             if (!(SWAB32(sec[offset]) & 0x0fffffff) &&
@@ -836,7 +848,7 @@ static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
         int offset = entry % CLUSTERS_PER_FAT16_SECTOR;
         unsigned short* sec;
 
-        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
+        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, false);
         if (!sec)
         {
             DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
@@ -852,7 +864,7 @@ static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
         unsigned int* sec;
 
-        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
+        sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, false);
         if (!sec)
         {
             DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
