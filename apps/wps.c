@@ -682,7 +682,7 @@ int wps_show(void)
                     else
 #endif
                     {
-                        if (id3->elapsed < 2*1000)
+                        if (id3->elapsed < 3*1000)
                             mpeg_prev();
                         else {
                             mpeg_pause();
