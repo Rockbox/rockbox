@@ -665,9 +665,6 @@ static char* select_bookmark(const char* bookmark_file_name)
         switch(key)
         {
             case SETTINGS_OK:
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
@@ -701,6 +698,9 @@ static char* select_bookmark(const char* bookmark_file_name)
             case SETTINGS_CANCEL:
 #ifdef SETTINGS_CANCEL2
             case SETTINGS_CANCEL2:
+#endif
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
 #endif
                 return NULL;
 
