@@ -527,7 +527,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
     struct format_flags flags;
     bool scroll_active = false;
     int i;
-
+#ifdef HAVE_LCD_BITMAP
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
        the peak meter. We can't use peak_meter_enabled itself
@@ -536,7 +536,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
        or sleep is called but who knows...)
     */
     bool enable_pm = false;
-
+#endif
     if (!id3)
     {
         lcd_stop_scroll();
@@ -611,10 +611,11 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
         }
     }
-
+#ifdef HAVE_LCD_BITMAP
     /* Now we know wether the peak meter is used. 
        So we can enable / disable the peak meter thread */
     peak_meter_enabled = enable_pm;
+#endif
     lcd_update();
 
     return true;

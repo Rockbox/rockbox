@@ -36,7 +36,9 @@
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
+#ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
+#endif
 #include "lang.h"
 
 static bool contrast(void)
