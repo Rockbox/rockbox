@@ -23,7 +23,7 @@ extern void debugf(char* fmt,...);
 
 #ifdef __GNUC__
 
-/* GCC handles ellipses in macros, which 
+/* GCC handles ellipses in macros, which
    means we can avoid the call completely */
 #ifdef DEBUG
 #define DEBUGF(fmt,args...) debugf(fmt, ## args)
@@ -33,7 +33,7 @@ extern void debugf(char* fmt,...);
 
 #else
 
-void DEBUGF debugf
+#define DEBUGF debugf
 
 #endif /* GCC */
 
