@@ -96,7 +96,7 @@ int dbg_mkfile(char* name, int num)
     int x=0;
     bool stop = false;
 
-    fd = open(name,O_WRONLY);
+    fd = creat(name,O_WRONLY);
     if (fd<0) {
         DEBUGF("Failed creating file\n");
         return -1;
