@@ -457,11 +457,6 @@ static int bpb_is_sane(void)
                 fat_bpb.bpb_bytspersec * fat_bpb.bpb_secperclus);
         return -2;
     }
-    if (fat_bpb.bpb_rsvdseccnt != 32)
-    {
-        DEBUGF( "bpb_is_sane() - Warning: Reserved sectors is not 32 (%d)\n",
-                fat_bpb.bpb_rsvdseccnt);
-    }
     if(fat_bpb.bpb_numfats != 2)
     {
         DEBUGF( "bpb_is_sane() - Warning: NumFATS is not 2 (%d)\n",
@@ -602,7 +597,7 @@ static int update_fat_entry(unsigned int entry, unsigned int val)
         DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
         return -1;
     }
-    fat_cache[sector & FAT_CACHE_MASK].dirty = true;
+    fat_cache[(sector + fat_bpb.bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
 
     if ( val ) {
         if (!(SWAB32(sec[offset]) & 0x0fffffff))
@@ -1443,7 +1438,6 @@ int fat_rename(struct fat_file* file,
     return 0;
 }
 
-
 static int next_write_cluster(struct fat_file* file,
                               int oldcluster,
                               int* newsector)
@@ -1467,7 +1461,7 @@ static int next_write_cluster(struct fat_file* file,
                 update_fat_entry(oldcluster, cluster); 
             else
                 file->firstcluster = cluster;
-            update_fat_entry(cluster, FAT_EOF_MARK); 
+            update_fat_entry(cluster, FAT_EOF_MARK);
         }
         else {
 #ifdef TEST_FAT
@@ -1611,7 +1605,6 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
         clusternum = seeksector / fat_bpb.bpb_secperclus;
         sectornum = seeksector % fat_bpb.bpb_secperclus;
 
-        
         for (i=0; i<clusternum; i++) {
             cluster = get_next_cluster(cluster);
             if (!cluster) {
