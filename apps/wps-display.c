@@ -414,7 +414,12 @@ static char* get_tag(struct mp3entry* id3,
 #endif
                 case 'p':  /* Playlist Position */
                     *flags |= WPS_REFRESH_STATIC;
-                    snprintf(buf, buf_size, "%d", id3->index + 1);
+                    {
+                        int index = id3->index - playlist_first_index();
+                        if (index < 0)
+                            index += playlist_amount();
+                        snprintf(buf, buf_size, "%d", index + 1);
+                    }
                     return buf;
 
                 case 'n':  /* Playlist Name (without path) */

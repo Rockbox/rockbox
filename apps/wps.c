@@ -223,8 +223,13 @@ bool browse_id3(void)
 
             case 7:
                 lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
-                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
-                         id3->index + 1, playlist_amount());
+                {
+                    int index = id3->index - playlist_first_index();
+                    if (index < 0)
+                        index += playlist_amount();
+                    snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
+                             index + 1, playlist_amount());
+                }
                 lcd_puts_scroll(0, 1, scroll_text);
                 break;
 
