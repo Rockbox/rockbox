@@ -75,6 +75,7 @@ static void soundsetting(int setting)
             case BUTTON_LEFT:
 #else
             case BUTTON_STOP:
+            case BUTTON_MENU:
 #endif
                 savedsettings[setting] = value;
                 done = true;
