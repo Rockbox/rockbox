@@ -50,7 +50,7 @@ A8. Run: "diff -ub oldfile newfile > patchfile" against the file(s) you have
 Q9. I want to join the development team, but don't have a SourceForge account,
     what should I do?
 A9. You don't need a SourceForge account to help developing Rockbox. Just
-    submit patches to the mailing list as per the instructions above.
+    submit patches as per the instructions above.
 
     If your patches are consistently well-written and thus accepted, you may
     ultimately be offered CVS commit access. If that should happen, you will
@@ -343,6 +343,10 @@ A48: I'd like to say we hid it because we don't like you, but you seem to be
      a good person so here's the truth.  It's just not implimented in Rockbox
      yet.  But stress not, you can still use Rolo to boot the default Archos
      firmware and record from there.  (Check out question #33).
+
+     Recent development versions (daily builds) have initial support for
+     Recording. If you're brave and want to help out, get one, try out and
+     report your findings!
 
 Q49: When recording is finally implimented in Rockbox, will it be possible to
      use custom codecs (like LAME) or is there a built in codec in the Archos?
