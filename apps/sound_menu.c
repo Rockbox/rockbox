@@ -118,13 +118,29 @@ static void treble(void)
     set_sound("Treble", &global_settings.treble, SOUND_TREBLE);
 }
 
+#ifdef ARCHOS_RECORDER
+static void loudness(void)
+{
+    set_sound("Loudness", &global_settings.loudness, SOUND_LOUDNESS);
+};
+
+static void bass_boost(void)
+{
+    set_sound("Bass boost", &global_settings.bass_boost, SOUND_SUPERBASS);
+};
+#endif /* ARCHOS_RECORDER */
+
 void sound_menu(void)
 {
     int m;
     struct menu_items items[] = {
         { "Volume", volume },
         { "Bass",   bass },
-        { "Treble", treble }
+        { "Treble", treble },
+#ifdef ARCHOS_RECORDER
+        { "Loudness", loudness },
+        { "Bass Boost", bass_boost }
+#endif
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

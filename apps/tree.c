@@ -114,7 +114,10 @@ static int compare(const void* p1, const void* p2)
     struct entry* e2 = *(struct entry**)p2;
     
     if (( e1->attr & ATTR_DIRECTORY ) == ( e2->attr & ATTR_DIRECTORY ))
-        return strncasecmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
+        if (global_settings.sort_case)
+            return strncmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
+        else
+            return strncasecmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
     else 
         return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }

@@ -43,6 +43,11 @@ static void mp3_filter(void)
     set_bool( "[MP3/M3U filter]", &global_settings.mp3filter );
 }
 
+static void sort_case(void)
+{
+    set_bool( "[Sort case sensitive]", &global_settings.sort_case );
+}
+
 static void backlight_timer(void)
 {
     set_int( "[Backlight]", "s", &global_settings.backlight, 
@@ -68,6 +73,7 @@ void settings_menu(void)
     struct menu_items items[] = {
         { "Shuffle",         shuffle         }, 
         { "MP3/M3U filter",  mp3_filter      },
+        { "Sort mode",       sort_case       },
         { "Backlight Timer", backlight_timer },
         { "Scroll speed",    scroll_speed    },  
         { "While Playing",   wps_set },

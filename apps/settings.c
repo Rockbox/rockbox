@@ -209,7 +209,8 @@ int settings_save( void )
     
     rtc_config_block[0xe] = (unsigned char)
         ((global_settings.playlist_shuffle & 1) |
-         ((global_settings.mp3filter & 1) << 1));
+         ((global_settings.mp3filter & 1) << 1) |
+         ((global_settings.sort_case & 1) << 2));
 
     rtc_config_block[0xf] = (unsigned char)
         ((global_settings.scroll_speed << 3) |
@@ -266,6 +267,7 @@ void settings_load(void)
         if (rtc_config_block[0xe] != 0xFF) {
             global_settings.playlist_shuffle = rtc_config_block[0xe] & 1;
             global_settings.mp3filter = (rtc_config_block[0xe] >> 1) & 1;
+            global_settings.sort_case = (rtc_config_block[0xe] >> 2) & 1;
         }
     
         c = rtc_config_block[0xf] >> 3;
@@ -303,6 +305,7 @@ void settings_reset(void) {
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
     global_settings.wps_display = DEFAULT_WPS_DISPLAY;
     global_settings.mp3filter   = true;
+    global_settings.sort_case   = false;
     global_settings.playlist_shuffle = false;
     global_settings.total_boots = 0;
     global_settings.total_uptime = 0;

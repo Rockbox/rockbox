@@ -341,18 +341,97 @@ void dbg_rtc(void)
 }
 #endif
 
+/* Read MAS registers and display them */
+void dbg_mas(void)
+{
+    char buf[32];
+    unsigned int addr = 0, r, i;
+    int button;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, "MAS register read:");
+
+    while(1)
+    {
+        for (r = 0; r < 4; r++) {
+            i = mas_readreg(addr + r);
+            snprintf(buf, 30, "0x%02x: %08x", addr + r, i);
+            lcd_puts(1, r+1, buf);
+        }
+        
+        lcd_update();
+        sleep(HZ/16);
+
+        button = button_get(false);
+
+        switch(button)
+        {
+            case BUTTON_DOWN:
+                addr += 4;
+                break;
+            case BUTTON_UP:
+                if (addr) { addr -= 4; }
+                break;
+            case BUTTON_LEFT:
+                return;
+        }
+    }
+}
+
+#ifdef ARCHOS_RECORDER
+void dbg_mas_codec(void)
+{
+    char buf[32];
+    unsigned int addr = 0, r, i;
+    int button;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, "MAS codec reg read:");
+
+    while(1)
+    {
+        for (r = 0; r < 4; r++) {
+            i = mas_codec_readreg(addr + r);
+            snprintf(buf, 30, "0x%02x: %08x", addr + r, i);
+            lcd_puts(1, r+1, buf);
+        }
+        
+        lcd_update();
+        sleep(HZ/16);
+
+        button = button_get(false);
+
+        switch(button)
+        {
+            case BUTTON_DOWN:
+                addr += 4;
+                break;
+            case BUTTON_UP:
+                if (addr) { addr -= 4; }
+                break;
+            case BUTTON_LEFT:
+                return;
+        }
+    }
+}
+#endif
+
 void debug_menu(void)
 {
     int m;
 
     struct menu_items items[] = {
-        { "Debug ports", dbg_ports },
+        { "View I/O ports", dbg_ports },
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC
-        { "Debug RTC", dbg_rtc },
+        { "View/clr RTC RAM", dbg_rtc },
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
-        { "Debug OS", dbg_os },
+        { "View OS stacks", dbg_os },
+        { "View MAS regs", dbg_mas },
+#ifdef ARCHOS_RECORDER
+        { "View MAS codec", dbg_mas_codec },
+#endif
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

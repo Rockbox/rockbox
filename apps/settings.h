@@ -52,8 +52,9 @@ struct user_settings
 
     /* misc options */
 
-    int loop_playlist; /* do we return to top of playlist at end?            */
-    bool mp3filter;
+    int loop_playlist; /* do we return to top of playlist at end?  */
+    bool mp3filter;    /* only display mp3/m3u files and dirs in directory? */
+    bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
 

@@ -147,7 +147,9 @@ void init(void)
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
-               global_settings.treble );
+               global_settings.treble,
+               global_settings.loudness,
+               global_settings.bass_boost );
 
     usb_start_monitoring();
 }
