@@ -92,6 +92,7 @@ void usb_display_info(void)
     status_set_param(false);
     status_set_audio(false);
     status_set_usb(true);
+    status_draw();
 #endif
 }
 
@@ -105,6 +106,10 @@ void usb_screen(void)
             usb_display_info();
         }
     }
+#ifdef HAVE_LCD_CHARCELLS
+    status_set_usb(false);
+#endif
+
     backlight_on();
 #endif
 }
