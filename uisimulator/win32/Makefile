@@ -72,7 +72,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += snake.c tetris.c sokoban.c bounce.c snow.c bmp.c \
+   APPS += tetris.c sokoban.c bounce.c snow.c bmp.c \
 	widgets.c wormlet.c
 endif
 
@@ -125,9 +125,6 @@ $(OBJDIR)/icons.o: $(MACHINEDIR)/icons.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/widgets.o: $(RECDIR)/widgets.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/snake.o: $(RECDIR)/snake.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/tetris.o: $(RECDIR)/tetris.c

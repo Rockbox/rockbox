@@ -548,7 +548,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 #else
                 int w,h;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-                lcd_getstringsize("M",FONT_UI,&w,&h);
+                lcd_getstringsize("M",&w,&h);
                 slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
                          (id3->elapsed + ff_rewind_count) * 100 / id3->length,
                          Grow_Right);

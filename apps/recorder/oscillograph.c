@@ -45,7 +45,7 @@ static int  drawMode = DRAW_MODE_FILLED;
  * hardware scrolling of the display. The user can change
  * speed
  */
-Menu oscillograph(void)
+bool oscillograph(void)
 {
     /* stores current volume value left */
     int  left;
@@ -184,7 +184,7 @@ Menu oscillograph(void)
             if (draw) {
                 char buf[16];
                 snprintf(buf, sizeof buf, "Speed: %d", -speed);
-                lcd_putsxy(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, buf, 0);
+                lcd_putsxy(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, buf);
                 lcd_update_rect(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, 
                                 LCD_WIDTH, 8);
             }
@@ -197,5 +197,5 @@ Menu oscillograph(void)
     lcd_update();
 
     /* standard return */
-    return MENU_OK;
+    return false;
 }

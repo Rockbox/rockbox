@@ -113,28 +113,28 @@ void roll_credits(void)
     int height;
     int width;
 
-    lcd_getfontsize(FONT_UI, &width, &height);
+    lcd_getstringsize("A", &width, &height);
 
     while(1) {
-      lcd_clear_display();
-      for ( i=0; i <= (64-y)/height; i++ )
-        lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"", FONT_UI);
-      snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
-              line+1, numnames);
-      lcd_putsxy(0, 0, buffer, FONT_UI);
-      lcd_update();
+        lcd_clear_display();
+        for ( i=0; i <= (64-y)/height; i++ )
+            lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"");
+        snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
+                 line+1, numnames);
+        lcd_putsxy(0, 0, buffer);
+        lcd_update();
 
-      if (button_get_w_tmo(HZ/20))
-        return;
+        if (button_get_w_tmo(HZ/20))
+            return;
 
-      y--;
+        y--;
 
-      if(y<0) {
-        line++;
-        if(line >= numnames)
-          break;
-        y+=height;
-      }
+        if(y<0) {
+            line++;
+            if(line >= numnames)
+                break;
+            y+=height;
+        }
 
     }
     return;

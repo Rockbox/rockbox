@@ -98,11 +98,11 @@ void ata_spindown(int s)
     (void)s;
 }
 
-Menu simulate_usb(void)
+bool simulate_usb(void)
 {
     usb_display_info();
     while (button_get(true) & BUTTON_REL);
-    return MENU_OK;
+    return false;
 }
 
 void lcd_define_pattern (int which,char *pattern,int length)

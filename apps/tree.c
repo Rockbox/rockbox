@@ -193,7 +193,8 @@ static int showdir(char *path, int start)
 #ifdef HAVE_LCD_BITMAP
     int line_height = LINE_HEIGTH;
     int fw, fh;
-    lcd_getfontsize(FONT_UI, &fw, &fh);
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("A", &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
     line_height = fh;
 #else
@@ -591,7 +592,7 @@ bool dirbrowse(char *root)
     bool lastshowhidden = global_settings.show_hidden_files;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
-    lcd_getfontsize(FONT_UI, &fw, &fh);
+    lcd_getstringsize("A", &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
@@ -740,16 +741,14 @@ bool dirbrowse(char *root)
                                 lcd_puts(0, 0, str(LANG_LANGUAGE_LOADED));
 #else
                                 lcd_getstringsize(str(LANG_LANGUAGE_LOADED),
-                                                  FONT_UI, &fw, &fh);
+                                                  &fw, &fh);
                                 if(fw>LCD_WIDTH)
                                     fw=0;
                                 else
                                     fw=LCD_WIDTH/2 - fw/2;
                                 
-                                lcd_putsxy(fw,
-                                           LCD_HEIGHT/2 - fh/2,
-                                           str(LANG_LANGUAGE_LOADED),
-                                           FONT_UI);
+                                lcd_putsxy(fw, LCD_HEIGHT/2 - fh/2,
+                                           str(LANG_LANGUAGE_LOADED));
 #endif
                                 lcd_update();
                                 sleep(HZ);            
@@ -762,7 +761,7 @@ bool dirbrowse(char *root)
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
                             font_load(buf);
-                            lcd_getfontsize(FONT_UI, &fw, &fh);
+                            lcd_getstringsize("A", &fw, &fh);
                             tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
                             /* make sure cursor is on screen */
                             while ( dircursor > tree_max_on_screen ) {

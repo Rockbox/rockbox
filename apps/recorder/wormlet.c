@@ -1213,8 +1213,8 @@ static void score_board(void)
                 snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_CRASHED));
             break;
     }
-        lcd_putsxy(FIELD_RECT_WIDTH + 3, y  , buf, 0);
-        lcd_putsxy(FIELD_RECT_WIDTH + 3, y+8, buf2, 0);
+        lcd_putsxy(FIELD_RECT_WIDTH + 3, y  , buf);
+        lcd_putsxy(FIELD_RECT_WIDTH + 3, y+8, buf2);
 
         if (!worms[i].alive){
             lcd_invertrect(FIELD_RECT_WIDTH + 2, y, 
@@ -1224,9 +1224,9 @@ static void score_board(void)
     }
     snprintf(buf , sizeof(buf), str(LANG_WORMLET_HIGHSCORE), highscore);
 #ifndef DEBUG_WORMLET
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, buf, 0);
+    lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, buf);
 #else
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, debugout, 0);
+    lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, debugout);
 #endif
 }
 
@@ -1451,7 +1451,7 @@ static void test_worm_food_collision(void) {
             collision_count++;
         }
         snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        lcd_putsxy(0, LCD_HEIGHT -8, buf, 0);
+        lcd_putsxy(0, LCD_HEIGHT -8, buf);
         lcd_update();
     }
     if (collision_count != FOOD_SIZE) {
@@ -1470,7 +1470,7 @@ static void test_worm_food_collision(void) {
             collision_count ++;
         }
         snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        lcd_putsxy(0, LCD_HEIGHT -8, buf, 0);
+        lcd_putsxy(0, LCD_HEIGHT -8, buf);
         lcd_update();
     }
     if (collision_count != FOOD_SIZE * 2) {
@@ -1518,7 +1518,7 @@ static void test_worm_argh_collision(void) {
             collision_count ++;
         }
         snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        lcd_putsxy(0, LCD_HEIGHT -8, buf, 0);
+        lcd_putsxy(0, LCD_HEIGHT -8, buf);
         lcd_update();
     }
     if (collision_count != ARGH_SIZE * 2) {
@@ -1535,7 +1535,7 @@ static void test_worm_argh_collision(void) {
             collision_count ++;
         }
         snprintf(buf, sizeof buf, "collisions: %d", collision_count);
-        lcd_putsxy(0, LCD_HEIGHT -8, buf, 0);
+        lcd_putsxy(0, LCD_HEIGHT -8, buf);
         lcd_update();
     }
     if (collision_count != ARGH_SIZE * 4) {
@@ -1562,7 +1562,7 @@ static int testline_in_rect(void) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
         lcd_update();
-        lcd_putsxy(0, 0, "failed 1", 0);
+        lcd_putsxy(0, 0, "failed 1");
         button_get(true);
         testfailed = 1;
     }
@@ -1573,7 +1573,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 2", 0);
+        lcd_putsxy(0, 0, "failed 2");
         lcd_update();
         button_get(true);
         testfailed = 2;
@@ -1585,7 +1585,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 3", 0);
+        lcd_putsxy(0, 0, "failed 3");
         lcd_update();
         button_get(true);
         testfailed = 3;
@@ -1597,7 +1597,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 4", 0);
+        lcd_putsxy(0, 0, "failed 4");
         lcd_update();
         button_get(true);
         testfailed = 4;
@@ -1609,7 +1609,7 @@ static int testline_in_rect(void) {
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 5", 0);
+        lcd_putsxy(0, 0, "failed 5");
         lcd_update();
         button_get(true);
         testfailed = 5;
@@ -1622,7 +1622,7 @@ static int testline_in_rect(void) {
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 6", 0);
+        lcd_putsxy(0, 0, "failed 6");
         lcd_update();
         button_get(true);
         testfailed = 6;
@@ -1637,7 +1637,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 7", 0);
+        lcd_putsxy(0, 0, "failed 7");
         lcd_update();
         button_get(true);
         testfailed = 7;
@@ -1649,7 +1649,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 8", 0);
+        lcd_putsxy(0, 0, "failed 8");
         lcd_update();
         button_get(true);
         testfailed = 8;
@@ -1661,7 +1661,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 9", 0);
+        lcd_putsxy(0, 0, "failed 9");
         lcd_update();
         button_get(true);
         testfailed = 9;
@@ -1673,7 +1673,7 @@ static int testline_in_rect(void) {
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 10", 0);
+        lcd_putsxy(0, 0, "failed 10");
         lcd_update();
         button_get(true);
         testfailed = 10;
@@ -1685,7 +1685,7 @@ static int testline_in_rect(void) {
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 11", 0);
+        lcd_putsxy(0, 0, "failed 11");
         lcd_update();
         button_get(true);
         testfailed = 11;
@@ -1698,7 +1698,7 @@ static int testline_in_rect(void) {
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 12", 0);
+        lcd_putsxy(0, 0, "failed 12");
         lcd_update();
         button_get(true);
         testfailed = 12;
@@ -1715,10 +1715,10 @@ static int testline_in_rect(void) {
     x2 = 10;
     y2 = 20;
     if (!(line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
-        line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
+          line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
         lcd_drawrect(rx, ry, rw, rh);
         lcd_drawline(x1, y1, x2, y2);
-        lcd_putsxy(0, 0, "failed 13", 0);
+        lcd_putsxy(0, 0, "failed 13");
         lcd_update();
         button_get(true);
         testfailed = 13;
@@ -1735,10 +1735,10 @@ static int testline_in_rect(void) {
     x2 = 10;
     y2 = 19;
     if (!(line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
-        line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
+          line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
         lcd_drawline(x1, y1, x2, y2);
         lcd_invertrect(rx, ry, rw, rh);
-        lcd_putsxy(0, 0, "failed 14", 0);
+        lcd_putsxy(0, 0, "failed 14");
         lcd_update();
         button_get(true);
         testfailed = 14;
@@ -1780,7 +1780,7 @@ static int test_specific_worm_collision(void) {
             }
             lcd_invertpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
             snprintf(buf, sizeof buf, "collisions %d", collisions);
-            lcd_putsxy(0, LCD_HEIGHT - 8, buf, 0);
+            lcd_putsxy(0, LCD_HEIGHT - 8, buf);
             lcd_update();
         }
     }
@@ -1837,7 +1837,7 @@ static void test_make_argh(void){
             }
 
                 snprintf(buf, sizeof buf, "(%d;%d) fail%d try%d", x, y, failures, tries);
-            lcd_putsxy(0, LCD_HEIGHT - 8, buf, 0);
+            lcd_putsxy(0, LCD_HEIGHT - 8, buf);
             lcd_update();
                 lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y, ARGH_SIZE, ARGH_SIZE);
                 lcd_update();
@@ -1875,7 +1875,7 @@ static void test_worm_argh_collision_in_moves(void) {
             hit_count ++;
         }
         snprintf(buf, sizeof buf, "in 5 moves hits: %d", hit_count);
-        lcd_putsxy(0, LCD_HEIGHT - 8, buf, 0);
+        lcd_putsxy(0, LCD_HEIGHT - 8, buf);
         lcd_update();
     }    
     if (hit_count != ARGH_SIZE + 5) {

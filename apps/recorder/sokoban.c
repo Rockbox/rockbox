@@ -1846,14 +1846,14 @@ static void update_screen(void) {
     
 
     snprintf (s, sizeof(s), "%d", current_level+1);
-    lcd_putsxy (86, 22, s, 0);
+    lcd_putsxy (86, 22, s);
     snprintf (s, sizeof(s), "%d", moves);
-    lcd_putsxy (86, 54, s, 0);
+    lcd_putsxy (86, 54, s);
 
     lcd_drawrect (80,0,32,32);
     lcd_drawrect (80,32,32,64);
-    lcd_putsxy (81, 10, str(LANG_SOKOBAN_LEVEL), 0);
-    lcd_putsxy (81, 42, str(LANG_SOKOBAN_MOVE), 0);
+    lcd_putsxy (81, 10, str(LANG_SOKOBAN_LEVEL));
+    lcd_putsxy (81, 42, str(LANG_SOKOBAN_MOVE));
     /* print out the screen */
     lcd_update();
 }
@@ -2197,7 +2197,7 @@ static bool sokoban_loop(void)
             if (current_level == NUM_LEVELS) {
                 for(ii=0; ii<30 ; ii++) {
                     lcd_clear_display();
-                    lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN), 2);
+                    lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
                     lcd_update();
                     lcd_invertrect(0,0,111,63);
                     lcd_update();
@@ -2220,12 +2220,12 @@ bool sokoban(void)
 {
     bool result;
     int w, h;
-    int len = strlen(SOKOBAN_TITLE);
+    int len;
 
-    lcd_getfontsize(SOKOBAN_TITLE_FONT, &w, &h);
+    lcd_getstringsize(SOKOBAN_TITLE, &w, &h);
 
     /* Get horizontel centering for text */
-    len *= w;
+    len = w;
     if (len%2 != 0)
         len = ((len+1)/2)+(w/2);
     else
@@ -2237,18 +2237,17 @@ bool sokoban(void)
         h /= 2;
 
     lcd_clear_display();
-    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SOKOBAN_TITLE, 
-               SOKOBAN_TITLE_FONT);
+    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SOKOBAN_TITLE);
 
     lcd_update();
     sleep(HZ*2);
 
     lcd_clear_display();
 
-    lcd_putsxy( 3,12,  str(LANG_SOKOBAN_QUIT), 0);
-    lcd_putsxy( 3,22, str(LANG_SOKOBAN_F1),0);
-    lcd_putsxy( 3,32, str(LANG_SOKOBAN_F2),0);
-    lcd_putsxy( 3,42, str(LANG_SOKOBAN_F3),0);
+    lcd_putsxy( 3,12, str(LANG_SOKOBAN_QUIT));
+    lcd_putsxy( 3,22, str(LANG_SOKOBAN_F1));
+    lcd_putsxy( 3,32, str(LANG_SOKOBAN_F2));
+    lcd_putsxy( 3,42, str(LANG_SOKOBAN_F3));
 
     lcd_update();
     sleep(HZ*2);

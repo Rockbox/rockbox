@@ -224,7 +224,7 @@ static void loopit(void)
             }
             snprintf(buffer, 30, "%s: %d",
                      values[show].what, values[show].num);
-            lcd_putsxy(0, 56, buffer, 0);
+            lcd_putsxy(0, 56, buffer);
             timeout--;
         }
         for(i=0, yy=y, xx=x;
@@ -241,13 +241,13 @@ static void loopit(void)
 }
 
 
-Menu bounce(void)
+bool bounce(void)
 {
     int w, h;
     char *off = "[Off] to stop";
     int len = strlen(SS_TITLE);
 
-    lcd_getfontsize(SS_TITLE_FONT, &w, &h);
+    lcd_getstringsize(SS_TITLE,&w, &h);
 
     /* Get horizontel centering for text */
     len *= w;
@@ -262,10 +262,10 @@ Menu bounce(void)
         h /= 2;
 
     lcd_clear_display();
-    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE, SS_TITLE_FONT);
+    lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE);
 
-    len = strlen(off);
-    lcd_getfontsize(0, &w, &h);
+    len = 1;
+    lcd_getstringsize(off, &w, &h);
 
     /* Get horizontel centering for text */
     len *= w;
@@ -279,13 +279,13 @@ Menu bounce(void)
     else
         h /= 2;
 
-    lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off,0);
+    lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
 
     lcd_update();
     sleep(HZ);
     loopit();
 
-    return MENU_OK;
+    return false;
 }
 
 #endif

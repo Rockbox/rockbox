@@ -88,20 +88,20 @@ int show_logo( void )
 
     debugf("read_bmp_file() returned %d, width %d height %d\n",
            failure, width, height);
-
-        for(i=0, eline=0; i < height; i+=8, eline++) {
-            /* the bitmap function doesn't work with full-height bitmaps
-               so we "stripe" the logo output */
-            lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
-                       (height-i)>8?8:height-i, false);
-        }
+    
+    for(i=0, eline=0; i < height; i+=8, eline++) {
+        /* the bitmap function doesn't work with full-height bitmaps
+           so we "stripe" the logo output */
+        lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
+                   (height-i)>8?8:height-i, false);
     }
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
-    lcd_getfontsize(FONT_SYSFIXED, &font_w, &font_h);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize("A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_HEIGHT-font_h, version, FONT_SYSFIXED);
+               LCD_HEIGHT-font_h, version);
     lcd_update();
 
 #else

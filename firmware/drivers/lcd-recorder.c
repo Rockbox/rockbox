@@ -228,17 +228,9 @@ void lcd_setfont(int newfont)
     curfont = newfont;
 }
 
-void lcd_getfontsize(int font, int *width, int *height)
+int lcd_getstringsize(unsigned char *str, int *w, int *h)
 {
-   struct font* pf = font_get(font);
-
-   *width =  pf->maxwidth;
-   *height = pf->height;
-}
-
-int lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
-{
-    struct font* pf = font_get(font);
+    struct font* pf = font_get(curfont);
     int ch;
     int width = 0;
 
@@ -279,10 +271,10 @@ void lcd_puts(int x, int y, unsigned char *str)
     if(!str || !str[0])
         return;
 
-    lcd_getstringsize(str, curfont, &w, &h);
+    lcd_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
-    lcd_putsxy( xpos, ypos, str, curfont);
+    lcd_putsxy(xpos, ypos, str);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
@@ -293,10 +285,10 @@ void lcd_puts(int x, int y, unsigned char *str)
 }
 
 /* put a string at a given pixel position */
-void lcd_putsxy(int x, int y, unsigned char *str, int font)
+void lcd_putsxy(int x, int y, unsigned char *str)
 {
     int ch;
-    struct font* pf = font_get(font);
+    struct font* pf = font_get(curfont);
 
     while (((ch = *str++) != '\0')) {
         bitmap_t *bits;
@@ -645,15 +637,14 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     struct scrollinfo* s = &scroll;
     unsigned char ch[2];
     int w, h;
-    int width, height;
-    lcd_getfontsize(curfont, &width, &height);
+    int width;
 
     ch[1] = 0; /* zero terminate */
     ch[0] = string[0];
     width = 0;
     s->space = 0;
     while ( ch[0] &&
-            (width + lcd_getstringsize(ch, curfont, &w, &h) <
+            (width + lcd_getstringsize(ch, &w, &h) <
              (LCD_WIDTH - x*8))) {
         width += w;
         s->space++;
@@ -664,7 +655,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     s->textlen = strlen(string);
 
     s->space += 2;
-    lcd_getstringsize(string,curfont,&w,&h);
+    lcd_getstringsize(string,&w,&h);
     if ( w > LCD_WIDTH - xmargin ) {
         s->offset=s->space;
         s->startx=x;
@@ -688,7 +679,7 @@ void lcd_stop_scroll(void)
         struct scrollinfo* s = &scroll;
         scroll_count = 0;
 
-        lcd_getstringsize( s->text, FONT_UI, &w, &h);
+        lcd_getstringsize( s->text, &w, &h);
         lcd_clearrect(xmargin + s->startx*w/s->textlen,
                       ymargin + s->starty*h,
                       LCD_WIDTH - xmargin,
@@ -745,7 +736,7 @@ static void scroll_thread(void)
                     s->offset = 0;
             }
 
-            lcd_getstringsize( s->text, FONT_UI, &w, &h);
+            lcd_getstringsize( s->text, &w, &h);
             lcd_clearrect(xmargin + s->startx*w/s->textlen,
                           ymargin + s->starty*h,
                           LCD_WIDTH - xmargin,

@@ -62,24 +62,24 @@ int on_screen(void)
             lcd_clear_display();
 
             ptr = str(LANG_PITCH_UP);
-            lcd_getstringsize(ptr,FONT_UI,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr, FONT_UI);
+            lcd_getstringsize(ptr,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_UpArrow],
                        LCD_WIDTH/2 - 3, h*2, 7, 8, true);
 
             snprintf(buf, sizeof buf, "%d%%", pitch);
-            lcd_getstringsize(buf,FONT_UI,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, h, buf, FONT_UI);
+            lcd_getstringsize(buf,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, h, buf);
 
             ptr = str(LANG_PITCH_DOWN);
-            lcd_getstringsize(ptr,FONT_UI,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr, FONT_UI);
+            lcd_getstringsize(ptr,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
             ptr = str(LANG_PAUSE);
-            lcd_getstringsize(ptr,FONT_UI,&w,&h);
-            lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr, FONT_UI);
+            lcd_getstringsize(ptr,&w,&h);
+            lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_Pause],
                        (LCD_WIDTH-(w/2))/2-10, LCD_HEIGHT/2 - h/2, 7, 8, true);
 
@@ -162,18 +162,18 @@ bool f2_screen(void)
     char buf[32];
 
     /* Get the font height */
-    lcd_getstringsize("A",FONT_UI,&w,&h);
+    lcd_getstringsize("A",&w,&h);
 
     lcd_stop_scroll();
 
     while (!exit) {
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE), FONT_UI);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE), FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
         lcd_putsxy(0, LCD_HEIGHT/2, 
                    global_settings.playlist_shuffle ? 
-                   str(LANG_ON) : str(LANG_OFF), FONT_UI);
+                   str(LANG_ON) : str(LANG_OFF));
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
@@ -181,8 +181,8 @@ bool f2_screen(void)
                  global_settings.mp3filter ? str(LANG_ON) : str(LANG_OFF));
 
         /* Get the string width and height */
-        lcd_getstringsize(buf,FONT_UI,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf, FONT_UI);
+        lcd_getstringsize(buf,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
@@ -236,20 +236,20 @@ bool f3_screen(void)
         char* ptr;
 
         ptr = str(LANG_F3_STATUS);
-        lcd_getstringsize(ptr,FONT_UI,&w,&h);
+        lcd_getstringsize(ptr,&w,&h);
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL), FONT_UI);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR), FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
         lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF), FONT_UI);
+                   global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF));
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, FONT_UI);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR), FONT_UI);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
-                   global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF), FONT_UI);
+                   global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
         lcd_update();
@@ -288,5 +288,3 @@ bool f3_screen(void)
     return false;
 }
 #endif
-
-

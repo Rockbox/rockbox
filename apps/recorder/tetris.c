@@ -319,7 +319,7 @@ static void move_down(void)
         }
 
         snprintf (s, sizeof(s), "%d Rows - Level %d", lines, level);
-        lcd_putsxy (2, 42, s, 0);
+        lcd_putsxy (2, 42, s);
 
         new_block();
         move_block(0,0,0);
@@ -371,7 +371,7 @@ static bool game_loop(void)
         if(gameover())
         {
             lcd_clearrect(0, 52, LCD_WIDTH, LCD_HEIGHT - 52);
-            lcd_putsxy (2, 52, str(LANG_TETRIS_LOSE), 0);
+            lcd_putsxy (2, 52, str(LANG_TETRIS_LOSE));
             lcd_update();
             sleep(HZ * 3);
             return false;
@@ -403,7 +403,7 @@ bool tetris(void)
     init_tetris();
 
     draw_frame(start_x, start_x + max_x - 1, start_y - 1, start_y + max_y);
-    lcd_putsxy (2, 42, str(LANG_TETRIS_LEVEL), 0);
+    lcd_putsxy (2, 42, str(LANG_TETRIS_LEVEL));
     lcd_update();
 
     next_b = t_rand(blocks);

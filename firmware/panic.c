@@ -50,8 +50,8 @@ void panicf( char *fmt, ...)
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
     
-    //FIXME putsxy may call panic...
-    lcd_putsxy(0,0,panic_buf,FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_putsxy(0,0,panic_buf);
     lcd_update();
 
 #else

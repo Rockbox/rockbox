@@ -29,11 +29,11 @@
 #include "panic.h"
 #include "settings.h"
 #include "status.h"
+#include "screens.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
-#include "screens.h"
 #endif
 
 struct menu {
@@ -95,7 +95,7 @@ void put_cursorxy(int x, int y, bool on)
 #ifdef HAVE_LCD_BITMAP
     int fh, fw;
     int xpos, ypos;
-    lcd_getfontsize(FONT_UI, &fw, &fh);
+    lcd_getstringsize("A", &fw, &fh);
     xpos = x*6;
     ypos = y*fh + lcd_getymargin();
     if ( fh > 8 )
@@ -134,7 +134,8 @@ static void menu_draw(int m)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
-    lcd_getfontsize(FONT_UI, &fw, &fh);
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("A", &fw, &fh);
     if (global_settings.statusbar)
         menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
     else
@@ -147,7 +148,6 @@ static void menu_draw(int m)
     lcd_clear_display(); /* ...then clean the screen */
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
-    lcd_setfont(FONT_UI);
 #endif
     /* correct cursor pos if out of screen */
     if (menus[m].cursor - menus[m].top >= menu_lines)
@@ -184,7 +184,7 @@ static void put_cursor(int m, int target)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
-    lcd_getfontsize(FONT_UI, &fw, &fh);
+    lcd_getstringsize("A", &fw, &fh);
     if (global_settings.statusbar)
         menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
     else
