@@ -358,13 +358,11 @@ static int readwrite(int fd, void* buf, int count, bool write)
         if (write) {
             memcpy( file->cache + offs, buf, headbytes );
             if (offs+headbytes == SECTOR_SIZE) {
-                int rc = fat_readwrite(&(file->fatfile), 1,
-                                       file->cache, true );
+                int rc = flush_cache(fd);
                 if ( rc < 0 ) {
                     errno = EIO;
                     return -2;
                 }
-                file->dirty = false;
                 file->cacheoffset = -1;
             }
             else
