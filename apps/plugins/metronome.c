@@ -189,10 +189,10 @@ void change_volume(int delta){
     if (vol != rb->global_settings->volume) {
         rb->mpeg_sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
-    rb->snprintf(buffer, sizeof(buffer), "Vol: %d ", vol);
+        rb->snprintf(buffer, sizeof(buffer), "Vol: %d ", vol);
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_puts(10,7, buffer);
-    rb->lcd_update();
+        rb->lcd_update();
 #else
         rb->lcd_puts(0,1, buffer);
 #endif
@@ -293,8 +293,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
                 
             case METRONOME_PAUSE:
-                if(!sound_paused)
+                if(!sound_paused) {
                     sound_paused = true;
+                    draw_display();
+                }    
                 break;
 #else
             case METRONOME_PLAYPAUSE:
