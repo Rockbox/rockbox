@@ -17,8 +17,6 @@
  *
  ****************************************************************************/
 
-//#ifdef __ROCKBOX_CREDITS_H__
-
 #include "credits.h"
 #include "lcd.h"
 #include "kernel.h"
@@ -27,7 +25,7 @@
 
 struct credit credits[CREDIT_COUNT] = {
     { "[Credits]",               ""                                  },
-    { "Björn Stenberg",          "Originator, project manager, code" },
+    { "Bjorn Stenberg",          "Originator, project manager, code" },
     { "Linus Nielsen Feltzing",  "Electronics, code"                 },
     { "Andy Choi",               "Checksums"                         },
     { "Andrew Jamieson",         "Schematics, electronics"           },
@@ -39,10 +37,10 @@ struct credit credits[CREDIT_COUNT] = {
     { "Stuart Martin",           "Code"                              },
     { "Felix Arends",            "Code"                              },
     { "Ulf Ralberg",             "Thread embryo"                     },
-    { "David Härdeman",          "Initial ID3 code"                  },
+    { "David Hardeman",          "Initial ID3 code"                  },
     { "Thomas Saeys",            "Logo"                              },
     { "Grant Wier",              "Code"                              },
-    { "Julien Labruyére",        "Donated Archos Player"             },
+    { "Julien Labruyere",        "Donated Archos Player"             },
     { "Nicolas Sauzede",         "Display research"                  },
     { "Robert Hak",              "Code, FAQ, Sarcasm"                },
     { "Dave Chapman",            "Code"                              },
@@ -52,28 +50,35 @@ struct credit credits[CREDIT_COUNT] = {
 void show_credits(void)
 {
     int i = 0;
-	int line = 0;
+    int line = 0;
 
-	lcd_clear_display();
+    lcd_clear_display();
 
-	while(i < CREDIT_COUNT-1) {
-		if ((line % 4 == 0) && (line!=0)) {
-			lcd_puts(0, 0, (char *)credits[0].name);
-			lcd_update();
-			sleep(DISPLAY_TIME);
-			lcd_clear_display();
-			line=0;
-		}
-		lcd_puts(0, ++line, (char *)credits[++i].name);
-	}
+    while(i < CREDIT_COUNT-1) {
+        if ((line % 4 == 0) && (line!=0)) {
+            lcd_puts(0, 0, (char *)credits[0].name);
+            lcd_update();
+            sleep(DISPLAY_TIME);
+            lcd_clear_display();
+            line=0;
+        }
+        lcd_puts(0, ++line, (char *)credits[++i].name);
+    }
 
-	if ((i-1)%4 != 0) {
-			lcd_puts(0, 0, (char *)credits[0].name);
-			lcd_update();
-			sleep(DISPLAY_TIME);
-			lcd_clear_display();
-	}
+    if ((i-1)%4 != 0) {
+        lcd_puts(0, 0, (char *)credits[0].name);
+        lcd_update();
+        sleep(DISPLAY_TIME);
+        lcd_clear_display();
+    }
 
 }
 
-//#endif
+
+
+
+
+
+
+
+
