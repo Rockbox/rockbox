@@ -155,6 +155,14 @@ static struct plugin_api rockbox_api = {
     atoi,
     get_time,
     plugin_get_buffer,
+
+    /* new stuff at the end, sort into place next time the API gets incompatible */
+
+#ifndef HAVE_LCD_CHARCELLS
+    &lcd_framebuffer[0][0],
+    lcd_blit,
+#endif
+    yield,
 };
 
 int plugin_load(char* plugin, void* parameter)

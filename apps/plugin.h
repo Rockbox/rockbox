@@ -43,7 +43,7 @@
 #include "mpeg.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 7
+#define PLUGIN_API_VERSION 8
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility */
@@ -181,6 +181,13 @@ struct plugin_api {
     int (*atoi)(const char *str);
     struct tm* (*get_time)(void);
     void* (*plugin_get_buffer)(int* buffer_size);
+    /* new stuff */
+#ifndef HAVE_LCD_CHARCELLS
+    unsigned char* lcd_framebuffer;
+    /* performance function */
+    void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
+#endif
+    void (*yield)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */

@@ -82,6 +82,7 @@ static struct
 #ifdef HAVE_LCD_BITMAP
     { ".fnt", TREE_ATTR_FONT,Font     },
     { ".ch8", TREE_ATTR_CH8, -1       },
+    { ".rvf", TREE_ATTR_RVF, Text     },
 #endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
@@ -1067,6 +1068,11 @@ static bool dirbrowse(char *root, int *dirfilter)
                         case TREE_ATTR_CH8:
                             plugin_load("/.rockbox/rocks/chip8.rock",buf);
                             break;
+
+                            /* "movie" animation */
+                        case TREE_ATTR_RVF:
+                            plugin_load("/.rockbox/rocks/video.rock",buf);
+                            break; 
 
                         case TREE_ATTR_FONT:
                             font_load(buf);
