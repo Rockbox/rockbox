@@ -489,6 +489,8 @@ void reset_settings(void)
  *********************************/
 void save_settings(void)
 {
+    int fd;
+
     rb->lcd_clear_display();
 
     show_logo(true, true);
@@ -496,7 +498,6 @@ void save_settings(void)
 
     rb->lcd_update();
 
-    int fd;
     fd = rb->creat(default_filename, O_WRONLY);
 
     if(fd >= 0)
@@ -1403,12 +1404,12 @@ void f2_screen(void)
  **********************/
 bool f3_screen(void)
 {
-    done = false;
-
     int invert_analog = 1;
     int invert_digital = 1;
     int invert_lcd = 1;
     int invert_fullscreen = 1;
+
+    done = false;
 
     while (!done)
     {
@@ -1958,14 +1959,14 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
  ****************/
 void select_mode(void)
 {
-    done = false;
-
     int cursorpos = settings.clock;
     bool a = false; /* (a)nalog */
     bool d = false; /* (d)igital */
     bool l = false; /* (l)cd */
     bool f = false; /* (f)ullscreen */
     bool b = false; /* (b)inary */
+
+    done = false;
 
     while(!done)
     {
