@@ -473,6 +473,11 @@ void lcd_puts(int x, int y, char *str)
     lcd_putsxy( xmargin + x*fonts[font],
                 ymargin + y*fontheight[font],
                 str, font );
+#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
+    /* this function is being used when simulating a charcell LCD and
+       then we update immediately */
+    lcd_update();
+#endif
 }
 
 /*
