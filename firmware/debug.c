@@ -34,6 +34,7 @@ static char debugbuf[200];
 #include "lcd.h"
 #include "adc.h"
 #include "mas.h"
+#include "power.h"
 
 void debug_init(void)
 {
@@ -230,6 +231,8 @@ void dbg_ports(void)
     int button;
     int battery_voltage;
     int batt_int, batt_frac;
+    bool charge_status = false;
+    bool ide_status = true;
 
     lcd_clear_display();
 
@@ -257,7 +260,8 @@ void dbg_ports(void)
         batt_int = battery_voltage / 100;
         batt_frac = battery_voltage % 100;
     
-        snprintf(buf, 32, "Battery: %d.%02dV", batt_int, batt_frac);
+        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
+                 battery_level());
         lcd_puts(0, 6, buf);
 
         snprintf(buf, 32, "ATA: %s, 0x%x",
@@ -271,16 +275,19 @@ void dbg_ports(void)
 
         switch(button)
         {
+            case BUTTON_ON:
+                charge_status = charge_status?false:true;
+                charger_enable(charge_status);
+                break;
+                
             case BUTTON_UP:
-                /* Toggle the IDE power */
-                PADR ^= 0x20;
+                ide_status = ide_status?false:true;
+                ide_power_enable(ide_status);
                 break;
 
             case BUTTON_OFF:
-                /* Disable the charger */
-                PBDR |= 0x20;
-                /* Enable the IDE power */
-                PADR |= 0x20;
+                charger_enable(false);
+                ide_power_enable(true);
                 return;
         }
     }
