@@ -63,6 +63,6 @@ nim.c
 alpine_cdc.c
 #endif
 
-#if SOFTWARECODECS == yes
+#if CONFIG_HWCODEC == MASNONE /* software codec platforms */
 mpa2wav.c
 #endif

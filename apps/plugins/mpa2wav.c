@@ -19,6 +19,9 @@
 
 #include "plugin.h"
 
+#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
+/* software codec platforms, not for simulator */
+
 #include <codecs/libmad/mad.h>
 
 typedef struct ao_sample_format {
@@ -478,3 +481,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   return PLUGIN_OK;
 }
+#endif /* CONFIG_HWCODEC == MASNONE */
