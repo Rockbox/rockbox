@@ -1835,36 +1835,41 @@ int fat_rename(struct fat_file* file,
     struct fat_file newfile = *file;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
+    
+    if (file->volume != dir->file.volume) {
+        DEBUGF("No rename across volumes!\n");
+        return -1;
+    }
 #endif
 
     if ( !file->dircluster ) {
         DEBUGF("File has no dir cluster!\n");
-        return -1;
+        return -2;
     }
 
     /* create a temporary file handle */
     rc = fat_opendir(IF_MV2(file->volume,) &olddir, file->dircluster, NULL);
     if (rc < 0)
-        return rc * 10 - 2;
+        return rc * 10 - 3;
 
     /* create new name */
     rc = add_dir_entry(dir, &newfile, newname, false, false);
     if (rc < 0)
-        return rc * 10 - 3;
+        return rc * 10 - 4;
 
     /* write size and cluster link */
     rc = update_short_entry(&newfile, size, attr);
     if (rc < 0)
-        return rc * 10 - 4;
+        return rc * 10 - 5;
 
     /* remove old name */
     rc = free_direntries(file);
     if (rc < 0)
-        return rc * 10 - 5;
+        return rc * 10 - 6;
 
     rc = flush_fat(IF_MV(fat_bpb));
     if (rc < 0)
-        return rc * 10 - 6;
+        return rc * 10 - 7;
 
     return 0;
 }
