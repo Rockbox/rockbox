@@ -184,6 +184,22 @@
     <td>290 g (10.23 oz)</td>
     <td>290 g (10.23 oz)</td>
 </tr>
+<tr><th><b>USB Connector</b></th>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+</tr>
+<tr><th><b>"Ear" Position</b></th>
+    <td>top</td>
+    <td>top</td>
+    <td>top</td>
+    <td>top</td>
+    <td>(which?) side</td>
+    <td>(which?) side</td>
+</tr>
 </table>
 <p>
 
