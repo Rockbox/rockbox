@@ -129,7 +129,7 @@ extern char rockboxdir[];
 #define DEFAULT_CONTRAST_SETTING    30
 #else
 #define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    32
+#define DEFAULT_CONTRAST_SETTING    38
 #endif
 #define MIN_CONTRAST_SETTING        5
 #define DEFAULT_POWEROFF_SETTING    0
