@@ -1074,6 +1074,7 @@ bool settings_save_config(void)
     int fd, i, value;
     char buf[MAX_PATH + 32];
     char filename[MAX_PATH];
+    char* boolopt[] = {"off","on"};
 
     /* find unused filename */
     for (i=0; ; i++) {
@@ -1188,9 +1189,8 @@ bool settings_save_config(void)
     write(fd, buf, strlen(buf));
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "shuffle: %s\r\n",
-                 options[global_settings.playlist_shuffle]);
+                 boolopt[global_settings.playlist_shuffle]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1202,9 +1202,8 @@ bool settings_save_config(void)
     }
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "play selected: %s\r\n",
-                 options[global_settings.play_selected]);
+                 boolopt[global_settings.play_selected]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1230,9 +1229,8 @@ bool settings_save_config(void)
     write(fd, buf, strlen(buf));
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "volume fade: %s\r\n",
-                 options[global_settings.fade_on_stop]);
+                 boolopt[global_settings.fade_on_stop]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1240,9 +1238,8 @@ bool settings_save_config(void)
     write(fd, buf, strlen(buf));
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "sort case: %s\r\n",
-                 options[global_settings.sort_case]);
+                 boolopt[global_settings.sort_case]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1255,9 +1252,8 @@ bool settings_save_config(void)
     }
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "follow playlist: %s\r\n",
-                 options[global_settings.browse_current]);
+                 boolopt[global_settings.browse_current]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1266,10 +1262,9 @@ bool settings_save_config(void)
 
 #ifdef HAVE_LCD_BITMAP
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "statusbar: %s\r\nscrollbar: %s\r\n",
-                 options[global_settings.statusbar],
-                 options[global_settings.scrollbar]);
+                 boolopt[global_settings.statusbar],
+                 boolopt[global_settings.scrollbar]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1308,9 +1303,14 @@ bool settings_save_config(void)
     }
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "backlight when plugged: %s\r\n",
-                 options[global_settings.backlight_on_when_charging]);
+                 boolopt[global_settings.backlight_on_when_charging]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        snprintf(buf, sizeof(buf), "caption backlight: %s\r\n",
+                 boolopt[global_settings.caption_backlight]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1326,13 +1326,12 @@ bool settings_save_config(void)
 
 #ifdef HAVE_LCD_BITMAP
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "invert: %s\r\n",
-                 options[global_settings.invert]);
+                 boolopt[global_settings.invert]);
         write(fd, buf, strlen(buf));
 
         snprintf(buf, sizeof(buf), "invert cursor: %s\r\n",
-                 options[global_settings.invert_cursor]);
+                 boolopt[global_settings.invert_cursor]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1359,11 +1358,10 @@ bool settings_save_config(void)
     }
 
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf),
                  "peak meter busy: %s\r\npeak meter dbfs: %s\r\n",
-                 options[global_settings.peak_meter_performance],
-                 options[global_settings.peak_meter_dbfs]);
+                 boolopt[global_settings.peak_meter_performance],
+                 boolopt[global_settings.peak_meter_dbfs]);
         write(fd, buf, strlen(buf));
     }
 
@@ -1379,9 +1377,8 @@ bool settings_save_config(void)
 
 #ifdef HAVE_ATA_POWER_OFF
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf), "disk poweroff: %s\r\n",
-                 options[global_settings.disk_poweroff]);
+                 boolopt[global_settings.disk_poweroff]);
         write(fd, buf, strlen(buf));
     }
 #endif
@@ -1392,11 +1389,10 @@ bool settings_save_config(void)
 
 #ifdef HAVE_CHARGE_CTRL
     {
-        static char* options[] = {"off","on"};
         snprintf(buf, sizeof(buf),
                  "deep discharge: %s\r\ntrickle charge: %s\r\n",
-                 options[global_settings.discharge],
-                 options[global_settings.trickle_charge]);
+                 boolopt[global_settings.discharge],
+                 boolopt[global_settings.trickle_charge]);
         write(fd, buf, strlen(buf));
     }
 #endif
@@ -1456,9 +1452,8 @@ bool settings_save_config(void)
     write(fd, buf, strlen(buf));
 
     {
-        static char* options[] = {"off", "on"};
         snprintf(buf, sizeof(buf), "editable recordings: %s\r\n",
-                 options[global_settings.rec_editable]);
+                 boolopt[global_settings.rec_editable]);
         write(fd, buf, strlen(buf));
     }
 
