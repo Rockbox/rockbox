@@ -939,7 +939,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 
 #ifdef HAVE_MAS_SIBI_CONTROL
     and_b(~0x01, &PBDRH); /* drive SIBI low */
-    and_b(~0x01, &PBIORH); /* output for PB8 */
+    or_b(0x01, &PBIORH); /* output for PB8 */
 #endif
 
 #if CONFIG_HWCODEC == MAS3587F
