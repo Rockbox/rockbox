@@ -1027,7 +1027,7 @@ int wps_show(void)
                     break;
                 }
                 lcd_stop_scroll();
-                dont_go_to_menu = true;
+                dont_go_to_menu = false;
                 menu_button_is_down = false;
                 lcd_icon(ICON_PARAM, true);
                 lcd_icon(ICON_AUDIO, true);
