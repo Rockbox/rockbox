@@ -2,9 +2,9 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<h2>Changes for version 1.2</h2>
+<h2>Changes for version 1.3</h2>
 
-<p>Very much has changed since last version. Read the <a href="rockbox-1.2-notes.txt">release notes</a>.
+<p>Please read the <a href="rockbox-1.3-notes.txt">release notes</a>.
 
 <p>
 <table><tr valign="top"><td>
@@ -12,7 +12,7 @@
 <p>This version is for old Archos Jukebox 6000 models with ROM firmware older than 4.50.
 
 <ul>
-<li><a href="rockbox-1.2-player-old.mod">rockbox-1.2-player-old.mod</a>
+<li><a href="rockbox-1.3-player-old.mod">rockbox-1.3-player-old.mod</a>
 </ul>
 
 </td><td>
@@ -21,7 +21,7 @@
 <p>This version is for Archos Jukebox 5000, 6000 with ROM firmware 4.50 or later, and all Studio models.
 
 <ul>
-<li><a href="rockbox-1.2-player.mod">rockbox-1.2-player.mod</a>
+<li><a href="rockbox-1.3-player.mod">rockbox-1.3-player.mod</a>
 </ul>
 
 </td><td>
@@ -30,18 +30,18 @@
 <p>This version is for all Archos Jukebox Recorder models.
 
 <ul>
-<li><a href="rockbox-1.2-recorder.ajz">rockbox-1.2-recorder.ajz</a>
+<li><a href="rockbox-1.3-recorder.ajz">rockbox-1.3-recorder.ajz</a>
 </ul>
 
 </td></tr></table>
 
 <h3>Source code</h3>
 <ul>
-<li><a href="rockbox-1.2.tar.gz">rockbox-1.2.tar.gz</a>
+<li><a href="rockbox-1.3.tar.gz">rockbox-1.3.tar.gz</a>
 </ul>
 
 
-<h3>Screen shots (from simulator)</h3>
+<h3>Screen shots (from 1.2 simulator)</h3>
 
 <p>
 <table><tr valign=top>
@@ -65,8 +65,8 @@
 
 <p>
 <ul>
-<li><a href="rockbox-1.2-player-sim">player simulator 1.2 for linux-x86</a>
-<li><a href="rockbox-1.2-recorder-sim">recorder simulator 1.2 for linux-x86</a>
+<li><a href="rockbox-1.3-player-sim">player simulator 1.3 for linux-x86</a>
+<li><a href="rockbox-1.3-recorder-sim">recorder simulator 1.3 for linux-x86</a>
 <li><a href="rockbox-1.2-player-sim.exe">player simulator 1.2 for win32</a>
 <li><a href="rockbox-1.2-recorder-sim.exe">recorder simulator 1.2 for win32</a>
 </ul>
