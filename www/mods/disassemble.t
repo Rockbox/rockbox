@@ -4,10 +4,11 @@
 <p>There are several ways to disassemble the Archos Jukeboxes.
 Here is an approach where you don't need to bend any metal parts.
 
+<p>You need a Torx 10 screwdriver and a very small (~2mm) philips head screwdriver.
 
 <p><img src="b10.jpg">
 <br>
-First, remove the battery covers and unscrew all 8 visible screws: 2 torx screws on the left and right sides, and 2 small philips head screws on the top and bottom. Then you simply lift off the plastic top cover.
+First, remove the battery covers and unscrew all 8 visible screws: 2 torx screws on the left and right sides, and 2 philips head screws on the top and bottom. Then you simply lift off the plastic top cover.
 <hr>
 
 <p><img src="b5.jpg"> <img src="b6.jpg">
