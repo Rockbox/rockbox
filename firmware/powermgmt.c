@@ -73,9 +73,15 @@ static int poweroff_idle_timeout_value[15] =
 
 static int percent_to_volt_decharge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
+#ifdef HAVE_LIION
+    /* values guessed, see http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf */
+    /* until someone measures voltages over a decharging cycle */
+    260, 280, 300, 320, 340, 350, 360, 370, 380, 390, 400
+#else /* NiMH */
     /* original values were taken directly after charging, */
     /* but it should show 100% after turning off the device for some hours, too */
     450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 /* orig. values: ...,528,560 */
+#endif
 };
 
 void set_battery_capacity(int capacity)
@@ -99,7 +105,13 @@ int charge_state = 0;                          /* at the beginning, the charger 
 
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
+#ifdef HAVE_LIION
+    /* values guessed, see http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf */
+    /* until someone measures voltages over a charging cycle */
+    260, 290, 320, 340, 360, 370, 380, 390, 400, 410, 420
+#else /* NiMH */
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
+#endif
 };
 
 void enable_trickle_charge(bool on)

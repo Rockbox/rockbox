@@ -21,13 +21,13 @@
 
 #ifndef SIMULATOR
 
-#ifdef HAVE_FMADC /* FM Recorder, LiIon */
+#ifdef HAVE_LIION /* FM Recorder, LiIon */
 #define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
 #define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
 #define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
 #define BATTERY_LEVEL_FULL       400 /* 4.00V */
 
-#else /* Recorder, NiCd */
+#else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
 #define BATTERY_LEVEL_DANGEROUS  475 /* 4.75V */
