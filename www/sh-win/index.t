@@ -1,4 +1,6 @@
-#define _PAGE_ Setting up an SH-1 compiler for Windows #include "head.t"
+#define _PAGE_ Setting up an SH-1 compiler for Windows
+#include "head.t"
+
 <P>
 	by <A href="mailto:edx@codeforce.d2g.com">Felix Arends</A>, 1/8/2002
 	<BR>
