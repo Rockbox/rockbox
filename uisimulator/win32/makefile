@@ -27,11 +27,11 @@ APPDIR = ../../apps/
 RECDIR = $(APPDIR)recorder/
 RM = del
 
-DISPLAY = -DHAVE_LCD_CHARCELLS
-#DISPLAY = -DHAVE_LCD_BITMAP
+#DISPLAY = -DHAVE_LCD_CHARCELLS
+DISPLAY = -DHAVE_LCD_BITMAP
 
-KEYPAD = -DHAVE_PLAYER_KEYPAD
-#KEYPAD = -DHAVE_RECORDER_KEYPAD
+#KEYPAD = -DHAVE_PLAYER_KEYPAD
+KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 CC = cl
 DEFINES = -DWIN32 -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
@@ -46,10 +46,10 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 SRCS = lcd-win32.c uisw32.c lcd.c button.c tree.c main.c \
   chartables.c kernel.c uisw32.res dir-win32.c main_menu.c \
   play.c debug-win32.c menu.c credits.c sound_menu.c mpeg.c \
-  id3.c settings.c sprintf.c thread-win32.c playlist.c
+  id3.c settings.c sprintf.c thread-win32.c playlist.c string-win32.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
-SRCS = $(SRCS) tetris.c screensaver.c icons.c bmp.c
+SRCS = $(SRCS) tetris.c boxes.c bounce.c sokoban.c icons.c bmp.c
 !ENDIF
 
 OBJS = $(SRCS:.c=.obj)
@@ -81,8 +81,14 @@ play.obj: ../../apps/play.c
 bmp.obj: ../../apps/recorder/bmp.c
  $(CC) $(CFLAGS) -c ../../apps/recorder/bmp.c -obmp.obj
 
-screensaver.obj: ../../apps/recorder/screensaver.c
- $(CC) $(CFLAGS) -c ../../apps/recorder/screensaver.c -oscreensaver.obj
+bounce.obj: ../../apps/recorder/bounce.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/bounce.c -obounce.obj
+
+sokoban.obj: ../../apps/recorder/sokoban.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/sokoban.c -osokoban.obj
+
+boxes.obj: ../../apps/recorder/boxes.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/boxes.c -oboxes.obj
 
 menu.obj: ../../apps/menu.c
  $(CC) $(CFLAGS) -c ../../apps/menu.c -omenu.obj
@@ -110,3 +116,4 @@ playlist.obj: ../../apps/playlist.c
 
 clean:
  $(RM) *.obj
+

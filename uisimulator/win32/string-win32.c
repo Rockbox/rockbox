@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
-typedef unsigned int bool;
-#define true        1
-#define false       0
+#include <string.h>
+
+int strcasecmp (const char *a, const char *b)
+{
+    return strcmpi (a, b);
+}
