@@ -312,7 +312,7 @@ int mas_direct_config_write(unsigned char reg, unsigned int val)
     }
 
     i2c_end();
-    return 0;
+    return ret;
 }
 
 int mas_codec_writereg(int reg, unsigned int val)
