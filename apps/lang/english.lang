@@ -3038,7 +3038,7 @@ new:
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
-eng: "presplit gap"
+eng: "Presplit gap"
 new:
 
 id: LANG_RECORD_TRIGGER_MODE
@@ -3048,12 +3048,12 @@ new:
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
-eng: "one"
+eng: "Once"
 new:
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
-eng: "repeat"
+eng: "Repeat"
 new:
 
 id: LANG_DB_INF
