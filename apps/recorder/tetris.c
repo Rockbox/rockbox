@@ -287,12 +287,12 @@ static int check_lines(void)
         if(line)
         {
             lines++;
-            // move rows down
+            /* move rows down */
             for(i = x; i < max_x - 1; i++)
                 for (j = 0; j < max_y; j++)
 		            *(virtual + j * max_x + i) = *(virtual + j * max_x + (i + 1));
 
-            x--; // re-check this line
+            x--; /* re-check this line */
         }
     }
 
@@ -318,7 +318,8 @@ static void move_down(void)
             score += l*l;
         }
 
-        snprintf (s, sizeof(s), "%d Rows - Level %d", lines, level);
+        snprintf (s, sizeof(s), "%d %s %d", lines, 
+                  str(LANG_TETRIS_LEVEL), level);
         lcd_putsxy (2, 42, s);
 
         new_block();
@@ -400,10 +401,13 @@ static void init_tetris(void)
 
 bool tetris(void)
 {
+    char buf[20];
+
     init_tetris();
 
     draw_frame(start_x, start_x + max_x - 1, start_y - 1, start_y + max_y);
-    lcd_putsxy (2, 42, str(LANG_TETRIS_LEVEL));
+    snprintf(buf, sizeof(buf), "0 %s 0", str(LANG_TETRIS_LEVEL));
+    lcd_putsxy (2, 42, buf);
     lcd_update();
 
     next_b = t_rand(blocks);

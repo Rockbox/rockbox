@@ -274,17 +274,31 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new:
 
+# depreciated
+id: LANG_RESET_ASK_PLAYER
+desc: confirm to reset settings
+eng: ""
+new:
+ 
+# depreciated
+id: LANG_RESET_CONFIRM_PLAYER
+desc: confirm to reset settings
+eng: ""
+new:
+
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are you sure?"
 new: 
 
-id: LANG_RESET_CONFIRM
+# depreciated
+id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "PLAY=Reset"
+eng: ""
 new:
 
-id: LANG_RESET_CANCEL
+# depreciated
+id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 new:
@@ -782,7 +796,7 @@ new:
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "0 Rows - Level 0"
+eng: "Rows - Level"
 new:
 
 id: LANG_POWEROFF_IDLE
@@ -874,3 +888,15 @@ id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
 new:
+
+id: LANG_RESET_CONFIRM
+desc: confirm to reset settings
+eng: "PLAY=Reset"
+new:
+ 
+id: LANG_RESET_CANCEL
+desc: confirm to reset settings
+eng: "OFF=Cancel"
+new:
+
+id: LANG_TETRIS_LEVEL
