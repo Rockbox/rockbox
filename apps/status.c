@@ -38,7 +38,7 @@ void status_set_playmode(enum playmode mode)
 
 void status_draw(void)
 {
-#ifdef HAVE_LCD_CHARCELLS
+#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
     int battlevel = battery_level();
     
     lcd_icon(ICON_BATTERY, true);
