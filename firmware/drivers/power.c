@@ -117,15 +117,31 @@ void ide_power_enable(bool on)
 #ifdef NEEDS_ATA_POWER_ON
     if(on)
     {
+#ifdef ATA_POWER_PLAYERSTYLE
+        if (read_rom_version() > 451) /* new players only */
+        {
+            or_b(0x10, &PBDRL);
+            touched = true;
+        }
+#else
         or_b(0x20, &PADRL);
         touched = true;
+#endif
     }
 #endif
 #ifdef HAVE_ATA_POWER_OFF
     if(!on)
     {
+#ifdef ATA_POWER_PLAYERSTYLE
+        if (read_rom_version() > 451) /* new players only */
+        {
+            and_b(~0x10, &PBDRL);
+            touched = true;
+        }
+#else
         and_b(~0x20, &PADRL);
         touched = true;
+#endif
     }
 #endif
 
@@ -133,8 +149,13 @@ void ide_power_enable(bool on)
    of other bits on same port, while input and floating high */
     if (touched)
     {
+#ifdef ATA_POWER_PLAYERSTYLE
+        or_b(0x10, &PBIORL); /* PB4 is an output */
+        PBCR2 &= ~0x0300; /* GPIO for PB4 */
+#else
         or_b(0x20, &PAIORL); /* PA5 is an output */
         PACR2 &= 0xFBFF; /* GPIO for PA5 */
+#endif
     }
 }
 #endif /* !HAVE_MMC */
@@ -143,10 +164,22 @@ void ide_power_enable(bool on)
 bool ide_powered(void)
 {
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
+#ifdef ATA_POWER_PLAYERSTYLE
+    if (read_rom_version() > 451) /* new players only */
+    {
+        if ((PBCR2 & 0x0300) || !(PBIOR & 0x0010)) /* not configured for output */
+            return false; /* would be floating low, disk off */
+        else
+            return (PBDR & 0x0010) != 0;
+    }
+    else
+        return true; /* old player: always on */
+#else
     if ((PACR2 & 0x0400) || !(PAIOR & 0x0020)) /* not configured for output */
         return true; /* would be floating high, disk on */
     else
         return (PADR & 0x0020) != 0;
+#endif /* ATA_POWER_PLAYERSTYLE */
 #else
     return true; /* pretend always powered if not controlable */
 #endif

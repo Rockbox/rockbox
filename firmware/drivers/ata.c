@@ -1131,15 +1131,6 @@ int ata_init(void)
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH); /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
-    
-#ifdef HAVE_LCD_CHARCELLS
-    if (read_rom_version() > 451) /* new player: power on the HD */
-    {
-        PBCR2 &= ~0x0300;      /* Set PB4 (IDE power) to GPIO */
-        or_b(0x10, &PBDRL);    /* ... high */
-        or_b(0x10, &PBIORL);   /* ... and output */
-    }    
-#endif
 #elif defined HAVE_SCF5249
 #endif
 

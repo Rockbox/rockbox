@@ -19,6 +19,13 @@
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A
 
+/* Define this if you need to power on ATA */
+#define NEEDS_ATA_POWER_ON
+
+/* Define this if you control ata power player style
+   (with PB4, new player only) */
+#define ATA_POWER_PLAYERSTYLE
+
 /* Define this to the CPU frequency */
 #define CPU_FREQ 12000000 /* cycle time ~83.3ns */
 
