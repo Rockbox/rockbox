@@ -173,6 +173,7 @@ static void draw_screen(struct mp3entry* id3)
 
 int player_id3_show(void)
 {
+#ifdef HAVE_PLAYER_KEYPAD
     int button;
     int menu_pos = 0;
     int menu_max = 6;
@@ -286,7 +287,8 @@ int player_id3_show(void)
         lcd_update();
         yield();
     }
-
+#endif
+    return(0);
 }
 
 void display_keylock_text(bool locked)
@@ -489,13 +491,13 @@ int wps_show(void)
                 break;
 
             case BUTTON_MENU | BUTTON_ON:
+                int retval;
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
                     break;
                 }
-                int retval;
                 dont_go_to_menu = true;
                 lcd_stop_scroll();
                 retval = player_id3_show();
@@ -532,7 +534,7 @@ int wps_show(void)
 #endif
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1: | BUTTON_UP:
+            case BUTTON_F1 | BUTTON_UP:
 #else
             case BUTTON_MENU | BUTTON_UP:
 #endif
