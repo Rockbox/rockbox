@@ -24,10 +24,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include "file.h"
+#include "debug.h"
+#include "system.h"
 
 /*** definitions ***/
 
-#define LCDR (PBDR+1)
+#define LCDR (PBDR_ADDR+1)
 
 /* PA14 : /LCD-BL --- backlight */
 #define LCD_BL 6
@@ -170,7 +172,7 @@ static int scroll_count = 0;
  *
  */ 
 
-
+#define ASM_IMPLEMENTATION
 
 static void lcd_write(bool command, int byte)
 
@@ -196,11 +198,12 @@ static void lcd_write(bool command, int byte)
              :
              : /* %0 */ "r"(((unsigned)byte)<<16),
              /* %1 */ "r"(8),
-             /* %2 */ "I"(~(LCD_SC|LCD_SD)),
+             /* %2 */ "I"(~(LCD_SC|LCD_SD|LCD_DS)),
              /* %3 */ "I"(LCD_SD),
-             /* %4 */ "I"(LCD_SC|LCD_DS),
+             /* %4 */ "I"(LCD_SC),
              /* %5 */ "z"(LCDR));
     else
+#if 0
         asm ("shll8  %0\n"
              "0:       \n\t"
              "and.b  %2, @(r0,gbr)\n\t"
@@ -215,10 +218,69 @@ static void lcd_write(bool command, int byte)
              :
              : /* %0 */ "r"(((unsigned)byte)<<16),
              /* %1 */ "r"(8),
-             /* %2 */ "I"(~(LCD_SC|LCD_DS|LCD_SD)),
-             /* %3 */ "I"(LCD_SD),
-             /* %4 */ "I"(LCD_SC),
+             /* %2 */ "I"(~(LCD_SC|LCD_SD)),
+             /* %3 */ "I"(LCD_SD|LCD_DS),
+             /* %4 */ "I"(LCD_SC|LCD_DS),
              /* %5 */ "z"(LCDR));
+#else
+        asm ("shll8  %0\n"
+             "0:       \n\t"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             "and.b  %2, @(r0,gbr)\n\t"
+             "shll   %0\n\t"  
+             "bf     1f\n\t"
+             "or.b   %3, @(r0,gbr)\n"
+             "1:       \n\t"
+             "or.b   %4, @(r0,gbr)\n"
+             :
+             : /* %0 */ "r"(((unsigned)byte)<<16),
+             /* %1 */ "r"(8),
+             /* %2 */ "I"(~(LCD_SC|LCD_SD)),
+             /* %3 */ "I"(LCD_SD|LCD_DS),
+             /* %4 */ "I"(LCD_SC|LCD_DS),
+             /* %5 */ "z"(LCDR));
+#endif
 
     asm("or.b %0, @(r0,gbr)"
          :
@@ -496,6 +558,17 @@ void lcd_init (void)
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
 
+    /* We are using timer 2 */
+    
+    TSTR &= ~0x04; /* Stop the timer */
+    TSNC &= ~0x04; /* No synchronization */
+    TMDR &= ~0x04; /* Operate normally */
+
+    TCNT2 = 0;   /* Start counting at 0 */
+    TCR2 = 0x03; /* sysclock/8 */
+
+    TSTR |= 0x04; /* Start timer 2 */
+
     lcd_clear_display();
     lcd_update();
     create_thread(scroll_thread, scroll_stack,
@@ -509,7 +582,15 @@ void lcd_init (void)
 void lcd_update (void)
 {
     int x, y;
+#ifdef DEBUG
+    int t1;
+    int t;
+    int i, d;
+    int tk1, tk2;
 
+    TCNT2 = 0;
+    tk1 = current_tick;
+#endif
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
@@ -520,6 +601,14 @@ void lcd_update (void)
         for (x = 0; x < LCD_WIDTH; x++)
             lcd_write (false, display[x][y]);
     }
+#ifdef DEBUG
+    tk2 = current_tick;
+    t1 = TCNT2;
+    t = (t1 * 10) / (FREQ/8000);
+    i = t / 10;
+    d = t % 10;
+    DEBUGF("TCNT2: %d, (%d.%d ms), %d\n", t1, i, d, tk2-tk1);
+#endif
 }
 
 #endif /* SIMULATOR */
