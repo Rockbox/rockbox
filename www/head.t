@@ -28,20 +28,14 @@
 
 <p align="right">
 <a class="menulink" href="/">home</a><br>
-<a class="menulink" href="/docs/features.html">features</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/screenshots/">screen&nbsp;shots</a><br>
 <a class="menulink" href="/docs/">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
-<a class="menulink" href="/internals/">photos</a><br>
 <a class="menulink" href="/daily.shtml">daily builds</a><br>
-<a class="menulink" href="/mods/">hardware mods</a><br>
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
 <a class="menulink" href="/bugs.shtml">bug reports</a><br>
 <a class="menulink" href="/patches.shtml">patches</a><br>
-<a class="menulink" href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">CVS</a><br>
-<a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
 <form action="http://www.google.com/search">

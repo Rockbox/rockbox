@@ -58,10 +58,14 @@ Archos Jukebox Recorder V2
 
 <h2>Source code</h2>
 <p><a href="rockbox-2.2.tar.gz">rockbox-2.2.tar.gz</a>
+<p>
+... or get the source directly off the <a href="/cvs.html">CVS server</a>.
 
 <h2>Manual</h2>
 
-<p>We have a <a href="/manual/manual.pdf">manual in PDF format</a>. Please read it.
+<p>We have a <a href="/manual/manual.pdf">manual in PDF format</a>. Please
+read it. Check out the <a href="/docs/">documentation</a> page for further
+info.
 
 <h2>Bug reports</h2>
 

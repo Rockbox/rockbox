@@ -1,23 +1,26 @@
 #define _PAGE_ Documentation
 #include "head.t"
 
-<h2>For users</h2>
+<h2>For Users</h2>
 <ul>
 <li> <a href="/manual/manual.pdf">User manual</a> (pdf, ~300 KB) (<a href="/manual/manual.txt">plain text version</a>, 105KB)
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
 <li> <a href="/screenshots/">Screenshots</a> of Rockbox.
-<p>
+</ul>
+<h2>For Advanced Users</h2>
+<ul>
 <li> <a href="nodo.html">Features We Will Not Implement</a>
 <li> <a href="features.html">Feature Comparison Chart</a>
 <li> <a href="custom_wps_format.html">How to make a custom WPS</a>
 <li> <a href="custom_cfg_format.html">How to make a custom config file</a>
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
 
-<li> Good external user forums devoted to Archos: <a
+<li> External forums devoted to Archos: <a
 href="http://forums.funmp3players.com/forum/forum.asp?forum_id=8&forum_title=General+%2D+Jukebox+Player%2FRecorder">funmp3players.com</a>,
 <a href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000
-on yahoo</a> and <a href="http://www.newmp3technology.net/forum/">newmp3technology.net</a>.
+on yahoo</a> and <a
+href="http://www.newmp3technology.net/forum/">newmp3technology.net</a>.
 
 <li> Small help texts for your <a href="Help-JBR.txt">Recorder</A> or <a
 href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
@@ -29,7 +32,7 @@ Archos. (Jean Boullier)
 
 </ul>
 
-<h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">hackers</a></h2>
+<h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">Hackers</a></h2>
 
 <h3>Howtos</h3>
 <ul>
@@ -42,6 +45,7 @@ Archos. (Jean Boullier)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
 <li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a> 
 <li> <a href="flash.html">How to flash Rockbox on your Archos</a>
+<li> <a href="http://sourceforge.net/cvs/?group_id=44306">How to check out Rockbox from CVS</a>
 <li> <a href="http://bjorn.haxx.se/isd200/">Linux driver for Archos Player/Studio</a>
 </ul>
 
@@ -91,7 +95,7 @@ PC can talk to your Archos
 
 </ul>
 
-<h2>External pages</h2>
+<h2>External Pages</h2>
 <ul>
 <li><a href="http://waechter.wiz.at/~matthias/Rockbox/HW-Mod/8MB/">Matthias Wächter 8BM RAM mod</a>
 <li><a href="http://www.uwe-freese.de/rockbox/8mb_ram_en.html">Uwe Freese's 8MB RAM mod for Recorders</a>

@@ -73,4 +73,7 @@ The batch timestamp is GMT.
 </td>
 </tr></table>
 
+<p>
+<a href="/cvs.html">How to use CVS</a>.
+
 #include "foot.t"
