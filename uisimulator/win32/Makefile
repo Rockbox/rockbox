@@ -67,8 +67,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mno-cygwin
 
-UNAME := $(shell uname)
-ifeq ($(UNAME),CYGWIN_NT-5.1)
+UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
+ifeq ($(UNAME),CYGWIN)
   CC = gcc
   WINDRES = windres
   DEFINES += -DNOCYGWIN
