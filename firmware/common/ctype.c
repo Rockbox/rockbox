@@ -1,6 +1,6 @@
 #include <ctype.h>
 
-char    _ctype_[]={
+char    _ctype_[257]={
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
 	_C,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C,	_C,
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
