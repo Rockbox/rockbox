@@ -720,7 +720,7 @@ int create_xing_header(int fd, int startpos, int filesize,
     memcpy(buf + index + 100, cooltext, sizeof(cooltext));
 
 #ifdef DEBUG
-    for(i = 0;i < info.framesize;i++)
+    for(i = 0;i < info.frame_size;i++)
     {
         if(i && !(i % 16))
             DEBUGF("\n");
