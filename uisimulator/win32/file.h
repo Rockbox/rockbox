@@ -19,11 +19,15 @@
 
 #ifndef _FILE_H_
 
+#include <io.h>
+#include <fcntl.h>
+
 int win32_rename(char *oldpath, char *newpath);
 int win32_filesize(int fd);
 
 #define rename(x,y) win32_rename(x,y)
 #define filesize(x) win32_filesize(x)
+#define flush(x) _commit(x)
 
 #include "../../firmware/include/file.h"
 
