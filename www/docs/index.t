@@ -37,7 +37,6 @@ Archos. (Jean Boullier)
 <li> <a href="patch.html">How To Work With Patches</a>
 <li> <a href="/cross-gcc.html">Building the cross compiler</a> (linux/cygwin)
 <li> <a href="http://rockbox.my-vserver.de/win32-sdk.html">Setup a cygwin Rockbox development environment</a> (Windows)
-<li> <a href="/sh-win/">Setting up the gnush cross compiler</a> (Windows)
 <li> <a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
 <li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a> 
