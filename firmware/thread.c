@@ -23,9 +23,9 @@ typedef union
     struct regs_t
     {
         unsigned int  r[7]; /* Registers r8 thru r14 */
+        void          *sp;  /* Stack pointer (r15) */
         unsigned int  mach,
                       macl;
-        void          *sp;  /* Stack pointer (r15) */
         unsigned int  sr;   /* Status register */
 #if 0
         void*         gbr;  /* Global base register */
