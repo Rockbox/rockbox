@@ -25,6 +25,8 @@
 
 long current_tick = 0;
 
+void (*tick_funcs[NUM_TICK_TASKS])(void);
+
 static void tick_start(unsigned int interval_in_ms);
 
 /****************************************************************************
@@ -32,6 +34,14 @@ static void tick_start(unsigned int interval_in_ms);
  ****************************************************************************/
 void kernel_init(void)
 {
+    int i;
+
+    /* Clear the tick task array */
+    for(i = 0;i < NUM_TICK_TASKS;i++)
+    {
+        tick_funcs[i] = NULL;
+    }
+    
     tick_start(1000/HZ);
 }
 
@@ -103,9 +113,6 @@ bool queue_empty(struct event_queue* q)
 /****************************************************************************
  * Timer tick
  ****************************************************************************/
-#define NUM_TICK_TASKS 4
-void (*tick_funcs[NUM_TICK_TASKS])(void) = {NULL, NULL, NULL, NULL};
-
 static void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;
