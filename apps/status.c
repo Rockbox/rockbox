@@ -30,7 +30,7 @@
 #endif
 #include "powermgmt.h"
 
-static enum playmode current_mode;
+static enum playmode current_mode = STATUS_STOP;
 
 #ifdef HAVE_LCD_BITMAP
 bool statusbar_enabled = true;
