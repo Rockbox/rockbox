@@ -267,6 +267,7 @@ void buttonbar_set(char* caption1, char *caption2, char *caption3)
 
 void buttonbar_draw(void)
 {
+    lcd_clearrect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
     draw_buttonbar_btn(0, stored_caption1);
     draw_buttonbar_btn(1, stored_caption2);
     draw_buttonbar_btn(2, stored_caption3);
