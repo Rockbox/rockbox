@@ -28,12 +28,7 @@ ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DIRS = .
 
-ifdef ENABLEDPLUGINS
 all: $(OBJDIR)/libplugin.a $(ROCKS) $(DEPFILE)
-else
-all:
-	@echo "no plugin support yet"
-endif
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a $(DEPFILE)
 	@echo "LD $@"
