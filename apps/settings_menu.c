@@ -31,11 +31,12 @@
 #include "settings.h"
 #include "settings_menu.h"
 #include "backlight.h"
-#include "playlist.h"  /* for playlist_shuffle */
+#include "playlist.h"           /* for playlist_shuffle */
 #include "fat.h"                /* For dotfile settings */
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
+#include "usb.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -51,41 +52,45 @@ static bool contrast(void)
 /**
  * Menu to set the hold time of normal peaks.
  */
-static bool peak_meter_hold(void) {
+static bool peak_meter_hold(void) 
+{
     char* names[] = { str(LANG_OFF),
-        "200 ms ", "300 ms ", "500 ms ", "1 s ", "2 s ",
-        "3 s ", "4 s ", "5 s ", "6 s ", "7 s",
-        "8 s", "9 s", "10 s", "15 s", "20 s",
-        "30 s", "1 min"
+                      "200 ms ", "300 ms ", "500 ms ", "1 s ", "2 s ",
+                      "3 s ", "4 s ", "5 s ", "6 s ", "7 s",
+                      "8 s", "9 s", "10 s", "15 s", "20 s",
+                      "30 s", "1 min"
     };
     return set_option( str(LANG_PM_PEAK_HOLD), 
-        &global_settings.peak_meter_hold, names,
-        18, NULL);
+                       &global_settings.peak_meter_hold, names,
+                       18, NULL);
 }
 
 /**
  * Menu to set the hold time of clips.
  */
-static bool peak_meter_clip_hold(void) {
+static bool peak_meter_clip_hold(void) 
+{
     char* names[] = { str(LANG_PM_ETERNAL),
-        "1s ", "2s ", "3s ", "4s ", "5s ",
-        "6s ", "7s ", "8s ", "9s ", "10s",
-        "15s", "20s", "25s", "30s", "45s",
-        "60s", "90s", "2min", "3min", "5min",
-        "10min", "20min", "45min", "90min"
+                      "1s ", "2s ", "3s ", "4s ", "5s ",
+                      "6s ", "7s ", "8s ", "9s ", "10s",
+                      "15s", "20s", "25s", "30s", "45s",
+                      "60s", "90s", "2min", "3min", "5min",
+                      "10min", "20min", "45min", "90min"
     };
+
     return set_option( str(LANG_PM_CLIP_HOLD), 
-        &global_settings.peak_meter_clip_hold, names,
-        25, peak_meter_set_clip_hold);
+                       &global_settings.peak_meter_clip_hold, names,
+                       25, peak_meter_set_clip_hold);
 }
 
 /**
  * Menu to set the release time of the peak meter.
  */
-static bool peak_meter_release(void)  {
+static bool peak_meter_release(void)  
+{
     return set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ), 
-             &global_settings.peak_meter_release,
-             NULL, 1, 1, LCD_WIDTH);
+                    &global_settings.peak_meter_release,
+                    NULL, 1, 1, LCD_WIDTH);
 }
 
 /**
@@ -124,7 +129,7 @@ static bool repeat_mode(void)
     int old_repeat = global_settings.repeat_mode;
 
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
-        names, 3, NULL );
+                         names, 3, NULL );
 
     if (old_repeat != global_settings.repeat_mode)
         mpeg_flush_and_reload_tracks();
@@ -142,6 +147,7 @@ static bool dir_filter(void)
     char* names[] = { str(LANG_FILTER_ALL),
                       str(LANG_FILTER_SUPPORTED),
                       str(LANG_FILTER_MUSIC) };
+
     return set_option( str(LANG_FILTER), &global_settings.dirfilter,
                        names, 3, NULL );
 }
@@ -156,6 +162,7 @@ static bool resume(void)
     char* names[] = { str(LANG_SET_BOOL_NO), 
                       str(LANG_RESUME_SETTING_ASK),
                       str(LANG_SET_BOOL_YES) };
+
     return set_option( str(LANG_RESUME), &global_settings.resume,
                        names, 3, NULL );
 }
@@ -175,6 +182,7 @@ static bool backlight_timer(void)
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
+
     return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
                       names, 19, backlight_set_timeout );
 }
@@ -185,6 +193,7 @@ static bool poweroff_idle_timer(void)
                       "1m ", "2m ", "3m ", "4m ", "5m ",
                       "6m ", "7m ", "8m ", "9m ", "10m",
                       "15m", "30m", "45m", "60m"};
+
     return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
                       names, 15, set_poweroff_timeout);
 }
@@ -290,6 +299,7 @@ static bool ff_rewind_min_step(void)
                       "5s", "6s", "8s", "10s",
                       "15s", "20s", "25s", "30s",
                       "45s", "60s" };
+
     return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
                       names, 14, NULL ); 
 } 
@@ -300,6 +310,7 @@ static bool ff_rewind_accel(void)
                       "2x/4s", "2x/5s", "2x/6s", "2x/7s", 
                       "2x/8s", "2x/9s", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
+
     return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
                       names, 16, NULL ); 
 } 
@@ -345,35 +356,52 @@ static bool playback_settings_menu(void)
 
 static bool reset_settings(void)
 {
-    int button = 0;
+    bool done=false;
+    int line;
+ 
+    lcd_clear_display();
+
+#ifdef HAVE_LCD_CHARCELLS
+    line = 0;
+#else
+    line = 1;
+    lcd_puts(0,0,str(LANG_RESET_ASK_RECORDER));
+#endif
+    lcd_puts(0,line,str(LANG_RESET_CONFIRM));
+    lcd_puts(0,line+1,str(LANG_RESET_CANCEL));
+
+    lcd_update();
 
     lcd_clear_display();
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_puts(0,0,str(LANG_RESET_ASK_PLAYER));
-    lcd_puts(0,1,str(LANG_RESET_CONFIRM_PLAYER));
+     
+    while(!done) {
+        switch(button_get(true)) {
+        case BUTTON_PLAY:
+            settings_reset();
+            settings_apply();
+            lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
+            done = true;
+            break;
+
+#ifdef HAVE_LCD_BITMAP
+        case BUTTON_OFF:
 #else
-    lcd_puts(0,0,str(LANG_RESET_ASK_RECORDER));
-    lcd_puts(0,1,str(LANG_RESET_CONFIRM_RECORDER));
-    lcd_puts(0,2,str(LANG_RESET_CANCEL_RECORDER));
+        case BUTTON_STOP:
 #endif
-    lcd_update();
-    button = button_get(true);
-    if (button == BUTTON_PLAY) {
-        settings_reset();
-        settings_apply();
-        lcd_clear_display();
-        lcd_puts(0,0,str(LANG_RESET_DONE_SETTING));
-        lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
-        lcd_update();
-        sleep(HZ);
-        return(true);
-    } else {
-        lcd_clear_display();
-        lcd_puts(0,0,str(LANG_RESET_DONE_CANCEL));
-        lcd_update();
-        sleep(HZ);
-        return(false);
+            lcd_puts(0,1,str(LANG_RESET_DONE_CANCEL));
+            done = true;
+            break;
+
+        case SYS_USB_CONNECTED:
+            usb_screen();
+            return true;
+        }
     }
+
+    lcd_puts(0,0,str(LANG_RESET_DONE_SETTING));
+    lcd_update();
+    sleep(HZ);
+    return false;
 }
 
 static bool fileview_settings_menu(void)
@@ -454,3 +482,9 @@ bool settings_menu(void)
     menu_exit(m);
     return result;
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * end:
+ */
