@@ -25,10 +25,10 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 CVSROOT /usr/bin/syncmail -C4 -u %1{sVv} bjorn@haxx.se
-^apps /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^flash /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^firmware /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^docs /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^uisimulator /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^tools /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
-^gdb /usr/bin/syncmail -C4 -u %1{sVv} rockbox-cvs@cool.haxx.se
+^apps /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^flash /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^firmware /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^docs /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^uisimulator /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^tools /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
+^gdb /usr/bin/syncmail -C4 -u -S "$USER:" %1{sVv} rockbox-cvs@cool.haxx.se
