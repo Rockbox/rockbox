@@ -39,9 +39,13 @@ void panicf( const char *fmt, ...)
     bool state = false;
 
     /* Disable interrupts */
+#if CONFIG_CPU == SH7034
     asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
+#elif CONFIG_CPU == MCF5249
+    asm volatile ("move.w #0x2700,%sr");
 #endif
-    
+#endif
+
     va_start( ap, fmt );
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
