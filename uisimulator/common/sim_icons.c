@@ -26,6 +26,8 @@
 #include <string.h>
 #include <debug.h>
 
+extern void lcd_print_icon(int x, int icon_line, bool enable, char **icon);
+
 static char* icon_battery_3[]=
   {
  "***************  ",
