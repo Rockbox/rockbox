@@ -298,8 +298,8 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     
-    char (*strchr)(const char *s, int c);
-    char (*strcat)(char *s1, const char *s2);
+    char *(*strchr)(const char *s, int c);
+    char *(*strcat)(char *s1, const char *s2);
 
 };
 
