@@ -70,8 +70,12 @@
 
 #define CMD_READ_SECTORS           0x20
 #define CMD_WRITE_SECTORS          0x30
+#define CMD_READ_MULTIPLE          0xC4
+#define CMD_WRITE_MULTIPLE         0xC5
+#define CMD_SET_MULTIPLE_MODE      0xC6
 #define CMD_STANDBY_IMMEDIATE      0xE0
 #define CMD_STANDBY                0xE2
+#define CMD_IDENTIFY               0xEC
 #define CMD_SLEEP                  0xE6
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
@@ -96,6 +100,9 @@ static int delayed_sector_num;
 static long last_user_activity = -1;
 static long last_disk_activity = -1;
 
+static int multisectors; /* number of supported multisectors */
+static unsigned short identify_info[SECTOR_SIZE];
+
 #ifdef USE_POWEROFF
 static int ata_power_on(void);
 #endif
@@ -110,13 +117,9 @@ static int wait_for_bsy(void)
         yield();
 
     if (TIME_BEFORE(current_tick, timeout))
-    {
         return 1;
-    }
     else
-    {
         return 0; /* timeout */
-    }
 }
 
 static int wait_for_rdy(void) __attribute__ ((section (".icode")));
@@ -134,13 +137,9 @@ static int wait_for_rdy(void)
         yield();
 
     if (TIME_BEFORE(current_tick, timeout))
-    {
         return STATUS_RDY;
-    }
     else
-    {
         return 0; /* timeout */
-    }
 }
 
 static int wait_for_start_of_transfer(void) __attribute__ ((section (".icode")));
@@ -166,7 +165,6 @@ int ata_read_sectors(unsigned long start,
                      int count,
                      void* buf)
 {
-    int i;
     int ret = 0;
 
     last_disk_activity = current_tick;
@@ -193,7 +191,7 @@ int ata_read_sectors(unsigned long start,
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
-        return -1;
+        return -2;
     }
 
     led(true);
@@ -207,27 +205,36 @@ int ata_read_sectors(unsigned long start,
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
     ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
-    ATA_COMMAND = CMD_READ_SECTORS;
+    ATA_COMMAND = CMD_READ_MULTIPLE;
 
-    for (i=0; i<count; i++) {
+    while (count) {
         int j;
+        int sectors;
+
         if (!wait_for_start_of_transfer())
         {
+            led(false);
             mutex_unlock(&ata_mtx);
             return -1;
         }
 
         /* if destination address is odd, use byte copying,
            otherwise use word copying */
+
+        if (count >= multisectors )
+            sectors = multisectors;
+        else
+            sectors = count;
+
         if ( (unsigned int)buf & 1 ) {
-            for (j=0; j<SECTOR_SIZE/2; j++) {
+            for (j=0; j < sectors * SECTOR_SIZE / 2; j++) {
                 unsigned short tmp = SWAB16(ATA_DATA);
                 ((unsigned char*)buf)[j*2] = tmp >> 8;
                 ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
             }
         }
         else {
-            for (j=0; j<SECTOR_SIZE/2; j++)
+            for (j=0; j < sectors * SECTOR_SIZE / 2; j++)
                 ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
         }
 
@@ -235,13 +242,14 @@ int ata_read_sectors(unsigned long start,
         /* reading the status register clears the interrupt */
         j = ATA_STATUS;
 #endif
-        buf += SECTOR_SIZE; /* Advance one sector */
+        buf += sectors * SECTOR_SIZE; /* Advance one sector */
+        count -= sectors;
     }
 
-    led(false);
-
     if(!wait_for_end_of_transfer())
-        ret = -1;
+        ret = -3;
+
+    led(false);
 
     mutex_unlock(&ata_mtx);
 
@@ -283,7 +291,7 @@ int ata_write_sectors(unsigned long start,
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
-        return 0;
+        return -2;
     }
 
     led(true);
@@ -318,7 +326,8 @@ int ata_write_sectors(unsigned long start,
 
     led(false);
 
-    i = wait_for_end_of_transfer();
+    if(!wait_for_end_of_transfer())
+        i = -3;
 
     mutex_unlock(&ata_mtx);
 
@@ -375,7 +384,7 @@ static int freeze_lock(void)
     ATA_COMMAND = CMD_SECURITY_FREEZE_LOCK;
 
     if (!wait_for_rdy())
-        return -1;
+        return -2;
 
     return 0;
 }
@@ -415,7 +424,7 @@ static int ata_perform_sleep(void)
     if (!wait_for_rdy())
     {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
-        ret = -1;
+        ret = -2;
     }
 #endif
     sleeping = true;
@@ -479,7 +488,7 @@ int ata_hard_reset(void)
 
     PADR |= 0x0200;
 
-    ret =  wait_for_rdy();
+    ret = wait_for_rdy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
@@ -624,6 +633,31 @@ void ata_enable(bool on)
     PAIOR |= 0x80;
 }
 
+static int identify(void)
+{
+    int i;
+
+    if(!wait_for_rdy()) {
+        DEBUGF("identify() - not RDY\n");
+        return -1;
+    }
+
+    ATA_SELECT = ata_device;
+    ATA_COMMAND = CMD_IDENTIFY;
+
+    if (!wait_for_start_of_transfer())
+    {
+        DEBUGF("identify() - CMD failed\n");
+        return -2;
+    }
+
+    for (i=0; i<SECTOR_SIZE/2; i++)
+        /* the IDENTIFY words are already swapped */
+        identify_info[i] = ATA_DATA;
+    
+    return 0;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
@@ -644,6 +678,11 @@ int ata_init(void)
         
         if (freeze_lock())
             return -4;
+
+        if (identify())
+            return -5;
+        multisectors = identify_info[47] & 0xff;
+        DEBUGF("ata: %d sectors per ata request\n",multisectors);
         
         queue_init(&ata_queue);
         create_thread(ata_thread, ata_stack,
