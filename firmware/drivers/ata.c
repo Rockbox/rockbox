@@ -717,6 +717,11 @@ static int set_multiple_mode(int sectors)
     return 0;
 }
 
+unsigned short* ata_get_identify(void)
+{
+    return identify_info;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);

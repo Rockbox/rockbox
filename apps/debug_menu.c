@@ -39,6 +39,7 @@
 #include "disk.h"
 #include "mpeg.h"
 #include "settings.h"
+#include "ata.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1080,6 +1081,81 @@ static bool view_runtime(void)
     return false;
 }
 
+static bool dbg_disk_info(void)
+{
+    char buf[128];
+    bool done = false;
+    int i;
+    int page = 0;
+    const int max_page = 2;
+    unsigned short* identify_info = ata_get_identify();
+
+    while(!done)
+    {
+        int y=0;
+        int key;
+        lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+        lcd_puts(0, y++, "Disk info:");
+        y++;
+#endif
+
+        switch (page) {
+        case 0:
+            for (i=0; i < 20; i++)
+                ((unsigned short*)buf)[i]=identify_info[i+27];
+            buf[40]=0;
+            /* kill trailing space */
+            for (i=39; i && buf[i]==' '; i--)
+                buf[i] = 0;
+            lcd_puts(0, y++, "Model");
+            lcd_puts_scroll(0, y++, buf);
+            break;
+
+        case 1:
+            for (i=0; i < 4; i++)
+                ((unsigned short*)buf)[i]=identify_info[i+23];
+            buf[8]=0;
+            lcd_puts(0, y++, "Firmware");
+            lcd_puts(0, y++, buf);
+            break;
+
+        case 2:
+            snprintf(buf, sizeof buf, "%d MB",
+                     ((unsigned)identify_info[61] << 16 | 
+                      (unsigned)identify_info[60]) / 2048 );
+            lcd_puts(0, y++, "Size");
+            lcd_puts(0, y++, buf);
+        }
+        lcd_update();
+
+        /* Wait for a key to be pushed */
+        key = button_get_w_tmo(HZ*5);
+        switch(key) {
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_STOP | BUTTON_REL:
+#else
+            case BUTTON_OFF | BUTTON_REL:
+#endif
+                done = true;
+                break;
+
+            case BUTTON_LEFT:
+                if (--page < 0)
+                    page = max_page;
+                break;
+                
+            case BUTTON_RIGHT:
+                if (++page > max_page)
+                    page = 0;
+                break;
+        }
+        lcd_stop_scroll();
+    }
+
+    return false;
+}
+
 bool debug_menu(void)
 {
     int m;
@@ -1105,6 +1181,7 @@ bool debug_menu(void)
 #endif
         { "View HW info", dbg_hw_info },
         { "View partitions", dbg_partitions },
+        { "View disk info", dbg_disk_info },
 #ifdef HAVE_LCD_BITMAP
         { "View mpeg thread", dbg_mpeg_thread },
 #ifdef PM_DEBUG
