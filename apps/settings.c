@@ -888,8 +888,10 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "bidir limit"))
             set_cfg_int(&global_settings.bidir_limit, value, 0, 200);
 #ifdef HAVE_LCD_BITMAP
-        else if (!strcasecmp(name, "font"))
-            strncpy(global_settings.font_file, value, MAX_FILENAME);
+        else if (!strcasecmp(name, "font")) {
+            if (!font_load(value))
+                set_file(value, global_settings.font_file, MAX_FILENAME);
+        }
         else if (!strcasecmp(name, "scroll step"))
             set_cfg_int(&global_settings.scroll_step, value, 1, LCD_WIDTH);
         else if (!strcasecmp(name, "statusbar"))
