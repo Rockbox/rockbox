@@ -626,12 +626,27 @@ static void scroll_thread(void)
                     int jumping_scroll=s->jump_scroll;
                     update = true;
                     if (s->jump_scroll) {
-                        s->offset+=s->jump_scroll_steps;
+
+                        /* Find new position to start jump scroll by
+                         * finding last white space within
+                         * jump_scroll_steps */
+                        int i;
+                        o = s->offset = s->offset + s->jump_scroll_steps;
+                        for (i = 0; i < s->jump_scroll_steps; i++, o--) {
+                            if (o < s->textlen &&
+                                ((0x20 <= s->text[o] && s->text[o] <= 0x2f) || s->text[o] == '_'))
+                            {
+                                s->offset = o;
+                                break;
+                            }
+                        }
+
                         s->scroll_start_tick = current_tick +
                             jump_scroll_delay;
                         /* Eat space */
                         while (s->offset < s->textlen &&
-                               s->text[s->offset] == ' ') {
+                               ((0x20 <= s->text[s->offset] && s->text[s->offset] <= 0x2f) ||
+                                s->text[s->offset] == '_')) {
                             s->offset++;
                         }
                         if (s->offset >= s->textlen) {
@@ -667,7 +682,7 @@ static void scroll_thread(void)
                     o=s->offset;
                     while (i<11) {
                         buffer[i++]=s->text[o++];
-                        if (o==s->textlen)
+                        if (o==s->textlen /* || (jump_scroll && buffer[i-1] == ' ') */)
                             break;
                     }
                     o=0;
