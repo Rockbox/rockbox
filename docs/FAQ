@@ -751,18 +751,18 @@ A78: Linus Nielsen Feltzing replied to a similar question on April 17th 2004,
      The MAS quality setting is just a way of selecting an average bit rate
      according to the following table (quality 0 is on the far left):
 
-     FREQUENCY        BITRATE IN KBIT/S
-     ------------------------------------------------------
-     44100Hz stereo:  75, 80, 90, 100, 120, 140, 160, 170
-     22050Hz stereo:  39, 41, 45, 50, 60, 80, 110, 130
-     44100Hz mono:    65, 68, 73, 80, 90, 105, 125, 140
-     22050Hz mono:    35, 38, 40, 45, 50, 60, 75, 90
+      FREQUENCY        BITRATE IN KBIT/S
+      ------------------------------------------------------
+      44100Hz stereo:  75, 80, 90, 100, 120, 140, 160, 170
+      22050Hz stereo:  39, 41, 45, 50, 60, 80, 110, 130
+      44100Hz mono:    65, 68, 73, 80, 90, 105, 125, 140
+      22050Hz mono:    35, 38, 40, 45, 50, 60, 75, 90
 
      (This table can be found on page 38 in the MAS3587 data sheet.)
 
      MPEG VERSIONS
 
      The different MPEG versions use different sample rates:
-     44100, 48000, 32000: MPEG version 1
-     22050, 24000, 16000: MPEG version 2
-     11025, 12000, 8000: MPEG version 2.5 (not an official standard)
+      44100, 48000, 32000: MPEG version 1
+      22050, 24000, 16000: MPEG version 2
+      11025, 12000, 8000: MPEG version 2.5 (not an official standard)
