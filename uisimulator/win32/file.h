@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#ifndef _FILE_H_
+
 #include <stdio.h>
 #include <string.h>
 
@@ -26,3 +28,6 @@ int win32_rename(char *oldpath, char *newpath);
 
 #include "../../firmware/include/file.h"
 
+#undef rename
+
+#endif
