@@ -29,7 +29,12 @@ extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, char *string);
-extern void lcd_update(void);
+
+#ifdef SIMULATOR
+  extern void lcd_update(void);
+#else
+  #define lcd_update()
+#endif
 
 #ifdef HAVE_LCD_CHARCELLS
 #    define LCD_ICON_BATTERY         0
