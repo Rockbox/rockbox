@@ -854,7 +854,7 @@ static void dma_tick(void)
             if(num_bytes < 0)
                 num_bytes += mp3buflen;
 
-            if(mp3buflen - num_bytes < MPEG_LOW_WATER && !saving)
+            if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
             {
                 saving = true;
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
@@ -1940,7 +1940,8 @@ static void mpeg_thread(void)
                        or if we should stop recording */
                     if(amount_to_save)
                     {
-                        if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
+                        if(mp3buflen -
+                           amount_to_save < MPEG_RECORDING_LOW_WATER ||
                            stop_pending)
                         {
                             int rc;

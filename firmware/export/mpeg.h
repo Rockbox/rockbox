@@ -26,6 +26,7 @@
                               wouldn't be able to see the difference between
                               an empty buffer and a full one. */
 #define MPEG_LOW_WATER  0x60000
+#define MPEG_RECORDING_LOW_WATER  0x80000
 #define MPEG_LOW_WATER_CHUNKSIZE  0x40000
 #define MPEG_LOW_WATER_SWAP_CHUNKSIZE  0x10000
 #define MPEG_PLAY_PENDING_THRESHOLD 0x10000
