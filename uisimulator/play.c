@@ -29,6 +29,10 @@
 
 #include "id3.h"
 
+#ifdef MPEG_PLAY
+#include "x11/mpegplay.h"
+#endif
+
 #define LINE_Y      8 /* initial line */
 #define LINE_HEIGTH 8 /* line height in pixels */
 
@@ -66,6 +70,12 @@ void playtune(char *dir, char *file)
     lcd_puts(0, LINE_Y+5*LINE_HEIGTH, buffer, 0);
   }
   lcd_update();
+#endif
+
+#ifdef MPEG_PLAY
+  sprintf(buffer, "%s/%s", dir, file);
+  mpeg_play(buffer);
+  return;
 #endif
 
   while(1) {

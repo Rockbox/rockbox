@@ -57,6 +57,12 @@ APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
+ifdef MPEG_PLAY
+  SRCS += mpegplay.c
+  DEFINES += -DMPEG_PLAY
+  LIBS = -lmad
+endif
+
 OBJS := $(SRCS:c=o)
 
 all: $(TARGET)
@@ -108,7 +114,7 @@ sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): $(OBJS)
-	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS)
+	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 
 DEPS:=.deps
 
