@@ -21,7 +21,8 @@
 
 #include <stdbool.h>
 
-void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc);
+void mpeg_init(int volume, int bass, int treble, int balance,
+               int loudness, int bass_boost, int avc);
 void mpeg_play(int offset);
 void mpeg_stop(void);
 void mpeg_pause(void);
@@ -30,7 +31,6 @@ void mpeg_next(void);
 void mpeg_prev(void);
 void mpeg_ff_rewind(int change);
 void mpeg_flush_and_reload_tracks(void);
-bool mpeg_is_playing(void);
 void mpeg_sound_set(int setting, int value);
 int mpeg_sound_min(int setting);
 int mpeg_sound_max(int setting);
@@ -41,6 +41,7 @@ char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
 bool mpeg_has_changed_track(void);
+int mpeg_status(void);
 #ifdef HAVE_MAS3587F
 void mpeg_set_pitch(int percent);
 #endif
@@ -59,5 +60,9 @@ void mpeg_set_pitch(int percent);
 #define MPEG_SOUND_MONO 1
 #define MPEG_SOUND_MONO_LEFT 2
 #define MPEG_SOUND_MONO_RIGHT 3
+
+#define MPEG_STATUS_PLAY 1
+#define MPEG_STATUS_PAUSE 2
+#define MPEG_STATUS_RECORD 4
 
 #endif

@@ -1528,9 +1528,17 @@ void mpeg_flush_and_reload_tracks(void)
 #endif
 }
 
-bool mpeg_is_playing(void)
+int mpeg_status(void)
 {
-    return is_playing;
+    int ret = 0;
+
+    if(is_playing)
+        ret |= MPEG_STATUS_PLAY;
+
+    if(paused)
+        ret |= MPEG_STATUS_PAUSE;
+
+    return ret;
 }
 
 #ifndef SIMULATOR

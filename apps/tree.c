@@ -851,7 +851,7 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_ON:
-                if (mpeg_is_playing())
+                if (mpeg_status() & MPEG_STATUS_PLAY)
                 {
                     lcd_stop_scroll();
                     if (wps_show() == SYS_USB_CONNECTED)

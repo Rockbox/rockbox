@@ -355,7 +355,8 @@ static bool ffwd_rew(int button)
                 }
                 else
                 {
-                    if ( mpeg_is_playing() && id3 && id3->length )
+                    if ( (mpeg_status() & MPEG_STATUS_PLAY) &&
+                          id3 && id3->length )
                     {
                         if (!paused)
                             mpeg_pause();
@@ -907,7 +908,7 @@ int wps_show(void)
 
     ff_rewind = false;
 
-    if(mpeg_is_playing())
+    if(mpeg_status() & MPEG_STATUS_PLAY)
     {
         id3 = mpeg_current_track();
         if (id3) {
