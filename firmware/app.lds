@@ -17,8 +17,8 @@ MEMORY
    FLASH (RX) : ORIGIN = 0x000000, LENGTH = 1024K
    ICMEM (RX) : ORIGIN = 0x3FC000, LENGTH = 32K
    IMEM1 : ORIGIN = 0x200000, LENGTH = 32K
-   IMEM2 : ORIGIN = 0x210000, LENGTH = 32K
-   IMEM3 : ORIGIN = 0x220000, LENGTH = 16K
+   IMEM2 : ORIGIN = 0x210000, LENGTH = 16K
+   IMEM3 : ORIGIN = 0x220000, LENGTH = 32K
    IMEM4 : ORIGIN = 0x230000, LENGTH = 16K
 
    DRAM : ORIGIN = 0x000000, LENGTH = 0x3F0000
@@ -29,11 +29,11 @@ SECTIONS
 .text LOADADDRESS : {
 	*(.init.text)
 	*(.text) 
-	*(.icode) /* We don't put it in ICMEM coz crt1 uses LCD (now)*/
 	}> FLASH  AT> FIRMWARE 
 
 .icode 0x3FC040: {
 	*(.vectors)
+	*(.icode)
 	}> ICMEM  AT> FIRMWARE
 
 /* We start at 0x2000, to avoid overwriting Archos' loader datasegment.
@@ -65,9 +65,9 @@ SECTIONS
 	*(.idata)
 }> IMEM1
 
-.idata2 0x210000: {
+.idata2 0x220000: {
 	*(.idata2)
-}> IMEM2
+}> IMEM3
 
 _codesize = SIZEOF(.text);
 
