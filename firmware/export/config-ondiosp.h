@@ -49,9 +49,6 @@
 /* FM recorders can wake up from RTC alarm */
 /* #define HAVE_ALARM_MOD 1 */
 
-/* Define this if you have an FM Radio */
-#define HAVE_FMRADIO 0
-
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
 
