@@ -98,7 +98,9 @@ int main(void)
 #include "power.h"
 #include "talk.h"
 #include "plugin.h"
+#ifdef CONFIG_TUNER
 #include "radio.h"
+#endif
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
