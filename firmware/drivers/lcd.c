@@ -820,10 +820,11 @@ static void scroll_thread(void)
             else
                 s->offset++;
             
-            if (s->offset > s->textlen) {
+            if (s->offset >= s->textlen) {
+                lcd_puts(s->startx + s->textlen - s->offset, s->starty," ");
                 scroll_count = scroll_speed; /* prevent wrap */
                 s->offset=0;
-                s->xpos = s->space;
+                s->xpos = s->space-1;
             }
         }
         sleep(HZ/scroll_speed);
