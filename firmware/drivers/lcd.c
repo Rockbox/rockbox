@@ -82,104 +82,50 @@
  *
  */ 
 
-void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
-void lcd_write(bool command, int byte)
+void lcd_write_command(int byte) __attribute__ ((section (".icode")));
+void lcd_write_command(int byte)
 {
-    asm("and.b %0, @(r0,gbr)"
-         :
-         : /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
-           /* %1 */ "z"(LCDR));
+    asm (
+        "and.b   %0, @(r0,gbr)"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
+        /* %1 = r0 */ "z"(LCDR)
+    );
 
-    if (command)
-        asm ("shll8 %0\n"
-             "0:      \n\t"
-             "and.b %2,@(r0,gbr)\n\t"
-             "shll  %0\n\t"  
-             "bf    1f\n\t"
-             "or.b  %3,@(r0,gbr)\n"
-             "1:      \n\t"
-             "or.b  %4,@(r0,gbr)\n"
-             "add   #-1,%1\n\t"
-             "cmp/pl %1\n\t"
-             "bt    0b"
-             :
-             : /* %0 */ "r"(((unsigned)byte)<<16),
-             /* %1 */ "r"(8),
-             /* %2 */ "I"(~(LCD_SC|LCD_SD|LCD_DS)),
-             /* %3 */ "I"(LCD_SD),
-             /* %4 */ "I"(LCD_SC),
-             /* %5 */ "z"(LCDR));
-    else
-        asm ("shll8  %0\n"
-             "0:       \n\t"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             "and.b  %2, @(r0,gbr)\n\t"
-             "shll   %0\n\t"  
-             "bf     1f\n\t"
-             "or.b   %3, @(r0,gbr)\n"
-             "1:       \n\t"
-             "or.b   %4, @(r0,gbr)\n"
-             :
-             : /* %0 */ "r"(((unsigned)byte)<<16),
-             /* %1 */ "r"(8),
-             /* %2 */ "I"(~(LCD_SC|LCD_SD)),
-             /* %3 */ "I"(LCD_SD|LCD_DS),
-             /* %4 */ "I"(LCD_SC|LCD_DS),
-             /* %5 */ "z"(LCDR));
+    asm (
+        "0:                      \n"
+        "and.b   %2,@(r0,gbr)    \n"
+        "shll    %0              \n"
+        "bf      1f              \n"
+        "or.b    %3,@(r0,gbr)    \n"
+        "1:                      \n"
+        "or.b    %4,@(r0,gbr)    \n"
+        "add     #-1,%1          \n"
+        "cmp/pl  %1              \n"
+        "bt      0b              \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(((unsigned)byte)<<24),
+        /* %1 */ "r"(8),
+        /* %2 */ "I"(~(LCD_SC|LCD_SD|LCD_DS)),
+        /* %3 */ "I"(LCD_SD),
+        /* %4 */ "I"(LCD_SC),
+        /* %5 = r0 */ "z"(LCDR)
+    );
 
-    asm("or.b %0, @(r0,gbr)"
-         :
-         : /* %0 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC),
-           /* %1 */ "z"(LCDR));
+    asm (
+        "or.b    %0, @(r0,gbr)"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC),
+        /* %1 = r0 */ "z"(LCDR)
+    );
 }
 
 
 /* A high performance function to write data to the display, 
-   one or multiple bytes.
-   Ultimately, all calls to lcd_write(false, xxx) should be substituted by 
-   this, it will be most efficient if the LCD buffer is tilted to have the
-   X row as consecutive bytes, so we can write a whole row */
+   one or multiple bytes. */
 void lcd_write_data(unsigned char* p_bytes, int count) __attribute__ ((section (".icode")));
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -199,16 +145,16 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
-            "mov.b  @%2,%0\n" /* sda1 = PBDRL */
-            "or     %4,%0\n"  /* sda1 |= LCD_DS | LCD_SD     DS and SD high, */
-            "and    %3,%0\n"  /* sda1 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
-            "mov    %0,%1\n"  /* sda1 -> clk0sda0 */
-            "and    %5,%1\n"  /* clk0sda0 &= ~LCD_SD  both low */
-            "mov.b  %1,@%2\n" /* PBDRL = clk0sda0 */
-            : // outputs
+            "mov.b   @%2,%0  \n" /* sda1 = PBDRL */
+            "or      %4,%0   \n" /* sda1 |= LCD_DS | LCD_SD     DS and SD high, */
+            "and     %3,%0   \n" /* sda1 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
+            "mov     %0,%1   \n" /* sda1 -> clk0sda0 */
+            "and     %5,%1   \n" /* clk0sda0 &= ~LCD_SD  both low */
+            "mov.b   %1,@%2  \n" /* PBDRL = clk0sda0 */
+            : /* outputs */
             /* %0 */ "=r"(sda1),
             /* %1 */ "=r"(clk0sda0)
-            : // inputs
+            : /* inputs */
             /* %2 */ "r"(LCDR),
             /* %3 */ "r"(~(LCD_CS | LCD_SC)),
             /* %4 */ "r"(LCD_DS | LCD_SD),
@@ -217,72 +163,71 @@ void lcd_write_data(unsigned char* p_bytes, int count)
         
         /* unrolled loop to serialize the byte */
         asm (
-            "mov    %4,r0\n" /* we need &PBDRL in r0 for "or.b x,@(r0,gbr)" */
-            
-            "shll   %0\n" /* shift the MSB into carry */
-            "bf     1f\n"
-            "mov.b  %1,@%4\n" /* if it was a "1": set SD high, SC low still */
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n" /* rise SC (independent of SD level) */
-            "shll   %0\n" /* shift for next round, now for longer hold time */
-            "mov.b  %3,@%4\n" /* SC and SD low again */
+            "shll    %0              \n" /* shift the MSB into carry */
 
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n"
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
-            "shll   %0\n"
-            "mov.b  %3,@%4\n"
-            
-            "bf     1f\n"
-            "mov.b  %1,@%4\n" /* set SD high, SC low still */
-            "1:       \n"
-            "or.b   %2, @(r0,gbr)\n" /* rise SC (independent of SD level) */
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n" /* if it was a "1": set SD high, SC low still */
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n" /* rise SC (independent of SD level) */
+            "shll    %0              \n" /* shift for next round, now for longer hold time */
+            "mov.b   %3,@%4          \n" /* SC and SD low again */
 
-            "or.b   %5, @(r0,gbr)\n" /* restore port */
-            :
-            : /* %0 */ "r"(byte),
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n"
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n"
+            "shll    %0              \n"
+            "mov.b   %3,@%4          \n"
+
+            "bf      1f              \n"
+            "mov.b   %1,@%4          \n" /* set SD high, SC low still */
+            "1:                      \n"
+            "or.b    %2,@(r0,gbr)    \n" /* rise SC (independent of SD level) */
+
+            "or.b    %5,@(r0,gbr)    \n" /* restore port */
+            : /* outputs */
+            : /* inputs */
+            /* %0 */ "r"(byte),
             /* %1 */ "r"(sda1),
             /* %2 */ "I"(LCD_SC),
             /* %3 */ "r"(clk0sda0),
-            /* %4 */ "r"(LCDR),
+            /* %4 = r0 */ "z"(LCDR),
             /* %5 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC)
-            : "r0"
         );
 
         /* This is the place to reenable the interrupts, if we have disabled
@@ -309,11 +254,11 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
-            "mov.b  @%1,r0\n" /* r0 = PBDRL */
-            "or     %3,r0\n"  /* r0 |= LCD_DS | LCD_SD     DS and SD high, */
-            "and    %2,r0\n"  /* r0 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
-            "mov.b  r0,@%1\n" /* PBDRL = r0 */
-            "neg    r0,%0\n"  /* sda1 = 0-r0 */
+            "mov.b   @%1,r0  \n" /* r0 = PBDRL */
+            "or      %3,r0   \n" /* r0 |= LCD_DS | LCD_SD     DS and SD high, */
+            "and     %2,r0   \n" /* r0 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
+            "mov.b   r0,@%1  \n" /* PBDRL = r0 */
+            "neg     r0,%0   \n" /* sda1 = 0-r0 */
             : /* outputs: */
             /* %0 */ "=r"(sda1)
             : /* inputs: */
@@ -326,56 +271,56 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
         /* unrolled loop to serialize the byte */
         asm (
-            "shll   %0    \n" /* shift the MSB into carry */
-            "negc   %1, r0\n" /* carry to SD, SC low */
-            "mov.b  r0,@%3\n" /* set data to port */
-            "or     %2, r0\n" /* rise SC (independent of SD level) */
-            "mov.b  r0,@%3\n" /* set to port */
+            "shll    %0      \n" /* shift the MSB into carry */
+            "negc    %1, r0  \n" /* carry to SD, SC low */
+            "mov.b   r0,@%3  \n" /* set data to port */
+            "or      %2, r0  \n" /* rise SC (independent of SD level) */
+            "mov.b   r0,@%3  \n" /* set to port */
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "shll   %0    \n"
-            "negc   %1, r0\n"
-            "mov.b  r0,@%3\n"
-            "or     %2, r0\n"
-            "mov.b  r0,@%3\n"
+            "shll    %0      \n"
+            "negc    %1, r0  \n"
+            "mov.b   r0,@%3  \n"
+            "or      %2, r0  \n"
+            "mov.b   r0,@%3  \n"
 
-            "or     %4, r0\n" /* restore port */
-            "mov.b  r0,@%3\n"
+            "or      %4, r0  \n" /* restore port */
+            "mov.b   r0,@%3  \n"
             : /* outputs: */
             : /* inputs: */
             /* %0 */ "r"(byte),
@@ -393,3 +338,5 @@ void lcd_write_data(unsigned char* p_bytes, int count)
     } while (--count); /* tail loop is faster */
 }
 #endif /* #ifdef HAVE_LCD_CHARCELLS */
+
+

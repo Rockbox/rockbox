@@ -94,7 +94,7 @@ int kbd_input(char* text, int buflen)
   lcd_puts(0, 0, kbdbuffer);
   kbd_show_legend(screen);
   lcd_cursor(cursorpos, 0);
-  lcd_write(true, LCD_BLINKCUR);
+  lcd_write_command(LCD_BLINKCUR);
   
   pstart = pcursor = kbdbuffer;
 
@@ -140,7 +140,7 @@ int kbd_input(char* text, int buflen)
               case BUTTON_IR|NEO_IR_BUTTON_STOP:
                   
                   /* Remove blinking cursor */
-                  lcd_write(true,LCD_OFFCUR);
+                  lcd_write_command(LCD_OFFCUR);
                   done = true;
           }
       }

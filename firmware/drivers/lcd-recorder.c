@@ -143,19 +143,19 @@ void lcd_init (void)
     PBIOR |= 0x000f; /* IOR = 1 */
 
     /* inits like the original firmware */
-    lcd_write(true, LCD_SOFTWARE_RESET);
-    lcd_write(true, LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
-    lcd_write(true, LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
-    lcd_write(true, LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
-    lcd_write(true, LCD_SET_DISPLAY_ON);
-    lcd_write(true, LCD_SET_NORMAL_DISPLAY);
-    lcd_write(true, LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
-    lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
-    lcd_write(true, LCD_SET_DISPLAY_START_LINE + 0);
+    lcd_write_command(LCD_SOFTWARE_RESET);
+    lcd_write_command(LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
+    lcd_write_command(LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
+    lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
+    lcd_write_command(LCD_SET_DISPLAY_ON);
+    lcd_write_command(LCD_SET_NORMAL_DISPLAY);
+    lcd_write_command(LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
+    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
+    lcd_write_command(LCD_SET_DISPLAY_START_LINE + 0);
     lcd_set_contrast(lcd_default_contrast());
-    lcd_write(true, LCD_SET_PAGE_ADDRESS);
-    lcd_write(true, LCD_SET_LOWER_COLUMN_ADDRESS + 0);
-    lcd_write(true, LCD_SET_HIGHER_COLUMN_ADDRESS + 0);
+    lcd_write_command(LCD_SET_PAGE_ADDRESS);
+    lcd_write_command(LCD_SET_LOWER_COLUMN_ADDRESS + 0);
+    lcd_write_command(LCD_SET_HIGHER_COLUMN_ADDRESS + 0);
 
     lcd_clear_display();
     lcd_update();
@@ -171,9 +171,9 @@ void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int s
     /* Copy display bitmap to hardware */
     while (height--)
     {
-        lcd_write (true, LCD_CNTL_PAGE | (y++ & 0xf));
-        lcd_write (true, LCD_CNTL_HIGHCOL | (((x+xoffset)>>4) & 0xf));
-        lcd_write (true, LCD_CNTL_LOWCOL | ((x+xoffset) & 0xf));
+        lcd_write_command (LCD_CNTL_PAGE | (y++ & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+xoffset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+xoffset) & 0xf));
 
         lcd_write_data(p_data, width);
         p_data += stride;
@@ -193,9 +193,9 @@ void lcd_update (void)
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
-        lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write (true, LCD_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
-        lcd_write (true, LCD_CNTL_LOWCOL | (xoffset & 0xf));
+        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | (xoffset & 0xf));
 
         lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
     }
@@ -224,9 +224,9 @@ void lcd_update_rect (int x_start, int y,
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
-        lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write (true, LCD_CNTL_HIGHCOL | (((x_start+xoffset)>>4) & 0xf));
-        lcd_write (true, LCD_CNTL_LOWCOL | ((x_start+xoffset) & 0xf));
+        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x_start+xoffset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x_start+xoffset) & 0xf));
 
         lcd_write_data (&lcd_framebuffer[y][x_start], width);
     }
@@ -234,16 +234,16 @@ void lcd_update_rect (int x_start, int y,
 
 void lcd_set_contrast(int val)
 {
-    lcd_write(true, LCD_CNTL_CONTRAST);
-    lcd_write(true, val);
+    lcd_write_command(LCD_CNTL_CONTRAST);
+    lcd_write_command(val);
 }
 
 void lcd_set_invert_display(bool yesno)
 {
     if (yesno) 
-        lcd_write(true, LCD_SET_REVERSE_DISPLAY);
+        lcd_write_command(LCD_SET_REVERSE_DISPLAY);
     else 
-        lcd_write(true, LCD_SET_NORMAL_DISPLAY);
+        lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -251,14 +251,14 @@ void lcd_set_flip(bool yesno)
 {
     if (yesno) 
     {
-        lcd_write(true, LCD_SET_SEGMENT_REMAP);
-        lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
+        lcd_write_command(LCD_SET_SEGMENT_REMAP);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
         xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 112 we have */
     }
     else 
     {
-        lcd_write(true, LCD_SET_SEGMENT_REMAP | 0x01);
-        lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
+        lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
         xoffset = 0;
     }
 }
@@ -274,7 +274,7 @@ void lcd_set_flip(bool yesno)
  */
 void lcd_roll(int lines)
 {
-    lcd_write(true, LCD_SET_DISPLAY_START_LINE | (lines & (LCD_HEIGHT-1)));
+    lcd_write_command(LCD_SET_DISPLAY_START_LINE | (lines & (LCD_HEIGHT-1)));
 }
 
 #endif /* SIMULATOR */

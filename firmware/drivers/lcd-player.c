@@ -111,6 +111,8 @@ static char lcd_cram;
 static char lcd_pram;
 static char lcd_iram;
 
+static unsigned char lcd_data_byte; /* global write buffer */
+
 unsigned short buffer_xlcd[11][2];
 unsigned short buffer_lcd_mirror[11][2];
 
@@ -122,7 +124,7 @@ unsigned char hardware_buffer_lcd[11][2];
 static void lcd_free_pat(int map_ch)
 {
     int x, y;
-    unsigned short substitute_char;
+    unsigned char substitute_char;
 
     int pat;
     pat=extended_chars_mapped[map_ch];
@@ -140,8 +142,8 @@ static void lcd_free_pat(int map_ch)
 #ifdef SIMULATOR
                     hardware_buffer_lcd[x][y]=substitute_char;
 #else
-                    lcd_write(true, LCD_CURSOR(x, y));
-                    lcd_write(false, substitute_char);
+                    lcd_write_command(LCD_CURSOR(x, y));
+                    lcd_write_data(&substitute_char, 1);
 #endif
                 }
             }
@@ -240,8 +242,8 @@ void xlcd_update(void)
 #ifdef SIMULATOR
             hardware_buffer_lcd[x][y]=hw_ch;
 #else
-            lcd_write(true,LCD_CURSOR(x,y));
-            lcd_write(false, hw_ch);
+            lcd_write_command(LCD_CURSOR(x,y));
+            lcd_write_data(&hw_ch, 1);
 #endif
         }
     }
@@ -274,8 +276,9 @@ bool lcdx_putc(int x, int y, unsigned short ch)
 #ifdef SIMULATOR
     hardware_buffer_lcd[x][y]=lcd_char;
 #else
-    lcd_write(true, LCD_CURSOR(x, y));
-    lcd_write(false, lcd_char);
+    lcd_data_byte = (unsigned char) lcd_char;
+    lcd_write_command(LCD_CURSOR(x, y));
+    lcd_write_data(&lcd_data_byte, 1);
 #endif
     return false;
 }
@@ -405,16 +408,14 @@ void lcd_define_pattern(int pat, char *pattern)
 #ifndef SIMULATOR
 void lcd_define_hw_pattern (int which,char *pattern,int length)
 {
-    int i;
-    lcd_write(true,lcd_pram | which);
-    for (i=0;i<length;i++)
-        lcd_write(false,pattern[i]);
+    lcd_write_command(lcd_pram | which);
+    lcd_write_data(pattern, length);
 }
 
 void lcd_double_height(bool on)
 {
     if(new_lcd)
-        lcd_write(true,on?9:8);
+        lcd_write_command(on?9:8);
 }
 
 static char icon_pos[] =
@@ -463,20 +464,21 @@ void lcd_icon(int icon, bool enable)
     pos = icon_pos[icon];
     mask = icon_mask[icon];
     
-    lcd_write(true, LCD_ICON(pos));
+    lcd_write_command(LCD_ICON(pos));
     
     if(enable)
         icon_mirror[pos] |= mask;
     else
         icon_mirror[pos] &= ~mask;
     
-    lcd_write(false, icon_mirror[pos]);
+    lcd_write_data(&icon_mirror[pos], 1);
 }
 
 void lcd_set_contrast(int val)
 {
-    lcd_write(true, lcd_contrast_set);
-    lcd_write(false, 31-val);
+    lcd_data_byte = (unsigned char) (31 - val);
+    lcd_write_command(lcd_contrast_set);
+    lcd_write_data(&lcd_data_byte, 1);
 }
 #endif /* SIMULATOR */
 
@@ -763,7 +765,7 @@ void lcd_cursor(int x, int y)
             value=0x80|(x+0x54);
             break;
     }
-    lcd_write(true,value);
+    lcd_write_command(value);
 }
 #endif
 
