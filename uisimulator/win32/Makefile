@@ -86,7 +86,7 @@ endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c
+	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c io.c
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
