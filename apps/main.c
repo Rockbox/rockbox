@@ -69,9 +69,6 @@ void init(void)
     show_logo();
     settings_reset();
     settings_load();
-    wps_load(ROCKBOX_DIR "/default.wps", false);
-    font_load(ROCKBOX_DIR "/default.fnt");
-    lang_load(ROCKBOX_DIR "/default.lng");
     sleep(HZ/2);
 }
 
@@ -149,9 +146,6 @@ void init(void)
     }
     
     settings_load();
-    wps_load(ROCKBOX_DIR "/default.wps", false);
-    font_load(ROCKBOX_DIR "/default.fnt");
-    lang_load(ROCKBOX_DIR "/default.lng");
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
