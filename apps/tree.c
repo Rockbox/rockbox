@@ -672,17 +672,18 @@ void xingupdate(int percent)
 void do_xing(char *filename)
 {
     char buf2[32];
-    unsigned long dbg_tick;
+    unsigned long start_tick;
+    unsigned long end_tick;
 
     lcd_clear_display();
     lcd_puts(0, 0, filename);
     lcd_update();
-    dbg_tick = current_tick;
+    start_tick = current_tick;
     mpeg_create_xing_header(filename, xingupdate);
-    dbg_tick = current_tick - dbg_tick;
-    snprintf(buf2, 32, "%d ticks", dbg_tick);
+    end_tick = current_tick;
+    snprintf(buf2, 32, "%d ticks", (int)(end_tick - start_tick));
     lcd_puts(0, 1, buf2);
-    snprintf(buf2, 32, "%d seconds", dbg_tick/HZ);
+    snprintf(buf2, 32, "%d seconds", (int)(end_tick - start_tick)/HZ);
     lcd_puts(0, 2, buf2);
     lcd_update();
 }
