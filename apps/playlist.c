@@ -978,7 +978,7 @@ int playlist_create(char *dir, char *file)
     
     update_playlist_filename(dir, file);
 
-    if (playlist.control_fd > 0)
+    if (playlist.control_fd >= 0)
     {
         if (fprintf(playlist.control_fd, "P:%d:%s:%s\n",
             PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
