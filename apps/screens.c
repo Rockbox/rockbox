@@ -166,9 +166,7 @@ int on_screen(void)
                 pitch++;
                 if ( pitch > 2000 )
                     pitch = 2000;
-#ifdef HAVE_MAS3587F
                 mpeg_set_pitch(pitch);
-#endif
                 break;
 
             case BUTTON_DOWN:
@@ -178,9 +176,7 @@ int on_screen(void)
                 pitch--;
                 if ( pitch < 500 )
                     pitch = 500;
-#ifdef HAVE_MAS3587F
                 mpeg_set_pitch(pitch);
-#endif
                 break;
 
             case BUTTON_ON | BUTTON_PLAY:

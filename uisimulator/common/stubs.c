@@ -170,3 +170,8 @@ void lcd_set_contrast( int x )
 {
     (void)x;
 }
+
+void mpeg_set_pitch(int pitch)
+{
+    (void)pitch;
+}
