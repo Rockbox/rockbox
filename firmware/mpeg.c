@@ -1315,8 +1315,7 @@ static void mpeg_thread(void)
                                inside the tag must be taken care of */
                             if(len < 0)
                                 len = 0;
-                            len = (len + 1) & 0xfffffffe;
-                        }
+                       }
 
                         mp3buf_write += len;
                         
@@ -1339,10 +1338,6 @@ static void mpeg_thread(void)
                         close(mpeg_file);
                         mpeg_file = -1;
                     
-                        /* Make sure that the write pointer is at a word
-                           boundary */
-                        mp3buf_write = (mp3buf_write + 1) & 0xfffffffe;
-
                         if(new_file(1) < 0)
                         {
                             /* No more data to play */
