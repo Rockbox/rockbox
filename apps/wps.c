@@ -127,9 +127,8 @@ int wps_show(void)
     unsigned int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
     bool lastvbr = false;
-#ifdef HAVE_PLAYER_KEYPAD
-    bool dont_quit = true;
-#endif
+    bool keys_locked = false;
+    bool dont_go_to_menu = false;
 
     lcd_clear_display();
 
@@ -195,20 +194,19 @@ int wps_show(void)
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
-#ifdef HAVE_PLAYER_KEYPAD
-                    /* We don't want to quit just yet. Let's wait until
-                       the key is released. */
-                    break;
-#else
-                    return 0;
+                    if(keys_locked)
+                        break;
+#ifdef HAVE_LCD_CHARCELLS
+                    lcd_icon(ICON_RECORD, false);
 #endif
+                    return 0;
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_PLAY:
 #else
                 case BUTTON_UP:
 #endif
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
 
                     if ( playing )
@@ -227,7 +225,7 @@ int wps_show(void)
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_UP:
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
                     global_settings.volume++;
                     if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
@@ -236,7 +234,7 @@ int wps_show(void)
                     break;
 
                 case BUTTON_DOWN:
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
                     global_settings.volume--;
                     if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
@@ -246,60 +244,85 @@ int wps_show(void)
 #endif
 
                 case BUTTON_LEFT:
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
                     mpeg_prev();
                     break;
 
                 case BUTTON_RIGHT:
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
                     mpeg_next();
                     break;
 
 #ifdef HAVE_PLAYER_KEYPAD
-                case BUTTON_LEFT | BUTTON_ON:
-                    dont_quit = true;
+                case BUTTON_MENU | BUTTON_LEFT:
+                    dont_go_to_menu = true;
                     global_settings.volume--;
                     if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                         global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     break;
 
-                case BUTTON_RIGHT | BUTTON_ON:
-                    dont_quit = true;
+                case BUTTON_MENU | BUTTON_RIGHT:
+                    dont_go_to_menu = true;
                     global_settings.volume++;
                     if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                         global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     break;
                     
-                case BUTTON_ON | BUTTON_REL:
-                    /* Quit if ON has been pressed without changing
-                       the volume */
-                    if(!dont_quit)
-                        return 0;
-
-                    dont_quit = false;
+                case BUTTON_MENU:
+                    lcd_icon(ICON_PARAM, true);
                     break;
 #endif
+
+#ifdef HAVE_RECORDER_KEYPAD
+                case BUTTON_F1 | BUTTON_DOWN:
+#else
+                case BUTTON_MENU | BUTTON_STOP:
+#endif
+                    keys_locked = !keys_locked;
+#ifdef HAVE_LCD_CHARCELLS
+                    lcd_icon(ICON_PARAM, false);
+                    if(keys_locked)
+                        lcd_icon(ICON_RECORD, true);
+                    else
+                        lcd_icon(ICON_RECORD, false);
+#endif
+                    dont_go_to_menu = true;
+                    break;
                     
 #ifdef HAVE_RECORDER_KEYPAD
-                case BUTTON_F1:
+                case BUTTON_F1 | BUTTON_REL:
 #else
-                case BUTTON_MENU:
+                case BUTTON_MENU | BUTTON_REL:
 #endif
-                    lcd_stop_scroll();
-                    main_menu();
-                    draw_screen(id3);
+#ifdef HAVE_LCD_CHARCELLS
+                    lcd_icon(ICON_PARAM, false);
+#endif
+                    if(!keys_locked && !dont_go_to_menu)
+                    {
+                        lcd_stop_scroll();
+                        main_menu();
+                        draw_screen(id3);
+                        /* Prevent any stray BUTTON_REL events from going
+                           back to the main menu until we get a new
+                           BUTTON_MENU event */
+                        dont_go_to_menu = true;
+                    }
+                    else
+                    {
+                        dont_go_to_menu = false;
+                    }
                     break;
 
-#ifdef HAVE_RECORDER_KEYPAD                
+#ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_OFF:
 #else
                 case BUTTON_DOWN:
 #endif
-                    if (global_settings.hold)
+                    if (keys_locked)
                         break;
                     mpeg_stop();
                     status_set_playmode(STATUS_STOP);
