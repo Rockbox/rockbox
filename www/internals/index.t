@@ -27,4 +27,9 @@
 <li> <a href="remote.html">Tjerk's photos of the archos remote control</a>
 </ul>
 
+<h2>"Freestyle" Photos</h2>
+<p>
+ Roland's "undressed" archos:<br>
+<a href="micromusic_archos_jb20rec.jpg"><img src="small-micromusic_archos_jb20rec.jpg" border="0"></a>
+
 #include "foot.t"
