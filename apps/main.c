@@ -181,13 +181,6 @@ void init(void)
 
     usb_start_monitoring();
 
-/* temporary hack for Ondio, which can't browse without disk I/O */
-#ifdef HAVE_MMC
-    while(button_get(true) & BUTTON_REL) {}; /* wait to see the logo */
-    while(1) main_menu(); /* just show the main menu, all we can do */
-#endif
-/* end of Ondio hack */
-
     pinfo = disk_init();
     if (!pinfo)
     {
@@ -230,7 +223,7 @@ void init(void)
     settings_apply();
 
     status_init();
-    playlist_init(); 
+    playlist_init();
     tree_init();
 
     /* No buffer allocation (see buffer.c) may take place after the call to
@@ -265,6 +258,13 @@ void init(void)
         }
     }
 #endif /* #ifdef AUTOROCK */
+
+/* temporary hack for Ondio */
+#ifdef HAVE_MMC
+    main_menu(); /* show the main menu once, since it is not yet callable
+                  * from the browser. The button handling needs a fix. */
+#endif
+/* end of Ondio hack */
 }
 
 int main(void)
