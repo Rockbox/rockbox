@@ -67,7 +67,7 @@ FIRMSRCS = lcd-recorder.c power.c sprintf.c id3.c usb.c		\
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c \
-	screens.c peakmeter.c
+	screens.c peakmeter.c viewer.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -148,6 +148,9 @@ $(OBJDIR)/main.o: $(APPDIR)/main.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/wps.o: $(APPDIR)/wps.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/viewer.o: $(APPDIR)/viewer.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/wps-display.o: $(APPDIR)/wps-display.c
