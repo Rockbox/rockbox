@@ -93,7 +93,7 @@ FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c $(EXTRAFI
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
-	screens.c peakmeter.c viewer.c sleeptimer.c keyboard.c
+	screens.c peakmeter.c viewer.c sleeptimer.c keyboard.c onplay.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -198,6 +198,9 @@ $(OBJDIR)/bmp.o: $(RECDIR)/bmp.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/tree.o: $(APPDIR)/tree.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/onplay.o: $(APPDIR)/onplay.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
