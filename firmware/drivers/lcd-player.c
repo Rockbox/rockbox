@@ -343,7 +343,8 @@ void lcd_remove_cursor(void)
         cursor.len=0;
         up = lcdx_putc(cursor.x_pos, cursor.y_pos, cursor.text[0]);
 #ifdef SIMULATOR
-        lcd_update();
+        if(up)
+            lcd_update();
 #endif
     }
 }
