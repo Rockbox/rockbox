@@ -63,19 +63,14 @@ int button_set_release(int newmask)
  */
 
 /* from uibasic.c */
-extern int screenhack_handle_events (void);
+extern int screenhack_handle_events(bool *release);
 
 static int get_raw_button (void)
 {
     int k;
-    static int next = 0;
-    if ( next ) {
-        k = next;
-        next = 0;
-        return k;
-    }
+    bool release=false; /* is this a release event */
 
-    switch(screenhack_handle_events())
+    switch(screenhack_handle_events(&release))
     {
 	case XK_KP_Left:
 	case XK_Left:
@@ -153,8 +148,9 @@ static int get_raw_button (void)
             break;
     }
 
-    if ( k )
-        next = k | BUTTON_REL;
+    if ( release )
+        /* return a release event */
+        k |= BUTTON_REL;
 
     return k;
 }

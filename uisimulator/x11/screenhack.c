@@ -188,9 +188,12 @@ static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 /* Dead-trivial event handling: exits if "q" or "ESC" are typed.
    Exit if the WM_PROTOCOLS WM_DELETE_WINDOW ClientMessage is received.
  */
-int screenhack_handle_event (Display *dpy, XEvent *event)
+int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
 {
     int key=0;
+
+    *release = FALSE;
+
     switch (event->xany.type) {
     case KeyPress:
       {
@@ -199,6 +202,18 @@ int screenhack_handle_event (Display *dpy, XEvent *event)
           XLookupString (&event->xkey, &c, 1, &keysym, 0);
           key = keysym;
           /*	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c); */
+      }
+      break;
+    case KeyRelease:
+      {
+          KeySym keysym;
+          unsigned char c = 0;
+          XLookupString (&event->xkey, &c, 1, &keysym, 0);
+          key = keysym;
+          /* fprintf(stderr, "KEY RELEASED: %c (%02x) %x\n", c, c,
+             event->xkey.keycode); */
+
+          *release = TRUE;
       }
       break;
     case ResizeRequest:
@@ -248,14 +263,14 @@ int screenhack_handle_event (Display *dpy, XEvent *event)
 }
 
 
-int screenhack_handle_events (void)
+int screenhack_handle_events(bool *release)
 {
     int key=0;
-    while (XPending (dpy))
+    while (XPending(dpy))
     {
         XEvent event;
-        XNextEvent (dpy, &event);
-        key=screenhack_handle_event (dpy, &event);
+        XNextEvent(dpy, &event);
+        key=screenhack_handle_event(dpy, &event, release);
     }
     return key;
 }
@@ -421,7 +436,7 @@ int main (int argc, char **argv)
             XWindowAttributes xgwa;
             XGetWindowAttributes (dpy, window, &xgwa);
             XSelectInput (dpy, window, 
-                          xgwa.your_event_mask | KeyPressMask | 
+                          xgwa.your_event_mask | KeyPressMask | KeyRelease |
                           ButtonPressMask | ResizeRedirectMask | ExposureMask);
             XChangeProperty (dpy, window, XA_WM_PROTOCOLS, XA_ATOM, 32,
                              PropModeReplace,
