@@ -303,7 +303,7 @@ void add_indices_to_playlist(void)
     int i = 0;
     int count = 0;
     int next_tick = current_tick + HZ;
-    bool store_index = true;
+    bool store_index;
 
     unsigned char *p = playlist_buffer;
     char line[16];
@@ -338,7 +338,7 @@ void add_indices_to_playlist(void)
             } 
             else if(store_index) 
             {
-				store_index = false;
+                store_index = false;
 
                 if(playlist.in_ram || (*p != '#'))
                 {
