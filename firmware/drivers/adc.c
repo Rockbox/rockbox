@@ -179,6 +179,17 @@ unsigned short adc_read(int channel)
     return adcdata[channel];
 }
 
+static int adc_counter;
+
+static void adc_tick(void)
+{
+    if(++adc_counter == HZ)
+    {
+        adc_counter = 0;
+        adcdata[ADC_BATTERY] = adc_scan(ADC_BATTERY);
+    }
+}
+
 void adc_init(void)
 {
     GPIO_FUNCTION |= 0x80600080; /* GPIO7:  CS
@@ -188,6 +199,10 @@ void adc_init(void)
     GPIO_ENABLE |= 0x00600080;
     GPIO_OUT |= 0x80;         /* CS high */
     GPIO_OUT &= ~0x00400000;  /* CLK low */
+
+    tick_add_task(adc_tick);
+
+    adcdata[3] = adc_scan(3);
 }
 
 #endif
