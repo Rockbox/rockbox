@@ -44,6 +44,10 @@
 #define ID_PLAYER   2
 #define ID_REC_V2   3
 
+/* We should never check for ARCHOS_* defines in source code. We must
+   check for features/hardware that have been defined in config-*.h files.
+   This makes it easier for us to maintain portability. */
+
 #if defined(ARCHOS_PLAYER)
 #define FILE_TYPE "player"
 #define KEEP VERSION_ADR /* keep the firmware version */
@@ -61,7 +65,7 @@
 #define KEEP MASK_ADR /* keep the mask value */
 #define PLATFORM_ID ID_FM
 #else
-#error ("No known platform given!")
+#error "No known platform given!"
 #endif
 
 /* result of the CheckFirmwareFile() function */
@@ -340,7 +344,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
         return eReadErr;
     }
 
-    // version number in file plausible with this hardware?
+    /* version number in file plausible with this hardware? */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(sector + VERSION_ADR)))
     {
         rb->close(fd);
