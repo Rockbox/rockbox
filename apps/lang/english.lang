@@ -58,12 +58,12 @@ new:
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMB"
+eng: "Buf: %d.%03dMB"
 new:
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMB"
+eng: "Buffer: %d.%03dMB"
 new:
 
 id: LANG_BATTERY_LEVEL_PLAYER
@@ -1009,4 +1009,9 @@ new:
 id: LANG_MONTH_DECEMBER
 desc: abbreviation for monthname
 eng: "Dec"
+new:
+
+id: LANG_CUBE
+desc: the name of the cube demo in the demo menu
+eng: "Cube"
 new:
