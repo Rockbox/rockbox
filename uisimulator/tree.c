@@ -28,6 +28,8 @@
 #include "kernel.h"
 #include "tree.h"
 
+#include "icons.h"
+
 #include "play.h"
 
 #define TREE_MAX_FILENAMELEN 64
@@ -50,17 +52,15 @@ struct entry {
 
 #ifdef HAVE_LCD_BITMAP
 
-static unsigned char fileimage[] = {
-  0x60, 0x7f, 0x03, 0x63, 0x7f, 0x00 };
+extern unsigned char bitmap_icons_6x8[LastIcon][6];
+extern icons_6x8;
 
-static unsigned char dirimage[] = {
-  0x3e, 0x26, 0x26, 0x24, 0x3c, 0x00 };
-
-int static
-showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
+int static showdir(char *path, struct entry *buffer, int start, 
+                   int scrollpos, int* at_end)
 {
   int i;
   int j=0;
+  int icon_type = 0;
   DIR *dir = opendir(path);
   struct dirent *entry;
 
@@ -89,8 +89,9 @@ showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
 
     buffer[i].file = !(entry->attribute&ATTR_DIRECTORY);
 
-    lcd_bitmap(buffer[i].file?
-               fileimage:dirimage, 6, LINE_Y+i*LINE_HEIGTH, 6, 8, TRUE);
+    buffer[i].file?(icon_type=FileIcon):(icon_type=DirIcon);
+    lcd_bitmap(bitmap_icons_6x8[icon_type], 6, LINE_Y+i*LINE_HEIGTH, 6, 
+               8, TRUE);
 
     if(len < TREE_MAX_LEN_DISPLAY)
       lcd_puts(LINE_X, LINE_Y+i*LINE_HEIGTH, buffer[i].name, 0);
