@@ -37,6 +37,7 @@
 #include "system.h"
 #include "font.h"
 #include "disk.h"
+#include "mpeg.h"
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -126,6 +127,45 @@ bool dbg_os(void)
                 currval = 0;
             break;
         }
+    }
+    return false;
+}
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+bool dbg_mpeg_thread(void)
+{
+    char buf[32];
+    int button;
+    struct mpeg_debug d;
+
+    while(1)
+    {
+        button = button_get_w_tmo(HZ/5);
+        switch(button)
+        {
+            case BUTTON_OFF | BUTTON_REL:
+                return false;
+        }
+
+        mpeg_get_debugdata(&d);
+        
+        lcd_clear_display();
+
+        snprintf(buf, sizeof(buf), "read: %x", d.mp3buf_read);
+        lcd_puts(0, 0, buf);
+        snprintf(buf, sizeof(buf), "write: %x", d.mp3buf_write);
+        lcd_puts(0, 1, buf);
+        snprintf(buf, sizeof(buf), "swap: %x", d.mp3buf_swapwrite);
+        lcd_puts(0, 2, buf);
+        snprintf(buf, sizeof(buf), "playing: %d", d.playing);
+        lcd_puts(0, 3, buf);
+        snprintf(buf, sizeof(buf), "unplayed: %x", d.unplayed_space);
+        lcd_puts(0, 4, buf);
+        snprintf(buf, sizeof(buf), "unswapped: %x", d.unswapped_space);
+        lcd_puts(0, 5, buf);
+        
+        lcd_update();
     }
     return false;
 }
@@ -968,6 +1008,9 @@ bool debug_menu(void)
 #endif
         { "View HW info", dbg_hw_info },
         { "View partitions", dbg_partitions },
+#ifdef HAVE_LCD_BITMAP
+        { "View mpeg thread", dbg_mpeg_thread },
+#endif
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
