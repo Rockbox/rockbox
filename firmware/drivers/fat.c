@@ -133,25 +133,6 @@ static int fat_cache_dirty[256];
 static unsigned char lastsector[SECTOR_SIZE];
 static unsigned char lastsector2[SECTOR_SIZE];
 
-#ifdef TEST_FAT
-
-int main(int argc, char *argv[])
-{
-    struct bpb bpb;
-    
-    memset(fat_cache, 0, sizeof(fat_cache));
-    memset(fat_cache_dirty, 0, sizeof(fat_cache_dirty));
-    
-    if(ata_init())
-        DEBUGF("*** Warning! The disk is uninitialized\n");
-    else
-        fat_mount(&bpb);
-
-    dbg_console(&bpb);
-    return 0;
-}
-#endif
-
 static int sec2cluster(struct bpb *bpb, unsigned int sec)
 {
     if ( sec < bpb->firstdatasector )
@@ -183,7 +164,7 @@ static int first_sector_of_cluster(struct bpb *bpb, unsigned int cluster)
     return (cluster - 2) * bpb->bpb_secperclus + bpb->firstdatasector;
 }
 
-int fat_mount(struct bpb *bpb)
+int fat_mount(struct bpb *bpb, int startsector)
 {
     unsigned char buf[SECTOR_SIZE];
     int err;
@@ -191,7 +172,7 @@ int fat_mount(struct bpb *bpb)
     int countofclusters;
 
     /* Read the sector */
-    err = ata_read_sectors(0,1,buf);
+    err = ata_read_sectors(startsector,1,buf);
     if(err)
     {
         DEBUGF( "fat_mount() - Couldn't read BPB (error code %i)\n",
@@ -200,6 +181,7 @@ int fat_mount(struct bpb *bpb)
     }
 
     memset(bpb, 0, sizeof(struct bpb));
+    bpb->startsector = startsector;
     
     strncpy(bpb->bs_oemname, &buf[BS_OEMNAME], 8);
     bpb->bs_oemname[8] = 0;
@@ -306,20 +288,6 @@ static int bpb_is_sane(struct bpb *bpb)
         DEBUGF( "bpb_is_sane() - Warning: RootEntCnt is not 512 (%i)\n",
                 bpb->bpb_rootentcnt);
     }
-    if(bpb->bpb_totsec16 < 200)
-    {
-        if(bpb->bpb_totsec16 == 0)
-        {
-            DEBUGF( "bpb_is_sane() - Error: TotSec16 is 0\n");
-            return -1;
-        }
-        else
-        {
-            DEBUGF( "bpb_is_sane() - Warning: TotSec16 "
-                    "is quite small (%i)\n",
-                    bpb->bpb_totsec16);
-        }
-    }
     if(bpb->bpb_media != 0xf0 && bpb->bpb_media < 0xf8)
     {
         DEBUGF( "bpb_is_sane() - Warning: Non-standard "
@@ -349,7 +317,7 @@ static void *cache_fat_sector(struct bpb *bpb, int secnum)
             DEBUGF( "cache_fat_sector() - Out of memory\n");
             return NULL;
         }
-        if(ata_read_sectors(secnum,1,sec))
+        if(ata_read_sectors(secnum+bpb->startsector,1,sec))
         {
             DEBUGF( "cache_fat_sector() - Could"
                     " not read sector %d\n",
@@ -447,14 +415,17 @@ static int flush_fat(struct bpb *bpb)
         {
             DEBUGF("Flushing FAT sector %d\n", i);
             sec = fat_cache[i];
-            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt,1,sec);
+            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt + bpb->startsector,
+                                    1,sec);
             if(err)
             {
                 DEBUGF( "flush_fat() - Couldn't write"
                         " sector (%d)\n", i + bpb->bpb_rsvdseccnt);
                 return -1;
             }
-            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt + fatsz,1,sec);
+            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt + fatsz +
+                                    bpb->startsector,
+                                    1,sec);
             if(err)
             {
                 DEBUGF( "flush_fat() - Couldn't write"
@@ -559,7 +530,7 @@ static int add_dir_entry(struct bpb *bpb,
 
         DEBUGF("Reading sector %d...\n", sec);
         /* Read the next sector in the current dir */
-        err = ata_read_sectors(sec,1,buf);
+        err = ata_read_sectors(sec + bpb->startsector,1,buf);
         if(err)
         {
             DEBUGF( "add_dir_entry() - Couldn't read dir sector"
@@ -624,7 +595,7 @@ static int add_dir_entry(struct bpb *bpb,
                         }
                     }
 
-                    err = ata_write_sectors(sec,1,buf);
+                    err = ata_write_sectors(sec + bpb->startsector,1,buf);
                     if(err)
                     {
                         DEBUGF( "add_dir_entry() - "
@@ -821,7 +792,8 @@ int fat_read(struct bpb *bpb,
     int err, i;
 
     for ( i=0; i<sectorcount; i++ ) {
-        err = ata_read_sectors(sector,1,(char*)buf+(i*SECTOR_SIZE));
+        err = ata_read_sectors(sector + bpb->startsector, 1,
+                               (char*)buf+(i*SECTOR_SIZE));
         if(err) {
             DEBUGF( "fat_read() - Couldn't read sector %d"
                     " (error code %i)\n", sector,err);
@@ -898,7 +870,7 @@ int fat_opendir(struct bpb *bpb,
     }
 
     /* Read the first sector in the current dir */
-    err = ata_read_sectors(sec,1,ent->cached_buf);
+    err = ata_read_sectors(sec + bpb->startsector,1,ent->cached_buf);
     if(err)
     {
         DEBUGF( "fat_getfirst() - Couldn't read dir sector"
@@ -1037,7 +1009,8 @@ int fat_getnext(struct bpb *bpb,
             }
    
             /* Read the next sector */
-            err = ata_read_sectors(ent->cached_sec,1,ent->cached_buf);
+            err = ata_read_sectors(ent->cached_sec + bpb->startsector, 1,
+                                   ent->cached_buf);
             if(err)
             {
                 DEBUGF( "fat_getnext() - Couldn't read dir sector"

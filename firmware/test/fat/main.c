@@ -4,6 +4,12 @@
 #include "fat.h"
 #include "ata.h"
 #include "debug.h"
+#include "disk.h"
+
+void dbg_dump_sector(int sec);
+void dbg_dump_buffer(unsigned char *buf);
+void dbg_print_bpb(struct bpb *bpb);
+void dbg_console(struct bpb *bpb);
 
 void dbg_dump_sector(int sec)
 {
@@ -189,3 +195,25 @@ void dbg_console(struct bpb* bpb)
         }
     }
 }
+
+int main(int argc, char *argv[])
+{
+    struct bpb bpb;
+    
+    if(ata_init()) {
+        DEBUGF("*** Warning! The disk is uninitialized\n");
+        return -1;
+    }
+    if (disk_init()) {
+        DEBUGF("*** Failed reading partitions\n");
+        return -1;
+    }
+
+    if(fat_mount(&bpb,part[0].start)) {
+        DEBUGF("*** Failed mounting fat\n");
+    }
+
+    dbg_console(&bpb);
+    return 0;
+}
+

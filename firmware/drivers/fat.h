@@ -60,6 +60,7 @@ struct bpb
     int totalsectors;
     int rootdirsector;
     int firstdatasector;
+    int startsector;
 };
 
 struct fat_direntry
@@ -100,7 +101,7 @@ struct fat_fileent
     int sectornum;       /* sector number in this cluster */
 };
 
-extern int fat_mount(struct bpb *bpb);
+extern int fat_mount(struct bpb *bpb, int startsector);
 
 #ifdef DISK_WRITE
 extern int fat_create_file(struct bpb *bpb, 

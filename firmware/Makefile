@@ -35,10 +35,10 @@ archos.bin : archos.elf
 	$(OC) -O binary archos.elf archos.bin
 
 archos.asm: archos.bin
-	sh2d -sh1 archos.bin > archos.asm
+	../tools/sh2d -sh1 archos.bin > archos.asm
 
 archos.mod : archos.bin
-	scramble archos.bin archos.mod
+	../tools/scramble archos.bin archos.mod
 
 dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
