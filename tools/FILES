@@ -1,3 +1,4 @@
 Makefile
 configure
 *.[ch]
+release
