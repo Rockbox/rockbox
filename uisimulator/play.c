@@ -94,7 +94,7 @@ void playtune(char *dir, char *file)
     switch(key) {
     case BUTTON_OFF:
     case BUTTON_LEFT:
-      return FALSE;
+      return;
       break;
     }
   }
