@@ -184,6 +184,9 @@ bool dirbrowse(char *root)
             continue;
         }
         switch(key) {
+            case BUTTON_OFF:
+                return false;
+
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
 #else
