@@ -23,6 +23,7 @@ plugins/rockboy/*.lds
 plugins/rockboy/Version
 plugins/rockboy/README
 plugins/rockboy/COPYING
+plugins/rockboy/HACKING
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
