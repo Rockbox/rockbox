@@ -135,6 +135,25 @@ static int get_raw_button (void)
 }
 
 /*
+ * Timeout after TICKS unless a key is pressed.
+ */
+int button_get_w_tmo(int ticks)
+{
+    int bits;
+    int i=0;
+
+    for(i=0; i< ticks; i++) {
+        bits = get_raw_button();
+        if(!bits)
+            x11_sleep(1);
+        else
+            break;
+    };
+
+    return bits;
+}
+
+/*
  * Get the currently pressed button.
  * Returns one of BUTTON_xxx codes, with possibly a modifier bit set.
  * No modifier bits are set when the button is first pressed.
