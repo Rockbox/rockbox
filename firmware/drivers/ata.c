@@ -310,7 +310,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
 }
 
-int ata_read_sectors(IF_MV((int drive,))
+int ata_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -321,6 +321,9 @@ int ata_read_sectors(IF_MV((int drive,))
     void* buf;
     int spinup_start;
 
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
     mutex_lock(&ata_mtx);
 
     last_disk_activity = current_tick;
@@ -577,7 +580,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 #endif
 }
 
-int ata_write_sectors(IF_MV((int drive,))
+int ata_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -586,6 +589,9 @@ int ata_write_sectors(IF_MV((int drive,))
     int ret = 0;
     int spinup_start;
 
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
     if (start == 0)
         panicf("Writing on sector 0\n");
 

@@ -1455,7 +1455,7 @@ static bool dbg_disk_info(void)
 
             case 3: {
                 unsigned int free;
-                fat_size( NULL, &free );
+                fat_size( IF_MV2(0,) NULL, &free );
                 snprintf(buf, sizeof buf, "%d MB",  free / 1024 );
                 lcd_puts(0, y++, "Free");
                 lcd_puts(0, y++, buf);
@@ -1530,7 +1530,7 @@ static bool dbg_disk_info(void)
 
             case 11:
                 lcd_puts(0, y++, "Cluster size");
-                snprintf(buf, 128, "%d bytes", fat_get_cluster_size());
+                snprintf(buf, 128, "%d bytes", fat_get_cluster_size(IF_MV(0)));
                 lcd_puts(0, y++, buf);
                 break;
         }
@@ -1560,7 +1560,7 @@ static bool dbg_disk_info(void)
                     lcd_puts(0,0,"Scanning");
                     lcd_puts(0,1,"disk...");
                     lcd_update();
-                    fat_recalc_free();
+                    fat_recalc_free(IF_MV(0));
                 }
                 break;
         }
