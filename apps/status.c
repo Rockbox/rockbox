@@ -202,8 +202,9 @@ void status_draw(void)
         if(charger_inserted()) {
             battery_state = true;
             plug_state = true;
-            if(charger_enabled) { /* animate battery if charging */
+            if (charge_state > 0) /* charge || top off || trickle */
                 global_settings.runtime = 0;
+            if ((charge_state == 1) || (charge_state == 2 )) { /* animate battery if charging or top-off charging*/
                 battlevel = battery_charge_step * 34; /* 34 for a better look */
                 battlevel = battlevel > 100 ? 100 : battlevel;
                 if(TIME_AFTER(current_tick, switch_tick)) {
