@@ -1491,7 +1491,6 @@ static bool dirbrowse(char *root, int *dirfilter)
 
                 if (dircache[i].attr & ATTR_DIRECTORY) /* directory? */
                 {
-                    int ret = 0;
                     /* play directory thumbnail */
                     if (global_settings.talk_dir == 3) /* hover */
                     {   // "schedule" a thumbnail, to have a little dalay */
