@@ -23,12 +23,12 @@
 
 int strcasecmp (const char *a, const char *b)
 {
-    return strcmp (a, b);
+    return stricmp (a, b);
 }
 
-int strncasecmp (const char *a, const char *b)
+int strncasecmp (const char *a, const char *b, size_t n)
 {
-    return strcmpi (a, b);
+    return _strnicmp (a, b, n);
 }
 
 #endif
