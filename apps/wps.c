@@ -224,8 +224,8 @@ int wps_load_custom_config(void)
     char ch = '/';
     char* szLast;
 
-    szLast = strrchr(id3->path, ch);
     id3 = mpeg_current_track();
+    szLast = strrchr(id3->path, ch);
     snprintf(buffer, sizeof(buffer), "");
     lcd_stop_scroll();
     fd = open("/wps.config", O_RDONLY);
