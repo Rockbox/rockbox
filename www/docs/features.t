@@ -44,7 +44,7 @@ EFEAT
 NAME Mid-track resume ENAME
 YES
 NO
-NO
+YES
 EFEAT
 
 NAME Mid-playlist resume ENAME
@@ -140,7 +140,7 @@ EFEAT
 NAME Text File Reader ENAME
 YES
 YES
-NO
+YES
 EFEAT
 
 NAME Games (Recorder) ENAME
@@ -158,7 +158,7 @@ EFEAT
 NAME File Delete & Rename ENAME
 YES
 YES
-NO
+<td class=fgood>Partly (delete)ETD
 EFEAT
 
 NAME Playlist Building ENAME
@@ -200,13 +200,13 @@ EFEAT
 NAME Backlight-on when charging option ENAME
 YES
 NO
-NO
+YES
 EFEAT
 
 NAME Queue function ENAME
 YES
 YES
-NO
+
 EFEAT
 
 NAME Supports the XING header ENAME
@@ -284,7 +284,7 @@ EFEAT
 NAME Queue songs to play next ENAME
 YES
 YES
-UNKNOWN
+YES
 EFEAT
 
 NAME Bookmark positions in songs ENAME
