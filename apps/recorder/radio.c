@@ -124,7 +124,16 @@ void radio_stop(void)
 
 bool radio_hardware_present(void)
 {
+#ifdef HAVE_TUNER_PWR_CTRL
+    bool ret;
+    int fmstatus = radio_get_status(); /* get current state */
+    radio_set_status(FMRADIO_PLAYING); /* power it up */
+    ret = radio_get(RADIO_PRESENT);
+    radio_set_status(fmstatus); /* restore previous state */
+    return ret;
+#else
     return radio_get(RADIO_PRESENT);
+#endif
 }
 
 static int find_preset(int freq)
