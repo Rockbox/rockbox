@@ -910,9 +910,17 @@ void lcd_fillrect (int x, int y, int nx, int ny)
 /* Invert a rectangular area at (x, y), size (nx, ny) */
 void lcd_invertrect (int x, int y, int nx, int ny)
 {
-    int i;
+    int i,j;
+
+    if (x>LCD_WIDTH) return;
+    if (y>LCD_HEIGHT) return;
+
+    if (x+nx>LCD_WIDTH) nx=LCD_WIDTH-x;
+    if (y+ny>LCD_HEIGHT) ny=LCD_HEIGHT-y;
+
     for (i = 0; i < nx; i++)
-        lcd_bitmap (ones, x+i, y, 1, ny, false);
+        for (j = 0; j < ny; j++)
+            INVERT_PIXEL((x+i),(y+j));
 }
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )

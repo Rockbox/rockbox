@@ -79,6 +79,7 @@ extern void lcd_double_height (bool on);
 
 #define DRAW_PIXEL(x,y) lcd_framebuffer[x][y/8] |= (1<<(y&7))
 #define CLEAR_PIXEL(x,y) lcd_framebuffer[x][y/8] &= ~(1<<(y&7))
+#define INVERT_PIXEL(x,y) lcd_framebuffer[x][y/8] ^= (1<<(y&7))
 
 /*
  * Memory copy of display bitmap
