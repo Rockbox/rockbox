@@ -345,7 +345,7 @@ static void usb_tick(void)
 #endif
 }
 
-void usb_acknowledge(int id)
+void usb_acknowledge(long id)
 {
     queue_post(&usb_queue, id, NULL);
 }
@@ -428,7 +428,7 @@ bool usb_inserted(void)
 #endif
 
 /* Dummy simulator functions */
-void usb_acknowledge(int id)
+void usb_acknowledge(long id)
 {
     id = id;
 }
