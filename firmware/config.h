@@ -32,7 +32,7 @@
 
 /* system defines */
 
-#define DEFAULT_VOLUME_SETTING     50
+#define DEFAULT_VOLUME_SETTING     70
 #define DEFAULT_BALANCE_SETTING    50
 #define DEFAULT_BASS_SETTING       50
 #define DEFAULT_TREBLE_SETTING     50
