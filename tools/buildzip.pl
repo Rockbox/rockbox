@@ -58,15 +58,22 @@ sub buildzip {
         die "can't create .rockbox/viewers.config";
     mkdir ".rockbox/viewers", 0777;
     for (@viewers) {
-        if (/,(.+),/) {
-            if(-e ".rockbox/rocks/$1") {
-                `mv .rockbox/rocks/$1 .rockbox/viewers`;
+        if (/,(.+).rock,/) {
+            my $r = "$1.rock";
+            my $o = "$1.ovl";
+            if(-e ".rockbox/rocks/$r") {
+                `mv .rockbox/rocks/$r .rockbox/viewers`;
                 print VIEWERS $_;
             }
-            elsif(-e ".rockbox/viewers/$1") {
+            elsif(-e ".rockbox/viewers/$r") {
                 # in case the same plugin works for multiple extensions, it
                 # was already moved to the viewers dir
                 print VIEWERS $_;
+            }
+            if(-e ".rockbox/rocks/$o") {
+                # if there's an "overlay" file for the .rock, move that as
+                # well
+                `mv .rockbox/rocks/$o .rockbox/viewers`;              
             }
         }
     }
