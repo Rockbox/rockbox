@@ -18,6 +18,9 @@
  ****************************************************************************/
 
 #include <file.h>
+#if defined(SIMULATOR) && defined(__MINGW32__)
+extern int printf(const char *format, ...);
+#endif
 
 #include "language.h"
 #include "lang.h"
