@@ -135,12 +135,18 @@ void show_info(void)
     button_get(true);
 }
 
+void hold_set(void)
+{
+    set_bool( "[Hold]", &global_settings.hold );
+}
+
 void main_menu(void)
 {
     int m;
 
     /* main menu */
     struct menu_items items[] = {
+        { "Hold",               hold_set          },
         { "Sound Settings",     sound_menu        },
         { "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
