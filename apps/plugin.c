@@ -233,6 +233,13 @@ static struct plugin_api rockbox_api = {
 #endif
     battery_level,
     set_time,
+
+    backlight_on,
+    backlight_off,
+
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon,
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)

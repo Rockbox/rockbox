@@ -56,7 +56,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 16
+#define PLUGIN_API_VERSION 17
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -245,6 +245,7 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     struct font* (*font_get)(int font);
 #endif
+
 #if defined(DEBUG) || defined(SIMULATOR)
    void (*debugf)(char *fmt, ...);
 #endif
@@ -267,6 +268,13 @@ struct plugin_api {
 #endif
     int  (*battery_level)(void);
     int  (*set_time)(struct tm *tm);
+
+    void (*backlight_on)(void);
+    void (*backlight_off)(void);
+
+#ifdef HAVE_LCD_CHARCELLS
+    void (*lcd_icon)(int icon, bool enable);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */
