@@ -52,6 +52,7 @@ sed > Makefile \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@LANGUAGE@,${language},g" \
+ -e "s,@TARGET@,${target},g" \
  -e "s,@SIMVER@,${simver},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
@@ -59,11 +60,13 @@ sed > Makefile \
 ARCHOS=@ARCHOS@
 ROOTDIR=@ROOTDIR@
 SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
+TOOLSDIR=\$(ROOTDIR)/tools
 DEBUG=@DEBUG@
 DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
 SIMVER=@SIMVER@
+TARGET=@TARGET@
 LANGUAGE=@LANGUAGE@
 VERSION=\$(shell date +%y%m%d-%H%M)
 
@@ -81,6 +84,12 @@ tags:
 	@rm -f TAGS
 	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) tags
 
+zip:
+	\$(TOOLSDIR)/buildzip.pl sim\$(TARGET)
+
+install:
+	@echo "installing a full setup in your archos dir"
+	@(make zip && cd archos && unzip -oq ../rockbox.zip)
 EOF
 
   echo "Created Makefile"
@@ -171,14 +180,13 @@ if [ "$target" = "update" ]; then
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
       memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
       rootdir=`grep "^ROOTDIR=" Makefile | cut -d= -f2-`
+      target=`grep "^TARGET=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
         simulator="yes"
         display=`grep "^DISPLAY=" Makefile | cut -d= -f2-`
         keypad=`grep "^KEYPAD=" Makefile | cut -d= -f2-`
         simver=`grep "^SIMVER=" Makefile | cut -d= -f2-`
-      else
-        target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       fi
     fi
   fi
