@@ -609,9 +609,7 @@ static int send_single_sector(const unsigned char *buf, int timeout)
 }
 
 int ata_read_sectors(
-#ifdef HAVE_MULTIVOLUME
-    int drive,
-#endif
+    IF_MV2(int drive,)
     unsigned long start,
     int incount,
     void* inbuf)
@@ -670,10 +668,7 @@ int ata_read_sectors(
     return ret;
 }
 
-int ata_write_sectors(
-#ifdef HAVE_MULTIVOLUME
-                      int drive,
-#endif
+int ata_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
