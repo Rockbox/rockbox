@@ -16,11 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "sh7034.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "config.h"
+#include "cpu.h"
 
 #ifdef DEBUG
 static char debugmembuf[100];
@@ -46,6 +47,7 @@ void debug_init(void)
 }
 
 #ifdef DEBUG
+#if CONFIG_CPU == SH7034 /* these are still very SH-oriented */
 static int debug_tx_ready(void)
 {
     return (SSR1 & SCI_TDRE);
@@ -195,6 +197,7 @@ static void debug(const char *msg)
     mem2hex(msg, &debugbuf[1], strlen(msg));
     putpacket(debugbuf);
 }
+#endif /* SH7034 */
 #endif /* end of DEBUG section */
 
 #ifdef __GNUC__
