@@ -2693,15 +2693,15 @@ int mpeg_phys2val(int setting, int value)
             break;
 
 #ifdef HAVE_MAS3587F
-        case SOUND_LOUDNESS:
-            result = value;
-            break;
-            
         case SOUND_SUPERBASS:
             result = value / 10;
             break;
 
+        case SOUND_LOUDNESS:
         case SOUND_AVC:
+        case SOUND_LEFT_GAIN:
+        case SOUND_RIGHT_GAIN:
+        case SOUND_MIC_GAIN:
             result = value;
             break;
 #endif
