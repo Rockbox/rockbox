@@ -273,6 +273,7 @@ if [ -z "$debug" ]; then
     [Ss])
       debug="SIMULATOR=1"
       simulator="yes"
+      simul
       ;;
     [Dd])
       debug="DEBUG=1"
@@ -324,12 +325,6 @@ if [ -z "$appsdir" ]; then
     appsdir=`input`
 fi
 
-if [ "yes" = "$simulator" ]; then
-    # we have already dealt with the simulator Makefile separately
-    simul
-    exit
-fi
-
 if [ -z "$language" ]; then
 
     echo "Select a number for the language to use (default is english)"
@@ -341,6 +336,11 @@ if [ -z "$language" ]; then
         # pick a default
         language="english"
     fi
+fi
+
+if [ "yes" = "$simulator" ]; then
+    # we have already dealt with the simulator Makefile separately
+    exit
 fi
 
 sed > Makefile \
