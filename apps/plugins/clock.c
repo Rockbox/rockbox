@@ -22,11 +22,17 @@ RELEASE NOTES *******************
 *********************************
 
 *********************************
+VERSION 2.3 * STABLE ************
+*********************************
+Tab indentation removed
+Counter screen added at ON+F2, with countdown options
+
+*********************************
 VERSION 2.22 * STABLE ***********
 *********************************
 Fixed two bugs:
--Digital settings are now independent of LCD settings
--12/24h "Analog" settings are now displayed correctly.
+Digital settings are now independent of LCD settings
+12/24h "Analog" settings are now displayed correctly.
 
 *********************************
 VERSION 2.21 * STABLE ***********
@@ -93,11 +99,12 @@ and a few options.
 
 #ifdef HAVE_LCD_BITMAP
 
-#define CLOCK_VERSION "2.22"
+#define CLOCK_VERSION "2.3"
 
 /* prototypes */
 void show_logo(bool animate, bool show_clock_text);
 void exit_logo(void);
+void save_settings(void);
 
 /* used in help screen */
 int screen = 1;
@@ -110,6 +117,11 @@ int displayed_value = 0;
 int count_h, count_m, count_s;
 char count_text[8];
 bool counting = false;
+bool counting_up = true;
+int target_hour=0, target_minute=0, target_second=0;
+int remaining_h=0, remaining_m=0, remaining_s=0;
+bool editing_target = false;
+bool display_counter = true;
 
 static struct plugin_api* rb;
 
@@ -381,6 +393,75 @@ const unsigned char clocklogo_4[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+/******************
+ * Time's Up bitmap
+ *****************/
+const unsigned char timesup[] = {
+0x78, 0x78, 0x78, 0x38, 0x08, 0x08, 0xf8, 0xfc, 0xfc, 0xfc, 0xfc, 0xfc, 0x04,
+0x04, 0x04, 0x0c, 0x3c, 0x3c, 0x3c, 0x04, 0x04, 0x04, 0xfc, 0xfc, 0xfc, 0xfc,
+0xfe, 0xfe, 0x06, 0x03, 0x03, 0x05, 0x05, 0x07, 0xff, 0xff, 0xff, 0xff, 0xff,
+0xfc, 0xfc, 0xf8, 0xf0, 0xc0, 0x00, 0x00, 0x00, 0x00, 0xc0, 0xf0, 0xfc, 0xfc,
+0xfc, 0xfc, 0xfc, 0x20, 0x22, 0x22, 0x22, 0x22, 0x02, 0x02, 0x02, 0x02, 0x0e,
+0xfe, 0xfe, 0xfe, 0xfe, 0x06, 0x06, 0x06, 0x06, 0x06, 0x0e, 0x1c, 0x3c, 0x3c,
+0x3c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0xfc, 0xfc, 0xfc, 0xfe, 0x00,
+0x00, 0x00, 0x00, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0xfe, 0xfe, 0xfe, 0xfe,
+0x86, 0x0e, 0x3e, 0xfe, 0xfe, 0xfe, 0xfe, 0x1e,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x40,
+0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x00, 0xff, 0xff, 0xff, 0xff,
+0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
+0x03, 0x0f, 0x3f, 0xff, 0xff, 0xfc, 0xf0, 0xfc, 0xff, 0x7f, 0x1f, 0x03, 0xff,
+0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0xff, 0xff, 0xff, 0xff, 0x08, 0x08, 0x08, 0x08, 0x08, 0x0e, 0x0e, 0x0e, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x03, 0x40,
+0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0xc0, 0xe0, 0xe0, 0xe3, 0xc7, 0x8f, 0x0f,
+0x1f, 0x1f, 0x3e, 0xfe, 0xfc, 0xf8, 0xf8, 0xf0,
+0x08, 0x08, 0x08, 0x08, 0x18, 0x18, 0x1f, 0x1f, 0x1f, 0x1f, 0x0f, 0x0f, 0x0c,
+0x08, 0x08, 0x00, 0x00, 0x08, 0x08, 0x08, 0x08, 0x0c, 0x0f, 0x0f, 0x0f, 0x0f,
+0x0f, 0x0f, 0x0c, 0x08, 0x08, 0x88, 0x80, 0xc0, 0xff, 0xff, 0xff, 0xff, 0xff,
+0x00, 0x00, 0x00, 0x00, 0x03, 0x0f, 0x0f, 0x07, 0x01, 0x10, 0x18, 0x1c, 0x0f,
+0x0f, 0x0f, 0x0f, 0x00, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x0c,
+0x0f, 0x0f, 0x0f, 0x0f, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x1c, 0x1c,
+0x1c, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x1f, 0x1f, 0x0f, 0x0f, 0x0f, 0x0f,
+0x0e, 0x0c, 0x0c, 0x0f, 0x0f, 0x0f, 0x0f, 0x03,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x40, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0xc8, 0xf8, 0xf8, 0xf8, 0x18, 0x08,
+0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xe0, 0xe0, 0x60, 0x60, 0xe0, 0xe0,
+0xe0, 0xe0, 0xa0, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xc0, 0xc0, 0xe0, 0xf1,
+0xff, 0xff, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
+0xff, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x3f, 0x7f, 0xff, 0xff, 0xf0,
+0xe0, 0xc0, 0xc0, 0xc0, 0xe0, 0xf0, 0xf0, 0x7c, 0x7f, 0x3f, 0x07, 0x04, 0x04,
+0x04, 0x04, 0x04, 0x04, 0x04, 0xe4, 0xff, 0xff, 0xff, 0xc0, 0x80, 0x80, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc3,
+0xe1, 0xe7, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x03, 0x03, 0x03, 0x02, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 /* settings saved to this location */
 static char default_filename[] = "/.rockbox/rocks/.clock_settings";
 
@@ -419,9 +500,9 @@ char* jobs[] = {
 bool done = false; /* This bool is used for most of the while loops */
 int logo = 4; /* must be set before we show the logo */
 
-/************************************
+/***********************************
  * This is saved to default_filename
- ************************************/
+ **********************************/
 struct saved_settings
 {
     /* general */
@@ -452,9 +533,9 @@ struct saved_settings
     bool fullscreen_invertseconds;
 } settings;
 
-/*************************
+/************************
  * Setting default values
- *************************/
+ ***********************/
 void reset_settings(void)
 {
     /* general */
@@ -485,20 +566,36 @@ void reset_settings(void)
     settings.fullscreen_invertseconds = false;
 }
 
-/*********************************
+/**************
+ * Exits plugin
+ *************/
+bool quit(bool save)
+{
+    if(save)
+        save_settings();
+
+    /* restore set backlight timeout */
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
+    return PLUGIN_OK;
+}
+
+/********************************
  * Saves "saved_settings" to disk
- *********************************/
+ *******************************/
 void save_settings(void)
 {
     int fd;
 
     rb->lcd_clear_display();
 
+    /* display information */
     show_logo(true, true);
     rb->lcd_puts(0, 7, "Saving...");
 
     rb->lcd_update();
 
+    /* create the settings file and write the settings to it */
     fd = rb->creat(default_filename, O_WRONLY);
 
     if(fd >= 0)
@@ -517,11 +614,12 @@ void save_settings(void)
     exit_logo();
 }
 
-/***********************************
+/**********************************
  * Loads "saved_settings" from disk
- ***********************************/
+ *********************************/
 void load_settings(void)
 {
+	/* open the settings file */
     int fd;
     fd = rb->open(default_filename, O_RDONLY);
 
@@ -559,9 +657,9 @@ void load_settings(void)
     exit_logo();
 }
 
-/**************************************************************
+/*************************************************************
  * 7-Segment LED/LCD imitation code, by Linus Nielsen Feltzing
- **************************************************************/
+ ************************************************************/
 /*
        a     0    b
         #########c
@@ -588,9 +686,9 @@ static unsigned int point_coords[6][2] =
     {1, 2}  /* f */
 };
 
-/*********************************************
+/********************************************
  * The end points (a-f) for each segment line
- *********************************************/
+ *******************************************/
 static unsigned int seg_points[7][2] =
 {
     {0,1}, /* a to b */
@@ -602,10 +700,10 @@ static unsigned int seg_points[7][2] =
     {4,5}  /* e to f */
 };
 
-/***********************************************************************
+/**********************************************************************
  * Lists that tell which segments (0-6) to enable for each digit (0-9),
  * the list is terminated with -1
- ***********************************************************************/
+ *********************************************************************/
 static int digit_segs[10][8] =
 {
     {0,1,2,4,5,6, -1},   /* 0 */
@@ -620,9 +718,9 @@ static int digit_segs[10][8] =
     {0,1,2,3,5,6, -1}    /* 9 */
 };
 
-/************************************
+/***********************************
  * Draws one segment - LED imitation
- ************************************/
+ **********************************/
 void draw_seg_led(int seg, int x, int y, int width, int height)
 {
     int p1 = seg_points[seg][0];
@@ -666,9 +764,9 @@ void draw_seg_led(int seg, int x, int y, int width, int height)
     }
 }
 
-/************************************
+/***********************************
  * Draws one segment - LCD imitation
- ************************************/
+ **********************************/
 void draw_seg_lcd(int seg, int x, int y, int width, int height)
 {
     int p1 = seg_points[seg][0];
@@ -738,9 +836,9 @@ void draw_seg_lcd(int seg, int x, int y, int width, int height)
     }
 }
 
-/******************
+/*****************
  * Draws one digit
- ******************/
+ ****************/
 void draw_7seg_digit(int digit, int x, int y, int width, int height, bool lcd_display)
 {
     int i;
@@ -757,49 +855,49 @@ void draw_7seg_digit(int digit, int x, int y, int width, int height, bool lcd_di
     }
 }
 
-/******************************************************
+/*****************************************************
  * Draws the entire 7-segment hour-minute time display
- ******************************************************/
+ ****************************************************/
 void draw_7seg_time(int hour, int minute, int x, int y, int width, int height,
 bool colon, bool lcd)
 {
     int xpos = x;
 
     /* Draw PM indicator */
-	if(settings.clock == 2)
-	{
-		if(settings.digital_12h)
-		{
-			if(hour > 12)
-				rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
-			else
-				rb->lcd_bitmap(am, 1, 55, 15, 8, true);
-		}
-	}
+    if(settings.clock == 2)
+    {
+        if(settings.digital_12h)
+        {
+            if(hour > 12)
+                rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+            else
+                rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+        }
+    }
     else
     {
-		if(settings.lcd_12h)
-		{
-			if(hour > 12)
-				rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
-			else
-				rb->lcd_bitmap(am, 1, 55, 15, 8, true);
-		}
-	}
+        if(settings.lcd_12h)
+        {
+            if(hour > 12)
+                rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+            else
+                rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+        }
+    }
 
     /* Now change to 12H mode if requested */
     if(settings.clock == 2)
     {
-		if(settings.digital_12h)
-			if(hour > 12)
-				hour -= 12;
-	}
-	else
-	{
-		if(settings.lcd_12h)
-			if(hour > 12)
-				hour -= 12;
-	}
+        if(settings.digital_12h)
+            if(hour > 12)
+                hour -= 12;
+    }
+    else
+    {
+        if(settings.lcd_12h)
+            if(hour > 12)
+                hour -= 12;
+    }
 
     draw_7seg_digit(hour / 10, xpos, y, width, height, lcd);
     xpos += width + 6;
@@ -839,9 +937,9 @@ bool colon, bool lcd)
     xpos += width + 6;
 }
 
-/**************
+/*************
  * Binary mode
- **************/
+ ************/
 void binary(int hour, int minute, int second)
 {
     /* temporary modifiable versions of ints */
@@ -851,9 +949,9 @@ void binary(int hour, int minute, int second)
 
     rb->lcd_clear_display();
 
-    /*****************
+    /******
      * HOUR
-     *****************/
+     *****/
     if(temphour >= 32)
     {
         rb->lcd_bitmap(bitmap_1, 0, 1, 15, 20, true);
@@ -897,9 +995,9 @@ void binary(int hour, int minute, int second)
     else
         rb->lcd_bitmap(bitmap_0, 95, 1, 15, 20, true);
 
-    /****************
+    /*********
      * MINUTES
-     ****************/
+     ********/
     if(tempmin >= 32)
     {
         rb->lcd_bitmap(bitmap_1, 0, 21, 15, 20, true);
@@ -943,9 +1041,9 @@ void binary(int hour, int minute, int second)
     else
         rb->lcd_bitmap(bitmap_0, 95, 21, 15, 20, true);
 
-    /****************
+    /*********
      * SECONDS
-     ****************/
+     ********/
     if(tempsec >= 32)
     {
          rb->lcd_bitmap(bitmap_1, 0, 42, 15, 20, true);
@@ -992,9 +1090,9 @@ void binary(int hour, int minute, int second)
     rb->lcd_update();
 }
 
-/*****************
+/****************
  * Shows the logo
- *****************/
+ ***************/
 void show_logo(bool animate, bool show_clock_text)
 {
     int x_position;
@@ -1051,9 +1149,9 @@ void show_logo(bool animate, bool show_clock_text)
     }
 }
 
-/*********************
+/********************
  * Logo flies off lcd
- *********************/
+ *******************/
 void exit_logo(void)
 {
     int x_position;
@@ -1078,9 +1176,9 @@ void exit_logo(void)
     }
 }
 
-/********************
+/*******************
  * Rolls the credits
- ********************/
+ ******************/
 /* The following function is pretty confusing, so
  * it's extra well commented. */
 bool roll_credits(void)
@@ -1180,9 +1278,9 @@ bool roll_credits(void)
     return true;
 }
 
-/*****************************************
+/****************************************
  * Shows the logo, then rolls the credits
- *****************************************/
+ ***************************************/
 bool show_credits(void)
 {
     int j = 0;
@@ -1213,9 +1311,9 @@ bool show_credits(void)
     return false;
 }
 
-/*******************
+/******************
  * F1 Screen - HELP
- *******************/
+ *****************/
 bool f1_screen(void)
 {
     done = false;
@@ -1232,18 +1330,19 @@ bool f1_screen(void)
             rb->lcd_puts(0, 2, "help, use LEFT and");
             rb->lcd_puts(0, 3, "RIGHT. F1 returns");
             rb->lcd_puts(0, 4, "you to the clock.");
-            rb->lcd_puts(0, 6, "");
+            rb->lcd_puts(0, 5, "At any mode, [F1]");
+            rb->lcd_puts(0, 6, "will show you this");
             rb->lcd_puts(0, 7, "<< ---- 1/9 NEXT >>");
         }
         else if(screen == 2)
         {
-            rb->lcd_puts(0, 0, "At any mode, [F1]");
-            rb->lcd_puts(0, 1, "will show you this");
-            rb->lcd_puts(0, 2, "help screen. [F2]");
-            rb->lcd_puts(0, 3, "will start/stop");
-            rb->lcd_puts(0, 4, "the Counter. Hold");
-            rb->lcd_puts(0, 5, "F2 to reset the");
-            rb->lcd_puts(0, 6, "Counter.");
+            rb->lcd_puts(0, 0, "help screen. [F2]");
+            rb->lcd_puts(0, 1, "will start/stop");
+            rb->lcd_puts(0, 2, "the Counter. Hold");
+            rb->lcd_puts(0, 3, "F2 to reset the");
+            rb->lcd_puts(0, 4, "Counter. [ON+F2]");
+            rb->lcd_puts(0, 5, "gives you counting");
+            rb->lcd_puts(0, 6, "options.");
             rb->lcd_puts(0, 7, "<< BACK 2/9 NEXT >>");
         }
         else if(screen == 3)
@@ -1352,10 +1451,10 @@ bool f1_screen(void)
     return true;
 }
 
-/**************************
+/*************************
  * F2 Screen - Pick a Logo
  * [[ NO LONGER USED ]]
- **************************/
+ ************************/
 void f2_screen(void)
 {
     rb->lcd_clear_display();
@@ -1422,9 +1521,9 @@ void f2_screen(void)
     }
 }
 
-/**********************
+/*********************
  * F3 Screen - OPTIONS
- **********************/
+ ********************/
 bool f3_screen(void)
 {
     int invert_analog = 1;
@@ -1815,9 +1914,9 @@ bool f3_screen(void)
     return true;
 }
 
-/*****************************************
+/****************************************
  * Draws the extras, IE border, digits...
- *****************************************/
+ ***************************************/
 void draw_extras(int year, int day, int month, int hour, int minute, int second)
 {
     char buf[11];
@@ -1977,9 +2076,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
     }
 }
 
-/****************
+/***************
  * Select a mode
- ****************/
+ **************/
 void select_mode(void)
 {
     int cursorpos = settings.clock;
@@ -2060,8 +2159,63 @@ void select_mode(void)
     }
 }
 
+/********************
+ * Counter's all done
+ *******************/
+void counter_finished(void)
+{
+    int btn;
+    int xpos = 0;
+    bool bouncing_up = false;
+    unsigned char *times_up = 0;
+    times_up = (unsigned char *)timesup;
+
+    done = false;
+
+    while(!done)
+    {
+		rb->lcd_clear_display();
+
+        /* draw "TIME'S UP" text */
+        rb->lcd_bitmap(times_up, 0, xpos, 112, 50, true);
+
+        /* invert lcd */
+        rb->lcd_invertrect(0, 0, 112, 64);
+
+        rb->lcd_update();
+
+        /* pause */
+        rb->sleep(HZ/15);
+
+        /* move bitmap up/down 1px */
+        if(bouncing_up)
+        {
+            if(xpos > 0)
+                xpos--;
+            else
+                bouncing_up = false;
+        }
+        else
+        {
+            if(xpos < 14)
+                xpos++;
+            else
+               bouncing_up = true;
+        }
+
+        /* exit on keypress */
+        btn = rb->button_get(false);
+        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+            done = true;
+    }
+}
+
+/*********************
+ * Display the counter
+ ********************/
 void show_counter(void)
 {
+    /* increment counter */
     if(counting)
     {
         passed_time = *rb->current_tick - start_tick;
@@ -2072,20 +2226,203 @@ void show_counter(void)
     displayed_value = counter + passed_time;
     displayed_value = displayed_value / HZ;
 
+    /* these are the REAL displayed values */
     count_s = displayed_value % 60;
     count_m = displayed_value % 3600 / 60;
     count_h = displayed_value / 3600;
 
-    rb->snprintf(count_text, sizeof(count_text), "%d:%02d:%02d", count_h, count_m, count_s);
+    /* compute "counting down" displayed value */
+    if(!counting_up)
+    {
+        remaining_s = target_second - count_s;
+        remaining_m = target_minute - count_m;
+        remaining_h = target_hour - count_h;
+    }
 
-    if(settings.clock == 1)
-        rb->lcd_puts(11, 7, count_text);
-    else if(settings.clock == 2)
-        rb->lcd_putsxy(1, 5, count_text);
-    else if(settings.clock == 3)
-        rb->lcd_putsxy(1, 5, count_text);
-    else if(settings.clock == 4)
-        rb->lcd_puts(6, 6, count_text);
+    if(remaining_s < 0)
+    {
+        remaining_s += 60;
+        remaining_m--;
+    }
+    if(remaining_m < 0)
+    {
+        remaining_m += 60;
+        remaining_h--;
+    }
+    if(remaining_h < 0)
+    {
+		/* reset modes */
+        counting = false;
+        counting_up = true;
+
+        /* all done! */
+        counter_finished();
+
+        /* reset all counter values */
+        remaining_h = target_hour = 0;
+        remaining_m = target_minute = 0;
+        remaining_s = target_second = 0;
+    }
+
+    if(counting_up)
+        rb->snprintf(count_text, sizeof(count_text), "%d:%02d:%02d", count_h, count_m, count_s);
+    else
+        rb->snprintf(count_text, sizeof(count_text), "%d:%02d:%02d", remaining_h, remaining_m, remaining_s);
+
+    /* allows us to flash the counter if it's paused */
+    if(display_counter)
+    {
+        if(settings.clock == 1)
+            rb->lcd_puts(11, 7, count_text);
+        else if(settings.clock == 2)
+            rb->lcd_putsxy(1, 5, count_text);
+        else if(settings.clock == 3)
+            rb->lcd_putsxy(1, 5, count_text);
+        else if(settings.clock == 4)
+            rb->lcd_puts(6, 6, count_text);
+    }
+}
+
+/******************
+ * Counter settings
+ *****************/
+void counter_options(void)
+{
+    int cursorpos = 1;
+    char target_time[15];
+    bool original = counting_up;
+    bool current = counting_up;
+
+    done = false;
+
+    while(!done)
+    {
+        /* print text to string */
+        rb->snprintf(target_time, sizeof(target_time), "%d:%02d:%02d", target_hour, target_minute, target_second);
+
+        /* draw text on lcd */
+        rb->lcd_clear_display();
+        rb->lcd_puts(0, 0, "Counter Options");
+        rb->lcd_puts(2, 2, "Count UP");
+        rb->lcd_puts(2, 3, "Count DOWN...");
+        rb->lcd_puts(4, 4, "Target Time:");
+        rb->lcd_puts(4, 5, target_time);
+        rb->lcd_puts(0, 7, "OFF: Return");
+
+        /* tell user what mode is selected */
+        rb->checkbox(1, 17, 8, 6, counting_up);
+        rb->checkbox(1, 25, 8, 6, !counting_up);
+
+
+        /* draw a cursor */
+        switch(cursorpos)
+        {
+            case 1: rb->lcd_invertrect(0, 16, 112, 8); break;
+            case 2: rb->lcd_invertrect(0, 24, 112, 8); break;
+            case 3: rb->lcd_invertrect(24, 40, 06, 8); break;
+            case 4: rb->lcd_invertrect(36, 40, 12, 8); break;
+            case 5: rb->lcd_invertrect(54, 40, 12, 8); break;
+        }
+
+        if(cursorpos > 2)
+            editing_target = true;
+        else
+            editing_target = false;
+
+        rb->lcd_update();
+
+        /* button scan */
+        switch(rb->button_get_w_tmo(HZ/4))
+        {
+            case BUTTON_F2: /* exit screen */
+            case BUTTON_OFF:
+                current = counting_up;
+                if(current != original)
+                    counter = 0;
+                done = true;
+                break;
+
+            case BUTTON_UP: /* increase / move cursor */
+            case BUTTON_UP | BUTTON_REPEAT:
+                if(!editing_target)
+                {
+                    if(cursorpos > 1)
+                        cursorpos--;
+                }
+                else
+                {
+                    if(cursorpos == 3)
+                        if(target_hour < 9)
+                            target_hour++;
+                        else
+                            target_hour = 0;
+                    else if(cursorpos == 4)
+                        if(target_minute < 59)
+                            target_minute++;
+                        else
+                            target_minute = 0;
+                    else
+                        if(target_second < 59)
+                            target_second++;
+                        else
+                            target_second = 0;
+                }
+                break;
+
+            case BUTTON_DOWN: /* decrease / move cursor */
+            case BUTTON_DOWN | BUTTON_REPEAT:
+                if(!editing_target)
+                {
+                    if(cursorpos < 3)
+                        cursorpos++;
+                }
+                else
+                {
+                    if(cursorpos == 3)
+                        if(target_hour > 0)
+                            target_hour--;
+                        else
+                            target_hour = 9;
+                    else if(cursorpos == 4)
+                        if(target_minute > 0)
+                            target_minute--;
+                        else
+                            target_minute = 59;
+                    else
+                        if(target_second > 0)
+                            target_second--;
+                        else
+                            target_second = 59;
+                }
+                break;
+
+            case BUTTON_LEFT: /* move cursor */
+                if(cursorpos > 3)
+                    cursorpos--;
+                else
+                    cursorpos = 5;
+                break;
+
+            case BUTTON_RIGHT: /* move cursor */
+                if(cursorpos < 5)
+                    cursorpos++;
+                else
+                    cursorpos = 3;
+                break;
+
+            case BUTTON_PLAY: /* toggle */
+                if(cursorpos == 1)
+                    counting_up = true;
+                if(cursorpos == 2)
+                    counting_up = false;
+                if(cursorpos >= 3 && cursorpos <= 5)
+                {
+                    cursorpos = 2;
+                    counting_up = false;
+				}
+                break;
+        }
+    }
 }
 
 /**********************************************************************
@@ -2150,11 +2487,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             rb->lcd_clear_display();
 
+            /* flash counter if needed */
+            if(!counting && displayed_value != 0)
+                display_counter = !display_counter;
+            else
+                display_counter = true;
+
+            /* and then print it */
             show_counter();
 
-            /**************
+            /*************
              * Analog Mode
-             **************/
+             ************/
             if(settings.clock == 1)
             {
                 /* Second hand */
@@ -2232,9 +2576,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 
             }
-            /***************
+            /**************
              * Digital mode
-             ***************/
+             *************/
             else if(settings.clock == 2)
             {
                 if(settings.digital_blinkcolon)
@@ -2242,9 +2586,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 else
                     draw_7seg_time(hour, minute, 8, 16, 16, 32, true, false);
             }
-            /***********
+            /**********
              * LCD mode
-             ***********/
+             *********/
             else if(settings.clock == 3)
             {
                 if(settings.lcd_blinkcolon)
@@ -2252,9 +2596,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 else
                     draw_7seg_time(hour, minute, 8, 16, 16, 32, true, true);
             }
-            /******************
+            /*****************
              * Fullscreen mode
-             ******************/
+             ****************/
             else if(settings.clock == 4)
             {
                 /* Second hand */
@@ -2320,9 +2664,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                                  (LCD_WIDTH/2)+1, (LCD_HEIGHT/2)-3);
                 rb->lcd_drawpixel(LCD_WIDTH/2, LCD_HEIGHT/2);
             }
-            /**************
+            /*************
              * Binary mode
-             **************/
+             ************/
             else
             {
                 binary(hour, minute, second);
@@ -2339,26 +2683,28 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         rb->lcd_update();
 
-        /**************************
+        /*************************
          * Scan for button presses
-         **************************/
+         ************************/
         switch (rb->button_get_w_tmo(HZ/10))
         {
             case BUTTON_OFF: /* save and exit */
-                save_settings();
-                rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-                return PLUGIN_OK;
+                quit(true);
                 break;
 
-            case BUTTON_ON: /* credit roll */
+            case BUTTON_ON | BUTTON_REL: /* credit roll */
                 show_credits();
                 break;
 
-            case BUTTON_F1: /* help */
+            case BUTTON_ON | BUTTON_F2: /* counter options */
+                counter_options();
+                break;
+
+            case BUTTON_F1 | BUTTON_REL: /* help */
                 f1_screen();
                 break;
 
-            case BUTTON_F2|BUTTON_REL: /* start/stop counter */
+            case BUTTON_F2 | BUTTON_REL: /* start/stop counter */
                 if(settings.clock != 5)
                 {
                     /* Ignore if the counter was reset */
