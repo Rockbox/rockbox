@@ -59,19 +59,18 @@ INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINE
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-	LCDSRSC = lcd-recorder.c
-else
-	LCDSRSC = lcd-playersim.c lcd-player.c
-endif
-
 DEFINES += -DWIN32
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 
-FIRMSRCS = lcd-recorder.c power.c sprintf.c id3.c usb.c		\
+ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+	LCDSRSC = lcd-recorder.c
+else
+	LCDSRSC = lcd-playersim.c lcd-player.c
+endif
+FIRMSRCS = $(LCDSRSC) power.c sprintf.c id3.c usb.c \
         mpeg.c powermgmt.c font.c sysfont.c ctype.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
