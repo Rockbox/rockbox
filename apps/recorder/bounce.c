@@ -21,7 +21,6 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#include "screensaver.h"
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
