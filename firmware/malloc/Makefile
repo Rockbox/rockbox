@@ -21,7 +21,7 @@ LIBOBJS = dmalloc.o bmalloc.o bysize.o
 
 # define this to talk a lot in runtime
 # -DDEBUG_VERBOSE 
-CFLAGS = -g -Wall -DDEBUG
+CFLAGS = -g -W -Wall -DDEBUG_MALLOC
 CC = gcc
 AR = ar
 

@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <string.h> /* memcpy */
 
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
 #include <stdarg.h>
 #endif
 
@@ -106,7 +106,7 @@ struct MemInfo {
    anyway: */
 #ifdef PSOS
 
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
 #define DMEM_OSALLOCMEM(size,pointer,type) pointer=(type)dbgmalloc(size)
 #define DMEM_OSFREEMEM(x) dbgfree(x)
 #else
@@ -126,7 +126,7 @@ struct MemInfo {
 #ifdef BMALLOC /* use our own big-memory-allocation system */
 #define DMEM_OSALLOCMEM(size,pointer,type) pointer=(type)bmalloc(size)
 #define DMEM_OSFREEMEM(x) bfree(x)
-#elif DEBUG
+#elif DEBUG_MALLOC
 #define DMEM_OSALLOCMEM(size,pointer,type) pointer=(type)dbgmalloc(size)
 #define DMEM_OSFREEMEM(x) dbgfree(x)
 #else
@@ -177,7 +177,7 @@ static struct MemTop top[ sizeof(qinfo)/sizeof(qinfo[0]) ];
 /*                          Start of the real code                        */
 /* ---------------------------------------------------------------------- */
 
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
 /************
  * A few functions that are verbose and tells us about the current status
  * of the dmalloc system

@@ -38,7 +38,7 @@
 #define FALSE 0
 #endif
 
-/* #define DEBUG */
+/* #define DEBUG_MALLOC */
 
 #define BMEM_ALIGN 64 /* resolution */ 
 
@@ -240,7 +240,7 @@ static void bmalloc_failed(size_t size)
 
 void bmalloc_status(void)
 {
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
   struct BlockInfo *block = blockHead;
   long mem_free = 0;
   long mem_used = 0;

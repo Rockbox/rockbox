@@ -388,7 +388,7 @@ Tree *removebyaddr(Tree *t, Tree *remove)
   return x;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
 static
 int printtree(Tree * t, int d, char output)
 {
@@ -441,7 +441,7 @@ char *bmalloc_obtainbysize( size_t size)
   return (char *)receive;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_MALLOC
 void bmalloc_print_sizes(void)
 {
   printtree(chunkHead, 0, 1);
