@@ -158,6 +158,9 @@ int kbd_input(char* text, int buflen)
             }
         }
 
+        /* Zero terminate the string */
+        outline[max_chars - 2] = '\0';
+        
         lcd_putsxy(font_w,main_y,outline);
 
         /* cursor */
