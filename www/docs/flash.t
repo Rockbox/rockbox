@@ -11,7 +11,7 @@ by Jörg Hohensohn aka [IDC]Dragon
 6. How do I bring in a current / my personal build of Rockbox?<br>
 7. Known issues, limitations<br>
 
-<h1>1. What is this about?</h1>
+<h2>1. What is this about?</h2>
 <p>
 This package contains tools to update the flash content of Archos Jukebox
 Recorder / FM.
@@ -25,7 +25,7 @@ spinup, in fact it has to wait for the disk. Your boot time will be as quick as
 a disk spinup. In my case, that's 3 seconds from powerup until resuming
 playback.
 
-<h1>2. How is it working?</h2>
+<h2>2. How is it working?</h2>
 <p>
 The replaced firmware will host a bootloader and 2 images. I use data
 compression to make this possible. The first is the "permanent" backup, not to
@@ -54,7 +54,7 @@ bootloader and the 2 images, the bootloader project, the plugin sources, and
 the tools for the UART boot feature: a monitor program for the box and a PC
 tool to drive it.
 
-<h1>3. Is it dangerous?</h3>
+<h2>3. Is it dangerous?</h3>
 <p>
 Yes, certainly, like programming a mainboard BIOS, CD/DVD drive firmware,
 mobile phone, etc. If the power fails, your chip breaks while programming or
@@ -88,7 +88,7 @@ box, reflash the second image with an updated Rockbox copy, etc.
 The flash chip being used by Archos is specified for 100,000 cycles (in words:
 one hundred thousand), so you don't need to worry about that wearing out.
 
-<h1>4. Will it work for me?</h1>
+<h2>4. Will it work for me?</h2>
 <p>
 You need two things:
 <ul>
@@ -105,7 +105,7 @@ is to solder in the right chip (SST39VF020), at best with the firmware already
 in. If the chip is blank, you'll need the UART boot mod as well.
 </ul>
 
-<h1>5. How do I flash the firmware?</h1>
+<h2>5. How do I flash the firmware?</h2>
 <p>
 I'm using the new plugin feature to run the flasher code. There's not really a
 wrong path to take, however here's a suggested step by step procedure:
@@ -174,7 +174,7 @@ like above, but copy and rename your backup to be "firmware_rec.bin" on the
 box this time. Keep the Rockbox copy and the plugins of this package for that
 job, because that's the one it was tested with.
 
-<h1>6. How do I bring in a current / my personal build of Rockbox?</h1>
+<h2>6. How do I bring in a current / my personal build of Rockbox?</h2>
 <p>
 The second image is the working copy, the "rockbox_flash.rock" plugin from this
 package reprograms it. I suggest to place the plugin to where you keep the
@@ -229,7 +229,7 @@ with memory (32kB for code and data). Currently I'm doing one flash sector
 (4096 bytes) at a time. Don't know how slow the compression algorithm would be
 on the box, that's the strenuous part.
 
-<h1>7. Known issues, limitations</h1>
+<h2>7. Known issues, limitations</h2>
 <p>
 The latest ATA init fixes seemed to have solved early adopter's problems.
 However, the wait for the harddisk is longer, you're unlikely to reach the 3
