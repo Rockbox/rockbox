@@ -128,6 +128,8 @@ static bool setvol(void)
 {
     if (global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
         global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+    if (global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
+        global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     status_draw(false);
     wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
