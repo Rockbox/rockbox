@@ -37,6 +37,7 @@
 #define SECTORSIZE 4096 
 
 #define BOOTLOAD_DEST 0x0FFFF500 // for the "normal" one
+#define FLASH_START  0x02000000
 #define BOOTLOAD_SCR 0x02000100
 #define ROCKBOX_DEST 0x09000000
 #define ROCKBOX_EXEC 0x09000200
@@ -130,6 +131,7 @@ UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 	FILE* pFile;
 	UINT32 align;
 	UINT32 flags;
+	UINT32 load_addr = ROCKBOX_DEST, exec_addr = ROCKBOX_EXEC; // defaults
 
 	// magic file header for compressed files
 	static const UINT8 magic[8] = { 0x00,0xe9,0x55,0x43,0x4c,0xff,0x01,0x1a };
@@ -151,7 +153,8 @@ UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 	fread(ucl_header, 1, sizeof(ucl_header), pFile);
 	if (memcmp(magic, ucl_header, sizeof(magic)) == 0)
 	{
-		if (ucl_header[12] != 0x2E) // check algorithm
+		if (ucl_header[12] != 0x2E // check algorithm
+			&& ucl_header[12] != 0x2B) // or uncompressed
 		{
 			printf("UCL compressed files must use algorithm 2e, not %d\n", ucl_header[12]);
 			printf("Generate with: uclpack --best --2e rockbox.bin %s\n", filename);
@@ -162,6 +165,15 @@ UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 		if (Read32(ucl_header + 18) > size) // compare with uncompressed size
 		{	// normal case
 			flags = 0x00000001; // flags for UCL compressed
+		}
+
+		if (ucl_header[12] == 0x2B) // uncompressed means "ROMbox", for direct flash execution
+		{
+			UINT8 reset_vec[4];
+			fread(reset_vec, 1, sizeof(reset_vec), pFile); // read the reset vector from image
+			fseek(pFile, 0-sizeof(reset_vec), SEEK_CUR); // wind back
+			load_addr = FLASH_START + pos + 16; // behind 16 byte header
+			exec_addr = Read32(reset_vec);
 		}
 	}
 	else
@@ -177,9 +189,9 @@ UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 	
 	// write header
 	align = (pos + 16 + size + SECTORSIZE-1) & ~(SECTORSIZE-1); // round up to next flash sector
-	Write32(pFirmware + pos, ROCKBOX_DEST); // load address
+	Write32(pFirmware + pos, load_addr); // load address
 	Write32(pFirmware + pos + 4, align - (pos + 16)); // image size
-	Write32(pFirmware + pos + 8, ROCKBOX_EXEC); // execution address
+	Write32(pFirmware + pos + 8, exec_addr); // execution address
 	Write32(pFirmware + pos + 12, flags); // compressed or not
 	pos += 16;
 
