@@ -44,30 +44,8 @@ fi
 
 simul () {
 
- ##################################################################
- # Figure out where the firmware code is!
- #
-
- # a file to check for in the uisimulator root dir
- simfile="$simver/lcd-$simver.c" 
-
- for dir in uisimulator . .. ../uisimulator ../../uisimulator; do
-   if [ -f "$dir/$simfile" ]; then
-     simdir="$dir/$simver"
-     break
-   fi
- done
-
- if [ -z "$simdir" ]; then
-   echo "This script couldn't find your uisimulator/$simver directory. Please enter the"
-   echo "full path to your uisimulator/$simver directory here:"
-
-   simdir=`input`
- fi
-
 sed > Makefile \
- -e "s,@SIMDIR@,${simdir},g" \
- -e "s,@TOOLSDIR@,${toolsdir},g" \
+ -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -80,8 +58,9 @@ sed > Makefile \
 ## Automaticly generated. http://rockbox.haxx.se
 
 ARCHOS=@ARCHOS@
-SIMDIR=@SIMDIR@
-TOOLSDIR=@TOOLSDIR@
+ROOTDIR=@ROOTDIR@
+SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
+TOOLSDIR=\$(ROOTDIR)/tools
 DEBUG=@DEBUG@
 TARGET=@TARGET@
 DISPLAY=@DISPLAY@
@@ -120,7 +99,7 @@ EOF
 
 picklang() {
     # figure out which languages that are around
-    for file in $appsdir/lang/*.lang; do
+    for file in $rootdir/apps/lang/*.lang; do
         clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
         langs="$langs $clean"
     done
@@ -200,6 +179,7 @@ if [ "$target" = "update" ]; then
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
       memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
+      rootdir=`grep "^ROOTDIR=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
         simulator="yes"
@@ -330,81 +310,38 @@ if [ -z "$debug" ]; then
   esac
 fi
 
-##################################################################
-# Figure out where the firmware code is!
-#
+if [ -z "$rootdir" ]; then
+  ##################################################################
+  # Figure out where the source code root is!
+  #
 
-firmfile="crt0.S" # a file to check for in the firmware root dir
+  firmfile="crt0.S" # a file to check for in the firmware root dir
 
-for dir in firmware . .. ../firmware ../../firmware; do
-  if [ -f $dir/$firmfile ]; then
-    firmdir=$dir
-    break
-  fi
-done
-
-if [ -z "$firmdir" ]; then
-  echo "This script couldn't find your firmware directory. Please enter the"
-  echo "full path to the firmware directory here:"
-
-  firmdir=`input`
-fi
-
-##################################################################
-# Figure out where the apps code is!
-#
-
-appsfile="credits.c" # a file to check for in the apps root dir
-
-for dir in apps . .. ../apps ../../apps $firmdir/apps $firmdir/../apps; do
-    if [ -f $dir/$appsfile ]; then
-        appsdir=$dir
-        break
-    fi
-done
-
-if [ -z "$appsdir" ]; then
-    echo "This script couldn't find your apps directory. Please enter the"
-    echo "full path to the apps directory here:"
-
-    appsdir=`input`
-fi
-
-##################################################################
-# Figure out where the tools directory is!
-#
-
-toolsfile="descramble.c" # a file to check for in the tools root dir
-
-for dir in tools . .. ../tools ../../tools $firmdir/tools $firmdir/../tools; do
-    if [ -f $dir/$toolsfile ]; then
-        toolsdir="$dir"
-        break
-    fi
-done
-
-if [ -z "$toolsdir" ]; then
-  # no file found, check if (some of) the necessary tools are in the PATH
-  # already
-
-  toolsexe="scramble"
-
-  for dir in `echo $PATH | tr ':' ' '`; do
-    if [ -x "$dir/$toolsexe" ]; then
-       echo "found $toolsexe in $dir"
-       toolsdir="$dir"
-       break
+  for dir in  . .. ../..; do
+    if [ -f $dir/firmware/$firmfile ]; then
+     rootdir=$dir
+     break
     fi
   done
 
+  if [ -z "$rootdir" ]; then
+    echo "This script couldn't find your source code root directory. Please enter the"
+    echo "full path to the source code directory here:"
+
+    firmdir=`input`
+  fi
+
+  #####################################################################
+  # Convert the possibly relative directory name to an absolute version
+  #
+  now=`pwd`
+  cd $rootdir
+  rootdir=`pwd`
+
+  # cd back to the build dir
+  cd $now
 fi
 
-if [ -z "$toolsdir" ]; then
-    echo "This script couldn't find your tools directory. Please enter the"
-    echo "full path to the tools directory here:"
-
-    toolsdir=`input`
-fi
 
 if [ -z "$language" ]; then
 
@@ -427,9 +364,7 @@ if [ "yes" = "$simulator" ]; then
 fi
 
 sed > Makefile \
- -e "s,@FIRMDIR@,${firmdir},g" \
- -e "s,@APPSDIR@,${appsdir},g" \
- -e "s,@TOOLSDIR@,${toolsdir},g" \
+ -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@MEMORY@,${memory},g" \
  -e "s,@TARGET@,${target},g" \
@@ -439,9 +374,10 @@ sed > Makefile \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
-FIRMDIR=@FIRMDIR@
-APPSDIR=@APPSDIR@
-TOOLSDIR=@TOOLSDIR@
+ROOTDIR=@ROOTDIR@
+FIRMDIR=\$(ROOTDIR)/firmware
+APPSDIR=\$(ROOTDIR)/apps
+TOOLSDIR=\$(ROOTDIR)/tools
 DEBUG=@DEBUG@
 ARCHOS=@ARCHOS@
 TARGET=@TARGET@
