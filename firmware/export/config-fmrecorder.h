@@ -36,3 +36,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 24
+
+/* FM recorders can wake up from RTC alarm */
+#define HAVE_ALARM_MOD 1
