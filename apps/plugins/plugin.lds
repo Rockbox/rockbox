@@ -16,6 +16,8 @@ OUTPUT_FORMAT(elf32-sh)
 
 #ifdef IRIVER_H100
 #define DRAMORIG 0x30000000
+#define IRAMORIG 0x10010000
+#define IRAMSIZE 0x8000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
@@ -31,6 +33,9 @@ OUTPUT_FORMAT(elf32-sh)
 MEMORY
 {
    PLUGIN_RAM : ORIGIN = PLUGIN_ORIGIN, LENGTH = PLUGIN_LENGTH
+#ifdef IRIVER_H100
+   PLUGIN_IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+#endif
 }
 
 SECTIONS
@@ -57,5 +62,18 @@ SECTIONS
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
+#ifdef IRIVER_H100
+        iramcopy = .;
+#endif
     } > PLUGIN_RAM
+
+#ifdef IRIVER_H100
+    .iram IRAMORIG : AT ( iramcopy)
+    {
+        iramstart = .;
+        *(.icode)
+        *(.idata)
+        iramend = .;
+    } > PLUGIN_IRAM
+#endif
 }

@@ -155,6 +155,9 @@ FLAC__bool flac_eof_handler (const FLAC__SeekableStreamDecoder *decoder,
   }
 }
 
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
@@ -168,6 +171,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
      otherwise you will get lovely "I04: IllInstr" errors... :-) */
   rb = api;
 
+  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
 
   /* This function sets up the buffers and reads the file into RAM */
 

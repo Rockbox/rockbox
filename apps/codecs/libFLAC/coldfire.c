@@ -1,6 +1,7 @@
 #ifndef SIMULATOR
 #include <private/coldfire.h>
 
+void FLAC__lpc_restore_signal_order8_mac(const FLAC__int32 residual[], unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 data[]) __attribute__ ((section (".icode")));
 void FLAC__lpc_restore_signal_order8_mac(const FLAC__int32 residual[], unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 data[])
 {
 	register const FLAC__int32 *qlp0 = &qlp_coeff[(order-1)];
