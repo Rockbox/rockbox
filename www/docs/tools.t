@@ -41,7 +41,7 @@
 <tr>
   <td><a href="http://samba.anu.edu.au/rsync/">rsync</a></td>
   <td align="center">X</td>
-  <td align="center">&nbsp;</td>
+  <td align="center">X</td>
   <td align="center">X</td>
   <td align="center">&nbsp;</td>
 </tr>
@@ -366,7 +366,7 @@
   <td align="center">X</td>
   </tr>
 <tr>
-  <td><a href="http://mywebpages.comcast.net/jstewart228368/lud">Linux Utility Disk</a></td>
+  <td><a href="http://mywebpages.comcast.net/jstewart228368/lud">Jukebox Utility Disk</a></td>
   <td colspan="2" align="center">OS independent</td>
   <td align="center">X</td>
   <td align="center">&nbsp;</td>
