@@ -115,7 +115,6 @@ setid3v1title(int fd, mp3entry *entry)
     char buffer[31];
     int offsets[3] = {-95,-65,-125};
     int i;
-    static char keepit[3][32];
 
     for(i=0;i<3;i++) {
         if(-1 == lseek(fd, offsets[i], SEEK_END))
@@ -128,16 +127,16 @@ setid3v1title(int fd, mp3entry *entry)
         if(buffer[0]) {
             switch(i) {
             case 0:
-                strcpy(keepit[0], buffer);
-                entry->artist = keepit[0];
+                strcpy(entry->id3v1buf[0], buffer);
+                entry->artist = entry->id3v1buf[0];
                 break;
             case 1:
-                strcpy(keepit[1], buffer);
-                entry->album = keepit[1];
+                strcpy(entry->id3v1buf[1], buffer);
+                entry->album = entry->id3v1buf[1];
                 break;
             case 2:
-                strcpy(keepit[2], buffer);
-                entry->title = keepit[2];
+                strcpy(entry->id3v1buf[2], buffer);
+                entry->title = entry->id3v1buf[2];
                 break;
             }
         }
@@ -166,8 +165,8 @@ setid3v2title(int fd, mp3entry *entry)
     char *album = NULL;
     char header[10];
     unsigned short int version;
-    static char buffer[512];
     int titlen=0, artistn=0, albumn=0;   
+    char *buffer = entry->id3v2buf;
 	
     /* 10 = headerlength */
     if(entry->id3v2len < 10)
@@ -183,8 +182,8 @@ setid3v2title(int fd, mp3entry *entry)
     /* Read all frames in the tag */
     size = entry->id3v2len - 10;
 
-    if(size >= (int)sizeof(buffer))
-        size = sizeof(buffer)-1;
+    if(size >= (int)sizeof(entry->id3v2buf))
+        size = sizeof(entry->id3v2buf)-1;
 
     if(size != read(fd, buffer, size)) {
         free(buffer);

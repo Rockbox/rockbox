@@ -29,6 +29,10 @@ struct mp3entry {
     int id3v1len;
     int filesize; /* in bytes */
     int length;   /* song length */
+
+    /* these following two fields are used for local buffering */
+    char id3v2buf[300];
+    char id3v1buf[3][32];
 };
 
 typedef struct mp3entry mp3entry;
