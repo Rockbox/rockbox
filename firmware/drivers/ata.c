@@ -470,7 +470,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
     if ( (unsigned int)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
         unsigned short tmp = 0;
-        unsigned char* bufend = buf + wordcount*2;
+        const unsigned char* bufend = buf + wordcount*2;
         do
         {   /* loop compiles to 9 assembler instructions */
             /* takes 13 clock cycles (2 pipeline stalls) */
