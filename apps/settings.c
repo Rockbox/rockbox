@@ -1530,7 +1530,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     return false;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
 /* This array holds the record timer interval lengths, in seconds */
 static const unsigned long rec_timer_seconds[] =
 {
