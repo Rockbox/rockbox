@@ -70,8 +70,9 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
-	-$(RM) -r $(DEPS)
+	-rm -f $(OBJS) $(OBJDIR)/archos.mod $(OBJDIR)/archos.asm \
+	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf
+	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/recorder
