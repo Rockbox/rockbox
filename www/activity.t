@@ -14,8 +14,8 @@
 
 <table cellspacing=0 cellpadding=2 border=1>
 <tr bgcolor="#cccccc"><th>Module</th><th>File(s) in CVS</h><th>Current person</th><th>Status</th></tr><tr>
-STATUS(GREEN,I<sup>2</sup>C driver,firmware/drivers/i2c.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/i2c.c", Linus,Works)
-STATUS(GREEN,LED driver,firmware/drivers/led.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/led.c",-,Written)
+STATUS(GREEN,I<sup><small>2</small></sup>C driver,firmware/drivers/i2c.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/i2c.c", Linus,Works)
+STATUS(GREEN,LED driver,firmware/drivers/led.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/led.c",&nbsp;,Written)
 STATUS(GREEN,GDB stub,gdb/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/gdb/", Linus,Works)
 STATUS(GREEN,List,firmware/common/list.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/common/lists.c", Linus,Works)
 STATUS(GREEN,ID3 parser,firmware/i3d.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/id3.c", Daniel,Works)
@@ -25,16 +25,16 @@ STATUS(GREEN,Tetris,uisimulator/tetris.c,"http://cvs.sourceforge.net/cgi-bin/vie
 STATUS(GREEN,MAS driver,firmware/drivers/mas.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/mas.c", Linus,Works)
 STATUS(GREEN,ATA driver,firmware/drivers/ata.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/ata.c", Björn,Works)
 STATUS(GREEN,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Works)
-STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/button.c", -,Written; untested)
+STATUS(GREEN,X11 simulator,uisimulator/x11, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/x11/", Daniel,Works)
+STATUS(GREEN,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Works)
+STATUS(GREEN,API docs,firmware/API,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/API",&nbsp;,First version)
+STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/button.c",&nbsp;,Written; untested)
 STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Written; untested)
 STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/system.c", Linus,In progress)
 STATUS(YELLOW,Playlist handling,firmware/playlist.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/playlist.c", Wavey, Progressing)
-STATUS(YELLOW,X11 simulator,uisimulator/x11, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/x11/", Daniel,Progressing)
-STATUS(YELLOW,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
-STATUS(RED,Boot loader (rolo),-,"", -,-)
-STATUS(RED,Directory browser UI,uisimulator/tree.c,"", Daniel,Progressing)
-STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
-STATUS(RED,API docs,-,"",-, Header files exist)
-STATUS(RED,New DSP algorithms,-,"",-, -)
+STATUS(YELLOW,Directory browser UI,uisimulator/tree.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/tree.c", Daniel,Works in simulator)
+STATUS(RED,Boot loader (rolo),&nbsp;,"",&nbsp;,Planned)
+STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",&nbsp;,Embryo)
+STATUS(RED,New DSP algorithms,&nbsp;,"",&nbsp;,We need help!)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
