@@ -1,4 +1,4 @@
-# $Id: wallisertitsch.lang,v 1.88 2003/10/24 14:14:08 vicentinimartin
+# $Id: wallisertitsch.lang,v 1.101 2004/03/06 12:44:33 vicentinimartin
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -9,16 +9,6 @@ id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 new: "Grundischtellige"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Schpili"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demos"
 
 id: LANG_INFO
 desc: in the main menu
@@ -32,90 +22,43 @@ new: "Version"
 
 id: LANG_DEBUG
 desc: in the main menu
-eng: "Debug (keep out!)"
+eng: "Debug (Keep Out!)"
 new: "Entwicklerbiriich"
 
 id: LANG_USB
 desc: in the main menu
-eng: "USB (sim)"
-new: "USB (sim)"
+eng: "USB (Sim)"
+new: "USB (Sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
-eng: "Rockbox info:"
-new: "Rockbox info:"
+eng: "Rockbox Info:"
+new: "Rockbox Info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%03dMb"
-new: "Puf: %d.%03dMb"
+eng: "Buf: %d.%03dMB"
+new: "Puf: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%03dMb"
-new: "Puffer: %d.%03dMb"
-
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Batt: %d%%%s"
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Akku: %d%%%s"
+eng: "Buffer: %d.%03dMB"
+new: "Puffer: %d.%03dMB"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
+eng: "Battery: Charging"
 new: "Akku: Üfladu"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Bounce"
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Schnee"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Sokoban"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Wurmji"
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Schlanga"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new: "Ladu..."
 
-# NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Mischlu..."
-
-# NO LONGER USED
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Abschpilu..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
@@ -124,59 +67,38 @@ new: "Liederlischta"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-eng: "buffer full"
+eng: "Buffer Full"
 new: "Puffer voll"
-
-# NO LONGER USED
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d files"
-new: "%d Datije"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Spiicherfähler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. low?"
+eng: "Partition?"
 new: "Akku läär?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Spiicherfähler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is battery low?"
+eng: "No partition?"
 new: "Akku läär?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
-eng: "ON to set"
+eng: "ON To Set"
 new: "ON = spiichru"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-eng: "OFF to revert"
+eng: "OFF To Revert"
 new: "OFF = abbrächu"
-
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: "Hidden Files"
-new: "Versteckti Datije"
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: "Show"
-new: "Azeigu"
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: "Hide"
-new: "Verstecku"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -190,13 +112,8 @@ new: "Züefall"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
-eng: "Play selected first"
+eng: "Play Selected First"
 new: "Gwählts zersch abschpilu"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: "Music Filter"
-new: "Müsig-Filter"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -215,7 +132,7 @@ new: "Üs"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
+eng: "Ask"
 new: "Naafrägu"
 
 id: LANG_ON
@@ -263,34 +180,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "aktuellum Titel naagah"
 
-# depreciated
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: "Really?"
-new: "Sicher?"
-
-# depreciated
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Abschpilu/Stop"
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-eng: "Are you sure?"
+eng: "Are You Sure?"
 new: "Bisch sicher?"
-
-# depreciated
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: "Play = Yes"
-new: "Play = Ja"
-
-# depreciated
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF=Abbrächu"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -314,12 +207,12 @@ new: "Sortiermodus"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new: "Scroll-Ischtellige"
 
 id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Reset settings"
+eng: "Reset Settings"
 new: "Ischtellige zruggsetzu"
 
 id: LANG_PLAYBACK
@@ -374,7 +267,7 @@ new: "Bass-Verschtercher"
 
 id: LANG_DECAY
 desc: in sound_settings
-eng: "AV decay time"
+eng: "AV Decay Time"
 new: "AV Trägheit"
 
 id: LANG_CHANNEL_MENU
@@ -384,7 +277,7 @@ new: "Kanäl"
 
 id: LANG_CHANNEL
 desc: in sound_settings
-eng: "Channel configuration"
+eng: "Channel Configuration"
 new: "Kanalischtellig"
 
 id: LANG_CHANNEL_STEREO
@@ -419,7 +312,7 @@ new: "Verzeichnispuffer"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
+eng: "Is Full!"
 new: "isch voll!"
 
 id: LANG_RESUME_ASK
@@ -432,36 +325,24 @@ desc: posible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(PLAY/STOP)"
 
-# depreciated
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: posible answer to resume question
-eng: "Play = Yes"
-new: "Play = Ja"
-
-# depreciated
-id: LANG_RESUME_CANCEL_RECORDER
-desc: posible answer to resume question
-eng: "Any Other = No"
-new: "Andri = Nei"
-
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-eng: "Keylock ON"
+eng: "Key Lock ON"
 new: "Schperri A"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-eng: "Keylock OFF"
+eng: "Key Lock OFF"
 new: "Schperri Üs"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key lock is ON"
+eng: "Key Lock Is ON"
 new: "Schperri isch A"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
+eng: "Key Lock Is OFF"
 new: "Schperri isch Üs"
 
 id: LANG_MUTE_ON_PLAYER
@@ -471,17 +352,17 @@ new: "Schtumm A"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: "MUTE OFF"
+eng: "Mute OFF"
 new: "Schtumm Üs"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-eng: "Mute is ON"
+eng: "Mute Is ON"
 new: "Schtumm isch A"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-eng: "Mute is OFF"
+eng: "Mute Is OFF"
 new: "Schtumm isch Üs"
 
 id: LANG_ID3_INFO
@@ -501,7 +382,7 @@ new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
+eng: "<No Title>"
 new: "<kei Titel>"
 
 id: LANG_ID3_ARTIST
@@ -511,7 +392,7 @@ new: "[Künschtler]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
+eng: "<No Artist>"
 new: "<kei Künschtler>"
 
 id: LANG_ID3_ALBUM
@@ -521,7 +402,7 @@ new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
+eng: "<No Album>"
 new: "<keis Album>"
 
 id: LANG_ID3_TRACKNUM
@@ -531,7 +412,7 @@ new: "[Lied Nr.]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
+eng: "<No Tracknum>"
 new: "<kei Liednummer>"
 
 id: LANG_ID3_LENGHT
@@ -556,17 +437,17 @@ new: "[Frequänz]"
 
 id: LANG_ID3_PATH
 desc: in wps
-eng: "[PATH]"
+eng: "[Path]"
 new: "[Pfad]"
 
 id: LANG_PITCH_UP
 desc: in wps
-eng: "Pitch up"
+eng: "Pitch Up"
 new: "schnäller"
 
 id: LANG_PITCH_DOWN
 desc: in wps
-eng: "Pitch down"
+eng: "Pitch Down"
 new: "langsamer"
 
 id: LANG_PAUSE
@@ -576,13 +457,8 @@ new: "Pause"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-eng: "mode:"
-new: "modus:"
-
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: "Dir filter: %s"
-new: "Verzeichnisf.: %s"
+eng: "Mode:"
+new: "Modus:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -596,199 +472,18 @@ new: "Scroll-"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-eng: "bar"
+eng: "Bar"
 new: "Azeig:"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End of list"
+eng: "End Of List"
 new: "Lischtuendi"
-
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: "<Press ON>"
-new: "<Drick ON>"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "<End of song list>"
-new: "<Lischtuendi>"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: "Press ON"
-new: "Drick ON"
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score :"
-new: "Dini Punktzahl:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Hegschtpunktzahl: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Neuji Hegschtpunktzahl!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Schpilpause"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[Play] to resume"
-new: "[Play] zum Fortsetzu"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[Off] to quit"
-new: "[Off] fer üfzheru"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Level - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - slow, 9 - fast)"
-new: "(1 - langsam, 9 - schnäll)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[Play] to start/pause"
-new: "[Play] Start/Pause"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: "Level"
-new: "Level"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Zig"
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "GIGWUNNU!"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: "[OFF] to stop"
-new: "[OFF] üfheru"
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: "[F1] - level"
-new: "[F1] - level"
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: "[F2] same level"
-new: "[F2] zgliich level"
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: "[F3] + level"
-new: "[F3] + level"
-
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: "Len:%d"
-new: "Län:%d"
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: "Growing"
-new: "Wagst"
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: "Hungry"
-new: "Hungrig"
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: "Wormed"
-new: "Gwurmt"
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: "Argh"
-new: "Aahh"
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: "Crashed"
-new: "Unfall!"
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: "Hs: %d"
-new: "Hs: %d"
-
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: "%d Players    up/dn"
-new: "%d Spiler     ra/ru"
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: "%d Worms        l/r"
-new: "%d Wirmer       l/r"
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: "Remote control F1"
-new: "Färnschtiirig   F1"
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: "No rem. control F1"
-new: "Kei Färnscht.   F1"
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: "2 key control   F1"
-new: "2 Taschtuscht.  F1"
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: "4 key control   F1"
-new: "4 Taschtuscht.  F1"
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: "Out of control"
-new: "Ohni Kontrolla"
-
-# Wormlet game ids ended
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: "You lose!"
-new: "Verloru!"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: "Rows - Level"
-new: "Reie - Level"
+eng: "End Of Song List"
+new: "Lischtuendi"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -797,12 +492,12 @@ new: "automatischus Üsschaltu"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-eng: "new language"
+eng: "New Language"
 new: "Nöiji Spraach"
 
 id: LANG_FILTER
 desc: setting name for dir filter
-eng: "Show files"
+eng: "Show Files"
 new: "Datiifilter"
 
 id: LANG_FILTER_MUSIC
@@ -832,43 +527,43 @@ new: "Nei"
 
 id: LANG_PM_MENU
 desc: in the display menu
-eng: "Peak meter"
+eng: "Peak Meter"
 new: "Üsstiirigsazeig"
 
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
-eng: "Peak release"
+eng: "Peak Release"
 new: "Gschw. bim Abfallu"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
-eng: "Peak hold time"
+eng: "Peak Hold Time"
 new: "Üsstiirig Haltezit"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
-eng: "Clip hold time"
+eng: "Clip Hold Time"
 new: "Uberstiirig Haltezit"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
-eng: "eternal"
-new: "ewig"
+eng: "Eternal"
+new: "Ewig"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
-eng: "Units per read"
+eng: "Units Per Read"
 new: "Einheite pro Mässig"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
-eng: "Backlight on when charging"
-new: "Bilüüchtig a bim ladu"
+eng: "Backlight On When Plugged"
+new: "Bilüüchtig a bim Netzbitrieb"
 
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
-new: "W'lig"
+new: "Wiederholig"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
@@ -890,10 +585,6 @@ desc: confirm to reset settings
 eng: "OFF=Cancel"
 new: "OFF=Abbrächu"
 
-# NOTE: ignore this label.  It is no longer used/was an error.
-# We are aware of this and it will this instance will be removed in the future
-id: LANG_TETRIS_LEVEL
-
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
@@ -901,12 +592,12 @@ new: "Zitformat"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-eng: "12 hour clock"
+eng: "12 Hour Clock"
 new: "12 Std. Ühr"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-eng: "24 hour clock"
+eng: "24 Hour Clock"
 new: "24 Std. Ühr"
 
 id: LANG_WEEKDAY_SUNDAY
@@ -1004,16 +695,6 @@ desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 new: "Dez"
 
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Würfel"
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oszillograph"
-
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
@@ -1051,7 +732,7 @@ new: "genaueri Azeig"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-eng: "Save energy"
+eng: "Save Energy"
 new: "Energie schparu"
 
 id: LANG_PM_SCALE
@@ -1071,12 +752,12 @@ new: "linear (%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-eng: "Minimum of range"
+eng: "Minimum Of Range"
 new: "chlinschte Wärt"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-eng: "Maximum of range"
+eng: "Maximum Of Range"
 new: "greeschte Wärt"
 
 id: LANG_RECORDING
@@ -1136,7 +817,7 @@ new: "Digital"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-eng: "Recording settings"
+eng: "Recording Settings"
 new: "Üfnahmeischtellige"
 
 id: LANG_DISK_STAT
@@ -1166,12 +847,12 @@ new: "%d%% %d Std %d Min"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-eng: "Sleep timer"
+eng: "Sleep Timer"
 new: "Ischlaaftimer"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
+eng: "Anti-Skip Buffer"
 new: "Puffer zum vorüs fillu"
 
 id: LANG_BIDIR_SCROLL
@@ -1219,40 +900,10 @@ desc: in settings_menu
 eng: "Battery Capacity"
 new: "Akku: Kapazität"
 
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "Vorgmerkt: %s"
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total queued: %d"
-new: "Iner Lischta: %d"
-
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue buffer full"
-new: "Warteschlanga voll"
-
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 new: "Abgibrochu"
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: "OK"
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Warteschlanga"
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Umb + Ent"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1281,7 +932,7 @@ new: "Umbinennu"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-eng: "failed"
+eng: "Failed"
 new: "gschitrut"
 
 id: LANG_ALARM_MOD_ALARM_MENU
@@ -1374,11 +1025,6 @@ desc: Display of recorded file size
 eng: "Size:"
 new: "Greessi:"
 
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: ""
-
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
@@ -1427,7 +1073,7 @@ new: "Karaoke"
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
-new: "Sichre .cfg datii"
+new: "Sichre .cfg Datii"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
@@ -1442,7 +1088,7 @@ new: "gschpiichrut"
 id: LANG_VBRFIX_STOP_PLAY
 desc: Tells the user to stop the playback
 eng: "Stop the playback first"
-new: "zersch Wiedergaab biendu"
+new: "zersch Wiedergaab stoppu"
 
 id: LANG_VBRFIX_NOT_VBR
 desc: Tells the user that the selected file is not a VBR file
@@ -1602,26 +1248,6 @@ desc: Do you want to reboot?
 eng: "Reboot now?"
 new: "jetz nöü bootu?"
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "zDräjiga"
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othelo"
-
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Schiebepuzzle"
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Schtäru"
-
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
@@ -1649,8 +1275,8 @@ new: "Ifiegu als negschts"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
-new: "dynamischi Abschpillischta schpichru"
+eng: "Save Current Playlist"
+new: "aktuelli Abschpillischta schpichru"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1719,13 +1345,13 @@ new: "Rekursiv?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
+eng: "Browse Fonts"
 new: "Schrifte"
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
-new: "Firmware"
+eng: "Browse Firmwares"
+new: "Firmwares"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
@@ -1734,20 +1360,333 @@ new: "Spraach"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
-new: "Azeig währund dum Abschpilu (WPS)"
+eng: "Browse .wps files"
+new: ".wps Datije"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
-new: "Ischtellige"
+eng: "Browse .cfg files"
+new: ".cfg Datije"
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
+eng: "Browse Plugins"
 new: "Plugins"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 new: "Autoadapter Modus"
+
+id: LANG_LINE_IN
+desc:  in settings_menu
+eng: "Line In"
+new: "Line In"
+
+id: LANG_NO_FILES
+desc:  in settings_menu
+eng: "No files"
+new: "kei Datije"
+
+id: LANG_BUTTONBAR_MENU
+desc:  in button bar
+eng: "Menu"
+new: "Mönü"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc:  in button bar
+eng: "Preset"
+new: "Sender"
+
+id: LANG_FM_SAVE_PRESET
+desc:  in radio screen
+eng: "Save preset"
+new: "Sender spiichru"
+
+id: LANG_FM_DELETE_PRESET
+desc:  in radio screen
+eng: "Remove preset"
+new: "Sender leschu"
+
+id: LANG_FM_STATION
+desc:  in radio screen
+eng: "Station: %d.%dMHz"
+new: "Sender: %d.%dMHz"
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc:  in radio screen
+eng: "Preset save failed"
+new: "Fähler bim spiichru"
+
+id: LANG_FM_NO_PRESETS
+desc:  in radio screen
+eng: "The preset list is empty"
+new: "Senderlischta läär"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc:  in radio screen
+eng: "The preset list is full"
+new: "Senderlischta isch voll"
+
+id: LANG_FM_RADIO
+desc:  in main menu
+eng: "FM Radio"
+new: "FM Radio"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc:  in main menu
+eng: "Record"
+new: "Üfnäh"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new: "zeig aktuelli Abschpillischta"
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new: "verschiebu"
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+new: "Fähler bim verschiebu"
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+new: "umgidräht"
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+new: "Vorüsüfnahm"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+new: "Vorüsüfnahmezit"
+
+#Auto bookmark prompts
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "zletscht Läsezeichu ladu?"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Läsezeichu erschtellu?"
+
+# Bookmark Select Menu Text
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "Embri = Lischta"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+new: "OFF = Biendu"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Läsezeichu"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: "Index"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Zit"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+new: "PLAY = üswählu"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+new: "ON+PLAY = leschu"
+
+# Bookmark creation/failure text
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Läsezeichu erschtellt"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Fähler bim Erschtellu fam Läsezeichu"
+
+# Bookmark creation/failure text
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "kei Läsezeichu"
+
+# Bookmark Settings Text
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Läsezeichu"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "letschts Läsezeichu ladu"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Bim Stoppu Läsezeichu erschtellu"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Lischta mit zletscht gibrüchte Läsezeichu verwaltu?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+new: "Ja - nur znöüschta"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+new: "Frägu - Nur znöüschta"
+
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "nur verschidni"
+
+# Main Bookmarks Menu
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Läsezeichu"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Läsezeichu erschtellu"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Läsezeichu üflischtu"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "nöüschti Läsezeichu"
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new: "Rockbox Info"
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new: "Üfnahm startu"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new: "FF/RW"
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new: "LCD Ischtellige"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new: "Status-/Scrollliischta"
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new: "Akku"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new: "Feschtplatta"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new: "Zit & Datum"
+
+# Limits
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new: "Grenzwärta"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+new: "Konfiguratione verwaltu"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new: "Verzeichnis"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new: "aktuells Verzeichnis"
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new: "Verzeichnis erschtellu"
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+new: "Azeigu"
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+new: "Zeig Indizes"
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+new: "Titelazeig"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+new: "Nur Titelnamu"
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+new: "ganze Pfad"
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+new: "leschu"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+new: "Datiioptione"
