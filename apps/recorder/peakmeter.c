@@ -31,6 +31,11 @@
 #include "lang.h"
 #include "peakmeter.h"
 
+/* no inline in simulator mode */
+#ifdef SIMULATOR
+#define inline
+#endif
+
 /* buffer the read peak value */
 static int peak_meter_max_l;
 static int peak_meter_max_r;
