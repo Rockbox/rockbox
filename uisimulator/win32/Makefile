@@ -34,7 +34,7 @@ DEBUG = -g
 # where to put all output files
 OBJDIR = .
 
-TARGET = $(OBJDIR)/rockboxui
+TARGET = $(OBJDIR)/uisw32.exe
 
 #DISPLAY = -DHAVE_LCD_CHARCELLS
 DISPLAY = -DHAVE_LCD_BITMAP
@@ -75,18 +75,18 @@ SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c \
 	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c
 
-OBJS := $(SRCS:%.c=$(OBJDIR)/%.o)
+OBJS := $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
-all: $(OBJDIR)/uisw32.exe
+all: $(TARGET)
 
-$(OBJDIR)/uisw32.exe: $(OBJS) $(OBJDIR)/uisw32-res.o
-	$(CC) $(OBJS) $(OBJDIR)/uisw32-res.o -o $(OBJDIR)/uisw32.exe  $(LDFLAGS)
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
 
 $(OBJDIR)/uisw32-res.o: uisw32.rc
 	$(WINDRES) -i $< -o $@
 
 clean:
-	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS)
+	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o
 	$(RM) -r $(DEPS)
 
 distclean: clean
@@ -187,9 +187,6 @@ $(OBJDIR)/backlight.o: $(FIRMWAREDIR)/backlight.c
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(TARGET): $(OBJS)
-	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 
 DEPS:=$(OBJDIR)/.deps
 
