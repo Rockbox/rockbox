@@ -121,6 +121,8 @@ static int current_card = 0;
 #endif
 static bool last_mmc_status = false;
 static int countdown;  /* for mmc switch debouncing */
+static bool usb_activity; /* monitoring the USB bridge */
+static long last_activity;
 
 /* private function declarations */
 
@@ -708,7 +710,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     addr = start * SECTOR_SIZE;
     
     mutex_lock(&mmc_mutex);
-	led(true);
+    led(true);
 #ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
     ret = select_card(drive);
@@ -753,7 +755,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     }
 
     deselect_card();
-	led(false);
+    led(false);
     mutex_unlock(&mmc_mutex);
 
     /* only flush if writing went ok */
@@ -842,12 +844,26 @@ bool mmc_detect(void)
     return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
 }
 
+bool mmc_usb_active(int delayticks)
+{
+    /* reading "inactive" is delayed by user-supplied monoflop value */
+    return (usb_activity ||
+            TIME_BEFORE(current_tick, last_activity+delayticks));
+}
+
 static void mmc_tick(void)
 {
     bool current_status;
 
+    /* USB bridge activity is 0 on idle, ~527 on active */
+    current_status = adc_read(ADC_USB_ACTIVE) > 0x100;
+    if (!current_status && usb_activity)
+    {
+        last_activity = current_tick;
+    }
+    usb_activity = current_status;
+
     current_status = mmc_detect();
-    
     /* Only report when the status has changed */
     if (current_status != last_mmc_status)
     {

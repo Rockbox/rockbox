@@ -111,6 +111,9 @@ void usb_screen(void)
     usb_display_info();
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
         if(usb_inserted()) {
+#ifdef HAVE_MMC /* USB-MMC bridge can report activity */
+            led(mmc_usb_active(HZ));
+#endif
             status_draw(false);
         }
     }

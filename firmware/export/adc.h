@@ -40,6 +40,7 @@
 #define ADC_BUTTON_ONOFF        3 /* the on/off button, high value if pressed */
 #define ADC_BUTTON_ROW1         4 /* Used for scanning the keys, different
                                      voltages for different keys */
+#define ADC_USB_ACTIVE          5 /* USB bridge activity */
 #define ADC_UNREG_POWER         7 /* Battery voltage */
 
 #else
