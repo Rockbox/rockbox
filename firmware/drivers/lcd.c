@@ -1284,9 +1284,13 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     s->textlen = strlen(string);
 
 
-#if defined(LCD_PROPFONTS) || defined(LOADABLE_FONTS)
+#if defined(LCD_PROPFONTS)
     s->space += 2;
     lcd_getstringsize(string,0,&w,&h);
+    if ( w > LCD_WIDTH - xmargin ) {
+#elif defined(LOADABLE_FONTS)
+    s->space += 2;
+    lcd_getstringsize(string,_font,&w,&h);
     if ( w > LCD_WIDTH - xmargin ) {
 #else
     if ( s->textlen > s->space ) {
