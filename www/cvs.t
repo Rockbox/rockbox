@@ -3,18 +3,20 @@
 
 <h2>Browsing the repositry</h2>
 
-<p>Just go <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
+<p>Just go <a
+href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
 
 <h2>Daily snapshots</h2>
 
-<p>Every night at 6am CET, we build a source tarball and target .mod files from the latest CVS code.
-<a href="daily.shtml">Get them here</a>.
+<p>Every night at 6am CET, we build a source tarball and target .mod files
+from the latest CVS code.  <a href="daily.shtml">Get them here</a>.
 
 <h2>Downloading (checking out) the source</h2>
 
-<p>You, obviously, need to have <a href="http://www.cvshome.org">CVS</a> installed to do this.
+<p>You, obviously, need to have <a href="http://www.cvshome.org">CVS</a>
+installed to do this.
 
-<p>The examples below use the 'firmware' module, since that's what most people are interested in. Here is a complete list of the available modules:
+<p>Here is a complete list of the available modules:
 
 <ul>
 <li>apps - the source code to the applications
@@ -22,7 +24,19 @@
 <li>gdb - the gdb stub to use for remote debugging
 <li>tools - tools for building the firmware
 <li>uisimulator - a user interface simulator for X11
+<li>docs - project documentation
 <li>www - the web page
+</ul>
+
+The examples below use the 'rockbox' module, since that's what most people are
+interested in. We have a few other convenient aliases that gets several
+modules at once for you:
+
+<ul>
+<li> rockbox - gets everything you need to compile and build rockbox for target
+<li> rockbox-devel - like 'rockbox' but also includes simulators and gdb code
+<li> rockbox-all - gets everything there is in CVS, all modules
+<li> website - gets the www and docs modules
 </ul>
 
 <h3>Anonymous read-only checkout</h3>
@@ -31,9 +45,10 @@
 When asked for a password, just press enter:
 
 <p><tt>cvs -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox login
-<br>cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co firmware</tt>
+<br>cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox</tt>
 
-<p>A "firmware" directory will be created in your current directory, and all the source files go there.
+<p>A "rockbox" directory will be created in your current directory, and all
+the directories and source files go there.
 
 <h3>Checkout for developers</h3>
 
@@ -51,7 +66,7 @@ of the Rockbox project
 <p>Then run:
 
 <p><tt>export CVS_RSH=ssh
-<br>cvs -z3 -d:ext:<b>username</b>@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co firmware</tt>
+<br>cvs -z3 -d:ext:<b>username</b>@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox</tt>
 
 <p>If you are using WinCVS, the procedure is
 <a href="http://www.wincvs.org/ssh.html">somewhat different</a>.
