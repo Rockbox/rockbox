@@ -266,15 +266,6 @@ procedure:
 	loader is replaced by mine.
 	</li>
 </ul>
-<p>
-When
-for any reason you'd like to revert to the original firmware, you can
-do like above, but copy and rename your backup to be
-&quot;firmware_rec.bin&quot; on the box this time. Keep the Rockbox
-copy and the plugins of this package for that job, because that's the
-one it was tested with.
-</p>
-
 <h2>6. Bringing in a current or personal build of Rockbox</h2>
 <p>
 Short
@@ -373,7 +364,17 @@ for the latest firmware
 
 </p>
 
-<h2>7. Known issues and limitations</h2>
+<h2>7. Restoring the original firmware</h2>
+<p>
+If you'd like to revert to the original firmware, you can
+do like you did when you flashed Rockbox for the first time (section 5), but
+copy and rename your backup to be
+&quot;firmware_rec.bin&quot; on the box this time. Keep the Rockbox
+copy and the plugins of this package for that job, because that's the
+one it was tested with.
+</p>
+
+<h2>8. Known issues and limitations</h2>
 <p>
 Latest
 Rockbox now has a charging screen, but it is in an early stage.
@@ -415,4 +416,3 @@ showing his unit booting Rockbox from flash.
 <img src="flash/rockbox-flash.jpg" width="352" height="288">
 
 #include "foot.t"
-
