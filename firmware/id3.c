@@ -497,7 +497,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->has_toc = info.has_toc;
     memcpy(entry->toc, info.toc, sizeof(info.toc));
 
-    entry->xing_header_pos = info.xing_header_pos;
+    entry->vbr_header_pos = info.vbr_header_pos;
     
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;

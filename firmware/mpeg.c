@@ -3030,42 +3030,49 @@ int mpeg_create_xing_header(char *filename, void (*progressfunc)(int))
         progressfunc(0);
 
     num_frames = count_mp3_frames(fd, entry.first_frame_offset,
-                                  flen,
-                                  progressfunc);
+                                  flen, progressfunc);
 
-    create_xing_header(fd, entry.first_frame_offset,
-                       flen, xingbuf, num_frames, progressfunc, true);
-
-    /* Try to fit the Xing header first in the stream. Replace the existing
-       Xing header if there is one, else see if there is room between the
-       ID3 tag and the first MP3 frame. */
-    if(entry.vbr_header_pos)
+    if(num_frames)
     {
-        /* Reuse existing Xing header */
-        fpos = entry.vbr_header_pos;
-
-        DEBUGF("Reusing Xing header at %d\n", fpos);
-    }
-    else
-    {
-        /* Any room between ID3 tag and first MP3 frame? */
-        if(entry.first_frame_offset - entry.id3v2len > 417)
+        create_xing_header(fd, entry.first_frame_offset,
+                           flen, xingbuf, num_frames, progressfunc, true);
+        
+        /* Try to fit the Xing header first in the stream. Replace the existing
+           Xing header if there is one, else see if there is room between the
+           ID3 tag and the first MP3 frame. */
+        if(entry.vbr_header_pos)
         {
-            fpos = entry.first_frame_offset - 417;
+            /* Reuse existing Xing header */
+            fpos = entry.vbr_header_pos;
+            
+            DEBUGF("Reusing Xing header at %d\n", fpos);
         }
         else
         {
-            close(fd);
-            return -3;
+            /* Any room between ID3 tag and first MP3 frame? */
+            if(entry.first_frame_offset - entry.id3v2len > 417)
+            {
+                fpos = entry.first_frame_offset - 417;
+            }
+            else
+            {
+                close(fd);
+                return -3;
+            }
         }
+        
+        lseek(fd, fpos, SEEK_SET);
+        write(fd, xingbuf, 417);
+        close(fd);
+        
+        if(progressfunc)
+            progressfunc(100);
+        return 0;
     }
-
-    lseek(fd, fpos, SEEK_SET);
-    write(fd, xingbuf, 417);
-    close(fd);
-
-    if(progressfunc)
-        progressfunc(100);
-
-    return 0;
+    else
+    {
+        /* Not a VBR file */
+        DEBUGF("Not a VBR file\n");
+        return -9;
+    }
 }

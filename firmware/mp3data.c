@@ -555,9 +555,9 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     int cnt;
     int progress_chunk = filesize / 50; /* Max is 50%, in 1% increments */
     int progress_cnt = 0;
+    bool is_vbr = false;
+    int last_bitrate = 0;
 
-    /* Nasty stuff to avoid passing the file handle around */
-    
     if(lseek(fd, startpos, SEEK_SET) < 0)
         return -1;
 
@@ -569,6 +569,14 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     
     while((header = buf_find_next_frame(fd, &bytes, -1, header))) {
         mp3headerinfo(&info, header);
+
+        /* See if this really is a VBR file */
+        if(last_bitrate && info.bitrate != last_bitrate)
+        {
+            is_vbr = true;
+        }
+        last_bitrate = info.bitrate;
+        
         buf_seek(fd, info.frame_size-4);
         num_frames++;
         if(progressfunc)
@@ -583,8 +591,14 @@ int count_mp3_frames(int fd, int startpos, int filesize,
         }
     }
     DEBUGF("Total number of frames: %d\n", num_frames);
-    
-    return num_frames;
+
+    if(is_vbr)
+        return num_frames;
+    else
+    {
+        DEBUGF("Not a VBR file\n");
+        return 0;
+    }
 }
 
 int create_xing_header(int fd, int startpos, int filesize,
