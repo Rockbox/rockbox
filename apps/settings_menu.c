@@ -481,9 +481,6 @@ static bool jump_scroll(void)
     bool ret;
     ret=set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
                    INT, names, 6, lcd_jump_scroll);
-    if (!ret && global_settings.jump_scroll>=JUMP_SCROLL_ALWAYS) {
-        global_settings.jump_scroll=254; /* Nice future "safe" value */
-    }
     return ret;
 }
 static bool jump_scroll_delay(void)
