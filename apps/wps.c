@@ -70,6 +70,7 @@
 bool keys_locked = false;
 bool device_muted = false;
 static bool ff_rewind = false;
+static bool paused = false;
 
 static void draw_screen(struct mp3entry* id3)
 {
@@ -507,11 +508,7 @@ int wps_show(void)
                 button_set_release(old_release_mask);
                 return 0;
                 
-#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
-#else
-            case BUTTON_UP:
-#endif
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
@@ -519,12 +516,13 @@ int wps_show(void)
                     break;
                 }
 
-                if ( mpeg_is_playing() )
+                if ( !paused )
                 {
                     mpeg_pause();
+                    paused = true;
                     status_set_playmode(STATUS_PAUSE);
+                    status_draw();
                     if (global_settings.resume) {
-                        status_draw();
                         settings_save();
 #ifndef HAVE_RTC
                         ata_flush();
@@ -534,7 +532,9 @@ int wps_show(void)
                 else
                 {
                     mpeg_resume();
+                    paused = false;
                     status_set_playmode(STATUS_PLAY);
+                    status_draw();
                 }
                 break;
 
