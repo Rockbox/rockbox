@@ -506,22 +506,31 @@ A63: There are a ton of ways to apply a patch.  One way is to use the (GNU)
      If patch can't apply some changes that are in the diff, you'll get those
      particular changes in a file named "[source-file].rej".
 
-Q64: I was told to download the [Daily-build/Bleeding Edge] version of
-     Rockbox.  What is that?
-A64: Rockbox really has 3 different 'types'.  You can download and play
-     with official version (see question #21).  There a large (1 month +)
-     periods of time between these releases.  
-     
-     If you are a bit more impatient you can grab a 'Daily Build' of what is 
-     currently being worked on.  The daily builds are created each morning 
-     and are just that, builds of what was put in the source tree the 
-     previous day. 
+Q64: Whats with all the different versions of Rockbox?
+A64: There are really only two versions of Rockbox.  One for Players and one
+     for Recorders.  However, we do have 3 other 'versions' of Rockbox 
+     available for download.  These would be Releases, Daily Builds, and 
+     Bleeding Edge.
 
-     Now, if you like to live on the edge, you can pull down a 'Bleeding edge'
-     version.  These are versions that are built from the source tree every 
-     20 minutes or so.  
+     The Release version (currently 1.4) has a fixed feature set.  This means
+     that we are confident that few, if any, significant bugs still reside
+     within the code/features of that 'version'.  This is the version for the 
+     common user. 
 
-     WARNING: Daily and bleeding edge builds are works in progress.  Bugs
-     may be rampant, especially in the case of bleeding edge versions.
+     The Daily Builds (see: http://rockbox.haxx.se/daily.shtml#target_builds)
+     are automated daily builds of the CVS code.  As such they contain all
+     the new features (and bugs ;) ) that have been introduced after the 
+     last official release, and upto and including that morning.  
 
-     Check http://rockbox.haxx.se/daily.shtml for all unofficial releases.
+     The Bleeding Edge 'versions' are automated builds that are updated 
+     every 20 minutes or so.  This are as feature full and bug ridden as you 
+     can possibly get if you are not a developer, or are not pulling directly
+     from the CVS tree.
+ 
+     Please Note: Daily and Bleeding Edge builds are expected to be buggy.
+     We ask that you _do not_ submit bug reports for Bleeding Edge versions,
+     but would love to hear any reports you may have about Release or Daily
+     build versions. (see question #62).
+            
+
+
