@@ -20,9 +20,38 @@
  * Archos Jukebox Recorder button functions
  */
 
+#include <stdlib.h>
 #include "config.h"
 #include "sh7034.h"
 #include "button.h"
+#include "kernel.h"
+
+static struct event_queue button_queue;
+
+#define POLL_FREQUENCY  HZ/10
+
+static int button_read(void);
+
+static void button_tick(void)
+{
+    static int counter=0;
+
+    /* only poll every X ticks */
+    if ( counter++ > POLL_FREQUENCY ) {
+        int btn = button_read();
+        queue_post(&button_queue, btn, NULL);
+        counter=0;
+    }
+}
+
+int button_get(void)
+{
+    struct event ev;
+
+    if ( !queue_empty(&button_queue) )
+        queue_wait(&button_queue, &ev);
+    return ev.id;
+}
 
 #ifdef HAVE_RECORDER_KEYPAD
 
@@ -73,6 +102,8 @@ void button_init()
 #endif
     last = BUTTON_NONE;
     count = 0;
+    queue_init(&button_queue);
+    tick_add_task(button_tick);
 }
 
 /*
@@ -119,7 +150,7 @@ static int get_raw_button (void)
  * BUTTON_HELD bit is while the button is being held.
  * BUTTON_REL bit is set when button has been released.
  */
-int button_get(void)
+static int button_read(void)
 {
     int btn = get_raw_button();
     int ret;
@@ -162,9 +193,11 @@ void button_init(void)
 {
     /* set port pins as input */
     PAIOR &= ~0x820;
+    queue_init(&button_queue);
+    tick_add_task(button_tick);
 }
 
-int button_get(void)
+static int button_read(void)
 {
     int porta = PADR;
     int portc = PCDR;
