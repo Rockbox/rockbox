@@ -20,7 +20,9 @@ DOCSDIR := ../docs
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I. -I$(OBJDIR)
 
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN=1
+CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
+-fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)	\
+-DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN=1
 AFLAGS += -small -relax
 
 # Check if this is a kind of Recorder
@@ -71,7 +73,7 @@ ifndef TOOLSDIR
 	TOOLSDIR=../tools
 endif
 
-all : $(OBJDIR)/$(OUTNAME) rocks
+all : $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.ucl rocks
 
 rocks:
 	$(MAKE) -C plugins TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
@@ -95,6 +97,15 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
+
+$(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
+	@a=`uclpack -h 2>/dev/null`; \
+	if test -n "$$a"; then \
+	  echo "runs uclpack"; \
+	  uclpack --best --2e $(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.ucl >/dev/null 2>&1; \
+	else \
+	  echo "no uclpack command found, not making any UCL file"; \
+	fi
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl credits.pl < $< > $@
