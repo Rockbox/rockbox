@@ -20,10 +20,10 @@ CFLAGS = $(GCCOPTS) $(TREMOROPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=$
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/Tremor/%.o)
-DEPFILE = $(OBJDIR)/dep-tremor
+DEPFILE = $(OBJDIR)/dep-Tremor
 DIRS = 
 
-OUTPUT = $(OBJDIR)/tremor.a
+OUTPUT = $(OBJDIR)/libTremor.a
 
 all: $(OUTPUT)
 
