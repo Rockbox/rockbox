@@ -420,6 +420,12 @@ void lcd_puts(int x, int y, unsigned char *string)
         lcd_write(false,lcd_ascii[*(unsigned char*)string++]);
 }
 
+void lcd_putc(int x, int y, unsigned char ch)
+{
+    lcd_write(true,LCD_CURSOR(x,y));
+    lcd_write(false,lcd_ascii[ch]);
+}
+
 void lcd_define_pattern (int which,char *pattern,int length)
 {
     int i;

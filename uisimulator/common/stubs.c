@@ -111,3 +111,11 @@ void lcd_define_pattern (int which,char *pattern,int length)
     (void)pattern;
     (void)length;
 }
+
+void lcd_putc(int x, int y, unsigned char ch)
+{
+    (void)x;
+    (void)y;
+    (void)ch;
+}
+
