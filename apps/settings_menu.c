@@ -428,6 +428,26 @@ static bool bidir_limit(void)
 }
 #endif
 
+/**
+ * Menu to set the battery capacity
+ */
+static bool battery_capacity(void) {
+    bool retval = false;
+
+    char* names[] = { "1500 mAh ", "1600 mAh ",
+                      "1700 mAh ", "1800 mAh ",
+                      "1900 mAh ", "2000 mAh ",
+                      "2100 mAh ", "2200 mAh "
+    };
+
+    retval = set_option( str(LANG_BATTERY_CAPACITY), 
+                       &global_settings.battery_capacity, names, 8, NULL);
+
+    set_battery_capacity(global_settings.battery_capacity);
+
+    return retval;
+}
+
 #ifdef HAVE_CHARGE_CTRL
 static bool deep_discharge(void)
 {
@@ -720,9 +740,10 @@ static bool system_settings_menu(void)
 #ifdef HAVE_ATA_POWER_OFF
         { str(LANG_POWEROFF),    poweroff        },
 #endif
+        { str(LANG_BATTERY_CAPACITY), battery_capacity },
 #ifdef HAVE_CHARGE_CTRL
-        { str(LANG_DISCHARGE),   deep_discharge  },
-        { str(LANG_TRICKLE_CHARGE),   trickle_charge  },
+        { str(LANG_DISCHARGE),        deep_discharge   },
+        { str(LANG_TRICKLE_CHARGE),   trickle_charge   },
 #endif
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_TIME),        timedate_set    },

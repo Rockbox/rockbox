@@ -831,6 +831,7 @@ void settings_reset(void) {
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
     global_settings.backlight_on_when_charging   = 
         DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
+    global_settings.battery_capacity = 0; /* 1500 mAh */
     global_settings.trickle_charge = true;
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
