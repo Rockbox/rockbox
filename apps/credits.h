@@ -20,13 +20,6 @@
 #ifndef __ROCKBOX_CREDITS_H__
 #define __ROCKBOX_CREDITS_H__
 
-#define CREDIT_COUNT 21
-
-struct credit {
-    const char *name;
-    const char *desc;
-};
-
 /* Show who worked on the project */
 void show_credits(void);
 

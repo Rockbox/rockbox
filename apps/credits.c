@@ -21,10 +21,12 @@
 #include "lcd.h"
 #include "kernel.h"
 
-#define DISPLAY_TIME  200
+struct credit {
+    char *name;
+    char *desc;
+};
 
-struct credit credits[CREDIT_COUNT] = {
-    { "[Credits]",               ""                                  },
+struct credit credits[] = {
     { "Bjorn Stenberg",          "Originator, project manager, code" },
     { "Linus Nielsen Feltzing",  "Electronics, code"                 },
     { "Andy Choi",               "Checksums"                         },
@@ -47,38 +49,49 @@ struct credit credits[CREDIT_COUNT] = {
     { "Stefan Meyer",            "Code"                              },
 };
 
+#ifdef HAVE_LCD_BITMAP
+#define MAX_LINES 6
+#define DISPLAY_TIME  HZ*2
+#else
+#define MAX_LINES 2
+#define DISPLAY_TIME  HZ
+#endif
+
 void show_credits(void)
 {
-    int i = 0;
+    int i,j;
     int line = 0;
 
     lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0,9);
+#endif
 
-    while(i < CREDIT_COUNT-1) {
-        if ((line % 4 == 0) && (line!=0)) {
-            lcd_puts(0, 0, (char *)credits[0].name);
+    for ( i=0; i<sizeof(credits)/sizeof(struct credit); i++ ) {
+#ifdef HAVE_LCD_BITMAP
+        lcd_putsxy(0, 0, " [Credits]",0);
+#endif
+        lcd_puts(0, line, credits[i].name);
+        line++;
+        if ( line == MAX_LINES ) {
             lcd_update();
-            sleep(DISPLAY_TIME);
+            /* abort on keypress */
+            for ( j=0;j<10;j++ ) {
+                sleep(DISPLAY_TIME/10);
+                if (button_get())
+                    return;
+            }
             lcd_clear_display();
             line=0;
         }
-        lcd_puts(0, ++line, (char *)credits[++i].name);
     }
-
-    if ((i-1)%4 != 0) {
-        lcd_puts(0, 0, (char *)credits[0].name);
+    if ( line != MAX_LINES ) {
         lcd_update();
-        sleep(DISPLAY_TIME);
-        lcd_clear_display();
+        /* abort on keypress */
+        for ( j=0;j<10;j++ ) {
+            sleep(DISPLAY_TIME/10);
+            if (button_get())
+                return;
+        }
     }
-
 }
-
-
-
-
-
-
-
-
-
