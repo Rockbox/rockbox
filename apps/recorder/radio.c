@@ -155,6 +155,9 @@ bool radio_screen(void)
     
     radio_load_presets();
 
+    if(rec_create_directory() > 0)
+        have_recorded = true;
+    
     mpeg_stop();
     
     mpeg_init_recording();

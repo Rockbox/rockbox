@@ -21,5 +21,6 @@
 
 bool recording_screen(void);
 char *rec_create_filename(char *buf);
+int rec_create_directory(void);
 
 #endif

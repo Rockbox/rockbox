@@ -137,6 +137,32 @@ char *rec_create_filename(char *buffer)
     return buffer;
 }
 
+int rec_create_directory(void)
+{
+    int rc;
+    
+    /* Try to create the base directory if needed */
+    if(global_settings.rec_directory == 0)
+    {
+        rc = mkdir(rec_base_directory, 0);
+        if(rc < 0 && errno != EEXIST)
+        {
+            splash(HZ * 2, true,
+                   "Can't create the %s directory. Error code %d.",
+                   rec_base_directory, rc);
+            return -1;
+        }
+        else
+        {
+            /* If we have created the directory, we want the dir browser to
+               be refreshed even if we haven't recorded anything */
+            if(errno != EEXIST)
+                return 1;
+        }
+    }
+    return 0;
+}
+
 bool recording_screen(void)
 {
     int button;
@@ -152,7 +178,6 @@ bool recording_screen(void)
     unsigned int last_seconds = 0;
     int hours, minutes;
     char path_buffer[MAX_PATH];
-    int rc;
     bool been_in_usb_mode = false;
 
     cursor = 0;
@@ -183,24 +208,8 @@ bool recording_screen(void)
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
 
-    /* Try to create the base directory if needed */
-    if(global_settings.rec_directory == 0)
-    {
-        rc = mkdir(rec_base_directory, 0);
-        if(rc < 0 && errno != EEXIST)
-        {
-            splash(HZ * 2, true,
-                   "Can't create the %s directory. Error code %d.",
-                   rec_base_directory, rc);
-        }
-        else
-        {
-            /* If we have created the directory, we want the dir browser to
-               be refreshed even if we haven't recorded anything */
-            if(errno != EEXIST)
-                have_recorded = true;
-        }
-    }
+    if(rec_create_directory() > 0)
+        have_recorded = true;
     
     while(!done)
     {
