@@ -32,6 +32,7 @@
 #include "hwcompat.h"
 #include "adc.h"
 #include "bitswap.h"
+#include "disk.h" /* for mount/unmount */
 
 #define SECTOR_SIZE     512
 
@@ -89,6 +90,11 @@ long last_disk_activity = -1;
 
 static struct mutex mmc_mutex;
 
+#ifdef HAVE_HOTSWAP
+static char mmc_stack[DEFAULT_STACK_SIZE];
+static const char mmc_thread_name[] = "mmc";
+static struct event_queue mmc_queue;
+#endif
 static bool initialized = false;
 static bool delayed_write = false;
 static unsigned char delayed_sector[SECTOR_SIZE];
@@ -786,6 +792,34 @@ void ata_spin(void)
 {
 }
 
+#ifdef HAVE_HOTSWAP
+static void mmc_thread(void)
+{
+    struct event ev;
+    
+    while (1) {
+        queue_wait(&mmc_queue, &ev);
+        switch ( ev.id ) {
+            case SYS_USB_CONNECTED:
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&mmc_queue);
+                break;
+
+            case SYS_MMC_INSERTED:
+                disk_mount(1); /* mount MMC */
+                queue_broadcast(SYS_FS_CHANGED, NULL);
+                break;
+
+            case SYS_MMC_EXTRACTED:
+                disk_unmount(1); /* release "by force" */
+                queue_broadcast(SYS_FS_CHANGED, NULL);
+                break;
+        }
+    }
+}
+#endif /* #ifdef HAVE_HOTSWAP */
+
 bool mmc_detect(void)
 {
     return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
@@ -880,6 +914,11 @@ int ata_init(void)
     
     if ( !initialized ) 
     {
+#ifdef HAVE_HOTSWAP
+        queue_init(&mmc_queue);
+        create_thread(mmc_thread, mmc_stack,
+                      sizeof(mmc_stack), mmc_thread_name);
+#endif
         tick_add_task(mmc_tick);
         initialized = true;
     }

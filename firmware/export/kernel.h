@@ -42,6 +42,7 @@
 #define SYS_MMC_INSERTED          ((SYS_EVENT | ((long)6 << 27)))
 #define SYS_MMC_EXTRACTED         ((SYS_EVENT | ((long)7 << 27)))
 #define SYS_POWEROFF              ((SYS_EVENT | ((long)8 << 27)))
+#define SYS_FS_CHANGED            ((SYS_EVENT | ((long)9 << 27)))
 
 struct event
 {
