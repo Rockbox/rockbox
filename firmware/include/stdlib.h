@@ -23,10 +23,6 @@ extern "C" {
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
-extern __IMPORT int __mb_cur_max;
-
-#define MB_CUR_MAX __mb_cur_max
-
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 
 void *malloc(size_t);
