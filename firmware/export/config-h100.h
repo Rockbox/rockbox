@@ -8,8 +8,7 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 
-/* define this if you have the Recorder's 10-key keyboard */
-#define CONFIG_KEYPAD RECORDER_PAD
+#define CONFIG_KEYPAD IRIVER_H100_PAD
 
 #ifndef SIMULATOR
 
