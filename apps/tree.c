@@ -380,6 +380,21 @@ static int showdir(char *path, int start)
         dirstart = start;
     }
 
+    /* The cursor might point to an invalid line, for example if someone
+       deleted the last file in the dir */
+    if(filesindir)
+    {
+        while(start + dircursor >= filesindir)
+        {
+            if(start)
+                start--;
+            else
+                if(dircursor)
+                    dircursor--;
+        }
+        dirstart = start;
+    }
+
 #ifdef HAVE_LCD_CHARCELLS
     lcd_stop_scroll();
     lcd_double_height(false);
@@ -1119,6 +1134,7 @@ bool dirbrowse(char *root)
 
         if (restore || reload_dir) {
             /* restore display */
+
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
             if(CURSOR_Y+LINE_Y+dircursor>tree_max_on_screen) {
