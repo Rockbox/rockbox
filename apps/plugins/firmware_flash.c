@@ -270,12 +270,16 @@ unsigned crc_32(unsigned char* buf, unsigned len, unsigned crc32)
 /* test if the version number is consistent with the platform */
 bool CheckPlatform(int platform_id, UINT16 version)
 {
-    if (version == 123)
+    if (version == 200)
+    {   /* for my very first firmwares, I foolishly changed it to 200 */
+        return (platform_id == ID_RECORDER || platform_id == ID_FM);
+    }
+    else if (version == 123)
     {   /* it can be a FM or V2 recorder */
         return (platform_id == ID_FM || platform_id == ID_REC_V2);
     }
-    else if ((version >= 124 && version <= 128) || version == 200)
-    {   /* for my very first firmware, I foolishly changed it to 200 */
+    else if (version >= 118 && version <= 128)
+    {   /* the range of Recorders seen so far */
         return (platform_id == ID_RECORDER);
     }
     else if (version == 0 || (version >= 300 && version <= 506))
@@ -819,7 +823,7 @@ void DoUserDialog(char* filename)
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, 0, true, "Wrong plugin");
+        rb->splash(HZ*3, 0, true, "Wrong version");
         return; /* exit */
     }
 
