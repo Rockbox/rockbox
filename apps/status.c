@@ -52,16 +52,16 @@ void status_set_playmode(enum playmode mode)
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state)
 {
-    bool laststate=statusbar_enabled;
+    bool laststate = statusbar_enabled;
 
-    statusbar_enabled=state;
+    statusbar_enabled = state;
 
     return(laststate);
 }
 
 void statusbar_toggle(void)
 {
-    statusbar_enabled=!statusbar_enabled;
+    statusbar_enabled = !statusbar_enabled;
 }
 #endif
 
@@ -144,7 +144,7 @@ void status_draw(void)
         }
         else {
             plug_state=false;
-            if(battlevel > battery_level_safe())
+            if(battery_level_safe())
                 battery_state = true;
             else
                 if(TIME_AFTER(current_tick, switch_tick)) {
