@@ -185,12 +185,12 @@ if [ "-" = "$extra_defines" ]; then
   
   echo "Loadable fonts support? (N)"
   getit=`input`;
-  if [ "y" = "$getit" ] ; then
+  if [ "y" = "$getit" -o "Y" = "$getit" ] ; then
      extra_defines="-DLOADABLE_FONTS"
   else
      echo "Proportional font support? (N)"
      getit=`input`;
-     if [ "y" = "$getit" ] ; then
+     if [ "y" = "$getit" -o "Y" = "$getit"  ] ; then
         extra_defines="-DLCD_PROPFONTS"
      else
         extra_defines=""
