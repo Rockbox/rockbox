@@ -191,11 +191,6 @@ screenhack (Display *the_dpy, Window the_window)
 
   screen_redraw();
 
-#ifdef HAVE_LCD_CHARCELLS
-  // FIXME??
-  lcd_setfont(2);
-#endif
-
   app_main();
 }
 
