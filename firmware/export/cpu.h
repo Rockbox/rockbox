@@ -24,3 +24,6 @@
 #if CONFIG_CPU == MCF5249
 #include "mcf5249.h"
 #endif
+#if CONFIG_CPU == TCC730
+#include "tcc730.h"
+#endif
