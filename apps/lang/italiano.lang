@@ -160,18 +160,18 @@ new: "OFF per ritornare"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
-new: "Files Nascosti"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
-new: "Mostra"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
-new: "Nascondi"
+eng: ""
+new: ""
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -190,8 +190,8 @@ new: "Suona prima i selezionati"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
-new: "Filtro Musicale"
+eng: ""
+new: ""
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -449,12 +449,12 @@ new: "Tastiera Sbloccata"
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-new: "Tastiera Bloccata"
+new: "  Tastiera Bloccata"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Tastiera Sbloccata"
+new: " Tastiera Sbloccata"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
@@ -569,12 +569,12 @@ new: "Pausa"
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "mode:"
-new: "modalità:"
+new: "Modalità:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
-new: "Filtro dir: %s"
+eng: ""
+new: ""
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -584,7 +584,7 @@ new: "Stato"
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-new: "Scorri"
+new: "Scorrimento"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
@@ -649,7 +649,7 @@ new: "Livello - %d"
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - slow, 9 - fast)"
-new: "(1 - lento, 9 - veloce)"
+new: "(1 - Lento, 9 - Veloce)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
@@ -679,17 +679,17 @@ new: "[Off] per interrompere"
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
 eng: "[F1] - level"
-new: "[F1] - livello"
+new: "[F1] - Livello"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: "[F2] same level"
-new: "[F2] stesso livello"
+new: "[F2] Stesso Livello"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: "[F3] + level"
-new: "[F3] + livello"
+new: "[F3] + Livello"
 
 # Next ids are for Worlmet Game.
 # Lenght restrictions for score board strings (LANG_SB_XXX):
@@ -738,12 +738,12 @@ new: "Rec: %d"
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
-new: "%d Giocatori  su/giù"
+new: "%d Giocatori      su/giù"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-new: "%d Vermi         d/s"
+new: "%d Vermi          d/s"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -753,7 +753,7 @@ new: "Telecomando       F1"
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-new: "No telecomando    F1"
+new: "No Telecomando    F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
@@ -786,5 +786,41 @@ id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 new: "Spegnimento per Inattività"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "Nuova Lingua"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Mostra Files"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Musica"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Supportati"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "Tutti"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Si"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "No"
+
 
 
