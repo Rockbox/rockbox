@@ -9,6 +9,8 @@
 
 <h2>News</h2>
 
+<p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
+
 <p><i>2003-04-23</i>: <a href="/digest/">The Rockbox Digest</a> - track
 Rockbox development.
 
