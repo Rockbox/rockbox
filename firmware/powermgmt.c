@@ -238,6 +238,10 @@ void battery_level_update(void)
 /* Returns battery level in percent */
 int battery_level(void)
 {
+#ifdef HAVE_CHARGE_CTRL
+    if ((charge_state==1) && (battery_level_cached==100))
+        return 99;
+#endif
     return battery_level_cached;
 }
 
