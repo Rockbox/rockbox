@@ -65,7 +65,9 @@ static char *units[] =
     "dB",   /* Treble */
     "%",    /* Balance */
     "dB",   /* Loudness */
-    "%"     /* Bass boost */
+    "%",    /* Bass boost */
+    "",     /* AVC */
+    ""      /* Channels */
 };
 
 static int numdecimals[] =
@@ -75,7 +77,9 @@ static int numdecimals[] =
     0,    /* Treble */
     0,    /* Balance */
     0,    /* Loudness */
-    0     /* Bass boost */
+    0,    /* Bass boost */
+    0,    /* AVC */
+    0     /* Channels */
 };
 
 static int minval[] =
@@ -85,7 +89,9 @@ static int minval[] =
     0,    /* Treble */
     -50,  /* Balance */
     0,    /* Loudness */
-    0     /* Bass boost */
+    0,    /* Bass boost */
+    0,    /* AVC */
+    0     /* Channels */
 };
 
 static int maxval[] =
@@ -100,7 +106,9 @@ static int maxval[] =
 #endif
     50,    /* Balance */
     17,    /* Loudness */
-    10     /* Bass boost */
+    10,    /* Bass boost */
+    0,     /* AVC */
+    3      /* Channels */
 };
 
 static int defaultval[] =
@@ -115,7 +123,9 @@ static int defaultval[] =
 #endif
     0,       /* Balance */
     0,       /* Loudness */
-    0        /* Bass boost */
+    0,       /* Bass boost */
+    0,       /* AVC */
+    0        /* Channels */
 };
 
 char *mpeg_sound_unit(int setting)
@@ -1603,6 +1613,9 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(MAS_REG_KAVC, tmp);
             break;
 #endif
+        case SOUND_CHANNELS:
+            mpeg_sound_channel_config(value);
+            break;
     }
 #endif /* SIMULATOR */
 }
@@ -1650,6 +1663,72 @@ int mpeg_val2phys(int setting, int value)
     return result;
 }
 
+void mpeg_sound_channel_config(int configuration)
+{
+    unsigned long val_on = 0x80000;
+    unsigned long val_off = 0;
+    
+    switch(configuration)
+    {
+        case MPEG_SOUND_STEREO:
+            val_on = 0x80000;
+#ifdef HAVE_MAS3587F
+            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D0, 0x7fd, &val_off, 1); /* LR */
+            mas_writemem(MAS_BANK_D0, 0x7fe, &val_off, 1); /* RL */
+            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
+#else
+            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D1, 0x7f9, &val_off, 1); /* LR */
+            mas_writemem(MAS_BANK_D1, 0x7fa, &val_off, 1); /* RL */
+            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
+#endif
+            break;
+        case MPEG_SOUND_MONO:
+            val_on = 0xc0000;
+#ifdef HAVE_MAS3587F
+            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D0, 0x7fd, &val_on, 1); /* LR */
+            mas_writemem(MAS_BANK_D0, 0x7fe, &val_on, 1); /* RL */
+            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
+#else
+            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D1, 0x7f9, &val_on, 1); /* LR */
+            mas_writemem(MAS_BANK_D1, 0x7fa, &val_on, 1); /* RL */
+            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
+#endif
+            break;
+        case MPEG_SOUND_MONO_LEFT:
+            val_on = 0x80000;
+#ifdef HAVE_MAS3587F
+            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D0, 0x7fd, &val_on, 1); /* LR */
+            mas_writemem(MAS_BANK_D0, 0x7fe, &val_off, 1); /* RL */
+            mas_writemem(MAS_BANK_D0, 0x7ff, &val_off, 1); /* RR */
+#else
+            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
+            mas_writemem(MAS_BANK_D1, 0x7f9, &val_on, 1); /* LR */
+            mas_writemem(MAS_BANK_D1, 0x7fa, &val_off, 1); /* RL */
+            mas_writemem(MAS_BANK_D1, 0x7fb, &val_off, 1); /* RR */
+#endif
+            break;
+        case MPEG_SOUND_MONO_RIGHT:
+            val_on = 0xc0000;
+#ifdef HAVE_MAS3587F
+            mas_writemem(MAS_BANK_D0, 0x7fc, &val_off, 1); /* LL */
+            mas_writemem(MAS_BANK_D0, 0x7fd, &val_off, 1); /* LR */
+            mas_writemem(MAS_BANK_D0, 0x7fe, &val_on, 1); /* RL */
+            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
+#else
+            mas_writemem(MAS_BANK_D1, 0x7f8, &val_off, 1); /* LL */
+            mas_writemem(MAS_BANK_D1, 0x7f9, &val_off, 1); /* LR */
+            mas_writemem(MAS_BANK_D1, 0x7fa, &val_on, 1); /* RL */
+            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
+#endif
+            break;
+    }
+}
+
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
@@ -1676,10 +1755,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     if(rc < 0)
         panicf("mas_ctrl_r: %d", rc);
 
-    /* Max volume on both ears */
-    val = 0x80000;
-    mas_writemem(MAS_BANK_D0,0x7fc,&val,1);
-    mas_writemem(MAS_BANK_D0,0x7ff,&val,1);
+    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
 
     /* Enable the D/A Converter */
     mas_codec_writereg(0x0, 0x0001);
@@ -1755,9 +1831,8 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_config(0x04); /* DAC on, all else off */
 
-    val = 0x80000;
-    mas_writemem(MAS_BANK_D1, 0x7f8, &val, 1);
-    mas_writemem(MAS_BANK_D1, 0x7fb, &val, 1);
+    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
+
 #endif
     
     mpeg_sound_set(SOUND_BASS, bass);

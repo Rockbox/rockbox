@@ -57,6 +57,7 @@ struct user_settings
     int loudness;   /* loudness eq:          0-100 0=off   100=max           */
     int bass_boost; /* bass boost eq:        0-100 0=off   100=max           */
     int avc;        /* auto volume correct:  0=disable, 1=2s 2=4s 3=8s       */
+    int channel_config;  /* Stereo, Mono, Mono left, Mono right */
     
     /* device settings */
 

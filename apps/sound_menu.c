@@ -185,11 +185,20 @@ static Menu bass_boost(void)
 static Menu avc(void)
 {
     char* names[] = { "off", "2s ", "4s ", "8s " };
-    set_option("[AV decay time]", &global_settings.avc, names, 4 );
+    set_option("AV decay time", &global_settings.avc, names, 4 );
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
     return MENU_OK;
 }
 #endif /* ARCHOS_RECORDER */
+
+static Menu chanconf(void)
+{
+    char *names[] = {"Stereo   ", "Mono      ", "Mono Left  ", "Mono Right" };
+    set_option("Channel configuration",
+               &global_settings.channel_config, names, 4 );
+    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
+    return MENU_OK;
+}
 
 Menu sound_menu(void)
 {
@@ -200,6 +209,7 @@ Menu sound_menu(void)
         { "Bass",   bass },
         { "Treble", treble },
         { "Balance", balance },
+        { "Channels", chanconf },
 #ifdef HAVE_MAS3587F
         { "Loudness", loudness },
         { "Bass Boost", bass_boost },

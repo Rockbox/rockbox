@@ -34,6 +34,7 @@ void mpeg_sound_set(int setting, int value);
 int mpeg_sound_min(int setting);
 int mpeg_sound_max(int setting);
 int mpeg_sound_default(int setting);
+void mpeg_sound_channel_config(int configuration);
 int mpeg_val2phys(int setting, int value);
 char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
@@ -47,6 +48,12 @@ bool mpeg_has_changed_track(void);
 #define SOUND_LOUDNESS 4
 #define SOUND_SUPERBASS 5
 #define SOUND_AVC 6
-#define SOUND_NUMSETTINGS 7
+#define SOUND_CHANNELS 7
+#define SOUND_NUMSETTINGS 8
+
+#define MPEG_SOUND_STEREO 0
+#define MPEG_SOUND_MONO 1
+#define MPEG_SOUND_MONO_LEFT 2
+#define MPEG_SOUND_MONO_RIGHT 3
 
 #endif
