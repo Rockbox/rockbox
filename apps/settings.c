@@ -69,13 +69,14 @@ offset  abs
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden,
-                 browse_current>
+                 scroll bar>
 0x0f    0x23    <scroll speed>
 0x10    0x24    <ff/rewind min step, acceleration rate>
 0x11    0x25    <AVC, channel config>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
+0x1b    0x2f    <browse current, play selected>
 
         <all unused space filled with 0xff>
 
@@ -268,8 +269,7 @@ int settings_save( void )
          ((global_settings.discharge & 1) << 3) |
          ((global_settings.statusbar & 1) << 4) |
          ((global_settings.show_hidden_files & 1) << 5) |
-         ((global_settings.scrollbar & 1) << 6) |
-         ((global_settings.browse_current & 1) << 7));
+         ((global_settings.scrollbar & 1) << 6));
 
     config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
     
@@ -278,10 +278,15 @@ int settings_save( void )
          (global_settings.ff_rewind_accel & 15));
     config_block[0x11] = (unsigned char)(global_settings.avc ||
                                          global_settings.channel_config << 2);
-    config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
 
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
+
+    config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
+    config_block[0x1b] = (unsigned char)
+        (((global_settings.browse_current & 1)) |
+         ((global_settings.play_selected & 1) << 1));
+    
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
     memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
@@ -359,7 +364,8 @@ void settings_load(void)
             global_settings.statusbar = (config_block[0xe] >> 4) & 1;
             global_settings.show_hidden_files = (config_block[0xe] >> 5) & 1;
             global_settings.scrollbar = (config_block[0xe] >> 6) & 1;
-            global_settings.browse_current = (config_block[0xe] >> 7) & 1;
+            /* Don't use the last bit, it must be unused to detect
+               an uninitialized entry */
         }
         
         c = config_block[0xf] >> 3;
@@ -385,6 +391,11 @@ void settings_load(void)
 
         if (config_block[0x1a] != 0xFF)
             global_settings.disk_spindown = config_block[0x1a];
+
+        if (config_block[0x1b] != 0xFF) {
+            global_settings.browse_current = (config_block[0x1b]) & 1;
+            global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
+        }
 
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -595,6 +606,7 @@ void settings_reset(void) {
     global_settings.resume_offset = -1;
     global_settings.disk_spindown = 5;
     global_settings.browse_current = false;
+    global_settings.play_selected = true;
 }
 
 

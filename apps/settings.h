@@ -81,6 +81,7 @@ struct user_settings
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
     bool playlist_shuffle;
+    bool play_selected; /* Plays selected file even in shuffle mode */
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
