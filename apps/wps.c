@@ -221,12 +221,15 @@ int wps_load_custom_config(void)
     int i;
     int fd;
     struct mp3entry* id3 = NULL;
-    char ch = '/';
     char* szLast;
 
     id3 = mpeg_current_track();
-    szLast = strrchr(id3->path, ch);
-    snprintf(buffer, sizeof(buffer), "");
+    szLast = strrchr(id3->path, '/');
+    if(szLast)
+      /* point to the first letter in the file name */
+      szLast++;
+
+    buffer[0]=0;
     lcd_stop_scroll();
     fd = open("/wps.config", O_RDONLY);
     if(-1 == fd)
@@ -280,7 +283,7 @@ int wps_load_custom_config(void)
                                     id3->title?id3->title:"<no title>");
                         else
                             snprintf(tmpbuf, sizeof(tmpbuf), "%s",
-                                    szLast?++szLast:id3->path);
+                                    szLast?szLast:id3->path);
                         break;
                     case 'h':  /* Conditional Filename \ ID3 Title-Artist */
                         if(id3->artist && id3->title)
@@ -289,7 +292,7 @@ int wps_load_custom_config(void)
                                      id3->artist?id3->artist:"<no artist>");
                         else
                             snprintf(tmpbuf, sizeof(tmpbuf), "%s",
-                                    szLast?++szLast:id3->path);
+                                    szLast?szLast:id3->path);
                         break;
                     case 'b':  /* File Bitrate */
                         snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->bitrate);
@@ -302,7 +305,7 @@ int wps_load_custom_config(void)
                         break;
                     case 'm':  /* File Name */
                         snprintf(tmpbuf, sizeof(tmpbuf), "%s", 
-                                szLast?++szLast:id3->path);
+                                szLast?szLast:id3->path);
                         break;
                     case 's':  /* File Size (In Kilobytes) */
                         snprintf(tmpbuf, sizeof(tmpbuf), "%d",
