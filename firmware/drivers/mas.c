@@ -271,7 +271,6 @@ void mas_reset(void)
     or_b(0x01, &PAIORH);
 
 #if CONFIG_HWCODEC == MAS3507D
-    or_b(0x01, &PAIORH);
     and_b(~0x01, &PADRH);
     sleep(HZ/100);
     or_b(0x01, &PADRH);
