@@ -256,27 +256,25 @@ bool bookmark_autobookmark(void)
     {
         /* Wait for a key to be pushed */
         key = button_get(true);
-        if (key & BUTTON_REL)
+        switch (key)
         {
-#ifdef BUTTON_PLAY
-            if (key & BUTTON_PLAY)
-#else
-            if (key & BUTTON_RIGHT)
-#endif
-            {
+            case SETTINGS_OK:
                 if (global_settings.autocreatebookmark ==
                     BOOKMARK_RECENT_ONLY_ASK)
-                    write_bookmark(false);
+                    return write_bookmark(false);
                 else
-                    write_bookmark(true);
-            }
-            done = true;
-        }
+                    return write_bookmark(true);
+                break;
 
-        if (default_event_handler(key) == SYS_USB_CONNECTED)
-            return false;
+            default:
+                /* Handle sys events, ignore button releases & repeats */
+                if(default_event_handler(key) || 
+                   !(key & (BUTTON_REL|BUTTON_REPEAT)))
+                    done = true;
+                break;
+        }
     }
-    return true;
+    return false;
 }
 
 /* ----------------------------------------------------------------------- */
@@ -482,7 +480,7 @@ bool bookmark_autoload(const char* file)
     }
     else
     {
-        while (button_get(false)); /* clear button queue */
+        button_clear_queue(); /* clear button queue */
         /* Prompting user to confirm bookmark load */
         lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
@@ -512,11 +510,7 @@ bool bookmark_autoload(const char* file)
                 case BUTTON_DOWN:
                     return bookmark_load(global_bookmark_file_name, false);
 #endif
-#ifdef BUTTON_PLAY
-                case BUTTON_PLAY:
-#else
-                case BUTTON_RIGHT:
-#endif
+                case SETTINGS_OK:
                     return bookmark_load(global_bookmark_file_name, true);
 
                 default:
@@ -621,7 +615,7 @@ static char* select_bookmark(const char* bookmark_file_name)
     lcd_setmargins(0, 0);
 #endif
 
-    while (button_get(false)); /* clear button queue */
+    button_clear_queue(); /* clear button queue */
     bookmark_count = get_bookmark_count(bookmark_file_name);
 
     while(true)
@@ -644,7 +638,7 @@ static char* select_bookmark(const char* bookmark_file_name)
             {
                 splash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
-                while (button_get(false)); /* clear button queue */
+                button_clear_queue(); /* clear button queue */
                 return NULL;
             }
             else
@@ -674,10 +668,10 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
                 return bookmark;
 
-#if defined(BUTTON_ON) && defined(BUTTON_PLAY)
-            case BUTTON_ON | BUTTON_PLAY:
-#elif defined(BUTTON_MENU) && defined(BUTTON_RIGHT)
+#if CONFIG_KEYPAD == ONDIO_PAD
             case BUTTON_MENU | BUTTON_RIGHT:
+#else
+            case BUTTON_ON | BUTTON_PLAY:
 #endif
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
@@ -685,7 +679,7 @@ static char* select_bookmark(const char* bookmark_file_name)
                 bookmark_count--;
                 if(bookmark_id >= bookmark_count)
                     bookmark_id = bookmark_count -1;
-                while (button_get(false)); /* clear button queue */
+                button_clear_queue(); /* clear button queue */
                 break;
 
             case SETTINGS_INC:
@@ -696,7 +690,9 @@ static char* select_bookmark(const char* bookmark_file_name)
                 bookmark_id++;
                 break;
 
+#if CONFIG_KEYPAD != ONDIO_PAD
             case SETTINGS_CANCEL:
+#endif
 #ifdef SETTINGS_CANCEL2
             case SETTINGS_CANCEL2:
 #endif
