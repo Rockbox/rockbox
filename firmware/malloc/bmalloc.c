@@ -238,12 +238,13 @@ static void bmalloc_failed(size_t size)
 #define bmalloc_failed(x)
 #endif
 
-void bmalloc_status()
+void bmalloc_status(void)
 {
+#ifdef DEBUG
   struct BlockInfo *block = blockHead;
   long mem_free = 0;
   long mem_used = 0;
-#if 1
+
   printf("List of BLOCKS (in address order):\n");
   while(block) {
     printf("  START %p END %p SIZE %ld FLAG %s\n",
@@ -259,9 +260,10 @@ void bmalloc_status()
   }
   printf(" Used mem: %ld , free mem: %ld (total %ld)\n",
          mem_used, mem_free, mem_used + mem_free);
-#endif
   bmalloc_print_sizes();
+#endif
 }
+
 
 void *bmalloc(size_t size)
 {
