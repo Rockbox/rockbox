@@ -251,6 +251,57 @@ void TIMER0(void)
 
     TER0 = 0xff; /* Clear all events */
 }
+
+#elif CONFIG_CPU == TCC730
+
+void TIMER0(void)
+{
+    int i;
+
+    /* Run through the list of tick tasks */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i])
+        {
+            tick_funcs[i]();
+        }
+    }
+
+    current_tick++;
+    wake_up_thread();
+
+    /* re-enable timer by clearing the counter */
+    TACON |= 0x80;
+}
+
+static void tick_start(unsigned int interval_in_ms)
+{
+    u32 count;
+    count = (long)FREQ * (long)interval_in_ms / 1000 / 16;
+
+    if(count > 0xffffL)
+    {
+        panicf("Error! The tick interval is too long (%dms->%x)\n",
+               interval_in_ms, count);
+        return;
+    }
+
+    /* Use timer A */
+    TAPRE = 0x0;
+    TADATA = (u16)count;
+
+    TACON = 0x89;
+    /* counter clear; */
+    /* interval mode; */
+    /* TICS = F(osc) / 16 */
+    /* TCS = internal clock */
+    /* enable */
+    
+    /* enable the interrupt */
+    interruptVector[2] = TIMER0;
+    IMR0 |= (1<<2);
+}
+
 #endif
 
 int tick_add_task(void (*f)(void))
