@@ -528,7 +528,7 @@ void lcd_init (void)
  *
  * Memory copy of display bitmap
  */
-unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
+unsigned char display[LCD_WIDTH][LCD_HEIGHT/8] __attribute__ ((section (".idata")));
 
 static int font=0;
 static int xmargin=0;
