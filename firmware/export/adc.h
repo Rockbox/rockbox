@@ -21,6 +21,21 @@
 
 #define NUM_ADC_CHANNELS 8
 
+#ifdef HAVE_ONDIO_ADC
+
+#define ADC_MMC_SWITCH          0 /* Battery voltage always reads 0x3FF due to
+                                     silly scaling */
+#define ADC_USB_POWER           1 /* USB, reads 0x000 when USB is inserted */
+#define ADC_BUTTON_OPTION       2 /* the option button, low value if pressed */
+#define ADC_BUTTON_ONOFF        3 /* the on/off button, high value if pressed */
+#define ADC_BUTTON_ROW1         4 /* Used for scanning the keys, different
+                                     voltages for different keys */
+#define ADC_UNREG_POWER         7 /* Battery voltage */
+/* FixMe: this doesn't exist, just to make the compiler happy */
+#define ADC_EXT_POWER           5 /* The external power voltage, V=X*0.0148 */
+
+#else
+/* normal JBR channel assignment */
 #define ADC_BATTERY             0 /* Battery voltage always reads 0x3FF due to
                                      silly scaling */
 #ifdef HAVE_FMADC
@@ -38,6 +53,8 @@
                                      voltages for different keys */
 #define ADC_UNREG_POWER         6 /* Battery voltage with a better scaling */
 #define ADC_EXT_POWER           7 /* The external power voltage, V=X*0.0148 */
+
+#endif
 
 #define EXT_SCALE_FACTOR 14800
 
