@@ -21,6 +21,7 @@
 
 #ifdef HAVE_FMRADIO
 bool radio_screen(void);
+void radio_stop(void);
 
 struct fmstation
 {

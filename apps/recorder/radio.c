@@ -58,11 +58,18 @@ static struct fmstation presets[MAX_PRESETS];
 
 static char default_filename[] = "/.rockbox/fm-presets-default.fmr";
 
-void fm_load_presets(void);
-bool fm_preset_select(void);
-bool fm_menu(void);
+void radio_load_presets(void);
+bool radio_preset_select(void);
+bool radio_menu(void);
 
-void fm_set_frequency(int freq)
+void radio_stop(void)
+{
+    /* Mute the FM radio */
+    fmradio_set(1, 0x100003);
+
+}
+
+void radio_set_frequency(int freq)
 {
     /* We add the standard Intermediate Frequency 10.7MHz before calculating
     ** the divisor
@@ -109,7 +116,7 @@ bool radio_screen(void)
     fmradio_set_status(FMRADIO_PLAYING);
     lcd_getstringsize("A", &fw, &fh);
 
-    fm_load_presets();
+    radio_load_presets();
     
     /* Enable the Left and right A/D Converter */
     mas_codec_writereg(0x0, 0xccc7);
@@ -117,7 +124,7 @@ bool radio_screen(void)
     mas_codec_writereg(6, 0x4000);
 
     fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
-    fm_set_frequency(curr_freq);
+    radio_set_frequency(curr_freq);
     curr_preset = find_preset(curr_freq);
     
     while(!done)
@@ -131,7 +138,7 @@ bool radio_screen(void)
                 curr_freq = MIN_FREQ;
 
             /* Tune in and delay */
-            fm_set_frequency(curr_freq);
+            radio_set_frequency(curr_freq);
             sleep(10);
             
             /* Start IF measurement */
@@ -182,6 +189,15 @@ bool radio_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
+                radio_stop();
+
+                /* Turn off the ADC gain */
+                mas_codec_writereg(6, 0x0000);
+                
+                done = true;
+                break;
+                
+            case BUTTON_ON | BUTTON_REL:
                 done = true;
                 break;
                 
@@ -190,7 +206,7 @@ bool radio_screen(void)
                 if(curr_freq < MIN_FREQ)
                     curr_freq = MIN_FREQ;
 
-                fm_set_frequency(curr_freq);
+                radio_set_frequency(curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
                 break;
@@ -200,7 +216,7 @@ bool radio_screen(void)
                 if(curr_freq > MAX_FREQ)
                     curr_freq = MAX_FREQ;
                 
-                fm_set_frequency(curr_freq);
+                radio_set_frequency(curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
                 break;
@@ -234,7 +250,7 @@ bool radio_screen(void)
                 break;
 
             case BUTTON_F1:
-                fm_menu();
+                radio_menu();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
@@ -242,7 +258,7 @@ bool radio_screen(void)
                 break;
                 
             case BUTTON_F2:
-                fm_preset_select();
+                radio_preset_select();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
@@ -287,7 +303,7 @@ static bool parseline(char* line, char** freq, char** name)
     return true;
 }
 
-void fm_save_presets(void)
+void radio_save_presets(void)
 {
     int fd;
     int i;
@@ -307,7 +323,7 @@ void fm_save_presets(void)
     }
 }
 
-void fm_load_presets(void)
+void radio_load_presets(void)
 {
     int fd;
     int rc;
@@ -350,7 +366,7 @@ void fm_load_presets(void)
     presets_loaded = true;
 }
 
-bool fm_preset_select(void)
+bool radio_preset_select(void)
 {
     struct menu_items menu[MAX_PRESETS];
     int m, result;
@@ -388,7 +404,7 @@ bool fm_preset_select(void)
             {
                 i = (int)menu[result].function;
                 curr_freq = presets[i].frequency;
-                fm_set_frequency(curr_freq);
+                radio_set_frequency(curr_freq);
             }
         }
         else
@@ -400,7 +416,7 @@ bool fm_preset_select(void)
     return reload_dir;
 }
 
-static bool fm_add_preset(void)
+static bool radio_add_preset(void)
 {
     char buf[27];
     int i = find_preset(0);
@@ -414,7 +430,7 @@ static bool fm_add_preset(void)
             buf[27] = 0;
             strcpy(presets[i].name, buf);
             presets[i].frequency = curr_freq;
-            fm_save_presets();
+            radio_save_presets();
         }
     }
     else
@@ -424,7 +440,7 @@ static bool fm_add_preset(void)
     return true;
 }
 
-bool fm_delete_preset(void)
+bool radio_delete_preset(void)
 {
     struct menu_items menu[MAX_PRESETS];
     int m, result;
@@ -460,25 +476,25 @@ bool fm_delete_preset(void)
         {
             i = (int)menu[result].function;
             presets[i].frequency = 0;
-            fm_save_presets();
+            radio_save_presets();
         }
     }
 
     return reload_dir;
 }
 
-static struct menu_items fm_menu_items[] = {
-    { "Add preset", fm_add_preset },
-    { "Delete preset", fm_delete_preset }
+static struct menu_items radio_menu_items[] = {
+    { "Add preset", radio_add_preset },
+    { "Delete preset", radio_delete_preset }
 };
     
-bool fm_menu(void)
+bool radio_menu(void)
 {
     int m;
     bool result;
 
-    m = menu_init( fm_menu_items,
-                   sizeof fm_menu_items / sizeof(struct menu_items) );
+    m = menu_init( radio_menu_items,
+                   sizeof radio_menu_items / sizeof(struct menu_items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
