@@ -123,7 +123,7 @@ A17. Pessimist's Answer: At the current time we believe this is not very
      simply have MP3 codecs in ROM. We can download new codecs in them and 
      we will be the first to celebrate if we can get OGG or FLAC or anything 
      into these DSPs. Unfortunately, we have no docs or tools for writing new 
-     MAS DSP code and Intermetall is very secretive about it.  If anyone can 
+     MAS DSP code and Micronas is very secretive about it.  If anyone can 
      help, please get in touch!
 
      The recent release of Tremor (integer Ogg decoder) indicates it uses
