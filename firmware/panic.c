@@ -36,7 +36,15 @@ void panicf( char *fmt, ...)
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
 
+#ifdef HAVE_LCD_CHARCELLS
     lcd_puts(0,0,panic_buf);
+#elif defined(HAVE_LCD_BITMAP)
+    lcd_clear_display();
+    lcd_puts(0,0,panic_buf, 0);
+    lcd_update();
+#else
+    /* no LCD */
+#endif
     DEBUGF(panic_buf);
     while(1);
 }
