@@ -17,7 +17,7 @@ input() {
     echo $response
 }
 
-simul () {
+whichsim () {
 
 if [ -z "$simver" ]; then
 
@@ -38,6 +38,10 @@ if [ -z "$simver" ]; then
      ;;
    esac
 fi
+}
+
+
+simul () {
 
  ##################################################################
  # Figure out where the firmware code is!
@@ -273,7 +277,7 @@ if [ -z "$debug" ]; then
     [Ss])
       debug="SIMULATOR=1"
       simulator="yes"
-      simul
+      whichsim
       ;;
     [Dd])
       debug="DEBUG=1"
@@ -340,6 +344,7 @@ fi
 
 if [ "yes" = "$simulator" ]; then
     # we have already dealt with the simulator Makefile separately
+    simul
     exit
 fi
 
