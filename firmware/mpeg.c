@@ -1480,7 +1480,7 @@ int mpeg_val2phys(int setting, int value)
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
-    volume = bass = treble = loudness = bass_boost = avc;
+    volume = bass = treble = balance = loudness = bass_boost = avc;
 #else
     unsigned long val;
 #ifdef HAVE_MAS3587F
