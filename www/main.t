@@ -15,6 +15,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-06-17</i>: We now have a <a href="/twiki">Wiki</a> for the documentation. Feel free to join the documentation frenzy!
+
 <p><i>2004-05-07</i>: The CVS repository has <a href="/cvs.html">moved</a>
 
 <p><i>2004-03-14</i>: Rockbox can <a href="/lang/">talk</a> to you
