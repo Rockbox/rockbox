@@ -519,7 +519,7 @@ void set_current_file(char *path)
     unsigned int i;
 
     /* separate directory from filename */
-    name = strrchr(path,'/');
+    name = strrchr(path+1,'/');
     if (name)
     {
         *name = 0;
