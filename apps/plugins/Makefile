@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad
+   CODECLIBS = -lmad -la52
 endif
 
 LDS := plugin.lds
