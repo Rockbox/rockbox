@@ -572,6 +572,31 @@ static void mas_poll_start(int interval_in_ms)
 
     TSTR |= 0x02; /* Start timer 1 */
 }
+#else
+static void postpone_dma_tick(void)
+{
+    unsigned int count;
+
+    count = FREQ / 1000 / 8;
+
+    /* We are using timer 1 */
+    
+    TSTR &= ~0x02; /* Stop the timer */
+    TSNC &= ~0x02; /* No synchronization */
+    TMDR &= ~0x02; /* Operate normally */
+
+    TCNT1 = 0;   /* Start counting at 0 */
+    GRA1 = count;
+    TCR1 = 0x23; /* Clear at GRA match, sysclock/8 */
+
+    /* Enable interrupt on level 5 */
+    IPRC = (IPRC & ~0x000f) | 0x0005;
+    
+    TSR1 &= ~0x02;
+    TIER1 = 0xf9; /* Enable GRA match interrupt */
+
+    TSTR |= 0x02; /* Start timer 1 */
+}
 #endif
 
 #ifdef DEBUG
@@ -914,15 +939,6 @@ void DEI3(void)
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
 }
 
-#ifdef HAVE_MAS3507D
-#pragma interrupt
-void IMIA1(void)
-{
-    dma_tick();
-    TSR1 &= ~0x01;
-}
-#endif
-
 #ifdef HAVE_MAS3587F
 static void demand_irq_enable(bool on)
 {
@@ -941,6 +957,17 @@ static void demand_irq_enable(bool on)
 #endif
 
 #pragma interrupt
+void IMIA1(void)
+{
+    dma_tick();
+    TSR1 &= ~0x01;
+#ifdef HAVE_MAS3587F
+    /* Disable interrupt */
+    IPRC &= ~0x000f;
+#endif
+}
+
+#pragma interrupt
 void IRQ6(void)
 {
     stop_dma();
@@ -953,7 +980,10 @@ void IRQ3(void)
     /* Begin with setting the IRQ to edge sensitive */
     ICR |= 0x0010;
     
-    dma_tick();
+    if(mpeg_mode == MPEG_ENCODER)
+        dma_tick();
+    else
+        postpone_dma_tick();
 
 #if 0
     if(mpeg_mode == MPEG_ENCODER)
