@@ -2473,6 +2473,8 @@ void mpeg_set_recording_options(int frequency, int quality,
         (1 << 2) /* Is an original */;
     mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
 
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
+
     val = (((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
@@ -2480,6 +2482,8 @@ void mpeg_set_recording_options(int frequency, int quality,
         1; /* Validate */
     mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
 
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+    
     if(source == 0) /* Mic */
     {
         /* Copy left channel to right (mono mode) */
@@ -2522,7 +2526,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     mas_reset();
     
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
-    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    rc = mas_direct_config_write(MAS_CONTROL, 0x4c00);
     if(rc < 0)
         panicf("mas_ctrl_w: %d", rc);
 
