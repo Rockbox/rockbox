@@ -643,7 +643,7 @@ char *bdf_getline(FILE *fp, char *buf, int len)
             *b++ = c;
         }
         *b = '\0';
-        if (c == EOF)
+        if (c == EOF && b == buf)
             return NULL;
         if (b != buf && !isprefix(buf, "COMMENT"))
             break;
