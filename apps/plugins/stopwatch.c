@@ -31,6 +31,30 @@
 #define MAX_LAPS 10
 #define MAX_SCROLL (MAX_LAPS - LAP_LINES)
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define STOPWATCH_QUIT BUTTON_OFF
+#define STOPWATCH_START_STOP BUTTON_PLAY
+#define STOPWATCH_RESET_TIMER BUTTON_LEFT
+#define STOPWATCH_LAP_TIMER BUTTON_ON
+#define STOPWATCH_SCROLL_UP BUTTON_UP
+#define STOPWATCH_SCROLL_DOWN BUTTON_DOWN
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define STOPWATCH_QUIT BUTTON_OFF
+#define STOPWATCH_START_STOP BUTTON_RIGHT
+#define STOPWATCH_RESET_TIMER BUTTON_LEFT
+#define STOPWATCH_LAP_TIMER BUTTON_MENU
+#define STOPWATCH_SCROLL_UP BUTTON_UP
+#define STOPWATCH_SCROLL_DOWN BUTTON_DOWN
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define STOPWATCH_QUIT BUTTON_MENU
+#define STOPWATCH_START_STOP BUTTON_PLAY
+#define STOPWATCH_RESET_TIMER BUTTON_STOP
+#define STOPWATCH_LAP_TIMER BUTTON_ON
+#define STOPWATCH_SCROLL_UP BUTTON_RIGHT
+#define STOPWATCH_SCROLL_DOWN BUTTON_LEFT
+#endif
+
 static struct plugin_api* rb;
 
 static int stopwatch = 0;
@@ -102,17 +126,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
 
-            /* OFF/MENU key to exit */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_MENU:
-#endif
+            /* exit */
+            case STOPWATCH_QUIT:
                   done = true;
                   break;
 
-            /* PLAY = Stop/Start toggle */
-            case BUTTON_PLAY:
+            /* Stop/Start toggle */
+            case STOPWATCH_START_STOP:
                  counting = ! counting;
                  if (counting)
                  {
@@ -126,12 +146,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  }
                  break;
 
-            /* LEFT = Reset timer */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-#endif
+            /* Reset timer */
+            case STOPWATCH_RESET_TIMER:
                  if (!counting)
                  {
                      prev_total = 0;
@@ -140,19 +156,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  }
                  break;
 
-            /* ON = Lap timer */
-            case BUTTON_ON:
+            /* Lap timer */
+            case STOPWATCH_LAP_TIMER:
                  lap_times[curr_lap%MAX_LAPS] = stopwatch;
                  curr_lap++;
                  update_lap = true;
                  break;
 
-            /* UP (RIGHT/+) = Scroll Lap timer up */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_UP:
-#else
-            case BUTTON_RIGHT:
-#endif
+            /* Scroll Lap timer up */
+            case STOPWATCH_SCROLL_UP:
                  if (lap_scroll > 0)
                  {
                      lap_scroll --;
@@ -160,12 +172,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  }
                  break;
 
-            /* DOWN (LEFT/-) = Scroll Lap timer down */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-#endif
+            /* Scroll Lap timer down */
+            case STOPWATCH_SCROLL_DOWN:
                  if ((lap_scroll < curr_lap - LAP_LINES) &&
                      (lap_scroll < MAX_SCROLL) )
                  {
@@ -174,9 +182,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  }
                  break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
 
         if (counting)

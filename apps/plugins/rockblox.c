@@ -318,12 +318,15 @@ static void move_down(void)
 
 static int game_loop(void)
 {
+    int button;
+
     while(1)
     {
         int count = 0;
         while(count * 300 < level_speeds[level])
         {
-            switch(rb->button_get_w_tmo(HZ/10))
+            button = rb->button_get_w_tmo(HZ/10);
+            switch(button)
             {
                 case BUTTON_OFF:
                     return PLUGIN_OK;
@@ -348,9 +351,10 @@ static int game_loop(void)
                     move_down();
                     break;
 
-                case SYS_USB_CONNECTED:
-                    rb->usb_screen();
-                    return PLUGIN_USB_CONNECTED;
+                default:
+                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                        return PLUGIN_USB_CONNECTED;
+                    break;
             }
             
             count++;

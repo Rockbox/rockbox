@@ -93,6 +93,7 @@ static void snow_init(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int button;
     TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
@@ -103,8 +104,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_update();
         rb->sleep(HZ/20);
         
-        if (rb->button_get(false) == BUTTON_OFF)
+        button = rb->button_get(false);
+
+        if (button == BUTTON_OFF)
             return false;
+        else
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                return PLUGIN_USB_CONNECTED;
     }
 }
 

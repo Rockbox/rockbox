@@ -56,6 +56,50 @@
 #define NEED_SCROLLBAR() ((!(ONE_SCREEN_FITS_ALL())) && \
  (view_mode==WIDE? scrollbar_mode[WIDE]==SB_ON: scrollbar_mode[NARROW]==SB_ON))
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define VIEWER_QUIT BUTTON_OFF
+#define VIEWER_PAGE_UP BUTTON_UP
+#define VIEWER_PAGE_DOWN BUTTON_DOWN
+#define VIEWER_SCREEN_LEFT BUTTON_LEFT
+#define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
+#define VIEWER_MODE_WRAP BUTTON_F1
+#define VIEWER_MODE_LINE BUTTON_F2
+#define VIEWER_MODE_WIDTH BUTTON_F3
+/* Recorder/ Ondio only */
+#define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_F1)
+#define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_F3)
+/* Recorder only */
+#define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
+#define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
+#define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
+#define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define VIEWER_QUIT BUTTON_OFF
+#define VIEWER_PAGE_UP BUTTON_UP
+#define VIEWER_PAGE_DOWN BUTTON_DOWN
+#define VIEWER_SCREEN_LEFT BUTTON_LEFT
+#define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
+#define VIEWER_MODE_WRAP (BUTTON_MENU | BUTTON_LEFT)
+#define VIEWER_MODE_LINE (BUTTON_MENU | BUTTON_UP)
+#define VIEWER_MODE_WIDTH (BUTTON_MENU | BUTTON_RIGHT)
+/* Recorder/ Ondio only */
+#define VIEWER_MODE_PAGE (BUTTON_MENU | BUTTON_DOWN)
+#define VIEWER_MODE_SCROLLBAR (BUTTON_MENU | BUTTON_OFF)
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define VIEWER_QUIT BUTTON_STOP
+#define VIEWER_PAGE_UP BUTTON_LEFT
+#define VIEWER_PAGE_DOWN BUTTON_RIGHT
+#define VIEWER_SCREEN_LEFT (BUTTON_MENU | BUTTON_LEFT)
+#define VIEWER_SCREEN_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
+#define VIEWER_MODE_WRAP (BUTTON_ON | BUTTON_LEFT)
+#define VIEWER_MODE_LINE (BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT)
+#define VIEWER_MODE_WIDTH (BUTTON_ON | BUTTON_RIGHT)
+
+#endif
+
 enum {
     WRAP=0,
     CHOP,
@@ -625,8 +669,10 @@ static bool viewer_init(char* file)
     return true;
 }
 
-static void viewer_exit(void)
+static void viewer_exit(void *parameter)
 {
+    (void)parameter;
+
     rb->close(fd);
 }
 
@@ -641,90 +687,10 @@ static int col_limit(int col)
     return col;
 }
 
-#ifdef HAVE_LCD_BITMAP
-static int viewer_recorder_on_button(int col)
-{
-    bool exit = false;
-
-    while (!exit) {
-        switch (rb->button_get(true)) {
-            case BUTTON_ON | BUTTON_F1:
-                /* Page-overlap mode */
-                if (++page_mode == PAGE_MODES)
-                    page_mode = 0;
-
-                rb->splash(HZ, true, "%s %s",
-                           page_mode_str[page_mode],
-                           page_mode_str[PAGE_MODES]);
-
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_F3:
-                /* Show-scrollbar mode for current view-width mode */
-                if (!(ONE_SCREEN_FITS_ALL())) {
-                    if (++scrollbar_mode[view_mode] == SCROLLBAR_MODES)
-                        scrollbar_mode[view_mode] = 0;
-
-                    init_need_scrollbar();
-                    viewer_draw(col);
-
-                    rb->splash(HZ, true, "%s %s (%s %s)",
-                               scrollbar_mode_str[SCROLLBAR_MODES],
-                               scrollbar_mode_str[scrollbar_mode[view_mode]],
-                               view_mode_str[view_mode],
-                               view_mode_str[VIEW_MODES]);
-                }
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
-                /* Scroll up one line */
-                viewer_scroll_up();
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
-                /* Scroll down one line */
-                if (next_screen_ptr != NULL)
-                    screen_top_ptr = next_line_ptr;
-
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_LEFT:
-            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
-                /* Scroll left one column */
-                col--;
-                col = col_limit(col);
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_RIGHT:
-            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
-                /* Scroll right one column */
-                col++;
-                col = col_limit(col);
-                viewer_draw(col);
-                break;
-
-            case BUTTON_ON | BUTTON_REL:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
-                /* Drop out of this loop (when ON btn released) */
-                exit = true;
-                break;
-        }
-    }
-    return col;
-}
-#endif
-
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
     bool exit=false;
+    int button;
     int col = 0;
     int i;
     int ok;
@@ -738,28 +704,22 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     ok = viewer_init(file);
     if (!ok) {
         rb->splash(HZ, false, "Error");
-        viewer_exit();
+        viewer_exit(NULL);
         return PLUGIN_OK;
     }
 
     viewer_draw(col);
 
     while (!exit) {
-        switch (rb->button_get(true)) {
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-#endif
-                viewer_exit();
+        button = rb->button_get(true);
+        switch (button) {
+
+            case VIEWER_QUIT:
+                viewer_exit(NULL);
                 exit = true;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_F1:
-#else
-            case BUTTON_ON | BUTTON_LEFT:
-#endif
+            case VIEWER_MODE_WRAP:
                 /* Word-wrap mode: WRAP or CHOP */
                 if (++word_mode == WORD_MODES)
                     word_mode = 0;
@@ -776,11 +736,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_F2:
-#else
-            case BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT:
-#endif
+            case VIEWER_MODE_LINE:
                 /* Line-paragraph mode: NORMAL, JOIN or EXPAND */
                 if (++line_mode == LINE_MODES)
                     line_mode = 0;
@@ -802,11 +758,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_F3:
-#else
-            case BUTTON_ON | BUTTON_RIGHT:
-#endif
+            case VIEWER_MODE_WIDTH:
                 /* View-width mode: NARROW or WIDE */
                 if (line_mode == JOIN)
                     rb->splash(HZ, true, "(no %s %s)",
@@ -843,13 +795,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case VIEWER_PAGE_UP:
+            case VIEWER_PAGE_UP | BUTTON_REPEAT:
                 /* Page up */
 #ifdef HAVE_LCD_BITMAP
                 for (i = page_mode==OVERLAP? 1:0; i < display_lines; i++)
@@ -861,13 +808,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case VIEWER_PAGE_DOWN:
+            case VIEWER_PAGE_DOWN | BUTTON_REPEAT:
                 /* Page down */
                 if (next_screen_ptr != NULL)
                     screen_top_ptr = next_screen_to_draw_ptr;
@@ -875,13 +817,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#else
-            case BUTTON_MENU | BUTTON_LEFT:
-            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case VIEWER_SCREEN_LEFT:
+            case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
                 if (view_mode == WIDE) {
                     /* Screen left */
                     col -= display_columns;
@@ -895,13 +832,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#else
-            case BUTTON_MENU | BUTTON_RIGHT:
-            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case VIEWER_SCREEN_RIGHT:
+            case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
                 if (view_mode == WIDE) {
                     /* Screen right */
                     col += display_columns;
@@ -915,18 +847,77 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_ON:
-                /*Go to On-btn combinations */
-                col = viewer_recorder_on_button(col);
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
+            case VIEWER_MODE_PAGE:
+                /* Page-overlap mode */
+                if (++page_mode == PAGE_MODES)
+                    page_mode = 0;
+
+                rb->splash(HZ, true, "%s %s",
+                           page_mode_str[page_mode],
+                           page_mode_str[PAGE_MODES]);
+
+                viewer_draw(col);
+                break;
+
+            case VIEWER_MODE_SCROLLBAR:
+                /* Show-scrollbar mode for current view-width mode */
+                if (!(ONE_SCREEN_FITS_ALL())) {
+                    if (++scrollbar_mode[view_mode] == SCROLLBAR_MODES)
+                        scrollbar_mode[view_mode] = 0;
+
+                    init_need_scrollbar();
+                    viewer_draw(col);
+
+                    rb->splash(HZ, true, "%s %s (%s %s)",
+                               scrollbar_mode_str[SCROLLBAR_MODES],
+                               scrollbar_mode_str[scrollbar_mode[view_mode]],
+                               view_mode_str[view_mode],
+                               view_mode_str[VIEW_MODES]);
+                }
+                viewer_draw(col);
                 break;
 #endif
 
-            case SYS_USB_CONNECTED:
-                /* Release control to USB functions */
-                rb->usb_screen();
-                viewer_exit();
-                return PLUGIN_USB_CONNECTED;
+#if CONFIG_KEYPAD == RECORDER_PAD
+            case VIEWER_LINE_UP:
+            case VIEWER_LINE_UP | BUTTON_REPEAT:
+                /* Scroll up one line */
+                viewer_scroll_up();
+                viewer_draw(col);
+                break;
+
+            case VIEWER_LINE_DOWN:
+            case VIEWER_LINE_DOWN | BUTTON_REPEAT:
+                /* Scroll down one line */
+                if (next_screen_ptr != NULL)
+                    screen_top_ptr = next_line_ptr;
+
+                viewer_draw(col);
+                break;
+
+            case VIEWER_COLUMN_LEFT:
+            case VIEWER_COLUMN_LEFT | BUTTON_REPEAT:
+                /* Scroll left one column */
+                col--;
+                col = col_limit(col);
+                viewer_draw(col);
+                break;
+
+            case VIEWER_COLUMN_RIGHT:
+            case VIEWER_COLUMN_RIGHT | BUTTON_REPEAT:
+                /* Scroll right one column */
+                col++;
+                col = col_limit(col);
+                viewer_draw(col);
+                break;
+#endif
+
+            default:
+                if (rb->default_event_handler_ex(button, viewer_exit, NULL)
+                    == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
     }
     return PLUGIN_OK;

@@ -33,10 +33,12 @@
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define JPEG_ZOOM_IN BUTTON_PLAY
 #define JPEG_ZOOM_OUT BUTTON_ON
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define JPEG_ZOOM_PRE BUTTON_MENU
 #define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
 #define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+
 #endif
 
 /******************************* Globals ***********************************/
@@ -1527,10 +1529,6 @@ int scroll_bmp(struct t_disp* pdisp)
 
         button = rb->button_get(true);
         
-        if (rb->default_event_handler_ex(button, cleanup, NULL)
-            == SYS_USB_CONNECTED)
-            return PLUGIN_USB_CONNECTED;
-
         switch(button)
         {
         case BUTTON_LEFT:
@@ -1617,6 +1615,13 @@ int scroll_bmp(struct t_disp* pdisp)
 
         case BUTTON_OFF:
             return PLUGIN_OK;
+            
+        default:
+            if (rb->default_event_handler_ex(button, cleanup, NULL)
+                == SYS_USB_CONNECTED)
+                return PLUGIN_USB_CONNECTED;
+            break;
+
         } /* switch */
 
         if (button != BUTTON_NONE)

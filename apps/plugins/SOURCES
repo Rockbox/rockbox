@@ -1,4 +1,5 @@
 /* plugins common to both Player+Recorder model */
+battery_test.c
 favorites.c
 firmware_flash.c
 helloworld.c
@@ -6,20 +7,16 @@ metronome.c
 rockbox_flash.c
 search.c
 sort.c
-vbrfix.c
-#if CONFIG_KEYPAD != ONDIO_PAD
-/* gradually bring in the ones not working yet */
-battery_test.c
 stopwatch.c
+vbrfix.c
 viewer.c
-#endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
 
 #ifdef HAVE_LCD_BITMAP /* recorder model only */
 grayscale.c
 jpeg.c
 rockblox.c
 snow.c
-video.c
+video.c                
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */
 bounce.c

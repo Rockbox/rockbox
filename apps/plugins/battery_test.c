@@ -29,6 +29,16 @@
    to watch.
 */
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define BATTERY_TEST_QUIT BUTTON_ON
+#define BATTERY_TEST_QUIT2 BUTTON_OFF
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define BATTERY_TEST_QUIT BUTTON_OFF
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define BATTERY_TEST_QUIT BUTTON_STOP
+#endif
+
 static struct plugin_api* rb;
 
 void* buffer;
@@ -94,19 +104,19 @@ enum plugin_status loop(void)
         /* simulate 128kbit/s (16kbyte/s) playback duration */
         do {
             button = rb->button_get_w_tmo(HZ * (buffersize / 16384) - HZ*10);
-
-            /* Check if we shall exit the plugin */
-            if (button==BUTTON_ON ||
-#if CONFIG_KEYPAD == RECORDER_PAD
-                button==BUTTON_OFF
-#else
-                button==BUTTON_STOP
-#endif
-                )
-                return PLUGIN_OK;
             
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-                return PLUGIN_USB_CONNECTED;
+            switch (button) {
+                /* Check if we shall exit the plugin */
+                case BATTERY_TEST_QUIT:
+#ifdef BATTERY_TEST_QUIT2
+                case BATTERY_TEST_QUIT2:
+#endif
+                    return PLUGIN_OK;
+                    
+                default:
+                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                        return PLUGIN_USB_CONNECTED;
+                    break;
             }
         } while (!(button&(BUTTON_REL|BUTTON_REPEAT)));
 

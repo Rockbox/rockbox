@@ -36,9 +36,17 @@
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define VIDEO_STOP_SEEK BUTTON_PLAY
 #define VIDEO_RESUME BUTTON_PLAY
+#define VIDEO_DEBUG BUTTON_F1
+#define VIDEO_CONTRAST_DOWN BUTTON_F2
+#define VIDEO_CONTRAST_UP BUTTON_F3
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define VIDEO_STOP_SEEK BUTTON_MENU
+#define VIDEO_STOP_SEEK_PRE BUTTON_MENU
+#define VIDEO_STOP_SEEK (BUTTON_MENU | BUTTON_REL)
 #define VIDEO_RESUME BUTTON_RIGHT
+#define VIDEO_CONTRAST_DOWN (BUTTON_MENU | BUTTON_DOWN)
+#define VIDEO_CONTRAST_UP (BUTTON_MENU | BUTTON_UP)
+
 #endif
 /****************** constants ******************/
 
@@ -285,7 +293,6 @@ void ChangeVolume(int delta)
 }
 
 
-#if CONFIG_KEYPAD == RECORDER_PAD
 // helper function to change the LCD contrast by a certain amount, +/-
 void ChangeContrast(int delta)
 {
@@ -313,7 +320,6 @@ void ChangeContrast(int delta)
         }
     }
 }
-#endif
 
 
 // sync the video to the current audio
@@ -563,6 +569,7 @@ void Cleanup(void *fd)
 int PlayTick(int fd)
 {
     int button;
+    static int lastbutton = 0;
     int avail_audio = -1, avail_video = -1;
     int retval = 1;
     int filepos;
@@ -667,11 +674,6 @@ int PlayTick(int fd)
         else
             filepos -= Available(gBuf.pReadAudio); // else audio
             
-        if (rb->default_event_handler_ex(button, Cleanup, &fd)
-            == SYS_USB_CONNECTED)
-            retval = -1; // signal "aborted" to caller
-            // SYS_USB_CONNECTED won't be catched again by the switch()
-
         switch (button)
         {   // set exit conditions
         case BUTTON_OFF:
@@ -686,6 +688,10 @@ int PlayTick(int fd)
             retval = 0; // signal "stopped" to caller
             break;
         case VIDEO_STOP_SEEK:
+#ifdef VIDEO_STOP_SEEK_PRE
+            if (lastbutton != VIDEO_STOP_SEEK_PRE)
+                break;
+#endif
             if (gPlay.bSeeking)
             {
                 gPlay.bSeeking = false;
@@ -757,25 +763,32 @@ int PlayTick(int fd)
             else
                 gPlay.nSeekAcc++;
             break;
-#if CONFIG_KEYPAD == RECORDER_PAD
-        case BUTTON_F1: // debug key
-        case BUTTON_F1 | BUTTON_REPEAT:
+#ifdef VIDEO_DEBUG
+        case VIDEO_DEBUG: // debug key
+        case VIDEO_DEBUG | BUTTON_REPEAT:
             DrawBuf(); // show buffer status
             gPlay.nTimeOSD = 30;
             gPlay.bDirtyOSD = true;
             break;
-        case BUTTON_F2: // contrast down
-        case BUTTON_F2 | BUTTON_REPEAT:
+#endif
+        case VIDEO_CONTRAST_DOWN: // contrast down
+        case VIDEO_CONTRAST_DOWN | BUTTON_REPEAT:
             if (gPlay.bHasVideo)
                 ChangeContrast(-1);
             break;
-        case BUTTON_F3: // contrast up
-        case BUTTON_F3 | BUTTON_REPEAT:
+        case VIDEO_CONTRAST_UP: // contrast up
+        case VIDEO_CONTRAST_UP | BUTTON_REPEAT:
             if (gPlay.bHasVideo)
                 ChangeContrast(1);
             break;
-#endif
+        default:
+            if (rb->default_event_handler_ex(button, Cleanup, &fd)
+                == SYS_USB_CONNECTED)
+                retval = -1; // signal "aborted" to caller
+            break;
         }
+
+        lastbutton = button;
     } /*  if (button != BUTTON_NONE) */
 
     

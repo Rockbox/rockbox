@@ -235,10 +235,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                     
     button = rb->button_get(true);
     
-    if (rb->default_event_handler_ex(button, cleanup, NULL) 
-        == SYS_USB_CONNECTED)
-        return PLUGIN_USB_CONNECTED;
-    
     switch (button) {
 
     case METRONOME_QUIT:
@@ -294,6 +290,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         calc_period();
         draw_display();
         break;
+        
+    default:
+        if (rb->default_event_handler_ex(button, cleanup, NULL)
+            == SYS_USB_CONNECTED)
+            return PLUGIN_USB_CONNECTED;
+        break;
+
     }
     }
 }
