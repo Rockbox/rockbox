@@ -61,20 +61,20 @@ static int count;	/* Number of calls button has been down */
 void button_init()
 {
 #ifndef SIMULATOR
-  /* Set PB4 and PB8 as input pins */
-  PBCR1 &= 0xfffc; /* PB8MD = 00 */
-  PBCR2 &= 0xfcff; /* PB4MD = 00 */
-  PBIOR &= ~(PBDR_BTN_ON|PBDR_BTN_OFF); /* Inputs */
+    /* Set PB4 and PB8 as input pins */
+    PBCR1 &= 0xfffc; /* PB8MD = 00 */
+    PBCR2 &= 0xfcff; /* PB4MD = 00 */
+    PBIOR &= ~(PBDR_BTN_ON|PBDR_BTN_OFF); /* Inputs */
   
-  /* Set A/D to scan AN4 and AN5.
-   * This needs to be changed to scan other analog pins
-   * for battery level, etc. */
-  ADCSR = 0;
-  ADCR  = 0;
-  ADCSR = ADCSR_ADST | ADCSR_SCAN | 0x5;
+    /* Set A/D to scan AN4 and AN5.
+     * This needs to be changed to scan other analog pins
+     * for battery level, etc. */
+    ADCSR = 0;
+    ADCR  = 0;
+    ADCSR = ADCSR_ADST | ADCSR_SCAN | 0x5;
 #endif
-  last = BUTTON_NONE;
-  count = 0;
+    last = BUTTON_NONE;
+    count = 0;
 }
 
 /*
@@ -82,36 +82,36 @@ void button_init()
  */
 static int get_raw_button (void)
 {
-  /* Check port B pins for ON and OFF */
-  int data = PBDR;
-  if ((data & PBDR_BTN_ON) == 0)
-    return BUTTON_ON;
-  else if ((data & PBDR_BTN_OFF) == 0)
-    return BUTTON_OFF;
+    /* Check port B pins for ON and OFF */
+    int data = PBDR;
+    if ((data & PBDR_BTN_ON) == 0)
+        return BUTTON_ON;
+    else if ((data & PBDR_BTN_OFF) == 0)
+        return BUTTON_OFF;
 
-  /* Check AN4 pin for F1-3 and UP */
-  data = ADDRAH;
-  if (data >= LEVEL4)
-    return BUTTON_F3;
-  else if (data >= LEVEL3)
-    return BUTTON_UP;
-  else if (data >= LEVEL2)
-    return BUTTON_F2;
-  else if (data >= LEVEL1)
-    return BUTTON_F1;
+    /* Check AN4 pin for F1-3 and UP */
+    data = ADDRAH;
+    if (data >= LEVEL4)
+        return BUTTON_F3;
+    else if (data >= LEVEL3)
+        return BUTTON_UP;
+    else if (data >= LEVEL2)
+        return BUTTON_F2;
+    else if (data >= LEVEL1)
+        return BUTTON_F1;
 
-  /* Check AN5 pin for DOWN, PLAY, LEFT, RIGHT */
-  data = ADDRBH;
-  if (data >= LEVEL4)
-    return BUTTON_DOWN;
-  else if (data >= LEVEL3)
-    return BUTTON_PLAY;
-  else if (data >= LEVEL2)
-    return BUTTON_LEFT;
-  else if (data >= LEVEL1)
-    return BUTTON_RIGHT;
+    /* Check AN5 pin for DOWN, PLAY, LEFT, RIGHT */
+    data = ADDRBH;
+    if (data >= LEVEL4)
+        return BUTTON_DOWN;
+    else if (data >= LEVEL3)
+        return BUTTON_PLAY;
+    else if (data >= LEVEL2)
+        return BUTTON_LEFT;
+    else if (data >= LEVEL1)
+        return BUTTON_RIGHT;
   
-  return BUTTON_NONE;
+    return BUTTON_NONE;
 }
 
 /*
@@ -123,29 +123,35 @@ static int get_raw_button (void)
  */
 int button_get(void)
 {
-  int btn = get_raw_button();
-  int ret;
+    int btn = get_raw_button();
+    int ret;
 
-  /* Last button pressed is still down */
-  if (btn != BUTTON_NONE && btn == last) {
-    count++;
-    if (count == BOUNCE_COUNT)
-      return btn;
-    else if (count >= HOLD_COUNT)
-      return btn | BUTTON_HELD;
+    /* Last button pressed is still down */
+    if (btn != BUTTON_NONE && btn == last) {
+        count++;
+        if (count == BOUNCE_COUNT)
+            return btn;
+        else if (count >= HOLD_COUNT)
+            return btn | BUTTON_HELD;
+        else
+            return BUTTON_NONE;
+    }
+
+    /* Last button pressed now released */
+    if (btn == BUTTON_NONE && last != BUTTON_NONE)
+        ret = last | BUTTON_REL;
     else
-      return BUTTON_NONE;
-  }
-
-  /* Last button pressed now released */
-  if (btn == BUTTON_NONE && last != BUTTON_NONE)
-    ret = last | BUTTON_REL;
-  else
-    ret = BUTTON_NONE;
-  
-  last = btn;
-  count = 0;
-  return ret;
+        ret = BUTTON_NONE;
+    
+    last = btn;
+    count = 0;
+    return ret;
 }
 
 #endif /* HAVE_RECORDER_KEYPAD */
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "rockbox-mode.el")
+ * end:
+ */
