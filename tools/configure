@@ -320,7 +320,7 @@ if [ -z "$archos" ]; then
     appextra="recorder"
     archosrom=""
     flash=""
-    plugins="no" # disabled for now, enable later on
+    plugins="" # disabled for now, enable later on
     ;;
 
    7)
