@@ -299,6 +299,8 @@ struct plugin_api {
        the API gets incompatible */
     
     char (*strchr)(const char *s, int c);
+    char (*strcat)(char *s1, const char *s2);
+
 };
 
 /* defined by the plugin loader (plugin.c) */

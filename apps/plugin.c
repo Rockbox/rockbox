@@ -263,6 +263,7 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
 
     strchr,
+    strcat,
 };
 
 int plugin_load(const char* plugin, void* parameter)
