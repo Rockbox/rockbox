@@ -14,7 +14,7 @@ ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA -DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer -funroll-loops -finline-functions -Wall -W -Winline -DFLaC__INLINE=__inline__
+FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA -DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer -funroll-loops -finline-functions -Wall -W -Winline -DFLaC__INLINE=__inline__ --param large-function-insns=10000
 CFLAGS = $(GCCOPTS) $(FLACOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
@@ -34,6 +34,7 @@ $(OUTPUT): $(OBJS)
 
 $(OBJDIR)/libFLAC/%.o: $(APPSDIR)/codecs/libFLAC/%.c
 	@mkdir -p $(OBJDIR)/libFLAC
+	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libFLAC/include/FLAC $< -o $@
 
 include $(TOOLSDIR)/make.inc
