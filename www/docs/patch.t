@@ -39,6 +39,11 @@ changes done to multiple:
  The -u option means the output is using the 'unified diff' format. Older
  diff programs don't have that, and then -c (for 'context diff') is OK.
 
+<h2>Submitting A Patch</h2>
+<p>All patches that are meant for inclusion in the sources would be posted to 
+the <a href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch tracker</a>.  
+Patches sent to the mailing list are quickly lost in the traffic of the list itself.  
+
 <h2>Applying A Patch</h2>
 <p>
  Applying a 'patch' (output from diff -u) is done with the 'patch' tool:
