@@ -32,7 +32,7 @@
 
 #define TREE_MAX_FILENAMELEN 64
 #define TREE_MAX_ON_SCREEN   7
-#define TREE_MAX_LEN_DISPLAY 17 /* max length that fits on screen */
+#define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
 void browse_root(void) {
 	dirbrowse("/");
@@ -45,10 +45,16 @@ struct entry {
 };
 
 #define LINE_Y      8 /* Y position the entry-list starts at */
-#define LINE_X      6 /* X position the entry-list starts at */
+#define LINE_X      12 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
 #ifdef HAVE_LCD_BITMAP
+
+static unsigned char fileimage[] = {
+  0x60, 0x7f, 0x03, 0x63, 0x7f, 0x00 };
+
+static unsigned char dirimage[] = {
+  0x3e, 0x26, 0x26, 0x24, 0x3c, 0x00 };
 
 int static
 showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
@@ -82,6 +88,9 @@ showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
       memcpy(buffer[i].name, "too long", 9);
 
     buffer[i].file = !(entry->attribute&ATTR_DIRECTORY);
+
+    lcd_bitmap(buffer[i].file?
+               fileimage:dirimage, 6, LINE_Y+i*LINE_HEIGTH, 6, 8, TRUE);
 
     if(len < TREE_MAX_LEN_DISPLAY)
       lcd_puts(LINE_X, LINE_Y+i*LINE_HEIGTH, buffer[i].name, 0);
