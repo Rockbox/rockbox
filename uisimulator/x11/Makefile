@@ -20,6 +20,7 @@
 APPDIR = ../../apps
 RECDIR = $(APPDIR)/recorder
 PLAYDIR = $(APPDIR)/player
+PLUGINDIR = $(APPDIR)/plugins
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 	MACHINEDIR = $(RECDIR)
@@ -126,6 +127,9 @@ all: $(TOOLSDIR)/convbdf $(TARGET) $(EXTRA_TARGETS) $(ROCKS)
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
+$(OBJDIR)/libplugin.a:
+	$(MAKE) -C $(PLUGINDIR)/lib DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" SIMULATOR=1
+
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/lang.[cho] \
 		$(OBJDIR)/build.lang $(OBJDIR)/*.o $(OBJDIR)/sysfont.c \
@@ -133,7 +137,7 @@ clean:
 	$(RM) -r $(DEPS)
 
 $(OBJDIR)/%.rock: $(APPDIR)/plugins/%.c $(APPDIR)/plugin.h
-	$(CC) $(APPCFLAGS) -DPLUGIN -shared $< -o $@
+	$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
 
 distclean: clean
 	$(RM) config.cache
@@ -314,10 +318,10 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ifeq ($(UNAME),CYGWIN)
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(OBJDIR)/libplugin.a
 	$(CC) -g -o $(TARGET) $(OBJS) $(LIBDIRS) $(LDFLAGS) $(LIBS)
 else
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS)  $(OBJDIR)/libplugin.a
 	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 endif
 
