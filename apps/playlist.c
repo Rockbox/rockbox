@@ -29,9 +29,9 @@
 #include "mpeg.h"
 #include "lcd.h"
 #include "kernel.h"
+#include "settings.h"
 
 playlist_info_t playlist;
-bool playlist_shuffle = false;
 
 char now_playing[256];
 
@@ -107,7 +107,7 @@ void play_list(char *dir, char *file)
     /* add track indices to playlist data structure */
     add_indices_to_playlist(&playlist);
 
-    if(playlist_shuffle) {
+    if(global_settings.playlist_shuffle) {
         lcd_puts(0,0,"Shuffling...");
         lcd_update();
         randomise_playlist( &playlist, current_tick );
