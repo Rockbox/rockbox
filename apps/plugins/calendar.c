@@ -46,7 +46,6 @@ struct shown {
     int     firstday;    /* first (w)day of month */
     int     lastday;     /* last (w)day of month */
 };
-
 /* leap year -- account for gregorian reformation in 1752 */
 static int is_leap_year(int yr)
 {
@@ -54,7 +53,8 @@ static int is_leap_year(int yr)
     (!((yr) % 4) && ((yr) % 100)) || !((yr) % 400))  ? 1:0 ;
 }
 
-/*  searches the weekday of the first day in month, relative to the given values */
+/* searches the weekday of the first day in month, 
+ * relative to the given values */
 static int calc_weekday( struct shown *shown )
 {
     return ( shown->wday + 36 - shown->mday ) % 7 ;
@@ -64,12 +64,14 @@ static int calc_weekday( struct shown *shown )
 static void calendar_init(struct today *today, struct shown *shown)
 {
     int w,h;
+#ifdef HAVE_RTC
+    struct tm *tm;
+#endif
     rb->lcd_getstringsize("A",&w,&h);
     if ( ((w * 14) > LCD_WIDTH) || ((h * 7) > LCD_HEIGHT) )
         rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
 #ifdef HAVE_RTC
-    struct tm *tm;
     tm = rb->get_time();
     today->mon = tm->tm_mon +1;
     today->year = 2000+tm->tm_year%100;
@@ -92,9 +94,9 @@ static int space = LCD_WIDTH / 7;
 static void draw_headers(void)
 {
     int i,w,h;
-    rb->lcd_getstringsize("A",&w,&h);
     char *Dayname[7] = {"M","T","W","T","F","S","S"};
     int ws = 2;
+    rb->lcd_getstringsize("A",&w,&h);
     for (i = 0; i < 8;)
     {
         rb->lcd_putsxy(ws, 0 , Dayname[i++]);
@@ -108,7 +110,8 @@ static bool wday_has_memo[6];
 static void draw_calendar(struct shown *shown)
 {
     int w,h;
-    rb->lcd_getstringsize("A",&w,&h);
+    int ws,row,pos,days_per_month,j;
+    char buffer[7];
     char *Monthname[] = {
                           "Jan",
                           "Feb",
@@ -123,16 +126,15 @@ static void draw_calendar(struct shown *shown)
                           "Nov",
                           "Dec"
                         };
+    rb->lcd_getstringsize("A",&w,&h);
     rb->lcd_clear_display();
     draw_headers();
-    int row,pos,days_per_month,j;
     if (shown->firstday > 6)
         shown->firstday -= 7;
-    char buffer[7];
     row = 1;
     pos = shown->firstday;
     days_per_month = days_in_month[leap_year][shown->mon];
-    int ws = 2 + (pos * space);
+    ws = 2 + (pos * space);
     for (j = 0; j < days_per_month;)
     {
         if ( (day_has_memo[++j]) || (wday_has_memo[pos]) )
@@ -494,11 +496,11 @@ static int start = 0;
 
 static void show_lines(int selected, struct shown *shown)
 {
-    int j = 1,w,h,i,k = 0, pos = 1,m = 0;
-    rb->lcd_getstringsize("A",&w,&h);
-    int lines = (LCD_HEIGHT / h) - 1;
+    int lines,j = 1,w,h,i,k = 0, pos = 1,m = 0;
     char temp[MAX_CHAR_MEMO_LEN + 12];
-    
+    rb->lcd_getstringsize("A",&w,&h);
+    lines = (LCD_HEIGHT / h) - 1;
+        
     rb->lcd_clear_display();
     rb->lcd_puts(0,0,"Events (play : menu)");
     
@@ -532,9 +534,9 @@ static void show_lines(int selected, struct shown *shown)
 
 static void update_memos_shown(struct shown *shown)
 {
+    int i;
     memos_in_shown_memory = 0;
     start = 0;
-    int i;
     for (i = 0; i < memos_in_memory; i++)
         if (
             (memos[i].day == shown->mday)
@@ -550,8 +552,9 @@ static void update_memos_shown(struct shown *shown)
 
 static bool any_events(struct shown *shown, bool force)
 {
-    update_memos_shown(shown);
     int lines_displayed = 0;
+    bool exit=false;
+    update_memos_shown(shown);
     if (memos_in_shown_memory > 0)
         show_lines(lines_displayed,shown);
     else if (force)
@@ -559,7 +562,6 @@ static bool any_events(struct shown *shown, bool force)
     else
         return false;
     rb->lcd_update();
-    bool exit = false;
     while (!exit)
     {
         switch (rb->button_get(true))
@@ -655,18 +657,18 @@ static void prev_day(struct shown *shown, int step)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
-    (void)(parameter);
-    rb = api;
-
     struct today today;
     struct shown shown;
+    bool exit = false;
+    TEST_PLUGIN_API(api);
+    (void)(parameter);
     
+    rb = api;
+
     calendar_init(&today, &shown);
     load_memo(&shown);
     any_events(&shown, false);
     draw_calendar(&shown);
-    bool exit = false;
     while (!exit)
     {
         switch (rb->button_get(true))

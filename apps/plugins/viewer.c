@@ -24,7 +24,10 @@
 #endif
 
 #include <ctype.h>
+
+#ifndef SIMULATOR
 #include <ctype.c>
+#endif
 
 #if PLUGIN_API_VERSION < 3
 #error Scrollbar function requires PLUGIN_API_VERSION 3 at least
