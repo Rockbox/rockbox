@@ -49,6 +49,7 @@
 #include "language.h"
 #include "wps-display.h"
 #include "playlist.h"
+#include "buffer.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -65,6 +66,7 @@ void app_main(void)
 void init(void)
 {
     init_threads();
+    buffer_init();
     lcd_init();
     font_init();
     show_logo();
@@ -96,6 +98,8 @@ void init(void)
 
     system_init();
     kernel_init();
+
+    buffer_init();
 
     settings_reset();
     
@@ -165,6 +169,14 @@ void init(void)
     
     settings_load();
     
+    status_init();
+    usb_start_monitoring();
+    power_init();
+    playlist_init();
+    tree_init();
+
+    /* This one must be the last one, since it wants the rest of the buffer
+       space */
     mpeg_init( global_settings.volume,
                global_settings.bass,
                global_settings.treble,
@@ -173,11 +185,6 @@ void init(void)
                global_settings.bass_boost,
                global_settings.avc,
                global_settings.channel_config );
-
-    status_init();
-    usb_start_monitoring();
-    power_init();
-    playlist_init();
 }
 
 int main(void)

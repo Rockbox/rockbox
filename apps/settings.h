@@ -154,6 +154,16 @@ struct user_settings
 
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool caption_backlight; /* turn on backlight at end and start of track */
+
+#ifdef HAVE_FMRADIO
+    int fm_freq_step;    /* Frequency step for manual tuning, in kHz */
+    bool fm_force_mono;  /* Forces Mono mode if true */
+    bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
+                            only 88MHz-108MHz */
+#endif
+
+    int max_files_in_dir; /* Max entries in directory (file browser) */
+    int max_files_in_playlist; /* Max entries in playlist */
 };
 
 /* prototypes */
@@ -209,9 +219,3 @@ enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES };
 
 #endif /* __SETTINGS_H__ */
-
-
-
-
-
-

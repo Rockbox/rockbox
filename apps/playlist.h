@@ -31,7 +31,10 @@ struct playlist_info
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
     int  fd;             /* file descriptor of the open playlist    */
     int  dirlen;         /* Length of the path to the playlist file */
-    int  indices[MAX_PLAYLIST_SIZE]; /* array of indices            */
+    int  *indices;       /* array of indices            */
+    int max_playlist_size; /* Max number of files in playlist. Mirror of
+                              global_settings.max_files_in_playlist */
+    int buffer_size;     /* Playlist buffer size */
     int  index;          /* index of current playing track          */
     int  first_index;    /* index of first song in playlist         */
     int  seed;           /* random seed                             */

@@ -41,6 +41,7 @@
 #include "fat.h"
 #include "sleeptimer.h"
 #include "wps.h"
+#include "buffer.h"
 #ifdef HAVE_FMRADIO
 #include "radio.h"
 #endif
@@ -152,14 +153,7 @@ bool show_credits(void)
 }
 
 #ifdef SIMULATOR
-#define mp3buf 0
-#define mp3end 0
-
 extern bool simulate_usb(void);
-#else
-/* defined in linker script */
-extern unsigned char mp3buf[];
-extern unsigned char mp3end[];
 #endif
 bool show_info(void)
 {

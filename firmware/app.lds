@@ -77,7 +77,7 @@ SECTIONS
 
     .mp3buf :
     {
-        _mp3buf = .;
+        _mp3buffer = .;
     } > DRAM
 
     .mp3end ENDADDR - 0x300:

@@ -51,21 +51,25 @@
 #include "screens.h"
 #include "keyboard.h"
 #include "onplay.h"
+#include "buffer.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #endif
 
-#define NAME_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH * MAX_FILES_IN_DIR)
+/* Mirror of global_settings.max_files_in_dir */
+int max_files_in_dir;
 
-static char name_buffer[NAME_BUFFER_SIZE];
-static int name_buffer_length;
+static char *name_buffer;
+static int name_buffer_size;    /* Size of allocated buffer */
+static int name_buffer_length;  /* Currently used amount */
 struct entry {
     short attr; /* FAT attributes + file type flags */
     char *name;
 };
 
-static struct entry dircache[MAX_FILES_IN_DIR];
+static struct entry *dircache;
+
 static int dircursor;
 static int dirstart;
 static int dirlevel;
@@ -249,7 +253,7 @@ static int showdir(char *path, int start)
         name_buffer_length = 0;
         dir_buffer_full = false;
         
-        for ( i=0; i<MAX_FILES_IN_DIR; i++ ) {
+        for ( i=0; i < max_files_in_dir; i++ ) {
             int len;
             struct dirent *entry = readdir(dir);
             struct entry* dptr = &dircache[i];
@@ -333,7 +337,7 @@ static int showdir(char *path, int start)
                 continue;
             }
 
-            if (len > NAME_BUFFER_SIZE - name_buffer_length - 1) {
+            if (len > name_buffer_size - name_buffer_length - 1) {
                 /* Tell the world that we ran out of buffer space */
                 dir_buffer_full = true;
                 break;
@@ -348,7 +352,7 @@ static int showdir(char *path, int start)
         lastdir[sizeof(lastdir)-1] = 0;
         qsort(dircache,filesindir,sizeof(struct entry),compare);
 
-        if ( dir_buffer_full || filesindir == MAX_FILES_IN_DIR ) {
+        if ( dir_buffer_full || filesindir == max_files_in_dir ) {
 #ifdef HAVE_LCD_CHARCELLS
             lcd_double_height(false);
 #endif
@@ -1316,4 +1320,15 @@ bool create_playlist(void)
     sleep(HZ);
     
     return true;
+}
+
+void tree_init(void)
+{
+    /* We copy the settings value in case it is changed by the user. We can't
+       use the next reboot. */
+    max_files_in_dir = global_settings.max_files_in_dir;
+    name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files_in_dir;
+    
+    name_buffer = buffer_alloc(name_buffer_size);
+    dircache = buffer_alloc(max_files_in_dir * sizeof(struct entry));
 }

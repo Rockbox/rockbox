@@ -27,6 +27,7 @@
 #include <kernel.h>
 #include "thread.h"
 #include "mp3data.h"
+#include "buffer.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -459,10 +460,6 @@ static unsigned int prescale_table[] =
 static struct event_queue mpeg_queue;
 static char mpeg_stack[DEFAULT_STACK_SIZE + 0x1000];
 static char mpeg_thread_name[] = "mpeg";
-
-/* defined in linker script */
-extern unsigned char mp3buf[];
-extern unsigned char mp3end[];
 
 static int mp3buflen;
 static int mp3buf_write;

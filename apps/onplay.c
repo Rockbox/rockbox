@@ -37,6 +37,7 @@
 #include "id3.h"
 #include "screens.h"
 #include "tree.h"
+#include "buffer.h"
 
 static char* selected_file = NULL;
 static bool reload_dir = false;
@@ -112,10 +113,6 @@ static void xingupdate(int percent)
     lcd_update();
 }
 
-
-/* defined in linker script */
-extern unsigned char mp3buf[];
-extern unsigned char mp3end[];
 
 static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 {

@@ -26,6 +26,7 @@
 #include "system.h"
 #include "i2c.h"
 #include "string.h"
+#include "buffer.h"
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -35,6 +36,8 @@ static void rolo_error(char *text)
     lcd_puts(0, 0, "ROLO error:");
     lcd_puts_scroll(0, 1, text);
     lcd_update();
+    button_get(true);
+    button_get(true);
     button_get(true);
     lcd_stop_scroll();
 }
@@ -49,7 +52,6 @@ int rolo_load(char* filename)
 {
     int fd,slen;
     unsigned long length,file_length,i;
-    extern unsigned char mp3buf[],mp3end;
     unsigned short checksum,file_checksum;
     unsigned char* ramstart = (void*)0x09000000;
     void (*start_func)(void) = (void*)ramstart + 0x200;
@@ -88,7 +90,7 @@ int rolo_load(char* filename)
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     /* verify that file can be read and descrambled */
-    if ((&mp3buf[0] + (2*length)+4) >= &mp3end) {
+    if ((mp3buf + (2*length)+4) >= &mp3end) {
         rolo_error("Not enough room to load file");
         return -1;
     }

@@ -34,6 +34,7 @@
 #include "debug.h"
 #include "mp3data.h"
 #include "file.h"
+#include "buffer.h"
 
 #define DEBUG_VERBOSE
 
@@ -253,13 +254,6 @@ unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long
     return header;
 }
 
-#ifdef SIMULATOR
-unsigned char mp3buf[0x100000];
-unsigned char mp3end[1];
-#else
-extern unsigned char mp3buf[];
-extern unsigned char mp3end[];
-#endif
 static int fnf_read_index;
 static int fnf_buf_len;
 

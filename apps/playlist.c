@@ -31,6 +31,7 @@
 #include "status.h"
 #include "applimits.h"
 #include "screens.h"
+#include "buffer.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -42,10 +43,8 @@ static struct playlist_info playlist;
 
 #define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
 
-#define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
-static unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
+static unsigned char *playlist_buffer;
 
-extern unsigned char mp3buf[],mp3end;
 static int playlist_end_pos = 0;
 
 static char now_playing[MAX_PATH+1];
@@ -53,6 +52,11 @@ static char now_playing[MAX_PATH+1];
 void playlist_init(void)
 {
     playlist.fd = -1;
+    playlist.max_playlist_size = global_settings.max_files_in_playlist;
+    playlist.indices = buffer_alloc(playlist.max_playlist_size);
+    playlist.buffer_size =
+        AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
+    playlist_buffer = buffer_alloc(playlist.buffer_size);
 }
 
 /*
@@ -291,7 +295,7 @@ int playlist_add(char *filename)
 {
     int len = strlen(filename);
 
-    if(len+2 > PLAYLIST_BUFFER_SIZE - playlist_end_pos)
+    if(len+2 > playlist.buffer_size - playlist_end_pos)
         return -1;
 
     strcpy(&playlist_buffer[playlist_end_pos], filename);
@@ -655,7 +659,7 @@ void add_indices_to_playlist(void)
     int i = 0;
     int count = 0;
     unsigned char* buffer = playlist_buffer;
-    int buflen = PLAYLIST_BUFFER_SIZE;
+    int buflen = playlist.buffer_size;
     bool store_index;
     unsigned char *p;
 
@@ -667,7 +671,7 @@ void add_indices_to_playlist(void)
         
 #ifndef SIMULATOR
         /* use mp3 buffer for maximum load speed */
-        buflen = (&mp3end - &mp3buf[0]);
+        buflen = (mp3end - mp3buf);
         buffer = mp3buf;
 #endif
     }
@@ -705,7 +709,7 @@ void add_indices_to_playlist(void)
                     /* Store a new entry */
                     playlist.indices[ playlist.amount ] = i+count;
                     playlist.amount++;
-                    if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
+                    if ( playlist.amount >= playlist.max_playlist_size ) {
                         lcd_clear_display();
                         lcd_puts(0,0,str(LANG_PLAYINDICES_PLAYLIST));
                         lcd_puts(0,1,str(LANG_PLAYINDICES_BUFFER));
@@ -772,7 +776,7 @@ void sort_playlist(bool start_current)
 
     if (playlist.amount > 0)
     {
-        qsort(&playlist.indices, playlist.amount, sizeof(playlist.indices[0]), compare);
+        qsort(playlist.indices, playlist.amount, sizeof(playlist.indices[0]), compare);
     }
 
     if (start_current)

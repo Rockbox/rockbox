@@ -126,6 +126,8 @@ modified unless the header & checksum test fails.
 
 
 Rest of config block, only saved to disk:
+0xAA  Max number of files in playlist (1000-20000)
+0xAC  Max number of files in dir (50-10000)
 0xAE  fade on pause/unpause/stop setting (bit 0)
       caption backlight (bit 1)
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
@@ -379,6 +381,14 @@ int settings_save( void )
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
     
+    config_block[0xaa] = (unsigned char)
+        global_settings.max_files_in_playlist & 0xff;
+    config_block[0xab] = (unsigned char)
+        (global_settings.max_files_in_playlist >> 8) & 0xff;
+    config_block[0xac] = (unsigned char)
+        global_settings.max_files_in_dir & 0xff;
+    config_block[0xad] = (unsigned char)
+        (global_settings.max_files_in_dir >> 8) & 0xff;
     config_block[0xae] = (unsigned char)
         ((global_settings.fade_on_stop & 1) |
          ((global_settings.caption_backlight & 1) << 1));
@@ -694,6 +704,14 @@ void settings_load(void)
 
         if (config_block[0xae] != 0xff)
             global_settings.fade_on_stop = config_block[0xae];
+
+        if (config_block[0xac] != 0xff)
+            global_settings.max_files_in_dir =
+                config_block[0xac] | (config_block[0xad] << 8);
+
+        if (config_block[0xaa] != 0xff)
+            global_settings.max_files_in_playlist =
+                config_block[0xaa] | (config_block[0xab] << 8);
 
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
@@ -1025,6 +1043,12 @@ bool settings_load_config(char* file)
 #endif
         else if (!strcasecmp(name, "volume fade"))
             set_cfg_bool(&global_settings.fade_on_stop, value);
+        else if (!strcasecmp(name, "max files in dir"))
+            set_cfg_int(&global_settings.max_files_in_dir, value,
+                        50, 10000);
+        else if (!strcasecmp(name, "max files in playlist"))
+            set_cfg_int(&global_settings.max_files_in_playlist, value,
+                        1000, 20000);
     }
 
     close(fd);
@@ -1302,6 +1326,11 @@ bool settings_save_config(void)
             boolopt[global_settings.rec_editable]);
 
 #endif
+
+    fprintf(fd, "max files in dir: %d\r\n", global_settings.max_files_in_dir);
+    fprintf(fd, "max files in playlist: %d\r\n",
+            global_settings.max_files_in_playlist);
+    
     close(fd);
 
     lcd_clear_display();
@@ -1384,32 +1413,8 @@ void settings_reset(void) {
     global_settings.runtime = 0;
     global_settings.topruntime = 0;
     global_settings.fade_on_stop = true;
-}
-
-
-/*
- * dump the list of current settings
- */
-void settings_display(void)
-{
-#ifdef DEBUG
-    DEBUGF( "\nsettings_display()\n" );
-
-    DEBUGF( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\n"
-            "loudness:\t%d\nbass boost:\t%d\n",
-            global_settings.volume,
-            global_settings.balance,
-            global_settings.bass,
-            global_settings.treble,
-            global_settings.loudness,
-            global_settings.bass_boost );
-
-    DEBUGF( "contrast:\t%d\ninvert:\t%d\npoweroff:\t%d\nbacklight_timeout:\t%d\n",
-            global_settings.contrast,
-            global_settings.invert,
-            global_settings.poweroff,
-            global_settings.backlight_timeout );
-#endif
+    global_settings.max_files_in_dir = 400;
+    global_settings.max_files_in_playlist = 10000;
 }
 
 bool set_bool(char* string, bool* variable )

@@ -567,6 +567,20 @@ static bool poweroff(void)
 }
 #endif
 
+static bool max_files_in_dir(void)
+{
+    return set_int(str(LANG_MAX_FILES_IN_DIR), "",
+                   &global_settings.max_files_in_dir,
+                   NULL, 50, 50, 10000 );
+}
+
+static bool max_files_in_playlist(void)
+{
+    return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "",
+                   &global_settings.max_files_in_playlist,
+                   NULL, 1000, 1000, 10000 );
+}
+
 static bool buffer_margin(void)
 {
     return set_int(str(LANG_MP3BUFFER_MARGIN), "s",
@@ -574,7 +588,7 @@ static bool buffer_margin(void)
                    mpeg_set_buffer_margin, 1, 0, 7 );
 }
 
-static bool ff_rewind_min_step(void) 
+static bool ff_rewind_min_step(void)
 { 
     char* names[] = { "1s", "2s", "3s", "4s",
                       "5s", "6s", "8s", "10s",
@@ -783,6 +797,8 @@ static bool system_settings_menu(void)
 #ifdef HAVE_ATA_POWER_OFF
         { str(LANG_POWEROFF),    poweroff        },
 #endif
+        { str(LANG_MAX_FILES_IN_DIR),    max_files_in_dir        },
+        { str(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
 #ifndef SIMULATOR
         { str(LANG_BATTERY_CAPACITY), battery_capacity },
 #endif
