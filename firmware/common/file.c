@@ -226,7 +226,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 int rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
                                        openfiles[fd].cache, true );
                 if ( rc < 0 ) {
-                    DEBUGF("Failed read/writing %d sectors\n",sectors);
+                    DEBUGF("Failed read/writing\n");
                     errno = EIO;
                     return -2;
                 }
