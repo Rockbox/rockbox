@@ -31,54 +31,52 @@
 static int serial_byte,serial_flag;
 
 void serial_putc (char byte) 
-	{
-    static int i = 0;
-		while (!(QI(SCISSR1) & (1<<TDRE)));
-		QI(SCITDR1) = byte;
-		clear_bit (TDRE,SCISSR1);
-    lcd_goto ((i++)%11,1); lcd_putc (byte);
-	}
+{
+    while (!(SSR1 & (1<<TDRE)));
+    TDR1 = byte;
+    clear_bit(TDRE,SSR1_ADDR);
+}
 
 void serial_puts (char const *string) 
-	{
+{
     int byte;
-		while ((byte = *string++))
- 			serial_putc (byte);
-	}
+    while ((byte = *string++))
+	serial_putc (byte);
+}
 
 int serial_getc( void )
-	{
-		int byte;
-		while (!serial_flag);
+{
+    int byte;
+    while (!serial_flag);
     byte = serial_byte;
     serial_flag = 0;
-		serial_putc (byte);
-		return byte;
-	}
+    serial_putc (byte);
+    return byte;
+}
 
 void serial_setup (int baudrate) 
-	{ 	
-  	QI(SCISCR1) =
-  	QI(SCISSR1) =
-  	QI(SCISMR1) = 0;
-  	QI(SCIBRR1) = (PHI/(32*baudrate))-1;	
-  	QI(SCISCR1) = 0x70; 
-	}
+{ 	
+    SCR1 = 0;
+    SSR1 = 0;
+    SMR1 = 0;
+    BRR1 = (FREQ/(32*baudrate))-1;
+    SCR1 = 0x70;
+}
 
 #pragma interrupt
 void REI1 (void)
-  {
-		clear_bit (FER,SCISSR1);
-  }
+{
+    clear_bit (FER,SSR1_ADDR);
+}
 
 #pragma interrupt
 void RXI1 (void)
-  {
-    serial_byte = QI(SCIRDR1);
+{
+    serial_byte = RDR1;
     serial_flag = 1;
-		clear_bit (RDRF,SCISSR1);
+    clear_bit(RDRF,SSR1_ADDR);
     if (serial_byte == '0')
-      lcd_turn_off_backlight ();
+	lcd_turn_off_backlight ();
     if (serial_byte == '1')
-      lcd_turn_on_backlight ();
-  }
+	lcd_turn_on_backlight ();
+}

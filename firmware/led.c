@@ -22,49 +22,49 @@
 #include <led.h>
 
 #define turn_on() \
-  set_bit (LEDB,PBDR+1)
+  set_bit (LEDB,PBDR_ADDR+1)
 
 #define turn_off() \
-  clear_bit (LEDB,PBDR+1)
+  clear_bit (LEDB,PBDR_ADDR+1)
 
 #define start_timer() \
-  set_bit (2,ITUTSTR)
+  set_bit (2,TSTR_ADDR)
 
 #define stop_timer() \
-  clear_bit (2,ITUTSTR)
+  clear_bit (2,TSTR_ADDR)
 
 #define eoi(subinterrupt) \
-  clear_bit (subinterrupt,ITUTSR2)
+  clear_bit (subinterrupt,TSR2_ADDR)
 
 #define set_volume(volume) \
-  HI(ITUGRA2) = volume & 0x7FFF
+  GRA2 = volume & 0x7FFF
 
 
 void led_set_volume (unsigned short volume)
-  {
+{
     volume <<= 10;
     if (volume == 0)
-      led_turn_off ();
+	led_turn_off ();
     else if (volume == 0x8000) 
-      led_turn_on ();
+	led_turn_on ();
     else
-      {
-  	    set_volume (volume);
+    {
+	set_volume (volume);
         start_timer ();
-      }
-  }
+    }
+}
 
 #pragma interrupt
 void IMIA2 (void)
-  {
+{
     turn_off ();
     eoi (0);
-  }
+}
 
 #pragma interrupt
 void OVI2 (void)
-  {
+{
     turn_on ();
     eoi (2);
-  }
+}
     

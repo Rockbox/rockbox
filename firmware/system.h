@@ -21,35 +21,16 @@
 #define __SYSTEM_H__
 #include <sh7034.h>
 
-#define KB  *1024
-#define MB  *1024 KB
-#define GB  *1024 MB
-
-#define Hz  *1
-#define KHz *1000 Hz
-#define MHz *1000 KHz
-
-#define ns  *1
-#define us  *1000 ns
-#define ms  *1000 us
-
 /*
  *   11.059,200 MHz => 90.4224537037037037037037037037037... ns
  *   12.000,000 MHz => 83.3333333333333333333333333333333... ns 
  */
 
-#define PHI ((int)(12.000000 MHz))
+#define FREQ     12000000
 #define BAUDRATE 9600
 
 //#define PHI ((int)(11.059200 MHz))
 //#define BAUDRATE 115200 /* 115200 - 9600 */
-
-#define SI(a) \
-  (*((volatile int   *)a)) /* single integer access  - 32-bit */
-#define HI(a) \
-  (*((volatile short *)a)) /* half integer access    - 16-bit */
-#define QI(a) \
-  (*((volatile char  *)a)) /* quarter integer access - 8-bit  */
 
 #define nop \
   asm volatile ("nop")

@@ -142,166 +142,169 @@ reserve_interrupt (        108);
 default_interrupt (ADITI,  109);
 
 void (*vbr[]) (void) __attribute__ ((section (".sram.vbr"))) = 
-  {
-  /*** 0-1 Power-on Reset ***/
+{
+    /*** 0-1 Power-on Reset ***/
 		
     reset_pc,reset_sp,
 
-  /*** 2-3 Manual Reset ***/
+    /*** 2-3 Manual Reset ***/
 		
     reset_pc,reset_sp,
 
-  /*** 4 General Illegal Instruction ***/
+    /*** 4 General Illegal Instruction ***/
 
-		GII,
+    GII,
 
-  /*** 5 Reserved ***/
+    /*** 5 Reserved ***/
 
-		UIE5,
+    UIE5,
 
-  /*** 6 Illegal Slot Instruction ***/
+    /*** 6 Illegal Slot Instruction ***/
 
-		ISI,
+    ISI,
 
-  /*** 7-8 Reserved ***/
+    /*** 7-8 Reserved ***/
 
-		UIE7,UIE8,
+    UIE7,UIE8,
 
-  /*** 9 CPU Address Error ***/
+    /*** 9 CPU Address Error ***/
 
-		CPUAE,
+    CPUAE,
 
-  /*** 10 DMA Address Error ***/
+    /*** 10 DMA Address Error ***/
 
-		DMAAE,
+    DMAAE,
 
-  /*** 11 NMI ***/
+    /*** 11 NMI ***/
 
-		NMI,
+    NMI,
 
-  /*** 12 User Break ***/
+    /*** 12 User Break ***/
 
-		UB,
+    UB,
 
-  /*** 13-31 Reserved ***/
+    /*** 13-31 Reserved ***/
 
-		UIE13,UIE14,UIE15,UIE16,UIE17,UIE18,UIE19,UIE20,UIE21,UIE22,UIE23,UIE24,UIE25,UIE26,UIE27,UIE28,UIE29,UIE30,UIE31,
+    UIE13,UIE14,UIE15,UIE16,UIE17,UIE18,UIE19,UIE20,UIE21,UIE22,UIE23,UIE24,UIE25,UIE26,UIE27,UIE28,UIE29,UIE30,UIE31,
   
- 	/*** 32-63 TRAPA #20...#3F ***/
+    /*** 32-63 TRAPA #20...#3F ***/
 
     TRAPA32,TRAPA33,TRAPA34,TRAPA35,TRAPA36,TRAPA37,TRAPA38,TRAPA39,TRAPA40,TRAPA41,TRAPA42,TRAPA43,TRAPA44,TRAPA45,TRAPA46,TRAPA47,TRAPA48,TRAPA49,TRAPA50,TRAPA51,TRAPA52,TRAPA53,TRAPA54,TRAPA55,TRAPA56,TRAPA57,TRAPA58,TRAPA59,TRAPA60,TRAPA61,TRAPA62,TRAPA63,
   
-  /*** 64-71 IRQ0-7 ***/ 
+    /*** 64-71 IRQ0-7 ***/ 
 
     IRQ0,IRQ1,IRQ2,IRQ3,IRQ4,IRQ5,IRQ6,IRQ7,
   
-  /*** 72 DMAC0 ***/ 
+    /*** 72 DMAC0 ***/ 
   
-		DEI0,
+    DEI0,
     
-  /*** 73 Reserved ***/
+    /*** 73 Reserved ***/
 
     UIE73,
 
-  /*** 74 DMAC1 ***/ 
+    /*** 74 DMAC1 ***/ 
 
     DEI1,
     
-  /*** 75 Reserved ***/
+    /*** 75 Reserved ***/
 
     UIE75,
 
-  /*** 76 DMAC2 ***/ 
+    /*** 76 DMAC2 ***/ 
 
     DEI2,
     
-  /*** 77 Reserved ***/
+    /*** 77 Reserved ***/
 
     UIE77,
 
-  /*** 78 DMAC3 ***/ 
+    /*** 78 DMAC3 ***/ 
 
-		DEI3,
+    DEI3,
     
-  /*** 79 Reserved ***/
+    /*** 79 Reserved ***/
 
     UIE79, 
   
-  /*** 80-82 ITU0 ***/
+    /*** 80-82 ITU0 ***/
   
-		IMIA0,IMIB0,OVI0,
+    IMIA0,IMIB0,OVI0,
     
-  /*** 83 Reserved ***/
+    /*** 83 Reserved ***/
 
     UIE83, 
 
-  /*** 84-86 ITU1 ***/
+    /*** 84-86 ITU1 ***/
   
-		IMIA1,IMIB1,OVI1,
+    IMIA1,IMIB1,OVI1,
     
-  /*** 87 Reserved ***/
+    /*** 87 Reserved ***/
 
     UIE87, 
   
-  /*** 88-90 ITU2 ***/
+    /*** 88-90 ITU2 ***/
   
-		IMIA2,IMIB2,OVI2,
+    IMIA2,IMIB2,OVI2,
     
-  /*** 91 Reserved ***/
+    /*** 91 Reserved ***/
 
     UIE91, 
   
-  /*** 92-94 ITU3 ***/
+    /*** 92-94 ITU3 ***/
   
-		IMIA3,IMIB3,OVI3,
+    IMIA3,IMIB3,OVI3,
     
-  /*** 95 Reserved ***/
+    /*** 95 Reserved ***/
 
     UIE95, 
   
-  /*** 96-98 ITU4 ***/
+    /*** 96-98 ITU4 ***/
   
-		IMIA4,IMIB4,OVI4,
+    IMIA4,IMIB4,OVI4,
     
-  /*** 99 Reserved ***/
+    /*** 99 Reserved ***/
 
     UIE99,
     
-  /*** 100-103 SCI0 ***/ 
+    /*** 100-103 SCI0 ***/ 
   
-		REI0,RXI0,TXI0,TEI0,
+    REI0,RXI0,TXI0,TEI0,
   
-  /*** 104-107 SCI1 ***/ 
+    /*** 104-107 SCI1 ***/ 
   
-		REI1,RXI1,TXI1,TEI1,
+    REI1,RXI1,TXI1,TEI1,
   
-  /*** 108 Parity Control Unit ***/
+    /*** 108 Parity Control Unit ***/
   
-		UIE108,       
+    UIE108,       
   
-  /*** 109 AD Converter ***/
+    /*** 109 AD Converter ***/
   
-		ADITI
+    ADITI
     
-	};
+};
 
 
 void system_reboot (void)
-  {
+{
     cli ();
 
     asm volatile ("ldc\t%0,vbr" : : "r"(0));
 
-    SI(INTCIPRAB) =
-    SI(INTCIPRCD) = 0;
-    HI(INTCIPRE)  =
-    HI(INTCICR)   = 0;
+    IPRA = 0;
+    IPRB = 0;
+    IPRC = 0;
+    IPRD = 0;
+    IPRE = 0;
+    ICR = 0;
 
-    asm volatile ("jmp @%0; mov.l @%1,r15" : : "r"(SI(0)),"r"(4));
-  }
+    asm volatile ("jmp @%0; mov.l @%1,r15" : :
+		  "r"(*(char*)0),"r"(4));
+}
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
-  {
+{
     unsigned int i,n;
     lcd_stop ();
     asm volatile ("sts\tpr,%0" : "=r"(n));
@@ -314,121 +317,121 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_stop ();
 
     while (1)
-      {
+    {
         led_toggle ();
 
         for (i = 0; i < 240000; ++i);
-      }
-  }
+    }
+}
 
 asm (
-     "_UIE0:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE1:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE2:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE3:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE4:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE5:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE6:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE7:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE8:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE9:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE10:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE11:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE12:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE13:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE14:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE15:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE16:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE17:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE18:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE19:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE20:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE21:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE22:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE23:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE24:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE25:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE26:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE27:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE28:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE29:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE30:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE31:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE32:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE33:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE34:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE35:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE36:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE37:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE38:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE39:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE40:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE41:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE42:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE43:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE44:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE45:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE46:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE47:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE48:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE49:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE50:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE51:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE52:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE53:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE54:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE55:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE56:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE57:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE58:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE59:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE60:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE61:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE62:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE63:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE64:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE65:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE66:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE67:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE68:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE69:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE70:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE71:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE72:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE73:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE74:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE75:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE76:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE77:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE78:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE79:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE80:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE81:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE82:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE83:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE84:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE85:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE86:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE87:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE88:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE89:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE90:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE91:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE92:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE93:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE94:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE95:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE96:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE97:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE98:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE99:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE100:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE101:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE102:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE103:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE104:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE105:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE106:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE107:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE108:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
-     "_UIE109:\tbsr\t_UIE\n\tmov.l\t@r15+,r4");
+    "_UIE0:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE1:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE2:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE3:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE4:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE5:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE6:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE7:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE8:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE9:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE10:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE11:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE12:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE13:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE14:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE15:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE16:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE17:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE18:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE19:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE20:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE21:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE22:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE23:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE24:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE25:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE26:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE27:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE28:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE29:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE30:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE31:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE32:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE33:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE34:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE35:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE36:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE37:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE38:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE39:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE40:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE41:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE42:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE43:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE44:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE45:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE46:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE47:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE48:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE49:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE50:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE51:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE52:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE53:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE54:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE55:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE56:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE57:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE58:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE59:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE60:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE61:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE62:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE63:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE64:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE65:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE66:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE67:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE68:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE69:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE70:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE71:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE72:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE73:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE74:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE75:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE76:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE77:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE78:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE79:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE80:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE81:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE82:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE83:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE84:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE85:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE86:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE87:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE88:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE89:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE90:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE91:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE92:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE93:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE94:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE95:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE96:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE97:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE98:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE99:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE100:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE101:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE102:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE103:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE104:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE105:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE106:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE107:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE108:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
+    "_UIE109:\tbsr\t_UIE\n\tmov.l\t@r15+,r4");
