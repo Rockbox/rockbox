@@ -1091,7 +1091,7 @@ bool settings_save_config(void)
 
     /* find unused filename */
     for (i=0; ; i++) {
-        snprintf(filename, sizeof filename, "/.rockbox/config%02d.cfg", i);
+        snprintf(filename, sizeof filename, ROCKBOX_DIR "/config%02d.cfg", i);
         fd = open(filename, O_RDONLY);
         if (fd < 0)
             break;
@@ -1129,14 +1129,17 @@ bool settings_save_config(void)
     fprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
 
     if (global_settings.wps_file[0] != 0)
-        fprintf(fd, "wps: /.rockbox/%s.wps\r\n", global_settings.wps_file);
+        fprintf(fd, "wps: %s/%s.wps\r\n", ROCKBOX_DIR,
+                global_settings.wps_file);
 
     if (global_settings.lang_file[0] != 0)
-        fprintf(fd, "lang: /.rockbox/%s.lng\r\n", global_settings.lang_file);
+        fprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR, 
+                global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.font_file[0] != 0)
-        fprintf(fd, "font: /.rockbox/%s.fnt\r\n", global_settings.font_file);
+        fprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR,
+                global_settings.font_file);
 #endif
 
     fprintf(fd, "#\r\n# Sound settings\r\n#\r\n");
