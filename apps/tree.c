@@ -853,7 +853,7 @@ static int onplay_screen(char* dir, char* file)
     if (dir[1])
         snprintf(buf, sizeof buf, "%s/%s", dir, file);
     else
-        snprintf(buf, sizeof buf, "/%s", dir, file);
+        snprintf(buf, sizeof buf, "/%s", file);
     
     if (playing) {
         items[lastitem].desc=str(LANG_QUEUE);
