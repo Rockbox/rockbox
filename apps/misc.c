@@ -54,6 +54,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     int scale = bin_scale ? 1024 : 1000;
     int fraction = 0;
     int unit_no = 0;
+    int i;
     char tbuf[5];
 
     while (value >= scale)
