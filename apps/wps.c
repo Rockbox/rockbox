@@ -385,7 +385,10 @@ void display_volume_level(int vol_level)
     lcd_puts(0, 0, buffer);
 #else
     lcd_puts(2, 3, buffer);
+    lcd_update();
 #endif
+
+    sleep(HZ/6);
 }
 
 void display_keylock_text(bool locked)
@@ -643,14 +646,13 @@ int wps_show(void)
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
+                if (menu_button_is_down && keys_locked)
+                {
+                    sleep(HZ/6);
+                    draw_screen(id3);
+                }
                 if (!keys_locked)
                 {
-                    if (menu_button_is_down)
-                    {
-                        sleep(HZ/6);
-                        draw_screen(id3);
-                    }
-
                     if (ff_rewind)
                     {
                         /* rewind */
@@ -684,14 +686,13 @@ int wps_show(void)
                 break;
 
             case BUTTON_RIGHT | BUTTON_REL:
+                if (menu_button_is_down && keys_locked)
+                {
+                    sleep(HZ/6);
+                    draw_screen(id3);
+                }
                 if (!keys_locked)
                 {
-                    if (menu_button_is_down)
-                    {
-                        sleep(HZ/6);
-                        draw_screen(id3);
-                    }
-
                     if (ff_rewind)
                     {
                         /* fast forward */
@@ -733,8 +734,8 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                    display_volume_level(global_settings.volume);
-
+                display_volume_level(global_settings.volume);
+                draw_screen(id3);
                 status_draw();
                 settings_save();
                 break;
@@ -746,8 +747,8 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                    display_volume_level(global_settings.volume);
-
+                display_volume_level(global_settings.volume);
+                draw_screen(id3);
                 status_draw();
                 settings_save();
                 break;
@@ -760,6 +761,8 @@ int wps_show(void)
                     break;
                 }
                 lcd_stop_scroll();
+                dont_go_to_menu = true;
+                menu_button_is_down = false;
                 lcd_icon(ICON_PARAM, true);
                 lcd_icon(ICON_AUDIO, true);
                 retval = player_id3_show();
