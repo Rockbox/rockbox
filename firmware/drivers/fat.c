@@ -843,10 +843,10 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
 
 static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
 {
+#ifdef HAVE_FAT16SUPPORT
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-#ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
     {
         int sector = entry / CLUSTERS_PER_FAT16_SECTOR;
@@ -882,13 +882,13 @@ static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
 
 static int get_next_cluster(IF_MV2(struct bpb* fat_bpb,) int cluster)
 {
-#ifndef HAVE_MULTIVOLUME
-    struct bpb* fat_bpb = &fat_bpbs[0];
-#endif
     int next_cluster;
     int eof_mark = FAT_EOF_MARK;
     
 #ifdef HAVE_FAT16SUPPORT
+#ifndef HAVE_MULTIVOLUME
+    struct bpb* fat_bpb = &fat_bpbs[0];
+#endif
     if (fat_bpb->is_fat16)
     {
         eof_mark &= 0xFFFF; /* only 16 bit */
