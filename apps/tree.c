@@ -86,6 +86,20 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
 #endif /* HAVE_LCD_BITMAP */
 
+#ifdef HAVE_RECORDER_KEYPAD
+#define TREE_NEXT  BUTTON_DOWN
+#define TREE_PREV  BUTTON_UP
+#define TREE_EXIT  BUTTON_LEFT
+#define TREE_ENTER BUTTON_RIGHT
+#define TREE_MENU  BUTTON_F1
+#else
+#define TREE_NEXT  BUTTON_RIGHT
+#define TREE_PREV  BUTTON_LEFT
+#define TREE_EXIT  BUTTON_STOP
+#define TREE_ENTER BUTTON_PLAY
+#define TREE_MENU  BUTTON_MENU
+#endif /* HAVE_RECORDER_KEYPAD */
+
 static int compare(const void* e1, const void* e2)
 {
     return strncmp((*(struct entry**)e1)->name, (*(struct entry**)e2)->name,
@@ -223,6 +237,7 @@ bool dirbrowse(char *root)
     lcd_putsxy(0,0, "[Browse]",0);
     lcd_setmargins(0,MARGIN_Y);
     lcd_setfont(0);
+}
 #endif
     memcpy(currdir,root,sizeof(currdir));
 
@@ -234,22 +249,11 @@ bool dirbrowse(char *root)
     lcd_puts(0, dircursor, CURSOR_CHAR);
     lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
                     dircacheptr[start+dircursor]->name);
-#ifdef HAVE_LCD_BITMAP
     lcd_update();
-#endif
 
     while(1) {
         switch(button_get(true)) {
-#if defined(SIMULATOR) && defined(HAVE_RECODER_KEYPAD)
-            case BUTTON_OFF:
-                return false;
-#endif
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-#endif
+            case TREE_EXIT:
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -275,10 +279,7 @@ bool dirbrowse(char *root)
 
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_RIGHT:
-#endif
-            case BUTTON_PLAY:
+            case TREE_ENTER:
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
                     snprintf(buf,sizeof(buf),"%s%s",currdir,
                              dircacheptr[dircursor+start]->name);
@@ -312,10 +313,6 @@ bool dirbrowse(char *root)
                         playing = 1;
                         playtune(buf);
                         playing = 0;
-#ifdef HAVE_LCD_BITMAP
-                        lcd_setmargins(0, MARGIN_Y);
-                        lcd_setfont(0);
-#endif
                     }
                 }
 
@@ -323,11 +320,7 @@ bool dirbrowse(char *root)
                 lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 break;
                 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#else
-            case BUTTON_LEFT:
-#endif
+            case TREE_PREV:
                 if(dircursor) {
                     lcd_puts(0, LINE_Y+dircursor, " ");
                     dircursor--;
@@ -343,11 +336,7 @@ bool dirbrowse(char *root)
                 }
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_RIGHT:
-#endif
+            case TREE_NEXT:
                 if (dircursor + start + 1 < numentries ) {
                     if(dircursor+1 < TREE_MAX_ON_SCREEN) {
                         lcd_puts(0, LINE_Y+dircursor, " ");
@@ -362,24 +351,13 @@ bool dirbrowse(char *root)
                 }
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1:
-            case BUTTON_F2:
-            case BUTTON_F3:
-#else
-            case BUTTON_MENU:
-#endif
+            case TREE_MENU:
                 lcd_stop_scroll();
                 main_menu();
 
                 /* restore display */
                 /* TODO: this is just a copy from BUTTON_STOP, fix it */
                 lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-                lcd_putsxy(0,0, "[Browse]",0);
-                lcd_setmargins(0,MARGIN_Y);
-                lcd_setfont(0);
-#endif
                 numentries = showdir(currdir, start);
                 lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
 
