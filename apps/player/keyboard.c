@@ -32,7 +32,7 @@ static char* kbd_setupkeys(int page)
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "abcdefghijklmnopqrstuvwxyz",
         "01234567890!@#$%&/(){}[]<>",
-        "+-*_.,:;!?'"
+        "       +-*_.,:;!?'        "
     };
 
     return lines[page];
