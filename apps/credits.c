@@ -131,7 +131,7 @@ void roll_credits(void)
         line++;
         if(line >= numnames)
           break;
-        y+=8;
+        y+=height;
       }
 
     }
