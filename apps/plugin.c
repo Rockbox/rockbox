@@ -41,6 +41,7 @@
 #include "ata.h"
 #include "talk.h"
 #include "mp3data.h"
+#include "powermgmt.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -166,6 +167,7 @@ static struct plugin_api rockbox_api = {
     atoi,
     get_time,
     plugin_get_buffer,
+    battery_level,
 
     /* new stuff at the end, sort into place next time the API gets incompatible */
 
