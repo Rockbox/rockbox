@@ -23,15 +23,14 @@ INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I. -I$(OBJDIR)
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES)
 AFLAGS += -small -relax
 
+# Check if this is a kind of Recorder
+ANYREC = $(findstring RECORDER, $(TARGET))
+
 ifdef DEBUG
     DEFINES := -DDEBUG
     CFLAGS += -g
     LDS := $(FIRMWARE)/gdb.lds
 else
-
-# Check if this is a kind of Recorder
-ANYREC = $(findstring RECORDER, $(TARGET))
-
 ifeq ($(ANYREC), RECORDER)
     LDS := $(FIRMWARE)/app.lds
 else
