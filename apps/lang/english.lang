@@ -866,46 +866,6 @@ desc: in the peak meter menu
 eng: "Units Per Read"
 new: 
 
-id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-new:
-
-id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-new:
-
-id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save energy"
-new:
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "dBfs <-> linear"
-new:
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "dBfs"
-new:
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "linear"
-new:
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum of range"
-new:
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum of range"
-new:
-
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
@@ -1081,4 +1041,44 @@ new:
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
+new:
+
+id: LANG_PM_PERFORMANCE
+desc: in the peak meter menu
+eng: "Performance"
+new:
+
+id: LANG_PM_HIGH_PERFORMANCE
+desc: in the peak meter menu
+eng: "High performance"
+new:
+
+id: LANG_PM_ENERGY_SAVER
+desc: in the peak meter menu
+eng: "Save energy"
+new:
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "dBfs <-> linear"
+new:
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "dBfs"
+new:
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "linear"
+new:
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum of range"
+new:
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum of range"
 new:
