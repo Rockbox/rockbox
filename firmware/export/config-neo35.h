@@ -7,6 +7,9 @@
 /* define this if you have the Player's keyboard */
 #define HAVE_NEO_KEYPAD 1
 
+/* Define this if you have a SH7034 */
+#define HAVE_SH7034
+
 /* Define this if you have a MAS3507D */
 #define HAVE_MAS3507D
 
