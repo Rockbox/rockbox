@@ -74,6 +74,18 @@ void radio_stop(void)
 
 }
 
+bool radio_hardware_present(void)
+{
+    int val;
+    
+    fmradio_set(2, 0x140885); /* 5kHz, 7.2MHz crystal, test mode 1 */
+    val = fmradio_read(0);
+    if(val == 0x140885)
+        return true;
+    else
+        return false;
+}
+
 void radio_set_frequency(int freq)
 {
     /* We add the standard Intermediate Frequency 10.7MHz before calculating

@@ -266,34 +266,65 @@ bool main_menu(void)
 {
     int m;
     bool result;
+    int i = 0;
 
     /* main menu */
-    struct menu_items items[] = {
-        { str(LANG_SOUND_SETTINGS),     sound_menu        },
-        { str(LANG_GENERAL_SETTINGS),   settings_menu     },
+    struct menu_items items[14];
+
+    items[i].desc = str(LANG_SOUND_SETTINGS);
+    items[i++].function = sound_menu;
+
+    items[i].desc = str(LANG_GENERAL_SETTINGS);
+    items[i++].function = settings_menu;
+
 #ifdef HAVE_FMRADIO
-        { str(LANG_FM_RADIO),   radio_screen     },
+    if(radio_hardware_present()) {
+        items[i].desc = str(LANG_FM_RADIO);
+        items[i++].function = radio_screen;
+    }
 #endif
+
 #ifdef HAVE_MAS3587F
-        { str(LANG_RECORDING),          recording_screen  },
-        { str(LANG_RECORDING_SETTINGS), recording_settings},
+    items[i].desc = str(LANG_RECORDING);
+    items[i++].function = recording_screen;
+
+    items[i].desc = str(LANG_RECORDING_SETTINGS);
+    items[i++].function = recording_settings;
 #endif
-        { str(LANG_PLAYLIST_MENU),      playlist_menu     },
-        { str(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
-        { str(LANG_SLEEP_TIMER),        sleeptimer_screen },
+
+    items[i].desc = str(LANG_PLAYLIST_MENU);
+    items[i++].function = playlist_menu;
+
+    items[i].desc = str(LANG_MENU_SHOW_ID3_INFO);
+    items[i++].function = browse_id3;
+
+    items[i].desc = str(LANG_SLEEP_TIMER);
+    items[i++].function = sleeptimer_screen;
+
 #ifdef HAVE_ALARM_MOD
-        { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen    },
+    items[i].desc = str(LANG_ALARM_MOD_ALARM_MENU);
+    items[i++].function = alarm_screen;
 #endif
-        { str(LANG_PLUGINS),            plugin_browse     },
-        { str(LANG_FIRMWARE),           firmware_browse   },
-        { str(LANG_INFO),               show_info         },
-        { str(LANG_VERSION),            show_credits      },
+
+    items[i].desc = str(LANG_PLUGINS);
+    items[i++].function = plugin_browse;
+
+    items[i].desc = str(LANG_FIRMWARE);
+    items[i++].function = firmware_browse;
+
+    items[i].desc = str(LANG_INFO);
+    items[i++].function = show_info;
+
+    items[i].desc = str(LANG_VERSION);
+    items[i++].function = show_credits;
+
 #ifndef SIMULATOR
-        { str(LANG_DEBUG),              debug_menu        },
+    items[i].desc = str(LANG_DEBUG);
+    items[i++].function = debug_menu;
 #else
-        { str(LANG_USB),                simulate_usb      },
+    items[i].desc = str(LANG_USB);
+    items[i++].function = simulate_usb;
 #endif
-    };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
 #ifdef HAVE_LCD_CHARCELLS
