@@ -223,7 +223,7 @@ new:
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
+eng: "Ask"
 new:
 
 id: LANG_ON
