@@ -1457,3 +1457,8 @@ id: LANG_VBRFIX_NOT_VBR
 desc: Tells the user that the selected file is not a VBR file
 eng: "Not a VBR file"
 new: 
+
+id: LANG_VBRFIX
+desc: The context menu entry
+eng: "Update VBR file"
+new: 
