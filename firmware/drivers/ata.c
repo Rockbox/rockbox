@@ -83,7 +83,7 @@ bool old_recorder = false;
 static bool sleeping = false;
 static int sleep_timeout = 5*HZ;
 static bool poweroff = false;
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_ATA_POWER_OFF
 static int poweroff_timeout = 2*HZ;
 #endif
 static char ata_stack[DEFAULT_STACK_SIZE];
@@ -411,6 +411,7 @@ void ata_spindown(int seconds)
     sleep_timeout = seconds * HZ;
 }
 
+#ifdef HAVE_ATA_POWER_OFF
 void ata_poweroff(bool enable)
 {
     if (enable)
@@ -418,6 +419,7 @@ void ata_poweroff(bool enable)
     else
         poweroff_timeout = 0;
 }
+#endif
 
 bool ata_disk_is_active(void)
 {
