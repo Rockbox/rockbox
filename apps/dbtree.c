@@ -368,7 +368,18 @@ const char* db_get_icon(struct tree_context* c)
 #else
 int   db_get_icon(struct tree_context* c)
 {
-    (void)c;
-    return Folder;
+    int icon;
+    switch (c->currtable)
+    {
+        case allsongs:
+        case songs:
+            icon = File;
+            break;
+
+        default:
+            icon = Folder;
+            break;
+    }
+    return icon;
 }
 #endif
