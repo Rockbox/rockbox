@@ -22,8 +22,8 @@
 #include <stdarg.h>
 #include "config.h"
 
-char debugmembuf[100];
-char debugbuf[200];
+static char debugmembuf[100];
+static char debugbuf[200];
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
 
