@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "adc.h"
+#include "kernel.h"
 #include "power.h"
 
 #ifdef HAVE_CHARGE_CTRL
@@ -66,6 +67,7 @@ void ide_power_enable(bool on)
 
 void power_off(void)
 {
+    set_irq_level(15);
 #ifdef ARCHOS_RECORDER
     PBDR &= ~PBDR_BTN_OFF;
     PBIOR |= PBDR_BTN_OFF;
@@ -73,6 +75,7 @@ void power_off(void)
     PADR &= ~0x800;
     PAIOR |= 0x800;
 #endif
+    while(1);
 }
 
 #else
