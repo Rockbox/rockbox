@@ -142,6 +142,8 @@ bool recording_screen(void)
                                global_settings.rec_source,
                                global_settings.rec_channels);
 
+    set_gain();
+
     lcd_setfont(FONT_UI);
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(w, 8);
