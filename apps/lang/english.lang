@@ -1660,7 +1660,7 @@ new:
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
+eng: "Save Current Playlist"
 new:
 
 id: LANG_PLAYLIST_MENU
@@ -1826,4 +1826,19 @@ new:
 id: LANG_FM_BUTTONBAR_RECORD
 desc:  in main menu
 eng: "Record"
+new:
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new:
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new:
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
 new:

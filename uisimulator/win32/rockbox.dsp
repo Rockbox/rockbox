@@ -365,6 +365,10 @@ SOURCE=..\..\apps\playlist_menu.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\apps\playlist_viewer.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\apps\plugin.c
 # End Source File
 # Begin Source File

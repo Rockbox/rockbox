@@ -578,8 +578,6 @@ static bool menu(void)
     status_set_param(false);
 #endif
 
-    wps_display(id3);
-    wps_refresh(id3, 0, WPS_REFRESH_ALL);
     return false;
 }
 
@@ -627,6 +625,7 @@ int wps_show(void)
     bool ignore_keyup = true;
     bool restore = false;
     bool exit = false;
+    bool update_track = false;
 
     id3 = NULL;
     current_track_path[0] = '\0';
@@ -902,6 +901,7 @@ int wps_show(void)
                 if (menu())
                     return SYS_USB_CONNECTED;
 
+                update_track = true;
                 restore = true;
                 break;
 
@@ -939,16 +939,22 @@ int wps_show(void)
                 return SYS_USB_CONNECTED;
 
             case BUTTON_NONE: /* Timeout */
-                if (update())
-                {
-                    /* set dir browser to current playing song */
-                    if (global_settings.browse_current &&
-                        current_track_path[0] != '\0')
-                        set_current_file(current_track_path);
-
-                    return 0;
-                }
+                update_track = true;
                 break;
+        }
+
+        if (update_track)
+        {
+            if (update())
+            {
+                /* set dir browser to current playing song */
+                if (global_settings.browse_current &&
+                    current_track_path[0] != '\0')
+                    set_current_file(current_track_path);
+                
+                return 0;
+            }
+            update_track = false;
         }
 
         if (exit) {
@@ -975,7 +981,6 @@ int wps_show(void)
             return 0;
         }
                     
-
         if ( button )
             ata_spin();
 

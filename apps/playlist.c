@@ -146,6 +146,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
 static void display_playlist_count(int count, char *fmt);
 static void display_buffer_full(void);
 static int flush_pending_control(void);
+static int rotate_index(int index);
 
 /*
  * remove any files and indices associated with the playlist
@@ -679,11 +680,7 @@ static int get_next_index(int steps)
     {
         case REPEAT_OFF:
         {
-            /* Rotate indices such that first_index is considered index 0 to
-               simplify next calculation */
-            current_index -= playlist.first_index;
-            if (current_index < 0)
-                current_index += playlist.amount;
+            current_index = rotate_index(current_index);
             
             next_index = current_index+steps;
             if ((next_index < 0) || (next_index >= playlist.amount))
@@ -990,6 +987,18 @@ static int flush_pending_control(void)
     }
 
     return result;
+}
+
+/*
+ * Rotate indices such that first_index is index 0
+ */
+static int rotate_index(int index)
+{
+    index -= playlist.first_index;
+    if (index < 0)
+        index += playlist.amount;
+
+    return index;
 }
 
 /*
@@ -1604,21 +1613,104 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
     return result;
 }
 
-/* delete track at specified index */
+/* 
+ * Delete track at specified index.  If index is PLAYLIST_DELETE_CURRENT then
+ * we want to delete the current playing track.
+ */
 int playlist_delete(int index)
 {
-    int result;
-    
+    int result = 0;
+
     if (playlist.control_fd < 0)
     {
         splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
+    if (index == PLAYLIST_DELETE_CURRENT)
+        index = playlist.index;
+
+    result = remove_track_from_playlist(index, true);
+    
+    if (result != -1)
+        mpeg_flush_and_reload_tracks();
+
+    return result;
+}
+
+/*
+ * Move track at index to new_index.  Tracks between the two are shifted
+ * appropriately.  Returns 0 on success and -1 on failure.
+ */
+int playlist_move(int index, int new_index)
+{
+    int result;
+    int seek;
+    bool control_file;
+    bool queue;
+    bool current = false;
+    int r = rotate_index(new_index);
+    char filename[MAX_PATH];
+
+    if (index == new_index)
+        return -1;
+
+    if (index == playlist.index)
+        /* Moving the current track */
+        current = true;
+
+    control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+    queue = playlist.indices[index] & PLAYLIST_QUEUE_MASK;
+    seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
+
+    if (get_filename(seek, control_file, filename, sizeof(filename)) < 0)
+        return -1;
+
+    /* Delete track from original position */
     result = remove_track_from_playlist(index, true);
 
     if (result != -1)
-        mpeg_flush_and_reload_tracks();
+    {
+        /* We want to insert the track at the position that was specified by
+           new_index.  This may be different then new_index because of the
+           shifting that occurred after the delete */
+        if (r == 0)
+            /* First index */
+            new_index = PLAYLIST_PREPEND;
+        else if (r == playlist.amount)
+            /* Append */
+            new_index = PLAYLIST_INSERT_LAST;
+        else
+            /* Calculate index of desired position */
+            new_index = (r+playlist.first_index)%playlist.amount;
+
+        result = add_track_to_playlist(filename, new_index, queue, -1);
+        
+        if (result != -1)
+        {
+            if (current)
+            {
+                /* Moved the current track */
+                switch (new_index)
+                {
+                    case PLAYLIST_PREPEND:
+                        playlist.index = playlist.first_index;
+                        break;
+                    case PLAYLIST_INSERT_LAST:
+                        playlist.index = playlist.first_index - 1;
+                        if (playlist.index < 0)
+                            playlist.index += playlist.amount;
+                        break;
+                    default:
+                        playlist.index = new_index;
+                        break;
+                }
+            }
+
+            fsync(playlist.control_fd);
+            mpeg_flush_and_reload_tracks();
+        }
+    }
 
     return result;
 }
@@ -1763,21 +1855,13 @@ int playlist_next(int steps)
     index = get_next_index(steps);
     playlist.index = index;
 
-    if (playlist.last_insert_pos >= 0)
+    if (playlist.last_insert_pos >= 0 && steps > 0)
     {
         /* check to see if we've gone beyond the last inserted track */
-        int rot_index = index;
-        int rot_last_pos = playlist.last_insert_pos;
+        int cur = rotate_index(index);
+        int last_pos = rotate_index(playlist.last_insert_pos);
 
-        rot_index -= playlist.first_index;
-        if (rot_index < 0)
-            rot_index += playlist.amount;
-
-        rot_last_pos -= playlist.first_index;
-        if (rot_last_pos < 0)
-            rot_last_pos += playlist.amount;
-
-        if (rot_index > rot_last_pos)
+        if (cur > last_pos)
         {
             /* reset last inserted track */
             playlist.last_insert_pos = -1;
@@ -1826,14 +1910,16 @@ int playlist_get_resume_info(short *resume_index)
    index into the playlist */
 int playlist_get_display_index(void)
 {
-    int index = playlist.index;
-
     /* first_index should always be index 0 for display purposes */
-    index -= playlist.first_index;
-    if (index < 0)
-        index += playlist.amount;
+    int index = rotate_index(playlist.index);
 
     return (index+1);
+}
+
+/* returns index of first track in playlist */
+int playlist_get_first_index(void)
+{
+    return playlist.first_index;
 }
 
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
@@ -1858,6 +1944,39 @@ char *playlist_name(char *buf, int buf_size)
         *sep = 0;
     
     return buf;
+}
+
+/* Fills info structure with information about track at specified index. 
+   Returns 0 on success and -1 on failure */
+int playlist_get_track_info(int index, struct playlist_track_info* info)
+{
+    int seek;
+    bool control_file;
+
+    if (index < 0 || index >= playlist.amount)
+        return -1;
+
+    control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+    seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
+
+    if (get_filename(seek, control_file, info->filename,
+            sizeof(info->filename)) < 0)
+        return -1;
+
+    info->attr = 0;
+
+    if (control_file)
+    {
+        if (playlist.indices[index] & PLAYLIST_QUEUE_MASK)
+            info->attr |= PLAYLIST_ATTR_QUEUED;
+        else
+            info->attr |= PLAYLIST_ATTR_INSERTED;
+    }
+
+    info->index = index;
+    info->display_index = rotate_index(index) + 1;
+
+    return 0;
 }
 
 /* save the current dynamic playlist to specified file */

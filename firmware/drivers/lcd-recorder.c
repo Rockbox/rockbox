@@ -543,6 +543,29 @@ void lcd_invertrect (int x, int y, int nx, int ny)
             INVERT_PIXEL((x + i), (y + j));
 }
 
+/* Reverse the invert setting of the scrolling line (if any) at given char
+   position.  Setting will go into affect next time line scrolls. */
+void lcd_invertscroll(int x, int y)
+{
+    struct scrollinfo* s;
+    int index;
+
+    for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
+        /* is this a scrolling line? */
+        if ( !(scrolling_lines&(1<<index)) )
+            continue;
+        
+        s = &scroll[index];
+
+        if (s->startx == x && s->starty == y)
+        {
+            /* Found the line */
+            s->invert = !s->invert;
+            break;
+        }
+    }
+}
+
 void lcd_drawline( int x1, int y1, int x2, int y2 )
 {
     int numpixels;

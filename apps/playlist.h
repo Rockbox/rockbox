@@ -47,6 +47,17 @@ struct playlist_info
     struct mutex control_mutex; /* mutex for control file access    */
 };
 
+#define PLAYLIST_ATTR_QUEUED    0x01
+#define PLAYLIST_ATTR_INSERTED  0x02
+
+struct playlist_track_info
+{
+    char filename[MAX_PATH]; /* path name of mp3 file               */
+    int  attr;               /* playlist attributes for track       */
+    int  index;              /* index of track in playlist          */
+    int  display_index;      /* index of track for display          */
+};
+
 void playlist_init(void);
 int playlist_create(char *dir, char *file);
 int playlist_resume(void);
@@ -56,6 +67,7 @@ int playlist_insert_directory(char *dirname, int position, bool queue,
                               bool recurse);
 int playlist_insert_playlist(char *filename, int position, bool queue);
 int playlist_delete(int index);
+int playlist_move(int index, int new_index);
 int playlist_shuffle(int random_seed, int start_index);
 int playlist_randomise(unsigned int seed, bool start_current);
 int playlist_sort(bool start_current);
@@ -65,8 +77,10 @@ char *playlist_peek(int steps);
 int playlist_next(int steps);
 int playlist_get_resume_info(short *resume_index);
 int playlist_get_display_index(void);
+int playlist_get_first_index(void);
 int playlist_amount(void);
 char *playlist_name(char *buf, int buf_size);
+int playlist_get_track_info(int index, struct playlist_track_info* info);
 int playlist_save(char *filename);
 
 enum {
@@ -74,6 +88,10 @@ enum {
     PLAYLIST_INSERT = -2,
     PLAYLIST_INSERT_LAST = -3,
     PLAYLIST_INSERT_FIRST = -4
+};
+
+enum {
+    PLAYLIST_DELETE_CURRENT = -1
 };
 
 #endif /* __PLAYLIST_H__ */

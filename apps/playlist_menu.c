@@ -25,6 +25,7 @@
 #include "playlist.h"
 #include "tree.h"
 #include "settings.h"
+#include "playlist_viewer.h"
 
 #include "lang.h"
 
@@ -64,9 +65,10 @@ bool playlist_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_CREATE_PLAYLIST),    create_playlist   },
-        { str(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist  },
-        { str(LANG_RECURSE_DIRECTORY), recurse_directory  },
+        { str(LANG_CREATE_PLAYLIST),       create_playlist   },
+        { str(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
+        { str(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
+        { str(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
     
     m = menu_init( items, sizeof items / sizeof(struct menu_items) );
