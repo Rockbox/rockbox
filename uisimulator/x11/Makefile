@@ -90,7 +90,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c\
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c bounce.c snow.c bmp.c widgets.c wormlet.c
+   APPS += tetris.c sokoban.c bounce.c snake.c snow.c bmp.c widgets.c wormlet.c
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
@@ -192,6 +192,9 @@ $(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/snake.o: $(RECDIR)/snake.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/snow.o: $(RECDIR)/snow.c
