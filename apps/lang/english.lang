@@ -2793,9 +2793,3 @@ desc:  in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new:
-
-id: LANG_PROGRESSBAR_SOLID
-desc: Appearance of the progress bar
-eng: "Solid progress bar"
-voice: "solid progress bar"
-new:
