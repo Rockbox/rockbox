@@ -1236,3 +1236,14 @@ id: LANG_QUEUE_FULL
 desc: queue buffer full
 eng: "Queue buffer full"
 new:
+
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
+eng: "Canceled"
+new:
+
+id: LANG_MENU_SETTING_OK
+desc: Visual confirmation of changing a setting
+eng: "OK"
+new:
+

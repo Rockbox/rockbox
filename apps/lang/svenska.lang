@@ -1208,3 +1208,13 @@ id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
 eng: "Total queued: %d"
 new: "Kö: %d st"
+
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
+eng: "Canceled"
+new: "Avbrutet"
+
+id: LANG_MENU_SETTING_OK
+desc: Visual confirmation of changing a setting
+eng: "OK"
+new: "OK"
