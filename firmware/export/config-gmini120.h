@@ -52,4 +52,6 @@
 
 #define GMINI_ARCH
 
+#define HAVE_LED
+
 #endif

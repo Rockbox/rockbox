@@ -31,6 +31,11 @@ void led(bool on)
 {
     current = on;
     if ( on ^ xor )
+#ifdef GMINI_ARCH
+        P2 |= 1;
+    else
+        P2 &= ~1;
+#else
     {
         or_b(0x40, &PBDRL);
     }
@@ -38,6 +43,7 @@ void led(bool on)
     {
         and_b(~0x40, &PBDRL);
     }
+#endif
 }
 
 void invert_led(bool on)
