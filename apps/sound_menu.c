@@ -19,23 +19,83 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "lcd.h"
 #include "menu.h"
+#include "button.h"
 #include "mpeg.h"
 #include "settings.h"
 
+void set_sound(char* string, 
+               int* variable,
+               int setting)
+{
+    bool done = false;
+    int min, max;
+    int val;
+    char* unit;
+    char str[32];
+
+    unit = mpeg_sound_unit(setting);
+    min = mpeg_sound_min(setting);
+    max = mpeg_sound_max(setting);
+    
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,string);
+
+    while (!done) {
+        val = mpeg_val2phys(setting, *variable);
+        snprintf(str,sizeof str,"%d %s  ", val, unit);
+        lcd_puts(0,1,str);
+        lcd_update();
+
+        switch( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                (*variable)++;
+                if(*variable > max )
+                    *variable = max;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                (*variable)--;
+                if(*variable < min )
+                    *variable = min;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                break;
+        }
+        mpeg_sound_set(setting, *variable);
+    }
+    lcd_stop_scroll();
+}
+
 static void volume(void)
 {
-    set_int("Volume","%", &global_settings.volume, mpeg_volume, 2, 0, 100);
+    set_sound("Volume", &global_settings.volume, SOUND_VOLUME);
 }
 
 static void bass(void)
 {
-    set_int("Bass","%", &global_settings.bass, mpeg_bass, 2, 0, 100);
+    set_sound("Bass", &global_settings.bass, SOUND_BASS);
 };
 
 static void treble(void)
 {
-    set_int("Treble","%", &global_settings.treble, mpeg_treble, 2, 0, 100);
+    set_sound("Treble", &global_settings.treble, SOUND_TREBLE);
 }
 
 void sound_menu(void)

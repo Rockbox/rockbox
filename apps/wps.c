@@ -176,17 +176,17 @@ void wps_show(void)
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_UP:
-                    global_settings.volume += 2;
-                    if(global_settings.volume > 100)
-                        global_settings.volume = 100;
-                    mpeg_volume(global_settings.volume);
+                    global_settings.volume++;
+                    if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
+                        global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     break;
 
                 case BUTTON_DOWN:
-                    global_settings.volume -= 2;
-                    if(global_settings.volume < 0)
-                        global_settings.volume = 0;
-                    mpeg_volume(global_settings.volume);
+                    global_settings.volume--;
+                    if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
+                        global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     break;
 #endif
 

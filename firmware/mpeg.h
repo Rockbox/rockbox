@@ -26,9 +26,25 @@ void mpeg_pause(void);
 void mpeg_resume(void);
 void mpeg_next(void);
 void mpeg_prev(void);
-void mpeg_volume(int percent);
-void mpeg_bass(int percent);
-void mpeg_treble(int percent);
+void mpeg_sound_set(int setting, int value);
+int mpeg_sound_min(int setting);
+int mpeg_sound_max(int setting);
+int mpeg_val2phys(int setting, int value);
+char *mpeg_sound_unit(int setting);
 struct mp3entry* mpeg_current_track(void);
+
+#define SOUND_VOLUME 0
+#define SOUND_BASS 1
+#define SOUND_TREBLE 2
+#define SOUND_BALANCE 3
+
+#ifdef ARCHOS_RECORDER
+#define SOUND_LOUDNESS 4
+#define SOUND_SUPERBASS 5
+#define SOUND_NUMSETTINGS 6
+#else
+#define SOUND_DEEMPH 4
+#define SOUND_NUMSETTINGS 5
+#endif
 
 #endif

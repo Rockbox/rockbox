@@ -27,6 +27,7 @@
 #include "thread.h"
 #include "panic.h"
 #include "file.h"
+#include "mpeg.h"
 #include "id3.h"
 
 #define MPEG_STACK_SIZE 0x2000
@@ -43,6 +44,42 @@
 
 extern char* peek_next_track(int type);
 extern char* peek_prev_track(int type);
+
+static char *units[] =
+{
+    "%",    /* Volume */
+    "%",    /* Bass */
+    "%"     /* Treble */
+};
+
+static int minval[] =
+{
+    0,    /* Volume */
+    0,    /* Bass */
+    0     /* Treble */
+};
+
+static int maxval[] =
+{
+    50,    /* Volume */
+    50,    /* Bass */
+    50     /* Treble */
+};
+
+char *mpeg_sound_unit(int setting)
+{
+    return units[setting];
+}
+
+int mpeg_sound_min(int setting)
+{
+    return minval[setting];
+}
+
+int mpeg_sound_max(int setting)
+{
+    return maxval[setting];
+}
 
 #ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
@@ -638,43 +675,69 @@ void mpeg_prev(void)
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
 }
 
-void mpeg_volume(int percent)
+void mpeg_sound_set(int setting, int value)
 {
-    int volume;
+    int tmp;
     
+    switch(setting)
+    {
+        case SOUND_VOLUME:
+            value *= 2; /* Convert to percent */
+            
 #ifdef ARCHOS_RECORDER
-    volume = 0x7f00 * percent / 100;
-    mas_codec_writereg(0x10, volume & 0xff00);
+            tmp = 0x7f00 * value / 100;
+            mas_codec_writereg(0x10, tmp & 0xff00);
 #else
-    volume = 0x38 * percent / 100;
-    dac_volume(volume, volume, false);
+            tmp = 0x38 * value / 100;
+            dac_volume(tmp, tmp, false);
 #endif
+            break;
+
+        case SOUND_BASS:
+            value *= 2; /* Convert to percent */
+            
+#ifdef ARCHOS_RECORDER
+            tmp = 0x6000 * value / 100;
+            mas_codec_writereg(0x14, tmp & 0xff00);
+#else    
+            tmp = 15 * value / 100;
+            mas_writereg(MAS_REG_KBASS, bass_table[tmp]);
+#endif
+            break;
+
+        case SOUND_TREBLE:
+            value *= 2; /* Convert to percent */
+
+#ifdef ARCHOS_RECORDER
+            tmp = 0x6000 * value / 100;
+            mas_codec_writereg(0x15, tmp & 0xff00);
+#else    
+            tmp = 15 * value / 100;
+            mas_writereg(MAS_REG_KTREBLE, treble_table[tmp]);
+#endif
+            break;
+    }
 }
 
-void mpeg_bass(int percent)
+int mpeg_val2phys(int setting, int value)
 {
-    int bass;
+    int result = 0;
     
-#ifdef ARCHOS_RECORDER
-    bass = 0x6000 * percent / 100;
-    mas_codec_writereg(0x14, bass & 0xff00);
-#else    
-    bass = 15 * percent / 100;
-    mas_writereg(MAS_REG_KBASS, bass_table[bass]);
-#endif
-}
-
-void mpeg_treble(int percent)
-{
-    int treble;
-
-#ifdef ARCHOS_RECORDER
-    treble = 0x6000 * percent / 100;
-    mas_codec_writereg(0x15, treble & 0xff00);
-#else    
-    treble = 15 * percent / 100;
-    mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
-#endif
+    switch(setting)
+    {
+        case SOUND_VOLUME:
+            result = value * 2;
+            break;
+        
+        case SOUND_BASS:
+            result = value * 2;
+            break;
+        
+        case SOUND_TREBLE:
+            result = value * 2;
+            break;
+    }
+    return result;
 }
 
 void mpeg_init(int volume, int bass, int treble)
@@ -742,7 +805,7 @@ void mpeg_init(int volume, int bass, int treble)
     dac_config(0x04); /* DAC on, all else off */
 #endif
     
-    mpeg_bass(bass);
-    mpeg_treble(treble);
-    mpeg_volume(volume);
+    mpeg_sound_set(SOUND_BASS, bass);
+    mpeg_sound_set(SOUND_TREBLE, treble);
+    mpeg_sound_set(SOUND_VOLUME, volume);
 }
