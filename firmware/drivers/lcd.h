@@ -74,6 +74,7 @@ extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_clearrect (int x, int y, int nx, int ny);
 extern void lcd_fillrect (int x, int y, int nx, int ny);
+extern void lcd_drawrect (int x, int y, int nx, int ny);
 extern void lcd_invertrect (int x, int y, int nx, int ny);
 extern void lcd_drawline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);

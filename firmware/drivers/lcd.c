@@ -540,6 +540,19 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     }
 }
 
+/* 
+ * Draw a rectangle with point a (upper left) at (x, y)
+ * and size (nx, ny)
+ */
+void lcd_drawrect (int x, int y, int nx, int ny)
+{
+    lcd_drawline(x, y, nx, y);
+    lcd_drawline(x, ny, nx, ny);
+
+    lcd_drawline(x, y, x, ny);
+    lcd_drawline(nx, y, nx, ny);
+}
+
 /*
  * Clear a rectangular area at (x, y), size (nx, ny)
  */
