@@ -120,7 +120,7 @@ int create_thread(void* fp, void* sp, int stk_size)
         stctx(ctxp);
         /* Subtract 4 to leave room for the PR push in ldctx()
            Align it on an even 32 bit boundary */
-        ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size - 4) & ~3;
+        ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size - 4) & ~3);
         ctxp->regs.pr = fp;
     }
     return 0;
