@@ -42,7 +42,10 @@ static void screen_dump(void);
 #endif
 
 void serial_setup (void) 
-{ 
+{
+    /* Set PB10 function to serial Rx */
+    PBCR1 = (PBCR1 & 0xffcf) | 0x0020;
+    
     SMR1 = 0x00;
     SCR1 = 0;
     BRR1 = (FREQ/(32*9600))-1;
