@@ -43,8 +43,8 @@
 #define FF_TICKS 3000; // experimentally found nice
 
 // trigger levels, we need about 80 kB/sec
-#define PRECHARGE (1024 * 64) // the initial filling before starting to play
-#define SPINUP 3300 // from what level on to refill, in milliseconds
+#define SPINUP_INIT 5000 // from what level on to refill, in milliseconds
+#define SPINUP_SAFETY 700 // how much on top of the measured spinup time
 #define CHUNK (1024*32) // read size
 
 
@@ -148,6 +148,7 @@ static struct
     bool bSeeking;
     int nSeekAcc; // accelleration value for seek
     int nSeekPos; // current file position for seek
+    bool bDiskSleep; // disk is suspended
 } gPlay;
 
 // buffer information
@@ -166,6 +167,7 @@ static struct
     bool bEOF; // flag for end of file
     int low_water; // reload threshold 
     int high_water; // end of reload threshold
+    int spinup_safety; // safety margin when recalculating low_water
     int nReadChunk; // how much data for normal buffer fill
     int nSeekChunk; // how much data while seeking
 } gBuf;
@@ -177,6 +179,8 @@ static struct
     int minVideoAvail;
     int nAudioUnderruns;
     int nVideoUnderruns;
+    long minSpinup;
+    long maxSpinup;
 } gStats;
 
 tFileHeader gFileHdr; // file header
@@ -485,8 +489,8 @@ int SeekTo(int fd, int nPos)
     gBuf.pBufFill = gBuf.pBufStart; // all empty
     gBuf.pReadVideo = gBuf.pReadAudio = gBuf.pBufStart;
 
-    read_now = (PRECHARGE + gBuf.granularity - 1); // round up
-    read_now -= read_now % gBuf.granularity; // to granularity
+    read_now = gBuf.low_water - 1; // less than low water, so loading will continue
+    read_now -= read_now % gBuf.granularity; // round down to granularity
     got_now = rb->read(fd, gBuf.pBufFill, read_now);
     gBuf.bEOF = (read_now != got_now);
     gBuf.pBufFill += got_now;
@@ -574,6 +578,7 @@ int PlayTick(int fd)
     {   // refill buffer
         int read_now, got_now;
         int buf_free;
+        long spinup; // measure the spinup time
         
         // how much can we reload, don't fill completely, would appear empty
         buf_free = gBuf.bufsize - MAX(avail_audio, avail_video) - gBuf.high_water;
@@ -590,6 +595,8 @@ int PlayTick(int fd)
         if (read_now == buf_free)
             gPlay.bRefilling = false; // last piece requested
 
+        spinup = *rb->current_tick; // in case this is interesting below
+        
         got_now = rb->read(fd, gBuf.pBufFill, read_now);
         if (got_now != read_now || read_now == 0)
         {
@@ -597,10 +604,25 @@ int PlayTick(int fd)
             gPlay.bRefilling = false;
         }
 
+        if (gPlay.bDiskSleep) // statistics about the spinup time
+        {
+            spinup = *rb->current_tick - spinup;
+            gPlay.bDiskSleep = false;
+            if (spinup > gStats.maxSpinup)
+                gStats.maxSpinup = spinup;
+            if (spinup < gStats.minSpinup)
+                gStats.minSpinup = spinup;
+
+            // recalculate the low water mark from real measurements
+            gBuf.low_water = (gStats.maxSpinup + gBuf.spinup_safety) 
+                             * gFileHdr.bps_peak / 8 / HZ;
+        }
+
         if (!gPlay.bRefilling 
             && rb->global_settings->disk_spindown < 20) // condition for test only
         {
             rb->ata_sleep(); // no point in leaving the disk run til timeout
+            gPlay.bDiskSleep = true;
         }
 
         gBuf.pBufFill += got_now;
@@ -749,6 +771,7 @@ int PlayTick(int fd)
     
     if ((gPlay.bAudioUnderrun || gPlay.bVideoUnderrun) && !gBuf.bEOF)
     {
+        gBuf.spinup_safety += HZ/2; // add extra spinup time for the future
         filepos = rb->lseek(fd, 0, SEEK_CUR);
 
         if (gPlay.bHasVideo && gPlay.bVideoUnderrun)
@@ -786,6 +809,7 @@ int main(char* filename)
     // init statistics
     rb->memset(&gStats, 0, sizeof(gStats));
     gStats.minAudioAvail = gStats.minVideoAvail = INT_MAX;
+    gStats.minSpinup = INT_MAX;
 
     // init playback state
     rb->memset(&gPlay, 0, sizeof(gPlay));
@@ -827,7 +851,8 @@ int main(char* filename)
         gBuf.granularity *= 2;
     gBuf.bufsize -= gBuf.bufsize % gBuf.granularity; // round down
     gBuf.pBufEnd = gBuf.pBufStart + gBuf.bufsize;
-    gBuf.low_water = SPINUP * gFileHdr.bps_peak / 8000;
+    gBuf.low_water = SPINUP_INIT * gFileHdr.bps_peak / 8000;
+    gBuf.spinup_safety = SPINUP_SAFETY * HZ / 1000; // in time ticks
     if (gFileHdr.audio_min_associated < 0)
         gBuf.high_water = 0 - gFileHdr.audio_min_associated;
     else
@@ -897,9 +922,9 @@ int main(char* filename)
         rb->lcd_puts(0, 2, gPrint);
         rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
         rb->lcd_puts(0, 3, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "ReadChunk: %d", gBuf.nReadChunk);
+        rb->snprintf(gPrint, sizeof(gPrint), "MinSpinup %d.%02d", gStats.minSpinup/HZ, gStats.minSpinup%HZ);
         rb->lcd_puts(0, 4, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "SeekChunk: %d", gBuf.nSeekChunk);
+        rb->snprintf(gPrint, sizeof(gPrint), "MaxSpinup %d.%02d", gStats.maxSpinup/HZ, gStats.maxSpinup%HZ);
         rb->lcd_puts(0, 5, gPrint);
         rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
         rb->lcd_puts(0, 6, gPrint);
