@@ -39,7 +39,6 @@
 #include "sound_menu.h"
 #include "status.h"
 #include "fat.h"
-#include "sleeptimer.h"
 #include "bookmark.h"
 #include "wps.h"
 #include "buffer.h"
@@ -53,10 +52,6 @@
 
 #ifdef HAVE_MAS3587F
 #include "recording.h"
-#endif
-
-#ifdef HAVE_ALARM_MOD
-#include "alarm_menu.h"
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -246,11 +241,6 @@ bool show_info(void)
     return false;
 }
 
-static bool firmware_browse(void)
-{
-    return rockbox_browse(ROCKBOX_DIR, SHOW_MOD);
-}
-
 static bool plugin_browse(void)
 {
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
@@ -263,6 +253,50 @@ static bool recording_settings(void)
 }
 #endif
 
+#ifdef HAVE_MAS3587F
+bool rec_menu(void)
+{
+    int m;
+    bool result;
+
+    /* recording menu */
+    struct menu_items items[] = {
+        { str(LANG_RECORDING_MENU),     recording_screen  },
+        { str(LANG_RECORDING_SETTINGS), recording_settings},
+    };
+
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+#endif
+
+bool info_menu(void)
+{
+    int m;
+    bool result;
+
+    /* info menu */
+    struct menu_items items[] = {
+        { str(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
+        { str(LANG_INFO_MENU),          show_info         },
+        { str(LANG_VERSION),            show_credits      },
+#ifndef SIMULATOR
+        { str(LANG_DEBUG),              debug_menu        },
+#else
+        { str(LANG_USB),                simulate_usb      },
+#endif
+    };
+
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
 bool main_menu(void)
 {
     int m;
@@ -270,7 +304,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_items items[15];
+    struct menu_items items[8];
 
     items[i].desc = str(LANG_BOOKMARK_MENU);
     items[i++].function = bookmark_menu;
@@ -290,45 +324,17 @@ bool main_menu(void)
 
 #ifdef HAVE_MAS3587F
     items[i].desc = str(LANG_RECORDING);
-    items[i++].function = recording_screen;
-
-    items[i].desc = str(LANG_RECORDING_SETTINGS);
-    items[i++].function = recording_settings;
+    items[i++].function = rec_menu;
 #endif
 
     items[i].desc = str(LANG_PLAYLIST_MENU);
     items[i++].function = playlist_menu;
 
-    items[i].desc = str(LANG_MENU_SHOW_ID3_INFO);
-    items[i++].function = browse_id3;
-
-    items[i].desc = str(LANG_SLEEP_TIMER);
-    items[i++].function = sleeptimer_screen;
-
-#ifdef HAVE_ALARM_MOD
-    items[i].desc = str(LANG_ALARM_MOD_ALARM_MENU);
-    items[i++].function = alarm_screen;
-#endif
-
     items[i].desc = str(LANG_PLUGINS);
     items[i++].function = plugin_browse;
 
-    items[i].desc = str(LANG_FIRMWARE);
-    items[i++].function = firmware_browse;
-
     items[i].desc = str(LANG_INFO);
-    items[i++].function = show_info;
-
-    items[i].desc = str(LANG_VERSION);
-    items[i++].function = show_credits;
-
-#ifndef SIMULATOR
-    items[i].desc = str(LANG_DEBUG);
-    items[i++].function = debug_menu;
-#else
-    items[i].desc = str(LANG_USB);
-    items[i++].function = simulate_usb;
-#endif
+    items[i++].function = info_menu;
 
     m=menu_init( items, i );
 #ifdef HAVE_LCD_CHARCELLS

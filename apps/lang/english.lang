@@ -325,7 +325,7 @@ new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new:
 
 id: LANG_RESET
@@ -1730,12 +1730,12 @@ new:
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
+eng: "Browse Fonts"
 new:
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
+eng: "Browse Firmwares"
 new:
 
 id: LANG_LANGUAGE
@@ -1745,17 +1745,17 @@ new:
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
+eng: "Browse .wps files"
 new:
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
+eng: "Browse .cfg files"
 new:
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
+eng: "Browse Plugins"
 new:
 
 id: LANG_CAR_ADAPTER_MODE
@@ -1978,4 +1978,55 @@ new:
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
+new:
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new:
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new:
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new:
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new:
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new:
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new:
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new:
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new:
+
+# Limits
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new:
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
 new:
