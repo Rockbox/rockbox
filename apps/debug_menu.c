@@ -1252,7 +1252,9 @@ static bool dbg_disk_info(void)
     bool timing_info_present = false;
     char pio3[2], pio4[2];
 
+#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
+#endif
     
     while(!done)
     {
