@@ -260,6 +260,8 @@ static int unicode_munge(char** string, int *len) {
    int i;
    char *str = *string;
    char *outstr = *string;
+   bool bom = false;
+   int outlen;
 
    if(str[0] > 0x03) {
       /* Plain old string */
@@ -275,21 +277,37 @@ static int unicode_munge(char** string, int *len) {
 
    /* Unicode with or without BOM */
    if(str[0] == 0x01 || str[0] == 0x02) {
+      (*len)--;
       str++;
       tmp = BYTES2INT(0, 0, str[0], str[1]);
 
       /* Now check if there is a BOM (zero-width non-breaking space, 0xfeff)
          and if it is in little or big endian format */
       if(tmp == 0xfffe) { /* Little endian? */
+	 bom = true;
          le = true;
          str += 2;
+	 (*len)-=2;
       }
 
-      if(tmp == 0xfeff) /* Big endian? */
+      if(tmp == 0xfeff) { /* Big endian? */
+	 bom = true;
          str += 2;
+	 (*len)-=2;
+      }
 
+      /* If there is no BOM (which is a specification violation),
+	 let's try to guess it. If one of the bytes is 0x00, it is
+	 probably the most significant one. */
+      if(!bom) {
+	 if(str[1] == 0)
+	    le = true;
+      }
+      
       i = 0;
 
+      outlen = *len / 2;
+      
       do {
          if(le) {
             if(str[1])
@@ -303,9 +321,11 @@ static int unicode_munge(char** string, int *len) {
                outstr[i++] = str[1];
          }
          str += 2;
-      } while(str[0] || str[1]);
+      } while((str[0] || str[1]) && (i < outlen));
 
       *len = i;
+
+      outstr[i] = 0; /* Terminate the string */
       return 0;
    }
 
