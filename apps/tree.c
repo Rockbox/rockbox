@@ -1374,7 +1374,9 @@ static bool dirbrowse(char *root, int *dirfilter)
         if (restore || reload_dir) {
             /* restore display */
 
+#ifdef HAVE_LCD_BITMAP
             tree_max_on_screen = recalc_screen_height();
+#endif
             
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
