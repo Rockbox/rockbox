@@ -17,11 +17,14 @@ sub list {
     print "</ul>\n";
 }
 
-print "<table class=rockbox><tr><th>player</th><th>recorder</th></tr>\n";
+print "<table class=rockbox><tr><th>player</th><th>recorder</th><th>fmrecorder</th></tr>\n";
 print "<tr><td>\n";
 &list("player");
 
 print "</td><td>\n";
 &list("recorder");
+
+print "</td><td><p><b>Note:</b> The FM Recorder version is still very early and buggy. It is available here for testing purposes only.\n";
+&list("fmrecorder");
 
 print "</td></tr></table>\n";
