@@ -21,8 +21,8 @@
 #define __LCD_H__
 
 #include "sh7034.h"
-#include "system.h"
 #include "types.h"
+#include "config.h"
 
 #define LCDR (PBDR+1)
 
@@ -137,149 +137,6 @@ void lcd_invertrect (int x, int y, int nx, int ny);
 
 
 #ifndef SIMULATOR
-/*
- * About /CS,DS,SC,SD
- * ------------------
- *
- * LCD on JBP and JBR uses a SPI protocol to receive orders (SDA and SCK lines)
- *
- * - /CS -> Chip Selection line :
- *            0 : LCD chipset is activated.
- * -  DS -> Data Selection line, latched at the rising edge
- *          of the 8th serial clock (*) :
- *            0 : instruction register,
- *            1 : data register; 
- * -  SC -> Serial Clock line (SDA).
- * -  SD -> Serial Data line (SCK), latched at the rising edge
- *          of each serial clock (*).  
- *
- *    _                                                          _
- * /CS \                                                        /
- *      \______________________________________________________/
- *    _____  ____  ____  ____  ____  ____  ____  ____  ____  _____ 
- *  SD     \/ D7 \/ D6 \/ D5 \/ D4 \/ D3 \/ D2 \/ D1 \/ D0 \/
- *    _____/\____/\____/\____/\____/\____/\____/\____/\____/\_____
- *
- *    _____     _     _     _     _     _     _     _     ________ 
- *  SC     \   * \   * \   * \   * \   * \   * \   * \   *
- *          \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
- *    _  _________________________________________________________ 
- *  DS \/                                                  
- *    _/\_________________________________________________________
- *
- */
-
-/*
- * The only way to do logical operations in an atomic way
- * on SH1 is using :
- *
- *   or.b/and.b/tst.b/xor.b #imm,@(r0,gbr)
- *
- * but GCC doesn't generate them at all so some assembly
- * codes are needed here.
- *
- * The Global Base Register gbr is expected to be zero
- * and r0 is the address of one register in the on-chip
- * peripheral module.
- *
- */ 
-
-static inline void lcd_start (void)
- /*
-  * Enter a LCD session :
-  *
-  * QI(LCDR) &= ~(LCD_CS|LCD_DS|LCD_SD|LCD_SC);
-  */
-  {
-    asm
-      ("and.b\t%0,@(r0,gbr)"
-       :
-       : /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
-         /* %1 */ "z"(LCDR));
-  }
-
-static inline void lcd_stop (void)
- /*
-  * Leave a LCD session :
-  *
-  * QI(LCDR) |= LCD_CS|LCD_RS|LCD_SD|LCD_SC;
-  */
-  {
-    asm
-      ("or.b\t%0,@(r0,gbr)"
-       :
-       : /* %0 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC),
-         /* %1 */ "z"(LCDR));
-  }
-
-static inline void lcd_byte (int byte,int rs)
- /*
-  * char j = 0x80;
-  * if (rs)
-  *   do
-  *     {
-  *       QI(LCDR) &= ~(LCD_SC|LCD_SD);
-  *       if (j & byte)
-  *         QI(LCDR) |= LCD_SD;
-  *       QI(LCDR) |= LCD_SC|LCD_DS;
-  *     }
-  *   while ((unsigned char)j >>= 1);
-  * else
-  *   do
-  *     {
-  *       QI(LCDR) &= ~(LCD_SC|LCD_SD|LCD_DS);
-  *       if (j & byte)
-  *         QI(LCDR) |= LCD_SD;
-  *       QI(LCDR) |= LCD_SC;
-  *     }
-  *   while ((unsigned char)j >>= 1);
-  */
-  {
-    if (rs > 0)
-      asm
-        ("shll8\t%0\n"
-         "0:\n\t"
-         "and.b\t%2,@(r0,gbr)\n\t"
-         "shll\t%0\n\t"  
-         "bf\t1f\n\t"
-         "or.b\t%3,@(r0,gbr)\n"
-         "1:\n\t"
-         "or.b\t%4,@(r0,gbr)\n"
-         "add\t#-1,%1\n\t"
-         "cmp/pl\t%1\n\t"
-         "bt\t0b"
-         :
-         : /* %0 */ "r"(((unsigned)byte)<<16),
-           /* %1 */ "r"(8),
-           /* %2 */ "I"(~(LCD_SC|LCD_SD)),
-           /* %3 */ "I"(LCD_SD),
-           /* %4 */ "I"(LCD_SC|LCD_DS),
-           /* %5 */ "z"(LCDR));
-    else
-      asm
-        ("shll8\t%0\n"
-         "0:\n\t"
-         "and.b\t%2,@(r0,gbr)\n\t"
-         "shll\t%0\n\t"  
-         "bf\t1f\n\t"
-         "or.b\t%3,@(r0,gbr)\n"
-         "1:\n\t"
-         "or.b\t%4,@(r0,gbr)\n"
-         "add\t#-1,%1\n\t"
-         "cmp/pl\t%1\n\t"
-         "bt\t0b"
-         :
-         : /* %0 */ "r"(((unsigned)byte)<<16),
-           /* %1 */ "r"(8),
-           /* %2 */ "I"(~(LCD_SC|LCD_DS|LCD_SD)),
-           /* %3 */ "I"(LCD_SD),
-           /* %4 */ "I"(LCD_SC),
-           /* %5 */ "z"(LCDR));
-  }
-#else
-/* make a faked lcd_byte() function when simulating */
-#define lcd_byte(x,y)
-#endif /* SIMULATOR */
 
 extern void lcd_data (int data);
 extern void lcd_instruction (int instruction);
@@ -296,22 +153,8 @@ extern void lcd_puthex (unsigned int value,int digits);
 
 extern void lcd_pattern (int which,char const *pattern,int count);
 
-static inline void lcd_goto (int x,int y)
-  { lcd_instruction (LCD_CURSOR(x,y)); }
+#endif  /* HAVE_LCD_CHARCELLS */
 
-/*** BACKLIGHT ***/
+#endif /* SIMULATOR */
 
-static inline void lcd_toggle_backlight (void)
-  { toggle_bit (LCD_BL,PAIOR); }
-
-static inline void lcd_turn_on_backlight (void)
-  { set_bit (LCD_BL,PAIOR); }
-
-static inline void lcd_turn_off_backlight (void)
-  { clear_bit (LCD_BL,PAIOR); }
-
-/*** ICONS ***/
-
-#endif /* HAVE_LCD_CHARCELLS */
-
-#endif
+#endif /* __LCD_H__ */

@@ -18,39 +18,203 @@
  ****************************************************************************/
 
 #include "config.h"
-
 #include "lcd.h"
+
+#ifndef SIMULATOR
+/*
+ * About /CS,DS,SC,SD
+ * ------------------
+ *
+ * LCD on JBP and JBR uses a SPI protocol to receive orders (SDA and SCK lines)
+ *
+ * - /CS -> Chip Selection line :
+ *            0 : LCD chipset is activated.
+ * -  DS -> Data Selection line, latched at the rising edge
+ *          of the 8th serial clock (*) :
+ *            0 : instruction register,
+ *            1 : data register; 
+ * -  SC -> Serial Clock line (SDA).
+ * -  SD -> Serial Data line (SCK), latched at the rising edge
+ *          of each serial clock (*).  
+ *
+ *    _                                                          _
+ * /CS \                                                        /
+ *      \______________________________________________________/
+ *    _____  ____  ____  ____  ____  ____  ____  ____  ____  _____ 
+ *  SD     \/ D7 \/ D6 \/ D5 \/ D4 \/ D3 \/ D2 \/ D1 \/ D0 \/
+ *    _____/\____/\____/\____/\____/\____/\____/\____/\____/\_____
+ *
+ *    _____     _     _     _     _     _     _     _     ________ 
+ *  SC     \   * \   * \   * \   * \   * \   * \   * \   *
+ *          \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
+ *    _  _________________________________________________________ 
+ *  DS \/                                                  
+ *    _/\_________________________________________________________
+ *
+ */
+
+/*
+ * The only way to do logical operations in an atomic way
+ * on SH1 is using :
+ *
+ *   or.b/and.b/tst.b/xor.b #imm,@(r0,gbr)
+ *
+ * but GCC doesn't generate them at all so some assembly
+ * codes are needed here.
+ *
+ * The Global Base Register gbr is expected to be zero
+ * and r0 is the address of one register in the on-chip
+ * peripheral module.
+ *
+ */ 
+
+ /*
+  * Enter a LCD session :
+  *
+  * QI(LCDR) &= ~(LCD_CS|LCD_DS|LCD_SD|LCD_SC);
+  */
+static void lcd_start (void)
+{
+    asm
+        ("and.b\t%0,@(r0,gbr)"
+         :
+         : /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
+           /* %1 */ "z"(LCDR));
+}
+
+ /*
+  * Leave a LCD session :
+  *
+  * QI(LCDR) |= LCD_CS|LCD_RS|LCD_SD|LCD_SC;
+  */
+static void lcd_stop (void)
+{
+    asm
+        ("or.b\t%0,@(r0,gbr)"
+         :
+         : /* %0 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC),
+           /* %1 */ "z"(LCDR));
+}
+
+static void lcd_byte (int byte,int rs)
+ /*
+  * char j = 0x80;
+  * if (rs)
+  *   do
+  *     {
+  *       QI(LCDR) &= ~(LCD_SC|LCD_SD);
+  *       if (j & byte)
+  *         QI(LCDR) |= LCD_SD;
+  *       QI(LCDR) |= LCD_SC|LCD_DS;
+  *     }
+  *   while ((unsigned char)j >>= 1);
+  * else
+  *   do
+  *     {
+  *       QI(LCDR) &= ~(LCD_SC|LCD_SD|LCD_DS);
+  *       if (j & byte)
+  *         QI(LCDR) |= LCD_SD;
+  *       QI(LCDR) |= LCD_SC;
+  *     }
+  *   while ((unsigned char)j >>= 1);
+  */
+{
+    if (rs > 0)
+        asm
+            ("shll8\t%0\n"
+             "0:\n\t"
+             "and.b\t%2,@(r0,gbr)\n\t"
+             "shll\t%0\n\t"  
+             "bf\t1f\n\t"
+             "or.b\t%3,@(r0,gbr)\n"
+             "1:\n\t"
+             "or.b\t%4,@(r0,gbr)\n"
+             "add\t#-1,%1\n\t"
+             "cmp/pl\t%1\n\t"
+             "bt\t0b"
+             :
+             : /* %0 */ "r"(((unsigned)byte)<<16),
+             /* %1 */ "r"(8),
+             /* %2 */ "I"(~(LCD_SC|LCD_SD)),
+             /* %3 */ "I"(LCD_SD),
+             /* %4 */ "I"(LCD_SC|LCD_DS),
+             /* %5 */ "z"(LCDR));
+    else
+        asm
+            ("shll8\t%0\n"
+             "0:\n\t"
+             "and.b\t%2,@(r0,gbr)\n\t"
+             "shll\t%0\n\t"  
+             "bf\t1f\n\t"
+             "or.b\t%3,@(r0,gbr)\n"
+             "1:\n\t"
+             "or.b\t%4,@(r0,gbr)\n"
+             "add\t#-1,%1\n\t"
+             "cmp/pl\t%1\n\t"
+             "bt\t0b"
+             :
+             : /* %0 */ "r"(((unsigned)byte)<<16),
+             /* %1 */ "r"(8),
+             /* %2 */ "I"(~(LCD_SC|LCD_DS|LCD_SD)),
+             /* %3 */ "I"(LCD_SD),
+             /* %4 */ "I"(LCD_SC),
+             /* %5 */ "z"(LCDR));
+}
 
 void lcd_data (int data)
 {
-  lcd_byte (data,1);
+    lcd_byte (data,1);
 }
 
 void lcd_instruction (int instruction)
 {
-  lcd_byte (instruction,0);
+    lcd_byte (instruction,0);
 }
 
 void lcd_zero (int length)
 {
-  length *= 8;
-  while (--length >= 0)
-    lcd_data (0);
+    length *= 8;
+    while (--length >= 0)
+        lcd_data (0);
 }
 
 void lcd_fill (int data,int length)
 {
-  length *= 8;
-  while (--length >= 0)
-    lcd_data (data);
+    length *= 8;
+    while (--length >= 0)
+        lcd_data (data);
 }
 
 void lcd_copy (void *data,int count)
 {
-  while (--count >= 0)
-    lcd_data (*((char *)data)++);
+    while (--count >= 0)
+        lcd_data (*((char *)data)++);
 }
 
+static void lcd_goto (int x,int y)
+{
+   lcd_instruction (LCD_CURSOR(x,y));
+}
+
+/*** BACKLIGHT ***/
+
+static void lcd_toggle_backlight (void)
+{
+   PAIOR ^= LCD_BL;
+}
+
+static void lcd_turn_on_backlight (void)
+{
+   PAIOR |= LCD_BL;
+}
+
+static void lcd_turn_off_backlight (void)
+{
+   PAIOR &= ~LCD_BL;
+}
+
+/*** ICONS ***/
+#endif
 
 #ifdef HAVE_LCD_CHARCELLS
 #  ifndef JBP_OLD
@@ -109,40 +273,40 @@ static char const lcd_ascii[] =
 
 void lcd_puts (char const *string)
 {
-  while (*string)
-    lcd_data (LCD_ASCII(*string++));
+    while (*string)
+        lcd_data (LCD_ASCII(*string++));
 }
 
 void lcd_putns (char const *string,int n)
 {
-  while (n--)
-    lcd_data (LCD_ASCII(*string++));
+    while (n--)
+        lcd_data (LCD_ASCII(*string++));
 }
 
 void lcd_putc (int character)
 {
-  lcd_data (LCD_ASCII(character));
+    lcd_data (LCD_ASCII(character));
 }
 
 void lcd_pattern (int which,char const *pattern,int count)
 {
-  lcd_instruction (LCD_PRAM|which);
-  lcd_copy ((void *)pattern,count);
+    lcd_instruction (LCD_PRAM|which);
+    lcd_copy ((void *)pattern,count);
 }
 
 void lcd_puthex (unsigned int value,int digits)
 {
-  switch (digits) {
-  case 8:
-    lcd_puthex (value >> 16,4);
-  case 4:
-    lcd_puthex (value >> 8,2);
-  case 2:
-    lcd_puthex (value >> 4,1);
-  case 1:
-    value &= 15;
-    lcd_putc (value+((value < 10) ? '0' : ('A'-10)));
-  }
+    switch (digits) {
+        case 8:
+            lcd_puthex (value >> 16,4);
+        case 4:
+            lcd_puthex (value >> 8,2);
+        case 2:
+            lcd_puthex (value >> 4,1);
+        case 1:
+            value &= 15;
+            lcd_putc (value+((value < 10) ? '0' : ('A'-10)));
+    }
 }
 
 
@@ -216,40 +380,40 @@ void lcd_init (void)
  */
 void lcd_update (void)
 {
-  int x, y;
+    int x, y;
 
-  /* Copy display bitmap to hardware */
-  for (y = 0; y < DISP_Y/8; y++)
-  {
-    lcd_write (TRUE, LCD_CNTL_PAGE | (y & 0xf));
-    lcd_write (TRUE, LCD_CNTL_HIGHCOL);
-    lcd_write (TRUE, LCD_CNTL_LOWCOL);
+    /* Copy display bitmap to hardware */
+    for (y = 0; y < DISP_Y/8; y++)
+    {
+        lcd_write (TRUE, LCD_CNTL_PAGE | (y & 0xf));
+        lcd_write (TRUE, LCD_CNTL_HIGHCOL);
+        lcd_write (TRUE, LCD_CNTL_LOWCOL);
 
-    for (x = 0; x < DISP_X; x++)
-      lcd_write (FALSE, display[x][y]);
-  }
+        for (x = 0; x < DISP_X; x++)
+            lcd_write (FALSE, display[x][y]);
+    }
 }
 
-static void lcd_write (BOOL command, int value)
+static void lcd_write (bool command, int value)
 {
-  int bit;
+    int bit;
 
-  /* Enable chip select, set DC if data */
-  PBDR &= ~(PBDR_LCD_CS1|PBDR_LCD_DC);
-  if (!command)
-    PBDR |= PBDR_LCD_DC;
+    /* Enable chip select, set DC if data */
+    PBDR &= ~(PBDR_LCD_CS1|PBDR_LCD_DC);
+    if (!command)
+        PBDR |= PBDR_LCD_DC;
 
-  /* Send each bit, starting with MSB */
-  for (bit = 0x80; bit > 0; bit >>= 1)
-  {
-    PBDR &= ~(PBDR_LCD_SDA|PBDR_LCD_SCK);
-    if (value & bit)
-      PBDR |= PBDR_LCD_SDA;
-    PBDR |= PBDR_LCD_SCK;
-  }
+    /* Send each bit, starting with MSB */
+    for (bit = 0x80; bit > 0; bit >>= 1)
+    {
+        PBDR &= ~(PBDR_LCD_SDA|PBDR_LCD_SCK);
+        if (value & bit)
+            PBDR |= PBDR_LCD_SDA;
+        PBDR |= PBDR_LCD_SCK;
+    }
   
-  /* Disable chip select */
-  PBDR |= PBDR_LCD_CS1;
+    /* Disable chip select */
+    PBDR |= PBDR_LCD_CS1;
 }
 
 #endif /* SIMULATOR */
@@ -259,8 +423,8 @@ static void lcd_write (BOOL command, int value)
  */
 void lcd_clear_display (void)
 {
-	lcd_position (0, 0, 8);
-	memset (display, 0, sizeof display);
+    lcd_position (0, 0, 8);
+    memset (display, 0, sizeof display);
 }
 
 /*
@@ -268,13 +432,13 @@ void lcd_clear_display (void)
  */
 void lcd_position (int x, int y, int size)
 {
-	if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y)
-	{
-		lcd_x = x;
-		lcd_y = y;
-	}
+    if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y)
+    {
+        lcd_x = x;
+        lcd_y = y;
+    }
 
-	lcd_size = size;
+    lcd_size = size;
 }
 
 /*
@@ -282,49 +446,49 @@ void lcd_position (int x, int y, int size)
  */
 void lcd_string (const char *str)
 {
-	int x = lcd_x;
-	int nx = lcd_size;
-	int ny, ch;
-	const unsigned char *src;
+    int x = lcd_x;
+    int nx = lcd_size;
+    int ny, ch;
+    const unsigned char *src;
 
-	if (nx == 12)
-		ny = 16;
-	else if (nx == 8)
-		ny = 12;
-	else
-	{
-		nx = 6;
-		ny = 8;
-	}
+    if (nx == 12)
+        ny = 16;
+    else if (nx == 8)
+        ny = 12;
+    else
+    {
+        nx = 6;
+        ny = 8;
+    }
 
-	while ((ch = *str++) != '\0')
-	{
-		if (ch == '\n' || lcd_x + nx > DISP_X)
-		{
-                  /* Wrap to next line */
-                  lcd_x = x;
-                  lcd_y += ny;
-		}
+    while ((ch = *str++) != '\0')
+    {
+        if (ch == '\n' || lcd_x + nx > DISP_X)
+        {
+            /* Wrap to next line */
+            lcd_x = x;
+            lcd_y += ny;
+        }
 
-		if (lcd_y + ny > DISP_Y)
-			return;
+        if (lcd_y + ny > DISP_Y)
+            return;
 
-		/* Limit to char generation table */
-		if (ch >= ASCII_MIN && ch <= ASCII_MAX)
-		{
-			if (nx == 12)
-				src = char_gen_12x16[ch-ASCII_MIN][0];
-			else if (nx == 8)
-				src = char_gen_8x12[ch-ASCII_MIN][0];
-			else
-				src = char_gen_6x8[ch-ASCII_MIN][0];
+        /* Limit to char generation table */
+        if (ch >= ASCII_MIN && ch <= ASCII_MAX)
+        {
+            if (nx == 12)
+                src = char_gen_12x16[ch-ASCII_MIN][0];
+            else if (nx == 8)
+                src = char_gen_8x12[ch-ASCII_MIN][0];
+            else
+                src = char_gen_6x8[ch-ASCII_MIN][0];
 
-			lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, TRUE);
-			lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, TRUE);
+            lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, TRUE);
+            lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, TRUE);
 
-			lcd_x += nx;
-		}
-	}
+            lcd_x += nx;
+        }
+    }
 }
 
 /*
@@ -334,57 +498,57 @@ void lcd_string (const char *str)
 void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
-	unsigned char *dst;
-	unsigned char *dst2 = &display[x][y/8];
-	unsigned int data, mask, mask2, mask3, mask4;
-	int shift = y & 7;
+    unsigned char *dst;
+    unsigned char *dst2 = &display[x][y/8];
+    unsigned int data, mask, mask2, mask3, mask4;
+    int shift = y & 7;
 
-	ny += shift;
+    ny += shift;
 
-	/* Calculate bit masks */
-	mask4 = ~(0xfe << ((ny-1) & 7));
-	if (clear)
-	{
-		mask = ~(0xff << shift);
-		mask2 = 0;
-		mask3 = ~mask4;
-		if (ny <= 8)
-			mask3 |= mask;
-	}
-	else
-		mask = mask2 = mask3 = 0xff;
+    /* Calculate bit masks */
+    mask4 = ~(0xfe << ((ny-1) & 7));
+    if (clear)
+    {
+        mask = ~(0xff << shift);
+        mask2 = 0;
+        mask3 = ~mask4;
+        if (ny <= 8)
+            mask3 |= mask;
+    }
+    else
+        mask = mask2 = mask3 = 0xff;
 
-	/* Loop for each column */
-	for (x = 0; x < nx; x++)
-	{
-		dst = dst2;
-		dst2 += DISP_Y/8;
-		data = 0;
-		y = 0;
+    /* Loop for each column */
+    for (x = 0; x < nx; x++)
+    {
+        dst = dst2;
+        dst2 += DISP_Y/8;
+        data = 0;
+        y = 0;
 
-		if (ny > 8)
-		{
-                  /* First partial row */
-                  data = *src++ << shift;
-                  *dst = (*dst & mask) ^ data;
-                  data >>= 8;
-                  dst++;
+        if (ny > 8)
+        {
+            /* First partial row */
+            data = *src++ << shift;
+            *dst = (*dst & mask) ^ data;
+            data >>= 8;
+            dst++;
 
-                  /* Intermediate rows */
-                  for (y = 8; y < ny-8; y += 8)
-                  {
-                    data |= *src++ << shift;
-                    *dst = (*dst & mask2) ^ data;
-                    data >>= 8;
-                    dst++;
-                  }
-		}
+            /* Intermediate rows */
+            for (y = 8; y < ny-8; y += 8)
+            {
+                data |= *src++ << shift;
+                *dst = (*dst & mask2) ^ data;
+                data >>= 8;
+                dst++;
+            }
+        }
 
-		/* Last partial row */
-		if (y + shift < ny)
-                  data |= *src++ << shift;
-		*dst = (*dst & mask3) ^ (data & mask4);
-	}
+        /* Last partial row */
+        if (y + shift < ny)
+            data |= *src++ << shift;
+        *dst = (*dst & mask3) ^ (data & mask4);
+    }
 }
 
 /*
@@ -392,9 +556,9 @@ void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
  */
 void lcd_clearrect (int x, int y, int nx, int ny)
 {
-  int i;
-  for (i = 0; i < nx; i++)
-    lcd_bitmap (zeros, x+i, y, 1, ny, TRUE);
+    int i;
+    for (i = 0; i < nx; i++)
+        lcd_bitmap (zeros, x+i, y, 1, ny, TRUE);
 }
 
 /*
@@ -402,17 +566,17 @@ void lcd_clearrect (int x, int y, int nx, int ny)
  */
 void lcd_fillrect (int x, int y, int nx, int ny)
 {
-  int i;
-  for (i = 0; i < nx; i++)
-    lcd_bitmap (ones, x+i, y, 1, ny, TRUE);
+    int i;
+    for (i = 0; i < nx; i++)
+        lcd_bitmap (ones, x+i, y, 1, ny, TRUE);
 }
 
 /* Invert a rectangular area at (x, y), size (nx, ny) */
 void lcd_invertrect (int x, int y, int nx, int ny)
 {
-  int i;
-  for (i = 0; i < nx; i++)
-    lcd_bitmap (ones, x+i, y, 1, ny, FALSE);
+    int i;
+    for (i = 0; i < nx; i++)
+        lcd_bitmap (ones, x+i, y, 1, ny, FALSE);
 }
 
 #define DRAW_PIXEL(x,y) display[x][y/8] |= (1<<(y%7))
