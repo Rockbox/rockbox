@@ -157,6 +157,8 @@ static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
 
+static unsigned long mas_version_code;
+
 static int tag_read_idx = 0;
 static int tag_write_idx = 0;
 
@@ -1238,8 +1240,6 @@ int mpeg_val2phys(int setting, int value)
     }
     return result;
 }
-
-static unsigned long mas_version_code;
 
 void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc)
 {
