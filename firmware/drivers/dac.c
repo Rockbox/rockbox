@@ -41,15 +41,15 @@ int dac_volume(unsigned int volume)
     return 0;
 }
 
-/***************************************************
-** Bit6:  0 = 3V, 1 = 5V
-** Bit5:  0 = normal, 1 = low power
-** Bit4:  0 = AUX2 off, 1 = AUX2 on
-** Bit3:  0 = AUX1 off, 1 = AUX2 on
-** Bit2:  0 = DAC off, 1 = DAC on
-** Bit1:  0 = stereo, 1 = mono
-** Bit0:  0 = normal right amp, 1 = inverted right amp
-***************************************************/
+/******************************************************************
+** Bit6:  0 = 3V        1 = 5V
+** Bit5:  0 = normal    1 = low power
+** Bit4:  0 = AUX2 off  1 = AUX2 on
+** Bit3:  0 = AUX1 off  1 = AUX2 on
+** Bit2:  0 = DAC off   1 = DAC on
+** Bit1:  0 = stereo    1 = mono
+** Bit0:  0 = normal right amp   1 = inverted right amp
+******************************************************************/
 int dac_config(int value)
 {
     int i;
