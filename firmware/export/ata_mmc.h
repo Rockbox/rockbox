@@ -33,6 +33,7 @@ typedef struct
     unsigned int nsac;            /* clock cycles */
     unsigned int tsac;            /* n * 0.1 ns */
     unsigned int r2w_factor;
+    unsigned int numsectors;      /* size in sectors */
 } tCardInfo;
 
 void mmc_select_clock(int card_no);

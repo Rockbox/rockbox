@@ -476,6 +476,10 @@ static int initialize_card(int card_no)
     card->r2w_factor = 1 << temp;
     card->write_timeout = card->read_timeout * card->r2w_factor;
 
+    /* card size */
+    card->numsectors = mmc_extract_bits(card->csd, 54, 12)
+                      * (1 << (mmc_extract_bits(card->csd, 78, 3)+2));
+
     /* switch to full speed */
     setup_sci1(card->bitrate_register);
     
@@ -616,11 +620,10 @@ static int send_single_sector(const unsigned char *buf, int timeout)
     return ret;
 }
 
-int ata_read_sectors(
-    IF_MV2(int drive,)
-    unsigned long start,
-    int incount,
-    void* inbuf)
+int ata_read_sectors(IF_MV2(int drive,)
+                     unsigned long start,
+                     int incount,
+                     void* inbuf)
 {
     int ret = 0;
     int i;
@@ -639,6 +642,9 @@ int ata_read_sectors(
     card = &card_info[current_card];
     ret = select_card(current_card);
 #endif
+    if (start + incount > card->numsectors)
+        panicf("Reading past end of card\n");
+
     if (ret == 0)
     {
         if (incount == 1)
@@ -702,6 +708,8 @@ int ata_write_sectors(IF_MV2(int drive,)
     card = &card_info[current_card];
     ret = select_card(current_card);
 #endif
+    if (start + count > card->numsectors)
+        panicf("Writing past end of card\n");
 
     if (ret == 0)
     {

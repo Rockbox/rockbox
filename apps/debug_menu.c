@@ -1278,7 +1278,6 @@ bool dbg_mmc_info(void)
 {
     bool done = false;
     int currval = 0;
-    unsigned long value;
     tCardInfo *card;
     unsigned char pbuf[32], pbuf2[32];
     unsigned char card_name[7];
@@ -1322,10 +1321,8 @@ bool dbg_mmc_info(void)
                          (int) mmc_extract_bits(card->cid, 0, 8),
                          (int) mmc_extract_bits(card->cid, 8, 16));
                 lcd_puts(0, 4, pbuf);
-                value = mmc_extract_bits(card->csd, 54, 12)
-                      * (SECTOR_SIZE << (mmc_extract_bits(card->csd, 78, 3)+2));
-                snprintf(pbuf, sizeof(pbuf), "Size: %ld MB",
-                         value / (1024*1024));
+                snprintf(pbuf, sizeof(pbuf), "Size: %d MB",
+                         card->numsectors * SECTOR_SIZE / (1024*1024));
                 lcd_puts(0, 5, pbuf);
             }
             else                  /* Technical details */
