@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
+#ifdef HAVE_LCD_BITMAP
+
 #define PAD_HEIGHT 10
 #define PAD_WIDTH 2
 
@@ -311,3 +313,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     return PLUGIN_OK;
 }
+
+#endif /* HAVE_LCD_BITMAP */
