@@ -49,40 +49,40 @@ void ss_loop(void)
     int y = LCD_HEIGHT/2;
     int i = 0;
     int center = 0;
-	int factor = 0;
-	int offset = 0;
+    int factor = 0;
+    int offset = 0;
 
-	if (LCD_HEIGHT < LCD_WIDTH)
-		center = LCD_HEIGHT/2;
-	else
-		center = LCD_WIDTH/2;
+    if (LCD_HEIGHT < LCD_WIDTH)
+        center = LCD_HEIGHT/2;
+    else
+        center = LCD_WIDTH/2;
 
-	i = center;
-	while(1)
+    i = center;
+    while(1)
     {
-		/* Grow */
-		if ( i <= 0 ) {
-			factor = 1;
-			i = 1;
-		}
+        /* Grow */
+        if ( i <= 0 ) {
+            factor = 1;
+            i = 1;
+        }
 
-		/* Shrink */
-		if (i >= center) {
-			factor = -1;
-			i = center;
-		}
+        /* Shrink */
+        if (i >= center) {
+            factor = -1;
+            i = center;
+        }
 
-		offset=i*factor;
+        offset=i*factor;
 
         b = button_get();
         if ( b & BUTTON_OFF )
             return;
 
-		lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-		drawrect(x-offset, y-offset, x2+offset, y2+offset);
-		lcd_update();
+        lcd_clear_display();
+        drawrect(x-offset, y-offset, x2+offset, y2+offset);
+        lcd_update();
 
-		i+=factor;
+        i+=factor;
 
         sleep(10);
     }
@@ -91,55 +91,48 @@ void ss_loop(void)
 
 void screensaver(void)
 {
-	char w, h;
-	char *off = "[Off] to stop";
-	int len = strlen(SS_TITLE);
+    char w, h;
+    char *off = "[Off] to stop";
+    int len = strlen(SS_TITLE);
 
-	lcd_fontsize(SS_TITLE_FONT, &w, &h);
+    lcd_fontsize(SS_TITLE_FONT, &w, &h);
 
-	/* Get horizontel centering for text */
-	len *= w;
-	if (len%2 != 0)
-		len = ((len+1)/2)+(w/2);
-	else
-		len /= 2;
+    /* Get horizontel centering for text */
+    len *= w;
+    if (len%2 != 0)
+        len = ((len+1)/2)+(w/2);
+    else
+        len /= 2;
 
-	if (h%2 != 0)
-		h = (h/2)+1;
-	else
-		h /= 2;
+    if (h%2 != 0)
+        h = (h/2)+1;
+    else
+        h /= 2;
 
-	lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-	lcd_puts(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE, SS_TITLE_FONT);
+    lcd_clear_display();
+    lcd_puts(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE, SS_TITLE_FONT);
 
-	len = strlen(off);
-	lcd_fontsize(0, &w, &h);
+    len = strlen(off);
+    lcd_fontsize(0, &w, &h);
 
-	/* Get horizontel centering for text */
-	len *= w;
-	if (len%2 != 0)
-		len = ((len+1)/2)+(w/2);
-	else
-		len /= 2;
+    /* Get horizontel centering for text */
+    len *= w;
+    if (len%2 != 0)
+        len = ((len+1)/2)+(w/2);
+    else
+        len /= 2;
 
-	if (h%2 != 0)
-		h = (h/2)+1;
-	else
-		h /= 2;
+    if (h%2 != 0)
+        h = (h/2)+1;
+    else
+        h /= 2;
 
-	lcd_puts(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off, 0);
+    lcd_puts(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off, 0);
 
     lcd_update();
-	sleep(150);
+    sleep(150);
     ss_loop();
 }
-
-
-
-
-
-
-
 
 
 
