@@ -77,6 +77,7 @@ void reset_settings( user_settings_t *settings ) {
  */
 void display_current_settings( user_settings_t *settings )
 {
+#ifdef DEBUG
     DEBUGF( "\ndisplay_current_settings()\n" );
 
     DEBUGF( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\nloudness:\t%d\nbass boost:\t%d\n",
@@ -91,6 +92,10 @@ void display_current_settings( user_settings_t *settings )
             settings->contrast,
             settings->poweroff,
             settings->backlight );
+#else
+    /* Get rid of warning */
+    settings = settings;
+#endif
 }
 
 
