@@ -31,6 +31,7 @@
 
 #include "boxes.h"
 extern void bounce(void);
+extern void blank(void);
 
 void screensavers_menu(void)
 {
@@ -39,6 +40,7 @@ void screensavers_menu(void)
     struct menu_items items[] = {
         { "Boxes", boxes },
         { "Bounce", bounce },
+        { "Blank", blank },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -47,5 +49,3 @@ void screensavers_menu(void)
 }
 
 #endif
-
-
