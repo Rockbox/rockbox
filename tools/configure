@@ -59,6 +59,12 @@ whichaddr () {
 	echo "In this case, reply '0x10000' (no quotes) and "
 	echo "re-configure when you know better."
 	loadaddress=`input`
+
+        if [ "0$loadaddress" = "0" ]; then
+            #default
+            loadaddress="0x10000";
+        fi
+        echo "You selected $loadaddress"
 	;;
     *)
 	;;
