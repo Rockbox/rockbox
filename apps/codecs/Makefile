@@ -57,7 +57,7 @@ dumb:
 
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(OBJDIR)/libdumb.a $(OBJDIR)/libdumbd.a
 	@$(MAKE) -C libmad clean
 	@$(MAKE) -C liba52 clean
 	@$(MAKE) -C libFLAC clean
