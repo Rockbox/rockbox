@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#include "kernel.h"
+#include <poll.h>
+
+
 /*
  * We emulate the target threads by using pthreads. We have a mutex that only
  * allows one thread at a time to execute. It forces each thread to yield()
@@ -31,6 +35,9 @@ pthread_mutex_t mp;
 void init_threads(void)
 {  
   pthread_mutex_init(&mp, NULL);
+  /* get mutex to only allow one thread running at a time */
+  pthread_mutex_lock(&mp);
+
 }
 /* 
    int pthread_create(pthread_t *new_thread_ID,
@@ -38,11 +45,18 @@ void init_threads(void)
    void * (*start_func)(void *), void *arg);
 */
 
-void yield(void)
+void (yield)(void)
 {
   pthread_mutex_unlock(&mp); /* return */
   pthread_mutex_lock(&mp); /* get it again */
 }
+
+void newfunc(void (*func)(void))
+{
+  yield();
+  func();
+}
+
 
 int create_thread(void* fp, void* sp, int stk_size)
 {
@@ -54,16 +68,25 @@ int create_thread(void* fp, void* sp, int stk_size)
   (void)sp;
   (void)stk_size;
   error = pthread_create(&tid,
-                         NULL, /* default attributes please */
-                         fp,   /* function to start */
-                         NULL  /* start argument */);
+                         NULL,   /* default attributes please */
+                         (void *(*)(void *)) newfunc,   /* function to start */
+                         fp      /* start argument */);
   if(0 != error)
     fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
   else 
-    fprintf(stderr, "Thread %ld is running\n", tid);
+    fprintf(stderr, "Thread %ld is running\n", (long)tid);
 
-  /* get mutex to only allow one thread running at a time */
-  pthread_mutex_lock(&mp);
+  yield();
 
   return error;
+}
+
+/* ticks is HZ per second */
+void x11_sleep(int ticks)
+{
+    pthread_mutex_unlock(&mp); /* return */
+    /* portable subsecond "sleep" */
+    poll((void *)0, 0, ticks * 1000/HZ);
+
+    pthread_mutex_lock(&mp); /* get it again */
 }
