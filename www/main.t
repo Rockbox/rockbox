@@ -9,16 +9,17 @@ Ondio MP3 players.
 
 <p> Rockbox is a complete rewrite and uses no fragments of the original
 firmware. It boasts <a href="/docs/features.html">numerous features</a> while
-remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
+remaining <a href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.3.pdf">easy
+to use</a>.
 
 <p> Installing Rockbox does not harm your Archos, it works the same way you
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
-<p><i>2004-12-17</i>: Rockbox started from <a href="http://www.rockbox.org/twiki/bin/view/Main/FlashingRockbox">flash ROM</a> finally available for players.
+<p><i>2004-12-17</i>: Rockbox started from <a href="/twiki/bin/view/Main/FlashingRockbox">flash ROM</a> finally available for players.
 
-<p><i>2004-12-16</i>: The <a href=http://www.rockbox.org/twiki/bin/view/Main/RockboxManual>Rockbox 2.3 manual</a> is out. Thanks go to Christi Alice Scarborough for her outstanding work!
+<p><i>2004-12-16</i>: The <a href="/twiki/bin/view/Main/RockboxManual">Rockbox 2.3 manual</a> is out. Thanks go to Christi Alice Scarborough for her outstanding work!
 
 <p><i>2004-11-09</i>: Some downtime due to planned server maintenance (replaced a harddisk).
 
