@@ -21,6 +21,10 @@
 #include <types.h>
 #include <lcd.h>
 #include <button.h>
+#include "kernel.h"
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
 
 #define TREE_MAX_LEN 15
 #define TREE_MAX_ON_SCREEN 7
@@ -47,7 +51,7 @@ bool dirbrowse(char *root)
     buffer[i][TREE_MAX_LEN]=0;
     lcd_puts(6, 8+i*8, buffer[i], 0);
 
-    if(++i > TREE_MAX_ON_SCREEN)
+    if(++i >= TREE_MAX_ON_SCREEN)
       break;
   }
 
