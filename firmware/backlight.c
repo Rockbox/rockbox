@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "config.h"
 #include <stdlib.h>
-#include "sh7034.h"
+#include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
 #include "i2c.h"
@@ -49,6 +49,35 @@ static bool backlight_on_when_charging = 0;
 static int backlight_timer;
 static unsigned int backlight_timeout = 5;
 
+static void __backlight_off(void)
+{
+#ifdef IRIVER_H100
+    GPIO1_OUT  &= ~0x00020000;
+#else
+#ifdef HAVE_RTC
+    /* Disable square wave */
+    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
+#else
+    and_b(~0x40, &PAIORH);
+#endif
+#endif
+}
+
+static void __backlight_on(void)
+{
+#ifdef IRIVER_H100
+    GPIO1_OUT  |= 0x00020000;
+#else
+#ifdef HAVE_RTC
+    /* Enable square wave */
+    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
+#else
+    and_b(~0x40, &PADRH);
+    or_b(0x40, &PAIORH);
+#endif
+#endif
+}
+
 void backlight_thread(void)
 {
     struct event ev;
@@ -69,36 +98,19 @@ void backlight_thread(void)
                     backlight_timer = HZ*backlight_timeout_value[backlight_timeout];
                 }
 
-                if(backlight_timer < 0)
+                if(backlight_timer < 0) /* Backlight == OFF in the setting? */
                 {
-                    backlight_timer = 0;    /* timer value 0 will not get ticked */
-#ifdef HAVE_RTC
-                    /* Disable square wave */
-                    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
-#else
-                    and_b(~0x40, &PAIORH);
-#endif  
+                    backlight_timer = 0; /* Disable the timeout */
+                    __backlight_off();
                 }
-                /* else if(backlight_timer) */
                 else 
                 {
-#ifdef HAVE_RTC
-                    /* Enable square wave */
-                    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
-#else
-                    and_b(~0x40, &PADRH);
-                    or_b(0x40, &PAIORH);
-#endif
+                    __backlight_on();
                 }
                 break;
                 
             case BACKLIGHT_OFF:
-#ifdef HAVE_RTC
-                /* Disable square wave */
-                rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
-#else
-                and_b(~0x40, &PAIORH);
-#endif
+                __backlight_off();
                 break;
                 
             case SYS_USB_CONNECTED:
@@ -175,6 +187,10 @@ void backlight_init(void)
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
 
+#ifdef IRIVER_H100
+    GPIO1_ENABLE  |= 0x00020000;
+    GPIO1_FUNCTION |= 0x00020000;
+#endif
     backlight_on();
 }
 
