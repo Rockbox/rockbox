@@ -1609,9 +1609,6 @@ void mpeg_sound_set(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            /* We are doing increments of 1 */
-            /*value *= 2;*/ /* Convert to percent */
-            
 #ifdef HAVE_MAS3587F
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
@@ -1739,7 +1736,6 @@ int mpeg_val2phys(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-/*            result = value * 2;*/
             result = value;
             break;
         
