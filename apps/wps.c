@@ -41,6 +41,12 @@
 #define PLAY_DISPLAY_FILENAME_SCROLL 1 
 #define PLAY_DISPLAY_TRACK_TITLE     2 
 
+#ifdef HAVE_RECORDER_KEYPAD
+#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN)
+#else
+#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP)
+#endif
+
 static void draw_screen(struct mp3entry* id3)
 {
     lcd_clear_display();
@@ -132,18 +138,51 @@ static void draw_screen(struct mp3entry* id3)
     lcd_update();
 }
 
+void display_keylock_text(bool locked)
+{
+    lcd_clear_display();
+
+#ifdef HAVE_LCD_CHARCELLS
+    if(locked)
+        lcd_puts(0, 0, "Keylock ON");
+    else
+        lcd_puts(0, 0, "Keylock OFF");
+#else
+    if(locked)
+    {
+        lcd_puts(2, 3, "Key lock is ON");
+    }
+    else
+    {
+        lcd_puts(2, 3, "Key lock is OFF");
+    }
+    lcd_update();
+#endif
+    
+    sleep(HZ);
+}
+
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
-    static bool playing = true;
-    struct mp3entry* id3 = mpeg_current_track();
+    struct mp3entry* id3 = NULL;
     bool keys_locked = false;
     bool dont_go_to_menu = false;
+    bool menu_button_is_down = false;
+    bool pending_keylock = true; /* Keylock will go ON next time */
+    int old_release_mask;
+    int x = 0;
 
-    lcd_clear_display();
-    draw_screen(id3);
+    old_release_mask = button_set_release(RELEASE_MASK);
 
-    while ( 1 ) {
+    if(mpeg_is_playing())
+    {
+        id3 = mpeg_current_track();
+        draw_screen(id3);
+    }
+    
+    while ( 1 )
+    {
         int i;
         char buffer[32];
 
@@ -154,7 +193,7 @@ int wps_show(void)
             draw_screen(id3);
         }
         
-        if (playing && id3)
+        if (mpeg_is_playing() && id3)
         {
 #ifdef HAVE_LCD_BITMAP
             snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
@@ -166,7 +205,8 @@ int wps_show(void)
             lcd_puts(0, 6, buffer);
             lcd_update();
 #else
-            // Display time with the filename scroll only because the screen has room. 
+            /* Display time with the filename scroll only because
+               the screen has room. */
             if (global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL)
             { 
                 snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
@@ -179,7 +219,7 @@ int wps_show(void)
                 lcd_update();
            }
 #endif
-        } 
+        }
 
         status_draw();
         
@@ -190,13 +230,32 @@ int wps_show(void)
 #endif
 
         for ( i=0;i<5;i++ ) {
-            switch ( button_get(false) ) {
+            int button = button_get(false);
+
+            if(button == BUTTON_NONE)
+                x++;
+            else
+            {
+                if(x)
+                    debugf("%d BUTTON_NONE\n", x);
+                debugf("Btn: %04x - lock: %d\n", button, keys_locked);
+                x = 0;
+            }
+
+            switch ( button )
+            {
                 case BUTTON_ON:
-                    if(keys_locked)
+                    if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
+
 #ifdef HAVE_LCD_CHARCELLS
                     lcd_icon(ICON_RECORD, false);
 #endif
+                    button_set_release(old_release_mask);
                     return 0;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -205,9 +264,13 @@ int wps_show(void)
                 case BUTTON_UP:
 #endif
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
 
-                    if ( playing )
+                    if ( mpeg_is_playing() )
                     {
                         mpeg_pause();
                         status_set_playmode(STATUS_PAUSE);
@@ -217,14 +280,17 @@ int wps_show(void)
                         mpeg_resume();
                         status_set_playmode(STATUS_PLAY);
                     }
-
-                    playing = !playing;
                     break;
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_UP:
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
+
                     global_settings.volume++;
                     if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                         global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -233,7 +299,12 @@ int wps_show(void)
 
                 case BUTTON_DOWN:
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
+
                     global_settings.volume--;
                     if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                         global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
@@ -243,13 +314,22 @@ int wps_show(void)
 
                 case BUTTON_LEFT:
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
+
                     mpeg_prev();
                     break;
 
                 case BUTTON_RIGHT:
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
                     mpeg_next();
                     break;
 
@@ -272,22 +352,50 @@ int wps_show(void)
                     
                 case BUTTON_MENU:
                     lcd_icon(ICON_PARAM, true);
+                    menu_button_is_down = true;
+                    break;
+
+                case BUTTON_STOP | BUTTON_REL:
+                    /* The STOP key has been release while the MENU key
+                       was held */
+                    if(menu_button_is_down)
+                        pending_keylock = !pending_keylock;
+                    break;
+#else
+                case BUTTON_F1:
+                    menu_button_is_down = true;
+                    break;
+                
+                case BUTTON_DOWN | BUTTON_REL:
+                    /* The DOWN key has been release while the F1 key
+                       was held */
+                    if(menu_button_is_down)
+                    {
+                        pending_keylock = !pending_keylock;
+                        debugf("pending: %d\n", pending_keylock);
+                    }
                     break;
 #endif
-
+                    
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_F1 | BUTTON_DOWN:
 #else
                 case BUTTON_MENU | BUTTON_STOP:
 #endif
-                    keys_locked = !keys_locked;
+                    if(keys_locked != pending_keylock)
+                    {
+                        keys_locked = pending_keylock;
+
 #ifdef HAVE_LCD_CHARCELLS
-                    lcd_icon(ICON_PARAM, false);
-                    if(keys_locked)
-                        lcd_icon(ICON_RECORD, true);
-                    else
-                        lcd_icon(ICON_RECORD, false);
+                        if(keys_locked)
+                            lcd_icon(ICON_RECORD, true);
+                        else
+                            lcd_icon(ICON_RECORD, false);
 #endif
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
+                    }
+
                     dont_go_to_menu = true;
                     break;
                     
@@ -299,16 +407,15 @@ int wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
                     lcd_icon(ICON_PARAM, false);
 #endif
+                    menu_button_is_down = false;
                     if(!keys_locked && !dont_go_to_menu)
                     {
                         lcd_stop_scroll();
+                        button_set_release(old_release_mask);
                         main_menu();
+                        old_release_mask = button_set_release(RELEASE_MASK);
                         id3 = mpeg_current_track();
                         draw_screen(id3);
-                        /* Prevent any stray BUTTON_REL events from going
-                           back to the main menu until we get a new
-                           BUTTON_MENU event */
-                        dont_go_to_menu = true;
                     }
                     else
                     {
@@ -319,12 +426,18 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_OFF:
 #else
-                case BUTTON_DOWN:
+                case BUTTON_STOP:
 #endif
                     if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
                         break;
+                    }
+
                     mpeg_stop();
                     status_set_playmode(STATUS_STOP);
+                    button_set_release(old_release_mask);
                     return 0;
                     
 #ifndef SIMULATOR
