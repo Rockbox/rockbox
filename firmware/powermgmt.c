@@ -94,6 +94,11 @@ void set_car_adapter_mode(bool setting)
     (void)setting;
 }
 
+void reset_poweroff_timer(void)
+{
+}
+
+
 #else /* not SIMULATOR ******************************************************/
 
 static const int poweroff_idle_timeout_value[15] =
@@ -908,6 +913,7 @@ void powermgmt_init(void)
 /* Various hardware housekeeping tasks relating to shutting down the jukebox */
 void shutdown_hw(void) 
 {
+#ifndef SIMULATOR
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
     if(fd >= 0) {
         close(fd);
@@ -930,4 +936,5 @@ void shutdown_hw(void)
     lcd_set_contrast(0);
 #endif
     power_off();
+#endif /* #ifndef SIMULATOR */
 }
