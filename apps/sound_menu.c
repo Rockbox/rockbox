@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include "lcd.h"
