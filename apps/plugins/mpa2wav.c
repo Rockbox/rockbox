@@ -121,14 +121,20 @@ signed int dither(mad_fixed_t sample, struct dither *dither)
 
 #define SHRT_MAX 32767
 
-#define INPUT_BUFFER_SIZE	(5*8192)
-#define OUTPUT_BUFFER_SIZE	8192 /* Must be an integer multiple of 4. */
+#define INPUT_BUFFER_SIZE	(10*8192)
+#define OUTPUT_BUFFER_SIZE	65536 /* Must be an integer multiple of 4. */
 
 unsigned char InputBuffer[INPUT_BUFFER_SIZE+MAD_BUFFER_GUARD];
 unsigned char OutputBuffer[OUTPUT_BUFFER_SIZE];
 unsigned char *OutputPtr=OutputBuffer;
 unsigned char *GuardPtr=NULL;
 const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
+
+#ifndef SIMULATOR
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+#endif
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
@@ -144,6 +150,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   TEST_PLUGIN_API(api);
   rb = api;
+
+#ifndef SIMULATOR
+  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+#endif
 
   /* This function sets up the buffers and reads the file into RAM */
 
