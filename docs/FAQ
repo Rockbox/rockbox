@@ -123,10 +123,10 @@ A19: Okay, last time.  No.  We have no problems whatsoever reading different
      data directly to the DAC.
 
 Q20. What is the most recent version of Rockbox?
-A20. We recently released version 2.2, so head on over to 
+A20. We recently released version 2.3, so head on over to
      http://www.rockbox.org/download/ and pull it down.
      Make sure to read the release notes.
-     (http://www.rockbox.org/download/rockbox-2.2-notes.txt).  
+     (http://www.rockbox.org/download/rockbox-2.3-notes.txt).
 
 Q21. What do you plan to add to coming versions?
 A21. We don't plan versions in detail. We just write code, and when it feels
