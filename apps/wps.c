@@ -315,7 +315,9 @@ int wps_load_custom_config(void)
                                 id3->elapsed / 60000,
                                 id3->elapsed % 60000 / 1000);
                         break;
-                    
+                    case '%':  /* Displays % */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%%");
+                        break;                    
                 }
                 break;
             default:

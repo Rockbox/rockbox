@@ -24,5 +24,6 @@
 extern bool keys_locked;
 
 int wps_show(void);
+int wps_load_custom_config(void);
 
 #endif
