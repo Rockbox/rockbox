@@ -33,7 +33,7 @@
 #include "backlight.h"
 #include "playlist.h"  /* for playlist_shuffle */
 
-enum { Shuffle, Backlight, Scroll, numsettings };
+enum { Shuffle, Backlight, Scroll, Wps, numsettings };
 
 static void shuffle(void)
 {
@@ -156,6 +156,65 @@ static void scroll_speed(void)
     }
 }
 
+
+void wps_set()
+{
+   /* Simple menu for selecting what the display shows during playback */
+
+    bool done = false;
+    int itemp = 0;
+    char buf[6];
+
+
+    buf[5] = 0;
+    //static int savedsettings[3] = { 0, 1, 2 };
+    static const char* names[] = { "Id3  ", "File ", "Parse" };
+
+    lcd_clear_display();
+    lcd_puts(0,0,"[Display]");
+
+    while (!done) {
+        snprintf(buf,sizeof(buf),"%s", names[itemp]);
+        lcd_puts(0,1,buf);
+        lcd_update();
+
+        switch ( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                itemp--;
+                if (itemp <= 0)
+                   itemp = 0;
+                break;
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                itemp++;
+                if (itemp >= 2)
+                   itemp = 2;
+                break;
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif            
+                done = true;
+                break;
+            default:
+                itemp = 0;
+                break;
+        }
+    }
+
+
+    global_settings.wps_display = itemp; //savedsettings[itemp];
+}
+
 void settings_menu(void)
 {
     int m;
@@ -163,6 +222,7 @@ void settings_menu(void)
         { Shuffle,   "Shuffle",         shuffle         }, 
         { Backlight, "Backlight Timer", backlight_timer },
         { Scroll,    "Scroll speed",    scroll_speed    },  
+        { Wps,       "While Playing",   wps_set },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
