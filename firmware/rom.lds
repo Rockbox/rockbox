@@ -1,17 +1,30 @@
 #include "config.h"
 
 ENTRY(start)
+#if CONFIG_CPU == MCF5249
+OUTPUT_FORMAT(elf32-m68k)
+#else
 OUTPUT_FORMAT(elf32-sh)
+#endif
 INPUT(crt0.o)
 
 #define PLUGINSIZE 0x8000
 
-#define DRAMORIG 0x09000000
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
+
+#ifdef IRIVER_H100
+#define DRAMORIG 0x30000000
+#define IRAMORIG 0x10000000
+#define IRAMSIZE 0x18000
+#define FLASHORIG 0x001f0000
+#define FLASHSIZE 2M
+#else
+#define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
 #define IRAMSIZE 0x1000
 #define FLASHORIG 0x02000000 + ROM_START
 #define FLASHSIZE 256K - ROM_START
+#endif
 
 #define ENDADDR  (DRAMORIG + DRAMSIZE)
 
@@ -33,7 +46,7 @@ SECTIONS
         _datastart = .;
         *(.resetvectors);
         *(.vectors);
-        . = _datastart + 0x200;
+        . = ALIGN(0x200);
         *(.data)
         . = ALIGN(0x4);
         _dataend = .;         
@@ -53,12 +66,13 @@ SECTIONS
     .rodata :
     {
         *(.rodata)
+        *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
         _iramcopy = .;
     } > FLASH
 
-    .iram 0xf000000 : AT ( _iramcopy )
+    .iram IRAMORIG : AT ( _iramcopy )
     {
         _iramstart = .;
         *(.icode)
@@ -70,8 +84,10 @@ SECTIONS
     {
        *(.stack)
        _stackbegin = .;
+       stackbegin = .;
        . += 0x2000;
        _stackend = .;
+       stackend = .;
     } > DRAM
 
     .bss :
