@@ -24,7 +24,12 @@
 
 #define KEY(k)      HIBYTE(GetKeyState (k))
 
-void button_init(void) {}
+int last_key ;
+
+void button_init(void) 
+{ 
+	last_key = 0 ;
+}
 
 int button_get(void)
 {
@@ -64,5 +69,8 @@ int button_get(void)
     if (KEY (VK_SUBTRACT))
         btn |= BUTTON_F3; // F3 button
 
-    return btn;
+	if (btn != 0) {
+		last_key = 0 ;
+	}
+    return btn;	
 }

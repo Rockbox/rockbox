@@ -21,9 +21,11 @@
 #include <process.h>
 #include "uisw32.h"
 #include "resource.h"
+#include "button.h"
 
 // extern functions
-extern void                 main (void *); // mod entry point
+extern void                 app_main (void *); // mod entry point
+extern void					new_key(int key);
 
 // variables
 HWND                                hGUIWnd; // the GUI window handle
@@ -250,7 +252,7 @@ int WINAPI WinMain (
     if (!GUIStartup ())
         return 0;
 
-    uThreadID = _beginthread (main, 0, NULL);
+    uThreadID = _beginthread (app_main, 0, NULL);
     if (uThreadID == -0L)
         return MessageBox (NULL, "Error creating mod thread!", "Error", MB_OK);
 

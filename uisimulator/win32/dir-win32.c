@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include <io.h>
+#include <windows.h>
 #include <malloc.h>
 #include "dir-win32.h"
 #include "dir.h"
@@ -33,11 +34,31 @@ DIR *opendir (
 {
     DIR                 *p = (DIR*)malloc(sizeof(DIR));
     struct _finddata_t  fd;
-    if ((p->handle = _findfirst (dirname, &fd)) == -1)
+    unsigned int        i;
+    char                *s = (char*)malloc(strlen(dirname) + 5);
+    wsprintf (s, "%s", dirname);
+
+    for (i = 0; i < strlen(s); i++)
+        if (s[i] == '/')
+            s[i] = '\\';
+
+    if (s[i - 1] != '\\')
     {
+        s[i] = '\\';
+        s[++i] = '\0';
+    }
+
+    OutputDebugString (s);
+
+    wsprintf (s, "%s*.*", s);
+
+    if ((p->handle = _findfirst (s, &fd)) == -1)
+    {
+        free (s);
         free (p);
         return 0;
     }
+    free (s);
     return p;
 }
 
