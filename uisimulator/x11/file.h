@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef ROCKBOX_FILE_H
+#define ROCKBOX_FILE_H
+
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -36,7 +39,9 @@ int x11_rename(char *oldpath, char *newpath);
 
 extern int open(char* pathname, int flags);
 extern int close(int fd);
-extern int read(int fd, void* buf, int count);
-extern int write(int fd, void* buf, int count);
-extern int lseek(int fd, int offset, int whence);
 extern int printf(const char *format, ...);
+
+off_t lseek(int fildes, off_t offset, int whence);
+ssize_t read(int fd, void *buf, size_t count);
+
+#endif
