@@ -78,11 +78,7 @@
 # define M_PI_2 1.5707963267
 #endif
 
-#include "yarandom.h"
-#include "usleep.h"
 #include "resources.h"
-#include "hsv.h"
-#include "colors.h"
 #include "visual.h"
 
 extern Bool mono_p;
