@@ -503,6 +503,7 @@ bool ask_resume(void)
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_RESUME_ASK));
 #ifdef HAVE_LCD_CHARCELLS
+    status_draw();
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #else
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_RECORDER));
