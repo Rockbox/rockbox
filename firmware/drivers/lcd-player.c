@@ -464,7 +464,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
         strncpy(s->text,string,sizeof s->text);
         s->turn_offset=-1;
         if (allow_bidirectional_scrolling && s->textlen + x > 11+4) {
-            s->turn_offset=s->textlen-x-11;
+            s->turn_offset=s->textlen+x-11;
         } else {
             for (i=0; i<scroll_spacing && s->textlen<(int)sizeof(s->text); i++) {
                 s->text[s->textlen++]=' ';
