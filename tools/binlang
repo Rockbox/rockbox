@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ############################################################################
 #             __________               __   ___.                  
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
@@ -68,7 +68,6 @@ while(<ENG>) {
 }
 close(ENG);
 
-
 while(<LANG>) {
     if($_ =~ / *\#/) {
         # comment
@@ -93,6 +92,7 @@ while(<LANG>) {
             $value =~ s/^\"(.*)\"/$1/g;
 
             $idnum = $idnum{$set{'id'}};
+            $idnum{$set{'id'}} = '_done_';
 
             printf OFILE ("%c%c%s\x00",
                           ($idnum>>8), ($idnum&0xff),
@@ -107,3 +107,11 @@ while(<LANG>) {
 close(LANG);
 
 close(OFILE);
+
+foreach $k (keys(%idnum))
+{
+   if($idnum{$k} ne '_done_')
+   {
+      warn "Missing ID in $input: $k\n";
+   }
+}
