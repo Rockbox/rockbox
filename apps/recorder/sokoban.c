@@ -156,7 +156,7 @@ void sokoban_loop(void) {
 
 
     while(1) {
-        b = button_get(false);
+        b = button_get(true);
 
         if ( b & BUTTON_OFF ) {
             /* get out of here */
