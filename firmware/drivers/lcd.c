@@ -413,7 +413,7 @@ void lcd_init (void)
     lcd_write (true, LCD_CNTL_SEGREMAP);
     lcd_write (true, LCD_CNTL_OUTSCAN);
     lcd_write (true, LCD_CNTL_CONTRAST);
-    lcd_write (true, 0x30); /* Contrast parameter */
+    lcd_write (true, 0x20); /* Contrast parameter */
     lcd_write (true, LCD_CNTL_DISPON);
 
     lcd_clear_display();
