@@ -727,7 +727,7 @@ static int onplay_screen(char* dir, char* file)
                     break;
                 lcd_clear_display();
                 lcd_puts(0,0,str(LANG_REALLY_DELETE));
-                lcd_puts(0,1,file);
+                lcd_puts_scroll(0,1,file);
                 lcd_puts(0,3,str(LANG_RESUME_CONFIRM_RECORDER));
                 lcd_puts(0,4,str(LANG_RESUME_CANCEL_RECORDER));
                 lcd_update();
@@ -739,7 +739,7 @@ static int onplay_screen(char* dir, char* file)
                             if (!remove(buf)) {
                                 reload_dir = true;
                                 lcd_clear_display();
-                                lcd_puts(0,0,file);
+                                lcd_puts_scroll(0,0,file);
                                 lcd_puts(0,1,str(LANG_DELETED));
                                 lcd_update();
                                 sleep(HZ);
@@ -851,7 +851,7 @@ static int onplay_screen(char* dir, char* file)
 
             case 3:
                 lcd_clear_display();
-                lcd_puts(0,0,file);
+                lcd_puts_scroll(0,0,file);
                 lcd_puts(0,1,str(LANG_REALLY_DELETE));
                 lcd_update();
                 while (!exit) {
@@ -861,7 +861,7 @@ static int onplay_screen(char* dir, char* file)
                             if (!remove(buf)) {
                                 reload_dir = true;
                                 lcd_clear_display();
-                                lcd_puts(0,0,file);
+                                lcd_puts_scroll(0,0,file);
                                 lcd_puts(0,1,str(LANG_DELETED));
                                 lcd_update();
                                 sleep(HZ);
