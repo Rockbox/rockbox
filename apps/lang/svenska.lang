@@ -65,8 +65,7 @@ eng: "Loading..."
 voice: ""
 new: "Laddar..."
 
-id: LAN
-  G_PLAYLIST_SHUFFLE
+id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
@@ -141,7 +140,7 @@ new: "Spela den valda först"
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: ""
+voice: "Sort Case Sensitive"
 new: "Sortera skiftlägeskänsligt"
 
 id: LANG_RESUME
@@ -241,10 +240,10 @@ voice: ""
 new: "Avbruten"
 
 id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-voice: "Sort Mode"
-new: "Sortera"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -1934,9 +1933,9 @@ new: "Administrera inställningar"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
-eng: "Start Recording"
-voice: "Start Recording"
-new: "Börja inspelning"
+eng: "Recording screen"
+voice: "Recording screen"
+new: "Inspelningsskärm"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
@@ -2625,24 +2624,59 @@ new: ""
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
+voice: ""
 new: "Tillägssamlingen är full"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
+voice: ""
 new: "Filtypssamlingen är full"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
+voice: ""
 new: "Insticksnamnet är för långt"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
+voice: ""
 new: "Strängbufferten för filtyper är tom"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
+voice: "open with"
 new: "Öppna med"
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+new: "Alfabetiskt"
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+new: "på datum"
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+new: "på senaste datum"
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+new: "Sortera kataloger"
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+new: "Sortera filer"
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+new: "på typ"
