@@ -487,42 +487,56 @@ void lcd_puts(int x, int y, char *str, int font)
 void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
-    unsigned char *dst2;
-    unsigned int mask1, mask2;
-    int shift;
-    int nny, _nnx = x, _nny = y;
+    unsigned char *dst;
+    unsigned char *dst2 = &display[x][y/8];
+    unsigned int data, mask, mask2, mask3, mask4;
+    int shift = y & 7;
 
-    for (nny = ny; nny > 0; nny -= 8, _nny += 8)
+    ny += shift;
+
+    /* Calculate bit masks */
+    mask4 = ~(0xfe << ((ny-1) & 7));
+    if (clear)
     {
-        x = _nnx; y = _nny; ny = (nny >= 8)?8:nny;
+        mask = ~(0xff << shift);
+        mask2 = 0;
+        mask3 = ~mask4;
+        if (ny <= 8)
+            mask3 |= mask;
+    }
+    else
+        mask = mask2 = mask3 = 0xff;
 
-        dst2 = &display[x][y/8];
-        shift = y & 7;
+    /* Loop for each column */
+    for (x = 0; x < nx; x++)
+    {
+        dst = dst2;
+        dst2 += LCD_HEIGHT/8;
+        data = 0;
+        y = 0;
 
-        mask1 = 0xFF >> (8 - shift);
-        mask2 = ~mask1;
-
-        ny += shift;
-
-        /* Loop for each column */
-        if (clear)
+        if (ny > 8)
         {
-            for (x = 0; x < nx; x++)
+            /* First partial row */
+            data = *src++ << shift;
+            *dst = (*dst & mask) ^ data;
+            data >>= 8;
+            dst++;
+
+            /* Intermediate rows */
+            for (y = 8; y < ny-8; y += 8)
             {
-                *dst2 = (*dst2 & mask1) | ((*(src)) << shift);
-                *(dst2 + 1) = (*(dst2+1) & mask2) | ((*(src++)) >> (8 - shift));
-                dst2 += LCD_HEIGHT/8;
+                data |= *src++ << shift;
+                *dst = (*dst & mask2) ^ data;
+                data >>= 8;
+                dst++;
             }
         }
-        else
-        {
-            for (x = 0; x < nx; x++)
-            {
-                *dst2 |= (*(src)) << shift;
-                *(dst2 + 1) |= (*(src++)) >> (8 - shift);
-                dst2 += LCD_HEIGHT/8;
-            }
-        }
+
+        /* Last partial row */
+        if (y + shift < ny)
+            data |= *src++ << shift;
+        *dst = (*dst & mask3) ^ (data & mask4);
     }
 }
 
