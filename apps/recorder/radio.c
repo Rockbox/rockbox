@@ -56,6 +56,8 @@ static int pll_cnt;
 static bool presets_loaded = false;
 static struct fmstation presets[MAX_PRESETS];
 
+static char default_filename[] = "/.rockbox/fm-presets-default.fmr";
+
 void fm_load_presets(void);
 bool fm_preset_select(void);
 bool fm_menu(void);
@@ -290,7 +292,7 @@ void fm_save_presets(void)
     int fd;
     int i;
     
-    fd = creat("/.rockbox/fm_presets.txt", O_WRONLY);
+    fd = creat(default_filename, O_WRONLY);
     if(fd >= 0)
     {
         for(i = 0;i < MAX_PRESETS;i++)
@@ -320,7 +322,7 @@ void fm_load_presets(void)
     {
         memset(presets, 0, sizeof(presets));
     
-        fd = open("/.rockbox/fm_presets.txt", O_RDONLY);
+        fd = open(default_filename, O_RDONLY);
         if(fd >= 0)
         {
             i = 0;
@@ -466,8 +468,8 @@ bool fm_delete_preset(void)
 }
 
 static struct menu_items fm_menu_items[] = {
-    { "Add preset...", fm_add_preset },
-    { "Delete preset...", fm_delete_preset }
+    { "Add preset", fm_add_preset },
+    { "Delete preset", fm_delete_preset }
 };
     
 bool fm_menu(void)
