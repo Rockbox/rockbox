@@ -67,20 +67,12 @@ A11. The MP3 encoding hardware does not allow this.
 Q12. Change tempo of a song without changing pitch!
 A12. The MP3 decoding hardware does now allow this.
 
-Q13. Increase the 400 file limit in directories!
-A13. The original Archos firmware used really big directories was a workaround 
-     for the poor playlist capabilities of the original Archos firmware.  With 
-     Rockbox, you no longer need this workaround.  Organize your files in 
-     directories, then build playlists for all collections you want to 
-     shuffle-play.  We feel more then 400 files becomes a bit unweildly to 
-     maintain or work with.  Playlists are much easier to manage.
-
-Q14. Graphic frequency (spectrum) analyzer!
-A14. We can't access the audio waveform from the MP3 decoder so we can't
+Q13. Graphic frequency (spectrum) analyzer!
+A13. We can't access the audio waveform from the MP3 decoder so we can't
      analyze it. Even if we had access to it, the CPU would probably be too
      slow to perform the analysis anyway.
 
-Q15. Cool sound effects!
-A15. Adding new sound effects requires reprogramming the MAS chip, and we can't
+Q14. Cool sound effects!
+A14. Adding new sound effects requires reprogramming the MAS chip, and we can't
      do that. The MAS chip is programmable, but we have no access to the chip
      documentation.
