@@ -64,7 +64,7 @@ tool to drive it. Feel free to review the
 <a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_sourcecode.zip">sources</a> 
  for all of it, but be careful when fooling around with powerful toys!
 
-<h2>3. Is it dangerous?</h3>
+<h2>3. Is it dangerous?</h2>
 <p>
 Yes, certainly, like programming a mainboard BIOS, CD/DVD drive firmware,
 mobile phone, etc. If the power fails, your chip breaks while programming or
