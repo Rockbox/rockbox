@@ -241,8 +241,6 @@ int list_empty(LIST *list)         /* The list to check */
 ******************************************************************************/
 LIST_NODE *list_get_first(LIST *lh)   /* The list to read from */
 {
-   LIST_NODE *ln;
-  
    if(list_empty(lh))       /* Return NULL if the list is empty */
    {
       return NULL;
@@ -260,8 +258,6 @@ LIST_NODE *list_get_first(LIST *lh)   /* The list to read from */
 ******************************************************************************/
 LIST_NODE *list_get_last(LIST *lh)    /* The list to read from */
 {
-   LIST_NODE *ln;
-  
    if(list_empty(lh))               /* Return NULL if the list is empty */
    {
       return NULL;
