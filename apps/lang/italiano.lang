@@ -573,7 +573,7 @@ new: "Pausa"
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
-new: "ModO:"
+new: "Modo:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
@@ -1452,8 +1452,49 @@ new: "Aggiorna Il File VBR"
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
-eng: "Invert cursor"
-new: "Inverti Il Cursore"
+eng: "Line Selector"
+new: "Selettore Di Linea"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+new: "Frames Indipendenti"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new: "Barra Di Stato"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+new: "Barra Di Scorrimento"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Retroilluminazione Intestazione"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Puntatore"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Barra (Invertita)"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "Normale"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "Invertito"
+
 
 
 
