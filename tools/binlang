@@ -40,6 +40,8 @@ open(OFILE, ">$output");
 
 my $langversion = 1;
 
+binmode OFILE;
+
 printf OFILE ("\x1a%c", $langversion); # magic lang file header
 
 #
