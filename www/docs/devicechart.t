@@ -108,7 +108,7 @@
     <td>Bitmap 112x64</td>
     <td>Bitmap 112x64</td>
     <td>Bitmap 112x64</td>
-    <td>Bitmap 160x128</td>
+    <td>Bitmap 160x128, 39mmx31mm</td>
 </tr>
 <tr><th><b>Real Time Clock</b></th>
     <td>No</td>
@@ -154,6 +154,17 @@
     <td>No</td>
     <td>Yes</td>
 </tr>
+<tr><th><b>RAM (MB)</b></th>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+    <td>32</td>
+</tr>
 <tr><th><b>MP3 decoder</b></th>
     <td>MAS3507D / DAC3550A</td>
     <td>MAS3507D / DAC3550A</td>
@@ -174,7 +185,7 @@
     <td>Hardware</td>
     <td>no</td>
     <td>no</td>
-    <td>?</td>
+    <td>Hardware</td>
 </tr>
 <tr><th><b>Charge via USB</b></th>
     <td>No</td>
@@ -185,7 +196,7 @@
     <td>Yes</td>
     <td>Power</td>
     <td>Power</td>
-    <td>?</td>
+    <td>Yes</td>
 </tr>
 <tr><th><b>Hard drive poweroff</b></th>
     <td>No</td>
@@ -198,16 +209,16 @@
     <td>n.a.</td>
     <td>?</td>
 </tr>
-<tr><th><b>CPU Frequency</b></th>
-    <td>12 MHz</td>
-    <td>12 MHz</td>
-    <td>11.0592 MHz</td>
-    <td>11.0592 MHz</td>
-    <td>11.0592 MHz</td>
-    <td>11.0592 MHz</td>
-    <td>12 MHz</td>
-    <td>12 MHz</td>
-    <td>?</td>
+<tr><th><b>CPU</b></th>
+    <td>SH7034 12 MHz</td>
+    <td>SH7034 12 MHz</td>
+    <td>SH7034 11.0592 MHz</td>
+    <td>SH7034 11.0592 MHz</td>
+    <td>SH7034 11.0592 MHz</td>
+    <td>SH7034 11.0592 MHz</td>
+    <td>SH7034 12 MHz</td>
+    <td>SH7034 12 MHz</td>
+    <td>Coldfire 5249 11 - 140 MHz</td>
 </tr>
 <tr><th><b>Battery type</b></th>
     <td>NiMH (Type AA)</td>
