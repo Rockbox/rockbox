@@ -567,7 +567,6 @@ bool dbg_partitions(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static bool boost = false;
 /* Test code!!! */
 bool dbg_ports(void)
 {
@@ -694,19 +693,19 @@ bool dbg_ports(void)
         {
         case BUTTON_UP:
             cpu_boost(true);
-            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
             splash(HZ, false, buf);
             break;
             
         case BUTTON_DOWN:
             cpu_boost(false);
-            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
             splash(HZ, false, buf);
             break;
             
         case BUTTON_SELECT:
             set_cpu_frequency(CPUFREQ_DEFAULT);
-            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
             splash(HZ, false, buf);
             break;
             
