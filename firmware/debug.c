@@ -94,7 +94,6 @@ static char lowhex(int  x)
 static void putpacket (char *buffer)
 {
     register  int checksum;
-    char ch;
 
     char *src = buffer;
 
