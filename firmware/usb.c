@@ -78,12 +78,12 @@ static void usb_thread(void)
 
 static void usb_tick(void)
 {
-    int current_status;
+    bool current_status;
 
 #ifdef ARCHOS_RECORDER
-    current_status = PCDR & 0x04;
+    current_status = (PCDR & 0x04)?true:false;
 #else
-    current_status = PADR & 0x8000;
+    current_status = (PADR & 0x8000)?false:true;
 #endif
 
     if(current_status && !usb_connected)
