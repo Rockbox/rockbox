@@ -307,6 +307,8 @@ static bool rectimesplit(void)
         { "00:15" , TALK_ID(15, UNIT_MIN) },
         { "00:30" , TALK_ID(30, UNIT_MIN) },
         { "01:00" , TALK_ID(1, UNIT_HOUR) },
+        { "01:14" , TALK_ID(74, UNIT_MIN) },
+        { "01:20" , TALK_ID(80, UNIT_MIN) },
         { "02:00" , TALK_ID(2, UNIT_HOUR) },
         { "04:00" , TALK_ID(4, UNIT_HOUR) },
         { "06:00" , TALK_ID(6, UNIT_HOUR) },
@@ -318,7 +320,7 @@ static bool rectimesplit(void)
     };
     return set_option(str(LANG_RECORD_TIMESPLIT),
                       &global_settings.rec_timesplit, INT,
-                      names, 14, NULL );
+                      names, 16, NULL );
 }
 
 static bool recprerecord(void)

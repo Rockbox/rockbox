@@ -307,8 +307,8 @@ static const struct bit_entry hd_bits[] =
 #if CONFIG_HWCODEC == MAS3587F
     /* recording */
     {1, S_O(rec_editable), false, "editable recordings", off_on },
-    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...13 */
-        "off,00:05,00:10,00:15,00:30,01:00,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
+    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
+        "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
     {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
     {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
     {3, S_O(rec_quality), 5, "rec quality", NULL },
@@ -1532,6 +1532,8 @@ static const unsigned long rec_timer_seconds[] =
     15*60,    /* 00:15 */
     30*60,    /* 00:30 */
     60*60,    /* 01:00 */
+    74*60,    /* 74:00 */
+    80*60,    /* 80:00 */
     2*60*60,  /* 02:00 */
     4*60*60,  /* 04:00 */
     6*60*60,  /* 06:00 */
