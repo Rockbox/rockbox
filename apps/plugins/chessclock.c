@@ -186,6 +186,7 @@ static int run_timer(int nr)
 
     while (!done) {
         int button;
+        long now;
         if (ticks>max_ticks) {
             if (round_time) 
                 rb->lcd_puts(0, 1, "ROUND UP!");
@@ -201,7 +202,7 @@ static int run_timer(int nr)
             }
             */
             rb->lcd_puts(0, 0, player_info);
-            long now=*rb->current_tick;
+            now=*rb->current_tick;
             if (!pause) {
                 ticks+=now-last_tick;
                 if ((max_ticks-ticks)/HZ == 10) {
