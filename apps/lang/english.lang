@@ -1391,3 +1391,8 @@ id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "loaded"
 new: 
+
+id: LANG_FADE_ON_STOP
+decs: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+new:

@@ -565,6 +565,12 @@ static bool ff_rewind_min_step(void)
                       names, 14, NULL ); 
 } 
 
+static bool set_fade_on_stop(void)
+{
+    return set_bool( str(LANG_FADE_ON_STOP), &global_settings.fade_on_stop );
+}
+
+
 static bool ff_rewind_accel(void) 
 { 
     char* names[] = { str(LANG_OFF), "2x/1s", "2x/2s", "2x/3s", 
@@ -594,6 +600,7 @@ static bool playback_settings_menu(void)
         { str(LANG_FFRW_STEP), ff_rewind_min_step },
         { str(LANG_FFRW_ACCEL), ff_rewind_accel },
         { str(LANG_MP3BUFFER_MARGIN), buffer_margin },
+        { str(LANG_FADE_ON_STOP), set_fade_on_stop },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

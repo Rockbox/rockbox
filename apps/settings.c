@@ -122,6 +122,7 @@ modified unless the header & checksum test fails.
 
 
 Rest of config block, only saved to disk:
+0xAE  fade on pause/unpause/stop setting (bit 0)
 0xB0  peak meter clip hold timeout (bit 0-4)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
 0xB2  peak meter min either in -db or in percent
@@ -368,7 +369,8 @@ int settings_save( void )
         config_block[0x28]=(unsigned char)(global_settings.topruntime & 0xff);
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
-
+    
+    config_block[0xae] = (unsigned char)global_settings.fade_on_stop;
     config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
         (global_settings.peak_meter_performance ? 0x80 : 0);
     config_block[0xb1] = global_settings.peak_meter_release |
@@ -651,6 +653,8 @@ void settings_load(void)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
 
+        global_settings.fade_on_stop=config_block[0xae];
+	
         global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
         global_settings.peak_meter_performance = 
             (config_block[0xb0] & 0x80) != 0;
@@ -672,6 +676,9 @@ void settings_load(void)
         if (config_block[0xb7] != 0xff)
             global_settings.bidir_limit = config_block[0xb7];
 
+	if (config_block[0xae] != 0xff)
+	    global_settings.fade_on_stop = config_block[0xae];
+	
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -980,6 +987,8 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "trickle charge"))
             set_cfg_bool(&global_settings.trickle_charge, value);
 #endif
+        else if (!strcasecmp(name, "volume fade"))
+            set_cfg_bool(&global_settings.fade_on_stop, value);
     }
 
     close(fd);
@@ -1057,6 +1066,7 @@ void settings_reset(void) {
     global_settings.runtime = 0;
     global_settings.topruntime = 0;
     global_settings.cpu_sleep = true;
+    global_settings.fade_on_stop = true;
 }
 
 

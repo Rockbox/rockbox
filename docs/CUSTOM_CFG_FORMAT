@@ -26,6 +26,7 @@ resume                 (off, ask, on)
 scan min step          (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25) [seconds]
 scan accel             (0 - 15) [double scan speed every X seconds]
 antiskip               (0 - 7) [seconds]
+volume fade            (on, off)
 
 sort case              (on, off)
 show files             (all, supported, music)

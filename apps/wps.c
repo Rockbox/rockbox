@@ -665,6 +665,43 @@ static bool menu(void)
     return false;
 }
 
+static void fade(bool fade_in)
+{
+    if (fade_in) {
+        /* fade in */
+        int current_volume = 20;
+        
+        /* zero out the sound */
+        mpeg_sound_set(SOUND_VOLUME, current_volume);
+
+        mpeg_resume();
+        sleep(1); /* let mpeg thread run */
+        
+        while (current_volume < global_settings.volume) {    
+            current_volume += 2;
+            sleep(1);
+            mpeg_sound_set(SOUND_VOLUME, current_volume);
+        }
+        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    }
+    else {
+        /* fade out */
+        int current_volume = global_settings.volume;
+
+        while (current_volume > 20) {    
+            current_volume -= 2;
+            sleep(1);
+            mpeg_sound_set(SOUND_VOLUME, current_volume);
+        }
+        mpeg_pause();
+        sleep(1); /* let mpeg thread run */
+
+        /* reset volume to what it was before the fade */
+        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    }
+}
+
+
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
@@ -801,15 +838,21 @@ int wps_show(void)
             case BUTTON_PLAY:
                 if ( paused )
                 {
-                    mpeg_resume();
                     paused = false;
                     status_set_playmode(STATUS_PLAY);
+                    if ( global_settings.fade_on_stop )
+                        fade(1);
+                    else
+                        mpeg_resume();
                 }
                 else
                 {
-                    mpeg_pause();
                     paused = true;
                     status_set_playmode(STATUS_PAUSE);
+                    if ( global_settings.fade_on_stop )
+                        fade(0);
+                    else
+                        mpeg_pause();
                     if (global_settings.resume) {
                         settings_save();
 #ifndef HAVE_RTC
@@ -915,7 +958,7 @@ int wps_show(void)
 
                 /* stop and exit wps */
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REL:
+            case BUTTON_OFF:
 #else
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
@@ -947,6 +990,9 @@ int wps_show(void)
             status_set_record(false);
             status_set_audio(false);
 #endif
+            if (global_settings.fade_on_stop)
+                fade(0);
+                
             lcd_stop_scroll();
             mpeg_stop();
             status_set_playmode(STATUS_STOP);

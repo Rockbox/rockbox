@@ -149,6 +149,7 @@ struct user_settings
     int scroll_step;   /* pixels to advance per update */
 
     bool cpu_sleep;    /* Use sleep instruction when idle? */
+    bool fade_on_stop; /* fade on pause/unpause/stop */
 };
 
 /* prototypes */
