@@ -50,9 +50,16 @@
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #endif /* HAVE_LCD_BITMAP */
 
-#define PLAY_DISPLAY_DEFAULT         0 
-#define PLAY_DISPLAY_FILENAME_SCROLL 1 
-#define PLAY_DISPLAY_TRACK_TITLE     2 
+#ifdef HAVE_LCD_BITMAP
+    #define PLAY_DISPLAY_2LINEID3        0 
+    #define PLAY_DISPLAY_FILENAME_SCROLL 1 
+    #define PLAY_DISPLAY_TRACK_TITLE     2 
+#else
+    #define PLAY_DISPLAY_1LINEID3        0
+    #define PLAY_DISPLAY_2LINEID3        1 
+    #define PLAY_DISPLAY_FILENAME_SCROLL 2 
+    #define PLAY_DISPLAY_TRACK_TITLE     3 
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
 #define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP)
@@ -121,16 +128,28 @@ static void draw_screen(struct mp3entry* id3)
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
             {
+                char buffer[64];
                 char ch = '/';
                 char* szLast = strrchr(id3->path, ch);
 
                 if (szLast)
-                    lcd_puts_scroll(0,LINE_Y, (++szLast));
+                {
+                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
+                            id3->index + 1,
+                            playlist.amount,
+                            ++szLast);
+                }
                 else
-                    lcd_puts_scroll(0,LINE_Y, id3->path);
+                {
+                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
+                            id3->index + 1,
+                            playlist.amount,
+                            id3->path);
+                }
+                lcd_puts_scroll(0,LINE_Y, buffer);
                 break;
             }
-            case PLAY_DISPLAY_DEFAULT:
+            case PLAY_DISPLAY_2LINEID3:
             {
                 int l = LINE_Y;
 #ifdef HAVE_LCD_BITMAP
@@ -168,6 +187,21 @@ static void draw_screen(struct mp3entry* id3)
 #endif
                 break;
             }
+#ifdef HAVE_LCD_CHARCELLS
+            case PLAY_DISPLAY_1LINEID3:
+            {
+                char buffer[64];
+
+                snprintf(buffer, sizeof(buffer), "%d/%d: %s - %s",
+                        id3->index + 1,
+                        playlist.amount,
+                        id3->artist?id3->artist:"<no artist>",
+                        id3->title?id3->title:"<no title>");
+
+                lcd_puts_scroll(0, 0, buffer);
+                break;
+            }
+#endif
         }
     }
     status_draw();
@@ -313,7 +347,8 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
     /* Display time with the filename scroll only because
        the screen has room. */
     if ((global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL) ||
-        ff_rewind )
+        global_settings.wps_display == PLAY_DISPLAY_1LINEID3 ||
+        ff_rewind)
     {
         snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
                  elapsed / 60000,
@@ -601,7 +636,7 @@ int wps_show(void)
                 {
                     if (menu_button_is_down)
                     {
-                        sleep(HZ/2);
+                        sleep(HZ/6);
                         draw_screen(id3);
                     }
 
@@ -642,7 +677,7 @@ int wps_show(void)
                 {
                     if (menu_button_is_down)
                     {
-                        sleep(HZ/2);
+                        sleep(HZ/6);
                         draw_screen(id3);
                     }
 
@@ -687,9 +722,8 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-#ifdef HAVE_PLAYER_KEYPAD
                     display_volume_level(global_settings.volume);
-#endif
+
                 status_draw();
                 settings_save();
                 break;
@@ -701,9 +735,8 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-#ifdef HAVE_PLAYER_KEYPAD
-                display_volume_level(global_settings.volume);
-#endif
+                    display_volume_level(global_settings.volume);
+
                 status_draw();
                 settings_save();
                 break;
