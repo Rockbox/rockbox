@@ -98,29 +98,29 @@ LRESULT CALLBACK GUIWndProc (
                 v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->bottom = r->top + v * UI_HEIGHT / 5;
                 r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_RIGHT:
                 v = (r->right - r->left) / (UI_WIDTH / 5);
                 r->bottom = r->top + v * UI_HEIGHT / 5;
                 r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_TOP:
                 v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->top = r->bottom - v * UI_HEIGHT / 5;
                 r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_LEFT:
                 v = (r->right - r->left) / (UI_WIDTH / 5);
                 r->bottom = r->top + v * UI_HEIGHT / 5;
                 r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_BOTTOMRIGHT:
                 GetWindowRect (hWnd, &r2);
@@ -130,8 +130,8 @@ LRESULT CALLBACK GUIWndProc (
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->bottom = r->top + v * UI_HEIGHT / 5;
                 r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_BOTTOMLEFT:
                 GetWindowRect (hWnd, &r2);
@@ -141,8 +141,8 @@ LRESULT CALLBACK GUIWndProc (
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->bottom = r->top + v * UI_HEIGHT / 5;
                 r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_TOPRIGHT:
                 GetWindowRect (hWnd, &r2);
@@ -152,8 +152,8 @@ LRESULT CALLBACK GUIWndProc (
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->top = r->bottom - v * UI_HEIGHT / 5;
                 r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
+                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
                 break;
             case WMSZ_TOPLEFT:
                 GetWindowRect (hWnd, &r2);
@@ -163,13 +163,13 @@ LRESULT CALLBACK GUIWndProc (
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
                 r->top = r->bottom - v * UI_HEIGHT / 5;
                 r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION);
+                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2+4;
+                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION)+4;
                 break;
             }
 
-            wsprintf (s, "RockBox Simulator @%d%%", 
-                (r->right - r->left - GetSystemMetrics (SM_CXSIZEFRAME) * 2)
+            wsprintf (s, UI_TITLE " @%d%%", 
+                (r->right - r->left - GetSystemMetrics (SM_CXSIZEFRAME) * 2 -4)
                 * 100 / UI_WIDTH);
             SetWindowText (hWnd, s);
 
