@@ -23,9 +23,6 @@
 
 #include "X11/keysym.h"
 
-static int release_mask;
-static int repeat_mask;
-
 /*
  *Initialize buttons
  */
