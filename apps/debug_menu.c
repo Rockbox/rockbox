@@ -42,6 +42,8 @@
 #include "settings.h"
 #include "ata.h"
 #include "fat.h"
+#include "dir.h"
+#include "panic.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1245,9 +1247,13 @@ static bool dbg_disk_info(void)
     bool done = false;
     int i;
     int page = 0;
-    const int max_page = 7;
+    const int max_page = 10;
     unsigned short* identify_info = ata_get_identify();
+    bool timing_info_present = false;
+    char pio3[2], pio4[2];
 
+    lcd_setmargins(0, 0);
+    
     while(!done)
     {
         int y=0;
@@ -1317,6 +1323,47 @@ static bool dbg_disk_info(void)
                 i = identify_info[82] & (1<<6);
                 lcd_puts(0, y++, "Read-ahead:");
                 lcd_puts(0, y++, i ? "enabled" : "unsupported");
+                break;
+
+            case 8:
+                timing_info_present = identify_info[53] & (1<<1);
+                if(timing_info_present) {
+                    pio3[1] = 0;
+                    pio4[1] = 0;
+                    lcd_puts(0, y++, "PIO modes:");
+                    pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
+                    pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
+                    snprintf(buf, 128, "0 1 2 %s %s", pio3, pio4);
+                    lcd_puts(0, y++, buf);
+                } else {
+                    lcd_puts(0, y++, "No PIO mode info");
+                }
+                break;
+
+            case 9:
+                timing_info_present = identify_info[53] & (1<<1);
+                if(timing_info_present) {
+                    snprintf(buf, 128, "Min time: %dns", identify_info[67]);
+                    lcd_puts(0, y++, buf);
+                    snprintf(buf, 128, "Min IORDY: %dns", identify_info[68]);
+                    lcd_puts(0, y++, buf);
+                } else {
+                    lcd_puts(0, y++, "No timing info");
+                }
+                break;
+
+            case 10:
+                timing_info_present = identify_info[53] & (1<<1);
+                if(timing_info_present) {
+                    i = identify_info[49] & (1<<11);
+                    snprintf(buf, 128, "IORDY support: %s", i ? "yes" : "no");
+                    lcd_puts(0, y++, buf);
+                    i = identify_info[49] & (1<<10);
+                    snprintf(buf, 128, "IORDY disable: %s", i ? "yes" : "no");
+                    lcd_puts(0, y++, buf);
+                } else {
+                    lcd_puts(0, y++, "No timing info");
+                }
                 break;
         }
         lcd_update();
