@@ -80,6 +80,12 @@ int button_set_release(int newmask);
 
 #endif /* HAVE_PLAYER_KEYPAD */
 
-#define DEFAULT_RELEASE_MASK 0
+#define DEFAULT_RELEASE_MASK ALL_BUTTONS
 
 #endif
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../rockbox-mode.el")
+ * end:
+ */
