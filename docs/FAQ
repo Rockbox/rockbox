@@ -33,12 +33,19 @@ A7. Start by reading up on the information about the jukeboxes on our web page.
 
 Q8. Okay, so how do I submit a patch?
 A8. Run: "diff -ub oldfile newfile > patchfile" against the file(s) you have 
-    changed.  Then mail the output to the rockbox mailing list and 
-    we will take it under consideration. Please remember that all 
+    changed.  Then submit the patch to the project via Sourceforge's patch
+    tracker.  See: http://sourceforge.net/tracker/?group_id=44306&atid=439120
+    Your patch will be taken under consideration. Please remember that all 
     submissions are not automatically accepted. This is nothing personal.
 
     Preferrably, run the diff against the current cvs code:
         cvs diff -ub > patchfile
+
+    One last note.  We would appreciate it if *all* patches, files and fixes 
+    that are meant for inclusion in the sources would be posted to the patch
+    tracker.  Patches sent to the mailing list are quickly lost in the 
+    traffic of the list itself.  (And looking back in the archives for 
+    missed patches quickly becomes a nightmare.)
 
 Q9. I want to join the development team, but don't have a SourceForge account,
     what should I do?
