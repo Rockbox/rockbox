@@ -43,7 +43,12 @@
 #include "lang.h"
 #include "keyboard.h"
 
-#if defined(LITTLE_ENDIAN) || defined(_X86_)
+/* workaround for cygwin not defining endian macros */
+#if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN) && defined(_X86_)
+#define LITTLE_ENDIAN
+#endif
+
+#ifdef LITTLE_ENDIAN
 #define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
                    ((_x_ & 0x00ff0000) >> 8) | \
                    ((_x_ & 0x0000ff00) << 8) | \
