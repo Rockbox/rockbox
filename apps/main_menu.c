@@ -27,6 +27,8 @@
 #include "sound_menu.h"
 #include "version.h"
 #include "debug.h"
+#include "sprintf.h"
+#include <string.h>
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
