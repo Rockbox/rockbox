@@ -30,3 +30,4 @@ extern int open(char* pathname, int flags);
 extern int close(int fd);
 extern int read(int fd, void* buf, int count);
 extern int lseek(int fd, int offset, int whence);
+extern int printf(const char *format, ...);
