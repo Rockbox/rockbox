@@ -2794,11 +2794,12 @@ static void mpeg_thread(void)
     while ( 1 ) {
         if (is_playing) {
             id3 = mpeg_current_track();
-            id3->elapsed+=1000;
+            if (!paused)
+                id3->elapsed+=1000;
             if (id3->elapsed>=id3->length)
                 mpeg_next();
         }
-        sleep(1);
+        sleep(HZ);
     }
 }
 #endif
