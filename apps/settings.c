@@ -267,7 +267,8 @@ int settings_save( void )
         ((global_settings.playlist_shuffle & 1) |
          ((global_settings.mp3filter & 1) << 1) |
          ((global_settings.sort_case & 1) << 2) |
-         ((global_settings.discharge & 1) << 3));
+         ((global_settings.discharge & 1) << 3) |
+         ((global_settings.statusbar & 1) << 4));
 
     rtc_config_block[0xf] = (unsigned char)
         ((global_settings.scroll_speed << 3) |
@@ -275,9 +276,6 @@ int settings_save( void )
     
     rtc_config_block[0x11] = (unsigned char)global_settings.avc;
     
-    rtc_config_block[0x12] = (unsigned char)
-        ((global_settings.statusbar & 1));
-
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
     
     if(save_config_buffer())
@@ -338,6 +336,7 @@ void settings_load(void)
             global_settings.mp3filter = (rtc_config_block[0xe] >> 1) & 1;
             global_settings.sort_case = (rtc_config_block[0xe] >> 2) & 1;
             global_settings.discharge = (rtc_config_block[0xe] >> 3) & 1;
+            global_settings.statusbar = (rtc_config_block[0xe] >> 4) & 1;
         }
         
         c = rtc_config_block[0xf] >> 3;
@@ -351,10 +350,6 @@ void settings_load(void)
         if (rtc_config_block[0x11] != 0xFF)
             global_settings.avc = rtc_config_block[0x11];
 
-        if (rtc_config_block[0x12] != 0xFF) {
-            global_settings.statusbar = rtc_config_block[0x12] & 1;
-        }
-    
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
     }
