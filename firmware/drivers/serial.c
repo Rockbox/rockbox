@@ -91,6 +91,7 @@ int remote_control_rx(void)
         }
         else
         {
+#ifndef HAVE_NEO_KEYPAD /* This needs to be fixed for Neo */
             switch (btn)
             {
                 case STOP:
@@ -126,6 +127,7 @@ int remote_control_rx(void)
                     last_valid_button = BUTTON_NONE;
                     break;
             }
+#endif
         }
     }
     else

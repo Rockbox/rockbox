@@ -105,7 +105,7 @@ static char pattern_size; /* Last pattern, 3 for old LCD, 7 for new LCD */
 
 static bool new_lcd;
 
-extern unsigned short *lcd_ascii;
+unsigned short *lcd_ascii;
 static char lcd_contrast_set;
 static char lcd_cram;
 static char lcd_pram;
@@ -130,7 +130,9 @@ static void lcd_free_pat(int map_ch)
 
         substitute_char=lcd_player_extended_lcd_to_rocklatin1[map_ch];
 
+        /* TODO: use a define for the screen width! */
         for (x=0; x<11; x++) {
+            /* TODO: use a define for the screen height! */
             for (y=0; y<2; y++)  {
                 if (map_ch==lcd_ascii[buffer_xlcd[x][y]]-512) {
                     buffer_xlcd[x][y]=substitute_char;
@@ -480,7 +482,11 @@ void lcd_set_contrast(int val)
 
 void lcd_init (void)
 {
+#ifdef HAVE_NEO_LCD
+    new_lcd = true;
+#else
     new_lcd = has_new_lcd();
+#endif
     memset(extended_chars_mapped, NO_CHAR, sizeof(extended_chars_mapped));
     memset(extended_pattern_content, NO_CHAR,sizeof(extended_pattern_content));
     memset(extended_pattern_usage, 0, sizeof(extended_pattern_usage));
@@ -491,7 +497,7 @@ void lcd_init (void)
         lcd_cram = NEW_LCD_CRAM;
         lcd_pram = NEW_LCD_PRAM;
         lcd_iram = NEW_LCD_IRAM;
-        pattern_size=7; /* Last pattern, 3 for old LCD, 7 for new LCD */
+        pattern_size=7; /* Last pattern, 7 for new LCD */
     }
     else {
         lcd_ascii = old_lcd_rocklatin1_to_xlcd;
@@ -499,7 +505,7 @@ void lcd_init (void)
         lcd_cram = OLD_LCD_CRAM;
         lcd_pram = OLD_LCD_PRAM;
         lcd_iram = OLD_LCD_IRAM;
-        pattern_size=3; /* Last pattern, 3 for old LCD, 7 for new LCD */
+        pattern_size=3; /* Last pattern, 3 for old LCD */
     }
     
     lcd_set_contrast(lcd_default_contrast());
@@ -718,5 +724,47 @@ static void scroll_thread(void)
         sleep(HZ/scroll_speed);
     }
 }
+
+#ifdef HAVE_NEO_LCD
+
+/*
+ * Function use by the Neo code, but could/should be made a generic one.
+ */
+void lcd_cursor(int x, int y)
+{
+    /* If we make sure the display size is setup with proper defines in the
+       config-*.h files, this should work on all displays */
+    if ((cursor.y_pos==y && cursor.x_pos==x) ||
+        x>=20 ||
+        y>3 ||
+        x<0 ||
+        y<0) {
+        DEBUGF("ignoring request for cursor to %d,%d - currently %d,%d\n",
+               x,y,cursor.x_pos,cursor.y_pos);
+        return;
+    }
+
+    char value=0;
+    
+    cursor.y_pos=y;
+    cursor.x_pos=x;
+    
+    switch (y) {
+        case 0:
+            value=0x80|x;
+            break;
+        case 1:
+            value=0x80|(x+0x40);
+            break;
+        case 2:
+            value=0x80|(x+0x14);
+            break;
+        case 3:
+            value=0x80|(x+0x54);
+            break;
+    }
+    lcd_write(true,value);
+}
+#endif
 
 #endif /* HAVE_LCD_CHARCELLS */

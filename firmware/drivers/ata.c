@@ -577,6 +577,7 @@ static void ata_thread(void)
         }
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
+#ifndef USB_NONE
             case SYS_USB_CONNECTED:
                 if (poweroff) {
                     mutex_lock(&ata_mtx);
@@ -593,7 +594,7 @@ static void ata_thread(void)
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&ata_queue);
                 break;
-
+#endif
             case Q_SLEEP:
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
