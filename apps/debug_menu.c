@@ -139,6 +139,9 @@ bool dbg_hw_info(void)
     int pr_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
+    unsigned char sec, sec2;
+    unsigned long tick;
+    bool is_12mhz;
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -149,6 +152,19 @@ bool dbg_hw_info(void)
         pr_polarity = 0; /* Negative */
     else
         pr_polarity = 1; /* Positive */
+
+    sec = rtc_read(0x01);
+    do {
+        sec2 = rtc_read(0x01);
+    } while(sec == sec2);
+
+    tick = current_tick;
+    
+    do {
+        sec = rtc_read(0x01);
+    } while(sec2 == sec);
+
+    is_12mhz = (current_tick - tick > HZ);
     
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -170,6 +186,9 @@ bool dbg_hw_info(void)
     
     snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
     lcd_puts(0, 5, buf);
+    
+    snprintf(buf, 32, "Freq: %s", is_12mhz?"12MHz":"11.0592MHz");
+    lcd_puts(0, 6, buf);
     
     lcd_update();
     
@@ -215,7 +234,7 @@ bool dbg_hw_info(void)
                 break;
         }
             
-        lcd_puts(0, 0, buf);
+        lcd_puts(0, 1, buf);
         lcd_update();
         
         button = button_get(true);
