@@ -151,8 +151,8 @@
 #define PADR          0x05FFFFC0
 #define PBDR          0x05FFFFC2
 #define PABIOR        0x05FFFFC4
-#define PAIOR         0x05FFFFC4
-#define PBIOR         0x05FFFFC6
+#define PAIOR         (*((volatile unsigned short *)0x05FFFFC4))
+#define PBIOR         (*((volatile unsigned short *)0x05FFFFC6))
 #define PACR          0x05FFFFC8
 #define PACR1         0x05FFFFC8
 #define PACR2         0x05FFFFCA
