@@ -46,6 +46,7 @@ bool dirbrowse(char *root)
   if(!dir)
     return TRUE; /* failure */
 
+#ifdef HAVE_LCD_BITMAP
   lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 
   lcd_puts(0,0, "[Browse]", 0);
@@ -97,6 +98,7 @@ bool dirbrowse(char *root)
       break;
     }
   }
+#endif
 
   return FALSE;
 }

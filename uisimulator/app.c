@@ -26,6 +26,8 @@
 #include "tree.h"
 #include "screensaver.h"
 
+#ifdef HAVE_LCD_BITMAP
+
 extern void tetris(void);
 
 #define MENU_ITEM_FONT    0
@@ -45,7 +47,7 @@ struct Menu_Items {
 struct Menu_Items items[] = {
     { Tetris,       "Tetris",       tetris      },
     { Screen_Saver, "Screen Saver", screensaver },
-    { Browse,       "Browse",       dirbrowse   },
+    { Browse,       "Browse",       browse_root },
 };
 
 
@@ -154,5 +156,26 @@ void app_main(void)
     }
 }
 
+#else
 
+void app_main(void)
+{
+    int key;
+    int cursor = 0;
 
+    lcd_puts(0,0, "Mooo!");
+    lcd_puts(1,1, " Rockbox!");
+
+    while(1) {
+      key = button_get();
+
+      if(!key) {
+        sleep(1);
+        continue;
+      }
+
+    }
+    
+}
+
+#endif

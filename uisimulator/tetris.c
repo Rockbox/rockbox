@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#ifdef HAVE_LCD_BITMAP
+
 #include "types.h"
 #include "lcd.h"
 #include "button.h"
@@ -356,3 +358,5 @@ void tetris(void)
     new_block();
     game_loop();
 }
+
+#endif

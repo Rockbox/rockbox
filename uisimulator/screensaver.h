@@ -23,4 +23,5 @@
 void ss_loop(void);
 void screensaver(void);
 
-#endif __SCREEN_SAVER_H__
+#endif /*__SCREEN_SAVER_H__ */
+
