@@ -2070,6 +2070,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 
 #ifdef DEBUG
     dbg_timer_start();
+    dbg_cnt2us(0);
 #endif
 }
 
