@@ -790,9 +790,10 @@ bool rectrigger(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                usb_screen();
-                retval = true;
-                exit_request = true;
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+                    retval = true;
+                    exit_request = true;
+                }
                 break;
         }
     }
