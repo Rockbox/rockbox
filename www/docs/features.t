@@ -239,7 +239,7 @@ NO
 EFEAT
 
 NAME Number of available languages ENAME
-TD 16 ETD
+TD 17 ETD
 TD 3? ETD
 EFEAT
 
@@ -249,7 +249,7 @@ NO
 EFEAT
 
 NAME FM Tuner support (FM Recorder) ENAME
-NO
+YES
 YES
 EFEAT
 
