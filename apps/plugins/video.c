@@ -368,7 +368,7 @@ void timer4_isr(void) // IMIA4
         if (!gBuf.bEOF && available < gStats.minVideoAvail)
             gStats.minVideoAvail = available;
 
-        if (available < (int)gFileHdr.blocksize)
+        if (available <= (int)gFileHdr.blocksize)
         {   // no data for next frame
 
             if (gBuf.bEOF && (gFileHdr.flags & FLAG_LOOP))
@@ -425,7 +425,7 @@ void GetMoreMp3(unsigned char** start, int* size)
     if (!gBuf.bEOF && available < gStats.minAudioAvail)
         gStats.minAudioAvail = available;
     
-    if (available < advance || advance == 0)
+    if (available < advance + gFileHdr.blocksize || advance == 0)
     {
         gPlay.bAudioUnderrun = true;
         return; // no data available
