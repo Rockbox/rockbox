@@ -14,16 +14,13 @@
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
-#define HAVE_SCF5249
+#define CONFIG_CPU MCF5249
 
 /* Define this if the platform has batteries */
 #define HAVE_BATTERIES 1
 
 /* The start address index for ROM builds */
 #define ROM_START 0x11010
-
-/* Define this for programmable LED available */
-#define HAVE_LED
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
