@@ -38,14 +38,11 @@
 static void ss_loop(void)
 {
     int b;
-    int x2 = LCD_WIDTH/2;
-    int y2 = LCD_HEIGHT/2;
     int x = LCD_WIDTH/2;
     int y = LCD_HEIGHT/2;
     int i = 0;
     int center = 0;
     int factor = 0;
-    int offset = 0;
 
     if (LCD_HEIGHT < LCD_WIDTH)
         center = LCD_HEIGHT/2;
@@ -67,14 +64,12 @@ static void ss_loop(void)
             i = center;
         }
 
-        offset=i*factor;
-
         b = button_get(false);
         if ( b & BUTTON_OFF )
             return;
 
         lcd_clear_display();
-        lcd_drawrect(x-offset, y-offset, x2+offset, y2+offset);
+        lcd_drawrect(x-i, y-i, 2*i+1, 2*i+1);
         lcd_update();
 
         i+=factor;

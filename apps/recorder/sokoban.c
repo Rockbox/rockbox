@@ -931,8 +931,8 @@ void update_screen(void) {
         for (c=0 ; c<20 ; c++) {
             switch ( board[b][c] ) {
                 case 0: /* this is a black space */
-                    lcd_drawrect (c*4, b*4, c*4+3, b*4+3);
-                    lcd_drawrect (c*4+1, b*4+1, c*4+2, b*4+2);
+                    lcd_drawrect (c*4, b*4, 4, 4);
+                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
                     break;
 
                 case 2: /* this is a wall */
@@ -947,11 +947,11 @@ void update_screen(void) {
                     break;
 
                 case 3: /* this is a home location */
-                    lcd_drawrect (c*4+1, b*4+1, c*4+2, b*4+2);
+                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
                     break;
 
                 case 4: /* this is a box */
-                    lcd_drawrect (c*4, b*4, c*4+3, b*4+3);
+                    lcd_drawrect (c*4, b*4, 4, 4);
                     break;
 
                 case 5: /* this is you */
@@ -963,8 +963,8 @@ void update_screen(void) {
                     break;
 
                 case 7: /* this is a box on a home spot */ 
-                    lcd_drawrect (c*4, b*4, c*4+3, b*4+3);
-                    lcd_drawrect (c*4+1, b*4+1, c*4+2, b*4+2);
+                    lcd_drawrect (c*4, b*4, 4, 4);
+                    lcd_drawrect (c*4+1, b*4+1, 2, 2);
                     break;
             }
         }
@@ -976,8 +976,8 @@ void update_screen(void) {
     snprintf (s, sizeof(s), "%d", moves);
     lcd_putsxy (86, 54, s, 0);
 
-    lcd_drawrect (80,0,111,31);
-    lcd_drawrect (80,32,111,63);
+    lcd_drawrect (80,0,32,32);
+    lcd_drawrect (80,32,32,64);
     lcd_putsxy (81, 10, "Level", 0);
     lcd_putsxy (81, 42, "Moves", 0);
     /* print out the screen */
