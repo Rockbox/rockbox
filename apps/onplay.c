@@ -127,32 +127,27 @@ static int insert_space_in_file(char *fname, int fpos, int num_bytes)
     snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
 
     orig_fd = open(fname, O_RDONLY);
-    if(orig_fd < 0)
-    {
+    if(orig_fd < 0) {
         return 10*orig_fd - 1;
     }
 
     fd = creat(tmpname, O_WRONLY);
-    if(fd < 0)
-    {
+    if(fd < 0) {
         close(orig_fd);
         return 10*fd - 2;
     }
 
     /* First, copy the initial portion (the ID3 tag) */
-    if(fpos)
-    {
+    if(fpos) {
         readlen = read(orig_fd, mp3buf, fpos);
-        if(readlen < 0)
-        {
+        if(readlen < 0) {
             close(fd);
             close(orig_fd);
             return 10*readlen - 3;
         }
         
         rc = write(fd, mp3buf, readlen);
-        if(rc < 0)
-        {
+        if(rc < 0) {
             close(fd);
             close(orig_fd);
             return 10*rc - 4;
@@ -163,35 +158,30 @@ static int insert_space_in_file(char *fname, int fpos, int num_bytes)
     memset(mp3buf, 0, num_bytes);
 
     rc = write(fd, mp3buf, num_bytes);
-    if(rc < 0)
-    {
+    if(rc < 0) {
         close(orig_fd);
         close(fd);
         return 10*rc - 5;
     }
 
     rc = lseek(orig_fd, 0, SEEK_SET);
-    if(rc < 0)
-    {
+    if(rc < 0) {
         close(orig_fd);
         close(fd);
         return 10*rc - 6;
     }
 
     /* Copy the file */
-    do
-    {
+    do {
         readlen = read(orig_fd, mp3buf, mp3end - mp3buf);
-        if(readlen < 0)
-        {
+        if(readlen < 0) {
             close(fd);
             close(orig_fd);
             return 10*readlen - 7;
         }
 
         rc = write(fd, mp3buf, readlen);
-        if(rc < 0)
-        {
+        if(rc < 0) {
             close(fd);
             close(orig_fd);
             return 10*rc - 8;
@@ -203,21 +193,24 @@ static int insert_space_in_file(char *fname, int fpos, int num_bytes)
 
     /* Remove the old file */
     rc = remove(fname);
-    if(rc < 0)
-    {
+    if(rc < 0) {
         return 10*rc - 9;
     }
 
     /* Replace the old file with the new */
     rc = rename(tmpname, fname);
-    if(rc < 0)
-    {
+    if(rc < 0) {
         return 10*rc - 9;
     }
     
     return 0;
 }
-        
+
+static void fileerror(int rc)
+{
+    splash(HZ*2, 0, true, "File error: %d", rc);
+}
+
 static bool vbr_fix(void)
 {
     unsigned char xingbuf[417];
@@ -229,9 +222,8 @@ static bool vbr_fix(void)
     int fpos;
     int numbytes;
 
-    if(mpeg_status())
-    {
-        splash(HZ*2, 0, true, "Stop the playback");
+    if(mpeg_status()) {
+        splash(HZ*2, 0, true, str(LANG_VBRFIX_STOP_PLAY));
         return reload_dir;
     }
     
@@ -242,16 +234,14 @@ static bool vbr_fix(void)
     xingupdate(0);
 
     rc = mp3info(&entry, selected_file);
-    if(rc < 0)
-    {
-        splash(HZ*2, 0, true, "File error: %d", rc);
+    if(rc < 0) {
+        fileerror(rc);
         return true;
     }
     
     fd = open(selected_file, O_RDWR);
-    if(fd < 0)
-    {
-        splash(HZ*2, 0, true, "File error: %d", fd);
+    if(fd < 0) {
+        fileerror(fd);
         return true;
     }
 
@@ -262,30 +252,23 @@ static bool vbr_fix(void)
     num_frames = count_mp3_frames(fd, entry.first_frame_offset,
                                   flen, xingupdate);
 
-    if(num_frames)
-    {
+    if(num_frames) {
         create_xing_header(fd, entry.first_frame_offset,
                            flen, xingbuf, num_frames, xingupdate, true);
         
         /* Try to fit the Xing header first in the stream. Replace the existing
            Xing header if there is one, else see if there is room between the
            ID3 tag and the first MP3 frame. */
-        if(entry.vbr_header_pos)
-        {
+        if(entry.vbr_header_pos) {
             /* Reuse existing Xing header */
             fpos = entry.vbr_header_pos;
             
             DEBUGF("Reusing Xing header at %d\n", fpos);
-        }
-        else
-        {
+        } else {
             /* Any room between ID3 tag and first MP3 frame? */
-            if(entry.first_frame_offset - entry.id3v2len > 417)
-            {
+            if(entry.first_frame_offset - entry.id3v2len > 417) {
                 fpos = entry.first_frame_offset - 417;
-            }
-            else
-            {
+            } else {
                 /* If not, insert some space. If there is an ID3 tag in the
                    file we only insert just enough to squeeze the Xing header
                    in. If not, we insert 4K. */
@@ -298,16 +281,14 @@ static bool vbr_fix(void)
                 rc = insert_space_in_file(selected_file,
                                           entry.first_frame_offset, numbytes);
                 
-                if(rc < 0)
-                {
-                    splash(HZ*2, 0, true, "File error: %d", rc);
+                if(rc < 0) {
+                    fileerror(rc);
                     return true;
                 }
                 
                 /* Reopen the file */
                 fd = open(selected_file, O_RDWR);
-                if(fd < 0)
-                {
+                if(fd < 0) {
                     splash(HZ*2, 0, true, "File reopen error: %d", fd);
                     return true;
                 }
@@ -316,8 +297,20 @@ static bool vbr_fix(void)
             }
         }
         
-        lseek(fd, fpos, SEEK_SET);
-        write(fd, xingbuf, 417);
+        rc = lseek(fd, fpos, SEEK_SET);
+        if(rc < 0) {
+            close(fd);
+            fileerror(rc);
+            return true;
+        }
+        
+        rc = write(fd, xingbuf, 417);
+        if(rc < 0) {
+            close(fd);
+            fileerror(rc);
+            return true;
+        }
+        
         close(fd);
         
         xingupdate(100);
@@ -326,11 +319,12 @@ static bool vbr_fix(void)
     {
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
-        splash(HZ*2, 0, true, "Not a VBR file");
+        splash(HZ*2, 0, true, str(LANG_VBRFIX_NOT_VBR));
     }
 
     return false;
 }
+
 int onplay(char* file, int attr)
 {
     struct menu_items menu[5]; /* increase this if you add entries! */
