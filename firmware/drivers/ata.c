@@ -473,7 +473,7 @@ static void ata_thread(void)
                 break;
 
             case Q_SLEEP:
-                last_disk_activity = current_tick - sleep_timeout;
+                last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
         }
     }
