@@ -2,6 +2,12 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
+<h2>Note</h2>
+
+<p>The 1.1 version is now quite old. We didn't manage to release the 1.2
+version before the summer vacation, so we would recommend you to try one
+of the daily builds if you want to experience the true Rockbox power.
+
 <h2>Version 1.1</h2>
 
 <p>Recorder support, playlists and scrolling are the main new features of this version. Read the <a href="rockbox-1.1-notes.txt">release notes</a>.
