@@ -1,6 +1,14 @@
 #define _PAGE_ Jukebox notes
 #include "head.t"
 
+<center><table class=rockbox width=70%><tr><td>
+<h2>Important:</h2>
+<p>This page was written in late 2001/early 2002 during the initial reverse engineering of the hardware. Much of the information has since turned out to be wrong.
+<p>View this page as a historical anecdote more than hard facts.
+<p align=right>/Björn
+</td></tr></table>
+</center>
+
 <h2>Exception vectors</h2>
 
 <p>The first 0x200 bytes of the image appears to be the exception vector table.
