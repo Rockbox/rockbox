@@ -199,7 +199,7 @@ static void showfileline(int line, int direntry, bool scroll)
         !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
         char* dotpos = strrchr(dircache[direntry].name, '.');
-        char temp;
+        char temp=0;
         if (dotpos) {
             temp = *dotpos;
             *dotpos = 0;
@@ -208,7 +208,7 @@ static void showfileline(int line, int direntry, bool scroll)
             lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
         else
             lcd_puts(LINE_X, line, dircache[direntry].name);
-        if (dotpos)
+        if (temp)
             *dotpos = temp;
     }
     else {
