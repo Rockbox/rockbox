@@ -686,7 +686,7 @@ void settings_load(void)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
 
-        if (config_block[0x29] != 0xae) {
+        if (config_block[0xae] != 0xff) {
             global_settings.fade_on_stop = config_block[0xae] & 1;
             global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
         }
