@@ -448,3 +448,18 @@ A53: It sees the playlist as a deck of cards, shuffling the entries using a
      The random seed is stored in the persistent setting area, so that the
      resume feature can shuffle the playlist in exactly the same way when
      resuming.
+
+Q54: How can I see what bugs are currently open/being worked on?
+A54: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
+     that have been reported.
+
+Q55: How can I report about bugs in Rockbox?
+A55: If we were better programmers we would take that as an insult.  But we
+     aren't, so we won't.  The first step in reporting a bug is to review 
+     the rules we ask you to follow in your submission (listed at: 
+     http://rockbox.haxx.se/bugs.shtml#rules).
+
+     Please note that we ask reports of bugs in CVS/daily builds to be sent
+     to the mailing list, and bugs in released versions of Rockbox to be
+     submitted through SourceForge's bug tracker.  (A link to the bug tracker
+     can be found under our bug submission rules.)
