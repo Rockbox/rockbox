@@ -84,7 +84,7 @@ struct scrollinfo {
     long start_tick;
 };
 
-static int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
+static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
@@ -212,7 +212,6 @@ void lcd_roll(int lines)
 
 void lcd_clear_display (void)
 {
-    DEBUGF("lcd_clear_display()\n");
     memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
     scrolling_lines = 0;
 }
@@ -244,7 +243,6 @@ int lcd_getstringsize(unsigned char *str, int *w, int *h)
     int ch;
     int width = 0;
 
-    /*    DEBUGF("lcd_getstringsize('%s')\n",  str); */
     while((ch = *str++)) {
         /* check input range*/
         if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
@@ -671,19 +669,24 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
     int index;
     int free_index=0;
 
-    DEBUGF("lcd_puts_scroll(%d, %d, %s)\n", x, y, string);
     for (index = 0; index < SCROLLABLE_LINES; index++) {
         s = &scroll[index];
+
         if (scrolling_lines&(1<<index)) {
             if (s->starty == y) {
+                /* we prefer to re-use an existing index with the
+                   same y-position */
                 free_index=index;
                 break;
             }
-        } else
+        }
+        else {
+            /* remember the last unused one */
             free_index=index;
+        }
     }
     index=free_index;
-
+    s = &scroll[index]; /* get the proper 's' */
     s->start_tick = current_tick + scroll_delay;
 
     lcd_puts(x,y,string);
@@ -693,14 +696,14 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
         /* prepare scroll line */
         char *end;
 
-        scrolling_lines|=(1<<index);
         memset(s->line, 0, sizeof s->line);
         strcpy(s->line, string);
 
         /* get width */
         s->width = lcd_getstringsize(s->line, &w, &h);
 
-        /* scroll bidirectional or forward only depending on the string width */
+        /* scroll bidirectional or forward only depending on the string
+           width */
         if ( bidir_limit ) {
             s->bidir = s->width < (LCD_WIDTH - xmargin) *
                 (100 + bidir_limit) / 100;
@@ -714,7 +717,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
             s->width = lcd_getstringsize(s->line, &w, &h);
         }
 
-        for (end = s->line; *end; end++);
+        end = strchr(s->line, '\0');
         strncpy(end, string, LCD_WIDTH/2);
 
         s->len = strlen(string);
@@ -722,34 +725,15 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
         s->startx = x;
         s->starty = y;
         s->backward = false;
+        scrolling_lines |= (1<<index);
     }
+    else
+        /* force a bit switch-off since it doesn't scroll */
+        scrolling_lines &= ~(1<<index);
 }
 
 void lcd_stop_scroll(void)
 {
-    DEBUGF("lcd_stop_scroll()\n");
-#if 0
-    struct scrollinfo* s;
-    int w,h;
-    int index;
-    int update=0;
-    for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-        s = &scroll[index];
-        if ( scrolling_lines&(1<<index) ) {
-            lcd_getstringsize(s->line, &w, &h);
-            lcd_clearrect(xmargin + s->startx * w / s->len,
-                          ymargin + s->starty * h,
-                          LCD_WIDTH - xmargin,
-                          h);
-
-            /* restore scrolled row */
-            lcd_puts(s->startx, s->starty, s->line);
-            update++;
-        }
-    }
-    if(update)
-        lcd_update(); /* update only if needed */
-#endif
     scrolling_lines=0;
 }
 
@@ -784,11 +768,11 @@ static void scroll_thread(void)
 
     while ( 1 ) {
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-            s = &scroll[index];
-
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
                 continue;
+
+            s = &scroll[index];
 
             /* check pause */
             if (TIME_BEFORE(current_tick, s->start_tick))
