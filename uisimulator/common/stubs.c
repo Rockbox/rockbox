@@ -184,6 +184,18 @@ int rtc_read(int address)
 
   case 2: /* minute */
     return (teem->tm_min%10) | ((teem->tm_min/10) << 4);
+
+  case 1: /* seconds */
+    return (teem->tm_sec%10) | ((teem->tm_sec/10) << 4);
+
+  case 7: /* year */
+    return ((teem->tm_year-100)%10) | (((teem->tm_year-100)/10) << 4);
+
+  case 6: /* month */
+    return ((teem->tm_mon+1)%10) | (((teem->tm_mon+1)/10) << 4);
+
+  case 5: /* day */
+    return (teem->tm_mday%10) | ((teem->tm_mday/10) << 4);
   }
 
   return address ^ 0x55;
