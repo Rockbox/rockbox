@@ -504,6 +504,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
@@ -519,6 +521,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
@@ -553,6 +557,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
@@ -573,6 +579,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
@@ -685,6 +693,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                 }
                 break;
 
@@ -725,6 +735,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
                 break;
@@ -761,6 +773,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
                 lcd_stop_scroll();
@@ -830,6 +844,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
@@ -842,6 +858,8 @@ int wps_show(void)
                     else
                         mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     display_mute_text(device_muted);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     draw_screen(id3);
                 }
                 dont_go_to_menu = true;
@@ -864,6 +882,8 @@ int wps_show(void)
 #endif
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                 }
 
                 dont_go_to_menu = true;
@@ -886,6 +906,8 @@ int wps_show(void)
                     ignore_keyup = true;
                     id3 = mpeg_current_track();
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                 }
                 else
                 {
@@ -907,6 +929,8 @@ int wps_show(void)
                 else
                     lcd_setmargins(0, 0);
                 draw_screen(id3);
+                if (mpeg_is_playing() && id3)
+                    display_file_time(id3->elapsed, id3->length);
 #endif
                 break;
 #endif
@@ -920,6 +944,8 @@ int wps_show(void)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
+                    if (mpeg_is_playing() && id3)
+                        display_file_time(id3->elapsed, id3->length);
                     break;
                 }
 
