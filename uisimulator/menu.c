@@ -37,7 +37,7 @@ enum Main_Menu_Ids {
     Tetris, Screen_Saver, Browse, Last_Id
 };
 
-struct Main_Menu_Items items[] = {
+struct main_menu_items items[] = {
     { Tetris,       "Tetris",       tetris      },
     { Screen_Saver, "Screen Saver", screensaver },
     { Browse,       "Browse",       browse_root },

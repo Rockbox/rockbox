@@ -20,7 +20,7 @@
 #ifndef __MENU_H__
 #define __MENU_H__
 
-struct Main_Menu_Items {
+struct main_menu_items {
     int menu_id;
     const char *menu_desc;
     void (*function) (void);
