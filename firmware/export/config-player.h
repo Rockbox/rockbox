@@ -50,6 +50,9 @@
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
 
+/* The start address index for ROM builds */
+#define ROM_START 0xD010
+
 /* Define this for programmable LED available */
 #define HAVE_LED
 

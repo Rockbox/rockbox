@@ -268,8 +268,8 @@ if [ -z "$archos" ]; then
     tool="$rootdir/tools/scramble"
     output="archos.mod"
     appextra="player"
-    archosrom=""
-    flash=""
+    archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
