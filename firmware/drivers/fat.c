@@ -992,9 +992,11 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
         {
             firstbyte = dir->cached_buf[i*32];
 
-            if(firstbyte == 0xe5)
+            if(firstbyte == 0xe5) {
                 /* free entry */
+                sectoridx = 0;
                 continue;
+            }
 
             if(firstbyte == 0) {
                 /* last entry */
@@ -1054,6 +1056,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                         entry->name[l]=0;
                     }
                     done = 1;
+                    sectoridx = 0;
                     break;
                 }
             }
