@@ -190,36 +190,21 @@ struct fsinfo {
 
 struct bpb
 {
-    char bs_oemname[9];  /* OEM string, ending with \0 */
-    int bpb_bytspersec;  /* Bytes per sectory, typically 512 */
+    int bpb_bytspersec;  /* Bytes per sector, typically 512 */
     unsigned int bpb_secperclus;  /* Sectors per cluster */
     int bpb_rsvdseccnt;  /* Number of reserved sectors */
     int bpb_numfats;     /* Number of FAT structures, typically 2 */
-    int bpb_rootentcnt;  /* Number of dir entries in the root */
     int bpb_totsec16;    /* Number of sectors on the volume (old 16-bit) */
     int bpb_media;       /* Media type (typically 0xf0 or 0xf8) */
     int bpb_fatsz16;     /* Number of used sectors per FAT structure */
-    int bpb_secpertrk;   /* Number of sectors per track */
-    int bpb_numheads;    /* Number of heads */
-    int bpb_hiddsec;     /* Hidden sectors before the volume */
     unsigned int bpb_totsec32;    /* Number of sectors on the volume
                                      (new 32-bit) */
     int last_word;       /* 0xAA55 */
 
-    /**** FAT12/16 specific *****/
-    int bs_drvnum;       /* Drive number */
-    int bs_bootsig;      /* Is 0x29 if the following 3 fields are valid */
-    unsigned int bs_volid; /* Volume ID */
-    char bs_vollab[12];    /* Volume label, 11 chars plus \0 */
-    char bs_filsystype[9]; /* File system type, 8 chars plus \0 */
-
     /**** FAT32 specific *****/
     int bpb_fatsz32;
-    int bpb_extflags;
-    int bpb_fsver;
     int bpb_rootclus;
     int bpb_fsinfo;
-    int bpb_bkbootsec;
 
     /* variables for internal use */
     unsigned int fatsize;
@@ -230,6 +215,7 @@ struct bpb
     unsigned int dataclusters;
     struct fsinfo fsinfo;
 #ifdef HAVE_FAT16SUPPORT
+    int bpb_rootentcnt;  /* Number of dir entries in the root */
     /* internals for FAT16 support */
     bool is_fat16; /* true if we mounted a FAT16 partition, false if FAT32 */
     unsigned int rootdirsectors; /* fixed # of sectors occupied by root dir */
@@ -334,21 +320,14 @@ int fat_mount(int startsector)
     memset(&fat_bpb, 0, sizeof(struct bpb));
     fat_bpb.startsector = startsector;
     
-    strncpy(fat_bpb.bs_oemname, &buf[BS_OEMNAME], 8);
-    fat_bpb.bs_oemname[8] = 0;
-
     fat_bpb.bpb_bytspersec = BYTES2INT16(buf,BPB_BYTSPERSEC);
     fat_bpb.bpb_secperclus = buf[BPB_SECPERCLUS];
     fat_bpb.bpb_rsvdseccnt = BYTES2INT16(buf,BPB_RSVDSECCNT);
     fat_bpb.bpb_numfats    = buf[BPB_NUMFATS];
-    fat_bpb.bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT); /* needed only for FAT16 */
     fat_bpb.bpb_totsec16   = BYTES2INT16(buf,BPB_TOTSEC16);
     fat_bpb.bpb_media      = buf[BPB_MEDIA];
     fat_bpb.bpb_fatsz16    = BYTES2INT16(buf,BPB_FATSZ16);
     fat_bpb.bpb_fatsz32    = BYTES2INT32(buf,BPB_FATSZ32);
-    fat_bpb.bpb_secpertrk  = BYTES2INT16(buf,BPB_SECPERTRK);
-    fat_bpb.bpb_numheads   = BYTES2INT16(buf,BPB_NUMHEADS);
-    fat_bpb.bpb_hiddsec    = BYTES2INT32(buf,BPB_HIDDSEC);
     fat_bpb.bpb_totsec32   = BYTES2INT32(buf,BPB_TOTSEC32);
     fat_bpb.last_word      = BYTES2INT16(buf,BPB_LAST_WORD);
 
@@ -364,6 +343,7 @@ int fat_mount(int startsector)
         fat_bpb.totalsectors = fat_bpb.bpb_totsec32;
 
 #ifdef HAVE_FAT16SUPPORT
+    fat_bpb.bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT);
     fat_bpb.rootdirsectors = ((fat_bpb.bpb_rootentcnt * 32) 
         + (fat_bpb.bpb_bytspersec - 1)) / fat_bpb.bpb_bytspersec;
 #endif /* #ifdef HAVE_FAT16SUPPORT */
@@ -405,15 +385,6 @@ int fat_mount(int startsector)
     if (fat_bpb.is_fat16)
     { /* FAT16 specific part of BPB */
         int dirclusters;  
-        fat_bpb.bs_drvnum = buf[BS_DRVNUM];
-        fat_bpb.bs_bootsig = buf[BS_BOOTSIG];
-
-        if(fat_bpb.bs_bootsig == 0x29)
-        {
-            fat_bpb.bs_volid = BYTES2INT32(buf, BS_VOLID);
-            strncpy(fat_bpb.bs_vollab, &buf[BS_VOLLAB], 11);
-            strncpy(fat_bpb.bs_filsystype, &buf[BS_FILSYSTYPE], 8);
-        }
         fat_bpb.rootdirsector = fat_bpb.bpb_rsvdseccnt
             + fat_bpb.bpb_numfats * fat_bpb.bpb_fatsz16;
         dirclusters = ((fat_bpb.rootdirsectors + fat_bpb.bpb_secperclus - 1) 
@@ -425,21 +396,8 @@ int fat_mount(int startsector)
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
     { /* FAT32 specific part of BPB */
-        fat_bpb.bpb_extflags  = BYTES2INT16(buf,BPB_EXTFLAGS);
-        fat_bpb.bpb_fsver     = BYTES2INT16(buf,BPB_FSVER);
         fat_bpb.bpb_rootclus  = BYTES2INT32(buf,BPB_ROOTCLUS);
         fat_bpb.bpb_fsinfo    = BYTES2INT16(buf,BPB_FSINFO);
-        fat_bpb.bpb_bkbootsec = BYTES2INT16(buf,BPB_BKBOOTSEC);
-        fat_bpb.bs_drvnum     = buf[BS_32_DRVNUM];
-        fat_bpb.bs_bootsig    = buf[BS_32_BOOTSIG];
-
-        if(fat_bpb.bs_bootsig == 0x29)
-        {
-            fat_bpb.bs_volid = BYTES2INT32(buf,BS_32_VOLID);
-            strncpy(fat_bpb.bs_vollab, &buf[BS_32_VOLLAB], 11);
-            strncpy(fat_bpb.bs_filsystype, &buf[BS_32_FILSYSTYPE], 8);
-        }
-
         fat_bpb.rootdirsector = cluster2sec(fat_bpb.bpb_rootclus);
     }
 
