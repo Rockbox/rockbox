@@ -193,7 +193,7 @@ static Menu ff_rewind_accel(void)
 
 static Menu browse_current(void)
 {
-    set_bool( "Browse Current Song", &global_settings.browse_current );
+    set_bool( "Follow Playlist", &global_settings.browse_current );
     return MENU_OK;
 }
 
@@ -271,7 +271,7 @@ static Menu fileview_settings_menu(void)
         { "Sort Mode",       sort_case           },
         { "Music Filter",    mp3_filter          },
         { "Hidden Files",    show_hidden_files   },
-        { "Browse Current",  browse_current      },
+        { "Follow Playlist", browse_current      },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
