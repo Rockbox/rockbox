@@ -135,8 +135,7 @@ int dbg_mkfile(char* name, int num)
         }
     }
 
-    close(fd);
-    return 0;
+    return close(fd);
 }
 
 
@@ -191,9 +190,7 @@ int dbg_chkfile(char* name, int size)
         block++;
     }
     
-    close(fd);
-
-    return 0;
+    return close(fd);
 }
 
 int dbg_wrtest(char* name)
@@ -263,9 +260,7 @@ int dbg_wrtest(char* name)
         block++;
     }
     
-    close(fd);
-
-    return 0;
+    return close(fd);
 }
 
 void dbg_type(char* name)
@@ -316,7 +311,8 @@ int dbg_append(char* name)
     x = size / CHUNKSIZE;
     LDEBUGF("Check base is %x (%d)\n",x,size);
 
-    close(fd);
+    if (close(fd) < 0)
+        return -1;
 
     fd = open(name,O_RDWR|O_APPEND);
     if (fd<0) {
@@ -329,9 +325,46 @@ int dbg_append(char* name)
     if ( rc < 0 )
         panicf("Failed writing data\n");
 
-    close(fd);
+    return close(fd);
+}
 
-    return 0;
+int dbg_test(char* name)
+{
+    int x=0;
+    int size, fd, rc;
+    char buf[4096];
+
+    fd = open(name,O_RDWR);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+
+    size = lseek(fd, -1024, SEEK_END);
+    size &= ~7;
+    DEBUGF("File is %d bytes\n", size);
+    x = size / CHUNKSIZE;
+    LDEBUGF("Check base is %x (%d)\n",x,size);
+
+    rc = read(fd, buf, sizeof buf);
+    if ( rc < 0 )
+        panicf("Failed reading data\n");
+    if ( rc == 0 )
+        DEBUGF("EOF\n");
+
+    rc = read(fd, buf, sizeof buf);
+    if ( rc < 0 )
+        panicf("Failed reading data\n");
+    if ( rc == 0 )
+        DEBUGF("EOF\n");
+
+    rc = write(fd, buf, sizeof buf);
+    if ( rc < 0 )
+        panicf("Failed writing data\n");
+    if ( rc == 0 )
+        DEBUGF("Nothing written!\n");
+
+    return close(fd);
 }
 
 int dbg_dump(char* name, int offset)
@@ -350,7 +383,8 @@ int dbg_dump(char* name, int offset)
     if ( rc < 0 )
         panicf("Error reading data\n");
 
-    close(fd);
+    if (close(fd) < 0)
+        return -1;
 
     dbg_dump_buffer(buf, rc, offset);
 
@@ -414,8 +448,7 @@ int dbg_head(char* name)
         DEBUGF("Failed reading file: %d\n",rc);
     }
 
-    close(fd);
-    return 0;
+    return close(fd);
 }
 
 int dbg_trunc(char* name, int size)
@@ -443,8 +476,7 @@ int dbg_trunc(char* name, int size)
         return -2;
 #endif
 
-    close(fd);
-    return 0;
+    return close(fd);
 }
 
 int dbg_cmd(int argc, char *argv[])
@@ -478,6 +510,7 @@ int dbg_cmd(int argc, char *argv[])
                " trunc <file> <size>\n"
                " wrtest <file>\n"
                " append <file>\n"
+               " test <file>\n"
             );
         return -1;
     }
@@ -568,6 +601,12 @@ int dbg_cmd(int argc, char *argv[])
     {
         if (arg1)
             return dbg_append(arg1);
+    }
+
+    if (!strcasecmp(cmd, "test"))
+    {
+        if (arg1)
+            return dbg_test(arg1);
     }
 
     if (!strcasecmp(cmd, "trunc"))
