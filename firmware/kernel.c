@@ -52,20 +52,22 @@ void yield(void)
 
 /****************************************************************************
  * Interrupt level setting
- * NOTE!!!!!!
- * This one is not entirely safe. If an interrupt uses this function it
- * MUST restore the old level before returning. Otherwise there is a small
- * risk that set_irq_level returns the wrong level if interrupted after
- * the stc instruction.
  ****************************************************************************/
+static int current_irq_level = 15;
+
 int set_irq_level(int level)
 {
-    int i;
+    int old;
 
-    /* Read the old level and set the new one */
-    asm volatile ("stc sr, %0" : "=r" (i));
-    asm volatile ("ldc %0, sr" : : "r" (level<<4));
-    return (i >> 4) & 0x0f;
+    /* First raise to highest level and update the shadow */
+    asm volatile ("ldc %0, sr" : : "r" (15<<4));
+    old = current_irq_level;
+    current_irq_level = level;
+
+    /* Then set the wanted level */
+    asm volatile ("ldc %0, sr" : : "r" ((unsigned int)level<<4));
+
+    return ((unsigned int)old >> 4) & 0x0f;
 }
 
 /****************************************************************************
@@ -89,10 +91,15 @@ struct event *queue_wait(struct event_queue *q)
 
 void queue_post(struct event_queue *q, int id, void *data)
 {
-    int wr = (q->write++) & QUEUE_LENGTH_MASK;
+    int wr;
+    int oldlevel;
+
+    oldlevel = set_irq_level(15);
+    wr = (q->write++) & QUEUE_LENGTH_MASK;
 
     q->events[wr].id = id;
     q->events[wr].data = data;
+    set_irq_level(oldlevel);
 }
 
 
