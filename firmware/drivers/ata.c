@@ -181,16 +181,23 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
         } while (buf < bufend); /* tail loop is faster */
 #else
-        asm ( /* I can bring it down to 7 instructions/loop */
-            "mov    #1, r0 \n"
+        /* I can bring it down to 7 instructions/loop, and exploit pipeline */
+        asm (
+            "mov    #1, r0 \n"      /* r0 = 1; */
+            /* correct for the "early increment" below */
+            "add  	#-2,%2 \n"    /* buf -= 2; */
+            "add  	#-2,%3 \n"    /* bufend -= 2; */
             "loop_b: \n"
-            "mov.w	@%1,%0 \n"
-            "mov.b	%0,@%2 \n"
-            "shlr8	%0 \n"
-            "mov.b	%0,@(r0,%2) \n"
-            "add  	#0x02,%2 \n"
-            "cmp/hs	%3,%2 \n"
-            "bf	    loop_b \n"
+            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
+            /* Now we're reading from the bus, I do something independent we 
+               need later, to avoid pipeline stall */
+            "add  	#0x02,%2 \n"    /* buf += 2; */
+            "cmp/hs	%3,%2 \n"       /* if (buf < bufend) */
+            /* now use the read result */
+            "mov.b	%0,@%2 \n"      /* buf[0] = lowbyte(tmp); */
+            "shlr8	%0 \n"          /* tmp >>= 8; */
+            "mov.b	%0,@(r0,%2) \n" /* buf[r0] = lowbyte(tmp); */
+            "bf	    loop_b \n"      /* goto loop_b; */
             : /* outputs */
             : /* inputs */
             /* %0 */ "r"(tmp),
@@ -212,18 +219,30 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
             *wbuf = SWAB16(ATA_DATA);
         } while (++wbuf < wbufend); /* tail loop is faster */
 #else
-        asm ( /* I can bring it down to 9 instructions for 2 loops */
-            "mov    #2, r0 \n"
+        /* I can bring it down to 9 instructions for 2 loops, and pipeline */
+        asm (
+            "mov    #2, r0 \n"      /* r0 = 2 */
+            /* correct for the "early increment" below */
+            "add  	#-4,%2 \n"      /* wbuf -= 4; */
+            "bra enter_loop \n"     /* goto enter_loop, after next instr. */
+            "add  	#-4,%3 \n"      /* wbufend -= 4; */
             "loop_w: \n"
-            "mov.w	@%1,%0 \n"
-            "swap.b	%0,%0 \n"
-            "mov.w	%0,@%2 \n"
-            "mov.w	@%1,%0 \n" /* unrolled, do one more */
-            "swap.b	%0,%0 \n"
-            "mov.w	%0,@(r0,%2) \n"
-            "add  	#0x04,%2 \n"
-            "cmp/hs	%3,%2 \n"
-            "bf	    loop_w \n"
+            /* use read result and store, from last round */
+            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
+            "mov.w	%0,@(r0,%2) \n" /* wbuf[r0] = tmp; */
+            "enter_loop: \n"
+            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
+            /* keep the pipeline busy with 2 independent instructions */
+            "add  	#0x04,%2 \n"    /* wbuf += 4; */
+            "cmp/hs	%3,%2 \n"       /* if (wbuf < wbufend) */
+            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
+            "mov.w	%0,@%2 \n"      /* wbuf[0] = tmp; */
+            /* unrolled, do one more */
+            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
+            /* use and store later, to keep pipeline busy */
+            "bf	    loop_w \n"      /* goto loop_w; */
+            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
+            "mov.w	%0,@(r0,%2) \n" /* wbuf[r0] = tmp; */
             : /* outputs */
             : /* inputs */
             /* %0 */ "r"(tmp),
