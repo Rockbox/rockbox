@@ -323,8 +323,8 @@ int ata_init(void)
     
     led(false);
 
-    /* activate ATA */
-    PADR &= ~0x80;
+    PADR |= 0x800; /* disable USB */
+    PADR &= ~0x80; /* activate ATA */
 
     if (master_slave())
         return -1;
