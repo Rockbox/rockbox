@@ -9,7 +9,7 @@ only be seen while there is actual music playback.
 <p>
 The screen lines contain the following information:
 <ol>
-<li>Status bar: Battery level, volume, play mode, repeat mode, shuffle mode and time (time not shown in screenshot)
+<li>Status bar: Battery level, charger status, volume, play mode, repeat mode, shuffle mode and clock
 <li>Scrolling path+filename of the current song.
 <li>The ID3 track name
 <li>The ID3 album name
