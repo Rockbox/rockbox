@@ -7,6 +7,11 @@ if($version eq "") {
     exit;
 }
 
+if(!-f "apps/version.h") {
+    print "run this script in the root dir\n";
+    exit;
+}
+
 @files=`find . -name FILES`;
 
 my @entries;
@@ -31,6 +36,9 @@ sub add {
 
     open(FILE, "<$file");
     while(<FILE>) {
+        if($_ =~ /^ *\#/) {
+            next;
+        }
         chomp;
         push @entries, "$dir/$_";
     }
@@ -74,6 +82,23 @@ for(@entries) {
     #print "Copy $_ to $dir\n";
     `cp -p $_ $dir`;
 }
+
+
+if(!open(VERSION, "<apps/version.h")) {
+    print "Can't read version.h\n";
+    exit;
+}
+   
+if(!open(THIS, ">rockbox-$version/apps/version.h")) {
+    print "Can't create a new version.h for this version\n";
+    exit;
+}
+while(<VERSION>) {
+    $_ =~ s/^\#define APPSVERSION .*/\#define APPSVERSION \"$version\"/;
+    print THIS $_;
+}
+close(VERSION);
+close(THIS);
 
 `tar -cf rockbox-$version.tar rockbox-$version`;
 `gzip -9 rockbox-$version.tar`;
