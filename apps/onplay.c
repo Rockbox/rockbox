@@ -112,6 +112,92 @@ static void xingupdate(int percent)
     lcd_update();
 }
 
+
+/* defined in linker script */
+extern unsigned char mp3buf[];
+extern unsigned char mp3end[];
+
+static int insert_space_in_file(char *fname, int num_bytes)
+{
+    int readlen;
+    int rc;
+    int orig_fd, fd;
+    char tmpname[MAX_PATH];
+    
+    /* Use the mp3 buffer to write 0's in the file */
+    memset(mp3buf, 0, num_bytes);
+
+    snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
+
+    orig_fd = open(fname, O_RDONLY);
+    if(orig_fd < 0)
+    {
+        return 10*orig_fd - 1;
+    }
+
+    fd = creat(tmpname, O_WRONLY);
+    if(fd < 0)
+    {
+        close(orig_fd);
+        return 10*fd - 2;
+    }
+
+    rc = write(fd, mp3buf, num_bytes);
+    if(rc < 0)
+    {
+        close(orig_fd);
+        close(fd);
+        return 10*rc - 3;
+    }
+
+    rc = lseek(orig_fd, 0, SEEK_SET);
+    if(rc < 0)
+    {
+        close(orig_fd);
+        close(fd);
+        return 10*rc - 4;
+    }
+
+    /* Copy the file */
+    do
+    {
+        readlen = read(orig_fd, mp3buf, mp3end - mp3buf);
+        if(readlen < 0)
+        {
+            close(fd);
+            close(orig_fd);
+            return 10*readlen - 5;
+        }
+
+        rc = write(fd, mp3buf, readlen);
+        if(rc < 0)
+        {
+            close(fd);
+            close(orig_fd);
+            return 10*rc - 6;
+        }
+    } while(readlen > 0);
+    
+    close(fd);
+    close(orig_fd);
+
+    /* Remove the old file */
+    rc = remove(fname);
+    if(rc < 0)
+    {
+        return 10*rc - 7;
+    }
+
+    /* Replace the old file with the new */
+    rc = rename(tmpname, fname);
+    if(rc < 0)
+    {
+        return 10*rc - 8;
+    }
+    
+    return 0;
+}
+        
 static bool vbr_fix(void)
 {
     unsigned char xingbuf[417];
@@ -121,7 +207,6 @@ static bool vbr_fix(void)
     int flen;
     int num_frames;
     int fpos;
-
 
     if(mpeg_status())
     {
@@ -174,9 +259,31 @@ static bool vbr_fix(void)
             }
             else
             {
+                /* If not, insert some space, but only if there is no ID3
+                   tag in the file */
                 close(fd);
-                splash(HZ*2, 0, true, "No room for header");
-                return -3;
+                if(entry.first_frame_offset == 0)
+                {
+                    rc = insert_space_in_file(selected_file, 4096);
+                    if(rc < 0)
+                    {
+                        splash(HZ*2, 0, true, "File error: %d", rc);
+                        return rc * 10 - 3;
+                    }
+
+                    /* Reopen the file */
+                    fd = open(selected_file, O_RDWR);
+                    if(fd < 0)
+                        return fd * 10 - 4;
+
+                    fpos = 4096-417;
+                }
+                else
+                {
+                    splash(HZ*2, 0, true,
+                           "There is no room for a Xing header");
+                    return -3;
+                }
             }
         }
         
@@ -195,7 +302,6 @@ static bool vbr_fix(void)
 
     return false;
 }
-
 int onplay(char* file, int attr)
 {
     struct menu_items menu[5]; /* increase this if you add entries! */
