@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
 #include "system.h"
@@ -301,7 +301,9 @@ bool usb_detect(void)
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
 #endif
-
+#ifdef IRIVER_H100
+    current_status = (GPIO1_READ & 0x80)?true:false;
+#endif
     return current_status;
 }
 
@@ -357,6 +359,10 @@ void usb_init(void)
     usb_state = USB_EXTRACTED;
     usb_monitor_enabled = false;
     countdown = -1;
+
+#ifdef IRIVER_H100
+    GPIO1_FUNCTION |= 0x80; /* GPIO39 is the USB detect input */
+#endif
 
     usb_enable(false);
 
