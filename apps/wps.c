@@ -487,6 +487,7 @@ int wps_show(void)
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 status_draw();
+                settings_save();
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -506,6 +507,7 @@ int wps_show(void)
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 status_draw();
+                settings_save();
                 break;
 
             case BUTTON_LEFT | BUTTON_REPEAT:
@@ -624,6 +626,7 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                settings_save();
                 break;
 
             case BUTTON_MENU | BUTTON_RIGHT:
@@ -633,6 +636,7 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                settings_save();
                 break;
 
             case BUTTON_MENU | BUTTON_ON:
