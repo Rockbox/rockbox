@@ -106,7 +106,7 @@ static const int steps[] =
     1,    /* Volume */
     1,    /* Bass */
     1,    /* Treble */
-    2,    /* Balance */
+    1,    /* Balance */
     1,    /* Loudness */
     1,    /* AVC */
     1,    /* Channels */
