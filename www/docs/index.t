@@ -3,25 +3,27 @@
 
 <h2>For users</h2>
 <ul>
-<li><a href="faq.html">Frequently Asked Questions</a>
-<li><a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
-<li><a href="/manual/">User manual</a>
-<li><a href="features.html">Feature Comparison Chart</a>
-<li><a href="nodo.html">Features We Will Not Implement</a>
-<li><a href="credits.html">The Noble People Behind Rockbox</a>
+<li> <a href="faq.html">Frequently Asked Questions</a>
+<li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
+<li> <a href="/manual/">User manual</a>
+<li> <a href="features.html">Feature Comparison Chart</a>
+<li> <a href="nodo.html">Features We Will Not Implement</a>
+<li> <a href="custom_wps_format.html">How to make a custom WPS</a>
+<li> <a href="custom_wps_format.html">How to make a custom config file</a>
+<li> <a href="credits.html">The Noble People Behind Rockbox</a>
 </ul>
 
 <h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">hackers</a></h2>
 
 <h3>Howtos</h3>
 <ul>
-<li><a href="firsttime.html">First-Time Guide to Rockbox Development</a>
-<li><a href="/cvs.html">How to use CVS</a>
-<li><a href="patch.html">How To Work With Patches</a>
-<li><a href="/cross-gcc.html">Building the cross compiler</a> (linux/cygwin)
-<li><a href="http://rockbox.my-vserver.de/win32-sdk.html">Setup a cygwin Rockbox development environment</a> (Windows)
-<li><a href="/sh-win/">Setting up the gnush cross compiler</a> (Windows)
-<li><a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
+<li> <a href="firsttime.html">First-Time Guide to Rockbox Development</a>
+<li> <a href="/cvs.html">How to use CVS</a>
+<li> <a href="patch.html">How To Work With Patches</a>
+<li> <a href="/cross-gcc.html">Building the cross compiler</a> (linux/cygwin)
+<li> <a href="http://rockbox.my-vserver.de/win32-sdk.html">Setup a cygwin Rockbox development environment</a> (Windows)
+<li> <a href="/sh-win/">Setting up the gnush cross compiler</a> (Windows)
+<li> <a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
 </ul>
 
 <h3>Specs and Papers</h3>
