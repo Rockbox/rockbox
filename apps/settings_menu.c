@@ -49,6 +49,31 @@ static bool contrast(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
+
+/**
+ * Menu to configure the battery display on status bar
+ */
+static bool battery_type(void)
+{
+    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
+                      str(LANG_DISPLAY_NUMERIC)  };
+
+    return set_option( str(LANG_BATTERY_DISPLAY), 
+                       &global_settings.battery_type, names, 2, NULL);
+}
+
+/**
+ * Menu to configure the volume display on status bar
+ */
+static bool volume_type(void)
+{
+    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
+                      str(LANG_DISPLAY_NUMERIC) };
+
+    return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
+                       names, 2, NULL);
+}
+
 /**
  * Menu to set the hold time of normal peaks.
  */
@@ -155,24 +180,6 @@ static bool dir_filter(void)
 static bool sort_case(void)
 {
     return set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
-}
-
-static bool battery_type(void)
-{
-    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
-                      str(LANG_DISPLAY_NUMERIC)  };
-
-    return set_option( str(LANG_BATTERY_DISPLAY), 
-                       &global_settings.battery_type, names, 2, NULL);
-}
-
-static bool volume_type(void)
-{
-    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
-                      str(LANG_DISPLAY_NUMERIC) };
-
-    return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
-                       names, 2, NULL);
 }
 
 static bool resume(void)
