@@ -130,7 +130,8 @@ int mmc_remove_request(void)
 
     lcd_clear_display();
     splash(1, true, str(LANG_REMOVE_MMC));
-    talk_id(LANG_REMOVE_MMC, false);
+    if (global_settings.talk_menu)
+        talk_id(LANG_REMOVE_MMC, false);
     
     while (1)
     {
