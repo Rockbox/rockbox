@@ -337,19 +337,9 @@ static int flush_cache(int fd)
 {
     int rc;
     struct filedesc* file = &openfiles[fd];
-#if 0
-    int sector = file->fileoffset / SECTOR_SIZE;
-#endif
     
-    DEBUGF("Flushing dirty sector cache %x\n", sector);
-    
-    /* seek back one sector to get file position right */
-#if 0
-    rc = fat_seek(&(file->fatfile), sector);
-    if ( rc < 0 )
-        return rc * 10 - 1;
-#endif
-    
+    DEBUGF("Flushing dirty sector cache\n");
+        
     rc = fat_readwrite(&(file->fatfile), 1,
                        file->cache, true );
     if ( rc < 0 )
