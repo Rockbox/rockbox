@@ -31,7 +31,7 @@ OBJS := $(SRC:%.c=%.o)
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
 
 
-all : $(OBJS) # archos.mod # archos.asm 
+all : archos.mod # archos.asm 
 
 archos.elf : $(OBJS) app.lds
 	$(CC) -nostdlib -o archos.elf $(OBJS) -lgcc -Tapp.lds -Wl,-Map,archos.map
