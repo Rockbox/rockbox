@@ -107,7 +107,7 @@ int read_bmp_file(char* filename,
    long size;
    unsigned int row, col, byte, bit;
    int l;
-   char *bmp;
+   unsigned char *bmp;
    int width;
    int height;
 
@@ -179,8 +179,12 @@ int read_bmp_file(char* filename,
          background = 1;
       }
 
-      width = readlong(fh.Width)*readshort(fh.BitCount);
-      PaddedWidth = ((width+31)&(~0x1f))/8;
+      /*  width = readlong(fh.Width)*readshort(fh.BitCount); */
+
+      width = readlong(fh.Width);
+
+      /* PaddedWidth = ((width+31)&(~0x1f))/8; */
+      PaddedWidth = ((width+7)&(~0x7));
       size = PaddedWidth*readlong(fh.Height);
 
       bmp = (unsigned char *)malloc(size);
@@ -231,13 +235,14 @@ int read_bmp_file(char* filename,
 #else
       /* Now convert the bitmap into an array with 1 byte per pixel,
          exactly the size of the image */
+
       for(row = 0;row < bitmap_height;row++) {
 	for(col = 0;col < bitmap_width;col++) {
-          if(bmp[(bitmap_height - row) * PaddedWidth]) {
-            bitmap[ (row/8) * bitmap_width + col ] |= 1<<(row&7);
+          if(bmp[(bitmap_height-1 -row) * PaddedWidth + col]) {
+            bitmap[ (row/8) * bitmap_width + col ] &= ~ (1<<(row&7));
           }
           else {
-            bitmap[ (row/8) * bitmap_width + col ] &= ~ 1<<(row&7);
+            bitmap[ (row/8) * bitmap_width + col ] |= 1<<(row&7);
           }
 	}
       }
