@@ -21,7 +21,7 @@
 #include <string.h>
 #include <sprintf.h>
 #include "playlist.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "screens.h"
 #include "status.h"
 #include "settings.h"
@@ -142,7 +142,7 @@ static bool initialize(char* filename, bool reload)
 {
     char* buffer;
     int buffer_size;
-    bool is_playing = mpeg_status() & MPEG_STATUS_PLAY;
+    bool is_playing = audio_status() & AUDIO_STATUS_PLAY;
 
     if (!filename && !is_playing)
         /* Nothing is playing, exit */
@@ -702,7 +702,7 @@ static int onplay_menu(int index)
             case 0:
                 /* delete track */
                 if (current)
-                    mpeg_stop();
+                    audio_stop();
 
                 playlist_delete(viewer.playlist, tracks[index].index);
 
@@ -714,7 +714,7 @@ static int onplay_menu(int index)
                         global_settings.repeat_mode == REPEAT_ALL)
                     {
                         talk_buffer_steal(); /* will use the mp3 buffer */
-                        mpeg_play(0);
+                        audio_play(0);
                         viewer.current_playing_track = -1;
                     }
                 }
@@ -838,7 +838,7 @@ bool playlist_viewer_ex(char* filename)
     {
         int track;
 
-        if (!viewer.playlist && !(mpeg_status() & MPEG_STATUS_PLAY))
+        if (!viewer.playlist && !(audio_status() & AUDIO_STATUS_PLAY))
         {
             /* Play has stopped */
 #ifdef HAVE_LCD_CHARCELLS
@@ -954,14 +954,14 @@ bool playlist_viewer_ex(char* filename)
                 else if (!viewer.playlist)
                 {
                     /* Stop current track and play new track */
-                    mpeg_stop();
+                    audio_stop();
                     playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
                     update_playlist(false);
                 }
                 else
                 {
                     /* Play track from playlist on disk */
-                    mpeg_stop();
+                    audio_stop();
 
                     /* New playlist */
                     if (playlist_set_current(viewer.playlist) < 0)

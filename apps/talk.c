@@ -28,7 +28,7 @@
 #include "system.h"
 #include "settings.h"
 #include "mp3_playback.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "lang.h"
 #include "talk.h"
 #include "id3.h"
@@ -432,7 +432,7 @@ int talk_id(long id, bool enqueue)
     unsigned char* clipbuf;
     int unit;
 
-    if (mpeg_status()) /* busy, buffer in use */
+    if (audio_status()) /* busy, buffer in use */
         return -1; 
 
     if (p_voicefile == NULL && has_voicefile)
@@ -471,7 +471,7 @@ int talk_file(const char* filename, bool enqueue)
     int size;
     struct mp3entry info;
 
-    if (mpeg_status()) /* busy, buffer in use */
+    if (audio_status()) /* busy, buffer in use */
         return -1; 
 
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
@@ -512,7 +512,7 @@ int talk_number(long n, bool enqueue)
     int level = 0; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
-    if (mpeg_status()) /* busy, buffer in use */
+    if (audio_status()) /* busy, buffer in use */
         return -1; 
 
     if (!enqueue)
@@ -591,7 +591,7 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_HERTZ,
     };
 
-    if (mpeg_status()) /* busy, buffer in use */
+    if (audio_status()) /* busy, buffer in use */
         return -1; 
 
     if (unit < 0 || unit >= UNIT_LAST)
@@ -623,7 +623,7 @@ int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
     
-    if (mpeg_status()) /* busy, buffer in use */
+    if (audio_status()) /* busy, buffer in use */
         return -1; 
 
     if (!enqueue)

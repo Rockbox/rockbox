@@ -38,7 +38,7 @@
 #include "system.h"
 #include "font.h"
 #include "disk.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"
 #include "ata.h"
@@ -335,11 +335,11 @@ bool dbg_os(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-bool dbg_mpeg_thread(void)
+bool dbg_audio_thread(void)
 {
     char buf[32];
     int button;
-    struct mpeg_debug d;
+    struct audio_debug d;
 
     lcd_setmargins(0, 0);
     
@@ -352,7 +352,7 @@ bool dbg_mpeg_thread(void)
                 return false;
         }
 
-        mpeg_get_debugdata(&d);
+        audio_get_debugdata(&d);
         
         lcd_clear_display();
 
@@ -1862,7 +1862,7 @@ static bool dbg_disk_info(void)
 
             case SETTINGS_OK:
                 if (page == 3) {
-                    mpeg_stop(); /* stop playback, to avoid disk access */
+                    audio_stop(); /* stop playback, to avoid disk access */
                     lcd_clear_display();
                     lcd_puts(0,0,"Scanning");
                     lcd_puts(0,1,"disk...");
@@ -2016,7 +2016,7 @@ bool debug_menu(void)
         { "View disk info", dbg_disk_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
-        { "View mpeg thread", dbg_mpeg_thread },
+        { "View audio thread", dbg_audio_thread },
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */

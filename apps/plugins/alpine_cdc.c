@@ -817,7 +817,7 @@ void emu_process_packet(unsigned char* mbus_msg, int msg_size)
 
     if (playmsg_dirty)
     {
-        rb->yield(); /* give the mpeg thread a chance to process */
+        rb->yield(); /* give the audio thread a chance to process */
         get_playmsg(); /* force update */
         mbus_send(gEmu.playmsg, sizeof(gEmu.playmsg));
     }
@@ -876,10 +876,10 @@ void get_playmsg(void)
 
     if (gEmu.set_state != EMU_FF && gEmu.set_state != EMU_FR)
     {
-        switch(rb->mpeg_status())
+        switch(rb->audio_status())
         {
-        case MPEG_STATUS_PLAY:
-            print_scroll("MpegStat Play");
+        case AUDIO_STATUS_PLAY:
+            print_scroll("AudioStat Play");
             if (gEmu.set_state == EMU_FF || gEmu.set_state == EMU_FR)
                 gEmu.playmsg[2] = gEmu.set_state; /* set FF/FR */
             else
@@ -890,8 +890,8 @@ void get_playmsg(void)
             bit_set(gEmu.playmsg, 59, false); /* clear stop */
             break;
 
-        case MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE:
-            print_scroll("MpegStat Pause");
+        case AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE:
+            print_scroll("AudioStat Pause");
             gEmu.playmsg[2] = EMU_PAUSED;
             bit_set(gEmu.playmsg, 56, false); /* clear play */
             bit_set(gEmu.playmsg, 57, true); /* set pause */
@@ -899,7 +899,7 @@ void get_playmsg(void)
             break;
 
         default:
-            print_scroll("MpegStat 0");
+            print_scroll("AudioStat 0");
             gEmu.playmsg[2] = EMU_STOPPED;
             bit_set(gEmu.playmsg, 56, false); /* clear play */
             bit_set(gEmu.playmsg, 57, false); /* clear pause */
@@ -943,7 +943,7 @@ int get_playtime(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->mpeg_current_track();
+    p_mp3entry = rb->audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -955,7 +955,7 @@ int get_tracklength(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->mpeg_current_track();
+    p_mp3entry = rb->audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -967,13 +967,13 @@ void set_track(int selected)
 {
     if (selected > get_track())
     {
-        print_scroll("mpeg_next");
-        rb->mpeg_next();
+        print_scroll("audio_next");
+        rb->audio_next();
     }
     else if (selected < get_track())
     {
-        print_scroll("mpeg_prev");
-        rb->mpeg_prev();
+        print_scroll("audio_prev");
+        rb->audio_prev();
     }
 }
 
@@ -982,7 +982,7 @@ int get_track(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->mpeg_current_track();
+    p_mp3entry = rb->audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -992,48 +992,48 @@ int get_track(void)
 /* start or resume playback */
 void set_play(void)
 {
-    if (rb->mpeg_status() == MPEG_STATUS_PLAY)
+    if (rb->audio_status() == AUDIO_STATUS_PLAY)
         return;
 
-    if (rb->mpeg_status() == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE))
+    if (rb->audio_status() == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
     {
-        print_scroll("mpeg_resume");
-        rb->mpeg_resume();
+        print_scroll("audio_resume");
+        rb->audio_resume();
     }
     else
     {
-        print_scroll("mpeg_play(0)");
-        rb->mpeg_play(0);
+        print_scroll("audio_play(0)");
+        rb->audio_play(0);
     }
 }
 
 /* pause playback */
 void set_pause(void)
 {
-    if (rb->mpeg_status() == MPEG_STATUS_PLAY)
+    if (rb->audio_status() == AUDIO_STATUS_PLAY)
     {
-        print_scroll("mpeg_pause");
-        rb->mpeg_pause();
+        print_scroll("audio_pause");
+        rb->audio_pause();
     }
 }
 
 /* stop playback */
 void set_stop(void)
 {
-    if (rb->mpeg_status() & MPEG_STATUS_PLAY)
+    if (rb->audio_status() & AUDIO_STATUS_PLAY)
     {
-        print_scroll("mpeg_stop");
-        rb->mpeg_stop();
+        print_scroll("audio_stop");
+        rb->audio_stop();
     }
 }
 
 /* seek */
 void set_position(int seconds)
 {
-    if (rb->mpeg_status() & MPEG_STATUS_PLAY)
+    if (rb->audio_status() & AUDIO_STATUS_PLAY)
     {
-        print_scroll("mpeg_ff_rewind");
-        rb->mpeg_ff_rewind(seconds * 1000);
+        print_scroll("audio_ff_rewind");
+        rb->audio_ff_rewind(seconds * 1000);
     }
 }
 

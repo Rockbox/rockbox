@@ -26,7 +26,7 @@
 #include "lcd.h"
 #include "dir.h"
 #include "file.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "menu.h"
 #include "lang.h"
 #include "playlist.h"
@@ -84,7 +84,7 @@ struct playlist_args {
 
 static bool add_to_playlist(int position, bool queue)
 {
-    bool new_playlist = !(mpeg_status() & MPEG_STATUS_PLAY);
+    bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
 
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -152,12 +152,12 @@ static bool add_to_playlist(int position, bool queue)
 
 static bool view_playlist(void)
 {
-    bool was_playing = mpeg_status() & MPEG_STATUS_PLAY;
+    bool was_playing = audio_status() & AUDIO_STATUS_PLAY;
     bool result;
 
     result = playlist_viewer_ex(selected_file);
 
-    if (!was_playing && (mpeg_status() & MPEG_STATUS_PLAY) &&
+    if (!was_playing && (audio_status() & AUDIO_STATUS_PLAY) &&
         onplay_result == ONPLAY_OK)
         /* playlist was started from viewer */
         onplay_result = ONPLAY_START_PLAY;
@@ -181,7 +181,7 @@ static bool playlist_options(void)
         pstart++;
     }
 
-    if (mpeg_status() & MPEG_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY)
     {
         items[i].desc = ID2P(LANG_INSERT);
         args[i].position = PLAYLIST_INSERT;

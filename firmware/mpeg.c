@@ -23,6 +23,7 @@
 #include "panic.h"
 #include "id3.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "ata.h"
 #include "string.h"
 #include <kernel.h>
@@ -220,10 +221,10 @@ static void set_elapsed(struct mp3entry* id3)
         id3->elapsed = id3->offset / id3->bpf * id3->tpf;
 }
 
-int mpeg_get_file_pos(void)
+int audio_get_file_pos(void)
 {
     int pos = -1;
-    struct mp3entry *id3 = mpeg_current_track();
+    struct mp3entry *id3 = audio_current_track();
     
     if (id3->vbr)
     {
@@ -402,12 +403,12 @@ static void recalculate_watermark(int bitrate)
     }
 }
 
-void mpeg_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(int seconds)
 {
     low_watermark_margin = seconds;
 }
 
-void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
+void audio_get_debugdata(struct audio_debug *dbgdata)
 {
     dbgdata->mp3buflen = mp3buflen;
     dbgdata->mp3buf_write = mp3buf_write;
@@ -1264,7 +1265,7 @@ static void mpeg_thread(void)
             }
 
             case MPEG_FF_REWIND: {
-                struct mp3entry *id3  = mpeg_current_track();
+                struct mp3entry *id3  = audio_current_track();
                 unsigned int oldtime  = id3->elapsed;
                 unsigned int newtime  = (unsigned int)ev.data;
                 int curpos, newpos, diffpos;
@@ -1272,7 +1273,7 @@ static void mpeg_thread(void)
 
                 id3->elapsed = newtime;
 
-                newpos = mpeg_get_file_pos();
+                newpos = audio_get_file_pos();
                 if(newpos < 0)
                 {
                     id3->elapsed = oldtime;
@@ -1808,7 +1809,7 @@ static void mpeg_thread(void)
                         {
                             if(errno == ENOSPC)
                             {
-                                mpeg_errno = MPEGERR_DISK_FULL;
+                                mpeg_errno = AUDIOERR_DISK_FULL;
                                 demand_irq_enable(false);
                                 stop_recording();
                                 queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
@@ -1830,7 +1831,7 @@ static void mpeg_thread(void)
                         {
                             if(errno == ENOSPC)
                             {
-                                mpeg_errno = MPEGERR_DISK_FULL;
+                                mpeg_errno = AUDIOERR_DISK_FULL;
                                 demand_irq_enable(false);
                                 stop_recording();
                                 queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
@@ -1902,7 +1903,7 @@ static void mpeg_thread(void)
                             {
                                 if(errno == ENOSPC)
                                 {
-                                    mpeg_errno = MPEGERR_DISK_FULL;
+                                    mpeg_errno = AUDIOERR_DISK_FULL;
                                     stop_recording();
                                     queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                                     break;
@@ -2013,7 +2014,7 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
-struct mp3entry* mpeg_current_track()
+struct mp3entry* audio_current_track()
 {
 #ifdef SIMULATOR
     return &taginfo;
@@ -2025,7 +2026,7 @@ struct mp3entry* mpeg_current_track()
 #endif /* #ifdef SIMULATOR */
 }
 
-struct mp3entry* mpeg_next_track()
+struct mp3entry* audio_next_track()
 {
 #ifdef SIMULATOR
     return &taginfo;
@@ -2037,7 +2038,7 @@ struct mp3entry* mpeg_next_track()
 #endif /* #ifdef SIMULATOR */
 }
 
-bool mpeg_has_changed_track(void)
+bool audio_has_changed_track(void)
 {
     if(last_track_counter != current_track_counter)
     {
@@ -2048,7 +2049,7 @@ bool mpeg_has_changed_track(void)
 }
 
 #if CONFIG_HWCODEC == MAS3587F
-void mpeg_init_playback(void)
+void audio_init_playback(void)
 {
     init_playback_done = false;
     queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
@@ -2407,7 +2408,7 @@ void mpeg_set_recording_gain(int left, int right, bool use_mic)
 }
 
 /* try to make some kind of beep, also in recording mode */
-void mpeg_beep(int duration)
+void audio_beep(int duration)
 {
     long starttick = current_tick;
     do
@@ -2495,7 +2496,7 @@ void bitswap(unsigned char *data, int length)
     (void)length;
 }
 
-void mpeg_init_playback(void)
+void audio_init_playback(void)
 {
     /* a dummy */
 }
@@ -2504,7 +2505,7 @@ unsigned long mpeg_recorded_time(void)
     /* a dummy */
     return 0;
 }
-void mpeg_beep(int duration)
+void audio_beep(int duration)
 {
     /* a dummy */
     (void)duration;
@@ -2558,7 +2559,7 @@ void mpeg_set_recording_options(int frequency, int quality,
 }
 #endif
 
-void mpeg_play(int offset)
+void audio_play(int offset)
 {
 #ifdef SIMULATOR
     char* trackname;
@@ -2595,7 +2596,7 @@ void mpeg_play(int offset)
     mpeg_errno = 0;
 }
 
-void mpeg_stop(void)
+void audio_stop(void)
 {
 #ifndef SIMULATOR
     mpeg_stop_done = false;
@@ -2610,7 +2611,7 @@ void mpeg_stop(void)
     
 }
 
-void mpeg_pause(void)
+void audio_pause(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
@@ -2621,7 +2622,7 @@ void mpeg_pause(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-void mpeg_resume(void)
+void audio_resume(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
@@ -2632,7 +2633,7 @@ void mpeg_resume(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-void mpeg_next(void)
+void audio_next(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
@@ -2660,7 +2661,7 @@ void mpeg_next(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-void mpeg_prev(void)
+void audio_prev(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
@@ -2687,7 +2688,7 @@ void mpeg_prev(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-void mpeg_ff_rewind(int newtime)
+void audio_ff_rewind(int newtime)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);
@@ -2696,43 +2697,43 @@ void mpeg_ff_rewind(int newtime)
 #endif /* #ifndef SIMULATOR */
 }
 
-void mpeg_flush_and_reload_tracks(void)
+void audio_flush_and_reload_tracks(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, NULL);
 #endif /* #ifndef SIMULATOR*/
 }
 
-int mpeg_status(void)
+int audio_status(void)
 {
     int ret = 0;
 
     if(is_playing)
-        ret |= MPEG_STATUS_PLAY;
+        ret |= AUDIO_STATUS_PLAY;
 
     if(paused)
-        ret |= MPEG_STATUS_PAUSE;
+        ret |= AUDIO_STATUS_PAUSE;
     
 #if CONFIG_HWCODEC == MAS3587F
     if(is_recording && !is_prerecording)
-        ret |= MPEG_STATUS_RECORD;
+        ret |= AUDIO_STATUS_RECORD;
 
     if(is_prerecording)
-        ret |= MPEG_STATUS_PRERECORD;
+        ret |= AUDIO_STATUS_PRERECORD;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
 
     if(mpeg_errno)
-        ret |= MPEG_STATUS_ERROR;
+        ret |= AUDIO_STATUS_ERROR;
     
     return ret;
 }
 
-unsigned int mpeg_error(void)
+unsigned int audio_error(void)
 {
     return mpeg_errno;
 }
 
-void mpeg_error_clear(void)
+void audio_error_clear(void)
 {
     mpeg_errno = 0;
 }
@@ -2745,21 +2746,21 @@ static void mpeg_thread(void)
     struct mp3entry* id3;
     while ( 1 ) {
         if (is_playing) {
-            id3 = mpeg_current_track();
+            id3 = audio_current_track();
             if (!paused)
             {
                 id3->elapsed+=1000;
                 id3->offset+=1000;
             }
             if (id3->elapsed>=id3->length)
-                mpeg_next();
+                audio_next();
         }
         sleep(HZ);
     }
 }
 #endif /* #ifdef SIMULATOR */
 
-void mpeg_init(void)
+void audio_init(void)
 {
     mpeg_errno = 0;
 

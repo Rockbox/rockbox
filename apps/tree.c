@@ -33,7 +33,7 @@
 #include "tree.h"
 #include "main_menu.h"
 #include "sprintf.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "playlist.h"
 #include "menu.h"
 #include "wps.h"
@@ -799,8 +799,8 @@ static bool dirbrowse(void)
                 {
                     /* Stop the music if it is playing, else show the shutdown
                        screen */
-                    if(mpeg_status())
-                        mpeg_stop();
+                    if(audio_status())
+                        audio_stop();
                     else {
                         if (!charger_inserted()) {
                             shutdown_screen();
@@ -998,7 +998,7 @@ static bool dirbrowse(void)
                 /* don't enter wps from plugin browser etc */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (mpeg_status() & MPEG_STATUS_PLAY)
+                    if (audio_status() & AUDIO_STATUS_PLAY)
                     {
                         start_wps=true;
                     }
@@ -1539,7 +1539,7 @@ int ft_play_dirname(int start_index)
     char dirname_mp3_filename[MAX_PATH+1];
     struct entry *dircache = tc.dircache;
 
-    if (mpeg_status() & MPEG_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY)
         return 0;
 
     snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
@@ -1566,7 +1566,7 @@ void ft_play_filename(char *dir, char *file)
 {
     char name_mp3_filename[MAX_PATH+1];
 
-    if (mpeg_status() & MPEG_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY)
         return;
 
     if (strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],

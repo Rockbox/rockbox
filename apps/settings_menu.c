@@ -26,6 +26,7 @@
 #include "lcd.h"
 #include "menu.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "button.h"
 #include "kernel.h"
 #include "thread.h"
@@ -452,7 +453,7 @@ static bool repeat_mode(void)
                          INT, names, 3, NULL );
 
     if (old_repeat != global_settings.repeat_mode)
-        mpeg_flush_and_reload_tracks();
+        audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -817,7 +818,7 @@ static bool buffer_margin(void)
 {
     return set_int(str(LANG_MP3BUFFER_MARGIN), "s", UNIT_SEC,
                    &global_settings.buffer_margin,
-                   mpeg_set_buffer_margin, 1, 0, 7 );
+                   audio_set_buffer_margin, 1, 0, 7 );
 }
 
 static bool ff_rewind_min_step(void)

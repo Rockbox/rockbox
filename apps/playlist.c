@@ -73,7 +73,7 @@
 #include "dir.h"
 #include "sprintf.h"
 #include "debug.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "lcd.h"
 #include "kernel.h"
 #include "settings.h"
@@ -348,7 +348,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if (!buffer)
     {
         /* use mp3 buffer for maximum load speed */
-        mpeg_stop();
+        audio_stop();
         talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
 
         buffer = mp3buf;
@@ -629,7 +629,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
                 display_playlist_count(*count, count_str);
 
                 if (*count == PLAYLIST_DISPLAY_COUNT)
-                    mpeg_flush_and_reload_tracks();
+                    audio_flush_and_reload_tracks();
             }
             
             /* let the other threads work */
@@ -1625,7 +1625,7 @@ int playlist_start(int start_index, int offset)
 
     playlist->index = start_index;
     talk_buffer_steal(); /* will use the mp3 buffer */
-    mpeg_play(offset);
+    audio_play(offset);
 
     return 0;
 }
@@ -1932,7 +1932,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
     if (result != -1)
     {
         fsync(playlist->control_fd);
-        mpeg_flush_and_reload_tracks();
+        audio_flush_and_reload_tracks();
     }
 
     return result;
@@ -1970,7 +1970,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     fsync(playlist->control_fd);
 
     display_playlist_count(count, count_str);
-    mpeg_flush_and_reload_tracks();
+    audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2063,7 +2063,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
                 display_playlist_count(count, count_str);
 
                 if (count == PLAYLIST_DISPLAY_COUNT)
-                    mpeg_flush_and_reload_tracks();
+                    audio_flush_and_reload_tracks();
             }            
         }
 
@@ -2078,7 +2078,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
         *temp_ptr = '/';
 
     display_playlist_count(count, count_str);
-    mpeg_flush_and_reload_tracks();
+    audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2106,7 +2106,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
     result = remove_track_from_playlist(playlist, index, true);
     
     if (result != -1)
-        mpeg_flush_and_reload_tracks();
+        audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2194,7 +2194,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
             }
 
             fsync(playlist->control_fd);
-            mpeg_flush_and_reload_tracks();
+            audio_flush_and_reload_tracks();
         }
     }
 
@@ -2215,7 +2215,7 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
     result = randomise_playlist(playlist, seed, start_current, true);
 
     if (result != -1)
-        mpeg_flush_and_reload_tracks();
+        audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2233,7 +2233,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
     result = sort_playlist(playlist, start_current, true);
 
     if (result != -1)
-        mpeg_flush_and_reload_tracks();
+        audio_flush_and_reload_tracks();
 
     return result;
 }

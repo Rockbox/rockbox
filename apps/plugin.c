@@ -199,20 +199,20 @@ static const struct plugin_api rockbox_api = {
 #endif
     
     /* playback control */
-    PREFIX(mpeg_play),
-    mpeg_stop,
-    mpeg_pause,
-    mpeg_resume,
-    mpeg_next,
-    mpeg_prev,
-    mpeg_ff_rewind,
-    mpeg_next_track,
+    PREFIX(audio_play),
+    audio_stop,
+    audio_pause,
+    audio_resume,
+    audio_next,
+    audio_prev,
+    audio_ff_rewind,
+    audio_next_track,
     playlist_amount,
-    mpeg_status,
-    mpeg_has_changed_track,
-    mpeg_current_track,
-    mpeg_flush_and_reload_tracks,
-    mpeg_get_file_pos,
+    audio_status,
+    audio_has_changed_track,
+    audio_current_track,
+    audio_flush_and_reload_tracks,
+    audio_get_file_pos,
     mpeg_get_last_header,
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     sound_set_pitch,
@@ -409,7 +409,7 @@ void* plugin_get_buffer(int* buffer_size)
    Playback gets stopped, to avoid conflicts. */
 void* plugin_get_mp3_buffer(int* buffer_size)
 {
-    mpeg_stop();
+    audio_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     *buffer_size = mp3end - mp3buf;
     return mp3buf;

@@ -614,11 +614,11 @@ static int save(
     }
 
     /* find the file position of the split point */
-    rb->mpeg_pause();
-    rb->mpeg_ff_rewind(splittime);
+    rb->audio_pause();
+    rb->audio_ff_rewind(splittime);
     rb->yield();
     rb->yield();
-    end = rb->mpeg_get_file_pos();
+    end = rb->audio_get_file_pos();
 
     /* open the source file */
     src_file = rb->open(mp3->path, O_RDONLY);
@@ -720,7 +720,7 @@ static int save(
         retval = -3;
     }
 
-    rb->mpeg_resume();
+    rb->audio_resume();
 
     return retval;
 }
@@ -985,27 +985,27 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
                     case LOOP_MODE_ALL:
                     case LOOP_MODE_TO:
-                        rb->mpeg_pause();
-                        rb->mpeg_ff_rewind(range_start);
+                        rb->audio_pause();
+                        rb->audio_ff_rewind(range_start);
 #ifdef HAVE_MMC
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
                             rb->splash(10*HZ, true, "Wait - reloading");
 #endif
-                        rb->mpeg_resume();
+                        rb->audio_resume();
                         break;
 
                     case LOOP_MODE_FROM:
-                        rb->mpeg_pause();
-                        rb->mpeg_ff_rewind(xpos_to_time(split_x));
+                        rb->audio_pause();
+                        rb->audio_ff_rewind(xpos_to_time(split_x));
 #ifdef HAVE_MMC
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
                             rb->splash(10*HZ, true, "Wait - reloading");
 #endif
-                        rb->mpeg_resume();
+                        rb->audio_resume();
                         break;
 
                     case LOOP_MODE_FREE:
@@ -1037,9 +1037,9 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 if (lastbutton != SPLITEDIT_PLAY_PRE)
                     break;
 #endif
-                rb->mpeg_pause();
-                rb->mpeg_ff_rewind(xpos_to_time(split_x));
-                rb->mpeg_resume();
+                rb->audio_pause();
+                rb->audio_ff_rewind(xpos_to_time(split_x));
+                rb->audio_resume();
                 break;
 
             case BUTTON_UP:
@@ -1159,9 +1159,9 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             }
             update_data();
 
-            if (mp3 != rb->mpeg_current_track())
+            if (mp3 != rb->audio_current_track())
             {
-                struct mp3entry *new_mp3 = rb->mpeg_current_track();
+                struct mp3entry *new_mp3 = rb->audio_current_track();
                 if (rb->strncasecmp(path_mp3, new_mp3->path,
                                     sizeof (path_mp3)))
                 {
@@ -1173,10 +1173,10 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 else
                 {
                     mp3 = new_mp3;
-                    rb->mpeg_pause();
-                    rb->mpeg_flush_and_reload_tracks();
-                    rb->mpeg_ff_rewind(range_start);
-                    rb->mpeg_resume();
+                    rb->audio_pause();
+                    rb->audio_flush_and_reload_tracks();
+                    rb->audio_ff_rewind(range_start);
+                    rb->audio_resume();
                 }
             }
         }
@@ -1192,12 +1192,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     rb->lcd_clear_display();
     rb->lcd_update();
-    mp3 = rb->mpeg_current_track();
+    mp3 = rb->audio_current_track();
     if (mp3 != NULL)
     {
-        if (rb->mpeg_status() & MPEG_STATUS_PAUSE)
+        if (rb->audio_status() & AUDIO_STATUS_PAUSE)
         {
-            rb->mpeg_resume();
+            rb->audio_resume();
         }
         splitedit_editor(mp3, mp3->elapsed, MIN_RANGE_SIZE * 8);
     }

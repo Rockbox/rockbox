@@ -31,7 +31,7 @@
 #include "usb.h"
 #include "backlight.h"
 #include "lcd.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "talk.h"
 #include "string.h"
@@ -757,7 +757,7 @@ void settings_apply(void)
 
     sound_settings_apply();
 
-    mpeg_set_buffer_margin(global_settings.buffer_margin);
+    audio_set_buffer_margin(global_settings.buffer_margin);
     
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);

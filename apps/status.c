@@ -25,7 +25,7 @@
 #include "settings.h"
 #include "status.h"
 #include "mp3_playback.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "wps.h"
 #ifdef HAVE_RTC
 #include "timefuncs.h"
@@ -75,16 +75,16 @@ void status_set_ffmode(enum playmode mode)
 
 int current_playmode(void)
 {
-    int mpeg_stat = mpeg_status();
+    int audio_stat = audio_status();
 
     /* ff_mode can be either STATUS_FASTFORWARD or STATUS_FASTBACKWARD
        and that supercedes the other modes */
     if(ff_mode)
         return ff_mode;
     
-    if(mpeg_stat & MPEG_STATUS_PLAY)
+    if(audio_stat & AUDIO_STATUS_PLAY)
     {
-        if(mpeg_stat & MPEG_STATUS_PAUSE)
+        if(audio_stat & AUDIO_STATUS_PAUSE)
             return STATUS_PAUSE;
         else
             return STATUS_PLAY;
@@ -92,9 +92,9 @@ int current_playmode(void)
 #if CONFIG_HWCODEC == MAS3587F
     else
     {
-        if(mpeg_stat & MPEG_STATUS_RECORD)
+        if(audio_stat & AUDIO_STATUS_RECORD)
         {
-            if(mpeg_stat & MPEG_STATUS_PAUSE)
+            if(audio_stat & AUDIO_STATUS_PAUSE)
                 return STATUS_RECORD_PAUSE;
             else
                 return STATUS_RECORD;

@@ -42,6 +42,7 @@
 #include "lcd.h"
 #include "id3.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "pcm_playback.h"
 #include "settings.h"
@@ -239,20 +240,20 @@ struct plugin_api {
 #endif
 
     /* playback control */
-    void (*PREFIX(mpeg_play))(int offset);
-    void (*mpeg_stop)(void);
-    void (*mpeg_pause)(void);
-    void (*mpeg_resume)(void);
-    void (*mpeg_next)(void);
-    void (*mpeg_prev)(void);
-    void (*mpeg_ff_rewind)(int newtime);
-    struct mp3entry* (*mpeg_next_track)(void);
+    void (*PREFIX(audio_play))(int offset);
+    void (*audio_stop)(void);
+    void (*audio_pause)(void);
+    void (*audio_resume)(void);
+    void (*audio_next)(void);
+    void (*audio_prev)(void);
+    void (*audio_ff_rewind)(int newtime);
+    struct mp3entry* (*audio_next_track)(void);
     int (*playlist_amount)(void);
-    int (*mpeg_status)(void);
-    bool (*mpeg_has_changed_track)(void);
-    struct mp3entry* (*mpeg_current_track)(void);
-    void (*mpeg_flush_and_reload_tracks)(void);
-    int (*mpeg_get_file_pos)(void);
+    int (*audio_status)(void);
+    bool (*audio_has_changed_track)(void);
+    struct mp3entry* (*audio_current_track)(void);
+    void (*audio_flush_and_reload_tracks)(void);
+    int (*audio_get_file_pos)(void);
     unsigned long (*mpeg_get_last_header)(void);
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     void (*sound_set_pitch)(int pitch);        

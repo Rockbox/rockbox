@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "led.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "mas.h"
 #include "button.h"
@@ -256,7 +257,7 @@ static void trigger_listener(int trigger_status)
     switch (trigger_status)
     {
         case TRIG_GO:
-            if((mpeg_status() & MPEG_STATUS_RECORD) != MPEG_STATUS_RECORD)
+            if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
             {
               talk_buffer_steal(); /* we use the mp3 buffer */
               mpeg_record(rec_create_filename(path_buffer));
@@ -276,9 +277,9 @@ static void trigger_listener(int trigger_status)
 
         /* A _change_ to TRIG_READY means the current recording has stopped */
         case TRIG_READY:
-            if(mpeg_status() & MPEG_STATUS_RECORD)
+            if(audio_status() & AUDIO_STATUS_RECORD)
             {
-                mpeg_stop();
+                audio_stop();
                 if (global_settings.rec_trigger_mode != TRIG_MODE_REARM)
                 {
                     peak_meter_set_trigger_listener(NULL);
@@ -306,7 +307,7 @@ bool recording_screen(void)
     int hours, minutes;
     char path_buffer[MAX_PATH];
     bool been_in_usb_mode = false;
-    int last_mpeg_stat = -1;
+    int last_audio_stat = -1;
     bool last_led_stat = false;
 
     const unsigned char *byte_units[] = {
@@ -352,15 +353,15 @@ bool recording_screen(void)
 
     while(!done)
     {
-        int mpeg_stat = mpeg_status();
+        int audio_stat = audio_status();
 
         /*
          * Flash the LED while waiting to record.  Turn it on while
          * recording.
          */
-        if(mpeg_stat & MPEG_STATUS_RECORD)
+        if(audio_stat & AUDIO_STATUS_RECORD)
         {
-            if (mpeg_stat & MPEG_STATUS_PAUSE)
+            if (audio_stat & AUDIO_STATUS_PAUSE)
             {
                 /*
                 This is supposed to be the same as
@@ -411,24 +412,24 @@ bool recording_screen(void)
         /* Wait for a button while drawing the peak meter */
         button = peak_meter_draw_get_btn(0, 8 + h*2, LCD_WIDTH, h);
 
-        if (last_mpeg_stat != mpeg_stat)
+        if (last_audio_stat != audio_stat)
         {
-            if (mpeg_stat == MPEG_STATUS_RECORD)
+            if (audio_stat == AUDIO_STATUS_RECORD)
             {
                 have_recorded = true;
             }
-            last_mpeg_stat = mpeg_stat;
+            last_audio_stat = audio_stat;
         }
 
         switch(button)
         {
             case REC_STOPEXIT:
-                if(mpeg_stat & MPEG_STATUS_RECORD)
+                if(audio_stat & AUDIO_STATUS_RECORD)
                 {
                     /* turn off the trigger */
                     peak_meter_trigger(false);
                     peak_meter_set_trigger_listener(NULL);
-                    mpeg_stop();
+                    audio_stop();
                 }
                 else
                 {
@@ -444,7 +445,7 @@ bool recording_screen(void)
 
             case REC_RECPAUSE:
                 /* Only act if the mpeg is stopped */
-                if(!(mpeg_stat & MPEG_STATUS_RECORD))
+                if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
                     /* is this manual or triggered recording? */
                     if ((global_settings.rec_trigger_mode == TRIG_MODE_OFF) ||
@@ -458,7 +459,7 @@ bool recording_screen(void)
                     last_seconds = 0;
                     if (global_settings.talk_menu)
                     {   /* no voice possible here, but a beep */
-                        mpeg_beep(HZ/2); /* longer beep on start */
+                        audio_beep(HZ/2); /* longer beep on start */
                     }
                 }
 
@@ -476,12 +477,12 @@ bool recording_screen(void)
                 }
                 else
                 {
-                    if(mpeg_stat & MPEG_STATUS_PAUSE)
+                    if(audio_stat & AUDIO_STATUS_PAUSE)
                     {
                         mpeg_resume_recording();
                         if (global_settings.talk_menu)
                         {   /* no voice possible here, but a beep */
-                            mpeg_beep(HZ/4); /* short beep on resume */
+                            audio_beep(HZ/4); /* short beep on resume */
                         }
                     }
                     else
@@ -594,7 +595,7 @@ bool recording_screen(void)
                 
 #ifdef REC_SETTINGS
             case REC_SETTINGS:
-                if(mpeg_stat != MPEG_STATUS_RECORD)
+                if(audio_stat != AUDIO_STATUS_RECORD)
                 {
                     /* led is restored at begin of loop / end of function */
                     led(false);
@@ -625,7 +626,7 @@ bool recording_screen(void)
 
 #ifdef REC_F2
             case REC_F2:
-                if(mpeg_stat != MPEG_STATUS_RECORD)
+                if(audio_stat != AUDIO_STATUS_RECORD)
                 {
                     /* led is restored at begin of loop / end of function */
                     led(false);
@@ -642,14 +643,14 @@ bool recording_screen(void)
 
 #ifdef REC_F3
             case REC_F3:
-                if(mpeg_stat & MPEG_STATUS_RECORD)
+                if(audio_stat & AUDIO_STATUS_RECORD)
                 {
                     mpeg_new_file(rec_create_filename(path_buffer));
                     last_seconds = 0;
                 }
                 else
                 {
-                    if(mpeg_stat != MPEG_STATUS_RECORD)
+                    if(audio_stat != AUDIO_STATUS_RECORD)
                     {
                         /* led is restored at begin of loop / end of function */
                         led(false);
@@ -667,7 +668,7 @@ bool recording_screen(void)
 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
-                if(mpeg_stat != MPEG_STATUS_RECORD)
+                if(audio_stat != AUDIO_STATUS_RECORD)
                 {
                     default_event_handler(SYS_USB_CONNECTED);
                     done = true;
@@ -708,7 +709,7 @@ bool recording_screen(void)
 
                 dseconds = rec_timesplit_seconds(); 
 
-                if(mpeg_stat & MPEG_STATUS_PRERECORD)
+                if(audio_stat & AUDIO_STATUS_PRERECORD)
                 {
                     snprintf(buf, 32, "%s...", str(LANG_RECORD_PRERECORD));
                 }
@@ -741,7 +742,7 @@ bool recording_screen(void)
                 /* We will do file splitting regardless, since the OFF
                    setting really means 24 hours. This is to make sure
                    that the recorded files don't get too big. */
-                if (mpeg_stat && (seconds >= dseconds))
+                if (audio_stat && (seconds >= dseconds))
                 {
                     mpeg_new_file(rec_create_filename(path_buffer));
                     update_countdown = 1;
@@ -822,7 +823,7 @@ bool recording_screen(void)
             }
         }
 
-        if(mpeg_stat & MPEG_STATUS_ERROR)
+        if(audio_stat & AUDIO_STATUS_ERROR)
         {
             done = true;
         }
@@ -830,12 +831,12 @@ bool recording_screen(void)
 
     invert_led(false);
 
-    if(mpeg_status() & MPEG_STATUS_ERROR)
+    if(audio_status() & AUDIO_STATUS_ERROR)
     {
         splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
-        mpeg_error_clear();
+        audio_error_clear();
 
         while(1)
         {
@@ -845,7 +846,7 @@ bool recording_screen(void)
         }
     }
     
-    mpeg_init_playback();
+    audio_init_playback();
 
     /* make sure the trigger is really turned off */
     peak_meter_trigger(false);

@@ -183,7 +183,7 @@ void mpeg_set_pitch(int pitch)
     (void)pitch;
 }
 
-void mpeg_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(int seconds)
 {
     (void)seconds;
 }

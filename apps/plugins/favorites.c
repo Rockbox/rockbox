@@ -21,7 +21,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if(parameter) {
         rb->strncpy(track_path, parameter, MAX_PATH);
     } else {
-        id3 = rb->mpeg_current_track();
+        id3 = rb->audio_current_track();
         if (!id3) {
             rb->splash(HZ*2, true, "Nothing To Save");
             return PLUGIN_OK;

@@ -25,7 +25,7 @@
 #include "lang.h"
 #include "icons.h"
 #include "font.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
 #include "settings.h"
@@ -452,17 +452,17 @@ int pitch_screen(void)
                 break;
 
             case BUTTON_ON | BUTTON_PLAY:
-                mpeg_pause();
+                audio_pause();
                 used = true;
                 break;
 
             case BUTTON_PLAY | BUTTON_REL:
-                mpeg_resume();
+                audio_resume();
                 used = true;
                 break;
 
             case BUTTON_ON | BUTTON_PLAY | BUTTON_REL:
-                mpeg_resume();
+                audio_resume();
                 exit = true;
                 break;
 
@@ -651,7 +651,7 @@ bool quick_screen(int context, int button)
                 global_settings.playlist_shuffle =
                     !global_settings.playlist_shuffle;
 
-                if(mpeg_status() & MPEG_STATUS_PLAY)
+                if(audio_status() & AUDIO_STATUS_PLAY)
                 {
                     if (global_settings.playlist_shuffle)
                         playlist_randomise(NULL, current_tick, true);
@@ -727,7 +727,7 @@ bool quick_screen(int context, int button)
         case BUTTON_F2:
 
             if ( oldrepeat != global_settings.repeat_mode )
-                mpeg_flush_and_reload_tracks();
+                audio_flush_and_reload_tracks();
 
             break;
         case BUTTON_F3:
@@ -1254,14 +1254,14 @@ bool shutdown_screen(void)
 
 bool browse_id3(void)
 {
-    struct mp3entry* id3 = mpeg_current_track();
+    struct mp3entry* id3 = audio_current_track();
     int button;
     int menu_pos = 0;
     int menu_max = 8;
     bool exit = false;
     char scroll_text[MAX_PATH];
 
-    if (!(mpeg_status() & MPEG_STATUS_PLAY))
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
         return false;
 
     while (!exit)

@@ -38,7 +38,7 @@
 #ifndef DEBUG
 #include "serial.h"
 #endif
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "main_menu.h"
 #include "thread.h"
@@ -114,7 +114,7 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-    mpeg_init();
+    audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
 }
 
@@ -235,7 +235,7 @@ void init(void)
     tree_init();
 
     /* No buffer allocation (see buffer.c) may take place after the call to
-       mpeg_init() since the mpeg thread takes the rest of the buffer space */
+       audio_init() since the mpeg thread takes the rest of the buffer space */
     mp3_init( global_settings.volume,
               global_settings.bass,
               global_settings.treble,
@@ -250,7 +250,7 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-    mpeg_init();
+    audio_init();
     talk_init();
 
 #ifdef AUTOROCK

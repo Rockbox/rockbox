@@ -26,7 +26,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "usb.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "wps.h"
 #include "settings.h"
 #include "bookmark.h"
@@ -227,7 +227,7 @@ bool bookmark_autobookmark(void)
     if (!system_check())
         return false;
 
-    mpeg_pause();    /* first pause playback */
+    audio_pause();    /* first pause playback */
     switch (global_settings.autocreatebookmark)
     {
         case BOOKMARK_YES:
@@ -404,7 +404,7 @@ static char* create_bookmark()
     char *file;
 
     /* grab the currently playing track */
-    struct mp3entry *id3 = mpeg_current_track();
+    struct mp3entry *id3 = audio_current_track();
     if(!id3)
         return NULL;
 
@@ -1144,7 +1144,7 @@ static bool generate_bookmark_file_name(const char *in)
 static bool system_check(void)
 {
     int resume_index = 0;
-    struct mp3entry *id3 = mpeg_current_track();
+    struct mp3entry *id3 = audio_current_track();
 
     if (!id3)
     {

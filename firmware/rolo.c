@@ -23,7 +23,7 @@
 #include "sprintf.h"
 #include "button.h"
 #include "file.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "system.h"
 #include "i2c.h"
 #include "string.h"
@@ -101,7 +101,7 @@ int rolo_load(const char* filename)
     lcd_puts(0, 1, "Loading");
     lcd_update();
 
-    mpeg_stop();
+    audio_stop();
 
     fd = open(filename, O_RDONLY);
     if(-1 == fd) {

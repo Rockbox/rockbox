@@ -31,7 +31,7 @@
 #include "power.h"
 #include "button.h"
 #include "ata.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
 #include "powermgmt.h"
@@ -343,7 +343,7 @@ static void battery_level_update(void)
 static void handle_auto_poweroff(void)
 {
     long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
-    int  mpeg_stat = mpeg_status();
+    int  audio_stat = audio_status();
 
 #ifdef HAVE_CHARGING
     /*
@@ -360,8 +360,8 @@ static void handle_auto_poweroff(void)
        (radio_get_status() != FMRADIO_PLAYING) &&
 #endif
        !usb_inserted() &&
-       ((mpeg_stat == 0) ||
-        ((mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)) &&
+       ((audio_stat == 0) ||
+        ((audio_stat == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE)) &&
          !sleeptimer_active)))
     {
         if(TIME_AFTER(current_tick, last_event_tick    + timeout) &&
@@ -377,7 +377,7 @@ static void handle_auto_poweroff(void)
         {
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
-                mpeg_stop();
+                audio_stop();
 #ifdef HAVE_CHARGING
                 if((charger_input_state == CHARGER) ||
                    (charger_input_state == CHARGER_PLUGGED))
@@ -413,8 +413,8 @@ static void car_adapter_mode_processing(void)
 
         if (waiting_to_resume_play) {
             if (TIME_AFTER(current_tick, play_resume_time)) {
-                if (mpeg_status() & MPEG_STATUS_PAUSE) {
-                    mpeg_resume(); 
+                if (audio_status() & AUDIO_STATUS_PAUSE) {
+                    audio_resume(); 
                 }
                 waiting_to_resume_play = false;
             }
@@ -423,15 +423,15 @@ static void car_adapter_mode_processing(void)
                 /*
                  * Just got unplugged, pause if playing
                  */
-                if ((mpeg_status() & MPEG_STATUS_PLAY) &&
-                    !(mpeg_status() & MPEG_STATUS_PAUSE)) {
-                    mpeg_pause(); 
+                if ((audio_status() & AUDIO_STATUS_PLAY) &&
+                    !(audio_status() & AUDIO_STATUS_PAUSE)) {
+                    audio_pause(); 
                 }
             } else if(charger_input_state == CHARGER_PLUGGED) { 
                 /*
                  * Just got plugged in, delay & resume if we were playing
                  */
-                if (mpeg_status() & MPEG_STATUS_PAUSE) {
+                if (audio_status() & AUDIO_STATUS_PAUSE) {
                     /* delay resume a bit while the engine is cranking */
                     play_resume_time = current_tick + HZ*5;
                     waiting_to_resume_play = true;
@@ -920,7 +920,7 @@ void shutdown_hw(void)
         fd = -1;
     }
 #endif
-    mpeg_stop();
+    audio_stop();
     ata_flush();
     ata_spindown(1);
     while(ata_disk_is_active())

@@ -29,7 +29,7 @@
 #include "lcd.h"
 #include "hwcompat.h"
 #include "font.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "id3.h"
 #include "settings.h"
 #include "playlist.h"
@@ -1011,7 +1011,7 @@ bool wps_display(struct mp3entry* id3,
 {
     lcd_clear_display();
 
-    if (!id3 && !(mpeg_status() & MPEG_STATUS_PLAY))
+    if (!id3 && !(audio_status() & AUDIO_STATUS_PLAY))
     {
 #ifdef HAVE_LCD_CHARCELLS
         lcd_puts(0, 0, str(LANG_END_PLAYLIST_PLAYER));

@@ -33,7 +33,7 @@
 #include "settings.h"
 #include "wps.h"
 #include "wps-display.h"
-#include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
@@ -262,11 +262,11 @@ static bool ffwd_rew(int button)
                 }
                 else
                 {
-                    if ( (mpeg_status() & MPEG_STATUS_PLAY) &&
+                    if ( (audio_status() & AUDIO_STATUS_PLAY) &&
                           id3 && id3->length )
                     {
                         if (!paused)
-                            mpeg_pause();
+                            audio_pause();
 #if CONFIG_KEYPAD == PLAYER_PAD
                         lcd_stop_scroll();
 #endif
@@ -308,12 +308,12 @@ static bool ffwd_rew(int button)
 
             case WPS_PREV:
             case WPS_NEXT: 
-                mpeg_ff_rewind(id3->elapsed+ff_rewind_count);
+                audio_ff_rewind(id3->elapsed+ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;
                 status_set_ffmode(0);
                 if (!paused)
-                    mpeg_resume();
+                    audio_resume();
 #ifdef HAVE_LCD_CHARCELLS
                 wps_display(id3, nid3);
 #endif
@@ -332,7 +332,7 @@ static bool ffwd_rew(int button)
             button = button_get(true);
     }
 
-    /* let mpeg thread update id3->elapsed before calling wps_refresh */
+    /* let audio thread update id3->elapsed before calling wps_refresh */
     yield(); 
     wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
     return usb;
@@ -340,14 +340,14 @@ static bool ffwd_rew(int button)
 
 static bool update(void)
 {
-    bool track_changed = mpeg_has_changed_track();
+    bool track_changed = audio_has_changed_track();
     bool retcode = false;
 
-    nid3 = mpeg_next_track();
+    nid3 = audio_next_track();
     if (track_changed)
     {
         lcd_stop_scroll();
-        id3 = mpeg_current_track();
+        id3 = audio_current_track();
         if (wps_display(id3, nid3))
             retcode = true;
         else
@@ -391,8 +391,8 @@ static void fade(bool fade_in)
         /* zero out the sound */
         sound_set(SOUND_VOLUME, current_volume);
 
-        sleep(HZ/10); /* let mpeg thread run */
-        mpeg_resume();
+        sleep(HZ/10); /* let audio thread run */
+        audio_resume();
         
         while (current_volume < global_settings.volume) {    
             current_volume += 2;
@@ -410,8 +410,8 @@ static void fade(bool fade_in)
             sleep(1);
             sound_set(SOUND_VOLUME, current_volume);
         }
-        mpeg_pause();
-        sleep(HZ/5); /* let mpeg thread run */
+        audio_pause();
+        sleep(HZ/5); /* let audio thread run */
 
         /* reset volume to what it was before the fade */
         sound_set(SOUND_VOLUME, global_settings.volume);
@@ -451,10 +451,10 @@ long wps_show(void)
 
     ff_rewind = false;
 
-    if(mpeg_status() & MPEG_STATUS_PLAY)
+    if(audio_status() & AUDIO_STATUS_PLAY)
     {
-        id3 = mpeg_current_track();
-        nid3 = mpeg_next_track();
+        id3 = audio_current_track();
+        nid3 = audio_next_track();
         if (id3) {
             if (wps_display(id3, nid3))
                 return 0;
@@ -468,13 +468,13 @@ long wps_show(void)
 
     while ( 1 )
     {
-        bool mpeg_paused = (mpeg_status() & MPEG_STATUS_PAUSE)?true:false;
+        bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
         
-        /* did someone else (i.e power thread) change mpeg pause mode? */
-        if (paused != mpeg_paused) {
-            paused = mpeg_paused;
+        /* did someone else (i.e power thread) change audio pause mode? */
+        if (paused != audio_paused) {
+            paused = audio_paused;
 
-            /* if another thread paused mpeg, we are probably in car mode,
+            /* if another thread paused audio, we are probably in car mode,
                about to shut down. lets save the settings. */
             if (paused && global_settings.resume) {
                 settings_save();
@@ -560,10 +560,10 @@ long wps_show(void)
         }
 #endif
 
-        /* Exit if mpeg has stopped playing. This can happen if using the
+        /* Exit if audio has stopped playing. This can happen if using the
            sleep timer with the charger plugged or if starting a recording
            from F1 */
-        if (!mpeg_status())
+        if (!audio_status())
             exit = true;
 
         switch(button)
@@ -598,7 +598,7 @@ long wps_show(void)
                     if ( global_settings.fade_on_stop )
                         fade(1);
                     else
-                        mpeg_resume();
+                        audio_resume();
                 }
                 else
                 {
@@ -606,7 +606,7 @@ long wps_show(void)
                     if ( global_settings.fade_on_stop )
                         fade(0);
                     else
-                        mpeg_pause();
+                        audio_pause();
                     if (global_settings.resume) {
                         settings_save();
 #ifndef HAVE_RTC
@@ -662,16 +662,16 @@ long wps_show(void)
             case WPS_RC_PREV:
 #endif
                 if (!id3 || (id3->elapsed < 3*1000)) {
-                    mpeg_prev();
+                    audio_prev();
                 }
                 else {
                     if (!paused)
-                        mpeg_pause();
+                        audio_pause();
 
-                    mpeg_ff_rewind(0);
+                    audio_ff_rewind(0);
 
                     if (!paused)
-                        mpeg_resume();
+                        audio_resume();
                 }
                 break;
 
@@ -684,7 +684,7 @@ long wps_show(void)
 #ifdef WPS_RC_NEXT
             case WPS_RC_NEXT:
 #endif
-                mpeg_next();
+                audio_next();
                 break;
 
                 /* menu key functions */
@@ -789,7 +789,7 @@ long wps_show(void)
                 
             lcd_stop_scroll();
             bookmark_autobookmark();
-            mpeg_stop();
+            audio_stop();
 
             /* Keys can be locked when exiting, so either unlock here
                or implement key locking in tree.c too */
