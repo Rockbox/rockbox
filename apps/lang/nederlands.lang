@@ -427,13 +427,13 @@ new:
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "PLAY = Yes"
-new: "PLAY = Ja"
+eng: ""
+new:
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-eng: "Any Other = No"
-new: "Elke andere = Nee"
+eng: ""
+new:
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -657,118 +657,118 @@ new: "[PLAY] om te starten/pauseren"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-eng: "Level"
-new: "Niveau"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Zetten"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "JE HEBT GEWONNEN !!!"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] To Stop"
-new: "[OFF] om te stoppen"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - Level"
-new: "[F1] - Niveau"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] Same Level"
-new: "[F2] zelfde Niveau"
+eng: ""
+new:
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + Level"
-new: "[F3] + Niveau"
+eng: ""
+new:
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "Len:%d"
+eng: ""
 new: 
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-eng: "Growing"
-new: "Groeien"
+eng: ""
+new:
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "Hungry"
-new: "Honger"
+eng: ""
+new:
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-eng: "Wormed"
-new: "Wormed"
+eng: ""
+new:
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-eng: "Argh"
-new: "Argh"
+eng: ""
+new:
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-eng: "Crashed"
-new: "Crashed"
+eng: ""
+new:
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-eng: "Hs: %d"
-new: "Hs: %d"
+eng: ""
+new:
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    UP/DN"
-new: "%d Spelers    UP/DN"
+eng: ""
+new:
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        L/R"
-new: "%d Wormen       L/R"
+eng: ""
+new:
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote Control F1"
-new: "Afstandsbed.   F1"
+eng: ""
+new:
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No Rem. Control F1"
-new: "Geen afstandsb. F1"
+eng: ""
+new:
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 Key Control   F1"
-new: "2 toets control F1"
+eng: ""
+new:
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 Key Control   F1"
-new: "4 toets control F1"
+eng: ""
+new:
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out Of Control"
-new: "Geen controle"
+eng: ""
+new:
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You Lose!"
-new: "Je hebt verloren!"
+eng: ""
+new:
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "Rows - Level"
-new: "Rijen - Niveau"
+eng: ""
+new:
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -1519,3 +1519,53 @@ id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 new: "Toon Ikonen" 
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "De disk is vol. Druk OFF om door te gaan." 
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new: "Opstart bestand gewijzigd" 
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Elke Andere = Nee" 
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "PLAY = Ja" 
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Kan %s niet openen"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Plugin foutmelding" 
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "Archos model is niet geschikt voor plugin" 
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "Rockbox versie is niet geschikt voor deze plugin" 
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Kon %s niet lezen" 
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "Opnieuw starten?"
