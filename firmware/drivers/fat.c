@@ -115,13 +115,13 @@ struct fsinfo {
 static int first_sector_of_cluster(struct bpb *bpb, unsigned int cluster);
 static int get_bpb(struct bpb *bpb);
 static int bpb_is_sane(struct bpb *bpb);
-static int flush_fat(struct bpb *bpb);
 static void *cache_fat_sector(struct bpb *bpb, int secnum);
-static int update_entry(struct bpb *bpb, int entry, unsigned int val);
+#ifdef DISK_WRITE
 static unsigned int getcurrdostime(unsigned short *dosdate,
                                    unsigned short *dostime,
                                    unsigned char *dostenth);
 static int create_dos_name(unsigned char *name, unsigned char *newname);
+#endif
 
 static unsigned char *fat_cache[256];
 static int fat_cache_dirty[256];
@@ -189,7 +189,7 @@ static int first_sector_of_cluster(struct bpb *bpb, unsigned int cluster)
 
 static int get_bpb(struct bpb *bpb)
 {
-    unsigned char buf[BLOCK_SIZE];
+    unsigned char buf[SECTOR_SIZE];
     int err;
     int datasec;
     int countofclusters;
@@ -284,8 +284,9 @@ static int bpb_is_sane(struct bpb *bpb)
 {
     if(bpb->bpb_bytspersec != 512)
     {
-        DEBUG1( "bpb_is_sane() - Warning: sector size is not 512 (%i)\n",
+        DEBUG1( "bpb_is_sane() - Error: sector size is not 512 (%i)\n",
                 bpb->bpb_bytspersec);
+        return -1;
     }
     if(bpb->bpb_secperclus * bpb->bpb_bytspersec > 32768)
     {
@@ -365,6 +366,7 @@ static void *cache_fat_sector(struct bpb *bpb, int secnum)
     return sec;
 }
 
+#ifdef DISK_WRITE
 static int update_entry(struct bpb *bpb, int entry, unsigned int val)
 {
     unsigned long *sec;
@@ -393,6 +395,7 @@ static int update_entry(struct bpb *bpb, int entry, unsigned int val)
 
     return 0;
 }
+#endif
 
 static int read_entry(struct bpb *bpb, int entry)
 {
@@ -430,6 +433,7 @@ static int get_next_cluster(struct bpb *bpb, unsigned int cluster)
         return next_cluster;
 }
 
+#ifdef DISK_WRITE
 static int flush_fat(struct bpb *bpb)
 {
     int i;
@@ -495,7 +499,7 @@ static int add_dir_entry(struct bpb *bpb,
                          unsigned int currdir,
                          struct fat_direntry *de)
 {
-    unsigned char buf[BLOCK_SIZE];
+    unsigned char buf[SECTOR_SIZE];
     unsigned char *eptr;
     int i;
     int err;
@@ -577,7 +581,7 @@ static int add_dir_entry(struct bpb *bpb,
         else
         {
             /* Look for a free slot */
-            for(i = 0;i < BLOCK_SIZE;i+=32)
+            for(i = 0;i < SECTOR_SIZE;i+=32)
             {
                 firstbyte = buf[i];
                 if(firstbyte == 0xe5 || firstbyte == 0)
@@ -610,7 +614,7 @@ static int add_dir_entry(struct bpb *bpb,
                     if(firstbyte == 0)
                     {
                         i += 32;
-                        if(i < BLOCK_SIZE)
+                        if(i < SECTOR_SIZE)
                         {
                             buf[i] = 0;
                             /* We are done */
@@ -780,8 +784,9 @@ int fat_create_file(struct bpb *bpb, unsigned int currdir, char *name)
     err = add_dir_entry(bpb, currdir, &de);
     return err;
 }
+#endif
 
-static int parse_direntry(struct fat_direntry *de, char *buf)
+static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
 {
     /* is this a long filename entry? */
     if ( ( buf[FATDIR_ATTR] & FAT_ATTR_LONG_NAME_MASK ) == 
@@ -798,10 +803,63 @@ static int parse_direntry(struct fat_direntry *de, char *buf)
     de->wrtdate = BYTES2INT16(buf,FATDIR_WRTDATE);
     de->wrttime = BYTES2INT16(buf,FATDIR_WRTTIME);
     de->filesize = BYTES2INT32(buf,FATDIR_FILESIZE);
+    de->firstcluster = BYTES2INT16(buf,FATDIR_FSTCLUSLO) |
+                      (BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
     strncpy(de->name, &buf[FATDIR_NAME], 11);
 
     return 1;
 }
+
+int fat_open(struct bpb *bpb, 
+             unsigned int startcluster,
+             struct fat_fileent *ent)
+{
+    ent->firstcluster = startcluster;
+    ent->nextcluster = startcluster;
+    ent->nextsector = cluster2sec(bpb,startcluster);
+    ent->sectornum = 0;
+    return 0;
+}
+
+int fat_read(struct bpb *bpb, 
+             struct fat_fileent *ent,
+             int sectorcount,
+             void* buf )
+{
+    int cluster = ent->nextcluster;
+    int sector = ent->nextsector;
+    int numsec = ent->sectornum;
+    int err, i;
+
+    for ( i=0; i<sectorcount; i++ ) {
+        err = ata_read_sectors(sector,1,(char*)buf+(i*SECTOR_SIZE));
+        if(err) {
+            DEBUG2( "fat_read() - Couldn't read sector %d"
+                    " (error code %i)\n", sector,err);
+            return -1;
+        }
+
+        numsec++;
+        if ( numsec >= bpb->bpb_secperclus ) {
+            cluster = get_next_cluster(bpb,cluster);
+            if (!cluster)
+                break; /* end of file */
+            
+            sector = cluster2sec(bpb,cluster);
+            if (sector<0)
+                return -1;
+            numsec=0;
+        }
+        else
+            sector++;
+    }
+    ent->nextcluster = cluster;
+    ent->nextsector = sector;
+    ent->sectornum = numsec;
+
+    return sectorcount;
+}
+
 
 int fat_opendir(struct bpb *bpb, 
                 struct fat_dirent *ent, 
@@ -848,7 +906,7 @@ int fat_getnext(struct bpb *bpb,
     while(!done)
     {
         /* Look for a free slot */
-        for(i = ent->entry;i < BLOCK_SIZE/32;i++)
+        for(i = ent->entry;i < SECTOR_SIZE/32;i++)
         {
             firstbyte = ent->cached_buf[i*32];
             if(firstbyte == 0xe5)
@@ -865,7 +923,7 @@ int fat_getnext(struct bpb *bpb,
         }
 
         /* Next sector? */
-        if(i < BLOCK_SIZE/32)
+        if(i < SECTOR_SIZE/32)
         {
             i++;
         }

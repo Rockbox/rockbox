@@ -20,7 +20,7 @@
 #ifndef FAT_H
 #define FAT_H
 
-#define BLOCK_SIZE 512
+#define SECTOR_SIZE 512
 
 struct bpb
 {
@@ -71,12 +71,12 @@ struct fat_direntry
     unsigned short crttime;         /* Creation time */
     unsigned short crtdate;         /* Creation date */
     unsigned short lstaccdate;      /* Last access date */
-    unsigned short fstclushi;       /* High word of first cluster
-                                       (0 for FAT12/16) */
     unsigned short wrttime;         /* Last write time */
     unsigned short wrtdate;         /* Last write date */
-    unsigned short fstcluslo;       /* Low word of first cluster */
     unsigned int filesize;          /* File size in bytes */
+    unsigned short fstclusterlo;
+    unsigned short fstclusterhi;
+    int firstcluster;               /* fstclusterhi<<16 + fstcluslo */
 };
 
 #define FAT_ATTR_READ_ONLY   0x01
@@ -91,7 +91,15 @@ struct fat_dirent
     int entry;
     unsigned int cached_sec;
     unsigned int num_sec;
-    char cached_buf[BLOCK_SIZE];
+    char cached_buf[SECTOR_SIZE];
+};
+
+struct fat_fileent
+{
+    int firstcluster;    /* first cluster in file */
+    int nextcluster;     /* cluster of last access */
+    int nextsector;      /* sector of last access */
+    int sectornum;       /* sector number in this cluster */
 };
 
 extern int fat_create_file(struct bpb *bpb, 
@@ -100,6 +108,14 @@ extern int fat_create_file(struct bpb *bpb,
 extern int fat_create_dir(struct bpb *bpb, 
                           unsigned int currdir,
                           char *name);
+extern int fat_open(struct bpb *bpb, 
+                    unsigned int cluster,
+                    struct fat_fileent *ent);
+extern int fat_read(struct bpb *bpb, 
+                    struct fat_fileent *ent,
+                    int sectorcount,
+                    void* buf );
+
 extern int fat_opendir(struct bpb *bpb, 
                        struct fat_dirent *ent, 
                        unsigned int currdir);
