@@ -324,8 +324,28 @@ void game_loop(void)
     }
 }
 
+void init_tetris()
+{
+    memset(&virtual, 0, sizeof(virtual));
+    start_x = 1;
+    start_y = 1;
+    max_x = 14;
+    max_y = 24;
+    current_x = 0;
+    current_y = 0;
+    current_f = 0;
+    current_b = 0;
+    level = 0;
+    lines = 0;
+    score = 0;
+    next_b = 0;
+    next_f = 0;
+}
+
 void tetris(void)
 {
+    init_tetris();
+
     draw_frame(start_x-1,start_x+max_x,start_y-1,start_y+max_y);
     lcd_puts(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
              TETRIS_TITLE, TETRIS_TITLE_FONT);
