@@ -231,7 +231,7 @@ void menu_exit(int m)
     inuse[m] = false;
 }
 
-bool menu_run(int m)
+int menu_show(int m)
 {
     bool exit = false;
 
@@ -289,17 +289,7 @@ bool menu_run(int m)
             case BUTTON_PLAY:
                 /* Erase current display state */
                 lcd_clear_display();
-            
-                /* if a child returns that USB was used, 
-                   we return immediately */
-                if (menus[m].items[menus[m].cursor].function()) {
-                    lcd_stop_scroll(); /* just in case */
-                    return true;
-                }
-            
-                /* Return to previous display state */
-                menu_draw(m);
-                break;
+                return menus[m].cursor;
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
@@ -331,11 +321,27 @@ bool menu_run(int m)
 #ifdef HAVE_LCD_CHARCELLS
                 status_set_param(false);
 #endif
-                return true;
+                return MENU_ATTACHED_USB;
         }
         
         status_draw();
     }
+    return MENU_SELECTED_EXIT;
+}
 
-    return false;
+
+bool menu_run(int m)
+{
+  bool stop=false;
+  while (!stop) {
+    int result=menu_show(m);
+    if (result == MENU_SELECTED_EXIT)
+      return false;
+    else if (result == MENU_ATTACHED_USB)
+      return true;
+    if (menus[m].items[menus[m].cursor].function()) {
+      return true;
+    }
+  }
+  return false;
 }

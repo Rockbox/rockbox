@@ -642,6 +642,7 @@ void set_current_file(char *path)
     }
 }
 
+#ifdef HAVE_LCD_BITMAP
 static int onplay_screen(char* dir, char* file)
 {
     bool exit = false;
@@ -788,6 +789,115 @@ static int onplay_screen(char* dir, char* file)
 
     return false;
 }
+
+#else
+
+static int onplay_screen(char* dir, char* file)
+{
+  bool exit = false;
+  bool playing = mpeg_status() & MPEG_STATUS_PLAY;
+  char buf[MAX_PATH];
+  struct entry* f = &dircache[dirstart + dircursor];
+  bool isdir = f->attr & ATTR_DIRECTORY;
+  struct menu_items items[3];
+  int ids[3];
+  int lastitem=0;
+  int m_handle;
+  int selected;
+
+  if ((dir[0]=='/') && (dir[1]==0))
+    snprintf(buf, sizeof buf, "%s%s", dir, file);
+  else
+    snprintf(buf, sizeof buf, "%s/%s", dir, file);
+
+  if (playing) {
+    items[lastitem].desc=str(LANG_QUEUE);
+    ids[lastitem]=1;
+    lastitem++;
+  }
+    
+  items[lastitem].desc=str(LANG_RENAME);
+  ids[lastitem]=2;
+  lastitem++;
+
+    /* don't delete directories */
+  if (!isdir) {
+    items[lastitem].desc=str(LANG_DELETE);
+    ids[lastitem]=3;
+    lastitem++;
+  }
+  m_handle=menu_init(items, lastitem);
+
+  selected=menu_show(m_handle);
+  if (selected>=0) {
+    switch(ids[selected]) {
+    case 1:
+      if (playing)
+        queue_add(buf);
+      break;
+    case 2:
+      {
+        char newname[MAX_PATH];
+        char* ptr = strrchr(buf, '/') + 1;
+        int pathlen = (ptr - buf);
+        strncpy(newname, buf, sizeof newname);
+        if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
+          if (rename(buf, newname) < 0) {
+            lcd_clear_display();
+            lcd_puts(0,0,str(LANG_RENAME));
+            lcd_puts(0,1,str(LANG_FAILED));
+            lcd_update();
+            sleep(HZ*2);
+          }
+          else
+            reload_dir = true;
+        }
+      }
+      break;
+    case 3:
+      lcd_clear_display();
+#ifdef HAVE_LCD_CHARCELLS
+      lcd_puts(0,0,file);
+      lcd_puts(0,1,str(LANG_REALLY_DELETE));
+#else
+      lcd_puts(0,0,str(LANG_REALLY_DELETE));
+      lcd_puts(0,1,file);
+      lcd_puts(0,3,str(LANG_RESUME_CONFIRM_RECORDER));
+      lcd_puts(0,4,str(LANG_RESUME_CANCEL_RECORDER));
+#endif
+      lcd_update();
+      {
+        while (!exit) {
+          int btn = button_get(true);
+          switch (btn) {
+          case BUTTON_PLAY:
+          case BUTTON_PLAY | BUTTON_REL:
+            if (!remove(buf)) {
+              reload_dir = true;
+              lcd_clear_display();
+              lcd_puts(0,0,file);
+              lcd_puts(0,1,str(LANG_DELETED));
+              lcd_update();
+              sleep(HZ);
+              exit = true;
+              break;
+            }
+          
+          default:
+            /* ignore button releases */
+            if (!(btn & BUTTON_REL))
+              exit = true;
+            break;
+          }
+        }
+      }
+      break;
+    }
+  }
+  menu_exit(m_handle);
+  return false;
+}
+#endif
 
 
 

@@ -32,6 +32,14 @@ void menu_exit(int menu);
 
 void put_cursorxy(int x, int y, bool on);
 
+ /* Returns below define, or number of selected menu item*/
+int menu_show(int m);
+#define MENU_ATTACHED_USB -1
+#define MENU_SELECTED_EXIT -2
+
 bool menu_run(int menu);
 
 #endif /* End __MENU_H__ */
+
+
+
