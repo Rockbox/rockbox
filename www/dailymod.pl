@@ -1,33 +1,66 @@
 #!/usr/bin/perl
 
-$basedir = "/home/dast/rockbox-build/daily-build";
+my $basedir = "/home/dast/rockbox-build/daily-build";
 
-sub list {
-    $dir = shift @_;
+my @list=("player", "recorder", "fmrecorder", "recorder8mb");
 
+for(@list) {
+    my $dir = $_;
     opendir(DIR, "$basedir/$dir") or
         die "Can't opendir($basedir/$dir)";
-    @tarballs = sort grep { /^a/ } readdir(DIR);
+    my @files = sort grep { /^rockbox2/ } readdir(DIR);
     closedir DIR;
-    
-    print "<ul>\n";
-    for ( @tarballs ) {
-        print "<li><a href=\"daily/$dir/$_\">$_</a>\n";
+
+    for(@files) {
+        /(\d+)/;
+        $date{$1}=$1;
     }
-    print "</ul>\n";
 }
 
-print "<table class=rockbox><tr><th>player</th><th>recorder</th><th>fm recorder</th><th>8MB recorder</th></tr>\n";
-print "<tr><td>\n";
-&list("player");
+print "<table class=rockbox><tr><th>date</th>";
 
-print "</td><td>\n";
-&list("recorder");
+for(@list) {
+    print "<th>$_</th>";
+}
 
-print "</td><td>\n";
-&list("fmrecorder");
+for(reverse sort keys %date) {
+    my $d = $_;
+    my $nice = $d;
+    if($d =~ /(\d\d\d\d)(\d\d)(\d\d)/) {
+        $nice = "$1-$2-$3";
+    }
+    print "</tr>\n<tr><td>$nice</td>";
+    
+    for(@list) {
+        my $n=0;
+        print "<td> ";
+        if( -f "daily/$_/rockbox${d}.mod") {
+            print "<a href=\"daily/$_/rockbox${d}.mod\">mod</a>";
+            $n++;
+        }
+        if( -f "daily/$_/rockbox${d}.ajz") {            
+            printf "%s<a href=\"daily/$_/rockbox${d}.ajz\">ajz</a>",
+            $n?", ":"";
+            $n++;
+        }
+        if( -f "daily/$_/rocks${d}.zip") {
+            printf "%s<a href=\"daily/$_/rocks${d}.zip\">rocks</a>",
+            $n?", ":"";
+            $n++;
+        }
+        if( -f "daily/$_/rockbox-${d}.zip") {
+            printf "%s<a href=\"daily/$_/rockbox-${d}.zip\">full</a>",
+            $n?", ":"";
+            $n++;
+        }
+        if( -f "daily/$_/rockbox${d}.ucl") {
+            printf "%s<a href=\"daily/$_/rockbox${d}.ucl\">ucl</a>",
+            $n?", ":"";
+            $n++;
+        }
+        print "</td>";
+    }
+    print "</tr>\n"
+}
+print "</table>\n";
 
-print "</td><td>\n";
-&list("recorder8mb");
-
-print "</td></tr></table>\n";
