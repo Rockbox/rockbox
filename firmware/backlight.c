@@ -70,9 +70,8 @@ void backlight_thread(void)
 		DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
 		usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-		/* Wait until the system reboots */
-		while(1)
-		    yield();
+		/* Wait until the USB cable is extracted again */
+		usb_wait_for_disconnect(&backlight_queue);
 		break;
         }
     }
