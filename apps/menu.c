@@ -16,48 +16,66 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include <stdbool.h>
 #include "lcd.h"
 #include "menu.h"
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"
 
-/* Global values for menuing */
-static int menu_top;
-static int menu_bottom;
-static int cursor;
-static struct menu_items* items;
-static int itemcount;
+struct menu {
+    int menu_top;
+    int menu_bottom;
+    int cursor;
+    struct menu_items* items;
+    int itemcount;
+};
+
+#define MAX_MENUS 4
+
+static struct menu menus[MAX_MENUS];
+static bool inuse[MAX_MENUS] = { false };
 
 /* 
  * Move the cursor to a particular id, 
  *   target: where you want it to be 
  */
-static void put_cursor(int target)
+static void put_cursor(int m, int target)
 {
-    lcd_puts(0, cursor, " ");
-    cursor = target;
-    lcd_puts(0, cursor, "-");
+    lcd_puts(0, menus[m].cursor, " ");
+    menus[m].cursor = target;
+    lcd_puts(0, menus[m].cursor, "-");
 }
 
-/* We call the function pointer related to the current cursor position */
-static void execute_menu_item(void)
+int menu_init(struct menu_items* mitems, int count)
 {
-    /* call the proper function for this line */
-    items[cursor].function();
+    int i;
+
+    for ( i=0; i<MAX_MENUS; i++ ) {
+        if ( !inuse[i] ) {
+            inuse[i] = true;
+            break;
+        }
+    }
+    if ( i == MAX_MENUS ) {
+        DEBUGF("Out of menus!\n");
+        return -1;
+    }
+    menus[i].items = mitems;
+    menus[i].itemcount = count;
+    menus[i].menu_top = 0;
+    menus[i].menu_bottom = count-1;
+    menus[i].cursor = 0;
+
+    return i;
 }
 
-void menu_init(struct menu_items* mitems, int count)
+void menu_exit(int m)
 {
-    items = mitems;
-    itemcount = count;
-    menu_top = items[0].id;
-    menu_bottom = count-1;
-    cursor = menu_top;
+    inuse[m] = false;
 }
 
-static void menu_draw(void)
+static void menu_draw(int m)
 {
     int i = 0;
 
@@ -66,23 +84,23 @@ static void menu_draw(void)
     lcd_setmargins(0,0);
     lcd_setfont(0);
 #endif
-    for (i = 0; i < itemcount; i++) {
-        lcd_puts(1, i, items[i].desc);
-        if (i < menu_top)
-            menu_top = i;
-        if (i > menu_bottom)
-            menu_bottom = i;
+    for (i = 0; i < menus[m].itemcount; i++) {
+        lcd_puts(1, i, menus[m].items[i].desc);
+        if (i < menus[m].menu_top)
+            menus[m].menu_top = i;
+        if (i > menus[m].menu_bottom)
+            menus[m].menu_bottom = i;
     }
 
-    lcd_puts(0, cursor, "-");
+    lcd_puts(0, menus[m].cursor, "-");
     lcd_update();
 }
 
-void menu_run(void)
+void menu_run(int m)
 {
     int key;
 
-    menu_draw();
+    menu_draw(m);
     
     while(1) {
         key = button_get();
@@ -97,12 +115,12 @@ void menu_run(void)
 #else
             case BUTTON_LEFT:
 #endif
-                if (cursor == menu_top) {
+                if (menus[m].cursor == menus[m].menu_top) {
                     /* wrap around to menu bottom */
-                    put_cursor(menu_bottom);
+                    put_cursor(m, menus[m].menu_bottom);
                 } else {
                     /* move up */
-                    put_cursor(cursor-1);
+                    put_cursor(m, menus[m].cursor-1);
                 }
                 break;
 
@@ -111,12 +129,12 @@ void menu_run(void)
 #else
             case BUTTON_RIGHT:
 #endif
-                if (cursor == menu_bottom) {
+                if (menus[m].cursor == menus[m].menu_bottom) {
                     /* wrap around to menu top */
-                    put_cursor(menu_top);
+                    put_cursor(m, menus[m].menu_top);
                 } else {
                     /* move down */
-                    put_cursor(cursor+1);
+                    put_cursor(m, menus[m].cursor+1);
                 }
                 break;
 
@@ -127,10 +145,10 @@ void menu_run(void)
                 /* Erase current display state */
                 lcd_clear_display();
             
-                execute_menu_item();
+                menus[m].items[menus[m].cursor].function();
             
                 /* Return to previous display state */
-                menu_draw();
+                menu_draw(m);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
