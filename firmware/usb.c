@@ -83,6 +83,7 @@ static bool usb_monitor_enabled;
 static void usb_enable(bool on)
 {
 #ifdef USB_ENABLE_ONDIOSTYLE
+    PACR2 &= ~0x04C0; /* use PA3, PA5 as GPIO */
     if(on)
     {
 #ifdef HAVE_MMC
@@ -96,7 +97,6 @@ static void usb_enable(bool on)
         and_b(~0x20, &PADRL); /* disable USB */
         or_b(0x08, &PADRL); /* deassert card detect */
     }
-    PACR2 &= ~0x04C0; /* use PA3, PA5 as GPIO */
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
 #else /* standard HD Jukebox */
 #ifdef HAVE_LCD_BITMAP
@@ -362,7 +362,7 @@ void usb_init(void)
 
     /* We assume that the USB cable is extracted */
     last_usb_status = false;
-    
+
     queue_init(&usb_queue);
     create_thread(usb_thread, usb_stack, sizeof(usb_stack), usb_thread_name);
 
