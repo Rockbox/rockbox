@@ -75,8 +75,8 @@ static long matrice[3][3];
 
 static int nb_points = 8;
 
-static int x_off = 56;
-static int y_off = 31;
+static int x_off = LCD_WIDTH/2;
+static int y_off = LCD_HEIGHT/2;
 static int z_off = 600;
 
 /* Precalculated sine and cosine * 10000 (four digit fixed point math) */
@@ -224,17 +224,23 @@ static void cube_viewport(void)
     }
 }
 
+#if LCD_HEIGHT > 100
+#define DIST 80
+#else
+#define DIST 40
+#endif
+
 static void cube_init(void)
 {
     /* Original 3D-position of cube's corners */
-    sommet[0].x = -40;  sommet[0].y = -40;  sommet[0].z = -40;
-    sommet[1].x =  40;  sommet[1].y = -40;  sommet[1].z = -40;
-    sommet[2].x =  40;  sommet[2].y =  40;  sommet[2].z = -40;
-    sommet[3].x = -40;  sommet[3].y =  40;  sommet[3].z = -40;
-    sommet[4].x =  40;  sommet[4].y = -40;  sommet[4].z =  40;
-    sommet[5].x = -40;  sommet[5].y = -40;  sommet[5].z =  40;
-    sommet[6].x = -40;  sommet[6].y =  40;  sommet[6].z =  40;
-    sommet[7].x =  40;  sommet[7].y =  40;  sommet[7].z =  40;
+    sommet[0].x = -DIST;  sommet[0].y = -DIST;  sommet[0].z = -DIST;
+    sommet[1].x =  DIST;  sommet[1].y = -DIST;  sommet[1].z = -DIST;
+    sommet[2].x =  DIST;  sommet[2].y =  DIST;  sommet[2].z = -DIST;
+    sommet[3].x = -DIST;  sommet[3].y =  DIST;  sommet[3].z = -DIST;
+    sommet[4].x =  DIST;  sommet[4].y = -DIST;  sommet[4].z =  DIST;
+    sommet[5].x = -DIST;  sommet[5].y = -DIST;  sommet[5].z =  DIST;
+    sommet[6].x = -DIST;  sommet[6].y =  DIST;  sommet[6].z =  DIST;
+    sommet[7].x =  DIST;  sommet[7].y =  DIST;  sommet[7].z =  DIST;
 }
 
 static void line(int a, int b)
