@@ -14,6 +14,8 @@ firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> M
 
 <h2>News</h2>
 
+<p><i>2002-05-26</i>: New web design. First player release drawing closer.
+
 <p><i>2002-05-03</i>: <b>SOUND!</b> Linus' experimental MAS code has 
 <a href="http://bjorn.haxx.se/rockbox/mail/rockbox-archive-2002-05/0016.shtml">played our first 4 seconds of music</a>.
 
