@@ -113,6 +113,7 @@ int kbd_input(char* text, int buflen)
           temptext[p++]=text[i++];
         }
         temptext[p]=0;
+        lcd_remove_cursor();
         lcd_puts(1, 0, temptext);
         lcd_put_cursor(cursor_pos-left_pos+1, 0, 0x7f);
         old_cursor_pos=cursor_pos;
