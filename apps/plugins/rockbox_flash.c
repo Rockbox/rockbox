@@ -816,7 +816,6 @@ void DoUserDialog(char* filename)
     UINT8* pos;
     int memleft;
     UINT32 crc;
-    bool show_greet = false;
 
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
