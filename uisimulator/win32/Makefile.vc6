@@ -65,7 +65,7 @@ SRCS =	*.c \
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
 SRCS = $(SRCS) $(RECDIR)*.c $(DRIVERS)/lcd-recorder.c
 !ELSE
-SRCS = $(SRCS) $(APPSCOMMON)/lcd-playersim.c
+SRCS = $(SRCS) $(APPSCOMMON)/lcd-playersim.c $(DRIVERS)/lcd-player.c
 !ENDIF
 
 OBJS = lang.obj $(SRCS:.c=.obj) uisw32.res
