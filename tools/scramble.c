@@ -61,7 +61,7 @@ int main (int argc, char** argv)
     unsigned long length,i,slen;
     unsigned char *inbuf,*outbuf;
     unsigned short crc=0;
-    unsigned long crc32=0; /* 32 bit checksum */
+    unsigned long chksum=0; /* 32 bit checksum */
     unsigned char header[24];
     unsigned char *iname = argv[1];
     unsigned char *oname = argv[2];
@@ -143,7 +143,7 @@ int main (int argc, char** argv)
         }
         /* we store a 4-letter model name too, for humans */
         strcpy(irivermodel, &argv[1][5]);
-        crc32 = irivernum; /* start checksum calcs with this */
+        chksum = irivernum; /* start checksum calcs with this */
     }
 
     else if(!strcmp(argv[1], "-iriver")) {
@@ -202,7 +202,7 @@ int main (int argc, char** argv)
             for (i = 0; i < length/2; i++) {
                 unsigned short *inbuf16 = (unsigned short *)inbuf;
                 /* add 16 unsigned bits but keep a 32 bit sum */
-                crc32 += inbuf16[i];
+                chksum += inbuf16[i];
             }
             break;
         case scramble:
@@ -237,7 +237,7 @@ int main (int argc, char** argv)
     {
         case add:
         {
-            int2be(crc32, header); /* checksum, big-endian */
+            int2be(chksum, header); /* checksum, big-endian */
             memcpy(&header[4], irivermodel, 4); /* 4 bytes model name */
             memcpy(outbuf, inbuf, length); /* the input buffer to output*/
             headerlen = 8;
