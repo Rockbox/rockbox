@@ -185,18 +185,12 @@ bool dirbrowse(char *root)
         }
         switch(key) {
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-                return false;
-                break;
             case BUTTON_LEFT:
 #else
             case BUTTON_STOP:
 #endif
                 i=strlen(currdir);
-                if (i==1) {
-                    return false;
-                }
-                else {
+                if (i>1) {
                     while (currdir[i-1]!='/')
                         i--;
                     strcpy(buf,&currdir[i]);
@@ -222,9 +216,7 @@ bool dirbrowse(char *root)
                     if (dircursor==TREE_MAX_ON_SCREEN)
                         dircursor=0;
                     lcd_puts(0, LINE_Y+dircursor, "-");
-#ifdef HAVE_LCD_BITMAP
                     lcd_update();
-#endif
                 }
 
                 break;
@@ -272,9 +264,7 @@ bool dirbrowse(char *root)
                     lcd_puts(0, LINE_Y+dircursor, " ");
                     dircursor--;
                     lcd_puts(0, LINE_Y+dircursor, "-");
-#ifdef HAVE_LCD_BITMAP
                     lcd_update();
-#endif
                 }
                 else {
                     if (start) {   
@@ -317,6 +307,39 @@ bool dirbrowse(char *root)
 #endif
                     }
                 }
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1:
+            case BUTTON_F2:
+            case BUTTON_F3:
+#else
+            case BUTTON_MENU:
+#endif
+                main_menu();
+
+                /* restore display */
+                /* TODO: this is just a copy from BUTTON_STOP, fix it */
+                lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+                lcd_putsxy(0,0, "[Browse]",0);
+                lcd_setmargins(0,MARGIN_Y);
+                lcd_setfont(0);
+#endif
+                if ( dirlevel < MAX_DIR_LEVELS )
+                    start = dirpos[dirlevel];
+                else
+                    start = 0;
+                numentries = showdir(currdir, buffer, 0, start, &at_end);
+                dircursor=0;
+                while ( (dircursor < TREE_MAX_ON_SCREEN) && 
+                        (strcmp(buffer[dircursor].name,buf)!=0)) 
+                    dircursor++;
+                if (dircursor==TREE_MAX_ON_SCREEN)
+                    dircursor=0;
+                lcd_puts(0, LINE_Y+dircursor, "-");
+                lcd_update();
+
                 break;
         }
     }
