@@ -912,11 +912,15 @@ void lcd_invertrect (int x, int y, int nx, int ny)
 {
     int i,j;
 
-    if (x>LCD_WIDTH) return;
-    if (y>LCD_HEIGHT) return;
+    if (x>LCD_WIDTH)
+        return;
+    if (y>LCD_HEIGHT)
+        return;
 
-    if (x+nx>LCD_WIDTH) nx=LCD_WIDTH-x;
-    if (y+ny>LCD_HEIGHT) ny=LCD_HEIGHT-y;
+    if (x+nx>LCD_WIDTH)
+        nx=LCD_WIDTH-x;
+    if (y+ny>LCD_HEIGHT)
+        ny=LCD_HEIGHT-y;
 
     for (i = 0; i < nx; i++)
         for (j = 0; j < ny; j++)
