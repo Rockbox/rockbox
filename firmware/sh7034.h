@@ -291,4 +291,46 @@
 
 #define CASCR      (*((volatile unsigned char*)CASCR_ADDR))  
 
+/***************************************************************************
+ * Register bit definitions
+ **************************************************************************/
+
+/*
+ * Serial mode register bits
+ */
+
+#define SYNC_MODE             0x80
+#define SEVEN_BIT_DATA        0x40
+#define PARITY_ON             0x20
+#define ODD_PARITY            0x10
+#define STOP_BITS_2           0x08
+#define ENABLE_MULTIP         0x04
+#define PHI_64                0x03
+#define PHI_16                0x02
+#define PHI_4                 0x01
+
+/*
+ * Serial control register bits
+ */
+#define SCI_TIE               0x80        /* Transmit interrupt enable */
+#define SCI_RIE               0x40        /* Receive interrupt enable */
+#define SCI_TE                0x20        /* Transmit enable */
+#define SCI_RE                0x10        /* Receive enable */
+#define SCI_MPIE              0x08        /* Multiprocessor interrupt enable */
+#define SCI_TEIE              0x04        /* Transmit end interrupt enable */
+#define SCI_CKE1              0x02        /* Clock enable 1 */
+#define SCI_CKE0              0x01        /* Clock enable 0 */
+
+/*
+ * Serial status register bits
+ */
+#define SCI_TDRE              0x80        /* Transmit data register empty */
+#define SCI_RDRF              0x40        /* Receive data register full */
+#define SCI_ORER              0x20        /* Overrun error */
+#define SCI_FER               0x10        /* Framing error */
+#define SCI_PER               0x08        /* Parity error */
+#define SCI_TEND              0x04        /* Transmit end */
+#define SCI_MPB               0x02        /* Multiprocessor bit */
+#define SCI_MPBT              0x01        /* Multiprocessor bit transfer */
+
 #endif
