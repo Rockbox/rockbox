@@ -7,8 +7,6 @@ Description / General Info
   as a means to customize the WPS to the user's likings.
 * After editing the .wps file, "play" it to make it take effect.
 * The file may be 2 lines long for the Player, and 10 lines for the Recorder.
-* The line that has the time displayed on it MUST NOT be the line that
-  is scrolled, or the time will not be updated.
 * All characters not preceded by % are displayed as typed.
 
 File Location
@@ -21,13 +19,10 @@ folder, it'll be remembered and used for subsequent restarts. Filenames in the
 
 Tags
 ----
-(Options marked (*) have been added after the last official release, and are
-thus only available in daily builds.)
-
 ID3 Info Tags:
   %ia : ID3 Artist
   %id : ID3 Album Name
-  %ig : ID3 Genre Name (*)
+  %ig : ID3 Genre Name
   %in : ID3 Track Number
   %it : ID3 Track Title
   %iy : ID3 Year
@@ -35,8 +30,8 @@ ID3 Info Tags:
 
 
 Battery Info:
-  %bl : Show numeric battery level in percent (*)
-  %bt : Show estimated battery time left (*)
+  %bl : Show numeric battery level in percent
+  %bt : Show estimated battery time left
 
 File Info Tags:
   %fb : File Bitrate (in kbps)
@@ -86,9 +81,9 @@ Other Tags:
   %>  : Display a '>'
   %s  : Indicate that the line should scroll. Can occur anywhere in 
         a line (given that the text is displayed; see conditionals
-        above). You can specify up to 10 scrolling lines (*).
-        %s is ignored if combined with %pb, %pc or %pr on the same
-        line (the result wouldn't be good anyway).
+        above). You can specify up to 10 scrolling lines.
+        Scrolling lines can not contain dynamic content such as timers,
+        peak meters or progress bars.
 
 Example File
 ------------
@@ -104,16 +99,16 @@ Default
 If you haven't selected a .wps file in the .rockbox directory, you get the
 hardcoded wps layout. The default WPS screen is for player:
 
-%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>
-%pc%pb%pt
+%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>
+%pc%?ps<*|/>%pt
 
 and for recorder:
 
-%s%fp
-%it
-%id
-%ia
-%fb kbit %fv
-Time: %pc / %pt
+%s%?it<%?in<%in. |>%it|%fn>
+%s%?ia<%ia|%?d2<%d2|(root)>>
+%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>
+
+%pc/%pt [%pp:%pe]
+%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
 %pb
 %pm
