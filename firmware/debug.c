@@ -277,9 +277,16 @@ void dbg_ports(void)
 	    PBDR ^= 0x20;
 	    break;
 
+	case BUTTON_UP:
+	    /* Toggle the IDE power */
+	    PADR ^= 0x20;
+	    break;
+
 	case BUTTON_OFF:
 	    /* Disable the charger */
 	    PBDR |= 0x20;
+	    /* Enable the IDE power */
+	    PADR |= 0x20;
 	    return;
 	}
     }
