@@ -19,7 +19,6 @@ sub show {
     if(@a) {
         print @a;
         undef @a;
-        print "</blockquote>\n";
     }
     if(@p) {
         print "<pre>\n";
@@ -63,7 +62,7 @@ while(<STDIN>) {
         }
         # first line of A
         $line =~ s/^A(\d*)[.:] *//g; # cut off the "A[num]."
-        push @a, "<blockquote><p class=\"faqa\">";
+        push @a, "<p class=\"faqa\">";
         push @a, $line;
 
         $prev='a';
@@ -76,7 +75,7 @@ while(<STDIN>) {
 
         if($prev ne 'a') {
             show();
-            push @a, "<blockquote><p class=\"faqa\">";
+            push @a, "<p class=\"faqa\">";
         }
 
         push @a, $_;
