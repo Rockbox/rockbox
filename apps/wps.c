@@ -85,6 +85,8 @@ void player_change_volume(int button)
                 break;
 
             case BUTTON_MENU | BUTTON_REL:
+            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REL:
+            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REL:
                 exit = true;
                 break;
         }
