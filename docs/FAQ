@@ -33,7 +33,7 @@ A7. Start by reading up on the information about the jukeboxes on our web page.
 Q8. I want to join the development team, but don't have a SourceForge account,
     what should I do?
 A8. You don't need a SourceForge account to help developing Rockbox. Just
-    submit patches (http://rockbox.haxx.se/docs/patch.html)
+    submit patches (http://rockbox.haxx.se/twiki/bin/view/Main/WorkingWithPatches)
 
     If your patches are consistently well-written and thus accepted, you may
     ultimately be offered CVS commit access. If that should happen, you will
@@ -149,10 +149,10 @@ A23: You have a couple options here.  You could forget the question, find an
      really recommend any of these (though I do opt for '42' often myself).
      What we do recommend is stopping by IRC, visiting the web site
      (http://rockbox.haxx.se) to see if the question was answered else where
-     (like our nodo http://rockbox.haxx.se/docs/nodo.html FAQ) and just not
-     included here, or ultimately dropping an email to the mailing list
-     (rockbox@cool.haxx.se) or the FAQ maintainer listed on the project home
-     page.
+     (like our nodo http://rockbox.haxx.se/twiki/bin/view/Main/NoDo FAQ)
+     and just not included here, or ultimately dropping an email to the
+     mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the
+     project home page.
 
 Q24: Are there other ways to contact the developers?
 A24: Yes.
@@ -220,7 +220,7 @@ A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
 
 Q33: Can I use the Archos as an USB hard disk to store data from my PDA/
      digital camera/phone etc.
-A33: No.  See: http://rockbox.haxx.se/docs/nodo.html#4
+A33: No.  See http://rockbox.haxx.se/twiki/bin/view/Main/NoDo#4_Interfacing_with_other_USB_dev
 
 Q34: When I use Rockbox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
@@ -233,8 +233,8 @@ A35: STOP!  We have put together a completely different FAQ for battery
      Check out: http://rockbox.haxx.se/docs/battery-faq.html
 
 Q36. I have a question about patches...
-A36. Check out http://rockbox.haxx.se/docs/patch.html as it should answer any
-     patch related questions you may have.
+A36. Check out http://rockbox.haxx.se/twiki/bin/view/Main/WorkingWithPatches
+     as it should answer any patch related questions you may have.
 
 Q37: What is the WPS?
 A37: That is the 'While Playing Screen'.  Basically this is what is shown on
@@ -248,9 +248,9 @@ A38: It is very good if you want information about the current item playing ;)
      Please see http://rockbox.haxx.se/manual/wps.html for information.
 
 Q40: So how do I load/make a .wps file?
-A40: You check out http://rockbox.haxx.se/docs/custom_wps_format.html to learn
-     the format/features of a .wps file, and you visit 
-     http://rockbox.haxx.se/manual/wps.html to learn how to load it ;)
+A40: You check out http://rockbox.haxx.se/twiki/bin/view/Main/CustomWPS
+     to learn the format/features of a .wps file, and read the manual to
+     learn how to load it ;)
 
 Q41: Does Rockbox support other languages? How do I load/use different 
      languages?
@@ -509,8 +509,8 @@ A65: There are several types of microphones.
      Recommendation for others: Buy some mic + preamp combination which can be
      plugged into a line in of any amplifier. Maybe such a commercially
      available combination needs a power supply and doesn't work with
-     batteries. Some are very expensive. (If you know a cheap solution with an
-     electret condenser mic + preamp, please tell us!)
+     batteries. Some are very expensive. You might have some luck at
+     http://www.giant-squid-audio-lab.com/.
 
      What does not work: Don't use an amplifier thing that is simply connected
      between some mic cable. Maybe it sounds as if it could work, but I
@@ -533,14 +533,10 @@ A66: If your device is off and you connect the charger, the Archos charger code
      you see the Rockbox logo!
 
 Q67: Why can't you implement a cross-fader? That would be so cool!
-A67: Please read our NODO faq. http://rockbox.haxx.se/docs/nodo.html#3
+A67: Please read our NODO faq. http://rockbox.haxx.se/twiki/bin/view/Main/NoDo#3_Crossfade_between_tracks_
 
 Q68: My screen is all black/white when I run Rockbox on my Recorder!
-A68: We have no way of knowing the correct contrast setting from start and the
-     displays differ a lot. Change your contrast setting by doing this:
-
-     F1, down, right, down, down, right, down, down, down, right, down (until
-     you like the contrast)
+A68: This bug has been fixed in the later versions of Rockbox. Upgrade!
 
 Q69: Where are the FM controls for the FM Recorder?
 A69: In the menu: FM Radio
