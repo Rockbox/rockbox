@@ -28,7 +28,7 @@
 // opendir
 // open directory for scanning
 DIR *opendir (
-              char *dirname // directory name
+              const char *dirname // directory name
               )
 {
     DIR                 *p = (DIR*)malloc(sizeof(DIR));
