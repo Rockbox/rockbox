@@ -23,10 +23,6 @@
 <p>
 <!--#include file="lastcvs.link" -->
 
-<h2>Open bug reports</h2>
-<p>
-<!--#include file="bugs.txt" -->
-
 <h2>Roadmap</h2>
 <p>This is a rough indication of which features we plan/expect/hope to be
 included in which versions. Naturally, this is all subject to change without
