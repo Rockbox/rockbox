@@ -34,6 +34,9 @@ static void tick_start(unsigned int interval_in_ms);
 static struct event_queue *all_queues[32];
 static int num_queues;
 
+void sleep(int ticks) __attribute__ ((section(".icode")));
+void queue_wait(struct event_queue *q, struct event *ev) __attribute__ ((section(".icode")));;
+
 /****************************************************************************
  * Standard kernel stuff
  ****************************************************************************/
