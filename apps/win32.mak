@@ -33,7 +33,7 @@ FIRMWARE := ../firmware
 TOOLS := ../tools
 DOCSDIR := ../docs
 
-INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
+INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I.
 
 # Pick a target to build for
 TARGET=-DARCHOS_RECORDER=1

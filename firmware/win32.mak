@@ -14,7 +14,7 @@ AS    = sh-elf-as
 OC    = sh-elf-objcopy
 TOOLSDIR = ../tools
 
-INCLUDES=-Iinclude -I. -Icommon -Idrivers
+INCLUDES=-Iinclude -I. -Icommon -Idrivers -Iexport
 
 # Pick a target to build for
 TARGET=-DARCHOS_RECORDER=1
