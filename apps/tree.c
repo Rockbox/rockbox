@@ -141,7 +141,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* playlist */
 #define TREE_ATTR_WPS 0x100 /* wps config file */
 #define TREE_ATTR_MOD 0x200 /* firmware file */
-#define TREE_ATTR_EQ  0x400 /* EQ config file */
+#define TREE_ATTR_CFG 0x400 /* config file */
 #define TREE_ATTR_TXT 0x500 /* text file */
 #define TREE_ATTR_FONT 0x800 /* font file */
 #define TREE_ATTR_LNG  0x1000 /* binary lang file */
@@ -256,8 +256,8 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_MPA;
                 else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
                     dptr->attr |= TREE_ATTR_M3U;
-                else if (!strcasecmp(&entry->d_name[len-3], ".eq"))
-                    dptr->attr |= TREE_ATTR_EQ;
+                else if (!strcasecmp(&entry->d_name[len-3], ".cfg"))
+                    dptr->attr |= TREE_ATTR_CFG;
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
                 else if (!strcasecmp(&entry->d_name[len-4], ".txt"))
@@ -383,7 +383,7 @@ static int showdir(char *path, int start)
                 icon_type = Wps;
                 break;
 
-            case TREE_ATTR_EQ:
+            case TREE_ATTR_CFG:
                 icon_type = Wps;
                 break;
 
@@ -806,10 +806,10 @@ bool dirbrowse(char *root)
                             restore = true;
                             break;
 
-                        case TREE_ATTR_EQ:
+                        case TREE_ATTR_CFG:
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
-                            settings_load_eq(buf);
+                            settings_load_config(buf);
                             restore = true;
                             break;
 

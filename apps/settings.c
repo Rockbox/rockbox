@@ -541,7 +541,7 @@ static bool settings_parseline(char* line, char** name, char** value)
     return true;
 }
 
-static void set_eq_sound(char* value, int type, int* setting)
+static void set_sound(char* value, int type, int* setting)
 {
     int num = atoi(value);
 
@@ -557,7 +557,7 @@ static void set_eq_sound(char* value, int type, int* setting)
     mpeg_sound_set(type, num);
 }
 
-bool settings_load_eq(char* file)
+bool settings_load_config(char* file)
 {
     int fd;
     char line[128];
@@ -575,23 +575,22 @@ bool settings_load_eq(char* file)
             continue;
 
         if (!strcasecmp(name, "volume"))
-            set_eq_sound(value, SOUND_VOLUME, &global_settings.volume);
+            set_sound(value, SOUND_VOLUME, &global_settings.volume);
         else if (!strcasecmp(name, "bass"))
-            set_eq_sound(value, SOUND_BASS, &global_settings.bass);
+            set_sound(value, SOUND_BASS, &global_settings.bass);
         else if (!strcasecmp(name, "treble"))
-            set_eq_sound(value, SOUND_TREBLE, &global_settings.treble);
+            set_sound(value, SOUND_TREBLE, &global_settings.treble);
         else if (!strcasecmp(name, "balance"))
-            set_eq_sound(value, SOUND_BALANCE, &global_settings.balance);
+            set_sound(value, SOUND_BALANCE, &global_settings.balance);
         else if (!strcasecmp(name, "channels"))
-            set_eq_sound(value, SOUND_CHANNELS,
-                         &global_settings.channel_config);
+            set_sound(value, SOUND_CHANNELS, &global_settings.channel_config);
 #ifdef HAVE_MAS3587F
         else if (!strcasecmp(name, "loudness"))
-            set_eq_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
+            set_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
         else if (!strcasecmp(name, "bass boost"))
-            set_eq_sound(value, SOUND_SUPERBASS, &global_settings.bass_boost);
+            set_sound(value, SOUND_SUPERBASS, &global_settings.bass_boost);
         else if (!strcasecmp(name, "auto volume"))
-            set_eq_sound(value, SOUND_AVC, &global_settings.avc);
+            set_sound(value, SOUND_AVC, &global_settings.avc);
 #endif
     }
 

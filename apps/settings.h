@@ -114,7 +114,7 @@ void settings_reset(void);
 void settings_apply(void);
 void settings_display(void);
 
-bool settings_load_eq(char* file);
+bool settings_load_config(char* file);
 bool set_bool_options(char* string, bool* variable, 
                       char* yes_str, char* no_str );
 
