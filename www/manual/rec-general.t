@@ -19,3 +19,5 @@ Buttons:
 <tr><td>F1</td><td>Toggle back to the screen you came from when you arrived here, <a href="rec-wps.html">WPS</a> or <a href="rec-dir.html">dir browser</a></td></tr>
 </table>
 
+#include "foot.t"
+
