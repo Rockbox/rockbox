@@ -36,5 +36,6 @@ STATUS(RED,Newlib port,-,"", -,-)
 STATUS(RED,Directory browser UI,uisimulator/tree.c,"", Daniel,Progressing)
 STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
 STATUS(RED,API docs,-,"",-, Header files exist)
+STATUS(RED,New DSP algorithms,-,"",-, -)
 </tr></table>
 <i><small>Updated __DATE__</small></i>

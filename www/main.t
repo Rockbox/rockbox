@@ -33,6 +33,9 @@ firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> M
 
 <h2>News</h2>
 
+<p><i>2002-05-03</i>: <b>SOUND!</b> Linus' experimental MAS code has 
+<a href="http://bjorn.haxx.se/rockbox/mail/rockbox-archive-2002-05/0016.shtml">played our first 4 seconds of music</a>.
+
 <p><i>2002-04-27</i>: Julien Labruyére has generously donated an Archos Jukebox 6000 to the project. Thank you!
 
 <p><i>2002-04-25</i>: Grant Wier has tested the Player LCD's double-height capability:
