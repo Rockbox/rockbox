@@ -159,9 +159,8 @@ static inline void ldctx(void* addr)
                   "mov.l @%0+,r13\n\t"
                   "mov.l @%0+,r14\n\t"
                   "mov.l @%0+,r15\n\t"
-                  "lds.l @%0+,pr\n\t"
-                  "ldc.l @%0+,sr"
-                   : : "r" (addr));
+                  "ldc.l @%0+,sr\n\t"
+                  "lds.l @%0+,pr" : : "r" (addr));
 
 }
 
