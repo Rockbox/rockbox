@@ -32,6 +32,7 @@ endif
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
 COMMON = $(FIRMWAREDIR)/common
+SIMCOMMON = ../common
 DRIVERS = $(FIRMWAREDIR)/drivers
 TOOLSDIR = ../../tools
 DOCSDIR = ../../docs
@@ -51,7 +52,7 @@ $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES) $(RTC)
 
 # Use this for simulator-only files
 INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)/export -I$(APPDIR) \
--I$(MACHINEDIR) -I../common -I$(OBJDIR)
+-I$(MACHINEDIR) -I$(SIMCOMMON) -I$(OBJDIR)
 SRCDIRS = . $(DRIVERS) $(FIRMWAREDIR)/export $(APPDIR) $(MACHINEDIR)
 
 # The true Rockbox Applications should use this include path:
@@ -110,7 +111,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
-        button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS)
+       button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS) \
+       lcd-common.c
 
 ROCKSRC := $(wildcard $(APPDIR)/plugins/*.c)
 ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
@@ -247,16 +249,19 @@ $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/lcd-common.o: $(SIMCOMMON)/lcd-common.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/buffer.o: $(FIRMWAREDIR)/buffer.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/ctype.o: $(COMMON)/ctype.c
 	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
 
-$(OBJDIR)/stubs.o: ../common/stubs.c
+$(OBJDIR)/stubs.o: $(SIMCOMMON)/stubs.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/sim_icons.o: ../common/sim_icons.c
+$(OBJDIR)/sim_icons.o: $(SIMCOMMON)/sim_icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
@@ -277,10 +282,10 @@ $(OBJDIR)/power.o: $(DRIVERS)/power.c
 $(OBJDIR)/lcd-player-charset.o: $(DRIVERS)/lcd-player-charset.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/lcd-playersim.o: ../common/lcd-playersim.c
+$(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/font-player.o: ../common/font-player.c
+$(OBJDIR)/font-player.o: $(SIMCOMMON)/font-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c

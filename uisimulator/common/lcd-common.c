@@ -29,3 +29,15 @@
 #else
  #include "lcd-x11.h"
 #endif
+
+void lcd_blit(unsigned char* p_data, int x, int y, int width, int height,
+              int stride)
+{
+    (void)p_data;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+    (void)stride;
+}
+    
