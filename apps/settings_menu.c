@@ -44,7 +44,7 @@
 #endif
 #include "lang.h"
 #ifdef HAVE_MAS3507D
-#include "dac.h"
+void dac_line_in(bool enable);
 #endif
 
 static bool car_adapter_mode(void)

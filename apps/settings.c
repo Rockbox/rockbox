@@ -59,7 +59,7 @@
 #include "keyboard.h"
 #include "version.h"
 #ifdef HAVE_MAS3507D
-#include "dac.h"
+void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
