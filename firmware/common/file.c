@@ -33,7 +33,7 @@
   The penalty is the RAM used for the cache and slightly more complex code.
 */
 
-#define MAX_OPEN_FILES 4
+#define MAX_OPEN_FILES 8
 
 struct filedesc {
     unsigned char cache[SECTOR_SIZE];

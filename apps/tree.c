@@ -66,10 +66,6 @@ static int max_files_in_dir;
 static char *name_buffer;
 static int name_buffer_size;    /* Size of allocated buffer */
 static int name_buffer_length;  /* Currently used amount */
-struct entry {
-    short attr; /* FAT attributes + file type flags */
-    char *name;
-};
 
 static struct entry *dircache;
 
@@ -86,6 +82,8 @@ static bool reload_dir = false;
 static int boot_size = 0;
 static int boot_cluster;
 static bool boot_changed = false;
+
+static bool dirbrowse(char *root);
 
 void browse_root(void)
 {
@@ -158,14 +156,13 @@ static int build_playlist(int start_index)
     int i;
     int start=start_index;
 
-    playlist_clear();
-
     for(i = 0;i < filesindir;i++)
     {
         if(dircache[i].attr & TREE_ATTR_MPA)
         {
             DEBUGF("Adding %s\n", dircache[i].name);
-            playlist_add(dircache[i].name);
+            if (playlist_add(dircache[i].name) < 0)
+                break;
         }
         else
         {
@@ -237,6 +234,133 @@ static void showfileline(int line, int direntry, bool scroll)
     }
 }
 
+/* load sorted directory into dircache.  returns NULL on failure. */
+struct entry* load_and_sort_directory(char *dirname, int dirfilter,
+                                      int *num_files, bool *buffer_full)
+{
+    int i;
+
+    DIR *dir = opendir(dirname);
+    if(!dir)
+        return NULL; /* not a directory */
+    
+    name_buffer_length = 0;
+    *buffer_full = false;
+    
+    for ( i=0; i < max_files_in_dir; i++ ) {
+        int len;
+        struct dirent *entry = readdir(dir);
+        struct entry* dptr = &dircache[i];
+        if (!entry)
+            break;
+        
+        len = strlen(entry->d_name);
+        
+        /* skip directories . and .. */
+        if ((entry->attribute & ATTR_DIRECTORY) &&
+            (((len == 1) && 
+            (!strncmp(entry->d_name, ".", 1))) ||
+            ((len == 2) && 
+            (!strncmp(entry->d_name, "..", 2))))) {
+            i--;
+            continue;
+        }
+        
+        /* Skip FAT volume ID */
+        if (entry->attribute & ATTR_VOLUME_ID) {
+            i--;
+            continue;
+        }
+        
+        /* filter out dotfiles and hidden files */
+        if (dirfilter != SHOW_ALL &&
+            ((entry->d_name[0]=='.') ||
+            (entry->attribute & ATTR_HIDDEN))) {
+            i--;
+            continue;
+        }
+        
+        dptr->attr = entry->attribute;
+        
+        /* mark mp? and m3u files as such */
+        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
+            if (!strcasecmp(&entry->d_name[len-4], ".mp3") ||
+                (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
+                (!strcasecmp(&entry->d_name[len-4], ".mpa")))
+                dptr->attr |= TREE_ATTR_MPA;
+            else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
+                dptr->attr |= TREE_ATTR_M3U;
+            else if (!strcasecmp(&entry->d_name[len-4], ".cfg"))
+                dptr->attr |= TREE_ATTR_CFG;
+            else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
+                dptr->attr |= TREE_ATTR_WPS;
+            else if (!strcasecmp(&entry->d_name[len-4], ".txt"))
+                dptr->attr |= TREE_ATTR_TXT;
+            else if (!strcasecmp(&entry->d_name[len-4], ".lng"))
+                dptr->attr |= TREE_ATTR_LNG;
+#ifdef HAVE_RECORDER_KEYPAD
+            else if (!strcasecmp(&entry->d_name[len-4], ".fnt"))
+                dptr->attr |= TREE_ATTR_FONT;
+            else if (!strcasecmp(&entry->d_name[len-4], ".ajz"))
+#else
+            else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
+#endif
+                dptr->attr |= TREE_ATTR_MOD;
+            else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
+                dptr->attr |= TREE_ATTR_ROCK;
+        }
+        
+        /* memorize/compare details about the boot file */
+        if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
+            if (boot_size) {
+                if ((entry->size != boot_size) ||
+                    (entry->startcluster != boot_cluster))
+                    boot_changed = true;
+            }
+            boot_size = entry->size;
+            boot_cluster = entry->startcluster;
+        }
+
+        /* filter out all non-playlist files */
+        if ( dirfilter == SHOW_PLAYLIST &&
+            (!(dptr->attr &
+            (ATTR_DIRECTORY|TREE_ATTR_M3U))) ) {
+            i--;
+            continue;
+        }
+        
+        /* filter out non-music files */
+        if ( dirfilter == SHOW_MUSIC &&
+            (!(dptr->attr &
+            (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ) {
+            i--;
+            continue;
+        }
+        
+        /* filter out non-supported files */
+        if ( dirfilter == SHOW_SUPPORTED &&
+            (!(dptr->attr & TREE_ATTR_MASK)) ) {
+            i--;
+            continue;
+        }
+        
+        if (len > name_buffer_size - name_buffer_length - 1) {
+            /* Tell the world that we ran out of buffer space */
+            *buffer_full = true;
+            break;
+        }
+        dptr->name = &name_buffer[name_buffer_length];
+        strcpy(dptr->name,entry->d_name);
+        name_buffer_length += len + 1;
+    }
+    *num_files = i;
+    closedir(dir);
+    strncpy(lastdir,dirname,sizeof(lastdir));
+    lastdir[sizeof(lastdir)-1] = 0;
+    qsort(dircache,i,sizeof(struct entry),compare);
+
+    return dircache;
+}
 
 static int showdir(char *path, int start)
 {
@@ -258,124 +382,9 @@ static int showdir(char *path, int start)
 
     /* new dir? cache it */
     if (strncmp(path,lastdir,sizeof(lastdir)) || reload_dir) {
-        DIR *dir = opendir(path);
-        if(!dir)
-            return -1; /* not a directory */
-
-        name_buffer_length = 0;
-        dir_buffer_full = false;
-        
-        for ( i=0; i < max_files_in_dir; i++ ) {
-            int len;
-            struct dirent *entry = readdir(dir);
-            struct entry* dptr = &dircache[i];
-            if (!entry)
-                break;
-
-            len = strlen(entry->d_name);
-
-            /* skip directories . and .. */
-            if ((entry->attribute & ATTR_DIRECTORY) &&
-                (((len == 1) && 
-                  (!strncmp(entry->d_name, ".", 1))) ||
-                 ((len == 2) && 
-                  (!strncmp(entry->d_name, "..", 2))))) {
-                i--;
-                continue;
-            }
-
-            /* Skip FAT volume ID */
-            if (entry->attribute & ATTR_VOLUME_ID) {
-                i--;
-                continue;
-            }
-
-            /* filter out dotfiles and hidden files */
-            if (global_settings.dirfilter != SHOW_ALL &&
-                ((entry->d_name[0]=='.') ||
-                 (entry->attribute & ATTR_HIDDEN))) {
-                i--;
-                continue;
-            }
-
-            dptr->attr = entry->attribute;
-
-            /* mark mp? and m3u files as such */
-            if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
-                if (!strcasecmp(&entry->d_name[len-4], ".mp3") ||
-                    (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
-                    (!strcasecmp(&entry->d_name[len-4], ".mpa")))
-                    dptr->attr |= TREE_ATTR_MPA;
-                else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
-                    dptr->attr |= TREE_ATTR_M3U;
-                else if (!strcasecmp(&entry->d_name[len-4], ".cfg"))
-                    dptr->attr |= TREE_ATTR_CFG;
-                else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
-                    dptr->attr |= TREE_ATTR_WPS;
-                else if (!strcasecmp(&entry->d_name[len-4], ".txt"))
-                    dptr->attr |= TREE_ATTR_TXT;
-                else if (!strcasecmp(&entry->d_name[len-4], ".lng"))
-                    dptr->attr |= TREE_ATTR_LNG;
-#ifdef HAVE_RECORDER_KEYPAD
-                else if (!strcasecmp(&entry->d_name[len-4], ".fnt"))
-                    dptr->attr |= TREE_ATTR_FONT;
-                else if (!strcasecmp(&entry->d_name[len-4], ".ajz"))
-#else
-                else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
-#endif
-                    dptr->attr |= TREE_ATTR_MOD;
-                else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
-                    dptr->attr |= TREE_ATTR_ROCK;
-            }
-
-            /* memorize/compare details about the boot file */
-            if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
-                if (boot_size) {
-                    if ((entry->size != boot_size) ||
-                        (entry->startcluster != boot_cluster))
-                        boot_changed = true;
-                }
-                boot_size = entry->size;
-                boot_cluster = entry->startcluster;
-            }
-            
-            /* filter out all non-playlist files */
-            if ( global_settings.dirfilter == SHOW_PLAYLIST &&
-                 (!(dptr->attr &
-                    (ATTR_DIRECTORY|TREE_ATTR_M3U))) ) {
-                i--;
-                continue;
-            }
-            
-            /* filter out non-music files */
-            if ( global_settings.dirfilter == SHOW_MUSIC &&
-                 (!(dptr->attr &
-                    (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ) {
-                i--;
-                continue;
-            }
-
-            /* filter out non-supported files */
-            if ( global_settings.dirfilter == SHOW_SUPPORTED &&
-                 (!(dptr->attr & TREE_ATTR_MASK)) ) {
-                i--;
-                continue;
-            }
-
-            if (len > name_buffer_size - name_buffer_length - 1) {
-                /* Tell the world that we ran out of buffer space */
-                dir_buffer_full = true;
-                break;
-            }
-            dptr->name = &name_buffer[name_buffer_length];
-            strcpy(dptr->name,entry->d_name);
-            name_buffer_length += len + 1;
-        }
-        filesindir = i;
-        closedir(dir);
-        strncpy(lastdir,path,sizeof(lastdir));
-        lastdir[sizeof(lastdir)-1] = 0;
-        qsort(dircache,filesindir,sizeof(struct entry),compare);
+        if (!load_and_sort_directory(path, global_settings.dirfilter,
+                &filesindir, &dir_buffer_full))
+            return -1;
 
         if ( dir_buffer_full || filesindir == max_files_in_dir ) {
 #ifdef HAVE_LCD_CHARCELLS
@@ -531,7 +540,7 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
-bool ask_resume(void)
+static bool ask_resume(void)
 {
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
@@ -570,92 +579,62 @@ bool ask_resume(void)
     return false;
 }
 
-void start_resume(void)
+/* load tracks from specified directory to resume play */
+void resume_directory(char *dir)
+{
+    bool buffer_full;
+
+    if (!load_and_sort_directory(dir, global_settings.dirfilter, &filesindir,
+            &buffer_full))
+        return;
+    lastdir[0] = 0;
+    
+    build_playlist(0);
+}
+
+/* Returns the current working directory and also writes cwd to buf if
+   non-NULL.  In case of error, returns NULL. */
+char *getcwd(char *buf, int size)
+{
+    if (!buf)
+        return currdir;
+    else if (size > 0)
+    {
+        strncpy(buf, currdir, size);
+        return buf;
+    }
+    else
+        return NULL;
+}
+
+/* Force a reload of the directory next time directory browser is called */
+void reload_directory(void)
+{
+    reload_dir = true;
+}
+
+static void start_resume(void)
 {
     if ( global_settings.resume &&
          global_settings.resume_index != -1 ) {
-        int len = strlen(global_settings.resume_file);
-
-        DEBUGF("Resume file %s\n",global_settings.resume_file);
         DEBUGF("Resume index %X offset %X\n",
                global_settings.resume_index,
                global_settings.resume_offset);
-        DEBUGF("Resume shuffle %s seed %X\n",
-               global_settings.playlist_shuffle?"on":"off",
-               global_settings.resume_seed);
 
-        /* playlist? */
-        if (!strcasecmp(&global_settings.resume_file[len-4], ".m3u")) {
-            char* slash;
+        if (!ask_resume())
+            return;
+        
+        if (playlist_resume() != -1)
+        {
+            playlist_start(global_settings.resume_index,
+                global_settings.resume_offset);
 
-            /* check that the file exists */
-            int fd = open(global_settings.resume_file, O_RDONLY);
-            if(fd<0)
-                return;
-            close(fd);
-
-            if (!ask_resume())
-                return;
-            
-            slash = strrchr(global_settings.resume_file,'/');
-            if (slash) {
-                *slash=0;
-                play_list(global_settings.resume_file,
-                          slash+1,
-                          global_settings.resume_index,
-                          true, /* the index is AFTER shuffle */
-                          global_settings.resume_offset,
-                          global_settings.resume_seed,
-                          global_settings.resume_first_index,
-                          global_settings.queue_resume,
-                          global_settings.queue_resume_index);
-                *slash='/';
-            }
-            else {
-                /* check that the dir exists */
-                DIR* dir = opendir(global_settings.resume_file);
-                if(!dir)
-                    return;
-                closedir(dir);
-
-                if (!ask_resume())
-                    return;
-
-                play_list("/",
-                          global_settings.resume_file,
-                          global_settings.resume_index,
-                          true,
-                          global_settings.resume_offset,
-                          global_settings.resume_seed,
-                          global_settings.resume_first_index,
-                          global_settings.queue_resume,
-                          global_settings.queue_resume_index);
-            }
+            status_set_playmode(STATUS_PLAY);
+            status_draw(true);
+            wps_show();
         }
-        else {
-            if (!ask_resume())
-                return;
-
-            if (showdir(global_settings.resume_file, 0) < 0 )
-                return;
-
-            lastdir[0] = '\0';
-
-            build_playlist(global_settings.resume_index);
-            play_list(global_settings.resume_file,
-                      NULL, 
-                      global_settings.resume_index,
-                      true,
-                      global_settings.resume_offset,
-                      global_settings.resume_seed,
-                      global_settings.resume_first_index,
-                      global_settings.queue_resume,
-                      global_settings.queue_resume_index);
-        }
-
-        status_set_playmode(STATUS_PLAY);
-        status_draw(true);
-        wps_show();
+        else
+            return;
     }
 }
 
@@ -751,19 +730,33 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 
             case BUTTON_PLAY:
             case BUTTON_RC_PLAY:
-            case BUTTON_ON | BUTTON_PLAY:
+            case BUTTON_ON | BUTTON_PLAY: {
+                int onplay_result;
+
                 if (currdir[1])
                     snprintf(buf, sizeof buf, "%s/%s",
                              currdir, dircache[dircursor+dirstart].name);
                 else
                     snprintf(buf, sizeof buf, "/%s",
                              dircache[dircursor+dirstart].name);
-                if (onplay(buf, dircache[dircursor+dirstart].attr))
-                    reload_dir = 1;
+                onplay_result = onplay(buf,
+                    dircache[dircursor+dirstart].attr);
+                switch (onplay_result)
+                {
+                    case ONPLAY_OK:
+                        used = true;
+                        break;
+                    case ONPLAY_RELOAD_DIR:
+                        reload_dir = 1;
+                        used = true;
+                        break;
+                    case ONPLAY_START_PLAY:
+                        used = false; /* this will enable the wps */
+                        break;
+                }
                 exit = true;
-                used = true;
                 break;
-                
+            }    
             case BUTTON_ON | BUTTON_REL:
             case BUTTON_ON | TREE_PREV | BUTTON_REL:
             case BUTTON_ON | TREE_NEXT | BUTTON_REL:
@@ -793,7 +786,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
     return used;
 }
 
-bool dirbrowse(char *root)
+static bool dirbrowse(char *root)
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -934,41 +927,36 @@ bool dirbrowse(char *root)
                     lcd_stop_scroll();
                     switch ( file->attr & TREE_ATTR_MASK ) {
                         case TREE_ATTR_M3U:
-                            if ( global_settings.resume ) {
-                                if (currdir[1])
-                                    snprintf(global_settings.resume_file,
-                                             MAX_PATH, "%s/%s",
-                                             currdir, file->name);
-                                else
-                                    snprintf(global_settings.resume_file,
-                                             MAX_PATH, "/%s", file->name);
-                            }
-                            play_list(currdir, file->name, 0, false, 0,
-                                      seed, 0, 0, -1);
-                            start_index = 0;
-                            play = true;
-                            break;
-
-                        case TREE_ATTR_MPA:
-                            if ( global_settings.resume )
-                                strncpy(global_settings.resume_file,
-                                        currdir, MAX_PATH);
-                            
-                            start_index =
-                                build_playlist(dircursor+dirstart);
-                            
-                            /* when shuffling dir.: play all files even if the
-                               file selected by user is not the first one */
-                            if (global_settings.playlist_shuffle
-                                && !global_settings.play_selected)
+                            if (playlist_create(currdir, file->name) != -1)
+                            {
+                                if (global_settings.playlist_shuffle)
+                                    playlist_shuffle(seed, -1);
                                 start_index = 0;
-                            
-                                /* it is important that we get back the index
-                                   in the (shuffled) list and store that */
-                            start_index = play_list(currdir, NULL,
-                                                    start_index, false,
-                                                    0, seed, 0, 0, -1);
-                            play = true;
+                                playlist_start(start_index,0);
+                                play = true;
+                            }
+                            break;
+                        
+                        case TREE_ATTR_MPA:
+                            if (playlist_create(currdir, NULL) != -1)
+                            {
+                                start_index =
+                                    build_playlist(dircursor+dirstart);
+                                if (global_settings.playlist_shuffle)
+                                {
+                                    start_index =
+                                        playlist_shuffle(seed,start_index);
+                                    
+                                    /* when shuffling dir.: play all files
+                                       even if the file selected by user is
+                                       not the first one */
+                                    if (!global_settings.play_selected)
+                                        start_index = 0;
+                                }
+                                
+                                playlist_start(start_index, 0);
+                                play = true;
+                            }
                             break;
 
                             /* wps config file */
@@ -1055,9 +1043,6 @@ bool dirbrowse(char *root)
                                shuffled list in case shuffle is enabled */
                             global_settings.resume_index = start_index;
                             global_settings.resume_offset = 0;
-                            global_settings.resume_first_index =
-                                playlist_first_index();
-                            global_settings.resume_seed = seed;
                             settings_save();
                         }
 

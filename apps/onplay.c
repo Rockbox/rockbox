@@ -38,13 +38,103 @@
 #include "screens.h"
 #include "tree.h"
 #include "buffer.h"
+#include "settings.h"
+#include "status.h"
+#include "onplay.h"
 
 static char* selected_file = NULL;
-static bool reload_dir = false;
+static int selected_file_attr = 0;
+static int onplay_result = ONPLAY_OK;
 
-static bool queue_file(void)
+/* For playlist options */
+struct playlist_args {
+    int position;
+    bool queue;
+};
+
+static bool add_to_playlist(int position, bool queue)
 {
-    queue_add(selected_file);
+    bool new_playlist = !(mpeg_status() & MPEG_STATUS_PLAY);
+
+    if (new_playlist)
+        playlist_create(NULL, NULL);
+
+    if (selected_file_attr & TREE_ATTR_MPA)
+        playlist_insert_track(selected_file, position, queue);
+    else if (selected_file_attr & ATTR_DIRECTORY)
+        playlist_insert_directory(selected_file, position, queue);
+    else if (selected_file_attr & TREE_ATTR_M3U)
+        playlist_insert_playlist(selected_file, position, queue);
+
+    if (new_playlist && (playlist_amount() > 0))
+    {
+        /* nothing is currently playing so begin playing what we just
+           inserted */
+        if (global_settings.playlist_shuffle)
+            playlist_shuffle(current_tick, -1);
+        playlist_start(0,0);
+        status_set_playmode(STATUS_PLAY);
+        status_draw(false);
+        onplay_result = ONPLAY_START_PLAY;
+    }
+
+    return false;
+}
+
+/* Sub-menu for playlist options */
+static bool playlist_options(void)
+{
+    struct menu_items menu[6]; 
+    struct playlist_args args[6]; /* increase these 2 if you add entries! */
+    int m, i=0, result;
+
+    if (mpeg_status() & MPEG_STATUS_PLAY)
+    {
+        menu[i].desc = str(LANG_INSERT);
+        args[i].position = PLAYLIST_INSERT;
+        args[i].queue = false;
+        i++;
+        
+        menu[i].desc = str(LANG_INSERT_FIRST);
+        args[i].position = PLAYLIST_INSERT_FIRST;
+        args[i].queue = false;
+        i++;
+        
+        menu[i].desc = str(LANG_INSERT_LAST);
+        args[i].position = PLAYLIST_INSERT_LAST;
+        args[i].queue = false;
+        i++;
+        
+        menu[i].desc = str(LANG_QUEUE);
+        args[i].position = PLAYLIST_INSERT;
+        args[i].queue = true;
+        i++;
+        
+        menu[i].desc = str(LANG_QUEUE_FIRST);
+        args[i].position = PLAYLIST_INSERT_FIRST;
+        args[i].queue = true;
+        i++;
+        
+        menu[i].desc = str(LANG_QUEUE_LAST);
+        args[i].position = PLAYLIST_INSERT_LAST;
+        args[i].queue = true;
+        i++;
+    }
+    else if ((selected_file_attr & TREE_ATTR_MPA) ||
+             (selected_file_attr & ATTR_DIRECTORY))
+    {
+        menu[i].desc = str(LANG_INSERT);
+        args[i].position = PLAYLIST_INSERT;
+        args[i].queue = false;
+        i++;
+    }
+
+    m = menu_init( menu, i );
+    result = menu_show(m);
+    if (result >= 0)
+        add_to_playlist(args[result].position, args[result].queue);
+    menu_exit(m);
+
     return false;
 }
 
@@ -68,7 +158,7 @@ static bool delete_file(void)
         switch (btn) {
         case BUTTON_PLAY:
             if (!remove(selected_file)) {
-                reload_dir = true;
+                onplay_result = ONPLAY_RELOAD_DIR;
                 lcd_clear_display();
                 lcd_puts(0,0,str(LANG_DELETED));
                 lcd_puts_scroll(0,1,selected_file);
@@ -104,7 +194,7 @@ static bool rename_file(void)
             sleep(HZ*2);
         }
         else
-            reload_dir = true;
+            onplay_result = ONPLAY_RELOAD_DIR;
     }
 
     return false;
@@ -225,7 +315,7 @@ static bool vbr_fix(void)
 
     if(mpeg_status()) {
         splash(HZ*2, 0, true, str(LANG_VBRFIX_STOP_PLAY));
-        return reload_dir;
+        return onplay_result;
     }
     
     lcd_clear_display();
@@ -356,12 +446,16 @@ int onplay(char* file, int attr)
     struct menu_items menu[5]; /* increase this if you add entries! */
     int m, i=0, result;
 
+    onplay_result = ONPLAY_OK;
+
     selected_file = file;
-    
-    if ((mpeg_status() & MPEG_STATUS_PLAY) && (attr & TREE_ATTR_MPA))
+    selected_file_attr = attr;
+
+    if ((attr & TREE_ATTR_MPA) || (attr & ATTR_DIRECTORY) ||
+        (attr & TREE_ATTR_M3U))
     {
-        menu[i].desc = str(LANG_QUEUE);
-        menu[i].function = queue_file;
+        menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
+        menu[i].function = playlist_options;
         i++;
     }
 
@@ -390,5 +484,5 @@ int onplay(char* file, int attr)
         menu[result].function();
     menu_exit(m);
 
-    return reload_dir;
+    return onplay_result;
 }

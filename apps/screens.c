@@ -341,9 +341,9 @@ bool f2_screen(void)
                 if(mpeg_status() & MPEG_STATUS_PLAY)
                 {
                     if (global_settings.playlist_shuffle)
-                        randomise_playlist(current_tick);
+                        playlist_randomise(current_tick, true);
                     else
-                        sort_playlist(true);
+                        playlist_sort(true);
                 }
                 used = true;
                 break;

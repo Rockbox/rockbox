@@ -103,3 +103,15 @@ int set_irq_level (int level)
     static int _lv = 0;
     return (_lv = level);
 }
+
+void mutex_init(struct mutex *m)
+{
+}
+
+void mutex_lock(struct mutex *m)
+{
+}
+
+void mutex_unlock(struct mutex *m)
+{
+}

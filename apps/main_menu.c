@@ -43,6 +43,7 @@
 #include "wps.h"
 #include "buffer.h"
 #include "screens.h"
+#include "playlist_menu.h"
 #ifdef HAVE_FMRADIO
 #include "radio.h"
 #endif
@@ -266,7 +267,7 @@ bool main_menu(void)
         { str(LANG_RECORDING),          recording_screen  },
         { str(LANG_RECORDING_SETTINGS), recording_menu    },
 #endif
-        { str(LANG_CREATE_PLAYLIST),    create_playlist   },
+        { str(LANG_PLAYLIST_MENU),      playlist_menu     },
         { str(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
         { str(LANG_SLEEP_TIMER),        sleeptimer_screen },
 #ifdef HAVE_ALARM_MOD

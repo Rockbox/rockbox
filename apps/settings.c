@@ -62,7 +62,7 @@
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
-#define CONFIG_BLOCK_VERSION 6
+#define CONFIG_BLOCK_VERSION 7
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -98,10 +98,10 @@ offset  abs
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
-0x1b    0x2f    <browse current, play selected, queue_resume>
+0x1b    0x2f    <browse current, play selected, recursive dir insert>
 0x1c    0x30    <peak meter hold timeout (bit 0-4),
                  rec_editable (bit 7)>
-0x1d    0x31    <(int) queue resume index>
+0x1d    0x31    <unused>
 0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
                  mic gain (bit 4-7)>
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
@@ -144,9 +144,9 @@ Rest of config block, only saved to disk:
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
-0xF4  (int) Playlist first index
-0xF8  (int) Playlist shuffle seed
-0xFC-0x1FF  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
+0xF4  <unused>
+0xF8  <unused>
+0xFC  <unused>
 
 *************************************/
 
@@ -343,17 +343,18 @@ int settings_save( void )
 
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
+    DEBUGF( "+Resume index %X offset %X\n",
+            global_settings.resume_index,
+            global_settings.resume_offset );
 
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
     config_block[0x1b] = (unsigned char)
         (((global_settings.browse_current & 1)) |
          ((global_settings.play_selected & 1) << 1) |
-         ((global_settings.queue_resume & 3) << 2));
+         ((global_settings.recursive_dir_insert & 1) << 2));
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
         (global_settings.rec_editable?0x80:0);
-
-    memcpy(&config_block[0x1d], &global_settings.queue_resume_index, 4);
 
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
@@ -415,17 +416,6 @@ int settings_save( void )
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
-    memcpy(&config_block[0xF4], &global_settings.resume_first_index, 4);
-    memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
-
-    strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
-    DEBUGF( "+Resume file %s\n",global_settings.resume_file );
-    DEBUGF( "+Resume index %X offset %X\n",
-            global_settings.resume_index,
-            global_settings.resume_offset );
-    DEBUGF( "+Resume shuffle %s seed %X\n",
-            global_settings.playlist_shuffle?"on":"off",
-            global_settings.resume_seed );
 
     if(save_config_buffer())
     {
@@ -655,7 +645,8 @@ void settings_load(void)
         if (config_block[0x1b] != 0xFF) {
             global_settings.browse_current = (config_block[0x1b]) & 1;
             global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
-            global_settings.queue_resume = (config_block[0x1b] >> 2) & 3;
+            global_settings.recursive_dir_insert =
+                (config_block[0x1b] >> 2) & 1;
         }
 
         if (config_block[0x1c] != 0xFF) {
@@ -663,10 +654,6 @@ void settings_load(void)
             global_settings.rec_editable =
                 (config_block[0x1c] & 0x80)?true:false;
         }
-
-        if (config_block[0x1d] != 0xFF)
-            memcpy(&global_settings.queue_resume_index, &config_block[0x1d],
-                4);
 
         if (config_block[0x21] != 0xFF)
         {
@@ -745,14 +732,9 @@ void settings_load(void)
             global_settings.max_files_in_playlist =
                 config_block[0xaa] | (config_block[0xab] << 8);
 
-        memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
-        memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
-
         strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
-        strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
-        global_settings.resume_file[MAX_PATH]=0;
 #ifdef HAVE_LCD_CHARCELLS
         if (config_block[0xa8] != 0xff)
             global_settings.jump_scroll = config_block[0xa8];
@@ -1097,6 +1079,8 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "max files in playlist"))
             set_cfg_int(&global_settings.max_files_in_playlist, value,
                         1000, 20000);
+        else if (!strcasecmp(name, "recursive directory insert"))
+            set_cfg_bool(&global_settings.recursive_dir_insert, value);
     }
 
     close(fd);
@@ -1385,6 +1369,9 @@ bool settings_save_config(void)
     fprintf(fd, "max files in playlist: %d\r\n",
             global_settings.max_files_in_playlist);
     
+    fprintf(fd, "recursive directory insert: %s\r\n",
+            boolopt[global_settings.recursive_dir_insert]);
+
     close(fd);
 
     lcd_clear_display();
@@ -1450,9 +1437,6 @@ void settings_reset(void) {
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
-    global_settings.save_queue_resume = true;
-    global_settings.queue_resume = 0;
-    global_settings.queue_resume_index = -1;
     global_settings.disk_spindown = 5;
     global_settings.disk_poweroff = false;
     global_settings.buffer_margin = 0;
@@ -1475,6 +1459,7 @@ void settings_reset(void) {
     global_settings.max_files_in_dir = 400;
     global_settings.max_files_in_playlist = 10000;
     global_settings.show_icons = true;
+    global_settings.recursive_dir_insert = false;
 }
 
 bool set_bool(char* string, bool* variable )

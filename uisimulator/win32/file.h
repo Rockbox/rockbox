@@ -29,7 +29,7 @@ int win32_filesize(int fd);
 
 #define rename(x,y) win32_rename(x,y)
 #define filesize(x) win32_filesize(x)
-#define flush(x) _commit(x)
+#define fsync(x) _commit(x)
 
 #include "../../firmware/include/file.h"
 

@@ -223,13 +223,8 @@ bool browse_id3(void)
 
             case 7:
                 lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
-                {
-                    int index = id3->index - playlist_first_index();
-                    if (index < 0)
-                        index += playlist_amount();
-                    snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
-                             index + 1, playlist_amount());
-                }
+                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
+                         playlist_get_display_index(), playlist_amount());
                 lcd_puts_scroll(0, 1, scroll_text);
                 break;
 
@@ -455,9 +450,7 @@ static bool update(void)
         DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
                id3->offset,id3);
  
-        if (!playlist_get_resume_info(&global_settings.resume_index,
-                &global_settings.queue_resume,
-                &global_settings.queue_resume_index))
+        if (!playlist_get_resume_info(&global_settings.resume_index))
         {
             global_settings.resume_offset = id3->offset;
             settings_save();

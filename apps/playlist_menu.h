@@ -16,15 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ONPLAY_H_
-#define _ONPLAY_H_
+#ifndef _PLAYLIST_MENU_H
+#define _PLAYLIST_MENU_H
 
-int onplay(char* file, int attr);
-
-enum {
-    ONPLAY_OK,
-    ONPLAY_RELOAD_DIR,
-    ONPLAY_START_PLAY
-};
+bool playlist_menu(void);
 
 #endif

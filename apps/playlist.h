@@ -22,57 +22,56 @@
 
 #include <stdbool.h>
 #include "file.h"
-#include "applimits.h"
+#include "kernel.h"
 
 /* playlist data */
 
 struct playlist_info
 {
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
-    int  fd;             /* file descriptor of the open playlist    */
+    int  fd;             /* descriptor of the open playlist file    */
+    int  control_fd;     /* descriptor of the open control file     */
     int  dirlen;         /* Length of the path to the playlist file */
-    int  *indices;       /* array of indices            */
-    int max_playlist_size; /* Max number of files in playlist. Mirror of
+    unsigned int *indices; /* array of indices                      */
+    int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
-    int buffer_size;     /* Playlist buffer size */
+    bool in_ram;         /* playlist stored in ram (dirplay)        */
+    char *buffer;        /* buffer for in-ram playlists             */
+    int  buffer_size;    /* size of buffer                          */
+    int  buffer_end_pos; /* last position where buffer was written  */
     int  index;          /* index of current playing track          */
     int  first_index;    /* index of first song in playlist         */
-    int  seed;           /* random seed                             */
     int  amount;         /* number of tracks in the index           */
-    bool in_ram;         /* True if the playlist is RAM-based       */
-
-    /* Queue function */
-    int queue_indices[MAX_QUEUED_FILES]; /* array of queue indices */
-    int last_queue_index; /* index of last queued track            */
-    int queue_index;    /* index of current playing queued track   */
-    int num_queued;     /* number of songs queued                  */
-    int start_queue;    /* the first song was queued               */
+    int  last_insert_pos; /* last position we inserted a track      */
+    struct mutex control_mutex; /* mutex for control file access    */
 };
 
-extern struct playlist_info playlist;
-extern bool playlist_shuffle;
-
 void playlist_init(void);
-int play_list(char *dir, char *file, int start_index, 
-              bool shuffled_index, int start_offset,
-              int random_seed, int first_index, int queue_resume,
-              int queue_resume_index);
-char* playlist_peek(int steps);
-char* playlist_name(char *name, int name_size);
-int playlist_next(int steps);
-bool playlist_check(int steps);
-void randomise_playlist( unsigned int seed );
-void sort_playlist(bool start_current);
-void add_indices_to_playlist(void);
-void playlist_clear(void);
+int playlist_create(char *dir, char *file);
+int playlist_resume(void);
 int playlist_add(char *filename);
-int queue_add(char *filename);
+int playlist_insert_track(char *filename, int position, bool queue);
+int playlist_insert_directory(char *dirname, int position, bool queue);
+int playlist_insert_playlist(char *filename, int position, bool queue);
+int playlist_delete(int index);
+int playlist_shuffle(int random_seed, int start_index);
+int playlist_randomise(unsigned int seed, bool start_current);
+int playlist_sort(bool start_current);
+int playlist_start(int start_index, int offset);
+bool playlist_check(int steps);
+char *playlist_peek(int steps);
+int playlist_next(int steps);
+int playlist_get_resume_info(int *resume_index);
+int playlist_get_display_index(void);
 int playlist_amount(void);
-int playlist_first_index(void);
-int playlist_get_resume_info(int *resume_index, int *queue_resume,
-                             int *queue_resume_index);
+char *playlist_name(char *buf, int buf_size);
+int playlist_save(char *filename);
 
-enum { QUEUE_OFF, QUEUE_BEGIN_QUEUE, QUEUE_BEGIN_PLAYLIST, NUM_QUEUE_MODES };
+enum {
+    PLAYLIST_PREPEND = -1,
+    PLAYLIST_INSERT = -2,
+    PLAYLIST_INSERT_LAST = -3,
+    PLAYLIST_INSERT_FIRST = -4
+};
 
 #endif /* __PLAYLIST_H__ */
-

@@ -21,6 +21,11 @@
 
 #include <stdbool.h>
 
+struct entry {
+    short attr; /* FAT attributes + file type flags */
+    char *name;
+};
+
 /* using attribute not used by FAT */
 #define TREE_ATTR_MPA 0x40 /* mpeg audio file */
 #define TREE_ATTR_M3U 0x80 /* playlist */
@@ -36,7 +41,11 @@
 void tree_init(void);
 void browse_root(void);
 void set_current_file(char *path);
-bool dirbrowse(char *root);
 bool create_playlist(void);
+void resume_directory(char *dir);
+char *getcwd(char *buf, int size);
+void reload_directory(void);
+struct entry* load_and_sort_directory(char *dirname, int dirfilter,
+                                      int *num_files, bool *buffer_full);
 
 #endif

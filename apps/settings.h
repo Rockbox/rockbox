@@ -103,16 +103,7 @@ struct user_settings
     int resume;        /* resume option: 0=off, 1=ask, 2=on */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_offset; /* byte offset in mp3 file */
-    int resume_seed;   /* random seed for playlist shuffle */
-    int resume_first_index; /* first index of playlist */
 
-    bool save_queue_resume; /* save queued songs for resume */
-    int queue_resume; /* resume queue file?: 0 = no
-                                             1 = resume at queue index
-                                             2 = resume at playlist index */
-    int queue_resume_index; /* queue index (seek point in queue file) */
-
-    unsigned char resume_file[MAX_PATH+1]; /* playlist name (or dir) */
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
@@ -175,6 +166,7 @@ struct user_settings
     int max_files_in_dir; /* Max entries in directory (file browser) */
     int max_files_in_playlist; /* Max entries in playlist */
     bool show_icons;   /* 0=hide 1=show */
+    bool recursive_dir_insert;/* should directories be inserted recursively */
 };
 
 enum optiontype { INT, BOOL };

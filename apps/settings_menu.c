@@ -724,11 +724,11 @@ static bool playback_settings_menu(void)
     {
         if (global_settings.playlist_shuffle)
         {
-            randomise_playlist(current_tick);
+            playlist_randomise(current_tick, true);
         }
         else
         {
-            sort_playlist(true);
+            playlist_sort(true);
         }
     }
     return result;
