@@ -255,17 +255,6 @@ bool bookmark_autobookmark(void)
         key = button_get(true);
         switch (key)
         {
-            case BUTTON_DOWN | BUTTON_REL:
-            case BUTTON_ON | BUTTON_REL:
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REL:
-            case BUTTON_RIGHT | BUTTON_REL:
-            case BUTTON_UP | BUTTON_REL:
-#endif
-            case BUTTON_LEFT | BUTTON_REL:
-                done = true;
-                break;
-
             case BUTTON_PLAY | BUTTON_REL:
                 if (global_settings.autocreatebookmark ==
                     BOOKMARK_RECENT_ONLY_ASK)
@@ -281,6 +270,11 @@ bool bookmark_autobookmark(void)
                 status_set_param(true);
 #endif
                 return false;
+
+            default:
+                if (key & BUTTON_REL)
+                    done = true;
+                break;
         }
     }
     return true;
