@@ -1,7 +1,6 @@
 #define _PAGE_ Setting up a cygwin Rockbox development environment
 #include "head.t"
 
-<h1>Setting up a Cygwin development environment</h1>
 <p>
  Eric Lassauge has kindly compiled the SH-1 cross GCC tools as Cygwin packages
  and put them up for us to use.
