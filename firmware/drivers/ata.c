@@ -161,9 +161,39 @@ static int wait_for_end_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
 }    
 
-int ata_read_sectors(unsigned long start,
-                     int count,
-                     void* buf) __attribute__ ((section (".icode")));
+
+/* the tight loop of ata_read_sectors(), to avoid the whole in IRAM */
+static void copy_read_sectors(unsigned char* buf,
+                         int wordcount)
+                         __attribute__ ((section (".icode")));
+static void copy_read_sectors(unsigned char* buf, int wordcount)
+{
+    int j;
+
+    if (wordcount <= 0)
+        return; /* should never happen, but to protect my tail loop */
+
+    if ( (unsigned int)buf & 1 ) 
+    {
+        unsigned char* bufend = buf + wordcount*2;
+        do
+        {   /* loop compiles to 8 assembler instructions */
+            unsigned short tmp = ATA_DATA;
+            *buf++ = tmp & 0xff; /* I assume big endian */
+            *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
+        } while (buf < bufend); /* tail loop is faster */
+    }
+    else 
+    {
+        unsigned short* wbuf = (unsigned short*)buf;
+        unsigned short* wbufend = wbuf + wordcount;
+        do
+        {   /* loop compiles to 7 assembler instructions */
+            *wbuf = SWAB16(ATA_DATA);
+        } while (++wbuf < wbufend); /* tail loop is faster */
+    }
+}
+
 int ata_read_sectors(unsigned long start,
                      int incount,
                      void* inbuf)
@@ -235,7 +265,6 @@ int ata_read_sectors(unsigned long start,
         asm volatile ("nop");
 
         while (count) {
-            int j;
             int sectors;
             int wordcount;
             int status;
@@ -265,17 +294,7 @@ int ata_read_sectors(unsigned long start,
 
             wordcount = sectors * SECTOR_SIZE / 2;
 
-            if ( (unsigned int)buf & 1 ) {
-                for (j=0; j < wordcount; j++) {
-                    unsigned short tmp = SWAB16(ATA_DATA);
-                    ((unsigned char*)buf)[j*2] = tmp >> 8;
-                    ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
-                }
-            }
-            else {
-                for (j=0; j < wordcount; j++)
-                    ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
-            }
+            copy_read_sectors(buf, wordcount);
 
             /*
               "Device errors encountered during READ MULTIPLE commands are
