@@ -174,7 +174,7 @@ int ata_read_sectors(unsigned long start,
     return ret;
 }
 
-#ifdef DISK_WRITE
+//#ifdef DISK_WRITE
 int ata_write_sectors(unsigned long start,
                       unsigned char count,
                       void* buf)
@@ -230,7 +230,7 @@ int ata_write_sectors(unsigned long start,
     mutex_unlock(&ata_mtx);
     return i;
 }
-#endif
+//#endif
 
 static int check_registers(void)
 {
@@ -267,6 +267,11 @@ static int freeze_lock(void)
 void ata_spindown(int seconds)
 {
     sleep_timeout = seconds * HZ;
+}
+
+bool ata_disk_is_active(void)
+{
+    return !sleeping;
 }
 
 static int ata_perform_sleep(void)
