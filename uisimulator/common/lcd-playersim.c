@@ -37,7 +37,7 @@
 #define CHAR_HEIGHT 8
 #define ICON_HEIGHT 24
 #define CHAR_PIXEL 4
-#define BORDER_MARGIN 5
+#define BORDER_MARGIN 2
 
 static int double_height=1;
 extern bool lcd_display_redraw;
