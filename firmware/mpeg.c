@@ -1873,6 +1873,11 @@ static void mpeg_thread(void)
                     if(mpeg_file < 0)
                         panicf("rec upd: %d", mpeg_file);
 
+                    /* If the number of recorded frames have reached 0x7ffff,
+                       we can no longer trust it */
+                    if(num_recorded_frames == 0x7ffff)
+                        num_recorded_frames = 0;
+                    
                     create_xing_header(mpeg_file, 0, num_rec_bytes,
                                        mp3buf, num_recorded_frames, NULL,
                                        false);
