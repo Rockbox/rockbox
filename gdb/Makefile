@@ -30,6 +30,7 @@ LIBS = -lgcc
 $(TARGET).$(EXT): $(TARGET).elf
 	sh-elf-objcopy -O binary $(TARGET).elf $(TARGET).out
 	../tools/scramble $(TARGET).out $(TARGET).$(EXT)
+	../tools/sh2d $(TARGET).out -o 09000000 > $(TARGET).asm
 
 $(TARGET).elf: $(OBJS)
 	sh-elf-gcc -nostartfiles $(OBJS) -nostdlib -Wl,-Map,$(TARGET).map -o $(TARGET).elf -Tlinker.cfg
@@ -37,6 +38,6 @@ $(TARGET).elf: $(OBJS)
 clean:
 	rm $(OBJS) $(TARGET).map $(TARGET).elf $(TARGET).out $(TARGET).mod $(TARGET).ajz
 
-start.o: start.s
+start.o: start.S
 sh-stub.o: sh-stub.c
 setjmp.o: setjmp.S
