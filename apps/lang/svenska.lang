@@ -1658,7 +1658,7 @@ new: "Förinställning"
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
-voice: "Remove preset"
+voice: ""
 new: "Ta bort förinställning"
 
 id: LANG_FM_NO_FREE_PRESETS
@@ -1682,7 +1682,7 @@ new: "Fel vid spara förinställningar"
 id: LANG_FM_SAVE_PRESET
 desc: in radio screen
 eng: "Save preset"
-voice: "Save preset"
+voice: ""
 new: "Spara förinställningar"
 
 id: LANG_FM_STATION
@@ -2690,29 +2690,35 @@ new: "på typ"
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
 eng: "Action"
+voice: ""
 new: "Sätt igång"
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
+voice: ""
 new: "Addera"
 
 id: LANG_FM_BUTTONBAR_EDIT
 desc: in radio screen
 eng: "Edit"
+voice: ""
 new: "Redigera"
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
 eng: "Exit"
+voice: ""
 new: "Gå ur"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
+voice: ""
 new: "Redigera förinställningar"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
 eng: "Force mono"
+voice: ""
 new: "Tvinga mono"
