@@ -45,9 +45,10 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
-  DEFINES += -DLINUX
+  DEFINES += -DLINUX -DLITTLE_ENDIAN
   MPEG_PLAY = 1
 else
+  DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
 endif
 
@@ -57,7 +58,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
-APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c
+APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c bmp.c
+
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
@@ -131,6 +133,9 @@ screensaver.o: $(APPDIR)/screensaver.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 app.o: $(APPDIR)/app.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+bmp.o: $(APPDIR)/bmp.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 play.o: $(APPDIR)/play.c
