@@ -133,10 +133,8 @@ A12: In our testing we found the following results:
      So leaving the unit on and paused consumes ~100mA, and thus much less
      than needing to reboot the unit.  Your mileage may vary.
 
-Q13: When I plug the charger in my Recorder, it doesn't immediately start
-     charging the batteries. And when I plug in the charger when the Recorder
-     is turned off, it turns itself on and starts charging in the Archos
-     software? What's up?
+Q13: When I plug in the charger when the Recorder is turned off, it turns
+     itself on and starts charging in the Archos software? What's up?
 A13: There is a switch in the DC IN jack of the Jukebox - when a charger (or
      whatever) is plugged in, the unit is powered on, even if the charger
      is not plugged in a mains outlet.
@@ -145,12 +143,12 @@ A13: There is a switch in the DC IN jack of the Jukebox - when a charger (or
      located on the FLASH ROM does not load a new firmware version (like
      Rockbox) from the disk, but goes into charging mode instead. You can
      use this feature to get to the Archos charger if you want to.
-     
-     When Rockbox is running on the Recorder (the device has been booted
+
+Q14: When I plug the charger in my Recorder, it doesn't immediately start
+     charging the batteries!
+A14: When Rockbox is running on the Recorder (the device has been booted
      without the charger) it's power management code runs once per minute
      (thus the charge level and charging status is only updated every minute).
      If the battery is not full, it will start charging. If the 'deep
      discharge' mode is enabled in the settings menu, it will start charging
      only when the battery is almost empty.
-
-
