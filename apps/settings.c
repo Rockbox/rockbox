@@ -310,7 +310,6 @@ void settings_reset(void) {
     global_settings.total_boots = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
-    global_settings.hold         = false;
 }
 
 

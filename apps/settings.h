@@ -64,9 +64,6 @@ struct user_settings
     /* geeky persistent statistics */
     unsigned short total_boots; /* how many times the device has been booted */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
-
-    /* Hold Mode */
-    bool hold;
 };
 
 /* prototypes */
