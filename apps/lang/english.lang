@@ -915,3 +915,98 @@ id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 hour clock"
 new:
+
+id: LANG_WEEKDAY_SUNDAY
+desc: abbreviation for weekday
+eng: "Sun"
+new:
+
+id: LANG_WEEKDAY_MONDAY
+desc: abbreviation for weekday
+eng: "Mon"
+new:
+
+id: LANG_WEEKDAY_TUESDAY
+desc: abbreviation for weekday
+eng: "Tue"
+new:
+
+id: LANG_WEEKDAY_WEDNESDAY
+desc: abbreviation for weekday
+eng: "Wed"
+new:
+
+id: LANF_WEEKDAY_THURSDAY
+desc: abbreviation for weekday
+eng: "Thu"
+new:
+
+id: LANG_WEEKDAY_FRIDAY
+desc: abbreviation for weekday
+eng: "Fri"
+new:
+
+id: LANG_WEEKDAY_SATURDAY
+desc: abbreviation for weekday
+eng: "Sat"
+new:
+
+id: LANG_MONTH_JANUARY
+desc: abbreviation for monthname
+eng: "Jan"
+new:
+
+id: LANG_MONTH_FEBRUARY
+desc: abbreviation for monthname
+eng: "Feb"
+new:
+
+id: LANG_MONTH_MARCH
+desc: abbreviation for monthname
+eng: "Mar"
+new:
+
+id: LANG_MONTH_APRIL
+desc: abbreviation for monthname
+eng: "Apr"
+new:
+
+id: LANG_MONTH_MAY
+desc: abbreviation for monthname
+eng: "May"
+new:
+
+id: LANG_MONTH_JUNE
+desc: abbreviation for monthname
+eng: "Jun"
+new:
+
+id: LANG_MONTH_JULY
+desc: abbreviation for monthname
+eng: "Jul"
+new:
+
+id: LANG_MONTH_AUGUST
+desc: abbreviation for monthname
+eng: "Aug"
+new:
+
+id: LANG_MONTH_SEPTEMBER
+desc: abbreviation for monthname
+eng: "Sep"
+new:
+
+id: LANG_MONTH_OCTOBER
+desc: abbreviation for monthname
+eng: "Oct"
+new:
+
+id: LANG_MONTH_NOVEMBER
+desc: abbreviation for monthname
+eng: "Nov"
+new:
+
+id: LANG_MONTH_DECEMBER
+desc: abbreviation for monthname
+eng: "Dec"
+new:

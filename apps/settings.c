@@ -881,13 +881,6 @@ bool set_option(char* string, int* variable, char* options[],
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
-char *dayname[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
-                    {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
-char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
 bool set_time(char* string, int timedate[])
 {
     bool done = false;
@@ -903,6 +896,29 @@ bool set_time(char* string, int timedate[])
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
+    char *dayname[] = {str(LANG_WEEKDAY_SUNDAY),
+                       str(LANG_WEEKDAY_MONDAY),
+                       str(LANG_WEEKDAY_TUESDAY),
+                       str(LANG_WEEKDAY_WEDNESDAY),
+                       str(LANF_WEEKDAY_THURSDAY),
+                       str(LANG_WEEKDAY_FRIDAY),
+                       str(LANG_WEEKDAY_SATURDAY)};
+    char *monthname[] = {str(LANG_MONTH_JANUARY),
+                         str(LANG_MONTH_FEBRUARY),
+                         str(LANG_MONTH_MARCH),
+                         str(LANG_MONTH_APRIL),
+                         str(LANG_MONTH_MAY),
+                         str(LANG_MONTH_JUNE),
+                         str(LANG_MONTH_JULY),
+                         str(LANG_MONTH_AUGUST),
+                         str(LANG_MONTH_SEPTEMBER),
+                         str(LANG_MONTH_OCTOBER),
+                         str(LANG_MONTH_NOVEMBER),
+                         str(LANG_MONTH_DECEMBER)};
+    char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
+                        {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
+    char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -945,6 +961,7 @@ bool set_time(char* string, int timedate[])
         lcd_getstringsize(buffer, &width, &line_height);
         lcd_getstringsize(":", &separator_width, &height);
 
+        /* hour */
         strncpy(reffub, buffer, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, &width, &height);
@@ -952,6 +969,7 @@ bool set_time(char* string, int timedate[])
         cursor[0][INDEX_Y] = prev_line_height;
         cursor[0][INDEX_WIDTH] = width;
 
+        /* minute */
         strncpy(reffub, buffer + 3, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, &width, &height);
@@ -959,6 +977,7 @@ bool set_time(char* string, int timedate[])
         cursor[1][INDEX_Y] = prev_line_height;
         cursor[1][INDEX_WIDTH] = width;
 
+        /* second */
         strncpy(reffub, buffer + 6, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, &width, &height);
@@ -978,27 +997,32 @@ bool set_time(char* string, int timedate[])
 
         /* recalculate the positions and offsets */
         lcd_getstringsize(buffer, &width, &line_height);
-        strncpy(reffub, buffer, 3);
-        reffub[3] = '\0';
+
+        /* weekday */
+        strncpy(reffub, buffer, strlen(dayname[timedate[6]]));
+        reffub[strlen(dayname[timedate[6]])] = '\0';
         lcd_getstringsize(reffub, &weekday_width, &height);
         lcd_getstringsize(" ", &separator_width, &height);
 
-        strncpy(reffub, buffer + 4, 4);
+        /* year */
+        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + 1, 4);
         reffub[4] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[3][INDEX_X] = weekday_width + separator_width;
         cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[3][INDEX_WIDTH] = width;
 
-        strncpy(reffub, buffer + 9, 3);
-        reffub[3] = '\0';
+        /* month */
+        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + 6, strlen(monthname[timedate[4] - 1]));
+        reffub[strlen(monthname[timedate[4] - 1])] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[4][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width;
         cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[4][INDEX_WIDTH] = width;
 
-        strncpy(reffub, buffer + 13, 2);
+        /* day */
+        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + strlen(monthname[timedate[4] - 1]) + 7, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[5][INDEX_X] = weekday_width + separator_width +
