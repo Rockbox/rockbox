@@ -51,7 +51,6 @@ Patches
 -------
 Create a patch using 'cvs diff -ub'. 
 Trim your patches so they only contain relevant changes.
-Now submist the patch to the project via Sourceforge's patch tracker.
-See: http://sourceforge.net/tracker/?group_id=44306&atid=439120
 
-
+Submit your patch to the project via Sourceforge's patch tracker:
+http://sourceforge.net/tracker/?group_id=44306&atid=439120
