@@ -338,16 +338,13 @@ static char* get_tag(struct mp3entry* id3,
             break;
     
         case 'd': /* Directory path information */
-            switch(tag[1])
             {
-                case '1':  /* Parent folder */
-                    return get_dir(buf, buf_size, id3->path, 1);
-
-                case '2':  /* Parent of parent */
-                    return get_dir(buf, buf_size, id3->path, 2);
-
-                case '3':  /* Parent of parent of parent */
-                    return get_dir(buf, buf_size, id3->path, 3);
+                int level = tag[1] - '0';
+                /* d1 through d9 */
+                if ((0 < level) && (9 > level))
+                {
+                    return get_dir(buf, buf_size, id3->path, level);
+                }
             }
             break;
     }
