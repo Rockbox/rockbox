@@ -488,7 +488,7 @@ int wps_show(void)
         if (button && ignore_keyup)
         {
             ignore_keyup = false;
-            if (button & BUTTON_REL)
+            if (button & BUTTON_REL & !SYS_USB_CONNECTED)
                 continue;
         }
         
