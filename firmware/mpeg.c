@@ -1995,6 +1995,9 @@ static void mpeg_thread(void)
             mpeg_stop_done = true;
             break;
         default:
+            /* Tell the USB thread that we are safe */
+            DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
             break;
         }
     }

@@ -116,8 +116,7 @@ static void usb_enable(bool on)
         or_b(0x08, &PADRL); /* deassert card detect */
     }
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
-#else /* standard HD Jukebox */
-#ifdef USB_GMINISTYLE
+#elif defined(USB_GMINISTYLE)
     {
         int i;
         int smscVer = getSMSCVer();
@@ -144,6 +143,19 @@ static void usb_enable(bool on)
             }
         }
     }
+#elif defined(USB_IRIVERSTYLE)
+    if(on)
+    {
+        /* Power on the Cypress chip */
+        GPIO_OUT |= 0x01000000;
+        sleep(2);
+    }
+    else
+    {
+        /* Power off the Cypress chip */
+        GPIO_OUT &= ~0x01000000;        
+    }
+    
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
@@ -158,7 +170,6 @@ static void usb_enable(bool on)
         or_b(0x04, &PADRH);
     }
     or_b(0x04, &PAIORH);
-#endif
 #endif
 }
 
@@ -403,7 +414,11 @@ void usb_init(void)
     countdown = -1;
 
 #ifdef IRIVER_H100
-    GPIO1_FUNCTION |= 0x80; /* GPIO39 is the USB detect input */
+    GPIO_OUT &= ~0x01000000;      /* GPIO24 is the Cypress chip power */
+    GPIO_ENABLE |= 0x01000000;
+    GPIO_FUNCTION |= 0x01000000;
+    
+    GPIO1_FUNCTION |= 0x00000080; /* GPIO39 is the USB detect input */
 #endif
 
     usb_enable(false);
