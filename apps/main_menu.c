@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <timefuncs.h>
 #include "config.h"
 #include "options.h"
 
@@ -154,6 +155,39 @@ bool show_info(void)
     bool done = false;
     int key;
     int state = 1;
+    unsigned int size, free;
+
+    fat_size( &size, &free );
+    size /= 1024;
+    free /= 1024;
+
+    if (global_settings.talk_menu)
+    {   /* say whatever is reasonable, no real connection to the screen */
+        struct tm* tm;
+
+        if (battery_level() >= 0)
+        {
+            talk_id(LANG_BATTERY_TIME, true);
+            talk_value(battery_level(), UNIT_PERCENT, true);
+        }
+
+        talk_id(LANG_DISK_FREE_STAT, false);
+        talk_number(free / 1024, true);
+        decimal = free % 1024 / 100;
+        talk_id(VOICE_POINT, true);
+        talk_value(decimal, UNIT_GB, true);
+
+#ifdef HAVE_RTC
+        tm = get_time();
+        talk_id(VOICE_CURRENT_TIME, true);
+        talk_value(tm->tm_hour, UNIT_HOUR, true);
+        talk_value(tm->tm_min, UNIT_MIN, true);
+        talk_value(tm->tm_sec, UNIT_SEC, true);
+        talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
+        talk_number(tm->tm_mday, true);
+        talk_number(1900 + tm->tm_year, true);
+#endif
+    }
 
     while(!done)
     {
@@ -195,16 +229,11 @@ bool show_info(void)
         }
 
         if (state & 2) {
-            unsigned int size, free;
-            fat_size( &size, &free );
-
-            size /= 1024;
             integer = size / 1024;
             decimal = size % 1024 / 100;
             snprintf(s, sizeof s, str(LANG_DISK_STAT), integer, decimal);
             lcd_puts(0, y++, s);
             
-            free /= 1024;
             integer = free / 1024;
             decimal = free % 1024 / 100;
             snprintf(s, sizeof s, str(LANG_DISK_FREE_STAT), integer, decimal);

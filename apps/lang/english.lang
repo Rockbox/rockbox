@@ -778,73 +778,73 @@ new:
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
-voice: ""
+voice: "January"
 new:
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
-voice: ""
+voice: "February"
 new:
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-voice: ""
+voice: "March"
 new:
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
-voice: ""
+voice: "April"
 new:
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
-voice: ""
+voice: "May"
 new:
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
-voice: ""
+voice: "June"
 new:
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
-voice: ""
+voice: "July"
 new:
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
-voice: ""
+voice: "August"
 new:
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
-voice: ""
+voice: "September"
 new:
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-voice: ""
+voice: "October"
 new:
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
-voice: ""
+voice: "November"
 new:
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
-voice: ""
+voice: "December"
 new:
 
 id: LANG_RESUME_SETTING_ASK_ONCE
@@ -1006,7 +1006,7 @@ new:
 id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
-voice: ""
+voice: "Free diskspace:"
 new:
 
 id: LANG_POWEROFF
@@ -1024,7 +1024,7 @@ new:
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-voice: ""
+voice: "Battery level"
 new:
 
 id: LANG_SLEEP_TIMER
@@ -1808,13 +1808,13 @@ new:
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
 eng: "Index"
-voice: ""
+voice: "Index"
 new:
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
-voice: ""
+voice: "Time"
 new:
 
 id: LANG_BOOKMARK_SELECT_PLAY
@@ -2336,7 +2336,7 @@ voice: "percent"
 new:
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix
+desc: spoken only, a unit postfix, currently not used
 eng: ""
 voice: "megabyte"
 new:
@@ -2626,7 +2626,7 @@ voice: "font"
 new:
 
 id: VOICE_EXT_BMARK
-desc: spoken only, for file extension
+desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "bookmark"
 new:
@@ -2647,4 +2647,10 @@ id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
 voice: "delete directory"
+new:
+
+id: VOICE_CURRENT_TIME
+desc: spoken only, for wall clock announce
+eng: ""
+voice: "Current time:"
 new:

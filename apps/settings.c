@@ -1968,12 +1968,18 @@ static void say_time(int cursorpos, int timedate[])
     const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
     int value = timedate[cursorpos];
 
+    if (!global_settings.talk_menu)
+        return;
+
     if (cursorpos == 3) /* year */
         value += 2000;
 
-    if (global_settings.talk_menu)
+    if (cursorpos == 4) /* month */
+        talk_id(LANG_MONTH_JANUARY + value - 1, false);
+    else
         talk_value(value, unit[cursorpos], false);
 }
+
 
 #define INDEX_X 0
 #define INDEX_Y 1

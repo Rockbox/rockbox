@@ -58,6 +58,8 @@ static bool  delete_bookmark(char* bookmark_file_name, int bookmark_id);
 static void  display_bookmark(char* bookmark,
                               int bookmark_id, 
                               int bookmark_count);
+static void  say_bookmark(char* bookmark,
+                          int bookmark_id);
 static bool  generate_bookmark_file_name(char *in,
                                          char *out,
                                          unsigned int max_length);
@@ -668,6 +670,8 @@ static char* select_bookmark(char* bookmark_file_name)
         else
         {
             display_bookmark(bookmark, bookmark_id, bookmark_count);
+            if (global_settings.talk_menu) /* for voice UI */
+                say_bookmark(bookmark, bookmark_id);
         }
 
         /* waiting for the user to click a button */
@@ -879,6 +883,48 @@ static void display_bookmark(char* bookmark,
 #endif
     lcd_update();
 }
+
+
+/* ----------------------------------------------------------------------- */
+/* This function parses a bookmark, says the voice UI part of it.          */
+/* ------------------------------------------------------------------------*/
+static void say_bookmark(char* bookmark,
+                         int bookmark_id)
+{
+    int resume_index;
+    int ms;
+    char dir[MAX_PATH];
+    bool enqueue = false; /* only the first voice is not queued */
+
+    parse_bookmark(bookmark,
+                   &resume_index, 
+                   NULL, NULL, NULL, 
+                   dir, sizeof(dir),
+                   &ms, NULL, NULL,
+                   NULL, 0);
+/* disabled, because transition between talkbox and voice UI clip is not nice */
+#if 0 
+    if (global_settings.talk_dir >= 3)
+    {   /* "talkbox" enabled */
+        char* last = strrchr(dir, '/');
+        if (last)
+        {   /* compose filename for talkbox */
+            strncpy(last + 1, dir_thumbnail_name, sizeof(dir)-(last-dir)-1);
+            talk_file(dir, enqueue);
+            enqueue = true;
+        }
+    }
+#endif
+    talk_id(VOICE_EXT_BMARK, enqueue);
+    talk_number(bookmark_id + 1, true);
+    talk_id(LANG_BOOKMARK_SELECT_INDEX_TEXT, true);
+    talk_number(resume_index + 1, true);
+    talk_id(LANG_BOOKMARK_SELECT_TIME_TEXT, true);
+    if (ms / 60000)
+        talk_value(ms / 60000, UNIT_MIN, true);
+    talk_value((ms % 60000) / 1000, UNIT_SEC, true);
+}
+
 
 /* ----------------------------------------------------------------------- */
 /* This function retrieves a given bookmark from a file.                   */
