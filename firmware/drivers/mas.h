@@ -38,7 +38,7 @@
 #endif
 
 /* registers..*/
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 #define	MAS_DATA_WRITE  0x68
 #define MAS_DATA_READ   0x69
 #define	MAS_CODEC_WRITE  0x6c
@@ -62,7 +62,7 @@
 #define	MAS_REG_KPRESCALE       0xe7
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 #define MAS_REG_KMDB_SWITCH     0x21
 #define MAS_REG_KMDB_STR        0x22
 #define MAS_REG_KMDB_HAR        0x23
@@ -78,7 +78,7 @@
 /*
  * MAS commands
  */
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 #define MAS_CMD_READ_ANCILLARY  0x50
 #define MAS_CMD_FAST_PRG_DL     0x60
 #define MAS_CMD_READ_IC_VER     0x70
