@@ -3,7 +3,10 @@
 
 <p>
  This guide will show you how to repair the battery connectors on your
- Jukebox Recorder V1.
+ Jukebox Recorder V1. You will need some soldering skills, and not be afraid
+ of opening up your jukebox. If you have second thoughts about this, let
+ somebody else do it for you. <a href=http://www.newmp3technology.com>
+ NewMP3Technology</a> can certainly help you with that.
 
 <h2>Symptoms</h2>
 A loose battery connector can give all kinds of weird behaviour:
