@@ -72,6 +72,13 @@ EOF
 echo "Created Makefile"
 }
 
+if [ "$target" = "--help" -o \
+     "$target" = "-h" ]; then
+  echo "Just invoke the script and answer the questions."
+  echo "This script will write a Makefile for you"
+  exit
+fi
+
 # get our current directory
 pwd=`pwd`;
 
