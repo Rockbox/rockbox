@@ -56,9 +56,6 @@ void lcd_update (void)
           if(display[y/8][x]&(1<<bit)) {
             points[p].x = x + MARGIN_X;
             points[p].y = y+bit + MARGIN_Y;
-#ifdef LCD_DEBUG
-            printf("Set pixel at %d,%d\n", x, y+bit);
-#endif
             p++; /* increase the point counter */
           }
         }
