@@ -906,8 +906,15 @@ bool dirbrowse(char *root)
                             if ( global_settings.resume )
                                 strncpy(global_settings.resume_file,
                                         currdir, MAX_PATH);
+                            
                             start_index =
                                 build_playlist(dircursor+dirstart);
+                            
+                            /* when shuffling dir.: play all files even if the
+                               file selected by user is not the first one */
+                            if (global_settings.playlist_shuffle
+                                && !global_settings.play_selected)
+                                start_index = 0;
                             
                                 /* it is important that we get back the index
                                    in the (shuffled) list and store that */
