@@ -472,4 +472,7 @@ void system_init(void)
 
     /* Enable burst mode on DRAM */
     DCR |= 0x1000;
+
+    /* Activate Warp mode (simultaneous internal and external mem access) */
+    BCR |= 0x2000;
 }
