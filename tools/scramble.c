@@ -49,6 +49,8 @@ void usage(void)
            "\t-neo    SSI Neo format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
+           "\t-add=X  Rockbox iRiver \"add-up\" checksum format\n"
+           "\t        (X values: h100, h120, h140, h300)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -59,6 +61,7 @@ int main (int argc, char** argv)
     unsigned long length,i,slen;
     unsigned char *inbuf,*outbuf;
     unsigned short crc=0;
+    unsigned long crc32=0; /* 32 bit checksum */
     unsigned char header[24];
     unsigned char *iname = argv[1];
     unsigned char *oname = argv[2];
@@ -66,7 +69,9 @@ int main (int argc, char** argv)
     int headerlen = 6;
     FILE* file;
     int version;
-    enum { none, scramble, xor } method = scramble;
+    unsigned long irivernum;
+    char irivermodel[5];
+    enum { none, scramble, xor, add } method = scramble;
 
     if (argc < 3) {
         usage();
@@ -119,6 +124,29 @@ int main (int argc, char** argv)
             return -1;
         }
     }
+    else if(!strncmp(argv[1], "-add=", 5)) {
+        iname = argv[2];
+        oname = argv[3];
+        method = add;
+
+        if(!strcmp(&argv[1][5], "h120"))
+            irivernum = 0;
+        else if(!strcmp(&argv[1][5], "h140"))
+            irivernum = 0; /* the same as the h120 */
+        else if(!strcmp(&argv[1][5], "h140"))
+            irivernum = 0; /* the same as the h120 */
+        else if(!strcmp(&argv[1][5], "h100"))
+            irivernum = 1;
+        else if(!strcmp(&argv[1][5], "h300"))
+            irivernum = 2;
+        else {
+            fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
+            return 2;
+        }
+        /* we store a 4-letter model name too, for humans */
+        strcpy(irivermodel, &argv[1][5]);
+        crc32 = irivernum; /* start checksum calcs with this */
+    }
 
     else if(!strcmp(argv[1], "-iriver")) {
         /* iRiver code dealt with in the iriver.c code */
@@ -148,11 +176,18 @@ int main (int argc, char** argv)
     inbuf = malloc(length);
     if (method == xor)
         outbuf = malloc(length*2);
+    else if(method == add)
+        outbuf = malloc(length + 8);
     else
         outbuf = malloc(length);
     if ( !inbuf || !outbuf ) {
        printf("out of memory!\n");
        return -1;
+    }
+    if(length> 4) {
+        /* zero-fill the last 4 bytes to make sure there's no rubbish there
+           when we write the size-aligned file later */
+        memset(outbuf+length-4, 0, 4);
     }
 
     /* read file */
@@ -165,6 +200,13 @@ int main (int argc, char** argv)
 
     switch (method)
     {
+        case add:
+            for (i = 0; i < length/2; i++) {
+                unsigned short *inbuf16 = (unsigned short *)inbuf;
+                /* add 16 unsigned bits but keep a 32 bit sum */
+                crc32 += inbuf16[i];
+            }
+            break;
         case scramble:
             slen = length/4;
             for (i = 0; i < length; i++) {
@@ -185,14 +227,25 @@ int main (int argc, char** argv)
             }
             break;
     }
-    
-    /* calculate checksum */
-    for (i=0;i<length;i++)
-       crc += inbuf[i];
+
+    if(method != add) {
+        /* calculate checksum */
+        for (i=0;i<length;i++)
+            crc += inbuf[i];
+    }
 
     memset(header, 0, sizeof header);
     switch (method)
     {
+        case add:
+        {
+            unsigned long *headp = (unsigned long *)header;
+            headp[0] = crc32; /* checksum */
+            memcpy(&header[4], irivermodel, 4); /* 4 bytes model name */
+            memcpy(outbuf, inbuf, length); /* the input buffer to output*/
+            headerlen = 8;
+        }
+        break;
         case scramble:
             if (headerlen == 6) {
                 int2be(length, header);
