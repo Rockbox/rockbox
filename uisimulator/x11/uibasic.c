@@ -45,8 +45,7 @@
 GC draw_gc;
 static Colormap cmap;
 
-static long maxx, maxy;
-static int display_zoom=2;
+static int display_zoom=1;
 
 Display *dpy;
 Window window;
@@ -80,17 +79,18 @@ void init_window ()
     get_pixel_resource ("foreground", "Foreground", dpy, cmap);
   draw_gc = XCreateGC (dpy, window, GCForeground, &gcv);
 
-  screen_resized(200, 100);
+  screen_resized(LCD_WIDTH, LCD_HEIGHT);
 }
 
 void screen_resized(int width, int height)
 {
-  maxx = width-1;
-  maxy = height-1;
+  int maxx, maxy;
+  maxx = width;
+  maxy = height;
 
-  display_zoom = maxy/64;
-  if (maxx/120 < display_zoom) 
-    display_zoom = maxx/120;
+  display_zoom = maxy/LCD_HEIGHT;
+  if (maxx/LCD_WIDTH < display_zoom) 
+    display_zoom = maxx/LCD_WIDTH;
   if (display_zoom<1)
     display_zoom = 1;
   XSetForeground (dpy, draw_gc, get_pixel_resource ("background", "Background",
