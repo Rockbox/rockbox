@@ -866,15 +866,10 @@ int gen_c_source(struct font* pf, char *path)
           int y8, ix=0;
           
           rotleft(bytemap, bits, width, pf->height);
-          ofs = (bitmap_t*)bytemap;
           for (y8=0; y8<pf->height; y8+=8) /* column rows */
           {
             for (x=0; x<width; x++) {
                 fprintf(ofp, "0x%02x, ", bytemap[ix]);
-                if (!did_syncmsg && bytemap[ix] != *ofs++) {
-                    fprintf(stderr, "Warning: found encoding values in non-sorted order (not an error).\n");
-                    did_syncmsg = 1;
-                }
                 ix++;
             }	
             fprintf(ofp, "\n");
