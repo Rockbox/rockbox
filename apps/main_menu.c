@@ -38,6 +38,8 @@
 #include "powermgmt.h"
 #include "sound_menu.h"
 
+#include "lang.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
@@ -206,11 +208,11 @@ Menu main_menu(void)
 
     /* main menu */
     struct menu_items items[] = {
-        { "Sound Settings",     sound_menu        },
-        { "General Settings",   settings_menu     },
+        { str(LANG_SOUND_SETTINGS),     sound_menu        },
+        { str(LANG_GENERAL_SETTINGS),   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
-        { "Games",              games_menu        },
+        { str(LANG_GAMES),              games_menu        },
 #endif
 #ifdef USE_DEMOS
         { "Demos",              demo_menu },
