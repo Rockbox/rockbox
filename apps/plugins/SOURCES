@@ -1,16 +1,25 @@
-battery_test.c
+/* plugins common to both Player+Recorder model */
 chessclock.c
 favorites.c
 firmware_flash.c
 helloworld.c
-metronome.c
-rockbox_flash.c
 search.c
 sort.c
-stopwatch.c
 vbrfix.c
+#if CONFIG_KEYPAD != ONDIO_PAD
+/* gradually bring in the ones not working yet */
+battery_test.c
+metronome.c
+rockbox_flash.c
+stopwatch.c
 viewer.c
-#ifdef HAVE_LCD_BITMAP
+#endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
+
+#ifdef HAVE_LCD_BITMAP /* recorder model only */
+rockblox.c
+snow.c
+#if CONFIG_KEYPAD != ONDIO_PAD
+/* gradually bring in the ones not working yet */
 bounce.c
 calculator.c
 calendar.c
@@ -25,11 +34,9 @@ minesweeper.c
 mosaique.c
 oscillograph.c
 pong.c
-rockblox.c
 sliding_puzzle.c
 snake.c
 snake2.c
-snow.c
 sokoban.c
 solitaire.c
 splitedit.c
@@ -37,9 +44,11 @@ star.c
 video.c
 vu_meter.c
 wormlet.c
-#endif
-#ifdef HAVE_LCD_CHARCELLS
+#endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
+#endif /*#ifdef HAVE_LCD_BITMAP */
+
+#ifdef HAVE_LCD_CHARCELLS /* Player model only */
 euroconverter.c
 jackpot.c
 nim.c
-#endif
+#endif /* #ifdef HAVE_LCD_CHARCELLS */
