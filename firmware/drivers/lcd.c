@@ -23,6 +23,7 @@
 #include "thread.h"
 #include <string.h>
 #include <stdlib.h>
+#include "file.h"
 
 /*** definitions ***/
 
@@ -102,13 +103,13 @@
 /*** generic code ***/
 
 struct scrollinfo {
-    char text[257];
+    char text[MAX_PATH];
     char line[32];
     int textlen;
-    char offset;
-    char startx;
-    char starty;
-    char space;
+    int offset;
+    int startx;
+    int starty;
+    int space;
 };
 
 static void scroll_thread(void);
