@@ -241,19 +241,6 @@ static bool timedate_set(void)
     timedate[4] = ((timedate[4] & 0x10) >> 4) * 10 + (timedate[4] & 0x0f); 
     /* day    */
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
-#else /* SIMULATOR */
-    /* hour   */
-    timedate[0] = 0;
-    /* minute */
-    timedate[1] = 0;
-    /* second */
-    timedate[2] = 0;
-    /* year   */
-    timedate[3] = 0;
-    /* month  */
-    timedate[4] = 1;
-    /* day    */
-    timedate[5] = 1;
 #endif
 
     result = set_time(str(LANG_TIME),timedate);
