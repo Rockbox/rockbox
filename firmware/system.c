@@ -18,7 +18,181 @@
  ****************************************************************************/
 #include <stdio.h>
 #include "config.h"
+#include <stdbool.h>
 
+#if CONFIG_CPU == MCF5249
+
+#define default_interrupt(name) \
+  extern __attribute__((weak,alias("UIE"))) void name (void);
+
+static const char* const irqname[] = {
+    "", "", "AccessErr","AddrErr","IllInstr", "", "","",
+    "PrivVio","Trace","Line-A", "Line-F","Debug","","FormErr","Uninit",
+    "","","","","","","","",
+    "Spurious","Level1","Level2","Level3","Level4","Level5","Level6","Level7",
+    "Trap0","Trap1","Trap2","Trap3","Trap4","Trap5","Trap6","Trap7",
+    "Trap8","Trap9","Trap10","Trap11","Trap12","Trap13","Trap14","Trap15",
+    "SWT","Timer0","Timer1","I2C","UART1","UART2","DMA0","DMA1",
+    "DMA2","DMA3","QSPI","","","","","",
+    "PDIR1FULL","PDIR2FULL","EBUTXEMPTY","IIS2TXEMPTY",
+    "IIS1TXEMPTY","PDIR3FULL","PDIR3RESYN","UQ2CHANERR",
+    "AUDIOTICK","PDIR2RESYN","PDIR2UNOV","PDIR1RESYN",
+    "PDIR1UNOV","UQ1CHANERR","IEC2BUFATTEN","IEC2PARERR",
+    "IEC2VALNOGOOD","IEC2CNEW","IEC1BUFATTEN","UCHANTXNF",
+    "UCHANTXUNDER","UCHANTXEMPTY","PDIR3UNOV","IEC1PARERR",
+    "IEC1VALNOGOOD","IEC1CNEW","EBUTXRESYN","EBUTXUNOV",
+    "IIS2TXRESYN","IIS2TXUNOV","IIS1TXRESYN","IIS1TXUNOV",
+    "GPIO0","GPI1","GPI2","GPI3","GPI4","GPI5","GPI6","GPI7",
+    "","","","","","","","SOFTINT0",
+    "SOFTINT1","SOFTINT2","SOFTINT3","",
+    "","CDROMCRCERR","CDROMNOSYNC","CDROMILSYNC",
+    "CDROMNEWBLK","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","","",
+    "","","","","","","",""
+};
+
+default_interrupt (TRAP0); /* Trap #0 */
+default_interrupt (TRAP1); /* Trap #1 */
+default_interrupt (TRAP2); /* Trap #2 */
+default_interrupt (TRAP3); /* Trap #3 */
+default_interrupt (TRAP4); /* Trap #4 */
+default_interrupt (TRAP5); /* Trap #5 */
+default_interrupt (TRAP6); /* Trap #6 */
+default_interrupt (TRAP7); /* Trap #7 */
+default_interrupt (TRAP8); /* Trap #8 */
+default_interrupt (TRAP9); /* Trap #9 */
+default_interrupt (TRAP10); /* Trap #10 */
+default_interrupt (TRAP11); /* Trap #11 */
+default_interrupt (TRAP12); /* Trap #12 */
+default_interrupt (TRAP13); /* Trap #13 */
+default_interrupt (TRAP14); /* Trap #14 */
+default_interrupt (TRAP15); /* Trap #15 */
+default_interrupt (SWT); /* Software Watchdog Timer */
+default_interrupt (TIMER0); /* Timer 0 */
+default_interrupt (TIMER1); /* Timer 1 */
+default_interrupt (I2C); /* I2C */
+default_interrupt (UART1); /* UART 1 */
+default_interrupt (UART2); /* UART 2 */
+default_interrupt (DMA0); /* DMA 0 */
+default_interrupt (DMA1); /* DMA 1 */
+default_interrupt (DMA2); /* DMA 2 */
+default_interrupt (DMA3); /* DMA 3 */
+default_interrupt (QSPI); /* QSPI */
+
+default_interrupt (PDIR1FULL); /* Processor data in 1 full */
+default_interrupt (PDIR2FULL); /* Processor data in 2 full */
+default_interrupt (EBUTXEMPTY); /* EBU transmit FIFO empty */
+default_interrupt (IIS2TXEMPTY); /* IIS2 transmit FIFO empty */
+default_interrupt (IIS1TXEMPTY); /* IIS1 transmit FIFO empty */
+default_interrupt (PDIR3FULL); /* Processor data in 3 full */
+default_interrupt (PDIR3RESYN); /* Processor data in 3 resync */
+default_interrupt (UQ2CHANERR); /* IEC958-2 Rx U/Q channel error */
+default_interrupt (AUDIOTICK); /* "tick" interrupt */
+default_interrupt (PDIR2RESYN); /* Processor data in 2 resync */
+default_interrupt (PDIR2UNOV); /* Processor data in 2 under/overrun */
+default_interrupt (PDIR1RESYN); /* Processor data in 1 resync */
+default_interrupt (PDIR1UNOV); /* Processor data in 1 under/overrun */
+default_interrupt (UQ1CHANERR); /* IEC958-1 Rx U/Q channel error */
+default_interrupt (IEC2BUFATTEN);/* IEC958-2 channel buffer full */
+default_interrupt (IEC2PARERR); /* IEC958-2 Rx parity or symbol error */
+default_interrupt (IEC2VALNOGOOD);/* IEC958-2 flag not good */
+default_interrupt (IEC2CNEW); /* IEC958-2 New C-channel received */
+default_interrupt (IEC1BUFATTEN);/* IEC958-1 channel buffer full */
+default_interrupt (UCHANTXNF); /* U channel Tx reg next byte is first */
+default_interrupt (UCHANTXUNDER);/* U channel Tx reg underrun */
+default_interrupt (UCHANTXEMPTY);/* U channel Tx reg is empty */
+default_interrupt (PDIR3UNOV); /* Processor data in 3 under/overrun */
+default_interrupt (IEC1PARERR); /* IEC958-1 Rx parity or symbol error */
+default_interrupt (IEC1VALNOGOOD);/* IEC958-1 flag not good */
+default_interrupt (IEC1CNEW); /* IEC958-1 New C-channel received */
+default_interrupt (EBUTXRESYN); /* EBU Tx FIFO resync */
+default_interrupt (EBUTXUNOV); /* EBU Tx FIFO under/overrun */
+default_interrupt (IIS2TXRESYN); /* IIS2 Tx FIFO resync */
+default_interrupt (IIS2TXUNOV); /* IIS2 Tx FIFO under/overrun */
+default_interrupt (IIS1TXRESYN); /* IIS1 Tx FIFO resync */
+default_interrupt (IIS1TXUNOV); /* IIS1 Tx FIFO under/overrun */
+default_interrupt (GPI0); /* GPIO interrupt 0 */
+default_interrupt (GPI1); /* GPIO interrupt 1 */
+default_interrupt (GPI2); /* GPIO interrupt 2 */
+default_interrupt (GPI3); /* GPIO interrupt 3 */
+default_interrupt (GPI4); /* GPIO interrupt 4 */
+default_interrupt (GPI5); /* GPIO interrupt 5 */
+default_interrupt (GPI6); /* GPIO interrupt 6 */
+default_interrupt (GPI7); /* GPIO interrupt 7 */
+
+default_interrupt (SOFTINT0); /* Software interrupt 0 */
+default_interrupt (SOFTINT1); /* Software interrupt 1 */
+default_interrupt (SOFTINT2); /* Software interrupt 2 */
+default_interrupt (SOFTINT3); /* Software interrupt 3 */
+
+default_interrupt (CDROMCRCERR); /* CD-ROM CRC error */
+default_interrupt (CDROMNOSYNC); /* CD-ROM No sync */
+default_interrupt (CDROMILSYNC); /* CD-ROM Illegal sync */
+default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
+
+void UIE (void) /* Unexpected Interrupt or Exception */
+{
+    unsigned int format_vector, pc;
+    int vector;
+    
+    asm volatile ("move.l (0,%%sp),%0": "=r"(format_vector));
+    asm volatile ("move.l (4,%%sp),%0": "=r"(pc));
+
+    vector = (format_vector >> 16) & 0xff;
+    
+    while (1)
+    {
+    }
+}
+
+/* reset vectors are handled in crt0.S */
+void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) = 
+{
+    UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+
+    TRAP0,TRAP1,TRAP2,TRAP3,TRAP4,TRAP5,TRAP6,TRAP7,
+    TRAP8,TRAP9,TRAP10,TRAP11,TRAP12,TRAP13,TRAP14,TRAP15,
+    
+    SWT,TIMER0,TIMER1,I2C,UART1,UART2,DMA0,DMA1,
+    DMA2,DMA3,QSPI,UIE,UIE,UIE,UIE,UIE,
+    PDIR1FULL,PDIR2FULL,EBUTXEMPTY,IIS2TXEMPTY,
+    IIS1TXEMPTY,PDIR3FULL,PDIR3RESYN,UQ2CHANERR,
+    AUDIOTICK,PDIR2RESYN,PDIR2UNOV,PDIR1RESYN,
+    PDIR1UNOV,UQ1CHANERR,IEC2BUFATTEN,IEC2PARERR,
+    IEC2VALNOGOOD,IEC2CNEW,IEC1BUFATTEN,UCHANTXNF,
+    UCHANTXUNDER,UCHANTXEMPTY,PDIR3UNOV,IEC1PARERR,
+    IEC1VALNOGOOD,IEC1CNEW,EBUTXRESYN,EBUTXUNOV,
+    IIS2TXRESYN,IIS2TXUNOV,IIS1TXRESYN,IIS1TXUNOV,
+    GPI0,GPI1,GPI2,GPI3,GPI4,GPI5,GPI6,GPI7,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,SOFTINT0,
+    SOFTINT1,SOFTINT2,SOFTINT3,UIE,
+    UIE,CDROMCRCERR,CDROMNOSYNC,CDROMILSYNC,
+    CDROMNEWBLK,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE
+};
+
+void system_init(void)
+{
+}
+
+#elif CONFIG_CPU == SH7034
 #include "lcd.h"
 #include "font.h"
 #include "led.h"
@@ -29,9 +203,6 @@
   extern __attribute__((weak,alias("UIE" #number))) void name (void); void UIE##number (void)
 #define reserve_interrupt(number) \
   void UIE##number (void)
-
-extern void reset_pc (void);
-extern void reset_sp (void);
 
 static const char* const irqname[] = {
     "", "", "", "", "IllInstr", "", "IllSltIn","","",
@@ -541,3 +712,4 @@ int system_memory_guard(int newmode)
     
     return oldmode;
 }
+#endif

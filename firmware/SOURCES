@@ -2,6 +2,7 @@
 crt0.S
 backlight.c
 thread.c
+system.c
 #else
 backlight.c
 buffer.c
