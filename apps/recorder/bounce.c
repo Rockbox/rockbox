@@ -54,7 +54,7 @@ static void loopit(void)
     int yy,xx;
     unsigned int i;
 
-    char rock[]={'R', 'O', 'C', 'K', 'b', 'o', 'x'};
+    char rock[]="ROCKbox";
 
     lcd_clear_display();
     while(1)
@@ -62,23 +62,17 @@ static void loopit(void)
         b = button_get(false);
         if ( b & BUTTON_OFF )
             return;
-#if 1
+
         lcd_clear_display();
-#else
-        lcd_clearrect(xtable[x&63], table[y&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF)&63], table[(y+YDIFF)&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF*2)&63], table[(y+YDIFF*2)&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF*3)&63], table[(y+YDIFF*3)&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF*4)&63], table[(y+YDIFF*4)&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF*5)&63], table[(y+YDIFF*5)&63], 11, 16);
-        lcd_clearrect(xtable[(x+XDIFF*6)&63], table[(y+YDIFF*6)&63], 11, 16);
-#endif
-        y+=3;
+        y++;
+        y += (y%13)?1:2;
+
         x++;
+        x += (x%17)?0:1;
 
         yy=y;
         xx=x;
-        for(i=0; i<sizeof(rock)/sizeof(rock[0]); i++, yy+=YDIFF, xx+=XDIFF)
+        for(i=0; i<sizeof(rock)-1; i++, yy+=YDIFF, xx+=XDIFF)
           lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
                      xtable[xx&63], table[yy&63],
                      11, 16, false);
