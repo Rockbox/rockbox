@@ -38,6 +38,12 @@ const struct {
 };
 #endif
 
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+#endif
+
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
@@ -114,6 +120,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
+#ifdef USE_IRAM
+          memcpy(iramstart, iramcopy, iramend-iramstart);
+#endif
     shut=0;
     cleanshut=0;
     mp3_bufferbase=mp3_bufferpointer=0;

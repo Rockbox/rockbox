@@ -55,7 +55,7 @@ extern struct scan scan;
 
 
 
-void updatepatpix(void);
+void updatepatpix(void) ICODE_ATTR;
 void tilebuf(void);
 void bg_scan(void);
 void wnd_scan(void);

@@ -35,7 +35,7 @@ void timer_advance(int cnt);
 void lcdc_advance(int cnt);
 void sound_advance(int cnt);
 void cpu_timers(int cnt);
-int cpu_emulate(int cycles);
-
+int cpu_emulate(int cycles) ICODE_ATTR;
+int cpu_step(int max) ICODE_ATTR;
 
 #endif

@@ -57,12 +57,22 @@ void ev_poll(void);
 #define open(a,b)       rb->sim_open((a),(b))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
+#define ICODE_ATTR	 
+#define IDATA_ATTR	 
 #else /* !SIMULATOR */
 #define opendir(a)      rb->opendir((a))
 #define closedir(a)     rb->closedir((a))
 #define mkdir(a,b)      rb->mkdir((a),(b))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#define ICODE_ATTR	__attribute__ ((section(".icode")))
+#define IDATA_ATTR	__attribute__ ((section(".idata")))
+#define USE_IRAM	1
+#else
+#define ICODE_ATTR	
+#define IDATA_ATTR	 
+#endif
 #endif /* !SIMULATOR */
 
 #define strcat(a,b)     rb->strcat((a),(b))
