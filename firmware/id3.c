@@ -175,8 +175,9 @@ setid3v1title(FILE *file, mp3entry *entry)
 static void
 setid3v2title(FILE *file, mp3entry *entry) 
 {
-    int minframesize;
-    int size, readsize = 0, headerlen;
+    unsigned int minframesize;
+    unsigned int size;
+    unsigned int readsize = 0, headerlen;
     char *title = NULL;
     char *artist = NULL;
     char *album = NULL;
@@ -200,7 +201,7 @@ setid3v2title(FILE *file, mp3entry *entry)
     if(size >= sizeof(buffer))
         size = sizeof(buffer)-1;
 
-    if(size != (int)fread(buffer, sizeof(char), size, file)) {
+    if(size != fread(buffer, sizeof(char), size, file)) {
         free(buffer);
         return;
     }
@@ -370,7 +371,6 @@ getsonglength(FILE *file, mp3entry *entry)
 
     long bpf;
     long tpf;
-    int i;
 
     /* Start searching after ID3v2 header */ 
     if(fseek(file, entry->id3v2len, SEEK_SET))
@@ -492,9 +492,6 @@ bool
 mp3info(mp3entry *entry, char *filename) 
 {
     FILE *file;
-    char *copy;
-    char *title;
-
     if((file = fopen(filename, "r")) == NULL)
         return TRUE;
 
@@ -544,7 +541,7 @@ int main(int argc, char **argv)
                "      Title: %s\n"
                "     Artist: %s\n"
                "      Album: %s\n"
-               "     Length: %s\n"
+               "     Length: %s / %d s\n"
                "    Bitrate: %d\n"
                "  Frequency: %d\n",
                argv[i],
@@ -552,6 +549,7 @@ int main(int argc, char **argv)
                mp3.artist?mp3.artist:"<blank>",
                mp3.album?mp3.album:"<blank>",
                secs2str(mp3.length),
+               mp3.length/1000,
                mp3.bitrate,
                mp3.frequency);
     }
