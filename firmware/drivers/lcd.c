@@ -541,7 +541,7 @@ void lcd_putspropxy(int x, int y, char *str, int thisfont)
             return;
 
         /* Limit to char generation table */
-        if ((ch < ASCII_MIN) || (ch > 0x7a))
+        if ((ch < ASCII_MIN) || (ch > 0xda))
             /* replace unsupported letters with question marks */
             ch = ' '-ASCII_MIN;
         else
