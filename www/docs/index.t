@@ -77,9 +77,11 @@ Archos. (Jean Boullier)
 
 <h2>Hardware</h2>
 <ul>
-<li> Fotographs of various <a href="/internals/">Archos Internals</a>
+<li> Photographs of various <a href="/internals/">Archos Internals</a>
 
 <li> <a href="repairlcd.html">How to repair your broken LCD</a>
+
+<li> <a href="repairbattery.html">How to repair your broken battery connectors</a>
 
 <li> <a href="/mods/disassemble.html">Disassembling the Archos</a>, part 1:
 removing the covers
