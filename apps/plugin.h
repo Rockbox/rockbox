@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 30
+#define PLUGIN_API_VERSION 31
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -300,7 +300,7 @@ struct plugin_api {
     
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
-
+    int (*memcmp)(const void *s1, const void *s2, size_t n);
 };
 
 /* defined by the plugin loader (plugin.c) */

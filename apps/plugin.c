@@ -265,6 +265,7 @@ static const struct plugin_api rockbox_api = {
 
     strchr,
     strcat,
+    memcmp
 };
 
 int plugin_load(const char* plugin, void* parameter)
