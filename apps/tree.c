@@ -653,6 +653,40 @@ void set_current_file(char *path)
 }
 
 #ifdef HAVE_LCD_BITMAP
+extern int d_1;
+extern int d_2;
+
+void xingupdate(int percent)
+{
+    char buf[32];
+
+    snprintf(buf, 32, "%d%%", percent);
+    lcd_puts(0, 3, buf);
+    snprintf(buf, 32, "%x", d_1);
+    lcd_puts(0, 4, buf);
+    snprintf(buf, 32, "%x", d_2);
+    lcd_puts(0, 5, buf);
+    lcd_update();
+}
+
+void do_xing(char *filename)
+{
+    char buf2[32];
+    unsigned long dbg_tick;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, filename);
+    lcd_update();
+    dbg_tick = current_tick;
+    mpeg_create_xing_header(filename, xingupdate);
+    dbg_tick = current_tick - dbg_tick;
+    snprintf(buf2, 32, "%d ticks", dbg_tick);
+    lcd_puts(0, 1, buf2);
+    snprintf(buf2, 32, "%d seconds", dbg_tick/HZ);
+    lcd_puts(0, 2, buf2);
+    lcd_update();
+}
+
 static int onplay_screen(char* dir, char* file)
 {
     bool exit = false;
@@ -697,6 +731,12 @@ static int onplay_screen(char* dir, char* file)
         lcd_putsxy(0, LCD_HEIGHT/2 - h/2, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+
+        ptr = "VBR Fix";
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+        lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
     }
     lcd_update();
 
@@ -760,6 +800,12 @@ static int onplay_screen(char* dir, char* file)
                 }
                 break;
 
+            case BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN:
+                do_xing(buf);
+//                exit = true;
+                break;
+                
             case BUTTON_PLAY:
             case BUTTON_ON | BUTTON_PLAY: {
                 if (playing)

@@ -46,7 +46,7 @@ struct mp3info {
     int frame_count; /* Number of frames in the file (if VBR) */
     int byte_count;  /* File size in bytes */
     int file_time;   /* Length of the whole file in milliseconds */
-    int xing_header_pos;
+    int vbr_header_pos;
 };
 
 /* Xing header information */
@@ -61,6 +61,6 @@ int count_mp3_frames(int fd, int startpos, int filesize,
                      void (*progressfunc)(int));
 int create_xing_header(int fd, int startpos, int filesize,
                        unsigned char *buf, int num_frames,
-                       void (*progressfunc)(int));
+                       void (*progressfunc)(int), bool generate_toc);
 
 #endif

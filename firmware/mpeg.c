@@ -353,6 +353,9 @@ static void set_elapsed(struct mp3entry* id3)
 }
 
 static bool paused; /* playback is paused */
+
+static unsigned char xingbuf[417];
+
 #ifdef SIMULATOR
 static bool is_playing = false;
 static bool playing = false;
@@ -500,9 +503,16 @@ static bool mpeg_stop_done;
 
 static void recalculate_watermark(int bitrate)
 {
-    int bytes_per_sec = bitrate * 1000 / 8;
+    int bytes_per_sec;
     int time = ata_spinup_time;
 
+    /* A bitrate of 0 probably means empty VBR header. We play safe
+       and set a high threshold */
+    if(bitrate == 0)
+        bitrate = 320000;
+    
+    bytes_per_sec = bitrate * 1000 / 8;
+    
     if(time)
     {
         /* No drive spins up faster than 3.5s */
@@ -1857,6 +1867,18 @@ static void mpeg_thread(void)
                     
                     if(mpeg_file >= 0)
                         close(mpeg_file);
+
+                    mpeg_file = open(recording_filename, O_RDWR);
+                    if(mpeg_file < 0)
+                        panicf("rec upd: %d", mpeg_file);
+
+                    create_xing_header(mpeg_file, 0, mpeg_num_recorded_bytes(),
+                                       xingbuf, 0, NULL, false);
+                    
+                    lseek(mpeg_file, 4096, SEEK_SET);
+                    write(mpeg_file, xingbuf, 417);
+                    close(mpeg_file);
+                    
                     mpeg_file = -1;
                     
 #ifdef DEBUG1
@@ -2982,7 +3004,6 @@ int d_2;
 int mpeg_create_xing_header(char *filename, void (*progressfunc)(int))
 {
     struct mp3entry entry;
-    char xingbuf[417];
     int fd;
     int rc;
     int flen;
@@ -3013,15 +3034,17 @@ int mpeg_create_xing_header(char *filename, void (*progressfunc)(int))
                                   progressfunc);
 
     create_xing_header(fd, entry.first_frame_offset,
-                       flen, xingbuf, num_frames, progressfunc);
+                       flen, xingbuf, num_frames, progressfunc, true);
 
     /* Try to fit the Xing header first in the stream. Replace the existing
        Xing header if there is one, else see if there is room between the
        ID3 tag and the first MP3 frame. */
-    if(entry.xing_header_pos)
+    if(entry.vbr_header_pos)
     {
         /* Reuse existing Xing header */
-        fpos = entry.xing_header_pos;
+        fpos = entry.vbr_header_pos;
+
+        DEBUGF("Reusing Xing header at %d\n", fpos);
     }
     else
     {

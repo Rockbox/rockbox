@@ -263,9 +263,7 @@ extern unsigned char mp3end[];
 static int fnf_read_index;
 static int fnf_buf_len;
 
-static int fd;
-
-static int buf_getbyte(unsigned char *c)
+static int buf_getbyte(int fd, unsigned char *c)
 {
     if(fnf_read_index < fnf_buf_len)
     {
@@ -291,7 +289,7 @@ static int buf_getbyte(unsigned char *c)
     return 0;
 }
 
-static int buf_seek(int len)
+static int buf_seek(int fd, int len)
 {
     fnf_read_index += len;
     if(fnf_read_index > fnf_buf_len)
@@ -320,7 +318,7 @@ static void buf_init(void)
     fnf_read_index = 0;
 }
 
-unsigned long buf_find_next_frame(int *offset, int max_offset,
+unsigned long buf_find_next_frame(int fd, int *offset, int max_offset,
                                   unsigned long last_header)
 {
     unsigned long header=0;
@@ -336,7 +334,7 @@ unsigned long buf_find_next_frame(int *offset, int max_offset,
     /* Fill up header with first 24 bits */
     for(i = 0; i < 3; i++) {
         header <<= 8;
-        if(!buf_getbyte(&tmp))
+        if(!buf_getbyte(fd, &tmp))
             return 0;
         header |= tmp;
         pos++;
@@ -344,7 +342,7 @@ unsigned long buf_find_next_frame(int *offset, int max_offset,
 
     do {
         header <<= 8;
-        if(!buf_getbyte(&tmp))
+        if(!buf_getbyte(fd, &tmp))
             return 0;
         header |= tmp;
         pos++;
@@ -413,7 +411,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         DEBUGF("Xing header\n");
 
         /* Remember where in the file the Xing header is */
-        info->xing_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;
+        info->vbr_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;
         
         /* We want to skip the Xing frame when playing the stream */
         bytecount += info->frame_size;
@@ -423,7 +421,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         header = find_next_frame(fd, &tmp, 0x20000, 0);
         if(header == 0)
             return -4;
-        
+
         if(!mp3headerinfo(info, header))
             return -5;
 
@@ -443,10 +441,14 @@ int get_mp3file_info(int fd, struct mp3info *info)
         {
             info->byte_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
                                          vbrheader[i+2], vbrheader[i+3]);
-            info->bitrate = info->byte_count * 8 / info->file_time;
             i += 4;
         }
 
+        if(info->file_time && info->byte_count)
+            info->bitrate = info->byte_count * 8 / info->file_time;
+        else
+            info->bitrate = 0;
+        
         if(vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
         {
             memcpy( info->toc, vbrheader+i, 100 );
@@ -554,6 +556,8 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     int progress_chunk = filesize / 50; /* Max is 50%, in 1% increments */
     int progress_cnt = 0;
 
+    /* Nasty stuff to avoid passing the file handle around */
+    
     if(lseek(fd, startpos, SEEK_SET) < 0)
         return -1;
 
@@ -563,9 +567,9 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     num_frames = 0;
     cnt = 0;
     
-    while((header = buf_find_next_frame(&bytes, -1, header))) {
+    while((header = buf_find_next_frame(fd, &bytes, -1, header))) {
         mp3headerinfo(&info, header);
-        buf_seek(info.frame_size-4);
+        buf_seek(fd, info.frame_size-4);
         num_frames++;
         if(progressfunc)
         {
@@ -585,7 +589,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
 
 int create_xing_header(int fd, int startpos, int filesize,
                        unsigned char *buf, int num_frames,
-                       void (*progressfunc)(int))
+                       void (*progressfunc)(int), bool generate_toc)
 {
     unsigned long header = 0;
     struct mp3info info;
@@ -595,6 +599,7 @@ int create_xing_header(int fd, int startpos, int filesize,
     int filepos;
     int tocentry;
     int x;
+    int index;
 
     DEBUGF("create_xing_header()\n");
     
@@ -609,46 +614,61 @@ int create_xing_header(int fd, int startpos, int filesize,
     buf[36+1] = 'i';
     buf[36+2] = 'n';
     buf[36+3] = 'g';
-    int2bytes(&buf[36+4], (VBR_FRAMES_FLAG | VBR_BYTES_FLAG | VBR_TOC_FLAG));
-    int2bytes(&buf[36+8], num_frames);
-    int2bytes(&buf[36+12], filesize - startpos);
-        
-    /* Generate filepos table */
-    last_pos = 0;
-    filepos = 0;
-    header = 0;
-    x = 0;
-    for(i = 0;i < 100;i++) {
-        /* Calculate the absolute frame number for this seek point */
-        pos = i * num_frames / 100;
-
-        /* Advance from the last seek point to this one */
-        for(j = 0;j < pos - last_pos;j++)
-        {
-            DEBUGF("fpos: %x frame no: %x ", filepos, x++);
-            header = buf_find_next_frame(&bytes, -1, header);
-            mp3headerinfo(&info, header);
-            buf_seek(info.frame_size-4);
-            filepos += info.frame_size;
-        }
-
-        if(progressfunc)
-        {
-            progressfunc(50 + i/2);
-        }
-        
-        tocentry = filepos * 256 / filesize;
-        
-        DEBUGF("Pos %d: %d  relpos: %d  filepos: %x tocentry: %x\n",
-               i, pos, pos-last_pos, filepos, tocentry);
-
-        /* Fill in the TOC entry */
-        buf[36+16+i] = tocentry;
-        
-        last_pos = pos;
+    int2bytes(&buf[36+4], (num_frames?VBR_FRAMES_FLAG:0 |
+                           filesize?VBR_BYTES_FLAG:0 |
+                           generate_toc?VBR_TOC_FLAG:0));
+    index = 36+8;
+    if(num_frames)
+    {
+        int2bytes(&buf[index], num_frames);
+        index += 4;
     }
 
-    memcpy(buf+152, cooltext, sizeof(cooltext));
+    if(filesize)
+    {
+        int2bytes(&buf[index], filesize - startpos);
+        index += 4;
+    }
+
+    if(generate_toc)
+    {
+        /* Generate filepos table */
+        last_pos = 0;
+        filepos = 0;
+        header = 0;
+        x = 0;
+        for(i = 0;i < 100;i++) {
+            /* Calculate the absolute frame number for this seek point */
+            pos = i * num_frames / 100;
+            
+            /* Advance from the last seek point to this one */
+            for(j = 0;j < pos - last_pos;j++)
+            {
+                DEBUGF("fpos: %x frame no: %x ", filepos, x++);
+                header = buf_find_next_frame(fd, &bytes, -1, header);
+                mp3headerinfo(&info, header);
+                buf_seek(fd, info.frame_size-4);
+                filepos += info.frame_size;
+            }
+            
+            if(progressfunc)
+            {
+                progressfunc(50 + i/2);
+            }
+            
+            tocentry = filepos * 256 / filesize;
+            
+            DEBUGF("Pos %d: %d  relpos: %d  filepos: %x tocentry: %x\n",
+                   i, pos, pos-last_pos, filepos, tocentry);
+            
+            /* Fill in the TOC entry */
+            buf[index + i] = tocentry;
+            
+            last_pos = pos;
+        }
+    }
+
+    memcpy(buf + index + 100, cooltext, sizeof(cooltext));
 
 #ifdef DEBUG
     for(i = 0;i < 417;i++)
