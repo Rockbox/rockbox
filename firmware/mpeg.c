@@ -1823,6 +1823,8 @@ static void mpeg_thread(void)
                 break;
                 
             case SYS_USB_CONNECTED:
+                is_playing = false;
+                paused = false;
                 stop_playing();
 #ifndef SIMULATOR
                 
