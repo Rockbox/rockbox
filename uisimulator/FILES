@@ -3,8 +3,8 @@ HACKING
 README
 common/*.[ch]
 win32/*.[ch]
-win32/makefile.vc6
-win32/makefile
+win32/Makefile
+win32/Makefile.vc6
 win32/uisw32.sln
 win32/uisw32.rc
 win32/uisw32.suo
