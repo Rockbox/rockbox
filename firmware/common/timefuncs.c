@@ -35,12 +35,6 @@ struct tm *get_time(void)
        buffer to match the data sheet */
     rtc_read_multiple(1, &rtcbuf[1], 7);
 
-    for(i = 0;i < 7;i++)
-    {
-        DEBUGF("%02x ", rtcbuf[i]);
-    }
-    DEBUGF("\n");
-    
     tm.tm_sec = ((rtcbuf[1] & 0x70) >> 4) * 10 + (rtcbuf[1] & 0x0f);
     tm.tm_min = ((rtcbuf[2] & 0x70) >> 4) * 10 + (rtcbuf[2] & 0x0f);
     tm.tm_hour = ((rtcbuf[3] & 0x30) >> 4) * 10 + (rtcbuf[3] & 0x0f);
