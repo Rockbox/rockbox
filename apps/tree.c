@@ -227,15 +227,15 @@ static int play_dirname(int start_index)
         return 0;
 
     snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
-		 currdir, dircache[start_index].name, dir_thumbnail_name);
+         currdir, dircache[start_index].name, dir_thumbnail_name);
 
     DEBUGF("Checking for %s\n", dirname_mp3_filename);
 
     fd = open(dirname_mp3_filename, O_RDONLY);
     if (fd < 0)
     {
-	    DEBUGF("Failed to find: %s\n", dirname_mp3_filename);
-	    return -1;
+        DEBUGF("Failed to find: %s\n", dirname_mp3_filename);
+        return -1;
     }
 
     close(fd);
@@ -579,7 +579,8 @@ static int showdir(const char *path, int start, const int *dirfilter)
                   start + tree_max_on_screen, VERTICAL);
 
     if(global_settings.buttonbar) {
-        buttonbar_set(str(LANG_DIRBROWSE_F1),
+        buttonbar_set(*dirfilter < NUM_FILTER_MODES ?
+                      str(LANG_DIRBROWSE_F1) : (unsigned char *) "",
                       str(LANG_DIRBROWSE_F2),
                       str(LANG_DIRBROWSE_F3));
         buttonbar_draw();
@@ -1226,7 +1227,9 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
                         start_wps = true;
                     }
-                    else if (*dirfilter > NUM_FILTER_MODES)
+                    else if (*dirfilter > NUM_FILTER_MODES &&
+                             *dirfilter != SHOW_FONT &&
+                             *dirfilter != SHOW_PLUGINS)
                         exit_func = true;
                 }
                 restore = true;
@@ -1330,14 +1333,18 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 else
                 {
-                    if (mpeg_status() & MPEG_STATUS_PLAY)
+                    if (*dirfilter < NUM_FILTER_MODES)
+                    /* don't catch single ON from .rockbox browsing */
                     {
-                        start_wps=true;
-                    }
-                    else
-                    {
-                        start_resume(false);
-                        restore = true;
+                        if (mpeg_status() & MPEG_STATUS_PLAY)
+                        {
+                            start_wps=true;
+                        }
+                        else
+                        {
+                            start_resume(false);
+                            restore = true;
+                        }
                     }
                 }
                 break;
@@ -1394,7 +1401,7 @@ static bool dirbrowse(const char *root, const int *dirfilter)
             ata_spin();
 
         if (start_wps)
-	{
+    {
             lcd_stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_root = true;
