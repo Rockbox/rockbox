@@ -22,6 +22,9 @@ INCLUDES= -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
 TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
+# store output files in this directory:
+OBJDIR = .
+
 ifdef DEBUG
     DEFINES := -DDEBUG
     LDS := $(FIRMWARE)/gdb.lds
@@ -38,21 +41,28 @@ ifeq ($(TARGET),-DARCHOS_RECORDER)
    SRC += $(wildcard recorder/*.c)
 endif
 
-OBJS := $(SRC:%.c=%.o)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
-all : archos.mod # archos.asm 
+all : $(OBJDIR)/archos.mod # archos.asm 
 
-archos.elf : $(OBJS) $(LDS) $(FIRMWARE)/librockbox.a
-	$(CC) -Os -nostdlib -o archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
+$(OBJDIR)/librockbox.a:
+	make -C $FIRMWARE OBJDIR=$(OBJDIR)
 
-archos.bin : archos.elf
-	$(OC) -O binary archos.elf archos.bin
+$(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
+	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
 
-archos.asm: archos.bin
-	../tools/sh2d -sh1 archos.bin > archos.asm
+$(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
+	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
 
-archos.mod : archos.bin
-	../tools/scramble archos.bin archos.mod
+$(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
+	../tools/sh2d -sh1 $(OBJDIR)/archos.bin > $(OBJDIR)/archos.asm
+
+$(OBJDIR)/archos.mod : $(OBJDIR)/archos.bin
+	../tools/scramble $(OBJDIR)/archos.bin $(OBJDIR)/archos.mod
+
+$(OBJDIR)/%.o: %.c
+	@mkdir -p `dirname $@`
+	$(CC) $(CFLAGS) -c $< -o $@
 
 dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
@@ -62,13 +72,13 @@ clean:
 	-$(RM) -r $(DEPS)
 
 DEPS:=.deps
-DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common
+DEPDIRS:=$(DEPS) $(DEPS)/recorder
 
-$(DEPS)/%.d: %.c
-	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
-	@echo "Updating dependencies for $<"
+$(OBJDIR)/$(DEPS)/%.d: %.c
+	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
+	@echo "Updating dependencies for $(OBJDIR)/$<"
 	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
-		|sed '\''s|\($*\)\.o[ :]*|\1.o $(<:%.c=%.d) : |g'\'' > $@; \
+		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
--include $(SRC:%.c=$(DEPS)/%.d)
+-include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
