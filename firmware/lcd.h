@@ -132,7 +132,9 @@ void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
 void lcd_clearrect (int x, int y, int nx, int ny);
 void lcd_fillrect (int x, int y, int nx, int ny);
 void lcd_invertrect (int x, int y, int nx, int ny);
-
+void lcd_drawline( int x1, int y1, int x2, int y2 );
+void lcd_drawpixel(int x, int y);
+void lcd_clearpixel(int x, int y);
 #endif
 
 

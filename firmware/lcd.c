@@ -580,6 +580,7 @@ void lcd_invertrect (int x, int y, int nx, int ny)
 }
 
 #define DRAW_PIXEL(x,y) display[x][y/8] |= (1<<(y%7))
+#define CLEAR_PIXEL(x,y) display[x][y/8] &= ~(1<<(y%7))
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )
 {
@@ -650,6 +651,23 @@ void lcd_drawline( int x1, int y1, int x2, int y2 )
         }
     }
 }
+
+/*
+ * Set a single pixel
+ */
+void lcd_drawpixel(int x, int y)
+{
+    DRAW_PIXEL(x,y);
+}
+
+/*
+ * Clear a single pixel
+ */
+void lcd_clearpixel(int x, int y)
+{
+    CLEAR_PIXEL(x,y);
+}
+
 
 #else
 /* no LCD defined, no code to use */
