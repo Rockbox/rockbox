@@ -328,9 +328,9 @@ static void scan_plugins(void)
         }
 
         /* filter out non rock files */
-        if (!strcasecmp(
-            &entry->d_name[strlen(entry->d_name) - sizeof(ROCK_EXTENSION) -1],
-            ROCK_EXTENSION)) {
+        if (strcasecmp(
+             &entry->d_name[strlen(entry->d_name) - sizeof(ROCK_EXTENSION) + 1],
+             ROCK_EXTENSION)) {
             continue;
         }
 
