@@ -11,3 +11,4 @@ sample.emacs
 buildzip.pl
 romsizetest.pl
 make.inc
+makesrc.inc
