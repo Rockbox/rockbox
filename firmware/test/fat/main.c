@@ -12,17 +12,17 @@ extern int ata_init(char*);
 extern void ata_read_sectors(int, int, char*);
 
 void dbg_dump_sector(int sec);
-void dbg_dump_buffer(unsigned char *buf);
+void dbg_dump_buffer(unsigned char *buf, int len);
 void dbg_console(void);
 
 void panicf( char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
-    printf("***PANIC*** ");
-    vprintf( fmt, ap );
+    fprintf(stderr,"***PANIC*** ");
+    vfprintf(stderr, fmt, ap );
     va_end( ap );
-    exit(0);
+    exit(1);
 }
 
 void dbg_dump_sector(int sec)
@@ -31,16 +31,16 @@ void dbg_dump_sector(int sec)
 
     ata_read_sectors(sec,1,buf);
     DEBUGF("---< Sector %d >-----------------------------------------\n", sec);
-    dbg_dump_buffer(buf);
+    dbg_dump_buffer(buf, 512);
 }
 
-void dbg_dump_buffer(unsigned char *buf)
+void dbg_dump_buffer(unsigned char *buf, int len)
 {
     int i, j;
     unsigned char c;
     unsigned char ascii[33];
 
-    for(i = 0;i < 512/16;i++)
+    for(i = 0;i < len/16;i++)
     {
         DEBUGF("%03x: ", i*16);
         for(j = 0;j < 16;j++)
@@ -83,41 +83,97 @@ void dbg_dir(char* currdir)
     }
 }
 
-void dbg_mkfile(char* name, int num)
+#define CHUNKSIZE 8
+
+int dbg_mkfile(char* name, int num)
 {
-    char text[1024];
+    char text[8192];
     int i;
-    int fd = open(name,O_WRONLY);
+    int fd;
+    int x=0;
+
+    fd = open(name,O_WRONLY);
     if (fd<0) {
         DEBUGF("Failed creating file\n");
-        return;
+        return -1;
     }
-    for (i=0; i<sizeof(text)/4; i++ )
-        sprintf(text+i*4,"%03x,",i);
+    num *= 1024;
+    while ( num ) {
+        int len = num > sizeof text ? sizeof text : num;
 
-    for (i=0;i<num;i++)
-        if (write(fd, text, sizeof(text)) < 0)
+        for (i=0; i<len/CHUNKSIZE; i++ )
+            sprintf(text+i*CHUNKSIZE,"%07x,",x++);
+
+        if (write(fd, text, len) < 0) {
             DEBUGF("Failed writing data\n");
+            return -1;
+        }
+        num -= len;
+        DEBUGF("wrote %d bytes\n",len);
+    }
     
     close(fd);
+    return 0;
+}
+
+int dbg_chkfile(char* name)
+{
+    char text[8192];
+    int i;
+    int x=0;
+    int block=0;
+    int fd = open(name,O_RDONLY);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+    while (1) {
+        int rc = read(fd, text, sizeof text);
+        DEBUGF("read %d bytes\n",rc);
+        if (rc < 0) {
+            DEBUGF("Failed writing data\n");
+            return -1;
+        }
+        else {
+            char tmp[CHUNKSIZE+1];
+            if (!rc)
+                break;
+            for (i=0; i<rc/CHUNKSIZE; i++ ) {
+                sprintf(tmp,"%07x,",x++);
+                if (strncmp(text+i*CHUNKSIZE,tmp,CHUNKSIZE)) {
+                    DEBUGF("Mismatch in byte %d (%.4s != %.4s)\n",
+                           block*sizeof(text)+i*CHUNKSIZE, tmp,
+                           text+i*CHUNKSIZE);
+                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40);
+                    return -1;
+                }
+            }
+        }
+        block++;
+    }
+    
+    close(fd);
+
+    return 0;
 }
 
 void dbg_type(char* name)
 {
-    unsigned char buf[SECTOR_SIZE*5];
-    int i,fd,rc;
+    const int size = SECTOR_SIZE*5;
+    unsigned char buf[size+1];
+    int fd,rc;
 
     fd = open(name,O_RDONLY);
     if (fd<0)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
     
-    for (i=0;i<5;i++) {
-        rc = read(fd, buf, SECTOR_SIZE*2/3);
+    while ( 1 ) {
+        rc = read(fd, buf, size);
         if( rc > 0 )
         {
-            buf[rc]=0;
-            printf("%d: %s\n", i, buf);
+            buf[size] = 0;
+            printf("%d: %.*s\n", rc, rc, buf);
         }
         else if ( rc == 0 ) {
             DEBUGF("EOF\n");
@@ -126,6 +182,7 @@ void dbg_type(char* name)
         else
         {
             DEBUGF("Failed reading file: %d\n",rc);
+            break;
         }
     }
     close(fd);
@@ -199,7 +256,7 @@ void dbg_prompt(void)
     DEBUGF("C:%s> ", current_directory);
 }
 
-void dbg_cmd(int argc, char *argv[])
+int dbg_cmd(int argc, char *argv[])
 {
     char* cmd = NULL;
     char* arg1 = NULL;
@@ -223,8 +280,9 @@ void dbg_cmd(int argc, char *argv[])
                " head <file>\n"
                " tail <file>\n"
                " mkfile <file> <size (KB)>\n"
+               " chkfile <file>\n"
             );
-        return;
+        return -1;
     }
 
     if (!strcasecmp(cmd, "dir"))
@@ -265,11 +323,19 @@ void dbg_cmd(int argc, char *argv[])
     {
         if (arg1) {
             if (arg2)
-                dbg_mkfile(arg1,atoi(arg2));
+                return dbg_mkfile(arg1,atoi(arg2));
             else
-                dbg_mkfile(arg1,1);
+                return dbg_mkfile(arg1,1);
         }
     }
+
+    if (!strcasecmp(cmd, "chkfile"))
+    {
+        if (arg1)
+            return dbg_chkfile(arg1);
+    }
+
+    return 0;
 }
 
 extern void ata_exit(void);
@@ -295,7 +361,7 @@ int main(int argc, char *argv[])
             rc = fat_mount(pinfo[i].start);
             if(rc) {
                 DEBUGF("mount: %d",rc);
-                return 0;
+                return -1;
             }
             break;
         }
@@ -303,14 +369,14 @@ int main(int argc, char *argv[])
     if ( i==4 ) {
         if(fat_mount(0)) {
             DEBUGF("No FAT32 partition!");
-            return 0;
+            return -1;
         }
     }
 
-    dbg_cmd(argc, argv);
+    rc = dbg_cmd(argc, argv);
 
     ata_exit();
 
-    return 0;
+    return rc;
 }
 
