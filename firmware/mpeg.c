@@ -91,13 +91,13 @@ static int minval[] =
     -50,  /* Balance */
     0,    /* Loudness */
     0,    /* Bass boost */
-    -1,    /* AVC */
+    -1,   /* AVC */
     0     /* Channels */
 };
 
 static int maxval[] =
 {
-    50,    /* Volume */
+    100,   /* Volume */
 #ifdef HAVE_MAS3587F
     24,    /* Bass */
     24,    /* Treble */
@@ -114,7 +114,7 @@ static int maxval[] =
 
 static int defaultval[] =
 {
-    70/2,    /* Volume */
+    70,      /* Volume */
 #ifdef HAVE_MAS3587F
     12+6,    /* Bass */
     12+6,    /* Treble */
@@ -1609,7 +1609,8 @@ void mpeg_sound_set(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            value *= 2; /* Convert to percent */
+            /* We are doing increments of 1 */
+            /*value *= 2;*/ /* Convert to percent */
             
 #ifdef HAVE_MAS3587F
             tmp = 0x7f00 * value / 100;
@@ -1738,7 +1739,8 @@ int mpeg_val2phys(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            result = value * 2;
+/*            result = value * 2;*/
+            result = value;
             break;
         
         case SOUND_BALANCE:
