@@ -44,7 +44,7 @@ extern void lcd_scroll_speed( int speed );
 extern void lcd_scroll_delay( int ms );
 extern void lcd_set_contrast(int val);
 extern void lcd_write_command( int byte );
-extern void lcd_write_command_ex( int cmd, unsigned char data );
+extern void lcd_write_command_ex( int cmd, int data1, int data2);
 extern void lcd_write_data( const unsigned char* p_bytes, int count );
 extern int  lcd_default_contrast(void);
 

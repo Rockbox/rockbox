@@ -333,11 +333,20 @@ lcd_write_command_ex:
         and.l   %d1,(0xb4,%a1)
         move.w  %d0,0xf0000000  /* Write to LCD */
 
-        move.l  (8,%sp),%d0     /* Data */
-
         not.l   %d1             /* Set A0 = 1 */
         or.l    %d1,(0xb4,%a1)
+
+        move.l  (8,%sp),%d0     /* Data */
+        cmp.l   #0xffffffff,%d0 /* -1? */
+        beq.b   .last
         move.w  %d0,0xf0000000  /* Write to LCD */
+        
+        move.l  (12,%sp),%d0     /* Data */
+        cmp.l   #0xffffffff,%d0 /* -1? */
+        beq.b   .last
+        move.w  %d0,0xf0000000  /* Write to LCD */
+        
+.last:  
         rts
 
     .align      2
