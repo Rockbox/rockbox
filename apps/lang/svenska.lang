@@ -1448,7 +1448,7 @@ new: "Disken är full. Tryck AV för att fortsätta."
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-voice: "Browse Firm-wares"
+voice: "Browse Firmwares"
 new: "Se fasta programvaror"
 
 id: LANG_INSERT
@@ -1544,7 +1544,7 @@ new: "Sparat %d spår (%s)"
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Browse Plug-Ins"
+voice: "Browse Plugins"
 new: "Se insticksmoduler"
 
 id: LANG_PLUGIN_CANT_OPEN
@@ -2208,7 +2208,7 @@ voice: "plus"
 new: ""
 
 id: VOICE_POINT
-desc: spoken only, for composing numbers
+desc: spoken only, decimal separator for composing numbers
 eng: ""
 voice: "point"
 new: ""
@@ -2570,7 +2570,7 @@ new: ""
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
-voice: "plug-in"
+voice: "plugin"
 new: ""
 
 id: VOICE_EXT_TXT
@@ -2806,3 +2806,18 @@ desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
 new: "Ingen .rockbox katalog"
+
+id: LANG_REMOVE_MMC
+desc: before acknowledging usb in case an MMC is inserted (Ondio)
+eng: "Please remove inserted MMC"
+new: "Var vänlig ta bort instucken MMC"
+
+id: VOICE_DOT
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_PAUSE
+desc: spoken only, for spelling, a split second of silence (difficult to author)
+eng: ""
+new: 
