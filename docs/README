@@ -1,0 +1,45 @@
+               __________               __   ___.
+     Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+     Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+     Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                       \/            \/     \/    \/            \/
+
+Build your own archos.mod.
+
+1. Check out 'firmware', 'apps' and 'tools' from CVS (or possibly from a
+   downloaded archive). You may possibly want 'uisimulator' too (for trying
+   out things on host before making target tests).  If you haven't already
+   done so, we advise you pull down the 'docs' directory as well.
+
+2. Build the tools by running 'make' in the tools/ directory.
+
+3. Create your own build directory, preferably in the same directory as the
+   firmware/ and apps/ directories. This is where all generated files will be
+   put.
+
+4. In your build directory, run the 'tools/configure' script and enter what
+   target you want to build for and if you want a debug version or not. It'll
+   prompt you. The debug version is for making a gdb version out of it. It is
+   only useful if you run gdb towards your target Archos.
+
+5. Make sure you have sh-elf-gcc and siblings in the PATH.
+
+6. *ploink*. Now you have got a Makefile generated for you. Run 'make' and
+   soon the necessary pieces from the firmware and the apps directories have
+   been compiled and linked.
+
+7. Copy the archos.mod file to your archos, reboot it and *smile*.
+
+Whenever the tools/configure script gets updated, you can make your makefile
+updated too by running 'tools/configure update'
+
+If you want to build for more than one target, just create a new build
+directory and create a setup for another target combination in there.
+
+Questions anyone? Take them to the mailing list. We'll be happy to help you
+out!
+
+
+
+
