@@ -755,7 +755,7 @@ struct mp3entry* mpeg_current_track(void)
 void mpeg_play(char* trackname)
 {
 #ifdef SIMULATOR
-    trackname = trackname;
+    mp3info(&(id3tags[0].id3), trackname);
 #else
     queue_post(&mpeg_queue, MPEG_PLAY, trackname);
 #endif
