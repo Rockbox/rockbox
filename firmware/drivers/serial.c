@@ -27,7 +27,9 @@
 #include "lcd.h"
 #include "serial.h"
 
-#if CONFIG_CPU != MCF5249 /* FIX: this is not compiled for coldfire */
+#if (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730)
+/* FIX: this doesn't work on iRiver or Gmini yet */
+
 #ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
 
 /* Received byte identifiers */
@@ -138,9 +140,9 @@ int remote_control_rx(void)
 }
 
 #endif /* HAVE_MMC */
-#else
+#else /*  (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */
 void serial_setup (void) 
 {
     /* a dummy */
 }
-#endif /* CONFIG_CPU != MCF5249 */
+#endif /* ! (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */

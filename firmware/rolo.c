@@ -29,7 +29,8 @@
 #include "string.h"
 #include "buffer.h"
 
-#if CONFIG_CPU != MCF5249 /* FIX: this doesn't work on iRiver yet */
+#if (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730)
+/* FIX: this doesn't work on iRiver or Gmini yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -145,7 +146,7 @@ int rolo_load(const char* filename)
 
     return 0; /* this is never reached */
 }
-#else  /* CONFIG_CPU != MCF5249 */
+#else  /* (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */
 int rolo_load(const char* filename)
 {
     /* dummy */
@@ -153,4 +154,4 @@ int rolo_load(const char* filename)
     return 0;
 }
 
-#endif /* CONFIG_CPU == MCF5249 */
+#endif /* ! (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */
