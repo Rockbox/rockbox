@@ -366,9 +366,13 @@ static bool ffwd_rew(int button)
                 }
 
                 if(wps_time_countup == false)
-                    wps_refresh(id3, -ff_rewind_count, WPS_REFRESH_PLAYER_PROGRESS);
+                    wps_refresh(id3, -ff_rewind_count,
+                                WPS_REFRESH_PLAYER_PROGRESS |
+                                WPS_REFRESH_DYNAMIC);
                 else
-                    wps_refresh(id3, ff_rewind_count, WPS_REFRESH_PLAYER_PROGRESS);
+                    wps_refresh(id3, ff_rewind_count,
+                                WPS_REFRESH_PLAYER_PROGRESS |
+                                WPS_REFRESH_DYNAMIC);
 
                 break;
 
