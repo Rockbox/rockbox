@@ -1185,7 +1185,7 @@ new:
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
-eng: "Backspace"
+eng: ""
 voice: ""
 new:
 
