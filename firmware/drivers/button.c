@@ -192,6 +192,6 @@ int button_get(void)
 
 /* -----------------------------------------------------------------
  * local variables:
- * eval: (load-file "rockbox-mode.el")
+ * eval: (load-file "../rockbox-mode.el")
  * end:
  */
