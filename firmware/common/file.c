@@ -266,9 +266,9 @@ int lseek(int fd, int offset, int whence)
             errno = EIO;
             return -1;
         }
+        openfiles[fd].cacheoffset = sectoroffset;
     }
 
-    openfiles[fd].cacheoffset = sectoroffset;
     openfiles[fd].fileoffset = pos;
 
     return pos;
