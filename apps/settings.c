@@ -182,12 +182,14 @@ static const struct bit_entry rtc_bits[] =
     {2, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one" },
     /* LCD */
     {6, S_O(contrast), 40, "contrast", NULL },
-#ifdef HAVE_BACKLIGHT
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_CHARGING
     {1, S_O(backlight_on_when_charging), false, 
         "backlight when plugged", off_on },
+#endif
     {5, S_O(backlight_timeout), 5, "backlight timeout",
         "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90" },
-#endif
+#endif /* CONFIG_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
     {1, S_O(invert), false, "invert", off_on },
     {1, S_O(flip_display), false, "flip display", off_on },
@@ -247,7 +249,7 @@ static const struct bit_entry hd_bits[] =
 
     /* # of bits, offset+size, default, .cfg name, .cfg values */
     /* more display */
-#ifdef HAVE_BACKLIGHT
+#ifdef CONFIG_BACKLIGHT
     {1, S_O(caption_backlight), false, "caption backlight", off_on },
 #endif
     {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */

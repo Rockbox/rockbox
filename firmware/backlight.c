@@ -28,7 +28,7 @@
 #include "power.h"
 #include "system.h"
 
-#ifdef HAVE_BACKLIGHT
+#ifdef CONFIG_BACKLIGHT
 
 const char backlight_timeout_value[19] =
 {
@@ -51,30 +51,30 @@ static unsigned int backlight_timeout = 5;
 
 static void __backlight_off(void)
 {
-#ifdef IRIVER_H100
+#if CONFIG_BACKLIGHT == BL_IRIVER
     GPIO1_OUT  |= 0x00020000;
-#else
-#ifdef HAVE_RTC
+#elif CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
-#else
-    and_b(~0x40, &PAIORH);
-#endif
+#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
+    and_b(~0x40, &PAIORH); /* let it float (up) */
+#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
+    and_b(~0x40, &PADRH); /* drive it low */
 #endif
 }
 
 static void __backlight_on(void)
 {
-#ifdef IRIVER_H100
+#if CONFIG_BACKLIGHT == BL_IRIVER
     GPIO1_OUT  &= ~0x00020000;
-#else
-#ifdef HAVE_RTC
+#elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
-#else
-    and_b(~0x40, &PADRH);
+#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
+    and_b(~0x40, &PADRH); /* drive an set low */
     or_b(0x40, &PAIORH);
-#endif
+#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
+    or_b(0x40, &PADRH); /* drive it high */
 #endif
 }
 
@@ -187,15 +187,13 @@ void backlight_init(void)
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
                   
-#ifdef HAVE_LCD_CHARCELLS 
+#if CONFIG_BACKLIGHT == BL_IRIVER
+    GPIO1_ENABLE  |= 0x00020000;
+    GPIO1_FUNCTION |= 0x00020000;
+#elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
 #endif    
-
-#ifdef IRIVER_H100
-    GPIO1_ENABLE  |= 0x00020000;
-    GPIO1_FUNCTION |= 0x00020000;
-#endif
     backlight_on();
 }
 
@@ -210,5 +208,5 @@ void backlight_set_timeout(int index) {(void)index;}
 bool backlight_get_on_when_charging(void) {return 0;}
 void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
 
-#endif /* #ifdef HAVE_BACKLIGHT */
+#endif /* #ifdef CONFIG_BACKLIGHT */
 

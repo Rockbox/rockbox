@@ -25,7 +25,7 @@
 #define ROM_START 0x11010
 
 /* Define this for LCD backlight available */
-#define HAVE_BACKLIGHT
+#define CONFIG_BACKLIGHT BL_IRIVER /* port controlled */
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600

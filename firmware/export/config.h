@@ -46,6 +46,12 @@
 #define BATT_4AA_NIMH       1500
 #define BATT_3AAA_ALKALINE  1000
 
+/* CONFIG_BACKLIGHT */
+#define BL_PA14_LO  0 /* Player, PA14 low active */
+#define BL_RTC      1 /* Recorder, RTC square wave output */
+#define BL_PA14_HI  2 /* Ondio, PA14 high active */
+#define BL_IRIVER   3 /* IRiver GPIO */
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"

@@ -65,7 +65,7 @@
 #define HAVE_LED
 
 /* Define this for LCD backlight available */
-#define HAVE_BACKLIGHT
+#define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
 
 /* Define this for S/PDIF output available */
 #define HAVE_SPDIF_OUT

@@ -64,6 +64,6 @@
 #define HAVE_LED
 
 /* Define this for LCD backlight available */
-#define HAVE_BACKLIGHT
+#define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
 
 #endif /* SIMULATOR */
