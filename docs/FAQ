@@ -31,73 +31,57 @@ A7. Start by reading up on the information about the jukeboxes on our web page.
     Then go into CVS and look at the code we've written. Then take what you
     need and start writing.
 
-Q8. Okay, so how do I submit a patch?
-A8. Run: "diff -ub oldfile newfile > patchfile" against the file(s) you have 
-    changed.  Then submit the patch to the project via Sourceforge's patch
-    tracker.  See: http://sourceforge.net/tracker/?group_id=44306&atid=439120
-    Your patch will be taken under consideration. Please remember that all 
-    submissions are not automatically accepted. This is nothing personal.
-
-    Preferrably, run the diff against the current cvs code:
-        cvs diff -ub > patchfile
-
-    One last note.  We would appreciate it if *all* patches, files and fixes 
-    that are meant for inclusion in the sources would be posted to the patch
-    tracker.  Patches sent to the mailing list are quickly lost in the 
-    traffic of the list itself.  (And looking back in the archives for 
-    missed patches quickly becomes a nightmare.)
-
-Q9. I want to join the development team, but don't have a SourceForge account,
+Q8. I want to join the development team, but don't have a SourceForge account,
     what should I do?
-A9. You don't need a SourceForge account to help developing Rockbox. Just
-    submit patches as per the instructions above.
+A8. You don't need a SourceForge account to help developing Rockbox. Just
+    submit patches (http://rockbox.haxx.se/docs/patch.html)
 
     If your patches are consistently well-written and thus accepted, you may
     ultimately be offered CVS commit access. If that should happen, you will
     need to get a Sourceforge account:
     http://sourceforge.net/account/register.php
 
-Q10. Do you have a mailing list?
-A10. Sure do!  As a matter of fact, we have several of them for specific 
+Q9. Do you have a mailing list?
+A9. Sure do!  As a matter of fact, we have several of them for specific 
      things.  Please check out: http://rockbox.haxx.se/mail/
 
-Q11. Great you have a mailing list!  Is there anyway for me to catch up on
+Q10. Great you have a mailing list!  Is there anyway for me to catch up on
      past posts?
-A11. Check out the archives at: http://rockbox.haxx.se/mail/
+A10. Check out the archives at: http://rockbox.haxx.se/mail/
 
-Q12. How can I meet the developers working on the project?
-A12. One way is by visiting us on IRC.  Head on over to the server
+Q11. How can I meet the developers working on the project?
+A11. One way is by visiting us on IRC.  Head on over to the server
      irc.openprojects.net, and then join "#rockbox".  There is usually at 
      least one person there.  If you don't see any activity, feel free to post 
      questions anyway, serveral of us log the channel and will get you answers
      when we unidle.
 
-Q13: Wow, you guys talk on IRC alot?  I wish I had been around for those 
+Q12: Wow, you guys talk on IRC alot?  I wish I had been around for those 
      conversations to see what happened.
-A13: We are glad you mentioned that!  http://rockbox.haxx.se/irc happens
+A12: We are glad you mentioned that!  http://rockbox.haxx.se/irc happens
      to have a list of various logs we have recorded of events in the channel.
      Feel free to read up, and ask questions on what you find.
 
-Q14. What is this "SourceForge" you keep mentioning?
-A14. http://www.sourceforge.net
+Q13. What is this "SourceForge" you keep mentioning?
+A13. http://www.sourceforge.net
 
-Q15. Can the changes or the software that Rockbox suggests or offers 
+Q14. Can the changes or the software that Rockbox suggests or offers 
      possibly damage my Archos Player?
-A15. All firmware mods that are presented are still highly experimental. 
+A14. All firmware mods that are presented are still highly experimental. 
      Try them at your own risk. We offer no guarantee that this software, or 
      the hardware modifications we show, will not damage your player or void 
      your warranty.  That said, we have not been able to damage any of our 
      units by modifying only the firmware. You can accidentally password 
      protect your harddisk, but there are ways around that. (See below.)
 
-Q16. I want to see what the inside of my player looks like, but I would really
+Q15. I want to see what the inside of my player looks like, but I would really
      like to avoid voiding my warranty.  Is there anything you can suggest?
-A16. We have a collection of photos of both the player and recorder. Look at
+A15. We have a collection of photos of both the player and recorder. Look at
      http://rockbox.haxx.se/internals/
 
-Q17. What exactly are you trying to achieve with this line of development?
+Q16. What exactly are you trying to achieve with this line of development?
      (A.K.A. whats your purpose for being here?)
-A17. Firstly, we wouldn't start something like this if we didn't simply enjoy
+A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
      it profusely. This is great fun!
      Secondly, we feel the firmware is lacking some features and contain a
      number of annoying bugs that we want to fix.
@@ -125,9 +109,9 @@ A17. Firstly, we wouldn't start something like this if we didn't simply enjoy
      being on the list does not mean it isn't a neat idea.  Bring it to 
      the list.
 
-Q18. You mention supporting Ogg Vorbis and other file types on your list of
+Q17. You mention supporting Ogg Vorbis and other file types on your list of
      ideas. What is the status on that?
-A18. Pessimist's Answer: At the current time we believe this is not very
+A17. Pessimist's Answer: At the current time we believe this is not very
      likely. The Micronas chip (MAS3507) decoder in the archos does not
      natively support decoding and there is very little program space in the
      player to implement it ourselves.  The alternative would be to write a
@@ -148,43 +132,43 @@ A18. Pessimist's Answer: At the current time we believe this is not very
      but we only have 4 KB for both code *and* data. So the grim reality is
      that Ogg will never be supported by the Archos Players and Recorders.
 
-Q19. What about supporting playing of WMA files?
-A19. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
+Q18. What about supporting playing of WMA files?
+A18. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
      your own project.
 
-Q20: But you don't understand, I'm not talking about decoding here, 
+Q19: But you don't understand, I'm not talking about decoding here, 
      since the data we want may already be in the decoded format (PCM). 
-A20: Okay, last time.  No.  We have no problems whatsoever reading different 
+A19: Okay, last time.  No.  We have no problems whatsoever reading different 
      file formats, call it PCM, WAV, GRI, PQR or whatever.  The problem is 
      that the CODEC only accepts MP3 data and nothing else. We could write a 
      new CODEC if we knew how to do it, but there is no documentation on the 
      DSP. Please note that we have no access to the DAC, so we can't send the 
      data directly to the DAC.
 
-Q21. What is the most recent version of Rockbox?
-A21. We recently released version 1.4, so head on over to 
+Q20. What is the most recent version of Rockbox?
+A20. We recently released version 1.4, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
      (http://rockbox.haxx.se/download/rockbox-1.4-notes.txt).  
 
-Q22. What do you plan to add to coming versions?
-A22. We have a rough idea of which features we plan/expect/hope to be included
+Q21. What do you plan to add to coming versions?
+A21. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
      Version 2.0
           Recording, Autobuild playlists, File/directory management
 
-Q23. I tried one of your firmware files and now I can't access my harddisk!
+Q22. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
                      Part. Error
                      Pls Chck HD
-A23. Your harddisk has been password protected. We're not 100% sure why it
+A22. Your harddisk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
      http://rockbox.haxx.se/lock.html
 
-Q24: This FAQ doesn't answer the question I have.  What should I do?
-A24: You have a couple options here.  You could forget the question, find an
+Q23: This FAQ doesn't answer the question I have.  What should I do?
+A23: You have a couple options here.  You could forget the question, find an
      easier question, or accept '42' as the answer no matter what.  We don't 
      really recommend any of these (though I do opt for '42' often myself).
      What we do recommend is stopping by IRC, reading 
@@ -193,43 +177,43 @@ A24: You have a couple options here.  You could forget the question, find an
      mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the 
      project homepage.
 
-Q25: Are there other ways to contact the developers?
-A25: Yes.
+Q24: Are there other ways to contact the developers?
+A24: Yes.
 
-Q26: Are you going to tell us what they are?
-A26: No.  Post to the mailing list and we will get back to you.
+Q25: Are you going to tell us what they are?
+A25: No.  Post to the mailing list and we will get back to you.
 
-Q27: But I _really_ want to talk with you in person.
-A27: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
+Q26: But I _really_ want to talk with you in person.
+A26: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
      doctors here won't let me have pens or pencils.  They say its some rule
      about us not having sharp objects.  I'm sorry.  Now please stop calling me
      here.
 
-Q28: Will you ever port Quake II to the Archos?
-A28: If you ask that again, I'm sending your address and phone number to the 
-     guy that mailed us with question #25.
+Q27: Will you ever port Quake II to the Archos?
+A27: If you ask that again, I'm sending your address and phone number to the 
+     guy that mailed us with question #24.
 
-Q29: Umm, was that sarcasm?
-A29: That's it, I'm mailing him now.
+Q28: Umm, was that sarcasm?
+A28: That's it, I'm mailing him now.
 
-Q30: Is this legal? I mean, I'd just hate to see something like that 
+Q29: Is this legal? I mean, I'd just hate to see something like that 
      challenged under the DMCA in all its ridiculousness. Any thoughts or 
      ideas?
-A30: We believe we are in the green on this.  We are not violating anyone's
+A29: We believe we are in the green on this.  We are not violating anyone's
      copyright and we are not circumventing any copy protection scheme.
      This has been a big point for the project since its inception.  Some 
      people wanted us to distribute patched versions of the original firmware,
      but seeing as that _would_ have violated Archos' copyright, we didn't 
      follow that course of action.
 
-Q31: On the website [and various information postings] you state 
+Q30: On the website [and various information postings] you state 
         "Every tiny bit was reverse engineered, disassembled and then 
          re-written from scratch".  
      If it was rewritten from scratch then why was it first reverse-engineered
      and disassembled? Instead this sounds more like someone disassembled it
      then used the understanding that they gained to create a new version,
      which is not quite the same as "from scratch". 
-A31: Don't confuse the terms.  Reverse engineering means examining a product 
+A30: Don't confuse the terms.  Reverse engineering means examining a product 
      to find out how it works.  Disassembling the firmware is merely one tool 
      used in that examination.  Oscilloscopes and logic analyzers are other 
      tools we have used.  We have written every single byte of the Rockbox 
@@ -239,11 +223,11 @@ A31: Don't confuse the terms.  Reverse engineering means examining a product
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
 
-Q32: Wait a minute here.  When you released version 1.0 you did not have a 
+Q31: Wait a minute here.  When you released version 1.0 you did not have a 
      single one of the ideas you have mentioned on your website actually 
      implimented!  Calling this version 1.0 is really misleading.  Whats the 
      story?!
-A32: In simple terms, the first release was called 1.0 because it had a basic 
+A31: In simple terms, the first release was called 1.0 because it had a basic 
      working feature set that worked and had no known bugs. That is what 1.0 
      meant.  It is true that Rockbox 1.0 lacked most of the feature set that 
      every sane user wanted.  However, we never said it was more 
@@ -255,9 +239,9 @@ A32: In simple terms, the first release was called 1.0 because it had a basic
      more recent releases we have completed many of our desired goals, and 
      several new ones that were implimented to fullfill user requests.
 
-Q33: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
+Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
-A33: Rolo is our bootloader.  Rolo became available with our 1.4 release.
+A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
      To make use of Rolo, you must have a file with the same extension as 
      your Rockbox firmware (.ajz on Recorder, .mod on Player) but a different
      name.   You can then browse to it, and you 'run' the other firmware
@@ -267,22 +251,26 @@ A33: Rolo is our bootloader.  Rolo became available with our 1.4 release.
      to Rockbox you may need to reboot manually if the new firmware you loaded
      does not have a bootloader itself.)
 
-Q34: Can I use the Archos as an USB harddisk to store data from my PDA/
+Q33: Can I use the Archos as an USB harddisk to store data from my PDA/
      digital camera/phone etc.
-A34: No. USB is a master/slave protocol, and both the Archos and your device
+A33: No. USB is a master/slave protocol, and both the Archos and your device
      are slaves. Two slaves cannot communicate without a master (usually a PC).
      (An upcoming extension called USB On-The-Go will let slaves communicate
      without a master, but current Archoses will not be able to support that.)
 
-Q35: When I use RockBox my jukebox's red "error" light turns on a lot, but this
+Q34: When I use RockBox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
-A35: Rockbox uses the red LED as harddisk activity light, not as an error 
+A34: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
 
-Q36: I have a question about the batteries...
-A36: STOP!  We have put together a completely different FAQ for battery 
+Q35: I have a question about the batteries...
+A35: STOP!  We have put together a completely different FAQ for battery 
      related questions.  
      Check out: http://rockbox.haxx.se/docs/battery-faq.html
+
+Q36. I have a question about patches...
+A36. Check out http://rockbox.haxx.se/docs/patch.html as it should answer any
+     patch related questions you may have.
 
 Q37: What is the WPS?
 A37: That is the 'While Playing Screen'.  Basically this is what is shown on
@@ -295,51 +283,45 @@ A38: It is very good if you want information about the current item playing ;)
      a feature that's not there, we are _always_ open to suggestions!) 
      Please see http://rockbox.haxx.se/manual/wps.html for information.
 
-Q39: So how do I load/make a .wps file?
-A39: You check out http://rockbox.haxx.se/docs/custom_wps_format.html to learn
+Q40: So how do I load/make a .wps file?
+A40: You check out http://rockbox.haxx.se/docs/custom_wps_format.html to learn
      the format/features of a .wps file, and you visit 
      http://rockbox.haxx.se/manual/wps.html to learn how to load it ;)
 
-Q40: Does Rockbox support other languages?
-A40: Sure do.  See the next question.
+Q41: Does Rockobx support other languages? How do I load/use different 
+     languages?
+A41: See: http://rockbox.haxx.se/lang
 
-Q41: How do I load/use different languages? (Recorder-only)
-A41: In the sense of brevity (wouldn't that be a first), check out:
-     http://rockbox.haxx.se/lang
+Q42: Does Rockbox support other fonts/character sets?
+A42: Recorders do, Players don't.
 
-Q42: Why can't I use other languages on the Player?
-A42: See the answer to question 45.
+Q43: How do I use the loadable fonts?
+A43: If you own a Recorder see: http://rockbox.haxx.se/fonts/  Players
+     cannot make use of loadable fonts.
 
-Q43: Does Rockbox support other fonts/character sets?
-A43: Yuppers.  See the next question.
-
-Q44: How do I use the loadable fonts? (Recorder-only)
-A44: That's and easy one.  To use a loadable font you load it.
-     For less sarcasm check out: http://rockbox.haxx.se/fonts/
-
-Q45: Why can't I use loadable fonts on the Player? 
-A45: This is because the Player font is character cell based (as opposed to 
+Q44: Why can't I use loadable fonts on the Player? 
+A44: This is because the Player font is character cell based (as opposed to 
      the Recorder's bitmap based display).  This
      means that we are able to choose what characters to display, but not how
      to display them.  We do have the ability to change/create up to 4 chars 
      on one model and 8 on another, however we are currently using several of 
      these 'letters' to store icons for the player.
 
-Q46: Why don't you have any games available for the Players?
-A46: The display on the Players is character cell and not bitmap based.  
+Q45: Why don't you have any games available for the Players?
+A45: The display on the Players is character cell and not bitmap based.  
      This means we can only control what characters get displayed, not
      what pixels are shown.  This makes the prospect of game play very 
      slim (at least for anything involving graphics, so if you have text
      based games that only use 2 lines send them on in!).
 
-Q47: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
+Q46: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
      STOP (Player) key be locked?
-A47: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
+A46: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
      hardware. The firmware can read the keys, but can't prevent them from
      shutting off the player.
 
-Q48: Where's the recording option?  Why can't I record?!!
-A48: I'd like to say we hid it because we don't like you, but you seem to be
+Q47: Where's the recording option?  Why can't I record?!!
+A47: I'd like to say we hid it because we don't like you, but you seem to be
      a good person so here's the truth.  It's just not implimented in Rockbox
      yet.  But stress not, you can still use Rolo to boot the default Archos
      firmware and record from there.  (Check out question #33).
@@ -348,19 +330,19 @@ A48: I'd like to say we hid it because we don't like you, but you seem to be
      Recording. If you're brave and want to help out, get one, try out and
      report your findings!
 
-Q49: When recording is finally implimented in Rockbox, will it be possible to
+Q48: When recording is finally implimented in Rockbox, will it be possible to
      use custom codecs (like LAME) or is there a built in codec in the Archos?
-A49: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
+A48: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
 
-Q50: What are the max/min bitrates for recording on the Recorder's encoder?
-A50: The builtin encoder is variable bit rate only with a max of 192kbit/s,
+Q49: What are the max/min bitrates for recording on the Recorder's encoder?
+A49: The builtin encoder is variable bit rate only with a max of 192kbit/s,
      and a min of 32kbit/s.
 
-Q51: Would it be possible to record from line in on the player?
-A51: No.
+Q50: Would it be possible to record from line in on the player?
+A50: No.
 
-Q52: I have a question about the id3v1 and id3v2 tags...
-A52: Stop!  Here is all the information about that (if you still have
+Q51: I have a question about the id3v1 and id3v2 tags...
+A51: Stop!  Here is all the information about that (if you still have
      questions when done, ask then.)
 
      - Rockbox supports both id3v1 and id3v2
@@ -376,8 +358,8 @@ A52: Stop!  Here is all the information about that (if you still have
      - The 300-byte limit is subject to be removed in a future version
        (Actually, it is already removed in post-1.4 versions)
 
-Q53: Where exactly did the name 'Rockbox' come from?
-A53: Well you can follow the full line of emails at 
+Q52: Where exactly did the name 'Rockbox' come from?
+A52: Well you can follow the full line of emails at 
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0062.shtml
      However, the brief rundown is that it was recommended first by 
      Tome Cvitan, and put to a vote (which it lost). 
@@ -388,8 +370,8 @@ A53: Well you can follow the full line of emails at
      
      There you have it.  Recommended by users, decision by dictator.
 
-Q54: Why is there a limit of 400 files in a directory?
-A54: We have answered this question numerous times.  It is mentioned in the
+Q53: Why is there a limit of 400 files in a directory?
+A53: We have answered this question numerous times.  It is mentioned in the
      release notes, and in the mailing list archives 
      (http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-08/0448.shtml).
      But, hey, we wouldn't want people to have to work to get an answer.  
@@ -401,9 +383,9 @@ A54: We have answered this question numerous times.  It is mentioned in the
      file limits in order to provide a greater amount of memory for buffering 
      of files being played.
 
-Q55: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
+Q54: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
      have this be dynamically allocated?
-A55: Because it's useless.  Dynamic memory is only ever useful if you have 
+A54: Because it's useless.  Dynamic memory is only ever useful if you have 
      memory consumers (tasks) that run at different points in time, and thus 
      can reuse the same memory for different purposes. 
 
@@ -421,22 +403,22 @@ A55: Because it's useless.  Dynamic memory is only ever useful if you have
      else is able to use it. This is standard practice in memory-limited 
      systems. 
 
-Q56: Why is there a 10,000 song limit on playlists?
-A56: This is another hardcoded limit.  We feel that as bigger disks arrive 
+Q55: Why is there a 10,000 song limit on playlists?
+A55: This is another hardcoded limit.  We feel that as bigger disks arrive 
      that this limit will increase.  Because of the way that playlists are
      stored, it tends to be a bit more maleable then the directory file limit.
      For further detail, look at questions 47 and 48 and replace any instances
      of '200' with '10,000'.
 
-Q57: You don't understand! I _really_ need to have more then 400 files
+Q56: You don't understand! I _really_ need to have more then 400 files
      in a directory!
-A57: The use of really big directories was a workaround for the poor playlist
+A56: The use of really big directories was a workaround for the poor playlist
      capabilities of the original Archos firmware. With Rockbox, you no longer
      need this workaround. Organize your files in directories, then build
      playlists for all collections you want to shuffle-play.
 
-Q58: How can I make playlists on my PC?
-A58: There are many programs that can create .m3u playlists. WinAmp is one.
+Q57: How can I make playlists on my PC?
+A57: There are many programs that can create .m3u playlists. WinAmp is one.
      Another simple method, that requires no extra software, is to use dir:
 
        dir /b /s X:\ > X:\allfiles.m3u
@@ -452,8 +434,8 @@ A58: There are many programs that can create .m3u playlists. WinAmp is one.
      Remember that playlists are simple text files. You can edit them with any
      normal text editor.
 
-Q59: How does the shuffle work?
-A59: It sees the playlist as a deck of cards, shuffling the entries using a
+Q58: How does the shuffle work?
+A58: It sees the playlist as a deck of cards, shuffling the entries using a
      pseudo-random generator called the Mersenne Twister. After shuffling,
      the list is never changed again until you reshuffle the list, by
      stopping the playback and restarting. If the repeat mode is enabled,
@@ -463,8 +445,8 @@ A59: It sees the playlist as a deck of cards, shuffling the entries using a
      resume feature can shuffle the playlist in exactly the same way when
      resuming.
 
-Q60: How can I find out about all the neat features that Rockbox has?
-A60: This information is in our manual (It sometimes gets a bit out of
+Q59: How can I find out about all the neat features that Rockbox has?
+A59: This information is in our manual (It sometimes gets a bit out of
      date, so please bear with us.)  The information you are most likely 
      looking for is a bit down the tree, so the here is the url:
      http://rockbox.haxx.se/manual/rec-general.html
@@ -472,12 +454,12 @@ A60: This information is in our manual (It sometimes gets a bit out of
      Also, check out the features-list at:
      http://rockbox.haxx.se/docs/features.html
 
-Q61: How can I see what bugs are currently open/being worked on?
-A61: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
+Q60: How can I see what bugs are currently open/being worked on?
+A60: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
      that have been reported.
 
-Q62: How can I report about bugs in Rockbox?
-A62: If we were better programmers we would take that as an insult.  But we
+Q61: How can I report about bugs in Rockbox?
+A61: If we were better programmers we would take that as an insult.  But we
      aren't, so we won't.  The first step in reporting a bug is to review 
      the rules we ask you to follow in your submission (listed at: 
      http://rockbox.haxx.se/bugs.shtml#rules).
@@ -487,8 +469,8 @@ A62: If we were better programmers we would take that as an insult.  But we
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
 
-Q63: Could you tell me how to apply a patch?
-A63: There are a ton of ways to apply a patch.  One way is to use the (GNU)
+Q62: Could you tell me how to apply a patch?
+A62: There are a ton of ways to apply a patch.  One way is to use the (GNU)
      'patch' program.  It used like this:
 
        $ cd rockbox-root
@@ -505,8 +487,8 @@ A63: There are a ton of ways to apply a patch.  One way is to use the (GNU)
      If patch can't apply some changes that are in the diff, you'll get those
      particular changes in a file named "[source-file].rej".
 
-Q64: Whats with all the different versions of Rockbox?
-A64: There are really only two versions of Rockbox.  One for Players and one
+Q63: Whats with all the different versions of Rockbox?
+A63: There are really only two versions of Rockbox.  One for Players and one
      for Recorders.  However, we do have 3 other 'versions' of Rockbox 
      available for download.  These would be Releases, Daily Builds, and 
      Bleeding Edge.
@@ -531,32 +513,32 @@ A64: There are really only two versions of Rockbox.  One for Players and one
      but would love to hear any reports you may have about Release or Daily
      build versions. (see question #62).
             
-Q65: I am in Windows and can't create a .rockbox directory to store my
+Q64: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
-A65: We won't.  The limitations of your operating system is not reason 
+A64: We won't.  The limitations of your operating system is not reason 
      enough for us to change how we handle things.  And you _can_ create
      this directory.  Open a command line and type:
           mkdir j:\.rockbox
      You will need to correct the location for the drive letter that Windows
      assigns to your drive.
 
-Q66: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
+Q65: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
      fix this?
-A66: Truth is, we don't need to fix anything.  If you are using OSX then you
+A65: Truth is, we don't need to fix anything.  If you are using OSX then you
      can just open a console, change directories to the device and just:
           mkdir .rockbox
 
      If you are in another version then you should be able to do command-N in 
      the Finder, then name the folder.  
          
-Q67: Will Rockbox work on an of Archos' other units? (FM player, Multimedia)
-A67: Unfortunately, RockBox will not likely support any units other than
+Q66: Will Rockbox work on an of Archos' other units? (FM player, Multimedia)
+A66: Unfortunately, RockBox will not likely support any units other than
      those that we do currently support.
 
-Q68: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
+Q67: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
      safely and rebooted. But Rockbox still didn't load. What is wrong?
      I am running Windows.
-A68: The old MOD/AJZ was not entirely deleted from the disk. It is still
+A67: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
 
@@ -585,8 +567,8 @@ A68: The old MOD/AJZ was not entirely deleted from the disk. It is still
 
      (Thanks to Olivier Rafidison for this info)
 
-Q69: What kind of mic can I connect to my AJBR?
-A69: There are several types of microphones.
+Q68: What kind of mic can I connect to my AJBR?
+A68: There are several types of microphones.
 
      Dynamic: The one that's available from archos is a dynamic one.
      Their output level is high enough so that they don't need an
@@ -644,20 +626,20 @@ A69: There are several types of microphones.
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
      (As described, you also need amplification.)
 
-Q70: I can't start rockbox when the charger is connected. What am I doing
+Q69: I can't start rockbox when the charger is connected. What am I doing
      wrong?
-A70: If your device is off and you connect the charger, the Archos charger code
+A69: If your device is off and you connect the charger, the Archos charger code
      is started immediately. You can then start Rockbox with holding down the
      ON key for several seconds. Hold the key down a really long time, until
      you see the Rockbox logo!
 
-Q71: Why can't you implement a crossfader? That would be so cool!
-A71: To crossfade you need to decode two MP3 streams simultaneously. The MP3
+Q70: Why can't you implement a crossfader? That would be so cool!
+A70: To crossfade you need to decode two MP3 streams simultaneously. The MP3
      decoding is done in hardware and we only have one decoder chip, so it
      can't be done. Sorry.
 
-Q72: My screen is all black/white when I run Rockbox on my Recorder!
-A72: We have no way of knowing the correct contrast setting from start and the
+Q71: My screen is all black/white when I run Rockbox on my Recorder!
+A71: We have no way of knowing the correct contrast setting from start and the
      displays differ a lot. Change your contrast setting by doing this:
 
      F1, down, right, down, down, right, down, down, down, right, down (until
