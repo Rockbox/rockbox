@@ -4,29 +4,24 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I../../common -I../.. -I../../drivers
+FIRMWARE=../..
+
+INCLUDES=-I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
 
 TARGET = -DARCHOS_PLAYER_OLD=1
 
 CFLAGS = -g -W -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
-OBJS= ../../crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o \
-	../../debug.o ../../kernel.o thread.o ../../common/sprintf.o \
-	../../drivers/dac.o ../../panic.o ../../system.o ../../drivers/led.o \
-	../../drivers/lcd.o ata.o ../../drivers/fat.o \
-	../../common/disk.o ../../common/file.o ../../common/dir.o
-
-%.o: %.S
-	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
-
+SRC := $(wildcard *.c)
+OBJS := $(SRC:%.c=%.o) $(FIRMWARE)/crt0.o
+DEPS:=.deps
+DEPDIRS:=$(DEPS)
 
 all : archos.mod
 
-main.o: main.c
-
 archos.elf : $(OBJS) app.lds
-	$(CC) -nostartfiles -o archos.elf $(OBJS) -lgcc -Tapp.lds -Wl,-Map,archos.map
+	$(CC) -nostartfiles -o archos.elf $(OBJS) -lgcc -lrockbox -L$(FIRMWARE) -Tapp.lds -Wl,-Map,archos.map
 
 archos.bin : archos.elf
 	$(OC) -O binary archos.elf archos.bin
@@ -45,16 +40,14 @@ dist:
 
 clean:
 	-rm -f $(OBJS) *.x *.i *.o *.s *.elf *.bin *.map *.mod *.bak *~
+	-$(RM) -r $(DEPS)
 
-install:
-	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
+$(DEPS)/%.d: %.c
+	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
+	@echo "Updating dependencies for $<"
+	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+		|sed '\''s|\($*\)\.o[ :]*|\1.o $(<:%.c=%.d) : |g'\'' > $@; \
+		[ -s $@ ] || rm -f $@'
 
-thread.o: ../../thread.c
-	$(CC) -O $(CFLAGS) -fomit-frame-pointer -c $<
-
-ata.o: ../../drivers/ata.c
-	$(CC) -O $(CFLAGS) -c $<
-
-main.o: main.c
-	$(CC) -O $(CFLAGS) -c $<
+-include $(SRC:%.c=$(DEPS)/%.d)
 
