@@ -994,7 +994,7 @@ bool settings_load_config(char* file)
             set_cfg_bool(&global_settings.scrollbar, value);
         else if (!strcasecmp(name, "invert"))
             set_cfg_bool(&global_settings.invert, value);
-        else if (!strcasecmp(name, "flip diplay"))
+        else if (!strcasecmp(name, "flip display"))
             set_cfg_bool(&global_settings.flip_display, value);
         else if (!strcasecmp(name, "invert cursor"))
             set_cfg_bool(&global_settings.invert_cursor, value);
