@@ -398,6 +398,10 @@ bool dirbrowse(char *root)
                         /* Force a re-read of the root directory */
                         strcpy(currdir, "/");
                         lastdir[0] = 0;
+                        dirlevel = 0;
+                        dircursor = 0;
+                        start = 0;
+                        play_mode = 0;
                     }
                 }
                 restore = true;
@@ -493,6 +497,10 @@ bool dirbrowse(char *root)
                         /* Force a re-read of the root directory */
                         strcpy(currdir, "/");
                         lastdir[0] = 0;
+                        dirlevel = 0;
+                        dircursor = 0;
+                        start = 0;
+                        play_mode = 0;
                     }
                     restore = true;
                 }
@@ -511,6 +519,10 @@ bool dirbrowse(char *root)
                 restore = true;
                 strcpy(currdir, "/");
                 lastdir[0] = 0;
+                dirlevel = 0;
+                dircursor = 0;
+                start = 0;
+                play_mode = 0;
                 break;
 #endif
         }
