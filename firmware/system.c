@@ -66,22 +66,22 @@ default_interrupt (UB,      12);
 reserve_interrupt (         13);
 reserve_interrupt (         14);
 reserve_interrupt (         15);
-reserve_interrupt (         16); // TCB #0
-reserve_interrupt (         17); // TCB #1
-reserve_interrupt (         18); // TCB #2
-reserve_interrupt (         19); // TCB #3
-reserve_interrupt (         20); // TCB #4
-reserve_interrupt (         21); // TCB #5
-reserve_interrupt (         22); // TCB #6
-reserve_interrupt (         23); // TCB #7
-reserve_interrupt (         24); // TCB #8
-reserve_interrupt (         25); // TCB #9
-reserve_interrupt (         26); // TCB #10
-reserve_interrupt (         27); // TCB #11
-reserve_interrupt (         28); // TCB #12
-reserve_interrupt (         29); // TCB #13
-reserve_interrupt (         30); // TCB #14
-reserve_interrupt (         31); // TCB #15
+reserve_interrupt (         16); /* TCB #0 */
+reserve_interrupt (         17); /* TCB #1 */
+reserve_interrupt (         18); /* TCB #2 */
+reserve_interrupt (         19); /* TCB #3 */
+reserve_interrupt (         20); /* TCB #4 */
+reserve_interrupt (         21); /* TCB #5 */
+reserve_interrupt (         22); /* TCB #6 */
+reserve_interrupt (         23); /* TCB #7 */
+reserve_interrupt (         24); /* TCB #8 */
+reserve_interrupt (         25); /* TCB #9 */
+reserve_interrupt (         26); /* TCB #10 */
+reserve_interrupt (         27); /* TCB #11 */
+reserve_interrupt (         28); /* TCB #12 */
+reserve_interrupt (         29); /* TCB #13 */
+reserve_interrupt (         30); /* TCB #14 */
+reserve_interrupt (         31); /* TCB #15 */
 default_interrupt (TRAPA32, 32);
 default_interrupt (TRAPA33, 33);
 default_interrupt (TRAPA34, 34);
@@ -330,7 +330,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_setfont(FONT_SYSFIXED);
 #endif
     /* output exception */
-    n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
+    n = (n - (unsigned)UIE0 - 4)>>2; /* get exception or interrupt number */
     snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
     lcd_puts(0,0,str);
     snprintf(str,sizeof(str),"at %08x",pc);

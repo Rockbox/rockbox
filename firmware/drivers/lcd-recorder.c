@@ -57,16 +57,16 @@
 #define LCD_SET_END_OF_READ_MODIFY_WRITE_MODE     ((char)0xEE)
 
 /* LCD command codes */
-#define LCD_CNTL_RESET          0xe2    // Software reset
-#define LCD_CNTL_POWER          0x2f    // Power control
-#define LCD_CNTL_CONTRAST       0x81    // Contrast
-#define LCD_CNTL_OUTSCAN        0xc8    // Output scan direction
-#define LCD_CNTL_SEGREMAP       0xa1    // Segment remap
-#define LCD_CNTL_DISPON         0xaf    // Display on
+#define LCD_CNTL_RESET          0xe2    /* Software reset */
+#define LCD_CNTL_POWER          0x2f    /* Power control */
+#define LCD_CNTL_CONTRAST       0x81    /* Contrast */
+#define LCD_CNTL_OUTSCAN        0xc8    /* Output scan direction */
+#define LCD_CNTL_SEGREMAP       0xa1    /* Segment remap */
+#define LCD_CNTL_DISPON         0xaf    /* Display on */
 
-#define LCD_CNTL_PAGE           0xb0    // Page address
-#define LCD_CNTL_HIGHCOL        0x10    // Upper column address
-#define LCD_CNTL_LOWCOL         0x00    // Lower column address
+#define LCD_CNTL_PAGE           0xb0    /* Page address */
+#define LCD_CNTL_HIGHCOL        0x10    /* Upper column address */
+#define LCD_CNTL_LOWCOL         0x00    /* Lower column address */
 
 #define SCROLL_SPACING 3
 

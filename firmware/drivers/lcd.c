@@ -23,15 +23,15 @@
 #define LCDR (PBDR_ADDR+1)
 
 #ifdef HAVE_LCD_CHARCELLS
-#define LCD_DS  1 // PB0 = 1 --- 0001 ---  LCD-DS
-#define LCD_CS  2 // PB1 = 1 --- 0010 --- /LCD-CS
-#define LCD_SD  4 // PB2 = 1 --- 0100 ---  LCD-SD
-#define LCD_SC  8 // PB3 = 1 --- 1000 ---  LCD-SC
+#define LCD_DS  1 /* PB0 = 1 --- 0001 ---  LCD-DS */
+#define LCD_CS  2 /* PB1 = 1 --- 0010 --- /LCD-CS */
+#define LCD_SD  4 /* PB2 = 1 --- 0100 ---  LCD-SD */
+#define LCD_SC  8 /* PB3 = 1 --- 1000 ---  LCD-SC */
 #else
-#define LCD_SD  1 // PB0 = 1 --- 0001
-#define LCD_SC  2 // PB1 = 1 --- 0010
-#define LCD_RS  4 // PB2 = 1 --- 0100
-#define LCD_CS  8 // PB3 = 1 --- 1000
+#define LCD_SD  1 /* PB0 = 1 --- 0001 */
+#define LCD_SC  2 /* PB1 = 1 --- 0010 */
+#define LCD_RS  4 /* PB2 = 1 --- 0100 */
+#define LCD_CS  8 /* PB3 = 1 --- 1000 */
 #define LCD_DS LCD_RS
 #endif
 
