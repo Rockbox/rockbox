@@ -20,7 +20,7 @@ readable and maintainable.
 Language features
 -----------------
 Write normal C code. Don't redefine the language. No new types (structs are
-structs, not typedefs), no C++isms or Javaisms. Also, avoid using "const".
+structs, not typedefs), no C++isms or Javaisms.
 
 Names
 -----
