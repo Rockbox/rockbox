@@ -112,7 +112,7 @@ static void init_config_buffer( void )
     rtc_config_block[0] = 'R';
     rtc_config_block[1] = 'o';
     rtc_config_block[2] = 'c';
-    rtc_config_block[3] = 0x0;	/* config block version number */
+    rtc_config_block[3] = 0x1;	/* config block version number */
 }
 
 #ifdef HAVE_RTC
