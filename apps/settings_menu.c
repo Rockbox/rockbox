@@ -73,8 +73,8 @@ static Menu sort_case(void)
 
 static Menu resume(void)
 {
-    char* names[] = { "off", "ask", "on " };
-    set_option( "Resume", &global_settings.resume, names, 3 );
+    char* names[] = { "off", "ask", "on" };
+    set_option( "Resume", &global_settings.resume, names, 3, NULL );
     return MENU_OK;
 }
 
@@ -85,8 +85,7 @@ static Menu backlight_timer(void)
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
-    set_option("Backlight", &global_settings.backlight, names, 19 );
-    backlight_time(global_settings.backlight);
+    set_option("Backlight", &global_settings.backlight, names, 19, backlight_time );
     return MENU_OK;
 }
 
@@ -172,23 +171,23 @@ static Menu spindown(void)
 
 static Menu ff_rewind_min_step(void) 
 { 
-    char* names[] = { "1s ", "2s ", "3s ", "4s ",
-                      "5s ", "6s ", "8s ", "10s",
+    char* names[] = { "1s", "2s", "3s", "4s",
+                      "5s", "6s", "8s", "10s",
                       "15s", "20s", "25s", "30s",
                       "45s", "60s" };
     set_option("FF/RW Min Step", &global_settings.ff_rewind_min_step,
-                names, 14 ); 
+                names, 14, NULL ); 
     return MENU_OK; 
 } 
 
 static Menu ff_rewind_accel(void) 
 { 
-    char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ", 
-                      "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ", 
-                      "2x/8s ", "2x/9s ", "2x/10s", "2x/11s",
+    char* names[] = { "off", "2x/1s", "2x/2s", "2x/3s", 
+                      "2x/4s", "2x/5s", "2x/6s", "2x/7s", 
+                      "2x/8s", "2x/9s", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
     set_option("FF/RW Accel", &global_settings.ff_rewind_accel, 
-                names, 16 ); 
+                names, 16, NULL ); 
     return MENU_OK; 
 } 
 

@@ -182,21 +182,29 @@ static Menu bass_boost(void)
     return MENU_OK;
 };
 
+static void set_chanconf(int val)
+{
+    mpeg_sound_set(SOUND_CHANNELS, val);
+}
+
+static void set_avc(int val)
+{
+    mpeg_sound_set(SOUND_AVC, val);
+}
+
 static Menu avc(void)
 {
-    char* names[] = { "off", "2s ", "4s ", "8s " };
-    set_option("AV decay time", &global_settings.avc, names, 4 );
-    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+    char* names[] = { "off", "2s", "4s", "8s" };
+    set_option("AV decay time", &global_settings.avc, names, 4, set_avc );
     return MENU_OK;
 }
 #endif /* ARCHOS_RECORDER */
 
 static Menu chanconf(void)
 {
-    char *names[] = {"Stereo   ", "Mono      ", "Mono Left  ", "Mono Right" };
+    char *names[] = {"Stereo", "Mono", "Mono Left", "Mono Right" };
     set_option("Channel configuration",
-               &global_settings.channel_config, names, 4 );
-    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
+               &global_settings.channel_config, names, 4, set_chanconf );
     return MENU_OK;
 }
 

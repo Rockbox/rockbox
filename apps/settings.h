@@ -114,7 +114,8 @@ bool settings_load_eq(char* file);
 void set_bool_options(char* string, bool* variable, char* yes_str, char* no_str );
 
 void set_bool(char* string, bool* variable );
-void set_option(char* string, int* variable, char* options[], int numoptions );
+void set_option(char* string, int* variable, char* options[],
+                int numoptions, void (*function)(int));
 void set_int(char* string, 
              char* unit,
              int* variable,

@@ -587,7 +587,7 @@ void set_bool_options(char* string, bool* variable, char* yes_str, char* no_str 
 {
     char* names[] = { yes_str, no_str };
     int value = !*variable;
-    set_option(string, &value, names, 2);
+    set_option(string, &value, names, 2, NULL);
     *variable = !value;
 }
 
@@ -675,7 +675,8 @@ void set_int(char* string,
     lcd_stop_scroll();
 }
 
-void set_option(char* string, int* variable, char* options[], int numoptions )
+void set_option(char* string, int* variable, char* options[],
+                int numoptions, void (*function)(int))
 {
     bool done = false;
 
@@ -742,6 +743,9 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
                 break;
 #endif
         }
+
+        if ( function )
+            function(*variable);
     }
     lcd_stop_scroll();
 }
