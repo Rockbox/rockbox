@@ -581,3 +581,52 @@ A68: The old MOD/AJZ was not entirely deleted from the disk. It is still
        Power it up and ...voila... Rockbox is there!
 
      (Thanks to Olivier Rafidison for this info)
+
+Q69: What kind of mic can I connect to my AJBR?
+A69: There are several types of microphones.
+     Dynamic: The one that's available from archos is a dynamic one.
+              Their output level is high enough so that they don't need an
+              amplifier (that's the reason why the archos mic is of
+              this type - it's cheap).
+              - cheap
+              - no good sound quality of cheap dynamic mics (good enough for
+                speech)
+              - no amplifier needed
+     Backplate Condenser: These are the professional mics. They need phantom
+              power (48V) for charging the condenser.
+              They also need an amplifier, because their output level is low.
+              - good sound quality
+              - need phantom power (48V)
+              - need amplifier
+              - expensive              
+     Electret Condenser: These capsules are cheap and result in a good recording
+              quality. They don't need phantom power voltage. They need power
+              for the FET (field effect transistor) that's inside. If you have
+              such a mic with a battery in it, it is mostly because of the FET
+              power, not because of an amplification circuit inside the mic.
+              These mics are in all the consumer products like mobile phones,
+              PC headsets and so on.
+              - cheap (2 EUR for a capsule)
+              - good sound quality
+              - need amplifier
+              - need power for the FET (1,5 - 15V)
+     recommendation for do-it-yourselfers: Use electret condenser mic capsules,
+              solder an amplifier for them which both amplifies the output level
+              and feeds the power needed for the FET to the capsule.
+              The one on http://www.geocities.com/ferocious_1999/md/micpreamp2.html
+              was soldered and tested by Uwe Freese, and it works.
+              There are some others available from www.elv.de and other sellers.
+     recommendation for others: Buy some mic + preamp combination which can be
+              plugged into a line in of any amplifier. Maybe such a commercially
+              available combination needs a power supply and doesn't work with
+              batteries. Some are very expensive. (If you know a cheap solution
+              with an electret condenser mic + preamp, please tell us!)
+     what does not work: Don't use an amplifier thing that can be simply connected
+              between some mic cable. Maybe it sounds as if it could work, but
+              I doesn't. If the piece of (expensive) electronic doesn't have a
+              power source and your mic doen't either, it does not work!
+              A PC sound card or md player has usually a power output (same pin
+              where the sound goes through, dc value) for feeding the FET of
+              an electret condenser capsule (see above) (and this power could
+              also used to feed a mic amplifier), but the archos hasn't
+              (it's a line in and no mic in!).
