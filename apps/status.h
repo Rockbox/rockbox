@@ -44,4 +44,7 @@ void status_set_param(bool b);
 void status_set_usb(bool b);
 #endif
 
+#ifdef SIMULATOR
+#include <time.h>
+#endif
 #endif
