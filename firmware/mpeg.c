@@ -794,7 +794,7 @@ void mpeg_prev(void)
 #endif
 }
 
-
+#ifndef SIMULATOR
 #ifndef ARCHOS_RECORDER
 int current_volume=0;  /* all values in tenth of dB */
 int current_treble=0;
@@ -832,7 +832,8 @@ void set_prescaled_volume(void)
     
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 }
-#endif
+#endif /* ARCHOS_RECORDER */
+#endif /* SIMULATOR */
 
 void mpeg_sound_set(int setting, int value)
 {
