@@ -66,3 +66,11 @@ A11. The MP3 encoding hardware does not allow this.
 
 Q12. Change tempo of a song without changing pitch!
 A12. The MP3 decoding hardware does now allow this.
+
+Q13. Increase the 400 file limit in directories!
+A13. The original Archos firmware used really big directories was a workaround 
+     for the poor playlist capabilities of the original Archos firmware.  With 
+     Rockbox, you no longer need this workaround.  Organize your files in 
+     directories, then build playlists for all collections you want to 
+     shuffle-play.  We feel more then 400 files becomes a bit unweildly to 
+     maintain or work with.  Playlists are much easier to manage.
