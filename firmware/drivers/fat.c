@@ -550,10 +550,6 @@ static unsigned int find_free_cluster(unsigned int startcluster)
     unsigned int offset;
     unsigned int i;
 
-    /* Cluster 0 and 1 are reserved */
-    if(startcluster < 2)
-        startcluster = 2;
-    
     sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
     offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
     
@@ -567,7 +563,9 @@ static unsigned int find_free_cluster(unsigned int startcluster)
             int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
             if (!(SWAB32(fat[k]) & 0x0fffffff)) {
                 unsigned int c = nr * CLUSTERS_PER_FAT_SECTOR + k;
-                if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
+                 /* Ignore the reserved clusters 0 & 1, and also
+                    cluster numbers out of bounds */
+                if ( c < 2 || c > fat_bpb.dataclusters+1 )
                     continue;
                 LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
                 fat_bpb.fsinfo.nextfree = c;
