@@ -33,6 +33,7 @@ static char debugbuf[200];
 #include "system.h"
 #include "lcd.h"
 #include "adc.h"
+#include "mas.h"
 
 void debug_init(void)
 {
@@ -291,6 +292,7 @@ void dbg_ports(void)
     unsigned short portb;
     unsigned char portc;
     char buf[32];
+    unsigned long crc_count;
     int button;
     int battery_voltage;
     int batt_int, batt_frac;
@@ -340,6 +342,11 @@ void dbg_ports(void)
                 snprintf(buf, 32, "%s, 0x%x ",
                          ata_device?"slv":"mst", ata_io_address);
                 break;
+            case 11:
+                mas_readmem(MAS_BANK_D0, 0x303, &crc_count, 1);
+                
+                snprintf(buf, 32, "CRC: %d    ", crc_count);
+                break;
         }
         lcd_puts(0, 0, buf);
         
@@ -362,12 +369,12 @@ void dbg_ports(void)
             case BUTTON_LEFT:
                 currval--;
                 if(currval < 0)
-                    currval = 10;
+                    currval = 11;
                 break;
 
             case BUTTON_RIGHT:
                 currval++;
-                if(currval > 10)
+                if(currval > 11)
                     currval = 0;
                 break;
         }
