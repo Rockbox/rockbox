@@ -877,8 +877,6 @@ static int set_features(void)
     };
     int i;
 
-    return 0;
-    
     ATA_SELECT = ata_device;
 
     if (!wait_for_rdy()) {
