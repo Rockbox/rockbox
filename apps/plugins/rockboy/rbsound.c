@@ -3,8 +3,6 @@
 #include "pcm.h"
 #include "rc.h"
 
-#define RBSOUND
-
 struct pcm pcm;
 
 #define BUF_SIZE (8192)
