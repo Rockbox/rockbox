@@ -65,8 +65,8 @@ binutils in the PATH.
  /home/linus> export PATH=/home/linus/sh1/bin:$PATH
  /home/linus> cd build/gcc
  /home/linus/gcc> ../../gcc-3.0.3/configure --target=sh-elf --prefix=/home/linus/sh1 --with-newlib --enable-languages=c
- /home/linus/build/binutils> make
- /home/linus/build/binutils> make install
+ /home/linus/build/gcc> make
+ /home/linus/build/gcc> make install
 </pre>
 <h2>Build GDB</h2>
 <p>
@@ -75,8 +75,8 @@ If you are planning to debug your code with GDB, you have to build it as well.
  /home/linus> export PATH=/home/linus/sh1/bin:$PATH
  /home/linus> cd build/gdb
  /home/linus/gdb> ../../gdb-5.1.1/configure --target=sh-elf --prefix=/home/linus/sh1
- /home/linus/build/binutils> make
- /home/linus/build/binutils> make install
+ /home/linus/build/gdb> make
+ /home/linus/build/gdb> make install
 </pre>
 <h2>Done</h2>
 <p>
