@@ -178,7 +178,7 @@ int fat_mount(int startsector)
     err = ata_read_sectors(startsector,1,buf);
     if(err)
     {
-        DEBUGF( "fat_mount() - Couldn't read BPB (error code %i)\n",
+        DEBUGF( "fat_mount() - Couldn't read BPB (error code %d)\n",
                 err);
         return -1;
     }
@@ -265,30 +265,30 @@ static int bpb_is_sane(void)
 {
     if(fat_bpb.bpb_bytspersec != 512)
     {
-        DEBUGF( "bpb_is_sane() - Error: sector size is not 512 (%i)\n",
+        DEBUGF( "bpb_is_sane() - Error: sector size is not 512 (%d)\n",
                 fat_bpb.bpb_bytspersec);
         return -1;
     }
     if(fat_bpb.bpb_secperclus * fat_bpb.bpb_bytspersec > 32768)
     {
         DEBUGF( "bpb_is_sane() - Warning: cluster size is larger than 32K "
-                "(%i * %i = %i)\n",
+                "(%d * %d = %d)\n",
                 fat_bpb.bpb_bytspersec, fat_bpb.bpb_secperclus,
                 fat_bpb.bpb_bytspersec * fat_bpb.bpb_secperclus);
     }
     if(fat_bpb.bpb_rsvdseccnt != 1)
     {
-        DEBUGF( "bpb_is_sane() - Warning: Reserved sectors is not 1 (%i)\n",
+        DEBUGF( "bpb_is_sane() - Warning: Reserved sectors is not 1 (%d)\n",
                 fat_bpb.bpb_rsvdseccnt);
     }
     if(fat_bpb.bpb_numfats != 2)
     {
-        DEBUGF( "bpb_is_sane() - Warning: NumFATS is not 2 (%i)\n",
+        DEBUGF( "bpb_is_sane() - Warning: NumFATS is not 2 (%d)\n",
                 fat_bpb.bpb_numfats);
     }
     if(fat_bpb.bpb_rootentcnt != 512)
     {
-        DEBUGF( "bpb_is_sane() - Warning: RootEntCnt is not 512 (%i)\n",
+        DEBUGF( "bpb_is_sane() - Warning: RootEntCnt is not 512 (%d)\n",
                 fat_bpb.bpb_rootentcnt);
     }
     if(fat_bpb.bpb_media != 0xf0 && fat_bpb.bpb_media < 0xf8)
@@ -535,7 +535,7 @@ static int add_dir_entry(unsigned int currdir, struct fat_direntry *de)
         if(err)
         {
             DEBUGF( "add_dir_entry() - Couldn't read dir sector"
-                    " (error code %i)\n", err);
+                    " (error code %d)\n", err);
             return -1;
         }
 
@@ -601,7 +601,7 @@ static int add_dir_entry(unsigned int currdir, struct fat_direntry *de)
                     {
                         DEBUGF( "add_dir_entry() - "
                                 " Couldn't write dir"
-                                " sector (error code %i)\n", err);
+                                " sector (error code %d)\n", err);
                         return -1;
                     }
                     break;
@@ -800,7 +800,7 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
                                (char*)buf+(i*SECTOR_SIZE));
         if(err) {
             DEBUGF( "fat_read() - Couldn't read sector %d"
-                    " (error code %i)\n", sector,err);
+                    " (error code %d)\n", sector,err);
             return -1;
         }
 
@@ -873,8 +873,8 @@ int fat_opendir(struct fat_dir *dir, unsigned int currdir)
     err = ata_read_sectors(sec + fat_bpb.startsector,1,dir->cached_buf);
     if(err)
     {
-        DEBUGF( "fat_getfirst() - Couldn't read dir sector"
-                " (error code %i)\n", err);
+        DEBUGF( "fat_opendir() - Couldn't read dir sector"
+                " (error code %d)\n", err);
         return -1;
     }
 
@@ -1014,7 +1014,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
             if(err)
             {
                 DEBUGF( "fat_getnext() - Couldn't read dir sector"
-                        " (error code %i)\n", err);
+                        " (error code %d)\n", err);
                 return -1;
             }
 
