@@ -381,6 +381,7 @@ void settings_reset(void) {
     global_settings.mp3filter   = true;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
+    global_settings.loop_playlist = true;
     global_settings.playlist_shuffle = false;
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
