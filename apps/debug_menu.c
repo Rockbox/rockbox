@@ -1964,6 +1964,8 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
+#endif
+#ifdef IRIVER_H100
         { "Audio test", uda1380_test },
 #endif
 #if CONFIG_CPU == SH7034
