@@ -274,6 +274,7 @@ static int last_dma_chunk_size;
 
 static bool dma_on;  /* The DMA is active */
 static bool playing; /* We are playing an MP3 stream */
+static bool play_pending; /* We are about to start playing */
 static bool filling; /* We are filling the buffer with data from disk */
 
 static int mpeg_file;
@@ -346,17 +347,17 @@ static void stop_dma(void)
 
 static void dma_tick(void)
 {
-    /* Start DMA if it isn't running */
-    if(playing && !dma_on)
+    if(playing)
     {
-        if(PBDR & 0x4000)
+	/* Start DMA if it is disabled and the DEMAND pin is high */
+        if(!dma_on && (PBDR & 0x4000))
         {
             if(!(SCR0 & 0x80))
                 start_dma();
         }
+	id3tags[0].id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
+	last_dma_tick = current_tick;
     }
-    id3tags[0].id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
-    last_dma_tick = current_tick;
 }
 
 static void bitswap(unsigned short *data, int length)
@@ -429,6 +430,7 @@ void DEI3(void)
         {
             DEBUGF("No more MP3 data. Stopping.\n");
             CHCR3 = 0; /* Stop DMA interrupt */
+	    playing = false;
         }
     }
 
@@ -486,7 +488,6 @@ static void mpeg_thread(void)
     int len;
     int free_space_left;
     int amount_to_read;
-    bool play_pending;
 
     play_pending = false;
     playing = false;
@@ -653,6 +654,7 @@ static void mpeg_thread(void)
                             play_pending = false;
                             playing = true;
                 
+			    last_dma_tick = current_tick;
                             init_dma();
                             start_dma();
                         }
@@ -792,6 +794,11 @@ void mpeg_prev(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
 #endif
+}
+
+bool mpeg_is_playing(void)
+{
+    return playing || play_pending;
 }
 
 #ifndef SIMULATOR
