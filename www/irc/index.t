@@ -7,8 +7,7 @@ over at irc.freenode.net (freenode was once known as openprojects.net, see
 Since there is a great deal of technical discussion, we log these sessions
 for later reference.
 
-<p>If you are lazy and don't want to download and install an IRC client, try visiting
-Roland's <a href=http://rockbox.my-vserver.de/chat/chat.html>Java IRC page</a>.
+<p>If you don't want to download and install an IRC client or are locked behind a firewall, try our <a href="cgiirc/irc.cgi">web client</a>.
 
 <h2>Nick reference</h2>
 <pre>
