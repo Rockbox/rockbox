@@ -21,11 +21,28 @@
 
 #include "X11/keysym.h"
 
+static int release_mask;
+static int repeat_mask;
+
 /*
  *Initialize buttons
  */
 void button_init()
 {
+}
+
+int button_set_repeat(int newmask)
+{
+    int oldmask = repeat_mask;
+    repeat_mask = newmask;
+    return oldmask;
+}
+
+int button_set_release(int newmask)
+{
+    int oldmask = release_mask;
+    release_mask = newmask;
+    return oldmask;
 }
 
 /*
