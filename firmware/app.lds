@@ -106,15 +106,18 @@ SECTIONS
     .mp3buf :
     {
         _mp3buffer = .;
+        mp3buffer = .;
     } > DRAM
 
     .mp3end ENDADDR:
     {
+        mp3end = .;
         _mp3end = .;
     } > DRAM
 
     .plugin ENDADDR:
     {
         _pluginbuf = .;
+        pluginbuf = .;
     }
 }
