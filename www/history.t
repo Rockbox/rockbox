@@ -2,6 +2,8 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-08-02</i>: <a href="tshirt-contest">Rockbox T-Shirt Design Contest</a>
+
 <p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk
 is not yet enabled on the players by default.
 

@@ -10,6 +10,8 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-09-03</i>: ROLO, the Rockbox Loader has been integrated into the CVS, allowing Archos or other Rockbox firmware being loaded by simply selecting the file!
+
 <p><i>2002-09-02</i>: <a href="http://rockbox.haxx.se/tshirt-contest/vote.html">Vote for your favourite tshirt designs!</a>
 
 <p><i>2002-08-28</i>: Version 1.3 is released. <a href="download/">Go fetch</a>.
@@ -19,8 +21,6 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 <p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>.
 
 <p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
-
-<p><i>2002-08-02</i>: <a href="tshirt-contest">Rockbox T-Shirt Design Contest</a>
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
@@ -40,11 +40,8 @@ included in which versions. Naturally, this is all subject to change without
 notice.
 
 <dl>
-<dt><b>Version 1.3</b>
-<dd> Resume, persistent settings, proportional fonts, UI improvements,
- Improved charging
 <dt><b>Version 1.4</b>
-<dd> Autobuild playlists, Recording, Loadable fonts, Customizable WPS
+<dd> Autobuild playlists, Recording, Loadable fonts, Customizable WPS, Firmware loading (ROLO)
 <dt><b>Version 1.5</b>
 <dd> File/directory management
 </dl>
