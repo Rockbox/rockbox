@@ -19,6 +19,11 @@ TOOLSDIR = ../tools
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
 
+ifndef MEM
+    # if MEM is not set, assume 2MB
+    MEM=2
+endif
+
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 else
