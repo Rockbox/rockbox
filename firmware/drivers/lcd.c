@@ -325,6 +325,7 @@ static const unsigned char lcd_ascii[] = {
 };
 #endif /* HAVE_NEW_CHARCELL_LCD */
 
+#ifndef SIMULATOR
 void lcd_clear_display(void)
 {
     int i;
@@ -347,8 +348,14 @@ void lcd_define_pattern (int which,char *pattern,int length)
     for (i=0;i<length;i++)
 	lcd_write(FALSE,pattern[i]);
 }
+#endif
 
-#elif HAVE_LCD_BITMAP /* not CHARCELLS */
+#endif
+#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR) /* not CHARCELLS */
+
+#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
+#include <chardef.h>
+#endif
 
 /*
  * All bitmaps have this format:
@@ -680,6 +687,10 @@ void lcd_fontsize(char font, char *width, char *height)
         *height = fontheight[font];
     }
 }
+
+#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
+#include <charundef.h>
+#endif
 
 #else
 /* no LCD defined, no code to use */
