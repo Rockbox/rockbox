@@ -33,7 +33,6 @@ struct regs
 };
 
 int num_threads;
-bool cpu_sleep_enabled;
 static volatile int num_sleepers;
 static int current_thread;
 static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")));
@@ -104,7 +103,7 @@ void switch_thread(void)
     /* Do nothing */
 #else
 
-    while (cpu_sleep_enabled && num_sleepers == num_threads)
+    while (num_sleepers == num_threads)
     {
         /* Enter sleep mode, woken up on interrupt */
         SBYCR &= 0x7F;
@@ -123,11 +122,6 @@ void switch_thread(void)
     
     if(stackptr[0] != 0xdeadbeef)
        panicf("Stkov %s", thread_name[next]);
-}
-
-void cpu_sleep(bool enabled)
-{
-    cpu_sleep_enabled = enabled;
 }
 
 void sleep_thread(void)

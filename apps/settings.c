@@ -105,7 +105,7 @@ offset  abs
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
 0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3),
-                 Trickle charge flag (bit 4), CPU sleep flag (bit 5)>
+                 Trickle charge flag (bit 4)>
 0x26    0x40    <runtime low byte>
 0x27    0x41    <runtime high byte>
 0x28    0x42    <topruntime low byte>
@@ -357,8 +357,7 @@ int settings_save( void )
     config_block[0x25] = (unsigned char)
         ((global_settings.disk_poweroff & 1) |
          ((global_settings.buffer_margin & 7) << 1) |
-         ((global_settings.trickle_charge & 1) << 4) |
-         ((global_settings.cpu_sleep & 1) << 5));
+         ((global_settings.trickle_charge & 1) << 4));
 
     {
         static long lasttime = 0;
@@ -522,8 +521,6 @@ void settings_apply(void)
                  global_settings.lang_file);
         lang_load(buf);
     }
-
-    cpu_sleep(global_settings.cpu_sleep);
 }
 
 /*
@@ -649,7 +646,6 @@ void settings_load(void)
             global_settings.disk_poweroff = config_block[0x25] & 1;
             global_settings.buffer_margin = (config_block[0x25] >> 1) & 7;
             global_settings.trickle_charge = (config_block[0x25] >> 4) & 1;
-            global_settings.cpu_sleep = (config_block[0x25] >> 5) & 1;
         }
 
         if (config_block[0x27] != 0xff)
@@ -1509,7 +1505,6 @@ void settings_reset(void) {
     global_settings.lang_file[0] = 0;
     global_settings.runtime = 0;
     global_settings.topruntime = 0;
-    global_settings.cpu_sleep = true;
     global_settings.fade_on_stop = true;
 }
 

@@ -30,6 +30,5 @@ void sleep_thread(void);
 void wake_up_thread(void);
 void init_threads(void);
 int thread_stack_usage(int threadnum);
-void cpu_sleep(bool enabled);
 
 #endif

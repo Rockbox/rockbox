@@ -548,13 +548,6 @@ static bool poweroff(void)
 }
 #endif
 
-static bool cpu_sleep_set(void)
-{
-    bool result = set_bool(str(LANG_CPU_SLEEP), &global_settings.cpu_sleep);
-    cpu_sleep(global_settings.cpu_sleep);
-    return result;
-}
-
 static bool buffer_margin(void)
 {
     return set_int(str(LANG_MP3BUFFER_MARGIN), "s",
@@ -755,7 +748,6 @@ static bool system_settings_menu(void)
 #ifdef HAVE_ATA_POWER_OFF
         { str(LANG_POWEROFF),    poweroff        },
 #endif
-        { str(LANG_CPU_SLEEP),   cpu_sleep_set   },
 #ifndef SIMULATOR
         { str(LANG_BATTERY_CAPACITY), battery_capacity },
 #endif

@@ -149,7 +149,6 @@ struct user_settings
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
 
-    bool cpu_sleep;    /* Use sleep instruction when idle? */
     bool fade_on_stop; /* fade on pause/unpause/stop */
 };
 

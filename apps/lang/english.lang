@@ -1381,8 +1381,8 @@ eng: "Size:"
 new:
 
 id: LANG_CPU_SLEEP
-desc: in system_settings_menu()
-eng: "Power Saving"
+desc: in system_settings_menu() (removed)
+eng: ""
 new:
 
 id: LANG_SETTINGS_LOADED1
