@@ -24,7 +24,7 @@
 <tr valign="top">
 <td bgcolor=MENUBG valign="top">
 <br>
-&nbsp;<a href="/"><img src="/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
+&nbsp;<a href="/"><img src="/rockbox100.png" width=99 height=30 border=0 alt="Rockbox Logo"></a>&nbsp;<br>
 
 <p align="right">
 <a class="menulink" href="/">home</a><br>
@@ -45,7 +45,7 @@
 </form>
 
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
-<a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36></a>
+<a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36 alt="Contactor Data AB Logo"></a>
 
 <p><a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
