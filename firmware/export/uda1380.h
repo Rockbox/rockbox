@@ -136,26 +136,4 @@ extern void uda1380_close(void);
 #define REG_AGC     0x23
 #define SKIP_DCFIL     ( 1 << 1)
 
-
-/* Audio tick interrupt */
-#define AUDIO_TICK_NUMBER       8
-#define AUDIO_TICK_BIT          (1 << 8)
-
-
-/* AUDIOGLOB bits */
-
-#define TICK_COUNT(x)           ((x) << 3)
-
-#define TICK_SOURCE_IIS1_TX     1
-#define TICK_SOURCE_IIS2_TX     2
-#define TICK_SOURCE_EBU_TX      3
-#define TICK_SOURCE_IIS1_RX     4
-#define TICK_SOURCE_IIS3_RX     5
-#define TICK_SOURCE_IIS4_RX     6
-#define TICK_SOURCE_EBU1_RX     7
-#define TICK_SOURCE_EBU2_RX     (1 << 11)
-
-
-
-
 #endif /* _UDA_1380_H */
