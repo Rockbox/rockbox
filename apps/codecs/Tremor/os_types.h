@@ -14,6 +14,8 @@
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
 
  ********************************************************************/
+#include "config.h"
+
 #ifndef _OS_TYPES_H
 #define _OS_TYPES_H
 
