@@ -21,6 +21,9 @@
 #define __SYSTEM_H__
 #include <sh7034.h>
 
+#define TRUE  1
+#define FALSE 0
+
 #define KB  *1024
 #define MB  *1024 KB
 #define GB  *1024 MB
@@ -183,6 +186,8 @@ extern char __swap_bit[256];
 #define swap_bit(byte) \
   __swap_bit[byte]
 
+#ifndef SIMULATOR
+
 static inline short swabHI (short value)
   /*
     result[15..8] = value[ 7..0];
@@ -233,6 +238,8 @@ static inline void cli (void)
   {
     asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
   }
+
+#endif
 
 /* Compare And Swap */
 static inline int cas (volatile int *pointer,int requested_value,int new_value)
