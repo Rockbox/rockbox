@@ -209,6 +209,7 @@ void statusbar_icon_volume(int percent)
 {
     int i,j;
     int volume;
+    int vol;
     int step=0;
     char buffer[4];
     unsigned int width, height;
@@ -235,9 +236,9 @@ void statusbar_icon_volume(int percent)
         }
 
         /* display volume level numerical? */
-                if (global_settings.volume_type || 
-                        TIME_BEFORE(current_tick,switch_tick)) 
-                {
+        if (global_settings.volume_type || 
+            TIME_BEFORE(current_tick,switch_tick)) 
+        {
             snprintf(buffer, sizeof(buffer), "%2d", percent);
             lcd_setfont(FONT_SYSFIXED);
             lcd_getstringsize(buffer, &width, &height);
@@ -247,8 +248,8 @@ void statusbar_icon_volume(int percent)
             lcd_setfont(FONT_UI);
         } else { 
             /* display volume bar */
-            volume = volume * 14 / 100;
-            for(i=0; i < volume; i++) {
+            vol = volume * 14 / 100;
+            for(i=0; i < vol; i++) {
                 if(i%2 == 0)
                     step++;
                 for(j=1; j <= step; j++)
