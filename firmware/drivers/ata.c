@@ -1402,9 +1402,7 @@ int ata_init(void)
     GPIO_ENABLE |= 0x00080000;
     GPIO_FUNCTION |= 0x00080000;
 
-    /* ATA controller interface */
-    IDECONFIG1 = 0x00107400;  /* BUFEN2 enable, 5 clock pre, 3 clock post */
-    IDECONFIG2 = 0x00040000;  /* TA Enable = 1 */
+    /* FYI: The IDECONFIGx registers are set by set_cpu_frequency() */
 #endif
 
     sleeping = false;
