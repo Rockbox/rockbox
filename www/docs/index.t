@@ -8,7 +8,7 @@
 <li><a href="/manual/">User manual</a>
 <li><a href="features.html">Feature Comparison Chart</a>
 <li><a href="nodo.html">Features We Will Not Implement</a>
-<li><a href="credits.html">The Noble Men Behind Rockbox</a>
+<li><a href="credits.html">The Noble People Behind Rockbox</a>
 </ul>
 
 <h2>For hackers</h2>
