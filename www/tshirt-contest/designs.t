@@ -482,6 +482,19 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 34 -->
+<tr><td>(34)</td>
+    <td colspan=2>Michael Frühmann</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="michael-fruhmann-rb.jpg"><img border=0 src="design34.jpg" width=300 height=119></a></td>
+    <td></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
 <!-- End Entries -->
 
 </table>
