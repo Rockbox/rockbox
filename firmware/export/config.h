@@ -48,6 +48,7 @@
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
 #define BATT_4AA_NIMH   1500
 #define BATT_3AAA       1000 /* Ondio */
+#define BATT_IRIVER     2    /* the type used in iRiver h1x0 models */
 
 /* CONFIG_LCD */
 #define LCD_GMINI100 0
@@ -65,6 +66,7 @@
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
 #define I2C_ONDIO    1 /* Ondio style */
 #define I2C_GMINI    2 /* Gmini style */
+#define I2C_H100     3 /* iRiver h100 style */
 
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)

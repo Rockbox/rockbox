@@ -18,8 +18,12 @@
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
-/* Type of mobile power, FIXME: probably different, make new type */
-#define CONFIG_BATTERY BATT_LIION2200
+#define CONFIG_I2C I2C_H100
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_IRIVER
+
+#define BATTERY_SCALE_FACTOR 6465 /* FIX: this value is picked at random */
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
@@ -43,5 +47,7 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
+
+#define USB_NONE /* FIX: USB temorarily disabled */
 
 #endif
