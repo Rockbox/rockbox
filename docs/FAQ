@@ -677,45 +677,53 @@ A73: Yes, the recorder can crash when you copy several gigabytes of
      * Copy incrementally. With fully charged standard batteries it
        should be capable of sustained copying for 2 - 2.5 hours.
 
-Q74: There's a digital I/O connector on my jukebox. What is it good for?
+Q74: What should I know about digital I/O connector on my jukebox?
 A74: The Recorder models have a connector for digital audio output using the
      common S/PDIF standard (Sony/Phillips Digital Interface). This jack is
      not present on the Studio/Player/FM Recorder models. By using the digital
      output in combination with high class external equipment, you can get
-     much better sound quality out of your jukebox, because you can use better
-     DA-converters and better amplifiers.
+     much better sound quality out of your jukebox. This is because you can
+     use better DA-converters and better amplifiers, plus you eliminate the
+     analog audio connections between the jukebox and your equipment that can
+     introduce noise and distortion.
 
      The Recorder and the FM Recorder models are able to record from digital
      sources, too. The digital inputs don't have the 15kHz lowpass filter like
      the analog inputs and you are sure to minimize the noise floor.
-     Generally, S/PDIF can be an electrical or an optical signal and there are
-     many devices that support both. There are even small 3.5mm sockets that
-     can take either an optical or an electrical cable. But the socket on the
-     jukebox is for electrical signals only!
+
+     Although S/PDIF can be an electrical or an optical signal and there are
+     many devices that support both, the socket on the jukebox is for
+     electrical signals only! Some devices have sockets that look the same,
+     and can take either an optical or an electrical cable, but sadly this is
+     not true with the Jukebox.
 
      If you want to connect your amp with digital input (RCA type) to the
      output of your Recorder you need an adapter cable (3.5mm stereo jack to
      dual RCA jack). Plug the 3.5mm stero jack into the digital I/O socket of
      your jukebox and the red RCA jack (right channel) into the digital input
      socket of your amp and that's it. You don't have to enable the digital
-     output. The sound settings on the digital output are always flat, your
-     volume, bass, treble, bass boost, loudness settings won't have any effect
-     here.
+     output, since it's always on. The sound settings on the digital output
+     are always flat, your volume, bass, treble, bass boost, loudness settings
+     won't have any effect here, that's why fade in/out won't work,
+     either. The sampling frequency of the digital output is the same as the
+     sampling frequency of the mp3. It's therefore possible that your external
+     equipment won't be able to synchronize to the output of your jukebox if
+     you have mp3's with sampling frequencies other than 32, 44.1 or 48kHz
+     (The pitch shift function also modifies the sampling frequency!).
 
      For recording digital signals on the Recorder, use the white RCA jack
-     (left channel) and plug it into the digital output of your CD player, MD
+     (left channel) and plug it into the digital output of your CD aplayer, MD
      player or whatever. Don't forget to select digital input in the recording
-     settings. Note that there exist some adapter cables with different color
-     coding, so if output doesn't work the red jack try the white RCA jack,
-     too. The tip of the 3.5mm jack is the digital input, the ring is the
-     ouput.
+     settings!
 
-     For recording digital signals on the FM Recorder, you need a special
-     4-pole 3.5mm plug (shaft = ground, tip = left channel analog line in,
-     first ring (next to tip) = right channel analog line in, second ring =
-     digital in).
+     Note that there exist some adapter cables with different color coding, so
+     if it doesn't work try to swap red and white. The tip of the 3.5mm jack
+     is the digital input, the ring is the ouput. For recording digital
+     signals on the FM Recorder, you need a special 4-pole 3.5mm plug (shaft =
+     ground, tip = left channel analog line in, first ring (next to tip) =
+     right channel analog line in, second ring = digital in).
 
      If you want to connect devices with optical inputs/outputs, you need a
      small converter box which converts your signal from electrical to optical
-     (for digital output) respectively optical to electrical (for digital
-     recording).
+     (for digital output from the Archos) or optical to electrical (for
+     digital recording in to the Archos).
