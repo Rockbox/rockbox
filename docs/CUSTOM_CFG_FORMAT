@@ -97,6 +97,6 @@ balance: 0
 time format: 12hour
 volume display: numeric
 show files: supported
-wps: car
-lang: afrikaans
+wps: /.rockbox/car.wps
+lang: /.rockbox/afrikaans.lng
 
