@@ -19,28 +19,30 @@
 
 TARGET = rockboxui
 
-APPDIR= ..
+APPDIR = ../../apps
+
+PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
-LIBMADDIR = $(APPDIR)/common/libmad
+LIBMADDIR = $(PREVAPPDIR)/common/libmad
 
 CC = gcc
 RM = rm -f
 DEBUG = -g
 
-DISPLAY = -DHAVE_LCD_CHARCELLS
-#DISPLAY = -DHAVE_LCD_BITMAP
+#DISPLAY = -DHAVE_LCD_CHARCELLS
+DISPLAY = -DHAVE_LCD_BITMAP
 
-KEYPAD = -DHAVE_PLAYER_KEYPAD
-#KEYPAD = -DHAVE_RECORDER_KEYPAD
+#KEYPAD = -DHAVE_PLAYER_KEYPAD
+KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
-INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR) -I$(APPDIR)
 
 LIBS = 
 
@@ -118,7 +120,7 @@ timer.o: $(LIBMADDIR)/timer.c
 version.o: $(LIBMADDIR)/version.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-mpegplay.o: $(APPDIR)/common/mpegplay.c
+mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 endif
