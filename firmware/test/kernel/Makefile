@@ -14,7 +14,7 @@ TARGET = -DARCHOS_PLAYER_OLD=1
 CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
-OBJS= 	../../crt0.o ../../system.o main.o timer.o \
+OBJS= 	../../crt0.o ../../system.o main.o ../../panic.o ../../drivers/lcd.o \
 	../../thread.o ../../kernel.o ../../drivers/led.o \
 	../../debug.o ../../common/sprintf.o
 

@@ -31,6 +31,14 @@ void t2(void);
 
 struct event_queue main_q;
 
+int tick_add_task(void (*f)(void));
+
+void testfunc(void)
+{
+    if(current_tick == 5000)
+        debugf("Yippie!\n");
+}
+
 int main(void)
 {
     char buf[40];
@@ -46,12 +54,19 @@ int main(void)
     SCR1 |= 0x40;
     SCR1 &= ~0x80;
     IPRE |= 0xf000; /* Set to highest priority */
-    asm ("ldc\t%0,sr" : : "r"(0<<4));
+
+    set_irq_level(0);
 
     debugf("OK. Let's go\n");
 
-    tick_start(10);
+    kernel_init();
 
+    tick_add_task(testfunc);
+    
+    debugf("sleeping 10s...\n");
+    sleep(10000);
+    debugf("woke up\n");
+    
     queue_init(&main_q);
     
     create_thread(t1, s1, 1024);
