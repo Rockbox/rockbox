@@ -545,7 +545,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     /* use the tree browser dircache to load files */
     global_settings.dirfilter = SHOW_ALL;
     strncpy(tc->currdir, dirname, sizeof(tc->currdir));
-    num_files = ft_load(tc, NULL);
+    num_files = ft_load(tc);
     files = (struct entry*) tc->dircache;
 
     if(!num_files)
@@ -585,7 +585,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
 
                 /* we now need to reload our current directory */
                 strncpy(tc->currdir, dirname, sizeof(tc->currdir));
-                num_files = ft_load(tc, NULL);
+                num_files = ft_load(tc);
                 files = (struct entry*) tc->dircache;
                 if (!num_files)
                 {

@@ -20,7 +20,7 @@
 #define FILETREE_H
 #include "tree.h"
 
-int ft_load(struct tree_context* c, bool *buffer_full);
+int ft_load(struct tree_context* c);
 int ft_play_filenumber(int pos, int attr);
 int ft_play_dirname(int start_index);
 void ft_play_filename(char *dir, char *file);

@@ -121,17 +121,20 @@ int db_init(void)
     return 0;
 }
 
-int db_load(struct tree_context* c, bool* dir_buffer_full)
+int db_load(struct tree_context* c)
 {
-    int i, offset, len, rc;
+    int i, offset, rc;
     int dcachesize = global_settings.max_files_in_dir * sizeof(struct entry);
     int max_items, itemcount, stringlen;
     unsigned int* nptr = (void*) c->name_buffer;
     unsigned int* dptr = c->dircache;
     unsigned int* safeplace = NULL;
+    int safeplacelen = 0;
 
     int table = c->currtable;
     int extra = c->currextra;
+
+    char* end_of_nbuf = c->name_buffer + c->name_buffer_size;
 
     if (!initialized) {
         DEBUGF("ID3 database is not initialized.\n");
@@ -140,8 +143,9 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
     }
     
     c->dentry_size = 2 * sizeof(int);
-    
-    DEBUGF("db_load(%d, %x)\n", table, extra);
+    c->dirfull = false;
+
+    DEBUGF("db_load(%d, %x, %d)\n", table, extra, c->firstpos);
 
     if (!table) {
         table = allartists;
@@ -150,51 +154,50 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
     
     switch (table) {
         case allsongs:
-            offset = songstart;
+            offset = songstart + c->firstpos * (songlen + 12);
             itemcount = songcount;
             stringlen = songlen;
             break;
 
         case allalbums:
-            offset = albumstart;
+            offset = albumstart +
+                c->firstpos * (albumlen + 4 + songarraylen * 4);
             itemcount = albumcount;
             stringlen = albumlen;
             break;
 
         case allartists:
-            offset = artiststart;
+            offset = artiststart +
+                c->firstpos * (artistlen + albumarraylen * 4);
             itemcount = artistcount;
             stringlen = artistlen;
             break;
 
-        case albums:
+        case albums4artist:
             /* 'extra' is offset to the artist */
-            len = albumarraylen * 4;
-            safeplace = (void*)(c->name_buffer + c->name_buffer_size - len);
-            //DEBUGF("Seeking to %x\n", extra + artistlen);
+            safeplacelen = albumarraylen * 4;
+            safeplace = (void*)(end_of_nbuf - safeplacelen);
             lseek(fd, extra + artistlen, SEEK_SET);
-            rc = read(fd, safeplace, len);
-            if (rc < len)
+            rc = read(fd, safeplace, safeplacelen);
+            if (rc < safeplacelen)
                 return -1;
 
 #ifdef LITTLE_ENDIAN
             for (i=0; i<albumarraylen; i++)
                 safeplace[i] = BE32(safeplace[i]);
 #endif
-
             offset = safeplace[0];
             itemcount = albumarraylen;
             stringlen = albumlen;
             break;
 
-        case songs:
+        case songs4album:
             /* 'extra' is offset to the album */
-            len = songarraylen * 4;
-            safeplace = (void*)(c->name_buffer + c->name_buffer_size - len);
-            //DEBUGF("Seeking to %x\n", extra + albumlen + 4);
+            safeplacelen = songarraylen * 4;
+            safeplace = (void*)(end_of_nbuf - safeplacelen);
             lseek(fd, extra + albumlen + 4, SEEK_SET);
-            rc = read(fd, safeplace, len);
-            if (rc < len)
+            rc = read(fd, safeplace, safeplacelen);
+            if (rc < safeplacelen)
                 return -1;
 
 #ifdef LITTLE_ENDIAN
@@ -211,6 +214,10 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
             return -1;
     }
     max_items = dcachesize / c->dentry_size;
+    end_of_nbuf -= safeplacelen;
+
+    c->dirlength = itemcount;
+    itemcount -= c->firstpos;
 
     if (!safeplace) {
         //DEBUGF("Seeking to %x\n", offset);
@@ -222,8 +229,7 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
        the rest is table specific. see below. */
 
     if (itemcount > max_items)
-        if (dir_buffer_full)
-            *dir_buffer_full = true;
+        c->dirfull = true;
     
     if (max_items > itemcount) {
         max_items = itemcount;
@@ -233,8 +239,10 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
         int rc, skip=0;
 
         if (safeplace) {
-            if (!safeplace[i])
+            if (!safeplace[i]) {
+                c->dirlength = i;
                 break;
+            }
             //DEBUGF("Seeking to %x\n", safeplace[i]);
             lseek(fd, safeplace[i], SEEK_SET);
             offset = safeplace[i];
@@ -252,15 +260,15 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
         dptr[0] = (unsigned int)nptr;
 
         switch (table) {
-            case songs:
             case allsongs:
+            case songs4album:
                 /* save offset of this song */
                 skip = 12;
                 dptr[1] = offset;
                 break;
 
             case allalbums:
-            case albums:
+            case albums4artist:
                 /* save offset of this album */
                 skip = songarraylen * 4 + 4;
                 dptr[1] = offset;
@@ -273,15 +281,14 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
                 break;
         }
 
-        //DEBUGF("%x: %s\n", dptr[1], dptr[0]);
-
         if (skip)
             lseek(fd, skip, SEEK_CUR);
         
         /* next name is stored immediately after this */
         nptr = (void*)nptr + strlen((char*)nptr) + 1;
-        if ((void*)nptr > (void*)c->name_buffer + c->name_buffer_size) {
+        if ((void*)nptr > (void*)end_of_nbuf) {
             DEBUGF("Name buffer overflow (%d)\n",i);
+            c->dirfull = true;
             break;
         }
         dptr = (void*)dptr + c->dentry_size;
@@ -299,11 +306,12 @@ void db_enter(struct tree_context* c)
 {
     switch (c->currtable) {
         case allartists:
-        case albums:
+        case albums4artist:
             c->dirpos[c->dirlevel] = c->dirstart;
             c->cursorpos[c->dirlevel] = c->dircursor;
             c->table_history[c->dirlevel] = c->currtable;
             c->extra_history[c->dirlevel] = c->currextra;
+            c->pos_history[c->dirlevel] = c->firstpos;
             c->dirlevel++;
             break;
 
@@ -313,16 +321,16 @@ void db_enter(struct tree_context* c)
 
     switch (c->currtable) {
         case allartists:
-            c->currtable = albums;
+            c->currtable = albums4artist;
             c->currextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
             break;
 
-        case albums:
-            c->currtable = songs;
+        case albums4artist:
+            c->currtable = songs4album;
             c->currextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
             break;
 
-        case songs:
+        case songs4album:
             splash(HZ,true,"No playing implemented yet");
 #if 0
             /* find filenames, build playlist, play */
@@ -334,7 +342,7 @@ void db_enter(struct tree_context* c)
             break;
     }
 
-    c->dirstart = c->dircursor = 0;
+    c->dirstart = c->dircursor = c->firstpos = 0;
 }
 
 void db_exit(struct tree_context* c)
@@ -344,6 +352,7 @@ void db_exit(struct tree_context* c)
     c->dircursor = c->cursorpos[c->dirlevel];
     c->currtable = c->table_history[c->dirlevel];
     c->currextra = c->extra_history[c->dirlevel];
+    c->firstpos  = c->pos_history[c->dirlevel];
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -354,7 +363,7 @@ const char* db_get_icon(struct tree_context* c)
     switch (c->currtable)
     {
         case allsongs:
-        case songs:
+        case songs4album:
             icon = File;
             break;
 
@@ -372,7 +381,7 @@ int   db_get_icon(struct tree_context* c)
     switch (c->currtable)
     {
         case allsongs:
-        case songs:
+        case songs4album:
             icon = File;
             break;
 

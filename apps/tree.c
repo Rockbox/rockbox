@@ -92,7 +92,9 @@ static struct tree_context tc;
 bool boot_changed = false;
 
 char lastfile[MAX_PATH];
-char lastdir[MAX_PATH];
+static char lastdir[MAX_PATH];
+static int lasttable, lastextra, lastfirstpos;
+static int max_files = 0;
 
 static bool reload_dir = false;
 
@@ -245,10 +247,9 @@ static int showdir(void)
     struct entry *dircache = tc.dircache;
     int i;
     int tree_max_on_screen;
-    bool dir_buffer_full = false;
     int start = tc.dirstart;
     bool id3db = global_settings.dirfilter == SHOW_ID3DB;
-
+    bool newdir = false;
 #ifdef HAVE_LCD_BITMAP
     const char* icon;
     int line_height;
@@ -264,17 +265,30 @@ static int showdir(void)
 
     /* new file dir? load it */
     if (id3db) {
-        if (db_load(&tc, &dir_buffer_full) < 0)
-            return -1;
+        if (tc.currtable != lasttable ||
+            tc.currextra != lastextra ||
+            tc.firstpos  != lastfirstpos)
+        {
+            if (db_load(&tc) < 0)
+                return -1;
+            lasttable = tc.currtable;
+            lastextra = tc.currextra;
+            lastfirstpos = tc.firstpos;
+            newdir = true;
+        }
     }
     else {
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
-            if (ft_load(&tc, &dir_buffer_full) < 0)
+            if (ft_load(&tc) < 0)
                 return -1;
+            strcpy(lastdir, tc.currdir);
+            newdir = true;
         }
     }
 
-    if ( dir_buffer_full || tc.filesindir == global_settings.max_files_in_dir ) {
+    if (newdir && !id3db &&
+        (tc.dirfull || tc.filesindir == global_settings.max_files_in_dir) )
+    {
 #ifdef HAVE_LCD_CHARCELLS
         lcd_double_height(false);
 #endif
@@ -383,10 +397,11 @@ static int showdir(void)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar && (tc.filesindir > tree_max_on_screen))
+    if (global_settings.scrollbar && (tc.dirlength > tree_max_on_screen))
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
-                  tree_max_on_screen * line_height, tc.filesindir, start,
-                  start + tree_max_on_screen, VERTICAL);
+                  tree_max_on_screen * line_height, tc.dirlength,
+                  start + tc.firstpos,
+                  start + tc.firstpos + tree_max_on_screen, VERTICAL);
 
 #if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar) {
@@ -483,10 +498,8 @@ static bool ask_resume(bool ask_once)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
-    bool buffer_full;
-
     strcpy(tc.currdir, dir);
-    if (!ft_load(&tc, &buffer_full))
+    if (!ft_load(&tc))
         return;
     lastdir[0] = 0;
 
@@ -586,10 +599,10 @@ static bool check_changed_id3mode(bool currmode)
     if (currmode != (global_settings.dirfilter == SHOW_ID3DB)) {
         currmode = global_settings.dirfilter == SHOW_ID3DB;
         if (currmode) {
-            db_load(&tc, NULL);
+            db_load(&tc);
         }
         else
-            ft_load(&tc, NULL);
+            ft_load(&tc);
     }
     return currmode;
 }
@@ -624,6 +637,10 @@ static bool dirbrowse(void)
     tc.dircursor=0;
     tc.dirstart=0;
     tc.dirlevel=0;
+    tc.firstpos=0;
+    lasttable = -1;
+    lastextra = -1;
+    lastfirstpos = 0;
 
     if (*tc.dirfilter < NUM_FILTER_MODES)
         start_resume(true);
@@ -778,39 +795,59 @@ static bool dirbrowse(void)
             case TREE_RC_PREV:
             case TREE_RC_PREV | BUTTON_REPEAT:
 #endif
-                if(tc.filesindir) {
-                    if(tc.dircursor) {
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                        tc.dircursor--;
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                    }
-                    else {
-                        if (tc.dirstart) {
+                if (!tc.filesindir)
+                    break;
+
+                if (tc.dircursor) {
+                    put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
+                    tc.dircursor--;
+                    put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
+                }
+                else {
+                    if (tc.dirstart || tc.firstpos) {
+                        if (tc.dirstart)
                             tc.dirstart--;
-                            numentries = showdir();
-                            update_all=true;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                        }
                         else {
-                            if (numentries < tree_max_on_screen) {
-                                put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
-                                             false);
-                                tc.dircursor = numentries - 1;
-                                put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
-                                             true);
+                            if (tc.firstpos > max_files/2) {
+                                tc.firstpos -= max_files/2;
+                                tc.dirstart += max_files/2;
+                                tc.dirstart--;
                             }
                             else {
-                                tc.dirstart = numentries - tree_max_on_screen;
-                                tc.dircursor = tree_max_on_screen - 1;
-                                numentries = showdir();
-                                update_all = true;
-                                put_cursorxy(CURSOR_X, CURSOR_Y +
-                                             tree_max_on_screen - 1, true);
+                                tc.dirstart = tc.firstpos - 1;
+                                tc.firstpos = 0;
                             }
                         }
+                        restore = true;
                     }
-                    need_update = true;
+                    else {
+                        if (numentries < tree_max_on_screen) {
+                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
+                                         false);
+                            tc.dircursor = numentries - 1;
+                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
+                                         true);
+                        }
+                        else if (id3db && tc.dirfull) {
+                            /* load last dir segment */
+                            /* use max_files/2 in case names are longer than
+                                AVERAGE_FILE_LENGTH */
+                            tc.firstpos = tc.dirlength - max_files/2;
+                            tc.dirstart = tc.firstpos;
+                            tc.dircursor = tree_max_on_screen - 1;
+                            numentries = showdir();
+                            update_all = true;
+                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
+                                         true);
+                        }
+                        else {
+                            tc.dirstart = numentries - tree_max_on_screen;
+                            tc.dircursor = tree_max_on_screen - 1;
+                            restore = true;
+                        }
+                    }
                 }
+                need_update = true;
                 break;
 
             case TREE_NEXT:
@@ -819,45 +856,66 @@ static bool dirbrowse(void)
             case TREE_RC_NEXT:
             case TREE_RC_NEXT | BUTTON_REPEAT:
 #endif
-                if(tc.filesindir)
-                {
-                    if (tc.dircursor + tc.dirstart + 1 < numentries ) {
-                        if(tc.dircursor+1 < tree_max_on_screen) {
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                            tc.dircursor++;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                        }
-                        else {
-                            tc.dirstart++;
-                            numentries = showdir();
-                            update_all = true;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                        }
+                if (!tc.filesindir)
+                    break;
+
+                if (tc.dircursor + tc.dirstart + 1 < numentries ) {
+                    if(tc.dircursor+1 < tree_max_on_screen) {
+                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
+                        tc.dircursor++;
+                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
                     }
                     else {
-                        if(numentries < tree_max_on_screen) {
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                            tc.dirstart = tc.dircursor = 0;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                        }
-                        else {
-                            tc.dirstart = tc.dircursor = 0;
-                            numentries = showdir();
-                            update_all=true;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                        }
+                        tc.dirstart++;
+                        restore = true;
                     }
-                    need_update = true;
                 }
+                else if (id3db && (tc.firstpos || tc.dirfull)) {
+                    if (tc.dircursor + tc.dirstart + tc.firstpos + 1 >= tc.dirlength) {
+                        /* wrap and load first dir segment */
+                        tc.firstpos = tc.dirstart = tc.dircursor = 0;
+                    }
+                    else {
+                        /* load next dir segment */
+                        tc.firstpos += tc.dirstart;
+                        tc.dirstart = 0;
+                    }
+                    restore = true;
+                }
+                else {
+                    if(numentries < tree_max_on_screen) {
+                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
+                        tc.dirstart = tc.dircursor = 0;
+                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
+                    }
+                    else {
+                        tc.dirstart = tc.dircursor = 0;
+                        numentries = showdir();
+                        update_all=true;
+                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
+                    }
+                }
+                need_update = true;
                 break;
 
 #ifdef TREE_PGUP
             case TREE_PGUP:
             case TREE_PGUP | BUTTON_REPEAT:
-                if ( tc.dirstart ) {
+                if (tc.dirstart) {
                     tc.dirstart -= tree_max_on_screen;
                     if ( tc.dirstart < 0 )
                         tc.dirstart = 0;
+                }
+                else if (tc.firstpos) {
+                    if (tc.firstpos > max_files/2) {
+                        tc.firstpos -= max_files/2;
+                        tc.dirstart += max_files/2;
+                        tc.dirstart -= tree_max_on_screen;
+                    }
+                    else {
+                        tc.dirstart = tc.firstpos - tree_max_on_screen;
+                        tc.firstpos = 0;
+                    }
                 }
                 else
                     tc.dircursor = 0;
@@ -868,9 +926,13 @@ static bool dirbrowse(void)
             case TREE_PGDN | BUTTON_REPEAT:
                 if ( tc.dirstart < numentries - tree_max_on_screen ) {
                     tc.dirstart += tree_max_on_screen;
-                    if ( tc.dirstart >
-                         numentries - tree_max_on_screen )
+                    if ( tc.dirstart > numentries - tree_max_on_screen )
                         tc.dirstart = numentries - tree_max_on_screen;
+                }
+                else if (id3db && tc.dirfull) {
+                    /* load next dir segment */
+                    tc.firstpos += tc.dirstart;
+                    tc.dirstart = 0;
                 }
                 else
                     tc.dircursor = numentries - tc.dirstart - 1;
@@ -1334,7 +1396,7 @@ void tree_init(void)
 {
     /* We copy the settings value in case it is changed by the user. We can't
        use it until the next reboot. */
-    int max_files = global_settings.max_files_in_dir;
+    max_files = global_settings.max_files_in_dir;
 
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));

@@ -21,13 +21,13 @@
 
 #include "tree.h"
 
-enum table { invalid, allsongs, allalbums, allartists, albums, songs };
+enum table { invalid, allsongs, allalbums, allartists,
+             albums4artist, songs4album };
 
 int db_init(void);
 void db_enter(struct tree_context* c);
 void db_exit(struct tree_context* c);
-int db_load(struct tree_context* c,
-            bool* dir_buffer_full);
+int db_load(struct tree_context* c);
 #ifdef HAVE_LCD_BITMAP
 const char* db_get_icon(struct tree_context* c);
 #else

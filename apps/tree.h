@@ -121,12 +121,16 @@ struct tree_context {
     int dirlevel;
     int dircursor;
     int dirstart;
+    int firstpos; /* which dir entry is on first
+                     position in dir buffer */
+    int pos_history[MAX_DIR_LEVELS];
     int dirpos[MAX_DIR_LEVELS];
     int cursorpos[MAX_DIR_LEVELS];
     char currdir[MAX_PATH]; /* file use */
     int *dirfilter; /* file use */
     int filesindir;
     int dirsindir; /* file use */
+    int dirlength; /* total number of entries in dir, incl. those not loaded */
     int table_history[MAX_DIR_LEVELS]; /* db use */
     int extra_history[MAX_DIR_LEVELS]; /* db use */
     int currtable; /* db use */
@@ -137,6 +141,7 @@ struct tree_context {
     char* name_buffer;
     int name_buffer_size;
     int dentry_size;
+    bool dirfull;
 };
 
 /* using attribute bits not used by FAT (FAT uses lower 7) */

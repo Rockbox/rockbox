@@ -184,9 +184,8 @@ static int compare(const void* p1, const void* p2)
 }
 
 /* load and sort directory into dircache.  returns NULL on failure. */
-int ft_load(struct tree_context* c, bool *buffer_full)
+int ft_load(struct tree_context* c)
 {
-    extern char lastdir[]; /* from tree.c */
     int i;
     int name_buffer_used = 0;
     DIR *dir = opendir(c->currdir);
@@ -194,13 +193,13 @@ int ft_load(struct tree_context* c, bool *buffer_full)
         return -1; /* not a directory */
 
     c->dirsindir = 0;
-    if (buffer_full)
-        *buffer_full = false;
+    c->dirfull = false;
 
     for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
         int len;
         struct dirent *entry = readdir(dir);
-        struct entry* dptr = (struct entry*)(c->dircache + i * sizeof(struct entry));
+        struct entry* dptr =
+            (struct entry*)(c->dircache + i * sizeof(struct entry));
         if (!entry)
             break;
 
@@ -268,8 +267,7 @@ int ft_load(struct tree_context* c, bool *buffer_full)
 
         if (len > c->name_buffer_size - name_buffer_used - 1) {
             /* Tell the world that we ran out of buffer space */
-            if (buffer_full)
-                *buffer_full = true;
+            c->dirfull = true;
             break;
         }
         dptr->name = &c->name_buffer[name_buffer_used];
@@ -281,10 +279,9 @@ int ft_load(struct tree_context* c, bool *buffer_full)
             c->dirsindir++; 
     }
     c->filesindir = i;
+    c->dirlength = i;
     closedir(dir);
 
-    strcpy(lastdir, c->currdir);
-    
     qsort(c->dircache,i,sizeof(struct entry),compare);
 
     /* If thumbnail talking is enabled, make an extra run to mark files with 
