@@ -596,6 +596,16 @@ static bool browse_current(void)
     return set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
 }
 
+static bool scroll_bar(void)
+{
+    return set_bool( str(LANG_SCROLL_BAR), &global_settings.scrollbar );
+}
+
+static bool status_bar(void)
+{
+    return set_bool( str(LANG_STATUS_BAR), &global_settings.statusbar );
+}
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -733,6 +743,8 @@ static bool display_settings_menu(void)
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
+        { str(LANG_SCROLL_BAR),      scroll_bar },
+        { str(LANG_STATUS_BAR),      status_bar },
         { str(LANG_INVERT),          invert },
         { str(LANG_INVERT_CURSOR),   invert_cursor },
         { str(LANG_PM_MENU),         peak_meter_menu },  
