@@ -126,7 +126,9 @@ static int showdir(char *path, int start)
         lastdir[sizeof(lastdir)-1] = 0;
         qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
     }
-
+#ifdef HAVE_NEW_CHARCELL_LCD
+    lcd_double_height(false);
+#endif
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_putsxy(0,0, "[Browse]",0);
