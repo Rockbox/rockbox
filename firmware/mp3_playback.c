@@ -1059,7 +1059,7 @@ void mp3_play_init(void)
     mp3_reset_playtime();
 }
 
-void mp3_play_data(unsigned char* start, int size,
+void mp3_play_data(const unsigned char* start, int size,
     void (*get_more)(unsigned char** start, int* size) /* callback fn */
 )
 {

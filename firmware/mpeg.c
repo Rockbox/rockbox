@@ -803,7 +803,7 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
     wake_up_thread();
 }
 
-static int add_track_to_tag_list(char *filename)
+static int add_track_to_tag_list(const char *filename)
 {
     struct id3tag *t = NULL;
     int i;
@@ -938,7 +938,7 @@ static void track_change(void)
 }
 
 #ifdef DEBUG
-void hexdump(unsigned char *buf, int len)
+void hexdump(const unsigned char *buf, int len)
 {
     int i;
 
@@ -2167,7 +2167,7 @@ static void init_recording(void)
        call mpeg_set_recording_options(). */
 }
 
-void mpeg_record(char *filename)
+void mpeg_record(const char *filename)
 {
     mpeg_errno = 0;
     
@@ -2396,7 +2396,7 @@ void mpeg_set_recording_gain(int left, int right, bool use_mic)
                        0x0007);
 }
 
-void mpeg_new_file(char *filename)
+void mpeg_new_file(const char *filename)
 {
     mpeg_errno = 0;
     

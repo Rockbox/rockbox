@@ -112,11 +112,11 @@ static char lowhex(int  x)
    return hexchars[x & 0xf];
 }
 
-static void putpacket (char *buffer)
+static void putpacket (const char *buffer)
 {
     register  int checksum;
 
-    char *src = buffer;
+    const char *src = buffer;
 
    /* Special debug hack. Shut off the Rx IRQ during I/O to prevent the debug
       stub from interrupting the message */
@@ -172,7 +172,7 @@ static void putpacket (char *buffer)
 
 /* convert the memory, pointed to by mem into hex, placing result in buf */
 /* return a pointer to the last char put in buf (null) */
-static char *mem2hex (char *mem, char *buf, int count)
+static char *mem2hex (const char *mem, char *buf, int count)
 {
     int i;
     int ch;
@@ -186,7 +186,7 @@ static char *mem2hex (char *mem, char *buf, int count)
     return (buf);
 }
 
-static void debug(char *msg)
+static void debug(const char *msg)
 {
     debugbuf[0] = 'O';
     
@@ -196,7 +196,7 @@ static void debug(char *msg)
 #endif /* end of DEBUG section */
 
 #ifdef __GNUC__
-void debugf(char *fmt, ...)
+void debugf(const char *fmt, ...)
 #endif
 {
 #ifdef DEBUG
@@ -218,7 +218,7 @@ void debug_init(void)
 {
 }
 
-void debugf(char *fmt, ...)
+void debugf(const char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
@@ -226,7 +226,7 @@ void debugf(char *fmt, ...)
     va_end( ap );
 }
 
-void ldebugf(char* file, int line, char *fmt, ...)
+void ldebugf(const char* file, int line, const char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );

@@ -20,6 +20,6 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
-void panicf( char *fmt, ... );
+void panicf( const char *fmt, ... );
 
 #endif /* __PANIC_H__ */

@@ -71,7 +71,7 @@ static inline void store_context(void* addr)
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
-static inline void load_context(void* addr)
+static inline void load_context(const void* addr)
 {
     asm volatile ("mov.l @%0+,r8\n\t"
                   "mov.l @%0+,r9\n\t"

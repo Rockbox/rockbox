@@ -35,8 +35,8 @@ extern void lcd_puts(int x, int y, const unsigned char *string);
 extern void lcd_puts_style(int x, int y, const unsigned char *string, int style);
 extern void lcd_putc(int x, int y, unsigned short ch);
 
-extern void lcd_puts_scroll(int x, int y, unsigned char* string );
-extern void lcd_puts_scroll_style(int x, int y, unsigned char* string,
+extern void lcd_puts_scroll(int x, int y, const unsigned char* string );
+extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
 extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);

@@ -51,7 +51,7 @@ void demand_irq_enable(bool on);
 
 /* new functions, exported to plugin API */
 void mp3_play_init(void);
-void mp3_play_data(unsigned char* start, int size,
+void mp3_play_data(const unsigned char* start, int size,
     void (*get_more)(unsigned char** start, int* size) /* callback fn */
 );
 void mp3_play_pause(bool play);

@@ -30,7 +30,7 @@
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
-static void rolo_error(char *text)
+static void rolo_error(const char *text)
 {
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO error:");
@@ -43,8 +43,10 @@ static void rolo_error(char *text)
 }
 
 /* these are in assembler file "descramble.S" */
-extern unsigned short descramble(unsigned char* source, unsigned char* dest, int length);
-extern void rolo_restart(unsigned char* source, unsigned char* dest, int length);
+extern unsigned short descramble(const unsigned char* source,
+                                 unsigned char* dest, int length);
+extern void rolo_restart(const unsigned char* source, unsigned char* dest,
+                         int length);
 
 /***************************************************************************
  *
@@ -52,7 +54,7 @@ extern void rolo_restart(unsigned char* source, unsigned char* dest, int length)
  * Filename must be a fully defined filename including the path and extension
  *
  ***************************************************************************/
-int rolo_load(char* filename)
+int rolo_load(const char* filename)
 {
     int fd;
     unsigned long length;

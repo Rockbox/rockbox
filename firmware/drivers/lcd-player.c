@@ -530,7 +530,7 @@ void lcd_bidir_scroll(int percent)
     bidir_limit = percent;
 }
 
-void lcd_puts_scroll(int x, int y, unsigned char* string )
+void lcd_puts_scroll(int x, int y, const unsigned char* string )
 {
     struct scrollinfo* s;
     int i;

@@ -53,9 +53,9 @@ static unsigned char *freeptr = mbuf;
 static unsigned char *fileptr;
 static unsigned char *eofptr;
 
-static void rotate_font_bits(struct font* pf);
+static void rotate_font_bits(const struct font* pf);
 static void rotleft(unsigned char *dst, 
-                    bitmap_t *src, 
+                    const bitmap_t *src,
                     unsigned int width,
                     unsigned int height);
 
@@ -120,7 +120,7 @@ void font_reset(void)
 }
 
 /* read and load font into incore font structure*/
-struct font* font_load(char *path)
+struct font* font_load(const char *path)
 {
     int fd, filesize;
     unsigned short maxwidth, height, ascent, pad;
@@ -263,7 +263,7 @@ struct font* font_get(int font)
 }
 
 /* convert font bitmap data inplace to rockbox format*/
-static void rotate_font_bits(struct font* pf)
+static void rotate_font_bits(const struct font* pf)
 {
     int i;
     unsigned long defaultchar = pf->defaultchar - pf->firstchar;
@@ -305,8 +305,8 @@ static void rotate_font_bits(struct font* pf)
  * Doing it this way keeps fonts in standard formats,
  * as well as keeping Rockbox hw bitmap format.
  */
-static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
-                    unsigned int height)
+static void rotleft(unsigned char *dst, const bitmap_t *src,
+                    unsigned int width, unsigned int height)
 {
     unsigned int i,j;
     unsigned int src_words;        /* # words of input image*/

@@ -77,8 +77,8 @@ int mpeg_status(void);
 #if defined(HAVE_MAS3587F) || defined(SIMULATOR)
 void mpeg_init_recording(void);
 void mpeg_init_playback(void);
-void mpeg_record(char *filename);
-void mpeg_new_file(char *filename);
+void mpeg_record(const char *filename);
+void mpeg_new_file(const char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time);

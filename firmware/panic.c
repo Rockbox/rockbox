@@ -31,7 +31,7 @@ static char panic_buf[128];
 /*
  * "Dude. This is pretty fucked-up, right here." 
  */
-void panicf( char *fmt, ...)
+void panicf( const char *fmt, ...)
 {
     va_list ap;
 

@@ -112,7 +112,7 @@ struct plugin_api {
     /* lcd */
     void (*lcd_clear_display)(void);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
-    void (*lcd_puts_scroll)(int x, int y, unsigned char* string);
+    void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_stop_scroll)(void);
     void (*lcd_set_contrast)(int x);
 #ifdef HAVE_LCD_CHARCELLS
@@ -211,7 +211,7 @@ struct plugin_api {
     /* sound */
     void (*mpeg_sound_set)(int setting, int value);
 #ifndef SIMULATOR
-    void (*mp3_play_data)(unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
+    void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
@@ -264,7 +264,7 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     void (*backlight_set_timeout)(int index);
-    bool (*mp3info)(struct mp3entry *entry, char *filename, bool v1first);
+    bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
     int (*create_xing_header)(int fd, int startpos, int filesize,
@@ -285,7 +285,8 @@ struct plugin_api {
     int  (*peak_meter_get_use_dbfs)(void);
 #endif
 #ifdef HAVE_LCD_BITMAP
-    void (*lcd_puts_scroll_style)(int x, int y, unsigned char* string, int style);
+    void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
+                                  int style);
 #endif
    void (*mpeg_flush_and_reload_tracks)(void);
    int (*strncasecmp)(const char *s1, const char *s2, size_t n);

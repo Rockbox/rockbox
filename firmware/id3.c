@@ -77,7 +77,7 @@ static const char* const genres[] = {
     "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall"
 };
 
-char* id3_get_genre(struct mp3entry* id3)
+char* id3_get_genre(const struct mp3entry* id3)
 {
     if( id3->genre_string )
         return id3->genre_string ;
@@ -799,7 +799,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
  * about an MP3 file and updates it's entry accordingly.
  *
  */
-bool mp3info(struct mp3entry *entry, char *filename, bool v1first)
+bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
 {
     int fd;
     int v1found = false;

@@ -784,12 +784,12 @@ void lcd_invertpixel(int x, int y)
     INVERT_PIXEL(x,y);
 }
 
-void lcd_puts_scroll(int x, int y, unsigned char *string)
+void lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
     lcd_puts_scroll_style(x, y, string, STYLE_DEFAULT);
 }
 
-void lcd_puts_scroll_style(int x, int y, unsigned char *string, int style)
+void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
 {
     struct scrollinfo* s;
     int w, h;
