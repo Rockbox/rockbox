@@ -635,25 +635,31 @@ static int get_bookmark_count(char* bookmark_file_name)
 static char* select_bookmark(char* bookmark_file_name)
 {
     int bookmark_id = 0;
-    bool delete_this_bookmark = true;
+    int bookmark_id_prev = -1;
     int  key = 0;
-    char* bookmark;
+    char* bookmark = NULL;
     int bookmark_count = 0;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
+
+    while (button_get(false)); /* clear button queue */
+    bookmark_count = get_bookmark_count(bookmark_file_name);
 
     while(true)
     {
-        /* Handles the case where the user wants to go below the 0th bookmark */
         if(bookmark_id < 0)
+            bookmark_id = bookmark_count -1;
+        if(bookmark_id == bookmark_count)
             bookmark_id = 0;
 
-        if(delete_this_bookmark)
+        if (bookmark_id != bookmark_id_prev)
         {
-            bookmark_count = get_bookmark_count(bookmark_file_name);
-            delete_this_bookmark = false;
+            bookmark = get_bookmark(bookmark_file_name, bookmark_id);
+            bookmark_id_prev = bookmark_id;
         }
         
-        bookmark = get_bookmark(bookmark_file_name, bookmark_id);
-
         if (!bookmark)
         {
             /* if there were no bookmarks in the file, delete the file and exit. */
@@ -666,6 +672,7 @@ static char* select_bookmark(char* bookmark_file_name)
             }
             else
             {
+               bookmark_id_prev = bookmark_id;
                bookmark_id--;
             }
         }
@@ -675,7 +682,6 @@ static char* select_bookmark(char* bookmark_file_name)
         }
 
         /* waiting for the user to click a button */
-        while (button_get(false)); /* clear button queue */
         key = button_get(true);
         switch(key)
         {
@@ -685,7 +691,11 @@ static char* select_bookmark(char* bookmark_file_name)
 
             case BUTTON_ON | BUTTON_PLAY:
                 /* User wants to delete this bookmark */
-                delete_this_bookmark = true;
+                delete_bookmark(bookmark_file_name, bookmark_id);
+                bookmark_id_prev=-1;
+                bookmark_id--;
+                bookmark_count--;
+                while (button_get(false)); /* clear button queue */
                 break;
 
             case SYS_USB_CONNECTED:
@@ -718,12 +728,6 @@ static char* select_bookmark(char* bookmark_file_name)
             case BUTTON_STOP:
                 return NULL;
 #endif
-        }
-
-        if (delete_this_bookmark)
-        {
-           delete_bookmark(bookmark_file_name, bookmark_id);
-           bookmark_id--;
         }
     }
 
