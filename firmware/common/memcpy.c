@@ -53,6 +53,12 @@ _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
 	_PTR dst0 _AND
 	_CONST _PTR src0 _AND
+	size_t len0) __attribute__ ((section (".icode")));
+
+_PTR
+_DEFUN (memcpy, (dst0, src0, len0),
+	_PTR dst0 _AND
+	_CONST _PTR src0 _AND
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
