@@ -120,6 +120,7 @@ void lcd_puts(int x, int y, char *string)
   strncpy(buffer, string, 11);
   buffer[11]=0;
 
-  sim_lcd_puts(x*6, y*8, buffer, 0);
+  debugf("lcd_puts(%d,%d,%s)\n",x,y,string);
+  sim_lcd_puts(x, y, buffer, 0);
 }
 #endif

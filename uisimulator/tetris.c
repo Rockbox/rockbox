@@ -310,14 +310,14 @@ void game_loop(void)
 	    sleep(10);
 	}
     if(gameover()) {
-        char w, h;
+        int w, h;
 
-        lcd_fontsize(TETRIS_TITLE_FONT, &w, &h);
+        lcd_getfontsize(TETRIS_TITLE_FONT, &w, &h);
         lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
                       TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
                       TETRIS_TITLE_YLOC-h);
-        lcd_puts(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
-                 "You lose!", TETRIS_TITLE_FONT);
+        lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
+                   TETRIS_TITLE_FONT);
         lcd_update();
         sleep(2);
         return;
@@ -349,8 +349,8 @@ void tetris(void)
     init_tetris();
 
     draw_frame(start_x-1,start_x+max_x,start_y-1,start_y+max_y);
-    lcd_puts(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
-             TETRIS_TITLE, TETRIS_TITLE_FONT);
+    lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, TETRIS_TITLE,
+               TETRIS_TITLE_FONT);
     lcd_update();
 
     next_b = t_rand(blocks);

@@ -86,7 +86,7 @@ void move_cursor_down(void)
 
 void redraw_cursor(void)
 {
-    lcd_puts(0, cursor*menu_line_height, "-", 0);
+    lcd_putsxy(0, cursor*menu_line_height, "-", 0);
 }
 
 /* 
@@ -96,9 +96,9 @@ void redraw_cursor(void)
  */
 void put_cursor(int target)
 {
-    lcd_puts(0, cursor*menu_line_height, " ", 0);
+    lcd_putsxy(0, cursor*menu_line_height, " ",0);
     cursor = target;
-    lcd_puts(0, cursor*menu_line_height, "-", 0);
+    lcd_putsxy(0, cursor*menu_line_height, "-",0);
 }
 
 /* We call the function pointer related to the current cursor position */
@@ -110,8 +110,8 @@ void execute_menu_item(void)
 
 void add_menu_item(int location, char *string)
 {
-    lcd_puts(MENU_ITEM_Y_LOC, MENU_LINE_HEIGHT*location,
-             string, MENU_ITEM_FONT);
+    lcd_putsxy(MENU_ITEM_Y_LOC, MENU_LINE_HEIGHT*location, string,
+               MENU_ITEM_FONT);
     if (location < menu_top)
         menu_top = location;
     if (location > menu_bottom)
@@ -130,7 +130,7 @@ void menu_init(void)
     for (i = i; i < Last_Id; i++)
         add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
 
-    lcd_puts(8, 38, "Rockbox!", 2);
+    lcd_putsxy(8, 38, "Rockbox!",2);
     redraw_cursor();
 }
 

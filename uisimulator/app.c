@@ -97,15 +97,7 @@ void app_main(void)
     lcd_puts(0,0, "Mooo!");
     lcd_puts(1,1, " Rockbox!");
 
-    while(1) {
-      key = button_get();
-
-      if(!key) {
-        sleep(1);
-        continue;
-      }
-
-    }
+    browse_root();
     
 }
 
