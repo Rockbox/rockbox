@@ -248,6 +248,13 @@ bool recording_screen(void)
     bool led_state;
     int led_delay;
 
+    const unsigned char *byte_units[] = {
+        ID2P(LANG_BYTE),
+        ID2P(LANG_KILOBYTE),
+        ID2P(LANG_MEGABYTE),
+        ID2P(LANG_GIGABYTE)
+    };
+
     cursor = 0;
     mpeg_init_recording();
 
@@ -587,10 +594,13 @@ bool recording_screen(void)
                                  dhours, dminutes);
                     }
                     else
+                    {
+                        output_dyn_value(buf2, sizeof buf2,
+                                         mpeg_num_recorded_bytes(),
+                                         byte_units, true);
                         snprintf(buf, 32, "%s %s",
-                                 str(LANG_RECORDING_SIZE),
-                                 num2max5(mpeg_num_recorded_bytes(),
-                                          buf2));
+                                 str(LANG_RECORDING_SIZE), buf2);
+                    }
                 }
                 lcd_puts(0, 1, buf);
 

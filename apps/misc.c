@@ -28,6 +28,7 @@
 #include "system.h"
 #include "timefuncs.h"
 #include "screens.h"
+#include "talk.h"
 #include "mpeg.h"
 #include "mp3_playback.h"
 #include "settings.h"
@@ -42,33 +43,67 @@
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
 
-/* The point of this function would be to return a string of the input data,
-   but never longer than 5 columns. Add suffix k and M when suitable...
-   Make sure to have space for 6 bytes in the buffer. 5 letters plus the
-   terminating zero byte. */
-char *num2max5(unsigned int bytes, char *max5)
+/* Format a large-range value for output, using the appropriate unit so that
+ * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
+ * units) if possible, and 3 significant digits are shown. If a buffer is
+ * given, the result is snprintf()'d into that buffer, otherwise the result is
+ * voiced.*/
+char *output_dyn_value(char *buf, int buf_size, int value,
+                       const unsigned char **units, bool bin_scale)
 {
-    if(bytes < 100000) {
-        snprintf(max5, 6, "%5d", bytes);
-        return max5;
+    int scale = bin_scale ? 1024 : 1000;
+    int fraction = 0;
+    int unit_no = 0;
+    char tbuf[5];
+
+    while (value >= scale)
+    {
+        fraction = value % scale;
+        value /= scale;
+        unit_no++;
     }
-    if(bytes < (9999*ONE_KILOBYTE)) {
-        snprintf(max5, 6, "%4dk", bytes/ONE_KILOBYTE);
-        return max5;
+    if (bin_scale)
+        fraction = fraction * 1000 / 1024;
+
+    if (buf)
+    {
+        if (value >= 100 || !unit_no)
+            snprintf(tbuf, sizeof(tbuf), "%d", value);
+        else if (value >= 10)
+            snprintf(tbuf, sizeof(tbuf), "%d%s%01d", value, str(LANG_POINT),
+                     fraction / 100);
+        else
+            snprintf(tbuf, sizeof(tbuf), "%d%s%02d", value, str(LANG_POINT),
+                     fraction / 10);
+
+        snprintf(buf, buf_size, "%s %s", tbuf, P2STR(units[unit_no]));
     }
-    if(bytes < (100*ONE_MEGABYTE)) {
-        /* 'XX.XM' is good as long as we're less than 100 megs */
-        snprintf(max5, 6, "%2d.%0dM",
-                 bytes/ONE_MEGABYTE,
-                 (bytes%ONE_MEGABYTE)/(ONE_MEGABYTE/10) );
-        return max5;
+    else
+    {
+        if (value >= 100 || !unit_no)
+            tbuf[0] = '\0';
+        else if (value >= 10)
+            snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
+        else
+            snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
+        
+        /* strip trailing zeros from the fraction */
+        for (i = strlen(tbuf) - 1; (i >= 0) && (tbuf[i] == '0'); i--)
+            tbuf[i] = '\0';
+
+        talk_number(value, true);
+        if (strlen(tbuf))
+        {
+            talk_id(LANG_POINT, true);
+            talk_spell(tbuf, true);
+        }
+        talk_id(P2ID(units[unit_no]), true);
     }
-    snprintf(max5, 6, "%4dM", bytes/ONE_MEGABYTE);
-    return max5;
+    return buf;
 }
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
- * read (which may be larger than the number of bytes stored in buffer). If 
+ * read (which may be larger than the number of bytes stored in buffer). If
  * an error occurs, -1 is returned (and buffer contains whatever could be 
  * read). A line is terminated by a LF char. Neither LF nor CR chars are 
  * stored in buffer.

@@ -1268,32 +1268,19 @@ static bool view_runtime(void)
 }
 
 #ifdef HAVE_MMC
-/* value is 10 * real value */
-static unsigned char prep_value_unit(unsigned long *value,
-                                     const unsigned char *units)
-{
-    int unit_no = 0;
-
-    while (*value >= 10000)
-    {
-        *value /= 1000;
-        unit_no++;
-    }
-    return units[unit_no];
-}
-
 bool dbg_mmc_info(void)
 {
     bool done = false;
     int currval = 0;
     unsigned long value;
     tCardInfo *card;
-    unsigned char pbuf[32];
+    unsigned char pbuf[32], pbuf2[32];
     unsigned char card_name[7];
-    unsigned char unit;
-    
+
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
+    static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
+    static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
     
     card_name[6] = '\0';
 
@@ -1337,24 +1324,14 @@ bool dbg_mmc_info(void)
             }
             else                  /* Technical details */
             {
-                value = card->speed / 100;
-                unit = prep_value_unit(&value, "kMG");
-                if (value < 100)
-                    snprintf(pbuf, sizeof(pbuf), "Speed: %d.%01d %cBit/s",
-                             (int)(value / 10), (int)(value % 10), unit);
-                else
-                    snprintf(pbuf, sizeof(pbuf), "Speed: %d %cBit/s",
-                             (int)(value / 10), unit);
+                output_dyn_value(pbuf2, sizeof pbuf2, card->speed / 1000,
+                                 kbit_units, false);
+                snprintf(pbuf, sizeof pbuf, "Speed: %s", pbuf2);
                 lcd_puts(0, 1, pbuf);
 
-                value = card->tsac;
-                unit = prep_value_unit(&value, "nµm");
-                if (value < 100)
-                    snprintf(pbuf, sizeof(pbuf), "Tsac: %d.%01d %cs",
-                             (int)(value / 10), (int)(value % 10), unit);
-                else
-                    snprintf(pbuf, sizeof(pbuf), "Tsac: %d %cs",
-                             (int)(value / 10), unit);
+                output_dyn_value(pbuf2, sizeof pbuf2, card->tsac,
+                                 nsec_units, false);
+                snprintf(pbuf, sizeof pbuf, "Tsac: %s", pbuf2);
                 lcd_puts(0, 2, pbuf);
 
                 snprintf(pbuf, sizeof(pbuf), "Nsac: %d clk", card->nsac);

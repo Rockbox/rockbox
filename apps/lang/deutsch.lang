@@ -985,16 +985,16 @@ voice: "Aufnahmeeinstellungen"
 new: "Aufnahmeeinstellungen"
 
 id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "HDD: %d,%dGB"
+new:
 
 id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
-voice: "Freier Plattenplatz:"
-new: "Frei: %d,%dGB"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -2256,9 +2256,9 @@ voice: "Plus"
 new:
 
 id: VOICE_POINT
-desc: spoken only, decimal separator for composing numbers
+desc: DEPRECATED
 eng: ""
-voice: "Komma"
+voice: ""
 new:
 
 id: VOICE_MILLISECONDS
@@ -2322,15 +2322,15 @@ voice: "Prozent"
 new:
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix
+desc: DEPRECATED
 eng: ""
-voice: "Megabyte"
+voice: ""
 new:
 
 id: VOICE_GIGABYTE
-desc: spoken only, a unit postfix
+desc: DEPRECATED
 eng: ""
-voice: "Gigabyte"
+voice: ""
 new:
 
 id: VOICE_MILLIAMPHOURS
@@ -2929,3 +2929,46 @@ desc: in battery settings
 eng: "NiMH"
 voice: "Nickel-Metallhydrid"
 new: "NiMH"
+
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+voice: "Komma"
+new: ","
+
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
+voice: ""
+new: "B"
+
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+voice: "Kilobyte"
+new: "KB"
+
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+voice: "Megabyte"
+new: "MB"
+
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+voice: "Gigabyte"
+new: "GB"
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "HDD:"
+voice: ""
+new: "Disk:"
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+voice: "Freier Plattenplatz:"
+new: "Frei:"
+

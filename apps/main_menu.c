@@ -137,7 +137,7 @@ extern bool simulate_usb(void);
 #endif
 bool show_info(void)
 {
-    char s[32];
+    char s[32], s2[32];
     /* avoid overflow for 8MB mod :) was: ((mp3end - mp3buf) * 1000) / 0x100000; */
     int buflen = ((mp3end - mp3buf) * 100) / 0x19999;
     int integer, decimal;
@@ -146,9 +146,13 @@ bool show_info(void)
     int state = 1;
     unsigned long size, free;
 
+    const unsigned char *kbyte_units[] = {
+        ID2P(LANG_KILOBYTE),
+        ID2P(LANG_MEGABYTE),
+        ID2P(LANG_GIGABYTE)
+    };
+
     fat_size( IF_MV2(0,) &size, &free );
-    size /= 1024;
-    free /= 1024;
 
     if (global_settings.talk_menu)
     {   /* say whatever is reasonable, no real connection to the screen */
@@ -160,11 +164,8 @@ bool show_info(void)
             talk_value(battery_level(), UNIT_PERCENT, true);
         }
 
-        talk_id(LANG_DISK_FREE_STAT, enqueue);
-        talk_number(free / 1024, true);
-        decimal = free % 1024 / 100;
-        talk_id(VOICE_POINT, true);
-        talk_value(decimal, UNIT_GB, true);
+        talk_id(LANG_DISK_FREE_INFO, enqueue);
+        output_dyn_value(NULL, 0, free, kbyte_units, true); /* NULL == talk */
 
 #ifdef HAVE_RTC
         {
@@ -220,14 +221,12 @@ bool show_info(void)
         }
 
         if (state & 2) {
-            integer = size / 1024;
-            decimal = size % 1024 / 100;
-            snprintf(s, sizeof s, str(LANG_DISK_STAT), integer, decimal);
+            output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
+            snprintf(s, sizeof s, "%s %s", str(LANG_DISK_SIZE_INFO), s2);
             lcd_puts(0, y++, s);
-            
-            integer = free / 1024;
-            decimal = free % 1024 / 100;
-            snprintf(s, sizeof s, str(LANG_DISK_FREE_STAT), integer, decimal);
+
+            output_dyn_value(s2, sizeof s2, free, kbyte_units, true);
+            snprintf(s, sizeof s, "%s %s", str(LANG_DISK_FREE_INFO), s2);
             lcd_puts(0, y++, s);
         }
         lcd_update();

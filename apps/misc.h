@@ -19,11 +19,13 @@
 #ifndef MISC_H
 #define MISC_H
 
-/* The point of this function would be to return a string of the input data,
-   but never longer than 5 columns. Add suffix k and M when suitable...
-   Make sure to have space for 6 bytes in the buffer. 5 letters plus the
-   terminating zero byte. */
-char *num2max5(unsigned int bytes, char *max5);
+/* Format a large-range value for output, using the appropriate unit so that
+ * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
+ * units) if possible, and 3 significant digits are shown. If a buffer is
+ * given, the result is snprintf()'d into that buffer, otherwise the result is
+ * voiced.*/
+void output_dyn_value(char *buf, int buf_size, int value,
+                      const unsigned char **units, bool bin_scale);
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If 

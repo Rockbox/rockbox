@@ -998,15 +998,15 @@ voice: "Recording Settings"
 new:
 
 id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
-voice: "Free diskspace:"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_POWEROFF
@@ -2270,9 +2270,9 @@ voice: "plus"
 new:
 
 id: VOICE_POINT
-desc: spoken only, decimal separator for composing numbers
+desc: DEPRECATED
 eng: ""
-voice: "point"
+voice: ""
 new:
 
 id: VOICE_MILLISECONDS
@@ -2336,15 +2336,15 @@ voice: "percent"
 new:
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix, currently not used
+desc: DEPRECATED
 eng: ""
-voice: "megabyte"
+voice: ""
 new:
 
 id: VOICE_GIGABYTE
-desc: spoken only, a unit postfix
+desc: DEPRECATED
 eng: ""
-voice: "gigabyte"
+voice: ""
 new:
 
 id: VOICE_MILLIAMPHOURS
@@ -2943,3 +2943,46 @@ desc: in battery settings
 eng: "NiMH"
 voice: "Nickel metal hydride"
 new:
+
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+voice: "point"
+new:
+
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
+voice: ""
+new:
+
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+voice: "kilobyte"
+new:
+
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+voice: "megabyte"
+new:
+
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+voice: "gigabyte"
+new:
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "Disk:"
+voice: ""
+new:
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+voice: "Free diskspace:"
+new:
+
