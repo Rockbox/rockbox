@@ -195,10 +195,19 @@ void status_draw(void)
 #endif
         statusbar_icon_volume(volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
-        if (global_settings.repeat_mode != REPEAT_OFF)
-            statusbar_icon_play_mode(Icon_Repeat);
-        else
-            statusbar_icon_play_mode(Icon_Normal);
+        switch (global_settings.repeat_mode) {
+            case REPEAT_OFF:
+                statusbar_icon_play_mode(Icon_Normal);
+                break;
+
+            case REPEAT_ONE:
+                statusbar_icon_play_mode(Icon_RepeatOne);
+                break;
+
+            case REPEAT_ALL:
+                statusbar_icon_play_mode(Icon_Repeat);
+                break;
+        }
         if(global_settings.playlist_shuffle)
             statusbar_icon_shuffle();
         if (keys_locked)

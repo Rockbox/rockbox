@@ -50,6 +50,7 @@ enum icons_7x8 {
     Icon_RecPause,
     Icon_Normal,
     Icon_Repeat,
+    Icon_RepeatOne,
     Icon_Shuffle,
     Icon_DownArrow,
     Icon_UpArrow,
