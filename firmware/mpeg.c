@@ -451,7 +451,28 @@ static int get_unplayed_space(void)
 {
     int space = mp3buf_write - mp3buf_read;
     if (space < 0)
-        space = mp3buflen + space;
+        space += mp3buflen;
+    return space;
+}
+
+static int get_unplayed_space_current_song(void)
+{
+    int space;
+
+    if (num_tracks_in_memory() > 1)
+    {
+        int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+
+        space = id3tags[track_offset]->mempos - mp3buf_read;
+    }
+    else
+    {
+        space = mp3buf_write - mp3buf_read;
+    }
+
+    if (space < 0)
+        space += mp3buflen;
+
     return space;
 }
 
@@ -461,7 +482,7 @@ static void init_dma(void)
     DAR3 = 0x5FFFEC3;
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
-    last_dma_chunk_size = MIN(65536, get_unplayed_space());
+    last_dma_chunk_size = MIN(65536, get_unplayed_space_current_song());
     DTCR3 = last_dma_chunk_size & 0xffff;
     DMAOR = 0x0001; /* Enable DMA */
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
