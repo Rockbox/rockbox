@@ -8,7 +8,11 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 INPUT(crt0.o)
 
+#if MEMORYSIZE >= 32
+#define PLUGINSIZE 0xC0000
+#else
 #define PLUGINSIZE 0x8000
+#endif
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
 

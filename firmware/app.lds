@@ -100,7 +100,11 @@ _pluginbuf = 0;
 
 
 
+#if MEMORYSIZE >= 32
+#define PLUGINSIZE 0xC0000
+#else
 #define PLUGINSIZE 0x8000
+#endif
 
 #ifdef DEBUG
 #define STUBOFFSET 0x10000
