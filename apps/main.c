@@ -146,6 +146,8 @@ void init(void)
             power_off();
         /* "On" pressed or USB connected: proceed */
     }
+#else
+    (void)coldstart;
 #endif
 
     rc = ata_init();
