@@ -51,7 +51,7 @@
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
-#define CONFIG_BLOCK_VERSION 1
+#define CONFIG_BLOCK_VERSION 2
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
