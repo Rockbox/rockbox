@@ -230,9 +230,9 @@ eng: "Scroll Speed Setting Example"
 new: "Exemplo da velocidade de desprazamento"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Descarga profunda"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1308,9 +1308,9 @@ eng: "Time Format"
 new: "Formato do reloxo"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Carga Trickle"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title

@@ -192,10 +192,10 @@ voice: ""
 new: "Exemple de vitesse de défilement"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Décharge complète"
-new: "Décharge complète"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1068,10 +1068,10 @@ voice: "Vitesse de défilement"
 new: "Vitesse de défilement"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Charge max persistante"
-new: "Charge max persistante"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

@@ -232,9 +232,9 @@ eng: "Scroll Speed Setting Example"
 new: "Esempio Impostazione Velocità Scorrimento"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Scarica Completa"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1196,9 +1196,9 @@ eng: "Scroll Speed"
 new: "Velocità Scorrimento"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Carica Passo-Passo"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

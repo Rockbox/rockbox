@@ -234,9 +234,9 @@ eng: "Scroll Speed Setting Example"
 new: "Skrunuhraði stillingar dæmi"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Full afhlöðun"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1196,9 +1196,9 @@ eng: "Scroll Speed"
 new: "Skrunahraði"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Stöðug hlöðun"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

@@ -235,9 +235,9 @@ eng: "Scroll Speed Setting Example"
 new: "Przykladowa predkosc przesuwu"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Rozladowanie"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1201,9 +1201,9 @@ eng: "Scroll Speed"
 new: "Predkosc przesuwania"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Wolne ladowanie"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

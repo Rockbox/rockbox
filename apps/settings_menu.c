@@ -722,23 +722,6 @@ static bool battery_type(void)
 #endif
 #endif
 
-#ifdef HAVE_CHARGE_CTRL
-static bool deep_discharge(void)
-{
-    bool result;
-    result = set_bool( str(LANG_DISCHARGE), &global_settings.discharge );
-    enable_deep_discharge(global_settings.discharge);
-    return result;
-}
-static bool trickle_charge(void)
-{
-    bool result;
-    result = set_bool( str(LANG_TRICKLE_CHARGE), &global_settings.trickle_charge );
-    enable_trickle_charge(global_settings.trickle_charge);
-    return result;
-}
-#endif
-
 #ifdef HAVE_RTC
 static bool timedate_set(void)
 {
@@ -1256,10 +1239,6 @@ static bool battery_settings_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-#ifdef HAVE_CHARGE_CTRL
-        { ID2P(LANG_DISCHARGE),        deep_discharge   },
-        { ID2P(LANG_TRICKLE_CHARGE),   trickle_charge   },
-#endif
 #ifndef SIMULATOR
         { ID2P(LANG_BATTERY_CAPACITY), battery_capacity },
 #if BATTERY_TYPES_COUNT > 1

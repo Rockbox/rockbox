@@ -224,9 +224,9 @@ eng: "Scroll Speed Setting Example"
 new: "Exemplu de viteza de defilare"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Descarcare completa"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1189,9 +1189,9 @@ eng: "Scroll Step Size Setting Example Text"
 new: "Exemplu de defilare pentru testarea pasilor"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Incarcare max persistenta"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full

@@ -145,7 +145,6 @@ int short_delta;                    /* short term delta battery voltage */
 
 char power_message[POWER_MESSAGE_LEN] = "";    /* message that's shown in
                                                   debug menu */
-static char charge_restart_level = CHARGE_RESTART_HI;
                                                /* percentage at which charging
                                                   starts */
 int powermgmt_last_cycle_startstop_min = 0;    /* how many minutes ago was the
@@ -153,7 +152,6 @@ int powermgmt_last_cycle_startstop_min = 0;    /* how many minutes ago was the
                                                   stopped? */
 int powermgmt_last_cycle_level = 0;            /* which level had the
                                                   batteries at this time? */
-bool trickle_charge_enabled = true;
 int  trickle_sec = 0;                          /* how many seconds should the
                                                   charger be enabled per
                                                   minute for trickle
@@ -193,19 +191,6 @@ int powermgmt_est_runningtime_min = -1;
 
 static bool sleeptimer_active = false;
 static unsigned long sleeptimer_endtick;
-
-#ifdef HAVE_CHARGE_CTRL
-
-void enable_deep_discharge(bool on)
-{
-    charge_restart_level = on ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
-}
-
-void enable_trickle_charge(bool on)
-{
-    trickle_charge_enabled = on;
-}
-#endif /* HAVE_CHARGE_CTRL */
 
 #if BATTERY_TYPES_COUNT > 1
 void set_battery_type(int type)
@@ -522,7 +507,6 @@ static void power_thread_sleep(int ticks)
 {
     int small_ticks;
 #ifdef HAVE_CHARGING
-    unsigned int tmp;
     bool charger_plugged;
 #endif
 
@@ -659,14 +643,14 @@ static void power_thread(void)
              *    the charger must have just been plugged in.
              * 2) If our battery level falls below the restart level, charge!
              */
-            if (((charge_state == DISCHARGING) && trickle_charge_enabled) ||
-                (battery_level() < charge_restart_level)) {
+            if ((charge_state == DISCHARGING) ||
+                (battery_level() < CHARGE_RESTART)) {
 
                 /*
                  * If the battery level is nearly charged, just trickle.
                  * If the battery is in between, top-off and then trickle.
                  */
-                if(battery_percent > charge_restart_level) {
+                if(battery_percent > CHARGE_RESTART) {
                     powermgmt_last_cycle_level = battery_percent;
                     powermgmt_last_cycle_startstop_min = 0;
                     if(battery_percent >= 95) {
@@ -772,14 +756,9 @@ static void power_thread(void)
                        charge time.  For trickle charging, we use 0.05C */
                     powermgmt_last_cycle_level = battery_percent;
                     powermgmt_last_cycle_startstop_min = 0;
-                    if (trickle_charge_enabled) {
-                        trickle_sec  = START_TRICKLE_SEC;
-                        charge_state = TRICKLE;
-                    } else {
-                        /* If we don't trickle charge, we discharge */
-                        trickle_sec  = 0; /* off */
-                        charge_state = DISCHARGING;
-                    }
+
+                    trickle_sec  = START_TRICKLE_SEC;
+                    charge_state = TRICKLE;
                 }
             }
             else if (charge_state > CHARGING)  /* top off or trickle */

@@ -180,10 +180,10 @@ voice: ""
 new: "Ejemplo de la velocidad de desplazamiento"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Descarga Completa"
-new: "Descarga Completa"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1170,10 +1170,10 @@ voice: "Formato del reloj"
 new: "Formato del reloj" 
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Carga de mantenimiento"
-new: "Carga de mantenimiento"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title

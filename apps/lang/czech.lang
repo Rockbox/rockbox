@@ -183,10 +183,10 @@ voice: ""
 new: "Ukázka rychlosti rolování"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Deep Discharge"
-new: "Úplné vybití"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1059,10 +1059,10 @@ voice: "Scroll Speed"
 new: "Rychlost rolování"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Trickle Charge"
-new: "Pøeru¹ované nabíjení"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

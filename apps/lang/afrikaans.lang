@@ -231,9 +231,9 @@ eng: "Scroll Speed Setting Example"
 new: "Rol Spoed Opsie Voorbeeld 12345"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Diepontlaai"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu

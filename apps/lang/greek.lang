@@ -232,9 +232,9 @@ eng: "Scroll Speed Setting Example"
 new: "Παράδειγμα Ταχύτητας Κύλισης"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Τέλεια Αποφόρτηση"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1202,8 +1202,8 @@ eng: "Scroll Step Size Setting Example Text"
 new: 
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
+desc: DEPRECATED
+eng: ""
 ### Not previously translated
 new: 
 

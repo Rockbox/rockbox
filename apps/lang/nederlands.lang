@@ -151,9 +151,9 @@ eng: "Scroll Speed Setting Example"
 new: "Scrollsnelheid voorbeeld"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Diepe Ontlading"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -896,9 +896,9 @@ eng: "Battery: Trickle Chg"
 new: "Batterij: Druppel Laden"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Druppel Laden" 
+desc: DEPRECATED
+eng: ""
+new: "" 
 
 id: LANG_DELETE
 desc: The verb/action Delete

@@ -228,9 +228,9 @@ eng: "Scroll Speed Setting Example"
 new: "Скролиране Скорост Настройки Пример"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Iieiay ?ac?yaea"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1188,9 +1188,9 @@ eng: "Scroll Step Size Setting Example Text"
 new:  "Пример"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Регулирано зареждане"
+desc: LANG_TRICKLE_CHARGE
+eng: ""
+new: ""
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute

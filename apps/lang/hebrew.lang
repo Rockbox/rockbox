@@ -245,9 +245,9 @@ eng: "Scroll Speed Setting Example"
 new: "דוגמה למהירות החלקה"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "פירוק הסוללה"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu

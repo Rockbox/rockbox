@@ -180,10 +180,10 @@ voice: ""
 new: "Exempel på rullningshastighet"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Deep Discharge"
-new: "Total urladdning"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1074,10 +1074,10 @@ voice: ""
 new: "Exempel för att sätta rullningsstegning"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Trickle Charge"
-new: "Underhållsladdning"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting

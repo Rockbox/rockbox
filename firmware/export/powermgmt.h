@@ -61,9 +61,8 @@
 #define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
                                  /* actual max time depends also on BATTERY_CAPACITY! */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define CHARGE_RESTART_HI 85     /* %: when to restart charging in 'charge' mode */
+#define CHARGE_RESTART    85     /* %: when to restart charging in 'charge' mode */
                                  /* attention: if set too high, normal charging is started in trickle mode */
-#define CHARGE_RESTART_LO 10     /* %: when to restart charging in 'discharge' mode */
 #define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
 #define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
 #define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
@@ -80,9 +79,6 @@ extern int short_delta;         /* short term delta battery voltage */
 extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
 extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
 
-void enable_deep_discharge(bool on);    /* deep discharge the battery */
-
-void enable_trickle_charge(bool on);
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
 #endif /* HAVE_CHARGE_CTRL */

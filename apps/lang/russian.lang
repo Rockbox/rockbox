@@ -175,10 +175,10 @@ voice: ""
 new: "Пример скорости прокрутки"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Deep Discharge"
-new: "Глубокая разрядка"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1069,10 +1069,10 @@ voice: ""
 new: "Образец текста для шага прокрутки"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Trickle Charge"
-new: "Перезарядка импульсами"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute

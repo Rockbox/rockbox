@@ -194,9 +194,9 @@ voice: ""
 new:
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Deep Discharge"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_TIME
@@ -1070,9 +1070,9 @@ voice: "Scroll Speed"
 new:
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Trickle Charge"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_BATTERY_TOPOFF_CHARGE

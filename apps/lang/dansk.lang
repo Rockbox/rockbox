@@ -187,10 +187,10 @@ voice: ""
 new: "Eksempel på rulle-hastighed"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Deep Discharge"
-new: "Dyb afladning"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1075,10 +1075,10 @@ voice: "Scroll Speed"
 new: "Rulle hastighed"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Trickle Charge"
-new: "Dryp-ladning"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

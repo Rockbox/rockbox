@@ -72,7 +72,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 
 
-#define CONFIG_BLOCK_VERSION 19
+#define CONFIG_BLOCK_VERSION 20
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -217,10 +217,6 @@ static const struct bit_entry rtc_bits[] =
     {14, S_O(max_files_in_dir), 400, 
         "max files in dir", NULL }, /* 50...10000 */
     /* battery */
-#ifdef HAVE_CHARGE_CTRL
-    {1, S_O(discharge), 0, "deep discharge", off_on },
-    {1, S_O(trickle_charge), true, "trickle charge", off_on },
-#endif
     {12, S_O(battery_capacity), BATTERY_CAPACITY_MIN, "battery capacity",
          NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,
                      500...1500 for Alkaline */
@@ -762,10 +758,6 @@ void settings_apply(void)
 #endif
 
     set_poweroff_timeout(global_settings.poweroff);
-#ifdef HAVE_CHARGE_CTRL
-    enable_deep_discharge(global_settings.discharge);
-    enable_trickle_charge(global_settings.trickle_charge);
-#endif
 
     set_battery_capacity(global_settings.battery_capacity);
 #if BATTERY_TYPES_COUNT > 1

@@ -244,9 +244,9 @@ eng: "Scroll Speed Setting Example"
 new: "Preizkus hitrosti premikanja"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Izprazni"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1210,9 +1210,9 @@ eng: "Scroll Speed"
 new: "Hitrost premikanja"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Trajno polnenje"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

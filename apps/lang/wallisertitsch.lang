@@ -151,9 +151,9 @@ eng: "Scroll Speed Setting Example"
 new: "Biispiltext fer dScrollgschwindigkeit"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep discharge"
-new: "Vollständigs Entladu"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -881,9 +881,9 @@ eng: "Scroll Speed"
 new: "Scroll-Gschwindigkeit"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-new: "Erhaltladu"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

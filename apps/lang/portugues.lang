@@ -236,9 +236,9 @@ eng: "Scroll Speed Setting Example"
 new: "Exemplo de conf. da Veloc. de desloc. do ecran"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-new: "Descarga completa"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu

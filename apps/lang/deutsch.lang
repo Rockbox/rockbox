@@ -181,10 +181,10 @@ voice: ""
 new: "Beispieltext für die Scrollgeschwindigkeit"
 
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep Discharge"
-voice: "Vollständiges Entladen"
-new: "Vollständiges Entladen"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_TIME
 desc: in settings_menu
@@ -1057,10 +1057,10 @@ voice: "Geschwindigkeit"
 new: "Geschwindigkeit"
 
 id: LANG_TRICKLE_CHARGE
-desc: in settings_menu
-eng: "Trickle Charge"
-voice: "Erhaltladen"
-new: "Erhaltladen"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running

@@ -229,9 +229,9 @@ eng: "Scroll Speed Setting Example"
 new: "Kayma Hizi Ayari Ornegi"
  
 id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep discharge"
-new: "Tam desarj"
+desc: DEPRECATED
+eng: ""
+new: ""
  
 id: LANG_TIME
 desc: in settings_menu
