@@ -31,7 +31,7 @@
 #include "wps.h"
 #include "mpeg.h"
 #include "usb.h"
-
+#include "power.h"
 
 #define LINE_Y      1 /* initial line */
 

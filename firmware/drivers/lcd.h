@@ -90,6 +90,7 @@ extern void lcd_fillrect (int x, int y, int nx, int ny);
 extern void lcd_drawrect (int x, int y, int nx, int ny);
 extern void lcd_invertrect (int x, int y, int nx, int ny);
 extern void lcd_drawline( int x1, int y1, int x2, int y2 );
+extern void lcd_clearline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 
