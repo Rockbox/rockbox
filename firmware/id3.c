@@ -491,7 +491,7 @@ mp3info(struct mp3entry *entry, char *filename)
     memset(entry, 0, sizeof(struct mp3entry));
 
     entry->title = NULL;
-
+    entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
     if(HASID3V2(entry))
         setid3v2title(fd, entry);
@@ -500,8 +500,6 @@ mp3info(struct mp3entry *entry, char *filename)
     entry->id3v1len = getid3v1len(fd);
     if(HASID3V1(entry) && !entry->title)
         setid3v1title(fd, entry);
-
-    entry->filesize = getfilesize(fd);
 
     close(fd);
 
