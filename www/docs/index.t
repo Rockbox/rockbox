@@ -24,6 +24,7 @@ href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
 Archos. (Jean Boullier)
 
 <li><a href="license.html">The GNU General Public License</a> under which terms Rockbox may be distributed
+<li><a href="tools.html">Useful mp3 and jukebox related tools</a>
 
 </ul>
 
