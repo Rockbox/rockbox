@@ -60,8 +60,10 @@ char* playlist_next(int type)
 
       if('/' == now_playing[1])
           return &now_playing[1];
-      else
+      else {
+          now_playing[0]='/';
           return now_playing;
+      }
     }
     else
         return NULL;
