@@ -1,0 +1,117 @@
+                        Rockbox From A Technical Angle
+                        ==============================
+
+Background
+
+  Björn Stenberg started this venture back in the late year 2001. The first
+  Rockbox code was committed to CVS end of March 2002. Rockbox 1.0 was
+  released in June.
+
+Booting and (De)Scrambling
+
+  The built-in firmware in the Archos Jukebox reads a file from disk into
+  memory, descrambles it, verifies the checksum and then runs it as code. When
+  we build Rockbox images, we scramble the result file to use the same kind of
+  scrambling that the original Archos firmware uses so that it can be loaded
+  by the built-in firmware.
+
+CPU
+
+  The CPU in use is a SH7034 from Hitachi, running at 11.0592MHz or 12MHz.
+  Most single instructions are excuted in 1 cycle. There is a 4KB internal ram
+  and a 2MB external ram.
+
+Memory Usage
+
+  All Archos Jukebox models have only 2MB ram. The ram is used for everything,
+  including code, graphics and config. To be able to play as long as possible
+  without having to load more data, the size of the mpeg playing buffer must
+  remain as big as possible. Also, since we need to be able to do almost
+  everything in Rockbox simultaneously, we use no dynamic memory allocation
+  system at all. All sub-parts that needs memory must allocate their needs
+  staticly. This puts a great responsibility on all coders.
+
+Playing MPEG
+
+  The MPEG decoding is performed by an external circuit, MAS3507D (for the
+  Player/Studio models) or MAS3587F (for the Recorder models).
+
+  ...
+
+Spinning The Disk Up/Down
+
+  To save battery, the spinning of the harddrive must be kept at a minimum.
+  Rockbox features a timeout, so that if no action has been performed within N
+  seconds, the disk will spin-down automaticly. However, if the disk was used
+  for mpeg-loading for music playback, the spin-down will be almost immediate
+  as then there's no point in timing out. The N second timer is thus only used
+  when the disk-activity is trigged by a user.
+
+FAT and Mounting
+
+  Rockbox scans the partitions of the disk and tries to mount them as fat32
+  filesystems at boot.
+
+Directory Buffer
+
+  When using the "dir browser" in Rockbox to display a single directory, it
+  loads all entries in the directory into memory first, then sorts them and
+  presents them on screen. The buffer used for all file entries is limited to
+  maximum 16K or 400 entries. If the file names are longish, the 16K will run
+  out before 400 entries have been used.
+
+  This rather limited buffer size is of course again related to the necessity
+  to keep the footprint small to keep the mpeg buffer as large as possible.
+
+Playlist Concepts
+
+  One of the most obvious limitations in the firmware Rockbox tries to
+  outperform, was the way playlists were dealt with.
+
+  When loading a playlist (which is a plain text file with file names
+  separated by newlines), Rockbox will scan through the file and store indexes
+  to all file names in an array. The array itself has a 10000-entry limit (for
+  memory size reasons).
+
+  To play a specific song from the playlist, Rockbox checks the index and then
+  seeks to that position in the original file on disk and gets the file name
+  from there. This way, very little memory is wasted and yet very large
+  playlists are supported.
+
+Playing a Directory
+
+  Playing a full directory is using the same technique as with playlists. The
+  difference is that the playlist is not a file on disk, but is the directory
+  buffer.
+
+Shuffle
+
+  Since the playlist is a an array of indexes to where to read the file name,
+  shuffle modifies the order of these indexes in the array. The randomness is
+  identical for the same random seed. This is the secret to good resume. Even
+  when you've shut down your unit and re-starts it, using the same random seed
+  as the previous time will give exactly the same random order.
+
+Saving Config Data
+
+  The Player/Studio models have no battery-backuped memory while the Recorder
+  models have 44 bytes battery-backuped.
+
+  To save data to be persistent and around even after reboots, Rockbox uses
+  harddisk sector 63, which is outside the FAT32 filesystem. (Recorder models
+  also get some data stored in the battery-backuped area).
+
+  The config is only saved when the disk is spinning. This is important to
+  realize, as if you change a config setting and then immediately shuts your
+  unit down, the new config is not saved.
+
+Resume Explained
+
+  ...
+
+Charging
+
+  (Charging concerns Recorder models only, the other models have hardware-
+  controlled charging that Rockbox can't affect.)
+
+  ...
