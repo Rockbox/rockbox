@@ -64,8 +64,10 @@ of the Rockbox project
 synchronize your local files with the changes made by others.
 This operation is called "update":
 
-<p><tt>cvs update</tt>
+<p><tt>cvs update -dP</tt>
 
+<p>The <b>-d</b> switch tells update to create any new directories that have been created the repository since last update.
+<br>The <b>-P</b> switch tells update to delete files that have been removed in the repository.
 
 <h2>Adding a new file</h2>
 
