@@ -8,7 +8,7 @@
 #
 CFLAGS := -O -s -ansi
 
-TARGETS := scramble descramble sh2d bmp2rb convbdf
+TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
 
 all: $(TARGETS)
 
@@ -23,6 +23,9 @@ bmp2rb:	bmp2rb.c
 
 convbdf: convbdf.c
 	$(CC) -g $+ -o $@
+
+generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
+	$(CC) -DHAVE_LCD_CHARCELLS -I../firmware/ -g $+ -o $@
 
 clean:
 	rm -f $(TARGETS) $(shell for f in $(TARGETS) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
