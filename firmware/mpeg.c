@@ -303,7 +303,6 @@ static bool paused; /* playback is paused */
 #ifdef SIMULATOR
 static bool is_playing = false;
 static bool playing = false;
-static bool play_pending = false;
 #else
 static int last_dma_tick = 0;
 
