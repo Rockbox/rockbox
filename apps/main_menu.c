@@ -80,7 +80,7 @@ void show_splash(void)
     if (show_logo() != 0) 
         return;
 
-    sleep(200);
+    sleep(HZ*2);
 }
 
 void version(void)
