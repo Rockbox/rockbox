@@ -329,7 +329,7 @@ static const struct bit_entry hd_bits[] =
     {9, S_O(mdb_center), 0, "mdb center", NULL},
     {9, S_O(mdb_shape), 0, "mdb shape", NULL},
     {1, S_O(mdb_enable), 0, "mdb enable", off_on},
-    {1, S_O(id3_v1_first), 0, "id3 tag order", "v2 first,v1 first"},
+    {1, S_O(id3_v1_first), 0, "id3 tag priority", "v2-v1,v1-v2"},
 
     /* new stuff to be added at the end */
 
