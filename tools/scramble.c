@@ -237,8 +237,7 @@ int main (int argc, char** argv)
     {
         case add:
         {
-            unsigned long *headp = (unsigned long *)header;
-            headp[0] = crc32; /* checksum */
+            int2be(crc32, header); /* checksum, big-endian */
             memcpy(&header[4], irivermodel, 4); /* 4 bytes model name */
             memcpy(outbuf, inbuf, length); /* the input buffer to output*/
             headerlen = 8;
