@@ -8,6 +8,7 @@
 <li><a href="/docs/battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
 <li><a href="/manual/">User manual</a>
 <li><a href="/docs/features.html">Feature Comparison Chart</a>
+<li><a href="/docs/nodo.html">Features We Will Not Implement</a>
 </ul>
 
 <h2>For developers</h2>
