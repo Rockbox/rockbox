@@ -35,7 +35,7 @@
 #include "mp3data.h"
 #include "file.h"
 
-#define DEBUG_VERBOSE
+#undef DEBUG_VERBOSE
 
 #define BYTES2INT(b1,b2,b3,b4) (((b1 & 0xFF) << (3*8)) | \
                                 ((b2 & 0xFF) << (2*8)) | \
@@ -658,7 +658,7 @@ int create_xing_header(int fd, int startpos, int filesize,
             /* Advance from the last seek point to this one */
             for(j = 0;j < pos - last_pos;j++)
             {
-                DEBUGF("fpos: %x frame no: %x ", filepos, x++);
+                DEBUGF("fpos: %x frame no: %x\n", filepos, x++);
                 header = buf_find_next_frame(fd, &bytes, -1, header);
                 mp3headerinfo(&info, header);
                 buf_seek(fd, info.frame_size-4);
