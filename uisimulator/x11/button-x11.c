@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define HAVE_RECORDER_KEYPAD
 #include "types.h"
 #include "button.h"
 
