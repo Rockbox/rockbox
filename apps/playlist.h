@@ -38,7 +38,7 @@ extern playlist_info_t playlist;
 extern bool playlist_shuffle;
 
 void play_list(char *dir, char *file);
-char* playlist_next(int steps);
+char* playlist_next(int steps, char *dirname);
 void randomise_playlist( playlist_info_t *playlist, unsigned int seed );
 void empty_playlist( playlist_info_t *playlist );
 void add_indices_to_playlist( playlist_info_t *playlist );

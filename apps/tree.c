@@ -245,7 +245,7 @@ char* peek_next_track(int steps)
       
         case 2:
             /* playlist mode */
-            return playlist_next(steps);
+            return playlist_next(steps, currdir);
     }
 
     return NULL;

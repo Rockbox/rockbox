@@ -33,14 +33,15 @@
 
 playlist_info_t playlist;
 
-char now_playing[256];
+char now_playing[MAX_PATH+1];
 
-char* playlist_next(int steps)
+char* playlist_next(int steps, char *dirname)
 {
     int seek;
     int max;
     int fd;
     int i;
+    char buf[MAX_PATH+1];
 
     playlist.index = (playlist.index+steps) % playlist.amount;
     seek = playlist.indices[playlist.index];
@@ -48,36 +49,40 @@ char* playlist_next(int steps)
     fd = open(playlist.filename, O_RDONLY);
     if(-1 != fd) {
       lseek(fd, seek, SEEK_SET);
-      max = read(fd, now_playing+1, sizeof(now_playing)-1);
+      max = read(fd, buf, sizeof(buf)-1);
       close(fd);
 
       /* Zero-terminate the file name */
       seek=0;
-      while((now_playing[seek] != '\n') &&
-            (now_playing[seek] != '\r') &&
+      while((buf[seek] != '\n') &&
+            (buf[seek] != '\r') &&
             (seek < max))
         seek++;
 
       /* Now work back killing white space */
-      while((now_playing[seek-1] == ' ') || 
-            (now_playing[seek-1] == '\t'))
+      while((buf[seek-1] == ' ') || 
+            (buf[seek-1] == '\t'))
           seek--;
 
-      now_playing[seek]=0;
+      buf[seek]=0;
       
       /* replace backslashes with forward slashes */
       for ( i=1; i<seek; i++ )
-          if ( now_playing[i] == '\\' )
-              now_playing[i] = '/';
+          if ( buf[i] == '\\' )
+              buf[i] = '/';
 
-      if('/' == now_playing[1])
-          return &now_playing[1];
+      if('/' == buf[0]) {
+          strcpy(now_playing, &buf[0]);
+          return now_playing;
+      }
       else {
           /* handle dos style drive letter */
-          if ( ':' == now_playing[2] )
-              return &now_playing[3];
+          if ( ':' == buf[1] ) {
+              strcpy(now_playing, &buf[2]);
+              return now_playing;
+          }
           else {
-              now_playing[0]='/';
+              snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, buf);
               return now_playing;
           }
       }
@@ -116,7 +121,7 @@ void play_list(char *dir, char *file)
     lcd_puts(0,0,"Playing...  ");
     lcd_update();
     /* also make the first song get playing */
-    mpeg_play(playlist_next(0));
+    mpeg_play(playlist_next(0, dir));
     sleep(HZ);
 }
 
@@ -172,7 +177,7 @@ void add_indices_to_playlist( playlist_info_t *playlist )
             }
             else if(store_index) 
             {
-
+                
                 /* Store a new entry */
                 playlist->indices[ playlist->amount ] = i+count;
                 playlist->amount++;
