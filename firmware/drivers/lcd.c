@@ -82,7 +82,7 @@
  *
  */ 
 
-//void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
+void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
 void lcd_write(bool command, int byte)
 {
     asm("and.b %0, @(r0,gbr)"
