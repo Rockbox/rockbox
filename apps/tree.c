@@ -60,16 +60,16 @@ void browse_root(void)
 
 #ifdef HAVE_LCD_BITMAP
 
-#define TREE_MAX_ON_SCREEN   7
+#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH)
 #define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
-#define MARGIN_Y      8  /* Y pixel margin */
+#define MARGIN_Y      0  /* Y pixel margin */
 #define MARGIN_X      12 /* X pixel margin */
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      2 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
-#define CURSOR_Y    1 /* the cursor is not positioned in regard to
+#define CURSOR_Y    0 /* the cursor is not positioned in regard to
                          the margins, so this is the amount of lines
                          we add to the cursor Y position to position
                          it on a line */
@@ -149,7 +149,6 @@ static int showdir(char *path, int start)
 #endif
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_putsxy(0,0, "[Browse]",0);
     lcd_setmargins(0,MARGIN_Y);
     lcd_setfont(0);
 #endif
