@@ -34,6 +34,9 @@
 #include "ata.h"
 #include "kernel.h"
 #include "power.h"
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
+#endif
 
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
@@ -231,7 +234,10 @@ int default_event_handler(int event)
     switch(event)
     {
         case SYS_USB_CONNECTED:
-            usb_screen();
+#ifdef HAVE_MMC
+            if (!mmc_detect() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
+#endif
+                usb_screen();
             return SYS_USB_CONNECTED;
     }
     return 0;

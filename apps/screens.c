@@ -40,7 +40,8 @@
 #include "action.h"
 #include "talk.h"
 #include "misc.h"
-#include "id3.h"
+#include "id3.h" 
+#include "screens.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -120,6 +121,30 @@ void usb_screen(void)
 #endif
 #endif /* USB_NONE */
 }
+
+#ifdef HAVE_MMC
+int mmc_remove_request(void)
+{
+    struct event ev;
+
+    lcd_clear_display();
+    splash(1, true, str(LANG_REMOVE_MMC));
+    talk_id(LANG_REMOVE_MMC, false);
+    
+    while (1)
+    {
+        queue_wait_w_tmo(&button_queue, &ev, HZ/2);
+        switch (ev.id)
+        {
+            case SYS_MMC_EXTRACTED:
+                return SYS_MMC_EXTRACTED;
+            
+            case SYS_USB_DISCONNECTED:
+                return SYS_USB_DISCONNECTED;
+        }
+    }
+}
+#endif
 
 
 /* some simulator dummies */

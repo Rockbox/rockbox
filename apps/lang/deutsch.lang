@@ -2827,3 +2827,9 @@ desc: in browse root
 eng: "Installation incomplete"
 voice: ""
 new: "Installation unvollständig"
+
+id: LANG_REMOVE_MMC
+desc: before acknowledging usb in case an MMC is inserted (Ondio)
+eng: "Please remove inserted MMC"
+voice: "Bitte Multimediakarte entfernen"
+new: "Bitte eingelegte MMC entfernen"
