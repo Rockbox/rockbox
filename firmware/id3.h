@@ -30,6 +30,7 @@ struct mp3entry {
     int version;
     int layer;
     int year;
+    unsigned char genre;
     unsigned int bitrate;
     unsigned int frequency;
     unsigned int id3v2len;

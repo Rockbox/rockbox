@@ -156,7 +156,7 @@ static int unicode_munge(char** string, int *len) {
 static bool setid3v1title(int fd, struct mp3entry *entry) 
 {
     unsigned char buffer[128];
-    static int offsets[] = {3, 33, 63, 93, 125};
+    static char offsets[] = {3, 33, 63, 93, 125, 127};
     int i, j;
 
     if (-1 == lseek(fd, -128, SEEK_END))
@@ -168,7 +168,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     if (strncmp(buffer, "TAG", 3))
         return false;
 
-    for (i=0;i<5;i++) {
+    for (i=0; i < (int)sizeof offsets; i++) {
         char* ptr = buffer + offsets[i];
         
         if (i<3) {
@@ -203,6 +203,11 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
                    number: first must be 0 and second is track num */
                 if (*ptr == 0)
                     entry->tracknum = ptr[1];
+                break;
+
+            case 5:
+                /* genre */
+                entry->genre = ptr[0];
                 break;
         }
     }
@@ -336,6 +341,16 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bytesread = read(fd, ptr, framelen);
             unicode_munge(&ptr, &bytesread);
             entry->year = atoi(ptr);
+            bufferpos += bytesread + 1;
+            size -= bytesread;
+        }
+        else if(!strncmp(header, "TCON", 4)) {
+            char* ptr = buffer + bufferpos;
+            bytesread = read(fd, ptr, framelen);
+            if (ptr[1] == '(' && ptr[2] != '(')
+                entry->genre = atoi(ptr+2);
+            else
+                entry->genre = 0xff;
             bufferpos += bytesread + 1;
             size -= bytesread;
         }
