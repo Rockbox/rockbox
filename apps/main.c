@@ -138,6 +138,7 @@ void init(void)
 
     powermgmt_init();
 
+#ifdef HAVE_BATTERIES
     if (coldstart && charger_inserted())
     {
         rc = charging_screen(); /* display a "charging" screen */
@@ -145,6 +146,7 @@ void init(void)
             power_off();
         /* "On" pressed or USB connected: proceed */
     }
+#endif
 
     rc = ata_init();
     if(rc)

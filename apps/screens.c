@@ -103,6 +103,9 @@ void usb_display_info(void)
 
 void usb_screen(void)
 {
+#ifdef USB_NONE
+    /* nothing here! */
+#else
 #ifndef SIMULATOR
     backlight_on();
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -118,6 +121,7 @@ void usb_screen(void)
 
     backlight_on();
 #endif
+#endif /* USB_NONE */
 }
 
 
@@ -230,7 +234,7 @@ void charging_display_info(bool animate)
 }
 #endif
 
-
+#ifdef HAVE_BATTERIES
 /* blocks while charging, returns on event:
    1 if charger cable was removed
    2 if Off/Stop key was pressed
@@ -279,7 +283,7 @@ int charging_screen(void)
 
     return rc;
 }
-
+#endif /* HAVE_BATTERIES */
 
 
 #ifdef HAVE_RECORDER_KEYPAD

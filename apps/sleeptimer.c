@@ -92,7 +92,7 @@ bool sleeptimer_screen(void)
           done = true;
           break;
 
-#ifdef HAVE_PLAYER_KEYPAD
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
         case BUTTON_RIGHT:
 #else
         case BUTTON_UP:

@@ -53,7 +53,7 @@ static bool paused = false;
 static struct mp3entry* id3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
-#ifdef HAVE_PLAYER_KEYPAD
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
 void player_change_volume(int button)
 {
     bool exit = false;
@@ -278,7 +278,7 @@ bool browse_id3(void)
             case BUTTON_REPEAT:
                 break;
 
-#ifdef HAVE_PLAYER_KEYPAD
+#ifdef BUTTON_STOP
             case BUTTON_STOP:
 #else
             case BUTTON_OFF:
@@ -506,7 +506,7 @@ static bool menu(void)
                 break;
 
                 /* mute */
-#ifdef HAVE_PLAYER_KEYPAD
+#ifdef BUTTON_MENU
             case BUTTON_MENU | BUTTON_PLAY:
 #else
             case BUTTON_F1 | BUTTON_PLAY:
@@ -534,7 +534,7 @@ static bool menu(void)
                 while (button_get(false)); /* clear button queue */
                 break;
 
-#ifdef HAVE_PLAYER_KEYPAD
+#ifdef BUTTON_MENU
                 /* change volume */
             case BUTTON_MENU | BUTTON_LEFT:
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
@@ -545,9 +545,11 @@ static bool menu(void)
                 break;
 
                 /* show id3 tags */
+#ifdef BUTTON_ON
             case BUTTON_MENU | BUTTON_ON:
                 status_set_param(true);
                 status_set_audio(true);
+#endif
 #else
             case BUTTON_F1 | BUTTON_ON:
 #endif
@@ -742,8 +744,11 @@ int wps_show(void)
             ! ((button & BUTTON_MENU) ||
 #endif
                (button == BUTTON_NONE) ||
-               (button == SYS_USB_CONNECTED) ||
-               (button & BUTTON_REMOTE)))
+               (button == SYS_USB_CONNECTED)
+#ifdef BUTTON_REMOTE
+               || (button & BUTTON_REMOTE)
+#endif
+               ))
         {
             while (button_get(false)); /* clear button queue */
             display_keylock_text(true);
@@ -759,6 +764,7 @@ int wps_show(void)
 
         switch(button)
         {
+#ifdef BUTTON_ON
             case BUTTON_ON:
 #ifdef HAVE_RECORDER_KEYPAD
                 switch (on_screen()) {
@@ -795,10 +801,12 @@ int wps_show(void)
                 }
                 break;
 #endif
-
+#endif /* BUTTON_ON */
                 /* play/pause */
             case BUTTON_PLAY:
+#ifdef BUTTON_RC_PLAY
             case BUTTON_RC_PLAY:
+#endif
                 if ( paused )
                 {
                     paused = false;
@@ -830,7 +838,9 @@ int wps_show(void)
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #endif
+#ifdef BUTTON_RC_VOL_UP
             case BUTTON_RC_VOL_UP:
+#endif
                 global_settings.volume++;
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -844,7 +854,9 @@ int wps_show(void)
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #endif
+#ifdef BUTTON_RC_VOL_DOWN
             case BUTTON_RC_VOL_DOWN:
+#endif
                 global_settings.volume--;
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
@@ -860,7 +872,9 @@ int wps_show(void)
                 break;
 
                 /* prev / restart */
+#ifdef BUTTON_RC_LEFT
             case BUTTON_RC_LEFT:
+#endif
             case BUTTON_LEFT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
                 if ((button == (BUTTON_LEFT | BUTTON_REL)) &&
@@ -882,7 +896,9 @@ int wps_show(void)
                 break;
 
                 /* next */
+#ifdef BUTTON_RC_RIGHT
             case BUTTON_RC_RIGHT:
+#endif
             case BUTTON_RIGHT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
                 if ((button == (BUTTON_RIGHT | BUTTON_REL)) &&
@@ -893,7 +909,7 @@ int wps_show(void)
                 break;
 
                 /* menu key functions */
-#ifdef HAVE_PLAYER_KEYPAD
+#ifdef BUTTON_MENU
             case BUTTON_MENU:
 #else
             case BUTTON_F1:
@@ -922,8 +938,10 @@ int wps_show(void)
 #endif
 
                 /* stop and exit wps */
+#ifdef BUTTON_RC_STOP
             case BUTTON_RC_STOP:
-#ifdef HAVE_RECORDER_KEYPAD
+#endif
+#ifdef BUTTON_OFF
             case BUTTON_OFF:
 #else
             case BUTTON_STOP | BUTTON_REL:

@@ -67,7 +67,7 @@ static struct
     char* extension; /* extension for which the file type is recognized */
     int tree_attr; /* which identifier */
     int icon; /* the icon which shall be used for it, -1 if unknown */
-    /* To have it extendable, there could be more useful stuff in here, 
+    /* To have it extendable, there could be more useful stuff in here,
        like handler functions, plugin name, etc. */
 } filetypes[] = {
     { ".mp3", TREE_ATTR_MPA, File     },
@@ -140,7 +140,7 @@ void browse_root(void)
 #define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 /* position the entry-list starts at */
-#define LINE_X   0 
+#define LINE_X   0
 #define LINE_Y   (global_settings.statusbar ? 1 : 0)
 
 #define CURSOR_X (global_settings.scrollbar && \
@@ -213,13 +213,13 @@ static int compare(const void* p1, const void* p2)
 {
     struct entry* e1 = (struct entry*)p1;
     struct entry* e2 = (struct entry*)p2;
-    
+
     if (( e1->attr & ATTR_DIRECTORY ) == ( e2->attr & ATTR_DIRECTORY ))
         if (global_settings.sort_case)
             return strncmp(e1->name, e2->name, MAX_PATH);
         else
             return strncasecmp(e1->name, e2->name, MAX_PATH);
-    else 
+    else
         return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }
 
@@ -234,7 +234,7 @@ static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
 #endif
 
     /* if any file filter is on, strip the extension */
-    if (*dirfilter != SHOW_ALL && 
+    if (*dirfilter != SHOW_ALL &&
         !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
         char* dotpos = strrchr(name, '.');
@@ -277,35 +277,35 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
     DIR *dir = opendir(dirname);
     if(!dir)
         return NULL; /* not a directory */
-    
+
     name_buffer_length = 0;
     *buffer_full = false;
-    
+
     for ( i=0; i < max_files_in_dir; i++ ) {
         int len;
         struct dirent *entry = readdir(dir);
         struct entry* dptr = &dircache[i];
         if (!entry)
             break;
-        
+
         len = strlen(entry->d_name);
-        
+
         /* skip directories . and .. */
         if ((entry->attribute & ATTR_DIRECTORY) &&
-            (((len == 1) && 
+            (((len == 1) &&
             (!strncmp(entry->d_name, ".", 1))) ||
-            ((len == 2) && 
+            ((len == 2) &&
             (!strncmp(entry->d_name, "..", 2))))) {
             i--;
             continue;
         }
-        
+
         /* Skip FAT volume ID */
         if (entry->attribute & ATTR_VOLUME_ID) {
             i--;
             continue;
         }
-        
+
         /* filter out dotfiles and hidden files */
         if (*dirfilter != SHOW_ALL &&
             ((entry->d_name[0]=='.') ||
@@ -313,11 +313,11 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
             i--;
             continue;
         }
-        
+
         dptr->attr = entry->attribute;
-        
+
         /* check for known file types */
-        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) 
+        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) )
         {
             unsigned j;
             for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
@@ -361,7 +361,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
             i--;
             continue;
         }
-        
+
         if (len > name_buffer_size - name_buffer_length - 1) {
             /* Tell the world that we ran out of buffer space */
             *buffer_full = true;
@@ -514,8 +514,8 @@ static int showdir(char *path, int start, int *dirfilter)
             int offset=0;
             if ( line_height > 8 )
                 offset = (line_height - 8) / 2;
-            lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                       CURSOR_X * 6 + CURSOR_WIDTH, 
+            lcd_bitmap(bitmap_icons_6x8[icon_type],
+                       CURSOR_X * 6 + CURSOR_WIDTH,
                        MARGIN_Y+(i-start)*line_height + offset,
                        6, 8, true);
 #else
@@ -527,7 +527,7 @@ static int showdir(char *path, int start, int *dirfilter)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar && (filesindir > tree_max_on_screen)) 
+    if (global_settings.scrollbar && (filesindir > tree_max_on_screen))
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
                   LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
@@ -539,7 +539,7 @@ static int showdir(char *path, int start, int *dirfilter)
 static bool ask_resume(bool ask_once)
 {
     bool stop = false;
-    
+
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
 #endif
@@ -562,16 +562,20 @@ static bool ask_resume(bool ask_once)
     while (!stop) {
         switch (button_get(true)) {
             case BUTTON_PLAY:
+#ifdef BUTTON_RC_PLAY
             case BUTTON_RC_PLAY:
+#endif
                 return true;
 
+#ifdef BUTTON_ON
                 /* ignore the ON button, since it might
                    still be pressed since booting */
             case BUTTON_ON:
             case BUTTON_ON | BUTTON_REL:
             case BUTTON_ON | BUTTON_REPEAT:
                 break;
-                
+#endif
+
             case SYS_USB_CONNECTED:
                 usb_screen();
                 stop = true;
@@ -600,7 +604,7 @@ void resume_directory(char *dir)
             &buffer_full))
         return;
     lastdir[0] = 0;
-    
+
     build_playlist(0);
 }
 
@@ -635,7 +639,7 @@ static void start_resume(bool ask_once)
 
         if (!ask_resume(ask_once))
             return;
-        
+
         if (playlist_resume() != -1)
         {
             playlist_start(global_settings.resume_index,
@@ -680,7 +684,7 @@ void set_current_file(char *path)
         dirlevel            =  0;
         dirpos[dirlevel]    = -1;
         cursorpos[dirlevel] =  0;
-        
+
         /* use '/' to calculate dirlevel */
         for (i=1; i<strlen(path)+1; i++)
         {
@@ -711,9 +715,13 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
     while (!exit) {
         switch (button_get(true)) {
             case TREE_PREV:
+#ifdef BUTTON_RC_LEFT
             case BUTTON_RC_LEFT:
+#endif
+#ifdef BUTTON_ON
             case BUTTON_ON | TREE_PREV:
             case BUTTON_ON | TREE_PREV | BUTTON_REPEAT:
+#endif
                 used = true;
                 if ( dirstart ) {
                     dirstart -= tree_max_on_screen;
@@ -723,15 +731,19 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
                 else
                     dircursor = 0;
                 break;
-                
+
             case TREE_NEXT:
+#ifdef BUTTON_RC_RIGHT
             case BUTTON_RC_RIGHT:
+#endif
+#ifdef BUTTON_ON
             case BUTTON_ON | TREE_NEXT:
             case BUTTON_ON | TREE_NEXT | BUTTON_REPEAT:
+#endif
                 used = true;
                 if ( dirstart < numentries - tree_max_on_screen ) {
                     dirstart += tree_max_on_screen;
-                    if ( dirstart > 
+                    if ( dirstart >
                          numentries - tree_max_on_screen )
                         dirstart = numentries - tree_max_on_screen;
                 }
@@ -741,8 +753,13 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
 
 
             case BUTTON_PLAY:
+#ifdef BUTTON_RC_PLAY
             case BUTTON_RC_PLAY:
-            case BUTTON_ON | BUTTON_PLAY: {
+#endif
+#ifdef BUTTON_ON
+            case BUTTON_ON | BUTTON_PLAY:
+#endif
+            {
                 int onplay_result;
 
                 if (currdir[1])
@@ -768,12 +785,14 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
                 }
                 exit = true;
                 break;
-            }    
+            }
+#ifdef BUTTON_ON
             case BUTTON_ON | BUTTON_REL:
             case BUTTON_ON | TREE_PREV | BUTTON_REL:
             case BUTTON_ON | TREE_NEXT | BUTTON_REL:
                 exit = true;
                 break;
+#endif
         }
         if ( used && !exit ) {
 #ifdef HAVE_LCD_BITMAP
@@ -834,15 +853,15 @@ static bool dirbrowse(char *root, int *dirfilter)
         start_resume(true);
 
     numentries = showdir(currdir, dirstart, dirfilter);
-    if (numentries == -1) 
+    if (numentries == -1)
         return false;  /* currdir is not a directory */
-    
+
     if (*dirfilter > NUM_FILTER_MODES && numentries==0)
     {
         splash(HZ*2, 0, true, str(LANG_NO_FILES));
         return false;  /* No files found for rockbox_browser() */
     }
-    
+
     update_all = true;
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
@@ -873,7 +892,9 @@ static bool dirbrowse(char *root, int *dirfilter)
 
         switch ( button ) {
             case TREE_EXIT:
+#ifdef BUTTON_RC_STOP
             case BUTTON_RC_STOP:
+#endif
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
@@ -918,7 +939,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 #endif
                 settings_save();
                 break;
-                
+
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF | BUTTON_REPEAT:
 #else
@@ -932,10 +953,12 @@ static bool dirbrowse(char *root, int *dirfilter)
 
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
+#ifdef BUTTON_RC_PLAY
             case BUTTON_RC_PLAY:
+#endif
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
-            case BUTTON_PLAY | BUTTON_REPEAT: 
+            case BUTTON_PLAY | BUTTON_REPEAT:
 #endif
                 if ( !numentries )
                     break;
@@ -971,7 +994,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                                 play = true;
                             }
                             break;
-                        
+
                         case TREE_ATTR_MPA:
                             if (playlist_create(currdir, NULL) != -1)
                             {
@@ -981,14 +1004,14 @@ static bool dirbrowse(char *root, int *dirfilter)
                                 {
                                     start_index =
                                         playlist_shuffle(seed,start_index);
-                                    
+
                                     /* when shuffling dir.: play all files
                                        even if the file selected by user is
                                        not the first one */
                                     if (!global_settings.play_selected)
                                         start_index = 0;
                                 }
-                                
+
                                 playlist_start(start_index, 0);
                                 play = true;
                             }
@@ -1015,7 +1038,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             lcd_getstringsize("A", &fw, &fh);
                             tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
                             /* make sure cursor is on screen */
-                            while ( dircursor > tree_max_on_screen ) 
+                            while ( dircursor > tree_max_on_screen )
                             {
                                 dircursor--;
                                 dirstart++;
@@ -1043,7 +1066,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             /* chip-8 game */
                         case TREE_ATTR_CH8:
                             plugin_load("/.rockbox/rocks/chip8.rock",buf);
-                            break; 
+                            break;
 
                         case TREE_ATTR_FONT:
                             font_load(buf);
@@ -1070,7 +1093,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             /* ucl flash file */
                         case TREE_ATTR_UCL:
                             plugin_load("/.rockbox/rocks/rockbox_flash.rock",buf);
-                            break; 
+                            break;
 #endif
 
                             /* plugin file */
@@ -1109,7 +1132,9 @@ static bool dirbrowse(char *root, int *dirfilter)
 
             case TREE_PREV:
             case TREE_PREV | BUTTON_REPEAT:
+#ifdef BUTTON_RC_LEFT
             case BUTTON_RC_LEFT:
+#endif
                 if(filesindir) {
                     if(dircursor) {
                         put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
@@ -1147,7 +1172,9 @@ static bool dirbrowse(char *root, int *dirfilter)
 
             case TREE_NEXT:
             case TREE_NEXT | BUTTON_REPEAT:
+#ifdef BUTTON_RC_RIGHT
             case BUTTON_RC_RIGHT:
+#endif
                 if(filesindir)
                 {
                     if (dircursor + dirstart + 1 < numentries ) {
@@ -1155,7 +1182,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
                             dircursor++;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
-                        } 
+                        }
                         else {
                             dirstart++;
                             numentries = showdir(currdir, dirstart, dirfilter);
@@ -1168,7 +1195,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
                             dirstart = dircursor = 0;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
-                        } 
+                        }
                         else {
                             dirstart = dircursor = 0;
                             numentries = showdir(currdir, dirstart, dirfilter);
@@ -1190,6 +1217,8 @@ static bool dirbrowse(char *root, int *dirfilter)
                 }
                 break;
 
+#ifdef BUTTON_ON /* I bet the folks without ON-button want this to
+                    work on a different button */
             case BUTTON_ON:
                 if (handle_on(&dirstart, &dircursor, numentries,
                               tree_max_on_screen, dirfilter))
@@ -1216,6 +1245,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                     }
                 }
                 break;
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F2:
@@ -1254,7 +1284,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 
         if ( button )
             ata_spin();
-        
+
         /* do we need to rescan dir? */
         if (reload_dir || reload_root ||
             lastfilter != *dirfilter ||
@@ -1298,7 +1328,7 @@ static bool dirbrowse(char *root, int *dirfilter)
             numentries = showdir(currdir, dirstart, dirfilter);
             update_all = true;
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
-            
+
             need_update = true;
             reload_dir = false;
         }
@@ -1340,15 +1370,15 @@ static bool add_dir(char* dirname, int fd)
     bool abort = false;
     char buf[MAX_PATH/2]; /* saving a little stack... */
     DIR* dir;
-    
+
     /* check for user abort */
-#ifdef HAVE_PLAYER_KEYPAD
+#ifdef BUTTON_STOP
     if (button_get(false) == BUTTON_STOP)
 #else
     if (button_get(false) == BUTTON_OFF)
 #endif
         return true;
-    
+
     dir = opendir(dirname);
     if(!dir)
         return true;
@@ -1431,7 +1461,7 @@ bool create_playlist(void)
     add_dir(currdir[1] ? currdir : "/", fd);
     close(fd);
     sleep(HZ);
-    
+
     return true;
 }
 
@@ -1465,7 +1495,7 @@ void tree_init(void)
        use it until the next reboot. */
     max_files_in_dir = global_settings.max_files_in_dir;
     name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files_in_dir;
-    
+
     name_buffer = buffer_alloc(name_buffer_size);
     dircache = buffer_alloc(max_files_in_dir * sizeof(struct entry));
 }

@@ -29,7 +29,7 @@
 
 #define KEYBOARD_PAGES 3
 
-unsigned short *lcd_ascii;
+extern unsigned short *lcd_ascii;
 
 static unsigned short* kbd_setupkeys(int page, int* len)
 {
