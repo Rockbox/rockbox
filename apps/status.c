@@ -35,11 +35,13 @@
 
 static enum playmode current_mode = STATUS_STOP;
 
-long switch_tick;
-int  battery_charge_step = 0;
-#ifdef HAVE_LCD_BITMAP
-bool plug_state;
-bool battery_state;
+#if defined(HAVE_LCD_CHARCELLS) || defined(HAVE_CHARGE_CTRL)
+static long switch_tick;
+static int  battery_charge_step = 0;
+#ifdef HAVE_CHARGE_CTRL
+static bool plug_state;
+static bool battery_state;
+#endif
 #endif
 
 void status_init(void)

@@ -26,7 +26,7 @@
 
 long current_tick = 0;
 
-void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
+static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 static void tick_start(unsigned int interval_in_ms);
 

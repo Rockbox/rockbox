@@ -56,8 +56,8 @@
 
 #define NAME_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH * MAX_FILES_IN_DIR)
 
-char name_buffer[NAME_BUFFER_SIZE];
-int name_buffer_length;
+static char name_buffer[NAME_BUFFER_SIZE];
+static int name_buffer_length;
 struct entry {
     short attr; /* FAT attributes + file type flags */
     char *name;

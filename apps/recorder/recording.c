@@ -104,7 +104,7 @@ char *fmt_gain(int snd, int val, char *str, int len)
     return str;
 }
 
-int cursor;
+static int cursor;
 
 void adjust_cursor(void)
 {

@@ -67,11 +67,13 @@ static int get_unswapped_space(void);
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
 
-enum
+#ifdef HAVE_MAS3587F
+static enum
 {
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
+#endif
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
@@ -457,9 +459,9 @@ extern unsigned char mp3buf[];
 extern unsigned char mp3end[];
 
 static int mp3buflen;
-int mp3buf_write;
+static int mp3buf_write;
 static int mp3buf_swapwrite;
-int mp3buf_read;
+static int mp3buf_read;
 
 static int last_dma_chunk_size;
 
@@ -691,10 +693,12 @@ static void stop_dma(void)
 }
 
 #ifdef HAVE_MAS3587F
-long timing_info_index = 0;
-long timing_info[1024];
-bool inverted_pr;
-unsigned long num_rec_bytes;
+#ifdef DEBUG
+static long timing_info_index = 0;
+static long timing_info[1024];
+#endif
+static bool inverted_pr;
+static unsigned long num_rec_bytes;
 
 void drain_dma_buffer(void)
 {

@@ -64,7 +64,7 @@
 /**
  * All the properties that a worm has.
  */
-struct worm {
+static struct worm {
     /* The worm is stored in a ring of xy coordinates */
     char x[MAX_WORM_SEGMENTS];
     char y[MAX_WORM_SEGMENTS];

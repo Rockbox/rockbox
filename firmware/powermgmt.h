@@ -70,7 +70,6 @@ extern int charge_state;         /* tells what the charger is doing (for info di
 #define CURRENT_CHARGING  300    /* charging current */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
-void set_battery_capacity(int capacity); /* set local battery capacity value */
 
 /* Start up power management thread */
 void power_init(void);
@@ -85,6 +84,7 @@ int battery_time(void); /* minutes */
 bool battery_level_safe(void);
 
 void set_poweroff_timeout(int timeout);
+void set_battery_capacity(int capacity); /* set local battery capacity value */
 
 void set_sleep_timer(int seconds);
 int get_sleep_timer(void);
