@@ -688,11 +688,11 @@ static char* select_bookmark(const char* bookmark_file_name)
                 while (button_get(false)); /* clear button queue */
                 break;
 
-            case SETTINGS_DEC:
+            case SETTINGS_INC:
                 bookmark_id--;
                 break;
 
-            case SETTINGS_INC:
+            case SETTINGS_DEC:
                 bookmark_id++;
                 break;
 
