@@ -859,7 +859,7 @@ desc: repeat one song
 eng: "One"
 new: "Einen Titel"
 
-id: LANF_WEEKDAY_THURSDAY
+id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Do"

@@ -896,6 +896,8 @@ desc: confirm to reset settings
 eng: "OFF=Cancel"
 new:
 
+# NOTE: ignore this label.  It is no longer used/was an error.
+# We are aware of this and it will this instance will be removed in the future
 id: LANG_TETRIS_LEVEL
 
 id: LANG_TIMEFORMAT
@@ -933,7 +935,7 @@ desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new:
 
-id: LANF_WEEKDAY_THURSDAY
+id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new:

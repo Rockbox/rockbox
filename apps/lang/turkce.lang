@@ -883,8 +883,6 @@ desc: confirm to reset settings
 eng: "OFF=Cancel"
 new: "OFF=Iptal"
  
-id: LANG_TETRIS_LEVEL
- 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
@@ -920,7 +918,7 @@ desc: abbreviation for weekday
 eng: "Wed"
 new: "Çar"
  
-id: LANF_WEEKDAY_THURSDAY
+id: LANG_WEEKDAY_THURSDAY
 desc: abbreviation for weekday
 eng: "Thu"
 new: "Per"

@@ -884,7 +884,7 @@ desc: select the time format of time in status bar
 eng: "Time Format"
 new: "Tidsformat"
 
-id: LANF_WEEKDAY_THURSDAY
+id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Tor"
