@@ -184,7 +184,7 @@ bool recording_screen(void)
 
     set_gain();
 
-    lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(w, 8);
 
@@ -445,6 +445,7 @@ bool recording_screen(void)
     mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
 #endif
+    lcd_setfont(FONT_UI);
     return have_recorded;
 }
 
