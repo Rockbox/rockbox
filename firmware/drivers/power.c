@@ -27,7 +27,7 @@
 bool charger_inserted(void)
 {
 #ifdef ARCHOS_RECORDER
-    return adc_read(ADC_BATTERY) > 0x200;
+    return adc_read(ADC_EXT_POWER) > 0x200;
 #else
     return (PADR & 1) == 0;
 #endif
