@@ -7,32 +7,33 @@
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
 <li> <a href="battery-faq-liion.html">Frequently Asked Questions about V2/FM Batteries</a>
-<li> <a href="/screenshots/">Screenshots</a> of Rockbox.
-<li> <a href="/fonts/">Fonts to download</a>
-<li> <a href="/lang/">Language files and voice clips to download</a>
-</ul>
-<h2>For Advanced Users</h2>
-<ul>
 <li> <a href="nodo.html">Features We Will Not Implement</a>
-<li> <a href="features.html">Feature Comparison Chart</a>
-<li> <a href="custom_wps_format.html">How to make a custom WPS</a>
-<li> <a href="custom_cfg_format.html">How to make a custom config file</a>
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
-
-<li> External forums devoted to Archos: <a
+<li> <a href="/screenshots/">Screenshots</a> of Rockbox.
+<li> External web forums devoted to Archos: <a
 href="http://forums.funmp3players.com/forum/forum.asp?forum_id=8&forum_title=General+%2D+Jukebox+Player%2FRecorder">funmp3players.com</a>,
 <a href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000
 on yahoo</a> and <a
 href="http://www.newmp3technology.net/forum/">newmp3technology.net</a>.
 
+</ul>
+<h2>Customizing Rockbox</h2>
+<ul>
+<li> <a href="/fonts/">Fonts to download</a>
+<li> <a href="/lang/">Language files to download</a>
+<li> <a href="/voice/">Voice clips to download</a>
+<li> <a href="custom_wps_format.html">How to make a custom WPS</a>
+<li> <a href="custom_cfg_format.html">How to make a custom config file</a>
+</ul>
+<h2>For Advanced Users</h2>
+<ul>
+<li> <a href="features.html">Feature Comparison Chart</a>
 <li> Small help texts for your <a href="Help-JBR.txt">Recorder</A> or <a
 href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
 Archos. (Jean Boullier)
-
 <li><a href="license.html">The GNU General Public License</a> under which terms Rockbox may be distributed
 <li><a href="tools.html">Useful mp3 and jukebox related tools</a>
 <li><a href="rvf.html">How to Create RVF Movies</a>
-
 </ul>
 
 <h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">Hackers</a></h2>
