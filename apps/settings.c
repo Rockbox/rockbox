@@ -311,7 +311,7 @@ static const struct bit_entry hd_bits[] =
         "rec left gain", NULL }, /* 0...15 */
     {4, S_O(rec_right_gain), 2, /* 0dB */
         "rec right gain", NULL }, /* 0...15 */
-    {1, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
+    {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
 #endif
