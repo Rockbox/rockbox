@@ -227,6 +227,16 @@ YES
 NO
 EFEAT
 
+NAME Queue songs to play next ENAME
+YES
+YES
+EFEAT
+
+NAME Bookmark positions in songs ENAME
+NO
+NO
+EFEAT
+
 </table>
 
 <p>
