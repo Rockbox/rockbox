@@ -21,6 +21,13 @@
 
 #ifdef HAVE_FMRADIO
 bool radio_screen(void);
+
+struct fmstation
+{
+    int frequency; /* In Hz */
+    char name[28];
+};
+
 #endif
 
 #endif
