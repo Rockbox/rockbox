@@ -751,17 +751,17 @@ bool wps_display(struct mp3entry* id3)
         if (!wps_loaded) {
             if ( !format_buffer[0] ) {
 #ifdef HAVE_LCD_BITMAP
-                wps_format("%s%fp\n"
-                           "%it\n"
-                           "%id\n"
-                           "%ia\n"
-                           "%fb kbit %fv\n"
-                           "Time: %pc / %pt\n"
+                wps_format("%s%?it<%?in<%in. |>%it|%fn>\n"
+                           "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+                           "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
+                           "\n"
+                           "%pc/%pt [%pp:%pe]\n"
+                           "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
                            "%pb\n"
                            "%pm\n");
 #else
-                wps_format("%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>\n"
-                           "%pc%pb%pt\n");
+                wps_format("%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
+                           "%pc%?ps<*|/>%pt\n");
 #endif
             }
         }
