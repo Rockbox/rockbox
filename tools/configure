@@ -180,7 +180,7 @@ if [ -z "$target" ]; then
   esac
 fi
 
-if [ "-" == "$extra_defines" ]; then
+if [ "-" = "$extra_defines" ]; then
  if [  "-DARCHOS_RECORDER" = "$target" ] ; then
   
   echo "Loadable fonts support? (N)"
