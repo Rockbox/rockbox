@@ -151,6 +151,7 @@ Rest of config block, only saved to disk:
 *************************************/
 
 #include "rtc.h"
+long lasttime = 0;
 static unsigned char config_block[CONFIG_BLOCK_SIZE];
 
 /*
@@ -372,7 +373,6 @@ int settings_save( void )
          ((global_settings.trickle_charge & 1) << 4));
 
     {
-        static long lasttime = 0;
         int elapsed_secs;
 
         elapsed_secs = (current_tick - lasttime) / HZ;

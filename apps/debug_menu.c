@@ -1148,6 +1148,16 @@ static bool view_runtime(void)
 #endif
 
         if (state & 1) {
+            if (charger_inserted())
+            {
+                global_settings.runtime = 0;
+            }
+            else
+            {
+                global_settings.runtime += ((current_tick - lasttime) / HZ);
+            }
+            lasttime = current_tick;
+
             t = global_settings.runtime;
             lcd_puts(0, y++, "Current time");
         }
@@ -1162,7 +1172,7 @@ static bool view_runtime(void)
         lcd_update();
 
         /* Wait for a key to be pushed */
-        key = button_get_w_tmo(HZ*5);
+        key = button_get_w_tmo(HZ);
         switch(key) {
 #ifdef HAVE_PLAYER_KEYPAD
             case BUTTON_STOP | BUTTON_REL:

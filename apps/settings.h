@@ -201,6 +201,7 @@ extern struct user_settings global_settings;
 /* name of directory where configuration, fonts and other data
  * files are stored */
 extern char rockboxdir[];
+extern long lasttime;
 
 /* system defines */
 

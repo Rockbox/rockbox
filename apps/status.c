@@ -137,12 +137,16 @@ void status_draw(bool force_redraw)
             plug_state = true;
 #ifdef HAVE_CHARGE_CTRL
             /* zero battery run time if charging */
-            if (charge_state > 0)
+            if (charge_state > 0) {
                 global_settings.runtime = 0;
+                lasttime = current_tick;
+            }
             
             /* animate battery if charging */
             if (charge_state == 1) {
 #else
+            global_settings.runtime = 0;
+            lasttime = current_tick;
             {
 #endif
                 /* animate in three steps (34% per step for a better look) */
