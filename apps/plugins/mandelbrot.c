@@ -38,10 +38,10 @@ static int delta;
 static int max_iter;
 
 void init_mandelbrot_set(void){
-    x_min = -5<<27;  // -2.5<<28
-    x_max =  1<<28;  //  1.0<<28
-    y_min = -1<<28;  // -1.0<<28
-    y_max =  1<<28;  //  1.0<<28
+    x_min = -5<<25;  // -2.5<<26
+    x_max =  1<<26;  //  1.0<<26
+    y_min = -1<<26;  // -1.0<<26
+    y_max =  1<<26;  //  1.0<<26
     delta = (x_max - x_min) >> 3;  // /8
     max_iter = 25;
 }
@@ -71,12 +71,12 @@ void calc_mandelbrot_set(void){
             n_iter = 0;
             
             while (++n_iter<=max_iter) {
-                x >>= 14;
-                y >>= 14;
+                x >>= 13;
+                y >>= 13;
                 x2 = x * x;
                 y2 = y * y;
                 
-                if (x2 + y2 > (4<<28)) break;
+                if (x2 + y2 > (4<<26)) break;
                 
                 y = 2 * x * y + b;
                 x = x2 - y2 + a;
@@ -114,7 +114,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     init_mandelbrot_set();
-    lcd_aspect_ratio = ((LCD_WIDTH<<14) / LCD_HEIGHT)<<14;
+    lcd_aspect_ratio = ((LCD_WIDTH<<13) / LCD_HEIGHT)<<13;
 
     /* main loop */
     while (true){
@@ -132,8 +132,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 	        return PLUGIN_OK;
 
 	    case BUTTON_ON:
-	        x_min -= ((delta>>14)*(lcd_aspect_ratio>>14));
-	        x_max += ((delta>>14)*(lcd_aspect_ratio>>14));
+	        x_min -= ((delta>>13)*(lcd_aspect_ratio>>13));
+	        x_max += ((delta>>13)*(lcd_aspect_ratio>>13));
 	        y_min -= delta;
 	        y_max += delta;
 	        delta = (x_max - x_min) >> 3;
@@ -141,8 +141,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
  	        
 
 	    case BUTTON_PLAY:
-	        x_min += ((delta>>14)*(lcd_aspect_ratio>>14));
-	        x_max -= ((delta>>14)*(lcd_aspect_ratio>>14));
+	        x_min += ((delta>>13)*(lcd_aspect_ratio>>13));
+	        x_max -= ((delta>>13)*(lcd_aspect_ratio>>13));
 	        y_min += delta;
 	        y_max -= delta;
 	        delta = (x_max - x_min) >> 3;
