@@ -146,6 +146,18 @@ int x11_mkdir(const char *name, mode_t mode)
     return (mkdir)(name, 0666);
 }
 
+int x11_rmdir(const char *name)
+{
+    char buffer[256]; /* sufficiently big */
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        
+        debugf("We remove the real directory '%s'\n", buffer);
+        return (rmdir)(buffer);
+    }
+    return (rmdir)(name);
+}
+
 int x11_remove(char *name)
 {
     char buffer[256]; /* sufficiently big */

@@ -42,6 +42,7 @@ extern int x11_mkdir(char *name, int mode);
 #define readdir(x) x11_readdir(x)
 #define closedir(x) x11_closedir(x)
 #define mkdir(x, y) x11_mkdir(x, y)
+#define rmdir(x) x11_rmdir(x)
 
 #endif
 
