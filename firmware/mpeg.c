@@ -2418,6 +2418,8 @@ void mpeg_new_file(const char *filename)
 
     /* Store the current time */
     record_start_time = current_tick;
+    if(paused)
+       pause_start_time = record_start_time;
 
     queue_post(&mpeg_queue, MPEG_NEW_FILE, NULL);
 }
