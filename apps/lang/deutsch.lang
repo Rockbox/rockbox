@@ -843,8 +843,8 @@ new: "einmalig fragen"
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-voice: "Batterie-Anzeige"
-new: "Batterie-Anzeige"
+voice: "Batterieanzeige"
+new: "Batterieanzeige"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title

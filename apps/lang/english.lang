@@ -2928,7 +2928,7 @@ new:
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
-eng: "Battery type"
+eng: "Battery Type"
 voice: "Battery type"
 new:
 
