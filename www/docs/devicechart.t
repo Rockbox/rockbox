@@ -31,6 +31,14 @@
     <td>2.0</td>
     <td>2.0</td>
 </tr>
+<tr><th><b>Bumper Colors</b></th>
+    <td>Blue</td>
+    <td>Blue</td>
+    <td>Blue</td>
+    <td>Blue or Black</td>
+    <td>Blue</td>
+    <td>Blue</td>
+</tr>
 <tr><th><b>S/PDIF</b></th>
     <td>No</td>
     <td>No</td>
@@ -169,7 +177,11 @@
 </tr>
 </table>
 <p>
- <a name=footnote1></a><i>(1) It is hard to tell if the recorder is old, but the Rec6 and Rec10 are old. I don't yet know about the Rec15.</i>
+
+ <a name=footnote1></a><i>(1) It is hard to tell if the recorder is old, but
+ the Rec6 and Rec10 are old. The Rec15 seems to be available in both new and
+ old versions.</i>
+
  <br>
  <a name=footnote2></a><i>(2) The old player has a limited LCD with no
    support for double line height and only four user definable characters
