@@ -14,6 +14,8 @@ remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
+<p><i>2004-03-11</i>: Version 2.2 is <a href="/download/">released</a>
+
 <p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
 
 <p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works
