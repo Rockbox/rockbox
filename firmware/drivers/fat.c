@@ -165,6 +165,7 @@ struct bpb
 
 static struct bpb fat_bpb;
 
+static int update_fsinfo(void);
 static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
@@ -341,23 +342,7 @@ int fat_mount(int startsector)
     /* calculate freecount if unset */
     if ( fat_bpb.fsinfo.freecount == 0xffffffff )
     {
-        int free = 0;
-        for (i = 0; i<fat_bpb.fatsize; i++) {
-            unsigned int j;
-            unsigned int* fat = cache_fat_sector(i);
-            for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
-                unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
-                if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
-                    break;
-
-                if (!(SWAB32(fat[j]) & 0x0fffffff)) {
-                    free++;
-                    if ( fat_bpb.fsinfo.nextfree == 0xffffffff )
-                        fat_bpb.fsinfo.nextfree = c;
-                }
-            }
-        }
-        fat_bpb.fsinfo.freecount = free;
+        fat_recalc_free();
     }
 
     LDEBUGF("Freecount: %d\n",fat_bpb.fsinfo.freecount);
@@ -367,6 +352,29 @@ int fat_mount(int startsector)
     LDEBUGF("FAT sectors: %x\n",fat_bpb.fatsize);
 
     return 0;
+}
+
+void fat_recalc_free(void)
+{
+    int free = 0;
+    unsigned i;
+    for (i = 0; i<fat_bpb.fatsize; i++) {
+        unsigned int j;
+        unsigned int* fat = cache_fat_sector(i);
+        for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
+            unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
+            if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
+                break;
+      
+            if (!(SWAB32(fat[j]) & 0x0fffffff)) {
+                free++;
+                if ( fat_bpb.fsinfo.nextfree == 0xffffffff )
+                    fat_bpb.fsinfo.nextfree = c;
+            }
+        }
+    }
+    fat_bpb.fsinfo.freecount = free;
+    update_fsinfo();
 }
 
 static int bpb_is_sane(void)
@@ -572,15 +580,41 @@ static int get_next_cluster(unsigned int cluster)
         return next_cluster;
 }
 
+static int update_fsinfo(void)
+{
+    unsigned char fsinfo[SECTOR_SIZE];
+    unsigned int* intptr;
+    int err;
+    
+    /* update fsinfo */
+    err = ata_read_sectors(fat_bpb.startsector + fat_bpb.bpb_fsinfo, 1,fsinfo);
+    if (err)
+    {
+        DEBUGF( "flush_fat() - Couldn't read FSInfo (error code %d)\n", err);
+        return -1;
+    }
+    intptr = (int*)&(fsinfo[FSINFO_FREECOUNT]);
+    *intptr = SWAB32(fat_bpb.fsinfo.freecount);
+
+    intptr = (int*)&(fsinfo[FSINFO_NEXTFREE]);
+    *intptr = SWAB32(fat_bpb.fsinfo.nextfree);
+
+    err = ata_write_sectors(fat_bpb.startsector + fat_bpb.bpb_fsinfo,1,fsinfo);
+    if (err)
+    {
+        DEBUGF( "flush_fat() - Couldn't write FSInfo (error code %d)\n", err);
+        return -2;
+    }
+
+    return 0;
+}
+
 static int flush_fat(void)
 {
     int i;
     int err;
     unsigned char *sec;
     int secnum;
-    unsigned char fsinfo[SECTOR_SIZE];
-    unsigned int* intptr;
-
     LDEBUGF("flush_fat()\n");
 
     for(i = 0;i < FAT_CACHE_SIZE;i++)
@@ -615,25 +649,8 @@ static int flush_fat(void)
         }
     }
 
-    /* update fsinfo */
-    err = ata_read_sectors(fat_bpb.startsector + fat_bpb.bpb_fsinfo, 1,fsinfo);
-    if (err)
-    {
-        DEBUGF( "flush_fat() - Couldn't read FSInfo (error code %d)\n", err);
+    if (update_fsinfo())
         return -3;
-    }
-    intptr = (int*)&(fsinfo[FSINFO_FREECOUNT]);
-    *intptr = SWAB32(fat_bpb.fsinfo.freecount);
-
-    intptr = (int*)&(fsinfo[FSINFO_NEXTFREE]);
-    *intptr = SWAB32(fat_bpb.fsinfo.nextfree);
-
-    err = ata_write_sectors(fat_bpb.startsector + fat_bpb.bpb_fsinfo,1,fsinfo);
-    if (err)
-    {
-        DEBUGF( "flush_fat() - Couldn't write FSInfo (error code %d)\n", err);
-        return -4;
-    }
 
     return 0;
 }

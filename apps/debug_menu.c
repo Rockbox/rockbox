@@ -40,6 +40,7 @@
 #include "mpeg.h"
 #include "settings.h"
 #include "ata.h"
+#include "fat.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1149,7 +1150,16 @@ static bool dbg_disk_info(void)
             lcd_puts(0, y++, buf);
             break;
 
-        case 3:
+        case 3: {
+            unsigned int free;
+            fat_size( NULL, &free );
+            snprintf(buf, sizeof buf, "%d MB",  free / 1024 );
+            lcd_puts(0, y++, "Free");
+            lcd_puts(0, y++, buf);
+            break;
+        }
+
+        case 4:
             snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
             lcd_puts(0, y++, "Spinup time");
             lcd_puts(0, y++, buf);
@@ -1176,6 +1186,17 @@ static bool dbg_disk_info(void)
             case BUTTON_RIGHT:
                 if (++page > max_page)
                     page = 0;
+                break;
+
+            case BUTTON_PLAY:
+                if (page == 3) {
+                    mpeg_stop(); /* stop playback, to avoid disk access */
+                    lcd_clear_display();
+                    lcd_puts(0,0,"Scanning");
+                    lcd_puts(0,1,"disk...");
+                    lcd_update();
+                    fat_recalc_free();
+                }
                 break;
         }
         lcd_stop_scroll();

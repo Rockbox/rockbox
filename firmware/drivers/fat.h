@@ -69,6 +69,7 @@ struct fat_dir
 
 extern int fat_mount(int startsector);
 extern void fat_size(unsigned int* size, unsigned int* free);
+extern void fat_recalc_free(void);
 
 extern int fat_create_dir(unsigned int currdir, char *name);
 extern int fat_startsector(void);
