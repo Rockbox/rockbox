@@ -17,7 +17,30 @@
  *
  ****************************************************************************/
 
+#ifndef __STDBOOL_H__
+#define __STDBOOL_H__   1
+
+#ifndef __MINGW32__
 typedef unsigned int bool;
+#define __attribute__(s)
+
 #define true        1
 #define false       0
-#define __attribute__(s)
+#else
+
+typedef enum
+{
+  false = 0,
+  true = 1
+} bool;
+
+#define false   false
+#define true    true
+
+/* Signal that all the definitions are present.  */
+#define __bool_true_false_are_defined   1
+
+#endif
+
+#endif /* __STDBOOL_H__ */
+

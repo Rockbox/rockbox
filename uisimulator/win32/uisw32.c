@@ -26,6 +26,10 @@
 #include "thread-win32.h"
 #include "kernel.h"
 
+#ifndef LR_VGACOLOR             /* Should be under MINGW32 builds? */
+#define LR_VGACOLOR LR_COLOR
+#endif
+
 // extern functions
 extern void                 app_main (void *); // mod entry point
 extern void					new_key(int key);

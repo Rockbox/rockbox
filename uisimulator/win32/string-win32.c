@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#ifndef __MINGW32__
+
 #include <string.h>
 
 int strcasecmp (const char *a, const char *b)
@@ -28,3 +30,5 @@ int strncasecmp (const char *a, const char *b)
 {
     return strcmpi (a, b);
 }
+
+#endif
