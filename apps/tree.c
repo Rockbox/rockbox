@@ -374,7 +374,7 @@ static int showdir(char *path, int start)
                 break;
 
             case TREE_ATTR_LNG:
-                icon_type = Wps; /* for now */
+                icon_type = Language;
                 break;
 
             case TREE_ATTR_MOD:

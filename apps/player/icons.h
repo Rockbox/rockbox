@@ -24,8 +24,8 @@
 
 #ifdef HAVE_LCD_CHARCELLS
 
-enum icons_6x8 {
-    Unknown, File, Folder, Playlist, Wps, Mod_Ajz, 
+enum {
+    Unknown, File, Folder, Playlist, Wps, Mod_Ajz, Language,
     LastTreeIcon
 };
 
