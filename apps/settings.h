@@ -122,7 +122,7 @@ struct user_settings
     int resume_first_index;  /* index of first track in playlist */
     int resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
-                                        >0=shuffled) */
+                          >0=shuffled) */
 
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
@@ -268,7 +268,7 @@ extern char rec_base_directory[];
 #define MIN_CONTRAST_SETTING        5
 #define DEFAULT_INVERT_SETTING    false
 #define DEFAULT_INVERT_CURSOR_SETTING false
-#define DEFAULT_POWEROFF_SETTING    0
+#define DEFAULT_POWEROFF_SETTING    10
 #define DEFAULT_BACKLIGHT_TIMEOUT_SETTING   5
 #define DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING   0
 #define DEFAULT_FF_REWIND_MIN_STEP  FF_REWIND_1000
