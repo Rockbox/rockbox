@@ -101,7 +101,17 @@ bool snow(void)
         snow_move();
         lcd_update();
         sleep(HZ/20);
-        if (button_get(false))
+        
+        if (button_get(false) == BUTTON_OFF)
             return false;
     }
 }
+
+
+
+
+
+
+
+
+
