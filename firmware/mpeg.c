@@ -91,7 +91,7 @@ static int minval[] =
     -50,  /* Balance */
     0,    /* Loudness */
     0,    /* Bass boost */
-    0,    /* AVC */
+    -1,    /* AVC */
     0     /* Channels */
 };
 
@@ -108,7 +108,7 @@ static int maxval[] =
     50,    /* Balance */
     17,    /* Loudness */
     10,    /* Bass boost */
-    0,     /* AVC */
+    3,     /* AVC */
     3      /* Channels */
 };
 
