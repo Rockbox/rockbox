@@ -625,7 +625,6 @@ bool f3_screen(void)
                 global_settings.flip_display = !global_settings.flip_display;
                 button_set_flip(global_settings.flip_display);
                 lcd_set_flip(global_settings.flip_display);
-                //lcd_update(); /* need to refresh */
                 used = true;
                 break;
 
