@@ -64,6 +64,7 @@ static int get_unswapped_space(void);
 #define MPEG_TRACK_CHANGE 101
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
+#define MPEG_REC_TIMEOUT  104
 
 enum
 {
@@ -643,19 +644,31 @@ static void dma_tick(void)
     else
     {
         int i;
+        int x;
         int num_bytes = 0;
         if(recording && (PBDR & 0x4000))
         {
             timing_info[timing_info_index++] = current_dma_tick;
             TCNT2 = 0;
-            for(i = 0;i < 30;i++)
+            for(i = 0;i < 30 && (PBDR & 0x4000);i++)
             {
                 if(read_hw_mask() & PR_ACTIVE_HIGH)
                     PADR |= 0x800;
                 else
                     PADR &= ~0x800;
+
+                for(x = 2000;PBDR & 0x8000 && x;x--) {};
+
+                if(x == 0)
+                {
+                    queue_post(&mpeg_queue, MPEG_REC_TIMEOUT, (void *)0);
+                    if(read_hw_mask() & PR_ACTIVE_HIGH)
+                        PADR &= ~0x800;
+                    else
+                        PADR |= 0x800;
+                    break;
+                }
                     
-                while(PBDR & 0x8000) {};
                 mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
                 
                 if(read_hw_mask() & PR_ACTIVE_HIGH)
@@ -668,7 +681,17 @@ static void dma_tick(void)
                     mp3buf_write = 0;
                 
                 num_bytes++;
-                while(!(PBDR & 0x8000)) {};
+                
+                for(x = 2000;!(PBDR & 0x8000) && x;x--) {};
+                if(x == 0)
+                {
+                    queue_post(&mpeg_queue, MPEG_REC_TIMEOUT, (void *)1);
+                    if(read_hw_mask() & PR_ACTIVE_HIGH)
+                        PADR &= ~0x800;
+                    else
+                        PADR |= 0x800;
+                    break;
+                }
             }
             timing_info[timing_info_index++] = TCNT2 + (num_bytes << 16);
 
@@ -1568,6 +1591,12 @@ static void mpeg_thread(void)
                         /* Save the remaining data in the buffer */
                         stop_pending = true;
                         queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                        break;
+
+                    case MPEG_REC_TIMEOUT:
+                        if(mpeg_file >= 0)
+                            close(mpeg_file);
+                        panicf("Timeout: %d", (int)ev.data);
                         break;
                         
                     case MPEG_STOP_DONE:
