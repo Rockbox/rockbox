@@ -30,7 +30,7 @@ int button_get (bool block);
 int button_get_w_tmo(int ticks);
 int button_status(void);
 void button_clear_queue(void);
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
+#ifdef HAVE_LCD_BITMAP
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 
@@ -38,76 +38,76 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 bool button_hold(void);
 #endif
 
-#define	BUTTON_NONE		0x0000
+#define  BUTTON_NONE          0x0000
 
 /* Shared button codes */
-#define	BUTTON_LEFT		0x0040
-#define	BUTTON_RIGHT		0x0080
+#define  BUTTON_LEFT          0x0040
+#define  BUTTON_RIGHT         0x0080
 
 /* Button modifiers */
-#define	BUTTON_REMOTE		0x2000
-#define	BUTTON_REPEAT		0x4000
-#define	BUTTON_REL		0x8000
+#define  BUTTON_REMOTE        0x2000
+#define  BUTTON_REPEAT        0x4000
+#define  BUTTON_REL           0x8000
 
 /* remote control buttons */
-#define BUTTON_RC_VOL_UP        (0x0008 | BUTTON_REMOTE)
-#define BUTTON_RC_VOL_DOWN      (0x0800 | BUTTON_REMOTE)
-#define BUTTON_RC_LEFT          (BUTTON_LEFT | BUTTON_REMOTE)
-#define BUTTON_RC_RIGHT         (BUTTON_RIGHT| BUTTON_REMOTE)
+#define  BUTTON_RC_VOL_UP     (0x0008 | BUTTON_REMOTE)
+#define  BUTTON_RC_VOL_DOWN   (0x0800 | BUTTON_REMOTE)
+#define  BUTTON_RC_LEFT       (BUTTON_LEFT | BUTTON_REMOTE)
+#define  BUTTON_RC_RIGHT      (BUTTON_RIGHT| BUTTON_REMOTE)
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 
 /* iRiver H100 specific button codes */
-#define BUTTON_SELECT           0x0100
-#define BUTTON_MODE             0x0200
-#define BUTTON_REC              0x0400
-#define	BUTTON_ON		0x0001
-#define	BUTTON_OFF		0x0002
-#define	BUTTON_UP		0x0010
-#define	BUTTON_DOWN		0x0020
+#define  BUTTON_SELECT        0x0100
+#define  BUTTON_MODE          0x0200
+#define  BUTTON_REC           0x0400
+#define  BUTTON_ON            0x0001
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
 /* Recorder specific button codes */
-#define	BUTTON_ON		0x0001
-#define	BUTTON_OFF		0x0002
-#define	BUTTON_PLAY		0x0004
-#define	BUTTON_UP		0x0010
-#define	BUTTON_DOWN		0x0020
-#define	BUTTON_F1		0x0100
-#define	BUTTON_F2		0x0200
-#define	BUTTON_F3		0x0400
+#define  BUTTON_ON            0x0001
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_PLAY          0x0004
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+#define  BUTTON_F1            0x0100
+#define  BUTTON_F2            0x0200
+#define  BUTTON_F3            0x0400
 
-#define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
-#define BUTTON_RC_STOP          (BUTTON_OFF | BUTTON_REMOTE)
+#define  BUTTON_RC_PLAY       (BUTTON_PLAY | BUTTON_REMOTE)
+#define  BUTTON_RC_STOP       (BUTTON_OFF | BUTTON_REMOTE)
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
 /* Jukebox 6000 and Studio specific button codes */
-#define	BUTTON_ON		0x0001
-#define	BUTTON_MENU		0x0002
-#define	BUTTON_PLAY		0x0010
-#define	BUTTON_STOP		0x0020
+#define  BUTTON_ON            0x0001
+#define  BUTTON_MENU          0x0002
+#define  BUTTON_PLAY          0x0010
+#define  BUTTON_STOP          0x0020
 
-#define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
-#define BUTTON_RC_STOP          (BUTTON_STOP | BUTTON_REMOTE)
+#define  BUTTON_RC_PLAY       (BUTTON_PLAY | BUTTON_REMOTE)
+#define  BUTTON_RC_STOP       (BUTTON_STOP | BUTTON_REMOTE)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
 /* Ondio specific button codes */
-#define	BUTTON_OFF		0x0002
-#define	BUTTON_UP		0x0010
-#define	BUTTON_DOWN		0x0020
-#define	BUTTON_MENU		0x0100
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+#define  BUTTON_MENU          0x0100
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 
-#define	BUTTON_ON		0x0001
-#define	BUTTON_CANCEL		0x0002
-#define	BUTTON_PLAY		0x0004
-#define	BUTTON_UP		0x0010
-#define	BUTTON_DOWN		0x0020
-#define	BUTTON_MENU		0x0100
+#define  BUTTON_ON            0x0001
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_PLAY          0x0004
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+#define  BUTTON_MENU          0x0100
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 

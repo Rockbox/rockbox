@@ -465,20 +465,20 @@ static int button_read(void)
 #elif CONFIG_KEYPAD == GMINI100_PAD
 
     if (adc_read(7) < 0x80)
-      btn |= BUTTON_LEFT;
+        btn |= BUTTON_LEFT;
     else if (adc_read(7) < 0x168)
-      btn |= BUTTON_DOWN;
+        btn |= BUTTON_DOWN;
     else if (adc_read(7) < 0x260)
-      btn |= BUTTON_RIGHT;
+        btn |= BUTTON_RIGHT;
     else if (adc_read(7) < 0x360)
-      btn |= BUTTON_UP;
+        btn |= BUTTON_UP;
 
     if (adc_read(6) < 0x240)
-      btn |= BUTTON_CANCEL;
+        btn |= BUTTON_OFF;
     else if (adc_read(6) < 0x280)
-      btn |= BUTTON_PLAY;
+        btn |= BUTTON_PLAY;
     else if (adc_read(6) < 0x300)
-      btn |= BUTTON_MENU;
+        btn |= BUTTON_MENU;
 
 
 #endif /* CONFIG_KEYPAD */
