@@ -566,9 +566,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             
             if (flags.player_progress) {
 #ifdef HAVE_LCD_CHARCELLS
-#ifndef SIMULATOR
                 draw_player_progress(id3, ff_rewind_count);
-#endif
 #else
                 int w,h;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
