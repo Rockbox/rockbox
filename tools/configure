@@ -35,7 +35,7 @@ coldfirecc () {
  AR=m68k-elf-ar
  AS=m68k-elf-as
  OC=m68k-elf-objcopy
- GCCOPTS="$CCOPTS -m5200 -Wa\,-m5249"
+ GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
@@ -328,7 +328,7 @@ if [ -z "$archos" ]; then
     coldfirecc
     tool="cp"
     output="rockbox.iriver"
-    appextra=""
+    appextra="recorder"
     archosrom=""
     flash=""
     plugins=""
