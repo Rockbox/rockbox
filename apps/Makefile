@@ -25,15 +25,16 @@ TARGET = -DARCHOS_PLAYER_OLD=1
 # store output files in this directory:
 OBJDIR = .
 
+CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
+AFLAGS += -small -relax
+
 ifdef DEBUG
     DEFINES := -DDEBUG
+    CFLAGS += -g
     LDS := $(FIRMWARE)/gdb.lds
 else
     LDS := $(FIRMWARE)/app.lds
 endif
-
-CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
-AFLAGS += -small -relax
 
 SRC := $(wildcard *.c)
 
@@ -46,7 +47,7 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 all : $(OBJDIR)/archos.mod # archos.asm 
 
 $(OBJDIR)/librockbox.a:
-	make -C $FIRMWARE OBJDIR=$(OBJDIR)
+	make -C $(FIRMWARE) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
