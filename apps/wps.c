@@ -45,7 +45,7 @@
                                 /* 3% of 30min file == 54s step size */
 
 #ifdef HAVE_RECORDER_KEYPAD
-#define RELEASE_MASK (BUTTON_F1 | BUTTON_F2 | BUTTON_F3 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP)
+#define RELEASE_MASK (BUTTON_F1 | BUTTON_F2 | BUTTON_F3 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP | BUTTON_ON | BUTTON_PLAY )
 #else
 #define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_PLAY)
 #endif
@@ -624,6 +624,120 @@ static bool menu(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
+/* returns:
+   0 if no key was pressed
+   1 if a key was pressed (or if ON was held down long enough to repeat)
+   2 if USB was connected */
+int on_screen(void)
+{
+    static int pitch = 100;
+    bool exit = false;
+    bool used = false;
+#ifdef SIMULATOR
+    bool draw = true;
+#else
+    bool draw = false;
+#endif
+
+    while (!exit) {
+
+        if ( draw ) {
+            char* ptr;
+            char buf[32];
+            int w, h;
+
+            lcd_scroll_pause();
+            lcd_clear_display();
+
+            ptr = "Pitch up";
+            lcd_getstringsize(ptr,FONT_UI,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr, FONT_UI);
+            lcd_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                       LCD_WIDTH/2 - 3, h*2, 7, 8, true);
+
+            snprintf(buf, sizeof buf, "%d%%", pitch);
+            lcd_getstringsize(buf,FONT_UI,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, h, buf, FONT_UI);
+
+            ptr = "Pitch down";
+            lcd_getstringsize(ptr,FONT_UI,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr, FONT_UI);
+            lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                       LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+
+            ptr = "Pause";
+            lcd_getstringsize(ptr,FONT_UI,&w,&h);
+            lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr, FONT_UI);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Pause],
+                       (LCD_WIDTH-(w/2))/2-10, LCD_HEIGHT/2 - h/2, 7, 8, true);
+
+            lcd_update();
+        }
+
+        /* use lastbutton, so the main loop can decide whether to
+           exit to browser or not */
+        switch (button_get(true)) {
+            case BUTTON_UP:
+            case BUTTON_ON | BUTTON_UP:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
+                used = true;
+                pitch++;
+                if ( pitch > 200 )
+                    pitch = 200;
+#ifdef HAVE_MAS3587F
+                mpeg_set_pitch(pitch);
+#endif
+                break;
+
+            case BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
+                used = true;
+                pitch--;
+                if ( pitch < 50 )
+                    pitch = 50;
+#ifdef HAVE_MAS3587F
+                mpeg_set_pitch(pitch);
+#endif
+                break;
+
+            case BUTTON_ON | BUTTON_PLAY:
+                mpeg_pause();
+                used = true;
+                break;
+
+            case BUTTON_PLAY | BUTTON_REL:
+                mpeg_resume();
+                used = true;
+                break;
+
+#ifdef SIMULATOR
+            case BUTTON_ON:
+#else
+            case BUTTON_ON | BUTTON_REL:
+#endif
+                exit = true;
+                break;
+
+            case BUTTON_ON | BUTTON_REPEAT:
+                draw = true;
+                used = true;
+                break;
+
+#ifndef SIMULATOR
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                return 2;
+#endif
+        }
+    }
+
+    if ( used )
+        return 1;
+    else
+        return 0;
+}
+
 bool f2_screen(void)
 {
     bool exit = false;
@@ -764,12 +878,14 @@ bool f3_screen(void)
 int wps_show(void)
 {
     int button, lastbutton = 0;
+    int old_repeat_mask;
     bool ignore_keyup = true;
     bool restore = false;
 
     id3 = NULL;
 
     old_release_mask = button_set_release(RELEASE_MASK);
+    old_repeat_mask = button_set_repeat(~0);
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon(ICON_AUDIO, true);
@@ -807,19 +923,36 @@ int wps_show(void)
         
         switch(button)
         {
-            /* exit to dir browser */
             case BUTTON_ON:
-#ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_RECORD, false);
-                lcd_icon(ICON_AUDIO, false);
-#endif
-                /* set dir browser to current playing song */
-                if (global_settings.browse_current && id3)
-                    set_current_file(id3->path);
-
-                button_set_release(old_release_mask);
-                return 0;
+#ifdef HAVE_RECORDER_KEYPAD
+                switch (on_screen()) {
+                    case 2:
+                        /* usb connected? */
+                        return SYS_USB_CONNECTED;
                 
+                    case 1:
+                        /* was on_screen used? */
+                        restore = true;
+                        break;
+
+                    case 0:
+                        /* otherwise, exit to browser */
+#else
+                        lcd_icon(ICON_RECORD, false);
+                        lcd_icon(ICON_AUDIO, false);
+#endif
+                        /* set dir browser to current playing song */
+                        if (global_settings.browse_current && id3)
+                            set_current_file(id3->path);
+                        
+                        button_set_release(old_release_mask);
+                        button_set_repeat(old_repeat_mask);
+                        return 0;
+#ifdef HAVE_RECORDER_KEYPAD
+                }
+                break;
+#endif
+
                 /* play/pause */
             case BUTTON_PLAY:
                 if ( paused )
@@ -937,7 +1070,7 @@ int wps_show(void)
 #else
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
-                    break; 
+                    break;
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
