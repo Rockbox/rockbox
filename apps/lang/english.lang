@@ -2270,7 +2270,7 @@ voice: "plus"
 new:
 
 id: VOICE_POINT
-desc: spoken only, for composing numbers
+desc: spoken only, decimal separator for composing numbers
 eng: ""
 voice: "point"
 new:
@@ -2847,3 +2847,16 @@ desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: "Please remove multimedia card"
 new:
+
+id: VOICE_DOT
+desc: spoken only, for spelling
+eng: ""
+voice: "dot"
+new:
+
+id: VOICE_PAUSE
+desc: spoken only, for spelling, a split second of silence (difficult to author)
+eng: ""
+voice: " "
+new:
+

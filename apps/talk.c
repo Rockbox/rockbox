@@ -610,7 +610,10 @@ int talk_spell(const char* spell, bool enqueue)
         else if (c == '+')
             talk_id(VOICE_PLUS, true);
         else if (c == '.')
-            talk_id(VOICE_POINT, true);
+            talk_id(VOICE_POINT, true); 
+            /* fixme: change to VOICE_DOT when settled in the voice files */
+        else if (c == ' ')
+            talk_id(VOICE_PAUSE, true);
     }
 
     return 0;
