@@ -20,8 +20,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#define LARGE 55
-#define HAUT  31
+#define LARGE ((LCD_WIDTH - 2) / 2)
+#define HAUT  ((LCD_HEIGHT - 2) / 2)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
