@@ -87,11 +87,10 @@ endif
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
 
-MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
+MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c blank.c bounce.c boxes.c bmp.c \
-	widgets.c wormlet.c
+   APPS += tetris.c sokoban.c bounce.c snow.c bmp.c widgets.c wormlet.c
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
@@ -171,7 +170,7 @@ $(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
 $(OBJDIR)/games_menu.o: $(APPDIR)/games_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/screensavers_menu.o: $(APPDIR)/screensavers_menu.c
+$(OBJDIR)/demo_menu.o: $(APPDIR)/demo_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings_menu.o: $(APPDIR)/settings_menu.c
@@ -192,13 +191,10 @@ $(OBJDIR)/wormlet.o: $(RECDIR)/wormlet.c
 $(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/blank.o: $(RECDIR)/blank.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/boxes.o: $(RECDIR)/boxes.c
+$(OBJDIR)/snow.o: $(RECDIR)/snow.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main.o: $(APPDIR)/main.c
