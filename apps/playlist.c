@@ -26,6 +26,7 @@
 #include <file.h>
 #include "sprintf.h"
 #include "debug.h"
+#include "mpeg.h"
 
 playlist_info_t playlist;
 
@@ -38,6 +39,8 @@ char* playlist_next(int type)
     int seek = playlist.indices[playlist.index];
     int max;
     int fd;
+    (void)type; /* prevent compiler warning until this is gets used */
+
     playlist.index = (playlist.index+1) % playlist.amount;
 
     fd = open(playlist.filename, O_RDONLY);
@@ -129,21 +132,18 @@ void add_indices_to_playlist( playlist_info_t *playlist )
 }
 
 static unsigned int playlist_seed = 0xdeadcafe;
-void seedit(unsigned int seed)
+static void seedit(unsigned int seed)
 {
     playlist_seed = seed;   
 }
 
-int getrand(void)
+static int getrand(void)
 {
     playlist_seed += 0x12345;
 
     /* the rand is from 0 to RAND_MAX */
     return playlist_seed;
 }
-
-
-
 
 /*
  * randomly rearrange the array of indices for the playlist
