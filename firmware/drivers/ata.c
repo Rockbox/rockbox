@@ -145,8 +145,6 @@ int ata_read_sectors(unsigned long start,
     int i;
     int ret = 0;
 
-    DEBUGF("ata_read(%X,%d,%X)\n",start,count,buf);
-
 #ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
