@@ -330,7 +330,6 @@ static int master_slave_detect(void)
 static int io_address_detect(void)
 {
     unsigned char tmp = ATA_STATUS & 0xf9; /* Mask the IDX and CORR bits */
-    unsigned char tmp2;
     unsigned char dummy;
     
     /* We compare the STATUS register with the ALT_STATUS register, which
@@ -344,7 +343,7 @@ static int io_address_detect(void)
        contents. */
     ATA_SECTOR = 0;
     dummy = ATA_SECTOR;
-    if(tmp == (*ATA_CONTROL2) & 0xf9)
+    if(tmp == ((*ATA_CONTROL2) & 0xf9))
     {
         DEBUGF("CONTROL is at 0x306\n");
         ata_control = ATA_CONTROL2;
