@@ -1,5 +1,6 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
+INPUT(crt0.o system.o)
 SECTIONS
 {
     .vectors 0x09000000 :
