@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <stddef.h>
 #include "config.h"
 #include "kernel.h"
 #include "thread.h"
@@ -61,6 +62,7 @@
 #include "sprintf.h"
 #include "keyboard.h"
 #include "version.h"
+#include "rtc.h"
 #ifdef HAVE_MAS3507D
 void dac_line_in(bool enable);
 #endif
@@ -69,15 +71,38 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
-#define CONFIG_BLOCK_VERSION 10
+#define CONFIG_BLOCK_VERSION 11
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
+#define MARKER 0x7FFFFFFF /* FIXME: to be removed with val2phys/phys2val */
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES 10
 #else
 #define MAX_LINES 2
 #endif
+
+long lasttime = 0;
+static unsigned char config_block[CONFIG_BLOCK_SIZE];
+
+
+/* descriptor for a configuration value */
+/* (watch the struct packing and member sizes to keep this small) */
+struct bit_entry
+{
+    /* how many bits within the bitfield (1-32), MSB set if value is signed */
+    unsigned char bit_size; /* min 6+1 bit */
+    /* how many bytes in the global_settings struct (1,2,4) */
+    unsigned char byte_size; /* min 2 bits */
+    /* store position in global_settings struct */
+    short settings_offset; /* min 9 bit, better 10 */
+    /* default value */
+    int default_val; /* min 15 bit */ 
+     /* variable name in a .cfg file, NULL if not to be saved */
+    const char* cfg_name;
+     /* set of values, or NULL for a numerical value */
+    const char* cfg_val;
+};
 
 /********************************************
 
@@ -87,89 +112,296 @@ of 44 bytes, starting at offset 0x14 of the RTC memory space.
 offset  abs
 0x00    0x14    "Roc"   header signature: 0x52 0x6f 0x63
 0x03    0x17    <version byte: 0x0>
-0x04    0x18    <volume byte>
-0x05    0x19    <balance byte>
-0x06    0x1a    <bass byte>
-0x07    0x1b    <treble byte>
-0x08    0x1c    <loudness byte>
-0x09    0x1d    <bass boost byte>
-0x0a    0x1e    <contrast (bit 0-5), invert bit (bit 6), show_icons (bit 7)>
-0x0b    0x1f    <backlight_on_when_charging, invert_cursor, backlight_timeout>
-0x0c    0x20    <poweroff timer byte>
-0x0d    0x21    <resume settings byte>
-0x0e    0x22    <shuffle,dirfilter,sort_case,discharge,statusbar,show_hidden,
-                 scroll bar>
-0x0f    0x23    <volume type, battery type, timeformat, scroll speed>
-0x10    0x24    <ff/rewind min step, acceleration rate>
-0x11    0x25    <AVC, channel config>
-0x12    0x26    <(short) Resume playlist index, or -1 if no playlist resume>
-0x14    0x28    <(short) Resume playlist first index>
-0x16    0x2a    <(int) Byte offset into resume file>
-0x1a    0x2e    <time until disk spindown>
-0x1b    0x2f    <browse current, play selected, recursive dir insert>
-0x1c    0x30    <peak meter hold timeout (bit 0-4),
-                 flip_display (bit 6)
-                 rec_editable (bit 7)>
-0x1d    0x31    <(int) Resume shuffle seed, or -1 if no shuffle>
-0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
-                 mic gain (bit 4-7)>
-0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
-0x23    0x37    <rec. left gain (bit 0-3)>
-0x24    0x38    <rec. right gain (bit 0-3)>
-0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3),
-                 Trickle charge flag (bit 4), buttonbar (bit 5)>
-0x26    0x40    <runtime low byte>
-0x27    0x41    <runtime high byte>
-0x28    0x42    <topruntime low byte>
-0x29    0x43    <topruntime high byte>
-
-0x2a    <checksum 2 bytes: xor of 0x0-0x29>
+0x04    0x18    start of bit-table
+...
+0x28,0x29 unused, not reachable by set_bits() without disturbing the next 2
+0x2A,0x2B <checksum 2 bytes: xor of 0x00-0x29>
 
 Config memory is reset to 0xff and initialized with 'factory defaults' if
 a valid header & checksum is not found. Config version number is only
 increased when information is _relocated_ or space is _reused_ so that old
-versions can read and modify configuration changed by new versions. New
-versions should check for the value of '0xff' in each config memory
-location used, and reset the setting in question with a factory default if
-needed. Memory locations not used by a given version should not be
+versions can read and modify configuration changed by new versions. 
+Memory locations not used by a given version should not be
 modified unless the header & checksum test fails.
 
-Because 0xff mean that the byte is unused, care must be taken so that
-a used byte can't have the value 0xff. Either use only 7 bits, or make sure
-that the value will never be 0xff.
-
 Rest of config block, only saved to disk:
-0xA8  (char)jump scroll mode (only for player)
-0xA9  (char)jump scroll delay (only for player)
-0xAA  Max number of files in playlist (1000-20000)
-0xAC  Max number of files in dir (50-10000)
-0xAE  fade on pause/unpause/stop setting (bit 0)
-      caption backlight (bit 1)
-      car adapter mode (bit 2)
-      line_in (Player only)  (bit 3)
-      playlist viewer icons (bit 4)
-      playlist viewer indices (bit 5)
-      playlist viewer track display (bit 6)
-0xAF  <most-recent-bookmarks, auto-bookmark, autoload>
-0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
-0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
-0xB2  peak meter min either in -db or in percent
-0xB3  peak meter max either in -db or in percent
-0xB4  battery capacity
-0xB5  scroll step in pixels
-0xB6  scroll start and endpoint delay
-0xB7  bidir scroll setting (bidi if 0-200% longer than screen width)
+0x2C  start of 2nd bit-table
+...
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
-0xF4  Prerecording time (bit 0-4), Recording directory option (bit 5-6)
-0xF5-0xFF  <unused>
+0xF4-0xFF  <unused>
 
 *************************************/
 
-#include "rtc.h"
-long lasttime = 0;
-static unsigned char config_block[CONFIG_BLOCK_SIZE];
+/* The persistence of the global_settings members is now controlled by
+   the two tables below, rtc_bits and hd_bits. 
+   New values can just be added to the end, it will be backwards 
+   compatible. If you however change order, bitsize, etc. of existing
+   entries, you need to bump CONFIG_BLOCK_VERSION to break compatibility.
+*/
+
+
+/* convenience macro for both size and offset of global_settings member */
+#define S_O(val) sizeof(global_settings.val), offsetof(struct user_settings, val)
+#define SIGNED 0x80 /* for bitsize value with signed attribute */
+
+/* some sets of values which are used more than once, to save memory */
+static const char off_on[] = "off,on";
+static const char off_on_ask[] = "off,on,ask";
+static const char graphic_numeric[] = "graphic,numeric";
+
+/* the part of the settings which ends up in the RTC RAM, where available 
+   (those we either need early, save frequently, or without spinup) */
+static struct bit_entry rtc_bits[] = 
+{
+    /* placeholder, containing the size information */
+    {9, 0, 0, 0, NULL, NULL }, /* 9 bit to tell how far this is populated */
+
+    /* # of bits, offset+size, default, .cfg name, .cfg values */
+    /* sound */
+    {7, S_O(volume), 70, "volume", NULL }, /* 0...100 */
+    {7 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -50...50 */
+    {5, S_O(bass), 0, "bass", NULL }, /* 0...30 */
+    {5, S_O(treble), 0, "treble", NULL }, /* 0...30 */
+#ifdef HAVE_MAS3587F
+    {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
+    {4, S_O(bass_boost), 0, "bass boost", NULL }, /* 0...10 */
+    {2, S_O(avc), 0, "auto volume", "off,2,4,8" },
+#endif
+    {3, S_O(channel_config), 6, "channels", 
+        "stereo,stereo narrow,mono,mono left,mono right,karaoke,stereo wide" },
+    /* playback */
+    {2, S_O(resume), RESUME_ASK, "resume", "off,ask,ask once,on" },
+    {1, S_O(playlist_shuffle), false, "shuffle", off_on },
+    {16 | SIGNED, S_O(resume_index), -1, NULL, NULL },
+    {16 | SIGNED, S_O(resume_first_index), 0, NULL, NULL },
+    {32 | SIGNED, S_O(resume_offset), -1, NULL, NULL },
+    {32 | SIGNED, S_O(resume_seed), -1, NULL, NULL },
+    {2, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one" },
+    /* LCD */
+    {6, S_O(contrast), 40, "contrast", NULL },
+    {1, S_O(backlight_on_when_charging), false, 
+        "backlight when plugged", off_on },
+    {5, S_O(backlight_timeout), 5, "backlight timeout", 
+        "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90" },
+#ifdef HAVE_LCD_BITMAP
+    {1, S_O(invert), false, "invert", off_on },
+    {1, S_O(flip_display), false, "flip display", off_on },
+    /* display */
+    {1, S_O(invert_cursor), false, "invert cursor", off_on },
+    {1, S_O(show_icons), true, "show icons", off_on },
+    {1, S_O(statusbar), true, "statusbar", off_on },
+    {1, S_O(scrollbar), true, "scrollbar", off_on },
+    {1, S_O(buttonbar), true, "buttonbar", off_on },
+    {1, S_O(volume_type), 0, "volume display", graphic_numeric },
+    {1, S_O(battery_type), 0, "battery display", graphic_numeric },
+    {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
+#endif
+    /* system */
+    {4, S_O(poweroff), 10, 
+        "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
+    {18, S_O(runtime), 0, NULL, NULL },
+    {18, S_O(topruntime), 0, NULL, NULL },
+    {15, S_O(max_files_in_playlist), 10000, 
+        "max files in playlist", NULL }, /* 1000...20000 */
+    {14, S_O(max_files_in_dir), 400, 
+        "max files in dir", NULL }, /* 50...10000 */
+    /* battery */
+#ifdef HAVE_CHARGE_CTRL
+    {1, S_O(discharge), 0, "deep discharge", off_on },
+    {1, S_O(trickle_charge), true, "trickle charge", off_on },
+#endif
+#ifdef HAVE_LIION
+    {12, S_O(battery_capacity), 2200, "battery capacity", NULL }, /* 1500...3200 */
+#else
+    {12, S_O(battery_capacity), 1500, "battery capacity", NULL }, /* 1500...3200 */
+#endif
+    {1, S_O(car_adapter_mode), false, "car adapter mode", off_on },
+
+    /* new stuff to be added here */
+    /* If values are just added to the end, no need to bump the version. */
+
+    /* Current sum of bits: 254 (worst case) */
+    /* Sum of all bit sizes must not grow beyond 288! */
+};
+
+
+/* the part of the settings which ends up in HD sector only */
+static struct bit_entry hd_bits[] = 
+{
+    /* This table starts after the 44 RTC bytes = 352 bits. */
+    /* Here we need 11 bits to tell how far this is populated. */
+
+    /* placeholder, containing the size information */
+    {11, 0, 0, 0, NULL, NULL }, /* 11 bit to tell how far this is populated */
+
+    /* # of bits, offset+size, default, .cfg name, .cfg values */
+    /* more display */
+    {1, S_O(caption_backlight), false, "caption backlight", off_on },
+    {4, S_O(scroll_speed), 8, "scroll speed", NULL }, /* 1...10 */
+    {7, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...112 */
+    {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
+    {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */
+#ifdef HAVE_LCD_CHARCELLS
+    {3, S_O(jump_scroll), 0, "jump scroll", NULL }, /* 0...5 */
+    {8, S_O(jump_scroll_delay), 50, "jump scroll delay", NULL }, /* 0...250 */
+#endif
+    /* more playback */
+    {1, S_O(play_selected), true, "play selected", off_on },
+    {1, S_O(fade_on_stop), true, "volume fade", off_on },
+    {4, S_O(ff_rewind_min_step), 1000, 
+        "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60" },
+    {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
+    {3, S_O(buffer_margin), 0, "antiskip", NULL },
+    /* disk */
+#ifdef HAVE_ATA_POWER_OFF
+    {1, S_O(disk_poweroff), false, "disk poweroff", off_on },
+#endif
+    {8, S_O(disk_spindown), 5, "disk spindown", NULL },
+    /* browser */
+    {2, S_O(dirfilter), SHOW_MUSIC, 
+        "show files", "all,supported,music,playlists" },
+    {1, S_O(sort_case), false, "sort case", off_on },
+    {1, S_O(browse_current), false, "follow playlist", off_on },
+    /* playlist */
+    {1, S_O(playlist_viewer_icons), true, "playlist viewer icons", off_on },
+    {1, S_O(playlist_viewer_indices), true, 
+        "playlist viewer indices", off_on },
+    {1, S_O(playlist_viewer_track_display), 0, 
+        "playlist viewer track display", "track name,full path" },
+    {2, S_O(recursive_dir_insert), RECURSE_OFF, 
+        "recursive directory insert", off_on_ask },
+    /* bookmarks */
+    {3, S_O(autocreatebookmark), BOOKMARK_NO, "autocreate bookmarks", 
+        "off,on,ask,recent only - on,recent only - ask" },
+    {2, S_O(autoloadbookmark), BOOKMARK_NO,
+        "autoload bookmarks", off_on_ask },
+    {2, S_O(usemrb), BOOKMARK_NO, 
+        "use most-recent-bookmarks", "off,on,unique only" },
+#ifdef HAVE_LCD_BITMAP
+    /* peak meter */
+    {5, S_O(peak_meter_clip_hold), 16, "peak meter clip hold", /* 0...25 */
+        "on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,2min,3min,5min,10min,20min,45min,90min" },
+    {1, S_O(peak_meter_performance), false, "peak meter busy", off_on },
+    {5, S_O(peak_meter_hold), 3, "peak meter hold", 
+        "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min" },
+    {7, S_O(peak_meter_release), 8, "peak meter release", NULL }, /* 0...126 */
+    {1, S_O(peak_meter_dbfs), true, "peak meter dbfs", NULL },
+    {7, S_O(peak_meter_min), 60, "peak meter min", NULL }, /* 0...100 */
+    {7, S_O(peak_meter_max), 0, "peak meter max", NULL }, /* 0...100 */
+#endif
+#ifdef HAVE_MAS3587F
+    /* recording */
+    {1, S_O(rec_editable), false, "editable recordings", off_on },
+    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...13 */
+        "off,00:05,00:10,00:15,00:30,01:00,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
+    {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
+    {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
+    {3, S_O(rec_quality), 5, "rec quality", NULL },
+    {2, S_O(rec_source), 0, /* 0=mic */
+        "rec source", "mic,line,spdif" },
+    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
+        "rec frequency", "44,48,32,22,24,16" },
+    {4, S_O(rec_left_gain), 2, /* 0dB */
+        "rec left gain", NULL }, /* 0...15 */
+    {4, S_O(rec_right_gain), 2, /* 0dB */
+        "rec right gain", NULL }, /* 0...15 */
+    {1, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
+    {1, S_O(rec_directory), 0, /* rec_base_directory */
+        "rec directory", REC_BASE_DIR ",current" },
+#endif
+#ifdef HAVE_MAS3507D
+    {1, S_O(line_in), false, "line in", off_on },
+#endif
+    /* voice */
+    {2, S_O(talk_dir), 0, "talk dir", "off,number,spell,enter,hover" },
+    {2, S_O(talk_file), 0, "talk file", "off,number,spell" },
+    {1, S_O(talk_menu), true, "talk menu", off_on },
+
+    /* new stuff to be added here */
+    /* If values are just added to the end, no need to bump the version. */
+
+    /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
+};
+
+
+/* helper function to extract n (<=32) bits from an arbitrary position */
+static unsigned long get_bits(
+    unsigned long* p, /* the start of the bitfield array */
+    unsigned int from, /* bit no. to start reading from */
+    unsigned int size) /* how many bits to read */
+{
+    unsigned int bit_index;
+    unsigned int bits_to_use;
+
+    unsigned long mask;
+    unsigned long result;
+
+    if (size==1)
+    {   /* short cut */
+        return (p[from/32] & 1<<from%32) != 0;
+    }
+
+    result = 0;
+    while (size)
+    {
+        bit_index = from % 32;
+        bits_to_use = MIN(32 - bit_index, size);
+        mask = 0xFFFFFFFF >> (32 - bits_to_use);
+        mask <<= bit_index;
+
+        result <<= bits_to_use; /* from last round */
+        result |= (p[from/32] & mask) >> bit_index;
+
+        from += bits_to_use;
+        size -= bits_to_use;
+    }
+
+    return result;
+}
+
+/* helper function to set n (<=32) bits to an arbitrary position */
+static void set_bits(
+    unsigned long* p, /* the start of the bitfield array */
+    unsigned int from, /* bit no. to start writing into */
+    unsigned int size, /* how many bits to change */
+    unsigned long value) /* content (LSBs will be taken) */
+{
+    unsigned int end;
+    unsigned int word_index, bit_index;
+    unsigned int bits_to_use;
+
+    unsigned long mask;
+
+    if (size==1)
+    {   /* short cut */
+        if (value & 1)
+            p[from/32] |= 1<<from%32;
+        else
+            p[from/32] &= ~(1<<from%32);
+        return;
+    }
+
+    end = from + size - 1;
+
+    /* write back to front, least to most significant */
+    while (size)
+    {
+        word_index = end / 32;
+        bit_index = (end % 32) + 1;
+        bits_to_use = MIN(bit_index, size);
+        bit_index -= bits_to_use;
+        mask = 0xFFFFFFFF >> (32 - bits_to_use);
+        mask <<= bit_index;
+
+        p[word_index] = (p[word_index] & ~mask) | (value<<bit_index & mask);
+
+        value >>= bits_to_use;
+        size -= bits_to_use;
+        end -= bits_to_use;
+    }
+}
 
 /*
  * Calculates the checksum for the config block and returns it
@@ -313,91 +545,52 @@ static int load_config_buffer( void )
     return 0;
 }
 
+
+/* helper to save content of global_settings into a bitfield,
+   as described per table */ 
+static void save_bit_table(const struct bit_entry* p_table, int count, int bitstart)
+{
+    unsigned long* p_bitfield = (unsigned long*)config_block; /* 32 bit addr. */
+    unsigned long value; /* 32 bit content */
+    int i;
+    const struct bit_entry* p_run = p_table; /* start after the size info */
+    int curr_bit = bitstart + p_table->bit_size;
+    count--; /* first is excluded from loop */
+
+    for (i=0; i<count; i++)
+    {
+        p_run++;
+        /* could do a memcpy, but that would be endian-dependent */
+        switch(p_run->byte_size)
+        {
+        case 1:
+            value = ((unsigned char*)&global_settings)[p_run->settings_offset];
+            break;
+        case 2:
+            value = ((unsigned short*)&global_settings)[p_run->settings_offset/2];
+            break;
+        case 4:
+            value = ((unsigned int*)&global_settings)[p_run->settings_offset/4];
+            break;
+        default:
+            DEBUGF( "illegal size!" );
+            continue;
+        }
+        set_bits(p_bitfield, curr_bit, p_run->bit_size & 0x3F, value);
+        curr_bit += p_run->bit_size & 0x3F;
+    }
+    set_bits(p_bitfield, bitstart, p_table->bit_size, /* write size */
+        curr_bit); /* = position after last element */
+}
+
+
 /*
  * persist all runtime user settings to disk or RTC RAM
  */
 int settings_save( void )
 {
+    int restore[6]; /* recover, FIXME: get rid of this */
     DEBUGF( "settings_save()\n" );
-    
-    /* update the config block buffer with current
-       settings and save the block in the RTC */
-    config_block[0x4] = (unsigned char)global_settings.volume;
-    config_block[0x5] = (char)global_settings.balance;
-    config_block[0x6] = (unsigned char)global_settings.bass;
-    config_block[0x7] = (unsigned char)global_settings.treble;
-    config_block[0x8] = (unsigned char)global_settings.loudness;
-    config_block[0x9] = (unsigned char)global_settings.bass_boost;
-    
-    config_block[0xa] = (unsigned char)
-      ((global_settings.contrast & 0x3f) |
-       (global_settings.invert ? 0x40 : 0) |
-       (global_settings.show_icons ? 0x80 : 0) );
-
-    config_block[0xb] = (unsigned char)
-        ((global_settings.backlight_on_when_charging?0x40:0) |
-         (global_settings.invert_cursor ? 0x20 : 0) |
-         (global_settings.backlight_timeout & 0x1f));
-    config_block[0xc] = (unsigned char)global_settings.poweroff;
-    config_block[0xd] = (unsigned char)global_settings.resume;
-    
-    config_block[0xe] = (unsigned char)
-        ((global_settings.playlist_shuffle & 1) |
-         ((global_settings.dirfilter & 1) << 1) |
-         ((global_settings.sort_case & 1) << 2) |
-         ((global_settings.discharge & 1) << 3) |
-         ((global_settings.statusbar & 1) << 4) |
-         ((global_settings.dirfilter & 2) << 4) |
-         ((global_settings.scrollbar & 1) << 6));
-    
-    config_block[0xf] = (unsigned char)
-        ((global_settings.volume_type & 1) |
-         ((global_settings.battery_type & 1) << 1) |
-         ((global_settings.timeformat & 1)   << 2) |
-         ( global_settings.scroll_speed      << 3));
-    
-    config_block[0x10] = (unsigned char)
-        ((global_settings.ff_rewind_min_step & 15) << 4 |
-         (global_settings.ff_rewind_accel & 15));
-
-    config_block[0x11] = (unsigned char)
-        ((global_settings.avc & 0x03) | 
-         ((global_settings.channel_config & 0x07) << 2));
-
-    *((short*)(&config_block[0x12])) = global_settings.resume_index;
-    *((short*)(&config_block[0x14])) = global_settings.resume_first_index;
-    memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
-    DEBUGF( "+Resume index %X offset %X\n",
-            global_settings.resume_index,
-            global_settings.resume_offset );
-
-    config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
-    config_block[0x1b] = (unsigned char)
-        (((global_settings.browse_current & 1)) |
-         ((global_settings.play_selected & 1) << 1) |
-         ((global_settings.recursive_dir_insert & 3) << 2));
-    
-    config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
-        (global_settings.flip_display ? 0x40 : 0) |
-        (global_settings.rec_editable?0x80:0);
-
-    memcpy(&config_block[0x1d], &global_settings.resume_seed, 4);
-
-    config_block[0x21] = (unsigned char)
-        ((global_settings.repeat_mode & 3) |
-         ((global_settings.rec_channels & 1) << 2) |
-         ((global_settings.rec_mic_gain & 0x0f) << 4));
-    config_block[0x22] = (unsigned char)
-        ((global_settings.rec_quality & 7) |
-         ((global_settings.rec_source & 3) << 3) |
-         ((global_settings.rec_frequency & 7) << 5));
-    config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
-    config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
-    config_block[0x25] = (unsigned char)
-        ((global_settings.disk_poweroff & 1) |
-         ((global_settings.buffer_margin & 7) << 1) |
-         ((global_settings.trickle_charge & 1) << 4) |
-         ((global_settings.buttonbar & 1) << 5));
 
     {
         int elapsed_secs;
@@ -408,57 +601,45 @@ int settings_save( void )
 
         if ( global_settings.runtime > global_settings.topruntime )
             global_settings.topruntime = global_settings.runtime;
-
-        config_block[0x26]=(unsigned char)(global_settings.runtime & 0xff);
-        config_block[0x27]=(unsigned char)(global_settings.runtime >> 8);
-        config_block[0x28]=(unsigned char)(global_settings.topruntime & 0xff);
-        config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
-    
-#ifdef HAVE_LCD_CHARCELLS
-    config_block[0xa8]=(unsigned char)global_settings.jump_scroll;
-    config_block[0xa9]=(unsigned char)global_settings.jump_scroll_delay;
-#endif
-    config_block[0xaa] = (unsigned char)
-        global_settings.max_files_in_playlist & 0xff;
-    config_block[0xab] = (unsigned char)
-        (global_settings.max_files_in_playlist >> 8) & 0xff;
-    config_block[0xac] = (unsigned char)
-        global_settings.max_files_in_dir & 0xff;
-    config_block[0xad] = (unsigned char)
-        (global_settings.max_files_in_dir >> 8) & 0xff;
-    config_block[0xae] = (unsigned char)
-        ((global_settings.fade_on_stop & 1) |
-         ((global_settings.caption_backlight & 1) << 1) |
-         ((global_settings.car_adapter_mode  & 1) << 2) |
-         ((global_settings.line_in & 1) << 3) |
-         ((global_settings.playlist_viewer_icons & 1) << 4) |
-         ((global_settings.playlist_viewer_indices & 1) << 5) |
-         ((global_settings.playlist_viewer_track_display & 1) << 6));
-    config_block[0xaf] = ((global_settings.usemrb << 5) |
-                          (global_settings.autocreatebookmark << 2) |
-                          (global_settings.autoloadbookmark));
-    config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
-        (global_settings.peak_meter_performance ? 0x80 : 0);
-    config_block[0xb1] = global_settings.peak_meter_release |
-        (global_settings.peak_meter_dbfs ? 0x80 : 0);
-    config_block[0xb2] = (unsigned char)global_settings.peak_meter_min;
-    config_block[0xb3] = (unsigned char)global_settings.peak_meter_max;
 
-    config_block[0xb4]=(global_settings.battery_capacity - 1000) / 50;
-    config_block[0xb5]=(unsigned char)global_settings.scroll_step;
-    config_block[0xb6]=(unsigned char)global_settings.scroll_delay;
-    config_block[0xb7]=(unsigned char)global_settings.bidir_limit;
+    /* While the mpeg_val2phys business still exists: ( to be removed) */
+    /* temporarily replace the hardware levels with the MMI values */
+    restore[SOUND_VOLUME] = global_settings.volume;
+    global_settings.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+    restore[SOUND_BASS] = global_settings.bass;
+    global_settings.bass = mpeg_val2phys(SOUND_BASS, global_settings.bass);
+    restore[SOUND_TREBLE] = global_settings.treble;
+    global_settings.treble = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
+    restore[SOUND_BALANCE] = global_settings.balance;
+    global_settings.balance = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
+#ifdef HAVE_MAS3587F
+    restore[SOUND_LOUDNESS] = global_settings.loudness;
+    global_settings.loudness = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
+    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
+    global_settings.bass_boost = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
+#endif
+    
+
+    /* serialize scalar values into RTC and HD sector, specified via table */
+    save_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
+    save_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
 
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
 
-    config_block[0xf4]=((unsigned char)global_settings.rec_prerecord_time |
-                        ((unsigned char)global_settings.rec_directory << 5));
-    config_block[0xf5] = (global_settings.talk_dir & 7) |
-                         ((global_settings.talk_file & 3) << 3) | 
-                         ((global_settings.talk_menu & 1) << 5);
+
+    /* restore the original values; to be removed with mpeg_val2phys */
+    global_settings.volume = restore[SOUND_VOLUME];
+    global_settings.bass = restore[SOUND_BASS];
+    global_settings.treble = restore[SOUND_TREBLE];
+    global_settings.balance = restore[SOUND_BALANCE];
+#ifdef HAVE_MAS3587F
+    global_settings.loudness = restore[SOUND_LOUDNESS];
+    global_settings.bass_boost = restore[SOUND_SUPERBASS];
+#endif
+
 
     if(save_config_buffer())
     {
@@ -593,11 +774,66 @@ void settings_apply(void)
     set_car_adapter_mode(global_settings.car_adapter_mode);
 }
 
+
+/* helper to load global_settings from a bitfield, as described per table */
+static void load_bit_table(const struct bit_entry* p_table, int count, int bitstart)
+{
+    unsigned long* p_bitfield = (unsigned long*)config_block; /* 32 bit addr. */
+    unsigned long value; /* 32 bit content */
+    int i;
+    int maxbit; /* how many bits are valid in the saved part */
+    const struct bit_entry* p_run = p_table; /* start after the size info */
+    count--; /* first is excluded from loop */
+    maxbit = get_bits(p_bitfield, bitstart, p_table->bit_size);
+    bitstart += p_table->bit_size;
+
+    for (i=0; i<count; i++)
+    {
+        int size;
+        p_run++;
+
+        size = p_run->bit_size & 0x3F; /* mask off abused bits */
+        if (bitstart + size > maxbit)
+            break; /* exit if this is not valid any more in bitfield */
+
+        value = get_bits(p_bitfield, bitstart, size);
+        bitstart += size;
+        if (p_run->bit_size & SIGNED)
+        {   // sign extend the read value
+            unsigned long mask = 0xFFFFFFFF << (size - 1);
+            if (value & mask) /* true if MSB of value is set */
+                value |= mask;
+        }
+
+        /* could do a memcpy, but that would be endian-dependent */
+        switch(p_run->byte_size)
+        {
+        case 1:
+            ((unsigned char*)&global_settings)[p_run->settings_offset] = 
+                (unsigned char)value;
+            break;
+        case 2:
+            ((unsigned short*)&global_settings)[p_run->settings_offset/2] = 
+                (unsigned short)value;
+            break;
+        case 4:
+            ((unsigned int*)&global_settings)[p_run->settings_offset/4] = 
+                (unsigned int)value;
+            break;
+        default:
+            DEBUGF( "illegal size!" );
+            continue;
+        }
+    }
+}
+
+
 /*
  * load settings from disk or RTC RAM
  */
 void settings_load(void)
 {
+    int restore[6]; /* recover, FIXME: get rid of this */
     
     DEBUGF( "reload_all_settings()\n" );
 
@@ -606,215 +842,53 @@ void settings_load(void)
     
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
-    if (!load_config_buffer()) {
-        if (config_block[0x4] != 0xFF)
-            global_settings.volume = config_block[0x4];
-        if (config_block[0x5] != 0xFF)
-            global_settings.balance = (char)config_block[0x5];
-        if (config_block[0x6] != 0xFF)
-            global_settings.bass = config_block[0x6];
-        if (config_block[0x7] != 0xFF)
-            global_settings.treble = config_block[0x7];
-        if (config_block[0x8] != 0xFF)
-            global_settings.loudness = config_block[0x8];
-        if (config_block[0x9] != 0xFF)
-            global_settings.bass_boost = config_block[0x9];
-    
-        if (config_block[0xa] != 0xFF) {
-            global_settings.contrast = config_block[0xa] & 0x3f;
-            global_settings.invert =
-                config_block[0xa] & 0x40 ? true : false;
-            if ( global_settings.contrast < MIN_CONTRAST_SETTING )
-                global_settings.contrast = lcd_default_contrast();
-            global_settings.show_icons =
-                config_block[0xa] & 0x80 ? true : false;
-        }
-
-        if (config_block[0xb] != 0xFF) {
-            /* Bit 7 is unused to be able to detect uninitialized entry */
-            global_settings.backlight_timeout = config_block[0xb] & 0x1f;
-            global_settings.invert_cursor =
-                config_block[0xb] & 0x20 ? true : false;
-            global_settings.backlight_on_when_charging =
-                config_block[0xb] & 0x40 ? true : false;
-        }
-
-        if (config_block[0xc] != 0xFF)
-            global_settings.poweroff = config_block[0xc];
-        if (config_block[0xd] != 0xFF)
-            global_settings.resume = config_block[0xd];
-        if (config_block[0xe] != 0xFF) {
-            global_settings.playlist_shuffle = config_block[0xe] & 1;
-            global_settings.dirfilter = (config_block[0xe] >> 1) & 1;
-            global_settings.sort_case = (config_block[0xe] >> 2) & 1;
-            global_settings.discharge = (config_block[0xe] >> 3) & 1;
-            global_settings.statusbar = (config_block[0xe] >> 4) & 1;
-            global_settings.dirfilter |= ((config_block[0xe] >> 5) & 1) << 1;
-            global_settings.scrollbar = (config_block[0xe] >> 6) & 1;
-            /* Don't use the last bit, it must be unused to detect
-               an uninitialized entry */
-        }
+    if (!load_config_buffer()) 
+    {
+        /* While the mpeg_val2phys business still exists: ( FIXME: to be removed) */
+        /* temporarily put markers into the values to detect if they got loaded */
+        restore[SOUND_VOLUME] = global_settings.volume;
+        global_settings.volume = MARKER;
+        restore[SOUND_BASS] = global_settings.bass;
+        global_settings.bass = MARKER;
+        restore[SOUND_TREBLE] = global_settings.treble;
+        global_settings.treble = MARKER;
+        restore[SOUND_BALANCE] = global_settings.balance;
+        global_settings.balance = MARKER;
+#ifdef HAVE_MAS3587F
+        restore[SOUND_LOUDNESS] = global_settings.loudness;
+        global_settings.loudness = MARKER;
+        restore[SOUND_SUPERBASS] = global_settings.bass_boost;
+        global_settings.bass_boost = MARKER;
+#endif
         
-        if (config_block[0xf] != 0xFF) {
-            global_settings.volume_type = config_block[0xf] & 1;
-            global_settings.battery_type = (config_block[0xf] >> 1) & 1;
-            global_settings.timeformat  = (config_block[0xf] >> 2) & 1;
-            global_settings.scroll_speed = config_block[0xf] >> 3;
-        }
-
-        if (config_block[0x10] != 0xFF) {
-            global_settings.ff_rewind_min_step = (config_block[0x10] >> 4) & 15;
-            global_settings.ff_rewind_accel = config_block[0x10] & 15;
-        }
-
-        if (config_block[0x11] != 0xFF)
-        {
-            global_settings.avc = config_block[0x11] & 0x03;
-            global_settings.channel_config = (config_block[0x11] >> 2) & 0x07;
-        }
-
-        if (config_block[0x12] != 0xFF)
-            global_settings.resume_index = *((short*)(&config_block[0x12]));
-
-        if (config_block[0x14] != 0xFF)
-            global_settings.resume_first_index= *((short*)(&config_block[0x14]));
-
-        if (config_block[0x16] != 0xFF)
-            memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
-
-        if (config_block[0x1a] != 0xFF)
-            global_settings.disk_spindown = config_block[0x1a];
-
-        if (config_block[0x1b] != 0xFF) {
-            global_settings.browse_current = (config_block[0x1b]) & 1;
-            global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
-            global_settings.recursive_dir_insert =
-                (config_block[0x1b] >> 2) & 3;
-        }
-
-        if (config_block[0x1c] != 0xFF) {
-            global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
-            global_settings.flip_display =
-                (config_block[0x1c] & 0x40)?true:false;
-            global_settings.rec_editable =
-                (config_block[0x1c] & 0x80)?true:false;
-        }
-
-        if (config_block[0x1d] != 0xFF)
-            memcpy(&global_settings.resume_seed, &config_block[0x1d], 4);
-
-        if (config_block[0x21] != 0xFF)
-        {
-            global_settings.repeat_mode = config_block[0x21] & 3;
-            global_settings.rec_channels = (config_block[0x21] >> 2) & 1;
-            global_settings.rec_mic_gain = (config_block[0x21] >> 4) & 0x0f;
-        }
-
-        if (config_block[0x22] != 0xFF)
-        {
-            global_settings.rec_quality = config_block[0x22] & 7;
-            global_settings.rec_source = (config_block[0x22] >> 3) & 3;
-            global_settings.rec_frequency = (config_block[0x22] >> 5) & 7;
-        }
-
-        if (config_block[0x23] != 0xFF)
-            global_settings.rec_left_gain = config_block[0x23] & 0x0f;
-
-        if (config_block[0x24] != 0xFF)
-            global_settings.rec_right_gain = config_block[0x24] & 0x0f;
-
-        if (config_block[0x25] != 0xFF)
-        {
-            global_settings.disk_poweroff = config_block[0x25] & 1;
-            global_settings.buffer_margin = (config_block[0x25] >> 1) & 7;
-            global_settings.trickle_charge = (config_block[0x25] >> 4) & 1;
-            global_settings.buttonbar = (config_block[0x25] >> 5) & 1;
-        }
-
-        if (config_block[0x27] != 0xff)
-            global_settings.runtime = 
-                config_block[0x26] | (config_block[0x27] << 8);
-
-        if (config_block[0x29] != 0xff)
-            global_settings.topruntime =
-                config_block[0x28] | (config_block[0x29] << 8);
-
-        if (config_block[0xae] != 0xff) {
-            global_settings.fade_on_stop = config_block[0xae] & 1;
-            global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
-            global_settings.car_adapter_mode  = (config_block[0xae] >> 2) & 1;
-            global_settings.line_in = (config_block[0xae] >> 3) & 1;
-            global_settings.playlist_viewer_icons =
-                (config_block[0xae] >> 4) & 1;
-            global_settings.playlist_viewer_indices =
-                (config_block[0xae] >> 5) & 1;
-            global_settings.playlist_viewer_track_display =
-                (config_block[0xae] >> 6) & 1;
-        }
-
-        if(config_block[0xb0] != 0xff) {
-            global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
-            global_settings.peak_meter_performance = 
-                (config_block[0xb0] & 0x80) != 0;
-        }
-
-        if(config_block[0xb1] != 0xff) {
-            global_settings.peak_meter_release = config_block[0xb1] & 0x7f;
-            global_settings.peak_meter_dbfs = (config_block[0xb1] & 0x80) != 0;
-        }
-
-        if(config_block[0xb2] != 0xff)
-            global_settings.peak_meter_min = config_block[0xb2];
+        /* load scalar values from RTC and HD sector, specified via table */
+        load_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
+        load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
         
-        if(config_block[0xb3] != 0xff)
-            global_settings.peak_meter_max = config_block[0xb3];
+        /* FIXME, to be removed with mpeg_val2phys: */
+        /* if a value got loaded, convert it, else restore it */
+        global_settings.volume = (global_settings.volume == MARKER) ? 
+            restore[SOUND_VOLUME] : mpeg_phys2val(SOUND_VOLUME, global_settings.volume);
+        global_settings.bass = (global_settings.bass == MARKER) ? 
+            restore[SOUND_BASS] : mpeg_phys2val(SOUND_BASS, global_settings.bass);
+        global_settings.treble = (global_settings.treble == MARKER) ? 
+            restore[SOUND_TREBLE] : mpeg_phys2val(SOUND_TREBLE, global_settings.treble);
+        global_settings.balance = (global_settings.balance == MARKER) ? 
+            restore[SOUND_BALANCE] : mpeg_phys2val(SOUND_BALANCE, global_settings.balance);
+#ifdef HAVE_MAS3587F
+        global_settings.loudness = (global_settings.loudness == MARKER) ? 
+            restore[SOUND_LOUDNESS] : mpeg_phys2val(SOUND_LOUDNESS, global_settings.loudness);
+        global_settings.bass_boost = (global_settings.bass_boost == MARKER) ? 
+            restore[SOUND_SUPERBASS] : mpeg_phys2val(SOUND_SUPERBASS, global_settings.bass_boost);
+#endif
 
-        if(config_block[0xb4] != 0xff)
-            global_settings.battery_capacity = config_block[0xb4]*50 + 1000;
-
-        if (config_block[0xb5] != 0xff)
-            global_settings.scroll_step = config_block[0xb5];
-
-        if (config_block[0xb6] != 0xff)
-            global_settings.scroll_delay = config_block[0xb6];
-
-        if (config_block[0xb7] != 0xff)
-            global_settings.bidir_limit = config_block[0xb7];
-
-       if (config_block[0xac] != 0xff)
-            global_settings.max_files_in_dir =
-                config_block[0xac] | (config_block[0xad] << 8);
-
-        if (config_block[0xaa] != 0xff)
-            global_settings.max_files_in_playlist =
-                config_block[0xaa] | (config_block[0xab] << 8);
+        if ( global_settings.contrast < MIN_CONTRAST_SETTING )
+            global_settings.contrast = lcd_default_contrast();
 
         strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
-
-        if (config_block[0xf4] != 0xff) {
-            global_settings.rec_prerecord_time = config_block[0xf4] & 0x1f;
-            global_settings.rec_directory = (config_block[0xf4] >> 5) & 3;
-        }
-        if (config_block[0xf5] != 0xff) {
-            global_settings.talk_dir = config_block[0xf5] & 7;
-            global_settings.talk_file = (config_block[0xf5] >> 3) & 3;
-            global_settings.talk_menu = (config_block[0xf5] >> 5) & 1;
-        }
-        
-#ifdef HAVE_LCD_CHARCELLS
-        if (config_block[0xa8] != 0xff)
-            global_settings.jump_scroll = config_block[0xa8];
-        if (config_block[0xa9] != 0xff)
-            global_settings.jump_scroll_delay = config_block[0xa9];
-#endif
-        if(config_block[0xaf] != 0xff) {
-            global_settings.usemrb = (config_block[0xaf] >> 5) & 3;
-            global_settings.autocreatebookmark = (config_block[0xaf] >> 2) & 7;
-            global_settings.autoloadbookmark = (config_block[0xaf]) & 3;
-        }
-    }
+   }
 
     settings_apply();
 }
@@ -882,94 +956,131 @@ void set_file(char* filename, char* setting, int maxlen)
     settings_save();
 }
 
-static void set_sound(char* value, int type, int* setting)
+/* helper to sort a .cfg file entry into a global_settings member,
+   as described per table. Returns the position if found, else 0. */ 
+static int load_cfg_table(
+    const struct bit_entry* p_table, /* the table which describes the entries */
+    int count, /* number of entries in the table, including the first */
+    char* name, /* the item to be searched */
+    char* value, /* the value which got loaded for that item */
+    int hint) /* position to start looking */
 {
-    int num = atoi(value);
+    int i = hint;
 
-    num = mpeg_phys2val(type, num);
-
-    if ((num > mpeg_sound_max(type)) ||
-        (num < mpeg_sound_min(type)))
+    do
     {
-        num = mpeg_sound_default(type);
-    }
+        if (p_table[i].cfg_name != NULL && !strcasecmp(name, p_table[i].cfg_name))
+        { /* found */
+            int val = 0;
+            if (p_table[i].cfg_val == NULL)
+            {   /* numerical value, just convert the string */
+                val = atoi(value);
+            }
+            else
+            {   /* set of string values, find the index */
+                const char* item;
+                const char* run;
+                int len = strlen(value);
+                
+                item = run = p_table[i].cfg_val;
+                
+                while(1)
+                {
+                    /* count the length of the field */
+                    while (*run != ',' && *run != '\0')
+                        run++;
 
-    *setting = num;
-    mpeg_sound_set(type, num);
+                    if (!strncasecmp(value, item, MAX(run-item, len)))
+                        break; /* match, exit the search */
+                    
+                    if (*run == '\0') /* reached the end of the choices */
+                        return i; /* return the position, but don't update */
 
-#ifdef HAVE_MAS3507D
-    /* This is required to actually apply balance */
-    if (SOUND_BALANCE == type)
-        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-#endif
-}
+                    val++; /* count the item up */
+                    run++; /* behind the ',' */
+                    item = run;
+                }
+            }
+        
+            /* could do a memcpy, but that would be endian-dependent */
+            switch(p_table[i].byte_size)
+            {
+            case 1:
+                ((unsigned char*)&global_settings)[p_table[i].settings_offset] = 
+                    (unsigned char)val;
+                break;
+            case 2:
+                ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] = 
+                    (unsigned short)val;
+                break;
+            case 4:
+                ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] = 
+                    (unsigned int)val;
+                break;
+            default:
+                DEBUGF( "illegal size!" );
+                continue;
+            }
 
-static void set_cfg_bool(bool* variable, char* value)
-{
-    /* look for the 'n' in 'on' */
-    if ((value[1] & 0xdf) == 'N') 
-        *variable = true;
-    else
-        *variable = false;
-}
-
-static void set_cfg_int(int* variable, char* value, int min, int max )
-{
-    *variable = atoi(value);
-
-    if (*variable < min)
-        *variable = min;
-    else
-        if (*variable > max)
-            *variable = max;
-}
-
-static void set_cfg_option(int* variable, char* value,
-                           char* options[], int numoptions )
-{
-    int i;
-
-    for (i=0; i<numoptions; i++) {
-        if (!strcasecmp(options[i], value)) {
-            *variable = i;
-            break;
+            return i; /* return the position */
         }
-    }
+
+        i++;
+        if (i==count)
+            i=1; /* wraparound */
+    } while (i != hint); /* back where we started, all searched */
+    
+    return 0; /* indicate not found */
 }
+
 
 bool settings_load_config(char* file)
 {
     int fd;
     char line[128];
+    int restore[6]; /* recover, FIXME: get rid of this */
 
     fd = open(file, O_RDONLY);
     if (fd < 0)
         return false;
 
+
+    /* While the mpeg_val2phys business still exists: ( to be removed) */
+    /* temporarily put markers into the values to detect if they got loaded */
+    restore[SOUND_VOLUME] = global_settings.volume;
+    global_settings.volume = MARKER;
+    restore[SOUND_BASS] = global_settings.bass;
+    global_settings.bass = MARKER;
+    restore[SOUND_TREBLE] = global_settings.treble;
+    global_settings.treble = MARKER;
+    restore[SOUND_BALANCE] = global_settings.balance;
+    global_settings.balance = MARKER;
+#ifdef HAVE_MAS3587F
+    restore[SOUND_LOUDNESS] = global_settings.loudness;
+    global_settings.loudness = MARKER;
+    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
+    global_settings.bass_boost = MARKER;
+#endif
+    
+    
     while (read_line(fd, line, sizeof line) > 0)
     {
         char* name;
         char* value;
+        const struct bit_entry* table[2] = { rtc_bits, hd_bits };
+        const int ta_size[2] = { 
+            sizeof(rtc_bits)/sizeof(rtc_bits[0]), 
+            sizeof(hd_bits)/sizeof(hd_bits[0])
+        };
+        int last_table = 0; /* which table was used last round */
+        int last_pos = 1; /* at which position did we succeed */
+        int pos; /* currently returned position */
 
         if (!settings_parseline(line, &name, &value))
             continue;
 
-        if (!strcasecmp(name, "volume"))
-            set_sound(value, SOUND_VOLUME, &global_settings.volume);
-        else if (!strcasecmp(name, "bass"))
-            set_sound(value, SOUND_BASS, &global_settings.bass);
-        else if (!strcasecmp(name, "treble"))
-            set_sound(value, SOUND_TREBLE, &global_settings.treble);
-        else if (!strcasecmp(name, "balance"))
-            set_sound(value, SOUND_BALANCE, &global_settings.balance);
-        else if (!strcasecmp(name, "channels")) {
-            static char* options[] = {
-                "stereo","stereo narrow","mono","mono left",
-                "mono right","karaoke","stereo wide"};
-            set_cfg_option(&global_settings.channel_config, value,
-                           options, 7);
-        }
-        else if (!strcasecmp(name, "wps")) {
+        /* check for the string values */
+        if (!strcasecmp(name, "wps")) {
             if (wps_load(value,false))
                 set_file(value, global_settings.wps_file, MAX_FILENAME);
         }
@@ -980,247 +1091,50 @@ bool settings_load_config(char* file)
                 talk_init(); /* use voice of same language */
             }
         }
-        else if (!strcasecmp(name, "bidir limit"))
-            set_cfg_int(&global_settings.bidir_limit, value, 0, 200);
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font")) {
             if (font_load(value))
                 set_file(value, global_settings.font_file, MAX_FILENAME);
         }
-        else if (!strcasecmp(name, "scroll step"))
-            set_cfg_int(&global_settings.scroll_step, value, 1, LCD_WIDTH);
-        else if (!strcasecmp(name, "statusbar"))
-            set_cfg_bool(&global_settings.statusbar, value);
-        else if (!strcasecmp(name, "buttonbar"))
-            set_cfg_bool(&global_settings.buttonbar, value);
-        else if (!strcasecmp(name, "peak meter release"))
-            set_cfg_int(&global_settings.peak_meter_release, value, 1, 0x7e);
-        else if (!strcasecmp(name, "peak meter hold")) {
-            static char* options[] = {
-                "off","200ms","300ms","500ms",
-                "1","2","3","4","5","6","7","8","9","10",
-                "15","20","30","1min"};
-            set_cfg_option(&global_settings.peak_meter_hold, value,
-                           options, 18);
-        }
-        else if (!strcasecmp(name, "peak meter clip hold")) {
-            static char* options[] = {
-                "on","1","2","3","4","5","6","7","8","9","10",
-                "15","20","25","30","45","60","90",
-                "2min","3min","5min","10min","20min","45min","90min"};
-            set_cfg_option(&global_settings.peak_meter_clip_hold, value,
-                           options, 25);
-        }
-        else if (!strcasecmp(name, "peak meter dbfs"))
-            set_cfg_bool(&global_settings.peak_meter_dbfs, value);
-        else if (!strcasecmp(name, "peak meter min"))
-            set_cfg_int(&global_settings.peak_meter_min, value, 0, 100);
-        else if (!strcasecmp(name, "peak meter max"))
-            set_cfg_int(&global_settings.peak_meter_max, value, 0, 100);
-        else if (!strcasecmp(name, "peak meter busy"))
-            set_cfg_bool(&global_settings.peak_meter_performance, value);
-        else if (!strcasecmp(name, "volume display")) {
-            static char* options[] = {"graphic", "numeric"};
-            set_cfg_option(&global_settings.volume_type, value, options, 2);
-        }
-        else if (!strcasecmp(name, "battery display")) {
-            static char* options[] = {"graphic", "numeric"};
-            set_cfg_option(&global_settings.battery_type, value, options, 2);
-        }
-        else if (!strcasecmp(name, "time format")) {
-            static char* options[] = {"24hour", "12hour"};
-            set_cfg_option(&global_settings.timeformat, value, options, 2);
-        }
-        else if (!strcasecmp(name, "scrollbar"))
-            set_cfg_bool(&global_settings.scrollbar, value);
-        else if (!strcasecmp(name, "invert"))
-            set_cfg_bool(&global_settings.invert, value);
-        else if (!strcasecmp(name, "flip display"))
-            set_cfg_bool(&global_settings.flip_display, value);
-        else if (!strcasecmp(name, "invert cursor"))
-            set_cfg_bool(&global_settings.invert_cursor, value);
-        else if (!strcasecmp(name, "show icons"))
-            set_cfg_bool(&global_settings.show_icons, value);
 #endif
-        else if (!strcasecmp(name, "caption backlight"))
-            set_cfg_bool(&global_settings.caption_backlight, value);
-        else if (!strcasecmp(name, "shuffle"))
-            set_cfg_bool(&global_settings.playlist_shuffle, value);
-        else if (!strcasecmp(name, "repeat")) {
-            static char* options[] = {"off", "all", "one"};
-            set_cfg_option(&global_settings.repeat_mode, value, options, 3);
-        }
-        else if (!strcasecmp(name, "resume")) {
-            static char* options[] = {"off", "ask", "ask once", "on"};
-            set_cfg_option(&global_settings.resume, value, options, 4);
-        }
-        else if (!strcasecmp(name, "sort case"))
-            set_cfg_bool(&global_settings.sort_case, value);
-        else if (!strcasecmp(name, "show files")) {
-            static char* options[] = {"all", "supported","music", "playlists"};
-            set_cfg_option(&global_settings.dirfilter, value, options, 4);
-        }
-        else if (!strcasecmp(name, "follow playlist"))
-            set_cfg_bool(&global_settings.browse_current, value);
-        else if (!strcasecmp(name, "play selected"))
-            set_cfg_bool(&global_settings.play_selected, value);
-        else if (!strcasecmp(name, "contrast"))
-            set_cfg_int(&global_settings.contrast, value,
-                        MIN_CONTRAST_SETTING, MAX_CONTRAST_SETTING);
-        else if (!strcasecmp(name, "scroll speed"))
-            set_cfg_int(&global_settings.scroll_speed, value, 1, 10);
-        else if (!strcasecmp(name, "scan min step")) {
-            static char* options[] =
-                {"1","2","3","4","5","6","8","10",
-                 "15","20","25","30","45","60"};
-            set_cfg_option(&global_settings.ff_rewind_min_step, value,
-                           options, 14);
-        }
-        else if (!strcasecmp(name, "scan accel"))
-            set_cfg_int(&global_settings.ff_rewind_accel, value, 0, 15);
-        else if (!strcasecmp(name, "scroll delay"))
-            set_cfg_int(&global_settings.scroll_delay, value, 0, 250);
-        else if (!strcasecmp(name, "backlight timeout")) {
-            static char* options[] = {
-                "off","on","1","2","3","4","5","6","7","8","9",
-                "10","15","20","25","30","45","60","90"};
-            set_cfg_option(&global_settings.backlight_timeout, value,
-                           options, 19);
-        }
-        else if (!strcasecmp(name, "backlight when plugged"))
-            set_cfg_bool(&global_settings.backlight_on_when_charging, value);
-        else if (!strcasecmp(name, "antiskip"))
-            set_cfg_int(&global_settings.buffer_margin, value, 0, 7);
-        else if (!strcasecmp(name, "disk spindown"))
-            set_cfg_int(&global_settings.disk_spindown, value, 3, 254);
-#ifdef HAVE_ATA_POWER_OFF
-        else if (!strcasecmp(name, "disk poweroff"))
-            set_cfg_bool(&global_settings.disk_poweroff, value);
-#endif
-#ifdef HAVE_MAS3587F
-        else if (!strcasecmp(name, "loudness"))
-            set_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
-        else if (!strcasecmp(name, "bass boost"))
-            set_sound(value, SOUND_SUPERBASS, &global_settings.bass_boost);
-        else if (!strcasecmp(name, "auto volume")) {
-            static char* options[] = {"off", "2", "4", "8" };
-            set_cfg_option(&global_settings.avc, value, options, 4);
-        }
-        else if (!strcasecmp(name, "rec mic gain"))
-            set_sound(value, SOUND_MIC_GAIN, &global_settings.rec_mic_gain);
-        else if (!strcasecmp(name, "rec left gain"))
-            set_sound(value, SOUND_LEFT_GAIN, &global_settings.rec_left_gain);
-        else if (!strcasecmp(name, "rec right gain"))
-            set_sound(value, SOUND_RIGHT_GAIN, &global_settings.rec_right_gain);
-        else if (!strcasecmp(name, "rec quality"))
-            set_cfg_int(&global_settings.rec_quality, value, 0, 7);
-        else if (!strcasecmp(name, "rec timesplit")){
-            static char* options[] = {"off", "00:05","00:10","00:15",
-                                      "00:30","01:00","02:00","04:00",
-                                      "06:00","08:00","10:00","12:00",
-                                      "18:00","24:00"};
-            set_cfg_option(&global_settings.rec_timesplit, value, 
-                           options, 14);
-        }
-        else if (!strcasecmp(name, "rec source")) {
-            static char* options[] = {"mic", "line", "spdif"};
-            set_cfg_option(&global_settings.rec_source, value, options, 3); 
-        }
-        else if (!strcasecmp(name, "rec frequency")) {
-            static char* options[] = {"44", "48", "32", "22", "24", "16"};
-            set_cfg_option(&global_settings.rec_frequency, value, options, 6);
-        }
-        else if (!strcasecmp(name, "rec channels")) {
-            static char* options[] = {"stereo", "mono"};
-            set_cfg_option(&global_settings.rec_channels, value, options, 2);
-        }
-        else if (!strcasecmp(name, "editable recordings")) {
-            set_cfg_bool(&global_settings.rec_editable, value);
-        }
-        else if (!strcasecmp(name, "prerecording time")) {
-            set_cfg_int(&global_settings.rec_prerecord_time, value, 0, 30);
-        }
-        else if (!strcasecmp(name, "rec directory")) {
-            static char* options[] = {rec_base_directory, "current"};
-            set_cfg_option(&global_settings.rec_directory, value, options, 2);
-        }
-#endif
-        else if (!strcasecmp(name, "idle poweroff")) {
-            static char* options[] = {"off","1","2","3","4","5","6","7","8",
-                                      "9","10","15","30","45","60"};
-            set_cfg_option(&global_settings.poweroff, value, options, 15);
-        }
-#ifdef HAVE_MAS3507D
-        else if (!strcasecmp(name, "line in")){
-            set_cfg_bool(&global_settings.line_in, value);
-	    dac_line_in(global_settings.line_in);
-	}
-#endif
-        else if (!strcasecmp(name, "battery capacity"))
-            set_cfg_int(&global_settings.battery_capacity, value,
-                        1500, BATTERY_CAPACITY_MAX);
-#ifdef HAVE_CHARGE_CTRL
-        else if (!strcasecmp(name, "deep discharge"))
-            set_cfg_bool(&global_settings.discharge, value);
-        else if (!strcasecmp(name, "trickle charge"))
-            set_cfg_bool(&global_settings.trickle_charge, value);
-#endif
-        else if (!strcasecmp(name, "volume fade"))
-            set_cfg_bool(&global_settings.fade_on_stop, value);
-        else if (!strcasecmp(name, "max files in dir"))
-            set_cfg_int(&global_settings.max_files_in_dir, value,
-                        50, 10000);
-        else if (!strcasecmp(name, "max files in playlist"))
-            set_cfg_int(&global_settings.max_files_in_playlist, value,
-                        1000, 20000);
-        else if (!strcasecmp(name, "car adapter mode"))
-            set_cfg_bool(&global_settings.car_adapter_mode, value);
-        else if (!strcasecmp(name, "recursive directory insert")) {
-            static char* options[] = {"off", "on", "ask"};
-            set_cfg_option(&global_settings.recursive_dir_insert, value,
-                options, 3);
-        }
-        else if (!strcasecmp(name, "autoload bookmarks"))
+
+        /* check for scalar values, using the two tables */
+        pos = load_cfg_table(table[last_table], ta_size[last_table], 
+            name, value, last_pos);
+        if (pos) /* success */
         {
-            static char* options[] = {"off", "on", "ask"};
-            set_cfg_option(&global_settings.autoloadbookmark, value, options, 3);
+            last_pos = pos; /* remember as a position hint for next round */
+            continue;
         }
-        else if (!strcasecmp(name, "autocreate bookmarks"))
+
+        last_table = 1-last_table; /* try other table */
+        last_pos = 1; /* search from start */
+        pos = load_cfg_table(table[last_table], ta_size[last_table],
+            name, value, last_pos);
+        if (pos) /* success */
         {
-            static char* options[] = {"off", "on", "ask","recent only - on", "recent only - ask"};
-            set_cfg_option(&global_settings.autocreatebookmark, value, options, 5);
-        }
-        else if (!strcasecmp(name, "use most-recent-bookmarks"))
-        {
-            static char* options[] = {"off", "on", "unique only"};
-            set_cfg_option(&global_settings.usemrb, value, options, 3);
-        }
-        else if (!strcasecmp(name, "playlist viewer icons"))
-            set_cfg_bool(&global_settings.playlist_viewer_icons, value);
-        else if (!strcasecmp(name, "playlist viewer indices"))
-            set_cfg_bool(&global_settings.playlist_viewer_indices, value);
-        else if (!strcasecmp(name, "playlist viewer track display"))
-        {
-            static char* options[] = {"track name", "full path"};
-            set_cfg_option(&global_settings.playlist_viewer_track_display,
-                value, options, 2);
-        }
-        else if (!strcasecmp(name, "talk dir"))
-        {
-            static char* options[] = {"off", "number", "spell", "enter", "hover"};
-            set_cfg_option(&global_settings.talk_dir, value, options, 5);
-        }
-        else if (!strcasecmp(name, "talk file"))
-        {
-            static char* options[] = {"off", "number", "spell"};
-            set_cfg_option(&global_settings.talk_file, value, options, 3);
-        }
-        else if (!strcasecmp(name, "talk menu"))
-        {
-            set_cfg_bool(&global_settings.talk_menu, value);
+            last_pos = pos; /* remember as a position hint for next round */
+            continue;
         }
     }
 
+    /* FIXME, to be removed with mpeg_val2phys: */
+    /* if a value got loaded, convert it, else restore it */
+    global_settings.volume = (global_settings.volume == MARKER) ? 
+        restore[SOUND_VOLUME] : mpeg_phys2val(SOUND_VOLUME, global_settings.volume);
+    global_settings.bass = (global_settings.bass == MARKER) ? 
+        restore[SOUND_BASS] : mpeg_phys2val(SOUND_BASS, global_settings.bass);
+    global_settings.treble = (global_settings.treble == MARKER) ? 
+        restore[SOUND_TREBLE] : mpeg_phys2val(SOUND_TREBLE, global_settings.treble);
+    global_settings.balance = (global_settings.balance == MARKER) ? 
+        restore[SOUND_BALANCE] : mpeg_phys2val(SOUND_BALANCE, global_settings.balance);
+#ifdef HAVE_MAS3587F
+    global_settings.loudness = (global_settings.loudness == MARKER) ? 
+        restore[SOUND_LOUDNESS] : mpeg_phys2val(SOUND_LOUDNESS, global_settings.loudness);
+    global_settings.bass_boost = (global_settings.bass_boost == MARKER) ? 
+        restore[SOUND_SUPERBASS] : mpeg_phys2val(SOUND_SUPERBASS, global_settings.bass_boost);
+#endif
+    
     close(fd);
     settings_apply();
     settings_save();
@@ -1228,13 +1142,78 @@ bool settings_load_config(char* file)
 }
 
 
+/* helper to save content of global_settings into a file,
+   as described per table */ 
+static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
+{
+    long value; /* 32 bit content */
+    int i;
+    const struct bit_entry* p_run = p_table; /* start after the size info */
+    count--; /* first is excluded from loop */
+
+    for (i=0; i<count; i++)
+    {
+        p_run++;
+
+        if (p_run->cfg_name == NULL)
+            continue; /* this value is not to be saved */
+
+        /* could do a memcpy, but that would be endian-dependent */
+        switch(p_run->byte_size)
+        {
+        case 1:
+            if (p_run->bit_size & SIGNED) /* signed? */
+                value = ((char*)&global_settings)[p_run->settings_offset];
+            else
+                value = ((unsigned char*)&global_settings)[p_run->settings_offset];
+            break;
+        case 2:
+            if (p_run->bit_size & SIGNED) /* signed? */
+                value = ((short*)&global_settings)[p_run->settings_offset/2];
+            else
+                value = ((unsigned short*)&global_settings)[p_run->settings_offset/2];
+            break;
+        case 4:
+            value = ((unsigned int*)&global_settings)[p_run->settings_offset/4];
+            break;
+        default:
+            DEBUGF( "illegal size!" );
+            continue;
+        }
+        
+        if (p_run->cfg_val == NULL) /* write as number */
+        {
+            fprintf(fd, "%s: %d\r\n", p_run->cfg_name, value);
+        }
+        else /* write as item */
+        {
+            const char* p = p_run->cfg_val;
+
+            fprintf(fd, "%s: ", p_run->cfg_name);
+            
+            while(value >= 0)
+            {
+                char c = *p++; /* currently processed char */
+                if (c == ',') /* separator */
+                    value--;
+                else if (c == '\0') /* end of string */
+                    break; /* not found */
+                else if (value == 0) /* the right place */
+                    write(fd, &c, 1); /* char by char, this is lame, OK */
+            }
+
+            fprintf(fd, "\r\n");
+        }
+    }
+}
+
+
 bool settings_save_config(void)
 {
     bool done = false;
-    int fd, i, value;
+    int fd, i;
     char filename[MAX_PATH];
-    char* boolopt[] = {"off","on"};
-    char* triopt[] = {"off","on","ask"};
+    int restore[6]; /* recover, FIXME: get rid of this */
 
     /* find unused filename */
     for (i=0; ; i++) {
@@ -1248,6 +1227,9 @@ bool settings_save_config(void)
     /* allow user to modify filename */
     while (!done) {
         if (!kbd_input(filename, sizeof filename)) {
+#ifdef WIN32 /* test hack !!! */
+            strcpy(filename, "C:/test.cfg");
+#endif
             fd = creat(filename,0);
             if (fd < 0) {
                 lcd_clear_display();
@@ -1289,292 +1271,36 @@ bool settings_save_config(void)
                 global_settings.font_file);
 #endif
 
-    fprintf(fd, "#\r\n# Sound settings\r\n#\r\n");
-
-    value = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-    fprintf(fd, "volume: %d\r\n", value);
-
-    value = mpeg_val2phys(SOUND_BASS, global_settings.bass);
-    fprintf(fd, "bass: %d\r\n", value);
-
-    value = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
-    fprintf(fd, "treble: %d\r\n", value);
-
-    value = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
-    fprintf(fd, "balance: %d\r\n", value);
-
-    {
-        static char* options[] =
-        {"stereo","stereo narrow","mono","mono left",
-         "mono right","karaoke","stereo wide"};
-        fprintf(fd, "channels: %s\r\n",
-                options[global_settings.channel_config]);
-    }
-
+    /* FIXME: While the mpeg_val2phys business still exists: ( to be removed) */
+    /* temporarily replace the hardware levels with the MMI values */
+    restore[SOUND_VOLUME] = global_settings.volume;
+    global_settings.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+    restore[SOUND_BASS] = global_settings.bass;
+    global_settings.bass = mpeg_val2phys(SOUND_BASS, global_settings.bass);
+    restore[SOUND_TREBLE] = global_settings.treble;
+    global_settings.treble = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
+    restore[SOUND_BALANCE] = global_settings.balance;
+    global_settings.balance = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
 #ifdef HAVE_MAS3587F
-    value = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
-    fprintf(fd, "loudness: %d\r\n", value);
-
-    value = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
-    fprintf(fd, "bass boost: %d\r\n", value);
-
-    {
-        static char* options[] = {"off", "2", "4", "8" };
-        fprintf(fd, "auto volume: %s\r\n", options[global_settings.avc]);
-    }
+    restore[SOUND_LOUDNESS] = global_settings.loudness;
+    global_settings.loudness = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
+    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
+    global_settings.bass_boost = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
 #endif
-
-    fprintf(fd, "#\r\n# Playback\r\n#\r\n");
-    fprintf(fd, "shuffle: %s\r\n", boolopt[global_settings.playlist_shuffle]);
-
-    {
-        static char* options[] = {"off", "all", "one"};
-        fprintf(fd, "repeat: %s\r\n", options[global_settings.repeat_mode]);
-    }
-
-    fprintf(fd, "play selected: %s\r\n",
-            boolopt[global_settings.play_selected]);
-
-    {
-        static char* options[] = {"off", "ask", "ask once", "on"};
-        fprintf(fd, "resume: %s\r\n", options[global_settings.resume]);
-    }
-
-    {
-        static char* options[] =
-        {"1","2","3","4","5","6","8","10",
-         "15","20","25","30","45","60"};
-        fprintf(fd, "scan min step: %s\r\n",
-                options[global_settings.ff_rewind_min_step]);
-    }
-
-    fprintf(fd, "scan accel: %d\r\nantiskip: %d\r\n",
-            global_settings.ff_rewind_accel,
-            global_settings.buffer_margin);
-    fprintf(fd, "volume fade: %s\r\n", boolopt[global_settings.fade_on_stop]);
-    fprintf(fd, "#\r\n# File View\r\n#\r\n");
-    fprintf(fd, "sort case: %s\r\n", boolopt[global_settings.sort_case]);
-
-    {
-        static char* options[] = {"all", "supported","music", "playlists"};
-        fprintf(fd, "show files: %s\r\n", options[global_settings.dirfilter]);
-    }
-
-    fprintf(fd, "follow playlist: %s\r\n",
-            boolopt[global_settings.browse_current]);
-
-    fprintf(fd, "#\r\n# Display\r\n#\r\n");
     
-#ifdef HAVE_LCD_BITMAP
-    fprintf(fd, "statusbar: %s\r\nbuttonbar: %s\r\nscrollbar: %s\r\n",
-            boolopt[global_settings.statusbar],
-            boolopt[global_settings.buttonbar],
-            boolopt[global_settings.scrollbar]);
+    /* here's the action: write values to file, specified via table */
+    save_cfg_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), fd);
+    save_cfg_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), fd);
 
-    {
-        static char* options[] = {"graphic", "numeric"};
-        fprintf(fd, "volume display: %s\r\nbattery display: %s\r\n",
-                options[global_settings.volume_type],
-                options[global_settings.battery_type]);
-    }
-#endif
-
-    fprintf(fd, "scroll speed: %d\r\nscroll delay: %d\r\n",
-             global_settings.scroll_speed,
-             global_settings.scroll_delay);
-
-#ifdef HAVE_LCD_BITMAP
-    fprintf(fd, "scroll step: %d\r\n", global_settings.scroll_step);
-#else
-    fprintf(fd, "jump scroll: %d\r\n", global_settings.jump_scroll);
-    fprintf(fd, "jump scroll delay: %d\r\n", global_settings.jump_scroll_delay);
-#endif
-
-    fprintf(fd, "bidir limit: %d\r\n", global_settings.bidir_limit);
-
-    {
-        static char* options[] =
-        {"off","on","1","2","3","4","5","6","7","8","9",
-         "10","15","20","25","30","45","60","90"};
-        fprintf(fd, "backlight timeout: %s\r\n",
-                 options[global_settings.backlight_timeout]);
-    }
-
-    fprintf(fd, "backlight when plugged: %s\r\n",
-            boolopt[global_settings.backlight_on_when_charging]);
-
-    fprintf(fd, "caption backlight: %s\r\n",
-            boolopt[global_settings.caption_backlight]);
-    fprintf(fd, "contrast: %d\r\n", global_settings.contrast);
-
-#ifdef HAVE_LCD_BITMAP
-    fprintf(fd, "invert: %s\r\n", boolopt[global_settings.invert]);
-    
-    fprintf(fd, "flip display: %s\r\n", boolopt[global_settings.flip_display]);
-
-    fprintf(fd, "invert cursor: %s\r\n",
-            boolopt[global_settings.invert_cursor]);
-
-    fprintf(fd, "show icons: %s\r\n",
-            boolopt[global_settings.show_icons]);
-
-    fprintf(fd, "peak meter release: %d\r\n",
-            global_settings.peak_meter_release);
-
-    {
-        static char* options[] =
-        {"off","200ms","300ms","500ms","1","2","3","4","5",
-         "6","7","8","9","10","15","20","30","1min"};
-        fprintf(fd, "peak meter hold: %s\r\n",
-                options[global_settings.peak_meter_hold]);
-    }
-
-    {
-        static char* options[] =
-        {"on","1","2","3","4","5","6","7","8","9","10","15","20","25","30",
-         "45","60","90","2min","3min","5min","10min","20min","45min","90min"};
-        fprintf(fd, "peak meter clip hold: %s\r\n",
-                options[global_settings.peak_meter_clip_hold]);
-    }
-
-    fprintf(fd, "peak meter busy: %s\r\npeak meter dbfs: %s\r\n",
-            boolopt[global_settings.peak_meter_performance],
-            boolopt[global_settings.peak_meter_dbfs]);
-
-    fprintf(fd, "peak meter min: %d\r\npeak meter max: %d\r\n",
-            global_settings.peak_meter_min,
-            global_settings.peak_meter_max);
-#endif
-
-    fprintf(fd, "#\r\n# System\r\n#\r\ndisk spindown: %d\r\n",
-             global_settings.disk_spindown);
-
-#ifdef HAVE_ATA_POWER_OFF
-    fprintf(fd, "disk poweroff: %s\r\n",
-            boolopt[global_settings.disk_poweroff]);
-#endif
-
-    fprintf(fd, "battery capacity: %d\r\n", global_settings.battery_capacity);
-
-#ifdef HAVE_CHARGE_CTRL
-    fprintf(fd, "deep discharge: %s\r\ntrickle charge: %s\r\n",
-            boolopt[global_settings.discharge],
-            boolopt[global_settings.trickle_charge]);
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    {
-        static char* options[] = {"24hour", "12hour"};
-        fprintf(fd, "time format: %s\r\n",
-                options[global_settings.timeformat]);
-    }
-#endif
-
-    {
-        static char* options[] =
-        {"off","1","2","3","4","5","6","7","8",
-         "9","10","15","30","45","60"};
-        fprintf(fd, "idle poweroff: %s\r\n",
-                options[global_settings.poweroff]);
-    }
-
-    fprintf(fd, "car adapter mode: %s\r\n",
-            boolopt[global_settings.car_adapter_mode]);
-
-#ifdef HAVE_MAS3507D
-    fprintf(fd, "line in: %s\r\n", boolopt[global_settings.line_in]);
-#endif
-
-    fprintf(fd, "max files in dir: %d\r\n", global_settings.max_files_in_dir);
-    fprintf(fd, "max files in playlist: %d\r\n",
-            global_settings.max_files_in_playlist);
-    
+    /* FIXME to be removed with mpeg_val2phys: restore the original values */
+    global_settings.volume = restore[SOUND_VOLUME];
+    global_settings.bass = restore[SOUND_BASS];
+    global_settings.treble = restore[SOUND_TREBLE];
+    global_settings.balance = restore[SOUND_BALANCE];
 #ifdef HAVE_MAS3587F
-    fprintf(fd, "#\r\n# Recording\r\n#\r\n");
-    fprintf(fd, "rec quality: %d\r\n", global_settings.rec_quality);
-    
-    {
-        static char* options[] = {"44", "48", "32", "22", "24", "16"};
-        fprintf(fd, "rec frequency: %s\r\n",
-                options[global_settings.rec_frequency]);
-    }
-
-    {
-        static char* options[] = {"mic", "line", "spdif"};
-        fprintf(fd, "rec source: %s\r\n", options[global_settings.rec_source]);
-    }
-
-    {
-        static char* options[] = {"stereo", "mono"};
-        fprintf(fd, "rec channels: %s\r\n",
-                options[global_settings.rec_channels]);
-    }
-
-    fprintf(fd,
-            "rec mic gain: %d\r\nrec left gain: %d\r\nrec right gain: %d\r\n",
-            global_settings.rec_mic_gain,
-            global_settings.rec_left_gain,
-            global_settings.rec_right_gain);
-
-    fprintf(fd, "editable recordings: %s\r\n",
-            boolopt[global_settings.rec_editable]);
-
-    fprintf(fd, "prerecording time: %d\r\n",
-            global_settings.rec_prerecord_time);
-
-    {
-        static char* options[] = {rec_base_directory, "current"};
-        fprintf(fd, "rec directory: %s\r\n",
-                options[global_settings.rec_directory]);
-    }
-
+    global_settings.loudness = restore[SOUND_LOUDNESS];
+    global_settings.bass_boost = restore[SOUND_SUPERBASS];
 #endif
-
-    fprintf(fd, "#\r\n# Bookmarking\r\n#\r\n");
-    {
-        fprintf(fd, "autoload bookmarks: %s\r\n",
-                triopt[global_settings.autoloadbookmark]);
-    }
-
-    {
-        static char* options[] = {"off", "on", "ask","recent only - on", "recent only - ask"};
-        fprintf(fd, "autocreate bookmarks: %s\r\n",
-                options[global_settings.autocreatebookmark]);
-    }
-
-    {
-        static char* options[] = {"off", "on", "unique only"};
-        fprintf(fd, "use most-recent-bookmarks: %s\r\n", options[global_settings.usemrb]);
-    }
-
-    fprintf(fd, "#\r\n# Playlists\r\n#\r\n");
-    {
-        fprintf(fd, "recursive directory insert: %s\r\n",
-                triopt[global_settings.recursive_dir_insert]);
-    }
-
-    fprintf(fd, "#\r\n# Playlist viewer\r\n#\r\n");
-    {
-        fprintf(fd, "playlist viewer icons: %s\r\n",
-            boolopt[global_settings.playlist_viewer_icons]);
-        fprintf(fd, "playlist viewer indices: %s\r\n",
-            boolopt[global_settings.playlist_viewer_indices]);
-        {
-            static char* options[] = {"track name", "full path"};
-            fprintf(fd, "playlist viewer track display: %s\r\n",
-                options[global_settings.playlist_viewer_track_display]);
-        }
-    }
-    fprintf(fd, "#\r\n# Voice\r\n#\r\n");
-    {
-        static char* options[] = {"off", "number", "spell", "enter", "hover"};
-        fprintf(fd, "talk dir: %s\r\n",
-            options[global_settings.talk_dir]);
-        fprintf(fd, "talk file: %s\r\n", /* recycle the options, */
-            options[global_settings.talk_file]); /* first 3 are alike */
-        fprintf(fd, "talk menu: %s\r\n",
-            boolopt[global_settings.talk_menu]);
-    }
 
     close(fd);
 
@@ -1586,6 +1312,37 @@ bool settings_save_config(void)
     return true;
 }
 
+
+/* helper to load defaults from table into global_settings members */
+static void default_table(const struct bit_entry* p_table, int count)
+{
+    int i;
+
+    for (i=1; i<count; i++) /* exclude the first, the size placeholder */
+    {
+        /* could do a memcpy, but that would be endian-dependent */
+        switch(p_table[i].byte_size)
+        {
+        case 1:
+            ((unsigned char*)&global_settings)[p_table[i].settings_offset] = 
+                (unsigned char)p_table[i].default_val;
+            break;
+        case 2:
+            ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] = 
+                (unsigned short)p_table[i].default_val;
+            break;
+        case 4:
+            ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] = 
+                (unsigned int)p_table[i].default_val;
+            break;
+        default:
+            DEBUGF( "illegal size!" );
+            continue;
+        }
+    }
+}
+
+
 /*
  * reset all settings to their default value 
  */
@@ -1593,6 +1350,11 @@ void settings_reset(void) {
         
     DEBUGF( "settings_reset()\n" );
 
+    /* read defaults from table(s) into global_settings */
+    default_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]));
+    default_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]));
+
+    /* do some special cases not covered by table */
     global_settings.volume      = mpeg_sound_default(SOUND_VOLUME);
     global_settings.balance     = mpeg_sound_default(SOUND_BALANCE);
     global_settings.bass        = mpeg_sound_default(SOUND_BASS);
@@ -1601,91 +1363,11 @@ void settings_reset(void) {
     global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
     global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
-    global_settings.rec_quality = 5;
-    global_settings.rec_source = 0;    /* 0=mic */
-    global_settings.rec_frequency = 0; /* 0=44.1kHz */
-    global_settings.rec_channels = 0;  /* 0=Stereo */
-    global_settings.rec_mic_gain = 8;
-    global_settings.rec_left_gain = 2; /* 0dB */
-    global_settings.rec_right_gain = 2; /* 0dB */
-    global_settings.rec_editable = false;
-    global_settings.rec_prerecord_time = 0;
-    global_settings.rec_directory = 0; /* rec_base_directory */
-    global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = lcd_default_contrast();
-    global_settings.invert      = DEFAULT_INVERT_SETTING;
-    global_settings.flip_display= false;
-    global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
-    global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
-    global_settings.invert_cursor = DEFAULT_INVERT_CURSOR_SETTING;
-    global_settings.backlight_on_when_charging   = 
-        DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
-#ifdef HAVE_LIION
-    global_settings.battery_capacity = 2200; /* mAh */
-#else
-    global_settings.battery_capacity = 1500; /* mAh */
-#endif
-    global_settings.trickle_charge = true;
-    global_settings.dirfilter   = SHOW_MUSIC;
-    global_settings.sort_case   = false;
-    global_settings.statusbar   = true;
-    global_settings.buttonbar   = true;
-    global_settings.scrollbar   = true;
-    global_settings.repeat_mode = REPEAT_ALL;
-    global_settings.playlist_shuffle = false;
-    global_settings.discharge    = 0;
-    global_settings.timeformat   = 0;
-    global_settings.volume_type  = 0;
-    global_settings.battery_type = 0;
-    global_settings.scroll_speed = 8;
-    global_settings.bidir_limit  = 50;
-#ifdef HAVE_LCD_CHARCELLS
-    global_settings.jump_scroll  = 0;
-    global_settings.jump_scroll_delay  = 50;
-#endif    
-    global_settings.scroll_delay = 100;
-    global_settings.scroll_step  = 6;
-    global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
-    global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
-    global_settings.resume_index = -1;
-    global_settings.resume_first_index = 0;
-    global_settings.resume_offset = -1;
-    global_settings.resume_seed = -1;
-    global_settings.disk_spindown = 5;
-    global_settings.disk_poweroff = false;
-    global_settings.buffer_margin = 0;
-    global_settings.browse_current = false;
-    global_settings.play_selected = true;
-    global_settings.peak_meter_release = 8;
-    global_settings.peak_meter_hold = 3;
-    global_settings.peak_meter_clip_hold = 16;
-    global_settings.peak_meter_dbfs = true;
-    global_settings.peak_meter_min = 60;
-    global_settings.peak_meter_max = 0;
-    global_settings.peak_meter_performance = false;
-    global_settings.wps_file[0] = 0;
-    global_settings.font_file[0] = 0;
-    global_settings.lang_file[0] = 0;
-    global_settings.runtime = 0;
-    global_settings.topruntime = 0;
-    global_settings.autocreatebookmark = BOOKMARK_NO;
-    global_settings.autoloadbookmark = BOOKMARK_NO;
-    global_settings.usemrb = BOOKMARK_NO;
-    global_settings.fade_on_stop = true;
-    global_settings.caption_backlight = false;
-    global_settings.car_adapter_mode = false;
-    global_settings.max_files_in_dir = 400;
-    global_settings.max_files_in_playlist = 10000;
-    global_settings.show_icons = true;
-    global_settings.recursive_dir_insert = RECURSE_OFF;
-    global_settings.line_in = false;
-    global_settings.playlist_viewer_icons = true;
-    global_settings.playlist_viewer_indices = true;
-    global_settings.playlist_viewer_track_display = 0;
-    /* talking menu on by default, to help the blind (if voice file present) */
-    global_settings.talk_menu = 1; 
-    global_settings.talk_dir = 0;
-    global_settings.talk_file = 0;
+    global_settings.wps_file[0] = '\0';
+    global_settings.font_file[0] = '\0';
+    global_settings.lang_file[0] = '\0';
+
 }
 
 bool set_bool(char* string, bool* variable )
