@@ -2659,6 +2659,7 @@ FLAC__bool FLAC__bitbuffer_read_utf8_uint64(FLAC__BitBuffer *bb, FLAC__uint64 *v
 	return true;
 }
 
+#if 0
 void FLAC__bitbuffer_dump(const FLAC__BitBuffer *bb, FILE *out)
 {
 	unsigned i, j;
@@ -2688,3 +2689,4 @@ void FLAC__bitbuffer_dump(const FLAC__BitBuffer *bb, FILE *out)
 		}
 	}
 }
+#endif
