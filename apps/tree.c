@@ -152,7 +152,6 @@ static int showdir(char *path, int start)
     lcd_putsxy(0,0, "[Browse]",0);
     lcd_setmargins(0,MARGIN_Y);
     lcd_setfont(0);
-    lcd_update();
 #endif
 
     for ( i=start; i < start+TREE_MAX_ON_SCREEN; i++ ) {
