@@ -28,6 +28,7 @@
 #include "usb.h"
 #include "power.h"
 #include "string.h"
+#include "hwcompat.h"
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -697,42 +698,20 @@ static int master_slave_detect(void)
 }
 
 static int io_address_detect(void)
-{
-    unsigned char tmp = ATA_STATUS & 0xf9; /* Mask the IDX and CORR bits */
-    unsigned char dummy;
-        
-    /* We compare the STATUS register with the ALT_STATUS register, which
-       is located at the same address as CONTROL. If they are the same, we
-       assume that we have the correct address.
-
-       We can't read the ATA_STATUS directly, since the read data will stay
-       on the data bus if the following read does not assert the Chip Select
-       to the ATA controller. We read a register that we know exists to make
-       sure that the data on the bus isn't identical to the STATUS register
-       contents. */
-    ATA_SECTOR = 0;
-    dummy = ATA_SECTOR;
-    if(tmp == ((*ATA_CONTROL2) & 0xf9))
+{   /* now, use the HW mask instead of probing */
+    if (read_hw_mask() & ATA_ADDRESS_200)
     {
-        DEBUGF("CONTROL is at 0x306\n");
-        ata_io_address = 0x300; /* For debug purposes only */
-        old_recorder = true;
-        ata_control = ATA_CONTROL2;
-    }
-    else
-    {
-        DEBUGF("CONTROL is at 0x206\n");
         ata_io_address = 0x200; /* For debug purposes only */
         old_recorder = false;
         ata_control = ATA_CONTROL1;
     }
-
-    /* Let's check again, to be sure */
-    if(tmp != (ATA_ALT_STATUS & 0xf9))
+    else
     {
-        DEBUGF("ATA I/O address detection failed\n");
-        return -1;
+        ata_io_address = 0x300; /* For debug purposes only */
+        old_recorder = true;
+        ata_control = ATA_CONTROL2;
     }
+
     return 0;
 }
 
