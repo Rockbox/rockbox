@@ -509,7 +509,7 @@ bool button_hold(void)
 
 int button_status(void)
 {
-    return last_btn;
+    return lastbtn;
 }
 
 void button_clear_queue(void)
