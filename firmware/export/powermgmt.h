@@ -48,13 +48,12 @@
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
-#define POWER_AVG_N       4      /* how many samples to take for each measurement */
-#define POWER_AVG_SLEEP   9      /* how long do we sleep between each measurement */
 
 #define CHARGE_END_NEGD   6      /* stop when N minutes have passed with
                                   * avg delta being < -0.05 V */
 #define CHARGE_END_ZEROD  50     /* stop when N minutes have passed with
                                   * avg delta being < 0.005 V */
+
 #ifndef SIMULATOR
 
 #ifdef HAVE_CHARGE_CTRL
@@ -65,27 +64,40 @@
 #define CHARGE_RESTART_HI 85     /* %: when to restart charging in 'charge' mode */
                                  /* attention: if set too high, normal charging is started in trickle mode */
 #define CHARGE_RESTART_LO 10     /* %: when to restart charging in 'discharge' mode */
-#define CHARGE_PAUSE_LEN  60     /* how many minutes to pause between charging cycles */
 #define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
 #define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
 #define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
 #define TRICKLE_VOLTAGE   545    /* which voltage is best? (centivolts) */
 
+#define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
+#define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
+
 extern char power_message[POWER_MESSAGE_LEN];
-extern char charge_restart_level;
+
+extern int long_delta;          /* long term delta battery voltage */
+extern int short_delta;         /* short term delta battery voltage */
 
 extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
 extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
 
-extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
+void enable_deep_discharge(bool on);    /* deep discharge the battery */
+
 void enable_trickle_charge(bool on);
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
 #endif /* HAVE_CHARGE_CTRL */
 
-#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
-extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
-#endif
+#if defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200)
+typedef enum {
+    DISCHARGING,
+    CHARGING,
+    TOPOFF,
+    TRICKLE
+} charge_state_type;
+
+/* tells what the charger is doing */
+extern charge_state_type charge_state;
+#endif /* defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200) */
 
 #ifdef HAVE_MMC  /* Values for Ondio */
 #define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
@@ -95,9 +107,14 @@ extern int charge_state;         /* tells what the charger is doing (for info di
 #define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 #define CURRENT_USB       500  /* usual current in mA in USB mode */
 #define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
-#define CURRENT_CHARGING  300  /* charging current */
-#endif
 
+#define CURRENT_MIN_CHG    70  /* minimum charge current */
+#define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
+#define CURRENT_MAX_CHG   350  /* maximum charging current */
+#define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
+#endif /* HAVE_MMC */
+
+extern unsigned int bat;       /* filtered battery voltage, centivolts */
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
 /* Start up power management thread */
@@ -114,7 +131,7 @@ bool battery_level_safe(void);
 
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */
-void set_battery_type(int type); /* set local battery type */
+void set_battery_type(int type);         /* set local battery type */
 
 void set_sleep_timer(int seconds);
 int get_sleep_timer(void);

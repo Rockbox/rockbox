@@ -727,8 +727,7 @@ static bool deep_discharge(void)
 {
     bool result;
     result = set_bool( str(LANG_DISCHARGE), &global_settings.discharge );
-    charge_restart_level = global_settings.discharge ? 
-        CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+    enable_deep_discharge(global_settings.discharge);
     return result;
 }
 static bool trickle_charge(void)

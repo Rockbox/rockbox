@@ -63,7 +63,7 @@
 #define ADC_BUTTON_ROW2         5 /* Used for scanning the keys, different
                                      voltages for different keys */
 #define ADC_UNREG_POWER         6 /* Battery voltage with a better scaling */
-#define ADC_EXT_POWER           7 /* The external power voltage, V=X*0.0148 */
+#define ADC_EXT_POWER           7 /* The external power voltage, 0v or 2.7v */
 
 #endif
 

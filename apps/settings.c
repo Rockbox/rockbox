@@ -763,8 +763,7 @@ void settings_apply(void)
 
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
-    charge_restart_level = global_settings.discharge ? 
-        CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+    enable_deep_discharge(global_settings.discharge);
     enable_trickle_charge(global_settings.trickle_charge);
 #endif
 

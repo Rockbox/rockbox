@@ -8,12 +8,13 @@ miss some information here, write to mail@uwe-freese.de.
 
 [INTRODUCTION]
 
-This doc describes how the charging works for the recorder. The algorithm can
-be found in firmware/powermgmt.[c|h]. Debug output is done in
- apps/debug_menu.c. 
-Charging for the player and the FM/V2 recorder is done by the hardware and 
-therefore isn't implemented in rockbox. Only the functions that calculate the 
-battery level are also used for these models.
+This doc describes how the charging works for the recorder. The algorithm
+can be found in firmware/powermgmt.[c|h]. Debug output is done in
+apps/debug_menu.c.
+
+Charging for the player and the FM/V2 recorder is done by the hardware and
+therefore isn't implemented in rockbox. Only the functions that
+calculate the battery level are also used for these models.
 
 All following information is related to the recorder.
 
@@ -38,15 +39,13 @@ voltage. Both voltage curves (charging and decharging) are used here.
 [CHARGE OVERVIEW]
 
 - If voltage drops under a certain value (with "deep discharge" option on the 
-  value is lower), charging is started.
+  value is a lot lower), charging is started.
 - If end of charge is detected, go to top off charge.
 - Make the batteries completely full. 90 minutes of top off charge (voltage
-  regulation at a high value).
-- After that, do trickle charge (max. 12 hours with voltage regulation at a 
-  lower value).
-- When trickle charge is done and you did not disconnect or shut off your AJB
-  by  now, the AJB decharges normally since it reaches a low voltage and
-  everything starts from the beginning.
+  regulation at a higher value).
+- After that, trickle charge (voltage regulation at a nominal battery value).
+  The trickle charge will continue as long as the charger is plugged in (this
+  is a change from the original charge algorithm).
 
 
 [NORMAL CHARGE]
@@ -89,7 +88,7 @@ Two facts on batteries are the reason why this works:
   goes down when the temperature goes up.
 
 NiMH batteries have a smaller delta peak than NiCd, but is is enough for
-Rockbox to detect that the batteries are full.
+Rockbox to detect that the batteries are full (in theory :-).
 
 Related documents on the web:
 
@@ -114,20 +113,33 @@ It goes on again and then the archos firmware charger code would charge again.
 So we have trickle charge in rockbox.
 
 In simple words, rockbox charges about 15 seconds per minute in trickle mode.
-An AJB consumes 100 mA when it's on and the charging current is about 300mA.
+An AJB consumes 100 mA when it's on and the charging current is about 350mA.
 So charging 15 s and decharge 45 s will keep the batteries full.
 
-But the number of seconds the charger is on in trickle charge mode is also 
-adjusted dynamically (between 1 and 24 sec). Rockbox tries to hold the battery 
-level at 5,65 V (top off charge, that means "make the batteries completely 
-full") for 90 minutes, then a level of 5,45 V. If the voltage drops below the 
-wanted value, rockbox will charge one second more the next minute. If is is 
-greater than this value, is will charge one second less.
+But the number of seconds the charger is on in trickle charge mode is
+also adjusted dynamically. Rockbox tries to hold the battery level at
+5,65 V (top off charge, that means "make the batteries completely full")
+for 90 minutes, then a level of 5,45 V. If the voltage drops below the
+desired value, rockbox will charge one second more the next minute. If
+is is greater than this value, is will charge one second less.
 
-Trickle charging runs 12 hours after finishing the normal charging. That
-should be enough for charging the AJB over night and then unplug the charger
-sometime in this 12 hour trickle charge time. It is not recommended to trickle
-charge over days, that's because it is stopped after 12 hours.
+The number of seconds the charger is on in top off and trickle charge
+modes is also dependant on the charger's output voltage: if the charger
+supplies less than about 10v, the current into the batteries is less and
+thus the percentage on is increased to maintain the proper current into
+the batteries.
+
+The original recharging algorithm stopped trickle charging after 12 hours,
+at which time the battery would be discharged until the the batteries
+fell below the "start charging" level.  At that time the charge cycle
+would be repeated.
+
+The time limit was removed by Jerry Van Baren (along with other changes)
+in the February, 2005 timeframe.  The rationale for this is that the
+trickle charge level is very low.  In addition, it is disconcerting to
+have a AJR plugged in and "recharged" only to find out that the battery
+is only 86% full.  This was giving the Rockbox recharging algorithm a
+bad name and frustrating our users.
 
 Many chargers do top off and trickle charge by feeding a constant (low)
 current to the batteries. Rockbox, as described, makes a voltage regulation.
@@ -177,25 +189,23 @@ because it uses the raw voltages):
   always set the battery level to 100%
 - the battery level is only allowed to change 1% per minute (exception: when
   usb is connected, it is allowed to go 3% down/min)
-- if charging just started (or stopped), ignore the battery voltage for the 
-  first 25 minutes
 - after turning on the device, add another 5% to the battery level, because
   the drive is used heavily when booting and the voltage usually gets a
-  little higher after that
+  little higher after that (rebounds)
 
 
 [WHICH CHARGING MODE TO USE]
 
-If you use your AJB connected to the power supply the whole time, select "deep 
-discharge on" and "trickle charge off".
+Jerry Van Baren's revised recommendation: Select "deep discharge OFF"
+and "trickle charge ON".  This will keep your batteries charged up and
+IMHO will not damage them.
 
-If you want to charge your AJB over night and take it with you the next day, 
-select "deep discharge off" (that it starts charging immediately) and "trickle 
-charge on" (that the batteries remain full).
+Original recommendation:
 
-A special case: If you fill up the batteries that are still nearly full every 
+A special case: If you use your AJR connected to the power supply all
+the time or if you fill up the batteries that are still nearly full every
 night, it is recommended that you make a complete charge cycle from time to 
-time. Select "deep discharge on" and "trickle charge on" and wait till the
+time. Select "deep discharge ON" and "trickle charge OFF" and wait till the
 whole cycle is over (you can speed up the discharging a little bit by turning
 on the LED backlight). Even if the battery sellers say NiMH cells don't show a
 memory effect, I recommend making this procedure from time to time (every 10th

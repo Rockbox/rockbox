@@ -968,7 +968,7 @@ bool dbg_mas_codec(void)
  * The power_history array is updated in power_thread of powermgmt.c.
  */
 
-#define BAT_FIRST_VAL  MAX(POWER_HISTORY_LEN - LCD_WIDTH - 1, 0)
+#define BAT_LAST_VAL  MIN(LCD_WIDTH, POWER_HISTORY_LEN)
 #define BAT_YSPACE    (LCD_HEIGHT - 20)
 
 bool view_battery(void)
@@ -986,30 +986,32 @@ bool view_battery(void)
         switch (view) {
             case 0: /* voltage history graph */
                 /* Find maximum and minimum voltage for scaling */
-                maxv = minv = 0;
-                for (i = BAT_FIRST_VAL; i < POWER_HISTORY_LEN; i++) {
+                maxv = 0;
+                minv = 65535;
+                for (i = 0; i < BAT_LAST_VAL; i++) {
                     if (power_history[i] > maxv)
                         maxv = power_history[i];
-                    if ((minv == 0) || ((power_history[i]) && 
-                                        (power_history[i] < minv)) )
+                    if (power_history[i] && (power_history[i] < minv))
                     {
                         minv = power_history[i];
                     }
                 }
                 
-                if (minv < 1)
+                if ((minv < 1) || (minv >= 65535))
                     minv = 1;
                 if (maxv < 2)
                     maxv = 2;
                     
                 lcd_clear_display();
-                lcd_puts(0, 0, "Battery voltage:");
+                snprintf(buf, 30, "Battery %d.%02d", power_history[0] / 100,
+                         power_history[0] % 100);
+                lcd_puts(0, 0, buf);
                 snprintf(buf, 30, "scale %d.%02d-%d.%02d V", 
                          minv / 100, minv % 100, maxv / 100, maxv % 100);
                 lcd_puts(0, 1, buf);
                 
                 x = 0;
-                for (i = BAT_FIRST_VAL+1; i < POWER_HISTORY_LEN; i++) {
+                for (i = BAT_LAST_VAL - 1; i >= 0; i--) {
                     y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
                     lcd_clearline(x, LCD_HEIGHT-1, x, 20);
                     lcd_drawline(x, LCD_HEIGHT-1, x, 
@@ -1035,31 +1037,15 @@ bool view_battery(void)
                 snprintf(buf, 30, "Charger: %s", 
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
+#endif
 #ifdef HAVE_CHARGE_CTRL
                 snprintf(buf, 30, "Charging: %s", 
                          charger_enabled ? "yes" : "no");
                 lcd_puts(0, 4, buf);
-#endif                
-#endif
-                y = ( power_history[POWER_HISTORY_LEN-1] * 100
-                    + power_history[POWER_HISTORY_LEN-2] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD+1] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
-                    / CHARGE_END_NEGD / 2;
-                
-                snprintf(buf, 30, "short delta: %d", y);
+                snprintf(buf, 30, "short delta: %d", short_delta);
                 lcd_puts(0, 5, buf);
-                
-                y = ( power_history[POWER_HISTORY_LEN-1] * 100
-                    + power_history[POWER_HISTORY_LEN-2] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD+1] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
-                    / CHARGE_END_ZEROD / 2;
-                
-                snprintf(buf, 30, "long delta: %d", y);
+                snprintf(buf, 30, "long delta: %d", long_delta);
                 lcd_puts(0, 6, buf);
-
-#ifdef HAVE_CHARGE_CTRL
                 lcd_puts(0, 7, power_message);
 #endif
                 break;
@@ -1069,8 +1055,7 @@ bool view_battery(void)
                 lcd_puts(0, 0, "Voltage deltas:");
                 
                 for (i = 0; i <= 6; i++) {
-                    y = power_history[POWER_HISTORY_LEN-1-i] - 
-                        power_history[POWER_HISTORY_LEN-1-i-1];
+                    y = power_history[i] - power_history[i+i];
                     snprintf(buf, 30, "-%d min: %s%d.%02d V", i,
                              (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 100, 
                              ((y < 0) ? y * -1 : y ) % 100);
@@ -1088,19 +1073,19 @@ bool view_battery(void)
                 snprintf(buf, 30, "Cycle time: %d m", powermgmt_last_cycle_startstop_min);
                 lcd_puts(0, 1, buf);
 
-                snprintf(buf, 30, "Lev.at cycle start: %d%%", powermgmt_last_cycle_level);
+                snprintf(buf, 30, "Lvl@cyc st: %d%%", powermgmt_last_cycle_level);
                 lcd_puts(0, 2, buf);
 #endif
 
-                snprintf(buf, 30, "Last PwrHist val: %d.%02d V",
-                    power_history[POWER_HISTORY_LEN-1] / 100,
-                    power_history[POWER_HISTORY_LEN-1] % 100);
+                snprintf(buf, 30, "Last PwrHist: %d.%02d V",
+                    power_history[0] / 100,
+                    power_history[0] % 100);
                 lcd_puts(0, 3, buf);
 
                 snprintf(buf, 30, "battery level: %d%%", battery_level());
                 lcd_puts(0, 5, buf);
 
-                snprintf(buf, 30, "Est. remaining: %d m", battery_time());
+                snprintf(buf, 30, "Est. remain: %d m", battery_time());
                 lcd_puts(0, 6, buf);
 
 #ifdef HAVE_CHARGE_CTRL
