@@ -12,7 +12,7 @@ for(@list) {
     closedir DIR;
 
     for(@files) {
-        /(\d+)/;
+        /(20\d+)/;
         $date{$1}=$1;
     }
 }
