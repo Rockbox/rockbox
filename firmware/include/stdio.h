@@ -1,6 +1,8 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_
 
+#include <_ansi.h>
+
 #define __need_size_t
 #include <stddef.h>
 
@@ -31,11 +33,7 @@
 #define __VALIST char*
 #endif
 
-int	_EXFUN(fprintf, (FILE *, const char *, ...));
-int	_EXFUN(fscanf, (FILE *, const char *, ...));
-int	_EXFUN(printf, (const char *, ...));
-int	_EXFUN(vfprintf, (FILE *, const char *, __VALIST));
-int	_EXFUN(vprintf, (const char *, __VALIST));
-int	_EXFUN(vsprintf, (char *, const char *, __VALIST));
+int snprintf (char *buf, size_t size, const char *fmt, ...);
+int vsnprintf (char *buf, int size, const char *fmt, __VALIST ap);
 
 #endif /* _STDIO_H_ */

@@ -29,6 +29,13 @@ extern __IMPORT int __mb_cur_max;
 
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 
+void *malloc(size_t);
+void *calloc (size_t nmemb, size_t size);
+void free(void *);
+void *realloc(void *, size_t);
+
+#define abs(x) ((x)>0?x:-x)
+
 #ifdef __cplusplus
 }
 #endif
