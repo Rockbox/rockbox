@@ -200,7 +200,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         
         rb->lcd_clear_display();
         rb->splash(0, true, "Writing...");
-        sort_buffer();
         
         rc = write_file();
         if(rc < 0) {
