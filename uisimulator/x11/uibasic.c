@@ -46,7 +46,7 @@
 GC draw_gc;
 static Colormap cmap;
 
-static int display_zoom=1;
+int display_zoom=1;
 
 Display *dpy;
 Window window;
@@ -90,11 +90,6 @@ void screen_resized(int width, int height)
   maxx = width;
   maxy = height;
 
-  display_zoom = maxy/LCD_HEIGHT;
-  if (maxx/LCD_WIDTH < display_zoom) 
-    display_zoom = maxx/LCD_WIDTH;
-  if (display_zoom<1)
-    display_zoom = 1;
   XSetForeground (dpy, draw_gc, get_pixel_resource ("background", "Background",
                                                     dpy, cmap));
   XFillRectangle(dpy, window, draw_gc, 0, 0, width*display_zoom, height*display_zoom);

@@ -84,6 +84,7 @@ static XrmOptionDescRec default_options [] = {
 
 static char *default_defaults[] = {
   ".root:		false",
+#define GEOMETRY_POSITION 1
   "*geometry:		"
 #ifdef HAVE_LCD_BITMAP
   "120x68"
@@ -99,6 +100,7 @@ static char *default_defaults[] = {
 };
 
 extern Display* dpy;
+extern int display_zoom;
 
 static XrmOptionDescRec *merged_options;
 static int merged_options_size;
@@ -313,6 +315,64 @@ int main (int argc, char **argv)
     char version[255];
 
     sprintf(version,"rockboxui %s",ROCKBOXUI_VERSION);
+#ifdef HAVE_LCD_BITMAP
+    display_zoom=2;
+    {
+      char *env=getenv("RECORDER_ZOOM");
+      if (env) {
+        display_zoom=atoi(env);
+      }
+    }
+#else
+    display_zoom=1;
+    {
+      char *env=getenv("PLAYER_ZOOM");
+      if (env) {
+        display_zoom=atoi(env);
+      }
+    }
+#endif
+
+    if (argc > 1)
+    {
+      int x;
+      for (x=1; x<argc; x++) {
+	if (!strcmp("--old_lcd", argv[x])) {
+	  having_new_lcd=FALSE;
+	  printf("Using old LCD layout.\n");
+	} else if (!strcmp("--recorder_zoom", argv[x])) {
+          x++;
+#ifdef HAVE_LCD_BITMAP
+	  display_zoom=atoi(argv[x]);
+          printf("Window zoom is %d\n", display_zoom);
+#endif
+	} else if (!strcmp("--player_zoom", argv[x])) {
+          x++;
+#ifndef HAVE_LCD_BITMAP
+	  display_zoom=atoi(argv[x]);
+          printf("Window zoom is %d\n", display_zoom);
+#endif
+	} else {
+	  printf("rockboxui\n");
+	  printf("Arguments:\n");
+	  printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
+	  printf("  --player_zoom \t [Player] window zoom\n");
+	  printf("  --recorder_zoom \t [Recorder] window zoom\n");
+	  exit(0);
+	}
+      }
+    }
+    {
+      static char geometry[40];
+#ifdef HAVE_LCD_BITMAP
+      snprintf(geometry, 40, "*geometry: %dx%d", 120*display_zoom, 68*display_zoom);
+#else
+      snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom, 132*display_zoom);
+#endif
+      default_defaults[GEOMETRY_POSITION]=geometry;
+    }
+
+
     merge_options ();
 
 #ifdef __sgi
@@ -344,22 +404,6 @@ int main (int argc, char **argv)
     XA_WM_PROTOCOLS = XInternAtom (dpy, "WM_PROTOCOLS", False);
     XA_WM_DELETE_WINDOW = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
 
-
-    if (argc > 1)
-    {
-      int x;
-      for (x=1; x<argc; x++) {
-	if (!strcmp("--old_lcd", argv[x])) {
-	  having_new_lcd=FALSE;
-	  printf("Using old LCD layout.\n");
-	} else {
-	  printf("rockboxui\n");
-	  printf("Arguments:\n");
-	  printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
-	  exit(0);
-	}
-      }
-    }
 
     if (CellsOfScreen (DefaultScreenOfDisplay (dpy)) <= 2)
         mono_p = True;
