@@ -1,3 +1,4 @@
+FILES
 Makefile
 *.[ch]
 recorder/*.[ch]
