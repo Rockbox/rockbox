@@ -333,7 +333,7 @@ void lcd_define_pattern(int pat, char *pattern)
     extended_font_player[pat][i]=pattern[i];
   }
   if (extended_chars_mapped[pat]!=NO_CHAR) {
-      lcd_define_hw_pattern(pat*8, pattern, 7);
+      lcd_define_hw_pattern(extended_chars_mapped[pat]*8, pattern, 7);
   }
 }
 
