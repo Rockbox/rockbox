@@ -16,17 +16,24 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <p><i>2002-06-19</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
 
-<p><i>2002-06-19</i>: Recorder sound support checked into CVS. Good news: No background noise!
-
-<p><i>2002-06-10</i>: Playlist and scroll support added. Testing for release v1.1.
-
-<p><i>2002-06-07</i>: The ATA driver now works for the Recorder models too.
-
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
 
-<p>We have a mailing list: rockbox@cool.haxx.se.
-To subscribe, send a message to <a href="mailto:majordomo@cool.haxx.se">majordomo@cool.haxx.se</a> with the words "subscribe rockbox" in the body.
+<h2>Recent CVS activity</h2>
+<p>
+<!--#include file="last5.html" -->
+
+<h2>Open bug reports</h2>
+<p>
+<!--#include file="bugs.html" -->
+<small><b>Note:</b> Don't file bug reports on daily builds. They are work in progress.</small>
+
+<h2>Vacations</h2>
+<p>Parts of the core team is currently away on vacation:
+<ul>
+<li>Björn Stenberg (Zagor): Back friday july 5, reads mail
+<li>Daniel Stenberg (Bagder): Back thursday july 25, does not read mail
+</ul>
 
 <h2>Roadmap</h2>
 <p>This is a rough indication of which features we plan/expect/hope to be
@@ -59,32 +66,5 @@ The first thing this version does after boot is to look for a file called
 "archos.mod" in the root directory of the harddisk. 
 If it exists, it is loaded into RAM and started.
 This is how firmware upgrades are loaded.
-
-<h2>Dreams</h2>
-<p>Ok, forget about reality, what could we do with this?
-
-<ul>
-<li>All those simple mp3-play features we sometimes miss:
- <ul>
- <li>No pause between songs
- <li>Mid-song resume
- <li>Mid-playlist resume
- <li>No-scan playlists
- <li>Unlimited playlist size
- <li>Autobuild playlists (such as "all songs in this directory tree")
- <li>Auto-continue play in the next directory
- <li>Current folder and all sub-folder random play
- <li>Full disk random play
- <li>REAL random (if press back it goes to the previous song that was played)
- <li>Multi song queue (folder queue)
-</ul>
-<li>Faster scroll speed
-<li>Archos Recorder support. Most of the hardware is the same, but the display and some other things differ.
-<li>All kinds of cool features done from the wire remote control, including controlling your Archos from your car radio (req hw mod)
-<li>Ogg Vorbis support [unverified: the MAS is somewhat programmable, but enough?]
-<li>Support for megabass switch (req hw mod) [unverified: I just saw the DAC docs shows how to do it switchable. we need a free port pin to be able to switch]
-<li>Player control via USB [unverified]
-<li>Memory expansion? [doubtful: the current DRAM chip only has 10 address lines. we'd have to pull off one heck of a hw mod to expand that]
-</ul>
 
 #include "foot.t"

@@ -2,6 +2,12 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-06-19</i>: Recorder sound support checked into CVS. Good news: No background noise!
+
+<p><i>2002-06-10</i>: Playlist and scroll support added. Testing for release v1.1.
+
+<p><i>2002-06-07</i>: The ATA driver now works for the Recorder models too.
+
 <p><i>2002-06-01</i>: Version 1.0 is released! <a href="download/">Download it here</a>.
 
 <p><i>2002-06-01</i>: Web site has been down three days due to a major power loss.

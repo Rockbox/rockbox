@@ -33,7 +33,7 @@
 <a class="menulink" href="/rockbox/docs/">data sheets</a><br>
 <a class="menulink" href="/rockbox/schematics/">schematics</a><br>
 <a class="menulink" href="/rockbox/mods/">hardware mods</a><br>
-<a class="menulink" href="http://bjorn.haxx.se/rockbox/mail.cgi">mail list archive</a><br>
+<a class="menulink" href="http://bjorn.haxx.se/rockbox/mail/">mailing list</a><br>
 <a class="menulink" href="/rockbox/irc/">IRC</a><br>
 <a class="menulink" href="/rockbox/tools.html">tools</a><br>
 <a class="menulink" href="/rockbox/internals/">photos</a><br>

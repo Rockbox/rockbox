@@ -66,6 +66,7 @@ of the Rockbox project
 
 <p><tt>cvs commit -m "This is my change comment" <b>filename</b></tt>
 
+<p><strong>Note:</strong> Before checking in modifications, test-build all targets (player, player-old, recorder, player-sim, recorder-sim) to make sure your changes don't break anything.
 
 <h2>Updating your repository</h2>
 
@@ -104,6 +105,16 @@ those on the remote repository. This is called "status":
 <p>To only list files who differ from the server, filter again:
 
 <p><tt>cvs status | grep Status | grep -v Up-to-date</tt>
+
+<h2>Producing a diff of your changes</h2>
+
+<p>If you want to see how your local files differ from the CVS repository,
+you can ask CVS to show you:
+
+<p><tt>cvs diff -u [files(s)]</tt>
+
+<p>The <tt>-u</tt> selects the "unified" diff format, which is preferrable
+when working with source code.
 
 <h2>What Happens in the Repository?</h2>
 <p>

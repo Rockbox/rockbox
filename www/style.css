@@ -42,7 +42,7 @@ A {
 
 .bgbox {
  left-border-width: 1px;
- border-color: black;
+ border-color: #000000;
 }
 
 .menulink {
@@ -56,7 +56,7 @@ A {
 }
 
 .buildwarn {
- background-color: yellow;
+ background-color: #ffff00;
  width: 3em;
 }
 
@@ -66,5 +66,18 @@ A {
 }
 
 .gccwarn {
+ color: #ff4040;
+}
+
+.gccerror {
  color: #ff0000;
+}
+
+.changetable, .bugs, .dailymod {
+ border: outset 2px #ffffff;
+}
+
+.changetable td, .bugs td {
+ background-color: #c6d6f5;
+ padding: 4px;
 }

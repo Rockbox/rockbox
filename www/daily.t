@@ -24,7 +24,6 @@ They are <i>not</i> official releases, they are in fact almost guaranteed to not
 
 <p><b>Note 1:</b> You must rename the file to "archos.mod" ("ajbrec.ajz" for the recorder) before copying it to the root of your archos.
 
-<p><b>Note 2:</b> The Recorder version does not fully work yet, due to unfinished drivers. It runs, but cannot play music.
 
 <h2>CVS compile status</h2>
 

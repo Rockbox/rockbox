@@ -1,7 +1,7 @@
 ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -Uunix -H -C -V -LL >$@
 
 SRC := $(wildcard *.t)
-OBJS := $(SRC:%.t=%.html) daily.shtml
+OBJS := $(SRC:%.t=%.html) daily.shtml main.shtml index.shtml
 
 .SUFFIXES: .t .html
 
@@ -22,6 +22,11 @@ all: $(OBJS)
 	@(cd download; $(MAKE))
 
 main.html: main.t activity.html
+
+main.shtml: main.t activity.html
+
+index.shtml: main.shtml
+	ln -s main.shtml index.shtml
 
 daily.shtml: daily.t
 
