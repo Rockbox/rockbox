@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2002 by Felix Arends
  *
@@ -164,8 +165,8 @@ LRESULT GUIWndProc (
             // draw lcd screen
 			StretchDIBits (hDc,
                 UI_LCD_POSX * r.right / UI_WIDTH, UI_LCD_POSY * r.bottom / UI_HEIGHT,
-                DISP_X * r.right / UI_WIDTH, DISP_Y * r.bottom / UI_HEIGHT,
-				0, 0, DISP_X, DISP_Y,
+                LCD_WIDTH * r.right / UI_WIDTH, LCD_HEIGHT * r.bottom / UI_HEIGHT,
+				0, 0, LCD_WIDTH, LCD_HEIGHT,
 				bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS, SRCCOPY);
 
             EndPaint (hWnd, &ps);

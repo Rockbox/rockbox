@@ -116,7 +116,22 @@
 				RelativePath="kernel.c">
 			</File>
 			<File
-				RelativePath="lcd.c">
+				RelativePath="lcd-win32.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\drivers\lcd.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="tetris.c">

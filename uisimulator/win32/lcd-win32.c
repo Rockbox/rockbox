@@ -18,9 +18,49 @@
  ****************************************************************************/
 
 #include <windows.h>
-#include "kernel.h"
+#include <process.h>
+#include "uisw32.h"
+#include "lcd.h"
 
-void sleep(int ticks)
+//
+// simulator specific code
+//
+
+// varaibles
+unsigned char       display[LCD_WIDTH][LCD_HEIGHT/8]; // the display
+char                bitmap[LCD_WIDTH][LCD_HEIGHT]; // the ui display
+
+BITMAPINFO2 bmi =
 {
-    Sleep (1000 / HZ * ticks);
+	sizeof (BITMAPINFOHEADER),
+	LCD_WIDTH, -LCD_HEIGHT, 1, 8,
+	BI_RGB, 0, 0, 0, 2, 2,
+	UI_LCD_COLOR, 0, // green background color
+	UI_LCD_BLACK, 0 // black color
+}; // bitmap information
+
+
+// lcd_init
+// init lcd controler
+void lcd_init()
+{
+    lcd_clear_display ();
+}
+
+// lcd_update
+// update lcd
+void lcd_update()
+{
+	int x, y;
+    if (hGUIWnd == NULL)
+        _endthread ();
+
+	for (x = 0; x < LCD_WIDTH; x++)
+		for (y = 0; y < LCD_HEIGHT; y++)
+            bitmap[y][x] = ((display[x][y/8] >> (y & 7)) & 1);
+
+	InvalidateRect (hGUIWnd, NULL, FALSE);
+
+    // natural sleep :)
+    Sleep (50);
 }
