@@ -188,6 +188,43 @@ bool dbg_mpeg_thread(void)
 }
 #endif
 
+
+/* Tool function to calculate a CRC16 across some buffer */
+unsigned short crc_16(unsigned char* buf, unsigned len)
+{
+    static const unsigned short crc16_lookup[16] = 
+    {   /* lookup table for 4 bits at a time is affordable */
+        0x0000, 0x1021, 0x2042, 0x3063, 
+        0x4084, 0x50A5, 0x60C6, 0x70E7, 
+        0x8108, 0x9129, 0xA14A, 0xB16B, 
+        0xC18C, 0xD1AD, 0xE1CE, 0xF1EF
+    };
+    unsigned short crc16 = 0xFFFF; /* initialise to 0xFFFF (CCITT specification) */
+    unsigned t;
+    unsigned char byte;
+
+    while (len--)
+    {   
+        byte = *buf++; /* get one byte of data */
+
+        /* upper nibble of our data */
+        t = crc16 >> 12; /* extract the 4 most significant bits */
+        t ^= byte >> 4; /* XOR in 4 bits of the data into the extracted bits */
+        crc16 <<= 4; /* shift the CRC Register left 4 bits */     
+        crc16 ^= crc16_lookup[t]; /* do the table lookup and XOR the result */
+
+        /* lower nibble of our data */
+        t = crc16 >> 12; /* extract the 4 most significant bits */
+        t ^= byte & 0x0F; /* XOR in 4 bits of the data into the extracted bits */
+        crc16 <<= 4; /* shift the CRC Register left 4 bits */     
+        crc16 ^= crc16_lookup[t]; /* do the table lookup and XOR the result */
+    }
+    
+    return crc16;
+}
+
+
+
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
@@ -235,6 +272,7 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
+    unsigned rom_crc; /* CRC16 of the boot ROM */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -251,6 +289,9 @@ bool dbg_hw_info(void)
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
     
+    /* calculate CRC16 checksum of boot ROM */
+    rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
@@ -277,6 +318,13 @@ bool dbg_hw_info(void)
     else
         snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
     lcd_puts(0, 6, buf);
+
+    snprintf(buf, 32-3, "ROM CRC: 0x%04x", rom_crc);
+    if (rom_crc == 0x222F) /* Version 1 */
+        strcat(buf, " V1");
+    else if (rom_crc == 0x8C1E) /* Version 2 */
+        strcat(buf, " V2");
+    lcd_puts(0, 7, buf);
     
     lcd_update();
 
@@ -300,6 +348,7 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
+    unsigned rom_crc; /* CRC16 of the boot ROM */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -310,6 +359,9 @@ bool dbg_hw_info(void)
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
+
+    /* calculate CRC16 checksum of boot ROM */
+    rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
 
     lcd_clear_display();
 
@@ -338,6 +390,8 @@ bool dbg_hw_info(void)
                 else
                     snprintf(buf, 32, "Flash:??,??"); /* unknown, sorry */
                 break;
+            case 5:
+                snprintf(buf, 32, "ROM CRC:%04x", rom_crc);
         }
             
         lcd_puts(0, 1, buf);
@@ -353,12 +407,12 @@ bool dbg_hw_info(void)
             case BUTTON_LEFT:
                 currval--;
                 if(currval < 0)
-                    currval = 4;
+                    currval = 5;
                 break;
                 
             case BUTTON_RIGHT:
                 currval++;
-                if(currval > 4)
+                if(currval > 5)
                     currval = 0;
                 break;
         }
