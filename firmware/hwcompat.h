@@ -20,6 +20,7 @@
 #define HWCOMPAT_H
 
 #include <stdbool.h>
+#include "config.h"
 
 /* Bit mask values for HW compatibility */
 #define ATA_ADDRESS_300 0x0100
