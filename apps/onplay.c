@@ -490,7 +490,7 @@ int onplay(char* file, int attr)
     selected_file_attr = attr;
 
     if ((attr & TREE_ATTR_MPA) || (attr & ATTR_DIRECTORY) ||
-        (attr & TREE_ATTR_M3U))
+        ((attr & TREE_ATTR_M3U) && (mpeg_status() & MPEG_STATUS_PLAY)))
     {
         menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
         menu[i].function = playlist_options;

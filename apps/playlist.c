@@ -153,12 +153,12 @@ static void empty_playlist(bool resume)
 {
     playlist.filename[0] = '\0';
 
-    if(-1 != playlist.fd)
+    if(playlist.fd >= 0)
         /* If there is an already open playlist, close it. */
         close(playlist.fd);
     playlist.fd = -1;
 
-    if(-1 != playlist.control_fd)
+    if(playlist.control_fd >= 0)
         close(playlist.control_fd);
     playlist.control_fd = -1;
 
@@ -221,7 +221,7 @@ static int add_indices_to_playlist(void)
 
     if(-1 == playlist.fd)
         playlist.fd = open(playlist.filename, O_RDONLY);
-    if(-1 == playlist.fd)
+    if(playlist.fd < 0)
         return -1; /* failure */
     
 #ifdef HAVE_LCD_BITMAP
@@ -963,11 +963,8 @@ int playlist_create(char *dir, char *file)
     empty_playlist(false);
 
     playlist.control_fd = open(PLAYLIST_CONTROL_FILE, O_RDWR);
-    if (-1 == playlist.control_fd)
-    {
+    if (playlist.control_fd < 0)
         splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-        return -1;
-    }
 
     if (!file)
     {
@@ -981,13 +978,13 @@ int playlist_create(char *dir, char *file)
     
     update_playlist_filename(dir, file);
 
-    if (fprintf(playlist.control_fd, "P:%d:%s:%s\n",
-            PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
-        fsync(playlist.control_fd);
-    else
+    if (playlist.control_fd > 0)
     {
-        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-        return -1;
+        if (fprintf(playlist.control_fd, "P:%d:%s:%s\n",
+            PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
+            fsync(playlist.control_fd);
+        else
+            splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
     }
 
     /* load the playlist file */
@@ -1029,7 +1026,7 @@ int playlist_resume(void)
     empty_playlist(true);
 
     playlist.control_fd = open(PLAYLIST_CONTROL_FILE, O_RDWR);
-    if (-1 == playlist.control_fd)
+    if (playlist.control_fd < 0)
     {
         splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
@@ -1371,7 +1368,15 @@ int playlist_add(char *filename)
  */
 int playlist_insert_track(char *filename, int position, bool queue)
 {
-    int result = add_track_to_playlist(filename, position, queue, -1);
+    int result;
+    
+    if (playlist.control_fd < 0)
+    {
+        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
+
+    result = add_track_to_playlist(filename, position, queue, -1);
 
     if (result != -1)
     {
@@ -1391,6 +1396,12 @@ int playlist_insert_directory(char *dirname, int position, bool queue,
     int count = 0;
     int result;
     char *count_str;
+
+    if (playlist.control_fd < 0)
+    {
+        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
 
     if (queue)
         count_str = str(LANG_PLAYLIST_QUEUE_COUNT);
@@ -1423,6 +1434,12 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
     char trackname[MAX_PATH+1];
     int count = 0;
     int result = 0;
+
+    if (playlist.control_fd < 0)
+    {
+        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
 
     fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -1513,7 +1530,15 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
 /* delete track at specified index */
 int playlist_delete(int index)
 {
-    int result = remove_track_from_playlist(index, true);
+    int result;
+    
+    if (playlist.control_fd < 0)
+    {
+        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
+
+    result = remove_track_from_playlist(index, true);
 
     if (result != -1)
         mpeg_flush_and_reload_tracks();
@@ -1762,6 +1787,12 @@ int playlist_save(char *filename)
     int count = 0;
     char tmp_buf[MAX_PATH+1];
     int result = 0;
+
+    if (playlist.control_fd < 0)
+    {
+        splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
 
     if (playlist.amount <= 0)
         return -1;
