@@ -11,14 +11,21 @@ A1: Player: the charging is all done by hardware and the exact
 
 Q2: Will keeping my charger connected a long time damage my batteries? Can I
     leave it over night?
-A2: The charger logic lets the batteries charge until they are full. After
-    that, the charger is disabled, but the device will stay powered on and
-    continue to consume some power from the batteries (the hardware does
-    not allow running from the charger without charging batteries, or
-    powering off with the charger connected). After some time, it will
-    start charging the batteries again to keep them full. This will
-    wear the batteries a little, but overnight charging is what most
-    people do.
+A2: There's a deep discharge mode and you can switch trickle charge on and off.
+    If you use your AJB connected to the power supply the whole time, select
+    "deep discharge on" and "trickle charge off". If you want to charge your
+    AJB over night and take it with you the next day, select "deep discharge
+    off" (that it starts charging immediately) and "trickle charge on"
+    (that the batteries remain full).
+
+    Trickle charge is needed to keep the batteries full. That's necessary because
+    the device will stay powered on and continue to consume some power from
+    the batteries (the hardware does not allow running from the charger
+    without charging batteries, or powering off with the charger connected).
+    The trickle charge time is 12 hours. It should be enough for you to disconnect
+    your AJB in this time and turn it off / use it.
+    However, after 12 hours of trickle charge, it will turn it off, the batteries
+    are discharged and another charge cycle is started.
     
     As the Battery FAQ at http://www.greenbatteries.com/ puts it:
     "A NiMH battery can be charged and discharged hundreds of times,
@@ -30,18 +37,22 @@ Q3: Does Rockbox charge the batteries more/less/worse/better than the Archos
 A3: Player: Rockbox doesn't affect the charging on Players, it is all done
     by hardware logic out of software control.
 
-    Recorder: The current release of 1.2 is much worse than the Archos
-    charger, it tends to stop charging much too early and leave the batteries
-    half empty.
+    Recorder: The whole algorithm is made to carefully charge the batteries full 
+    and keep them full after that with a trickle charge option. Many documents 
+    about charge ICs were considered. If you want to know details, then look 
+    into docs/CHARGING_ALGORITHM. If you have comments, write to
+    mail@uwe-freese.de or the Rockbox mailinglist.
+    
+    Test results with trickle charge (battery capacities measured with an
+    external charger, Model "Conrad Electronic Charge Manager 2010", ~100 EUR):
+    
+    - after normal charge and top off time: 1798, 1834, 1819, 1815 mAh
+    - after normal + top off + trickle charge (12h): 1784, 1748, 1738, 1752 mAh
+    - charged with external charger: 1786, 1819, 1802, 1802 mAh
 
-    The current development code (CVS daily builds as of 20.8.2002) is much
-    better than the 1.2 release, but still not perfect. Linus recently
-    measured 6 hours continuous playtime after a rockbox charge, and much
-    over 7 hours after an Archos charge. We are working on fine-tuning
-    the charger logic to get the most out of the batteries, but the
-    emphasis is on not overcharging them, since that would damage the
-    batteries. Better be safe than sorry.
-
+    You can see, whenever you take your AJB with you in the 12h trickle charge 
+    period, the batteries are at least 97% full. :) 
+    
 Q4: What kind of batteries are there in my factory default Player/Recorder?
 A4: Both ship with 1500 mAh NiMH (Nickel Metal Hydride) batteries.
 
@@ -63,13 +74,15 @@ A6: http://www.greenbatteries.com sells 1800 mAh NiMH cells at $3.25USD each,
     online shops. Browse around. There's a pretty good comparison between
     different battery makes and models at the digital imaging resource site:
     http://www.imaging-resource.com/ACCS/BATTS/BATTS.HTM
+    In Germany, www.reichelt.de sells GP 2000 batteries for 2,75 EUR (12/2002).
 
 Q7: What kind of run-time can I expect on a set of fully-charged batteries
     when running Rockbox?
 A7: For the stock 1500 mAh cells, from 6 hours to 8 hours, depending on
-    which charger was used (see Q3). It depends a lot on the condition of
-    the batteries. We are looking into implementing more battery-saving
-    techniques in rockbox to make it rock longer.
+    which charger was used (see Q3). It depends a lot on the condition of the 
+    batteries. With 2000 mAh batteries, you should reach about 10 hours or more. 
+    We are looking into implementing more battery-saving techniques in rockbox 
+    to make it rock longer.
 
 Q8: Can I use different batteries in my Archos? How much playtime would
     I gain by using 1800 mAh batteries instead of the 1500 mAh ones?
@@ -205,4 +218,3 @@ A15: That depends on who you ask. ;-) NiMH sellers say NiMHs are better and
      
      However, if you use your AJB connected to the charger all the time,
      we recommend you to use the deep discharge option.
-
