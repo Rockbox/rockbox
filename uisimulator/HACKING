@@ -32,11 +32,26 @@ Terminology
     (This has been compiled and run on at least Solaris and Linux. It should
     work on other unixes too but we haven't tried any other yet.)
 
-    Create a new directory and run the 'tools/configure'
-    script. Select target to simulate and select simulation. The script will
-    then generate a Makefile for you.
+    Create a new directory and run the 'tools/configure' script in
+    there. Select target to simulate and select simulation. The script will
+    then generate a Makefile for you:
  
-    Run 'make'.
+        $ mkdir build-dir
+        $ cd build-dir
+        $ ../tools/configure
+
+        [ answer to questions ]
+
+        [ Makefile created, archos subdirectory created ]
+
+        $ make
+        $ ./rockboxui
+
+    Note that the simulator uses a local subdirectory named 'archos' as "root
+    directory" for the simulated box. Copy a bunch of mp3 files into that
+    directory, create subdirectories and do all sorts of things you want to be
+    able to browse when you fire up the simulator.
+
 
   For the Win32 simulator:
 
