@@ -113,6 +113,10 @@ SOURCE=..\..\firmware\id3.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\firmware\mp3_playback.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\firmware\mp3data.c
 # End Source File
 # Begin Source File
