@@ -30,4 +30,8 @@
 <li><a href="rocklatin.html">The Rocklatin charset used in Players</a>
 </ul>
 
+<h2>Hardware Modifications</h2>
+
+See this <a href="/mods/">seperage mods page</a>
+
 #include "foot.t"
