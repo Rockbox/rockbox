@@ -157,6 +157,9 @@ static struct
     int nSeekAcc; // accelleration value for seek
     int nSeekPos; // current file position for seek
     bool bDiskSleep; // disk is suspended
+#if FREQ == 12000000 /* Ondio speed kludge */
+    int nFrameTimeAdjusted;
+#endif
 } gPlay;
 
 // buffer information
@@ -528,7 +531,11 @@ int SeekTo(int fd, int nPos)
     {
         gPlay.bVideoUnderrun = false;
         // start display interrupt
+#if FREQ == 12000000 /* Ondio speed kludge */
+        rb->plugin_register_timer(gPlay.nFrameTimeAdjusted, 1, timer4_isr);
+#else
         rb->plugin_register_timer(gFileHdr.video_frametime, 1, timer4_isr);
+#endif
     }
 
     return 0;
@@ -704,8 +711,13 @@ int PlayTick(int fd)
                 }
                 if (gPlay.bHasVideo)
                 {   // start the video
+#if FREQ == 12000000 /* Ondio speed kludge */
+                    rb->plugin_register_timer(
+                        gPlay.nFrameTimeAdjusted, 1, timer4_isr);
+#else
                     rb->plugin_register_timer(
                         gFileHdr.video_frametime, 1, timer4_isr);
+#endif
                 }
             }
             break;
@@ -862,14 +874,12 @@ int main(char* filename)
         gFileHdr.video_format = VIDEOFORMAT_RAW;
         gFileHdr.video_width = LCD_WIDTH;
         gFileHdr.video_height = LCD_HEIGHT;
-        gFileHdr.video_frametime = FREQ / FPS;
+        gFileHdr.video_frametime = 11059200 / FPS;
         gFileHdr.bps_peak = gFileHdr.bps_average = LCD_WIDTH * LCD_HEIGHT * FPS;
     }
-#if FREQ == 12000000  
-/* temporary sync fix for Ondio, as .rvf is tailored to the recorder CPU freq
- * 625 / 576 == 12000000 / 11059200 */
-    else
-        gFileHdr.video_frametime = (gFileHdr.video_frametime * 625) / 576;
+
+#if FREQ == 12000000 /* Ondio speed kludge, 625 / 576 == 12000000 / 11059200 */
+    gPlay.nFrameTimeAdjusted = (gFileHdr.video_frametime * 625) / 576;
 #endif
 
     // continue buffer init: align the end, calc low water, read sizes
