@@ -860,6 +860,34 @@ int fat_read(struct bpb *bpb,
     return sectorcount;
 }
 
+int fat_seek(struct bpb *bpb, 
+             struct fat_fileent *ent,
+             int seeksector )
+{
+    int cluster = ent->firstcluster;
+    int sector;
+    int numsec = 0;
+    int i;
+
+    for (i=0; i<seeksector; i++) {
+        numsec++;
+        if ( numsec >= bpb->bpb_secperclus ) {
+            cluster = get_next_cluster(bpb,cluster);
+            if (!cluster)
+                /* end of file */
+                return -1; 
+            
+            sector = cluster2sec(bpb,cluster);
+            if (sector<0)
+                return -2;
+            numsec=0;
+        }
+    }
+    ent->nextcluster = cluster;
+    ent->nextsector = sector;
+    ent->sectornum = numsec;
+    return 0;
+}
 
 int fat_opendir(struct bpb *bpb, 
                 struct fat_dirent *ent, 

@@ -115,6 +115,9 @@ extern int fat_read(struct bpb *bpb,
                     struct fat_fileent *ent,
                     int sectorcount,
                     void* buf );
+extern int fat_seek(struct bpb *bpb, 
+                    struct fat_fileent *ent,
+                    int sector );
 
 extern int fat_opendir(struct bpb *bpb, 
                        struct fat_dirent *ent, 
