@@ -45,6 +45,7 @@
 #include "kernel.h"
 #include "sprintf.h"
 
+#define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
 
@@ -255,6 +256,17 @@ bool bookmark_autobookmark(void)
         key = button_get(true);
         switch (key)
         {
+            case BUTTON_DOWN | BUTTON_REL:
+            case BUTTON_ON | BUTTON_REL:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF | BUTTON_REL:
+            case BUTTON_RIGHT | BUTTON_REL:
+            case BUTTON_UP | BUTTON_REL:
+#endif
+            case BUTTON_LEFT | BUTTON_REL:
+                done = true;
+                break;
+
             case BUTTON_PLAY | BUTTON_REL:
                 if (global_settings.autocreatebookmark ==
                     BOOKMARK_RECENT_ONLY_ASK)
@@ -270,11 +282,6 @@ bool bookmark_autobookmark(void)
                 status_set_param(true);
 #endif
                 return false;
-
-            default:
-                if (key & BUTTON_REL)
-                    done = true;
-                break;
         }
     }
     return true;
@@ -357,6 +364,7 @@ static bool add_bookmark(char* bookmark_file_name, char* bookmark)
     /* Writing the new bookmark to the begining of the temp file */
     write(temp_bookmark_file, bookmark, strlen(bookmark));
     write(temp_bookmark_file, "\n", 1);
+    bookmark_count++;
 
     /* Reading in the previous bookmarks and writing them to the temp file */
     bookmark_file = open(bookmark_file_name, O_RDONLY);
@@ -365,6 +373,14 @@ static bool add_bookmark(char* bookmark_file_name, char* bookmark)
         while (read_line(bookmark_file, global_read_buffer,
                          sizeof(global_read_buffer)))
         {
+            /* The MRB has a max of MAX_BOOKMARKS in it */
+            /* This keeps it from getting too large */
+            if ((strcmp(bookmark_file_name,RECENT_BOOKMARK_FILE)==0))
+            {
+                if(bookmark_count >= MAX_BOOKMARKS)
+                break;
+            }
+                        
             if (unique)
             {
                 cp=strchr(global_read_buffer,'/');
@@ -737,6 +753,14 @@ static bool delete_bookmark(char* bookmark_file_name, int bookmark_id)
     while (read_line(bookmark_file, global_read_buffer,
                      sizeof(global_read_buffer)))
     {
+        /* The MRB has a max of MAX_BOOKMARKS in it */
+        /* This keeps it from getting too large */
+        if ((strcmp(bookmark_file_name,RECENT_BOOKMARK_FILE)==0))
+        {
+            if(bookmark_count >= MAX_BOOKMARKS)
+            break;
+        }
+        
         if (check_bookmark(global_read_buffer))
         {
             if (bookmark_id != bookmark_count)
