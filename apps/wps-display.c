@@ -163,7 +163,7 @@ bool wps_load(char* file, bool display)
 
     fd = open(file, O_RDONLY);
     
-    if (-1 != fd)
+    if (fd >= 0)
     {
         int numread = read(fd, buffer, sizeof(buffer) - 1);
         
