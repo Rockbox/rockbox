@@ -46,7 +46,7 @@
 #define MAX_EXTTYPES 32
 
 /* string buffer length */
-#define STRING_BUFFER_SIZE 256
+#define STRING_BUFFER_SIZE 512
 
 /* number of bytes for the binary icon */
 #define ICON_LENGTH 6
