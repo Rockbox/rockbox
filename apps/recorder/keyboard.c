@@ -43,14 +43,11 @@
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE BUTTON_F3
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
-#define KBD_CURSOR_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
-#define KBD_CURSOR_LEFT (BUTTON_MENU | BUTTON_LEFT)
-#define KBD_SELECT (BUTTON_MENU | BUTTON_REL)
+#define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
 #define KBD_SELECT_PRE BUTTON_MENU
-#define KBD_PAGE_FLIP (BUTTON_MENU | BUTTON_UP)
-#define KBD_DONE (BUTTON_OFF | BUTTON_REL)
-#define KBD_ABORT (BUTTON_OFF | BUTTON_REPEAT)
-#define KBD_BACKSPACE (BUTTON_MENU | BUTTON_DOWN)
+#define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
+#define KBD_ABORT BUTTON_OFF
 #endif
 
 
@@ -107,6 +104,9 @@ int kbd_input(char* text, int buflen)
     int editpos;
     bool redraw = true;
     const char* line[KEYBOARD_LINES];
+#ifdef KBD_MODES
+    bool line_edit = false;
+#endif
 
     char outline[256];
     char c = 0;
@@ -138,7 +138,7 @@ int kbd_input(char* text, int buflen)
         if(redraw)
         {
             lcd_clear_display();
-            
+
             lcd_setfont(FONT_SYSFIXED);
             
             /* draw page */
@@ -198,7 +198,7 @@ int kbd_input(char* text, int buflen)
             outline[max_chars - 2] = '\0';
             
             lcd_putsxy(font_w,main_y,outline);
-            
+
             /* cursor */
             lcd_drawline(curpos, main_y, curpos, main_y + font_h);
             
@@ -207,9 +207,13 @@ int kbd_input(char* text, int buflen)
             buttonbar_set("Shift", "OK", "Del");
             buttonbar_draw();
 #endif            
-            /* highlight the key that has focus */
-            lcd_invertrect(font_w * x, 8 + font_h * y, font_w, font_h);
             
+#ifdef KBD_MODES
+            if (!line_edit)
+#endif
+                /* highlight the key that has focus */
+                lcd_invertrect(font_w * x, 8 + font_h * y, font_w, font_h);
+
             status_draw(true);
         
             lcd_update();
@@ -226,62 +230,119 @@ int kbd_input(char* text, int buflen)
                 return -1;
                 break;
 
+#ifdef KBD_PAGE_FLIP
             case KBD_PAGE_FLIP:
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
                 kbd_setupkeys(line, page);
                 kbd_spellchar(line[y][x]);
                 break;
+#endif
 
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
-                if (x < (int)strlen(line[y]) - 1)
-                    x++;
+#ifdef KBD_MODES
+                if (line_edit) /* right doubles as cursor_right in line_edit */
+                {
+                    editpos++;
+                    if (editpos > len)
+                        editpos = len;
+                    else
+                        kbd_spellchar(text[editpos]);
+                }
                 else
-                    x = 0;
-                kbd_spellchar(line[y][x]);
+#endif
+                {
+                    if (x < (int)strlen(line[y]) - 1)
+                        x++;
+                    else
+                    {
+                        x = 0;
+#ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
+                        if (++page == KEYBOARD_PAGES)
+                            page = 0;
+                        kbd_setupkeys(line, page);
+#endif
+                    }
+                    kbd_spellchar(line[y][x]);
+                }
                 break;
 
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
-                if (x)
-                    x--;
+#ifdef KBD_MODES
+                if (line_edit) /* left doubles as cursor_left in line_edit */
+                {
+                    editpos--;
+                    if (editpos < 0)
+                        editpos = 0;
+                    else
+                        kbd_spellchar(text[editpos]);
+                }
                 else
-                    x = strlen(line[y]) - 1;
-                kbd_spellchar(line[y][x]);
+#endif
+                {
+                    if (x)
+                        x--;
+                    else
+                    {
+#ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
+                        if (--page < 0)
+                            page = (KEYBOARD_PAGES-1);
+                        kbd_setupkeys(line, page);
+#endif
+                        x = strlen(line[y]) - 1;
+                    }
+                    kbd_spellchar(line[y][x]);
+                }
                 break;
 
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-                if (y < KEYBOARD_LINES - 1)
-                    y++;
+#ifdef KBD_MODES
+                if (line_edit)
+                {
+                    y = 0;
+                    line_edit = false;
+                }
                 else
-                    y=0;
-                kbd_spellchar(line[y][x]);
+                {
+#endif
+                    if (y < KEYBOARD_LINES - 1)
+                        y++;
+                    else
+#ifndef KBD_MODES
+                        y=0;
+#else
+                        line_edit = true;
+                }
+                if (!line_edit)
+#endif
+                    kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
-                if (y)
-                    y--;
-                else
-                    y = KEYBOARD_LINES - 1;
-                kbd_spellchar(line[y][x]);
-                break;
-
-            case KBD_BACKSPACE:
-            case KBD_BACKSPACE | BUTTON_REPEAT:
-                if (editpos > 0)
+#ifdef KBD_MODES
+                if (line_edit)
                 {
-                    for (i = editpos; i <= (len - 1);i++)
-                    {
-                        text[i-1] = text[i];
-                    }
-                    text[i-1]='\0';
-                    editpos--;
-                    if (editpos < 0)
-                        editpos=0;
+                    y = KEYBOARD_LINES - 1;
+                    line_edit = false;
                 }
+                else
+                {
+#endif
+                    if (y)
+                        y--;
+                    else
+#ifndef KBD_MODES
+                        y = KEYBOARD_LINES - 1;
+#else
+                        line_edit = true;
+                }
+                if (!line_edit)
+#endif
+                    kbd_spellchar(line[y][x]);
                 break;
 
             case KBD_DONE:
@@ -295,24 +356,59 @@ int kbd_input(char* text, int buflen)
                 if (lastbutton != KBD_SELECT_PRE)
                     break;
 #endif
-                if (len<buflen)
+#ifdef KBD_MODES
+                if (line_edit) /* select doubles as backspace in line_edit */
                 {
-                    c = line[y][x];
-                    if ( editpos == len )
+                    if (editpos > 0)
                     {
-                        text[len] = c;
-                        text[len+1] = 0;
+                        for (i = editpos; i <= (len - 1);i++)
+                        {
+                            text[i-1] = text[i];
+                        }
+                        text[i-1]='\0';
+                        editpos--;
+                        if (editpos < 0)
+                            editpos=0;
                     }
-                    else
-                    {
-                        for (i = len ; i + 1 > editpos; i--)
-                            text[i+1] = text[i];
-                        text[editpos] = c;
-                    }
-                    editpos++;
                 }
-                if (global_settings.talk_menu) /* voice UI? */
-                    talk_spell(text, false); /* speak revised text */
+                else
+#endif
+                {
+                    if (len<buflen)
+                    {
+                        c = line[y][x];
+                        if ( editpos == len )
+                        {
+                            text[len] = c;
+                            text[len+1] = 0;
+                        }
+                        else
+                        {
+                            for (i = len ; i + 1 > editpos; i--)
+                                text[i+1] = text[i];
+                            text[editpos] = c;
+                        }
+                        editpos++;
+                    }
+                    if (global_settings.talk_menu) /* voice UI? */
+                        talk_spell(text, false); /* speak revised text */
+                }
+                break;
+
+#ifndef KBD_MODES
+            case KBD_BACKSPACE:
+            case KBD_BACKSPACE | BUTTON_REPEAT:
+                if (editpos > 0)
+                {
+                    for (i = editpos; i <= (len - 1);i++)
+                    {
+                        text[i-1] = text[i];
+                    }
+                    text[i-1]='\0';
+                    editpos--;
+                    if (editpos < 0)
+                        editpos=0;
+                }
                 break;
 
             case KBD_CURSOR_RIGHT:
@@ -332,6 +428,7 @@ int kbd_input(char* text, int buflen)
                 else
                     kbd_spellchar(text[editpos]);
                 break;
+#endif /* !KBD_MODES */
 
             case BUTTON_NONE:
                 status_draw(false);
