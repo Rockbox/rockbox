@@ -666,12 +666,13 @@ bool wps_display(struct mp3entry* id3)
 #if defined(HAVE_LCD_CHARCELLS)
 bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
-    if(!id3)
-        return(false);
     char player_progressbar[7];
     char binline[36];
     int songpos = 0;
     int i,j;
+
+    if (!id3)
+        return false;
 
     memset(binline, 1, sizeof binline);
     memset(player_progressbar, 1, sizeof player_progressbar);
@@ -694,6 +695,6 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
         }
     }
     lcd_define_pattern(8,player_progressbar,7);
-    return(true);
+    return true;
 }
 #endif
