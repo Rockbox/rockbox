@@ -3,7 +3,7 @@
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	@echo "CC $<"
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.S
 	@mkdir -p `dirname $@`
