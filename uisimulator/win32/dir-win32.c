@@ -90,3 +90,9 @@ struct dirent *readdir (
     
     return &dir->fd;
 }
+
+void fat_size(unsigned int* size, unsigned int* free)
+{
+    *size = 2049;
+    *free = 1037;
+}
