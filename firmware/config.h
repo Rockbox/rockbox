@@ -30,4 +30,19 @@
 /* no known platform */
 #endif
 
+/* system defines */
+
+#define DEFAULT_VOLUME_SETTING     50
+#define DEFAULT_BALANCE_SETTING    50
+#define DEFAULT_BASS_SETTING       50
+#define DEFAULT_TREBLE_SETTING     50
+#define DEFAULT_LOUDNESS_SETTING    0
+#define DEFAULT_BASS_BOOST_SETTING  0
+#define DEFAULT_CONTRAST_SETTING    0
+#define DEFAULT_POWEROFF_SETTING    0
+#define DEFAULT_BACKLIGHT_SETTING   1
+
+#define DEBUG_CRT_ON 1
+#define CRT_DISPLAY 1
+
 #endif
