@@ -6,6 +6,7 @@
  * Copyright (c) 2002 by Greg Haerr <greg@censoft.com>
  */
 #include <stdio.h>
+#define ARCHOS_RECORDER
 #include "../firmware/font.h"
 
 extern MWCFONT FONT;
