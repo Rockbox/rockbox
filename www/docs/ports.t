@@ -138,8 +138,8 @@
     <td><b>GP Out</b></td><td>I²C Data</td>
 </tr>
 <tr><th><b>PB8</b></th>
-    <td><b>&nbsp;</b></td><td>&nbsp;</td>
-    <td><b>&nbsp;</b></td><td>&nbsp;</td>
+    <td><b>GP In</b></td><td>ON key</td>
+    <td><b>GP In</b></td><td>ON key</td>
     <td><b>&nbsp;</b></td><td>&nbsp;</td>
 </tr>
 <tr><th><b>PB9</b></th>
