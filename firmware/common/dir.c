@@ -66,7 +66,6 @@ DIR* opendir(char* name)
 
     for ( part = strtok_r(namecopy, "/", &end); part;
           part = strtok_r(NULL, "/", &end)) {
-        int partlen = strlen(part);
         /* scan dir for name */
         while (1) {
             if ((fat_getnext(&(opendirs[dd].fatdir),&entry) < 0) ||
@@ -75,7 +74,7 @@ DIR* opendir(char* name)
                 return NULL;
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
-                 (!strncasecmp(part, entry.name, partlen)) ) {
+                 (!strcasecmp(part, entry.name)) ) {
                 if ( fat_opendir(&(opendirs[dd].fatdir),
                                  entry.firstcluster) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",
