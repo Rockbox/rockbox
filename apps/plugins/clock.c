@@ -19,7 +19,7 @@
 
 /*****************************
  * RELEASE NOTES
- 
+
 ***** VERSION 2.50 **
 -New general settings mode added, -reworked options screen,
 -cleaned up a few things and removed redundant code, -faster
@@ -264,7 +264,7 @@ const unsigned char clocklogo[] = {
 /******************
  * Time's Up bitmap
  *****************/
-const const unsigned char timesup[] = {
+const unsigned char timesup[] = {
 0x78, 0x78, 0x78, 0x38, 0x08, 0x08, 0xf8, 0xfc, 0xfc, 0xfc, 0xfc, 0xfc, 0x04,
 0x04, 0x04, 0x0c, 0x3c, 0x3c, 0x3c, 0x04, 0x04, 0x04, 0xfc, 0xfc, 0xfc, 0xfc,
 0xfe, 0xfe, 0x06, 0x03, 0x03, 0x05, 0x05, 0x07, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -482,9 +482,9 @@ void save_settings(bool interface)
     if(interface)
     {
         rb->lcd_update();
-    
+
         rb->sleep(HZ);
-    
+
         exit_logo();
     }
 }
@@ -1283,7 +1283,7 @@ bool f1_screen(void)
     while (!done)
     {
         rb->lcd_clear_display();
-        
+
         if(screen == 1)
         {
             rb->snprintf(buf, sizeof(buf), "<<---- 1/9 NEXT>>");
@@ -1295,7 +1295,7 @@ bool f1_screen(void)
             rb->snprintf(buf, sizeof(buf), "<<BACK 9/9 ---->>");
             rb->lcd_getstringsize(buf, &buf_w, &buf_h);
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
-        }            
+        }
         else
         {
             rb->snprintf(buf, sizeof(buf), "<<BACK %d/9 NEXT>>", screen);
@@ -1450,14 +1450,14 @@ bool f3_screen(void)
     while (!done)
     {
         rb->lcd_clear_display();
-        
+
         rb->lcd_puts(0, 1, "UP/DN: move, L/R:");
         rb->lcd_puts(0, 2, "change, OFF: done");
 
         if(settings.clock == 1)
         {
             rb->lcd_puts(0, 0, "OPTIONS (Analog)");
-            
+
             rb->lcd_puts(2, 4, "Digits");
 
             if(settings.analog_date == 0)
@@ -1478,21 +1478,21 @@ bool f3_screen(void)
 
             /* Draw checkboxes */
             draw_checkbox(settings.analog_digits, 1, 33);
-            
+
             if(settings.analog_date == 0)
                 rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
             else if(settings.analog_date == 1)
                 rb->lcd_bitmap(checkbox_half, 1, 41, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
-            
+
             if(settings.analog_time == 0)
                 rb->lcd_bitmap(checkbox_empty, 1, 49, 8, 6, true);
             else if(settings.analog_time == 1)
                 rb->lcd_bitmap(checkbox_half, 1, 49, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 49, 8, 6, true);
-            
+
             draw_checkbox(settings.analog_secondhand, 1, 57);
 
             /* Draw line selector */
@@ -1521,7 +1521,7 @@ bool f3_screen(void)
                     else
                         invert_analog = 1;
                     break;
-                    
+
                 case BUTTON_LEFT:
                     if(invert_analog == 1)
                         settings.analog_digits = false;
@@ -1538,7 +1538,7 @@ bool f3_screen(void)
                     else
                         settings.analog_secondhand = false;
                     break;
-                    
+
                 case BUTTON_RIGHT:
                     if(invert_analog == 1)
                         settings.analog_digits = true;
@@ -1594,7 +1594,7 @@ bool f3_screen(void)
                 rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6, true);
-            
+
             if(settings.digital_seconds == 0)
                 rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
             else if(settings.digital_seconds == 1)
@@ -1603,7 +1603,7 @@ bool f3_screen(void)
                 rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
-            
+
             draw_checkbox(settings.digital_blinkcolon, 1, 49);
             draw_checkbox(settings.digital_12h, 1, 57);
 
@@ -1633,7 +1633,7 @@ bool f3_screen(void)
                     else
                         invert_digital++;
                     break;
-                    
+
                 case BUTTON_LEFT:
                     if(invert_digital == 1)
                     {
@@ -1649,8 +1649,8 @@ bool f3_screen(void)
                         settings.digital_blinkcolon = false;
                     else
                         settings.digital_12h = false;
-                    break;  
-                    
+                    break;
+
                 case BUTTON_RIGHT:
                     if(invert_digital == 1)
                     {
@@ -1666,8 +1666,8 @@ bool f3_screen(void)
                         settings.digital_blinkcolon = true;
                     else
                         settings.digital_12h = true;
-                    break;                                                
-                    
+                    break;
+
                 case BUTTON_F3:
                 case BUTTON_OFF:
                     if(settings.save_mode == 2)
@@ -1706,7 +1706,7 @@ bool f3_screen(void)
                 rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6, true);
-            
+
             if(settings.lcd_seconds == 0)
                 rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
             else if(settings.lcd_seconds == 1)
@@ -1715,7 +1715,7 @@ bool f3_screen(void)
                 rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
             else
                 rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
-            
+
             draw_checkbox(settings.lcd_blinkcolon, 1, 49);
             draw_checkbox(settings.lcd_12h, 1, 57);
 
@@ -1760,8 +1760,8 @@ bool f3_screen(void)
                         settings.lcd_blinkcolon = false;
                     else
                         settings.lcd_12h = false;
-                    break;  
-                    
+                    break;
+
                 case BUTTON_RIGHT:
                     if(invert_lcd == 1)
                     {
@@ -1826,7 +1826,7 @@ bool f3_screen(void)
                     else
                         invert_fullscreen++;
                     break;
-                    
+
                 case BUTTON_LEFT:
                     if(invert_fullscreen == 1)
                         settings.fullscreen_border = false;
@@ -1835,7 +1835,7 @@ bool f3_screen(void)
                     else if(invert_fullscreen ==3)
                         settings.fullscreen_invertseconds = false;
                     break;
-                    
+
                 case BUTTON_RIGHT:
                     if(invert_fullscreen == 1)
                         settings.fullscreen_border = true;
@@ -1953,7 +1953,7 @@ void general_settings(void)
         rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
         rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
         draw_checkbox(display_counter, 1, 33);
-        
+
         if(settings.save_mode == 1)
             rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
         else if(settings.save_mode == 2)
@@ -1987,7 +1987,7 @@ void general_settings(void)
                 if(cursorpos < 4)
                     cursorpos++;
                 break;
-                
+
             case BUTTON_LEFT:
                 if(cursorpos == 3)
                     display_counter = false;
@@ -2000,7 +2000,7 @@ void general_settings(void)
                     }
                 }
                 break;
-                
+
             case BUTTON_RIGHT:
                 if(cursorpos == 1)
                     confirm_reset();
@@ -2564,7 +2564,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
-    
+
     /* universal font */
     rb->lcd_setfont(FONT_SYSFIXED);
 
