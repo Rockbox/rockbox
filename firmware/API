@@ -1,0 +1,102 @@
+$Id$
+               __________               __   ___.
+     Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+     Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+     Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                       \/            \/     \/    \/            \/
+
+                                 API summmary
+
+[ This is still pretty rough and basic. Extend! ]
+
+LCD
+
+  #include <lcd.h>
+
+  Generic
+
+    Most LCD functions are specific for which output we work with, due to the
+    huge differences.
+
+    lcd_init() - init the LCD stuff
+    lcd_clear_display() - clear the whole display
+    lcd_backlight(on) - set backlight on/off
+
+  Recorder
+ 
+    All the functions operate on a display buffer. You make the buffer get
+    shown on screen by calling lcd_update().
+
+    lcd_update() update the LCD according to the internal buffer.
+    lcd_puts(x,y,string,font) put a string at given position
+    lcd_bitmap(src,x,y,width,height,clear) put a bitmap at given position
+    lcd_clearrect(x,y,width,height) clear a rectangle area
+    lcd_fillrect(x,y,width,height) fill a rectangle area
+    lcd_drawrect(x,y,width,height) draw a rectangle
+    lcd_invertrect(x,y,width,height) revert the graphics of the given area
+    lcd_drawline(x1,y1,x2,y2) draw a line between the coordinates
+    lcd_drawpixel(x,y) put a pixel on the given coordinate
+    lcd_clearpixel(x,y) clear the pixel at the given coordinate
+    lcd_fontsize(font,width,height) return the width and height of the font
+
+  Player
+
+    lcd_puts(x,y,string) write a string at given position
+    lcd_define_pattern(which,pattern,lenth) define a custom pattern
+
+Buttons
+
+  #include <button.h>
+
+  These functions work the same unregarding of which keypad you have, but they
+  return a different set of values. Note that the Recorder keypad have 10
+  keys, while the Player keypad only features 6.
+
+  button_init() init button functions
+  button_get() returns a bitmask for which keys that were pressed
+
+Files
+
+  #include <file.h>
+
+  open()
+  read()
+  lseek()
+  write()
+  close()
+  rename()
+  remove()
+
+Directories
+
+  #include <dir.h>
+
+  opendir()
+  readdir()
+  closedir()
+
+String/Memory
+
+  #include <string.h>
+
+  strcmp()
+  strcpy()
+  memcpy()
+  memset()
+  ...
+
+ID3
+
+  #include <id3.h>
+  bool mp3info(mp3entry *entry, char *filename);
+
+    Return FALSE if successful. The given mp3entry is then filled in with
+    whatever id3 info it could find about the given file.
+
+Various
+
+  #include <kernel.h>
+
+  sleep(ticks) - sleep a specified number of ticks, we currently have HZ ticks
+                 per second
