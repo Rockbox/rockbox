@@ -2,12 +2,12 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Ljudinställningar"
+new: "Ljudinställning"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Huvudinställningar"
+new: "Huvudinställning"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -202,12 +202,12 @@ new: "Spel"
 id: LANG_HIDDEN
 desc: in settings_menu
 eng: "Hidden Files"
-new: "Gömda filer"
+new: "Dolda filer"
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
 eng: "Hide"
-new: "Göm"
+new: "Dölj"
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
