@@ -12,7 +12,7 @@ The top line is the latest.
 <b>mod</b> - The file you should name "archos.mod" before copying it to the root of your archos.<br>
 <b>ajz</b> - The file you should name "archos.ajz" before copying it to the root of your archos.<br>
 <b>rocks</b> - All plugins for this particular release of Rockbox.<br>
-<b>full</b> - Full zip archive, with rockbox, plugins, fonts, languages etc.<br>
+<b>full</b> - Full zip archive, with rockbox, plugins, languages, docs, fonts, ucl etc.<br>
 <b>ucl</b> - File to use when <a href="/docs/flash.html">flashing Rockbox</a>
 
 <h2>Source tarballs</h2>
