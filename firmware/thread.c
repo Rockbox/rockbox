@@ -1,4 +1,4 @@
-/***************************************************************************
+e/***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -207,7 +207,7 @@ void switch_thread(void)
     
     /* Check if the current thread stack is overflown */
     stackptr = thread_stack[current]; 
-#if ! (defined(IRIVER_H100) || defined (ARCHOS_GMINI120))
+#if ! (defined(IRIVER_H100) || (CONFIG_CPU == TCC730))
     if(stackptr[0] != DEADBEEF)
        panicf("Stkov %s", thread_name[current]);
 #endif
