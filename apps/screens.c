@@ -1092,6 +1092,7 @@ bool set_time_screen(char* string, struct tm *tm)
 }
 #endif
 
+#ifdef HAVE_RECORDER_KEYPAD
 bool shutdown_screen(void)
 {
     int button;
@@ -1099,21 +1100,14 @@ bool shutdown_screen(void)
 
     lcd_stop_scroll();
 
-#ifdef HAVE_LCD_CHARCELLS
-    splash(0, true, "Push STOP to shut off");
-#else
-    splash(0, true, "Push OFF to shut off");
-#endif
+    splash(0, true, str(LANG_CONFIRM_SHUTDOWN));
+
     while(!done)
     {
         button = button_get_w_tmo(HZ*2);
         switch(button)
         {
-#ifdef HAVE_PLAYER_KEYPAD
-            case BUTTON_STOP:
-#else
             case BUTTON_OFF:
-#endif
                 clean_shutdown();
                 break;
 
@@ -1129,3 +1123,4 @@ bool shutdown_screen(void)
     }
     return false;
 }
+#endif
