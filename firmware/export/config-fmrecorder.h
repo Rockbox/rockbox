@@ -22,6 +22,9 @@
 /* Define this if you need to power on ATA */
 #define NEEDS_ATA_POWER_ON
 
+/* Define this if battery voltage can only be measured with ATA powered */
+#define NEED_ATA_POWER_BATT_MEASURE
+
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
 

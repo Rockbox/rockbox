@@ -140,17 +140,24 @@ void charging_display_info(bool animate)
     const int pox_y = 32;
     static unsigned phase = 3;
     unsigned i;
-    int battery_voltage;
-    int batt_int, batt_frac;
     char buf[32];
+    (void)buf;
 
-    battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
-    batt_int = battery_voltage / 100;
-    batt_frac = battery_voltage % 100;
+#ifdef NEED_ATA_POWER_BATT_MEASURE
+    if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
+#endif
+    {
+        int battery_voltage;
+        int batt_int, batt_frac;
 
-    snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
-             battery_level());
-    lcd_puts(0, 7, buf);
+        battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+        batt_int = battery_voltage / 100;
+        batt_frac = battery_voltage % 100;
+
+        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
+                 battery_level());
+        lcd_puts(0, 7, buf);
+    }
 
 #ifdef HAVE_CHARGE_CTRL
 
