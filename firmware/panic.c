@@ -43,9 +43,7 @@ void panicf( char *fmt, ...)
     va_end( ap );
 
 #ifdef HAVE_LCD_CHARCELLS
-#ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(false);
-#endif
     lcd_puts(0,0,panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
