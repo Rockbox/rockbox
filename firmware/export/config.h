@@ -34,12 +34,14 @@
 /* CONFIG_CPU */
 #define SH7034  7034
 #define MCF5249 5249
+#define CR16    16   /* lacking a proper abbrivation */
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD      0
 #define RECORDER_PAD    1
 #define ONDIO_PAD       2
 #define IRIVER_H100_PAD 3
+#define GMINI_PAD       4
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200      2200 /* FM/V2 recorder type */
@@ -67,6 +69,8 @@
 #include "config-ondiofm.h"
 #elif defined(IRIVER_H100)
 #include "config-h100.h"
+#elif defined(ARCHOS_GMINI120)
+#include "config-gmini120.h"
 #else
 /* no known platform */
 #endif
