@@ -19,6 +19,8 @@
 
 /* Global declarations to be used in rockbox software codecs */
 
+#include "config.h"
+
 #include <sys/types.h>
 
 /* Get these functions 'out of the way' of the standard functions. Not doing

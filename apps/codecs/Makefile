@@ -17,7 +17,8 @@ ifdef APPEXTRA
 endif
 
 .PHONY: libmad liba52 libFLAC libTremor libwavpack
-OUTPUT = libmad liba52 libFLAC libTremor libwavpack
+
+OUTPUT = $(SOFTWARECODECS)
 
 all: $(OUTPUT)
 

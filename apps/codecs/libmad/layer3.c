@@ -853,7 +853,7 @@ void III_exponents(struct channel const *channel,
       exponents[sfbi + 2] = gain2 -
 	(signed int) (channel->scalefac[sfbi + 2] << scalefac_multiplier);
 
-      l    += 3 * sfbwidth[sfbi];
+      l    += 3I * sfbwidth[sfbi];
       sfbi += 3;
     }
   }
@@ -1308,7 +1308,8 @@ void III_reorder(mad_fixed_t xr[576], struct channel const *channel,
       w = (w + 1) % 3;
     }
 
-    tmp[sbw[w]][w][sw[w]++] = xr[l];
+    unsigned int sbww = sbw[w];
+    tmp[sbww][w][sw[w]++] = xr[l];
 
     if (sw[w] == 6) {
       sw[w] = 0;

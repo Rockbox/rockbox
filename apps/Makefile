@@ -69,7 +69,7 @@ $(OBJDIR)/librockbox.a:
 
 $(LINKFILE): $(LDS)
 	@echo "Build LDS file"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	@cat $< | $(CC) -DLOADADDRESS=$(LOADADDRESS) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(LINKROM): $(ROMLDS)
 	@echo "Build LDS file for Rombox"

@@ -485,7 +485,8 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
     for (sb = 0; sb < bound; ++sb) {
       for (ch = 0; ch < nch; ++ch) {
 	if ((index = allocation[ch][sb])) {
-	  index = offset_table[bitalloc_table[offsets[sb]].offset][index - 1];
+          int off = bitalloc_table[offsets[sb]].offset;
+	  index = offset_table[off][index - 1];
 
 	  II_samples(&stream->ptr, &qc_table[index], samples);
 
@@ -503,7 +504,8 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
 
     for (sb = bound; sb < sblimit; ++sb) {
       if ((index = allocation[0][sb])) {
-	index = offset_table[bitalloc_table[offsets[sb]].offset][index - 1];
+        int off = bitalloc_table[offsets[sb]].offset;
+	index = offset_table[off][index - 1];
 
 	II_samples(&stream->ptr, &qc_table[index], samples);
 

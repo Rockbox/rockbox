@@ -342,7 +342,7 @@ if [ -z "$archos" ]; then
 
    5)
     archos="gmini120"
-    target="-DARCHOS_GMINI120 -DLOADADDRESS=\$(LOADADDRESS)"
+    target="-DARCHOS_GMINI120"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!
@@ -351,12 +351,12 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
-    codecs=""
+    codecs="libmad"
     ;;
 
    6)
     archos="gminisp"
-    target="-DARCHOS_GMINISP -DLOADADDRESS=\$(LOADADDRESS)"
+    target="-DARCHOS_GMINISP"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!
@@ -365,7 +365,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
-    codecs=""
+    codecs="libmad"
     ;;
 
    7)
@@ -405,7 +405,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="yes"
+    codecs="libmad liba52 libFLAC libTremor libwavpack"
     ;;
 
    *)
