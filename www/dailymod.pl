@@ -19,7 +19,7 @@ sub list {
 
 print "<table border=1><tr valign=\"top\"><td>\n";
 print "<h3>player-old</h3>\n";
-print "<p>This version is for old Archos Jukebox 6000 models with ROM firmware older than 4.50:\n";
+print "<p>This version is for old Archos Jukebox 5000, 6000 models with ROM firmware older than 4.50:\n";
 &list("playerold");
 
 print "</td><td>\n";
