@@ -4,6 +4,7 @@
 <p>
 In this example I will assume that you are running Linux with the bash shell.
 We will only build the C compiler along with the assembler, linker and stuff.
+Note that the procedure is exactly the same if you are running cygwin on Windows.
 <h2>Download the source code</h2>
 <p>
 You will need the following archives:
