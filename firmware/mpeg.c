@@ -2239,8 +2239,6 @@ static void start_recording(void)
 
 static void pause_recording(void)
 {
-    unsigned long val;
-
     pause_start_time = current_tick;
 
     /* Set the pause bit */
@@ -2252,8 +2250,6 @@ static void pause_recording(void)
 
 static void resume_recording(void)
 {
-    unsigned long val;
-
     paused = false;
     
     /* Clear the pause bit */
