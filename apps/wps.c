@@ -569,52 +569,73 @@ int wps_show(void)
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
-                if (ff_rewind)
+                if (!keys_locked)
                 {
-                    /* rewind */
-                    mpeg_ff_rewind(ff_rewind_count);
-                    ff_rewind_count = 0;
-                    ff_rewind = false;
-                    status_set_playmode(STATUS_PLAY);
-#ifdef HAVE_LCD_CHARCELLS
-                    draw_screen(id3);
-#endif
-                }
-                else
-                {
-                    if (keys_locked)
+                    if (ff_rewind)
                     {
-                        display_keylock_text(keys_locked);
+                        /* rewind */
+                        mpeg_ff_rewind(ff_rewind_count);
+                        ff_rewind_count = 0;
+                        ff_rewind = false;
+                        status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
-                        break;
+#endif
                     }
-                    mpeg_prev();
-                    status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_PLAYER_KEYPAD
+                    else if(!menu_button_is_down)
+#else
+                    else
+#endif
+                    {
+                        mpeg_prev();
+                        status_set_playmode(STATUS_PLAY);
+                    }
+                }
+#ifdef HAVE_PLAYER_KEYPAD
+                else if(!menu_button_is_down)
+#else
+                else
+#endif
+                {
+                    display_keylock_text(keys_locked);
+                    draw_screen(id3);
                 }
                 break;
 
             case BUTTON_RIGHT | BUTTON_REL:
-                if (ff_rewind)
+                if (!keys_locked)
                 {
-                    /* fast forward */
-                    mpeg_ff_rewind(ff_rewind_count);
-                    ff_rewind_count = 0;
-                    ff_rewind = false;
-                    status_set_playmode(STATUS_PLAY);
-#ifdef HAVE_LCD_CHARCELLS
-                    draw_screen(id3);
-#endif
-                }
-                else
-                {
-                    if (keys_locked)
+                    if (ff_rewind)
                     {
-                        display_keylock_text(keys_locked);
+                        /* fast forward */
+                        mpeg_ff_rewind(ff_rewind_count);
+                        ff_rewind_count = 0;
+                        ff_rewind = false;
+                        status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
-                        break;
+#endif
                     }
-                    mpeg_next();
-                    status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_PLAYER_KEYPAD
+                    else if(!menu_button_is_down)
+#else
+                    else
+#endif
+                    {
+                        mpeg_next();
+                        status_set_playmode(STATUS_PLAY);
+                    }
+                }
+#ifdef HAVE_PLAYER_KEYPAD
+                else if(!menu_button_is_down)
+#else
+                else
+#endif
+                {
+                    display_keylock_text(keys_locked);
+                    draw_screen(id3);
+                    break;
                 }
                 break;
 
@@ -626,6 +647,7 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                status_draw();
                 settings_save();
                 break;
 
@@ -636,6 +658,7 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                status_draw();
                 settings_save();
                 break;
 
