@@ -1931,8 +1931,8 @@ static void init_recording(void)
     val = 0;
     mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1);    
     
-    /* Set Demand mode and validate all settings */
-    val = 0x25;
+    /* Set Demand mode, no monitoring and validate all settings */
+    val = 0x125;
     mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
 
     /* Start the encoder application */
@@ -1943,6 +1943,13 @@ static void init_recording(void)
         mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while(!(val & 0x40));
 
+    /* We have started the recording application with monitoring OFF.
+       This is because we want to record at least one frame to fill the DMA
+       buffer, because the silly MAS will not negate EOD until at least one
+       DMA transfer has taken place.
+       Now let's wait for some data to be encoded. */
+    sleep(20);
+    
     /* Disable IRQ6 */
     IPRB &= 0xff0f;
 
@@ -2026,6 +2033,14 @@ static void start_recording(void)
     val |= 1;
     mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
 
+    /* Wait until the DSP has accepted the settings */
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+    } while(val & 1);
+
+    sleep(20);
+    
     /* Read the current frame */
     mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
 
@@ -2044,6 +2059,12 @@ static void stop_recording(void)
     val |= (1 << 10) | 1;
     mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
 
+    /* Wait until the DSP has accepted the settings */
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+    } while(val & 1);
+    
     drain_dma_buffer();
 }
 
@@ -2617,7 +2638,7 @@ void mpeg_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
 
-    val = ((1 << 10) | /* Monitoring on */
+    val = ((!is_recording << 10) | /* Monitoring */
         ((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
@@ -2626,7 +2647,7 @@ void mpeg_set_recording_options(int frequency, int quality,
     mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
 
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
-    
+
     drain_dma_buffer();
     
     if(source == 0) /* Mic */
