@@ -71,7 +71,7 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
-#define CONFIG_BLOCK_VERSION 11
+#define CONFIG_BLOCK_VERSION 12
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
