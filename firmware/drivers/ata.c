@@ -424,8 +424,18 @@ extern void ata_flush(void)
 
 static int check_registers(void)
 {
-    if ( ATA_STATUS & STATUS_BSY )
-        return -1;
+    /* When starting from Flash, the disk is not yet ready when we get here. */
+    /* Crude first fix is to block and poll here for a while, 
+       can we do better? */
+    int time = 0;
+    while ((ATA_STATUS & STATUS_BSY))
+    {
+        if (time >= HZ*10) /* timeout, disk is not coming up */
+            return -1;
+
+        sleep(HZ/10);
+        time += HZ/10;
+    };
     
     ATA_NSECTOR = 0xa5;
     ATA_SECTOR  = 0x5a;
@@ -797,14 +807,14 @@ unsigned short* ata_get_identify(void)
 
 int ata_init(void)
 {
-    mutex_init(&ata_mtx);
+	mutex_init(&ata_mtx);
 
     led(false);
 
-	/* Port A setup */
-	PAIOR |= 0x0200; /* output for ATA reset */
-	PADR |= 0x0200; /* release ATA reset */
-	PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+    /* Port A setup */
+    PAIOR |= 0x0200; /* output for ATA reset */
+    PADR |= 0x0200; /* release ATA reset */
+    PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 
     ata_enable(true);
 
