@@ -185,6 +185,9 @@ static void usb_thread(void)
                 waiting_for_ack = true;
                 DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
                        num_acks_to_expect);
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_icon(ICON_USB, false);
+#endif
                 break;
         
             case SYS_USB_DISCONNECTED_ACK:
@@ -369,5 +372,8 @@ void usb_display_info(void)
     lcd_update();
 #else
     lcd_puts(0, 0, "[USB Mode]");
+    lcd_icon(ICON_PARAM, false);
+    lcd_icon(ICON_AUDIO, false);
+    lcd_icon(ICON_USB, true);
 #endif
 }

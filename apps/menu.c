@@ -22,6 +22,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"
+#include "usb.h"
 #include "panic.h"
 #include "settings.h"
 #include "status.h"
@@ -213,8 +214,10 @@ void menu_exit(int m)
 
 void menu_run(int m)
 {
+    bool laststate;
+
     menu_draw(m);
-    
+
     while(1) {
         switch( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
@@ -274,6 +277,22 @@ void menu_run(int m)
                 global_settings.statusbar = !global_settings.statusbar;
                 settings_save();
                 menu_draw(m);
+#endif
+                break;
+#endif
+
+#ifndef SIMULATOR
+            case SYS_USB_CONNECTED:
+#ifdef HAVE_LCD_BITMAP
+                laststate = statusbar(false);
+#endif
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_wait_for_disconnect(&button_queue);
+                menu_draw(m);
+#ifdef HAVE_LCD_BITMAP
+                statusbar(laststate);
+#else
+                lcd_icon(ICON_PARAM, true);
 #endif
                 break;
 #endif
