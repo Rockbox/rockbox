@@ -67,7 +67,7 @@ char* playlist_next(int steps, char *dirname)
       buf[seek]=0;
       
       /* replace backslashes with forward slashes */
-      for ( i=1; i<seek; i++ )
+      for ( i=0; i<seek; i++ )
           if ( buf[i] == '\\' )
               buf[i] = '/';
 
