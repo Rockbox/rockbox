@@ -29,6 +29,18 @@ sub buildzip {
     if($notplayer) {
         `cp ../apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
 
+        open VIEWERS, "../apps/plugins/viewers.config" or
+            die "can't open viewers.config";
+        @viewers = <VIEWERS>;
+        close VIEWERS;
+        `cp ../apps/plugins/viewers.config .rockbox`;
+        mkdir ".rockbox/viewers";
+        for (@viewers) {
+            if (/,(.+),/) {
+                `mv .rockbox/rocks/$1 .rockbox/viewers`;
+            }
+        }
+
         mkdir ".rockbox/fonts", 0777;
 
         opendir(DIR, "../fonts") || die "can't open dir fonts";
