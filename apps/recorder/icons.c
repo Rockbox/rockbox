@@ -163,9 +163,12 @@ void statusbar_icon_battery(int percent, bool charging)
 	if (fill > 100)
 		fill = 100;
 
+#ifdef SIMULATOR
+	if (global_settings.battery_type) {
+#else
     /* show graphical animation when charging instead of numbers */
 	if ((global_settings.battery_type) && (charge_state != 1)) {
-
+#endif
 		/* Numeric display */
 		snprintf(buffer, sizeof(buffer), "%3d", percent);
 		lcd_setfont(FONT_SYSFIXED);
