@@ -288,6 +288,7 @@ int ata_write_sectors(unsigned long start,
                       void* buf)
 {
     int i;
+    int ret = 0;
 
     last_disk_activity = current_tick;
 
@@ -347,7 +348,7 @@ int ata_write_sectors(unsigned long start,
     }
 
     if(!wait_for_end_of_transfer())
-        i = -3;
+        ret = -3;
 
     led(false);
 
@@ -358,7 +359,7 @@ int ata_write_sectors(unsigned long start,
 
     last_disk_activity = current_tick;
 
-    return i;
+    return ret;
 }
 
 extern void ata_delayed_write(unsigned long sector, void* buf)
