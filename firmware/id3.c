@@ -101,8 +101,8 @@ static int unicode_munge(char** string, int *len) {
    
    /* Type 0x00 is ordinary ISO 8859-1 */
    if(str[0] == 0x00) {
-      *len--;
-      *string++; /* Skip the encoding type byte */
+      (*len)--;
+      (*string)++; /* Skip the encoding type byte */
       return 0;
    }
 
@@ -136,7 +136,7 @@ static int unicode_munge(char** string, int *len) {
       } while(str[0] || str[1]);
 
       *len = i;
-      *string++; /* Skip the encoding type byte */
+      (*string)++; /* Skip the encoding type byte */
       return 0;
    }
 
