@@ -1287,7 +1287,7 @@ new: "- Ren + Del"
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-new: "Kö"
+new: "Köa"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
