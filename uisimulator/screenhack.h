@@ -83,7 +83,6 @@
 #include "resources.h"
 #include "hsv.h"
 #include "colors.h"
-#include "grabscreen.h"
 #include "visual.h"
 
 extern Bool mono_p;
