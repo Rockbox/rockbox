@@ -195,7 +195,7 @@ static const char levels[][320] = {
     "00000000000000000000"
     "00000000000000000000"
     "00000000000000000000",
-
+    /* level 10 */
     "00000000000000000000"
     "00000000000000000000"
     "00000000000000000000"
@@ -213,6 +213,7 @@ static const char levels[][320] = {
     "00000000000000000000"
     "00000000000000000000",
 
+    "00000000000000000000"
     "00000000000000000000"
     "00000000000000000000"
     "00000000000000000000"
@@ -1010,6 +1011,9 @@ void sokoban_loop(void) {
                 load_level(current_level);
                 moves=0;
                 idle=true;
+                load_level(current_level);
+                lcd_clear_display();
+                update_screen();
                 break;
             
             case BUTTON_F1:
@@ -1019,6 +1023,9 @@ void sokoban_loop(void) {
                 load_level(current_level);
                 moves=0;
                 idle=true;
+                load_level(current_level);
+                lcd_clear_display();
+                update_screen();
                 break;
 
             case BUTTON_LEFT:
