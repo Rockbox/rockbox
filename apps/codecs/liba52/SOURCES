@@ -1,0 +1,5 @@
+bit_allocate.c
+bitstream.c
+downmix.c
+imdct.c
+parse.c

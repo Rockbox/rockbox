@@ -1,0 +1,27 @@
+Library: liba52-0.7.5 (CVS version 2005-02-16)
+Imported: 2005-02-16 by Dave Chapman
+
+
+This directory contains a local version of liba52 for decoding ATSC
+A/52 (aka AC-3) audio streams.  A/52 is commonly used in digital TV and
+on DVDs.
+
+LICENSING INFORMATION
+
+liba52 is released under the GNU General Public License as described
+in the COPYING file in this directory.
+
+
+IMPORT DETAILS
+
+The base version first imported into Rockbox was the CVS version of
+liba52-0.7.5 (0.7.4 was at the time the latest official) which was 
+checked out of sourceforge on 2005-02-16.
+
+The .[ch] files from a52dec/liba52/ and a52dec/include/ as well as the
+documentation files in a52dec/ were imported into Rockbox.  The other
+files in the archive relate to the test player (a52dec) and were not
+imported.
+
+A simple config.h file was added to enable liba52's fixed-point
+integer-only mode and to specify the endianness of the target CPU.
