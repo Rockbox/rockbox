@@ -64,7 +64,9 @@ static char current_track_path[MAX_PATH+1];
 /* button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_NEXT_PRE BUTTON_RIGHT
 #define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
+#define WPS_PREV_PRE BUTTON_LEFT
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
 #define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
 #define WPS_INCVOL   BUTTON_UP
@@ -86,7 +88,9 @@ static char current_track_path[MAX_PATH+1];
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_NEXT_PRE BUTTON_RIGHT
 #define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
+#define WPS_PREV_PRE BUTTON_LEFT
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
 #define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
 #define WPS_INCVOL  (BUTTON_MENU | BUTTON_RIGHT)
@@ -108,7 +112,9 @@ static char current_track_path[MAX_PATH+1];
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_NEXT_PRE BUTTON_RIGHT
 #define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
+#define WPS_PREV_PRE BUTTON_LEFT
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
 #define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
 #define WPS_INCVOL   BUTTON_UP
@@ -608,10 +614,10 @@ int wps_show(void)
             case WPS_RC_PREV:
 #endif
             case WPS_PREV:
-                /* ignore release event after rewind */
-                if (lastbutton & BUTTON_REPEAT)
-                    break; 
-
+#ifdef WPS_PREV_PRE
+                if (lastbutton != WPS_PREV_PRE)
+                    break;
+#endif
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     mpeg_prev();
                 }
@@ -631,8 +637,8 @@ int wps_show(void)
             case WPS_RC_NEXT:
 #endif
             case WPS_NEXT:
-#if CONFIG_KEYPAD == RECORDER_PAD
-                if (lastbutton & BUTTON_REPEAT)
+#ifdef WPS_NEXT_PRE
+                if (lastbutton != WPS_NEXT_PRE)
                     break; 
 #endif
                 mpeg_next();
