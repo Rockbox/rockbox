@@ -151,6 +151,22 @@
     <td>6V 700mA</td>
     <td>6V 700mA</td>
 </tr>
+<tr><th><b>Dimensions</b></th>
+    <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
+    <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
+    <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
+    <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
+    <td>113x79x30 mm (4.45"x3.11"x1.18")</td>
+    <td>113x79x30 mm (4.45"x3.11"x1.18")</td>
+</tr>
+<tr><th><b>Weight</b></th>
+    <td>340 g (12 oz)</td>
+    <td>340 g (12 oz)</td>
+    <td>350 g (12.3 oz)</td>
+    <td>350 g (12.3 oz)</td>
+    <td>290 g (10.23 oz)</td>
+    <td>290 g (10.23 oz)</td>
+</tr>
 </table>
 <p>
  <a name=footnote1></a><i>(1) It is hard to tell if the recorder is old, but the Rec6 and Rec10 are old. I don't yet know about the Rec15.</i>
