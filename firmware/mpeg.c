@@ -2917,19 +2917,11 @@ void mpeg_set_recording_options(int frequency, int quality,
     {
         /* Copy left channel to right (mono mode) */
         mas_codec_writereg(8, 0x8000);
-
-        /* We set the channel config to stereo to get a clean left channel */
-        mpeg_sound_channel_config(MPEG_SOUND_STEREO);
     }
     else
     {
         /* Stereo input mode */
         mas_codec_writereg(8, 0);
-
-        if(channel_mode == 1) /* Mono */
-            mpeg_sound_channel_config(MPEG_SOUND_MONO);
-        else
-            mpeg_sound_channel_config(MPEG_SOUND_STEREO);
     }
 }
 
