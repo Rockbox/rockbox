@@ -117,6 +117,8 @@ bool radio_screen(void)
     lcd_getstringsize("A", &fw, &fh);
 
     radio_load_presets();
+
+    mpeg_stop();
     
     /* Enable the Left and right A/D Converter */
     mas_codec_writereg(0x0, 0xccc7);
