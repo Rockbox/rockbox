@@ -69,6 +69,7 @@ Archos. (Jean Boullier)
 
 <h3>Rockbox Design Docs</h3>
 <ul>
+<li> <a href="http://rockbox.gratiswiki.dk/">wiki about new rockbox UI devel</a>
 <li><a href="rocklatin.html">The Rocklatin charset used in Players</a>
 <li> API docs
 <li> Software Design
