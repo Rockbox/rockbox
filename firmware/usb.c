@@ -72,9 +72,9 @@ static int usb_state;
 static int usb_mmc_countdown = 0;
 #endif
 
-/* FIXME: The extra 0x400 is consumed by fat_mount() when the fsinfo
+/* FIXME: The extra 0x800 is consumed by fat_mount() when the fsinfo
    needs updating */
-static long usb_stack[(DEFAULT_STACK_SIZE + 0x400)/sizeof(long)];
+static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static struct event_queue usb_queue;
 static bool last_usb_status;
