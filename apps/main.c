@@ -16,6 +16,48 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+
+#ifdef IRIVER_H100
+#include "thread.h"
+#include "cpu.h"
+
+unsigned long test_thread_stack[0x1000];
+
+void yield(void)
+{
+    switch_thread();
+    wake_up_thread();
+}
+
+void test_thread(void)
+{
+    while(1)
+    {
+        GPIO1_OUT ^= 0x00020000;
+        yield();
+    }
+}
+
+int main(void)
+{
+    int i;
+
+    init_threads();
+
+    create_thread(test_thread, test_thread_stack,
+                  sizeof(test_thread_stack), "Test thread");
+    
+    GPIO1_FUNCTION |= 0x00020000;
+    GPIO1_ENABLE |= 0x00020000;
+    
+    while(1) {
+        for(i = 0;i < 10000;i++) {}
+        yield();
+    }
+}
+
+#else
 #include "ata.h"
 #include "disk.h"
 #include "fat.h"
@@ -271,4 +313,4 @@ int main(void)
     return 0;
 }
 #endif
-
+#endif
