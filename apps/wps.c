@@ -210,10 +210,8 @@ int wps_show(void)
 #ifndef SIMULATOR
                 case SYS_USB_CONNECTED:
                     /* Tell the USB thread that we are safe */
-                    DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
+                    DEBUGF("wps got SYS_USB_CONNECTED\n");
                     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                    
-                    usb_display_info();
                     
                     /* Wait until the USB cable is extracted again */
                     usb_wait_for_disconnect(&button_queue);
