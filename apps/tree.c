@@ -80,7 +80,7 @@ const struct filetype filetypes[] = {
     { ".fnt", TREE_ATTR_FONT,Font, VOICE_EXT_FONT },
 #endif
     { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
-#ifndef SIMULATOR
+#ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */
 };
@@ -691,7 +691,7 @@ static bool dirbrowse(void)
 
         button = button_get_w_tmo(HZ/5);
 
-#ifndef SIMULATOR
+#ifdef BOOTFILE
         if (boot_changed) {
             bool stop = false;
             unsigned int button;

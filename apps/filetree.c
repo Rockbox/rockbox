@@ -243,7 +243,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) )
            dptr->attr |= filetype_get_attr(entry->d_name);
 
-#ifndef SIMULATOR
+#ifdef BOOTFILE
         /* memorize/compare details about the boot file */
         if ((c->currdir[1] == 0) && !strcasecmp(entry->d_name, BOOTFILE)) {
             if (boot_size) {
