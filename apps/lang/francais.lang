@@ -1,8 +1,7 @@
-# francais.lang 2003/04/28
+# francais.lang 2003/05/09
 #
-# Based on english.lang,v 1.72 2003/04/24 13:13:16
+# Based on file english.lang,v 1.73 2003/05/09 16:01:20 linusnielsen Exp $
 #
-
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -1501,3 +1500,13 @@ id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
 new: "Inversé"
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+new: "Max fichiers par répertoire"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+new: "Max fichiers par liste musicale"
