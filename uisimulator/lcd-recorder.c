@@ -79,38 +79,6 @@ void lcd_update (void)
   }
 }
 
-#if 0
-/*
- * Display a string at current position
- */
-void lcd_string (const char *text, BOOL invert)
-{
-  int ch;
-
-  while ((ch = *text++) != '\0') {
-    if (lcd_y > DISP_Y-CHAR_Y) {
-      /* Scroll (8 pixels) */
-      memcpy (display[0], display[1], DISP_X*(DISP_Y/8-1));
-      lcd_y -= 8;
-    }
-
-    if (ch == '\n')
-      lcd_x = DISP_X;
-    else {
-      lcd_char (ch, invert);
-      lcd_x += CHAR_X;
-    }
-
-    if (lcd_x > DISP_X-CHAR_X) {
-      /* Wrap to next line */
-      lcd_x = 0;
-      lcd_y += CHAR_Y;
-    }
-  }
-}
-#endif
-
-
 /*
  * Write a byte to LCD controller.
  * command is TRUE if value is a command byte.
