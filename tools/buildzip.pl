@@ -173,6 +173,9 @@ if($target !~ /sim/i) {
     if($target =~ /(recorder|ondio)/i) {
         $exe = "ajbrec.ajz";
     }
+    elsif($target =~ /iriver/i) {
+        $exe = "rockbox.iriver";
+    }
     else {
         $exe = "archos.mod";
     }
