@@ -169,7 +169,8 @@ void init(void)
                global_settings.balance,
                global_settings.loudness,
                global_settings.bass_boost,
-               global_settings.avc );
+               global_settings.avc,
+               global_settings.channel_config );
 
     status_init();
     usb_start_monitoring();

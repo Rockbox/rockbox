@@ -56,7 +56,7 @@ struct mpeg_debug
 };
 
 void mpeg_init(int volume, int bass, int treble, int balance,
-               int loudness, int bass_boost, int avc);
+               int loudness, int bass_boost, int avc, int channel_config);
 void mpeg_play(int offset);
 void mpeg_stop(void);
 void mpeg_pause(void);

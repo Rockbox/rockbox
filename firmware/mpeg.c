@@ -2809,10 +2809,12 @@ static void mpeg_thread(void)
 }
 #endif
 
-void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
+void mpeg_init(int volume, int bass, int treble, int balance, int loudness, 
+    int bass_boost, int avc, int channel_config)
 {
 #ifdef SIMULATOR
-    volume = bass = treble = balance = loudness = bass_boost = avc;
+    volume = bass = treble = balance = loudness
+        = bass_boost = avc = channel_config;
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
 #else
@@ -2893,7 +2895,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_config(0x04); /* DAC on, all else off */
 
-    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
+    mpeg_sound_channel_config(channel_config);
 #endif
 
 #ifdef HAVE_MAS3587F
@@ -2910,6 +2912,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     mpeg_sound_set(SOUND_VOLUME, volume);
     
 #ifdef HAVE_MAS3587F
+    mpeg_sound_channel_config(channel_config);
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
     mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
     mpeg_sound_set(SOUND_AVC, avc);

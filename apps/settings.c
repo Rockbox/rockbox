@@ -320,8 +320,9 @@ int settings_save( void )
     config_block[0x10] = (unsigned char)
         ((global_settings.ff_rewind_min_step & 15) << 4 |
          (global_settings.ff_rewind_accel & 15));
-    config_block[0x11] = (unsigned char)(global_settings.avc ||
-                                         global_settings.channel_config << 2);
+    config_block[0x11] = (unsigned char)
+        ((global_settings.avc & 0x03) | 
+         ((global_settings.channel_config & 0x03) << 2));
 
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
@@ -448,6 +449,7 @@ void settings_apply(void)
     mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
     
 #ifdef HAVE_MAS3587F
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
