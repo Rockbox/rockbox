@@ -694,7 +694,7 @@ static void fade(bool fade_in)
             mpeg_sound_set(SOUND_VOLUME, current_volume);
         }
         mpeg_pause();
-        sleep(HZ/10); /* let mpeg thread run */
+        sleep(HZ/5); /* let mpeg thread run */
 
         /* reset volume to what it was before the fade */
         mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
