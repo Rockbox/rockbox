@@ -814,12 +814,12 @@ static bool handle_shift(int *ds, int *dc, int numentries,
                 break;
 
 
-            case TREE_RUN:
+            case TREE_RUN | BUTTON_REL:
 #ifdef TREE_RC_PLAY
             case TREE_RC_RUN:
 #endif
 #ifdef TREE_SHIFT
-            case TREE_SHIFT | TREE_RUN:
+            case TREE_SHIFT | TREE_RUN | BUTTON_REL:
 #endif
             {
                 int onplay_result;
