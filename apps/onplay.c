@@ -206,10 +206,10 @@ int onplay(char* file, int attr)
     if ((mpeg_status() & MPEG_STATUS_PLAY) && (attr & TREE_ATTR_MPA))
         menu[i++] = (struct menu_items) { str(LANG_QUEUE), queue_file };
 
+    menu[i++] = (struct menu_items) { str(LANG_RENAME), rename_file };
+
     if (!(attr & ATTR_DIRECTORY))
         menu[i++] = (struct menu_items) { str(LANG_DELETE), delete_file };
-
-    menu[i++] = (struct menu_items) { str(LANG_RENAME), rename_file };
 
     if (attr & TREE_ATTR_MPA)
         menu[i++] = (struct menu_items) { "VBRfix", vbr_fix };
