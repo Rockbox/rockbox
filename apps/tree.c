@@ -46,6 +46,7 @@
 #include "rolo.h"
 #include "icons.h"
 #include "lang.h"
+#include "language.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -139,6 +140,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_MOD 0x200 /* firmware file */
 #define TREE_ATTR_EQ  0x400 /* EQ config file */
 #define TREE_ATTR_FONT 0x800 /* font file */
+#define TREE_ATTR_LNG  0x1000 /* binary lang file */
 #define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 static int build_playlist(int start_index)
@@ -253,6 +255,8 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_EQ;
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
+                else if (!strcasecmp(&entry->d_name[len-4], ".lng"))
+                    dptr->attr |= TREE_ATTR_LNG;
 #ifdef HAVE_RECORDER_KEYPAD
                 else if (!strcasecmp(&entry->d_name[len-4], ".fnt"))
                     dptr->attr |= TREE_ATTR_FONT;
@@ -367,6 +371,10 @@ static int showdir(char *path, int start)
 
             case TREE_ATTR_EQ:
                 icon_type = Wps;
+                break;
+
+            case TREE_ATTR_LNG:
+                icon_type = Wps; /* for now */
                 break;
 
             case TREE_ATTR_MOD:
@@ -722,6 +730,13 @@ bool dirbrowse(char *root)
                             restore = true;
                             break;
 
+                        case TREE_ATTR_LNG:
+                            snprintf(buf, sizeof buf, "%s/%s",
+                                     currdir, file->name);
+                            lang_load(buf);
+                            restore = true;
+                            break;
+
 #ifdef HAVE_LCD_BITMAP
                         case TREE_ATTR_FONT:
                             snprintf(buf, sizeof buf, "%s/%s",
@@ -966,3 +981,9 @@ bool dirbrowse(char *root)
 
     return false;
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * end:
+ */
