@@ -271,6 +271,24 @@ void IMIA1(void)
     TSR1 &= ~0x01;
 }
 
+static int new_file(void)
+{
+    char *trackname;
+
+    trackname = peek_next_track(0);
+    if ( !trackname )
+        return -1;
+
+    debugf("playing %s\n", trackname);
+    mpeg_file = open(trackname, O_RDONLY);
+    if(mpeg_file < 0)
+    {
+        debugf("Couldn't open file\n");
+        return -1;
+    }
+    return 0;
+}
+
 static void mpeg_thread(void)
 {
     struct event ev;
@@ -394,12 +412,6 @@ static void mpeg_thread(void)
                            boundary */
                         mp3buf_write &= 0xfffffffe;
 
-#if 1
-                        /* No more data to play */
-                        DEBUGF("Finished playing\n");
-                        filling = false;
-#else
-                        next_track();
                         if(new_file() < 0)
                         {
                             /* No more data to play */
@@ -412,7 +424,6 @@ static void mpeg_thread(void)
                             /* Tell ourselves that we want more data */
                             queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         }
-#endif
                     }
                 }
                 break;
