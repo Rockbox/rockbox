@@ -37,6 +37,7 @@
  */
 
 #include "lcd.h"
+#include "lcd-x11.h"
 
 extern unsigned char display[LCD_WIDTH/8][LCD_HEIGHT];
 
@@ -53,8 +54,8 @@ void lcd_update (void)
         /* one or more bits/pixels are set */
         for(bit=0; bit<8; bit++) {
           if(display[y/8][x]&(1<<bit)) {
-            points[p].x = x;
-            points[p].y = y+bit;
+            points[p].x = x + MARGIN_X;
+            points[p].y = y+bit + MARGIN_Y;
             p++; /* increase the point counter */
           }
         }
@@ -63,4 +64,5 @@ void lcd_update (void)
     }
   }
   drawdots(&points[0], p);
+  fprintf(stderr, "lcd_update: Draws %d pixels\n", p);
 }

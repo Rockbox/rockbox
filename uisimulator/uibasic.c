@@ -33,6 +33,9 @@
 
 #include "version.h"
 
+#include "lcd.h"
+#include "lcd-x11.h"
+
 #define MAX(x,y) ((x)>(y)?(x):(y))
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
@@ -78,7 +81,7 @@ void Logf(char *fmt, ...)
   t = localtime(&now);
   log = fopen(LOGFILE, "a");
   if(log) {
-    fprintf(log, "%02d.%02d.%02d ",
+    fprintf(log, "%02d:%02d:%02d ",
             t->tm_hour, t->tm_min, t->tm_sec);
     vfprintf(log, fmt, args);
     fprintf(log, "\n");
@@ -86,7 +89,7 @@ void Logf(char *fmt, ...)
     fclose(log);
   }
 
-  fprintf(stderr, "%02d.%02d.%02d ",
+  fprintf(stderr, "%02d:%02d:%02d ",
           t->tm_hour, t->tm_min, t->tm_sec);
   vfprintf(stderr, fmt, args);
   fprintf(stderr, "\n");
@@ -221,7 +224,14 @@ screenhack (Display *the_dpy, Window the_window)
 
   Logf("Rockbox will kill ya!");
 
-  lcd_string( PROGNAME, 0);
+  lcd_position(1, 1);
+  lcd_string( "RockBoxx", 0);
+
+  lcd_position(8, 16);
+  lcd_string( "R", 0);
+
+  lcd_position(8, 24);
+  lcd_string( "2", 0);
 
   while (1) {
     /* deal with input here */
@@ -236,6 +246,16 @@ void screen_redraw()
   int y, x;
 
   lcd_update();
+
+#define X1 0
+#define Y1 0
+#define X2 (LCD_WIDTH + MARGIN_X*2)
+#define Y2 (LCD_HEIGHT + MARGIN_Y*2)
+
+  drawline(1, X1, Y1, X2, Y1);
+  drawline(1, X2, Y1, X2, Y2);
+  drawline(1, X1, Y2, X2, Y2);
+  drawline(1, X1, Y1, X1, Y2);
 
 #if 0
   /* does nothing "real" yet */

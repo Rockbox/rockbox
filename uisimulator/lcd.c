@@ -22,6 +22,9 @@
  */
 
 #include "lcd.h"
+#ifdef LCD_DEBUG
+#include <stdio.h>
+#endif
 
 #define	DISP_X LCD_WIDTH	/* Display width in pixels */
 #define	DISP_Y LCD_HEIGHT       /* Display height in pixels */
@@ -40,7 +43,7 @@
 #define	ASCII_MIN			0x20	/* First char in table */
 #define	ASCII_MAX			0x7f	/* Last char in table */
 
-static const unsigned char char_gen[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
+static const unsigned char lcd_font_data[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
 {
   0x00, 0x00, 0x00, 0x00, 0x00,	/* 0x20-0x2f */
   0x00, 0x00, 0x4f, 0x00, 0x00,
@@ -154,8 +157,8 @@ static const unsigned char char_gen[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
  */
 unsigned char display[LCD_HEIGHT/8][LCD_WIDTH];
 
-static unsigned char lcd_y;	/* Current pixel row */
-static unsigned char lcd_x;	/* Current pixel column */
+static int lcd_y;	/* Current pixel row */
+static int lcd_x;	/* Current pixel column */
 
 /*
  * Set current x,y position
@@ -165,7 +168,15 @@ void lcd_position(int x, int y)
   if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y) {
     lcd_x = x;
     lcd_y = y;
+#ifdef LCD_DEBUG
+    fprintf(stderr, "lcd_position: set to %d, %d\n", x, y);
+#endif
   }
+#ifdef LCD_DEBUG
+  else
+    fprintf(stderr, "lcd_position: not set\n");
+#endif
+
 }
 
 /*
@@ -202,7 +213,7 @@ void lcd_char (int ch, char invert)
 
   /* Write each char column */
   for (col = 0; col < CHAR_X-1; col++) {
-    unsigned long data = (char_gen[ch-ASCII_MIN][col] << shift) ^ invert;
+    unsigned long data = (lcd_font_data[ch-ASCII_MIN][col] << shift) ^ invert;
     dp[0][col] = (dp[0][col] & mask) | data;
     if (lcd_y < DISP_Y-8)
       dp[1][col] = (dp[1][col] & (mask >> 8)) | (data >> 8);
@@ -221,6 +232,10 @@ void lcd_string(const char *text, char invert)
 {
   int ch;
 
+#ifdef LCD_DEBUG
+  fprintf(stderr, "lcd_string: output %s at %d, %d\n",
+          text, lcd_x, lcd_y);
+#endif
   while ((ch = *text++) != '\0') {
     if (lcd_y > DISP_Y-CHAR_Y) {
       /* Scroll (8 pixels) */

@@ -17,12 +17,6 @@
  *
  ****************************************************************************/
 
-/*
- * This file is meant for generic LCD defines
- */
-
-#define	LCD_WIDTH  112		/* Display width in pixels */
-#define	LCD_HEIGHT 64		/* Display height in pixels */
-
-#define LCD_DEBUG 1
+#define MARGIN_X 3
+#define MARGIN_Y 3
 
