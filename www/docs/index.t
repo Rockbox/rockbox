@@ -5,10 +5,9 @@
 <ul>
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
-<li> <a href="nodo.html">Frequently Asked Questions about Features We Will Not Implement</a>
+<li> <a href="nodo.html">Features We Will Not Implement</a>
 <li> <a href="/manual/manual.pdf">User manual</a>
 <li> <a href="features.html">Feature Comparison Chart</a>
-<li> <a href="nodo.html">Features We Will Not Implement</a>
 <li> <a href="custom_wps_format.html">How to make a custom WPS</a>
 <li> <a href="custom_cfg_format.html">How to make a custom config file</a>
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
