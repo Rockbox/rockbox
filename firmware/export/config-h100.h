@@ -50,4 +50,7 @@
 
 #define USB_NONE /* FIX: USB temorarily disabled */
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #endif
