@@ -84,10 +84,14 @@ static int xoffset = 0; /* needed for flip */
 
 unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 
-/* All zeros and ones bitmaps for area filling */
-static const unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-static const unsigned char ones[8]  = { 0xff, 0xff, 0xff, 0xff,
-                                        0xff, 0xff, 0xff, 0xff};
+/* All zeros and ones bitmaps for area filling */  
+static const unsigned char zeros[16] = { 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+static const unsigned char ones[16]  = { 
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
 
 int lcd_default_contrast(void)
 {
