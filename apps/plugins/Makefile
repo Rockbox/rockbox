@@ -53,7 +53,7 @@ ifeq ($(SIMVER), x11)
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
 	@echo "LD $@"
 	@$(CC) $(CFLAGS) -shared $< -L$(OBJDIR)  $(CODECLIBS) -lplugin -o $@
-ifeq ($(UNAME),CYGWIN)
+ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
 #         #define ERROR_ACCESS_DENIED 5L
@@ -71,7 +71,7 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
 	@echo "DLL $@"
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
-ifeq ($(UNAME),CYGWIN)
+ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
 #         #define ERROR_ACCESS_DENIED 5L

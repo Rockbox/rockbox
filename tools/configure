@@ -573,7 +573,8 @@ sed > Makefile \
  -e "s,@SIMVER@,${simver},g" \
  -e "s,@GCCVER@,${gccver},g" \
  -e "s,@GCCNUM@,${gccnum},g" \
-<<EOF 
+ -e "s,@UNAME@,${uname},g" \
+<<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
 export ROOTDIR=@ROOTDIR@
@@ -612,6 +613,7 @@ export SIMDIR=\$(ROOTDIR)/uisimulator/\$(SIMVER)
 export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
+export UNAME=@UNAME@
 
 .PHONY: all clean tags zip
 
