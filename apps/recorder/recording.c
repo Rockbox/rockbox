@@ -48,6 +48,7 @@
 #include "dir.h"
 #include "errno.h"
 #include "talk.h"
+#include "atoi.h"
 
 #ifdef HAVE_RECORDING
 
@@ -149,18 +150,53 @@ void adjust_cursor(void)
 char *rec_create_filename(char *buffer)
 {
     int fpos;
-    struct tm *tm = get_time();
 
     if(global_settings.rec_directory)
         getcwd(buffer, MAX_PATH);
     else
         strncpy(buffer, rec_base_directory, MAX_PATH);
 
-    /* Append filename to path: RYYMMDD-HH.MM.SS.mp3 */
     fpos = strlen(buffer);
-    snprintf(&buffer[fpos], MAX_PATH-fpos, "/R%02d%02d%02d-%02d%02d%02d.mp3",
-             tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
-             tm->tm_hour, tm->tm_min, tm->tm_sec);
+#ifdef HAVE_RTC
+    {
+        struct tm *tm = get_time();
+
+        /* Append filename to path: RYYMMDD-HH.MM.SS.mp3 */
+        snprintf(&buffer[fpos], MAX_PATH-fpos, 
+                 "/R%02d%02d%02d-%02d%02d%02d.mp3",
+                 tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
+                 tm->tm_hour, tm->tm_min, tm->tm_sec);
+    }
+#else
+    {
+        DIR* dir;
+        int max_rec_file = 1; /* default to rec_0001.mp3 */
+        dir = opendir(buffer);
+        if (dir) /* found */
+        {
+            /* Search for the highest recording filename present,
+               increment behind that. So even with "holes" 
+               (deleted recordings), the newest will always have the
+               highest number. */
+            while(true)
+            {   
+                struct dirent* entry;
+                int curr_rec_file;
+                /* walk through the directory content */
+                entry = readdir(dir);
+                if (!entry)
+                    break; /* end of dir */
+                if (strncasecmp(entry->d_name, "rec_", 4))
+                    continue; /* no recording file */
+                curr_rec_file = atoi(&entry->d_name[4]);
+                if (curr_rec_file >= max_rec_file)
+                    max_rec_file = curr_rec_file + 1;
+            }
+        }
+        snprintf(&buffer[fpos], MAX_PATH-fpos, 
+            "/rec_%04d.mp3", max_rec_file);
+    }
+#endif
     return buffer;
 }
 
