@@ -20,12 +20,6 @@ endif
 CFLAGS = $(GCCOPTS) \
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-ifdef DEBUG
-CFLAGS += -g -DDEBUG
-else
-CFLAGS += -fomit-frame-pointer -fschedule-insns
-endif
-
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
