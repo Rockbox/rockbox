@@ -71,6 +71,7 @@ static int get_raw_button (void)
 #ifdef HAVE_RECORDER_KEYPAD
 	case XK_KP_Space:
 	case XK_KP_5:
+	case XK_KP_Begin:
 	    return BUTTON_PLAY;
 
 	case XK_KP_Enter:
