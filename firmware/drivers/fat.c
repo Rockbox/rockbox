@@ -155,7 +155,7 @@ struct bpb
     int startsector;
 };
 
-struct bpb fat_bpb;
+static struct bpb fat_bpb;
 
 static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
@@ -166,9 +166,6 @@ static unsigned int getcurrdostime(unsigned short *dosdate,
                                    unsigned char *dostenth);
 static int create_dos_name(unsigned char *name, unsigned char *newname);
 #endif
-
-/* global FAT info struct */
-struct bpb fat_bpb;
 
 #define FAT_CACHE_SIZE 0x20
 #define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
