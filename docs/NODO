@@ -40,9 +40,9 @@ A7. The Archos Multimedia is a completely different beast. It is an entirely
 
     Others may do so. We do not.
 
-Q8. Multi-band (or graphic) equalizer!
-A8. We cannot access information for that kind of visualization from the MP3
-    decoding harware.
+Q8. Multi-band equalizer!
+A8. The MAS only offers the standard bass/treble settings and we can't do
+    anything about it.
 
 Q9. Support other filesystems than FAT32 (like NTFS or ext2 or whatever)!
 A9. No.
@@ -74,3 +74,13 @@ A13. The original Archos firmware used really big directories was a workaround
      directories, then build playlists for all collections you want to 
      shuffle-play.  We feel more then 400 files becomes a bit unweildly to 
      maintain or work with.  Playlists are much easier to manage.
+
+Q14. Graphic frequency (spectrum) analyzer!
+A14. We can't access the audio waveform from the MP3 decoder so we can't
+     analyze it. Even if we had access to it, the CPU would probably be too
+     slow to perform the analysis anyway.
+
+Q15. Cool sound effects!
+A15. Adding new sound effects requires reprogramming the MAS chip, and we can't
+     do that. The MAS chip is programmable, but we have no access to the chip
+     documentation.
