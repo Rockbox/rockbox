@@ -237,7 +237,6 @@ bool dirbrowse(char *root)
     lcd_putsxy(0,0, "[Browse]",0);
     lcd_setmargins(0,MARGIN_Y);
     lcd_setfont(0);
-}
 #endif
     memcpy(currdir,root,sizeof(currdir));
 
