@@ -31,9 +31,13 @@ endif
 
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
+
+# build some sources from these dirs
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
-LIBMADDIR = $(PREVAPPDIR)/common/libmad
+
+# include here:
+EXPORT = $(FIRMWAREDIR)/export
 TOOLSDIR = ../../tools
 DOCSDIR = ../../docs
 
@@ -54,7 +58,7 @@ $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) $(RTC)
 LDFLAGS =  -lgdi32 -luser32  -mwindows
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
+INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)

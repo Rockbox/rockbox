@@ -21,7 +21,6 @@
 #include <windows.h>
 #include <malloc.h>
 #include "dir-win32.h"
-#include "dir.h"
 
 // Directory operations
 //

@@ -23,7 +23,7 @@
 #define mkdir(x) dos_mkdir(x)
 
 #include <io.h>
-#include "dir.h"
+#include "../../firmware/include/dir.h"
 
 
 #endif // #ifndef __FILE_WIN32_H__

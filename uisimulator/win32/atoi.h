@@ -17,12 +17,4 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-
-int win32_rename(char *oldpath, char *newpath);
-
-#define rename(x,y) win32_rename(x,y)
-
-#include "../../firmware/include/file.h"
-
+int atoi(const char *);
