@@ -68,6 +68,8 @@ extern void bitswap(unsigned char *data, int length);
 
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
+static void (*pfn_timer)(void) = NULL; /* user timer handler */
+static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
 
 static int plugin_test(int api_version, int model, int memsize);
 
@@ -188,6 +190,24 @@ static struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     checkbox,
 #endif
+#ifndef SIMULATOR
+    plugin_register_timer,
+    plugin_unregister_timer,
+#endif
+    plugin_tsr,
+    create_thread,
+    remove_thread,
+    lcd_set_contrast,
+    mpeg_play,
+    mpeg_stop,
+    mpeg_pause,
+    mpeg_resume,
+    mpeg_next,
+    mpeg_prev,
+    mpeg_ff_rewind,
+    mpeg_next_track,
+    mpeg_has_changed_track,
+    mpeg_status,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -201,6 +221,12 @@ int plugin_load(char* plugin, void* parameter)
 #else
     int fd;
 #endif
+
+    if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
+    {
+        pfn_tsr_exit(); /* force it to exit now */
+        pfn_tsr_exit = NULL;
+    }
 
 #ifdef HAVE_LCD_BITMAP
     int xm,ym;
@@ -334,6 +360,67 @@ void* plugin_get_mp3_buffer(int* buffer_size)
     return mp3buf;
 #endif 
 }
+
+#ifndef SIMULATOR
+/* Register a periodic time callback, called every "cycles" CPU clocks. 
+   Note that this function will be called in interrupt context! */ 
+int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
+{
+    int phi = 0; /* bits for the prescaler */
+    int prescale = 1;
+
+    while (cycles > 0x10000)
+    {   /* work out the smallest prescaler that makes it fit */
+        phi++;
+        prescale *= 2;
+        cycles /= 2;
+    }
+
+    if (prescale > 8 || cycles == 0 || prio < 1 || prio > 15)
+        return 0; /* error, we can't do such period, bad argument */
+
+    and_b(~0x10, &TSTR); /* Stop the timer 4 */
+    and_b(~0x10, &TSNC); /* No synchronization */
+    and_b(~0x10, &TMDR); /* Operate normally */
+
+    pfn_timer = timer_callback; /* install 2nd level ISR */
+
+    TSR4 &= ~0x01;
+    TIER4 = 0xF9; /* Enable GRA match interrupt */
+
+    GRA4 = (unsigned short)(cycles - 1);
+    TCR4 = 0x20 | phi; /* clear at GRA match, set prescaler */
+    IPRD = (IPRD & 0xFF0F) | prio << 4; /* interrupt priority */
+    or_b(0x10, &TSTR); /* start timer 4 */
+
+    return cycles * prescale; /* return the actual period, in CPU clocks */
+}
+
+/* disable the user timer */
+void plugin_unregister_timer(void)
+{
+    and_b(~0x10, &TSTR); /* stop the timer 4 */
+    IPRD = (IPRD & 0xFF0F); /* disable interrupt */
+    pfn_timer = NULL;
+}
+
+/* interrupt handler for user timer */
+#pragma interrupt
+void IMIA4(void)
+{
+    if (pfn_timer != NULL)
+        pfn_timer(); /* call the user timer function */
+}
+#endif /* #ifndef SIMULATOR */
+
+/* The plugin wants to stay resident after leaving its main function, e.g.
+   runs from timer or own thread. The callback is registered to later 
+   instruct it to free its resources before a new plugin gets loaded. */
+void plugin_tsr(void (*exit_callback)(void))
+{
+    pfn_tsr_exit = exit_callback; /* remember the callback for later */
+}
+
 
 static int plugin_test(int api_version, int model, int memsize)
 {

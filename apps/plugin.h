@@ -43,9 +43,10 @@
 #include "mpeg.h"
 #include "mp3_playback.h"
 #include "settings.h"
+#include "thread.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 11
+#define PLUGIN_API_VERSION 12
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -195,7 +196,7 @@ struct plugin_api {
     void* (*plugin_get_mp3_buffer)(int* buffer_size);
     void (*mpeg_sound_set)(int setting, int value);
 #ifndef SIMULATOR
-    void (*mp3_play_init)(void);
+    void (*mp3_play_init)(void); /* FIXME: remove this next time we break compatibility */
     void (*mp3_play_data)(unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
@@ -210,12 +211,35 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     void (*checkbox)(int x, int y, int width, int height, bool checked);
 #endif
+#ifndef SIMULATOR
+    int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
+    void (*plugin_unregister_timer)(void);
+#endif
+    void (*plugin_tsr)(void (*exit_callback)(void));
+    int (*create_thread)(void* function, void* stack, int stack_size, char *name);
+    void (*remove_tread)(void);
+    void (*lcd_set_contrast)(int x);
+
+    /* playback control */
+    void (*mpeg_play)(int offset);
+    void (*mpeg_stop)(void);
+    void (*mpeg_pause)(void);
+    void (*mpeg_resume)(void);
+    void (*mpeg_next)(void);
+    void (*mpeg_prev)(void);
+    void (*mpeg_ff_rewind)(int newtime);
+    struct mp3entry* (*mpeg_next_track)(void);
+    bool (*mpeg_has_changed_track)(void);
+    int (*mpeg_status)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
 int plugin_load(char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_mp3_buffer(int *buffer_size);
+int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void));
+void plugin_unregister_timer(void);
+void plugin_tsr(void (*exit_callback)(void));
 
 /* defined by the plugin */
 enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
