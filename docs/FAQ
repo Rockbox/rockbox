@@ -291,3 +291,7 @@ A38: It is very good if you want information about the current item playing ;)
      Recorder version of Rockbox.  Please see 
      http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
 
+Q39: Can the Player LCD font be modified?
+A39: The simple answer is no.  The more detailed answer is that we have
+     the ability to change/create up to 4 chars on one model and 8 on another.
+     We currently use several of this 'letters' to store icons for the player.
