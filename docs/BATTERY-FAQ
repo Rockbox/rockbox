@@ -138,26 +138,26 @@ A10: The short answer is: Using a different charger will void your warranty
 
      Here is how changing the input voltage changes the charging current:
 
-     voltage   charging current (limited only by the AJB)
-     ------------------------------------------------------
-     7,0V          10 mA
-     7,5V          30 mA
-     8,0V          50 mA
-     8,5V          70 mA
-     9,0V         140 mA
-     9,5V         250 mA
-     10,0V        330 mA
-     10,5V        350 mA
-     11,0V        350 mA
-     11,5V        350 mA
-     12,0V        350 mA
+      voltage   charging current (limited only by the AJB)
+      ------------------------------------------------------
+      7,0V          10 mA
+      7,5V          30 mA
+      8,0V          50 mA
+      8,5V          70 mA
+      9,0V         140 mA
+      9,5V         250 mA
+      10,0V        330 mA
+      10,5V        350 mA
+      11,0V        350 mA
+      11,5V        350 mA
+      12,0V        350 mA
      
      To summarize:
 
-     - do not use an input voltage > 12V
-     - optimal input voltage is 10V (regulated)
-     - use a fuse of ~600mA
-     - using a different charger voids your warrenty
+      - do not use an input voltage > 12V (it will only heat up the regulator)
+      - optimal input voltage is 10V (regulated)
+      - use a fuse of ~600mA
+      - using a different charger voids your warrenty
      
      Many people are happy using an external quick charger which
      is specified to work with NiMH batteries. This is completely safe
@@ -180,14 +180,14 @@ Q12: I often need to stop my player for about 15 minutes or so, and when I do
      player down completely and rebooting it when I want to listen again, or 
      leaving the unit on?  Which way does it draw more power?
 A12: In our testing we found the following results:
-         HDD off, LED off, idle 94 mA
-         HDD off, LED off, play 97 mA
-         HDD off, LED on, idle 129 mA
-         HDD off, LED on, play 131 mA
-         HDD on, LED on, play 230 mA
-         HD on, reading, LED off ~ 600 mA
+         HDD off, backlight off, idle 94 mA
+         HDD off, backlight off, play 97 mA
+         HDD off, backlight on, idle 129 mA
+         HDD off, backlight on, play 131 mA
+         HDD on, backlight on, play 230 mA
+         HD on, reading, backlight off ~ 600 mA
          HD spin up before read max 800 mA
-    
+
      So leaving the unit on and paused consumes ~100mA, and thus much less
      than needing to reboot the unit.  Your mileage may vary.
 
