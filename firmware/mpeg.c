@@ -54,6 +54,7 @@ extern void bitswap(unsigned char *data, int length);
 #define MPEG_NEED_DATA    100
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
+#define MPEG_DMA_UNDERRUN 103
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
@@ -440,7 +441,7 @@ static void mas_poll_start(int interval_in_ms)
 {
     unsigned int count;
 
-    count = FREQ / 1000 / 8 * interval_in_ms;
+    count = (FREQ * interval_in_ms) / 1000 / 8;
 
     if(count > 0xffff)
     {
@@ -639,10 +640,17 @@ void DEI3(void)
         else
         {
             DEBUGF("No more MP3 data. Stopping.\n");
-            queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
-            CHCR3 = 0; /* Stop DMA interrupt */
-            playing = false;
-            is_playing = false;
+
+            /* Check if the end of data is because of a hard disk error */
+            if(filling)
+                queue_post(&mpeg_queue, MPEG_DMA_UNDERRUN, 0);
+            else
+            {
+                queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                playing = false;
+                is_playing = false;
+            }
+            CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
         }
     }
 
@@ -1355,6 +1363,10 @@ static void mpeg_thread(void)
                 
             case MPEG_TRACK_CHANGE:
                 track_change();
+                break;
+                
+            case MPEG_DMA_UNDERRUN:
+                CHCR3 |= 0x0001; /* Enable the DMA interrupt */
                 break;
                 
             case SYS_USB_CONNECTED:
