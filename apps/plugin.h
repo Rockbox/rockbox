@@ -178,7 +178,7 @@ struct plugin_api {
     void*  (*memset)(void *dst, int c, size_t length);
     void*  (*memcpy)(void *out, const void *in, size_t n);
 #ifndef SIMULATOR
-    char *_ctype_;
+    const char *_ctype_;
 #endif
 
     /* sound */

@@ -39,7 +39,7 @@ int _EXFUN(_toupper, (int __c));
 #ifdef PLUGIN
 #define _ctype_ (rb->_ctype_)
 #else
-extern	char	_ctype_[];
+extern	const char _ctype_[];
 #endif
 
 #ifndef __cplusplus
