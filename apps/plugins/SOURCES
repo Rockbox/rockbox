@@ -54,3 +54,8 @@ euroconverter.c
 jackpot.c
 nim.c
 #endif /* #ifdef HAVE_LCD_CHARCELLS */
+
+#ifndef HAVE_MMC
+/* not for Ondio, has no remote control pin */
+alpine_cdc.c
+#endif
