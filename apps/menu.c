@@ -288,11 +288,17 @@ int menu_show(int m)
     }
 
     menu_lines = height / fh;
+#else
+    int menu_lines = MENU_LINES;
 #endif
 
     /* Put the cursor on the first line and draw the menu */
     put_cursor(m, menus[m].cursor);
 
+    /* wait until all keys are released */
+    while (button_get(false) != BUTTON_NONE)
+        yield();
+    
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
 
@@ -308,25 +314,15 @@ int menu_show(int m)
             key = menus[m].callback(key, m);
         
         switch( key ) {
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case MENU_PREV:
+            case MENU_PREV | BUTTON_REPEAT:
                 if (menus[m].cursor) {
                     /* move up */
                     put_cursor(m, menus[m].cursor-1);
                 }
                 else {
                     /* move to bottom */
-#ifdef HAVE_RECORDER_KEYPAD
                     menus[m].top = menus[m].itemcount-(menu_lines+1);
-#else
-                    menus[m].top = menus[m].itemcount-3;
-#endif
                     if (menus[m].top < 0)
                         menus[m].top = 0;
                     menus[m].cursor = menus[m].itemcount-1;
@@ -334,13 +330,8 @@ int menu_show(int m)
                 }
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case MENU_NEXT:
+            case MENU_NEXT | BUTTON_REPEAT:
                 if (menus[m].cursor < menus[m].itemcount-1) {
                     /* move down */
                     put_cursor(m, menus[m].cursor+1);
@@ -353,22 +344,23 @@ int menu_show(int m)
                 }
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_RIGHT:
+            case MENU_ENTER:
+#ifdef MENU_ENTER2
+            case MENU_ENTER2:
 #endif
-            case BUTTON_PLAY:
                 /* Erase current display state */
                 lcd_clear_display();
                 return menus[m].cursor;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-            case BUTTON_F1:
-            case BUTTON_OFF | BUTTON_REPEAT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-            case BUTTON_STOP | BUTTON_REPEAT:
+            case MENU_EXIT:
+            case MENU_EXIT | BUTTON_REPEAT:
+#ifdef MENU_EXIT2
+            case MENU_EXIT2:
+            case MENU_EXIT2 | BUTTON_REPEAT:
+#endif
+#ifdef MENU_EXIT3
+            case MENU_EXIT3:
+            case MENU_EXIT3 | BUTTON_REPEAT:
 #endif
                 lcd_stop_scroll();
                 exit = true;
@@ -388,18 +380,21 @@ int menu_show(int m)
 
 bool menu_run(int m)
 {
-  bool stop=false;
-  while (!stop) {
-    int result=menu_show(m);
-    if (result == MENU_SELECTED_EXIT)
-      return false;
-    else if (result == MENU_ATTACHED_USB)
-      return true;
-    if (menus[m].items[menus[m].cursor].function()) {
-      return true;
+    while (1) {
+        switch (menu_show(m))
+        {
+            case MENU_SELECTED_EXIT:
+                return false;
+
+            case MENU_ATTACHED_USB:
+                return true;
+
+            default:
+                if (menus[m].items[menus[m].cursor].function())
+                    return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 /*  

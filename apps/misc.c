@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdlib.h>
 #include <ctype.h>
 #include "lang.h"
 #include "string.h"
@@ -206,7 +207,9 @@ bool settings_parseline(char* line, char** name, char** value)
 
 bool clean_shutdown(void)
 {
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+    exit(0);
+#else
     if(!charger_inserted())
     {
         lcd_clear_display();

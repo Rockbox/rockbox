@@ -256,33 +256,25 @@ bool bookmark_autobookmark(void)
     {
         /* Wait for a key to be pushed */
         key = button_get(true);
-        switch (key)
+        if (key & BUTTON_REL)
         {
-            case BUTTON_DOWN | BUTTON_REL:
-            case BUTTON_ON | BUTTON_REL:
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REL:
-            case BUTTON_RIGHT | BUTTON_REL:
-            case BUTTON_UP | BUTTON_REL:
+#ifdef BUTTON_PLAY
+            if (key & BUTTON_PLAY)
+#else
+            if (key & BUTTON_RIGHT)
 #endif
-            case BUTTON_LEFT | BUTTON_REL:
-                done = true;
-                break;
-
-            case BUTTON_PLAY | BUTTON_REL:
+            {
                 if (global_settings.autocreatebookmark ==
                     BOOKMARK_RECENT_ONLY_ASK)
                     write_bookmark(false);
                 else
                     write_bookmark(true);
-                done = true;
-                break;
-
-            default:
-                if(default_event_handler(key) == SYS_USB_CONNECTED)
-                    return false;
-                break;
+            }
+            done = true;
         }
+
+        if (default_event_handler(key) == SYS_USB_CONNECTED)
+            return false;
     }
     return true;
 }
@@ -520,7 +512,11 @@ bool bookmark_autoload(const char* file)
                 case BUTTON_DOWN:
                     return bookmark_load(global_bookmark_file_name, false);
 #endif
+#ifdef BUTTON_PLAY
                 case BUTTON_PLAY:
+#else
+                case BUTTON_RIGHT:
+#endif
                     return bookmark_load(global_bookmark_file_name, true);
 
                 default:
@@ -668,7 +664,10 @@ static char* select_bookmark(const char* bookmark_file_name)
         key = button_get(true);
         switch(key)
         {
-            case BUTTON_PLAY:
+            case SETTINGS_OK:
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
+#endif
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
@@ -678,7 +677,11 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
                 return bookmark;
 
+#if defined(BUTTON_ON) && defined(BUTTON_PLAY)
             case BUTTON_ON | BUTTON_PLAY:
+#elif defined(BUTTON_MENU) && defined(BUTTON_RIGHT)
+            case BUTTON_MENU | BUTTON_RIGHT:
+#endif
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
                 bookmark_id_prev=-1;
@@ -687,36 +690,20 @@ static char* select_bookmark(const char* bookmark_file_name)
                 while (button_get(false)); /* clear button queue */
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
+            case SETTINGS_DEC:
                 bookmark_id--;
                 break;
 
-            case BUTTON_DOWN:
+            case SETTINGS_INC:
                 bookmark_id++;
                 break;
 
-            case BUTTON_LEFT:
-            case BUTTON_OFF:
-#ifdef HAVE_LCD_BITMAP
-                if (global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
+            case SETTINGS_CANCEL:
+#ifdef SETTINGS_CANCEL2
+            case SETTINGS_CANCEL2:
 #endif
                 return NULL;
-#else
-            case BUTTON_LEFT:
-                bookmark_id--;
-                break;
 
-            case BUTTON_RIGHT:
-                bookmark_id++;
-                break;
-
-            case BUTTON_STOP:
-                return NULL;
-#endif
             default:
                 if(default_event_handler(key) == SYS_USB_CONNECTED)
                     return NULL;

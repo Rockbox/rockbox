@@ -93,10 +93,7 @@ bool dbg_os(void)
 
         switch(button)
         {
-#ifdef BUTTON_OFF
-            case BUTTON_OFF:
-#endif
-            case BUTTON_LEFT:
+            case SETTINGS_CANCEL:
                 return false;
         }
     }
@@ -127,16 +124,16 @@ bool dbg_os(void)
 
         switch(button)
         {
-        case BUTTON_STOP:
+        case SETTINGS_CANCEL:
             return false;
 
-        case BUTTON_LEFT:
+        case SETTINGS_DEC:
             currval--;
             if(currval < 0)
                 currval = num_threads-1;
             break;
 
-        case BUTTON_RIGHT:
+        case SETTINGS_INC:
             currval++;
             if(currval > num_threads-1)
                 currval = 0;
@@ -161,7 +158,7 @@ bool dbg_mpeg_thread(void)
         button = button_get_w_tmo(HZ/5);
         switch(button)
         {
-            case BUTTON_OFF | BUTTON_REL:
+            case SETTINGS_CANCEL:
                 return false;
         }
 
@@ -375,7 +372,7 @@ bool dbg_hw_info(void)
     while(1)
     {
         button = button_get(true);
-        if(button == (BUTTON_OFF | BUTTON_REL))
+        if(button == SETTINGS_CANCEL)
             return false;
     }
 
@@ -460,16 +457,16 @@ bool dbg_hw_info(void)
 
         switch(button)
         {
-            case BUTTON_STOP:
+            case SETTINGS_CANCEL:
                 return false;
 
-            case BUTTON_LEFT:
+            case SETTINGS_DEC:
                 currval--;
                 if(currval < 0)
                     currval = 5;
                 break;
                 
-            case BUTTON_RIGHT:
+            case SETTINGS_INC:
                 currval++;
                 if(currval > 5)
                     currval = 0;
@@ -507,26 +504,17 @@ bool dbg_partitions(void)
 
         switch(button)
         {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-#endif
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
                 return false;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#endif
-            case BUTTON_LEFT:
+            case SETTINGS_DEC:
                 partition--;
                 if (partition < 0)
                     partition = 3;
                 break;
                 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#endif
-            case BUTTON_RIGHT:
+            case SETTINGS_INC:
                 partition++;
                 if (partition > 3)
                     partition = 0;
@@ -595,7 +583,7 @@ bool dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_OFF | BUTTON_REL:
+            case SETTINGS_CANCEL:
                 return false;
         }
     }
@@ -675,16 +663,16 @@ bool dbg_ports(void)
 
         switch(button)
         {
-        case BUTTON_STOP | BUTTON_REL:
+        case SETTINGS_CANCEL:
             return false;
 
-        case BUTTON_LEFT:
+        case SETTINGS_DEC:
             currval--;
             if(currval < 0)
                 currval = 10;
             break;
 
-        case BUTTON_RIGHT:
+        case SETTINGS_INC:
             currval++;
             if(currval > 10)
                 currval = 0;
@@ -727,20 +715,25 @@ bool dbg_rtc(void)
 
         switch(button)
         {
-        case BUTTON_DOWN:
-            if (addr < 63-16) { addr += 16; }
-            break;
-        case BUTTON_UP:
-            if (addr) { addr -= 16; }
-            break;
-        case BUTTON_F2:
-            /* clear the user RAM space */
-            for (c = 0; c <= 43; c++)
-                rtc_write(0x14 + c, 0);
-            break;
-        case BUTTON_OFF | BUTTON_REL:
-        case BUTTON_LEFT | BUTTON_REL:
-            return false;
+            case SETTINGS_INC:
+                if (addr < 63-16) { addr += 16; }
+                break;
+
+            case SETTINGS_DEC:
+                if (addr) { addr -= 16; }
+                break;
+
+#ifdef BUTTON_F2
+            case BUTTON_F2:
+                /* clear the user RAM space */
+                for (c = 0; c <= 43; c++)
+                    rtc_write(0x14 + c, 0);
+                break;
+#endif
+
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+                return false;
         }
     }
     return false;
@@ -781,26 +774,17 @@ bool dbg_mas(void)
 
         switch(button_get_w_tmo(HZ/16))
         {
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_DOWN:
-#else
-        case BUTTON_RIGHT:
-#endif      
-            addr = (addr + NUMROWS) & 0xFF;  /* register addrs are 8 bit */
-            break;
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_UP:
-#else
-        case BUTTON_LEFT:
-#endif
-            addr = (addr - NUMROWS) & 0xFF;  /* register addrs are 8 bit */
-            break;
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_LEFT:
-#else
-        case BUTTON_DOWN:
-#endif
-            return false;
+            case SETTINGS_INC:
+                addr = (addr + NUMROWS) & 0xFF;  /* register addrs are 8 bit */
+                break;
+
+            case SETTINGS_DEC:
+                addr = (addr - NUMROWS) & 0xFF;  /* register addrs are 8 bit */
+                break;
+
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+                return false;
         }
     }
     return false;
@@ -830,15 +814,16 @@ bool dbg_mas_codec(void)
 
         switch(button_get_w_tmo(HZ/16))
         {
-        case BUTTON_DOWN:
-            addr += 4;
-            break;
-        case BUTTON_UP:
-            if (addr) { addr -= 4; }
-            break;
-        case BUTTON_LEFT | BUTTON_REL:
-        case BUTTON_OFF | BUTTON_REL:
-            return false;
+            case SETTINGS_INC:
+                addr += 4;
+                break;
+            case SETTINGS_DEC:
+                if (addr) { addr -= 4; }
+                break;
+
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+                return false;
         }
     }
     return false;
@@ -994,18 +979,18 @@ bool view_battery(void)
         
         switch(button_get_w_tmo(HZ/2))
         {
-            case BUTTON_UP:
+            case SETTINGS_DEC:
                 if (view)
                     view--;
                 break;
                 
-            case BUTTON_DOWN:
+            case SETTINGS_INC:
                 if (view < 3)
                     view++;
                 break;
                 
-            case BUTTON_LEFT | BUTTON_REL:
-            case BUTTON_OFF | BUTTON_REL:
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
                 return false;
         }
     }
@@ -1031,158 +1016,159 @@ bool dbg_mas_info(void)
     {
         switch(currval)
         {
-        case 0:
-            mas_readmem(MAS_BANK_D1, 0xff7, &val, 1);
-            lcd_puts(0, 0, "Design Code");
-            snprintf(buf, 32, "%05x      ", val);
-            break;
-        case 1:
-            lcd_puts(0, 0, "DC/DC mode ");
-            snprintf(buf, 32, "8e: %05x  ", mas_readreg(0x8e) & 0xfffff);
-            break;
-        case 2:
-            lcd_puts(0, 0, "Mute/Bypass");
-            snprintf(buf, 32, "aa: %05x  ", mas_readreg(0xaa) & 0xfffff);
-            break;
-        case 3:
-            lcd_puts(0, 0, "PIOData    ");
-            snprintf(buf, 32, "ed: %05x  ", mas_readreg(0xed) & 0xfffff);
-            break;
-        case 4:
-            lcd_puts(0, 0, "Startup Cfg");
-            snprintf(buf, 32, "e6: %05x  ", mas_readreg(0xe6) & 0xfffff);
-            break;
-        case 5:
-            lcd_puts(0, 0, "KPrescale  ");
-            snprintf(buf, 32, "e7: %05x  ", mas_readreg(0xe7) & 0xfffff);
-            break;
-        case 6:
-            lcd_puts(0, 0, "KBass      ");
-            snprintf(buf, 32, "6b: %05x   ", mas_readreg(0x6b) & 0xfffff);
-            break;
-        case 7:
-            lcd_puts(0, 0, "KTreble    ");
-            snprintf(buf, 32, "6f: %05x   ", mas_readreg(0x6f) & 0xfffff);
-            break;
-        case 8:
-            mas_readmem(MAS_BANK_D0, 0x300, &val, 1);
-            lcd_puts(0, 0, "Frame Count");
-            snprintf(buf, 32, "0/300: %04x", val & 0xffff);
-            break;
-        case 9:
-            mas_readmem(MAS_BANK_D0, 0x301, &val, 1);
-            lcd_puts(0, 0, "Status1    ");
-            snprintf(buf, 32, "0/301: %04x", val & 0xffff);
-            break;
-        case 10:
-            mas_readmem(MAS_BANK_D0, 0x302, &val, 1);
-            lcd_puts(0, 0, "Status2    ");
-            snprintf(buf, 32, "0/302: %04x", val & 0xffff);
-            break;
-        case 11:
-            mas_readmem(MAS_BANK_D0, 0x303, &val, 1);
-            lcd_puts(0, 0, "CRC Count  ");
-            snprintf(buf, 32, "0/303: %04x", val & 0xffff);
-            break;
-        case 12:
-            mas_readmem(MAS_BANK_D0, 0x36d, &val, 1);
-            lcd_puts(0, 0, "PLLOffset48");
-            snprintf(buf, 32, "0/36d %05x", val & 0xfffff);
-            break;
-        case 13:
-            mas_readmem(MAS_BANK_D0, 0x32d, &val, 1);
-            lcd_puts(0, 0, "PLLOffset48");
-            snprintf(buf, 32, "0/32d %05x", val & 0xfffff);
-            break;
-        case 14:
-            mas_readmem(MAS_BANK_D0, 0x36e, &val, 1);
-            lcd_puts(0, 0, "PLLOffset44");
-            snprintf(buf, 32, "0/36e %05x", val & 0xfffff);
-            break;
-        case 15:
-            mas_readmem(MAS_BANK_D0, 0x32e, &val, 1);
-            lcd_puts(0, 0, "PLLOffset44");
-            snprintf(buf, 32, "0/32e %05x", val & 0xfffff);
-            break;
-        case 16:
-            mas_readmem(MAS_BANK_D0, 0x36f, &val, 1);
-            lcd_puts(0, 0, "OutputConf ");
-            snprintf(buf, 32, "0/36f %05x", val & 0xfffff);
-            break;
-        case 17:
-            mas_readmem(MAS_BANK_D0, 0x32f, &val, 1);
-            lcd_puts(0, 0, "OutputConf ");
-            snprintf(buf, 32, "0/32f %05x", val & 0xfffff);
-            break;
-        case 18:
-            mas_readmem(MAS_BANK_D1, 0x7f8, &val, 1);
-            lcd_puts(0, 0, "LL Gain    ");
-            snprintf(buf, 32, "1/7f8 %05x", val & 0xfffff);
-            break;
-        case 19:
-            mas_readmem(MAS_BANK_D1, 0x7f9, &val, 1);
-            lcd_puts(0, 0, "LR Gain    ");
-            snprintf(buf, 32, "1/7f9 %05x", val & 0xfffff);
-            break;
-        case 20:
-            mas_readmem(MAS_BANK_D1, 0x7fa, &val, 1);
-            lcd_puts(0, 0, "RL Gain    ");
-            snprintf(buf, 32, "1/7fa %05x", val & 0xfffff);
-            break;
-        case 21:
-            mas_readmem(MAS_BANK_D1, 0x7fb, &val, 1);
-            lcd_puts(0, 0, "RR Gain    ");
-            snprintf(buf, 32, "1/7fb %05x", val & 0xfffff);
-            break;
-        case 22:
-            lcd_puts(0, 0, "L Trailbits");
-            snprintf(buf, 32, "c5: %05x   ", mas_readreg(0xc5) & 0xfffff);
-            break;
-        case 23:
-            lcd_puts(0, 0, "R Trailbits");
-            snprintf(buf, 32, "c6: %05x   ", mas_readreg(0xc6) & 0xfffff);
-            break;
+            case 0:
+                mas_readmem(MAS_BANK_D1, 0xff7, &val, 1);
+                lcd_puts(0, 0, "Design Code");
+                snprintf(buf, 32, "%05x      ", val);
+                break;
+            case 1:
+                lcd_puts(0, 0, "DC/DC mode ");
+                snprintf(buf, 32, "8e: %05x  ", mas_readreg(0x8e) & 0xfffff);
+                break;
+            case 2:
+                lcd_puts(0, 0, "Mute/Bypass");
+                snprintf(buf, 32, "aa: %05x  ", mas_readreg(0xaa) & 0xfffff);
+                break;
+            case 3:
+                lcd_puts(0, 0, "PIOData    ");
+                snprintf(buf, 32, "ed: %05x  ", mas_readreg(0xed) & 0xfffff);
+                break;
+            case 4:
+                lcd_puts(0, 0, "Startup Cfg");
+                snprintf(buf, 32, "e6: %05x  ", mas_readreg(0xe6) & 0xfffff);
+                break;
+            case 5:
+                lcd_puts(0, 0, "KPrescale  ");
+                snprintf(buf, 32, "e7: %05x  ", mas_readreg(0xe7) & 0xfffff);
+                break;
+            case 6:
+                lcd_puts(0, 0, "KBass      ");
+                snprintf(buf, 32, "6b: %05x   ", mas_readreg(0x6b) & 0xfffff);
+                break;
+            case 7:
+                lcd_puts(0, 0, "KTreble    ");
+                snprintf(buf, 32, "6f: %05x   ", mas_readreg(0x6f) & 0xfffff);
+                break;
+            case 8:
+                mas_readmem(MAS_BANK_D0, 0x300, &val, 1);
+                lcd_puts(0, 0, "Frame Count");
+                snprintf(buf, 32, "0/300: %04x", val & 0xffff);
+                break;
+            case 9:
+                mas_readmem(MAS_BANK_D0, 0x301, &val, 1);
+                lcd_puts(0, 0, "Status1    ");
+                snprintf(buf, 32, "0/301: %04x", val & 0xffff);
+                break;
+            case 10:
+                mas_readmem(MAS_BANK_D0, 0x302, &val, 1);
+                lcd_puts(0, 0, "Status2    ");
+                snprintf(buf, 32, "0/302: %04x", val & 0xffff);
+                break;
+            case 11:
+                mas_readmem(MAS_BANK_D0, 0x303, &val, 1);
+                lcd_puts(0, 0, "CRC Count  ");
+                snprintf(buf, 32, "0/303: %04x", val & 0xffff);
+                break;
+            case 12:
+                mas_readmem(MAS_BANK_D0, 0x36d, &val, 1);
+                lcd_puts(0, 0, "PLLOffset48");
+                snprintf(buf, 32, "0/36d %05x", val & 0xfffff);
+                break;
+            case 13:
+                mas_readmem(MAS_BANK_D0, 0x32d, &val, 1);
+                lcd_puts(0, 0, "PLLOffset48");
+                snprintf(buf, 32, "0/32d %05x", val & 0xfffff);
+                break;
+            case 14:
+                mas_readmem(MAS_BANK_D0, 0x36e, &val, 1);
+                lcd_puts(0, 0, "PLLOffset44");
+                snprintf(buf, 32, "0/36e %05x", val & 0xfffff);
+                break;
+            case 15:
+                mas_readmem(MAS_BANK_D0, 0x32e, &val, 1);
+                lcd_puts(0, 0, "PLLOffset44");
+                snprintf(buf, 32, "0/32e %05x", val & 0xfffff);
+                break;
+            case 16:
+                mas_readmem(MAS_BANK_D0, 0x36f, &val, 1);
+                lcd_puts(0, 0, "OutputConf ");
+                snprintf(buf, 32, "0/36f %05x", val & 0xfffff);
+                break;
+            case 17:
+                mas_readmem(MAS_BANK_D0, 0x32f, &val, 1);
+                lcd_puts(0, 0, "OutputConf ");
+                snprintf(buf, 32, "0/32f %05x", val & 0xfffff);
+                break;
+            case 18:
+                mas_readmem(MAS_BANK_D1, 0x7f8, &val, 1);
+                lcd_puts(0, 0, "LL Gain    ");
+                snprintf(buf, 32, "1/7f8 %05x", val & 0xfffff);
+                break;
+            case 19:
+                mas_readmem(MAS_BANK_D1, 0x7f9, &val, 1);
+                lcd_puts(0, 0, "LR Gain    ");
+                snprintf(buf, 32, "1/7f9 %05x", val & 0xfffff);
+                break;
+            case 20:
+                mas_readmem(MAS_BANK_D1, 0x7fa, &val, 1);
+                lcd_puts(0, 0, "RL Gain    ");
+                snprintf(buf, 32, "1/7fa %05x", val & 0xfffff);
+                break;
+            case 21:
+                mas_readmem(MAS_BANK_D1, 0x7fb, &val, 1);
+                lcd_puts(0, 0, "RR Gain    ");
+                snprintf(buf, 32, "1/7fb %05x", val & 0xfffff);
+                break;
+            case 22:
+                lcd_puts(0, 0, "L Trailbits");
+                snprintf(buf, 32, "c5: %05x   ", mas_readreg(0xc5) & 0xfffff);
+                break;
+            case 23:
+                lcd_puts(0, 0, "R Trailbits");
+                snprintf(buf, 32, "c6: %05x   ", mas_readreg(0xc6) & 0xfffff);
+                break;
         }
         lcd_puts(0, 1, buf);
         
         button = button_get_w_tmo(HZ/5);
         switch(button)
         {
-        case BUTTON_STOP:
-            return false;
+            case SETTINGS_CANCEL:
+                return false;
 
-        case BUTTON_LEFT:
-            currval--;
-            if(currval < 0)
-                currval = 23;
-            break;
+            case SETTINGS_DEC:
+                currval--;
+                if(currval < 0)
+                    currval = 23;
+                break;
 
-        case BUTTON_RIGHT:
-            currval++;
-            if(currval > 23)
-                currval = 0;
-            break;
-        case BUTTON_PLAY:
-            pll_toggle = !pll_toggle;
-            if(pll_toggle)
-            {
-                /* 14.31818 MHz crystal */
-                pll48 = 0x5d9d0;
-                pll44 = 0xfffceceb;
-                config = 0;
-            }
-            else
-            {
-                /* 14.725 MHz crystal */
-                pll48 = 0x2d0de;
-                pll44 = 0xfffa2319;
-                config = 0;
-            }
-            mas_writemem(MAS_BANK_D0, 0x32d, &pll48, 1);
-            mas_writemem(MAS_BANK_D0, 0x32e, &pll44, 1);
-            mas_writemem(MAS_BANK_D0, 0x32f, &config, 1);
-            mas_run(0x475);
-            break;
+            case SETTINGS_INC:
+                currval++;
+                if(currval > 23)
+                    currval = 0;
+                break;
+
+            case SETTINGS_OK:
+                pll_toggle = !pll_toggle;
+                if(pll_toggle)
+                {
+                    /* 14.31818 MHz crystal */
+                    pll48 = 0x5d9d0;
+                    pll44 = 0xfffceceb;
+                    config = 0;
+                }
+                else
+                {
+                    /* 14.725 MHz crystal */
+                    pll48 = 0x2d0de;
+                    pll44 = 0xfffa2319;
+                    config = 0;
+                }
+                mas_writemem(MAS_BANK_D0, 0x32d, &pll48, 1);
+                mas_writemem(MAS_BANK_D0, 0x32e, &pll44, 1);
+                mas_writemem(MAS_BANK_D0, 0x32f, &config, 1);
+                mas_run(0x475);
+                break;
         }
     }
     return false;
@@ -1233,23 +1219,19 @@ static bool view_runtime(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ);
         switch(key) {
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-            case BUTTON_STOP | BUTTON_REL:
-#elif HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REL:
-#endif
+            case SETTINGS_CANCEL:
                 done = true;
                 break;
 
-            case BUTTON_LEFT:
-            case BUTTON_RIGHT:
+            case SETTINGS_INC:
+            case SETTINGS_DEC:
                 if (state == 1)
                     state = 2;
                 else
                     state = 1;
                 break;
-                
-            case BUTTON_PLAY:
+
+            case SETTINGS_OK:
                 lcd_clear_display();
                 lcd_puts(0,0,"Clear time?");
                 lcd_puts(0,1,"PLAY = Yes");
@@ -1258,7 +1240,7 @@ static bool view_runtime(void)
                     key = button_get_w_tmo(HZ*10);
                     if ( key & BUTTON_REL )
                         continue;
-                    if ( key == BUTTON_PLAY ) {
+                    if ( key == SETTINGS_OK ) {
                         if ( state == 1 )
                             global_settings.runtime = 0;
                         else
@@ -1412,25 +1394,21 @@ static bool dbg_disk_info(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-            case BUTTON_STOP | BUTTON_REL:
-#else
-            case BUTTON_OFF | BUTTON_REL:
-#endif
+            case SETTINGS_CANCEL:
                 done = true;
                 break;
 
-            case BUTTON_LEFT:
+            case SETTINGS_DEC:
                 if (--page < 0)
                     page = max_page;
                 break;
                 
-            case BUTTON_RIGHT:
+            case SETTINGS_INC:
                 if (++page > max_page)
                     page = 0;
                 break;
 
-            case BUTTON_PLAY:
+            case SETTINGS_OK:
                 if (page == 3) {
                     mpeg_stop(); /* stop playback, to avoid disk access */
                     lcd_clear_display();
@@ -1498,11 +1476,7 @@ bool dbg_fm_radio(void)
 
         switch(button)
         {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-#endif
+            case SETTINGS_CANCEL:
                 return false;
         }
     }

@@ -166,6 +166,10 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
+#ifndef HAVE_RECORDING_KEYPAD
+    splash(HZ*2, true, "Recording not supported yet");
+    return false;
+#else
     int button;
     bool done = false;
     char buf[32];
@@ -280,13 +284,12 @@ bool recording_screen(void)
                 }
                 break;
 
-#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_UP:
                 cursor--;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
-#endif                
+
             case BUTTON_DOWN:
                 cursor++;
                 adjust_cursor();
@@ -619,8 +622,10 @@ bool recording_screen(void)
         reload_directory();
 
     return been_in_usb_mode;
+#endif    
 }
 
+#ifdef HAVE_RECORDER_KEYPAD
 bool f2_rec_screen(void)
 {
     bool exit = false;
@@ -813,3 +818,4 @@ bool f3_rec_screen(void)
 
     return false;
 }
+#endif

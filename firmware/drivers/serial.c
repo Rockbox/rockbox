@@ -85,7 +85,7 @@ int remote_control_rx(void)
         }
         else
         {
-#ifndef HAVE_NEO_KEYPAD /* This needs to be fixed for Neo */
+#if !defined(HAVE_NEO_KEYPAD) && !defined(HAVE_ONDIO_KEYPAD)
             switch (btn)
             {
                 case STOP:

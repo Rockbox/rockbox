@@ -167,6 +167,10 @@ static void remember_frequency(void)
 
 bool radio_screen(void)
 {
+#ifndef HAVE_RECORDER_KEYPAD
+    splash(HZ*2, true, "Radio not supported yet");
+    return false;
+#else
     char buf[MAX_PATH];
     bool done = false;
     int button;
@@ -554,6 +558,7 @@ bool radio_screen(void)
     }
 #endif
     return have_recorded;
+#endif /* ONDIO */
 }
 
 void radio_save_presets(void)
@@ -663,12 +668,14 @@ static bool radio_add_preset(void)
 static int handle_radio_presets_menu_cb(int key, int m)
 {
     (void)m;
+#ifdef HAVE_RECORDER_KEYPAD
     switch(key)
     {
         case BUTTON_F3:
             key = BUTTON_LEFT; /* Fake an exit */
             break;
     }
+#endif
     return key;
 }
 
@@ -725,6 +732,11 @@ bool handle_radio_presets_menu(void)
 
 int handle_radio_presets_cb(int key, int m)
 {
+#ifdef HAVE_ONDIO_KEYPAD
+    (void)key;
+    (void)m;
+    return BUTTON_NONE;
+#else
     bool ret;
     
     switch(key)
@@ -750,6 +762,7 @@ int handle_radio_presets_cb(int key, int m)
             break;
     }
     return key;
+#endif
 }
 
 bool handle_radio_presets(void)

@@ -40,6 +40,7 @@
 #include "action.h"
 #include "talk.h"
 #include "misc.h"
+#include "id3.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -240,7 +241,7 @@ int charging_screen(void)
 {
     int button;
     int rc = 0;
-#ifdef HAVE_RECORDER_KEYPAD
+#ifdef BUTTON_OFF
     const int offbutton = BUTTON_OFF;
 #else
     const int offbutton = BUTTON_STOP;
@@ -263,7 +264,11 @@ int charging_screen(void)
         status_draw(false);
         charging_display_info(true);
         button = button_get_w_tmo(HZ/3);
+#ifdef BUTTON_ON
         if (button == (BUTTON_ON | BUTTON_REL))
+#else
+        if (button == (BUTTON_RIGHT | BUTTON_REL))
+#endif
             rc = 3;
         else if (button == offbutton)
             rc = 2;
@@ -286,7 +291,7 @@ int charging_screen(void)
    0 if no key was pressed
    1 if a key was pressed (or if ON was held down long enough to repeat)
    2 if USB was connected */
-int on_screen(void)
+int pitch_screen(void)
 {
     int button;
     static int pitch = 1000;
@@ -1082,15 +1087,19 @@ bool set_time_screen(const char* string, struct tm *tm)
                     *valptr = min;
                 say_time(cursorpos, tm);
                 break;
+
+#ifdef BUTTON_ON
             case BUTTON_ON:
+#elif defined BUTTON_MENU
+            case BUTTON_MENU:
+#endif
                 done = true;
                 break;
-#if (BUTTON_ON != BUTTON_OFF) /* FixMe, this is just to make the Ondio compile */
+
             case BUTTON_OFF:
                 done = true;
                 tm->tm_year = -1;
                 break;
-#endif
 
             default:
                 if (default_event_handler(button) == SYS_USB_CONNECTED)
@@ -1140,3 +1149,143 @@ bool shutdown_screen(void)
     return false;
 }
 #endif
+
+bool browse_id3(void)
+{
+    struct mp3entry* id3 = mpeg_current_track();
+    int button;
+    int menu_pos = 0;
+    int menu_max = 8;
+    bool exit = false;
+    char scroll_text[MAX_PATH];
+
+    if (!(mpeg_status() & MPEG_STATUS_PLAY))
+        return false;
+
+    while (!exit)
+    {
+        lcd_clear_display();
+
+        switch (menu_pos)
+        {
+            case 0:
+                lcd_puts(0, 0, str(LANG_ID3_TITLE));
+                lcd_puts_scroll(0, 1, id3->title ? id3->title : 
+                                (char*)str(LANG_ID3_NO_TITLE));
+                break;
+
+            case 1:
+                lcd_puts(0, 0, str(LANG_ID3_ARTIST));
+                lcd_puts_scroll(0, 1, 
+                                id3->artist ? id3->artist : 
+                                (char*)str(LANG_ID3_NO_ARTIST));
+                break;
+
+            case 2:
+                lcd_puts(0, 0, str(LANG_ID3_ALBUM));
+                lcd_puts_scroll(0, 1, id3->album ? id3->album : 
+                                (char*)str(LANG_ID3_NO_ALBUM));
+                break;
+
+            case 3:
+                lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
+                
+                if (id3->tracknum) {
+                    snprintf(scroll_text,sizeof(scroll_text), "%d",
+                             id3->tracknum);
+                    lcd_puts_scroll(0, 1, scroll_text);
+                }
+                else
+                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_TRACKNUM));
+                break;
+
+            case 4:
+                lcd_puts(0, 0, str(LANG_ID3_GENRE));
+                lcd_puts_scroll(0, 1,
+                                id3_get_genre(id3) ?
+                                id3_get_genre(id3) :
+                                (char*)str(LANG_ID3_NO_INFO));
+                break;
+
+            case 5:
+                lcd_puts(0, 0, str(LANG_ID3_YEAR));
+                if (id3->year) {
+                    snprintf(scroll_text,sizeof(scroll_text), "%d",
+                             id3->year);
+                    lcd_puts_scroll(0, 1, scroll_text);
+                }
+                else
+                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_INFO));
+                break;
+
+            case 6:
+                lcd_puts(0, 0, str(LANG_ID3_LENGHT));
+                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
+                         id3->length / 60000,
+                         id3->length % 60000 / 1000 );
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 7:
+                lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
+                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
+                         playlist_get_display_index(), playlist_amount());
+                lcd_puts_scroll(0, 1, scroll_text);
+                break;
+
+
+            case 8:
+                lcd_puts(0, 0, str(LANG_ID3_BITRATE));
+                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
+                         id3->bitrate);
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 9:
+                lcd_puts(0, 0, str(LANG_ID3_FRECUENCY));
+                snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
+                         id3->frequency);
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 10:
+                lcd_puts(0, 0, str(LANG_ID3_PATH));
+                lcd_puts_scroll(0, 1, id3->path);
+                break;
+        }
+        lcd_update();
+
+        button = button_get(true);
+
+        switch(button)
+        {
+            case SETTINGS_DEC:
+                if (menu_pos > 0)
+                    menu_pos--;
+                else
+                    menu_pos = menu_max;
+                break;
+
+            case SETTINGS_INC:
+                if (menu_pos < menu_max)
+                    menu_pos++;
+                else
+                    menu_pos = 0;
+                break;
+            
+            case SETTINGS_CANCEL:
+                lcd_stop_scroll();
+                /* eat release event */
+                button_get(true);
+                exit = true;
+                break;
+
+            default:
+                if(default_event_handler(button) ==  SYS_USB_CONNECTED)
+                    return true;
+                break;
+        }
+    }
+    return false;
+}
+

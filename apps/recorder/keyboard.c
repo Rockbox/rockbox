@@ -33,6 +33,7 @@
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
 
+#ifdef HAVE_RECORDER_KEYPAD
 static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
 {
     switch (page) {
@@ -58,6 +59,7 @@ static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
         break;
     }
 }
+#endif
 
 /* helper function to spell a char if voice UI is enabled */
 void kbd_spellchar(char c)
@@ -75,6 +77,12 @@ void kbd_spellchar(char c)
 
 int kbd_input(char* text, int buflen)
 {
+#ifndef HAVE_RECORDER_KEYPAD
+    (void)text;
+    (void)buflen;
+    splash(HZ*2, true, "Keyboard not implemented yet");
+    return 0;
+#else
     bool done = false;
     int page = 0;
 
@@ -240,7 +248,6 @@ int kbd_input(char* text, int buflen)
                 kbd_spellchar(line[y][x]);
                 break;
 
-#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
                 if (y)
@@ -249,7 +256,7 @@ int kbd_input(char* text, int buflen)
                     y = KEYBOARD_LINES - 1;
                 kbd_spellchar(line[y][x]);
                 break;
-#endif
+
             case BUTTON_F3:
             case BUTTON_F3 | BUTTON_REPEAT:
                 /* backspace */
@@ -326,5 +333,7 @@ int kbd_input(char* text, int buflen)
         }
     }
     lcd_setfont(FONT_UI);
+
     return 0;
+#endif /* ONDIO */
 }

@@ -23,6 +23,7 @@ PLAYDIR = $(APPDIR)/player
 PLUGINDIR = $(APPDIR)/plugins
 SIMCOMMON = ../common
 
+ISONDIO := $(findstring ONDIO, $(TARGET))
 ISPLAYER := $(findstring PLAYER, $(TARGET))
 ifeq ($(ISPLAYER), PLAYER)
      MACHINEDIR = $(PLAYDIR)
@@ -142,8 +143,10 @@ SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
+ifneq ($(ISONDIO),ONDIO)
 ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
 PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
+endif
 
 all: $(TOOLSDIR)/convbdf $(EXEFILE) $(ROCKS)
 
@@ -249,11 +252,11 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ifeq ($(UNAME),CYGWIN)
-$(EXEFILE): $(OBJS) $(OBJDIR)/libplugin.a
+$(EXEFILE): $(OBJS)
 	@echo LD $@
 	@$(CC) -g -o $(EXEFILE) $(OBJS) $(LIBDIRS) $(LDFLAGS) $(LIBS)
 else
-$(EXEFILE): $(OBJS) $(OBJDIR)/libplugin.a
+$(EXEFILE): $(OBJS)
 	@echo LD $@
 	@$(CC) -g -o $(EXEFILE) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 endif

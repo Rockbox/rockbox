@@ -116,21 +116,22 @@ static bool add_to_playlist(int position, bool queue)
             while (!exit) {
                 int btn = button_get(true);
                 switch (btn) {
-                case BUTTON_PLAY:
-                    recurse = true;
-                    exit = true;
-                    break;
-                default:
-                    /* ignore button releases */
-                    if (!(btn & BUTTON_REL))
+                    case SETTINGS_OK:
+                        recurse = true;
                         exit = true;
-                    break;
+                        break;
+
+                    default:
+                        /* ignore button releases */
+                        if (!(btn & BUTTON_REL))
+                            exit = true;
+                        break;
                 }
             }
         }
 
         playlist_insert_directory(NULL, selected_file, position, queue,
-            recurse);
+                                  recurse);
     }
     else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
         playlist_insert_playlist(NULL, selected_file, position, queue);
@@ -303,34 +304,34 @@ static bool delete_handler(bool is_dir)
     while (!exit) {
         int btn = button_get(true);
         switch (btn) {
-        case BUTTON_PLAY:
-            if (is_dir)
-            {
-                char pathname[MAX_PATH]; /* space to go deep */
-                strncpy(pathname, selected_file, sizeof pathname);
-                res = remove_dir(pathname, sizeof(pathname));
-            }
-            else
-            {
-                res = remove(selected_file);
-            }
+            case SETTINGS_OK:
+                if (is_dir)
+                {
+                    char pathname[MAX_PATH]; /* space to go deep */
+                    strncpy(pathname, selected_file, sizeof pathname);
+                    res = remove_dir(pathname, sizeof(pathname));
+                }
+                else
+                {
+                    res = remove(selected_file);
+                }
 
-            if (!res) {
-                onplay_result = ONPLAY_RELOAD_DIR;
-                lcd_clear_display();
-                lcd_puts(0,0,str(LANG_DELETED));
-                lcd_puts_scroll(0,1,selected_file);
-                lcd_update();
-                sleep(HZ);
-                exit = true;
-            }
-            break;
+                if (!res) {
+                    onplay_result = ONPLAY_RELOAD_DIR;
+                    lcd_clear_display();
+                    lcd_puts(0,0,str(LANG_DELETED));
+                    lcd_puts_scroll(0,1,selected_file);
+                    lcd_update();
+                    sleep(HZ);
+                    exit = true;
+                }
+                break;
 
-        default:
-            /* ignore button releases */
-            if (!(btn & BUTTON_REL))
-                exit = true;
-            break;
+            default:
+                /* ignore button releases */
+                if (!(btn & BUTTON_REL))
+                    exit = true;
+                break;
         }
     }
     return false;

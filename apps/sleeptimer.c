@@ -69,68 +69,50 @@ bool sleeptimer_screen(void)
         button = button_get_w_tmo(HZ);
         switch(button)
         {
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_LEFT:
-        case BUTTON_PLAY:
-#else
-        case BUTTON_PLAY:
-#endif
-          done = true;
-          break;
+            case SETTINGS_OK:
+                done = true;
+                break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_OFF:
-#else
-        case BUTTON_STOP:
-        case BUTTON_MENU:
-#endif
-          if (changed) {
-            lcd_stop_scroll();
-            lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
-            lcd_update();
-            set_sleep_timer(org_timer);
-            sleep(HZ/2);
-          }
-          done = true;
-          break;
+            case SETTINGS_CANCEL:
+                if (changed) {
+                    lcd_stop_scroll();
+                    lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+                    lcd_update();
+                    set_sleep_timer(org_timer);
+                    sleep(HZ/2);
+                }
+                done = true;
+                break;
 
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-        case BUTTON_RIGHT:
-#else
-        case BUTTON_UP:
-#endif
-            oldtime = (get_sleep_timer()+59) / 60;
-            if(oldtime < THRESHOLD)
-                amount = SMALL_STEP_SIZE;
-            else
-                amount = LARGE_STEP_SIZE;
+            case SETTINGS_INC:
+                oldtime = (get_sleep_timer()+59) / 60;
+                if(oldtime < THRESHOLD)
+                    amount = SMALL_STEP_SIZE;
+                else
+                    amount = LARGE_STEP_SIZE;
             
-            newtime = oldtime * 60 + amount;
-            if(newtime > MAX_TIME)
-                newtime = MAX_TIME;
+                newtime = oldtime * 60 + amount;
+                if(newtime > MAX_TIME)
+                    newtime = MAX_TIME;
 
-            changed = sayit = true;
-            set_sleep_timer(newtime);
-            break;
+                changed = sayit = true;
+                set_sleep_timer(newtime);
+                break;
                 
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-        case BUTTON_LEFT:
-#else
-        case BUTTON_DOWN:
-#endif
-            oldtime = (get_sleep_timer()+59) / 60;
-            if(oldtime <= THRESHOLD)
-                amount = SMALL_STEP_SIZE;
-            else
-                amount = LARGE_STEP_SIZE;
+            case SETTINGS_DEC:
+                oldtime = (get_sleep_timer()+59) / 60;
+                if(oldtime <= THRESHOLD)
+                    amount = SMALL_STEP_SIZE;
+                else
+                    amount = LARGE_STEP_SIZE;
             
-            newtime = oldtime*60 - amount;
-            if(newtime < 0)
-                newtime = 0;
+                newtime = oldtime*60 - amount;
+                if(newtime < 0)
+                    newtime = 0;
             
-            changed = sayit = true;
-            set_sleep_timer(newtime);
-            break;
+                changed = sayit = true;
+                set_sleep_timer(newtime);
+                break;
         }
 
         seconds = get_sleep_timer();

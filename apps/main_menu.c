@@ -231,24 +231,19 @@ bool show_info(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-            case BUTTON_STOP | BUTTON_REL:
-#else
-            case BUTTON_LEFT | BUTTON_REL:
-            case BUTTON_OFF | BUTTON_REL:
-#endif
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
                 done = true;
                 break;
 
-#if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-            case BUTTON_LEFT:
-            case BUTTON_RIGHT:
+            case SETTINGS_INC:
+            case SETTINGS_DEC:
                 if (state == 1)
                     state = 2;
                 else
                     state = 1;
                 break;
-#endif
+
            default:
                if(default_event_handler(key) == SYS_USB_CONNECTED)
                    return true;

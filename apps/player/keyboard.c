@@ -181,14 +181,15 @@ int kbd_input(char* text, int buflen)
             case MENU_LINE_INPUT:
                 switch (button_pressed)
                 {
-                    case BUTTON_UP:
-                    case BUTTON_UP | BUTTON_REPEAT:
+                    case BUTTON_PLAY:
+                    case BUTTON_PLAY | BUTTON_REPEAT:
                         if (cursor_pos<len)
                             cursor_pos++;
                         button_pressed=BUTTON_NONE;
                         break;
-                    case BUTTON_DOWN:
-                    case BUTTON_DOWN | BUTTON_REPEAT:
+
+                    case BUTTON_STOP:
+                    case BUTTON_STOP | BUTTON_REPEAT:
                         if (cursor_pos>0)
                             cursor_pos--;
                         button_pressed=BUTTON_NONE;
@@ -199,13 +200,13 @@ int kbd_input(char* text, int buflen)
             case MENU_LINE_NEWCHARS:
                 switch (button_pressed)
                 {
-                    case BUTTON_UP:
-                    case BUTTON_UP | BUTTON_REPEAT:
+                    case BUTTON_PLAY:
+                    case BUTTON_PLAY | BUTTON_REPEAT:
                         x=(x+1+linelen)%linelen;
                         button_pressed=BUTTON_NONE;
                         break;
-                    case BUTTON_DOWN:
-                    case BUTTON_DOWN | BUTTON_REPEAT:
+                    case BUTTON_STOP:
+                    case BUTTON_STOP | BUTTON_REPEAT:
                         x=(x-1+linelen)%linelen;
                         button_pressed=BUTTON_NONE;
                         break;

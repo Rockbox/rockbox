@@ -102,7 +102,7 @@ void lcd_print_char(int x, int y)
   static char bitmap_content[11*8][2*8];
 
   if (double_height == 2 && y == 1)
-    return; /* Second row can't be printed in double height. ??*/
+    return; /* only one row available if text is double height */
 
   for (col=0; col<5; col++) {
     unsigned char fontbitmap=(*font_player)[ch][col];

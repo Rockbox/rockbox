@@ -267,7 +267,6 @@ void button_set_flip(bool flip)
     }
 }
 
-
 /*
  * Get button pressed from hardware
  */
@@ -376,12 +375,12 @@ static int button_read(void)
     if(adc_read(2) < 0x180)
         btn |= BUTTON_RIGHT;
     if(adc_read(3) < 0x180)
-        btn |= BUTTON_PLAY | BUTTON_UP;
+        btn |= BUTTON_PLAY;
 
     if ( !(porta & 0x20) )
         btn |= BUTTON_ON;
     if ( !(porta & 0x800) )
-        btn |= BUTTON_STOP | BUTTON_DOWN;
+        btn |= BUTTON_STOP;
 
     return btn;
 }
@@ -488,7 +487,7 @@ static int button_read(void)
     if(adc_read(ADC_BUTTON_OPTION) > 0x200) /* active high */
         btn |= BUTTON_MENU;
     if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
-        btn |= BUTTON_ON;
+        btn |= BUTTON_OFF;
 
     /* Check the 4 direction keys, hard-coded analog limits for now */
     if (data >= 0x2EF)
@@ -496,9 +495,9 @@ static int button_read(void)
     else if (data >= 0x246)
         btn |= BUTTON_RIGHT;
     else if (data >= 0x19D)
-        btn |= BUTTON_PLAY | BUTTON_UP;
+        btn |= BUTTON_UP;
     else if (data >= 0x0A1)
-        btn |= BUTTON_STOP | BUTTON_DOWN;
+        btn |= BUTTON_DOWN;
 
     return btn;
 }

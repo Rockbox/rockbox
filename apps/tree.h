@@ -21,6 +21,48 @@
 
 #include <stdbool.h>
 
+#ifdef HAVE_RECORDER_KEYPAD
+#define TREE_NEXT  BUTTON_DOWN
+#define TREE_PREV  BUTTON_UP
+#define TREE_EXIT  BUTTON_LEFT
+#define TREE_ENTER BUTTON_RIGHT
+#define TREE_RUN   BUTTON_PLAY
+#define TREE_MENU  (BUTTON_F1 | BUTTON_REL)
+#define TREE_SHIFT BUTTON_ON
+#define TREE_OFF   BUTTON_OFF
+
+#define TREE_RC_NEXT  BUTTON_RC_RIGHT
+#define TREE_RC_REV   BUTTON_RC_LEFT
+#define TREE_RC_EXIT  BUTTON_RC_STOP
+#define TREE_RC_ENTER BUTTON_RC_PLAY
+#define TREE_RC_RUN   BUTTON_RC_PLAY
+
+#elif defined HAVE_PLAYER_KEYPAD
+#define TREE_NEXT  BUTTON_RIGHT
+#define TREE_PREV  BUTTON_LEFT
+#define TREE_EXIT  BUTTON_STOP
+#define TREE_ENTER BUTTON_PLAY
+#define TREE_RUN   BUTTON_PLAY
+#define TREE_MENU  (BUTTON_MENU | BUTTON_REL)
+#define TREE_SHIFT BUTTON_ON
+
+#define TREE_RC_NEXT  BUTTON_RC_RIGHT
+#define TREE_RC_REV   BUTTON_RC_LEFT
+#define TREE_RC_EXIT  BUTTON_RC_STOP
+#define TREE_RC_ENTER BUTTON_RC_PLAY
+#define TREE_RC_RUN   BUTTON_RC_PLAY
+
+#elif defined HAVE_ONDIO_KEYPAD
+#define TREE_NEXT  BUTTON_DOWN
+#define TREE_PREV  BUTTON_UP
+#define TREE_EXIT  BUTTON_LEFT
+#define TREE_ENTER BUTTON_RIGHT
+#define TREE_RUN   BUTTON_RIGHT
+#define TREE_MENU  (BUTTON_MENU | BUTTON_REPEAT)
+#define TREE_SHIFT BUTTON_MENU
+
+#endif
+
 struct entry {
     short attr; /* FAT attributes + file type flags */
     unsigned long time_write; /* Last write time */

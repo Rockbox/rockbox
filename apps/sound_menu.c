@@ -103,38 +103,29 @@ bool set_sound(const char* string,
         changed = false;
         button = button_get_w_tmo(HZ/2);
         switch( button ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
                 (*variable)+=steps;
                 if(*variable > max )
                     *variable = max;
                 changed = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
                 (*variable)-=steps;
                 if(*variable < min )
                     *variable = min;
                 changed = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-            case BUTTON_PLAY:
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
+#endif
+#ifdef SETTINGS_CANCEL2
+            case SETTINGS_CANCEL2:
 #endif
                 done = true;
                 break;

@@ -75,35 +75,49 @@ static int get_raw_button (void)
 	case XK_KP_Up:
 	case XK_Up:
 	case XK_KP_8:
+#ifdef BUTTON_UP
 	    k = BUTTON_UP;
+#elif defined BUTTON_PLAY
+	    k = BUTTON_PLAY;
+#endif
             break;
 
 	case XK_KP_Down:
 	case XK_Down:
 	case XK_KP_2:
+#ifdef BUTTON_DOWN
 	    k = BUTTON_DOWN;
+#elif defined BUTTON_STOP
+            k = BUTTON_STOP;
+#endif
             break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#ifdef BUTTON_PLAY
 	case XK_KP_Space:
 	case XK_KP_5:
 	case XK_KP_Begin:
 	case XK_space:
 	    k = BUTTON_PLAY;
             break;
+#endif
 
+#ifdef BUTTON_OFF
 	case XK_KP_Enter:
 	case XK_A:
 	case XK_a:
 	    k = BUTTON_OFF;
             break;
+#endif
 
+#ifdef BUTTON_ON
 	case XK_KP_Add:
 	case XK_Q:
 	case XK_q:
 	    k = BUTTON_ON;
             break;
+#endif
 
+#ifdef BUTTON_F1
 	case XK_KP_Divide:
 	case XK_1:
 	    k = BUTTON_F1;
@@ -118,7 +132,9 @@ static int get_raw_button (void)
 	case XK_3:
 	    k = BUTTON_F3;
             break;
+#endif
 
+#ifdef HAVE_LCD_BITMAP
         case XK_5:
             if(!release)
             {
@@ -126,16 +142,16 @@ static int get_raw_button (void)
                 return 0;
             }
             break;
+#endif
 
-#else
-	case XK_KP_Add:
-	case XK_Q:
-	case XK_q:
-	    k = BUTTON_ON;
-            break;
-
+#ifdef BUTTON_MENU
+#ifdef HAVE_PLAYER_KEYPAD
 	case XK_KP_Enter:
 	case XK_Return:
+#elif defined HAVE_ONDIO_KEYPAD
+	case XK_KP_Insert:
+	case XK_Control_R:
+#endif
 	    k = BUTTON_MENU;
             break;
 #endif

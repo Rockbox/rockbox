@@ -70,6 +70,7 @@ struct user_settings global_settings;
 const char rec_base_directory[] = REC_BASE_DIR;
 
 
+
 #define CONFIG_BLOCK_VERSION 16
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
@@ -1319,40 +1320,26 @@ bool set_int(const char* string,
 
         button = button_get_w_tmo(HZ/2);
         switch(button) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
                 *variable += step;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
                 *variable -= step;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-            case BUTTON_PLAY:
-#else
-            case BUTTON_PLAY:
+            case SETTINGS_OK:
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
 #endif
                 done = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
+            case SETTINGS_CANCEL:
+#ifdef SETTINGS_CANCEL2
+            case SETTINGS_CANCEL2:
 #endif
                 if (*variable != org_value) {
                     *variable=org_value;
@@ -1431,13 +1418,8 @@ bool set_option(const char* string, void* variable, enum optiontype type,
 
         button = button_get_w_tmo(HZ/2);
         switch (button) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
                 if (type == INT) {
                     if ( *intvar < (numoptions-1) )
                         (*intvar)++;
@@ -1448,13 +1430,8 @@ bool set_option(const char* string, void* variable, enum optiontype type,
                     *boolvar = !*boolvar;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
                 if (type == INT) {
                     if ( *intvar > 0 )
                         (*intvar)--;
@@ -1465,20 +1442,16 @@ bool set_option(const char* string, void* variable, enum optiontype type,
                     *boolvar = !*boolvar;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-            case BUTTON_PLAY:
-#else
-            case BUTTON_PLAY:
+            case SETTINGS_OK:
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
 #endif
                 done = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
+            case SETTINGS_CANCEL:
+#ifdef SETTINGS_CANCEL2
+            case SETTINGS_CANCEL2:
 #endif
                 if (((type==INT) && (*intvar != oldval)) ||
                     ((type==BOOL) && (*boolvar != (bool)oldval))) {

@@ -130,7 +130,7 @@ static void update_display_line(int line, bool scroll);
 static void scroll_display(int lines);
 static void update_first_index(void);
 static bool update_playlist(bool force);
-#ifdef BUTTON_ON
+#ifdef TREE_SHIFT
 static int  onplay_menu(int index);
 #endif
 static bool viewer_menu(void);
@@ -672,7 +672,7 @@ static bool update_playlist(bool force)
     return true;
 }
 
-#ifdef BUTTON_ON
+#ifdef TREE_SHIFT
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
    changed. */
@@ -902,67 +902,37 @@ bool playlist_viewer_ex(char* filename)
 
         switch (button)
         {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-#endif
+            case TREE_EXIT:
                 exit = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case TREE_PREV:
+            case TREE_PREV | BUTTON_REPEAT:
                 scroll_display(-1);
                 update = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case TREE_NEXT:
+            case TREE_NEXT | BUTTON_REPEAT:
                 scroll_display(1);
                 update = true;
                 break;
 
-#ifdef BUTTON_ON
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_ON | BUTTON_LEFT:
-            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case TREE_SHIFT | TREE_PREV:
+            case TREE_SHIFT | TREE_PREV | BUTTON_REPEAT:
                 /* Pageup */
                 scroll_display(-viewer.num_display_lines);
                 update = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_ON | BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_ON | BUTTON_RIGHT:
-            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case TREE_SHIFT | TREE_NEXT:
+            case TREE_SHIFT | TREE_NEXT | BUTTON_REPEAT:
                 /* Pagedown */
                 scroll_display(viewer.num_display_lines);
                 update = true;
                 break;
-#endif /* BUTTON_ON */
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_RIGHT:
-#endif
-            case BUTTON_PLAY:
+                
+            case TREE_RUN:
                 if (viewer.move_track >= 0)
                 {
                     /* Move track */
@@ -1003,8 +973,7 @@ bool playlist_viewer_ex(char* filename)
                 update = true;
                 break;
 
-#ifdef BUTTON_ON
-            case BUTTON_ON | BUTTON_PLAY:
+            case TREE_SHIFT | TREE_RUN:
             {
                 /* ON+PLAY menu */
                 int ret;
@@ -1030,12 +999,8 @@ bool playlist_viewer_ex(char* filename)
                 update = true;
                 break;
             }
-#endif /* BUTTON_ON */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1:
-#else
-            case BUTTON_MENU:
-#endif
+
+            case TREE_MENU:
                 if (viewer_menu())
                 {
                     ret = true;

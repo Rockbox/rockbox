@@ -27,7 +27,7 @@ int charging_screen(void);
 void charging_splash(void);
 
 #ifdef HAVE_RECORDER_KEYPAD
-int on_screen(void);
+int pitch_screen(void);
 bool quick_screen(const int, const int);
 #endif
 
@@ -42,6 +42,7 @@ bool set_time_screen(const char* string, struct tm *tm);
 #endif
 
 bool shutdown_screen(void);
+bool browse_id3(void);
 
 #endif
 

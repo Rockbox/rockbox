@@ -61,63 +61,86 @@ static struct mp3entry* id3 = NULL;
 static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-void player_change_volume(int button)
+/* button definitions */
+#ifdef HAVE_RECORDER_KEYPAD
+#define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
+#define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
+#define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_INCVOL   BUTTON_UP
+#define WPS_DECVOL   BUTTON_DOWN
+#define WPS_PAUSE    BUTTON_PLAY
+#define WPS_MENU    (BUTTON_F1 | BUTTON_REL)
+#define WPS_MENU_PRE BUTTON_F1
+#define WPS_BROWSE  (BUTTON_ON | BUTTON_REL)
+#define WPS_EXIT     BUTTON_OFF
+#define WPS_KEYLOCK (BUTTON_F1 | BUTTON_DOWN)
+#define WPS_ID3     (BUTTON_F1 | BUTTON_ON)
+
+#define WPS_RC_NEXT   BUTTON_RC_RIGHT
+#define WPS_RC_PREV   BUTTON_RC_LEFT
+#define WPS_RC_PAUSE  BUTTON_RC_PLAY
+#define WPS_RC_INCVOL BUTTON_RC_VOL_UP
+#define WPS_RC_DECVOL BUTTON_RC_VOL_DOWN
+#define WPS_RC_EXIT   BUTTON_RC_STOP
+
+#elif defined HAVE_PLAYER_KEYPAD
+#define WPS_NEXT     BUTTON_RIGHT
+#define WPS_PREV     BUTTON_LEFT
+#define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
+#define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_INCVOL  (BUTTON_MENU | BUTTON_RIGHT)
+#define WPS_DECVOL  (BUTTON_MENU | BUTTON_LEFT)
+#define WPS_PAUSE    BUTTON_PLAY
+#define WPS_MENU    (BUTTON_MENU | BUTTON_REL)
+#define WPS_MENU_PRE BUTTON_MENU
+#define WPS_BROWSE  (BUTTON_ON | BUTTON_REL)
+#define WPS_EXIT     BUTTON_STOP
+#define WPS_KEYLOCK (BUTTON_MENU | BUTTON_STOP)
+#define WPS_ID3     (BUTTON_MENU | BUTTON_ON)
+
+#define WPS_RC_NEXT   BUTTON_RC_RIGHT
+#define WPS_RC_PREV   BUTTON_RC_LEFT
+#define WPS_RC_PAUSE  BUTTON_RC_PLAY
+#define WPS_RC_INCVOL BUTTON_RC_VOL_UP
+#define WPS_RC_DECVOL BUTTON_RC_VOL_DOWN
+#define WPS_RC_EXIT   BUTTON_RC_STOP
+
+#elif defined HAVE_ONDIO_KEYPAD
+#define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
+#define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
+#define WPS_REW     (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_INCVOL   BUTTON_UP
+#define WPS_DECVOL   BUTTON_DOWN
+#define WPS_PAUSE    BUTTON_OFF
+#define WPS_MENU    (BUTTON_MENU | BUTTON_REPEAT)
+#define WPS_BROWSE  (BUTTON_MENU | BUTTON_REL)
+#define WPS_KEYLOCK (BUTTON_MENU | BUTTON_DOWN)
+
+#endif
+
+/* set volume
+   return true if screen restore is needed
+   return false otherwise
+*/
+static bool setvol(void)
 {
-    bool exit = false;
-    char buffer[32];
-
-    lcd_stop_scroll();
-    while (!exit)
-    {
-        switch (button)
-        {
-            case BUTTON_MENU | BUTTON_RIGHT:
-            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                global_settings.volume++;
-                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
-                settings_save();
-                break;
-
-            case BUTTON_MENU | BUTTON_LEFT:
-            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-                global_settings.volume--;
-                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
-                settings_save();
-                break;
-
-            case BUTTON_MENU | BUTTON_REL:
-            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REL:
-            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REL:
-                exit = true;
-                break;
-        }
-
-        snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", 
-                 mpeg_val2phys(SOUND_VOLUME, global_settings.volume));
-
+    if (global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
+        global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    status_draw(false);
+    wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
+    settings_save();
 #ifdef HAVE_LCD_CHARCELLS
-        lcd_puts(0, 0, buffer);
-#else
-        lcd_puts(2, 3, buffer);
-        lcd_update();
+    splash(0, false, "Vol: %d %%   ",
+           mpeg_val2phys(SOUND_VOLUME, global_settings.volume));
+    return true;
 #endif
-        status_draw(false);
-
-        if (!exit)
-            button = button_get(true);
-    }
-    wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
+    return false;
 }
-#endif
 
-void display_keylock_text(bool locked)
+static void display_keylock_text(bool locked)
 {
     char* s;
     lcd_stop_scroll();
@@ -133,176 +156,6 @@ void display_keylock_text(bool locked)
         s = str(LANG_KEYLOCK_OFF_RECORDER);
 #endif
     splash(HZ, true, s);
-}
-
-void display_mute_text(bool muted)
-{
-    char *s;
-    lcd_stop_scroll();
-#ifdef HAVE_LCD_CHARCELLS
-    if (muted)
-        s = str(LANG_MUTE_ON_PLAYER);
-    else
-        s = str(LANG_MUTE_OFF_PLAYER);
-#else
-    if (muted)
-        s = str(LANG_MUTE_ON_RECORDER);
-    else
-        s = str(LANG_MUTE_OFF_RECORDER);
-#endif
-    splash(HZ, true, s);
-}
-
-bool browse_id3(void)
-{
-    int button;
-    int menu_pos = 0;
-    int menu_max = 8;
-    bool exit = false;
-    char scroll_text[MAX_PATH];
-
-    if (!(mpeg_status() & MPEG_STATUS_PLAY))
-        return false;
-
-    while (!exit)
-    {
-        lcd_clear_display();
-
-        switch (menu_pos)
-        {
-            case 0:
-                lcd_puts(0, 0, str(LANG_ID3_TITLE));
-                lcd_puts_scroll(0, 1, id3->title ? id3->title : 
-                                (char*)str(LANG_ID3_NO_TITLE));
-                break;
-
-            case 1:
-                lcd_puts(0, 0, str(LANG_ID3_ARTIST));
-                lcd_puts_scroll(0, 1, 
-                                id3->artist ? id3->artist : 
-                                (char*)str(LANG_ID3_NO_ARTIST));
-                break;
-
-            case 2:
-                lcd_puts(0, 0, str(LANG_ID3_ALBUM));
-                lcd_puts_scroll(0, 1, id3->album ? id3->album : 
-                                (char*)str(LANG_ID3_NO_ALBUM));
-                break;
-
-            case 3:
-                lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
-                
-                if (id3->tracknum) {
-                    snprintf(scroll_text,sizeof(scroll_text), "%d",
-                             id3->tracknum);
-                    lcd_puts_scroll(0, 1, scroll_text);
-                }
-                else
-                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_TRACKNUM));
-                break;
-
-            case 4:
-                lcd_puts(0, 0, str(LANG_ID3_GENRE));
-                lcd_puts_scroll(0, 1,
-                                id3_get_genre(id3) ?
-                                id3_get_genre(id3) :
-                                (char*)str(LANG_ID3_NO_INFO));
-                break;
-
-            case 5:
-                lcd_puts(0, 0, str(LANG_ID3_YEAR));
-                if (id3->year) {
-                    snprintf(scroll_text,sizeof(scroll_text), "%d",
-                             id3->year);
-                    lcd_puts_scroll(0, 1, scroll_text);
-                }
-                else
-                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_INFO));
-                break;
-
-            case 6:
-                lcd_puts(0, 0, str(LANG_ID3_LENGHT));
-                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
-                         id3->length / 60000,
-                         id3->length % 60000 / 1000 );
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 7:
-                lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
-                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
-                         playlist_get_display_index(), playlist_amount());
-                lcd_puts_scroll(0, 1, scroll_text);
-                break;
-
-
-            case 8:
-                lcd_puts(0, 0, str(LANG_ID3_BITRATE));
-                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
-                         id3->bitrate);
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 9:
-                lcd_puts(0, 0, str(LANG_ID3_FRECUENCY));
-                snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
-                         id3->frequency);
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 10:
-                lcd_puts(0, 0, str(LANG_ID3_PATH));
-                lcd_puts_scroll(0, 1, id3->path);
-                break;
-        }
-        lcd_update();
-
-        button = button_get(true);
-
-        switch(button)
-        {
-            case BUTTON_LEFT:
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#endif
-                if (menu_pos > 0)
-                    menu_pos--;
-                else
-                    menu_pos = menu_max;
-                break;
-
-            case BUTTON_RIGHT:
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#endif
-                if (menu_pos < menu_max)
-                    menu_pos++;
-                else
-                    menu_pos = 0;
-                break;
-            
-            case BUTTON_REPEAT:
-                break;
-
-#ifdef BUTTON_STOP
-            case BUTTON_STOP:
-#else
-            case BUTTON_OFF:
-#endif
-            case BUTTON_PLAY:
-                lcd_stop_scroll();
-                /* eat release event */
-                button_get(true);
-                exit = true;
-                break;
-
-            default:
-                if(default_event_handler(button) ==  SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
-    }
-    return false;
 }
 
 static bool ffwd_rew(int button)
@@ -324,8 +177,8 @@ static bool ffwd_rew(int button)
 
     while (!exit) {
         switch ( button ) {
-            case BUTTON_LEFT | BUTTON_REPEAT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case WPS_FFWD:
+            case WPS_REW:
                 if (ff_rewind)
                 {
                     if (direction == 1)
@@ -367,7 +220,7 @@ static bool ffwd_rew(int button)
 #ifdef HAVE_PLAYER_KEYPAD
                         lcd_stop_scroll();
 #endif
-                        direction = (button & BUTTON_RIGHT) ? 1 : -1;
+                        direction = (button & WPS_FFWD) ? 1 : -1;
 
                         if (direction > 0) 
                             status_set_ffmode(STATUS_FASTFORWARD);
@@ -405,8 +258,8 @@ static bool ffwd_rew(int button)
 
                 break;
 
-            case BUTTON_LEFT | BUTTON_REL:
-            case BUTTON_RIGHT | BUTTON_REL: 
+            case WPS_PREV:
+            case WPS_NEXT: 
                 mpeg_ff_rewind(id3->elapsed+ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;
@@ -483,133 +336,6 @@ static bool update(void)
     return retcode;
 }
 
-static bool menu(void)
-{
-    static bool muted = false;
-    bool exit = false;
-    int last_button = 0;
-
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_param(true);
-    status_draw(false);
-#endif
-
-    while (!exit) {
-        int button = button_get(true);
-
-        /* these are never locked */
-        switch (button)
-        {
-            /* key lock */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_DOWN:
-#else
-            case BUTTON_MENU | BUTTON_STOP:
-#endif
-                keys_locked = !keys_locked;
-                display_keylock_text(keys_locked);
-                exit = true;
-                while (button_get(false)); /* clear button queue */
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED) {
-                    keys_locked = false;
-                    return true;
-                }
-                break;
-        }
-
-        if (keys_locked) {
-            display_keylock_text(true);
-            break;
-        }
-        
-        switch ( button ) {
-            /* go into menu */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_REL:
-#else
-            case BUTTON_MENU | BUTTON_REL:
-#endif
-                exit = true;
-                if ( !last_button && !keys_locked ) {
-                    lcd_stop_scroll();
-
-                    if (main_menu())
-                        return true;
-#ifdef HAVE_LCD_BITMAP
-                    if(global_settings.statusbar)
-                        lcd_setmargins(0, STATUSBAR_HEIGHT);
-                    else
-                        lcd_setmargins(0, 0);
-#endif
-                }
-                break;
-
-                /* mute */
-#ifdef BUTTON_MENU
-            case BUTTON_MENU | BUTTON_PLAY:
-#else
-            case BUTTON_F1 | BUTTON_PLAY:
-#endif
-                if ( muted )
-                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                else
-                    mpeg_sound_set(SOUND_VOLUME, 0);
-                muted = !muted;
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(false);
-#endif
-                display_mute_text(muted);
-                break;
-
-#ifdef BUTTON_MENU
-                /* change volume */
-            case BUTTON_MENU | BUTTON_LEFT:
-            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-            case BUTTON_MENU | BUTTON_RIGHT:
-            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                player_change_volume(button);
-                exit = true;
-                break;
-
-                /* show id3 tags */
-#ifdef BUTTON_ON
-            case BUTTON_MENU | BUTTON_ON:
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(true);
-                status_set_audio(true);
-#endif
-#endif
-#else
-            case BUTTON_F1 | BUTTON_ON:
-#endif
-                lcd_clear_display();
-                lcd_puts(0, 0, str(LANG_ID3_INFO));
-                lcd_puts(0, 1, str(LANG_ID3_SCREEN));
-                lcd_update();
-                sleep(HZ);
- 
-                if(browse_id3())
-                    return true;
-#ifdef HAVE_PLAYER_KEYPAD
-                status_set_param(false);
-                status_set_audio(true);
-#endif
-                exit = true;
-                break;
-        }
-        last_button = button;
-    }
-
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_param(false);
-#endif
-
-    return false;
-}
-
 static void fade(bool fade_in)
 {
     if (fade_in) {
@@ -647,12 +373,20 @@ static void fade(bool fade_in)
 }
 
 
+static void waitfor_nokey(void)
+{
+    /* wait until all keys are released */
+    while (button_get(false) != BUTTON_NONE)
+        yield();
+}
+
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
     int button = 0, lastbutton = 0;
     bool ignore_keyup = true;
     bool restore = false;
+    long restoretimer = 0; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool update_track = false;
 
@@ -763,26 +497,22 @@ int wps_show(void)
             if (button >= 0 && button & BUTTON_REL )
                 continue;
         }
-        
+
+#ifdef WPS_KEYLOCK
         /* ignore non-remote buttons when keys are locked */
         if (keys_locked &&
             ! ((button < 0) ||
-#ifdef HAVE_RECORDER_KEYPAD
-               (button & BUTTON_F1) ||
-#else
-               (button & BUTTON_MENU) ||
-#endif
-               (button == BUTTON_NONE)
-#ifdef BUTTON_REMOTE
-               || (button & BUTTON_REMOTE)
-#endif
-               ))
+               (button == BUTTON_NONE) ||
+               ((button & WPS_KEYLOCK) == WPS_KEYLOCK) ||
+               (button & BUTTON_REMOTE)
+                ))
         {
-            while (button_get(false)); /* clear button queue */
-            display_keylock_text(true);
+            if (!(button & BUTTON_REL))
+                display_keylock_text(true);
             restore = true;
-            continue;
+            button = BUTTON_NONE;
         }
+#endif
 
         /* Exit if mpeg has stopped playing. This can happen if using the
            sleep timer with the charger plugged or if starting a recording
@@ -792,49 +522,25 @@ int wps_show(void)
 
         switch(button)
         {
-#ifdef BUTTON_ON
-            case BUTTON_ON:
-#ifdef HAVE_RECORDER_KEYPAD
-                switch (on_screen()) {
-                    case 2:
-                        /* usb connected? */
-                        return SYS_USB_CONNECTED;
-                
-                    case 1:
-                        /* was on_screen used? */
-                        restore = true;
-
-                        /* pause may have been turned off by pitch screen */
-                        if (paused && !(mpeg_status() & MPEG_STATUS_PAUSE)) {
-                            paused = false;
-                        }
-                        break;
-
-                    case 0:
-                        /* otherwise, exit to browser */
-#else
+            case WPS_BROWSE:
 #ifdef HAVE_LCD_CHARCELLS
-                        status_set_record(false);
-                        status_set_audio(false);
+                status_set_record(false);
+                status_set_audio(false);
 #endif
-#endif
-                        lcd_stop_scroll();
+                lcd_stop_scroll();
 
-                        /* set dir browser to current playing song */
-                        if (global_settings.browse_current &&
-                            current_track_path[0] != '\0')
-                            set_current_file(current_track_path);
-                        
-                        return 0;
-#ifdef HAVE_RECORDER_KEYPAD
-                }
+                /* set dir browser to current playing song */
+                if (global_settings.browse_current &&
+                    current_track_path[0] != '\0')
+                    set_current_file(current_track_path);
+                
+                return 0;
                 break;
-#endif
-#endif /* BUTTON_ON */
+
                 /* play/pause */
-            case BUTTON_PLAY:
-#ifdef BUTTON_RC_PLAY
-            case BUTTON_RC_PLAY:
+            case WPS_PAUSE:
+#ifdef WPS_RC_PAUSE
+            case WPS_RC_PAUSE:
 #endif
                 if ( paused )
                 {
@@ -861,53 +567,50 @@ int wps_show(void)
                 break;
 
                 /* volume up */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#endif
-#ifdef BUTTON_RC_VOL_UP
-            case BUTTON_RC_VOL_UP:
+            case WPS_INCVOL:
+            case WPS_INCVOL | BUTTON_REPEAT:
+#ifdef WPS_RC_INCVOL
+            case WPS_RC_INCVOL:
 #endif
                 global_settings.volume++;
-                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw(false);
-                settings_save();
+                if (setvol()) {
+                    restore = true;
+                    restoretimer = current_tick + HZ;
+                }
                 break;
 
                 /* volume down */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#endif
-#ifdef BUTTON_RC_VOL_DOWN
-            case BUTTON_RC_VOL_DOWN:
+            case WPS_DECVOL:
+            case WPS_DECVOL | BUTTON_REPEAT:
+#ifdef WPS_RC_DECVOL
+            case WPS_RC_DECVOL:
 #endif
                 global_settings.volume--;
-                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw(false);
-                settings_save();
+                if (setvol()) {
+                    restore = true;
+                    restoretimer = current_tick + HZ;
+                }
                 break;
 
                 /* fast forward / rewind */
-            case BUTTON_LEFT | BUTTON_REPEAT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case WPS_FFWD:
+            case WPS_REW:
+#ifdef WPS_RC_FFWD
+            case WPS_RC_FFWD:
+            case WPS_RC_RWD:
+#endif
                 ffwd_rew(button);
                 break;
 
                 /* prev / restart */
-#ifdef BUTTON_RC_LEFT
-            case BUTTON_RC_LEFT:
+#ifdef WPS_RC_PREV
+            case WPS_RC_PREV:
 #endif
-            case BUTTON_LEFT | BUTTON_REL:
-#ifdef HAVE_RECORDER_KEYPAD
-                if ((button == (BUTTON_LEFT | BUTTON_REL)) &&
-                    (lastbutton != BUTTON_LEFT ))
+            case WPS_PREV:
+                /* ignore release event after rewind */
+                if (lastbutton & BUTTON_REPEAT)
                     break; 
-#endif
+
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     mpeg_prev();
                 }
@@ -923,29 +626,43 @@ int wps_show(void)
                 break;
 
                 /* next */
-#ifdef BUTTON_RC_RIGHT
-            case BUTTON_RC_RIGHT:
+#ifdef WPS_RC_NEXT
+            case WPS_RC_NEXT:
 #endif
-            case BUTTON_RIGHT | BUTTON_REL:
+            case WPS_NEXT:
 #ifdef HAVE_RECORDER_KEYPAD
-                if ((button == (BUTTON_RIGHT | BUTTON_REL)) &&
-                    (lastbutton != BUTTON_RIGHT))
-                     break; 
+                if (lastbutton & BUTTON_REPEAT)
+                    break; 
 #endif
                 mpeg_next();
                 break;
 
                 /* menu key functions */
-#ifdef BUTTON_MENU
-            case BUTTON_MENU:
-#else
-            case BUTTON_F1:
+            case WPS_MENU:
+#ifdef WPS_MENU_PRE
+                if (lastbutton != WPS_MENU_PRE)
+                    break;
 #endif
-                if (menu())
-                    return SYS_USB_CONNECTED;
+                lcd_stop_scroll();
 
-                update_track = true;
+                if (main_menu())
+                    return true;
+#ifdef HAVE_LCD_BITMAP
+                if (global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+#endif
                 restore = true;
+                break;
+
+            /* key lock */
+            case WPS_KEYLOCK:
+            case WPS_KEYLOCK | BUTTON_REPEAT:
+                keys_locked = !keys_locked;
+                display_keylock_text(keys_locked);
+                restore = true;
+                waitfor_nokey();
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -962,22 +679,32 @@ int wps_show(void)
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
+
+                /* pitch screen */
+            case BUTTON_ON | BUTTON_REPEAT:
+                if (2 == pitch_screen())
+                    return SYS_USB_CONNECTED;
+                restore = true;
+                break;
 #endif
 
                 /* stop and exit wps */
-#ifdef BUTTON_OFF
-            case BUTTON_OFF | BUTTON_REL:
-#else
-            case BUTTON_STOP | BUTTON_REL:
-                if ( lastbutton != BUTTON_STOP )
-                    break;
-#endif
-#ifdef BUTTON_RC_STOP
-            case BUTTON_RC_STOP:
+#ifdef WPS_EXIT
+            case WPS_EXIT:
+#ifdef WPS_RC_EXIT
+            case WPS_RC_EXIT:
 #endif
                 exit = true;
                 break;
+#endif
 
+#ifdef WPS_ID3
+            case WPS_ID3:
+                browse_id3();
+                restore = true;
+                break;
+#endif
+                
             case BUTTON_NONE: /* Timeout */
                 update_track = true;
                 break;
@@ -1029,8 +756,12 @@ int wps_show(void)
         if ( button )
             ata_spin();
 
-        if (restore) {
+        if (restore &&
+            ((restoretimer == 0) ||
+             (restoretimer < current_tick)))
+        {
             restore = false;
+            restoretimer = 0;
             if (wps_display(id3, nid3))
             {
                 /* set dir browser to current playing song */
@@ -1044,7 +775,7 @@ int wps_show(void)
             if (id3)
                 wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
         }
-        if(button != BUTTON_NONE)
+        if (button != BUTTON_NONE)
             lastbutton = button;
     }
     return 0; /* unreachable - just to reduce compiler warnings */

@@ -71,6 +71,8 @@ static void calendar_init(struct today *today, struct shown *shown)
     int w,h;
 #ifdef HAVE_RTC
     struct tm *tm;
+#else
+    (void)today;
 #endif
     rb->lcd_getstringsize("A",&w,&h);
     if ( ((w * 14) > LCD_WIDTH) || ((h * 7) > LCD_HEIGHT) )

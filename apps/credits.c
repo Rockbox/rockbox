@@ -54,7 +54,7 @@ void roll_credits(void)
         }
 
         /* abort on keypress */
-        if (button_get_w_tmo(DISPLAY_TIME))
+        if (button_get_w_tmo(DISPLAY_TIME) & BUTTON_REL)
             return;
     }
     return;

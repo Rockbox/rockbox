@@ -37,7 +37,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define	BUTTON_NONE		0x0000
 
 #ifdef HAVE_NEO_KEYPAD
-
+/* neo button codes */
 #define BUTTON_UP               0x0080
 #define	BUTTON_DOWN		0x0010
 #define	BUTTON_LEFT		0x0001
@@ -80,9 +80,6 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #else
 
 /* Shared button codes */
-#define	BUTTON_ON		0x0001
-#define	BUTTON_UP		0x0010
-#define	BUTTON_DOWN		0x0020
 #define	BUTTON_LEFT		0x0040
 #define	BUTTON_RIGHT		0x0080
 
@@ -94,38 +91,42 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 /* remote control buttons */
 #define BUTTON_RC_VOL_UP        (0x0008 | BUTTON_REMOTE)
 #define BUTTON_RC_VOL_DOWN      (0x0800 | BUTTON_REMOTE)
-#define BUTTON_RC_PLAY          (BUTTON_UP | BUTTON_REMOTE)
-#define BUTTON_RC_STOP          (BUTTON_DOWN | BUTTON_REMOTE)
 #define BUTTON_RC_LEFT          (BUTTON_LEFT | BUTTON_REMOTE)
 #define BUTTON_RC_RIGHT         (BUTTON_RIGHT| BUTTON_REMOTE)
 
 #ifdef HAVE_RECORDER_KEYPAD
 
 /* Recorder specific button codes */
+#define	BUTTON_ON		0x0001
 #define	BUTTON_OFF		0x0002
 #define	BUTTON_PLAY		0x0004
+#define	BUTTON_UP		0x0010
+#define	BUTTON_DOWN		0x0020
 #define	BUTTON_F1		0x0100
 #define	BUTTON_F2		0x0200
 #define	BUTTON_F3		0x0400
 
+#define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
+#define BUTTON_RC_STOP          (BUTTON_OFF | BUTTON_REMOTE)
+
 #elif defined(HAVE_PLAYER_KEYPAD)
 
 /* Jukebox 6000 and Studio specific button codes */
+#define	BUTTON_ON		0x0001
 #define	BUTTON_MENU		0x0002
-#define	BUTTON_PLAY		BUTTON_UP
-#define	BUTTON_STOP		BUTTON_DOWN
+#define	BUTTON_PLAY		0x0010
+#define	BUTTON_STOP		0x0020
+
+#define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
+#define BUTTON_RC_STOP          (BUTTON_STOP | BUTTON_REMOTE)
 
 #elif defined HAVE_ONDIO_KEYPAD
 
 /* Ondio specific button codes */
-#define	BUTTON_MENU		0x0002
-#define	BUTTON_PLAY		BUTTON_UP
-#define	BUTTON_STOP		BUTTON_DOWN
-/* ON is also interpreted as OFF, let's see if that helps a bit */
-#define BUTTON_OFF      BUTTON_ON
-#define	BUTTON_F1		0x0100 /* unreacheable */
-#define	BUTTON_F2		0x0200 /* unreacheable */
-#define	BUTTON_F3		0x0400 /* unreacheable */
+#define	BUTTON_OFF		0x0002
+#define	BUTTON_UP		0x0010
+#define	BUTTON_DOWN		0x0020
+#define	BUTTON_MENU		0x0100
 
 #endif /* HAVE_RECORDER/PLAYER/ONDIO_KEYPAD */
 

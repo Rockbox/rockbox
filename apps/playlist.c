@@ -564,11 +564,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     for (i=0; i<num_files; i++)
     {
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-        if (button_get(false) == BUTTON_STOP)
-#else
-        if (button_get(false) == BUTTON_OFF)
-#endif
+        if (button_get(false) == SETTINGS_CANCEL)
         {
             result = -1;
             break;
@@ -2016,11 +2012,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-        if (button_get(false) == BUTTON_STOP)
-#else
-        if (button_get(false) == BUTTON_OFF)
-#endif
+        if (button_get(false) == SETTINGS_CANCEL)
             break;
 
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
@@ -2384,11 +2376,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         int seek;
 
         /* user abort */
-#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
-        if (button_get(false) == BUTTON_STOP)
-#else
-        if (button_get(false) == BUTTON_OFF)
-#endif
+        if (button_get(false) == SETTINGS_CANCEL)
             break;
 
         control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;

@@ -194,20 +194,6 @@ void tree_get_filetypes(const struct filetype** types, int* count)
 
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_RECORDER_KEYPAD
-#define TREE_NEXT  BUTTON_DOWN
-#define TREE_PREV  BUTTON_UP
-#define TREE_EXIT  BUTTON_LEFT
-#define TREE_ENTER BUTTON_RIGHT
-#define TREE_MENU  BUTTON_F1
-#else
-#define TREE_NEXT  BUTTON_RIGHT
-#define TREE_PREV  BUTTON_LEFT
-#define TREE_EXIT  BUTTON_STOP
-#define TREE_ENTER BUTTON_PLAY
-#define TREE_MENU  BUTTON_MENU
-#endif /* HAVE_RECORDER_KEYPAD */
-
 /* talkbox hovering delay, to avoid immediate disk activity */
 #define HOVER_DELAY (HZ/2)
 
@@ -641,9 +627,9 @@ static bool ask_resume(bool ask_once)
     while (!stop) {
         button = button_get(true);
         switch (button) {
-            case BUTTON_PLAY:
-#ifdef BUTTON_RC_PLAY
-            case BUTTON_RC_PLAY:
+            case TREE_RUN:
+#ifdef TREE_RC_RUN
+            case TREE_RC_RUN:
 #endif
                 return true;
 
@@ -771,9 +757,10 @@ void set_current_file(char *path)
     }
 }
 
-#ifdef BUTTON_ON
-static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
-                      const int *dirfilter)
+#ifdef TREE_SHIFT
+static bool handle_shift(int *ds, int *dc, int numentries,
+                         int tree_max_on_screen,
+                         const int *dirfilter)
 {
     bool exit = false;
     bool used = false;
@@ -790,12 +777,12 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
     while (!exit) {
         switch (button_get(true)) {
             case TREE_PREV:
-#ifdef BUTTON_RC_LEFT
-            case BUTTON_RC_LEFT:
+#ifdef TREE_RC_PREV
+            case TREE_RC_PREV:
 #endif
-#ifdef BUTTON_ON
-            case BUTTON_ON | TREE_PREV:
-            case BUTTON_ON | TREE_PREV | BUTTON_REPEAT:
+#ifdef TREE_SHIFT
+            case TREE_SHIFT | TREE_PREV:
+            case TREE_SHIFT | TREE_PREV | BUTTON_REPEAT:
 #endif
                 used = true;
                 if ( dirstart ) {
@@ -808,12 +795,12 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
                 break;
 
             case TREE_NEXT:
-#ifdef BUTTON_RC_RIGHT
-            case BUTTON_RC_RIGHT:
+#ifdef TREE_RC_NEXT
+            case TREE_RC_NEXT:
 #endif
-#ifdef BUTTON_ON
-            case BUTTON_ON | TREE_NEXT:
-            case BUTTON_ON | TREE_NEXT | BUTTON_REPEAT:
+#ifdef TREE_SHIFT
+            case TREE_SHIFT | TREE_NEXT:
+            case TREE_SHIFT | TREE_NEXT | BUTTON_REPEAT:
 #endif
                 used = true;
                 if ( dirstart < numentries - tree_max_on_screen ) {
@@ -827,12 +814,12 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
                 break;
 
 
-            case BUTTON_PLAY:
-#ifdef BUTTON_RC_PLAY
-            case BUTTON_RC_PLAY:
+            case TREE_RUN:
+#ifdef TREE_RC_PLAY
+            case TREE_RC_RUN:
 #endif
-#ifdef BUTTON_ON
-            case BUTTON_ON | BUTTON_PLAY:
+#ifdef TREE_SHIFT
+            case TREE_SHIFT | TREE_RUN:
 #endif
             {
                 int onplay_result;
@@ -866,10 +853,10 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
                 exit = true;
                 break;
             }
-#ifdef BUTTON_ON
-            case BUTTON_ON | BUTTON_REL:
-            case BUTTON_ON | TREE_PREV | BUTTON_REL:
-            case BUTTON_ON | TREE_NEXT | BUTTON_REL:
+#ifdef TREE_SHIFT
+            case TREE_SHIFT | BUTTON_REL:
+            case TREE_SHIFT | TREE_PREV | BUTTON_REL:
+            case TREE_SHIFT | TREE_NEXT | BUTTON_REL:
                 exit = true;
                 break;
 #endif
@@ -969,7 +956,7 @@ static bool dirbrowse(const char *root, const int *dirfilter)
             while (!stop) {
                 button = button_get(true);
                 switch (button) {
-                    case BUTTON_PLAY:
+                    case TREE_RUN:
                         rolo_load("/" BOOTFILE);
                         stop = true;
                         break;
@@ -988,11 +975,9 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
         switch ( button ) {
             case TREE_EXIT:
-#ifdef BUTTON_RC_STOP
-            case BUTTON_RC_STOP:
-#endif
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case TREE_EXIT | BUTTON_REPEAT:
+#ifdef TREE_RC_EXIT
+            case TREE_RC_EXIT:
 #endif
                 i=strlen(currdir);
                 if (i>1) {
@@ -1027,8 +1012,8 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
+#ifdef TREE_OFF
+            case TREE_OFF:
                 /* Stop the music if it is playing, else show the shutdown
                    screen */
                 if(mpeg_status())
@@ -1042,27 +1027,23 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                     restore = true;
                 }
                 break;
-#endif
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REPEAT:
-#else
-            case BUTTON_STOP | BUTTON_REPEAT:
-#endif
+            case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();
                     restore = true;
                 }
                 break;
+#endif
 
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
-#ifdef BUTTON_RC_PLAY
-            case BUTTON_RC_PLAY:
+#if defined TREE_RC_ENTER && (TREE_RC_ENTER != TREE_RC_RUN)
+            case TREE_RC_ENTER:
 #endif
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_PLAY:
-            case BUTTON_PLAY | BUTTON_REPEAT:
+#if defined TREE_RUN && (TREE_RUN != TREE_ENTER)
+            case TREE_RUN:
+            case TREE_RUN | BUTTON_REPEAT:
 #endif
                 if ( !numentries )
                     break;
@@ -1255,8 +1236,9 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
             case TREE_PREV:
             case TREE_PREV | BUTTON_REPEAT:
-#ifdef BUTTON_RC_LEFT
-            case BUTTON_RC_LEFT:
+#ifdef TREE_RC_PREV
+            case TREE_RC_PREV:
+            case TREE_RC_PREV | BUTTON_REPEAT:
 #endif
                 if(filesindir) {
                     if(dircursor) {
@@ -1295,8 +1277,9 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
             case TREE_NEXT:
             case TREE_NEXT | BUTTON_REPEAT:
-#ifdef BUTTON_RC_RIGHT
-            case BUTTON_RC_RIGHT:
+#ifdef TREE_RC_NEXT
+            case TREE_RC_NEXT:
+            case TREE_RC_NEXT | BUTTON_REPEAT:
 #endif
                 if(filesindir)
                 {
@@ -1340,11 +1323,11 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 break;
 
-#ifdef BUTTON_ON /* I bet the folks without ON-button want this to
+#ifdef TREE_SHIFT /* I bet the folks without ON-button want this to
                     work on a different button */
-            case BUTTON_ON:
-                if (handle_on(&dirstart, &dircursor, numentries,
-                              tree_max_on_screen, dirfilter))
+            case TREE_SHIFT:
+                if (handle_shift(&dirstart, &dircursor, numentries,
+                                 tree_max_on_screen, dirfilter))
                 {
                     /* start scroll */
                     restore = true;

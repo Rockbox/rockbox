@@ -1066,27 +1066,23 @@ static bool reset_settings(void)
     while(!done) {
         button = button_get(true);
         switch(button) {
-        case BUTTON_PLAY:
-            settings_reset();
-            settings_apply();
-            lcd_clear_display();
-            lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
-            done = true;
-            break;
+            case SETTINGS_OK:
+                settings_reset();
+                settings_apply();
+                lcd_clear_display();
+                lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
+                done = true;
+                break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-        case BUTTON_OFF:
-#else
-        case BUTTON_STOP:
-#endif
-            lcd_clear_display();
-            lcd_puts(0,1,str(LANG_RESET_DONE_CANCEL));
-            done = true;
-            break;
+            case SETTINGS_CANCEL:
+                lcd_clear_display();
+                lcd_puts(0,1,str(LANG_RESET_DONE_CANCEL));
+                done = true;
+                break;
 
-        default:
-            if(default_event_handler(button) == SYS_USB_CONNECTED)
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
         }
     }
 

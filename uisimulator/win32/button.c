@@ -59,22 +59,38 @@ void button_event(int key, bool pressed)
     case VK_RIGHT:
         new_btn = BUTTON_RIGHT;
         break;
+
     case VK_NUMPAD8:
     case VK_UP:
+#ifdef BUTTON_UP
         new_btn = BUTTON_UP;
+#elif defined BUTTON_PLAY
+        new_btn = BUTTON_PLAY;
+#endif
         break;
+
     case VK_NUMPAD2:
     case VK_DOWN:
+#ifdef BUTTON_DOWN
         new_btn = BUTTON_DOWN;
+#elif defined BUTTON_STOP
+        new_btn = BUTTON_STOP;
+#endif
         break;
+
+#ifdef BUTTON_ON
     case VK_ADD:
         new_btn = BUTTON_ON;
         break;
+#endif
 
-#ifdef HAVE_RECORDER_KEYPAD
+#ifdef BUTTON_OFF
     case VK_RETURN:
         new_btn = BUTTON_OFF;
         break;
+#endif
+
+#ifdef BUTTON_F1
     case VK_DIVIDE:
     case VK_F1:
         new_btn = BUTTON_F1;
@@ -87,11 +103,16 @@ void button_event(int key, bool pressed)
     case VK_F3:
         new_btn = BUTTON_F3;
         break;
+#endif
+
+#ifdef BUTTON_PLAY
     case VK_NUMPAD5:
     case VK_SPACE:
         new_btn = BUTTON_PLAY;
         break;
+#endif
 
+#ifdef HAVE_LCD_BITMAP
     case VK_NUMPAD0:
     case VK_F5:
         if(pressed)
@@ -100,8 +121,14 @@ void button_event(int key, bool pressed)
             return;
         }
         break;
-#else
+#endif
+
+#ifdef BUTTON_MENU
+#ifdef HAVE_PLAYER_KEYPAD
     case VK_RETURN:
+#elif defined HAVE_ONDIO_KEYPAD
+    case VK_INSERT:
+#endif
         new_btn = BUTTON_MENU;
         break;
 #endif

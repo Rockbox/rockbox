@@ -22,6 +22,32 @@
 
 #include <stdbool.h>
 
+/* button definitions */
+#ifdef HAVE_RECORDER_KEYPAD
+#define MENU_NEXT   BUTTON_DOWN
+#define MENU_PREV   BUTTON_UP
+#define MENU_EXIT   (BUTTON_LEFT | BUTTON_REL)
+#define MENU_EXIT2  (BUTTON_OFF | BUTTON_REL)
+#define MENU_EXIT3  (BUTTON_F1 | BUTTON_REL)
+#define MENU_ENTER  (BUTTON_RIGHT | BUTTON_REL)
+#define MENU_ENTER2 (BUTTON_PLAY | BUTTON_REL)
+
+#elif defined HAVE_PLAYER_KEYPAD
+#define MENU_NEXT  BUTTON_RIGHT
+#define MENU_PREV  BUTTON_LEFT
+#define MENU_EXIT  (BUTTON_STOP | BUTTON_REL)
+#define MENU_EXIT2 (BUTTON_MENU | BUTTON_REL)
+#define MENU_ENTER (BUTTON_PLAY | BUTTON_REL)
+
+#elif defined HAVE_ONDIO_KEYPAD
+#define MENU_NEXT  BUTTON_DOWN
+#define MENU_PREV  BUTTON_UP
+#define MENU_EXIT  (BUTTON_LEFT | BUTTON_REL)
+#define MENU_EXIT2 (BUTTON_MENU | BUTTON_REL)
+#define MENU_ENTER (BUTTON_RIGHT | BUTTON_REL)
+
+#endif
+
 struct menu_item {
     unsigned char *desc; /* string or ID */
     bool (*function) (void); /* return true if USB was connected */
