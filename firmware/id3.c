@@ -280,9 +280,9 @@ static struct tag_resolver taglist[] = {
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
     { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
+    { "TCOM", 4, offsetof(struct mp3entry, composer), NULL },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre },
-    { "TCOM", 4, offsetof(struct mp3entry, composer), NULL }
 };
 
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
