@@ -42,7 +42,7 @@ DISPLAY = -DHAVE_LCD_BITMAP
 KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
-$(KEYPAD) $(DISPLAY) 
+$(KEYPAD) $(DISPLAY) -DLCD_PROPFONTS
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
@@ -69,7 +69,7 @@ ifdef MPEG_PLAY
   INCLUDES += -I$(PREVAPPDIR)/common
 endif
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall 
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
@@ -84,7 +84,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c
 endif
 
-SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
         button-x11.c io.c thread.c $(APPS) $(MENUS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
@@ -219,6 +219,9 @@ $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/stubs.o: ../common/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
