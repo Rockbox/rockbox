@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\firmware&quot;;&quot;C:\Programming\CVS Checkout\firmware\drivers&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -107,16 +107,22 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\app.c">
-			</File>
-			<File
 				RelativePath="button.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\chartables.c">
 			</File>
 			<File
+				RelativePath="debug-win32.c">
+			</File>
+			<File
 				RelativePath="dir-win32.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\disk.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\test\wavey\harness.c">
 			</File>
 			<File
 				RelativePath="kernel.c">
@@ -128,7 +134,16 @@
 				RelativePath="..\..\firmware\drivers\lcd.c">
 			</File>
 			<File
-				RelativePath="..\tetris.c">
+				RelativePath="panic-win32.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\playlist.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\settings.c">
+			</File>
+			<File
+				RelativePath="..\tree.c">
 			</File>
 			<File
 				RelativePath="uisw32.c">
@@ -137,6 +152,9 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="harness.h">
+			</File>
 			<File
 				RelativePath="lcd-win32.h">
 			</File>

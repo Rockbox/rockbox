@@ -9,8 +9,8 @@ Global
 	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Debug.ActiveCfg = Release|Win32
-		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Debug.Build.0 = Release|Win32
+		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Debug.ActiveCfg = Debug|Win32
+		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Debug.Build.0 = Debug|Win32
 		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Release.ActiveCfg = Release|Win32
 		{A81A8EFA-647A-427A-BD04-F6B469752E7A}.Release.Build.0 = Release|Win32
 	EndGlobalSection
