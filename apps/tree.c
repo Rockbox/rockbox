@@ -248,7 +248,7 @@ static int showdir(void)
     int i;
     int tree_max_on_screen;
     int start = tc.dirstart;
-    bool id3db = global_settings.dirfilter == SHOW_ID3DB;
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
     bool newdir = false;
 #ifdef HAVE_LCD_BITMAP
     const char* icon;
@@ -626,7 +626,7 @@ static bool dirbrowse(void)
                                 has been refreshed on screen */
     int lastbutton = 0;
     char* currdir = tc.currdir; /* just a shortcut */
-    bool id3db = global_settings.dirfilter == SHOW_ID3DB;
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
 
 #ifdef HAVE_LCD_BITMAP
     tree_max_on_screen = recalc_screen_height();
