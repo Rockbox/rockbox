@@ -240,7 +240,9 @@
     <td>113x79x30 mm (4.45"x3.11"x1.18")</td>
     <td>81x47x25 mm (3.1"x1.8"x0.9")</td>
     <td>81x47x25 mm (3.1"x1.8"x0.9")</td>
-    <td> (4.1"x2.4"x0.7")</td>
+    <td>104x61x18 mm (4.1"x2.4"x0.7")
+     <a href=#footnote5>(5)</a>
+    </td>
 </tr>
 <tr><th><b>Weight</b></th>
     <td>340 g (12 oz)</td>
@@ -251,7 +253,9 @@
     <td>290 g (10.23 oz)</td>
     <td>60 g (2.1 oz)</td>
     <td>60 g (2.1 oz)</td>
-    <td>160-170g (5.6 oz)</td>
+    <td>160g (5.6 oz)
+     <a href=#footnote5>(5)</a>
+    </td>
 </tr>
 <tr><th><b>USB Connector</b></th>
     <td>A male</td>
@@ -303,6 +307,8 @@
  <br>
  <a name=footnote4></a><i>(4) The picture shows an FM Recorder, but
    they look exactly the same, apart from the printed text.</i>
-
+ <br>
+ <a name=footnote5></a><i>(5) The H120 and H140 players differ in thickness
+ and weight due to the physically bigger disk in the H140 model.
 
 #include "foot.t"
