@@ -14,6 +14,7 @@ describing how to compile Rockbox
 <lI><a href="manual/">The Rockbox Manual</a>
 </ul>
 
+<a name="target_builds">
 <h2>Target builds</h2>
 
 <p>These are automated daily builds of the CVS code.
@@ -35,6 +36,7 @@ The batch timestamp is GMT.
 <p>
 <!--#include virtual="buildstatus.link" -->
 
+<a name="bleeding_edge">
 <h2>Bleeding edge builds</h2>
 
 <p>These builds are as "bleeding edge" as you can get. Up-to-date builds of the latest CVS code (the top line from the above table):
