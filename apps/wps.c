@@ -140,6 +140,7 @@ int wps_show(void)
              ( (id3->album?id3->album[0]:0) != lastalbum ) ||
              ( (id3->title?id3->title[0]:0) != lasttitle ) )
         {
+            lcd_stop_scroll();
             draw_screen(id3);
             lastlength = id3->length;
             lastsize = id3->filesize;
