@@ -21,7 +21,7 @@
 #ifndef _SOUND_H
 #define _SOUND_H
 
-#ifdef LINUX
+#ifdef HAVE_OSS
 
 /* The "sound device type" */
 
