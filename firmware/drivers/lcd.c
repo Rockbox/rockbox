@@ -265,7 +265,7 @@ void lcd_backlight(bool on)
 
 #endif /* SIMULATOR */
 
-
+unsigned char icon_mirror[11];
 
 /*** model specific code */
 
@@ -345,8 +345,6 @@ static const unsigned char lcd_ascii[] = {
    0x24,0x79,0x79,0x79,0x79,0x7d,0x24,0x7d
 };
 #endif /* HAVE_NEW_CHARCELL_LCD */
-
-unsigned char icon_mirror[11];
 
 #ifndef SIMULATOR
 void lcd_clear_display(void)
