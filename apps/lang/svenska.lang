@@ -1691,8 +1691,8 @@ new: "Rekursivt?"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
-new: "Spara dynamisk spellista"
+eng: "Save Current Playlist"
+new: "Spara aktuell spellista"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1784,3 +1784,17 @@ desc: in main menu
 eng: "FM Radio"
 new: "FM Radio"
 
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new: "Flytta"
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+new: "Flytten misslyckades"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new: "Se aktuell spellista"
