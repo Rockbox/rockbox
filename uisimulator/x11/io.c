@@ -123,9 +123,9 @@ int x11_creat(char *name, int mode)
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
     debugf("We create the real file '%s'\n", buffer);
-    return (creat)(buffer, mode);
+    return (creat)(buffer, 0666);
   }
-  return (creat)(name, mode);
+  return (creat)(name, 0666);
 }
 
 int x11_remove(char *name)
