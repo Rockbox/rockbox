@@ -13,6 +13,11 @@
 #define GOODNO  <td class=fgood>No ETD
 #define UNKNOWN TD ? ETD
 
+<p>
+ The Rockbox column may specify features only available in CVS and daily
+ builds.
+
+<p>
 <table class=rockbox>
 
 <tr class=header><th>Feature</th><th>Rockbox</th><th>Archos</th></tr>
@@ -83,7 +88,7 @@ TD 999 ETD
 EFEAT
 
 NAME Supports bad path prefixes in playlists ENAME
-NO
+YES
 YES
 EFEAT
 
@@ -128,7 +133,7 @@ YES
 EFEAT
 
 NAME Recording (Recorder) ENAME
-TD In development ETD
+YES
 YES
 EFEAT
 
@@ -158,7 +163,7 @@ NO
 EFEAT
 
 NAME Queue function ENAME
-NO
+YES
 YES
 EFEAT
 
