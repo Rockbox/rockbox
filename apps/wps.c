@@ -171,7 +171,6 @@ int wps_show(void)
     bool menu_button_is_down = false;
     bool pending_keylock = true; /* Keylock will go ON next time */
     int old_release_mask;
-    int x = 0;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -231,16 +230,6 @@ int wps_show(void)
 
         for ( i=0;i<5;i++ ) {
             int button = button_get(false);
-
-            if(button == BUTTON_NONE)
-                x++;
-            else
-            {
-                if(x)
-                    debugf("%d BUTTON_NONE\n", x);
-                debugf("Btn: %04x - lock: %d\n", button, keys_locked);
-                x = 0;
-            }
 
             switch ( button )
             {
