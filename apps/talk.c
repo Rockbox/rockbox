@@ -44,6 +44,8 @@ const char* const dir_thumbnail_name = "_dirname.talk";
 
 #define QUEUE_LEVEL ((queue_write - queue_read) & QUEUE_MASK)
 
+#define LOADED_MASK 0x80000000 /* MSB */
+
 
 /***************** Data types *****************/
 
@@ -81,11 +83,12 @@ static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
+static int filehandle; /* global, so the MMC variant can keep the file open */
 
 
 /***************** Private prototypes *****************/
 
-static int load_voicefile(void);
+static void load_voicefile(void);
 static void mp3_callback(unsigned char** start, int* size);
 static int shutup(void);
 static int queue_clip(unsigned char* buf, int size, bool enqueue);
@@ -112,41 +115,65 @@ static int open_voicefile(void)
 
 
 /* load the voice file into the mp3 buffer */
-static int load_voicefile(void)
+static void load_voicefile(void)
 {
-    int fd;
-    int size;
+    int load_size;
+    int got_size;
+    int file_size;
 
-    p_voicefile = NULL; /* indicate no voicefile if we fail below */
+    filehandle = open_voicefile();
+    if (filehandle < 0) /* failed to open */
+        goto load_err;
 
-    fd = open_voicefile();
-    if (fd < 0) /* failed to open */
-    {
-        p_voicefile = NULL; /* indicate no voicefile */
-        has_voicefile = false; /* don't try again */
-        return 0;
-    }
+    file_size = filesize(filehandle);
+    if (file_size > mp3end - mp3buf) /* won't fit? */
+       goto load_err;
 
-    size = read(fd, mp3buf, mp3end - mp3buf);
-    if (size > 10000 /* too small is probably invalid */
-        && size == filesize(fd) /* has to fit completely */
+#ifdef HAVE_MMC /* load only the header for now */
+    load_size = offsetof(struct voicefile, index);
+#else /* load the full file */
+    load_size = file_size; 
+#endif
+
+    got_size = read(filehandle, mp3buf, load_size);
+    if (got_size == load_size /* success */
         && ((struct voicefile*)mp3buf)->table /* format check */
            == offsetof(struct voicefile, index))
     {
         p_voicefile = (struct voicefile*)mp3buf;
 
         /* thumbnail buffer is the remaining space behind */
-        p_thumbnail = mp3buf + size;
+        p_thumbnail = mp3buf + file_size;
         p_thumbnail += (int)p_thumbnail % 2; /* 16-bit align */
         size_for_thumbnail = mp3end - p_thumbnail;
     }
     else
-    {
-        has_voicefile = false; /* don't try again */
-    }
-    close(fd);
+       goto load_err;
 
-    return size;
+#ifdef HAVE_MMC 
+    /* load the index table, now that we know its size from the header */
+    load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
+                * sizeof(struct clip_entry);
+    got_size = read(filehandle, 
+                    mp3buf + offsetof(struct voicefile, index), load_size);
+    if (got_size != load_size) /* read error */
+       goto load_err;
+#else
+    close(filehandle); /* only the MMC variant leaves it open */
+    filehandle = -1;
+#endif
+
+    return;
+
+load_err:
+    p_voicefile = NULL;  
+    has_voicefile = false; /* don't try again */
+    if (filehandle >= 0)
+    {
+        close(filehandle);
+        filehandle = -1;
+    }
+    return;
 }
 
 
@@ -289,7 +316,7 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
     return 0;
 }
 
-
+/* common code for talk_init() and talk_buffer_steal() */
 static void reset_state(void)
 {
     queue_write = queue_read = 0; /* reset the queue */
@@ -302,20 +329,20 @@ static void reset_state(void)
 
 void talk_init(void)
 {
-    int fd;
-
-    fd = open_voicefile();
-    if (fd >= 0) /* success */
-    {
-        close(fd);
-        has_voicefile = true;
-    }
-    else
-    {
-        has_voicefile = false; /* no voice file available */
-    }
-    
     reset_state(); /* use this for most of our inits */
+
+#ifdef HAVE_MMC
+    load_voicefile(); /* load the tables right away */
+    has_voicefile = (p_voicefile != NULL);
+#else
+    filehandle = open_voicefile();
+    has_voicefile = (filehandle >= 0); /* test if we can open it */
+    if (has_voicefile)
+    {
+        close(filehandle); /* close again, this was just to detect presence */
+        filehandle = -1;
+    }
+#endif
 }
 
 
@@ -323,6 +350,13 @@ void talk_init(void)
 int talk_buffer_steal(void)
 {
     mp3_play_stop();
+#ifdef HAVE_MMC
+    if (filehandle >= 0) /* only relevant for MMC */
+    {
+        close(filehandle);
+        filehandle = -1;
+    }
+#endif
     reset_state();
     return 0;
 }
@@ -373,8 +407,22 @@ int talk_id(int id, bool enqueue)
     clipsize = p_voicefile->index[id].size;
     if (clipsize == 0) /* clip not included in voicefile */
         return -1;
-
     clipbuf = mp3buf + p_voicefile->index[id].offset;
+
+#ifdef HAVE_MMC /* dynamic loading, on demand */
+    if (!(clipsize & LOADED_MASK))
+    {   /* clip used for the first time, needs loading */
+        lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
+        if (read(filehandle, clipbuf, clipsize) != clipsize)
+            return -1; /* read error */
+
+        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
+    }
+    else
+    {   /* clip is in memory already */
+        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
+    }
+#endif
 
     queue_clip(clipbuf, clipsize, enqueue);
 
