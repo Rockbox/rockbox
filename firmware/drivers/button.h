@@ -16,11 +16,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BUTTON_H_
+#define _BUTTON_H_
 
+#include <stdbool.h>
 #include "config.h"
 
 void button_init (void);
-int button_get (void);
+int button_get (bool block);
 
 /* Shared button codes */
 #define	BUTTON_NONE		0x0000
@@ -50,5 +53,7 @@ int button_get (void);
 #define	BUTTON_MENU		0x0002
 #define	BUTTON_PLAY		BUTTON_UP
 #define	BUTTON_STOP		BUTTON_DOWN
+
+#endif
 
 #endif

@@ -76,11 +76,11 @@ static void button_tick(void)
     }
 }
 
-int button_get(void)
+int button_get(bool block)
 {
     struct event ev;
 
-    if ( !queue_empty(&button_queue) ) {
+    if ( block || !queue_empty(&button_queue) ) {
         queue_wait(&button_queue, &ev);
         return ev.id;
     }
