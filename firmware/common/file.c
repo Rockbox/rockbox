@@ -63,6 +63,7 @@ int open(const char* pathname, int flags)
     struct dirent* entry;
     int fd;
     char* name;
+    struct filedesc* file = NULL;
 
     LDEBUGF("open(\"%s\",%d)\n",pathname,flags);
 
@@ -83,15 +84,17 @@ int open(const char* pathname, int flags)
         errno = EMFILE;
         return -2;
     }
-    memset(&openfiles[fd], 0, sizeof (struct filedesc));
+
+    file = &openfiles[fd];
+    memset(file, 0, sizeof(struct filedesc));
 
     if (flags & (O_RDWR | O_WRONLY)) {
-        openfiles[fd].write = true;
+        file->write = true;
         
         if (flags & O_TRUNC)
-            openfiles[fd].trunc = true;
+            file->trunc = true;
     }
-    openfiles[fd].busy = true;
+    file->busy = true;
 
     /* locate filename */
     name=strrchr(pathname+1,'/');
@@ -108,7 +111,7 @@ int open(const char* pathname, int flags)
     if (!dir) {
         DEBUGF("Failed opening dir\n");
         errno = EIO;
-        openfiles[fd].busy = false;
+        file->busy = false;
         return -4;
     }
 
@@ -116,38 +119,38 @@ int open(const char* pathname, int flags)
     while ((entry = readdir(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
             fat_open(entry->startcluster,
-                     &(openfiles[fd].fatfile),
+                     &(file->fatfile),
                      &(dir->fatdir));
-            openfiles[fd].size = entry->size;
+            file->size = entry->size;
             break;
         }
     }
     closedir(dir);
     if ( !entry ) {
         LDEBUGF("Didn't find file %s\n",name);
-        if ( openfiles[fd].write && (flags & O_CREAT) ) {
+        if ( file->write && (flags & O_CREAT) ) {
             if (fat_create_file(name,
-                                &(openfiles[fd].fatfile),
+                                &(file->fatfile),
                                 &(dir->fatdir)) < 0) {
                 DEBUGF("Couldn't create %s in %s\n",name,pathname);
                 errno = EIO;
-                openfiles[fd].busy = false;
+                file->busy = false;
                 return -5;
             }
-            openfiles[fd].size = 0;
+            file->size = 0;
         }
         else {
             DEBUGF("Couldn't find %s in %s\n",name,pathname);
             errno = ENOENT;
-            openfiles[fd].busy = false;
+            file->busy = false;
             return -6;
         }
     }
 
-    openfiles[fd].cacheoffset = -1;
-    openfiles[fd].fileoffset = 0;
+    file->cacheoffset = -1;
+    file->fileoffset = 0;
 
-    if (openfiles[fd].write && (flags & O_APPEND)) {
+    if (file->write && (flags & O_APPEND)) {
         if (lseek(fd,0,SEEK_END) < 0 )
             return -7;
     }
@@ -157,6 +160,7 @@ int open(const char* pathname, int flags)
 
 int close(int fd)
 {
+    struct filedesc* file = &openfiles[fd];
     int rc = 0;
 
     LDEBUGF("close(%d)\n",fd);
@@ -165,53 +169,55 @@ int close(int fd)
         errno = EINVAL;
         return -1;
     }
-    if (!openfiles[fd].busy) {
+    if (!file->busy) {
         errno = EBADF;
         return -2;
     }
-    if (openfiles[fd].write) {
+    if (file->write) {
         /* truncate? */
-        if (openfiles[fd].trunc) {
-            if (ftruncate(fd, openfiles[fd].fileoffset) < 0)
+        if (file->trunc) {
+            if (ftruncate(fd, file->fileoffset) < 0)
                 return -1;
         }
 
         /* flush sector cache */
-        if ( openfiles[fd].dirty ) {
+        if ( file->dirty ) {
             if (flush_cache(fd) < 0)
                 return -2;
         }
 
         /* tie up all loose ends */
-        if (fat_closewrite(&(openfiles[fd].fatfile), openfiles[fd].size) < 0)
+        if (fat_closewrite(&(file->fatfile), file->size) < 0)
             return -3;
     }
-    openfiles[fd].busy = false;
+    file->busy = false;
     return rc;
 }
 
 int remove(const char* name)
 {
     int rc;
+    struct filedesc* file;
     int fd = open(name, O_WRONLY);
     if ( fd < 0 )
         return fd;
 
-    rc = fat_truncate(&(openfiles[fd].fatfile));
+    file = &openfiles[fd];
+    rc = fat_truncate(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed truncating file\n");
         errno = EIO;
         return -1;
     }
 
-    rc = fat_remove(&(openfiles[fd].fatfile));
+    rc = fat_remove(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed removing file\n");
         errno = EIO;
         return -2;
     }
 
-    openfiles[fd].size = 0;
+    file->size = 0;
 
     close(fd);
 
@@ -221,24 +227,25 @@ int remove(const char* name)
 int ftruncate(int fd, unsigned int size)
 {
     int rc, sector;
+    struct filedesc* file = &openfiles[fd];
 
     sector = size / SECTOR_SIZE;
     if (size % SECTOR_SIZE)
         sector++;
 
-    rc = fat_seek(&(openfiles[fd].fatfile), sector);
+    rc = fat_seek(&(file->fatfile), sector);
     if (rc < 0) {
         errno = EIO;
         return -1;
     }
 
-    rc = fat_truncate(&(openfiles[fd].fatfile));
+    rc = fat_truncate(&(file->fatfile));
     if (rc < 0) {
         errno = EIO;
         return -2;
     }
 
-    openfiles[fd].size = size;
+    file->size = size;
 
     return 0;
 }
@@ -246,21 +253,22 @@ int ftruncate(int fd, unsigned int size)
 static int flush_cache(int fd)
 {
     int rc;
-    int sector = openfiles[fd].fileoffset / SECTOR_SIZE;
+    struct filedesc* file = &openfiles[fd];
+    int sector = file->fileoffset / SECTOR_SIZE;
     
     DEBUGF("Flushing dirty sector cache %x\n", sector);
     
     /* seek back one sector to get file position right */
-    rc = fat_seek(&(openfiles[fd].fatfile), sector);
+    rc = fat_seek(&(file->fatfile), sector);
     if ( rc < 0 )
         return -1;
     
-    rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                       openfiles[fd].cache, true );
+    rc = fat_readwrite(&(file->fatfile), 1,
+                       file->cache, true );
     if ( rc < 0 )
         return -2;
 
-    openfiles[fd].dirty = false;
+    file->dirty = false;
 
     return 0;
 }
@@ -269,8 +277,9 @@ static int readwrite(int fd, void* buf, int count, bool write)
 {
     int sectors;
     int nread=0;
+    struct filedesc* file = &openfiles[fd];
 
-    if ( !openfiles[fd].busy ) {
+    if ( !file->busy ) {
         errno = EBADF;
         return -1;
     }
@@ -279,41 +288,41 @@ static int readwrite(int fd, void* buf, int count, bool write)
              fd,buf,count,write?"write":"read");
 
     /* attempt to read past EOF? */
-    if (!write && count > openfiles[fd].size - openfiles[fd].fileoffset)
-        count = openfiles[fd].size - openfiles[fd].fileoffset;
+    if (!write && count > file->size - file->fileoffset)
+        count = file->size - file->fileoffset;
 
     /* any head bytes? */
-    if ( openfiles[fd].cacheoffset != -1 ) {
+    if ( file->cacheoffset != -1 ) {
         int headbytes;
-        int offs = openfiles[fd].cacheoffset;
-        if ( count <= SECTOR_SIZE - openfiles[fd].cacheoffset ) {
+        int offs = file->cacheoffset;
+        if ( count <= SECTOR_SIZE - file->cacheoffset ) {
             headbytes = count;
-            openfiles[fd].cacheoffset += count;
-            if ( openfiles[fd].cacheoffset >= SECTOR_SIZE )
-                openfiles[fd].cacheoffset = -1;
+            file->cacheoffset += count;
+            if ( file->cacheoffset >= SECTOR_SIZE )
+                file->cacheoffset = -1;
         }
         else {
-            headbytes = SECTOR_SIZE - openfiles[fd].cacheoffset;
-            openfiles[fd].cacheoffset = -1;
+            headbytes = SECTOR_SIZE - file->cacheoffset;
+            file->cacheoffset = -1;
         }
 
         if (write) {
-            memcpy( openfiles[fd].cache + offs, buf, headbytes );
+            memcpy( file->cache + offs, buf, headbytes );
             if (offs+headbytes == SECTOR_SIZE) {
-                int rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                                       openfiles[fd].cache, true );
+                int rc = fat_readwrite(&(file->fatfile), 1,
+                                       file->cache, true );
                 if ( rc < 0 ) {
                     errno = EIO;
                     return -2;
                 }
-                openfiles[fd].dirty = false;
-                openfiles[fd].cacheoffset = -1;
+                file->dirty = false;
+                file->cacheoffset = -1;
             }
             else
-                openfiles[fd].dirty = true;
+                file->dirty = true;
         }
         else {
-            memcpy( buf, openfiles[fd].cache + offs, headbytes );
+            memcpy( buf, file->cache + offs, headbytes );
         }
 
         nread = headbytes;
@@ -321,7 +330,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
     }
 
     /* if buffer has been modified, write it back to disk */
-    if (count && openfiles[fd].dirty) {
+    if (count && file->dirty) {
         if (flush_cache(fd) < 0)
             return -3;
     }
@@ -329,7 +338,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
     /* read whole sectors right into the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        int rc = fat_readwrite(&(openfiles[fd].fatfile), sectors, 
+        int rc = fat_readwrite(&(file->fatfile), sectors, 
                                buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
@@ -350,27 +359,27 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 count=0;
             }
 
-            openfiles[fd].cacheoffset = -1;
+            file->cacheoffset = -1;
         }
     }
 
     /* any tail bytes? */
     if ( count ) {
         if (write) {
-            if ( openfiles[fd].fileoffset + nread < openfiles[fd].size ) {
+            if ( file->fileoffset + nread < file->size ) {
                 /* sector is only partially filled. copy-back from disk */
                 int rc;
                 LDEBUGF("Copy-back tail cache\n");
-                rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                                   openfiles[fd].cache, false );
+                rc = fat_readwrite(&(file->fatfile), 1,
+                                   file->cache, false );
                 if ( rc < 0 ) {
                     DEBUGF("Failed reading\n");
                     errno = EIO;
                     return -6;
                 }
                 /* seek back one sector to put file position right */
-                rc = fat_seek(&(openfiles[fd].fatfile), 
-                              (openfiles[fd].fileoffset + nread) / 
+                rc = fat_seek(&(file->fatfile), 
+                              (file->fileoffset + nread) / 
                               SECTOR_SIZE);
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
@@ -378,29 +387,29 @@ static int readwrite(int fd, void* buf, int count, bool write)
                     return -7;
                 }
             }
-            memcpy( openfiles[fd].cache, buf + nread, count );
-            openfiles[fd].dirty = true;
+            memcpy( file->cache, buf + nread, count );
+            file->dirty = true;
         }
         else {
-            if ( fat_readwrite(&(openfiles[fd].fatfile), 1,
-                               &(openfiles[fd].cache),false) < 1 ) {
+            if ( fat_readwrite(&(file->fatfile), 1,
+                               &(file->cache),false) < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
                 return -8;
             }
-            memcpy( buf + nread, openfiles[fd].cache, count );
+            memcpy( buf + nread, file->cache, count );
         }
             
         nread += count;
-        openfiles[fd].cacheoffset = count;
+        file->cacheoffset = count;
     }
 
-    openfiles[fd].fileoffset += nread;
-    LDEBUGF("fileoffset: %d\n", openfiles[fd].fileoffset);
+    file->fileoffset += nread;
+    LDEBUGF("fileoffset: %d\n", file->fileoffset);
 
     /* adjust file size to length written */
-    if ( write && openfiles[fd].fileoffset > openfiles[fd].size )
-        openfiles[fd].size = openfiles[fd].fileoffset;
+    if ( write && file->fileoffset > file->size )
+        file->size = file->fileoffset;
 
     return nread;
 }
@@ -427,10 +436,11 @@ int lseek(int fd, int offset, int whence)
     int oldsector;
     int sectoroffset;
     int rc;
+    struct filedesc* file = &openfiles[fd];
 
     LDEBUGF("lseek(%d,%d,%d)\n",fd,offset,whence);
 
-    if ( !openfiles[fd].busy ) {
+    if ( !file->busy ) {
         errno = EBADF;
         return -1;
     }
@@ -441,59 +451,59 @@ int lseek(int fd, int offset, int whence)
             break;
 
         case SEEK_CUR:
-            pos = openfiles[fd].fileoffset + offset;
+            pos = file->fileoffset + offset;
             break;
 
         case SEEK_END:
-            pos = openfiles[fd].size + offset;
+            pos = file->size + offset;
             break;
 
         default:
             errno = EINVAL;
             return -2;
     }
-    if ((pos < 0) || (pos > openfiles[fd].size)) {
+    if ((pos < 0) || (pos > file->size)) {
         errno = EINVAL;
         return -3;
     }
 
     /* new sector? */
     newsector = pos / SECTOR_SIZE;
-    oldsector = openfiles[fd].fileoffset / SECTOR_SIZE;
+    oldsector = file->fileoffset / SECTOR_SIZE;
     sectoroffset = pos % SECTOR_SIZE;
 
     if ( (newsector != oldsector) ||
-         ((openfiles[fd].cacheoffset==-1) && sectoroffset) ) {
+         ((file->cacheoffset==-1) && sectoroffset) ) {
 
         if ( newsector != oldsector ) {
-            if (openfiles[fd].dirty) {
+            if (file->dirty) {
                 if (flush_cache(fd) < 0)
                     return -5;
             }
             
-            rc = fat_seek(&(openfiles[fd].fatfile), newsector);
+            rc = fat_seek(&(file->fatfile), newsector);
             if ( rc < 0 ) {
                 errno = EIO;
                 return -4;
             }
         }
         if ( sectoroffset ) {
-            rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                               &(openfiles[fd].cache),false);
+            rc = fat_readwrite(&(file->fatfile), 1,
+                               &(file->cache),false);
             if ( rc < 0 ) {
                 errno = EIO;
                 return -6;
             }
-            openfiles[fd].cacheoffset = sectoroffset;
+            file->cacheoffset = sectoroffset;
         }
         else
-            openfiles[fd].cacheoffset = -1;
+            file->cacheoffset = -1;
     }
     else
-        if ( openfiles[fd].cacheoffset != -1 )
-            openfiles[fd].cacheoffset = sectoroffset;
+        if ( file->cacheoffset != -1 )
+            file->cacheoffset = sectoroffset;
 
-    openfiles[fd].fileoffset = pos;
+    file->fileoffset = pos;
 
     return pos;
 }
