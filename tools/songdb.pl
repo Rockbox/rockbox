@@ -129,6 +129,10 @@ sub dodir {
 
         $id3->{'FILE'}="$dir/$f"; # store file name
 
+        $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
+        $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
+        $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
+
         # prepend Artist name to handle duplicate album names from other
         # artists
         my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
