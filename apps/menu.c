@@ -107,10 +107,6 @@ void put_cursorxy(int x, int y, bool on)
 #ifdef HAVE_LCD_BITMAP
         lcd_bitmap ( bitmap_icons_6x8[Cursor], 
                      xpos, ypos, 4, 8, true);
-#elif defined(SIMULATOR)
-        /* player simulator */
-        unsigned char cursor[] = { 0x7f, 0x3e, 0x1c, 0x08 };
-        lcd_bitmap ( cursor, x*6, 12+y*16, 4, 8, true);
 #else
         lcd_putc(x, y, CURSOR_CHAR);
 #endif
@@ -119,9 +115,6 @@ void put_cursorxy(int x, int y, bool on)
 #if defined(HAVE_LCD_BITMAP)
         /* I use xy here since it needs to disregard the margins */
         lcd_clearrect (xpos, ypos, 4, 8);
-#elif defined(SIMULATOR)
-        /* player simulator in action */
-        lcd_clearrect (x*6, 12+y*16, 4, 8);
 #else
         lcd_putc(x, y, ' ');
 #endif
