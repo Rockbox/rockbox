@@ -59,6 +59,14 @@ static bool invert(void)
     return rc;
 }
 
+static bool invert_cursor(void)
+{
+    bool rc = set_bool( str(LANG_INVERT_CURSOR),
+                        &global_settings.invert_cursor);
+
+    return rc;
+}
+
 /**
  * Menu to configure the battery display on status bar
  */
@@ -726,6 +734,7 @@ static bool display_settings_menu(void)
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_INVERT),          invert },
+        { str(LANG_INVERT_CURSOR),   invert_cursor },
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },

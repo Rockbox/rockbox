@@ -81,6 +81,7 @@ struct scrollinfo {
     int starty;
     bool backward; /* scroll presently forward or backward? */
     bool bidir;
+    bool invert; /* invert the scrolled text */
     long start_tick;
 };
 
@@ -270,6 +271,11 @@ int lcd_getstringsize(unsigned char *str, int *w, int *h)
 /* put a string at a given char position */
 void lcd_puts(int x, int y, unsigned char *str)
 {
+    lcd_puts_style(x, y, str, STYLE_DEFAULT);
+}
+
+void lcd_puts_style(int x, int y, unsigned char *str, int style)
+{
     int xpos,ypos,w,h;
 
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
@@ -294,6 +300,8 @@ void lcd_puts(int x, int y, unsigned char *str)
     ypos = ymargin + y*h;
     lcd_putsxy(xpos, ypos, str);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
+    if (style & STYLE_INVERT)
+        lcd_invertrect(xpos, ypos, LCD_WIDTH - xpos, h);
 
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     lcd_update();
@@ -670,14 +678,19 @@ void lcd_invertpixel(int x, int y)
     INVERT_PIXEL(x,y);
 }
 
-void lcd_puts_scroll(int x, int y, unsigned char* string)
+void lcd_puts_scroll(int x, int y, unsigned char *string)
+{
+    lcd_puts_scroll_style(x, y, string, STYLE_DEFAULT);
+}
+
+void lcd_puts_scroll_style(int x, int y, unsigned char *string, int style)
 {
     struct scrollinfo* s;
     int w, h;
     int index;
     int free_index=0;
 
-    DEBUGF("puts_scroll: %s\n", string);
+    DEBUGF("puts_scroll_style: %s\n", string);
     
     for (index = 0; index < SCROLLABLE_LINES; index++) {
         s = &scroll[index];
@@ -698,8 +711,14 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
     index=free_index;
     s = &scroll[index]; /* get the proper 's' */
     s->start_tick = current_tick + scroll_delay;
+    s->invert = false;
+    if (style & STYLE_INVERT) {
+        s->invert = true;
+        lcd_puts_style(x,y,string,STYLE_INVERT);
+    }
+    else
+        lcd_puts(x,y,string);
 
-    lcd_puts(x,y,string);
     lcd_getstringsize(string, &w, &h);
 
     if (LCD_WIDTH - x * 8 - xmargin < w) {
@@ -819,6 +838,8 @@ static void scroll_thread(void)
 
             lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
             lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+            if (s->invert)
+                lcd_invertrect(xpos, ypos, LCD_WIDTH - xmargin, h);
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xmargin, h);
         }
 

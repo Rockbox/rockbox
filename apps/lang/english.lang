@@ -1462,3 +1462,8 @@ id: LANG_VBRFIX
 desc: The context menu entry
 eng: "Update VBR file"
 new: 
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Invert cursor"
+new:

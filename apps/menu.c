@@ -64,7 +64,7 @@ struct menu {
                       the margins, so this is the amount of lines
                       we add to the cursor Y position to position
                       it on a line */
-#define CURSOR_WIDTH  4
+#define CURSOR_WIDTH (global_settings.invert_cursor ? 0 : 4)
 
 #define SCROLLBAR_X      0
 #define SCROLLBAR_Y      lcd_getymargin()
@@ -92,6 +92,8 @@ void put_cursorxy(int x, int y, bool on)
 #ifdef HAVE_LCD_BITMAP
     int fh, fw;
     int xpos, ypos;
+    if (global_settings.invert_cursor)
+        return;
     lcd_getstringsize("A", &fw, &fh);
     xpos = x*6;
     ypos = y*fh + lcd_getymargin();
@@ -146,7 +148,13 @@ static void menu_draw(int m)
          (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
          i++) {
         if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
-            lcd_puts_scroll(LINE_X, i-menus[m].top, menus[m].items[i].desc);
+#ifdef HAVE_LCD_BITMAP
+            if (global_settings.invert_cursor)
+                lcd_puts_scroll_style(LINE_X, i-menus[m].top,
+                                       menus[m].items[i].desc, STYLE_INVERT);
+            else
+#endif
+                lcd_puts_scroll(LINE_X, i-menus[m].top, menus[m].items[i].desc);
         else
             lcd_puts(LINE_X, i-menus[m].top, menus[m].items[i].desc);
     }
@@ -197,8 +205,8 @@ static void put_cursor(int m, int target)
         do_update = false;
     }
 
-    if (do_update) {
-        put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true); 
+    if (do_update && !global_settings.invert_cursor) {
+        put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
         lcd_update();
     }
 

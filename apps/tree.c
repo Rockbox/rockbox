@@ -107,7 +107,7 @@ void browse_root(void)
                       the margins, so this is the amount of lines
                       we add to the cursor Y position to position
                       it on a line */
-#define CURSOR_WIDTH  4
+#define CURSOR_WIDTH  (global_settings.invert_cursor ? 0 : 4)
 
 #define ICON_WIDTH    6
 
@@ -195,7 +195,13 @@ static void showfileline(int line, int direntry, bool scroll)
             *dotpos = 0;
         }
         if(scroll)
-            lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+#ifdef HAVE_LCD_BITMAP
+            if (global_settings.invert_cursor)
+                lcd_puts_scroll_style(LINE_X, line, dircache[direntry].name,
+                                      STYLE_INVERT);
+            else
+#endif
+                lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
         else
             lcd_puts(LINE_X, line, dircache[direntry].name);
         if (temp)
@@ -203,7 +209,13 @@ static void showfileline(int line, int direntry, bool scroll)
     }
     else {
         if(scroll)
-            lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+#ifdef HAVE_LCD_BITMAP
+            if (global_settings.invert_cursor)
+                lcd_puts_scroll_style(LINE_X, line, dircache[direntry].name,
+                                      STYLE_INVERT);
+            else
+#endif
+                lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
         else
             lcd_puts(LINE_X, line, dircache[direntry].name);
     }
@@ -666,6 +678,11 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
     int dircursor = *dc;
     char buf[MAX_PATH];
 
+#ifdef HAVE_LCD_BITMAP
+    int fw, fh;
+    lcd_getstringsize("A", &fw, &fh);
+#endif
+
     while (!exit) {
         switch (button_get(true)) {
             case TREE_PREV:
@@ -717,8 +734,19 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
                 break;
         }
         if ( used && !exit ) {
+#ifdef HAVE_LCD_BITMAP
+            int xpos,ypos;
+#endif
             showdir(currdir, dirstart);
-            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
+#ifdef HAVE_LCD_BITMAP
+            if (global_settings.invert_cursor) {
+                xpos = lcd_getxmargin();
+                ypos = (CURSOR_Y + dircursor) * fh + lcd_getymargin();
+                lcd_invertrect(xpos, ypos, LCD_WIDTH-xpos, fh);
+            }
+            else
+#endif
+                put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
             lcd_update();
         }
     }
@@ -1020,8 +1048,7 @@ bool dirbrowse(char *root)
                 {
                     if (dircursor + dirstart + 1 < numentries ) {
                         if(dircursor+1 < tree_max_on_screen) {
-                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
-                                         false);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
                             dircursor++;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 
@@ -1034,8 +1061,7 @@ bool dirbrowse(char *root)
                     }
                     else {
                         if(numentries < tree_max_on_screen) {
-                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
-                                         false);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
                             dirstart = dircursor = 0;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 

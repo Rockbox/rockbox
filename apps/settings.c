@@ -84,7 +84,7 @@ offset  abs
 0x08    0x1c    <loudness byte>
 0x09    0x1d    <bass boost byte>
 0x0a    0x1e    <contrast (bit 0-5), invert bit (bit 6)>
-0x0b    0x1f    <backlight_on_when_charging, backlight_timeout>
+0x0b    0x1f    <backlight_on_when_charging, invert_cursor, backlight_timeout>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,dirfilter,sort_case,discharge,statusbar,show_hidden,
@@ -304,7 +304,8 @@ int settings_save( void )
 
     config_block[0xb] = (unsigned char)
         ((global_settings.backlight_on_when_charging?0x40:0) |
-         (global_settings.backlight_timeout & 0x3f));
+         (global_settings.invert_cursor ? 0x20 : 0) |
+         (global_settings.backlight_timeout & 0x1f));
     config_block[0xc] = (unsigned char)global_settings.poweroff;
     config_block[0xd] = (unsigned char)global_settings.resume;
     
@@ -560,7 +561,9 @@ void settings_load(void)
 
         if (config_block[0xb] != 0xFF) {
             /* Bit 7 is unused to be able to detect uninitialized entry */
-            global_settings.backlight_timeout = config_block[0xb] & 0x3f;
+            global_settings.backlight_timeout = config_block[0xb] & 0x1f;
+            global_settings.invert_cursor =
+                config_block[0xb] & 0x20 ? true : false;
             global_settings.backlight_on_when_charging =
                 config_block[0xb] & 0x40 ? true : false;
         }
@@ -657,7 +660,7 @@ void settings_load(void)
                 config_block[0x28] | (config_block[0x29] << 8);
 
         global_settings.fade_on_stop=config_block[0xae];
-	
+
         global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
         global_settings.peak_meter_performance = 
             (config_block[0xb0] & 0x80) != 0;
@@ -679,9 +682,9 @@ void settings_load(void)
         if (config_block[0xb7] != 0xff)
             global_settings.bidir_limit = config_block[0xb7];
 
-	if (config_block[0xae] != 0xff)
-	    global_settings.fade_on_stop = config_block[0xae];
-	
+        if (config_block[0xae] != 0xff)
+            global_settings.fade_on_stop = config_block[0xae];
+
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -941,6 +944,8 @@ bool settings_load_config(char* file)
             set_cfg_bool(&global_settings.scrollbar, value);
         else if (!strcasecmp(name, "invert"))
             set_cfg_bool(&global_settings.invert, value);
+        else if (!strcasecmp(name, "invert cursor"))
+            set_cfg_bool(&global_settings.invert_cursor, value);
 #endif
         else if (!strcasecmp(name, "shuffle"))
             set_cfg_bool(&global_settings.playlist_shuffle, value);
@@ -1305,6 +1310,10 @@ bool settings_save_config(void)
         snprintf(buf, sizeof(buf), "invert: %s\r\n",
                  options[global_settings.invert]);
         write(fd, buf, strlen(buf));
+
+        snprintf(buf, sizeof(buf), "invert cursor: %s\r\n",
+                 options[global_settings.invert_cursor]);
+        write(fd, buf, strlen(buf));
     }
 
     snprintf(buf, sizeof(buf), "peak meter release: %d\r\n",
@@ -1463,6 +1472,7 @@ void settings_reset(void) {
     global_settings.invert      = DEFAULT_INVERT_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
+    global_settings.invert_cursor = DEFAULT_INVERT_CURSOR_SETTING;
     global_settings.backlight_on_when_charging   = 
         DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
     global_settings.battery_capacity = 1500; /* mAh */
@@ -1684,7 +1694,7 @@ bool set_option(char* string, int* variable, char* options[],
 #endif
                 if ( *variable < (numoptions-1) )
                     (*variable)++;
-				else
+                else
                     (*variable) -= (numoptions-1);
                 break;
 

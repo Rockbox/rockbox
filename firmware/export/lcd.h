@@ -24,14 +24,20 @@
 #include "sh7034.h"
 #include "config.h"
 
+#define STYLE_DEFAULT 0
+#define STYLE_INVERT  1
+
 /* common functions */
 extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, unsigned char *string);
+extern void lcd_puts_style(int x, int y, unsigned char *string, int style);
 extern void lcd_putc(int x, int y, unsigned short ch);
 
 extern void lcd_puts_scroll(int x, int y, unsigned char* string );
+extern void lcd_puts_scroll_style(int x, int y, unsigned char* string,
+                                  int style);
 extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);
 extern void lcd_scroll_speed( int speed );
