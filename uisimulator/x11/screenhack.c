@@ -403,6 +403,11 @@ int main (int argc, char **argv)
 
     if (argc > 1)
     {
+        fprintf (stderr, 
+                 "This is the RockBox simulator.  The firmware will not take\n"
+                 "arguements, so the simulator will not either.\n");
+		exit(0);
+#ifdef LETS_NOT_USE_ARGS
         const char *s;
         int i;
         int x = 18;
@@ -432,6 +437,7 @@ int main (int argc, char **argv)
         }
         fprintf (stderr, ".\n");
         exit (help_p ? 0 : 1);
+#endif
     }
 
     dont_clear = get_boolean_resource ("dontClearRoot", "Boolean");
