@@ -13,8 +13,8 @@ Build Your Own Rockbox
 
    (For more information about the simulator, read UISIMULATOR.)
 
-   $ cvs -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox login 
-   $ cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox
+   $ cvs -d:pserver:anonymous@rockbox.haxx.se:/cvsroot/rockbox login 
+   $ cvs -z3 -d:pserver:anonymous@rockbox.haxx.se:/cvsroot/rockbox co rockbox
 
      or
 
