@@ -30,7 +30,7 @@ is not yet enabled on the players by default.
 
 <h2>Recent CVS activity</h2>
 <p>
-<!--#include file="last5.html" -->
+<!--#include file="lastcvs.link" -->
 
 <h2>Open bug reports</h2>
 <p>

@@ -21,6 +21,7 @@ all: $(OBJS)
 	@(cd sh-win; $(MAKE))
 	@(cd download; $(MAKE))
 	@(cd manual; $(MAKE))
+	@(cd tshirt-contest; $(MAKE))
 
 main.html: main.t activity.html
 
@@ -31,3 +32,5 @@ index.shtml: main.shtml
 
 daily.shtml: daily.t
 
+bugs.html:
+	perl getbugs.pl > bugs.html

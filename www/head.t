@@ -39,7 +39,7 @@
 <a class="menulink" href="/internals/">photos</a><br>
 <a class="menulink" href="/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/cvs.html">CVS</a><br>
-<a class="menulink" href="http://sourceforge.net/projects/">sourceforge</a><br>
+<a class="menulink" href="http://sourceforge.net/projects/rockbox/">sourceforge</a><br>
 <a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
