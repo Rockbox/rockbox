@@ -149,6 +149,8 @@ static int showdir(char *path, int start)
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_putsxy(0,0, "[Browse]",0);
+    lcd_setmargins(0,MARGIN_Y);
+    lcd_setfont(0);
     lcd_update();
 #endif
 
@@ -231,17 +233,9 @@ bool dirbrowse(char *root)
 {
     char buf[255];
     int i;
-    lcd_clear_display();
 
-#ifdef HAVE_LCD_BITMAP
-    lcd_putsxy(0,0, "[Browse]",0);
-    lcd_setmargins(0,MARGIN_Y);
-    lcd_setfont(0);
-#endif
     memcpy(currdir,root,sizeof(currdir));
-
     numentries = showdir(root, start);
-
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
@@ -314,7 +308,6 @@ bool dirbrowse(char *root)
                         playing = 0;
                     }
                 }
-
                 numentries = showdir(currdir, start);  
                 lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 break;
