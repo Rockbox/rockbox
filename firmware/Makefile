@@ -31,8 +31,6 @@ else
 CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
-AFLAGS += -small -relax
-
 SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
 
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o
@@ -48,6 +46,10 @@ $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/%.o: %.S
+	@mkdir -p `dirname $@`
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	rm -f $(OBJS) $(OUTPUT)
 	rm -rf $(OBJDIR)/$(DEPS)
@@ -55,9 +57,6 @@ clean:
 # Special targets
 $(OBJDIR)/thread.o: thread.c thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
-
-$(OBJDIR)/crt0.o: crt0.S
-	$(AS) $(AFLAGS) -o $@ $<
 
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
