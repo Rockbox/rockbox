@@ -157,7 +157,7 @@ new: "PÅ för att ställa"
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "AV flr att återgå"
+new: "AV för att återgå"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -197,7 +197,7 @@ new: ""
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Sortera olika"
+new: "Sortera skiftlägeskänsligt"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -247,12 +247,12 @@ new: "Disk spindown"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "FF/RW Min Step"
+new: "FF/RW Min Steg"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "FF/RW Accel"
+new: "FF/RW Acceleration"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -372,7 +372,7 @@ new: "AV falltid"
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-new: "kanaler"
+new: "Kanaler"
 
 id: LANG_CHANNEL
 desc: in sound_settings
@@ -407,12 +407,12 @@ new: "Automatvolym"
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-new: "Filsystemet bufferten"
+new: "Filsystembufferten"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "är fullt!"
+new: "är full!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the beginning when resume is on
@@ -437,12 +437,12 @@ new: "Övriga = Nej"
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Keylock ON"
-new: "Tangentlås PÅ"
+new: "Lås PÅ"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Keylock OFF"
-new: "Tangentlås AV"
+new: "Lås AV"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -457,22 +457,22 @@ new: "Tangentlåset är AV"
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Mute PÅ"
+new: "Tyst PÅ"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "MUTE OFF"
-new: "MUTE AV"
+new: "TYST AV"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Mute är PÅ"
+new: "Tyst är PÅ"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Mute är AV"
+new: "Tyst är AV"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
@@ -552,12 +552,12 @@ new: "[VÄG]"
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch up"
-new: "Tonhöjd upp"
+new: "Höj tonläget"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch down"
-new: "Tonhöjd ner"
+new: "Sänk tonläget"
 
 id: LANG_PAUSE
 desc: in wps
@@ -817,32 +817,27 @@ new: "Belysning vid laddning"
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip hold time"
-### Not previously translated
-new: 
+new: "Klipphålltid"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "eternal"
-### Not previously translated
-new: 
+new: "oändlig"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak meter"
-### Not previously translated
-new: 
+new: "Toppmätare"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak hold time"
-### Not previously translated
-new: 
+new: "Topphålltid"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak release"
-### Not previously translated
-new: 
+new: "Toppsläppning"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
