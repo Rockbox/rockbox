@@ -270,13 +270,14 @@ int charging_screen(void)
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
     lcd_clear_display();
-    if(global_settings.backlight_on_when_charging)
-       backlight_on();
+    backlight_set_timeout(global_settings.backlight_timeout);
+    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     status_draw(true);
 
 #ifdef HAVE_LCD_BITMAP
     charging_display_info(false);
 #else
+    lcd_double_height(false);
     lcd_puts(0, 1, "[charging]");
 #endif
     
