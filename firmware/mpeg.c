@@ -1713,7 +1713,7 @@ void mpeg_sound_channel_config(int configuration)
 #endif
             break;
         case MPEG_SOUND_MONO_RIGHT:
-            val_on = 0xc0000;
+            val_on = 0x80000;
 #ifdef HAVE_MAS3587F
             mas_writemem(MAS_BANK_D0, 0x7fc, &val_off, 1); /* LL */
             mas_writemem(MAS_BANK_D0, 0x7fd, &val_off, 1); /* LR */
