@@ -34,7 +34,6 @@
 #include "id3.h"
 
 /* Some utility macros used in getsonglength() */
-#define CHECKSYNC(x) (((x >> 21) & 0x07FF) == 0x7FF)
 #define BYTE0(x) ((x >> 24) & 0xFF)
 #define BYTE1(x) ((x >> 16) & 0xFF)
 #define BYTE2(x) ((x >> 8)  & 0xFF)
@@ -345,6 +344,29 @@ static int getid3v1len(int fd)
     return offset;
 }
 
+/* check if 'head' is a valid mp3 frame header */
+static bool mp3frameheader(unsigned long head)
+{
+    if ((head & 0xffe00000) != 0xffe00000) /* bad sync? */
+        return false;
+    if (!((head >> 17) & 3)) /* no layer? */
+        return false;
+    if (((head >> 12) & 0xf) == 0xf) /* bad bitrate? */
+        return false;
+    if (!((head >> 12) & 0xf)) /* no bitrate? */
+        return false;
+    if (((head >> 10) & 0x3) == 0x3) /* bad sample rate? */
+        return false;
+    if (((head >> 19) & 1) == 1 &&
+        ((head >> 17) & 3) == 3 &&
+        ((head >> 16) & 1) == 1)
+        return false;
+    if ((head & 0xffff0000) == 0xfffe0000)
+        return false;
+	
+    return true;
+}
+
 /*
  * Calculates the length (in milliseconds) of an MP3 file. Currently this code
  * doesn't care about VBR (Variable BitRate) files since it would have to scan
@@ -397,7 +419,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
         if(!read(fd, &tmp, 1))
             return -1;
         header |= tmp;
-    } while(!CHECKSYNC(header));
+    } while(!mp3frameheader(header));
 	
     /* 
      * Some files are filled with garbage in the beginning, 
