@@ -567,8 +567,9 @@ void mpeg_treble(int percent)
 
 void mpeg_init(void)
 {
-    int rc;
+#ifdef ARCHOS_RECORDER
     unsigned long val;
+#endif
 
     setup_sci0();
     i2c_init();
@@ -593,7 +594,7 @@ void mpeg_init(void)
     mas_codec_writereg(0x0, 0x0001);
 
     /* DSP scale 100% */
-    rc = mas_codec_writereg(7, 0x4000);
+    mas_codec_writereg(7, 0x4000);
 
     /* Disable S/PDIF, SDO and SDI */
     val = 0x2d;
