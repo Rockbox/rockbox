@@ -233,9 +233,6 @@ bool dbg_hw_info(void)
     int pr_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
-    unsigned char sec, sec2;
-    unsigned long tick;
-    bool is_12mhz;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
 
@@ -249,19 +246,6 @@ bool dbg_hw_info(void)
     else
         pr_polarity = 1; /* Positive */
 
-    sec = rtc_read(0x01);
-    do {
-        sec2 = rtc_read(0x01);
-    } while(sec == sec2);
-
-    tick = current_tick;
-    
-    do {
-        sec = rtc_read(0x01);
-    } while(sec2 == sec);
-
-    is_12mhz = (current_tick - tick > HZ);
-    
     /* get flash ROM type */
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
     if (!got_id)
@@ -288,14 +272,11 @@ bool dbg_hw_info(void)
     snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
     lcd_puts(0, 5, buf);
     
-    snprintf(buf, 32, "Freq: %s", is_12mhz?"12MHz":"11.0592MHz");
-    lcd_puts(0, 6, buf);
-    
     if (got_id)
         snprintf(buf, 32, "Flash: M=%02x D=%02x", manu, id);
     else
         snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
-    lcd_puts(0, 7, buf);
+    lcd_puts(0, 6, buf);
     
     lcd_update();
 
@@ -1254,12 +1235,34 @@ static bool dbg_disk_info(void)
     return false;
 }
 
+bool dbg_save_roms(void)
+{
+    int fd;
+
+    fd = creat("/internal_rom_0000-FFFF.bin", O_WRONLY);
+    if(fd >= 0)
+    {
+        write(fd, (void *)0, 0x10000);
+        close(fd);
+    }
+    
+    fd = creat("/internal_rom_2000000-203FFFF.bin", O_WRONLY);
+    if(fd >= 0)
+    {
+        write(fd, (void *)0x2000000, 0x40000);
+        close(fd);
+    }
+
+    return false;
+}
+
 bool debug_menu(void)
 {
     int m;
     bool result;
 
     struct menu_items items[] = {
+        { "Dump ROM contents", dbg_save_roms },
         { "View I/O ports", dbg_ports },
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC
