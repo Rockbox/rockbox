@@ -100,6 +100,11 @@ void pgfx_drawpixel(int x, int y)
     gfx_buffer[pixel_height * (x/5) + y] |= 0x10 >> (x%5);
 }
 
+void pgfx_clearpixel(int x, int y)
+{
+    gfx_buffer[pixel_height * (x/5) + y] &= ~(0x10 >> (x%5));
+}
+
 void pgfx_invertpixel(int x, int y)
 {
     gfx_buffer[pixel_height * (x/5) + y] ^= 0x10 >> (x%5);
@@ -177,6 +182,11 @@ static void linefunc(int x1, int y1, int x2, int y2,
 void pgfx_drawline(int x1, int y1, int x2, int y2)
 {
     linefunc(x1, y1, x2, y2, pgfx_drawpixel);
+}
+
+void pgfx_clearline(int x1, int y1, int x2, int y2)
+{
+    linefunc(x1, y1, x2, y2, pgfx_clearpixel);
 }
 
 void pgfx_invertline(int x1, int y1, int x2, int y2)

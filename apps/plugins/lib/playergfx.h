@@ -32,8 +32,10 @@ void pgfx_display(int cx, int cy);
 void pgfx_update(void);
 void pgfx_clear_display(void);
 void pgfx_drawpixel(int x, int y);
+void pgfx_clearpixel(int x, int y);
 void pgfx_invertpixel(int x, int y);
 void pgfx_drawline(int x1, int y1, int x2, int y2);
+void pgfx_clearline(int x1, int y1, int x2, int y2);
 void pgfx_invertline(int x1, int y1, int x2, int y2);
 void pgfx_invertrect (int x, int y, int nx, int ny);
 
