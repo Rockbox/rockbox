@@ -111,8 +111,8 @@ void set_battery_capacity(int capacity)
     battery_capacity = capacity;
     if (battery_capacity > BATTERY_CAPACITY_MAX)
         battery_capacity = BATTERY_CAPACITY_MAX;
-    if (battery_capacity < 1500)
-        battery_capacity = 1500;
+    if (battery_capacity < BATTERY_CAPACITY_MIN)
+        battery_capacity = BATTERY_CAPACITY_MIN;
 }
 
 #if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
