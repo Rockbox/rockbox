@@ -50,5 +50,17 @@
   <li>Devel - sh-gcc</li>
  </ul>
 
+<h2>Step 4: Set the PATH variable</h2>
+<p>
+ Now you edit your .bash_profile and add the following last:
+
+<p>
+ <pre>PATH=${PATH}:/opt/sh1/bin</pre>
+
+<p>
+ Done. Happy hacking!
+
+<p>
+ <i>Linus</i>
 
 #include "foot.t"
