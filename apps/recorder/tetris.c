@@ -316,7 +316,7 @@ void move_down(void)
             from_virtual();
             score += l*l;
         }
-        sprintf (s, "%d Rows - Level %d", lines, level);
+        snprintf (s, sizeof(s), "%d Rows - Level %d", lines, level);
         lcd_putsxy (2, 52, s, 0);
         new_block();
         move_block(0,0,0);
