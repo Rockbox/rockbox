@@ -122,12 +122,24 @@ void PlatformInit(void)
 #endif
 
 #if defined PLATFORM_PLAYER
-    BRR1   = 0x19;   /* 14400 Baud for monitor */
-    PACR2 &= 0xFFFC; /* GPIO for PA0 (charger detection, input by default) */
-    if (FW_VERSION > 451 && (PADRL & 0x01))
-    {   /* "new" Player and charger not plugged? */
-        PBDR  |= 0x0010; /* set PB4 to 1 to power-up the harddisk early */
-        PBIOR |= 0x0010; /* make PB4 an output */
+    BRR1    = 0x19; /* 14400 Baud for monitor */
+    PBDRL  |= 0x10; /* set PB4 to 1 to power the hd early (and prepare for
+                     * probing in case the charger is connected) */
+    PBIORL |= 0x10; /* make PB4 an output */
+    PACR2  &= 0xFFFC; /* GPIO for PA0 (charger detection, input by default) */
+    if (!(PADRL & 0x01)) /* charger plugged? */
+    {   /* we need to probe whether the box is able to control hd power */
+        int i;
+
+        PBIORL &= ~0x10; /* set PB4 to input */
+        /* wait whether it goes low, max. ~1 ms */
+        for (i = 0; (PBDRL & 0x10) && i < 1000; i++);
+
+        if (~(PBDRL & 0x10)) /* pulled low -> power controllable */
+            PBDRL &= 0x10;   /* set PB4 low */
+        else                 /* still floating high -> not controllable */
+            PBDRL |= 0x10;   /* set PB4 high */
+        PBIORL |= 0x10;      /* ..and output again */
     }
 #elif defined PLATFORM_RECORDER
     BRR1 = 0x02;     /* 115200 Baud for monitor */
