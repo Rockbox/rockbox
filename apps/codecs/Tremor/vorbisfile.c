@@ -657,10 +657,12 @@ static int _fetch_and_process_packet(OggVorbis_File *vf,
 
 /* if, eg, 64 bit stdio is configured by default, this will build with
    fseek64 */
+#if 0
 static int _fseek64_wrap(FILE *f,ogg_int64_t off,int whence){
   if(f==NULL)return(-1);
   return fseek(f,off,whence);
 }
+#endif
 
 static int _ov_open1(void *f,OggVorbis_File *vf,char *initial,
 		     long ibytes, ov_callbacks callbacks){
@@ -764,6 +766,7 @@ int ov_open_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
   return _ov_open2(vf);
 }
 
+#if 0
 int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
   ov_callbacks callbacks = {
     (size_t (*)(void *, size_t, size_t, void *))  fread,
@@ -774,6 +777,7 @@ int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
 
   return ov_open_callbacks((void *)f, vf, initial, ibytes, callbacks);
 }
+#endif
   
 /* Only partially open the vorbis file; test for Vorbisness, and load
    the headers for the first chain.  Do not seek (although test for
@@ -786,6 +790,7 @@ int ov_test_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
   return _ov_open1(f,vf,initial,ibytes,callbacks);
 }
 
+#if 0
 int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
   ov_callbacks callbacks = {
     (size_t (*)(void *, size_t, size_t, void *))  fread,
@@ -796,6 +801,7 @@ int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
 
   return ov_test_callbacks((void *)f, vf, initial, ibytes, callbacks);
 }
+#endif
   
 int ov_test_open(OggVorbis_File *vf){
   if(vf->ready_state!=PARTOPEN)return(OV_EINVAL);
@@ -988,7 +994,7 @@ int ov_raw_seek(OggVorbis_File *vf,ogg_int64_t pos){
     int lastblock=0;
     int accblock=0;
     int thisblock;
-    int eosflag;
+    int eosflag=0;
 
     work_os=ogg_stream_create(vf->current_serialno); /* get the memory ready */
     while(1){

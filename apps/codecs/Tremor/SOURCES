@@ -11,4 +11,6 @@ registry.c
 res012.c
 sharedbook.c
 synthesis.c
+vorbisfile.c
 window.c
+ctype.c

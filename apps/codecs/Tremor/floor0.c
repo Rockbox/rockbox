@@ -139,6 +139,7 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
 			 ogg_int32_t ampoffset,
 			 ogg_int32_t *icos){
 
+  (void)ln;
   /* 0 <= m < 256 */
 
   /* set up for using all int later */
@@ -343,7 +344,7 @@ static vorbis_info_floor *floor0_unpack (vorbis_info *vi,oggpack_buffer *opb){
 static vorbis_look_floor *floor0_look (vorbis_dsp_state *vd,vorbis_info_mode *mi,
                               vorbis_info_floor *i){
   int j;
-  ogg_int32_t scale; 
+  //  ogg_int32_t scale; 
   vorbis_info        *vi=vd->vi;
   codec_setup_info   *ci=(codec_setup_info *)vi->codec_setup;
   vorbis_info_floor0 *info=(vorbis_info_floor0 *)i;
@@ -413,7 +414,8 @@ static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
 			   void *memo,ogg_int32_t *out){
   vorbis_look_floor0 *look=(vorbis_look_floor0 *)i;
   vorbis_info_floor0 *info=look->vi;
-  
+  (void)vb;
+
   if(memo){
     ogg_int32_t *lsp=(ogg_int32_t *)memo;
     ogg_int32_t amp=lsp[look->m];
