@@ -61,26 +61,15 @@ static struct mp3entry* id3 = NULL;
 static int old_release_mask;
 
 #ifdef HAVE_PLAYER_KEYPAD
-void player_change_volume(void)
+void player_change_volume(int button)
 {
-    int button;
-    bool fun_done = false;
+    bool exit = false;
     char buffer[32];
 
     lcd_stop_scroll();
-    while(!fun_done)
+    while (!exit)
     {
-        snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", global_settings.volume * 2);
-
-#ifdef HAVE_LCD_CHARCELLS
-        lcd_puts(0, 0, buffer);
-#else
-        lcd_puts(2, 3, buffer);
-        lcd_update();
-#endif
-
-        button = button_get(false);
-        switch(button)
+        switch (button)
         {
             case BUTTON_MENU | BUTTON_RIGHT:
             case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
@@ -91,6 +80,7 @@ void player_change_volume(void)
                 wps_refresh(id3,0,false);
                 settings_save();
                 break;
+
             case BUTTON_MENU | BUTTON_LEFT:
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
                 global_settings.volume--;
@@ -100,11 +90,23 @@ void player_change_volume(void)
                 wps_refresh(id3,0,false);
                 settings_save();
                 break;
+
             case BUTTON_MENU | BUTTON_REL:
-                fun_done = true;
+                exit = true;
                 break;
         }
-        yield();
+
+        snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", 
+                 global_settings.volume * 2);
+
+#ifdef HAVE_LCD_CHARCELLS
+        lcd_puts(0, 0, buffer);
+#else
+        lcd_puts(2, 3, buffer);
+        lcd_update();
+#endif
+        if (!exit)
+            button = button_get(true);
     }
     status_draw();
     wps_refresh(id3,0,true);
@@ -142,12 +144,12 @@ void display_mute_text(bool muted)
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
-    if(muted)
+    if (muted)
         lcd_puts(0, 0, "Mute ON");
     else
         lcd_puts(0, 0, "Mute OFF");
 #else
-    if(muted)
+    if (muted)
     {
         lcd_puts(2, 3, "Mute is ON");
     }
@@ -191,23 +193,72 @@ int player_id3_show(void)
     int button;
     int menu_pos = 0;
     int menu_max = 6;
-    bool menu_changed = true;
+    bool exit = false;
     char scroll_text[MAX_PATH];
 
     lcd_stop_scroll();
     lcd_clear_display();
     lcd_puts(0, 0, "-ID3 Info- ");
     lcd_puts(0, 1, "--Screen-- ");
-    sleep(HZ*1.5);
+    sleep(HZ);
  
-    while(1)
+    while (!exit)
     {
-        button = button_get(false);
+        lcd_stop_scroll();
+        lcd_clear_display();
+
+        switch (menu_pos)
+        {
+            case 0:
+                lcd_puts(0, 0, "[Title]");
+                lcd_puts_scroll(0, 1, id3->title ? id3->title : "<no title>");
+                break;
+
+            case 1:
+                lcd_puts(0, 0, "[Artist]");
+                lcd_puts_scroll(0, 1, 
+                                id3->artist ? id3->artist : "<no artist>");
+                break;
+
+            case 2:
+                lcd_puts(0, 0, "[Album]");
+                lcd_puts_scroll(0, 1, id3->album ? id3->album : "<no album>");
+                break;
+
+            case 3:
+                lcd_puts(0, 0, "[Length]");
+                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
+                         id3->length / 60000,
+                         id3->length % 60000 / 1000 );
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 4:
+                lcd_puts(0, 0, "[Bitrate]");
+                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
+                         id3->bitrate);
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 5:
+                lcd_puts(0, 0, "[Frequency]");
+                snprintf(scroll_text,sizeof(scroll_text), "%d kHz",
+                        id3->frequency);
+                lcd_puts(0, 1, scroll_text);
+                break;
+
+            case 6:
+                lcd_puts(0, 0, "[Path]");
+                lcd_puts_scroll(0, 1, id3->path);
+                break;
+        }
+        lcd_update();
+
+        button = button_get(true);
 
         switch(button)
         {
             case BUTTON_LEFT:
-                menu_changed = true;
                 if (menu_pos > 0)
                     menu_pos--;
                 else
@@ -215,7 +266,6 @@ int player_id3_show(void)
                 break;
 
             case BUTTON_RIGHT:
-                menu_changed = true;
                 if (menu_pos < menu_max)
                     menu_pos++;
                 else
@@ -229,7 +279,7 @@ int player_id3_show(void)
             case BUTTON_PLAY:
                 lcd_stop_scroll();
                 wps_display(id3);
-                return(0);
+                exit = true;
                 break;
 
 #ifndef SIMULATOR
@@ -238,59 +288,7 @@ int player_id3_show(void)
                 return SYS_USB_CONNECTED;
                 break;
 #endif
-
         }
-
-        switch(menu_pos)
-        {
-            case 0:
-                lcd_puts(0, 0, "[Title]");
-                snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->title?id3->title:"<no title>");
-                break;
-            case 1:
-                lcd_puts(0, 0, "[Artist]");
-                snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->artist?id3->artist:"<no artist>");
-                break;
-            case 2:
-                lcd_puts(0, 0, "[Album]");
-                snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->album?id3->album:"<no album>");
-                break;
-            case 3:
-                lcd_puts(0, 0, "[Length]");
-                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
-                   id3->length / 60000,
-                   id3->length % 60000 / 1000 );
-                break;
-            case 4:
-                lcd_puts(0, 0, "[Bitrate]");
-                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
-                        id3->bitrate);
-                break;
-            case 5:
-                lcd_puts(0, 0, "[Frequency]");
-                snprintf(scroll_text,sizeof(scroll_text), "%d kHz",
-                        id3->frequency);
-                break;
-            case 6:
-                lcd_puts(0, 0, "[Path]");
-                snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->path);
-                break;
-        }
-
-        if (menu_changed == true)
-        {
-            menu_changed = false;
-            lcd_stop_scroll();
-            lcd_clear_display();
-            lcd_puts_scroll(0, 1, scroll_text);
-        }
-
-        lcd_update();
-        yield();
     }
     return 0;
 }
@@ -603,14 +601,9 @@ static bool menu(void)
                 /* change volume */
             case BUTTON_MENU | BUTTON_LEFT:
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-                player_change_volume();
-                exit = true;
-                break;
-
-                /* change volume */
             case BUTTON_MENU | BUTTON_RIGHT:
             case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                player_change_volume();
+                player_change_volume(button);
                 exit = true;
                 break;
 
