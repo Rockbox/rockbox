@@ -1796,7 +1796,7 @@ void mpeg_set_pitch(int percent)
     unsigned long val;
 
     /* Calculate the new (bogus) frequency */
-    val = 18432 + (18432*percent/100);
+    val = 18432 - (18432*percent/100);
     
     mas_writemem(MAS_BANK_D0,0x7f3,&val,1);
 
