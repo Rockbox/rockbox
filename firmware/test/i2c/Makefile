@@ -6,7 +6,7 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-I../.. -I../../drivers
 
-CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
+CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
 
 OBJS= crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o ../../debug.o
@@ -38,7 +38,7 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 
 install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
