@@ -60,7 +60,7 @@ int create_thread(void* fp, void* sp, int stk_size)
   if(0 != error)
     fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
   else 
-    fprintf(stderr, "Thread %d is running\n", tid);
+    fprintf(stderr, "Thread %ld is running\n", tid);
 
   /* get mutex to only allow one thread running at a time */
   pthread_mutex_lock(&mp);
