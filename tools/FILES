@@ -3,3 +3,5 @@ Makefile
 configure
 *.[ch]
 release
+genlang
+uplang
