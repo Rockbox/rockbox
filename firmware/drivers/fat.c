@@ -265,11 +265,8 @@ static long cluster2sec(IF_MV2(struct bpb* fat_bpb,) long cluster)
 #else
     const long zerocluster = 2;
 #endif
-    long max_cluster = (fat_bpb->totalsectors -
-        fat_bpb->firstdatasector) / fat_bpb->bpb_secperclus + 1;
-    
-    
-    if (cluster > max_cluster)
+
+    if (cluster > (long)(fat_bpb->dataclusters + 1))
     {
       DEBUGF( "cluster2sec() - Bad cluster number (%ld)\n", cluster);
         return -1;
