@@ -879,17 +879,14 @@ void lcd_puts(int x, int y, unsigned char *str)
 }
 
 
-void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
-{
-#ifdef LOADABLE_FONTS
-    lcd_putsldfxy(x,y,str);
-    (void)thisfont;
-#elif LCD_PROPFONTS
-    lcd_putspropxy(x,y,str,thisfont);
-#else
 /*
  * Put a string at specified bit position
  */
+void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
+{
+#ifdef LCD_PROPFONTS
+    lcd_putspropxy(x,y,str,thisfont);
+#else
 
     int nx = fonts[thisfont];
     int ny = fontheight[thisfont];
@@ -897,6 +894,13 @@ void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
     unsigned char *src;
     int lcd_x = x;
     int lcd_y = y;
+
+#ifdef LOADABLE_FONTS
+    if ( _font ) {
+        lcd_putsldfxy(x,y,str);
+        return;
+    }
+#endif
 
     while (((ch = *str++) != '\0') && (lcd_x + nx < LCD_WIDTH))
     {
