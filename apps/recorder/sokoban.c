@@ -17,10 +17,8 @@
  *
  ****************************************************************************/
 
+#include <sprintf.h>
 #include "config.h"
-
-#ifdef HAVE_LCD_BITMAP
-
 #include "sokoban.h"
 #include "lcd.h"
 #include "button.h"
@@ -582,5 +580,3 @@ void sokoban(void)
     lcd_clear_display();
     sokoban_loop();
 }
-
-#endif
