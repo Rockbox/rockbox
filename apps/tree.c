@@ -358,6 +358,7 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_ON:
+                lcd_stop_scroll();
                 wps_show();
                 restore = true;
                 break;
@@ -370,13 +371,11 @@ bool dirbrowse(char *root)
             numentries = showdir(currdir, start);
             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
         }
-        else {
-            lcd_stop_scroll();
-            if ( numentries )
-                lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                                dircacheptr[start+dircursor]->name);
-        }
 
+        lcd_stop_scroll();
+        if ( numentries )
+            lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                            dircacheptr[start+dircursor]->name);
         lcd_update();
     }
 

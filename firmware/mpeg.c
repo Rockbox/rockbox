@@ -283,12 +283,13 @@ void DEI3(void)
 
             /* will we move across the track boundary? */
             if (( mp3buf_read <= id3tags[0].mempos ) &&
-                ( mp3buf_read + last_dma_chunk_size > id3tags[0].mempos )) {
+                ( (mp3buf_read + last_dma_chunk_size) > id3tags[0].mempos )) {
                 /* shift array so index 0 is current track */
                 int i;
-                for (i=0; i<MAX_ID3_TAGS-1; i++)
+                for (i=0; i<last_tag-1; i++)
                     id3tags[i] = id3tags[i+1];
-                last_tag--;
+                if ( last_tag )
+                    last_tag--;
             }
         }
         else
