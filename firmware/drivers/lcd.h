@@ -45,6 +45,7 @@ extern void lcd_update(void);
 extern void lcd_update_rect(int x, int y, int width, int height);
 #else
   #define lcd_update()
+  #define lcd_update_rect(x,y,w,h)
 #endif
 
 #if defined(SIMULATOR)
