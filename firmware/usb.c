@@ -94,7 +94,19 @@ static void usb_slave_mode(bool on)
 
         rc = ata_init();
         if(rc)
+        {
+#ifdef ARCHOS_RECORDER
+            char str[32];
+            lcd_clear_display();
+            snprintf(str, 31, "ATA error: %d", rc);
+            lcd_puts(0, 1, str);
+            lcd_puts(0, 3, "Press ON to debug");
+            lcd_update();
+            while(button_get(true) != BUTTON_ON) {};
+            dbg_ports();
+#endif
             panicf("ata: %d",rc);
+        }
     
         pinfo = disk_init();
         if (!pinfo)
