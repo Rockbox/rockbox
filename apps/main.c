@@ -35,6 +35,10 @@
 #include "mpeg.h"
 #include "main_menu.h"
 
+#include "version.h"
+
+char appsversion[]=APPSVERSION;
+
 void app_main(void)
 {
     browse_root();
