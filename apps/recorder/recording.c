@@ -160,8 +160,9 @@ bool recording_screen(void)
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     
     status_set_playmode(STATUS_STOP);
-    
-    peak_meter_playback(false);
+
+    /* Yes, we use the D/A for monitoring */
+    peak_meter_playback(true);
     
     peak_meter_enabled = true;
 

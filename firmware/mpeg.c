@@ -2101,9 +2101,11 @@ static void init_recording(void)
     /* Copy left channel to right (mono mode) */
     mas_codec_writereg(8, 0x8000);
     
-    /* ADC scale 100%, DSP scale 0% */
-    mas_codec_writereg(6, 0x4000);
-    mas_codec_writereg(7, 0x0000);
+    /* ADC scale 0%, DSP scale 100%
+       We use the DSP output for monitoring, because it works with all
+       sources including S/PDIF */
+    mas_codec_writereg(6, 0x0000);
+    mas_codec_writereg(7, 0x4000);
 
     /* No mute */
     val = 0;
