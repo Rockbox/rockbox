@@ -183,7 +183,8 @@ static int save_config_buffer( void )
     for (i=0; i < RTC_BLOCK_SIZE; i++ ) {
         int r = rtc_write(0x14+i, config_block[i]);
         if (r) {
-            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", 14+i, r );
+            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n",
+                    14+i, r );
             return r;
         }
     }
@@ -325,13 +326,13 @@ int settings_save( void )
 
     strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
     
-    DEBUGF("+Resume file %s\n",global_settings.resume_file);
-    DEBUGF("+Resume index %X offset %X\n",
-           global_settings.resume_index,
-           global_settings.resume_offset);
-    DEBUGF("+Resume shuffle %s seed %X\n",
-           global_settings.playlist_shuffle?"on":"off",
-           global_settings.resume_seed);
+    DEBUGF( "+Resume file %s\n",global_settings.resume_file );
+    DEBUGF( "+Resume index %X offset %X\n",
+            global_settings.resume_index,
+            global_settings.resume_offset );
+    DEBUGF( "+Resume shuffle %s seed %X\n",
+            global_settings.playlist_shuffle?"on":"off",
+            global_settings.resume_seed );
 
     if(save_config_buffer())
     {
@@ -372,7 +373,8 @@ void settings_apply(void)
     ata_spindown(global_settings.disk_spindown);
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
-    charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+    charge_restart_level = global_settings.discharge ? 
+        CHARGE_RESTART_LO : CHARGE_RESTART_HI;
 #endif
 
     if ( global_settings.wps_file[0] && 
@@ -655,7 +657,8 @@ void settings_reset(void) {
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
-    global_settings.backlight_on_when_charging   = DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
+    global_settings.backlight_on_when_charging   = 
+        DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
@@ -689,7 +692,8 @@ void settings_display(void)
 #ifdef DEBUG
     DEBUGF( "\nsettings_display()\n" );
 
-    DEBUGF( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\nloudness:\t%d\nbass boost:\t%d\n",
+    DEBUGF( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\n"
+            "loudness:\t%d\nbass boost:\t%d\n",
             global_settings.volume,
             global_settings.balance,
             global_settings.bass,
@@ -706,7 +710,8 @@ void settings_display(void)
 
 bool set_bool(char* string, bool* variable )
 {
-    return set_bool_options(string, variable, str(LANG_SET_BOOL_YES), str(LANG_SET_BOOL_NO));
+    return set_bool_options(string, variable, str(LANG_SET_BOOL_YES), 
+                            str(LANG_SET_BOOL_NO));
 }
 
 bool set_bool_options(char* string, bool* variable,
@@ -1049,13 +1054,15 @@ bool set_time(char* string, int timedate[])
                 break;
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
-                timedate[cursorpos] = (timedate[cursorpos] + steps - min + 1) % steps + min;
+                timedate[cursorpos] = (timedate[cursorpos] + steps - min + 1) %
+                    steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
                 break;
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-                timedate[cursorpos]=(timedate[cursorpos]+steps - min - 1) % steps + min;
+                timedate[cursorpos]=(timedate[cursorpos]+steps - min - 1) % 
+                    steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
                 break;
@@ -1092,3 +1099,9 @@ bool set_time(char* string, int timedate[])
     return false;
 }
 #endif
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * end:
+ */
