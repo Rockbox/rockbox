@@ -37,7 +37,11 @@ notice.
 
 <dl>
 <dt><b>Version 1.3</b>
-<dd>Resume, persistent settings, autobuild playlists, proportional fonts
+<dd> Resume, persistent settings, proportional fonts, UI improvements
+<dt><b>Version 1.4</b>
+<dd> Autobuild playlists, Recording, Loadable fonts, Customizable WPS
+<dt><b>Version 1.5</b>
+<dd> File/directory management
 </dl>
 
 <h2>About the hardware</h2>
