@@ -46,6 +46,10 @@ extern void lcd_update_rect(int x, int y, int width, int height);
   #define lcd_update()
 #endif
 
+#if defined(SIMULATOR)
+#include "sim_icons.h"
+#endif
+
 #ifdef HAVE_LCD_CHARCELLS
 
 /* Icon definitions for lcd_icon() */

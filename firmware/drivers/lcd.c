@@ -32,6 +32,9 @@
 #include "panic.h"
 #endif
 
+#if defined(SIMULATOR)
+#include "sim_icons.h"
+#endif
 
 
 /*** definitions ***/
@@ -492,8 +495,7 @@ void lcd_icon(int icon, bool enable)
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
 void lcd_icon(int icon, bool enable)
 {
-    icon = icon;
-    enable = enable;
+    sim_lcd_icon(icon, enable);
 }
 #endif
 
@@ -648,11 +650,19 @@ void lcd_update_rect (int x_start, int y,
  */
 void lcd_clear_display (void)
 {
-    memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
+    /* Clear just the text portion of the display */
+    int x, y;
+    for (y = 8; y <= (32 + 7); ++y)
+    {
+        for (x = 0; x < LCD_WIDTH; x++)
+            CLEAR_PIXEL(x, y);
+    }
     /* this function is being used when simulating a charcell LCD and
        then we update immediately */
     lcd_update();
+#else
+    memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
 #endif
 }
 

@@ -48,7 +48,7 @@ $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR) -I../common
 SRCDIRS = . $(DRIVERS) $(COMMON) $(FIRMWAREDIR) $(APPDIR) $(RECDIR)
 
 # The true Rockbox Applications should use this include path:
@@ -93,7 +93,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
-        button-x11.c io.c thread.c $(APPS) $(MENUS) $(FIRMSRCS)
+        button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
   SRCS += mpegplay.c oss_sound.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
@@ -242,6 +242,9 @@ $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/sim_icons.o: ../common/sim_icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c

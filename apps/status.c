@@ -63,7 +63,7 @@ bool statusbar(bool state)
 
 void status_draw(void)
 {
-#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_CHARCELLS)
     int battlevel = battery_level();
     int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
     
