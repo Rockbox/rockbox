@@ -40,7 +40,7 @@ static enum playmode current_mode = STATUS_STOP;
 static long switch_tick;
 static int  battery_charge_step = 0;
 static bool plug_state;
-static bool battery_state;
+static bool battery_state = true;
 
 struct status_info {
     int battlevel;
@@ -167,7 +167,8 @@ void status_draw(bool force_redraw)
                 battery_state = true;
             else {
                 /* blink battery if level is low */
-                if(TIME_AFTER(current_tick, switch_tick)) {
+                if(TIME_AFTER(current_tick, switch_tick) &&
+                   (info.battlevel > -1)) {
                     switch_tick = current_tick+HZ;
                     battery_state =! battery_state;
                 }
@@ -175,7 +176,7 @@ void status_draw(bool force_redraw)
         }
 
 #ifdef HAVE_LCD_BITMAP
-        if (battery_state && (info.battlevel > -1))
+        if (battery_state)
             statusbar_icon_battery(info.battlevel, plug_state);
             
         statusbar_icon_volume(info.volume);

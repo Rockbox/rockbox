@@ -158,17 +158,19 @@ void statusbar_icon_battery(int percent, bool charging)
         fill = 100;
 
 #ifdef SIMULATOR
-    if (global_settings.battery_type) {
+    if (global_settings.battery_type && (percent > -1)) {
 #else
 #ifdef HAVE_CHARGE_CTRL /* Recorder */
     /* show graphical animation when charging instead of numbers */
-    if ((global_settings.battery_type) && (charge_state != 1)) {
+    if ((global_settings.battery_type) &&
+        (charge_state != 1) &&
+        (percent > -1)) {
 #else /* FM */
-    if (global_settings.battery_type) {
+    if (global_settings.battery_type && (percent > -1)) {
 #endif /* HAVE_CHARGE_CTRL */
 #endif
         /* Numeric display */
-        snprintf(buffer, sizeof(buffer), "%3d", percent);
+        snprintf(buffer, sizeof(buffer), "%3d", fill);
         lcd_setfont(FONT_SYSFIXED);
         lcd_getstringsize(buffer, &width, &height);
         if (height <= STATUSBAR_HEIGHT)
@@ -188,6 +190,13 @@ void statusbar_icon_battery(int percent, bool charging)
         lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
     }
 
+    if (percent == -1) {
+        lcd_setfont(FONT_SYSFIXED);
+        lcd_putsxy(ICON_BATTERY_X_POS + ICON_BATTERY_WIDTH / 2 - 4,
+                   STATUSBAR_Y_POS, "?");
+        lcd_setfont(FONT_UI);
+    }
+    
     /* draw power plug if charging */
     if (charging)
         lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
