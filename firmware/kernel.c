@@ -276,7 +276,7 @@ void TIMER0(void)
 
 static void tick_start(unsigned int interval_in_ms)
 {
-    u32 count;
+    long count;
     count = (long)FREQ * (long)interval_in_ms / 1000 / 16;
 
     if(count > 0xffffL)
@@ -288,7 +288,7 @@ static void tick_start(unsigned int interval_in_ms)
 
     /* Use timer A */
     TAPRE = 0x0;
-    TADATA = (u16)count;
+    TADATA = count;
 
     TACON = 0x89;
     /* counter clear; */
@@ -298,7 +298,7 @@ static void tick_start(unsigned int interval_in_ms)
     /* enable */
     
     /* enable the interrupt */
-    interruptVector[2] = TIMER0;
+    interrupt_vector[2] = TIMER0;
     IMR0 |= (1<<2);
 }
 
