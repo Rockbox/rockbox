@@ -29,6 +29,8 @@ struct dirent {
 };
 
 extern DIR* opendir(char* name);
+extern int closedir(DIR* dir);
+
 extern struct dirent* readdir(DIR* dir);
 
 #endif
