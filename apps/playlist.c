@@ -31,6 +31,7 @@
 #include "kernel.h"
 
 playlist_info_t playlist;
+bool playlist_shuffle = false;
 
 char now_playing[256];
 
@@ -101,9 +102,13 @@ void play_list(char *dir, char *file)
     /* add track indices to playlist data structure */
     add_indices_to_playlist(&playlist);
 
-    /* if shuffle is wanted, this is where to do that */
+    if(playlist_shuffle) {
+        lcd_puts(0,0,"Shuffling...");
+        lcd_update();
+        randomise_playlist( &playlist, current_tick );
+    }
 
-    lcd_puts(0,0,"Complete. ");
+    lcd_puts(0,0,"Playing...  ");
     lcd_update();
     /* also make the first song get playing */
     mpeg_play(playlist_next(0));

@@ -169,18 +169,29 @@ void scroll_speed(void)
 
 void shuffle(void)
 {
+    bool done = false;
+
     lcd_clear_display();
-    if(playlist.amount) {
-        lcd_puts(0,0,"Shuffling...");
+    lcd_puts(0,0,"[Shuffle]");
+
+    while ( !done ) {
+        lcd_puts(0,1,playlist_shuffle ? "on " : "off");
         lcd_update();
-        randomise_playlist( &playlist, current_tick );
-       lcd_puts(0,1,"Done.");
+
+        switch ( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+#endif
+                done = true;
+                break;
+
+            default:
+                playlist_shuffle = !playlist_shuffle;
+                break;
+        }
     }
-    else {
-        lcd_puts(0,0,"No playlist");
-    }
-    lcd_update();
-    sleep(HZ);
 }
 
 void main_menu(void)

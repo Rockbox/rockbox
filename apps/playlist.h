@@ -20,6 +20,8 @@
 #ifndef __PLAYLIST_H__
 #define __PLAYLIST_H__
 
+#include <stdbool.h>
+
 /* playlist data */
 
 #define MAX_PLAYLIST_SIZE 10000
@@ -33,6 +35,7 @@ typedef struct
 } playlist_info_t;
 
 extern playlist_info_t playlist;
+extern bool playlist_shuffle;
 
 void play_list(char *dir, char *file);
 char* playlist_next(int type);
