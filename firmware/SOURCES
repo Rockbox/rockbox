@@ -24,21 +24,33 @@ common/timefuncs.c
 debug.c
 drivers/adc.c
 drivers/ata.c
+#ifdef HAVE_MMC
 drivers/ata_mmc.c
+#endif
 drivers/button.c
 drivers/dac.c
 drivers/fat.c
+#ifdef CONFIG_TUNER
 drivers/fmradio.c
+#endif
 drivers/i2c.c
+#ifdef HAVE_LCD_CHARCELLS
 drivers/lcd-player-charset.c
 drivers/lcd-player.c
+#endif
+#ifdef HAVE_LCD_BITMAP
 drivers/lcd-recorder.c
+#endif
 drivers/led.c
 drivers/mas.c
 drivers/power.c
+#ifdef HAVE_RTC
 drivers/rtc.c
+#endif
 drivers/serial.c
+#ifdef HAVE_LCD_BITMAP
 font.c
+#endif
 hwcompat.c
 id3.c
 kernel.c
