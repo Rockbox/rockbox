@@ -24,8 +24,7 @@ for ( @logs ) {
             $m = $2;
             $d = $3;
 
-$mname = $m;
-#            $mname = ucfirst MonthNameEng($m);
+            $mname = ucfirst MonthNameEng($m);
             if ($y != $lasty) {
                 print "</tr><tr>\n" if $lasty != 0;
                 print "<th>$y</th>\n";
