@@ -1480,7 +1480,7 @@ new: "St. schmal"
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: in sound_settings
 eng: "Stereo Narrow"
-new: "Stereo breit"
+new: "Stereo schmal"
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: in sound_settings
