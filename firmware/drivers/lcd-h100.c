@@ -77,7 +77,7 @@ struct scrollinfo {
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
 
 static void scroll_thread(void);
-static char scroll_stack[DEFAULT_STACK_SIZE];
+static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char scroll_name[] = "scroll";
 static char scroll_ticks = 12; /* # of ticks between updates*/
 static int scroll_delay = HZ/2; /* ticks delay before start */
@@ -104,7 +104,7 @@ static const unsigned char ones[16]  = {
 
 int lcd_default_contrast(void)
 {
-    return 32;
+    return 28;
 }
 
 #ifdef SIMULATOR
