@@ -26,20 +26,26 @@ sub buildzip {
     mkdir ".rockbox/rocks", 0777;
     `find . -name "*.rock" ! -empty | xargs --replace=foo cp foo .rockbox/rocks/`;
 
-    if($notplayer) {
-        `cp ../apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
+    open VIEWERS, "../apps/plugins/viewers.config" or
+        die "can't open viewers.config";
+    @viewers = <VIEWERS>;
+    close VIEWERS;
 
-        open VIEWERS, "../apps/plugins/viewers.config" or
-            die "can't open viewers.config";
-        @viewers = <VIEWERS>;
-        close VIEWERS;
-        `cp ../apps/plugins/viewers.config .rockbox`;
-        mkdir ".rockbox/viewers";
-        for (@viewers) {
-            if (/,(.+),/) {
+    open VIEWERS, ">.rockbox/viewers.config" or
+        die "can't create .rockbox/viewers.config";
+    mkdir ".rockbox/viewers";
+    for (@viewers) {
+        if (/,(.+),/) {
+            if(-e ".rockbox/rocks/$1") {
                 `mv .rockbox/rocks/$1 .rockbox/viewers`;
+                print VIEWERS $_;
             }
         }
+    }
+    close VIEWERS;
+    
+    if($notplayer) {
+        `cp ../apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
 
         mkdir ".rockbox/fonts", 0777;
 
