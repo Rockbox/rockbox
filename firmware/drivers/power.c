@@ -72,6 +72,17 @@ void ide_power_enable(bool on)
 #endif
 }
 
+void power_off(void)
+{
+#ifdef ARCHOS_RECORDER
+    PBDR &= ~PBDR_BTN_OFF;
+    PBIOR |= PBDR_BTN_OFF;
+#else
+    PADR &= ~0x800;
+    PAIOR |= 0x800;
+#endif
+}
+
 #else
 
 bool charger_inserted(void)
@@ -88,6 +99,10 @@ int battery_level(void)
 void charger_enable(bool on)
 {
     on = on;
+}
+
+void power_off(void)
+{
 }
 
 #endif /* SIMULATOR */

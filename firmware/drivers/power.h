@@ -21,13 +21,14 @@
 
 #define BATTERY_LEVEL_SHUTDOWN (4500000 / BATTERY_SCALE_FACTOR) /* 4.5V */
 #define BATTERY_LEVEL_DANGEROUS (4750000 / BATTERY_SCALE_FACTOR) /* 4.75V */
-#define BATTERY_LEVEL_FULL (5550000 / BATTERY_SCALE_FACTOR) /* 5.55V */
+#define BATTERY_LEVEL_FULL (5300000 / BATTERY_SCALE_FACTOR) /* 5.3V */
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_SHUTDOWN)
 
 bool charger_inserted(void);
 void charger_enable(bool on);
 void ide_power_enable(bool on);
+void power_off(void);
 
 /* Returns battery level in percent */
 int battery_level(void);
