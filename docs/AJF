@@ -1,0 +1,22 @@
+Description of the binary AJF font file format
+
+Index    Descripton
+
+00       MAGIC1 (0xBD)
+01       MAGIC2 (0xFC) used to make sure this is an ajf font
+02       Unused, planned use: "code page"
+03 - 22  ASCII text holding the font name
+23 - 24  "bound width"  (high 8 bits, low 8 bits)
+25 - 26  "bound height" (high 8 bits, low 8 bits)
+26 - 28  first character in the font
+29 - 2a  0x00ff (supposed number of characters in the font?)
+2b -     map offset table starts here. Each offset entry is supposed to be 
+         three bytes: width, offset highbyte, offset lowbyte
+         The offset is a relative offset, counted in bytes, to where in the
+         font data this particular char's bitmap image starts.
+
+         font data, in Rockbox-internal image-format. That means column-wise
+         left-to-right for the full width, the first 8 pixels of height. Then
+         follows the next 8 pixels of height left-to-right.
+
+         We don't currently support fonts larger than 16 pixels.
