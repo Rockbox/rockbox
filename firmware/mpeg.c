@@ -1840,10 +1840,6 @@ static void mpeg_thread(void)
                     if(mpeg_file < 0)
                         panicf("recfile: %d", mpeg_file);
 
-                    
-                    close(mpeg_file);
-                    
-                    mpeg_file = -1;
                     break;
                     
                 case MPEG_STOP:
@@ -1905,10 +1901,6 @@ static void mpeg_thread(void)
                                            mp3buflen - mp3buf_read);
                             
                             DEBUGF("wrl: %x\n", writelen);
-                            mpeg_file = open(recording_filename,
-                                             O_WRONLY| O_APPEND);
-                            if(mpeg_file < 0)
-                                panicf("rec open: %d", mpeg_file);
                             
                             rc = write(mpeg_file, mp3buf + mp3buf_read,
                                        writelen);
@@ -1916,13 +1908,10 @@ static void mpeg_thread(void)
                             if(rc < 0)
                                 panicf("rec wrt: %d", rc);
                             
-                            rc = close(mpeg_file);
+                            rc = flush(mpeg_file);
                             if(rc < 0)
-                                panicf("rec cls: %d", rc);
-                            
-                            mpeg_file = -1;
-                            DEBUGF("rc: %x\n", rc);
-                            
+                                panicf("rec fls: %d", rc);
+
                             mp3buf_read += amount_to_save;
                             if(mp3buf_read >= mp3buflen)
                                 mp3buf_read = 0;
