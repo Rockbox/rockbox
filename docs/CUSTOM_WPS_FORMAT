@@ -13,10 +13,10 @@ Description / General Info
 
 File Location
 -------------
-The default configuration file must be located in the /.rockbox folder
-of the evice and must be named default.wps (lowercase). Any other Custom
-WPS files may be located anywhere on the drive. The only restriction
-is that they must end in .wps
+Custom WPS files may be located anywhere on the drive. The only restriction is
+that they must end in .wps. When you PLAY a .wps file, it'll be used for the
+future WPS screens. If the "played" wps file is located in the /.rockbox
+folder, it'll be remembered and used for subsequent restarts.
 
 Tags
 ----
@@ -85,8 +85,8 @@ displayed if available. Could also be rendered as "filename" or
 
 Default
 -------
-If you don't use a default.wps file, you get the hardcoded wps layout.
-The default WPS screen is for player:
+If you haven't selected a .wps file in the .rockbox directory, you get the
+hardcoded wps layout. The default WPS screen is for player:
 
 %s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>
 %pc/%pt
