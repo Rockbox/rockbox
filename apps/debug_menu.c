@@ -1109,7 +1109,7 @@ static bool dbg_disk_info(void)
     bool done = false;
     int i;
     int page = 0;
-    const int max_page = 3;
+    const int max_page = 4;
     unsigned short* identify_info = ata_get_identify();
 
     while(!done)
