@@ -42,6 +42,9 @@ File Info Tags:
   %fn : File Name
   %fs : File Size (In Kilobytes)
 Playlist/Song Info Tags:
+  %pb : Progress Bar (Player ONLY)
+        This will display a 1 character "cup" that empties as the song goes
+        forward.
   %pp : Playlist Position
   %pe : Playlist Total Entries
   %pc : Current Time In Song
