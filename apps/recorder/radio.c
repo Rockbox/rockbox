@@ -60,6 +60,8 @@
 #define FM_FREEZE BUTTON_PLAY
 #define FM_STOP BUTTON_OFF
 #define FM_EXIT (BUTTON_ON | BUTTON_REL)
+#define FM_PRESET_ADD BUTTON_F1
+#define FM_PRESET_ACTION BUTTON_F3
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
 #define FM_RECORD (BUTTON_MENU | BUTTON_REL)
@@ -669,14 +671,14 @@ static int handle_radio_presets_menu_cb(int key, int m)
 #if CONFIG_KEYPAD == RECORDER_PAD
     switch(key)
     {
-        case BUTTON_F3 | BUTTON_REL:
+        case FM_PRESET_ACTION:
             key = MENU_EXIT; /* Fake an exit */
             break;
             
-       case BUTTON_F3:
-          /* Ignore the DOWN events */
-          key = BUTTON_NONE;
-          break;
+        case FM_PRESET_ACTION | BUTTON_REL:
+            /* Ignore the release events */
+            key = BUTTON_NONE;
+            break;
     }
 #endif
     return key;
@@ -744,18 +746,18 @@ int handle_radio_presets_cb(int key, int m)
     
     switch(key)
     {
-        case BUTTON_F1 | BUTTON_REL:
+        case FM_PRESET_ADD:
             radio_add_preset();
             menu_draw(m);
             key = BUTTON_NONE;
             break;
             
-        case BUTTON_F2 | BUTTON_REL:
+        case FM_PRESET:
             menu_draw(m);
             key = MENU_EXIT; /* Fake an exit */
             break;
             
-        case BUTTON_F3 | BUTTON_REL:
+        case FM_PRESET_ACTION:
             ret = handle_radio_presets_menu();
             menu_draw(m);
             if(ret)
@@ -763,13 +765,12 @@ int handle_radio_presets_cb(int key, int m)
             else
                 key = BUTTON_NONE;
             break;
-            
-       case BUTTON_F1:
-       case BUTTON_F2:
-       case BUTTON_F3:
-          /* Ignore the DOWN events */
-          key = BUTTON_NONE;
-          break;
+
+        case FM_PRESET_ADD | BUTTON_REL:
+        case FM_PRESET_ACTION | BUTTON_REL:
+            /* Ignore the release events */
+            key = BUTTON_NONE;
+            break;
     }
     return key;
 #endif
