@@ -185,7 +185,7 @@ new: "Aleatorio"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Reproducir primero la cancion marcada"
+new: "Reproducir primero la canción marcada"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -623,7 +623,7 @@ new: "Máx. puntuac.: %d"
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "Nuevo record!"
+new: "¡Nuevo record!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
@@ -668,7 +668,7 @@ new: "Movs."
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-new: "GANASTE!" 
+new: "¡GANASTE!" 
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
@@ -774,10 +774,99 @@ new: "Sin control"
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
-new: "Perdiste!"
+new: "¡Perdiste!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
-new: "0 Filas - Nivel 0"
+new: "%d Filas - Nivel %d"
 
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "Auto apagado"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "nuevo idioma"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "mostrar archivos"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "música"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "soportados"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "todos"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Si"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "No"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Analizador de espectro"
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Caida del analizador"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Permanencia del analizador"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Permanencia de los recortes"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "eterno"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Unidades por lectura"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Iluminación mientras carga"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Repetir"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Todas"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Una"
