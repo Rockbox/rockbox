@@ -38,7 +38,15 @@
 #define O_RDWR   2
 #endif
 
-#if !defined(SIMULATOR) || defined(__MINGW32__)
+#if defined(__MINGW32__) && defined(SIMULATOR)
+int             open (const char*, int, ...);
+extern int close(int fd);
+int             read (int, void*, unsigned int);
+long            lseek (int, long, int);
+
+#else
+
+#ifndef SIMULATOR
 extern int open(char* pathname, int flags);
 extern int close(int fd);
 extern int read(int fd, void* buf, int count);
@@ -56,5 +64,7 @@ extern int rename(char* oldname, char* newname);
 #include <stdio.h>
 #endif /* WIN32 */
 #endif /* SIMULATOR */
+
+#endif /* __MINGW32__ */
 
 #endif
