@@ -888,7 +888,7 @@ int wps_show(void)
 
                 /* stop and exit wps */
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
+            case BUTTON_OFF | BUTTON_REL:
 #else
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
