@@ -36,7 +36,7 @@ typedef struct
 {
     int   created;
     int   current;
-    ctx_t ctx[MAXTHREADS] __attribute__ ((aligned (32)));
+    ctx_t ctx[MAXTHREADS];
 } thread_t;
 
 static thread_t threads = {1, 0};
@@ -118,7 +118,9 @@ int create_thread(void* fp, void* sp, int stk_size)
     {
         ctx_t* ctxp = &t->ctx[t->created++];
         stctx(ctxp);
-        ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size) & ~31);
+        /* Subtract 4 to leave room for the PR push in ldctx()
+           Align it on an even 32 bit boundary */
+        ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size - 4) & ~3;
         ctxp->regs.pr = fp;
     }
     return 0;
