@@ -259,7 +259,8 @@ int settings_save( void )
          ((global_settings.mp3filter & 1) << 1) |
          ((global_settings.sort_case & 1) << 2) |
          ((global_settings.discharge & 1) << 3) |
-         ((global_settings.statusbar & 1) << 4));
+         ((global_settings.statusbar & 1) << 4) |
+         ((global_settings.show_hidden_files & 1) << 5));
 
     config_block[0xf] = (unsigned char)
         ((global_settings.scroll_speed << 3) |
@@ -345,6 +346,7 @@ void settings_load(void)
             global_settings.sort_case = (config_block[0xe] >> 2) & 1;
             global_settings.discharge = (config_block[0xe] >> 3) & 1;
             global_settings.statusbar = (config_block[0xe] >> 4) & 1;
+            global_settings.show_hidden_files = (config_block[0xe] >> 5) & 1;
         }
         
         c = config_block[0xf] >> 3;
@@ -410,6 +412,7 @@ void settings_reset(void) {
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
+    global_settings.show_hidden_files = false;
     global_settings.ff_rewind    = DEFAULT_FF_REWIND_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;

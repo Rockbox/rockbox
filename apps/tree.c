@@ -190,15 +190,27 @@ static int showdir(char *path, int start)
             if (!entry)
                 break;
 
+            len = strlen(entry->d_name);
+
             /* skip directories . and .. */
             if ((entry->attribute & ATTR_DIRECTORY) &&
-                (!strncmp(entry->d_name, ".", 1) ||
-                 !strncmp(entry->d_name, "..", 2))) {
+                (((len == 1) && 
+                  (!strncmp(entry->d_name, ".", 1))) ||
+                 ((len == 2) && 
+                  (!strncmp(entry->d_name, "..", 2))))) {
                 i--;
                 continue;
             }
+
+            /* Skip dotfiles if set to skip them */
+            if (!global_settings.show_hidden_files &&
+                ((entry->d_name[0]=='.') ||
+                 (entry->attribute & ATTR_HIDDEN))) {
+                i--;
+                continue;
+            }
+
             dptr->attr = entry->attribute;
-            len = strlen(entry->d_name);
 
             /* mark mp3 and m3u files as such */
             if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
@@ -209,10 +221,10 @@ static int showdir(char *path, int start)
                         dptr->attr |= TREE_ATTR_M3U;
             }
 
-            /* filter hidden files and directories and non-mp3 or m3u files */
+            /* filter non-mp3 or m3u files */
             if ( global_settings.mp3filter &&
-                 ((dptr->attr & ATTR_HIDDEN) ||
-                  !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_MP3|TREE_ATTR_M3U))) ) {
+                 (!(dptr->attr &
+                    (ATTR_DIRECTORY|TREE_ATTR_MP3|TREE_ATTR_M3U))) ) {
                 i--;
                 continue;
             }
@@ -627,13 +639,23 @@ bool dirbrowse(char *root)
             case TREE_MENU: {
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
+                bool show_hidden_files = global_settings.show_hidden_files;
+
+#ifdef HAVE_LCD_BITMAP
+                bool laststate=statusbar(false);
+#endif
+
                 lcd_stop_scroll();
                 main_menu();
                 /* do we need to rescan dir? */
                 if ( lastfilter != global_settings.mp3filter ||
-                     lastsortcase != global_settings.sort_case)
+                     lastsortcase != global_settings.sort_case ||
+                     show_hidden_files != global_settings.show_hidden_files)
                     lastdir[0] = 0;
                 restore = true;
+#ifdef HAVE_LCD_BITMAP
+                statusbar(laststate);
+#endif
                 break;
             }
 

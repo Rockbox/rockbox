@@ -32,9 +32,14 @@
 #include "settings_menu.h"
 #include "backlight.h"
 #include "playlist.h"  /* for playlist_shuffle */
+#include "fat.h"                /* For dotfile settings */
 #include "powermgmt.h"
 #include "rtc.h"
 
+static void show_hidden_files(void)
+{
+    set_bool( "[Show hidden files]", &global_settings.show_hidden_files );
+}
 
 static void contrast(void)
 {
@@ -169,6 +174,7 @@ void settings_menu(void)
 #ifdef HAVE_RTC
         { "Time/Date",       timedate_set    },
 #endif
+        { "Show hidden files", show_hidden_files },
         { "FF/Rewind",       ff_rewind       },
         { "Resume",          resume          },
     };

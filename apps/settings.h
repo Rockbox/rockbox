@@ -69,6 +69,10 @@ struct user_settings
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
+
+    /* Hidden and dotfile settings */
+    bool show_hidden_files; /* 1=show dotfiles/hidden,
+                               0=hide dotfiles/hidden */
     
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
