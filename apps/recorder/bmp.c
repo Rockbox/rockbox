@@ -28,11 +28,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "debug.h"
 
 #include "file.h"
 
 #ifdef __GNUC__
 #define STRUCT_PACKED __attribute__((packed))
+#else
+#define STRUCT_PACKED
+#pragma pack (push, 2)
 #endif
 
 struct Fileheader
