@@ -59,11 +59,9 @@ static bool list_viewers(void)
     {
         m = menu_init( menu, i, NULL, NULL, NULL, NULL );
         result = menu_show(m);
+        menu_exit(m);
         if (result >= 0)
-        {
-            menu_exit(m);
             filetype_load_plugin(menu[result].desc,selected_file);
-        }
     }
     else
     {
