@@ -23,10 +23,8 @@
 #include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
-
-#include "bmp.h"
-#include "icons.h"
 #include "font.h"
+#include "screens.h"
 
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
@@ -45,7 +43,7 @@ static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
         line[0] = "abcdefg ¢£¤¥¦§©®¬";
         line[1] = "hijklmn «»°ºª¹²³¶";
         line[2] = "opqrstu ¯±×÷¡¿µ·¨";
-        line[3] = "vwxyz   ¼½¾      ";
+        line[3] = "vwxyz., ¼½¾      ";
         break;
 
     case 2:
@@ -79,8 +77,10 @@ int kbd_input(char* text, int buflen)
     int main_x, main_y, max_chars, margin;
     int status_y1, status_y2, curpos;
     int len;
-    char* line[KEYBOARD_LINES]; 
+    int editpos;
+    char* line[KEYBOARD_LINES];
 
+    char outline[256];
     char c = 0;
     struct font* font = font_get(FONT_SYSFIXED);
 
@@ -94,6 +94,8 @@ int kbd_input(char* text, int buflen)
     status_y1 = LCD_HEIGHT - font_h;
     status_y2 = LCD_HEIGHT;
 
+    editpos = strlen(text);
+
     max_chars = LCD_WIDTH / font_w;
     kbd_setupkeys(line, page);
 
@@ -106,43 +108,73 @@ int kbd_input(char* text, int buflen)
             lcd_putsxy(0, i * font_h, line[i]);
 
         len = strlen(text);
-        
+
         /* separator */
         lcd_drawline(0, main_y - margin, LCD_WIDTH, main_y - margin);
-		
+
         /* write out the text */
-        if (len <= max_chars)
-        {	  
-            /* if we have enough room */
-            lcd_putsxy(main_x, main_y, text);
-            curpos = main_x + len * font_w;
+        if (editpos < max_chars - 3 )
+        {
+            strncpy(outline, text, max_chars - 2);
+            if (len > max_chars - 2)
+                lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
+            curpos = (1 + editpos) * font_w;
         }
         else
         {
-            /* if we don't have enough room, write out the last bit only */
-            lcd_putsxy(0, main_y, "<");
-            lcd_invertrect(0, main_y, font_w, font_h);
-			
-            lcd_putsxy(font_w, main_y, text + len - (max_chars-1));
-            curpos = main_x + max_chars * font_w;
+            /* not room for all text, cut left, right or both */
+            if (editpos == len )
+            {
+                if ( max_chars - 3 == len)
+                {
+                    strncpy(outline, text, max_chars - 2);
+                    curpos  = (1 + editpos) * font_w;
+                }
+                else
+                {
+                    strncpy(outline, text + editpos - max_chars + 2,
+                            max_chars - 2);
+                    if (len > max_chars - 2)
+                        lcd_putsxy(0, main_y, "<");
+                    curpos = ( max_chars - 1) * font_w;
+                }
+            }
+            else
+            {
+                if (len - 1 == editpos)
+                {
+                    strncpy(outline, text + editpos - max_chars + 3,
+                            max_chars - 2);
+                    curpos = ( max_chars - 2) * font_w;
+                }
+                else
+                {
+                    strncpy(outline, text + editpos - max_chars + 4,
+                            max_chars - 2);
+                    curpos = ( max_chars - 3) * font_w;
+                }
+                lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
+                lcd_putsxy(0, main_y, "<");
+            }
         }
+
+        lcd_putsxy(font_w,main_y,outline);
 
         /* cursor */
         lcd_drawline(curpos, main_y, curpos, main_y + font_h);
 
         /* draw the status bar */
         kbd_draw_statusbar_button(0, "Shift", status_y1, font_w);
-        kbd_draw_statusbar_button(1, "Cancl", status_y1, font_w);
+        kbd_draw_statusbar_button(1, "OK", status_y1, font_w);
         kbd_draw_statusbar_button(2, "Del", status_y1, font_w);
-		
-        /* highlight the key that has focus */		
+
+        /* highlight the key that has focus */
         lcd_invertrect(font_w * x, font_h * y, font_w, font_h);
         lcd_update();
 
         switch ( button_get(true) ) {
 
             case BUTTON_OFF:
-            case BUTTON_F2:
                 /* abort */
                 lcd_setfont(FONT_UI);
                 return -1;
@@ -157,9 +189,9 @@ int kbd_input(char* text, int buflen)
 
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
-                if (x < (int)strlen(line[y]) - 1) 
-                    x++; 
-                else 
+                if (x < (int)strlen(line[y]) - 1)
+                    x++;
+                else
                     x = 0;
                 break;
 
@@ -190,12 +222,21 @@ int kbd_input(char* text, int buflen)
             case BUTTON_F3:
             case BUTTON_F3 | BUTTON_REPEAT:
                 /* backspace */
-                if (len)
-                    text[len-1] = 0;
+                if (editpos > 0)
+                {
+                    for (i = editpos; i <= (len - 1);i++)
+                    {
+                        text[i-1] = text[i];
+                    }
+                    text[i-1]='\0';
+                    editpos--;
+                    if (editpos < 0)
+                        editpos=0;
+                }
                 break;
 
-            case BUTTON_ON:
-                /* ON accepts what was entered and continues */
+            case BUTTON_F2:
+                /* F2 accepts what was entered and continues */
                 done = true;
                 break;
 
@@ -204,9 +245,40 @@ int kbd_input(char* text, int buflen)
                 if (len<buflen)
                 {
                     c = line[y][x];
-                    text[len] = c;
-                    text[len+1] = 0;
+                    if ( editpos == len )
+                    {
+                        text[len] = c;
+                        text[len+1] = 0;
+                    }
+                    else
+                    {
+                        for (i = len ; i + 1 > editpos; i--)
+                            text[i+1] = text[i];
+                        text[editpos] = c;
+                    }
+                    editpos++;
                 }
+                break;
+
+            case BUTTON_ON | BUTTON_RIGHT:
+            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
+                /* moved cursor right */
+                editpos++;
+                if (editpos > len)
+                    editpos = len;
+                break;
+
+            case BUTTON_ON | BUTTON_LEFT:
+            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
+                /* moved cursor left */
+                editpos--;
+                if (editpos < 0)
+                    editpos = 0;
+                break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                lcd_setfont(FONT_SYSFIXED);
                 break;
         }
     }
