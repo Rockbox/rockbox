@@ -29,6 +29,7 @@
 #include "backlight.h"
 #include "adc.h"
 #include "serial.h"
+#include "power.h"
 
 struct event_queue button_queue;
 
@@ -127,15 +128,12 @@ static void button_tick(void)
                                 /* initial repeat */
                                 count = REPEAT_INTERVAL_START; 
                             }
-                            /* If the OFF button is pressed long enough,
-                               and we are still alive, then the unit must be
-                               connected to a charger. Therefore we will
-                               reboot and let the original firmware handle
-                               the charging. */
+                            /* Reboot if the OFF button is pressed long enough
+                               and we are connected to a charger. */
 #ifdef HAVE_RECORDER_KEYPAD
-                            if(btn == BUTTON_OFF)
+                            if(btn == BUTTON_OFF && charger_inserted())
 #elif HAVE_PLAYER_KEYPAD
-                            if(btn == BUTTON_STOP)
+                            if(btn == BUTTON_STOP && charger_inserted())
 #endif
                                 system_reboot();
                         }
