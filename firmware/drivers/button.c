@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "system.h"
 #include "button.h"
 #include "kernel.h"
@@ -36,7 +36,7 @@
 struct event_queue button_queue;
 
 static int lastbtn;   /* Last valid button status */
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 static int last_read; /* Last button status, for debouncing/filtering */
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
@@ -68,7 +68,7 @@ static void button_tick(void)
     int diff;
     int btn;
 
-#ifndef HAVE_MMC
+#if !defined(HAVE_MMC) && !defined(IRIVER_H100_PAD)
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
@@ -180,7 +180,121 @@ int button_get_w_tmo(int ticks)
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 }
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+void button_init()
+{
+#ifndef SIMULATOR
+    /* Set GPIO37 as general purpose input */
+    GPIO1_FUNCTION |= 0x00000020;
+    GPIO1_ENABLE &= ~0x00000020;
+#endif
+    queue_init(&button_queue);
+    lastbtn = 0;
+    tick_add_task(button_tick);
+    reset_poweroff_timer();
+    flipped = false;
+}
+
+/*
+ * helper function to swap UP/DOWN, LEFT/RIGHT
+ */
+static int button_flip(int button)
+{
+    int newbutton;
+
+    newbutton = button & 
+        ~(BUTTON_UP | BUTTON_DOWN
+        | BUTTON_LEFT | BUTTON_RIGHT);
+
+    if (button & BUTTON_UP)
+        newbutton |= BUTTON_DOWN;
+    if (button & BUTTON_DOWN)
+        newbutton |= BUTTON_UP;
+    if (button & BUTTON_LEFT)
+        newbutton |= BUTTON_RIGHT;
+    if (button & BUTTON_RIGHT)
+        newbutton |= BUTTON_LEFT;
+
+    return newbutton;
+}
+
+/*
+ * set the flip attribute
+ * better only call this when the queue is empty
+ */
+void button_set_flip(bool flip)
+{
+    if (flip != flipped) /* not the current setting */
+    {
+        /* avoid race condition with the button_tick() */
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        lastbtn = button_flip(lastbtn); 
+        flipped = flip;
+        set_irq_level(oldlevel);
+    }
+}
+
+/*
+ * Get button pressed from hardware
+ */
+static int button_read(void)
+{
+    int btn = BUTTON_NONE;
+    int retval;
+
+    int data;
+
+    data = adc_scan(0);
+
+    if(data < 0x80)
+        if(data < 0x30)
+            if(data < 0x18)
+                btn = BUTTON_SELECT;
+            else
+                btn = BUTTON_UP;
+        else
+            if(data < 0x50)
+                btn = BUTTON_LEFT;
+            else
+                btn = BUTTON_DOWN;
+    else
+        if(data < 0xb0)
+            if(data < 0xa0)
+                btn = BUTTON_RIGHT;
+            else
+                btn = BUTTON_OFF;
+        else
+            if(data < 0xd0)
+                btn = BUTTON_MODE;
+            else
+                if(data < 0xf0)
+                    btn = BUTTON_REC;
+        
+    data = GPIO1_READ;
+    if ((data & 0x20) == 0)
+        btn |= BUTTON_ON;
+
+
+    if (btn && flipped)
+        btn = button_flip(btn); /* swap upside down */
+
+    /* Filter the button status. It is only accepted if we get the same
+       status twice in a row. */
+    if(btn != last_read)
+        retval = lastbtn;
+    else
+        retval = btn;
+    last_read = btn;
+    
+    return retval;
+}
+
+bool button_hold(void)
+{
+    return (GPIO1_READ & 0x00000002)?true:false;
+}
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
 
 /* AJBR buttons are connected to the CPU as follows:
  *
@@ -279,7 +393,6 @@ static int button_read(void)
     int btn = BUTTON_NONE;
     int retval;
 
-    /* Check port B pins for ON and OFF */
     int data;
 
 #ifdef HAVE_FMADC
@@ -290,6 +403,7 @@ static int button_read(void)
     if ( adc_read(2) > 512 )
         btn |= BUTTON_OFF;
 #else
+    /* Check port B pins for ON and OFF */
     data = PBDR;
     if ((data & PBDR_BTN_ON) == 0)
         btn |= BUTTON_ON;
