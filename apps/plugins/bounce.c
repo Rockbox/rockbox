@@ -231,6 +231,7 @@ static int scrollit(void)
     int textpos=0;
 
     char* rock="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
+    unsigned int rocklen = rb->strlen(rock);
     int letter;
 
     rb->lcd_clear_display();
@@ -245,7 +246,7 @@ static int scrollit(void)
         rb->lcd_clear_display();
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
-            letter = rock[(i+textpos) % (sizeof(rock)-1) ];
+            letter = rock[(i+textpos) % rocklen ];
 
             rb->lcd_bitmap((char *)char_gen_12x16[letter-0x20],
                        xx, table[yy&63],
@@ -282,6 +283,7 @@ static int loopit(void)
     unsigned int xsanke=0;
 
     char* rock="ROCKbox";
+    unsigned int rocklen = rb->strlen(rock);
 
     int show=0;
     int timeout=0;
@@ -334,7 +336,7 @@ static int loopit(void)
             timeout--;
         }
         for(i=0, yy=y, xx=x;
-            i<sizeof(rock)-1;
+            i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
           rb->lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
                      xtable[xx%71], table[yy&63],
