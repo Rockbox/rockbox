@@ -885,13 +885,13 @@ bool settings_load_config(char* file)
             if (!lang_load(value))
                 set_file(value, global_settings.lang_file, MAX_FILENAME);
         }
+        else if (!strcasecmp(name, "bidir limit"))
+            set_cfg_int(&global_settings.bidir_limit, value, 0, 200);
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font"))
             strncpy(global_settings.font_file, value, MAX_FILENAME);
         else if (!strcasecmp(name, "scroll step"))
             set_cfg_int(&global_settings.scroll_step, value, 1, LCD_WIDTH);
-        else if (!strcasecmp(name, "bidir limit"))
-            set_cfg_int(&global_settings.bidir_limit, value, 0, 200);
         else if (!strcasecmp(name, "statusbar"))
             set_cfg_bool(&global_settings.statusbar, value);
         else if (!strcasecmp(name, "peak meter release"))
