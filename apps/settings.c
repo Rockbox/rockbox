@@ -984,11 +984,6 @@ bool set_int(char* string,
             case BUTTON_PLAY:
 #endif
                 done = true;
-                if (*variable != org_value) {
-                   lcd_stop_scroll();
-                   lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
-                   sleep(HZ/2);
-                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -998,10 +993,11 @@ bool set_int(char* string,
             case BUTTON_MENU:
 #endif
                 if (*variable != org_value) {
-                   *variable=org_value;
-                   lcd_stop_scroll();
-                   lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
-                   sleep(HZ/2);
+                    *variable=org_value;
+                    lcd_stop_scroll();
+                    lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+                    lcd_update();
+                    sleep(HZ/2);
                 }
                 done = true;
                 break;
@@ -1084,11 +1080,6 @@ bool set_option(char* string, int* variable, char* options[],
             case BUTTON_PLAY:
 #endif
                 done = true;
-                if (*variable != org_value) {
-                   lcd_stop_scroll();
-                   lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
-                   sleep(HZ/2);
-                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -1098,10 +1089,11 @@ bool set_option(char* string, int* variable, char* options[],
             case BUTTON_MENU:
 #endif
                 if (*variable != org_value) {
-                   *variable=org_value;
-                   lcd_stop_scroll();
-                   lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
-                   sleep(HZ/2);
+                    *variable=org_value;
+                    lcd_stop_scroll();
+                    lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+                    lcd_update();
+                    sleep(HZ/2);
                 }
                 done = true;
                 break;

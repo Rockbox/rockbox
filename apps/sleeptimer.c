@@ -74,11 +74,6 @@ bool sleeptimer_screen(void)
         case BUTTON_PLAY:
 #endif
           done = true;
-          if (changed) {
-            lcd_stop_scroll();
-            lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
-            sleep(HZ/2);
-          }
           break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -90,6 +85,7 @@ bool sleeptimer_screen(void)
           if (changed) {
             lcd_stop_scroll();
             lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+            lcd_update();
             set_sleep_timer(org_timer);
             sleep(HZ/2);
           }
