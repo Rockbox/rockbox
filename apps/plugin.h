@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 27
+#define PLUGIN_API_VERSION 28
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -289,15 +289,16 @@ struct plugin_api {
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
 #endif
-   void (*mpeg_flush_and_reload_tracks)(void);
-   int (*strncasecmp)(const char *s1, const char *s2, size_t n);
-   int (*mpeg_get_file_pos)(void);
-   unsigned long (*find_next_frame)(int fd, int *offset,
+    void (*mpeg_flush_and_reload_tracks)(void);
+    int (*strncasecmp)(const char *s1, const char *s2, size_t n);
+    int (*mpeg_get_file_pos)(void);
+    unsigned long (*find_next_frame)(int fd, int *offset,
                                     int max_offset, unsigned long last_header);
-   unsigned long (*mpeg_get_last_header)(void);
+    unsigned long (*mpeg_get_last_header)(void);
 #ifndef SIMULATOR
-   int (*system_memory_guard)(int newmode);
+    int (*system_memory_guard)(int newmode);
 #endif
+    int (*default_event_handler_ex)(int event, void (*callback)(void *), void *parameter);
 };
 
 /* defined by the plugin loader (plugin.c) */

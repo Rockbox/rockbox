@@ -262,6 +262,7 @@ static const struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     system_memory_guard,
 #endif
+    default_event_handler_ex,
 };
 
 int plugin_load(const char* plugin, void* parameter)

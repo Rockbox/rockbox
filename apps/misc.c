@@ -230,20 +230,30 @@ bool clean_shutdown(void)
     return false;
 }
 
-int default_event_handler(int event)
+int default_event_handler_ex(int event, void (*callback)(void *), void *parameter)
 {
     switch(event)
     {
         case SYS_USB_CONNECTED:
+            if (callback != NULL)
+                callback(parameter);
 #ifdef HAVE_MMC
             if (!mmc_detect() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
 #endif
                 usb_screen();
             return SYS_USB_CONNECTED;
         case SYS_POWEROFF:
+            if (callback != NULL)
+                callback(parameter);
             if (!clean_shutdown())
                 return SYS_POWEROFF;
             break;
     }
     return 0;
 }
+
+int default_event_handler(int event)
+{
+    return default_event_handler_ex(event, NULL, NULL);
+}
+
