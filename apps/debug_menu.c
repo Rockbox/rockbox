@@ -240,25 +240,39 @@ unsigned short crc_16(unsigned char* buf, unsigned len)
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
-bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device, unsigned addr1, unsigned addr2)
+   /* In IRAM to avoid problems when running directly from Flash */
+bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device, 
+                  unsigned addr1, unsigned addr2)
+                  __attribute__ ((section (".icode")));
+bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
+                  unsigned addr1, unsigned addr2)
+          
 {
     unsigned not_manu, not_id; /* read values before switching to ID mode */
     unsigned manu, id; /* read values when in ID mode */
     volatile unsigned char* flash = (unsigned char*)0x2000000; /* flash mapping */
+    int old_level; /* saved interrupt level */
 
     not_manu = flash[0]; /* read the normal content */
     not_id   = flash[1]; /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
 
+    /* disable interrupts, prevent any stray flash access */
+    old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     flash[addr1] = 0xAA; /* enter command mode */
     flash[addr2] = 0x55;
     flash[addr1] = 0x90; /* ID command */
-    sleep(HZ/50); /* Atmel wants 20ms pause here */
+    /* Atmel wants 20ms pause here */
+    /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
     manu = flash[0]; /* read the IDs */
     id   = flash[1];
 
     flash[0] = 0xF0; /* reset flash (back to normal read mode) */
-    sleep(HZ/50); /* Atmel wants 20ms pause here */
+    /* Atmel wants 20ms pause here */
+    /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
+
+    set_irq_level(old_level); /* enable interrupts again */
 
     /* I assume success if the obtained values are different from
         the normal flash content. This is not perfectly bulletproof, they 
