@@ -248,6 +248,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* print instructions */
     rb->lcd_clear_display();
+    rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_putsxy(2, 8, "[OFF] to stop");
     rb->lcd_putsxy(2, 18, "[PLAY] toggle");
     rb->lcd_putsxy(2, 28, "[F1] shuffle");
