@@ -469,8 +469,6 @@ static int save_config_buffer( void )
     unsigned int i;
 #endif
 
-    DEBUGF( "save_config_buffer()\n" );
-    
     /* update the checksum in the end of the block before saving */
     chksum = calculate_config_checksum(config_block);
     config_block[ RTC_BLOCK_SIZE - 2 ] = chksum >> 8;
@@ -645,8 +643,6 @@ void settings_calc_config_sector(void)
  */
 int settings_save( void )
 {
-    DEBUGF( "settings_save()\n" );
-
     {
         int elapsed_secs;
 

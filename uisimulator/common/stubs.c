@@ -160,8 +160,9 @@ int rtc_read(int address)
 
 int rtc_write(int address, int value)
 {
-  DEBUGF("write %02x to address %02x\n", value, address);
-  return 0;
+    (void)address;
+    (void)value;
+     return 0;
 }
 
 bool has_new_lcd(void)
