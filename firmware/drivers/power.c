@@ -38,14 +38,14 @@ int battery_level(void)
 {
     int level;
     
-    level = adc_read(ADC_UNREG_POWER) - BATTERY_LEVEL_SHUTDOWN;
+    level = adc_read(ADC_UNREG_POWER);
     if(level < 0)
         level = 0;
     
     if(level > BATTERY_LEVEL_FULL)
         level = BATTERY_LEVEL_FULL;
-        
-    return (level * 100) / BATTERY_RANGE;
+
+    return ((level-BATTERY_LEVEL_SHUTDOWN) * 100) / BATTERY_RANGE;
 }
 
 void charger_enable(bool on)
