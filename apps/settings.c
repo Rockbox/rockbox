@@ -64,6 +64,7 @@
 #include "keyboard.h"
 #include "version.h"
 #include "rtc.h"
+#include "sound.h"
 #if CONFIG_HWCODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
@@ -719,21 +720,21 @@ void settings_apply_pm_range(void)
 
 void sound_settings_apply(void)
 {
-    mpeg_sound_set(SOUND_BASS, global_settings.bass);
-    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
-    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
-    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
-    mpeg_sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
+    sound_set(SOUND_BASS, global_settings.bass);
+    sound_set(SOUND_TREBLE, global_settings.treble);
+    sound_set(SOUND_BALANCE, global_settings.balance);
+    sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set(SOUND_CHANNELS, global_settings.channel_config);
+    sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
-    mpeg_sound_set(SOUND_AVC, global_settings.avc);
-    mpeg_sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
-    mpeg_sound_set(SOUND_MDB_HARMONICS, global_settings.mdb_harmonics);
-    mpeg_sound_set(SOUND_MDB_CENTER, global_settings.mdb_center);
-    mpeg_sound_set(SOUND_MDB_SHAPE, global_settings.mdb_shape);
-    mpeg_sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
-    mpeg_sound_set(SOUND_SUPERBASS, global_settings.superbass);
+    sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    sound_set(SOUND_AVC, global_settings.avc);
+    sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
+    sound_set(SOUND_MDB_HARMONICS, global_settings.mdb_harmonics);
+    sound_set(SOUND_MDB_CENTER, global_settings.mdb_center);
+    sound_set(SOUND_MDB_SHAPE, global_settings.mdb_shape);
+    sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
+    sound_set(SOUND_SUPERBASS, global_settings.superbass);
 #endif
 }
 
@@ -1261,20 +1262,20 @@ void settings_reset(void) {
     default_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]));
 
     /* do some special cases not covered by table */
-    global_settings.volume      = mpeg_sound_default(SOUND_VOLUME);
-    global_settings.balance     = mpeg_sound_default(SOUND_BALANCE);
-    global_settings.bass        = mpeg_sound_default(SOUND_BASS);
-    global_settings.treble      = mpeg_sound_default(SOUND_TREBLE);
-    global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
-    global_settings.avc         = mpeg_sound_default(SOUND_AVC);
-    global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
-    global_settings.stereo_width = mpeg_sound_default(SOUND_STEREO_WIDTH);
-    global_settings.mdb_strength = mpeg_sound_default(SOUND_MDB_STRENGTH);
-    global_settings.mdb_harmonics = mpeg_sound_default(SOUND_MDB_HARMONICS);
-    global_settings.mdb_center = mpeg_sound_default(SOUND_MDB_CENTER);
-    global_settings.mdb_shape = mpeg_sound_default(SOUND_MDB_SHAPE);
-    global_settings.mdb_enable = mpeg_sound_default(SOUND_MDB_ENABLE);
-    global_settings.superbass = mpeg_sound_default(SOUND_SUPERBASS);
+    global_settings.volume      = sound_default(SOUND_VOLUME);
+    global_settings.balance     = sound_default(SOUND_BALANCE);
+    global_settings.bass        = sound_default(SOUND_BASS);
+    global_settings.treble      = sound_default(SOUND_TREBLE);
+    global_settings.loudness    = sound_default(SOUND_LOUDNESS);
+    global_settings.avc         = sound_default(SOUND_AVC);
+    global_settings.channel_config = sound_default(SOUND_CHANNELS);
+    global_settings.stereo_width = sound_default(SOUND_STEREO_WIDTH);
+    global_settings.mdb_strength = sound_default(SOUND_MDB_STRENGTH);
+    global_settings.mdb_harmonics = sound_default(SOUND_MDB_HARMONICS);
+    global_settings.mdb_center = sound_default(SOUND_MDB_CENTER);
+    global_settings.mdb_shape = sound_default(SOUND_MDB_SHAPE);
+    global_settings.mdb_enable = sound_default(SOUND_MDB_ENABLE);
+    global_settings.superbass = sound_default(SOUND_SUPERBASS);
     global_settings.contrast    = lcd_default_contrast();
     global_settings.wps_file[0] = '\0';
     global_settings.font_file[0] = '\0';

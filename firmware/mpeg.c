@@ -31,6 +31,7 @@
 #include "mp3data.h"
 #include "buffer.h"
 #include "mp3_playback.h"
+#include "sound.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -901,7 +902,7 @@ static void track_change(void)
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* Reset the AVC */
-    mpeg_sound_set(SOUND_AVC, -1);
+    sound_set(SOUND_AVC, -1);
 #endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
     remove_current_tag();
 

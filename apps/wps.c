@@ -49,6 +49,7 @@
 #include "lang.h"
 #include "bookmark.h"
 #include "misc.h"
+#include "sound.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -172,17 +173,17 @@ static char current_track_path[MAX_PATH+1];
 */
 static bool setvol(void)
 {
-    if (global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-        global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-    if (global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-        global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    if (global_settings.volume < sound_min(SOUND_VOLUME))
+        global_settings.volume = sound_min(SOUND_VOLUME);
+    if (global_settings.volume > sound_max(SOUND_VOLUME))
+        global_settings.volume = sound_max(SOUND_VOLUME);
+    sound_set(SOUND_VOLUME, global_settings.volume);
     status_draw(false);
     wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
     settings_save();
 #ifdef HAVE_LCD_CHARCELLS
     splash(0, false, "Vol: %d %%   ",
-           mpeg_val2phys(SOUND_VOLUME, global_settings.volume));
+           sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif
     return false;
@@ -388,7 +389,7 @@ static void fade(bool fade_in)
         int current_volume = 20;
         
         /* zero out the sound */
-        mpeg_sound_set(SOUND_VOLUME, current_volume);
+        sound_set(SOUND_VOLUME, current_volume);
 
         sleep(HZ/10); /* let mpeg thread run */
         mpeg_resume();
@@ -396,9 +397,9 @@ static void fade(bool fade_in)
         while (current_volume < global_settings.volume) {    
             current_volume += 2;
             sleep(1);
-            mpeg_sound_set(SOUND_VOLUME, current_volume);
+            sound_set(SOUND_VOLUME, current_volume);
         }
-        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+        sound_set(SOUND_VOLUME, global_settings.volume);
     }
     else {
         /* fade out */
@@ -407,13 +408,13 @@ static void fade(bool fade_in)
         while (current_volume > 20) {    
             current_volume -= 2;
             sleep(1);
-            mpeg_sound_set(SOUND_VOLUME, current_volume);
+            sound_set(SOUND_VOLUME, current_volume);
         }
         mpeg_pause();
         sleep(HZ/5); /* let mpeg thread run */
 
         /* reset volume to what it was before the fade */
-        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+        sound_set(SOUND_VOLUME, global_settings.volume);
     }
 }
 

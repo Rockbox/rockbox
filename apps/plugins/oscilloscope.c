@@ -242,7 +242,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (vol < 100)
                 {
                     vol++;
-                    rb->mpeg_sound_set(SOUND_VOLUME, vol);
+                    rb->sound_set(SOUND_VOLUME, vol);
                     rb->global_settings->volume = vol;
                 }
                 break;
@@ -253,7 +253,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (vol > 0)
                 {
                     vol--;
-                    rb->mpeg_sound_set(SOUND_VOLUME, vol);
+                    rb->sound_set(SOUND_VOLUME, vol);
                     rb->global_settings->volume = vol;
                 }
                 break;

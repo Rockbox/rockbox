@@ -34,6 +34,7 @@
 #include "sprintf.h"
 #include "talk.h"
 #include "misc.h"
+#include "sound.h"
 
 static const char* const fmt[] =
 {
@@ -59,11 +60,11 @@ bool set_sound(const char* string,
     int steps;
     int button;
 
-    unit = mpeg_sound_unit(setting);
-    numdec = mpeg_sound_numdecimals(setting);
-    steps = mpeg_sound_steps(setting);
-    min = mpeg_sound_min(setting);
-    max = mpeg_sound_max(setting);
+    unit = sound_unit(setting);
+    numdec = sound_numdecimals(setting);
+    steps = sound_steps(setting);
+    min = sound_min(setting);
+    max = sound_max(setting);
     if (*unit == 'd') /* crude reconstruction */
         talkunit = UNIT_DB;
     else if (*unit == '%')
@@ -82,7 +83,7 @@ bool set_sound(const char* string,
 
     while (!done) {
         if (changed) {
-            val = mpeg_val2phys(setting, *variable);
+            val = sound_val2phys(setting, *variable);
             if(numdec)
             {
                 integer = val / (10 * numdec);
@@ -136,7 +137,7 @@ bool set_sound(const char* string,
                 break;
         }
         if (changed)
-            mpeg_sound_set(setting, *variable);
+            sound_set(setting, *variable);
     }
     lcd_stop_scroll();
     return false;
@@ -196,7 +197,7 @@ static bool mdb_shape(void)
 
 static void set_mdb_enable(bool value)
 {
-    mpeg_sound_set(SOUND_MDB_ENABLE, (int)value);
+    sound_set(SOUND_MDB_ENABLE, (int)value);
 }
 
 static bool mdb_enable(void)
@@ -210,7 +211,7 @@ static bool mdb_enable(void)
 
 static void set_superbass(bool value)
 {
-    mpeg_sound_set(SOUND_SUPERBASS, (int)value);
+    sound_set(SOUND_SUPERBASS, (int)value);
 }
 
 static bool superbass(void)
@@ -224,7 +225,7 @@ static bool superbass(void)
 
 static void set_avc(int val)
 {
-    mpeg_sound_set(SOUND_AVC, val);
+    sound_set(SOUND_AVC, val);
 }
 
 static bool avc(void)
@@ -379,7 +380,7 @@ static bool reconstartup(void)
 
 static void set_chanconf(int val)
 {
-    mpeg_sound_set(SOUND_CHANNELS, val);
+    sound_set(SOUND_CHANNELS, val);
 }
 
 static bool chanconf(void)

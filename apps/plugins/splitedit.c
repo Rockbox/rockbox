@@ -1055,17 +1055,17 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 #if defined(SPLITEDIT_SPEED150) && defined(SPLITEDIT_SPEED100) && defined(SPLITEDIT_SPEED50)
             case SPLITEDIT_SPEED150:
-                rb->mpeg_set_pitch(1500);
+                rb->sound_set_pitch(1500);
                 splitedit_invalidate_osci();
                 break;
 
             case SPLITEDIT_SPEED100:
-                rb->mpeg_set_pitch(1000);
+                rb->sound_set_pitch(1000);
                 splitedit_invalidate_osci();
                 break;
 
             case SPLITEDIT_SPEED50:
-                rb->mpeg_set_pitch(500);
+                rb->sound_set_pitch(500);
                 splitedit_invalidate_osci();
                 break;
 #endif

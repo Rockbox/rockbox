@@ -278,7 +278,7 @@ void ChangeVolume(int delta)
     else if (vol < 0) vol = 0;
     if (vol != rb->global_settings->volume)
     {
-        rb->mpeg_sound_set(SOUND_VOLUME, vol);
+        rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
         rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d", vol);
         rb->lcd_puts(0, 7, gPrint);

@@ -50,6 +50,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #endif
+#include "sound.h"
 
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -228,7 +229,7 @@ struct plugin_api {
     int (*memcmp)(const void *s1, const void *s2, size_t n);
 
     /* sound */
-    void (*mpeg_sound_set)(int setting, int value);
+    void (*sound_set)(int setting, int value);
 #ifndef SIMULATOR
     void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
@@ -254,7 +255,7 @@ struct plugin_api {
     int (*mpeg_get_file_pos)(void);
     unsigned long (*mpeg_get_last_header)(void);
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    void (*mpeg_set_pitch)(int pitch);        
+    void (*sound_set_pitch)(int pitch);        
 #endif
 
     /* MAS communication */

@@ -1042,25 +1042,25 @@ void set_position(int seconds)
 /* set to everything flat and 0 dB volume */
 void sound_neutral(void)
 {    /* neutral sound settings */
-    rb->mpeg_sound_set(SOUND_BASS, 0);
-    rb->mpeg_sound_set(SOUND_TREBLE, 0);
-    rb->mpeg_sound_set(SOUND_BALANCE, 0);
-    rb->mpeg_sound_set(SOUND_VOLUME, 92); /* 0 dB */
-    rb->mpeg_sound_set(SOUND_LOUDNESS, 0);
-    rb->mpeg_sound_set(SOUND_SUPERBASS, 0);
-    rb->mpeg_sound_set(SOUND_AVC, 0);
+    rb->sound_set(SOUND_BASS, 0);
+    rb->sound_set(SOUND_TREBLE, 0);
+    rb->sound_set(SOUND_BALANCE, 0);
+    rb->sound_set(SOUND_VOLUME, 92); /* 0 dB */
+    rb->sound_set(SOUND_LOUDNESS, 0);
+    rb->sound_set(SOUND_SUPERBASS, 0);
+    rb->sound_set(SOUND_AVC, 0);
 }
 
 /* return to user settings */
 void sound_normal(void)
 {   /* restore sound settings */
-    rb->mpeg_sound_set(SOUND_BASS, rb->global_settings->bass);
-    rb->mpeg_sound_set(SOUND_TREBLE, rb->global_settings->treble);
-    rb->mpeg_sound_set(SOUND_BALANCE, rb->global_settings->balance);
-    rb->mpeg_sound_set(SOUND_VOLUME, rb->global_settings->volume);
-    rb->mpeg_sound_set(SOUND_LOUDNESS, rb->global_settings->loudness);
-    rb->mpeg_sound_set(SOUND_SUPERBASS, rb->global_settings->superbass);
-    rb->mpeg_sound_set(SOUND_AVC, rb->global_settings->avc);
+    rb->sound_set(SOUND_BASS, rb->global_settings->bass);
+    rb->sound_set(SOUND_TREBLE, rb->global_settings->treble);
+    rb->sound_set(SOUND_BALANCE, rb->global_settings->balance);
+    rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+    rb->sound_set(SOUND_LOUDNESS, rb->global_settings->loudness);
+    rb->sound_set(SOUND_SUPERBASS, rb->global_settings->superbass);
+    rb->sound_set(SOUND_AVC, rb->global_settings->avc);
 }
 
 /* the thread running it all */

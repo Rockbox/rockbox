@@ -36,6 +36,7 @@
 #endif
 #include "powermgmt.h"
 #include "led.h"
+#include "sound.h"
 
 static enum playmode ff_mode;
 
@@ -146,7 +147,7 @@ void status_draw(bool force_redraw)
     (void)force_redraw; /* players always "redraw" */
 #endif
 
-    info.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+    info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
     info.inserted = charger_inserted();
     info.battlevel = battery_level();
     info.battery_safe = battery_level_safe();

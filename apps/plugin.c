@@ -44,6 +44,7 @@
 #include "mp3data.h"
 #include "powermgmt.h"
 #include "system.h"
+#include "sound.h"
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
 #endif
@@ -188,7 +189,7 @@ static const struct plugin_api rockbox_api = {
     memcmp,
 
     /* sound */
-    mpeg_sound_set,
+    sound_set,
 #ifndef SIMULATOR
     mp3_play_data,
     mp3_play_pause,
@@ -214,7 +215,7 @@ static const struct plugin_api rockbox_api = {
     mpeg_get_file_pos,
     mpeg_get_last_header,
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    mpeg_set_pitch,
+    sound_set_pitch,
 #endif
 
 #if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)

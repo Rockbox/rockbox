@@ -111,7 +111,10 @@ bitswap.S
 descramble.S
 #endif
 drivers/lcd.S
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#ifdef IRIVER_H100
+#ifndef SIMULATOR
 drivers/uda1380.c
 pcm_playback.c
 #endif
+#endif
+sound.c

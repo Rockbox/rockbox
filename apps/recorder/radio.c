@@ -220,8 +220,8 @@ bool radio_screen(void)
                                global_settings.rec_prerecord_time);
 
     
-    mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
-                            mpeg_sound_default(SOUND_RIGHT_GAIN), false);
+    mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                            sound_default(SOUND_RIGHT_GAIN), false);
 #endif
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
@@ -356,9 +356,9 @@ bool radio_screen(void)
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
                 global_settings.volume++;
-                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                if(global_settings.volume > sound_max(SOUND_VOLUME))
+                    global_settings.volume = sound_max(SOUND_VOLUME);
+                sound_set(SOUND_VOLUME, global_settings.volume);
                 update_screen = true;
                 settings_save();
                 break;
@@ -366,9 +366,9 @@ bool radio_screen(void)
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
                 global_settings.volume--;
-                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                if(global_settings.volume < sound_min(SOUND_VOLUME))
+                    global_settings.volume = sound_min(SOUND_VOLUME);
+                sound_set(SOUND_VOLUME, global_settings.volume);
                 update_screen = true;
                 settings_save();
                 break;
@@ -548,8 +548,8 @@ bool radio_screen(void)
     if(keep_playing)
     {
         /* Enable the Left and right A/D Converter */
-        mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
-                                mpeg_sound_default(SOUND_RIGHT_GAIN), false);
+        mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                                sound_default(SOUND_RIGHT_GAIN), false);
         mas_codec_writereg(6, 0x4000);
         radio_set_status(FMRADIO_POWERED); /* leave it powered */
     }

@@ -44,6 +44,7 @@
 #include "screens.h"
 #include "debug.h"
 #include "led.h"
+#include "sound.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -437,7 +438,7 @@ int pitch_screen(void)
                 pitch++;
                 if ( pitch > 2000 )
                     pitch = 2000;
-                mpeg_set_pitch(pitch);
+                sound_set_pitch(pitch);
                 break;
 
             case BUTTON_DOWN:
@@ -447,7 +448,7 @@ int pitch_screen(void)
                 pitch--;
                 if ( pitch < 500 )
                     pitch = 500;
-                mpeg_set_pitch(pitch);
+                sound_set_pitch(pitch);
                 break;
 
             case BUTTON_ON | BUTTON_PLAY:
@@ -468,28 +469,28 @@ int pitch_screen(void)
             case BUTTON_ON | BUTTON_RIGHT:
                 if ( pitch < 2000 ) {
                     pitch += 20;
-                    mpeg_set_pitch(pitch);
+                    sound_set_pitch(pitch);
                 }
                 break;
 
             case BUTTON_RIGHT | BUTTON_REL:
                 if ( pitch > 500 ) {
                     pitch -= 20;
-                    mpeg_set_pitch(pitch);
+                    sound_set_pitch(pitch);
                 }
                 break;
 
             case BUTTON_ON | BUTTON_LEFT:
                 if ( pitch > 500 ) {
                     pitch -= 20;
-                    mpeg_set_pitch(pitch);
+                    sound_set_pitch(pitch);
                 }
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
                 if ( pitch < 2000 ) {
                     pitch += 20;
-                    mpeg_set_pitch(pitch);
+                    sound_set_pitch(pitch);
                 }
                 break;
 

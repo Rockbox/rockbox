@@ -201,7 +201,7 @@ void change_volume(int delta){
     if (vol > 100) vol = 100;
     else if (vol < 0) vol = 0;
     if (vol != rb->global_settings->volume) {
-        rb->mpeg_sound_set(SOUND_VOLUME, vol);
+        rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
         rb->snprintf(buffer, sizeof(buffer), "Vol: %d ", vol);
 #ifdef HAVE_LCD_BITMAP

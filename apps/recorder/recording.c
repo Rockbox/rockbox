@@ -49,6 +49,7 @@
 #include "errno.h"
 #include "talk.h"
 #include "atoi.h"
+#include "sound.h"
 
 #ifdef HAVE_RECORDING
 
@@ -124,9 +125,9 @@ char *fmt_gain(int snd, int val, char *str, int len)
     int tmp, i, d, numdec;
     const char *unit;
     
-    tmp = mpeg_val2phys(snd, val);
-    numdec = mpeg_sound_numdecimals(snd);
-    unit = mpeg_sound_unit(snd);
+    tmp = sound_val2phys(snd, val);
+    numdec = sound_numdecimals(snd);
+    unit = sound_unit(snd);
     
     i = tmp / (10*numdec);
     d = abs(tmp % (10*numdec));
@@ -268,7 +269,7 @@ bool recording_screen(void)
     cursor = 0;
     mpeg_init_recording();
 
-    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set(SOUND_VOLUME, global_settings.volume);
     
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
@@ -395,16 +396,16 @@ bool recording_screen(void)
                         {
                             global_settings.rec_mic_gain++;
                             if(global_settings.rec_mic_gain >
-                               mpeg_sound_max(SOUND_MIC_GAIN))
+                               sound_max(SOUND_MIC_GAIN))
                                 global_settings.rec_mic_gain =
-                                    mpeg_sound_max(SOUND_MIC_GAIN);
+                                    sound_max(SOUND_MIC_GAIN);
                         }
                         else
                         {
                             gain = MAX(global_settings.rec_left_gain,
                                        global_settings.rec_right_gain) + 1;
-                            if(gain > mpeg_sound_max(SOUND_MIC_GAIN))
-                                gain = mpeg_sound_max(SOUND_MIC_GAIN);
+                            if(gain > sound_max(SOUND_MIC_GAIN))
+                                gain = sound_max(SOUND_MIC_GAIN);
                             global_settings.rec_left_gain = gain;
                             global_settings.rec_right_gain = gain;
                         }
@@ -412,16 +413,16 @@ bool recording_screen(void)
                     case 1:
                         global_settings.rec_left_gain++;
                         if(global_settings.rec_left_gain >
-                           mpeg_sound_max(SOUND_LEFT_GAIN))
+                           sound_max(SOUND_LEFT_GAIN))
                             global_settings.rec_left_gain =
-                                mpeg_sound_max(SOUND_LEFT_GAIN);
+                                sound_max(SOUND_LEFT_GAIN);
                         break;
                     case 2:
                         global_settings.rec_right_gain++;
                         if(global_settings.rec_right_gain >
-                           mpeg_sound_max(SOUND_RIGHT_GAIN))
+                           sound_max(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain =
-                                mpeg_sound_max(SOUND_RIGHT_GAIN);
+                                sound_max(SOUND_RIGHT_GAIN);
                         break;
                 }
                 set_gain();
@@ -437,16 +438,16 @@ bool recording_screen(void)
                         {
                             global_settings.rec_mic_gain--;
                             if(global_settings.rec_mic_gain <
-                               mpeg_sound_min(SOUND_MIC_GAIN))
+                               sound_min(SOUND_MIC_GAIN))
                                 global_settings.rec_mic_gain =
-                                    mpeg_sound_min(SOUND_MIC_GAIN);
+                                    sound_min(SOUND_MIC_GAIN);
                         }
                         else
                         {
                             gain = MAX(global_settings.rec_left_gain,
                                        global_settings.rec_right_gain) - 1;
-                            if(gain < mpeg_sound_min(SOUND_LEFT_GAIN))
-                                gain = mpeg_sound_min(SOUND_LEFT_GAIN);
+                            if(gain < sound_min(SOUND_LEFT_GAIN))
+                                gain = sound_min(SOUND_LEFT_GAIN);
                             global_settings.rec_left_gain = gain;
                             global_settings.rec_right_gain = gain;
                         }
@@ -454,16 +455,16 @@ bool recording_screen(void)
                     case 1:
                         global_settings.rec_left_gain--;
                         if(global_settings.rec_left_gain <
-                           mpeg_sound_min(SOUND_LEFT_GAIN))
+                           sound_min(SOUND_LEFT_GAIN))
                             global_settings.rec_left_gain =
-                                mpeg_sound_min(SOUND_LEFT_GAIN);
+                                sound_min(SOUND_LEFT_GAIN);
                         break;
                     case 2:
                         global_settings.rec_right_gain--;
                         if(global_settings.rec_right_gain <
-                           mpeg_sound_min(SOUND_MIC_GAIN))
+                           sound_min(SOUND_MIC_GAIN))
                             global_settings.rec_right_gain =
-                                mpeg_sound_min(SOUND_MIC_GAIN);
+                                sound_min(SOUND_MIC_GAIN);
                         break;
                 }
                 set_gain();
