@@ -38,7 +38,7 @@ struct tm *get_time(void)
     tm.tm_min = ((rtcbuf[2] & 0x70) >> 4) * 10 + (rtcbuf[2] & 0x0f);
     tm.tm_hour = ((rtcbuf[3] & 0x30) >> 4) * 10 + (rtcbuf[3] & 0x0f);
     tm.tm_mday = ((rtcbuf[5] & 0x30) >> 4) * 10 + (rtcbuf[5] & 0x0f);
-    tm.tm_mon = ((rtcbuf[6] & 0x10) >> 4) * 10 + (rtcbuf[6] & 0x0f);
+    tm.tm_mon = ((rtcbuf[6] & 0x10) >> 4) * 10 + (rtcbuf[6] & 0x0f) - 1;
     tm.tm_year = ((rtcbuf[7] & 0xf0) >> 4) * 10 + (rtcbuf[7] & 0x0f) + 100;
     tm.tm_wday = rtcbuf[4] & 0x07;
     tm.tm_yday = 0; /* Not implemented for now */
@@ -48,8 +48,8 @@ struct tm *get_time(void)
     tm.tm_min = 0;
     tm.tm_hour = 0;
     tm.tm_mday = 1;
-    tm.tm_mon = 1;
-    tm.tm_year = 1970;
+    tm.tm_mon = 0;
+    tm.tm_year = 70;
     tm.tm_wday = 1;
     tm.tm_yday = 0; /* Not implemented for now */
     tm.tm_isdst = -1; /* Not implemented for now */
