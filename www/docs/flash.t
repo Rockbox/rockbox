@@ -12,31 +12,25 @@ by Jörg Hohensohn aka [IDC]Dragon
 7. Known issues, limitations<br>
 8. Movies and images<br>
 
-<h2>What is Flashing</h2>
-
-<p> Flashing in the sense used here and elsewhere in regard to Rockbox means
+<h2>1. What is this about?</h2>
+<p>
+Flashing in the sense used here and elsewhere in regard to Rockbox means
 reprogramming the flash memory of the Archos unit.  Flash memory (sometimes
 called "Flash ROM") is a type of nonvolatile memory that can be erased and 
-reprogrammed. It is a variation of electrically erasable programmable 
-read-only memory (EEPROM).
-
+reprogrammed in circuit. It is a variation of electrically erasable 
+programmable read-only memory (EEPROM).
 <p>
  When you bought Your Archos, it came with the Archos firmware flashed. Now,
 you can replace the built-in software with Rockbox.
-
-<h2>1. What is this about?</h2>
-<p>
-This package contains tools to update the flash content of Archos Jukebox
-Recorder / FM.
 <p>
 Some terminology I'm gonna use in the following:<br>
 <b>Firmware</b> means the flash ROM content as a whole.<br>
 <b>Image</b> means one operating software started from there.
 <p>
-By reprogramming the firmware we can boot much faster. Archos has a pathetic
-boot loader, versus the boot time for rockbox is much faster than the disk
+By reprogramming the firmware we can bot much faster. Archos has a pathetic
+boot loader, versus the boot time for Rrockbox is much faster than the disk
 spinup, in fact it has to wait for the disk. Your boot time will be as quick as
-a disk spinup. In my case, that's 3 seconds from powerup until resuming
+a disk spinup. In my case, that's 4 seconds from powerup until resuming
 playback.
 
 <h2>2. How is it working?</h2>
@@ -66,7 +60,9 @@ I will provide more technical details in the future, as well as my non-user
 tools. There's an authoring tool which composed the firmware file with the
 bootloader and the 2 images, the bootloader project, the plugin sources, and
 the tools for the UART boot feature: a monitor program for the box and a PC
-tool to drive it.
+tool to drive it. Feel free to review the 
+<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_sourcecode.zip">sources</a> 
+ for all of it, but be careful when fooling around with powerful toys!
 
 <h2>3. Is it dangerous?</h3>
 <p>
@@ -84,7 +80,7 @@ such low level code should behave different on your box.
 There's one ultimate safety net to bring back boxes with even completely
 garbled flash content: the UART boot mod, which in turn requires the serial
 mod. It can bring the dead back to life, with that it's possible to reflash
-completely from the outside, even if the flash is completely erased. I used
+independently from the outside, even if the flash is completely erased. I used
 that during development, else Rockbox in flash wouldn't have been possible.
 Most of the developing effort went into this tooling. So people skilled to do
 these mods don't need to worry. The others may feel unpleasant using the first
@@ -134,12 +130,17 @@ different. It takes a developer with the serial mod to go ahead with it.
 I'm using the new plugin feature to run the flasher code. There's not really a
 wrong path to take, however here's a suggested step by step procedure:
 <ul>
-<li> copy the following files of <a href="http://joerg.hohensohn.bei.t-online.de/archos/">this package</a> to your box:<ol>
+<li> download the correct package for you model, 
+<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_rec.zip">Recorder</a> 
+ or 
+<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_fm.zip">FM</a>
+, copy some files of it to your box:
+<ol>
   <li> "ajbrec.ajz" into the root directory (the version of Rockbox we're going to use and have in the
 firmware file)<br>
   <li> firmware_rec.bin or firmware_fm.bin into the root directory (the complete firmware for your model,
 with my bootloader and the two images)
-  <li> all .rock files to .rockbox/rocks (the plugins for Rockbox)<br>
+  <li> the .rockbox subdirectory with all the plugins for Rockbox<br>
  </ol>
 <li> Restart the box so that the new ajbrec.ajz gets started.
 
@@ -212,9 +213,9 @@ it down to about 58% of the original size. For details on UCL, see: <a
 href="http://www.oberhumer.com/opensource/ucl/">www.oberhumer.com/opensource/ucl/</a>
 
 <p> Linux users will have to download it from there and compile it, for Win32
-and Cygwin I can do that, so the executables are in <a
-href="http://joerg.hohensohn.bei.t-online.de/archos/">the package</a>. The
-sample program from that download is called "uclpack". We'll use that to
+and Cygwin I can do that, so the executables are in 
+<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash">the packages</a>.
+The sample program from that download is called "uclpack". We'll use that to
 compress "rockbox.bin" which is the result of the compilation. This is 
 a part of the build process meanwhile. If you compile Rockbox yourself,
 you should copy uclpack to a directory which is in the path, I recommend 
@@ -236,10 +237,10 @@ bootloader), with maximum compression, by typing
 "uclpack --2e --best rockbox.bin rockbox.ucl". You can make a batch file for
 this and the above step, if you like.
 
-<li> Normally, you'll download or compile rockbox.ucl. Copy it together 
+<li> Normally, you'll simply download or compile rockbox.ucl. Copy it together 
 with ajbrec.ajz and all the rocks to the appropriate places, replacing the old.
 
-<li> Just "play" the .ucl file, thos will kick off the "rockbox_flash.rock" 
+<li> Just "play" the .ucl file, this will kick off the "rockbox_flash.rock" 
 plugin. It's a bit similar to the other one, but I made it different 
 to make the user aware. It will check the file, 
 available size, etc. With F2 it's being programmed, no need for warning this 
@@ -261,6 +262,12 @@ compression by itself, but that's hard to do because a plugin is very limited
 with memory (32kB for code and data). Currently I'm doing one flash sector
 (4096 bytes) at a time. Don't know how slow the compression algorithm would be
 on the box, that's the strenuous part.
+<p>
+If you like or have to, you can also flash the Archos image as the second one,
+e.g. in case Rockbox from flash doesn't work for you. This way you keep the 
+dual bootloader and you can easily try different later. I prepared 
+<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash">UCLs</a>
+for the latest Recorder and FM firmware.
 
 <h2>7. Known issues, limitations</h2>
 <p>
@@ -290,11 +297,12 @@ the new version before flashing it.
 
 <p>
 Two people have an issue with recording, it freezes after a few minutes or so 
-(statistically). The use F1 to record with Archos software as a workaround.
+(statistically). They use F1 to record with Archos software as a workaround.
 
 <h2>8. Movies and images</h2>
 <p>
- Jörg's AVI movie (1.5MB) <a href="flash/rockbox_flash_boot.avi">rockbox_flash_boot.avi</a> showing his unit booting Rockbox from flash.
+ Jörg's AVI movie (1.5MB) <a href="flash/rockbox_flash_boot.avi">rockbox_flash_boot.avi</a> 
+showing his unit booting Rockbox from flash.
 <p>
  Roland's screendump from the movie:<br>
 <img src="flash/rockbox-flash.jpg" width="352" height="288">
