@@ -66,8 +66,6 @@ void backlight_thread(void)
                     backlight_timer = HZ*timeout_value[backlight_timeout];
                 }
 
-                backlight_timer = HZ*timeout_value[backlight_timeout];
-
                 if(backlight_timer < 0)
                 {
                     backlight_timer = 0;    /* timer value 0 will not get ticked */
@@ -136,14 +134,14 @@ void backlight_set_on_when_charging(bool yesno)
 
 void backlight_tick(void)
 {
-  bool charger_is_inserted = charger_inserted();
+    bool charger_is_inserted = charger_inserted();
     if( backlight_on_when_charging &&
         (charger_was_inserted != charger_is_inserted) )
     {
         backlight_on();
     }
     charger_was_inserted = charger_is_inserted;
-
+    
     if(backlight_timer)
     {
         backlight_timer--;
@@ -164,3 +162,9 @@ void backlight_init(void)
     
     backlight_on();
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "rockbox-mode.el")
+ * end:
+ */
