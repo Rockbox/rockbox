@@ -238,6 +238,7 @@ static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
 static int create_dos_name(unsigned char *name, unsigned char *newname);
 static unsigned int find_free_cluster(unsigned int start);
+static int transfer( unsigned int start, int count, char* buf, bool write );
 
 #define FAT_CACHE_SIZE 0x20
 #define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
@@ -1334,6 +1335,9 @@ int fat_create_dir(char* name,
                    struct fat_dir* newdir,
                    struct fat_dir* dir)
 {
+    unsigned char buf[SECTOR_SIZE];
+    int i;
+    int sector;
     int rc;
     struct fat_file dummyfile;
 
@@ -1347,20 +1351,33 @@ int fat_create_dir(char* name,
     if (rc < 0)
         return rc * 10 - 1;
 
-    /* Then add the "." entry */
+    /* Allocate a new cluster for the directory */
     newdir->file.firstcluster = find_free_cluster(fat_bpb.fsinfo.nextfree);
+    if(newdir->file.firstcluster == 0)
+        return -1;
+
     update_fat_entry(newdir->file.firstcluster, FAT_EOF_MARK);
+
+    /* Clear the entire cluster */
+    memset(buf, 0, sizeof buf);
+    sector = cluster2sec(newdir->file.firstcluster);
+    for(i = 0;i < (int)fat_bpb.bpb_secperclus;i++) {
+        rc = transfer( sector + fat_bpb.startsector + i, 1, buf, true );
+        if (rc < 0)
+            return rc * 10 - 2;
+    }
     
+    /* Then add the "." entry */
     rc = add_dir_entry(newdir, &dummyfile, ".", true, true);
     if (rc < 0)
-        return rc * 10 - 2;
+        return rc * 10 - 3;
     dummyfile.firstcluster = newdir->file.firstcluster;
     update_short_entry(&dummyfile, 0, FAT_ATTR_DIRECTORY);
 
     /* and the ".." entry */
     rc = add_dir_entry(newdir, &dummyfile, "..", true, true);
     if (rc < 0)
-        return rc * 10 - 3;
+        return rc * 10 - 4;
 
     /* The root cluster is cluster 0 in the ".." entry */
     if(dir->file.firstcluster == fat_bpb.bpb_rootclus)
@@ -1374,7 +1391,7 @@ int fat_create_dir(char* name,
     
     rc = flush_fat();
     if (rc < 0)
-        return rc * 10 - 4;
+        return rc * 10 - 5;
 
     return rc;
 }
