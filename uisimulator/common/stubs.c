@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
+#include "debug.h"
 
 void backlight_on(void)
 {
@@ -25,4 +27,51 @@ void backlight_on(void)
 void backlight_time(int dummy)
 {
     (void)dummy;
+}
+
+int fat_startsector(void)
+{
+    return 63;
+}
+
+int ata_write_sectors(unsigned long start,
+                      unsigned char count,
+                      void* buf)
+{
+    int i;
+    
+    for (i=0; i<count; i++ ) {
+        FILE* f;
+        char name[32];
+
+        DEBUGF("Writing sector %X\n",start+i);
+        sprintf(name,"sector%lX.bin",start+i);
+        f=fopen(name,"w");
+        if (f) {
+            fwrite(buf,512,1,f);
+            fclose(f);
+        }
+    }
+    return 1;
+}
+
+int ata_read_sectors(unsigned long start,
+                     unsigned char count,
+                     void* buf)
+{
+    int i;
+    
+    for (i=0; i<count; i++ ) {
+        FILE* f;
+        char name[32];
+
+        DEBUGF("Reading sector %X\n",start+i);
+        sprintf(name,"sector%lX.bin",start+i);
+        f=fopen(name,"r");
+        if (f) {
+            fread(buf,512,1,f);
+            fclose(f);
+        }
+    }
+    return 1;
 }

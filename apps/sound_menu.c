@@ -160,5 +160,4 @@ void sound_menu(void)
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
     menu_run(m);
     menu_exit(m);
-    settings_save();
 }

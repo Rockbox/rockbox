@@ -102,12 +102,13 @@ extern struct user_settings global_settings;
 #define DEFAULT_BASS_BOOST_SETTING  0
 #define DEFAULT_AVC_SETTING         0
 #ifdef HAVE_LCD_CHARCELLS
-#define MAX_CONTRAST_SETTING    31
+#define MAX_CONTRAST_SETTING        31
 #define DEFAULT_CONTRAST_SETTING    30
 #else
-#define MAX_CONTRAST_SETTING    63
+#define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    32
 #endif
+#define MIN_CONTRAST_SETTING        5
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5
 #define DEFAULT_WPS_DISPLAY         0 

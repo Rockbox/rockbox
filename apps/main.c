@@ -75,6 +75,7 @@ void init(void)
     lcd_init();
     show_logo();
     settings_reset();
+    settings_load();
     sleep(HZ/2);
 }
 

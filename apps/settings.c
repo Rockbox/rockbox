@@ -30,11 +30,17 @@
 #include "mpeg.h"
 #include "string.h"
 #include "ata.h"
+#include "fat.h"
 #include "power.h"
 #include "backlight.h"
 #include "powermgmt.h"
 
 struct user_settings global_settings;
+
+static unsigned short last_checksum = 0;
+
+#define CONFIG_BLOCK_VERSION 0
+#define CONFIG_BLOCK_SIZE 44
 
 /********************************************
 
@@ -78,25 +84,24 @@ modified unless the header & checksum test fails.
 *************************************/
 
 #include "rtc.h"
-static unsigned char rtc_config_block[44];
+static unsigned char rtc_config_block[CONFIG_BLOCK_SIZE];
 
 /*
  * Calculates the checksum for the config block and places it in the given 2-byte buffer
  */
 
-static void calculate_config_checksum(unsigned char *cksum)
+static unsigned short calculate_config_checksum(void)
 {
-    unsigned char *p;
+    unsigned int i;
+    unsigned char cksum[2];
     cksum[0] = cksum[1] = 0;
     
-    for (p = rtc_config_block; 
-         p < rtc_config_block + sizeof(rtc_config_block) - 2;
-         p++)
-    {
-        cksum[0] = cksum[0] ^ *p;
-        p++;
-        cksum[1] = cksum[1] ^ *p;
+    for (i=0; i < CONFIG_BLOCK_SIZE - 2; i+=2 ) {
+        cksum[0] ^= rtc_config_block[i];
+        cksum[1] ^= rtc_config_block[i+1];
     }
+
+    return (cksum[0] << 8) | cksum[1];
 }
 
 /*
@@ -107,140 +112,106 @@ static void init_config_buffer( void )
     DEBUGF( "init_config_buffer()\n" );
     
     /* reset to 0xff - all unused */
-    memset(rtc_config_block, 0xff, sizeof(rtc_config_block));
+    memset(rtc_config_block, 0xff, CONFIG_BLOCK_SIZE);
     /* insert header */
     rtc_config_block[0] = 'R';
     rtc_config_block[1] = 'o';
     rtc_config_block[2] = 'c';
-    rtc_config_block[3] = 0x1;	/* config block version number */
+    rtc_config_block[3] = CONFIG_BLOCK_VERSION;
 }
 
-#ifdef HAVE_RTC
 /*
- * save the config block buffer on the RTC RAM
+ * save the config block buffer to disk or RTC RAM
  */
 static int save_config_buffer( void )
 {
-    unsigned char addr = 0x14;
-    int r;
-    unsigned char *p;
-    
+    unsigned short chksum;
+
+#ifdef HAVE_RTC
+    unsigned int i;
+    int addr=0x14;
+#endif
+
     DEBUGF( "save_config_buffer()\n" );
     
     /* update the checksum in the end of the block before saving */
-    calculate_config_checksum(rtc_config_block + sizeof(rtc_config_block) - 2);
-    
+    chksum = calculate_config_checksum();
+    rtc_config_block[ CONFIG_BLOCK_SIZE - 2 ] = chksum >> 8;
+    rtc_config_block[ CONFIG_BLOCK_SIZE - 1 ] = chksum & 0xff;
+
+    /* don't save if no changes were made */
+    if ( chksum == last_checksum )
+        return 0;
+
+#ifdef HAVE_RTC    
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
        that it would write a number of bytes at a time since the RTC chip
        supports that, but this will have to do for now 8-) */
-    for (p = rtc_config_block; 
-         p < rtc_config_block + sizeof(rtc_config_block);
-         p++)
-    {
-        r = rtc_write(addr, *p);
+    for (i=0; i < CONFIG_BLOCK_SIZE; i++ ) {
+        int r = rtc_write(14, rtc_config_block[i]);
         if (r) {
-            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", addr, r );
+            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", 14, r );
             return r;
         }
         addr++;
     }
-    
-    return 0;
-}
 
-/*
- * load the config block buffer from the RTC RAM
- */
-static int load_config_buffer( void )
-{
-    unsigned char addr = 0x14;
-    unsigned char cksum[2];
-    unsigned char *p;
-    
-    DEBUGF( "load_config_buffer()\n" );
-    
-    /* FIXME: the same comment applies here as for rtc_write */
-    for (p = rtc_config_block; 
-         p < rtc_config_block + sizeof(rtc_config_block);
-         p++)
-    {
-        *p = rtc_read(addr);
-        addr++;
-    }
-    
-    /* calculate the checksum, check it and the header */
-    calculate_config_checksum(cksum);
-    
-    if (rtc_config_block[0x0] == 'R'
-         && rtc_config_block[0x1] == 'o'
-         && rtc_config_block[0x2] == 'c'
-         && rtc_config_block[0x3] == 0x0
-         && cksum[0] == rtc_config_block[0x2a]
-         && cksum[1] == rtc_config_block[0x2b]) {
-            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
-            return 0; /* header and checksum is valid */
-        }
-    
-    /* if checksum is not valid, initialize the config buffer to all-unused */
-    DEBUGF( "load_config_buffer: header & checksum test failed\n" );
-    init_config_buffer();
-    return 1;
-}
+#else
 
-#else /* HAVE_RTC */
-/*
- * save the config block buffer on the 61 Sector
- */
-static int save_config_buffer( void )
-{
-    DEBUGF( "save_config_buffer()\n" );
-
-    /* update the checksum in the end of the block before saving */
-    calculate_config_checksum(rtc_config_block + sizeof(rtc_config_block) - 2);
-#ifdef SAVE_TO_DISK
-    if(battery_level_safe() && (fat_firstsector()!=0))
+    if(battery_level_safe() && (fat_startsector()!=0))
         return !ata_write_sectors( 61, 1, rtc_config_block);
     else
         return -1;
-#else
-    return 0;
+
 #endif
+
+    return 0;
 }
 
 /*
- * load the config block buffer from disk
+ * load the config block buffer from disk or RTC RAM
  */
 static int load_config_buffer( void )
 {
-#ifdef SAVE_TO_DISK
-    unsigned char cksum[2];
+    unsigned short chksum;
+
+#ifdef HAVE_RTC
+    unsigned char addr = 0x14;
+    unsigned int i;
+#endif
     
     DEBUGF( "load_config_buffer()\n" );
-    
-    ata_read_sectors( 61, 1,  rtc_config_block);
 
-    /* calculate the checksum, check it and the header */
-    calculate_config_checksum(cksum);
-    
-    if (rtc_config_block[0x0] == 'R'
-         && rtc_config_block[0x1] == 'o'
-         && rtc_config_block[0x2] == 'c'
-         && rtc_config_block[0x3] == 0x0
-         && cksum[0] == rtc_config_block[0x2a]
-         && cksum[1] == rtc_config_block[0x2b]) {
-            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
-            return 0; /* header and checksum is valid */
-        }
+#ifdef HAVE_RTC    
+    /* FIXME: the same comment applies here as for rtc_write */
+    for (i=0; i < CONFIG_BLOCK_SIZE; i++ ) {
+        rtc_config_block[i] = rtc_read(addr);
+        addr++;
+    }
+#else
+    ata_read_sectors( 61, 1,  rtc_config_block);
 #endif
+    
+    /* calculate the checksum, check it and the header */
+    chksum = calculate_config_checksum();
+    
+    if (rtc_config_block[0] == 'R' &&
+        rtc_config_block[1] == 'o' &&
+        rtc_config_block[2] == 'c' &&
+        rtc_config_block[3] == CONFIG_BLOCK_VERSION &&
+        (chksum >> 8) == rtc_config_block[CONFIG_BLOCK_SIZE - 2] &&
+        (chksum & 0xff) == rtc_config_block[CONFIG_BLOCK_SIZE - 1])
+    {
+        DEBUGF( "load_config_buffer: header & checksum test ok\n" );
+        last_checksum = chksum;
+        return 0; /* header and checksum is valid */
+    }
+    
     /* if checksum is not valid, initialize the config buffer to all-unused */
     DEBUGF( "load_config_buffer: header & checksum test failed\n" );
     init_config_buffer();
     return 1;
 }
-
-
-#endif /* HAVE_RTC */
-
 
 /*
  * persist all runtime user settings to disk or RTC RAM
@@ -275,8 +246,6 @@ int settings_save( void )
          (global_settings.wps_display & 7));
     
     rtc_config_block[0x11] = (unsigned char)global_settings.avc;
-    
-    rtc_config_block[0x12] = (unsigned char)global_settings.contrast;
     
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
     
@@ -325,8 +294,11 @@ void settings_load(void)
         if (rtc_config_block[0x9] != 0xFF)
             global_settings.bass_boost = rtc_config_block[0x9];
     
-        if (rtc_config_block[0xa] != 0xFF)
+        if (rtc_config_block[0xa] != 0xFF) {
             global_settings.contrast = rtc_config_block[0xa];
+            if ( global_settings.contrast < MIN_CONTRAST_SETTING )
+                global_settings.contrast < DEFAULT_CONTRAST_SETTING;
+        }
         if (rtc_config_block[0xb] != 0xFF)
             global_settings.backlight = rtc_config_block[0xb];
         if (rtc_config_block[0xc] != 0xFF)
@@ -351,9 +323,6 @@ void settings_load(void)
         
         if (rtc_config_block[0x11] != 0xFF)
             global_settings.avc = rtc_config_block[0x11];
-
-        if (rtc_config_block[0x12] != 0xff)
-            global_settings.contrast = rtc_config_block[0x12];
 
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
