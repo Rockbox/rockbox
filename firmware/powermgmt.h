@@ -30,7 +30,7 @@
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 #define POWER_AVG_N       4      /* how many samples to take for each measurement */
-#define POWER_AVG_SLEEP   10     /* how long do we sleep between each measurement */
+#define POWER_AVG_SLEEP   9      /* how long do we sleep between each measurement */
 
 #define CHARGE_END_NEGD   6      /* stop when N minutes have passed with
                                   * avg delta being < -0.05 V */
@@ -41,9 +41,14 @@
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
 #define CHARGE_MAX_TIME   8*60   /* minutes: maximum charging time */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define CHARGE_RESTART_HI 95     /* %: when to restart charging in 'charge' mode */
+#define CHARGE_RESTART_HI 85     /* %: when to restart charging in 'charge' mode */
+                                 /* attention: if set too high, normal charging is started in trickle mode */
 #define CHARGE_RESTART_LO 10     /* %: when to restart charging in 'discharge' mode */
 #define CHARGE_PAUSE_LEN  60     /* how many minutes to pause between charging cycles */
+#define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
+#define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
+#define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
+#define TRICKLE_VOLTAGE   545    /* which voltage is best? (centivolts) */
 
 extern char power_message[POWER_MESSAGE_LEN];
 extern char charge_restart_level;
@@ -52,6 +57,7 @@ extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the c
 extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
 
 extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
+extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
 #endif /* HAVE_CHARGE_CTRL */
 

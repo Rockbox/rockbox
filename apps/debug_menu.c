@@ -825,6 +825,8 @@ bool view_battery(void)
                 snprintf(buf, 30, "Est. remaining: %d m", battery_time());
                 lcd_puts(0, 6, buf);
 
+                snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
+                lcd_puts(0, 7, buf);
 #ifdef HAVE_CHARGE_CTRL
 #endif                
                 break;
