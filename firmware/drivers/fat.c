@@ -926,8 +926,18 @@ int fat_seek(struct fat_file *file, int seeksector )
             if ( numsec >= fat_bpb.bpb_secperclus ) {
                 cluster = get_next_cluster(cluster);
                 if (!cluster)
+                {
                     /* end of file */
-                    return -1; 
+                    if (i == (seeksector-1))
+                    {
+                        /* seeksector is last sector in file */
+                        sector = -1;
+                        break;
+                    }
+                    else
+                        /* attempting to seek beyond end of file */
+                        return -1;
+                }
                 
                 sector = cluster2sec(cluster);
                 if (sector<0)
