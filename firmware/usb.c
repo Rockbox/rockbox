@@ -76,12 +76,15 @@ static void usb_enable(bool on)
     if(on)
     {
         or_b(0x20, &PADRL); /* enable USB */
+        and_b(~0x08, &PADRL); /* assert card detect */
     }
     else
     {
         and_b(~0x20, &PADRL); /* disable USB */
+        or_b(0x08, &PADRL); /* deassert card detect */
     }
-    or_b(0x20, &PAIORL); /* output for USB enable */
+    PACR2 &= ~0x00C0; /* use PA3 as GPIO */
+    or_b(0x28, &PAIORL); /* output for USB enable and card detect */
 #else /* standard HD Jukebox */
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
