@@ -124,7 +124,7 @@ void lcd_define_pattern(int which, char *pattern, int length)
     for (j = 0; j <= 5; j++) {
         for (i = 0; i < length; i++) {
             if ((pattern[i])&(1<<(j)))
-                icon[j] |= (1<<(i));
+                icon[5-j] |= (1<<(i));
         }
     }
     for (i = 0; i <= 5; i++)
