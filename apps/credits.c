@@ -54,6 +54,8 @@ char* credits[] = {
     "Markus Braun",
     "Justin Heiner",
     "Magnus Holmgren",
+    "Bill Napier",
+    "George Styles"
 };
 
 #ifdef HAVE_LCD_BITMAP
