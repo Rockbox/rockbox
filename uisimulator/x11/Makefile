@@ -73,10 +73,10 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c settings.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c wps.c
+	playlist.c showtext.c wps.c settings.c
 
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
@@ -203,7 +203,7 @@ $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/settings.o: $(FIRMWAREDIR)/settings.c
+$(OBJDIR)/settings.o: $(APPDIR)/settings.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
