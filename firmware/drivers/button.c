@@ -170,17 +170,18 @@ int button_get(void)
     int portc = PCDR;
     int btn = 0;
     
-    if ( portc & 1 )
+    /* buttons are active low */
+    if ( !(portc & 1) )
         btn |= BUTTON_LEFT;
-    if ( portc & 2 )
+    if ( !(portc & 2) )
         btn |= BUTTON_MENU;
-    if ( portc & 4 )
+    if ( !(portc & 4) )
         btn |= BUTTON_RIGHT;
-    if ( portc & 8 )
+    if ( !(portc & 8) )
         btn |= BUTTON_PLAY | BUTTON_UP;
-    if ( porta & 0x20 )
+    if ( !(porta & 0x20) )
         btn |= BUTTON_ON;
-    if ( porta & 0x800 )
+    if ( !(porta & 0x800) )
         btn |= BUTTON_STOP | BUTTON_DOWN;
 
     return btn;
