@@ -97,6 +97,12 @@ while(<LANG>) {
 
             if($value =~ s/^\"(.*)\"\s*$/$1/g) {
 
+                # Skip voice-only entries
+                if(!$value && $set{'voice'}) {
+                    $idnum{$set{'id'}} = '_done_';
+                    next;
+                }
+
                 $idnum = $idnum{$set{'id'}};
 
                 if($idnum eq "") {
