@@ -38,7 +38,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
-#if CONFIG_HWCODEC == MAS3587F || CONFIG_HWCODEC == MAS3539F
+#if CONFIG_HWCODEC == MAS3587F
 #include "peakmeter.h"
 #include "mas.h"
 #endif
@@ -471,7 +471,7 @@ static char* create_thres_str(int threshold)
 }
 #endif
 
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC == MAS3587F || CONFIG_HWCODEC == MAS3539F)
+#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
 #define INF_DB (-89)
 static void change_threshold(int *threshold, int change)
 {
