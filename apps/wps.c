@@ -45,19 +45,20 @@
 #endif
 
 #define FF_REWIND_MIN_STEP 1000 /* minimum ff/rewind step is 1 second */
-#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
-                                /* 3% of 30min file == 54s step size */
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
+                                /* 3% of 30min file == 54s step size */ 
 
 #ifdef HAVE_LCD_BITMAP
     #define PLAY_DISPLAY_2LINEID3        0 
     #define PLAY_DISPLAY_FILENAME_SCROLL 1 
     #define PLAY_DISPLAY_TRACK_TITLE     2 
+    #define PLAY_DISPLAY_CUSTOM_WPS      3 
 #else
-    #define PLAY_DISPLAY_1LINEID3        0
+    #define PLAY_DISPLAY_1LINEID3        0 
     #define PLAY_DISPLAY_2LINEID3        1 
     #define PLAY_DISPLAY_FILENAME_SCROLL 2 
     #define PLAY_DISPLAY_TRACK_TITLE     3 
-    #define PLAY_DISPLAY_CUSTOM_WPS      4
+    #define PLAY_DISPLAY_CUSTOM_WPS      4 
 #endif
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -70,17 +71,22 @@ bool keys_locked = false;
 bool device_muted = false;
 static bool ff_rewind = false;
 static bool paused = false;
+int ff_rewind_count = 0;
 
 #ifdef CUSTOM_WPS
-static char custom_wps[64];
+static char custom_wps[5][64];
+static char wps_display[5][64];
+static int scroll_line;
+static int scroll_line_custom;
 #endif
 
 static void draw_screen(struct mp3entry* id3)
 {
     int font_height;
+
 #ifdef LOADABLE_FONTS
     unsigned char *font = lcd_getcurrentldfont();
-    font_height  = ajf_get_fontheight(font);
+    font_height = ajf_get_fontheight(font);
 #else
     font_height = 8;
 #endif
@@ -99,7 +105,6 @@ static void draw_screen(struct mp3entry* id3)
     else
     {
 #ifdef CUSTOM_WPS
-#ifdef HAVE_LCD_CHARCELLS
         static int last_wps = -1;
         if ((last_wps != global_settings.wps_display
             && global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS))
@@ -107,7 +112,6 @@ static void draw_screen(struct mp3entry* id3)
             load_custom_wps();
             last_wps = global_settings.wps_display;
         }
-#endif
 #endif
         switch ( global_settings.wps_display ) {
             case PLAY_DISPLAY_TRACK_TITLE:
@@ -120,7 +124,9 @@ static void draw_screen(struct mp3entry* id3)
                 char szArtist[26];
                 char szBuff[257];
                 szBuff[sizeof(szBuff)-1] = 0;
-
+#ifdef CUSTOM_WPS
+                int tmpcnt = 0;
+#endif
                 strncpy(szBuff, id3->path, sizeof(szBuff));
 
                 szTok = strtok_r(szBuff, "/", &end);
@@ -136,14 +142,33 @@ static void draw_screen(struct mp3entry* id3)
                 szPeriod = strrchr(szDelimit, '.');
                 if (szPeriod != NULL)
                     *szPeriod = 0;
-
+#ifdef CUSTOM_WPS
+                snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
+                        (++szDelimit));
+#ifdef HAVE_LCD_CHARCELLS
+                snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
+                        "%pc/%pt");
+#endif
+                for(tmpcnt=2;tmpcnt<=5;tmpcnt++)
+                    wps_display[tmpcnt][0] = 0;
+                scroll_line = 0;
+                refresh_wps(true);
+#else
                 lcd_puts_scroll(0, 1, (++szDelimit));
+#endif
                 break;
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
             {
 #ifdef CUSTOM_WPS
-                display_custom_wps(0, 0, true, "%pp/%pe: %fn");
+                snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
+                        "%pp/%pe: %fn");
+#ifdef HAVE_LCD_CHARCELLS
+                snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
+                        "%pc/%pt");
+#endif
+                scroll_line = 0;
+                refresh_wps(true);
 #else
                 char buffer[64];
                 char ch = '/';
@@ -169,8 +194,37 @@ static void draw_screen(struct mp3entry* id3)
             }
             case PLAY_DISPLAY_2LINEID3:
             {
-                int l = 0;
 #ifdef HAVE_LCD_BITMAP
+                int l = 0;
+
+#ifdef CUSTOM_WPS
+                snprintf(wps_display[l],sizeof(wps_display[l]),"%s","%fn");
+                snprintf(wps_display[l++],sizeof(wps_display[l]),"%s","%it");
+                snprintf(wps_display[l++],sizeof(wps_display[l]),"%s","%id");
+                snprintf(wps_display[l++],sizeof(wps_display[l]),"%s","%ia");
+                if(!global_settings.statusbar && font_height <= 8)
+                {
+                    if(id3->vbr)
+                        snprintf(wps_display[l++],sizeof(wps_display[l]),"%s",
+                                "%fb kbit (avg)");
+                    else
+                        snprintf(wps_display[l],sizeof(wps_display[l]),"%s",
+                                "%fb kbit");
+                    snprintf(wps_display[l],sizeof(wps_display[l]),"%s",
+                            "%ff Hz");
+                }
+                else
+                {
+                    if(id3->vbr)
+                        snprintf(wps_display[l++],sizeof(wps_display[l]),"%s",
+                                "%fb kbit(a) %ffHz");
+                    else
+                        snprintf(wps_display[l],sizeof(wps_display[l]),"%s",
+                                "%fb kbit    %ffHz");
+                }
+                scroll_line = 0;
+                refresh_wps(true);
+#else
                 char buffer[64];
 
                 lcd_puts_scroll(0, l++, id3->path);
@@ -200,13 +254,16 @@ static void draw_screen(struct mp3entry* id3)
 
                     lcd_puts(0, l++, buffer);
                 }
+#endif
 #else
 #ifdef CUSTOM_WPS
-                display_custom_wps(0, l++, false, "%ia");
-                display_custom_wps(0, l++, true, "%it");
+                snprintf(wps_display[0],sizeof(wps_display[0]),"%s","%ia");
+                snprintf(wps_display[1],sizeof(wps_display[1]),"%s","%it");
+                scroll_line = 1;
+                refresh_wps(true);
 #else
-                lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
-                lcd_puts_scroll(0, l++, id3->title?id3->title:"<no title>");
+                lcd_puts(0, 0, id3->artist?id3->artist:"<no artist>");
+                lcd_puts_scroll(0, 1, id3->title?id3->title:"<no title>");
 #endif
 #endif
                 break;
@@ -215,7 +272,12 @@ static void draw_screen(struct mp3entry* id3)
             case PLAY_DISPLAY_1LINEID3:
             {
 #ifdef CUSTOM_WPS
-                display_custom_wps(0, 0, true, "%pp/%pe: %fc");
+                snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
+                        "%pp/%pe: %fc");
+                snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
+                        "%pc/%pt");
+                scroll_line = 0;
+                refresh_wps(true);
 #else
                 char buffer[64];
                 char ch = '/';
@@ -234,16 +296,20 @@ static void draw_screen(struct mp3entry* id3)
 #endif
                 break;
             }
+#endif
 #ifdef CUSTOM_WPS
             case PLAY_DISPLAY_CUSTOM_WPS:
             {
                 if(custom_wps[0] == 0)
-                snprintf(custom_wps, sizeof(custom_wps),
+                {
+                    snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
                         "Couldn't Load Custom WPS");
-                display_custom_wps(0, 0, true, custom_wps);
+                    snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
+                            "%pc/%pt");
+                }
+                refresh_wps(true);
                 break;
             }
-#endif
 #endif
         }
     }
@@ -252,19 +318,108 @@ static void draw_screen(struct mp3entry* id3)
 }
 
 #ifdef CUSTOM_WPS
+bool refresh_wps(bool refresh_scroll)
+{
+    int l;
+#ifdef CUSTOM_WPS
+#ifdef HAVE_LCD_BITMAP
+    int bmp_time_line;
+#endif
+#endif
+
+    struct mp3entry* id3 = NULL;
+    id3 = mpeg_current_track();
+
+    if(!id3)
+    {
+        lcd_stop_scroll();
+        lcd_clear_display();
+        return(false);
+    }
+
+#ifdef HAVE_LCD_CHARCELL
+    for(l = 0; l <= 1; l++)
+#else
+    for(l = 0; l <= 5; l++)
+#endif
+    {
+        if(global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS)
+        {
+            scroll_line = scroll_line_custom;
+            if(scroll_line != l)
+                    display_custom_wps(0, l, false, custom_wps[l]);
+            else
+                if(refresh_scroll)
+                        display_custom_wps(0, l, true, custom_wps[l]);
+        }
+        else
+        {
+            if(scroll_line != l)
+                    display_custom_wps(0, l, false, wps_display[l]);                
+            else
+                if(refresh_scroll)
+                        display_custom_wps(0, l, true, wps_display[l]);                
+        }
+    }
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        bmp_time_line = 5;
+    else
+        bmp_time_line = 6;
+    snprintf(wps_display[bmp_time_line],sizeof(wps_display[bmp_time_line]),
+             "%s","Time: %pc/%pt");
+
+    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, id3->elapsed*100/id3->length, Grow_Right);
+    lcd_update();
+#endif
+    return(true);
+}
+
 bool load_custom_wps(void)
 {
     int fd;
+    int l = 0;
+    int numread = 1;
+    char cchr[0];
+
+    for(l=0;l<=5;l++)
+    {
+         custom_wps[l][0] = 0;
+    }
+    l = 0;
 
     fd = open("/wps.config", O_RDONLY);
     if(-1 == fd)
     {
-        custom_wps[0] = 0;
         close(fd);
         return(false);
     }
-    read(fd, custom_wps, sizeof(custom_wps));
+
+    while(l<=5)
+    {
+        numread = read(fd, cchr, 1);
+        if(numread==0)
+            break;
+        switch(cchr[0])
+        {
+            case 10: /* LF */
+                l++;
+                break;
+            case 13: /* CR ... Ignore it */
+                break;                
+            default:
+                snprintf(custom_wps[l], sizeof(custom_wps[l]), "%s%c", custom_wps[l], cchr[0]);
+                break;
+        }
+    }
     close(fd);
+
+    scroll_line_custom = 0;
+    for(l=0;l<=5;l++)
+    {
+        if(custom_wps[l][0] == '%' && custom_wps[l][1] == 's')
+            scroll_line_custom = l;
+    }
     return(true);
 }
 
@@ -325,10 +480,6 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                             case 'd':  /* ID3 Album/Disc */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->album);
                                 break;
-                            case '\r':
-                            case '\n':
-                                /* As of yet, do nothing with these */
-                                break;
                         }
                         break;
                     case 'f':  /* File Information */
@@ -364,16 +515,12 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->path);
                                 break;
                             case 'n':  /* File Name */
-                                snprintf(tmpbuf, sizeof(tmpbuf), "%s", 
+                                snprintf(tmpbuf, sizeof(tmpbuf), "%s",
                                         szLast?szLast:id3->path);
                                 break;
                             case 's':  /* File Size (In Kilobytes) */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d",
                                         id3->filesize / 1024);
-                                break;
-                            case '\r':
-                            case '\n':
-                                /* As of yet, do nothing with these */
                                 break;
                         }
                         break;
@@ -390,17 +537,13 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 break;
                             case 'c':  /* Current Time in Song */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
-                                        id3->elapsed / 60000,
-                                        id3->elapsed % 60000 / 1000);
+                                        (id3->elapsed + ff_rewind_count) / 60000,
+                                        (id3->elapsed + ff_rewind_count) % 60000 / 1000);
                                 break;
                             case 't':  /* Total Time */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
-                                        id3->elapsed / 60000,
-                                        id3->elapsed % 60000 / 1000);
-                                break;
-                            case '\r':
-                            case '\n':
-                                /* As of yet, do nothing with these */
+                                        id3->length / 60000,
+                                        id3->length % 60000 / 1000);
                                 break;
                         }
                         break;
@@ -441,10 +584,6 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                         break;
                 }
                 break;
-            case '\r':
-            case '\n':
-                /* As of yet, do nothing with these */
-                break;
             default:
                 switch(con_flag)
                 {
@@ -462,9 +601,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
         }
         if(seek >= strlen(wps_string))
         {
-            lcd_stop_scroll();
             if(do_scroll)
+            {
+                lcd_stop_scroll();
                 lcd_puts_scroll(x_val, y_val, buffer);
+            }
             else
                 lcd_puts(x_val, y_val, buffer);
             return(true);
@@ -541,38 +682,38 @@ int player_id3_show(void)
         switch(menu_pos)
         {
             case 0:
-                lcd_puts(0, 0, "Title");
+                lcd_puts(0, 0, "[Title]");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
                         id3->title?id3->title:"<no title>");
                 break;
             case 1:
-                lcd_puts(0, 0, "Artist");
+                lcd_puts(0, 0, "[Artist]");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
                         id3->artist?id3->artist:"<no artist>");
                 break;
             case 2:
-                lcd_puts(0, 0, "Album");
+                lcd_puts(0, 0, "[Album]");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
                         id3->album?id3->album:"<no album>");
                 break;
             case 3:
-                lcd_puts(0, 0, "Length");
+                lcd_puts(0, 0, "[Length]");
                 snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
                    id3->length / 60000,
                    id3->length % 60000 / 1000 );
                 break;
             case 4:
-                lcd_puts(0, 0, "Bitrate");
+                lcd_puts(0, 0, "[Bitrate]");
                 snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
                         id3->bitrate);
                 break;
             case 5:
-                lcd_puts(0, 0, "Frequency");
+                lcd_puts(0, 0, "[Frequency]");
                 snprintf(scroll_text,sizeof(scroll_text), "%d kHz",
                         id3->frequency);
                 break;
             case 6:
-                lcd_puts(0, 0, "Path");
+                lcd_puts(0, 0, "[Path]");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
                         id3->path);
                 break;
@@ -594,6 +735,7 @@ int player_id3_show(void)
     return(0);
 }
 
+#ifndef CUSTOM_WPS
 static void display_file_time(unsigned int elapsed, unsigned int length)
 {
     char buffer[32];
@@ -633,6 +775,7 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
     }
 #endif
 }
+#endif
 
 void display_volume_level(int vol_level)
 {
@@ -717,10 +860,9 @@ int wps_show(void)
     bool pending_mute = true; /* Mute will go ON next time */
     int old_release_mask;
     int button;
-    int ff_rewind_count = 0;
-    unsigned int ff_rewind_step = 0; /* current rewind step size */
-    unsigned int ff_rewind_max_step = 0; /* max rewind step size */
-    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */
+    unsigned int ff_rewind_step = 0; /* current rewind step size */ 
+    unsigned int ff_rewind_max_step = 0; /* max rewind step size */ 
+    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */ 
     bool ignore_keyup = true;
     bool restore = false;
 
@@ -745,7 +887,7 @@ int wps_show(void)
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
-//        draw_screen(id3);
+        draw_screen(id3);
         restore = true;
     }
 
@@ -860,16 +1002,16 @@ int wps_show(void)
                 {
                     if (ff_rewind)
                     {
-                        ff_rewind_count -= ff_rewind_step;
-                        if (global_settings.ff_rewind_accel != 0 &&
-                            current_tick >= ff_rewind_accel_tick)
-                        {
-                            ff_rewind_step *= 2;
-                            if (ff_rewind_step > ff_rewind_max_step)
-                                ff_rewind_step = ff_rewind_max_step;
-                            ff_rewind_accel_tick = current_tick +
-                                global_settings.ff_rewind_accel*HZ;
-                        }
+                        ff_rewind_count -= ff_rewind_step; 
+                        if (global_settings.ff_rewind_accel != 0 && 
+                            current_tick >= ff_rewind_accel_tick) 
+                            { 
+                                ff_rewind_step *= 2; 
+                                if (ff_rewind_step > ff_rewind_max_step) 
+                                    ff_rewind_step = ff_rewind_max_step; 
+                                ff_rewind_accel_tick = current_tick + 
+                                    global_settings.ff_rewind_accel*HZ; 
+                            } 
                     }
                     else
                     {
@@ -883,14 +1025,14 @@ int wps_show(void)
                             status_set_playmode(STATUS_FASTBACKWARD);
                             status_draw();
                             ff_rewind = true;
-                            ff_rewind_max_step =
-                                id3->length * FF_REWIND_MAX_PERCENT / 100;
+                            ff_rewind_max_step = 
+                                id3->length * FF_REWIND_MAX_PERCENT / 100; 
                             ff_rewind_step = FF_REWIND_MIN_STEP;
-                            if (ff_rewind_step > ff_rewind_max_step)
-                                ff_rewind_step = ff_rewind_max_step;
-                            ff_rewind_count = -ff_rewind_step;
-                            ff_rewind_accel_tick = current_tick +
-                                global_settings.ff_rewind_accel*HZ;
+                            if (ff_rewind_step > ff_rewind_max_step) 
+                                ff_rewind_step = ff_rewind_max_step; 
+                            ff_rewind_count = -ff_rewind_step; 
+                            ff_rewind_accel_tick = current_tick + 
+                                global_settings.ff_rewind_accel*HZ; 
                         }
                         else
                             break;
@@ -899,8 +1041,12 @@ int wps_show(void)
                     if ((int)(id3->elapsed + ff_rewind_count) < 0)
                         ff_rewind_count = -id3->elapsed;
 
+#ifdef CUSTOM_WPS
+                    refresh_wps(false);
+#else
                     display_file_time(id3->elapsed + ff_rewind_count,
                                       id3->length);
+#endif
                 }
                 break;
 
@@ -909,16 +1055,16 @@ int wps_show(void)
                 {
                     if (ff_rewind)
                     {
-                        ff_rewind_count += ff_rewind_step;
-                        if (global_settings.ff_rewind_accel != 0 &&
-                            current_tick >= ff_rewind_accel_tick)
-                        {
-                            ff_rewind_step *= 2;
-                            if (ff_rewind_step > ff_rewind_max_step)
-                                ff_rewind_step = ff_rewind_max_step;
-                            ff_rewind_accel_tick = current_tick +
-                                global_settings.ff_rewind_accel*HZ;
-                        }
+                           ff_rewind_count += ff_rewind_step; 
+                           if (global_settings.ff_rewind_accel != 0 && 
+                               current_tick >= ff_rewind_accel_tick) 
+                           { 
+                               ff_rewind_step *= 2; 
+                               if (ff_rewind_step > ff_rewind_max_step) 
+                                   ff_rewind_step = ff_rewind_max_step; 
+                               ff_rewind_accel_tick = current_tick + 
+                                   global_settings.ff_rewind_accel*HZ; 
+                           } 
                     }
                     else
                     {
@@ -932,14 +1078,14 @@ int wps_show(void)
                             status_set_playmode(STATUS_FASTFORWARD);
                             status_draw();
                             ff_rewind = true;
-                            ff_rewind_max_step =
-                                id3->length * FF_REWIND_MAX_PERCENT / 100;
-                            ff_rewind_step = FF_REWIND_MIN_STEP;
-                            if (ff_rewind_step > ff_rewind_max_step)
-                                ff_rewind_step = ff_rewind_max_step;
-                            ff_rewind_count = ff_rewind_step;
-                            ff_rewind_accel_tick = current_tick +
-                                global_settings.ff_rewind_accel*HZ;
+                            ff_rewind_max_step = 
+                                id3->length * FF_REWIND_MAX_PERCENT / 100; 
+                            ff_rewind_step = FF_REWIND_MIN_STEP; 
+                            if (ff_rewind_step > ff_rewind_max_step) 
+                                ff_rewind_step = ff_rewind_max_step; 
+                            ff_rewind_count = ff_rewind_step; 
+                            ff_rewind_accel_tick = current_tick + 
+                                global_settings.ff_rewind_accel*HZ; 
                         }
                         else
                             break;
@@ -948,8 +1094,12 @@ int wps_show(void)
                     if ((id3->elapsed + ff_rewind_count) > id3->length)
                         ff_rewind_count = id3->length - id3->elapsed;
 
+#ifdef CUSTOM_WPS
+                    refresh_wps(false);
+#else
                     display_file_time(id3->elapsed + ff_rewind_count,
                                       id3->length);
+#endif
                 }
                 break;
 
@@ -1276,7 +1426,11 @@ int wps_show(void)
                     restore = true;
                 
                 if (id3)
+#ifdef CUSTOM_WPS
+                    refresh_wps(false);
+#else
                     display_file_time(id3->elapsed, id3->length);
+#endif
                 
                 /* save resume data */
                 if ( id3 && 
@@ -1300,7 +1454,11 @@ int wps_show(void)
             restore = false;
             draw_screen(id3);
             if (mpeg_is_playing() && id3)
+#ifdef CUSTOM_WPS
+                refresh_wps(false);
+#else
                 display_file_time(id3->elapsed, id3->length);
+#endif
         }
     }
 }

@@ -97,8 +97,13 @@ static Menu scroll_speed(void)
 static Menu wps_set(void)
 {
 #ifdef HAVE_LCD_BITMAP
+#ifdef CUSTOM_WPS
+    char* names[] = { "ID3 Tags", "File     ", "Parse    ", "Custom WPS" };
+    set_option("[WPS display]", &global_settings.wps_display, names, 4 );
+#else
     char* names[] = { "ID3 Tags", "File     ", "Parse    " };
     set_option("[WPS display]", &global_settings.wps_display, names, 3 );
+#endif
 #else
 #ifdef CUSTOM_WPS
     char* names[] = { "1 Line ID3", "2 Line ID3", "File      ",
@@ -172,16 +177,16 @@ static Menu spindown(void)
     return MENU_OK;
 }
 
-static Menu ff_rewind_accel(void)
-{
-    char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ",
-                      "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ",
+static Menu ff_rewind_accel(void) 
+{ 
+    char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ", 
+                      "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ", 
                       "2x/8s ", "2x/9s ", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
-    set_option("[FF/rewind accel]", &global_settings.ff_rewind_accel,
-               names, 16 );
-    return MENU_OK;
-}
+    set_option("[FF/rewind accel]", &global_settings.ff_rewind_accel, 
+                names, 16 ); 
+    return MENU_OK; 
+} 
 
 Menu settings_menu(void)
 {
@@ -203,7 +208,7 @@ Menu settings_menu(void)
         { "Time/Date",       timedate_set    },
 #endif
         { "Show hidden files", show_hidden_files },
-        { "FF/rewind accel", ff_rewind_accel },
+        { "FF/Rewind Accel", ff_rewind_accel },
         { "Resume",          resume          },
         { "Disk spindown",   spindown        },
     };

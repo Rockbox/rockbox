@@ -21,8 +21,6 @@
 #include "id3.h"
 #include "playlist.h" 
 
-/* #define CUSTOM_WPS */
-
 extern bool keys_locked;
 
 int wps_show(void);
@@ -30,6 +28,7 @@ int wps_show(void);
 #ifdef CUSTOM_WPS
 bool load_custom_wps(void);
 bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string);
+bool refresh_wps(bool refresh_scroll);
 #endif
 
 #endif
