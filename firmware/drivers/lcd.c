@@ -644,10 +644,19 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
     unsigned char *dst;
-    unsigned char *dst2 = &display[x][y/8];
+    unsigned char *dst2;
     unsigned int data, mask, mask2, mask3, mask4;
-    int shift = y & 7;
+    int shift;
 
+    if (((unsigned)x >= LCD_WIDTH) || ((unsigned)y >= LCD_HEIGHT))
+        return;
+    if (((unsigned)(x + nx)) >= LCD_WIDTH)
+       nx = LCD_WIDTH - x;
+    if (((unsigned)(y + ny)) >= LCD_HEIGHT)
+        ny = LCD_HEIGHT - y;      
+
+    shift = y & 2;
+    dst2 = &display[x][y/8];
     ny += shift;
 
     /* Calculate bit masks */
