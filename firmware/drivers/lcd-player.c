@@ -264,6 +264,7 @@ void lcd_clear_display(void)
     int i;
     bool update=false; 
     DEBUGF("lcd_clear_display()\n");
+    lcd_stop_scroll();
     for (i=0;i<22;i++)
       update|=lcdx_putc(i%11, i/11, ' ');
     if (update)

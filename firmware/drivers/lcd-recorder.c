@@ -216,6 +216,7 @@ void lcd_roll(int lines)
 void lcd_clear_display (void)
 {
     memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
+    lcd_stop_scroll();
 }
 
 void lcd_setmargins(int x, int y)
@@ -290,9 +291,7 @@ void lcd_puts(int x, int y, unsigned char *str)
     lcd_putsxy(xpos, ypos, str);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 
-#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
-    /* this function is being used when simulating a charcell LCD and
-       then we update immediately */
+#if defined(SIMULATOR)
     lcd_update();
 #endif
 }
