@@ -156,7 +156,7 @@ static int compare(const void* p1, const void* p2);
 static int get_filename(struct playlist_info* playlist, int seek,
                         bool control_file, char *buf, int buf_length);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             const char *dir);
+                             char *dir);
 static void display_playlist_count(int count, const char *fmt);
 static void display_buffer_full(void);
 static int flush_pending_control(struct playlist_info* playlist);
@@ -972,7 +972,7 @@ static int get_filename(struct playlist_info* playlist, int seek,
  * Returns absolute path of track
  */
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             const char *dir)
+                             char *dir)
 {
     int i = 0;
     int j;
@@ -1005,13 +1005,11 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
         /* handle dos style drive letter */
         if (':' == src[1])
             strncpy(dest, &src[2], buf_length);
-        else if ('.' == src[0] && '.' == src[1] && '/' == src[2])
+        else if (!strncmp(src, "../", 3))
         {
             /* handle relative paths */
             i=3;
-            while(src[i] == '.' &&
-                  src[i] == '.' &&
-                  src[i] == '/')
+            while(!strncmp(&src[i], "../", 3))
                 i += 3;
             for (j=0; j<i/3; j++) {
                 temp_ptr = strrchr(dir, '/');
