@@ -210,6 +210,9 @@ static struct plugin_api rockbox_api = {
     mpeg_next_track,
     mpeg_has_changed_track,
     mpeg_status,
+#ifdef HAVE_LCD_BITMAP
+    font_get,
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)

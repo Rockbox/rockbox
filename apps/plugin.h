@@ -46,7 +46,7 @@
 #include "thread.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 13
+#define PLUGIN_API_VERSION 14
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -231,6 +231,10 @@ struct plugin_api {
     struct mp3entry* (*mpeg_next_track)(void);
     bool (*mpeg_has_changed_track)(void);
     int (*mpeg_status)(void);
+    
+#ifdef HAVE_LCD_BITMAP
+    struct font* (*font_get)(int font);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */
