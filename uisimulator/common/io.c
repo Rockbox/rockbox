@@ -136,9 +136,15 @@ int sim_open(const char *name, int o)
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We open the real file '%s'\n", buffer);
+#ifdef WIN32
         return (open)(buffer, opts);
+#else
+        return (open)(buffer, opts, 0666);
+#endif
     }
-    return (open)(name, opts);
+    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
+            name);
+    return -1;
 }
 
 int sim_close(int fd)
@@ -156,7 +162,9 @@ int sim_creat(const char *name, mode_t mode)
         debugf("We create the real file '%s'\n", buffer);
         return (creat)(buffer, 0666);
     }
-    return (creat)(name, 0666);
+    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
+            name);
+    return -1;
 }
 
 int sim_mkdir(const char *name, mode_t mode)
