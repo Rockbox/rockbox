@@ -173,7 +173,7 @@ void randomise_playlist( playlist_info_t *playlist ) {
     int candidate;
     int adjusted_candidate;
     int found_next_number;
-    int index_list[ playlist->indices_count ];
+    int *index_list = (int*) malloc(sizeof(int) * playlist->indices_count);
     int *randomised_list;
     int i;
     
