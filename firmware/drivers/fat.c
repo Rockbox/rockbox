@@ -1274,6 +1274,7 @@ int fat_truncate(struct fat_file *file)
 
 int fat_closewrite(struct fat_file *file, int size, int attr)
 {
+    int rc;
     LDEBUGF("fat_closewrite(size=%d)\n",size);
 
     if (!size) {
@@ -1285,8 +1286,9 @@ int fat_closewrite(struct fat_file *file, int size, int attr)
     }
 
     if (file->dircluster)
-        if (update_short_entry(file, size, attr) < 0)
-            return -1;
+        rc = update_short_entry(file, size, attr);
+        if (rc < 0)
+            return rc * 10 - 1;
 
     flush_fat();
 
