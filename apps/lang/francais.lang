@@ -794,7 +794,7 @@ new: "Musique"
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-new: "Supporté" 
+new: "Supportés" 
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
