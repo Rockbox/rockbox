@@ -55,19 +55,7 @@ static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
         break;
     }
 }
-#if 0
-static void kbd_draw_statusbar_button(int num, char* caption, int y, int fw)
-{
-    int x, x2, tw, cx;
-    x = num*(LCD_WIDTH/3);
-    x2 = (num+1)*(LCD_WIDTH/3);
-    tw = fw * strlen(caption);
-    cx = x2 - x;
-    /* center the text */
-    lcd_putsxy((x + (cx/2)) - (tw/2), y, caption);
-    lcd_invertrect(x, y - 1, (x2-x)-1, LCD_HEIGHT-y+1);
-}
-#endif
+
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
@@ -79,6 +67,7 @@ int kbd_input(char* text, int buflen)
     int status_y1, status_y2, curpos;
     int len;
     int editpos;
+    bool redraw = true;
     char* line[KEYBOARD_LINES];
 
     char outline[256];
@@ -90,7 +79,7 @@ int kbd_input(char* text, int buflen)
     font_h = font->height;
 
     margin = 3;
-    main_y = (KEYBOARD_LINES + 1) * font_h + margin;
+    main_y = (KEYBOARD_LINES + 1) * font_h + margin*2;
     main_x = 0;
     status_y1 = LCD_HEIGHT - font_h;
     status_y2 = LCD_HEIGHT;
@@ -102,79 +91,90 @@ int kbd_input(char* text, int buflen)
 
     while(!done)
     {
-        lcd_clear_display();
-
-        /* draw page */
-        for (i=0; i < KEYBOARD_LINES; i++)
-            lcd_putsxy(0, i * font_h, line[i]);
-
         len = strlen(text);
-
-        /* separator */
-        lcd_drawline(0, main_y - margin, LCD_WIDTH, main_y - margin);
-
-        /* write out the text */
-        if (editpos < max_chars - 3 )
+            
+        if(redraw)
         {
-            strncpy(outline, text, max_chars - 2);
-            if (len > max_chars - 2)
-                lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
-            curpos = (1 + editpos) * font_w;
-        }
-        else
-        {
-            /* not room for all text, cut left, right or both */
-            if (editpos == len )
+            lcd_clear_display();
+            
+            lcd_setfont(FONT_SYSFIXED);
+            
+            /* draw page */
+            for (i=0; i < KEYBOARD_LINES; i++)
+                lcd_putsxy(0, 8+i * font_h, line[i]);
+            
+            /* separator */
+            lcd_drawline(0, main_y - margin, LCD_WIDTH, main_y - margin);
+            
+            /* write out the text */
+            if (editpos < max_chars - 3 )
             {
-                if ( max_chars - 3 == len)
-                {
-                    strncpy(outline, text, max_chars - 2);
-                    curpos  = (1 + editpos) * font_w;
-                }
-                else
-                {
-                    strncpy(outline, text + editpos - max_chars + 2,
-                            max_chars - 2);
-                    if (len > max_chars - 2)
-                        lcd_putsxy(0, main_y, "<");
-                    curpos = ( max_chars - 1) * font_w;
-                }
+                strncpy(outline, text, max_chars - 2);
+                if (len > max_chars - 2)
+                    lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
+                curpos = (1 + editpos) * font_w;
             }
             else
             {
-                if (len - 1 == editpos)
+                /* not room for all text, cut left, right or both */
+                if (editpos == len )
                 {
-                    strncpy(outline, text + editpos - max_chars + 3,
-                            max_chars - 2);
-                    curpos = ( max_chars - 2) * font_w;
+                    if ( max_chars - 3 == len)
+                    {
+                        strncpy(outline, text, max_chars - 2);
+                        curpos  = (1 + editpos) * font_w;
+                    }
+                    else
+                    {
+                        strncpy(outline, text + editpos - max_chars + 2,
+                                max_chars - 2);
+                        if (len > max_chars - 2)
+                            lcd_putsxy(0, main_y, "<");
+                        curpos = ( max_chars - 1) * font_w;
+                    }
                 }
                 else
                 {
-                    strncpy(outline, text + editpos - max_chars + 4,
-                            max_chars - 2);
-                    curpos = ( max_chars - 3) * font_w;
+                    if (len - 1 == editpos)
+                    {
+                        strncpy(outline, text + editpos - max_chars + 3,
+                                max_chars - 2);
+                        curpos = ( max_chars - 2) * font_w;
+                    }
+                    else
+                    {
+                        strncpy(outline, text + editpos - max_chars + 4,
+                                max_chars - 2);
+                        curpos = ( max_chars - 3) * font_w;
+                    }
+                    lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
+                    lcd_putsxy(0, main_y, "<");
                 }
-                lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
-                lcd_putsxy(0, main_y, "<");
             }
+
+            /* Zero terminate the string */
+            outline[max_chars - 2] = '\0';
+            
+            lcd_putsxy(font_w,main_y,outline);
+            
+            /* cursor */
+            lcd_drawline(curpos, main_y, curpos, main_y + font_h);
+            
+            /* draw the status bar */
+            buttonbar_set("Shift", "OK", "Del");
+            buttonbar_draw();
+            
+            /* highlight the key that has focus */
+            lcd_invertrect(font_w * x, 8 + font_h * y, font_w, font_h);
+            
+            status_draw(true);
+        
+            lcd_update();
         }
 
-        /* Zero terminate the string */
-        outline[max_chars - 2] = '\0';
+        /* The default action is to redraw */
+        redraw = true;
         
-        lcd_putsxy(font_w,main_y,outline);
-
-        /* cursor */
-        lcd_drawline(curpos, main_y, curpos, main_y + font_h);
-
-        /* draw the status bar */
-        buttonbar_set("Shift", "OK", "Del");
-        buttonbar_draw();
-        
-        /* highlight the key that has focus */
-        lcd_invertrect(font_w * x, font_h * y, font_w, font_h);
-        lcd_update();
-
         switch ( button_get_w_tmo(HZ/2) ) {
 
             case BUTTON_OFF:
@@ -286,6 +286,7 @@ int kbd_input(char* text, int buflen)
 
             case BUTTON_NONE:
                 status_draw(false);
+                redraw = false;
                 break;
         }
     }
