@@ -117,6 +117,11 @@ TD In development ETD
 YES
 EFEAT
 
+NAME Generates XING when recording ENAME
+YES
+NO
+EFEAT
+
 NAME Low volume support ENAME
 YES
 NO
@@ -140,6 +145,21 @@ EFEAT
 NAME Queue function ENAME
 NO
 YES
+EFEAT
+
+NAME Supports the XING header ENAME
+YES
+YES
+EFEAT
+
+NAME Supports the VBRI header ENAME
+NO
+YES
+EFEAT
+
+NAME Max number of files in a dir ENAME
+TD 400 ETD
+UNKNOWN
 EFEAT
 
 </table>
