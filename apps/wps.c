@@ -50,6 +50,7 @@ bool keys_locked = false;
 static bool ff_rewind = false;
 static bool paused = false;
 static struct mp3entry* id3 = NULL;
+static char current_track_path[MAX_PATH+1];
 
 #ifdef HAVE_PLAYER_KEYPAD
 void player_change_volume(int button)
@@ -420,6 +421,9 @@ static bool update(void)
             retcode = true;
         else
             wps_refresh(id3, 0, WPS_REFRESH_ALL);
+
+        if (id3)
+            memcpy(current_track_path, id3->path, sizeof(current_track_path));
     }
 
     if (id3)
@@ -428,7 +432,7 @@ static bool update(void)
     status_draw();
 
     /* save resume data */
-    if ( id3 && 
+    if ( id3 &&
          global_settings.resume &&
          global_settings.resume_offset != id3->offset ) {
         DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
@@ -644,6 +648,7 @@ int wps_show(void)
     bool restore = false;
 
     id3 = NULL;
+    current_track_path[0] = '\0';
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
@@ -664,7 +669,10 @@ int wps_show(void)
             if (wps_display(id3))
                 return 0;
             wps_refresh(id3, 0, WPS_REFRESH_ALL);
+
+            memcpy(current_track_path, id3->path, sizeof(current_track_path));
         }
+
         restore = true;
     }
 
@@ -753,8 +761,9 @@ int wps_show(void)
                         lcd_stop_scroll();
 
                         /* set dir browser to current playing song */
-                        if (global_settings.browse_current && id3)
-                            set_current_file(id3->path);
+                        if (global_settings.browse_current &&
+                            current_track_path[0] != '\0')
+                            set_current_file(current_track_path);
                         
                         return 0;
 #ifdef HAVE_RECORDER_KEYPAD
@@ -888,8 +897,9 @@ int wps_show(void)
                 lcd_stop_scroll();
 
                 /* set dir browser to current playing song */
-                if (global_settings.browse_current && id3)
-                    set_current_file(id3->path);
+                if (global_settings.browse_current &&
+                    current_track_path[0] != '\0')
+                    set_current_file(current_track_path);
 
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
@@ -902,7 +912,14 @@ int wps_show(void)
 
             case BUTTON_NONE: /* Timeout */
                 if (update())
+                {
+                    /* set dir browser to current playing song */
+                    if (global_settings.browse_current &&
+                        current_track_path[0] != '\0')
+                        set_current_file(current_track_path);
+
                     return 0;
+                }
                 break;
         }
 
@@ -912,7 +929,15 @@ int wps_show(void)
         if (restore) {
             restore = false;
             if (wps_display(id3))
+            {
+                /* set dir browser to current playing song */
+                if (global_settings.browse_current &&
+                    current_track_path[0] != '\0')
+                    set_current_file(current_track_path);
+
                 return 0;
+            }
+
             if (id3)
                 wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
         }
