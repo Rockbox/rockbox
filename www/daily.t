@@ -32,4 +32,29 @@ The batch timestamp is GMT.
 
 <p>
 <!--#include virtual="buildstatus.link" -->
+
+<h2>CVS builds</h2>
+
+<p>These builds are as "bleeding edge" as you can get. Up-to-date builds of the latest CVS code (the top line from the above table):
+
+<p><table class=dailymod><tr valign=top>
+<td>
+<a href="auto/build-player/archos.mod">Player</a><br>
+<a href="auto/build-playerdebug/archos.mod">Player debug</a><br>
+<a href="auto/build-playersim/rockboxui">Player simulator (linux)</a><br>
+<a href="auto/build-playersimwin32/uisw32.exe">Player simulator (win32)</a>
+</td>
+<td>
+<a href="auto/build-playerold/archos.mod">Player-old</a><br>
+<a href="auto/build-playerolddebug/archos.mod">Player-old debug</a><br>
+<a href="auto/build-playeroldsim/rockboxui">Player-old simulator (linux)</a>
+</td>
+<td>
+<a href="auto/build-recorder/ajbrec.ajz">Recorder</a><br>
+<a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a><br>
+<a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a><br>
+<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
+</td>
+</tr></table>
+
 #include "foot.t"

@@ -1,7 +1,7 @@
 ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -Uunix -H -C -V -LL >$@
 
 SRC := $(wildcard *.t)
-OBJS := $(SRC:%.t=%.html) daily.shtml main.shtml index.shtml bugs.html
+OBJS := $(SRC:%.t=%.html) daily.shtml main.shtml index.shtml bugs.html status.shtml
 
 .SUFFIXES: .t .html
 

@@ -55,9 +55,12 @@ The data is then spread over four memory segments. The two least significant bit
 
 <p>There are also 
 <a href="http://www.sh-linux.org/rpm/RPMS/i386/RedHat7.1/">
-pre-cooked RH7.1 RPMs</a> available from sh-linux.org
+pre-cooked RH7.1 RPMs</a> available from sh-linux.org, although some people have reported difficulties getting Rockbox to work with this.
 
 <p>Felix Arends has written a page about
 <a href="sh-win/">setting up an SH-1 compiler for Windows</a>.
+
+<p>Justin Heiner has built a 
+<a href="http://merwin.bespin.org/sh1cygwin/">win32 cross compiler for cygwin users</a>.
 
 #include "foot.t"
