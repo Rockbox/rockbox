@@ -105,7 +105,7 @@ static int perform_soft_reset(void);
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
-    int timeout = current_tick + HZ*4;
+    int timeout = current_tick + HZ*10;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
         yield();
 
@@ -127,7 +127,7 @@ static int wait_for_rdy(void)
     if (!wait_for_bsy())
         return 0;
 
-    timeout = current_tick + HZ*4;
+    timeout = current_tick + HZ*10;
     
     while (TIME_BEFORE(current_tick, timeout) &&
            !(ATA_ALT_STATUS & STATUS_RDY))
