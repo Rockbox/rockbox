@@ -16,9 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+
 #ifdef HAVE_LCD_BITMAP
 
-#include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include "lcd.h"
