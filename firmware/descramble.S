@@ -19,11 +19,11 @@
 
     .section    .icode,"ax",@progbits
 
-    .align      4
+    .align      2  /* this aligns to 2^2=4 byte bounday */
     .global     _descramble
     .type       _descramble,@function
 
-/* Descramble a block of byte data, from source to dest, processing len 
+/* Descramble a block of byte data, from source to dest, processing len
  * bytes. Size only limited by the len argument. Note that len must
  * be an even multiple of 4 (something rolo_load() already assumes.
  * (Does the Archos firmware loader also require that?).
