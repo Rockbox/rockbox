@@ -489,7 +489,8 @@ unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
 static bool saving; /* We are saving the buffer to disk */
 static char recording_filename[MAX_PATH];
-
+static int rec_frequency_index; /* For create_xing_header() calls */
+static int rec_version_index;   /* For create_xing_header() calls */
 #endif
 
 static int mpeg_file;
@@ -1010,13 +1011,6 @@ void IRQ3(void)
         dma_tick();
     else
         postpone_dma_tick();
-
-#if 0
-    if(mpeg_mode == MPEG_ENCODER)
-        /* Shut off if recording is stopped */
-        if(!is_recording)
-            demand_irq_enable(false);
-#endif
 }
 #endif
 
@@ -1271,6 +1265,7 @@ static void mpeg_thread(void)
 #ifdef HAVE_MAS3587F
     int amount_to_save;
     int writelen;
+    int framelen;
 #endif
     
     is_playing = false;
@@ -1734,15 +1729,6 @@ static void mpeg_thread(void)
                     DEBUGF("R\n");
                     t1 = current_tick;
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
-#if 0
-                    if(id3tags[tag_read_idx]->id3.vbr)
-                        /* Average bitrate * 1.5 */
-                        recalculate_watermark(
-                            (id3tags[tag_read_idx]->id3.bitrate * 3) / 2);
-                    else
-                        recalculate_watermark(
-                            id3tags[tag_read_idx]->id3.bitrate);
-#endif               
                     if(len > 0)
                     {
                         t2 = current_tick;
@@ -1854,10 +1840,10 @@ static void mpeg_thread(void)
                     DEBUGF("Recording...\n");
                     reset_mp3_buffer();
 
-                    /* Advance the write pointer 4096+417 bytes to make
+                    /* Advance the write pointer 4096+1500 bytes to make
                        room for an ID3 tag plus a VBR header */
-                    mp3buf_write = 4096+417;
-                    memset(mp3buf, 0, 4096+417);
+                    mp3buf_write = 4096+1500;
+                    memset(mp3buf, 0, 4096+1500);
 
                     /* Insert the ID3 header */
                     memcpy(mp3buf, empty_id3_header, sizeof(empty_id3_header));
@@ -1898,12 +1884,14 @@ static void mpeg_thread(void)
                     if(num_recorded_frames == 0x7ffff)
                         num_recorded_frames = 0;
                     
-                    create_xing_header(mpeg_file, 0, num_rec_bytes,
-                                       mp3buf, num_recorded_frames, NULL,
-                                       false);
+                    framelen = create_xing_header(mpeg_file, 0, num_rec_bytes,
+                                                  mp3buf, num_recorded_frames,
+                                                  rec_version_index,
+                                                  rec_frequency_index,
+                                                  NULL, false);
                     
-                    lseek(mpeg_file, 4096, SEEK_SET);
-                    write(mpeg_file, mp3buf, 417);
+                    lseek(mpeg_file, 4096+1500-framelen, SEEK_SET);
+                    write(mpeg_file, mp3buf, framelen);
                     close(mpeg_file);
                     
                     mpeg_file = -1;
@@ -2841,9 +2829,12 @@ void mpeg_set_recording_options(int frequency, int quality,
     unsigned long val;
 
     is_mpeg1 = (frequency < 3)?true:false;
+
+    rec_version_index = is_mpeg1?3:2;
+    rec_frequency_index = frequency % 3;
     
     val = (quality << 17) |
-        ((frequency % 3) << 10) |
+        (rec_frequency_index << 10) |
         ((is_mpeg1?1:0) << 9) |
         (1 << 8) | /* CRC on */
         (((channel_mode * 2 + 1) & 3) << 6) |

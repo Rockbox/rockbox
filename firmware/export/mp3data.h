@@ -61,6 +61,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
                      void (*progressfunc)(int));
 int create_xing_header(int fd, int startpos, int filesize,
                        unsigned char *buf, int num_frames,
+                       int mpeg_version, int sample_rate,
                        void (*progressfunc)(int), bool generate_toc);
 
 #endif

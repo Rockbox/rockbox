@@ -210,14 +210,15 @@ static const unsigned char empty_id3_header[] =
 
 static bool vbr_fix(void)
 {
-    unsigned char xingbuf[417];
+    unsigned char xingbuf[1500];
     struct mp3entry entry;
     int fd;
     int rc;
     int flen;
     int num_frames;
-    int fpos;
     int numbytes;
+    int framelen;
+    int unused_space;
 
     if(mpeg_status()) {
         splash(HZ*2, 0, true, str(LANG_VBRFIX_STOP_PLAY));
@@ -250,26 +251,45 @@ static bool vbr_fix(void)
                                   flen, xingupdate);
 
     if(num_frames) {
-        create_xing_header(fd, entry.first_frame_offset,
-                           flen, xingbuf, num_frames, xingupdate, true);
+        /* Note: We don't need to pass any values for mpeg_version and
+           sample_rate because they will be extracted from the mpeg stream */
+        framelen = create_xing_header(fd, entry.first_frame_offset,
+                                      flen, xingbuf, num_frames,
+                                      0, 0, xingupdate, true);
         
         /* Try to fit the Xing header first in the stream. Replace the existing
-           Xing header if there is one, else see if there is room between the
+           VBR header if there is one, else see if there is room between the
            ID3 tag and the first MP3 frame. */
-        if(entry.vbr_header_pos) {
-            /* Reuse existing Xing header */
-            fpos = entry.vbr_header_pos;
-            
-            DEBUGF("Reusing Xing header at %d\n", fpos);
-                
-            rc = lseek(fd, entry.vbr_header_pos, SEEK_SET);
+        if(entry.first_frame_offset - entry.id3v2len >=
+           (unsigned int)framelen) {
+            DEBUGF("Using existing space between ID3 and first frame\n");
+
+            /* Seek to the beginning of the unused space */
+            rc = lseek(fd, entry.id3v2len, SEEK_SET);
             if(rc < 0) {
                 close(fd);
                 fileerror(rc);
                 return true;
             }
+
+            unused_space =
+                entry.first_frame_offset - entry.id3v2len - framelen;
             
-            rc = write(fd, xingbuf, 417);
+            /* Fill the unused space with 0's (using the MP3 buffer)
+               and write it to the file */
+            if(unused_space)
+            {
+                memset(mp3buf, 0, unused_space);
+                rc = write(fd, mp3buf, unused_space);
+                if(rc < 0) {
+                    close(fd);
+                    fileerror(rc);
+                    return true;
+                }
+            }
+
+            /* Then write the Xing header */
+            rc = write(fd, xingbuf, framelen);
             if(rc < 0) {
                 close(fd);
                 fileerror(rc);
@@ -278,61 +298,41 @@ static bool vbr_fix(void)
             
             close(fd);
         } else {
-            /* Any room between ID3 tag and first MP3 frame? */
-            if(entry.first_frame_offset - entry.id3v2len > 417) {
-                DEBUGF("Using existing space between ID3 and first frame\n");
-                rc = lseek(fd, entry.first_frame_offset - 417, SEEK_SET);
-                if(rc < 0) {
-                    close(fd);
-                    fileerror(rc);
-                    return true;
-                }
-                
-                rc = write(fd, xingbuf, 417);
-                if(rc < 0) {
-                    close(fd);
-                    fileerror(rc);
-                    return true;
-                }
-                
-                close(fd);
+            /* If not, insert some space. If there is an ID3 tag in the
+               file we only insert just enough to squeeze the Xing header
+               in. If not, we insert an additional empty ID3 tag of 4K. */
+            
+            close(fd);
+            
+            /* Nasty trick alert! The insert_data_in_file() function
+               uses the MP3 buffer when copying the data. We assume
+               that the ID3 tag isn't longer than 1MB so the xing
+               buffer won't be overwritten. */
+            
+            if(entry.first_frame_offset) {
+                DEBUGF("Inserting %d bytes\n", framelen);
+                numbytes = framelen;
             } else {
-                /* If not, insert some space. If there is an ID3 tag in the
-                   file we only insert just enough to squeeze the Xing header
-                   in. If not, we insert an additional empty ID3 tag of 4K. */
-
-                close(fd);
-
-                /* Nasty trick alert! The insert_data_in_file() function
-                   uses the MP3 buffer when copying the data. We assume
-                   that the ID3 tag isn't longer than 1MB so the xing
-                   buffer won't be overwritten. */
-
-                if(entry.first_frame_offset) {
-                    DEBUGF("Inserting 417 bytes\n");
-                    numbytes = 417;
-                } else {
-                    DEBUGF("Inserting 4096+417 bytes\n");
-                    numbytes = 4096 + 417;
-                    
-                    memset(mp3buf + 0x100000, 0, numbytes);
-
-                    /* Insert the ID3 header */
-                    memcpy(mp3buf + 0x100000, empty_id3_header,
-                           sizeof(empty_id3_header));
-                }
-
-                /* Copy the Xing header */
-                memcpy(mp3buf + 0x100000 + numbytes - 417, xingbuf, 417);
+                DEBUGF("Inserting 4096+%d bytes\n", framelen);
+                numbytes = 4096 + framelen;
                 
-                rc = insert_data_in_file(selected_file,
-                                         entry.first_frame_offset,
-                                         mp3buf + 0x100000, numbytes);
+                memset(mp3buf + 0x100000, 0, numbytes);
                 
-                if(rc < 0) {
-                    fileerror(rc);
-                    return true;
-                }
+                /* Insert the ID3 header */
+                memcpy(mp3buf + 0x100000, empty_id3_header,
+                       sizeof(empty_id3_header));
+            }
+            
+            /* Copy the Xing header */
+            memcpy(mp3buf + 0x100000 + numbytes - framelen, xingbuf, framelen);
+            
+            rc = insert_data_in_file(selected_file,
+                                     entry.first_frame_offset,
+                                     mp3buf + 0x100000, numbytes);
+            
+            if(rc < 0) {
+                fileerror(rc);
+                return true;
             }
         }
         

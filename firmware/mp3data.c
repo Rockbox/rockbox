@@ -35,7 +35,7 @@
 #include "mp3data.h"
 #include "file.h"
 
-#undef DEBUG_VERBOSE
+#define DEBUG_VERBOSE
 
 #define BYTES2INT(b1,b2,b3,b4) (((b1 & 0xFF) << (3*8)) | \
                                 ((b2 & 0xFF) << (2*8)) | \
@@ -530,9 +530,10 @@ int get_mp3file_info(int fd, struct mp3info *info)
     return bytecount;
 }
 
-/* This is an MP3 header, 128kbit/s, 44.1kHz, with silence */
+/* This is an MP3 header, 128kbit/s, with silence
+   MPEG version and sample frequency are not set */
 static const unsigned char xing_frame_header[] = {
-    0xff, 0xfa, 0x90, 0x64, 0x86, 0x1f
+    0xff, 0xe2, 0x90, 0x64, 0x86, 0x1f
 };
 
 static const char cooltext[] = "Rockbox rocks";
@@ -601,11 +602,15 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     }
 }
 
+/* Note: mpeg_version and sample_rate are 2-bit values, as specified by the
+   MPEG frame standard. See the tables above. */
 int create_xing_header(int fd, int startpos, int filesize,
                        unsigned char *buf, int num_frames,
+                       int mpeg_version, int sample_rate,
                        void (*progressfunc)(int), bool generate_toc)
 {
     unsigned long header = 0;
+    unsigned long saved_header;
     struct mp3info info;
     int pos, last_pos;
     int i, j;
@@ -618,9 +623,9 @@ int create_xing_header(int fd, int startpos, int filesize,
     DEBUGF("create_xing_header()\n");
     
     /* Create the frame header */
-    memset(buf, 0, 417);
+    memset(buf, 0, 1500);
     memcpy(buf, xing_frame_header, 6);
-           
+
     lseek(fd, startpos, SEEK_SET);
     buf_init();
     
@@ -664,6 +669,10 @@ int create_xing_header(int fd, int startpos, int filesize,
                 buf_seek(fd, info.frame_size-4);
                 filepos += info.frame_size;
             }
+
+            /* Save one header for later use */
+            if(i == 1)
+                saved_header = header;
             
             if(progressfunc)
             {
@@ -684,6 +693,26 @@ int create_xing_header(int fd, int startpos, int filesize,
 
     memcpy(buf + index + 100, cooltext, sizeof(cooltext));
 
+    /* We must fill in the correct sample rate and mpeg version. If the TOC
+       should be generated, we take that data from the actual stream. If not,
+       we use the supplied parameters. */
+    if(generate_toc)
+    {
+        saved_header &= (VERSION_MASK | SAMPLERATE_MASK);
+    
+        buf[1] |= (saved_header >> 16) & 0xff;
+        buf[2] |= (saved_header >> 8) & 0xff;
+    }
+    else
+    {
+        buf[1] |= mpeg_version << 3;
+        buf[2] |= sample_rate << 2;
+    }
+
+    /* Now get the length of the newly created frame */
+    header = BYTES2INT(buf[0], buf[1], buf[2], buf[3]);
+    mp3headerinfo(&info, header);
+    
 #ifdef DEBUG
     for(i = 0;i < 417;i++)
     {
@@ -694,5 +723,5 @@ int create_xing_header(int fd, int startpos, int filesize,
     }
 #endif
     
-    return 0;
+    return info.frame_size;
 }
