@@ -117,7 +117,7 @@ static void xingupdate(int percent)
 extern unsigned char mp3buf[];
 extern unsigned char mp3end[];
 
-static int insert_space_in_file(char *fname, int fpos, int num_bytes)
+static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 {
     int readlen;
     int rc;
@@ -154,21 +154,12 @@ static int insert_space_in_file(char *fname, int fpos, int num_bytes)
         }
     }
     
-    /* Now insert some 0's in the file */
-    memset(mp3buf, 0, num_bytes);
-
-    rc = write(fd, mp3buf, num_bytes);
+    /* Now insert the data into the file */
+    rc = write(fd, buf, num_bytes);
     if(rc < 0) {
         close(orig_fd);
         close(fd);
         return 10*rc - 5;
-    }
-
-    rc = lseek(orig_fd, 0, SEEK_SET);
-    if(rc < 0) {
-        close(orig_fd);
-        close(fd);
-        return 10*rc - 6;
     }
 
     /* Copy the file */
@@ -210,6 +201,12 @@ static void fileerror(int rc)
 {
     splash(HZ*2, 0, true, "File error: %d", rc);
 }
+
+static const unsigned char empty_id3_header[] =
+{
+    'I', 'D', '3', 0x04, 0x00, 0x00,
+    0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
+};
 
 static bool vbr_fix(void)
 {
@@ -264,54 +261,80 @@ static bool vbr_fix(void)
             fpos = entry.vbr_header_pos;
             
             DEBUGF("Reusing Xing header at %d\n", fpos);
+                
+            rc = lseek(fd, entry.vbr_header_pos, SEEK_SET);
+            if(rc < 0) {
+                close(fd);
+                fileerror(rc);
+                return true;
+            }
+            
+            rc = write(fd, xingbuf, 417);
+            if(rc < 0) {
+                close(fd);
+                fileerror(rc);
+                return true;
+            }
+            
+            close(fd);
         } else {
             /* Any room between ID3 tag and first MP3 frame? */
             if(entry.first_frame_offset - entry.id3v2len > 417) {
-                fpos = entry.first_frame_offset - 417;
+                DEBUGF("Using existing space between ID3 and first frame\n");
+                rc = lseek(fd, entry.first_frame_offset - 417, SEEK_SET);
+                if(rc < 0) {
+                    close(fd);
+                    fileerror(rc);
+                    return true;
+                }
+                
+                rc = write(fd, xingbuf, 417);
+                if(rc < 0) {
+                    close(fd);
+                    fileerror(rc);
+                    return true;
+                }
+                
+                close(fd);
             } else {
                 /* If not, insert some space. If there is an ID3 tag in the
                    file we only insert just enough to squeeze the Xing header
-                   in. If not, we insert 4K. */
+                   in. If not, we insert an additional empty ID3 tag of 4K. */
+
                 close(fd);
-                if(entry.first_frame_offset)
+
+                /* Nasty trick alert! The insert_data_in_file() function
+                   uses the MP3 buffer when copying the data. We assume
+                   that the ID3 tag isn't longer than 1MB so the xing
+                   buffer won't be overwritten. */
+
+                if(entry.first_frame_offset) {
+                    DEBUGF("Inserting 417 bytes\n");
                     numbytes = 417;
-                else
-                    numbytes = 4096;
+                } else {
+                    DEBUGF("Inserting 4096+417 bytes\n");
+                    numbytes = 4096 + 417;
+                    
+                    memset(mp3buf + 0x100000, 0, numbytes);
+
+                    /* Insert the ID3 header */
+                    memcpy(mp3buf + 0x100000, empty_id3_header,
+                           sizeof(empty_id3_header));
+                }
+
+                /* Copy the Xing header */
+                memcpy(mp3buf + 0x100000 + numbytes - 417, xingbuf, 417);
                 
-                rc = insert_space_in_file(selected_file,
-                                          entry.first_frame_offset, numbytes);
+                rc = insert_data_in_file(selected_file,
+                                         entry.first_frame_offset,
+                                         mp3buf + 0x100000, numbytes);
                 
                 if(rc < 0) {
                     fileerror(rc);
                     return true;
                 }
-                
-                /* Reopen the file */
-                fd = open(selected_file, O_RDWR);
-                if(fd < 0) {
-                    splash(HZ*2, 0, true, "File reopen error: %d", fd);
-                    return true;
-                }
-                
-                fpos = numbytes - 417;
             }
         }
-        
-        rc = lseek(fd, fpos, SEEK_SET);
-        if(rc < 0) {
-            close(fd);
-            fileerror(rc);
-            return true;
-        }
-        
-        rc = write(fd, xingbuf, 417);
-        if(rc < 0) {
-            close(fd);
-            fileerror(rc);
-            return true;
-        }
-        
-        close(fd);
         
         xingupdate(100);
     }
@@ -352,7 +375,7 @@ int onplay(char* file, int attr)
 
     if (attr & TREE_ATTR_MPA)
     {
-        menu[i].desc = "VBRfix";
+        menu[i].desc = str(LANG_VBRFIX);
         menu[i].function = vbr_fix;
         i++;
     }
