@@ -532,5 +532,11 @@ A64: There are really only two versions of Rockbox.  One for Players and one
      but would love to hear any reports you may have about Release or Daily
      build versions. (see question #62).
             
-
+Q65: I am in Windows and can't create a .rockbox directory to store my
+     files.  When are you going to fix this?
+A65: We won't.  The limitations of your operating system is not reason 
+     enough for us to change how we handle things.  And you _can_ create
+     this directory.  Open a command line and type:
+          mkdir j:\.rockbox
+     You will need to correct the location for where your archos is mounted.
 
