@@ -9,7 +9,7 @@
     
     Copyright (C) 2002 by Robert E. Hak
     
---------------------------------------------------------------------
+-------------------------------------------------------------------
 
 
 Rockbox FAQ 
@@ -231,7 +231,7 @@ A29: Don't confuse the terms.  Reverse engineering means examining a product
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
 
-Q30: Wait a minute here.  You have release version 1.0, but not a single one 
+Q30: Wait a minute here.  You have released version 1.0, but not a single one 
      of the ideas you have spoken about is actually implimented!  Calling this
      version 1.0 is really misleading.  Whats the story?!
 A30: In simple terms, the first release is called 1.0 because it has a basic 
@@ -244,3 +244,12 @@ A30: In simple terms, the first release is called 1.0 because it has a basic
      bring the project some attention, and some additional developers.  
      Adding the missing features is just a matter of time (and that time goes
      faster if you, yes you, help too). 
+
+Q31: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
+     to know about Rockbox boot loaders')
+A31: The developers have discussed the possibility of a boot loader.  (Mainly
+     because having one sounds cool, and isn't Rolo just a great name?)
+     The idea would be that a user could use the load to choose between
+     different verions of Rockbox or the Archo firmware itself.  We do not
+     have an expected date on this.  (As a matter of fact, developement on it
+     has not even started yet).
