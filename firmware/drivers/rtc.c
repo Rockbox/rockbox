@@ -65,7 +65,6 @@ int rtc_write(unsigned char address, unsigned char value)
     return ret;
 }
 
-
 int rtc_read(unsigned char address)
 {
     int value = -1;
@@ -92,4 +91,37 @@ int rtc_read(unsigned char address)
     return value;
 }
 
+int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes)
+{
+    int ret = 0;
+    unsigned char obuf[1];
+    int i;
+
+    i2c_begin();
+    
+    obuf[0] = address;
+
+    /* send read command */
+    if (i2c_write(RTC_DEV_READ, obuf, 1) >= 0)
+    {
+        i2c_start();
+        i2c_outb(RTC_DEV_READ);
+        if (i2c_getack())
+        {
+            for(i = 0;i < numbytes-1;i++)
+                buf[i] = i2c_inb(0);
+            
+            buf[i] = i2c_inb(1);
+        }
+        else
+        {
+            ret = -1;
+        }
+    }
+
+    i2c_stop();
+
+    i2c_end();
+    return ret;
+}
 #endif
