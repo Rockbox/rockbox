@@ -38,7 +38,7 @@ struct event_queue button_queue;
 #define REPEAT_START      6
 
 /* the speed repeat starts at */
-#define REPEAT_INTERVAL_START   8
+#define REPEAT_INTERVAL_START   4
 
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
