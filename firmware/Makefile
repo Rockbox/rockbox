@@ -13,7 +13,7 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-Iinclude -I. -Icommon -Idrivers
+INCLUDES=-Iinclude -I. -Iexport -Icommon -Idrivers
 
 TOOLSDIR = ../tools
 
@@ -69,7 +69,7 @@ clean:
 	rm -rf $(OBJDIR)/$(DEPS)
 
 # Special targets
-$(OBJDIR)/thread.o: thread.c thread.h
+$(OBJDIR)/thread.o: thread.c export/thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(OBJDIR)/sysfont.o: fonts/clR6x8.bdf

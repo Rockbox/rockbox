@@ -24,7 +24,7 @@
 #include "mpeg.h"
 #include "ata.h"
 #include "string.h"
-#include "kernel.h"
+#include <kernel.h>
 #include "thread.h"
 #ifndef SIMULATOR
 #include "i2c.h"

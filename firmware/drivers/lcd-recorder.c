@@ -669,6 +669,8 @@ void lcd_puts_scroll(int x, int y, unsigned char* string)
     int index;
     int free_index=0;
 
+    DEBUGF("puts_scroll: %s\n", string);
+    
     for (index = 0; index < SCROLLABLE_LINES; index++) {
         s = &scroll[index];
 
