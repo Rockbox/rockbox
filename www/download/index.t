@@ -53,7 +53,7 @@
 
 <h2>Installation</h2>
 
-<p>Unpack the zip archive in the root (top) directory of your Archos disk. Make sure you stop/eject/unmount the usb disk before you unplug it.
+<p>Unpack the entire zip archive in the root (top) directory of your Archos disk. Make sure you stop/eject/unmount the usb disk before you unplug it. <b>Note:</b> All files in the zip file are needed, don't just install a few of them.
 
 <p>Windows users can also use the the installer: Simply select your model and destination drive.
 
