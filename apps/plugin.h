@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 23
+#define PLUGIN_API_VERSION 24
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -293,6 +293,7 @@ struct plugin_api {
     void (*button_clear_queue)(void);
     char *(*strncpy)(char *dst, const char *src, size_t length);
     int (*strcasecmp)(const char *, const char *);
+    int (*default_event_handler)(int event);
 };
 
 /* defined by the plugin loader (plugin.c) */
