@@ -38,7 +38,7 @@
 
 #define ATA_IOBASE      0x20000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
-#define ATA_CONTROL     (*((volatile unsigned short*)(ATA_IOBASE + 0xe)))
+#define ATA_CONTROL     (*((volatile unsigned short*)(ATA_IOBASE + 0x1c)))
 
 #define ATA_ERROR       (*((volatile unsigned short*)(ATA_IOBASE + 0x22)))
 #define ATA_NSECTOR     (*((volatile unsigned short*)(ATA_IOBASE + 0x24)))
@@ -247,7 +247,7 @@ static bool poweroff = false;
 #ifdef HAVE_ATA_POWER_OFF
 static int poweroff_timeout = 2*HZ;
 #endif
-static char ata_stack[DEFAULT_STACK_SIZE];
+static long ata_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
