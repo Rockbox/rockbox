@@ -11,8 +11,6 @@
 target=$1
 debug=$2
 
-extra_defines="-"
-
 if test "$1" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
@@ -92,8 +90,9 @@ sed > Makefile \
  -e "s,@DISPLAY@,${display},g" \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
+ -e "s,@LANGUAGE@,${language},g" \
  -e "s,@SIMVER@,${simver},g" \
- -e "s,@EXTRA_DEFINES@,\"${extra_defines}\",g" \
+ -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
@@ -104,6 +103,7 @@ DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
 SIMVER=@SIMVER@
+LANGUAGE=@LANGUAGE@
 VERSION=\$(shell date +%y%m%d-%H%M)
 EXTRA_DEFINES=@EXTRA_DEFINES@
 
@@ -112,7 +112,7 @@ EXTRA_DEFINES=@EXTRA_DEFINES@
 all: sim
 
 sim:
-	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
+	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)"
 
 clean:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
@@ -151,6 +151,7 @@ if [ "$target" = "update" ]; then
       echo "Existing generated Makefile found. Getting defaults from it."
       target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
+      language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
       extra_defines=`grep "^EXTRA_DEFINES=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
@@ -206,28 +207,25 @@ if [ -z "$target" ]; then
   esac
 fi
 
-if [ "-" = "$extra_defines" ]; then
- extra_defines=""
+if [ -z "$extra_defines" ]; then
+    if [  "-DARCHOS_RECORDER" = "$target" ] ; then
+        disable_demos="-DDISABLE_NOTHING"
+        disable_games=""
 
- if [  "-DARCHOS_RECORDER" = "$target" ] ; then
+        echo "Do you want to use Demos? (Y)"
+        getit=`input`;
+        if [ "n" = "$getit" -o "N" = "$getit" ] ; then
+            disable_demos="-DDISABLE_DEMOS"
+        fi
+ 
+        echo "Do you want to play Games? (Y)"
+        getit=`input`;
+        if [ "n" = "$getit" -o "N" = "$getit" ] ; then
+            disable_games=" -DDISABLE_GAMES"
+        fi
 
-  echo "Do you want to use Demos? (Y)"
-  getit=`input`;
-  if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines="$extra_defines -DDISABLE_DEMOS"
-  else
-        extra_defines="$extra_defines"
-  fi
- 
-  echo "Do you want to play Games? (Y)"
-  getit=`input`;
-  if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines="$extra_defines -DDISABLE_GAMES"
-  else
-        extra_defines="$extra_defines"
-  fi
- 
- fi
+        extra_defines="$disable_demos$disable_games"
+    fi
 fi
 
 
@@ -288,25 +286,68 @@ fi
 appsfile="credits.c" # a file to check for in the apps root dir
 
 for dir in apps . .. ../apps ../../apps $firmdir/apps $firmdir/../apps; do
-  if [ -f $dir/$appsfile ]; then
-    appsdir=$dir
-    break
-  fi
+    if [ -f $dir/$appsfile ]; then
+        appsdir=$dir
+        break
+    fi
 done
 
 if [ -z "$appsdir" ]; then
-  echo "This script couldn't find your apps directory. Please enter the"
-  echo "full path to the apps directory here:"
+    echo "This script couldn't find your apps directory. Please enter the"
+    echo "full path to the apps directory here:"
 
-  appsdir=`input`
+    appsdir=`input`
 fi
+
+picklang() {
+    # figure out which languages that are around
+    for file in $appsdir/lang/*.lang; do
+        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
+        langs="$langs $clean"
+    done
+
+    num=1
+    for one in $langs; do
+        echo "$num. $one"
+        num=`expr $num + 1`
+    done
+
+    read pick
+    return $pick;
+}
+
+whichlang() {
+    num=1
+    for one in $langs; do
+        if [ "$num" = "$pick" ]; then
+            echo $one
+            return
+        fi
+        num=`expr $num + 1`
+    done
+}
+
+if [ -z "$language" ]; then
+
+    echo "Select a number for the language to use (default is english)"
+
+    picklang
+    language=`whichlang`
+
+    if [ -z "$language" ]; then
+        # pick a default
+        language="english"
+    fi
+fi
+
 
 sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@TARGET@,${target},g" \
- -e "s,@EXTRA_DEFINES@,\"${extra_defines}\",g" \
+ -e "s,@LANGUAGE@,${language},g" \
+ -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
@@ -316,6 +357,7 @@ APPSDIR=@APPSDIR@
 DEBUG=@DEBUG@
 TARGET=@TARGET@
 THISDIR="@PWD@"
+LANGUAGE=@LANGUAGE@
 VERSION=\$(shell date +%y%m%d-%H%M)
 
 EXTRA_DEFINES=@EXTRA_DEFINES@
@@ -324,10 +366,10 @@ EXTRA_DEFINES=@EXTRA_DEFINES@
 all: firmware apps
 
 firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES=\$(EXTRA_DEFINES)
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES="\$(EXTRA_DEFINES)"
 
 apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES=\$(EXTRA_DEFINES)
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
@@ -350,8 +392,3 @@ tags:
 EOF
 
 echo "Created Makefile"
-
-
-
-
-
