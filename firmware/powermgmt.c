@@ -31,6 +31,7 @@
 #include "button.h"
 #include "ata.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
@@ -875,6 +876,7 @@ void powermgmt_init(void)
 #endif /* SIMULATOR */
 
 void shutdown_hw(void) {
+#ifndef SIMULATOR
     mpeg_stop();
     ata_flush();
     ata_spindown(1);
@@ -888,4 +890,5 @@ void shutdown_hw(void) {
     lcd_set_contrast(0);
 #endif
     power_off();
+#endif
 }
