@@ -51,13 +51,14 @@ int init(void)
     return 0;
 }
 
-void loop(void)
+enum plugin_status loop(void)
 {
     while (true) {
         struct tm* t;
         char buf[80];
         int f;
         int batt = rb->battery_level();
+        int button;
 
         /* stop measuring when <5% battery left */
         if ((batt > 0) && (batt < 5))
@@ -91,7 +92,23 @@ void loop(void)
         rb->splash(0, true, buf);
         
         /* simulate 128kbit/s (16kbyte/s) playback duration */
-        rb->sleep(HZ * (buffersize / 16384) - HZ*10);
+        do {
+            button = rb->button_get_w_tmo(HZ * (buffersize / 16384) - HZ*10);
+
+            /* Check if we shall exit the plugin */
+            if (button==BUTTON_ON ||
+#ifdef HAVE_RECORDER_KEYPAD
+                button==BUTTON_OFF
+#else
+                button==BUTTON_STOP
+#endif
+                )
+                return PLUGIN_OK;
+            if (button==SYS_USB_CONNECTED) {
+                rb->usb_screen();
+                return PLUGIN_USB_CONNECTED;
+            }
+        } while (!(button&(BUTTON_REL|BUTTON_REPEAT)));
 
         /* simulate filling the mp3 buffer */
         f = rb->open("/battery.dummy", O_RDONLY);
@@ -102,6 +119,7 @@ void loop(void)
         rb->read(f, buffer, buffersize);
         rb->close(f);
     }
+    return PLUGIN_OK;
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -113,8 +131,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (init() < 0)
         return PLUGIN_OK;
 
-    loop();
-
-    return PLUGIN_OK;
+    return loop();
 }
 
