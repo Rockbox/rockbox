@@ -136,7 +136,7 @@ void status_draw(void)
                     battery_charge_step = 0;
                     break;
             }
-           switch_tick = current_tick + HZ/2;
+           switch_tick = current_tick + (HZ/2);
        }
     } else {
         lcd_icon(ICON_BATTERY, true);
