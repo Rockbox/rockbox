@@ -34,6 +34,10 @@
 #include "power.h"
 #include "backlight.h"
 #include "powermgmt.h"
+#include "status.h"
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#endif
 
 struct user_settings global_settings;
 
@@ -440,14 +444,23 @@ void set_bool(char* string, bool* variable )
     bool done = false;
     int button;
 
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
-    lcd_puts_scroll(0,0,string);
+    lcd_puts_scroll(0, 0, string);
 
     while ( !done ) {
         lcd_puts(0, 1, *variable ? "on " : "off");
+#ifdef HAVE_LCD_BITMAP
+        status_draw();
+#endif
         lcd_update();
 
-        button = button_get(true);
+        button = button_get_w_tmo(HZ/2);
         switch ( button ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
@@ -458,10 +471,31 @@ void set_bool(char* string, bool* variable )
                 done = true;
                 break;
 
-            default:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+            case BUTTON_RIGHT:
+#endif
                 if(!(button & BUTTON_REL))
                    *variable = !*variable;
                 break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+                lcd_clear_display();
+                lcd_puts_scroll(0, 0, string);
+#endif
+                break;
+#endif
         }
     }
     lcd_stop_scroll();
@@ -477,16 +511,25 @@ void set_int(char* string,
 {
     bool done = false;
 
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
-    lcd_puts_scroll(0,0,string);
+    lcd_puts_scroll(0, 0, string);
 
     while (!done) {
         char str[32];
         snprintf(str,sizeof str,"%d %s  ", *variable, unit);
-        lcd_puts(0,1,str);
+        lcd_puts(0, 1, str);
+#ifdef HAVE_LCD_BITMAP
+        status_draw();
+#endif
         lcd_update();
 
-        switch( button_get(true) ) {
+        switch( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -519,6 +562,21 @@ void set_int(char* string,
 #endif
                 done = true;
                 break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+                lcd_clear_display();
+                lcd_puts_scroll(0, 0, string);
+#endif
+                break;
+#endif
         }
         if ( function )
             function(*variable);
@@ -530,14 +588,23 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
 {
     bool done = false;
 
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
-    lcd_puts_scroll(0,0,string);
+    lcd_puts_scroll(0, 0, string);
 
     while ( !done ) {
         lcd_puts(0, 1, options[*variable]);
+#ifdef HAVE_LCD_BITMAP
+        status_draw();
+#endif
         lcd_update();
 
-        switch ( button_get(true) ) {
+        switch ( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -568,6 +635,21 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
 #endif
                 done = true;
                 break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+                lcd_clear_display();
+                lcd_puts_scroll(0, 0, string);
+#endif
+                break;
+#endif
         }
     }
     lcd_stop_scroll();
@@ -605,6 +687,12 @@ void set_time(char* string, int timedate[])
 #endif
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
     lcd_puts_scroll(0, 0, string);
 
@@ -734,7 +822,7 @@ void set_time(char* string, int timedate[])
         cursor[5][INDEX_WIDTH] = width + strlen(reffub) - 1;
 
         lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
                        cursor[cursorpos][INDEX_WIDTH],
                        line_height);
 #elif defined(LOADABLE_FONTS)
@@ -770,17 +858,20 @@ void set_time(char* string, int timedate[])
         cursor[5][INDEX_WIDTH] = width;
 
         lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
                        cursor[cursorpos][INDEX_WIDTH],
                        line_height);
 #else
         lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
                        cursor[cursorpos][INDEX_WIDTH],
                        8);
 #endif
-        lcd_puts(0,4,"ON  to set");
-        lcd_puts(0,5,"OFF to revert");
+        lcd_puts(0, 4, "ON  to set");
+        lcd_puts(0, 5, "OFF to revert");
+#ifdef HAVE_LCD_BITMAP
+        status_draw();
+#endif
         lcd_update();
 
         /* calculate the minimum and maximum for the number under cursor */
@@ -811,7 +902,7 @@ void set_time(char* string, int timedate[])
             }
         }
 
-        button = button_get(true);
+        button = button_get_w_tmo(HZ/2);
         switch ( button ) {
             case BUTTON_LEFT:
                 cursorpos = (cursorpos + 6 - 1) % 6;
@@ -838,6 +929,20 @@ void set_time(char* string, int timedate[])
                 done = true;
                 timedate[0] = -1;
                 break;
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+                lcd_clear_display();
+                lcd_puts_scroll(0, 0, string);
+#endif
+                break;
+#endif
             default:
                 break;
         }

@@ -23,13 +23,15 @@
 #include "kernel.h"
 #include "debug.h"
 #include "panic.h"
-
+#include "settings.h"
+#include "status.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
 #ifdef LOADABLE_FONTS
 #include "ajf.h"
 #endif
+
 struct menu {
     int top;
     int cursor;
@@ -40,7 +42,9 @@ struct menu {
 #define MAX_MENUS 4
 
 #ifdef HAVE_LCD_BITMAP
-#define MENU_LINES 8
+#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
+#define LINE_HEIGTH 8 /* pixels for each text line */
+#define MENU_LINES  (LCD_HEIGHT / LINE_HEIGTH - LINE_Y)
 #else
 #define MENU_LINES 2
 #endif
@@ -71,7 +75,7 @@ void put_cursorxy(int x, int y, bool on)
     if(on) {
 #ifdef HAVE_LCD_BITMAP
         lcd_bitmap ( bitmap_icons_6x8[Cursor], 
-                     x*6, y*fh, 4, 8, true);
+                     x*6, y*fh + lcd_getymargin(), 4, 8, true);
 #elif defined(SIMULATOR)
         /* player simulator */
         unsigned char cursor[] = { 0x7f, 0x3e, 0x1c, 0x08 };
@@ -83,7 +87,7 @@ void put_cursorxy(int x, int y, bool on)
     else {
 #if defined(HAVE_LCD_BITMAP)
         /* I use xy here since it needs to disregard the margins */
-        lcd_clearrect (x*6, y*fh, 4, 8);
+        lcd_clearrect (x*6, y*fh + lcd_getymargin(), 4, 8);
 #elif defined(SIMULATOR)
         /* player simulator in action */
         lcd_clearrect (x*6, 12+y*16, 4, 8);
@@ -101,7 +105,10 @@ static void menu_draw(int m)
     int fh;
     unsigned char* font = lcd_getcurrentldfont();
     fh = ajf_get_fontheight(font);
-    menu_lines = LCD_HEIGHT/fh;
+    if (global_settings.statusbar)
+        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
+    else
+        menu_lines = LCD_HEIGHT/fh;
 #else
     int menu_lines = MENU_LINES;
 #endif
@@ -109,9 +116,16 @@ static void menu_draw(int m)
     lcd_clear_display(); 
     lcd_stop_scroll();
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,0);
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
     lcd_setfont(0);
 #endif
+    /* correct cursor pos if out of screen */
+    if (menus[m].cursor - menus[m].top >= menu_lines)
+        menus[m].top++;
+
     for (i = menus[m].top; 
          (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
          i++) {
@@ -123,6 +137,9 @@ static void menu_draw(int m)
 
     /* place the cursor */
     put_cursorxy(0, menus[m].cursor - menus[m].top, true);
+#ifdef HAVE_LCD_BITMAP
+    status_draw();
+#endif
     lcd_update();
 }
 
@@ -138,7 +155,10 @@ static void put_cursor(int m, int target)
     int fh;
     unsigned char* font = lcd_getcurrentldfont();
     fh = ajf_get_fontheight(font);
-    menu_lines = LCD_HEIGHT/fh;
+    if (global_settings.statusbar)
+        menu_lines = (LCD_HEIGHT-STATUSBAR_HEIGHT)/fh;
+    else
+        menu_lines = LCD_HEIGHT/fh;
 #else
     int menu_lines = MENU_LINES;
 #endif
@@ -196,7 +216,7 @@ void menu_run(int m)
     menu_draw(m);
     
     while(1) {
-        switch( button_get(true) ) {
+        switch( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -247,10 +267,21 @@ void menu_run(int m)
                 lcd_stop_scroll();
                 return;
 
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                menu_draw(m);
+#endif
+                break;
+#endif
+
             default:
                 break;
         }
         
+        status_draw();
         lcd_update();
     }
 }

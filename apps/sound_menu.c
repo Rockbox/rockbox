@@ -19,12 +19,16 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "kernel.h"
 #include "lcd.h"
 #include "menu.h"
 #include "button.h"
 #include "mpeg.h"
 #include "settings.h"
 #include "status.h"
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#endif
 
 static char *fmt[] =
 {
@@ -38,6 +42,7 @@ void set_sound(char* string,
                int setting)
 {
     bool done = false;
+    bool changed = false;
     int min, max;
     int val;
     int numdec;
@@ -51,26 +56,35 @@ void set_sound(char* string,
     min = mpeg_sound_min(setting);
     max = mpeg_sound_max(setting);
     
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
     lcd_puts_scroll(0,0,string);
 
     while (!done) {
-        val = mpeg_val2phys(setting, *variable);
-        if(numdec)
-        {
-            integer = val / (10 * numdec);
-            dec = val % (10 * numdec);
-            snprintf(str,sizeof str, fmt[numdec], integer, dec, unit);
-        }
-        else
-        {
-            snprintf(str,sizeof str,"%d %s  ", val, unit);
+        if (changed) {
+            val = mpeg_val2phys(setting, *variable);
+            if(numdec)
+            {
+                integer = val / (10 * numdec);
+                dec = val % (10 * numdec);
+                snprintf(str,sizeof str, fmt[numdec], integer, dec, unit);
+            }
+            else
+            {
+                snprintf(str,sizeof str,"%d %s  ", val, unit);
+            }
         }
         lcd_puts(0,1,str);
-        lcd_update();
         status_draw();
+        lcd_update();
 
-        switch( button_get(true) ) {
+        changed = false;
+        switch( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -81,6 +95,7 @@ void set_sound(char* string,
                 (*variable)++;
                 if(*variable > max )
                     *variable = max;
+                changed = true;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -93,6 +108,7 @@ void set_sound(char* string,
                 (*variable)--;
                 if(*variable < min )
                     *variable = min;
+                changed = true;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -103,12 +119,28 @@ void set_sound(char* string,
 #endif
                 done = true;
                 break;
-        }
-        mpeg_sound_set(setting, *variable);
-#ifdef HAVE_MAS3507D
-        if(setting == SOUND_BALANCE)
-            mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                if(global_settings.statusbar)
+                  lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+                lcd_clear_display();
+                lcd_puts_scroll(0, 0, string);
 #endif
+                break;
+#endif
+        }
+        if (changed) {
+            mpeg_sound_set(setting, *variable);
+#ifdef HAVE_MAS3507D
+            if(setting == SOUND_BALANCE)
+                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#endif
+        }
     }
     lcd_stop_scroll();
 }
