@@ -86,70 +86,71 @@ static void button_tick(void)
         {
             queue_post(&button_queue, BUTTON_REL | diff, NULL);
         }
-        
-        if ( btn )
-        {
-            /* normal keypress */
-            if ( btn != lastbtn )
-            {
-                post = true;
-                repeat = false;
-                repeat_speed = REPEAT_INTERVAL_START;
-                
-            }
-            else /* repeat? */
-            {
-                if ( repeat )
-                {
-                    count--;
-                    if (count == 0) {
-                        post = true;
-                        /* yes we have repeat */
-                        repeat_speed--;
-                        if (repeat_speed < REPEAT_INTERVAL_FINISH)
-                           repeat_speed = REPEAT_INTERVAL_FINISH;
-                        count = repeat_speed;
-
-                        repeat_count++;
-                        
-                        /* Shutdown if we have a device which doesn't shut
-                           down easily with the OFF key */
-#ifdef HAVE_POWEROFF_ON_PB5
-                        if(btn == BUTTON_OFF && !charger_inserted() &&
-                            repeat_count > POWEROFF_COUNT)
-                            power_off();
-#endif
-                    }
-                }
-                else
-                {
-                    if (count++ > REPEAT_START)
-                    {
-                        post = true;
-                        repeat = true;
-                        repeat_count = 0;
-                        /* initial repeat */
-                        count = REPEAT_INTERVAL_START; 
-                    }
-                }
-            }
-            if ( post )
-            {
-                if(repeat)
-                    queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
-                else
-                    queue_post(&button_queue, btn, NULL);
-                backlight_on();
-
-                reset_poweroff_timer();
-            }
-        }
         else
         {
-            repeat = false;
-            count = 0;
+            if ( btn )
+            {
+                /* normal keypress */
+                if ( btn != lastbtn )
+                {
+                    post = true;
+                    repeat = false;
+                    repeat_speed = REPEAT_INTERVAL_START;
+                    
+                }
+                else /* repeat? */
+                {
+                    if ( repeat )
+                    {
+                        count--;
+                        if (count == 0) {
+                            post = true;
+                            /* yes we have repeat */
+                            repeat_speed--;
+                            if (repeat_speed < REPEAT_INTERVAL_FINISH)
+                                repeat_speed = REPEAT_INTERVAL_FINISH;
+                            count = repeat_speed;
+                            
+                            repeat_count++;
+                            
+                            /* Shutdown if we have a device which doesn't shut
+                               down easily with the OFF key */
+#ifdef HAVE_POWEROFF_ON_PB5
+                            if(btn == BUTTON_OFF && !charger_inserted() &&
+                               repeat_count > POWEROFF_COUNT)
+                                power_off();
+#endif
+                        }
+                    }
+                    else
+                    {
+                        if (count++ > REPEAT_START)
+                        {
+                            post = true;
+                            repeat = true;
+                            repeat_count = 0;
+                            /* initial repeat */
+                            count = REPEAT_INTERVAL_START; 
+                        }
+                    }
+                }
+                if ( post )
+                {
+                    if(repeat)
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                    else
+                        queue_post(&button_queue, btn, NULL);
+                    backlight_on();
+                    
+                    reset_poweroff_timer();
+                }
+            }
+            else
+            {
+                repeat = false;
+                count = 0;
+            }
         }
-            
         lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
         tick = 0;
     }
