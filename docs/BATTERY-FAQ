@@ -188,8 +188,26 @@ A12: In our testing we found the following results:
          HD on, reading, backlight off ~ 600 mA
          HD spin up before read max 800 mA
 
-     So leaving the unit on and paused consumes ~100mA, and thus much less
-     than needing to reboot the unit.  Your mileage may vary.
+     Using the power draw measurements shown above, lets look at the numbers:
+     Power-down and restart vs. paused for 15 minutes.:
+
+     Pause for 15 minutes will draw: 94 mA / 60 minutes * 15 minutes =
+     23.5 mAh.
+
+     Power-down and restart will draw about (800mA / 3600 seconds * 3
+     seconds = 0.6666 mAh) + (600 mA / 3600 seconds * 6 seconds = 1.0 mAh) +
+     (230 mA / 3600 seconds * 8 seconds = 0.5111 mAh) = 2.18 mAh total used.
+
+     Thus, leaving it paused for 15 minutes draws more power (23.5 mAh) than
+     turning off and then on again (2.18 mAh).
+
+     So where is the break-even point?
+
+     Each second of pause will draw about 94 mAh / 3600 seconds = 26 µAh.
+
+     2.18 mAh / 26 µAh = 2180 µAh / 26 µAh = 83.5 seconds
+
+     Thus a shutdown and restart uses as much power as 83.5 seconds of pause.
 
 Q13: When I plug in the charger when the Recorder is turned off, it turns
      itself on and starts charging in the Archos software? What's up?
