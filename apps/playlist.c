@@ -40,10 +40,11 @@
 static struct playlist_info playlist;
 
 #define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
-#define PLAYLIST_BUFFER_SIZE (&mp3end - &mp3buf[0])
+
+#define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
+static unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
 
 extern unsigned char mp3buf[],mp3end;
-static unsigned char* playlist_buffer = mp3buf;
 static int playlist_end_pos = 0;
 
 static char now_playing[MAX_PATH+1];
@@ -643,15 +644,20 @@ void add_indices_to_playlist(void)
     int i = 0;
     int count = 0;
     int next_tick = current_tick + HZ;
+    unsigned char* buffer = playlist_buffer;
+    int buflen = PLAYLIST_BUFFER_SIZE;
     bool store_index;
-
-    unsigned char *p = playlist_buffer;
+    unsigned char *p;
     char line[16];
 
     if(!playlist.in_ram) {
         fd = open(playlist.filename, O_RDONLY);
         if(-1 == fd)
             return; /* failure */
+
+        /* use mp3 buffer for maximum load speed */
+        buflen = (&mp3end - &mp3buf[0]);
+        buffer = mp3buf;
     }
 
     store_index = true;
@@ -663,13 +669,13 @@ void add_indices_to_playlist(void)
         if(playlist.in_ram) {
             nread = playlist_end_pos;
         } else {
-            nread = read(fd, playlist_buffer, PLAYLIST_BUFFER_SIZE);
+            nread = read(fd, buffer, buflen);
             /* Terminate on EOF */
             if(nread <= 0)
                 break;
         }
         
-        p = playlist_buffer;
+        p = buffer;
 
         for(count=0; count < nread; count++,p++) {
 
