@@ -36,14 +36,10 @@
 
 static enum playmode current_mode = STATUS_STOP;
 
-#if defined(HAVE_LCD_CHARCELLS) || defined(HAVE_CHARGE_CTRL)
 static long switch_tick;
 static int  battery_charge_step = 0;
-#ifdef HAVE_CHARGE_CTRL
 static bool plug_state;
 static bool battery_state;
-#endif
-#endif
 
 struct status_info {
     int battlevel;
@@ -111,137 +107,46 @@ void status_draw(bool force_redraw)
     (void)force_redraw; /* players always "redraw" */
 #endif
 
-    info.battlevel = battery_level();
     info.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
     info.inserted = charger_inserted();
+    info.battlevel = battery_level();
+    info.battery_safe = battery_level_safe();
 
-#if defined(HAVE_LCD_CHARCELLS)
-    lcd_icon(ICON_VOLUME, true);
-    if(info.volume > 10)
-        lcd_icon(ICON_VOLUME_1, true);
-    else
-        lcd_icon(ICON_VOLUME_1, false);
-    if(info.volume > 30)
-        lcd_icon(ICON_VOLUME_2, true);
-    else
-        lcd_icon(ICON_VOLUME_2, false);
-    if(info.volume > 50)
-        lcd_icon(ICON_VOLUME_3, true);
-    else
-        lcd_icon(ICON_VOLUME_3, false);
-    if(info.volume > 70)
-        lcd_icon(ICON_VOLUME_4, true);
-    else
-        lcd_icon(ICON_VOLUME_4, false);
-    if(info.volume > 90)
-        lcd_icon(ICON_VOLUME_5, true);
-    else
-        lcd_icon(ICON_VOLUME_5, false);
-
-    switch(current_mode)
-    {
-        case STATUS_PLAY:
-            lcd_icon(ICON_PLAY, true);
-            lcd_icon(ICON_PAUSE, false);
-            break;
-    
-        case STATUS_STOP:
-            lcd_icon(ICON_PLAY, false);
-            lcd_icon(ICON_PAUSE, false);
-            break;
-    
-        case STATUS_PAUSE:
-            lcd_icon(ICON_PLAY, false);
-            lcd_icon(ICON_PAUSE, true);
-            break;
-
-        default:
-            break;
-    }
-    if(info.inserted)
-    {
-        global_settings.runtime = 0;
-        if(TIME_AFTER(current_tick, switch_tick))
-        {
-            lcd_icon(ICON_BATTERY, true);
-            lcd_icon(ICON_BATTERY_1, false);
-            lcd_icon(ICON_BATTERY_2, false);
-            lcd_icon(ICON_BATTERY_3, false);
-            switch(battery_charge_step)
-            {
-                case 0:
-                    battery_charge_step++;
-                    break;
-                case 1:
-                    lcd_icon(ICON_BATTERY_1, true);
-                    battery_charge_step++;
-                    break;
-                case 2:
-                    lcd_icon(ICON_BATTERY_1, true);
-                    lcd_icon(ICON_BATTERY_2, true);
-                    battery_charge_step++;
-                    break;
-                case 3:
-                    lcd_icon(ICON_BATTERY_1, true);
-                    lcd_icon(ICON_BATTERY_2, true);
-                    lcd_icon(ICON_BATTERY_3, true);
-                    battery_charge_step = 0;
-                    break;
-                default:
-                    battery_charge_step = 0;
-                    break;
-            }
-           switch_tick = current_tick + (HZ/2);
-       }
-    } else {
-        lcd_icon(ICON_BATTERY, true);
-        if(info.battlevel > 25)
-            lcd_icon(ICON_BATTERY_1, true);
-        else
-            lcd_icon(ICON_BATTERY_1, false);
-        if(info.battlevel > 50)
-            lcd_icon(ICON_BATTERY_2, true);
-        else
-            lcd_icon(ICON_BATTERY_2, false);
-        if(info.battlevel > 75)
-            lcd_icon(ICON_BATTERY_3, true);
-        else
-            lcd_icon(ICON_BATTERY_3, false);
-    }
-
-    lcd_icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
-    lcd_icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
-    
-    lcd_icon(ICON_RECORD, record);
-    lcd_icon(ICON_AUDIO, audio);
-    lcd_icon(ICON_PARAM, param);
-    lcd_icon(ICON_USB, usb);
-
-#endif
 #ifdef HAVE_LCD_BITMAP
-    
     tm = get_time();
     info.hour = tm->tm_hour;
     info.minute = tm->tm_min;
     info.shuffle = global_settings.playlist_shuffle;
     info.keylock = keys_locked;
-    info.battery_safe = battery_level_safe();
     info.repeat = global_settings.repeat_mode;
 
+    /* only redraw if forced to, or info has changed */
     if (force_redraw ||
         info.inserted ||
         !info.battery_safe || 
-        memcmp(&info, &lastinfo, sizeof(struct status_info))) {
+        memcmp(&info, &lastinfo, sizeof(struct status_info)))
+    {
         lcd_clearrect(0,0,LCD_WIDTH,8);
-
-#ifdef HAVE_CHARGE_CTRL /* Recorder */
-        if(info.inserted) {
+#else
+    /* players always "redraw" */
+    {
+#endif
+        
+        if (info.inserted) {
             battery_state = true;
             plug_state = true;
-            if (charge_state > 0) /* charge || top off || trickle */
+#ifdef HAVE_CHARGE_CTRL
+            /* zero battery run time if charging */
+            if (charge_state > 0)
                 global_settings.runtime = 0;
-            if (charge_state == 1) { /* animate battery if charging */
-                info.battlevel = battery_charge_step * 34; /* 34 for a better look */
+            
+            /* animate battery if charging */
+            if (charge_state == 1) {
+#else
+            {
+#endif
+                /* animate in three steps (34% per step for a better look) */
+                info.battlevel = battery_charge_step * 34;
                 if (info.battlevel > 100)
                     info.battlevel = 100;
                 if(TIME_AFTER(current_tick, switch_tick)) {
@@ -252,23 +157,20 @@ void status_draw(bool force_redraw)
         }
         else {
             plug_state=false;
-            if(!info.battery_safe)
+            if (info.battery_safe)
                 battery_state = true;
-            else /* blink battery if level is low */
+            else {
+                /* blink battery if level is low */
                 if(TIME_AFTER(current_tick, switch_tick)) {
                     switch_tick = current_tick+HZ;
                     battery_state =! battery_state;
                 }
+            }
         }
-                
-        statusbar_icon_battery(info.battlevel, plug_state);
-#else
-#ifdef HAVE_FMADC /* FM */
-        statusbar_icon_battery(info.battlevel, charger_inserted());
-#else /* Player */
-        statusbar_icon_battery(info.battlevel, false);
-#endif /* HAVE_FMADC */
-#endif /* HAVE_CHARGE_CTRL */
+
+#ifdef HAVE_LCD_BITMAP
+        if (battery_state)
+            statusbar_icon_battery(info.battlevel, plug_state);
         statusbar_icon_volume(info.volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
         switch (info.repeat) {
@@ -280,17 +182,43 @@ void status_draw(bool force_redraw)
                 statusbar_icon_play_mode(Icon_Repeat);
                 break;
         }
-        if(info.shuffle)
+        if (info.shuffle)
             statusbar_icon_shuffle();
         if (info.keylock)
             statusbar_icon_lock();
 #ifdef HAVE_RTC
         statusbar_time(info.hour, info.minute);
 #endif
-
         lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
+        lastinfo = info;
+#endif
     }
 
-    lastinfo = info;
+
+#if defined(HAVE_LCD_CHARCELLS)
+    lcd_icon(ICON_BATTERY, battery_state);
+    lcd_icon(ICON_BATTERY_1, info.battlevel > 25);
+    lcd_icon(ICON_BATTERY_2, info.battlevel > 50);
+    lcd_icon(ICON_BATTERY_3, info.battlevel > 75);
+
+    lcd_icon(ICON_VOLUME, true);
+    lcd_icon(ICON_VOLUME_1, info.volume > 10);
+    lcd_icon(ICON_VOLUME_2, info.volume > 30);
+    lcd_icon(ICON_VOLUME_3, info.volume > 50);
+    lcd_icon(ICON_VOLUME_4, info.volume > 70);
+    lcd_icon(ICON_VOLUME_5, info.volume > 90);
+
+    lcd_icon(ICON_PLAY, current_mode == STATUS_PLAY);
+    lcd_icon(ICON_PAUSE, current_mode == STATUS_PAUSE);
+
+    lcd_icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
+    lcd_icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
+    
+    lcd_icon(ICON_RECORD, record);
+    lcd_icon(ICON_AUDIO, audio);
+    lcd_icon(ICON_PARAM, param);
+    lcd_icon(ICON_USB, usb);
 #endif
+
 }
+
