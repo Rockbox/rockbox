@@ -9,18 +9,21 @@
 <ul>
 <li><a href="cross-gcc.html">Building the SH1 cross compiler</a>
 <li><a href="sh-win/">Setting up an SH1 cross compiler for Windows</a>
+<li><a href="firmware/README">README from the firmware directory</a>,
+describing how to compile Rockbox
 </ul>
 
 <h2>Target builds</h2>
+
+<p>These are automated daily builds of the CVS code.
+They are <i>not</i> official releases, they are in fact almost guaranteed to not work properly! These builds are discussed in IRC only, <b>do not file bug reports for them.</b>
 
 <p>There are three versions of each build:
 
 <!--#exec cmd="./dailymod.pl" -->
 
-#if 0
-<p>Note 1: Due to the big difference between the player and recorder models, they support different features.
-#endif
+<p><b>Note 1:</b> You must rename the file to "archos.mod" before copying it to the root of your archos.
 
-<p><b>Note:</b> You must rename the file to "archos.mod" before copying it to the root of your archos.
+<p><b>Note 2:</b> The Recorder version does not work yet, due to unfinished drivers. It builds, but does not run.
 
 #include "foot.t"
