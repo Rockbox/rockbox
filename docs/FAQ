@@ -41,8 +41,8 @@ A8. You don't need a SourceForge account to help developing Rockbox. Just
     http://sourceforge.net/account/register.php
 
 Q9. Do you have a mailing list?
-A9. Sure do!  As a matter of fact, we have several of them for specific 
-     things.  Please check out: http://rockbox.haxx.se/mail/
+A9. Sure do!  As a matter of fact, we have several of them for specific things.
+    Please check out: http://rockbox.haxx.se/mail/
 
 Q10. Great you have a mailing list!  Is there anyway for me to catch up on
      past posts?
@@ -132,8 +132,8 @@ A17. Pessimist's Answer: At the current time we believe this is not very
      that Ogg will never be supported by the Archos Players and Recorders.
 
 Q18. What about supporting playing of WMA files?
-A18. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
-     your own project.
+A18. Dear Mr. Gates, you have two options.  Re-read previous question, or go 
+     buy your own project.
 
 Q19: But you don't understand, I'm not talking about decoding here, 
      since the data we want may already be in the decoded format (PCM). 
@@ -491,7 +491,7 @@ A62: There are really only two versions of Rockbox.  One for Players and one
      Please Note: Daily and Bleeding Edge builds are expected to be buggy.
      We ask that you _do not_ submit bug reports for Bleeding Edge versions,
      but would love to hear any reports you may have about Release or Daily
-     build versions. (see question #62).
+     build versions. (see "How can I report about bugs in Rockbox?")
             
 Q63: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
@@ -511,7 +511,7 @@ A64: Truth is, we don't need to fix anything.  If you are using OSX then you
      If you are in another version then you should be able to do command-N in 
      the Finder, then name the folder.  
          
-Q65: Will Rockbox work on an of Archos' other units?
+Q65: Will Rockbox work on any of Archos' other units?
 A65: Some development has recently occurred on the Archos FM units, and is 
      in the daily builds.  However the FM development is not being done by 
      the core team, and so is progressing at a slower rate.  As yet, 
