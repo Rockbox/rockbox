@@ -22,7 +22,7 @@ open(HFILE, ">$prefix.h");
 open(CFILE, ">$prefix.c");
 
 print HFILE <<MOO
-/* This file was automaticly generated using genlang */
+/* This file was automatically generated using genlang */
 /*
  * The str() macro/functions is how to access strings that might be
  * translated. Use it like str(MACRO) and expect a string to be
