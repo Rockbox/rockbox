@@ -469,9 +469,7 @@ static char* create_thres_str(int threshold)
     }
     return retval;
 }
-#endif
 
-#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
 #define INF_DB (-89)
 static void change_threshold(int *threshold, int change)
 {
@@ -499,6 +497,17 @@ static void change_threshold(int *threshold, int change)
     }
 }
 
+/* Variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define TRIG_CANCEL BUTTON_OFF
+#define TRIG_ACCEPT BUTTON_PLAY
+#define TRIG_RESET_SIM BUTTON_F2
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define TRIG_CANCEL BUTTON_OFF
+#define TRIG_ACCEPT BUTTON_MENU
+#endif
+
 /**
  * Displays a menu for editing the trigger settings.
  */
@@ -510,22 +519,29 @@ bool rectrigger(void)
     int old_x_margin, old_y_margin;
 
 #define TRIGGER_MODE_COUNT 3
-    char *trigger_modes[] =
-    {
-        str(LANG_OFF),
-        str(LANG_RECORD_TRIG_NOREARM),
-        str(LANG_RECORD_TRIG_REARM)
+    static const unsigned char *trigger_modes[] = {
+        ID2P(LANG_OFF),
+        ID2P(LANG_RECORD_TRIG_NOREARM),
+        ID2P(LANG_RECORD_TRIG_REARM)
     };
 
 #define PRERECORD_TIMES_COUNT 31
-    char *prerecord_times[] = {
-        str(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+    static const unsigned char *prerecord_times[] = {
+        ID2P(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
         "10s", "11s", "12s", "13s", "14s", "15s", "16s", "17s", "18s", "19s",
         "20s", "21s", "22s", "23s", "24s", "25s", "26s", "27s", "28s", "29s",
         "30s"
     };
 
-    char *option_name[TRIG_OPTION_COUNT];
+    static const unsigned char *option_name[] = {
+        [TRIGGER_MODE] =    ID2P(LANG_RECORD_TRIGGER_MODE),
+        [PRERECORD_TIME] =  ID2P(LANG_RECORD_PRERECORD_TIME),
+        [START_THRESHOLD] = ID2P(LANG_RECORD_START_THRESHOLD),
+        [START_DURATION] =  ID2P(LANG_RECORD_MIN_DURATION),
+        [STOP_THRESHOLD] =  ID2P(LANG_RECORD_STOP_THRESHOLD),
+        [STOP_POSTREC] =    ID2P(LANG_RECORD_STOP_POSTREC),
+        [STOP_GAP] =        ID2P(LANG_RECORD_STOP_GAP)
+    };
 
     int old_start_thres = global_settings.rec_start_thres;
     int old_start_duration = global_settings.rec_start_duration;
@@ -538,15 +554,6 @@ bool rectrigger(void)
     int offset = 0;
     int option_lines;
     int w, h;
-
-    option_name[TRIGGER_MODE] =    str(LANG_RECORD_TRIGGER_MODE);
-    option_name[PRERECORD_TIME] =  str(LANG_RECORD_PRERECORD_TIME);
-    option_name[START_THRESHOLD] = str(LANG_RECORD_START_THRESHOLD);
-    option_name[START_DURATION] =  str(LANG_RECORD_MIN_DURATION);
-    option_name[STOP_THRESHOLD] =  str(LANG_RECORD_STOP_THRESHOLD);
-    option_name[STOP_POSTREC] =    str(LANG_RECORD_STOP_POSTREC);
-    option_name[STOP_GAP] =        str(LANG_RECORD_STOP_GAP);
-
 
     /* restart trigger with new values */
     settings_apply_trigger();
@@ -569,20 +576,20 @@ bool rectrigger(void)
     while (!exit_request) {
         int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
         int button, i;
-        char *str;
+        const char *str;
         char option_value[TRIG_OPTION_COUNT][7];
 
         snprintf(
             option_value[TRIGGER_MODE],
             sizeof option_value[TRIGGER_MODE],
             "%s",
-            trigger_modes[global_settings.rec_trigger_mode]);
+            P2STR(trigger_modes[global_settings.rec_trigger_mode]));
 
         snprintf (
             option_value[PRERECORD_TIME],
             sizeof option_value[PRERECORD_TIME],
             "%s",
-            prerecord_times[global_settings.rec_prerecord_time]);
+            P2STR(prerecord_times[global_settings.rec_prerecord_time]));
 
         /* due to value range shift (peak_meter_define_trigger) -1 is 0db */
         if (global_settings.rec_start_thres == -1) {
@@ -635,7 +642,7 @@ bool rectrigger(void)
         for (i = 0; i < option_lines; i++) {
             int x, y;
 
-            str = option_name[i + offset];
+            str = P2STR(option_name[i + offset]);
             lcd_putsxy(5, stat_height + i * h, str);
 
             str = option_value[i + offset];
@@ -659,7 +666,7 @@ bool rectrigger(void)
         lcd_update();
 
         switch (button) {
-            case BUTTON_OFF:
+            case TRIG_CANCEL:
                 splash(50, true, str(LANG_RESET_DONE_CANCEL));
                 global_settings.rec_start_thres = old_start_thres;
                 global_settings.rec_start_duration = old_start_duration;
@@ -671,7 +678,7 @@ bool rectrigger(void)
                 exit_request = true;
                 break;
 
-            case BUTTON_PLAY:
+            case TRIG_ACCEPT:
                 exit_request = true;
                 break;
 
@@ -785,9 +792,11 @@ bool rectrigger(void)
                 }
                 break;
 
-            case BUTTON_F2:
+#ifdef TRIG_RESET_SIM
+            case TRIG_RESET_SIM:
                 peak_meter_trigger(true);
                 break;
+#endif
 
             case SYS_USB_CONNECTED:
                 if(default_event_handler(button) == SYS_USB_CONNECTED) {

@@ -318,7 +318,7 @@ bool recording_screen(void)
     };
 
     cursor = 0;
-#ifndef SIMULATOR
+#if defined(HAVE_LED) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
     mpeg_init_recording();
@@ -859,7 +859,7 @@ bool recording_screen(void)
     if (have_recorded)
         reload_directory();
 
-#ifndef SIMULATOR
+#if defined(HAVE_LED) && !defined(SIMULATOR)
     ata_set_led_enabled(true);
 #endif
     return been_in_usb_mode;

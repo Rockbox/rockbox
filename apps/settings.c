@@ -154,10 +154,12 @@ static const char off_on_ask[] = "off,on,ask";
 static const char graphic_numeric[] = "graphic,numeric";
 static const char off_number_spell_hover[] = "off,number,spell,hover";
 
+#ifdef HAVE_RECORDING
 /* keep synchronous to trig_durations and
    trigger_times in settings_apply_trigger */
 static const char trig_durations_conf [] =
                   "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min";
+#endif
 
 /* the part of the settings which ends up in the RTC RAM, where available 
    (those we either need early, save frequently, or without spinup) */

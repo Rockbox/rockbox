@@ -68,6 +68,7 @@ static unsigned short db_min = 0;
 static unsigned short db_max = 9000;
 static unsigned short db_range = 9000;
 
+#ifdef HAVE_RECORDING
 static unsigned short trig_strt_threshold;
 static long trig_strt_duration;
 static long trig_strt_dropout;
@@ -81,10 +82,11 @@ static long trig_hightime;
 /* point in time when the volume fell below the threshold*/
 static long trig_lowtime;
 
-/* The output value of the trigger. See TRIG_XXX constants vor valid values */
+/* The output value of the trigger. See TRIG_XXX constants for valid values */
 static int trig_status = TRIG_OFF;
 
 static void (*trigger_listener)(int) = NULL;
+#endif
 
 #if CONFIG_HWCODEC == MASNONE
 #define MAS_REG_DQPEAK_L 0
@@ -175,21 +177,6 @@ static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     0,     /* -inf   */
 };
 #endif
-
-const char* peak_meter_dbnames[DB_SCALE_SRC_VALUES_SIZE] = {
-    "0 db",
-    "-3 db",
-    "-6 db",
-    "-9 db",
-    "-12 db",
-    "-18 db",
-    "-24 db",
-    "-30 db",
-    "-40 db",
-    "-50 db",
-    "-60 db",
-    "-inf",
-};
 
 static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
 
@@ -540,6 +527,7 @@ void peak_meter_playback(bool playback)
 #endif
 }
 
+#ifdef HAVE_RECORDING
 static void set_trig_status(int new_state) {
     if (trig_status != new_state) {
         trig_status = new_state;
@@ -548,6 +536,7 @@ static void set_trig_status(int new_state) {
         }
     }
 }
+#endif
 
 /**
  * Reads peak values from the MAS, and detects clips. The 
@@ -591,6 +580,7 @@ inline void peak_meter_peek(void)
             current_tick + clip_time_out[peak_meter_clip_hold];
     }
 
+#ifdef HAVE_RECORDING
     switch (trig_status) {
         case TRIG_READY:
             /* no more changes, if trigger was activated as release trigger */
@@ -705,6 +695,7 @@ inline void peak_meter_peek(void)
             }
             break;
     }
+#endif
 
     /* peaks are searched -> we have to find the maximum. When
        many calls of peak_meter_peek the maximum value will be
@@ -971,6 +962,7 @@ void peak_meter_draw(int x, int y, int width, int height) {
         lcd_invertpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
     }
 
+#ifdef HAVE_RECORDING
     if (trig_status != TRIG_OFF) {
         int start_trigx, stop_trigx, ycenter;
 
@@ -984,8 +976,8 @@ void peak_meter_draw(int x, int y, int width, int height) {
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
         lcd_drawline(stop_trigx, ycenter - 2, stop_trigx, ycenter);
         if (stop_trigx > 0) lcd_drawpixel(stop_trigx - 1, ycenter - 1);
-
     }
+#endif
 
 #ifdef PM_DEBUG
     /* display a bar to show how many calls to peak_meter_peek 
@@ -1011,6 +1003,7 @@ void peak_meter_draw(int x, int y, int width, int height) {
     last_right = right;
 }
 
+#ifdef HAVE_RECORDING
 /**
  * Defines the parameters of the trigger. After these parameters are defined
  * the trigger can be started either by peak_meter_attack_trigger or by
@@ -1142,6 +1135,7 @@ void peak_meter_draw_trig(int xpos, int ypos) {
     }
 
 }
+#endif
 
 int peak_meter_draw_get_btn(int x, int y, int width, int height)
 {
