@@ -90,6 +90,10 @@ void mpeg_set_buffer_margin(int seconds);
 unsigned int mpeg_error(void);
 void mpeg_error_clear(void);
 
+/* in order to keep the recording here, I have to expose this */
+void rec_tick(void);
+void playback_tick(void); /* FixMe: get rid of this, use mp3_get_playtime() */
+
 #define MPEG_STATUS_PLAY 1
 #define MPEG_STATUS_PAUSE 2
 #define MPEG_STATUS_RECORD 4

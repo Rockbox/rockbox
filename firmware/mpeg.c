@@ -74,7 +74,7 @@ static int get_unswapped_space(void);
 #define MPEG_STOP_DONE    103
 
 #ifdef HAVE_MAS3587F
-static enum
+extern enum /* from mp3_playback.c */
 {
     MPEG_DECODER,
     MPEG_ENCODER
@@ -371,33 +371,6 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
     dbgdata->lowest_watermark_level = lowest_watermark_level;
 }
 
-#ifndef HAVE_MAS3507D
-static void postpone_dma_tick(void)
-{
-    unsigned int count;
-
-    count = FREQ / 1000 / 8;
-
-    /* We are using timer 1 */
-    
-    TSTR &= ~0x02; /* Stop the timer */
-    TSNC &= ~0x02; /* No synchronization */
-    TMDR &= ~0x02; /* Operate normally */
-
-    TCNT1 = 0;   /* Start counting at 0 */
-    GRA1 = count;
-    TCR1 = 0x23; /* Clear at GRA match, sysclock/8 */
-
-    /* Enable interrupt on level 5 */
-    IPRC = (IPRC & ~0x000f) | 0x0005;
-    
-    TSR1 &= ~0x02;
-    TIER1 = 0xf9; /* Enable GRA match interrupt */
-
-    TSTR |= 0x02; /* Start timer 1 */
-}
-#endif /* #ifndef HAVE_MAS3507D */
-
 #ifdef DEBUG
 static void dbg_timer_start(void)
 {
@@ -524,132 +497,120 @@ static void drain_dma_buffer(void)
 
 #endif /* #ifdef HAVE_MAS3587F */
 
-static void dma_tick (void) __attribute__ ((section (".icode")));
-static void dma_tick(void)
+void rec_tick (void) __attribute__ ((section (".icode")));
+void rec_tick(void)
 {
 #ifdef HAVE_MAS3587F
-    if(mpeg_mode == MPEG_DECODER)
+    int i;
+    int num_bytes;
+    if(is_recording && (PBDR & 0x4000))
     {
-#endif /* #ifdef HAVE_MAS3587F */
-        if(playing && !paused)
-        {
-            /* Start DMA if it is disabled and the DEMAND pin is high */
-            if(!(SCR0 & 0x80) && (PBDR & 0x4000))
-            {
-                mp3_play_pause(true);
-            }
-            id3tags[tag_read_idx]->id3.elapsed +=
-                (current_tick - last_dma_tick) * 1000 / HZ;
-            last_dma_tick = current_tick;
-        }
-#ifdef HAVE_MAS3587F
-    }
-    else /* MPEG_ENCODER */
-    {
-        int i;
-        int num_bytes;
-        if(is_recording && (PBDR & 0x4000))
-        {
 #ifdef DEBUG
-            timing_info[timing_info_index++] = current_tick;
-            TCNT2 = 0;
+        timing_info[timing_info_index++] = current_tick;
+        TCNT2 = 0;
 #endif /* #ifdef DEBUG */
-            /* We read as long as EOD is high, but max 30 bytes.
-               This code is optimized, and should probably be
-               written in assembler instead. */
-            if(inverted_pr)
+        /* We read as long as EOD is high, but max 30 bytes.
+           This code is optimized, and should probably be
+           written in assembler instead. */
+        if(inverted_pr)
+        {
+            i = 0;
+            while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
+                  && i < 30)
             {
-                i = 0;
-                while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
-                      && i < 30)
-                {
-                    or_b(0x08, &PADRH);
+                or_b(0x08, &PADRH);
 
-                    while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-                    
-                    /* It must take at least 5 cycles before
-                       the data is read */
-                    asm(" nop\n nop\n nop\n");
-                    mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
-                    
-                    if(mp3buf_write >= mp3buflen)
-                        mp3buf_write = 0;
-
-                    i++;
-                    
-                    and_b(~0x08, &PADRH);
-
-                    /* No wait for /RTW, cause it's not necessary */
-                }
-            }
-            else /* !inverted_pr */
-            {
-                i = 0;
-                while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
-                      && i < 30)
-                {
-                    and_b(~0x08, &PADRH);
-                    
-                    while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-                    
-                    /* It must take at least 5 cycles before
-                       the data is read */
-                    asm(" nop\n nop\n nop\n");
-                    mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
-                    
-                    if(mp3buf_write >= mp3buflen)
-                        mp3buf_write = 0;
-
-                    i++;
-                    
-                    or_b(0x08, &PADRH);
-
-                    /* No wait for /RTW, cause it's not necessary */
-                }
-            }
-#ifdef DEBUG
-            timing_info[timing_info_index++] = TCNT2 + (i << 16);
-            timing_info_index &= 0x3ff;
-#endif /* #ifdef DEBUG */
-
-            num_rec_bytes += i;
-            
-            if(is_prerecording)
-            {
-                if(TIME_AFTER(current_tick, prerecord_timeout))
-                {
-                    prerecord_timeout = current_tick + HZ;
-
-                    /* Store the write pointer every second */
-                    prerecord_buffer[prerecord_index++] = mp3buf_write;
-
-                    /* Wrap if necessary */
-                    if(prerecord_index == prerecording_max_seconds)
-                        prerecord_index = 0;
-
-                    /* Update the number of seconds recorded */
-                    if(prerecord_count < prerecording_max_seconds)
-                        prerecord_count++;
-                }
-            }
-            else
-            {
-                /* Signal to save the data if we are running out of buffer
-                   space */
-                num_bytes = mp3buf_write - mp3buf_read;
-                if(num_bytes < 0)
-                    num_bytes += mp3buflen;
+                while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                 
-                if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
-                {
-                    saving = true;
-                    queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
-                    wake_up_thread();
-                }
+                /* It must take at least 5 cycles before
+                   the data is read */
+                asm(" nop\n nop\n nop\n");
+                mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
+                
+                if(mp3buf_write >= mp3buflen)
+                    mp3buf_write = 0;
+
+                i++;
+                
+                and_b(~0x08, &PADRH);
+
+                /* No wait for /RTW, cause it's not necessary */
+            }
+        }
+        else /* !inverted_pr */
+        {
+            i = 0;
+            while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
+                  && i < 30)
+            {
+                and_b(~0x08, &PADRH);
+                
+                while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
+                
+                /* It must take at least 5 cycles before
+                   the data is read */
+                asm(" nop\n nop\n nop\n");
+                mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
+                
+                if(mp3buf_write >= mp3buflen)
+                    mp3buf_write = 0;
+
+                i++;
+                
+                or_b(0x08, &PADRH);
+
+                /* No wait for /RTW, cause it's not necessary */
+            }
+        }
+#ifdef DEBUG
+        timing_info[timing_info_index++] = TCNT2 + (i << 16);
+        timing_info_index &= 0x3ff;
+#endif /* #ifdef DEBUG */
+
+        num_rec_bytes += i;
+        
+        if(is_prerecording)
+        {
+            if(TIME_AFTER(current_tick, prerecord_timeout))
+            {
+                prerecord_timeout = current_tick + HZ;
+
+                /* Store the write pointer every second */
+                prerecord_buffer[prerecord_index++] = mp3buf_write;
+
+                /* Wrap if necessary */
+                if(prerecord_index == prerecording_max_seconds)
+                    prerecord_index = 0;
+
+                /* Update the number of seconds recorded */
+                if(prerecord_count < prerecording_max_seconds)
+                    prerecord_count++;
+            }
+        }
+        else
+        {
+            /* Signal to save the data if we are running out of buffer
+               space */
+            num_bytes = mp3buf_write - mp3buf_read;
+            if(num_bytes < 0)
+                num_bytes += mp3buflen;
+            
+            if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
+            {
+                saving = true;
+                queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                wake_up_thread();
             }
         }
     }
 #endif /* #ifdef HAVE_MAS3587F */
+}
+
+void playback_tick(void)
+{
+    id3tags[tag_read_idx]->id3.elapsed +=
+        (current_tick - last_dma_tick) * 1000 / HZ;
+    last_dma_tick = current_tick;
 }
 
 static void reset_mp3_buffer(void)
@@ -751,48 +712,6 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
     wake_up_thread();
 }
 
-#ifdef HAVE_MAS3587F
-static void demand_irq_enable(bool on)
-{
-    int oldlevel = set_irq_level(15);
-    
-    if(on)
-    {
-        IPRA = (IPRA & 0xfff0) | 0x000b;
-        ICR &= ~0x0010; /* IRQ3 level sensitive */
-    }
-    else
-        IPRA &= 0xfff0;
-
-    set_irq_level(oldlevel);
-}
-#endif /* #ifdef HAVE_MAS3587F */
-
-#pragma interrupt
-void IMIA1(void) /* Timer 1 interrupt */
-{
-    dma_tick();
-    TSR1 &= ~0x01;
-#ifdef HAVE_MAS3587F
-    /* Disable interrupt */
-    IPRC &= ~0x000f;
-#endif /* #ifdef HAVE_MAS3587F */
-}
-
-#ifdef HAVE_MAS3587F
-#pragma interrupt
-void IRQ3(void) /* PA15: MAS demand IRQ */
-{
-    /* Begin with setting the IRQ to edge sensitive */
-    ICR |= 0x0010;
-    
-    if(mpeg_mode == MPEG_ENCODER)
-        dma_tick();
-    else
-        postpone_dma_tick();
-}
-#endif /* #ifdef HAVE_MAS3587F */
-
 static int add_track_to_tag_list(char *filename)
 {
     struct id3tag *t = NULL;
@@ -892,15 +811,12 @@ static int new_file(int steps)
 static void stop_playing(void)
 {
     /* Stop the current stream */
-#ifdef HAVE_MAS3587F
-    demand_irq_enable(false);
-#endif /* #ifdef HAVE_MAS3587F */
+    mp3_play_stop();
     playing = false;
     filling = false;
     if(mpeg_file >= 0)
         close(mpeg_file);
     mpeg_file = -1;
-    mp3_play_pause(false);
     remove_all_tags();
 }
 
@@ -967,17 +883,14 @@ static void start_playback_if_ready(void)
             play_pending = false;
             playing = true;
 			
-            last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-            mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
-            dma_underrun = false;
-
             if (!paused)
             {
+                last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
+                mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+                dma_underrun = false;
+
                 last_dma_tick = current_tick;
                 mp3_play_pause(true);
-#ifdef HAVE_MAS3587F
-                demand_irq_enable(true);
-#endif /* #ifdef HAVE_MAS3587F */
             }
 
             /* Tell ourselves that we need more data */
@@ -2002,10 +1915,7 @@ static void mpeg_thread(void)
                 case MPEG_INIT_PLAYBACK:
                     /* Stop the prerecording */ 
                     stop_recording();
-                    
                     mp3_play_init();
-                    mpeg_mode = MPEG_DECODER;
-
                     init_playback_done = true;
                     break;
 

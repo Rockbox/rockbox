@@ -40,6 +40,12 @@ int mpeg_sound_numdecimals(int setting);
 void mpeg_set_pitch(int percent);
 #endif
 
+
+/* exported just for mpeg.c, to keep the recording there */
+#ifdef HAVE_MAS3587F
+void demand_irq_enable(bool on);
+#endif
+
 /* new functions, to be exported to plugin API */
 void mp3_play_init(void);
 void mp3_play_data(unsigned char* start, int size,
@@ -47,6 +53,8 @@ void mp3_play_data(unsigned char* start, int size,
 );
 void mp3_play_pause(bool play);
 void mp3_play_stop(void);
+long mp3_get_playtime(void);
+void mp3_reset_playtime(void);
 
 
 #define SOUND_VOLUME 0

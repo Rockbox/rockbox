@@ -34,6 +34,30 @@
 #include "hwcompat.h"
 #endif
 
+/* hacking into mpeg.c, recording is still there */
+#ifdef HAVE_MAS3587F
+enum
+{
+    MPEG_DECODER,
+    MPEG_ENCODER
+} mpeg_mode;
+#endif /* #ifdef HAVE_MAS3587F */
+
+/**** globals ****/
+
+/* own version, independent of mpeg.c */
+static bool paused; /* playback is paused */
+static bool playing; /* We are playing an MP3 stream */
+
+#ifndef SIMULATOR
+/* for measuring the play time */
+static long playstart_tick;
+static long cumulative_ticks;
+
+/* the registered callback function to ask for more mp3 data */
+static void (*callback_for_more)(unsigned char**, int*);
+#endif /* #ifndef SIMULATOR */
+
 static char *units[] =
 {
     "%",    /* Volume */
@@ -283,10 +307,65 @@ static void mas_poll_start(int interval_in_ms)
 
     TSTR |= 0x02; /* Start timer 1 */
 }
+#else
+static void postpone_dma_tick(void)
+{
+    unsigned int count;
+
+    count = FREQ / 1000 / 8;
+
+    /* We are using timer 1 */
+    
+    TSTR &= ~0x02; /* Stop the timer */
+    TSNC &= ~0x02; /* No synchronization */
+    TMDR &= ~0x02; /* Operate normally */
+
+    TCNT1 = 0;   /* Start counting at 0 */
+    GRA1 = count;
+    TCR1 = 0x23; /* Clear at GRA match, sysclock/8 */
+
+    /* Enable interrupt on level 5 */
+    IPRC = (IPRC & ~0x000f) | 0x0005;
+    
+    TSR1 &= ~0x02;
+    TIER1 = 0xf9; /* Enable GRA match interrupt */
+
+    TSTR |= 0x02; /* Start timer 1 */
+}
 #endif
 
-/* the registered callback function ta ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, int*);
+
+#ifdef HAVE_MAS3587F
+void demand_irq_enable(bool on)
+{
+    int oldlevel = set_irq_level(15);
+    
+    if(on)
+    {
+        IPRA = (IPRA & 0xfff0) | 0x000b;
+        ICR &= ~0x0010; /* IRQ3 level sensitive */
+    }
+    else
+        IPRA &= 0xfff0;
+
+    set_irq_level(oldlevel);
+}
+#endif /* #ifdef HAVE_MAS3587F */
+
+
+void play_tick(void)
+{
+    if(playing && !paused)
+    {
+        /* Start DMA if it is disabled and the DEMAND pin is high */
+        if(!(SCR0 & 0x80) && (PBDR & 0x4000))
+        {
+            SCR0 |= 0x80;
+        }
+
+        playback_tick(); /* dirty call to mpeg.c */
+    }
+}
 
 #pragma interrupt
 void DEI3(void)
@@ -313,10 +392,36 @@ void DEI3(void)
 }
 
 #pragma interrupt
+void IMIA1(void) /* Timer 1 interrupt */
+{
+    if(playing)
+        play_tick();
+    TSR1 &= ~0x01;
+#ifdef HAVE_MAS3587F
+    /* Disable interrupt */
+    IPRC &= ~0x000f;
+#endif /* #ifdef HAVE_MAS3587F */
+}
+
+#pragma interrupt
 void IRQ6(void) /* PB14: MAS stop demand IRQ */
 {
-    mp3_play_pause(false);
+    SCR0 &= ~0x80;
 }
+
+#ifdef HAVE_MAS3587F
+#pragma interrupt
+void IRQ3(void) /* PA15: MAS demand IRQ */
+{
+    /* Begin with setting the IRQ to edge sensitive */
+    ICR |= 0x0010;
+    
+    if(mpeg_mode == MPEG_ENCODER)
+        rec_tick();
+    else
+        postpone_dma_tick();
+}
+#endif /* #ifdef HAVE_MAS3587F */
 
 static void setup_sci0(void)
 {
@@ -403,6 +508,8 @@ static void init_playback(void)
     } while((val & 0x0c) != 0x0c);
 
     mpeg_sound_channel_config(MPEG_SOUND_STEREO);
+
+    mpeg_mode = MPEG_DECODER;
 
     /* set IRQ6 to edge detect */
     ICR |= 0x02;
@@ -893,6 +1000,9 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     mpeg_sound_set(SOUND_AVC, avc);
 #endif
 #endif /* !SIMULATOR */
+
+    playing = false;
+    paused = true;
 }
 
 
@@ -905,7 +1015,10 @@ void mp3_play_init(void)
 #ifdef HAVE_MAS3587F
     init_playback();
 #endif
+    playing = false;
+    paused = true;
     callback_for_more = NULL;
+    mp3_reset_playtime();
 }
 
 void mp3_play_data(unsigned char* start, int size,
@@ -923,21 +1036,54 @@ void mp3_play_data(unsigned char* start, int size,
     SAR3 = (unsigned int)start;
     DTCR3 = size & 0xffff;
 
+    playing = true;
+    paused = true;
+
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
+
+#ifdef HAVE_MAS3587F
+    demand_irq_enable(true);
+#endif
 }
 
 void mp3_play_pause(bool play)
 {
-    if (play)
+    if (paused && play)
+    {   /* resume playback */
         SCR0 |= 0x80;
-    else
+        paused = false;
+        playstart_tick = current_tick;
+    }
+    else if (!paused && !play)
+    {   /* stop playback */
         SCR0 &= 0x7f;
+        paused = true;
+        cumulative_ticks += current_tick - playstart_tick;
+    }
 }
 
 void mp3_play_stop(void)
 {
+    playing = false;
     mp3_play_pause(false);
     CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
+#ifdef HAVE_MAS3587F
+    demand_irq_enable(false);
+#endif
+}
+
+long mp3_get_playtime(void)
+{
+    if (paused)
+        return cumulative_ticks;
+    else
+        return cumulative_ticks + current_tick - playstart_tick;
+}
+
+void mp3_reset_playtime(void)
+{
+    cumulative_ticks = 0;
+    playstart_tick = current_tick;
 }
 
 #endif /* #ifndef SIMULATOR */
