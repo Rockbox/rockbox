@@ -11,33 +11,95 @@ A1: Player: the charging is all done by hardware and the exact
 
 Q2: Will keeping my charger connected a long time damage my batteries? Can I
     leave it over night?
-A2: [fill in]
+A2: The charger logic lets the batteries charge until they are full. After
+    that, the charger is disabled, but the device will stay powered on and
+    continue to consume some power from the batteries (the hardware does
+    not allow running from the charger without charging batteries, or
+    powering off with the charger connected). After some time, it will
+    start charging the batteries again to keep them full. This will
+    wear the batteries a little, but overnight charging is what most
+    people do.
+    
+    As the Battery FAQ at http://www.greenbatteries.com/ puts it:
+    "A NiMH battery can be charged and discharged hundreds of times,
+    but whether that means 200 times or 800 times has a lot to do
+    with how (you use it)".
 
 Q3: Does Rockbox charge the batteries more/less/worse/better than the Archos
     firmware?
-A3: [fill in]
+A3: The current release of 1.2 is much worse than the Archos charger, it
+    tends to stop charging much too early and leave the batteries half
+    empty.
+    The current development code (CVS daily builds as of 20.8.2002) is much
+    better than the 1.2 release, but still not perfect. Linus recently
+    measured 6 hours continuous playtime after a rockbox charge, and much
+    over 7 hours after an Archos charge. We are working on fine-tuning
+    the charger logic to get the most out of the batteries, but the
+    emphasis is on not overcharging them, since that would damage the
+    batteries. Better be safe than sorry.
 
 Q4: What kind of batteries are there in my factory default Player/Recorder?
-A4: [fill in]
+A4: Both ship with 1500 mAh NiMH (Nickel Metal Hydride) batteries.
 
 Q5: Is it hard to change the batteries? Does it void my warranty?
-A5: [fill in]
+A5: The archos manual and web site describe how to replace the batteries,
+    so you're supposed to do it. They recommend using only Archos-supplied
+    batteries, but my Recorder 20 unit only shipped with one set. Some
+    units have been shipped with two sets of batteries. Someone actually had
+    Archos send him new batteries free of charge after they had weared out,
+    under the warranty. (have asked from support-technique@archos.com,
+    waiting for an answer to arrive!)
 
-Q6: How much cost replacement batteries? Where can I buy them?
-A6: [fill in]
+Q6: How much do replacement batteries cost? Where can I buy them?
+A6: www.greenbatteries.com sells 1800 mAh NiMH cells at $3.25USD each,
+    and I bought 4 of the same GP batteries for 20 euros in an
+    home electronics & household appliance store in Finland.
+    NiMH batteries are sold in almost all shops that sell consumer
+    electronics, and in many online shops. Browse around.
 
 Q7: What kind of run-time can I expect on a set of fully-charged batteries
     when running Rockbox?
-A7: [fill in]
+A7: For the stock 1500 mAh cells, from 6 hours to 8 hours, depending on
+    which charger was used (see Q3). It depends a lot on the condition of
+    the batteries. We are looking into implementing more battery-saving
+    techniques in rockbox to make it rock longer.
 
 Q8: Can I use different batteries in my Archos?
-A8: [fill in]
+A8: Only use NiMH-type rechargeable batteries. It is considered to be safe
+    to use NiMH batteries of different capacities though, a lot of people
+    have purchaced 1700 or 1800 mAh batteries to replace the stock 1500 mAh
+    cells and have the device run a bit longer.
 
-Q9: Can I use non-charable batteries in my Archos?
-A9: [fill in]
+Q9: Can I use non-chargeable batteries in my Archos?
+A9: This is not recommended. The unit has been designed to operate with
+    four 1.2V batteries producing about 4.8V at most, and using 1.5V
+    alkaline/zinc carbon batteries will produce around 6.0V, which will
+    heat up the unit a lot more and might even damage it. The Archos
+    manual explicitly tells you not to do so.
 
 Q10: Can I use a different charger?
-A10: [fill in]
+A10: People have successfully used different chargers with similar
+     specifications as the stock charger. The charger must have the
+     same kind of connector with same polarity (center positive/+).
+     The charger should supply at least 7-8 volts, and if it provides
+     more than 9V, it probably should be current limited (do not
+     directly plug it in your 12V car battery or it's charger!).
+     
+     Using lower charging voltage will slow down the charging, and using
+     higher voltage will cause a higher charging current, more heat,
+     and too much heat and current can damage the batteries or the unit.
+     Using a different charger will void your warranty and can be
+     dangerous to your unit, so we can not recommend it.
+     
+     Many people are happy using an external quick charger which
+     is specified to work with NiMH batteries.
 
 Q11: Can I buy a replacement charger exactly as the one Archos shipped?
-A11: [fill in]
+A11: The FAQ on the Archos web site and the top of the charger both read:
+
+      Output: 9VDC 600mA
+      Center positive (+) polarity
+      
+     Chargers with similar (or user-adjustable) properties are available
+     at shops selling consumer electronics.
+
