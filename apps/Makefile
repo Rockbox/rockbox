@@ -46,20 +46,30 @@ endif
 SRC := $(wildcard *.c)
 
 ifeq ($(TARGET), -DARCHOS_FMRECORDER)
-   SCRAMBLE_OPT = -fm
+   TOOL_OPT = -fm
 endif
 ifeq ($(TARGET), -DARCHOS_RECORDERV2)
-   SCRAMBLE_OPT = -v2
+   TOOL_OPT = -v2
 endif
 
 ifeq ($(ANYREC), RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
+   TOOL = scramble
 else
+ifeq ($(TARGET), -DARCHOS_PLAYER)
    SRC += $(wildcard player/*.c)
    CFLAGS += -Iplayer
    OUTNAME = archos.mod
+   TOOL = scramble
+else
+# some kind of Neo 
+   SRC += $(wildcard neo/*.c)
+   CFLAGS += -Ineo
+   OUTNAME = Rockbox.bin
+   TOOL = mkneofile
+endif
 endif
 
 OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
@@ -90,7 +100,7 @@ $(OBJDIR)/librockbox.a:
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
-	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
+	 $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - < $< >$@
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
@@ -102,7 +112,7 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
-	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $< $@
+	$(TOOLSDIR)/$(TOOL) $(TOOL_OPT) $< $@
 
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	@a=`uclpack -h 2>/dev/null`; \
@@ -145,7 +155,12 @@ DEPDIRS:=$(DEPS)
 ifeq ($(ANYREC), RECORDER)
     DEPDIRS += $(DEPS)/recorder
 else
+ifeq ($(TARGET), -DARCHOS_PLAYER)
     DEPDIRS +=  $(DEPS)/player
+else
+# some kind of Neo
+    DEPDIRS +=  $(DEPS)/neo
+endif
 endif
 
 DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
