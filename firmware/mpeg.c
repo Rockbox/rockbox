@@ -470,6 +470,7 @@ static bool filling; /* We are filling the buffer with data from disk */
 static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
 static int low_watermark; /* Dynamic low watermark level */
+static int low_watermark_margin; /* Extra time in seconds for watermark */
 static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
 #ifdef HAVE_MAS3587F
@@ -492,12 +493,18 @@ static void recalculate_watermark(int bitrate)
 {
     if(ata_spinup_time)
     {
-        low_watermark = ata_spinup_time * 3 / HZ * bitrate*1000 / 8;
+        low_watermark = (low_watermark_margin + ata_spinup_time * 3 / HZ) *
+            bitrate*1000 / 8;
     }
     else
     {
         low_watermark = MPEG_LOW_WATER;
     }
+}
+
+void mpeg_set_buffer_margin(int seconds)
+{
+    low_watermark_margin = seconds;
 }
 
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata)

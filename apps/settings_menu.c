@@ -496,6 +496,13 @@ static bool poweroff(void)
 }
 #endif
 
+static bool buffer_margin(void)
+{
+    return set_int(str(LANG_MP3BUFFER_MARGIN), "s",
+                   &global_settings.buffer_margin,
+                   mpeg_set_buffer_margin, 1, 0, 7 );
+}
+
 static bool ff_rewind_min_step(void) 
 { 
     char* names[] = { "1s", "2s", "3s", "4s",
@@ -535,6 +542,7 @@ static bool playback_settings_menu(void)
         { str(LANG_RESUME), resume },
         { str(LANG_FFRW_STEP), ff_rewind_min_step },
         { str(LANG_FFRW_ACCEL), ff_rewind_accel },
+        { str(LANG_MP3BUFFER_MARGIN), buffer_margin },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

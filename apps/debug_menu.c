@@ -174,10 +174,11 @@ bool dbg_mpeg_thread(void)
         percent = d.unplayed_space * 100 / d.mp3buflen;
         progressbar(0, 6*8, 112, 4, percent, Grow_Right);
 
-        percent = MPEG_LOW_WATER * 100 / d.mp3buflen;
+        percent = d.low_watermark_level * 100 / d.mp3buflen;
         progressbar(0, 6*8+4, 112, 4, percent, Grow_Right);
 
-        snprintf(buf, sizeof(buf), "lowest: %x", d.lowest_watermark_level);
+        snprintf(buf, sizeof(buf), "wm: %x - %x",
+                 d.low_watermark_level, d.lowest_watermark_level);
         lcd_puts(0, 7, buf);
         
         lcd_update();

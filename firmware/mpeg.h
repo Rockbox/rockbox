@@ -85,6 +85,7 @@ unsigned long mpeg_num_recorded_frames(void);
 unsigned long mpeg_num_recorded_bytes(void);
 #endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
+void mpeg_set_buffer_margin(int seconds);
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1

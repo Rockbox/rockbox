@@ -105,7 +105,7 @@ offset  abs
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
-0x25    0x39    <disk_spindown flag>
+0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3)>
 0x26    0x40    <runtime low byte>
 0x27    0x41    <runtime high byte>
 0x28    0x42    <topruntime low byte>
@@ -344,7 +344,9 @@ int settings_save( void )
          ((global_settings.rec_frequency & 7) << 5));
     config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
     config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
-    config_block[0x25] = (unsigned char)global_settings.disk_poweroff & 1;
+    config_block[0x25] = (unsigned char)
+        ((global_settings.disk_poweroff & 1) |
+         ((global_settings.buffer_margin & 7) << 1));
 
     {
         static long lasttime = 0;
@@ -618,7 +620,10 @@ void settings_load(void)
             global_settings.rec_right_gain = config_block[0x24] & 0x0f;
 
         if (config_block[0x25] != 0xFF)
+        {
             global_settings.disk_poweroff = config_block[0x25] & 1;
+            global_settings.buffer_margin = (config_block[0x25] >> 1) & 7;
+        }
 
         if (config_block[0x27] != 0xff)
             global_settings.runtime = 
@@ -819,6 +824,7 @@ void settings_reset(void) {
     global_settings.resume_offset = -1;
     global_settings.disk_spindown = 5;
     global_settings.disk_poweroff = false;
+    global_settings.buffer_margin = 0;
     global_settings.browse_current = false;
     global_settings.play_selected = true;
     global_settings.peak_meter_release = 8;

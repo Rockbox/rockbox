@@ -1171,3 +1171,8 @@ id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep timer"
 new:
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "MP3 buffer margin"
+new:
