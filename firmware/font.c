@@ -30,47 +30,210 @@
 #include <string.h>
 #include "lcd.h"
 #include "font.h"
+#include "file.h"
 #include "debug.h"
 #include "panic.h"
 
-/* available compiled-in fonts*/
-extern MWCFONT font_X5x8;
-/*extern MWCFONT font_X6x9; */
-/*extern MWCFONT font_courB08; */
-/*extern MWCFONT font_timR08; */
-
-/* structure filled in by rbf_load_font*/
-static MWCFONT font_UI;
-
-/* system font table, in order of FONT_xxx definition*/
-struct corefont sysfonts[MAXFONTS] = {
-    { &font_X5x8, NULL 	        }, /* compiled-in FONT_SYSFIXED*/
-    { &font_UI,	  "/system.fnt"	}, /* loaded FONT_UI*/
-    { NULL,       NULL	        }, /* no FONT_MP3*/
-};
-
-static void rotate_font_bits(PMWCFONT pf);
-static void rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
-                unsigned int height);
-
-void
-font_init(void)
-{
-    struct corefont *cfp;
-
-    for (cfp=sysfonts; cfp < &sysfonts[MAXFONTS]; ++cfp) {
-        if (cfp->pf && cfp->diskname) {
-            cfp->pf = rbf_load_font(cfp->diskname, cfp->pf);
-#if defined(DEBUG) || defined(SIMULATOR)
-            if (!cfp->pf)
-                DEBUGF("Font load failed: %s\n", cfp->diskname);
+#ifndef O_BINARY
+#define O_BINARY 0
 #endif
-        }
 
-        /* one-time rotate font bits to rockbox format*/
-        if (cfp->pf && cfp->pf->height)
-            rotate_font_bits(cfp->pf);
+/* compiled-in font */
+extern struct font sysfont;
+
+/* structure filled in by font_load */
+static struct font font_ui;
+
+/* system font table, in order of FONT_xxx definition */
+static struct font* sysfonts[MAXFONTS] = { &sysfont, &font_ui };
+
+/* static buffer allocation structures */
+static unsigned char mbuf[MAX_FONT_SIZE];
+static unsigned char *freeptr = mbuf;
+static unsigned char *fileptr;
+static unsigned char *eofptr;
+
+static void rotate_font_bits(struct font* pf);
+static void rotleft(unsigned char *dst, 
+                    bitmap_t *src, 
+                    unsigned int width,
+                    unsigned int height);
+
+void font_init(void)
+{
+    rotate_font_bits(&sysfont);
+    memset(&font_ui, 0, sizeof(struct font));
+}
+
+static int readshort(unsigned short *sp)
+{
+    unsigned short s;
+
+    s = *fileptr++ & 0xff;
+    *sp = (*fileptr++ << 8) | s;
+    return (fileptr <= eofptr);
+}
+
+static int readlong(unsigned long *lp)
+{
+    unsigned long l;
+
+    l = *fileptr++ & 0xff;
+    l |= *fileptr++ << 8;
+    l |= *fileptr++ << 16;
+    *lp = (*fileptr++ << 24) | l;
+    return (fileptr <= eofptr);
+}
+
+/* read count bytes*/
+static int readstr(char *buf, int count)
+{
+    int n = count;
+
+    while (--n >= 0)
+        *buf++ = *fileptr++;
+    return (fileptr <= eofptr)? count: 0;
+}
+
+/* read totlen bytes, return NUL terminated string*/
+/* may write 1 past buf[totlen]; removes blank pad*/
+static int readstrpad(char *buf, int totlen)
+{
+    char *p = buf;
+    int n = totlen;
+
+    while (--n >= 0)
+        *p++ = *fileptr++;
+    if (fileptr > eofptr)
+        return 0;
+
+    p = &buf[totlen];
+    *p-- = 0;
+    while (*p == ' ' && p >= buf)
+        *p-- = '\0';
+    return totlen;
+}
+
+/* read and load font into incore font structure*/
+struct font* font_load(char *path)
+{
+    int fd, filesize;
+    unsigned short maxwidth, height, ascent, pad;
+    unsigned long firstchar, defaultchar, size;
+    unsigned long i, nbits, noffset, nwidth;
+    char version[4+1];
+    char copyright[256+1];
+    struct font* pf = &font_ui;
+
+    memset(pf, 0, sizeof(struct font));
+
+    /* open and read entire font file*/
+    fd = open(path, O_RDONLY|O_BINARY);
+    if (fd < 0) {
+        DEBUGF("Can't open font: %s\n", path);
+        return NULL;
     }
+
+    /* currently, font loading replaces earlier font allocation*/
+    freeptr = (unsigned char *)(((int)mbuf + 3) & ~3);
+
+    fileptr = freeptr;
+    filesize = read(fd, fileptr, MAX_FONT_SIZE);
+    eofptr = fileptr + filesize;
+
+    /* no need for multiple font loads currently*/
+    /*freeptr += filesize;*/
+    /*freeptr = (unsigned char *)(freeptr + 3) & ~3;*/  /* pad freeptr*/
+
+    close(fd);
+    if (filesize == MAX_FONT_SIZE) {
+        DEBUGF("Font %s too large: %d\n", path, filesize);
+        return NULL;
+    }
+
+    /* read magic and version #*/
+    memset(version, 0, sizeof(version));
+    if (readstr(version, 4) != 4)
+        return NULL;
+    if (strcmp(version, VERSION) != 0)
+        return NULL;
+
+    /* internal font name*/
+    pf->name = fileptr;
+    if (readstrpad(pf->name, 64) != 64)
+        return NULL;
+
+    /* copyright, not currently stored*/
+    if (readstrpad(copyright, 256) != 256)
+        return NULL;
+
+    /* font info*/
+    if (!readshort(&maxwidth))
+        return NULL;
+    pf->maxwidth = maxwidth;
+    if (!readshort(&height))
+        return NULL;
+    pf->height = height;
+    if (!readshort(&ascent))
+        return NULL;
+    pf->ascent = ascent;
+    if (!readshort(&pad))
+        return NULL;
+    if (!readlong(&firstchar))
+        return NULL;
+    pf->firstchar = firstchar;
+    if (!readlong(&defaultchar))
+        return NULL;
+    pf->defaultchar = defaultchar;
+    if (!readlong(&size))
+        return NULL;
+    pf->size = size;
+
+    /* get variable font data sizes*/
+    /* # words of bitmap_t*/
+    if (!readlong(&nbits))
+        return NULL;
+    pf->bits_size = nbits;
+
+    /* # longs of offset*/
+    if (!readlong(&noffset))
+        return NULL;
+
+    /* # bytes of width*/
+    if (!readlong(&nwidth))
+        return NULL;
+
+    /* variable font data*/
+    pf->bits = (bitmap_t *)fileptr;
+    for (i=0; i<nbits; ++i)
+        if (!readshort(&pf->bits[i]))
+            return NULL;
+    /* pad to longword boundary*/
+    fileptr = (unsigned char *)(((int)fileptr + 3) & ~3);
+
+    if (noffset) {
+        pf->offset = (unsigned long *)fileptr;
+        for (i=0; i<noffset; ++i)
+            if (!readlong(&pf->offset[i]))
+                return NULL;
+    }
+    else
+        pf->offset = NULL;
+
+    if (nwidth) {
+        pf->width = (unsigned char *)fileptr;
+        fileptr += nwidth*sizeof(unsigned char);
+    }
+    else
+        pf->width = NULL;
+
+    if (fileptr > eofptr)
+        return NULL;
+
+    /* one-time rotate font bits to rockbox format*/
+    rotate_font_bits(pf);
+
+    return pf;	/* success!*/
 }
 
 /*
@@ -78,15 +241,15 @@ font_init(void)
  * If the requested font isn't loaded/compiled-in,
  * decrement the font number and try again.
  */
-PMWCFONT
-getfont(int font)
+struct font* font_get(int font)
 {
-    PMWCFONT pf;
+    struct font* pf;
 
     if (font >= MAXFONTS)
         font = 0;
+
     while (1) {
-        pf = sysfonts[font].pf;
+        pf = sysfonts[font];
         if (pf && pf->height)
             return pf;
         if (--font < 0)
@@ -94,101 +257,30 @@ getfont(int font)
     }
 }
 
-/*
- * Return width and height of a given font.
- */
-void lcd_getfontsize(int font, int *width, int *height)
-{
-   PMWCFONT pf = getfont(font);
-
-   *width =  pf->maxwidth;
-   *height = pf->height;
-}
-
-/*
- * Return width and height of a given font.
- */
-//FIXME rename to font_gettextsize, add baseline
-int
-lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
-{
-    PMWCFONT pf = getfont(font);
-    int ch;
-    int width = 0;
-
-    while((ch = *str++)) {
-        /* check input range*/
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
-        /* get proportional width and glyph bits*/
-        width += pf->width? pf->width[ch]: pf->maxwidth;
-    }
-    *w = width;
-    *h = pf->height;
-
-    return width;
-}
-
-/*
- * Put a string at specified bit position
- */
-//FIXME rename font_putsxy?
-void
-lcd_putsxy(int x, int y, unsigned char *str, int font)
-{
-    int ch;
-    PMWCFONT pf = getfont(font);
-
-    while (((ch = *str++) != '\0')) {
-        MWIMAGEBITS *bits;
-        int width;
-
-        /* check input range*/
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
-        /* get proportional width and glyph bits*/
-        width = pf->width? pf->width[ch]: pf->maxwidth;
-        if (x + width > LCD_WIDTH)
-            break;
-
-        /* no partial-height drawing for now...*/
-        if (y + pf->height > LCD_HEIGHT)
-            break;
-        bits = pf->bits + (pf->offset? pf->offset[ch]: (pf->height * ch));
-
-        lcd_bitmap((unsigned char *)bits, x, y, width, pf->height, true);
-        x += width;
-    }
-}
-
 /* convert font bitmap data inplace to rockbox format*/
-static void
-rotate_font_bits(PMWCFONT pf)
+static void rotate_font_bits(struct font* pf)
 {
     int i;
-    int defaultchar = pf->defaultchar - pf->firstchar;
-    int did_defaultchar = 0;
+    unsigned long defaultchar = pf->defaultchar - pf->firstchar;
+    bool did_defaultchar = false;
     unsigned char buf[256];
 
     for (i=0; i<pf->size; ++i) {
-        MWIMAGEBITS *bits = pf->bits +
-            (pf->offset? pf->offset[i]: (pf->height * i));
+        bitmap_t *bits = pf->bits +
+            (pf->offset ? pf->offset[i] : (pf->height * i));
         int width = pf->width? pf->width[i]: pf->maxwidth;
-        int src_bytes = MWIMAGE_BYTES(width) * pf->height;
+        int src_bytes = BITMAP_BYTES(width) * pf->height;
 
         /*
          * Due to the way the offset map works,
          * non-mapped characters are mapped to the default
          * character, and shouldn't be rotated twice.
          */
-        if (i == defaultchar) {
+
+        if (pf->offset && pf->offset[i] == defaultchar) {
             if (did_defaultchar)
                 continue;
-            did_defaultchar = 1;
+            did_defaultchar = true;
         }
 
         /* rotate left for lcd_bitmap function input*/
@@ -200,16 +292,15 @@ rotate_font_bits(PMWCFONT pf)
 }
 
 /*
- * Take an MWIMAGEBITS bitmap and convert to Rockbox format.
+ * Take an bitmap_t bitmap and convert to Rockbox format.
  * Used for converting font glyphs for the time being.
  * Can use for standard X11 and Win32 images as well.
  *
  * Doing it this way keeps fonts in standard formats,
  * as well as keeping Rockbox hw bitmap format.
  */
-static void
-rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
-	unsigned int height)
+static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
+                    unsigned int height)
 {
     unsigned int i,j;
     unsigned int dst_col = 0;		/* destination column*/
@@ -221,17 +312,17 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
     dst_linelen = (height-1)/8+1;
 
     /* calc words of input image*/
-    src_words = MWIMAGE_WORDS(width) * height;
+    src_words = BITMAP_WORDS(width) * height;
 
     /* clear background*/
     memset(dst, 0, dst_linelen*width);
 
     for (i=0; i < src_words; i++) {
-        MWIMAGEBITS srcmap;	/* current src input bit*/
-        MWIMAGEBITS dstmap;	/* current dst output bit*/
+        bitmap_t srcmap;	/* current src input bit*/
+        bitmap_t dstmap;	/* current dst output bit*/
         
         /* calc src input bit*/
-        srcmap = 1 << (sizeof(MWIMAGEBITS)*8-1);
+        srcmap = 1 << (sizeof(bitmap_t)*8-1);
 
         /* calc dst output bit*/
         if (i>0 && (i%8==0)) {
@@ -244,9 +335,9 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
         for(j=0; j < width; j++) {
 
             /* calc input bitmask*/
-            MWIMAGEBITS bit = srcmap >> j;
+            bitmap_t bit = srcmap >> j;
             if (bit==0) {
-                srcmap = 1 << (sizeof(MWIMAGEBITS)*8-1);
+                srcmap = 1 << (sizeof(bitmap_t)*8-1);
                 bit = srcmap >> (j % 16);
             }
 

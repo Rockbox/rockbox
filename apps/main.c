@@ -68,6 +68,7 @@ void init(void)
     show_logo();
     settings_reset();
     settings_load();
+    font_load(ROCKBOX_DIR "/default.fon");
     sleep(HZ/2);
 }
 
@@ -89,10 +90,7 @@ void init(void)
     
     lcd_init();
 
-    // FIXME should call font_init before this, 
-    // because may use loadable font in show_logo().
-    // I didn't call font_init here, since
-    // disk system isn't up yet.
+    font_init();
     show_logo();
 
 #ifdef DEBUG
@@ -148,6 +146,7 @@ void init(void)
     }
     
     settings_load();
+    font_load(ROCKBOX_DIR "/default.fon");
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
@@ -160,7 +159,6 @@ void init(void)
     status_init();
     usb_start_monitoring();
     power_init();
-    font_init();
 }
 
 int main(void)

@@ -38,13 +38,14 @@
  * must be available at system startup.
  * Fonts are specified in firmware/font.c.
  */
-#define FONT_SYSFIXED	0	/* system fixed pitch font*/
-#define FONT_UI		1	/* system porportional font*/
-#define FONT_MP3	2	/* font used for mp3 info*/
-#define MAXFONTS	3	/* max # fonts*/
+enum {
+    FONT_SYSFIXED, /* system fixed pitch font*/
+    FONT_UI,       /* system porportional font*/
+    MAXFONTS
+};
 
 /*
- * .fnt (.rbf) loadable font file format definition
+ * .fnt loadable font file format definition
  *
  * format                     len	description
  * -------------------------  ----	------------------------------
@@ -70,54 +71,42 @@
 /* loadable font magic and version #*/
 #define VERSION		"RB11"
 
-/* MWIMAGEBITS helper macros*/
-#define MWIMAGE_WORDS(x)	(((x)+15)/16)	/* image size in words*/
-#define MWIMAGE_BYTES(x)	(MWIMAGE_WORDS(x)*sizeof(MWIMAGEBITS))
-#define	MWIMAGE_BITSPERIMAGE	(sizeof(MWIMAGEBITS) * 8)
-#define	MWIMAGE_BITVALUE(n)	((MWIMAGEBITS) (((MWIMAGEBITS) 1) << (n)))
-#define	MWIMAGE_FIRSTBIT	(MWIMAGE_BITVALUE(MWIMAGE_BITSPERIMAGE - 1))
-#define	MWIMAGE_TESTBIT(m)	((m) & MWIMAGE_FIRSTBIT)
-#define	MWIMAGE_SHIFTBIT(m)	((MWIMAGEBITS) ((m) << 1))
+typedef unsigned short bitmap_t; /* bitmap image unit size*/
 
-typedef unsigned short	MWIMAGEBITS;	/* bitmap image unit size*/
+/* bitmap_t helper macros*/
+#define BITMAP_WORDS(x)         (((x)+15)/16)	/* image size in words*/
+#define BITMAP_BYTES(x)         (BITMAP_WORDS(x)*sizeof(bitmap_t))
+#define	BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
+#define	BITMAP_BITVALUE(n)      ((bitmap_t) (((bitmap_t) 1) << (n)))
+#define	BITMAP_FIRSTBIT         (BITMAP_BITVALUE(BITMAP_BITSPERIMAGE - 1))
+#define	BITMAP_TESTBIT(m)       ((m) & BITMAP_FIRSTBIT)
+#define	BITMAP_SHIFTBIT(m)      ((bitmap_t) ((m) << 1))
 
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
-typedef struct {
+struct font {
     char *	name;		/* font name*/
     int		maxwidth;	/* max width in pixels*/
     unsigned int height;	/* height in pixels*/
     int		ascent;		/* ascent (baseline) height*/
     int		firstchar;	/* first character in bitmap*/
     int		size;		/* font size in glyphs*/
-    MWIMAGEBITS *bits;		/* 16-bit right-padded bitmap data*/
+    bitmap_t *bits;		/* 16-bit right-padded bitmap data*/
     unsigned long *offset;	/* offsets into bitmap data*/
     unsigned char *width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
-    long	bits_size;	/* # words of MWIMAGEBITS bits*/
-#if 0
-    char *	facename;	/* facename of font*/
-    char *	copyright;	/* copyright info for loadable fonts*/
-#endif
-} MWCFONT, *PMWCFONT;
-
-/* structure for rockbox startup font selection*/
-struct corefont {
-    PMWCFONT pf;		/* compiled-in or loaded font*/
-    char *diskname;		/* diskname if not compiled-in*/
+    long	bits_size;	/* # words of bitmap_t bits*/
 };
 
-extern struct corefont sysfonts[MAXFONTS];
-
 /* font routines*/
-PMWCFONT getfont(int font);
-PMWCFONT rbf_load_font(char *path, PMWCFONT pf);
-
 void font_init(void);
+struct font* font_load(char *path);
+struct font* font_get(int font);
 
 #else /* HAVE_LCD_BITMAP */
 
 #define font_init()
+#define font_load(x)
 
 #endif
 

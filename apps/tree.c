@@ -137,7 +137,8 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* playlist */
 #define TREE_ATTR_WPS 0x100 /* wps config file */
 #define TREE_ATTR_MOD 0x200 /* firmware file */
-#define TREE_ATTR_EQ  0x300 /* EQ config file */
+#define TREE_ATTR_EQ  0x400 /* EQ config file */
+#define TREE_ATTR_FONT 0x800 /* font file */
 #define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 static int build_playlist(int start_index)
@@ -182,14 +183,12 @@ static int compare(const void* p1, const void* p2)
 static int showdir(char *path, int start)
 {
     int icon_type = 0;
-#ifdef HAVE_LCD_BITMAP
-    int line_height = LINE_HEIGTH;
-#endif
     int i;
     int tree_max_on_screen;
     bool dir_buffer_full;
 
 #ifdef HAVE_LCD_BITMAP
+    int line_height = LINE_HEIGTH;
     int fw, fh;
     lcd_getfontsize(FONT_UI, &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
@@ -255,6 +254,8 @@ static int showdir(char *path, int start)
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
 #ifdef HAVE_RECORDER_KEYPAD
+                else if (!strcasecmp(&entry->d_name[len-4], ".fnt"))
+                    dptr->attr |= TREE_ATTR_FONT;
                 else if (!strcasecmp(&entry->d_name[len-4], ".ajz"))
 #else
                 else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
@@ -372,15 +373,24 @@ static int showdir(char *path, int start)
                 icon_type = Mod_Ajz;
                 break;
 
+#ifdef HAVE_LCD_BITMAP
+            case TREE_ATTR_FONT:
+                icon_type = Font;
+                break;
+#endif
             default:
                 icon_type = 0;
         }
 
         if (icon_type) {
 #ifdef HAVE_LCD_BITMAP
+            int offset=0;
+            if ( line_height > 8 )
+                offset = (line_height - 8) / 2;
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
                        CURSOR_X * 6 + CURSOR_WIDTH, 
-                       MARGIN_Y+(i-start)*line_height, 6, 8, true);
+                       MARGIN_Y+(i-start)*line_height + offset,
+                       6, 8, true);
 #else
             lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
             lcd_putc(LINE_X-1, i-start, i-start);
@@ -711,6 +721,22 @@ bool dirbrowse(char *root)
                             settings_load_eq(buf);
                             restore = true;
                             break;
+
+#ifdef HAVE_LCD_BITMAP
+                        case TREE_ATTR_FONT:
+                            snprintf(buf, sizeof buf, "%s/%s",
+                                     currdir, file->name);
+                            font_load(buf);
+                            lcd_getfontsize(FONT_UI, &fw, &fh);
+                            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                            /* make sure cursor is on screen */
+                            while ( dircursor > tree_max_on_screen ) {
+                                dircursor--;
+                                dirstart++;
+                            }
+                            restore = true;
+                            break;
+#endif
 
 #ifndef SIMULATOR
                             /* firmware file */

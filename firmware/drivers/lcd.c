@@ -547,7 +547,6 @@ void lcd_set_contrast(int val)
  */
 unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
-static int font=0;
 static int xmargin=0;
 static int ymargin=0;
 
@@ -661,11 +660,6 @@ void lcd_clear_display (void)
 #endif
 }
 
-void lcd_setfont(int newfont)
-{
-    font = newfont;
-}
-
 void lcd_setmargins(int x, int y)
 {
     xmargin = x;
@@ -682,10 +676,11 @@ int lcd_getymargin(void)
     return ymargin;
 }
 
+static int curfont = FONT_SYSFIXED;
+
 /*
  * Put a string at specified character position
  */
-//FIXME require font parameter
 void lcd_puts(int x, int y, unsigned char *str)
 {
     int xpos,ypos,w,h;
@@ -707,16 +702,90 @@ void lcd_puts(int x, int y, unsigned char *str)
     if(!str || !str[0])
         return;
 
-    lcd_getstringsize(str, font, &w, &h);
-    xpos = xmargin + x*w / strlen(str); //FIXME why strlen?
+    lcd_getstringsize(str, curfont, &w, &h);
+    xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
-    lcd_putsxy( xpos, ypos, str, font);
+    lcd_putsxy( xpos, ypos, str, curfont);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* this function is being used when simulating a charcell LCD and
        then we update immediately */
     lcd_update();
 #endif
+}
+
+/* set current font*/
+void lcd_setfont(int newfont)
+{
+    curfont = newfont;
+}
+
+/*
+ * Return width and height of a given font.
+ */
+void lcd_getfontsize(int font, int *width, int *height)
+{
+   struct font* pf = font_get(font);
+
+   *width =  pf->maxwidth;
+   *height = pf->height;
+}
+
+
+/*
+ * Return width and height of a given font.
+ */
+int lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
+{
+    struct font* pf = font_get(font);
+    int ch;
+    int width = 0;
+
+    while((ch = *str++)) {
+        /* check input range*/
+        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
+            ch = pf->defaultchar;
+        ch -= pf->firstchar;
+
+        /* get proportional width and glyph bits*/
+        width += pf->width? pf->width[ch]: pf->maxwidth;
+    }
+    *w = width;
+    *h = pf->height;
+
+    return width;
+}
+
+/*
+ * Put a string at specified bit position
+ */
+void lcd_putsxy(int x, int y, unsigned char *str, int font)
+{
+    int ch;
+    struct font* pf = font_get(font);
+
+    while (((ch = *str++) != '\0')) {
+        bitmap_t *bits;
+        int width;
+
+        /* check input range*/
+        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
+            ch = pf->defaultchar;
+        ch -= pf->firstchar;
+
+        /* get proportional width and glyph bits*/
+        width = pf->width ? pf->width[ch] : pf->maxwidth;
+        if (x + width > LCD_WIDTH)
+            break;
+
+        /* no partial-height drawing for now...*/
+        if (y + pf->height > LCD_HEIGHT)
+            break;
+        bits = pf->bits + (pf->offset ? pf->offset[ch] : (pf->height * ch));
+
+        lcd_bitmap((unsigned char *)bits, x, y, width, pf->height, true);
+        x += width;
+    }
 }
 
 /*
@@ -1038,14 +1107,14 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     unsigned char ch[2];
     int w, h;
     int width, height;
-    lcd_getfontsize(font, &width, &height);
+    lcd_getfontsize(curfont, &width, &height);
 
     ch[1] = 0; /* zero terminate */
     ch[0] = string[0];
     width = 0;
     s->space = 0;
     while ( ch[0] &&
-            (width + lcd_getstringsize(ch, 0, &w, &h) <
+            (width + lcd_getstringsize(ch, curfont, &w, &h) <
              (LCD_WIDTH - x*8))) {
         width += w;
         s->space++;
@@ -1058,7 +1127,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 
 #ifdef HAVE_LCD_BITMAP
     s->space += 2;
-    lcd_getstringsize(string,0,&w,&h);
+    lcd_getstringsize(string,curfont,&w,&h);
     if ( w > LCD_WIDTH - xmargin ) {
 #else
     if ( s->textlen > s->space ) {

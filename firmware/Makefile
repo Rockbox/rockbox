@@ -19,6 +19,7 @@ SYSTEM_FONT = fonts/alt6x10.bdf
 
 # store output files in this directory:
 OBJDIR = .
+TOOLSDIR = ../tools
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
 
@@ -38,9 +39,8 @@ DIRS = $(subst $(DEPS),".",$(DEPDIRS))
 
 OUTPUT = $(OBJDIR)/librockbox.a
 
-
-ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(CFLAGS)))
-	EXTRA_TARGETS = $(OBJDIR)/system.ajf
+ifeq (RECORDER,$(findstring RECORDER, $(CFLAGS)))
+	OBJS +=	$(OBJDIR)/sysfont.o
 endif
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
@@ -69,6 +69,10 @@ clean:
 # Special targets
 $(OBJDIR)/thread.o: thread.c thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
+
+$(OBJDIR)/sysfont.o: fonts/clR6x8.bdf
+	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'

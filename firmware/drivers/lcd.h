@@ -99,9 +99,6 @@ extern void lcd_double_height (bool on);
  */
 extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
-extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
-extern void lcd_setfont(int font);
-extern void lcd_getfontsize(int font, int *width, int *height);
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
@@ -117,6 +114,10 @@ extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 extern void lcd_invertpixel(int x, int y);
 extern void lcd_roll(int pixels);
+
+extern void lcd_setfont(int font);
+extern void lcd_getfontsize(int font, int *width, int *height);
+extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
 
 #endif /* CHARCELLS / BITMAP */
 

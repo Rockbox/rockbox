@@ -69,6 +69,8 @@ unsigned char bitmap_icons_6x8[LastIcon][6] =
     { 0x58, 0x5f, 0x42, 0x50, 0x55, 0x00 },
     /* Mod or ajz file */
     { 0x63, 0x7f, 0x3a, 0x7f, 0x63, 0x00 },
+    /* Font file */
+    { 0x60, 0x70, 0x38, 0x2c, 0x7e, 0x7e },
 };
 
 unsigned char bitmap_icons_7x8[][7] =
@@ -234,10 +236,10 @@ void statusbar_icon_volume(int percent)
         /* display volume lever numerical? */
         if (TIME_BEFORE(current_tick,switch_tick)) { 
             snprintf(buffer, sizeof(buffer), "%2d", percent);
-            lcd_getstringsize(buffer, FONT_UI, &width, &height);
+            lcd_getstringsize(buffer, FONT_SYSFIXED, &width, &height);
             if (height <= STATUSBAR_HEIGHT)
                 lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
-                           width/2, STATUSBAR_Y_POS, buffer, 0);
+                           width/2, STATUSBAR_Y_POS, buffer, FONT_SYSFIXED);
         }
         else { /* display volume bar */
             volume = volume * 14 / 100;
@@ -309,8 +311,8 @@ void statusbar_time(int hour, int minute)
         strncpy(buffer, "--:--", sizeof buffer);
     }
 
-    lcd_getstringsize(buffer, FONT_UI, &width, &height);
+    lcd_getstringsize(buffer, FONT_SYSFIXED, &width, &height);
     if (height <= STATUSBAR_HEIGHT)
-        lcd_putsxy(TIME_X_END - width, STATUSBAR_Y_POS, buffer, 0);
+        lcd_putsxy(TIME_X_END - width, STATUSBAR_Y_POS, buffer, FONT_SYSFIXED);
 }
 #endif

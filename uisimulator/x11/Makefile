@@ -78,7 +78,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
 FIRMSRCS = lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
-  powermgmt.c font.c X5x8.c loadfont.c panic.c
+  powermgmt.c font.c panic.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
@@ -221,22 +221,11 @@ $(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/X6x9.o: $(FIRMWAREDIR)/X6x9.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/timR08.o: $(FIRMWAREDIR)/timR08.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/courB08.o: $(FIRMWAREDIR)/courB08.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+$(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
+	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 $(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/loadfont.o: $(FIRMWAREDIR)/loadfont.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings.o: $(APPDIR)/settings.c

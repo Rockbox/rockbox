@@ -16,31 +16,31 @@
 /* loadable font magic and version #*/
 #define VERSION		"RB11"
 
-/* MWIMAGEBITS helper macros*/
-#define MWIMAGE_WORDS(x)	(((x)+15)/16)	/* image size in words*/
-#define MWIMAGE_BYTES(x)	(MWIMAGE_WORDS(x)*sizeof(MWIMAGEBITS))
-#define	MWIMAGE_BITSPERIMAGE (sizeof(MWIMAGEBITS) * 8)
-#define	MWIMAGE_BITVALUE(n)	((MWIMAGEBITS) (((MWIMAGEBITS) 1) << (n)))
-#define	MWIMAGE_FIRSTBIT	(MWIMAGE_BITVALUE(MWIMAGE_BITSPERIMAGE - 1))
-#define	MWIMAGE_TESTBIT(m)	((m) & MWIMAGE_FIRSTBIT)
-#define	MWIMAGE_SHIFTBIT(m)	((MWIMAGEBITS) ((m) << 1))
+/* bitmap_t helper macros*/
+#define BITMAP_WORDS(x)         (((x)+15)/16)	/* image size in words*/
+#define BITMAP_BYTES(x)         (BITMAP_WORDS(x)*sizeof(bitmap_t))
+#define	BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
+#define	BITMAP_BITVALUE(n)      ((bitmap_t) (((bitmap_t) 1) << (n)))
+#define	BITMAP_FIRSTBIT         (BITMAP_BITVALUE(BITMAP_BITSPERIMAGE - 1))
+#define	BITMAP_TESTBIT(m)	((m) & BITMAP_FIRSTBIT)
+#define	BITMAP_SHIFTBIT(m)	((bitmap_t) ((m) << 1))
 
-typedef unsigned short	MWIMAGEBITS;	/* bitmap image unit size*/
+typedef unsigned short bitmap_t; /* bitmap image unit size*/
 
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
-typedef struct {
+struct font {
     char *	name;		/* font name*/
     int		maxwidth;	/* max width in pixels*/
     int 	height;		/* height in pixels*/
     int		ascent;		/* ascent (baseline) height*/
     int		firstchar;	/* first character in bitmap*/
     int		size;		/* font size in glyphs*/
-    MWIMAGEBITS *	bits;		/* 16-bit right-padded bitmap data*/
-    unsigned long *	offset;		/* offsets into bitmap data*/
-    unsigned char *	width;		/* character widths or NULL if fixed*/
+    bitmap_t*	bits;		/* 16-bit right-padded bitmap data*/
+    unsigned long* offset;	/* offsets into bitmap data*/
+    unsigned char* width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
-    long	bits_size;	/* # words of MWIMAGEBITS bits*/
+    long	bits_size;	/* # words of bitmap_t bits*/
     
     /* unused by runtime system, read in by convbdf*/
     char *	facename;	/* facename of font*/
@@ -48,7 +48,7 @@ typedef struct {
     int		pixel_size;
     int		descent;
     int		fbbw, fbbh, fbbx, fbby;
-} MWCFONT, *PMWCFONT;
+};
 /* END font.h*/
 
 #define isprefix(buf,str)	(!strncmp(buf, str, strlen(str)))
@@ -64,19 +64,19 @@ int limit_char = 65535;
 int oflag = 0;
 char outfile[256];
 
-void        usage(void);
-void        getopts(int *pac, char ***pav);
-int         convbdf(char *path);
+void usage(void);
+void getopts(int *pac, char ***pav);
+int convbdf(char *path);
 
-void        free_font(PMWCFONT pf);
-PMWCFONT    bdf_read_font(char *path);
-int         bdf_read_header(FILE *fp, PMWCFONT pf);
-int         bdf_read_bitmaps(FILE *fp, PMWCFONT pf);
-char *      bdf_getline(FILE *fp, char *buf, int len);
-MWIMAGEBITS bdf_hexval(unsigned char *buf, int ndx1, int ndx2);
+void free_font(struct font* pf);
+struct font* bdf_read_font(char *path);
+int bdf_read_header(FILE *fp, struct font* pf);
+int bdf_read_bitmaps(FILE *fp, struct font* pf);
+char * bdf_getline(FILE *fp, char *buf, int len);
+bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2);
 
-int         gen_c_source(PMWCFONT pf, char *path);
-int         gen_fnt_file(PMWCFONT pf, char *path);
+int gen_c_source(struct font* pf, char *path);
+int gen_fnt_file(struct font* pf, char *path);
 
 void
 usage(void)
@@ -96,8 +96,7 @@ usage(void)
 }
 
 /* parse command line options*/
-void
-getopts(int *pac, char ***pav)
+void getopts(int *pac, char ***pav)
 {
     char *p;
     char **av;
@@ -171,8 +170,7 @@ getopts(int *pac, char ***pav)
 }
 
 /* remove directory prefix and file suffix from full path*/
-char *
-basename(char *path)
+char *basename(char *path)
 {
     char *p, *b;
     static char base[256];
@@ -193,10 +191,9 @@ basename(char *path)
     return base;
 }
 
-int
-convbdf(char *path)
+int convbdf(char *path)
 {
-    PMWCFONT pf;
+    struct font* pf;
     int ret = 0;
 
     pf = bdf_read_font(path);
@@ -223,8 +220,7 @@ convbdf(char *path)
     return ret;
 }
 
-int
-main(int ac, char **av)
+int main(int ac, char **av)
 {
     int ret = 0;
 
@@ -251,8 +247,7 @@ main(int ac, char **av)
 }
 
 /* free font structure*/
-void
-free_font(PMWCFONT pf)
+void free_font(struct font* pf)
 {
     if (!pf)
         return;
@@ -270,11 +265,10 @@ free_font(PMWCFONT pf)
 }
 
 /* build incore structure from .bdf file*/
-PMWCFONT
-bdf_read_font(char *path)
+struct font* bdf_read_font(char *path)
 {
     FILE *fp;
-    PMWCFONT pf;
+    struct font* pf;
 
     fp = fopen(path, "rb");
     if (!fp) {
@@ -282,7 +276,7 @@ bdf_read_font(char *path)
         return NULL;
     }
     
-    pf = (PMWCFONT)calloc(1, sizeof(MWCFONT));
+    pf = (struct font*)calloc(1, sizeof(struct font));
     if (!pf)
         goto errout;
 	
@@ -308,8 +302,7 @@ bdf_read_font(char *path)
 }
 
 /* read bdf font header information, return 0 on error*/
-int
-bdf_read_header(FILE *fp, PMWCFONT pf)
+int bdf_read_header(FILE *fp, struct font* pf)
 {
     int encoding;
     int nchars, maxwidth;
@@ -391,7 +384,10 @@ bdf_read_header(FILE *fp, PMWCFONT pf)
                 fprintf(stderr, "Error: bad 'ENCODING'\n");
                 return 0;
             }
-            if (encoding >= 0 && encoding <= limit_char && encoding >= start_char) {
+            if (encoding >= 0 && 
+                encoding <= limit_char && 
+                encoding >= start_char) {
+
                 if (firstchar > encoding)
                     firstchar = encoding;
                 if (lastchar < encoding)
@@ -411,7 +407,9 @@ bdf_read_header(FILE *fp, PMWCFONT pf)
     pf->height = pf->ascent + pf->descent;
 
     /* calc default char*/
-    if (pf->defaultchar < 0 || pf->defaultchar < firstchar)
+    if (pf->defaultchar < 0 || 
+        pf->defaultchar < firstchar || 
+        pf->defaultchar > limit_char )
         pf->defaultchar = firstchar;
 
     /* calc font size (offset/width entries)*/
@@ -423,10 +421,10 @@ bdf_read_header(FILE *fp, PMWCFONT pf)
     maxwidth = pf->fbbw;
 
     /* initially use font maxwidth * height for bits allocation*/
-    pf->bits_size = nchars * MWIMAGE_WORDS(maxwidth) * pf->height;
+    pf->bits_size = nchars * BITMAP_WORDS(maxwidth) * pf->height;
 
     /* allocate bits, offset, and width arrays*/
-    pf->bits = (MWIMAGEBITS *)malloc(pf->bits_size * sizeof(MWIMAGEBITS) + EXTRA);
+    pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t) + EXTRA);
     pf->offset = (unsigned long *)malloc(pf->size * sizeof(unsigned long));
     pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
 	
@@ -439,8 +437,7 @@ bdf_read_header(FILE *fp, PMWCFONT pf)
 }
 
 /* read bdf font bitmaps, return 0 on error*/
-int
-bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
+int bdf_read_bitmaps(FILE *fp, struct font* pf)
 {
     long ofs = 0;
     int maxwidth = 0;
@@ -494,7 +491,7 @@ bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
             continue;
         }
         if (strequal(buf, "BITMAP")) {
-            MWIMAGEBITS *ch_bitmap = pf->bits + ofs;
+            bitmap_t *ch_bitmap = pf->bits + ofs;
             int ch_words;
 
             if (encoding < 0)
@@ -520,11 +517,11 @@ bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
             pf->width[encoding-pf->firstchar] = width;
 
             /* clear bitmap*/
-            memset(ch_bitmap, 0, MWIMAGE_BYTES(width) * pf->height);
+            memset(ch_bitmap, 0, BITMAP_BYTES(width) * pf->height);
 
-            ch_words = MWIMAGE_WORDS(width);
+            ch_words = BITMAP_WORDS(width);
 #define BM(row,col)	(*(ch_bitmap + ((row)*ch_words) + (col)))
-#define MWIMAGE_NIBBLES	(MWIMAGE_BITSPERIMAGE/4)
+#define BITMAP_NIBBLES	(BITMAP_BITSPERIMAGE/4)
 
             /* read bitmaps*/
             for (i=0; ; ++i) {
@@ -539,30 +536,30 @@ bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
 
                 hexnibbles = strlen(buf);
                 for (k=0; k<ch_words; ++k) {
-                    int ndx = k * MWIMAGE_NIBBLES;
+                    int ndx = k * BITMAP_NIBBLES;
                     int padnibbles = hexnibbles - ndx;
-                    MWIMAGEBITS value;
+                    bitmap_t value;
 					
                     if (padnibbles <= 0)
                         break;
-                    if (padnibbles >= MWIMAGE_NIBBLES)
+                    if (padnibbles >= BITMAP_NIBBLES)
                         padnibbles = 0;
 
                     value = bdf_hexval((unsigned char *)buf,
-                                       ndx, ndx+MWIMAGE_NIBBLES-1-padnibbles);
-                    value <<= padnibbles * MWIMAGE_NIBBLES;
+                                       ndx, ndx+BITMAP_NIBBLES-1-padnibbles);
+                    value <<= padnibbles * BITMAP_NIBBLES;
 
                     BM(pf->height - pf->descent - bby - bbh + i, k) |=
                         value >> bbx;
                     /* handle overflow into next image word*/
                     if (bbx) {
                         BM(pf->height - pf->descent - bby - bbh + i, k+1) =
-                            value << (MWIMAGE_BITSPERIMAGE - bbx);
+                            value << (BITMAP_BITSPERIMAGE - bbx);
                     }
                 }
             }
 
-            ofs += MWIMAGE_WORDS(width) * pf->height;
+            ofs += BITMAP_WORDS(width) * pf->height;
 
             continue;
         }
@@ -590,7 +587,7 @@ bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
             encodetable = 1;
             break;
         }
-        l += MWIMAGE_WORDS(pf->width[i]) * pf->height;
+        l += BITMAP_WORDS(pf->width[i]) * pf->height;
     }
     if (!encodetable) {
         free(pf->offset);
@@ -611,23 +608,25 @@ bdf_read_bitmaps(FILE *fp, PMWCFONT pf)
 
     /* reallocate bits array to actual bits used*/
     if (ofs < pf->bits_size) {
-        pf->bits = realloc(pf->bits, ofs * sizeof(MWIMAGEBITS));
+        pf->bits = realloc(pf->bits, ofs * sizeof(bitmap_t));
         pf->bits_size = ofs;
-    } else if (ofs > pf->bits_size) {
-        fprintf(stderr, "Warning: DWIDTH spec > max FONTBOUNDINGBOX\n");
-        if (ofs > pf->bits_size+EXTRA) {
-            fprintf(stderr, "Error: Not enough bits initially allocated\n");
-            return 0;
+    }
+    else {
+        if (ofs > pf->bits_size) {
+            fprintf(stderr, "Warning: DWIDTH spec > max FONTBOUNDINGBOX\n");
+            if (ofs > pf->bits_size+EXTRA) {
+                fprintf(stderr, "Error: Not enough bits initially allocated\n");
+                return 0;
+            }
+            pf->bits_size = ofs;
         }
-        pf->bits_size = ofs;
     }
 
     return 1;
 }
 
 /* read the next non-comment line, returns buf or NULL if EOF*/
-char *
-bdf_getline(FILE *fp, char *buf, int len)
+char *bdf_getline(FILE *fp, char *buf, int len)
 {
     int c;
     char *b;
@@ -653,36 +652,37 @@ bdf_getline(FILE *fp, char *buf, int len)
 }
 
 /* return hex value of portion of buffer*/
-MWIMAGEBITS
-bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
+bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
 {
-    MWIMAGEBITS val = 0;
+    bitmap_t val = 0;
     int i, c;
 
     for (i=ndx1; i<=ndx2; ++i) {
         c = buf[i];
         if (c >= '0' && c <= '9')
             c -= '0';
-        else if (c >= 'A' && c <= 'F')
-            c = c - 'A' + 10;
-        else if (c >= 'a' && c <= 'f')
-            c = c - 'a' + 10;
-        else c = 0;
+        else 
+            if (c >= 'A' && c <= 'F')
+                c = c - 'A' + 10;
+            else 
+                if (c >= 'a' && c <= 'f')
+                    c = c - 'a' + 10;
+                else 
+                    c = 0;
         val = (val << 4) | c;
     }
     return val;
 }
 
 /* generate C source from in-core font*/
-int
-gen_c_source(PMWCFONT pf, char *path)
+int gen_c_source(struct font* pf, char *path)
 {
     FILE *ofp;
     int i;
     int did_defaultchar = 0;
     int did_syncmsg = 0;
     time_t t = time(0);
-    MWIMAGEBITS *ofs = pf->bits;
+    bitmap_t *ofs = pf->bits;
     char buf[256];
     char obuf[256];
     char hdr1[] = {
@@ -704,7 +704,7 @@ gen_c_source(PMWCFONT pf, char *path)
         "*/\n"
         "\n"
         "/* Font character bitmap data. */\n"
-        "static MWIMAGEBITS _%s_bits[] = {\n"
+        "static bitmap_t _font_bits[] = {\n"
     };
 
     ofp = fopen(path, "w");
@@ -712,7 +712,6 @@ gen_c_source(PMWCFONT pf, char *path)
         fprintf(stderr, "Can't create %s\n", path);
         return 1;
     }
-    fprintf(stderr, "Generating %s\n", path);
 
     strcpy(buf, ctime(&t));
     buf[strlen(buf)-1] = 0;
@@ -727,8 +726,7 @@ gen_c_source(PMWCFONT pf, char *path)
             pf->firstchar+pf->size-1, pf->firstchar+pf->size-1,
             pf->defaultchar, pf->defaultchar,
             pf->width? "yes": "no",
-            pf->copyright? pf->copyright: "",
-            pf->name);
+            pf->copyright? pf->copyright: "");
 
     /* generate bitmaps*/
     for (i=0; i<pf->size; ++i) {
@@ -736,15 +734,16 @@ gen_c_source(PMWCFONT pf, char *path)
         int bitcount = 0;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
         int height = pf->height;
-        MWIMAGEBITS *bits = pf->bits + (pf->offset? pf->offset[i]: (height * i));
-        MWIMAGEBITS bitvalue;
+        bitmap_t *bits = pf->bits + (pf->offset? pf->offset[i]: (height * i));
+        bitmap_t bitvalue;
 
         /*
          * Generate bitmap bits only if not this index isn't
          * the default character in encode map, or the default
          * character hasn't been generated yet.
          */
-        if (pf->offset && (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
+        if (pf->offset && 
+            (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
             if (did_defaultchar)
                 continue;
             did_defaultchar = 1;
@@ -763,13 +762,13 @@ gen_c_source(PMWCFONT pf, char *path)
                 if (x == 0) fprintf(ofp, "   |");
 
                 if (bitcount <= 0) {
-                    bitcount = MWIMAGE_BITSPERIMAGE;
+                    bitcount = BITMAP_BITSPERIMAGE;
                     bitvalue = *bits++;
                 }
 
-                fprintf(ofp, MWIMAGE_TESTBIT(bitvalue)? "*": " ");
+                fprintf(ofp, BITMAP_TESTBIT(bitvalue)? "*": " ");
 
-                bitvalue = MWIMAGE_SHIFTBIT(bitvalue);
+                bitvalue = BITMAP_SHIFTBIT(bitvalue);
                 --bitcount;
                 if (++x == width) {
                     fprintf(ofp, "|\n");
@@ -779,13 +778,15 @@ gen_c_source(PMWCFONT pf, char *path)
                 }
             }
             fprintf(ofp, "   +");
-            for (x=0; x<width; ++x) fprintf(ofp, "-");
+            for (x=0; x<width; ++x)
+                fprintf(ofp, "-");
             fprintf(ofp, "+ */\n");
-        } else
+        }
+        else
             fprintf(ofp, " */\n");
 
         bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
-        for (x=MWIMAGE_WORDS(width)*pf->height; x>0; --x) {
+        for (x=BITMAP_WORDS(width)*pf->height; x>0; --x) {
             fprintf(ofp, "0x%04x,\n", *bits);
             if (!did_syncmsg && *bits++ != *ofs++) {
                 fprintf(stderr, "Warning: found encoding values in non-sorted order (not an error).\n");
@@ -793,80 +794,79 @@ gen_c_source(PMWCFONT pf, char *path)
             }
         }	
     }
-    fprintf(ofp, 	"};\n\n");
+    fprintf(ofp, "};\n\n");
 
     if (pf->offset) {
         /* output offset table*/
         fprintf(ofp, "/* Character->glyph mapping. */\n"
-                "static unsigned long _%s_offset[] = {\n",
-                pf->name);
+                "static unsigned long _sysfont_offset[] = {\n");
 
         for (i=0; i<pf->size; ++i)
-            fprintf(ofp, "  %ld,\t/* (0x%02x) */\n", pf->offset[i], i+pf->firstchar);
+            fprintf(ofp, "  %ld,\t/* (0x%02x) */\n", 
+                    pf->offset[i], i+pf->firstchar);
         fprintf(ofp, "};\n\n");
     }
 
     /* output width table for proportional fonts*/
     if (pf->width) {
-        fprintf(ofp, 	"/* Character width data. */\n"
-                "static unsigned char _%s_width[] = {\n",
-                pf->name);
+        fprintf(ofp, "/* Character width data. */\n"
+                "static unsigned char _sysfont_width[] = {\n");
 
         for (i=0; i<pf->size; ++i)
-            fprintf(ofp, "  %d,\t/* (0x%02x) */\n", pf->width[i], i+pf->firstchar);
+            fprintf(ofp, "  %d,\t/* (0x%02x) */\n", 
+                    pf->width[i], i+pf->firstchar);
         fprintf(ofp, "};\n\n");
     }
 
-    /* output MWCFONT struct*/
+    /* output struct font struct*/
     if (pf->offset)
-        sprintf(obuf, "_%s_offset,", pf->name);
-    else sprintf(obuf, "0,  /* no encode table*/");
+        sprintf(obuf, "_sysfont_offset,");
+    else
+        sprintf(obuf, "0,  /* no encode table*/");
+
     if (pf->width)
-        sprintf(buf, "_%s_width,", pf->name);
-    else sprintf(buf, "0,  /* fixed width*/");
+        sprintf(buf, "_sysfont_width,");
+    else
+        sprintf(buf, "0,  /* fixed width*/");
+
     fprintf(ofp, 	"/* Exported structure definition. */\n"
-            "MWCFONT font_%s = {\n"
+            "struct font sysfont = {\n"
             "  \"%s\",\n"
             "  %d,\n"
             "  %d,\n"
             "  %d,\n"
             "  %d,\n"
             "  %d,\n"
-            "  _%s_bits,\n"
+            "  _font_bits,\n"
             "  %s\n"
             "  %s\n"
             "  %d,\n"
-            "  sizeof(_%s_bits)/sizeof(MWIMAGEBITS),\n"
+            "  sizeof(_font_bits)/sizeof(bitmap_t),\n"
             "};\n",
-            pf->name, pf->name,
+            pf->name,
             pf->maxwidth, pf->height,
             pf->ascent,
             pf->firstchar,
             pf->size,
-            pf->name,
             obuf,
             buf,
-            pf->defaultchar,
-            pf->name);
+            pf->defaultchar);
 
     return 0;
 }
 
-static int
-WRITEBYTE(FILE *fp, unsigned char c)
+static int writebyte(FILE *fp, unsigned char c)
 {
     return putc(c, fp) != EOF;
 }
 
-static int
-WRITESHORT(FILE *fp, unsigned short s)
+static int writeshort(FILE *fp, unsigned short s)
 {
     putc(s, fp);
     return putc(s>>8, fp) != EOF;
 }
 
-static int
-WRITELONG(FILE *fp, unsigned long l)
+static int writelong(FILE *fp, unsigned long l)
 {
     putc(l, fp);
     putc(l>>8, fp);
@@ -874,30 +874,28 @@ WRITELONG(FILE *fp, unsigned long l)
     return putc(l>>24, fp) != EOF;
 }
 
-static int
-WRITESTR(FILE *fp, char *str, int count)
+static int writestr(FILE *fp, char *str, int count)
 {
     return fwrite(str, 1, count, fp) == count;
 }
 
-static int
-WRITESTRPAD(FILE *fp, char *str, int totlen)
+static int writestrpad(FILE *fp, char *str, int totlen)
 {
     int ret;
 	
-    while (str && *str && totlen > 0)
+    while (str && *str && totlen > 0) {
         if (*str) {
             ret = putc(*str++, fp);
             --totlen;
         }
+    }
     while (--totlen >= 0)
         ret = putc(' ', fp);
     return ret;
 }
 
 /* generate .fnt format file from in-core font*/
-int
-gen_fnt_file(PMWCFONT pf, char *path)
+int gen_fnt_file(struct font* pf, char *path)
 {
     FILE *ofp;
     int i;
@@ -907,44 +905,43 @@ gen_fnt_file(PMWCFONT pf, char *path)
         fprintf(stderr, "Can't create %s\n", path);
         return 1;
     }
-    fprintf(stderr, "Generating %s\n", path);
 
     /* write magic and version #*/
-    WRITESTR(ofp, VERSION, 4);
+    writestr(ofp, VERSION, 4);
 
     /* internal font name*/
-    WRITESTRPAD(ofp, pf->name, 64);
+    writestrpad(ofp, pf->name, 64);
 
     /* copyright*/
-    WRITESTRPAD(ofp, pf->copyright, 256);
+    writestrpad(ofp, pf->copyright, 256);
 
     /* font info*/
-    WRITESHORT(ofp, pf->maxwidth);
-    WRITESHORT(ofp, pf->height);
-    WRITESHORT(ofp, pf->ascent);
-    WRITESHORT(ofp, 0);
-    WRITELONG(ofp, pf->firstchar);
-    WRITELONG(ofp, pf->defaultchar);
-    WRITELONG(ofp, pf->size);
+    writeshort(ofp, pf->maxwidth);
+    writeshort(ofp, pf->height);
+    writeshort(ofp, pf->ascent);
+    writeshort(ofp, 0);
+    writelong(ofp, pf->firstchar);
+    writelong(ofp, pf->defaultchar);
+    writelong(ofp, pf->size);
 
     /* variable font data sizes*/
-    WRITELONG(ofp, pf->bits_size);		  /* # words of MWIMAGEBITS*/
-    WRITELONG(ofp, pf->offset? pf->size: 0);  /* # longs of offset*/
-    WRITELONG(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
+    writelong(ofp, pf->bits_size);		  /* # words of bitmap_t*/
+    writelong(ofp, pf->offset? pf->size: 0);  /* # longs of offset*/
+    writelong(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
 
     /* variable font data*/
     for (i=0; i<pf->bits_size; ++i)
-        WRITESHORT(ofp, pf->bits[i]);
+        writeshort(ofp, pf->bits[i]);
     if (ftell(ofp) & 2)
-        WRITESHORT(ofp, 0);		/* pad to 32-bit boundary*/
+        writeshort(ofp, 0);		/* pad to 32-bit boundary*/
 
     if (pf->offset)
         for (i=0; i<pf->size; ++i)
-            WRITELONG(ofp, pf->offset[i]);
+            writelong(ofp, pf->offset[i]);
 
     if (pf->width)
         for (i=0; i<pf->size; ++i)
-            WRITEBYTE(ofp, pf->width[i]);
+            writebyte(ofp, pf->width[i]);
 
     fclose(ofp);
     return 0;

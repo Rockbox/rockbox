@@ -63,7 +63,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 
 FIRMSRCS = lcd.c power.c sprintf.c id3.c usb.c		\
-        mpeg.c powermgmt.c font.c loadfont.c X5x8.c
+        mpeg.c powermgmt.c font.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c \
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c
@@ -187,11 +187,9 @@ $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
 $(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/loadfont.o: $(FIRMWAREDIR)/loadfont.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
+	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 $(OBJDIR)/status.o: $(APPDIR)/status.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
