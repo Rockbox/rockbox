@@ -12,7 +12,7 @@ A3. The purpose of this project is to write an Open Source replacement
 
 Q4. I want to write code for my Archos, how do I proceed?
 A4. First make sure to read the file CONTRIBUTING in the docs directory
-    on Sourceforge.  See http://rockbox.haxx.se/docs/CONTRIBUTING
+    on Sourceforge.  See http://rockbox.haxx.se/docs/contributing.html
     if you do not want to have to wade through the CVS directories.
 
 Q5: Whats CVS?
@@ -133,10 +133,10 @@ A18. Pessimist's Answer: At the current time we belive this is not very likely
 
 
 Q19. What about supporting playing of WMA files?
-A19. Dear Mr. Gates, you have two options.  Re-read question #17, or go buy 
+A19. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
      your own project.
 
-Q20. When do you think there will be a version available for my Archos?
+Q20. What is the most recent version of Rockbox?
 A20. We recently released version 1.2, so head on over to 
      http://rockbox.haxx.se/download.html and pull it down.
      Make sure to read the release notes.
@@ -290,8 +290,4 @@ A38: It is very good if you want information about the current item playing ;)
      your Archos Player.  Currently this feature has not yet been added to the
      Recorder version of Rockbox.  Please see 
      http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
-
-
-
-
 
