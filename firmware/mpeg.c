@@ -21,7 +21,6 @@
 #include "i2c.h"
 #include "mas.h"
 #include "dac.h"
-#include "sh7034.h"
 #include "system.h"
 #include "debug.h"
 #include "kernel.h"
@@ -612,6 +611,7 @@ void mpeg_treble(int percent)
 void mpeg_init(void)
 {
 #ifdef ARCHOS_RECORDER
+    int rc;
     unsigned long val;
 #endif
 
@@ -619,15 +619,16 @@ void mpeg_init(void)
     i2c_init();
 
 #ifdef ARCHOS_RECORDER
-    /* Reset the MAS */
-    PAIOR |= 0x100;
-    PADR &= ~0x100;
-    sleep(HZ/100);
-    PADR |= 0x100;
-    sleep(HZ/10);
-
+    mas_reset();
+    
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
-    mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    if(rc < 0)
+        panicf("mas_ctrl_w: %d", rc);
+
+    rc = mas_direct_config_read(MAS_CONTROL);
+    if(rc < 0)
+        panicf("mas_ctrl_r: %d", rc);
 
     /* Max volume on both ears */
     val = 0x80000;
