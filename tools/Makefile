@@ -8,13 +8,15 @@
 #
 CFLAGS := -O -ansi
 
-TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
+TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin mkneofile
 
 all: $(TARGETS)
 
 scramble: scramble.c
 
 descramble: descramble.c
+
+mkneofile: mkneofile.c
 
 sh2d: sh2d.c
 
