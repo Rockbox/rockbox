@@ -464,9 +464,11 @@ int get_mp3file_info(int fd, struct mp3info *info)
         
         /* Now get the next frame to find out the real info about
            the mp3 stream */
-        header = find_next_frame(fd, &bytecount, 0x20000, 0);
+        header = find_next_frame(fd, &tmp, 0x20000, 0);
         if(header == 0)
             return -6;
+
+        bytecount += tmp;
         
         if(!mp3headerinfo(info, header))
             return -7;
