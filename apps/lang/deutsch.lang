@@ -1,12 +1,25 @@
+# $Id$
+#
+# This is the master of the language files. This is the original, the one with
+# all the existing strings Rockbox features.
+#
+# *WARNING*
+#
+# If you want to add a new string, add it to the end of this file!
+# If you want to remove a string, just blank it, don't actually remove it!
+#
+# If you re-order things or remove entries, you must bump the binary language
+# file version number in both the 'binlang' tool and the language loader code.
+#
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Klang Einstellungen"
+new: "Klangeinstellugen"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Allgemeine Einstellungen"
+new: "Grundeinstellungen"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -31,7 +44,7 @@ new: "Version"
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (keep out!)"
-new: "Debug (Hände weg!)"
+new: "Entwicklerbereich"
 
 id: LANG_USB
 desc: in the main menu
@@ -76,7 +89,7 @@ new: "Bounce"
 id: LANG_SNOW
 desc: in the demos menu
 eng: "Snow"
-new: "Schnee"
+new: "Snow"
 
 id: LANG_TETRIS
 desc: in the games menu
@@ -106,17 +119,17 @@ new: "Lade..."
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-new: "Zufallswiedergabe.."
+new: "Mische..."
 
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
-new: "Wiedergabe.."
+new: "Wiedergeben.."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-new: "Playliste"
+new: "Spielliste"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -131,17 +144,17 @@ new: "%d Dateien"
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Fehler b. Speichern"
+new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-new: "Batt. schwach?
+new: "Batt. schwach?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Fehler b. Speichern"
+new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -156,7 +169,7 @@ new: "ON = speichern"
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "OFF = verwerfen"
+new: "OFF = abbrechen"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -181,7 +194,7 @@ new: "Kontrast"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Zufall"
+new: "Zufallwiedergabe"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -201,7 +214,7 @@ new: "Sortieren Groß-/Kleinschreibung"
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-new: "Resume"
+new: "Fortsetzen"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -211,12 +224,12 @@ new: "Aus"
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "ask"
-new: "fragen"
+new: "nachfragen"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-new: "Ein"
+new: "an"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -229,42 +242,42 @@ desc: in settings_menu,
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Scrollgeschwindigkeit Beispiel"
+new: "Beispiel Scrollgeschwindigkeit"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
 eng: "Deep discharge"
-new: "Tiefes Entladen"
+new: "Vollständiges Entladen"
 
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-new: "Zeit/Datum einstellen"
+new: "Zeit/Datum setzen"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "HDD Ausschaltzeit"
+new: "Stromsparmodus HDD"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "FF/RW min. Schritt"
+new: "FF/RR min. Schritt"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "FF/RW Beschl."
+new: "FF/RW Beschleunigung"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Folge Playliste"
+new: "Spielreihenfolge einhalten"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
-eng: "Really?"
-new: "Sicher?"
+eng: "Sicher?"
+new:
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
@@ -276,6 +289,7 @@ desc: confirm to reset settings
 eng: "Are you sure?"
 new: "Sind Sie sicher?"
 
+
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
 eng: "Play = Yes"
@@ -284,7 +298,7 @@ new: "Play = Ja"
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "Any Other = No"
-new: "Andere = Nein"
+new: "Sonstige = Nein"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -299,22 +313,22 @@ new: "Gelöscht"
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
-new: "Abbruch"
+new: "Abgebrochen"
 
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Art der Sort."
+new: "Sortiermodus"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-new: "Scrollgeschw."
+new: "Scrollgeschwindigkeit"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset settings"
-new: "Einstell. zuruecksetzen"
+new: "Einstell. zurücksetzen"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -324,7 +338,7 @@ new: "Wiedergabe"
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "Datei Ansicht"
+new: "Dateiansicht"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -349,7 +363,7 @@ new: "Balance"
 id: LANG_BASS
 desc: in sound_settings
 eng: "Bass"
-new: "Bass"
+new: "Tiefen"
 
 id: LANG_TREBLE
 desc: in sound_settings
@@ -359,17 +373,17 @@ new: "Höhen"
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Loudness"
+new: "Verstärkung"
 
 id: LANG_BBOOST
 desc: in sound settings
 eng: "Bass Boost"
-new: "Bass Boost"
+new: "Tiefenverstärkung"
 
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV decay time"
-new: "AL Trägheit"
+new: "AV Trägheit"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -379,7 +393,7 @@ new: "Kanäle"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel configuration"
-new: "Kanal-Konfiguration"
+new: "Kanalkonfiguration"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -394,12 +408,12 @@ new: "Mono"
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-new: "Mono Links"
+new: "Mono links"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-new: "Mono Rechts"
+new: "Mono rechts"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -409,7 +423,7 @@ new: "Autom. Lautstärke"
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-new: "Ordner Puffer"
+new: "Verzeichnispuffer"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -419,22 +433,22 @@ new: "ist voll!"
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
 eng: "Resume?"
-new: "Wiederaufnahme?"
+new: "Fortsetzen"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: posible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(Wiedergabe/Stop)"
+new: "(Wiederg./Stop)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
 eng: "Play = Yes"
-new: "Play = Ja"
+new: "Wiederg. = JA"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
 eng: "Any Other = No"
-new: "Andere = Nein"
+new: "Sonstige = NEIN"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -454,7 +468,7 @@ new: "Tastensperre ist AN"
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Tastensperre ist AUS"
+new: "Tastensperre ist aus"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
@@ -469,12 +483,12 @@ new: "Stumm AUS"
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Stumm ist AN"
+new: "Stummschaltung ist AN"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Stumm ist AUS"
+new: "Stummschaltung ist AUS"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
@@ -484,17 +498,17 @@ new: "-ID3 Info-"
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-new: "--Schirm-- "
+new: "-Anzeige--"
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-new: "[Titel]
+new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<no title>"
-new: "<kein Titel>"
+new: "<unbekannt>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -504,7 +518,7 @@ new: "[Künstler]"
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<no artist>"
-new: "<kein Künstler>"
+new: "<unbekannt>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -514,17 +528,17 @@ new: "[Album]"
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
 eng: "<no album>"
-new: "<kein Album>"
+new: "<unbekannt>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[Liednr]"
+new: "[Song Nr.]
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<no tracknum>"
-new: "<keine Liednr>"
+new: "<unbekannt>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -534,7 +548,7 @@ new: "[Länge]"
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-new: "[Playliste]"
+new: "[Spielliste]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -549,7 +563,7 @@ new: "[Frequenz]"
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[PATH]"
-new: "[PFAD]"
+new: "[PFAD]" 
 
 id: LANG_PITCH_UP
 desc: in wps
@@ -574,7 +588,7 @@ new: "Modus:"
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
 eng: "Dir filter: %s"
-new: "Ordner Filter: %s"
+new: "Verzeichnisf.: %s"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -594,7 +608,7 @@ new: "Leiste"
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End of list"
-new: "Ende der Liste"
+new: "Listenende"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
@@ -604,7 +618,7 @@ new: "<Drücke ON>"
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "<End of song list>"
-new: "<Ende der Liederliste>"
+new: "<Listenende>"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -614,7 +628,7 @@ new: "Drücke ON"
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score :"
-new: "Dein Resultat :"
+new: "Ihre Punktzahl :"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
@@ -624,7 +638,7 @@ new: "High Score: %d"
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "Neuer High Score!"
+new: "Neuer Highscore!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
@@ -634,12 +648,12 @@ new: "Spiel pausiert"
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[Play] to resume"
-new: "[Play] = fortfahren"
+new: "[Wiederg.] um fortzusetzen"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[Off] to quit"
-new: "[Off] = beenden"
+new: "[Off] zum Beenden"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -649,12 +663,12 @@ new: "Level - %d"
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - slow, 9 - fast)"
-new: "(1 - langsam, 9 - schnell)
+new: "(1 - langsam, 9 - schnell)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
-new: "[Play] für Start/Pause"
+new: "[Wiederg.] Start/Pause"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
@@ -669,12 +683,12 @@ new: "Bewg."
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-new: "Gewonnen!!"
+new: "GEWONNEN!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[Off] to stop"
-new: "[Off] = stoppen"
+new: "[Off] beenden"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -684,7 +698,7 @@ new: "[F1] - Level"
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: "[F2] same level"
-new: "[F2] gleiches Level"
+new: "[F2] gl. Level"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
@@ -704,7 +718,7 @@ new: "Län:%d"
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
 eng: "Growing"
-new: "Wachsen"
+new: "Wachse"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
@@ -724,7 +738,7 @@ new: "Argh"
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
 eng: "Crashed"
-new: "Crash!"
+new: "Unfall!"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
@@ -738,7 +752,7 @@ new: "Hs: %d"
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
-new: "%d Spieler    up/dn"
+new: "%d Spieler    ho/ru"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
@@ -758,12 +772,12 @@ new: "Keine Fernst.   F1"
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-new: "2 Key Kontrolle F1"
+new: "2 Tastenkontr.  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: "4 key control   F1"
-new: "4 Key Kontrolle F1"
+new: "4 Tastenkontr.  F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
@@ -781,4 +795,14 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new: "0 Reih - Level 0"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new:
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new:
 
