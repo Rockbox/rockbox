@@ -1140,10 +1140,6 @@ FLAC__bool read_metadata_seektable_(FLAC__StreamDecoder *decoder, FLAC__bool is_
 	decoder->private_->seek_table.data.seek_table.num_points = length / FLAC__STREAM_METADATA_SEEKPOINT_LENGTH;
 
 	/* use realloc since we may pass through here several times (e.g. after seeking) */
-	if(0 == (decoder->private_->seek_table.data.seek_table.points = (FLAC__StreamMetadata_SeekPoint*)realloc(decoder->private_->seek_table.data.seek_table.points, decoder->private_->seek_table.data.seek_table.num_points * sizeof(FLAC__StreamMetadata_SeekPoint)))) {
-		decoder->protected_->state = FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
-		return false;
-	}
 	for(i = 0; i < decoder->private_->seek_table.data.seek_table.num_points; i++) {
 		if(!FLAC__bitbuffer_read_raw_uint64(decoder->private_->input, &xx, FLAC__STREAM_METADATA_SEEKPOINT_SAMPLE_NUMBER_LEN, read_callback_, decoder))
 			return false; /* the read_callback_ sets the state for us */
