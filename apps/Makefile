@@ -43,6 +43,8 @@ MAXOUTFILE = $(OBJDIR)/romstart
 ifdef SIMVER
 # this is a sim build
 all: $(OBJDIR)/$(BINARY) $(CODECS) $(ROCKS)
+	@$(MAKE) -C $(SIMDIR)
+	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
 else
 # regular target build
 all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
@@ -101,12 +103,22 @@ $(OBJDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
 
 else
 # this is a simulator build
-$(OBJDIR)/$(BINARY) : $(OBJS) $(OBJDIR)/librockbox.a $(DEPFILE) $(OBJDIR)/libsim.a
+
+ifeq ($(SIMVER), win32)
+# OK, this is ugly but we need it on the link line to make it do right
+EXTRAOBJ = $(OBJDIR)/uisw32-res.o
+endif
+
+
+$(OBJDIR)/$(BINARY) : $(OBJS) $(OBJDIR)/librockbox.a $(DEPFILE) $(OBJDIR)/libsim.a $(OBJDIR)/libcomsim.a
 	@echo "LD $(BINARY)"
-	$(CC) $(GCCOPTS) -o $@ $(OBJS) $(LDOPTS) -L$(OBJDIR) -lrockbox -lsim -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lsim -lcomsim $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/libsim.a:
 	@$(MAKE) -C $(SIMDIR)
+
+$(OBJDIR)/libcomsim.a:
+	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
 endif
 
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin

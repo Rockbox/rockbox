@@ -23,7 +23,7 @@ RM = rm -f
 DEBUG = -g
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
+INCLUDES = -I. -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR) -I$(ROOTDIR)/uisimulator/$(SIMVER)
 
 SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
  $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
@@ -38,7 +38,7 @@ DIRS = .
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
 
-OUTFILE = $(OBJDIR)/libsim.a
+OUTFILE = $(OBJDIR)/libcomsim.a
 
 all: $(OUTFILE)
 
@@ -46,7 +46,7 @@ include $(TOOLSDIR)/make.inc
 
 clean:
 	@echo "cleaning commonsim"
-	@$(RM) $(OBJS) *~ core $(DEPFILE)
+	@$(RM) $(OBJS) *~ core $(DEPFILE) $(OUTFILE)
 
 $(OUTFILE): $(OBJS)
 	@echo "AR+RANLIB $@"

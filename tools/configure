@@ -48,19 +48,29 @@ simcc () {
  # default tool setup for native building
  prefixtools ""
 
- GCCOPTS='-W -Wall -g -fno-builtin -I$(ROOTDIR)/uisimulator/common -I$(ROOTDIR)/uisimulator/$(SIMVER)'
+ GCCOPTS='-W -Wall -g -fno-builtin'
 
  output="rockboxui" # use this as default output binary name
 
  case $uname in
    CYGWIN*)
    echo "Cygwin host detected"
-   LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
+
+   if [ "$simver" = "win32" ]; then
+       # win32 version
+       GCCOPTS="$GCCOPTS -mno-cygwin -DNOCYGWIN"
+       LDOPTS="-lgdi32 -luser32 -mno-cygwin"
+   else
+       # x11 version
+       GCCOPTS="$GCCOPTS -DNOCYGWIN"
+       LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
+   fi
    output="rockboxui.exe" # use this as output binary name
    ;;
 
    Linux)
    echo "Linux host detected"
+   GCCOPTS="$GCCOPTS"
    LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
    if [ "$simver" = "win32" ]; then
      crosswincc # setup cross-compiler

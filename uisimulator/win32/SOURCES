@@ -1,6 +1,8 @@
 button.c
 debug-win32.c
+#if 0 /* this is only for non-cygwin simulator builds */
 dir-win32.c
+#endif
 kernel.c
 lcd-win32.c
 mpeg-win32.c

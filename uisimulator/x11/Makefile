@@ -43,8 +43,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
 OUTFILE = $(OBJDIR)/libsim.a
 
 all: $(OUTFILE)
-	@echo "MAKE in common sim"
-	$(MAKE) -C $(SIMCOMMON)
+	@$(MAKE) -C $(SIMCOMMON)
 
 include $(TOOLSDIR)/make.inc
 

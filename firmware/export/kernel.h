@@ -65,6 +65,10 @@ struct mutex
 /* global tick variable */
 extern long current_tick;
 
+#ifdef SIMULATOR
+#define sleep(x) sim_sleep(x)
+#endif
+
 /* kernel functions */
 extern void kernel_init(void);
 extern void yield(void);

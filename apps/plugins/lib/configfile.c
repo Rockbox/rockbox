@@ -38,24 +38,24 @@ int configfile_save(const char *filename, struct configdata *cfg,
     if(fd < 0)
         return fd*10 - 1;
 
-    cfg_rb->fprintf(fd, "file version: %d\n", version);
+    cfg_rb->fdprintf(fd, "file version: %d\n", version);
     
     for(i = 0;i < num_items;i++) {
         switch(cfg[i].type) {
             case TYPE_INT:
-                cfg_rb->fprintf(fd, "%s: %d\n",
+                cfg_rb->fdprintf(fd, "%s: %d\n",
                                 cfg[i].name,
                                 *cfg[i].val);
                 break;
 
             case TYPE_ENUM:
-                cfg_rb->fprintf(fd, "%s: %s\n",
+                cfg_rb->fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
                                 cfg[i].values[*cfg[i].val]);
                 break;
                 
             case TYPE_STRING:
-                cfg_rb->fprintf(fd, "%s: %s\n",
+                cfg_rb->fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
                                 cfg[i].string);
                 break;

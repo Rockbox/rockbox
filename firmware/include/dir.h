@@ -30,6 +30,16 @@
 #define ATTR_ARCHIVE     0x20
 #define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
 
+#ifdef SIMULATOR
+#define dirent sim_dirent
+#define DIR SIM_DIR
+#define opendir(x) sim_opendir(x)
+#define readdir(x) sim_readdir(x)
+#define closedir(x) sim_closedir(x)
+#define mkdir(x, y) sim_mkdir(x, y)
+#define rmdir(x) sim_rmdir(x)
+#endif
+
 #ifndef DIRENT_DEFINED
 
 struct dirent {
@@ -42,12 +52,10 @@ struct dirent {
 };
 #endif
 
-
-#ifndef SIMULATOR
-
 #include "fat.h"
 
 typedef struct {
+#ifndef SIMULATOR
     bool busy;
     int startcluster;
     struct fat_dir fatdir;
@@ -56,24 +64,12 @@ typedef struct {
 #ifdef HAVE_MULTIVOLUME
     int volumecounter; /* running counter for faked volume entries */
 #endif
+#else
+    /* simulator: */
+    void *dir; /* actually a DIR* dir */
+    char *name;
+#endif
 } DIR;
-
-#else /* SIMULATOR */
-
-#ifdef WIN32
-#ifndef __MINGW32__
-#include <io.h>
-#endif /* __MINGW32__ */
-
-typedef struct DIRtag
-{
-    struct dirent   fd;
-    int             handle;
-} DIR;
-
-#endif /* WIN32 */
-
-#endif /* SIMULATOR */
 
 #ifndef DIRFUNCTIONS_DEFINED
 

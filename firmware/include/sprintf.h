@@ -33,7 +33,7 @@ int snprintf (char *buf, size_t size, const char *fmt, ...)
     ATTRIBUTE_PRINTF(3, 4);
 
 int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-int fprintf (int fd, const char *fmt, ...)
+int fdprintf (int fd, const char *fmt, ...)
     ATTRIBUTE_PRINTF(2, 3);
 
 #endif /* __SPRINTF_H__ */

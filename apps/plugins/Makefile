@@ -71,7 +71,13 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
 	@echo "DLL $@"
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
+ifeq ($(UNAME),CYGWIN)
+# 'x' must be kept or you'll have "Win32 error 5"
+#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
+#         #define ERROR_ACCESS_DENIED 5L
+else
 	@chmod -x $@
+endif
 endif # end of win32-simulator
 
 endif # end of simulator section

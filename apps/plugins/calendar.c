@@ -325,13 +325,13 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         }
         if (new_mod)
         {
-            rb->fprintf(fq, "%02d%02d%04d%01d%01d%s\n",
-                        memos[changed].day,
-                        memos[changed].month,
-                        memos[changed].year,
-                        memos[changed].wday,
-                        memos[changed].type,
-                        memos[changed].message);
+            rb->fdprintf(fq, "%02d%02d%04d%01d%01d%s\n",
+                         memos[changed].day,
+                         memos[changed].month,
+                         memos[changed].year,
+                         memos[changed].wday,
+                         memos[changed].type,
+                         memos[changed].message);
         }
         rb->lseek(fp, memos[changed].file_pointer_end, SEEK_SET);
         for (i = memos[changed].file_pointer_end;

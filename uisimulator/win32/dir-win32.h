@@ -20,7 +20,6 @@
 #define _DIR_WIN32_H_
 
 #include <stdbool.h>
-#include "file.h"
 
 struct dirent {
     unsigned char d_name[MAX_PATH];

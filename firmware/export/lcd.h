@@ -27,6 +27,10 @@
 #define STYLE_DEFAULT 0
 #define STYLE_INVERT  1
 
+#ifdef SIMULATOR
+#define lcd_icon(x,y) sim_lcd_icon(x,y)
+#endif
+
 /* common functions */
 extern void lcd_init(void);
 extern void lcd_clear_display(void);
@@ -59,10 +63,6 @@ extern void lcd_update_rect(int x, int y, int width, int height);
 #else
   #define lcd_update()
   #define lcd_update_rect(x,y,w,h)
-#endif
-
-#if defined(SIMULATOR)
-#include "sim_icons.h"
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS

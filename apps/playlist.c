@@ -231,7 +231,7 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
 
     if (playlist->control_fd >= 0)
     {
-        if (fprintf(playlist->control_fd, "P:%d:%s:%s\n",
+        if (fdprintf(playlist->control_fd, "P:%d:%s:%s\n",
             PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
             fsync(playlist->control_fd);
         else
@@ -279,7 +279,7 @@ static int check_control(struct playlist_info* playlist)
 
             playlist->filename[playlist->dirlen-1] = '\0';
 
-            if (fprintf(playlist->control_fd, "P:%d:%s:%s\n",
+            if (fdprintf(playlist->control_fd, "P:%d:%s:%s\n",
                 PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
                 fsync(playlist->control_fd);
             else
@@ -499,13 +499,13 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
         if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
-            if (fprintf(playlist->control_fd, "%c:%d:%d:", (queue?'Q':'A'),
+            if (fdprintf(playlist->control_fd, "%c:%d:%d:", (queue?'Q':'A'),
                     position, playlist->last_insert_pos) > 0)
             {
                 /* save the position in file where track name is written */
                 seek_pos = lseek(playlist->control_fd, 0, SEEK_CUR);
 
-                if (fprintf(playlist->control_fd, "%s\n", filename) > 0)
+                if (fdprintf(playlist->control_fd, "%s\n", filename) > 0)
                     result = 0;
             }
         }
@@ -697,7 +697,7 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
 
         if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
-            if (fprintf(playlist->control_fd, "D:%d\n", position) > 0)
+            if (fdprintf(playlist->control_fd, "D:%d\n", position) > 0)
             {
                 fsync(playlist->control_fd);
                 result = 0;
@@ -1098,10 +1098,10 @@ static int flush_pending_control(struct playlist_info* playlist)
         if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
             if (global_settings.resume_seed == 0)
-                result = fprintf(playlist->control_fd, "U:%d\n",
+                result = fdprintf(playlist->control_fd, "U:%d\n",
                     playlist->first_index);
             else
-                result = fprintf(playlist->control_fd, "S:%d:%d\n",
+                result = fdprintf(playlist->control_fd, "S:%d:%d\n",
                     global_settings.resume_seed, playlist->first_index);
 
             if (result > 0)
@@ -1737,7 +1737,7 @@ int playlist_next(int steps)
             
                 if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
                 {
-                    if (fprintf(playlist->control_fd, "R\n") > 0)
+                    if (fdprintf(playlist->control_fd, "R\n") > 0)
                     {
                         fsync(playlist->control_fd);
                         result = 0;
@@ -2407,7 +2407,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
                 break;
             }
 
-            if (fprintf(fd, "%s\n", tmp_buf) < 0)
+            if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
                 splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
                 result = -1;

@@ -29,8 +29,6 @@ INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
 $(TARGET) -DAPPSVERSION=\"$(VERSION)\" -DMEM=${MEMORYSIZE} $(EXTRA_DEFINES)
 
-LDFLAGS =  -lgdi32 -luser32
-
 SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
  $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
@@ -40,20 +38,15 @@ DIRS = .
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
-DLLTOOLFLAGS = --export-all
-DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
-
 OUTFILE = $(OBJDIR)/libsim.a
 
 all: $(OUTFILE)
 	@echo "MAKE in common sim"
 	$(MAKE) -C $(SIMCOMMON)
 
-include $(TOOLSDIR)/make.inc
-
-$(OUTFILE): $(OBJS)
+$(OUTFILE): $(OBJS) $(OBJDIR)/UI256.bmp $(OBJDIR)/uisw32-res.o
 	@echo "AR+RANLIB $@"
-	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	@$(AR) ruv $@ $(OBJS) $(OBJDIR)/uisw32-res.o >/dev/null 2>&1
 	@$(RANLIB) $@
 
 clean:
@@ -68,6 +61,8 @@ $(OBJDIR)/UI256.bmp: UI-$(ARCHOS).bmp
 	@cp $< $@
 
 $(OBJDIR)/uisw32-res.o: uisw32.rc $(OBJDIR)/UI256.bmp
-	$(WINDRES) -I$(OBJDIR) -i $< -o $@
+	$(WINDRES) --include-dir $(OBJDIR) -i $< -o $@
+
+include $(TOOLSDIR)/make.inc
 
 -include $(DEPFILE)

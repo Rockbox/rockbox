@@ -42,6 +42,10 @@
 /* For ID3 info and VBR header */
 #define MPEG_RESERVED_HEADER_SPACE (4096 + 1500)
 
+#ifdef SIMULATOR
+#define mpeg_play(x) sim_mpeg_play(x)
+#endif
+
 struct mpeg_debug
 {
         int mp3buflen;

@@ -94,3 +94,18 @@ void sim_sleep(int ticks)
 
     pthread_mutex_lock(&mp); /* get it again */
 }
+
+void mutex_init(struct mutex *m)
+{
+    (void)m;
+}
+
+void mutex_lock(struct mutex *m)
+{
+    (void)m;
+}
+
+void mutex_unlock(struct mutex *m)
+{
+    (void)m;
+}

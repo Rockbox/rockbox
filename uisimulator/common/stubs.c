@@ -28,7 +28,7 @@
 
 #include "string.h"
 #include "lcd.h"
-#include "settings.h"
+
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
@@ -285,5 +285,6 @@ void remove_thread(int threadnum)
 }
 
 /* assure an unused place to direct virtual pointers to */
+#define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];
 

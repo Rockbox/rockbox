@@ -20,12 +20,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <sys/stat.h>
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/mount.h>
 #elif !defined(WIN32)
 #include <sys/vfs.h>
+#endif
+
+#ifdef WIN32
+#include <windows.h>
 #endif
 
 #ifndef _MSC_VER
@@ -35,17 +40,26 @@
 #include "dir-win32.h"
 #endif
 
+#define MAX_PATH 260
+
 #include <fcntl.h>
 #include "debug.h"
 
-#define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
-#define dirent sim_dirent
-#define DIR SIMDIR
-#include "../../firmware/include/dir.h"
-#undef dirent
-#undef DIR
-
 #define SIMULATOR_ARCHOS_ROOT "archos"
+
+struct sim_dirent {
+    unsigned char d_name[MAX_PATH];
+    int attribute;
+    int size;
+    int startcluster;
+    unsigned short wrtdate; /*  Last write date */ 
+    unsigned short wrttime; /*  Last write time */
+};
+
+struct dirstruct {
+    void *dir; /* actually a DIR* dir */
+    char *name;    
+} SIM_DIR;
 
 struct mydir {
     DIR *dir;
@@ -113,6 +127,8 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
             dir->name, x11->d_name);
     stat(buffer, &s); /* get info */
 
+#define ATTR_DIRECTORY 0x10
+    
     secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
     secret.size = s.st_size;
     secret.wrtdate = (unsigned short)(s.st_mtime >> 16); 
@@ -181,6 +197,7 @@ int sim_mkdir(const char *name, mode_t mode)
         
     debugf("We create the real directory '%s'\n", buffer);
 #ifdef WIN32
+    /* since we build with -DNOCYGWIN we have the plain win32 version */
     return (mkdir)(buffer);
 #else
     return (mkdir)(buffer, 0666);
@@ -258,5 +275,98 @@ void fat_size(unsigned int* size, unsigned int* free)
         if (free)
             *free = 0;
     }
+#endif
+}
+
+int sim_fsync(int fd)
+{
+#ifdef WIN32
+    return _commit(fd);
+#else
+    return fsync(fd);
+#endif
+}
+
+#ifdef WIN32
+/* sim-win32 */
+typedef enum plugin_status (*plugin_fn)(void* api, void* param);
+#define dlopen(_x_, _y_) LoadLibrary(_x_)
+#define dlsym(_x_, _y_) (plugin_fn)GetProcAddress(_x_, _y_)
+#define dlclose(_x_) FreeLibrary(_x_)
+#define dlerror() "Unknown"
+#else
+/* sim-x11 */
+#include <dlfcn.h>
+#endif
+
+void *sim_plugin_load(char *plugin, int *fd)
+{
+    void* pd;
+    char path[256];
+    char buf[256];
+    int (*plugin_start)(void * api, void* param);
+    
+    snprintf(path, sizeof path, "archos%s", plugin);
+
+    *fd = -1;
+    
+    pd = dlopen(path, RTLD_NOW);
+    if (!pd) {
+        snprintf(buf, sizeof buf, "failed to load %s", plugin);
+        DEBUGF("dlopen(%s): %s\n",path,dlerror());
+        dlclose(pd);
+        return NULL;
+    }
+
+    plugin_start = dlsym(pd, "plugin_start");
+    if (!plugin_start) {
+        plugin_start = dlsym(pd, "_plugin_start");
+        if (!plugin_start) {
+            dlclose(pd);
+            return NULL;
+        }
+    }
+    *fd = pd; /* success */
+    return plugin_start;
+}
+
+void sim_plugin_close(int pd)
+{
+    dlclose(pd);
+}
+
+#ifndef WIN32
+/* the win32 version is in debug-win32.c */
+
+void debug_init(void)
+{
+    /* nothing to be done */
+}
+
+void debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}
+
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    fprintf( stderr, "%s:%d ", file, line );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}
+
+#endif
+
+int sim_ftruncate(int fd, off_t length)
+{
+#ifdef WIN32
+    return _chsize(fd, length);
+#else
+    return ftruncate(fd, length);
 #endif
 }

@@ -216,28 +216,4 @@ void debugf(const char *fmt, ...)
 #endif
 }
 
-
-#else /* SIMULATOR code coming up */
-
-void debug_init(void)
-{
-}
-extern void *stderr;
-
-void debugf(const char *fmt, ...)
-{
-    va_list ap;
-    va_start( ap, fmt );
-    vfprintf( stderr, fmt, ap );
-    va_end( ap );
-}
-
-void ldebugf(const char* file, int line, const char *fmt, ...)
-{
-    va_list ap;
-    va_start( ap, fmt );
-    fprintf( stderr, "%s:%d ", file, line );
-    vfprintf( stderr, fmt, ap );
-    va_end( ap );
-}
 #endif

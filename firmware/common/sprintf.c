@@ -231,7 +231,7 @@ static int fprfunc(void *pr, unsigned char letter)
 }
 
 
-int fprintf(int fd, const char *fmt, ...)
+int fdprintf(int fd, const char *fmt, ...)
 {
     bool ok;
     va_list ap;

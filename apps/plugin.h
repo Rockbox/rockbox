@@ -32,6 +32,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include "config.h"
 #include "dir.h"
 #include "kernel.h"
@@ -51,7 +52,9 @@
 
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
+#undef DEBUGF
 #define DEBUGF  rb->debugf
+#undef LDEBUGF
 #define LDEBUGF rb->debugf
 #else
 #define DEBUGF(...)
@@ -59,13 +62,19 @@
 #endif
 #endif
 
+#ifdef SIMULATOR
+#define PREFIX(_x_) sim_ ## _x_
+#else
+#define PREFIX(_x_) _x_
+#endif
+
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 31
+#define PLUGIN_API_VERSION 32
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 29
+#define PLUGIN_MIN_API_VERSION 32
 
 /* plugin return codes */
 enum plugin_status {
@@ -165,17 +174,17 @@ struct plugin_api {
     void (*button_clear_queue)(void);
 
     /* file */
-    int (*open)(const char* pathname, int flags);
+    int (*PREFIX(open))(const char* pathname, int flags);
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*lseek)(int fd, off_t offset, int whence);
-    int (*creat)(const char *pathname, mode_t mode);
+    int (*PREFIX(creat))(const char *pathname, mode_t mode);
     ssize_t (*write)(int fd, const void* buf, size_t count);
-    int (*remove)(const char* pathname);
-    int (*rename)(const char* path, const char* newname);
-    int (*ftruncate)(int fd, off_t length);
-    off_t (*filesize)(int fd);
-    int (*fprintf)(int fd, const char *fmt, ...);
+    int (*PREFIX(remove))(const char* pathname);
+    int (*PREFIX(rename))(const char* path, const char* newname);
+    int (*PREFIX(ftruncate))(int fd, off_t length);
+    off_t (*PREFIX(filesize))(int fd);
+    int (*fdprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
 #ifndef SIMULATOR
@@ -188,7 +197,7 @@ struct plugin_api {
     struct dirent* (*readdir)(DIR* dir);
 
     /* kernel/ system */
-    void (*sleep)(int ticks);
+    void (*PREFIX(sleep))(int ticks);
     void (*yield)(void);
     long* current_tick;
     long (*default_event_handler)(long event);
@@ -213,6 +222,9 @@ struct plugin_api {
     void* (*memcpy)(void *out, const void *in, size_t n);
     const char *_ctype_;
     int (*atoi)(const char *str);
+    char *(*strchr)(const char *s, int c);
+    char *(*strcat)(char *s1, const char *s2);
+    int (*memcmp)(const void *s1, const void *s2, size_t n);
 
     /* sound */
     void (*mpeg_sound_set)(int setting, int value);
@@ -225,7 +237,7 @@ struct plugin_api {
 #endif
 
     /* playback control */
-    void (*mpeg_play)(int offset);
+    void (*PREFIX(mpeg_play))(int offset);
     void (*mpeg_stop)(void);
     void (*mpeg_pause)(void);
     void (*mpeg_resume)(void);
@@ -295,10 +307,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    
-    char *(*strchr)(const char *s, int c);
-    char *(*strcat)(char *s1, const char *s2);
-    int (*memcmp)(const void *s1, const void *s2, size_t n);
 };
 
 /* defined by the plugin loader (plugin.c) */

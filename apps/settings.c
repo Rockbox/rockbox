@@ -1127,13 +1127,13 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
         
         if (p_run->cfg_val == NULL) /* write as number */
         {
-            fprintf(fd, "%s: %ld\r\n", p_run->cfg_name, value);
+            fdprintf(fd, "%s: %ld\r\n", p_run->cfg_name, value);
         }
         else /* write as item */
         {
             const char* p = p_run->cfg_val;
 
-            fprintf(fd, "%s: ", p_run->cfg_name);
+            fdprintf(fd, "%s: ", p_run->cfg_name);
             
             while(value >= 0)
             {
@@ -1146,9 +1146,9 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
                     write(fd, &c, 1); /* char by char, this is lame, OK */
             }
 
-            fprintf(fd, "\r\n");
+            fdprintf(fd, "\r\n");
             if (p_run->cfg_val != off_on) /* explaination for non-bool */
-                fprintf(fd, "# (possible values: %s)\r\n", p_run->cfg_val);
+                fdprintf(fd, "# (possible values: %s)\r\n", p_run->cfg_val);
         }
     }
 }
@@ -1195,21 +1195,21 @@ bool settings_save_config(void)
         return false;
     }
 
-    fprintf(fd, "# >>> .cfg file created by rockbox %s <<<\r\n", appsversion);
-    fprintf(fd, "# >>>    http://rockbox.haxx.se    <<<\r\n#\r\n");
-    fprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
+    fdprintf(fd, "# .cfg file created by rockbox %s - ", appsversion);
+    fdprintf(fd, "http://www.rockbox.org\r\n#\r\n");
+    fdprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
 
     if (global_settings.wps_file[0] != 0)
-        fprintf(fd, "wps: %s/%s.wps\r\n", ROCKBOX_DIR,
+        fdprintf(fd, "wps: %s/%s.wps\r\n", ROCKBOX_DIR,
                 global_settings.wps_file);
 
     if (global_settings.lang_file[0] != 0)
-        fprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR, 
+        fdprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR, 
                 global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.font_file[0] != 0)
-        fprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR FONT_DIR,
+        fdprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR FONT_DIR,
                 global_settings.font_file);
 #endif
 

@@ -50,18 +50,6 @@
 #include "widgets.h"
 #endif
 
-#ifdef SIMULATOR
-  #include <debug.h>
-  #ifdef WIN32
-    #include "plugin-win32.h"
-  #else
-    #include <dlfcn.h>
-  #endif
-  #define PREFIX(_x_) sim_ ## _x_
-#else
-#define PREFIX(_x_) _x_
-#endif
-
 #if MEM >= 32
 #define PLUGIN_BUFFER_SIZE 0xC0000
 #else
@@ -70,7 +58,9 @@
 
 #ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
+void *sim_plugin_load(char *plugin, int *fd);
 #else
+#define sim_plugin_close(x)
 extern unsigned char pluginbuf[];
 #include "bitswap.h"
 #endif
@@ -142,16 +132,16 @@ static const struct plugin_api rockbox_api = {
 
     /* file */
     (open_func)PREFIX(open),
-    PREFIX(close),
+    close,
     (read_func)read,
     lseek,
     (creat_func)PREFIX(creat),
     (write_func)write,
     PREFIX(remove),
     PREFIX(rename),
-    ftruncate,
+    PREFIX(ftruncate),
     PREFIX(filesize),
-    fprintf,
+    fdprintf,
     read_line,
     settings_parseline,
 #ifndef SIMULATOR
@@ -189,6 +179,9 @@ static const struct plugin_api rockbox_api = {
     memcpy,
     _ctype_,
     atoi,
+    strchr,
+    strcat,
+    memcmp,
 
     /* sound */
     mpeg_sound_set,
@@ -201,7 +194,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     
     /* playback control */
-    mpeg_play,
+    PREFIX(mpeg_play),
     mpeg_stop,
     mpeg_pause,
     mpeg_resume,
@@ -264,10 +257,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    strchr,
-    strcat,
-    memcmp
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -275,12 +264,8 @@ int plugin_load(const char* plugin, void* parameter)
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int rc;
     char buf[64];
-#ifdef SIMULATOR
-    void* pd;
-    char path[256];
-#else
     int fd;
-#endif
+
 #ifdef HAVE_LCD_BITMAP
     int xm,ym;
 #endif
@@ -301,26 +286,9 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_clear_display();
 #endif
 #ifdef SIMULATOR
-    snprintf(path, sizeof path, "archos%s", plugin);
-
-    pd = dlopen(path, RTLD_NOW);
-    if (!pd) {
-        snprintf(buf, sizeof buf, str(LANG_PLUGIN_CANT_OPEN), plugin);
-        splash(HZ*2, true, buf);
-        DEBUGF("dlopen(%s): %s\n",path,dlerror());
-        dlclose(pd);
+    plugin_start = sim_plugin_load(plugin, &fd);
+    if(!plugin_start)
         return -1;
-    }
-
-    plugin_start = dlsym(pd, "plugin_start");
-    if (!plugin_start) {
-        plugin_start = dlsym(pd, "_plugin_start");
-        if (!plugin_start) {
-            splash(HZ*2, true, "Can't find entry point");
-            dlclose(pd);
-            return -1;
-        }
-    }
 #else
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
@@ -379,9 +347,7 @@ int plugin_load(const char* plugin, void* parameter)
             break;
     }
 
-#ifdef SIMULATOR
-    dlclose(pd);
-#endif
+    sim_plugin_close(fd);
 
 #ifdef HAVE_LCD_BITMAP
     /* restore margins */

@@ -39,8 +39,6 @@
 #include "usb.h"
 #include "file.h"
 #include "hwcompat.h"
-#else
-#include "mpegplay.h"
 #endif /* #ifndef SIMULATOR */
 
 #include "bitswap.h"

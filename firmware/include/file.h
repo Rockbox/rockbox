@@ -20,6 +20,8 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
+#include <sys/types.h>
+
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 
@@ -42,30 +44,14 @@
 #define O_TRUNC  0x10
 #endif
 
-#if !defined(__ssize_t_defined) && !defined(_SSIZE_T_) && !defined(ssize_t)
-#define __ssize_t_defined
-#define _SSIZE_T_
-#define ssize_t ssize_t
-typedef signed long ssize_t;
-#endif
-
-#if !defined(__off_t_defined) && !defined(_OFF_T_) && !defined(off_t)
-#define __off_t_defined
-#define _OFF_T_
-#define off_t off_t
-typedef signed long off_t;
-#endif
-
-#if !defined(__mode_t_defined) && !defined(_MODE_T_) && !defined(mode_t)
-#define __mode_t_defined
-#define _MODE_T_
-#define mode_t mode_t
-typedef unsigned int mode_t;
-#endif
-
-#ifndef _SIZE_T
-#define _SIZE_T
-typedef unsigned long size_t;
+#ifdef SIMULATOR
+#define open(x,y) sim_open(x,y)
+#define creat(x,y) sim_creat(x,y)
+#define remove(x) sim_remove(x)
+#define rename(x,y) sim_rename(x,y)
+#define filesize(x) sim_filesize(x)
+#define fsync(x) sim_fsync(x)
+#define ftruncate(x,y) sim_ftruncate(x,y)
 #endif
 
 typedef int (*open_func)(const char* pathname, int flags);
@@ -75,7 +61,6 @@ typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
 typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
                            int(*_compar)(const void *, const void *));
 
-#ifndef SIMULATOR
 extern int open(const char* pathname, int flags);
 extern int close(int fd);
 extern int fsync(int fd);
@@ -88,6 +73,5 @@ extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
-#endif /* SIMULATOR */
 
 #endif

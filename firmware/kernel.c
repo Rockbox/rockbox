@@ -352,6 +352,11 @@ int tick_remove_task(void (*f)(void))
     return -1;
 }
 
+#ifndef SIMULATOR
+/*
+ * Simulator versions in uisimulator/SIMVER/
+ */
+
 /****************************************************************************
  * Simple mutex functions
  ****************************************************************************/
@@ -375,3 +380,5 @@ void mutex_unlock(struct mutex *m)
 {
     m->locked = false;
 }
+
+#endif

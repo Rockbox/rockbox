@@ -7,10 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Robert E. Hak <rhak@ramapo.edu>
- *
- * Windows Copyright (C) 2002 by Felix Arends
- * X11 Copyright (C) 2002 by Daniel Stenberg <daniel@haxx.se>
+ * Copyright (C) 2005 by Daniel Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -20,29 +17,33 @@
  *
  ****************************************************************************/
 
-#include "lcd-common.h"
+#ifndef _SYS_TYPES_H_
+#define _SYS_TYPES_H_
 
-#include "lcd.h"
-
-#ifdef WIN32 
-#include "lcd-win32.h"
-#else
-#include "lcd-x11.h"
+#if !defined(__ssize_t_defined) && !defined(_SSIZE_T_) && !defined(ssize_t)
+#define __ssize_t_defined
+#define _SSIZE_T_
+#define ssize_t ssize_t
+typedef signed long ssize_t;
 #endif
 
-void lcd_blit(const unsigned char* p_data, int x, int y, int width, int height,
-              int stride)
-{
-    (void)p_data;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)stride;
-}
-    
-void lcd_set_flip(bool yesno)
-{
-    (void)yesno;
-}
+#if !defined(__off_t_defined) && !defined(_OFF_T_) && !defined(off_t)
+#define __off_t_defined
+#define _OFF_T_
+#define off_t off_t
+typedef signed long off_t;
+#endif
 
+#if !defined(__mode_t_defined) && !defined(_MODE_T_) && !defined(mode_t)
+#define __mode_t_defined
+#define _MODE_T_
+#define mode_t mode_t
+typedef unsigned int mode_t;
+#endif
+
+#ifndef _SIZE_T
+#define _SIZE_T
+typedef unsigned long size_t;
+#endif
+
+#endif /* _SYS_TYPES_H */
