@@ -25,6 +25,7 @@
 <h2>Recorder specific</h2>
 <ul>
 <li><a href="ssd1815r1_5.pdf">Solomon SSD 1815 LCD controller</a> 864 kB
+<li><a href="g112064-30-3.pdf">Shing Yih G112064-30 LCD display</a> 102 kB
 <li><a href="mas3587f_2pd.pdf">Micronas MAS 3587F MPEG Audio Encoder/Decoder</a> 1300 kB
 <li><a href="dram_k4e151612d.pdf">Samsung K4E151612D EDO DRAM</a> 400 kB
 </ul>
@@ -34,6 +35,7 @@
 <li><a href="fet_FZT849.pdf">FZT824 High Current Transistor</a> 60 kB
 <li><a href="rtc_tm41st84w.pdf">ST M41ST84W Real Time Clock</a> 180 kB
 <li><a href="isd300.pdf">ISD-300 USB/ATA bridge</a> 376 kB
+
 </ul>
 
 <h2>FM Recorder specific</h2>
