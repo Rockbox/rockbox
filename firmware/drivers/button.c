@@ -480,7 +480,10 @@ static int button_read(void)
     else if (adc_read(6) < 0x300)
         btn |= BUTTON_MENU;
 
-
+    data = P7;
+    if (data & 0x01)
+        btn |= BUTTON_ON;
+    
 #endif /* CONFIG_KEYPAD */
 
 
