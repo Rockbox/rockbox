@@ -383,7 +383,7 @@ bool dbg_hw_info(void)
                 break;
             case 2:
                 snprintf(buf, 32, "ATA: 0x%x%s",
-                         ata_io_address, ata_device ? "s","m");
+                         ata_io_address, ata_device ? "s":"m");
                 break;
             case 3:
                 snprintf(buf, 32, "Mask: %04x", bitmask);
