@@ -57,11 +57,11 @@ test: test.tab.o test.lex.o $(LIBRARY)
 
 test.tab.o: test.tab.c
 	@echo "Compiling" $<...
-	@$(CC) $(INCLUDES) -g -o $(@) -O3 -fomit-frame-pointer -c test.tab.c
+	@$(CC) $(INCLUDES) $(DEFINES) -g -o $(@) -O3 -fomit-frame-pointer -c test.tab.c
 
 test.lex.o: test.lex.c
 	@echo "Compiling" $<...
-	@$(CC) $(INCLUDES) -g -o $(@) -O3 -fomit-frame-pointer -c test.lex.c
+	@$(CC) $(INCLUDES) $(DEFINES) -g -o $(@) -O3 -fomit-frame-pointer -c test.lex.c
 
 test.tab.h: test.tab.c
 
