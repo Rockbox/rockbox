@@ -38,26 +38,22 @@
 void serial_setup (void) 
 { 
     char dummy;
-    int i;
-    int j;
     dummy = SSR1;
-    SSR1=0;
+    SSR1 = 0;
     SMR1 = 0x00;
-    SCR1=0;
+    SCR1 = 0;
     BRR1 = (FREQ/(32*9600))-1;
-	
+
     /* let the hardware settle */
-    for (i = 0; i < 1000; i++)
-        j++;
+    sleep(1);
 
     SCR1 = 0x50;
 
     /* This enables the serial Rx interrupt*/
     IPRE = (IPRE & 0x0FFF) | 0x8000; /* Set to medium priority */
-
 }
 
-static void process_byte(char byte)
+static void process_byte(int byte)
 {
     int btn = 0;
 
@@ -109,7 +105,7 @@ void REI1 (void)
 #pragma interrupt
 void RXI1 (void)
 {
-    char serial_byte;
+    unsigned char serial_byte;
     serial_byte = RDR1;
     SSR1 = SSR1 & ~0x40; /* Clear RDRF */
     process_byte(serial_byte);
