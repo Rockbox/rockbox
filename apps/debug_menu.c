@@ -77,9 +77,10 @@ Menu dbg_os(void)
         {
             case BUTTON_OFF:
             case BUTTON_LEFT:
-                return;
+                return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 #else
 Menu dbg_os(void)
