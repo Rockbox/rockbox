@@ -164,6 +164,17 @@ static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int reques
     set_irq_level(oldlevel);
     return 0;
   }
+ 
+/* Utilize the user break controller to catch invalid memory accesses. */
+int system_memory_guard(int newmode);
+
+enum {
+    MEMGUARD_KEEP = -1,    /* don't change the mode; for reading */
+    MEMGUARD_NONE = 0,     /* catch nothing */
+    MEMGUARD_FLASH_WRITES, /* catch writes to area 02 (flash ROM) */
+    MEMGUARD_ZERO_AREA,    /* catch all accesses to areas 00 and 01 */
+    MAXMEMGUARD
+};
 
 #endif
 

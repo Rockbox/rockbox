@@ -315,7 +315,7 @@ void system_reboot (void)
     ICR = 0;
 
     asm volatile ("jmp @%0; mov.l @%1,r15" : :
-		  "r"(*(int*)0),"r"(4));
+                  "r"(*(int*)0),"r"(4));
 }
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
@@ -498,4 +498,50 @@ void system_init(void)
     WCR1 = 0x4000; /* Long wait states for CS6 (ATA), short for the rest. */
     WCR3 = 0x8000; /* WAIT is pulled up, 1 state inserted for CS6 */
 #endif
+
+}
+
+/* Utilize the user break controller to catch invalid memory accesses. */
+int system_memory_guard(int newmode)
+{
+    static const struct {
+        unsigned long  addr;
+        unsigned long  mask;
+        unsigned short bbr;
+    } modes[MAXMEMGUARD] = {
+        /* catch nothing */
+        { 0x00000000, 0x00000000, 0x0000 },
+        /* catch writes to area 02 (flash ROM) */
+        { 0x02000000, 0x00FFFFFF, 0x00F8 },
+        /* catch all accesses to areas 00 (internal ROM) and 01 (free) */
+        { 0x00000000, 0x01FFFFFF, 0x00FC }
+    };
+
+    int oldmode = MEMGUARD_NONE;
+    int i;
+    
+    /* figure out the old mode from what is in the UBC regs. If the register
+       values don't match any mode, assume MEMGUARD_NONE */
+    for (i = MEMGUARD_NONE; i < MAXMEMGUARD; i++)
+    {
+        if (BAR == modes[i].addr && BAMR == modes[i].mask &&
+            BBR == modes[i].bbr)
+        {
+            oldmode = i;
+            break;
+        }
+    }
+    
+    if (newmode == MEMGUARD_KEEP)
+        newmode = oldmode;
+
+    BBR = 0;  /* switch off everything first */
+
+    /* always set the UBC according to the mode, in case the old settings
+       didn't match any valid mode */
+    BAR  = modes[newmode].addr;
+    BAMR = modes[newmode].mask;
+    BBR  = modes[newmode].bbr;
+    
+    return oldmode;
 }

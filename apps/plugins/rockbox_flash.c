@@ -977,6 +977,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char* filename;
     bool show_greet;
+    int oldmode;
 
     /* this macro should be called as the first thing you do in the plugin.
        it test that the api version and model the plugin was compiled for
@@ -997,7 +998,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api; /* copy to global api pointer */
 
     /* now go ahead and have fun! */
+    oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
     DoUserDialog(filename, show_greet);
+    rb->system_memory_guard(oldmode);              /* re-enable memory guard */
 
     return PLUGIN_OK;
 }

@@ -122,7 +122,7 @@ bool dbg_os(void)
         usage = thread_stack_usage(currval);
         snprintf(buf, 32, "%d: %d%%  ", currval, usage);
         lcd_puts(0, 1, buf);
-	
+    
         button = button_get_w_tmo(HZ/10);
 
         switch(button)
@@ -130,7 +130,7 @@ bool dbg_os(void)
         case BUTTON_STOP:
             return false;
 
-	    case BUTTON_LEFT:
+        case BUTTON_LEFT:
             currval--;
             if(currval < 0)
                 currval = num_threads-1;
@@ -301,6 +301,7 @@ bool dbg_hw_info(void)
     bool got_id; /* flag if we managed to get the flash IDs */
     unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
+    int oldmode;  /* saved memory guard mode */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -311,6 +312,8 @@ bool dbg_hw_info(void)
         pr_polarity = 0; /* Negative */
     else
         pr_polarity = 1; /* Positive */
+
+    oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
     /* get flash ROM type */
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
@@ -324,6 +327,8 @@ bool dbg_hw_info(void)
         /* calculate CRC16 checksum of boot ROM */
         rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
     }
+
+    system_memory_guard(oldmode);  /* re-enable memory guard */
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -389,11 +394,14 @@ bool dbg_hw_info(void)
     bool got_id; /* flag if we managed to get the flash IDs */
     unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
+    int oldmode;  /* saved memory guard mode */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
     else
         usb_polarity = 1; /* Positive */
+
+    oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
     /* get flash ROM type */
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
@@ -407,6 +415,8 @@ bool dbg_hw_info(void)
         /* calculate CRC16 checksum of boot ROM */
         rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
     }
+    
+    system_memory_guard(oldmode);  /* re-enable memory guard */
 
     lcd_clear_display();
 
@@ -579,7 +589,7 @@ bool dbg_ports(void)
         snprintf(buf, 32, "ATA: %s, 0x%x",
                  ata_device?"slave":"master", ata_io_address);
         lcd_puts(0, 7, buf);
-	
+
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
@@ -1440,6 +1450,7 @@ static bool dbg_disk_info(void)
 bool dbg_save_roms(void)
 {
     int fd;
+    int oldmode = system_memory_guard(MEMGUARD_NONE);
 
     fd = creat("/internal_rom_0000-FFFF.bin", O_WRONLY);
     if(fd >= 0)
@@ -1455,6 +1466,7 @@ bool dbg_save_roms(void)
         close(fd);
     }
 
+    system_memory_guard(oldmode);
     return false;
 }
 
@@ -1510,6 +1522,21 @@ bool dbg_screendump(void)
 }
 #endif
 
+bool dbg_set_memory_guard(void)
+{
+    static const struct opt_items names[MAXMEMGUARD] = {
+        { "None",             -1 },
+        { "Flash ROM writes", -1 },
+        { "Zero area (all)",  -1 }
+    };
+    int mode = system_memory_guard(MEMGUARD_KEEP);
+    
+    set_option( "Catch mem accesses", &mode, INT, names, MAXMEMGUARD, NULL);
+    system_memory_guard(mode);
+
+    return false;
+}
+
 bool debug_menu(void)
 {
     int m;
@@ -1524,6 +1551,7 @@ bool debug_menu(void)
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
         { "View OS stacks", dbg_os },
+        { "Catch mem accesses", dbg_set_memory_guard },
 #ifdef HAVE_MAS3507D
         { "View MAS info", dbg_mas_info },
 #endif

@@ -1010,6 +1010,8 @@ void DoUserDialog(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int oldmode;
+
     /* this macro should be called as the first thing you do in the plugin.
     it test that the api version and model the plugin was compiled for
     matches the machine it is running on */
@@ -1018,7 +1020,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api; /* copy to global api pointer */
     
     /* now go ahead and have fun! */
+    oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
     DoUserDialog((char*) parameter);
+    rb->system_memory_guard(oldmode);              /* re-enable memory guard */
 
     return PLUGIN_OK;
 }

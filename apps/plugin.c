@@ -259,6 +259,9 @@ static const struct plugin_api rockbox_api = {
     mpeg_get_file_pos,
     find_next_frame,
     mpeg_get_last_header,
+#ifndef SIMULATOR
+    system_memory_guard,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

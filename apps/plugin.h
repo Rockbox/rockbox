@@ -51,7 +51,7 @@
 
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
-#define DEBUGF	rb->debugf
+#define DEBUGF  rb->debugf
 #define LDEBUGF rb->debugf
 #else
 #define DEBUGF(...)
@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 26
+#define PLUGIN_API_VERSION 27
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -295,6 +295,9 @@ struct plugin_api {
    unsigned long (*find_next_frame)(int fd, int *offset,
                                     int max_offset, unsigned long last_header);
    unsigned long (*mpeg_get_last_header)(void);
+#ifndef SIMULATOR
+   int (*system_memory_guard)(int newmode);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */
