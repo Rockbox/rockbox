@@ -640,7 +640,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                skip it using the total size */
 
             if(global_unsynch && version <= ID3_VER_2_3) {
-                skip_unsynched(fd, totframelen);
+                size -= skip_unsynched(fd, totframelen);
             } else {
                 if(data_length_ind)
                     totframelen = data_length_ind;
