@@ -92,7 +92,6 @@ void redraw_cursor(void)
 
 /* 
  * Move the cursor to a particular id, 
- *   current: where it is now 
  *   target: where you want it to be 
  */
 void put_cursor(int target)
@@ -196,18 +195,19 @@ void menu_draw(void)
 
 void show_splash(void)
 {
-#ifdef HAVE_LCD_BITMAP
+	char *rockbox = "ROCKbox!";
+
 	lcd_clear_display();
 
-	if (show_logo() == 0) {
-		lcd_update();
-		busy_wait();
-	}
+#ifdef HAVE_LCD_BITMAP
+	if (show_logo() != 0) 
+		return;
 #else
-	char *rockbox = "ROCKbox!";
 	lcd_puts(0, 0, rockbox);
-	busy_wait();
 #endif
+
+	lcd_update();
+	busy_wait();
 }
 
 
