@@ -391,6 +391,7 @@ int wps_show(void)
     int old_release_mask;
     int button;
     int ff_rewind_count = 0;
+    bool ignore_keyup;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -401,15 +402,25 @@ int wps_show(void)
     lcd_setmargins(0,0);
 #endif
 
+    ff_rewind = false;
+    ignore_keyup = true;
+    
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
         draw_screen(id3);
     }
-    
+
     while ( 1 )
     {
         button = button_get_w_tmo(HZ/5);
+
+        /* Discard stray key-up events */
+        if(ignore_keyup && (button & BUTTON_REL))
+        {
+            ignore_keyup = false;
+            continue;
+        }
         
         if(mpeg_has_changed_track())
         {
@@ -755,6 +766,7 @@ int wps_show(void)
                     statusbar(laststate);
 #endif
                     old_release_mask = button_set_release(RELEASE_MASK);
+                    ignore_keyup = true;
                     id3 = mpeg_current_track();
                     draw_screen(id3);
                 }
