@@ -79,6 +79,7 @@ sim:
 
 clean:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
+	rm -rf rockbox.zip
 
 tags:
 	@rm -f TAGS
