@@ -109,12 +109,13 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
 #define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
 
-static void build_playlist(int start_index)
+static void build_playlist(void)
 {
     int i;
 
     playlist_clear();
-    for(i = start_index;i < filesindir;i++)
+
+    for(i = 0;i < filesindir;i++)
     {
         if(dircacheptr[i]->attr & TREE_ATTR_MP3)
         {
@@ -251,7 +252,6 @@ static int start=0;
 static int dirpos[MAX_DIR_LEVELS];
 static int cursorpos[MAX_DIR_LEVELS];
 static int dirlevel=0;
-static int play_mode = 0;
 static char currdir[MAX_PATH];
 
 /* QUICK HACK! this should be handled by the playlist code later */
@@ -303,8 +303,6 @@ bool dirbrowse(char *root)
         button = button_get(true);
         switch ( button ) {
             case TREE_EXIT:
-                if ( play_mode == 1 )
-                    play_mode = 0;
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -328,7 +326,6 @@ bool dirbrowse(char *root)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
                 mpeg_stop();
-                play_mode = 0;
                 status_set_playmode(STATUS_STOP);
                 break;
 #endif
@@ -349,8 +346,6 @@ bool dirbrowse(char *root)
                 }
 
                 if (dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) {
-                    if ( play_mode == 1 )
-                        play_mode = 0;
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirpos[dirlevel] = start;
@@ -363,16 +358,14 @@ bool dirbrowse(char *root)
                     lcd_stop_scroll();
                     if(dircacheptr[dircursor+start]->attr & TREE_ATTR_M3U )
                     {
-                        play_mode = 2;
-                        play_list(currdir, dircacheptr[dircursor+start]->name);
-                        status_set_playmode(STATUS_PLAY);
+                        play_list(currdir,
+                                  dircacheptr[dircursor+start]->name, 0);
                     }
                     else {
-                        build_playlist(dircursor+start);
-                        play_mode = 2;
-                        play_list(currdir, NULL);
-                        status_set_playmode(STATUS_PLAY);
+                        build_playlist();
+                        play_list(currdir, NULL, dircursor+start);
                     }
+                    status_set_playmode(STATUS_PLAY);
                     status_draw();
                     lcd_stop_scroll();
                     rc = wps_show();
@@ -384,7 +377,6 @@ bool dirbrowse(char *root)
                         dirlevel = 0;
                         dircursor = 0;
                         start = 0;
-                        play_mode = 0;
                     }
                 }
                 restore = true;
@@ -582,12 +574,8 @@ bool dirbrowse(char *root)
 
             case BUTTON_ON:
                 browse_speed = 0;
-                /* The mpeg thread may have stopped playing, so we'd
-                   better update our status */
-                if(!mpeg_is_playing())
-                   play_mode = 0;
-                   
-                if ( play_mode ) {
+                if (mpeg_is_playing())
+                {
                     lcd_stop_scroll();
                     rc = wps_show();
                     if(rc == SYS_USB_CONNECTED)
@@ -598,7 +586,6 @@ bool dirbrowse(char *root)
                         dirlevel = 0;
                         dircursor = 0;
                         start = 0;
-                        play_mode = 0;
                     }
                     restore = true;
                 }
@@ -620,7 +607,6 @@ bool dirbrowse(char *root)
                 dirlevel = 0;
                 dircursor = 0;
                 start = 0;
-                play_mode = 0;
                 break;
 #endif
         }

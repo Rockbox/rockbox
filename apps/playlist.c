@@ -153,12 +153,14 @@ char* playlist_next(int steps)
     }
 }
 
-void play_list(char *dir, char *file)
+void play_list(char *dir, char *file, int start_index)
 {
     char *sep="";
     int dirlen;
 
     empty_playlist();
+
+    playlist.index = start_index;
 
     /* If file is NULL, the list is in RAM */
     if(file) {

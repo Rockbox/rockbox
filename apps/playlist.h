@@ -37,10 +37,10 @@ typedef struct
     bool in_ram;         /* True if the playlist is RAM-based       */
 } playlist_info_t;
 
-//extern playlist_info_t playlist;
+extern playlist_info_t playlist;
 extern bool playlist_shuffle;
 
-void play_list(char *dir, char *file);
+void play_list(char *dir, char *file, int start_index);
 char* playlist_next(int steps);
 void randomise_playlist( unsigned int seed );
 void sort_playlist(void);
