@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 /* size of the buffer used for loadable, translated strings */
-#define MAX_LANGUAGE_SIZE 6000
+#define MAX_LANGUAGE_SIZE 6500
 
 /* both these must match the two initial bytes in the binary lang file */
 #define LANGUAGE_COOKIE  0x1a
