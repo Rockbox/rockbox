@@ -97,7 +97,7 @@ that performs the amazing magic of flashing the red LED. :-)
 
 <p><i>2001-12-09</i>: Working my way through the setup code. The <a href="notes.html">notes</a> are being updated continously.
 
-<p><i>2001-12-08</i>: Analyzed the exception vector table. See <a href="notes.html">the notes</a>. Also, a <a href="mail.cgi">mailing list archive</a> is up.
+<p><i>2001-12-08</i>: Analyzed the exception vector table. See <a href="notes.html">the notes</a>. Also, a <a href="mail/">mailing list archive</a> is up.
 
 <p><i>2001-12-07</i>:
  I just wrote this web page to announce descramble.c. 

@@ -5,7 +5,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<link rel="STYLESHEET" type="text/css" href="/rockbox/style.css">
+<link rel="STYLESHEET" type="text/css" href="/style.css">
 #ifdef _PAGE_
 <title>Rockbox - _PAGE_</title>
 #else
@@ -23,24 +23,24 @@
 <tr valign="top">
 <td bgcolor=MENUBG valign="top">
 <br>
-&nbsp;<a href="/rockbox/"><img src="/rockbox/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
+&nbsp;<a href="/"><img src="/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
 
 <p align="right">
-<a class="menulink" href="/rockbox/">main page</a><br>
-<a class="menulink" href="/rockbox/download/">download</a><br>
-<a class="menulink" href="/rockbox/docs/FAQ">FAQ</a><br>
-<a class="menulink" href="/rockbox/notes.html">research notes</a><br>
-<a class="menulink" href="/rockbox/docs/">data sheets</a><br>
-<a class="menulink" href="/rockbox/schematics/">schematics</a><br>
-<a class="menulink" href="/rockbox/mods/">hardware mods</a><br>
-<a class="menulink" href="http://bjorn.haxx.se/rockbox/mail/">mailing list</a><br>
-<a class="menulink" href="/rockbox/irc/">IRC</a><br>
-<a class="menulink" href="/rockbox/tools.html">tools</a><br>
-<a class="menulink" href="/rockbox/internals/">photos</a><br>
-<a class="menulink" href="http://bjorn.haxx.se/rockbox/daily.shtml">daily builds</a><br>
-<a class="menulink" href="/rockbox/cvs.html">CVS</a><br>
-<a class="menulink" href="http://sourceforge.net/projects/rockbox/">sourceforge</a><br>
-<a class="menulink" href="/isd200/">linux driver</a>
+<a class="menulink" href="/">main page</a><br>
+<a class="menulink" href="/download/">download</a><br>
+<a class="menulink" href="/docs/FAQ">FAQ</a><br>
+<a class="menulink" href="/notes.html">research notes</a><br>
+<a class="menulink" href="/docs/">data sheets</a><br>
+<a class="menulink" href="/schematics/">schematics</a><br>
+<a class="menulink" href="/mods/">hardware mods</a><br>
+<a class="menulink" href="/mail/">mailing list</a><br>
+<a class="menulink" href="/irc/">IRC</a><br>
+<a class="menulink" href="/tools.html">tools</a><br>
+<a class="menulink" href="/internals/">photos</a><br>
+<a class="menulink" href="/daily.shtml">daily builds</a><br>
+<a class="menulink" href="/cvs.html">CVS</a><br>
+<a class="menulink" href="http://sourceforge.net/projects/">sourceforge</a><br>
+<a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
 <form action="http://www.google.com/search">
