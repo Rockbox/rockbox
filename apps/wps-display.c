@@ -79,7 +79,7 @@ static char map_fullbar_char(char ascii_val);
 static char format_buffer[FORMAT_BUFFER_SIZE];
 static char* format_lines[MAX_LINES][MAX_SUBLINES];
 static unsigned char line_type[MAX_LINES][MAX_SUBLINES];
-static unsigned char time_mult[MAX_LINES][MAX_SUBLINES];
+static unsigned short time_mult[MAX_LINES][MAX_SUBLINES];
 static long subline_expire_time[MAX_LINES];
 static int curr_subline[MAX_LINES];
 
@@ -310,7 +310,7 @@ static char* get_tag(struct mp3entry* cid3,
                      char* buf,
                      int buf_size,
                      unsigned char* tag_len,
-                     unsigned char* subline_time_mult,
+                     unsigned short* subline_time_mult,
                      unsigned char* flags)
 {
     struct mp3entry *id3 = cid3; /* default to current song */
@@ -694,7 +694,7 @@ static void format_display(char* buf,
                            struct mp3entry* id3,
                            struct mp3entry* nid3, /* next song's id3 */
                            const char* fmt,
-                           unsigned char* subline_time_mult,
+                           unsigned short* subline_time_mult,
                            unsigned char* flags)
 {
     char temp_buf[128];
