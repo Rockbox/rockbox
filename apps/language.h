@@ -24,5 +24,8 @@
 #define LANGUAGE_COOKIE  0x1a
 #define LANGUAGE_VERSION 0x02
 
+/* Initialize language array with the builtin strings */
+void lang_init(void);
+
 /* load a given language file */
 int lang_load(const char *filename);

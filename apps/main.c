@@ -126,6 +126,7 @@ void init(void)
     lcd_init();
     font_init();
     show_logo();
+    lang_init();
     settings_reset();
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
@@ -171,6 +172,7 @@ void init(void)
 
     font_init();
     show_logo();
+    lang_init();
 
     set_irq_level(0);
 #ifdef DEBUG

@@ -25,8 +25,20 @@ extern int printf(const char *format, ...);
 #include "language.h"
 #include "lang.h"
 #include "debug.h"
+#include "string.h"
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
+
+void lang_init(void)
+{
+    int i;
+    unsigned char *ptr = (unsigned char *) language_builtin;
+    
+    for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
+        language_strings[i] = ptr;
+        ptr += strlen(ptr) + 1; /* advance pointer to next string */
+    }
+}
 
 int lang_load(const char *filename)
 {
@@ -39,6 +51,7 @@ int lang_load(const char *filename)
     if(filesize != MAX_LANGUAGE_SIZE) {
         if((language_buffer[0] == LANGUAGE_COOKIE) &&
            (language_buffer[1] == LANGUAGE_VERSION)) {
+            lang_init();                    /* initialize with builtin */
             unsigned char *ptr=&language_buffer[2];
             int id;
             filesize-=2;

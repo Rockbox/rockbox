@@ -30,8 +30,11 @@ print HFILE <<MOO
  */
 #define str(x) language_strings[x]
 
-/* this is the array with all the strings */
+/* this is the array for holding the string pointers.
+   It will be initialized at runtime. */
 extern unsigned char *language_strings[];
+/* this contains the concatenation of all strings, separated by \0 chars */
+extern const unsigned char language_builtin[];
 
 /* The enum below contains all available strings */
 enum {
@@ -41,8 +44,11 @@ MOO
 print CFILE <<MOO
 /* This file was automaticly generated using genlang, the strings come
    from "$input" */
+   
+#include "$prefix.h"
 
-unsigned char *language_strings[]={
+unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
+const unsigned char language_builtin[] =
 MOO
     ;
 
@@ -85,7 +91,8 @@ while(<LANG>) {
             }
             else {
                 push @hfile, $set{'id'};
-                print CFILE "    $value,\n";
+                $value =~ s/\"$/\\0\"/;
+                print CFILE "    $value\n";
             }
 
             undef %set;
@@ -118,7 +125,7 @@ MOO
     ;
 
 print CFILE <<MOO
-};
+;
 /* end of generated string list */
 MOO
     ;
