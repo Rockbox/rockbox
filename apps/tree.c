@@ -770,7 +770,6 @@ bool dirbrowse(char *root)
 #else
             case BUTTON_STOP | BUTTON_REL:
 #endif
-                global_settings.resume_index = -1;
                 settings_save();
                 break;
                 
@@ -928,7 +927,6 @@ bool dirbrowse(char *root)
                         lcd_stop_scroll();
                         if ( wps_show() == SYS_USB_CONNECTED ) {
                             reload_root = true;
-                            global_settings.resume_index = -1;
                         }
 #ifdef HAVE_LCD_BITMAP
                         tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
