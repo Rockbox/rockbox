@@ -37,6 +37,10 @@ int rand(void);
 
 #define abs(x) ((x)>0?(x):-(x))
 
+#ifdef SIMULATOR
+void exit(int status);
+#endif
+    
 #ifdef __cplusplus
 }
 #endif
