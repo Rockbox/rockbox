@@ -368,9 +368,7 @@ void settings_apply(void)
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_set_timeout(global_settings.backlight_timeout);
-#ifdef HAVE_CHARGE_CTRL
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-#endif
     ata_spindown(global_settings.disk_spindown);
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
@@ -657,9 +655,7 @@ void settings_reset(void) {
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
-#ifdef HAVE_CHARGE_CTRL
     global_settings.backlight_on_when_charging   = DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
-#endif
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
