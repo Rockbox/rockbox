@@ -134,37 +134,39 @@ void status_draw(void)
         statusbar_wipe();
 #ifdef HAVE_CHARGE_CTRL
         if(charger_inserted()) {
-            battery_state=true;
+            battery_state = true;
             if(!charger_enabled)
-                plug_state=true;
+                plug_state = true;
             else if(TIME_AFTER(current_tick, switch_tick)) {
-                plug_state=!plug_state;
-                switch_tick=current_tick+HZ;
+                plug_state = !plug_state;
+                switch_tick = current_tick + HZ;
             }
         }
         else {
             plug_state=false;
-            if(battlevel > (BATTERY_LEVEL_DANGEROUS-BATTERY_LEVEL_EMPTY)*100/BATTERY_RANGE)
-                battery_state=true;
+            if(battlevel > battery_level_safe())
+                battery_state = true;
             else
                 if(TIME_AFTER(current_tick, switch_tick)) {
-                    switch_tick=current_tick+HZ;
-                    battery_state=!battery_state;
+                    switch_tick = current_tick+HZ;
+                    battery_state =! battery_state;
                 }
         }
                 
-        if(battery_state) statusbar_icon_battery(battlevel,plug_state);
+        if(battery_state) statusbar_icon_battery(battlevel, plug_state);
 #else
-        statusbar_icon_battery(battlevel,false);
+        statusbar_icon_battery(battlevel, false);
 #endif
         statusbar_icon_volume(volume);
-        statusbar_icon_play_state(current_mode+Icon_Play);
+        statusbar_icon_play_state(current_mode + Icon_Play);
         if (global_settings.loop_playlist)
             statusbar_icon_play_mode(Icon_Repeat);
         else
             statusbar_icon_play_mode(Icon_Normal);
-        if(global_settings.playlist_shuffle) statusbar_icon_shuffle();
-        if (keys_locked) statusbar_icon_lock();
+        if(global_settings.playlist_shuffle)
+            statusbar_icon_shuffle();
+        if (keys_locked)
+            statusbar_icon_lock();
 #ifdef HAVE_RTC
         statusbar_time();
 #endif
