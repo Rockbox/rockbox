@@ -457,7 +457,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     dst2 = &lcd_framebuffer[y/8][x];
 
     /* short cut for byte aligned match (e.g. standard text) */
-    if (!shift && ny==8)
+    if (!shift && clear && ny==8)
     {
         memcpy(dst2, src, nx);
         return;
