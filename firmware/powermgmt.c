@@ -318,8 +318,8 @@ static void handle_auto_poweroff(void)
             {
                 if(charger_is_inserted)
                 {
-                    DEBUGF("Sleep timer timeout. Rebooting...\n");
-                    system_reboot();
+                    DEBUGF("Sleep timer timeout. Stopping...\n");
+                    mpeg_stop();
                 }
                 else
                 {
