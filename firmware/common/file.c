@@ -63,6 +63,7 @@ int open(const char* pathname, int flags)
     DIR* dir;
     struct dirent* entry;
     int fd;
+    char pathnamecopy[MAX_PATH];
     char* name;
     struct filedesc* file = NULL;
     int rc;
@@ -92,23 +93,26 @@ int open(const char* pathname, int flags)
 
     if (flags & (O_RDWR | O_WRONLY)) {
         file->write = true;
-        
+
         if (flags & O_TRUNC)
             file->trunc = true;
     }
     file->busy = true;
 
+    strncpy(pathnamecopy,pathname,sizeof(pathnamecopy));
+    pathnamecopy[sizeof(pathnamecopy)-1] = 0;
+
     /* locate filename */
-    name=strrchr(pathname+1,'/');
+    name=strrchr(pathnamecopy+1,'/');
     if ( name ) {
-        *name = 0;
-        dir = opendir((char*)pathname);
+        *name = 0; 
+        dir = opendir(pathnamecopy);
         *name = '/';
         name++;
     }
     else {
         dir = opendir("/");
-        name = (char*)pathname+1;
+        name = pathnamecopy+1;
     }
     if (!dir) {
         DEBUGF("Failed opening dir\n");
@@ -144,7 +148,7 @@ int open(const char* pathname, int flags)
                                  &(file->fatfile),
                                  &(dir->fatdir));
             if (rc < 0) {
-                DEBUGF("Couldn't create %s in %s\n",name,pathname);
+                DEBUGF("Couldn't create %s in %s\n",name,pathnamecopy);
                 errno = EIO;
                 file->busy = false;
                 closedir(dir);
@@ -154,7 +158,7 @@ int open(const char* pathname, int flags)
             file->attr = 0;
         }
         else {
-            DEBUGF("Couldn't find %s in %s\n",name,pathname);
+            DEBUGF("Couldn't find %s in %s\n",name,pathnamecopy);
             errno = ENOENT;
             file->busy = false;
             closedir(dir);
