@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include "lcd.h"
+#include "hwcompat.h"
 #include "font.h"
 #include "mpeg.h"
 #include "id3.h"
@@ -394,11 +395,17 @@ static char* get_tag(struct mp3entry* id3,
 #endif
                 case 'f':  /* full-line progress bar */
 #ifdef HAVE_LCD_CHARCELLS
-                    *flags |= WPS_REFRESH_PLAYER_PROGRESS;
-                    *flags |= WPS_REFRESH_DYNAMIC;
-                    full_line_progressbar=1;
-                    /* we need 11 characters (full line) for progress-bar */
-                    snprintf(buf, buf_size, "           ");
+                    if(has_new_lcd()) {
+                        *flags |= WPS_REFRESH_PLAYER_PROGRESS;
+                        *flags |= WPS_REFRESH_DYNAMIC;
+                        full_line_progressbar=1;
+                        /* we need 11 characters (full line) for
+                           progress-bar */
+                        snprintf(buf, buf_size, "           ");
+                    } else {
+                        /* Tell the user if we have an OldPlayer */
+                        snprintf(buf, buf_size, " <Old LCD> ");
+                    }
                     return buf;
 #endif
                 case 'p':  /* Playlist Position */
