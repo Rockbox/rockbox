@@ -32,6 +32,7 @@
 
 
 #define TREE_MAX_FILENAMELEN 128
+#define MAX_DIR_LEVELS 10
 
 struct entry {
   bool file; /* true if file, false if dir */
@@ -148,6 +149,8 @@ bool dirbrowse(char *root)
     int i;
     int start=0;
     int at_end=0;
+    int dirpos[MAX_DIR_LEVELS];
+    int dirlevel=0;
 
     lcd_clear_display();
 
@@ -196,9 +199,13 @@ bool dirbrowse(char *root)
 #ifdef HAVE_LCD_BITMAP
                     lcd_putsxy(0,0, "[Browse]",0);
 #endif
-                    numentries = showdir(currdir, buffer, 0, 0, &at_end);  
+                    dirlevel--;
+                    if ( dirlevel < MAX_DIR_LEVELS )
+                        start = dirpos[dirlevel];
+                    else
+                        start = 0;
+                    numentries = showdir(currdir, buffer, 0, start, &at_end);
                     dircursor=0;
-                    start=0;
                     while ( (dircursor < TREE_MAX_ON_SCREEN) && 
                             (strcmp(buffer[dircursor].name,buf)!=0)) 
                         dircursor++;
@@ -220,6 +227,9 @@ bool dirbrowse(char *root)
 
                 if (!buffer[dircursor].file) {
                     memcpy(currdir,buf,sizeof(currdir));
+                    if ( dirlevel < MAX_DIR_LEVELS )
+                        dirpos[dirlevel] = start+dircursor;
+                    dirlevel++;
                     dircursor=0;
                     start=0;
                 } else {
@@ -245,8 +255,8 @@ bool dirbrowse(char *root)
                     dircursor--;
                     lcd_puts(0, LINE_Y+dircursor, "-");
                     lcd_update();
-                } else
-                {
+                }
+                else {
                     if (start) {   
                         lcd_clear_display();
                         start--;
