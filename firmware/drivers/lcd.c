@@ -1282,13 +1282,24 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
+
+
+#if defined(LCD_PROPFONTS) || defined(LOADABLE_FONTS)
+    s->space += 2;
+    lcd_getstringsize(string,0,&w,&h);
+    if ( w > LCD_WIDTH - xmargin ) {
+#else
     if ( s->textlen > s->space ) {
+#endif
         s->offset=s->space;
         s->startx=x;
         s->starty=y;
         strncpy(s->text,string,sizeof s->text);
         s->text[sizeof s->text - 1] = 0;
-        strncpy(s->line,string,sizeof s->line);
+        memset(s->line, 0, sizeof s->line);
+        strncpy(s->line,string,
+                s->space > (int)sizeof s->line ?
+                (int)sizeof s->line : s->space );
         s->line[sizeof s->line - 1] = 0;
         scroll_count = 1;
     }
