@@ -538,5 +538,15 @@ A65: We won't.  The limitations of your operating system is not reason
      enough for us to change how we handle things.  And you _can_ create
      this directory.  Open a command line and type:
           mkdir j:\.rockbox
-     You will need to correct the location for where your archos is mounted.
+     You will need to correct the location for the drive letter that Windows
+     assigns to your drive.
 
+Q66: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
+     fix this?
+A66: Truth is, we don't need to fix anything.  If you are using OSX then you
+     can just open a console, change directories to the device and just:
+          mkdir .rockbox
+
+     If you are in another version then you should be able to do command-N in 
+     the Finder, then name the folder.  
+         
