@@ -485,6 +485,7 @@ static bool stop_pending;
 unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
 static bool saving; /* We are saving the buffer to disk */
+static char recording_filename[MAX_PATH];
 #endif
 
 static int mpeg_file;
@@ -1576,7 +1577,7 @@ static void mpeg_thread(void)
                     {
                         /* We need to load more data before starting */
                         filling = true;
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);                        
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         play_pending = true;
                     }
                     else if (unswapped_space_left > unplayed_space_left)
@@ -1805,10 +1806,13 @@ static void mpeg_thread(void)
                         reset_mp3_buffer();
                         start_recording();
                         demand_irq_enable(true);
-                        mpeg_file = open((char *)ev.data,
-                                         O_WRONLY | O_TRUNC | O_CREAT);
+                        mpeg_file = creat(recording_filename, O_WRONLY);
+
                         if(mpeg_file < 0)
                             panicf("recfile: %d", mpeg_file);
+
+                        close(mpeg_file);
+                        mpeg_file = -1;
                         break;
 
                     case MPEG_STOP:
@@ -1870,8 +1874,16 @@ static void mpeg_thread(void)
                                                mp3buflen - mp3buf_read);
 
                                 DEBUGF("wrl: %x\n", writelen);
+                                mpeg_file = open(recording_filename,
+                                                 O_WRONLY| O_APPEND);
+                                if(mpeg_file < 0)
+                                    panicf("recfile: %d", mpeg_file);
+                                    
                                 rc = write(mpeg_file, mp3buf + mp3buf_read,
                                            writelen);
+
+                                close(mpeg_file);
+                                mpeg_file = -1;
                                 DEBUGF("rc: %x\n", rc);
                                 
                                 mp3buf_read += amount_to_save;
@@ -2137,8 +2149,11 @@ static void init_playback(void)
 
 void mpeg_record(char *filename)
 {
+    strncpy(recording_filename, filename, MAX_PATH - 1);
+    recording_filename[MAX_PATH - 1] = 0;
+    
     num_rec_bytes = 0;
-    queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
+    queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
 static void start_recording(void)
