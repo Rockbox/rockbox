@@ -21,7 +21,7 @@
 #define __LCD_H__
 
 #include <stdbool.h>
-#include "sh7034.h"
+#include "cpu.h"
 #include "config.h"
 
 #define STYLE_DEFAULT 0

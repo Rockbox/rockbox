@@ -16,10 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 
     .section    .icode,"ax",@progbits
 
     .align      2
+#if CONFIG_CPU == SH7034        
     .global     _memset
     .type       _memset,@function
 
@@ -105,4 +107,26 @@ _memset:
 
 .end:
     .size   _memset,.end-_memset
+#elif CONFIG_CPU == MCF5249
+    .global     memset
+    .type       memset,@function
 
+/* Fills a memory region with specified byte value
+ * This version is not optimized at all
+ */
+memset:
+        move.l  (4,%sp),%a0     /* Start address */
+        move.l  (8,%sp),%d0    /* Value */
+        move.l  (12,%sp),%d1    /* Length */
+        lea.l   (%d1,%a0),%a1 /* a1 = a0+d1 */
+
+        bra.b   .byteloopend
+        
+.byteloop:
+        move.b  %d0,(%a0)+
+.byteloopend:
+        cmp.l   %a0,%a1
+        bne.b   .byteloop
+        
+        rts
+#endif

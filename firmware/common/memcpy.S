@@ -16,9 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 
     .section    .icode,"ax",@progbits
 
+#if CONFIG_CPU == SH7034
     .align      2
     .global     _memcpy
     .type       _memcpy,@function
@@ -168,4 +170,27 @@ _memcpy:
     mov     r7,r0       /* return dest start address */
 .end:
     .size   _memcpy,.end-_memcpy
+#elif CONFIG_CPU == MCF5249
+    .align      2
+    .global     memcpy
+    .type       memcpy,@function
 
+/* Copies <length> bytes of data in memory from <source> to <dest>
+ * This version is not optimized at all
+ */
+memcpy:
+        move.l  (4,%sp),%a1    /* Destination */
+        move.l  (8,%sp),%a0     /* Source */
+        move.l  (12,%sp),%d1    /* Length */
+
+        cmp.l   #0,%d1
+        bra.b   .byteloopend
+
+.byteloop:
+        move.b  (%a0)+,(%a1)+
+        subq.l  #1,%d1
+.byteloopend:
+        bne.b   .byteloop
+
+        rts
+#endif
