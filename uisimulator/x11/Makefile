@@ -80,7 +80,7 @@ APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -
 FIRMSRCS = lcd-recorder.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c panic.c sysfont.c
 
-APPS = main.c tree.c menu.c credits.c main_menu.c\
+APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
@@ -155,6 +155,9 @@ $(OBJDIR)/menu.o: $(APPDIR)/menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/language.o: $(APPDIR)/language.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
