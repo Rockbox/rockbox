@@ -27,7 +27,7 @@
 #elif defined(ARCHOS_FMRECORDER)
 #include "config-fmrecorder.h"
 #elif defined(ARCHOS_RECORDERV2)
-/* The v2 looks and acts a lot like a recorder */
+/* The v2 looks and acts a lot like an FM recorder */
 #include "config-fmrecorder.h"
 #else
 /* no known platform */
