@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# bdf2fnt - shell script to convert a BDF file to RBF format
+#
+# usage: bdf2fnt bdffile   (don't use .bdf extension!)
+#
+# Example: bdf2fnt courB08
+#	creates ./courB08.fnt and /tmp/courB08.c
+#	the .fnt file can be renamed /system.fnt for loading
+#	the .c file can be moved to firmware dir to compile-in font
+#
+
+# convert from bdf to C source
+./bdf2c $1.bdf > /tmp/$1.c
+
+# compile writerbf with linked C source font
+gcc -DFONT=font_$1 -I../firmware -o /tmp/writerbf writerbf.c /tmp/$1.c
+
+# run writerbf, will write linked incore font to .rbf format
+/tmp/writerbf
+rm /tmp/writerbf
+
+# load .rbf font and display it for test
+gcc -DMAX_FONT_SIZE=500000 -o /tmp/loadrbf loadrbf.c
+/tmp/loadrbf $1.fnt > /tmp/$1.1
+rm /tmp/loadrbf
+
+# link .c font and diff with .fnt load for test
+gcc -DFONT=font_$1 -I../firmware -o /tmp/loadrbf loadrbf.c /tmp/$1.c
+/tmp/loadrbf > /tmp/$1.2
+rm /tmp/loadrbf
+
+#
+# we diff the output to ensure correctness
+diff /tmp/$1.1 /tmp/$1.2
+
+# clean up
+rm /tmp/$1.1 /tmp/$1.2
+#rm /tmp/$1.c
