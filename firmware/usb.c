@@ -80,6 +80,20 @@ static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
 
+#ifdef USB_GMINISTYLE
+static int getSMSCVer(void) {
+  int v;
+  int* smscVerAddr = (int*)0x4C20;
+  __asm__ ("ldc %0, @%1" : "=r"(v) : "a"(smscVerAddr));
+  v &= 0xFF;
+  if (v < 4 || v == 0xFF) {
+    return 3;
+  }
+  return v;
+}
+
+#endif
+
 static void usb_enable(bool on)
 {
 #ifdef USB_ENABLE_ONDIOSTYLE
@@ -103,6 +117,34 @@ static void usb_enable(bool on)
     }
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
 #else /* standard HD Jukebox */
+#ifdef USB_GMINISTYLE
+    {
+        int i;
+        int smscVer = getSMSCVer();
+        if (on) {
+            if (smscVer < 4) {
+                P6 &= ~0x04;
+                P10 &= ~0x20;
+                
+                for (i=0; i < 20; i++)
+                    ;
+                
+                P6 |= 0x08;
+                P10 |= 0x20;    
+                
+                for (i=0; i < 20; i++)
+                    ;
+            }
+            P6 |= 0x10;
+        } else {
+            P6 &= ~0x10;
+            if (smscVer < 4) {
+                P6 &= ~0x04;
+                P10 &= ~0x20;
+            }
+        }
+    }
+#else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
         on = !on;
@@ -116,6 +158,7 @@ static void usb_enable(bool on)
         or_b(0x04, &PADRH);
     }
     or_b(0x04, &PAIORH);
+#endif
 #endif
 }
 
@@ -299,6 +342,9 @@ bool usb_detect(void)
 #endif
 #ifdef IRIVER_H100
     current_status = (GPIO1_READ & 0x80)?true:false;
+#endif
+#ifdef USB_GMINISTYLE
+    current_status = (P5 & 0x80)?true:false;
 #endif
     return current_status;
 }
