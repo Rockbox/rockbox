@@ -70,7 +70,11 @@ drivers/fmradio_i2c.c
 tuner_philips.c
 #endif
 #endif
+#if CONFIG_I2C == I2C_H100
+drivers/i2c-h100.c
+#else
 drivers/i2c.c
+#endif
 #if CONFIG_HWCODEC != MASNONE
 drivers/mas.c
 #endif
@@ -107,3 +111,7 @@ bitswap.S
 descramble.S
 #endif
 drivers/lcd.S
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+drivers/uda1380.c
+pcm_playback.c
+#endif
