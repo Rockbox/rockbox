@@ -73,6 +73,9 @@ static char   string_buffer[STRING_BUFFER_SIZE];
 /* prototypes */
 #ifdef HAVE_LCD_BITMAP
 static char*  string2icon(const char*);
+static int    add_plugin(char*,char*);
+#else
+static int    add_plugin(char*);
 #endif
 static char*  get_string(const char*);
 static int    find_attr_index(int);
@@ -426,6 +429,69 @@ static void scan_plugins(void)
     closedir(dir);
 }
 
+#ifdef HAVE_LCD_BITMAP
+static int add_plugin(char *plugin, char *icon)
+#else
+static int add_plugin(char *plugin)
+#endif
+{
+    char *cp;
+    int i;
+
+    if (!plugin)
+        return 0;
+
+    cp=strrchr(plugin, '.');
+    if (cp)
+        *cp='\0';
+
+    for (i=first_soft_filetype; i < cnt_filetypes; i++)
+    {
+        if (filetypes[i].plugin)
+        {
+            if (!strcasecmp(plugin, filetypes[i].plugin))
+            {
+#ifdef HAVE_LCD_BITMAP
+                if (filetypes[i].icon == NULL && icon)
+                {
+                    cp = string2icon(icon);
+                    if (cp)
+                        filetypes[cnt_filetypes].icon = cp;
+                    else
+                        return 0;
+                }
+#endif
+                return i;
+            }
+        }
+    }
+
+    /* new plugin */
+    cp = get_string(plugin);
+    if (cp)
+    {
+        filetypes[cnt_filetypes].plugin = cp;
+#ifdef HAVE_LCD_BITMAP
+        /* add icon */
+        if (icon)
+        {
+            cp = string2icon(icon);
+            if (cp)
+                filetypes[cnt_filetypes].icon = cp;
+            else
+                return 0;
+        }
+#endif
+    }
+    else
+    {
+        return 0;
+    }
+
+    cnt_filetypes++;
+    return cnt_filetypes - 1;
+}
+
 /* read config file (or cahe file) */
 bool read_config(const char* file)
 {
@@ -436,7 +502,7 @@ bool read_config(const char* file)
 #endif
           last};
 
-    int   i;
+    int   i,ix;
     int   fd;
     char* end;
     char* cp;
@@ -491,91 +557,120 @@ bool read_config(const char* file)
                 }
             }
             str[i] = strtok_r(NULL, ",", &end);
+            if (str[i])
+                if (!strlen(str[i]))
+                    str[i]=NULL;
             i++;
         }
 
         /* bail out if no icon and no plugin */
-        if ((!str[plugin] || !strlen(str[plugin])) &&
+        if (!str[plugin]
 #ifdef HAVE_LCD_BITMAP
-            (!str[icon]   || !strlen(str[icon])) &&
+            && !str[icon]
 #endif
-            strlen(str[extension]))
+           )
             continue;
 
         /* bail out if no plugin and icon is incorrect*/
-        if ((!str[plugin] || !strlen(str[plugin])) &&
+        if (!str[plugin]
 #ifdef HAVE_LCD_BITMAP
-            (strlen(str[icon]) != ICON_LENGTH*2) &&
+            && strlen(str[icon]) != ICON_LENGTH*2
 #endif
-            strlen(str[extension]))
+           )
             continue;
 
         /* bail out if no icon and no plugin and no extension*/
-        if ((!str[plugin] || !strlen(str[plugin])) &&
+        if (!str[plugin] &&
 #ifdef HAVE_LCD_BITMAP
-            (!str[icon]   || !strlen(str[icon])) &&
+            !str[icon] &&
 #endif
-            (!str[extension] || !strlen(str[extension])))
+            !str[extension])
             continue;
 
-        /* add extension */
-        if (str[extension])
-        {
-            if (strlen(str[extension]))
-            {
-                cp=get_string(str[extension]);
-                if (cp)
-                {
-                    exttypes[cnt_exttypes].type = &filetypes[cnt_filetypes];
-                    exttypes[cnt_exttypes].extension = cp;
-                    cnt_exttypes++;
-                }
-                else
-                    break;
-
-#ifdef HAVE_LCD_BITMAP
-                /* add icon */
-                if (str[icon])
-                {
-                    cp = string2icon(str[icon]);
-                    if (cp)
-                        filetypes[cnt_filetypes].icon = cp;
-                    else
-                        break;
-                }
-#endif
-            }
-        }
-
-        /* are we able to start plugin from onplay.c ?*/
+        /* bail out if we are not able to start plugin from onplay.c ?*/
         if (str[plugin])
         {
             if (strlen(str[plugin]) > MAX_PLUGIN_LENGTH)
             {
                 splash(HZ, true, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
                 str[plugin] = NULL;
+                continue;
             }
         }
 
-        /* add plugin */
-        if (str[plugin])
+        ix=0;
+        /* if extension already exist don't add a new one */
+        for (i=0; i < cnt_exttypes; i++)
         {
-            if (strlen(str[plugin]))
+            if (!strcasecmp(str[extension],exttypes[i].extension))
             {
-                cp=strrchr(str[plugin], '.');
-                if (cp)
-                    *cp='\0';
-
-                cp = get_string(str[plugin]);
-                if (cp)
-                    filetypes[cnt_filetypes].plugin = cp;
-                else
-                    break;
+#ifdef HAVE_LCD_BITMAP
+                ix=add_plugin(str[plugin],NULL);
+                if (ix)
+                {
+                    if (str[icon] && filetypes[ix].icon == NULL)
+                    {
+                        if (exttypes[i].type->icon == NULL)
+                        {
+                            cp = string2icon(str[icon]);
+                            if (cp)
+                                exttypes[i].type->icon = cp;
+                        }
+                    }
+                }
+#else
+                ix=add_plugin(str[plugin]);
+#endif
+                if (exttypes[i].type == NULL)
+                {
+                    exttypes[i].type = &filetypes[ix];
+                }
+                break;
             }
         }
+        if (ix)
+            continue;
 
-        if (filetypes[cnt_filetypes].plugin)
-            cnt_filetypes++;
+        /* add extension */
+        if (str[extension])
+        {
+#ifdef HAVE_LCD_BITMAP
+            ix=add_plugin(str[plugin],str[icon]);
+#else
+            ix=add_plugin(str[plugin]);
+#endif
+            if (ix)
+            {
+                cp=get_string(str[extension]);
+                if (cp)
+                {
+                    exttypes[cnt_exttypes].extension = cp;
+
+                    exttypes[cnt_exttypes].type = &filetypes[ix];
+                    cnt_exttypes++;
+                    filetypes[i].no_extension=false;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+#ifdef HAVE_LCD_BITMAP
+            ix=add_plugin(str[plugin],str[icon]);
+#else
+            ix=add_plugin(str[plugin]);
+#endif
+            filetypes[ix].no_extension=true;
+            if (!i)
+                break;
+        }
     }
     close(fd);
 
