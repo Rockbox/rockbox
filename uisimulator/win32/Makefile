@@ -81,7 +81,6 @@ else
   CFLAGS += -mwindows
   LDFLAGS += -mwindows
   APPCFLAGS += -mwindows
-  EXTRAFIRMSRC = sprintf.c
 endif
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
@@ -89,7 +88,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
-FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c $(EXTRAFIRMSRC)
+FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c \
+	sprintf.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
