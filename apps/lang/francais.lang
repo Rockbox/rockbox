@@ -1,3 +1,4 @@
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -138,18 +139,13 @@ desc: if save settings has failed
 eng: "Batt. low?"
 new: "Batt. faible?"
 
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save failed"
-new :"Echec de l'enregistrement"
-
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new:  "Batterie faible ?"
+new: "Batterie faible ?"
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: if save settings has failed
 eng: "ON to set"
 new: "ON pour valider"
 
@@ -160,17 +156,23 @@ new: "OFF pour annuler"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Fichiers cachés"
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Afficher"
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Cacher"
 
 id: LANG_CONTRAST
@@ -190,7 +192,9 @@ new: "Lire fichier selectionné en 1er"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Filtre musical"
 
 id: LANG_SORT_CASE
@@ -222,9 +226,6 @@ id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 new: "Rétro-Eclairage"
-
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu, 
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -429,7 +430,7 @@ new: "(LECT/STOP)"
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
 eng: "Play = Yes"
-new:  "Lecture = Oui"
+new: "Lecture = Oui"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
@@ -519,12 +520,12 @@ new: "<aucun album>"
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new:  "[N° de Piste]"
+new: "[N° de Piste]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<no tracknum>"
-new:"<aucun N° de piste>"
+new: "<aucun N° de piste>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -543,7 +544,9 @@ new: "[Taux de d'encodage]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
-eng: "[Frecuency]"
+### English phrase was changed! Previous translation was made on:
+### "[Frequency]"
+eng: "[Frequency]"
 new: "[Fréquence]"
 
 id: LANG_ID3_PATH
@@ -573,7 +576,9 @@ new: "Mode:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Filtre répertoire: %s"
 
 id: LANG_F3_STATUS
@@ -604,7 +609,7 @@ new: "<Presser ON>"
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "<End of song list>"
-new:  "<Fin de la liste>"
+new: "<Fin de la liste>"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -654,12 +659,12 @@ new: "(1 - lent, 9 - rapide)"
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
-new:  "[Lecture] pour commencer/pause"
+new: "[Lecture] pour commencer/pause"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new:  "Niveau"
+new: "Niveau"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
@@ -690,11 +695,6 @@ id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: "[F3] + level"
 new: "[F3] + niveau"
-
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
@@ -731,10 +731,6 @@ desc: wormlet game
 eng: "Hs: %d"
 new: "Rec: %d"
 
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
-
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
@@ -770,8 +766,6 @@ desc: wormlet game
 eng: "Out of control"
 new: "Hors de contrôle"
 
-# Wormlet game ids ended
-
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
@@ -781,3 +775,49 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new: "0 Ligne - Niveau 0"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Montrer fichiers" 
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: " tous" 
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Musique" 
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Supporté" 
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "nouvelle langue"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+### Not previously translated
+new: "Arrêt suite à inactivité"
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save failed"
+new: "Echec de l'enregistrement"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Non" 
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "oui"
