@@ -193,6 +193,8 @@ static int fprfunc(void *pr, unsigned char letter)
 }
 
 
+#ifndef SIMULATOR
+
 int fprintf(int fd, const char *fmt, ...)
 {
     bool ok;
@@ -208,3 +210,4 @@ int fprintf(int fd, const char *fmt, ...)
 
     return fpr.bytes; /* return 0 on error */
 }
+#endif
