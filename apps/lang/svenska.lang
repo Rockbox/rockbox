@@ -1338,3 +1338,33 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 new: "Visa ID3 Info"
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu()
+eng: "Power Saving"
+new: "Strömspar"
+
+id: LANG_FADE_ON_STOP
+desc: 
+eng: "Fade On Stop/Pause"
+new: "Tona bort vid Stop/Paus"
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+new: "Storlek:"
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+new: "Tid:"
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: "Inställningar"
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "loaded"
+new: "inlästa"
