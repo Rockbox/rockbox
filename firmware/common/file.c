@@ -227,15 +227,14 @@ int lseek(int fd, int offset, int whence)
             break;
 
         case SEEK_END:
-            pos = openfiles[fd].size - offset;
+            pos = openfiles[fd].size + offset;
             break;
 
         default:
             errno = EINVAL;
             return -1;
     }
-    if ( (pos < 0) ||
-         (pos > openfiles[fd].size) ) {
+    if ((pos < 0) || (pos > openfiles[fd].size)) {
         errno = EINVAL;
         return -1;
     }
