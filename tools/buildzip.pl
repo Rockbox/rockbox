@@ -1,5 +1,20 @@
 #!/usr/bin/perl
 
+$ROOT="..";
+
+if($ARGV[0] eq "-r") {
+    $ROOT=$ARGV[1];
+    shift @ARGV;
+    shift @ARGV;    
+}
+
+my $verbose;
+if($ARGV[0] eq "-v") {
+    $verbose =1;
+    shift @ARGV;
+}
+
+
 sub filesize {
     my ($filename)=@_;
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
@@ -10,7 +25,7 @@ sub filesize {
 
 sub buildlangs {
     my ($outputlang)=@_;
-    my $dir = "../apps/lang";
+    my $dir = "$ROOT/apps/lang";
     opendir(DIR, $dir);
     my @files = grep { /\.lang$/ } readdir(DIR);
     closedir(DIR);
@@ -19,7 +34,7 @@ sub buildlangs {
         my $output = $_;
         $output =~ s/(.*)\.lang/$1.lng/;
         print "lang $_\n" if($verbose);
-        system ("../tools/binlang $dir/english.lang $dir/$_ $outputlang/$output >/dev/null 2>&1");
+        system ("$ROOT/tools/binlang $dir/english.lang $dir/$_ $outputlang/$output >/dev/null 2>&1");
     }
 }
 
@@ -34,7 +49,7 @@ sub buildzip {
     mkdir ".rockbox/rocks", 0777;
     `find . -name "*.rock" ! -empty | xargs --replace=foo cp foo .rockbox/rocks/`;
 
-    open VIEWERS, "../apps/plugins/viewers.config" or
+    open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
     @viewers = <VIEWERS>;
     close VIEWERS;
@@ -53,17 +68,17 @@ sub buildzip {
     close VIEWERS;
     
     if($notplayer) {
-        `cp ../apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
-        `cp ../apps/plugins/snake2.levels .rockbox/`; # snake2 levels
+        `cp $ROOT/apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
+        `cp $ROOT/apps/plugins/snake2.levels .rockbox/`; # snake2 levels
 
         mkdir ".rockbox/fonts", 0777;
 
-        opendir(DIR, "../fonts") || die "can't open dir fonts";
-        my @fonts = grep { /\.bdf$/ && -f "../fonts/$_" } readdir(DIR);
+        opendir(DIR, "$ROOT/fonts") || die "can't open dir fonts";
+        my @fonts = grep { /\.bdf$/ && -f "$ROOT/fonts/$_" } readdir(DIR);
         closedir DIR;
 
         my $maxfont;
-        open(HEADER, "<../firmware/export/font.h");
+        open(HEADER, "<$ROOT/firmware/export/font.h");
         while(<HEADER>) {
             if(/^\#define MAX_FONT_SIZE[ \t]*(\d+)/) {
                 $maxfont = $1;
@@ -78,7 +93,7 @@ sub buildzip {
             print "FONT: $f\n" if($verbose);
             my $o = $f;
             $o =~ s/\.bdf/\.fnt/;
-            my $cmd ="../tools/convbdf -s 32 -l 255 -f -o \".rockbox/fonts/$o\" \"../fonts/$f\" >/dev/null 2>&1";
+            my $cmd ="$ROOT/tools/convbdf -s 32 -l 255 -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
             print "CMD: $cmd\n" if($verbose);
             `$cmd`;
             
@@ -102,7 +117,7 @@ sub buildzip {
          "FAQ",
          "NODO",
          "TECH")) {
-        `cp ../docs/$_ .rockbox/docs/$_.txt`;
+        `cp $ROOT/docs/$_ .rockbox/docs/$_.txt`;
     }
 
     # now copy the file made for reading on the unit:
@@ -133,12 +148,6 @@ $year+=1900;
 
 $date=sprintf("%04d%02d%02d", $year,$mon, $mday);
 $shortdate=sprintf("%02d%02d%02d", $year%100,$mon, $mday);
-
-my $verbose;
-if($ARGV[0] eq "-v") {
-    $verbose =1;
-    shift @ARGV;
-}
 
 # made once for all targets
 sub runone {

@@ -86,7 +86,7 @@ tags:
 	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) tags
 
 zip:
-	\$(TOOLSDIR)/buildzip.pl sim\$(TARGET)
+	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" sim\$(TARGET)
 
 install:
 	@echo "installing a full setup in your archos dir"
@@ -423,7 +423,7 @@ tags:
 	\$(MAKE) tags-firmware tags-apps
 
 zip:
-	\$(TOOLSDIR)/buildzip.pl \$(TARGET)
+	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET)
 EOF
 
 echo "Created Makefile"
