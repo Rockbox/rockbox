@@ -28,6 +28,12 @@
    If it does, we should put this within #ifdef __MINGW32__ */
 int errno;
 
+int set_irq_level (int level)
+{
+    static int _lv = 0;
+    return (_lv = level);
+}
+
 void sleep(int ticks)
 {
     Sleep (1000 / HZ * ticks);
@@ -96,12 +102,6 @@ bool queue_empty(struct event_queue* q)
 void switch_thread (void)
 {
     yield ();
-}
-
-int set_irq_level (int level)
-{
-    static int _lv = 0;
-    return (_lv = level);
 }
 
 /* TODO: Implement mutexes for win32 */
