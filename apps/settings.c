@@ -314,7 +314,7 @@ static struct bit_entry hd_bits[] =
     {1, S_O(line_in), false, "line in", off_on },
 #endif
     /* voice */
-    {2, S_O(talk_dir), 0, "talk dir", "off,number,spell,enter,hover" },
+    {3, S_O(talk_dir), 0, "talk dir", "off,number,spell,enter,hover" },
     {2, S_O(talk_file), 0, "talk file", "off,number,spell" },
     {1, S_O(talk_menu), true, "talk menu", off_on },
 
