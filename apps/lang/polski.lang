@@ -1,16 +1,5 @@
 # $Id$
-#
-# This is the master of the language files. This is the original, the one with
-# all the existing strings Rockbox features.
-#
-# *WARNING*
-#
-# If you want to add a new string, add it to the end of this file!
-# If you want to remove a string, just blank it, don't actually remove it!
-#
-# If you re-order things or remove entries, you must bump the binary language
-# file version number in both the 'binlang' tool and the language loader code.
-#
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -43,12 +32,12 @@ new: "Wersja"
 
 id: LANG_DEBUG
 desc: in the main menu
-eng: "Debug (keep out!)"
+eng: "Debug (Keep Out!)"
 new: "Sledz bledy (ostroznie!)"
 
 id: LANG_USB
 desc: in the main menu
-eng: "USB (sim)"
+eng: "USB (Sim)"
 new: "USB (sim)"
 
 id: LANG_ROCKBOX_INFO
@@ -78,7 +67,7 @@ new: "Bateria: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
+eng: "Battery: Charging"
 new: "Bateria: ladowanie"
 
 id: LANG_BOUNCE
@@ -133,42 +122,42 @@ new: "Playlista"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-eng: "buffer full"
+eng: "Buffer Full"
 new: "pelny bufor"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
-eng: "%d files"
+eng: "%d Files"
 new: "%d plikow"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Blad zapisu"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. low?"
+eng: "Batt. Low?"
 new: "Slabe bat.?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Blad zapisu"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is battery low?"
+eng: "Is Battery Low?"
 new: "Slabe baterie?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
-eng: "ON to set"
+eng: "ON To Set"
 new: "ON - ustaw"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-eng: "OFF to revert"
+eng: "OFF To Revert"
 new: "OFF - przywroc"
 
 id: LANG_HIDDEN
@@ -259,7 +248,7 @@ new: "Usypianie dysku"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "Skok przewijania.(min.)"
+new: "Skok przewijania (minim.)"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
@@ -276,7 +265,7 @@ id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
 eng: ""
 new: "Na pewno?"
- 
+
 # depreciated
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
@@ -285,7 +274,7 @@ new: "GRAJ/STOP"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-eng: "Are you sure?"
+eng: "Are You Sure?"
 new: "Jestes pewny?"
 
 # depreciated
@@ -323,11 +312,11 @@ new: "Tryb sortowania"
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll"
-new: "Przesun"
+new: "Przesuwanie napisow"
 
 id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Reset settings"
+eng: "Reset Settings"
 new: "Ustawienia domyslne"
 
 id: LANG_PLAYBACK
@@ -338,7 +327,7 @@ new: "Odtwarzanie"
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "Widok pliku"
+new: "Widok plikow"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -427,7 +416,7 @@ new: "Bufor katalogow"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
+eng: "Is Full!"
 new: "jest pelny!"
 
 id: LANG_RESUME_ASK
@@ -452,22 +441,22 @@ new: "Kazdy inny = Nie"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-eng: "Keylock ON"
+eng: "Key Lock ON"
 new: "Blokada klawiszy"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-eng: "Keylock OFF"
+eng: "Key Lock OFF"
 new: "Klawisze odblokowane"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key lock is ON"
+eng: "Key Lock Is ON"
 new: "Klawisze sa zablokowane"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
+eng: "Key Lock Is OFF"
 new: "Klawisze sa odblokowane"
 
 id: LANG_MUTE_ON_PLAYER
@@ -482,12 +471,12 @@ new: "Wzmocn. normalne"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-eng: "Mute is ON"
+eng: "Mute Is ON"
 new: "Wyciszenie"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-eng: "Mute is OFF"
+eng: "Mute Is OFF"
 new: "Wzmocn. normalne"
 
 id: LANG_ID3_INFO
@@ -507,7 +496,7 @@ new: "[Tytul]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
+eng: "<No Title>"
 new: "<bez tytulu>"
 
 id: LANG_ID3_ARTIST
@@ -517,7 +506,7 @@ new: "[Artysta]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
+eng: "<No Artist>"
 new: "<brak artysty>"
 
 id: LANG_ID3_ALBUM
@@ -527,7 +516,7 @@ new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
+eng: "<No Album>"
 new: "<brak albumu>"
 
 id: LANG_ID3_TRACKNUM
@@ -537,7 +526,7 @@ new: "[Sciezka nr]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
+eng: "<No Tracknum>"
 new: "<brak nru sciezki>"
 
 id: LANG_ID3_LENGHT
@@ -567,12 +556,12 @@ new: "[Sciezka]"
 
 id: LANG_PITCH_UP
 desc: in wps
-eng: "Pitch up"
+eng: "Pitch Up"
 new: "Podnies"
 
 id: LANG_PITCH_DOWN
 desc: in wps
-eng: "Pitch down"
+eng: "Pitch Down"
 new: "Obniz"
 
 id: LANG_PAUSE
@@ -582,7 +571,7 @@ new: "Pauza"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-eng: "mode:"
+eng: "Mode:"
 new: "tryb:"
 
 id: LANG_DIR_FILTER
@@ -598,16 +587,16 @@ new: "Status"
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-new: "Przesun"
+new: "Przesuw"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-eng: "bar"
+eng: "Bar"
 new: "pasek"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End of list"
+eng: "End Of List"
 new: "Koniec listy"
 
 id: LANG_END_CONFIRM_PLAYER
@@ -617,8 +606,8 @@ new: "Wcisnij ON"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "End of song list"
-new: "Koniec listy piosenek"
+eng: "End Of Song List"
+new: "Koniec playlisty"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -647,12 +636,12 @@ new: "Gra wstrzymana"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[PLAY] to resume"
+eng: "[PLAY] To Resume"
 new: "[GRAJ] dalej"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[OFF] to quit"
+eng: "[OFF] To Quit"
 new: "[OFF] zakoncz"
 
 id: LANG_SNAKE_LEVEL
@@ -662,12 +651,12 @@ new: "Poziom - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
-eng: "(1 - slow, 9 - fast)"
+eng: "(1 - Slow, 9 - Fast)"
 new: "(1- wolno, 9 - szybko)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[PLAY] to start/pause"
+eng: "[PLAY] To Start/Pause"
 new: "[GRAJ] start/wstrzymaj"
 
 id: LANG_SOKOBAN_LEVEL
@@ -687,22 +676,22 @@ new: "WYGRALES!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] to stop"
+eng: "[OFF] To Stop"
 new: "[OFF] zatrzymaj"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - level"
+eng: "[F1] - Level"
 new: "[F1] - poziom"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] same level"
-new: "[F2] ten sam poziom"
+eng: "[F2] Same Level"
+new: "[F2] ten sam poz."
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + level"
+eng: "[F3] + Level"
 new: "[F3] + poziom"
 
 # Next ids are for Worlmet Game.
@@ -761,40 +750,40 @@ new: "%d Robakow      L/P"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote control F1"
+eng: "Remote Control F1"
 new: "Zdalne ster.   F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No rem. control F1"
+eng: "No Rem. Control F1"
 new: "Brak zdal.ster. F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 key control   F1"
+eng: "2 Key Control   F1"
 new: "2 klaw. steruj. F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 key control   F1"
+eng: "4 Key Control   F1"
 new: "4 klaw. steruj. F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out of control"
+eng: "Out Of Control"
 new: " Brak sterow. "
 
 # Wormlet game ids ended
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You lose!"
+eng: "You Lose!"
 new: "Przegrales!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "Rows - Level"
-new: "Rzedzy - Poziom"
+new: "rzedow - poziom"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -803,7 +792,7 @@ new: "Aut. wylaczanie"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-eng: "new language"
+eng: "New Language"
 new: "Nowy jezyk"
 
 id: LANG_FILTER
@@ -841,10 +830,10 @@ desc: in the display menu
 eng: "Peak Meter"
 new: "Wskaznik szczyt."
 
-id:   LANG_PM_RELEASE
+id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
-new: "Zwolnij szczyt."
+new: "Zwolnienie szczyt."
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
@@ -890,11 +879,15 @@ id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 new: "GRAJ=Reset"
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 new: "OFF=Anuluj"
+
+# NOTE: ignore this label.  It is no longer used/was an error.
+# We are aware of this and it will this instance will be removed in the future
+id: LANG_TETRIS_LEVEL
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -903,12 +896,12 @@ new: "Format czasu"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-eng: "12 hour clock"
+eng: "12 Hour Clock"
 new: "12-godzinny"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-eng: "24 hour clock"
+eng: "24 Hour Clock"
 new: "24-godzinny"
 
 id: LANG_WEEKDAY_SUNDAY
@@ -1053,12 +1046,12 @@ new: "Wysoka wydajnosc"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-eng: "Save energy"
+eng: "Save Energy"
 new: "Oszczedz. energii"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
+eng: "dBfs <-> Linear"
 new: "dBfs <-> linearny"
 
 id: LANG_PM_DBFS
@@ -1068,17 +1061,17 @@ new: "dBfs"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "linear"
+eng: "Linear"
 new: "linearny"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-eng: "Minimum of range"
+eng: "Minimum Of Range"
 new: "Zakres minimum"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-eng: "Maximum of range"
+eng: "Maximum Of Range"
 new: "Zakres maksimum"
 
 id: LANG_RECORDING
@@ -1138,7 +1131,7 @@ new: "Digital"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-eng: "Recording settings"
+eng: "Recording Settings"
 new: "Ustawienia nagrywania"
 
 id: LANG_DISK_STAT
@@ -1168,12 +1161,12 @@ new: "%d%% %dg %dm"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-eng: "Sleep timer"
+eng: "Sleep Timer"
 new: "Usypiacz"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
+eng: "Anti-Skip Buffer"
 new: "Bufor antywstrzasowy"
 
 id: LANG_BIDIR_SCROLL
@@ -1228,12 +1221,12 @@ new: "W kolejce: %s"
 
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
-eng: "Total queued: %d"
+eng: "Total Queued: %d"
 new: "Wszystkich w kolejce: %d"
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full
-eng: "Queue buffer full"
+eng: "Queue Buffer Full"
 new: "Pusty bufor kolejki"
 
 id: LANG_MENU_SETTING_CANCEL
@@ -1283,7 +1276,7 @@ new: "Zm.Naz"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-eng: "failed"
+eng: "Failed"
 new: "nie udalo sie"
 
 id: LANG_ALARM_MOD_ALARM_MENU
@@ -1293,22 +1286,22 @@ new: "Alarm - Budzik"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm time: %02d:%02d"
+eng: "Alarm Time: %02d:%02d"
 new: "Czas alarmu: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking up in %d:%02d"
+eng: "Waking Up In %d:%02d"
 new: "Budzenie za %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting down..."
+eng: "Shutting Down..."
 new: "Wylaczanie..."
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm time is too soon!"
+eng: "Alarm Time Is Too Soon!"
 new: "Za wczesny czas alarmu!"
 
 id: LANG_ALARM_MOD_KEYS
@@ -1363,7 +1356,7 @@ new: "[Rok]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
-eng: "<no info>"
+eng: "<No Info>"
 new: "<brak info>"
 
 id: LANG_RECORDING_TIME
@@ -1375,3 +1368,28 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 new: "Rozmiar:"
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu()
+eng: "Power Saving"
+new: "Oszczedzanie"
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: "Ustawienia"
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "Loaded"
+new: "zaladowane"
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+new: "Fade przy zatrzymaniu"
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] To Undo"
+new: "[ON] - przywroc"

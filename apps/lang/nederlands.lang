@@ -32,12 +32,12 @@ new: "Versie"
 
 id: LANG_DEBUG
 desc: in the main menu
-eng: "Debug (keep out!)"
+eng: "Debug (Keep Out!)"
 new: "Debug (afblijven!)"
 
 id: LANG_USB
 desc: in the main menu
-eng: "USB (sim)"
+eng: "USB (Sim)"
 new: 
 
 id: LANG_ROCKBOX_INFO
@@ -67,8 +67,8 @@ new: "Batterij: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
-new: "Batterij: opladen"
+eng: "Battery: Charging"
+new: "Batterij: Opladen"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -122,42 +122,42 @@ new: "Speellijst"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-eng: "buffer full"
-new: "buffer vol"
+eng: "Buffer Full"
+new: "buffer Vol"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
-eng: "%d files"
-new: "%d nummers"
+eng: "%d Files"
+new: "%d Nummers"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-eng: "Save failed"
-new: "Opslaan mislukt"
+eng: "Save Failed"
+new: "Opslaan Mislukt"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. low?"
-new: "Batt. leeg?"
+eng: "Batt. Low?"
+new: "Batt. Leeg?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-eng: "Save failed"
-new: "Opslaan mislukt"
+eng: "Save Failed"
+new: "Opslaan Mislukt"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is battery low?"
+eng: "Is Battery Low?"
 new: "Is de batterij leeg ?"
 
 id: LANG_TIME_SET
-desc: 
-eng: "ON to set"
+desc: used in set_time()
+eng: "ON To Set"
 new: "ON om in te stellen"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-eng: "OFF to revert"
+eng: "OFF To Revert"
 new: "OFF om terug te zetten"
 
 id: LANG_HIDDEN
@@ -272,7 +272,7 @@ new: ""
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-eng: "Are you sure?"
+eng: "Are You Sure?"
 new: "Weet je het zeker?"
 
 id: LANG_RESET_CONFIRM_RECORDER
@@ -312,7 +312,7 @@ new:
 
 id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Reset settings"
+eng: "Reset Settings"
 new: "Instellingen resetten"
 
 id: LANG_PLAYBACK
@@ -408,11 +408,11 @@ new:
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-new: "Map Buffer"
+new: "Map buffer"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
+eng: "Is Full!"
 new: "is vol!!"
 
 id: LANG_RESUME_ASK
@@ -437,22 +437,22 @@ new: "Elke andere = Nee"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-eng: "Keylock ON"
+eng: "Key Lock ON"
 new: "Toetsblok AAN"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-eng: "Keylock OFF"
+eng: "Key Lock OFF"
 new: "Toetsblok UIT"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key lock is ON"
+eng: "Key Lock Is ON"
 new: "Toetsblok is AAN"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
+eng: "Key Lock Is OFF"
 new: "Toetsblok is UIT"
 
 id: LANG_MUTE_ON_PLAYER
@@ -467,12 +467,12 @@ new: "Stil UIT"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-eng: "Mute is ON"
+eng: "Mute Is ON"
 new: "Stil is AAN"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-eng: "Mute is OFF"
+eng: "Mute Is OFF"
 new: "Stil is UIT"
 
 id: LANG_ID3_INFO
@@ -492,7 +492,7 @@ new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
+eng: "<No Title>"
 new: "<geen titel>"
 
 id: LANG_ID3_ARTIST
@@ -502,7 +502,7 @@ new: "[Artiest]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
+eng: "<No Artist>"
 new: "<geen artiest>"
 
 id: LANG_ID3_ALBUM
@@ -512,7 +512,7 @@ new:
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
+eng: "<No Album>"
 new: "<geen album>"
 
 id: LANG_ID3_TRACKNUM
@@ -522,7 +522,7 @@ new:
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
+eng: "<No Tracknum>"
 new: "<geen tracknum>"
 
 id: LANG_ID3_LENGHT
@@ -552,12 +552,12 @@ new: "[Pad]"
 
 id: LANG_PITCH_UP
 desc: in wps
-eng: "Pitch up"
+eng: "Pitch Up"
 new: "Versnel"
 
 id: LANG_PITCH_DOWN
 desc: in wps
-eng: "Pitch down"
+eng: "Pitch Down"
 new: "Vertraag"
 
 id: LANG_PAUSE
@@ -567,7 +567,7 @@ new: "Pauze"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-eng: "mode:"
+eng: "Mode:"
 new: 
 
 id: LANG_DIR_FILTER
@@ -587,12 +587,12 @@ new:
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-eng: "bar"
+eng: "Bar"
 new: "balk"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End of list"
+eng: "End Of List"
 new: "Einde van de lijst"
 
 id: LANG_END_CONFIRM_PLAYER
@@ -602,7 +602,7 @@ new: ""
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "End of song list"
+eng: "End Of Song List"
 new: "Einde van de titellijst"
 
 id: LANG_END_CONFIRM_RECORDER
@@ -632,12 +632,12 @@ new: "Spel gepauseerd"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[PLAY] to resume"
+eng: "[PLAY] To Resume"
 new: "[PLAY] om door te gaan"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[OFF] to quit"
+eng: "[OFF] To Quit"
 new: "[OFF] om te stoppen"
 
 id: LANG_SNAKE_LEVEL
@@ -647,12 +647,12 @@ new: "Niveau - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
-eng: "(1 - slow, 9 - fast)"
+eng: "(1 - Slow, 9 - Fast)"
 new: "(1 - langzaam, 9 - snel)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[PLAY] to start/pause"
+eng: "[PLAY] To Start/Pause"
 new: "[PLAY] om te starten/pauseren"
 
 id: LANG_SOKOBAN_LEVEL
@@ -672,23 +672,23 @@ new: "JE HEBT GEWONNEN !!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] to stop"
+eng: "[OFF] To Stop"
 new: "[OFF] om te stoppen"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - level"
-new: "[F1] - niveau"
+eng: "[F1] - Level"
+new: "[F1] - Niveau"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] same level"
-new: "[F2] zelfde niveau"
+eng: "[F2] Same Level"
+new: "[F2] zelfde Niveau"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + level"
-new: "[F3] volgend niveau"
+eng: "[F3] + Level"
+new: "[F3] + Niveau"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
@@ -737,32 +737,32 @@ new: "%d Wormen       L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote control F1"
+eng: "Remote Control F1"
 new: "Afstandsbed.   F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No rem. control F1"
+eng: "No Rem. Control F1"
 new: "Geen afstandsb. F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 key control   F1"
+eng: "2 Key Control   F1"
 new: "2 toets control F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 key control   F1"
+eng: "4 Key Control   F1"
 new: "4 toets control F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out of control"
+eng: "Out Of Control"
 new: "Geen controle"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You lose!"
+eng: "You Lose!"
 new: "Je hebt verloren!"
 
 id: LANG_TETRIS_LEVEL
@@ -777,7 +777,7 @@ new: "Uitschakeltijd"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-eng: "new language"
+eng: "New Language"
 new: "Nieuwe Taal"
 
 id: LANG_FILTER
@@ -867,12 +867,12 @@ new: "Do"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-eng: "12 hour clock"
+eng: "12 Hour Clock"
 new: "12 uurs klok" 
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-eng: "24 hour clock"
+eng: "24 Hour Clock"
 new: "24 uurs klok" 
 
 id: LANG_MONTH_APRIL
@@ -1012,7 +1012,7 @@ new:
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-eng: "Save energy"
+eng: "Save Energy"
 new: "Laag(Spaar energie)" 
 
 id: LANG_PM_HIGH_PERFORMANCE
@@ -1022,17 +1022,17 @@ new: "Hoog"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "linear"
-new: "lineair" 
+eng: "Linear"
+new: "Lineair" 
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-eng: "Maximum of range"
+eng: "Maximum Of Range"
 new: "Maximaal bereik" 
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-eng: "Minimum of range"
+eng: "Minimum Of Range"
 new: "Minimaal bereik" 
 
 id: LANG_PM_PERFORMANCE
@@ -1042,13 +1042,13 @@ new: "Nauwkeurigheid"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
-new: "dBfs <-> lineair" 
+eng: "dBfs <-> Linear"
+new: "dBfs <-> Lineair" 
 
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
-new: "Vraag eenmalig" 
+new: "Vraag Eenmalig" 
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
@@ -1073,12 +1073,12 @@ new: "Frequentie"
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
-new: 
+new: "Gain   "
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
-new: "Links" 
+new: "Links  " 
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -1088,11 +1088,11 @@ new: "Kwaliteit"
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
-new: "Rechts" 
+new: "Rechts " 
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-eng: "Recording settings"
+eng: "Recording Settings"
 new: "Opname Instellingen" 
 
 id: LANG_RECORDING_SOURCE
@@ -1142,12 +1142,12 @@ new:
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-eng: "Sleep timer"
+eng: "Sleep Timer"
 new: 
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
+eng: "Anti-Skip Buffer"
 new: "Overslaan buffer" 
 
 id: LANG_BIDIR_SCROLL
@@ -1168,12 +1168,12 @@ new: "Scroll Snelheid"
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-new: "Scroll Stapgrote" 
+new: "Scroll Stapgrootte" 
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-new: "Scroll Stapgrote Instelling Voorbeeld Text" 
+new: "Scroll Stapgrootte Instelling Voorbeeld Text"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1197,7 +1197,7 @@ new: "Druppel Laden"
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full
-eng: "Queue buffer full"
+eng: "Queue Buffer Full"
 new: "Wachtrij buffer vol"
 
 id: LANG_QUEUE_QUEUED
@@ -1207,7 +1207,7 @@ new: "In Wachtrij: %s"
 
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
-eng: "Total queued: %d"
+eng: "Total Queued: %d"
 new: "Totaal In Wachtrij: %d" 
 
 id: LANG_DELETE
@@ -1222,7 +1222,7 @@ new: "Verwijderd"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-eng: "failed"
+eng: "Failed"
 new: "Mislukt" 
 
 id: LANG_MENU_SETTING_CANCEL
@@ -1267,7 +1267,7 @@ new: "Inschakeltijd"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm time is too soon!"
+eng: "Alarm Time Is Too Soon!"
 new: "Inschakel tijd is te snel" 
 
 id: LANG_ALARM_MOD_KEYS
@@ -1277,17 +1277,17 @@ new: "PLAY=Set OFF=Afbreken"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting down..."
+eng: "Shutting Down..."
 new: "Uitschakelen..." 
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm time: %02d:%02d"
+eng: "Alarm Time: %02d:%02d"
 new: "Inschakel tijd: %02d:%02d" 
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking up in %d:%02d"
+eng: "Waking Up In %d:%02d"
 new: "Inschakelen om:  
 
 id: LANG_CREATE_PLAYLIST
@@ -1299,3 +1299,103 @@ id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 new: "Creeëren..."
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu()
+eng: "Power Saving"
+new: "Energie sparen" 
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+new: "Fade Bij Stop/Pause" 
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+new: 
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<No Info>"
+new: "<geen info>"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+new: "[Jaar]" 
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+new: "Toon ID3 Info" 
+
+id: LANG_PLAYER_KEYBOARD_ABORT
+desc: Abort alternative in player keyboard interaction
+eng: "Abort"
+new: "Afbreken" 
+
+id: LANG_PLAYER_KEYBOARD_ACCEPT
+desc: Accept alternative in player keyboard interaction
+eng: "Accept"
+new: "Accepteren" 
+
+id: LANG_PLAYER_KEYBOARD_BACKSPACE
+desc: Backspace alternative in player keyboard interaction
+eng: "Backspace"
+new: 
+
+id: LANG_PLAYER_KEYBOARD_DELETE
+desc: Delete alternative in player keyboard interaction
+eng: "Delete"
+new: 
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+new: "Grootte:"
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+new: "Tijd   :"
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: "Instellingen" 
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "Loaded"
+new: "Geladen" 
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] To Undo"
+new: "[ON] Ongedaan maken" 
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new: 
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new: "Smal stereo"
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new: "Smal Stereo" 
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new: "Breed Stereo" 
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "Invert"
+new: "Omgedraaid" 

@@ -1,4 +1,3 @@
-
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -407,7 +406,7 @@ new: "Tampon"
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "est plein !"
+new: "plein !"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
@@ -472,12 +471,12 @@ new: "Le son est activé"
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
-new: "-Info ID3- "
+new: "--Ecran-- "
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-new: "--Ecran-- "
+new: "-d'infos ID3- "
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -492,7 +491,7 @@ new: "<Aucun titre>"
 id: LANG_ID3_ARTIST
 desc: in wps 
 eng: "[Artist]"
-new: "[Artist]"
+new: "[Artiste]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
@@ -652,7 +651,7 @@ new: "[Lecture] pour commencer/pause"
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new: "Niveau"
+new: "Niv."
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
@@ -687,7 +686,7 @@ new: "[F3] + niveau"
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
-new: "Taille:%d"
+new: "%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
@@ -722,32 +721,32 @@ new: "Rec: %d"
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    UP/DN"
-new: "%d Joueurs haut/bas"
+new: "%d Joueurs    [H/B]"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        L/R"
-new: "%d Vers   gauche/droite"
+new: "%d Vers       [G/D]"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: "Remote control F1"
-new: "Télécommande F1"
+new: "Télécommande [F1]"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-new: "Pas de téléc. F1"
+new: "Pas de téléc. [F1]"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-new: "2 touche de contrôle F1"
+new: "2 touches     [F1]"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: "4 key control   F1"
-new: "4 touche de contrôle F1"
+new: "4 touches     [F1]"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
@@ -762,7 +761,7 @@ new: "PERDU !"
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "Rows - Level"
-new: "0 Lignes - Niveau 0"
+new: "Lignes - Niv."
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -947,7 +946,7 @@ new: "OFF=Annuler"
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
-new: "Lecture=Reinitialisation"
+new: "Lecture=Réinitialisation"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -992,7 +991,7 @@ new: "Oscillographe"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
-new: "demander une fois"
+new: "demander une seule fois"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -1142,7 +1141,7 @@ new: "%d%% %dh %dm"
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep timer"
-new: "minuterie d'arrêt auto"
+new: "Minuterie d'arrêt"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1152,7 +1151,7 @@ new: "Capacité Batterie"
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-new: "niveau max de charge"
+new: "Niveau max de charge"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
@@ -1162,7 +1161,7 @@ new: "Batterie: Chrg persistante"
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-new: "limite de défilement bidirectionnel"
+new: "Limite de défilement bidirectionnel"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
@@ -1172,7 +1171,7 @@ new: "Mémoire Anti-choc"
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-new: "delai de debut de défilement"
+new: "Délai avant début du défilement"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1182,7 +1181,7 @@ new: "Vitesse de défilement"
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-new: "taille du pas de défilement"
+new: "Pas du défilement"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
@@ -1207,47 +1206,47 @@ new: "Mis en queue: %s"
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
 eng: "Total queued: %d"
-new: "total mis en Queue: %d"
+new: "Total mis en queue: %d"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
-new: "Reveil"
+new: "Réveil"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm time is too soon!"
-new: "le reveil est trop tôt!"
+new: "le réveil est trop tôt!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
-new: "PLAY=Regler OFF=Annuler"
+new: "PLAY=Régler OFF=Annuler"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Shutting down..."
-new: "Extinction..."
+new: "Arrêt..."
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm time: %02d:%02d"
-new: "Heure du Reveil : %02d:%02d"
+new: "Heure du réveil : %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking up in %d:%02d"
-new: "Reveil dans %d:%02d"
+new: "Réveil dans %d:%02d"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-new: "Créer une Liste musicale"
+new: "Créer une liste musicale"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
-new: "en cours de création"
+new: "En cours de création"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1318,3 +1317,83 @@ id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
 new: "Renomer"
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+new: "Infos ID3"
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+new: "[Genre]"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+new: "[Année]"
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<No Info>"
+new: "<pas d'infos>"
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+new: "Durée:"
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+new: "Taille:"
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu()
+eng: "Power Saving"
+new: "Economie d'énergie"
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: "Configuration"
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "Loaded"
+new: "Chargée"
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+new: "Fondu à l'arrêt/pause"
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] To Undo"
+new: "[ON] : annuler"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "Invert"
+new: "Inverser"
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new: "Réduction st."
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new: "Réduction stéréo"
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new: "Elargissement stéréo"
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new: "Karaoké"
