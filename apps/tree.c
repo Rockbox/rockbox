@@ -173,8 +173,6 @@ static int showdir(char *path, int start)
     int icon_type = 0;
 #ifdef HAVE_LCD_BITMAP
     int line_height = LINE_HEIGTH;
-#else
-    char tmpstring[2];
 #endif
     int i;
     int tree_max_on_screen;
@@ -310,10 +308,8 @@ static int showdir(char *path, int start)
                        CURSOR_X * 6 + CURSOR_WIDTH, 
                        MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #else
-        lcd_define_pattern(0,tree_icons_5x7[0],LastTreeIcon*8);
-        tmpstring[0] = icon_type;
-        tmpstring[1] = 0;
-        lcd_puts(LINE_X-1, i-start, tmpstring);
+        lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
+        lcd_putc(LINE_X-1, i-start, i-start);
 #endif
 
         /* if MP3 filter is on, cut off the extension */
