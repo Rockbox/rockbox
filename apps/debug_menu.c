@@ -53,6 +53,9 @@ void dbg_os(void)
     int i;
     int usage;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
 
     while(1)
@@ -86,6 +89,9 @@ void dbg_os(void)
     int usage;
     int currval = 0;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
 
     while(1)
@@ -135,6 +141,9 @@ void dbg_ports(void)
     bool charge_status = false;
     bool ide_status = true;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
 
     while(1)
@@ -206,6 +215,9 @@ void dbg_ports(void)
     int batt_int, batt_frac;
     int currval = 0;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
 
     while(1)
@@ -295,6 +307,9 @@ void dbg_rtc(void)
     int i;
     int button;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
     lcd_puts(0, 0, "RTC read:");
 
@@ -351,6 +366,9 @@ void dbg_mas(void)
     char buf[32];
     unsigned int addr = 0, r, i;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
     lcd_puts(0, 0, "MAS register read:");
 
@@ -398,6 +416,9 @@ void dbg_mas_codec(void)
     char buf[32];
     unsigned int addr = 0, r, i;
 
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     lcd_clear_display();
     lcd_puts(0, 0, "MAS codec reg read:");
 
@@ -444,6 +465,9 @@ void view_battery(void)
     int maxv, minv;
     char buf[32];
     
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     while(1)
     {
         switch (view) {
@@ -572,6 +596,9 @@ void dbg_mas_info(void)
     unsigned long pll48, pll44, config;
     int pll_toggle = 0;
     
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
     while(1)
     {
         switch(currval)
