@@ -274,7 +274,7 @@ new: "Lecture/Stop"
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are you sure?"
-new: "Etes vous sûr ?"
+new: "Etes-vous sûr ?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
@@ -494,7 +494,7 @@ new: "[Titre]"
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<no title>"
-new: "<Pas de titre>"
+new: "<Aucun titre>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -504,7 +504,7 @@ new: "[Artist]"
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<no artist>"
-new: "<Pas d'artiste>"
+new: "<aucun artiste>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -514,7 +514,7 @@ new: "[Album]"
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
 eng: "<no album>"
-new: "<Pas d'album>"
+new: "<aucun album>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -524,7 +524,7 @@ new:  "[N° de Piste]"
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<no tracknum>"
-new:"<Pas de N° de piste>"
+new:"<aucun N° de piste>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
