@@ -39,9 +39,9 @@ my $output = $ARGV[2];
 
 my $idnum=0;
 
-open(ENG, "<$english");
-open(LANG, "<$input");
-open(OFILE, ">$output");
+open(ENG, "<$english") or die "Can't open $english";
+open(LANG, "<$input") or die "Can't open $input";
+open(OFILE, ">$output" or die "Can't open $output");
 
 my $langversion = 1;
 
