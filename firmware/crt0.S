@@ -31,14 +31,56 @@ start:
         move.l #MBAR2+1,%d0
         movec.l %d0,%mbar2
 
+        lea MBAR,%a0
+        lea MBAR2,%a1
+        
+        /* 64K DMA-capable SRAM at 0x10000000
+           DMA is enabled and has priority in both banks
+           All types of accesses are allowed
+           (We might want to restrict that to save power) */
+        move.l #0x1000e001,%d0
+        movec.l %d0,%rambar1
+
+        /* 32K Non-DMA SRAM at 0x10010000
+           All types of accesses are allowed
+           (We might want to restrict that to save power) */
+        move.l #0x10010001,%d0
+        movec.l %d0,%rambar0
+
+        /* Chip select 0 - Flash ROM */
+        move.l #0x00000000,%d0 /* CSAR0 - Base = 0x00000000 */
+        move.l %d0,(0x080,%a0)
+        move.l #0x001f0101,%d0 /* CSMR0 - 2M, All access, write protect */
+        move.l %d0,(0x084,%a0)
+        move.l #0x00000d80,%d0 /* CSCR0 - 3 wait states, 16 bits, no bursts */
+        move.l %d0,(0x088,%a0)
+        
+        /* Chip select 1 - LCD controller */
+        move.l #0xf0000000,%d0 /* CSAR1 - Base = 0xf0000000 */
+        move.l %d0,(0x08c,%a0)
+        move.l #0x0000007b,%d0 /* CSMR1 - 64K, Only data access */
+        move.l %d0,(0x090,%a0)
+        move.l #0x00002180,%d0 /* CSCR1 - 8 wait states, 16 bits, no bursts */
+        move.l %d0,(0x094,%a0)
+        
+        /* Chip select 2 - ATA controller */
+        move.l #0x20000000,%d0 /* CSAR2 - Base = 0x20000000 */
+        move.l %d0,(0x098,%a0)
+        move.l #0x0000007b,%d0 /* CSMR2 - 64K, Only data access */
+        move.l %d0,(0x09c,%a0)
+        move.l #0x00000180,%d0 /* CSCR2 - no wait states, 16 bits, no bursts */
+        move.l %d0,(0x0a0,%a0) /* NOTE:  I'm not sure about the wait states.
+                                  We have to be careful with the access times,
+                                  since IORDY isn't connected to the HDD. */
+        
+        
         /* Test code: blink the backlight */
-        lea MBAR2,%a0
         move.l #0x00020000,%d0
-        move.l %d0,(0xbc,%a0) /* Function = 1 */
-        move.l %d0,(0xb8,%a0) /* Enable = 1 */
+        move.l %d0,(0xbc,%a1) /* Function = 1 */
+        move.l %d0,(0xb8,%a1) /* Enable = 1 */
         
 .blinkloop:
-        eor.l %d0,(0xb4,%a0)
+        eor.l %d0,(0xb4,%a1)
         
         move.l #2000000,%d2
 .delay:  
