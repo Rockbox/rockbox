@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+if(!$ARGV[0]) {
+    print <<MOO
+Usage: lang.pl <file>
+MOO
+;
+    exit;
+}
+
+print <<MOO
+/* This file was automaticly generated using genlan */
+/*
+ * The str() macro/functions is how to access strings that might be
+ * translated. Use it like str(MACRO) and except a string to be
+ * returned!
+ */
+#define str(x) x
+MOO
+    ;
+
+open(LANG, "<$ARGV[0]");
+while(<LANG>) {
+    if($_ =~ / *\#/) {
+        # comment
+        next;
+    }
+    if($_ =~ / *([a-z]+): *(.*)/) {
+        ($var, $value) = ($1, $2);
+  #      print "$var => $value\n";
+
+        $set{$var} = $value;
+
+        if($var eq "new") {
+            # the last one for a single phrase
+
+            if(!$value) {
+                # if not set, get the english version
+                $value = $set{'eng'};
+            }
+
+            print "#define ".$set{'id'}." $value\n";
+            undef %set;
+        }
+
+    }
+
+}
+close(LANG);
