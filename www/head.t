@@ -26,7 +26,8 @@
 &nbsp;<a href="/rockbox/"><img src="/rockbox/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
 
 <p align="right">
-<a class="menulink" href="/rockbox/">Main page</a><br>
+<a class="menulink" href="/rockbox/">main page</a><br>
+<a class="menulink" href="/rockbox/download.html">download</a><br>
 <a class="menulink" href="/rockbox/docs/FAQ">FAQ</a><br>
 <a class="menulink" href="/rockbox/notes.html">research notes</a><br>
 <a class="menulink" href="/rockbox/docs/">data sheets</a><br>
