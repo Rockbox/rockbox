@@ -78,7 +78,13 @@ static bool reload_dir = false;
 
 void browse_root(void)
 {
+#ifndef SIMULATOR
     dirbrowse("/");
+#else
+    if (!dirbrowse("/")) {
+        DEBUGF("No filesystem found. Have you forgotten to create it?\n");
+    }
+#endif
 }
 
 
@@ -995,7 +1001,7 @@ bool dirbrowse(char *root)
 
     numentries = showdir(currdir, dirstart);
     if (numentries == -1) 
-        return -1;  /* currdir is not a directory */
+        return false;  /* currdir is not a directory */
     update_all = true;
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
@@ -1417,7 +1423,7 @@ bool dirbrowse(char *root)
         }
     }
 
-    return false;
+    return true;
 }
 
 static int plsize = 0;
