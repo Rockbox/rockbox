@@ -492,13 +492,9 @@ void system_init(void)
     BCR |= 0x2000;
 
     /* Bus state controller initializations. These are only necessary when
-       running from flash. The correct settings for player models are not
-       verified, so we only do this for the recorder and for the Ondio. */
-#if defined(HAVE_RECORDING) || defined(HAVE_MMC)
-    WCR1 = 0x4000; /* Long wait states for CS6 (ATA), short for the rest. */
+       running from flash. */
+    WCR1 = 0x40FD; /* Long wait states for CS6 (ATA), short for the rest. */
     WCR3 = 0x8000; /* WAIT is pulled up, 1 state inserted for CS6 */
-#endif
-
 }
 
 /* Utilize the user break controller to catch invalid memory accesses. */
