@@ -45,6 +45,11 @@ bool battery_level_safe(void)
     return true;
 }
 
+void set_poweroff_timeout(int timeout)
+{
+    (void)timeout;
+}
+
 #else /* not SIMULATOR */
 
 static int poweroff_idle_timeout_value[15] =
