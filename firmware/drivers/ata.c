@@ -162,33 +162,129 @@ static int wait_for_end_of_transfer(void)
 }    
 
 
+/*
+0x090156A8: 0x4F22	sts.l	pr,@-r15
+0x090156AA: 0x6243	mov	r4,r2
+0x090156AC: 0x6023	mov	r2,r0
+0x090156AE: 0xC901	and	#0x01,r0
+0x090156B0: 0x2008	tst	r0,r0
+0x090156B2: 0x8911	bt	0x090156D8
+0x090156B4: 0x6153	mov	r5,r1
+0x090156B6: 0x311C	add	r1,r1
+0x090156B8: 0x6523	mov	r2,r5
+0x090156BA: 0x351C	add	r1,r5
+0x090156BC: 0xD30E	mov.l	@(0x03C,pc),r3	; 0x090156F8 (0x06104100) 
+0x090156BE: 0x0009	nop
+
+0x090156C0: 0x6131	mov.w	@r3,r1
+0x090156C2: 0x611D	extu.w	r1,r1
+0x090156C4: 0x2210	mov.b	r1,@r2
+0x090156C6: 0x7201	add	#0x01,r2
+0x090156C8: 0x4119	shlr8	r1
+0x090156CA: 0x2210	mov.b	r1,@r2
+0x090156CC: 0x7201	add	#0x01,r2
+0x090156CE: 0x3252	cmp/hs	r5,r2
+0x090156D0: 0x8BF6	bf	0x090156C0
+
+0x090156D2: 0xA00F	bra	0x090156F4
+0x090156D4: 0x4F26	lds.l	@r15+,pr
+0x090156D6: 0x0009	nop
+0x090156D8: 0x6423	mov	r2,r4
+0x090156DA: 0x6153	mov	r5,r1
+0x090156DC: 0x311C	add	r1,r1
+0x090156DE: 0x6543	mov	r4,r5
+0x090156E0: 0x351C	add	r1,r5
+0x090156E2: 0xD205	mov.l	@(0x018,pc),r2	; 0x090156F8 (0x06104100) 
+
+0x090156E4: 0x6121	mov.w	@r2,r1
+0x090156E6: 0x611F	exts.w	r1,r1
+0x090156E8: 0x6118	swap.b	r1,r1
+0x090156EA: 0x2411	mov.w	r1,@r4
+0x090156EC: 0x7402	add	#0x02,r4
+0x090156EE: 0x3452	cmp/hs	r5,r4
+0x090156F0: 0x8BF8	bf	0x090156E4
+
+0x090156F2: 0x4F26	lds.l	@r15+,pr
+0x090156F4: 0x000B	rts
+0x090156F6: 0x0009	nop
+0x090156F8: 0x0610	.long	0x06104100	; 0x090156E0
+0x090156FA: 0x4100	
+*/
+
+
+
 /* the tight loop of ata_read_sectors(), to avoid the whole in IRAM */
 static void copy_read_sectors(unsigned char* buf,
                          int wordcount)
                          __attribute__ ((section (".icode")));
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
-    if (wordcount <= 0)
-        return; /* should never happen, but to protect my tail loop */
+    unsigned short tmp = 0; /* have to init to prevent warning? */
 
-    if ( (unsigned int)buf & 1 ) 
-    {
+    if ( (unsigned int)buf & 1) 
+    {   /* not 16-bit aligned, copy byte by byte */
         unsigned char* bufend = buf + wordcount*2;
+#ifdef PREFER_C
         do
-        {   /* loop compiles to 8 assembler instructions */
-            unsigned short tmp = ATA_DATA;
+        {   /* loop compiles to 9 assembler instructions */
+            tmp = ATA_DATA;
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
         } while (buf < bufend); /* tail loop is faster */
+#else
+        asm (
+            "mov    #1, r0 \n"
+            "loop_b: \n"
+            "mov.w	@%1,%0 \n"
+            "mov.b	%0,@%2 \n"
+            "shlr8	%0 \n"
+            "mov.b	%0,@(r0,%2) \n"
+            "add  	#0x02,%2 \n"
+            "cmp/hs	%3,%2 \n"
+            "bf	    loop_b \n"
+            : /* outputs */
+            : /* inputs */
+            /* %0 */ "r"(tmp),
+            /* %1 */ "r"(&ATA_DATA),
+            /* %2 */ "r"(buf),
+            /* %3 */ "r"(bufend)
+            : /* trashed */
+            "r0"
+        );
+#endif
     }
     else 
-    {
+    {   /* 16-bit aligned, can do faster copy */
         unsigned short* wbuf = (unsigned short*)buf;
         unsigned short* wbufend = wbuf + wordcount;
+#ifdef PREFER_C
         do
         {   /* loop compiles to 7 assembler instructions */
             *wbuf = SWAB16(ATA_DATA);
         } while (++wbuf < wbufend); /* tail loop is faster */
+#else
+        asm (
+            "mov    #2, r0 \n"
+            "loop_w: \n"
+            "mov.w	@%1,%0 \n"
+            "swap.b	%0,%0 \n"
+            "mov.w	%0,@%2 \n"
+            "mov.w	@%1,%0 \n" /* unrolled, do one more */
+            "swap.b	%0,%0 \n"
+            "mov.w	%0,@(r0,%2) \n"
+            "add  	#0x04,%2 \n"
+            "cmp/hs	%3,%2 \n"
+            "bf	    loop_w \n"
+            : /* outputs */
+            : /* inputs */
+            /* %0 */ "r"(tmp),
+            /* %1 */ "r"(&ATA_DATA),
+            /* %2 */ "r"(wbuf),
+            /* %3 */ "r"(wbufend)
+            : /* trashed */
+            "r0"
+        );
+#endif
     }
 }
 
