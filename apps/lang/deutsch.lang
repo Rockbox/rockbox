@@ -1188,3 +1188,8 @@ id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
 new: "Erhaltladen"
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+new: "Akkukapazität"

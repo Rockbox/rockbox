@@ -1216,3 +1216,8 @@ id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 new:
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+new:
