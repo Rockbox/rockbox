@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-void mpeg_init(int volume, int bass, int treble);
+void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost);
 void mpeg_play(char* trackname);
 void mpeg_stop(void);
 void mpeg_pause(void);

@@ -60,6 +60,11 @@
 #define	MAS_REG_KPRESCALE       0xe7
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
+#define MAS_REG_KMDB_SWITCH     0x21
+#define MAS_REG_KMDB_STR        0x22
+#define MAS_REG_KMDB_HAR        0x23
+#define MAS_REG_KMDB_FC         0x24
+#define MAS_REG_KLOUDNESS       0x1e
 
 /*
  * MAS commands

@@ -56,21 +56,30 @@ static char *units[] =
 {
     "%",    /* Volume */
     "dB",   /* Bass */
-    "dB"    /* Treble */
+    "dB",   /* Treble */
+    "",     /* Balance */
+    "dB",   /* Loudness */
+    "%"     /* Bass boost */
 };
 
 static int numdecimals[] =
 {
     0,    /* Volume */
     0,    /* Bass */
-    0     /* Treble */
+    0,    /* Treble */
+    0,    /* Balance */
+    0,    /* Loudness */
+    0     /* Bass boost */
 };
 
 static int minval[] =
 {
     0,    /* Volume */
     0,    /* Bass */
-    0     /* Treble */
+    0,    /* Treble */
+    0,    /* Balance */
+    0,    /* Loudness */
+    0     /* Bass boost */
 };
 
 static int maxval[] =
@@ -78,11 +87,14 @@ static int maxval[] =
     50,    /* Volume */
 #ifdef ARCHOS_RECORDER
     24,    /* Bass */
-    24     /* Treble */
+    24,    /* Treble */
 #else
     30,    /* Bass */
-    30     /* Treble */
+    30,    /* Treble */
 #endif
+    100,   /* Balance */
+    17,    /* Loudness */
+    10     /* Bass boost */
 };
 
 static int defaultval[] =
@@ -90,11 +102,14 @@ static int defaultval[] =
     70/2,    /* Volume */
 #ifdef ARCHOS_RECORDER
     12+6,    /* Bass */
-    12+6     /* Treble */
+    12+6,    /* Treble */
 #else
     15+7,    /* Bass */
-    15+7     /* Treble */
+    15+7,    /* Treble */
 #endif
+    50,      /* Balance */
+    0,       /* Loudness */
+    0        /* Bass boost */
 };
 
 char *mpeg_sound_unit(int setting)
@@ -965,6 +980,34 @@ void mpeg_sound_set(int setting, int value)
             set_prescaled_volume();
 #endif
             break;
+            
+#ifdef ARCHOS_RECORDER
+        case SOUND_SUPERBASS:
+            if (value) {
+                tmp = MAX(MIN(value * 12, 0x7f), 0);
+                mas_codec_writereg(MAS_REG_KMDB_STR, (tmp & 0xff) << 8);
+                tmp = 0x30; /* MDB_HAR: Space for experiment here */
+                mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0xff) << 8);
+                tmp = 60 / 10; /* calculate MDB_FC, 60hz - experiment here,
+                                  this would depend on the earphones...
+                                  perhaps make it tunable? */
+                mas_codec_writereg(MAS_REG_KMDB_FC, (tmp & 0xff) << 8);
+                tmp = (3 * tmp) / 2; /* calculate MDB_SHAPE */
+                mas_codec_writereg(MAS_REG_KMDB_SWITCH,
+                    ((tmp & 0xff) << 8) /* MDB_SHAPE */
+                    | 2);  /* MDB_SWITCH enable */
+            } else {
+                mas_codec_writereg(MAS_REG_KMDB_STR, 0);
+                mas_codec_writereg(MAS_REG_KMDB_HAR, 0);
+                mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0); /* MDB_SWITCH disable */
+            }
+            break;
+            
+        case SOUND_LOUDNESS:
+            tmp = MAX(MIN(value * 4, 0x44), 0);
+            mas_codec_writereg(MAS_REG_KLOUDNESS, (tmp & 0xff) << 8);
+            break;
+#endif
     }
 #endif /* SIMULATOR */
 }
@@ -994,18 +1037,30 @@ int mpeg_val2phys(int setting, int value)
             result = value - 15;
 #endif
             break;
+
+#ifdef ARCHOS_RECORDER            
+        case SOUND_LOUDNESS:
+            result = value;
+            break;
+            
+        case SOUND_SUPERBASS:
+            result = value * 10;
+            break;
+#endif
     }
     return result;
 }
 
-void mpeg_init(int volume, int bass, int treble)
+void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost)
 {
 #ifdef SIMULATOR
-    volume = bass = treble;
+    volume = bass = treble = loudness = bass_boost;
 #else
 #ifdef ARCHOS_RECORDER
     int rc;
     unsigned long val;
+#else
+    loudness = bass_boost;
 #endif
 
     setup_sci0();
@@ -1069,5 +1124,9 @@ void mpeg_init(int volume, int bass, int treble)
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);
     mpeg_sound_set(SOUND_VOLUME, volume);
+#ifdef ARCHOS_RECORDER
+    mpeg_sound_set(SOUND_LOUDNESS, loudness);
+    mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
+#endif
 #endif /* SIMULATOR */
 }
