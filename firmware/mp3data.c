@@ -38,24 +38,24 @@
 
 #define DEBUG_VERBOSE
 
-#define BYTES2INT(b1,b2,b3,b4) (((b1 & 0xFF) << (3*8)) | \
-                                ((b2 & 0xFF) << (2*8)) | \
-                                ((b3 & 0xFF) << (1*8)) | \
-                                ((b4 & 0xFF) << (0*8)))
+#define BYTES2INT(b1,b2,b3,b4) (((long)(b1 & 0xFF) << (3*8)) |      \
+                                ((long)(b2 & 0xFF) << (2*8)) | \
+                                ((long)(b3 & 0xFF) << (1*8)) | \
+                                ((long)(b4 & 0xFF) << (0*8)))
 
-#define SYNC_MASK (0x7ff << 21)
-#define VERSION_MASK (3 << 19)
-#define LAYER_MASK (3 << 17)
-#define PROTECTION_MASK (1 << 16)
-#define BITRATE_MASK (0xf << 12)
-#define SAMPLERATE_MASK (3 << 10)
-#define PADDING_MASK (1 << 9)
-#define PRIVATE_MASK (1 << 8)
-#define CHANNELMODE_MASK (3 << 6)
-#define MODE_EXT_MASK (3 << 4)
-#define COPYRIGHT_MASK (1 << 3)
-#define ORIGINAL_MASK (1 << 2)
-#define EMPHASIS_MASK 3
+#define SYNC_MASK (0x7ffL << 21)
+#define VERSION_MASK (3L << 19)
+#define LAYER_MASK (3L << 17)
+#define PROTECTION_MASK (1L << 16)
+#define BITRATE_MASK (0xfL << 12)
+#define SAMPLERATE_MASK (3L << 10)
+#define PADDING_MASK (1L << 9)
+#define PRIVATE_MASK (1L << 8)
+#define CHANNELMODE_MASK (3L << 6)
+#define MODE_EXT_MASK (3L << 4)
+#define COPYRIGHT_MASK (1L << 3)
+#define ORIGINAL_MASK (1L << 2)
+#define EMPHASIS_MASK 3L
 
 /* Table of bitrates for MP3 files, all values in kilo.
  * Indexed by version, layer and value of bit 15-12 in header.
@@ -77,7 +77,7 @@ const int bitrate_table[2][3][16] =
 /* Table of samples per frame for MP3 files.
  * Indexed by layer. Multiplied with 1000.
  */
-const int bs[3] = {384000, 1152000, 1152000};
+const long bs[3] = {384000, 1152000, 1152000};
 
 /* Table of sample frequency for MP3 files.
  * Indexed by version and layer.
@@ -95,7 +95,7 @@ static bool is_mp3frameheader(unsigned long head)
 {
     if ((head & SYNC_MASK) != (unsigned long)SYNC_MASK) /* bad sync? */
         return false;
-    if ((head & VERSION_MASK) == (1 << 19)) /* bad version? */
+    if ((head & VERSION_MASK) == (1L << 19)) /* bad version? */
         return false;
     if (!(head & LAYER_MASK)) /* no layer? */
         return false;
@@ -129,16 +129,16 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
         bittable = MPEG_VERSION2 - 1; /* use the V2 bit rate table */
         break;
         
-    case (1 << 19):
+    case (1L << 19):
         return false;
         
-    case (2 << 19):
+    case (2L << 19):
         /* MPEG version 2 (ISO/IEC 13818-3) */
         info->version = MPEG_VERSION2;
         bittable = MPEG_VERSION2 - 1;
         break;
         
-    case (3 << 19):
+    case (3L << 19):
         /* MPEG version 1 (ISO/IEC 11172-3) */
         info->version = MPEG_VERSION1;
         bittable = MPEG_VERSION1 - 1;
@@ -148,13 +148,13 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     switch(header & LAYER_MASK) {
     case 0:
         return false;
-    case (1 << 17):
+    case (1L << 17):
         info->layer = 2;
         break;
-    case (2 << 17):
+    case (2L << 17):
         info->layer = 1;
         break;
-    case (3 << 17):
+    case (3L << 17):
         info->layer = 0;
         break;
     }
@@ -212,13 +212,15 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     return true;
 }
 
-static unsigned long __find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header, int(*getfunc)(int fd, unsigned char *c))
+static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
+                                       unsigned long last_header,
+                                       int(*getfunc)(int fd, unsigned char *c))
 {
     unsigned long header=0;
     unsigned char tmp;
     int i;
 
-    int pos = 0;
+    long pos = 0;
 
     /* We remember the last header we found, to use as a template to see if
        the header we find has the same frequency, layer etc */
@@ -259,7 +261,7 @@ static int fileread(int fd, unsigned char *c)
     return read(fd, c, 1);
 }
 
-unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header)
+unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header)
 {
     return __find_next_frame(fd, offset, max_offset, last_header, fileread);
 }
@@ -322,7 +324,7 @@ static void buf_init(void)
     fnf_read_index = 0;
 }
 
-unsigned long buf_find_next_frame(int fd, int *offset, int max_offset,
+unsigned long buf_find_next_frame(int fd, long *offset, long max_offset,
                                   unsigned long last_header)
 {
     return __find_next_frame(fd, offset, max_offset, last_header, buf_getbyte);
@@ -347,7 +349,7 @@ static int mem_getbyte(int dummy, unsigned char *c)
         return 1;
 }
 
-unsigned long mem_find_next_frame(int startpos, int *offset, int max_offset,
+unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
                                   unsigned long last_header)
 {
     mp3buflen = mp3end - mp3buf;
@@ -363,13 +365,13 @@ int get_mp3file_info(int fd, struct mp3info *info)
     unsigned char frame[1800];
     unsigned char *vbrheader;
     unsigned long header;
-    int bytecount;
+    long bytecount;
     int num_offsets;
     int frames_per_entry;
     int i;
-    int offset;
+    long offset;
     int j;
-    int tmp;
+    long tmp;
 
     header = find_next_frame(fd, &bytecount, 0x20000, 0);
     /* Quit if we haven't found a valid header within 128K */
@@ -520,7 +522,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     return bytecount;
 }
 
-static void int2bytes(unsigned char *buf, int val)
+static void long2bytes(unsigned char *buf, long val)
 {
     buf[0] = (val >> 24) & 0xff;
     buf[1] = (val >> 16) & 0xff;
@@ -534,9 +536,9 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     unsigned long header = 0;
     struct mp3info info;
     int num_frames;
-    int bytes;
+    long bytes;
     int cnt;
-    int progress_chunk = filesize / 50; /* Max is 50%, in 1% increments */
+    long progress_chunk = filesize / 50; /* Max is 50%, in 1% increments */
     int progress_cnt = 0;
     bool is_vbr = false;
     int last_bitrate = 0;
@@ -599,8 +601,8 @@ int create_xing_header(int fd, int startpos, int filesize,
     struct mp3info info;
     int pos, last_pos;
     int i, j;
-    int bytes;
-    unsigned int filepos;
+    long bytes;
+    unsigned long filepos;
     int x;
     int index;
     unsigned char toc[100];
@@ -702,7 +704,7 @@ int create_xing_header(int fd, int startpos, int filesize,
     header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
 
     /* Write the header to the buffer */
-    int2bytes(buf, header);
+    long2bytes(buf, header);
     
     /* Now get the length of the newly created frame */
     mp3headerinfo(&info, header);
@@ -712,19 +714,19 @@ int create_xing_header(int fd, int startpos, int filesize,
     buf[index+1] = 'i';
     buf[index+2] = 'n';
     buf[index+3] = 'g';
-    int2bytes(&buf[index+4], ((num_frames?VBR_FRAMES_FLAG:0) |
+    long2bytes(&buf[index+4], ((num_frames?VBR_FRAMES_FLAG:0) |
                               (filesize?VBR_BYTES_FLAG:0) |
                               (generate_toc?VBR_TOC_FLAG:0)));
     index = index+8;
     if(num_frames)
     {
-        int2bytes(&buf[index], num_frames);
+        long2bytes(&buf[index], num_frames);
         index += 4;
     }
 
     if(filesize)
     {
-        int2bytes(&buf[index], filesize - startpos);
+        long2bytes(&buf[index], filesize - startpos);
         index += 4;
     }
 

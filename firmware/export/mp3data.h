@@ -43,9 +43,9 @@ struct mp3info {
     bool is_xing_vbr; /* True if the VBR header is of Xing type */
     bool is_vbri_vbr; /* True if the VBR header is of VBRI type */
     unsigned char toc[100];
-    int frame_count; /* Number of frames in the file (if VBR) */
-    int byte_count;  /* File size in bytes */
-    int file_time;   /* Length of the whole file in milliseconds */
+    long frame_count; /* Number of frames in the file (if VBR) */
+    long byte_count;  /* File size in bytes */
+    long file_time;   /* Length of the whole file in milliseconds */
     int vbr_header_pos;
 };
 
@@ -55,8 +55,8 @@ struct mp3info {
 #define VBR_TOC_FLAG    0x04
 
 
-unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header);
-unsigned long mem_find_next_frame(int startpos, int *offset, int max_offset,
+unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header);
+unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
                                   unsigned long last_header);
 int get_mp3file_info(int fd, struct mp3info *info);
 int count_mp3_frames(int fd, int startpos, int filesize,
