@@ -149,7 +149,7 @@ EFEAT
 
 NAME Customizable backlight timeout ENAME
 YES
-NO
+YES
 EFEAT
 
 NAME Backlight-on when charging option ENAME
