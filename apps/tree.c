@@ -69,7 +69,7 @@ const struct filetype filetypes[] = {
     { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYINDICES_PLAYLIST },
+    { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYLIST },
     { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },
     { ".wps", TREE_ATTR_WPS, Wps, VOICE_EXT_WPS },
     { ".lng", TREE_ATTR_LNG, Language, LANG_LANGUAGE },

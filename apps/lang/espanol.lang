@@ -72,9 +72,9 @@ voice: ""
 new: "Mezclando..."
 
 id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
-voice: "Playlist"
+voice: ""
 new: "El bufer de la" 
 
 id: LANG_PLAYINDICES_BUFFER
@@ -2956,3 +2956,9 @@ desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
 new: "<Todas las Canciones>"
+
+id: LANG_PLAYLIST
+desc: Used when you need to say playlist, also voiced
+eng: "Playlist"
+voice: "Lista de reproducción"
+new: "Lista de reproducción"

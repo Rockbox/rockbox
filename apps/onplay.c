@@ -414,7 +414,7 @@ int onplay(char* file, int attr)
             (attr & ATTR_DIRECTORY) ||
             ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
         {
-            items[i].desc = ID2P(LANG_PLAYINDICES_PLAYLIST);
+            items[i].desc = ID2P(LANG_PLAYLIST);
             items[i].function = playlist_options;
             i++;
         }
