@@ -130,9 +130,7 @@ static void update_display_line(int line, bool scroll);
 static void scroll_display(int lines);
 static void update_first_index(void);
 static bool update_playlist(bool force);
-#ifdef TREE_SHIFT
 static int  onplay_menu(int index);
-#endif
 static bool viewer_menu(void);
 static bool show_icons(void);
 static bool show_indices(void);
@@ -672,7 +670,6 @@ static bool update_playlist(bool force)
     return true;
 }
 
-#ifdef TREE_SHIFT
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
    changed. */
@@ -747,7 +744,6 @@ static int onplay_menu(int index)
 
     return ret;
 }
-#endif
 
 /* Menu of viewer options.  Invoked via F1(r) or Menu(p). */
 static bool viewer_menu(void)
@@ -918,20 +914,22 @@ bool playlist_viewer_ex(char* filename)
                 update = true;
                 break;
 
-            case TREE_SHIFT | TREE_PREV:
-            case TREE_SHIFT | TREE_PREV | BUTTON_REPEAT:
+#ifdef TREE_PGUP
+            case TREE_PGUP:
+            case TREE_PGUP | BUTTON_REPEAT:
                 /* Pageup */
                 scroll_display(-viewer.num_display_lines);
                 update = true;
                 break;
 
-            case TREE_SHIFT | TREE_NEXT:
-            case TREE_SHIFT | TREE_NEXT | BUTTON_REPEAT:
+            case TREE_PGDN:
+            case TREE_PGDN | BUTTON_REPEAT:
                 /* Pagedown */
                 scroll_display(viewer.num_display_lines);
                 update = true;
                 break;
-                
+#endif
+
             case TREE_RUN:
                 if (viewer.move_track >= 0)
                 {
@@ -973,7 +971,10 @@ bool playlist_viewer_ex(char* filename)
                 update = true;
                 break;
 
-            case TREE_SHIFT | TREE_RUN:
+            case TREE_CONTEXT:
+#ifdef TREE_CONTEXT2
+            case TREE_CONTEXT2:
+#endif
             {
                 /* ON+PLAY menu */
                 int ret;

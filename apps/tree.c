@@ -764,134 +764,6 @@ void set_current_file(char *path)
     }
 }
 
-#ifdef TREE_SHIFT
-static bool handle_shift(int *ds, int *dc, int numentries,
-                         int tree_max_on_screen,
-                         const int *dirfilter)
-{
-    bool exit = false;
-    bool used = false;
-
-    int dirstart = *ds;
-    int dircursor = *dc;
-    char buf[MAX_PATH];
-
-#ifdef HAVE_LCD_BITMAP
-    int fw, fh;
-    lcd_getstringsize("A", &fw, &fh);
-#endif
-
-    while (!exit) {
-        switch (button_get(true)) {
-            case TREE_PREV:
-#ifdef TREE_RC_PREV
-            case TREE_RC_PREV:
-#endif
-#ifdef TREE_SHIFT
-            case TREE_SHIFT | TREE_PREV:
-            case TREE_SHIFT | TREE_PREV | BUTTON_REPEAT:
-#endif
-                used = true;
-                if ( dirstart ) {
-                    dirstart -= tree_max_on_screen;
-                    if ( dirstart < 0 )
-                        dirstart = 0;
-                }
-                else
-                    dircursor = 0;
-                break;
-
-            case TREE_NEXT:
-#ifdef TREE_RC_NEXT
-            case TREE_RC_NEXT:
-#endif
-#ifdef TREE_SHIFT
-            case TREE_SHIFT | TREE_NEXT:
-            case TREE_SHIFT | TREE_NEXT | BUTTON_REPEAT:
-#endif
-                used = true;
-                if ( dirstart < numentries - tree_max_on_screen ) {
-                    dirstart += tree_max_on_screen;
-                    if ( dirstart >
-                         numentries - tree_max_on_screen )
-                        dirstart = numentries - tree_max_on_screen;
-                }
-                else
-                    dircursor = numentries - dirstart - 1;
-                break;
-
-
-            case TREE_RUN | BUTTON_REL:
-#ifdef TREE_RC_PLAY
-            case TREE_RC_RUN:
-#endif
-#ifdef TREE_SHIFT
-            case TREE_SHIFT | TREE_RUN | BUTTON_REL:
-#endif
-            {
-                int onplay_result;
-
-                if(!numentries)
-                    onplay_result = onplay(NULL, 0);
-                else {
-                    if (currdir[1])
-                        snprintf(buf, sizeof buf, "%s/%s",
-                                 currdir, dircache[dircursor+dirstart].name);
-                    else
-                        snprintf(buf, sizeof buf, "/%s",
-                                 dircache[dircursor+dirstart].name);
-                    onplay_result = onplay(buf,
-                                           dircache[dircursor+dirstart].attr);
-                }
-                
-                switch (onplay_result)
-                {
-                    case ONPLAY_OK:
-                        used = true;
-                        break;
-                    case ONPLAY_RELOAD_DIR:
-                        reload_dir = 1;
-                        used = true;
-                        break;
-                    case ONPLAY_START_PLAY:
-                        used = false; /* this will enable the wps */
-                        break;
-                }
-                exit = true;
-                break;
-            }
-#ifdef TREE_SHIFT
-            case TREE_SHIFT | BUTTON_REL:
-            case TREE_SHIFT | TREE_PREV | BUTTON_REL:
-            case TREE_SHIFT | TREE_NEXT | BUTTON_REL:
-                exit = true;
-                break;
-#endif
-        }
-        if ( used && !exit ) {
-#ifdef HAVE_LCD_BITMAP
-            int xpos,ypos;
-#endif
-            showdir(currdir, dirstart, dirfilter);
-#ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor) {
-                xpos = lcd_getxmargin();
-                ypos = (CURSOR_Y + dircursor) * fh + lcd_getymargin();
-                lcd_invertrect(xpos, ypos, LCD_WIDTH-xpos, fh);
-            }
-            else
-#endif
-                put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
-            lcd_update();
-        }
-    }
-    *ds = dirstart;
-    *dc = dircursor;
-
-    return used;
-}
-#endif
-
 static bool dirbrowse(const char *root, const int *dirfilter)
 {
     int numentries=0;
@@ -910,6 +782,7 @@ static bool dirbrowse(const char *root, const int *dirfilter)
     long thumbnail_time = -1; /* for delaying a thumbnail */
     bool update_all = false; /* set this to true when the whole file list
                                 has been refreshed on screen */
+    int lastbutton = 0;
 
 #ifdef HAVE_LCD_BITMAP
     tree_max_on_screen = recalc_screen_height();
@@ -1043,15 +916,14 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 break;
 #endif
 
+#ifdef TREE_ENTER
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
-#if defined TREE_RC_ENTER && (TREE_RC_ENTER != TREE_RC_RUN)
+#endif
+#ifdef TREE_RC_ENTER
             case TREE_RC_ENTER:
 #endif
-#if defined TREE_RUN && (TREE_RUN != TREE_ENTER)
             case TREE_RUN:
-            case TREE_RUN | BUTTON_REPEAT:
-#endif
                 if ( !numentries )
                     break;
                 if (currdir[1])
@@ -1320,6 +1192,33 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 break;
 
+#ifdef TREE_PGUP
+            case TREE_PGUP:
+            case TREE_PGUP | BUTTON_REPEAT:
+                if ( dirstart ) {
+                    dirstart -= tree_max_on_screen;
+                    if ( dirstart < 0 )
+                        dirstart = 0;
+                }
+                else
+                    dircursor = 0;
+                restore = true;
+                break;
+
+            case TREE_PGDN:
+            case TREE_PGDN | BUTTON_REPEAT:
+                if ( dirstart < numentries - tree_max_on_screen ) {
+                    dirstart += tree_max_on_screen;
+                    if ( dirstart >
+                         numentries - tree_max_on_screen )
+                        dirstart = numentries - tree_max_on_screen;
+                }
+                else
+                    dircursor = numentries - dirstart - 1;
+                restore = true;
+                break;
+#endif
+
             case TREE_MENU:
                 if (*dirfilter < NUM_FILTER_MODES)
                 {
@@ -1330,35 +1229,27 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 break;
 
-#ifdef TREE_SHIFT /* I bet the folks without ON-button want this to
-                    work on a different button */
-            case TREE_SHIFT:
-                if (handle_shift(&dirstart, &dircursor, numentries,
-                                 tree_max_on_screen, dirfilter))
+            case TREE_WPS:
+#ifdef TREE_WPS_PRE
+                if (lastbutton != TREE_WPS_PRE)
+                    break;
+#endif
+                /* don't enter wps from plugin browser etc */
+                if (*dirfilter < NUM_FILTER_MODES)
                 {
-                    /* start scroll */
-                    restore = true;
-                }
-                else
-                {
-                    if (*dirfilter < NUM_FILTER_MODES)
-                    /* don't catch single ON from .rockbox browsing */
+                    if (mpeg_status() & MPEG_STATUS_PLAY)
                     {
-                        if (mpeg_status() & MPEG_STATUS_PLAY)
-                        {
-                            start_wps=true;
-                        }
-                        else
-                        {
-                            start_resume(false);
-                            restore = true;
-                        }
+                        start_wps=true;
+                    }
+                    else
+                    {
+                        start_resume(false);
+                        restore = true;
                     }
                 }
                 break;
-#endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef BUTTON_F2
             case BUTTON_F2:
                 if (*dirfilter < NUM_FILTER_MODES)
                 {
@@ -1373,14 +1264,48 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 {
                     if (quick_screen(CONTEXT_TREE, BUTTON_F3))
                         reload_root = true;
-
-#ifdef HAVE_LCD_BITMAP
                     tree_max_on_screen = recalc_screen_height();
-#endif
                     restore = true;
                 }
-#endif
                 break;
+#endif
+
+            case TREE_CONTEXT:
+#ifdef TREE_CONTEXT2
+            case TREE_CONTEXT2:
+#endif
+            {
+                int onplay_result;
+
+                if(!numentries)
+                    onplay_result = onplay(NULL, 0);
+                else {
+                    if (currdir[1])
+                        snprintf(buf, sizeof buf, "%s/%s",
+                                 currdir, dircache[dircursor+dirstart].name);
+                    else
+                        snprintf(buf, sizeof buf, "/%s",
+                                 dircache[dircursor+dirstart].name);
+                    onplay_result = onplay(buf,
+                                           dircache[dircursor+dirstart].attr);
+                }
+                
+                switch (onplay_result)
+                {
+                    case ONPLAY_OK:
+                        restore = true;
+                        break;
+
+                    case ONPLAY_RELOAD_DIR:
+                        reload_dir = true;
+                        break;
+
+                    case ONPLAY_START_PLAY:
+                        start_wps = true;
+                        break;
+                }
+                break;
+            }
 
             case BUTTON_NONE:
                 if (thumbnail_time != -1 &&
@@ -1406,10 +1331,13 @@ static bool dirbrowse(const char *root, const int *dirfilter)
         }
 
         if ( button )
+        {
             ata_spin();
+            lastbutton = button;
+        }
 
         if (start_wps)
-    {
+        {
             lcd_stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_root = true;
