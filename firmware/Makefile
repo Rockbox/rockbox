@@ -17,7 +17,7 @@ INCLUDES=-Iinclude -I. -Iexport -Icommon -Idrivers
 
 TOOLSDIR = ../tools
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
+CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
