@@ -213,9 +213,65 @@ static bool playlist_options(void)
     return ret;
 }
 
-static bool delete_file(void)
+
+/* helper function to remove a non-empty directory */
+static int remove_dir(char* dirname, int len)
+{
+    int result = 0;
+    DIR* dir;
+    int dirlen = strlen(dirname);
+    
+    dir = opendir(dirname);
+    if (!dir)
+        return -1; /* open error */
+
+    while(true)
+    {
+        struct dirent* entry;
+        /* walk through the directory content */
+        entry = readdir(dir);
+        if (!entry)
+            break;
+
+        /* append name to current directory */
+        snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
+
+        if (entry->attribute & ATTR_DIRECTORY) 
+        {   /* remove a subdirectory */
+            if (!strcmp(entry->d_name, ".") ||
+                !strcmp(entry->d_name, ".."))
+                continue; /* skip these */
+
+            result = remove_dir(dirname, len); /* recursion */
+            if (result) 
+                break; /* or better continue, delete what we can? */
+        }
+        else 
+        {   /* remove a file */
+            result = remove(dirname);
+        }
+    }
+    closedir(dir);
+
+    if (!result)
+    {   /* remove the now empty directory */
+        dirname[dirlen] = '\0'; /* terminate to original length */
+        
+        /* FIXME: It's not working like below, 
+            we need a way to delete a directory */
+
+        /* result = remove(dirname); */
+    }
+
+    return result;
+}
+
+
+/* share code for file and directory deletion, saves space */
+static bool delete_handler(bool is_dir)
 {
     bool exit = false;
+    int res;
 
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_REALLY_DELETE));
@@ -232,7 +288,18 @@ static bool delete_file(void)
         int btn = button_get(true);
         switch (btn) {
         case BUTTON_PLAY:
-            if (!remove(selected_file)) {
+            if (is_dir)
+            {
+                char pathname[MAX_PATH]; /* space to go deep */
+                strncpy(pathname, selected_file, sizeof pathname);
+                res = remove_dir(pathname, sizeof(pathname));
+            }
+            else
+            {
+                res = remove(selected_file);
+            }
+
+            if (!res) {
                 onplay_result = ONPLAY_RELOAD_DIR;
                 lcd_clear_display();
                 lcd_puts(0,0,str(LANG_DELETED));
@@ -251,6 +318,17 @@ static bool delete_file(void)
         }
     }
     return false;
+}
+
+
+static bool delete_file(void)
+{
+    return delete_handler(false);
+}
+
+static bool delete_dir(void)
+{
+    return delete_handler(true);
 }
 
 static bool rename_file(void)
@@ -580,6 +658,13 @@ int onplay(char* file, int attr)
             items[i].desc = str(LANG_DELETE);
             items[i].voice_id = LANG_DELETE;
             items[i].function = delete_file;
+            i++;
+        }
+        else
+        {
+            items[i].desc = str(LANG_DELETE_DIR);
+            items[i].voice_id = LANG_DELETE_DIR;
+            items[i].function = delete_dir;
             i++;
         }
         

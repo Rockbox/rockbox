@@ -2643,3 +2643,8 @@ eng: ""
 voice: "firmware"
 new:
 
+id: LANG_DELETE_DIR
+desc: in on+play menu
+eng: "Delete directory"
+voice: "delete directory"
+new:
