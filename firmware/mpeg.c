@@ -492,10 +492,18 @@ static bool init_playback_done;
 
 static void recalculate_watermark(int bitrate)
 {
-    if(ata_spinup_time)
+    int bytes_per_sec = bitrate * 1000 / 8;
+    int time = ata_spinup_time;
+
+    if(time)
     {
-        low_watermark = (low_watermark_margin + ata_spinup_time * 2 / HZ) *
-            bitrate*1000 / 8;
+        /* No drive spins up faster than 2.5s */
+        if(time < 250)
+            time = 250;
+
+        time = time * 3;
+        low_watermark = ((low_watermark_margin * HZ + time) *
+                         bytes_per_sec) / HZ;
     }
     else
     {
@@ -1038,7 +1046,7 @@ static int new_file(int steps)
                 id3tags[new_tag_idx]->id3.offset = 0;
 
                 if(id3tags[new_tag_idx]->id3.vbr)
-                                /* Average bitrate * 1.5 */
+                    /* Average bitrate * 1.5 */
                     recalculate_watermark(
                         (id3tags[new_tag_idx]->id3.bitrate * 3) / 2);
                 else
