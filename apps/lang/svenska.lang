@@ -306,8 +306,8 @@ new: "Sortera"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll Speed"
-new: "Rullningshastighet"
+eng: "Scroll"
+new: "Rullning"
 
 id: LANG_RESET
 desc: in system_settings_menu()
@@ -1144,3 +1144,52 @@ desc: sleep timer setting
 eng: "Sleep timer"
 new: "Insomningstimer"
 
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+new: "Batterikapacitet"
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+new: "Batteri: Top-Off-laddning"
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+new: "Batteri: Underhållsladdning"
+
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+new: "Gräns för dubbelriktad rullning"
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-skip buffer"
+new: "Antiskak-buffert"
+
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+new: "Fördröjning av rullningsstart"
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "Rullningshastighet"
+
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+new: "Rullningssteg"
+
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
+new: "Exempel för att sätta rullningssteget"
+
+id: LANG_TRICKLE_CHARGE
+desc: in settings_menu
+eng: "Trickle Charge"
+new: "Underhållsladdning"
