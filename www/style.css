@@ -151,3 +151,16 @@ td.fbad {
 td.toolscat {
  background-color: #b6c6e5;
 }
+
+.vc_diff_nochange {
+ background-color: #ffffff;
+}
+
+.vc_navheader {
+ background-color: #7897cb;
+}
+
+.vc_diff_chunk_header {
+ background-color: #90afe3;
+}
+
