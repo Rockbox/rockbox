@@ -46,7 +46,7 @@ Archos. (Jean Boullier)
 <li> <a href="http://rockbox.my-vserver.de/win32-sdk.html">Another way of setting up a cygwin Rockbox development environment</a> (Windows)
 <li> <a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
-<li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a> 
+<li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a>
 <li> <a href="flash.html">How to flash Rockbox on your Archos</a>
 <li> <a href="http://sourceforge.net/cvs/?group_id=44306">How to check out Rockbox from CVS</a>
 <li> <a href="http://bjorn.haxx.se/isd200/">Linux driver for Archos Player/Studio</a>
@@ -113,6 +113,8 @@ PC can talk to your Archos
 power-on from the RTC alarm</a>.
 <li><a href="http://www.geocities.com/raichea/">Steve Russell's PIC-based remote control</a>
 <li><a href="http://www.angelfire.com/trek/archos/">Chris Halsall's MMJB20 page</a> with disassembly instructions useful for FM and V2 owners.
+<li> Matthias Klumpp's <a href="http://de.geocities.com/matthiasklumpp/">Archos Atmel remote control</a>.
+
 </ul>
 
 #include "foot.t"
