@@ -75,7 +75,7 @@ MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c bounce.c snow.c bmp.c \
-	widgets.c wormlet.c
+	widgets.c wormlet.c cube.c
 endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
@@ -141,6 +141,9 @@ $(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/cube.o: $(RECDIR)/cube.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/snow.o: $(RECDIR)/snow.c
