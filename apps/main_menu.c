@@ -27,9 +27,9 @@
 #include "sound_menu.h"
 #include "version.h"
 #include "debug.h"
-#include "bmp.h"
 
 #ifdef HAVE_LCD_BITMAP
+#include "bmp.h"
 #include "screensaver.h"
 extern void tetris(void);
 #endif
