@@ -96,19 +96,19 @@
 #define SAR0_ADDR       0x05FFFF40
 #define DAR0_ADDR       0x05FFFF44
 #define OR_ADDR         0x05FFFF48
-#define TCR0_ADDR       0x05FFFF4A
+#define DTCR0_ADDR       0x05FFFF4A
 #define CHCR0_ADDR      0x05FFFF4E
 #define SAR1_ADDR       0x05FFFF50
 #define DAR1_ADDR       0x05FFFF54
-#define TCR1_ADDR       0x05FFFF5A
+#define DTCR1_ADDR       0x05FFFF5A
 #define CHCR1_ADDR      0x05FFFF5E
 #define SAR2_ADDR       0x05FFFF60
 #define DAR2_ADDR       0x05FFFF64
-#define TCR2_ADDR       0x05FFFF6A
+#define DTCR2_ADDR       0x05FFFF6A
 #define CHCR2_ADDR      0x05FFFF6E
 #define SAR3_ADDR       0x05FFFF70
 #define DAR3_ADDR       0x05FFFF74
-#define TCR3_ADDR       0x05FFFF7A
+#define DTCR3_ADDR       0x05FFFF7A
 #define CHCR3_ADDR      0x05FFFF7E
 
 #define IPRA_ADDR       0x05FFFF84
@@ -232,19 +232,19 @@
 #define SAR0       (*((volatile unsigned long*)SAR0_ADDR))   
 #define DAR0       (*((volatile unsigned long*)DAR0_ADDR))   
 #define DMAOR      (*((volatile unsigned long*)DMAOR_ADDR))  
-#define TCR0       (*((volatile unsigned long*)TCR0_ADDR))   
+#define DTCR0       (*((volatile unsigned long*)DTCR0_ADDR))   
 #define CHCR0      (*((volatile unsigned short*)CHCR0_ADDR)) 
 #define SAR1       (*((volatile unsigned long*)SAR1_ADDR))   
 #define DAR1       (*((volatile unsigned long*)DAR1_ADDR))   
-#define TCR1       (*((volatile unsigned long*)TCR1_ADDR))   
+#define DTCR1       (*((volatile unsigned long*)DTCR1_ADDR))   
 #define CHCR1      (*((volatile unsigned short*)CHCR1_ADDR)) 
 #define SAR2       (*((volatile unsigned long*)SAR2_ADDR))   
 #define DAR2       (*((volatile unsigned long*)DAR2_ADDR))   
-#define TCR2       (*((volatile unsigned long*)TCR2_ADDR))   
+#define DTCR2       (*((volatile unsigned long*)DTCR2_ADDR))   
 #define HCR2       (*((volatile unsigned short*)CHCR2_ADDR)) 
 #define SAR3       (*((volatile unsigned long*)SAR3_ADDR))   
 #define DAR3       (*((volatile unsigned long*)DAR3_ADDR))   
-#define TCR3       (*((volatile unsigned long*)TCR3_ADDR))   
+#define DTCR3       (*((volatile unsigned long*)DTCR3_ADDR))   
 #define CHCR3      (*((volatile unsigned short*)CHCR3_ADDR)) 
 
 #define IPRA       (*((volatile unsigned short*)IPRA_ADDR))  
