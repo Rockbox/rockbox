@@ -173,12 +173,6 @@ int ata_read_sectors(unsigned long start,
     int count;
     void* buf;
 
-    if ( incount > 1 )
-        DEBUGF("[Reading %d blocks: 0x%x to 0x%x]\n",
-               incount, start, start+incount-1); 
-    else
-        DEBUGF("[Reading block 0x%x]\n", start); 
-
     last_disk_activity = current_tick;
 
     mutex_lock(&ata_mtx);
