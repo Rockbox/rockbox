@@ -25,6 +25,18 @@
 #define FREQ     12000000 /* cycle time ~83.3ns */
 #define BAUDRATE 9600
 
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+#ifndef MIN
+#define MIN(a, b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+#define MAX(a, b) MIN(b,a)
+#endif
+
 #ifdef LITTLE_ENDIAN
 #define SWAB16(x) (x)
 #define SWAB32(x) (x)
