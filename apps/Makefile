@@ -31,6 +31,9 @@ AFLAGS += -small -relax
 # Check if this is a kind of Recorder
 ANYREC = $(findstring RECORDER, $(TARGET))
 
+# Check if this is an Ondio model
+ANYONDIO = $(findstring ONDIO, $(TARGET))
+
 # scramble tool
 TOOL = scramble
 
@@ -59,6 +62,12 @@ endif
 ifeq ($(TARGET), -DARCHOS_RECORDERV2)
    TOOL_OPT = -v2
 endif
+ifeq ($(TARGET), -DARCHOS_ONDIOSP)
+   TOOL_OPT = -osp
+endif
+ifeq ($(TARGET), -DARCHOS_ONDIOFM)
+   TOOL_OPT = -ofm
+endif
 
 
 ifeq ($(ANYREC), RECORDER)
@@ -73,11 +82,18 @@ ifeq ($(TARGET), -DARCHOS_PLAYER)
    CFLAGS += -Iplayer
    OUTNAME = archos.mod
 else
+ifeq ($(ANYONDIO), ONDIO)
+# use the recorder tree for now
+   SRC += $(wildcard recorder/*.c)
+   CFLAGS += -Irecorder
+   OUTNAME = ajbrec.ajz
+else
 # some kind of Neo 
    SRC += $(wildcard neo/*.c)
    CFLAGS += -Ineo
    OUTNAME = Rockbox.bin
    TOOL_OPT = -neo
+endif
 endif
 endif
 
@@ -223,8 +239,13 @@ else
 ifeq ($(TARGET), -DARCHOS_PLAYER)
     DEPDIRS +=  $(DEPS)/player
 else
+ifeq ($(ANYONDIO), ONDIO)
+# use the recorder tree for now
+    DEPDIRS += $(DEPS)/recorder
+else
 # some kind of Neo
     DEPDIRS +=  $(DEPS)/neo
+endif
 endif
 endif
 

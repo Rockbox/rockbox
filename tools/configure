@@ -213,6 +213,8 @@ if [ -z "$archos" ]; then
   echo "4 - Archos Recorder v2"
   echo "5 - Neo mStation"
   echo "6 - Neo 35"
+  echo "7 - Archos Ondio SP"
+  echo "8 - Archos Ondio FM"
 
   getit=`input`;
 
@@ -251,6 +253,20 @@ if [ -z "$archos" ]; then
     target="-DNEO_35"
     display="-DHAVE_NEOLCD_CHARCELLS"
     keypad="-DHAVE_NEO_KEYPAD"
+    ;;
+
+   7)
+    archos="ondiosp"
+    target="-DARCHOS_ONDIOSP"
+    display="-DHAVE_LCD_BITMAP"
+    keypad="-DHAVE_ONDIO_KEYPAD"
+    ;;
+
+   8)
+    archos="ondiofm"
+    target="-DARCHOS_ONDIOFM"
+    display="-DHAVE_LCD_BITMAP"
+    keypad="-DHAVE_ONDIO_KEYPAD"
     ;;
 
    *)

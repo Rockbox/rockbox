@@ -42,6 +42,9 @@ OUTPUT = $(OBJDIR)/librockbox.a
 ifeq (RECORDER,$(findstring RECORDER, $(CFLAGS)))
 	OBJS +=	$(OBJDIR)/sysfont.o
 endif
+ifeq (ONDIO,$(findstring ONDIO, $(CFLAGS)))
+	OBJS +=	$(OBJDIR)/sysfont.o
+endif
 
 ifndef OBJDIR
 no_configure:

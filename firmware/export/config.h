@@ -30,8 +30,10 @@
 #include "config-recorderv2.h"
 #elif defined(NEO_35)
 #include "config-neo35.h"
-#elif defined(NEO_MSTATION)
-#include "config-mstation.h"
+#elif defined(ARCHOS_ONDIOSP)
+#include "config-ondiosp.h"
+#elif defined(ARCHOS_ONDIOFM)
+#include "config-ondiofm.h"
 #else
 /* no known platform */
 #endif
