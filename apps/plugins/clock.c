@@ -21,6 +21,11 @@
 RELEASE NOTES *******************
 *********************************
 
+*********************************
+VERSION 2.21 * STABLE ***********
+*********************************
+Changed the behaviour of F2
+
 ********************************
 VERSION 2.2 * STABLE ***********
 ********************************
@@ -79,6 +84,8 @@ and a few options.
 #include "time.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+#define CLOCK_VERSION "2.21"
 
 /* prototypes */
 void show_logo(bool animate, bool show_clock_text);
@@ -526,7 +533,7 @@ void load_settings(void)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_puts(0, 6, "Clock v2.2");
+    rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
 
     if(fd >= 0) /* does file exist? */
     {
@@ -536,7 +543,7 @@ void load_settings(void)
             rb->read(fd, &settings, sizeof(struct saved_settings));
             rb->close(fd);
             show_logo(true, true);
-            rb->lcd_puts(0, 6, "Clock v2.2");
+            rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
             rb->lcd_puts(0, 7, "Loaded settings");
         }
         else /* bail out */
@@ -559,7 +566,7 @@ void load_settings(void)
 }
 
 /**************************************************************
- * 7-Segment LED/LCD imitation code, by Linus Nielson Feltzing
+ * 7-Segment LED/LCD imitation code, by Linus Nielsen Feltzing
  **************************************************************/
 /*
        a     0    b
@@ -997,7 +1004,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
             rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock v2.2");
+                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
             rb->lcd_update();
         }
         /* bounce back up a little */
@@ -1007,7 +1014,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
             rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock v2.2");
+                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
             rb->lcd_update();
         }
         /* and go back down again */
@@ -1017,7 +1024,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
             rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock v2.2");
+                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
             rb->lcd_update();
         }
     }
@@ -1167,7 +1174,7 @@ bool show_credits(void)
 
     rb->lcd_clear_display();
 
-    /* show the logo with an animation and the clock 2.2 text */
+    /* show the logo with an animation and the clock version text */
     show_logo(true, true);
 
     rb->lcd_puts(0, 7, "Credit Roll...");
@@ -1204,7 +1211,7 @@ bool f1_screen(void)
         /* page one */
         if(screen == 1)
         {
-            rb->lcd_puts(0, 0, "Using Clock v2.2:");
+            rb->lcd_puts(0, 0, "Using Clock " CLOCK_VERSION ":");
             rb->lcd_puts(0, 1, "To navigate this");
             rb->lcd_puts(0, 2, "help, use LEFT and");
             rb->lcd_puts(0, 3, "RIGHT. F1 returns");
@@ -2087,6 +2094,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* poweroff activated or not? */
     bool reset_timer = false;
 
+    bool f2_held = false;
+
     struct tm* current_time;
 
     TEST_PLUGIN_API(api);
@@ -2334,24 +2343,31 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 f1_screen();
                 break;
 
-            case BUTTON_F2: /* start/stop counter */
+            case BUTTON_F2|BUTTON_REL: /* start/stop counter */
                 if(settings.clock != 5)
                 {
-                    if(counting)
+                    /* Ignore if the counter was reset */
+                    if(!f2_held)
                     {
-                        counting = false;
-                        counter += passed_time;
+                        if(counting)
+                        {
+                            counting = false;
+                            counter += passed_time;
+                        }
+                        else
+                        {
+                            counting = true;
+                            start_tick = *rb->current_tick;
+                        }
                     }
-                    else
-                    {
-                        counting = true;
-                        start_tick = *rb->current_tick;
-                    }
+                    f2_held = false;
                 }
                 break;
 
             case BUTTON_F2 | BUTTON_REPEAT: /* reset counter */
+                f2_held = true;  /* Ignore the release event */
                 counter = 0;
+                start_tick = *rb->current_tick;
                 break;
 
             case BUTTON_F3: /* options */
