@@ -322,7 +322,7 @@ getid3v1len(int fd)
     int offset;
 
     /* Check if we find "TAG" 128 bytes from EOF */
-    if((lseek(fd, -128, SEEK_END) != 0) ||
+    if((lseek(fd, -128, SEEK_END) == -1) ||
        (read(fd, buf, 3) != 3) ||
        (strncmp(buf, "TAG", 3) != 0))
         offset = 0;
