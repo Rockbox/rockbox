@@ -37,8 +37,10 @@
 
 extern void bitswap(unsigned char *data, int length);
 
+#ifndef SIMULATOR
 static int get_unplayed_space(void);
 static int get_unswapped_space(void);
+#endif
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
