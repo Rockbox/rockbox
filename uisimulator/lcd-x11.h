@@ -20,3 +20,5 @@
 #define MARGIN_X 3
 #define MARGIN_Y 3
 
+/* include the "real" lcd.h file here */
+#include <lcd.h>
