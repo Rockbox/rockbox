@@ -271,8 +271,8 @@ Note: Submissions that do not state if their image is for the front or back of t
 </tr>
 <tr>
     <td></td>
-    <td><a href="dw-rbox3-front.png"><img border=0 src="design18f2.jpg" width=300 height=252></a></td>
-    <td><a href="dw-rbox3-back.png"><img border=0 src="design18b.jpg" width=300 height=151></a></td>
+    <td><a href="dw-rbox3-front.png"><img border=0 src="design18f.png" width=300 height=252></a></td>
+    <td><a href="dw-rbox3-back.png"><img border=0 src="design18b.png" width=300 height=151></a></td>
 </tr>
 <tr>
     <td colspan=3>&nbsp</td>
@@ -328,8 +328,8 @@ Note: Submissions that do not state if their image is for the front or back of t
 </tr>
 <tr>
     <td></td>
-    <td><a href="Pedro-Eisman-04-whitefront.gif"><img border=0 src="design22f.jpg" width=300 height=143></a></td>
-    <td><a href="Pedro-Eisman-04-whiteback.gif"><img border=0 src="design22b.jpg" width=300 height=143></a></td>
+    <td><a href="Pedro-Eisman-04-whitefront.gif"><img border=0 src="design22f.gif" width=300 height=143></a></td>
+    <td><a href="Pedro-Eisman-04-whiteback.gif"><img border=0 src="design22b.gif" width=300 height=143></a></td>
 </tr>
 <tr>
     <td colspan=3>&nbsp</td>
