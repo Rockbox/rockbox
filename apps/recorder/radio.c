@@ -50,6 +50,7 @@
 #include "tuner.h"
 #include "hwcompat.h"
 #include "power.h"
+#include "sound.h"
 
 #ifdef CONFIG_TUNER
 
