@@ -305,10 +305,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             t_disp--;
             rb->snprintf(buffer, 30, "x:%d y:%d z:%d h:%d",xs,ys,zs,highspeed);
-            rb->lcd_putsxy(0, 56, buffer);
+            rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
         }
         rb->lcd_update();
-        
+
         xa+=xs;
         if (xa>359)
             xa-=360;
