@@ -82,8 +82,8 @@ void setup_sci0(void)
     /* Clear FER and PER */
     SSR0 &= 0xe7;
 
-    /* Set interrupt D priority to 0 */
-//    IPRD &= 0x0ff0;
+    /* Set interrupt ITU2 and SCI0 priority to 0 */
+    IPRD &= 0x0ff0;
 
     /* set IRQ6 and IRQ7 to edge detect */
 //    ICR |= 0x03;
@@ -98,12 +98,31 @@ void setup_sci0(void)
     IPRB = 0;
     
     /* Enable Tx (only!) */
-    SCR0 |= 0x20;
+    SCR0 |= 0xa0;
 }
 
 int mas_tx_ready(void)
 {
     return (SSR0 & SCI_TDRE);
+}
+
+void init_dma(void)
+{
+    SAR3 = (unsigned int) mp3data;
+    DAR3 = 0xFFFFEC3;
+    CHCR3 = 0x1500; /* Single address destination, TXI0 */
+    DTCR3 = 64000;
+    DMAOR = 0x0001; /* Enable DMA */
+}
+
+void start_dma(void)
+{
+    CHCR3 |= 1;
+}
+
+void stop_dma(void)
+{
+    CHCR3 &= ~1;
 }
 
 
@@ -112,6 +131,7 @@ int main(void)
    char buf[40];
    char str[32];
    int i=0;
+   int dma_on = 0;
 
    /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
@@ -217,11 +237,15 @@ int main(void)
 
    i = 0;
 
+   init_dma();
+
    while(1)
    {
        /* Demand pin high? */
        if(PBDR & 0x4000)
        {
+           start_dma();
+#if 0
            /* More data to write? */
            if(i < mp3datalen)
            {
@@ -232,18 +256,13 @@ int main(void)
                TDR0 = fliptable[mp3data[i++]];
                SSR0 &= ~SCI_TDRE;
            }
+#endif
+       }
+       else
+       {
+           stop_dma();
        }
    }
    
    while(1);
 }
-
-extern const void stack(void);
-
-const void* vectors[] __attribute__ ((section (".vectors"))) = 
-{
-   main,    /* Power-on reset */
-   stack,   /* Power-on reset (stack pointer) */
-   main,    /* Manual reset */
-   stack    /* Manual reset (stack pointer) */
-};
