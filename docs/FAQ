@@ -505,3 +505,23 @@ A63: There are a ton of ways to apply a patch.  One way is to use the (GNU)
 
      If patch can't apply some changes that are in the diff, you'll get those
      particular changes in a file named "[source-file].rej".
+
+Q64: I was told to download the [Daily-build/Bleeding Edge] version of
+     Rockbox.  What is that?
+A64: Rockbox really has 3 different 'types'.  You can download and play
+     with official version (see question #21).  There a large (1 month +)
+     periods of time between these releases.  
+     
+     If you are a bit more impatient you can grab a 'Daily Build' of what is 
+     currently being worked on.  The daily builds are created each morning 
+     and are just that, builds of what was put in the source tree the 
+     previous day. 
+
+     Now, if you like to live on the edge, you can pull down a 'Bleeding edge'
+     version.  These are versions that are built from the source tree every 
+     20 minutes or so.  
+
+     WARNING: Daily and bleeding edge builds are works in progress.  Bugs
+     may be rampant, especially in the case of bleeding edge versions.
+
+     Check http://rockbox.haxx.se/daily.shtml for all unofficial releases.
