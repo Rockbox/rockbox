@@ -57,6 +57,8 @@
 #include "version.h"
 #include "vroot.h"
 
+#include "debug.h"
+
 #ifndef isupper
 # define isupper(c)  ((c) >= 'A' && (c) <= 'Z')
 #endif
@@ -207,14 +209,28 @@ static Bool MapNotify_event_p (Display *dpy, XEvent *event, XPointer window)
 
 static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 
-/* Dead-trivial event handling: exits if "q" or "ESC" are typed.
+static Bool checkrepeat(time_t prev,
+                       time_t now)
+{
+    if(now-prev < 50) {
+        DEBUGF("Consider this a button repeat\n");
+        return true;
+    }
+    return false;
+}
+
+/* Dead-trivial event handling.
    Exit if the WM_PROTOCOLS WM_DELETE_WINDOW ClientMessage is received.
  */
-int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
+int screenhack_handle_event(Display *dpy, XEvent *event,
+                            bool *release, bool *repeat)
 {
     int key=0;
+    static time_t lasttime;
+    static unsigned int lastkeycode;
 
     *release = FALSE;
+    *repeat = false;
 
     switch (event->xany.type) {
     case KeyPress:
@@ -223,7 +239,15 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
           unsigned char c = 0;
           XLookupString (&event->xkey, &c, 1, &keysym, 0);
           key = keysym;
-          /*	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c); */
+#if 0
+          DEBUGF("Got keypress: %02x %x, time %lx\n", c,
+                 event->xkey.keycode,
+                 event->xkey.time);
+#endif
+          if(lastkeycode == event->xkey.keycode)
+              *repeat = checkrepeat(lasttime, event->xkey.time);
+          lasttime = event->xkey.time;
+          lastkeycode = event->xkey.keycode;
       }
       break;
     case KeyRelease:
@@ -232,28 +256,26 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
           unsigned char c = 0;
           XLookupString (&event->xkey, &c, 1, &keysym, 0);
           key = keysym;
-          /* fprintf(stderr, "KEY RELEASED: %c (%02x) %x\n", c, c,
-             event->xkey.keycode); */
-
+#if 0
+          DEBUGF("Got keyrelease: %c (%02x) %x\n", c, c,
+                 event->xkey.keycode);
+#endif
+          if(lastkeycode == event->xkey.keycode)
+              *repeat = checkrepeat(lasttime, event->xkey.time);          
+          lasttime = event->xkey.time;
+          lastkeycode = event->xkey.keycode;
+          if(*repeat)
+              return 0; /* on repeats, return nothing on release */
+              
           *release = TRUE;
       }
       break;
     case Expose:
       {
-	/*
-	int x=event->xexpose.width+event->xexpose.x;
-	int y=event->xexpose.height+event->xexpose.y;
-	screen_resized(x, y);
-	fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
-		x, y);
-	*/
 	screen_redraw();
       }
       break;
     default:
-      break;
-    case ButtonPress:
-      fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
       break;
     case ClientMessage:
       {
@@ -281,14 +303,14 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
 }
 
 
-int screenhack_handle_events(bool *release)
+int screenhack_handle_events(bool *release, bool *repeat)
 {
     int key=0;
-    while (XPending(dpy))
+    if(XPending(dpy))
     {
         XEvent event;
         XNextEvent(dpy, &event);
-        key=screenhack_handle_event(dpy, &event, release);
+        key=screenhack_handle_event(dpy, &event, release, repeat);
     }
     return key;
 }

@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "button.h"
 #include "kernel.h"
+#include "debug.h"
 
 #include "X11/keysym.h"
 
@@ -62,15 +63,15 @@ int button_set_release(int newmask)
  * Q=On Return=Menu
  */
 
-/* from uibasic.c */
-extern int screenhack_handle_events(bool *release);
+extern int screenhack_handle_events(bool *release, bool *repeat);
 
 static int get_raw_button (void)
 {
     int k;
     bool release=false; /* is this a release event */
-
-    switch(screenhack_handle_events(&release))
+    bool repeat=false;  /* is the key a repeated one */
+    int ev=screenhack_handle_events(&release, &repeat);
+    switch(ev)
     {
 	case XK_KP_Left:
 	case XK_Left:
@@ -145,12 +146,17 @@ static int get_raw_button (void)
 
 	default:
 	    k = 0;
+            if(ev)
+                DEBUGF("received ev %d\n", ev);
             break;
     }
 
-    if ( release )
+    if(release)
         /* return a release event */
         k |= BUTTON_REL;
+
+    if(repeat)
+        k |= BUTTON_REPEAT;
 
     return k;
 }
