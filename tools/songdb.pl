@@ -131,11 +131,14 @@ sub dodir {
 
         # prepend Artist name to handle duplicate album names from other
         # artists
+        my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
         if($id3->{'ALBUM'}) {
-            my $num = $albums{$id3->{'ARTIST'}."___".$id3->{'ALBUM'}}++;
+            my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
                 $maxsongperalbum = $num;
             }
+            $album2songs{$albumid}{$$id3{TITLE}} = $id3;
+            $artist2albums{$$id3{ARTIST}}{$$id3{ALBUM}} = $id3;
         }
     }
 
@@ -169,11 +172,12 @@ for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
         $maxsonglen = $l;
     }
 }
+$maxsonglen++; # include zero termination byte
 while($maxsonglen&3) {
     $maxsonglen++;
 }
 
-my $maxaristlen;
+my $maxartistlen;
 print "\nArtist table\n";
 my $i=0;
 my %artistcount;
@@ -181,12 +185,18 @@ for(sort keys %artists) {
     printf("  %s\n", $_);
     $artistcount{$_}=$i++;
     my $l = length($_);
-    if($l > $maxaristlen) {
-        $maxaristlen = $l;
+    if($l > $maxartistlen) {
+        $maxartistlen = $l;
+    }
+
+    $l = scalar keys %{$artist2albums{$_}};
+    if ($l > $maxalbumsperartist) {
+        $maxalbumsperartist = $l;
     }
 }
-while($maxaristlen&3) {
-    $maxaristlen++;
+$maxartistlen++; # include zero termination byte
+while($maxartistlen&3) {
+    $maxartistlen++;
 }
 
 print "\nGenre table\n";
@@ -205,16 +215,18 @@ my %albumcount;
 $i=0;
 for(sort keys %albums) {
     my @moo=split(/___/, $_);
-    printf("  %s\n", $moo[1]);
-    $albumcount{$moo[1]} = $i++;
-    my $l = length($moo[1]);
+    printf("  %s\n", $moo[0]);
+    $albumcount{$_} = $i++;
+    my $l = length($moo[0]);
     if($l > $maxalbumlen) {
         $maxalbumlen = $l;
     }
 }
+$maxalbumlen++; # include zero termination byte
 while($maxalbumlen&3) {
     $maxalbumlen++;
 }
+
 
 
 sub dumpint {
@@ -232,8 +244,13 @@ sub dumpint {
 if($db) {
     print STDERR "\nCreating db $db\n";
 
+    my $songentrysize = $maxsonglen + 12;
+    my $albumentrysize = $maxalbumlen + 4 + $maxsongperalbum*4;
+    my $artistentrysize = $maxartistlen + $maxalbumsperartist*4;
+
     print STDERR "Max song length: $maxsonglen\n";
     print STDERR "Max album length: $maxalbumlen\n";
+    print STDERR "Max artist length: $maxartistlen\n";
     print STDERR "Database version: $dbver\n";
 
     open(DB, ">$db") || die "couldn't make $db";
@@ -247,7 +264,7 @@ if($db) {
     dumpint($maxsonglen); # length of song name field
 
     # set total size of song title table
-    $sc = scalar(keys %entries) * $maxsonglen;
+    $sc = scalar(keys %entries) * $songentrysize;
     
     $albumindex = $songindex + $sc; # sc is size of all songs
     dumpint($albumindex); # file position index of album table
@@ -255,12 +272,12 @@ if($db) {
     dumpint($maxalbumlen); # length of album name field
     dumpint($maxsongperalbum); # number of entries in songs-per-album array
 
-    my $ac = ($maxalbumlen + 8 ) * scalar(keys %albums);
+    my $ac = scalar(keys %albums) * $albumentrysize;
 
     $artistindex = $albumindex + $ac; # ac is size of all albums
     dumpint($artistindex); # file position index of artist table
     dumpint(scalar(keys %artists)); # number of artists
-    dumpint($maxaristlen); # length of artist name field
+    dumpint($maxartistlen); # length of artist name field
     dumpint($maxalbumsperartist); # number of entries in albums-per-artist array
 
     my $l=0;
@@ -281,21 +298,26 @@ if($db) {
     # pointer to album of song1
     # pointer to filename of song1
 
+    my $offset = $songindex;
     for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
         my $f = $_;
         my $id3 = $entries{$f};
         my $t = $id3->{'TITLE'};
         my $str = $t."\x00" x ($maxsonglen- length($t));
-        printf DB ("%s\x00", $str); # title
 
-        my $a = $artistcount{$id3->{'ARTIST'}} * $maxaristlen;
+        print DB $str; # title
+
+        my $a = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
         dumpint($a + $artistindex); # pointer to artist of this song
 
-        $a = $albumcount{$id3->{'ALBUM'}} * $maxalbumlen;
+        $a = $albumcount{"$$id3{ALBUM}___$$id3{ARTIST}"} * $albumentrysize;
         dumpint($a + $albumindex); # pointer to album of this song
 
         # pointer to filename of this song
         dumpint($filenamepos{$id3->{'FILE'}} + $pathindex);
+
+        $$id3{'songoffset'} = $offset;
+        $offset += $songentrysize;
     }
 
     #### TABLE of albums ###
@@ -304,25 +326,44 @@ if($db) {
     # pointers to songs on album1
 
     for(sort keys %albums) {
-
+        my $albumid = $_;
         my @moo=split(/___/, $_);
-        my $t = $moo[1];
+        my $t = $moo[0];
         my $str =  $t."\x00" x ($maxalbumlen - length($t));
-        printf DB ("%s\x00", $str);
+        print DB $str;
 
-        my $a = $artistcount{$moo[0]} * $maxaristlen;
+        my $a = $artistcount{$moo[0]} * $artistentrysize;
         dumpint($a + $artistindex); # pointer to artist of this album
 
-        # $maxsongperalbum
-        dumpint(15); # pointers to songs on album1
+        for (sort keys %{$album2songs{$albumid}}) {
+            my $id3 = $album2songs{$albumid}{$_};
+            dumpint($$id3{'songoffset'});
+        }
+
+        for (scalar keys %{$album2songs{$albumid}} .. $maxsongperalbum-1) {
+            print DB "\x00\x00\x00\x00";
+        }
     }
     
     #### TABLE of artists ###
     # name of artist1
     # pointers to albums of artist1
 
-    for(sort keys %artists) {
-        printf DB ("%s\x00", $_);
+    for (sort keys %artists) {
+        my $artist = $_;
+        my $str =  $_."\x00" x ($maxartistlen - length($_));
+        print DB $str;
+
+        for (sort keys %{$artist2albums{$artist}}) {
+            my $id3 = $artist2albums{$artist}{$_};
+            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'ARTIST'}"} * albumentrysize;
+            dumpint($a + $albumindex);
+        }
+
+        for (scalar keys %{$artist2albums{$artist}} .. $maxalbumsperartist-1) {
+            print DB "\x00\x00\x00\x00";
+        }
+
     }
 
     close(DB);
