@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -27,7 +28,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "tree.h"
-//#include "play.h"
+#include "play.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -187,8 +188,10 @@ bool dirbrowse(char *root)
             case BUTTON_OFF:
                 return false;
                 break;
-#endif
             case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+#endif
                 i=strlen(currdir);
                 if (i==1) {
                     return false;
@@ -226,14 +229,14 @@ bool dirbrowse(char *root)
 
                 break;
 
-            case BUTTON_RIGHT:
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_PLAY:
+            case BUTTON_RIGHT:
 #endif
+            case BUTTON_PLAY:
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
-                    sprintf(buf,"%s%s",currdir,buffer[dircursor].name);
+                    snprintf(buf,sizeof(buf),"%s%s",currdir,buffer[dircursor].name);
                 } else {
-                    sprintf(buf,"%s/%s",currdir,buffer[dircursor].name);
+                    snprintf(buf,sizeof(buf),"%s/%s",currdir,buffer[dircursor].name);
                 }
 
                 if (!buffer[dircursor].file) {
@@ -259,13 +262,19 @@ bool dirbrowse(char *root)
                 lcd_update();
 #endif
                 break;
-      
+                
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
+#else
+            case BUTTON_LEFT:
+#endif
                 if(dircursor) {
                     lcd_puts(0, LINE_Y+dircursor, " ");
                     dircursor--;
                     lcd_puts(0, LINE_Y+dircursor, "-");
+#ifdef HAVE_LCD_BITMAP
                     lcd_update();
+#endif
                 }
                 else {
                     if (start) {   
@@ -281,7 +290,12 @@ bool dirbrowse(char *root)
                     }
                 }
                 break;
+
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
+#else
+            case BUTTON_RIGHT:
+#endif
                 if(dircursor+1 < numentries) {
                     lcd_puts(0, LINE_Y+dircursor, " ");
                     dircursor++;
