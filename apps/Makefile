@@ -78,10 +78,10 @@ $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang
+$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang ../tools/uplang
 	perl ../tools/uplang lang/english.lang $< > $@
 
-$(OBJDIR)/lang.o: $(OBJDIR)/build.lang
+$(OBJDIR)/lang.o: $(OBJDIR)/build.lang ../tools/genlang
 	perl -s ../tools/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
