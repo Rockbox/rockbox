@@ -21,6 +21,7 @@
 #include "uisw32.h"
 #include "kernel.h"
 #include "thread-win32.h"
+#include "thread.h"
 
 void sleep(int ticks)
 {
@@ -31,4 +32,49 @@ void sleep(int ticks)
 void yield (void)
 {
     PostThreadMessage (GetWindowThreadProcessId (hGUIWnd,NULL), TM_YIELD, 0, 0);
+}
+
+void queue_init(struct event_queue *q)
+{
+    q->read = 0;
+    q->write = 0;
+}
+
+void queue_wait(struct event_queue *q, struct event *ev)
+{
+    while(q->read == q->write)
+    {
+        switch_thread();
+    }
+
+    *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
+}
+
+void queue_post(struct event_queue *q, int id, void *data)
+{
+    int wr;
+    int oldlevel;
+
+    oldlevel = set_irq_level(15);
+    wr = (q->write++) & QUEUE_LENGTH_MASK;
+
+    q->events[wr].id = id;
+    q->events[wr].data = data;
+    set_irq_level(oldlevel);
+}
+
+bool queue_empty(struct event_queue* q)
+{
+    return ( q->read == q->write );
+}
+
+void switch_thread (void)
+{
+    yield ();
+}
+
+int set_irq_level (int level)
+{
+    static int _lv = 0;
+    return (_lv = level);
 }

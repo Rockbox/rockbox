@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\apps\recorder&quot;;&quot;C:\Programming\CVS Checkout\RockBox\apps&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\uisimulator\win32&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAVE_RECORDER_KEYPAD;HAVE_LCD_BITMAP;SIMULATOR;SIMULATOR;"
+				AdditionalIncludeDirectories="&quot;..\..\apps\recorder&quot;;&quot;..\..\apps&quot;;&quot;..\..\firmware&quot;;&quot;..\win32&quot;;&quot;..\..\firmware\drivers&quot;;&quot;..\..\firmware\common&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAVE_RECORDER_KEYPAD;HAVE_LCD_BITMAP;SIMULATOR;SIMULATOR;LCD_PROPFONTS;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -107,7 +107,16 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\..\firmware\backlight.c">
+			</File>
+			<File
 				RelativePath="..\..\apps\recorder\bmp.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\recorder\bounce.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\recorder\boxes.c">
 			</File>
 			<File
 				RelativePath="button.c">
@@ -123,6 +132,9 @@
 			</File>
 			<File
 				RelativePath="dir-win32.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\games_menu.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\recorder\icons.c">
@@ -185,16 +197,28 @@
 				RelativePath="..\..\apps\playlist.c">
 			</File>
 			<File
-				RelativePath="..\..\apps\recorder\screensaver.c">
+				RelativePath="..\..\apps\screensavers_menu.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\settings.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\settings_menu.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\recorder\sokoban.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\sound_menu.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\common\sprintf.c">
+			</File>
+			<File
+				RelativePath="string-win32.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\common\strtok.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\recorder\tetris.c">
@@ -207,6 +231,9 @@
 			</File>
 			<File
 				RelativePath="uisw32.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\wps.c">
 			</File>
 		</Filter>
 		<Filter

@@ -38,6 +38,19 @@ void mpeg_stop(void)
 {
 }
 
+void mpeg_resume(void)
+{
+}
+
+void mpeg_pause(void)
+{
+}
+
+struct mp3entry* mpeg_current_track(void)
+{
+    return 0;
+}
+
 #ifndef MPEGPLAY
 void mpeg_play(char *tune)
 {
