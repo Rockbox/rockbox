@@ -1413,3 +1413,13 @@ id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 new: "Sparad"
+
+id: LANG_VBRFIX_NOT_VBR
+desc: Tells the user that the selected file is not a VBR file
+eng: "Not a VBR file"
+new: "Filen är inte VBR"
+
+id: LANG_VBRFIX_STOP_PLAY
+desc: Tells the user to stop the playback
+eng: "Stop the playback first"
+new: "Stoppa uppspelningen först"
