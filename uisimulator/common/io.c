@@ -27,8 +27,13 @@
 #elif !defined(WIN32)
 #include <sys/vfs.h>
 #endif
+
+#ifndef _MSC_VER
 #include <dirent.h>
 #include <unistd.h>
+#else
+#include "dir-win32.h"
+#endif
 
 #include <fcntl.h>
 #include "debug.h"

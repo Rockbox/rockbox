@@ -32,6 +32,11 @@
 #ifdef WIN32
 #ifndef _commit
 extern int _commit( int handle );
+
+#ifdef _MSC_VER
+typedef unsigned int mode_t;
+#endif
+
 #endif
 #endif
 
