@@ -870,7 +870,7 @@ static int onplay_screen(char* dir, char* file)
                             break;
           
                         default:
-                                /* ignore button releases */
+                            /* ignore button releases */
                             if (!(btn & BUTTON_REL))
                                 exit = true;
                             break;
@@ -1293,6 +1293,7 @@ bool dirbrowse(char *root)
                               tree_max_on_screen))
                 {
                     /* start scroll */
+                    reload_dir = true;
                     restore = true;
                 }
                 else
@@ -1343,7 +1344,7 @@ bool dirbrowse(char *root)
             ata_spin();
         
         /* do we need to rescan dir? */
-        if (reload_root ||
+        if (reload_dir || reload_root ||
             lastfilter != global_settings.dirfilter ||
             lastsortcase != global_settings.sort_case)
         {
@@ -1352,9 +1353,12 @@ bool dirbrowse(char *root)
                 dirlevel = 0;
                 reload_root = false;
             }
-            dircursor = 0;
-            dirstart = 0;
-            lastdir[0] = 0;
+            if (! reload_dir )
+            {
+                dircursor = 0;
+                dirstart = 0;
+                lastdir[0] = 0;
+            }
             lastfilter = global_settings.dirfilter;
             lastsortcase = global_settings.sort_case;
             restore = true;
