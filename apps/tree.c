@@ -1416,6 +1416,7 @@ bool rockbox_browse(char *root, int dirfilter)
     int cursorpos_save = cursorpos[0];
 
     memcpy(currdir_save, currdir, sizeof(currdir));
+    reload_dir = true;
     rc = dirbrowse(root, &dirfilter);
     memcpy(currdir, currdir_save, sizeof(currdir));
 
