@@ -78,7 +78,7 @@ ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(DEFINES)))
 endif
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c wps.c settings.c status.c
+	playlist.c showtext.c wps.c wps-display.c settings.c status.c
 
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
@@ -198,6 +198,9 @@ $(OBJDIR)/main.o: $(APPDIR)/main.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/wps.o: $(APPDIR)/wps.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/wps-display.o: $(APPDIR)/wps-display.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bmp.o: $(RECDIR)/bmp.c
