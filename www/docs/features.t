@@ -15,9 +15,9 @@
 #define UNKNOWN TD ? ETD
 #define NA TD N/A ETD
 
-<p>
- The Rockbox column may specify features only available in CVS and daily
- builds.
+<p> This chart compares Rockbox with the original firmwares as shipped by the
+ manufacturers of the players. The Rockbox column may specify features only
+ available in CVS and daily builds.
 
 <p>
 <table class=rockbox>
@@ -98,7 +98,7 @@ EFEAT
 NAME Playlist load speed, songs/sec ENAME
 TD 3000 - 4000 ETD
 TD 15 - 20 ETD
-UNKNOWN
+TD 30 - 40 ETD
 EFEAT
 
 NAME Max number of songs in a playlist ENAME
@@ -260,7 +260,7 @@ EFEAT
 NAME Sleep timer ENAME
 YES
 NO
-NO
+YES
 EFEAT
 
 NAME Easy User Interface ENAME
@@ -302,7 +302,7 @@ EFEAT
 NAME Accurate VBR bitrate display ENAME
 YES
 NO
-UNKNOWN
+NO
 EFEAT
 
 NAME FM Tuner support (FM Recorder) ENAME
@@ -332,7 +332,7 @@ EFEAT
 NAME Boot Time from Flash (in seconds) ENAME
 TD 4 ETD
 TD 12 ETD
-UNKNOWN
+TD 13 ETD
 EFEAT
 
 NAME Speaking Menus Support ENAME
