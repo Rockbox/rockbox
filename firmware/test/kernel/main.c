@@ -42,36 +42,39 @@ int main(void)
        debugger when you hit CTRL-C */
     SCR1 |= 0x40;
     SCR1 &= ~0x80;
+    IPRE |= 0xf000; /* Set to highest priority */
     asm ("ldc\t%0,sr" : : "r"(0<<4));
 
     debugf("OK. Let's go\n");
 
-    tick_start(40);
+    tick_start(10);
 
     create_thread(t1, s1, 1024);
     create_thread(t2, s2, 1024);
 
     while(1)
     {
-	debugf("t0\n");
-	sleep(100);
+        sleep(100);
+        debugf("Thread 0 awakened\n");
     }
 }
 
 void t1(void)
 {
+    debugf("Thread 1 started\n");
     while(1)
     {
-	debugf("t1\n");
-	sleep(200);
+        sleep(200);
+        debugf("Thread 1 awakened\n");
     }
 }
 
 void t2(void)
 {
+    debugf("Thread 2 started\n");
     while(1)
     {
-	debugf("t2\n");
-	sleep(300);
+        sleep(300);
+        debugf("Thread 2 awakened\n");
     }
 }

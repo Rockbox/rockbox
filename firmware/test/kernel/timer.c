@@ -49,7 +49,7 @@ void tick_start(unsigned int interval_in_ms)
     IPRC = (IPRC & ~0x00f0) | 0x0010;
     
     TSR0 &= ~0x01;
-    TIER0 |= 0x01; /* Enable GRA match interrupt */
+    TIER0 = 0xf9; /* Enable GRA match interrupt */
 
     TSTR |= 0x01; /* Start timer 1 */
 }
@@ -59,5 +59,6 @@ void IMIA0(void)
 {
     current_tick++;
 
+//    debugf("t\n");
     TSR0 &= ~0x01;
 }
