@@ -22,3 +22,5 @@
 #define sleep(x) x11_sleep(x)
 
 void x11_sleep(int);
+
+#define yield() x11_sleep(5)
