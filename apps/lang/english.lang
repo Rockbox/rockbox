@@ -322,7 +322,7 @@ new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll Speed"
+eng: "Scroll"
 new:
 
 id: LANG_RESET
@@ -1195,4 +1195,9 @@ new:
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
+new:
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
 new:

@@ -614,6 +614,7 @@ static bool reset_settings(void)
         case BUTTON_PLAY:
             settings_reset();
             settings_apply();
+            lcd_clear_display();
             lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
             done = true;
             break;
@@ -623,6 +624,7 @@ static bool reset_settings(void)
 #else
         case BUTTON_STOP:
 #endif
+            lcd_clear_display();
             lcd_puts(0,1,str(LANG_RESET_DONE_CANCEL));
             done = true;
             break;
@@ -656,23 +658,39 @@ static bool fileview_settings_menu(void)
     return result;
 }
 
+
+static bool scroll_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    struct menu_items items[] = {
+        { str(LANG_SCROLL_SPEED),     scroll_speed    },
+        { str(LANG_SCROLL_DELAY),    scroll_delay    },  
+#ifdef HAVE_LCD_BITMAP
+        { str(LANG_SCROLL_STEP),     scroll_step     },  
+        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
+#endif
+    };
+
+    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
+
+
 static bool display_settings_menu(void)
 {
     int m;
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SCROLL_MENU),     scroll_speed    },
-#ifdef HAVE_LCD_BITMAP
-        { str(LANG_SCROLL_STEP),     scroll_step     },  
-#endif
-        { str(LANG_SCROLL_DELAY),    scroll_delay    },  
-#ifdef HAVE_LCD_BITMAP
-        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
-#endif
         { str(LANG_BACKLIGHT),       backlight_timer },
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { str(LANG_CONTRAST),        contrast        },  
+        { str(LANG_SCROLL_MENU),     scroll_settings_menu },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
