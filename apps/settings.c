@@ -173,12 +173,12 @@ static int load_config_buffer( void )
          && rtc_config_block[0x3] == 0x0
          && cksum[0] == rtc_config_block[0x2a]
          && cksum[1] == rtc_config_block[0x2b]) {
-            DEBUGF( "load_config_buffer: header & checksum test ok" );
+            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
             return 0; /* header and checksum is valid */
         }
     
     /* if checksum is not valid, initialize the config buffer to all-unused */
-    DEBUGF( "load_config_buffer: header & checksum test failed" );
+    DEBUGF( "load_config_buffer: header & checksum test failed\n" );
     init_config_buffer();
     return 1;
 }
