@@ -18,6 +18,10 @@ ifdef DEBUG
     CFLAGS += -g
 endif
 
+ifdef ENABLEDPLUGINS
+ROCKS=rocks
+endif
+
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
@@ -37,9 +41,9 @@ MAXINFILE = $(OBJDIR)/romstart.temp
 MAXOUTFILE = $(OBJDIR)/romstart
 
 ifdef DEBUG
-all: $(OBJDIR)/rockbox.elf rocks
+all: $(OBJDIR)/rockbox.elf $(ROCKS)
 else
-all: $(OBJDIR)/$(BINARY) $(FLASHFILE) rocks $(ARCHOSROM)
+all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
