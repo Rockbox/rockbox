@@ -555,9 +555,7 @@ bool chip8_run(char* file)
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
     {   /* prepare */
-        rb->mp3_play_init();
         rb->mp3_play_data(beep, sizeof(beep), callback);
-        rb->mpeg_sound_set(SOUND_VOLUME, rb->global_settings->volume);
     }
 
     chip8_reset();
