@@ -245,6 +245,6 @@ int button_status(void)
 
 void button_clear_queue(void)
 {
-    queue_empty(&button_queue);
+    queue_clear(&button_queue);
 }
 

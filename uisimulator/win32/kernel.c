@@ -99,6 +99,13 @@ bool queue_empty(const struct event_queue* q)
     return ( q->read == q->write );
 }
 
+void queue_clear(struct event_queue* q)
+{
+    /* fixme: This is potentially unsafe in case we do interrupt-like processing */
+    q->read = 0;
+    q->write = 0;
+}
+
 void switch_thread (void)
 {
     yield ();
