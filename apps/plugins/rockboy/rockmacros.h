@@ -42,9 +42,15 @@ void sys_sleep(int us);
 int  pcm_submit(void);
 void pcm_init(void);
 void doevents(void);
-int  isupper(int c);
-int  isdigit(int c);
 void ev_poll(void);
+int do_user_menu(void);
+#define USER_MENU_QUIT -2
+
+
+/* libc functions */
+#define isdigit(c) ((c) >= '0' && (c) <= '9')
+#define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && ((c) <= 'Z')))
+#define isalnum(c) (isdigit(c) || (isalpha(c)))
 
 #ifdef SIMULATOR
 #undef opendir

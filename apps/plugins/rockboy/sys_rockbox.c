@@ -60,14 +60,14 @@ void joy_close(void)
 #define ROCKBOY_PAD_B BUTTON_OFF
 #define ROCKBOY_PAD_START BUTTON_REC
 #define ROCKBOY_PAD_SELECT BUTTON_SELECT
-#define ROCKBOY_QUIT BUTTON_MODE
+#define ROCKBOY_MENU BUTTON_MODE
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define ROCKBOY_PAD_A BUTTON_F1
 #define ROCKBOY_PAD_B BUTTON_F2
 #define ROCKBOY_PAD_START BUTTON_F3
 #define ROCKBOY_PAD_SELECT BUTTON_PLAY
-#define ROCKBOY_QUIT BUTTON_OFF
+#define ROCKBOY_MENU BUTTON_OFF
 
 #endif
 
@@ -115,9 +115,11 @@ void ev_poll(void)
             ev.code=PAD_SELECT;
             ev_postevent(&ev);
         }
-        if(pressed & ROCKBOY_QUIT) {
+        if(pressed & ROCKBOY_MENU) {
+          if (do_user_menu() == USER_MENU_QUIT) {
             die("");
             cleanshut=1;
+          }
         }
     }
     

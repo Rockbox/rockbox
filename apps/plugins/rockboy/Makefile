@@ -20,7 +20,7 @@ LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-rockboy
 SRC = cpu.c emu.c events.c exports.c fastmem.c hw.c lcd.c lcdc.c loader.c \
 	main.c mem.c nosound.c rccmds.c rcvars.c rtc.c save.c sound.c split.c \
-	sys_rockbox.c rockboy.c
+	sys_rockbox.c rockboy.c menu.c
 
 #CFLAGS += -DDYNAREC
 #SRC += dynarec.c

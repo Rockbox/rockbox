@@ -45,16 +45,24 @@ void doevents()
 
 
 
+/* convenience macro for printing loading state */
+#define PUTS(str) do { \
+  rb->lcd_putsxy(1, y, str); \
+  rb->lcd_getstringsize(str, &w, &h); \
+  y += h + 1; \
+} while (0)
+
 int gnuboy_main(char *rom)
 {
-	int i;
+	int i, w, h, y;
 
+  y = 1;
 	// Avoid initializing video if we don't have to 
 	// If we have special perms, drop them ASAP! 
-	rb->splash(HZ*1, true, "Init exports");
+	PUTS("Init exports");
 	init_exports();
 
-	rb->splash(HZ*1, true, "Loading default config");
+	PUTS("Loading default config");
 	for (i = 0; defaultconfig[i]; i++)
 		rc_command(defaultconfig[i]);
 
@@ -65,19 +73,20 @@ int gnuboy_main(char *rom)
 //	rc_command(cmd);
 
 	// FIXME - make interface modules responsible for atexit() 
-	rb->splash(HZ*1, true, "Init video");
+	PUTS("Init video");
 	vid_init();
-	rb->splash(HZ*1, true, "Init sound (nosound)");
+	PUTS("Init sound (nosound)");
 	pcm_init();
-	rb->splash(HZ*1, true, "Loading rom");
+	PUTS("Loading rom");
 	loader_init(rom);
 	if(shut)
 		return PLUGIN_ERROR;
-	rb->splash(HZ*1, true, "Emu reset");
+	PUTS("Emu reset");
 	emu_reset();
-	rb->splash(HZ*1, true, "Emu run");
+	PUTS("Emu run");
 	emu_run();
 
 	// never reached 
 	return PLUGIN_OK;
 }
+#undef PUTS

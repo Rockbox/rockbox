@@ -52,24 +52,6 @@ int shut,cleanshut;
 char *errormsg;
 int gnuboy_main(char *rom);
 
-/* libc functions */
-
-int isdigit(int c) {
-    return c>='0' && c<= '9';
-}
-
-int isalpha(int c) {
-    return (c>='a' && c<='z')||(c>='A' && c<='Z');
-}
-
-int isupper(int c) {
-    return c>='A'&&c<='Z';
-}
-
-int isalnum(int c) {
-    return isdigit(c)||isalpha(c);
-}
-
 void die(char *message, ...)
 {
     shut=1;
@@ -129,8 +111,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     mp3_buffer_free=0;
 
     /* now go ahead and have fun! */
-    rb->splash(HZ*2, true, "Rockboy v0.3");
-    rb->lcd_clear_display();
+    /* rb->splash(HZ*2, true, "Rockboy v0.3"); */
+    /* rb->lcd_clear_display(); */
     gnuboy_main(parameter);
 
     if(shut&&!cleanshut) {
