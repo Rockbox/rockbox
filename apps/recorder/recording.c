@@ -53,6 +53,9 @@ extern int mp3buf_write;
 extern int mp3buf_read;
 extern bool recording;
 
+extern unsigned long record_start_frame; /* Frame number where
+                                            recording started */
+
 #define SOURCE_MIC 0
 #define SOURCE_LINE 1
 #define SOURCE_SPDIF 2
@@ -122,8 +125,6 @@ void adjust_cursor(void)
     }
 }
 
-#define BLINK_INTERVAL 2
-
 unsigned int frame_times[] =
 {
     2612, /* 44.1kHz */
@@ -161,10 +162,10 @@ bool recording_screen(void)
     int w, h;
     int update_countdown = 1;
     bool have_recorded = false;
-    bool blink_toggle = false;
     unsigned long seconds;
     unsigned long last_seconds = 0;
     int hours, minutes;
+    unsigned long val;
 
     cursor = 0;
     mpeg_init_recording();
@@ -360,12 +361,12 @@ bool recording_screen(void)
 
                 lcd_clear_display();
 
-                if(mpeg_status() & MPEG_STATUS_RECORD)
-                {
-                    blink_toggle = blink_toggle?false:true;
-                    if(blink_toggle)
-                        lcd_puts(0, 0, "Recording");
-                }
+                /* DEBUG: Read the current frame */
+                mas_readmem(MAS_BANK_D0, 0xfd0, &val, 1);
+                
+                snprintf(buf, 32, "%05x:%05x:%05x",
+                         mpeg_num_recorded_frames(), val, record_start_frame);
+                lcd_puts(0, 0, buf);
 
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;

@@ -482,8 +482,8 @@ static int lowest_watermark_level; /* Debug value to observe the buffer
 #ifdef HAVE_MAS3587F
 static bool is_recording; /* We are recording */
 static bool stop_pending;
-static unsigned long record_start_frame; /* Frame number where
-                                            recording started */
+unsigned long record_start_frame; /* Frame number where
+                                     recording started */
 static bool saving; /* We are saving the buffer to disk */
 #endif
 
@@ -2187,7 +2187,7 @@ unsigned long mpeg_num_recorded_frames(void)
     {
         /* Read the current frame */
         mas_readmem(MAS_BANK_D0, 0xfd0, &val, 1);
-        
+
         return val - record_start_frame;
     }
     else
