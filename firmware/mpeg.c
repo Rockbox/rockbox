@@ -292,6 +292,9 @@ static void remove_all_tags(void)
     
     for(i = 0;i < MAX_ID3_TAGS;i++)
         remove_current_tag();
+
+    tag_write_idx = tag_read_idx;
+
     debug_tags();
 }
 #endif
@@ -1133,9 +1136,8 @@ static void track_change(void)
 #endif
     remove_current_tag();
 
-    current_track_counter++;
-
     update_playlist();
+    current_track_counter++;
 }
 
 #ifdef DEBUG
@@ -1323,8 +1325,8 @@ static void mpeg_thread(void)
                 play_pending = true;
                 paused = false;
 
-                current_track_counter++;
                 update_playlist();
+                current_track_counter++;
                 break;
 
             case MPEG_STOP:
@@ -1366,10 +1368,10 @@ static void mpeg_thread(void)
                 if ( num_tracks_in_memory() > 1 ) {
                     int unplayed_space_left, unswapped_space_left;
 
-                /* stop the current stream */
-                play_pending = false;
-                playing = false;
-                stop_dma();
+                    /* stop the current stream */
+                    play_pending = false;
+                    playing = false;
+                    stop_dma();
 
                     track_change();
                     mp3buf_read = id3tags[tag_read_idx]->mempos;
@@ -1423,8 +1425,8 @@ static void mpeg_thread(void)
                            to start playing as soon as we have some data */
                         play_pending = true;
 
-                        current_track_counter++;
                         update_playlist();
+                        current_track_counter++;
                     }
                 }
                 break;
@@ -1458,8 +1460,8 @@ static void mpeg_thread(void)
                        start playing as soon as we have some data */
                     play_pending = true;
 
-                    current_track_counter++;
                     update_playlist();
+                    current_track_counter++;
                 }
                 break;
             }
@@ -2287,8 +2289,8 @@ void mpeg_next(void)
             continue;
         }
         index = playlist_next(steps);
-        current_track_counter++;
         taginfo.index = index;
+        current_track_counter++;
         is_playing = true;
         playing = true;
         break;
@@ -2314,8 +2316,8 @@ void mpeg_prev(void)
             continue;
         }
         index = playlist_next(steps);
-        current_track_counter++;
         taginfo.index = index;
+        current_track_counter++;
         is_playing = true;
         playing = true;
         break;
