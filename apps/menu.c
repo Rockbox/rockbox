@@ -55,6 +55,10 @@ static void menu_draw(int m)
          i++) {
         lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
     }
+
+	/* place the cursor */
+    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
+
     lcd_update();
 }
 
@@ -64,18 +68,27 @@ static void menu_draw(int m)
  */
 static void put_cursor(int m, int target)
 {
-    lcd_puts(0, menus[m].cursor - menus[m].top, " ");
+    bool do_update = true;
+
+    lcd_puts(0, menus[m].cursor - menus[m].top, " ");    
+    menus[m].cursor = target;
 
     if ( target < menus[m].top ) {
         menus[m].top--;
         menu_draw(m);
+        do_update = false;
     }
     else if ( target-menus[m].top > MENU_LINES-1 ) {
         menus[m].top++;
         menu_draw(m);
+        do_update = false;
     }
-    menus[m].cursor = target;
-    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
+
+    if (do_update) {
+        lcd_puts(0, menus[m].cursor - menus[m].top, "-"); 
+        lcd_update();
+    }
+
 }
 
 int menu_init(struct menu_items* mitems, int count)
@@ -108,7 +121,6 @@ void menu_exit(int m)
 void menu_run(int m)
 {
     menu_draw(m);
-    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
     
     while(1) {
         switch( button_get(true) ) {
@@ -145,7 +157,6 @@ void menu_run(int m)
             
                 /* Return to previous display state */
                 menu_draw(m);
-                lcd_puts(0, menus[m].cursor - menus[m].top, "-");
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD

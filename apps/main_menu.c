@@ -76,9 +76,9 @@ static int show_logo(void)
 void show_splash(void)
 {
     lcd_clear_display();
-
+    
     if (show_logo() != 0) 
-      return;
+        return;
 }
 
 void version(void)
