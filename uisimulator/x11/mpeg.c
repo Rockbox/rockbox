@@ -31,3 +31,7 @@ void mpeg_bass(void)
 void mpeg_treble(void)
 {
 }
+
+void mpeg_stop(void)
+{
+}
