@@ -21,6 +21,7 @@
 
 #include <lcd.h>
 #include "led.h"
+#include "system.h"
 
 #define default_interrupt(name,number) \
   extern __attribute__((weak,alias("UIE" #number))) void name (void); void UIE##number (void)
@@ -317,11 +318,11 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     while (1)
     {
-	bool state = TRUE;
-	
+        bool state = TRUE;
+        
         led (state);
-	state = state?FALSE:TRUE;
-	
+        state = state?FALSE:TRUE;
+        
         for (i = 0; i < 240000; ++i);
     }
 }
