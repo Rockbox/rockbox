@@ -15,8 +15,6 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-Iinclude -I. -Iexport -Icommon -Idrivers
 
-TOOLSDIR = ../tools
-
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
 
 ifndef MEM
@@ -51,6 +49,11 @@ no_configure:
 	@echo
 	@echo "More help on how to build rockbox can be found here:"
 	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
+endif
+
+ifndef TOOLSDIR
+no_toolsdir:
+	@echo "Rerun the configure script."
 endif
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
