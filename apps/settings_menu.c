@@ -957,11 +957,13 @@ static bool status_bar(void)
     return set_bool( str(LANG_STATUS_BAR), &global_settings.statusbar );
 }
 
+#if CONFIG_KEYPAD == RECORDER_PAD
 static bool button_bar(void)
 {
     return set_bool( str(LANG_BUTTON_BAR), &global_settings.buttonbar );
 }
-#endif
+#endif /* CONFIG_KEYPAD == RECORDER_PAD */
+#endif /* HAVE_LCD_BITMAP */
 
 static bool ff_rewind_settings_menu(void)
 {
@@ -1175,7 +1177,9 @@ static bool bars_settings_menu(void)
     static const struct menu_item items[] = {
         { ID2P(LANG_SCROLL_BAR),      scroll_bar },
         { ID2P(LANG_STATUS_BAR),      status_bar },
+#if CONFIG_KEYPAD == RECORDER_PAD
         { ID2P(LANG_BUTTON_BAR),      button_bar },
+#endif
         { ID2P(LANG_VOLUME_DISPLAY),  volume_type },
         { ID2P(LANG_BATTERY_DISPLAY), battery_type },
     };

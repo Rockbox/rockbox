@@ -636,6 +636,7 @@ static int showdir(const char *path, int start, const int *dirfilter)
                   tree_max_on_screen * line_height, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar) {
         buttonbar_set(*dirfilter < NUM_FILTER_MODES ?
                       str(LANG_DIRBROWSE_F1) : (unsigned char *) "",
@@ -643,6 +644,7 @@ static int showdir(const char *path, int start, const int *dirfilter)
                       str(LANG_DIRBROWSE_F3));
         buttonbar_draw();
     }
+#endif
 #endif
     status_draw(true);
 

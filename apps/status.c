@@ -267,7 +267,7 @@ void status_draw(bool force_redraw)
 
 }
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
 static void draw_buttonbar_btn(int num, const char* caption)
 {
     int xpos, ypos, button_width, text_width;

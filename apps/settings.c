@@ -195,7 +195,9 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(invert_cursor), false, "invert cursor", off_on },
     {1, S_O(statusbar), true, "statusbar", off_on },
     {1, S_O(scrollbar), true, "scrollbar", off_on },
+#if CONFIG_KEYPAD == RECORDER_PAD
     {1, S_O(buttonbar), true, "buttonbar", off_on },
+#endif
     {1, S_O(volume_type), 0, "volume display", graphic_numeric },
     {1, S_O(battery_type), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },

@@ -145,12 +145,14 @@ void menu_draw(int m)
     if (global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar && menus[m].use_buttonbar) {
         buttonbar_set(menus[m].buttonbar[0],
                       menus[m].buttonbar[1],
                       menus[m].buttonbar[2]);
         height -= BUTTONBAR_HEIGHT;
     }
+#endif
 
     menu_lines = height / fh;
     
@@ -196,9 +198,11 @@ void menu_draw(int m)
                   height, menus[m].itemcount, menus[m].top,
                   menus[m].top + menu_lines, VERTICAL);
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar && menus[m].use_buttonbar)
         buttonbar_draw();
-#endif
+#endif /* CONFIG_KEYPAD == RECORDER_PAD */
+#endif /* HAVE_LCD_BITMAP */
     status_draw(true);
 
     lcd_update();
@@ -280,12 +284,14 @@ int menu_show(int m)
     if (global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar && menus[m].use_buttonbar) {
         buttonbar_set(menus[m].buttonbar[0],
                       menus[m].buttonbar[1],
                       menus[m].buttonbar[2]);
         height -= BUTTONBAR_HEIGHT;
     }
+#endif
 
     menu_lines = height / fh;
 #else
