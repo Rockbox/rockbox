@@ -94,7 +94,7 @@ id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "Akku leer?"
+new: "Partition?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -106,7 +106,7 @@ id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "Akku leer?"
+new: "Keine Partition?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -141,8 +141,8 @@ new: "Gewählte zuerst wiedergeben"
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: ""
-new: "Sortieren Groß-/Kleinschreibung"
+voice: "Sortiere Groß- und Kleinschreibung"
+new: "Sortiere Groß-/Kleinschreibung"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -159,8 +159,8 @@ new: "Aus"
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
-voice: "nachfragen"
-new: "nachfragen"
+voice: "Nachfragen"
+new: "Nachfragen"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -207,14 +207,14 @@ new: "FF/RW min. Schritt"
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-voice: "Such-lauf Beschleunigung"
+voice: "Suchlauf Beschleunigung"
 new: "FF/RW Beschleunigung"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-voice: "aktuellem Titel folgen"
-new: "aktuellem Titel folgen"
+voice: "Aktuellem Titel folgen"
+new: "Aktuellem Titel folgen"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -241,10 +241,10 @@ voice: ""
 new: "Abgebrochen"
 
 id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-voice: "Sortiermodus"
-new: "Sortiermodus"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -322,7 +322,7 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "AV Trägheit"
+new: "AV-Trägheit"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -382,7 +382,7 @@ id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
 eng: "Resume?"
 voice: ""
-new: "Fortsetzen"
+new: "Fortsetzen?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -585,8 +585,8 @@ new: "Playlist zu Ende"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-voice: "automatisches Ausschalten"
-new: "automatisches Ausschalten"
+voice: "Automatisches Ausschalten"
+new: "Automatisches Ausschalten"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -879,7 +879,7 @@ new: "genauere Anzeige"
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
-voice: "Ener-gie sparen"
+voice: "Energie sparen"
 new: "Energie sparen"
 
 id: LANG_PM_SCALE
@@ -903,14 +903,14 @@ new: "linear(%)"
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
-voice: "kleinster Wert"
-new: "kleinster Wert"
+voice: "Kleinster Wert"
+new: "Kleinster Wert"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
-voice: "größter Wert"
-new: "größter Wert"
+voice: "Größter Wert"
+new: "Größter Wert"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -1089,8 +1089,8 @@ new: "Abgebrochen"
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-voice: "in Warteschlange stellen"
-new: "in Warteschlange stellen"
+voice: "In Warteschlange stellen"
+new: "In Warteschlange stellen"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1257,8 +1257,8 @@ new:
 id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
-voice: "LCD Modus"
-new: "LCD Modus"
+voice: "LCD-Modus"
+new: "LCD-Modus"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: in sound_settings
@@ -1329,8 +1329,8 @@ new: "Zeilenauswahl"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-voice: "unabhängige mp3-Rahmen"
-new: "unabhängige mp3-Frames"
+voice: "Unabhängige mp3-Rahmen"
+new: "Unabhängige mp3-Frames"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1365,19 +1365,19 @@ new: "Balken(invertiert)"
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
 eng: "Normal"
-voice: "normal"
-new: "normal"
+voice: "Normal"
+new: "Normal"
 
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
-voice: "invertiert"
-new: "invertiert"
+voice: "Invertiert"
+new: "Invertiert"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
-voice: "Maximale Anzahl Dateien in Verzeichnis"
+voice: "Maximale Anzahl Dateien in Verzeichnisanzeige"
 new: "Max Anzahl Dateien in Verzeichnisanzeige"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
@@ -1389,8 +1389,8 @@ new: "Max Playlist-Länge"
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
-voice: "Sprung-Scollen"
-new: "Sprung-Scollen"
+voice: "Sprung-Scrollen"
+new: "Sprung-Scrollen"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
@@ -1407,8 +1407,8 @@ new: "Immer"
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-voice: "Sprung-Scoll Verzögerung"
-new: "Sprung-Scoll Verzögerung"
+voice: "Sprung-Scroll Verzögerung"
+new: "Sprung-Scroll Verzögerung"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
@@ -1523,8 +1523,8 @@ new: "Warteschlange als Nächsten"
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
-voice: "Einfügen als nächsten"
-new: "Einfügen als nächsten"
+voice: "Einfügen als Nächsten"
+new: "Einfügen als Nächsten"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1572,7 +1572,7 @@ id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Fehler beim Anpassen der Playlist-Kontrolldatei"
+new: "Fehler beim Anpassen der Playlist-Steuerdatei"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1584,19 +1584,19 @@ id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Fehler beim Zugriff auf Playlist-Kontrolldatei"
+new: "Fehler beim Zugriff auf Playlist-Steuerdatei"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "Fehler beim Verzeichnis-Zugriff"
+new: "Fehler beim Verzeichniszugriff"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Playlist-Kontrolldatei ist ungültig"
+new: "Playlist-Steuerdatei ist ungültig"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1649,8 +1649,8 @@ new: "Zeige Plugins"
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
-voice: "Kfz-Adapter Modus"
-new: "Kfz-Adapter Modus"
+voice: "Kfz-Adapter-Modus"
+new: "Kfz-Adapter-Modus"
 
 id: LANG_LINE_IN
 desc:  in settings_menu
@@ -1733,8 +1733,8 @@ new: "Zeige aktuelle Playliste"
 id: LANG_MOVE
 desc: The verb/action Move
 eng: "Move"
-voice: "verschieben"
-new: "verschieben"
+voice: "Verschieben"
+new: "Verschieben"
 
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
@@ -1795,13 +1795,13 @@ new: "Lesezeichen"
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
 eng: "Index"
-voice: ""
+voice: "Index"
 new: "Index"
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
-voice: ""
+voice: "Zeit"
 new: "Zeit"
 
 id: LANG_BOOKMARK_SELECT_PLAY
@@ -1912,21 +1912,21 @@ new: "Rockbox Info"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
-eng: "Start Recording"
-voice: "Aufnahme starten"
-new: "Aufnahme starten"
+eng: "Recording screen"
+voice: "Aufnahmemodus"
+new: "Aufnahmemodus"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "Vor und Rücklauf"
+voice: "Vor- und Rücklauf"
 new: "FF/RW"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
-voice: "LCD Einstellungen"
-new: "LCD Einstellungen"
+voice: "LCD-Einstellungen"
+new: "LCD-Einstellungen"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -2258,7 +2258,7 @@ new:
 id: VOICE_POINT
 desc: spoken only, for composing numbers
 eng: ""
-voice: "Punkt"
+voice: "Komma"
 new:
 
 id: VOICE_MILLISECONDS
@@ -2602,7 +2602,7 @@ new:
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
-voice: "plug-in"
+voice: "Zusatzprogramm"
 new:
 
 id: VOICE_EXT_FONT
@@ -2671,3 +2671,39 @@ desc: Onplay open with
 eng: "Open with"
 voice: "öffnen mit"
 new: "Öffnen mit"
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+voice: "Sortiere Verzeichnisse"
+new: "Sortiere Verzeichnisse"
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+voice: "Sortiere Dateien"
+new: "Sortiere Dateien"
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+voice: "alphabetisch"
+new: "alphabetisch"
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+voice: "nach Datum"
+new: "nach Datum"
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+voice: "nach neuestem Datum"
+new: "nach neuestem Datum"
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+voice: "nach Typ"
+new: "nach Typ"
