@@ -1381,3 +1381,13 @@ id: LANG_CPU_SLEEP
 desc: in system_settings_menu()
 eng: "Power Saving"
 new:
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: 
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "loaded"
+new: 

@@ -1114,8 +1114,6 @@ bool dirbrowse(char *root)
 
                             /* wps config file */
                         case TREE_ATTR_WPS:
-                            snprintf(buf, sizeof buf, "%s/%s", 
-                                     currdir, file->name);
                             wps_load(buf,true);
                             storefile(file->name, global_settings.wps_file,
                                       MAX_FILENAME);
@@ -1123,22 +1121,34 @@ bool dirbrowse(char *root)
                             break;
 
                         case TREE_ATTR_CFG:
-                            snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir, file->name);
-                            settings_load_config(buf);
+                            if (!settings_load_config(buf))
+                                break;
+                            lcd_clear_display();
+                            lcd_puts(0,0,str(LANG_SETTINGS_LOADED1));
+                            lcd_puts(0,1,str(LANG_SETTINGS_LOADED2));
+#ifdef HAVE_LCD_BITMAP
+                            lcd_update();
+
+                            /* maybe we have a new font */
+                            lcd_getstringsize("A", &fw, &fh);
+                            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                            /* make sure cursor is on screen */
+                            while ( dircursor > tree_max_on_screen ) 
+                            {
+                                dircursor--;
+                                dirstart++;
+                            }
+#endif
+                            sleep(HZ/2);
                             restore = true;
                             break;
 
                         case TREE_ATTR_TXT:
-                            snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir, file->name);
                             viewer_run(buf);
                             restore = true;
                             break;
 
                         case TREE_ATTR_LNG:
-                            snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir, file->name);
                             if(!lang_load(buf)) {
                                 storefile(file->name,
                                           global_settings.lang_file,
@@ -1166,8 +1176,6 @@ bool dirbrowse(char *root)
 
 #ifdef HAVE_LCD_BITMAP
                         case TREE_ATTR_FONT:
-                            snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir, file->name);
                             font_load(buf);
                             storefile(file->name, global_settings.font_file,
                                       MAX_FILENAME);
@@ -1186,8 +1194,6 @@ bool dirbrowse(char *root)
 #ifndef SIMULATOR
                             /* firmware file */
                         case TREE_ATTR_MOD:
-                            snprintf(buf, sizeof buf, "%s/%s", 
-                                     currdir, file->name);
                             rolo_load(buf);
                             break;
 #endif

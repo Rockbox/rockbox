@@ -128,8 +128,8 @@ struct user_settings
     int peak_meter_clip_hold; /* hold time for clips */
     bool peak_meter_dbfs;     /* show linear or dbfs values */
     bool peak_meter_performance;  /* true: high performance, else save energy*/
-    unsigned char peak_meter_min; /* range minimum */
-    unsigned char peak_meter_max; /* range maximum */
+    int peak_meter_min; /* range minimum */
+    int peak_meter_max; /* range maximum */
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */

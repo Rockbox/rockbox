@@ -1,24 +1,85 @@
-Custom CFG
-File Format Specifications
+Custom CFG File Format Specification
 
-Description / General Info
---------------------------
-* The .cfg file is used on both the Rockbox Player and Recorder, in order to
-  load custom settings.
-* Currently, only sound settings are supported but this will change in the
-  future.
-
-File Location
--------------
-The files may reside anywhere on the hard disk. The only restriction is that
-the filename must end in .cfg
+General Info
+------------
+The .cfg file is used to load settings from a plain text file. A .cfg file may
+reside anywhere on the hard disk. The only restriction is that the filename
+must end in .cfg
 
 Format Rules
 ------------
-* Each setting must have it's own line.
+* Format: setting: value
+* Each setting must be on a separate line.
 * Lines starting with # are ignored.
-* If a value is out of the acceptable range for the device, which can vary 
-  depending on the model, the value will be set to its default value.
+
+Settings (allowed values) [unit]
+--------------------------------
+volume                 (0 - 100)
+bass                   (-15 - 15)
+treble                 (-15 - 15)
+balance                (-100 - 100)
+
+shuffle                (on, off)
+repeat                 (off, all, one)
+play selected          (on, off)
+resume                 (off, ask, on)
+scan min step          (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25) [seconds]
+scan accel             (0 - 15) [double scan speed every X seconds]
+antiskip               (0 - 7) [seconds]
+
+sort case              (on, off)
+show files             (all, supported, music)
+follow playlist        (on, off)
+
+scroll speed           (1 - 10)  [Hz]
+start delay            (0 - 250) [1/10s]
+scroll step            (1 - 112) [pixel]
+bidir limit            (0 - 200) [% of screen width]
+contrast               (0 - 63)
+backlight timeout      (off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                        15, 20, 30, 45, 60, 90) [seconds]
+backlight when plugged (on, off)
+
+disk spindown          (3 - 254) [seconds]
+disk poweroff          (on, off)
+battery capacity       (1500 - 2400) [mAh]
+idle poweroff          (off, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        10, 15, 30, 45, 60) [minutes]
+
+Recorder-specific settings (allowed values) [unit]
+---------------------------------------------------
+loudness               (0 - 17)
+bass boost             (0 - 100)
+auto volume            (0=off, 1=2s, 2=4s, 3=8s)
+
+peak meter release     (1 - 126)
+peak meter hold        (off, 200ms, 300ms, 500ms,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                        15, 20, 25, 30, 45, 90,
+                        2min, 3min, 5min, 10min, 20min, 45min, 90min)
+peak meter clip hold   (on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                        15, 20, 25, 30, 45, 60, 90,
+                        2min, 3min, 5min, 10min, 20min, 45min, 90min)
+peak meter busy        (on, off)
+peak meter dbfs        (on, off) (on = dbfs, off = linear)
+peak meter min         (0 - 89) [dB] or (0 - 100) [%]
+peak meter max         (0 - 89) [dB] or (0 - 100) [%]
+
+volume display         (graphic, numeric)
+battery display        (graphic, numeric)
+time format            (12hour, 24hour)
+
+deep discharge         (on, off)
+trickle charge         (on, off)
+
+rec quality            (0 - 7) (0=smallest size, 7=highest quality)
+rec frequency          (48, 44, 32, 24, 22, 16) [kHz]
+rec source             (mic, line, spdif)
+rec channels           (mono, stereo)
+rec mic gain           (0 to 15)
+rec left gain          (0 to 15)
+rec right gain         (0 to 15)
+
 
 Example File
 ------------
@@ -26,20 +87,9 @@ volume: 70
 bass: 11
 treble: 12
 balance: 0
-channels: 0
-loudness: 5
-bass boost: 30
-auto volume: 0
+time format: 12hour
+volume display: numeric
+show files: supported
+wps: car
+lang: afrikaans
 
-This sets each line to the respective values after it.
-
-Value ranges
-------------
-volume: 0 to 100
-bass: player: -15 to 15, recorder: -12 to 12
-treble: player: -15 to 15, recorder: -12 to 12
-balance: -100 to 100
-channels: 0=Stereo, 1=Mono, 2=Mono Left, 3=Mono Right
-loudness: 0 to 17 (recorder only)
-bass boost: 0 to 100 (recorder only)
-auto volume: 0=off, 1=2s, 2=4s, 3=8s (recorder only)
