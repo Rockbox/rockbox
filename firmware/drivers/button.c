@@ -36,8 +36,8 @@
 struct event_queue button_queue;
 
 static int lastbtn;   /* Last valid button status */
-static int last_read; /* Last button status, for debouncing/filtering */
 #if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
+static int last_read; /* Last button status, for debouncing/filtering */
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
 
