@@ -585,6 +585,7 @@ int ata_soft_reset(void)
 void ata_enable(bool on)
 {
     PBCR1 &= ~0x0CF0; /* PB13, PB11 and PB10 become GPIOs, if not modified below */
+    PACR2 &= ~0x4000; /* use PA7 (bridge reset) as GPIO */
     if (on)
     {
         PBCR1 |= 0x08A0;    /* as SCK1, TxD1, RxD1 */
@@ -607,6 +608,8 @@ int ata_init(void)
     led(false);
 
     /* Port setup */
+    PACR1 &= ~0x0F00; /* GPIO function for PA12, /IRQ1 for PA13 */
+    PACR1 |= 0x0400;
     PADR |= 0x0680;   /* set all the selects + reset high (=inactive) */
     PAIOR |= 0x1680;  /* make outputs for them and the PA12 clock gate */
 
@@ -638,3 +641,4 @@ int ata_init(void)
 }
 
 #endif /* #ifdef HAVE_MMC */
+
