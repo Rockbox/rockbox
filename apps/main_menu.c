@@ -26,6 +26,8 @@
 #include "main_menu.h"
 #include "sound_menu.h"
 #include "version.h"
+#include "debug.h"
+#include "bmp.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "screensaver.h"

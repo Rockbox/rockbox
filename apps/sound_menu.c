@@ -25,6 +25,7 @@
 #include "mpeg.h"
 #include "button.h"
 #include "kernel.h"
+#include "sprintf.h"
 
 typedef void (*settingfunc)(int);
 enum { Volume, Bass, Treble, numsettings };

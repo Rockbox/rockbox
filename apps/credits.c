@@ -20,6 +20,7 @@
 #include "credits.h"
 #include "lcd.h"
 #include "kernel.h"
+#include "button.h"
 
 struct credit {
     char *name;

@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "tree.h"
 #include "debug.h"
+#include "sprintf.h"
 
 #include "id3.h"
 #include "mpeg.h"

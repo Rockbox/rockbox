@@ -25,6 +25,7 @@
 #include "playlist.h"
 #include "debug.h"
 #include <file.h>
+#include "sprintf.h"
 
 /*
  * load playlist info from disk

@@ -30,6 +30,7 @@
 #include "tree.h"
 #include "play.h"
 #include "main_menu.h"
+#include "sprintf.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
