@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include <lcd.h>
 #include "kernel.h"
+#include "sprintf.h"
 
 #include "icons.h"
 #ifndef SIMULATOR
