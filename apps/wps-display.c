@@ -34,6 +34,10 @@
 #include "widgets.h"
 #endif
 
+#ifdef LOADABLE_FONTS
+#include "ajf.h"
+#endif
+
 #define WPS_CONFIG "/wps.config"
 
 #ifdef HAVE_LCD_BITMAP
