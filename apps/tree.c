@@ -591,6 +591,7 @@ static int showdir(char *path, int start, int *dirfilter)
 
 static bool ask_resume(bool ask_once)
 {
+    int button;
     bool stop = false;
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -618,7 +619,8 @@ static bool ask_resume(bool ask_once)
     lcd_update();
 
     while (!stop) {
-        switch (button_get(true)) {
+        button = button_get(true);
+        switch (button) {
             case BUTTON_PLAY:
 #ifdef BUTTON_RC_PLAY
             case BUTTON_RC_PLAY:
@@ -640,7 +642,9 @@ static bool ask_resume(bool ask_once)
                 break;
 
             default:
-                stop = true;
+                /* React only on release events */
+                if(button & BUTTON_REL)
+                    stop = true;
                 break;
         }
     }
