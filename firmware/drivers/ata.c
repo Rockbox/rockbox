@@ -21,6 +21,7 @@
 #include "led.h"
 #include "sh7034.h"
 #include "system.h"
+#include "debug.h"
 
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
@@ -32,7 +33,7 @@
 #define ATA_SELECT      (*((volatile unsigned char*)0x06100106))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
 #define ATA_STATUS      ATA_COMMAND
-#define ATA_CONTROL     (*((volatile unsigned char*)0x06100306))
+#define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
 #define ATA_ALT_STATUS  ATA_CONTROL
 
 #define SELECT_LBA      0x40
@@ -59,9 +60,13 @@ static int wait_for_bsy(void)
         yield();
 
     if (TIME_BEFORE(current_tick, timeout))
+    {
         return 1;
+    }
     else
+    {
         return 0; /* timeout */
+    }
 }
 
 static int wait_for_rdy(void)
@@ -210,7 +215,7 @@ static int freeze_lock(void)
 
 int ata_spindown(int time)
 {
-    if (!wait_for_rdy())
+    if(!wait_for_rdy())
         return -1;
 
     if ( time == -1 ) {
@@ -231,11 +236,11 @@ int ata_spindown(int time)
 
 int ata_hard_reset(void)
 {
-    clear_bit(1,PADR);
-    sleep(HZ/500);
+    PADR &= ~0x0002;
 
-    set_bit(1,PADR);
-    sleep(HZ/500);
+    sleep(2);
+
+    PADR |= 0x0002;
 
     return wait_for_rdy();
 }
@@ -257,7 +262,7 @@ int ata_init(void)
     led(FALSE);
 
     /* activate ATA */
-    PADR |= 0x80;
+    PADR &= ~0x80;
 
     if (!ata_hard_reset())
         return -1;
@@ -265,11 +270,14 @@ int ata_init(void)
     if (!check_registers())
         return -2;
 
-    if (!check_harddisk())
-        return -3;
+//    if (!check_harddisk())
+//        return -3;
 
-    if (!freeze_lock())
+    if (freeze_lock() < 0)
         return -4;
+
+//    if(ata_spindown(-1) < 0)
+//        return -5;
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
