@@ -402,6 +402,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     int chmode;
     int bytecount;
     int bittable; /* which bitrate table to use */
+    bool header_found = false;
 
     long bpf;
     long tpf;
@@ -585,6 +586,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
         /* Make sure we skip this frame in playback */
         bytecount += bpf;
+
+        header_found = true;
     }
 
     /* Is it a LAME Info frame? */
@@ -595,6 +598,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
     {
         /* Make sure we skip this frame in playback */
         bytecount += bpf;
+
+        header_found = true;
     }
 
 
@@ -613,7 +618,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     DEBUGF("Old ID3V2 length: %x\n", entry->id3v2len);
     /* Adjust the tag length only if there is a tag present */
-    if(entry->id3v2len)
+    if(entry->id3v2len || header_found)
         entry->id3v2len = bytecount;
     DEBUGF("New ID3V2 length: %x\n", bytecount);
     
