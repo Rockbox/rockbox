@@ -59,6 +59,12 @@ INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINE
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
 
+ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+	LCDSRSC = lcd-recorder.c
+else
+	LCDSRSC = lcd-playersim.c lcd-player.c
+endif
+
 DEFINES += -DWIN32
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
@@ -237,6 +243,12 @@ $(OBJDIR)/stubs.o: ../common/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sim_icons.o: ../common/sim_icons.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/lcd-playersim.o: ../common/lcd-playersim.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
