@@ -34,8 +34,6 @@ included in which versions. Naturally, this is all subject to change without
 notice.
 
 <dl>
-<dt><b>Version 1.4</b>
-<dd> Loadable fonts, Customizable WPS, Firmware loading (ROLO)
 <dt><b>Version 2.0</b>
 <dd> Recording, Autobuild playlists, File/directory management
 </dl>
