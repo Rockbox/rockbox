@@ -210,9 +210,5 @@ void main_menu(void)
 #endif
     menu_exit(m);
 
-    lcd_clear_display();
-    lcd_puts(0,0,"Saving");
-    lcd_puts(0,1,"settings...");
-    lcd_update();
     settings_save();
 }
