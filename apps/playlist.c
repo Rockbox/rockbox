@@ -1662,7 +1662,7 @@ int playlist_next(int steps)
 {
     int index;
 
-    if (steps > 0)
+    if (steps > 0 && global_settings.repeat_mode != REPEAT_ONE)
     {
         int i, j;
 
