@@ -50,9 +50,11 @@ static bool save_playlist(void)
 
 static bool recurse_directory(void)
 {
-    char* names[] = { str(LANG_OFF), 
-                      str(LANG_ON),
-                      str(LANG_RESUME_SETTING_ASK) };
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
+        { STR(LANG_RESUME_SETTING_ASK)},
+    };
 
     return set_option( str(LANG_RECURSE_DIRECTORY),
                        &global_settings.recursive_dir_insert, INT, names, 3,

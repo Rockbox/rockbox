@@ -32,6 +32,7 @@
 #include "lcd.h"
 #include "mpeg.h"
 #include "mp3_playback.h"
+#include "talk.h"
 #include "string.h"
 #include "ata.h"
 #include "fat.h"
@@ -1643,8 +1644,10 @@ void settings_reset(void) {
 
 bool set_bool(char* string, bool* variable )
 {
-    return set_bool_options(string, variable, str(LANG_SET_BOOL_YES), 
-                            str(LANG_SET_BOOL_NO), NULL);
+    return set_bool_options(string, variable, 
+        STR(LANG_SET_BOOL_YES), 
+        STR(LANG_SET_BOOL_NO), 
+        NULL);
 }
 
 /* wrapper to convert from int param to bool param in set_option */
@@ -1658,9 +1661,11 @@ void bool_funcwrapper(int value)
 }
 
 bool set_bool_options(char* string, bool* variable,
-                      char* yes_str, char* no_str, void (*function)(bool))
+                      char* yes_str, int yes_voice,
+                      char* no_str, int no_voice,
+                      void (*function)(bool))
 {
-    char* names[] = { no_str, yes_str };
+    struct opt_items names[] = { {no_str, no_voice}, {yes_str, yes_voice} };
     bool result;
 
     boolfunction = function;
@@ -1775,13 +1780,14 @@ bool set_int(char* string,
    code. */
 
 bool set_option(char* string, void* variable, enum optiontype type,
-                char* options[], int numoptions, void (*function)(int))
+                struct opt_items* options, int numoptions, void (*function)(int))
 {
     bool done = false;
     int button;
     int* intvar = (int*)variable;
     bool* boolvar = (bool*)variable;
     int oldval = 0;
+    int index, oldindex = -1; /* remember what we said */
 
     if (type==INT)
         oldval=*intvar;
@@ -1799,7 +1805,13 @@ bool set_option(char* string, void* variable, enum optiontype type,
     lcd_puts_scroll(0, 0, string);
 
     while ( !done ) {
-        lcd_puts(0, 1, options[type==INT ? *intvar : (int)*boolvar]);
+        index = type==INT ? *intvar : (int)*boolvar;
+        lcd_puts(0, 1, options[index].string);
+        if (index != oldindex)
+        {
+            talk_id(options[index].voice_id, false);
+            oldindex = index;
+        }
 #ifdef HAVE_LCD_BITMAP
         status_draw(true);
 #endif

@@ -792,9 +792,9 @@ static bool show_indices(void)
 /* How to display a track */
 static bool track_display(void)
 {
-    char* names[] = {
-        str(LANG_DISPLAY_TRACK_NAME_ONLY),
-        str(LANG_DISPLAY_FULL_PATH)
+    struct opt_items names[] = {
+        { STR(LANG_DISPLAY_TRACK_NAME_ONLY) },
+        { STR(LANG_DISPLAY_FULL_PATH) }
     };
     
     return set_option(str(LANG_TRACK_DISPLAY), 

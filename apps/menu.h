@@ -28,9 +28,6 @@ struct menu_items {
     bool (*function) (void); /* return true if USB was connected */
 };
 
-/* convenience macro to have both string and ID as arguments */
-#define STR(id) str(id), id
-
 int menu_init(struct menu_items* items, int count, int (*callback) (int keycode, int menu));
 void menu_exit(int menu);
 

@@ -181,15 +181,23 @@ static void set_avc(int val)
 
 static bool avc(void)
 {
-    char* names[] = { str(LANG_OFF), "2s", "4s", "8s" };
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "2s", -1 },
+        { "4s", -1 },
+        { "8s", -1 }
+    };
     return set_option(str(LANG_DECAY), &global_settings.avc, INT,
                       names, 4, set_avc);
 }
 
 static bool recsource(void)
 {
-    char *names[] = {str(LANG_RECORDING_SRC_MIC), str(LANG_RECORDING_SRC_LINE),
-                     str(LANG_RECORDING_SRC_DIGITAL) };
+    struct opt_items names[] = {
+        { STR(LANG_RECORDING_SRC_MIC) },
+        { STR(LANG_RECORDING_SRC_LINE) },
+        { STR(LANG_RECORDING_SRC_DIGITAL) }
+    };
     return set_option(str(LANG_RECORDING_SOURCE),
                       &global_settings.rec_source, INT,
                       names, 3, NULL );
@@ -197,9 +205,14 @@ static bool recsource(void)
 
 static bool recfrequency(void)
 {
-    char *names[] = {"44.1kHz", "48kHz", "32kHz",
-                     "22.05kHz", "24kHz", "16kHz"};
-
+    struct opt_items names[] = {
+        { "44.1kHz", -1 },
+        { "48kHz", -1 },
+        { "32kHz", -1 },
+        { "22.05kHz", -1 },
+        { "24kHz", -1 },
+        { "16kHz", -1 }
+    };
     return set_option(str(LANG_RECORDING_FREQUENCY),
                       &global_settings.rec_frequency, INT,
                       names, 6, NULL );
@@ -207,8 +220,10 @@ static bool recfrequency(void)
 
 static bool recchannels(void)
 {
-    char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO)};
-
+    struct opt_items names[] = {
+        { STR(LANG_CHANNEL_STEREO) },
+        { STR(LANG_CHANNEL_MONO) }
+    };
     return set_option(str(LANG_RECORDING_CHANNELS),
                       &global_settings.rec_channels, INT,
                       names, 2, NULL );
@@ -229,13 +244,22 @@ static bool receditable(void)
 
 static bool rectimesplit(void)
 {
-    char *names[] = {
-        str(LANG_OFF), "00:05","00:10","00:15",
-        "00:30","01:00","02:00","04:00",
-        "06:00","08:00","10:00","12:00",
-        "18:00","24:00"
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "00:05" , -1 },
+        { "00:10" , -1 },
+        { "00:15" , -1 },
+        { "00:30" , -1 },
+        { "01:00" , -1 },
+        { "02:00" , -1 },
+        { "04:00" , -1 },
+        { "06:00" , -1 },
+        { "08:00" , -1 },
+        { "10:00" , -1 },
+        { "12:00" , -1 },
+        { "18:00" , -1 },
+        { "24:00" , -1 }
     };
-
     return set_option(str(LANG_RECORD_TIMESPLIT),
                       &global_settings.rec_timesplit, INT,
                       names, 14, NULL );
@@ -243,13 +267,39 @@ static bool rectimesplit(void)
 
 static bool recprerecord(void)
 {
-    char *names[] = {
-        str(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
-        "10s", "11s", "12s", "13s", "14s", "15s", "16s", "17s", "18s", "19s",
-        "20s", "21s", "22s", "23s", "24s", "25s", "26s", "27s", "28s", "29s",
-        "30s"
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "1s", -1 },
+        { "2s", -1 },
+        { "3s", -1 },
+        { "4s", -1 },
+        { "5s", -1 },
+        { "6s", -1 },
+        { "7s", -1 },
+        { "8s", -1 },
+        { "9s", -1 },
+        { "10s", -1 },
+        { "11s", -1 },
+        { "12s", -1 },
+        { "13s", -1 },
+        { "14s", -1 },
+        { "15s", -1 },
+        { "16s", -1 },
+        { "17s", -1 },
+        { "18s", -1 },
+        { "19s", -1 },
+        { "10s", -1 },
+        { "21s", -1 },
+        { "22s", -1 },
+        { "23s", -1 },
+        { "24s", -1 },
+        { "25s", -1 },
+        { "26s", -1 },
+        { "27s", -1 },
+        { "28s", -1 },
+        { "29s", -1 },
+        { "30s", -1 }
     };
-
     return set_option(str(LANG_RECORD_PRERECORD_TIME),
                       &global_settings.rec_prerecord_time, INT,
                       names, 31, NULL );
@@ -257,10 +307,10 @@ static bool recprerecord(void)
 
 static bool recdirectory(void)
 {
-    char *names[] = {
-        rec_base_directory, str(LANG_RECORD_CURRENT_DIR)
+    struct opt_items names[] = {
+        { rec_base_directory, -1 },
+        { STR(LANG_RECORD_CURRENT_DIR) }
     };
-
     return set_option(str(LANG_RECORD_DIRECTORY),
                       &global_settings.rec_directory, INT,
                       names, 2, NULL );
@@ -275,16 +325,18 @@ static void set_chanconf(int val)
 
 static bool chanconf(void)
 {
-    char *names[] = {
-        str(LANG_CHANNEL_STEREO),
+    struct opt_items names[] = {
+        { STR(LANG_CHANNEL_STEREO) },
 #ifdef HAVE_LCD_CHARCELLS
-        str(LANG_CHANNEL_STEREO_NARROW_PLAYER),
+        { STR(LANG_CHANNEL_STEREO_NARROW_PLAYER) },
 #else
-        str(LANG_CHANNEL_STEREO_NARROW_RECORDER),
+        { STR(LANG_CHANNEL_STEREO_NARROW_RECORDER) },
 #endif
-        str(LANG_CHANNEL_MONO),
-        str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT),
-        str(LANG_CHANNEL_KARAOKE), str(LANG_CHANNEL_STEREO_WIDE)
+        { STR(LANG_CHANNEL_MONO) },
+        { STR(LANG_CHANNEL_LEFT) },
+        { STR(LANG_CHANNEL_RIGHT) },
+        { STR(LANG_CHANNEL_KARAOKE) }, 
+        { STR(LANG_CHANNEL_STEREO_WIDE) }
     };
     return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
                       names, 7, set_chanconf );

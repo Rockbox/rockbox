@@ -60,6 +60,9 @@
 #define FF_REWIND_45000 12
 #define FF_REWIND_60000 13
 
+/* convenience macro to have both string and ID as arguments */
+#define STR(id) str(id), id
+
 
 struct user_settings
 {
@@ -203,6 +206,11 @@ struct user_settings
 
 enum optiontype { INT, BOOL };
 
+struct opt_items {
+    char* string;
+    int voice_id;
+};
+
 /* prototypes */
 
 int settings_save(void);
@@ -215,11 +223,13 @@ void settings_display(void);
 bool settings_load_config(char* file);
 bool settings_save_config(void);
 bool set_bool_options(char* string, bool* variable, 
-                      char* yes_str, char* no_str, void (*function)(bool));
+                      char* yes_str, int yes_voice,
+                      char* no_str, int no_voice,
+                      void (*function)(bool));
 
 bool set_bool(char* string, bool* variable );
 bool set_option(char* string, void* variable, enum optiontype type,
-                char* options[], int numoptions, void (*function)(int));
+                struct opt_items* options, int numoptions, void (*function)(int));
 bool set_int(char* string, char* unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);

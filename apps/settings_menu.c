@@ -55,8 +55,8 @@ static bool car_adapter_mode(void)
 {
     return set_bool_options( str(LANG_CAR_ADAPTER_MODE),
                              &global_settings.car_adapter_mode,
-                             str(LANG_SET_BOOL_YES),
-                             str(LANG_SET_BOOL_NO),
+                             STR(LANG_SET_BOOL_YES),
+                             STR(LANG_SET_BOOL_NO),
                              set_car_adapter_mode);
 }
 
@@ -92,8 +92,8 @@ static bool invert(void)
 {
      bool rc = set_bool_options(str(LANG_INVERT),
                                 &global_settings.invert,
-                                str(LANG_INVERT_LCD_INVERSE),
-                                str(LANG_INVERT_LCD_NORMAL),
+                                STR(LANG_INVERT_LCD_INVERSE),
+                                STR(LANG_INVERT_LCD_NORMAL),
                                 lcd_set_invert_display);
      return rc;
 }
@@ -105,8 +105,8 @@ static bool invert_cursor(void)
 {
         return set_bool_options(str(LANG_INVERT_CURSOR),
                             &global_settings.invert_cursor,
-                            str(LANG_INVERT_CURSOR_BAR),
-                            str(LANG_INVERT_CURSOR_POINTER),
+                            STR(LANG_INVERT_CURSOR_BAR),
+                            STR(LANG_INVERT_CURSOR_POINTER),
                             NULL);
 }
 
@@ -129,9 +129,10 @@ static bool flip_display(void)
  */
 static bool battery_type(void)
 {
-    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
-                      str(LANG_DISPLAY_NUMERIC)  };
-
+    struct opt_items names[] = {
+        { STR(LANG_DISPLAY_GRAPHIC) }, 
+        { STR(LANG_DISPLAY_NUMERIC) }
+    };
     return set_option( str(LANG_BATTERY_DISPLAY), 
                        &global_settings.battery_type, INT, names, 2, NULL);
 }
@@ -141,9 +142,10 @@ static bool battery_type(void)
  */
 static bool volume_type(void)
 {
-    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
-                      str(LANG_DISPLAY_NUMERIC) };
-
+    struct opt_items names[] = { 
+        { STR(LANG_DISPLAY_GRAPHIC) }, 
+        { STR(LANG_DISPLAY_NUMERIC) }
+    };
     return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
                        INT, names, 2, NULL);
 }
@@ -163,11 +165,25 @@ static bool peak_meter_fps_menu(void) {
  */
 static bool peak_meter_hold(void) {
     bool retval = false;
-    char* names[] = { str(LANG_OFF),
-                      "200 ms ", "300 ms ", "500 ms ", "1 s ", "2 s ",
-                      "3 s ", "4 s ", "5 s ", "6 s ", "7 s",
-                      "8 s", "9 s", "10 s", "15 s", "20 s",
-                      "30 s", "1 min"
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "200 ms " , -1 },
+        { "300 ms " , -1 },
+        { "500 ms " , -1 },
+        { "1 s " , -1 },
+        { "2 s " , -1 },
+        { "3 s " , -1 },
+        { "4 s " , -1 },
+        { "5 s " , -1 },
+        { "6 s " , -1 },
+        { "7 s" , -1 },
+        { "8 s" , -1 },
+        { "9 s" , -1 },
+        { "10 s" , -1 },
+        { "15 s" , -1 },
+        { "20 s" , -1 },
+        { "30 s" , -1 },
+        { "1 min" , -1 }
     };
     retval = set_option( str(LANG_PM_PEAK_HOLD),
                          &global_settings.peak_meter_hold, INT, names,
@@ -186,14 +202,33 @@ static bool peak_meter_hold(void) {
 static bool peak_meter_clip_hold(void) {
     bool retval = false;
 
-    char* names[] = { str(LANG_PM_ETERNAL),
-                      "1s ", "2s ", "3s ", "4s ", "5s ",
-                      "6s ", "7s ", "8s ", "9s ", "10s",
-                      "15s", "20s", "25s", "30s", "45s",
-                      "60s", "90s", "2min", "3min", "5min",
-                      "10min", "20min", "45min", "90min"
+    struct opt_items names[] = {
+        { STR(LANG_PM_ETERNAL) },
+        { "1s " , -1 },
+        { "2s " , -1 },
+        { "3s " , -1 },
+        { "4s " , -1 },
+        { "5s " , -1 },
+        { "6s " , -1 },
+        { "7s " , -1 },
+        { "8s " , -1 },
+        { "9s " , -1 },
+        { "10s" , -1 },
+        { "15s" , -1 },
+        { "20s" , -1 },
+        { "25s" , -1 },
+        { "30s" , -1 },
+        { "45s" , -1 },
+        { "60s" , -1 },
+        { "90s" , -1 },
+        { "2min" , -1 },
+        { "3min" , -1 },
+        { "5min" , -1 },
+        { "10min" , -1 },
+        { "20min" , -1 },
+        { "45min" , -1 },
+        { "90min" , -1 }
     };
-
     retval = set_option( str(LANG_PM_CLIP_HOLD), 
                          &global_settings.peak_meter_clip_hold, INT, names,
                          25, peak_meter_set_clip_hold);
@@ -235,7 +270,7 @@ static bool peak_meter_scale(void) {
     bool use_dbfs = global_settings.peak_meter_dbfs;
     retval = set_bool_options(str(LANG_PM_SCALE), 
         &use_dbfs, 
-        str(LANG_PM_DBFS), str(LANG_PM_LINEAR),
+        STR(LANG_PM_DBFS), STR(LANG_PM_LINEAR),
         NULL);
 
     /* has the user really changed the scale? */
@@ -348,7 +383,7 @@ static bool peak_meter_performance(void) {
     bool retval = false;
     retval = set_bool_options(str(LANG_PM_PERFORMANCE), 
         &global_settings.peak_meter_performance, 
-        str(LANG_PM_HIGH_PERFORMANCE), str(LANG_PM_ENERGY_SAVER),
+        STR(LANG_PM_HIGH_PERFORMANCE), STR(LANG_PM_ENERGY_SAVER),
         NULL);
 
     if (global_settings.peak_meter_performance) {
@@ -395,10 +430,11 @@ static bool shuffle(void)
 static bool repeat_mode(void)
 {
     bool result;
-    char* names[] = { str(LANG_OFF), 
-                      str(LANG_REPEAT_ALL),
-                      str(LANG_REPEAT_ONE) };
-
+    struct opt_items names[] = { 
+        { STR(LANG_OFF) },
+        { STR(LANG_REPEAT_ALL) },
+        { STR(LANG_REPEAT_ONE) }
+    };
     int old_repeat = global_settings.repeat_mode;
 
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
@@ -417,11 +453,12 @@ static bool play_selected(void)
 
 static bool dir_filter(void)
 {
-    char* names[] = { str(LANG_FILTER_ALL),
-                      str(LANG_FILTER_SUPPORTED),
-                      str(LANG_FILTER_MUSIC),
-                      str(LANG_FILTER_PLAYLIST) };
-
+    struct opt_items names[] = {
+        { STR(LANG_FILTER_ALL) },
+        { STR(LANG_FILTER_SUPPORTED) },
+        { STR(LANG_FILTER_MUSIC) },
+        { STR(LANG_FILTER_PLAYLIST) }
+    };
     return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
                        names, 4, NULL );
 }
@@ -433,23 +470,25 @@ static bool sort_case(void)
 
 static bool resume(void)
 {
-    char* names[] = { str(LANG_SET_BOOL_NO), 
-                      str(LANG_RESUME_SETTING_ASK),
-                      str(LANG_RESUME_SETTING_ASK_ONCE),
-                      str(LANG_SET_BOOL_YES) };
-
+    struct opt_items names[] = {
+        { STR(LANG_SET_BOOL_NO) }, 
+        { STR(LANG_RESUME_SETTING_ASK) },
+        { STR(LANG_RESUME_SETTING_ASK_ONCE) },
+        { STR(LANG_SET_BOOL_YES) }
+    };
     return set_option( str(LANG_RESUME), &global_settings.resume, INT,
                        names, 4, NULL );
 }
 
 static bool autocreatebookmark(void)
 {
-    char* names[] = { str(LANG_SET_BOOL_NO),
-                      str(LANG_SET_BOOL_YES),
-                      str(LANG_RESUME_SETTING_ASK),
-                      str(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES),
-                      str(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK) };
-
+    struct opt_items names[] = {
+        { STR(LANG_SET_BOOL_NO) },
+        { STR(LANG_SET_BOOL_YES) },
+        { STR(LANG_RESUME_SETTING_ASK) },
+        { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES) },
+        { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK) }
+    };
     return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOCREATE),
                        &global_settings.autocreatebookmark, INT,
                        names, 5, NULL );
@@ -457,10 +496,11 @@ static bool autocreatebookmark(void)
 
 static bool autoloadbookmark(void)
 {
-    char* names[] = { str(LANG_SET_BOOL_NO),
-                      str(LANG_SET_BOOL_YES),
-                      str(LANG_RESUME_SETTING_ASK) };
-
+    struct opt_items names[] = {
+        { STR(LANG_SET_BOOL_NO) },
+        { STR(LANG_SET_BOOL_YES) },
+        { STR(LANG_RESUME_SETTING_ASK) }
+    };
     return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOLOAD),
                        &global_settings.autoloadbookmark, INT,
                        names, 3, NULL );
@@ -468,10 +508,11 @@ static bool autoloadbookmark(void)
 
 static bool useMRB(void)
 {
-    char* names[] = { str(LANG_SET_BOOL_NO),
-                      str(LANG_SET_BOOL_YES),
-                      str(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY)};
-
+    struct opt_items names[] = {
+        { STR(LANG_SET_BOOL_NO) },
+        { STR(LANG_SET_BOOL_YES) },
+        { STR(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY) }
+    };
     return set_option( str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS),
                        &global_settings.usemrb, INT,
                        names, 3, NULL );
@@ -486,23 +527,50 @@ static bool backlight_on_when_charging(void)
 
 static bool backlight_timer(void)
 {
-    char* names[] = { str(LANG_OFF), str(LANG_ON),
-                      "1s ", "2s ", "3s ", "4s ", "5s ",
-                      "6s ", "7s ", "8s ", "9s ", "10s",
-                      "15s", "20s", "25s", "30s", "45s",
-                      "60s", "90s"};
-
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
+        { "1s ", -1 },
+        { "2s ", -1 },
+        { "3s ", -1 },
+        { "4s ", -1 },
+        { "5s ", -1 },
+        { "6s ", -1 },
+        { "7s ", -1 },
+        { "8s ", -1 },
+        { "9s ", -1 },
+        { "10s", -1 },
+        { "15s", -1 },
+        { "20s", -1 },
+        { "25s", -1 },
+        { "30s", -1 },
+        { "45s", -1 },
+        { "60s", -1 },
+        { "90s", -1 }
+    };
     return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
                       INT, names, 19, backlight_set_timeout );
 }
 
 static bool poweroff_idle_timer(void)
 {
-    char* names[] = { str(LANG_OFF),
-                      "1m ", "2m ", "3m ", "4m ", "5m ",
-                      "6m ", "7m ", "8m ", "9m ", "10m",
-                      "15m", "30m", "45m", "60m"};
-
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "1m ", -1 },
+        { "2m ", -1 },
+        { "3m ", -1 },
+        { "4m ", -1 },
+        { "5m ", -1 },
+        { "6m ", -1 },
+        { "7m ", -1 },
+        { "8m ", -1 },
+        { "9m ", -1 },
+        { "10m", -1 },
+        { "15m", -1 },
+        { "30m", -1 },
+        { "45m", -1 },
+        { "60m", -1 }
+    };
     return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
                       INT, names, 15, set_poweroff_timeout);
 }
@@ -541,8 +609,14 @@ static bool bidir_limit(void)
 #ifdef HAVE_LCD_CHARCELLS
 static bool jump_scroll(void)
 {
-    char* names[] = { str(LANG_OFF), str(LANG_ONE_TIME), "2",
-                      "3", "4", str(LANG_ALWAYS)};
+    struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_ONE_TIME) },
+        { "2", -1 },
+        { "3", -1 },
+        { "4", -1 },
+        { STR(LANG_ALWAYS) }
+    };
     bool ret;
     ret=set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
                    INT, names, 6, lcd_jump_scroll);
@@ -667,9 +741,10 @@ static bool timedate_set(void)
 
 static bool timeformat_set(void)
 {
-    char* names[] = { str(LANG_24_HOUR_CLOCK),
-                      str(LANG_12_HOUR_CLOCK) };
-
+    struct opt_items names[] = { 
+        { STR(LANG_24_HOUR_CLOCK) },
+        { STR(LANG_12_HOUR_CLOCK) }
+    };
     return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat, 
                       INT, names, 2, NULL);
 }
@@ -722,11 +797,22 @@ static bool buffer_margin(void)
 
 static bool ff_rewind_min_step(void)
 { 
-    char* names[] = { "1s", "2s", "3s", "4s",
-                      "5s", "6s", "8s", "10s",
-                      "15s", "20s", "25s", "30s",
-                      "45s", "60s" };
-
+    struct opt_items names[] = {
+        { "1s", -1 },
+        { "2s", -1 },
+        { "3s", -1 },
+        { "4s", -1 },
+        { "5s", -1 },
+        { "6s", -1 },
+        { "8s", -1 },
+        { "10s", -1 },
+        { "15s", -1 },
+        { "20s", -1 },
+        { "25s", -1 },
+        { "30s", -1 },
+        { "45s", -1 },
+        { "60s", -1 }
+    };
     return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
                       INT, names, 14, NULL ); 
 } 
@@ -739,11 +825,24 @@ static bool set_fade_on_stop(void)
 
 static bool ff_rewind_accel(void) 
 { 
-    char* names[] = { str(LANG_OFF), "2x/1s", "2x/2s", "2x/3s", 
-                      "2x/4s", "2x/5s", "2x/6s", "2x/7s", 
-                      "2x/8s", "2x/9s", "2x/10s", "2x/11s",
-                      "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
-
+    struct opt_items names[] = {
+        { STR(LANG_OFF) }, 
+        { "2x/1s", -1 },
+        { "2x/2s", -1 },
+        { "2x/3s", -1 },
+        { "2x/4s", -1 },
+        { "2x/5s", -1 },
+        { "2x/6s", -1 },
+        { "2x/7s", -1 },
+        { "2x/8s", -1 },
+        { "2x/9s", -1 },
+        { "2x/10s", -1 },
+        { "2x/11s", -1 },
+        { "2x/12s", -1 },
+        { "2x/13s", -1 },
+        { "2x/14s", -1 },
+        { "2x/15s", -1 }
+    };
     return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
                       INT, names, 16, NULL ); 
 } 
