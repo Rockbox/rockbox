@@ -2828,14 +2828,32 @@ new: ""
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
+voice: "Custom"
 new: "Anpassning"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
+voice: "ID3 database"
 new: "ID3-databas"
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
+voice: "Stereo width"
 new: "Stereobredd"
+
+id: LANG_ID3DB_ALBUMS
+desc: ID3 virtual folder name
+eng: "Albums"
+new: "Album"
+
+id: LANG_ID3DB_ARTISTS
+desc: ID3 virtual folder name
+eng: "Artists"
+new: "Artister"
+
+id: LANG_ID3DB_SONGS
+desc: ID3 virtual folder name
+eng: "Songs"
+new: "Sånger"
