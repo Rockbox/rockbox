@@ -82,14 +82,16 @@ extern void lcd_define_pattern (int which,char *pattern,int length);
 extern void lcd_double_height (bool on);
 
 #endif
+
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
 #if !defined(HAVE_LCD_BITMAP) && defined(SIMULATOR)
-#define LCD_WIDTH       16*11 /* Display width in pixels */
+#define LCD_WIDTH       16*6  /* Display width in pixels */
+#define LCD_HEIGHT      32    /* Display height in pixels */
 #else
 #define LCD_WIDTH       112   /* Display width in pixels */
-#endif
 #define LCD_HEIGHT      64    /* Display height in pixels */
+#endif
 
 #define DRAW_PIXEL(x,y) lcd_framebuffer[(x)][(y)/8] |= (1<<((y)&7))
 #define CLEAR_PIXEL(x,y) lcd_framebuffer[(x)][(y)/8] &= ~(1<<((y)&7))
