@@ -24,7 +24,7 @@ TARGET = -DARCHOS_RECORDER=1
 
 # store output files in this directory:
 OBJDIR = .
-DEFINES = -DLCD_PROPFONTS
+DEFINES = -DLCD_PROPFONTS -DAPPSVERSION=\"CVS\"
 
 CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
 AFLAGS += -small -relax
