@@ -22,10 +22,10 @@
 #include "led.h"
 #include "system.h"
 
-#ifndef HAVE_NO_LED
-
 static bool xor;
 static bool current;
+
+#ifdef HAVE_LED
 
 void led(bool on)
 {
@@ -53,4 +53,16 @@ void invert_led(bool on)
     led(current);
 }
 
-#endif // #ifndef HAVE_NO_LED
+#else /* no LED, just dummies */
+
+void led(bool on)
+{
+    (void)on;
+}
+
+void invert_led(bool on)
+{
+    (void)on;
+}
+
+#endif // #ifdef HAVE_LED

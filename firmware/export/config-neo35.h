@@ -41,3 +41,9 @@
 /* If this is a Neo-style memory architecture platform */
 #define NEO_MEMORY 1
 
+/* Define this for programmable LED available */
+#define HAVE_LED
+
+/* Define this for LCD backlight available */
+#define HAVE_BACKLIGHT
+

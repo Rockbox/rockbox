@@ -54,7 +54,3 @@
 
 /* Define this for different I2C pinout */
 #define HAVE_ONDIO_I2C
-
-/* Define this for no LED available */
-#define HAVE_NO_LED
-

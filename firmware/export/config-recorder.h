@@ -48,3 +48,10 @@
 
 /* The start address index for ROM builds */
 #define ROM_START 0x11010
+
+/* Define this for programmable LED available */
+#define HAVE_LED
+
+/* Define this for LCD backlight available */
+#define HAVE_BACKLIGHT
+

@@ -37,3 +37,10 @@
 
 /* Define this if the platform has batteries */
 #define HAVE_BATTERIES 1
+
+/* Define this for programmable LED available */
+#define HAVE_LED
+
+/* Define this for LCD backlight available */
+#define HAVE_BACKLIGHT
+

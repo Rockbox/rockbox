@@ -123,6 +123,9 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define	BUTTON_STOP		BUTTON_DOWN
 /* ON is also interpreted as OFF, let's see if that helps a bit */
 #define BUTTON_OFF      BUTTON_ON
+#define	BUTTON_F1		0x0100 /* unreacheable */
+#define	BUTTON_F2		0x0200 /* unreacheable */
+#define	BUTTON_F3		0x0400 /* unreacheable */
 
 #endif /* HAVE_RECORDER/PLAYER/ONDIO_KEYPAD */
 
