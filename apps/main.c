@@ -203,10 +203,12 @@ void init(void)
                global_settings.avc,
                global_settings.channel_config );
 
+    /* no auto-rolo on startup any more, but I leave it here for reference */
+#if 0
     if (coldstart && !usb_detect())
     {   /* when starting from flash, this time _we_ have to yield */
         int fd;
-#ifdef HAVE_LCD_CHARCELLS
+#ifdef ARCHOS_PLAYER
         static const char filename[] = "/archos.mod"; 
 #else
         static const char filename[] = "/ajbrec.ajz";
@@ -218,6 +220,7 @@ void init(void)
             rolo_load((char*)filename); /* start if it does */
         }
     }
+#endif // #if 0
 }
 
 int main(void)
