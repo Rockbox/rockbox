@@ -444,20 +444,11 @@ void lcd_clear_display (void)
 void lcd_puts(int x, int y, char *str, int font)
 {
     int nx = fonts[font];
-    int ny, ch;
+    int ny = fontheight[font];
+    int ch;
     unsigned char *src;
     int lcd_x = x;
     int lcd_y = y;
-
-    if (nx == 12)
-        ny = 16;
-    else if (nx == 8)
-        ny = 12;
-    else
-    {
-        nx = 6;
-        ny = 8;
-    }
 
     while ((ch = *str++) != '\0')
     {
