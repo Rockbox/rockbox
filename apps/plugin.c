@@ -44,7 +44,9 @@
 #include "mp3data.h"
 #include "powermgmt.h"
 #include "system.h"
+#if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -269,9 +271,11 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     button_hold,
 #endif
+#if (CONFIG_HWCODEC == MASNONE)
     pcm_play_data,
     pcm_play_stop,
     pcm_is_playing,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
