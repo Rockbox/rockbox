@@ -251,6 +251,15 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'd':  /* ID3 Album/Disc */
                     return id3->album;
+
+                case 'y':  /* year */
+                    if (id3->year) {
+                        snprintf(buf, buf_size, "%d", id3->year);
+                        return buf;
+                    }
+                    else
+                        return NULL;
+                    break;
             }
             break;
 

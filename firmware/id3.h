@@ -29,6 +29,7 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
+    int year;
     unsigned int bitrate;
     unsigned int frequency;
     unsigned int id3v2len;

@@ -146,30 +146,6 @@ static int unicode_munge(char** string, int *len) {
 }
 
 /*
- * Removes trailing spaces from a string.
- *
- * Arguments: buffer - the string to process
- *
- * Returns: void
- */
-static void 
-stripspaces(char *buffer) 
-{
-    int i = 0;
-    while(*(buffer + i) != '\0')
-        i++;
-    
-    for(;i >= 0; i--) {
-        if(*(buffer + i) == ' ')
-            *(buffer + i) = '\0';
-        else if(*(buffer + i) == '\0')
-            continue;
-        else
-            break;
-    }
-}
-
-/*
  * Sets the title of an MP3 entry based on its ID3v1 tag.
  *
  * Arguments: file - the MP3 file to scen for a ID3v1 tag
@@ -179,39 +155,55 @@ stripspaces(char *buffer)
  */
 static bool setid3v1title(int fd, struct mp3entry *entry) 
 {
-    unsigned char buffer[31];
-    int offsets[4] = {-95,-65,-125,-31};
-    int i;
+    unsigned char buffer[128];
+    static int offsets[] = {3, 33, 63, 93, 125};
+    int i, j;
 
-    for (i=0;i<4;i++) {
-        if (-1 == lseek(fd, offsets[i], SEEK_END))
-            return false;
+    if (-1 == lseek(fd, -128, SEEK_END))
+        return false;
 
-        buffer[30]=0;
-        read(fd, buffer, 30);
-        stripspaces(buffer);
+    if (read(fd, buffer, sizeof buffer) != sizeof buffer)
+        return false;
+
+    if (strncmp(buffer, "TAG", 3))
+        return false;
+
+    for (i=0;i<5;i++) {
+        char* ptr = buffer + offsets[i];
         
-        if (buffer[0] || i == 3) {
-            switch(i) {
-                case 0:
-                    strcpy(entry->id3v1buf[0], buffer);
-                    entry->artist = entry->id3v1buf[0];
-                    break;
-                case 1:
-                    strcpy(entry->id3v1buf[1], buffer);
-                    entry->album = entry->id3v1buf[1];
-                    break;
-                case 2:
-                    strcpy(entry->id3v1buf[2], buffer);
-                    entry->title = entry->id3v1buf[2];
-                    break;
-                case 3:
-                    /* id3v1.1 uses last two bytes of comment field for track
-                       number: first must be 0 and second is track num */
-                    if (buffer[28] == 0)
-                        entry->tracknum = buffer[29];
-                    break;
-            }
+        if (i<3) {
+            /* kill trailing space in strings */
+            for (j=29; j && ptr[j]==' '; j--)
+                ptr[j] = 0;
+        }
+
+        switch(i) {
+            case 0:
+                strcpy(entry->id3v1buf[2], ptr);
+                entry->title = entry->id3v1buf[2];
+                break;
+
+            case 1:
+                strcpy(entry->id3v1buf[0], ptr);
+                entry->artist = entry->id3v1buf[0];
+                break;
+
+            case 2:
+                strcpy(entry->id3v1buf[1], ptr);
+                entry->album = entry->id3v1buf[1];
+                break;
+
+            case 3:
+                ptr[4] = 0;
+                entry->year = atoi(ptr);
+                break;
+
+            case 4:
+                /* id3v1.1 uses last two bytes of comment field for track
+                   number: first must be 0 and second is track num */
+                if (*ptr == 0)
+                    entry->tracknum = ptr[1];
+                break;
         }
     }
 
@@ -300,6 +292,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(framelen >= buffersize - bufferpos)
             framelen = buffersize - bufferpos - 1;
 
+        DEBUGF("id3v2 frame: %.4s\n", header);
+
         /* Check for certain frame headers */
         if(!strncmp(header, "TPE1", strlen("TPE1")) || 
            !strncmp(header, "TP1", strlen("TP1"))) {
@@ -333,6 +327,15 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             unicode_munge(&tracknum, &bytesread);
             tracknum[bytesread + 1] = '\0';
             entry->tracknum = atoi(tracknum);
+            bufferpos += bytesread + 1;
+            size -= bytesread;
+        }
+        else if(!strncmp(header, "TYER", 4) ||
+                !strncmp(header, "TYR", 3)) {
+            char* ptr = buffer + bufferpos;
+            bytesread = read(fd, ptr, framelen);
+            unicode_munge(&ptr, &bytesread);
+            entry->year = atoi(ptr);
             bufferpos += bytesread + 1;
             size -= bytesread;
         }
@@ -382,29 +385,6 @@ static int getfilesize(int fd)
         return 0; /* unknown */
 
     return size;
-}
-
-/*
- * Calculates the size of the ID3v1 tag.
- *
- * Arguments: file - the file to search for a tag.
- *
- * Returns: the size of the tag or 0 if none was found
- */
-static int getid3v1len(int fd) 
-{
-    char buf[3];
-    int offset;
-
-    /* Check if we find "TAG" 128 bytes from EOF */
-    if((lseek(fd, -128, SEEK_END) == -1) ||
-       (read(fd, buf, 3) != 3) ||
-       (strncmp(buf, "TAG", 3) != 0))
-        offset = 0;
-    else
-        offset = 128;
-	
-    return offset;
 }
 
 /* check if 'head' is a valid mp3 frame header */
@@ -739,8 +719,7 @@ bool mp3info(struct mp3entry *entry, char *filename)
 
     /* only seek to end of file if no id3v2 tags were found */
     if (!entry->id3v2len) {
-        entry->id3v1len = getid3v1len(fd);
-        if(entry->id3v1len && !entry->title)
+        if(!entry->title)
             setid3v1title(fd, entry);
     }
 
