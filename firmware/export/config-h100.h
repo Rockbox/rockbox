@@ -56,4 +56,7 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
+/* Define this if you can play raw PCM audio */
+#define HAVE_PCM_PLAYBACK
+
 #endif
