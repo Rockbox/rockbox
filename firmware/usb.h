@@ -19,6 +19,8 @@
 #ifndef _USB_H_
 #define _USB_H_
 
+#include "kernel.h"
+
 void usb_init(void);
 void usb_start_monitoring(void);
 void usb_acknowledge(int id);
