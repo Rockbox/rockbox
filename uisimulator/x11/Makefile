@@ -31,8 +31,8 @@ endif
 
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
+COMMON = $(FIRMWAREDIR)/common
 DRIVERS = $(FIRMWAREDIR)/drivers
-LIBMADDIR = $(PREVAPPDIR)/common/libmad
 TOOLSDIR = ../../tools
 DOCSDIR = ../../docs
 
@@ -88,7 +88,7 @@ else
 	LCDSRSC = lcd-playersim.c lcd-player.c font-player.c lcd-player-charset.c
 endif
 FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c power.c\
-  powermgmt.c panic.c mp3data.c
+  powermgmt.c panic.c mp3data.c sprintf.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
