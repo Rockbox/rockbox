@@ -652,7 +652,7 @@ bool wps_display(struct mp3entry* id3)
                            "%pm\n");
 #else
                 wps_format("%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>\n"
-                           "%pc/%pt\n");
+                           "%pc%pb%pt\n");
 #endif
             }
         }
