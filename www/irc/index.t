@@ -16,4 +16,6 @@ for later reference.
 
 <!--#exec cmd="./irclogs.pl" -->
 
+<p><a href="current.txt">Today's log</a> (updating live)
+
 #include "foot.t"
