@@ -223,5 +223,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_update();
 #endif
     }
-    return true;
+    return PLUGIN_OK;
 }
