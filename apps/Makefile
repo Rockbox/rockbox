@@ -41,6 +41,10 @@ endif
 
 SRC := $(wildcard *.c)
 
+ifeq ($(TARGET), -DARCHOS_FMRECORDER)
+   SCRAMBLE_OPT = -fm
+endif
+
 ifeq ($(ANYREC), RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
@@ -77,7 +81,7 @@ $(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
 	../tools/sh2d -sh1 $(OBJDIR)/archos.bin > $(OBJDIR)/archos.asm
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
-	../tools/scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
+	../tools/scramble $(SCRAMBLE_OPT) $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl credits.pl < $< > $@
