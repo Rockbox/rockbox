@@ -351,6 +351,7 @@ void start_resume(void)
                 play_list(global_settings.resume_file,
                           slash+1,
                           global_settings.resume_index,
+                          true, /* the index is AFTER shuffle */
                           global_settings.resume_offset,
                           global_settings.resume_seed );
                 *slash='/';
@@ -368,6 +369,7 @@ void start_resume(void)
                 play_list("/",
                           global_settings.resume_file,
                           global_settings.resume_index,
+                          true,
                           global_settings.resume_offset,
                           global_settings.resume_seed );
             }
@@ -381,7 +383,8 @@ void start_resume(void)
             build_playlist(global_settings.resume_index);
             play_list(global_settings.resume_file,
                       NULL, 
-                      global_settings.resume_index, 
+                      global_settings.resume_index,
+                      true,
                       global_settings.resume_offset,
                       global_settings.resume_seed);
         }
@@ -505,8 +508,10 @@ bool dirbrowse(char *root)
                                      currdir,
                                      dircache[dircursor+start].name);
                         play_list(currdir,
-                                  dircache[dircursor+start].name, 
-                                  0, 0, seed );
+                                  dircache[dircursor+start].name,
+                                  0,
+                                  false,
+                                  0, seed );
                         start_index = 0;
                     }
                     else {
@@ -514,10 +519,16 @@ bool dirbrowse(char *root)
                             strncpy(global_settings.resume_file,
                                     currdir, MAX_PATH);
                         start_index = build_playlist(dircursor+start);
-                        play_list(currdir, NULL, start_index, 0, seed);
+
+                        /* it is important that we get back the index in
+                           the (shuffled) list and stor that */
+                        start_index = play_list(currdir, NULL,
+                                                start_index, false, 0, seed);
                     }
 
                     if ( global_settings.resume ) {
+                        /* the resume_index must always be the index in the
+                           shuffled list in case shuffle is enabled */
                         global_settings.resume_index = start_index;
                         global_settings.resume_offset = 0;
                         global_settings.resume_seed = seed;

@@ -168,12 +168,16 @@ char* playlist_next(int steps, int* index)
 /*
  * This function is called to start playback of a given playlist.  This
  * playlist may be stored in RAM (when using full-dir playback).
+ *
+ * Return: the new index (possibly different due to shuffle)
  */
-void play_list(char *dir,         /* "current directory" */
-               char *file,        /* playlist */
-               int start_index,   /* index in the playlist */
-               int start_offset,  /* offset in the file */
-               int random_seed )  /* used for shuffling */
+int play_list(char *dir,         /* "current directory" */
+              char *file,        /* playlist */
+              int start_index,   /* index in the playlist */
+              bool shuffled_index, /* if TRUE the specified index is for the
+                                       playlist AFTER the shuffle */
+              int start_offset,  /* offset in the file */
+              int random_seed )  /* used for shuffling */
 {
     char *sep="";
     int dirlen;
@@ -235,19 +239,22 @@ void play_list(char *dir,         /* "current directory" */
             /* now shuffle around the indices */
             randomise_playlist( random_seed );
 
-            /* Because the playlists in RAM is always dir-based playlists,
-               we want the selected file played first so we scan the list
-               for that file to be able to play that one first. */
+            if(!shuffled_index) {
+                /* The given index was for the unshuffled list, so we need
+                   to figure out the index AFTER the shuffle has been made.
+                   We scan for the seek position we remmber from before. */
 
-            for(i=0; i< playlist.amount; i++) {
-                if(seek_pos == playlist.indices[i]) {
-                    /* here's the start song! yiepee! */
-                    playlist.index = i;
-                    break; /* now stop searching */
+                for(i=0; i< playlist.amount; i++) {
+                    if(seek_pos == playlist.indices[i]) {
+                        /* here's the start song! yiepee! */
+                        playlist.index = i;
+                        break; /* now stop searching */
+                    }
                 }
+                /* if we for any reason wouldn't find the index again, it
+                   won't set the index again and we should start at index 0
+                   instead */
             }
-            /* if we for any reason wouldn't find the index again, it won't
-               set the index again and we should start at index 0 instead */
         }
     }
 
@@ -258,6 +265,8 @@ void play_list(char *dir,         /* "current directory" */
     }
     /* also make the first song get playing */
     mpeg_play(start_offset);
+
+    return playlist.index;
 }
 
 /*

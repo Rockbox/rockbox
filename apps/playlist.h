@@ -40,8 +40,8 @@ typedef struct
 extern playlist_info_t playlist;
 extern bool playlist_shuffle;
 
-void play_list(char *dir, char *file, int start_index, 
-               int start_offset, int random_seed );
+int play_list(char *dir, char *file, int start_index, 
+              bool shuffled_index, int start_offset, int random_seed );
 char* playlist_next(int steps, int* id);
 void randomise_playlist( unsigned int seed );
 void sort_playlist(void);
