@@ -293,6 +293,14 @@ void add_indices_to_playlist(void)
                 if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
                     if(!playlist.in_ram)
                         close(fd);
+
+                    lcd_clear_display();
+                    lcd_puts(0,0,"10000 file");
+                    lcd_puts(0,1,"limit reached");
+                    lcd_update();
+                    sleep(HZ*2);
+                    lcd_clear_display();
+
                     return;
                 }
 

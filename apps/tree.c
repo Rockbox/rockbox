@@ -221,6 +221,18 @@ static int showdir(char *path, int start)
         strncpy(lastdir,path,sizeof(lastdir));
         lastdir[sizeof(lastdir)-1] = 0;
         qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
+
+        if ( filesindir == MAX_FILES_IN_DIR ) {
+#ifdef HAVE_NEW_CHARCELL_LCD
+            lcd_double_height(false);
+#endif
+            lcd_clear_display();
+            lcd_puts(0,0,"200 file");
+            lcd_puts(0,1,"limit reached");
+            lcd_update();
+            sleep(HZ*2);
+            lcd_clear_display();
+        }
     }
 
     lcd_stop_scroll();
