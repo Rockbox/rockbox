@@ -316,7 +316,7 @@ void move_down(void)
         }
 
         snprintf (s, sizeof(s), "%d Rows - Level %d", lines, level);
-        lcd_putsxy (2, 52, s, 0);
+        lcd_putsxy (2, 42, s, 0);
 
         new_block();
         move_block(0,0,0);
@@ -394,7 +394,7 @@ Menu tetris(void)
     init_tetris();
 
     draw_frame(start_x, start_x + max_x - 1, start_y - 1, start_y + max_y);
-    lcd_putsxy (2, 52, "0 Rows - Level 0", 0);
+    lcd_putsxy (2, 42, "0 Rows - Level 0", 0);
     lcd_update();
 
     next_b = t_rand(blocks);
