@@ -155,7 +155,7 @@ void init(void)
 
 void init(void)
 {
-    int rc, i;
+    int rc;
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
 
