@@ -51,9 +51,10 @@ struct clip_entry /* one entry of the index table */
 struct voicefont /* file format of our "voicefont" */
 {
     int version; /* version of the voicefont */
-    int headersize; /* size of the header, =offset to index */
-    int id_max; /* number of clips contained */
-    struct clip_entry index[]; /* followed by the index table */
+    int table;   /* offset to index table, (=header size) */
+    int id1_max; /* number of "normal" clips contained in above index */
+    int id2_max; /* number of "voice only" clips contained in above index */
+    struct clip_entry index[]; /* followed by the index tables */
     /* and finally the bitswapped mp3 clips, not visible here */
 };
 
@@ -104,7 +105,7 @@ static int load_voicefont(void)
 
     size = read(fd, mp3buf, mp3end - mp3buf);
     if (size > 1000
-        && ((struct voicefont*)mp3buf)->headersize
+        && ((struct voicefont*)mp3buf)->table
            == offsetof(struct voicefont, index))
     {
         p_voicefont = (struct voicefont*)mp3buf;
@@ -294,9 +295,12 @@ int talk_id(int id, bool enqueue)
     if (p_voicefont == NULL) /* still no voices? */
         return -1;
 
+    if (id == -1) /* -1 is an indication for silence */
+        return -1;
+
     /* check if this is a special ID, with a value */
     unit = ((unsigned)id) >> UNIT_SHIFT;
-    if (id != -1 && unit)
+    if (unit)
     {   /* sign-extend the value */
         //splash(200, true,"unit=%d", unit);
         id = (unsigned)id << (32-UNIT_SHIFT);
@@ -305,9 +309,19 @@ int talk_id(int id, bool enqueue)
         return 0; /* and stop, end of special case */
     }
 
-    if (id < 0 || id >= p_voicefont->id_max)
-        return -1;
-
+    if (id > VOICEONLY_DELIMITER)
+    {   /* voice-only entries use the second part of the table */
+        id -= VOICEONLY_DELIMITER + 1;
+        if (id >= p_voicefont->id2_max)
+            return -1; /* must be newer than we have */
+        id += p_voicefont->id1_max; /* table 2 is behind table 1 */
+    }
+    else
+    {   /* normal use of the first table */
+        if (id >= p_voicefont->id1_max)
+            return -1; /* must be newer than we have */
+    }
+    
     clipsize = p_voicefont->index[id].size;
     if (clipsize == 0) /* clip not included in voicefont */
         return -1;
