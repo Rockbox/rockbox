@@ -30,7 +30,7 @@
 #define BACKLIGHT_OFF 2
 
 static void backlight_thread(void);
-static char backlight_stack[0x100];
+static char backlight_stack[0x400];
 static struct event_queue backlight_queue;
 
 static int backlight_timer;

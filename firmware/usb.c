@@ -54,7 +54,7 @@ static int countdown;
 
 static int usb_state;
 
-static char usb_stack[0x200];
+static char usb_stack[0x800];
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
