@@ -88,10 +88,7 @@ void app_main(void)
         menu_init();
         break;
       case (LINE_BROWSE * LINE_HEIGHT):
-        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         dirbrowse("/");
-        lcd_update();
-        while((!button_get()));
         lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         menu_init();
         break;
