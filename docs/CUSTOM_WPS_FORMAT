@@ -71,7 +71,7 @@ Other Tags:
   %>  : Display a '>'
   %s  : Indicate that the line should scroll. Can occur anywhere in 
         a line (given that the text is displayed; see conditional 
-        below). Only the first line with a %s will actually scroll.
+        below). You can specify up to 10 scrolling lines.
         %s is ignored if combined with %pb, %pc or %pr on the same
         line (the result wouldn't be good anyway).
 

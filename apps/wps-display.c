@@ -530,7 +530,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 {
     char buf[MAX_PATH];
     struct format_flags flags;
-    bool scroll_active = false;
     int i;
 #ifdef HAVE_LCD_BITMAP
     /* to find out wether the peak meter is enabled we
@@ -602,9 +601,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
 #endif
 
-            if (!scroll_active && flags.scroll && !flags.dynamic)
+            if (flags.scroll && !flags.dynamic)
             {
-                scroll_active = true;
                 lcd_puts_scroll(0, i, buf);
             }
             else

@@ -700,6 +700,8 @@ int wps_show(void)
                         status_set_record(false);
                         status_set_audio(false);
 #endif
+                        lcd_stop_scroll();
+
                         /* set dir browser to current playing song */
                         if (global_settings.browse_current && id3)
                             set_current_file(id3->path);
@@ -833,6 +835,8 @@ int wps_show(void)
                 status_set_record(false);
                 status_set_audio(false);
 #endif
+                lcd_stop_scroll();
+
                 /* set dir browser to current playing song */
                 if (global_settings.browse_current && id3)
                     set_current_file(id3->path);
