@@ -1133,3 +1133,13 @@ id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
 new: "Listes Musicales"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+new: "%d%% %dh %dm"
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep timer"
+new: "minuterie d'arrêt auto"
