@@ -77,7 +77,7 @@ extern user_settings_t global_settings;
 #define DEFAULT_BASS_BOOST_SETTING  0
 #define DEFAULT_CONTRAST_SETTING    0
 #define DEFAULT_POWEROFF_SETTING    0
-#define DEFAULT_BACKLIGHT_SETTING   1
+#define DEFAULT_BACKLIGHT_SETTING   5
 
 
 #endif /* __SETTINGS_H__ */
