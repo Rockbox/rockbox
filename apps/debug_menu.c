@@ -820,7 +820,7 @@ bool view_battery(void)
                 snprintf(buf, 30, "resulting act.lev: %d%%", battery_level());
                 lcd_puts(0, 5, buf);
 
-                snprintf(buf, 30, "Est. remaining: %d m", powermgmt_est_runningtime_min);
+                snprintf(buf, 30, "Est. remaining: %d m", battery_time());
                 lcd_puts(0, 6, buf);
 
 #ifdef HAVE_CHARGE_CTRL

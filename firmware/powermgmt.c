@@ -68,10 +68,12 @@ static int percent_to_volt_nocharge[11] = /* voltages (centivolt) of 0%, 10%, ..
     450, 481, 491, 497, 503, 507, 512, 514, 517, 528, 560
 };
 
+#ifdef HAVE_CHARGE_CTRL
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
 };
+#endif
 
 int battery_lazyness[20] = /* how does the battery react when plugging in/out the charger */
 {
