@@ -37,7 +37,7 @@
 #include <psos.h>
 #define SEMAPHORE /* the PSOS routines use semaphore protection */
 #else
-#include <stdlib.h> /* makes the PSOS complain on the 'size_t' typedef */
+
 #endif
 
 #define BMALLOC /* we use our own big-malloc system */
@@ -290,7 +290,7 @@ void dmalloc_initialize(void)
 #ifdef SEMAPHORE
         {
             char name[7];
-            sprintf(name, "MEM%d", i);
+            snprintf(name, 7, "MEM%d", i);
             SEMAPHORECREATE(name, top[i].semaphore_id);
             /* doesn't matter if it failed, we continue anyway ;-( */
         }
@@ -341,11 +341,11 @@ static void *fragfromblock(struct MemBlock *block)
  *
  **************************************************************************/
 
-void *dmalloc(size_t size)
+void *malloc(size_t size)
 {
     void *mem;
 
-    DBG(("dmalloc(%d)\n", size));
+    DBG(("malloc(%d)\n", size));
 
     /* First, we make room for the space needed in every allocation */
     size += sizeof(struct MemInfo);
@@ -485,12 +485,12 @@ void *dmalloc(size_t size)
  *
  **************************************************************************/
 
-void dfree(void *memp)
+void free(void *memp)
 {
     struct MemInfo *meminfo = (struct MemInfo *)
         ((char *)memp- sizeof(struct MemInfo));
 
-    DBG(("dfree(%p)\n", memp));
+    DBG(("free(%p)\n", memp));
 
     if(!((size_t)meminfo->block&BLOCK_BIT)) {
         /* this is a FRAGMENT we have to deal with */
@@ -551,7 +551,7 @@ void dfree(void *memp)
  *
  **************************************************************************/
 
-void *drealloc(char *ptr, size_t size)
+void *realloc(char *ptr, size_t size)
 {
     struct MemInfo *meminfo = (struct MemInfo *)
         ((char *)ptr- sizeof(struct MemInfo));
@@ -567,10 +567,10 @@ void *drealloc(char *ptr, size_t size)
     /* NOTE that this is only valid if BLOCK_BIT isn't set: */
     struct MemBlock *block;
 
-    DBG(("drealloc(%p, %d)\n", ptr, size));
+    DBG(("realloc(%p, %d)\n", ptr, size));
 
     if(NULL == ptr)
-        return dmalloc( size );
+        return malloc( size );
 
     block = meminfo->block;
 
@@ -604,10 +604,10 @@ void *drealloc(char *ptr, size_t size)
 
         /* No tricks involved here, just grab a new bite of memory, copy the
          * data from the old place and free the old memory again. */
-        mem = dmalloc(size);
+        mem = malloc(size);
         if(mem) {
             memcpy(mem, ptr, MIN(size, prevsize) );
-            dfree(ptr);
+            free(ptr);
         }
     }
     return mem;
@@ -623,9 +623,9 @@ void *drealloc(char *ptr, size_t size)
 /* Allocate an array of NMEMB elements each SIZE bytes long.
    The entire array is initialized to zeros.  */
 void *
-dcalloc (size_t nmemb, size_t size)
+calloc (size_t nmemb, size_t size)
 {
-    void *result = dmalloc (nmemb * size);
+    void *result = malloc (nmemb * size);
     
     if (result != NULL)
         memset (result, 0, nmemb * size);
