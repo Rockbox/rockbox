@@ -30,7 +30,6 @@
 #include "menu.h"
 #include "system.h"
 #include "usb.h"
-#include "powermgmt.h"
 #include "adc.h"
 #include "i2c.h"
 #ifndef SIMULATOR
