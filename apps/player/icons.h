@@ -25,10 +25,8 @@
 #ifdef HAVE_LCD_CHARCELLS
 
 enum {
-    Unknown, File, Folder, Playlist, Wps, Mod_Ajz, Language, Text, Config,
-    LastTreeIcon
+    Unknown=0x90, 
+    Folder=0x18, Mod_Ajz, Language, File, Wps, Playlist, Text, Config
 };
-
-extern char tree_icons_5x7[LastTreeIcon][8];
 
 #endif

@@ -81,8 +81,7 @@ struct menu {
 
 #endif /* HAVE_LCD_BITMAP */
 
-#define NEW_CURSOR_CHAR 0x7e
-#define OLD_CURSOR_CHAR 0x89
+#define CURSOR_CHAR 0x92
 
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
@@ -106,7 +105,7 @@ void put_cursorxy(int x, int y, bool on)
         lcd_bitmap ( bitmap_icons_6x8[Cursor], 
                      xpos, ypos, 4, 8, true);
 #else
-        lcd_putc(x, y, has_new_lcd()?NEW_CURSOR_CHAR:OLD_CURSOR_CHAR);
+        lcd_putc(x, y, CURSOR_CHAR);
 #endif
     }
     else {

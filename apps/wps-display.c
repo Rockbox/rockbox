@@ -57,6 +57,10 @@
 
 #define FORMAT_BUFFER_SIZE 300
 
+#ifdef HAVE_LCD_CHARCELLS
+unsigned char wps_progress_pat=0;
+#endif
+
 static char format_buffer[FORMAT_BUFFER_SIZE];
 static char* format_lines[MAX_LINES];
 static unsigned char line_type[MAX_LINES];
@@ -369,7 +373,12 @@ static char* get_tag(struct mp3entry* id3,
             {
                 case 'b':  /* progress bar */
                     *flags |= WPS_REFRESH_PLAYER_PROGRESS;
+#ifdef HAVE_LCD_CHARCELLS
+                    snprintf(buf, buf_size, "%c", wps_progress_pat);
+                    return buf;
+#else
                     return "\x01";
+#endif
 
                 case 'p':  /* Playlist Position */
                     *flags |= WPS_REFRESH_STATIC;
@@ -767,8 +776,12 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
     if (!id3)
         return false;
 
+    if (wps_progress_pat==0)
+        wps_progress_pat=lcd_get_locked_pattern();
+
     memset(binline, 1, sizeof binline);
     memset(player_progressbar, 1, sizeof player_progressbar);
+
     if(id3->elapsed >= id3->length)
         songpos = 0;
     else
@@ -787,7 +800,7 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
             player_progressbar[i] += binline[i*5+j];
         }
     }
-    lcd_define_pattern(8,player_progressbar,7);
+    lcd_define_pattern(wps_progress_pat, player_progressbar);
     return true;
 }
 #endif

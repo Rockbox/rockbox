@@ -411,7 +411,11 @@ static int showdir(char *path, int start)
                 break;
 #endif
             default:
+#ifdef HAVE_LCD_BITMAP
                 icon_type = 0;
+#else
+                icon_type = Unknown;
+#endif
         }
 
         if (icon_type) {
@@ -424,8 +428,7 @@ static int showdir(char *path, int start)
                        MARGIN_Y+(i-start)*line_height + offset,
                        6, 8, true);
 #else
-            lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
-            lcd_putc(LINE_X-1, i-start, i-start);
+            lcd_putc(LINE_X-1, i-start, icon_type);
 #endif
         }
 
