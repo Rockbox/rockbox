@@ -1,0 +1,106 @@
+#define _PAGE_ Accessing source code via CVS
+#include "head.t"
+
+<h2>Browsing the repositry</h2>
+
+<p>Just go <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
+
+<h2>Downloading (checking out) the source</h2>
+
+<p>You need to have
+<a href="http://www.cvshome.org">CVS</a> and
+<a href="http://www.openssh.com">SSH</a> installed.
+
+<h3>Anonymously</h3>
+
+<p>If you are not a registered developer, use this method.
+When asked for a password, just press enter:
+
+<p><tt>cvs -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox login
+<br>cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co firmware</tt>
+
+<p>A "firmware" directory will be created in your current directory, and all the source files go there.
+
+<h3>For developers</h3>
+
+<p>For this, you need to:
+
+<ol>
+<li> Have a <a href="http://sourceforge.net/account/register.php">SourceForge account</a>
+<li> Be a 
+<a href="http://sourceforge.net/project/memberlist.php?group_id=44306">registered developer</a>
+of the Rockbox project
+<li> Have logged on to your account once (ssh <b>username</b>@rockbox.sourceforge.net) and then waited a few hours for SourceForge to set up your cvs
+</ol>
+
+<p>Then run:
+
+<p><tt>export CVS_RSH=ssh
+<br>cvs -z3 -d:ext:<b>username</b>@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co firmware</tt>
+
+<h2>Checking in modifications</h2>
+
+<p>CVS is a "no-reserve" version control system. This means that you work on your local files without first reserving them. Any conflicts with other developers are resolved when you check-in, or "commit" as it's called in CVS:
+
+<p><tt>cvs commit <b>filename</b></tt>
+
+<p>This will start an editor and ask you to describe the changes you've made. If you want, you can use the -m command line option to specify the comment right there:
+
+<p><tt>cvs commit -m "This is my change comment" <b>filename</b></tt>
+
+
+<h2>Updating your repository</h2>
+
+<p>Since several people commit to the repository, you will need to periodically
+synchronize your local files with the changes made by others.
+This operation is called "update":
+
+<p><tt>cvs update</tt>
+
+
+<h2>Adding a new file</h2>
+n
+<p>Adding a file is very simple:
+
+<p><tt>cvs add <b>filename</b></tt>
+
+<p>If you are adding a binary file, you need to specify the -kb flag:
+
+<p><tt>cvs add -kb <b>filename</b></tt>
+
+<p>These changes, like any other change, has to be committed before they will be visible on the server.
+
+<h2>Querying the status of your files</h2>
+
+<p>Sometimes it is interesting to get a list of the status of your files versus
+those on the remote repository. This is called "status":
+
+<p><tt>cvs status</tt>
+
+<p>The output from "status" can be rather verbose. You may want to filter it with grep:
+
+<p><tt>cvs status | grep Status</tt>
+
+<p>To only list files who differ from the server, filter again:
+
+<p><tt>cvs status | grep Status | grep -v Up-to-date</tt>
+
+<h2>Getting rid of the password prompts</h2>
+
+<p>Each cvs operation has to be authenticated with ssh. This is normally done
+by you entering your password. This gets boring fast.
+Instead, you can register your public ssh key with your SourceForge account. This way, your connection is authenticated automatically.
+
+<p><a href="http://sourceforge.net/account/login.php">Log in</a>
+to your SourceForge account and go to your
+<a href="https://sourceforge.net/account/">account options</a>.
+On the bottom of the page, there is a link to
+<a href="https://sourceforge.net/account/editsshkeys.php">edit your ssh keys</a>.
+Copy the contents of your local <tt>.ssh/identity.pub</tt> or
+<tt>.ssh/id_rsa.pub</tt> there.
+
+<p>Like many things on SourceForge, they key change doesn't take effect immediately. You'll have to wait a few hours until some magic batch job kicks in and puts your keys where they should be. Then you can use cvs without entering your password.
+
+<p>If you work from several different computers, you must add the key for each of your accounts you are using.
+
+#include "foot.t"

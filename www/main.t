@@ -12,7 +12,7 @@
 <a href="tools.html">tools</a> &middot;
 <a href="internals/">photos</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a> &middot;
-<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">browse cvs</a> &middot;
+<a href="cvs.html">CVS</a> &middot;
 <a href="/isd200/">linux driver</a>
 </small>
 
