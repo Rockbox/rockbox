@@ -16,8 +16,6 @@ scramble: scramble.c
 
 descramble: descramble.c
 
-mkneofile: mkneofile.c
-
 sh2d: sh2d.c
 
 bmp2rb:	bmp2rb.c
