@@ -25,6 +25,8 @@
 #include "file.h"
 
 #define ROCKBOX_DIR "/.rockbox"
+#define FONT_DIR "/fonts"
+#define LANG_DIR "/langs"
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
 
 #define MAX_FILENAME 20

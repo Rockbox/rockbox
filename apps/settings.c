@@ -544,7 +544,7 @@ void settings_apply(void)
 #ifdef HAVE_LCD_BITMAP
     if ( global_settings.font_file[0] &&
          global_settings.font_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.fnt",
+        snprintf(buf, sizeof buf, ROCKBOX_DIR FONT_DIR "/%s.fnt",
                  global_settings.font_file);
         font_load(buf);
     }
@@ -561,7 +561,7 @@ void settings_apply(void)
 
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.lng",
+        snprintf(buf, sizeof buf, ROCKBOX_DIR LANG_DIR "/%s.lng",
                  global_settings.lang_file);
         lang_load(buf);
     }
@@ -829,7 +829,8 @@ void set_file(char* filename, char* setting, int maxlen)
         ptr--;
     }
         
-    if (strcmp(ROCKBOX_DIR, filename) || (len-extlen > maxlen))
+    if (strncmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
+        (len-extlen > maxlen))
         return;
         
     strncpy(setting, fptr, len-extlen);
@@ -1187,12 +1188,12 @@ bool settings_save_config(void)
                 global_settings.wps_file);
 
     if (global_settings.lang_file[0] != 0)
-        fprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR, 
+        fprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR, 
                 global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.font_file[0] != 0)
-        fprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR,
+        fprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR FONT_DIR,
                 global_settings.font_file);
 #endif
 

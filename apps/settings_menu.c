@@ -731,13 +731,13 @@ static bool custom_cfg_browse(void)
 
 static bool language_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_LNG);
+    return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
 }
 
 #ifdef HAVE_RECORDER_KEYPAD
 static bool font_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_FONT);
+    return rockbox_browse(ROCKBOX_DIR FONT_DIR, SHOW_FONT);
 }
 #endif
 
