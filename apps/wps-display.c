@@ -663,7 +663,7 @@ bool wps_display(struct mp3entry* id3)
     return false;
 }
 
-#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_CHARCELLS)
 bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
     if(!id3)
