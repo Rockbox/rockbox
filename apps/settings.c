@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include "config.h"
+#include "limits.h"
 #include "kernel.h"
 #include "thread.h"
 #include "settings.h"
@@ -1334,7 +1335,7 @@ bool set_int(const char* string,
     bool done = false;
     int button;
     int org_value=*variable;
-    int last_value = __INT_MAX__; /* out of range init */
+    int last_value = INT_MAX; /* out of range init */
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
