@@ -1483,3 +1483,18 @@ id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 new: "Max storlek på spellistan"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+new: "Hopprullning"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time"
+eng: "One time"
+new: "En gång"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always"
+eng: "Always"
+new: "Alltid"

@@ -70,6 +70,7 @@ struct scrollinfo {
     int starty;
     long scroll_start_tick;
     int direction; /* +1 for right or -1 for left*/
+    int jump_scroll;
 };
 
 #define MAX_CURSOR_CHARS 8
@@ -91,6 +92,7 @@ static int scroll_delay = HZ/2; /* delay before starting scroll */
 static char scroll_spacing = 3; /* spaces between end and start of text */
 static bool allow_bidirectional_scrolling = true;
 static int bidir_limit = 50;  /* percent */
+static int jump_scroll = 0; /* 0=off, 1=once, 2=always */
 
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 
@@ -498,6 +500,11 @@ void lcd_init (void)
                   sizeof(scroll_stack), scroll_name);
 }
 
+void lcd_jump_scroll (int mode) /* 0=off, 1=once, 2=always */
+{
+    jump_scroll=mode;
+}
+
 void lcd_bidir_scroll(int percent)
 {
     bidir_limit = percent;
@@ -522,6 +529,9 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
         s->startx=x;
         s->starty=y;
         s->direction=+1;
+        s->jump_scroll=0;
+        if (jump_scroll && scroll_delay/2<(HZ/scroll_speed)*(s->textlen-11+x))
+            s->jump_scroll=11-x;
         strncpy(s->text,string,sizeof s->text);
         s->turn_offset=-1;
         if (bidir_limit && (s->textlen < ((11-x)*(100+bidir_limit))/100)) {
@@ -596,18 +606,40 @@ static void scroll_thread(void)
                 if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
                     char buffer[12];
                     update = true;
-                    if ( s->offset < s->textlen-1 ) {
-                        s->offset+=s->direction;
-                        if (s->offset==0) {
-                            s->direction=+1;
-                            s->scroll_start_tick = current_tick + scroll_delay;
-                        } else if (s->offset==s->turn_offset) {
-                            s->direction=-1;
-                            s->scroll_start_tick = current_tick + scroll_delay;
+                    if (s->jump_scroll) {
+                        s->offset+=s->jump_scroll;
+                        s->scroll_start_tick = current_tick +
+                            scroll_delay/2;
+                        /* Eat space */
+                        while (s->offset < s->textlen &&
+                               s->text[s->offset] == ' ') {
+                            s->offset++;
                         }
-                    }
-                    else {
-                        s->offset = 0;
+                        if (s->offset >= s->textlen) {
+                            s->offset=0;
+                            if (jump_scroll!=2) {
+                                s->jump_scroll=0;
+                                s->direction=1;
+                            }
+                        }
+                    } else {
+                        if ( s->offset < s->textlen-1 ) {
+                            s->offset+=s->direction;
+                            if (s->offset==0) {
+                                s->direction=+1;
+                                s->scroll_start_tick = current_tick +
+                                    scroll_delay;
+                            } else {
+                                if (s->offset == s->turn_offset) {
+                                    s->direction=-1;
+                                    s->scroll_start_tick = current_tick +
+                                        scroll_delay;
+                                }
+                            }
+                        }
+                        else {
+                            s->offset = 0;
+                        }
                     }
 
                     i=0;
@@ -618,10 +650,17 @@ static void scroll_thread(void)
                             break;
                     }
                     o=0;
-                    while (i<11) {
-                        buffer[i++]=s->text[o++];
+                    if (s->turn_offset == -1 && !s->jump_scroll) {
+                        while (i<11) {
+                            buffer[i++]=s->text[o++];
+                        }
+                    } else {
+                        while (i<11) {
+                            buffer[i++]=' ';
+                        }
                     }
                     buffer[11]=0;
+                    
                     lcd_puts_cont_scroll(s->startx, s->starty, buffer);
                 }
             }

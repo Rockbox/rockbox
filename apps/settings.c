@@ -144,6 +144,7 @@ Rest of config block, only saved to disk:
 0xF4  (int) Playlist first index
 0xF8  (int) Playlist shuffle seed
 0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
+0xFD  (char)jump scroll mode (only for player)
 
 *************************************/
 
@@ -411,7 +412,9 @@ int settings_save( void )
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
     strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
-    
+#ifdef HAVE_LCD_CHARCELLS
+    config_block[0xfd]=(unsigned char)global_settings.jump_scroll;
+#endif
     DEBUGF( "+Resume file %s\n",global_settings.resume_file );
     DEBUGF( "+Resume index %X offset %X\n",
             global_settings.resume_index,
@@ -528,6 +531,8 @@ void settings_apply(void)
         font_reset();
 
     lcd_scroll_step(global_settings.scroll_step);
+#else
+    lcd_jump_scroll(global_settings.jump_scroll);
 #endif
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
@@ -727,6 +732,10 @@ void settings_load(void)
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
+#ifdef HAVE_LCD_CHARSCELLS
+        if (config_block[0xfd] != 0xff)
+            global_settings.jump_scroll = config_block[0xfd];
+#endif
         global_settings.resume_file[MAX_PATH]=0;
     }
 
@@ -1217,6 +1226,8 @@ bool settings_save_config(void)
 
 #ifdef HAVE_LCD_BITMAP
     fprintf(fd, "scroll step: %d\r\n", global_settings.scroll_step);
+#else
+    fprintf(fd, "jump scroll: %d\r\n", global_settings.jump_scroll);
 #endif
 
     fprintf(fd, "bidir limit: %d\r\n", global_settings.bidir_limit);
@@ -1393,6 +1404,9 @@ void settings_reset(void) {
     global_settings.battery_type = 0;
     global_settings.scroll_speed = 8;
     global_settings.bidir_limit  = 50;
+#ifdef HAVE_LCD_CHARCELLS
+    global_settings.jump_scroll  = 1;
+#endif    
     global_settings.scroll_delay = 100;
     global_settings.scroll_step  = 6;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;

@@ -456,6 +456,16 @@ static bool bidir_limit(void)
                    &lcd_bidir_scroll, 25, 0, 200 );
 }
 
+#ifdef HAVE_LCD_CHARCELLS
+static bool jump_scroll(void)
+{
+    char* names[] = { str(LANG_OFF), str(LANG_ONE_TIME), str(LANG_ALWAYS)};
+    
+    return set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
+                      names, 3, lcd_jump_scroll);
+}
+#endif
+
 #ifndef SIMULATOR
 /**
  * Menu to set the battery capacity
@@ -748,7 +758,10 @@ static bool scroll_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_SCROLL_STEP),     scroll_step     },  
 #endif
-        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
+        { str(LANG_BIDIR_SCROLL),    bidir_limit    },
+#ifdef HAVE_LCD_CHARCELLS
+        { str(LANG_JUMP_SCROLL),    jump_scroll    },
+#endif
     };
 
     m = menu_init( items, sizeof items / sizeof(struct menu_items) );

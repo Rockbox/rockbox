@@ -151,7 +151,9 @@ struct user_settings
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
-
+#ifdef HAVE_LCD_CHARCELLS
+    int jump_scroll;   /* Fast jump when scrolling */
+#endif
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool caption_backlight; /* turn on backlight at end and start of track */
 
