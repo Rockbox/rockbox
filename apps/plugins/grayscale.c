@@ -63,6 +63,9 @@ static unsigned int gbuf_size = 0;
 #define GRAY_RUNNING          0x0001  /* grayscale overlay is running */
 #define GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
 
+/* unsigned 16 bit multiplication (a single instruction on the SH) */
+#define MULU16(a, b) (((unsigned short) (a)) * ((unsigned short) (b)))
+
 typedef struct
 {
     int x;
@@ -80,19 +83,21 @@ typedef struct
 } tGraybuf;
 
 static tGraybuf *graybuf = NULL;
+static short gray_random_buffer;
 
 /** prototypes **/
 
-void timer_isr(void);
+void gray_timer_isr(void);
 void graypixel(int x, int y, unsigned long pattern);
-void grayinvertmasked(int x, int yb, unsigned char mask);
+void grayblock(int x, int by, unsigned char* src, int stride);
+void grayinvertmasked(int x, int by, unsigned char mask);
 
 /** implementation **/
 
 /* timer interrupt handler: display next bitplane */
-void timer_isr(void)
+void gray_timer_isr(void)
 {
-    rb->lcd_blit(graybuf->data + (graybuf->plane_size * graybuf->cur_plane),
+    rb->lcd_blit(graybuf->data + MULU16(graybuf->plane_size, graybuf->cur_plane),
                  graybuf->x, graybuf->by, graybuf->width, graybuf->bheight,
                  graybuf->width);
 
@@ -126,7 +131,6 @@ void timer_isr(void)
  * This is the fundamental graphics primitive, asm optimized */
 void graypixel(int x, int y, unsigned long pattern)
 {
-    static short random_buffer;
     register long address, mask, random;
 
     /* Some (pseudo-)random function must be used here to shift the bit
@@ -149,7 +153,7 @@ void graypixel(int x, int y, unsigned long pattern)
         : /* outputs */
         /* %0 */ "=&r"(random)
         : /* inputs */
-        /* %1 */ "r"(&random_buffer),
+        /* %1 */ "r"(&gray_random_buffer),
         /* %2 */ "r"(graybuf->randmask)
         : /* clobbers */
         "r1","macl"
@@ -255,6 +259,141 @@ void graypixel(int x, int y, unsigned long pattern)
         /* %5 */ "r"(random)
         : /* clobbers */
         "r1", "r2", "r3", "macl"
+    );
+}
+
+/* Set 8 pixels to specific gray values at once, asm optimized
+ * This greatly enhances performance of gray_fillrect() and gray_drawgraymap()
+ * for larger rectangles and graymaps */
+void grayblock(int x, int by, unsigned char* src, int stride)
+{
+    /* precalculate the bit patterns with random shifts (same RNG as graypixel,
+     * see there for an explanation) for all 8 pixels and put them on the 
+     * stack (!) */
+    asm(
+        "mova    .gb_reload,r0   \n"  /* set default loopback address */
+        "tst     %1,%1           \n"  /* stride == 0 ? */
+        "bf      .gb_needreload  \n"  /* no: keep that address */
+        "mova    .gb_reuse,r0    \n"  /* yes: set shortcut (no reload) */
+    ".gb_needreload:             \n"
+        "mov     r0,r2           \n"  /* loopback address to r2 */
+        "mov     #7,r3           \n"  /* loop count in r3: 8 pixels */
+
+        ".align  2               \n"  /** load pattern for pixel **/
+    ".gb_reload:                 \n"
+        "mov.b   @%0,r0          \n"  /* load src byte */
+        "extu.b  r0,r0           \n"  /* extend unsigned */
+        "mulu    %2,r0           \n"  /* macl = byte * depth; */
+        "add     %1,%0           \n"  /* src += stride; */
+        "sts     macl,r4         \n"  /* r4 = macl; */
+        "add     r4,r0           \n"  /* byte += r4; */
+        "shlr8   r0              \n"  /* byte >>= 8; */
+        "shll2   r0              \n"
+        "mov.l   @(r0,%3),r4     \n"  /* r4 = bitpattern[byte]; */
+
+        ".align  2               \n"  /** RNG **/
+    ".gb_reuse:                  \n"
+        "mov.w   @%4,r1          \n"  /* load last value */
+        "mov     #75,r0          \n"
+        "mulu    r0,r1           \n"  /* multiply by 75 */
+        "sts     macl,r1         \n"
+        "add     #74,r1          \n"  /* add another 74 */
+        "mov.w   r1,@%4          \n"  /* store new value */
+        /* Since the lower bits are not very random: */
+        "shlr8   r1              \n"  /* get bits 8..15 (need max. 5) */
+        "and     %5,r1           \n"  /* mask out unneeded bits */
+
+        "cmp/hs  %2,r1           \n"  /* random >= depth ? */
+        "bf      .gb_ntrim       \n"
+        "sub     %2,r1           \n"  /* yes: random -= depth; */
+    ".gb_ntrim:                  \n"
+
+        "mov.l   .ashlsi3,r0     \n"  /** rotate pattern **/
+        "jsr     @r0             \n"  /* shift r4 left by r1 */
+        "mov     r1,r5           \n"
+
+        "mov     %2,r5           \n"
+        "sub     r1,r5           \n"  /* r5 = depth - r1 */
+        "mov     r0,r1           \n"  /* last result stored in r1 */
+        "mov.l   .lshrsi3,r0     \n"
+        "jsr     @r0             \n"  /* shift r4 right by r5 */
+        "nop                     \n"
+
+        "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
+        "mov.l   r0,@-r15        \n"  /* push pattern */
+        
+        "cmp/pl  r3              \n"  /* loop count > 0? */
+        "bf      .gb_patdone     \n"  /* no: done */
+
+        "jmp     @r2             \n"  /* yes: loop */
+        "add     #-1,r3          \n"  /* decrease loop count */
+
+        ".align  2               \n"
+    ".ashlsi3:                   \n"  /* C library routine: */
+        ".long   ___ashlsi3      \n"  /* shift r4 left by r5, return in r0 */
+    ".lshrsi3:                   \n"  /* C library routine: */
+        ".long   ___lshrsi3      \n"  /* shift r4 right by r5, return in r0 */
+        /* both routines preserve r4, destroy r5 and take ~16 cycles */
+
+    ".gb_patdone:                \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(src),
+        /* %1 */ "r"(stride),
+        /* %2 */ "r"(graybuf->depth),
+        /* %3 */ "r"(graybuf->bitpattern),
+        /* %4 */ "r"(&gray_random_buffer),
+        /* %5 */ "r"(graybuf->randmask)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r4", "r5", "macl"
+    );
+
+    /* calculate start address in first bitplane and end address */
+    register unsigned char *address = graybuf->data + x
+                                    + MULU16(graybuf->width, by);
+    register unsigned char *end_addr = address
+                           + MULU16(graybuf->depth, graybuf->plane_size);
+
+    /* set the bits for all 8 pixels in all bytes according to the
+     * precalculated patterns on the stack */
+    asm (
+        "mov.l   @r15+,r1        \n"  /* pop all 8 patterns */
+        "mov.l   @r15+,r2        \n"
+        "mov.l   @r15+,r3        \n"
+        "mov.l   @r15+,r4        \n"
+        "mov.l   @r15+,r5        \n"
+        "mov.l   @r15+,r6        \n"
+        "mov.l   @r15+,r7        \n"
+        "mov.l   @r15+,r8        \n"
+
+    ".gb_loop:                   \n"  /* loop for all bitplanes */
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r4              \n"
+        "rotcl   r0              \n"
+        "shlr    r5              \n"
+        "rotcl   r0              \n"
+        "shlr    r6              \n"
+        "rotcl   r0              \n"
+        "shlr    r7              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "mov.b   r0,@%0          \n"  /* store byte to bitplane */
+        "add     %2,%0           \n"  /* advance to next bitplane */
+        "cmp/hi  %0,%1           \n"  /* last bitplane done? */
+        "bt      .gb_loop        \n"  /* no: loop */
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(address),
+        /* %1 */ "r"(end_addr),
+        /* %2 */ "r"(graybuf->plane_size)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"
     );
 }
 
@@ -473,7 +612,7 @@ void gray_show_display(bool enable)
     if (enable)
     {
         graybuf->flags |= GRAY_RUNNING;
-        rb->plugin_register_timer(FREQ / 67, 1, timer_isr);
+        rb->plugin_register_timer(FREQ / 67, 1, gray_timer_isr);
     }
     else
     {
@@ -533,7 +672,7 @@ void gray_clear_display(void)
     if (graybuf == NULL)
         return;
 
-    rb->memset(graybuf->data, 0, graybuf->depth * graybuf->plane_size);
+    rb->memset(graybuf->data, 0, MULU16(graybuf->depth, graybuf->plane_size));
 }
 
 /* Set the grayscale display to all black
@@ -543,7 +682,7 @@ void gray_black_display(void)
     if (graybuf == NULL)
         return;
 
-    rb->memset(graybuf->data, 0xFF, graybuf->depth * graybuf->plane_size);
+    rb->memset(graybuf->data, 0xFF, MULU16(graybuf->depth, graybuf->plane_size));
 }
 
 /* Do a lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
@@ -567,8 +706,8 @@ void gray_deferred_update(void)
  */
 void gray_scroll_left(int count, bool black_border)
 {
-    int x, by, d;
-    unsigned char *src, *dest;
+    int by, d;
+    unsigned char *ptr;
     unsigned char filler;
 
     if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
@@ -582,17 +721,42 @@ void gray_scroll_left(int count, bool black_border)
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 0; by < graybuf->bheight; by++)
     {
+        ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
-        {
-            dest = graybuf->data + graybuf->plane_size * d 
-                   + graybuf->width * by;
-            src = dest + count;
+        {   
+            if (count & 1)  /* odd count: scroll byte-wise */
+                asm volatile (
+                ".sl_loop1:                   \n"
+                    "mov.b   @%0+,r1          \n"
+                    "mov.b   r1,@(%2,%0)      \n"
+                    "cmp/hi  %0,%1            \n"
+                    "bt      .sl_loop1        \n"
+                    : /* outputs */
+                    : /* inputs */
+                    /* %0 */ "r"(ptr + count),
+                    /* %1 */ "r"(ptr + graybuf->width),
+                    /* %2 */ "z"(-count - 1)
+                    : /* clobbers */
+                    "r1"
+                );
+            else           /* even count: scroll word-wise */
+                asm volatile (
+                ".sl_loop2:                   \n"
+                    "mov.w   @%0+,r1          \n"
+                    "mov.w   r1,@(%2,%0)      \n"
+                    "cmp/hi  %0,%1            \n"
+                    "bt      .sl_loop2        \n"
+                    : /* outputs */
+                    : /* inputs */
+                    /* %0 */ "r"(ptr + count),
+                    /* %1 */ "r"(ptr + graybuf->width),
+                    /* %2 */ "z"(-count - 2)
+                    : /* clobbers */
+                    "r1"
+                );
 
-            for (x = count; x < graybuf->width; x++)
-                *dest++ = *src++;
-
-            for (x = 0; x < count; x++)
-                *dest++ = filler;
+            rb->memset(ptr + graybuf->width - count, filler, count);
+            ptr += graybuf->plane_size;
         }
     }
 }
@@ -604,8 +768,8 @@ void gray_scroll_left(int count, bool black_border)
  */
 void gray_scroll_right(int count, bool black_border)
 {
-    int x, by, d;
-    unsigned char *src, *dest;
+    int by, d;
+    unsigned char *ptr;
     unsigned char filler;
 
     if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
@@ -619,17 +783,42 @@ void gray_scroll_right(int count, bool black_border)
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 0; by < graybuf->bheight; by++)
     {
+        ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
         {
-            dest = graybuf->data + graybuf->plane_size * d
-                   + graybuf->width * (by + 1) - 1;
-            src = dest - count;
+            if (count & 1)  /* odd count: scroll byte-wise */
+                asm volatile (
+                ".sr_loop1:                   \n"
+                    "mov.b   @(%2,%0),r1      \n"
+                    "mov.b   r1,@-%0          \n"
+                    "cmp/hs  %1,%0            \n"
+                    "bt      .sr_loop1        \n"
+                    : /* outputs */
+                    : /* inputs */
+                    /* %0 */ "r"(ptr + graybuf->width),
+                    /* %1 */ "r"(ptr + count),
+                    /* %2 */ "z"(-count - 1)
+                    : /* clobbers */
+                    "r1"
+                );
+            else            /* even count: scroll word-wise */
+                asm volatile (
+                ".sr_loop2:                   \n"
+                    "mov.w   @(%2,%0),r1      \n"
+                    "mov.w   r1,@-%0          \n"
+                    "cmp/hs  %1,%0            \n"
+                    "bt      .sr_loop2        \n"
+                    : /* outputs */
+                    : /* inputs */
+                    /* %0 */ "r"(ptr + graybuf->width),
+                    /* %1 */ "r"(ptr + count),
+                    /* %2 */ "z"(-count - 2)
+                    : /* clobbers */
+                    "r1"
+                );
 
-            for (x = count; x < graybuf->width; x++)
-                *dest-- = *src--;
-
-            for (x = 0; x < count; x++)
-                *dest-- = filler;
+            rb->memset(ptr, filler, count);
+            ptr += graybuf->plane_size;
         }
     }
 }
@@ -642,7 +831,7 @@ void gray_scroll_right(int count, bool black_border)
 void gray_scroll_up8(bool black_border)
 {
     int by, d;
-    unsigned char *src;
+    unsigned char *ptr;
     unsigned char filler;
 
     if (graybuf == NULL)
@@ -656,18 +845,19 @@ void gray_scroll_up8(bool black_border)
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 1; by < graybuf->bheight; by++)
     {
+        ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
         {
-            src = graybuf->data + graybuf->plane_size * d 
-                  + graybuf->width * by;
-            
-            rb->memcpy(src - graybuf->width, src, graybuf->width);
+            rb->memcpy(ptr - graybuf->width, ptr, graybuf->width);
+            ptr += graybuf->plane_size;
         }
     }
-    for (d = 0; d < graybuf->depth; d++) /* fill last row */
+    /* fill last row */
+    ptr = graybuf->data + graybuf->plane_size - graybuf->width;
+    for (d = 0; d < graybuf->depth; d++) 
     {
-        rb->memset(graybuf->data + graybuf->plane_size * (d + 1)
-                   - graybuf->width, filler, graybuf->width);
+        rb->memset(ptr, filler, graybuf->width);
+        ptr += graybuf->plane_size;
     }
 }
 
@@ -679,7 +869,7 @@ void gray_scroll_up8(bool black_border)
 void gray_scroll_down8(bool black_border)
 {
     int by, d;
-    unsigned char *dest;
+    unsigned char *ptr;
     unsigned char filler;
 
     if (graybuf == NULL)
@@ -693,18 +883,19 @@ void gray_scroll_down8(bool black_border)
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = graybuf->bheight - 1; by > 0; by--)
     {
+        ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
         {
-            dest = graybuf->data + graybuf->plane_size * d 
-                   + graybuf->width * by;
-            
-            rb->memcpy(dest, dest - graybuf->width, graybuf->width);
+            rb->memcpy(ptr, ptr - graybuf->width, graybuf->width);
+            ptr += graybuf->plane_size;
         }
     }
-    for (d = 0; d < graybuf->depth; d++) /* fill first row */
+    /* fill first row */
+    ptr = graybuf->data;
+    for (d = 0; d < graybuf->depth; d++) 
     {
-        rb->memset(graybuf->data + graybuf->plane_size * d, filler,
-                   graybuf->width);
+        rb->memset(ptr, filler, graybuf->width);
+        ptr += graybuf->plane_size;
     }
 }
 
@@ -858,8 +1049,8 @@ void gray_drawpixel(int x, int y, int brightness)
         || (unsigned) brightness > 255)
         return;
 
-    graypixel(x, y, graybuf->bitpattern[(brightness
-                    * (graybuf->depth + 1)) >> 8]);
+    graypixel(x, y, graybuf->bitpattern[MULU16(brightness,
+                    graybuf->depth + 1) >> 8]);
 }
 
 /* Invert a pixel
@@ -899,10 +1090,12 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
         || (unsigned) brightness > 255)
         return;
 
-    pattern = graybuf->bitpattern[(brightness * (graybuf->depth + 1)) >> 8];
+    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
+    xinc2 = 1;
+    yinc2 = 1;
 
     if (deltax >= deltay)
     {
@@ -911,9 +1104,7 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
         dinc1 = deltay * 2;
         dinc2 = (deltay - deltax) * 2;
         xinc1 = 1;
-        xinc2 = 1;
         yinc1 = 0;
-        yinc2 = 1;
     }
     else
     {
@@ -922,9 +1113,7 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
         dinc1 = deltax * 2;
         dinc2 = (deltax - deltay) * 2;
         xinc1 = 0;
-        xinc2 = 1;
         yinc1 = 1;
-        yinc2 = 1;
     }
     numpixels++; /* include endpoints */
 
@@ -985,6 +1174,8 @@ void gray_invertline(int x1, int y1, int x2, int y2)
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
+    xinc2 = 1;
+    yinc2 = 1;
 
     if (deltax >= deltay)
     {
@@ -993,9 +1184,7 @@ void gray_invertline(int x1, int y1, int x2, int y2)
         dinc1 = deltay * 2;
         dinc2 = (deltay - deltax) * 2;
         xinc1 = 1;
-        xinc2 = 1;
         yinc1 = 0;
-        yinc2 = 1;
     }
     else
     {
@@ -1004,9 +1193,7 @@ void gray_invertline(int x1, int y1, int x2, int y2)
         dinc1 = deltax * 2;
         dinc2 = (deltax - deltay) * 2;
         xinc1 = 0;
-        xinc2 = 1;
         yinc1 = 1;
-        yinc2 = 1;
     }
     numpixels++; /* include endpoints */
 
@@ -1053,6 +1240,7 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
 {
     int x, y;
     unsigned long pattern;
+    unsigned char srcpixel;
 
     if (graybuf == NULL 
         || (unsigned) x1 >= (unsigned) graybuf->width
@@ -1061,8 +1249,6 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
         || (unsigned) y2 >= (unsigned) graybuf->height
         || (unsigned) brightness > 255)
         return;
-
-    pattern = graybuf->bitpattern[(brightness * (graybuf->depth + 1)) >> 8];
 
     if (y1 > y2)
     {
@@ -1077,15 +1263,30 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
         x2 = x;
     }
 
-    for (x = x1; x <= x2; x++)
+    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
+    srcpixel = brightness;
+
+    for (x = x1 + 1; x < x2; x++)
     {
         graypixel(x, y1, pattern);
         graypixel(x, y2, pattern);
     }
-    for (y = y1; y <= y2; y++)
+    for (y = y1; y <= y2; )
     {
-        graypixel(x1, y, pattern);
-        graypixel(x2, y, pattern);
+        if (!(y & 7) && (y2 - y >= 7))
+        /* current row byte aligned in fb & at least 8 rows left */
+        {
+            /* shortcut: draw all 8 rows at once: 2..3 times faster */
+            grayblock(x1, y >> 3, &srcpixel, 0);
+            grayblock(x2, y >> 3, &srcpixel, 0);
+            y += 8;
+        }
+        else
+        {
+            graypixel(x1, y, pattern);
+            graypixel(x2, y, pattern);
+            y++;
+        }
     }
 }
 
@@ -1098,6 +1299,7 @@ void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
 {
     int x, y;
     unsigned long pattern;
+    unsigned char srcpixel;
 
     if (graybuf == NULL 
         || (unsigned) x1 >= (unsigned) graybuf->width
@@ -1120,13 +1322,28 @@ void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
         x2 = x;
     }
 
-    pattern = graybuf->bitpattern[(brightness * (graybuf->depth + 1)) >> 8];
+    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
+    srcpixel = brightness;
 
-    for (y = y1; y <= y2; y++)
+    for (y = y1; y <= y2; )
     {
-        for (x = x1; x <= x2; x++)
+        if (!(y & 7) && (y2 - y >= 7))
+        /* current row byte aligned in fb & at least 8 rows left */
         {
-            graypixel(x, y, pattern);
+            for (x = x1; x <= x2; x++)
+            {
+                /* shortcut: draw all 8 rows at once: 2..3 times faster */
+                grayblock(x, y >> 3, &srcpixel, 0);
+            }
+            y += 8;
+        }
+        else
+        {
+            for (x = x1; x <= x2; x++)
+            {
+                graypixel(x, y, pattern);
+            }
+            y++;
         }
     }
 }
@@ -1218,14 +1435,30 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
     if ((x + nx) >= graybuf->width) /* clip right */
         nx = graybuf->width - x;
 
-    for (yi = y; yi < y + ny; yi++)
+    for (yi = y; yi < y + ny; )
     {
     	row = src;
-    	src += stride;
-        for (xi = x; xi < x + nx; xi++)
+
+        if (!(yi & 7) && (y + ny - yi > 7))
+        /* current row byte aligned in fb & at least 8 rows left */
         {
-            graypixel(xi, yi, graybuf->bitpattern[((int)(*row++)
-                              * (graybuf->depth + 1)) >> 8]);
+            for (xi = x; xi < x + nx; xi++)
+            {
+                /* shortcut: draw all 8 rows at once: 2..3 times faster */
+                grayblock(xi, yi >> 3, row++, stride);
+            }
+            yi += 8;
+    	    src += stride << 3;
+        }
+        else
+        {
+            for (xi = x; xi < x + nx; xi++)
+            {
+                graypixel(xi, yi, graybuf->bitpattern[MULU16(*row++,
+                                  graybuf->depth + 1) >> 8]);
+            }
+            yi++;
+    	    src += stride;
         }
     }
 }
@@ -1258,7 +1491,7 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
     unsigned long fg_pattern, bg_pattern;
     unsigned char *col;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height
         || (unsigned) fg_brightness > 255
@@ -1271,11 +1504,11 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
     if ((x + nx) >= graybuf->width) /* clip right */
         nx = graybuf->width - x;
 
-    fg_pattern = graybuf->bitpattern[(fg_brightness
-                                      * (graybuf->depth + 1)) >> 8];
+    fg_pattern = graybuf->bitpattern[MULU16(fg_brightness,
+                                     graybuf->depth + 1) >> 8];
 
-    bg_pattern = graybuf->bitpattern[(bg_brightness
-                                      * (graybuf->depth + 1)) >> 8];
+    bg_pattern = graybuf->bitpattern[MULU16(bg_brightness,
+                                     graybuf->depth + 1) >> 8];
 
     for (xi = x; xi < x + nx; xi++)
     {
@@ -1410,7 +1643,7 @@ int main(void)
 
     gray_fillrect(0, 0, 111, 55, 150); /* fill everything with gray 150 */
 
-    /* draw a dark gray star background */
+    /* draw a dark gray line star background */
     for (y = 0; y < 56; y += 8)        /* horizontal part */
     {
     	gray_drawline(0, y, 111, 55 - y, 80); /* gray lines */
@@ -1466,7 +1699,7 @@ int main(void)
             black_border = true;
             
         if (button & BUTTON_REPEAT)
-            scroll_amount = 3;
+            scroll_amount = 4;
 
         switch(button & ~(BUTTON_ON | BUTTON_REPEAT))
         {
