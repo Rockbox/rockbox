@@ -355,6 +355,7 @@ static char* get_tag(struct mp3entry* cid3,
     {
         case 'I':  /* ID3 Information */
             id3 = nid3; /* display next-song data */
+            *flags |= WPS_REFRESH_DYNAMIC;
             if(!id3)
                 return NULL; /* no such info (yet) */
             /* fall-through */
@@ -422,6 +423,7 @@ static char* get_tag(struct mp3entry* cid3,
 
         case 'F':  /* File Information */
             id3 = nid3;
+            *flags |= WPS_REFRESH_DYNAMIC;
             if(!id3)
                 return NULL; /* no such info (yet) */
             /* fall-through */
@@ -581,6 +583,7 @@ static char* get_tag(struct mp3entry* cid3,
 
         case 'D': /* Directory path information */
             id3 = nid3; /* next song please! */
+            *flags |= WPS_REFRESH_DYNAMIC;
             if(!id3)
                 return NULL; /* no such info (yet) */
             /* fall-through */

@@ -433,11 +433,11 @@ static bool update(void)
     bool track_changed = mpeg_has_changed_track();
     bool retcode = false;
 
+    nid3 = mpeg_next_track();
     if (track_changed)
     {
         lcd_stop_scroll();
         id3 = mpeg_current_track();
-        nid3 = mpeg_next_track();
         if (wps_display(id3, nid3))
             retcode = true;
         else
