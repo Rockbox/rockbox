@@ -151,7 +151,7 @@ new:
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. Low?"
+eng: "Partition?"
 new:
 
 id: LANG_SETTINGS_SAVE_RECORDER
@@ -161,7 +161,7 @@ new:
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is Battery Low?"
+eng: "No partition?"
 new:
 
 id: LANG_TIME_SET
