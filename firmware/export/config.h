@@ -33,7 +33,7 @@
 
 /* CONFIG_CPU */
 #define SH7034  7034
-#define SCF5249 5249
+#define MCF5249 5249
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD   0
