@@ -75,5 +75,6 @@ enum {
 };
 
 bool mp3info(struct mp3entry *entry, char *filename);
+char* id3_get_genre(struct mp3entry* id3);
 
 #endif
