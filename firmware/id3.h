@@ -19,8 +19,6 @@
 #ifndef ID3_H
 #define ID3_H
 
-#define VARIABLE_BIT_RATE 1
-
 struct mp3entry {
     char path[256];
     char *title;
@@ -29,6 +27,7 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
+    bool vbr;
     unsigned int bitrate;
     unsigned int frequency;
     unsigned int id3v2len;

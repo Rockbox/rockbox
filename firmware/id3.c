@@ -490,13 +490,15 @@ static int getsonglength(int fd, struct mp3entry *entry)
        frame[34] == 'n' &&
        frame[35] == 'g')
     {
+        /* Yes, it is a VBR file */
+        entry->vbr = true;
+        
         if(frame[39] & 0x01) /* Is the frame count there? */
         {
             framecount = (frame[40] << 24) | (frame[41] << 16) |
                 (frame[42] << 8) | frame[43];
 
             filetime = framecount * tpf;
-            entry->bitrate = VARIABLE_BIT_RATE;
         }
         /* We don't care about the file size and the TOC just yet. Maybe
            another time. */
