@@ -255,6 +255,16 @@ struct plugin_api {
                              unsigned char *buf, int num_frames,
                              unsigned long header_template,
                              void (*progressfunc)(int), bool generate_toc);
+
+#ifndef SIMULATOR
+   int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
+   int (*mas_writemem)(int bank, int addr, unsigned long* src, int len);
+   int (*mas_readreg)(int reg);
+   int (*mas_writereg)(int reg, unsigned int val);
+#ifdef HAVE_MAS3587F
+   int (*mas_codec_writereg)(int reg, unsigned int val);
+#endif
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */

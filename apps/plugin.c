@@ -220,6 +220,16 @@ static struct plugin_api rockbox_api = {
     mp3info,
     count_mp3_frames,
     create_xing_header,
+
+#ifndef SIMULATOR
+    mas_readmem,
+    mas_writemem,
+    mas_readreg,
+    mas_writereg,
+#ifdef HAVE_MAS3587F
+    mas_codec_writereg,
+#endif
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)
