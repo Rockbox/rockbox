@@ -709,8 +709,8 @@ void mpeg_init(void)
     /* DSP scale 100% */
     mas_codec_writereg(7, 0x4000);
 
-    /* Disable S/PDIF, SDO and SDI */
-    val = 0x2d;
+    /* Disable SDO and SDI */
+    val = 0x0d;
     mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
 
     /* Set Demand mode and validate all settings */
