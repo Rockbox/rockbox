@@ -91,4 +91,6 @@ extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
 extern void tick_start(unsigned int interval_in_ms);
 
+#define IS_SYSEVENT(ev) ((ev & SYS_EVENT) == SYS_EVENT)
+
 #endif
