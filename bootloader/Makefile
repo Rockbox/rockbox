@@ -9,7 +9,7 @@
 
 INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)
 
-DEPFILE = $(OBJDIR)/dep-apps
+DEPFILE = $(OBJDIR)/dep-bootloader
 LDS := $(FIRMDIR)/boot.lds
 
 ifdef DEBUG
