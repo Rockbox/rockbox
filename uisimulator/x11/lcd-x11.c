@@ -46,8 +46,6 @@ extern Display *dpy;
 #ifdef HAVE_LCD_BITMAP
 unsigned char lcd_framebuffer_copy[LCD_HEIGHT/8][LCD_WIDTH];
 
-static int counter;
-
 void lcd_set_invert_display(bool invert)
 {
     (void)invert;
