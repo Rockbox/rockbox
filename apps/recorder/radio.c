@@ -42,6 +42,7 @@
 #include "screens.h"
 #include "peakmeter.h"
 #include "lang.h"
+#include "font.h"
 
 #ifdef HAVE_FMRADIO
 
@@ -107,20 +108,27 @@ bool radio_screen(void)
     int val;
     int freq;
     int i_freq;
-    bool lock;
-    bool stereo;
+    bool stereo = false;
     int search_dir = 0;
     int fw, fh;
-    
+    int last_stereo_status = false;
+    int top_of_screen = 0;
     bool update_screen = true;
     int timeout = current_tick + HZ/10;
+    bool screen_freeze = false;
 
     lcd_clear_display();
     lcd_setmargins(0, 8);
     status_draw(true);
     fmradio_set_status(FMRADIO_PLAYING);
-    lcd_getstringsize("A", &fw, &fh);
 
+    font_get(FONT_UI);
+    lcd_getstringsize("M", &fw, &fh);
+
+    /* Adjust for font size, trying to center the information vertically */
+    if(fh < 10)
+        top_of_screen = 1;
+    
     radio_load_presets();
 
     mpeg_stop();
@@ -133,8 +141,10 @@ bool radio_screen(void)
     fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
     radio_set_frequency(curr_freq);
     curr_preset = find_preset(curr_freq);
-    
-    peak_meter_playback(true);
+
+    /* We use the A/D pseudo peak */
+    peak_meter_playback(false);
+    peak_meter_enabled = true;
 
     buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
                   NULL);
@@ -198,6 +208,7 @@ bool radio_screen(void)
                 radio_set_frequency(curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
+                update_screen = true;
                 break;
 
             case BUTTON_RIGHT:
@@ -208,6 +219,7 @@ bool radio_screen(void)
                 radio_set_frequency(curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
+                update_screen = true;
                 break;
 
             case BUTTON_LEFT | BUTTON_REPEAT:
@@ -260,6 +272,20 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
                 
+            case BUTTON_F3:
+                if(!screen_freeze)
+                {
+                    splash(0, 0, true, "Screen frozen");
+                    lcd_update();
+                    screen_freeze = true;
+                }
+                else
+                {
+                    update_screen = true;
+                    screen_freeze = false;
+                }
+                break;
+                
             case SYS_USB_CONNECTED:
                 usb_screen();
                 fmradio_set_status(0);
@@ -268,41 +294,58 @@ bool radio_screen(void)
 
         peak_meter_peek();
 
-        lcd_clearrect(0, 8 + fh*4, LCD_WIDTH, fh);
-        peak_meter_draw(0, 8 + fh*4, LCD_WIDTH, fh);
-        lcd_update_rect(0, 8 + fh*4, LCD_WIDTH, fh);
-        
-        if(update_screen || TIME_AFTER(current_tick, timeout))
+        if(!screen_freeze)
         {
-            update_screen = false;
-
-            timeout = current_tick + HZ/2;
-
-            freq = curr_freq / 100000;
-            snprintf(buf, 128, str(LANG_FM_STATION), freq / 10, freq % 10);
-            lcd_puts(0, 2, buf);
-
-            val = fmradio_read(3);
-            stereo = (val & 0x100000)?true:false;
-            lock = (val & 0x80000)?true:false;
-            snprintf(buf, 128,
-                     stereo?str(LANG_CHANNEL_STEREO):str(LANG_CHANNEL_MONO));
-            lcd_puts(0, 3, buf);
-
-            if(curr_preset >= 0)
-            {
-                lcd_puts_scroll(0, 1, presets[curr_preset].name);
-            }
-            else
-            {
-                lcd_clearrect(0, 8+fh*1, LCD_WIDTH, fh);
-            }
-
-            status_draw(true);
+            lcd_setmargins(0, 8);
+            lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+            peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+            lcd_update_rect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
             
-            buttonbar_draw();
-
-            lcd_update();
+            if(TIME_AFTER(current_tick, timeout))
+            {
+                timeout = current_tick + HZ;
+                
+                val = fmradio_read(3);
+                stereo = (val & 0x100000)?true:false;
+                if(stereo != last_stereo_status)
+                {
+                    update_screen = true;
+                    last_stereo_status = stereo;
+                }
+            }
+            
+            if(update_screen)
+            {
+                lcd_setfont(FONT_UI);
+                
+                if(curr_preset >= 0)
+                {
+                    lcd_puts_scroll(0, top_of_screen,
+                                    presets[curr_preset].name);
+                }
+                else
+                {
+                    lcd_clearrect(0, 8 + top_of_screen*fh, LCD_WIDTH, fh);
+                }
+                
+                freq = curr_freq / 100000;
+                snprintf(buf, 128, str(LANG_FM_STATION), freq / 10, freq % 10);
+                lcd_puts(0, top_of_screen + 1, buf);
+                
+                snprintf(buf, 128,
+                         stereo?str(LANG_CHANNEL_STEREO):
+                         str(LANG_CHANNEL_MONO));
+                lcd_puts(0, top_of_screen + 2, buf);
+                
+                /* Only force the redraw if update_screen is true */
+                status_draw(update_screen);
+                
+                buttonbar_draw();
+                
+                lcd_update();
+                
+                update_screen = false;
+            }
         }
     }
 
