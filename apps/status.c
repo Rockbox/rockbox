@@ -69,7 +69,7 @@ void status_draw(void)
 {
     int battlevel = battery_level();
     int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && defined(HAVE_RTC)
     int hour, minute;
 #endif
     
