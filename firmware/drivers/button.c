@@ -31,9 +31,17 @@
 
 struct event_queue button_queue;
 
+/* how often we check to see if a button is pressed */
 #define POLL_FREQUENCY    HZ/20
+
+/* how long until repeat kicks in */
 #define REPEAT_START      6
-#define REPEAT_INTERVAL   4
+
+/* the speed repeat starts at */
+#define REPEAT_INTERVAL_START   8
+
+/* speed repeat finishes at */
+#define REPEAT_INTERVAL_FINISH  2
 
 static int repeat_mask = DEFAULT_REPEAT_MASK;
 static int release_mask = DEFAULT_RELEASE_MASK;
@@ -45,6 +53,7 @@ static void button_tick(void)
     static int tick=0;
     static int count=0;
     static int lastbtn=0;
+    static int repeat_speed=REPEAT_INTERVAL_START;
     static bool repeat=false;
     int diff;
 
@@ -69,14 +78,21 @@ static void button_tick(void)
             {
                 post = true;
                 repeat = false;
+                repeat_speed = REPEAT_INTERVAL_START;
+                
             }
             else /* repeat? */
             {
                 if ( repeat )
                 {
-                    if ( ! --count ) {
+                    count--;
+                    if (count == 0) {
                         post = true;
-                        count = REPEAT_INTERVAL;
+                        /* yes we have repeat */
+			repeat_speed--;
+                        if (repeat_speed < REPEAT_INTERVAL_FINISH)
+                           repeat_speed = REPEAT_INTERVAL_FINISH;
+                        count = repeat_speed;
                     }
                 }
                 else
@@ -95,7 +111,8 @@ static void button_tick(void)
                             {
                                 post = true;
                                 repeat = true;
-                                count = REPEAT_INTERVAL;
+                                /* initial repeat */
+                                count = REPEAT_INTERVAL_START; 
                             }
                             /* If the OFF button is pressed long enough,
                                and we are still alive, then the unit must be
