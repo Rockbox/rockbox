@@ -775,16 +775,15 @@ bool dbg_mas(void)
         case BUTTON_DOWN:
 #else
         case BUTTON_RIGHT:
-#endif
-            addr += NUMROWS;
+#endif      
+            addr = (addr + NUMROWS) & 0xFF;  /* register addrs are 8 bit */
             break;
 #ifdef HAVE_RECORDER_KEYPAD
         case BUTTON_UP:
 #else
         case BUTTON_LEFT:
 #endif
-            if(addr)
-                addr -= NUMROWS;
+            addr = (addr - NUMROWS) & 0xFF;  /* register addrs are 8 bit */
             break;
 #ifdef HAVE_RECORDER_KEYPAD
         case BUTTON_LEFT:
