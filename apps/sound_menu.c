@@ -25,6 +25,13 @@
 #include "mpeg.h"
 #include "settings.h"
 
+static char *fmt[] =
+{
+    "",                 /* no decimals */
+    "%d.%d %s  ",       /* 1 decimal */
+    "%d.%02d %s  "      /* 2 decimals */
+};
+
 void set_sound(char* string, 
                int* variable,
                int setting)
@@ -32,10 +39,14 @@ void set_sound(char* string,
     bool done = false;
     int min, max;
     int val;
+    int numdec;
+    int integer;
+    int dec;
     char* unit;
     char str[32];
 
     unit = mpeg_sound_unit(setting);
+    numdec = mpeg_sound_numdecimals(setting);
     min = mpeg_sound_min(setting);
     max = mpeg_sound_max(setting);
     
@@ -44,7 +55,16 @@ void set_sound(char* string,
 
     while (!done) {
         val = mpeg_val2phys(setting, *variable);
-        snprintf(str,sizeof str,"%d %s  ", val, unit);
+        if(numdec)
+        {
+            integer = val / (10 * numdec);
+            dec = val % (10 * numdec);
+            snprintf(str,sizeof str, fmt[numdec], integer, dec, unit);
+        }
+        else
+        {
+            snprintf(str,sizeof str,"%d %s  ", val, unit);
+        }
         lcd_puts(0,1,str);
         lcd_update();
 
