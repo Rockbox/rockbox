@@ -192,7 +192,6 @@ char* playlist_peek(int steps)
 
     if('/' == buf[0]) {
         strcpy(now_playing, &buf[0]);
-        return now_playing;
     }
     else {
         strncpy(dir_buf, playlist.filename, playlist.dirlen-1);
@@ -201,7 +200,6 @@ char* playlist_peek(int steps)
         /* handle dos style drive letter */
         if ( ':' == buf[1] ) {
             strcpy(now_playing, &buf[2]);
-            return now_playing;
         }
         else if ( '.' == buf[0] && '.' == buf[1] && '/' == buf[2] ) {
             /* handle relative paths */
@@ -218,17 +216,35 @@ char* playlist_peek(int steps)
                     break;
             }
             snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[seek]);
-            return now_playing;
         }
         else if ( '.' == buf[0] && '/' == buf[1] ) {
             snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[2]);
-            return now_playing;
         }
         else {
             snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, buf);
-            return now_playing;
         }
     }
+
+    buf = now_playing;
+
+    /* remove bogus dirs from beginning of path
+       (workaround for buggy playlist creation tools) */
+    while (buf)
+    {
+        fd = open(buf, O_RDONLY);
+        if (fd > 0)
+        {
+            close(fd);
+            break;
+        }
+
+        buf = strchr(buf+1, '/');
+    }
+
+    if (buf)
+        return buf;
+
+    return now_playing;
 }
 
 /*
