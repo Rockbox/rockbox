@@ -773,8 +773,11 @@ void splash(int ticks,   /* how long the splash is displayed */
                 if(y > (LCD_HEIGHT-h))
                     /* STOP */
                     break;
-                if(center)
+                if(center) {
                     x = (LCD_WIDTH-widths[line])/2;
+                    if(x < 0)
+                       x = 0;
+                }
                 else
                     x=0;
             }
