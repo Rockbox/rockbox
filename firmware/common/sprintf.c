@@ -100,10 +100,10 @@ int vsnprintf (char *buf, int size, const char *fmt, va_list ap)
 	    if (width > 0)
 	    {
 		width -= strlen (str);
-		while (width-- > 0 && buf < end)
+		while (width-- > 0 && bp < end)
 		    *bp++ = pad;
 	    }
-	    while (*str != '\0' && buf < end)
+	    while (*str != '\0' && bp < end)
 		*bp++ = *str++;
 	}
 	else
