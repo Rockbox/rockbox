@@ -210,7 +210,6 @@ def main():
     print 'Generating notification message... done.'
 
 
-
 
 if __name__ == '__main__':
     main()
