@@ -60,9 +60,7 @@ static void  display_bookmark(char* bookmark,
                               int bookmark_count);
 static void  say_bookmark(char* bookmark,
                           int bookmark_id);
-static bool  generate_bookmark_file_name(char *in,
-                                         char *out,
-                                         unsigned int max_length);
+static bool  generate_bookmark_file_name(char *in);
 static char* get_bookmark(char* bookmark_file, int bookmark_count);
 static bool  parse_bookmark(char *bookmark,
                             int *resume_index,
@@ -147,9 +145,7 @@ static bool bookmark_load_menu(void)
     {
         char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
-        if (generate_bookmark_file_name(name,
-                                        global_bookmark_file_name,
-                                        sizeof(global_bookmark_file_name)))
+        if (generate_bookmark_file_name(name))
         {
             bookmark = select_bookmark(global_bookmark_file_name);
             if (!bookmark)
@@ -319,9 +315,7 @@ static bool write_bookmark(bool create_bookmark_file)
     {
         char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
-        if (generate_bookmark_file_name(name,
-                                        global_bookmark_file_name,
-                                        sizeof(global_bookmark_file_name)))
+        if (generate_bookmark_file_name(name))
         {
             success = add_bookmark(global_bookmark_file_name, bookmark);
         }
@@ -475,9 +469,7 @@ bool bookmark_autoload(char* file)
         return false;
 
     /*Checking to see if a bookmark file exists.*/
-    if(!generate_bookmark_file_name(file,
-                                   global_bookmark_file_name,
-                                   sizeof(global_bookmark_file_name)))
+    if(!generate_bookmark_file_name(file))
     {
         return false;
     }
@@ -1109,33 +1101,21 @@ static bool parse_bookmark(char *bookmark,
 /* it would be here that the centralized/decentralized bookmark code       */
 /* could be placed.                                                        */
 /* ----------------------------------------------------------------------- */
-static bool generate_bookmark_file_name(char *in, char *out,
-                                        unsigned int max_length)
+static bool generate_bookmark_file_name(char *in)
 {
-    char* cp;
+    int len = strlen(in);
 
-    if (!in || !out || max_length <= 0)
-        return false;
-
-    if (max_length < strlen(in)+6)
-        return false;
-
-    /* if this is a root dir MP3, rename the boomark file root_dir.bmark */
+    /* if this is a root dir MP3, rename the bookmark file root_dir.bmark */
     /* otherwise, name it based on the in variable */
-    cp = in;
-
-    cp = in + strlen(in) - 1;
-    if (*cp == '/')
-        *cp = 0;
-
-    cp = in;
-    if (*cp == '/')
-        cp++;
-
-    if (strlen(in) > 0)
-        snprintf(out, max_length, "/%s.%s", cp, "bmark");
+    if (!strcmp("/", in))
+        strcpy(global_bookmark_file_name, "/root_dir.bmark");
     else
-        snprintf(out, max_length, "/root_dir.%s", "bmark");
+    {
+        strcpy(global_bookmark_file_name, in);
+        if(global_bookmark_file_name[len-1] == '/')
+            len--;
+        strcpy(&global_bookmark_file_name[len], ".bmark");
+    }
 
     return true;
 }
