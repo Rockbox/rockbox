@@ -30,10 +30,6 @@
 #include "system.h"
 #include "font.h"
 
-#if defined(SIMULATOR)
-#include "sim_icons.h"
-#endif
-
 /*** definitions ***/
 
 #ifdef HAVE_NEW_CHARCELL_LCD
