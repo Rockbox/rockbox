@@ -4,7 +4,8 @@
 #include "head.t"
 
 <p class="ingress"> Rockbox is an Open Source replacement firmware for the
-Archos Jukebox 5000, 6000, Studio, Recorder, FM Recorder and Recorder V2 MP3 players.
+Archos Jukebox 5000, 6000, Studio, Recorder, FM Recorder, Recorder V2 and
+Ondio MP3 players.
 
 <p> Rockbox is a complete rewrite and uses no fragments of the original
 firmware. It boasts <a href="/docs/features.html">numerous features</a> while
