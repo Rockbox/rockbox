@@ -221,6 +221,9 @@ int plugin_load(char* plugin, void* parameter)
 #else
     int fd;
 #endif
+#ifdef HAVE_LCD_BITMAP
+    int xm,ym;
+#endif
 
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
@@ -229,7 +232,6 @@ int plugin_load(char* plugin, void* parameter)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    int xm,ym;
     lcd_clear_display();
     xm = lcd_getxmargin();
     ym = lcd_getymargin();

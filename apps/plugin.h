@@ -217,7 +217,7 @@ struct plugin_api {
 #endif
     void (*plugin_tsr)(void (*exit_callback)(void));
     int (*create_thread)(void* function, void* stack, int stack_size, char *name);
-    void (*remove_tread)(void);
+    void (*remove_tread)(int threadnum);
     void (*lcd_set_contrast)(int x);
 
     /* playback control */
