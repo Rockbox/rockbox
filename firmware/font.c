@@ -67,14 +67,15 @@ static int readshort(unsigned short *sp)
     return (fileptr <= eofptr);
 }
 
-static int readlong(unsigned long *lp)
+static long readlong(unsigned long *lp)
 {
     unsigned long l;
 
     l = *fileptr++ & 0xff;
     l |= *fileptr++ << 8;
-    l |= *fileptr++ << 16;
-    *lp = (*fileptr++ << 24) | l;
+    l |= ((unsigned long)(*fileptr++)) << 16;
+    l |= ((unsigned long)(*fileptr++)) << 24;
+    *lp = l;
     return (fileptr <= eofptr);
 }
 
