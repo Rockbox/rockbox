@@ -285,7 +285,7 @@ bool battery_level_safe(void)
     if (power_history[POWER_HISTORY_LEN-1])
         return power_history[POWER_HISTORY_LEN-1] > BATTERY_LEVEL_DANGEROUS;
     else
-        return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000) /
+        return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000L) /
             BATTERY_SCALE_FACTOR;
 }
 
