@@ -9,3 +9,6 @@
 
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A
+
+/* Define this to the CPU frequency */
+#define CPU_FREQ 12000000 /* cycle time ~83.3ns */

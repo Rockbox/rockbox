@@ -21,3 +21,6 @@
 
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1
+
+/* Define this to the CPU frequency */
+#define CPU_FREQ      11059200

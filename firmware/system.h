@@ -23,11 +23,7 @@
 #include "sh7034.h"
 #include "config.h"
 
-#ifdef ARCHOS_RECORDER
-# define FREQ     11059200
-#else
-# define FREQ     12000000 /* cycle time ~83.3ns */
-#endif
+#define FREQ CPU_FREQ
 #define BAUDRATE 9600
 
 #ifndef NULL
