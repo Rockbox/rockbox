@@ -105,14 +105,14 @@ int x11_open(char *name, int opts)
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
     debugf("We open the real file '%s'\n", buffer);
-    return open(buffer, opts);
+    return (open)(buffer, opts);
   }
-  return open(name, opts);
+  return (open)(name, opts);
 }
 
 int x11_close(int fd)
 {
-  return close(fd);
+  return (close)(fd);
 }
 
 int x11_creat(char *name, int mode)
@@ -123,9 +123,9 @@ int x11_creat(char *name, int mode)
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
     debugf("We create the real file '%s'\n", buffer);
-    return creat(buffer, mode);
+    return (creat)(buffer, mode);
   }
-  return creat(name, mode);
+  return (creat)(name, mode);
 }
 
 int x11_remove(char *name)
@@ -136,9 +136,9 @@ int x11_remove(char *name)
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
     debugf("We remove the real file '%s'\n", buffer);
-    return remove(buffer);
+    return (remove)(buffer);
   }
-  return remove(name);
+  return (remove)(name);
 }
 
 int x11_rename(char *oldpath, char* newpath)
@@ -151,7 +151,7 @@ int x11_rename(char *oldpath, char* newpath)
       sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
 
       debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
-      return rename(buffer1, buffer2);
+      return (rename)(buffer1, buffer2);
   }
   return -1;
 }
