@@ -34,5 +34,6 @@
 
 extern int dac_volume(unsigned int left, unsigned int right, bool deemph);
 extern int dac_config(int value);
+extern void dac_init(void);
 
 #endif

@@ -1327,6 +1327,8 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 
     setup_sci0();
 
+    dac_init();
+
 #ifdef HAVE_MAS3587F
     mas_reset();
     
@@ -1364,6 +1366,11 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 #endif
     
 #ifdef HAVE_MAS3507D
+    PBDR &= ~0x20;
+    sleep(HZ/5);
+    PBDR |= 0x20;
+    sleep(HZ/5);
+    
     mas_readmem(MAS_BANK_D1, 0xff7, &mas_version_code, 1);
     
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */

@@ -37,7 +37,7 @@ int dac_volume(unsigned int left, unsigned int right, bool deemph)
     buf[1] = (left & 0x3f) | (deemph ? 0x40 : 0);
     buf[2] = right & 0x3f;
 
-    /* send read command */
+    /* send write command */
     if (i2c_write(DAC_DEV_WRITE,buf,3))
     {
         ret = -1;
@@ -66,7 +66,7 @@ int dac_config(int value)
     buf[0] = DAC_REG_WRITE | DAC_GCFG;
     buf[1] = value;
 
-    /* send read command */
+    /* send write command */
     if (i2c_write(DAC_DEV_WRITE,buf,2))
     {
         ret = -1;
@@ -74,4 +74,18 @@ int dac_config(int value)
 
     i2c_end();
     return ret;
+}
+
+void dac_init(void)
+{
+    unsigned char buf[2];
+
+    i2c_begin();
+
+    buf[0] = DAC_REG_WRITE | DAC_SR_REG;
+    buf[1] = 0x07;
+
+    /* send write command */
+    i2c_write(DAC_DEV_WRITE,buf,2);
+    i2c_end();
 }
