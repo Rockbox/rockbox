@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2002 Eric Linenberg
  * February 2003: Robert Hak performs a cleanup/rewrite/feature addition.
- *                Eric smiles.  Bjorn cris.  Linus say 'huh?'.
+ *                Eric smiles.  Bjorn cries.  Linus say 'huh?'.
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -24,6 +24,8 @@
 
 #ifdef USE_GAMES
 
+#include <sprintf.h>
+#include "ctype.h"
 #include "sokoban.h"
 #include "lcd.h"
 #include "button.h"
@@ -32,9 +34,6 @@
 #include "screens.h"
 #include "font.h"
 #include "file.h"
-
-#include "debug.h"
-#include "sokoban_levels.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -45,20 +44,25 @@
 
 #define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
-#define LEVELS_FILE         "/sokoban.levels"
-#define NUM_LEVELS          sizeof(levels)/320
+
+#define LEVELS_FILE         "/.rockbox/sokoban/levels.txt"
 
 #define ROWS                16
 #define COLS                20
 #define MAX_UNDOS           5
 
+#define SOKOBAN_LEVEL_SIZE (ROWS*COLS)
+
 static void init_undo(void);
 static void undo(void);
 static void add_undo(int button);
 
+static int get_level(char *level, int level_size);
+static int get_level_count(void);
+static int load_level(void);
+static void draw_level(void);
+
 static void init_boards(void);
-static void load_level(short level);
-static void draw_level(short level);
 static void update_screen(void);
 static bool sokoban_loop(void);
 
@@ -101,6 +105,9 @@ static struct BoardInfo {
     char board[ROWS][COLS];
     struct LevelInfo level;
     struct Location player;
+    int max_level;               /* How many levels do we have? */
+    int level_offset;            /* Where in the level file is this level */
+    int loaded_level;            /* Which level is in memory */
 } current_info;
 
 
@@ -239,34 +246,181 @@ static void init_boards(void)
     current_info.player.row = 0;
     current_info.player.col = 0;
     current_info.player.spot = ' ';
+    current_info.max_level = 0;
+    current_info.level_offset = 0;
+    current_info.loaded_level = 0;
 
     init_undo();
 }
 
-static void load_level(short level_to_load) 
+static int get_level_count(void) 
 {
-    short a = 0, b = 0, c = 0;
+    int i = 0;
+    int fd = 0;
+    int nread = 0;
+    char buffer[ROWS * COLS * 2];
+
+    if ((fd = open(LEVELS_FILE, O_RDONLY)) < 0) {
+        splash(0, 0, true, "Unable to open %s", LEVELS_FILE);
+        return -1;
+    }
+
+    do {
+        if ((nread = read(fd, buffer, sizeof(buffer))) < 0) {
+            splash(0, 0, true, "Reading %s failed.", LEVELS_FILE);
+            close(fd);
+            return -1;
+        }
+
+        for (i = 0; i < (nread - 1); i++) {
+            if (buffer[i] == '\n' && buffer[i+1] == '\n') {
+
+				while (isspace(buffer[i]))
+					i++;
+
+                current_info.max_level++;
+			}
+        }
+
+        if (buffer[i] == '\n' && buffer[i-1] != '\n')
+            lseek(fd, -1, SEEK_CUR);
+        
+    } while (nread == sizeof(buffer));
+    
+    close(fd);
+
+    return 0;
+}
+
+static int get_level(char *level, int level_size) 
+{
+    int fd = 0, i = 0;
+    int nread = 0;
+    int count = 0;
+    int offset = 0;
+    int level_ct = 0;
+    unsigned char buffer[SOKOBAN_LEVEL_SIZE * 2];
+    bool level_found = false;
+    int prevnewl=2; /* previous newlines in a row */
+
+    /* Lets not reparse the full file if we can avoid it */
+    if (current_info.loaded_level > current_info.level.level)
+        offset = 0;
+
+    /* open file */
+    if ((fd = open(LEVELS_FILE, O_RDONLY)) < 0)
+        return -1;
+
+    /* go where we left off */
+    offset = current_info.level_offset;
+    if(offset)
+        if (lseek(fd, offset, SEEK_SET) < 0) {
+            close(fd);
+            return -1;
+        }
+    
+    while (!level_found) {
+        nread = read(fd, buffer, sizeof(buffer));
+        if (nread < SOKOBAN_LEVEL_SIZE) {
+            close(fd);
+            return -1;
+        }
+
+        /* we search for the first character that isn't a newline */
+        for (i = 0; i < nread; i++) {
+            /* skip and count all newlines */
+            while((buffer[i] == '\n') && (i < nread)) {
+                prevnewl++;
+                i++;
+            }
+
+            /* end of buffer? */
+            if(i == nread)
+                break;
+
+            /* start of new level? */
+            if((prevnewl>1) && (buffer[i] != '\n')) {
+                prevnewl=0; /* none now */
+                level_ct++;
+                    
+                if (level_ct == current_info.level.level) {
+                    level_found = true;                    
+                    offset += i;
+                    break;
+                }
+            }
+            
+            /* skip all non-newlines */
+            while((buffer[i] != '\n') && (i < nread))
+                i++;
+        }
+        if(!level_found)
+            offset += nread;
+    } 
+
+    if (!level_found) 
+        return -1;
+
+    /* now seek back to the exact start position */
+    lseek(fd, offset, SEEK_SET);
+
+    /* read a full buffer chunk from here */
+    nread = read(fd, buffer, sizeof(buffer)-1);
+    if (nread < 0)
+        return -1;
+    buffer[nread] = 0;
+    
+    close(fd);
+    
+    /* If we read less then a level, error */
+    if (nread < level_size)
+        return -1;
+    
+    /* Load our new level */
+    for(i=0, count=0; (count < nread) && (i<level_size);) {
+        if (buffer[count] != '\n' && buffer[count] != '\r')
+            level[i++] = buffer[count];
+        count++;
+    }
+    level[i] = 0;
+
+    current_info.loaded_level = current_info.level.level;
+    return 0;
+}
+
+/* return non-zero on error */
+static int load_level(void)
+{
+    short c = 0;
+    short r = 0;
+    short i = 0;
+    char level[ROWS*COLS+1];
+    int x = 0;
 
     current_info.player.spot=' ';
     current_info.level.boxes_to_go = 0;
     current_info.level.moves = 0;
 
-    for (b = 0; b < ROWS; b++) {
-        for (c = 0; c < COLS; c++) {
-            current_info.board[b][c] = levels[level_to_load][a];
-            a++;
+    if (get_level(level, sizeof(level)) != 0)
+        return -1;
 
-            if (current_info.board[b][c] == '@') {
-                current_info.player.row = b;
+    i = 0;
+    for (r = 0; r < ROWS; r++) {
+        x++;
+        for (c = 0; c < COLS; c++, i++) {
+            current_info.board[r][c] = level[i];
+            
+            if (current_info.board[r][c] == '.')
+                current_info.level.boxes_to_go++;
+
+            else if (current_info.board[r][c] == '@') {
+                current_info.player.row = r;
                 current_info.player.col = c;
             }
-
-            if (current_info.board[b][c] == '.')
-                current_info.level.boxes_to_go++;        
         }
     }
 
-    return;
+    return 0;
 }
 
 static void update_screen(void) 
@@ -326,7 +480,7 @@ static void update_screen(void)
     }
     
 
-    snprintf(s, sizeof(s), "%d", current_info.level.level+1);
+    snprintf(s, sizeof(s), "%d", current_info.level.level);
     lcd_putsxy(86, 22, s);
     snprintf(s, sizeof(s), "%d", current_info.level.moves);
     lcd_putsxy(86, 54, s);
@@ -340,9 +494,9 @@ static void update_screen(void)
     lcd_update();
 }
 
-static void draw_level(short level)
+static void draw_level(void)
 {
-    load_level(level);
+    load_level();
     lcd_clear_display();
     update_screen();
 }
@@ -354,9 +508,9 @@ static bool sokoban_loop(void)
     int i = 0, button = 0;
     short r = 0, c = 0;
 
-    current_info.level.level = 0;
+    current_info.level.level = 1;
 
-    load_level(current_info.level.level);
+    load_level();
     update_screen(); 
 
     while (1) {
@@ -396,10 +550,10 @@ static bool sokoban_loop(void)
         case BUTTON_F1 | BUTTON_REPEAT:
             /* previous level */
             init_undo();
-            if (current_info.level.level)
+            if (current_info.level.level > 1)
                 current_info.level.level--;
 
-            draw_level(current_info.level.level);
+            draw_level();
             moved = false;
             break;
 
@@ -407,7 +561,7 @@ static bool sokoban_loop(void)
         case BUTTON_F2 | BUTTON_REPEAT:
             /* same level */
             init_undo();
-            draw_level(current_info.level.level);
+            draw_level();
             moved = false;
             break;
 
@@ -697,7 +851,7 @@ static bool sokoban_loop(void)
 
             lcd_clear_display();
 			
-            if (current_info.level.level == NUM_LEVELS) {
+            if (current_info.level.level == current_info.max_level) {
                 lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
 
                 for (i = 0; i < 30000 ; i++) {
@@ -711,7 +865,7 @@ static bool sokoban_loop(void)
                 return false;
             }
 
-            load_level(current_info.level.level);
+            load_level();
             update_screen();
         }
 
@@ -762,6 +916,10 @@ bool sokoban(void)
     lcd_clear_display();
 
     init_boards();
+
+    if (get_level_count() != 0) 
+        return false;
+
     result = sokoban_loop();
 
     lcd_setfont(FONT_UI);
@@ -770,7 +928,3 @@ bool sokoban(void)
 }
 
 #endif
-
-
-
-
