@@ -52,6 +52,12 @@ int main (int argc, char** argv)
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
     
+    if ((length + headerlen) >= 0x32000) {
+        printf("error: max firmware size is 200KB!\n");
+        fclose(file);
+        return -1;
+    }
+    
     fseek(file,0,SEEK_SET); 
     inbuf = malloc(length);
     outbuf = malloc(length);
@@ -129,5 +135,5 @@ int main (int argc, char** argv)
     free(inbuf);
     free(outbuf);
     
-    return 0;	
+    return 0;
 }
