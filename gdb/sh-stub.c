@@ -224,7 +224,7 @@ static void putpacket (register char *buffer);
 static int computeSignal (int exceptionVector);
 void handle_buserror (void);
 void handle_exception (int exceptionVector);
-void init_serial();
+void init_serial(void);
 
 void serial_putc (char ch);
 char serial_getc (void);
@@ -365,8 +365,8 @@ int init_stack[init_stack_size] __attribute__ ((section ("stack"))) = {0};
 int stub_stack[stub_stack_size] __attribute__ ((section ("stack"))) = {0};
 
 
-void INIT ();
-void start ();
+void INIT (void);
+void start (void);
 
 #define CPU_BUS_ERROR_VEC  9
 #define DMA_BUS_ERROR_VEC 10
@@ -937,11 +937,11 @@ void breakpoint (void)
 /* SH1/SH2 exception vector table format */
 typedef struct
 {
-        void (*func_cold) ();
+        void (*func_cold) (void);
         int *stack_cold;
-        void (*func_warm) ();
+        void (*func_warm) (void);
         int *stack_warm;
-        void (*(handler[128 - 4])) ();
+        void (*(handler[128 - 4])) (void);
 } vec_type;
 
 /* vectable is the SH1/SH2 vector table. It must be at address 0
@@ -1104,7 +1104,7 @@ void INIT (void)
     blink();
 }
 
-void sr()
+void sr(void)
 {
     /* Calling Reset does the same as pressing the button */
     asm (".global _Reset\n"
@@ -1170,7 +1170,7 @@ void sr()
         "	.long	_handle_exception");
 }
 
-void rr()
+void rr(void)
 {
     asm("	.align 2	\n"
         "        .global _resume\n"

@@ -14,7 +14,7 @@ LIBS = -lgcc
 	sh-elf-as -o $@ $<
 
 .c.o:
-	sh-elf-gcc -O -I../firmware/drivers -m1 -Wall -c -o $@ $<
+	sh-elf-gcc -O -I../firmware/drivers -m1 -Wall -Wstrict-prototypes -c -o $@ $<
 
 $(TARGET).out: $(TARGET).elf
 	sh-elf-objcopy -O binary $(TARGET).elf $(TARGET).out
