@@ -31,6 +31,7 @@
 #include "usb.h"
 #include "button.h"
 #include "sprintf.h"
+#include "hwcompat.h"
 
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
@@ -62,12 +63,13 @@ static char usb_thread_name[] = "usb";
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
-static bool usb_inverted;
 
 static void usb_enable(bool on)
 {
-    if(usb_inverted)
+#ifdef HAVE_LCD_BITMAP
+    if(read_hw_mask() & USB_ACTIVE_HIGH)
         on = !on;
+#endif
     
     if(on)
         PADR &= ~0x400; /* enable USB */
@@ -262,13 +264,6 @@ void usb_init(void)
     usb_monitor_enabled = false;
     countdown = -1;
 
-    /* This is lame. Really lame. We determine the polarity of the USB
-       enable pin by checking how it is set by the Archos firmware. */
-    if(PADR & 0x400)
-        usb_inverted = false;
-    else
-        usb_inverted = true;
-        
     usb_enable(false);
 
     /* We assume that the USB cable is extracted */
