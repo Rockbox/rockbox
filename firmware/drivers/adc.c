@@ -226,7 +226,6 @@ static void adc_tick(void)
     if (ADCON & (1 << 3)) {
         /* previous conversion finished? */
         adcdata[current_channel] = ADDATA >> 6;
-        emu_debugf("ADC[%x] = %x", current_channel, adcdata[current_channel]);
         if (++current_channel_idx >= CHANNEL_ORDER_SIZE)
             current_channel_idx = 0;
         current_channel = channel_order[current_channel_idx];
