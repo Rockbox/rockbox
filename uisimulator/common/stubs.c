@@ -24,6 +24,9 @@
 #include "button.h"
 #include "menu.h"
 
+#include "string.h"
+#include "lcd.h"
+
 void backlight_on(void)
 {
   /* we could do something better here! */
@@ -106,18 +109,51 @@ bool simulate_usb(void)
     return false;
 }
 
-void lcd_define_pattern (int which,char *pattern,int length)
+static char patterns[8][7];
+
+void lcd_define_pattern(int which, char *pattern, int length)
 {
-    (void)which;
-    (void)pattern;
-    (void)length;
+    int i, j;
+    int pat = which / 8;
+    char icon[8];
+    memset(icon, 0, sizeof icon);
+    
+    DEBUGF("Defining pattern %d\n", pat);
+    for (j = 0; j <= 5; j++) {
+        for (i = 0; i < length; i++) {
+            if ((pattern[i])&(1<<(j)))
+                icon[j] |= (1<<(i));
+        }
+    }
+    for (i = 0; i <= 5; i++)
+    {
+        patterns[pat][i] = icon[i];
+    }
 }
+
+char* get_lcd_pattern(int which)
+{
+    DEBUGF("Get pattern %d\n", which);
+    return patterns[which];
+}
+
+extern void lcd_puts(int x, int y, unsigned char *str);
 
 void lcd_putc(int x, int y, unsigned char ch)
 {
-    (void)x;
-    (void)y;
-    (void)ch;
+    static char str[2] = "x";
+    if (ch <= 8)
+    {
+        char* bm = get_lcd_pattern(ch);
+        lcd_bitmap(bm, x * 6, (y * 8) + 8, 6, 8, true);
+        return;
+    }
+    if (ch == 137) {
+        /* Have no good font yet. Simulate the cursor character. */
+        ch = '>';
+    }
+    str[0] = ch;
+    lcd_puts(x, y, str);
 }
 
 void lcd_set_contrast( int x )
