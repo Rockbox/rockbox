@@ -1074,7 +1074,7 @@ static void start_playback_if_ready(void)
            the watermark, the file must be smaller than the
            watermark. We must still play it. */
         if(((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER) ||
-           !filling)
+           !filling || dma_underrun)
         {
             DEBUGF("P\n");
             play_pending = false;
