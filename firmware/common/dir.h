@@ -31,13 +31,13 @@ typedef struct {
     int offset;
 } DIR;
 #else // SIMULATOR
-#ifdef _WIN32
+#ifdef WIN32
 typedef struct DIRtag
 {
     struct dirent   fd;
     intptr_t        handle;
 } DIR;
-#endif //   _WIN32
+#endif //   WIN32
 #endif // SIMULATOR
 
 extern DIR* opendir(char* name);

@@ -36,10 +36,10 @@ extern int lseek(int fd, int offset, int whence);
 extern int remove(char* pathname);
 extern int rename(char* oldname, char* newname);
 #else
-#ifdef _WIN32
+#ifdef WIN32
 #include <io.h>
 #include <stdio.h>
-#endif
-#endif
+#endif // WIN32
+#endif // SIMULATOR
 
 #endif
