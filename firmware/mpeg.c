@@ -52,8 +52,7 @@
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
 
-extern char* peek_next_track(int type);
-extern char* peek_prev_track(int type);
+extern char* playlist_next(int steps);
 
 static char *units[] =
 {
@@ -428,13 +427,21 @@ static void mas_poll_start(int interval_in_ms)
     TSTR |= 0x02; /* Start timer 2 */
 }
 
+static int get_unplayed_space(void)
+{
+    int space = mp3buf_write - mp3buf_read;
+    if (space < 0)
+        space = mp3buflen + space;
+    return space;
+}
+
 static void init_dma(void)
 {
     SAR3 = (unsigned int) mp3buf + mp3buf_read;
     DAR3 = 0x5FFFEC3;
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
-    last_dma_chunk_size = MIN(65536, mp3buf_write - mp3buf_read);
+    last_dma_chunk_size = MIN(65536, get_unplayed_space());
     DTCR3 = last_dma_chunk_size & 0xffff;
     DMAOR = 0x0001; /* Enable DMA */
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
@@ -494,12 +501,12 @@ void IRQ6(void)
 #pragma interrupt
 void DEI3(void)
 {
-    int unplayed_space_left;
-    int space_until_end_of_buffer;
-    int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
-
     if(playing)
     {
+        int unplayed_space_left = get_unplayed_space();
+        int space_until_end_of_buffer;
+        int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+
         mp3buf_read += last_dma_chunk_size;
         if(mp3buf_read >= mp3buflen)
             mp3buf_read = 0;
@@ -514,10 +521,6 @@ void DEI3(void)
             }
         }
         
-        unplayed_space_left = mp3buf_write - mp3buf_read;
-        if(unplayed_space_left < 0)
-            unplayed_space_left = mp3buflen + unplayed_space_left;
-
         space_until_end_of_buffer = mp3buflen - mp3buf_read;
         
         if(!filling && unplayed_space_left < MPEG_LOW_WATER)
@@ -593,12 +596,12 @@ static void add_track_to_tag_list(char *filename)
 }
 
 /* If next_track is true, opens the next track, if false, opens prev track */
-static int new_file(bool next_track)
+static int new_file(int steps)
 {
     char *trackname;
 
     do {
-        trackname = peek_next_track( next_track ? 1 : -1 );
+        trackname = playlist_next( steps );
         if ( !trackname )
             return -1;
         
@@ -627,6 +630,19 @@ static void stop_playing(void)
     mpeg_file = -1;
     stop_dma();
     remove_all_tags();
+}
+
+static void track_change(void)
+{
+    DEBUGF("Track change\n");
+
+#ifdef HAVE_MAS3587F
+    /* Reset the AVC */
+    mpeg_sound_set(SOUND_AVC, -1);
+#endif
+    remove_current_tag();
+
+    current_track_counter++;
 }
 
 static void mpeg_thread(void)
@@ -667,7 +683,7 @@ static void mpeg_thread(void)
                 mpeg_file = open((char*)ev.data, O_RDONLY);
                 while (mpeg_file < 0) {
                     DEBUGF("Couldn't open file: %s\n",ev.data);
-                    if ( new_file(true) == -1 )
+                    if ( new_file(1) == -1 )
                         return;
                 }
 
@@ -721,7 +737,7 @@ static void mpeg_thread(void)
                     last_dma_tick = current_tick;
                     init_dma();
                     start_dma();
-                    queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                    track_change();
                 }
                 else {
                     reset_mp3_buffer();
@@ -731,7 +747,7 @@ static void mpeg_thread(void)
                     if (mpeg_file >= 0)
                         close(mpeg_file);
                     
-                    if (new_file(true) < 0) {
+                    if (new_file(1) < 0) {
                         DEBUGF("No more files to play\n");
                         filling = false;
                     } else {
@@ -748,7 +764,8 @@ static void mpeg_thread(void)
                 }
                 break;
 
-            case MPEG_PREV:
+            case MPEG_PREV: {
+                int numtracks = num_tracks_in_memory();
                 DEBUGF("MPEG_PREV\n");
                 /* stop the current stream */
                 play_pending = false;
@@ -762,7 +779,7 @@ static void mpeg_thread(void)
                 if (mpeg_file >= 0)
                     close(mpeg_file);
 
-                if (new_file(false) < 0) {
+                if (new_file(-numtracks) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
                 } else {
@@ -776,7 +793,8 @@ static void mpeg_thread(void)
 
                     current_track_counter++;
                 }
-                break; 
+                break;
+            }
 
             case MPEG_SWAP_DATA:
                 free_space_left = mp3buf_write - mp3buf_swapwrite;
@@ -930,15 +948,7 @@ static void mpeg_thread(void)
                 break;
                 
             case MPEG_TRACK_CHANGE:
-                DEBUGF("Track change\n");
-
-#ifdef HAVE_MAS3587F
-                /* Reset the AVC */
-                mpeg_sound_set(SOUND_AVC, -1);
-#endif
-                remove_current_tag();
-
-                current_track_counter++;
+                track_change();
                 break;
                 
             case SYS_USB_CONNECTED:
