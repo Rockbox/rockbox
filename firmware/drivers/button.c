@@ -87,6 +87,11 @@ static void button_tick(void)
         else {
             repeat = false;
             count = 0;
+            /* Report that the key has been released */
+            if(lastbtn != btn)
+            {
+                queue_post(&button_queue, BUTTON_REL | lastbtn, NULL);
+            }
         }
 
         lastbtn = btn;
