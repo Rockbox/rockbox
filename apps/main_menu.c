@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "main_menu.h"
 #include "sound_menu.h"
+#include "version.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "screensaver.h"
@@ -85,7 +86,6 @@ static int show_logo(void)
 
 void show_splash(void)
 {
-    int i;
     char *rockbox = "ROCKbox!";
     lcd_clear_display();
 
@@ -99,11 +99,19 @@ void show_splash(void)
     lcd_update();
 }
 
+void version(void)
+{
+    lcd_clear_display();
+    lcd_puts(0,0,appsversion);
+    lcd_update();
+    sleep(HZ);
+}
+
 void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Splash, Credits, Sound
+        Tetris, Screen_Saver, Splash, Credits, Sound, Version
     };
 
     /* main menu */
@@ -114,7 +122,8 @@ void main_menu(void)
         { Screen_Saver, "Screen Saver", screensaver },
 #endif
         { Splash,       "Splash",       show_splash },
-        { Credits,      "Credits",      show_credits }
+        { Credits,      "Credits",      show_credits },
+        { Version,      "Version",      version }
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
