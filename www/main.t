@@ -14,6 +14,8 @@ remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
+<p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works!
+
 <p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
 
 <p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
