@@ -2,6 +2,20 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2004-11-09</i>: Some downtime due to planned server maintenance (replaced a harddisk).
+
+<p><i>2004-11-01</i>: The site was down nearly four days due to hardware failure while the admins were away.
+
+<p><i>2004-10-26</i>: Rockbox v2.3 is <a href="download/">released</a>.
+
+<p><i>2004-10-26</i>: iRiver progress: the LCD driver <a href="/twiki/bin/view/Main/IriverPort#Writing_an_LCD_driver_">is working</a>!
+
+<p><i>2004-10-05</i>: Call for help: We need information from Ondio owners for our <a href="/twiki/bin/view/Main/ArchosOndio">Archos Ondio port</a>.
+
+<p><i>2004-10-01</i>: Touchdown! The Coldfire BDM wiggler is working on the iHP-120 target! Time for some sweet GDB debugging...
+
+<p><i>2004-09-24</i>: We finally have rockbox.org, thanks to Jeff at Misticriver.
+
 <p><i>2004-09-13</i>: Call for help! Please donate your broken iRiver iHP-1xx to the project!
 
 <p><i>2004-07-08</i>: Good news for Windows users! You can now install the <a href=/daily.shtml>daily builds</a> with an installer executable. Thanks to Christi Scarborough for that.
