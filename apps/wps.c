@@ -941,15 +941,15 @@ int wps_show(void)
 #endif
 
                 /* stop and exit wps */
-#ifdef BUTTON_RC_STOP
-            case BUTTON_RC_STOP:
-#endif
 #ifdef BUTTON_OFF
             case BUTTON_OFF | BUTTON_REL:
 #else
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
                     break;
+#endif
+#ifdef BUTTON_RC_STOP
+            case BUTTON_RC_STOP:
 #endif
                 exit = true;
                 break;
