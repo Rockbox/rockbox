@@ -26,6 +26,7 @@ typedef struct {
     off_t curpos;
     off_t filesize;
     int samplerate;
+    int bitspersample;
     int channels;
     int frames_decoded;
     unsigned long total_samples;

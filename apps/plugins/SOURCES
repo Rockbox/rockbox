@@ -66,4 +66,5 @@ alpine_cdc.c
 #if CONFIG_HWCODEC == MASNONE /* software codec platforms */
 mpa2wav.c
 a52towav.c
+flac2wav.c
 #endif
