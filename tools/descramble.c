@@ -30,11 +30,11 @@ int main (int argc, char** argv)
     FILE* file;
 
     if (argc < 3) {
-       printf("usage: %s [-fm] <input file> <output file>\n",argv[0]);
+       printf("usage: %s [-fm] [-v2] <input file> <output file>\n",argv[0]);
        return -1;
     }
 
-    if (argv[1][0] == '-') { /* assume any parameter is -fm :-) */
+    if (!strcmp(argv[1], "-fm") || !strcmp(argv[1], "-v2")) {
         headerlen = 24;
         iname = argv[2];
         oname = argv[3];

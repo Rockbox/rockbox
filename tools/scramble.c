@@ -30,16 +30,25 @@ int main (int argc, char** argv)
     unsigned char *oname = argv[2];
     int headerlen = 6;
     FILE* file;
+    int version;
 
     if (argc < 3) {
-       printf("usage: %s [-fm] <input file> <output file>\n",argv[0]);
+       printf("usage: %s [-fm] [-v2] <input file> <output file>\n",argv[0]);
        return -1;
     }
 
-    if (argv[1][0] == '-') { /* assume any parameter is -fm :-) */
+    if(!strcmp(argv[1], "-fm")) {
         headerlen = 24;
         iname = argv[2];
         oname = argv[3];
+        version = 4;
+    }
+    
+    if(!strcmp(argv[1], "-v2")) {
+        headerlen = 24;
+        iname = argv[2];
+        oname = argv[3];
+        version = 2;
     }
     
     /* open file */
@@ -106,7 +115,7 @@ int main (int argc, char** argv)
         header[6] = (crc >> 8) & 0xff;
         header[7] = crc & 0xff;
 
-        header[11] = 4; /* ??? */
+        header[11] = version;
 
         header[15] = headerlen; /* really? */
 
