@@ -22,6 +22,8 @@ yahoo</a>.
 href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
 Archos. (Jean Boullier)
 
+<li><a href="license.html">The GNU General Public License</a> under which terms Rockbox may be distributed
+
 </ul>
 
 <h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">hackers</a></h2>
@@ -36,6 +38,7 @@ Archos. (Jean Boullier)
 <li> <a href="/sh-win/">Setting up the gnush cross compiler</a> (Windows)
 <li> <a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
+<li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a> 
 <li> <a href="flash.html">How to flash Rockbox on your Archos</a>
 </ul>
 
@@ -49,7 +52,6 @@ Archos. (Jean Boullier)
 <li><a href="id3v2.4.0-frames.txt">ID3 v2.4 frames</a>
 <li><a href="id3v2.3.0.html">ID3 v2.3 specification</a> (<a href="id3v2.3.0.txt">txt</a>)
 <li><a href="id3guide.html">ID3 v2.3 Programming Guidelines</a>
-<li><a href="id3v2.2.0.html">ID3 v2.2 specification</a>
 </ul>
 
 <h3>Rockbox Design Docs</h3>

@@ -67,5 +67,11 @@ credits.raw: $(DOCS)/CREDITS $(TXT2HTML)
 credits.html: credits.t credits.raw $(TXT2HTML)
 	$(ACTION) $<
 
+license.raw: $(DOCS)/COPYING $(TXT2HTML)
+	$(TXT2HTML) < $< > $@
+
+license.html: license.t license.raw $(TXT2HTML)
+	$(ACTION) $<
+
 %.html : %.t
 	$(ACTION) $<
