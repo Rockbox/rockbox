@@ -471,8 +471,10 @@ static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
 #ifdef HAVE_MAS3587F
 static bool is_recording; /* We are recording */
-bool stop_pending;
-unsigned long record_start_frame; /* Frame number where recording started */
+static bool stop_pending;
+static unsigned long record_start_frame; /* Frame number where
+                                            recording started */
+static bool saving; /* We are saving the buffer to disk */
 #endif
 
 static int mpeg_file;
@@ -725,7 +727,7 @@ static void dma_tick(void)
             if(num_bytes < 0)
                 num_bytes += mp3buflen;
 
-            if(mp3buflen - num_bytes < MPEG_LOW_WATER)
+            if(mp3buflen - num_bytes < MPEG_LOW_WATER && !saving)
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
         }
     }
@@ -1653,6 +1655,7 @@ static void mpeg_thread(void)
 
                     case MPEG_STOP:
                         DEBUGF("MPEG_STOP\n");
+                        demand_irq_enable(false);
                         is_recording = false;
 
                         /* Save the remaining data in the buffer */
@@ -1663,12 +1666,11 @@ static void mpeg_thread(void)
                     case MPEG_STOP_DONE:
                         DEBUGF("MPEG_STOP_DONE\n");
 
-                        demand_irq_enable(false);
                         if(mpeg_file >= 0)
                             close(mpeg_file);
                         mpeg_file = -1;
 
-#ifdef DEBUG
+#ifdef DEBUG1
                         {
                             int i;
                             for(i = 0;i < 512;i++)
@@ -1703,6 +1705,8 @@ static void mpeg_thread(void)
                                stop_pending)
                             {
                                 int rc;
+
+                                saving = true;
                                 
                                 /* Only save up to the end of the buffer */
                                 writelen = MIN(amount_to_save,
@@ -1718,6 +1722,10 @@ static void mpeg_thread(void)
                                     mp3buf_read = 0;
                                 
                                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                            }
+                            else
+                            {
+                                saving = false;
                             }
                         }
                         else
