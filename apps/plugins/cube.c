@@ -343,14 +343,27 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         rb->lcd_update();
 #else
-        rb->lcd_clear_display();
         if (t_disp>0)
         {
+            if (t_disp == DISP_TIME)
+            {
+                rb->snprintf(buffer, 30, "x%d", xs);
+                rb->lcd_puts(0, 0, buffer);
+                rb->snprintf(buffer, 30, "y%d", ys);
+                rb->lcd_puts(8, 0, buffer);
+                rb->snprintf(buffer, 30, "z%d", zs);
+                rb->lcd_puts(0, 1, buffer);
+                rb->snprintf(buffer, 30, "h%d", highspeed);
+                rb->lcd_puts(8, 1, buffer);
+            }
             t_disp--;
-            rb->snprintf(buffer, 30, "x%d     y%d", xs, ys);
-            rb->lcd_puts(0, 0, buffer);
-            rb->snprintf(buffer, 30, "z%d     h%d", zs, highspeed);
-            rb->lcd_puts(0, 1, buffer);
+            if (t_disp == 0)
+            {
+                rb->lcd_puts(0, 0, "   ");
+                rb->lcd_puts(8, 0, "   ");
+                rb->lcd_puts(0, 1, "   ");
+                rb->lcd_puts(8, 1, "   ");
+            }
         }
         pgfx_display(3, 0);
 #endif
