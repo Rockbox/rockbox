@@ -29,6 +29,7 @@
 #include "debug.h"
 
 #include "id3.h"
+#include "mpeg.h"
 
 #ifdef MPEG_PLAY
 #include "mpegplay.h"
@@ -43,6 +44,7 @@ void playtune(char *dir, char *file)
     bool good=1;
 
     snprintf(buffer, sizeof(buffer), "%s/%s", dir, file);
+    mpeg_play(buffer);
 
     if(mp3info(&mp3, buffer)) {
         DEBUGF("id3 failure!");
@@ -80,12 +82,6 @@ void playtune(char *dir, char *file)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_update();
-#endif
-
-#ifdef MPEG_PLAY
-    snprintf(buffer,sizeof(buffer), "%s/%s", dir, file);
-    mpeg_play(buffer);
-    return;
 #endif
 
     while(1) {
