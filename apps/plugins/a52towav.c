@@ -24,7 +24,7 @@
 
 #include <inttypes.h>  /* Needed by a52.h */
 
-#include <codecs/liba52/config.h>
+#include <codecs/liba52/config-a52.h>
 #include <codecs/liba52/a52.h>
 
 #include "lib/xxx2wav.h" /* Helper functions common to test decoders */
