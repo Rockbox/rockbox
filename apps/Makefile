@@ -68,8 +68,7 @@ no_configure:
 endif
 
 ifndef TOOLSDIR
-no_toolsdir:
-	@echo "Rerun the configure script."
+	TOOLSDIR=../tools
 endif
 
 all : $(OBJDIR)/$(OUTNAME)
