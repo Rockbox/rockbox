@@ -117,6 +117,8 @@ bool wps_load_custom(char* file)
     int fd;
     bool special = true;
 
+    wps_loaded = true;
+
     /* default wps file? */
     if (!file) {
         file = WPS_CONFIG;
@@ -149,7 +151,6 @@ bool wps_load_custom(char* file)
             sleep(HZ);
         }
 
-        wps_loaded = true;
         return numread > 0;
     }
     
