@@ -193,7 +193,7 @@ static bool playlist_options(void)
         i++;
     }
 
-    m = menu_init( menu, i );
+    m = menu_init( menu, i, NULL );
     result = menu_show(m);
     if (result >= 0 && result < pstart)
         ret = menu[result].function();
@@ -580,7 +580,7 @@ int onplay(char* file, int attr)
     i++;
 
     /* DIY menu handling, since we want to exit after selection */
-    m = menu_init( menu, i );
+    m = menu_init( menu, i, NULL );
     result = menu_show(m);
     if (result >= 0)
         menu[result].function();

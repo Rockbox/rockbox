@@ -27,7 +27,7 @@ struct menu_items {
     bool (*function) (void); /* return true if USB was connected */
 };
 
-int menu_init(struct menu_items* items, int count);
+int menu_init(struct menu_items* items, int count, int (*callback) (int keycode, int menu));
 void menu_exit(int menu);
 
 void put_cursorxy(int x, int y, bool on);
@@ -38,6 +38,13 @@ int menu_show(int m);
 #define MENU_SELECTED_EXIT -2
 
 bool menu_run(int menu);
+int menu_cursor(int menu);
+char* menu_description(int menu, int position);
+void menu_delete(int menu, int position);
+int menu_count(int menu);
+bool menu_moveup(int menu);
+bool menu_movedown(int menu);
+void menu_draw(int menu);
 
 #endif /* End __MENU_H__ */
 

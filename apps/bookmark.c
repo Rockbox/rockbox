@@ -98,7 +98,7 @@ bool bookmark_menu(void)
         { str(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);

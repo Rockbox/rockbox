@@ -693,7 +693,7 @@ static int onplay_menu(int index)
     menu[i].desc = str(LANG_FILE_OPTIONS);
     i++;
 
-    m = menu_init(menu, i);
+    m = menu_init(menu, i, NULL);
     result = menu_show(m);
     if (result == MENU_ATTACHED_USB)
         ret = -1;
@@ -763,7 +763,7 @@ static bool viewer_menu(void)
         { str(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
     };
     
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
 

@@ -254,6 +254,7 @@ static bool recording_settings(void)
 #endif
 
 #ifdef HAVE_MAS3587F
+
 bool rec_menu(void)
 {
     int m;
@@ -265,7 +266,7 @@ bool rec_menu(void)
         { str(LANG_RECORDING_SETTINGS), recording_settings},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -290,7 +291,7 @@ bool info_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -336,7 +337,7 @@ bool main_menu(void)
     items[i].desc = str(LANG_INFO);
     items[i++].function = info_menu;
 
-    m=menu_init( items, i );
+    m=menu_init( items, i, NULL );
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
 #endif

@@ -604,7 +604,7 @@ bool radio_preset_select(void)
         if(num_presets)
         {
             /* DIY menu handling, since we want to exit after selection */
-            m = menu_init( menu, num_presets );
+            m = menu_init( menu, num_presets, NULL );
             result = menu_show(m);
             menu_exit(m);
             if (result == MENU_SELECTED_EXIT)
@@ -676,7 +676,7 @@ bool radio_delete_preset(void)
         }
         
         /* DIY menu handling, since we want to exit after selection */
-        m = menu_init( menu, num_presets );
+        m = menu_init( menu, num_presets, NULL );
         result = menu_show(m);
         menu_exit(m);
         if (result == MENU_SELECTED_EXIT)
@@ -724,7 +724,7 @@ bool radio_menu(void)
     bool result;
 
     m = menu_init( radio_menu_items,
-                   sizeof radio_menu_items / sizeof(struct menu_items) );
+                   sizeof radio_menu_items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;

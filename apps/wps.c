@@ -43,6 +43,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
+#include "action.h"
 #endif
 #include "lang.h"
 #include "bookmark.h"
@@ -926,14 +927,14 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
                 /* play settings */
             case BUTTON_F2:
-                if (f2_screen())
+                if (quick_screen(CONTEXT_WPS, BUTTON_F2))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
 
                 /* screen settings */
             case BUTTON_F3:
-                if (f3_screen())
+                if (quick_screen(CONTEXT_WPS, BUTTON_F2))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;

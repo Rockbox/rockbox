@@ -71,7 +71,7 @@ bool playlist_menu(void)
         { str(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
     
-    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m = menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;

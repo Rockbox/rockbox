@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "hwcompat.h"
 #include "lcd.h"
@@ -42,6 +43,7 @@ struct menu {
     int cursor;
     struct menu_items* items;
     int itemcount;
+    int (*callback)(int, int);
 };
 
 #define MAX_MENUS 5
@@ -123,7 +125,7 @@ void put_cursorxy(int x, int y, bool on)
     }
 }
 
-static void menu_draw(int m)
+void menu_draw(int m)
 {
     int i = 0;
 #ifdef HAVE_LCD_BITMAP
@@ -216,7 +218,7 @@ static void put_cursor(int m, int target)
 
 }
 
-int menu_init(struct menu_items* mitems, int count)
+int menu_init(struct menu_items* mitems, int count, int (*callback)(int, int))
 {
     int i;
 
@@ -234,6 +236,7 @@ int menu_init(struct menu_items* mitems, int count)
     menus[i].itemcount = count;
     menus[i].top = 0;
     menus[i].cursor = 0;
+    menus[i].callback = callback;
 
     return i;
 }
@@ -246,6 +249,7 @@ void menu_exit(int m)
 int menu_show(int m)
 {
     bool exit = false;
+    int key;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
@@ -260,7 +264,16 @@ int menu_show(int m)
     menu_draw(m);
 
     while (!exit) {
-        switch( button_get_w_tmo(HZ/2) ) {
+        key = button_get_w_tmo(HZ/2);
+        
+        /*  
+         *   "short-circuit" the default keypresses by running the callback function
+         */
+
+        if( menus[m].callback != NULL )
+            key = menus[m].callback(key, m);            /* make sure there's no match in the switch */
+
+        switch( key ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -326,20 +339,6 @@ int menu_show(int m)
                 exit = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F2:
-                if (f2_screen())
-                    return MENU_ATTACHED_USB;
-                menu_draw(m);
-                break;
-
-            case BUTTON_F3:
-                if (f3_screen())
-                    return MENU_ATTACHED_USB;
-                menu_draw(m);
-                break;
-#endif
-
             case SYS_USB_CONNECTED:
                 usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
@@ -368,4 +367,93 @@ bool menu_run(int m)
     }
   }
   return false;
+}
+
+/*  
+ *  Property function - return the current cursor for "menu"
+ */
+
+int menu_cursor(int menu)
+{
+    return menus[menu].cursor;
+}
+
+/*  
+ *  Property function - return the "menu" description at "position"
+ */
+
+char* menu_description(int menu, int position)
+{
+    return menus[menu].items[position].desc;
+}
+
+/*  
+ *  Delete the element "position" from the menu items in "menu"
+ */
+
+void menu_delete(int menu, int position)
+{
+    int i;
+    
+    /* copy the menu item from the one below */
+    for( i = position; i < (menus[menu].itemcount - 1); i++)
+        menus[menu].items[i] = menus[menu].items[i + 1];
+ 
+    /* reduce the count */       
+    menus[menu].itemcount--;
+    
+    /* adjust if this was the last menu item and the cursor was on it */
+    if( menus[menu].itemcount <= menus[menu].cursor)
+        menus[menu].cursor = menus[menu].itemcount - 1;
+}
+
+/*  
+ *  Property function - return the "count" of menu items in "menu" 
+ */
+
+int menu_count(int menu)
+{
+    return menus[menu].itemcount;
+}
+
+/*  
+ *  Allows a menu item at the current cursor position in "menu" to be moved up the list
+ */
+
+bool menu_moveup(int menu)
+{
+    struct menu_items swap;
+    
+    /* can't be the first item ! */
+    if( menus[menu].cursor == 0)
+        return false;
+    
+    /* use a temporary variable to do the swap */    
+    swap = menus[menu].items[menus[menu].cursor - 1];
+    menus[menu].items[menus[menu].cursor - 1] = menus[menu].items[menus[menu].cursor];
+    menus[menu].items[menus[menu].cursor] = swap;
+    menus[menu].cursor--;
+    
+    return true;
+}
+
+/*  
+ *  Allows a menu item at the current cursor position in "menu" to be moved down the list
+ */
+
+bool menu_movedown(int menu)
+{
+    struct menu_items swap;
+    
+    /* can't be the last item ! */
+    if( menus[menu].cursor == menus[menu].itemcount - 1)
+        return false;
+    
+    /* use a temporary variable to do the swap */    
+    swap = menus[menu].items[menus[menu].cursor + 1];
+    menus[menu].items[menus[menu].cursor + 1] = menus[menu].items[menus[menu].cursor];
+    menus[menu].items[menus[menu].cursor] = swap;
+    menus[menu].cursor++;
+    
+    return true;
 }

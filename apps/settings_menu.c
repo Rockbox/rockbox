@@ -380,7 +380,7 @@ static bool peak_meter_menu(void)
         { str(LANG_PM_MAX)      , peak_meter_max       },
     };
     
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -795,7 +795,7 @@ static bool ff_rewind_settings_menu(void)
         { str(LANG_FFRW_ACCEL), ff_rewind_accel },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -819,7 +819,7 @@ static bool playback_settings_menu(void)
 
     bool old_shuffle = global_settings.playlist_shuffle;
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -848,7 +848,7 @@ static bool bookmark_settings_menu(void)
         { str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -916,7 +916,7 @@ static bool fileview_settings_menu(void)
         { str(LANG_SHOW_ICONS),   show_icons          },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -941,7 +941,7 @@ static bool scroll_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -964,7 +964,7 @@ static bool lcd_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -983,7 +983,7 @@ static bool bars_settings_menu(void)
         { str(LANG_BATTERY_DISPLAY), battery_type },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1009,7 +1009,7 @@ static bool display_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1036,7 +1036,7 @@ static bool battery_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1054,7 +1054,7 @@ static bool disk_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1071,7 +1071,7 @@ static bool time_settings_menu(void)
         { str(LANG_TIMEFORMAT),  timeformat_set  },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1090,7 +1090,7 @@ static bool manage_settings_menu(void)
         { str(LANG_SAVE_SETTINGS),   settings_save_config },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1106,7 +1106,7 @@ static bool limits_settings_menu(void)
         { str(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1137,7 +1137,7 @@ static bool system_settings_menu(void)
         { str(LANG_MANAGE_MENU),      manage_settings_menu   },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1157,7 +1157,7 @@ bool settings_menu(void)
         { str(LANG_LANGUAGE),         language_browse        },
     };
     
-    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;

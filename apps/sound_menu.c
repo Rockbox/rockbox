@@ -307,7 +307,7 @@ bool sound_menu(void)
 #endif
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
     result = menu_run(m);
     menu_exit(m);
 
@@ -341,7 +341,7 @@ bool recording_menu(bool no_source)
     menu[i].desc = str(LANG_RECORD_DIRECTORY);
     menu[i++].function = recdirectory;
         
-    m=menu_init( menu, i );
+    m=menu_init( menu, i, NULL );
     result = menu_run(m);
     menu_exit(m);
 

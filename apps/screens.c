@@ -37,6 +37,7 @@
 #include "system.h"
 #include "powermgmt.h"
 #include "adc.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -427,85 +428,128 @@ int on_screen(void)
         return 0;
 }
 
-bool f2_screen(void)
+bool quick_screen(int context, int button)
 {
     bool exit = false;
     bool used = false;
-    int w, h;
+    int w, h, key;
     char buf[32];
     int oldrepeat = global_settings.repeat_mode;
-
+    
+    /* just to stop compiler warning */
+    context = context;
     lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("A",&w,&h);
+
+    if(button==BUTTON_F2)
+        lcd_getstringsize("A",&w,&h);
 
     while (!exit) {
         char* ptr=NULL;
 
         lcd_clear_display();
 
-        /* Shuffle mode */
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-        lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.playlist_shuffle ? 
-                   str(LANG_ON) : str(LANG_OFF));
+        switch(button)
+        {
+            case BUTTON_F2:
+                /* Shuffle mode */
+                lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
+                lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
+                lcd_putsxy(0, LCD_HEIGHT/2, 
+                           global_settings.playlist_shuffle ? 
+                           str(LANG_ON) : str(LANG_OFF));
+
+                /* Directory Filter */
+                switch ( global_settings.dirfilter ) {
+                    case SHOW_ALL:
+                        ptr = str(LANG_FILTER_ALL);
+                        break;
+        
+                    case SHOW_SUPPORTED:
+                        ptr = str(LANG_FILTER_SUPPORTED);
+                        break;
+        
+                    case SHOW_MUSIC:
+                        ptr = str(LANG_FILTER_MUSIC);
+                        break;
+                        
+                    case SHOW_PLAYLIST:
+                        ptr = str(LANG_FILTER_PLAYLIST);
+                        break;
+                }
+        
+                snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));
+                lcd_getstringsize(buf,&w,&h);
+                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
+                lcd_getstringsize(ptr,&w,&h);
+                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+
+                /* Repeat Mode */
+                switch ( global_settings.repeat_mode ) {
+                    case REPEAT_OFF:
+                        ptr = str(LANG_OFF);
+                        break;
+        
+                    case REPEAT_ALL:
+                        ptr = str(LANG_REPEAT_ALL);
+                        break;
+        
+                    case REPEAT_ONE:
+                        ptr = str(LANG_REPEAT_ONE);
+                        break;
+                }
+        
+                lcd_getstringsize(str(LANG_REPEAT),&w,&h);
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
+                break;
+            case BUTTON_F3:
+                /* Scrollbar */
+                lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
+                lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
+                lcd_putsxy(0, LCD_HEIGHT/2, 
+                           global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF));
+    
+                /* Status bar */
+                ptr = str(LANG_F3_STATUS);
+                lcd_getstringsize(ptr,&w,&h);
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
+                           global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
+    
+                /* Flip */
+                ptr = str(LANG_FLIP_DISPLAY);
+                lcd_getstringsize(ptr,&w,&h);
+                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_FLIP_DISPLAY));
+                ptr = global_settings.flip_display ?
+                           str(LANG_SET_BOOL_YES) : str(LANG_SET_BOOL_NO);
+                lcd_getstringsize(ptr,&w,&h);
+                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+                break;
+        }
+
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
-
-        /* Directory Filter */
-        switch ( global_settings.dirfilter ) {
-            case SHOW_ALL:
-                ptr = str(LANG_FILTER_ALL);
-                break;
-
-            case SHOW_SUPPORTED:
-                ptr = str(LANG_FILTER_SUPPORTED);
-                break;
-
-            case SHOW_MUSIC:
-                ptr = str(LANG_FILTER_MUSIC);
-                break;
-                
-            case SHOW_PLAYLIST:
-                ptr = str(LANG_FILTER_PLAYLIST);
-                break;
-        }
-
-        snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));
-        lcd_getstringsize(buf,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
-
-        /* Repeat Mode */
-        switch ( global_settings.repeat_mode ) {
-            case REPEAT_OFF:
-                ptr = str(LANG_OFF);
-                break;
-
-            case REPEAT_ALL:
-                ptr = str(LANG_REPEAT_ALL);
-                break;
-
-            case REPEAT_ONE:
-                ptr = str(LANG_REPEAT_ONE);
-                break;
-        }
-
-        lcd_getstringsize(str(LANG_REPEAT),&w,&h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
 
         lcd_update();
-
-        switch (button_get(true)) {
-            case BUTTON_LEFT:
+        key = button_get(true);
+        
+        /*  
+         *  This is a temporary kludge so that the F2 & F3 menus operate in exactly
+         *  the same manner up until the full F2/F3 configurable menus are complete
+         */  
+          
+        if( key == BUTTON_LEFT || key == BUTTON_RIGHT || key == BUTTON_DOWN || key == ( BUTTON_LEFT | BUTTON_REPEAT ) || key == ( BUTTON_RIGHT  | BUTTON_REPEAT ) || key == ( BUTTON_DOWN  | BUTTON_REPEAT ) )
+            key = button | key;
+            
+        switch (key) {
             case BUTTON_F2 | BUTTON_LEFT:
+            case BUTTON_F2 | BUTTON_LEFT | BUTTON_REPEAT:
                 global_settings.playlist_shuffle =
                     !global_settings.playlist_shuffle;
 
@@ -519,110 +563,38 @@ bool f2_screen(void)
                 used = true;
                 break;
 
-            case BUTTON_DOWN:
             case BUTTON_F2 | BUTTON_DOWN:
+            case BUTTON_F2 | BUTTON_DOWN | BUTTON_REPEAT:
                 global_settings.dirfilter++;
                 if ( global_settings.dirfilter >= NUM_FILTER_MODES )
                     global_settings.dirfilter = 0;
                 used = true;
                 break;
 
-            case BUTTON_RIGHT:
             case BUTTON_F2 | BUTTON_RIGHT:
+            case BUTTON_F2 | BUTTON_RIGHT | BUTTON_REPEAT:
                 global_settings.repeat_mode++;
                 if ( global_settings.repeat_mode >= NUM_REPEAT_MODES )
                     global_settings.repeat_mode = 0;
                 used = true;
                 break;
 
-            case BUTTON_F2 | BUTTON_REL:
-                if ( used )
-                    exit = true;
-                used = true;
-                break;
-
-            case BUTTON_F2 | BUTTON_REPEAT:
-                used = true;
-                break;
-
-            case BUTTON_OFF | BUTTON_REPEAT:
-                return false;
-                
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
-        }
-    }
-
-    settings_save();
-    lcd_setfont(FONT_UI);
-    if ( oldrepeat != global_settings.repeat_mode )
-        mpeg_flush_and_reload_tracks();
-
-    return false;
-}
-
-bool f3_screen(void)
-{
-    bool exit = false;
-    bool used = false;
-
-    lcd_setfont(FONT_SYSFIXED);
-
-    while (!exit) {
-        int w,h;
-        char* ptr;
-
-        lcd_clear_display();
-
-        /* Scrollbar */
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-        lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF));
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
-
-        /* Status bar */
-        ptr = str(LANG_F3_STATUS);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
-                   global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
-                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
-
-        /* Flip */
-        ptr = str(LANG_FLIP_DISPLAY);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_FLIP_DISPLAY));
-        ptr = global_settings.flip_display ?
-                   str(LANG_SET_BOOL_YES) : str(LANG_SET_BOOL_NO);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-        lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
-
-        lcd_update();
-
-        switch (button_get(true)) {
-            case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
+            case BUTTON_F3 | BUTTON_LEFT | BUTTON_REPEAT:
                 global_settings.scrollbar = !global_settings.scrollbar;
                 used = true;
                 break;
 
-            case BUTTON_RIGHT:
             case BUTTON_F3 | BUTTON_RIGHT:
+            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
                 global_settings.statusbar = !global_settings.statusbar;
                 used = true;
                 break;
 
-            case BUTTON_DOWN:
             case BUTTON_F3 | BUTTON_DOWN:
-            case BUTTON_UP: /* allow "up" as well, more tolerant if tilted */
+            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
             case BUTTON_F3 | BUTTON_UP:
+            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
                 global_settings.flip_display = !global_settings.flip_display;
                 button_set_flip(global_settings.flip_display);
                 lcd_set_flip(global_settings.flip_display);
@@ -630,13 +602,13 @@ bool f3_screen(void)
                 break;
 
             case BUTTON_F3 | BUTTON_REL:
-                if ( used )
+            case BUTTON_F2 | BUTTON_REL:
+            
+                if( used )
                     exit = true;
-                used = true;
-                break;
 
-            case BUTTON_F3 | BUTTON_REPEAT:
                 used = true;
+                    
                 break;
 
             case BUTTON_OFF | BUTTON_REPEAT:
@@ -649,10 +621,25 @@ bool f3_screen(void)
     }
 
     settings_save();
-    if (global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
+    
+    switch( button )
+    {
+        case BUTTON_F2:
+
+            if ( oldrepeat != global_settings.repeat_mode )
+                mpeg_flush_and_reload_tracks();
+
+            break;
+        case BUTTON_F3:
+
+            if (global_settings.statusbar)
+                lcd_setmargins(0, STATUSBAR_HEIGHT);
+            else
+                lcd_setmargins(0, 0);
+                
+            break;
+    }
+    
     lcd_setfont(FONT_UI);
 
     return false;

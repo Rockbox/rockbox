@@ -54,6 +54,7 @@
 #include "buffer.h"
 #include "plugin.h"
 #include "power.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -1277,7 +1278,7 @@ static bool dirbrowse(char *root, int *dirfilter)
             case BUTTON_F2:
                 if (*dirfilter < NUM_FILTER_MODES)
                 {
-                    if (f2_screen())
+                    if (quick_screen(CONTEXT_TREE, BUTTON_F2))
                         reload_root = true;
                     restore = true;
                     break;
@@ -1286,7 +1287,7 @@ static bool dirbrowse(char *root, int *dirfilter)
             case BUTTON_F3:
                 if (*dirfilter < NUM_FILTER_MODES)
                 {
-                    if (f3_screen())
+                    if (quick_screen(CONTEXT_TREE, BUTTON_F3))
                         reload_root = true;
 
 #ifdef HAVE_LCD_BITMAP
