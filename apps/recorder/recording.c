@@ -188,8 +188,6 @@ bool recording_screen(void)
 
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     
-    status_set_playmode(STATUS_STOP);
-
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
     
@@ -248,7 +246,6 @@ bool recording_screen(void)
                 if(mpeg_status() & MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
-                    status_set_playmode(STATUS_STOP);
                 }
                 else
                 {
@@ -266,7 +263,6 @@ bool recording_screen(void)
                     have_recorded = true;
                     talk_buffer_steal(); /* we use the mp3 buffer */
                     mpeg_record(rec_create_filename(path_buffer));
-                    status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
                     last_seconds = 0;
                 }
@@ -275,12 +271,10 @@ bool recording_screen(void)
                     if(mpeg_status() & MPEG_STATUS_PAUSE)
                     {
                         mpeg_resume_recording();
-                        status_set_playmode(STATUS_RECORD);
                     }
                     else
                     {
                         mpeg_pause_recording();
-                        status_set_playmode(STATUS_RECORD_PAUSE);
                     }
                     update_countdown = 1; /* Update immediately */
                 }
@@ -595,7 +589,6 @@ bool recording_screen(void)
     }
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
-        status_set_playmode(STATUS_STOP);
         splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();

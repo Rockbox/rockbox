@@ -254,7 +254,6 @@ int charging_screen(void)
 #ifdef HAVE_LCD_BITMAP
     charging_display_info(false);
 #else
-    status_set_playmode(STATUS_STOP);
     lcd_puts(0, 1, "[charging]");
 #endif
     

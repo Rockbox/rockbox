@@ -171,8 +171,6 @@ bool radio_screen(void)
     mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
 
-    status_set_playmode(STATUS_STOP);
-
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
     
@@ -241,7 +239,6 @@ bool radio_screen(void)
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
-                    status_set_playmode(STATUS_STOP);
                 }
                 else
                 {
@@ -262,7 +259,6 @@ bool radio_screen(void)
                     have_recorded = true;
                     talk_buffer_steal(); /* we use the mp3 buffer */
                     mpeg_record(rec_create_filename(buf));
-                    status_set_playmode(STATUS_RECORD);
                     update_screen = true;
                 }
                 last_seconds = 0;
@@ -462,7 +458,6 @@ bool radio_screen(void)
     
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
-        status_set_playmode(STATUS_STOP);
         splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
