@@ -18,6 +18,9 @@ FIRMWARE = ../../../firmware
 # Check if this is a kind of Recorder
 ANYREC = $(findstring RECORDER, $(TARGET))
 
+# Check if this is an Ondio model
+ANYONDIO = $(findstring ONDIO, $(TARGET))
+
 # ../.. for the plugin.h in the apps dir
 # .. for stuff in the plugins dir
 # . for stuff in the pluginlib dir
@@ -27,6 +30,11 @@ INCLUDES=-I../.. -I.. -I. -I$(FIRMWARE)/include -I$(FIRMWARE)/export	\
 ifeq ($(ANYREC), RECORDER)
 INCLUDES += -I../../recorder
 endif
+ifeq ($(ANYONDIO), ONDIO)
+# use the recorder tree for now
+INCLUDES += -I../../recorder
+endif
+
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
