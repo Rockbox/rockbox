@@ -201,13 +201,13 @@ new: "HD-Ausschaltzeit"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-voice: "Suchlauf kleinster Schritt"
+voice: "Such-lauf kleinster Schritt"
 new: "FF/RW min. Schritt"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-voice: "Suchlauf Beschleunigung"
+voice: "Such-lauf Beschleunigung"
 new: "FF/RW Beschleunigung"
 
 id: LANG_FOLLOW
@@ -879,7 +879,7 @@ new: "genauere Anzeige"
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
-voice: "Energie sparen"
+voice: "Ener-gie sparen"
 new: "Energie sparen"
 
 id: LANG_PM_SCALE
@@ -1245,7 +1245,7 @@ new: "geladen"
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
-voice: "Ausblenden bei Stop/Pause"
+voice: "Ausblenden bei Stop und Pause"
 new: "Blenden bei Stop/Pause"
 
 id: LANG_SOKOBAN_ON
@@ -1529,7 +1529,7 @@ new: "Einfügen als nächsten"
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
-voice: "Speichere aktuelle Apspielliste"
+voice: "Speichere aktuelle Abspielliste"
 new: "Speichere aktuelle Playlist"
 
 id: LANG_PLAYLIST_MENU
@@ -1727,7 +1727,7 @@ new: "Aufnehmen"
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
-voice: "Zeige aktuelle Aspielliste"
+voice: "Zeige aktuelle Abspielliste"
 new: "Zeige aktuelle Playliste"
 
 id: LANG_MOVE
@@ -1919,7 +1919,7 @@ new: "Aufnahme starten"
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "Vor und Rücklauf"
+voice: "Vor und Rück-lauf"
 new: "FF/RW"
 
 id: LANG_LCD_MENU
