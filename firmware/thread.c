@@ -137,7 +137,7 @@ void wake_up_thread(void)
 
 /*--------------------------------------------------------------------------- 
  * Create thread.
- * Return 0 if context area could be allocated, else -1.
+ * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
 int create_thread(void* function, void* stack, int stack_size, char *name)
@@ -149,9 +149,8 @@ int create_thread(void* function, void* stack, int stack_size, char *name)
         
     if (num_threads >= MAXTHREADS)
         return -1;
-    else
-    {
-	/* Munge the stack to make it easy to spot stack overflows */
+
+    /* Munge the stack to make it easy to spot stack overflows */
 	stacklen = stack_size / 4;
 	stackptr = stack;
 	for(i = 0;i < stacklen;i++)
@@ -163,16 +162,38 @@ int create_thread(void* function, void* stack, int stack_size, char *name)
 	thread_name[num_threads] = name;
 	thread_stack[num_threads] = stack;
 	thread_stack_size[num_threads] = stack_size;
-        regs = &thread_contexts[num_threads++];
-        store_context(regs);
-        /* Subtract 4 to leave room for the PR push in load_context()
-           Align it on an even 32 bit boundary */
-        regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
-        regs->sr = 0;
-        regs->pr = function;
-    }
+    regs = &thread_contexts[num_threads];
+    store_context(regs);
+    /* Subtract 4 to leave room for the PR push in load_context()
+       Align it on an even 32 bit boundary */
+    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
+    regs->sr = 0;
+    regs->pr = function;
+
     wake_up_thread();
-    return 0;
+    return num_threads++; /* return the current ID, e.g for remove_tread() */
+}
+
+/*--------------------------------------------------------------------------- 
+ * Remove a thread from the scheduler.
+ * Parameter is the ID as returned from create_thread().
+ *---------------------------------------------------------------------------
+ */
+void remove_thread(int threadnum)
+{
+    int i;
+
+    if(threadnum >= num_threads)
+       return;
+
+    num_threads--;
+    for (i=threadnum; i<num_threads-1; i++)
+    {   /* move all entries which are behind */
+        thread_name[i]       = thread_name[i+1];
+        thread_stack[i]      = thread_stack[i+1];
+        thread_stack_size[i] = thread_stack_size[i+1];
+        thread_contexts[i]   = thread_contexts[i+1];
+    }
 }
 
 void init_threads(void)
