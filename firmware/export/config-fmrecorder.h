@@ -25,8 +25,8 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
 
-/* Battery scale factor (?) */
-#define BATTERY_SCALE_FACTOR 6465
+/* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
+#define BATTERY_SCALE_FACTOR 8081
 
 /* Define this if you control power on PBDR (instead of PADR) */
 #define HAVE_POWEROFF_ON_PBDR
