@@ -7,9 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 1999 Mattis Wadman (nappe@sudac.org)
- *
- * Heavily modified for embedded use by Björn Stenberg (bjorn@haxx.se)
+ * Copyright (C) 2002 Daniel Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
