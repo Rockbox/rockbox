@@ -7,7 +7,7 @@
 # $Id$
 #
 
-CC    = sh-elf-gcc 
+CC    = sh-elf-gcc
 LD    = sh-elf-ld
 AR    = sh-elf-ar
 AS    = sh-elf-as
@@ -56,7 +56,7 @@ $(OBJDIR)/thread.o: thread.c thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(OBJDIR)/$(DEPS)/%.d: %.c
-	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
+	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
 	@echo "Updating dependencies for $<"
 	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
