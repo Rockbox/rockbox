@@ -42,10 +42,12 @@
 #include "settings.h"
 #include "ata.h"
 #include "fat.h"
-#include "radio.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
+#endif
+#ifdef HAVE_FMRADIO
+#include "radio.h"
 #endif
 
 /*---------------------------------------------------*/
