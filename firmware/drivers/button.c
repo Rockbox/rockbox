@@ -477,6 +477,9 @@ static int button_read(void)
     else if (data >= 0x0A1)
         btn |= BUTTON_DOWN;
 
+    if (btn && flipped)
+        btn = button_flip(btn); /* swap upside down */
+
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
     if(btn != last_read)
