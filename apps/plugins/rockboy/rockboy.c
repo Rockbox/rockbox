@@ -102,8 +102,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
+    
+    if (!parameter) {
+        rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
+        return PLUGIN_OK;
+    }
 #ifdef USE_IRAM
-          memcpy(iramstart, iramcopy, iramend-iramstart);
+    memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
     shut=0;
     cleanshut=0;
