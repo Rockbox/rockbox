@@ -140,7 +140,7 @@ int kbd_input(char* text, int buflen)
             lcd_puts(1, 0, temptext);
 
             /* write out the text */
-            curpos = MIN(editpos, 9 - MIN(len - editpos, 2));
+            curpos = MIN(MIN(editpos, 10 - MIN(len - editpos, 3)), 9);
             leftpos = editpos - curpos;
             strncpy(temptext, text + leftpos, 10);
             temptext[10] = 0;
