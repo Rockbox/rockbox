@@ -853,7 +853,7 @@ void settings_reset(void) {
     global_settings.battery_type = 0;
     global_settings.scroll_speed = 8;
     global_settings.bidir_limit  = 50;
-    global_settings.scroll_delay = 500;
+    global_settings.scroll_delay = 100;
     global_settings.scroll_step  = 6;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
