@@ -121,8 +121,10 @@ static int battery_type = 0;
 
 void set_battery_type(int type)
 {
-    battery_type = type;
-    battery_level_cached = -1; /* reset on type change */
+    if (type != battery_type) {
+        battery_type = type;
+        battery_level_cached = -1; /* reset on type change */
+    }
 }
 #endif
 
