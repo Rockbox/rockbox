@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include "screensaver.h"
 #include "types.h"
 #include "lcd.h"
 #include "button.h"
@@ -29,16 +30,6 @@
 
 #define SS_TITLE       "Boxes"
 #define SS_TITLE_FONT  2
-
-
-void drawrect(int x, int y, int x2, int y2)
-{
-    lcd_drawline(x, y, x2, y);
-    lcd_drawline(x, y2, x2, y2);
-
-    lcd_drawline(x, y, x, y2);
-    lcd_drawline(x2, y, x2, y2);
-}
 
 void ss_loop(void)
 {
