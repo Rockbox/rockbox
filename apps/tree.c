@@ -278,14 +278,16 @@ static int showdir(char *path, int start)
 #ifdef HAVE_LCD_BITMAP
         if ( dircache[i].attr & ATTR_DIRECTORY )
             icon_type = Folder;
-        else {
-            if ( dircache[i].attr & TREE_ATTR_M3U )
-                icon_type = Playlist;
-            else
-                icon_type = File;
-        }
-        lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                   4, MARGIN_Y+(i-start)*line_height, 6, 8, true);
+        else if ( dircache[i].attr & TREE_ATTR_M3U )
+            icon_type = Playlist;
+        else if ( dircache[i].attr & TREE_ATTR_MP3 )
+            icon_type = File;
+        else
+            icon_type = 0;
+
+        if (icon_type)
+            lcd_bitmap(bitmap_icons_6x8[icon_type], 
+                       4, MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #endif
 
 
@@ -526,7 +528,7 @@ bool dirbrowse(char *root)
                                   0, seed );
                         start_index = 0;
                     }
-                    else {
+                    else if (dircache[dircursor+start].attr & TREE_ATTR_MP3 ) {
                         if ( global_settings.resume )
                             strncpy(global_settings.resume_file,
                                     currdir, MAX_PATH);
@@ -537,6 +539,8 @@ bool dirbrowse(char *root)
                         start_index = play_list(currdir, NULL,
                                                 start_index, false, 0, seed);
                     }
+                    else
+                        break;
 
                     if ( global_settings.resume ) {
                         /* the resume_index must always be the index in the
