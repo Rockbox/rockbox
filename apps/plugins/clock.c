@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: clock.c,v 2.40 2003/12/8
+ * $Id: clock.c,v 2.51 2003/12/8
  *
  * Copyright (C) 2003 Zakk Roberts
  *
@@ -19,6 +19,9 @@
 
 /*****************************
  * RELEASE NOTES
+
+***** VERSION 2.51 **
+-"Show Counter" option is now saved to disk
 
 ***** VERSION 2.50 **
 -New general settings mode added, -reworked options screen,
@@ -73,7 +76,7 @@ Original release, featuring analog / digital modes and a few options.
 
 #ifdef HAVE_LCD_BITMAP
 
-#define CLOCK_VERSION "2.50"
+#define CLOCK_VERSION "2.51"
 
 /************
  * Prototypes
@@ -96,7 +99,6 @@ bool counting_up = true;
 int target_hour=0, target_minute=0, target_second=0;
 int remaining_h=0, remaining_m=0, remaining_s=0;
 bool editing_target = false;
-bool display_counter = true;
 
 /*********************
  * Used to center text
@@ -373,6 +375,7 @@ struct saved_settings
     int clock; /* 1: analog, 2: digital led, 3: digital lcd, 4: full, 5: binary */
     bool backlight_on;
     int save_mode; /* 1: on exit, 2: automatically, 3: manually */
+    bool display_counter;
 
     /* analog */
     bool analog_digits;
@@ -407,6 +410,7 @@ void reset_settings(void)
     settings.clock = 1; /* 1: analog, 2: digital led, 3: digital lcd, 4: full, 5: binary */
     settings.backlight_on = true;
     settings.save_mode = 1; /* 1: on exit, 2: automatically, 3: manually */
+    settings.display_counter = true;
 
     /* analog */
     settings.analog_digits = false;
@@ -1952,7 +1956,7 @@ void general_settings(void)
 
         rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
         rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
-        draw_checkbox(display_counter, 1, 33);
+        draw_checkbox(settings.display_counter, 1, 33);
 
         if(settings.save_mode == 1)
             rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
@@ -1975,6 +1979,8 @@ void general_settings(void)
         {
             case BUTTON_OFF:
             case BUTTON_F3:
+                if(settings.save_mode == 2)
+                    save_settings(false);
                 done = true;
                 break;
 
@@ -1990,7 +1996,7 @@ void general_settings(void)
 
             case BUTTON_LEFT:
                 if(cursorpos == 3)
-                    display_counter = false;
+                    settings.display_counter = false;
                 else
                 {
                     if(settings.save_mode > 1)
@@ -2007,7 +2013,7 @@ void general_settings(void)
                 else if(cursorpos == 2)
                     save_settings(false);
                 else if(cursorpos == 3)
-                    display_counter = true;
+                    settings.display_counter = true;
                 else
                 {
                     if(settings.save_mode < 3)
@@ -2382,7 +2388,7 @@ void show_counter(void)
         rb->snprintf(count_text, sizeof(count_text), "%d:%02d:%02d", remaining_h, remaining_m, remaining_s);
 
     /* allows us to flash the counter if it's paused */
-    if(display_counter)
+    if(settings.display_counter)
     {
         if(settings.clock == 1)
             rb->lcd_puts(11, 7, count_text);
@@ -2825,7 +2831,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case BUTTON_F2 | BUTTON_REL: /* start/stop counter */
-                if(display_counter)
+                if(settings.display_counter)
                 {
                     if(!f2_held) /* Ignore if the counter was reset */
                     {
@@ -2845,7 +2851,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case BUTTON_F2 | BUTTON_REPEAT: /* reset counter */
-                if(display_counter)
+                if(settings.display_counter)
                 {
                     f2_held = true;  /* Ignore the release event */
                     counter = 0;
