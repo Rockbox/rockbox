@@ -176,7 +176,9 @@ setid3v2title(int fd, mp3entry *entry)
 
     /* Check version */
     lseek(fd, 0, SEEK_SET);
-    read(fd, header, 10);
+    if(10 != read(fd, header, 10))
+        return;
+
     version = (unsigned short int)header[3];
 	
     /* Read all frames in the tag */
@@ -348,7 +350,7 @@ getid3v1len(int fd)
 static int 
 getsonglength(int fd, mp3entry *entry)
 {
-    long header;
+    long header=0;
     int version;
     int layer;
     int bitindex;
