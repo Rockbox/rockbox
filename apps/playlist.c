@@ -245,14 +245,6 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
 static void create_control(struct playlist_info* playlist)
 {
     playlist->control_fd = creat(playlist->control_filename, 0000200);
-    if (playlist->control_fd >= 0)
-    {   
-        /* have to close and re-open without O_TRUNC, otherwise it may get
-           chopped on closing (the file pointer is not always at the end) */
-        close(playlist->control_fd);
-        playlist->control_fd = open(playlist->control_filename, O_RDWR);
-    }
-
     if (playlist->control_fd < 0)
     {
         splash(HZ*2, true, "%s (%d)", str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
