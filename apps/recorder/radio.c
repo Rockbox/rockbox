@@ -504,8 +504,6 @@ bool radio_screen(void)
                     }
                 }
                 
-                /* Only force the redraw if update_screen is true */
-                status_draw(update_screen);
 #if CONFIG_KEYPAD == RECORDER_PAD
                 buttonbar_draw();
 #endif                
@@ -513,6 +511,8 @@ bool radio_screen(void)
                 
                 update_screen = false;
             }
+            /* Only force the redraw if update_screen is true */
+            status_draw(update_screen);
         }
 
         if(mpeg_status() & MPEG_STATUS_ERROR)
