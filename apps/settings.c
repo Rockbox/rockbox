@@ -63,12 +63,12 @@ offset  abs
 0x0b    0x1f    <backlight byte>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
-0x0e    0x22    <shuffle mode & directory filter byte>
+0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden>
 0x0f    0x23    <scroll speed & WPS display byte>
 0x10    0x24    <playlist options byte>
 0x11    0x25    <AVC byte>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
-0x16    0x2b    <(int) Byte offset into resume file>
+0x16    0x2a    <(int) Byte offset into resume file>
 
         <all unused space filled with 0xff>
 
