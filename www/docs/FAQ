@@ -268,3 +268,7 @@ A32: You really don't want to know what I think, it involves road flares,
      a slave.  Most other USB devices are slaves as well.  So without some
      master involved there can be no communication.  Sorry.  Now about your
      soul.  Would you settle for 3 cents and a small wad of belly button lint?
+
+Q33: When I use RockBox my jukebox's red "error" light turns on a lot, but this     doesn't happen on the factory firmware.  Why?
+A33: Rockbox uses the red LED as harddisk activity light, not as an error 
+     light. Relax and enjoy the music.
