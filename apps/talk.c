@@ -85,6 +85,10 @@ static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 static int filehandle; /* global, so the MMC variant can keep the file open */
+static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
+static int silence_len; /* length of the VOICE_PAUSE clip */
+static bool silence_add; /* flag if trailing silence shall be added */
+static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 
 
 /***************** Private prototypes *****************/
@@ -94,6 +98,7 @@ static void mp3_callback(unsigned char** start, int* size);
 static int shutup(void);
 static int queue_clip(unsigned char* buf, int size, bool enqueue);
 static int open_voicefile(void);
+static unsigned char* get_clip(int id, int* p_size);
 
 
 /***************** Private implementation *****************/
@@ -164,6 +169,9 @@ static void load_voicefile(void)
     filehandle = -1;
 #endif
 
+    /* make sure to have the silence clip, if available */
+    p_silence = get_clip(VOICE_PAUSE, &silence_len);
+
     return;
 
 load_err:
@@ -191,7 +199,7 @@ static void mp3_callback(unsigned char** start, int* size)
         *size = sent;
         return;
     }
-    else /* go to next entry */
+    else if (sent > 0) /* go to next entry */
     {
         queue_read++;
         if (queue_read >= QUEUE_SIZE)
@@ -201,11 +209,19 @@ static void mp3_callback(unsigned char** start, int* size)
     if (QUEUE_LEVEL) /* queue is not empty? */
     {   /* start next clip */
         sent = MIN(queue[queue_read].len, 0xFFFF);
-        *start = queue[queue_read].buf;
+        *start = p_lastclip = queue[queue_read].buf;
         *size = sent;
         curr_hd[0] = *start[1];
         curr_hd[1] = *start[2];
         curr_hd[2] = *start[3];
+    }
+    else if (silence_add && p_silence != NULL /* want and can add silence */
+          && p_lastclip < p_thumbnail) /* and wasn't playing thumbnail file */
+    {   /* add silence clip when queue runs empty playing a voice clip */
+        silence_add = false; /* do this only once */
+        sent = 0; /* not part of "official" data from queue */
+        *start = p_silence;
+        *size = silence_len;
     }
     else
     {
@@ -302,6 +318,8 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
         
     if (queue_level == 0)
     {   /* queue was empty, we have to do the initial start */
+        silence_add = true;
+        p_lastclip = buf;
         sent = MIN(size, 0xFFFF); /* DMA can do no more */
         mp3_play_data(buf, sent, mp3_callback);
         curr_hd[0] = buf[1];
@@ -317,6 +335,50 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
     return 0;
 }
 
+/* fetch a clip from the voice file */
+static unsigned char* get_clip(int id, int* p_size)
+{
+    int clipsize;
+    unsigned char* clipbuf;
+    
+    if (id > VOICEONLY_DELIMITER)
+    {   /* voice-only entries use the second part of the table */
+        id -= VOICEONLY_DELIMITER + 1;
+        if (id >= p_voicefile->id2_max)
+            return NULL; /* must be newer than we have */
+        id += p_voicefile->id1_max; /* table 2 is behind table 1 */
+    }
+    else
+    {   /* normal use of the first table */
+        if (id >= p_voicefile->id1_max)
+            return NULL; /* must be newer than we have */
+    }
+    
+    clipsize = p_voicefile->index[id].size;
+    if (clipsize == 0) /* clip not included in voicefile */
+        return NULL;
+    clipbuf = mp3buf + p_voicefile->index[id].offset;
+
+#ifdef HAVE_MMC /* dynamic loading, on demand */
+    if (!(clipsize & LOADED_MASK))
+    {   /* clip used for the first time, needs loading */
+        lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
+        if (read(filehandle, clipbuf, clipsize) != clipsize)
+            return NULL; /* read error */
+
+        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
+    }
+    else
+    {   /* clip is in memory already */
+        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
+    }
+#endif
+
+    *p_size = clipsize;
+    return clipbuf;
+}
+
+
 /* common code for talk_init() and talk_buffer_steal() */
 static void reset_state(void)
 {
@@ -324,6 +386,7 @@ static void reset_state(void)
     p_voicefile = NULL; /* indicate no voicefile (trashed) */
     p_thumbnail = mp3buf; /*  whole space for thumbnail */
     size_for_thumbnail = mp3end - mp3buf;
+    p_silence = NULL; /* pause clip not accessible */
 }
 
 /***************** Public implementation *****************/
@@ -392,38 +455,9 @@ int talk_id(int id, bool enqueue)
         return 0; /* and stop, end of special case */
     }
 
-    if (id > VOICEONLY_DELIMITER)
-    {   /* voice-only entries use the second part of the table */
-        id -= VOICEONLY_DELIMITER + 1;
-        if (id >= p_voicefile->id2_max)
-            return -1; /* must be newer than we have */
-        id += p_voicefile->id1_max; /* table 2 is behind table 1 */
-    }
-    else
-    {   /* normal use of the first table */
-        if (id >= p_voicefile->id1_max)
-            return -1; /* must be newer than we have */
-    }
-    
-    clipsize = p_voicefile->index[id].size;
-    if (clipsize == 0) /* clip not included in voicefile */
-        return -1;
-    clipbuf = mp3buf + p_voicefile->index[id].offset;
-
-#ifdef HAVE_MMC /* dynamic loading, on demand */
-    if (!(clipsize & LOADED_MASK))
-    {   /* clip used for the first time, needs loading */
-        lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
-        if (read(filehandle, clipbuf, clipsize) != clipsize)
-            return -1; /* read error */
-
-        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
-    }
-    else
-    {   /* clip is in memory already */
-        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
-    }
-#endif
+    clipbuf = get_clip(id, &clipsize);
+    if (clipbuf == NULL)
+        return -1; /* not present */
 
     queue_clip(clipbuf, clipsize, enqueue);
 
