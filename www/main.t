@@ -1,26 +1,7 @@
 #define _LOGO_ <img src="rockbox400.png" align=center width=400 height=123>
 #define _PAGE_ Open Source Jukebox Firmware
+#define MAIN_PAGE
 #include "head.t"
-
-<p><small><a href="docs/FAQ">FAQ</a> &middot;
-<a href="notes.html">research notes</a> &middot;
-<a href="docs/">data sheets</a> &middot;
-<a href="schematics/">schematics</a> &middot;
-<a href="mods/">hardware mods</a> &middot;
-<a href="http://bjorn.haxx.se/rockbox/mail.cgi">mail list archive</a> &middot;
-<a href="irc/">IRC</a> &middot;
-<a href="tools.html">tools</a> &middot;
-<a href="internals/">photos</a> &middot;
-<a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a> &middot;
-<a href="cvs.html">CVS</a> &middot;
-<a href="/isd200/">linux driver</a>
-</small>
-
-<form action="http://www.google.com/search">
-<input name=as_q> <input value="Search" type=submit>
-<input type=hidden name=as_oq value=rockbox>
-<input type=hidden name=as_sitesearch value="bjorn.haxx.se">
-</form>
 
 <h2>Purpose</h2>
 

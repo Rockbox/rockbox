@@ -1,0 +1,51 @@
+BODY {
+ background-color: #b6c6e5;
+ color: black;
+ margin: 0px;
+}
+
+H1 {
+ text-decoration:  none;
+ font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-style:       normal;
+ font-weight:      bold;
+ font-size:        20pt;
+}
+
+H2 {
+ text-decoration:  none;
+ font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-style:       normal;
+ font-weight:      bold;
+ font-size:        12pt;
+}
+
+H3 {
+ text-decoration:  none;
+ font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-style:       normal;
+ font-weight:      bold;
+ font-size:        10pt;
+}
+
+BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT, A
+{
+ text-decoration:  none;
+ font-family:      Verdana,Arial,Helvetica,sans-serif;
+ font-style:       normal;
+ font-size:        10pt;
+}
+
+A {
+ text-decoration: underline;
+}
+
+.bgbox {
+ left-border-width: 1px;
+ border-color: black;
+}
+
+.menulink {
+ color: #f0f0f0;
+# text-decoration: none;
+}
