@@ -24,8 +24,6 @@
 
 #include "icons.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 unsigned char slider_bar[] =
 {
     0x38, 0x28, 0x28, 0x28, 0x28,
@@ -159,7 +157,7 @@ void statusbar_wipe(void)
     int x;
 
     for (x = 0; x < LCD_WIDTH; x++)
-        lcd_framebuffer[x][STATUSBAR_Y_POS/8]=0x00; 
+        lcd_framebuffer[x][STATUSBAR_Y_POS / 8] = 0; 
 }
 
 /*
@@ -171,31 +169,35 @@ void statusbar_icon_battery(int percent, bool charging)
     int fill;
 
     /* draw battery */
-    for(i=0;i<17;i++) {
-        DRAW_PIXEL((ICON_BATTERY_X_POS+i),STATUSBAR_Y_POS);
-        DRAW_PIXEL((ICON_BATTERY_X_POS+i),(STATUSBAR_Y_POS+6));
+    for (i=0; i < 17; i++) {
+        DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS);
+        DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS + 6);
     }
-    for(i=1;i<6;i++) {
-        DRAW_PIXEL(ICON_BATTERY_X_POS,(STATUSBAR_Y_POS+i));
-        DRAW_PIXEL((ICON_BATTERY_X_POS+16),(STATUSBAR_Y_POS+i));
+
+    for (i=1; i < 6; i++) {
+        DRAW_PIXEL(ICON_BATTERY_X_POS, STATUSBAR_Y_POS + i);
+        DRAW_PIXEL(ICON_BATTERY_X_POS + 16, STATUSBAR_Y_POS + i);
     }
-    for(i=2;i<5;i++)
-        DRAW_PIXEL((ICON_BATTERY_X_POS+17),(STATUSBAR_Y_POS+i));
+
+    for (i=2; i < 5; i++)
+        DRAW_PIXEL(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
 
     /* fill battery */
     fill=percent;
-    if(fill<0)
-        fill=0;
-    if(fill>100)
-        fill=100;
-    fill=fill*15/100;
+    if (fill < 0)
+        fill = 0;
+    if (fill > 100)
+        fill = 100;
 
-    for(i=1;i<=fill;i++)
-        for(j=1;j<6;j++)
-            DRAW_PIXEL((ICON_BATTERY_X_POS+i),(STATUSBAR_Y_POS+j));
+    fill = fill * 15 / 100;
 
-    if(charging)
-        lcd_bitmap(bitmap_icon_7x8[Icon_Plug], ICON_PLUG_X_POS, STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+    for (i=1; i <= fill; i++)
+        for (j=1; j < 6; j++)
+            DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS + j);
+
+    if (charging)
+        lcd_bitmap(bitmap_icon_7x8[Icon_Plug], ICON_PLUG_X_POS,
+                   STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
 };
 
 /*
@@ -210,30 +212,35 @@ void statusbar_icon_volume(int percent)
     static long switch_tick;
     static int last_volume;
 
-    volume=percent;
-    if(volume<0)
-        volume=0;
-    if(volume>100)
-        volume=100;
+    volume = percent;
+    if (volume < 0)
+        volume = 0;
+    if (volume > 100)
+        volume = 100;
 
-    if(volume==0)
-        lcd_bitmap(bitmap_icon_7x8[Icon_Mute], ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-4, STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
+    if (volume==0) {
+        lcd_bitmap(bitmap_icon_7x8[Icon_Mute], 
+                   ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 - 4,
+                   STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
+    }
     else {
-        if(last_volume!=volume) {
-            switch_tick=current_tick+HZ;
-            last_volume=volume;
+        if (last_volume != volume) {
+            switch_tick = current_tick + HZ;
+            last_volume = volume;
         }
-        if(TIME_BEFORE(current_tick,switch_tick)) { /* display volume lever numerical */
+        /* display volume lever numerical? */
+        if (TIME_BEFORE(current_tick,switch_tick)) { 
             snprintf(buffer, sizeof(buffer), "%2d", percent);
-            lcd_putsxy(ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-6*strlen(buffer)/2, STATUSBAR_Y_POS, buffer, 0);
+            lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
+                       6*strlen(buffer)/2, STATUSBAR_Y_POS, buffer, 0);
         }
         else { /* display volume bar */
-            volume=volume*14/100;
-            for(i=0;i<volume;i++) {
+            volume = volume * 14 / 100;
+            for(i=0; i < volume; i++) {
                 if(i%2 == 0)
                     step++;
-                for(j=1;j<=step;j++)
-                    DRAW_PIXEL((ICON_VOLUME_X_POS+i),(STATUSBAR_Y_POS+7-j));
+                for(j=1; j <= step; j++)
+                    DRAW_PIXEL(ICON_VOLUME_X_POS + i, STATUSBAR_Y_POS + 7 - j);
             }
         }
     }
@@ -244,7 +251,8 @@ void statusbar_icon_volume(int percent)
  */
 void statusbar_icon_play_state(int state)
 {
-    lcd_bitmap(bitmap_icon_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS, ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+    lcd_bitmap(bitmap_icon_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS,
+               ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
 /*
@@ -252,7 +260,8 @@ void statusbar_icon_play_state(int state)
  */
 void statusbar_icon_play_mode(int mode)
 {
-    lcd_bitmap(bitmap_icon_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS, ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT, false);
+    lcd_bitmap(bitmap_icon_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS,
+               ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
 /*
@@ -260,7 +269,8 @@ void statusbar_icon_play_mode(int mode)
  */
 void statusbar_icon_shuffle(void)
 {
-    lcd_bitmap(bitmap_icon_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT, false);
+    lcd_bitmap(bitmap_icon_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, 
+               STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
 /*
@@ -268,7 +278,8 @@ void statusbar_icon_shuffle(void)
  */
 void statusbar_icon_lock(void)
 {
-    lcd_bitmap(bitmap_icon_5x8[Icon_Lock], LOCK_X_POS, STATUSBAR_Y_POS, 5, 8, false);
+    lcd_bitmap(bitmap_icon_5x8[Icon_Lock], LOCK_X_POS, 
+               STATUSBAR_Y_POS, 5, 8, false);
 }
 
 #ifdef HAVE_RTC
@@ -290,5 +301,4 @@ void statusbar_time(void)
              minute & 0x0f);
     lcd_putsxy(TIME_X_POS, STATUSBAR_Y_POS, buffer, 0);
 }
-#endif
 #endif
