@@ -24,6 +24,7 @@
 #include "button.h"
 #include "mpeg.h"
 #include "settings.h"
+#include "status.h"
 
 static char *fmt[] =
 {
@@ -67,6 +68,7 @@ void set_sound(char* string,
         }
         lcd_puts(0,1,str);
         lcd_update();
+        status_draw();
 
         switch( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
