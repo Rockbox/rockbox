@@ -43,7 +43,7 @@
 #endif
 
 #define MAX_FILES_IN_DIR 200
-#define TREE_MAX_FILENAMELEN 128
+#define TREE_MAX_FILENAMELEN MAX_PATH
 #define MAX_DIR_LEVELS 10
 
 struct entry {
@@ -54,7 +54,7 @@ struct entry {
 static struct entry dircache[MAX_FILES_IN_DIR];
 static struct entry* dircacheptr[MAX_FILES_IN_DIR];
 static int filesindir;
-static char lastdir[256] = {0};
+static char lastdir[MAX_PATH] = {0};
 
 void browse_root(void)
 {
@@ -201,12 +201,12 @@ static int dirpos[MAX_DIR_LEVELS];
 static int cursorpos[MAX_DIR_LEVELS];
 static int dirlevel=0;
 static int play_mode = 0;
-static char currdir[255];
+static char currdir[MAX_PATH];
 
 /* QUICK HACK! this should be handled by the playlist code later */
 char* peek_next_track(int steps)
 {
-    static char buf[256];
+    static char buf[MAX_PATH];
 
     switch(play_mode) {
         case 1:
@@ -253,7 +253,7 @@ char* peek_next_track(int steps)
 
 bool dirbrowse(char *root)
 {
-    char buf[255];
+    char buf[MAX_PATH];
     int i;
     int button;
     int rc;
