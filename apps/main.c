@@ -51,6 +51,8 @@
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"
+#include "screens.h"
+#include "power.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -98,7 +100,8 @@ void init(void)
 {
     int rc, i;
     struct partinfo* pinfo;
-    bool coldstart; /* starting from Flash */
+    /* if nobody initialized ATA before, I consider this a cold start */
+    bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
 
     system_init();
     kernel_init();
@@ -133,8 +136,14 @@ void init(void)
 
     button_init();
 
-    /* if nobody initialized ATA before, I consider this a cold start */
-    coldstart = (PACR2 & 0x4000) != 0; 
+    if (coldstart && charger_inserted())
+    {
+        rc = charging_screen(); /* display a "charging" screen */
+        if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
+            power_off();
+        /* "On" pressed or USB connected: proceed */
+        ide_power_enable(true);
+    }
 
     rc = ata_init();
     if(rc)
@@ -222,3 +231,4 @@ int main(void)
     return 0;
 }
 #endif
+

@@ -32,6 +32,7 @@
 #include "playlist.h"
 #include "sprintf.h"
 #include "kernel.h"
+#include "power.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -115,6 +116,60 @@ void usb_screen(void)
     backlight_on();
 #endif
 }
+
+
+/* blocks while charging, returns on event:
+   1 if charger cable was removed
+   2 if Off/Stop key was pressed
+   3 if On key was pressed
+   4 if USB was connected */
+int charging_screen(void)
+{
+    int button;
+    int rc = 0;
+#ifdef HAVE_RECORDER_KEYPAD
+    const int offbutton = BUTTON_OFF;
+#else
+    const int offbutton = BUTTON_STOP;
+#endif
+
+    ide_power_enable(false); /* power down the disk, else would be spinning */
+
+    backlight_on();
+    lcd_clear_display();
+    status_draw(true);
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_puts(0, 3, "[Rockbox charging]"); /* ToDo: show some logo instead */
+    lcd_update();
+#else
+    status_set_playmode(STATUS_STOP);
+    lcd_puts(0, 1, "[charging]");
+#endif
+    
+    charger_enable(true);
+
+    do
+    {
+        status_draw(false);
+        button = button_get_w_tmo(HZ/2);
+        if (button == BUTTON_ON)
+            rc = 3;
+        else if (button == offbutton)
+            rc = 2;
+        else
+        {
+            if (usb_detect())
+                rc = 4;
+            else if (!charger_inserted())
+                rc = 1;
+        }
+    } while (!rc);
+
+    return rc;
+}
+
+
 
 #ifdef HAVE_RECORDER_KEYPAD
 /* returns:
@@ -643,3 +698,4 @@ void splash(int ticks,   /* how long */
             sleep(ticks);
     }
 }
+
