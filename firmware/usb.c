@@ -173,7 +173,8 @@ static void usb_tick(void)
     if(usb_monitor_enabled)
     {
 #ifdef ARCHOS_RECORDER
-	current_status = (PCDR & 0x04)?true:false;
+	/* If AN2 reads more than about 500, the USB is inserted */
+	current_status = (adc_read(2) > 500);
 #else
 	current_status = (PADR & 0x8000)?false:true;
 #endif

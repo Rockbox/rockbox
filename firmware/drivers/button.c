@@ -27,6 +27,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
+#include "adc.h"
 
 struct event_queue button_queue;
 
@@ -118,7 +119,7 @@ int button_get(bool block)
  *
  * DOWN, PLAY, LEFT, and RIGHT are likewise connected to AN5. */
  
-/* Button voltage levels on AN4 and AN5 */
+/* Button analog voltage levels */
 #define	LEVEL1		50
 #define	LEVEL2		125
 #define	LEVEL3		175
@@ -134,13 +135,6 @@ void button_init()
     PBCR1 &= 0xfffc; /* PB8MD = 00 */
     PBCR2 &= 0xfcff; /* PB4MD = 00 */
     PBIOR &= ~(PBDR_BTN_ON|PBDR_BTN_OFF); /* Inputs */
-  
-    /* Set A/D to scan AN4 and AN5.
-     * This needs to be changed to scan other analog pins
-     * for battery level, etc. */
-    ADCSR = 0;
-    ADCR  = 0;
-    ADCSR = ADCSR_ADST | ADCSR_SCAN | 0x5;
 #endif
     queue_init(&button_queue);
     tick_add_task(button_tick);
@@ -158,8 +152,8 @@ static int button_read(void)
     else if ((data & PBDR_BTN_OFF) == 0)
         return BUTTON_OFF;
 
-    /* Check AN4 pin for F1-3 and UP */
-    data = ADDRAH;
+    /* Check F1-3 and UP */
+    data = adc_read(ADC_BUTTON_ROW1);
     if (data >= LEVEL4)
         return BUTTON_F3;
     else if (data >= LEVEL3)
@@ -169,8 +163,8 @@ static int button_read(void)
     else if (data >= LEVEL1)
         return BUTTON_F1;
 
-    /* Check AN5 pin for DOWN, PLAY, LEFT, RIGHT */
-    data = ADDRBH;
+    /* Check DOWN, PLAY, LEFT, RIGHT */
+    data = adc_read(ADC_BUTTON_ROW2);
     if (data >= LEVEL4)
         return BUTTON_DOWN;
     else if (data >= LEVEL3)
