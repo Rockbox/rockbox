@@ -24,7 +24,6 @@
 # endif
 
 # include "global.h"
-
 # include "fixed.h"
 # include "frame.h"
 # include "synth.h"
@@ -101,7 +100,6 @@ void mad_synth_mute(struct mad_synth *synth)
 # endif
 
 /* possible DCT speed optimization */
-
 # if defined(OPT_SPEED) && defined(MAD_F_MLX)
 #  define OPT_DCTO
 #  define MUL(x, y)  \
@@ -114,7 +112,6 @@ void mad_synth_mute(struct mad_synth *synth)
 #  undef OPT_DCTO
 #  define MUL(x, y)  mad_f_mul((x), (y))
 # endif
-
 /*
  * NAME:	dct32()
  * DESCRIPTION:	perform fast in[32]->out[32] DCT
@@ -161,7 +158,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 #  define costab9	MAD_F(0x73b5ebd1)
 #  define costab10	MAD_F(0x70e2cbc6)
 #  define costab11	MAD_F(0x6dca0d14)
-#  define costab12	MAD_F(0x6a6d98a4)
+#  define costab12	MAD_F(0x6a5d98a4)
 #  define costab13	MAD_F(0x66cf8120)
 #  define costab14	MAD_F(0x62f201ac)
 #  define costab15	MAD_F(0x5ed77c8a)
@@ -211,7 +208,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 #  define costab27	MAD_F(0x03e33f2f)  /* 0.242980180 */
 #  define costab28	MAD_F(0x031f1708)  /* 0.195090322 */
 #  define costab29	MAD_F(0x0259020e)  /* 0.146730474 */
-#  define costab30	MAD_F(0x01917a6c)  /* 0.098017140 */
+#  define costab30	MAD_F(0x01917a5c)  /* 0.098017140 */
 #  define costab31	MAD_F(0x00c8fb30)  /* 0.049067674 */
 # endif
 
@@ -542,7 +539,7 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 # endif
 
 static
-mad_fixed_t const D[17][32] = {
+mad_fixed_t const D[17][32] __attribute__ ((section(".idata"))) = {
 # include "D.dat"
 };
 
@@ -550,10 +547,167 @@ mad_fixed_t const D[17][32] = {
 void synth_full(struct mad_synth *, struct mad_frame const *,
 		unsigned int, unsigned int);
 # else
+
 /*
  * NAME:	synth->full()
  * DESCRIPTION:	perform full frequency PCM synthesis
  */
+
+/* optimised version of synth full, requires OPT_SSO at the moment */
+# if CONFIG_CPU==MCF5249 && defined(OPT_SSO) && !defined(SIMULATOR)
+static
+void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
+		unsigned int nch, unsigned int ns)
+{
+  unsigned int phase, ch, s, sb, pe, po;
+  mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
+  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  mad_fixed_t const (*Dptr)[32], *ptr;
+  mad_fixed64hi_t hi = 0;
+  mad_fixed64lo_t lo;
+
+  asm volatile("move.l #0, %macsr"); /* need integer mode */
+  
+  for (ch = 0; ch < nch; ++ch) {
+    sbsample = &frame->sbsample[ch];
+    filter   = &synth->filter[ch];
+    phase    = synth->phase;
+    pcm1     = synth->pcm.samples[ch];
+
+    for (s = 0; s < ns; ++s) {
+      dct32((*sbsample)[s], phase >> 1,
+	    (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+
+      pe = phase & ~1;
+      po = ((phase - 1) & 0xf) | 1;
+
+      /* calculate 32 samples */
+
+      fe = &(*filter)[0][ phase & 1][0];
+      fx = &(*filter)[0][~phase & 1][0];
+      fo = &(*filter)[1][~phase & 1][0];
+
+      Dptr = &D[0];
+
+      asm volatile(
+        "movem.l (%1), %%d0-%%d7\n\t"
+        "move.l (%2), %%a5\n\t"
+        "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d7, %%a5, (%4), %%a5, %%acc0\n\t"
+        
+        "movem.l (%3), %%d0-%%d7\n\t"
+        "mac.l %%d0, %%a5, 56(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, 48(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, 40(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, 32(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d4, %%a5, 24(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d5, %%a5, 16(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d6, %%a5, 8(%4), %%a5, %%acc0\n\t"
+        "mac.l %%d7, %%a5, %%acc0\n\t"
+        "movclr.l %%acc0, %0"
+        : "=ad" (lo) : "a" (*fx), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+      *pcm1++ = SHIFT(MLZ(hi, lo));
+
+      pcm2 = pcm1 + 30;
+
+      for (sb = 1; sb < 16; ++sb) {
+	++fe;
+	++Dptr;
+
+	/* D[32 - sb][i] == -D[sb][31 - i] */
+        asm volatile (
+          "movem.l (%1), %%d0-%%d7\n\t"
+          "move.l (%2), %%a5\n\t"
+          "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d7, %%a5, 8(%4), %%a5, %%acc0\n\t"
+        
+          "movem.l (%3), %%d0-%%d7\n\t"
+          "mac.l %%d7, %%a5, 16(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d6, %%a5, 24(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d5, %%a5, 32(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d4, %%a5, 40(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d3, %%a5, 48(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d2, %%a5, 56(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d1, %%a5, (%4), %%a5, %%acc0\n\t"
+          "mac.l %%d0, %%a5, %%acc0\n\t"
+          "movclr.l %%acc0, %0"
+          : "=ad" (lo) 
+          : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
+          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+	*pcm1++ = SHIFT(MLZ(hi, lo));
+
+        asm volatile(
+          "movem.l (%1), %%d0-%%d7\n\t"
+          "move.l 60(%2), %%a5\n\t"
+          "mac.l %%d0, %%a5, 68(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d1, %%a5, 76(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d2, %%a5, 84(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d3, %%a5, 92(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d4, %%a5, 100(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d5, %%a5, 108(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d6, %%a5, 116(%2), %%a5, %%acc0\n\t"
+          "mac.l %%d7, %%a5, 116(%4), %%a5, %%acc0\n\t"
+       
+          "movem.l (%3), %%d0-%%d7\n\t"
+          "mac.l %%d7, %%a5, 108(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d6, %%a5, 100(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d5, %%a5, 92(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d4, %%a5, 84(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d3, %%a5, 76(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d2, %%a5, 68(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d1, %%a5, 60(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d0, %%a5, %%acc0\n\t"
+          "movclr.l %%acc0, %0"
+          : "=ad" (lo) 
+          : "a" (*fe), "a" (*Dptr - pe), "a" (*fo), "a" (*Dptr - po) 
+          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+	*pcm2-- = SHIFT(MLZ(hi, lo));
+
+	++fo;
+      }
+
+      ++Dptr;
+      asm volatile(
+        "movem.l (%1), %%d0-%%d7\n\t"
+        "move.l (%2), %%a5\n\t"
+        "mac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d7, %%a5, %%acc0\n\t"
+        "movclr.l %%acc0, %0" 
+        : "=ad" (lo) : "a" (*fo), "a" (*Dptr + po) 
+        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+      *pcm1 = SHIFT(-MLZ(hi, lo));
+      pcm1 += 16;
+
+      phase = (phase + 1) % 16;
+    }
+  }
+}
+
+#else
+
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
@@ -685,6 +839,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
     }
   }
 }
+# endif
 # endif
 
 /*
@@ -855,3 +1010,4 @@ void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 
   synth->phase = (synth->phase + ns) % 16;
 }
+

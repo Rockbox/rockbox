@@ -28,9 +28,9 @@
 
 static struct plugin_api* rb;
 
-struct mad_stream  Stream;
-struct mad_frame  Frame;
-struct mad_synth  Synth;
+struct mad_stream  Stream __attribute__ ((section(".idata")));
+struct mad_frame  Frame __attribute__ ((section(".idata")));
+struct mad_synth  Synth __attribute__ ((section(".idata")));
 mad_timer_t      Timer;
 struct dither d0, d1;
 
