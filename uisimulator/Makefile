@@ -24,8 +24,9 @@ RM = rm
 
 CFLAGS = -g
 CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS
-LDFLAGS = -lX11 -lm -lXt -lXmu -lsocket -lnsl
-
+LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
+INCLUDES = -I/usr/X11R6/include
+LIBDIRS = -L/usr/X11R6/lib
 DEPEND = .depends
 
 OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o
@@ -42,13 +43,13 @@ distclean: clean
 	$(RM) config.cache
 
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $<
 
 $(DEPEND):
 	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPEND)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $(LDFLAGS) $(OBJS)
+	$(CC) -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS)
 
 # Dependencies
 include $(DEPEND)
