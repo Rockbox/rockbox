@@ -16,9 +16,64 @@ input() {
     echo $response
 }
 
-echo "Setup your Rockbox build environment."
-echo "http://bjorn.haxx.se/rockbox/"
-echo ""
+simulator() {
+ ##################################################################
+ # Figure out where the firmware code is!
+ #
+
+ simfile="x11/lcd-x11.c" # a file to check for in the uisimulator root dir
+
+ for dir in uisimulator . .. ../uisimulator ../../uisimulator; do
+   if [ -f "$dir/$simfile" ]; then
+     simdir="$dir/x11"
+     break
+   fi
+ done
+
+ if [ -z "$simdir" ]; then
+   echo "This script couldn't find your uisimulator/x11 directory. Please enter the"
+   echo "full path to your uisimulator/x11 directory here:"
+
+   simdir=`input`
+ fi
+
+sed > Makefile \
+ -e "s,@SIMDIR@,${simdir},g" \
+ -e "s,@TARGET@,${target},g" \
+ -e "s,@DEBUG@,${debug},g" \
+ -e "s,@DISPLAY@,${display},g" \
+ -e "s,@KEYPAD@,${keypad},g" \
+ -e "s,@PWD@,${pwd},g" \
+<<EOF 
+## Automaticly generated. http://bjorn.haxx.se/rockbox/
+
+SIMDIR=@SIMDIR@
+DEBUG=@DEBUG@
+TARGET=@TARGET@
+DISPLAY=@DISPLAY@
+KEYPAD=@KEYPAD@
+THISDIR="@PWD@"
+
+.PHONE: 
+
+all: sim
+
+sim:
+	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR)
+
+clean-sim:
+	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
+
+clean:
+	make clean-sim
+
+EOF
+
+echo "Created Makefile"
+}
+
+# get our current directory
+pwd=`pwd`;
 
 if [ "$target" = "update" ]; then
   target=""
@@ -29,6 +84,12 @@ if [ "$target" = "update" ]; then
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
     fi
   fi
+else
+
+echo "Setup your Rockbox build environment."
+echo "http://bjorn.haxx.se/rockbox/"
+echo ""
+
 fi
 
 if [ -z "$target" ]; then
@@ -49,18 +110,22 @@ if [ -z "$target" ]; then
 
    1)
     target="-DARCHOS_PLAYER_OLD"
+    display="-DHAVE_LCD_CHARCELLS"
+    keypad="-DHAVE_PLAYER_KEYPAD"
     ;;
+
    2)
     target="-DARCHOS_PLAYER"
+    display="-DHAVE_LCD_CHARCELLS"
+    keypad="-DHAVE_PLAYER_KEYPAD"
     ;;
 
-   3)
+   *|3)
     target="-DARCHOS_RECORDER"
+    display="-DHAVE_LCD_BITMAP"
+    keypad="-DHAVE_RECORDER_KEYPAD"
     ;;
 
-   *)
-    target="-DARCHOS_RECORDER"
-    ;;
   esac
 fi
 
@@ -70,12 +135,16 @@ if [ -z "$debug" ]; then
   # Figure out debug on/off
   #
   echo ""
-  echo "Build DEBUG version? (y/N)"
+  echo "Build (N)ormal, (D)ebug or (S)imulated version? (N)"
 
   option=`input`;
 
   case $option in
-    [Yy])
+    [Ss])
+      debug="SIMULATOR=1"
+      simulator="yes"
+      ;;
+    [Dd])
       debug="DEBUG=1"
       ;;
     *)
@@ -85,6 +154,11 @@ if [ -z "$debug" ]; then
   esac
 fi
 
+if [ -n "$simulator" ]; then
+  # we deal with the simulator Makefile separately
+  simulator
+  exit
+fi
 
 ##################################################################
 # Figure out where the firmware code is!
@@ -125,8 +199,6 @@ if [ -z "$appsdir" ]; then
 
   appsdir=`input`
 fi
-
-pwd=`pwd`;
 
 sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
