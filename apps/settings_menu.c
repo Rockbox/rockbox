@@ -441,6 +441,7 @@ static bool trickle_charge(void)
 {
     bool result;
     result = set_bool( str(LANG_TRICKLE_CHARGE), &global_settings.trickle_charge );
+    enable_trickle_charge(result);
     return result;
 }
 #endif

@@ -33,7 +33,7 @@
 #include "mpeg.h"
 #include "usb.h"
 #include "powermgmt.h"
-#include "../apps/settings.h"
+#include "backlight.h"
 
 #ifdef SIMULATOR
 
@@ -70,11 +70,26 @@ static int percent_to_volt_nocharge[11] = /* voltages (centivolt) of 0%, 10%, ..
 };
 
 #ifdef HAVE_CHARGE_CTRL
+
+char power_message[POWER_MESSAGE_LEN] = "";
+char charge_restart_level = CHARGE_RESTART_HI;
+
+int powermgmt_last_cycle_startstop_min = 20; /* how many minutes ago was the charging started or stopped? */
+int powermgmt_last_cycle_level = 0;          /* which level had the batteries at this time? */
+bool trickle_charge_enabled = true;
+int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
+int charge_state = 0;                        /* at the beginning, the charger does nothing */
+
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
 };
-#endif
+
+void enable_trickle_charge(bool on)
+{
+    trickle_charge_enabled = on;
+}
+#endif /* HAVE_CHARGE_CTRL */
 
 int battery_lazyness[20] = /* how does the battery react when plugging in/out the charger */
 {
@@ -92,15 +107,6 @@ static bool sleeptimer_active = false;
 static unsigned long sleeptimer_endtick;
 
 unsigned short power_history[POWER_HISTORY_LEN];
-#ifdef HAVE_CHARGE_CTRL
-char power_message[POWER_MESSAGE_LEN] = "";
-char charge_restart_level = CHARGE_RESTART_HI;
-
-int powermgmt_last_cycle_startstop_min = 20; /* how many minutes ago was the charging started or stopped? */
-int powermgmt_last_cycle_level = 0;          /* which level had the batteries at this time? */
-int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
-int charge_state = 0;                        /* at the beginning, the charger does nothing */
-#endif
 
 
 int battery_time(void)
@@ -344,14 +350,20 @@ static void power_thread(void)
                 powermgmt_est_runningtime_min = (100 - battery_level()) * BATTERY_CAPACITY / 100 * 60 / CURRENT_CHARGING;
             }
         else {
-#endif
             current = CURRENT_NORMAL;
-            if (global_settings.backlight_timeout == 1) /* LED always on */
+            if ((backlight_get_timeout() == 1) || (charger_inserted() && backlight_get_on_when_charging()))
+                                                       /* LED always on or LED on when charger connected */
                 current += CURRENT_BACKLIGHT;
             powermgmt_est_runningtime_min = battery_level() * BATTERY_CAPACITY / 100 * 60 / current;
+        }
+#else
+        current = CURRENT_NORMAL;
+        if (backlight_get_timeout() == 1) /* LED always on */
+            current += CURRENT_BACKLIGHT;
+        powermgmt_est_runningtime_min = battery_level() * BATTERY_CAPACITY / 100 * 60 / current;
+#endif
         
 #ifdef HAVE_CHARGE_CTRL
-        }
 
         if (charge_pause > 0)
             charge_pause--;
@@ -397,7 +409,7 @@ static void power_thread(void)
                             /* disable charging for several hours from this point, just to be sure */
                             charge_pause = CHARGE_PAUSE_LEN;
                             /* enable trickle charging */
-                            if (global_settings.trickle_charge) {
+                            if (trickle_charge_enabled) {
                                 trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
                                 trickle_time = 0;
                                 charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
@@ -419,7 +431,7 @@ static void power_thread(void)
                                 /* disable charging for several hours from this point, just to be sure */
                                 charge_pause = CHARGE_PAUSE_LEN;
                                 /* enable trickle charging */
-                                if (global_settings.trickle_charge) {
+                                if (trickle_charge_enabled) {
                                     trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
                                     trickle_time = 0;
                                     charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
