@@ -142,12 +142,16 @@ int rand(void)
 {
     int y;
   
-    if(--left < 0)
-        return rand_reload();
-  
-    y  = *next++;
-    y ^= (y >> 11);
-    y ^= (y <<  7) & 0x9D2C5680U;
-    y ^= (y << 15) & 0xEFC60000U;
-    return (y ^ (y >> 18)) & ((2^31)-1); /* 31-bit limit by Björn Stenberg*/
+    if(--left < 0) {
+        y = rand_reload();
+    }
+    else {
+        y  = *next++;
+        y ^= (y >> 11);
+        y ^= (y <<  7) & 0x9D2C5680U;
+        y ^= (y << 15) & 0xEFC60000U;
+        y ^= (y >> 18);
+    }
+
+    return y & 0x7fffffff; /* 31-bit limit by Björn Stenberg*/
 }
