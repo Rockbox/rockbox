@@ -1,0 +1,35 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2002 Daniel Stenberg
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+/* size of the buffer used for loadable, translated strings */
+#define MAX_LANGUAGE_SIZE 4096
+
+/* both these must match the two initial bytes in the binary lang file */
+#define LANGUAGE_COOKIE  0x1a
+#define LANGUAGE_VERSION 0x01
+
+/* load a given language file */
+void lang_load(char *filename);
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * vim: et sw=4 ts=8 sts=4 tw=78
+ * end:
+ */
