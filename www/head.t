@@ -23,7 +23,7 @@
 <tr valign="top">
 <td bgcolor=MENUBG valign="top">
 <br>
-&nbsp;<a href="/rockbox/"><img src="/rockbox/rockbox100.png" width=99 height=30></a>&nbsp;<br>
+&nbsp;<a href="/rockbox/"><img src="/rockbox/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
 
 <p align="right">
 <a class="menulink" href="/rockbox/">Main page</a><br>
