@@ -18,6 +18,8 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "options.h"
+
 #ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
 
