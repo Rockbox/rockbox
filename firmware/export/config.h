@@ -36,9 +36,10 @@
 #define MCF5249 5249
 
 /* CONFIG_KEYPAD */
-#define PLAYER_PAD   0
-#define RECORDER_PAD 1
-#define ONDIO_PAD    2
+#define PLAYER_PAD      0
+#define RECORDER_PAD    1
+#define ONDIO_PAD       2
+#define IRIVER_H100_PAD 3
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200      2200 /* FM/V2 recorder type */
