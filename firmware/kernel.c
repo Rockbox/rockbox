@@ -36,6 +36,9 @@ void kernel_init(void)
 {
     int i;
 
+    /* Init the threading API */
+    init_threads();
+    
     /* Clear the tick task array */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {

@@ -23,5 +23,6 @@
 
 int create_thread(void* fp, void* sp, int stk_size);
 void switch_thread(void);
+void init_threads(void);
 
 #endif

@@ -29,12 +29,11 @@ typedef union
         unsigned int  sr;   /* Status register */
         void*         pr;   /* Procedure register */
     } regs;
-    unsigned int mem[12];
 } ctx_t;
 
 typedef struct
 {
-    int   created;
+    int   num_threads;
     int   current;
     ctx_t ctx[MAXTHREADS];
 } thread_t;
@@ -88,15 +87,14 @@ static inline void ldctx(void* addr)
  * Switch thread in round robin fashion.
  *---------------------------------------------------------------------------
  */
-void
-switch_thread(void)
+void switch_thread(void)
 {
     int        ct;
     int        nt;
     thread_t*  t = &threads;
 
     nt = ct = t->current;
-    if (++nt >= t->created)
+    if (++nt >= t->num_threads)
         nt = 0;
     t->current = nt;
     stctx(&t->ctx[ct]);
@@ -112,11 +110,11 @@ int create_thread(void* fp, void* sp, int stk_size)
 {
     thread_t* t = &threads;
 
-    if (t->created >= MAXTHREADS)
+    if (t->num_threads >= MAXTHREADS)
         return -1;
     else
     {
-        ctx_t* ctxp = &t->ctx[t->created++];
+        ctx_t* ctxp = &t->ctx[t->num_threads++];
         stctx(ctxp);
         /* Subtract 4 to leave room for the PR push in ldctx()
            Align it on an even 32 bit boundary */
@@ -124,4 +122,10 @@ int create_thread(void* fp, void* sp, int stk_size)
         ctxp->regs.pr = fp;
     }
     return 0;
+}
+
+void init_threads(void)
+{
+    threads.num_threads = 1; /* We have 1 thread to begin with */
+    threads.current = 0;     /* The current thread is number 0 */
 }
