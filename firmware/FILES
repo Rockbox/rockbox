@@ -1,0 +1,17 @@
+*.c
+*.h
+*.S
+CONFIG
+API
+CONTRIBUTING
+CREDITS
+Makefile
+README
+*.lds
+rockbox-mode.el
+common/*.[ch]
+malloc/*.[ch]
+malloc/README
+malloc/THOUGHTS
+malloc/Makefile
+drivers/*.[ch]
