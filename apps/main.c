@@ -178,7 +178,19 @@ void init(void)
 
     pinfo = disk_init();
     if (!pinfo)
-        panicf("disk: NULL");
+    {
+        lcd_clear_display();
+        lcd_puts(0, 0, "No partition");
+        lcd_puts(0, 1, "table.");
+#ifdef HAVE_LCD_BITMAP
+        lcd_puts(0, 2, "Insert USB cable");
+        lcd_puts(0, 3, "and fix it.");
+        lcd_update();
+#endif
+        while(button_get(true) != SYS_USB_CONNECTED) {};
+        usb_screen();
+        system_reboot();
+    }
 
     for ( i=0; i<4; i++ ) {
         if (!fat_mount(pinfo[i].start))
