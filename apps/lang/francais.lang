@@ -844,7 +844,7 @@ desc: in the peak meter menu
 eng: "Units per read"
 new: "Unités par mesure"
 
-d: LANG_REPEAT
+id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
 new: "Répétition"
