@@ -161,8 +161,6 @@ new: ""
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-
-
 eng: ""
 new: ""
 
@@ -208,7 +206,7 @@ new: "Eteindre"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
+eng: "Ask"
 new: "Demander"
 
 id: LANG_ON
@@ -538,8 +536,6 @@ new: "[Taux de d'encodage]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
-### English phrase was changed! Previous translation was made on:
-### "[Frequency]"
 eng: "[Frequency]"
 new: "[Fréquence]"
 
@@ -812,3 +808,38 @@ id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
 new: "Oui"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Rétro-Eclairage pendant chargement"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "persistance marqueur seuil max"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "Eternel" 
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Vu-mètre" 
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Persistance marqueur de crête"
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "taux de baisse de l'indicateur"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Unités par mesure"
