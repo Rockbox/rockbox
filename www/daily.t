@@ -22,7 +22,7 @@ They are <i>not</i> official releases, they are in fact almost guaranteed to not
 
 <!--#exec cmd="./dailymod.pl" -->
 
-<p><b>Note 1:</b> You must rename the file to "archos.mod" before copying it to the root of your archos.
+<p><b>Note 1:</b> You must rename the file to "archos.mod" (archos.ajz for the recorder) before copying it to the root of your archos.
 
 <p><b>Note 2:</b> The Recorder version does not work yet, due to unfinished drivers. It builds, but does not run.
 
