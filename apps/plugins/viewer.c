@@ -66,10 +66,10 @@
 #define VIEWER_MODE_WRAP BUTTON_F1
 #define VIEWER_MODE_LINE BUTTON_F2
 #define VIEWER_MODE_WIDTH BUTTON_F3
-/* Recorder/ Ondio only */
+/* Recorder, Ondio, iRiver */
 #define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_F1)
 #define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_F3)
-/* Recorder only */
+/* Recorder, iRiver */
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
@@ -84,7 +84,7 @@
 #define VIEWER_MODE_WRAP (BUTTON_MENU | BUTTON_LEFT)
 #define VIEWER_MODE_LINE (BUTTON_MENU | BUTTON_UP)
 #define VIEWER_MODE_WIDTH (BUTTON_MENU | BUTTON_RIGHT)
-/* Recorder/ Ondio only */
+/* Recorder, Ondio, iRiver */
 #define VIEWER_MODE_PAGE (BUTTON_MENU | BUTTON_DOWN)
 #define VIEWER_MODE_SCROLLBAR (BUTTON_MENU | BUTTON_OFF)
 
@@ -104,9 +104,17 @@
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_ON | BUTTON_LEFT)
-#define VIEWER_MODE_LINE (BUTTON_ON | BUTTON_DOWN)
-#define VIEWER_MODE_WIDTH (BUTTON_ON | BUTTON_RIGHT)
+#define VIEWER_MODE_WRAP BUTTON_REC
+#define VIEWER_MODE_LINE BUTTON_MODE
+#define VIEWER_MODE_WIDTH BUTTON_SELECT
+/* Recorder, Ondio, iRiver */
+#define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_MODE)
+#define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_REC)
+/* Recorder, iRiver */
+#define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
+#define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
+#define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
+#define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
 #endif
 
@@ -857,7 +865,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H100_PAD)
             case VIEWER_MODE_PAGE:
                 /* Page-overlap mode */
                 if (++page_mode == PAGE_MODES)
@@ -889,7 +898,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
             case VIEWER_LINE_UP:
             case VIEWER_LINE_UP | BUTTON_REPEAT:
                 /* Scroll up one line */
