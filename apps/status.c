@@ -36,6 +36,7 @@ static enum playmode current_mode = STATUS_STOP;
 bool statusbar_enabled = true;
 long switch_tick;
 bool plug_state;
+bool battery_state;
 #endif
 
 void status_init(void)
@@ -133,6 +134,7 @@ void status_draw(void)
         statusbar_wipe();
 #ifdef HAVE_CHARGE_CTRL
         if(charger_inserted()) {
+            battery_state=true;
             if(!charger_enabled)
                 plug_state=true;
             else if(TIME_AFTER(current_tick, switch_tick)) {
@@ -140,9 +142,18 @@ void status_draw(void)
                 switch_tick=current_tick+HZ;
             }
         }
-        else
+        else {
             plug_state=false;
-        statusbar_icon_battery(battlevel,plug_state);
+            if(battlevel > (BATTERY_LEVEL_DANGEROUS-BATTERY_LEVEL_EMPTY)*100/BATTERY_RANGE)
+                battery_state=true;
+            else
+                if(TIME_AFTER(current_tick, switch_tick)) {
+                    switch_tick=current_tick+HZ;
+                    battery_state=!battery_state;
+                }
+        }
+                
+        if(battery_state) statusbar_icon_battery(battlevel,plug_state);
 #else
         statusbar_icon_battery(battlevel,false);
 #endif
