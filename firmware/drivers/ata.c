@@ -54,6 +54,8 @@
 #define CMD_SLEEP                  0xE6
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
+struct mutex ata_mtx;
+
 static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*4;
@@ -96,9 +98,15 @@ int ata_read_sectors(unsigned long start,
                      void* buf)
 {
     int i;
+    int ret = 0;
 
+    mutex_lock(&ata_mtx);
+    
     if (!wait_for_rdy())
+    {
+        mutex_unlock(&ata_mtx);
         return -1;
+    }
 
     led(true);
 
@@ -112,7 +120,10 @@ int ata_read_sectors(unsigned long start,
     for (i=0; i<count; i++) {
         int j;
         if (!wait_for_start_of_transfer())
+        {
+            mutex_unlock(&ata_mtx);
             return -1;
+        }
 
         for (j=0; j<256; j++)
             ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
@@ -126,9 +137,10 @@ int ata_read_sectors(unsigned long start,
     led(false);
 
     if(!wait_for_end_of_transfer())
-        return -1;
-    else
-        return 0;
+        ret = -1;
+
+    mutex_unlock(&ata_mtx);
+    return ret;
 }
 
 #ifdef DISK_WRITE
@@ -138,8 +150,13 @@ int ata_write_sectors(unsigned long start,
 {
     int i;
 
+    mutex_lock(&ata_mtx);
+    
     if (!wait_for_rdy())
+    {
+        mutex_unlock(&ata_mtx);
         return 0;
+    }
 
     led(true);
 
@@ -153,7 +170,10 @@ int ata_write_sectors(unsigned long start,
     for (i=0; i<count; i++) {
         int j;
         if (!wait_for_start_of_transfer())
+        {
+            mutex_unlock(&ata_mtx);
             return 0;
+        }
 
         for (j=0; j<256; j++)
             ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
@@ -166,14 +186,24 @@ int ata_write_sectors(unsigned long start,
 
     led(false);
 
-    return wait_for_end_of_transfer();
+    i = wait_for_end_of_transfer();
+
+    mutex_unlock(&ata_mtx);
+    return i;
 }
 #endif
 
 static int check_registers(void)
 {
+    int ret = 0;
+    
+    mutex_lock(&ata_mtx);
+    
     if ( ATA_STATUS & STATUS_BSY )
+    {
+        mutex_unlock(&ata_mtx);
         return 0;
+    }
     
     ATA_NSECTOR = 0xa5;
     ATA_SECTOR  = 0x5a;
@@ -184,9 +214,10 @@ static int check_registers(void)
         (ATA_SECTOR  == 0x5a) &&
         (ATA_LCYL    == 0xaa) &&
         (ATA_HCYL    == 0x55))
-        return 1;
-    else
-        return 0;
+        ret = 1;
+
+    mutex_unlock(&ata_mtx);
+    return ret;
 }
 
 static int freeze_lock(void)
@@ -204,38 +235,60 @@ static int freeze_lock(void)
 
 int ata_spindown(int time)
 {
+    int ret = 0;
+
+    mutex_lock(&ata_mtx);
+    
     if(!wait_for_rdy())
+    {
+        mutex_unlock(&ata_mtx);
         return -1;
+    }
 
     if ( time == -1 ) {
         ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
     }
     else {
         if (time > 255)
+        {
+            mutex_unlock(&ata_mtx);
             return -1;
+        }
         ATA_NSECTOR = time & 0xff;
         ATA_COMMAND = CMD_STANDBY;
     }
 
     if (!wait_for_rdy())
-        return -1;
+        ret = -1;
 
-    return 0;
+    mutex_unlock(&ata_mtx);
+    return ret;
 }
 
 int ata_hard_reset(void)
 {
+    int ret;
+    
+    mutex_lock(&ata_mtx);
+    
     PADR &= ~0x0002;
 
     sleep(2);
 
     PADR |= 0x0002;
 
-    return wait_for_rdy();
+    ret =  wait_for_rdy();
+
+    mutex_unlock(&ata_mtx);
+    return ret;
 }
 
 int ata_soft_reset(void)
 {
+    int ret;
+    
+    mutex_lock(&ata_mtx);
+    
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
@@ -243,11 +296,16 @@ int ata_soft_reset(void)
     ATA_CONTROL = CONTROL_nIEN;
     sleep(HZ/400); /* >2ms */
 
-    return wait_for_rdy();
+    ret = wait_for_rdy();
+
+    mutex_unlock(&ata_mtx);
+    return ret;
 }
 
 int ata_init(void)
 {
+    mutex_init(&ata_mtx);
+    
     led(false);
 
     /* activate ATA */
