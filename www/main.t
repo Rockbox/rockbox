@@ -16,9 +16,11 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-11-01</i>: The site was down nearly four days due to hardware failure while the admins were away.
+
 <p><i>2004-10-26</i>: Rockbox v2.3 is <a href="download/">released</a>.
 
-<p><i>2004-10-26</i>: iRiver progress: the LCD driver <a href="/twiki/bin/view/Main/IriverPort#Writing_an_LCD_driver_">is working</a>! .
+<p><i>2004-10-26</i>: iRiver progress: the LCD driver <a href="/twiki/bin/view/Main/IriverPort#Writing_an_LCD_driver_">is working</a>!
 
 <p><i>2004-10-05</i>: Call for help: We need information from Ondio owners for our <a href="/twiki/bin/view/Main/ArchosOndio">Archos Ondio port</a>.
 
