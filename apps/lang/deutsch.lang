@@ -1643,38 +1643,34 @@ new: "FF/RW"
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
-new: "Voller Pfad"
+new: "Kompletter Pfad"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-new: "Nur Name"
+new: "Nur Titelbezeichnung"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
-new: "Datei Optionen"
+new: "Dateioptionen"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
 eng: "Remove"
-### Not previously translated
-new: 
+new: "Entfernen"
 
 id: LANG_SHOW_INDICES
 desc: in playlist viewer menu
 eng: "Show Indices"
-### Not previously translated
-new: 
+new: "Zeige Indizes"
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
-### Not previously translated
-new: 
+new: "Titelanzeige"
 
 id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
-### Not previously translated
-new: 
+new: "Anzeigen"
