@@ -1432,7 +1432,7 @@ unsigned char char2dos(unsigned char c)
         case 0xe5: /* Special kanji character */
             c = 0x05;
             break;
-        case 0x20:
+
         case 0x22:
         case 0x2a:
         case 0x2b:
@@ -1448,14 +1448,14 @@ unsigned char char2dos(unsigned char c)
         case 0x5c:
         case 0x5d:
         case 0x7c:
-            /* Illegal name */
-            c = 0;
+            /* Illegal name, replace */
+            c = '_';
             break;
                 
         default:
-            if(c < 0x20)
+            if(c <= 0x20)
             {
-                /* Illegal name */
+                /* Illegal name, remove */
                 c = 0;
             }
             break;
