@@ -29,7 +29,6 @@ struct tm *get_time(void)
 {
 #ifdef HAVE_RTC
     char rtcbuf[8];
-    int i;
 
     /* We don't need the first byte, but we want the indexes in the
        buffer to match the data sheet */
