@@ -15,6 +15,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-10-26</i>: iRiver progress: the LCD driver is working! http://www.rockbox.org/twiki/bin/view/Main/IriverPort.
+
 <p><i>2004-10-05</i>: Call for help: We need information from Ondio owners for our <a href="/twiki/bin/view/Main/ArchosOndio">Archos Ondio port</a>.
 
 <p><i>2004-10-01</i>: Touchdown! The Coldfire BDM wiggler is working on the iHP-120 target! Time for some sweet GDB debugging...
