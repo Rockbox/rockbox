@@ -22,6 +22,7 @@
 
 /* Only build for target */
 #ifndef SIMULATOR
+#ifdef HAVE_LCD_BITMAP
 
 #ifndef UINT8
 #define UINT8 unsigned char
@@ -450,8 +451,6 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
 /***************** User Interface Functions *****************/
 /*                 (to be changed for Player)               */
 
-#ifdef HAVE_LCD_BITMAP
-
 /* helper for DoUserDialog() */
 void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 {
@@ -656,16 +655,6 @@ void DoUserDialog(char* filename)
     button = rb->button_get(true);
 }
 
-#else /* HAVE_LCD_BITMAP */
-
-/* Player implementation has to go here */
-void DoUserDialog(void)
-{
-}
-
-#endif /* HAVE_LCD_BITMAP */
-
-
 /***************** Plugin Entry Point *****************/
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -689,5 +678,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     return PLUGIN_OK;
 }
+
+#endif
 
 #endif
