@@ -15,7 +15,7 @@ A4. First make sure to read the file CONTRIBUTING in the docs directory
     on Sourceforge.  See http://rockbox.haxx.se/docs/contributing.html
     if you do not want to have to wade through the CVS directories.
 
-Q5: Whats CVS?
+Q5: What is CVS?
 A5: Concurrent Versions System (http://www.cvshome.org).  We have a small
     help page about how to use this to get, update and commit files on the web
     at http://rockbox.haxx.se/cvs.html
