@@ -22,7 +22,7 @@
 #include <fcntl.h>
 
 #include <linux/soundcard.h>
-#include "oss_sound.h"
+#include "../common/sound.h"
 
 /* We want to use the "real" open in some cases */
 #undef open

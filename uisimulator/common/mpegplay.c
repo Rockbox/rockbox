@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <mad.h>
 
-#include "oss_sound.h"
+#include "sound.h"
 
 /* The "dither" code to convert the 24-bit samples produced by libmad was
    taken from the coolplayer project - coolplayer.sourceforge.net */
