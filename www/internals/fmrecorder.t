@@ -1,7 +1,7 @@
 #define _PAGE_ Internals of the Recorder
 #include "head.t"
 
-<p>cwLinus' photos of his FM Recorder.
+<p>Linus' photos of his FM Recorder.
 
 <p><a href="fmrec_top_hires.jpg"><img src="fmrec_top_thumb.jpg"></a><br>
 Top of PCB, with LCD and buttons
