@@ -7,9 +7,8 @@
 <a href="schematics/">schematics</a> &middot;
 <a href="mods/">hardware mods</a> &middot;
 <a href="http://bjorn.haxx.se/rockbox/mail.cgi">mail list archive</a> &middot;
-<a href="#descrambler">descrambler</a> &middot;
-<a href="#sh2d">sh2d disassembler</a> &middot;
-<a href="/isd200/archos.html">archos internals</a> &middot;
+<a href="tools.html">tools</a> &middot;
+<a href="internals/">archos internals</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a>
 </small>
 
@@ -134,53 +133,6 @@ The data is then spread over four memory segments. The two least significant bit
 <li>32 bit length (big-endian)
 <li>16 bit checksum
 </ul>
-
-<a name="descrambler">
-<p>I've written a small utility to descramble firmware files:
-<ul>
-<li><a href="descramble.c">descramble.c</a> - 1835 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
-<li><a href="descramble">descramble</a> - 4280 bytes - Dynamically linked i386 linux executable
-<li><a href="descramble.static.bz2">descramble.static.bz2</a> - 176015 bytes - bzip2 compressed statically linked i386 linux executable
-<li><a href="descramble.exe">descramble.exe</a> - 45056 bytes - win32 executable
-</ul>
-
-<a name="scrambler">
-<p>...and one to scramble files:
-<ul>
-<li><a href="scramble.c">scramble.c</a> - 2242 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
-<li><a href="scramble">scramble</a> - 4376 bytes - Dynamically linked i386 linux executable
-<li><a href="scramble.static.bz2">scramble.static.bz2</a> - 176117 bytes - bzip2 compressed statically linked i386 linux executable
-<li><a href="scramble.exe">scramble.exe</a> - 93385 bytes - win32 executable
-</ul>
-
-<h2>So?</h2>
-
-<p>We now have the possiblity to actually research how the Archos works
-and create our own software for it.
-There is of course a long way still to go before we can start playing
-around with fancy mp3 features.
-
-<a name="sh2d">
-<h3>Disassembler</h3>
-
-<p>I found a nice public domain SH-1/SH-2 disassembler written by Bart Trzynadlowski, called <a href="http://saturndev.emuvibes.com/Files/sh2d020.zip">sh2d</a>:
-<p><b>Update:</b> I've added address lookup and register name translation to the disassembler (2001-12-09)
-<ul>
-<li><a href="sh2d.c">sh2d.c</a> - 28 kB - Source code
-<li><a href="sh2d">sh2d</a> - 15 kB - Dynamically linked i386 linux executable
-<li><a href="sh2d.static.bz2">sh2d.static.bz2</a> - 170 kB - bzip2 compressed statically linked i386 linux executable
-<li><a href="sh2d.exe">sh2d.exe</a> - 40 kB - win32 executable (original version; no lookup)
-</ul>
-
-<h3>Compiler</h3>
-
-<p>GCC supports the SH processor. Just 
-<a href="cross-gcc.html">cook yourself a cross-compiler</a>
-(sh-elf-gcc) and voila, instant SH-1 code.
-
-<p>There are also 
-<a href="http://www.sh-linux.org/rpm/RPMS/i386/RedHat7.1/">
-pre-cooked RH7.1 RPMs</a> available from sh-linux.org
 
 <h2>Dreams</h2>
 <p>Ok, forget about reality, what could we do with this?

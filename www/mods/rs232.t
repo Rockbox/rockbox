@@ -12,7 +12,7 @@ It takes its power from the DTR signal in the serial port, so the communication 
 
 <h2>How to power it the safe way</h2>
 <p>
-It is also possible to take power from the USB port, or another 5-10V source. Just remove the D1 diode and connect the power to the +5V and GND pads.
+If your PC is a laptop or otherwise might risk having too little power in the serial port, it is also possible to take power from the USB port or another 5-10V source. Just remove the D1 diode and connect the power to the +5V and GND pads.
 
 <h2>How to make one</h2>
 

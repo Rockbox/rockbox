@@ -20,10 +20,10 @@ Use your thumb nails to compress the thin edge of the rubber while gently pullin
 Do the same on the side.
 <hr>
 
-<p><img src="b9.jpg">
+<p><img src="b9.jpg"> <img src="b11.jpg">
 <br>
-You have liberated one end of the Archos from the metal back plate!
-Now lightly lift the blue rubber bumbers up from the circuit board on the other end, then slide the Archos out of the back plate.
+You have now freed one end of the Archos.
+Now lift the blue rubber bumbers up from the circuit board on the other end, and simply slide the Archos out of its' back plate.
 
 <p><i>Björn</i>
 
