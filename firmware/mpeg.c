@@ -139,7 +139,7 @@ static int maxval[] =
     17,   /* Loudness */
     10,   /* Bass boost */
     3,    /* AVC */
-    3,    /* Channels */
+    6,    /* Channels */
     15,   /* Left gain */
     15,   /* Right gain */
     15,   /* Mic gain */
@@ -2654,68 +2654,73 @@ void mpeg_sound_channel_config(int configuration)
 #ifdef SIMULATOR
     (void)configuration;
 #else
-    unsigned long val_on = 0x80000;
-    unsigned long val_off = 0;
+    unsigned long val_ll = 0x80000;
+    unsigned long val_lr = 0;
+    unsigned long val_rl = 0;
+    unsigned long val_rr = 0x80000;
     
     switch(configuration)
     {
         case MPEG_SOUND_STEREO:
-            val_on = 0x80000;
-#ifdef HAVE_MAS3587F
-            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D0, 0x7fd, &val_off, 1); /* LR */
-            mas_writemem(MAS_BANK_D0, 0x7fe, &val_off, 1); /* RL */
-            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
-#else
-            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D1, 0x7f9, &val_off, 1); /* LR */
-            mas_writemem(MAS_BANK_D1, 0x7fa, &val_off, 1); /* RL */
-            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
-#endif
+            val_ll = 0x80000;
+            val_lr = 0;
+            val_rl = 0;
+            val_rr = 0x80000;
             break;
+
         case MPEG_SOUND_MONO:
-            val_on = 0xc0000;
-#ifdef HAVE_MAS3587F
-            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D0, 0x7fd, &val_on, 1); /* LR */
-            mas_writemem(MAS_BANK_D0, 0x7fe, &val_on, 1); /* RL */
-            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
-#else
-            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D1, 0x7f9, &val_on, 1); /* LR */
-            mas_writemem(MAS_BANK_D1, 0x7fa, &val_on, 1); /* RL */
-            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
-#endif
+            val_ll = 0xc0000;
+            val_lr = 0xc0000;
+            val_rl = 0xc0000;
+            val_rr = 0xc0000;
             break;
+
         case MPEG_SOUND_MONO_LEFT:
-            val_on = 0x80000;
-#ifdef HAVE_MAS3587F
-            mas_writemem(MAS_BANK_D0, 0x7fc, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D0, 0x7fd, &val_on, 1); /* LR */
-            mas_writemem(MAS_BANK_D0, 0x7fe, &val_off, 1); /* RL */
-            mas_writemem(MAS_BANK_D0, 0x7ff, &val_off, 1); /* RR */
-#else
-            mas_writemem(MAS_BANK_D1, 0x7f8, &val_on, 1); /* LL */
-            mas_writemem(MAS_BANK_D1, 0x7f9, &val_on, 1); /* LR */
-            mas_writemem(MAS_BANK_D1, 0x7fa, &val_off, 1); /* RL */
-            mas_writemem(MAS_BANK_D1, 0x7fb, &val_off, 1); /* RR */
-#endif
+            val_ll = 0x80000;
+            val_lr = 0x80000;
+            val_rl = 0;
+            val_rr = 0;
             break;
+
         case MPEG_SOUND_MONO_RIGHT:
-            val_on = 0x80000;
-#ifdef HAVE_MAS3587F
-            mas_writemem(MAS_BANK_D0, 0x7fc, &val_off, 1); /* LL */
-            mas_writemem(MAS_BANK_D0, 0x7fd, &val_off, 1); /* LR */
-            mas_writemem(MAS_BANK_D0, 0x7fe, &val_on, 1); /* RL */
-            mas_writemem(MAS_BANK_D0, 0x7ff, &val_on, 1); /* RR */
-#else
-            mas_writemem(MAS_BANK_D1, 0x7f8, &val_off, 1); /* LL */
-            mas_writemem(MAS_BANK_D1, 0x7f9, &val_off, 1); /* LR */
-            mas_writemem(MAS_BANK_D1, 0x7fa, &val_on, 1); /* RL */
-            mas_writemem(MAS_BANK_D1, 0x7fb, &val_on, 1); /* RR */
-#endif
+            val_ll = 0;
+            val_lr = 0;
+            val_rl = 0x80000;
+            val_rr = 0x80000;
+            break;
+
+        case MPEG_SOUND_STEREO_NARROW:
+            val_ll = 0xa0000;
+            val_lr = 0xe0000;
+            val_rl = 0xe0000;
+            val_rr = 0xa0000;
+            break;
+
+        case MPEG_SOUND_STEREO_WIDE:
+            val_ll = 0x80000;
+            val_lr = 0x40000;
+            val_rl = 0x40000;
+            val_rr = 0x80000;
+            break;
+        case MPEG_SOUND_KARAOKE:
+            val_ll = 0x80001;
+            val_lr = 0x7ffff;
+            val_rl = 0x7ffff;
+            val_rr = 0x80001;
             break;
     }
+
+#ifdef HAVE_MAS3587F
+    mas_writemem(MAS_BANK_D0, 0x7fc, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D0, 0x7fd, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D0, 0x7fe, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D0, 0x7ff, &val_rr, 1); /* RR */
+#else
+    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
+#endif
 #endif
 }
 

@@ -228,10 +228,17 @@ static void set_chanconf(int val)
 
 static bool chanconf(void)
 {
-    char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO),
-                     str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT) };
+    char *names[] = {str(LANG_CHANNEL_STEREO),
+#ifdef HAVE_LCD_CHARCELLS
+                     str(LANG_CHANNEL_STEREO_NARROW_PLAYER),
+#else
+                     str(LANG_CHANNEL_STEREO_NARROW_RECORDER),
+#endif
+                     str(LANG_CHANNEL_MONO),
+                     str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT),
+                     str(LANG_CHANNEL_KARAOKE), str(LANG_CHANNEL_STEREO_WIDE) };
     return set_option(str(LANG_CHANNEL), &global_settings.channel_config,
-                      names, 4, set_chanconf );
+                      names, 7, set_chanconf );
 }
 
 bool sound_menu(void)

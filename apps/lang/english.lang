@@ -1409,3 +1409,23 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "Invert"
 new:
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new:
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new:
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new:
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new:
