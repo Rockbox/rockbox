@@ -19,6 +19,12 @@ faq.raw: $(DOCS)/FAQ $(FAQ2HTML)
 faq.html: faq.t faq.raw $(FAQ2HTML)
 	$(ACTION) $<
 
+nodo.raw: $(DOCS)/NODO $(FAQ2HTML)
+	$(FAQ2HTML) < $< > $@
+
+nodo.html: nodo.t nodo.raw $(FAQ2HTML)
+	$(ACTION) $<
+
 battery-faq.raw: $(DOCS)/BATTERY-FAQ $(FAQ2HTML)
 	$(FAQ2HTML) < $< > $@
 
