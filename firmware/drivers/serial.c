@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include "button.h"
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "system.h"
 #include "kernel.h"
 #include "backlight.h"
@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "serial.h"
 
+#if CONFIG_CPU != MCF5249 /* FIX: this is not compiled for coldfire */
 #ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
 
 /* Received byte identifiers */
@@ -137,3 +138,9 @@ int remote_control_rx(void)
 }
 
 #endif /* HAVE_MMC */
+#else
+void serial_setup (void) 
+{
+    /* a dummy */
+}
+#endif /* CONFIG_CPU != MCF5249 */

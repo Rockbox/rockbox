@@ -23,6 +23,8 @@
 #include "debug.h"
 #include "system.h"
 
+#if CONFIG_I2C != I2C_H100 /* FIX: not yet done */
+
 /* cute little functions, atomic read-modify-write */
 #if CONFIG_I2C == I2C_GMINI
 
@@ -279,3 +281,9 @@ int i2c_read(int address, unsigned char* buf, int count )
     i2c_stop();
     return x;
 }
+#else /* not h100 i2c */
+void i2c_init(void)
+{
+    /* a dummy */
+}
+#endif /* h100 i2c */
