@@ -2793,3 +2793,15 @@ desc:  in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new:
+
+id: LANG_SHUTDOWN
+desc:  in main menu
+eng: "Shut down"
+voice: "Shut down"
+new:
+
+id: LANG_SHUTTINGDOWN
+desc:  in main menu
+eng: "Shutting down..."
+voice: ""
+new:

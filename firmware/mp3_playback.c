@@ -1028,6 +1028,20 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     paused = true;
 }
 
+void mp3_shutdown(void)
+{
+#ifndef SIMULATOR
+#ifdef HAVE_MAS3587F
+    unsigned long val = 1;
+    mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1); /* Mute */
+#endif
+
+#ifdef HAVE_MAS3507D
+    dac_volume(0, 0, false);
+#endif
+
+#endif
+}
 
 /* new functions, to be exported to plugin API */
 

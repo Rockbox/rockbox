@@ -39,6 +39,7 @@
 #include "adc.h"
 #include "action.h"
 #include "talk.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -1090,3 +1091,41 @@ bool set_time_screen(char* string, struct tm *tm)
     return false;
 }
 #endif
+
+bool shutdown_screen(void)
+{
+    int button;
+    bool done = false;
+
+    lcd_stop_scroll();
+
+#ifdef HAVE_LCD_CHARCELLS
+    splash(0, true, "Push STOP to shut off");
+#else
+    splash(0, true, "Push OFF to shut off");
+#endif
+    while(!done)
+    {
+        button = button_get_w_tmo(HZ*2);
+        switch(button)
+        {
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_STOP:
+#else
+            case BUTTON_OFF:
+#endif
+                clean_shutdown();
+                break;
+
+            default:
+                /* Return if any other button was pushed, or if there
+                   was a timeout. We ignore RELEASE events, since we may
+                   have been called by a button down event, and the user might
+                   not have released the button yet. */
+                if(!(button & BUTTON_REL))
+                   done = true;
+                break;
+        }
+    }
+    return false;
+}

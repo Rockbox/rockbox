@@ -40,6 +40,8 @@ void splash(int ticks,  /* how long */
 #ifdef HAVE_RTC
 bool set_time_screen(char* string, struct tm *tm);
 #endif
-    
+
+bool shutdown_screen(void);
+
 #endif
 

@@ -1012,18 +1012,18 @@ static bool dirbrowse(char *root, int *dirfilter)
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF:
-                bookmark_autobookmark();
-                mpeg_stop();
-                status_draw(false);
-                restore = true;
-                break;
-
             case BUTTON_OFF | BUTTON_REL:
-#else
-            case BUTTON_STOP | BUTTON_REL:
 #endif
-                settings_save();
+                /* Stop the music if it is playing, else show the shutdown
+                   screen */
+                if(mpeg_status())
+                    mpeg_stop();
+                else {
+                    if (!charger_inserted()) {
+                        shutdown_screen();
+                        restore = true;
+                    }
+                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD

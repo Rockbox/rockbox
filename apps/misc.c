@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <ctype.h>
+#include "lang.h"
 #include "string.h"
 #include "config.h"
 #include "file.h"
@@ -25,6 +26,13 @@
 #include "errno.h"
 #include "system.h"
 #include "timefuncs.h"
+#include "screens.h"
+#include "mpeg.h"
+#include "mp3_playback.h"
+#include "settings.h"
+#include "ata.h"
+#include "kernel.h"
+#include "power.h"
 
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
@@ -203,4 +211,24 @@ bool settings_parseline(char* line, char** name, char** value)
         ptr++;
     *value = ptr;
     return true;
+}
+
+bool clean_shutdown(void)
+{
+    lcd_clear_display();
+    splash(0, true, str(LANG_SHUTTINGDOWN));
+    mpeg_stop();
+    settings_save();
+    ata_flush();
+    ata_spindown(1);
+#ifndef SIMULATOR
+    while(ata_disk_is_active())
+        sleep(HZ/10);
+    if(!charger_inserted())
+    {
+       mp3_shutdown();
+        power_off();
+    }
+#endif
+    return false;
 }

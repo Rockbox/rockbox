@@ -49,7 +49,7 @@
 #ifdef HAVE_FMRADIO
 #include "radio.h"
 #endif
-
+#include "misc.h"
 #include "lang.h"
 
 #ifdef HAVE_MAS3587F
@@ -324,7 +324,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_item items[8];
+    struct menu_item items[9];
 
     items[i].desc = ID2P(LANG_BOOKMARK_MENU);
     items[i++].function = bookmark_menu;
@@ -355,6 +355,9 @@ bool main_menu(void)
 
     items[i].desc = ID2P(LANG_INFO);
     items[i++].function = info_menu;
+
+    items[i].desc = ID2P(LANG_SHUTDOWN);
+    items[i++].function = clean_shutdown;
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL );
 #ifdef HAVE_LCD_CHARCELLS

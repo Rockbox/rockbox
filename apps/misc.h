@@ -39,5 +39,6 @@ void screen_dump(void);
 #endif
 
 bool settings_parseline(char* line, char** name, char** value);
+bool clean_shutdown(void);
 
 #endif
