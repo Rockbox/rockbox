@@ -13,7 +13,7 @@ only be seen while there is actual music playback.
 Buttons:
 <p>
 <table>
-<tr><td> PLAY </td><td> Toggle PAUSE/PLAY </td></tr>
+<tr><td> PLAY </td><td> Toggle PAUSE/PLAY.  If 'resume' is enabled, pressing PAUSE will make it store a "resume point" where it can start again from later. </td></tr>
 <tr><td> ON </td><td> Switch to the <a href="play-dir.html">dir browser</a>.
 </td></tr>
 <tr><td> STOP </td><td> Stop playback </td></tr>
