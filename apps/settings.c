@@ -617,7 +617,7 @@ void settings_calc_config_sector(void)
     int i, partition_start;
     int sector = 0;
 
-    if (fat_startsector != 0)    /* There is a partition table */
+    if (fat_startsector() != 0)    /* There is a partition table */
     {
         sector = 61;
         for (i = 0; i < 4; i++)
