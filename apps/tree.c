@@ -221,6 +221,25 @@ static int build_playlist(int start_index)
     return start_index;
 }
 
+static int play_filenumber(int pos, int attr)
+{
+    /* try to find a voice ID for the extension, if known */
+    unsigned int j;
+    int ext_id = -1; /* default to none */
+    for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
+    {
+        if (attr == filetypes[j].tree_attr)
+        {
+            ext_id = filetypes[j].voiceclip;
+            break;
+        }
+    }
+
+    talk_id(VOICE_FILE, false);
+    talk_number(pos, true);
+    talk_id(ext_id, true);
+    return 1;
+}
 
 static int play_dirname(int start_index)
 {
@@ -250,6 +269,41 @@ static int play_dirname(int start_index)
     return 1;
 }
 
+static int play_filename(char *dir, char *file)
+{
+    int fd;
+    char name_mp3_filename[MAX_PATH+1];
+
+    if (mpeg_status() & MPEG_STATUS_PLAY)
+        return 0;
+
+    if (strcasecmp(&file[strlen(file) - strlen(TALK_EXT)], TALK_EXT))
+    {   /* file has no .talk extension */
+        snprintf(name_mp3_filename, sizeof(name_mp3_filename),
+            "%s/%s" TALK_EXT, dir, file);
+
+        /* check if a corresponding .talk file exists */
+        DEBUGF("Checking for Filename Thumb %s\n", name_mp3_filename);
+        fd = open(name_mp3_filename, O_RDONLY);
+        if (fd < 0)
+        {
+	        DEBUGF("Failed to find: %s\n", name_mp3_filename);
+	        return -1;
+        }
+        DEBUGF("Found: %s\n", name_mp3_filename);
+        close(fd);
+        talk_file(name_mp3_filename, false);
+    }
+    else
+    {   /* it already is a .talk file, play this directly */
+        snprintf(name_mp3_filename, sizeof(name_mp3_filename),
+            "%s/%s", dir, file);
+        talk_id(LANG_VOICE_DIR_HOVER, false); /* prefix it */
+        talk_file(name_mp3_filename, true);
+    }
+
+    return 1;
+}
 
 static int compare(const void* p1, const void* p2)
 {
@@ -771,7 +825,6 @@ static bool dirbrowse(const char *root, const int *dirfilter)
     int lastdircursor=-1;
     bool need_update = true;
     bool exit_func = false;
-    bool enqueue_next = false;
     long thumbnail_time = -1; /* for delaying a thumbnail */
     bool update_all = false; /* set this to true when the whole file list
                                 has been refreshed on screen */
@@ -926,14 +979,6 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                     snprintf(buf,sizeof(buf),"/%s",file->name);
 
                 if (file->attr & ATTR_DIRECTORY) {
-                    if (global_settings.talk_dir == 3) /* enter */
-                    {
-                        /* play_dirname */
-                        DEBUGF("Playing directory thumbnail: %s", currdir);
-                        play_dirname(dircursor+dirstart);
-                        /* avoid reading getting cut by next filename */
-                        enqueue_next = true;
-                    }
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirpos[dirlevel] = dirstart;
@@ -1306,12 +1351,26 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                     TIME_AFTER(current_tick, thumbnail_time))
                 {   /* a delayed hovering thumbnail is due now */
                     int res;
-                    DEBUGF("Playing directory thumbnail: %s", currdir);
-                    res = play_dirname(lasti);
-                    if (res < 0) /* failed, not existing */
-                    {   /* say the number instead, as a fallback */
-                        talk_id(VOICE_DIR, false);
-                        talk_number(lasti+1, true);
+                    if (dircache[lasti].attr & ATTR_DIRECTORY)
+                    {
+                        DEBUGF("Playing directory thumbnail: %s", currdir);
+                        res = play_dirname(lasti);
+                        if (res < 0) /* failed, not existing */
+                        {   /* say the number instead, as a fallback */
+                            talk_id(VOICE_DIR, false);
+                            talk_number(lasti+1, true);
+                        }
+                    }
+                    else
+                    {
+                        DEBUGF("Playing file thumbnail: %s/%s%s\n", 
+                            currdir, dircache[lasti].name, TALK_EXT);
+                        res = play_filename(currdir, dircache[lasti].name);
+                        if (res < 0) /* failed, not existing */
+                        {   /* say the number instead, as a fallback */
+                            play_filenumber(lasti-dirsindir+1, 
+                                dircache[lasti].attr);
+                        }
                     }
                     thumbnail_time = -1; /* job done */
                 }
@@ -1417,7 +1476,7 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 if (dircache[i].attr & ATTR_DIRECTORY) /* directory? */
                 {
                     /* play directory thumbnail */
-                    if (global_settings.talk_dir == 4) /* hover */
+                    if (global_settings.talk_dir == 3) /* hover */
                     {   /* "schedule" a thumbnail, to have a little dalay */
                         thumbnail_time = current_tick + HOVER_DELAY;
                     }
@@ -1433,29 +1492,16 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 }
                 else if (global_settings.talk_file == 1) /* files as numbers */
                 {
-                    /* try to find a voice ID for the extension, if known */
-                    unsigned int j;
-                    int ext_id = -1; /* default to none */
-                    for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
-                    {
-                        if ((dircache[i].attr & TREE_ATTR_MASK) == filetypes[j].tree_attr)
-                        {
-                            ext_id = filetypes[j].voiceclip;
-                            break;
-                        }
-                    }
-
-                    /* enqueue_next is true if still talking the dir name */
-                    talk_id(VOICE_FILE, enqueue_next);
-                    talk_number(i-dirsindir+1, true);
-                    talk_id(ext_id, true);
-                    enqueue_next = false;
+                    play_filenumber(i-dirsindir+1, 
+                                    dircache[i].attr & TREE_ATTR_MASK);
                 }
                 else if (global_settings.talk_file == 2) /* files spelled */
                 {
-                    /* enqueue_next is true if still talking the dir name */
-                    talk_spell(dircache[i].name, enqueue_next);
-                    enqueue_next = false;
+                    talk_spell(dircache[i].name, false);
+                }
+                else if (global_settings.talk_file == 3) /* hover */
+                {   /* "schedule" a thumbnail, to have a little dalay */
+                    thumbnail_time = current_tick + HOVER_DELAY;
                 }
 
             }

@@ -2390,16 +2390,16 @@ voice: "als Zahl"
 new: "als Zahl"
 
 id: LANG_VOICE_DIR_ENTER
-desc: "talkbox" mode for directories
-eng: "on enter"
-voice: "beim Betreten"
-new: "beim Betreten"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_VOICE_DIR_HOVER
-desc: "talkbox" mode for directories
-eng: "while hovering"
-voice: "mit Zeiger"
-new: "mit Cursor"
+desc: "talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: "Sprachdatei"
+new: ".talk mp3 Datei"
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number

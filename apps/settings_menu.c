@@ -898,28 +898,24 @@ static bool voice_menus(void)
     return ret;
 }
 
+/* this is used 2 times below, so it saves memory to put it in global scope */
+static const struct opt_items voice_names[] = {
+    { STR(LANG_OFF) }, 
+    { STR(LANG_VOICE_NUMBER) },
+    { STR(LANG_VOICE_SPELL) },
+    { STR(LANG_VOICE_DIR_HOVER) }
+};
+
 static bool voice_dirs(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) }, 
-        { STR(LANG_VOICE_NUMBER) },
-        { STR(LANG_VOICE_SPELL) },
-        { STR(LANG_VOICE_DIR_ENTER) },
-        { STR(LANG_VOICE_DIR_HOVER) }
-    };
     return set_option( str(LANG_VOICE_DIR), 
-                       &global_settings.talk_dir, INT, names, 5, NULL);
+                       &global_settings.talk_dir, INT, voice_names, 4, NULL);
 }
 
 static bool voice_files(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) }, 
-        { STR(LANG_VOICE_NUMBER) },
-        { STR(LANG_VOICE_SPELL) }
-    };
     return set_option( str(LANG_VOICE_FILE), 
-                       &global_settings.talk_file, INT, names, 3, NULL);
+                       &global_settings.talk_file, INT, voice_names, 4, NULL);
 }
 
 static bool voice_menu(void)

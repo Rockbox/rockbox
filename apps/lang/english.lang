@@ -2404,15 +2404,15 @@ voice: "Numbers"
 new:
 
 id: LANG_VOICE_DIR_ENTER
-desc: "talkbox" mode for directories
-eng: "on enter"
-voice: "on enter"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_VOICE_DIR_HOVER
-desc: "talkbox" mode for directories
-eng: "while hovering"
-voice: "while hovering"
+desc: "talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: "talk mp3 clip"
 new:
 
 id: VOICE_FILE

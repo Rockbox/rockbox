@@ -71,7 +71,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 
 
-#define CONFIG_BLOCK_VERSION 16
+#define CONFIG_BLOCK_VERSION 17
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -150,6 +150,7 @@ Rest of config block, only saved to disk:
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
 static const char graphic_numeric[] = "graphic,numeric";
+static const char off_number_spell_hover[] = "off,number,spell,hover";
 
 /* the part of the settings which ends up in the RTC RAM, where available 
    (those we either need early, save frequently, or without spinup) */
@@ -319,8 +320,8 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(line_in), false, "line in", off_on },
 #endif
     /* voice */
-    {3, S_O(talk_dir), 0, "talk dir", "off,number,spell,enter,hover" },
-    {2, S_O(talk_file), 0, "talk file", "off,number,spell" },
+    {2, S_O(talk_dir), 0, "talk dir", off_number_spell_hover },
+    {2, S_O(talk_file), 0, "talk file", off_number_spell_hover },
     {1, S_O(talk_menu), true, "talk menu", off_on },
 
     /* If values are just added to the end, no need to bump the version. */
