@@ -122,9 +122,25 @@ static int wait_for_bsy(void)
 static int wait_for_rdy(void) __attribute__ ((section (".icode")));
 static int wait_for_rdy(void)
 {
+    int timeout;
+    
     if (!wait_for_bsy())
         return 0;
-    return ATA_ALT_STATUS & STATUS_RDY;
+
+    timeout = current_tick + HZ*4;
+    
+    while (TIME_BEFORE(current_tick, timeout) &&
+           !(ATA_ALT_STATUS & STATUS_RDY))
+        yield();
+
+    if (TIME_BEFORE(current_tick, timeout))
+    {
+        return STATUS_RDY;
+    }
+    else
+    {
+        return 0; /* timeout */
+    }
 }
 
 static int wait_for_start_of_transfer(void) __attribute__ ((section (".icode")));
