@@ -380,32 +380,34 @@ int mas_codec_readreg(int reg)
     /* send read command */
     if (i2c_write(MAS_DEV_WRITE,buf,3))
     {
-        return -1;
+        ret = -1;
     }
-
-    i2c_start();
-    i2c_outb(MAS_DEV_WRITE);
-    if (i2c_getack()) {
-        i2c_outb(MAS_CODEC_READ);
+    else
+    {
+        i2c_start();
+        i2c_outb(MAS_DEV_WRITE);
         if (i2c_getack()) {
-            i2c_start();
-            i2c_outb(MAS_DEV_READ);
+            i2c_outb(MAS_CODEC_READ);
             if (i2c_getack()) {
-                tmp[0] = i2c_inb(0);
-                tmp[1] = i2c_inb(1); /* NAK the last byte */
-                ret = (tmp[0] << 8) | tmp[1];
+                i2c_start();
+                i2c_outb(MAS_DEV_READ);
+                if (i2c_getack()) {
+                    tmp[0] = i2c_inb(0);
+                    tmp[1] = i2c_inb(1); /* NAK the last byte */
+                    ret = (tmp[0] << 8) | tmp[1];
+                }
+                else
+                    ret = -4;
             }
             else
                 ret = -3;
         }
         else
             ret = -2;
-    }
-    else
-        ret = -1;
-    
-    i2c_stop();
 
+        i2c_stop();
+    }
+    
     i2c_end();
     return ret;
 }
