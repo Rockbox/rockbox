@@ -200,6 +200,7 @@ void menu_run(int m)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
+            case BUTTON_F1:
 #else
             case BUTTON_STOP:
             case BUTTON_MENU:
