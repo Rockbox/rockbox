@@ -557,6 +557,7 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 #ifndef SIMULATOR
     if(!id3)
         return(false);
+    char player_progressbar[7];
     char binline[36];
     int songpos = 0;
     int i,j;
