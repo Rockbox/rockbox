@@ -333,15 +333,29 @@ int onplay(char* file, int attr)
     selected_file = file;
     
     if ((mpeg_status() & MPEG_STATUS_PLAY) && (attr & TREE_ATTR_MPA))
-        menu[i++] = (struct menu_items) { str(LANG_QUEUE), queue_file };
+    {
+        menu[i].desc = str(LANG_QUEUE);
+        menu[i].function = queue_file;
+        i++;
+    }
 
-    menu[i++] = (struct menu_items) { str(LANG_RENAME), rename_file };
+    menu[i].desc = str(LANG_RENAME);
+    menu[i].function = rename_file;
+    i++;
 
     if (!(attr & ATTR_DIRECTORY))
-        menu[i++] = (struct menu_items) { str(LANG_DELETE), delete_file };
+    {
+        menu[i].desc = str(LANG_DELETE);
+        menu[i].function = delete_file;
+        i++;
+    }
 
     if (attr & TREE_ATTR_MPA)
-        menu[i++] = (struct menu_items) { "VBRfix", vbr_fix };
+    {
+        menu[i].desc = "VBRfix";
+        menu[i].function = vbr_fix;
+        i++;
+    }
 
     /* DIY menu handling, since we want to exit after selection */
     m = menu_init( menu, i );
