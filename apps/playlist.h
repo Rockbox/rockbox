@@ -49,6 +49,7 @@ struct playlist_info
 extern struct playlist_info playlist;
 extern bool playlist_shuffle;
 
+void playlist_init(void);
 int play_list(char *dir, char *file, int start_index, 
               bool shuffled_index, int start_offset,
               int random_seed, int first_index, int queue_resume,

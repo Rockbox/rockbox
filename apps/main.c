@@ -48,6 +48,7 @@
 #include "font.h"
 #include "language.h"
 #include "wps-display.h"
+#include "playlist.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -176,6 +177,7 @@ void init(void)
     status_init();
     usb_start_monitoring();
     power_init();
+    playlist_init();
 }
 
 int main(void)

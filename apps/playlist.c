@@ -38,22 +38,7 @@
 
 #include "lang.h"
 
-static struct playlist_info playlist={
-    "",  /* filename */
-    -1,  /* fd */
-    0,   /* dirlen */
-    {0}, /* indices[] */
-    0,   /* index */
-    0,   /* first_index */
-    0,   /* seed */
-    0,   /* amount */
-    false, /* in_ram */
-    {0}, /* queue_indices[] */
-    0,   /* last_queue_index */
-    0,   /* queue_index */
-    0,   /* num_queued */
-    0    /* start_queue */
-};
+static struct playlist_info playlist;
 
 #define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
 
@@ -64,6 +49,11 @@ extern unsigned char mp3buf[],mp3end;
 static int playlist_end_pos = 0;
 
 static char now_playing[MAX_PATH+1];
+
+void playlist_init(void)
+{
+    playlist.fd = -1;
+}
 
 /*
  * remove any files and indices associated with the playlist
