@@ -8,3 +8,4 @@ uplang
 binlang
 rockbox-style.el
 sample.emacs
+buildzip.pl
