@@ -9,7 +9,7 @@ The main menu offers:
 
 <p> <b><a href="rec-general.html">General Settings</a></b> - Scroll, display, filters etc.
 
-<p> <b>Games</b> - pick a game to play!
+<p> <b>Games</b> - pick a game to play! <a href=wormlet.html>Wormlet</a> is one of them.
 
 <p> <b>Screensavers</b> - pick an enterainer!
 

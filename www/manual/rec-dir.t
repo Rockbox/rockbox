@@ -74,6 +74,9 @@ with .mp3 or .m3u will be displayed in the browser.
 <p> If the cursor is on a .wps file (WPS config), the file will
   be loaded and used for the wps display.
 
+<p> If the cursor is on a .eq file (Equalizer configuration), the file will
+  be loaded and the sound settings will be set accordingly.
+
 </td></tr>
 <tr><td>
  ON
