@@ -233,6 +233,7 @@ Various
   void queue_post(struct event_queue *q, int id, void *data)
 
      Post an event to a queue.
+     NOTE: Negative event ID's are for system use only!!!
 
   bool queue_empty(struct event_queue* q)
 
