@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "ata.h"
+#include "ata_mmc.h"
 #include "kernel.h"
 #include "thread.h"
 #include "led.h"
@@ -106,22 +107,6 @@ static const unsigned char dummy[] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-typedef struct
-{  
-    bool initialized;
-    unsigned char bitrate_register;
-    unsigned char rev;
-    unsigned char rev_fract;
-    unsigned int speed;           /* bps */
-    unsigned int read_timeout;    /* n * 8 clock cycles */
-    unsigned int write_timeout;   /* n * 8 clock cycles */
-    unsigned int size;            /* in bytes */
-    unsigned int manuf_month;
-    unsigned int manuf_year;
-    unsigned long serial_number;
-    unsigned char name[7];
-} tCardInfo;
-
 static tCardInfo card_info[2];
 
 /* private function declarations */
@@ -149,6 +134,8 @@ static int select_card(int card_no)
         or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
     else                          /* external */
         and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
+        
+    last_disk_activity = current_tick;
 
     if (!card_info[card_no].initialized)
     {
@@ -177,6 +164,8 @@ static void deselect_card(void)
 {
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     or_b(0x06, &PADRH);           /* deassert CS (both cards) */
+
+    last_disk_activity = current_tick;
 }
 
 static void setup_sci1(int bitrate_register)
@@ -235,8 +224,7 @@ static void read_transfer(unsigned char *buf, int len)
     *buf = fliptable[(signed char)(RDR1)]; /* read & bitswap */
 }
 
-/* timeout is in bytes */
-static unsigned char poll_byte(int timeout)
+static unsigned char poll_byte(int timeout) /* timeout is in bytes */
 {
     int i;
     unsigned char data = 0;       /* stop the compiler complaining */
@@ -254,7 +242,7 @@ static unsigned char poll_byte(int timeout)
     return fliptable[(signed char)data];
 }
 
-static unsigned char poll_busy(int timeout)
+static unsigned char poll_busy(int timeout) /* timeout is in bytes */
 {
     int i;
     unsigned char data, dummy;
@@ -362,99 +350,132 @@ static int send_data(char start_token, const unsigned char *buf, int len,
     return ret;
 }
 
+/* helper function to extract n (<=32) bits from an arbitrary position.
+   counting from MSB to LSB */
+unsigned long mmc_extract_bits(
+    const unsigned long *p, /* the start of the bitfield array */
+    unsigned int start,     /* bit no. to start reading  */
+    unsigned int size)      /* how many bits to read */
+{
+    unsigned int bit_index;
+    unsigned int bits_to_use;
+    unsigned long mask;
+    unsigned long result;
+
+    if (size == 1)
+    {   /* short cut */
+        return ((p[start/32] >> (31 - (start % 32))) & 1);
+    }
+
+    result = 0;
+    while (size)
+    {
+        bit_index = start % 32;
+        bits_to_use = MIN(32 - bit_index, size);
+        mask = 0xFFFFFFFF >> (32 - bits_to_use);
+
+        result <<= bits_to_use; /* start last round */
+        result |= (p[start/32] >> (32 - bits_to_use - bit_index)) & mask;
+
+        start += bits_to_use;
+        size -= bits_to_use;
+    }
+
+    return result;
+}
+
 static int initialize_card(int card_no)
 {
     int i, temp;
-    unsigned char response;
-    unsigned char cxd[16];
+    unsigned char response[5];
     tCardInfo *card = &card_info[card_no];
 
     static const char mantissa[] = {  /* *10 */
         0,  10, 12, 13, 15, 20, 25, 30,
         35, 40, 45, 50, 55, 60, 70, 80
     };
-    static const int speed_exponent[] = {  /* /10 */
-        10000, 100000, 1000000, 10000000, 0, 0, 0, 0
-    };
-    
-    static const int time_exponent[] = { /* reciprocal */
-        1000000000, 100000000, 10000000, 1000000, 100000, 10000, 1000, 100
+    static const int exponent[] = {  /* use varies */
+        1, 10, 100, 1000, 10000, 100000, 1000000,
+        10000000, 100000000, 1000000000
     };
 
     /* switch to SPI mode */
-    send_cmd(CMD_GO_IDLE_STATE, 0, &response);
-    if (response != 0x01)
+    send_cmd(CMD_GO_IDLE_STATE, 0, response);
+    if (response[0] != 0x01)
         return -1;                /* error response */
 
     /* initialize card */
     i = 0;
-    while (send_cmd(CMD_SEND_OP_COND, 0, &response) && (++i < 200));
-    if (response != 0x00)
+    while (send_cmd(CMD_SEND_OP_COND, 0, response) && (++i < 200));
+    if (response[0] != 0x00)
         return -2;                /* not ready */
+        
+    /* get OCR register */
+    if (send_cmd(CMD_READ_OCR, 0, response))
+        return -3;
+    card->ocr = (response[1] << 24) + (response[2] << 16)
+              + (response[3] << 8) + response[4];
+        
+    /* check voltage */
+    if (!(card->ocr & 0x00100000)) /* 3.2 .. 3.3 V */
+        return -4;
     
     /* get CSD register */
-    if (send_cmd(CMD_SEND_CSD, 0, &response))
-        return -3;
-    if (receive_data(cxd, 16, 50))
-        return -4;
-        
-    /* check block size */
-    if (1 << (cxd[5] & 0x0F) != SECTOR_SIZE)
+    if (send_cmd(CMD_SEND_CSD, 0, response))
         return -5;
+    if (receive_data((unsigned char*)card->csd, 16, 20))
+        return -6;
 
-    /* max transmission speed the card is capable of */
-    card->speed = mantissa[(cxd[3] & 0x78) >> 3]
-                * speed_exponent[(cxd[3] & 0x07)];
-    
-    /* calculate the clock divider */
+    /* check block size */
+    if ((1 << mmc_extract_bits(card->csd, 44, 4)) != SECTOR_SIZE)
+        return -7;
+
+    /* max transmission speed, clock divider */
+    temp = mmc_extract_bits(card->csd, 29, 3);
+    temp = (temp > 3) ? 3 : temp;
+    card->speed = mantissa[mmc_extract_bits(card->csd, 25, 4)]
+                * exponent[temp + 4];
     card->bitrate_register = (FREQ/4-1) / card->speed;
 
-    /* calculate read timeout in clock cycles from TSAC, NSAC and the actual
-     * clock frequency */
-    temp = (FREQ/4) / (card->bitrate_register + 1); /* actual frequency */
-    card->read_timeout =
-        (temp * mantissa[(cxd[1] & 0x78) >> 3] + (1000 * cxd[2]))
-         / (time_exponent[cxd[1] & 0x07] * 8);
-     
-    /* calculate write timeout */
-    temp = (cxd[12] & 0x1C) >> 2;
-    if (temp > 5)
-        temp = 5;
-    card->write_timeout = card->read_timeout * (1 << temp);
+    /* NSAC, TSAC, read timeout */
+    card->nsac = 100 * mmc_extract_bits(card->csd, 16, 8);
+    card->tsac = mantissa[mmc_extract_bits(card->csd, 9, 4)];
+    temp = mmc_extract_bits(card->csd, 13, 3);
+    card->read_timeout = ((FREQ/4) / (card->bitrate_register + 1)
+                         * card->tsac / exponent[9 - temp]
+                         + (10 * card->nsac));
+    card->read_timeout /= 8;      /* clocks -> bytes */
+    card->tsac *= exponent[temp];
 
-    /* calculate size */
-    card->size = ((unsigned int)(cxd[6] & 0x03) << 10)
-               + ((unsigned int)cxd[7] << 2)
-               + ((unsigned int)(cxd[8] & 0xC0) >> 6);
-    temp = ((cxd[9] & 0x03) << 1) + ((cxd[10] & 0x80) >> 7) + 2;
-    card->size *= (SECTOR_SIZE << temp);
+    /* r2w_factor, write timeout */
+    temp = mmc_extract_bits(card->csd, 99, 3);
+    temp = (temp > 5) ? 5 : temp;
+    card->r2w_factor = 1 << temp;
+    card->write_timeout = card->read_timeout * card->r2w_factor;
 
     /* switch to full speed */
     setup_sci1(card->bitrate_register);
     
     /* get CID register */
-    if (send_cmd(CMD_SEND_CID, 0, &response))
-        return -6;
-    if (receive_data(cxd, 16, 50))
-        return -7;
-    
-    /* get data from CID */
-    strncpy(card->name, &cxd[3], 6);
-    card->name[6] = '\0';
-    
-    card->rev = (cxd[9] & 0xF0) >> 4;
-    card->rev_fract = cxd[9] & 0x0F;
-
-    card->manuf_month = (cxd[14] & 0xF0) >> 4;
-    card->manuf_year = (cxd[14] & 0x0F) + 1997;
-    
-    card->serial_number = ((unsigned long)cxd[10] << 24)
-                        + ((unsigned long)cxd[11] << 16)
-                        + ((unsigned long)cxd[12] << 8)
-                        + (unsigned long)cxd[13];
+    if (send_cmd(CMD_SEND_CID, 0, response))
+        return -8;
+    if (receive_data((unsigned char*)card->cid, 16, 20))
+        return -9;
 
     card->initialized = true;
     return 0;
+}
+
+tCardInfo *mmc_card_info(int card_no)
+{
+    tCardInfo *card = &card_info[card_no];
+    
+    if (!card->initialized)
+    {
+        select_card(card_no);
+        deselect_card();
+    }
+    return card;
 }
 
 int ata_read_sectors(unsigned long start,
@@ -466,9 +487,6 @@ int ata_read_sectors(unsigned long start,
     unsigned long addr;
     unsigned char response;
     tCardInfo *card = &card_info[current_card];
-    
-    if (incount <= 0)
-        return ret;
     
     addr = start * SECTOR_SIZE;
 
@@ -482,6 +500,7 @@ int ata_read_sectors(unsigned long start,
             ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
             if (ret == 0)
                 ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
+                last_disk_activity = current_tick;
         }
         else
         {
@@ -490,6 +509,7 @@ int ata_read_sectors(unsigned long start,
             {
                 ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
                 inbuf += SECTOR_SIZE;
+                last_disk_activity = current_tick;
             }
             if (ret == 0)
                 ret = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
@@ -519,9 +539,6 @@ int ata_write_sectors(unsigned long start,
     if (start == 0)
         panicf("Writing on sector 0\n");
 
-    if (count <= 0)
-        return ret;
-
     addr = start * SECTOR_SIZE;
     
     mutex_lock(&mmc_mutex);
@@ -535,6 +552,7 @@ int ata_write_sectors(unsigned long start,
             if (ret == 0)
                 ret = send_data(DT_START_BLOCK, buf, SECTOR_SIZE,
                                 card->write_timeout);
+            last_disk_activity = current_tick;
         }
         else
         {
@@ -544,12 +562,14 @@ int ata_write_sectors(unsigned long start,
                 ret = send_data(DT_START_WRITE_MULTIPLE, buf, SECTOR_SIZE,
                                 card->write_timeout);
                 buf += SECTOR_SIZE;
+                last_disk_activity = current_tick;
             }
             if (ret == 0)
             {
                 response = DT_STOP_TRAN;
                 write_transfer(&response, 1);
                 poll_busy(card->write_timeout);
+                last_disk_activity = current_tick;
             }
         }
     }
