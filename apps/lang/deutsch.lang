@@ -136,7 +136,9 @@ new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. Low?"
+### English phrase was changed! Previous translation was made on:
+### "Batt. Low?"
+eng: "Partition?"
 new: "Akku leer?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
@@ -146,7 +148,9 @@ new: "Speicherfehler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is Battery Low?"
+### English phrase was changed! Previous translation was made on:
+### "Is Battery Low?"
+eng: "No partition?"
 new: "Akku leer?"
 
 id: LANG_TIME_SET
@@ -426,12 +430,16 @@ new: "(PLAY/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "PLAY = Yes"
+### English phrase was changed! Previous translation was made on:
+### "PLAY = Yes"
+eng: ""
 new: "PLAY = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-eng: "Any Other = No"
+### English phrase was changed! Previous translation was made on:
+### "Any Other = No"
+eng: ""
 new: "Sonstige = Nein"
 
 id: LANG_KEYLOCK_ON_PLAYER
@@ -656,117 +664,163 @@ new: "[PLAY] Start/Pause"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-eng: "Level"
+### English phrase was changed! Previous translation was made on:
+### "Level"
+eng: ""
 new: "Level"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-eng: "Moves"
+### English phrase was changed! Previous translation was made on:
+### "Moves"
+eng: ""
 new: "Bewg."
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-eng: "YOU WIN!!"
+### English phrase was changed! Previous translation was made on:
+### "YOU WIN!!"
+eng: ""
 new: "GEWONNEN!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] To Stop"
+### English phrase was changed! Previous translation was made on:
+### "[OFF] To Stop"
+eng: ""
 new: "[OFF] beenden"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - Level"
+### English phrase was changed! Previous translation was made on:
+### "[F1] - Level"
+eng: ""
 new: "[F1] - Level"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] Same Level"
+### English phrase was changed! Previous translation was made on:
+### "[F2] Same Level"
+eng: ""
 new: "[F2] gl. Level"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + Level"
+### English phrase was changed! Previous translation was made on:
+### "[F3] + Level"
+eng: ""
 new: "[F3] + Level"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "Len:%d"
+### English phrase was changed! Previous translation was made on:
+### "Len:%d"
+eng: ""
 new: "Län:%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-eng: "Growing"
+### English phrase was changed! Previous translation was made on:
+### "Growing"
+eng: ""
 new: "Wachse"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "Hungry"
+### English phrase was changed! Previous translation was made on:
+### "Hungry"
+eng: ""
 new: "Hungrig"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-eng: "Wormed"
+### English phrase was changed! Previous translation was made on:
+### "Wormed"
+eng: ""
 new: "Gewurmt"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-eng: "Argh"
+### English phrase was changed! Previous translation was made on:
+### "Argh"
+eng: ""
 new: "Argh"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-eng: "Crashed"
+### English phrase was changed! Previous translation was made on:
+### "Crashed"
+eng: ""
 new: "Unfall!"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-eng: "Hs: %d"
+### English phrase was changed! Previous translation was made on:
+### "Hs: %d"
+eng: ""
 new: "Hs: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    UP/DN"
+### English phrase was changed! Previous translation was made on:
+### "%d Players    UP/DN"
+eng: ""
 new: "%d Spieler    UP/DN"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        L/R"
+### English phrase was changed! Previous translation was made on:
+### "%d Worms        L/R"
+eng: ""
 new: "%d Würmer       L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote Control F1"
+### English phrase was changed! Previous translation was made on:
+### "Remote Control F1"
+eng: ""
 new: "Fernsteuerung  F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No Rem. Control F1"
+### English phrase was changed! Previous translation was made on:
+### "No Rem. Control F1"
+eng: ""
 new: "Keine Fernst.   F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 Key Control   F1"
+### English phrase was changed! Previous translation was made on:
+### "2 Key Control   F1"
+eng: ""
 new: "2 Tastenkontr.  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 Key Control   F1"
+### English phrase was changed! Previous translation was made on:
+### "4 Key Control   F1"
+eng: ""
 new: "4 Tastenkontr.  F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out Of Control"
+### English phrase was changed! Previous translation was made on:
+### "Out Of Control"
+eng: ""
 new: "Ohne Kontrolle"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You Lose!"
+### English phrase was changed! Previous translation was made on:
+### "You Lose!"
+eng: ""
 new: "Verloren!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "Rows - Level"
+### English phrase was changed! Previous translation was made on:
+### "Rows - Level"
+eng: ""
 new: "Reihen - Level"
 
 id: LANG_POWEROFF_IDLE
@@ -1265,12 +1319,16 @@ eng: "OK"
 new: "OK"
 
 id: LANG_PLAYER_ONPLAY_1
-desc: 
+### Description changed! Previous description was:
+### ""
+desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
 new: "\x81 Warteschlange"
 
 id: LANG_PLAYER_ONPLAY_2
-desc: 
+### Description changed! Previous description was:
+### ""
+desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
 new: "- Umb + Ent"
 
@@ -1478,3 +1536,323 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 new: "Beleuchtung an bei Titelwechsel"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always"
+eng: "Always"
+new: "Immer"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Lesezeichen erstellen?"
+
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "Letztes Lesezeichen laden?"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Lesezeichen Fehler!"
+
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Lesezeichen angelegt"
+
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "Lesezeichen leer"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Lesezeichen anlegen"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Lesezeichen auflisten"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "Letzte Lesezeichen"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play to Delete"
+new: "ON+PLAY = Löschen"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "LEFT = Exit"
+new: "LINKS = Verlassen"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: "Index"
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "UNTEN = Liste"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY to Select"
+new: "PLAY = Auswählen"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Zeit"
+
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Lesezeichen beim Stoppen"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "Letztes Lesezeichen laden"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Liste mit zuletzt benutzten Lesezeichen verwalten?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Recent only - Ask"
+new: "Nur letzte - Fragen"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Recent only - Yes"
+new: "Nur letzte - Ja"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "Nur einmalig"
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new: "Boot geändert"
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Andere = Nein"
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "PLAY = Ja"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "Festplatte voll. Drücke OFF zum fortfahren."
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "Flipit"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Einfügen"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Einfügen als nächsten"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Einfügen als Letzten"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+new: "Sprung-Scollen"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new: "Sprung-Scoll Verzögerung"
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+new: "Max Anzahl Dateien in Verzeichnisanzeige"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+new: "Max Playlist-Länge"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "OFF zum Abbrechen"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time"
+eng: "One time"
+new: "Einmalig"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othelo"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Fehler beim Zugriff auf Playliste"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Fehler beim Zugriff auf Playlist-Kontrolldatei"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Playlist-Kontrolldatei ist ungültig"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Fehler beim Anpassen der Playlist-Kontrolldatei"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Fehler beim Verzeichnis-Zugriff"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "%d Tracks eingefügt (%s)"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Playlist Optionen"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "%d Tracks in Warteschlange (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "%d Tracks abgespeichert (%s)"
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Kann %s nicht öffnen"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Plugin erzeugte Fehler"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "Inkompatibles Modell"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "Inkompatible Version"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Warteschlange als Nächsten"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "Warteschlange als Letzten"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Fehler beim Lesen von %s"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "Jetzt neu booten?"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Zeitabhängiges Aufteilen"
+
+id: LANG_RECORD_TIMESPLIT_REC
+desc: 
+eng: "Split time:"
+new: "Zeit zum Aufteilen:"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Verzeichnisse rekursiv hinzufügen"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Rekursiv?"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "Speichere dynamische Playlist"
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Verschiebe-Puzzle"
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Stern"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STOP zum Abbrechen"
