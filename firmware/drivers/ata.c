@@ -69,6 +69,7 @@
 #define CMD_STANDBY                0xE2
 #define CMD_IDENTIFY               0xEC
 #define CMD_SLEEP                  0xE6
+#define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
 #define Q_SLEEP 0
@@ -773,6 +774,44 @@ static int set_multiple_mode(int sectors)
     return 0;
 }
 
+static int set_features(void)
+{
+    struct {
+        unsigned char id_word;
+        unsigned char id_bit;
+        unsigned char subcommand;
+        unsigned char parameter;
+    } features[] = {
+        { 83, 3, 0x05, 1 },    /* power management: lowest power */
+        { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
+        { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
+        { 0, 0, 0, 0 }         /* <end of list> */
+    };
+    int i;
+
+    ATA_SELECT = ata_device;
+
+    if (!wait_for_rdy()) {
+        DEBUGF("set_features() - not RDY\n");
+        return -1;
+    }
+
+    for (i=0; features[i].id_word; i++) {
+        if (identify_info[features[i].id_word] & (1 << features[i].id_bit)) {
+            ATA_FEATURE = features[i].subcommand;
+            ATA_NSECTOR = features[i].parameter;
+            ATA_COMMAND = CMD_SET_FEATURES;
+
+            if (!wait_for_rdy()) {
+                DEBUGF("set_features() - CMD failed\n");
+                return -2 - i;
+            }
+        }
+    }
+
+    return 0;
+}
+
 unsigned short* ata_get_identify(void)
 {
     return identify_info;
@@ -842,6 +881,10 @@ int ata_init(void)
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
         
+        rc = set_features();
+        if (rc)
+            return -60 + rc;
+
         queue_init(&ata_queue);
 
         last_disk_activity = current_tick;
@@ -851,7 +894,7 @@ int ata_init(void)
     }
     rc = set_multiple_mode(multisectors);
     if (rc)
-        return -60 + rc;
+        return -70 + rc;
 
     return 0;
 }
