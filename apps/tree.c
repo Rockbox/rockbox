@@ -719,6 +719,7 @@ bool dirbrowse(char *root)
         struct entry* file = &dircache[dircursor+dirstart];
 
         bool restore = false;
+        bool need_update = false;
 
         button = button_get_w_tmo(HZ/5);
         switch ( button ) {
@@ -961,7 +962,7 @@ bool dirbrowse(char *root)
                             }
                         }
                     }
-                    lcd_update();
+                    need_update = true;
                 }
                 break;
 
@@ -996,7 +997,7 @@ bool dirbrowse(char *root)
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
-                    lcd_update();
+                    need_update = true;
                 }
                 break;
 
@@ -1054,6 +1055,10 @@ bool dirbrowse(char *root)
                 usb_screen();
                 reload_root = true;
                 break;
+
+            case BUTTON_NONE:
+                status_draw();
+                break;
         }
 
         if ( button )
@@ -1092,6 +1097,8 @@ bool dirbrowse(char *root)
 #endif
             numentries = showdir(currdir, dirstart);
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
+            
+            need_update = true;
         }
 
         if ( numentries ) {
@@ -1112,10 +1119,16 @@ bool dirbrowse(char *root)
                 }
                 else
                     lcd_puts_scroll(LINE_X, dircursor, dircache[i].name);
+
+                need_update = true;
             }
         }
-        status_draw();
-        lcd_update();
+
+        if(need_update) {
+            lcd_update();
+
+            need_update = false;
+        }
     }
 
     return false;
