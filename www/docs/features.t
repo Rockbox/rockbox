@@ -1,100 +1,119 @@
 #define _PAGE_ Firmware Feature Comparison Chart
 #include "head.t"
 
-#define NAME    <tr><td>
+#define NAME    <tr><td class=feature>
 #define ENAME   </td>
-#define TD <td>
+#define TD <td class=fneutral>
 #define ETD </td>
 #define EFEAT </tr>
 
-#define YES  TD <font color="#00ff00">Yes</font> ETD
-#define NO   TD <font color="#ff0000">No</font> ETD
+#define YES  <td class=fgood>Yes ETD
+#define NO   <td class=fbad>No ETD
+#define BADYES  <td class=fbad>Yes ETD
+#define GOODNO  <td class=fgood>No ETD
 #define UNKNOWN TD ? ETD
 
-<table>
+<table class=rockbox>
 
-NAME <b>ID3v1 and ID3v2</b> support ENAME
+<tr class=header><th>Feature</th><th>Rockbox</th><th>Archos</th></tr>
+
+NAME ID3v1 and ID3v2 support ENAME
 YES
 UNKNOWN
 EFEAT
 
-NAME <b>Mid-track and mid-playlist resume</b> ENAME
+NAME Background noise ENAME
+GOODNO
+BADYES
+EFEAT
+
+NAME Mid-track resume ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Games</b> ENAME
-TD Tetris, Sokoban, Snake ETD
-NO
-EFEAT
-
-NAME When resuming playback of a shuffled playlist, <b>PREV still works</b>. ENAME
+NAME Mid-playlist resume ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Battery lifetime</b> ENAME
+NAME Resumed playlist order ENAME
+YES
+NO
+EFEAT
+
+NAME Battery lifetime ENAME
 TD Longer ETD
 TD  Long ETD
 EFEAT
 
-NAME <b>Customizable font</b> (Recorder) ENAME
+NAME Charges batteries 100% full ENAME
+NO
+YES
+EFEAT
+
+NAME Customizable font (Recorder) ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Customizable screen info</b> when playing songs ENAME
+NAME Customizable screen info when playing songs ENAME
 YES
 NO
 EFEAT
 
-NAME <b>USB attach/detach without reboot</b> ENAME
+NAME USB attach/detach without reboot ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Ability to run another firmware</b> without rebooting ENAME
+NAME Can load another firmware without rebooting ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Fast playlist loading</b> ENAME
+NAME Fast playlist loading ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Max number of songs in a playlist</b> ENAME
-TD 10.000 ETD
+NAME Max number of songs in a playlist ENAME
+TD 10 000 ETD
 TD 999 ETD
 EFEAT
 
-NAME <b>Open source/development process</b> ENAME
+NAME Open source/development process ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Corrects reported bugs</b> ENAME
+NAME Corrects reported bugs ENAME
 YES
 NO
 EFEAT
 
-NAME <b>Text File Reader</b> ENAME
+NAME Text File Reader ENAME
 YES
 NO
 EFEAT
 
-NAME <b>File Management</b> ENAME
+NAME Games ENAME
+TD Tetris, Sokoban, Snake ETD
+NO
+EFEAT
+
+NAME File Delete & Rename ENAME
 NO
 YES
 EFEAT
 
-NAME <b>Playlist Building</b> ENAME
+NAME Playlist Building ENAME
 NO
 YES
 EFEAT
 
-NAME <b>Recording</b> (Recorder) ENAME
-TD Developing ETD
+NAME Recording (Recorder) ENAME
+TD In development ETD
 YES
 EFEAT
 
