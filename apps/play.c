@@ -42,7 +42,7 @@
 void playtune(char *filename)
 {
     static char mfile[256];
-    mp3entry mp3;
+    struct mp3entry mp3;
     bool good=1;
 #ifdef HAVE_LCD_BITMAP
     char buffer[256];

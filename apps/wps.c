@@ -40,7 +40,7 @@
 /* demonstrates showing different formats from playtune */
 void wps_show_play(char* filename)
 {
-    mp3entry  mp3;
+    struct mp3entry mp3;
     mp3info(&mp3,filename);
 
     switch ( global_settings.wps_display ) {

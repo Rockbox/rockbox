@@ -110,7 +110,7 @@ stripspaces(char *buffer)
  * Returns: true if a title was found and created, else false
  */
 static bool 
-setid3v1title(int fd, mp3entry *entry) 
+setid3v1title(int fd, struct mp3entry *entry) 
 {
     char buffer[31];
     int offsets[3] = {-95,-65,-125};
@@ -155,7 +155,7 @@ setid3v1title(int fd, mp3entry *entry)
  * Returns: true if a title was found and created, else false
  */
 static void
-setid3v2title(int fd, mp3entry *entry) 
+setid3v2title(int fd, struct mp3entry *entry) 
 {
     unsigned int minframesize;
     int size;
@@ -345,7 +345,7 @@ getid3v1len(int fd)
  *          -1 means that it couldn't be calculated
  */
 static int 
-getsonglength(int fd, mp3entry *entry)
+getsonglength(int fd, struct mp3entry *entry)
 {
     unsigned long header=0;
     unsigned char tmp;
@@ -480,14 +480,14 @@ getsonglength(int fd, mp3entry *entry)
  * Returns: void
  */
 bool
-mp3info(mp3entry *entry, char *filename) 
+mp3info(struct mp3entry *entry, char *filename) 
 {
     int fd;
     fd = open(filename, O_RDONLY);
     if(-1 == fd)
         return true;
 
-    memset(entry, 0, sizeof(mp3entry));
+    memset(entry, 0, sizeof(struct mp3entry));
 
     entry->path = filename;
 
@@ -524,7 +524,7 @@ int main(int argc, char **argv)
 {
     int i;
     for(i=1; i<argc; i++) {
-        mp3entry mp3;
+        struct mp3entry mp3;
         if(mp3info(&mp3, argv[i])) {
             printf("Failed to get %s\n", argv[i]);
             return 0;

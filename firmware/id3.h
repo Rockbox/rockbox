@@ -38,8 +38,6 @@ struct mp3entry {
     char id3v1buf[3][32];
 };
 
-typedef struct mp3entry mp3entry;
-
-bool mp3info(mp3entry *entry, char *filename);
+bool mp3info(struct mp3entry *entry, char *filename);
 
 #endif
