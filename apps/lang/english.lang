@@ -1326,3 +1326,23 @@ id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 new:
+
+id: LANG_PLAYER_KEYBOARD_BACKSPACE
+desc: Backspace alternative in player keyboard interaction
+eng: "Backspace"
+new:
+
+id: LANG_PLAYER_KEYBOARD_DELETE
+desc: Delete alternative in player keyboard interaction
+eng: "Delete"
+new:
+
+id: LANG_PLAYER_KEYBOARD_ACCEPT
+desc: Accept alternative in player keyboard interaction
+eng: "Accept"
+new:
+
+id: LANG_PLAYER_KEYBOARD_ABORT
+desc: Abort alternative in player keyboard interaction
+eng: "Abort"
+new:

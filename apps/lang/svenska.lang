@@ -1218,3 +1218,103 @@ id: LANG_MENU_SETTING_OK
 desc: Visual confirmation of changing a setting
 eng: "OK"
 new: "OK"
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+new: "Väckarklocka"
+
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm time is too soon!"
+new: "Väckning om för kort tid!"
+
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+new: "PLAY=Sätt OFF=Avbryt"
+
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting down..."
+new: "Stannar..."
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm time: %02d:%02d"
+new: "Alarm: %02d:%02d"
+
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking up in %d:%02d"
+new: "Vaknar om %d:%02d"
+
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+new: "Skapa Spellista"
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+new: "Skapar"
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+new: "Radera"
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+new: "Raderad"
+
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "failed"
+new: "misslyckades"
+
+id: LANG_PLAYER_ONPLAY_1
+desc: 
+eng: "\x81 Queue"
+new: "\x81 Köa"
+
+id: LANG_PLAYER_ONPLAY_2
+desc: 
+eng: "- Ren + Del"
+new: "- Ren + Del"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+new: "Kö"
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+new: "Radera?"
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+new: "Ändra namn"
+
+id: LANG_PLAYER_KEYBOARD_ABORT
+desc: Abort alternative in player keyboard interaction
+eng: "Abort"
+new: "Avbryt"
+
+id: LANG_PLAYER_KEYBOARD_ACCEPT
+desc: Accept alternative in player keyboard interaction
+eng: "Accept"
+new: "Utför"
+
+id: LANG_PLAYER_KEYBOARD_BACKSPACE
+desc: Backspace alternative in player keyboard interaction
+eng: "Backspace"
+new: "Backsteg"
+
+id: LANG_PLAYER_KEYBOARD_DELETE
+desc: Delete alternative in player keyboard interaction
+eng: "Delete"
+new: "Radera"

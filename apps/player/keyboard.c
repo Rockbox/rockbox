@@ -24,7 +24,7 @@
 #include "sprintf.h"
 #include <string.h>
 #include "lcd-player-charset.h"
-
+#include "lang.h"
 #include "debug.h"
 
 #define KEYBOARD_PAGES 3
@@ -132,16 +132,16 @@ int kbd_input(char* text, int buflen)
                 lcd_puts(1, 1, temptext);
                 break;
             case MENU_LINE_BACKSPACE:
-                lcd_puts_scroll(1, 1, "Backspace");
+                lcd_puts_scroll(1, 1, str(LANG_PLAYER_KEYBOARD_BACKSPACE));
                 break;
             case MENU_LINE_DELETE:
-                lcd_puts_scroll(1, 1, "Delete");
+                lcd_puts_scroll(1, 1, str(LANG_PLAYER_KEYBOARD_DELETE));
                 break;
             case MENU_LINE_ACCEPT:
-                lcd_puts_scroll(1, 1, "Accept");
+                lcd_puts_scroll(1, 1, str(LANG_PLAYER_KEYBOARD_ACCEPT));
                 break;
             case MENU_LINE_QUIT:
-                lcd_puts_scroll(1, 1, "Abort");
+                lcd_puts_scroll(1, 1, str(LANG_PLAYER_KEYBOARD_ABORT));
                 break;
         }
         if (menu_line==MENU_LINE_INPUT) {
