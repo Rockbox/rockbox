@@ -220,7 +220,7 @@ new:
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-voice: "Accelleration"
+voice: "Acceleration"
 new:
 
 id: LANG_FOLLOW
@@ -1390,7 +1390,7 @@ new:
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
-voice: "Max files in dir browser"
+voice: "Max files in directory browser"
 new:
 
 id: LANG_MAX_FILES_IN_PLAYLIST
