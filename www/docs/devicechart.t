@@ -252,8 +252,8 @@
 </tr>
 <tr><th><b>Storage</b></th>
     <td>6 GB 2.5"</td>
-    <td>6 GB 2.5"</td>
-    <td>10-15 GB 2.5"</td>
+    <td>6-20 GB 2.5"</td>
+    <td>6-15 GB 2.5"</td>
     <td>20 GB 2.5"</td>
     <td>20 GB 2.5"</td>
     <td>20 GB 2.5"</td>
