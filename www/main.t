@@ -8,6 +8,7 @@
 <p>Rockbox is an Open Source replacement firmware for the Archos Jukebox 5000, 6000, Studio and Recorder MP3 players.
 
 <h2>News</h2>
+<p><i>2003-05-09</i>: The 400-file dir browser limit is <a href=http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml>gone</a>.
 
 <p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
 

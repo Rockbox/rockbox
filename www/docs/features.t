@@ -84,7 +84,7 @@ TD 15 - 20 ETD
 EFEAT
 
 NAME Max number of songs in a playlist ENAME
-TD 10 000 ETD
+TD 20 000 ETD
 TD 999 ETD
 EFEAT
 
@@ -179,7 +179,7 @@ YES
 EFEAT
 
 NAME Max number of files in a dir ENAME
-TD 400 ETD
+TD 10 000 ETD
 TD 999 ETD
 EFEAT
 
