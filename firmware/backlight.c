@@ -28,6 +28,13 @@
 #include "power.h"
 #include "system.h"
 
+const char backlight_timeout_value[19] =
+{
+    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
+};
+
+#ifdef HAVE_BACKLIGHT
+
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
 
@@ -41,11 +48,6 @@ static bool backlight_on_when_charging = 0;
 
 static int backlight_timer;
 static unsigned int backlight_timeout = 5;
-
-const char backlight_timeout_value[19] =
-{
-    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
-};
 
 void backlight_thread(void)
 {
@@ -175,3 +177,17 @@ void backlight_init(void)
 
     backlight_on();
 }
+
+#else /* no backlight, empty dummy functions */
+
+void backlight_init(void) {}
+void backlight_on(void) {}
+void backlight_off(void) {}
+void backlight_tick(void) {}
+int  backlight_get_timeout(void) {return 0;}
+void backlight_set_timeout(int index) {(void)index;}
+bool backlight_get_on_when_charging(void) {return 0;}
+void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
+
+#endif /* #ifdef HAVE_BACKLIGHT */
+
