@@ -83,7 +83,7 @@ void ev_poll(void)
     oldbuttonstate = newbuttonstate;
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     if (rb->button_hold()&~holdbutton)
-	fb.mode=(fb.mode+1)%3;
+	fb.mode=(fb.mode+1)%4;
     holdbutton=rb->button_hold();
 #endif
     if(released) {
@@ -153,7 +153,7 @@ void vid_init(void)
     fb.enabled=1;
     fb.dirty=0;
     video_base_buf=fb.ptr=(byte *)frameb;
-    fb.mode=0;
+    fb.mode=3;
 }
 
 void vid_update(int scanline) 
@@ -164,11 +164,8 @@ void vid_update(int scanline)
     int balance = 0;
     if (fb.mode==1)
       scanline-=16;
-    else if (fb.mode==2) {
+    else if (fb.mode==2)
       scanline-=8;
-      if(scanline>=128)
-          return;
-    }
     scanline_remapped = scanline / 16;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
@@ -242,11 +239,8 @@ void vid_update(int scanline)
 #else /* LCD_HEIGHT != 64, iRiver */
     if (fb.mode==1)
       scanline-=16;
-    else if (fb.mode==2) {
+    else if (fb.mode==2)
       scanline-=8;
-      if(scanline>=128)
-          return;
-    }
 #ifdef GRAYSCALE
     scanline_remapped = scanline / 4;
 #else

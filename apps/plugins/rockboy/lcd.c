@@ -52,7 +52,7 @@ static int rgb332;
 
 static int sprsort = 1;
 static int sprdebug;
-static int scanline_ind=0;
+static int scanline_ind=0,insync=0;
 
 #define DEF_PAL { 0x98d0e0, 0x68a0b0, 0x60707C, 0x2C3C3C }
 
@@ -536,12 +536,6 @@ void bg_scan_color(void)
 	blendcpy(dest, src, *(tile++), cnt);
 }
 
-// blend in window source WND target BUF
-// WX = starting X in buf where WND starts
-// WV = vertical line selected for this scanline
-// reverse:
-// WY = starting y in buf where WND starts ? 
-// W?? = horizontal line selected for this scanline
 void wnd_scan_color(void)
 {
 	int cnt;
@@ -735,32 +729,30 @@ void lcd_begin(void)
 void lcd_refreshline(void)
 {
 	if (!fb.enabled) return;
+	if(!insync) {
+		if(R_LY!=0)
+			return;
+		else
+		   insync=1;
+	}
 
 	if (!(R_LCDC & 0x80))
 		return; /* should not happen... */
 
-        if ( ((fb.mode==0)&&(R_LY >= 128)) ||
-             ((fb.mode==1)&&(R_LY < 16)) ||
-             ((fb.mode==2)&&((R_LY<8)||(R_LY>=136)))
+        if ( (fb.mode==0&&(R_LY >= 128)) ||
+             (fb.mode==1&&(R_LY < 16)) ||
+             (fb.mode==2&&(R_LY<8||R_LY>=136)) ||
+	     (fb.mode==3&&((R_LY%9)==8))
 							
 #if LCD_HEIGHT == 64
 	     || (R_LY & 1) /* calculate only even lines */
 #endif
 	   )
-		return;
+	    return;
 
 	updatepatpix();
 
     L = R_LY;
-#if LCD_HEIGHT == 64
-    scanline_ind = (L/2) % 8;
-#else
-#ifdef GRAYSCALE
-    scanline_ind = L % 4;
-#else
-    scanline_ind = L % 8;
-#endif
-#endif
     X = R_SCX;
     Y = (R_SCY + L) & 0xff;
     S = X >> 3;
@@ -795,20 +787,26 @@ void lcd_refreshline(void)
         recolor(BUF+WX, 0x04, 160-WX);
     }
     spr_scan();
-/*
-    if (fb.dirty) memset(fb.ptr, 0, fb.pitch * fb.h);
-    fb.dirty = 0;
-    if (density > scale) density = scale;
-    if (scale == 1) density = 1;
-    dest = vdest;
-*/
 #ifdef GRAYSCALE
     if (scanline_ind == 3)
 #else
     if (scanline_ind == 7)
 #endif
-        vid_update(L);
-  //  vdest += fb.pitch * scale;
+    {
+        if(fb.mode!=3)
+            vid_update(L);
+	else
+	    vid_update(L-((int)(L/9)));
+    }
+#if LCD_HEIGHT == 64
+    scanline_ind = (scanline_ind+1) % 8;
+#else
+#ifdef GRAYSCALE
+    scanline_ind = (scanline_ind+1) % 4;
+#else
+    scanline_ind = (scanline_ind+1) % 8;
+#endif
+#endif
 }
 
 
