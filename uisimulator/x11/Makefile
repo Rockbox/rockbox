@@ -76,7 +76,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
+FIRMSRCS = lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c X5x8.c loadfont.c panic.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
@@ -215,9 +215,6 @@ $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
