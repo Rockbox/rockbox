@@ -2408,7 +2408,7 @@ void mpeg_set_recording_options(int frequency, int quality,
     is_mpeg1 = (frequency < 3)?true:false;
     
     val = (quality << 17) |
-        ((frequency % 3) << 11) |
+        ((frequency % 3) << 10) |
         ((is_mpeg1?1:0) << 9) |
         ((channel_mode * 2 + 1) << 6) |
         (1 << 5) /* MS-stereo */ |
