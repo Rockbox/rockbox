@@ -145,7 +145,7 @@ THISDIR="@PWD@"
 
 .PHONE: firmware apps
 
-all: firmware apps
+all: apps
 
 firmware:
 	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
