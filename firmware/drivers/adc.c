@@ -34,7 +34,7 @@ static void adc_tick(void)
 {
     /* Read the data that has bee converted since the last tick */
     adcdata[current_channel] =
-	*(unsigned short *)adcreg[current_channel] >> 6;
+    *(unsigned short *)adcreg[current_channel] >> 6;
 
     /* Start a conversion on the next channel */
     current_channel++;
@@ -82,10 +82,10 @@ void adc_init(void)
     current_channel = 0;
 
     /* Do a first scan to initialize all values */
-    /* AN0 to AN3 */
-    adc_batch_convert(true);
     /* AN4 to AN7 */
     adc_batch_convert(false);
+    /* AN0 to AN3 */
+    adc_batch_convert(true);
     
     tick_add_task(adc_tick);
 }
