@@ -6,7 +6,7 @@
 <h2>Purpose</h2>
 
 <p>The purpose of this project is to write an Open Source replacement
-firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> MP3 players.
+firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>Recorder</i> MP3 players.
 
 <h2>News</h2>
 
