@@ -29,6 +29,7 @@
 #include "string.h"
 #include "lcd.h"
 #include "settings.h"
+#include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
 
@@ -53,9 +54,10 @@ int fat_startsector(void)
     return 63;
 }
 
-int ata_write_sectors(unsigned long start,
-                      unsigned char count,
-                      void* buf)
+int ata_write_sectors(IF_MV2(int drive,)
+                      unsigned long start,
+                      int count,
+                      const void* buf)
 {
     int i;
     
@@ -74,8 +76,9 @@ int ata_write_sectors(unsigned long start,
     return 1;
 }
 
-int ata_read_sectors(unsigned long start,
-                     unsigned char count,
+int ata_read_sectors(IF_MV2(int drive,)
+                     unsigned long start,
+                     int count,
                      void* buf)
 {
     int i;
@@ -95,9 +98,9 @@ int ata_read_sectors(unsigned long start,
     return 1;
 }
 
-void ata_delayed_write(unsigned long sector, void* buf)
+void ata_delayed_write(unsigned long sector, const void* buf)
 {
-    ata_write_sectors(sector,1,buf);
+    ata_write_sectors(IF_MV2(0,) sector, 1, buf);
 }
 
 void ata_flush(void)
