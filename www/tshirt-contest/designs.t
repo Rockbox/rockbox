@@ -363,6 +363,21 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 25 -->
+<tr><td>(25)</td>
+    <td colspan=2>Damien Teney</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Damien-Teney-front.png"><img border=0 src="design25f.png" width=300 height=252></a></td>
+    <td><a href="Damien-Teney-back.png"><img border=0 src="design25b.png" width=300 height=252></a></td>
+
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
 
 <!-- End Entries -->
 
