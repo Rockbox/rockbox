@@ -153,6 +153,8 @@ void init(void)
     (void)coldstart;
 #endif
 
+    usb_start_monitoring();
+
     rc = ata_init();
     if(rc)
     {
@@ -177,6 +179,7 @@ void init(void)
         if (!fat_mount(pinfo[i].start))
             break;
     }
+
     if ( i==4 ) {
         DEBUGF("No partition found, trying to mount sector 0.\n");
         rc = fat_mount(0);
@@ -186,15 +189,16 @@ void init(void)
             lcd_puts(0,1,"partition!");
             lcd_update();
             sleep(HZ);
-            while(1)
-                dbg_partitions();
+            /* Don't leave until we have been in USB mode */
+            while(!dbg_partitions());
+
+            /* The USB thread will panic if the drive still can't be mounted */
         }
     }
 
     settings_load();
     
     status_init();
-    usb_start_monitoring();
     playlist_init();
     tree_init();
 

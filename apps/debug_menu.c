@@ -45,6 +45,7 @@
 #include "fat.h"
 #include "dir.h"
 #include "panic.h"
+#include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -504,6 +505,10 @@ bool dbg_partitions(void)
                 if (partition > 3)
                     partition = 0;
                 break;
+                
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
     }
     return false;
