@@ -44,14 +44,17 @@ struct filedesc {
     bool busy;
     bool write;
     bool dirty;
+    bool trunc;
 };
 
 static struct filedesc openfiles[MAX_OPEN_FILES];
 
+static int flush_cache(int fd);
+
 int creat(const char *pathname, int mode)
 {
     (void)mode;
-    return open(pathname, O_WRONLY);
+    return open(pathname, O_WRONLY|O_CREAT);
 }
 
 int open(const char* pathname, int flags)
@@ -81,20 +84,16 @@ int open(const char* pathname, int flags)
         return -2;
     }
 
-    switch ( flags ) {
-        case O_RDONLY:
-            openfiles[fd].write = false;
-            break;
-
-        case O_RDWR:
-        case O_WRONLY:
+    if (flags & O_RDONLY) {
+        openfiles[fd].write = false;
+    }
+    else {
+        if (flags & (O_RDWR | O_WRONLY)) {
             openfiles[fd].write = true;
-            break;
 
-        default:
-            DEBUGF("Only O_RDONLY and O_WRONLY is supported\n");
-            errno = EROFS;
-            return -3;
+            if (flags & O_TRUNC)
+                openfiles[fd].trunc = true;
+        }
     }
     openfiles[fd].busy = true;
 
@@ -130,7 +129,7 @@ int open(const char* pathname, int flags)
     closedir(dir);
     if ( !entry ) {
         LDEBUGF("Didn't find file %s\n",name);
-        if ( openfiles[fd].write ) {
+        if ( openfiles[fd].write && (flags & O_CREAT) ) {
             if (fat_create_file(name,
                                 &(openfiles[fd].fatfile),
                                 &(dir->fatdir)) < 0) {
@@ -151,6 +150,12 @@ int open(const char* pathname, int flags)
 
     openfiles[fd].cacheoffset = -1;
     openfiles[fd].fileoffset = 0;
+
+    if (openfiles[fd].write && (flags & O_APPEND)) {
+        if (lseek(fd,0,SEEK_END) < 0 )
+            return -7;
+    }
+
     return fd;
 }
 
@@ -169,18 +174,21 @@ int close(int fd)
         return -2;
     }
     if (openfiles[fd].write) {
+        /* truncate? */
+        if (openfiles[fd].trunc) {
+            if (ftruncate(fd, openfiles[fd].fileoffset) < 0)
+                return -1;
+        }
+
         /* flush sector cache */
         if ( openfiles[fd].dirty ) {
-            if ( fat_readwrite(&(openfiles[fd].fatfile), 1,
-                               &(openfiles[fd].cache),true) < 0 ) {
-                DEBUGF("Failed flushing cache\n");
-                errno = EIO;
-                rc = -1;
-            }
+            if (flush_cache(fd) < 0)
+                return -2;
         }
-        
+
         /* tie up all loose ends */
-        fat_closewrite(&(openfiles[fd].fatfile), openfiles[fd].size);
+        if (fat_closewrite(&(openfiles[fd].fatfile), openfiles[fd].size) < 0)
+            return -3;
     }
     openfiles[fd].busy = false;
     return rc;
@@ -235,6 +243,28 @@ int ftruncate(int fd, unsigned int size)
     }
 
     openfiles[fd].size = size;
+
+    return 0;
+}
+
+static int flush_cache(int fd)
+{
+    int rc;
+    int sector = openfiles[fd].fileoffset / SECTOR_SIZE;
+    
+    DEBUGF("Flushing dirty sector cache %x\n", sector);
+    
+    /* seek back one sector to get file position right */
+    rc = fat_seek(&(openfiles[fd].fatfile), sector);
+    if ( rc < 0 )
+        return -1;
+    
+    rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
+                       openfiles[fd].cache, true );
+    if ( rc < 0 )
+        return -2;
+
+    openfiles[fd].dirty = false;
 
     return 0;
 }
@@ -296,24 +326,8 @@ static int readwrite(int fd, void* buf, int count, bool write)
 
     /* if buffer has been modified, write it back to disk */
     if (count && openfiles[fd].dirty) {
-        int rc;
-        DEBUGF("Flushing dirty sector cache\n");
-
-        /* seek back one sector to get file position right */
-        rc = fat_seek(&(openfiles[fd].fatfile), 
-                      openfiles[fd].fileoffset / SECTOR_SIZE);
-        if ( rc < 0 ) {
-            errno = EIO;
+        if (flush_cache(fd) < 0)
             return -3;
-        }
-
-        rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                           openfiles[fd].cache, true );
-        if ( rc < 0 ) {
-            errno = EIO;
-            return -4;
-        }
-        openfiles[fd].dirty = false;
     }
 
     /* read whole sectors right into the supplied buffer */
@@ -454,7 +468,13 @@ int lseek(int fd, int offset, int whence)
 
     if ( (newsector != oldsector) ||
          ((openfiles[fd].cacheoffset==-1) && sectoroffset) ) {
+
         if ( newsector != oldsector ) {
+            if (openfiles[fd].dirty) {
+                if (flush_cache(fd) < 0)
+                    return -5;
+            }
+            
             rc = fat_seek(&(openfiles[fd].fatfile), newsector);
             if ( rc < 0 ) {
                 errno = EIO;
@@ -466,7 +486,7 @@ int lseek(int fd, int offset, int whence)
                                &(openfiles[fd].cache),false);
             if ( rc < 0 ) {
                 errno = EIO;
-                return -5;
+                return -6;
             }
             openfiles[fd].cacheoffset = sectoroffset;
         }
