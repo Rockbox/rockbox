@@ -18,7 +18,7 @@ firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> M
 If you like living on the edge, <a href="daily.shtml">here are daily builds</a>.
 
 <p><i><small>(Old news items have moved to a 
-<a href="history.t">separate page</a>.)</small></i>
+<a href="history.html">separate page</a>.)</small></i>
 
 <p>We have a mailing list: rockbox@cool.haxx.se.
 To subscribe, send a message to <a href="mailto:majordomo@cool.haxx.se">majordomo@cool.haxx.se</a> with the words "subscribe rockbox" in the body.
