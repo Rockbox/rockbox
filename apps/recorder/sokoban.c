@@ -45,14 +45,62 @@
 static void load_level(int);
 static void update_screen(void);
 static bool sokoban_loop(void);
+static void copy_current_state_to_undo(void);
+static void copy_current_undo_to_state(void);
 
 static char board[16][20];
+static char undo_board[16][20];
 static int current_level=0;
+static int undo_current_level=0;
 static int moves=0;
+static int undo_moves=0;
 static int row=0;
+static int undo_row=0;
 static int col=0;
+static int undo_col=0;
 static int boxes_to_go=0;
+static int undo_boxes_to_go=0;
 static char current_spot= ' ';
+static char undo_current_spot=' ';
+
+
+
+static void copy_current_state_to_undo(void) {
+    int a = 0;
+    int b = 0;
+    
+    for (a=0 ; a<16 ; a++) {
+        for (b=0; b<16 ; b++) {
+            undo_board[a][b] = board[a][b];
+        }
+    }
+    undo_current_level = current_level;
+    undo_moves = moves;
+    undo_row = row;
+    undo_col = col;
+    undo_boxes_to_go = boxes_to_go;
+    undo_current_spot = current_spot;
+
+    return;
+}
+
+static void copy_current_undo_to_state(void) {
+    int a = 0;
+    int b = 0;
+    
+    for (a=0 ; a<16 ; a++) {
+        for (b=0; b<16 ; b++) {
+            board[a][b] = undo_board[a][b];
+        }
+    }
+    current_level = undo_current_level;
+    moves = undo_moves-1;
+    row = undo_row;
+    col = undo_col;
+    boxes_to_go = undo_boxes_to_go;
+    current_spot = undo_current_spot;
+    return;
+}
 
 static void load_level (int level_to_load) {
     int a = 0;
@@ -152,9 +200,9 @@ static bool sokoban_loop(void)
     update_screen();
 
     while(1) {
+       
         bool idle = false;
         switch ( button_get(true) ) {
-
             case BUTTON_OFF:
                 /* get out of here */
                 return false; 
@@ -163,6 +211,11 @@ static bool sokoban_loop(void)
                 /* increase level */
                 boxes_to_go=0;
                 idle=true;
+                break;
+
+            case BUTTON_ON:
+                /* this is UNDO */
+                copy_current_undo_to_state();
                 break;
 
             case BUTTON_F2:
@@ -188,6 +241,7 @@ static bool sokoban_loop(void)
                 break;
 
             case BUTTON_LEFT:
+                copy_current_state_to_undo();
                 switch ( board[row][col-1] ) {
                     case ' ': /* if it is a blank spot */
                         board[row][col-1]='@';
@@ -256,6 +310,7 @@ static bool sokoban_loop(void)
                 break;
 
             case BUTTON_RIGHT: /* if it is a blank spot */
+                copy_current_state_to_undo();
                 switch ( board[row][col+1] ) {
                     case ' ':
                         board[row][col+1]='@';
@@ -324,6 +379,7 @@ static bool sokoban_loop(void)
                 break;
 
             case BUTTON_UP:
+                copy_current_state_to_undo();
                 switch ( board[row-1][col] ) {
                     case ' ': /* if it is a blank spot */
                         board[row-1][col]='@';
@@ -392,6 +448,7 @@ static bool sokoban_loop(void)
                 break;
 
             case BUTTON_DOWN:
+                copy_current_state_to_undo();
                 switch ( board[row+1][col] ) {
                     case ' ': /* if it is a blank spot */
                         board[row+1][col]='@';
@@ -478,7 +535,7 @@ static bool sokoban_loop(void)
             moves=0;
             current_level++;
             if (current_level == NUM_LEVELS) {
-                for(ii=0; ii<30 ; ii++) {
+                for(ii=0; ii<300 ; ii++) {
                     lcd_clear_display();
                     lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
                     lcd_update();
