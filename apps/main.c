@@ -50,7 +50,7 @@
 #endif
 
 
-char appsversion[]=APPSVERSION;
+char appsversion[]="WIN32";
 
 void init(void);
 
