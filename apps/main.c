@@ -70,6 +70,13 @@ void init(void)
     settings_reset();
     settings_load();
     sleep(HZ/2);
+    mpeg_init( global_settings.volume,
+               global_settings.bass,
+               global_settings.treble,
+               global_settings.balance,
+               global_settings.loudness,
+               global_settings.bass_boost,
+               global_settings.avc );
 }
 
 #else
