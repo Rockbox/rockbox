@@ -71,7 +71,7 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
-#define CONFIG_BLOCK_VERSION 14
+#define CONFIG_BLOCK_VERSION 15
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -189,7 +189,6 @@ static struct bit_entry rtc_bits[] =
     {1, S_O(flip_display), false, "flip display", off_on },
     /* display */
     {1, S_O(invert_cursor), false, "invert cursor", off_on },
-    {1, S_O(show_icons), true, "show icons", off_on },
     {1, S_O(statusbar), true, "statusbar", off_on },
     {1, S_O(scrollbar), true, "scrollbar", off_on },
     {1, S_O(buttonbar), true, "buttonbar", off_on },
@@ -197,6 +196,7 @@ static struct bit_entry rtc_bits[] =
     {1, S_O(battery_type), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
 #endif
+    {1, S_O(show_icons), true, "show icons", off_on },
     /* system */
     {4, S_O(poweroff), 10, 
         "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
