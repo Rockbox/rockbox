@@ -36,7 +36,8 @@ int cursor = 0;
 void menu_init(void)
 {
   lcd_puts(6, 0,  "Rockabox", 0);
-  lcd_puts(6, 8,  "Boxrock", 0);
+  lcd_puts(6, 8,  "Screen Saver", 0);
+#define LINE_SS 1
   lcd_puts(6, 16, "Browse", 0);
 #define LINE_BROWSE 2
   lcd_puts(6, 24, "Tetris", 0);
@@ -85,6 +86,11 @@ void app_main(void)
         break;
       case (LINE_BROWSE * LINE_HEIGHT):
         dirbrowse("/");
+        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+        menu_init();
+        break;
+      case (LINE_SS * LINE_HEIGHT):
+        screensaver();
         lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         menu_init();
         break;
