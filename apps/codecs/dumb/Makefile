@@ -93,16 +93,9 @@ uninstall: config-if-necessary
 	$(call ECHO,DUMB has been uninstalled.)
 
 
-ifdef COMSPEC
-# Assume DOS or Windows.
-SHELL := $(COMSPEC)
-CONFIG_COMMAND := make\config.bat
-DUMBASK_EXE := make/dumbask.exe
-else
 # Assume a Unix-compatible system.
 CONFIG_COMMAND := make/config.sh
 DUMBASK_EXE := make/dumbask
-endif
 
 # This will always configure.
 config: $(DUMBASK_EXE)
@@ -159,7 +152,7 @@ CORE_MODULES :=            \
     it/itorder.c           \
     it/itmisc.c
 #    helpers/stdfile.c      
-    
+
 ALLEGRO_MODULES :=         \
     allegro/alplay.c       \
     allegro/datduh.c       \
