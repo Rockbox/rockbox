@@ -64,7 +64,7 @@
 #define TIER1_ADDR      0x05FFFF10
 #define TSR1_ADDR       0x05FFFF11
 #define TCNT1_ADDR      0x05FFFF12
-#define GRA_ADDR1       0x05FFFF14
+#define GRA1_ADDR       0x05FFFF14
 #define GRB1_ADDR       0x05FFFF16
 #define TCR2_ADDR       0x05FFFF18
 #define TIOR2_ADDR      0x05FFFF19
@@ -200,7 +200,7 @@
 #define TIER1      (*((volatile unsigned char*)TIER1_ADDR))  
 #define TSR1       (*((volatile unsigned char*)TSR1_ADDR))   
 #define TCNT1      (*((volatile unsigned short*)TCNT1_ADDR)) 
-#define GRA1       (*((volatile unsigned short*)GRA_ADDR))1  
+#define GRA1       (*((volatile unsigned short*)GRA1_ADDR))
 #define GRB1       (*((volatile unsigned short*)GRB1_ADDR))  
 #define TCR2       (*((volatile unsigned char*)TCR2_ADDR))   
 #define TIOR2      (*((volatile unsigned char*)TIOR2_ADDR))  
