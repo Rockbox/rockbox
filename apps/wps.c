@@ -589,6 +589,7 @@ int wps_show(void)
     int button;
     int ff_rewind_count = 0;
     bool ignore_keyup = true;
+    bool restore = false;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -609,11 +610,13 @@ int wps_show(void)
         id3 = mpeg_current_track();
         draw_screen(id3);
     }
+    else if(!id3)
+    {
+      restore  = true;
+    }
 
     while ( 1 )
     {
-        bool restore = false;
-
         button = button_get_w_tmo(HZ/5);
 
         /* discard first event if it's a button release */
@@ -814,7 +817,7 @@ int wps_show(void)
                     else
 #endif
                     {
-                        if (id3->elapsed < 3*1000)
+                        if (!id3 || (id3->elapsed < 3*1000))
                             mpeg_prev();
                         else {
                             mpeg_pause();
