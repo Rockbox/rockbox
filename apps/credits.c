@@ -47,6 +47,7 @@ char* credits[] = {
     "Tom Cvitan",
     "Magnus Oman",
     "Jerome Kuptz",
+    "Julien Boissinot",
 };
 
 #ifdef HAVE_LCD_BITMAP
