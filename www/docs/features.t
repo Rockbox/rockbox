@@ -92,6 +92,16 @@ YES
 NO
 EFEAT
 
+NAME Automatic Volume Control (Recorder) ENAME
+YES
+NO
+EFEAT
+
+NAME Pitch control (Recorder) ENAME
+YES
+NO
+EFEAT
+
 NAME Text File Reader ENAME
 YES
 YES
@@ -117,8 +127,8 @@ TD In development ETD
 YES
 EFEAT
 
-NAME Generates XING when recording ENAME
-YES
+NAME Generates XING VBR header when recording ENAME
+Soon
 NO
 EFEAT
 
@@ -132,7 +142,7 @@ YES
 NO
 EFEAT
 
-NAME Cutomizable backlight timeout ENAME
+NAME Customizable backlight timeout ENAME
 YES
 NO
 EFEAT
