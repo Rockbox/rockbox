@@ -129,11 +129,11 @@ static Menu timedate_set(void)
     timedate[4] = rtc_read(0x06); /* month  */
     timedate[5] = rtc_read(0x05); /* day    */
     /* day of week not read, calculated */
-    timedate[0] = ((timedate[0] & 0x70) >> 4) * 10 + (timedate[0] & 0x0f); /* hour   */
-    timedate[1] = ((timedate[1] & 0xf0) >> 4) * 10 + (timedate[1] & 0x0f); /* minute */
-    timedate[2] = ((timedate[2] & 0x30) >> 4) * 10 + (timedate[2] & 0x0f); /* second */
-    timedate[3] = ((timedate[3] & 0x30) >> 4) * 10 + (timedate[3] & 0x0f); /* year   */
-    timedate[4] = ((timedate[4] & 0x30) >> 4) * 10 + (timedate[4] & 0x0f); /* month  */
+    timedate[0] = ((timedate[0] & 0x30) >> 4) * 10 + (timedate[0] & 0x0f); /* hour   */
+    timedate[1] = ((timedate[1] & 0x70) >> 4) * 10 + (timedate[1] & 0x0f); /* minute */
+    timedate[2] = ((timedate[2] & 0x70) >> 4) * 10 + (timedate[2] & 0x0f); /* second */
+    timedate[3] = ((timedate[3] & 0xf0) >> 4) * 10 + (timedate[3] & 0x0f); /* year   */
+    timedate[4] = ((timedate[4] & 0x10) >> 4) * 10 + (timedate[4] & 0x0f); /* month  */
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f); /* day    */
 
     set_time("[Set time/date]",timedate);
