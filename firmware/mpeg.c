@@ -2389,6 +2389,7 @@ void mpeg_stop(void)
     while(!mpeg_stop_done)
         yield();
 #else
+    paused = false;
     is_playing = false;
     playing = false;
 #endif /* #ifndef SIMULATOR */
