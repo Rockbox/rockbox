@@ -6,6 +6,7 @@
 #                     \/            \/     \/    \/            \/
 #     Fichier de langue français - Version optimisée pour le player (!)
 #     Eric LASSAUGE <lassauge AT users.sourceforge.net> - Juin 2004
+#     Modifié pa Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -197,7 +198,7 @@ id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
 voice: "Set Time and Date"
-new: "Régler heure/date"
+new: "Régler date/heure"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
@@ -320,10 +321,10 @@ voice: "Loudness"
 new: "Loudness"
 
 id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-voice: "Bass Boost"
-new: "Amplification basses"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -401,13 +402,13 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Verrou: oui"
+new: "Verrouillage"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Verrou: non"
+new: "Dé-verrouillage"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -419,13 +420,13 @@ id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Touches actives"
+new: "Touches activées"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
 voice: ""
-new: "Silence"
+new: "Son coupé"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
@@ -437,25 +438,25 @@ id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute Is ON"
 voice: ""
-new: "Son coupé"
+new: "Le son est coupé"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute Is OFF"
 voice: ""
-new: "Son activé"
+new: "Son est actif"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
 voice: ""
-new: "---Ecran---"
+new: "-Infos ID3-"
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
 voice: ""
-new: "-Infos ID3-"
+new: "--Ecran--"
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -467,7 +468,7 @@ id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<No Title>"
 voice: ""
-new: "<pas d'info>"
+new: "<Pas de titre>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -479,7 +480,7 @@ id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<No Artist>"
 voice: ""
-new: "<pas d'info>"
+new: "<Pas d'artiste>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -491,19 +492,19 @@ id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
 eng: "<No Album>"
 voice: ""
-new: "<pas d'info>"
+new: "<Pas d'album>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new: "[No Piste]"
+new: "[N° Piste]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<No Tracknum>"
 voice: ""
-new: "<pas d'info>"
+new: "<Pas N° de piste>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -581,7 +582,7 @@ id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 voice: ""
-new: "Fin liste"
+new: "Fin de la liste"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
@@ -653,7 +654,7 @@ id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
 voice: "Peak Hold Time"
-new: "Persistance de l'indicateur"
+new: "Temps de Persistance du Pic"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
@@ -869,7 +870,7 @@ id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numeric"
-new: "Nuérique"
+new: "Numérique"
 
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
@@ -893,31 +894,31 @@ id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "Scale"
 voice: "Scale"
-new: "dBfs <-> linéaire"
+new: "Echelle"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
 voice: "Logarithmic decibel"
-new: "dBfs"
+new: "Logarithmique(dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "linéaire"
+new: "linéaire(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Minimum du spectre"
+new: "Minimum"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Maximum du spectre"
+new: "Maximum"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -1001,7 +1002,7 @@ id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
 voice: "Free diskspace:"
-new: "Vide: %d.%dGo"
+new: "Dispo: %d.%dGo"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1049,7 +1050,7 @@ id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
 voice: "Scroll Step Size"
-new: "Pas du défilement"
+new: "Taille du Pas de défilement"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
@@ -1205,7 +1206,7 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "Infos ID3"
+new: "Monter Infos ID3"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1253,7 +1254,7 @@ id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 voice: "Fade On Stop and Pause"
-new: "Arrêt/Pause"
+new: "Fondu sur Arrêt/Pause"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1337,7 +1338,7 @@ id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
 voice: "Independent frames"
-new: "Fichier MP3 éditable"
+new: "Frame MP3 independantes"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1475,7 +1476,7 @@ id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "Mauvaise version"
+new: "Version incompatible"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
@@ -1571,25 +1572,25 @@ id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Err. de MAJ de la liste"
+new: "Erreur de mise à jour de la liste"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Err. d'accès à la liste"
+new: "Erreur d'accès à la liste"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Err. d'accès à la liste"
+new: "Erreur d'accès à la liste"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "Err. d'accès au répertoire"
+new: "Erreur d'accès au répertoire"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
@@ -1613,12 +1614,12 @@ id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
 voice: "Browse Fonts"
-new: "Polices"
+new: "Liste des Polices"
 
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-voice: "Browse Firm-wares"
+voice: "Browse Firmwares"
 new: "Liste des microprogrammes"
 
 id: LANG_LANGUAGE
@@ -1642,7 +1643,7 @@ new: "Liste des configurations"
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Browse Plug-Ins"
+voice: "Browse Plugins"
 new: "Liste des extensions"
 
 id: LANG_CAR_ADAPTER_MODE
@@ -1678,13 +1679,13 @@ new: "Pré-selections"
 id: LANG_FM_SAVE_PRESET
 desc: in radio screen
 eng: "Save preset"
-voice: "Save preset"
+voice: ""
 new: "Enreg. pré-selection"
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
-voice: "Remove preset"
+voice: ""
 new: "Suppr. pré-selection"
 
 id: LANG_FM_STATION
@@ -1739,7 +1740,7 @@ id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "Erreur déplacement"
+new: "Echec du déplacement"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
@@ -1847,7 +1848,7 @@ id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "Enreg. les signets quand la lecture s'arrête"
+new: "Crée signet sur arrêt de lecture"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
@@ -1943,7 +1944,7 @@ id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: "Heure & Date"
+new: "Date & Heure"
 
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
@@ -1997,13 +1998,13 @@ id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
 voice: "Track name only"
-new: "Nom piste"
+new: "Nom piste seul"
 
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
 voice: "Full path"
-new: "Chemin"
+new: "Chemin complet"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
@@ -2240,7 +2241,7 @@ voice: "plus"
 new: 
 
 id: VOICE_POINT
-desc: spoken only, for composing numbers
+desc: spoken only, decimal separator for composing numbers
 eng: ""
 voice: "point"
 new: 
@@ -2360,15 +2361,15 @@ voice: "Voice Directories"
 new: "Répertoires"
 
 id: LANG_VOICE_DIR_ENTER
-desc: "talkbox" mode for directories
-eng: "on enter"
-voice: "on enter"
-new: "A l'entrée"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_VOICE_DIR_HOVER
-desc: "talkbox" mode for directories
-eng: "while hovering"
-voice: "while hovering"
+desc: "talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: "talk mp3 clip"
 new: "En station"
 
 id: LANG_VOICE_FILE
@@ -2608,7 +2609,7 @@ new:
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
-voice: "plug-in"
+voice: "plugin"
 new: 
 
 id: VOICE_EXT_TXT
@@ -2662,47 +2663,150 @@ new: "Ouvrir avec"
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
-new: "alphabèt."
+voice: "Alphabetical"
+new: "Alphabèt."
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
-new: "par date"
+voice: "by date"
+new: "Par date"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
+voice: "by newest date"
 new: "plus récent"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
+voice: "sort directories"
 new: "Tri des répertoires"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
+voice: "sort files"
 new: "Tri des fichiers"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
+voice: "by type"
 new: "par type"
 
-id: LANG_FADE
-desc: options menu to set fade mode
-eng: "Volume fade"
-voice: ""
-new: "Effets de fondu du volume"
+id: LANG_CONFIRM_SHUTDOWN
+desc: in shutdown screen
+eng: "Press OFF to shut down"
+new: "Presser OFF pr Arrêter"
 
-id: LANG_FADE_ON_NP
-desc: fade on next/previous
-eng: "on Next/Previous"
-voice: ""
-new: "Suiv/Préc"
+id: LANG_FM_BUTTONBAR_ACTION
+desc: in radio screen
+eng: "Action"
+new: 
 
-id: LANG_FADE_ALL
-desc: fade on all events
-eng: "All events"
-voice: "All"
-new: "Tous"
+id: LANG_FM_BUTTONBAR_ADD
+desc: in radio screen
+eng: "Add"
+new: "Ajout."
+
+id: LANG_FM_BUTTONBAR_EDIT
+desc: in radio screen
+eng: "Edit"
+new: "Editer"
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc: in radio screen
+eng: "Exit"
+new: "Sortie"
+
+id: LANG_FM_EDIT_PRESET
+desc: in radio screen
+eng: "Edit preset"
+new: "Editer pré-select."
+
+id: LANG_FM_MONO_MODE
+desc: in radio screen
+eng: "Force mono"
+new: "Mode mono"
+
+id: LANG_ID3_ORDER
+desc: in playback settings screen
+eng: "ID3 tag priority"
+new: "priorité de tag ID3"
+
+id: LANG_ID3_V1_FIRST
+desc: in playback settings screen
+eng: "V1 then V2"
+new: "V1 puis V2"
+
+id: LANG_ID3_V2_FIRST
+desc: in playback settings screen
+eng: "V2 then V1"
+new: "V2 puis V1"
+
+id: LANG_INSTALLATION_INCOMPLETE
+desc: in browse root
+eng: "Installation incomplete"
+new: "Installation incomplète"
+
+id: LANG_MDB_CENTER
+desc: in sound settings
+eng: "MDB Center frequency"
+new: 
+
+id: LANG_MDB_ENABLE
+desc: in sound settings
+eng: "MDB Enable"
+new: "MDB Actif"
+
+id: LANG_MDB_HARMONICS
+desc: in sound settings
+eng: "MDB Harmonics"
+new: "Harmoniques MDB"
+
+id: LANG_MDB_SHAPE
+desc: in sound settings
+eng: "MDB Shape"
+new: "MDB Modéle"
+
+id: LANG_MDB_STRENGTH
+desc: in sound settings
+eng: "MDB Strength"
+new: "MDB renforcé"
+
+id: LANG_NO_ROCKBOX_DIR
+desc: in browse root
+eng: "No .rockbox directory"
+new: "Pas de rep. '.rockbox' !"
+
+id: LANG_REMOVE_MMC
+desc: before acknowledging usb in case an MMC is inserted (Ondio)
+eng: "Please remove inserted MMC"
+new: "Enlever la carte MMC insérée"
+
+id: LANG_SHUTDOWN
+desc: in main menu
+eng: "Shut down"
+new: "Arrêter..."
+
+id: LANG_SHUTTINGDOWN
+desc: in main menu
+eng: "Shutting down..."
+new: "Arrêt en cours"
+
+id: LANG_SUPERBASS
+desc: in sound settings
+eng: "Super bass"
+new: "Super basses"
+
+id: VOICE_DOT
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_PAUSE
+desc: spoken only, for spelling, a split second of silence (difficult to author)
+eng: ""
+new: 
