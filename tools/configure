@@ -186,12 +186,20 @@ if [ "-" = "$extra_defines" ]; then
 
  if [  "-DARCHOS_RECORDER" = "$target" ] ; then
 
-  echo "Do you want to make use of Screensavers? (Y)"
+  echo "Do you want to use Screensavers? (Y)"
   getit=`input`;
   if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines=""
+	extra_defines="$extra_defines"
   else
-        extra_defines="-DUSE_SCREENSAVERS"
+        extra_defines="$extra_defines -DUSE_SCREENSAVERS"
+  fi
+ 
+  echo "Do you want to play Games? (Y)"
+  getit=`input`;
+  if [ "n" = "$getit" -o "N" = "$getit" ] ; then
+	extra_defines="$extra_defines"
+  else
+        extra_defines="$extra_defines -DUSE_GAMES"
   fi
  
   echo "Loadable fonts support? (N)"
@@ -210,6 +218,7 @@ if [ "-" = "$extra_defines" ]; then
   fi
  fi
 fi
+
 
 if [ -z "$debug" ]; then
   ##################################################################
@@ -286,7 +295,7 @@ sed > Makefile \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@TARGET@,${target},g" \
- -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
+ -e "s,@EXTRA_DEFINES@,\"${extra_defines}\",g" \
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
