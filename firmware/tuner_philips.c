@@ -19,10 +19,12 @@
  ****************************************************************************/
 
 #include <stdbool.h>
+#include <string.h>
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio_i2c.h" /* physical interface driver */
 
-/* FIXME: this is just a dummy */
+#define I2C_ADR 0xC0
+static unsigned char write_bytes[5];
 
 /* tuner abstraction layer: set something to the tuner */
 void philips_set(int setting, int value)
@@ -31,12 +33,22 @@ void philips_set(int setting, int value)
     switch(setting)
     {
         case RADIO_INIT:
+            memset(write_bytes, 0, sizeof(write_bytes));
             break;
 
         case RADIO_FREQUENCY:
+            {
+                int n;
+                n = (4 * (value - 225000)) / 50000;
+                write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
+                write_bytes[1] = n & 0xFF;
+                fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+            }
             break;
 
         case RADIO_MUTE:
+            write_bytes[0] = (write_bytes[0] & 0x7F) | (value ? 0x80 : 0);
+            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
 
         case RADIO_IF_MEASUREMENT:
@@ -46,6 +58,8 @@ void philips_set(int setting, int value)
             break;
 
         case RADIO_FORCE_MONO:
+            write_bytes[2] = (write_bytes[2] & 0xF7) | (value ? 0x08 : 0);
+            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
     }
 }
@@ -53,17 +67,24 @@ void philips_set(int setting, int value)
 /* tuner abstraction layer: read something from the tuner */
 int philips_get(int setting)
 {
+    unsigned char read_bytes[5];
     int val = -1;
+
+    fmradio_i2c_read(I2C_ADR, read_bytes, sizeof(read_bytes));
+
     switch(setting)
     {
         case RADIO_PRESENT:
-            val = 0; /* false */
+            val = 1; /* true */
             break;
 
         case RADIO_IF_MEASURED:
+            val = read_bytes[2] & 0x7F;
+            val = 1070 + (val-55)/2;
             break;
 
         case RADIO_STEREO:
+            val = read_bytes[2] >> 7;
             break;
     }
     return val;

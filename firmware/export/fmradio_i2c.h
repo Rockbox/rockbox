@@ -20,7 +20,7 @@
 #ifndef FMRADIO_I2C_H
 #define FMRADIO_I2C_H
 
-void fmradio_i2c_read(unsigned char* p_data); /* reads 5 byte */
-void fmradio_i2c_set(const unsigned char* p_data); /* writes 5 bytes */
+int fmradio_i2c_write(int address, const unsigned char* buf, int count);
+int fmradio_i2c_read(int address, unsigned char* buf, int count);
 
 #endif
