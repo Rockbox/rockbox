@@ -74,6 +74,7 @@ scrollbar              (on, off)
 volume display         (graphic, numeric)
 battery display        (graphic, numeric)
 time format            (12hour, 24hour)
+font                   (/path/filename.fnt)
 
 deep discharge         (on, off)
 trickle charge         (on, off)
