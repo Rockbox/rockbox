@@ -37,6 +37,11 @@ void backlight_on(void)
   /* we could do something better here! */
 }
 
+void backlight_off(void)
+{
+  /* we could do something better here! */
+}
+
 void backlight_time(int dummy)
 {
     (void)dummy;
