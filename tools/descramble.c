@@ -20,6 +20,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "iriver.h"
+
+void usage(void)
+{
+    printf("usage: descramble [options] <input file> <output file>\n");
+    printf("options:\n"
+           "\t-fm     Archos FM recorder format\n"
+           "\t-v2     Archos V2 recorder format\n"
+           "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
+           "\t-iriver iRiver format\n"
+          "\nNo option assumes Archos standard player/recorder format.\n");
+    exit(1);
+}
+
 int main (int argc, char** argv)
 {
     unsigned long length,i,slen;
@@ -32,9 +46,7 @@ int main (int argc, char** argv)
     FILE* file;
 
     if (argc < 3) {
-       printf("usage: %s [-fm] [-v2] [-mm] <input file> <output file>\n",
-              argv[0]);
-       return -1;
+        usage();
     }
 
     if (!strcmp(argv[1], "-fm") || !strcmp(argv[1], "-v2")) {
@@ -48,6 +60,14 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         descramble = 0;
+    }
+
+    if(!strcmp(argv[1], "-iriver")) {
+        /* iRiver code dealt with in the iriver.c code */
+        iname = argv[2];
+        oname = argv[3];
+        iriver_decode(iname, oname, FALSE, STRIP_NONE);
+        return 0;
     }
     
     /* open file and check size */

@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "iriver.h"
+
 void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
@@ -34,6 +36,22 @@ void int2be(unsigned int val, unsigned char* addr)
     addr[1] = (val >> 16) & 0xff;
     addr[2] = (val >> 8) & 0xff;
     addr[3] = val & 0xFF;
+}
+
+void usage(void)
+{
+    printf("usage: scramble [options] <input file> <output file> [xor string]\n");
+    printf("options:\n"
+           "\t-fm     Archos FM recorder format\n"
+           "\t-v2     Archos V2 recorder format\n"
+           "\t-ofm    Archos Ondio FM recorder format\n"
+           "\t-osp    Archos Ondio SP format\n"
+           "\t-neo    SSI Neo format\n"
+           "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
+           "\t-iriver iRiver format\n"
+           "\nNo option results in Archos standard player/recorder format.\n");
+
+    exit(1);
 }
 
 int main (int argc, char** argv)
@@ -51,16 +69,7 @@ int main (int argc, char** argv)
     enum { none, scramble, xor } method = scramble;
 
     if (argc < 3) {
-       printf("usage: %s [options] <input file> <output file> [xor string]\n",argv[0]);
-       printf("options:\n");
-       printf("\t-fm    Archos FM recorder format\n");
-       printf("\t-v2    Archos V2 recorder format\n");
-       printf("\t-ofm   Archos Ondio FM recorder format\n");
-       printf("\t-osp   Archos Ondio SP format\n");
-       printf("\t-neo   SSI Neo format\n");
-       printf("\t-mm=X  Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n");
-       printf("\nNo option results in Archos standard player/recorder format.\n");
-       return -1;
+        usage();
     }
 
     if(!strcmp(argv[1], "-fm")) {
@@ -111,6 +120,14 @@ int main (int argc, char** argv)
         }
     }
 
+    else if(!strcmp(argv[1], "-iriver")) {
+        /* iRiver code dealt with in the iriver.c code */
+        iname = argv[2];
+        oname = argv[3];
+        iriver_encode(iname, oname, FALSE);
+        return 0;
+    }
+    
     /* open file */
     file = fopen(iname,"rb");
     if (!file) {

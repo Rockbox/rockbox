@@ -13,9 +13,12 @@ TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
 all: $(TARGETS)
 	@echo "tools done"
 
-scramble: scramble.c
+scramble: scramble.o iriver.o
+descramble: descramble.o iriver.o
 
-descramble: descramble.c
+scramble.o: scramble.c iriver.h
+descramble.o: descramble.c iriver.h
+iriver.o: iriver.c iriver.h
 
 sh2d: sh2d.c
 
