@@ -648,7 +648,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 #endif
     if (start + incount > card->numsectors)
     {
-        ret = -1;
+        ret = -15;
         /* panicf("Reading %d@%d, past end of card %d\n", 
             incount, start, card->numsectors); */
     }
