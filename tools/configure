@@ -153,9 +153,14 @@ firmware:
 apps:
 	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
 
+clean-firmware:
+	make -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
+
+clean-apps:
+	make -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
+
 clean:
-	make -C \$(APPSDIR) clean
-	make -C \$(FIRMDIR) clean
+	make clean-firmware clean-apps
 
 EOF
 
