@@ -25,6 +25,9 @@
 
 # include "global.h"
 
+#include "debug.h"
+
+
 # include <string.h>
 
 # ifdef HAVE_ASSERT_H
@@ -834,8 +837,8 @@ void III_exponents(struct channel const *channel,
 	exponents[sfbi] = gain -
 	  (signed int) ((channel->scalefac[sfbi] + (pretab[sfbi] & premask)) <<
 			scalefac_multiplier);
-
-	l += sfbwidth[sfbi++];
+        unsigned int w = sfbwidth[sfbi++];
+	l += 3 * w;
       }
     }
 
@@ -853,7 +856,7 @@ void III_exponents(struct channel const *channel,
       exponents[sfbi + 2] = gain2 -
 	(signed int) (channel->scalefac[sfbi + 2] << scalefac_multiplier);
 
-      l    += 3I * sfbwidth[sfbi];
+      l    += sfbwidth[sfbi];
       sfbi += 3;
     }
   }
@@ -2636,12 +2639,15 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
   enum mad_error error;
   int result = 0;
 
+  DEBUGF("mad_layer_III: 0 Enter");
+  
   /* allocate Layer III dynamic structures */
 
   if (stream->main_data == 0) {
     stream->main_data = malloc(MAD_BUFFER_MDLEN);
     if (stream->main_data == 0) {
       stream->error = MAD_ERROR_NOMEM;
+      DEBUGF("mad_layer_III: Nomem 1");
       return -1;
     }
   }
@@ -2650,6 +2656,7 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
     frame->overlap = calloc(2 * 32 * 18, sizeof(mad_fixed_t));
     if (frame->overlap == 0) {
       stream->error = MAD_ERROR_NOMEM;
+      DEBUGF("mad_layer_III: Nomem 2");
       return -1;
     }
   }
@@ -2664,6 +2671,8 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
       (signed int) si_len) {
     stream->error = MAD_ERROR_BADFRAMELEN;
     stream->md_len = 0;
+    DEBUGF("mad_layer_III: Insane frame");
+
     return -1;
   }
 
@@ -2677,6 +2686,7 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
 	!(frame->options & MAD_OPTION_IGNORECRC)) {
       stream->error = MAD_ERROR_BADCRC;
       result = -1;
+      DEBUGF("mad_layer_III: CRC incorrect");
     }
   }
 
@@ -2687,6 +2697,7 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
   if (error && result == 0) {
     stream->error = error;
     result = -1;
+    DEBUGF("mad_layer_III: III_sideinfo error");
   }
 
   header->flags        |= priv_bitlen;
@@ -2734,6 +2745,9 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
       if (result == 0) {
 	stream->error = MAD_ERROR_BADDATAPTR;
 	result = -1;
+        DEBUGF("mad_layer_III: bad data ptr si.main_data_begin=%x stream->md_len=%x", si.main_data_begin, stream->md_len);
+        DEBUGF("frame space = %x", frame_space);
+        DEBUGF("next_md_begin = %x", next_md_begin);
       }
     }
     else {
@@ -2760,6 +2774,7 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
     error = III_decode(&ptr, frame, &si, nch);
     if (error) {
       stream->error = error;
+      DEBUGF("mad_layer_III: III_decode error");
       result = -1;
     }
 
