@@ -118,8 +118,8 @@ A17. Firstly, we wouldn't start something like this if we didn't simply enjoy
      being on the list does not mean it isn't a neat idea.  Bring it to 
      the list.
 
-Q18. I don't see you mentioning other file types on your list of ideas.  What 
-     about supporting those?
+Q18. You mention supporting Ogg Vorbis and other file types on your list of
+     ideas. What is the status on that?
 A18. Pessimist's Answer: At the current time we belive this is not very likely 
      The Micronas chip (MAS3507) decoder in the archos does not natively 
      support decoding and there is very little program space in the player to 
@@ -135,6 +135,11 @@ A18. Pessimist's Answer: At the current time we belive this is not very likely
      into these DSPs. Unfortunately, we have no docs or tools for writing new 
      MAS DSP code and Intermetall is very secretive about it.  If anyone can 
      help, please get in touch!
+
+     The recent release of Tremor (integer Ogg decoder) indicates it uses
+     around 100 KB for lookup tables. That's not unreasonable for a decoder,
+     but we only have 4 KB for both code *and* data. So the grim reality is
+     that Ogg will never be supported by the Archos Players and Recorders.
 
 Q19. What about supporting playing of WMA files?
 A19. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
@@ -351,7 +356,7 @@ A46: Well you can follow the full line of emails at
      Tome Cvitan, and put to a vote (which it lost). 
 
      Funny thing about democracys.  This isn't one ;)  Our beloved project
-     vetoed the winning name and chose Rockbox instead.
+     leader vetoed the winning name and chose Rockbox instead.
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
      
      There you have it.  Recommeded by users, decision by dictator.
@@ -365,7 +370,7 @@ A47: We have answered this question numerous times.  It is mentioned in the
 
      We settled on 400 files in a directory because file listings take up
      memory on the unit, and we felt that 400 is significantly large enough 
-     for a majority of the populace.  We prefer the optiono of limiting 
+     for a majority of the populace.  We prefer the option of limiting 
      file limits in order to provide a greater amount of memory for buffering 
      of files being played.
 
@@ -408,8 +413,8 @@ A51: There are many programs that can create .m3u playlists. WinAmp is one.
      Another simple method, that requires no extra software, is to use dir:
 
        cd f:\jukebox
-       dir /bs > allfiles.m3u
-       dir /bs \Pop > pop.m3u
+       dir /b /s > allfiles.m3u
+       dir /b /s \Pop > pop.m3u
 
      Linux users can use the 'find' command:
 
