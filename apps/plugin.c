@@ -30,6 +30,11 @@
 #include "mas.h"
 #include "plugin.h"
 #include "lang.h"
+#include "keyboard.h"
+
+#ifdef HAVE_LCD_BITMAP
+#include "widgets.h"
+#endif
 
 #ifdef SIMULATOR
   #include <debug.h>
@@ -73,6 +78,9 @@ static struct plugin_api rockbox_api = {
     lcd_getstringsize,
     lcd_update,
     lcd_update_rect,
+    progressbar,
+    slidebar,
+    scrollbar,
 #ifndef SIMULATOR
     lcd_roll,
 #endif
@@ -125,6 +133,7 @@ static struct plugin_api rockbox_api = {
     rand,
     splash,
     qsort,
+    kbd_input,
 };
 
 int plugin_load(char* plugin, void* parameter)

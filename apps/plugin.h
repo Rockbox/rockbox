@@ -37,7 +37,7 @@
 #include "lcd.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 2
+#define PLUGIN_API_VERSION 3
 
 /* plugin return codes */
 enum plugin_status {
@@ -98,6 +98,12 @@ struct plugin_api {
     int  (*lcd_getstringsize)(unsigned char *str, int *w, int *h);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
+    void (*progressbar)(int x, int y, int width, int height,
+                        int percent, int direction);
+    void (*slidebar)(int x, int y, int width, int height,
+                     int percent, int direction);
+    void (*scrollbar)(int x, int y, int width, int height, int items,
+                      int min_shown, int max_shown, int orientation);
 #ifndef SIMULATOR
     void (*lcd_roll)(int pixels);
 #endif
@@ -151,6 +157,7 @@ struct plugin_api {
     void (*splash)(int ticks, int keymask, bool center, char *fmt, ...);
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
+    int (*kbd_input)(char* buffer, int buflen);
 };
 
 /* defined by the plugin loader (plugin.c) */
