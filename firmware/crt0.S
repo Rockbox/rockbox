@@ -99,6 +99,17 @@ start_l:
 	bt	start_l
 	nop
 
+	/* Munge the main thread stack */
+	mov.l	stack_k,r2
+	mov.l	deadbeef_k,r0
+	mov.l	stackbegin_k,r1
+munge_loop:
+	mov.l	r0,@r1
+	add	#4,r1
+	cmp/ge	r1,r2
+	bt	munge_loop
+	nop
+	
 	! call the mainline	
 	mov.l	main_k,r0
 	jsr	@r0
@@ -108,7 +119,11 @@ start_l:
 
 	.align 2
 stack_k:
-	.long	_stack	
+	.long	_stackend	
+stackbegin_k:
+	.long	_stackbegin
+deadbeef_k:
+	.long	0xdeadbeef
 edata_k:
 	.long	_edata
 end_k:
@@ -123,6 +138,6 @@ orig_vbr_k:
 	.section .resetvectors
 vectors:
 	.long start
-	.long _stack
+	.long _stackend
 	.long start
-	.long _stack
+	.long _stackend
