@@ -22,10 +22,10 @@
 
 #include <stdbool.h>
 #include "file.h"
+#include "applimits.h"
 
 /* playlist data */
 
-#define MAX_PLAYLIST_SIZE 10000
 typedef struct 
 {
     char filename[MAX_PATH];  /* path name of m3u playlist on disk       */

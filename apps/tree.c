@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "applimits.h"
 #include "dir.h"
 #include "file.h"
 #include "lcd.h"
@@ -47,17 +48,16 @@
 #include "ajf.h"
 #endif
 
-#define MAX_FILES_IN_DIR 200
-#define TREE_MAX_FILENAMELEN MAX_PATH
-#define MAX_DIR_LEVELS 10
+#define NAME_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH * MAX_FILES_IN_DIR)
 
+char name_buffer[NAME_BUFFER_SIZE];
+int name_buffer_length;
 struct entry {
-    char attr; /* FAT attributes */
-    char name[TREE_MAX_FILENAMELEN];
+    short attr; /* FAT attributes */
+    char *name;
 };
 
 static struct entry dircache[MAX_FILES_IN_DIR];
-static struct entry* dircacheptr[MAX_FILES_IN_DIR];
 static int filesindir;
 static char lastdir[MAX_PATH] = {0};
 
@@ -122,10 +122,10 @@ static int build_playlist(int start_index)
 
     for(i = 0;i < filesindir;i++)
     {
-        if(dircacheptr[i]->attr & TREE_ATTR_MP3)
+        if(dircache[i].attr & TREE_ATTR_MP3)
         {
-            DEBUGF("Adding %s\n", dircacheptr[i]->name);
-            playlist_add(dircacheptr[i]->name);
+            DEBUGF("Adding %s\n", dircache[i].name);
+            playlist_add(dircache[i].name);
         }
         else
         {
@@ -140,14 +140,14 @@ static int build_playlist(int start_index)
 
 static int compare(const void* p1, const void* p2)
 {
-    struct entry* e1 = *(struct entry**)p1;
-    struct entry* e2 = *(struct entry**)p2;
+    struct entry* e1 = (struct entry*)p1;
+    struct entry* e2 = (struct entry*)p2;
     
     if (( e1->attr & ATTR_DIRECTORY ) == ( e2->attr & ATTR_DIRECTORY ))
         if (global_settings.sort_case)
-            return strncmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
+            return strncmp(e1->name, e2->name, MAX_PATH);
         else
-            return strncasecmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
+            return strncasecmp(e1->name, e2->name, MAX_PATH);
     else 
         return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }
@@ -160,6 +160,7 @@ static int showdir(char *path, int start)
 #endif
     int i;
     int tree_max_on_screen;
+    bool dir_buffer_full;
 #ifdef LOADABLE_FONTS
     int fh;
     unsigned char *font = lcd_getcurrentldfont();
@@ -177,7 +178,9 @@ static int showdir(char *path, int start)
         if(!dir)
             return -1; /* not a directory */
 
-        memset(dircacheptr,0,sizeof(dircacheptr));
+        name_buffer_length = 0;
+        dir_buffer_full = false;
+        
         for ( i=0; i<MAX_FILES_IN_DIR; i++ ) {
             int len;
             struct dirent *entry = readdir(dir);
@@ -212,23 +215,28 @@ static int showdir(char *path, int start)
                 continue;
             }
 
-            strncpy(dptr->name,entry->d_name,TREE_MAX_FILENAMELEN);
-            dptr->name[TREE_MAX_FILENAMELEN-1]=0;
-            dircacheptr[i] = dptr;
+            if(len > NAME_BUFFER_SIZE - name_buffer_length - 1) {
+                /* Tell the world that we ran out of buffer space */
+                dir_buffer_full = true;
+                break;
+            }
+            dptr->name = &name_buffer[name_buffer_length];
+            strcpy(dptr->name,entry->d_name);
+            name_buffer_length += len + 1;
         }
         filesindir = i;
         closedir(dir);
         strncpy(lastdir,path,sizeof(lastdir));
         lastdir[sizeof(lastdir)-1] = 0;
-        qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
+        qsort(dircache,filesindir,sizeof(struct entry),compare);
 
-        if ( filesindir == MAX_FILES_IN_DIR ) {
+        if ( dir_buffer_full || filesindir == MAX_FILES_IN_DIR ) {
 #ifdef HAVE_NEW_CHARCELL_LCD
             lcd_double_height(false);
 #endif
             lcd_clear_display();
-            lcd_puts(0,0,"200 file");
-            lcd_puts(0,1,"limit reached");
+            lcd_puts(0,0,"Dir buffer");
+            lcd_puts(0,1,"is full!");
             lcd_update();
             sleep(HZ*2);
             lcd_clear_display();
@@ -251,13 +259,13 @@ static int showdir(char *path, int start)
         if ( i >= filesindir )
             break;
 
-        len = strlen(dircacheptr[i]->name);
+        len = strlen(dircache[i].name);
 
 #ifdef HAVE_LCD_BITMAP
-        if ( dircacheptr[i]->attr & ATTR_DIRECTORY )
+        if ( dircache[i].attr & ATTR_DIRECTORY )
             icon_type = Folder;
         else {
-            if ( dircacheptr[i]->attr & TREE_ATTR_M3U )
+            if ( dircache[i].attr & TREE_ATTR_M3U )
                 icon_type = Playlist;
             else
                 icon_type = File;
@@ -269,15 +277,15 @@ static int showdir(char *path, int start)
 
         /* if MP3 filter is on, cut off the extension */
         if (global_settings.mp3filter && 
-            (dircacheptr[i]->attr & (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+            (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MP3)))
         {
-            char temp = dircacheptr[i]->name[len-4];
-            dircacheptr[i]->name[len-4] = 0;
-            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
-            dircacheptr[i]->name[len-4] = temp;
+            char temp = dircache[i].name[len-4];
+            dircache[i].name[len-4] = 0;
+            lcd_puts(LINE_X, LINE_Y+i-start, dircache[i].name);
+            dircache[i].name[len-4] = temp;
         }
         else
-            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
+            lcd_puts(LINE_X, LINE_Y+i-start, dircache[i].name);
     }
 
     status_draw();
@@ -359,13 +367,13 @@ bool dirbrowse(char *root)
                     break;
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
                     snprintf(buf,sizeof(buf),"%s%s",currdir,
-                             dircacheptr[dircursor+start]->name);
+                             dircache[dircursor+start].name);
                 } else {
                     snprintf(buf,sizeof(buf),"%s/%s",currdir,
-                             dircacheptr[dircursor+start]->name);
+                             dircache[dircursor+start].name);
                 }
 
-                if (dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) {
+                if (dircache[dircursor+start].attr & ATTR_DIRECTORY) {
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirpos[dirlevel] = start;
@@ -376,10 +384,10 @@ bool dirbrowse(char *root)
                     start=0;
                 } else {
                     lcd_stop_scroll();
-                    if(dircacheptr[dircursor+start]->attr & TREE_ATTR_M3U )
+                    if(dircache[dircursor+start].attr & TREE_ATTR_M3U )
                     {
                         play_list(currdir,
-                                  dircacheptr[dircursor+start]->name, 0);
+                                  dircache[dircursor+start].name, 0);
                     }
                     else {
                         start_index = build_playlist(dircursor+start);
@@ -568,19 +576,19 @@ bool dirbrowse(char *root)
                 lasti=i;
                 lcd_stop_scroll();
                 if (global_settings.mp3filter && 
-                    (dircacheptr[i]->attr &
+                    (dircache[i].attr &
                      (TREE_ATTR_M3U|TREE_ATTR_MP3)))
                 {
-                    int len = strlen(dircacheptr[i]->name);
-                    char temp = dircacheptr[i]->name[len-4];
-                    dircacheptr[i]->name[len-4] = 0;
+                    int len = strlen(dircache[i].name);
+                    char temp = dircache[i].name[len-4];
+                    dircache[i].name[len-4] = 0;
                     lcd_puts_scroll(LINE_X, LINE_Y+dircursor, 
-                                    dircacheptr[i]->name);
-                    dircacheptr[i]->name[len-4] = temp;
+                                    dircache[i].name);
+                    dircache[i].name[len-4] = temp;
                 }
                 else
                     lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                                    dircacheptr[i]->name);
+                                    dircache[i].name);
             }
         }
         status_draw();

@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "settings.h"
 #include "status.h"
+#include "applimits.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
@@ -38,7 +39,7 @@
 
 playlist_info_t playlist;
 
-#define PLAYLIST_BUFFER_SIZE (MAX_PATH*200)
+#define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
 
 unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
 static int playlist_end_pos = 0;
@@ -293,8 +294,8 @@ void add_indices_to_playlist(void)
                         close(fd);
 
                     lcd_clear_display();
-                    lcd_puts(0,0,"10000 file");
-                    lcd_puts(0,1,"limit reached");
+                    lcd_puts(0,0,"Playlist");
+                    lcd_puts(0,1,"buffer full");
                     lcd_update();
                     sleep(HZ*2);
                     lcd_clear_display();
