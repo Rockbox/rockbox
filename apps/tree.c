@@ -868,10 +868,6 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
         button = button_get_w_tmo(HZ/5);
 
-        /* ignore leftover release event */
-        if (!lastbutton && (button & BUTTON_REL))
-            continue;
-
 #ifndef SIMULATOR
         if (boot_changed) {
             bool stop = false;
@@ -981,6 +977,11 @@ static bool dirbrowse(const char *root, const int *dirfilter)
             case TREE_RC_ENTER:
 #endif
             case TREE_RUN:
+#ifdef TREE_RUN_PRE
+                if ((button == TREE_RUN) &&
+                    (lastbutton != TREE_RUN_PRE))
+                    break;
+#endif
                 if ( !numentries )
                     break;
                 if (currdir[1])
