@@ -61,18 +61,21 @@ static bool caption_backlight(void)
 
 static bool invert(void)
 {
-    bool rc = set_bool( str(LANG_INVERT), &global_settings.invert);
-    lcd_set_invert_display(global_settings.invert);
+     bool rc = set_bool_options(str(LANG_INVERT),
+                                &global_settings.invert,
+                                str(LANG_INVERT_LCD_INVERSE),
+                                str(LANG_INVERT_LCD_NORMAL));
 
-    return rc;
+     lcd_set_invert_display(global_settings.invert);
+     return rc;
 }
 
 static bool invert_cursor(void)
 {
-    bool rc = set_bool( str(LANG_INVERT_CURSOR),
-                        &global_settings.invert_cursor);
-
-    return rc;
+        return set_bool_options(str(LANG_INVERT_CURSOR),
+                            &global_settings.invert_cursor,
+                            str(LANG_INVERT_CURSOR_BAR),
+                            str(LANG_INVERT_CURSOR_POINTER));
 }
 
 /**

@@ -1065,17 +1065,17 @@ new:
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> Linear"
+eng: "Scale"
 new:
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
+eng: "Logarithmic(dB)"
 new:
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear"
+eng: "Linear(%)"
 new:
 
 id: LANG_PM_MIN
@@ -1410,7 +1410,7 @@ new:
 
 id: LANG_INVERT
 desc: in settings_menu
-eng: "Invert"
+eng: "LCD Mode"
 new:
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
@@ -1434,7 +1434,7 @@ eng: "Karaoke"
 new:
 
 id: LANG_SAVE_SETTINGS
-desc:  in system_settings_menu()
+desc: in system_settings_menu()
 eng: "Write .cfg file"
 new: 
 
@@ -1465,7 +1465,7 @@ new:
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
-eng: "Invert cursor"
+eng: "Line Selector"
 new:
 
 id: LANG_RECORDING_EDITABLE
@@ -1486,4 +1486,24 @@ new:
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
+new:
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new:
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new:
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new:
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
 new:

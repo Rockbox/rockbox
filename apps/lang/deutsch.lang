@@ -1036,8 +1036,8 @@ new: "Puffer vorzeitig füllen"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
-new: "dBfs"
+eng: "Logarithmic(dB)"
+new: "logarithmisch(dB)"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
@@ -1051,8 +1051,8 @@ new: "genauere Anzeige"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear"
-new: "linear"
+eng: "Linear(%)"
+new: "linear(%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
@@ -1071,8 +1071,8 @@ new: "Genauigkeit"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> Linear"
-new: "dBfs <-> linear"
+eng: "Scale"
+new: "Skalierung"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1371,8 +1371,8 @@ new: "Blenden bei Stop/Pause"
 
 id: LANG_INVERT
 desc: in settings_menu
-eng: "Invert"
-new: "Invertieren"
+eng: "LCD Mode"
+new: "LCD Modus"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
@@ -1433,3 +1433,38 @@ id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
 new: "Scrollleiste"
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Line Selector"
+new: "Zeilenauswahl" 
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Balken(invertiert)"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Zeiger"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "invertiert"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "normal"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Editable files"
+new: "Editierbare Dateien"
+
+id: LANG_VBRFIX
+desc: The context menu entry
+eng: "Update VBR file"
+new: "VBR Datei aktualisieren"
