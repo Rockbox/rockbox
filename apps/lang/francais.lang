@@ -817,7 +817,7 @@ new: "Rétro-Eclairage pendant chargement"
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip hold time"
-new: "persistance marqueur seuil max"
+new: "Persistance marqueur seuil max"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
@@ -837,9 +837,24 @@ new: "Persistance marqueur de crête"
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak release"
-new: "taux de baisse de l'indicateur"
+new: "Taux de baisse de l'indicateur"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units per read"
 new: "Unités par mesure"
+
+d: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Répétition"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Toutes"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Une"
