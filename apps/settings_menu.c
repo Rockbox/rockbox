@@ -980,6 +980,15 @@ static bool ff_rewind_settings_menu(void)
     return result;
 }
 
+static bool id3_order(void)
+{
+    return set_bool_options( str(LANG_ID3_ORDER),
+                             &global_settings.id3_v1_first,
+                             STR(LANG_ID3_V1_FIRST),
+                             STR(LANG_ID3_V2_FIRST),
+                             mpeg_id3_options);
+}
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -993,6 +1002,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_WIND_MENU), ff_rewind_settings_menu },
         { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
+        { ID2P(LANG_ID3_ORDER), id3_order },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

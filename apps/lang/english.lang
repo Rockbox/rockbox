@@ -2811,3 +2811,21 @@ desc:  in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new:
+
+id: LANG_ID3_ORDER
+desc:  in playback settings screen
+eng: "ID3 tag priority"
+voice: "ID3 tag priority"
+new:
+
+id: LANG_ID3_V1_FIRST
+desc:  in playback settings screen
+eng: "V1 then V2"
+voice: "Version 1 then version 2"
+new:
+
+id: LANG_ID3_V2_FIRST
+desc:  in playback settings screen
+eng: "V2 then V1"
+voice: "Version 2 then version 1"
+new:
