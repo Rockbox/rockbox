@@ -142,25 +142,4 @@ extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
 #endif /* CHARCELLS / BITMAP */
 
-/* These control codes may only work on the Neo LCD display */
-#ifdef HAVE_NEO_LCD
-
-/* Cursor Control Instructions */
-#define LCD_OFFCUR    0x0C
-#define LCD_LINECUR   0x0E
-#define LCD_BLINKCUR  0x0D
-#define LCD_COMBNCUR  0x0F
-#define LCD_HOMECUR   0x02
-#define LCD_SHLFCUR   0x10
-#define LCD_SHRTCUR   0x14
-
-/* Display Control Instructions */
-#define LCD_CLEAR     0x01
-#define LCD_OFFDISP   0x08
-#define LCD_ONDISP    0x0C
-#define LCD_SHLFDISP  0x18
-#define LCD_SHRTDISP  0x1C
-#define LCD_SET_CGRAM 0x40
-#endif
-
 #endif /* __LCD_H__ */

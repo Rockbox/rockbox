@@ -385,42 +385,6 @@ static int button_read(void)
     return btn;
 }
 
-#elif defined(HAVE_NEO_KEYPAD)
-static bool mStation = false;
-void button_init(void)
-{
-    /* set port pins as input */
-    PAIOR &= ~0x4000;  /* PA14 for stop button */
-
-    queue_init(&button_queue);
-    lastbtn = 0;
-    tick_add_task(button_tick);
-
-    reset_poweroff_timer();
-}
-int button_read(void)
-{
-    int btn=BUTTON_NONE;
-    
-    btn|=((~PCDR)&0xFF);
-
-    /* mStation does not have a stop button and this floods the button queue
-       with stops if used on a mStation */
-    if (!mStation)
-        btn|=((~(PADR>>6))&0x100);
-
-    return btn;
-}
-
-/* This function adds a button press event to the button queue, and this
-   really isn't anything Neo-specific but might be subject for adding to
-   the generic button driver */
-int button_add(unsigned int button)
-{
-    queue_post(&button_queue,button,NULL);
-    return 1;
-}
-
 #elif defined HAVE_ONDIO_KEYPAD
 
 /*

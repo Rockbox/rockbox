@@ -488,11 +488,7 @@ void lcd_set_contrast(int val)
 
 void lcd_init (void)
 {
-#ifdef HAVE_NEO_LCD
-    new_lcd = true;
-#else
     new_lcd = has_new_lcd();
-#endif
     memset(extended_chars_mapped, NO_CHAR, sizeof(extended_chars_mapped));
     memset(extended_pattern_content, NO_CHAR,sizeof(extended_pattern_content));
     memset(extended_pattern_usage, 0, sizeof(extended_pattern_usage));
@@ -730,47 +726,5 @@ static void scroll_thread(void)
         sleep(HZ/scroll_speed);
     }
 }
-
-#ifdef HAVE_NEO_LCD
-
-/*
- * Function use by the Neo code, but could/should be made a generic one.
- */
-void lcd_cursor(int x, int y)
-{
-    /* If we make sure the display size is setup with proper defines in the
-       config-*.h files, this should work on all displays */
-    if ((cursor.y_pos==y && cursor.x_pos==x) ||
-        x>=20 ||
-        y>3 ||
-        x<0 ||
-        y<0) {
-        DEBUGF("ignoring request for cursor to %d,%d - currently %d,%d\n",
-               x,y,cursor.x_pos,cursor.y_pos);
-        return;
-    }
-
-    char value=0;
-    
-    cursor.y_pos=y;
-    cursor.x_pos=x;
-    
-    switch (y) {
-        case 0:
-            value=0x80|x;
-            break;
-        case 1:
-            value=0x80|(x+0x40);
-            break;
-        case 2:
-            value=0x80|(x+0x14);
-            break;
-        case 3:
-            value=0x80|(x+0x54);
-            break;
-    }
-    lcd_write_command(value);
-}
-#endif
 
 #endif /* HAVE_LCD_CHARCELLS */

@@ -208,8 +208,6 @@ if [ -z "$archos" ]; then
   echo "2 - Archos Recorder"
   echo "3 - Archos FM Recorder"
   echo "4 - Archos Recorder v2"
-  echo "5 - Neo mStation"
-  echo "6 - Neo 35"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
   echo "9 - Iriver H100"
@@ -231,16 +229,6 @@ if [ -z "$archos" ]; then
    4)
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
-    ;;
-
-   5)
-    archos="neomstation"
-    target="-DNEO_MSTATION"
-    ;;
-
-   6)
-    archos="neo35"
-    target="-DNEO_35"
     ;;
 
    7)

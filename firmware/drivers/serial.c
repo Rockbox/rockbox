@@ -85,7 +85,7 @@ int remote_control_rx(void)
         }
         else
         {
-#if !defined(HAVE_NEO_KEYPAD) && !defined(HAVE_ONDIO_KEYPAD)
+#ifndef HAVE_ONDIO_KEYPAD
             switch (btn)
             {
                 case STOP:

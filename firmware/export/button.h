@@ -36,49 +36,6 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 
 #define	BUTTON_NONE		0x0000
 
-#ifdef HAVE_NEO_KEYPAD
-/* neo button codes */
-#define BUTTON_UP               0x0080
-#define	BUTTON_DOWN		0x0010
-#define	BUTTON_LEFT		0x0001
-#define	BUTTON_RIGHT		0x0002
-
-#define BUTTON_SELECT           0x0040
-
-#define BUTTON_ON BUTTON_SELECT
-
-#define BUTTON_PROGRAM          0x0020
-#define	BUTTON_MENU		0x0004
-#define	BUTTON_PLAY		0x0008
-#define	BUTTON_STOP		0x0100
-
-#define BUTTON_IR               0x2000
-#define BUTTON_REPEAT           0x4000
-#define BUTTON_REL              0x8000
-
-#define BUTTON_FLAG_MASK	0xF000
-#define BUTTON_MASK		0x0FFF
-#define BUTTON_ALL		BUTTON_MASK
-#define BUTTON_ALL_FLAGS	BUTTON_FLAG_MASK
-
-#define NEO_IR_BUTTON_POWER     0x0001
-#define NEO_IR_BUTTON_SETTING   0x0002
-#define NEO_IR_BUTTON_REWIND    0x0004
-#define NEO_IR_BUTTON_FFORWARD  0x0008
-#define NEO_IR_BUTTON_PLAY      0x0010
-#define NEO_IR_BUTTON_VOLUP     0x0020
-#define NEO_IR_BUTTON_VOLDN     0x0040
-#define NEO_IR_BUTTON_BROWSE    0x0080
-#define NEO_IR_BUTTON_EQ        0x0100
-#define NEO_IR_BUTTON_MUTE      0x0200
-#define NEO_IR_BUTTON_PROGRAM   0x0400
-#define NEO_IR_BUTTON_STOP      0x0800
-#define NEO_IR_BUTTON_NONE      0x0000
-
-#define NEO_IR_BUTTON_REPEAT    0x1000
-
-#else
-
 /* Shared button codes */
 #define	BUTTON_LEFT		0x0040
 #define	BUTTON_RIGHT		0x0080
@@ -129,8 +86,6 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define	BUTTON_MENU		0x0100
 
 #endif /* HAVE_RECORDER/PLAYER/ONDIO_KEYPAD */
-
-#endif /* HAVE_NEO_KEYPAD */
 
 #endif /* _BUTTON_H_ */
 

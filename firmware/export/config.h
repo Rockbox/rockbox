@@ -28,8 +28,6 @@
 #include "config-fmrecorder.h"
 #elif defined(ARCHOS_RECORDERV2)
 #include "config-recorderv2.h"
-#elif defined(NEO_35)
-#include "config-neo35.h"
 #elif defined(ARCHOS_ONDIOSP)
 #include "config-ondiosp.h"
 #elif defined(ARCHOS_ONDIOFM)

@@ -461,7 +461,6 @@ static char* get_tag(struct mp3entry* cid3,
 #endif
                 case 'f':  /* full-line progress bar */
 #ifdef HAVE_LCD_CHARCELLS
-#ifndef HAVE_NEO_LCD
                     if(has_new_lcd()) {
                         *flags |= WPS_REFRESH_PLAYER_PROGRESS;
                         *flags |= WPS_REFRESH_DYNAMIC;
@@ -471,7 +470,6 @@ static char* get_tag(struct mp3entry* cid3,
                         snprintf(buf, buf_size, "           ");
                     }
                     else
-#endif /* HAVE_NEO_LCD */
                     {
                         /* Tell the user if we have an OldPlayer */
                         snprintf(buf, buf_size, " <Old LCD> ");
