@@ -186,6 +186,7 @@ static unsigned int treble_table[] =
     0x5f800  /* 15dB */
 };
 
+#if 0
 static unsigned int prescale_table[] =
 {
     0x80000,  /* 0db */
@@ -205,6 +206,7 @@ static unsigned int prescale_table[] =
     0xe6800, /* 14dB */
     0xe9400  /* 15dB */
 };
+#endif
 #endif
 
 static unsigned char fliptable[] =
