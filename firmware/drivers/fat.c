@@ -331,6 +331,7 @@ int fat_mount(int startsector)
     LDEBUGF("Freecount: %x\n",fat_bpb.fsinfo.freecount);
     LDEBUGF("Nextfree: %x\n",fat_bpb.fsinfo.nextfree);
     LDEBUGF("Cluster count: %x\n",fat_bpb.dataclusters);
+    LDEBUGF("Sectors per cluster: %d\n",fat_bpb.bpb_secperclus);
     LDEBUGF("FAT sectors: %x\n",fat_bpb.fatsize);
 
     return 0;
@@ -442,11 +443,12 @@ static int find_free_cluster(int startcluster)
         unsigned int* fat = cache_fat_sector(nr);
         if ( !fat )
             break;
-        for (j = offset; j < CLUSTERS_PER_FAT_SECTOR; j++) {
-            if (!(SWAB32(fat[j]) & 0x0fffffff)) {
-                int c = nr * CLUSTERS_PER_FAT_SECTOR + j;
+        for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
+            int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
+            if (!(SWAB32(fat[k]) & 0x0fffffff)) {
+                int c = nr * CLUSTERS_PER_FAT_SECTOR + k;
                 if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
-                    break;
+                    continue;
                 LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
                 fat_bpb.fsinfo.nextfree = c;
                 return c;
@@ -1224,6 +1226,8 @@ int fat_seek(struct fat_file *file, int seeksector )
         if ( sector > -1 )
             sector = cluster2sec(cluster) + sectornum;
     }
+    else
+        sectornum = -1;
 
     LDEBUGF("fat_seek(%x) == %x, %x, %x\n",
             seeksector, cluster, sector, sectornum);
