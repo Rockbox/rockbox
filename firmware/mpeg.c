@@ -833,8 +833,11 @@ static void dma_tick(void)
             if(num_bytes < 0)
                 num_bytes += mp3buflen;
 
-            if(mp3buflen - num_bytes < low_watermark && !saving)
+            if(mp3buflen - num_bytes < MPEG_LOW_WATER && !saving)
+            {
+                saving = true;
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+            }
         }
     }
 #endif
@@ -1850,8 +1853,6 @@ static void mpeg_thread(void)
                             {
                                 int rc;
 
-                                saving = true;
-                                
                                 /* Only save up to the end of the buffer */
                                 writelen = MIN(amount_to_save,
                                                mp3buflen - mp3buf_read);
