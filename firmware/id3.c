@@ -349,7 +349,8 @@ getid3v1len(int fd)
 static int 
 getsonglength(int fd, mp3entry *entry)
 {
-    long header=0;
+    unsigned long header=0;
+    unsigned char tmp;
     int version;
     int layer;
     int bitindex;
@@ -367,16 +368,18 @@ getsonglength(int fd, mp3entry *entry)
     /* Fill up header with first 24 bits */
     for(version = 0; version < 3; version++) {
         header <<= 8;
-        if(!read(fd, &header, 1))
+        if(!read(fd, &tmp, 1))
             return -1;
+        header |= tmp;
     }
 	
     /* Loop trough file until we find a frame header */
  restart:
     do {
         header <<= 8;
-        if(!read(fd, &header, 1))
+        if(!read(fd, &tmp, 1))
             return -1;
+        header |= tmp;
     } while(!CHECKSYNC(header));
 	
     /* 
@@ -493,9 +496,10 @@ mp3info(mp3entry *entry, char *filename)
     entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->id3v1len = getid3v1len(fd);
-    /* entry->length = getsonglength(fd, entry); */
+    entry->length = getsonglength(fd, entry);
     entry->title = NULL;
 
+    
     if(HASID3V2(entry))
         setid3v2title(fd, entry);
 
