@@ -1755,7 +1755,9 @@ eng: ""
 new: ""
 
 id: VOICE_GIGABYTE
-desc: spoken only
+### Description changed! Previous description was:
+### "spoken only"
+desc: spoken only, a unit postfix
 eng: ""
 new: ""
 
@@ -1780,7 +1782,7 @@ eng: ""
 new: ""
 
 id: VOICE_MEGABYTE
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 new: ""
 
@@ -1830,7 +1832,7 @@ eng: ""
 new: ""
 
 id: VOICE_PERCENT
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 new: ""
 
@@ -1926,5 +1928,25 @@ new: ""
 
 id: VOICE_ZERO
 desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_HERTZ
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_MILLIAMPHOURS
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_PER_SEC
+desc: spoken only, a unit postfix
+eng: ""
+new: "" 
+
+id: VOICE_PIXEL
+desc: spoken only, a unit postfix
 eng: ""
 new: ""
