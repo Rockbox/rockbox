@@ -22,9 +22,13 @@
 #include "led.h"
 #include "system.h"
 
+static bool xor;
+static bool current;
+
 void led(bool on)
 {
-    if ( on )
+    current = on;
+    if ( on ^ xor )
     {
         or_b(0x40, &PBDRL);
     }
@@ -33,3 +37,17 @@ void led(bool on)
         and_b(~0x40, &PBDRL);
     }
 }
+
+void invert_led(bool on)
+{
+    if ( on )
+    {
+        xor = 1;
+    }
+    else
+    {
+        xor = 0;
+    }
+    led(current);
+}
+

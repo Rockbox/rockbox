@@ -23,5 +23,6 @@
 #include <stdbool.h>
 
 extern void led( bool on );
+extern void invert_led( bool on );
 
 #endif

@@ -25,6 +25,7 @@
 
 #include "system.h"
 #include "lcd.h"
+#include "led.h"
 #include "mpeg.h"
 #include "mp3_playback.h"
 #include "mas.h"
@@ -179,6 +180,8 @@ bool recording_screen(void)
     int hours, minutes;
     char path_buffer[MAX_PATH];
     bool been_in_usb_mode = false;
+    bool led_state;
+    int led_delay;
 
     cursor = 0;
     mpeg_init_recording();
@@ -210,9 +213,34 @@ bool recording_screen(void)
 
     if(rec_create_directory() > 0)
         have_recorded = true;
+
+    led_state = false;
+    led_delay = 0;
     
     while(!done)
     {
+        /*
+         * Flash the LED while waiting to record.  Turn it on while
+         * recording.
+         */
+        if(mpeg_status() != MPEG_STATUS_RECORD)
+        {
+            if(led_delay++ >= 4)
+            {
+                led_state = !led_state;
+                invert_led(led_state);
+                led_delay = 0;
+            }
+        }
+        else
+        {
+            if(!led_state)
+            {
+                led_state = true;
+                invert_led(true);
+            }
+        }
+
         button = button_get_w_tmo(HZ / peak_meter_fps);
         switch(button)
         {
@@ -565,7 +593,6 @@ bool recording_screen(void)
             done = true;
         }
     }
-    
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
         status_set_playmode(STATUS_STOP);
@@ -582,6 +609,8 @@ bool recording_screen(void)
         }
     }
     
+    invert_led(false);
+
     mpeg_init_playback();
 
     mpeg_sound_channel_config(global_settings.channel_config);
