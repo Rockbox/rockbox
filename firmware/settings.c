@@ -29,63 +29,6 @@
  */
 int persist_all_settings( void )
 {
-    if( ! persist_volume_setting() )
-    {
-        panicf( "failed to persist volume setting" );
-    }
-    
-    if( ! persist_balance_setting() )
-    {
-        panicf( "failed to persist balance setting" );
-    }
-    
-    if( ! persist_bass_setting() )
-    {
-        panicf( "failed to persist bass setting" );
-    }
-    
-    if( ! persist_treble_setting() )
-    {
-        panicf( "failed to persist treble setting" );
-    }
-    
-    if( ! persist_loudness_setting() )
-    {
-        panicf( "failed to persist loudness setting" );
-    }
-    
-    if( ! persist_bass_boost_setting() )
-    {
-        panicf( "failed to persist bass boost setting" );
-    }
-    
-    if( ! persist_contrast_setting() )
-    {
-        panicf( "failed to persist contrast setting" );
-    }
-    
-    if( ! persist_poweroff_setting() )
-    {
-        panicf( "failed to persist poweroff setting" );
-    }
-    
-    if( ! persist_backlight_setting() )
-    {
-        panicf( "failed to persist backlight setting" );
-    }
-    
-    if( ! persist_poweroff_setting() )
-    {
-        panicf( "failed to persist poweroff setting" );
-    }
-    
-    if( ! persist_resume_setting() )
-    {
-        panicf( "failed to persist resume setting" );
-    }
-    
-    /* by getting here, we had no problems */
-    
     return 1;
 }
 
@@ -94,28 +37,6 @@ int persist_all_settings( void )
  */
 int persist_all_playlist_info( void )
 {
-    if( ! persist_playlist_filename() )
-    {
-        panicf( "failed to persist playlist filename" );
-    }
-    
-    if( ! persist_playlist_indices() )
-    {
-        panicf( "failed to persist playlist indices" );
-    }
-    
-    if( ! persist_playlist_index() )
-    {
-        panicf( "failed to persist playlist index" );
-    }
-    
-    if( ! persist_resume_track_time() )
-    {
-        panicf( "failed to persist resume track time" );
-    }
-
-    /* by getting here, we had no problems */
-    
     return 1;
 }
 
