@@ -111,7 +111,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
 	screens.c sleeptimer.c keyboard.c onplay.c\
 	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c \
-	settings_menu.c sound_menu.c playlist_menu.c
+	settings_menu.c sound_menu.c playlist_menu.c filetree.c dbtree.c
 
 ifneq ($(ISPLAYER),PLAYER)
    APPS += peakmeter.c bmp.c widgets.c radio.c
