@@ -8,7 +8,7 @@
 * $Id$
 *
 * Plugin for reprogramming the whole Flash ROM chip with a new content.
-* !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SHURE WHAT YOU DO !!!
+* !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SURE WHAT YOU DO !!!
 *
 * Copyright (C) 2003 Jörg Hohensohn [IDC]Dragon
 *
@@ -729,7 +729,7 @@ void DoUserDialog(char* filename)
     
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Program all Flash?");
-    rb->lcd_puts(0, 1, "Are you shure?");
+    rb->lcd_puts(0, 1, "Are you sure?");
     rb->lcd_puts(0, 2, "If it goes wrong,");
     rb->lcd_puts(0, 3, "it kills your box!");
     rb->lcd_puts(0, 4, "See documentation.");
