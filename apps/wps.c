@@ -161,7 +161,7 @@ static void draw_screen(struct mp3entry* id3)
                                  id3->bitrate);
                     else
                         snprintf(buffer, sizeof(buffer), "%d kbit", 
-								 id3->bitrate);
+                                 id3->bitrate);
 
                     lcd_puts(0, l++, buffer);
                     snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
@@ -1116,7 +1116,7 @@ int wps_show(void)
                      global_settings.resume &&
                      global_settings.resume_offset != id3->offset ) {
                     DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
-						   id3->offset,id3);
+                           id3->offset,id3);
                     global_settings.resume_index = id3->index;
                     global_settings.resume_offset = id3->offset;
                     settings_save();
