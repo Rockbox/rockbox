@@ -122,6 +122,7 @@ int read_bmp_file(char* filename,
         sizeof(struct Fileheader))
       {
 	debugf("error - can't Read Fileheader Stucture\n");
+        close(fd);
         return 2;
       }
 
@@ -130,6 +131,7 @@ int read_bmp_file(char* filename,
       {
 	debugf("error - Bitmap must be less than 8, got %d\n",
                readshort(fh.BitCount));
+        close(fd);
         return 2;
       }
 
@@ -138,6 +140,7 @@ int read_bmp_file(char* filename,
       {
 	debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
                readlong(fh.Width));
+        close(fd);
         return 3;
       }
       debugf("Bitmap is %d pixels wide\n", readlong(fh.Width));
@@ -147,6 +150,7 @@ int read_bmp_file(char* filename,
       {
 	debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
                readlong(fh.Height));
+        close(fd);
 	return 4;
       }
       debugf("Bitmap is %d pixels heigh\n", readlong(fh.Height));
@@ -157,6 +161,7 @@ int read_bmp_file(char* filename,
            sizeof(struct RGBQUAD))
 	{
           debugf("error - Can't read bitmap's color palette\n");
+          close(fd);
           return 5;
 	}
       }
@@ -192,12 +197,14 @@ int read_bmp_file(char* filename,
       if(bmp == NULL)
       {
           debugf("error - Out of memory\n");
+          close(fd);
           return 6;
       }
       else
       {
           if(read(fd, (unsigned char*)bmp,(long)size) != size) {
               debugf("error - Can't read image\n");
+              close(fd);
               return 7;
           }
       }
@@ -249,6 +256,7 @@ int read_bmp_file(char* filename,
 
 #endif
    }
+   close(fd);
    return 0; /* success */
 }
 
