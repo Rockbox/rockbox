@@ -85,7 +85,7 @@ void dbg_dir(char* currdir)
 
 void dbg_mkfile(char* name, int num)
 {
-    char text[800];
+    char text[1024];
     int i;
     int fd = open(name,O_WRONLY);
     if (fd<0) {
@@ -147,7 +147,7 @@ void dbg_tail(char* name)
         if( rc > 0 )
         {
             buf[rc]=0;
-            printf("%d: %s\n", strlen(buf), buf);
+            printf("%d:\n%s\n", strlen(buf), buf);
         }
         else if ( rc == 0 ) {
             DEBUGF("EOF\n");
@@ -174,11 +174,11 @@ void dbg_head(char* name)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
     
-    rc = read(fd, buf, SECTOR_SIZE);
+    rc = read(fd, buf, SECTOR_SIZE*3);
     if( rc > 0 )
     {
         buf[rc]=0;
-        printf("%d: %s\n", strlen(buf), buf);
+        printf("%d:\n%s\n", strlen(buf), buf);
     }
     else if ( rc == 0 ) {
         DEBUGF("EOF\n");
@@ -199,72 +199,76 @@ void dbg_prompt(void)
     DEBUGF("C:%s> ", current_directory);
 }
 
-void dbg_console(void)
+void dbg_cmd(int argc, char *argv[])
 {
-    char cmd[32] = "";
-    char last_cmd[32] = "";
-    int quit = 0;
-    char *s;
+    char* cmd = NULL;
+    char* arg1 = NULL;
+    char* arg2 = NULL;
 
-    while(!quit)
-    {
-        dbg_prompt();
-        if(fgets(cmd, sizeof(cmd) - 1, stdin))
-        {
-            if(strlen(cmd) == 1) /* empty command? */
-            {
-                strcpy(cmd, last_cmd);
-            }
-
-            /* Get the first token */
-	    s = strtok(cmd, " \n");
-            if(s)
-            {
-                if(!strcasecmp(s, "dir"))
-                {
-                    s = strtok(NULL, " \n");
-                    if (!s)
-                        s = "/";
-                    dbg_dir(s);
-                    continue;
-                }
-
-                if(!strcasecmp(s, "ds"))
-                {
-                    /* Remember the command */
-                    strcpy(last_cmd, s);
-                    
-                    if((s = strtok(NULL, " \n")))
-                    {
-                        last_secnum = atoi(s);
-                    }
-                    else
-                    {
-                        last_secnum++;
-                    }
-                    DEBUGF("secnum: %d\n", last_secnum);
-                    dbg_dump_sector(last_secnum);
-                    continue;
-                }
-
-                if(!strcasecmp(s, "type"))
-                {
-                    s = strtok(NULL, " \n");
-                    if (!s)
-                        continue;
-                    dbg_type(s);
-                    continue;
-                }
-            
-                if(!strcasecmp(s, "exit") ||
-                   !strcasecmp(s, "x"))
-                {
-                    quit = 1;
-                }
+    if (argc > 1) {
+        cmd = argv[1];
+        if ( argc > 2 ) {
+            arg1 = argv[2];
+            if ( argc > 3 ) {
+                arg2 = argv[3];
             }
         }
+    }
+    else {
+        DEBUGF("usage: fat command [options]\n"
+               "commands:\n"
+               " dir <dir>\n"
+               " ds <sector> - display sector\n"
+               " type <file>\n"
+               " head <file>\n"
+               " tail <file>\n"
+               " mkfile <file> <size (KB)>\n"
+            );
+        return;
+    }
+
+    if (!strcasecmp(cmd, "dir"))
+    {
+        if ( arg1 )
+            dbg_dir(arg1);
         else
-            quit = 1;
+            dbg_dir("/");
+    }
+
+    if (!strcasecmp(cmd, "ds"))
+    {                    
+        if ( arg1 ) {
+            DEBUGF("secnum: %d\n", atoi(arg1));
+            dbg_dump_sector(atoi(arg1));
+        }
+    }
+
+    if (!strcasecmp(cmd, "type"))
+    {
+        if (arg1)
+            dbg_type(arg1);
+    }
+
+    if (!strcasecmp(cmd, "head"))
+    {
+        if (arg1)
+            dbg_head(arg1);
+    }
+            
+    if (!strcasecmp(cmd, "tail"))
+    {
+        if (arg1)
+            dbg_tail(arg1);
+    }
+
+    if (!strcasecmp(cmd, "mkfile"))
+    {
+        if (arg1) {
+            if (arg2)
+                dbg_mkfile(arg1,atoi(arg2));
+            else
+                dbg_mkfile(arg1,1);
+        }
     }
 }
 
@@ -275,7 +279,7 @@ int main(int argc, char *argv[])
     int rc,i;
     struct partinfo* pinfo;
 
-    if(ata_init(argv[1])) {
+    if(ata_init("disk.img")) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
         return -1;
     }
@@ -283,11 +287,6 @@ int main(int argc, char *argv[])
     if (!pinfo) {
         DEBUGF("*** Failed reading partitions\n");
         return -1;
-    }
-
-    if ( argc > 2 ) {
-        dbg_dump_sector(atoi(argv[2]));
-        return 0;
     }
 
     for ( i=0; i<4; i++ ) {
@@ -308,14 +307,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //dbg_console();
-    //dbg_dir("/");
-#if 1
-    dbg_tail("/depa.txt");
-#else
-    dbg_mkfile("/depa.txt", 10);
-#endif
-    dbg_dir("/");
+    dbg_cmd(argc, argv);
 
     ata_exit();
 
