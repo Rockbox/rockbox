@@ -666,9 +666,11 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+                int percent=
+                    id3->length?
+                    (id3->elapsed + ff_rewind_count) * 100 / id3->length:0;
                 slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
-                         (id3->elapsed + ff_rewind_count) * 100 / id3->length,
-                         Grow_Right);
+                         percent, Grow_Right);
                 update_line = true;
             }
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
@@ -702,7 +704,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
                 if (refresh_mode & WPS_REFRESH_SCROLL)  {
                     lcd_puts_scroll(0, i, buf);
                 }
-                flags=0;
             }
 
             /* dynamic / static line */
