@@ -20,7 +20,9 @@ endif
 CFLAGS = $(GCCOPTS) \
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DPLUGIN
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-pluginlib

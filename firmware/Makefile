@@ -11,7 +11,9 @@ INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers
 
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 SOURCES = $(SRC)
 OBJS2 := $(patsubst %.c, $(OBJDIR)/%.o, $(SRC)) $(OBJDIR)/sysfont.o
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))

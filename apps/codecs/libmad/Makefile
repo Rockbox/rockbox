@@ -18,7 +18,9 @@ MADOPTS =  -DFPM_DEFAULT -DNDEBUG
 CFLAGS = $(GCCOPTS) $(MADOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 SOURCES = $(SRC)
 OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))

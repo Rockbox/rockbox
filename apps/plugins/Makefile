@@ -24,8 +24,9 @@ LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
- $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
 SOURCES = $(SRC)
 ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
@@ -33,6 +34,8 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 # as created by the cross-compiler for win32:
 DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
+
+ELFDEP = $(OBJDIR)/dep-elf
 
 #for any recorder and iRiver model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
@@ -43,9 +46,14 @@ endif
 all: $(OBJDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
-	@echo "LD $@"
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(OBJDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+
+ELFIT=@echo "LD $@"; \
+      $(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(OBJDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+
+$(ELFDEP): $(SOURCES)
+	perl elfdep.pl > $(ELFDEP)
+
+-include $(ELFDEP)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY $<"
@@ -109,7 +117,7 @@ $(SUBDIRS):
 clean:
 	@echo "cleaning plugins"
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
-	$(OBJS) $(DEFS)
+	$(OBJS) $(DEFS) $(ELFDEP)
 	@$(MAKE) -C lib clean
 	@$(MAKE) -C rockboy clean
 

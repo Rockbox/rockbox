@@ -21,8 +21,9 @@ ifdef SOFTWARECODECS
 CODECS=build-codecs
 endif
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
-$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 DIRS = .
 
 ifdef APPEXTRA
