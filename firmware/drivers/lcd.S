@@ -19,8 +19,9 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 
+#if CONFIG_CPU == SH7034
 #define LCDR (PBDR_ADDR+1)
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -304,4 +305,55 @@ _lcd_write_data:
 
 .end:
     .size   _lcd_write_command,.end-_lcd_write_command
+#elif CONFIG_CPU == MCF5249
+    .section    .icode,"ax",@progbits
 
+    .align      2
+    .global     lcd_write_command
+    .type       lcd_write_command,@function
+
+lcd_write_command:
+        move.l  (4,%sp),%d0
+        lea MBAR2,%a1
+        move.l   #~8,%d1
+        and.l   %d1,(0xb4,%a1)
+        move.w  %d0,0xf0000000
+        rts
+
+    .align      2
+    .global     lcd_write_command_ex
+    .type       lcd_write_command_ex,@function
+
+lcd_write_command_ex:
+        lea MBAR2,%a1
+        
+        move.l  (4,%sp),%d0     /* Command */
+
+        move.l   #~8,%d1        /* Set A0 = 0 */
+        and.l   %d1,(0xb4,%a1)
+        move.w  %d0,0xf0000000  /* Write to LCD */
+
+        move.l  (8,%sp),%d0     /* Data */
+
+        not.l   %d1             /* Set A0 = 1 */
+        or.l    %d1,(0xb4,%a1)
+        move.w  %d0,0xf0000000  /* Write to LCD */
+        rts
+
+    .align      2
+    .global     lcd_write_data
+    .type       lcd_write_data,@function
+
+lcd_write_data:
+        move.l  (4,%sp),%a0       /* Data pointer */
+        move.l  (8,%sp),%d0     /* Length */
+        lea MBAR2,%a1
+        moveq   #8,%d1
+        or.l    %d1,(0xb4,%a1)
+.loop:
+        move.b  (%a0)+,%d1
+        move.w  %d1,0xf0000000
+        subq.l  #1,%d0
+        bne     .loop
+        rts
+#endif
