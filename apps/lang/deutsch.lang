@@ -2864,3 +2864,21 @@ eng: "ID3 database"
 voice: "ID3 database"
 new: "ID3-Datenbank"
 
+id: LANG_ID3DB_ARTISTS
+desc: ID3 virtual folder name
+eng: "Artists"
+voice: "Künstler"
+new: "Künstler"
+
+id: LANG_ID3DB_ALBUMS
+desc: ID3 virtual folder name
+eng: "Albums"
+voice: "Alben"
+new: "Alben"
+
+id: LANG_ID3DB_SONGS
+desc: ID3 virtual folder name
+eng: "Songs"
+voice: "Titel"
+new: "Titel"
+
