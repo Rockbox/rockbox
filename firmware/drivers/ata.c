@@ -37,10 +37,41 @@
 #define PREFER_C_WRITING
 
 #define ATA_IOBASE      0x20000000
-#define ATA_DATA        (*((volatile unsigned short*)ATA_IOBASE))
-#define ATA_CONTROL     (*((volatile unsigned short*)ATA_IOBASE + 0xe))
+#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
+#define ATA_CONTROL     (*((volatile unsigned short*)(ATA_IOBASE + 0xe)))
+
+#define ATA_ERROR       (*((volatile unsigned short*)(ATA_IOBASE + 0x22)))
+#define ATA_NSECTOR     (*((volatile unsigned short*)(ATA_IOBASE + 0x24)))
+#define ATA_SECTOR      (*((volatile unsigned short*)(ATA_IOBASE + 0x26)))
+#define ATA_LCYL        (*((volatile unsigned short*)(ATA_IOBASE + 0x28)))
+#define ATA_HCYL        (*((volatile unsigned short*)(ATA_IOBASE + 0x2a)))
+#define ATA_SELECT      (*((volatile unsigned short*)(ATA_IOBASE + 0x2c)))
+#define ATA_COMMAND     (*((volatile unsigned short*)(ATA_IOBASE + 0x2e)))
+
+#define STATUS_BSY      0x8000
+#define STATUS_RDY      0x4000
+#define STATUS_DF       0x2000
+#define STATUS_DRQ      0x0800
+#define STATUS_ERR      0x0100
+
+#define ERROR_ABRT      0x0400
+
+#define WRITE_PATTERN1 0xa5
+#define WRITE_PATTERN2 0x5a
+#define WRITE_PATTERN3 0xaa
+#define WRITE_PATTERN4 0x55
+
+#define READ_PATTERN1 0xa500
+#define READ_PATTERN2 0x5a00
+#define READ_PATTERN3 0xaa00
+#define READ_PATTERN4 0x5500
+
+#define SET_REG(reg,val) reg = ((val) << 8)
+#define SET_16BITREG(reg,val) reg = (val)
 
 #elif CONFIG_CPU == SH7034
+
+#define SWAP_WORDS
 
 #define ATA_IOBASE      0x06100100
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -48,12 +79,41 @@
 #define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
 #define ATA_CONTROL     (*ata_control)
 
-#endif
+#define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))
+#define ATA_NSECTOR     (*((volatile unsigned char*)ATA_IOBASE + 2))
+#define ATA_SECTOR      (*((volatile unsigned char*)ATA_IOBASE + 3))
+#define ATA_LCYL        (*((volatile unsigned char*)ATA_IOBASE + 4))
+#define ATA_HCYL        (*((volatile unsigned char*)ATA_IOBASE + 5))
+#define ATA_SELECT      (*((volatile unsigned char*)ATA_IOBASE + 6))
+#define ATA_COMMAND     (*((volatile unsigned char*)ATA_IOBASE + 7))
 
-#if CONFIG_CPU == TCC730
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_DF       0x20
+#define STATUS_DRQ      0x08
+#define STATUS_ERR      0x01
+
+#define ERROR_ABRT      0x04
+
+#define WRITE_PATTERN1 0xa5
+#define WRITE_PATTERN2 0x5a
+#define WRITE_PATTERN3 0xaa
+#define WRITE_PATTERN4 0x55
+
+#define READ_PATTERN1 0xa5
+#define READ_PATTERN2 0x5a
+#define READ_PATTERN3 0xaa
+#define READ_PATTERN4 0x55
+
+#define SET_REG(reg,val) reg = (val)
+#define SET_16BITREG(reg,val) reg = (val)
+
+#elif CONFIG_CPU == TCC730
 
 #define PREFER_C_READING
 #define PREFER_C_WRITING
+
+#define SWAP_WORDS
 
 #define ATA_DATA_IDX        (0xD0)
 #define ATA_ERROR_IDX       (0xD2) 
@@ -70,6 +130,7 @@
 #define ATA_ALT_STATUS_IDX  ATA_CONTROL_IDX
 
 #define SET_REG(reg, value) (ide_write_register(reg ## _IDX, value))
+#define SET_16BITREG(reg, value) (ide_write_register(reg ## _IDX, value))
 #define GET_REG(reg) (ide_read_register(reg))
 
 #define ATA_DATA        (GET_REG(ATA_DATA_IDX))
@@ -85,6 +146,23 @@
 #define ATA_ALT_STATUS  (GET_REG(ATA_ALT_STATUS_IDX))
 #define ATA_FEATURE     (GET_REG(ATA_FEATURE_IDX))
 
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_DF       0x20
+#define STATUS_DRQ      0x08
+#define STATUS_ERR      0x01
+
+#define ERROR_ABRT      0x04
+
+#define WRITE_PATTERN1 0xa5
+#define WRITE_PATTERN2 0x5a
+#define WRITE_PATTERN3 0xaa
+#define WRITE_PATTERN4 0x55
+
+#define READ_PATTERN1 0xa5
+#define READ_PATTERN2 0x5a
+#define READ_PATTERN3 0xaa
+#define READ_PATTERN4 0x55
 
 extern int idatastart __attribute__ ((section(".idata")));
 
@@ -125,46 +203,14 @@ int ide_read_register(int reg) {
     return ide_reg_temp;
 }
 
+#endif
 
-#else
-
-/* generic registers */
-#define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))
-#define ATA_NSECTOR     (*((volatile unsigned char*)ATA_IOBASE + 2))
-#define ATA_SECTOR      (*((volatile unsigned char*)ATA_IOBASE + 3))
-#define ATA_LCYL        (*((volatile unsigned char*)ATA_IOBASE + 4))
-#define ATA_HCYL        (*((volatile unsigned char*)ATA_IOBASE + 5))
-#define ATA_SELECT      (*((volatile unsigned char*)ATA_IOBASE + 6))
-#define ATA_COMMAND     (*((volatile unsigned char*)ATA_IOBASE + 7))
 #define ATA_FEATURE     ATA_ERROR
 #define ATA_STATUS      ATA_COMMAND
 #define ATA_ALT_STATUS  ATA_CONTROL
 
-#define SET_REG(reg, value) ((reg) = (value))
-
-#endif
-
-#define SET_ATA_DATA(v)        (SET_REG(ATA_DATA,v))
-#define SET_ATA_SELECT(v)      (SET_REG(ATA_SELECT,v))
-#define SET_ATA_NSECTOR(v)     (SET_REG(ATA_NSECTOR,v))
-#define SET_ATA_SECTOR(v)      (SET_REG(ATA_SECTOR,v))
-#define SET_ATA_LCYL(v)        (SET_REG(ATA_LCYL,v))
-#define SET_ATA_HCYL(v)        (SET_REG(ATA_HCYL,v))
-#define SET_ATA_COMMAND(v)     (SET_REG(ATA_COMMAND,v))
-#define SET_ATA_CONTROL(v)     (SET_REG(ATA_CONTROL,v))
-#define SET_ATA_FEATURE(v)     (SET_REG(ATA_FEATURE, v))
-
-
 #define SELECT_DEVICE1  0x10
 #define SELECT_LBA      0x40
-
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-
-#define ERROR_ABRT      0x04
 
 #define CONTROL_nIEN    0x02
 #define CONTROL_SRST    0x04
@@ -190,7 +236,9 @@ int ide_read_register(int reg) {
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
 int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
+#if CONFIG_CPU == SH7034
 static volatile unsigned char* ata_control;
+#endif
 
 bool old_recorder = false;
 int ata_spinup_time = 0;
@@ -294,8 +342,13 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         {   /* loop compiles to 9 assembler instructions */
             /* takes 14 clock cycles (2 pipeline stalls, 1 wait) */
             tmp = ATA_DATA;
+#ifdef SWAP_WORDS
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
+#else
+            *buf++ = tmp >> 8;
+            *buf++ = tmp & 0xff;
+#endif
         } while (buf < bufend); /* tail loop is faster */
     }
     else
@@ -305,7 +358,11 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         do
         {   /* loop compiles to 7 assembler instructions */
             /* takes 12 clock cycles (2 pipeline stalls, 1 wait) */
+#ifdef SWAP_WORDS
             *wbuf = SWAB16(ATA_DATA);
+#else
+            *wbuf = ATA_DATA;
+#endif
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 #else
@@ -415,7 +472,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     int timeout;
     int count;
     void* buf;
-    int spinup_start;
+    long spinup_start;
 
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
@@ -447,7 +504,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 
     timeout = current_tick + READ_TIMEOUT;
 
-    SET_ATA_SELECT(ata_device);
+    SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -463,15 +520,15 @@ int ata_read_sectors(IF_MV2(int drive,)
         last_disk_activity = current_tick;
 
         if ( count == 256 )
-	  SET_ATA_NSECTOR(0); /* 0 means 256 sectors */
+            SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
         else
-	  SET_ATA_NSECTOR((unsigned char)count);
+            SET_REG(ATA_NSECTOR, (unsigned char)count);
 
-        SET_ATA_SECTOR(start & 0xff);
-        SET_ATA_LCYL((start >> 8) & 0xff);
-	SET_ATA_HCYL((start >> 16) & 0xff);
-	SET_ATA_SELECT(((start >> 24) & 0xf) | SELECT_LBA | ata_device);
-	SET_ATA_COMMAND(CMD_READ_MULTIPLE);
+        SET_REG(ATA_SECTOR, start & 0xff);
+        SET_REG(ATA_LCYL, (start >> 8) & 0xff);
+        SET_REG(ATA_HCYL, (start >> 16) & 0xff);
+        SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+        SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE);
 
         /* wait at least 400ns between writing command and reading status */
         __asm__ volatile ("nop");
@@ -572,11 +629,18 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         unsigned short tmp = 0;
         const unsigned char* bufend = buf + wordcount*2;
         do
-        {   /* loop compiles to 9 assembler instructions */
+        {
+#ifdef SWAP_WORDS
+            /* SH1: loop compiles to 9 assembler instructions */
             /* takes 13 clock cycles (2 pipeline stalls) */
             tmp = (unsigned short) *buf++;
             tmp |= (unsigned short) *buf++ << 8; /* I assume big endian */
-            SET_ATA_DATA(tmp);           /* and don't use the SWAB16 macro */
+            SET_16BITREG(ATA_DATA, tmp);  /* and don't use the SWAB16 macro */
+#else
+            tmp = (unsigned short) *buf++ << 8;
+            tmp |= (unsigned short) *buf++;
+            SET_16BITREG(ATA_DATA, tmp);
+#endif
         } while (buf < bufend); /* tail loop is faster */
     }
     else
@@ -584,9 +648,14 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         unsigned short* wbuf = (unsigned short*)buf;
         unsigned short* wbufend = wbuf + wordcount;
         do
-        {   /* loop compiles to 6 assembler instructions */
+        {
+#ifdef SWAP_WORDS
+            /* loop compiles to 6 assembler instructions */
             /* takes 10 clock cycles (2 pipeline stalls) */
-	  SET_ATA_DATA(SWAB16(*wbuf));
+            SET_16BITREG(ATA_DATA, SWAB16(*wbuf));
+#else
+            SET_16BITREG(ATA_DATA, *wbuf);
+#endif
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 #else
@@ -716,7 +785,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         }
     }
     
-    SET_ATA_SELECT(ata_device);
+    SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -725,14 +794,14 @@ int ata_write_sectors(IF_MV2(int drive,)
     }
 
     if ( count == 256 )
-      SET_ATA_NSECTOR(0); /* 0 means 256 sectors */
+        SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
     else
-      SET_ATA_NSECTOR((unsigned char)count);
-    SET_ATA_SECTOR(start & 0xff);
-    SET_ATA_LCYL((start >> 8) & 0xff);
-    SET_ATA_HCYL((start >> 16) & 0xff);
-    SET_ATA_SELECT(((start >> 24) & 0xf) | SELECT_LBA | ata_device);
-    SET_ATA_COMMAND(CMD_WRITE_SECTORS);
+        SET_REG(ATA_NSECTOR, (unsigned char)count);
+    SET_REG(ATA_SECTOR, start & 0xff);
+    SET_REG(ATA_LCYL, (start >> 8) & 0xff);
+    SET_REG(ATA_HCYL, (start >> 16) & 0xff);
+    SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+    SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS);
 
     for (i=0; i<count; i++) {
 
@@ -803,15 +872,15 @@ static int check_registers(void)
             return -1;
 
     for (i = 0; i<64; i++) {
-      SET_ATA_NSECTOR ( 0xa5);
-      SET_ATA_SECTOR  ( 0x5a);
-      SET_ATA_LCYL    ( 0xaa);
-      SET_ATA_HCYL    ( 0x55);
+      SET_REG(ATA_NSECTOR, WRITE_PATTERN1);
+      SET_REG(ATA_SECTOR,  WRITE_PATTERN2);
+      SET_REG(ATA_LCYL,    WRITE_PATTERN3);
+      SET_REG(ATA_HCYL,    WRITE_PATTERN4);
       
-      if ((ATA_NSECTOR == 0xa5) &&
-	  (ATA_SECTOR  == 0x5a) &&
-	  (ATA_LCYL    == 0xaa) &&
-	  (ATA_HCYL    == 0x55))
+      if ((ATA_NSECTOR == READ_PATTERN1) &&
+	  (ATA_SECTOR  == READ_PATTERN2) &&
+	  (ATA_LCYL    == READ_PATTERN3) &&
+	  (ATA_HCYL    == READ_PATTERN4))
         return 0;
     }
 
@@ -823,12 +892,12 @@ static int freeze_lock(void)
     /* does the disk support Security Mode feature set? */
     if (identify_info[82] & 2)
     {
-      SET_ATA_SELECT (ata_device);
+        SET_REG(ATA_SELECT, ata_device);
 
         if (!wait_for_rdy())
             return -1;
 
-        SET_ATA_COMMAND(CMD_SECURITY_FREEZE_LOCK);
+        SET_REG(ATA_COMMAND, CMD_SECURITY_FREEZE_LOCK);
 
         if (!wait_for_rdy())
             return -2;
@@ -863,7 +932,7 @@ static int ata_perform_sleep(void)
 
     mutex_lock(&ata_mtx);
 
-    SET_ATA_SELECT(ata_device);
+    SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
@@ -871,7 +940,7 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-    SET_ATA_COMMAND(CMD_SLEEP);
+    SET_REG(ATA_COMMAND, CMD_SLEEP);
 
     if (!wait_for_rdy())
     {
@@ -890,7 +959,7 @@ int ata_standby(int time)
 
     mutex_lock(&ata_mtx);
 
-    SET_ATA_SELECT(ata_device);
+    SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("ata_standby() - not RDY\n");
@@ -899,11 +968,12 @@ int ata_standby(int time)
     }
 
     if(time)
-        SET_ATA_NSECTOR ( ((time + 5) / 5) & 0xff); /* Round up to nearest 5 secs */
+        /* Round up to nearest 5 secs */
+        SET_REG(ATA_NSECTOR, ((time + 5) / 5) & 0xff);
     else
-        SET_ATA_NSECTOR ( 0); /* Disable standby */
+        SET_REG(ATA_NSECTOR, 0); /* Disable standby */
         
-    SET_ATA_COMMAND(CMD_STANDBY);
+    SET_REG(ATA_COMMAND, CMD_STANDBY);
 
     if (!wait_for_rdy())
     {
@@ -996,11 +1066,16 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-#elif defined HAVE_SCF5249
+#elif defined HAVE_MCF5249
+    GPIO_OUT &= ~0x00080000;
+    sleep(1); /* > 25us */
+
+    GPIO_OUT |= 0x00080000;
+    sleep(1); /* > 25us */
 #endif
 
     /* state HRR2 */
-    SET_ATA_SELECT(ata_device); /* select the right device */
+    SET_REG(ATA_SELECT, ata_device); /* select the right device */
     ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
@@ -1014,11 +1089,11 @@ static int perform_soft_reset(void)
     int ret;
     int retry_count;
     
-    SET_ATA_SELECT ( SELECT_LBA | ata_device );
-    SET_ATA_CONTROL ( CONTROL_nIEN|CONTROL_SRST );
+    SET_REG(ATA_SELECT, SELECT_LBA | ata_device );
+    SET_REG(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
 
-    SET_ATA_CONTROL (CONTROL_nIEN);
+    SET_REG(ATA_CONTROL, CONTROL_nIEN);
     sleep(1); /* >2ms */
 
     /* This little sucker can take up to 30 seconds */
@@ -1070,14 +1145,14 @@ static int ata_power_on(void)
 static int master_slave_detect(void)
 {
     /* master? */
-  SET_ATA_SELECT( 0 );
+    SET_REG(ATA_SELECT, 0);
     if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
         ata_device = 0;
         DEBUGF("Found master harddisk\n");
     }
     else {
         /* slave? */
-      SET_ATA_SELECT( SELECT_DEVICE1 );
+        SET_REG(ATA_SELECT, SELECT_DEVICE1);
         if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
             ata_device = SELECT_DEVICE1;
             DEBUGF("Found slave harddisk\n");
@@ -1115,7 +1190,8 @@ void ata_enable(bool on)
         or_b(0x80, &PADRL); /* disable ATA */
 
     or_b(0x80, &PAIORL);
-#elif defined HAVE_SCF5249
+#elif CONFIG_CPU == MCF5249
+    (void)on; /* FIXME */
 #endif
 }
 
@@ -1123,15 +1199,14 @@ static int identify(void)
 {
     int i;
 
-    SET_ATA_SELECT ( ata_device );
+    SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("identify() - not RDY\n");
         return -1;
     }
 
-
-    SET_ATA_COMMAND ( CMD_IDENTIFY );
+    SET_REG(ATA_COMMAND, CMD_IDENTIFY);
 
     if (!wait_for_start_of_transfer())
     {
@@ -1139,25 +1214,30 @@ static int identify(void)
         return -2;
     }
 
-
-    for (i=0; i<SECTOR_SIZE/2; i++)
-        /* the IDENTIFY words are already swapped */
+    for (i=0; i<SECTOR_SIZE/2; i++) {
+        /* the IDENTIFY words are already swapped, so we need to treat
+           this info differently that normal sector data */
+#ifdef SWAP_WORDS
         identify_info[i] = ATA_DATA;
+#else
+        identify_info[i] = SWAB16(ATA_DATA);
+#endif
+    }
     
     return 0;
 }
 
 static int set_multiple_mode(int sectors)
 {
-  SET_ATA_SELECT ( ata_device );
+    SET_REG(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
         DEBUGF("set_multiple_mode() - not RDY\n");
         return -1;
     }
 
-    SET_ATA_NSECTOR ( sectors );
-    SET_ATA_COMMAND ( CMD_SET_MULTIPLE_MODE );
+    SET_REG(ATA_NSECTOR, sectors);
+    SET_REG(ATA_COMMAND, CMD_SET_MULTIPLE_MODE);
 
     if (!wait_for_rdy())
     {
@@ -1195,7 +1275,7 @@ static int set_features(void)
     /* Update the table */
     features[3].parameter = 8 + pio_mode;
     
-    SET_ATA_SELECT( ata_device );
+    SET_REG(ATA_SELECT, ata_device);
 
     if (!wait_for_rdy()) {
         DEBUGF("set_features() - not RDY\n");
@@ -1204,9 +1284,9 @@ static int set_features(void)
 
     for (i=0; features[i].id_word; i++) {
         if (identify_info[features[i].id_word] & (1 << features[i].id_bit)) {
-            SET_ATA_FEATURE ( features[i].subcommand );
-            SET_ATA_NSECTOR ( features[i].parameter );
-            SET_ATA_COMMAND ( CMD_SET_FEATURES );
+            SET_REG(ATA_FEATURE, features[i].subcommand);
+            SET_REG(ATA_NSECTOR, features[i].parameter);
+            SET_REG(ATA_COMMAND, CMD_SET_FEATURES);
 
             if (!wait_for_rdy()) {
                 DEBUGF("set_features() - CMD failed\n");
@@ -1262,6 +1342,8 @@ int ata_init(void)
 #if CONFIG_CPU == TCC730
     /* TODO: check for cold start (never happenning now) */
     bool coldstart = false;
+#elif CONFIG_CPU == MCF5249
+    bool coldstart = true; /* FIXME */
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif
@@ -1275,7 +1357,10 @@ int ata_init(void)
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH); /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
-#elif defined HAVE_SCF5249
+#elif defined HAVE_MCF5249
+    GPIO_OUT |= 0x00080000;
+    GPIO_ENABLE |= 0x00080000;
+    GPIO_FUNCTION |= 0x00080000;
 #endif
 
     sleeping = false;
