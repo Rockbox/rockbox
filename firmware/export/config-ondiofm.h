@@ -76,4 +76,7 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* define this if more than one device/partition can be used */
+#define HAVE_MULTIVOLUME
+
 #endif /* SIMULATOR */
