@@ -63,6 +63,9 @@ The batch timestamp is GMT.
 (<a href="auto/build-fmrecorder/rocks.zip">rocks</a>)<br>
 <a href="auto/build-recorder8mb/ajbrec.ajz">8MB Recorder</a>
 (<a href="auto/build-recorder8mb/rocks.zip">rocks</a>)<br>
+
+<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
+(<a href="auto/build-recordersimwin32/rocks.zip">rocks</a>)<br>
 </td>
 </tr></table>
 
