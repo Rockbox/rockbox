@@ -21,8 +21,103 @@
 #include <stdbool.h>
 #include "lcd.h"
 #include "font.h"
+#include "system.h"
 
-#if CONFIG_CPU == MCF5249
+#if CONFIG_CPU == TCC730
+
+void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
+
+void ddma_wait_idle(void)
+{
+    do {
+    } while ((DDMACOM & 3) != 0);
+}
+
+void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num) {
+    int irq = set_irq_level(1);
+    ddma_wait_idle();
+    long externalAddress = (long) extAddr;
+    long internalAddress = (long) intAddr;
+    /* HW wants those two in word units. */
+    num /= 2;
+    externalAddress /= 2;
+    
+    DDMACFG = (dir << 1) | (mem << 2);
+    DDMAIADR = internalAddress;
+    DDMAEADR = externalAddress;
+    DDMANUM = num;
+    DDMACOM |= 0x4; /* start */
+    
+    ddma_wait_idle(); /* wait for completion */
+    set_irq_level(irq);
+}
+
+/* Some linker-defined symbols */
+extern int icodecopy;
+extern int icodesize;
+extern int icodestart;
+
+/* called by crt0 */
+void system_init(void)
+{
+    /* Disable watchdog */
+    WDTEN = 0xA5;
+    
+    /* Setup the CPU */
+    
+    
+    /* PLL0 (cpu osc. frequency) */
+    
+#if 0
+    PLL0DATA = 0xf98;
+    PLL0CON = 0x1; /* activate */
+    do {
+        asm "nop";
+    } while ((PLL0CON & 0x2) == 0); /*  wait for stabilization */
+
+    PLL0CON = 0x5; /* use as CPU clock */
+
+#endif
+
+    /*******************
+     * configure S(D)RAM 
+     */
+
+    /************************
+     * Copy .icode section to icram
+     */
+    ddma_transfer(0, 0, 0x40, (long)&icodecopy, (int)&icodesize);
+   
+
+    /***************************
+     * Interrupt mask
+     */
+
+    /* interrupt priorities ? */
+
+    IMR0 = 0;
+    IMR1 = 0;
+
+
+/*  IRQ0            BT INT */
+/*  IRQ1           RTC INT */
+/*  IRQ2            TA INT */
+/*  IRQ3          TAOV INT */
+/*  IRQ4            TB INT */
+/*  IRQ5          TBOV INT */
+/*  IRQ6            TC INT */
+/*  IRQ7          TCOV INT */
+/*  IRQ8           USB INT */
+/*  IRQ9          PPIC INT */
+/* IRQ10 UART_Rx/UART_Err/ UART_tx INT */
+/* IRQ11            IIC INT */
+/* IRQ12           SIO INT */
+/* IRQ13           IIS0 INT */
+/* IRQ14           IIS1 INT */
+/* IRQ15               ­ */
+}
+
+#elif CONFIG_CPU == MCF5249
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIE"))) void name (void);

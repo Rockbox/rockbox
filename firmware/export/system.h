@@ -179,21 +179,25 @@ static inline unsigned long SWAB32(unsigned long value)
 
 #elif CONFIG_CPU == TCC730
 
-extern void* interrupt_vector[16]  __attribute__ ((section(".idata")));
+extern void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
 
-extern void ddma_transfer(int dir, int mem, long intAddr, void* extAddr,
+extern void ddma_transfer(int dir, int mem, long intAddr, long extAddr,
                           int num);
 
-static inline void clear_watchdog(void)
-{
-    WDTCON = 0x0A;
-}
 
-
-#define HIGHEST_IRQ_LEVEL (1<<15)
+#define HIGHEST_IRQ_LEVEL (1)
 static inline int set_irq_level(int level)
 {
-    return 0;
+  int result;
+  __asm__ ("ld %0, 0\n\t"
+	   "tstsr ie\n\t"
+	   "incc %0" : "=r"(result));
+  if (level > 0)
+    __asm__ volatile ("clrsr ie");
+  else
+    __asm__ volatile ("setsr ie");
+    
+  return result;
 }
 
 static inline unsigned short SWAB16(unsigned short value)
