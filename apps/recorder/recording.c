@@ -192,12 +192,6 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
-/*
-#if CONFIG_KEYPAD != RECORDER_PAD
-    splash(HZ*2, true, "Recording not supported yet");
-    return false;
-#else
-*/
     int button;
     bool done = false;
     char buf[32];
