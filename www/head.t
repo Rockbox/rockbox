@@ -48,7 +48,7 @@
 <input value="Search" type=submit>
 <input type=hidden name=as_sitesearch value="rockbox.haxx.se">
 </form>
-<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/"><img src="viewcvs.png" width="128" height="48" border="0" alt="View CVS"></a>
+<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/"><img src="/viewcvs.png" width="128" height="48" border="0" alt="View CVS"></a>
 
 <br><a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
