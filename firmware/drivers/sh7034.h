@@ -194,7 +194,7 @@
 #define ADDRB      (*((volatile unsigned short*)ADDRBH_ADDR)) /* combined */
 #define ADDRBH     (*((volatile unsigned char*)ADDRBH_ADDR)) 
 #define ADDRBL     (*((volatile unsigned char*)ADDRBL_ADDR)) 
-#define ADDRC      (*((volatile unsigned short*)ADDRCJ_ADDR)) /* combined */
+#define ADDRC      (*((volatile unsigned short*)ADDRCH_ADDR)) /* combined */
 #define ADDRCH     (*((volatile unsigned char*)ADDRCH_ADDR)) 
 #define ADDRCL     (*((volatile unsigned char*)ADDRCL_ADDR)) 
 #define ADDRD      (*((volatile unsigned short*)ADDRDH_ADDR)) /* combined */
