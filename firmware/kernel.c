@@ -32,7 +32,7 @@ static void tick_start(unsigned int interval_in_ms);
  ****************************************************************************/
 void kernel_init(void)
 {
-    tick_start(1);
+    tick_start(1000/HZ);
 }
 
 void sleep(int ticks)
