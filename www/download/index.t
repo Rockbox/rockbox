@@ -15,12 +15,14 @@
 <th>recorder v2</th>
 </tr><tr  valign=top>
 <td>
+<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg></a>
 Archos Jukebox 5000, 6000 and Studio models
 
 <p><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
 <br>(189 KB)
 
 </td><td>
+<a href=/docs/recorder.jpg><img src=/docs/recorder_t.jpg></a><br>
 Archos Jukebox Recorder 6, 10, 15 and 20
 
 <p><a href="rockbox-2.2-recorder.zip">rockbox-2.2-recorder.zip</a>
@@ -28,6 +30,7 @@ Archos Jukebox Recorder 6, 10, 15 and 20
 
 </td>
 <td>
+<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg></a><br>
 Archos Jukebox FM Recorder
 
 <p><a href="rockbox-2.2-fmrecorder.zip">rockbox-2.2-fmrecorder.zip</a>
@@ -35,6 +38,7 @@ Archos Jukebox FM Recorder
 
 </td>
 <td>
+<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg></a><br>
 Archos Jukebox Recorder V2
 
 <p><a href="rockbox-2.2-recorderv2.zip">rockbox-2.2-recorderv2.zip</a>
