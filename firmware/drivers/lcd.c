@@ -346,6 +346,8 @@ static const unsigned char lcd_ascii[] = {
 };
 #endif /* HAVE_NEW_CHARCELL_LCD */
 
+unsigned char icon_mirror[11];
+
 #ifndef SIMULATOR
 void lcd_clear_display(void)
 {
@@ -375,7 +377,6 @@ void lcd_double_height(bool on)
     lcd_write(true,on?9:8);
 }
 
-unsigned char icon_mirror[11];
 static char icon_pos[] =
 {
     0, 0, 0, 0, /* Battery */
