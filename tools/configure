@@ -37,6 +37,7 @@ if [ -z "$simver" ]; then
      simver="x11"
      ;;
    esac
+   echo "Selected $simver simulator"
 fi
 }
 
@@ -189,6 +190,7 @@ fi
 pwd=`pwd`;
 
 if [ "$target" = "update" ]; then
+  update="1"
   target=""
   if [ -f Makefile ]; then
     if { grep "^## Auto" Makefile >/dev/null 2>&1 ; } then
@@ -197,6 +199,7 @@ if [ "$target" = "update" ]; then
       target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
+      memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
       extra_defines=`grep "^EXTRA_DEFINES=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
@@ -209,8 +212,8 @@ if [ "$target" = "update" ]; then
   fi
 else
 
-echo "Setup your Rockbox build environment."
-echo "http://rockbox.haxx.se/"
+echo "This script will setup your Rockbox build environment."
+echo "Further docs here: http://rockbox.haxx.se/docs/"
 echo ""
 
 fi
@@ -253,6 +256,28 @@ if [ -z "$archos" ]; then
     ;;
 
   esac
+
+  echo "Platform set to $archos"
+
+fi
+
+if [ -z "$memory" ]; then
+  size="2"
+  if [ -z "$update" ]; then
+    echo "Enter size of your RAM (in MB): (defaults to 2)"
+    size=`input`;
+  fi
+
+  case $size in
+   8)
+    memory="8"
+    ;;
+   *)
+    memory="2"
+    ;;
+
+  esac
+  echo "Memory size selected: $memory MB"
 fi
 
 if [ -z "$extra_defines" ]; then
@@ -264,12 +289,18 @@ if [ -z "$extra_defines" ]; then
         getit=`input`;
         if [ "n" = "$getit" -o "N" = "$getit" ] ; then
             disable_demos="-DDISABLE_DEMOS"
+            echo "Demos disabled"
+        else
+            echo "Demos enabled"
         fi
  
         echo "Do you want to play Games? (Y)"
         getit=`input`;
         if [ "n" = "$getit" -o "N" = "$getit" ] ; then
             disable_games=" -DDISABLE_GAMES"
+            echo "Games disabled"
+        else
+            echo "Games enabled"
         fi
 
         extra_defines="$disable_demos$disable_games"
@@ -281,7 +312,6 @@ if [ -z "$debug" ]; then
   ##################################################################
   # Figure out debug on/off
   #
-  echo ""
   echo "Build (N)ormal, (D)ebug or (S)imulated version? (N)"
 
   option=`input`;
@@ -290,13 +320,16 @@ if [ -z "$debug" ]; then
     [Ss])
       debug="SIMULATOR=1"
       simulator="yes"
+      echo "Simulator build selected"
       whichsim
       ;;
     [Dd])
       debug="DEBUG=1"
+      echo "Debug build selected"
       ;;
     *)
       debug="NODEBUG=1"
+      echo "Normal build selected"
       ;;
 
   esac
@@ -353,6 +386,7 @@ if [ -z "$language" ]; then
         # pick a default
         language="english"
     fi
+    echo "Language set to $language"
 fi
 
 if [ "yes" = "$simulator" ]; then
@@ -365,6 +399,7 @@ sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
+ -e "s,@MEMORY@,${memory},g" \
  -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
@@ -380,6 +415,7 @@ ARCHOS=@ARCHOS@
 TARGET=@TARGET@
 THISDIR="@PWD@"
 LANGUAGE=@LANGUAGE@
+MEMORYSIZE=@MEMORY@
 VERSION=\$(shell date +%y%m%d-%H%M)
 
 EXTRA_DEFINES=@EXTRA_DEFINES@
@@ -391,7 +427,7 @@ firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES="\$(EXTRA_DEFINES)"
 
 apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)"
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE)
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
