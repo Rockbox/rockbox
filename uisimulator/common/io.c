@@ -140,7 +140,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 void sim_closedir(MYDIR *dir)
 {
     free(dir->name);
-    (closedir)(dir->dir);
+    closedir(dir->dir);
 
     free(dir);
 }
@@ -155,9 +155,9 @@ int sim_open(const char *name, int o)
 
         debugf("We open the real file '%s'\n", buffer);
 #ifdef WIN32
-        return (open)(buffer, opts);
+        return open(buffer, opts);
 #else
-        return (open)(buffer, opts, 0666);
+        return open(buffer, opts, 0666);
 #endif
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
@@ -173,7 +173,7 @@ int sim_creat(const char *name, mode_t mode)
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
-        return (creat)(buffer, 0666);
+        return creat(buffer, 0666);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
@@ -190,9 +190,9 @@ int sim_mkdir(const char *name, mode_t mode)
     debugf("We create the real directory '%s'\n", buffer);
 #ifdef WIN32
     /* since we build with -DNOCYGWIN we have the plain win32 version */
-    return (mkdir)(buffer);
+    return mkdir(buffer);
 #else
-    return (mkdir)(buffer, 0666);
+    return mkdir(buffer, 0666);
 #endif
 }
 
@@ -203,9 +203,9 @@ int sim_rmdir(const char *name)
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We remove the real directory '%s'\n", buffer);
-        return (rmdir)(buffer);
+        return rmdir(buffer);
     }
-    return (rmdir)(name);
+    return rmdir(name);
 }
 
 int sim_remove(const char *name)
@@ -216,9 +216,9 @@ int sim_remove(const char *name)
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We remove the real file '%s'\n", buffer);
-        return (remove)(buffer);
+        return remove(buffer);
     }
-    return (remove)(name);
+    return remove(name);
 }
 
 int sim_rename(const char *oldpath, const char* newpath)
@@ -231,7 +231,7 @@ int sim_rename(const char *oldpath, const char* newpath)
         sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
 
         debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
-        return (rename)(buffer1, buffer2);
+        return rename(buffer1, buffer2);
     }
     return -1;
 }
@@ -373,7 +373,8 @@ void ldebugf(const char* file, int line, const char *fmt, ...)
 
 #endif
 
-int sim_ftruncate(int fd, off_t length)
+/* rockbox off_t may be different from system off_t */
+int sim_ftruncate(int fd, long length)
 {
 #ifdef WIN32
     return _chsize(fd, length);
