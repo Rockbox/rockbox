@@ -30,6 +30,12 @@
 #define ADC_UNREG_POWER         6
 #define ADC_EXT_POWER           7
 
+#ifdef ARCHOS_RECORDER
+#define BATTERY_SCALE_FACTOR 6465
+#else
+#define BATTERY_SCALE_FACTOR 6546
+#endif
+
 unsigned short adc_read(int channel);
 void adc_init(void);
 
