@@ -82,7 +82,7 @@ extern void lcd_double_height (bool on);
 
 extern void lcd_putsxy(int x, int y, char *string, int font);
 extern void lcd_setfont(int font);
-extern void lcd_getfontsize(int font, int *width, int *height);
+extern void lcd_getfontsize(unsigned int font, int *width, int *height);
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);

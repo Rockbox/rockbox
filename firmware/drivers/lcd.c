@@ -715,7 +715,7 @@ void lcd_clearpixel(int x, int y)
 /*
  * Return width and height of a given font.
  */
-void lcd_getfontsize(int font, int *width, int *height)
+void lcd_getfontsize(unsigned int font, int *width, int *height)
 {
     if(font < sizeof(fonts)) {
         *width =  fonts[font];
