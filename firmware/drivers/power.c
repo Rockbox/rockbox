@@ -64,11 +64,6 @@ int radio_get_status(void)
 void power_init(void)
 {
 #ifdef IRIVER_H100
-    GPIO1_OUT |= 0x00080000;
-    GPIO1_ENABLE |= 0x00080000;
-    GPIO1_FUNCTION |= 0x00080000;
-
-    GPIO_OUT |= 0x80000000;
     GPIO_ENABLE |= 0x80000000;
     GPIO_FUNCTION |= 0x80000000;
 #else
