@@ -163,6 +163,7 @@ int ata_read_sectors(unsigned long start,
             return -1;
         }
 #endif
+        sleeping = false;
     }
 #endif
     mutex_lock(&ata_mtx);
@@ -179,7 +180,7 @@ int ata_read_sectors(unsigned long start,
         ATA_NSECTOR = 0; /* 0 means 256 sectors */
     else
         ATA_NSECTOR = (unsigned char)count;
-    
+
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
@@ -239,6 +240,7 @@ int ata_write_sectors(unsigned long start,
     last_disk_activity = current_tick;
 
 #ifndef USE_STANDBY
+    if ( sleeping ) {
 #ifdef USE_POWEROFF
         if (ata_power_on()) {
             return -1;
@@ -248,6 +250,8 @@ int ata_write_sectors(unsigned long start,
             return -1;
         }
 #endif
+        sleeping = false;
+    }
 #endif
     mutex_lock(&ata_mtx);
     
@@ -408,6 +412,7 @@ static void ata_thread(void)
     while (1) {
         while ( queue_empty( &ata_queue ) ) {
             if ( sleep_timeout &&
+                 !sleeping &&
                  TIME_AFTER( current_tick, 
                              last_user_activity + sleep_timeout ) &&
                  TIME_AFTER( current_tick, 
