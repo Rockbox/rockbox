@@ -1067,7 +1067,7 @@ new: "Disque : %d.%dGo"
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-new:  "Enregistrement"
+new: "Enregistrement"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
@@ -1077,12 +1077,12 @@ new: "Canaux"
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
-new:  "Fréquence"
+new: "Fréquence"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
-new:  "Gain"
+new: "Gain"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
@@ -1092,7 +1092,7 @@ new: "Gauche"
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-new:  "Qualité"
+new: "Qualité"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
@@ -1123,3 +1123,8 @@ id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
 new: "Micro"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new: "Mise en veille du disque"
