@@ -104,10 +104,6 @@ void init(void)
 
 #else
 
-/* defined in linker script */
-extern int poolstart[];
-extern int poolend[];
-
 void init(void)
 {
     int rc, i;
