@@ -60,7 +60,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
 FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c usb.c \
-        mpeg.c powermgmt.c stubs.c
+        mpeg.c powermgmt.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c status.c
