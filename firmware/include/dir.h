@@ -45,8 +45,8 @@
 struct dirent {
     unsigned char d_name[MAX_PATH];
     int attribute;
-    int size;
-    int startcluster;
+    long size;
+    long startcluster;
     unsigned short wrtdate; /*  Last write date */ 
     unsigned short wrttime; /*  Last write time */
 };
@@ -57,7 +57,7 @@ struct dirent {
 typedef struct {
 #ifndef SIMULATOR
     bool busy;
-    int startcluster;
+    long startcluster;
     struct fat_dir fatdir;
     struct fat_dir parent_dir;
     struct dirent theent;

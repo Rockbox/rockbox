@@ -1940,7 +1940,7 @@ int fat_rename(struct fat_file* file,
     return 0;
 }
 
-static int next_write_cluster(struct fat_file* file,
+static long next_write_cluster(struct fat_file* file,
                               long oldcluster,
                               long* newsector)
 {
@@ -2032,7 +2032,7 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
 }
 
 
-int fat_readwrite( struct fat_file *file, long sectorcount,
+long fat_readwrite( struct fat_file *file, long sectorcount,
                    void* buf, bool write )
 {
 #ifdef HAVE_MULTIVOLUME
@@ -2406,7 +2406,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     return 0;
 }
 
-int fat_get_cluster_size(IF_MV_NONVOID(int volume))
+unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume))
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;

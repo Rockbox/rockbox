@@ -90,7 +90,7 @@ extern int fat_open(IF_MV2(int volume,)
 extern int fat_create_file(const char* name,
                            struct fat_file* ent,
                            struct fat_dir* dir);
-extern int fat_readwrite(struct fat_file *ent, long sectorcount, 
+extern long fat_readwrite(struct fat_file *ent, long sectorcount, 
                          void* buf, bool write );
 extern int fat_closewrite(struct fat_file *ent, long size, int attr);
 extern int fat_seek(struct fat_file *ent, unsigned long sector );
@@ -105,7 +105,7 @@ extern int fat_opendir(IF_MV2(int volume,)
                        struct fat_dir *ent, unsigned long currdir,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
-extern int fat_get_cluster_size(IF_MV_NONVOID(int volume));
+extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
 extern bool fat_ismounted(int volume);
 
 #endif
