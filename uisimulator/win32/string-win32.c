@@ -21,5 +21,10 @@
 
 int strcasecmp (const char *a, const char *b)
 {
+    return strcmp (a, b);
+}
+
+int strncasecmp (const char *a, const char *b)
+{
     return strcmpi (a, b);
 }
