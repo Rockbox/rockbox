@@ -35,6 +35,7 @@ DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
 LIBMADDIR = $(PREVAPPDIR)/common/libmad
 TOOLSDIR = ../../tools
+DOCSDIR = ../../docs
 
 CC = i386-mingw32msvc-gcc
 WINDRES = i386-mingw32msvc-windres
