@@ -422,6 +422,8 @@ static void power_thread(void)
                                 trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
                                 trickle_time = 0;
                                 charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                            } else {
+                                charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                             }
                         } else {
                             /* if we didn't disable the charger in the previous test, check for low positive delta */
@@ -444,6 +446,8 @@ static void power_thread(void)
                                     trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
                                     trickle_time = 0;
                                     charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                                } else {
+                                    charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                                 }
                             }
                         }
