@@ -126,7 +126,8 @@ void init(void)
         panicf("disk: NULL");
 
     for ( i=0; i<4; i++ ) {
-        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ) {
+        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ||
+             pinfo[i].type == PARTITION_TYPE_FAT32_LBA ) {
             rc = fat_mount(pinfo[i].start);
             if(rc)
                 panicf("mount: %d",rc);
