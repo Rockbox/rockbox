@@ -55,7 +55,7 @@ KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
 VERSION=\$(shell date +%y%m%d-%H%M)
 
-.PHONE: 
+.PHONY: 
 
 all: sim
 
@@ -237,7 +237,7 @@ TARGET=@TARGET@
 THISDIR="@PWD@"
 VERSION=\$(shell date +%y%m%d-%H%M)
 
-.PHONE: firmware apps
+.PHONY: firmware apps
 
 all: firmware apps
 
