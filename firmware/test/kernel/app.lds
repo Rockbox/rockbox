@@ -2,9 +2,16 @@ ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 SECTIONS
 {
-    .text 0x09018000 :
+    .text 0x09010000 :
     {
+	*(.vectors)
+        . = ALIGN(0x200);
+        crt0.o(.text)
         *(.rodata)
+    }
+
+    .text :
+    {
         *(.text)
     }
 
@@ -16,8 +23,8 @@ SECTIONS
     .bss :
     {
         *(.bss)
-       _end = . + 0x8000;
-       _stack = . + 0x9000;
+       _end = .;
+       _stack = . + 0x1000;
        _edata = .;
     }
 }
