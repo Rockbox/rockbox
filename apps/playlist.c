@@ -46,9 +46,13 @@ char* playlist_next(int type)
     fd = open(playlist.filename, O_RDONLY);
     if(-1 != fd) {
       lseek(fd, seek, SEEK_SET);
-      max = read(fd, now_playing, sizeof(now_playing));
+      max = read(fd, now_playing+1, sizeof(now_playing)-1);
       close(fd);
+
+      /* Only absolute paths allowed */
+      now_playing[0] = '/';
       
+      /* Zero-terminate the file name */
       seek=0;
       while((now_playing[seek] != '\n') &&
             (now_playing[seek] != '\r') &&
