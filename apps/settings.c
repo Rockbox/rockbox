@@ -286,7 +286,7 @@ static struct bit_entry hd_bits[] =
     {5, S_O(peak_meter_hold), 3, "peak meter hold", 
         "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min" },
     {7, S_O(peak_meter_release), 8, "peak meter release", NULL }, /* 0...126 */
-    {1, S_O(peak_meter_dbfs), true, "peak meter dbfs", NULL },
+    {1, S_O(peak_meter_dbfs), true, "peak meter dbfs", off_on },
     {7, S_O(peak_meter_min), 60, "peak meter min", NULL }, /* 0...100 */
     {7, S_O(peak_meter_max), 0, "peak meter max", NULL }, /* 0...100 */
 #endif
