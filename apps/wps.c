@@ -119,7 +119,6 @@ void wps_show(void)
     struct mp3entry* id3 = mpeg_current_track();
     int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
-    char buffer[32];
 
     while ( 1 ) {
         int i;
@@ -141,13 +140,16 @@ void wps_show(void)
         }
 
 #ifdef HAVE_LCD_BITMAP
-        snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
-                 id3->elapsed / 60000,
-                 id3->elapsed % 60000 / 1000,
-                 id3->length / 60000,
-                 id3->length % 60000 / 1000 );
-        lcd_puts(0, 6, buffer);
-        lcd_update();
+        {
+            char buffer[32];
+            snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
+                     id3->elapsed / 60000,
+                     id3->elapsed % 60000 / 1000,
+                     id3->length / 60000,
+                     id3->length % 60000 / 1000 );
+            lcd_puts(0, 6, buffer);
+            lcd_update();
+        }
 #endif
 
         for ( i=0;i<5;i++ ) {
