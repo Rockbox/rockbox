@@ -16,9 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BMALLOC_H_
+#define _BMALLOC_H_
+
+#include <stdlib.h>
+
 int bmalloc_add_pool(void *start, size_t size);
 void bmalloc_status(void);
 
 void *bmalloc(size_t size);
 void bfree(void *ptr);
 
+#endif

@@ -16,6 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _DMALLOC_H_
+#define _DMALLOC_H_
+
+#include <stdlib.h>
 
 void *malloc(size_t);
 void *calloc (size_t nmemb, size_t size);
@@ -27,4 +31,6 @@ void dmalloc_initialize(void);
 
 #ifdef DEBUG
 void dmalloc_status(void);
+#endif
+
 #endif
