@@ -2144,6 +2144,116 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
  * NAME:	III_imdct_s()
  * DESCRIPTION:	perform IMDCT and windowing for short blocks
  */
+
+# if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+/* this should probably be stuffed in a .S file somewhere, it's almost
+   100% asm as it is.
+ */
+static
+void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
+{
+  mad_fixed_t y[36], *yptr;
+  mad_fixed_t const *wptr;
+
+  /* IMDCT */
+  yptr = &y[0];
+
+  /* if additional precision is needed in this block, it is possible to
+   * get more low bits out of the accext01 register _before_ doing the
+   * movclrs.
+   */
+  asm volatile (
+    "move.l #0x000000b0, %%macsr\n\t" /* frac. mode, saturation, rounding */
+    "suba.l %%a0, %%a0\n\t"         /* clear loop variable */
+    ".align 2\n\t.imdctloop:\n\t"   /* outer loop label */
+    "lea.l imdct_s, %%a1\n\t"       /* load pointer to imdct coefs in a1 */
+    "movem.l (%[X]), %%d0-%%d5\n\t" /* load input data in d0-d5 */
+    
+    "clr.l %%d7\n\t"                /* init loop variable */
+    "move.l (%%a1)+, %%a5\n\t"      /* load imdct coef in a5 */
+    ".align 2\n\t.macloop:\n\t"     /* inner loop label */
+    "mac.l %%d0, %%a5, (%%a1)+, %%a5, %%acc0\n\t" /* mac sequence */
+    "mac.l %%d1, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d2, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d3, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d4, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d5, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"     /* get result, left shifted once */
+    "asl.l #3, %%d6\n\t"            /* got one shift free, shift three more */
+    "mov.l %%d6, (%[yptr], %%d7.l*4)\n\t"         /* yptr[i] = result */
+    "neg.l %%d6\n\t"
+    "neg.l %%d7\n\t"
+    "mov.l %%d6, (5*4, %[yptr], %%d7.l*4)\n\t"    /* yptr[5 - 1] = -result */
+    "mac.l %%d0, %%a5, (%%a1)+, %%a5, %%acc0\n\t" /* mac sequence */
+    "mac.l %%d1, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d2, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d3, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d4, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "mac.l %%d5, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"    /* get result */
+    "asl.l #3, %%d6\n\t"
+    "mov.l %%d6, (11*4, %[yptr], %%d7.l*4)\n\t"   /* yptr[11 - i] = result*/
+    "neg.l %%d7\n\t"
+    "mov.l %%d6, (6*4, %[yptr], %%d7.l*4)\n\t"    /* yptr[i + 6] = result */
+    "addq.l #1, %%d7\n\t"           /* increment inner loop variable */
+    "cmp.l #3, %%d7\n\t"            /* we do three inner loop iterations */
+    "jne .macloop\n\t"
+
+    "adda.l #48, %[yptr]\n\t"       /* add pointer increment */
+    "adda.l #24, %[X]\n\t"
+    "addq.l #1, %%a0\n\t"           /* increment outer loop variable */
+    "cmpa.l #3, %%a0\n\t"           /* we do three outer loop iterations */
+    "jne .imdctloop\n\t"
+    : [X] "+a" (X), [yptr] "+a" (yptr) 
+    : : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a0", "a1", "a5");
+
+  /* windowing, overlapping and concatenation */
+
+  yptr = &y[0];
+  wptr = &window_s[0];
+
+  asm volatile (
+    "clr.l %%d7\n\t"
+    ".align 2\n\t.overlaploop:\n\t"
+    "clr.l (%[z], %%d7.l*4)\n\t" /* z[i + 0] = 0 */
+    "move.l (%[wptr]), %%d0\n\t"
+    "move.l (%[yptr]), %%d2\n\t"
+    "mac.l %%d0, %%d2, 24(%[wptr]), %%d1, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (6*4, %[z], %%d7.l*4)\n\t" /* z[i + 6] = result */
+    
+    "move.l 24(%[yptr]), %%d2\n\t"
+    "mac.l %%d1, %%d2, 48(%[yptr]), %%d2, %%acc0\n\t"
+    "mac.l %%d0, %%d2, 72(%[yptr]), %%d2, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (12*4, %[z], %%d7.l*4)\n\t" /* z[i + 12] = result */
+    
+    "mac.l %%d1, %%d2, (24*4, %[yptr]), %%d2, %%acc0\n\t"
+    "mac.l %%d0, %%d2, (30*4, %[yptr]), %%d2, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (18*4, %[z], %%d7.l*4)\n\t" /* z[i + 18] = result */
+    
+    "mac.l %%d1, %%d2, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (24*4, %[z], %%d7.l*4)\n\t"   /* z[i + 24] = result */
+    
+    "clr.l (30*4, %[z], %%d7.l*4)\n\t"       /* z[i + 30] = 0 */
+    "addq.l #1, %%d7\n\t"
+    "addq.l #4, %[yptr]\n\t"
+    "addq.l #4, %[wptr]\n\t"
+    "cmp.l #6, %%d7\n\t"                    /* six iterations */
+    "jne .overlaploop\n\t"
+    : [yptr] "+a" (yptr), [wptr] "+a" (wptr)
+    : [z] "a" (z) 
+    : "d7");
+}
+
+#else
+
 static
 void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
 {
@@ -2218,6 +2328,8 @@ void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
     ++wptr;
   }
 }
+
+#endif
 
 /*
  * NAME:	III_overlap()

@@ -24,6 +24,7 @@
 # endif
 
 # include "global.h"
+
 # include "fixed.h"
 # include "frame.h"
 # include "synth.h"
@@ -100,6 +101,7 @@ void mad_synth_mute(struct mad_synth *synth)
 # endif
 
 /* possible DCT speed optimization */
+
 # if defined(OPT_SPEED) && defined(MAD_F_MLX)
 #  define OPT_DCTO
 #  define MUL(x, y)  \
@@ -112,6 +114,7 @@ void mad_synth_mute(struct mad_synth *synth)
 #  undef OPT_DCTO
 #  define MUL(x, y)  mad_f_mul((x), (y))
 # endif
+
 /*
  * NAME:	dct32()
  * DESCRIPTION:	perform fast in[32]->out[32] DCT
@@ -547,7 +550,6 @@ mad_fixed_t const D[17][32] __attribute__ ((section(".idata"))) = {
 void synth_full(struct mad_synth *, struct mad_frame const *,
 		unsigned int, unsigned int);
 # else
-
 /*
  * NAME:	synth->full()
  * DESCRIPTION:	perform full frequency PCM synthesis
@@ -563,7 +565,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
   mad_fixed_t const (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
-  mad_fixed_t const (*Dptr)[32], *ptr;
+  mad_fixed_t const (*Dptr)[32];
   mad_fixed64hi_t hi = 0;
   mad_fixed64lo_t lo;
 
@@ -1010,4 +1012,3 @@ void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 
   synth->phase = (synth->phase + ns) % 16;
 }
-
