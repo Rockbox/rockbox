@@ -49,6 +49,7 @@
 #include "language.h"
 #include "screens.h"
 #include "keyboard.h"
+#include "bookmark.h"
 #include "onplay.h"
 #include "buffer.h"
 #include "plugin.h"
@@ -83,6 +84,9 @@ static struct
     { ".fnt", TREE_ATTR_FONT,Font     },
     { ".ch8", TREE_ATTR_CH8, Chip8    },
     { ".rvf", TREE_ATTR_RVF, Video    },
+    { ".bmark",TREE_ATTR_BMARK,Bookmark   },
+#else
+   {  ".bmark", TREE_ATTR_BMARK, -1       },
 #endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
@@ -118,6 +122,7 @@ static int boot_size = 0;
 static int boot_cluster;
 static bool boot_changed = false;
 
+static bool start_wps = false;
 static bool dirbrowse(char *root, int *dirfilter);
 
 void browse_root(void)
@@ -646,9 +651,7 @@ static void start_resume(bool ask_once)
             playlist_start(global_settings.resume_index,
                 global_settings.resume_offset);
 
-            status_set_playmode(STATUS_PLAY);
-            status_draw(true);
-            wps_show();
+            start_wps = true;
         }
         else
             return;
@@ -930,6 +933,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
+                bookmark_autobookmark();
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
                 status_draw(false);
@@ -988,6 +992,12 @@ static bool dirbrowse(char *root, int *dirfilter)
                     lcd_stop_scroll();
                     switch ( file->attr & TREE_ATTR_MASK ) {
                         case TREE_ATTR_M3U:
+                            if (bookmark_autoload(buf))
+                            {
+                                restore = true;
+                                break;
+                            }
+
                             if (playlist_create(currdir, file->name) != -1)
                             {
                                 if (global_settings.playlist_shuffle)
@@ -999,6 +1009,12 @@ static bool dirbrowse(char *root, int *dirfilter)
                             break;
 
                         case TREE_ATTR_MPA:
+                            if (bookmark_autoload(currdir))
+                            {
+                                restore = true;
+                                break;
+                            }
+
                             if (playlist_create(currdir, NULL) != -1)
                             {
                                 start_index =
@@ -1049,6 +1065,12 @@ static bool dirbrowse(char *root, int *dirfilter)
 #endif
                             sleep(HZ/2);
                             restore = true;
+                            break;
+
+                        case TREE_ATTR_BMARK:
+                            bookmark_load(buf, false);
+                            restore = true;
+                            reload_dir = true;
                             break;
 
                         case TREE_ATTR_TXT:
@@ -1122,15 +1144,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             settings_save();
                         }
 
-                        status_set_playmode(STATUS_PLAY);
-                        status_draw(false);
-                        lcd_stop_scroll();
-                        if ( wps_show() == SYS_USB_CONNECTED ) {
-                            reload_root = true;
-                        }
-#ifdef HAVE_LCD_BITMAP
-                        tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#endif
+                        start_wps = true;
                     }
                     else if (*dirfilter > NUM_FILTER_MODES)
                         exit_func = true;
@@ -1238,13 +1252,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 {
                     if (mpeg_status() & MPEG_STATUS_PLAY)
                     {
-                        lcd_stop_scroll();
-                        if (wps_show() == SYS_USB_CONNECTED)
-                            reload_root = true;
-#ifdef HAVE_LCD_BITMAP
-                        tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#endif
-                        restore = true;
+                        start_wps=true;
                     }
                     else
                     {
@@ -1293,6 +1301,18 @@ static bool dirbrowse(char *root, int *dirfilter)
         if ( button )
             ata_spin();
 
+        if (start_wps)
+	{
+            lcd_stop_scroll();
+            if (wps_show() == SYS_USB_CONNECTED)
+                reload_root = true;
+#ifdef HAVE_LCD_BITMAP
+            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#endif
+            restore = true;
+            start_wps=false;
+        }
+
         /* do we need to rescan dir? */
         if (reload_dir || reload_root ||
             lastfilter != *dirfilter ||
@@ -1313,6 +1333,7 @@ static bool dirbrowse(char *root, int *dirfilter)
             lastfilter = *dirfilter;
             lastsortcase = global_settings.sort_case;
             restore = true;
+            while (button_get(false)); /* clear button queue */
         }
 
         if (exit_func)
@@ -1506,4 +1527,52 @@ void tree_init(void)
 
     name_buffer = buffer_alloc(name_buffer_size);
     dircache = buffer_alloc(max_files_in_dir * sizeof(struct entry));
+}
+
+void bookmark_play(char *resume_file, int index, int offset, int seed)
+{
+    int len=strlen(resume_file);
+
+    if (!strcasecmp(&resume_file[len-4], ".m3u"))
+    {
+        char* slash;
+        // check that the file exists
+        int fd = open(resume_file, O_RDONLY);
+        if(fd<0)
+            return;
+        close(fd);
+
+        slash = strrchr(resume_file,'/');
+        if (slash)
+        {
+            char* cp;
+            *slash=0;
+
+            cp=resume_file;
+            if (!cp[0])
+                cp="/";
+
+            if (playlist_create(cp, slash+1) != -1)
+            {
+                if (global_settings.playlist_shuffle)
+                    playlist_shuffle(seed, -1);
+                playlist_start(index,offset);
+            }
+            *slash='/';
+        }
+    }
+    else
+    {
+        lastdir[0]='\0';
+        if (playlist_create(resume_file, NULL) != -1)
+        {
+            resume_directory(resume_file);
+            if (global_settings.playlist_shuffle)
+                playlist_shuffle(seed, -1);
+            playlist_start(index,offset);
+        }
+    }
+
+    status_set_playmode(STATUS_PLAY);
+    start_wps=true;
 }

@@ -45,6 +45,7 @@
 #include "peakmeter.h"
 #endif
 #include "lang.h"
+#include "bookmark.h"
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 
@@ -943,7 +944,7 @@ int wps_show(void)
             case BUTTON_RC_STOP:
 #endif
 #ifdef BUTTON_OFF
-            case BUTTON_OFF:
+            case BUTTON_OFF | BUTTON_REL:
 #else
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
@@ -985,6 +986,7 @@ int wps_show(void)
                 fade(0);
                 
             lcd_stop_scroll();
+            bookmark_autobookmark();
             mpeg_stop();
             status_set_playmode(STATUS_STOP);
 

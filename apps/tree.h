@@ -39,6 +39,7 @@ struct entry {
 #define TREE_ATTR_UCL  0x0A00 /* rockbox flash image */ 
 #define TREE_ATTR_CH8  0x0B00 /* chip-8 game */ 
 #define TREE_ATTR_RVF  0x0C00 /* rockbox video file */ 
+#define TREE_ATTR_BMARK 0x0D00 /* book mark file */
 #define TREE_ATTR_MASK 0xFFC0 /* which bits tree.c uses (above) */
 
 void tree_init(void);

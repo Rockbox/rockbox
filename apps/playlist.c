@@ -172,6 +172,10 @@ static void empty_playlist(bool resume)
     playlist.first_index = 0;
     playlist.amount = 0;
     playlist.last_insert_pos = -1;
+    playlist.seed = 0;
+    playlist.shuffle_modified = false;
+    playlist.deleted = false;
+    playlist.num_inserted_tracks = 0;
     playlist.shuffle_flush = false;
 
     if (!resume)
@@ -412,6 +416,7 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
     playlist.indices[insert_position] = flags | seek_pos;
 
     playlist.amount++;
+    playlist.num_inserted_tracks++;
 
     return insert_position;
 }
@@ -528,15 +533,23 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
 static int remove_track_from_playlist(int position, bool write)
 {
     int i;
+    bool inserted;
 
     if (playlist.amount <= 0)
         return -1;
+
+    inserted = playlist.indices[position] & PLAYLIST_INSERT_TYPE_MASK;
 
     /* shift indices now that track has been removed */
     for (i=position; i<playlist.amount; i++)
         playlist.indices[i] = playlist.indices[i+1];
 
     playlist.amount--;
+
+    if (inserted)
+        playlist.num_inserted_tracks--;
+    else
+        playlist.deleted = true;
 
     /* update stored indices if needed */
     if (position < playlist.index)
@@ -622,6 +635,10 @@ static int randomise_playlist(unsigned int seed, bool start_current, bool write)
     /* indices have been moved so last insert position is no longer valid */
     playlist.last_insert_pos = -1;
 
+    playlist.seed = seed;
+    if (playlist.num_inserted_tracks > 0 || playlist.deleted)
+        playlist.shuffle_modified = true;
+
     if (write)
     {
         /* Don't write to disk immediately.  Instead, save in settings and
@@ -652,6 +669,8 @@ static int sort_playlist(bool start_current, bool write)
     /* indices have been moved so last insert position is no longer valid */
     playlist.last_insert_pos = -1;
 
+    if (!playlist.num_inserted_tracks && !playlist.deleted)
+        playlist.shuffle_modified = false;
     if (write && playlist.control_fd >= 0)
     {
         /* Don't write to disk immediately.  Instead, save in settings and
@@ -1898,9 +1917,26 @@ int playlist_next(int steps)
     return index;
 }
 
+bool playlist_modified(void)
+{
+    if ((mpeg_status() & MPEG_STATUS_PLAY))
+    {
+        if (playlist.shuffle_modified ||
+            playlist.deleted ||
+            playlist.num_inserted_tracks > 0)
+            return true;
+    }
+    return false;
+}
+
+int playlist_get_seed(void)
+{
+    return playlist.seed;
+}
+
 /* Get resume info for current playing song.  If return value is -1 then
    settings shouldn't be saved. */
-int playlist_get_resume_info(short *resume_index)
+int playlist_get_resume_info(int *resume_index)
 {
     *resume_index = playlist.index;
 
@@ -1924,6 +1960,16 @@ int playlist_get_first_index(void)
     return playlist.first_index;
 }
 
+char *playlist_get_name(char *buf, int buf_size)
+{
+    snprintf(buf, buf_size, "%s", playlist.filename);
+
+    if (!buf[0])
+        return NULL;
+
+    return buf;
+}
+
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
 int playlist_amount(void)
 {
@@ -1937,14 +1983,14 @@ char *playlist_name(char *buf, int buf_size)
 
     snprintf(buf, buf_size, "%s", playlist.filename+playlist.dirlen);
 
-    if (0 == buf[0])
+    if (!buf[0])
         return NULL;
 
     /* Remove extension */
     sep = strrchr(buf, '.');
-    if (NULL != sep)
+    if (sep)
         *sep = 0;
-    
+
     return buf;
 }
 
@@ -2001,7 +2047,7 @@ int playlist_save(char *filename)
 
     /* use current working directory as base for pathname */
     if (format_track_path(tmp_buf, filename, sizeof(tmp_buf),
-            strlen(filename)+1, getcwd(NULL, -1)) < 0)
+                          strlen(filename)+1, getcwd(NULL, -1)) < 0)
         return -1;
 
     fd = open(tmp_buf, O_CREAT|O_WRONLY|O_TRUNC);
@@ -2043,15 +2089,14 @@ int playlist_save(char *filename)
 
             if (fprintf(fd, "%s\n", tmp_buf) < 0)
             {
-                splash(HZ*2, true,
-                    str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+                splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
                 result = -1;
                 break;
             }
 
             count++;
 
-            if ((count%PLAYLIST_DISPLAY_COUNT) == 0)
+            if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
                 display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));
 
             yield();

@@ -38,6 +38,12 @@
 #define RESUME_ASK_ONCE 2
 #define RESUME_ON  3
 
+#define BOOKMARK_NO  0
+#define BOOKMARK_YES 1
+#define BOOKMARK_ASK 2
+#define BOOKMARK_UNIQUE_ONLY 2
+#define BOOKMARK_RECENT_ONLY_YES 3
+#define BOOKMARK_RECENT_ONLY_ASK 4
 #define FF_REWIND_1000   0
 #define FF_REWIND_2000   1
 #define FF_REWIND_3000   2
@@ -109,8 +115,8 @@ struct user_settings
     /* resume settings */
 
     int resume;        /* resume option: 0=off, 1=ask, 2=on */
-    short resume_index;  /* index in playlist (-1 for no active resume) */
-    short resume_first_index;  /* index of first track in playlist */
+    int resume_index;  /* index in playlist (-1 for no active resume) */
+    int resume_first_index;  /* index of first track in playlist */
     int resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
                                         >0=shuffled) */
@@ -161,6 +167,11 @@ struct user_settings
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
+
+    /* auto bookmark settings */
+    int autoloadbookmark;   /* auto load option: 0=off, 1=ask, 2=on */
+    int autocreatebookmark; /* auto create option: 0=off, 1=ask, 2=on */
+    int usemrb;                 /* use MRB list: 0=No, 1=Yes*/
 #ifdef HAVE_LCD_CHARCELLS
     int jump_scroll;   /* Fast jump when scrolling */
     int jump_scroll_delay; /* Delay between jump scroll screens */
@@ -205,6 +216,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
 bool set_int(char* string, char* unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);
+int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 
 #ifdef HAVE_MAS3587F

@@ -30,6 +30,7 @@ enum icons_6x8 {
     Selected,   Cursor,    Wps,               Mod_Ajz, 
     Font,       Language,  Text,              Config,
     Plugin,     Flashfile, Chip8,             Video,
+    Bookmark,
     LastIcon
 };
 

@@ -80,7 +80,7 @@ struct playlist_viewer_info {
     int char_width;             /* Width (in pixels) of a character         */
 
     int num_tracks;             /* Number of tracks in playlist             */
-    short current_playing_track;/* Index of current playing track           */
+    int current_playing_track;  /* Index of current playing track           */
 
     int num_loaded;             /* Number of track entries loaded in viewer */
     int first_index;            /* Index of first loaded track              */
@@ -643,7 +643,7 @@ bool playlist_viewer(void)
 
     while (!exit)
     {
-        short track;
+        int track;
 
         /* Timeout so we can determine if play status has changed */
         button = button_get_w_tmo(HZ/2);

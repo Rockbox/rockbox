@@ -56,6 +56,7 @@
 #include "language.h"
 #include "wps-display.h"
 #include "powermgmt.h"
+#include "bookmark.h"
 #include "sprintf.h"
 #include "keyboard.h"
 #include "version.h"
@@ -143,7 +144,7 @@ Rest of config block, only saved to disk:
       caption backlight (bit 1)
       car adapter mode (bit 2)
       line_in (Player only)  (bit 3)
-0xAF  [available/unused]
+0xAF  <most-recent-bookmarks, auto-bookmark, autoload>
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
 0xB2  peak meter min either in -db or in percent
@@ -419,6 +420,9 @@ int settings_save( void )
          ((global_settings.caption_backlight & 1) << 1) |
          ((global_settings.car_adapter_mode  & 1) << 2) |
          ((global_settings.line_in & 1) << 3));
+    config_block[0xaf] = ((global_settings.usemrb << 5) |
+                          (global_settings.autocreatebookmark << 2) |
+                          (global_settings.autoloadbookmark));
     config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
         (global_settings.peak_meter_performance ? 0x80 : 0);
     config_block[0xb1] = global_settings.peak_meter_release |
@@ -771,6 +775,9 @@ void settings_load(void)
         if (config_block[0xa9] != 0xff)
             global_settings.jump_scroll_delay = config_block[0xa9];
 #endif
+        global_settings.usemrb = (config_block[0xaf] >> 5) & 3;
+        global_settings.autocreatebookmark = (config_block[0xaf] >> 2) & 7;
+        global_settings.autoloadbookmark = (config_block[0xaf]) & 3;
     }
 
     settings_apply();
@@ -1128,6 +1135,21 @@ bool settings_load_config(char* file)
             set_cfg_option(&global_settings.recursive_dir_insert, value,
                 options, 3);
         }
+        else if (!strcasecmp(name, "autoload bookmarks"))
+        {
+            static char* options[] = {"off", "on", "ask"};
+            set_cfg_option(&global_settings.autoloadbookmark, value, options, 3);
+        }
+        else if (!strcasecmp(name, "autocreate bookmarks"))
+        {
+            static char* options[] = {"off", "on", "ask","recent only - yes","recent only - ask"};
+            set_cfg_option(&global_settings.autocreatebookmark, value, options, 5);
+        }
+        else if (!strcasecmp(name, "use most-recent-bookmarks"))
+        {
+            static char* options[] = {"off", "on", "unique only"};
+            set_cfg_option(&global_settings.usemrb, value, options, 3);
+        }
     }
 
     close(fd);
@@ -1143,6 +1165,7 @@ bool settings_save_config(void)
     int fd, i, value;
     char filename[MAX_PATH];
     char* boolopt[] = {"off","on"};
+    char* triopt[] = {"off","on","ask"};
 
     /* find unused filename */
     for (i=0; ; i++) {
@@ -1431,11 +1454,27 @@ bool settings_save_config(void)
 
 #endif
 
+    fprintf(fd, "#\r\n# Bookmarking\r\n#\r\n");
+    {
+        fprintf(fd, "autoload bookmarks: %s\r\n",
+                triopt[global_settings.autoloadbookmark]);
+    }
+
+    {
+        static char* options[] = {"off", "on", "ask","recent only - on", "recent only - ask"};
+        fprintf(fd, "autocreate bookmarks: %s\r\n",
+                options[global_settings.autocreatebookmark]);
+    }
+
+    {
+        static char* options[] = {"off", "on", "unique only"};
+        fprintf(fd, "UseMRB: %s\r\n", options[global_settings.usemrb]);
+    }
+
     fprintf(fd, "#\r\n# Playlists\r\n#\r\n");
     {
-        static char* options[] = {"off", "on", "ask"};
         fprintf(fd, "recursive directory insert: %s\r\n",
-                options[global_settings.recursive_dir_insert]);
+                triopt[global_settings.recursive_dir_insert]);
     }
 
     close(fd);
@@ -1528,6 +1567,9 @@ void settings_reset(void) {
     global_settings.lang_file[0] = 0;
     global_settings.runtime = 0;
     global_settings.topruntime = 0;
+    global_settings.autocreatebookmark = BOOKMARK_NO;
+    global_settings.autoloadbookmark = BOOKMARK_NO;
+    global_settings.usemrb = BOOKMARK_NO;
     global_settings.fade_on_stop = true;
     global_settings.caption_backlight = false;
     global_settings.car_adapter_mode = false;

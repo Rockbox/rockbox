@@ -40,6 +40,7 @@
 #include "status.h"
 #include "fat.h"
 #include "sleeptimer.h"
+#include "bookmark.h"
 #include "wps.h"
 #include "buffer.h"
 #include "screens.h"
@@ -269,7 +270,10 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_items items[14];
+    struct menu_items items[15];
+
+    items[i].desc = str(LANG_BOOKMARK_MENU);
+    items[i++].function = bookmark_menu;
 
     items[i].desc = str(LANG_SOUND_SETTINGS);
     items[i++].function = sound_menu;

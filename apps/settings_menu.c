@@ -438,6 +438,40 @@ static bool resume(void)
                        names, 4, NULL );
 }
 
+static bool autocreatebookmark(void)
+{
+    char* names[] = { str(LANG_SET_BOOL_NO),
+                      str(LANG_SET_BOOL_YES),
+                      str(LANG_RESUME_SETTING_ASK),
+                      str(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES),
+                      str(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK) };
+
+    return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOCREATE),
+                       &global_settings.autocreatebookmark, INT,
+                       names, 5, NULL );
+}
+
+static bool autoloadbookmark(void)
+{
+    char* names[] = { str(LANG_SET_BOOL_NO),
+                      str(LANG_SET_BOOL_YES),
+                      str(LANG_RESUME_SETTING_ASK) };
+
+    return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOLOAD),
+                       &global_settings.autoloadbookmark, INT,
+                       names, 3, NULL );
+}
+
+static bool useMRB(void)
+{
+    char* names[] = { str(LANG_SET_BOOL_NO),
+                      str(LANG_SET_BOOL_YES),
+                      str(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY)};
+
+    return set_option( str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS),
+                       &global_settings.usemrb, INT,
+                       names, 3, NULL );
+}
 static bool backlight_on_when_charging(void)
 {
     bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
@@ -789,6 +823,23 @@ static bool playback_settings_menu(void)
     return result;
 }
 
+static bool bookmark_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    struct menu_items items[] = {
+        { str(LANG_BOOKMARK_SETTINGS_AUTOCREATE), autocreatebookmark},
+        { str(LANG_BOOKMARK_SETTINGS_AUTOLOAD), autoloadbookmark},
+        { str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
+    };
+
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
 static bool reset_settings(void)
 {
     bool done=false;
@@ -966,6 +1017,7 @@ bool settings_menu(void)
         { str(LANG_CUSTOM_FONT),     font_browse            },
 #endif
         { str(LANG_SYSTEM),          system_settings_menu   },
+        { str(LANG_BOOKMARK_SETTINGS),bookmark_settings_menu  },
         { str(LANG_SAVE_SETTINGS),   settings_save_config   },
     };
     
