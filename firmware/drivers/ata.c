@@ -411,6 +411,14 @@ void ata_spindown(int seconds)
     sleep_timeout = seconds * HZ;
 }
 
+void ata_poweroff(bool enable)
+{
+    if (enable)
+        poweroff_timeout = 2*HZ;
+    else
+        poweroff_timeout = 0;
+}
+
 bool ata_disk_is_active(void)
 {
     return !sleeping;
@@ -487,8 +495,13 @@ static void ata_thread(void)
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
             case SYS_USB_CONNECTED:
-                if (poweroff)
+                if (poweroff) {
+                    mutex_lock(&ata_mtx);
+                    led(true);
                     ata_power_on();
+                    led(false);
+                    mutex_unlock(&ata_mtx);
+                }
 
                 /* Tell the USB thread that we are safe */
                 DEBUGF("ata_thread got SYS_USB_CONNECTED\n");

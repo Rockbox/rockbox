@@ -486,6 +486,13 @@ static bool spindown(void)
                    ata_spindown, 1, 3, 254 );
 }
 
+static bool poweroff(void)
+{
+    bool rc = set_bool(str(LANG_POWEROFF), &global_settings.disk_poweroff);
+    ata_poweroff(global_settings.disk_poweroff);
+    return rc;
+}
+
 static bool ff_rewind_min_step(void) 
 { 
     char* names[] = { "1s", "2s", "3s", "4s",
@@ -642,6 +649,7 @@ static bool system_settings_menu(void)
 
     struct menu_items items[] = {
         { str(LANG_SPINDOWN),    spindown        },
+        { str(LANG_POWEROFF),    poweroff        },
 #ifdef HAVE_CHARGE_CTRL
         { str(LANG_DISCHARGE),   deep_discharge  },
 #endif

@@ -104,7 +104,7 @@ offset  abs
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
-
+0x25    0x39    <disk_spindown flag>
 
         <all unused space filled with 0xff>
 
@@ -341,6 +341,7 @@ int settings_save( void )
          ((global_settings.rec_frequency & 7) << 5));
     config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
     config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
+    config_block[0x25] = (unsigned char)global_settings.disk_poweroff & 1;
 
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
@@ -593,6 +594,9 @@ void settings_load(void)
         if (config_block[0x24] != 0xFF)
             global_settings.rec_right_gain = config_block[0x24] & 0x0f;
 
+        if (config_block[0x25] != 0xFF)
+            global_settings.disk_poweroff = config_block[0x25] & 1;
+
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -783,6 +787,7 @@ void settings_reset(void) {
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
     global_settings.disk_spindown = 5;
+    global_settings.disk_poweroff = false;
     global_settings.browse_current = false;
     global_settings.play_selected = true;
     global_settings.peak_meter_release = 8;

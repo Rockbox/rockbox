@@ -1152,3 +1152,7 @@ desc: disk size info
 eng: "Free: %d.%dGB"
 new:
 
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new:
