@@ -264,6 +264,7 @@ static const struct plugin_api rockbox_api = {
     cpu_boost,
 #endif
 #endif
+    PREFIX(mkdir),
 };
 
 int plugin_load(const char* plugin, void* parameter)
