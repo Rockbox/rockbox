@@ -331,7 +331,7 @@ void game_loop(void)
         int count = 0;
         while(count * 300 < level_speeds[level])
         {
-            switch(button_get(false))
+            switch(button_get_w_tmo(HZ/10))
             {
             case BUTTON_OFF:
                 return;
@@ -358,7 +358,6 @@ void game_loop(void)
             }
             
             count++;
-            sleep(HZ/10);
         }
         
         if(gameover())
