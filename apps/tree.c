@@ -39,6 +39,7 @@
 #include "settings.h"
 #include "status.h"
 #include "debug.h"
+#include "ata.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -718,6 +719,9 @@ bool dirbrowse(char *root)
 #endif
         }
 
+        if ( button )
+            ata_spin();
+        
         if ( restore ) {
             /* restore display */
             /* We need to adjust if the number of lines on screen have

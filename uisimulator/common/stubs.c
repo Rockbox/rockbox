@@ -89,6 +89,15 @@ void ata_flush(void)
 {
 }
 
+void ata_spin(void)
+{
+}
+
+void ata_spindown(int s)
+{
+    (void)s;
+}
+
 Menu simulate_usb(void)
 {
     usb_display_info();

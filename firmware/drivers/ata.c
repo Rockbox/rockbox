@@ -84,7 +84,6 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 static bool sleeping = false;
-static int sleep_timer = 0;
 static int sleep_timeout = 5*HZ;
 static char ata_stack[DEFAULT_STACK_SIZE];
 static char ata_thread_name[] = "ata";
@@ -93,6 +92,9 @@ static bool initialized = false;
 static bool delayed_write = false;
 static unsigned char delayed_sector[SECTOR_SIZE];
 static int delayed_sector_num;
+
+static long last_user_activity = -1;
+static long last_disk_activity = -1;
 
 #ifdef USE_POWEROFF
 static int ata_power_on(void);
@@ -149,6 +151,7 @@ int ata_read_sectors(unsigned long start,
     int i;
     int ret = 0;
 
+    last_disk_activity = current_tick;
 #ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
@@ -163,7 +166,6 @@ int ata_read_sectors(unsigned long start,
     }
 #endif
     mutex_lock(&ata_mtx);
-    sleep_timer = sleep_timeout;
 
     if (!wait_for_rdy())
     {
@@ -223,6 +225,8 @@ int ata_read_sectors(unsigned long start,
     if ( delayed_write )
         ata_flush();
 
+    last_disk_activity = current_tick;
+
     return ret;
 }
 
@@ -231,6 +235,8 @@ int ata_write_sectors(unsigned long start,
                       void* buf)
 {
     int i;
+
+    last_disk_activity = current_tick;
 
 #ifndef USE_STANDBY
 #ifdef USE_POWEROFF
@@ -244,7 +250,6 @@ int ata_write_sectors(unsigned long start,
 #endif
 #endif
     mutex_lock(&ata_mtx);
-    sleep_timer = sleep_timeout;
     
     if (!wait_for_rdy())
     {
@@ -290,6 +295,8 @@ int ata_write_sectors(unsigned long start,
 
     if ( delayed_write )
         ata_flush();
+
+    last_disk_activity = current_tick;
 
     return i;
 }
@@ -379,7 +386,6 @@ static int ata_perform_sleep(void)
         ret = -1;
 #endif
     sleeping = true;
-    sleep_timer = 0;
     mutex_unlock(&ata_mtx);
     return ret;
 }
@@ -390,11 +396,25 @@ int ata_sleep(void)
     return 0;
 }
 
+void ata_spin(void)
+{
+    last_user_activity = current_tick;
+}
+
 static void ata_thread(void)
 {
     struct event ev;
     
     while (1) {
+        while ( queue_empty( &ata_queue ) ) {
+            if ( sleep_timeout &&
+                 TIME_AFTER( current_tick, 
+                             last_user_activity + sleep_timeout ) &&
+                 TIME_AFTER( current_tick, 
+                             last_disk_activity + sleep_timeout ) )
+                ata_perform_sleep();
+            sleep(HZ/4);
+        }
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
             case SYS_USB_CONNECTED:
@@ -407,18 +427,9 @@ static void ata_thread(void)
                 break;
 
             case Q_SLEEP:
-                ata_perform_sleep();
+                last_disk_activity = current_tick - sleep_timeout;
                 break;
         }
-    }
-}
-
-static void ata_tick(void)
-{
-    if (sleep_timer) {
-        sleep_timer--;
-        if (!sleep_timer)
-            queue_post(&ata_queue, 0, NULL);
     }
 }
 
@@ -597,7 +608,6 @@ int ata_init(void)
         queue_init(&ata_queue);
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name);
-        tick_add_task(ata_tick);
         initialized = true;
     }
 

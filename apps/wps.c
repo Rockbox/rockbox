@@ -1185,6 +1185,9 @@ int wps_show(void)
                 break;
         }
 
+        if ( button )
+            ata_spin();
+
         if(restore) {
             restore = false;
             draw_screen(id3);

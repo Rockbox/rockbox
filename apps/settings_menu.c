@@ -35,6 +35,7 @@
 #include "fat.h"                /* For dotfile settings */
 #include "powermgmt.h"
 #include "rtc.h"
+#include "ata.h"
 
 static Menu show_hidden_files(void)
 {
@@ -167,7 +168,14 @@ static Menu timedate_set(void)
 static Menu ff_rewind(void)
 {
     set_int("[FF/Rewind Step Size]", "s", &global_settings.ff_rewind,
-            NULL, 1, 1, 255 );
+            NULL, 1, 1, 254 );
+    return MENU_OK;
+}
+
+static Menu spindown(void)
+{
+    set_int("[Disk spindown]", "s", &global_settings.disk_spindown,
+            ata_spindown, 1, 1, 254 );
     return MENU_OK;
 }
 
@@ -193,6 +201,7 @@ Menu settings_menu(void)
         { "Show hidden files", show_hidden_files },
         { "FF/Rewind",       ff_rewind       },
         { "Resume",          resume          },
+        { "Disk spindown",   spindown        },
     };
     bool old_shuffle = global_settings.playlist_shuffle;
     

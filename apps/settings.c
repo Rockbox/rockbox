@@ -268,7 +268,8 @@ int settings_save( void )
     
     config_block[0x10] = (unsigned char)global_settings.ff_rewind;
     config_block[0x11] = (unsigned char)global_settings.avc;
-    
+    config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
+
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
@@ -369,6 +370,9 @@ void settings_load(void)
         if (config_block[0x16] != 0xFF)
             memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
 
+        if (config_block[0x1a] != 0xFF)
+            global_settings.disk_spindown = config_block[0x1a];
+
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
         if (config_block[0x24] != 0xFF)
@@ -380,6 +384,7 @@ void settings_load(void)
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_time(global_settings.backlight);
+    ata_spindown(global_settings.disk_spindown);
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
 #endif
@@ -416,6 +421,7 @@ void settings_reset(void) {
     global_settings.ff_rewind    = DEFAULT_FF_REWIND_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
+    global_settings.disk_spindown = 5;
 }
 
 

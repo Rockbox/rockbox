@@ -63,6 +63,8 @@ struct user_settings
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
+    int ff_rewind;     /* FF/Rewind step size (in seconds) */
+    int disk_spindown; /* time until disk spindown, in seconds (0=off) */
 
     /* while playing screen settings  */
     int wps_display;   /* 0=id3, 1=file, 2=parse */
@@ -77,8 +79,6 @@ struct user_settings
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
 
-    /* FF/Rewind step size (in seconds) */
-    int ff_rewind;
 };
 
 /* prototypes */

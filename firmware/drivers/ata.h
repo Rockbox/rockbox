@@ -43,5 +43,6 @@ extern int ata_read_sectors(unsigned long start, int count, void* buf);
 extern int ata_write_sectors(unsigned long start, int count, void* buf);
 extern void ata_delayed_write(unsigned long sector, void* buf);
 extern void ata_flush(void);
+extern void ata_spin(void);
 
 #endif
