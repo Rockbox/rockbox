@@ -141,6 +141,7 @@ static int save_config_buffer( void )
     /* don't save if no changes were made */
     if ( chksum == last_checksum )
         return 0;
+    last_checksum = chksum;
 
 #ifdef HAVE_RTC    
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
