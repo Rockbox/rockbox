@@ -9,10 +9,9 @@ A. The purpose of this project is to write an Open Source replacement
    firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
 Q. I want to write code for my Archos, how do I proceed?
-A. Well, you have two options.  If you are a member of SourceForge then
-   you can request to be added to the developers list.  If you would like to 
-   remain anonymous, then please feel free to submit patches for consideration
-   to the project.
+A. Start by reading up on the information about the jukeboxes on our web page.
+   Then go into CVS and look at the code we've written. Then take what you
+   need and start writing.
 
 Q. Okay, so how do I submist a patch?
 A. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
@@ -43,13 +42,14 @@ A. All firmware mods that are presented are still highly experimental.
    Try them at your own risk. We offer no garuntee that this software, or the
    hardware modifications we show, will not damage your player or void your 
    warentee.
+   That said, we have not been able to damage any of our units by modifying
+   only the firmware. You can accidentally password protect your harddisk,
+   but there are ways around that.
 
 Q. I want to see what the inside of my player looks like, but I would really
    like to avoid voiding my warentee.  Is there anything you can suggest?
-A. Well Björn Stenberg was kind enough to void his warentee so you don't have 
-   to.  Take a look at his dissection of the player at: 
-   http://bjorn.haxx.se/rockbox/mods/disassemble.html   
-   http://bjorn.haxx.se/rockbox/mods/disassemble2.html
+A. We have a collection of photos of both the player and recorder. Look at
+   http://bjorn.haxx.se/rockbox/internals/
 
 Q. What exactly are you trying to achieve with this line of development?
    (A.K.A. whats your purpose for being here?)
@@ -79,3 +79,13 @@ A. Well, some of the ideas that have been presented/discussed for the future
          technically feasible. (But hey we can dream)  And something not
          being on the list does not mean it isn't a neat idea.  Bring it to 
          the list.
+
+Q. I tried one of your firmware files and now I can't access my harddisk!
+   When I turn on the jukebox, it says:
+
+   Part. Error
+   Pls Chck HD
+
+A. Your harddisk has been password protected. We're not 100% sure why it
+   happens, but you can unlock it yourself. Look at:
+   http://rockbox.sourceforge.net/rockbox/lock.html
