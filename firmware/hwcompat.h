@@ -23,7 +23,7 @@
 #include "config.h"
 
 /* Bit mask values for HW compatibility */
-#define ATA_ADDRESS_300 0x0100
+#define ATA_ADDRESS_200 0x0100
 #define USB_ACTIVE_HIGH 0x0100
 #define PR_ACTIVE_HIGH  0x0100
 
