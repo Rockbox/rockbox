@@ -105,6 +105,12 @@ Saving Config Data
   realize, as if you change a config setting and then immediately shuts your
   unit down, the new config is not saved.
 
+  DEVELOPERS:
+  The config checksum includes a header with a version number. This version
+  number must be increased when the config structure becomes incompatible.
+  This makes the checksum check fail, and the settings are reset to default
+  values.
+
 Resume Explained
 
   ...
