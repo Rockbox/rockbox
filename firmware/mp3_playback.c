@@ -674,6 +674,8 @@ void mpeg_sound_set(int setting, int value)
 #ifdef HAVE_MAS3587F
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
+#else
+            current_balance = value;
 #endif
             break;
 
