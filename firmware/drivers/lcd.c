@@ -100,6 +100,23 @@
 
 /*** generic code ***/
 
+struct scrollinfo {
+    char text[128];
+    int textlen;
+    char offset;
+    char xpos;
+    char startx;
+    char starty;
+    char space;
+};
+
+static void scroll_thread(void);
+static char scroll_stack[0x100];
+static char scroll_speed = 10; /* updates per second */
+
+static struct scrollinfo scroll; /* only one scroll line at the moment */
+static bool run_scroll = false;
+
 #ifndef SIMULATOR
 /*
  * About /CS,DS,SC,SD
@@ -745,24 +762,6 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
 #else
 /* no LCD defined, no code to use */
 #endif
-
-
-struct scrollinfo {
-    char text[128];
-    int textlen;
-    char offset;
-    char xpos;
-    char startx;
-    char starty;
-    char space;
-};
-
-static void scroll_thread(void);
-static char scroll_stack[0x100];
-static char scroll_speed = 10; /* updates per second */
-
-static struct scrollinfo scroll; /* only one scroll line at the moment */
-static bool run_scroll = false;
 
 void lcd_puts_scroll(int x, int y, char* string )
 {
