@@ -80,12 +80,12 @@
 #ifdef PLATFORM_ID
 
 #if CONFIG_KEYPAD == ONDIO_PAD /* limited keypad */
-#define KEY1 BUTTON_UP
-#define KEY2 BUTTON_RIGHT
-#define KEY3 BUTTON_DOWN
-#define KEYNAME1 "[UP]"
-#define KEYNAME2 "[RIGHT]"
-#define KEYNAME3 "[DOWN]"
+#define KEY1 BUTTON_LEFT
+#define KEY2 BUTTON_UP
+#define KEY3 BUTTON_RIGHT
+#define KEYNAME1 "[Left]"
+#define KEYNAME2 "[Up]"
+#define KEYNAME3 "[Right]"
 #else /* recorder keypad */
 #define KEY1 BUTTON_F1
 #define KEY2 BUTTON_F2
@@ -310,9 +310,13 @@ bool CheckPlatform(int platform_id, UINT16 version)
         return (platform_id == ID_FM || platform_id == ID_REC_V2);
     }
     else if (version == 132)
-    {   /* Ondio, and seen on a V2 recorder */
+    {   /* newer Ondio, and seen on a V2 recorder */
         return (platform_id == ID_ONDIO_SP || platform_id == ID_ONDIO_FM
             || platform_id == ID_REC_V2);
+    }
+    else if (version == 104)
+    {   /* classic Ondio128 */
+        return (platform_id == ID_ONDIO_FM);
     }
     else if (version >= 115 && version <= 129)
     {   /* the range of Recorders seen so far */
