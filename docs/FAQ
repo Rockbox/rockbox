@@ -364,7 +364,7 @@ A52: Well you can follow the full line of emails at
      However, the brief rundown is that it was recommended first by 
      Tome Cvitan, and put to a vote (which it lost). 
 
-     Funny thing about democracys.  This isn't one ;)  Our beloved project
+     Funny thing about democracies.  This isn't one ;)  Our beloved project
      leader vetoed the winning name and chose Rockbox instead.
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
      
@@ -406,9 +406,9 @@ A54: Because it's useless.  Dynamic memory is only ever useful if you have
 Q55: Why is there a 10,000 song limit on playlists?
 A55: This is another hardcoded limit.  We feel that as bigger disks arrive 
      that this limit will increase.  Because of the way that playlists are
-     stored, it tends to be a bit more maleable then the directory file limit.
-     For further detail, look at questions 47 and 48 and replace any instances
-     of '200' with '10,000'.
+     stored, it tends to be a bit more malleable than the directory file limit.
+     For further detail, look at questions 53 and 54 and replace any instances
+     of '400' with '10,000'.
 
 Q56: You don't understand! I _really_ need to have more then 400 files
      in a directory!
