@@ -25,13 +25,13 @@ void led(bool on)
 {
 #ifdef ASM_IMPLEMENTATION
     if ( on )
-	asm("or.b %0, @(r0,gbr)" : : "I"(0x40), "z"(PBDR_ADDR+1));
+        asm("or.b"  "\t" "%0,@(r0,gbr)" : : "I"(0x40), "z"(PBDR_ADDR+1));
     else
-	asm("and.b %0, @(r0,gbr)" : : "I"(~0x40), "z"(PBDR_ADDR+1));
+        asm("and.b" "\t" "%0,@(r0,gbr)" : : "I"(~0x40), "z"(PBDR_ADDR+1));
 #else
     if ( on )
-	PBDR |= 0x40;
+        PBDR |= 0x40;
     else
-	PBDR &= ~0x40;
+        PBDR &= ~0x40;
 #endif
 }
