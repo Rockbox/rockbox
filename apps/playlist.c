@@ -1059,12 +1059,9 @@ static void display_playlist_count(int count, char *fmt)
  */
 static void display_buffer_full(void)
 {
-    lcd_clear_display();
-    lcd_puts(0,0,str(LANG_PLAYINDICES_PLAYLIST));
-    lcd_puts(0,1,str(LANG_PLAYINDICES_BUFFER));
-    lcd_update();
-    sleep(HZ*2);
-    lcd_clear_display();
+    splash(HZ*2, true, "%s %s",
+           str(LANG_PLAYINDICES_PLAYLIST),
+           str(LANG_PLAYINDICES_BUFFER));
 }
 
 /*
