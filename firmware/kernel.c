@@ -258,6 +258,12 @@ void TIMER0(void)
 {
     int i;
 
+    /* Keep alive (?) */
+    if (current_tick % 2 == 0)
+        P8 |= 1;
+    else
+        P8 &= ~1;
+    
     /* Run through the list of tick tasks */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
