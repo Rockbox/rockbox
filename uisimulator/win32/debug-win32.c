@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include <windows.h>
+#include <stdio.h>
 
 char debugmembuf[100];
 char debugbuf[200];
@@ -25,7 +26,25 @@ char debugbuf[200];
 
 void debug( const char *message )
 {
-    OutputDebugString (message);
+    static int debugger = -1;
+
+    if (debugger == -1)
+    {
+        HINSTANCE hInst = LoadLibrary("kernel32.dll");
+        debugger = 0;
+
+        if (hInst != NULL)
+        {
+            FARPROC pIsDebuggerPresent = GetProcAddress(hInst, "IsDebuggerPresent");
+            if (pIsDebuggerPresent != NULL)
+                debugger = pIsDebuggerPresent();
+        }
+    }
+
+    if (debugger)
+        OutputDebugString (message);
+    else
+        printf("%s", message);
 }
 
 void debugf(char *fmt, ...)
