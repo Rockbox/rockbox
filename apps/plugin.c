@@ -19,6 +19,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <atoi.h>
+#include <timefuncs.h>
 #include "button.h"
 #include "lcd.h"
 #include "dir.h"
@@ -138,7 +140,9 @@ static struct plugin_api rockbox_api = {
     splash,
     qsort,
     kbd_input,
-    mpeg_current_track, 
+    mpeg_current_track,
+    atoi,
+    get_time
 };
 
 int plugin_load(char* plugin, void* parameter)

@@ -168,6 +168,8 @@ struct plugin_api {
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
     struct mp3entry* (*mpeg_current_track)(void);
+    int (*atoi)(const char *str);
+    struct tm* (*get_time)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
