@@ -106,6 +106,9 @@ static int curfont = FONT_SYSFIXED;
 static int xoffset; /* needed for flip */
 #endif
 
+int lcd_width = 112;
+int lcd_height = 64;
+
 unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 
 /* All zeros and ones bitmaps for area filling */

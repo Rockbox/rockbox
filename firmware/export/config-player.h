@@ -1,9 +1,14 @@
 /* define this if you have a charcell LCD display */
 #define HAVE_LCD_CHARCELLS 1
 
+/* LCD dimensions (for the simulator) */
+#define LCD_WIDTH       (4*11*6)    /* Display width in pixels */
+#define LCD_HEIGHT      (4*16+2*24) /* 4*char + 2*icons */
+
 /* define this if you have the Player's keyboard */
 #define HAVE_PLAYER_KEYPAD 1
 
+#ifndef SIMULATOR
 /* Define this if you have a MAS3507D */
 #define HAVE_MAS3507D
 
@@ -44,3 +49,4 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+#endif /* SIMULATOR */

@@ -4,8 +4,14 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* LCD dimensions */
+#define LCD_WIDTH  112
+#define LCD_HEIGHT 64
+
 /* define this if you have an Ondio style 6-key keyboard */
 #define HAVE_ONDIO_KEYPAD
+
+#ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F
@@ -64,3 +70,4 @@
 /* Define this for MMC support instead of ATA harddisk */
 #define HAVE_MMC
 
+#endif /* SIMULATOR */

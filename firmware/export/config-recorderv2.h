@@ -4,11 +4,17 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* LCD dimensions */
+#define LCD_WIDTH  112
+#define LCD_HEIGHT 64
+
 /* define this if you have a Recorder style 10-key keyboard */
 #define HAVE_RECORDER_KEYPAD 1
 
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
+
+#ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F
@@ -64,3 +70,4 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+#endif /* SIMULATOR */

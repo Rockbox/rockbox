@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"

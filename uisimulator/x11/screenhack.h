@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "config.h"
+#include "config-x11.h"
 
 #ifdef __hpux
  /* Which of the ten billion standards does values.h belong to?

@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #ifdef HAVE_LCD_CHARCELLS
 
 #include "sim_icons.h"

@@ -34,6 +34,8 @@
 #include "config-ondiosp.h"
 #elif defined(ARCHOS_ONDIOFM)
 #include "config-ondiofm.h"
+#elif defined(IRIVER_H100)
+#include "config-h100.h"
 #else
 /* no known platform */
 #endif

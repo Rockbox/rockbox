@@ -23,13 +23,11 @@ PLAYDIR = $(APPDIR)/player
 PLUGINDIR = $(APPDIR)/plugins
 SIMCOMMON = ../common
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-     MACHINEDIR = $(RECDIR)
-     # not very nice to set config stuff like this, but...
-     RTC += -DHAVE_RTC
-     RADIO += -DHAVE_FMRADIO
-else
+ISPLAYER := $(findstring PLAYER, $(TARGET))
+ifeq ($(ISPLAYER), PLAYER)
      MACHINEDIR = $(PLAYDIR)
+else
+     MACHINEDIR = $(RECDIR)
 endif
 
 PREVAPPDIR= ..
@@ -60,9 +58,8 @@ LANGUAGE = english
 
 TARGET = $(OBJDIR)/rockboxui
 
-DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
-$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) \
-$(RTC) $(RADIO)
+DEFINES := -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
+$(TARGET) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) 
 
 # Use this for simulator-only files
 INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(OBJDIR) -I$(PLUGINDIR)/lib
@@ -82,6 +79,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
+EXEFILE = $(OBJDIR)/rockboxui
 ifeq ($(UNAME),Linux)
   LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl -ldl
   INCLUDES += -I/usr/X11R6/include
@@ -93,7 +91,7 @@ ifeq ($(UNAME),CYGWIN)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DHAVE_OSS -D_SSIZE_T_
-  TARGET = $(OBJDIR)/rockboxui.exe
+  EXEFILE = $(OBJDIR)/rockboxui.exe
 else
 ifeq ($(UNAME),FreeBSD)
   LIBS = -pthread
@@ -117,10 +115,10 @@ else
 	SOUNDSRC = 
 endif
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-	LCDSRSC = lcd-recorder.c sysfont.c font.c
-else
+ifeq ($(ISPLAYER), PLAYER)
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
+else
+	LCDSRSC = lcd-recorder.c sysfont.c font.c
 endif
 COMMONSRCS = io.c stubs.c lcd-common.c sim_icons.c fmradio.c
 
@@ -134,7 +132,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c \
 	settings_menu.c sound_menu.c playlist_menu.c
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+ifneq ($(ISPLAYER), PLAYER)
    APPS += peakmeter.c bmp.c widgets.c radio.c
 endif
 
@@ -147,7 +145,7 @@ OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
 PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
 
-all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
+all: $(TOOLSDIR)/convbdf $(EXEFILE) $(ROCKS)
 
 $(ROCKS): $(OBJDIR)/libplugin.a
 
@@ -155,7 +153,7 @@ $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
 clean:
-	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/lang.[cho] \
+	$(RM) $(OBJS) *~ core $(EXEFILE) $(CLIENTS) $(OBJDIR)/lang.[cho] \
 	$(OBJDIR)/build.lang $(OBJDIR)/*.o $(OBJDIR)/sysfont.c \
 	$(ROCKS) $(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
@@ -173,50 +171,62 @@ $(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.r
 $(OBJDIR)/thread.o: ./thread.c
 $(OBJDIR)/plugin.o: $(APPDIR)/plugin.c
 $(OBJDIR)/build.lang: $(APPDIR)/lang/$(LANGUAGE).lang
-	perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
+	@echo "UPLANG"
+	@perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
-	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
-	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
+	@echo GENLANG
+	@perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	@echo "CC lang.c"
+	@$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 $(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
-	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
-	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
+	@echo CC $<
+	@$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	@$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 ################## Plugins ##################
 $(OBJDIR)/libplugin.a:  $(PLUGINLIBOBJS)
-	$(AR) ruv $@ $+
+	@echo AR $<
+	@$(AR) ru $@ $+
 
 $(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
-	$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
+	@echo CC $<
+	@$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
 
 $(OBJDIR)/%.rock: $(APPDIR)/plugins/%.c $(APPDIR)/plugin.h
-	$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
+	@chmod -x $@
 
 ################## Patterns for building objects ##################
 $(OBJDIR)/%.o: ../x11/%.c
-	echo x11
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(SIMCOMMON)/%.c
-	echo simcommon
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(MACHINEDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(DRIVERS)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(FIRMWAREDIR)/%.c
-	echo firmware $<
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(COMMON)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(APPDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 
 ################## Auto-dependencies ##################
@@ -239,11 +249,13 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ifeq ($(UNAME),CYGWIN)
-$(TARGET): $(OBJS) $(OBJDIR)/libplugin.a
-	$(CC) -g -o $(TARGET) $(OBJS) $(LIBDIRS) $(LDFLAGS) $(LIBS)
+$(EXEFILE): $(OBJS) $(OBJDIR)/libplugin.a
+	@echo LD $@
+	@$(CC) -g -o $(EXEFILE) $(OBJS) $(LIBDIRS) $(LDFLAGS) $(LIBS)
 else
-$(TARGET): $(OBJS)  $(OBJDIR)/libplugin.a
-	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
+$(EXEFILE): $(OBJS) $(OBJDIR)/libplugin.a
+	@echo LD $@
+	@$(CC) -g -o $(EXEFILE) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 endif
 
 tags:

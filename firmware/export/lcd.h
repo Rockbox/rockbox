@@ -105,11 +105,6 @@ void lcd_remove_cursor(void);
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 #if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
-#define LCD_WIDTH       (4*11*6)  /* Display width in pixels */
-#define LCD_HEIGHT      (4*16+2*24) /* 4*char + 2*icons */
-#else
-#define LCD_WIDTH       112   /* Display width in pixels */
-#define LCD_HEIGHT      64    /* Display height in pixels */
 #endif
 
 #define DRAW_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] |= (1<<((y)&7))

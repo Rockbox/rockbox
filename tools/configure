@@ -75,15 +75,15 @@ VERSION=\$(shell date +%y%m%d-%H%M)
 all: sim
 
 sim:
-	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE)
+	\$(MAKE) -C \$(SIMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE)
 
 clean:
-	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
+	\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(THISDIR) clean
 	rm -rf rockbox.zip
 
 tags:
 	@rm -f TAGS
-	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) tags
+	make -C \$(SIMDIR) OBJDIR=\$(THISDIR) tags
 
 zip:
 	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" sim\$(TARGET)
@@ -215,6 +215,7 @@ if [ -z "$archos" ]; then
   echo "6 - Neo 35"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
+  echo "9 - Iriver H100"
 
   getit=`input`;
 
@@ -223,57 +224,46 @@ if [ -z "$archos" ]; then
    1)
     archos="player"
     target="-DARCHOS_PLAYER"
-    display="-DHAVE_LCD_CHARCELLS"
-    keypad="-DHAVE_PLAYER_KEYPAD"
     ;;
 
    3)
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
-    display="-DHAVE_LCD_BITMAP"
-    keypad="-DHAVE_RECORDER_KEYPAD"
     ;;
 
    4)
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
-    display="-DHAVE_LCD_BITMAP"
-    keypad="-DHAVE_RECORDER_KEYPAD"
     ;;
 
    5)
     archos="neomstation"
     target="-DNEO_MSTATION"
-    display="-DHAVE_NEOLCD_CHARCELLS"
-    keypad="-DHAVE_NEO_KEYPAD"
     ;;
 
    6)
     archos="neo35"
     target="-DNEO_35"
-    display="-DHAVE_NEOLCD_CHARCELLS"
-    keypad="-DHAVE_NEO_KEYPAD"
     ;;
 
    7)
     archos="ondiosp"
     target="-DARCHOS_ONDIOSP"
-    display="-DHAVE_LCD_BITMAP"
-    keypad="-DHAVE_ONDIO_KEYPAD"
     ;;
 
    8)
     archos="ondiofm"
     target="-DARCHOS_ONDIOFM"
-    display="-DHAVE_LCD_BITMAP"
-    keypad="-DHAVE_ONDIO_KEYPAD"
+    ;;
+
+   9)
+    archos="h100"
+    target="-DIRIVER_H100"
     ;;
 
    *)
     archos="recorder"
     target="-DARCHOS_RECORDER"
-    display="-DHAVE_LCD_BITMAP"
-    keypad="-DHAVE_RECORDER_KEYPAD"
     ;;
 
   esac

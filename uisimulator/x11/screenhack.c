@@ -58,6 +58,7 @@
 #include "vroot.h"
 
 #include "debug.h"
+#include "config.h"
 
 #ifndef isupper
 # define isupper(c)  ((c) >= 'A' && (c) <= 'Z')
@@ -412,7 +413,8 @@ int main (int argc, char **argv)
     {
       static char geometry[40];
 #ifdef HAVE_LCD_BITMAP
-      snprintf(geometry, 40, "*geometry: %dx%d", 120*display_zoom, 68*display_zoom);
+      snprintf(geometry, 40, "*geometry: %dx%d",
+               LCD_WIDTH*display_zoom+14, LCD_HEIGHT*display_zoom+8);
 #else
       snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom, 132*display_zoom);
 #endif

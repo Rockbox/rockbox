@@ -31,6 +31,7 @@
 #include <time.h>
 
 #include "screenhack.h"
+#include "config.h"
 
 /*
  * Specific implementations for X11, using the generic LCD API and data.
