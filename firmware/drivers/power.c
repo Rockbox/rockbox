@@ -105,12 +105,12 @@ void ide_power_enable(bool on)
 bool ide_powered(void)
 {
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
-    if ((PACR2 & 0x0400) || !(PAIOR & 0x0020)) // not configured for output
-        return true; // would be floating high, disk on
+    if ((PACR2 & 0x0400) || !(PAIOR & 0x0020)) /* not configured for output */
+        return true; /* would be floating high, disk on */
     else
         return (PADR & 0x0020) != 0;
 #else
-    return TRUE; /* pretend always powered if not controlable */
+    return true; /* pretend always powered if not controlable */
 #endif
 }
 
