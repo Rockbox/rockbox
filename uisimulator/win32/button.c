@@ -24,7 +24,7 @@
 #include "button.h"
 #include "kernel.h"
 
-#define KEY(k)      HIBYTE(GetKeyState (k))
+#define KEY(k)      (HIBYTE(GetKeyState (k)) & 1)
 
 int last_key ;
 
@@ -65,13 +65,13 @@ int button_get(bool block)
             if (KEY (VK_RETURN))
                 btn |= BUTTON_OFF; // off button
 
-            if (KEY (VK_DIVIDE))
+            if (KEY (VK_DIVIDE) || KEY(VK_F1))
                 btn |= BUTTON_F1; // F1 button
 
-            if (KEY (VK_MULTIPLY))
+            if (KEY (VK_MULTIPLY) || KEY(VK_F2))
                 btn |= BUTTON_F2; // F2 button
 
-            if (KEY (VK_SUBTRACT))
+            if (KEY (VK_SUBTRACT) || KEY(VK_F3))
                 btn |= BUTTON_F3; // F3 button
 
             if (KEY (VK_NUMPAD5) ||

@@ -17,8 +17,6 @@
 #
 ############################################################################
 
-TARGET = rockboxui
-
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
@@ -46,7 +44,7 @@ INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON) -I$(SIMDIR) -I$(APPDIR) -I$
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb" /c
 
 SRCS = *.c \
-	$(DRIVERS)/lcd.c \
+	$(DRIVERS)/lcd.c $(DRIVERS)/power.c \
 	$(APPDIR)*.c \
 	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/usb.c \
         $(COMMON)/sprintf.c $(COMMON)/strtok.c
