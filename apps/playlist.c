@@ -124,7 +124,7 @@ char* playlist_next(int steps)
         return now_playing;
     }
     else {
-        strncpy(dir_buf, playlist.filename, playlist.dirlen);
+        strncpy(dir_buf, playlist.filename, playlist.dirlen-1);
         dir_buf[playlist.dirlen] = 0;
 
         /* handle dos style drive letter */
