@@ -116,15 +116,20 @@ static int showdir(char *path, int start)
 #endif
 
     for ( i=start; i < start+TREE_MAX_ON_SCREEN; i++ ) {
-        int len = strlen(buffer[i].name);
+        int len;
+
+        if ( i >= filesindir )
+            break;
+
+        len = strlen(buffer[i].name);
 
 #ifdef HAVE_LCD_BITMAP
         if ( buffer[i].file )
             icon_type=File;
         else
             icon_type=Folder;
-        lcd_bitmap(bitmap_icons_6x8[icon_type], 6, MARGIN_Y+i*LINE_HEIGTH, 6, 
-                   8, true);
+        lcd_bitmap(bitmap_icons_6x8[icon_type], 
+                   6, MARGIN_Y+(i-start)*LINE_HEIGTH, 6, 8, true);
 #endif
 
         if(len < TREE_MAX_LEN_DISPLAY)
@@ -273,7 +278,6 @@ bool dirbrowse(char *root)
                     numentries = showdir(currdir, start);
                     lcd_puts(0, LINE_Y+dircursor, "-");
                 }
-                debugf("s:%d d:%d\n",start,dircursor);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
