@@ -877,7 +877,7 @@ int wps_show(void)
                 /* next */
             case BUTTON_RIGHT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
-                if ( lastbutton != BUTTON_LEFT )   
+                if ( lastbutton != BUTTON_RIGHT )   
                      break; 
 #endif
                 mpeg_next();
