@@ -48,7 +48,7 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 all : $(OBJDIR)/archos.mod # archos.asm 
 
 $(OBJDIR)/librockbox.a:
-	make -C $(FIRMWARE) OBJDIR=$(OBJDIR)
+	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
