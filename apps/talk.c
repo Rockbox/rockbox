@@ -290,6 +290,14 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
 }
 
 
+static void reset_state(void)
+{
+    queue_write = queue_read = 0; /* reset the queue */
+    p_voicefile = NULL; /* indicate no voicefile (trashed) */
+    p_thumbnail = mp3buf; /*  whole space for thumbnail */
+    size_for_thumbnail = mp3end - mp3buf;
+}
+
 /***************** Public implementation *****************/
 
 void talk_init(void)
@@ -307,7 +315,7 @@ void talk_init(void)
         has_voicefile = false; /* no voice file available */
     }
     
-    talk_buffer_steal(); /* abuse this for most of our inits */
+    reset_state(); /* use this for most of our inits */
 }
 
 
@@ -315,10 +323,7 @@ void talk_init(void)
 int talk_buffer_steal(void)
 {
     mp3_play_stop();
-    queue_write = queue_read = 0; /* reset the queue */
-    p_voicefile = NULL; /* indicate no voicefile (trashed) */
-    p_thumbnail = mp3buf; /*  whole space for thumbnail */
-    size_for_thumbnail = mp3end - mp3buf;
+    reset_state();
     return 0;
 }
 
