@@ -68,7 +68,6 @@ static void button_tick(void)
     if(btn)
     {
         queue_post(&button_queue, btn, NULL);
-        queue_post(&button_queue, btn | BUTTON_REL, NULL);
         backlight_on();
     }   
     
