@@ -618,13 +618,13 @@ int wps_show(void)
                 break;
 
                 /* prev / restart */
-#ifdef WPS_RC_PREV
-            case WPS_RC_PREV:
-#endif
             case WPS_PREV:
 #ifdef WPS_PREV_PRE
                 if (lastbutton != WPS_PREV_PRE)
                     break;
+#endif
+#ifdef WPS_RC_PREV
+            case WPS_RC_PREV:
 #endif
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     mpeg_prev();
@@ -641,13 +641,13 @@ int wps_show(void)
                 break;
 
                 /* next */
-#ifdef WPS_RC_NEXT
-            case WPS_RC_NEXT:
-#endif
             case WPS_NEXT:
 #ifdef WPS_NEXT_PRE
                 if (lastbutton != WPS_NEXT_PRE)
                     break; 
+#endif
+#ifdef WPS_RC_NEXT
+            case WPS_RC_NEXT:
 #endif
                 mpeg_next();
                 break;
