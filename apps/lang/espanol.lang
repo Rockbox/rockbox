@@ -22,17 +22,18 @@ new: "Demos"
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
-new: "InformaciÛn"  
+new: "Informaci√≥n"  
 
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
-new: "VersiÛn"
+new: "Versi√≥n"
+
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
-new: "DepuraciÛn (°no tocar!)"
+new: "Depuraci√≥n (¬°no tocar!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -62,12 +63,12 @@ new: "Bat: %d%%%s"
 id: LANG_BATTERY_LEVEL_RECORDER
 desc: the battery level in percentage
 eng: "Battery: %d%%%s"
-new: "BaterÌa: %d%%%s" 
+new: "Bater√≠a: %d%%%s" 
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-new: "BaterÌa: Cargando" 
+new: "Bater√≠a: Cargando" 
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -137,7 +138,7 @@ new: "Fallo al salvar"
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. Low?"
-new: "øBat. baja?" 
+new: "¬øBat. baja?" 
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -147,7 +148,7 @@ new: "Fallo al guardar"
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is Battery Low?"
-new: "øEst· la bat. baja?" 
+new: "¬øEst√° la bat. baja?" 
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -187,7 +188,7 @@ new: "Aleatorio"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new: "Reproducir primero la canciÛn marcada"
+new: "Reproducir primero la canci√≥n marcada"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -197,7 +198,7 @@ new: ""
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Sensible a May/min˙sculas" 
+new: "Sensible a May/min√∫sculas" 
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -222,7 +223,7 @@ new: "Activo"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "IluminaciÛn" 
+new: "Iluminaci√≥n" 
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -247,12 +248,12 @@ new: "Parada del disco duro"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "Paso mÌnimo FF/RW" 
+new: "Paso m√≠nimo FF/RW" 
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "AceleraciÛn FF/RW"  
+new: "Aceleraci√≥n FF/RW"  
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -272,7 +273,7 @@ new: ""
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
-new: "øEst·s seguro?"  
+new: "¬øEst√°s seguro?"  
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
@@ -302,7 +303,7 @@ new: "Cancelado"
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Modo de ordenaciÛn"  
+new: "Modo de ordenaci√≥n"  
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -317,7 +318,7 @@ new: "Reiniciar opciones"
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
-new: "ReproducciÛn"    
+new: "Reproducci√≥n"    
 
 id: LANG_FILE
 desc: in settings_menu()
@@ -367,7 +368,7 @@ new: "Realce de graves"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-new: "Tiempo de caÌda del AV"    
+new: "Tiempo de ca√≠da del AV"    
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -377,12 +378,12 @@ new: "Canales"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-new: "ConfiguraciÛn de canales"   
+new: "Configuraci√≥n de canales"   
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
 eng: "Stereo"
-new: "EstÈreo"
+new: "Est√©reo"
 
 id: LANG_CHANNEL_MONO
 desc: in sound_settings
@@ -427,12 +428,13 @@ new: "(PLAY/STOP)"
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
 eng: "PLAY = Yes"
-new: "Play = SÌ"
+new: "Play = S√≠"
+
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
 eng: "Any Other = No"
-new: "Las dem·s = No" 
+new: "Las dem√°s = No" 
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -487,12 +489,12 @@ new: "-Info ID3- "
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-new: "[TÌtulo]" 
+new: "[T√≠tulo]" 
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<No Title>"
-new: "<sin tÌtulo>"
+new: "<sin t√≠tulo>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -507,27 +509,27 @@ new: "<sin artista>"
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
-new: "[¡lbum]" 
+new: "[√Ålbum]" 
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
 eng: "<No Album>"
-new: "<sin ·lbum>" 
+new: "<sin √°lbum>" 
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[N∫ pista]"
+new: "[N¬∫ pista]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<No Tracknum>"
-new: "<sin n∫ pista>" 
+new: "<sin n¬∫ pista>" 
 
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-new: "[TamaÒo]" 
+new: "[Tama√±o]" 
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -612,17 +614,17 @@ new: ""
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score:"
-new: "Tu puntuaciÛn:"   
+new: "Tu puntuaci√≥n:"   
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
 eng: "High Score: %d"
-new: "M·x. puntuac.: %d"   
+new: "M√°x. puntuac.: %d"   
 
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "°Nuevo record!"
+new: "¬°Nuevo record!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
@@ -647,7 +649,7 @@ new: "Nivel - %d"
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - Slow, 9 - Fast)"
-new: "(1 -lento,9 -r·pido)" 
+new: "(1 -lento,9 -r√°pido)" 
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
@@ -667,7 +669,7 @@ new: "Movs."
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-new: "°GANASTE!" 
+new: "¬°GANASTE!" 
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
@@ -762,7 +764,7 @@ new: "Sin control"
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You Lose!"
-new: "°Perdiste!"
+new: "¬°Perdiste!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
@@ -787,7 +789,7 @@ new: "mostrar archivos"
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
-new: "m˙sica"
+new: "m√∫sica"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
@@ -842,7 +844,7 @@ new: "Unidades por lectura"
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "IluminaciÛn estando enchufado"
+new: "Iluminaci√≥n estando enchufado"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -892,7 +894,7 @@ new: "PLAY=Acepta OFF=Cancela"
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Shutting Down..."
-new: "Apag·ndose..."
+new: "Apag√°ndose..."
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
@@ -907,12 +909,12 @@ new:
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "Capacidad BaterÌa"
+new: "Capacidad Bater√≠a"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-new: "Mostrar BaterÌa"
+new: "Mostrar Bater√≠a"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -922,22 +924,23 @@ new: "%d%% %dh %dm"
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-new: "BaterÌa: Top-Off Chg"
+new: "Bater√≠a: Top-Off Chg"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
-new: "BaterÌa: Trickle Chg"
+new: "Bater√≠a: Trickle Chg"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-new: "LÌmite de desplac. bidireccional"
+new: "L√≠mite de desplac. bidireccional"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-new: "Crear Lista de ReproducciÛn"
+new: "Crear Lista de Reproducci√≥n"
+
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -972,12 +975,12 @@ new: "Disco: %d.%dGB"
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
-new: "Gr·fico"
+new: "Gr√°fico"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
-new: "NumÈrico"
+new: "Num√©rico"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
@@ -987,12 +990,13 @@ new: "Fallido"
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
-new: "Lista reproducciÛn"
+new: "Lista reproducci√≥n"
+
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
-new: "[GÈnero]"
+new: "[G√©nero]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
@@ -1002,7 +1006,7 @@ new: "<sin info>"
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
-new: "[AÒo]"
+new: "[A√±o]"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
@@ -1087,7 +1091,7 @@ new: "Buffer Anit-salto"
 id: LANG_OSCILLOGRAPH
 desc: the name of the oscillograph demo in the demo menu
 eng: "Oscillograph"
-new: "OscilÛgrafo"
+new: "Oscil√≥grafo"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: Abort alternative in player keyboard interaction
@@ -1110,19 +1114,19 @@ eng: "Delete"
 new: "Borrar"
 
 id: LANG_PLAYER_ONPLAY_1
-desc: 
+desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
 new: "\x81 Cola"
 
 id: LANG_PLAYER_ONPLAY_2
-desc: 
+desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
 new: "- Ren + Borr"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
-new: "cBfs"
+eng: "Logarithmic(dB)"
+new: "Logar√≠tmica(dB)"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
@@ -1136,18 +1140,18 @@ new: "Rendimiento elevado"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear"
-new: "Lineal"
+eng: "Linear(%)"
+new: "Lineal(%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
-new: "M·ximo de rango"
+new: "M√°ximo de rango"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
-new: "MÌnimo de rango"
+new: "M√≠nimo de rango"
 
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
@@ -1156,8 +1160,8 @@ new: "Rendimiento"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> Linear"
-new: "dBfs <-> lineal"
+eng: "Scale"
+new: "Escala"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1187,12 +1191,12 @@ new: "Total en cola: %d"
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
-new: "øBorrar?" 
+new: "¬øBorrar?" 
 
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-new: "GrabaciÛn" 
+new: "Grabaci√≥n" 
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
@@ -1227,7 +1231,8 @@ new: "Derecho"
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
-new: "Opciones de GrabaciÛn"
+new: "Opciones de Grabaci√≥n"
+
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
@@ -1282,12 +1287,12 @@ new: "Velocidad de Desplazamiento"
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-new: "TamaÒo del paso de Desplaz."
+new: "Tama√±o del paso de Desplaz."
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-new: "Texto de ejemplo del tamaÒo de paso de desplazamiento" 
+new: "Texto de ejemplo del tama√±o de paso de desplazamiento" 
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
@@ -1371,13 +1376,13 @@ new: "Fade al Parar/Pausar"
 
 id: LANG_INVERT
 desc: in settings_menu
-eng: "Invert"
-new: "Invertir"
+eng: "LCD Mode"
+new: "Modo LCD"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
-new: "TamaÒo:"
+new: "Tama√±o:"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
@@ -1429,12 +1434,47 @@ desc: The context menu entry
 eng: "Update VBR file"
 new: "Actualizar archivo VBR"
 
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Line Selector"
+new: "Selector de linea"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+new: "Marcos independientes"
+
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-new: "Estado Barra"
+new: "Barra de Estado"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new: "Desplazamiento Barra"
+new: "Barra de Desplazamiento"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Iluminaci√≥n al iniciar MP3"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Puntero"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Barra(inversa)"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "Normal"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "Inverso"
