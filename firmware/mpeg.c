@@ -1844,6 +1844,10 @@ int mpeg_phys2val(int setting, int value)
         case SOUND_SUPERBASS:
             result = value / 10;
             break;
+
+        case SOUND_AVC:
+            result = value;
+            break;
 #endif
     }
 
