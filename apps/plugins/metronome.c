@@ -20,6 +20,30 @@
 
 #ifndef SIMULATOR 
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define METRONOME_QUIT BUTTON_OFF
+#define METRONOME_PLAYPAUSE BUTTON_PLAY
+#define METRONOME_VOL_UP BUTTON_UP
+#define METRONOME_VOL_DOWN BUTTON_DOWN
+#define METRONOME_MSG_START "press play"
+#define METRONOME_MSG_STOP "press pause"
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define METRONOME_QUIT BUTTON_OFF
+#define METRONOME_PLAYPAUSE BUTTON_MENU
+#define METRONOME_VOL_UP BUTTON_UP
+#define METRONOME_VOL_DOWN BUTTON_DOWN
+#define METRONOME_MSG_START "start: menu"
+#define METRONOME_MSG_STOP "pause: menu"
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define METRONOME_QUIT BUTTON_STOP
+#define METRONOME_PLAYPAUSE BUTTON_PLAY
+#define METRONOME_VOL_UP (BUTTON_ON | BUTTON_RIGHT)
+#define METRONOME_VOL_DOWN (BUTTON_ON | BUTTON_LEFT)
+
+#endif
 static struct plugin_api* rb;
 
 static int bpm      = 120;
@@ -140,9 +164,9 @@ void draw_display(void){
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_drawline(0, 12, 111, 12);
     if(sound_paused)
-    rb->lcd_puts(0,2,"press play");
+    rb->lcd_puts(0,2,METRONOME_MSG_START);
     else
-    rb->lcd_puts(0,2,"press pause");
+    rb->lcd_puts(0,2,METRONOME_MSG_STOP);
     rb->lcd_update();
 #endif
 }
@@ -179,8 +203,18 @@ void timer_callback(void){
     }
 }
 
+void cleanup(void *parameter)
+{
+    (void)parameter;
+
+    rb->plugin_unregister_timer();
+    rb->mp3_play_stop(); /* stop audio ISR */
+    led(0);
+}
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
+
+    int button;
 
     TEST_PLUGIN_API(api);
     (void)parameter;
@@ -198,20 +232,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 
     /* main loop */
     while (true){
+                    
+    button = rb->button_get(true);
     
-    switch (rb->button_get(true)) {
-#if CONFIG_KEYPAD == RECORDER_PAD
-    case BUTTON_OFF:
-#else
-    case BUTTON_STOP:
-#endif
+    if (rb->default_event_handler_ex(button, cleanup, NULL) 
+        == SYS_USB_CONNECTED)
+        return PLUGIN_USB_CONNECTED;
+    
+    switch (button) {
+
+    case METRONOME_QUIT:
         /* get out of here */
-        rb->plugin_unregister_timer();
-        rb->mp3_play_stop(); /* stop audio ISR */
-        led(0);
+        cleanup(NULL);
         return PLUGIN_OK;
 
-    case BUTTON_PLAY:
+    case METRONOME_PLAYPAUSE:
         if(sound_paused)
         sound_paused = false;
         else
@@ -220,24 +255,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         draw_display();
         break;
       
-#if CONFIG_KEYPAD == RECORDER_PAD
-    case BUTTON_UP:
-    case BUTTON_UP | BUTTON_REPEAT:
-#else
-    case BUTTON_ON | BUTTON_RIGHT:
-    case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+    case METRONOME_VOL_UP:
+    case METRONOME_VOL_UP | BUTTON_REPEAT:
         change_volume(1);
         calc_period();
         break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-    case BUTTON_DOWN:
-    case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-    case BUTTON_ON | BUTTON_LEFT:
-    case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+    case METRONOME_VOL_DOWN:
+    case METRONOME_VOL_DOWN | BUTTON_REPEAT:
         change_volume(-1);
         calc_period();
         break;
@@ -269,13 +294,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         calc_period();
         draw_display();
         break;
-
-    case SYS_USB_CONNECTED:
-        rb->plugin_unregister_timer();
-        rb->mp3_play_stop(); /* stop audio ISR */
-        led(0);
-        rb->usb_screen();
-        return PLUGIN_USB_CONNECTED;
     }
     }
 }
