@@ -6,7 +6,7 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-I../../
 
-CFLAGS = -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
+CFLAGS = -g -O -finline-functions -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
 
 OBJS= crt0.o main.o ../../thread.o ../../debug.o
@@ -36,7 +36,7 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 
 install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
