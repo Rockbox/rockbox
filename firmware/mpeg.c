@@ -1036,6 +1036,7 @@ static void mpeg_thread(void)
     int start_offset;
 #ifdef HAVE_MAS3587F
     int amount_to_save;
+    int writelen;
 #endif
     
     is_playing = false;
@@ -1622,9 +1623,9 @@ static void mpeg_thread(void)
                            wrapped */
                         if(amount_to_save < 0)
                         {
-                            amount_to_save = mp3buflen - mp3buf_read;
+                            amount_to_save += mp3buflen;
                         }
-
+                        
                         /* Save data only if the buffer is getting full,
                            or if we should stop recording */
                         if(amount_to_save)
@@ -1632,8 +1633,12 @@ static void mpeg_thread(void)
                             if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
                                stop_pending)
                             {
+                                /* Only save up to the end of the buffer */
+                                writelen = MIN(amount_to_save,
+                                               mp3buflen - mp3buf_read);
+                                
                                 write(mpeg_file, mp3buf + mp3buf_read,
-                                      amount_to_save);
+                                      writelen);
                                 
                                 mp3buf_read += amount_to_save;
                                 if(mp3buf_read >= mp3buflen)
