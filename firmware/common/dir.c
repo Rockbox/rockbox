@@ -97,3 +97,9 @@ struct dirent* readdir(DIR* dir)
 
     return &theent;
 }
+
+/*
+ * local variables:
+ * eval: (load-file "../rockbox-mode.el")
+ * end:
+ */
