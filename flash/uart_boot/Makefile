@@ -14,3 +14,6 @@ CFLAGS := -O -W -Wall -mno-cygwin
 uart_boot: uart_boot.c client.c flash.c uart_win.c
 	$(CC) $(CFLAGS) $+ -o $@
 
+clean:
+	-rm -f uart_boot.exe
+
