@@ -202,6 +202,11 @@ YES
 NO
 EFEAT
 
+NAME Intuitive User Interface ENAME
+YES
+NO
+EFEAT
+
 </table>
 
 <p>
