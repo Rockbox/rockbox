@@ -50,6 +50,6 @@
 
 <h2>Hardware Modifications</h2>
 
-See this <a href="/mods/">seperate mods page</a>
+See this <a href="/mods/">separate mods page</a>
 
 #include "foot.t"
