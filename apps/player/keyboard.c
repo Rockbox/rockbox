@@ -23,27 +23,59 @@
 #include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
+#include "lcd-player-charset.h"
 
-#define KEYBOARD_PAGES 4
+#include "debug.h"
 
-static char* kbd_setupkeys(int page)
+#define KEYBOARD_PAGES 3
+
+unsigned short *lcd_ascii;
+
+static unsigned short* kbd_setupkeys(int page, int* len)
 {
-    static char* lines[] = {
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        "abcdefghijklmnopqrstuvwxyz",
-        "01234567890!@#$%&/(){}[]<>",
-        "       +-*_.,:;!?'        "
-    };
+    static unsigned short lines[256];
 
-    return lines[page];
+    unsigned short ch;
+    int i = 0;
+
+    switch (page) {
+    case 0: /* Capitals */
+        for (ch = 'A'; ch <= 'Z'; ch++) lines[i++] = ch;
+        for (ch = 0xc0; ch <= 0xdd; ch++)
+            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
+                lines[i++] = ch;
+        break;
+
+    case 1: /* Small */
+        for (ch = 'a'; ch <= 'z'; ch++) lines[i++] = ch;
+        for (ch = 0xdf; ch <= 0xff; ch++)
+            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
+                lines[i++] = ch;
+        break;
+
+    case 2: /* Others */
+        for (ch = ' '; ch <= '@'; ch++) lines[i++] = ch;
+        for (ch = 0x5b; ch <= 0x60; ch++)
+            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
+                lines[i++] = ch;
+        for (ch = 0x07b; ch <= 0x0bf; ch++)
+            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
+                lines[i++] = ch;
+        break;
+    }
+
+    lines[i] = 0;
+    *len = i;
+
+    return lines;
 }
 
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
     int page=0, x=0;
-    char* line = kbd_setupkeys(page);
-    int linelen = strlen(line);
+    int linelen;
+    unsigned short* line = kbd_setupkeys(page, &linelen);
 
     while(!done)
     {
@@ -74,12 +106,16 @@ int kbd_input(char* text, int buflen)
 
         switch ( button_get(true) ) {
 
+            case BUTTON_MENU | BUTTON_STOP:
+                /* abort */
+                return -1;
+                break;
+
             case BUTTON_MENU:
                 /* shift */
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
-                line = kbd_setupkeys(page);
-                linelen = strlen(line);
+                line = kbd_setupkeys(page, &linelen);
                 break;
 
             case BUTTON_RIGHT:
