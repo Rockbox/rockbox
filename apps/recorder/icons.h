@@ -57,6 +57,9 @@ enum icons_7x8 {
     Icon_Shuffle,
     Icon_DownArrow,
     Icon_UpArrow,
+#ifndef HAVE_LED
+	Icon_Disk,
+#endif
     Icon_Last
 };
 
@@ -89,6 +92,8 @@ extern const unsigned char rockbox160x53[];
 #define ICON_SHUFFLE_WIDTH    7
 #define LOCK_X_POS            STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+ICON_PLAY_MODE_WIDTH+ICON_SHUFFLE_WIDTH+2+2+2+2+2+2
 #define LOCK_WIDTH            5
+#define ICON_DISK_WIDTH       7
+#define ICON_DISK_X_POS       STATUSBAR_WIDTH-ICON_DISK_WIDTH
 #define TIME_X_END            STATUSBAR_WIDTH-1
 
 extern void statusbar_wipe(void);
@@ -101,6 +106,10 @@ extern void statusbar_icon_lock(void);
 #ifdef HAVE_RTC
 extern void statusbar_time(int hour, int minute);
 #endif
+#ifndef HAVE_LED
+extern void	statusbar_led(void);
+#endif
+
 #endif /* End HAVE_LCD_BITMAP */
 
 #endif /*  _ICONS_H_ */

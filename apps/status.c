@@ -35,6 +35,7 @@
 #include "font.h"
 #endif
 #include "powermgmt.h"
+#include "led.h"
 
 static enum playmode ff_mode;
 
@@ -55,6 +56,9 @@ struct status_info {
     bool keylock;
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
+#ifndef HAVE_LED
+	bool led; /* disk LED simulation in the status bar */
+#endif
 };
 
 void status_init(void)
@@ -155,6 +159,9 @@ void status_draw(bool force_redraw)
     info.keylock = keys_locked;
     info.repeat = global_settings.repeat_mode;
     info.playmode = current_playmode();
+#ifndef HAVE_LED
+	info.led = led_read();
+#endif
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||
@@ -181,7 +188,7 @@ void status_draw(bool force_redraw)
             
             /* animate battery if charging */
             if ((charge_state == 1) ||
-                (charge_state == 2)) {
+€                (charge_state == 2)) {
 #else
             global_settings.runtime = 0;
             lasttime = current_tick;
@@ -232,6 +239,10 @@ void status_draw(bool force_redraw)
             statusbar_icon_lock();
 #ifdef HAVE_RTC
         statusbar_time(info.hour, info.minute);
+#endif
+#ifndef HAVE_LED
+		if (info.led)
+			statusbar_led();
 #endif
         lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
         lastinfo = info;

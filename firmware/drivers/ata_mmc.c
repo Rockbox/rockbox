@@ -635,6 +635,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     addr = start * SECTOR_SIZE;
 
     mutex_lock(&mmc_mutex);
+    led(true);
 #ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
     ret = select_card(drive);
@@ -681,6 +682,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     }
 
     deselect_card();
+    led(false);
     mutex_unlock(&mmc_mutex);
     
     /* only flush if reading went ok */
@@ -706,6 +708,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     addr = start * SECTOR_SIZE;
     
     mutex_lock(&mmc_mutex);
+	led(true);
 #ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
     ret = select_card(drive);
@@ -750,6 +753,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     }
 
     deselect_card();
+	led(false);
     mutex_unlock(&mmc_mutex);
 
     /* only flush if writing went ok */

@@ -72,6 +72,9 @@ const unsigned char bitmap_icons_7x8[][7] =
     {0x3e,0x41,0x51,0x41,0x45,0x41,0x3e}, /* Shuffle playmode (dice) */
     {0x04,0x0c,0x1c,0x3c,0x1c,0x0c,0x04}, /* Down-arrow */
     {0x20,0x30,0x38,0x3c,0x38,0x30,0x20}, /* Up-arrow */
+#ifndef HAVE_LED
+    {0x1c,0x22,0x41,0x49,0x41,0x22,0x1c}, /* Disk/MMC activity */
+#endif
 };
 
 #if LCD_WIDTH == 112 || LCD_WIDTH == 128
@@ -398,6 +401,17 @@ void statusbar_icon_lock(void)
     lcd_bitmap(bitmap_icons_5x8[Icon_Lock], LOCK_X_POS, 
                STATUSBAR_Y_POS, 5, 8, false);
 }
+
+#ifndef HAVE_LED
+/*
+ * no real LED: disk activity in status bar
+ */
+void statusbar_led(void)
+{
+    lcd_bitmap(bitmap_icons_7x8[Icon_Disk], ICON_DISK_X_POS, 
+               STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT, false);
+}
+#endif
 
 #ifdef HAVE_RTC
 /*

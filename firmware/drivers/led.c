@@ -21,11 +21,13 @@
 #include "cpu.h"
 #include "led.h"
 #include "system.h"
+#include "kernel.h"
+
+static bool current;
 
 #ifdef HAVE_LED
 
 static bool xor;
-static bool current;
 
 void led(bool on)
 {
@@ -59,16 +61,27 @@ void invert_led(bool on)
     led(current);
 }
 
-#else /* no LED, just dummies */
+#else /* no LED, just status update */
+
+static long delay; 
 
 void led(bool on)
 {
-    (void)on;
+	if (current && !on) /* switching off */
+	{
+		delay = current_tick + HZ/2; /* delay the "off" status a bit */
+	}
+    current = on;
 }
 
 void invert_led(bool on)
 {
-    (void)on;
+    (void)on; /* no invert feature */
+}
+
+bool led_read(void) /* read by status bar update */
+{
+	return (current || TIME_BEFORE(current_tick, delay));
 }
 
 #endif // #ifdef HAVE_LED
