@@ -23,23 +23,29 @@
 #include "debug.h"
 #include "system.h"
 
-/*
-**  SDA is PB7
-**  SCL is PB13
-*/
-   
 /* cute little functions, atomic read-modify-write */
+/* SDA is PB7 */
 #define SDA_LO     and_b(~0x80, &PBDRL)
 #define SDA_HI     or_b(0x80, &PBDRL)
 #define SDA_INPUT  and_b(~0x80, &PBIORL)
 #define SDA_OUTPUT or_b(0x80, &PBIORL)
 #define SDA     (PBDR & 0x80)
 
+#ifdef HAVE_ONDIO_I2C
+/* Ondio pinout, SCL moved to PB6 */
+#define SCL_INPUT  and_b(~0x40, &PBIORL)
+#define SCL_OUTPUT or_b(0x40, &PBIORL)
+#define SCL_LO     and_b(~0x40, &PBDRL)
+#define SCL_HI     or_b(0x40, &PBDRL)
+#define SCL     (PBDR & 0x0040)
+#else 
+/* "classic" pinout, SCL is PB13 */
 #define SCL_INPUT  and_b(~0x20, &PBIORH)
 #define SCL_OUTPUT or_b(0x20, &PBIORH)
 #define SCL_LO     and_b(~0x20, &PBDRH)
 #define SCL_HI     or_b(0x20, &PBDRH)
 #define SCL     (PBDR & 0x2000)
+#endif
 
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
@@ -78,17 +84,22 @@ void i2c_init(void)
 {
    int i;
 
+#ifdef HAVE_ONDIO_I2C
+   /* make PB5, PB6 & PB7 general I/O */
+   PBCR2 &= ~0xfc00; /* includes PB5, see FIXME below */
+#else
    /* make PB5, PB7 & PB13 general I/O */
    PBCR1 &= ~0x0c00; /* PB13 */
-   PBCR2 &= ~0xcc00; /* PB5 abd PB7 */
+   PBCR2 &= ~0xcc00; /* PB5 and PB7, see FIXME below */
+#endif
 
-   /* PB5 is "MAS enable". make it output and high */
+   /* PB5 is "MAS enable" (no I2C signal!). make it output and high */
+   /* FIXME: this is true only for Players, and should go into mas.c */
+   /* for Recorders, it shuts off the charger, for FM/V2 it holds power */
    or_b(0x20, &PBIORL);
    or_b(0x20, &PBDRL);
 
-   /* Set the clock line PB13 to an output */
-    or_b(0x20, &PBIORH);
-   
+   SCL_OUTPUT;
    SDA_OUTPUT;
    SDA_HI;
    SCL_LO;

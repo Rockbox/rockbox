@@ -28,8 +28,8 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000
 
-/* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
-#define BATTERY_SCALE_FACTOR 8081 /* don't know yet */
+/* Battery scale factor (measured from Jörg's FM) */
+#define BATTERY_SCALE_FACTOR 4785 /* 4.890V read as 0x3FE */
 
 /* Define this if you control power on PB5 (instead of the OFF button) */
 #define HAVE_POWEROFF_ON_PB5 /* don't know yet */
@@ -60,4 +60,7 @@
 
 /* Define this if the display is mounted upside down */
 #define HAVE_DISPLAY_FLIPPED
+
+/* Define this for different I2C pinout */
+#define HAVE_ONDIO_I2C
 
