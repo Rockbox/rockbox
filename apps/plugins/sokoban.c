@@ -388,7 +388,7 @@ static int load_level(void)
 
 static void update_screen(void) 
 {
-    short b = 0, c = 0,x,y;
+    short b = 0, c = 0;
     short rows = 0, cols = 0;
     char s[25];
     
