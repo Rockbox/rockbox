@@ -295,15 +295,15 @@ bool sound_menu(void)
     int m;
     bool result;
     struct menu_items items[] = {
-        { str(LANG_VOLUME), volume },
-        { str(LANG_BASS), bass },
-        { str(LANG_TREBLE), treble },
-        { str(LANG_BALANCE), balance },
-        { str(LANG_CHANNEL_MENU), chanconf },
+        { STR(LANG_VOLUME), volume },
+        { STR(LANG_BASS), bass },
+        { STR(LANG_TREBLE), treble },
+        { STR(LANG_BALANCE), balance },
+        { STR(LANG_CHANNEL_MENU), chanconf },
 #ifdef HAVE_MAS3587F
-        { str(LANG_LOUDNESS), loudness },
-        { str(LANG_BBOOST), bass_boost },
-        { str(LANG_AUTOVOL), avc }
+        { STR(LANG_LOUDNESS), loudness },
+        { STR(LANG_BBOOST), bass_boost },
+        { STR(LANG_AUTOVOL), avc }
 #endif
     };
     
@@ -323,22 +323,30 @@ bool recording_menu(bool no_source)
     bool result;
 
     menu[i].desc = str(LANG_RECORDING_QUALITY);
+    menu[i].voice_id = LANG_RECORDING_QUALITY;
     menu[i++].function = recquality;
     menu[i].desc = str(LANG_RECORDING_FREQUENCY);
+    menu[i].voice_id = LANG_RECORDING_FREQUENCY;
     menu[i++].function = recfrequency;
     if(!no_source) {
         menu[i].desc = str(LANG_RECORDING_SOURCE);
+        menu[i].voice_id = LANG_RECORDING_SOURCE;
         menu[i++].function = recsource;
     }
     menu[i].desc = str(LANG_RECORDING_CHANNELS);
+    menu[i].voice_id = LANG_RECORDING_CHANNELS;
     menu[i++].function = recchannels;
     menu[i].desc = str(LANG_RECORDING_EDITABLE);
+    menu[i].voice_id = LANG_RECORDING_EDITABLE;
     menu[i++].function = receditable;
     menu[i].desc = str(LANG_RECORD_TIMESPLIT);
+    menu[i].voice_id = LANG_RECORD_TIMESPLIT;
     menu[i++].function = rectimesplit;
     menu[i].desc = str(LANG_RECORD_PRERECORD_TIME);
+    menu[i].voice_id = LANG_RECORD_PRERECORD_TIME;
     menu[i++].function = recprerecord;
     menu[i].desc = str(LANG_RECORD_DIRECTORY);
+    menu[i].voice_id = LANG_RECORD_DIRECTORY;
     menu[i++].function = recdirectory;
         
     m=menu_init( menu, i, NULL );

@@ -93,9 +93,9 @@ bool bookmark_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
-        { str(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
-        { str(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
+        { STR(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
+        { STR(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
+        { STR(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );

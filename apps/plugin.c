@@ -38,6 +38,7 @@
 #include "mp3_playback.h"
 #include "backlight.h"
 #include "ata.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -325,6 +326,7 @@ void* plugin_get_mp3_buffer(int* buffer_size)
     return buf;
 #else
     mpeg_stop();
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     *buffer_size = mp3end - mp3buf;
     return mp3buf;
 #endif 

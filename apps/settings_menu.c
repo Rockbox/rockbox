@@ -368,16 +368,16 @@ static bool peak_meter_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_PM_RELEASE)  , peak_meter_release   },  
-        { str(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
-        { str(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
-        { str(LANG_PM_PERFORMANCE), peak_meter_performance },
+        { STR(LANG_PM_RELEASE)  , peak_meter_release   },  
+        { STR(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
+        { STR(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
+        { STR(LANG_PM_PERFORMANCE), peak_meter_performance },
 #ifdef PM_DEBUG
-        { "Refresh rate"        , peak_meter_fps_menu  },
+        { "Refresh rate" , -1    , peak_meter_fps_menu  },
 #endif
-        { str(LANG_PM_SCALE)    , peak_meter_scale     },
-        { str(LANG_PM_MIN)      , peak_meter_min       },
-        { str(LANG_PM_MAX)      , peak_meter_max       },
+        { STR(LANG_PM_SCALE)    , peak_meter_scale     },
+        { STR(LANG_PM_MIN)      , peak_meter_min       },
+        { STR(LANG_PM_MAX)      , peak_meter_max       },
     };
     
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -791,8 +791,8 @@ static bool ff_rewind_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_FFRW_STEP), ff_rewind_min_step },
-        { str(LANG_FFRW_ACCEL), ff_rewind_accel },
+        { STR(LANG_FFRW_STEP), ff_rewind_min_step },
+        { STR(LANG_FFRW_ACCEL), ff_rewind_accel },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -808,13 +808,13 @@ static bool playback_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SHUFFLE), shuffle },
-        { str(LANG_REPEAT), repeat_mode },
-        { str(LANG_PLAY_SELECTED), play_selected },
-        { str(LANG_RESUME), resume },
-        { str(LANG_WIND_MENU), ff_rewind_settings_menu },
-        { str(LANG_MP3BUFFER_MARGIN), buffer_margin },
-        { str(LANG_FADE_ON_STOP), set_fade_on_stop },
+        { STR(LANG_SHUFFLE), shuffle },
+        { STR(LANG_REPEAT), repeat_mode },
+        { STR(LANG_PLAY_SELECTED), play_selected },
+        { STR(LANG_RESUME), resume },
+        { STR(LANG_WIND_MENU), ff_rewind_settings_menu },
+        { STR(LANG_MP3BUFFER_MARGIN), buffer_margin },
+        { STR(LANG_FADE_ON_STOP), set_fade_on_stop },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;
@@ -843,9 +843,9 @@ static bool bookmark_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_BOOKMARK_SETTINGS_AUTOCREATE), autocreatebookmark},
-        { str(LANG_BOOKMARK_SETTINGS_AUTOLOAD), autoloadbookmark},
-        { str(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
+        { STR(LANG_BOOKMARK_SETTINGS_AUTOCREATE), autocreatebookmark},
+        { STR(LANG_BOOKMARK_SETTINGS_AUTOLOAD), autoloadbookmark},
+        { STR(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
@@ -910,10 +910,10 @@ static bool fileview_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_CASE_MENU),    sort_case           },
-        { str(LANG_FILTER),       dir_filter          },
-        { str(LANG_FOLLOW),       browse_current      },
-        { str(LANG_SHOW_ICONS),   show_icons          },
+        { STR(LANG_CASE_MENU),    sort_case           },
+        { STR(LANG_FILTER),       dir_filter          },
+        { STR(LANG_FOLLOW),       browse_current      },
+        { STR(LANG_SHOW_ICONS),   show_icons          },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -929,15 +929,15 @@ static bool scroll_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SCROLL_SPEED),     scroll_speed    },
-        { str(LANG_SCROLL_DELAY),    scroll_delay    },  
+        { STR(LANG_SCROLL_SPEED),     scroll_speed    },
+        { STR(LANG_SCROLL_DELAY),    scroll_delay    },  
 #ifdef HAVE_LCD_BITMAP
-        { str(LANG_SCROLL_STEP),     scroll_step     },  
+        { STR(LANG_SCROLL_STEP),     scroll_step     },  
 #endif
-        { str(LANG_BIDIR_SCROLL),    bidir_limit    },
+        { STR(LANG_BIDIR_SCROLL),    bidir_limit    },
 #ifdef HAVE_LCD_CHARCELLS
-        { str(LANG_JUMP_SCROLL),    jump_scroll    },
-        { str(LANG_JUMP_SCROLL_DELAY),    jump_scroll_delay    },
+        { STR(LANG_JUMP_SCROLL),    jump_scroll    },
+        { STR(LANG_JUMP_SCROLL_DELAY),    jump_scroll_delay    },
 #endif
     };
 
@@ -953,14 +953,14 @@ static bool lcd_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_BACKLIGHT),       backlight_timer },
-        { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
-        { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
-        { str(LANG_CONTRAST),        contrast },
+        { STR(LANG_BACKLIGHT),       backlight_timer },
+        { STR(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
+        { STR(LANG_CAPTION_BACKLIGHT), caption_backlight },
+        { STR(LANG_CONTRAST),        contrast },
 #ifdef HAVE_LCD_BITMAP
-        { str(LANG_INVERT),          invert },
-        { str(LANG_FLIP_DISPLAY),    flip_display },
-        { str(LANG_INVERT_CURSOR),   invert_cursor },
+        { STR(LANG_INVERT),          invert },
+        { STR(LANG_FLIP_DISPLAY),    flip_display },
+        { STR(LANG_INVERT_CURSOR),   invert_cursor },
 #endif
     };
 
@@ -977,10 +977,10 @@ static bool bars_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SCROLL_BAR),      scroll_bar },
-        { str(LANG_STATUS_BAR),      status_bar },
-        { str(LANG_VOLUME_DISPLAY),  volume_type },
-        { str(LANG_BATTERY_DISPLAY), battery_type },
+        { STR(LANG_SCROLL_BAR),      scroll_bar },
+        { STR(LANG_STATUS_BAR),      status_bar },
+        { STR(LANG_VOLUME_DISPLAY),  volume_type },
+        { STR(LANG_BATTERY_DISPLAY), battery_type },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -998,14 +998,14 @@ static bool display_settings_menu(void)
 
     struct menu_items items[] = {
 #ifdef HAVE_LCD_BITMAP
-        { str(LANG_CUSTOM_FONT),     font_browse },
+        { STR(LANG_CUSTOM_FONT),     font_browse },
 #endif
-        { str(LANG_WHILE_PLAYING),   custom_wps_browse },
-        { str(LANG_LCD_MENU),        lcd_settings_menu },
-        { str(LANG_SCROLL_MENU),     scroll_settings_menu },
+        { STR(LANG_WHILE_PLAYING),   custom_wps_browse },
+        { STR(LANG_LCD_MENU),        lcd_settings_menu },
+        { STR(LANG_SCROLL_MENU),     scroll_settings_menu },
 #ifdef HAVE_LCD_BITMAP
-        { str(LANG_BARS_MENU),       bars_settings_menu },
-        { str(LANG_PM_MENU),         peak_meter_menu },
+        { STR(LANG_BARS_MENU),       bars_settings_menu },
+        { STR(LANG_PM_MENU),         peak_meter_menu },
 #endif
     };
 
@@ -1028,11 +1028,11 @@ static bool battery_settings_menu(void)
 
     struct menu_items items[] = {
 #ifdef HAVE_CHARGE_CTRL
-        { str(LANG_DISCHARGE),        deep_discharge   },
-        { str(LANG_TRICKLE_CHARGE),   trickle_charge   },
+        { STR(LANG_DISCHARGE),        deep_discharge   },
+        { STR(LANG_TRICKLE_CHARGE),   trickle_charge   },
 #endif
 #ifndef SIMULATOR
-        { str(LANG_BATTERY_CAPACITY), battery_capacity },
+        { STR(LANG_BATTERY_CAPACITY), battery_capacity },
 #endif
     };
 
@@ -1048,9 +1048,9 @@ static bool disk_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SPINDOWN),    spindown        },
+        { STR(LANG_SPINDOWN),    spindown        },
 #ifdef HAVE_ATA_POWER_OFF
-        { str(LANG_POWEROFF),    poweroff        },
+        { STR(LANG_POWEROFF),    poweroff        },
 #endif
     };
 
@@ -1067,8 +1067,8 @@ static bool time_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_TIME),        timedate_set    },
-        { str(LANG_TIMEFORMAT),  timeformat_set  },
+        { STR(LANG_TIME),        timedate_set    },
+        { STR(LANG_TIMEFORMAT),  timeformat_set  },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -1084,10 +1084,10 @@ static bool manage_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_CUSTOM_CFG),      custom_cfg_browse },
-        { str(LANG_FIRMWARE),        firmware_browse },
-        { str(LANG_RESET),           reset_settings },
-        { str(LANG_SAVE_SETTINGS),   settings_save_config },
+        { STR(LANG_CUSTOM_CFG),      custom_cfg_browse },
+        { STR(LANG_FIRMWARE),        firmware_browse },
+        { STR(LANG_RESET),           reset_settings },
+        { STR(LANG_SAVE_SETTINGS),   settings_save_config },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -1102,8 +1102,8 @@ static bool limits_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_MAX_FILES_IN_DIR),    max_files_in_dir        },
-        { str(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
+        { STR(LANG_MAX_FILES_IN_DIR),    max_files_in_dir        },
+        { STR(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -1119,22 +1119,22 @@ static bool system_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_BATTERY_MENU),     battery_settings_menu },
-        { str(LANG_DISK_MENU),        disk_settings_menu     },
+        { STR(LANG_BATTERY_MENU),     battery_settings_menu },
+        { STR(LANG_DISK_MENU),        disk_settings_menu     },
 #ifdef HAVE_RTC
-        { str(LANG_TIME_MENU),        time_settings_menu     },
+        { STR(LANG_TIME_MENU),        time_settings_menu     },
 #endif
-        { str(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },
-        { str(LANG_SLEEP_TIMER),      sleeptimer_screen      },
+        { STR(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },
+        { STR(LANG_SLEEP_TIMER),      sleeptimer_screen      },
 #ifdef HAVE_ALARM_MOD
-        { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
+        { STR(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
 #endif
-        { str(LANG_LIMITS_MENU),      limits_settings_menu   },
+        { STR(LANG_LIMITS_MENU),      limits_settings_menu   },
 #ifdef HAVE_MAS3507D
-        { str(LANG_LINE_IN),          line_in                },
+        { STR(LANG_LINE_IN),          line_in                },
 #endif
-        { str(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
-        { str(LANG_MANAGE_MENU),      manage_settings_menu   },
+        { STR(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
+        { STR(LANG_MANAGE_MENU),      manage_settings_menu   },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
@@ -1149,12 +1149,12 @@ bool settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_PLAYBACK),         playback_settings_menu },
-        { str(LANG_FILE),             fileview_settings_menu },
-        { str(LANG_DISPLAY),          display_settings_menu  },
-        { str(LANG_SYSTEM),           system_settings_menu   },
-        { str(LANG_BOOKMARK_SETTINGS),bookmark_settings_menu },
-        { str(LANG_LANGUAGE),         language_browse        },
+        { STR(LANG_PLAYBACK),         playback_settings_menu },
+        { STR(LANG_FILE),             fileview_settings_menu },
+        { STR(LANG_DISPLAY),          display_settings_menu  },
+        { STR(LANG_SYSTEM),           system_settings_menu   },
+        { STR(LANG_BOOKMARK_SETTINGS),bookmark_settings_menu },
+        { STR(LANG_LANGUAGE),         language_browse        },
     };
     
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );

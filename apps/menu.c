@@ -32,6 +32,7 @@
 #include "settings.h"
 #include "status.h"
 #include "screens.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -216,6 +217,13 @@ static void put_cursor(int m, int target)
         lcd_update();
     }
 
+    if (do_update)
+    {   /* "say" the entry under the cursor */
+        int voice_id = menus[m].items[menus[m].cursor].voice_id;
+        if (voice_id >= 0) /* valid ID given? */
+            talk_id(voice_id, false); /* say it */
+    }
+
 }
 
 int menu_init(struct menu_items* mitems, int count, int (*callback)(int, int))
@@ -250,6 +258,7 @@ int menu_show(int m)
 {
     bool exit = false;
     int key;
+    int voice_id;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
@@ -263,9 +272,16 @@ int menu_show(int m)
 
     menu_draw(m);
 
+    /* say current entry */
+    voice_id = menus[m].items[menus[m].cursor].voice_id;
+    if (voice_id >= 0) /* valid ID given? */
+        talk_id(voice_id, false); /* say it */
+
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
+
         
+
         /*  
          *   "short-circuit" the default keypresses by running the callback function
          */
@@ -274,6 +290,7 @@ int menu_show(int m)
             key = menus[m].callback(key, m);            /* make sure there's no match in the switch */
 
         switch( key ) {
+
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:

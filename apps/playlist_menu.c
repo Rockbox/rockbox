@@ -65,10 +65,10 @@ bool playlist_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_CREATE_PLAYLIST),       create_playlist   },
-        { str(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
-        { str(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
-        { str(LANG_RECURSE_DIRECTORY),     recurse_directory },
+        { STR(LANG_CREATE_PLAYLIST),       create_playlist   },
+        { STR(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
+        { STR(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
+        { STR(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
     
     m = menu_init( items, sizeof items / sizeof(struct menu_items), NULL );

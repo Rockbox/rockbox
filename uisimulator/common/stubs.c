@@ -225,3 +225,22 @@ void button_set_flip(bool yesno)
 {
     (void)yesno;
 }
+
+int talk_buffer_steal(void)
+{
+    return 0;
+}
+
+int talk_id(int id, bool block)
+{
+    (void)id;
+    (void)block;
+    return 0;
+}
+
+int talk_file(char* filename, bool block)
+{
+    (void)filename;
+    (void)block;
+    return 0;
+}

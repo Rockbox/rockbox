@@ -595,6 +595,7 @@ bool radio_preset_select(void)
             if(presets[i].frequency)
             {
                 menu[num_presets].desc = presets[i].name;
+                menu[num_presets].voice_id = -1;
                 /* We use the function pointer entry for the preset
                    entry index */
                 menu[num_presets++].function = (void *)i;
@@ -669,6 +670,7 @@ bool radio_delete_preset(void)
             if(presets[i].frequency)
             {
                 menu[num_presets].desc = presets[i].name;
+                menu[num_presets].voice_id = -1;
                 /* We use the function pointer entry for the preset
                    entry index */
                 menu[num_presets++].function = (void *)i;
@@ -715,10 +717,10 @@ static bool fm_recording_settings(void)
 bool radio_menu(void)
 {
     struct menu_items radio_menu_items[] = {
-        { str(LANG_FM_SAVE_PRESET), radio_add_preset },
-        { str(LANG_FM_DELETE_PRESET), radio_delete_preset },
-        { str(LANG_SOUND_SETTINGS), sound_menu },
-        { str(LANG_RECORDING_SETTINGS), fm_recording_settings }
+        { STR(LANG_FM_SAVE_PRESET), radio_add_preset },
+        { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
+        { STR(LANG_SOUND_SETTINGS), sound_menu },
+        { STR(LANG_RECORDING_SETTINGS), fm_recording_settings }
     };
     int m;
     bool result;

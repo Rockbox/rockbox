@@ -685,12 +685,15 @@ static int onplay_menu(int index)
     bool current = (tracks[index].index == viewer.current_playing_track);
 
     menu[i].desc = str(LANG_REMOVE);
+    menu[i].voice_id = LANG_REMOVE;
     i++;
 
     menu[i].desc = str(LANG_MOVE);
+    menu[i].voice_id = LANG_MOVE;
     i++;
 
     menu[i].desc = str(LANG_FILE_OPTIONS);
+    menu[i].voice_id = LANG_FILE_OPTIONS;
     i++;
 
     m = menu_init(menu, i, NULL);
@@ -757,10 +760,10 @@ static bool viewer_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { str(LANG_SHOW_ICONS),             show_icons },
-        { str(LANG_SHOW_INDICES),           show_indices },
-        { str(LANG_TRACK_DISPLAY),          track_display },
-        { str(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
+        { STR(LANG_SHOW_ICONS),             show_icons },
+        { STR(LANG_SHOW_INDICES),           show_indices },
+        { STR(LANG_TRACK_DISPLAY),          track_display },
+        { STR(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
     };
     
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL );

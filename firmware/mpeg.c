@@ -2134,6 +2134,7 @@ void mpeg_record(char *filename)
     recording_filename[MAX_PATH - 1] = 0;
     
     disable_xing_header = false;
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
@@ -2148,6 +2149,7 @@ static void start_prerecording(void)
     prerecord_timeout = current_tick + HZ;
     memset(prerecord_buffer, 0, sizeof(prerecord_buffer));
     reset_mp3_buffer();
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     
     is_prerecording = true;
 
@@ -2404,6 +2406,7 @@ void mpeg_play(int offset)
 #else
     is_playing = true;
     
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
 #endif /* #ifdef SIMULATOR */
 

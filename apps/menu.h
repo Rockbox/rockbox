@@ -23,9 +23,13 @@
 #include <stdbool.h>
 
 struct menu_items {
-    unsigned char *desc;
+    unsigned char *desc; /* string */
+    int voice_id; /* the associated voice clip, -1 if none */
     bool (*function) (void); /* return true if USB was connected */
 };
+
+/* convenience macro to have both string and ID as arguments */
+#define STR(id) str(id), id
 
 int menu_init(struct menu_items* items, int count, int (*callback) (int keycode, int menu));
 void menu_exit(int menu);

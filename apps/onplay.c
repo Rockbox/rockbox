@@ -41,6 +41,7 @@
 #include "settings.h"
 #include "status.h"
 #include "playlist_viewer.h"
+#include "talk.h"
 #include "onplay.h"
 
 static char* selected_file = NULL;
@@ -147,6 +148,7 @@ static bool playlist_options(void)
     if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
     {
         menu[i].desc = str(LANG_VIEW);
+        menu[i].voice_id = LANG_VIEW;
         menu[i].function = view_playlist;
         i++;
         pstart++;
@@ -155,31 +157,37 @@ static bool playlist_options(void)
     if (mpeg_status() & MPEG_STATUS_PLAY)
     {
         menu[i].desc = str(LANG_INSERT);
+        menu[i].voice_id = LANG_INSERT;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
         
         menu[i].desc = str(LANG_INSERT_FIRST);
+        menu[i].voice_id = LANG_INSERT_FIRST;
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = false;
         i++;
         
         menu[i].desc = str(LANG_INSERT_LAST);
+        menu[i].voice_id = LANG_INSERT_LAST;
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = false;
         i++;
         
         menu[i].desc = str(LANG_QUEUE);
+        menu[i].voice_id = LANG_QUEUE;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = true;
         i++;
         
         menu[i].desc = str(LANG_QUEUE_FIRST);
+        menu[i].voice_id = LANG_QUEUE_FIRST;
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = true;
         i++;
         
         menu[i].desc = str(LANG_QUEUE_LAST);
+        menu[i].voice_id = LANG_QUEUE_LAST;
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = true;
         i++;
@@ -188,6 +196,7 @@ static bool playlist_options(void)
              (selected_file_attr & ATTR_DIRECTORY))
     {
         menu[i].desc = str(LANG_INSERT);
+        menu[i].voice_id = LANG_INSERT;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
@@ -283,6 +292,8 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
     int orig_fd, fd;
     char tmpname[MAX_PATH];
     
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
+
     snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
 
     orig_fd = open(fname, O_RDONLY);
@@ -384,6 +395,8 @@ static bool vbr_fix(void)
         return onplay_result;
     }
     
+    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
+
     lcd_clear_display();
     lcd_puts_scroll(0, 0, selected_file);
     lcd_update();
@@ -552,17 +565,20 @@ int onplay(char* file, int attr)
             ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
         {
             menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
+            menu[i].voice_id = LANG_PLAYINDICES_PLAYLIST;
             menu[i].function = playlist_options;
             i++;
         }
         
         menu[i].desc = str(LANG_RENAME);
+        menu[i].voice_id = LANG_RENAME;
         menu[i].function = rename_file;
         i++;
         
         if (!(attr & ATTR_DIRECTORY))
         {
             menu[i].desc = str(LANG_DELETE);
+            menu[i].voice_id = LANG_DELETE;
             menu[i].function = delete_file;
             i++;
         }
@@ -570,12 +586,14 @@ int onplay(char* file, int attr)
         if ((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
         {
             menu[i].desc = str(LANG_VBRFIX);
+            menu[i].voice_id = LANG_VBRFIX;
             menu[i].function = vbr_fix;
             i++;
         }
     }
 
     menu[i].desc = str(LANG_CREATE_DIR);
+    menu[i].voice_id = LANG_CREATE_DIR;
     menu[i].function = create_dir;
     i++;
 

@@ -1476,36 +1476,36 @@ bool debug_menu(void)
     bool result;
 
     struct menu_items items[] = {
-        { "Dump ROM contents", dbg_save_roms },
-        { "View I/O ports", dbg_ports },
+        { "Dump ROM contents", -1, dbg_save_roms },
+        { "View I/O ports", -1, dbg_ports },
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC
-        { "View/clr RTC RAM", dbg_rtc },
+        { "View/clr RTC RAM", -1, dbg_rtc },
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
-        { "View OS stacks", dbg_os },
+        { "View OS stacks", -1, dbg_os },
 #ifdef HAVE_MAS3507D
-        { "View MAS info", dbg_mas_info },
+        { "View MAS info", -1, dbg_mas_info },
 #endif
-        { "View MAS regs", dbg_mas },
+        { "View MAS regs", -1, dbg_mas },
 #ifdef HAVE_MAS3587F
-        { "View MAS codec", dbg_mas_codec },
+        { "View MAS codec", -1, dbg_mas_codec },
 #endif
 #ifdef HAVE_LCD_BITMAP
-        { "View battery", view_battery },
+        { "View battery", -1, view_battery },
 #endif
-        { "View HW info", dbg_hw_info },
-        { "View partitions", dbg_partitions },
-        { "View disk info", dbg_disk_info },
+        { "View HW info", -1, dbg_hw_info },
+        { "View partitions", -1, dbg_partitions },
+        { "View disk info", -1, dbg_disk_info },
 #ifdef HAVE_LCD_BITMAP
-        { "View mpeg thread", dbg_mpeg_thread },
+        { "View mpeg thread", -1, dbg_mpeg_thread },
 #ifdef PM_DEBUG
-        { "pm histogram", peak_meter_histogram},
+        { "pm histogram", -1, peak_meter_histogram},
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
-        { "View runtime", view_runtime },
+        { "View runtime", -1, view_runtime },
 #ifdef HAVE_FMRADIO
-        { "FM Radio", dbg_fm_radio },
+        { "FM Radio", -1, dbg_fm_radio },
 #endif
     };
 

@@ -54,6 +54,7 @@
 #include "rolo.h"
 #include "screens.h"
 #include "power.h"
+#include "talk.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -208,6 +209,7 @@ void init(void)
               global_settings.avc,
               global_settings.channel_config );
     mpeg_init();
+    talk_init();
 
     /* no auto-rolo on startup any more, but I leave it here for reference */
 #if 0
