@@ -25,6 +25,9 @@
 #include "status.h"
 #include "mpeg.h"
 #include "wps.h"
+#ifdef HAVE_RTC
+#include "rtc.h"
+#endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
