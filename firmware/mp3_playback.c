@@ -41,6 +41,9 @@ enum
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
+
+unsigned long shadow_7f1;
+
 #endif /* #ifdef HAVE_MAS3587F */
 
 /**** globals ****/
@@ -893,8 +896,8 @@ void mpeg_set_pitch(int pitch)
 
     /* We must tell the MAS that the frequency has changed.
        This will unfortunately cause a short silence. */
-    val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+    val = shadow_7f1;
+    mas_writemem(MAS_BANK_D0,0x7f1,&shadow_7f1,1);
 }
 #endif
 
