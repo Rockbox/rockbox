@@ -621,7 +621,7 @@ int PlayTick(int fd)
                 if (gPlay.bHasAudio)
                     rb->mp3_play_pause(false); // pause audio
                 if (gPlay.bHasVideo)
-                    and_b(~0x10, &TSTR); // stop the timer 4
+                    rb->plugin_unregister_timer(); // stop the timer
             }
             else if (gPlay.state == paused)
             {
@@ -633,7 +633,10 @@ int PlayTick(int fd)
                     rb->mp3_play_pause(true); // play audio
                 }
                 if (gPlay.bHasVideo)
-                    or_b(0x10, &TSTR); // start the video
+                {   // start the video
+                    rb->plugin_register_timer(
+                        gFileHdr.video_frametime, 1, timer4_isr);
+                }
             }
             break;
         case BUTTON_UP:
