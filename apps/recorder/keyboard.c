@@ -19,6 +19,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "system.h"
 #include "version.h"
 #include "debug_menu.h"
 #include "sprintf.h"
@@ -74,41 +75,40 @@
 
 static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
 {
-    switch (page) {
-    case 0:
-        line[0] = "ABCDEFG !?\" @#$%+'";
-        line[1] = "HIJKLMN 789 &_()-`";
-        line[2] = "OPQRSTU 456 §|{}/<";
-        line[3] = "VWXYZ.,0123 ~=[]*>";
-        break;
+    switch (page) 
+    {
+        case 0:
+            line[0] = "ABCDEFG !?\" @#$%+'";
+            line[1] = "HIJKLMN 789 &_()-`";
+            line[2] = "OPQRSTU 456 §|{}/<";
+            line[3] = "VWXYZ.,0123 ~=[]*>";
+            break;
 
-    case 1:
-        line[0] = "abcdefg ¢£¤¥¦§©®¬";
-        line[1] = "hijklmn «»°ºª¹²³¶";
-        line[2] = "opqrstu ¯±×÷¡¿µ·¨";
-        line[3] = "vwxyz., ¼½¾      ";
-        break;
+        case 1:
+            line[0] = "abcdefg ¢£¤¥¦§©®¬";
+            line[1] = "hijklmn «»°ºª¹²³¶";
+            line[2] = "opqrstu ¯±×÷¡¿µ·¨";
+            line[3] = "vwxyz., ¼½¾      ";
+            break;
 
-    case 2:
-        line[0] = "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË";
-        line[1] = "àáâãäåæ ìíîï èéêë";
-        line[2] = "ÓÒÔÕÖØ ÇĞŞİß ÙÚÛÜ";
-        line[3] = "òóôõöø çğşıÿ ùúûü";
-        break;
+        case 2:
+            line[0] = "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË";
+            line[1] = "àáâãäåæ ìíîï èéêë";
+            line[2] = "ÓÒÔÕÖØ ÇĞŞİß ÙÚÛÜ";
+            line[3] = "òóôõöø çğşıÿ ùúûü";
+            break;
     }
 }
 
 /* helper function to spell a char if voice UI is enabled */
-void kbd_spellchar(char c)
+static void kbd_spellchar(char c)
 {
-    char spell_char[2]; /* store char to pass to talk_spell */
+    static char spell_char[2] = "\0\0"; /* store char to pass to talk_spell */
 
     if (global_settings.talk_menu) /* voice UI? */
     {
         spell_char[0] = c; 
-        spell_char[1] = '\0'; /* mark end of char string */ 
-
-        talk_spell(spell_char, false); 
+        talk_spell(spell_char, false);
     }
 }
 
@@ -120,9 +120,9 @@ int kbd_input(char* text, int buflen)
     int font_w = 0, font_h = 0, i;
     int x = 0, y = 0;
     int main_x, main_y, max_chars, margin;
-    int status_y1, status_y2, curpos;
+    int status_y1, status_y2;
     int len;
-    int editpos;
+    int editpos, curpos, leftpos;
     bool redraw = true;
     const char* line[KEYBOARD_LINES];
 #ifdef KBD_MODES
@@ -146,7 +146,7 @@ int kbd_input(char* text, int buflen)
 
     editpos = strlen(text);
 
-    max_chars = LCD_WIDTH / font_w;
+    max_chars = LCD_WIDTH / font_w - 2; /* leave room for < and > */
     kbd_setupkeys(line, page);
 
     if (global_settings.talk_menu) /* voice UI? */
@@ -159,75 +159,38 @@ int kbd_input(char* text, int buflen)
         if(redraw)
         {
             lcd_clear_display();
-
-            lcd_setfont(FONT_SYSFIXED);
             
+            lcd_setfont(FONT_SYSFIXED);
+
             /* draw page */
             for (i=0; i < KEYBOARD_LINES; i++)
                 lcd_putsxy(0, 8+i * font_h, line[i]);
             
             /* separator */
-            lcd_drawline(0, main_y - margin, LCD_WIDTH, main_y - margin);
+            lcd_drawline(0, main_y - margin, LCD_WIDTH - 1, main_y - margin);
             
             /* write out the text */
-            if (editpos < max_chars - 3 )
-            {
-                strncpy(outline, text, max_chars - 2);
-                if (len > max_chars - 2)
-                    lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
-                curpos = (1 + editpos) * font_w;
-            }
-            else
-            {
-                /* not room for all text, cut left, right or both */
-                if (editpos == len )
-                {
-                    if ( max_chars - 3 == len)
-                    {
-                        strncpy(outline, text, max_chars - 2);
-                        curpos  = (1 + editpos) * font_w;
-                    }
-                    else
-                    {
-                        strncpy(outline, text + editpos - max_chars + 2,
-                                max_chars - 2);
-                        if (len > max_chars - 2)
-                            lcd_putsxy(0, main_y, "<");
-                        curpos = ( max_chars - 1) * font_w;
-                    }
-                }
-                else
-                {
-                    if (len - 1 == editpos)
-                    {
-                        strncpy(outline, text + editpos - max_chars + 3,
-                                max_chars - 2);
-                        curpos = ( max_chars - 2) * font_w;
-                    }
-                    else
-                    {
-                        strncpy(outline, text + editpos - max_chars + 4,
-                                max_chars - 2);
-                        curpos = ( max_chars - 3) * font_w;
-                    }
-                    lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
-                    lcd_putsxy(0, main_y, "<");
-                }
-            }
-
-            /* Zero terminate the string */
-            outline[max_chars - 2] = '\0';
+            curpos = MIN(editpos, max_chars - MIN(len - editpos, 2));
+            leftpos = editpos - curpos;
+            strncpy(outline, text + leftpos, max_chars);
+            outline[max_chars] = 0;
             
-            lcd_putsxy(font_w,main_y,outline);
+            lcd_putsxy(font_w, main_y, outline);
+
+            if (leftpos)
+                lcd_putsxy(0, main_y, "<");
+            if (len - leftpos > max_chars)
+                lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
 
             /* cursor */
-            lcd_drawline(curpos, main_y, curpos, main_y + font_h);
-            
+            i = (curpos + 1) * font_w;
+            lcd_drawline(i, main_y, i, main_y + font_h);
+
 #if CONFIG_KEYPAD == RECORDER_PAD
             /* draw the status bar */
             buttonbar_set("Shift", "OK", "Del");
             buttonbar_draw();
-#endif            
+#endif
             
 #ifdef KBD_MODES
             if (!line_edit)
@@ -265,11 +228,11 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) /* right doubles as cursor_right in line_edit */
                 {
-                    editpos++;
-                    if (editpos > len)
-                        editpos = len;
-                    else
+                    if (editpos < len)
+                    {
+                        editpos++;
                         kbd_spellchar(text[editpos]);
+                    }
                 }
                 else
 #endif
@@ -294,11 +257,11 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) /* left doubles as cursor_left in line_edit */
                 {
-                    editpos--;
-                    if (editpos < 0)
-                        editpos = 0;
-                    else
+                    if (editpos)
+                    {
+                        editpos--;
                         kbd_spellchar(text[editpos]);
+                    }
                 }
                 else
 #endif
@@ -382,38 +345,34 @@ int kbd_input(char* text, int buflen)
                 {
                     if (editpos > 0)
                     {
-                        for (i = editpos; i <= (len - 1);i++)
-                        {
+                        for (i = editpos; i < len; i++)
                             text[i-1] = text[i];
-                        }
-                        text[i-1]='\0';
+                        text[i-1] = '\0';
                         editpos--;
-                        if (editpos < 0)
-                            editpos=0;
                     }
                 }
                 else
 #endif
                 {
-                    if (len<buflen)
+                    if (len < buflen)
                     {
                         c = line[y][x];
-                        if ( editpos == len )
+                        if (editpos == len)
                         {
                             text[len] = c;
                             text[len+1] = 0;
                         }
                         else
                         {
-                            for (i = len ; i + 1 > editpos; i--)
+                            for (i = len ; i >= editpos; i--)
                                 text[i+1] = text[i];
                             text[editpos] = c;
                         }
                         editpos++;
                     }
-                    if (global_settings.talk_menu) /* voice UI? */
-                        talk_spell(text, false); /* speak revised text */
                 }
+                if (global_settings.talk_menu) /* voice UI? */
+                    talk_spell(text, false);   /* speak revised text */
                 break;
 
 #ifndef KBD_MODES
@@ -421,33 +380,31 @@ int kbd_input(char* text, int buflen)
             case KBD_BACKSPACE | BUTTON_REPEAT:
                 if (editpos > 0)
                 {
-                    for (i = editpos; i <= (len - 1);i++)
-                    {
+                    for (i = editpos; i < len; i++)
                         text[i-1] = text[i];
-                    }
-                    text[i-1]='\0';
+                    text[i-1] = '\0';
                     editpos--;
-                    if (editpos < 0)
-                        editpos=0;
                 }
+                if (global_settings.talk_menu) /* voice UI? */
+                    talk_spell(text, false);   /* speak revised text */
                 break;
 
             case KBD_CURSOR_RIGHT:
             case KBD_CURSOR_RIGHT | BUTTON_REPEAT:
-                editpos++;
-                if (editpos > len)
-                    editpos = len;
-                else
+                if (editpos < len)
+                {
+                    editpos++;
                     kbd_spellchar(text[editpos]);
+                }
                 break;
 
             case KBD_CURSOR_LEFT:
             case KBD_CURSOR_LEFT | BUTTON_REPEAT:
-                editpos--;
-                if (editpos < 0)
-                    editpos = 0;
-                else
+                if (editpos)
+                {
+                    editpos--;
                     kbd_spellchar(text[editpos]);
+                }
                 break;
 #endif /* !KBD_MODES */
 
