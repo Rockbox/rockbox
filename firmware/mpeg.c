@@ -18,18 +18,20 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "config.h"
+#include "debug.h"
+#include "panic.h"
+#include "id3.h"
+#include "mpeg.h"
+#ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
 #include "dac.h"
 #include "system.h"
-#include "debug.h"
 #include "kernel.h"
 #include "thread.h"
 #include "usb.h"
-#include "panic.h"
 #include "file.h"
-#include "mpeg.h"
-#include "id3.h"
+#endif
 
 #define MPEG_STACK_SIZE 0x2000
 #define MPEG_CHUNKSIZE  0x20000
@@ -115,6 +117,17 @@ int mpeg_sound_default(int setting)
 {
     return defaultval[setting];
 }
+
+/* list of tracks in memory */
+#define MAX_ID3_TAGS 4
+static struct {
+    struct mp3entry id3;
+    int mempos;
+} id3tags[MAX_ID3_TAGS];
+
+#ifndef SIMULATOR
+static int last_tag = 0;
+static int last_dma_tick = 0;
 
 #ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
@@ -266,15 +279,6 @@ static bool playing; /* We are playing an MP3 stream */
 static bool filling; /* We are filling the buffer with data from disk */
 
 static int mpeg_file;
-
-/* list of tracks in memory */
-#define MAX_ID3_TAGS 4
-static struct {
-    struct mp3entry id3;
-    int mempos;
-} id3tags[MAX_ID3_TAGS];
-static int last_tag = 0;
-static int last_dma_tick = 0;
 
 static void create_fliptable(void)
 {
@@ -465,11 +469,6 @@ static int new_file(bool next_track)
         return -1;
     }
     return 0;
-}
-
-struct mp3entry* mpeg_current_track(void)
-{
-    return &(id3tags[0].id3);
 }
 
 static void stop_playing(void)
@@ -746,40 +745,62 @@ static void setup_sci0(void)
     /* Enable Tx (only!) */
     SCR0 |= 0x20;
 }
+#endif /* SIMULATOR */
 
+struct mp3entry* mpeg_current_track(void)
+{
+    return &(id3tags[0].id3);
+}
 
 void mpeg_play(char* trackname)
 {
+#ifdef SIMULATOR
+    trackname = trackname;
+#else
     queue_post(&mpeg_queue, MPEG_PLAY, trackname);
+#endif
 }
 
 void mpeg_stop(void)
 {
+#ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
+#endif
 }
 
 void mpeg_pause(void)
 {
+#ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
+#endif
 }
 
 void mpeg_resume(void)
 {
+#ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
+#endif
 }
 
 void mpeg_next(void)
 {
+#ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
+#endif
 }
 
 void mpeg_prev(void)
 {
+#ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
+#endif
 }
 
 void mpeg_sound_set(int setting, int value)
 {
+#ifdef SIMULATOR
+    setting = value;
+#else
     int tmp;
     
     switch(setting)
@@ -814,6 +835,7 @@ void mpeg_sound_set(int setting, int value)
 #endif
             break;
     }
+#endif /* SIMULATOR */
 }
 
 int mpeg_val2phys(int setting, int value)
@@ -847,6 +869,9 @@ int mpeg_val2phys(int setting, int value)
 
 void mpeg_init(int volume, int bass, int treble)
 {
+#ifdef SIMULATOR
+    volume = bass = treble;
+#else
 #ifdef ARCHOS_RECORDER
     int rc;
     unsigned long val;
@@ -913,4 +938,5 @@ void mpeg_init(int volume, int bass, int treble)
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);
     mpeg_sound_set(SOUND_VOLUME, volume);
+#endif /* SIMULATOR */
 }
