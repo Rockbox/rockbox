@@ -327,6 +327,21 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
 #endif
 }
 
+void display_volume_level(int vol_level)
+{
+    char buffer[32];
+
+    lcd_stop_scroll();
+    lcd_clear_display();
+    snprintf(buffer,sizeof(buffer),"Vol: %d %s", vol_level * 2, "%");
+
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_puts(0, 0, buffer);
+#else
+    lcd_puts(2, 3, buffer);
+#endif
+}
+
 void display_keylock_text(bool locked)
 {
     lcd_stop_scroll();
@@ -585,6 +600,12 @@ int wps_show(void)
             case BUTTON_LEFT | BUTTON_REL:
                 if (!keys_locked)
                 {
+                    if (menu_button_is_down)
+                    {
+                        sleep(HZ/2);
+                        draw_screen(id3);
+                    }
+
                     if (ff_rewind)
                     {
                         /* rewind */
@@ -620,6 +641,12 @@ int wps_show(void)
             case BUTTON_RIGHT | BUTTON_REL:
                 if (!keys_locked)
                 {
+                    if (menu_button_is_down)
+                    {
+                        sleep(HZ/2);
+                        draw_screen(id3);
+                    }
+
                     if (ff_rewind)
                     {
                         /* fast forward */
@@ -661,6 +688,9 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#ifdef HAVE_PLAYER_KEYPAD
+                    display_volume_level(global_settings.volume);
+#endif
                 status_draw();
                 settings_save();
                 break;
@@ -672,6 +702,9 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#ifdef HAVE_PLAYER_KEYPAD
+                display_volume_level(global_settings.volume);
+#endif
                 status_draw();
                 settings_save();
                 break;
