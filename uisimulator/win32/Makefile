@@ -142,7 +142,7 @@ clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
 	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
-	$(OBJDIR)/credits.raw
+	$(OBJDIR)/credits.raw $(OBJDIR)/libplugin.a
 	$(RM) -r $(DEPS)
 
 ################## Specific dependencies ##################
