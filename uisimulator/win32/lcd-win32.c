@@ -28,14 +28,14 @@
 
 // varaibles
 unsigned char       display[LCD_WIDTH][LCD_HEIGHT/8]; // the display
-char                bitmap[LCD_WIDTH][LCD_HEIGHT]; // the ui display
+char                bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 
 BITMAPINFO2 bmi =
 {
 	sizeof (BITMAPINFOHEADER),
 	LCD_WIDTH, -LCD_HEIGHT, 1, 8,
 	BI_RGB, 0, 0, 0, 2, 2,
-	UI_LCD_COLOR, 0, // green background color
+	UI_LCD_BGCOLOR, 0, // green background color
 	UI_LCD_BLACK, 0 // black color
 }; // bitmap information
 
@@ -63,4 +63,24 @@ void lcd_update()
 
     // natural sleep :)
     Sleep (50);
+}
+
+// lcd_backlight
+// set backlight state of lcd
+void lcd_backlight (
+                    bool on // switch backlight on or off?
+                    )
+{
+    if (on)
+    {
+        RGBQUAD blon = {UI_LCD_BGCOLORLIGHT, 0};
+        bmi.bmiColors[0] = blon;
+    }
+    else
+    {
+        RGBQUAD blon = {UI_LCD_BGCOLOR, 0};
+        bmi.bmiColors[0] = blon;
+    }
+
+	InvalidateRect (hGUIWnd, NULL, FALSE);
 }

@@ -65,8 +65,8 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR"
+				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;WIN32"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
@@ -113,6 +113,9 @@
 				RelativePath="..\..\firmware\chartables.c">
 			</File>
 			<File
+				RelativePath="file-win32.c">
+			</File>
+			<File
 				RelativePath="kernel.c">
 			</File>
 			<File
@@ -120,29 +123,20 @@
 			</File>
 			<File
 				RelativePath="..\..\firmware\drivers\lcd.c">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="tetris.c">
+				RelativePath="main.c">
 			</File>
 			<File
-				RelativePath="uisw32.cpp">
+				RelativePath="uisw32.c">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="file-win32.h">
+			</File>
 			<File
 				RelativePath="lcd-win32.h">
 			</File>

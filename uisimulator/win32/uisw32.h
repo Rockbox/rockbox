@@ -25,7 +25,8 @@
 
 #define UI_WIDTH                    240 // width of GUI window
 #define UI_HEIGHT                   360 // height of GUI window
-#define UI_LCD_COLOR                46, 67, 49 // bkgnd color of LCD
+#define UI_LCD_BGCOLOR              46, 67, 49 // bkgnd color of LCD (no backlight)
+#define UI_LCD_BGCOLORLIGHT         56, 77, 59 // bkgnd color of LCD (backlight)
 #define UI_LCD_BLACK                0, 0, 0 // black
 #define UI_LCD_POSX                 59 // x position of lcd
 #define UI_LCD_POSY                 95 // y position of lcd

@@ -39,7 +39,7 @@ extern unsigned char        display[LCD_WIDTH][LCD_HEIGHT/8]; // the display
 #endif
 
 
-extern char                 bitmap[LCD_WIDTH][LCD_HEIGHT]; // the ui display
+extern char                 bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 extern BITMAPINFO2          bmi; // bitmap information
 
 
