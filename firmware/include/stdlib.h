@@ -32,8 +32,8 @@ void *realloc(void *, size_t);
 
 #define RAND_MAX 0x7fffffff
 
-void srand(unsigned int seed);
-int rand(void);
+void srand(unsigned long seed);
+long rand(void);
 
 #define abs(x) ((x)>0?(x):-(x))
 
