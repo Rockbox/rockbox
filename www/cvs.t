@@ -5,6 +5,11 @@
 
 <p>Just go <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
 
+<h2>Daily snapshots</h2>
+
+<p>Every night at 6am CET, we build a source tarball and target .mod files from the latest CVS code.
+<a href="daily.shtml">Get them here</a>.
+
 <h2>Downloading (checking out) the source</h2>
 
 <p>You, obviously, need to have <a href="http://www.cvshome.org">CVS</a> installed to do this.
