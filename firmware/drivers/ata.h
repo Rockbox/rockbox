@@ -19,6 +19,18 @@
 #ifndef __ATA_H__
 #define __ATA_H__
 
+/*
+  ata_spindown() time values:
+   -1     Immediate spindown
+   0      Timeout disabled
+   1-240  (time * 5) seconds
+   241-251((time - 240) * 30) minutes
+   252    21 minutes
+   253    Period between 8 and 12 hrs
+   254    Reserved
+   255    21 min 15 s
+*/
+extern int ata_spindown(int time);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
 extern int ata_init(void);

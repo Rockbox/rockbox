@@ -31,6 +31,7 @@
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
 #define ATA_STATUS      ATA_COMMAND
 #define ATA_CONTROL     (*((volatile unsigned char*)0x06100306))
+#define ATA_ALT_STATUS  ATA_CONTROL
 
 #define SELECT_LBA      0x40
 
@@ -52,7 +53,7 @@
 static int wait_for_bsy(void)
 {
     char timeout = current_tick + HZ;
-    while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY))
+    while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
         yield();
 
     if (TIME_BEFORE(current_tick, timeout))
@@ -65,21 +66,21 @@ static int wait_for_rdy(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return ATA_STATUS & STATUS_RDY;
+    return ATA_ALT_STATUS & STATUS_RDY;
 }
 
 static int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_STATUS & (STATUS_RDY|STATUS_DRQ)) == (STATUS_RDY|STATUS_DRQ);
-}    
+    return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
+}
 
 static int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
+    return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
 }    
 
 int ata_read_sectors(unsigned long start,
@@ -107,6 +108,11 @@ int ata_read_sectors(unsigned long start,
 
         for (j=0; j<256; j++)
             ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
+
+#ifdef USE_INTERRUPT
+        /* reading the status register clears the interrupt */
+        j = ATA_STATUS;
+#endif
     }
 
     led_turn_off();
@@ -139,6 +145,11 @@ int ata_write_sectors(unsigned long start,
 
         for (j=0; j<256; j++)
             ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
+
+#ifdef USE_INTERRUPT
+        /* reading the status register clears the interrupt */
+        j = ATA_STATUS;
+#endif
     }
 
     led_turn_off ();
@@ -186,6 +197,27 @@ static int freeze_lock(void)
         return -1;
 
     ATA_COMMAND = CMD_SECURITY_FREEZE_LOCK;
+
+    if (!wait_for_rdy())
+        return -1;
+
+    return 0;
+}
+
+int ata_spindown(int time)
+{
+    if (!wait_for_rdy())
+        return -1;
+
+    if ( time == -1 ) {
+        ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
+    }
+    else {
+        if (time > 255)
+            return -1;
+        ATA_NSECTOR = time & 0xff;
+        ATA_COMMAND = CMD_STANDBY;
+    }
 
     if (!wait_for_rdy())
         return -1;
