@@ -20,7 +20,8 @@ $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libmad
 DIRS = 
 
