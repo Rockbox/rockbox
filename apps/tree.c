@@ -45,6 +45,7 @@
 #include "ata.h"
 #include "rolo.h"
 #include "icons.h"
+#include "lang.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -289,8 +290,8 @@ static int showdir(char *path, int start)
             lcd_double_height(false);
 #endif
             lcd_clear_display();
-            lcd_puts(0,0,"Dir buffer");
-            lcd_puts(0,1,"is full!");
+            lcd_puts(0,0,str(LANG_SHOWDIR_ERROR_BUFFER));
+            lcd_puts(0,1,str(LANG_SHOWDIR_ERROR_FULL));
             lcd_update();
             sleep(HZ*2);
             lcd_clear_display();
@@ -420,12 +421,12 @@ bool ask_resume(void)
         return true;
 
     lcd_clear_display();
-    lcd_puts(0,0,"Resume?");
+    lcd_puts(0,0,str(LANG_RESUME_ASK));
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_puts(0,1,"(Play/Stop)");
+    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #else
-    lcd_puts(0,1,"Play = Yes");
-    lcd_puts(0,2,"Any other = No");
+    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_RECORDER));
+    lcd_puts(0,2,str(LANG_RESUME_CANCEL_RECORDER));
 #endif
     lcd_update();
     if (button_get(true) == BUTTON_PLAY)

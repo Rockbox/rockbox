@@ -32,7 +32,7 @@
 #include <stdio.h>
 #endif
 #include <string.h>
-
+#include "lang.h"
 #define SOKOBAN_TITLE   "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 #define NUM_LEVELS  sizeof(levels)/320
@@ -1847,8 +1847,8 @@ void update_screen(void) {
 
     lcd_drawrect (80,0,32,32);
     lcd_drawrect (80,32,32,64);
-    lcd_putsxy (81, 10, "Level", 0);
-    lcd_putsxy (81, 42, "Moves", 0);
+    lcd_putsxy (81, 10, str(LANG_SOKOBAN_LEVEL), 0);
+    lcd_putsxy (81, 42, str(LANG_SOKOBAN_MOVE), 0);
     /* print out the screen */
     lcd_update();
 }
@@ -2187,7 +2187,7 @@ void sokoban_loop(void) {
             if (current_level == NUM_LEVELS) {
                 for(ii=0; ii<30 ; ii++) {
                     lcd_clear_display();
-                    lcd_putsxy(10, 20, "YOU WIN!!", 2);
+                    lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN), 2);
                     lcd_update();
                     lcd_invertrect(0,0,111,63);
                     lcd_update();
@@ -2232,10 +2232,10 @@ Menu sokoban(void)
 
     lcd_clear_display();
 
-    lcd_putsxy( 3,12,  "[Off] to stop", 0);
-    lcd_putsxy( 3,22, "[F1] - level",0);
-    lcd_putsxy( 3,32, "[F2] same level",0);
-    lcd_putsxy( 3,42, "[F3] + level",0);
+    lcd_putsxy( 3,12,  str(LANG_SOKOBAN_QUIT), 0);
+    lcd_putsxy( 3,22, str(LANG_SOKOBAN_F1),0);
+    lcd_putsxy( 3,32, str(LANG_SOKOBAN_F2),0);
+    lcd_putsxy( 3,42, str(LANG_SOKOBAN_F3),0);
 
     lcd_update();
     sleep(HZ*2);

@@ -37,7 +37,7 @@
 #include "status.h"
 #include "wps-display.h"
 #include "debug.h"
-
+#include "lang.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -579,11 +579,11 @@ void wps_display(struct mp3entry* id3)
     if (!id3 && !mpeg_is_playing())
     {
 #ifdef HAVE_LCD_CHARCELLS
-        lcd_puts(0, 0, "End of list");
-        lcd_puts(0, 1, "<Press ON>");
+        lcd_puts(0, 0, str(LANG_END_PLAYLIST_PLAYER));
+        lcd_puts(0, 1, str(LANG_END_CONFIRM_PLAYER));
 #else
-        lcd_puts(0, 2, "<End of song list>");
-        lcd_puts(5, 4, "Press ON");
+        lcd_puts(0, 2, str(LANG_END_PLAYLIST_RECORDER));
+        lcd_puts(5, 4, str(LANG_END_CONFIRM_RECORDER));
 #endif
     }
     else

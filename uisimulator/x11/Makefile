@@ -42,6 +42,7 @@ DEBUG = -g
 OBJDIR = .
 
 TARGET = $(OBJDIR)/rockboxui
+LANGUAGE = english
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
@@ -49,7 +50,7 @@ $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(OBJDIR)
 SRCDIRS = . $(DRIVERS) $(COMMON) $(FIRMWAREDIR) $(APPDIR) $(MACHINEDIR)
 
 # The true Rockbox Applications should use this include path:
@@ -80,8 +81,7 @@ FIRMSRCS = lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c X5x8.c loadfont.c panic.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c \
-	lang.c
+	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -98,7 +98,7 @@ ifdef MPEG_PLAY
   INCLUDES += -I$(LIBMADDIR)
 endif
 
-OBJS := $(SRCS:%.c=$(OBJDIR)/%.o)
+OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
 all: $(TARGET) $(EXTRA_TARGETS)
 
@@ -214,8 +214,9 @@ $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
 $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/lang.o: $(APPDIR)/lang.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+$(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
+	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@

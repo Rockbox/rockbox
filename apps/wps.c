@@ -40,7 +40,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
-
+#include "lang.h"
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 
@@ -116,17 +116,17 @@ void display_keylock_text(bool locked)
 
 #ifdef HAVE_LCD_CHARCELLS
     if(locked)
-        lcd_puts(0, 0, "Keylock ON");
+        lcd_puts(0, 0, str(LANG_KEYLOCK_ON_PLAYER));
     else
-        lcd_puts(0, 0, "Keylock OFF");
+        lcd_puts(0, 0, str(LANG_KEYLOCK_OFF_PLAYER));
 #else
     if(locked)
     {
-        lcd_puts(2, 3, "Key lock is ON");
+        lcd_puts(2, 3, str(LANG_KEYLOCK_ON_RECORDER));
     }
     else
     {
-        lcd_puts(2, 3, "Key lock is OFF");
+        lcd_puts(2, 3, str(LANG_KEYLOCK_OFF_RECORDER));
     }
     lcd_update();
 #endif
@@ -141,17 +141,17 @@ void display_mute_text(bool muted)
 
 #ifdef HAVE_LCD_CHARCELLS
     if (muted)
-        lcd_puts(0, 0, "Mute ON");
+        lcd_puts(0, 0, str(LANG_MUTE_ON_PLAYER));
     else
-        lcd_puts(0, 0, "Mute OFF");
+        lcd_puts(0, 0, str(LANG_MUTE_OFF_PLAYER));
 #else
     if (muted)
     {
-        lcd_puts(2, 3, "Mute is ON");
+        lcd_puts(2, 3, str(LANG_MUTE_ON_RECORDER));
     }
     else
     {
-        lcd_puts(2, 3, "Mute is OFF");
+        lcd_puts(2, 3, str(LANG_MUTE_OFF_RECORDER));
     }
     lcd_update();
 #endif
@@ -185,8 +185,8 @@ static int browse_id3(void)
 
     lcd_stop_scroll();
     lcd_clear_display();
-    lcd_puts(0, 0, "-ID3 Info- ");
-    lcd_puts(0, 1, "--Screen-- ");
+    lcd_puts(0, 0, str(LANG_ID3_INFO));
+    lcd_puts(0, 1, str(LANG_ID3_SCREEN));
     lcd_update();
     sleep(HZ);
  
@@ -198,23 +198,26 @@ static int browse_id3(void)
         switch (menu_pos)
         {
             case 0:
-                lcd_puts(0, 0, "[Title]");
-                lcd_puts_scroll(0, 1, id3->title ? id3->title : "<no title>");
+                lcd_puts(0, 0, str(LANG_ID3_TITLE));
+                lcd_puts_scroll(0, 1, id3->title ? id3->title : 
+                                (char*)str(LANG_ID3_NO_TITLE));
                 break;
 
             case 1:
-                lcd_puts(0, 0, "[Artist]");
+                lcd_puts(0, 0, str(LANG_ID3_ARTIST));
                 lcd_puts_scroll(0, 1, 
-                                id3->artist ? id3->artist : "<no artist>");
+                                id3->artist ? id3->artist : 
+                                (char*)str(LANG_ID3_NO_ARTIST));
                 break;
 
             case 2:
-                lcd_puts(0, 0, "[Album]");
-                lcd_puts_scroll(0, 1, id3->album ? id3->album : "<no album>");
+                lcd_puts(0, 0, str(LANG_ID3_ALBUM));
+                lcd_puts_scroll(0, 1, id3->album ? id3->album : 
+                                (char*)str(LANG_ID3_NO_ALBUM));
                 break;
 
             case 3:
-                lcd_puts(0, 0, "[Tracknum]");
+                lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
                 
                 if (id3->tracknum)
                 {
@@ -224,12 +227,12 @@ static int browse_id3(void)
                 }
                 else
                 {
-                    lcd_puts_scroll(0, 1, "<no tracknum>");
+                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_TRACKNUM));
                 }
                 break;
 
             case 4:
-                lcd_puts(0, 0, "[Length]");
+                lcd_puts(0, 0, str(LANG_ID3_LENGHT));
                 snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
                          id3->length / 60000,
                          id3->length % 60000 / 1000 );
@@ -237,7 +240,7 @@ static int browse_id3(void)
                 break;
 
             case 5:
-                lcd_puts(0, 0, "[Playlist]");
+                lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
                 snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
                          id3->index + 1, playlist.amount);
                 lcd_puts_scroll(0, 1, scroll_text);
@@ -245,21 +248,21 @@ static int browse_id3(void)
 
 
             case 6:
-                lcd_puts(0, 0, "[Bitrate]");
+                lcd_puts(0, 0, str(LANG_ID3_BITRATE));
                 snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
                          id3->bitrate);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
             case 7:
-                lcd_puts(0, 0, "[Frequency]");
+                lcd_puts(0, 0, str(LANG_ID3_FRECUENCY));
                 snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
                          id3->frequency);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
             case 8:
-                lcd_puts(0, 0, "[Path]");
+                lcd_puts(0, 0, str(LANG_ID3_PATH));
                 lcd_puts_scroll(0, 1, id3->path);
                 break;
         }
@@ -644,7 +647,7 @@ int on_screen(void)
             lcd_scroll_pause();
             lcd_clear_display();
 
-            ptr = "Pitch up";
+            ptr = str(LANG_PITCH_UP);
             lcd_getstringsize(ptr,FONT_UI,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr, FONT_UI);
             lcd_bitmap(bitmap_icons_7x8[Icon_UpArrow],
@@ -654,13 +657,13 @@ int on_screen(void)
             lcd_getstringsize(buf,FONT_UI,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, h, buf, FONT_UI);
 
-            ptr = "Pitch down";
+            ptr = str(LANG_PITCH_DOWN);
             lcd_getstringsize(ptr,FONT_UI,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr, FONT_UI);
             lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
-            ptr = "Pause";
+            ptr = str(LANG_PAUSE);
             lcd_getstringsize(ptr,FONT_UI,&w,&h);
             lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr, FONT_UI);
             lcd_bitmap(bitmap_icons_7x8[Icon_Pause],
@@ -753,15 +756,15 @@ bool f2_screen(void)
     while (!exit) {
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Shuffle", FONT_UI);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, "mode:", FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE), FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE), FONT_UI);
         lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.playlist_shuffle ? "on" : "off", FONT_UI);
+                   global_settings.playlist_shuffle ? str(LANG_ON) : str(LANG_OFF), FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        snprintf(buf, sizeof buf, "Dir filter: %s",
-                 global_settings.mp3filter ? "on" : "off");
+        snprintf(buf, sizeof buf, str(LANG_DIR_FILTER),
+                 global_settings.mp3filter ? str(LANG_ON) : str(LANG_OFF));
 
         /* Get the string width and height */
         lcd_getstringsize(buf,FONT_UI,&w,&h);
@@ -819,21 +822,21 @@ bool f3_screen(void)
         int w,h;
         char* ptr;
 
-        ptr = "Status";
+        ptr = str(LANG_F3_STATUS);
         lcd_getstringsize(ptr,FONT_UI,&w,&h);
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Scroll", FONT_UI);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, "bar:", FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL), FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR), FONT_UI);
         lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.scrollbar ? "on" : "off", FONT_UI);
+                   global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF), FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, FONT_UI);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "bar:", FONT_UI);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR), FONT_UI);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
-                   global_settings.statusbar ? "on" : "off", FONT_UI);
+                   global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF), FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
         lcd_update();

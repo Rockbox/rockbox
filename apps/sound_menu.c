@@ -29,6 +29,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
+#include "lang.h"
 
 static char *fmt[] =
 {
@@ -147,38 +148,38 @@ void set_sound(char* string,
 
 static Menu volume(void)
 {
-    set_sound("Volume", &global_settings.volume, SOUND_VOLUME);
+    set_sound(str(LANG_VOLUME), &global_settings.volume, SOUND_VOLUME);
     return MENU_OK;
 }
 
 static Menu balance(void)
 {
-    set_sound("Balance", &global_settings.balance, SOUND_BALANCE);
+    set_sound(str(LANG_BALANCE), &global_settings.balance, SOUND_BALANCE);
     return MENU_OK;
 }
 
 static Menu bass(void)
 {
-    set_sound("Bass", &global_settings.bass, SOUND_BASS);
+    set_sound(str(LANG_BASS), &global_settings.bass, SOUND_BASS);
     return MENU_OK;
 };
 
 static Menu treble(void)
 {
-    set_sound("Treble", &global_settings.treble, SOUND_TREBLE);
+    set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
     return MENU_OK;
 }
 
 #ifdef HAVE_MAS3587F
 static Menu loudness(void)
 {
-    set_sound("Loudness", &global_settings.loudness, SOUND_LOUDNESS);
+    set_sound(str(LANG_LOUDNESS), &global_settings.loudness, SOUND_LOUDNESS);
     return MENU_OK;
 };
 
 static Menu bass_boost(void)
 {
-    set_sound("Bass boost", &global_settings.bass_boost, SOUND_SUPERBASS);
+    set_sound(str(LANG_BBOOST), &global_settings.bass_boost, SOUND_SUPERBASS);
     return MENU_OK;
 };
 
@@ -189,8 +190,8 @@ static void set_avc(int val)
 
 static Menu avc(void)
 {
-    char* names[] = { "off", "2s", "4s", "8s" };
-    set_option("AV decay time", &global_settings.avc, names, 4, set_avc );
+    char* names[] = { str(LANG_OFF), "2s", "4s", "8s" };
+    set_option(str(LANG_DECAY), &global_settings.avc, names, 4, set_avc );
     return MENU_OK;
 }
 #endif /* ARCHOS_RECORDER */
@@ -202,8 +203,9 @@ static void set_chanconf(int val)
 
 static Menu chanconf(void)
 {
-    char *names[] = {"Stereo", "Mono", "Mono Left", "Mono Right" };
-    set_option("Channel configuration",
+    char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO),
+	    str(LANG_CHANNEL_LEFT),str(LANG_CHANNEL_RIGHT) };
+    set_option(str(LANG_CHANNEL),
                &global_settings.channel_config, names, 4, set_chanconf );
     return MENU_OK;
 }
@@ -213,15 +215,15 @@ Menu sound_menu(void)
     int m;
     Menu result;
     struct menu_items items[] = {
-        { "Volume", volume },
-        { "Bass",   bass },
-        { "Treble", treble },
-        { "Balance", balance },
-        { "Channels", chanconf },
+        { str(LANG_VOLUME), volume },
+        { str(LANG_BASS), bass },
+        { str(LANG_TREBLE), treble },
+        { str(LANG_BALANCE), balance },
+        { str(LANG_CHANNEL_MENU), chanconf },
 #ifdef HAVE_MAS3587F
-        { "Loudness", loudness },
-        { "Bass Boost", bass_boost },
-        { "Auto Volume", avc }
+        { str(LANG_LOUDNESS), loudness },
+        { str(LANG_BBOOST), bass_boost },
+        { str(LANG_AUTOVOL), avc }
 #endif
     };
     

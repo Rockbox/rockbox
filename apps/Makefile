@@ -13,9 +13,11 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
+LANGUAGE = english
+
 FIRMWARE := ../firmware
 
-INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
+INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I. -I$(OBJDIR)
 
 # store output files in this directory:
 OBJDIR = .
@@ -47,7 +49,7 @@ else
    OUTNAME = archos.mod
 endif
 
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
 
 all : $(OBJDIR)/$(OUTNAME)
 
@@ -69,6 +71,10 @@ $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/lang.o: lang/$(LANGUAGE).lang
+	../tools/genlang -p=$(OBJDIR)/lang $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds

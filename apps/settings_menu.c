@@ -36,17 +36,18 @@
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
+#include "lang.h"
 
 static Menu show_hidden_files(void)
 {
-    set_bool_options( "Hidden Files", &global_settings.show_hidden_files,
-                      "show", "hide" );
+    set_bool_options( str(LANG_HIDDEN), &global_settings.show_hidden_files,
+                      str(LANG_HIDDEN_SHOW), str(LANG_HIDDEN_HIDE) );
     return MENU_OK;
 }
 
 static Menu contrast(void)
 {
-    set_int( "Contrast", "", &global_settings.contrast, 
+    set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
              lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
     return MENU_OK;
 }
@@ -54,50 +55,53 @@ static Menu contrast(void)
 #ifndef HAVE_RECORDER_KEYPAD
 static Menu shuffle(void)
 {
-    set_bool( "Shuffle", &global_settings.playlist_shuffle );
+    set_bool( str(LANG_SHUFFLE), &global_settings.playlist_shuffle );
     return MENU_OK;
 }
 #endif
 
 static Menu play_selected(void)
 {
-    set_bool( "Play Selected", &global_settings.play_selected );
+    set_bool( str(LANG_PLAY_SELECTED), &global_settings.play_selected );
     return MENU_OK;
 }
 
 static Menu mp3_filter(void)
 {
-    set_bool( "Music Filter", &global_settings.mp3filter );
+    set_bool( str(LANG_MP3FILTER), &global_settings.mp3filter );
     return MENU_OK;
 }
 
 static Menu sort_case(void)
 {
-    set_bool( "Sort Case Sensitive", &global_settings.sort_case );
+    set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
     return MENU_OK;
 }
 
 static Menu resume(void)
 {
-    char* names[] = { "off", "ask", "on" };
-    set_option( "Resume", &global_settings.resume, names, 3, NULL );
+    char* names[] = { str(LANG_OFF), 
+                      str(LANG_RESUME_SETTING_ASK),
+                      str(LANG_ON) };
+    set_option( str(LANG_RESUME), &global_settings.resume, names, 3, NULL );
     return MENU_OK;
 }
 
 static Menu backlight_timer(void)
 {
-    char* names[] = { "off", "on ",
+    char* names[] = { str(LANG_OFF), str(LANG_ON),
                       "1s ", "2s ", "3s ", "4s ", "5s ",
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
-    set_option("Backlight", &global_settings.backlight, names, 19, backlight_time );
+    set_option(str(LANG_BACKLIGHT), &global_settings.backlight, names, 19, 
+               backlight_time );
     return MENU_OK;
 }
 
 static Menu scroll_speed(void)
 {
-    set_int("Scroll Speed Setting Example", "", &global_settings.scroll_speed, 
+    set_int(str(LANG_SCROLL), "", &global_settings.scroll_speed, 
             &lcd_scroll_speed, 1, 1, 30 );
     return MENU_OK;
 }
@@ -105,7 +109,7 @@ static Menu scroll_speed(void)
 #ifdef HAVE_CHARGE_CTRL
 static Menu deep_discharge(void)
 {
-    set_bool( "Deep Discharge", &global_settings.discharge );
+    set_bool( str(LANG_DISCHARGE), &global_settings.discharge );
     charge_restart_level = global_settings.discharge ? 
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
     return MENU_OK;
@@ -139,7 +143,7 @@ static Menu timedate_set(void)
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
 
 
-    set_time("Set time/date",timedate);
+    set_time(str(LANG_TIME),timedate);
 
     if(timedate[0] != -1) {
         /* hour   */
@@ -155,14 +159,14 @@ static Menu timedate_set(void)
         /* day    */
         timedate[5] = ((timedate[5]/10) << 4 | timedate[5]%10) & 0x3f; 
 
-        rtc_write(0x03, timedate[0] | (rtc_read(0x03) & 0xc0));  /* hour      */
-        rtc_write(0x02, timedate[1] | (rtc_read(0x02) & 0x80));  /* minute    */
-        rtc_write(0x01, timedate[2] | (rtc_read(0x01) & 0x80));  /* second    */
-        rtc_write(0x07, timedate[3]);                            /* year      */
-        rtc_write(0x06, timedate[4] | (rtc_read(0x06) & 0xe0));  /* month     */
-        rtc_write(0x05, timedate[5] | (rtc_read(0x05) & 0xc0));  /* day       */
-        rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0xf8));  /* dayofweek */
-        rtc_write(0x00, 0x00);                          /* 0.1 + 0.01 seconds */
+        rtc_write(0x03, timedate[0] | (rtc_read(0x03) & 0xc0)); /* hour */
+        rtc_write(0x02, timedate[1] | (rtc_read(0x02) & 0x80)); /* minute */
+        rtc_write(0x01, timedate[2] | (rtc_read(0x01) & 0x80)); /* second */
+        rtc_write(0x07, timedate[3]);                           /* year */
+        rtc_write(0x06, timedate[4] | (rtc_read(0x06) & 0xe0)); /* month */
+        rtc_write(0x05, timedate[5] | (rtc_read(0x05) & 0xc0)); /* day */
+        rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0xf8)); /* dayofweek */
+        rtc_write(0x00, 0x00); /* 0.1 + 0.01 seconds */
     }
     return MENU_OK;
 }
@@ -170,7 +174,7 @@ static Menu timedate_set(void)
 
 static Menu spindown(void)
 {
-    set_int("Disk Spindown", "s", &global_settings.disk_spindown,
+    set_int(str(LANG_SPINDOWN), "s", &global_settings.disk_spindown,
             ata_spindown, 1, 3, 254 );
     return MENU_OK;
 }
@@ -181,25 +185,25 @@ static Menu ff_rewind_min_step(void)
                       "5s", "6s", "8s", "10s",
                       "15s", "20s", "25s", "30s",
                       "45s", "60s" };
-    set_option("FF/RW Min Step", &global_settings.ff_rewind_min_step,
+    set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
                 names, 14, NULL ); 
     return MENU_OK; 
 } 
 
 static Menu ff_rewind_accel(void) 
 { 
-    char* names[] = { "off", "2x/1s", "2x/2s", "2x/3s", 
+    char* names[] = { str(LANG_OFF), "2x/1s", "2x/2s", "2x/3s", 
                       "2x/4s", "2x/5s", "2x/6s", "2x/7s", 
                       "2x/8s", "2x/9s", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
-    set_option("FF/RW Accel", &global_settings.ff_rewind_accel, 
+    set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
                 names, 16, NULL ); 
     return MENU_OK; 
 } 
 
 static Menu browse_current(void)
 {
-    set_bool( "Follow Playlist", &global_settings.browse_current );
+    set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
     return MENU_OK;
 }
 
@@ -210,13 +214,14 @@ Menu playback_settings_menu(void)
 
     struct menu_items items[] = {
 #ifndef HAVE_RECORDER_KEYPAD
-        { "Shuffle",        shuffle            },
+        { str(LANG_SHUFFLE), shuffle },
 #endif
-        { "Play Selected",  play_selected      },
-        { "Resume",         resume             },
-        { "FF/RW Min Step", ff_rewind_min_step },
-        { "FF/RW Accel",    ff_rewind_accel    },
+        { str(LANG_PLAY_SELECTED), play_selected },
+        { str(LANG_RESUME), resume },
+        { str(LANG_FFRW_STEP), ff_rewind_min_step },
+        { str(LANG_FFRW_ACCEL), ff_rewind_accel },
     };
+
     bool old_shuffle = global_settings.playlist_shuffle;
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -243,26 +248,26 @@ static Menu reset_settings(void)
 
     lcd_clear_display();
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_puts(0,0,"Really?");
-    lcd_puts(0,1,"Play/Stop");
+    lcd_puts(0,0,str(LANG_RESET_ASK_PLAYER));
+    lcd_puts(0,1,str(LANG_RESET_CONFIRM_PLAYER));
 #else
-    lcd_puts(0,0,"Are you sure?");
-    lcd_puts(0,1,"Play = Yes");
-    lcd_puts(0,2,"Any Other = No");
+    lcd_puts(0,0,str(LANG_RESET_ASK_RECORDER));
+    lcd_puts(0,1,str(LANG_RESET_CONFIRM_RECORDER));
+    lcd_puts(0,2,str(LANG_RESET_CANCEL_RECORDER));
 #endif
     lcd_update();
     button = button_get(true);
     if (button == BUTTON_PLAY) {
         settings_reset();
         lcd_clear_display();
-        lcd_puts(0,0,"Settings");
-        lcd_puts(0,1,"Cleared");
+        lcd_puts(0,0,str(LANG_RESET_DONE_SETTING));
+        lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
         lcd_update();
         sleep(HZ);
         return(true);
     } else {
         lcd_clear_display();
-        lcd_puts(0,0,"Canceled");
+        lcd_puts(0,0,str(LANG_RESET_DONE_CANCEL));
         lcd_update();
         sleep(HZ);
         return(false);
@@ -275,10 +280,10 @@ static Menu fileview_settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Sort Mode",       sort_case           },
-        { "Music Filter",    mp3_filter          },
-        { "Hidden Files",    show_hidden_files   },
-        { "Follow Playlist", browse_current      },
+        { str(LANG_CASE_MENU),    sort_case           },
+        { str(LANG_MP3FILTER),    mp3_filter          },
+        { str(LANG_HIDDEN),       show_hidden_files   },
+        { str(LANG_FOLLOW),       browse_current      },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -293,9 +298,9 @@ static Menu display_settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Scroll Speed",    scroll_speed    },  
-        { "Backlight",       backlight_timer },
-        { "Contrast",        contrast        },  
+        { str(LANG_SCROLL_MENU),     scroll_speed    },  
+        { str(LANG_BACKLIGHT),       backlight_timer },
+        { str(LANG_CONTRAST),        contrast        },  
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -310,14 +315,14 @@ static Menu system_settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Disk Spindown",   spindown        },
+        { str(LANG_SPINDOWN),    spindown        },
 #ifdef HAVE_CHARGE_CTRL
-        { "Deep Discharge",  deep_discharge  },
+        { str(LANG_DISCHARGE),   deep_discharge  },
 #endif
 #ifdef HAVE_RTC
-        { "Time/Date",       timedate_set    },
+        { str(LANG_TIME),        timedate_set    },
 #endif
-        { "Reset settings",  reset_settings },
+        { str(LANG_RESET),        reset_settings },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -332,10 +337,10 @@ Menu settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Playback",        playback_settings_menu },
-        { "File View",       fileview_settings_menu },
-        { "Display",         display_settings_menu  },
-        { "System",          system_settings_menu   },
+        { str(LANG_PLAYBACK),        playback_settings_menu },
+        { str(LANG_FILE),            fileview_settings_menu },
+        { str(LANG_DISPLAY),         display_settings_menu  },
+        { str(LANG_SYSTEM),          system_settings_menu   },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -35,7 +35,7 @@
 #include <stdio.h>
 #endif
 #include "sprintf.h"
-
+#include "lang.h"
 #define TETRIS_TITLE       "Tetris!"
 #define TETRIS_TITLE_FONT  1
 #define TETRIS_TITLE_XLOC  43
@@ -366,7 +366,7 @@ void game_loop(void)
         if(gameover())
         {
             lcd_clearrect(0, 52, LCD_WIDTH, LCD_HEIGHT - 52);
-            lcd_putsxy (2, 52, "You lose!", 0);
+            lcd_putsxy (2, 52, str(LANG_TETRIS_LOSE), 0);
             lcd_update();
             sleep(HZ * 3);
             return;
@@ -396,7 +396,7 @@ Menu tetris(void)
     init_tetris();
 
     draw_frame(start_x, start_x + max_x - 1, start_y - 1, start_y + max_y);
-    lcd_putsxy (2, 42, "0 Rows - Level 0", 0);
+    lcd_putsxy (2, 42, str(LANG_TETRIS_LEVEL), 0);
     lcd_update();
 
     next_b = t_rand(blocks);

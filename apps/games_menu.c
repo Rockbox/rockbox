@@ -34,6 +34,8 @@
 
 #include "sokoban.h"
 #include "wormlet.h"
+#include "lang.h"
+
 extern Menu tetris(void);
 extern Menu snake(void);
 
@@ -43,10 +45,10 @@ Menu games_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Tetris",  tetris  },
-        { "Sokoban", sokoban },
-	{ "Wormlet", wormlet },
-        { "Snake",   snake   } 
+        { str(LANG_TETRIS),  tetris  },
+        { str(LANG_SOKOBAN), sokoban },
+        { str(LANG_WORMLET), wormlet },
+        { str(LANG_SNAKE),   snake   } 
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

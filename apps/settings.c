@@ -43,6 +43,8 @@
 #include "font.h"
 #endif
 
+#include "lang.h"
+
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
@@ -304,11 +306,11 @@ int settings_save( void )
     {
         lcd_clear_display();
 #ifdef HAVE_LCD_CHARCELLS
-        lcd_puts(0, 0, "Save failed");
-        lcd_puts(0, 1, "Batt. low?");
+        lcd_puts(0, 0, str(LANG_SETTINGS_SAVE_PLAYER));
+        lcd_puts(0, 1, str(LANG_SETTINGS_BATTERY_PLAYER));
 #else
-        lcd_puts(4, 2, "Save failed");
-        lcd_puts(2, 4, "Is battery low?");
+        lcd_puts(4, 2, str(LANG_SETTINGS_SAVE_RECORDER));
+        lcd_puts(2, 4, str(LANG_SETTINGS_BATTERY_RECORDER));
         lcd_update();
 #endif
         sleep(HZ*2);
@@ -944,8 +946,8 @@ void set_time(char* string, int timedate[])
                        cursor[cursorpos][INDEX_WIDTH],
                        line_height);
 
-        lcd_puts(0, 4, "ON  to set");
-        lcd_puts(0, 5, "OFF to revert");
+        lcd_puts(0, 4, str(LANG_TIME_SET));
+        lcd_puts(0, 5, str(LANG_TIME_REVERT));
 #ifdef HAVE_LCD_BITMAP
         status_draw();
 #endif

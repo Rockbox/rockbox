@@ -40,6 +40,7 @@ DEBUG = -g
 
 # where to put all output files
 OBJDIR = .
+LANGUAGE = english
 
 TARGET = $(OBJDIR)/uisw32.exe
 
@@ -49,7 +50,7 @@ $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\"
 LDFLAGS =  -lgdi32 -luser32  -mwindows
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
@@ -64,8 +65,7 @@ FIRMSRCS = lcd.c power.c sprintf.c id3.c usb.c		\
         mpeg.c powermgmt.c font.c loadfont.c X5x8.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c \
-	playlist.c showtext.c wps.c wps-display.c settings.c status.c \
-	lang.c
+	playlist.c showtext.c wps.c wps-display.c settings.c status.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -78,7 +78,7 @@ SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
 	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c
 
-OBJS := $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
+OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
 all: $(TARGET)
 
@@ -161,8 +161,9 @@ $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
 $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/lang.o: $(APPDIR)/lang.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+$(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
+	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(APPCFLAGS) -c $< -o $@

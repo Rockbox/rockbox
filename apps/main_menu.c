@@ -172,19 +172,19 @@ Menu show_info(void)
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-        snprintf(s, sizeof(s), "Batt: %d%%%s", 
+        snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_PLAYER), 
                  battery_level(), battery_level_safe() ? "" : "!");
         lcd_puts(0, 1, s);
 #else
 #ifdef HAVE_CHARGE_CTRL
         if (charger_enabled)
-            snprintf(s, sizeof(s), "Battery: charging");
+            snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
         else
-            snprintf(s, sizeof(s), "Battery: %d%%%s", 
+            snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
                      battery_level(), battery_level_safe() ? "" : " !!");
         lcd_puts(0, 3, s);
 #else
-        snprintf(s, sizeof(s), "Battery: %d%%%s", 
+        snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
                  battery_level(), battery_level_safe() ? "" : " !!");
         lcd_puts(0, 3, s);
 #endif
@@ -224,7 +224,7 @@ Menu main_menu(void)
 #ifndef SIMULATOR
         { str(LANG_DEBUG),              debug_menu        },
 #else
-        { "USB (sim)",          simulate_usb      },
+        { str(LANG_USB),                simulate_usb      },
 #endif
     };
 

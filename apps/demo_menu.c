@@ -31,6 +31,8 @@
 #include "kernel.h"
 #include "sprintf.h"
 
+#include "lang.h"
+
 extern Menu bounce(void);
 extern Menu snow(void);
 
@@ -40,8 +42,8 @@ Menu demo_menu(void)
     Menu result;
 
     struct menu_items items[] = {
-        { "Bounce", bounce },
-        { "Snow", snow },
+        { str(LANG_BOUNCE), bounce },
+        { str(LANG_SNOW), snow },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -35,6 +35,8 @@
 #include "widgets.h"
 #endif
 
+#include "lang.h"
+
 struct playlist_info playlist;
 
 #define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
@@ -209,7 +211,7 @@ int play_list(char *dir,         /* "current directory" */
     /* If file is NULL, the list is in RAM */
     if(file) {
         lcd_clear_display();
-        lcd_puts(0,0,"Loading...");
+        lcd_puts(0,0,str(LANG_PLAYLIST_LOAD));
         status_draw();
         lcd_update();
         playlist.in_ram = false;
@@ -273,7 +275,7 @@ int play_list(char *dir,         /* "current directory" */
     }
 
     if(!playlist.in_ram) {
-        lcd_puts(0,0,"Playing...  ");
+        lcd_puts(0,0,str(LANG_PLAYLIST_PLAY));
         status_draw();
         lcd_update();
     }
@@ -350,8 +352,8 @@ void add_indices_to_playlist(void)
                             close(fd);
 
                         lcd_clear_display();
-                        lcd_puts(0,0,"Playlist");
-                        lcd_puts(0,1,"buffer full");
+                        lcd_puts(0,0,str(LANG_PLAYINDICES_PLAYLIST));
+                        lcd_puts(0,1,str(LANG_PLAYINDICES_BUFFER));
                         lcd_update();
                         sleep(HZ*2);
                         lcd_clear_display();
@@ -363,7 +365,8 @@ void add_indices_to_playlist(void)
                     if(!playlist.in_ram) {
                         if ( current_tick >= next_tick ) {
                             next_tick = current_tick + HZ;
-                            snprintf(line, sizeof line, "%d files",
+                            snprintf(line, sizeof line,
+                                     str(LANG_PLAYINDICES_AMOUNT), 
                                      playlist.amount);
                             lcd_puts(0,1,line);
                             status_draw();
@@ -380,7 +383,8 @@ void add_indices_to_playlist(void)
             break;
     }
     if(!playlist.in_ram) {
-        snprintf(line, sizeof line, "%d files", playlist.amount);
+        snprintf(line, sizeof line, str(LANG_PLAYINDICES_AMOUNT),
+			       	playlist.amount);
         lcd_puts(0,1,line);
         status_draw();
         lcd_update();

@@ -20,7 +20,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #include "button.h"
 #include "kernel.h"
 #include "menu.h"
- 
+#include "lang.h" 
 
 int board[28][16],snakelength;
 unsigned int score,hiscore=0;
@@ -35,14 +35,14 @@ void die (void) {
     lcd_clear_display();
     snprintf(pscore,sizeof(pscore),"%d",score);
     lcd_putsxy(3,12,"oops...",0);
-    lcd_putsxy(3,22,"Your Score :",0);
+    lcd_putsxy(3,22,str(LANG_SNAKE_SCORE),0);
     lcd_putsxy(3,32, pscore,0);
     if (score>hiscore) {
         hiscore=score;
-        lcd_putsxy(3,42,"New High Score!",0);
+        lcd_putsxy(3,42,str(LANG_SNAKE_HISCORE_NEW),0);
     }
     else {
-        snprintf(hscore,sizeof(hscore),"High Score %d",hiscore);
+        snprintf(hscore,sizeof(hscore),str(LANG_SNAKE_HISCORE),hiscore);
         lcd_putsxy(3,42,hscore,0);
     }
     lcd_update();
@@ -141,9 +141,9 @@ void redraw (void) {
 
 void game_pause (void) {
     lcd_clear_display();
-    lcd_putsxy(3,12,"Game Paused",0);
-    lcd_putsxy(3,22,"[play] to resume",0);
-    lcd_putsxy(3,32,"[off] to quit",0);
+    lcd_putsxy(3,12,str(LANG_SNAKE_PAUSE),0);
+    lcd_putsxy(3,22,str(LANG_SNAKE_RESUME),0);
+    lcd_putsxy(3,32,str(LANG_SNAKE_QUIT),0);
     lcd_update();
     while (1) {
         switch (button_get(true)) {
@@ -221,12 +221,12 @@ void game_init(void) {
 
 
     lcd_clear_display();
-    snprintf(plevel,sizeof(plevel),"Level - %d",level);
-    snprintf(phscore,sizeof(phscore),"High Score - %d",hiscore);
+    snprintf(plevel,sizeof(plevel),str(LANG_SNAKE_LEVEL),level);
+    snprintf(phscore,sizeof(phscore),str(LANG_SNAKE_HISCORE),hiscore);
     lcd_putsxy(3,2, plevel,0);
-    lcd_putsxy(3,12, "(1 - slow, 9 - fast)",0);
-    lcd_putsxy(3,22, "[off] to quit",0);
-    lcd_putsxy(3,32, "[play] to start/pause",0);
+    lcd_putsxy(3,12, str(LANG_SNAKE_RANGE),0);
+    lcd_putsxy(3,22, str(LANG_SNAKE_QUIT),0);
+    lcd_putsxy(3,32, str(LANG_SNAKE_START),0);
     lcd_putsxy(3,42, phscore,0);
     lcd_update();
 
@@ -250,7 +250,7 @@ void game_init(void) {
                 return;
                 break;
         }
-        snprintf(plevel,sizeof(plevel),"Level - %d",level);
+        snprintf(plevel,sizeof(plevel),str(LANG_SNAKE_LEVEL),level);
         lcd_putsxy(3,2, plevel,0);
         lcd_update();
     }

@@ -33,36 +33,7 @@
 #include "kernel.h"
 #include "menu.h"
 #include "rtc.h"
-
-/* I extracted string constants for output to 
-   simplify inernationalization - once we have
-   decided how to do that exactly. Even though
-   there are other strings in the code they don't
-   have to be internationalized because they are
-   only for debugging purposes and are only included
-   if DEBUG_WORMLET is defined anyway.*/
-
-/* Length restriction for score board strings (LANG_SB_XXX):
-   LCD_PROPFONTS: max 43 pixel
-   fix font: max 7 characters*/  
-#define LANG_SB_LENGTH    "Len:%d"
-#define LANG_SB_GROWING   "Growing"
-#define LANG_SB_HUNGRY    "Hungry"
-#define LANG_SB_WORMED    "Wormed"
-#define LANG_SB_ARGH      "Argh"
-#define LANG_SB_CRASHED   "Crashed"
-#define LANG_SB_HIGHSCORE "Hs: %d"
-
-/* Length restriction for config screen strings (LANG_CS_XXX):
-   The must fit on the entire screen - preferably
-   with the key names aligned right. */
-#define LANG_CS_PLAYERS     "%d Players    up/dn"
-#define LANG_CS_WORMS       "%d Worms        l/r"
-#define LANG_CS_REMOTE_CTRL "Remote control  F1"
-#define LANG_CS_NO_REM_CTRL "No rem. control F1"
-#define LANG_CS_2_KEY_CTRL  "2 key control   F1"
-#define LANG_CS_4_KEY_CTRL  "4 key control   F1"
-#define LANG_CS_NO_CONTROL  "Out of control"
+#include "lang.h"
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
@@ -1208,37 +1179,37 @@ static void score_board(void)
         }
 
     /* length */
-        snprintf(buf, sizeof (buf), LANG_SB_LENGTH, score);
+        snprintf(buf, sizeof (buf),str(LANG_WORMLET_LENGTH), score);
 
         /* worm state */
         switch (check_collision(&worms[i])) {
         case COLLISION_NONE:  
                 if (worms[i].growing > 0){
-                    snprintf(buf2, sizeof(buf2), LANG_SB_GROWING);
+                    snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_GROWING));
                 }
                 else {
                     if (worms[i].alive) {
-                        snprintf(buf2, sizeof(buf2), LANG_SB_HUNGRY);
+                        snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_HUNGRY));
                     } else {
-                        snprintf(buf2, sizeof(buf2), LANG_SB_WORMED);
+                        snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_WORMED));
                     }
                 }
             break;
 
         case COLLISION_WORM:  
-                snprintf(buf2, sizeof(buf2), LANG_SB_WORMED);
+                snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_WORMED));
             break;
 
         case COLLISION_FOOD:  
-                snprintf(buf2, sizeof(buf2), LANG_SB_GROWING);
+                snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_GROWING));
             break;
 
         case COLLISION_ARGH:  
-                snprintf(buf2, sizeof(buf2), LANG_SB_ARGH);
+                snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_ARGH));
             break;
 
         case COLLISION_FIELD: 
-                snprintf(buf2, sizeof(buf2), LANG_SB_CRASHED);
+                snprintf(buf2, sizeof(buf2), str(LANG_WORMLET_CRASHED));
             break;
     }
         lcd_putsxy(FIELD_RECT_WIDTH + 3, y  , buf, 0);
@@ -1250,7 +1221,7 @@ static void score_board(void)
         }
         y += 19;
     }
-    snprintf(buf , sizeof(buf), LANG_SB_HIGHSCORE, highscore);
+    snprintf(buf , sizeof(buf), str(LANG_WORMLET_HIGHSCORE), highscore);
 #ifndef DEBUG_WORMLET
     lcd_putsxy(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, buf, 0);
 #else
@@ -1937,29 +1908,29 @@ Menu wormlet(void)
         lcd_clear_display();
 
         /* first line players */
-        snprintf(buf, sizeof buf, LANG_CS_PLAYERS, players);
+        snprintf(buf, sizeof buf, str(LANG_WORMLET_PLAYERS), players);
         lcd_puts(0, 0, buf);
 
         /* second line worms */
-        snprintf(buf, sizeof buf, LANG_CS_WORMS, worm_count);
+        snprintf(buf, sizeof buf, str(LANG_WORMLET_WORMS), worm_count);
         lcd_puts(0, 1, buf);
 
         /* third line control */
         if (players > 1) {
             if (use_remote) {
-                snprintf(buf, sizeof buf, LANG_CS_REMOTE_CTRL);
+                snprintf(buf, sizeof buf, str(LANG_WORMLET_REMOTE_CTRL));
             } else {
-                snprintf(buf, sizeof buf, LANG_CS_NO_REM_CTRL);
+                snprintf(buf, sizeof buf, str(LANG_WORMLET_NO_REM_CTRL));
             }
         } else {
             if (players > 0) {
                 if (use_remote) {
-                    snprintf(buf, sizeof buf, LANG_CS_2_KEY_CTRL);
+                    snprintf(buf, sizeof buf, str(LANG_WORMLET_2_KEY_CTRL));
                 } else {
-                    snprintf(buf, sizeof buf, LANG_CS_4_KEY_CTRL);
+                    snprintf(buf, sizeof buf, str(LANG_WORMLET_4_KEY_CTRL));
                 }
             } else {
-                snprintf(buf, sizeof buf, LANG_CS_NO_CONTROL);
+                snprintf(buf, sizeof buf, str(LANG_WORMLET_NO_CONTROL));
             }
         }
         lcd_puts(0, 2, buf);
