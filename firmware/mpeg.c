@@ -2000,6 +2000,9 @@ static void mpeg_thread(void)
                     break;
                     
                 case MPEG_INIT_PLAYBACK:
+                    /* Stop the prerecording */ 
+                    stop_recording();
+                    
                     mp3_play_init();
                     mpeg_mode = MPEG_DECODER;
 
