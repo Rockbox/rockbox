@@ -20,8 +20,10 @@
 #ifndef __UISW32_H__
 #define __UISW32_H__
 
+#ifdef _MSC_VER
 typedef unsigned short wchar_t;
 #define _WCHAR_T_DEFINED
+#endif
 #include <windows.h>
 #include "lcd-win32.h"
 
