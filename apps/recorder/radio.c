@@ -398,6 +398,7 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
                 
+#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_PLAY:
                 if(!screen_freeze)
                 {
@@ -411,7 +412,7 @@ bool radio_screen(void)
                     screen_freeze = false;
                 }
                 break;
-                
+#endif                
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
                 if(mpeg_status() != MPEG_STATUS_RECORD)

@@ -280,12 +280,13 @@ bool recording_screen(void)
                 }
                 break;
 
+#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_UP:
                 cursor--;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
-                
+#endif                
             case BUTTON_DOWN:
                 cursor++;
                 adjust_cursor();

@@ -1085,7 +1085,7 @@ bool set_time_screen(const char* string, struct tm *tm)
             case BUTTON_ON:
                 done = true;
                 break;
-#if (BUTTON_ON != BUTTON_OFF)
+#if (BUTTON_ON != BUTTON_OFF) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_OFF:
                 done = true;
                 tm->tm_year = -1;

@@ -240,6 +240,7 @@ int kbd_input(char* text, int buflen)
                 kbd_spellchar(line[y][x]);
                 break;
 
+#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
                 if (y)
@@ -248,7 +249,7 @@ int kbd_input(char* text, int buflen)
                     y = KEYBOARD_LINES - 1;
                 kbd_spellchar(line[y][x]);
                 break;
-
+#endif
             case BUTTON_F3:
             case BUTTON_F3 | BUTTON_REPEAT:
                 /* backspace */
