@@ -267,21 +267,12 @@ A33: Rolo is our bootloader.  Rolo became available with our 1.4 release.
      to Rockbox you may need to reboot manually if the new firmware you loaded
      does not have a bootloader itself.)
 
-Q34: I was thinking about making the USB a bit more usable.  What are the
-     chances of using the USB port to [play games / share files / list
-     the device as something other then a hard drive / sell my soul to you
-     for a nickel].  What do you think?
-A34: You really don't want to know what I think, it involves road flares, 
-     microwave ovens and shaved cats.  Enough said.  But regarding the USB 
-     portion of your question, this is not feasible.  First, any ideas 
-     regarding special communications over the USB port will not work because
-     we have no control over the USB port itself.  We are capable of 
-     dectecting if it is in use (so we know which mode to switch to) but that 
-     is it.  Second, if you would like to have your Archos as a harddrive for
-     another device, know that this will not work either.  The Archos unit is 
-     a slave.  Most other USB devices are slaves as well.  So without some
-     master involved there can be no communication.  Sorry.  Now about your
-     soul.  Would you settle for 3 cents and a small wad of belly button lint?
+Q34: Can I use the Archos as an USB harddisk to store data from my PDA/
+     digital camera/phone etc.
+A34: No. USB is a master/slave protocol, and both the Archos and your device
+     are slaves. Two slaves cannot communicate without a master (usually a PC).
+     (An upcoming extension called USB On-The-Go will let slaves communicate
+     without a master, but current Archoses will not be able to support that.)
 
 Q35: When I use RockBox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
