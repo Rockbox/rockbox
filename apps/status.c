@@ -53,6 +53,34 @@ void status_set_playmode(enum playmode mode)
     status_draw();
 }
 
+#if defined(HAVE_LCD_CHARCELLS)
+static bool record = false;
+static bool audio = false;
+static bool param = false;
+static bool usb = false;
+
+void status_set_record(bool b)
+{
+    record = b;
+}
+
+void status_set_audio(bool b)
+{
+    audio = b;
+}
+
+void status_set_param(bool b)
+{
+    param = b;
+}
+
+void status_set_usb(bool b)
+{
+    usb = b;
+}
+
+#endif /* HAVE_LCD_CHARCELLS */
+
 void status_draw(void)
 {
     int battlevel = battery_level();
@@ -160,6 +188,11 @@ void status_draw(void)
     lcd_icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
     lcd_icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
     
+    lcd_icon(ICON_RECORD, record);
+    lcd_icon(ICON_AUDIO, audio);
+    lcd_icon(ICON_PARAM, param);
+    lcd_icon(ICON_USB, usb);
+
 #endif
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.statusbar) {

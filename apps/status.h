@@ -38,4 +38,11 @@ bool statusbar(bool state);
 #endif
 void status_draw(void);
 
+#if defined(HAVE_LCD_CHARCELLS)
+void status_set_record(bool b);
+void status_set_audio(bool b);
+void status_set_param(bool b);
+void status_set_usb(bool b);
+#endif
+
 #endif
