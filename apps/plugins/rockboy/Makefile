@@ -106,7 +106,7 @@ $(LINKFILE): $(LDS)
 clean:
 	@echo "cleaning rockboy"
 	@rm -rf $(OBJDIR)/rockboy
-	@rm -f $(OBJDIR)/rockboy.*
+	@rm -f $(OBJDIR)/rockboy.* $(DEPFILE)
 
 -include $(DEPFILE)
 
