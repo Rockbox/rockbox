@@ -158,6 +158,7 @@ void menu_run(int m)
             case BUTTON_LEFT:
 #else
             case BUTTON_STOP:
+            case BUTTON_MENU:
 #endif
                 return;
 
