@@ -169,7 +169,7 @@ ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples)
 		    break;
 
 		if (wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
-		    strcpy (wpc->error_message, "not compatible with this version of WavPack file!");
+		    /*strcpy (wpc->error_message, "not compatible with this version of WavPack file!");*/
 		    break;
 		}
 
