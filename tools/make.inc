@@ -12,9 +12,11 @@ $(OBJDIR)/%.o: %.S
 # to cause an error code to get returned and thus stop the build
 $(DEPFILE): $(SOURCES)
 	@rm -f $(DEPFILE)
-	@(for each in $(SOURCES); do \
-	  obj=`echo $$each | sed -e 's/\.[cS]/.o/'`; \
-	  $(CC) -MM -MT "$(OBJDIR)/$$obj" $(CFLAGS) $$each >> $(DEPFILE) 2>/dev/null; \
+	@(for each in $(SOURCES) x; do \
+          if test "x" != "$$each"; then \
+	    obj=`echo $$each | sed -e 's/\.[cS]/.o/'`; \
+	    $(CC) -MM -MT "$(OBJDIR)/$$obj" $(CFLAGS) $$each >> $(DEPFILE) 2>/dev/null; \
+          fi; \
 	done; \
 	echo "oo" >/dev/null )
 
