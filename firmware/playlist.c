@@ -24,7 +24,7 @@
 #include <string.h>
 #include "playlist.h"
 #include "debug.h"
-#include "disk.h"
+#include <file.h>
 
 /*
  * load playlist info from disk
@@ -59,18 +59,13 @@ int reload_playlist_info( playlist_info_t *playlist )
  */
 void load_playlist( playlist_info_t *playlist, const char *filename ) {
 
-    char *m3u_buf = NULL;
-    
     DEBUGF( "load_playlist( %s )\n", filename );
     
-    /* read file */
-    read_file_into_buffer( &m3u_buf, filename );
-
     /* store playlist filename */
     strncpy( playlist->filename, filename, sizeof(playlist->filename) );
     
     /* add track indices to playlist data structure */
-    add_indices_to_playlist( m3u_buf, playlist );
+    add_indices_to_playlist( playlist );
 }
 
 /*
@@ -88,46 +83,43 @@ void empty_playlist( playlist_info_t *playlist ) {
 }
 
 /*
- * calculate track offsets within a playlist buffer
+ * calculate track offsets within a playlist file
  */
-void add_indices_to_playlist( char *buf, playlist_info_t *playlist )
+void add_indices_to_playlist( playlist_info_t *playlist )
 {
     char *p;
     int   i = 0;
+    unsigned char byte;
+    unsigned char lastbyte='\n';
+    int nread;
+
+    int fd;
+
+    fd = open(playlist->filename, O_RDONLY);
+    if(-1 == fd)
+        return; /* failure */
+
     
     /*DEBUGF( "add_indices_to_playlist()\n" ); */
     
-    p = buf;
+    p = &byte;
     
     /* loop thru buffer, store index whenever we get a new line */
     
-    while( p[i] != '\0' )
+    while((nread = read(fd, &byte, 1)) == 1)
     {
         /* move thru (any) newlines */
         
-        while( ( p[i] != '\0' ) && ( ( p[i] == '\n' ) || ( p[i] == '\r' ) ) )
-        {
-            i++;
-        }
+        if(( byte != '\n' ) && ( byte != '\r' ) &&
+           ((lastbyte == '\n') || (lastbyte == '\r')))
+            /* we're now at the start of a new track filename. store index */
+            extend_indices( playlist, i );
 
-        /* did we get to the end of the buffer? */
-        
-        if( p[i] == '\0' )
-        {
-            break;
-        }
-        
-        /* we're now at the start of a new track filename. store index */
-        
-        extend_indices( playlist, i );
-        
-        /* we're now inside a track name. move to next newline */
-        
-        while( ( p[i] != '\0' ) && ( ( p[i] != '\n' ) && ( p[i] != '\r' ) ) )
-        {
-            i++;
-        }
+        lastbyte = byte;
+        i++;
     }
+
+    close(fd);
 }
 
 /*
