@@ -130,8 +130,8 @@ static char *create_filename(void)
 
     tm = get_time();
 
-    /* Create a filename: RYYMMDDHHMMSS.mp3 */
-    snprintf(fname, 32, "/R%02d%02d%02d%02d%02d%02d.mp3",
+    /* Create a filename: RYYMMDD-HHMMSS.mp3 */
+    snprintf(fname, 32, "/R%02d%02d%02d-%02d%02d%02d.mp3",
              tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
              tm->tm_hour, tm->tm_min, tm->tm_sec);
 
