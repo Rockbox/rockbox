@@ -414,9 +414,9 @@ static int ymargin=0;
 #define	ASCII_MIN			0x20	/* First char in table */
 #define	ASCII_MAX			0x7f	/* Last char in table */
 
-extern unsigned char char_gen_6x8[][5][1];
-extern unsigned char char_gen_8x12[][7][2];
-extern unsigned char char_gen_12x16[][11][2];
+extern unsigned char char_gen_6x8[][5];
+extern unsigned char char_gen_8x12[][14];
+extern unsigned char char_gen_12x16[][22];
 
 /* All zeros and ones bitmaps for area filling */
 static unsigned char zeros[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -433,6 +433,8 @@ static char fontheight[] = { 8,12,16 };
  */
 void lcd_init (void)
 {
+    int i;
+
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
@@ -550,11 +552,11 @@ void lcd_putsxy(int x, int y, char *str, int thisfont)
             ch -= ASCII_MIN;
         
         if (thisfont == 2)
-            src = char_gen_12x16[ch][0];
+            src = char_gen_12x16[ch];
         else if (thisfont == 1)
-            src = char_gen_8x12[ch][0];
+            src = char_gen_8x12[ch];
         else
-            src = char_gen_6x8[ch][0];
+            src = char_gen_6x8[ch];
         
         lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, true);
         lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, true);
