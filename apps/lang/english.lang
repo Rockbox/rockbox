@@ -864,3 +864,8 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units per read"
 new: 
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new:

@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "rtc.h"
 #include "usb.h"
+#include "power.h"
 
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
@@ -33,6 +34,11 @@ static void backlight_thread(void);
 static char backlight_stack[DEFAULT_STACK_SIZE];
 static char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
+
+#ifdef HAVE_CHARGE_CTRL
+static bool charger_was_inserted = 0;
+static bool backlight_on_when_charging = 0;
+#endif
 
 static int backlight_timer;
 static int backlight_timeout = 5;
@@ -52,9 +58,22 @@ void backlight_thread(void)
         switch(ev.id)
         {
             case BACKLIGHT_ON:
+#ifdef HAVE_CHARGE_CTRL
+                if( backlight_on_when_charging && charger_inserted() )
+                {
+                    /* Forcing to zero keeps the lights on */
+                    backlight_timer = 0;
+                }
+                else
+                {
                 backlight_timer = HZ*timeout_value[backlight_timeout];
+                }
+#else
+                backlight_timer = HZ*timeout_value[backlight_timeout];
+#endif
                 if(backlight_timer < 0)
                 {
+                    backlight_timer = 0;    /* timer value 0 will not get ticked */
 #ifdef HAVE_RTC
                     /* Disable square wave */
                     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
@@ -62,7 +81,8 @@ void backlight_thread(void)
                     PADR |= 0x4000;
 #endif  
                 }
-                else if(backlight_timer)
+                /* else if(backlight_timer) */
+                else 
                 {
 #ifdef HAVE_RTC
                     /* Enable square wave */
@@ -105,14 +125,28 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
-void backlight_time(int value)
+void backlight_set_timeout(int seconds)
 {
-    backlight_timeout = value;
+    backlight_timeout = seconds;
+    backlight_on();
+}
+
+void backlight_set_on_when_charging(bool yesno)
+{
+    backlight_on_when_charging = yesno;
     backlight_on();
 }
 
 void backlight_tick(void)
 {
+#ifdef HAVE_CHARGE_CTRL
+    bool charger_is_inserted = charger_inserted();
+    if( backlight_on_when_charging && (charger_was_inserted != charger_is_inserted) )
+    {
+        backlight_on();
+    }
+    charger_was_inserted = charger_is_inserted;
+#endif
     if(backlight_timer)
     {
         backlight_timer--;

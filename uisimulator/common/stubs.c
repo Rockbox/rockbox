@@ -123,3 +123,8 @@ void lcd_set_contrast( int x )
 {
     (void)x;
 }
+
+void backlight_set_timeout(int seconds)
+{
+  (void)seconds;
+}

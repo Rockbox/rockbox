@@ -23,6 +23,7 @@ void backlight_init(void);
 void backlight_on(void);
 void backlight_off(void);
 void backlight_tick(void);
-void backlight_time(int seconds);
+void backlight_set_timeout(int seconds);
+void backlight_set_on_when_charging(bool yesno);
 
 #endif

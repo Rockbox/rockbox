@@ -63,7 +63,10 @@ struct user_settings
 
     int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
     int poweroff;   /* power off timer */
-    int backlight;  /* backlight off timer:  0-100 0=never:each 1% = 10 secs */
+    int backlight_timeout;  /* backlight off timeout:  0-18 0=never,1=always,then according to timeout_values[] */
+#ifdef HAVE_CHARGE_CTRL
+    bool backlight_on_when_charging;
+#endif
     bool discharge; /* maintain charge of at least: false = 90%, true = 10%  */
 
     /* resume settings */
@@ -144,7 +147,8 @@ extern char rockboxdir[];
 #endif
 #define MIN_CONTRAST_SETTING        5
 #define DEFAULT_POWEROFF_SETTING    0
-#define DEFAULT_BACKLIGHT_SETTING   5
+#define DEFAULT_BACKLIGHT_TIMEOUT_SETTING   5
+#define DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING   0
 #define DEFAULT_FF_REWIND_MIN_STEP  FF_REWIND_1000
 #define DEFAULT_FF_REWIND_ACCEL_SETTING 3
 

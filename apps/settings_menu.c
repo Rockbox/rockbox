@@ -144,6 +144,16 @@ static bool resume(void)
                        names, 3, NULL );
 }
 
+#ifdef HAVE_CHARGE_CTRL
+static bool backlight_on_when_charging(void)
+{
+    bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+                           &global_settings.backlight_on_when_charging);
+    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+    return result;
+}
+#endif
+
 static bool backlight_timer(void)
 {
     char* names[] = { str(LANG_OFF), str(LANG_ON),
@@ -151,8 +161,8 @@ static bool backlight_timer(void)
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
-    return set_option(str(LANG_BACKLIGHT), &global_settings.backlight, 
-                      names, 19, backlight_time );
+    return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
+                      names, 19, backlight_set_timeout );
 }
 
 static bool poweroff_idle_timer(void)
@@ -377,6 +387,9 @@ static bool display_settings_menu(void)
     struct menu_items items[] = {
         { str(LANG_SCROLL_MENU),     scroll_speed    },  
         { str(LANG_BACKLIGHT),       backlight_timer },
+#ifdef HAVE_CHARGE_CTRL
+        { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
+#endif
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_PM_MENU),         peak_meter_menu },  

@@ -74,7 +74,7 @@ offset  abs
 0x08    0x1c    <loudness byte>
 0x09    0x1d    <bass boost byte>
 0x0a    0x1e    <contrast byte>
-0x0b    0x1f    <backlight byte>
+0x0b    0x1f    <backlight_on_when_charging, backlight_timeout>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,dirfilter,sort_case,discharge,statusbar,show_hidden,
@@ -270,7 +270,16 @@ int settings_save( void )
     config_block[0x9] = (unsigned char)global_settings.bass_boost;
     
     config_block[0xa] = (unsigned char)global_settings.contrast;
-    config_block[0xb] = (unsigned char)global_settings.backlight;
+
+#ifdef HAVE_CHARGE_CTRL
+    if( global_settings.backlight_on_when_charging ) {
+        config_block[0xb] = (unsigned char) (global_settings.backlight_timeout + 128);
+    } else {
+        config_block[0xb] = (unsigned char)global_settings.backlight_timeout;
+    }
+#else
+    config_block[0xb] = (unsigned char)global_settings.backlight_timeout;
+#endif
     config_block[0xc] = (unsigned char)global_settings.poweroff;
     config_block[0xd] = (unsigned char)global_settings.resume;
     
@@ -366,8 +375,15 @@ void settings_load(void)
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
                 global_settings.contrast = DEFAULT_CONTRAST_SETTING;
         }
+#ifdef HAVE_CHARGE_CTRL
+        if (config_block[0xb] != 0xFF) {
+            global_settings.backlight_timeout = config_block[0xb] & 127;
+            global_settings.backlight_on_when_charging = config_block[0xb] & 128 ? 1 : 0;
+        }
+#else
         if (config_block[0xb] != 0xFF)
-            global_settings.backlight = config_block[0xb];
+            global_settings.backlight_timeout = config_block[0xb];
+#endif
         if (config_block[0xc] != 0xFF)
             global_settings.poweroff = config_block[0xc];
         if (config_block[0xd] != 0xFF)
@@ -432,7 +448,10 @@ void settings_load(void)
     }
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
-    backlight_time(global_settings.backlight);
+    backlight_set_timeout(global_settings.backlight_timeout);
+#ifdef HAVE_CHARGE_CTRL
+    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+#endif
     ata_spindown(global_settings.disk_spindown);
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
@@ -615,7 +634,10 @@ void settings_reset(void) {
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
-    global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
+    global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
+#ifdef HAVE_CHARGE_CTRL
+    global_settings.backlight_on_when_charging   = DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
+#endif
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
@@ -654,10 +676,10 @@ void settings_display(void)
             global_settings.loudness,
             global_settings.bass_boost );
 
-    DEBUGF( "contrast:\t%d\npoweroff:\t%d\nbacklight:\t%d\n",
+    DEBUGF( "contrast:\t%d\npoweroff:\t%d\nbacklight_timeout:\t%d\n",
             global_settings.contrast,
             global_settings.poweroff,
-            global_settings.backlight );
+            global_settings.backlight_timeout );
 #endif
 }
 
