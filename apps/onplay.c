@@ -419,21 +419,26 @@ int onplay(char* file, int attr)
             i++;
         }
         
-        items[i].desc = ID2P(LANG_RENAME);
-        items[i].function = rename_file;
-        i++;
+#ifdef HAVE_MULTIVOLUME        
+        if (!(attr & ATTR_VOLUME)) /* no rename+delete for volumes */
+#endif
+        {
+            items[i].desc = ID2P(LANG_RENAME);
+            items[i].function = rename_file;
+            i++;
         
-        if (!(attr & ATTR_DIRECTORY))
-        {
-            items[i].desc = ID2P(LANG_DELETE);
-            items[i].function = delete_file;
-            i++;
-        }
-        else
-        {
-            items[i].desc = ID2P(LANG_DELETE_DIR);
-            items[i].function = delete_dir;
-            i++;
+            if (!(attr & ATTR_DIRECTORY))
+            {
+                items[i].desc = ID2P(LANG_DELETE);
+                items[i].function = delete_file;
+                i++;
+            }
+            else
+            {
+                items[i].desc = ID2P(LANG_DELETE_DIR);
+                items[i].function = delete_dir;
+                i++;
+            }
         }
 
         if (!(attr & ATTR_DIRECTORY))
