@@ -523,7 +523,7 @@ static void mpeg_thread(void)
     while(1)
     {
         DEBUGF("S R:%x W:%x SW:%x\n",
-	       mp3buf_read, mp3buf_write, mp3buf_swapwrite);
+               mp3buf_read, mp3buf_write, mp3buf_swapwrite);
         yield();
         queue_wait(&mpeg_queue, &ev);
         switch(ev.id)
@@ -595,16 +595,16 @@ static void mpeg_thread(void)
                     close(mpeg_file);
                 last_tag=0;
                 if (new_file(true) < 0) {
-                     DEBUGF("Finished Playing!\n");
-                     filling = false;
+                    DEBUGF("Finished Playing!\n");
+                    filling = false;
                 } else {
-                     /* Make it read more data */
-                     filling = true;
-                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                    /* Make it read more data */
+                    filling = true;
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-                     /* Tell the file loading code that we want to start playing
-                        as soon as we have some data */
-                     play_pending = true;
+                    /* Tell the file loading code that we want to start playing
+                       as soon as we have some data */
+                    play_pending = true;
                 }
                 break;
 
@@ -621,16 +621,16 @@ static void mpeg_thread(void)
                     close(mpeg_file);
                 last_tag=0;
                 if (new_file(false) < 0) {
-                     DEBUGF("Finished Playing!\n");
-                     filling = false;
+                    DEBUGF("Finished Playing!\n");
+                    filling = false;
                 } else {
-                     /* Make it read more data */
-                     filling = true;
-                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                    /* Make it read more data */
+                    filling = true;
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-                     /* Tell the file loading code that we want to start playing
-                        as soon as we have some data */
-                     play_pending = true;
+                    /* Tell the file loading code that we want to start playing
+                       as soon as we have some data */
+                    play_pending = true;
                 }
                 break; 
 
@@ -643,13 +643,13 @@ static void mpeg_thread(void)
                 if(free_space_left < 0)
                     free_space_left = mp3buflen + free_space_left;
 
-		amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
-		if(mp3buf_write < mp3buf_swapwrite)
-		    amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
-					 amount_to_swap);
-		else
-		    amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
-					 amount_to_swap);
+                amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+                if(mp3buf_write < mp3buf_swapwrite)
+                    amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+                                         amount_to_swap);
+                else
+                    amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
+                                         amount_to_swap);
                 
                 DEBUGF("B %x\n", amount_to_swap);
                 bitswap((unsigned short *)(mp3buf + mp3buf_swapwrite),
@@ -669,20 +669,20 @@ static void mpeg_thread(void)
                    playing yet. If not, do it. */
                 if(play_pending)
                 {
-		    if((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER)
-		    {
-			DEBUGF("P\n");
-			play_pending = false;
-			playing = true;
+                    if((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER)
+                    {
+                        DEBUGF("P\n");
+                        play_pending = false;
+                        playing = true;
 			
-			last_dma_tick = current_tick;
-			init_dma();
-			start_dma();
+                        last_dma_tick = current_tick;
+                        init_dma();
+                        start_dma();
 
-			/* Tell ourselves that we need more data */
-			queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        /* Tell ourselves that we need more data */
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-		    }
+                    }
                 }
                 break;
 
@@ -693,7 +693,7 @@ static void mpeg_thread(void)
                 if(free_space_left <= 0)
                     free_space_left = mp3buflen + free_space_left;
 
-		unplayed_space_left = mp3buflen - free_space_left;
+                unplayed_space_left = mp3buflen - free_space_left;
 
                 /* Make sure that we don't fill the entire buffer */
                 free_space_left -= 2;
@@ -713,11 +713,11 @@ static void mpeg_thread(void)
                 }
                 else
                 {
-		    if(unplayed_space_left < MPEG_LOW_WATER)
-			amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
-					     free_space_left);
-		    else
-			amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+                    if(unplayed_space_left < MPEG_LOW_WATER)
+                        amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
+                                             free_space_left);
+                    else
+                        amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
                 }
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
                 
@@ -731,10 +731,15 @@ static void mpeg_thread(void)
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
                     if(len > 0)
                     {
-			DEBUGF("R: %x\n", len);
+                        DEBUGF("R: %x\n", len);
                         /* Tell ourselves that we need to swap some data */
                         queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
 
+                        /* Make sure that the write pointer is at a word
+                           boundary when we reach the end of the file */
+                        if(len < amount_to_read)
+                            mp3buf_write = (mp3buf_write + 1) & 0xfffffffe;
+                        
                         mp3buf_write += len;
                         if(mp3buf_write >= mp3buflen)
                         {
@@ -742,11 +747,11 @@ static void mpeg_thread(void)
                             DEBUGF("W\n");
                         }
 
-			if(!play_pending)
-			{
-			    /* Tell ourselves that we want more data */
-			    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-			}
+                        if(!play_pending)
+                        {
+                            /* Tell ourselves that we want more data */
+                            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        }
                     }
                     else
                     {
