@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "system.h"
 #include "usb.h"
+#include "powermgmt.h"
 #include "adc.h"
 #include "i2c.h"
 #ifndef SIMULATOR
@@ -97,7 +98,11 @@ void init(void)
     set_irq_level(0);
 
     i2c_init();
-    
+
+#ifdef HAVE_RTC
+    rtc_init();
+#endif
+
     adc_init();
     
     usb_init();
