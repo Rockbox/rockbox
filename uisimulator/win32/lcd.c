@@ -410,7 +410,7 @@ BITMAPINFO2 bmi =
 	DISP_X, -DISP_Y, 1, 8,
 	BI_RGB, 0, 0, 0, 2, 2,
 	UI_LCD_COLOR, 0, // green background color
-	0,  0,  0, 0 // black color
+	UI_LCD_BLACK, 0 // black color
 }; // bitmap information
 
 
