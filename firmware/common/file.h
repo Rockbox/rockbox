@@ -24,6 +24,10 @@
 #define SEEK_CUR 1
 #define SEEK_END 2
 
+#define O_RDONLY 0
+#define O_WRONLY 1
+#define O_RDWR   2
+
 #ifndef SIMULATOR
 extern int open(char* pathname, int flags);
 extern int close(int fd);
