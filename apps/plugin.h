@@ -159,8 +159,8 @@ struct plugin_api {
     void (*splash)(int ticks, bool center, const char *fmt, ...);
 
     /* button */
-    int (*button_get)(bool block);
-    int (*button_get_w_tmo)(int ticks);
+    long (*button_get)(bool block);
+    long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
 

@@ -187,7 +187,7 @@ static int get_raw_button (void)
 /*
  * Timeout after TICKS unless a key is pressed.
  */
-int button_get_w_tmo(int ticks)
+long button_get_w_tmo(int ticks)
 {
     int bits;
     int i=0;
@@ -210,7 +210,7 @@ int button_get_w_tmo(int ticks)
  * BUTTON_HELD bit is while the button is being held.
  * BUTTON_REL bit is set when button has been released.
  */
-int button_get(bool block)
+long button_get(bool block)
 {
     int bits;
     do {
