@@ -22,11 +22,6 @@
 #include "uisw32.h"
 #include "lcd.h"
 
-/*
- * simulator specific code
- */
-
-/* varaibles */
 extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; /* the display */
 char bitmap[LCD_HEIGHT][LCD_WIDTH]; /* the ui display */
 
@@ -37,36 +32,61 @@ BITMAPINFO2 bmi =
    BI_RGB, 0, 0, 0, 2, 2,
   },
   {
-    {UI_LCD_BGCOLOR, 0}, // green background color
-    {UI_LCD_BLACK, 0} // black color
+    {UI_LCD_BGCOLOR, 0}, /* green background color */
+    {UI_LCD_BLACK, 0}    /* black color */
   }
   
-}; // bitmap information
+}; /* bitmap information */
 
 
-// lcd_update
-// update lcd
+/* lcd_update()
+   update lcd */
 void lcd_update()
 {
-	int x, y;
+    int x, y;
     if (hGUIWnd == NULL)
         _endthread ();
 
-	for (x = 0; x < LCD_WIDTH; x++)
-		for (y = 0; y < LCD_HEIGHT; y++)
+    for (x = 0; x < LCD_WIDTH; x++)
+        for (y = 0; y < LCD_HEIGHT; y++)
             bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
 
-	InvalidateRect (hGUIWnd, NULL, FALSE);
+    InvalidateRect (hGUIWnd, NULL, FALSE);
 
-    // natural sleep :)
+    /* natural sleep :) Bagder: why is this here? */
     Sleep (50);
 }
 
-// lcd_backlight
-// set backlight state of lcd
-void lcd_backlight (
-                    bool on // switch backlight on or off?
-                    )
+void lcd_update_rect(int x_start, int y_start,
+                     int width, int height)
+{
+    int x, y;
+    int xmax, ymax;
+
+    ymax = y_start + height;
+    xmax = x_start + width;
+    
+    if (hGUIWnd == NULL)
+        _endthread ();
+
+    if(xmax > LCD_WIDTH)
+        xmax = LCD_WIDTH;
+    if(ymax >= LCD_HEIGHT)
+        ymax = LCD_HEIGHT;
+
+    for (x = x_start; x < xmax; x++)
+        for (y = y_start; y < ymax; y++)
+            bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
+
+    /* Bagder: If I only knew how, I would make this call only invalidate
+       the actual rectangle we want updated here, this NULL thing here will
+       make the full rectangle updated! */
+    InvalidateRect (hGUIWnd, NULL, FALSE);
+}
+
+/* lcd_backlight()
+   set backlight state of lcd */
+void lcd_backlight (bool on)
 {
     if (on)
     {
@@ -79,5 +99,11 @@ void lcd_backlight (
         bmi.bmiColors[0] = blon;
     }
 
-	InvalidateRect (hGUIWnd, NULL, FALSE);
+    InvalidateRect (hGUIWnd, NULL, FALSE);
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../../firmware/rockbox-mode.el")
+ * end:
+ */
