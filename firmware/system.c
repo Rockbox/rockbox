@@ -469,4 +469,7 @@ void system_init(void)
 
     /* NMI level low, falling edge on all interrupts */
     ICR = 0;
+
+    /* Enable burst mode on DRAM */
+    DCR |= 0x1000;
 }
