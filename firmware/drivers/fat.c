@@ -1503,7 +1503,7 @@ static void randomize_dos_name(unsigned char *name)
     int i;
     unsigned char buf[5];
 
-    snprintf(buf, sizeof buf, "%04x", (unsigned)rand() & 0xffff);
+    snprintf(buf, sizeof buf, "%04X", (unsigned)rand() & 0xffff);
 
     for (i = 0; (i < 4) && (name[i] != ' '); i++);
     /* account for possible shortname length < 4 */
