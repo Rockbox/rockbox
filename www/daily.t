@@ -48,11 +48,6 @@ The batch timestamp is GMT.
 <a href="http://codeforce.d2g.com/rockbox/autocvs">Player simulator (win32)</a><br>
 </td>
 <td>
-<a href="auto/build-playerold/archos.mod">Player-old</a><br>
-<a href="auto/build-playerolddebug/archos.mod">Player-old debug</a><br>
-<a href="auto/build-playeroldsim/rockboxui">Player-old simulator (linux)</a>
-</td>
-<td>
 <a href="auto/build-recorder/ajbrec.ajz">Recorder</a><br>
 <a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a><br>
 <a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a><br>
