@@ -135,7 +135,7 @@ int open(const char* pathname, int flags)
             fat_open(entry->startcluster,
                      &(file->fatfile),
                      &(dir->fatdir));
-            file->size = entry->size;
+            file->size = file->trunc ? 0 : entry->size;
             file->attr = entry->attribute;
             break;
         }
@@ -236,7 +236,7 @@ int fsync(int fd)
 
         /* truncate? */
         if (file->trunc) {
-            rc = ftruncate(fd, file->fileoffset);
+            rc = ftruncate(fd, file->size);
             if (rc < 0)
                 return rc * 10 - 4;
         }
