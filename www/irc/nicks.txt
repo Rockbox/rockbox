@@ -1,0 +1,6 @@
+Zagor   => Björn Stenberg
+linus   => Linus Nielsen Feltzing
+Bagder  => Daniel Stenberg
+Wavey   => Stuart Martin
+alkorr  => Alan Korr
+adiamas => Robert Hak
