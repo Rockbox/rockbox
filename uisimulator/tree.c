@@ -201,7 +201,7 @@ bool dirbrowse(char *root)
 
       lcd_clear_display();
       lcd_puts(0,0, "[Browse]", 0);
-      numentries = showdir(currdir, buffer, 0, 0, &at_end);  
+      numentries = showdir(currdir, buffer, 0, start, &at_end);  
       lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
       lcd_update();
       break;
