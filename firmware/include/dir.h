@@ -51,7 +51,7 @@ typedef struct {
     struct dirent theent;
 } DIR;
 
-#else // SIMULATOR
+#else /* SIMULATOR */
 
 #ifdef WIN32
 #ifndef __MINGW32__
@@ -66,7 +66,7 @@ typedef struct DIRtag
 
 #endif /* WIN32 */
 
-#endif // SIMULATOR
+#endif /* SIMULATOR */
 
 #ifndef DIRFUNCTIONS_DEFINED
 

@@ -65,7 +65,7 @@ extern unsigned char rockbox112x37[];
 extern unsigned char slider_bar[];
 
 #define STATUSBAR_X_POS       0
-#define STATUSBAR_Y_POS       0 // MUST be a multiple of 8
+#define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */
 #define STATUSBAR_HEIGHT      8
 #define STATUSBAR_WIDTH       LCD_WIDTH
 #define ICON_BATTERY_X_POS    0
