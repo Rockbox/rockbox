@@ -45,22 +45,6 @@ void playtune(char *dir, char *file)
     Logf("Failure!");
     good=0;
   }
-  else {
-    printf("****** File: %s\n"
-           "      Title: %s\n"
-           "     Artist: %s\n"
-           "      Album: %s\n"
-           "     Length: %d ms\n"
-           "    Bitrate: %d\n"
-           "  Frequency: %d\n",
-           buffer,
-           mp3.title?mp3.title:"<blank>",
-           mp3.artist?mp3.artist:"<blank>",
-           mp3.album?mp3.album:"<blank>",
-           mp3.length,
-           mp3.bitrate,
-           mp3.frequency);
-  }
 #ifdef HAVE_LCD_BITMAP
   lcd_clear_display();
   if(!good) {
