@@ -106,6 +106,7 @@ int show_logo( void )
 void show_credits(void)
 {
     int j = 0;
+    int btn;
 
     show_logo();
 #ifdef HAVE_NEW_CHARCELL_LCD
@@ -115,7 +116,8 @@ void show_credits(void)
     for (j = 0; j < 10; j++) {
         sleep((HZ*2)/10);
 
-        if (button_get(false))
+        btn = button_get(false);
+        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
             return;
     }
     roll_credits();
@@ -150,13 +152,9 @@ void show_info(void)
     lcd_puts(0, 3, s);
     
     lcd_update();
-    
-    button_get(true);
-}
 
-void hold_set(void)
-{
-    set_bool( "[Hold]", &global_settings.hold );
+    /* Wait for a key to be pushed */
+    while(button_get(true) & BUTTON_REL);
 }
 
 void main_menu(void)
@@ -165,7 +163,6 @@ void main_menu(void)
 
     /* main menu */
     struct menu_items items[] = {
-        { "Hold",               hold_set          },
         { "Sound Settings",     sound_menu        },
         { "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
