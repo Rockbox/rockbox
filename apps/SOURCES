@@ -1,4 +1,5 @@
 #ifdef IRIVER_H100
+main.c
 #else
 alarm_menu.c
 bookmark.c
