@@ -32,6 +32,8 @@
 
 #include "file.h"
 
+#if 0
+
 #ifdef __GNUC__
 #define STRUCT_PACKED __attribute__((packed))
 #else
@@ -585,3 +587,5 @@ int main(int argc, char **argv)
 }
 
 #endif
+
+#endif /* 0 */

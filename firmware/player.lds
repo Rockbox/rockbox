@@ -51,13 +51,6 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .heap :
-    {
-        _poolstart = .;
-        . = 0x20000;
-        _poolend = .;
-    } > DRAM
-
     .mp3buf :
     {
         _mp3buf = .;

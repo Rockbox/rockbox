@@ -23,7 +23,6 @@
 #include "id3.h"
 #include "mpeg.h"
 #include "ata.h"
-#include "malloc.h"
 #include "string.h"
 #ifndef SIMULATOR
 #include "i2c.h"
@@ -147,9 +146,11 @@ struct id3tag
 {
     struct mp3entry id3;
     int mempos;
+    bool used;
 };
 
 static struct id3tag *id3tags[MAX_ID3_TAGS];
+static struct id3tag _id3tags[MAX_ID3_TAGS];
 
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
@@ -202,7 +203,6 @@ static bool append_tag(struct id3tag *tag)
 static void remove_current_tag(void)
 {
     int oldidx = tag_read_idx;
-    struct id3tag *tag = id3tags[tag_read_idx];
     
     if(num_tracks_in_memory() > 0)
     {
@@ -210,8 +210,8 @@ static void remove_current_tag(void)
         tag_read_idx = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
         /* Now delete it */
+        id3tags[oldidx]->used = false;
         id3tags[oldidx] = NULL;
-        free(tag);
         debug_tags();
     }
 }
@@ -578,21 +578,26 @@ void IMIA1(void)
 
 static void add_track_to_tag_list(char *filename)
 {
-    struct id3tag *t;
+    struct id3tag *t = NULL;
+    int i;
 
-    /* grab id3 tag of new file and
-       remember where in memory it starts */
-    t = malloc(sizeof(struct id3tag));
+    /* find a free tag */
+    for (i=0; i < MAX_ID3_TAGS_MASK; i++ )
+        if ( !_id3tags[i].used )
+            t = &_id3tags[i];
     if(t)
     {
+        /* grab id3 tag of new file and
+           remember where in memory it starts */
         mp3info(&(t->id3), filename);
         t->mempos = mp3buf_write;
         t->id3.elapsed = 0;
         if(!append_tag(t))
         {
-            free(t);
             DEBUGF("Tag list is full\n");
         }
+        else
+            t->used = true;
     }
     else
     {
@@ -659,7 +664,7 @@ static void mpeg_thread(void)
     int amount_to_read;
     int amount_to_swap;
     int t1, t2;
-    
+
     play_pending = false;
     playing = false;
     mpeg_file = -1;
@@ -1411,4 +1416,5 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 #endif /* !SIMULATOR */
 
     memset(id3tags, sizeof(id3tags), 0);
+    memset(_id3tags, sizeof(id3tags), 0);
 }

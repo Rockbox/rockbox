@@ -33,12 +33,8 @@
 #include "powermgmt.h"
 #include "adc.h"
 #include "i2c.h"
-#ifndef SIMULATOR
-#include "dmalloc.h"
-#include "bmalloc.h"
 #ifndef DEBUG
 #include "serial.h"
-#endif
 #endif
 #include "mpeg.h"
 #include "main_menu.h"
@@ -95,8 +91,6 @@ void init(void)
 
     settings_reset();
     
-    dmalloc_initialize();
-    bmalloc_add_pool(poolstart, poolend-poolstart);
     lcd_init();
 
     show_logo();

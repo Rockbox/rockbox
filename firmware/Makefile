@@ -33,7 +33,7 @@ else
 CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
-SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
+SRC := $(wildcard drivers/*.c common/*.c *.c)
 
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o
 DEPS:=.deps

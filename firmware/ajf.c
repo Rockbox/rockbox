@@ -21,7 +21,6 @@
 #endif
 #include <file.h>
 #include "ajf.h"
-#include <malloc.h>
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
