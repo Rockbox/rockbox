@@ -347,8 +347,6 @@ static bool update(void)
     if ( id3 &&
          global_settings.resume &&
          global_settings.resume_offset != id3->offset ) {
-        DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
-               id3->offset,id3);
  
         if (!playlist_get_resume_info(&global_settings.resume_index))
         {
