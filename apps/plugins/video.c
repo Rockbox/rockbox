@@ -759,7 +759,7 @@ int main(char* filename)
     int file_size;
     int fd; /* file descriptor handle */
     int read_now, got_now;
-    int button;
+    int button = 0;
     int retval;
 
     // try to open the file
@@ -865,27 +865,32 @@ int main(char* filename)
         return PLUGIN_USB_CONNECTED;
     }
 
-    // display statistics
-    rb->lcd_clear_display();
-    rb->snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
-    rb->lcd_puts(0, 0, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "%d Video Underruns", gStats.nVideoUnderruns);
-    rb->lcd_puts(0, 1, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "%d MinAudio bytes", gStats.minAudioAvail);
-    rb->lcd_puts(0, 2, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
-    rb->lcd_puts(0, 3, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "ReadChunk: %d", gBuf.nReadChunk);
-    rb->lcd_puts(0, 4, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "SeekChunk: %d", gBuf.nSeekChunk);
-    rb->lcd_puts(0, 5, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
-    rb->lcd_puts(0, 6, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
-    rb->lcd_puts(0, 7, gPrint);
+#ifndef DEBUG // for release compilations, only display the stats in case of error
+    if (gStats.nAudioUnderruns || gStats.nVideoUnderruns)
+#endif
+    {
+        // display statistics
+        rb->lcd_clear_display();
+        rb->snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
+        rb->lcd_puts(0, 0, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "%d Video Underruns", gStats.nVideoUnderruns);
+        rb->lcd_puts(0, 1, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "%d MinAudio bytes", gStats.minAudioAvail);
+        rb->lcd_puts(0, 2, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
+        rb->lcd_puts(0, 3, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "ReadChunk: %d", gBuf.nReadChunk);
+        rb->lcd_puts(0, 4, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "SeekChunk: %d", gBuf.nSeekChunk);
+        rb->lcd_puts(0, 5, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
+        rb->lcd_puts(0, 6, gPrint);
+        rb->snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
+        rb->lcd_puts(0, 7, gPrint);
  
-    rb->lcd_update();
-    button = WaitForButton();
+        rb->lcd_update();
+        button = WaitForButton();
+    }
     return (button == SYS_USB_CONNECTED) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
