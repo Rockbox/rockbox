@@ -26,6 +26,8 @@
 #include "font.h"
 #include "screens.h"
 #include "status.h"
+#include "talk.h"
+#include "settings.h"
 
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
@@ -53,6 +55,20 @@ static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
         line[2] = "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ";
         line[3] = "òóôõöø çðþýÿ ùúûü";
         break;
+    }
+}
+
+/* helper function to spell a char if voice UI is enabled */
+void kbd_spellchar(char c)
+{
+    char spell_char[2]; /* store char to pass to talk_spell */
+
+    if (global_settings.talk_menu) /* voice UI? */
+    {
+        spell_char[0] = c; 
+        spell_char[1] = '\0'; /* mark end of char string */ 
+
+        talk_spell(spell_char, false); 
     }
 }
 
@@ -88,6 +104,9 @@ int kbd_input(char* text, int buflen)
 
     max_chars = LCD_WIDTH / font_w;
     kbd_setupkeys(line, page);
+
+    if (global_settings.talk_menu) /* voice UI? */
+        talk_spell(text, true); /* spell initial text */ 
 
     while(!done)
     {
@@ -188,6 +207,7 @@ int kbd_input(char* text, int buflen)
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
                 kbd_setupkeys(line, page);
+                kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_RIGHT:
@@ -196,6 +216,7 @@ int kbd_input(char* text, int buflen)
                     x++;
                 else
                     x = 0;
+                kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_LEFT:
@@ -204,6 +225,7 @@ int kbd_input(char* text, int buflen)
                     x--;
                 else
                     x = strlen(line[y]) - 1;
+                kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_DOWN:
@@ -212,6 +234,7 @@ int kbd_input(char* text, int buflen)
                     y++;
                 else
                     y=0;
+                kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_UP:
@@ -220,6 +243,7 @@ int kbd_input(char* text, int buflen)
                     y--;
                 else
                     y = KEYBOARD_LINES - 1;
+                kbd_spellchar(line[y][x]);
                 break;
 
             case BUTTON_F3:
@@ -261,6 +285,8 @@ int kbd_input(char* text, int buflen)
                     }
                     editpos++;
                 }
+                if (global_settings.talk_menu) /* voice UI? */
+                    talk_spell(text, false); /* speak revised text */
                 break;
 
             case BUTTON_ON | BUTTON_RIGHT:
@@ -269,6 +295,8 @@ int kbd_input(char* text, int buflen)
                 editpos++;
                 if (editpos > len)
                     editpos = len;
+                else
+                    kbd_spellchar(text[editpos]);
                 break;
 
             case BUTTON_ON | BUTTON_LEFT:
@@ -277,6 +305,8 @@ int kbd_input(char* text, int buflen)
                 editpos--;
                 if (editpos < 0)
                     editpos = 0;
+                else
+                    kbd_spellchar(text[editpos]);
                 break;
 
             case SYS_USB_CONNECTED:
