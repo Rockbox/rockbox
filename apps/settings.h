@@ -86,6 +86,10 @@ struct user_settings
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
 
+    int peak_meter_release;   /* units per read out */
+    int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
+    int peak_meter_clip_hold; /* hold time for clips */
+
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
 

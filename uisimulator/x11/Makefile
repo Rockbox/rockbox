@@ -82,7 +82,7 @@ FIRMSRCS = lcd-recorder.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c\
-	screens.c
+	screens.c peakmeter.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -240,6 +240,9 @@ $(OBJDIR)/status.o: $(APPDIR)/status.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/screens.o: $(APPDIR)/screens.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/peakmeter.o: $(RECDIR)/peakmeter.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c

@@ -834,3 +834,33 @@ id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
 new:
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: 
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: 
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: 
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: 
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: 
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: 

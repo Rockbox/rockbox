@@ -40,6 +40,7 @@
 #include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "peakmeter.h"
 #endif
 #include "lang.h"
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
@@ -610,7 +611,7 @@ static bool menu(void)
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
-    int button, lastbutton = 0;
+    int button = 0, lastbutton = 0;
     int old_repeat_mask;
     bool ignore_keyup = true;
     bool restore = false;
@@ -644,7 +645,27 @@ int wps_show(void)
 
     while ( 1 )
     {
+
+#ifdef HAVE_LCD_BITMAP
+        /* when the peak meter is enabled we want to have a
+            few extra updates to make it look smooth. On the
+            other hand we don't want to waste energy if it 
+            isn't displayed */
+        if (peak_meter_enabled) {
+            int i;
+            for (i = 0; i < 4; i++) {
+                button = button_get_w_tmo(HZ / 20);
+                if (button != 0) {
+                    break;
+                }
+                wps_refresh(id3, 0, false);
+            }
+        } else {
+            button = button_get_w_tmo(HZ/5);
+        }
+#else
         button = button_get_w_tmo(HZ/5);
+#endif
 
         /* discard first event if it's a button release */
         if (button && ignore_keyup)
@@ -839,4 +860,5 @@ int wps_show(void)
         if(button != BUTTON_NONE)
             lastbutton = button;
     }
+    return 0; /* unreachable - just to reduce compiler warnings */
 }

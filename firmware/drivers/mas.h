@@ -22,6 +22,8 @@
 #define MAS_BANK_D0 0
 #define MAS_BANK_D1 1
 
+#define MAX_PEAK 0x8000
+
 /*
 	MAS I2C	defs
 */

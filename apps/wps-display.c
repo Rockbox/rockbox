@@ -37,10 +37,13 @@
 #include "status.h"
 #include "wps-display.h"
 #include "debug.h"
+#include "mas.h"
 #include "lang.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
+#include "peakmeter.h"
 #endif
 
 #define WPS_CONFIG ROCKBOX_DIR "/default.wps"
@@ -52,12 +55,12 @@
 #endif
 
 #define FORMAT_BUFFER_SIZE 300
-
 struct format_flags
 {
     bool dynamic;
     bool scroll;
     bool player_progress;
+    bool peak_meter;
 };
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
@@ -331,6 +334,13 @@ static char* get_tag(struct mp3entry* id3,
                 case 't':  /* Total Time */
                     format_time(buf, buf_size, id3->length);
                     return buf;
+
+#ifdef HAVE_LCD_BITMAP
+                case 'm': /* Peak Meter */
+                    flags->peak_meter = true;
+                    flags->dynamic = true;
+                    return "\x01";
+#endif
             }
             break;
     
@@ -518,6 +528,15 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
     bool scroll_active = false;
     int i;
 
+    /* to find out wether the peak meter is enabled we
+       assume it wasn't until we find a line that contains
+       the peak meter. We can't use peak_meter_enabled itself
+       because that would mean to turn off the meter thread 
+       temporarily. (That shouldn't matter unless yield 
+       or sleep is called but who knows...)
+    */
+    bool enable_pm = false;
+
     if (!id3)
     {
         lcd_stop_scroll();
@@ -537,6 +556,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             flags.dynamic = false;
             flags.scroll = false;
             flags.player_progress = false;
+            flags.peak_meter = false;
             format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
             dynamic_lines[i] = flags.dynamic;
             
@@ -556,6 +576,30 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 #endif
             }
 
+#ifdef HAVE_LCD_BITMAP
+            if (flags.peak_meter) {
+                int peak_meter_y;
+                int w,h;
+                int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+                lcd_getstringsize("M",&w,&h);
+
+                peak_meter_y = i * h + offset;
+
+                /* The user might decide to have the peak meter in the last 
+                   line so that it is only displayed if no status bar is 
+                   visible. If so we neither want do draw nor enable the
+                   peak meter. */
+                if (peak_meter_y + h <= LCD_HEIGHT) {
+                    /* found a line with a peak meter -> remember that we must
+                       enable it later */
+                    enable_pm = true;
+                    peak_meter_draw(0, peak_meter_y, LCD_WIDTH,
+                                    MIN(h, LCD_HEIGHT - peak_meter_y));
+                }
+                continue;
+            }
+#endif
+
             if (!scroll_active && flags.scroll && !flags.dynamic)
             {
                 scroll_active = true;
@@ -567,6 +611,10 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
         }
     }
+
+    /* Now we know wether the peak meter is used. 
+       So we can enable / disable the peak meter thread */
+    peak_meter_enabled = enable_pm;
     lcd_update();
 
     return true;
@@ -602,7 +650,8 @@ void wps_display(struct mp3entry* id3)
                            "%ia\n"
                            "%fb kbit %fv\n"
                            "Time: %pc / %pt\n"
-                           "%pb\n");
+                           "%pb\n"
+                           "%pm\n");
 #else
                 wps_format("%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>\n"
                            "%pc/%pt\n");

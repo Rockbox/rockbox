@@ -46,6 +46,8 @@ Playlist/Song Info Tags:
         Player: This will display a 1 character "cup" that empties as the
                 progresses.
         Recorder: This will replace the entire line with a progress bar.
+  %pm : Peak Meter (Recorder only)
+        The entire line is used as volume peak meter.
   %pp : Playlist Position
   %pe : Total Number of Playlist Entries
   %pc : Current Time In Song

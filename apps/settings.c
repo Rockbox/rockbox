@@ -53,6 +53,12 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
+#ifdef HAVE_LCD_BITMAP
+#define MAX_LINES 10
+#else
+#define MAX_LINES 2
+#endif
+
 /********************************************
 
 Config block as saved on the battery-packed RTC user RAM memory block
@@ -80,6 +86,9 @@ offset  abs
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
 0x1b    0x2f    <browse current, play selected>
+0x1c    0x30    <peak meter hold timeout (bit 0-4)>
+0x1d    0x31    <peak meter clip hold timeout (bit 0-4)>
+0x1e    0x32    <peak meter release step size>
 
         <all unused space filled with 0xff>
 
@@ -290,6 +299,10 @@ int settings_save( void )
         (((global_settings.browse_current & 1)) |
          ((global_settings.play_selected & 1) << 1));
     
+    config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold;
+    config_block[0x1d] = (unsigned char)global_settings.peak_meter_clip_hold;
+    config_block[0x1e] = (unsigned char)global_settings.peak_meter_release;
+
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
     memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
@@ -400,6 +413,15 @@ void settings_load(void)
             global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
         }
 
+        if (config_block[0x1c] != 0xFF)
+            global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
+
+        if (config_block[0x1d] != 0xFF)
+            global_settings.peak_meter_clip_hold = (config_block[0x1d]) & 0x1f;
+
+        if (config_block[0x1e] != 0xFF)
+            global_settings.peak_meter_release = config_block[0x1e];
+
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
         if (config_block[0x24] != 0xFF)
@@ -471,7 +493,7 @@ bool settings_load_eq(char* file)
                                 break;
                             case 3:
                                 snprintf(buf_disp,sizeof(buf_disp),"[%s]%s", buf_set, buf_val);
-                                lcd_puts(0,line++ % 6,buf_disp);
+                                lcd_puts(0,line++ % MAX_LINES, buf_disp);
                                 lcd_update();
                                 sleep(HZ/2);
                                 if (!strcasecmp(buf_set,"volume")) {
@@ -610,6 +632,9 @@ void settings_reset(void) {
     global_settings.disk_spindown = 5;
     global_settings.browse_current = false;
     global_settings.play_selected = true;
+    global_settings.peak_meter_release = 8;
+    global_settings.peak_meter_hold = 1;
+    global_settings.peak_meter_clip_hold = 16;
 }
 
 

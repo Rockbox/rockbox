@@ -36,6 +36,7 @@
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
+#include "peakmeter.h"
 #include "lang.h"
 
 static bool contrast(void)
@@ -43,6 +44,68 @@ static bool contrast(void)
     return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
                     lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
 }
+
+#ifdef HAVE_LCD_BITMAP
+/**
+ * Menu to set the hold time of normal peaks.
+ */
+static bool peak_meter_hold(void) {
+    char* names[] = { str(LANG_OFF),
+        "200 ms ", "300 ms ", "500 ms ", "1 s ", "2 s ",
+        "3 s ", "4 s ", "5 s ", "6 s ", "7 s",
+        "8 s", "9 s", "10 s", "15 s", "20 s",
+        "30 s", "1 min"
+    };
+    return set_option( str(LANG_PM_PEAK_HOLD), 
+        &global_settings.peak_meter_hold, names,
+        18, NULL);
+}
+
+/**
+ * Menu to set the hold time of clips.
+ */
+static bool peak_meter_clip_hold(void) {
+    char* names[] = { str(LANG_PM_ETERNAL),
+        "1s ", "2s ", "3s ", "4s ", "5s ",
+        "6s ", "7s ", "8s ", "9s ", "10s",
+        "15s", "20s", "25s", "30s", "45s",
+        "60s", "90s", "2min", "3min", "5min",
+        "10min", "20min", "45min", "90min"
+    };
+    return set_option( str(LANG_PM_CLIP_HOLD), 
+        &global_settings.peak_meter_clip_hold, names,
+        25, peak_meter_set_clip_hold);
+}
+
+/**
+ * Menu to set the release time of the peak meter.
+ */
+static bool peak_meter_release(void)  {
+    return set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ), 
+             &global_settings.peak_meter_release,
+             NULL, 1, 1, LCD_WIDTH);
+}
+
+/**
+ * Menu to configure the peak meter
+ */
+static bool peak_meter_menu(void) 
+{
+    int m;
+    bool result;
+
+    struct menu_items items[] = {
+        { str(LANG_PM_RELEASE)  , peak_meter_release   },  
+        { str(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
+        { str(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+#endif
 
 #ifndef HAVE_RECORDER_KEYPAD
 static bool shuffle(void)
@@ -313,6 +376,9 @@ static bool display_settings_menu(void)
         { str(LANG_SCROLL_MENU),     scroll_speed    },  
         { str(LANG_BACKLIGHT),       backlight_timer },
         { str(LANG_CONTRAST),        contrast        },  
+#ifdef HAVE_LCD_BITMAP
+        { str(LANG_PM_MENU),         peak_meter_menu },  
+#endif
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
