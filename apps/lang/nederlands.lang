@@ -1424,3 +1424,8 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: Tells the user to stop the playback
 eng: "Stop the playback first"
 new: "Stop afspelen eerst"
+
+id: LANG_VBRFIX
+desc: The context menu entry
+eng: "Update VBR file"
+new: "Update VBR bestand"
