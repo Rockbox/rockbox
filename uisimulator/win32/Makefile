@@ -128,7 +128,10 @@ all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
-$(TARGET): $(OBJS)
+$(OBJDIR)/libplugin.a:
+	$(MAKE) -C $(PLUGINDIR)/lib DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" SIMULATOR=1
+
+$(TARGET): $(OBJS) $(OBJDIR)/libplugin.a
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
 
 $(OBJDIR)/uisw32-res.o: uisw32.rc
@@ -140,6 +143,7 @@ clean:
 	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
 	$(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
+	$(MAKE) -C $(PLUGINDIR)/lib clean
 
 distclean: clean
 	$(RM) config.cache
@@ -324,7 +328,7 @@ $(OBJDIR)/%.po : $(PLUGINDIR)/%.c
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.po
 	$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< -o $@
+	$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
 
 DEPS:=$(OBJDIR)/.deps
 
