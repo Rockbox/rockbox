@@ -594,8 +594,8 @@ struct bitstream
 {
     unsigned long get_buffer; /* current bit-extraction buffer */
     int bits_left; /* # of unused bits in it */
-    unsigned short* next_input_word;
-    long words_left; /* # of words remaining in source buffer */
+    unsigned char* next_input_byte;
+    unsigned char* input_end; /* upper limit +1 */
 };
 
 struct jpeg
@@ -605,9 +605,10 @@ struct jpeg
     int x_mbl; /* x dimension of MBL */
     int y_mbl; /* y dimension of MBL */
     int blocks; /* blocks per MBL */
+    int restart_interval; /* number of MCUs between RSTm markers */
 
-    unsigned short* p_entropy_data;
-    long words_in_buffer; /* # of valid words in source buffer */
+    unsigned char* p_entropy_data;
+    unsigned char* p_entropy_end;
 
     int quanttable[4][QUANT_TABLE_LENGTH]; /* raw quantization tables 0-3 */
     int qt_idct[2][QUANT_TABLE_LENGTH]; /* quantization tables for IDCT */
@@ -635,20 +636,21 @@ struct jpeg
 #define DQT       0x0080 /* with definition of quantization table */
 
 /* Preprocess the JPEG JFIF file */
-int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
+int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
 {
-    unsigned char* p_src = p_bytes;
-    /* write without markers nor stuffing in same buffer */
-    unsigned char* p_dest;
+    unsigned char* p_bytes = p_src;
     int marker_size; /* variable length of marker segment */
     int i, j, n;
     int ret = 0; /* returned flags */
+
+    p_jpeg->p_entropy_end = p_src + size;
 
     while (p_src < p_bytes + size)
     {
         if (*p_src++ != 0xFF) /* no marker? */
         {
             p_src--; /* it's image data, put it back */
+            p_jpeg->p_entropy_data = p_src;
             break; /* exit marker processing */
         }
 
@@ -818,14 +820,6 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
         case 0xCC: /* Define Arithmetic coding conditioning(s) */
             return(-6); /* Arithmetic coding not supported */
 
-        case 0xD0: /* Restart with modulo 8 count 0 */
-        case 0xD1: /* Restart with modulo 8 count 1 */
-        case 0xD2: /* Restart with modulo 8 count 2 */
-        case 0xD3: /* Restart with modulo 8 count 3 */
-        case 0xD4: /* Restart with modulo 8 count 4 */
-        case 0xD5: /* Restart with modulo 8 count 5 */
-        case 0xD6: /* Restart with modulo 8 count 6 */
-        case 0xD7: /* Restart with modulo 8 count 7 */
         case 0xD8: /* Start of Image */
         case 0xD9: /* End of Image */
         case 0x01: /* for temp private use arith code */
@@ -873,8 +867,17 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
             }
             break;
 
-        case 0xDC: /* Define Number of Lines */
         case 0xDD: /* Define Restart Interval */
+            {
+                marker_size = *p_src++ << 8; /* Highbyte */
+                marker_size |= *p_src++; /* Lowbyte */
+                p_jpeg->restart_interval = *p_src++ << 8; /* Highbyte */
+                p_jpeg->restart_interval |= *p_src++; /* Lowbyte */
+                p_src += marker_size-4; /* skip segment */
+            }
+            break;
+
+        case 0xDC: /* Define Number of Lines */
         case 0xDE: /* Define Hierarchical progression */
         case 0xDF: /* Expand Reference Component(s) */
         case 0xE0: /* Application Field 0*/
@@ -921,38 +924,6 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
         } /* switch */
     } /* while */
 
-
-    /* memory location for later decompress (16-bit aligned) */
-    p_dest = (unsigned char*)(((int)p_bytes + 1) & ~1);
-    p_jpeg->p_entropy_data = (unsigned short*)p_dest;
-
-
-    /* remove byte stuffing and restart markers, if present */
-    while (p_src < p_bytes + size)
-    {
-        if ((*p_dest++ = *p_src++) != 0xFF)
-            continue;
-
-        /* 0xFF marker found, have a closer look at the next byte */
-
-        if (*p_src == 0x00)
-        {
-            p_src++; /* continue reading after marker */
-            continue; /* stuffing byte, a true 0xFF */
-        }
-        else if (*p_src >= 0xD0 && *p_src <= 0xD7) /* restart marker */
-        {
-            return (-12); /* can't decode such images for now */
-            /* below won't work, is not seamless to the huffman decoder */
-            p_src++; /* continue reading after marker */
-            p_dest--; /* roll back, don't copy it */
-            continue; /* ignore */
-        }
-        else
-            break; /* exit on any other marker */
-    }
-    MEMSET(p_dest, 0, size - (p_dest - p_bytes)); /* fill tail with zeros */
-    p_jpeg->words_in_buffer = (p_dest - p_bytes) / sizeof(unsigned short);
     return (ret); /* return flags with seen markers */
 }
 
@@ -1154,10 +1125,23 @@ void build_lut(struct jpeg* p_jpeg)
 INLINE void check_bit_buffer(struct bitstream* pb, int nbits)
 {
     if (pb->bits_left < nbits)
-    {
-        pb->words_left--;
-        pb->get_buffer = (pb->get_buffer << 16)
-                       | ENDIAN_SWAP16(*pb->next_input_word++);
+    {   /* nbits is <= 16, so I can always refill 2 bytes in this case */
+        unsigned char byte;
+
+        byte = *pb->next_input_byte++;
+        if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
+        {   /* simplification: just skip the (one-byte) marker code */
+            pb->next_input_byte++;
+        }
+        pb->get_buffer = (pb->get_buffer << 8) | byte;
+
+        byte = *pb->next_input_byte++;
+        if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
+        {   /* simplification: just skip the (one-byte) marker code */
+            pb->next_input_byte++;
+        }
+        pb->get_buffer = (pb->get_buffer << 8) | byte;
+        
         pb->bits_left += 16;
     }
 }
@@ -1175,6 +1159,19 @@ INLINE int peek_bits(struct bitstream* pb, int nbits)
 INLINE void drop_bits(struct bitstream* pb, int nbits)
 {
     pb->bits_left -= nbits;
+}
+
+/* re-synchronize to entropy data (skip restart marker) */
+void search_restart(struct bitstream* pb)
+{
+    pb->next_input_byte--; /* we may have overread it, taking 2 bytes */
+    /* search for a non-byte-padding marker, has to be RSTm or EOS */
+    while (pb->next_input_byte < pb->input_end &&
+        (pb->next_input_byte[-2] != 0xFF || pb->next_input_byte[-1] == 0x00))
+    {
+        pb->next_input_byte++;
+    }
+    pb->bits_left = 0;
 }
 
 /* Figure F.12: extend sign bit. */
@@ -1295,6 +1292,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
 
     int last_dc_val = 0;
     int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
+    int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
 
     /* pick the IDCT we want, determine how to work with coefs */
     if (downscale == 1)
@@ -1323,10 +1321,10 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     }
     else return -1; /* not supported */
 
-    /* init bitstream */
+    /* init bitstream, fake a restart to make it start */
+    bs.next_input_byte = p_jpeg->p_entropy_data;
     bs.bits_left = 0;
-    bs.next_input_word = p_jpeg->p_entropy_data;
-    bs.words_left = p_jpeg->words_in_buffer;
+    bs.input_end = p_jpeg->p_entropy_end;
 
     width  = p_jpeg->x_phys / downscale;
     height = p_jpeg->y_phys / downscale;
@@ -1340,7 +1338,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     store_offs[2] = width * 8 / downscale; /* below */
     store_offs[3] = store_offs[1] + store_offs[2]; /* right+below */
 
-    for(y=0; y<p_jpeg->y_mbl; y++)
+    for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
     {
         p_byte = p_pixel;
         p_pixel += skip_strip;
@@ -1349,8 +1347,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
             int blkn;
 
             /* Outer loop handles each block in the MCU */
-
-            for (blkn = 0; blkn < p_jpeg->blocks && bs.words_left>=0; blkn++)
+            for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
             {   /* Decode a single block's worth of coefficients */
                 int k = 1; /* coefficient index */
                 int s, r; /* huffman values */
@@ -1368,7 +1365,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
                     block[0] = last_dc_val; /* output it (assumes zag[0] = 0) */
 
                     /* coefficient buffer must be cleared */
-                    MEMSET(block+1, 0, zero_need*sizeof(int));
+                    MEMSET(block+1, 0, zero_need*sizeof(block[0]));
 
                     /* Section F.2.2.2: decode the AC coefficients */
                     for (; k < k_need; k++)
@@ -1418,11 +1415,17 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
 
                 if (ci == 0)
                 {   /* only for Y component */
-                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti],
+                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti], 
                         skip_line);
                 }
             } /* for blkn */
             p_byte += skip_mcu;
+            if (p_jpeg->restart_interval && --restart == 0) 
+            {   /* if a restart marker is due: */
+                restart = p_jpeg->restart_interval; /* count again */
+                search_restart(&bs); /* align the bitstream */
+                last_dc_val = 0; /* reset decoder */
+            }
         } /* for x */
         if (pf_progress != NULL)
             pf_progress(y, p_jpeg->y_mbl-1); /* notify about decoding progress */
@@ -1430,6 +1433,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
 
     return 0; /* success */
 }
+
 
 /**************** end JPEG code ********************/
 
@@ -1765,6 +1769,8 @@ int main(char* filename)
     buf_jpeg = (unsigned char*)(((int)buf + 1) & ~1);
     buf += filesize;
     buf_size -= filesize;
+    buf_root = buf; /* we can start the decompressed images behind it */
+    root_size = buf_size;
     if (buf_size <= 0)
     {
         rb->splash(HZ*2, true, "out of memory");
@@ -1794,14 +1800,6 @@ int main(char* filename)
     if (!(status & DHT)) /* if no Huffman table present: */
         default_huff_tbl(&jpg); /* use default */
     build_lut(&jpg); /* derive Huffman and other lookup-tables */
-
-    /* I can correct the buffer now, re-gain what the removed markers took */
-    buf -= filesize; /* back to before */
-    buf_size += filesize;
-    buf += jpg.words_in_buffer * sizeof(short); /* real space */
-    buf_size -= jpg.words_in_buffer * sizeof(short);
-    buf_root = buf; /* we can start the images here */
-    root_size = buf_size;
 
     rb->snprintf(print, sizeof(print), "image %d*%d", jpg.x_size, jpg.y_size);
     rb->lcd_puts(0, 2, print);
