@@ -347,7 +347,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             return;
     }
     entry->id3version = version;
-    entry->tracknum = entry->year = entry->genre = 0;
+    entry->tracknum = entry->year = 0;
+    entry->genre = 0xff;
     entry->title = entry->artist = entry->album = NULL;
 
     /* Skip the extended header if it is present */
