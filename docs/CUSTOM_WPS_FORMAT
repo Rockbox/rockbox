@@ -5,7 +5,7 @@ Description / General Info
 --------------------------
 * The Custom WPS Display is used on both the Rockbox Player and Recorder, 
   as a means to customize the WPS to the user's likings.
-* After editing the wps.config file, you may need to reboot your Rockbox.
+* After editing the .wps file, you may need to reboot your Rockbox.
 * The file may be 2 lines long for the Player, and 6 lines for the Recorder.
 * The line that has the time displayed on it MUST NOT be the line that
   is scrolled, or the time will not be updated.
@@ -71,8 +71,8 @@ Other Tags:
         %s is ignored if combined with %pb, %pc or %pr on the same
         line (the result wouldn't be good anyway).
 
-Example wps.config
-------------------
+Example File
+------------
 %s%?in<%in - >%?it<%it|%fn> %?ia<[%ia%?id<, %id>]>
 %pb%pc/%pt
 
