@@ -1924,7 +1924,14 @@ static void mpeg_thread(void)
                         
                         /* Read the first MP3 frame from the recorded stream */
                         lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE, SEEK_SET);
-                        read(mpeg_file, &saved_header, 4);
+                        rc = read(mpeg_file, &saved_header, 4);
+                        if(rc <= 0)
+                        {
+                            close(mpeg_file);
+                            mpeg_file = -1;
+                            mpeg_stop_done = true;
+                            break;
+                        }
                         
                         framelen = create_xing_header(mpeg_file, 0,
                                                       num_rec_bytes, mp3buf,
@@ -1980,13 +1987,21 @@ static void mpeg_thread(void)
                         DEBUGF("Header: %08x\n", saved_header);
                     }
 
-                    mem_find_next_frame(startpos, &offset, 1800, saved_header);
-
-                    /* offset will now contain the number of bytes to
-                       add to startpos to find the frame boundary */
-                    startpos += offset;
-                    if(startpos >= mp3buflen)
-                        startpos -= mp3buflen;
+                    rc = mem_find_next_frame(startpos, &offset, 1800,
+                                             saved_header);
+                    if(rc) /* Header found? */
+                    {
+                        /* offset will now contain the number of bytes to
+                           add to startpos to find the frame boundary */
+                        startpos += offset;
+                        if(startpos >= mp3buflen)
+                            startpos -= mp3buflen;
+                    }
+                    else
+                    {
+                        /* No header found. Let's save the whole buffer. */
+                        startpos = mp3buf_write;
+                    }
 
                     amount_to_save = startpos - mp3buf_read;
                     if(amount_to_save < 0)
