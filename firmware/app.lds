@@ -55,6 +55,7 @@ SECTIONS
     .rodata :
     {
         *(.rodata)
+        *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
 
@@ -74,7 +75,7 @@ SECTIONS
         _iramcopy = .;
     } > DRAM
 
-    .iram 0xf000000 : AT ( _iramcopy)
+    .iram IRAMORIG : AT ( _iramcopy)
     {
         _iramstart = .;
         *(.icode)
