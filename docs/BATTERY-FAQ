@@ -105,21 +105,46 @@ A10: The short answer is: Using a different charger will void your warranty
      with similar specifications as the stock charger. The charger must
      have the same kind of connector with same polarity (center positive/+).
      The charger should supply at least 7-8 volts, and if it provides
-     more than 10V, it probably should be regulated to 9V (do not
+     more than 10V, it probably should be regulated to 10V (do not
      directly plug it in your 12V car battery or it's charger!).
      The universal travel charger sold by Archos is specified at
      12V, 1.2A so that's probably the maximum rating you should use.
      A good circuit for powering from a car battery or other source
-     with a higher voltage would be a 600 mA fuse and a 9V regulator like
-     a 7809 of your favourite manufacturer in series.
+     with a higher voltage would be a 600 mA fuse and a 10V regulator like
+     a 7810 of your favourite manufacturer in series.
      
-     Using lower charging voltage will slow down the charging, and using
-     higher voltage will cause a higher charging current, more heat,
-     and too much heat and current can damage the batteries or the unit.
      Inside the Jukebox there is a regulator which limits the charging
-     voltage applied to the batteries (which in turn limits the current
-     - the usual ohm's law applies: current = voltage / resistance) but
-     if a high input voltage is applied, the regulator will heat up a lot!
+     current applied to the batteries. The higher the input voltage, the hotter
+     this IC gets. Don't use an input voltage above 12V.
+     Using lower charging voltage < 10V will slow down the charging. But the
+     rockbox charging algorithm should work then, too.
+
+     These are the output voltages of an original archos power supply:
+     - connected to AJB Recorder, not charging: 13,7 Volt
+     - connected to AJB Recorder, charging: going down to 10,4 Volt
+
+     Here is how changing the input voltage changes the charging current:
+
+     voltage   charging current (limited only by the AJB)
+     ------------------------------------------------------
+     7,0V          10 mA
+     7,5V          30 mA
+     8,0V          50 mA
+     8,5V          70 mA
+     9,0V         140 mA
+     9,5V         250 mA
+     10,0V        330 mA
+     10,5V        350 mA
+     11,0V        350 mA
+     11,5V        350 mA
+     12,0V        350 mA
+     
+     To summarize:
+
+     - do not use an input voltage > 12V
+     - optimal input voltage is 10V (regulated)
+     - use a fuse of ~600mA
+     - using a different charger voids your warrenty
      
      Many people are happy using an external quick charger which
      is specified to work with NiMH batteries. This is completely safe
@@ -136,7 +161,6 @@ A11: The FAQ on the Archos web site and the top of the charger both read:
      
      Chargers with similar (or user-adjustable) properties are available
      at shops selling consumer electronics.
-
 
 Q12: I often need to stop my player for about 15 minutes or so, and when I do
      it runs off it's batteries.  I was wondering, which is best: shutting the
