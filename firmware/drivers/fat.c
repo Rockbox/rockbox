@@ -1670,7 +1670,19 @@ static void unicode2iso(unsigned char* unicode, unsigned char* iso, int count )
                 /* Sergei says most russians use Win1251, so we will too.
                    Win1251 differs from ISO 8859-5 by an offset of 0x10. */
             case 0x04: /* cyrillic, convert to Win1251 */
-                iso[i] = unicode[x] + 0xb0; /* 0xa0 for ISO 8859-5 */
+                switch (unicode[x]) {
+                    case 1:
+                        iso[i] = 168;
+                        break;
+
+                    case 81:
+                        iso[i] = 184;
+                        break;
+
+                    default:
+                        iso[i] = unicode[x] + 0xb0; /* 0xa0 for ISO 8859-5 */
+                        break;
+                }
                 break;
 
             case 0x05: /* hebrew, convert to ISO 8859-8 */
