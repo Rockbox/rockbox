@@ -205,13 +205,8 @@ void screen_redraw()
 
 #define X1 0
 #define Y1 0
-#ifdef HAVE_LCD_BITMAP
 #define X2 (LCD_WIDTH + MARGIN_X*2)
 #define Y2 (LCD_HEIGHT + MARGIN_Y)
-#else
-#define X2 137
-#define Y2 53
-#endif
 
   drawline(1, X1, Y1, X2, Y1);
   drawline(1, X2, Y1, X2, Y2);
