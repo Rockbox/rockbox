@@ -81,6 +81,8 @@
 
 #define Q_SLEEP 0
 
+#define READ_TIMEOUT 5*HZ
+
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
 int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
@@ -166,6 +168,7 @@ int ata_read_sectors(unsigned long start,
                      void* buf)
 {
     int ret = 0;
+    int timeout;
 
     last_disk_activity = current_tick;
 
@@ -196,62 +199,67 @@ int ata_read_sectors(unsigned long start,
 
     led(true);
 
-    if ( count == 256 )
-        ATA_NSECTOR = 0; /* 0 means 256 sectors */
-    else
-        ATA_NSECTOR = (unsigned char)count;
+    timeout = current_tick + READ_TIMEOUT;
+    while (TIME_BEFORE(current_tick, timeout)) {
 
-    ATA_SECTOR  = start & 0xff;
-    ATA_LCYL    = (start >> 8) & 0xff;
-    ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
-    ATA_COMMAND = CMD_READ_MULTIPLE;
-
-    while (count) {
-        int j;
-        int sectors;
-        int wordcount;
-
-        if (!wait_for_start_of_transfer())
-        {
-            led(false);
-            mutex_unlock(&ata_mtx);
-            return -1;
-        }
-
-        /* if destination address is odd, use byte copying,
-           otherwise use word copying */
-
-        if (count >= multisectors )
-            sectors = multisectors;
+        if ( count == 256 )
+            ATA_NSECTOR = 0; /* 0 means 256 sectors */
         else
-            sectors = count;
+            ATA_NSECTOR = (unsigned char)count;
 
-        wordcount = sectors * SECTOR_SIZE / 2;
+        ATA_SECTOR  = start & 0xff;
+        ATA_LCYL    = (start >> 8) & 0xff;
+        ATA_HCYL    = (start >> 16) & 0xff;
+        ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
+        ATA_COMMAND = CMD_READ_MULTIPLE;
 
-        if ( (unsigned int)buf & 1 ) {
-            for (j=0; j < wordcount; j++) {
-                unsigned short tmp = SWAB16(ATA_DATA);
-                ((unsigned char*)buf)[j*2] = tmp >> 8;
-                ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
+        while (count) {
+            int j;
+            int sectors;
+            int wordcount;
+
+            if (!wait_for_start_of_transfer()) {
+                ret = -4;
+                continue;
             }
-        }
-        else {
-            for (j=0; j < wordcount; j++)
-                ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
-        }
+
+            /* if destination address is odd, use byte copying,
+               otherwise use word copying */
+
+            if (count >= multisectors )
+                sectors = multisectors;
+            else
+                sectors = count;
+
+            wordcount = sectors * SECTOR_SIZE / 2;
+
+            if ( (unsigned int)buf & 1 ) {
+                for (j=0; j < wordcount; j++) {
+                    unsigned short tmp = SWAB16(ATA_DATA);
+                    ((unsigned char*)buf)[j*2] = tmp >> 8;
+                    ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
+                }
+            }
+            else {
+                for (j=0; j < wordcount; j++)
+                    ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
+            }
 
 #ifdef USE_INTERRUPT
-        /* reading the status register clears the interrupt */
-        j = ATA_STATUS;
+            /* reading the status register clears the interrupt */
+            j = ATA_STATUS;
 #endif
-        buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
-        count -= sectors;
+            buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
+            count -= sectors;
+        }
+
+        if(!wait_for_end_of_transfer()) {
+            ret = -3;
+            continue;
+        }
+
+        break;
     }
-
-    if(!wait_for_end_of_transfer())
-        ret = -3;
-
     led(false);
 
     mutex_unlock(&ata_mtx);
