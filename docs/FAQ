@@ -688,3 +688,24 @@ A76: It means you have more files in a single directory than you have
         another setting for the file filter, or insert the USB and extract
         it again
      4) Turn it off and on again
+
+Q77: Why are you developing X when you should be doing Y?
+A77: You make the common mistake of confusing Rockbox development with that of
+     commercial projects. There is not much of an agenda for the development
+     of Rockbox. Anyone who wants to write new features can do that.
+
+     If there is a current "huge emphasis" on the X functionality, it is
+     because one or more developers, decided he/they wanted to write it. It's
+     not because "Rockbox project management" decided function X is a more
+     important feature than anything else.
+
+     That is the nature of Free Software: People write code that scratches
+     their own itches, or that simply is fun to write. Everybody working with
+     Rockbox is doing it for fun. A wide or narrow audience actually has only
+     little bearing on the choice of features to implement.
+
+     The moment someone with a bit of time to spare and the necessary
+     programming skills (or a will to learn them) feels function Y is a
+     sufficiently useful feature, it will be written.
+
+     (That could be you.)
