@@ -530,6 +530,9 @@ int wps_show(void)
                         if ( mpeg_is_playing() && id3 && id3->length )
                         {
                             mpeg_pause();
+#ifdef HAVE_PLAYER_KEYPAD
+                            lcd_stop_scroll();
+#endif
                             status_set_playmode(STATUS_FASTBACKWARD);
                             status_draw();
                             ff_rewind = true;
@@ -559,6 +562,9 @@ int wps_show(void)
                         if ( mpeg_is_playing() && id3 && id3->length )
                         {
                             mpeg_pause();
+#ifdef HAVE_PLAYER_KEYPAD
+                            lcd_stop_scroll();
+#endif
                             status_set_playmode(STATUS_FASTFORWARD);
                             status_draw();
                             ff_rewind = true;
