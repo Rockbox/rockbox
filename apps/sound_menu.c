@@ -47,6 +47,7 @@ static void soundsetting(int setting)
     while ( !done ) {
         snprintf(buf,sizeof buf,"%d %% ",value);
         lcd_puts(0,1,buf);
+        lcd_update();
 
         switch ( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
