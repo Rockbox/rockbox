@@ -41,13 +41,13 @@ my $idnum=0;
 
 open(ENG, "<$english") or die "Can't open $english";
 open(LANG, "<$input") or die "Can't open $input";
-open(OFILE, ">$output" or die "Can't open $output");
+open(OUTF, ">$output") or die "Can't open $output";
 
 my $langversion = 1;
 
-binmode OFILE;
+binmode OUTF;
 
-printf OFILE ("\x1a%c", $langversion); # magic lang file header
+printf OUTF ("\x1a%c", $langversion); # magic lang file header
 
 #
 # We scan the english file to get the correct order of the id numbers
@@ -105,7 +105,7 @@ while(<LANG>) {
                 else {
                     $idnum{$set{'id'}} = '_done_';
 
-                    printf OFILE ("%c%c%s\x00",
+                    printf OUTF ("%c%c%s\x00",
                                   ($idnum>>8), ($idnum&0xff),
                                   $value);
                     if($debug) {
@@ -125,7 +125,7 @@ while(<LANG>) {
 }
 close(LANG);
 
-close(OFILE);
+close(OUTF);
 
 foreach $k (keys(%idnum))
 {
