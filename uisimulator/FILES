@@ -1,0 +1,7 @@
+HACKING
+README
+common/*.[ch]
+win32/*.[ch]
+x11/*.[ch]
+x11/Makefile
+x11/archos/rockbox112.bmp
