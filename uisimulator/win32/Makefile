@@ -61,7 +61,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 
 FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c usb.c \
-        mpeg.c powermgmt.c
+        mpeg.c powermgmt.c font.c loadfont.c X5x8.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c \
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c
@@ -181,8 +181,20 @@ $(OBJDIR)/settings.o: $(APPDIR)/settings.c
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
+$(OBJDIR)/font.o: $(FIRMWAREDIR)/id3.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/loadfont.o: $(FIRMWAREDIR)/loadfont.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
 $(OBJDIR)/status.o: $(APPDIR)/status.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/version.o: $(FIRMWAREDIR)/version.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
