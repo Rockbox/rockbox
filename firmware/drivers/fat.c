@@ -881,20 +881,14 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
     int cluster = file->nextcluster;
     int sector = file->nextsector;
     int numsec = file->sectornum;
+    int first = sector, last = sector;
     int err, i;
 
     if ( sector == -1 )
         return 0;
 
-    for ( i=0; i<sectorcount; i++ ) {
-        err = ata_read_sectors(sector + fat_bpb.startsector, 1,
-                               (char*)buf+(i*SECTOR_SIZE));
-        if(err) {
-            DEBUGF( "fat_read() - Couldn't read sector %d"
-                    " (error code %d)\n", sector,err);
-            return -1;
-        }
-
+    /* find sequential sectors and read them all at once */
+    for (i=0; i<sectorcount; i++ ) {
         numsec++;
         if ( numsec >= fat_bpb.bpb_secperclus ) {
             cluster = get_next_cluster(cluster);
@@ -911,6 +905,21 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
         }
         else
             sector++;
+
+        if ( (sector != last+1) ||     /* not sequential any more? */
+             (i == sectorcount-1) ||   /* last sector requested? */
+             (last-first+1 == 256) ) { /* max 256 sectors per ata request */
+            int count = last-first+1;
+            err = ata_read_sectors(first + fat_bpb.startsector, count, buf);
+            if(err) {
+                DEBUGF( "fat_read() - Couldn't read sector %d"
+                        " (error code %d)\n", sector,err);
+                return -1;
+            }
+            ((char*)buf) += count * SECTOR_SIZE;
+            first = sector;
+        }
+        last = sector;
     }
     file->nextcluster = cluster;
     file->nextsector = sector;
