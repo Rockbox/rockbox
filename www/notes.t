@@ -52,7 +52,7 @@ This is backed by the HW manual p102, which says that DRAM can only be at put on
 <tr><td>PA11</td><td>i/o</td><td>Input</td><td></td><td>Key: STOP</td></tr>
 <tr><td>PA12</td><td>/IRQ0</td></tr>
 <tr><td>PA13</td><td>i/o</td></tr>
-<tr><td>PA14</td><td>i/o</td></tr>
+<tr><td>PA14</td><td>i/o</td><td>Output</td><td></td><td>Backlight</td></tr>
 <tr><td>PA15</td><td>i/o</td><td>Input</td><td></td><td>USB cable detect</td></tr>
 </table>
 
