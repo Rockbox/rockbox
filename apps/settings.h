@@ -100,6 +100,9 @@ void set_time(char* string, int timedate[]);
 
 /* global settings */
 extern struct user_settings global_settings;
+/* name of directory where configuration, fonts and other data
+ * files are stored */
+extern char rockboxdir[];
 
 /* system defines */
 
