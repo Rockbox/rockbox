@@ -101,4 +101,6 @@ void adc_init(void)
     IPRE = (IPRE & 0xf0ff) | 0x0100;
     
     tick_add_task(adc_tick);
+    
+    sleep(1);    /* Ensure valid readings when adc_init returns */
 }
