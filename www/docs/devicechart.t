@@ -143,6 +143,14 @@
     <td>No</td>
     <td>No</td>
 </tr>
+<tr><th><b>CPU Frequency</b></th>
+    <td>12 MHz</td>
+    <td>12 MHz</td>
+    <td>11.0592 MHz</td>
+    <td>11.0592 MHz</td>
+    <td>11.0592 MHz</td>
+    <td>11.0592 MHz</td>
+</tr>
 <tr><th><b>Battery type</b></th>
     <td>NiMH (Type AA)</td>
     <td>NiMH (Type AA)</td>
