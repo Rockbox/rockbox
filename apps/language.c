@@ -25,12 +25,13 @@
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
 
-void lang_load(char *filename)
+int lang_load(char *filename)
 {
     int filesize;
     int fd = open(filename, O_RDONLY);
+    int retcode=0;
     if(fd == -1)
-        return;
+        return 1;
     filesize = read(fd, language_buffer, MAX_LANGUAGE_SIZE);
     if(filesize != MAX_LANGUAGE_SIZE) {
         if((language_buffer[0] == LANGUAGE_COOKIE) &&
@@ -53,12 +54,15 @@ void lang_load(char *filename)
         }
         else {
             DEBUGF("Illegal language file\n");
+            retcode = 2;
         }
     }
     else {
         DEBUGF("Language %s too large: %d\n", filename, filesize);
+        retcode = 3;
     }
     close(fd);
+    return retcode;
 }
 
 /* -----------------------------------------------------------------
