@@ -54,6 +54,24 @@ struct mydir {
 
 typedef struct mydir MYDIR;
 
+static unsigned int rockbox2sim(int opt)
+{
+    int newopt = 0;
+    if(opt & 1)
+        newopt |= O_WRONLY;
+    if(opt & 2)
+        newopt |= O_RDWR;
+    if(opt & 4)
+        newopt |= O_CREAT;
+    if(opt & 8)
+        newopt |= O_APPEND;
+    if(opt & 0x10)
+        newopt |= O_TRUNC;
+
+    return newopt;
+}
+
+
 MYDIR *sim_opendir(const char *name)
 {
     char buffer[256]; /* sufficiently big */
@@ -109,9 +127,10 @@ void sim_closedir(MYDIR *dir)
 }
 
 
-int sim_open(const char *name, int opts)
+int sim_open(const char *name, int o)
 {
     char buffer[256]; /* sufficiently big */
+    int opts = rockbox2sim(o);
 
     if(name[0] == '/') {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
