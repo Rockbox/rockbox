@@ -246,6 +246,8 @@ static int showdir(void)
     int i;
     int tree_max_on_screen;
     bool dir_buffer_full = false;
+    int start = tc.dirstart;
+    bool id3db = global_settings.dirfilter == SHOW_ID3DB;
 
 #ifdef HAVE_LCD_BITMAP
     const char* icon;
@@ -259,8 +261,6 @@ static int showdir(void)
     int icon;
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
-    int start = tc.dirstart;
-    bool id3db = global_settings.dirfilter == SHOW_ID3DB;
 
     /* new file dir? load it */
     if (id3db) {
@@ -1332,16 +1332,16 @@ bool rockbox_browse(const char *root, int dirfilter)
 
 void tree_init(void)
 {
+    /* We copy the settings value in case it is changed by the user. We can't
+       use it until the next reboot. */
+    int max_files = global_settings.max_files_in_dir;
+
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
 
     db_init();
     
-    /* We copy the settings value in case it is changed by the user. We can't
-       use it until the next reboot. */
-    int max_files = global_settings.max_files_in_dir;
-
     tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);
 

@@ -540,10 +540,10 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     int i;
     int dirfilter = global_settings.dirfilter;
     struct entry *files;
+    struct tree_context* tc = tree_get_context();
 
     /* use the tree browser dircache to load files */
     global_settings.dirfilter = SHOW_ALL;
-    struct tree_context* tc = tree_get_context();
     strncpy(tc->currdir, dirname, sizeof(tc->currdir));
     num_files = ft_load(tc, NULL);
     files = (struct entry*) tc->dircache;

@@ -36,6 +36,7 @@
 #include "screens.h"
 #include "plugin.h"
 #include "rolo.h"
+#include "sprintf.h"
 
 static int boot_size = 0;
 static int boot_cluster;
@@ -187,11 +188,11 @@ int ft_load(struct tree_context* c, bool *buffer_full)
 {
     extern char lastdir[]; /* from tree.c */
     int i;
+    int name_buffer_used = 0;
     DIR *dir = opendir(c->currdir);
     if(!dir)
         return -1; /* not a directory */
 
-    int name_buffer_used = 0;
     c->dirsindir = 0;
     if (buffer_full)
         *buffer_full = false;
