@@ -1,5 +1,7 @@
 ## Rockbox danish language file
-## Translated by Rune Wiinberg
+## Translated by:
+## - Rune Wiinberg
+## - Jakob Givoni
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -127,7 +129,7 @@ new: "Blander..."
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
-new: "Spiller..."
+new: "Afspiller..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
@@ -147,7 +149,7 @@ new: "%d filer"
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Gemning er fejlet"
+new: "Gem mislykkedes"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
@@ -157,7 +159,7 @@ new: "Lavt batt. ?"
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Gemning er fejlet"
+new: "Gem mislykkedes"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -167,17 +169,17 @@ new: "Er batteristanden lav?"
 id: LANG_TIME_SET
 dec: used in set_time()
 eng: "ON to set"
-new: "ON for sæt"
+new: "ON: indstil"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "OFF for fortryd" 
+new: "OFF: fortryd" 
 
 id: LANG_HIDDEN
 desc: in settings_menu
 eng: "Hidden Files"
-new: "Gemte filer"
+new: "Skjulte filer"
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
@@ -202,22 +204,22 @@ new: "'Shuffle'"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Afspil valgte først"
+new: "Start v. valgte"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
 eng: "Music Filter"
-new: "Musik filter"
+new: "Musik-filter"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Sorter versal-sensetivt"
+new: "Sortér versal-sensitivt"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-new: "Forsæt e. genstart"
+new: "Forsæt ef. boot"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -255,12 +257,12 @@ new: "Dyb afladning"
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-new: "Sæt Tid/Dato"
+new: "Indstil tid/dato"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "Disk nedspinding" 
+new: "'Disk spindown'" 
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
@@ -312,7 +314,7 @@ new: "Indstillinger"
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-new: "Slettet"
+new: "Nulstillet"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
@@ -332,7 +334,7 @@ new: "Scroll-hastighed"
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset settings"
-new: "Slet indstillinger"
+new: "Nulstil indstillinger"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -358,7 +360,7 @@ new:
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-new: "Lydstyrke"
+new: "Styrke"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -402,7 +404,7 @@ new: "Kanaler"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel configuration"
-new: "Kanal indstilling"
+new: "Kanal-indstilling"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -461,32 +463,32 @@ new: "Play = Ja"
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
 eng: "Any Other = No"
-new: "Enhver anden = Nej"
+new: "Andre knapper = Nej"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Keylock ON"
-new: "Lås PÅ"
+new: "Lås TIL"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Keylock OFF"
-new: "Lås AF"
+new: "Lås FRA"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-new: "Tast. lås er PÅ"
+new: "Tast. lås er TIL"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Tast. lås er AF"
+new: "Tast. lås er FRA"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Mute PÅ"
+new: "Mute TIL"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
@@ -496,7 +498,7 @@ new: "Mute FRA"
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Mute er PÅ"
+new: "Mute er TIL"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
@@ -851,4 +853,46 @@ id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 new: "Alle"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Ja"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Nej"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+### Not previously translated
+new: ""
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Peak frigivelse"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Peak frysetid"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Klip frysetid"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "evigt"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Enheder pr. læsning"
+
 
