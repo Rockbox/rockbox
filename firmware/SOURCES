@@ -1,3 +1,7 @@
+#ifdef IRIVER_H100
+crt0.S
+backlight.c
+#else
 backlight.c
 buffer.c
 common/atoi.c
@@ -70,3 +74,4 @@ common/memset.S
 crt0.S
 descramble.S
 drivers/lcd.S
+#endif
