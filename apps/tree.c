@@ -358,7 +358,6 @@ bool dirbrowse(char *root)
                     put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
                     dircursor--;
                     put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    lcd_update();
                 }
                 else {
                     if (start) {
@@ -366,7 +365,21 @@ bool dirbrowse(char *root)
                         numentries = showdir(currdir, start);
                         put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     }
+                    else {
+                        if (numentries < TREE_MAX_ON_SCREEN) {
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
+                            dircursor = numentries - 1;
+                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        }
+                        else {
+                            start = numentries - TREE_MAX_ON_SCREEN;
+                            dircursor = TREE_MAX_ON_SCREEN - 1;
+                            numentries = showdir(currdir, start);
+                            put_cursorxy(0, CURSOR_Y + LINE_Y + TREE_MAX_ON_SCREEN - 1, true);
+                        }
+                    }
                 }
+                lcd_update();
                 break;
 
             case TREE_NEXT:
@@ -382,6 +395,19 @@ bool dirbrowse(char *root)
                         put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     }
                 }
+                else {
+                    if(numentries < TREE_MAX_ON_SCREEN) {
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
+                        start = dircursor = 0;
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                    } 
+                    else {
+                        start = dircursor = 0;
+                        numentries = showdir(currdir, start);
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                    }
+                }
+                lcd_update();
                 break;
 
             case TREE_MENU: {
