@@ -1072,7 +1072,6 @@ bool settings_save_config(void)
 {
     bool done = false;
     int fd, i, value;
-    char buf[MAX_PATH + 32];
     char filename[MAX_PATH];
     char* boolopt[] = {"off","on"};
 
@@ -1111,298 +1110,197 @@ bool settings_save_config(void)
         return false;
     }
 
-    strncpy(buf, "# >>> .cfg file created by rockbox <<<\r\n", sizeof(buf));
-    write(fd, buf, strlen(buf));
-    
-    strncpy(buf, "# >>>    http://rockbox.haxx.se    <<<\r\n#\r\n", sizeof(buf));
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "# >>> .cfg file created by rockbox <<<\r\n");
+    fprintf(fd, "# >>>    http://rockbox.haxx.se    <<<\r\n#\r\n");
+    fprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
 
-    snprintf(buf, sizeof(buf), "#\r\n# wps / language / font \r\n#\r\n");
-    write(fd, buf, strlen(buf));
+    if (global_settings.wps_file[0] != 0)
+        fprintf(fd, "wps: /.rockbox/%s.wps\r\n", global_settings.wps_file);
 
-    if (global_settings.wps_file[0] != 0) {
-        snprintf(buf, sizeof(buf),
-                 "wps: /.rockbox/%s.wps\r\n", global_settings.wps_file);
-        write(fd, buf, strlen(buf));
-    }
-
-    if (global_settings.lang_file[0] != 0) {
-        snprintf(buf, sizeof(buf), "lang: /.rockbox/%s.lng\r\n",
-                 global_settings.lang_file);
-        write(fd, buf, strlen(buf));
-    }
+    if (global_settings.lang_file[0] != 0)
+        fprintf(fd, "lang: /.rockbox/%s.lng\r\n", global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.font_file[0] != 0) {
-        snprintf(buf, sizeof(buf), "font: /.rockbox/%s.fnt\r\n",
-                 global_settings.font_file);
-        write(fd, buf, strlen(buf));
-    }
+    if (global_settings.font_file[0] != 0)
+        fprintf(fd, "font: /.rockbox/%s.fnt\r\n", global_settings.font_file);
 #endif
 
-    snprintf(buf, sizeof(buf), "#\r\n# Sound settings\r\n#\r\n");
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "#\r\n# Sound settings\r\n#\r\n");
 
     value = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-    snprintf(buf, sizeof(buf), "volume: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "volume: %d\r\n", value);
 
     value = mpeg_val2phys(SOUND_BASS, global_settings.bass);
-    snprintf(buf, sizeof(buf), "bass: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "bass: %d\r\n", value);
 
     value = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
-    snprintf(buf, sizeof(buf), "treble: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "treble: %d\r\n", value);
 
     value = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
-    snprintf(buf, sizeof(buf), "balance: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "balance: %d\r\n", value);
 
     {
         static char* options[] =
         {"stereo","stereo narrow","mono","mono left",
          "mono right","karaoke","stereo wide"};
-        snprintf(buf, sizeof(buf), "channels: %s\r\n",
-                 options[global_settings.channel_config]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "channels: %s\r\n",
+                options[global_settings.channel_config]);
     }
 
 #ifdef HAVE_MAS3587F
     value = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
-    snprintf(buf, sizeof(buf), "loudness: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "loudness: %d\r\n", value);
 
     value = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
-    snprintf(buf, sizeof(buf), "bass boost: %d\r\n", value);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "bass boost: %d\r\n", value);
 
     {
         static char* options[] = {"off", "2", "4", "8" };
-        snprintf(buf, sizeof(buf), "auto volume: %s\r\n",
-                 options[global_settings.avc]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "auto volume: %s\r\n", options[global_settings.avc]);
     }
 #endif
 
-    snprintf(buf, sizeof(buf), "#\r\n# Playback\r\n#\r\n");
-    write(fd, buf, strlen(buf));
-
-    {
-        snprintf(buf, sizeof(buf), "shuffle: %s\r\n",
-                 boolopt[global_settings.playlist_shuffle]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "#\r\n# Playback\r\n#\r\n");
+    fprintf(fd, "shuffle: %s\r\n", boolopt[global_settings.playlist_shuffle]);
 
     {
         static char* options[] = {"off", "all", "one"};
-        snprintf(buf, sizeof(buf), "repeat: %s\r\n",
-                 options[global_settings.repeat_mode]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "repeat: %s\r\n", options[global_settings.repeat_mode]);
     }
 
-    {
-        snprintf(buf, sizeof(buf), "play selected: %s\r\n",
-                 boolopt[global_settings.play_selected]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "play selected: %s\r\n",
+            boolopt[global_settings.play_selected]);
 
     {
         static char* options[] = {"off", "ask", "ask once", "on"};
-        snprintf(buf, sizeof(buf), "resume: %s\r\n",
-                 options[global_settings.resume]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "resume: %s\r\n", options[global_settings.resume]);
     }
 
     {
         static char* options[] =
         {"1","2","3","4","5","6","8","10",
          "15","20","25","30","45","60"};
-        snprintf(buf, sizeof(buf), "scan min step: %s\r\n",
-                 options[global_settings.ff_rewind_min_step]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "scan min step: %s\r\n",
+                options[global_settings.ff_rewind_min_step]);
     }
 
-    snprintf(buf, sizeof(buf), "scan accel: %d\r\nantiskip: %d\r\n",
-             global_settings.ff_rewind_accel,
-             global_settings.buffer_margin);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "scan accel: %d\r\nantiskip: %d\r\n",
+            global_settings.ff_rewind_accel,
+            global_settings.buffer_margin);
+    fprintf(fd, "volume fade: %s\r\n", boolopt[global_settings.fade_on_stop]);
+    fprintf(fd, "#\r\n# File View\r\n#\r\n");
+    fprintf(fd, "sort case: %s\r\n", boolopt[global_settings.sort_case]);
 
     {
-        snprintf(buf, sizeof(buf), "volume fade: %s\r\n",
-                 boolopt[global_settings.fade_on_stop]);
-        write(fd, buf, strlen(buf));
+        static char* options[] = {"all", "supported","music", "playlists"};
+        fprintf(fd, "show files: %s\r\n", options[global_settings.dirfilter]);
     }
 
-    snprintf(buf, sizeof(buf), "#\r\n# File View\r\n#\r\n");
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "follow playlist: %s\r\n",
+            boolopt[global_settings.browse_current]);
 
-    {
-        snprintf(buf, sizeof(buf), "sort case: %s\r\n",
-                 boolopt[global_settings.sort_case]);
-        write(fd, buf, strlen(buf));
-    }
-
-    {
-        static char* options[] =
-        {"all", "supported","music", "playlists"};
-        snprintf(buf, sizeof(buf), "show files: %s\r\n",
-                 options[global_settings.dirfilter]);
-        write(fd, buf, strlen(buf));
-    }
-
-    {
-        snprintf(buf, sizeof(buf), "follow playlist: %s\r\n",
-                 boolopt[global_settings.browse_current]);
-        write(fd, buf, strlen(buf));
-    }
-
-    snprintf(buf, sizeof(buf), "#\r\n# Display\r\n#\r\n");
-    write(fd, buf, strlen(buf));
-
+    fprintf(fd, "#\r\n# Display\r\n#\r\n");
+    
 #ifdef HAVE_LCD_BITMAP
-    {
-        snprintf(buf, sizeof(buf), "statusbar: %s\r\nscrollbar: %s\r\n",
-                 boolopt[global_settings.statusbar],
-                 boolopt[global_settings.scrollbar]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "statusbar: %s\r\nscrollbar: %s\r\n",
+            boolopt[global_settings.statusbar],
+            boolopt[global_settings.scrollbar]);
 
     {
         static char* options[] = {"graphic", "numeric"};
-        snprintf(buf, sizeof(buf),
-                 "volume display: %s\r\nbattery display: %s\r\n",
-                 options[global_settings.volume_type],
-                 options[global_settings.battery_type]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "volume display: %s\r\nbattery display: %s\r\n",
+                options[global_settings.volume_type],
+                options[global_settings.battery_type]);
     }
 #endif
 
-    snprintf(buf, sizeof(buf), "scroll speed: %d\r\nscroll delay: %d\r\n",
+    fprintf(fd, "scroll speed: %d\r\nscroll delay: %d\r\n",
              global_settings.scroll_speed,
              global_settings.scroll_delay);
-    write(fd, buf, strlen(buf));
 
 #ifdef HAVE_LCD_BITMAP
-    snprintf(buf, sizeof(buf), "scroll step: %d\r\n",
-             global_settings.scroll_step);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "scroll step: %d\r\n", global_settings.scroll_step);
 #endif
 
-    snprintf(buf, sizeof(buf), "bidir limit: %d\r\n",
-             global_settings.bidir_limit);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "bidir limit: %d\r\n", global_settings.bidir_limit);
 
     {
         static char* options[] =
         {"off","on","1","2","3","4","5","6","7","8","9",
          "10","15","20","25","30","45","60","90"};
-        snprintf(buf, sizeof(buf), "backlight timeout: %s\r\n",
+        fprintf(fd, "backlight timeout: %s\r\n",
                  options[global_settings.backlight_timeout]);
-        write(fd, buf, strlen(buf));
     }
 
-    {
-        snprintf(buf, sizeof(buf), "backlight when plugged: %s\r\n",
-                 boolopt[global_settings.backlight_on_when_charging]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "backlight when plugged: %s\r\n",
+            boolopt[global_settings.backlight_on_when_charging]);
 
-    {
-        snprintf(buf, sizeof(buf), "caption backlight: %s\r\n",
-                 boolopt[global_settings.caption_backlight]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "caption backlight: %s\r\n",
+            boolopt[global_settings.caption_backlight]);
 
     {
         static char* options[] = {"off","on"};
-        snprintf(buf, sizeof(buf), "caption backlight: %s\r\n",
+        fprintf(fd, "caption backlight: %s\r\n",
                  options[global_settings.caption_backlight]);
-        write(fd, buf, strlen(buf));
     }
 
-    snprintf(buf, sizeof(buf), "contrast: %d\r\n", global_settings.contrast);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "contrast: %d\r\n", global_settings.contrast);
 
 #ifdef HAVE_LCD_BITMAP
-    {
-        snprintf(buf, sizeof(buf), "invert: %s\r\n",
-                 boolopt[global_settings.invert]);
-        write(fd, buf, strlen(buf));
+    fprintf(fd, "invert: %s\r\n", boolopt[global_settings.invert]);
+    
+    fprintf(fd, "invert cursor: %s\r\n",
+            boolopt[global_settings.invert_cursor]);
 
-        snprintf(buf, sizeof(buf), "invert cursor: %s\r\n",
-                 boolopt[global_settings.invert_cursor]);
-        write(fd, buf, strlen(buf));
-    }
-
-    snprintf(buf, sizeof(buf), "peak meter release: %d\r\n",
-             global_settings.peak_meter_release);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "peak meter release: %d\r\n",
+            global_settings.peak_meter_release);
 
     {
         static char* options[] =
         {"off","200ms","300ms","500ms","1","2","3","4","5",
          "6","7","8","9","10","15","20","30","1min"};
-        snprintf(buf, sizeof(buf), "peak meter hold: %s\r\n",
-                 options[global_settings.peak_meter_hold]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "peak meter hold: %s\r\n",
+                options[global_settings.peak_meter_hold]);
     }
 
     {
         static char* options[] =
         {"on","1","2","3","4","5","6","7","8","9","10","15","20","25","30",
          "45","60","90","2min","3min","5min","10min","20min","45min","90min"};
-        snprintf(buf, sizeof(buf), "peak meter clip hold: %s\r\n",
-                 options[global_settings.peak_meter_clip_hold]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "peak meter clip hold: %s\r\n",
+                options[global_settings.peak_meter_clip_hold]);
     }
 
-    {
-        snprintf(buf, sizeof(buf),
-                 "peak meter busy: %s\r\npeak meter dbfs: %s\r\n",
-                 boolopt[global_settings.peak_meter_performance],
-                 boolopt[global_settings.peak_meter_dbfs]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "peak meter busy: %s\r\npeak meter dbfs: %s\r\n",
+            boolopt[global_settings.peak_meter_performance],
+            boolopt[global_settings.peak_meter_dbfs]);
 
-    snprintf(buf, sizeof(buf), "peak meter min: %d\r\npeak meter max: %d\r\n",
-             global_settings.peak_meter_min,
-             global_settings.peak_meter_max);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "peak meter min: %d\r\npeak meter max: %d\r\n",
+            global_settings.peak_meter_min,
+            global_settings.peak_meter_max);
 #endif
 
-    snprintf(buf, sizeof(buf), "#\r\n# System\r\n#\r\ndisk spindown: %d\r\n",
+    fprintf(fd, "#\r\n# System\r\n#\r\ndisk spindown: %d\r\n",
              global_settings.disk_spindown);
-    write(fd, buf, strlen(buf));
 
 #ifdef HAVE_ATA_POWER_OFF
-    {
-        snprintf(buf, sizeof(buf), "disk poweroff: %s\r\n",
-                 boolopt[global_settings.disk_poweroff]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "disk poweroff: %s\r\n",
+            boolopt[global_settings.disk_poweroff]);
 #endif
 
-    snprintf(buf, sizeof(buf), "battery capacity: %d\r\n",
-             global_settings.battery_capacity);
-    write(fd, buf, strlen(buf));
+    fprintf(fd, "battery capacity: %d\r\n", global_settings.battery_capacity);
 
 #ifdef HAVE_CHARGE_CTRL
-    {
-        snprintf(buf, sizeof(buf),
-                 "deep discharge: %s\r\ntrickle charge: %s\r\n",
-                 boolopt[global_settings.discharge],
-                 boolopt[global_settings.trickle_charge]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "deep discharge: %s\r\ntrickle charge: %s\r\n",
+            boolopt[global_settings.discharge],
+            boolopt[global_settings.trickle_charge]);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
     {
         static char* options[] = {"24hour", "12hour"};
-        snprintf(buf, sizeof(buf), "time format: %s\r\n",
-                 options[global_settings.timeformat]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "time format: %s\r\n",
+                options[global_settings.timeformat]);
     }
 #endif
 
@@ -1410,52 +1308,39 @@ bool settings_save_config(void)
         static char* options[] =
         {"off","1","2","3","4","5","6","7","8",
          "9","10","15","30","45","60"};
-        snprintf(buf, sizeof(buf), "idle poweroff: %s\r\n",
-                 options[global_settings.poweroff]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "idle poweroff: %s\r\n",
+                options[global_settings.poweroff]);
     }
 
 #ifdef HAVE_MAS3587F
-    snprintf(buf, sizeof(buf), "#\r\n# Recording\r\n#\r\n");
-    write(fd, buf, strlen(buf));
-
-    snprintf(buf, sizeof(buf), "rec quality: %d\r\n",
-             global_settings.rec_quality);
-    write(fd, buf, strlen(buf));
-
+    fprintf(fd, "#\r\n# Recording\r\n#\r\n");
+    fprintf(fd, "rec quality: %d\r\n", global_settings.rec_quality);
+    
     {
         static char* options[] = {"44", "48", "32", "22", "24", "16"};
-        snprintf(buf, sizeof(buf), "rec frequency: %s\r\n",
-                 options[global_settings.rec_frequency]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "rec frequency: %s\r\n",
+                options[global_settings.rec_frequency]);
     }
 
     {
         static char* options[] = {"mic", "line", "spdif"};
-        snprintf(buf, sizeof(buf), "rec source: %s\r\n",
-                 options[global_settings.rec_source]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "rec source: %s\r\n", options[global_settings.rec_source]);
     }
 
     {
         static char* options[] = {"stereo", "mono"};
-        snprintf(buf, sizeof(buf), "rec channels: %s\r\n",
-                 options[global_settings.rec_channels]);
-        write(fd, buf, strlen(buf));
+        fprintf(fd, "rec channels: %s\r\n",
+                options[global_settings.rec_channels]);
     }
 
-    snprintf(buf, sizeof(buf),
-             "rec mic gain: %d\r\nrec left gain: %d\r\nrec right gain: %d\r\n",
-             global_settings.rec_mic_gain,
-             global_settings.rec_left_gain,
-             global_settings.rec_right_gain);
-    write(fd, buf, strlen(buf));
+    fprintf(fd,
+            "rec mic gain: %d\r\nrec left gain: %d\r\nrec right gain: %d\r\n",
+            global_settings.rec_mic_gain,
+            global_settings.rec_left_gain,
+            global_settings.rec_right_gain);
 
-    {
-        snprintf(buf, sizeof(buf), "editable recordings: %s\r\n",
-                 boolopt[global_settings.rec_editable]);
-        write(fd, buf, strlen(buf));
-    }
+    fprintf(fd, "editable recordings: %s\r\n",
+            boolopt[global_settings.rec_editable]);
 
 #endif
     close(fd);
