@@ -8,7 +8,7 @@
 # redirect is triggered by more than:
 $nlim = 10; # accesses in...
 $tlim = 10; # seconds
-$mirror = "http://rockbox.sourceforge.net/bjorn.haxx.se/rockbox/";
+$mirror = "http://rockbox.sourceforge.net/rockbox/";
 
 open FILE, "+<.load" or die "Can't open .load: $!";
 flock FILE, LOCK_EX;
