@@ -30,6 +30,7 @@
 #include "mp3data.h"
 #include "buffer.h"
 #include "mp3_playback.h"
+#include "talk.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
