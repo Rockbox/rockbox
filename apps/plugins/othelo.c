@@ -2,7 +2,7 @@
    Designed, Written, AI Bots, the lot ...BlueChip =8ªD#
 
    Thanks espcially to
-      DevZer0, LinusN, Zagor
+      DevZer0, LinusN, Zagor, scott666
          for their help with understanding Rockbox & the SDK
 
    Please note that the code formatting is not that which was
@@ -15,6 +15,7 @@
 /*
  *  Version   Date      Who   Comment
  *  --------  --------  ----  ------------------------------------------------
+ *  1.4       20030729  BC    Ensure game terminates even if dreamer disabled
  *  1.3       20030729  BC    Fixed display bug introduced by port to plugin
  *                            Updated documentation
  *  1.2       2003            Ported to new plugin system
@@ -30,10 +31,11 @@
  *  # Reintroduce suspend feature under plugin system
  */
 
-/* Plugin header */
-#include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+/* Plugin header */
+#include "plugin.h"
 static struct plugin_api* rb;
 
 /***************************************************************************/
@@ -1194,16 +1196,16 @@ static bool calcposs(struct move* plist, unsigned char* pcnt, bool turn)
 {
     int i;
 
+    /* get list of all possible moves */
+    (*pcnt) = getplist(plist, turn);
+
+    /* no moves? trigger Game Over */
+    if (!(*pcnt))
+        return(true);
+
     /* only evaluate moves for AIBOTs or HUMAN+HELP */
     if ( (player[turn]==AIBOT) || (ai_help[turn]) )
     {
-        /* get list of all possible moves */
-        (*pcnt) = getplist(plist, turn);
-
-        /* no moves? trigger Game Over */
-        if (!(*pcnt))
-            return(true);
-
         /* mark all possible moves on board */
         for (i=0; i<(*pcnt); i++)
             board[plist[i].y][plist[i].x] = POSS;
