@@ -97,6 +97,10 @@ int kbd_input(char* text, int buflen)
 
     lcd_clear_display();
 
+    old_cursor_pos=cursor_pos=strlen(text);
+    if (9<cursor_pos)
+        left_pos=cursor_pos-9;
+
     while (!done) {
         int i, p;
         int len = strlen(text);
@@ -109,8 +113,8 @@ int kbd_input(char* text, int buflen)
                 left_pos--;
         p=0;
         i = left_pos;
-        while (p<10 && line[i]) {
-          temptext[p++]=text[i++];
+        while (p<10 && text[i]) {
+            temptext[p++]=text[i++];
         }
         temptext[p]=0;
         lcd_remove_cursor();
@@ -128,7 +132,7 @@ int kbd_input(char* text, int buflen)
                 for (i=1; i < 8; i++) {
                     temptext[i+2]=line[(i+x)%linelen];
                 }
-                temptext[p]=0;
+                temptext[i+2]=0;
                 lcd_puts(1, 1, temptext);
                 break;
             case MENU_LINE_BACKSPACE:
