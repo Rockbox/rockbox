@@ -52,7 +52,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c
 
-APPS = tetris.c screensaver.c tree.c app.c play.c
+APPS = tetris.c screensaver.c tree.c app.c play.c menu.c
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
@@ -67,6 +67,9 @@ clean:
 
 distclean: clean
 	$(RM) config.cache
+
+menu.o: $(APPDIR)/menu.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 tetris.o: $(APPDIR)/tetris.c
 	$(CC) $(CFLAGS) -c $< -o $@
