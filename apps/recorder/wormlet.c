@@ -67,11 +67,7 @@
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
 #define FIELD_RECT_Y 1
-#ifdef LCD_PROPFONTS
 #define FIELD_RECT_WIDTH  (LCD_WIDTH - 39)
-#else
-#define FIELD_RECT_WIDTH  (LCD_WIDTH - 46)
-#endif
 #define FIELD_RECT_HEIGHT (LCD_HEIGHT - 2)
 
 /* size of the ring of the worm 

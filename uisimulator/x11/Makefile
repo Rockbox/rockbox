@@ -76,13 +76,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c powermgmt.c 
-
-ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(DEFINES)))
-	FIRMSRCS += unicode.c ajf.c panic.c
-	EXTRA_TARGETS = $(OBJDIR)/archos/system.ajf
-	SYSTEM_FONT = $(FIRMWAREDIR)/fonts/alt6x10.bdf
-endif
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
+  powermgmt.c font.c X5x8.c loadfont.c panic.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
@@ -109,9 +104,6 @@ all: $(TARGET) $(EXTRA_TARGETS)
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS)
 	$(RM) -r $(DEPS)
-
-$(OBJDIR)/archos/system.ajf: $(TOOLSDIR)/bdf2ajf $(SYSTEM_FONT)
-	$(TOOLSDIR)/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/archos/system.ajf
 
 distclean: clean
 	$(RM) config.cache
@@ -225,6 +217,24 @@ $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/X6x9.o: $(FIRMWAREDIR)/X6x9.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/timR08.o: $(FIRMWAREDIR)/timR08.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/courB08.o: $(FIRMWAREDIR)/courB08.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/loadfont.o: $(FIRMWAREDIR)/loadfont.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings.o: $(APPDIR)/settings.c

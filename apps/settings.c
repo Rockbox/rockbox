@@ -40,6 +40,7 @@
 #include "atoi.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "font.h"
 #endif
 
 struct user_settings global_settings;
@@ -772,15 +773,10 @@ void set_time(char* string, int timedate[])
     int realyear;
     int julianday;
     int i;
-#if defined(LOADABLE_FONTS) || defined(LCD_PROPFONTS)
     unsigned char reffub[5];
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
-#if defined(LOADABLE_FONTS)
-    unsigned char *font = lcd_getcurrentldfont();
-#endif
-#endif
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -817,65 +813,35 @@ void set_time(char* string, int timedate[])
                  timedate[1],
                  timedate[2]);
         lcd_puts(0, 1, buffer);
-#if defined(LCD_PROPFONTS)
+
         /* recalculate the positions and offsets */
-        lcd_getstringsize(string, 0, &width, &prev_line_height);
-        lcd_getstringsize(buffer, 0, &width, &line_height);
-        lcd_getstringsize(":", 0, &separator_width, &height);
+        lcd_getstringsize(string, FONT_UI, &width, &prev_line_height);
+        lcd_getstringsize(buffer, FONT_UI, &width, &line_height);
+        lcd_getstringsize(":", FONT_UI, &separator_width, &height);
 
         strncpy(reffub, buffer, 2);
         reffub[2] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[0][INDEX_X] = 0;
         cursor[0][INDEX_Y] = 1 + prev_line_height + 1;
         cursor[0][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 3, 2);
         reffub[2] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
         cursor[1][INDEX_Y] = 1 + prev_line_height + 1;
         cursor[1][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 6, 2);
         reffub[2] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
                              cursor[1][INDEX_WIDTH] + separator_width;
         cursor[2][INDEX_Y] = 1 + prev_line_height + 1;
         cursor[2][INDEX_WIDTH] = width;
 
-        lcd_getstringsize(buffer, 0, &width, &prev_line_height);
-#elif defined(LOADABLE_FONTS)
-        /* recalculate the positions and offsets */
-        lcd_getstringsize(string, font, &width, &prev_line_height);
-        lcd_getstringsize(buffer, font, &width, &line_height);
-        lcd_getstringsize(":", font, &separator_width, &height);
-        
-        strncpy(reffub, buffer, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[0][INDEX_X] = 0;
-        cursor[0][INDEX_Y] = prev_line_height;
-        cursor[0][INDEX_WIDTH] = width;
-
-        strncpy(reffub, buffer + 3, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-        cursor[1][INDEX_Y] = prev_line_height;
-        cursor[1][INDEX_WIDTH] = width;
-
-        strncpy(reffub, buffer + 6, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
-                             cursor[1][INDEX_WIDTH] + separator_width;
-        cursor[2][INDEX_Y] = prev_line_height;
-        cursor[2][INDEX_WIDTH] = width;
-
-        lcd_getstringsize(buffer, font, &width, &prev_line_height);
-#endif
+        lcd_getstringsize(buffer, FONT_UI, &width, &prev_line_height);
 
         snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
                  dayname[timedate[6]],
@@ -883,24 +849,24 @@ void set_time(char* string, int timedate[])
                  monthname[timedate[4] - 1],
                  timedate[5]);
         lcd_puts(0, 2, buffer);
-#if defined(LCD_PROPFONTS)
+
         /* recalculate the positions and offsets */
-        lcd_getstringsize(buffer, 0, &width, &line_height);
+        lcd_getstringsize(buffer, FONT_UI, &width, &line_height);
         strncpy(reffub, buffer, 3);
         reffub[3] = '\0';
-        lcd_getstringsize(reffub, 0, &weekday_width, &height);
-        lcd_getstringsize(" ", 0, &separator_width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &weekday_width, &height);
+        lcd_getstringsize(" ", FONT_UI, &separator_width, &height);
 
         strncpy(reffub, buffer + 4, 4);
         reffub[4] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[3][INDEX_X] = weekday_width + separator_width;
         cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
         cursor[3][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 9, 3);
         reffub[3] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[4][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width;
         cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
@@ -908,7 +874,7 @@ void set_time(char* string, int timedate[])
 
         strncpy(reffub, buffer + 13, 2);
         reffub[2] = '\0';
-        lcd_getstringsize(reffub, 0, &width, &height);
+        lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[5][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width +
                              cursor[4][INDEX_WIDTH] + separator_width;
@@ -919,48 +885,7 @@ void set_time(char* string, int timedate[])
                        cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
                        cursor[cursorpos][INDEX_WIDTH],
                        line_height);
-#elif defined(LOADABLE_FONTS)
-        /* recalculate the positions and offsets */
-        lcd_getstringsize(buffer, font, &width, &line_height);
-        strncpy(reffub, buffer, 3);
-        reffub[3] = '\0';
-        lcd_getstringsize(reffub, font, &weekday_width, &height);
-        lcd_getstringsize(" ", font, &separator_width, &height);
 
-        strncpy(reffub, buffer + 4, 4);
-        reffub[4] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[3][INDEX_X] = weekday_width + separator_width;
-        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[3][INDEX_WIDTH] = width;
-
-        strncpy(reffub, buffer + 9, 3);
-        reffub[3] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[4][INDEX_X] = weekday_width + separator_width +
-                             cursor[3][INDEX_WIDTH] + separator_width;
-        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[4][INDEX_WIDTH] = width;
-
-        strncpy(reffub, buffer + 13, 2);
-        reffub[2] = '\0';
-        lcd_getstringsize(reffub, font, &width, &height);
-        cursor[5][INDEX_X] = weekday_width + separator_width +
-                             cursor[3][INDEX_WIDTH] + separator_width +
-                             cursor[4][INDEX_WIDTH] + separator_width;
-        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-        cursor[5][INDEX_WIDTH] = width;
-
-        lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
-                       cursor[cursorpos][INDEX_WIDTH],
-                       line_height);
-#else
-        lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
-                       cursor[cursorpos][INDEX_WIDTH],
-                       8);
-#endif
         lcd_puts(0, 4, "ON  to set");
         lcd_puts(0, 5, "OFF to revert");
 #ifdef HAVE_LCD_BITMAP

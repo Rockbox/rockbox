@@ -26,7 +26,8 @@ extern void debugf(char* fmt,...);
 
 /*  */
 #if defined(DEBUG) || defined(SIMULATOR)
-#define DEBUGF(...) debugf(__VA_ARGS__)
+//#define DEBUGF(...) debugf(__VA_ARGS__)
+#define DEBUGF	debugf
 #else
 #define DEBUGF(...)
 #endif

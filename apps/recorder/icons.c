@@ -16,8 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <lcd.h>
 #include <string.h>
+#include "lcd.h"
+#include "font.h"
 #include "kernel.h"
 #include "sprintf.h"
 #include "rtc.h"
@@ -233,15 +234,7 @@ void statusbar_icon_volume(int percent)
         /* display volume lever numerical? */
         if (TIME_BEFORE(current_tick,switch_tick)) { 
             snprintf(buffer, sizeof(buffer), "%2d", percent);
-#if defined(LCD_PROPFONTS)
-            lcd_getstringsize(buffer, 0, &width, &height);
-#elif defined(LOADABLE_FONTS)
-            font = lcd_getcurrentldfont();
-            lcd_getstringsize(buffer, font, &width, &height);
-#else
-            width = 6*strlen(buffer);
-            height = 8;
-#endif
+            lcd_getstringsize(buffer, FONT_UI, &width, &height);
             if (height <= STATUSBAR_HEIGHT)
                 lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
                            width/2, STATUSBAR_Y_POS, buffer, 0);
@@ -316,15 +309,7 @@ void statusbar_time(int hour, int minute)
         strncpy(buffer, "--:--", sizeof buffer);
     }
 
-#if defined(LCD_PROPFONTS)
-    lcd_getstringsize(buffer, 0, &width, &height);
-#elif defined(LOADABLE_FONTS)
-    font = lcd_getcurrentldfont();
-    lcd_getstringsize(buffer, font, &width, &height);
-#else
-    width = 6*strlen(buffer);
-    height = 8;
-#endif
+    lcd_getstringsize(buffer, FONT_UI, &width, &height);
     if (height <= STATUSBAR_HEIGHT)
         lcd_putsxy(TIME_X_END - width, STATUSBAR_Y_POS, buffer, 0);
 }

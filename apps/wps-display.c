@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include "lcd.h"
+#include "font.h"
 #include "mpeg.h"
 #include "id3.h"
 #include "settings.h"
@@ -40,10 +41,6 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
-#endif
-
-#ifdef LOADABLE_FONTS
-#include "ajf.h"
 #endif
 
 #define WPS_CONFIG ROCKBOX_DIR "/default.wps"
@@ -551,11 +548,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 #else
                 int w,h;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-#ifdef LCD_PROPFONTS
-                lcd_getstringsize("M",0,&w,&h);
-#else
-                lcd_getfontsize(0,&w,&h);
-#endif
+                lcd_getstringsize("M",FONT_UI,&w,&h);
                 slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
                          (id3->elapsed + ff_rewind_count) * 100 / id3->length,
                          Grow_Right);
@@ -581,15 +574,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 
 void wps_display(struct mp3entry* id3)
 {
-    int font_height;
-
-#ifdef LOADABLE_FONTS
-    unsigned char *font = lcd_getcurrentldfont();
-    font_height = ajf_get_fontheight(font);
-#else
-    font_height = 8;
-#endif
-
     lcd_clear_display();
 
     if (!id3 && !mpeg_is_playing())

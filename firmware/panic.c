@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include "panic.h"
 #include "lcd.h"
+#include "font.h"
 #include "debug.h"
 
 static char panic_buf[128];
@@ -48,7 +49,9 @@ void panicf( char *fmt, ...)
     lcd_puts(0,0,panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
-    lcd_putsxy(0,0,panic_buf,0);
+    
+    //FIXME putsxy may call panic...
+    lcd_putsxy(0,0,panic_buf,FONT_SYSFIXED);
     lcd_update();
 
 #else

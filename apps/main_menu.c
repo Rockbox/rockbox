@@ -23,6 +23,7 @@
 #include "tree.h"
 #include "credits.h"
 #include "lcd.h"
+#include "font.h"
 #include "button.h"
 #include "kernel.h"
 #include "main_menu.h"
@@ -96,9 +97,9 @@ int show_logo( void )
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
-    lcd_getfontsize(0, &font_w, &font_h);
+    lcd_getfontsize(FONT_SYSFIXED, &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               height+10+font_h, version, 0);
+               LCD_HEIGHT-font_h, version, FONT_SYSFIXED);
     lcd_update();
 
 #else

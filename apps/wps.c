@@ -22,6 +22,7 @@
 
 #include "file.h"
 #include "lcd.h"
+#include "font.h"
 #include "backlight.h"
 #include "button.h"
 #include "kernel.h"
@@ -38,10 +39,6 @@
 #include "ata.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#endif
-
-#ifdef LOADABLE_FONTS
-#include "ajf.h"
 #endif
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
@@ -634,21 +631,17 @@ bool f2_screen(void)
     char buf[32];
 
     /* Get the font height */
-#ifdef LCD_PROPFONTS
-        lcd_getstringsize("A",0,&w,&h);
-#else
-        lcd_getfontsize(0,&w,&h);
-#endif
+    lcd_getstringsize("A",FONT_UI,&w,&h);
 
     lcd_stop_scroll();
 
     while (!exit) {
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Shuffle", 0);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, "mode:", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Shuffle", FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, "mode:", FONT_UI);
         lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.playlist_shuffle ? "on" : "off", 0);
+                   global_settings.playlist_shuffle ? "on" : "off", FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
@@ -656,13 +649,8 @@ bool f2_screen(void)
                  global_settings.mp3filter ? "on" : "off");
 
         /* Get the string width and height */
-#ifdef LCD_PROPFONTS
-        lcd_getstringsize(buf,0,&w,&h);
-#else
-        lcd_getfontsize(0,&w,&h);
-        w *= strlen(buf);
-#endif
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf, 0);
+        lcd_getstringsize(buf,FONT_UI,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf, FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
@@ -717,26 +705,20 @@ bool f3_screen(void)
         char* ptr;
 
         ptr = "Status";
-#ifdef LCD_PROPFONTS
-        lcd_getstringsize(ptr,0,&w,&h);
-#else
-        lcd_getfontsize(0,&w,&h);
-        w *= strlen(ptr);
-#endif
-
+        lcd_getstringsize(ptr,FONT_UI,&w,&h);
         lcd_clear_display();
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Scroll", 0);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h, "bar:", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Scroll", FONT_UI);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, "bar:", FONT_UI);
         lcd_putsxy(0, LCD_HEIGHT/2, 
-                   global_settings.scrollbar ? "on" : "off", 0);
+                   global_settings.scrollbar ? "on" : "off", FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, 0);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "bar:", 0);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, FONT_UI);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "bar:", FONT_UI);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
-                   global_settings.statusbar ? "on" : "off", 0 );
+                   global_settings.statusbar ? "on" : "off", FONT_UI);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
         lcd_update();

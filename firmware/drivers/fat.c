@@ -1049,10 +1049,6 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                         for (j=longs-1; j>=0; j--) {
                             unsigned char* ptr = dir->cached_buf;
                             int index = longarray[j];
-#ifdef LOADABLE_FONTS
-                            int offset_idx = 0;
-                            unsigned char uni_char[2];
-#endif
                             /* current or cached sector? */
                             if ( sectoridx >= SECTOR_SIZE ) {
                                 if ( sectoridx >= SECTOR_SIZE*2 ) {
@@ -1070,30 +1066,6 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 index &= SECTOR_SIZE-1;
                             }
 
-                            /* piece together the name subcomponents. */
-#ifdef LOADABLE_FONTS
-                            for (k=0; k<5; k++)
-                            {
-                                offset_idx = index + k*2 + 1;
-                                uni_char[0] = ptr[offset_idx+1];
-                                uni_char[1] = ptr[offset_idx];
-                                entry->name[l++] = from_unicode(uni_char);
-                            }
-                            for (k=0; k<6; k++)
-                            {
-                                offset_idx = index + k*2 + 14;
-                                uni_char[0] = ptr[offset_idx+1];
-                                uni_char[1] = ptr[offset_idx];
-                                entry->name[l++] = from_unicode(uni_char);
-                            }
-                            for (k=0; k<2; k++)
-                            {
-                                offset_idx = index + k*2 + 28;
-                                uni_char[0] = ptr[offset_idx+1];
-                                uni_char[1] = ptr[offset_idx];
-                                entry->name[l++] = from_unicode(uni_char);
-                            }
-#else
                             /* names are stored in unicode, but we
                                only grab the low byte (iso8859-1). */
                             for (k=0; k<5; k++)
@@ -1102,7 +1074,6 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 entry->name[l++] = ptr[index + k*2 + 14];
                             for (k=0; k<2; k++)
                                 entry->name[l++] = ptr[index + k*2 + 28];
-#endif
                         }
                         entry->name[l]=0;
                     }

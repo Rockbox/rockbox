@@ -136,7 +136,6 @@ static void loopit(void)
           lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
                      xtable[xx%71], table[yy&63],
                      11, 16, false);
-
         lcd_update();
 
         ysanke+= values[NUM_YSANKE].num;

@@ -101,7 +101,7 @@ extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
 extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
 extern void lcd_setfont(int font);
-extern void lcd_getfontsize(unsigned int font, int *width, int *height);
+extern void lcd_getfontsize(int font, int *width, int *height);
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
@@ -119,19 +119,6 @@ extern void lcd_invertpixel(int x, int y);
 
 #endif /* CHARCELLS / BITMAP */
 
-#ifdef LOADABLE_FONTS
-extern int lcd_init_fonts(void);
-extern void lcd_putsldfxy(int x, int y, unsigned char *str);
-extern int lcd_getstringsize(unsigned char *str,
-                             unsigned char* font,
-                             int *w, int *h);
-extern void lcd_setldfont(unsigned char* f);
-
-extern unsigned char* lcd_getcurrentldfont(void);
-#endif
-
-#ifdef LCD_PROPFONTS
-extern int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h);
-#endif
+extern int lcd_getstringsize(unsigned char *str, int font, int *w, int *h);
 
 #endif /* __LCD_H__ */

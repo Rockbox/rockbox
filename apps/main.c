@@ -45,9 +45,7 @@
 #include "debug_menu.h"
 #include "version.h"
 #include "sprintf.h"
-#ifdef LOADABLE_FONTS
-#include "unicode.h"
-#endif
+#include "font.h"
 
 
 char appsversion[]=APPSVERSION;
@@ -65,10 +63,8 @@ void app_main(void)
 void init(void)
 {
     init_threads();
-#ifdef LOADABLE_FONTS
-    unicode_init();
-#endif
     lcd_init();
+    font_init();
     show_logo();
     settings_reset();
     settings_load();
@@ -93,6 +89,10 @@ void init(void)
     
     lcd_init();
 
+    // FIXME should call font_init before this, 
+    // because may use loadable font in show_logo().
+    // I didn't call font_init here, since
+    // disk system isn't up yet.
     show_logo();
 
 #ifdef DEBUG
@@ -160,10 +160,7 @@ void init(void)
     status_init();
     usb_start_monitoring();
     power_init();
-#ifdef LOADABLE_FONTS
-    unicode_init();
-    lcd_init_fonts();
-#endif
+    font_init();
 }
 
 int main(void)

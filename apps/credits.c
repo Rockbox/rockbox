@@ -19,6 +19,7 @@
 
 #include "credits.h"
 #include "lcd.h"
+#include "font.h"
 #include "kernel.h"
 #include "button.h"
 #include "sprintf.h"
@@ -64,6 +65,7 @@ char* credits[] = {
     "Chad Lockwood",
     "John Pybus",
     "Randy Wood",
+    "Gregory Haerr",
 };
 
 #ifdef HAVE_LCD_BITMAP
@@ -111,15 +113,15 @@ void roll_credits(void)
     int height;
     int width;
 
-    lcd_getfontsize(0, &width, &height);
+    lcd_getfontsize(FONT_UI, &width, &height);
 
     while(1) {
       lcd_clear_display();
       for ( i=0; i <= (64-y)/height; i++ )
-        lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"", 0);
+        lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"", FONT_UI);
       snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
               line+1, numnames);
-      lcd_putsxy(0, 0, buffer, 0);
+      lcd_putsxy(0, 0, buffer, FONT_UI);
       lcd_update();
 
       if (button_get_w_tmo(HZ/20))

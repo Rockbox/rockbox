@@ -26,16 +26,11 @@
 #include "file.h"
 #include "debug.h"
 #include "system.h"
-
-#ifdef LOADABLE_FONTS
-#include "ajf.h"
-#include "panic.h"
-#endif
+#include "font.h"
 
 #if defined(SIMULATOR)
 #include "sim_icons.h"
 #endif
-
 
 /*** definitions ***/
 
@@ -513,9 +508,6 @@ void lcd_init (void)
 {
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
-#if  defined(LOADABLE_FONTS) && defined(SIMULATOR)
-    lcd_init_fonts();
-#endif
 }
 #endif
 
@@ -568,17 +560,11 @@ static int ymargin=0;
 #define    ASCII_MIN            0x20    /* First char in table */
 #define    ASCII_MAX            0x7f    /* Last char in table */
 
-extern unsigned char char_gen_6x8[][5];
-extern unsigned char char_gen_8x12[][14];
-extern unsigned char char_gen_12x16[][22];
-
 /* All zeros and ones bitmaps for area filling */
 static unsigned char zeros[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                  0x00, 0x00 };
 static unsigned char ones[]  = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                  0xff, 0xff };
-static char fonts[] = { 6,8,12 };
-static char fontheight[] = { 8,12,16 };
 
 #ifndef SIMULATOR
 
@@ -696,175 +682,14 @@ int lcd_getymargin(void)
     return ymargin;
 }
 
-
-
-#ifdef LOADABLE_FONTS
-
-static unsigned char* _font = NULL;
-
-int lcd_init_fonts(void)
-{
-    if (!_font)
-        _font = ajf_read_font("/system.ajf");
-
-    if (!_font)
-    {
-        lcd_putsxy(0,0,"No font", 0);
-        return -1;
-    }
-
-    return 0;
-}
-
-void lcd_setldfont(unsigned char* f)
-{
-    _font = f;
-}
-
-unsigned char* lcd_getcurrentldfont()
-{
-    if (!_font)
-        panicf("No font loaded!");
-    return _font;
-}
-
-/*
- * Return width and height of a string with a given font.
- */
-int lcd_getstringsize(unsigned char *str, unsigned char* font, int *w, int *h)
-{
-    int width=0;
-    int height=0;
-    unsigned char ch;
-
-    if (!font)
-        panicf("No font specified");
-
-    while((ch = *str++)) 
-    {
-        int dw,dh;
-        ajf_get_charsize(ch, font, &dw, &dh);
-        if (dh>height)
-            height = dh;
-        width+=dw;
-    }
-    *w = width;
-    *h = height;
-
-    return width;
-}
-
-/*
- * Put a string at specified bit position
- */
-
-void lcd_putsldfxy(int x, int y, unsigned char *str)
-{
-    unsigned char ch;
-    int nx;
-    int ny=8;
-    int lcd_x = x;
-    int lcd_y = y;
-    if (!_font)
-    {
-        lcd_putsxy(0,0,"No font", 0);
-        return;
-    }
-    ny = (int)_font[2];
-    while (((ch = *str++) != '\0'))
-    {
-        unsigned char *char_buf = ajf_get_charbuf(ch, _font, &nx, &ny);
-        if (!char_buf)
-        {
-            char_buf = ajf_get_charbuf('?', _font, &nx, &ny);
-            if (!char_buf)
-                panicf("Bad font");
-        }
-        if(lcd_x + nx > LCD_WIDTH)
-            break;
-
-        lcd_bitmap (&char_buf[0], lcd_x, lcd_y, nx, ny, true);
-        lcd_x += nx;
-    }
-}
-#endif
-
-
-#ifdef LCD_PROPFONTS
-
-extern unsigned char char_dw_8x8_prop[][9];
-
-/*
- * Return width and height of a given font.
- */
-int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h)
-{
-    int width=0;
-    unsigned char ch, byte;
-    (void)font;
-
-    while((ch = *str++)) {
-        /* Limit to char generation table */
-        if (ch < ASCII_MIN)
-            /* replace unsupported letters with question marks */
-            ch = ' '-ASCII_MIN;
-        else
-            ch -= ASCII_MIN;
-
-        byte = char_dw_8x8_prop[ch][8];
-        width += (byte>>4) + 1;
-    }
-    *w = width;
-    *h = 8;
-
-    return width;
-}
-
-/*
- * Put a string at specified bit position
- */
-
-void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
-{
-    unsigned int ch;
-    int nx;
-    int ny=8;
-    unsigned char *src;
-    int lcd_x = x;
-    int lcd_y = y;
-
-    (void)thisfont;
-
-    while (((ch = *str++) != '\0'))
-    {
-        /* Limit to char generation table */
-        if (ch < ASCII_MIN)
-            /* replace unsupported letters with question marks */
-            ch = ' '-ASCII_MIN;
-        else
-            ch -= ASCII_MIN;
-        
-        nx = char_dw_8x8_prop[ch][8] >> 4;
-
-        if(lcd_x + nx > LCD_WIDTH)
-            break;
-
-        src = char_dw_8x8_prop[ch];
-        lcd_clearrect (lcd_x+nx, lcd_y, 1, ny );
-        lcd_bitmap (src, lcd_x, lcd_y, nx, ny, true);
-
-        lcd_x += nx+1;
-    }
-}
-
-#endif
-
 /*
  * Put a string at specified character position
  */
+//FIXME require font parameter
 void lcd_puts(int x, int y, unsigned char *str)
 {
     int xpos,ypos,w,h;
+
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
        as otherwise it'll wrap. The real target doesn't wrap. */
@@ -882,80 +707,15 @@ void lcd_puts(int x, int y, unsigned char *str)
     if(!str || !str[0])
         return;
 
-#ifdef LCD_PROPFONTS
     lcd_getstringsize(str, font, &w, &h);
-    xpos = xmargin + x * fonts[font];
-    ypos = ymargin + y * fontheight[font];
-    lcd_putspropxy(xpos, ypos, str, font);
-#elif LOADABLE_FONTS
-    lcd_getstringsize(str,_font,&w,&h);
-    xpos = xmargin + x * w / strlen(str);
-    ypos = ymargin + y * h;
-    lcd_putsldfxy(xpos, ypos, str);
-#else
-    xpos = xmargin + x * fonts[font];
-    ypos = ymargin + y * fontheight[font];
-    lcd_putsxy(xpos, ypos, str, font);
-    w = strlen(str) * fonts[font];
-    h = fontheight[font];
-#endif
+    xpos = xmargin + x*w / strlen(str); //FIXME why strlen?
+    ypos = ymargin + y*h;
+    lcd_putsxy( xpos, ypos, str, font);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* this function is being used when simulating a charcell LCD and
        then we update immediately */
     lcd_update();
-#endif
-}
-
-
-/*
- * Put a string at specified bit position
- */
-void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
-{
-#ifdef LCD_PROPFONTS
-    lcd_putspropxy(x,y,str,thisfont);
-#else
-
-    int nx = fonts[thisfont];
-    int ny = fontheight[thisfont];
-    int ch;
-    unsigned char *src;
-    int lcd_x = x;
-    int lcd_y = y;
-
-#ifdef LOADABLE_FONTS
-    if ( _font ) {
-        lcd_putsldfxy(x,y,str);
-        return;
-    }
-#endif
-
-    while (((ch = *str++) != '\0') && (lcd_x + nx <= LCD_WIDTH))
-    {
-        if (lcd_y + ny > LCD_HEIGHT)
-            return;
-
-        /* Limit to char generation table */
-        if ((ch < ASCII_MIN) || (ch > ASCII_MAX))
-            /* replace unsupported letters with question marks */
-            ch = '?' - ASCII_MIN;
-        else
-            ch -= ASCII_MIN;
-        
-        if (thisfont == 2)
-            src = char_gen_12x16[ch];
-        else if (thisfont == 1)
-            src = char_gen_8x12[ch];
-        else
-            src = char_gen_6x8[ch];
-        
-        lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, true);
-        lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, true);
-
-        lcd_x += nx;
-
-    }
 #endif
 }
 
@@ -1265,17 +1025,6 @@ void lcd_invertpixel(int x, int y)
     INVERT_PIXEL(x,y);
 }
 
-/*
- * Return width and height of a given font.
- */
-void lcd_getfontsize(unsigned int font, int *width, int *height)
-{
-    if(font < sizeof(fonts)) {
-        *width =  fonts[font];
-        *height = fontheight[font];
-    }
-}
-
 #else
 /* no LCD defined, no code to use */
 #endif
@@ -1286,46 +1035,30 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 #ifdef HAVE_LCD_CHARCELLS
     s->space = 11 - x;
 #else
-
-#if defined(LCD_PROPFONTS) || defined(LOADABLE_FONTS)
     unsigned char ch[2];
     int w, h;
-#endif
     int width, height;
     lcd_getfontsize(font, &width, &height);
-#if defined(LCD_PROPFONTS) || defined(LOADABLE_FONTS)
+
     ch[1] = 0; /* zero terminate */
     ch[0] = string[0];
     width = 0;
     s->space = 0;
     while ( ch[0] &&
-#ifdef LCD_PROPFONTS
             (width + lcd_getstringsize(ch, 0, &w, &h) <
              (LCD_WIDTH - x*8))) {
-#else
-            (width + lcd_getstringsize(ch, _font, &w, &h) <
-             (LCD_WIDTH - x*8))) {
-#endif
         width += w;
         s->space++;
         ch[0]=string[s->space];
     }
-#else
-    s->space = (LCD_WIDTH - xmargin - x*width) / width;
-#endif
 #endif
 
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
 
-
-#if defined(LCD_PROPFONTS)
+#ifdef HAVE_LCD_BITMAP
     s->space += 2;
     lcd_getstringsize(string,0,&w,&h);
-    if ( w > LCD_WIDTH - xmargin ) {
-#elif defined(LOADABLE_FONTS)
-    s->space += 2;
-    lcd_getstringsize(string,_font,&w,&h);
     if ( w > LCD_WIDTH - xmargin ) {
 #else
     if ( s->textlen > s->space ) {
@@ -1344,32 +1077,24 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     }
 }
 
+
 void lcd_stop_scroll(void)
 {
     if ( scroll_count ) {
         struct scrollinfo* s = &scroll;
         scroll_count = 0;
-        
-#ifdef LCD_PROPFONTS
 
-        lcd_clearrect(xmargin + s->startx*fonts[font],
-                      ymargin + s->starty*fontheight[font],
-                      LCD_WIDTH - xmargin,
-                      fontheight[font]);
-
-#elif defined(LOADABLE_FONTS)
+#ifdef HAVE_LCD_BITMAP
         {
             int w,h;
-            lcd_getstringsize( s->text, _font, &w, &h);
+            /* FIXME no font index */
+            lcd_getstringsize( s->text, FONT_UI, &w, &h);
             lcd_clearrect(xmargin + s->startx*w/s->textlen,
                           ymargin + s->starty*h,
                           LCD_WIDTH - xmargin,
                           h);
-
         }
 #endif
-
-
         /* restore scrolled row */
         lcd_puts(s->startx,s->starty,s->text);
         lcd_update();
@@ -1420,20 +1145,16 @@ static void scroll_thread(void)
                     s->offset = 0;
             }
 
-#ifdef LCD_PROPFONTS
-            lcd_clearrect(xmargin + s->startx*fonts[font],
-                          ymargin + s->starty*fontheight[font],
-                          LCD_WIDTH - xmargin,
-                          fontheight[font]);
-#elif defined(LOADABLE_FONTS)
-            {
-                int w,h;
-                lcd_getstringsize( s->text, _font, &w, &h);
+#ifdef HAVE_LCD_BITMAP
+	    {
+	        /* FIXME no font index */
+		int w, h;
+                lcd_getstringsize( s->text, FONT_UI, &w, &h);
                 lcd_clearrect(xmargin + s->startx*w/s->textlen,
                               ymargin + s->starty*h,
                               LCD_WIDTH - xmargin,
                               h);
-            }
+	    }
 #endif
             lcd_puts(s->startx,s->starty,s->line);
             lcd_update();

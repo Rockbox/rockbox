@@ -26,6 +26,7 @@
 #include "dir.h"
 #include "file.h"
 #include "lcd.h"
+#include "font.h"
 #include "backlight.h"
 #include "button.h"
 #include "kernel.h"
@@ -47,10 +48,6 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
-#endif
-
-#ifdef LOADABLE_FONTS
-#include "ajf.h"
 #endif
 
 #define NAME_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH * MAX_FILES_IN_DIR)
@@ -190,16 +187,15 @@ static int showdir(char *path, int start)
     int i;
     int tree_max_on_screen;
     bool dir_buffer_full;
-#ifdef LOADABLE_FONTS
-    int fh;
-    unsigned char *font = lcd_getcurrentldfont();
-    fh  = ajf_get_fontheight(font);
+
+#ifdef HAVE_LCD_BITMAP
+    int fw, fh;
+    lcd_getfontsize(FONT_UI, &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
     line_height = fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
-
 
     /* new dir? cache it */
     if (strncmp(path,lastdir,sizeof(lastdir))) {
@@ -339,7 +335,7 @@ static int showdir(char *path, int start)
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
-    lcd_setfont(0);
+    lcd_setfont(FONT_UI);
 #endif
 
     for ( i=start; i < start+tree_max_on_screen; i++ ) {
@@ -573,10 +569,9 @@ bool dirbrowse(char *root)
     bool lastfilter = global_settings.mp3filter;
     bool lastsortcase = global_settings.sort_case;
     bool lastshowhidden = global_settings.show_hidden_files;
-#ifdef LOADABLE_FONTS
-    int fh;
-    unsigned char *font = lcd_getcurrentldfont();
-    fh  = ajf_get_fontheight(font);
+#ifdef HAVE_LCD_BITMAP
+    int fw, fh;
+    lcd_getfontsize(FONT_UI, &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
@@ -743,10 +738,8 @@ bool dirbrowse(char *root)
                             reload_root = true;
                             global_settings.resume_index = -1;
                         }
-#ifdef LOADABLE_FONTS
+#ifdef HAVE_LCD_BITMAP
                         tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#else
-                        tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
                     }
                 }
@@ -836,10 +829,8 @@ bool dirbrowse(char *root)
                     lcd_stop_scroll();
                     if (wps_show() == SYS_USB_CONNECTED)
                         reload_root = true;
-#ifdef LOADABLE_FONTS
+#ifdef HAVE_LCD_BITMAP
                     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#else
-                    tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
                     restore = true;
                 }
@@ -855,10 +846,9 @@ bool dirbrowse(char *root)
             case BUTTON_F3:
                 if (f3_screen())
                     reload_root = true;
-#ifdef LOADABLE_FONTS
+
+#ifdef HAVE_LCD_BITMAP
                 tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#else
-                tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
                 restore = true;
                 break;

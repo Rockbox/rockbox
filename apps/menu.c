@@ -19,6 +19,7 @@
 #include <stdbool.h>
 
 #include "lcd.h"
+#include "font.h"
 #include "backlight.h"
 #include "menu.h"
 #include "button.h"
@@ -32,10 +33,6 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
-#endif
-
-#ifdef LOADABLE_FONTS
-#include "ajf.h"
 #endif
 
 struct menu {
@@ -54,8 +51,10 @@ struct menu {
 
 #define LINE_X      0 /* X position the entry-list starts at */
 #define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
-#define LINE_HEIGTH 8 /* pixels for each text line */
 
+//FIXME remove
+#define LINE_HEIGTH 8 /* pixels for each text line */
+//FIXME remove
 #define MENU_LINES  (LCD_HEIGHT / LINE_HEIGTH - LINE_Y)
 
 #define CURSOR_X    (global_settings.scrollbar ? 1 : 0)
@@ -89,17 +88,12 @@ struct menu {
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
 
-/* count in letter posistions, NOT pixels */
+/* count in letter positions, NOT pixels */
 void put_cursorxy(int x, int y, bool on)
 {
 #ifdef HAVE_LCD_BITMAP
-#ifdef LOADABLE_FONTS
-    int fh;
-    unsigned char* font = lcd_getcurrentldfont();
-    fh = ajf_get_fontheight(font);
-#else 
-    int fh = 8;
-#endif
+    int fh, fw;
+    lcd_getfontsize(FONT_UI, &fw, &fh);
 #endif
 
     /* place the cursor */
@@ -131,11 +125,10 @@ void put_cursorxy(int x, int y, bool on)
 static void menu_draw(int m)
 {
     int i = 0;
-#ifdef LOADABLE_FONTS
+#if LCD_PROPFONTS
+    int fw, fh;
     int menu_lines;
-    int fh;
-    unsigned char* font = lcd_getcurrentldfont();
-    fh = ajf_get_fontheight(font);
+    lcd_getfontsize(FONT_UI, &fw, &fh);
     if (global_settings.statusbar)
         menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
     else
@@ -148,7 +141,7 @@ static void menu_draw(int m)
     lcd_clear_display(); /* ...then clean the screen */
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
-    lcd_setfont(0);
+    lcd_setfont(FONT_UI);
 #endif
     /* correct cursor pos if out of screen */
     if (menus[m].cursor - menus[m].top >= menu_lines)
@@ -182,18 +175,18 @@ static void menu_draw(int m)
 static void put_cursor(int m, int target)
 {
     bool do_update = true;
-#ifdef LOADABLE_FONTS
+#if LCD_PROPFONTS
+    int fw, fh;
     int menu_lines;
-    int fh;
-    unsigned char* font = lcd_getcurrentldfont();
-    fh = ajf_get_fontheight(font);
+    lcd_getfontsize(FONT_UI, &fw, &fh);
     if (global_settings.statusbar)
-        menu_lines = (LCD_HEIGHT-STATUSBAR_HEIGHT)/fh;
+        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
     else
         menu_lines = LCD_HEIGHT/fh;
 #else
     int menu_lines = MENU_LINES;
 #endif
+
     put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
     menu_draw(m);
