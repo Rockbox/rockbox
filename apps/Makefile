@@ -73,10 +73,10 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/build.lang: lang/$(LANGUAGE).lang
-	../tools/uplang lang/english.lang $< > $@
+	perl ../tools/uplang lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
-	../tools/genlang -p=$(OBJDIR)/lang $<
+	perl ../tools/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 dist:
