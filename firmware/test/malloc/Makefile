@@ -1,8 +1,4 @@
 
-TARGET = libdmalloc.a
-
-LIBOBJS = dmalloc.o bmalloc.o bysize.o
-
 OBJS1 = mytest.o
 TARGET1 = mytest
 
@@ -14,20 +10,17 @@ TARGET3 = dmytest
 
 # define this to talk a lot in runtime
 # -DDEBUG_VERBOSE 
-CFLAGS = -g -DUNIX -DBMALLOC -Wall -DDEBUG
+CFLAGS = -g -Wall -DDEBUG -I../../malloc
 CC = gcc
 AR = ar
 
-LDFLAGS = -L. -ldmalloc
+LDFLAGS = -L../../malloc -ldmalloc
 
-all: $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3)
+all: $(TARGET1) $(TARGET2) $(TARGET3)
 
 clean:
-	rm -f core *~ $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) \
-	$(LIBOBJS) $(OBJS1) $(OBJS2) $(OBJS3)
-
-$(TARGET): $(LIBOBJS)
-	$(AR) ruv $(TARGET) $(LIBOBJS)
+	rm -f core *~ $(TARGET1) $(TARGET2) $(TARGET3) \
+	$(OBJS1) $(OBJS2) $(OBJS3)
 
 $(TARGET1): $(OBJS1)
 	$(CC) -g -o $(TARGET1) $(OBJS1) $(LDFLAGS)
@@ -38,14 +31,6 @@ $(TARGET2): $(OBJS2)
 $(TARGET3): $(OBJS3)
 	$(CC) -g -o $(TARGET3) $(OBJS3) $(LDFLAGS)
 
-bmalloc.o: bmalloc.c bysize.h
-bysize.o: bysize.c
-dmalloc.o: dmalloc.c
-dmytest.o: dmytest.c dmalloc.h bmalloc.h
+dmytest.o: dmytest.c
 Malloc.o: Malloc.c
-mytest.o: mytest.c bmalloc.h
-
-tgz:
-	@(dir=`pwd`;name=`basename $$dir`;echo Creates $$name.tar.gz; cd .. ; \
-	tar -cf $$name.tar `cat $$name/FILES | sed "s:^/:$$name/:g"` ; \
-	gzip $$name.tar ; chmod a+r $$name.tar.gz ; mv $$name.tar.gz $$name/)
+mytest.o: mytest.c

@@ -1,3 +1,21 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2002 by Daniel Stenberg
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 /*****************************************************************************
  *
  * Dynamic small-blocks Memory Allocation
@@ -21,6 +39,8 @@
 #else
 #include <stdlib.h> /* makes the PSOS complain on the 'size_t' typedef */
 #endif
+
+#define BMALLOC /* we use our own big-malloc system */
 
 #ifdef BMALLOC
 #include "bmalloc.h"
@@ -132,8 +152,7 @@ struct MemInfo {
 
 /* a little 'bc' script that helps us maximize the usage:
    - for 32-bit aligned addresses (SPARC crashes otherwise):
-   for(i=20; i<2040; i++) { a=4064/i; if(a*i >= 4060) { if(i%4==0)  {i;} } }
-
+   for(i=20; i<2040; i+=4) { a=4064/i; if(a*i >= 4060) { {i;} } }
 
    I try to approximate a double of each size, starting with ~20. We don't do
    ODD sizes since several CPU flavours dump core when accessing such
@@ -141,9 +160,9 @@ struct MemInfo {
    happy with us.
    */
 
-short qinfo[]= { 20, 28, 52, 116, 312, 580, 1016, 2032};
-/* 52 and 312 only make use of 4056 bytes, but without them there are too
-   wide gaps */
+const static short qinfo[]= {
+  20, 28, 52, 116, 312, 580, 1016, 2032
+};
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 

@@ -1,6 +1,6 @@
-		    =====================================
-		    Memory Allocation Algorithm Theories.
-		    =====================================
+		    ====================================
+		    Memory Allocation Algorithm Theories
+		    ====================================
 
 GOAL
   It is intended to be a 100% working memory allocation system. It should be
@@ -15,8 +15,8 @@ GOAL
 
 TERMINOLOGY
 
-  FRAGMENT - small identically sized parts of a larger BLOCK, they are when
-	     travered in lists etc _not_ allocated.
+  FRAGMENT - small identically sized parts of a larger BLOCK, they are _not_
+             allocated when traversed in lists etc 
   BLOCK    - large memory area, if used for FRAGMENTS, they are linked in a
 	     lists. One list for each FRAGMENT size supported.
   TOP      - head struct that holds information about and points to a chain
@@ -39,12 +39,12 @@ MEMORY SYSTEM
   ALLOC
 
   * Small allocations are "aligned" upwards to a set of preset sizes. In the
-    current implementation I use 20, 28, 52, 116, 312, 580, 812, 2028 bytes.
-    Memory allocations of these sizes are refered to as FRAGMENTS.
+    current implementation I use 20, 28, 52, 116, 312, 580, 1016, 2032 bytes.
+    Memory allocations of these sizes are referred to as FRAGMENTS.
     (The reason for these specific sizes is the requirement that they must be
-    32-bit aligned and fit as good as possible within 4060 bytes.)
+    32-bit aligned and fit as good as possible within 4064 bytes.)
 
-  * Allocations larger than 2028 will get a BLOCK for that allocation only.
+  * Allocations larger than 2032 will get a BLOCK for that allocation only.
 
   * Each of these sizes has it's own TOP. When a FRAGMENT is requested, a
     larger BLOCK will be allocated and divided into many FRAGMENTS (all of the
@@ -52,12 +52,12 @@ MEMORY SYSTEM
     the same size. Each BLOCK has a 'number of free FRAGMENTS' counter and so
     has each TOP (for the entire chain).
 
-  * A BLOCK is around 4060 bytes plus the size of the information header. This
+  * A BLOCK is around 4064 bytes plus the size of the information header. This
     size is adjusted to make the allocation of the big block not require more
     than 4096 bytes. (This might not be so easy to be sure of, if you don't
     know how the big-block system works, but the BMALLOC system uses an
     extra header of 12 bytes and the header for the FRAGMENT BLOCK is 20 bytes
-    in a general 32-bit unix environment.)
+    in a general 32-bit environment.)
 
   * In case the allocation of a BLOCK fails when a FRAGMENT is required, the
     next size of FRAGMENTS will be checked for a free FRAGMENT. First when the
@@ -122,16 +122,16 @@ MEMORY SYSTEM
     no real gain in increasing the size of the align.
 
   * We link *all* pieces of memory (AREAS), free or not free. We keep the list
-    in address order and thus when a FREE() occurs we know instanstly if there
+    in address order and thus when a FREE() occurs we know instantly if there
     are FREE CHUNKS wall-to-wall. No list "travels" needed. Requires some
     extra space in every allocated BLOCK. Still needs to put the new CHUNK in
     the right place in size-sorted list/tree. All memory areas, allocated or
     not, contain the following header:
-    - size of this memory area
-    - FREE status
-    - pointer to the next AREA closest in memory
-    - pointer to the prev AREA closest in memory
-    (12 bytes)
+    - size of this memory area (31 bits)
+    - FREE status (1 bit)
+    - pointer to the next AREA closest in memory (32 bits)
+    - pointer to the prev AREA closest in memory (32 bits)
+    (Totally 12 bytes)
 
   * Sort all FREE CHUNKS in size-order. We use a SPLAY TREE algorithm for
     maximum speed. Data/structs used for the size-sorting functions are kept
@@ -154,7 +154,7 @@ MEMORY SYSTEM
 
   REALLOC
  
-  * There IS NO realloc() of large blocks, they are performed in the higher
+  * There IS NO realloc() of large blocks, they are performed in the previous
     layer (dmalloc).
 
 

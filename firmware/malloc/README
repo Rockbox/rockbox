@@ -2,7 +2,7 @@ Package: dbestfit - a dynamic best-fit memory allocator
 Date:	 1996 - 2002
 Version: 3.3
 Author:	 Daniel Stenberg <daniel@haxx.se>
-License: MIT
+License: MIT originally, files in the Rockbox project are GPL licensed.
 
  I wrote the dmalloc part for small allocation sizes to improve the behavior
 of the built-in (first-fit) allocator found in pSOS, during late 1996 and

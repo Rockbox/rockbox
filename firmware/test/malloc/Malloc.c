@@ -26,7 +26,7 @@ kommentaren på srand() och det löser sig.
 
 */
 
-/*#undef BMALLOC*/
+#define BMALLOC /* go go go */
 
 #ifdef BMALLOC
 #include "dmalloc.h"
@@ -162,7 +162,7 @@ int main(void)
     }
   output:    
     if (out_of_memory || !(count%DISPLAY_WHEN)) {
-      printf("(%d)  malloc %d, realloc %d, free %d, total size %d\n",
+      printf("(%ld)  malloc %ld, realloc %ld, free %ld, total size %ld\n",
              count, count_malloc, count_realloc, count_free, total_memory);
       {
 	int count;
@@ -175,7 +175,7 @@ int main(void)
     }
     if (out_of_memory) {
       if(out_of_memory)
-        printf("Couldn't get %d bytes\n", out_of_memory);
+        printf("Couldn't get %ld bytes\n", out_of_memory);
 
       dmalloc_status();
       bmalloc_status();
