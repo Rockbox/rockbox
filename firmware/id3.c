@@ -493,7 +493,7 @@ mp3info(mp3entry *entry, char *filename)
     entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->id3v1len = getid3v1len(fd);
-    entry->length = getsonglength(fd, entry);
+    /* entry->length = getsonglength(fd, entry); */
     entry->title = NULL;
 
     if(HASID3V2(entry))
