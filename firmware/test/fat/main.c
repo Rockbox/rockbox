@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "fat.h"
 #include "debug.h"
 #include "disk.h"
@@ -13,6 +14,15 @@ extern void ata_read_sectors(int, int, char*);
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf);
 void dbg_console(void);
+
+void panicf( char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    vprintf( fmt, ap );
+    va_end( ap );
+    exit(0);
+}
 
 void dbg_dump_sector(int sec)
 {
@@ -75,14 +85,16 @@ void dbg_dir(char* currdir)
 void dbg_mkfile(char* name)
 {
     char* text = "Detta är en dummy-text\n";
+    int i;
     int fd = open(name,O_WRONLY);
     if (fd<0) {
         DEBUGF("Failed creating file\n");
         return;
     }
-    if (write(fd, text, strlen(text)) < 0)
-        DEBUGF("Failed writing data\n");
-
+    for (i=0;i<200;i++)
+        if (write(fd, text, strlen(text)) < 0)
+            DEBUGF("Failed writing data\n");
+    
     close(fd);
 }
 
@@ -163,6 +175,33 @@ void dbg_tail(char* name)
     }
     else {
         perror("lseek");
+    }
+
+    close(fd);
+}
+
+void dbg_head(char* name)
+{
+    unsigned char buf[SECTOR_SIZE*5];
+    int fd,rc;
+
+    fd = open(name,O_RDONLY);
+    if (fd<0)
+        return;
+    DEBUGF("Got file descriptor %d\n",fd);
+    
+    rc = read(fd, buf, SECTOR_SIZE);
+    if( rc > 0 )
+    {
+        buf[rc]=0;
+        printf("%d: %s\n", strlen(buf), buf);
+    }
+    else if ( rc == 0 ) {
+        DEBUGF("EOF\n");
+    }
+    else
+    {
+        DEBUGF("Failed reading file: %d\n",rc);
     }
 
     close(fd);
@@ -284,9 +323,12 @@ int main(int argc, char *argv[])
     }
 
     //dbg_console();
-    //dbg_tail("/fat.h");
     //dbg_dir("/");
-    dbg_mkfile("/apa.txt");
+#if 1
+    dbg_head("/bepa.txt");
+#else
+    dbg_mkfile("/bepa.txt");
+#endif
     dbg_dir("/");
 
     return 0;

@@ -1,0 +1,25 @@
+This code is for testing the Rockbox fat code on a dummy drive image file.
+
+Dummy image
+-----------
+Here's how to create a 1 gig dummy drive image in linux:
+
+# dd if=/dev/hda of=disk.img bs=1M count=1024
+
+You can then format disk.img as a FAT32 partition:
+
+# mkdosfs -F 32 disk.img
+
+To mount the image, your linux kernel must include the loopback device:
+
+# mount -o loop disk.img /mnt/image
+
+Now copy some test data to the disk, umount it and start testing.
+
+
+Test code
+---------
+The files in this dir build the 'fat' program. It will read 'disk.img' and
+treat is as a real disk, thanks to the ata-sim.c module.
+
+Modify the main.c source code to make it perform the tests you want.

@@ -40,24 +40,22 @@
 #endif
 
 #if defined(__MINGW32__) && defined(SIMULATOR)
-int             open (const char*, int, ...);
+extern int open(const char*, int, ...);
 extern int close(int fd);
-int             read (int, void*, unsigned int);
-long            lseek (int, long, int);
+extern int read(int, void*, unsigned int);
+extern long lseek(int, long, int);
 
 #else
 
 #ifndef SIMULATOR
-extern int open(char* pathname, int flags);
+extern int open(const char* pathname, int flags);
 extern int close(int fd);
 extern int read(int fd, void* buf, int count);
 extern int lseek(int fd, int offset, int whence);
-
-#ifdef DISK_WRITE
+extern int creat(const char *pathname, int mode);
 extern int write(int fd, void* buf, int count);
-extern int remove(char* pathname);
-extern int rename(char* oldname, char* newname);
-#endif
+extern int remove(const char* pathname);
+extern int rename(const char* oldname, const char* newname);
 
 #else
 #ifdef WIN32

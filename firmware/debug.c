@@ -195,7 +195,9 @@ static void debug(char *msg)
 }
 #endif /* end of DEBUG section */
 
+#ifdef __GNUC__
 void debugf(char *fmt, ...)
+#endif
 {
 #ifdef DEBUG
     va_list ap;
@@ -220,6 +222,15 @@ void debugf(char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}
+
+void ldebugf(char* file, int line, char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    fprintf( stderr, "%s:%d ", file, line );
     vfprintf( stderr, fmt, ap );
     va_end( ap );
 }

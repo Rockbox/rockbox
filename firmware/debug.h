@@ -21,20 +21,24 @@
 
 extern void debug_init(void);
 extern void debugf(char* fmt,...);
+extern void ldebugf(char* file, int line, char *fmt, ...);
 
 #ifdef __GNUC__
 
 /*  */
 #if defined(DEBUG) || defined(SIMULATOR)
-//#define DEBUGF(...) debugf(__VA_ARGS__)
 #define DEBUGF	debugf
+#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
 #else
 #define DEBUGF(...)
+#define LDEBUGF(...)
 #endif
+
 
 #else
 
 #define DEBUGF debugf
+#define LDEBUGF debugf
 
 #endif /* GCC */
 

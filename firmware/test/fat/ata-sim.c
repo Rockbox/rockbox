@@ -24,6 +24,13 @@ int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 
 int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
 {
+    DEBUGF("Writing block 0x%lx\n",start); 
+
+    if (start == 0) {
+        DEBUGF("Holy crap! You're writing on sector 0!\n");
+        exit(0);
+    }
+
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;

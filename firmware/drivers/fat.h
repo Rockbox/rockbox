@@ -20,6 +20,8 @@
 #ifndef FAT_H
 #define FAT_H
 
+#include <stdbool.h>
+
 #define SECTOR_SIZE 512
 
 struct fat_direntry
@@ -50,6 +52,7 @@ struct fat_dir
     int cached_sec;
     int num_sec;
     unsigned char cached_buf[SECTOR_SIZE];
+    int startcluster;
 };
 
 struct fat_file
@@ -58,17 +61,23 @@ struct fat_file
     int nextcluster;     /* cluster of last access */
     int nextsector;      /* sector of last access */
     int sectornum;       /* sector number in this cluster */
+    int dirsector;       /* sector where the dir entry is located */
+    int direntry;        /* dir entry index in sector */
 };
 
 extern int fat_mount(int startsector);
 
-#ifdef DISK_WRITE
-extern int fat_create_file(unsigned int currdir, char *name);
 extern int fat_create_dir(unsigned int currdir, char *name);
-#endif
 extern int fat_startsector(void);
-extern int fat_open(unsigned int cluster, struct fat_file *ent);
-extern int fat_read(struct fat_file *ent, int sectorcount, void* buf );
+extern int fat_open(unsigned int cluster,
+                    struct fat_file* ent,
+                    struct fat_dir* dir);
+extern int fat_create_file(char* name, 
+                           struct fat_file* ent,
+                           struct fat_dir* dir);
+extern int fat_readwrite(struct fat_file *ent, int sectorcount, 
+                         void* buf, bool write );
+extern int fat_closewrite(struct fat_file *ent, int size);
 extern int fat_seek(struct fat_file *ent, int sector );
 
 extern int fat_opendir(struct fat_dir *ent, unsigned int currdir);
