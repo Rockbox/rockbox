@@ -34,14 +34,14 @@
 
 #define CHARGE_END_NEGD   6      /* stop when N minutes have passed with
                                   * avg delta being < -0.05 V */
-#define CHARGE_END_ZEROD  30     /* stop when N minutes have passed with
+#define CHARGE_END_ZEROD  50     /* stop when N minutes have passed with
                                   * avg delta being < 0.005 V */
 
 #ifdef HAVE_CHARGE_CTRL
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
 #define CHARGE_MAX_TIME   6*60   /* minutes: maximum charging time */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define CHARGE_RESTART_HI 90     /* %: when to restart charging in 'charge' mode */
+#define CHARGE_RESTART_HI 95     /* %: when to restart charging in 'charge' mode */
 #define CHARGE_RESTART_LO 10     /* %: when to restart charging in 'discharge' mode */
 
 extern char power_message[POWER_MESSAGE_LEN];
