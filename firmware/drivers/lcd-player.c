@@ -201,8 +201,7 @@ void xlcd_update(void)
                         } else {
 #ifdef DEBUG
                             if (extended_pattern_usage[pat]!=0) {
-                                fprintf(STDERR, "***Pattern %d is not zero!\n",
-                                        pat);
+                                DEBUGF("***Pattern %d is not zero!\n", pat);
                             }
 #endif
                             extended_chars_mapped[map_ch]=pat;
