@@ -1,0 +1,67 @@
+Q1. What is this NODO document?
+A1. This is a list if Feature Requests we get repeatedly that we simply
+    cannot do. View it as the opposite of a TODO!
+
+Q2. Record to WAV (uncompressed) or MP3pro format!
+A2. The recording hardware (the MAS) does not allow us to do this.
+
+Q3. Crossfade between tracks!
+A3. Crossfading would require two mp3 decorders, and we only have one. This
+    is not possible.
+
+Q4. Interfacing with other USB devices (like cameras) or 2 player games over
+    USB
+A4. The USB system demands that there is a master that talkes to a slave.
+    The Archos can only serve as a slave, as most other USB devices such
+    as cameras can. Thus, without a master no communication between the slaves
+    can take place.
+
+    If that is not enough, we have no ways of actually controlling the
+    communication performed over USB since the USB circuit in the Archos is
+    strictly made for disk-access and does not allow us to play with it the
+    way we'd need for any good communication to work.
+
+Q5. Support MP3pro and WMA playback!
+A5. The mp3-decoding hardware cannot do this.
+
+Q6. Converting OGG->MP3
+A6. The mp3-decoding hardware cannot decode ogg. It can be reprogrammed, but
+    there is too little memory for OGG and we have no documentation on how
+    to program the MAS' DSP.
+
+    Doing the conversion with the CPU is impossible, since a 12MHz SH1 is far
+    too slow for this daunting task.
+
+Q7. Archos Multimedia support!
+A7. The Archos Multimedia is a completely different beast. It is an entirely
+    different architecture, differnt CPU and upgrading the software is done a
+    completely different way. We do not venture into this.
+
+    Others may do so. We do not.
+
+Q8. Multi-band (or graphic) equalizer!
+A8. We cannot access information for that kind of visualization from the MP3
+    decoding harware.
+
+Q9. Support other filesystems than FAT32 (like NTFS or ext2 or whatever)!
+A9. No.
+
+    Rockbox needs to support FAT32 since it can only start off a FAT32
+    partition (since that is the only way the ROM can load it), and adding
+    support for more filesystems will just take away valueable ram for
+    unnecessary features.
+
+    You can partition your Archos fine, just make sure the first one is FAT32
+    and then make the other ones whatever file system you want. Just don't
+    expect Rockbox to understand them.
+
+Q10. Add scandisk-like features!
+A10. It would be a very slow operation that would drain the batteries and take
+     a lot of useful ram for something that is much better and faster done
+     when connected to a host computer.
+
+Q11. CBR recording!
+A11. The MP3 encoding hardware does not allow this.
+
+Q12. Change tempo of a song without changing pitch!
+A12. The MP3 decoding hardwar does now allow this.
