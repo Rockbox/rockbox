@@ -70,7 +70,7 @@
 #define KEYBOARD_GENERIC \
   "Keyboard   Rockbox\n" \
   "--------   ------------\n" \
-  "2, Left    LEFT\n" \
+  "4, Left    LEFT\n" \
   "6, Right   RIGHT\n"
 
 #if CONFIG_KEYPAD == PLAYER_PAD
