@@ -268,6 +268,16 @@ YES
 YES
 EFEAT
 
+NAME Video Playback with sound (Recorders) ENAME
+YES
+NO
+EFEAT
+
+NAME Boot Time from Flash (in seconds) ENAME
+TD 4 ETD
+TD 12 ETD
+EFEAT
+
 </table>
 
 <p>
