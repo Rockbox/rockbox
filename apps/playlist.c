@@ -126,9 +126,17 @@ static int get_next_index(int steps, bool *queue)
     int next_index    = -1;
 
     if (global_settings.repeat_mode == REPEAT_ONE)
+    {
+        /* this is needed for repeat one to work with queue mode */
         steps = 0;
+    }
     else if (steps >= 0)
+    {
+        /* Queue index starts from 0 which needs to be accounted for.  Also,
+           after resume, this handles case where we want to begin with
+           playlist */
         steps -= playlist.start_queue;
+    }
 
     if (steps >= 0 && playlist.num_queued > 0 &&
         playlist.num_queued - steps > 0)
@@ -139,9 +147,16 @@ static int get_next_index(int steps, bool *queue)
         if (playlist.num_queued)
         {
             if (steps >= 0)
+            {
+                /* skip the queued tracks */
                 steps -= (playlist.num_queued - 1);
+            }
             else if (!playlist.start_queue)
+            {
+                /* previous from queue list needs to go to current track in
+                   playlist */
                 steps += 1;
+            }
         }
     }
 
@@ -166,6 +181,8 @@ static int get_next_index(int steps, bool *queue)
             break;
 
         case REPEAT_ONE:
+            /* if we are still in playlist when repeat one is set, don't go to
+               queue list */
             if (*queue && !playlist.start_queue)
                 next_index = playlist.queue_index;
             else
@@ -201,6 +218,9 @@ int playlist_first_index(void)
     return playlist.first_index;
 }
 
+/* Get resume info for current playing song.  If return value is -1 then
+   settings shouldn't be saved (eg. when playing queued song and save queue
+   disabled) */
 int playlist_get_resume_info(int *resume_index, int *queue_resume,
                              int *queue_resume_index)
 {
@@ -214,6 +234,7 @@ int playlist_get_resume_info(int *resume_index, int *queue_resume,
         {
             *queue_resume_index =
                 playlist.queue_indices[playlist.queue_index];
+            /* have we started playing the queue list yet? */
             if (playlist.start_queue)
                 *queue_resume = QUEUE_BEGIN_PLAYLIST;
             else
@@ -288,6 +309,8 @@ int queue_add(char *filename)
         return -1;
     }
 
+    /* save the file name with a trailing \n. QUEUE_FILE can be used as a 
+       playlist if desired */
     filename[len] = '\n';
     result = write(fd, filename, len+1);
     if (result < 0)
@@ -307,6 +330,7 @@ int queue_add(char *filename)
         (playlist.last_queue_index + 1) % MAX_QUEUED_FILES;
     playlist.num_queued++;
 
+    /* the play order has changed */
     mpeg_flush_and_reload_tracks();
 
     return playlist.num_queued;
@@ -319,6 +343,7 @@ int playlist_next(int steps)
 
     if (queue)
     {
+        /* queue_diff accounts for bad songs in queue list */
         int queue_diff = index - playlist.queue_index;
         if (queue_diff < 0)
             queue_diff += MAX_QUEUED_FILES;
@@ -334,11 +359,16 @@ int playlist_next(int steps)
         {
             if (steps >= 0)
             {
+                /* done with queue list */
                 playlist.queue_index = playlist.last_queue_index;
                 playlist.num_queued = 0;
             }
             else
-                playlist.start_queue = true;
+            {
+                /* user requested previous.  however, don't forget about queue
+                   list */
+                playlist.start_queue = 1;
+            }
         }
     }
 
@@ -469,10 +499,15 @@ char* playlist_peek(int steps)
         buf = strchr(buf+1, '/');
     }
 
-    if (buf)
-        return buf;
+    if (!buf)
+    {
+        /* Even though this is an invalid file, we still need to pass a file
+           name to the caller because NULL is used to indicate end of 
+           playlist */
+        return now_playing;
+    }
 
-    return now_playing;
+    return buf;
 }
 
 /*
@@ -573,13 +608,14 @@ int play_list(char *dir,         /* "current directory" */
         }
     }
 
-    /* update the queue indices */
     if (queue_resume)
     {
+        /* update the queue indices */
         add_indices_to_queuelist(queue_resume_index);
 
         if (queue_resume == QUEUE_BEGIN_PLAYLIST)
         {
+            /* begin with current playlist index */
             playlist.start_queue = 1;
             playlist.index++; /* so we begin at the correct track */
         }
