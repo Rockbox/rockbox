@@ -689,15 +689,9 @@ int create_xing_header(int fd, int startpos, int filesize,
             
             last_pos = pos;
         }
-    }
 
-    memcpy(buf + index + 100, cooltext, sizeof(cooltext));
-
-    /* We must fill in the correct sample rate and mpeg version. If the TOC
-       should be generated, we take that data from the actual stream. If not,
-       we use the supplied parameters. */
-    if(generate_toc)
-    {
+        /* Copy the MPEG version and sample rate from the mpeg stream into
+           the Xing header */
         saved_header &= (VERSION_MASK | SAMPLERATE_MASK);
     
         buf[1] |= (saved_header >> 16) & 0xff;
@@ -705,9 +699,12 @@ int create_xing_header(int fd, int startpos, int filesize,
     }
     else
     {
+        /* Fill in the MPEG version and sample rate into the Xing header */
         buf[1] |= mpeg_version << 3;
         buf[2] |= sample_rate << 2;
     }
+    
+    memcpy(buf + index + 100, cooltext, sizeof(cooltext));
 
     /* Now get the length of the newly created frame */
     header = BYTES2INT(buf[0], buf[1], buf[2], buf[3]);
