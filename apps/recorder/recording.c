@@ -336,6 +336,8 @@ bool recording_screen(void)
         
         if(TIME_AFTER(current_tick, timeout))
         {
+            lcd_setfont(FONT_SYSFIXED);
+
             timeout = current_tick + HZ/10;
 
             seconds = mpeg_recorded_time() / HZ;
@@ -396,8 +398,6 @@ bool recording_screen(void)
                     }
                 }
 
-                status_draw();
-
                 if(global_settings.rec_source != SOURCE_SPDIF)
                     put_cursorxy(0, 3 + cursor, true);
 
@@ -407,6 +407,9 @@ bool recording_screen(void)
                          str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
                          global_settings.rec_quality);
                 lcd_puts(0, 6, buf);
+
+                status_draw();
+
                 lcd_update();
             }
             else
