@@ -57,6 +57,10 @@ void rtc_init(void)
         rtc_write(0x04, data);
     }
 
+    /* Also, make sure that the OUT bit in register 8 is 1,
+       otherwise the player can't be turned off. */
+    rtc_write(8, rtc_read(8) | 0x80);
+    
     rtc_enable_alarm(false);
 #endif
 }
