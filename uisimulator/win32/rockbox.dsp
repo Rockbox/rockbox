@@ -197,6 +197,10 @@ SOURCE=..\..\firmware\common\errno.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\firmware\common\random.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\firmware\common\sprintf.c
 # End Source File
 # Begin Source File

@@ -97,7 +97,7 @@ else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
 FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c \
-	sprintf.c buffer.c lcd-common.c
+	sprintf.c buffer.c lcd-common.c strtok.c random.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
@@ -112,7 +112,7 @@ endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c sim_icons.c io.c
+	$(APPS) $(MENUS) $(FIRMSRCS) sim_icons.c io.c
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
@@ -266,14 +266,14 @@ $(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
 $(OBJDIR)/buffer.o: $(FIRMWAREDIR)/buffer.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/ctype.o: $(COMMON)/ctype.c
-	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
+$(OBJDIR)/random.o: $(COMMON)/random.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/strtok.o: $(COMMON)/strtok.c
 	$(CC) $(CFLAGS) -c $< -o $@
