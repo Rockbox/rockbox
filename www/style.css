@@ -96,7 +96,7 @@ PRE {
 }
 
 
-.rockbox, .changetable, .bugs, .requests, .patches, .dailymod, .buildstatus, .archive, .buttontable, .changesummary
+.rockbox, .changetable, .bugs, .requests, .patches, .dailymod, .buildstatus, .archive, .buttontable, .changesummary, .tools
 {
  border: outset 2px #ffffff;
 }
@@ -116,7 +116,7 @@ PRE {
  vertical-align: top;
 }
 
-.rockbox td, .changetable td, .bugs td, .requests td, .patches td, .archive td, .buttontable td
+.rockbox td, .changetable td, .bugs td, .requests td, .patches td, .archive td, .buttontable td, .tools td
 {
  background-color: #c6d6f5;
  padding: 4px;
@@ -141,4 +141,8 @@ td.fgood {
 
 td.fbad {
  background-color: #f0c0c0;
+}
+
+td.toolscat {
+ background-color: #b6c6e5;
 }
