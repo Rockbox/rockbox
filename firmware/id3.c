@@ -159,9 +159,9 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
  */
 static void setid3v2title(int fd, struct mp3entry *entry) 
 {
-    unsigned int minframesize;
+    int minframesize;
     int size;
-    unsigned int readsize = 0, headerlen;
+    int readsize = 0, headerlen;
     char *title = NULL;
     char *artist = NULL;
     char *album = NULL;
@@ -181,7 +181,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         return;
 
     version = (unsigned short int)header[3];
-	
+    
     /* Read all frames in the tag */
     size = entry->id3v2len - 10;
 
@@ -193,7 +193,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
     *(buffer + size) = '\0';
 
-    /* Set minimun frame size according to ID3v2 version */
+    /* Set minimum frame size according to ID3v2 version */
     if(version > 2)
         minframesize = 12;
     else
@@ -218,7 +218,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 (header[4] << 8) + 
                 (header[5]);
         }
-        if(headerlen < 1)
+
+        /* Continue if the frame length seems bad */
+        if(headerlen > size)
             continue;
         
         /* Check for certain frame headers */
