@@ -25,7 +25,7 @@
 char debugmembuf[100];
 char debugbuf[200];
 
-#ifndef CRT_DISPLAY /* allow non archos platforms to display output */
+#ifndef SIMULATOR /* allow non archos platforms to display output */
 
 static int debug_tx_ready(void)
 {
@@ -187,17 +187,15 @@ void debugf(char *fmt, ...)
 #endif
 }
 
-#else
+#else /* SIMULATOR code coming up */
 
 void debugf(char *fmt, ...)
 {
-#ifdef DEBUG
     va_list ap;
     
     va_start( ap, fmt );
     vsnprintf( debugmembuf, sizeof(debugmembuf), fmt, ap );
     va_end( ap );
-    printf( debugmembuf );
-#endif
+    printf( "%s", debugmembuf );
 }
 #endif
