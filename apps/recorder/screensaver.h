@@ -20,7 +20,6 @@
 #ifndef __SCREEN_SAVER_H__
 #define __SCREEN_SAVER_H__
 
-void ss_loop(void);
 void screensaver(void);
 
 #endif /*__SCREEN_SAVER_H__ */

@@ -34,7 +34,7 @@
 #define SS_TITLE       "Boxes"
 #define SS_TITLE_FONT  2
 
-void ss_loop(void)
+static void ss_loop(void)
 {
     int b;
     int x2 = LCD_WIDTH/2;
