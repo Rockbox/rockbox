@@ -1316,3 +1316,13 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 new: 
+
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+new:
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+new:

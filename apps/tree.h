@@ -24,5 +24,6 @@
 void browse_root(void);
 void set_current_file(char *path);
 bool dirbrowse(char *root);
+bool create_playlist(void);
 
 #endif

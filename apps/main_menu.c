@@ -257,13 +257,14 @@ bool main_menu(void)
     struct menu_items items[] = {
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
+#ifdef HAVE_MAS3587F
+        { str(LANG_RECORDING),          recording_screen  },
+        { str(LANG_RECORDING_SETTINGS), recording_menu    },
+#endif
+        { str(LANG_CREATE_PLAYLIST),    create_playlist },
         { str(LANG_SLEEP_TIMER),        sleeptimer_screen },
 #ifdef HAVE_ALARM_MOD
         { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen    },
-#endif
-#ifdef HAVE_MAS3587F
-        { str(LANG_RECORDING_SETTINGS), recording_menu    },
-        { str(LANG_RECORDING),          recording_screen  },
 #endif
 #ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES

@@ -1419,3 +1419,104 @@ bool dirbrowse(char *root)
 
     return false;
 }
+
+static int plsize = 0;
+static bool add_dir(char* dirname, int fd)
+{
+    bool abort = false;
+    char buf[MAX_PATH/2]; /* saving a little stack... */
+
+    DEBUGF("add_dir(%s)\n",dirname);
+    
+    /* check for user abort */
+#ifdef HAVE_PLAYER_KEYPAD
+    if (button_get(false) == BUTTON_STOP)
+#else
+    if (button_get(false) == BUTTON_OFF)
+#endif
+        return true;
+    
+    DIR* dir = opendir(dirname);
+    if(!dir)
+        return true;
+
+    while (true) {
+        struct dirent *entry;
+
+        entry = readdir(dir);
+        if (!entry)
+            break;
+        if (entry->attribute & ATTR_DIRECTORY) {
+            if (!strcmp(entry->d_name, ".") ||
+                !strcmp(entry->d_name, ".."))
+                continue;
+            snprintf(buf, sizeof buf, "%s/%s", dirname, entry->d_name);
+            if (add_dir(buf,fd)) {
+                abort = true;
+                break;
+            }
+        }
+        else {
+            int x = strlen(entry->d_name);
+            if ((!strcasecmp(&entry->d_name[x-4], ".mp3")) ||
+                (!strcasecmp(&entry->d_name[x-4], ".mp2")) ||
+                (!strcasecmp(&entry->d_name[x-4], ".mpa")))
+            {
+                DEBUGF("adding %s\n",entry->d_name);
+                write(fd, dirname, strlen(dirname));
+                write(fd, "/", 1);
+                write(fd, entry->d_name, x);
+                write(fd, "\n", 1);
+
+                plsize++;
+                snprintf(buf, sizeof buf, "%d", plsize);
+#ifdef HAVE_LCD_BITMAP
+                lcd_puts(0,4,buf);
+                lcd_update();
+#else
+                x = 10;
+                if (plsize > 999)
+                    x=7;
+                else {
+                    if (plsize > 99)
+                        x=8;
+                    else {
+                        if (plsize > 9)
+                            x=9;
+                    }
+                }
+                lcd_puts(x,0,buf);
+#endif
+            }
+        }
+    }
+    closedir(dir);
+
+    return abort;
+}
+
+bool create_playlist(void)
+{
+    int fd;
+    char filename[MAX_PATH];
+
+    snprintf(filename, sizeof filename, "%s.m3u",
+             currdir[1] ? currdir : "/root");
+
+    lcd_clear_display();
+    lcd_puts(0,0,str(LANG_CREATING));
+    lcd_puts_scroll(0,1,filename);
+    lcd_update();
+
+    fd = creat(filename,0);
+    if (!fd)
+        return false;
+
+    plsize = 0;
+    add_dir(currdir[1] ? currdir : "/", fd);
+    close(fd);
+    sleep(HZ);
+    
+    return false;
+}
+
