@@ -1367,7 +1367,7 @@ bool set_time(char* string, int timedate[])
                        str(LANG_WEEKDAY_MONDAY),
                        str(LANG_WEEKDAY_TUESDAY),
                        str(LANG_WEEKDAY_WEDNESDAY),
-                       str(LANF_WEEKDAY_THURSDAY),
+                       str(LANG_WEEKDAY_THURSDAY),
                        str(LANG_WEEKDAY_FRIDAY),
                        str(LANG_WEEKDAY_SATURDAY)};
     char *monthname[] = {str(LANG_MONTH_JANUARY),
