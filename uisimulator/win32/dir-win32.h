@@ -20,6 +20,8 @@
 #ifndef __FILE_WIN32_H__
 #define __FILE_WIN32_H__
 
+#define mkdir(x) dos_mkdir(x)
+
 #include <io.h>
 #include "dir.h"
 
