@@ -31,6 +31,7 @@ int rtc_write(unsigned char address, unsigned char value);
 void rtc_set_alarm(int h, int m);
 void rtc_get_alarm(int *h, int *m);
 bool rtc_enable_alarm(bool enable);
+bool rtc_check_alarm_started(bool release_alarm);
 #endif /* HAVE_ALARM_MOD */
 
 #endif /* HAVE_RTC */

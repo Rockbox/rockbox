@@ -60,6 +60,7 @@
 #include "filetree.h"
 #include "dbtree.h"
 #include "recorder/recording.h"
+#include "rtc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -434,8 +435,11 @@ static bool ask_resume(bool ask_once)
         return false;
     }
     
+    if ( rtc_check_alarm_started(true) ) 
+       return true;
+
     /* always resume? */
-    if ( global_settings.resume == RESUME_ON )
+    if ( global_settings.resume == RESUME_ON)
         return true;
 
     lcd_clear_display();

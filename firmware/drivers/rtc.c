@@ -28,7 +28,13 @@
 
 void rtc_init(void)
 {
-    unsigned char data;
+    unsigned char data; 
+
+#ifdef HAVE_ALARM_MOD
+    /* Check + save alarm bit first, since something in rtc_init resets AF */
+    rtc_check_alarm_started(false);
+#endif
+
     rtc_write(0x13, 0x10); /* 32 kHz square wave */
 
     /* Clear the Stop bit if it is set */
@@ -66,6 +72,25 @@ void rtc_init(void)
 }
 
 #ifdef HAVE_ALARM_MOD    
+
+/* check whether the unit has been started by the RTC alarm function */
+/* (check for AF, which => started using wakeup alarm) */
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    static bool alarm_state, run_before;
+    bool rc;
+
+    if (run_before) {
+        rc = alarm_state;
+        alarm_state &= ~release_alarm;
+    } else { 
+        /* This call resets AF, so we store the state for later recall */ 
+        rc = alarm_state = ((rtc_read(0x0f) & 0x40) != 0);
+        run_before = true; 
+    }
+ 
+    return rc;
+}
 
 /* set alarm time registers to the given time (repeat once per day) */
 void rtc_set_alarm(int h, int m)
@@ -114,7 +139,7 @@ bool rtc_enable_alarm(bool enable)
         data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
     rtc_write(0x0a, data);
     
-    /* check if alarm flag AF is off (as it sould be) */
+    /* check if alarm flag AF is off (as it should be) */
     if ((rtc_read(0x0f) & 0x40) != 0) /* on */
     {
        data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
