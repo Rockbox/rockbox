@@ -612,7 +612,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
     }
 
     DEBUGF("Old ID3V2 length: %x\n", entry->id3v2len);
-    entry->id3v2len = bytecount;
+    /* Adjust the tag length only if there is a tag present */
+    if(entry->id3v2len)
+        entry->id3v2len = bytecount;
     DEBUGF("New ID3V2 length: %x\n", bytecount);
     
     return filetime;
