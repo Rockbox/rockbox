@@ -296,7 +296,7 @@ frame length may change from frame to frame due to padding or bitrate switching.
 <P ALIGN=LEFT>For Layer II & III files use this formula:
 <P ALIGN=CENTER>FrameLengthInBytes = 144 * BitRate / SampleRate + Padding 
 <P>Example:<BR>
-Layer III, BitRate=128000, SampleRate=441000, Padding=0<BR>
+Layer III, BitRate=128000, SampleRate=44100, Padding=0<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ==&gt;&nbsp; FrameSize=417 bytes 
 </TD></TR>
 
