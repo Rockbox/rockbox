@@ -194,3 +194,9 @@ int rtc_write(int address, int value)
   DEBUGF("write %x to address %x\n", value, address);
   return 0;
 }
+
+bool oscillograph(void)
+{
+  /* does nothing */
+  return false;
+}
