@@ -49,9 +49,6 @@ char* playlist_next(int type)
       max = read(fd, now_playing+1, sizeof(now_playing)-1);
       close(fd);
 
-      /* Only absolute paths allowed */
-      now_playing[0] = '/';
-      
       /* Zero-terminate the file name */
       seek=0;
       while((now_playing[seek] != '\n') &&
@@ -61,18 +58,28 @@ char* playlist_next(int type)
 
       now_playing[seek]=0;
 
-      return now_playing;
+      if('/' == now_playing[1])
+          return &now_playing[1];
+      else
+          return now_playing;
     }
     else
-      return NULL;
+        return NULL;
 }
 
 void play_list(char *dir, char *file)
 {
+    char *sep="";
     empty_playlist(&playlist);
 
+    /* If the dir does not end in trailing new line, we use a separator.
+       Otherwise we don't. */
+    if('/' != dir[strlen(dir)-1])
+        sep="/";
+
     snprintf(playlist.filename, sizeof(playlist.filename),
-             "%s/%s", dir, file);
+             "%s%s%s", 
+             dir, sep, file);
 
     /* add track indices to playlist data structure */
     add_indices_to_playlist(&playlist);
