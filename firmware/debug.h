@@ -21,9 +21,6 @@
 
 extern void debug_init(void);
 extern void debugf(char* fmt,...);
-#ifndef SIMULATOR
-extern void dbg_ports(void);
-#endif
 
 #ifdef __GNUC__
 

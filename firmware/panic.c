@@ -23,7 +23,7 @@
 #include "lcd.h"
 #include "debug.h"
 
-char panic_buf[128];
+static char panic_buf[128];
 
 /*
  * "Dude. This is pretty fucked-up, right here." 

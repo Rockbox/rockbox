@@ -54,20 +54,23 @@ struct user_settings
 
     int loop_playlist; /* do we return to top of playlist at end?            */
     bool mp3filter;
-    int scroll_speed;
+    int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
 
     /* while playing screen settings  */
-    int wps_display;
-
+    int wps_display;   /* 0=id3, 1=file, 2=parse */
+    
+    /* geeky persistent statistics */
+    unsigned short total_boots; /* how many times the device has been booted */
+    unsigned int total_uptime; /* total uptime since rockbox was first booted */
 };
 
 /* prototypes */
 
-int persist_all_settings( void );
-void reload_all_settings( struct user_settings *settings );
-void reset_settings( struct user_settings *settings );
-void display_current_settings( struct user_settings *settings );
+int settings_save(void);
+void settings_load(void);
+void settings_reset(void);
+void settings_display(void);
 
 void set_bool(char* string, bool* variable );
 void set_option(char* string, int* variable, char* options[], int numoptions );

@@ -41,6 +41,7 @@
 #include "thread.h"
 #include "settings.h"
 #include "backlight.h"
+#include "debug_menu.h"
 
 #include "version.h"
 
@@ -63,7 +64,7 @@ void init(void)
     init_threads();
     lcd_init();
     show_logo();
-    reset_settings(&global_settings);
+    settings_reset();
     sleep(HZ/2);
 }
 
@@ -81,7 +82,7 @@ void init(void)
     system_init();
     kernel_init();
 
-    reset_settings(&global_settings);
+    settings_reset();
     
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
@@ -114,12 +115,12 @@ void init(void)
         lcd_puts(0, 1, str);
         lcd_puts(0, 3, "Press ON to debug");
         lcd_update();
-        while(button_get(true) != BUTTON_ON) {};
+        while(button_get(true) != BUTTON_ON);
         dbg_ports();
 #endif
         panicf("ata: %d", rc);
     }
-        
+    
     pinfo = disk_init();
     if (!pinfo)
         panicf("disk: NULL");
@@ -127,6 +128,10 @@ void init(void)
     rc = fat_mount(pinfo[0].start);
     if(rc)
         panicf("mount: %d",rc);
+    
+    settings_load();
+    global_settings.total_boots++;
+    settings_save();
     
     mpeg_init( global_settings.volume,
                global_settings.bass,

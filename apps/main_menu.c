@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "main_menu.h"
 #include "version.h"
-#include "debug.h"
+#include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
 #include "playlist.h"
@@ -116,9 +116,23 @@ void show_credits(void)
         sleep((HZ*2)/10);
 
         if (button_get(false))
-            return;	
+            return;
     }
     roll_credits();
+}
+
+void show_info(void)
+{
+    char s[32];
+    
+    lcd_clear_display();
+    lcd_puts(0, 0, "Rockbox info:");
+    /* TODO: add disk size/usage info, battery charge etc here? */
+    snprintf(s, sizeof(s), "Booted: %d times", global_settings.total_boots);
+    lcd_puts(0, 2, s);
+    lcd_update();
+    
+    button_get(true);
 }
 
 void main_menu(void)
@@ -133,9 +147,10 @@ void main_menu(void)
         { "Games",              games_menu        },
         { "Screensavers",       screensavers_menu },
 #endif
+        { "Info",               show_info         },
         { "Version",            show_credits      },
 #ifndef SIMULATOR
-        { "Debug (keep out!)",  dbg_ports         },
+        { "Debug (keep out!)",  debug_menu        },
 #endif
     };
 

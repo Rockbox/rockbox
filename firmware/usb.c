@@ -32,6 +32,9 @@
 #include "button.h"
 #include "sprintf.h"
 
+#ifdef ARCHOS_RECORDER
+extern void dbg_ports(void);
+#endif
 
 #define USB_REALLY_BRAVE
 
