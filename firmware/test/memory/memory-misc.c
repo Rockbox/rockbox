@@ -16,13 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define __LIBRARY_MEMORY_C__
 #include <memory.h>
-#include "memory-page.h"
-#if 0
-#  include "memory-slab.h"
-#  include "memory-block.h"
-#endif
 
 /* NOT VERY OPTIMIZED AT ALL BUT WE WILL DO IT WHEN PRIORITY COMES */
 void memory_copy (void *target,void const *source,unsigned int count)
