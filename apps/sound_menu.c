@@ -105,6 +105,10 @@ void set_sound(char* string,
                 break;
         }
         mpeg_sound_set(setting, *variable);
+#ifdef HAVE_MAS3507D
+        if(setting == SOUND_BALANCE)
+            mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#endif
     }
     lcd_stop_scroll();
 }
@@ -112,6 +116,11 @@ void set_sound(char* string,
 static void volume(void)
 {
     set_sound("Volume", &global_settings.volume, SOUND_VOLUME);
+}
+
+static void balance(void)
+{
+    set_sound("Balance", &global_settings.balance, SOUND_BALANCE);
 }
 
 static void bass(void)
@@ -150,6 +159,7 @@ void sound_menu(void)
         { "Volume", volume },
         { "Bass",   bass },
         { "Treble", treble },
+        { "Balance", balance },
 #ifdef HAVE_MAS3587F
         { "Loudness", loudness },
         { "Bass Boost", bass_boost },

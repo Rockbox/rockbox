@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc);
+void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc);
 void mpeg_play(char* trackname);
 void mpeg_stop(void);
 void mpeg_pause(void);
@@ -44,15 +44,9 @@ bool mpeg_has_changed_track(void);
 #define SOUND_BASS 1
 #define SOUND_TREBLE 2
 #define SOUND_BALANCE 3
-
-#ifdef HAVE_MAS3587F
 #define SOUND_LOUDNESS 4
 #define SOUND_SUPERBASS 5
 #define SOUND_AVC 6
 #define SOUND_NUMSETTINGS 7
-#else
-#define SOUND_DEEMPH 4
-#define SOUND_NUMSETTINGS 5
-#endif
 
 #endif

@@ -97,13 +97,6 @@ extern struct user_settings global_settings;
 
 /* system defines */
 
-#define DEFAULT_VOLUME_SETTING     70/2
-#define DEFAULT_BALANCE_SETTING    50
-#define DEFAULT_BASS_SETTING       50/2
-#define DEFAULT_TREBLE_SETTING     50/2
-#define DEFAULT_LOUDNESS_SETTING    0
-#define DEFAULT_BASS_BOOST_SETTING  0
-#define DEFAULT_AVC_SETTING         0
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_CONTRAST_SETTING        31
 #define DEFAULT_CONTRAST_SETTING    30

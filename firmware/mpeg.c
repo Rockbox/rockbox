@@ -59,7 +59,7 @@ static char *units[] =
     "%",    /* Volume */
     "dB",   /* Bass */
     "dB",   /* Treble */
-    "",     /* Balance */
+    "%",    /* Balance */
     "dB",   /* Loudness */
     "%"     /* Bass boost */
 };
@@ -79,7 +79,7 @@ static int minval[] =
     0,    /* Volume */
     0,    /* Bass */
     0,    /* Treble */
-    0,    /* Balance */
+    -50,  /* Balance */
     0,    /* Loudness */
     0     /* Bass boost */
 };
@@ -94,7 +94,7 @@ static int maxval[] =
     30,    /* Bass */
     30,    /* Treble */
 #endif
-    100,   /* Balance */
+    50,    /* Balance */
     17,    /* Loudness */
     10     /* Bass boost */
 };
@@ -109,7 +109,7 @@ static int defaultval[] =
     15+7,    /* Bass */
     15+7,    /* Treble */
 #endif
-    50,      /* Balance */
+    0,       /* Balance */
     0,       /* Loudness */
     0        /* Bass boost */
 };
@@ -1266,10 +1266,11 @@ bool mpeg_is_playing(void)
 
 #ifndef SIMULATOR
 #ifdef HAVE_MAS3507D
-int current_volume=0;  /* all values in tenth of dB */
-int current_treble=0;
-int current_bass=0;
-int current_balance=0;
+int current_left_volume = 0;  /* all values in tenth of dB */
+int current_right_volume = 0;  /* all values in tenth of dB */
+int current_treble = 0;
+int current_bass = 0;
+int current_balance = 0;
 
 /* convert tenth of dB volume to register value */
 static int tenthdb2reg(int db) {
@@ -1292,14 +1293,9 @@ void set_prescaled_volume(void)
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
     
     /* gain up the analog volume to compensate the prescale reduction gain */
-    r = l = current_volume + prescale;
+    l = current_left_volume + prescale;
+    r = current_right_volume + prescale;
 
-    /* balance */
-    if (current_balance >= 0)
-        l -= current_balance;
-    else
-        r += current_balance;
-    
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 }
 #endif /* HAVE_MAS3507D */
@@ -1310,7 +1306,11 @@ void mpeg_sound_set(int setting, int value)
 #ifdef SIMULATOR
     setting = value;
 #else
+#ifdef HAVE_MAS3507D
+    int l, r;
+#else
     int tmp;
+#endif
     
     switch(setting)
     {
@@ -1321,12 +1321,41 @@ void mpeg_sound_set(int setting, int value)
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
 #else
-            tmp = 0x38 * value / 100;
+            l = value;
+            r = value;
+            
+            if(current_balance > 0)
+            {
+                l -= current_balance;
+                if(l < 0)
+                    l = 0;
+            }
+            
+            if(current_balance < 0)
+            {
+                r += current_balance;
+                if(r < 0)
+                    r = 0;
+            }
+            
+            l = 0x38 * l / 100;
+            r = 0x38 * r / 100;
 
             /* store volume in tenth of dB */
-            current_volume = ( tmp < 0x08 ? tmp*30 - 780 : tmp*15 - 660 );
+            current_left_volume = ( l < 0x08 ? l*30 - 780 : l*15 - 660 );
+            current_right_volume = ( r < 0x08 ? r*30 - 780 : r*15 - 660 );
 
             set_prescaled_volume();
+#endif
+            break;
+
+        case SOUND_BALANCE:
+#ifdef HAVE_MAS3587F
+            tmp = ((value * 127 / 100) & 0xff) << 8;
+            mas_codec_writereg(0x11, tmp & 0xff00);
+#else
+            /* Convert to percent */
+            current_balance = value * 2;
 #endif
             break;
 
@@ -1415,6 +1444,10 @@ int mpeg_val2phys(int setting, int value)
             result = value * 2;
             break;
         
+        case SOUND_BALANCE:
+            result = value * 2;
+            break;
+        
         case SOUND_BASS:
 #ifdef HAVE_MAS3587F
             result = value - 12;
@@ -1444,7 +1477,7 @@ int mpeg_val2phys(int setting, int value)
     return result;
 }
 
-void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc)
+void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
     volume = bass = treble = loudness = bass_boost = avc;
@@ -1556,6 +1589,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
     
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);
+    mpeg_sound_set(SOUND_BALANCE, balance);
     mpeg_sound_set(SOUND_VOLUME, volume);
     
 #ifdef HAVE_MAS3587F

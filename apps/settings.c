@@ -39,7 +39,7 @@ struct user_settings global_settings;
 
 static unsigned short last_checksum = 0;
 
-#define CONFIG_BLOCK_VERSION 0
+#define CONFIG_BLOCK_VERSION 1
 #define CONFIG_BLOCK_SIZE 44
 
 /********************************************
@@ -339,12 +339,12 @@ void settings_reset(void) {
     DEBUGF( "settings_reset()\n" );
 
     global_settings.volume      = mpeg_sound_default(SOUND_VOLUME);
-    global_settings.balance     = DEFAULT_BALANCE_SETTING;
+    global_settings.balance     = mpeg_sound_default(SOUND_BALANCE);
     global_settings.bass        = mpeg_sound_default(SOUND_BASS);
     global_settings.treble      = mpeg_sound_default(SOUND_TREBLE);
-    global_settings.loudness    = DEFAULT_LOUDNESS_SETTING;
-    global_settings.bass_boost  = DEFAULT_BASS_BOOST_SETTING;
-    global_settings.avc         = DEFAULT_AVC_SETTING;
+    global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
+    global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
+    global_settings.avc         = mpeg_sound_default(SOUND_AVC);
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
