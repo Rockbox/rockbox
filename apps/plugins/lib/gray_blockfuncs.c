@@ -54,7 +54,6 @@ static void _writeblock(unsigned char *address, unsigned mask, unsigned bits)
      * see there for an explanation) for all 8 pixels and put them on an
      * extra stack */
     asm (
-        "sts.l   pr,@-r15        \n"  /* save pr (fix GCC331 build, cleaner) */
         "mov     #8,r3           \n"  /* loop count in r3: 8 pixels */
         "mov     %6,r2           \n"  /* copy mask */
 
@@ -104,7 +103,6 @@ static void _writeblock(unsigned char *address, unsigned mask, unsigned bits)
         "add     #-1,r3          \n"  /* decrease loop count */
         "cmp/pl  r3              \n"  /* loop count > 0? */
         "bt      .wb_loop        \n"  /* yes: loop */
-        "lds.l   @r15+,pr        \n"  /* retsore pr */
         : /* outputs */
         /* %0, in & out */ "+r"(_gray_random_buffer),
         /* %1, in & out */ "+r"(pat_ptr)
@@ -116,7 +114,7 @@ static void _writeblock(unsigned char *address, unsigned mask, unsigned bits)
         /* %6 */ "r"(mask),
         /* %7 */ "r"(bits)
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r4", "r5", "macl"
+        "r0", "r1", "r2", "r3", "r4", "r5", "macl", "pr"
     );
 
     end_addr = address + MULU16(_graybuf->depth, _graybuf->plane_size);
