@@ -275,6 +275,13 @@ static bool plugin_browse(void)
 }
 
 #ifdef HAVE_RECORDING
+#ifdef SIMULATOR
+bool recording_screen(void)
+{
+    /* a dummy */
+}
+#endif
+
 static bool recording_settings(void)
 {
     return recording_menu(false);
@@ -350,7 +357,7 @@ bool main_menu(void)
     }
 #endif
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
     items[i].desc = ID2P(LANG_RECORDING);
     items[i++].function = rec_menu;
 #endif
