@@ -28,6 +28,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef SIMULATOR
+#include <fcntl.h>
+#endif
+
 struct mp3entry {
     char *path;
     char *title;
@@ -126,20 +130,19 @@ stripspaces(char *buffer)
  * Returns: TRUE if a title was found and created, else FALSE
  */
 static bool 
-setid3v1title(FILE *file, mp3entry *entry) 
+setid3v1title(int fd, mp3entry *entry) 
 {
     char buffer[31];
     int offsets[3] = {-95,-65,-125};
     int i;
-
     static char keepit[3][32];
 
     for(i=0;i<3;i++) {
-        if(fseek(file, offsets[i], SEEK_END) != 0)
+        if(-1 == lseek(fd, offsets[i], SEEK_END))
             return FALSE;
 
         buffer[0]=0;
-        fgets(buffer, 31, file);
+        read(fd, buffer, 31);
         stripspaces(buffer);
         
         if(buffer[0]) {
@@ -173,10 +176,10 @@ setid3v1title(FILE *file, mp3entry *entry)
  * Returns: TRUE if a title was found and created, else FALSE
  */
 static void
-setid3v2title(FILE *file, mp3entry *entry) 
+setid3v2title(int fd, mp3entry *entry) 
 {
     unsigned int minframesize;
-    unsigned int size;
+    int size;
     unsigned int readsize = 0, headerlen;
     char *title = NULL;
     char *artist = NULL;
@@ -191,17 +194,17 @@ setid3v2title(FILE *file, mp3entry *entry)
         return;
 
     /* Check version */
-    fseek(file, 0, SEEK_SET);
-    fread(header, sizeof(char), 10, file);
+    lseek(fd, 0, SEEK_SET);
+    read(fd, header, 10);
     version = (unsigned short int)header[3];
 	
     /* Read all frames in the tag */
     size = entry->id3v2len - 10;
 
-    if(size >= sizeof(buffer))
+    if(size >= (int)sizeof(buffer))
         size = sizeof(buffer)-1;
 
-    if(size != fread(buffer, sizeof(char), size, file)) {
+    if(size != read(fd, buffer, size)) {
         free(buffer);
         return;
     }
@@ -291,18 +294,18 @@ setid3v2title(FILE *file, mp3entry *entry)
  * Returns: the size of the tag or 0 if none was found
  */
 static int 
-getid3v2len(FILE *file) 
+getid3v2len(int fd) 
 {
     char buf[6];
     int offset;
 	
     /* Make sure file has a ID3 tag */
-    if((fseek(file, 0, SEEK_SET) != 0) ||
-       (fread(buf, sizeof(char), 6, file) != 6) ||
+    if((-1 == lseek(fd, 0, SEEK_SET)) ||
+       (read(fd, buf, 6) != 6) ||
        (strncmp(buf, "ID3", strlen("ID3")) != 0))
         offset = 0;
     /* Now check what the ID3v2 size field says */
-    else if(fread(buf, sizeof(char), 4, file) != 4)
+    else if(read(fd, buf, 4) != 4)
         offset = 0;
     else
         offset = UNSYNC(buf[0], buf[1], buf[2], buf[3]) + 10;
@@ -311,13 +314,16 @@ getid3v2len(FILE *file)
 }
 
 static int
-getfilesize(FILE *file)
+getfilesize(int fd)
 {
+    int size;
+    
     /* seek to the end of it */
-    if(fseek(file, 0, SEEK_END)) 
+    size = lseek(fd, 0, SEEK_END);
+    if(-1 == size)
         return 0; /* unknown */
 
-    return ftell(file);
+    return size;
 }
 
 /*
@@ -328,14 +334,14 @@ getfilesize(FILE *file)
  * Returns: the size of the tag or 0 if none was found
  */
 static int 
-getid3v1len(FILE *file) 
+getid3v1len(int fd) 
 {
     char buf[3];
     int offset;
 
     /* Check if we find "TAG" 128 bytes from EOF */
-    if((fseek(file, -128, SEEK_END) != 0) ||
-       (fread(buf, sizeof(char), 3, file) != 3) ||
+    if((lseek(fd, -128, SEEK_END) != 0) ||
+       (read(fd, buf, 3) != 3) ||
        (strncmp(buf, "TAG", 3) != 0))
         offset = 0;
     else
@@ -359,7 +365,7 @@ getid3v1len(FILE *file)
  *          -1 means that it couldn't be calculated
  */
 static int 
-getsonglength(FILE *file, mp3entry *entry)
+getsonglength(int fd, mp3entry *entry)
 {
     long header;
     int version;
@@ -373,13 +379,13 @@ getsonglength(FILE *file, mp3entry *entry)
     long tpf;
 
     /* Start searching after ID3v2 header */ 
-    if(fseek(file, entry->id3v2len, SEEK_SET))
+    if(-1 == lseek(fd, entry->id3v2len, SEEK_SET))
         return -1;
 	
     /* Fill up header with first 24 bits */
     for(version = 0; version < 3; version++) {
         header <<= 8;
-        if(!fread(&header, 1, 1, file))
+        if(!read(fd, &header, 1))
             return -1;
     }
 	
@@ -387,7 +393,7 @@ getsonglength(FILE *file, mp3entry *entry)
  restart:
     do {
         header <<= 8;
-        if(!fread(&header, 1, 1, file))
+        if(!read(fd, &header, 1))
             return -1;
     } while(!CHECKSYNC(header));
 	
@@ -491,27 +497,28 @@ getsonglength(FILE *file, mp3entry *entry)
 bool
 mp3info(mp3entry *entry, char *filename) 
 {
-    FILE *file;
-    if((file = fopen(filename, "r")) == NULL)
+    int fd;
+    fd = open(filename, O_RDONLY);
+    if(-1 == fd)
         return TRUE;
 
     memset(entry, 0, sizeof(mp3entry));
 
     entry->path = filename;
 
-    entry->filesize = getfilesize(file);
-    entry->id3v2len = getid3v2len(file);
-    entry->id3v1len = getid3v1len(file);
-    entry->length = getsonglength(file, entry);
+    entry->filesize = getfilesize(fd);
+    entry->id3v2len = getid3v2len(fd);
+    entry->id3v1len = getid3v1len(fd);
+    entry->length = getsonglength(fd, entry);
     entry->title = NULL;
 
     if(HASID3V2(entry))
-        setid3v2title(file, entry);
+        setid3v2title(fd, entry);
 
     if(HASID3V1(entry) && !entry->title)
-        setid3v1title(file, entry);
-	
-    fclose(file);
+        setid3v1title(fd, entry);
+
+    close(fd);
 
     return FALSE;
 }
