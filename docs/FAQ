@@ -291,12 +291,19 @@ Q35: When I use RockBox my jukebox's red "error" light turns on a lot, but this
 A35: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
 
-Q36: How do I use the loadable fonts?
-A36: Loadable fonts are a work in progress.  We do not have full documentation
-     for it.  The best we can do now is tell you that you need a valid .bdf
-     font, and to use the tool "bdf2ajf" from CVS to conver to the .ajf format.
-     The final .ajf font must be stored in the archos root as 'system.ajf'
-     We do expect more documentation on this process shortly.
+Q36: How do I use the loadable fonts? (Recorder-only)
+A36: They are files using an .fnt extension. Just press PLAY on a font you
+     want to use and voila, Rockbox will use it. If the font is put in your
+     /.rockbox directory, your choice will be remembered by Rockbox and thus
+     become your selected font every time you start it in the future.
+     Download fonts from http://rockbox.haxx.se/fonts/
+
+     You can also make your own font. Create one using the "standard" BDF
+     format and then convert that into the Rockbox .fnt format using the
+     convbdf tool.
+
+     Loadable fonts are introduced in the 1.4 release, they did not work in
+     the 1.3.
 
 Q37: I have a question about the batteries...
 A37: STOP!  We have put together a completely different FAQ for battery 
