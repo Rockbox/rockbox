@@ -2,13 +2,13 @@
 #define _PAGE_ Open Source Jukebox Firmware
 #include "head.t"
 
-<p><small><a href="docs/FAQ">faq</a> &middot;
+<p><small><a href="docs/FAQ">FAQ</a> &middot;
 <a href="notes.html">research notes</a> &middot;
 <a href="docs/">data sheets</a> &middot;
 <a href="schematics/">schematics</a> &middot;
 <a href="mods/">hardware mods</a> &middot;
 <a href="http://bjorn.haxx.se/rockbox/mail.cgi">mail list archive</a> &middot;
-<a href="irc/">irc logs</a> &middot;
+<a href="irc/">IRC</a> &middot;
 <a href="tools.html">tools</a> &middot;
 <a href="internals/">photos</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a> &middot;
