@@ -856,7 +856,6 @@ static int onplay_screen(char* dir, char* file)
                     int btn = button_get(true);
                     switch (btn) {
                         case BUTTON_PLAY:
-                        case BUTTON_PLAY | BUTTON_REL:
                             if (!remove(buf)) {
                                 reload_dir = true;
                                 lcd_clear_display();
