@@ -51,6 +51,26 @@
 
 #ifdef HAVE_RECORDING
 
+
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define REC_STOPEXIT BUTTON_OFF
+#define REC_RECPAUSE BUTTON_PLAY
+#define REC_INC BUTTON_RIGHT
+#define REC_DEC BUTTON_LEFT
+#define REC_NEXT BUTTON_DOWN
+#define REC_PREV BUTTON_UP
+#define REC_SETTINGS BUTTON_F1
+#define REC_F2 BUTTON_F2
+#define REC_F3 BUTTON_F3
+#elif CONFIG_KEYPAD == ONDIO_PAD /* only limited features */
+#define REC_STOPEXIT BUTTON_OFF
+#define REC_RECPAUSE BUTTON_RIGHT
+#define REC_INC BUTTON_UP
+#define REC_DEC BUTTON_DOWN
+#define REC_NEXT (BUTTON_MENU | BUTTON_REL) 
+#define REC_SETTINGS (BUTTON_MENU | BUTTON_REPEAT) 
+#endif
+
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
 
@@ -168,10 +188,12 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
+/*
 #if CONFIG_KEYPAD != RECORDER_PAD
     splash(HZ*2, true, "Recording not supported yet");
     return false;
 #else
+*/
     int button;
     bool done = false;
     char buf[32];
@@ -248,7 +270,7 @@ bool recording_screen(void)
         button = button_get_w_tmo(HZ / peak_meter_fps);
         switch(button)
         {
-            case BUTTON_OFF:
+            case REC_STOPEXIT:
                 if(mpeg_status() & MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
@@ -262,7 +284,7 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
 
-            case BUTTON_PLAY:
+            case REC_RECPAUSE:
                 /* Only act if the mpeg is stopped */
                 if(!(mpeg_status() & MPEG_STATUS_RECORD))
                 {
@@ -286,20 +308,24 @@ bool recording_screen(void)
                 }
                 break;
 
-            case BUTTON_UP:
+#ifdef REC_PREV
+            case REC_PREV:
                 cursor--;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
+#endif
 
-            case BUTTON_DOWN:
+#ifdef REC_NEXT
+            case REC_NEXT:
                 cursor++;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
+#endif
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case REC_INC:
+            case REC_INC | BUTTON_REPEAT:
                 switch(cursor)
                 {
                     case 0:
@@ -340,8 +366,8 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
                 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case REC_DEC:
+            case REC_DEC | BUTTON_REPEAT:
                 switch(cursor)
                 {
                     case 0:
@@ -382,7 +408,8 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
                 
-            case BUTTON_F1:
+#ifdef REC_SETTINGS
+            case REC_SETTINGS:
                 if (recording_menu(false))
                     return SYS_USB_CONNECTED;
                 settings_save();
@@ -404,8 +431,10 @@ bool recording_screen(void)
                 lcd_setfont(FONT_SYSFIXED);
                 lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
                 break;
+#endif
 
-            case BUTTON_F2:
+#ifdef REC_F2
+            case REC_F2:
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     if (f2_rec_screen())
@@ -417,8 +446,10 @@ bool recording_screen(void)
                         update_countdown = 1; /* Update immediately */
                 }
                 break;
+#endif
 
-            case BUTTON_F3:
+#ifdef REC_F3
+            case REC_F3:
                 if(mpeg_status() & MPEG_STATUS_RECORD)
                 {
                     mpeg_new_file(rec_create_filename(path_buffer));
@@ -438,6 +469,7 @@ bool recording_screen(void)
                     }
                 }
                 break;
+#endif
 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
@@ -607,7 +639,7 @@ bool recording_screen(void)
         while(1)
         {
             button = button_get(true);
-            if(button == (BUTTON_OFF | BUTTON_REL))
+            if(button == (REC_STOPEXIT | BUTTON_REL))
                 break;
         }
     }
@@ -624,10 +656,12 @@ bool recording_screen(void)
         reload_directory();
 
     return been_in_usb_mode;
-#endif    
+/*
+#endif
+*/
 }
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef REC_F2
 bool f2_rec_screen(void)
 {
     bool exit = false;
@@ -744,7 +778,9 @@ bool f2_rec_screen(void)
 
     return false;
 }
+#endif /* #ifdef REC_F2 */
 
+#ifdef REC_F3
 bool f3_rec_screen(void)
 {
     bool exit = false;
@@ -820,5 +856,6 @@ bool f3_rec_screen(void)
 
     return false;
 }
-#endif
+#endif /* #ifdef REC_F3 */
+
 #endif /* HAVE_RECORDING */
