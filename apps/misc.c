@@ -233,9 +233,9 @@ bool clean_shutdown(void)
     return false;
 }
 
-int default_event_handler(int button)
+int default_event_handler(int event)
 {
-    switch(button)
+    switch(event)
     {
         case SYS_USB_CONNECTED:
             usb_screen();

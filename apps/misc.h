@@ -40,6 +40,6 @@ void screen_dump(void);
 
 bool settings_parseline(char* line, char** name, char** value);
 bool clean_shutdown(void);
-int default_event_handler(int button);
+int default_event_handler(int event);
 
 #endif
