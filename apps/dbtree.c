@@ -286,8 +286,7 @@ int db_load(struct tree_context* c)
         
         /* next name is stored immediately after this */
         nptr = (void*)nptr + strlen((char*)nptr) + 1;
-        if ((void*)nptr > (void*)end_of_nbuf) {
-            DEBUGF("Name buffer overflow (%d)\n",i);
+        if ((void*)nptr + stringlen > (void*)end_of_nbuf) {
             c->dirfull = true;
             break;
         }
