@@ -1,5 +1,5 @@
 Custom WPS Display
-wps.config File Format Specifications
+File Format Specifications
 
 Description / General Info
 --------------------------
@@ -13,8 +13,10 @@ Description / General Info
 
 File Location
 -------------
-The configuration file must be located in the /.rockbox folder of the
-device and must be named default.wps (lowercase)
+The default configuration file must be located in the /.rockbox folder
+of the evice and must be named default.wps (lowercase). Any other Custom
+WPS files may be located anywhere on the drive. The only restriction
+is that they must end in .wps
 
 Tags
 ----
