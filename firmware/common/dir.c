@@ -55,7 +55,7 @@ DIR* opendir(char* name)
         return NULL;
     }
 
-    if ( fat_opendir(&(opendirs[dd].fatdir), 0) < 0 ) {
+    if ( fat_opendir(&(opendirs[dd].fatdir), 0, NULL) < 0 ) {
         DEBUGF("Failed opening root dir\n");
         opendirs[dd].busy = false;
         return NULL;
@@ -75,8 +75,10 @@ DIR* opendir(char* name)
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
+                opendirs[dd].parent_dir = opendirs[dd].fatdir;
                 if ( fat_opendir(&(opendirs[dd].fatdir),
-                                 entry.firstcluster) < 0 ) {
+                                 entry.firstcluster,
+                                 &(opendirs[dd].parent_dir)) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",
                            part, entry.firstcluster);
                     opendirs[dd].busy = false;
@@ -175,6 +177,44 @@ int mkdir(char *name, int mode)
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
     
+    closedir(dir);
+    
+    return rc;
+}
+
+int rmdir(char* name)
+{
+    int rc;
+    DIR* dir;
+    struct dirent* entry;
+    
+    dir = opendir(name);
+    if (!dir)
+    {
+        errno = ENOENT; /* open error */
+        return -1;
+    }
+
+    /* check if the directory is empty */
+    while ((entry = readdir(dir)))
+    {
+        if (strcmp(entry->d_name, ".") &&
+            strcmp(entry->d_name, ".."))
+        {
+            DEBUGF("rmdir error: not empty\n");
+            errno = ENOTEMPTY;
+            closedir(dir);
+            return -2;
+        }
+    }
+
+    rc = fat_remove(&(dir->fatdir.file));
+    if ( rc < 0 ) {
+        DEBUGF("Failed removing dir: %d\n", rc);
+        errno = EIO;
+        rc = rc * 10 - 3;
+    }
+
     closedir(dir);
     
     return rc;

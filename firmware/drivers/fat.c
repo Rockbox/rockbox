@@ -1543,6 +1543,10 @@ int fat_remove(struct fat_file* file)
     file->firstcluster = 0;
     file->dircluster = 0;
 
+    rc = flush_fat();
+    if (rc < 0)
+        return rc * 10 - 2;
+
     return 0;
 }
 
@@ -1561,7 +1565,7 @@ int fat_rename(struct fat_file* file,
     }
 
     /* create a temporary file handle */
-    rc = fat_opendir(&dir, file->dircluster);
+    rc = fat_opendir(&dir, file->dircluster, NULL);
     if (rc < 0)
         return rc * 10 - 2;
 
@@ -1796,14 +1800,15 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
     return 0;
 }
 
-int fat_opendir(struct fat_dir *dir, unsigned int startcluster)
+int fat_opendir(struct fat_dir *dir, unsigned int startcluster,
+                struct fat_dir *parent_dir)
 {
     int rc;
 
     if (startcluster == 0)
         startcluster = sec2cluster(fat_bpb.rootdirsector);
 
-    rc = fat_open(startcluster, &dir->file, NULL);
+    rc = fat_open(startcluster, &dir->file, parent_dir);
     if(rc)
     {
         DEBUGF( "fat_opendir() - Couldn't open dir"

@@ -48,6 +48,7 @@ typedef struct {
     bool busy;
     int startcluster;
     struct fat_dir fatdir;
+    struct fat_dir parent_dir;
     struct dirent theent;
 } DIR;
 
@@ -73,6 +74,7 @@ typedef struct DIRtag
 extern DIR* opendir(char* name);
 extern int closedir(DIR* dir);
 extern int mkdir(char* name, int mode);
+extern int rmdir(char* name);
 
 extern struct dirent* readdir(DIR* dir);
 

@@ -92,7 +92,8 @@ extern int fat_rename(struct fat_file* file,
                       unsigned char* newname,
                       int size, int attr);
 
-extern int fat_opendir(struct fat_dir *ent, unsigned int currdir);
+extern int fat_opendir(struct fat_dir *ent, unsigned int currdir,
+                       struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 extern int fat_get_cluster_size(void);
 
