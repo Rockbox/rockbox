@@ -27,6 +27,7 @@ struct
 } gCmd;
 
 
+
 int ProcessCmdLine(int argc, char* argv[])
 {
 	argc--; // exclude our name
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
 	UINT16 reg;
 	FILE* pFile;
 	size_t size;
-	UINT8 abFirmware[512*1024]; // blocksize
+	static UINT8 abFirmware[256*1024]; // blocksize
 	memset(abFirmware, 0xFF, sizeof(abFirmware));
 
 	ProcessCmdLine(argc, argv); // what to do
@@ -172,7 +173,7 @@ int main(int argc, char* argv[])
 		
 	if (gCmd.bNoDownload)
 	{	// just set our speed
-		if (!UartConfig(serial_handle, gCmd.bRecorder ? 115200 : 14400, eNOPARITY, eONESTOPBIT, 8))
+		if (!UartConfig(serial_handle, gCmd.bRecorder ? 115200 : 38400, eNOPARITY, eONESTOPBIT, 8))
 		{
 			printf("Error setting up COM params\n");
 			exit(1);
@@ -183,7 +184,7 @@ int main(int argc, char* argv[])
 		if (gCmd.bArchos)
 		{
 			printf("Waiting for box startup to download monitor...");
-			DownloadArchosMonitor(serial_handle, "minimon_v2.bin"); // load the monitor image
+			DownloadArchosMonitor(serial_handle, "minimon_archos.bin"); // load the monitor image
 			printf("\b\b\b done.\n");
 		}
 		else
@@ -197,6 +198,10 @@ int main(int argc, char* argv[])
 			{	// we can be faster
 				SetTargetBaudrate(serial_handle, 11059200, 115200); // set to 115200
 			}
+            else
+            {
+				SetTargetBaudrate(serial_handle, 12000000, 38400); // set to 38400
+            }
 		}
 	}
 
@@ -219,17 +224,30 @@ int main(int argc, char* argv[])
 	if (gCmd.bSpindown)
 	{
 		// power down the disk
-		reg = ReadHalfword(serial_handle, 0x05FFFFCA); // PACR2
-		reg &= ~0x0400; // clear bit 10: GPIO
-		WriteHalfword(serial_handle, 0x05FFFFCA, reg);
+        if (gCmd.bRecorder)
+        {   // Recorder (V1+V2) and FM have disk power control on PA5
+		    reg = ReadHalfword(serial_handle, 0x05FFFFCA); // PACR2
+		    reg &= ~0x0400; // clear bit 10: GPIO
+		    WriteHalfword(serial_handle, 0x05FFFFCA, reg);
 
-		reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PAIOR
-		reg |= 0x0020; // set bit 5: output
-		WriteHalfword(serial_handle, 0x05FFFFC4, reg);
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PAIOR
+		    reg |= 0x0020; // set bit 5: output
+		    WriteHalfword(serial_handle, 0x05FFFFC4, reg);
 
-		reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PADR
-		reg &= ~0x0020; // clear PA5 to power down
-		WriteHalfword(serial_handle, 0x05FFFFC0, reg);
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PADR
+		    reg &= ~0x0020; // clear PA5 to power down
+		    WriteHalfword(serial_handle, 0x05FFFFC0, reg);
+        }
+        else
+        {   // new Players have disk power control on PB4
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PBIOR
+		    reg |= 0x0010; // set bit 4: output
+		    WriteHalfword(serial_handle, 0x05FFFFC6, reg);
+
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PBDR
+		    reg &= ~0x0010; // clear PB4 to power down
+		    WriteHalfword(serial_handle, 0x05FFFFC2, reg);
+        }
 		printf("Harddisk powered down.\n");
 	}
 
@@ -327,26 +345,110 @@ int main(int argc, char* argv[])
 	}
 
 
-	if (gCmd.bTest)
+	if (gCmd.bTest) // DRAM test
 	{
-		// test code: toggle PA5 to test FM IDE power
+        static UINT8 abRam[2*1024*1024]; // DRAM copy, not on stack
+        int i;
+        int fails;
+		
+        // init the DRAM controller like the flash boot does
 		reg = ReadHalfword(serial_handle, 0x05FFFFCA); // PACR2
-		reg &= ~0x0400; // clear bit 10: GPIO
-		WriteHalfword(serial_handle, 0x05FFFFCA, reg);
+		reg &= 0xFFFB; // PA1 config: /RAS
+		reg |= 0x0008;
+		WriteHalfword(serial_handle, 0x05FFFFCA, reg); // PACR2
+		reg = 0xAFFF; // CS1, CS3 config: /CASH. /CASL
+		WriteHalfword(serial_handle, 0x05FFFFEE, reg); // CASCR
+		reg = ReadHalfword(serial_handle, 0x05FFFFA0); // BCR  
+		reg |= 0x8000; // DRAM enable, default bus 
+		WriteHalfword(serial_handle, 0x05FFFFA0, reg); // BCR 
+		reg = ReadHalfword(serial_handle, 0x05FFFFA2); // WCR1	 
+		reg &= 0xFDFD; // 1-cycle CAS 
+		WriteHalfword(serial_handle, 0x05FFFFA2, reg); // WCR1	
+		reg = 0x0E00; // CAS 35%, multiplexed, 10 bit row addr.
+		WriteHalfword(serial_handle, 0x05FFFFA8, reg); // DCR
+		reg = 0x5AB0; // refresh, 4 cycle waitstate
+		WriteHalfword(serial_handle, 0x05FFFFAC, reg); // RCR
+		reg = 0x9605; // refresh constant
+		WriteHalfword(serial_handle, 0x05FFFFB2, reg); // RTCOR
+		reg = 0xA518; // phi/32
+		WriteHalfword(serial_handle, 0x05FFFFAE, reg); // RTCSR
 
-		reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PAIOR
-		reg |= 0x0020; // set bit 5: output
-		WriteHalfword(serial_handle, 0x05FFFFC4, reg);
+        fails = 0;
+        memset(abRam, 0xFF, sizeof(abRam));
+		printf("writing 0xFF pattern\n");
+		WriteByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+		printf("testing marching 0x00\n");
+        for (i=0; i<sizeof(abRam); i++)
+        {
+       		UINT8 byte; 
+			WriteByte(serial_handle, 0x09000000 + i, 0x00);
+            byte = ReadByte(serial_handle, 0x09000000 + i);
+			WriteByte(serial_handle, 0x09000000 + i, 0xFF);
 
-		printf("Toggling PA5 forever... (stop with Ctrl-C)\n");
-		reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PADR
-		while (1)
-		{
-			reg ^= 0x0020;
-			WriteHalfword(serial_handle, 0x05FFFFC0, reg); // PADR
-			Sleep(1000);
-		}
-	}
+            if (byte != 0x00)
+            {
+                printf("RAM at offset 0x%06X is 0x%02X instead of 0x%02X\n", i, byte, 0x00);
+                fails++;
+            }
+
+        }
+        printf("%d failures\n", fails);
+        
+        fails = 0;
+        memset(abRam, 0x00, sizeof(abRam));
+		printf("writing 0x00 pattern\n");
+		WriteByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+		printf("testing marching 0xFF\n");
+        for (i=0; i<sizeof(abRam); i++)
+        {
+       		UINT8 byte; 
+			WriteByte(serial_handle, 0x09000000 + i, 0xFF);
+            byte = ReadByte(serial_handle, 0x09000000 + i);
+			WriteByte(serial_handle, 0x09000000 + i, 0x00);
+
+            if (byte != 0xFF)
+            {
+                printf("RAM at offset 0x%06X is 0x%02X instead of 0x%02X\n", i, byte, 0xFF);
+                fails++;
+            }
+
+        }
+        printf("%d failures\n", fails);
+        
+        fails = 0;
+        memset(abRam, 0xAA, sizeof(abRam));
+		printf("writing 0xAA pattern\n");
+		WriteByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+		printf("reading back\n");
+		ReadByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+        for (i=0; i<sizeof(abRam); i++)
+        {
+            if (abRam[i] != 0xAA)
+            {
+                printf("RAM at offset 0x%06X is 0x%02X instead of 0x%02X\n", i, abRam[i], 0xAA);
+                fails++;
+            }
+
+        }
+        printf("%d failures\n", fails);
+
+        fails = 0;
+        memset(abRam, 0x55, sizeof(abRam));
+		printf("writing 0x55 pattern\n");
+		WriteByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+		printf("reading back\n");
+		ReadByteMultiple(serial_handle, 0x09000000, sizeof(abRam), abRam);
+        for (i=0; i<sizeof(abRam); i++)
+        {
+            if (abRam[i] != 0x55)
+            {
+                printf("RAM at offset 0x%06X is 0x%02X instead of 0x%02X\n", i, abRam[i], 0x55);
+                fails++;
+            }
+
+        }
+        printf("%d failures\n", fails);
+    }
 
 
 	if (gCmd.bBlink)
