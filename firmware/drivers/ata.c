@@ -632,10 +632,10 @@ static int perform_soft_reset(void)
     
     ATA_SELECT = SELECT_LBA | ata_device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
-    sleep(HZ/20000); /* >= 5us */
+    sleep(1); /* >= 5us */
 
     ATA_CONTROL = CONTROL_nIEN;
-    sleep(HZ/400); /* >2ms */
+    sleep(1); /* >2ms */
 
     /* This little sucker can take up to 30 seconds */
     retry_count = 8;
