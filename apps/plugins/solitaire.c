@@ -36,7 +36,6 @@ use F3 to put card on top of the remains' stack on one of the 4 final color
 #include "lcd.h"
 
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_KEYPAD != IRIVER_H100_PAD /* FIX! */
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
@@ -92,16 +91,16 @@ static struct plugin_api* rb;
 #define SOL_DOWN BUTTON_DOWN
 #define SOL_LEFT BUTTON_LEFT
 #define SOL_RIGHT BUTTON_RIGHT
-#define SOL_MOVE BUTTON_ON
-#define SOL_DRAW BUTTON_SELECT
-#define SOL_REM2CUR BUTTON_PLAY
-#define SOL_CUR2STACK BUTTON_F1
-#define SOL_REM2STACK BUTTON_F3
-#define SOL_MENU_RUN BUTTON_RIGHT
-#define SOL_MENU_RUN2 BUTTON_ON
-#define SOL_MENU_INFO BUTTON_SELECT
+#define SOL_MOVE_PRE BUTTON_SELECT
+#define SOL_MOVE (BUTTON_SELECT | BUTTON_REL)
+#define SOL_DRAW BUTTON_MODE
+#define SOL_REM2CUR (BUTTON_LEFT | BUTTON_ON)
+#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_REPEAT)
+#define SOL_REM2STACK (BUTTON_RIGHT | BUTTON_ON)
+#define SOL_MENU_RUN BUTTON_SELECT
+#define SOL_MENU_RUN2 BUTTON_RIGHT
+#define SOL_MENU_INFO BUTTON_MODE
 #define SOL_MENU_INFO2 BUTTON_REC
-#define SOL_MENU_INFO3 BUTTON_MODE
 #endif
 
 /* common help definitions */
@@ -124,6 +123,13 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2CUR "LEFT..: Put the card on top of the remains' stack on top of the cursor."
 #define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final color stacks."
 #define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final color stacks."
+
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "REC: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "PLAY+LEFT: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final color stacks."
+#define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final color stacks."
 
 #endif
 
@@ -365,6 +371,14 @@ int solitaire_help(void){
         rb->lcd_putsxy(0, 42, "All actions can be");
         rb->lcd_putsxy(0, 49, "done using arrows,");
         rb->lcd_putsxy(0, 56, "short & long MODE.");
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+        rb->lcd_putsxy(20, 8, "Press a key or key");
+        rb->lcd_putsxy(20, 16, "combo to see it's");
+        rb->lcd_putsxy(20, 24, "role. Press STOP to");
+        rb->lcd_putsxy(20, 32, "return to menu.");
+        rb->lcd_putsxy(20, 48, "All actions can be");
+        rb->lcd_putsxy(20, 56, "done using the");
+        rb->lcd_putsxy(20, 64, "joystick and RECORD.");
 #endif
 
         rb->lcd_update();
@@ -1193,5 +1207,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return (result == SOLITAIRE_USB) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
-#endif /* iRiver h100 keypad */
 #endif
