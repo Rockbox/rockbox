@@ -1311,7 +1311,7 @@ static bool dbg_disk_info(void)
                 break;
 
             case 7:
-                i = identify_info[82] & (6<<3);
+                i = identify_info[82] & (1<<6);
                 lcd_puts(0, y++, "Read-ahead:");
                 lcd_puts(0, y++, i ? "enabled" : "unsupported");
                 break;
