@@ -40,13 +40,6 @@ extern void bitswap(unsigned char *data, int length);
 static int get_unplayed_space(void);
 static int get_unswapped_space(void);
 
-#define MPEG_SWAP_CHUNKSIZE  0x2000
-#define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we
-                              wouldn't be able to see the difference between
-                              an empty buffer and a full one. */
-#define MPEG_LOW_WATER  0x40000
-#define MPEG_LOW_WATER_CHUNKSIZE  0x40000
-
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
 #define MPEG_PAUSE        3
@@ -439,7 +432,8 @@ static bool is_playing; /* We are (attempting to) playing MP3 files */
 static bool filling; /* We are filling the buffer with data from disk */
 static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
-
+static int lowest_watermark_level; /* Debug value to observe the buffer
+                                      usage */
 static int mpeg_file;
 
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
@@ -460,6 +454,8 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
 
     dbgdata->unplayed_space = get_unplayed_space();
     dbgdata->unswapped_space = get_unswapped_space();
+
+    dbgdata->lowest_watermark_level = lowest_watermark_level;
 }
 
 static void mas_poll_start(int interval_in_ms)
@@ -598,6 +594,7 @@ static void reset_mp3_buffer(void)
     mp3buf_read = 0;
     mp3buf_write = 0;
     mp3buf_swapwrite = 0;
+    lowest_watermark_level = mp3buflen;
 }
 
 #pragma interrupt
@@ -662,6 +659,10 @@ void DEI3(void)
             DTCR3 = last_dma_chunk_size & 0xffff;
             SAR3 = (unsigned int)mp3buf + mp3buf_read;
             id3tags[tag_read_idx]->id3.offset += last_dma_chunk_size;
+
+            /* Update the watermark debug level */
+            if(unplayed_space_left < lowest_watermark_level)
+                lowest_watermark_level = unplayed_space_left;
         }
         else
         {

@@ -38,6 +38,7 @@
 #include "font.h"
 #include "disk.h"
 #include "mpeg.h"
+#include "widgets.h"
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -137,8 +138,11 @@ bool dbg_mpeg_thread(void)
 {
     char buf[32];
     int button;
+    int percent;
     struct mpeg_debug d;
 
+    lcd_setmargins(0, 0);
+    
     while(1)
     {
         button = button_get_w_tmo(HZ/5);
@@ -164,6 +168,15 @@ bool dbg_mpeg_thread(void)
         lcd_puts(0, 4, buf);
         snprintf(buf, sizeof(buf), "unswapped: %x", d.unswapped_space);
         lcd_puts(0, 5, buf);
+
+        percent = d.unplayed_space * 100 / d.mp3buflen;
+        progressbar(0, 6*8, 112, 4, percent, Grow_Right);
+
+        percent = MPEG_LOW_WATER * 100 / d.mp3buflen;
+        progressbar(0, 6*8+4, 112, 4, percent, Grow_Right);
+
+        snprintf(buf, sizeof(buf), "lowest: %x", d.lowest_watermark_level);
+        lcd_puts(0, 7, buf);
         
         lcd_update();
     }
