@@ -61,6 +61,7 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joer
 
 <li> Copy the .rvf output to your jukebox, load up a recent daily build and
    plugins, and kick back and watch the movie!
+</ol>
 
 <p>
 Video tools, player: Jörg Hohensohn
