@@ -92,6 +92,7 @@ void ss_loop(void)
 void screensaver(void)
 {
 	char w, h;
+	char *off = "[Off] to stop";
 	int len = strlen(SS_TITLE);
 
 	lcd_fontsize(SS_TITLE_FONT, &w, &h);
@@ -108,10 +109,28 @@ void screensaver(void)
 	else
 		h /= 2;
 
-    lcd_puts(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, 
-			 SS_TITLE, SS_TITLE_FONT);
+	lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+	lcd_puts(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE, SS_TITLE_FONT);
+
+	len = strlen(off);
+	lcd_fontsize(0, &w, &h);
+
+	/* Get horizontel centering for text */
+	len *= w;
+	if (len%2 != 0)
+		len = ((len+1)/2)+(w/2);
+	else
+		len /= 2;
+
+	if (h%2 != 0)
+		h = (h/2)+1;
+	else
+		h /= 2;
+
+	lcd_puts(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off, 0);
 
     lcd_update();
+	sleep(150);
     ss_loop();
 }
 
