@@ -312,7 +312,7 @@ static void postpone_dma_tick(void)
 {
     unsigned int count;
 
-    count = FREQ / 1000 / 8;
+    count = FREQ / 2000 / 8;
 
     /* We are using timer 1 */
     
