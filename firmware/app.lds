@@ -2,11 +2,17 @@ ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
 
+#ifdef DEBUG
+#define DRAMSIZE 0x1f0000
+#define ORIGADDR 0x09010000
+#else
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
+#define ORIGADDR 0x09000000
+#endif
 
 MEMORY
 {
-   DRAM : ORIGIN = 0x09000000, LENGTH = DRAMSIZE
+   DRAM : ORIGIN = ORIGADDR, LENGTH = DRAMSIZE
    IRAM : ORIGIN = 0x0f000000, LENGTH = 0x1000
 }
 
@@ -55,6 +61,15 @@ SECTIONS
         *(COMMON)
        _end = .;
     } > DRAM
+
+#ifdef DEBUG
+    .heap :
+    {
+        _poolstart = .;
+        . = 0x20000;
+        _poolend = .;
+    } > DRAM
+#endif
 
     .mp3buf :
     {

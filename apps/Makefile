@@ -31,12 +31,11 @@ ifndef MEM
     MEM=2
 endif
 
+LDS := $(FIRMWARE)/app.lds
+
 ifdef DEBUG
     DEFINES := -DDEBUG
     CFLAGS += -g
-    LDS := $(FIRMWARE)/gdb.lds
-else
-    LDS := $(FIRMWARE)/app.lds
 endif
 
 SRC := $(wildcard *.c)
@@ -76,7 +75,7 @@ $(OBJDIR)/librockbox.a:
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
-	cat $< | $(CC) -DMEMORYSIZE=$(MEM) -E -P - >$@
+	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $(OBJDIR)/rockbox.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
