@@ -20,41 +20,7 @@
  *
  ****************************************************************************/
 
-#include "lcd.h"
 
-#ifdef WIN32
- #ifndef __LCDWIN32_H__
- #define __LCDWIN32_H__
-
- #include "uisw32.h"
- #include "lcd.h"
-
- typedef struct
- {
-     BITMAPINFOHEADER bmiHeader;
-     RGBQUAD bmiColors[2];
- } BITMAPINFO2;
-
- #ifdef HAVE_LCD_BITMAP
-  /* the display */
-  extern unsigned char        display[LCD_WIDTH][LCD_HEIGHT/8];
- #else
-  #define DISP_X              112
-  #define DISP_Y              64
- #endif /* HAVE_LCD_BITMAP */
-
- /* the ui display */
- extern char                 bitmap[LCD_HEIGHT][LCD_WIDTH];
- /* bitmap information */
- extern BITMAPINFO2          bmi;
- #endif /* __LCDWIN32_H__ */
-
-#else
- /* X11 */
- #define MARGIN_X 3
- #define MARGIN_Y 3
-
-#endif /* WIN32 */
 
 
 
