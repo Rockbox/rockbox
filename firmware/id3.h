@@ -20,7 +20,7 @@
 #define ID3_H
 
 struct mp3entry {
-    char *path;
+    char path[256];
     char *title;
     char *artist;
     char *album;

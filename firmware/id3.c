@@ -507,7 +507,9 @@ mp3info(struct mp3entry *entry, char *filename)
         return true;
 
     memset(entry, 0, sizeof(struct mp3entry));
-    entry->path  = filename;
+   
+    strncpy(entry->path, filename, sizeof(entry->path));
+ 
     entry->title = NULL;
     entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
