@@ -713,26 +713,38 @@ static void mpeg_thread(void)
                 playing = false;
                 stop_dma();
 
-                reset_mp3_buffer();
-                remove_all_tags();
+                /* is next track in ram? */
+                if ( num_tracks_in_memory() > 1 ) {
+                    int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+                    mp3buf_read = id3tags[track_offset]->mempos;
+                    playing = true;
+                    last_dma_tick = current_tick;
+                    init_dma();
+                    start_dma();
+                    queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                }
+                else {
+                    reset_mp3_buffer();
+                    remove_all_tags();
                 
-                /* Open the next file */
-                if (mpeg_file >= 0)
-                    close(mpeg_file);
+                    /* Open the next file */
+                    if (mpeg_file >= 0)
+                        close(mpeg_file);
+                    
+                    if (new_file(true) < 0) {
+                        DEBUGF("No more files to play\n");
+                        filling = false;
+                    } else {
+                        /* Make it read more data */
+                        filling = true;
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        
+                        /* Tell the file loading code that we want to start playing
+                           as soon as we have some data */
+                        play_pending = true;
 
-                if (new_file(true) < 0) {
-                    DEBUGF("No more files to play\n");
-                    filling = false;
-                } else {
-                    /* Make it read more data */
-                    filling = true;
-                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-
-                    /* Tell the file loading code that we want to start playing
-                       as soon as we have some data */
-                    play_pending = true;
-
-                    current_track_counter++;
+                        current_track_counter++;
+                    }
                 }
                 break;
 
