@@ -167,7 +167,7 @@ $(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	  echo "UCLPACK rombox" ; \
 	  uclpack --none $< $@ >/dev/null 2>&1; \
 	  if test -s $@; then \
-	    perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $@; \
+	    perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
 	    if test $$? -ne 0; then \
 	      echo "removing UCL file again, making it a fake one"; \
 	      echo "fake" > $@; \
