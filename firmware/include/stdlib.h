@@ -36,6 +36,7 @@ void srand(unsigned int seed);
 int rand(void);
 
 #define abs(x) ((x)>0?(x):-(x))
+#define labs(x) abs(x)
 
 #ifdef SIMULATOR
 void exit(int status);
