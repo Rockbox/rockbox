@@ -23,6 +23,7 @@
 #include "config.h"
 
 extern struct event_queue button_queue;
+extern long last_keypress;
 
 void button_init (void);
 int button_get (bool block);

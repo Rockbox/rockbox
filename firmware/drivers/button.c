@@ -31,6 +31,8 @@
 
 struct event_queue button_queue;
 
+long last_keypress;
+
 /* how often we check to see if a button is pressed */
 #define POLL_FREQUENCY    HZ/20
 
@@ -140,6 +142,8 @@ static void button_tick(void)
                 else
                     queue_post(&button_queue, btn, NULL);
                 backlight_on();
+
+                last_keypress = current_tick;
             }
         }
         else
@@ -291,6 +295,8 @@ void button_init(void)
     PAIOR &= ~0x820;
     queue_init(&button_queue);
     tick_add_task(button_tick);
+
+    last_keypress = current_tick;
 }
 
 static int button_read(void)
