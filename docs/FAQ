@@ -630,3 +630,6 @@ A69: There are several types of microphones.
               an electret condenser capsule (see above) (and this power could
               also used to feed a mic amplifier), but the archos hasn't
               (it's a line in and no mic in!).
+     If you want to know more on microphone powering, read this:
+     http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
+     (As described, you need also amplification.)
