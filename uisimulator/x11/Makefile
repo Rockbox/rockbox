@@ -46,9 +46,10 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c
 
+APPS = tetris.c screensaver.c 
+
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
-        button-x11.c tetris.c app.c tree.c io.c sleep.c \
-	$(FIRMSRCS)
+        button-x11.c app.c tree.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
 OBJS := $(SRCS:c=o)
 
@@ -62,6 +63,9 @@ distclean: clean
 	$(RM) config.cache
 
 tetris.o: $(APPDIR)/tetris.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+screensaver.o: $(APPDIR)/screensaver.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 app.o: $(APPDIR)/app.c
