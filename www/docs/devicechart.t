@@ -75,7 +75,7 @@
     <td>No</td>
     <td>No</td>
     <td>No</td>
-    <td>?</td>
+    <td>Yes</td>
 </tr>
 <tr><th><b>Remote control</b></th>
     <td>Yes</td>
@@ -229,7 +229,7 @@
     <td>6V 700mA center&nbsp;+</td>
     <td>no charger</td>
     <td>no charger</td>
-    <td>?</td>
+    <td>350mA 5 volt 2 A</td>
 </tr>
 <tr><th><b>Dimensions</b></th>
     <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
