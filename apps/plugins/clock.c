@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: clock.c,v 2.0 2003/12/8
+ * $Id: clock.c,v 2.31 2003/12/8
  *
  * Copyright (C) 2003 Zakk Roberts
  *
@@ -17,89 +17,51 @@
  *
  ****************************************************************************/
 
-/********************************
-RELEASE NOTES *******************
-*********************************
+/*****************************
+ * RELEASE NOTES
 
-*********************************
-VERSION 2.3 * STABLE ************
-*********************************
-Tab indentation removed
-Counter screen added at ON+F2, with countdown options
+***** VERSION 2.31 **
+Fixed credits roll - now displays all names. Features
+improved animations. Also revised release notes.
 
-*********************************
-VERSION 2.22 * STABLE ***********
-*********************************
+***** VERSION 2.30 **
+Tab indentation removed, and -Counter screen added
+at ON+F2, with countdown options
+
+***** VERSION 2.22 **
 Fixed two bugs:
 Digital settings are now independent of LCD settings
 12/24h "Analog" settings are now displayed correctly.
 
-*********************************
-VERSION 2.21 * STABLE ***********
-*********************************
-Changed the behaviour of F2
+***** VERSION 2.21 **
+-Changed the behaviour of F2
 
-********************************
-VERSION 2.2 * STABLE ***********
-********************************
-Few small bugs taken care of.
-Release version.
+***** VERSION 2.20 **
+Few small bugs taken care of. New features: -New binary mode,
+-new mode selector, -new feature, "counter", and -redesigned help screen.
 
-Features:
--New mode, "Binary"
--New mode selector - access via PLAY
--New feature, "Counter" - F2 to start/stop, Hold F2 to reset.
--New redesigned 9-page help screen.
--Small bugs fixed.
+***** VERSION 2.10 **
+New bug fixes, and some new features: -an LCD imitation mode, and
+-American and European date modes are an option.
 
-*********************************
-VERSION 2.1 * STABLE ************
-*********************************
-Even more bugs fixed. Almost bug-free :)
+***** VERSION 2.00 [BETA] **
+Major update, lots of bugfixes and new features.
+New Features: -Fullscreen mode introduced, -modes have independent
+settings, -credit roll added, -options screen reworked, -logo selector,
+and -much- cleaner code. Analog changes include: -removed border option,
+and -added both 12/24h time readouts. Digital changes include: -centered
+second and date readouts and also -introduced two new additional ways
+of graphically conveying second progress: a bar, and a LCD-invert mode.
 
-Features:
--Another new mode!! LCD imitation (similar to Digital)
--American/European date modes added
--lots of bugs fixed
-
-*********************************
-VERSION 2.0: * BETA *************
-*********************************
-
-Major update. Code pretty much rewritten. Lots of bugs fixed.
-
-New Features: *******************
--New mode, Fullscreen!
--Seperate settings for each mode
--Credits at F2
--Options at F3
--Startup / Shutdown logo (choose one by hitting ON)
--CLEANER code!
-
-Analog specific changes: ********
--removed outer border option
--added 12/24h readout (and am/pm bitmaps for 12h mode)
-
-Digital specific changes: *******
--now centers date and second readouts
--second readout options, "Digital" (text), "Bar" (progressbar), "Inverse" (inverts the display as the seconds go by)
--12/24h modes as well here (and of course the am/pm bitmaps)
-
-********************************
-VERSION 1.0 * "ALPHA" (STABLE) *
-********************************
-Release Version.
-
-Features analog / digital modes,
-and a few options.
-********************************/
-
+***** VERSION 1.0 **
+Original release, featuring analog / digital modes and a few options.
+*****************************/
 #include "plugin.h"
 #include "time.h"
 
 #ifdef HAVE_LCD_BITMAP
 
-#define CLOCK_VERSION "2.3"
+#define CLOCK_VERSION "2.31"
 
 /* prototypes */
 void show_logo(bool animate, bool show_clock_text);
@@ -619,7 +581,7 @@ void save_settings(void)
  *********************************/
 void load_settings(void)
 {
-	/* open the settings file */
+    /* open the settings file */
     int fd;
     fd = rb->open(default_filename, O_RDONLY);
 
@@ -1096,17 +1058,9 @@ void binary(int hour, int minute, int second)
 void show_logo(bool animate, bool show_clock_text)
 {
     int x_position;
-    unsigned char *clogo = 0;
 
-    /* decide which logo we're using - usually #4 */
-    if(logo == 1)
-        clogo = (unsigned char *)clocklogo_1;
-    else if(logo == 2)
-        clogo = (unsigned char *)clocklogo_2;
-    else if(logo == 3)
-        clogo = (unsigned char *)clocklogo_3;
-    else
-        clogo = (unsigned char *)clocklogo_4;
+    unsigned char *clogo = 0;
+    clogo = (unsigned char *)clocklogo_4;
 
     /* animate logo */
     if(animate)
@@ -1157,15 +1111,7 @@ void exit_logo(void)
     int x_position;
 
     unsigned char *clogo = 0;
-
-    if(logo == 1)
-        clogo = (unsigned char *)clocklogo_1;
-    else if(logo == 2)
-        clogo = (unsigned char *)clocklogo_2;
-    else if(logo == 3)
-        clogo = (unsigned char *)clocklogo_3;
-    else
-        clogo = (unsigned char *)clocklogo_4;
+    clogo = (unsigned char *)clocklogo_4;
 
     /* fly downwards */
     for(x_position = 20; x_position <= 128; x_position++)
@@ -1176,9 +1122,9 @@ void exit_logo(void)
     }
 }
 
-/*******************
+/********************
  * Rolls the credits
- ******************/
+ ********************/
 /* The following function is pretty confusing, so
  * it's extra well commented. */
 bool roll_credits(void)
@@ -1203,7 +1149,7 @@ bool roll_credits(void)
 
         show_logo(false, false);
 
-        rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d", j+1, numnames);
+        rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %02d/%02d", j+1, numnames);
         rb->lcd_puts(0, 0, elapsednames);
 
         /* used to center the text */
@@ -1213,10 +1159,10 @@ bool roll_credits(void)
         rb->lcd_getstringsize(job, &job_w, &job_h);
 
         /* line 1 flies in */
-        for (namepos=0; namepos < LCD_WIDTH/2-name_w/2; namepos++)
+        for (namepos=0-name_w; namepos < (LCD_WIDTH/2)-(name_w/2)-2; namepos++)
         {
             rb->lcd_clearrect(0, 48, 112, 8); /* clear any trails left behind */
-            rb->lcd_putsxy(namepos, 48, name); /* show their name */
+            rb->lcd_putsxy(namepos, 48, name);
             rb->lcd_update();
 
             /* exit on keypress */
@@ -1226,10 +1172,10 @@ bool roll_credits(void)
         }
 
         /* now line 2 flies in */
-        for(jobpos=LCD_WIDTH; jobpos > LCD_WIDTH/2-(job_w+2)/2; jobpos--) /* we use (job_w+2) to ensure it fits on the LCD */
+        for(jobpos=LCD_WIDTH; jobpos > (LCD_WIDTH/2)-(job_w+2)/2; jobpos--) /* we use (job_w+2) to ensure it fits on the LCD */
         {
             rb->lcd_clearrect(0, 56, 112, 8); /* clear trails */
-            rb->lcd_putsxy(jobpos, 56, job); /* show their job */
+            rb->lcd_putsxy(jobpos, 56, job);
             rb->lcd_update();
 
             /* exit on keypress */
@@ -1243,14 +1189,22 @@ bool roll_credits(void)
         {
             rb->sleep((HZ*2)/10); /* wait a moment */
 
+            namepos++;
+            jobpos--;
+
+            rb->lcd_clearrect(0, 48, 112, 16);
+            rb->lcd_putsxy(namepos, 48, name);
+            rb->lcd_putsxy(jobpos, 56, job);
+            rb->lcd_update();
+
             btn = rb->button_get(false);
             if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
                 return false;
         }
 
         /* fly out both lines at same time */
-        namepos=(LCD_WIDTH/2-name_w/2)+5;
-        jobpos=(LCD_WIDTH/2-(job_w+2)/2)-5;
+        namepos=((LCD_WIDTH/2)-(name_w/2))+8;
+        jobpos=((LCD_WIDTH/2)-(job_w+2)/2)-8;
         while(namepos<LCD_WIDTH || jobpos > 0-job_w)
         {
             rb->lcd_clearrect(0, 48, 112, 16); /* clear trails */
@@ -1267,14 +1221,16 @@ bool roll_credits(void)
             jobpos--;
         }
 
-        /* pause (.5s) */
+        /* pause (.2s) */
         rb->sleep(HZ/2);
 
         /* and scan for button presses */
         btn = rb->button_get(false);
-        if ( (!btn) && (!(btn&BUTTON_REL)) )
+        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
              return false;
     }
+    exit_logo();
+
     return true;
 }
 
@@ -1288,10 +1244,10 @@ bool show_credits(void)
 
     rb->lcd_clear_display();
 
+    rb->lcd_puts(0, 7, "Credit Roll...");
+
     /* show the logo with an animation and the clock version text */
     show_logo(true, true);
-
-    rb->lcd_puts(0, 7, "Credit Roll...");
 
     rb->lcd_update();
 
@@ -2174,7 +2130,7 @@ void counter_finished(void)
 
     while(!done)
     {
-		rb->lcd_clear_display();
+        rb->lcd_clear_display();
 
         /* draw "TIME'S UP" text */
         rb->lcd_bitmap(times_up, 0, xpos, 112, 50, true);
@@ -2251,7 +2207,7 @@ void show_counter(void)
     }
     if(remaining_h < 0)
     {
-		/* reset modes */
+        /* reset modes */
         counting = false;
         counting_up = true;
 
@@ -2419,7 +2375,7 @@ void counter_options(void)
                 {
                     cursorpos = 2;
                     counting_up = false;
-				}
+                }
                 break;
         }
     }
