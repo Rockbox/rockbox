@@ -33,34 +33,31 @@ unsigned short *lcd_ascii;
 
 static unsigned short* kbd_setupkeys(int page, int* len)
 {
-    static unsigned short lines[256];
+    static unsigned short lines[128];
 
     unsigned short ch;
     int i = 0;
 
     switch (page) {
     case 0: /* Capitals */
-        for (ch = 'A'; ch <= 'Z'; ch++) lines[i++] = ch;
+        for (ch = 'A'; ch <= 'Z'; ch++)
+            lines[i++] = ch;
         for (ch = 0xc0; ch <= 0xdd; ch++)
             if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
                 lines[i++] = ch;
         break;
 
     case 1: /* Small */
-        for (ch = 'a'; ch <= 'z'; ch++) lines[i++] = ch;
+        for (ch = 'a'; ch <= 'z'; ch++)
+            lines[i++] = ch;
         for (ch = 0xdf; ch <= 0xff; ch++)
             if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
                 lines[i++] = ch;
         break;
 
     case 2: /* Others */
-        for (ch = ' '; ch <= '@'; ch++) lines[i++] = ch;
-        for (ch = 0x5b; ch <= 0x60; ch++)
-            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
-                lines[i++] = ch;
-        for (ch = 0x07b; ch <= 0x0bf; ch++)
-            if (lcd_ascii[ch] != NOCHAR_NEW && lcd_ascii[ch] != NOCHAR_OLD)
-                lines[i++] = ch;
+        for (ch = ' '; ch <= '@'; ch++) 
+          lines[i++] = ch;
         break;
     }
 
@@ -76,41 +73,102 @@ int kbd_input(char* text, int buflen)
     int page=0, x=0;
     int linelen;
     unsigned short* line = kbd_setupkeys(page, &linelen);
+    int menu_line=0;
+    int cursor_pos=0;
+    int button_pressed;
+    unsigned char temptext[12];
+#define MENU_LINE_FILENAME 0
+#define MENU_LINE_NEWCHARS 1
+#define MENU_LINE_DELETE 2
+#define MENU_LINE_ACCEPT 3
+#define MENU_LINE_QUIT 4
+#define MENU_LINE_LAST 4
 
-    while(!done)
-    {
-        int i;
+    lcd_clear_display();
+
+    while(!done) {
+        int i, p;
         int len = strlen(text);
 
-        lcd_clear_display();
-
-        /* draw chars */
-        for (i=0; i < 11; i++) {
-            if (line[i+x])
-                lcd_putc(i, 1, line[i+x]);
-            else
-                break;
+        /* draw filename */
+        p=0;
+        i=0;
+        if (cursor_pos>7) {
+            i=cursor_pos-7;
         }
         
-        /* write out the text */
-        if (len <= 11) {
-            /* if we have enough room */
-            lcd_puts(0, 0, text);
+        while (p<10 && line[i]) {
+            if (i == cursor_pos)
+                temptext[p++]=0x7f;
+            temptext[p++]=text[i];
+            i++;
         }
-        else {
-            /* if we don't have enough room, write out the last bit only */
-            lcd_putc(0, 0, '<');
-            lcd_puts(1, 0, text + len - 10);
+        temptext[p]=0;
+        lcd_puts(1, 0, temptext);
+
+        switch (menu_line) {
+        case MENU_LINE_FILENAME:
+        case MENU_LINE_NEWCHARS:
+            /* Draw insert chars */
+            temptext[0]=0x81;
+            temptext[1]=line[x%linelen];
+            temptext[2]=0x82;
+            for (i=1; i < 8; i++) {
+                temptext[i+2]=line[(i+x)%linelen];
+            }
+            temptext[p]=0;
+            lcd_puts(1, 1, temptext);
+            break;
+        case MENU_LINE_DELETE:
+            lcd_puts_scroll(1, 1, "Delete next char");
+            break;
+        case MENU_LINE_ACCEPT:
+            lcd_puts_scroll(1, 1, "Accept");
+            break;
+        case MENU_LINE_QUIT:
+            lcd_puts_scroll(1, 1, "Cancel");
+            break;
         }
+        if (menu_line==MENU_LINE_FILENAME) {
+            lcd_putc(0, 0, 0x92);
+            lcd_putc(0, 1, ' ');
+        } else {
+            lcd_putc(0, 0, ' ');
+            lcd_putc(0, 1, 0x92);
+        }
+          
         lcd_update();
 
-        switch ( button_get(true) ) {
-
-            case BUTTON_MENU | BUTTON_STOP:
-                /* abort */
-                return -1;
+        button_pressed=button_get(true);
+        if (menu_line==MENU_LINE_FILENAME) {
+            switch ( button_pressed ) {
+            case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
+                if (cursor_pos<len)
+                    cursor_pos++;
+                button_pressed=0;
                 break;
+            case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
+                if (cursor_pos>0)
+                    cursor_pos--;
+                button_pressed=0;
+                break;
+            }
+        } else if (menu_line==MENU_LINE_NEWCHARS) {
+            switch ( button_pressed ) {
 
+            case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
+                x=(x+1+linelen)%linelen;
+                button_pressed=0;
+                break;
+            case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
+                x=(x-1+linelen)%linelen;
+                button_pressed=0;
+                break;
+            
             case BUTTON_MENU:
                 /* shift */
                 if (++page == KEYBOARD_PAGES)
@@ -118,41 +176,68 @@ int kbd_input(char* text, int buflen)
                 line = kbd_setupkeys(page, &linelen);
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-                if (x < linelen - 1) 
-                    x++; 
-                else 
-                    x = 0;
-                break;
-
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-                if (x)
-                    x--;
-                else
-                    x = linelen - 1;
-                break;
-
-            case BUTTON_STOP:
-                /* backspace */
-                if (len)
-                    text[len-1] = 0;
-                break;
-
             case BUTTON_ON:
-                /* ON accepts what was entered and continues */
-                done = true;
-                break;
-
-            case BUTTON_PLAY:
-                /* PLAY inserts the selected char */
-                if (len<buflen)
-                {
-                    text[len] = line[x];
-                    text[len+1] = 0;
+                if (len < buflen) {
+                    /* ON insert the char */
+                    for (i=len; i>cursor_pos; i--) {
+                        text[i]=text[i-1];
+                    }
+                    text[cursor_pos]=line[x];
+                    button_pressed=0;
+                    cursor_pos++;
                 }
                 break;
+            }
+        } else if (menu_line==MENU_LINE_DELETE) {
+            switch ( button_pressed ) {
+            case BUTTON_ON:
+            case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REPEAT:
+                button_pressed=0;
+                for (i=cursor_pos; i<=len; i++) {
+                    text[i]=text[i+1];
+                }
+                break;
+            }
+        } else if (menu_line==MENU_LINE_ACCEPT) {
+            switch ( button_pressed ) {
+            case BUTTON_ON:
+            case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REPEAT:
+                button_pressed=0;
+                done=true;
+                break;
+            }
+        } else if (menu_line==MENU_LINE_QUIT) {
+            switch ( button_pressed ) {
+            case BUTTON_ON:
+            case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REPEAT:
+                return 1;
+                break;
+            }
+        }
+
+        /* Handle unhandled events */
+        switch ( button_pressed ) {
+        case 0:
+            /* button is already handled */
+            break;
+
+        case BUTTON_MENU | BUTTON_STOP:
+            break;
+        
+        case BUTTON_RIGHT:
+        case BUTTON_RIGHT | BUTTON_REPEAT:
+            if (menu_line<MENU_LINE_LAST)
+                menu_line++;
+            break;
+          
+        case BUTTON_LEFT:
+        case BUTTON_LEFT | BUTTON_REPEAT:
+            if (menu_line>0)
+                menu_line--;
+            break;
         }
     }
     return 0;
