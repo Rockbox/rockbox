@@ -262,12 +262,6 @@ static int cursorpos[MAX_DIR_LEVELS];
 static int dirlevel=0;
 static char currdir[MAX_PATH];
 
-/* QUICK HACK! this should be handled by the playlist code later */
-char* peek_next_track(int steps)
-{
-    return playlist_next(steps);
-}
-
 bool dirbrowse(char *root)
 {
     char buf[MAX_PATH];
