@@ -67,7 +67,7 @@ $(RTC) $(RADIO)
 LDFLAGS =  -lgdi32 -luser32
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(MACHINEDIR) -I$(OBJDIR)
+INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(OBJDIR) -I$(PLUGINDIR)/lib
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES =  $(INCLUDES)
@@ -129,6 +129,8 @@ ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.
 PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
 
 all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
+
+$(ROCKS): $(OBJDIR)/libplugin.a
 
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
