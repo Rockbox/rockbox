@@ -22,6 +22,11 @@
 #include "lcd.h"
 #include "font.h"
 #include "system.h"
+#include "kernel.h"
+
+#ifndef SIMULATOR
+long cpu_frequency = CPU_FREQ;
+#endif
 
 #if CONFIG_CPU == TCC730
 
@@ -414,6 +419,81 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
 void system_init(void)
 {
+}
+
+void set_cpu_frequency (long) __attribute__ ((section (".icode")));
+void set_cpu_frequency(long frequency)
+{
+    switch(frequency)
+    {
+    case CPUFREQ_MAX:
+        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+                                            frequency */
+        PLLCR &= ~1;  /* Bypass mode */
+        PLLCR = 0x11c8600d;
+        CSCR0 = 0x00000580; /* Flash: 1 wait state */
+        CSCR1 = 0x00001180; /* LCD: 4 wait states */
+        while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
+                                            This may take up to 10ms! */
+        DCR = (DCR & ~0x000001ff) | 33;   /* Refresh timer */
+        cpu_frequency = CPUFREQ_MAX;
+        tick_start(1000/HZ);
+        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (5 << 10); /* CS2Pre,Post */
+        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        break;
+        
+    case CPUFREQ_NORMAL:
+        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+                                            frequency */
+        PLLCR &= ~1;  /* Bypass mode */
+        PLLCR = 0x10c86801;
+        CSCR0 = 0x00000180; /* Flash: 0 wait states */
+        CSCR1 = 0x00000980; /* LCD: 2 wait states */
+        while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
+                                            This may take up to 10ms! */
+        DCR = (DCR & ~0x000001ff) | 10;   /* Refresh timer */
+        cpu_frequency = CPUFREQ_NORMAL;
+        tick_start(1000/HZ);
+        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (5 << 10); /* CS2Pre,Post */
+        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        break;
+    default:
+        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+                                            frequency */
+        PLLCR &= ~1;  /* Bypass mode */
+        CSCR0 = 0x00000180; /* Flash: 0 wait states */
+        CSCR1 = 0x00000180; /* LCD: 0 wait states */
+        cpu_frequency = CPU_FREQ;
+        tick_start(1000/HZ);
+        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (1 << 10); /* CS2Pre,Post */
+        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        break;
+    }
+}
+
+void cpu_boost(bool on_off)
+{
+    static int counter = 0;
+    if(on_off)
+    {
+        /* Boost the frequency if not already boosted */
+        if(counter++ == 0)
+        {
+            set_cpu_frequency(CPUFREQ_MAX);
+        }
+    }
+    else
+    {
+        /* Lower the frequency if the counter reaches 0 */
+        if(--counter == 0)
+        {
+            set_cpu_frequency(CPUFREQ_NORMAL);
+        }
+
+        /* Safety measure */
+        if(counter < 0)
+            counter = 0;
+    }
 }
 
 #elif CONFIG_CPU == SH7034

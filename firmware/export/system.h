@@ -22,11 +22,18 @@
 
 #include "cpu.h"
 #include "config.h"
+#include "stdbool.h"
 
 extern void system_reboot (void);
 extern void system_init(void);
 
+extern long cpu_frequency;
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#define FREQ cpu_frequency
+#else
 #define FREQ CPU_FREQ
+#endif
 #define BAUDRATE 9600
 
 #ifndef NULL
@@ -187,6 +194,13 @@ static inline void invalidate_icache(void)
                  "move.l #0x80000000,%d0\n"
 		 "movec.l %d0,%cacr");
 }
+
+#define CPUFREQ_DEFAULT CPU_FREQ
+#define CPUFREQ_NORMAL 47980800
+#define CPUFREQ_MAX 95961600
+
+void set_cpu_frequency(long frequency);
+void cpu_boost(bool on_off);
 
 #elif CONFIG_CPU == TCC730
 

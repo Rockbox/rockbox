@@ -53,4 +53,7 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* Define this if you have adjustable CPU frequency */
+#define HAVE_ADJUSTABLE_CPU_FREQ
+
 #endif

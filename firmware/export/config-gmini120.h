@@ -56,4 +56,7 @@
 
 #define HAVE_LED
 
+/* Define this if you have adjustable CPU frequency */
+#define HAVE_ADJUSTABLE_CPU_FREQ
+
 #endif
