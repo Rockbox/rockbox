@@ -221,7 +221,7 @@ static struct bit_entry rtc_bits[] =
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
 
-    /* Current sum of bits: 254 (worst case) */
+    /* Current sum of bits: 271 (worst case) */
     /* Sum of all bit sizes must not grow beyond 288! */
 };
 
