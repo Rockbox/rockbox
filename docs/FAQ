@@ -398,16 +398,26 @@ A49: This is another hardcoded limit.  We feel that as bigger disks arrive
 
 Q50: You don't understand! I _really_ need to have more then 400 files
      in a directory!
-A50: No you don't. You need to organize your files.  Your laziness is not a 
-     very good reason for us to change our software.  If you want to play
-     or shuffle very large numbers of files, use playlists.  Thats the reason
-     they exist.  If you mention this again, I'm handing your name the 
-     Mr. #25 as well.
+A50: The use of really big directories was a workaround for the poor playlist
+     capabilities of the original Archos firmware. With Rockbox, you no longer
+     need this workaround. Organise your files in directories, then build
+     playlists for all collections you want to shuffle-play.
 
-Q51: Can I ask one more question?
-A51: You just did.  Thank you for your time.  That completes your alotment of
-     stupid question for the year.  Please insert another 35 cents to
-     continue.   
+Q51: How can I make playlists on my PC?
+A51: There are many programs that can create .m3u playlists. WinAmp is one.
+     Another simple method, that requires no extra software, is to use dir:
+
+       cd f:\jukebox
+       dir /bs > allfiles.m3u
+       dir /bs \Pop > pop.m3u
+
+     Linux users can use the 'find' command:
+
+       cd /mnt/archos
+       find . -name "*.mp3" > all.m3u
+
+     Remember that playlists are simple text files. You can edit them with any
+     normal text editor.
 
 Q52: How can I find out about all the neat features that Rockbox has?
 A52: This information is in our manual (It sometimes gets a bit out of
