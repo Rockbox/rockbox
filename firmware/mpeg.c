@@ -22,6 +22,7 @@
 #include "panic.h"
 #include "id3.h"
 #include "mpeg.h"
+#include "ata.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
