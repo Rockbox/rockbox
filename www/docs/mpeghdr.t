@@ -1,14 +1,5 @@
-<HTML>
-<HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<META NAME="AUTHOR" CONTENT="Predrag Supurovic, broker@dv.co.yu">
-<META NAME="KEYWORDS" CONTENT="mpeg, mp3, header, coding, programming,
-structure, frame, audio, music, file, format, layer I, layer II, layer III, layer 1, layer 2, layer 3, ISO/IEC 11172-3, ISO/IEC 13818-3">
-<META NAME="GENERATOR" CONTENT="handmade">
-<TITLE>MPEG AUDIO FRAME HEADER</TITLE>
-</HEAD>
-
-<BODY BGCOLOR="#FFFFFF">
+#define _PAGE_ MPEG Audio Frame Header
+#include "head.t"
 
 <P>This is a brief and informal document targeted to those who want to deal
 with the MPEG format. If you are one of them, you probably already know what
@@ -766,4 +757,5 @@ You may use it freely. Distribution is allowed only in unaltered form. If you
 can help me make it more accurate, please do. </FONT></P>
 <P>&nbsp;</P>
 </CENTER>
-</BODY></HTML>
+
+#include "foot.t"
