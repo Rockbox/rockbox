@@ -50,40 +50,27 @@ enum {
 /*
  * .fnt loadable font file format definition
  *
- * format                     len	description
- * -------------------------  ----	------------------------------
- * UCHAR version[4]		4	magic number and version bytes
- * UCHAR name[64]	       64	font name, space padded
- * UCHAR copyright[256]	      256	copyright info, space padded
- * USHORT maxwidth		2	font max width in pixels
- * USHORT height		2	font height in pixels
- * USHORT ascent		2	font ascent (baseline) in pixels
- * USHORT pad                   2       unused, pad to 32-bit boundary
- * ULONG firstchar		4	first character code in font
- * ULONG defaultchar		4	default character code in font
- * ULONG size			4	# characters in font
- * ULONG nbits			4	# words imagebits data in file
- * ULONG noffset		4	# longs offset data in file
- * ULONG nwidth			4	# bytes width data in file
- * MWIMAGEBITS bits	  nbits*2	image bits variable data
- * [MWIMAGEBITS padded to 32-bit boundary]
- * ULONG offset         noffset*4	offset variable data
- * UCHAR width		 nwidth*1	width variable data
+ * format                     len  description
+ * -------------------------  ---- ------------------------------
+ * UCHAR version[4]              4   magic number and version bytes
+ * USHORT maxwidth               2   font max width in pixels
+ * USHORT height                 2   font height in pixels
+ * USHORT ascent                 2   font ascent (baseline) in pixels
+ * USHORT pad                    2   unused, pad to 32-bit boundary
+ * ULONG firstchar               4   first character code in font
+ * ULONG defaultchar             4   default character code in font
+ * ULONG size                    4   # characters in font
+ * ULONG nbits                   4   # bytes imagebits data in file
+ * ULONG noffset                 4   # longs offset data in file
+ * ULONG nwidth                  4   # bytes width data in file
+ * MWIMAGEBITS bits          nbits   image bits variable data
+ * [MWIMAGEBITS padded to 16-bit boundary]
+ * USHORT offset         noffset*2   offset variable data
+ * UCHAR width            nwidth*1   width variable data
  */
 
 /* loadable font magic and version #*/
-#define VERSION		"RB12"
-
-typedef unsigned short bitmap_t; /* bitmap image unit size*/
-
-/* bitmap_t helper macros*/
-#define BITMAP_WORDS(x)         (((x)+15)/16)	/* image size in words*/
-#define BITMAP_BYTES(x)         (BITMAP_WORDS(x)*sizeof(bitmap_t))
-#define	BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
-#define	BITMAP_BITVALUE(n)      ((bitmap_t) (((bitmap_t) 1) << (n)))
-#define	BITMAP_FIRSTBIT         (BITMAP_BITVALUE(BITMAP_BITSPERIMAGE - 1))
-#define	BITMAP_TESTBIT(m)       ((m) & BITMAP_FIRSTBIT)
-#define	BITMAP_SHIFTBIT(m)      ((bitmap_t) ((m) << 1))
+#define VERSION "RB12"
 
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
