@@ -41,9 +41,11 @@
 #include "lcd.h"
 #include "id3.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
+#include "settings.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 9
+#define PLUGIN_API_VERSION 10
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility */
@@ -181,18 +183,33 @@ struct plugin_api {
     int (*atoi)(const char *str);
     struct tm* (*get_time)(void);
     void* (*plugin_get_buffer)(int* buffer_size);
-    /* new stuff */
+
+    /* new stuff, sort in next time the API gets broken! */
 #ifndef HAVE_LCD_CHARCELLS
     unsigned char* lcd_framebuffer;
     /* performance function */
     void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
 #endif
     void (*yield)(void);
+
+    void* (*plugin_get_mp3_buffer)(int* buffer_size);
+    void (*mpeg_sound_set)(int setting, int value);
+#ifndef SIMULATOR
+    void (*mp3_play_init)(void);
+    void (*mp3_play_data)(unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
+    void (*mp3_play_pause)(bool play);
+    void (*mp3_play_stop)(void);
+    bool (*mp3_is_playing)(void);
+    void (*bitswap)(unsigned char *data, int length);
+#endif
+    struct user_settings* global_settings;
+    void (*backlight_set_timeout)(unsigned int index);
 };
 
 /* defined by the plugin loader (plugin.c) */
 int plugin_load(char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
+void* plugin_get_mp3_buffer(int *buffer_size);
 
 /* defined by the plugin */
 enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)

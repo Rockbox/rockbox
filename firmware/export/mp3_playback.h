@@ -46,7 +46,7 @@ void mpeg_set_pitch(int percent);
 void demand_irq_enable(bool on);
 #endif
 
-/* new functions, to be exported to plugin API */
+/* new functions, exported to plugin API */
 void mp3_play_init(void);
 void mp3_play_data(unsigned char* start, int size,
     void (*get_more)(unsigned char** start, int* size) /* callback fn */
@@ -55,6 +55,7 @@ void mp3_play_pause(bool play);
 void mp3_play_stop(void);
 long mp3_get_playtime(void);
 void mp3_reset_playtime(void);
+bool mp3_is_playing(void);
 
 
 #define SOUND_VOLUME 0

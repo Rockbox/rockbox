@@ -34,6 +34,9 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "mpeg.h"
+#include "buffer.h"
+#include "mp3_playback.h"
+#include "backlight.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -58,6 +61,7 @@
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 #else
 extern unsigned char pluginbuf[];
+extern void bitswap(unsigned char *data, int length);
 #endif
 
 static bool plugin_loaded = false;
@@ -163,6 +167,19 @@ static struct plugin_api rockbox_api = {
     lcd_blit,
 #endif
     yield,
+
+    plugin_get_mp3_buffer,
+    mpeg_sound_set,
+#ifndef SIMULATOR
+    mp3_play_init,
+    mp3_play_data,
+    mp3_play_pause,
+    mp3_play_stop,
+    mp3_is_playing,
+    bitswap,
+#endif
+    &global_settings,
+    backlight_set_timeout,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -292,6 +309,21 @@ void* plugin_get_buffer(int* buffer_size)
     }
 
     return &pluginbuf[buffer_pos];
+}
+
+/* Returns a pointer to the mp3 buffer. 
+   Playback gets stopped, to avoid conflicts. */
+void* plugin_get_mp3_buffer(int* buffer_size)
+{
+#ifdef SIMULATOR
+    static unsigned char buf[1700*1024];
+    *buffer_size = sizeof(buf);
+    return buf;
+#else
+    mpeg_stop();
+    *buffer_size = mp3end - mp3buf;
+    return mp3buf;
+#endif 
 }
 
 static int plugin_test(int api_version, int model, int memsize)

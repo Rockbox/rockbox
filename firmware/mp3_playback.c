@@ -1086,4 +1086,10 @@ void mp3_reset_playtime(void)
     playstart_tick = current_tick;
 }
 
+
+bool mp3_is_playing(void)
+{
+    return playing;
+}
+
 #endif /* #ifndef SIMULATOR */
