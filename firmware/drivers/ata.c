@@ -24,6 +24,7 @@
 #include "system.h"
 #include "debug.h"
 
+#define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
 #define ATA_FEATURE     ATA_ERROR
@@ -127,13 +128,14 @@ int ata_read_sectors(unsigned long start,
             return -1;
         }
 
-        for (j=0; j<256; j++)
+        for (j=0; j<SECTOR_SIZE/2; j++)
             ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
 
 #ifdef USE_INTERRUPT
         /* reading the status register clears the interrupt */
         j = ATA_STATUS;
 #endif
+        buf += SECTOR_SIZE; /* Advance one sector */
     }
 
     led(false);
@@ -177,13 +179,14 @@ int ata_write_sectors(unsigned long start,
             return 0;
         }
 
-        for (j=0; j<256; j++)
+        for (j=0; j<SECTOR_SIZE/2; j++)
             ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
 
 #ifdef USE_INTERRUPT
         /* reading the status register clears the interrupt */
         j = ATA_STATUS;
 #endif
+        buf += SECTOR_SIZE;
     }
 
     led(false);
