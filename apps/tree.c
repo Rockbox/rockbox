@@ -84,7 +84,7 @@ static struct
     { ".ch8", TREE_ATTR_CH8, -1       },
 #endif
 #ifndef SIMULATOR
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_LCD_BITMAP
     { ".ucl", TREE_ATTR_UCL, Flashfile},
     { ".ajz", TREE_ATTR_MOD, Mod_Ajz  },
 #else
