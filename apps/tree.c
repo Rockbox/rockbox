@@ -165,6 +165,7 @@ bool dirbrowse(char *root)
     int i;
     int start=0;
     int dirpos[MAX_DIR_LEVELS];
+    int cursorpos[MAX_DIR_LEVELS];
     int dirlevel=0;
 
     lcd_clear_display();
@@ -209,17 +210,13 @@ bool dirbrowse(char *root)
                         currdir[i-1]=0;
 
                     dirlevel--;
-                    if ( dirlevel < MAX_DIR_LEVELS )
+                    if ( dirlevel < MAX_DIR_LEVELS ) {
                         start = dirpos[dirlevel];
+                        dircursor = cursorpos[dirlevel];
+                    }
                     else
-                        start = 0;
+                        start = dircursor = 0;
                     numentries = showdir(currdir, start);
-                    dircursor=0;
-                    while ( (dircursor < TREE_MAX_ON_SCREEN) &&
-                            (strcmp(dircacheptr[dircursor+start]->name,buf)))
-                        dircursor++;
-                    if (dircursor==TREE_MAX_ON_SCREEN)
-                        dircursor=0;
                     lcd_puts(0, LINE_Y+dircursor, "-");
                 }
                 else
@@ -241,8 +238,10 @@ bool dirbrowse(char *root)
 
                 if (!dircacheptr[dircursor+start]->file) {
                     memcpy(currdir,buf,sizeof(currdir));
-                    if ( dirlevel < MAX_DIR_LEVELS )
-                        dirpos[dirlevel] = start+dircursor;
+                    if ( dirlevel < MAX_DIR_LEVELS ) {
+                      dirpos[dirlevel] = start;
+                      cursorpos[dirlevel] = dircursor;
+                    }
                     dirlevel++;
                     dircursor=0;
                     start=0;
@@ -315,12 +314,6 @@ bool dirbrowse(char *root)
                 lcd_setfont(0);
 #endif
                 numentries = showdir(currdir, start);
-                dircursor=0;
-                while ( (dircursor < TREE_MAX_ON_SCREEN) && 
-                        (strcmp(dircacheptr[dircursor+start]->name,buf))) 
-                    dircursor++;
-                if (dircursor==TREE_MAX_ON_SCREEN)
-                    dircursor=0;
                 lcd_puts(0, LINE_Y+dircursor, "-");
 
                 break;
