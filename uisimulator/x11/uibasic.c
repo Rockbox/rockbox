@@ -61,8 +61,8 @@ XrmOptionDescRec options [] = {
 char *progclass = "rockboxui";
 
 char *defaults [] = {
-  ".background:	black",
-  ".foreground:	white",
+  ".background:	lightgreen",
+  ".foreground:	black",
   "*help:       false",
   0
 };
