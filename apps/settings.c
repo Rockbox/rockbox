@@ -1961,6 +1961,20 @@ bool set_option(char* string, void* variable, enum optiontype type,
 }
 
 #ifdef HAVE_LCD_BITMAP
+
+/* little helper function for voice output */
+static void say_time(int cursorpos, int timedate[])
+{
+    const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
+    int value = timedate[cursorpos];
+
+    if (cursorpos == 3) /* year */
+        value += 2000;
+
+    if (global_settings.talk_menu)
+        talk_value(value, unit[cursorpos], false);
+}
+
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
@@ -1979,25 +1993,25 @@ bool set_time(char* string, int timedate[])
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
-    int dayname[] = {LANG_WEEKDAY_SUNDAY,
-                     LANG_WEEKDAY_MONDAY,
-                     LANG_WEEKDAY_TUESDAY,
-                     LANG_WEEKDAY_WEDNESDAY,
-                     LANG_WEEKDAY_THURSDAY,
-                     LANG_WEEKDAY_FRIDAY,
-                     LANG_WEEKDAY_SATURDAY};
-    int monthname[] = {LANG_MONTH_JANUARY,
-                       LANG_MONTH_FEBRUARY,
-                       LANG_MONTH_MARCH,
-                       LANG_MONTH_APRIL,
-                       LANG_MONTH_MAY,
-                       LANG_MONTH_JUNE,
-                       LANG_MONTH_JULY,
-                       LANG_MONTH_AUGUST,
-                       LANG_MONTH_SEPTEMBER,
-                       LANG_MONTH_OCTOBER,
-                       LANG_MONTH_NOVEMBER,
-                       LANG_MONTH_DECEMBER};
+    const int dayname[] = {LANG_WEEKDAY_SUNDAY,
+                           LANG_WEEKDAY_MONDAY,
+                           LANG_WEEKDAY_TUESDAY,
+                           LANG_WEEKDAY_WEDNESDAY,
+                           LANG_WEEKDAY_THURSDAY,
+                           LANG_WEEKDAY_FRIDAY,
+                           LANG_WEEKDAY_SATURDAY};
+    const int monthname[] = {LANG_MONTH_JANUARY,
+                             LANG_MONTH_FEBRUARY,
+                             LANG_MONTH_MARCH,
+                             LANG_MONTH_APRIL,
+                             LANG_MONTH_MAY,
+                             LANG_MONTH_JUNE,
+                             LANG_MONTH_JULY,
+                             LANG_MONTH_AUGUST,
+                             LANG_MONTH_SEPTEMBER,
+                             LANG_MONTH_OCTOBER,
+                             LANG_MONTH_NOVEMBER,
+                             LANG_MONTH_DECEMBER};
     char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
                         {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
     char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -2154,6 +2168,7 @@ bool set_time(char* string, int timedate[])
                     steps = daysinmonth[timedate[4] - 1];
                     break;
             }
+            say_time(cursorpos, timedate);
         }
 
         button = button_get_w_tmo(HZ/2);
@@ -2170,6 +2185,7 @@ bool set_time(char* string, int timedate[])
                     steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
+                    say_time(cursorpos, timedate);
                 break;
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
@@ -2177,6 +2193,7 @@ bool set_time(char* string, int timedate[])
                     steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
+                say_time(cursorpos, timedate);
                 break;
             case BUTTON_ON:
                 done = true;
