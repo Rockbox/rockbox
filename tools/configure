@@ -35,7 +35,7 @@ calmrisccc () {
  AR=calmrisc16-unknown-elf-ar
  AS=calmrisc16-unknown-elf-as
  OC=calmrisc16-unknown-elf-objcopy
- GCCOPTS="$CCOPTS -m1"
+ GCCOPTS="$CCOPTS"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
