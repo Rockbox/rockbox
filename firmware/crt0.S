@@ -116,6 +116,9 @@ copy_l:
 	mov.l	datacopy_k,r0
 	mov.l	data_k,r1
 	mov.l	dataend_k,r2
+        /* Don't copy if src and dest are equal */
+        cmp/eq  r0,r1
+        bt      nodatacopy
 copy_l2:
 	mov.l	@r0,r3
 	mov.l	r3,@r1
@@ -124,7 +127,7 @@ copy_l2:
 	cmp/ge	r2,r1
 	bf	copy_l2
 	nop
-
+nodatacopy:
 	/* Munge the main thread stack */
 	mov.l	stack_k,r2
 	mov.l	deadbeef_k,r0
