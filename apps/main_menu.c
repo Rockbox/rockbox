@@ -40,34 +40,37 @@ extern void tetris(void);
 int show_logo( void )
 {
 #ifdef HAVE_LCD_BITMAP
-    unsigned char buffer[112 * 8];
     char version[32];
+    unsigned char *ptr=rockbox112x37;
+    int height, i, font_h, font_w;
 
-    int failure;
-    int height, width, font_h, font_w;
+    lcd_clear_display();
+
+    for(i=0; i < 37; i+=8) {
+        /* the bitmap function doesn't work with full-height bitmaps
+           so we "stripe" the logo output */
+        lcd_bitmap(ptr, 0, 10+i, 112, (37-i)>8?8:37-i, false);
+        ptr += 112;
+    }
+    height = 37;
+
+#if 0
+    /*
+     * This code is not used anymore, but I kept it here since it shows
+     * one way of using the BMP reader function to display an externally
+     * providing logo.
+     */
+    unsigned char buffer[112 * 8];
+    int width;
 
     int i;
     int eline;
 
+    int failure;
     failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
 
     debugf("read_bmp_file() returned %d, width %d height %d\n",
            failure, width, height);
-
-    lcd_clear_display();
-
-    if (failure) {
-        unsigned char *ptr=rockbox112x37;
-        for(i=0; i < 37; i+=8) {
-            /* the bitmap function doesn't work with full-height bitmaps
-               so we "stripe" the logo output */
-            lcd_bitmap(ptr, 0, 10+i, 112, (37-i)>8?8:37-i, false);
-            ptr += 112;
-        }
-        height = 37;
-
-    }
-    else {
 
         for(i=0, eline=0; i < height; i+=8, eline++) {
             /* the bitmap function doesn't work with full-height bitmaps
@@ -76,6 +79,7 @@ int show_logo( void )
                        (height-i)>8?8:height-i, false);
         }
     }
+#endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
     lcd_getfontsize(0, &font_w, &font_h);
