@@ -22,6 +22,7 @@
 #include "playlist.h" 
 
 extern bool keys_locked;
+extern bool wps_time_countup;
 
 int wps_show(void);
 

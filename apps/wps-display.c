@@ -47,10 +47,11 @@
     #define PLAY_DISPLAY_CUSTOM_WPS      3 
 #else
     #define PLAY_DISPLAY_1LINEID3        0 
-    #define PLAY_DISPLAY_2LINEID3        1 
-    #define PLAY_DISPLAY_FILENAME_SCROLL 2 
-    #define PLAY_DISPLAY_TRACK_TITLE     3 
-    #define PLAY_DISPLAY_CUSTOM_WPS      4 
+    #define PLAY_DISPLAY_1LINEID3_PLUS   1
+    #define PLAY_DISPLAY_2LINEID3        2 
+    #define PLAY_DISPLAY_FILENAME_SCROLL 3 
+    #define PLAY_DISPLAY_TRACK_TITLE     4 
+    #define PLAY_DISPLAY_CUSTOM_WPS      5 
 #endif
 
 #define LINE_LEN 64
@@ -60,6 +61,7 @@ static char custom_wps[5][LINE_LEN];
 static char display[5][LINE_LEN];
 static int scroll_line;
 static int scroll_line_custom;
+bool wps_time_countup = true;
 
 static bool load_custom_wps(void)
 {
@@ -232,6 +234,12 @@ static bool display_custom_wps( struct mp3entry* id3,
 
                     switch(cchr3)
                     {
+#ifdef HAVE_LCD_CHARCELLS
+                        case 'b':  /* Progress Bar (PLAYER ONLY)*/
+                            draw_player_progress(id3, ff_rewind_count);
+                            snprintf(buf, LINE_LEN, "\x01");
+                            break;
+#endif
                         case 'p':  /* Playlist Position */
                             snprintf(buf, LINE_LEN, "%d", id3->index + 1);
                             break;
@@ -245,6 +253,7 @@ static bool display_custom_wps( struct mp3entry* id3,
                             snprintf(buf, LINE_LEN, "%d:%02d",
                                      i / 60000,
                                      i % 60000 / 1000);
+                            wps_time_countup = true;
                             break;
 
                         case 'r': /* Remaining Time in Song */
@@ -252,6 +261,7 @@ static bool display_custom_wps( struct mp3entry* id3,
                             snprintf(buf, LINE_LEN, "%d:%02d",
                                      i / 60000,
                                      i % 60000 / 1000 );
+                            wps_time_countup = false;
                             break;
 
                         case 't':  /* Total Time */
@@ -367,9 +377,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
             scroll_line = scroll_line_custom;
             if (scroll_line != l)
                     display_custom_wps(id3, 0, l, false, custom_wps[l]);
-            else
-                if (refresh_scroll)
-                        display_custom_wps(id3, 0, l, true, custom_wps[l]);
+            if (scroll_line == l && refresh_scroll)
+                    display_custom_wps(id3, 0, l, true, custom_wps[l]);
         }
         else
         {
@@ -389,11 +398,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
 
     slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, id3->elapsed*100/id3->length, Grow_Right);
     lcd_update();
-#endif
-#ifdef PLAYER_PROGRESS
-#ifdef HAVE_LCD_CHARCELLS
-    draw_player_progress(10,1,id3);
-#endif
 #endif
     return true;
 }
@@ -466,7 +470,6 @@ void wps_display(struct mp3entry* id3)
                 for (tmpcnt=2;tmpcnt<=5;tmpcnt++)
                     display[tmpcnt][0] = 0;
                 scroll_line = 0;
-                wps_refresh(id3,0,false);
                 break;
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
@@ -476,7 +479,6 @@ void wps_display(struct mp3entry* id3)
                 snprintf(display[1], sizeof display[1], "%s", "%pc/%pt");
 #endif
                 scroll_line = 0;
-                wps_refresh(id3,0,false);
                 break;
             }
             case PLAY_DISPLAY_2LINEID3:
@@ -506,12 +508,10 @@ void wps_display(struct mp3entry* id3)
                         strncpy(display[l++], "%fb kbit    %ffHz", LINE_LEN);
                 }
                 scroll_line = 0;
-                wps_refresh(id3,0,false);
 #else
                 strncpy(display[0], "%ia", LINE_LEN);
                 strncpy(display[1], "%it", LINE_LEN);
                 scroll_line = 1;
-                wps_refresh(id3,0,false);
 #endif
                 break;
             }
@@ -521,7 +521,13 @@ void wps_display(struct mp3entry* id3)
                 strncpy(display[0], "%pp/%pe: %fc", LINE_LEN);
                 strncpy(display[1], "%pc/%pt", LINE_LEN);
                 scroll_line = 0;
-                wps_refresh(id3,0,false);
+                break;
+            }
+            case PLAY_DISPLAY_1LINEID3_PLUS:
+            {
+                strncpy(display[0], "%pp/%pe: %fc", LINE_LEN);
+                strncpy(display[1], "%pr%pb%fbkps", LINE_LEN);
+                scroll_line = 0;
                 break;
             }
 #endif
@@ -532,51 +538,41 @@ void wps_display(struct mp3entry* id3)
                     strncpy(display[0], "Couldn't Load Custom WPS", LINE_LEN);
                     strncpy(display[1], "%pc/%pt", LINE_LEN);
                 }
-                wps_refresh(id3,0,false);
                 break;
             }
         }
     }
+    wps_refresh(id3,0,false);
     status_draw();
     lcd_update();
 }
 
-#ifdef PLAYER_PROGRESS
-/*static int bin2int(char *input, int size)
-{
-    int result=0;
-    while(size--) {
-        result <<= 1;
-        result += (*input++ - '0');
-    }
-    return result;
-}
-*/
 #ifdef HAVE_LCD_CHARCELLS
-void draw_player_progress(int x, int y, struct mp3entry* id3)
+bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
+    if(!id3)
+        return(false);
     char player_progressbar[7];
     char binline[36];
     int songpos = 0;
     int i,j;
 
-    memset(binline, 0, sizeof binline);
-    memset(player_progressbar, 0, sizeof player_progressbar);
-    songpos = (id3->elapsed * 36) / id3->length;
-
+    memset(binline, 1, sizeof binline);
+    memset(player_progressbar, 1, sizeof player_progressbar);
+    if(wps_time_countup == false)
+        songpos = ((id3->elapsed - ff_rewwind_count) * 36) / id3->length;
+    else
+        songpos = ((id3->elapsed + ff_rewwind_count) * 36) / id3->length;
     for (i=0; i < songpos; i++)
-        binline[i] = 1;
+        binline[i] = 0;
 
     for (i=0; i<=6; i++) {
         for (j=0;j<5;j++) {
             player_progressbar[i] <<= 1;
             player_progressbar[i] += binline[i*5+j];
         }
-    /*    player_progressbar[i] = bin2int(binline+(i*5),4); */
     }
-
     lcd_define_pattern(8,player_progressbar,7);
-    lcd_puts(x,y,"\x01");
+    return(true);
 }
-#endif
 #endif

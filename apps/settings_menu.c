@@ -21,13 +21,13 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+
 #include "lcd.h"
 #include "menu.h"
 #include "mpeg.h"
 #include "button.h"
 #include "kernel.h"
 #include "sprintf.h"
-
 #include "settings.h"
 #include "settings_menu.h"
 #include "backlight.h"
@@ -97,12 +97,12 @@ static Menu scroll_speed(void)
 static Menu wps_set(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    char* names[] = { "ID3 Tags   ", "File      ", "Parse     ", "Custom WPS  " };
+    char* names[] = { "ID3 Tags   ", "Filename  ", "Dir Parse  ", "Custom WPS  " };
     set_option("[WPS display]", &global_settings.wps_display, names, 4 );
 #else
-    char* names[] = { "1 Line ID3", "2 Line ID3", "File       ",
-        "Parse     ", "Custom WPS " };
-    set_option("[WPS display]", &global_settings.wps_display, names, 5 );
+    char* names[] = { "1 Line ID3 ", "1 Line ID3+", "2 Line ID3 ", "Filename   ",
+        "Dir Parse  ", "Custom WPS " };
+    set_option("[WPS display]", &global_settings.wps_display, names, 6 );
 #endif
     return MENU_OK;
 }

@@ -26,6 +26,8 @@
 #include "panic.h"
 #include "debug.h"
 #include "button.h"
+#include "usb.h"
+#include "backlight.h"
 #include "lcd.h"
 #include "mpeg.h"
 #include "string.h"

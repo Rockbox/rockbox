@@ -22,6 +22,7 @@
 
 #include "file.h"
 #include "lcd.h"
+#include "backlight.h"
 #include "button.h"
 #include "kernel.h"
 #include "tree.h"
@@ -59,23 +60,56 @@ static bool paused = false;
 static struct mp3entry* id3 = NULL;
 static int old_release_mask;
 
-
-void display_volume_level(int vol_level)
+#ifdef HAVE_PLAYER_KEYPAD
+void player_change_volume(void)
 {
+    int button;
+    bool fun_done = false;
     char buffer[32];
 
     lcd_stop_scroll();
-    snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", vol_level * 2);
+    while(!fun_done)
+    {
+        snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", global_settings.volume * 2);
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_puts(0, 0, buffer);
+        lcd_puts(0, 0, buffer);
 #else
-    lcd_puts(2, 3, buffer);
-    lcd_update();
+        lcd_puts(2, 3, buffer);
+        lcd_update();
 #endif
 
-    sleep(HZ/6);
+        button = button_get(false);
+        switch(button)
+        {
+            case BUTTON_MENU | BUTTON_RIGHT:
+            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
+                global_settings.volume++;
+                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
+                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
+                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                wps_refresh(id3,0,false);
+                settings_save();
+                break;
+            case BUTTON_MENU | BUTTON_LEFT:
+            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
+                global_settings.volume--;
+                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
+                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                wps_refresh(id3,0,false);
+                settings_save();
+                break;
+            case BUTTON_MENU | BUTTON_REL:
+                fun_done = true;
+                break;
+        }
+        yield();
+    }
+    status_draw();
+    wps_refresh(id3,0,true);
 }
+#endif
 
 void display_keylock_text(bool locked)
 {
@@ -133,12 +167,17 @@ static void handle_usb(void)
 #ifdef HAVE_LCD_BITMAP
     bool laststate=statusbar(false);
 #endif
+
+    backlight_time(4);
+
     /* Tell the USB thread that we are safe */
     DEBUGF("wps got SYS_USB_CONNECTED\n");
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
                     
     /* Wait until the USB cable is extracted again */
     usb_wait_for_disconnect(&button_queue);
+
+    backlight_time(global_settings.backlight);
 
 #ifdef HAVE_LCD_BITMAP
     statusbar(laststate);
@@ -195,14 +234,7 @@ int player_id3_show(void)
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED: 
-                /* Tell the USB thread that we are safe */
-                DEBUGF("wps got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                    
-                /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&button_queue);
-
-                /* Signal to our caller that we have been in USB mode */
+                handle_usb();
                 return SYS_USB_CONNECTED;
                 break;
 #endif
@@ -316,7 +348,10 @@ static bool ffwd_rew(int button)
                 if ((int)(id3->elapsed + ff_rewind_count) < 0)
                     ff_rewind_count = -id3->elapsed;
 
-                wps_refresh(id3, ff_rewind_count, false);
+                if(wps_time_countup == false)
+                    wps_refresh(id3, -ff_rewind_count, false);
+                else
+                    wps_refresh(id3, ff_rewind_count, false);
                 break;
 
             case BUTTON_RIGHT | BUTTON_REPEAT:
@@ -360,7 +395,10 @@ static bool ffwd_rew(int button)
                 if ((id3->elapsed + ff_rewind_count) > id3->length)
                     ff_rewind_count = id3->length - id3->elapsed;
 
-                wps_refresh(id3, ff_rewind_count, false);
+                if(wps_time_countup == false)
+                    wps_refresh(id3, -ff_rewind_count, false);
+                else
+                    wps_refresh(id3, ff_rewind_count, false);
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
@@ -524,10 +562,10 @@ static bool menu(void)
                     button_set_release(old_release_mask);
                     main_menu();
 #ifdef HAVE_LCD_BITMAP
-                    if(global_settings.statusbar)
-                        lcd_setmargins(0, STATUSBAR_HEIGHT);
-                    else
-                        lcd_setmargins(0, 0);
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
 #endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                 }
@@ -565,27 +603,15 @@ static bool menu(void)
                 /* change volume */
             case BUTTON_MENU | BUTTON_LEFT:
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-                global_settings.volume--;
-                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                display_volume_level(global_settings.volume);
-                wps_display(id3);
-                status_draw();
-                settings_save();
+                player_change_volume();
+                exit = true;
                 break;
 
                 /* change volume */
             case BUTTON_MENU | BUTTON_RIGHT:
             case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                global_settings.volume++;
-                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                display_volume_level(global_settings.volume);
-                wps_display(id3);
-                status_draw();
-                settings_save();
+                player_change_volume();
+                exit = true;
                 break;
 
                 /* show id3 tags */

@@ -17,7 +17,9 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+
 #include "lcd.h"
+#include "backlight.h"
 #include "menu.h"
 #include "button.h"
 #include "kernel.h"
@@ -69,7 +71,7 @@ struct menu {
 
 #else /* HAVE_LCD_BITMAP */
 
-#define LINE_X      0 /* X position the entry-list starts at */
+#define LINE_X      1 /* X position the entry-list starts at */
 
 #define MENU_LINES 2
 
@@ -331,8 +333,10 @@ Menu menu_run(int m)
 #ifdef HAVE_LCD_BITMAP
                 laststate = statusbar(false);
 #endif
+                backlight_time(4);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&button_queue);
+                backlight_time(global_settings.backlight);
 #ifdef HAVE_LCD_BITMAP
                 statusbar(laststate);
 #else

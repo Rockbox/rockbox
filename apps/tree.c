@@ -26,6 +26,7 @@
 #include "dir.h"
 #include "file.h"
 #include "lcd.h"
+#include "backlight.h"
 #include "button.h"
 #include "kernel.h"
 #include "usb.h"
@@ -731,12 +732,16 @@ bool dirbrowse(char *root)
 #ifdef HAVE_LCD_BITMAP
                 bool laststate=statusbar(false);
 #endif
+                backlight_time(4);
+
                 /* Tell the USB thread that we are safe */
                 DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&button_queue);
+
+                backlight_time(global_settings.backlight);
                 
                 /* Force a re-read of the root directory */
                 restore = true;
