@@ -849,6 +849,10 @@ int wps_show(void)
 
                 /* prev / restart */
             case BUTTON_LEFT | BUTTON_REL:
+#ifdef HAVE_RECORDER_KEYPAD
+                if ( lastbutton != BUTTON_LEFT )   
+                     break; 
+#endif
                 if (!id3 || (id3->elapsed < 3*1000))
                     mpeg_prev();
                 else {
@@ -864,6 +868,10 @@ int wps_show(void)
 
                 /* next */
             case BUTTON_RIGHT | BUTTON_REL:
+#ifdef HAVE_RECORDER_KEYPAD
+                if ( lastbutton != BUTTON_LEFT )   
+                     break; 
+#endif
                 mpeg_next();
                 break;
 
