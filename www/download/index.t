@@ -2,11 +2,11 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<h2>Latest version: 2.2 (2004-03-11)</h2>
+<h2>Latest version is 2.2 (2004-03-11)</h2>
 
 <p>Please read the <a href="rockbox-2.2-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
-<p>
+<p>Make sure you download the correct file for your specific archos model:
 <table class=rockbox><tr>
 <th>player</th>
 <th>recorder</th>
@@ -42,17 +42,6 @@ Archos Jukebox Recorder V2
 </td>
 </tr></table>
 
-<h3>Source code</h3>
-<ul>
-<li><a href="rockbox-2.2.tar.gz">rockbox-2.2.tar.gz</a>
-</ul>
-
-<h3>Auxiliary files</h3>
-<ul>
-<li><a href="/lang/">Languages</a>
-<li><a href="/fonts/">Fonts</a> (Recorders only)
-</ul>
-
 <h2>Installation</h2>
 
 <p>Unpack the zip archive in the root (top) directory of your Archos disk. Make sure you 'eject' (unmount) the usb disk before you unplug it.
@@ -63,9 +52,12 @@ Archos Jukebox Recorder V2
 
 <p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) from the root of your Archos disk.
 
+<h2>Source code</h2>
+<p><a href="rockbox-2.2.tar.gz">rockbox-2.2.tar.gz</a>
+
 <h2>Manual</h2>
 
-<p>We have a brand new <a href="/manual/manual.pdf">manual in PDF format</a>. Please read it.
+<p>We have a <a href="/manual/manual.pdf">manual in PDF format</a>. Please read it.
 
 <h2>Bug reports</h2>
 
