@@ -25,8 +25,7 @@
 #elif defined(ARCHOS_RECORDER)
 #include "config-recorder.h"
 #elif defined(ARCHOS_FMRECORDER)
-/* include the standard recorder config for now */
-#include "config-recorder.h"
+#include "config-fmrecorder.h"
 #else
 /* no known platform */
 #endif
