@@ -6,7 +6,7 @@ Q2. Record to WAV (uncompressed) or MP3pro format!
 A2. The recording hardware (the MAS) does not allow us to do this.
 
 Q3. Crossfade between tracks!
-A3. Crossfading would require two mp3 decorders, and we only have one. This
+A3. Crossfading would require two mp3 decoders, and we only have one. This
     is not possible.
 
 Q4. Interfacing with other USB devices (like cameras) or 2 player games over
@@ -21,8 +21,9 @@ A4. The USB system demands that there is a master that talkes to a slave.
     strictly made for disk-access and does not allow us to play with it the
     way we'd need for any good communication to work.
 
-Q5. Support MP3pro and WMA playback!
-A5. The mp3-decoding hardware cannot do this.
+Q5. Support MP3pro, WMA or other sound format playback!
+A5. The mp3-decoding hardware can only play MP3. We cannot make it play other
+    sound formats.
 
 Q6. Converting OGG->MP3
 A6. The mp3-decoding hardware cannot decode ogg. It can be reprogrammed, but
@@ -64,4 +65,4 @@ Q11. CBR recording!
 A11. The MP3 encoding hardware does not allow this.
 
 Q12. Change tempo of a song without changing pitch!
-A12. The MP3 decoding hardwar does now allow this.
+A12. The MP3 decoding hardware does now allow this.
