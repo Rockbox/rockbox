@@ -226,7 +226,10 @@ static void remove_all_tags(void)
 }
 #endif
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+static bool playing = false;
+static bool play_pending = false;
+#else
 static int last_dma_tick = 0;
 static int pause_tick = 0;
 
@@ -1050,6 +1053,7 @@ void mpeg_play(char* trackname)
 {
 #ifdef SIMULATOR
     mp3info(&taginfo, trackname);
+    playing = true;
 #else
     queue_post(&mpeg_queue, MPEG_PLAY, trackname);
 #endif
@@ -1059,6 +1063,8 @@ void mpeg_stop(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
+#else
+    playing = false;
 #endif
 }
 
@@ -1066,6 +1072,8 @@ void mpeg_pause(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
+#else
+    playing = false;
 #endif
 }
 
@@ -1073,6 +1081,8 @@ void mpeg_resume(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
+#else
+    playing = true;
 #endif
 }
 
@@ -1080,6 +1090,8 @@ void mpeg_next(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
+#else
+    playing = true;
 #endif
 }
 
@@ -1087,16 +1099,14 @@ void mpeg_prev(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
+#else
+    playing = true;
 #endif
 }
 
 bool mpeg_is_playing(void)
 {
-#ifndef SIMULATOR
     return playing || play_pending;
-#else
-    return false;
-#endif
 }
 
 #ifndef SIMULATOR
