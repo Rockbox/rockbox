@@ -216,7 +216,8 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
             entry->genre_string = 0;
             return tag - entry->id3v2buf;
         } else {
-            entry->genre = 0xFF;
+            entry->genre_string = tag;
+            entry->genre = 0xff;
             return bufferpos;
         }
     } else {
@@ -226,7 +227,8 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
             return tag - entry->id3v2buf;
         }
         else {
-            entry->genre = 0xFF;
+            entry->genre_string = tag;
+            entry->genre = 0xff;
             return bufferpos;
         }
     }
