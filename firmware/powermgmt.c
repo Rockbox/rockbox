@@ -26,6 +26,7 @@
 #include "adc.h"
 #include "string.h"
 #include "sprintf.h"
+#include "ata.h"
 #include "power.h"
 #include "powermgmt.h"
 
@@ -71,11 +72,6 @@ int battery_level(void)
     else /* history was empty, get a fresh sample */
         level = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
 
-#ifdef HAVE_CHARGE_CTRL    
-    if (charger_enabled)
-    	level -= 10;  /* the charger raises the voltage 0.05-0.2v */
-#endif
-    
     if(level > BATTERY_LEVEL_FULL)
         level = BATTERY_LEVEL_FULL;
 
@@ -89,13 +85,15 @@ int battery_level(void)
 bool battery_level_safe(void)
 {
     /* I'm pretty sure we don't want an average over a long time here */
-    return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000) / BATTERY_SCALE_FACTOR;
+    if (power_history[POWER_HISTORY_LEN-1])
+        return power_history[POWER_HISTORY_LEN-1] > BATTERY_LEVEL_DANGEROUS;
+    else
+        return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000) / BATTERY_SCALE_FACTOR;
 }
 
 /*
  * This power thread maintains a history of battery voltage
- * and should, in the future, enable charging when it's needed
- * and power is available, and disable it when the battery is full.
+ * and implements a charging algorithm.
  * Battery 'fullness' can be determined by the voltage drop, see:
  *
  * http://www.nimhbattery.com/nimhbattery-faq.htm questions 3 & 4
@@ -120,7 +118,7 @@ bool battery_level_safe(void)
 static void power_thread(void)
 {
     int i;
-    int avg;
+    int avg, ok_samples, spin_samples;
 #ifdef HAVE_CHARGE_CTRL
     int delta;
     int charged_time = 0;
@@ -128,22 +126,35 @@ static void power_thread(void)
     
     while (1)
     {
-        DEBUGF("power_thread woke up\n");
-        /* make POWER_AVG measurements and calculate an average of that to
-         * reduce the effect of backlights/disk spinning/other variation
+        /* Make POWER_AVG measurements and calculate an average of that to
+         * reduce the effect of backlights/disk spinning/other variation.
          */
-        avg = 0;
-        for (i = 0; i < POWER_AVG; i++) {
-            avg += adc_read(ADC_UNREG_POWER);
-            sleep(15);
+        ok_samples = spin_samples = avg = 0;
+        for (i = 0; i < POWER_AVG_N; i++) {
+            if (ata_disk_is_active()) {
+                if (!ok_samples) {
+                    /* if we don't have any good non-disk-spinning samples,
+                     * we take a sample anyway in case the disk is going
+                     * to spin all the time.
+                     */
+                    avg += adc_read(ADC_UNREG_POWER);
+                    spin_samples++;
+                }
+            } else {
+                if (spin_samples) /* throw away disk-spinning samples */
+                    spin_samples = avg = 0;
+                avg += adc_read(ADC_UNREG_POWER);
+                ok_samples++;
+            }
+            sleep(HZ*POWER_AVG_SLEEP);
         }
-        avg = avg / POWER_AVG;
+        avg = avg / ((ok_samples) ? ok_samples : spin_samples);
         
         /* rotate the power history */
         for (i = 0; i < POWER_HISTORY_LEN-1; i++)
             power_history[i] = power_history[i+1];
         
-        /* insert new value in the end, in decivolts 8-) */
+        /* insert new value in the end, in centivolts 8-) */
         power_history[POWER_HISTORY_LEN-1] = (avg * BATTERY_SCALE_FACTOR) / 10000;
         
 #ifdef HAVE_CHARGE_CTRL
@@ -163,25 +174,25 @@ static void power_thread(void)
                         /* have charged continuously over the minimum charging time,
                          * so we monitor for deltaV going negative. Multiply things
                          * by 100 to get more accuracy without floating point arithmetic.
-                         * power_history[] contains decivolts.
+                         * power_history[] contains centivolts so after multiplying by 100
+                         * the deltas are in tenths of millivolts (delta of 5 is
+                         * 0.0005 V).
                          */
-                        delta = 0;
-                        for (i = 0; i < CHARGE_END_NEGD; i++)
-                            delta += power_history[POWER_HISTORY_LEN-1-i]*100 - power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                        delta = delta / CHARGE_END_NEGD;
+                        delta = ( power_history[POWER_HISTORY_LEN-1] * 100
+                                - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
+                                / CHARGE_END_NEGD;
                         
-                        if (delta < -50) { /* delta < -0.3 V */
+                        if (delta < -100) { /* delta < -10 mV */
                             DEBUGF("power: short-term negative delta, enough!\n");
                             charger_enable(false);
                             snprintf(power_message, POWER_MESSAGE_LEN, "end negd %d %dmin", delta, charged_time);
                         } else {
                             /* if we didn't disable the charger in the previous test, check for low positive delta */
-                            delta = 0;
-                            for (i = 0; i < CHARGE_END_ZEROD; i++)
-                                delta += power_history[POWER_HISTORY_LEN-1-i]*100 - power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                            delta = delta / CHARGE_END_ZEROD;
+                            delta = ( power_history[POWER_HISTORY_LEN-1] * 100
+                                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
+                                    / CHARGE_END_ZEROD;
                             
-                            if (delta <= 5) { /* delta of <= 0.005 V */
+                            if (delta < 1) { /* delta < 0.1 mV */
                                 DEBUGF("power: long-term small positive delta, enough!\n");
                                 charger_enable(false);
                                 snprintf(power_message, POWER_MESSAGE_LEN, "end lowd %d %dmin", delta, charged_time);
@@ -212,7 +223,7 @@ static void power_thread(void)
 #endif /* HAVE_CHARGE_CTRL*/
         
         /* sleep for roughly a minute */
-        sleep(HZ*(60-POWER_AVG*15));
+        sleep(HZ*(60 - POWER_AVG_N * POWER_AVG_SLEEP));
     }
 }
 

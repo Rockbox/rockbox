@@ -29,10 +29,11 @@
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
-#define POWER_AVG         3      /* how many samples to take for each measurement */
+#define POWER_AVG_N       4      /* how many samples to take for each measurement */
+#define POWER_AVG_SLEEP   10     /* how long do we sleep between each measurement */
 
 #define CHARGE_END_NEGD   6      /* stop when N minutes have passed with
-                                  * avg delta being < -0.3 V */
+                                  * avg delta being < -0.05 V */
 #define CHARGE_END_ZEROD  30     /* stop when N minutes have passed with
                                   * avg delta being < 0.005 V */
 
