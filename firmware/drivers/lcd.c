@@ -1027,11 +1027,29 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
  */
 void lcd_drawrect (int x, int y, int nx, int ny)
 {
-    lcd_drawline(x, y, nx, y);
-    lcd_drawline(x, ny, nx, ny);
+    int i;
 
-    lcd_drawline(x, y, x, ny);
-    lcd_drawline(nx, y, nx, ny);
+    if (x > LCD_WIDTH)
+        return;
+    if (y > LCD_HEIGHT)
+        return;
+
+    if (x + nx > LCD_WIDTH)
+        nx = LCD_WIDTH - x;
+    if (y + ny > LCD_HEIGHT)
+        ny = LCD_HEIGHT - y;
+
+    /* vertical lines */
+    for (i = 0; i < ny; i++) {
+        DRAW_PIXEL(x, (y + i));
+        DRAW_PIXEL((x + nx - 1), (y + i));
+    }
+
+    /* horizontal lines */
+    for (i = 0; i < nx; i++) {
+        DRAW_PIXEL((x + i),y);
+        DRAW_PIXEL((x + i),(y + ny - 1));
+    }
 }
 
 /*
@@ -1057,21 +1075,21 @@ void lcd_fillrect (int x, int y, int nx, int ny)
 /* Invert a rectangular area at (x, y), size (nx, ny) */
 void lcd_invertrect (int x, int y, int nx, int ny)
 {
-    int i,j;
+    int i, j;
 
-    if (x>LCD_WIDTH)
+    if (x > LCD_WIDTH)
         return;
-    if (y>LCD_HEIGHT)
+    if (y > LCD_HEIGHT)
         return;
 
-    if (x+nx>LCD_WIDTH)
-        nx=LCD_WIDTH-x;
-    if (y+ny>LCD_HEIGHT)
-        ny=LCD_HEIGHT-y;
+    if (x + nx > LCD_WIDTH)
+        nx = LCD_WIDTH - x;
+    if (y + ny > LCD_HEIGHT)
+        ny = LCD_HEIGHT - y;
 
     for (i = 0; i < nx; i++)
         for (j = 0; j < ny; j++)
-            INVERT_PIXEL((x+i),(y+j));
+            INVERT_PIXEL((x + i), (y + j));
 }
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )
@@ -1228,6 +1246,14 @@ void lcd_drawpixel(int x, int y)
 void lcd_clearpixel(int x, int y)
 {
     CLEAR_PIXEL(x,y);
+}
+
+/*
+ * Invert a single pixel
+ */
+void lcd_invertpixel(int x, int y)
+{
+    INVERT_PIXEL(x,y);
 }
 
 /*
