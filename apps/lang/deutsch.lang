@@ -2815,3 +2815,15 @@ desc:  in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 vor Version 1"
 new: "V2 vor V1"
+
+id: LANG_NO_ROCKBOX_DIR
+desc: in browse root
+eng: "No .rockbox directory"
+voice: ""
+new: "Verzeichnis .rockbox fehlt"
+
+id: LANG_INSTALLATION_INCOMPLETE
+desc: in browse root
+eng: "Installation incomplete"
+voice: ""
+new: "Installation unvollständig"
