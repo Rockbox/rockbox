@@ -299,7 +299,7 @@ $(OBJDIR)/power.o: $(DRIVERS)/power.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd-playersim.o: ../common/lcd-playersim.c
-	$(CC) $(CFLAGS) -DHAVE_LCD_BITMAP -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
 
