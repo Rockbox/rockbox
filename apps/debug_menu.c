@@ -300,7 +300,11 @@ bool dbg_hw_info(void)
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
 
+#ifdef USB_ENABLE_ONDIOSTYLE
+    if(PADR & 0x20)
+#else
     if(PADR & 0x400)
+#endif
         usb_polarity = 0; /* Negative */
     else
         usb_polarity = 1; /* Positive */
