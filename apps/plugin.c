@@ -345,6 +345,9 @@ int plugin_load(const char* plugin, void* parameter)
 #endif
 
     plugin_loaded = true;
+
+    invalidate_icache();
+
     rc = plugin_start((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
