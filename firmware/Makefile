@@ -20,35 +20,21 @@ TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -Os -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) -DDEBUG
+CFLAGS = -Os -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
-SRC := $(wildcard drivers/*.c common/*.c *.c)
+SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
 OBJS := $(SRC:%.c=%.o) crt0.o
+DEPS:=.deps
+DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
-all : archos.mod # archos.asm 
 
-archos.elf : $(OBJS) app.lds
-	$(CC) -nostdlib -o archos.elf $(OBJS) -lgcc -lc -Tapp.lds -Wl,-Map,archos.map
-
-archos.bin : archos.elf
-	$(OC) -O binary archos.elf archos.bin
-
-archos.asm: archos.bin
-	../tools/sh2d -sh1 archos.bin > archos.asm
-
-archos.mod : archos.bin
-	../tools/scramble archos.bin archos.mod
-
-dist:
-	tar czvf dist.tar.gz Makefile main.c start.s app.lds
+librockbox.a: $(OBJS)
+	$(AR) ruv $@ $+
 
 clean:
-	-rm -f *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 	-$(RM) -r $(DEPS)
-
-DEPS:=.deps
-DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common
 
 $(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
