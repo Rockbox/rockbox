@@ -1,16 +1,4 @@
-# $Id$
-#
-# This is the master of the language files. This is the original, the one with
-# all the existing strings Rockbox features.
-#
-# *WARNING*
-#
-# If you want to add a new string, add it to the end of this file!
-# If you want to remove a string, just blank it, don't actually remove it!
-#
-# If you re-order things or remove entries, you must bump the binary language
-# file version number in both the 'binlang' tool and the language loader code.
-#
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -162,7 +150,7 @@ eng: "Is battery low?"
 new: "Batterie schwach?"
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: if save settings has failed
 eng: "ON to set"
 new: "ON = speichern"
 
@@ -173,17 +161,23 @@ new: "OFF = abbrechen"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Versteckte Dateien"
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Anzeigen"
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Verstecken"
 
 id: LANG_CONTRAST
@@ -194,16 +188,18 @@ new: "Kontrast"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Zufallwiedergabe"
+new: "Zufallswiedergabe"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Gewählte zuerst wiederg."
+new: "Gewählte zuerst wiedergeben"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Musik-Filter"
 
 id: LANG_SORT_CASE
@@ -223,7 +219,9 @@ new: "Aus"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
+### English phrase was changed! Previous translation was made on:
+### "Ask"
+eng: "Ask"
 new: "nachfragen"
 
 id: LANG_ON
@@ -236,13 +234,10 @@ desc: in settings_menu
 eng: "Backlight"
 new: "Beleuchtung"
 
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu, 
-
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Beispiel Scrollgeschwindigkeit"
+new: "Beispieltext für die Scrollgeschwindigkeit"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
@@ -582,11 +577,13 @@ new: "Pause"
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "mode:"
-new: "Modus:"
+new: "modus:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
+### English phrase was changed! Previous translation was made on:
+### ""
+eng: ""
 new: "Verzeichnisf.: %s"
 
 id: LANG_F3_STATUS
@@ -704,11 +701,6 @@ desc: what does F3 do
 eng: "[F3] + level"
 new: "[F3] + Level"
 
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
-
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
@@ -743,10 +735,6 @@ id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
 eng: "Hs: %d"
 new: "Hs: %d"
-
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
@@ -783,8 +771,6 @@ desc: wormlet game
 eng: "Out of control"
 new: "Ohne Kontrolle"
 
-# Wormlet game ids ended
-
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
@@ -805,3 +791,67 @@ desc: shown when a language has been loaded from the dir browser
 eng: "new language"
 new: "neue Sprache"
 
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Beleuchtung an bei Netzbetrieb"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Dateifilter"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "Alle"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Musik"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Unterstützte"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Übersteuerung Haltezeit"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "Ewig"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Aussteuerungsanzeige"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Aussteuerung Haltezeit"
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Geschwindigkeit beim Abfallen"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Einheiten pro gelesenem Wert"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Nein"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Ja"
