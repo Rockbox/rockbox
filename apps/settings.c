@@ -553,8 +553,10 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
 #ifdef HAVE_RTC
 #define INDEX_X 0
 #define INDEX_Y 1
+#define INDEX_WIDTH 2
 char *dayname[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-char cursor[][2]={{9, 1}, {12, 1}, {15, 1}, {9, 2}, {12, 2}, {15, 2}};
+char *monthname[]={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+char cursor[][3]={{0, 1, 2}, {3, 1, 2}, {6, 1, 2}, {4, 2, 4}, {9, 2, 3}, {13, 2, 2}};
 char daysinmonth[]={31,28,31,30,31,30,31,31,30,31,30,31};
 
 void set_time(char* string, int timedate[])
@@ -574,36 +576,36 @@ void set_time(char* string, int timedate[])
 
     while ( !done ) {
         /* calculate the number of days in febuary */
-        realyear=timedate[5]+2000;
+        realyear=timedate[3]+2000;
         if((realyear%4==0 && !(realyear%100 == 0)) || realyear%400 == 0) /* for february depends on year */
             daysinmonth[1]=29;
         else
             daysinmonth[1]=28;
 
         /* fix day if month or year changed */
-        timedate[3]=timedate[3]<daysinmonth[timedate[4]-1]?timedate[3]:daysinmonth[timedate[4]-1];
+        timedate[5]=timedate[5]<daysinmonth[timedate[4]-1]?timedate[5]:daysinmonth[timedate[4]-1];
 
         /* calculate day of week */
         julianday=0;
         for(i=0;i<timedate[4]-1;i++) {
            julianday+=daysinmonth[i];
         }
-        julianday+=timedate[3];
+        julianday+=timedate[5];
         timedate[6]=(realyear+julianday+(realyear-1)/4-(realyear-1)/100+(realyear-1)/400+7-1)%7;
 
-        snprintf(buffer, sizeof(buffer), "Time     %02d:%02d:%02d",
+        snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d",
                  timedate[0],
                  timedate[1],
                  timedate[2]);
         lcd_puts(0,1,buffer);
 
-        snprintf(buffer, sizeof(buffer), "Date %s %02d.%02d.%02d",
+        snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d",
                  dayname[timedate[6]],
                  timedate[3],
-                 timedate[4],
+                 monthname[timedate[4]-1],
                  timedate[5]);
         lcd_puts(0,2,buffer);
-        lcd_invertrect(cursor[cursorpos][INDEX_X]*6,cursor[cursorpos][INDEX_Y]*8,12,8);
+        lcd_invertrect(cursor[cursorpos][INDEX_X]*6,cursor[cursorpos][INDEX_Y]*8,cursor[cursorpos][INDEX_WIDTH]*6,8);
         lcd_puts(0,4,"ON  to set");
         lcd_puts(0,5,"OFF to revert");
         lcd_update();
@@ -621,17 +623,17 @@ void set_time(char* string, int timedate[])
                     min=0;
                     steps=60;
                     break;
-                case 3: /* day */
-                    min=1;
-                    steps=daysinmonth[timedate[4]-1];
+                case 3: /* year */
+                    min=0;
+                    steps=100;
                     break;
                 case 4: /* month */
                     min=1;
                     steps=12;
                     break;
-                case 5: /* year */
-                    min=0;
-                    steps=100;
+                case 5: /* day */
+                    min=1;
+                    steps=daysinmonth[timedate[4]-1];
                     break;
             }
         }
