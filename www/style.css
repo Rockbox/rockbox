@@ -91,7 +91,8 @@ PRE {
 }
 
 
-.rockbox, .changetable, .bugs, .requests, .dailymod, .buildstatus, .archive, .buttontable {
+.rockbox, .changetable, .bugs, .requests, .dailymod, .buildstatus, .archive, .buttontable, .changesummary
+{
  border: outset 2px #ffffff;
 }
 
@@ -99,7 +100,14 @@ PRE {
  vertical-align: top;
 }
 
-.rockbox td, .changetable td, .bugs td, .requests td, .archive td, .buttontable td {
+.filechange {
+ background-color: #c6d6f5;
+ font-weight: bold;
+ padding: 4px;
+}
+
+.rockbox td, .changetable td, .bugs td, .requests td, .archive td, .buttontable td
+{
  background-color: #c6d6f5;
  padding: 4px;
 }
@@ -113,3 +121,14 @@ PRE {
  background-color: #f0c0c0;
 }
 
+.feature {
+ font-weight: bold;
+}
+
+td.fgood {
+ background-color: #aae8aa;
+}
+
+td.fbad {
+ background-color: #f0c0c0;
+}
