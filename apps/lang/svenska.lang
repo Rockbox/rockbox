@@ -2654,29 +2654,65 @@ new: "Öppna med"
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
+voice: "Alphabetical"
 new: "Alfabetiskt"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
+voice: "by date"
 new: "på datum"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
+voice: "by newest date"
 new: "på senaste datum"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
+voice: "sort directories"
 new: "Sortera kataloger"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
+voice: "sort files"
 new: "Sortera filer"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
+voice: "by type"
 new: "på typ"
+
+id: LANG_FM_BUTTONBAR_ACTION
+desc: in radio screen
+eng: "Action"
+new: "Sätt igång"
+
+id: LANG_FM_BUTTONBAR_ADD
+desc: in radio screen
+eng: "Add"
+new: "Addera"
+
+id: LANG_FM_BUTTONBAR_EDIT
+desc: in radio screen
+eng: "Edit"
+new: "Redigera"
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc: in radio screen
+eng: "Exit"
+new: "Gå ur"
+
+id: LANG_FM_EDIT_PRESET
+desc: in radio screen
+eng: "Edit preset"
+new: "Redigera förinställningar"
+
+id: LANG_FM_MONO_MODE
+desc: in radio screen
+eng: "Force mono"
+new: "Tvinga mono"
