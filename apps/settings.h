@@ -77,7 +77,7 @@ struct user_settings
     /* misc options */
 
     int loop_playlist; /* do we return to top of playlist at end?  */
-    bool mp3filter;    /* only display mp3/m3u files and dirs in directory? */
+    int dirfilter;     /* 0=display all, 1=only supported, 2=only music */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
     bool playlist_shuffle;
@@ -92,10 +92,6 @@ struct user_settings
     /* show scroll bar */
     bool scrollbar;    /* 0=hide, 1=show */
 
-    /* Hidden and dotfile settings */
-    bool show_hidden_files; /* 1=show dotfiles/hidden,
-                               0=hide dotfiles/hidden */
-    
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
@@ -147,5 +143,8 @@ extern char rockboxdir[];
 #define DEFAULT_BACKLIGHT_SETTING   5
 #define DEFAULT_FF_REWIND_MIN_STEP  FF_REWIND_1000
 #define DEFAULT_FF_REWIND_ACCEL_SETTING 3
+
+/* dir filter options */
+enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, NUM_FILTER_MODES };
 
 #endif /* __SETTINGS_H__ */

@@ -173,17 +173,17 @@ new:
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
+eng: ""
 new:
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
+eng: ""
 new:
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
+eng: ""
 new:
 
 id: LANG_CONTRAST
@@ -203,7 +203,7 @@ new:
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
+eng: ""
 new:
 
 id: LANG_SORT_CASE
@@ -586,7 +586,7 @@ new:
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
+eng: ""
 new:
 
 id: LANG_F3_STATUS
@@ -803,4 +803,24 @@ new:
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "new language"
+new:
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new:
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new:
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new:
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
 new:

@@ -167,6 +167,8 @@ bool f2_screen(void)
     lcd_stop_scroll();
 
     while (!exit) {
+        char* ptr=NULL;
+
         lcd_clear_display();
 
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
@@ -177,12 +179,25 @@ bool f2_screen(void)
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        snprintf(buf, sizeof buf, str(LANG_DIR_FILTER),
-                 global_settings.mp3filter ? str(LANG_ON) : str(LANG_OFF));
+        switch ( global_settings.dirfilter ) {
+            case SHOW_ALL:
+                ptr = str(LANG_FILTER_ALL);
+                break;
 
-        /* Get the string width and height */
+            case SHOW_SUPPORTED:
+                ptr = str(LANG_FILTER_SUPPORTED);
+                break;
+
+            case SHOW_MUSIC:
+                ptr = str(LANG_FILTER_MUSIC);
+                break;
+        }
+
+        snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));
         lcd_getstringsize(buf,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
@@ -203,7 +218,9 @@ bool f2_screen(void)
 
             case BUTTON_DOWN:
             case BUTTON_F2 | BUTTON_DOWN:
-                global_settings.mp3filter = !global_settings.mp3filter;
+                global_settings.dirfilter++;
+                if ( global_settings.dirfilter >= NUM_FILTER_MODES )
+                    global_settings.dirfilter = 0;
                 used = true;
                 break;
 

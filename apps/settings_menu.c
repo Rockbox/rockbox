@@ -38,14 +38,6 @@
 #include "ata.h"
 #include "lang.h"
 
-static bool show_hidden_files(void)
-{
-    return set_bool_options( str(LANG_HIDDEN),
-                             &global_settings.show_hidden_files,
-                             str(LANG_HIDDEN_SHOW),
-                             str(LANG_HIDDEN_HIDE) );
-}
-
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
@@ -64,9 +56,13 @@ static bool play_selected(void)
     return set_bool( str(LANG_PLAY_SELECTED), &global_settings.play_selected );
 }
 
-static bool mp3_filter(void)
+static bool dir_filter(void)
 {
-    return set_bool( str(LANG_MP3FILTER), &global_settings.mp3filter );
+    char* names[] = { str(LANG_FILTER_ALL),
+                      str(LANG_FILTER_SUPPORTED),
+                      str(LANG_FILTER_MUSIC) };
+    return set_option( str(LANG_FILTER), &global_settings.dirfilter,
+                       names, 3, NULL );
 }
 
 static bool sort_case(void)
@@ -298,8 +294,7 @@ static bool fileview_settings_menu(void)
 
     struct menu_items items[] = {
         { str(LANG_CASE_MENU),    sort_case           },
-        { str(LANG_MP3FILTER),    mp3_filter          },
-        { str(LANG_HIDDEN),       show_hidden_files   },
+        { str(LANG_FILTER),       dir_filter          },
         { str(LANG_FOLLOW),       browse_current      },
     };
 

@@ -71,7 +71,7 @@ offset  abs
 0x0b    0x1f    <backlight byte>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
-0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden,
+0x0e    0x22    <shuffle,dirfilter,sort_case,discharge,statusbar,show_hidden,
                  scroll bar>
 0x0f    0x23    <scroll speed>
 0x10    0x24    <ff/rewind min step, acceleration rate>
@@ -267,11 +267,11 @@ int settings_save( void )
     
     config_block[0xe] = (unsigned char)
         ((global_settings.playlist_shuffle & 1) |
-         ((global_settings.mp3filter & 1) << 1) |
+         ((global_settings.dirfilter & 1) << 1) |
          ((global_settings.sort_case & 1) << 2) |
          ((global_settings.discharge & 1) << 3) |
          ((global_settings.statusbar & 1) << 4) |
-         ((global_settings.show_hidden_files & 1) << 5) |
+         ((global_settings.dirfilter & 2) << 4) |
          ((global_settings.scrollbar & 1) << 6));
 
     config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
@@ -361,11 +361,11 @@ void settings_load(void)
             global_settings.resume = config_block[0xd];
         if (config_block[0xe] != 0xFF) {
             global_settings.playlist_shuffle = config_block[0xe] & 1;
-            global_settings.mp3filter = (config_block[0xe] >> 1) & 1;
+            global_settings.dirfilter = (config_block[0xe] >> 1) & 1;
             global_settings.sort_case = (config_block[0xe] >> 2) & 1;
             global_settings.discharge = (config_block[0xe] >> 3) & 1;
             global_settings.statusbar = (config_block[0xe] >> 4) & 1;
-            global_settings.show_hidden_files = (config_block[0xe] >> 5) & 1;
+            global_settings.dirfilter |= ((config_block[0xe] >> 5) & 1) << 1;
             global_settings.scrollbar = (config_block[0xe] >> 6) & 1;
             /* Don't use the last bit, it must be unused to detect
                an uninitialized entry */
@@ -594,7 +594,7 @@ void settings_reset(void) {
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
-    global_settings.mp3filter   = true;
+    global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
     global_settings.scrollbar   = true;
@@ -603,7 +603,6 @@ void settings_reset(void) {
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
-    global_settings.show_hidden_files = false;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;

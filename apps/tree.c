@@ -235,8 +235,8 @@ static int showdir(char *path, int start)
                 continue;
             }
 
-            /* Skip dotfiles if set to skip them */
-            if (!global_settings.show_hidden_files &&
+            /* filter out dotfiles and hidden files */
+            if (global_settings.dirfilter != SHOW_ALL &&
                 ((entry->d_name[0]=='.') ||
                  (entry->attribute & ATTR_HIDDEN))) {
                 i--;
@@ -269,15 +269,22 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_MOD;
             }
 
-            /* filter non-mp3 or m3u files */
-            if ( global_settings.mp3filter &&
+            /* filter out non-music files */
+            if ( global_settings.dirfilter == SHOW_MUSIC &&
                  (!(dptr->attr &
                     (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ) {
                 i--;
                 continue;
             }
 
-            if(len > NAME_BUFFER_SIZE - name_buffer_length - 1) {
+            /* filter out non-supported files */
+            if ( global_settings.dirfilter == SHOW_SUPPORTED &&
+                 (!(dptr->attr & TREE_ATTR_MASK)) ) {
+                i--;
+                continue;
+            }
+
+            if (len > NAME_BUFFER_SIZE - name_buffer_length - 1) {
                 /* Tell the world that we ran out of buffer space */
                 dir_buffer_full = true;
                 break;
@@ -407,8 +414,8 @@ static int showdir(char *path, int start)
 #endif
         }
 
-        /* if MP3 filter is on, cut off the extension */
-        if (global_settings.mp3filter && 
+        /* if music filter is on, cut off the extension */
+        if (global_settings.dirfilter == SHOW_MUSIC && 
             (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
         {
             char temp = dircache[i].name[len-4];
@@ -587,9 +594,8 @@ bool dirbrowse(char *root)
     int button;
     int tree_max_on_screen;
     bool reload_root = false;
-    bool lastfilter = global_settings.mp3filter;
+    int lastfilter = global_settings.dirfilter;
     bool lastsortcase = global_settings.sort_case;
-    bool lastshowhidden = global_settings.show_hidden_files;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     lcd_getstringsize("A", &fw, &fh);
@@ -927,9 +933,8 @@ bool dirbrowse(char *root)
         
         /* do we need to rescan dir? */
         if (reload_root ||
-            lastfilter != global_settings.mp3filter ||
-            lastsortcase != global_settings.sort_case ||
-            lastshowhidden != global_settings.show_hidden_files)
+            lastfilter != global_settings.dirfilter ||
+            lastsortcase != global_settings.sort_case)
         {
             if ( reload_root ) {
                 strcpy(currdir, "/");
@@ -939,9 +944,8 @@ bool dirbrowse(char *root)
             dircursor = 0;
             dirstart = 0;
             lastdir[0] = 0;
-            lastfilter = global_settings.mp3filter;
+            lastfilter = global_settings.dirfilter;
             lastsortcase = global_settings.sort_case;
-            lastshowhidden = global_settings.show_hidden_files;
             restore = true;
         }
 
@@ -964,25 +968,21 @@ bool dirbrowse(char *root)
             if(lasti!=i || restore) {
                 lasti=i;
                 lcd_stop_scroll();
-                if (global_settings.mp3filter && 
-                    (dircache[i].attr &
-                     (TREE_ATTR_M3U|TREE_ATTR_MPA)))
+                if (global_settings.dirfilter == SHOW_MUSIC && 
+                    (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
                 {
                     int len = strlen(dircache[i].name);
                     char temp = dircache[i].name[len-4];
                     dircache[i].name[len-4] = 0;
-                    lcd_puts_scroll(LINE_X, dircursor, 
-                                    dircache[i].name);
+                    lcd_puts_scroll(LINE_X, dircursor, dircache[i].name);
                     dircache[i].name[len-4] = temp;
                 }
                 else
-                    lcd_puts_scroll(LINE_X, dircursor,
-                                    dircache[i].name);
+                    lcd_puts_scroll(LINE_X, dircursor, dircache[i].name);
             }
         }
         status_draw();
         lcd_update();
-
     }
 
     return false;
