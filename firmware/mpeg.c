@@ -48,6 +48,7 @@
 #define MPEG_PREV         6
 #define MPEG_NEED_DATA    100
 #define MPEG_SWAP_DATA    101
+#define MPEG_TRACK_CHANGE 102
 
 extern char* peek_next_track(int type);
 extern char* peek_prev_track(int type);
@@ -408,6 +409,7 @@ void DEI3(void)
 {
     int unplayed_space_left;
     int space_until_end_of_buffer;
+    int track_offset = 0;
 
     if(playing)
     {
@@ -420,15 +422,8 @@ void DEI3(void)
         {
             if (mp3buf_read == id3tags[1].mempos)
             {
-                /* shift array so index 0 is current track */
-                int i;
-
-                DEBUGF("Track change\n");
-                for (i=0; i<last_tag-1; i++)
-                {
-                    id3tags[i] = id3tags[i+1];
-                }
-                last_tag--;
+                queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                track_offset = 1;
             }
         }
         
@@ -451,14 +446,16 @@ void DEI3(void)
                                       space_until_end_of_buffer);
 
             /* several tracks loaded? */
-            if (last_tag>1)
+            if ((last_tag - track_offset) > 1)
             {
                 /* will we move across the track boundary? */
-                if (( mp3buf_read < id3tags[1].mempos ) &&
-                    ((mp3buf_read+last_dma_chunk_size) > id3tags[1].mempos ))
+                if (( mp3buf_read < id3tags[1+track_offset].mempos ) &&
+                    ((mp3buf_read+last_dma_chunk_size) >
+                     id3tags[1+track_offset].mempos ))
                 {
                     /* Make sure that we end exactly on the boundary */
-                    last_dma_chunk_size = id3tags[1].mempos - mp3buf_read;
+                    last_dma_chunk_size = id3tags[1+track_offset].mempos
+                        - mp3buf_read;
                 }
             }
 
@@ -532,7 +529,8 @@ static void mpeg_thread(void)
     int unplayed_space_left;
     int amount_to_read;
     int amount_to_swap;
-
+    int i;
+    
     play_pending = false;
     playing = false;
     mpeg_file = -1;
@@ -797,6 +795,17 @@ static void mpeg_thread(void)
                         }
                     }
                 }
+                break;
+                
+            case MPEG_TRACK_CHANGE:
+                DEBUGF("Track change\n");
+
+                /* shift array so index 0 is current track */
+                for (i=0; i<last_tag-1; i++)
+                {
+                    id3tags[i] = id3tags[i+1];
+                }
+                last_tag--;
                 break;
                 
             case SYS_USB_CONNECTED:
