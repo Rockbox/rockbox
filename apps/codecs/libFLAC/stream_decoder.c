@@ -43,6 +43,10 @@
 #include "private/lpc.h"
 #include "private/memory.h"
 
+#if CONFIG_CPU==MCF5249
+#include <private/coldfire.h>
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -298,7 +302,11 @@ FLAC_API FLAC__StreamDecoderState FLAC__stream_decoder_init(FLAC__StreamDecoder 
 	decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal;
 	decoder->private_->local_lpc_restore_signal_64bit = FLAC__lpc_restore_signal_wide;
 	decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal;
+#if CONFIG_CPU==MCF5249 && !SIMULATOR
+	decoder->private_->local_lpc_restore_signal_16bit_order8 = FLAC__lpc_restore_signal_order8_mac;
+#else
 	decoder->private_->local_lpc_restore_signal_16bit_order8 = FLAC__lpc_restore_signal;
+#endif
 	/* now override with asm where appropriate */
 #ifndef FLAC__NO_ASM
 	if(decoder->private_->cpuinfo.use_asm) {
