@@ -102,7 +102,7 @@
 /*** generic code ***/
 
 struct scrollinfo {
-    char text[128];
+    char text[257];
     char line[32];
     int textlen;
     char offset;
