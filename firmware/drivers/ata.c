@@ -66,6 +66,8 @@ static char device; /* device 0 (master) or 1 (slave) */
 
 static volatile unsigned char* ata_control;
 
+bool old_recorder = false;
+
 static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*4;
@@ -346,11 +348,13 @@ static int io_address_detect(void)
     if(tmp == ((*ATA_CONTROL2) & 0xf9))
     {
         DEBUGF("CONTROL is at 0x306\n");
+        old_recorder = true;
         ata_control = ATA_CONTROL2;
     }
     else
     {
         DEBUGF("CONTROL is at 0x206\n");
+        old_recorder = false;
         ata_control = ATA_CONTROL1;
     }
 
