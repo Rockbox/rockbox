@@ -30,7 +30,7 @@ static struct event_queue button_queue;
 
 #define POLL_FREQUENCY    HZ/10
 #define REPEAT_START      3
-#define REPEAT_INTERVAL   3
+#define REPEAT_INTERVAL   2
 
 static int button_read(void);
 
@@ -105,17 +105,6 @@ int button_get(bool block)
 #define	LEVEL3		175
 #define	LEVEL4		225
 
-/* Number of calls to get_button for a button to stop bouncing
- * and to be considered held down.
- * Should really use a hardware timer for this.
- */
-#define BOUNCE_COUNT	200
-#define HOLD_COUNT		10000
-
-static int last;	/* Last button pressed */
-static int count;	/* Number of calls button has been down */
-
-
 /*
  *Initialize buttons
  */
@@ -134,8 +123,6 @@ void button_init()
     ADCR  = 0;
     ADCSR = ADCSR_ADST | ADCSR_SCAN | 0x5;
 #endif
-    last = BUTTON_NONE;
-    count = 0;
     queue_init(&button_queue);
     tick_add_task(button_tick);
 }
@@ -143,7 +130,7 @@ void button_init()
 /*
  * Get button pressed from hardware
  */
-static int get_raw_button (void)
+static int button_read(void)
 {
     /* Check port B pins for ON and OFF */
     int data = PBDR;
@@ -175,40 +162,6 @@ static int get_raw_button (void)
         return BUTTON_RIGHT;
   
     return BUTTON_NONE;
-}
-
-/*
- * Get the currently pressed button.
- * Returns one of BUTTON_xxx codes, with possibly a modifier bit set.
- * No modifier bits are set when the button is first pressed.
- * BUTTON_HELD bit is while the button is being held.
- * BUTTON_REL bit is set when button has been released.
- */
-static int button_read(void)
-{
-    int btn = get_raw_button();
-    int ret;
-
-    /* Last button pressed is still down */
-    if (btn != BUTTON_NONE && btn == last) {
-        count++;
-        if (count == BOUNCE_COUNT)
-            return btn;
-        else if (count >= HOLD_COUNT)
-            return btn | BUTTON_HELD;
-        else
-            return BUTTON_NONE;
-    }
-
-    /* Last button pressed now released */
-    if (btn == BUTTON_NONE && last != BUTTON_NONE)
-        ret = last | BUTTON_REL;
-    else
-        ret = BUTTON_NONE;
-    
-    last = btn;
-    count = 0;
-    return ret;
 }
 
 #elif HAVE_PLAYER_KEYPAD
