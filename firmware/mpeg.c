@@ -845,14 +845,19 @@ static void swap_one_chunk(void)
 {
     int free_space_left;
     int amount_to_swap;
-    int t1, t2;
 
     free_space_left = get_unswapped_space();
 
     if(free_space_left == 0 && !play_pending)
         return;
-                
-    amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+
+    /* Swap in larger chunks when the user is waiting for the playback
+       to start */
+    if(play_pending)
+        amount_to_swap = MIN(MPEG_LOW_WATER_CHUNKSIZE, free_space_left);
+    else
+        amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+    
     if(mp3buf_write < mp3buf_swapwrite)
         amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
                              amount_to_swap);
@@ -860,17 +865,12 @@ static void swap_one_chunk(void)
         amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
                              amount_to_swap);
                 
-    DEBUGF("B %x\n", amount_to_swap);
-    t1 = current_tick;
     bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
-    t2 = current_tick;
-    DEBUGF("time: %d\n", t2 - t1);
 
     mp3buf_swapwrite += amount_to_swap;
     if(mp3buf_swapwrite >= mp3buflen)
     {
         mp3buf_swapwrite = 0;
-        DEBUGF("BW\n");
     }
 
     /* And while we're at it, see if we have started
@@ -919,8 +919,6 @@ static void mpeg_thread(void)
 
     while(1)
     {
-        DEBUGF("S R:%x W:%x SW:%x\n",
-               mp3buf_read, mp3buf_write, mp3buf_swapwrite);
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -931,6 +929,8 @@ static void mpeg_thread(void)
         }
         else
         {
+            DEBUGF("S R:%x W:%x SW:%x\n",
+                   mp3buf_read, mp3buf_write, mp3buf_swapwrite);
             queue_wait(&mpeg_queue, &ev);
         }
         
