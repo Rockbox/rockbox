@@ -285,8 +285,8 @@ int wps_load_custom_config(void)
                     case 'h':  /* Conditional Filename \ ID3 Title-Artist */
                         if(id3->artist && id3->title)
                             snprintf(tmpbuf, sizeof(tmpbuf), "%s - %s",
-                                    id3->title?id3->title:"<no title>");
-                                    id3->artist?id3->artist:"<no artist>",
+                                     id3->title?id3->title:"<no title>",
+                                     id3->artist?id3->artist:"<no artist>");
                         else
                             snprintf(tmpbuf, sizeof(tmpbuf), "%s",
                                     szLast?++szLast:id3->path);
