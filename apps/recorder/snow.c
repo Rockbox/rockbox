@@ -93,7 +93,7 @@ static void snow_init(void)
     lcd_clear_display();
 }
 
-Menu snow(void)
+bool snow(void)
 {
     snow_init();
 
@@ -102,6 +102,6 @@ Menu snow(void)
         lcd_update();
         sleep(HZ/20);
         if (button_get(false))
-            return MENU_OK;
+            return false;
     }
 }
