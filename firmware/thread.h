@@ -20,9 +20,11 @@
 #define THREAD_H
 
 #define MAXTHREADS	16
+#define DEFAULT_STACK_SIZE 0x800 /* Bytes */
 
-int create_thread(void* function, void* stack, int stack_size);
+int create_thread(void* function, void* stack, int stack_size, char *name);
 void switch_thread(void);
 void init_threads(void);
+int thread_stack_usage(int threadnum);
 
 #endif

@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "thread.h"
+#include "panic.h"
 
 struct regs
 {
@@ -28,9 +29,16 @@ struct regs
     void*         pr;   /* Procedure register */
 };
 
-static int num_threads;
+int num_threads;
 static int current_thread;
 static struct regs thread_contexts[MAXTHREADS];
+char *thread_name[MAXTHREADS];
+void *thread_stack[MAXTHREADS];
+int thread_stack_size[MAXTHREADS];
+static char main_thread_name[] = "main";
+
+extern int stackbegin[];
+extern int stackend[];
 
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
@@ -83,6 +91,7 @@ void switch_thread(void)
 {
     int current;
     int next;
+    unsigned int *stackptr;
 
     next = current = current_thread;
     if (++next >= num_threads)
@@ -90,6 +99,11 @@ void switch_thread(void)
     current_thread = next;
     store_context(&thread_contexts[current]);
     load_context(&thread_contexts[next]);
+
+    stackptr = thread_stack[next];
+    
+    if(stackptr[0] != 0xdeadbeef)
+       panicf("Stkov %s", thread_name[next]);
 }
 
 /*--------------------------------------------------------------------------- 
@@ -97,11 +111,12 @@ void switch_thread(void)
  * Return 0 if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread(void* function, void* stack, int stack_size)
+int create_thread(void* function, void* stack, int stack_size, char *name)
 {
     unsigned int i;
     unsigned int stacklen;
     unsigned int *stackptr;
+    struct regs *regs;
         
     if (num_threads >= MAXTHREADS)
         return -1;
@@ -115,9 +130,13 @@ int create_thread(void* function, void* stack, int stack_size)
 	    stackptr[i] = 0xdeadbeef;
 	}
 
-        struct regs* regs = &thread_contexts[num_threads++];
+	/* Store interesting information */
+	thread_name[num_threads] = name;
+	thread_stack[num_threads] = stack;
+	thread_stack_size[num_threads] = stack_size;
+        regs = &thread_contexts[num_threads++];
         store_context(regs);
-        /* Subtract 4 to leave room for the PR push in ldctx()
+        /* Subtract 4 to leave room for the PR push in load_context()
            Align it on an even 32 bit boundary */
         regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
         regs->sr = 0;
@@ -130,4 +149,25 @@ void init_threads(void)
 {
     num_threads = 1; /* We have 1 thread to begin with */
     current_thread = 0; /* The current thread is number 0 */
+    thread_name[0] = main_thread_name;
+    thread_stack[0] = stackbegin;
+    thread_stack_size[0] = (int)stackend - (int)stackbegin;
+}
+
+int thread_stack_usage(int threadnum)
+{
+   unsigned int i;
+   unsigned int *stackptr = thread_stack[threadnum];
+
+   if(threadnum >= num_threads)
+      return -1;
+   
+   for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
+   {
+      if(stackptr[i] != 0xdeadbeef)
+	 break;
+   }
+   
+   return ((thread_stack_size[threadnum] - i * 4) * 100) /
+      thread_stack_size[threadnum];
 }
