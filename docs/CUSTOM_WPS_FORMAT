@@ -5,8 +5,8 @@ Description / General Info
 --------------------------
 * The Custom WPS Display is used on both the Rockbox Player and Recorder, 
   as a means to customize the WPS to the user's likings.
-* After editing the .wps file, you may need to reboot your Rockbox.
-* The file may be 2 lines long for the Player, and 6 lines for the Recorder.
+* After editing the .wps file, "play" it to make it take effect.
+* The file may be 2 lines long for the Player, and 10 lines for the Recorder.
 * The line that has the time displayed on it MUST NOT be the line that
   is scrolled, or the time will not be updated.
 * All characters not preceded by % are displayed as typed.
@@ -42,9 +42,10 @@ Example for the the %dN commands: If the path is "/Rock/Kent/Isola/11 -
 747.mp3", %d1 is "Isola", %d2 is "Kent"... You get the picture.
 
 Playlist/Song Info Tags:
-  %pb : Progress Bar (Player ONLY)
-        This will display a 1 character "cup" that empties as the song goes
-        forward.
+  %pb : Progress Bar
+        Player: This will display a 1 character "cup" that empties as the
+                progresses.
+        Recorder: This will replace the entire line with a progress bar.
   %pp : Playlist Position
   %pe : Total Number of Playlist Entries
   %pc : Current Time In Song
