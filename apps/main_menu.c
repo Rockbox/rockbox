@@ -189,8 +189,11 @@ bool show_info(void)
                 snprintf(s, sizeof(s), str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
-            snprintf(s, sizeof(s), str(LANG_BATTERY_TIME), battery_level(),
-                     battery_time() / 60, battery_time() % 60);
+            if (battery_level() >= 0)
+                snprintf(s, sizeof(s), str(LANG_BATTERY_TIME), battery_level(),
+                         battery_time() / 60, battery_time() % 60);
+            else
+                strncpy(s, "(n/a)", sizeof(s));
             lcd_puts(0, y++, s);
         }
 
