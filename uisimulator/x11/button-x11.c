@@ -82,6 +82,12 @@ static int get_raw_button (void)
 
 	case XK_KP_Subtract:
 	    return BUTTON_F3;
+#else
+	case XK_KP_Add:
+	    return BUTTON_ON;
+
+	case XK_KP_Enter:
+	    return BUTTON_MENU;
 #endif
 
 	default:
