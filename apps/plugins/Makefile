@@ -34,7 +34,13 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
 
-all: $(OBJDIR)/libplugin.a $(ROCKS) $(DEPFILE)
+#for any recorder and iRiver model
+ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
+    SUBDIRS += rockboy
+endif
+
+.PHONY: $(SUBDIRS)
+all: $(OBJDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
@@ -95,10 +101,16 @@ $(LINKFILE): $(LDS)
 	@echo "build $@"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
+$(SUBDIRS):
+	@echo "MAKE in $@"
+	@mkdir -p $(OBJDIR)/$@
+	@$(MAKE) -C $@ TARGET=$(TARGET) DEBUG=$(DEBUG) OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+
 clean:
 	@echo "cleaning plugins"
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
 	$(OBJS) $(DEFS)
 	@$(MAKE) -C lib clean
+	@$(MAKE) -C rockboy clean
 
 -include $(DEPFILE)

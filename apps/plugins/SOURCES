@@ -29,6 +29,10 @@ oscillograph.c
 oscilloscope.c
 pong.c
 rockblox.c
+#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(SIMULATOR)
+/* loader, only needed for Archos */
+rockboy.c
+#endif
 sliding_puzzle.c
 snake.c
 snake2.c
