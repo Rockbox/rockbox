@@ -1,3 +1,4 @@
+# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -1483,3 +1484,38 @@ id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 new: "Max speellijst grootte"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always"
+eng: "Always"
+new: "Altijd" 
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+new: 
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new: "Vertraging" 
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time"
+eng: "One time"
+new: "Een keer" 
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Tijdsdeel" 
+
+id: LANG_RECORD_TIMESPLIT_REC
+desc: 
+eng: "Split time:"
+new: "Splits tijd:" 
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Toon Ikonen" 
