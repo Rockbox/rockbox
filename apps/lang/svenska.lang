@@ -127,7 +127,7 @@ new: "Dir filter: %s"
 id: LANG_DISCHARGE
 desc: in settings_menu
 eng: "Deep discharge"
-new: "Ljup urladdning"
+new: "Djup urladdning"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
