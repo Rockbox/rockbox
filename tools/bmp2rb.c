@@ -70,17 +70,18 @@ struct RGBQUAD
   unsigned char rgbReserved;
 } STRUCT_PACKED;
 
-#ifdef LITTLE_ENDIAN
-#define readshort(x) x
-#define readlong(x) x
-#else
 
-#define readshort(x) (((x&0xff00)>>8)|((x&0x00ff)<<8))
-#define readlong(x) (((x&0xff000000)>>24)| \
-                     ((x&0x00ff0000)>>8) | \
-                     ((x&0x0000ff00)<<8) | \
-                     ((x&0x000000ff)<<24))
-#endif
+short readshort(void* value)
+{
+    unsigned char* bytes = (unsigned char*) value;
+    return bytes[0] | (bytes[1] << 8);
+}
+
+int readlong(void* value)
+{
+    unsigned char* bytes = (unsigned char*) value;
+    return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+}
 
 /*********************************************************************
  * read_bmp_file()
@@ -125,7 +126,7 @@ int read_bmp_file(char* filename,
      }
 
      /* Exit if more than 8 bits */
-     depth = readshort(fh.BitCount);
+     depth = readshort(&fh.BitCount);
      if(depth > 8)
      {
          debugf("error - Bitmap uses more than 8 bit depth, got %d\n",
@@ -135,19 +136,19 @@ int read_bmp_file(char* filename,
      }
 
      /* Exit if too wide */
-     if(readlong(fh.Width) > 112)
+     if(readlong(&fh.Width) > 112)
      {
          debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
-                readlong(fh.Width));
+                readlong(&fh.Width));
          close(fd);
          return 3;
      }
 
      /* Exit if too high */
-     if(readlong(fh.Height) > 64)
+     if(readlong(&fh.Height) > 64)
      {
          debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
-                readlong(fh.Height));
+                readlong(&fh.Height));
          close(fd);
          return 4;
      }
@@ -183,14 +184,14 @@ int read_bmp_file(char* filename,
          background = 1;
      }
 
-      width = readlong(fh.Width);
+      width = readlong(&fh.Width);
 
       if(depth == 8)
           PaddedWidth = ((width+3)&(~0x3)); /* aligned 4-bytes boundaries */
       else
           PaddedWidth = ((width+31)&(~0x1f))/8;
 
-      size = PaddedWidth*readlong(fh.Height);
+      size = PaddedWidth*readlong(&fh.Height);
 
       bmp = (unsigned char *)malloc(size);
       *bitmap = (unsigned char *)malloc(size);
@@ -210,8 +211,8 @@ int read_bmp_file(char* filename,
           }
       }
 
-      bitmap_height = readlong(fh.Height);
-      bitmap_width = readlong(fh.Width);
+      bitmap_height = readlong(&fh.Height);
+      bitmap_width = readlong(&fh.Width);
 
       *get_width = bitmap_width;
       *get_height = bitmap_height;
