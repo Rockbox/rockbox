@@ -418,7 +418,7 @@ static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
 
         if (width > 0)
         {
-            int i;
+            unsigned int i;
             bitmap_t* bits = pf->bits +
                 (pf->offset ? pf->offset[ch] : (pf->height * ch));
 
