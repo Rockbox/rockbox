@@ -34,7 +34,14 @@
 /*** definitions ***/
 
 /* LCD command codes */
+#define LCD_CNTL_POWER_CONTROL              0x25
+#define LCD_CNTL_VOLTAGE_SELECT             0x2b
+#define LCD_CNTL_LINE_INVERT_DRIVE          0x36
+#define LCD_CNTL_GRAY_SCALE_PATTERN         0x39
+#define LCD_CNTL_TEMP_GRADIENT_SELECT       0x4e
+#define LCD_CNTL_OSC_FREQUENCY              0x5f
 #define LCD_CNTL_ON_OFF                     0xae
+#define LCD_CNTL_OSC_ON_OFF                 0xab
 #define LCD_CNTL_OFF_MODE                   0xbe
 #define LCD_CNTL_REVERSE                    0xa6
 #define LCD_CNTL_ALL_LIGHTING               0xa4
@@ -42,7 +49,9 @@
 #define LCD_CNTL_COLUMN_ADDRESS_DIR         0xa0
 #define LCD_CNTL_NLINE_ON_OFF               0xe4
 #define LCD_CNTL_DISPLAY_MODE               0x66
-#define LCD_CNTL_ELECTRIC_VOLUME            0x81
+#define LCD_CNTL_DUTY_SET                   0x6d
+#define LCD_CNTL_ELECTRONIC_VOLUME          0x81
+#define LCD_CNTL_DATA_INPUT_DIR             0x84
 #define LCD_CNTL_DISPLAY_START_LINE         0x8a
 
 #define LCD_CNTL_PAGE           0xb1
@@ -113,10 +122,18 @@ void lcd_init(void)
  */
 void lcd_init (void)
 {
-    /* GPO35 is the LCD A0 pin, GPO46 is LCD RESET */
+    /* GPO35 is the LCD A0 pin
+       GPO46 is LCD RESET */
     GPIO1_OUT |= 0x00004008;
-    GPIO1_FUNCTION |= 0x00004008;
     GPIO1_ENABLE |= 0x00004008;
+    GPIO1_FUNCTION |= 0x00004008;
+
+    /* Reset LCD */
+    sleep(1);
+    GPIO1_OUT &= ~0x00004000;
+    sleep(1);
+    GPIO1_OUT |= 0x00004000;
+    sleep(1);
     
     lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
     lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);   /* Normal */
@@ -126,8 +143,22 @@ void lcd_init (void)
     lcd_write_command(LCD_CNTL_OFF_MODE | 1); /* OFF -> VCC on drivers */
     lcd_write_command(LCD_CNTL_NLINE_ON_OFF | 1); /* N-line ON */
 
-    lcd_write_command_ex(LCD_CNTL_DISPLAY_MODE, 1); /* Monochrome mode */
+    lcd_write_command_ex(LCD_CNTL_DUTY_SET, 0x20, 1);
+    lcd_write_command_ex(LCD_CNTL_VOLTAGE_SELECT, 3, -1);
+    lcd_write_command_ex(LCD_CNTL_ELECTRONIC_VOLUME, 0x1c, -1);
+    lcd_write_command_ex(LCD_CNTL_TEMP_GRADIENT_SELECT, 0, -1);
+    lcd_write_command_ex(LCD_CNTL_LINE_INVERT_DRIVE, 0x10, -1);
+    lcd_write_command_ex(LCD_CNTL_OSC_FREQUENCY, 3, -1);
+    lcd_write_command(LCD_CNTL_OSC_ON_OFF | 1); /* Oscillator ON */
+    lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x17, -1);
 
+    sleep(1);
+
+    lcd_write_command_ex(LCD_CNTL_DISPLAY_START_LINE, 0, -1);
+    lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x42, -1);
+    lcd_write_command_ex(LCD_CNTL_DISPLAY_MODE, 1, -1); /* Monochrome mode */
+    lcd_write_command(LCD_CNTL_DATA_INPUT_DIR | 0); /* Column mode */
+    
     lcd_clear_display();
     lcd_update();
 
@@ -144,8 +175,8 @@ void lcd_blit (const unsigned char* p_data, int x, int y, int width,
     /* Copy display bitmap to hardware */
     while (height--)
     {
-        lcd_write_command_ex(LCD_CNTL_PAGE, y++ & 0xf);
-        lcd_write_command_ex(LCD_CNTL_COLUMN, x+xoffset);
+        lcd_write_command_ex(LCD_CNTL_PAGE, y++ & 0xf, -1);
+        lcd_write_command_ex(LCD_CNTL_COLUMN, x+xoffset, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
         lcd_write_data(p_data, width);
@@ -166,8 +197,8 @@ void lcd_update (void)
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
-        lcd_write_command_ex(LCD_CNTL_PAGE, y);
-        lcd_write_command_ex(LCD_CNTL_COLUMN, 0);
+        lcd_write_command_ex(LCD_CNTL_PAGE, y, -1);
+        lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
         lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
@@ -197,8 +228,8 @@ void lcd_update_rect (int x_start, int y,
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
-        lcd_write_command_ex(LCD_CNTL_PAGE, y);
-        lcd_write_command_ex(LCD_CNTL_COLUMN, x_start+xoffset);
+        lcd_write_command_ex(LCD_CNTL_PAGE, y, -1);
+        lcd_write_command_ex(LCD_CNTL_COLUMN, x_start+xoffset, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
         lcd_write_data (&lcd_framebuffer[y][x_start], width);
@@ -207,7 +238,7 @@ void lcd_update_rect (int x_start, int y,
 
 void lcd_set_contrast(int val)
 {
-    lcd_write_command_ex(LCD_CNTL_ELECTRIC_VOLUME, val);
+    lcd_write_command_ex(LCD_CNTL_ELECTRONIC_VOLUME, val, -1);
 }
 
 void lcd_set_invert_display(bool yesno)
