@@ -43,6 +43,10 @@
 #include "id3.h" 
 #include "screens.h"
 #include "debug.h"
+#include "led.h"
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -111,9 +115,13 @@ void usb_screen(void)
     usb_display_info();
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
         if(usb_inserted()) {
+
 #ifdef HAVE_MMC /* USB-MMC bridge can report activity */
+
             led(mmc_usb_active(HZ));
+
 #endif
+
             status_draw(false);
         }
     }
