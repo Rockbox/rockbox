@@ -270,11 +270,6 @@ void dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_ON:
-                /* Toggle the charger */
-                PBDR ^= 0x20;
-                break;
-
             case BUTTON_UP:
                 /* Toggle the IDE power */
                 PADR ^= 0x20;
@@ -361,24 +356,7 @@ void dbg_ports(void)
 
         switch(button)
         {
-#ifndef ARCHOS_PLAYER_OLD
-            case BUTTON_ON:
-                /* Toggle the charger */
-                PBDR ^= 0x20;
-                break;
-
-            case BUTTON_PLAY:
-                /* Toggle the IDE power */
-                PADR ^= 0x20;
-                break;
-#endif
             case BUTTON_STOP:
-#ifndef ARCHOS_PLAYER_OLD
-                /* Disable the charger */
-                PBDR |= 0x20;
-                /* Enable the IDE power */
-                PADR |= 0x20;
-#endif
                 return;
 
             case BUTTON_LEFT:
