@@ -110,6 +110,7 @@ static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*10;
+    last_disk_activity = timeout;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
         sleep_thread();
     wake_up_thread();
@@ -129,7 +130,8 @@ static int wait_for_rdy(void)
         return 0;
 
     timeout = current_tick + HZ*10;
-    
+    last_disk_activity = timeout;
+
     while (TIME_BEFORE(current_tick, timeout) &&
            !(ATA_ALT_STATUS & STATUS_RDY))
         sleep_thread();
@@ -180,12 +182,14 @@ int ata_read_sectors(unsigned long start,
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
+                led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
                 mutex_unlock(&ata_mtx);
+                led(false);
                 return -1;
             }
         }
@@ -198,6 +202,7 @@ int ata_read_sectors(unsigned long start,
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
+        led(false);
         return -2;
     }
 
@@ -218,6 +223,13 @@ int ata_read_sectors(unsigned long start,
         ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
         ATA_COMMAND = CMD_READ_MULTIPLE;
 
+        /* wait at least 400ns between writing command and reading status */
+        asm volatile ("nop");
+        asm volatile ("nop");
+        asm volatile ("nop");
+        asm volatile ("nop");
+        asm volatile ("nop");
+
         while (count) {
             int j;
             int sectors;
@@ -226,8 +238,6 @@ int ata_read_sectors(unsigned long start,
 
             if (!wait_for_start_of_transfer()) {
                 ret = -4;
-                if(ata_hard_reset())
-                    break;
                 goto retry;
             }
 
@@ -312,17 +322,21 @@ int ata_write_sectors(unsigned long start,
     
     last_disk_activity = current_tick;
 
+    led(true);
+
     if ( sleeping ) {
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
+                led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
                 mutex_unlock(&ata_mtx);
+                led(false);
                 return -1;
             }
         }
@@ -332,10 +346,9 @@ int ata_write_sectors(unsigned long start,
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
+        led(false);
         return -2;
     }
-
-    led(true);
 
     if ( count == 256 )
         ATA_NSECTOR = 0; /* 0 means 256 sectors */
