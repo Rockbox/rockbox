@@ -27,12 +27,12 @@ STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net
 STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Written; untested)
 STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/system.c", Linus,In progress)
 STATUS(YELLOW,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Final touches)
-STATUS(YELLOW,Playlist handling,-,"", Stuart,Planning)
+STATUS(YELLOW,Playlist handling,firmware/playlist.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/playlist.c", Wavey, Progressing)
 STATUS(YELLOW,X11 simulator,uisimulator/x11, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/x11/", Daniel,Progressing)
 STATUS(YELLOW,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
 STATUS(RED,Boot loader,-,"", -,-)
 STATUS(RED,Newlib port,-,"", -,-)
-STATUS(RED,Directory browser UI,-,"", -,-)
+STATUS(RED,Directory browser UI,uisimulator/tree.c,"", Daniel,Progressing)
 STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
