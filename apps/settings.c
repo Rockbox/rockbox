@@ -1682,6 +1682,7 @@ bool set_bool_options(char* string, bool* variable,
 
 bool set_int(char* string, 
              char* unit,
+             int voice_unit,
              int* variable,
              void (*function)(int),
              int step,
@@ -1691,6 +1692,7 @@ bool set_int(char* string,
     bool done = false;
     int button;
     int org_value=*variable;
+    int last_value = 0x7FFFFFFF; /* out of range init */
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -1710,6 +1712,20 @@ bool set_int(char* string,
         status_draw(true);
 #endif
         lcd_update();
+
+        if (*variable != last_value)
+        {
+            if (voice_unit < UNIT_LAST)
+            {   /* use the available unit definition */
+                talk_value(*variable, voice_unit, false);
+            }
+            else
+            {   /* say the number, followed by an arbitrary voice ID */
+                talk_number(*variable, false);
+                talk_id(voice_unit, true);
+            }
+            last_value = *variable;
+        }
 
         button = button_get_w_tmo(HZ/2);
         switch(button) {

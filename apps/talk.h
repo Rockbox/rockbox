@@ -38,6 +38,10 @@ enum {
     UNIT_PERCENT, /* % */
     UNIT_MB,      /* megabyte */
     UNIT_GB,      /* gigabyte */
+    UNIT_MAH,     /* milliAmp hours */
+    UNIT_PIXEL,   /* pixels */
+    UNIT_PER_SEC, /* per second */
+    UNIT_HERTZ,   /* hertz */
     UNIT_LAST     /* END MARKER */
 };
 

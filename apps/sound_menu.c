@@ -238,7 +238,7 @@ static bool recchannels(void)
 
 static bool recquality(void)
 {
-    return set_int(str(LANG_RECORDING_QUALITY), "",
+    return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
                    &global_settings.rec_quality, 
                    NULL, 1, 0, 7 );
 }

@@ -63,7 +63,8 @@ static bool car_adapter_mode(void)
 
 static bool contrast(void)
 {
-    return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
+    return set_int( str(LANG_CONTRAST), "", UNIT_INT,
+                    &global_settings.contrast, 
                     lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
                     MAX_CONTRAST_SETTING );
 }
@@ -154,7 +155,7 @@ static bool volume_type(void)
 #ifdef PM_DEBUG
 static bool peak_meter_fps_menu(void) {
     bool retval = false;
-    retval = set_int( "Refresh rate", "/s", 
+    retval = set_int( "Refresh rate", "/s", UNIT_PER_SEC,
              &peak_meter_fps,
              NULL, 1, 5, 40);
     return retval;
@@ -251,7 +252,7 @@ static bool peak_meter_release(void)  {
        fits into a 7 bit number. The 8th bit is used for storing
        something else in the rtc ram.
        Also, the max value is 0x7e, since the RTC value 0xff is reserved */
-    retval = set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ), 
+    retval = set_int( str(LANG_PM_RELEASE), STR(LANG_PM_UNITS_PER_READ), 
                     &global_settings.peak_meter_release,
              NULL, 1, 1, 0x7e);
 
@@ -320,7 +321,7 @@ static bool peak_meter_min(void) {
         int range_max = -global_settings.peak_meter_max;
         int min = -global_settings.peak_meter_min;
 
-        retval =  set_int(str(LANG_PM_MIN), str(LANG_PM_DBFS),
+        retval =  set_int(str(LANG_PM_MIN), str(LANG_PM_DBFS), UNIT_DB,
             &min, NULL, 1, -89, range_max);
 
         global_settings.peak_meter_min = - min;
@@ -330,7 +331,7 @@ static bool peak_meter_min(void) {
     else {
         int min = global_settings.peak_meter_min;
 
-        retval =  set_int(str(LANG_PM_MIN), "%",
+        retval =  set_int(str(LANG_PM_MIN), "%", UNIT_PERCENT,
             &min, NULL, 
             1, 0, global_settings.peak_meter_max - 1);
 
@@ -354,7 +355,7 @@ static bool peak_meter_max(void) {
         int range_min = -global_settings.peak_meter_min;
         int max = -global_settings.peak_meter_max;;
 
-        retval =  set_int(str(LANG_PM_MAX), str(LANG_PM_DBFS),
+        retval =  set_int(str(LANG_PM_MAX), str(LANG_PM_DBFS), UNIT_DB,
             &max, NULL, 1, range_min, 0);
 
         global_settings.peak_meter_max = - max;
@@ -365,7 +366,7 @@ static bool peak_meter_max(void) {
     else {
         int max = global_settings.peak_meter_max;
 
-        retval =  set_int(str(LANG_PM_MAX), "%",
+        retval =  set_int(str(LANG_PM_MAX), "%", UNIT_PERCENT,
             &max, NULL, 
             1, global_settings.peak_meter_min + 1, 100);
 
@@ -579,7 +580,8 @@ static bool poweroff_idle_timer(void)
 
 static bool scroll_speed(void)
 {
-    return set_int(str(LANG_SCROLL), "Hz", &global_settings.scroll_speed, 
+    return set_int(str(LANG_SCROLL), "Hz", UNIT_HERTZ,
+                   &global_settings.scroll_speed, 
                    &lcd_scroll_speed, 1, 1, 10 );
 }
 
@@ -587,7 +589,8 @@ static bool scroll_speed(void)
 static bool scroll_delay(void)
 {
     int dummy = global_settings.scroll_delay * (HZ/10);
-    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", &dummy, 
+    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
+                     &dummy, 
                      &lcd_scroll_delay, 100, 0, 2500 );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
@@ -596,7 +599,7 @@ static bool scroll_delay(void)
 #ifdef HAVE_LCD_BITMAP
 static bool scroll_step(void)
 {
-    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels",
+    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels", UNIT_PIXEL,
                    &global_settings.scroll_step,
                    &lcd_scroll_step, 1, 1, LCD_WIDTH );
 }
@@ -604,7 +607,8 @@ static bool scroll_step(void)
 
 static bool bidir_limit(void)
 {
-    return set_int(str(LANG_BIDIR_SCROLL), "%", &global_settings.bidir_limit, 
+    return set_int(str(LANG_BIDIR_SCROLL), "%", UNIT_PERCENT,
+                   &global_settings.bidir_limit, 
                    &lcd_bidir_scroll, 25, 0, 200 );
 }
 
@@ -627,7 +631,8 @@ static bool jump_scroll(void)
 static bool jump_scroll_delay(void)
 {
     int dummy = global_settings.jump_scroll_delay * (HZ/10);
-    int rc = set_int(str(LANG_JUMP_SCROLL_DELAY), "ms", &dummy, 
+    int rc = set_int(str(LANG_JUMP_SCROLL_DELAY), "ms", UNIT_MS,
+                     &dummy, 
                      &lcd_jump_scroll_delay, 100, 0, 2500 );
     global_settings.jump_scroll_delay = dummy / (HZ/10);
     return rc;
@@ -640,7 +645,8 @@ static bool jump_scroll_delay(void)
  */
 static bool battery_capacity(void)
 {
-    return set_int(str(LANG_BATTERY_CAPACITY), "mAh", &global_settings.battery_capacity, 
+    return set_int(str(LANG_BATTERY_CAPACITY), "mAh", UNIT_MAH,
+                   &global_settings.battery_capacity, 
                    &set_battery_capacity, 50, 1500, BATTERY_CAPACITY_MAX );
 }
 #endif
@@ -754,7 +760,8 @@ static bool timeformat_set(void)
 
 static bool spindown(void)
 {
-    return set_int(str(LANG_SPINDOWN), "s", &global_settings.disk_spindown,
+    return set_int(str(LANG_SPINDOWN), "s", UNIT_SEC,
+                   &global_settings.disk_spindown,
                    ata_spindown, 1, 3, 254 );
 }
 
@@ -778,21 +785,21 @@ static bool poweroff(void)
 
 static bool max_files_in_dir(void)
 {
-    return set_int(str(LANG_MAX_FILES_IN_DIR), "",
+    return set_int(str(LANG_MAX_FILES_IN_DIR), "", UNIT_INT,
                    &global_settings.max_files_in_dir,
                    NULL, 50, 50, 10000 );
 }
 
 static bool max_files_in_playlist(void)
 {
-    return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "",
+    return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "", UNIT_INT,
                    &global_settings.max_files_in_playlist,
                    NULL, 1000, 1000, 20000 );
 }
 
 static bool buffer_margin(void)
 {
-    return set_int(str(LANG_MP3BUFFER_MARGIN), "s",
+    return set_int(str(LANG_MP3BUFFER_MARGIN), "s", UNIT_SEC,
                    &global_settings.buffer_margin,
                    mpeg_set_buffer_margin, 1, 0, 7 );
 }

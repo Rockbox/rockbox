@@ -35,8 +35,8 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 /***************** Constants *****************/
 
-#define VOICEFONT_FILENAME "/.rockbox/langs/english.voice"
-#define QUEUE_SIZE 32
+#define QUEUE_SIZE 20
+const char* voicefont_file = "/.rockbox/langs/english.voice";
 
 
 /***************** Data types *****************/
@@ -87,7 +87,7 @@ static int load_voicefont(void)
 
     p_voicefont = NULL; /* indicate no voicefont if we fail below */
 
-    fd = open(VOICEFONT_FILENAME, O_RDONLY);
+    fd = open(voicefont_file, O_RDONLY);
     if (fd < 0) /* failed to open */
     {
         p_voicefont = NULL; /* indicate no voicefont */
@@ -203,8 +203,20 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
 
 void talk_init(void)
 {
-    has_voicefont = true; /* unless we fail later, assume we have one */
-    talk_buffer_steal();
+    int fd;
+
+    fd = open(voicefont_file, O_RDONLY);
+    if (fd >= 0) /* success */
+    {
+        close(fd);
+        has_voicefont = true;
+    }
+    else
+    {
+        has_voicefont = false; /* no voice file available */
+    }
+    
+    talk_buffer_steal(); /* abuse this for most of our inits */
     queue_write = queue_read = 0; 
 }
 
@@ -294,18 +306,18 @@ int talk_file(char* filename, bool enqueue)
 }
 
 
-/* say a numeric value, this works for english,
-   but not necessarily for other languages */
+/* say a numeric value, this word ordering works for english,
+   but not necessarily for other languages (e.g. german) */
 int talk_number(int n, bool enqueue)
 {
-    int level = 0; // mille count
-    int mil = 1000000000; // highest possible "-illion"
+    int level = 0; /* mille count */
+    int mil = 1000000000; /* highest possible "-illion" */
 
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
     
     if (n==0)
-    {   // special case
+    {   /* special case */
         talk_id(VOICE_ZERO, true);
         return 0;
     }
@@ -318,9 +330,9 @@ int talk_number(int n, bool enqueue)
     
     while (n)
     {
-        int segment = n / mil; // extract in groups of 3 digits
-        n -= segment * mil; // remove the used digits from number
-        mil /= 1000; // digit place for next round
+        int segment = n / mil; /* extract in groups of 3 digits */
+        n -= segment * mil; /* remove the used digits from number */
+        mil /= 1000; /* digit place for next round */
 
         if (segment)
         {
@@ -333,7 +345,7 @@ int talk_number(int n, bool enqueue)
                 talk_id(VOICE_HUNDRED, true);
             }
 
-            // combination indexing
+            /* combination indexing */
             if (ones > 20)
             {
                int tens = ones/10 + 18;
@@ -341,11 +353,11 @@ int talk_number(int n, bool enqueue)
                ones %= 10;
             }
 
-            // direct indexing
+            /* direct indexing */
             if (ones)
                 talk_id(VOICE_ZERO + ones, true);
  
-            // add billion, million, thousand
+            /* add billion, million, thousand */
             if (mil)
                 talk_id(VOICE_BILLION + level, true);
         }
@@ -369,7 +381,11 @@ int talk_value(int n, int unit, bool enqueue)
         VOICE_DB, 
         VOICE_PERCENT, 
         VOICE_MEGABYTE, 
-        VOICE_GIGABYTE
+        VOICE_GIGABYTE,
+        VOICE_MILLIAMPHOURS,
+        VOICE_PIXEL,
+        VOICE_PER_SEC,
+        VOICE_HERTZ,
     };
 
     if (unit < 0 || unit >= UNIT_LAST)
@@ -377,7 +393,7 @@ int talk_value(int n, int unit, bool enqueue)
     else
         unit_id = unit_voiced[unit];
 
-    if ((n==1 || n==-1) // singular?
+    if ((n==1 || n==-1) /* singular? */
         && unit_id >= VOICE_SECONDS && unit_id <= VOICE_HOURS)
     {
         unit_id--; /* use the singular for those units which have */

@@ -230,7 +230,7 @@ bool set_bool_options(char* string, bool* variable,
 bool set_bool(char* string, bool* variable );
 bool set_option(char* string, void* variable, enum optiontype type,
                 struct opt_items* options, int numoptions, void (*function)(int));
-bool set_int(char* string, char* unit, int* variable,
+bool set_int(char* string, char* unit, int voice_unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);
 int read_line(int fd, char* buffer, int buffer_size);
