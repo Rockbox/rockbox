@@ -28,7 +28,11 @@ ifdef DEBUG
     CFLAGS += -g
     LDS := $(FIRMWARE)/gdb.lds
 else
-ifeq ($(TARGET),-DARCHOS_RECORDER)
+
+# Check if this is a kind of Recorder
+ANYREC = $(findstring RECORDER, $(TARGET))
+
+ifeq ($(ANYREC), RECORDER)
     LDS := $(FIRMWARE)/app.lds
 else
     LDS := $(FIRMWARE)/player.lds
@@ -37,7 +41,7 @@ endif
 
 SRC := $(wildcard *.c)
 
-ifeq ($(TARGET),-DARCHOS_RECORDER)
+ifeq ($(ANYREC), RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
@@ -99,15 +103,16 @@ dist:
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
 	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map \
-	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]
+	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch] \
+	$(OBJDIR)/credits.raw
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS)
-ifeq ($(TARGET),-DARCHOS_RECORDER)
-DEPDIRS += $(DEPS)/recorder
+ifeq ($(ANYREC), RECORDER)
+    DEPDIRS += $(DEPS)/recorder
 else
-DEPDIRS +=  $(DEPS)/player
+    DEPDIRS +=  $(DEPS)/player
 endif
 
 DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
