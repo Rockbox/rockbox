@@ -37,6 +37,7 @@ int mpeg_sound_max(int setting);
 int mpeg_sound_default(int setting);
 void mpeg_sound_channel_config(int configuration);
 int mpeg_val2phys(int setting, int value);
+int mpeg_phys2val(int setting, int value);
 char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);

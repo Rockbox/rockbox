@@ -1757,6 +1757,51 @@ int mpeg_val2phys(int setting, int value)
     return result;
 }
 
+int mpeg_phys2val(int setting, int value)
+{
+    int result = 0;
+    
+    switch(setting)
+    {
+        case SOUND_VOLUME:
+            result = value / 2;
+            break;
+        
+        case SOUND_BALANCE:
+            result = value / 2;
+            break;
+        
+        case SOUND_BASS:
+#ifdef HAVE_MAS3587F
+            result = value + 12;
+#else
+            result = value + 15;
+#endif
+            break;
+        
+        case SOUND_TREBLE:
+#ifdef HAVE_MAS3587F
+            result = value + 12;
+#else
+            result = value + 15;
+#endif
+            break;
+
+#ifdef HAVE_MAS3587F
+        case SOUND_LOUDNESS:
+            result = value;
+            break;
+            
+        case SOUND_SUPERBASS:
+            result = value / 10;
+            break;
+#endif
+    }
+
+    return result;
+}
+
+
 void mpeg_sound_channel_config(int configuration)
 {
 #ifdef SIMULATOR

@@ -78,7 +78,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
 FIRMSRCS = lcd-recorder.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
-  powermgmt.c font.c panic.c sysfont.c
+  powermgmt.c font.c panic.c sysfont.c ctype.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c\
@@ -262,6 +262,9 @@ $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/ctype.o: $(COMMON)/ctype.c
+	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@

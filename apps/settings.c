@@ -39,6 +39,8 @@
 #include "status.h"
 #include "atoi.h"
 #include "screens.h"
+#include "ctype.h"
+#include "file.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -459,161 +461,120 @@ void settings_load(void)
 #endif
 }
 
-/*
- * Loads a .eq file
- */
+static int read_line(int fd, char* buffer, int buffer_size)
+{
+    int count = 0;
+
+    while (count < buffer_size)
+    {
+        unsigned char c;
+
+        if (1 != read(fd, &c, 1))
+            break;
+        
+        if ( c == '\n' )
+            break;
+
+        if ( c == '\r' )
+            continue;
+
+        buffer[count++] = c;
+    }
+
+    if ( count < buffer_size )
+        buffer[count] = 0;
+
+    return count;
+}
+
+/* parse a line from a configuration file. the line format is: 
+
+   setting name: setting value
+
+   Any whitespace before setting name or value (after ':') is ignored.
+   A # as first non-whitespace character discards the whole line.
+   Function sets pointers to null-terminated setting name and value.
+   Returns false if no valid config entry was found.
+*/
+
+static bool settings_parseline(char* line, char** name, char** value)
+{
+    char* ptr;
+
+    while ( isspace(*line) )
+        line++;
+
+    if ( *line == '#' )
+        return false;
+
+    ptr = strchr(line, ':');
+    if ( !ptr )
+        return false;
+
+    *name = line;
+    *ptr = 0;
+    ptr++;
+    while (isspace(*ptr))
+        ptr++;
+    *value = ptr;
+    return true;
+}
+
+static void set_eq_sound(char* value, int type, int* setting)
+{
+    int num = atoi(value);
+
+    num = mpeg_phys2val(type, num);
+
+    if ((num > mpeg_sound_max(type)) ||
+        (num < mpeg_sound_min(type)))
+    {
+        num = mpeg_sound_default(type);
+    }
+
+    *setting = num;
+    mpeg_sound_set(type, num);
+}
+
 bool settings_load_eq(char* file)
 {
-    char buffer[512];
-    char buf_set[16];
-    char buf_disp[16];
-    char buf_val[8];
-    bool syntax_error = false;
     int fd;
-    int i;
-    int d = 0;
-    int vtype = 0;
-    int line = 0;
+    char line[128];
 
-
-    lcd_clear_display();
     fd = open(file, O_RDONLY);
-    
-    if (-1 != fd)
-    {
-        int numread = read(fd, buffer, sizeof(buffer) - 1);
-        
-        if (numread > 0) {
-            buffer[numread] = 0;
-            for(i=0;i<numread;i++) {
-                switch(buffer[i]) {
-                    case '[':
-                        vtype = 1;
-                        buf_set[0] = 0;
-                        d = 0;
-                        break;
-                    case ']':
-                        vtype = 2;
-                        buf_set[d] = 0;
-                        buf_val[0] = 0;
-                        d = 0;
-                        break;
-                    case '#':
-                        buf_val[d] = 0;
-                        vtype = 3;
-                        break;
-                    default:
-                        switch(vtype) {
-                            case 1:
-                                buf_set[d++] = buffer[i];
-                                break;
-                            case 2:
-                                buf_val[d++] = buffer[i];
-                                break;
-                            case 3:
-                                snprintf(buf_disp,sizeof(buf_disp),"[%s]%s", buf_set, buf_val);
-                                lcd_puts(0,line++ % MAX_LINES, buf_disp);
-                                lcd_update();
-                                sleep(HZ/2);
-                                if (!strcasecmp(buf_set,"volume")) {
-                                    global_settings.volume = (atoi(buf_val)/2);
-                                    if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME) ||
-                                       global_settings.volume < mpeg_sound_min(SOUND_VOLUME)) {
-                                        global_settings.volume = mpeg_sound_default(SOUND_VOLUME);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    if (-1 == fd)
+        return false;
 
-                                } else
-                                    if (!strcasecmp(buf_set,"bass")) {
-                                        if (buf_val[0] == '-')
-                                            global_settings.bass = ((mpeg_sound_max(SOUND_BASS)/2)-atoi(buf_val+1));
-                                        else
-                                            global_settings.bass = (atoi(buf_val)+(mpeg_sound_max(SOUND_BASS)/2));
-                                        if (global_settings.bass > mpeg_sound_max(SOUND_BASS) || 
-                                            global_settings.bass < mpeg_sound_min(SOUND_BASS)) {
-                                            global_settings.bass = mpeg_sound_default(SOUND_BASS);
-                                            syntax_error = true;
-                                        }
-                                        mpeg_sound_set(SOUND_BASS, global_settings.bass);
-                                    } else
-                                        if (!strcasecmp(buf_set,"treble")) {
-                                            if (buf_val[0] == '-')
-                                                global_settings.treble = ((mpeg_sound_max(SOUND_TREBLE)/2)-atoi(buf_val+1));
-                                            else
-                                                global_settings.treble = (atoi(buf_val)+(mpeg_sound_max(SOUND_TREBLE)/2));
-                                            if (global_settings.treble > mpeg_sound_max(SOUND_TREBLE) || 
-                                                global_settings.treble < mpeg_sound_min(SOUND_TREBLE)) {
-                                                global_settings.treble = mpeg_sound_default(SOUND_TREBLE);
-                                                syntax_error = true;
-                                            }
-                                            mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
-                                        } else
-                                            if (!strcasecmp(buf_set,"balance")) {
-                                                if (buf_val[0] == '-')
-                                                    global_settings.balance = -(atoi(buf_val+1)/2);
-                                                else
-                                                    global_settings.balance = ((atoi(buf_val)/2));
-                                                if (global_settings.balance > mpeg_sound_max(SOUND_BALANCE) || 
-                                                    global_settings.balance < mpeg_sound_min(SOUND_BALANCE)) {
-                                                    global_settings.balance = mpeg_sound_default(SOUND_BALANCE);
-                                                    syntax_error = true;
-                                                }
-                                                mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
-                                            } else
-                                                if (!strcasecmp(buf_set,"channels")) {
-                                                    global_settings.channel_config = atoi(buf_val);
-                                                    if (global_settings.channel_config > mpeg_sound_max(SOUND_CHANNELS) || 
-                                                        global_settings.channel_config < mpeg_sound_min(SOUND_CHANNELS)) {
-                                                        global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
-                                                        syntax_error = true;
-                                                    }
-                                                    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
-                                                } else
-                                                    if (!strcasecmp(buf_set,"loudness")) {
-                                                        global_settings.loudness = atoi(buf_val);
-                                                        if(global_settings.loudness > mpeg_sound_max(SOUND_LOUDNESS) ||
-                                                           global_settings.loudness < mpeg_sound_min(SOUND_LOUDNESS)) {
-                                                            global_settings.loudness = mpeg_sound_default(SOUND_LOUDNESS);
-                                                            syntax_error = true;
-                                                        }
-                                                        mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
-                                                    } else
-                                                        if (!strcasecmp(buf_set,"bass boost")) {
-                                                            global_settings.bass_boost = (atoi(buf_val)/10);
-                                                            if(global_settings.bass_boost > mpeg_sound_max(SOUND_SUPERBASS) ||
-                                                               global_settings.bass_boost < mpeg_sound_min(SOUND_SUPERBASS)) {
-                                                                global_settings.bass_boost = mpeg_sound_default(SOUND_SUPERBASS);
-                                                                syntax_error = true;
-                                                            }
-                                                            mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
-                                                        } else                                if (!strcasecmp(buf_set,"auto volume")) {
-                                                            global_settings.avc = atoi(buf_val);
-                                                            if (global_settings.avc > mpeg_sound_max(SOUND_AVC) || 
-                                                                global_settings.avc < mpeg_sound_min(SOUND_AVC)) {
-                                                                global_settings.avc = mpeg_sound_default(SOUND_AVC);
-                                                                syntax_error = true;
-                                                            }
-                                                            mpeg_sound_set(SOUND_AVC, global_settings.avc);
-                                                        }
-                                if (syntax_error) {
-                                    lcd_clear_display();
-                                    lcd_puts(0,1,"SyntaxError");
-                                    lcd_puts(0,2,buf_set);
-                                    lcd_update();
-                                    sleep(HZ);
-                                    syntax_error = false;
-                                }
-                                vtype = 0;
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-        close(fd);
+    while (read_line(fd, line, sizeof line))
+    {
+        char* name;
+        char* value;
+
+        if (!settings_parseline(line, &name, &value))
+            continue;
+
+        if (!strcasecmp(name, "volume"))
+            set_eq_sound(value, SOUND_VOLUME, &global_settings.volume);
+        else if (!strcasecmp(name, "bass"))
+            set_eq_sound(value, SOUND_BASS, &global_settings.bass);
+        else if (!strcasecmp(name, "treble"))
+            set_eq_sound(value, SOUND_TREBLE, &global_settings.treble);
+        else if (!strcasecmp(name, "balance"))
+            set_eq_sound(value, SOUND_BALANCE, &global_settings.balance);
+        else if (!strcasecmp(name, "channels"))
+            set_eq_sound(value, SOUND_CHANNELS, &global_settings.bass);
+#ifdef HAVE_MAS3587F
+        else if (!strcasecmp(name, "loudness"))
+            set_eq_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
+        else if (!strcasecmp(name, "bass boost"))
+            set_eq_sound(value, SOUND_SUPERBASS, &global_settings.bass_boost);
+        else if (!strcasecmp(name, "auto volume"))
+            set_eq_sound(value, SOUND_AVC, &global_settings.avc);
+#endif
     }
-    return(false);
+
+    close(fd);
+    return true;
 }
 
 /*
