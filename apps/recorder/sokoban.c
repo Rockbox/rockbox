@@ -64,7 +64,6 @@ static char current_spot= ' ';
 static char undo_current_spot=' ';
 
 
-
 static void copy_current_state_to_undo(void) {
     int a = 0;
     int b = 0;
@@ -226,9 +225,12 @@ static bool sokoban_loop(void)
                 load_level(current_level);
                 lcd_clear_display();
                 update_screen();
+                copy_current_state_to_undo();
+                copy_current_undo_to_state();
                 break;
             
             case BUTTON_F1:
+
                 /* previous level */
                 if (current_level)
                     current_level--;
@@ -238,6 +240,8 @@ static bool sokoban_loop(void)
                 load_level(current_level);
                 lcd_clear_display();
                 update_screen();
+                copy_current_state_to_undo();
+                copy_current_undo_to_state();
                 break;
 
             case BUTTON_LEFT:
@@ -535,10 +539,9 @@ static bool sokoban_loop(void)
             moves=0;
             current_level++;
             if (current_level == NUM_LEVELS) {
-                for(ii=0; ii<300 ; ii++) {
-                    lcd_clear_display();
-                    lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
-                    lcd_update();
+                lcd_clear_display();
+                lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
+                for(ii=0; ii<30000 ; ii++) {
                     lcd_invertrect(0,0,111,63);
                     lcd_update();
                     if ( button_get(false) )
@@ -549,6 +552,8 @@ static bool sokoban_loop(void)
             load_level(current_level);
             lcd_clear_display();
             update_screen();
+            copy_current_state_to_undo();
+            copy_current_undo_to_state();
         }
     }
 
