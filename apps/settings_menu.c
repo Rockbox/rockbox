@@ -165,13 +165,6 @@ static Menu timedate_set(void)
 }
 #endif
 
-static Menu ff_rewind(void)
-{
-    set_int("[FF/Rewind Step Size]", "s", &global_settings.ff_rewind,
-            NULL, 1, 1, 254 );
-    return MENU_OK;
-}
-
 static Menu spindown(void)
 {
     set_int("[Disk spindown]", "s", &global_settings.disk_spindown,
@@ -183,9 +176,10 @@ static Menu ff_rewind_accel(void)
 {
     char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ",
                       "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ",
-                      "2x/8s ", "2x/9s ", "2x/10s" };
-    set_option("[FF/Rewind Accel]", &global_settings.ff_rewind_accel,
-               names, 11 );
+                      "2x/8s ", "2x/9s ", "2x/10s", "2x/11s",
+                      "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
+    set_option("[FF/rewind accel]", &global_settings.ff_rewind_accel,
+               names, 16 );
     return MENU_OK;
 }
 
@@ -209,8 +203,7 @@ Menu settings_menu(void)
         { "Time/Date",       timedate_set    },
 #endif
         { "Show hidden files", show_hidden_files },
-        { "FF/Rewind",       ff_rewind       },
-        { "FF/Rewind Accel", ff_rewind_accel },
+        { "FF/rewind accel", ff_rewind_accel },
         { "Resume",          resume          },
         { "Disk spindown",   spindown        },
     };

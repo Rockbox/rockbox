@@ -44,6 +44,7 @@
 #include "ajf.h"
 #endif
 
+#define FF_REWIND_MIN_STEP 1000 /* minimum ff/rewind step is 1 second */
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
                                 /* 3% of 30min file == 54s step size */
 
@@ -884,7 +885,7 @@ int wps_show(void)
                             ff_rewind = true;
                             ff_rewind_max_step =
                                 id3->length * FF_REWIND_MAX_PERCENT / 100;
-                            ff_rewind_step = global_settings.ff_rewind*1000;
+                            ff_rewind_step = FF_REWIND_MIN_STEP;
                             if (ff_rewind_step > ff_rewind_max_step)
                                 ff_rewind_step = ff_rewind_max_step;
                             ff_rewind_count = -ff_rewind_step;
@@ -933,7 +934,7 @@ int wps_show(void)
                             ff_rewind = true;
                             ff_rewind_max_step =
                                 id3->length * FF_REWIND_MAX_PERCENT / 100;
-                            ff_rewind_step = global_settings.ff_rewind*1000;
+                            ff_rewind_step = FF_REWIND_MIN_STEP;
                             if (ff_rewind_step > ff_rewind_max_step)
                                 ff_rewind_step = ff_rewind_max_step;
                             ff_rewind_count = ff_rewind_step;

@@ -65,12 +65,11 @@ offset  abs
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden>
 0x0f    0x23    <scroll speed & WPS display byte>
-0x10    0x24    <ff/rewind step size>
+0x10    0x24    <ff/rewind accleration rate>
 0x11    0x25    <AVC byte>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
-0x1b    0x2f    <ff/rewind acceleration rate>
 
         <all unused space filled with 0xff>
 
@@ -268,10 +267,9 @@ int settings_save( void )
         ((global_settings.scroll_speed << 3) |
          (global_settings.wps_display & 7));
     
-    config_block[0x10] = (unsigned char)global_settings.ff_rewind;
+    config_block[0x10] = (unsigned char)global_settings.ff_rewind_accel;
     config_block[0x11] = (unsigned char)global_settings.avc;
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
-    config_block[0x1b] = (unsigned char)global_settings.ff_rewind_accel;
 
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
@@ -362,7 +360,7 @@ void settings_load(void)
             global_settings.wps_display = c;
         
         if (config_block[0x10] != 0xFF)
-            global_settings.ff_rewind = config_block[0x10];
+            global_settings.ff_rewind_accel = config_block[0x10];
 
         if (config_block[0x11] != 0xFF)
             global_settings.avc = config_block[0x11];
@@ -375,9 +373,6 @@ void settings_load(void)
 
         if (config_block[0x1a] != 0xFF)
             global_settings.disk_spindown = config_block[0x1a];
-
-        if (config_block[0x1b] != 0xFF)
-            global_settings.ff_rewind_accel = config_block[0x1b];
 
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -424,7 +419,6 @@ void settings_reset(void) {
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
     global_settings.show_hidden_files = false;
-    global_settings.ff_rewind    = DEFAULT_FF_REWIND_SETTING;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
