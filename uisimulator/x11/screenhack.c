@@ -210,25 +210,17 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
           *release = TRUE;
       }
       break;
-    case ResizeRequest:
-      screen_resized(event->xresizerequest.width, 
-                     event->xresizerequest.height);
-      screen_redraw();
-      fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
-              event->xresizerequest.width, event->xresizerequest.height);
+    case Expose:
+      {
+	int x=event->xexpose.width+event->xexpose.x;
+	int y=event->xexpose.height+event->xexpose.y;
+	screen_resized(x, y);
+	screen_redraw();
+	fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
+		x, y);
+      }
       break;
     default:
-/*	    fprintf(stderr, "EVENT: %d (see /usr/include/X11/X.h)\n",  
-            event->xany.type);
-*/
-      break;
-    case Expose:
-      screen_redraw();
-      /*
-      fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
-              event->xexpose.x, event->xexpose.y,
-              event->xexpose.width, event->xexpose.height);
-      */
       break;
     case ButtonPress:
       fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
@@ -433,7 +425,7 @@ int main (int argc, char **argv)
             XGetWindowAttributes (dpy, window, &xgwa);
             XSelectInput (dpy, window, 
                           xgwa.your_event_mask | KeyPressMask | KeyRelease |
-                          ButtonPressMask | ResizeRedirectMask | ExposureMask);
+                          ButtonPressMask | ExposureMask);
             XChangeProperty (dpy, window, XA_WM_PROTOCOLS, XA_ATOM, 32,
                              PropModeReplace,
                              (unsigned char *) &XA_WM_DELETE_WINDOW, 1);
