@@ -10,6 +10,8 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-09-13</i>: We took a big step and converted to an entirely new font system for the Recorder. Please bear with us as we smoothen out the initial quirks.
+
 <p><i>2002-09-03</i>: ROLO, the Rockbox Loader has been integrated into the CVS, allowing Archos or other Rockbox firmware being loaded by simply selecting the file!
 
 <p><i>2002-09-02</i>: <a href="http://rockbox.haxx.se/tshirt-contest/vote.html">Vote for your favourite tshirt designs!</a>
