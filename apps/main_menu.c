@@ -104,7 +104,7 @@ void version(void)
     lcd_clear_display();
     lcd_puts(0,0,appsversion);
     lcd_update();
-    sleep(HZ);
+    button_get(true);
 }
 
 void main_menu(void)
