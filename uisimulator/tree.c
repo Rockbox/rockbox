@@ -50,16 +50,6 @@ struct entry {
 
 #ifdef HAVE_LCD_BITMAP
 
-bool is_dir(char* path)
-{
-  DIR* dir = opendir(path);
-  if(dir) {
-    closedir(dir);
-    return TRUE;
-  }
-  return FALSE;
-}
-
 int static
 showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
 {
@@ -91,7 +81,7 @@ showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
     else
       memcpy(buffer[i].name, "too long", 9);
 
-    buffer[i].file = TRUE; /* files only for now */
+    buffer[i].file = !(entry->attribute&ATTR_DIRECTORY);
 
     if(len < TREE_MAX_LEN_DISPLAY)
       lcd_puts(LINE_X, LINE_Y+i*LINE_HEIGTH, buffer[i].name, 0);
@@ -191,7 +181,7 @@ bool dirbrowse(char *root)
         sprintf(buf,"%s/%s",currdir,buffer[dircursor].name);
       }
 
-      if (is_dir(buf)) {
+      if (!buffer[dircursor].file) {
         memcpy(currdir,buf,sizeof(currdir));
         dircursor=0;
         start=0;
