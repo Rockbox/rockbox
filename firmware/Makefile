@@ -15,8 +15,6 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
-SYSTEM_FONT = fonts/alt6x10.bdf
-
 # store output files in this directory:
 OBJDIR = .
 TOOLSDIR = ../tools
@@ -56,14 +54,11 @@ $(OBJDIR)/%.o: %.S
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/system.ajf: $(SYSTEM_FONT)
-	../tools/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/system.ajf
-
 tags:
 	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
 
 clean:
-	rm -f $(OBJS) $(OUTPUT)
+	rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c
 	rm -rf $(OBJDIR)/$(DEPS)
 
 # Special targets
