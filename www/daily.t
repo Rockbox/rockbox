@@ -47,6 +47,8 @@ The batch timestamp is GMT.
 
 <a href="auto/build-playersim/rockboxui">Player simulator (linux)</a>
 (<a href="auto/build-playersim/rocks.zip">rocks</a>)<br>
+<a href="auto/build-playersimwin32/uisw32.exe">Player simulator (win32)</a>
+(<a href="auto/build-playersimwin32/rocks.zip">rocks</a>)<br>
 </td>
 <td>
 <a href="auto/build-recorder/ajbrec.ajz">Recorder</a>
@@ -57,15 +59,14 @@ The batch timestamp is GMT.
 
 <a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a>
 (<a href="auto/build-recordersim/rocks.zip">rocks</a>)<br>
+<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
+(<a href="auto/build-recordersimwin32/rocks.zip">rocks</a>)<br>
 </td>
 <td>
 <a href="auto/build-fmrecorder/ajbrec.ajz">FM Recorder</a>
 (<a href="auto/build-fmrecorder/rocks.zip">rocks</a>)<br>
 <a href="auto/build-recorder8mb/ajbrec.ajz">8MB Recorder</a>
 (<a href="auto/build-recorder8mb/rocks.zip">rocks</a>)<br>
-
-<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
-(<a href="auto/build-recordersimwin32/rocks.zip">rocks</a>)<br>
 </td>
 </tr></table>
 
