@@ -103,7 +103,9 @@ static struct scrollinfo scroll[SCROLLABLE_LINES];
 static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
+#ifndef SIMULATOR
 static int xoffset = 0; /* needed for flip */
+#endif
 
 unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
