@@ -21,6 +21,7 @@
 #define __SETTINGS_H__
 
 #include <stdbool.h>
+#include "config.h"
 #include "file.h"
 
 #define ROCKBOX_DIR "/.rockbox"
