@@ -884,7 +884,6 @@ void DEI3(void)
                closed. */
             if(mpeg_file >= 0)
             {
-
                 /* Update the watermark debug level */
                 if(unplayed_space_left < lowest_watermark_level)
                     lowest_watermark_level = unplayed_space_left;
@@ -1037,6 +1036,15 @@ static int new_file(int steps)
                       SEEK_SET);
                 id3tags[new_tag_idx]->id3.index = steps;
                 id3tags[new_tag_idx]->id3.offset = 0;
+
+                if(id3tags[new_tag_idx]->id3.vbr)
+                                /* Average bitrate * 1.5 */
+                    recalculate_watermark(
+                        (id3tags[new_tag_idx]->id3.bitrate * 3) / 2);
+                else
+                    recalculate_watermark(
+                        id3tags[new_tag_idx]->id3.bitrate);
+                    
             }
         }
     } while ( mpeg_file < 0 );
@@ -1637,7 +1645,7 @@ static void mpeg_thread(void)
                     DEBUGF("R\n");
                     t1 = current_tick;
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
-
+#if 0
                     if(id3tags[tag_read_idx]->id3.vbr)
                         /* Average bitrate * 1.5 */
                         recalculate_watermark(
@@ -1645,7 +1653,7 @@ static void mpeg_thread(void)
                     else
                         recalculate_watermark(
                             id3tags[tag_read_idx]->id3.bitrate);
-                    
+#endif               
                     if(len > 0)
                     {
                         t2 = current_tick;
