@@ -434,7 +434,7 @@ void menu_delete(int menu, int position)
     menus[menu].itemcount--;
     
     /* adjust if this was the last menu item and the cursor was on it */
-    if( menus[menu].itemcount <= menus[menu].cursor)
+    if(menus[menu].itemcount && menus[menu].itemcount <= menus[menu].cursor)
         menus[menu].cursor = menus[menu].itemcount - 1;
 }
 
