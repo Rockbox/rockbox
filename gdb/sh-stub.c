@@ -415,11 +415,11 @@ static char remcomOutBuffer[BUFMAX];
 #define ATA_NSECTOR     (*((volatile unsigned char*)0x06100102))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
 
-#ifdef RECORDER
+/* You may need to change this depending on your ATA I/O address
+** 0x200 - 0x06200206
+** 0x300 - 0x06200306
+*/
 #define ATA_CONTROL     (*((volatile unsigned char*)0x06200206))
-#else
-#define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
-#endif
 #define ATA_ALT_STATUS  ATA_CONTROL
 
 #define STATUS_BSY      0x80
