@@ -97,7 +97,6 @@ struct font {
     const unsigned short *offset;	/* offsets into bitmap data*/
     const unsigned char *width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
-    long	bits_size;	/* # words of bitmap_t bits*/
 };
 
 /* font routines*/

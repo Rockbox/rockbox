@@ -37,7 +37,7 @@
 void gray_putsxy(int x, int y, const unsigned char *str)
 {
     int ch, width;
-    unsigned char *bits;
+    const unsigned char *bits;
     struct font *pf = _graybuf->curfont;
 
     if ((unsigned) x >= (unsigned) _graybuf->width
