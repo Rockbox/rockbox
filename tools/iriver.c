@@ -33,9 +33,9 @@ const char * const models[] = { "iHP-100", "iHP-120/iHP-140", "H300 series",
                                 NULL };
 
 /* aligns with models array;  expected min firmware size */
-const unsigned int firmware_minsize[] = { 1000000, 1000000, 2000000 };
+const unsigned int firmware_minsize[] = { 0x100000, 0x100000, 0x200000 };
 /* aligns with models array;  expected max firmware size */
-const unsigned int firmware_maxsize[] = { 2000000, 2000000, 4000000 };
+const unsigned int firmware_maxsize[] = { 0x200000, 0x200000, 0x400000 };
 
 const unsigned char header[][16] = {
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
