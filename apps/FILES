@@ -4,3 +4,4 @@ Makefile
 recorder/*.[ch]
 player/*.[ch]
 win32.mak
+lang/*.lang
