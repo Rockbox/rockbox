@@ -171,6 +171,8 @@ unsigned char adc_scan(int channel)
     
     CS_HI;
 
+    adcdata[channel] = data;
+
     return data;
 }
 
@@ -186,7 +188,7 @@ static void adc_tick(void)
     if(++adc_counter == HZ)
     {
         adc_counter = 0;
-        adcdata[ADC_BATTERY] = adc_scan(ADC_BATTERY);
+        adc_scan(ADC_BATTERY);
     }
 }
 
@@ -201,8 +203,6 @@ void adc_init(void)
     GPIO_OUT &= ~0x00400000;  /* CLK low */
 
     tick_add_task(adc_tick);
-
-    adcdata[3] = adc_scan(3);
 }
 
 #elif CONFIG_CPU == TCC730

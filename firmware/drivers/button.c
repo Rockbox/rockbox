@@ -351,7 +351,7 @@ static int button_read(void)
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 
-    data = adc_scan(0);
+    data = adc_scan(ADC_BUTTONS);
 
     if (data < 0x80)
         if (data < 0x30)
@@ -376,6 +376,38 @@ static int button_read(void)
             else
                 if (data < 0xf0)
                     btn = BUTTON_REC;
+
+    data = adc_scan(ADC_REMOTE);
+
+    if (data < 0x74)
+        if (data < 0x40)
+            if (data < 0x20)
+                if(data < 0x10)
+                    btn = BUTTON_RC_STOP;
+                else
+                    btn = BUTTON_RC_VOL_DOWN;
+            else
+                btn = BUTTON_RC_VOL;
+        else
+            if (data < 0x58)
+                btn = BUTTON_RC_VOL_UP;
+            else
+                btn = BUTTON_RC_BITRATE;
+    else
+        if (data < 0xb0)
+            if (data < 0x88)
+                btn = BUTTON_RC_REC;
+            else
+                btn = BUTTON_RC_SOURCE;
+        else
+            if (data < 0xd8)
+                if(data < 0xc0)
+                    btn = BUTTON_RC_FF;
+                else
+                    btn = BUTTON_RC_MENU;
+            else
+                if (data < 0xf0)
+                    btn = BUTTON_RC_REW;
 
     data = GPIO1_READ;
     if ((data & 0x20) == 0)
