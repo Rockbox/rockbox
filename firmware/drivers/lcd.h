@@ -73,10 +73,6 @@ extern void lcd_double_height (bool on);
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
-#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
-#include <chardef.h>
-#endif
-
 #define LCD_WIDTH       112   /* Display width in pixels */
 #define LCD_HEIGHT      64    /* Display height in pixels */
 
@@ -93,11 +89,6 @@ extern void lcd_invertrect (int x, int y, int nx, int ny);
 extern void lcd_drawline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
-
-
-#if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
-#include <charundef.h>
-#endif
 
 #endif /* CHARCELLS / BITMAP */
 
