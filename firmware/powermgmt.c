@@ -368,14 +368,14 @@ static void power_thread(void)
         if (charge_state == 1)
             powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * 60 / CURRENT_CHARGING;
         else {
-            current = CURRENT_NORMAL;
+            current = usb_inserted() ? CURRENT_USB : CURRENT_NORMAL;
             if ((backlight_get_timeout() == 1) || (charger_inserted() && backlight_get_on_when_charging()))
                                                        /* LED always on or LED on when charger connected */
                 current += CURRENT_BACKLIGHT;
             powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;
         }
 #else
-        current = CURRENT_NORMAL;
+        current = usb_inserted() ? CURRENT_USB : CURRENT_NORMAL;
         if (backlight_get_timeout() == 1) /* LED always on */
             current += CURRENT_BACKLIGHT;
         powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;

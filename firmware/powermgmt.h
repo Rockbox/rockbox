@@ -66,6 +66,7 @@ extern int charge_state;         /* tells what the charger is doing (for info di
 #endif /* HAVE_CHARGE_CTRL */
 
 #define CURRENT_NORMAL    145    /* usual current in mA when using the AJB including some disk/backlight/... activity */
+#define CURRENT_USB       500    /* usual current in mA in USB mode */
 #define CURRENT_BACKLIGHT  30    /* additional current when backlight is always on */
 #define CURRENT_CHARGING  300    /* charging current */
 
