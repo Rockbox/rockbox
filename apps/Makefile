@@ -15,7 +15,7 @@ OC    = sh-elf-objcopy
 
 FIRMWARE := ../firmware
 
-INCLUDES= -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
+INCLUDES= -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc
 
 # Pick a target to build for
 #TARGET = -DARCHOS_PLAYER=1
@@ -51,7 +51,7 @@ $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
+	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
 
 $(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
 	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
