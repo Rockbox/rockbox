@@ -22,14 +22,14 @@
 
 static struct plugin_api* rb;
 
-static long bpm = 120;
-static long time_to_next_tock;
+static int bpm      = 120;
+static int period   = 0;
+static int minitick = 0;
 
 static bool sound_active = false;
 static bool sound_paused = true;
-static bool key_pressed = false;
 
-static long sound_playback_tick;
+static char buffer[30];
 
 /*tick sound from a metronome*/
 static unsigned char sound[]={
@@ -96,14 +96,8 @@ void led(bool on){
 	and_b(~0x40, &PBDRL);
 }
 
-void calc_time_to_next_tock(void){
-    time_to_next_tock = ((HZ * 60) / bpm);
-    if (key_pressed){
-	/* we changed timing, so re-initialize timing loop
-	   to be on the safe side */
-	sound_playback_tick = *rb->current_tick;
-	key_pressed = false;
-    }
+void calc_period(void){
+    period =  61440/bpm-1; // (60*1024)/bpm;
 }
 	
 void callback(unsigned char** start, int* size){
@@ -122,7 +116,6 @@ void play_tock(void){
 
 
 void draw_display(void){
-    char buffer[30];
     rb->lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP 
@@ -174,6 +167,19 @@ void change_volume(int delta){
     }
 }
 
+void timer_callback(void){
+    if(minitick>=period){
+	minitick = 0;
+	if(!sound_active && !sound_paused){
+	    play_tock();
+	}
+    } 
+    else {
+	minitick++;
+    }
+}
+
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 
     TEST_PLUGIN_API(api);
@@ -185,20 +191,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     if (rb->mp3_is_playing())
 	rb->mp3_play_stop(); // stop audio ISR
 
-     calc_time_to_next_tock();
-     sound_playback_tick = *rb->current_tick;
+     calc_period();
+     rb->plugin_register_timer((FREQ/1024), 1, timer_callback);
+
      draw_display();
 
     /* main loop */
     while (true){
-	/* playback time reached? */
-	if (*rb->current_tick == (sound_playback_tick + time_to_next_tock)){
-	    sound_playback_tick = *rb->current_tick;
-	    if(!sound_active && !sound_paused){
-		play_tock();
-	    }
-	}
-
+	
 	switch (rb->button_get(false)) {
 #ifdef HAVE_RECORDER_KEYPAD
 	case BUTTON_OFF:
@@ -207,16 +207,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #endif
 	    /* get out of here */
 	    rb->mp3_play_stop(); /* stop audio ISR */
+	    rb->plugin_unregister_timer();
 	    led(0);
 	    return PLUGIN_OK;
 
 	case BUTTON_PLAY:
-	    key_pressed = true;
 	    if(sound_paused)
 		sound_paused = false;
 	    else
 		sound_paused = true;
-	    calc_time_to_next_tock();
+	    calc_period();
 	    draw_display();
 	    break;
       
@@ -228,7 +228,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 	case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
 	    change_volume(1);
-	    calc_time_to_next_tock();
+	    calc_period();
 	    break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -239,42 +239,39 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 	case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
 #endif
 	    change_volume(-1);
-	    calc_time_to_next_tock();
+	    calc_period();
 	    break;
 
 	case BUTTON_LEFT:
-	    key_pressed = true;
 	    if (bpm > 1)
 		bpm--;
-	    calc_time_to_next_tock();
+	    calc_period();
 	    draw_display();
 	    break;
 
 	case BUTTON_LEFT | BUTTON_REPEAT:
-	    key_pressed = true;
 	    if (bpm > 10)
 		bpm=bpm-10;
-	    calc_time_to_next_tock();
+	    calc_period();
 	    draw_display();
 	    break;
 
 	case BUTTON_RIGHT:
-	    key_pressed = true;
-	    if(bpm < 300)
+	    if(bpm < 400)
 		bpm++;
-	    calc_time_to_next_tock();
+	    calc_period();
 	    draw_display();
 	    break;
 
 	case BUTTON_RIGHT | BUTTON_REPEAT:
-	    key_pressed = true;
-	    if (bpm < 300)
+	    if (bpm < 400)
 		bpm=bpm+10;
-	    calc_time_to_next_tock();
+	    calc_period();
 	    draw_display();
 	    break;
 
 	case SYS_USB_CONNECTED:
+	    rb->plugin_unregister_timer();
 	    rb->usb_screen();
 	    return PLUGIN_USB_CONNECTED;
 	}
