@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _FONT_H
+#define _FONT_H
+
 /*
  * Incore font and image definitions
  */
@@ -111,6 +114,7 @@ void font_reset(void);
 
 #endif
 
+#endif
 /* -----------------------------------------------------------------
  * vim: et sw=4 ts=8 sts=4 tw=78
  */
