@@ -247,10 +247,17 @@ static void create_control(struct playlist_info* playlist)
     playlist->control_fd = creat(playlist->control_filename, 0000200);
     if (playlist->control_fd < 0)
     {
-        splash(HZ*2, true, "%s (%d)", str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
-            playlist->control_fd);
+        if (check_rockboxdir())
+        {
+            splash(HZ*2, true, "%s (%d)", str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
+                playlist->control_fd);
+        }
+        playlist->control_created = false;
     }
-    playlist->control_created = true;
+    else
+    {
+        playlist->control_created = true;
+    }
 }
 
 /*

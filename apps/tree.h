@@ -59,5 +59,6 @@ char *getcwd(char *buf, int size);
 void reload_directory(void);
 struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
                                       int *num_files, bool *buffer_full);
+bool check_rockboxdir(void);
 
 #endif

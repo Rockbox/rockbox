@@ -120,20 +120,27 @@ static bool boot_changed = false;
 static bool start_wps = false;
 static bool dirbrowse(const char *root, const int *dirfilter);
 
-void browse_root(void)
+bool check_rockboxdir(void)
 {
-    filetype_init();
-
-#ifndef SIMULATOR
     DIR *dir = opendir(ROCKBOX_DIR);
     if(!dir)
     {
         lcd_clear_display();
-        splash(HZ*5, true, str(LANG_NO_ROCKBOX_DIR));
+        splash(HZ*2, true, str(LANG_NO_ROCKBOX_DIR));
         lcd_clear_display();
-        splash(HZ*5, true, str(LANG_INSTALLATION_INCOMPLETE));
+        splash(HZ*2, true, str(LANG_INSTALLATION_INCOMPLETE));
+        return false;
     }
     closedir(dir);
+    return true;
+}
+
+void browse_root(void)
+{
+    filetype_init();
+    check_rockboxdir();
+
+#ifndef SIMULATOR
     dirbrowse("/", &global_settings.dirfilter);
 
 #else
