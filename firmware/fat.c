@@ -28,6 +28,7 @@
 #define BLOCK_SIZE 512
 
 #include "fat.h"
+#include "ata.h"
 
 #define NUM_ROOT_DIR_ENTRIES 512
 #define NUM_FATS 2
@@ -311,9 +312,8 @@ int fat_format(struct disk_info *di, char *vol_name)
     buf[BPB_LAST_WORD+1] = 0xaa;
 
     /* Now write the sector to disk */
-    err = write_block(buf, 0);
-
-    if(err < 0)
+    err = ata_write_sectors(0,1,buf);
+    if(err)
     {
         fprintf(stderr, "fat_format() - Couldn't write BSB (error code %i)\n",
                 err);
@@ -352,8 +352,8 @@ int fat_get_bpb(struct bpb *bpb)
     int countofclusters;
 
     /* Read the sector */
-    err = read_block(buf, 0);
-    if(err < 0)
+    err = ata_read_sectors(0,1,buf);
+    if(err)
     {
         fprintf(stderr, "fat_get_bpb() - Couldn't read BPB (error code %i)\n",
                 err);
@@ -526,7 +526,7 @@ int fat_create_fat(struct bpb* bpb)
     if(!sec)
     {
         fprintf(stderr, "fat_create_fat() - Couldn't cache fat sector"
-                " (%d)\n", i);
+                " (%d)\n", secnum);
         return -1;
     }
 
@@ -587,7 +587,7 @@ int fat_dbg_read_block(char *name, unsigned char *buf)
             return -1;
         }
         /* Now write the sector to disk */
-        write_block(buf, 0);
+        ata_write_sectors(0,1,buf);
         fclose(f);
     }
     else
@@ -612,7 +612,7 @@ unsigned char *fat_cache_fat_sector(struct bpb *bpb, int secnum)
             fprintf(stderr, "fat_cache_fat_sector() - Out of memory\n");
             return NULL;
         }
-        if(read_block(sec, secnum + bpb->bpb_rsvdseccnt) < 0)
+        if(ata_read_sectors(secnum + bpb->bpb_rsvdseccnt,1,sec))
         {
             fprintf(stderr, "fat_cache_fat_sector() - Could"
                     " not read sector %d\n",
@@ -715,7 +715,7 @@ int fat_read_entry(struct bpb *bpb, int entry)
     int fatoffset;
     int thisfatsecnum;
     int thisfatentoffset;
-    unsigned int val;
+    int val = -1;
 
     fatsz = fat_get_fatsize(bpb);
     
@@ -799,15 +799,15 @@ int fat_flush_fat(struct bpb *bpb)
         {
             printf("Flushing FAT sector %d\n", i);
             sec = fat_cache[i];
-            err = write_block(sec, i + bpb->bpb_rsvdseccnt);
-            if(err < 0)
+            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt,1,sec);
+            if(err)
             {
                 fprintf(stderr, "fat_flush_fat() - Couldn't write"
                         " sector (%d)\n", i + bpb->bpb_rsvdseccnt);
                 return -1;
             }
-            err = write_block(sec, i + bpb->bpb_rsvdseccnt + fatsz);
-            if(err < 0)
+            err = ata_write_sectors(i + bpb->bpb_rsvdseccnt + fatsz,1,sec);
+            if(err)
             {
                 fprintf(stderr, "fat_flush_fat() - Couldn't write"
                         " sector (%d)\n", i + bpb->bpb_rsvdseccnt + fatsz);
@@ -873,8 +873,8 @@ int fat_create_root_dir(struct bpb *bpb)
 
     printf("Writing rootdir to sector %d...\n", sec);
 
-    res = write_block(buf, sec);
-    if(res < 0)
+    res = ata_write_sectors(sec,1,buf);
+    if(res)
     {
         fprintf(stderr, "fat_create_root_dir() - Couldn't write sector (%d)\n",
                 sec);
@@ -888,7 +888,7 @@ int fat_create_root_dir(struct bpb *bpb)
     
     for(i = 1;i < num_root_sectors;i++)
     {
-        if(write_block(buf, sec++) < 0)
+        if(ata_write_sectors(sec++,1,buf))
         {
             fprintf(stderr, "fat_create_root_dir() - "
                             " Couldn't write sector (%d)\n", sec);
@@ -976,8 +976,8 @@ int fat_add_dir_entry(struct bpb *bpb, unsigned int currdir,
 
         printf("Reading sector %d...\n", sec);
         /* Read the next sector in the current dir */
-        err = read_block(buf, sec);
-        if(err < 0)
+        err = ata_read_sectors(sec,1,buf);
+        if(err)
         {
             fprintf(stderr, "fat_add_dir_entry() - Couldn't read dir sector"
                     " (error code %i)\n", err);
@@ -1041,8 +1041,8 @@ int fat_add_dir_entry(struct bpb *bpb, unsigned int currdir,
                         }
                     }
 
-                    err = write_block(buf, sec);
-                    if(err < 0)
+                    err = ata_write_sectors(sec,1,buf);
+                    if(err)
                     {
                         fprintf(stderr, "fat_add_dir_entry() - "
                                 " Couldn't write dir"
@@ -1232,8 +1232,8 @@ int fat_opendir(struct bpb *bpb, struct fat_dirent *ent, unsigned int currdir)
     }
 
     /* Read the first sector in the current dir */
-    err = read_block(ent->cached_buf, sec);
-    if(err < 0)
+    err = ata_read_sectors(sec,1,ent->cached_buf);
+    if(err)
     {
         fprintf(stderr, "fat_getfirst() - Couldn't read dir sector"
                 " (error code %i)\n", err);
@@ -1295,8 +1295,8 @@ int fat_getnext(struct bpb *bpb, struct fat_dirent *ent,
             }
 
             /* Read the next sector */
-            err = read_block(ent->cached_buf, ent->cached_sec);
-            if(err < 0)
+            err = ata_read_sectors(ent->cached_sec,1,ent->cached_buf);
+            if(err)
             {
                 fprintf(stderr, "fat_getnext() - Couldn't read dir sector"
                         " (error code %i)\n", err);
