@@ -23,9 +23,6 @@
 #include <stdbool.h>
 #include "file.h"
 
-/* Custom WPS Parsing - Uncomment to enable - PLAYER ONLY */
-#define CUSTOM_WPS
-
 /* data structures */
 
 #define RESUME_OFF 0
