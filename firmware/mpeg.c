@@ -48,8 +48,8 @@ extern char* peek_prev_track(int type);
 static char *units[] =
 {
     "%",    /* Volume */
-    "%",    /* Bass */
-    "%"     /* Treble */
+    "dB",   /* Bass */
+    "dB"    /* Treble */
 };
 
 static int numdecimals[] =
@@ -69,15 +69,25 @@ static int minval[] =
 static int maxval[] =
 {
     50,    /* Volume */
-    50,    /* Bass */
-    50     /* Treble */
+#ifdef ARCHOS_RECORDER
+    24,    /* Bass */
+    24     /* Treble */
+#else
+    30,    /* Bass */
+    30     /* Treble */
+#endif
 };
 
 static int defaultval[] =
 {
     70/2,    /* Volume */
-    50/2,    /* Bass */
-    50/2     /* Treble */
+#ifdef ARCHOS_RECORDER
+    12,      /* Bass */
+    12       /* Treble */
+#else
+    15,      /* Bass */
+    15       /* Treble */
+#endif
 };
 
 char *mpeg_sound_unit(int setting)
@@ -108,6 +118,21 @@ int mpeg_sound_default(int setting)
 #ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
 {
+    0x9e400, /* -15dB */
+    0xa2800, /* -14dB */
+    0xa7400, /* -13dB */
+    0xac400, /* -12dB */
+    0xb1800, /* -11dB */
+    0xb7400, /* -10dB */
+    0xbd400, /* -9dB */
+    0xc3c00, /* -8dB */
+    0xca400, /* -7dB */
+    0xd1800, /* -6dB */
+    0xd8c00, /* -5dB */
+    0xe0400, /* -4dB */
+    0xe8000, /* -3dB */
+    0xefc00, /* -2dB */
+    0xf7c00, /* -1dB */
     0,
     0x800,   /* 1dB */
     0x10000, /* 2dB */
@@ -128,6 +153,21 @@ static unsigned int bass_table[] =
 
 static unsigned int treble_table[] =
 {
+    0xb2c00, /* -15dB */
+    0xbb400, /* -14dB */
+    0xc1800, /* -13dB */
+    0xc6c00, /* -12dB */
+    0xcbc00, /* -11dB */
+    0xd0400, /* -10dB */
+    0xd5000, /* -9dB */
+    0xd9800, /* -8dB */
+    0xde000, /* -7dB */
+    0xe2800, /* -6dB */
+    0xe7e00, /* -5dB */
+    0xec000, /* -4dB */
+    0xf0c00, /* -3dB */
+    0xf5c00, /* -2dB */
+    0xfac00, /* -1dB */
     0,
     0x5400,  /* 1dB */
     0xac00,  /* 2dB */
@@ -144,6 +184,26 @@ static unsigned int treble_table[] =
     0x51800, /* 13dB */
     0x58400, /* 14dB */
     0x5f800  /* 15dB */
+};
+
+static unsigned int prescale_table[] =
+{
+    0x80000,  /* 0db */
+    0x8e000,  /* 1dB */
+    0x9a400,  /* 2dB */
+    0xa5800, /* 3dB */
+    0xaf400, /* 4dB */
+    0xb8000, /* 5dB */
+    0xbfc00, /* 6dB */
+    0xc6c00, /* 7dB */
+    0xcd000, /* 8dB */
+    0xd25c0, /* 9dB */
+    0xd7800, /* 10dB */
+    0xdc000, /* 11dB */
+    0xdfc00, /* 12dB */
+    0xe3400, /* 13dB */
+    0xe6800, /* 14dB */
+    0xe9400  /* 15dB */
 };
 #endif
 
@@ -718,26 +778,20 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_BASS:
-            value *= 2; /* Convert to percent */
-            
 #ifdef ARCHOS_RECORDER
-            tmp = 0x6000 * value / 100;
+            tmp = (((value-12) * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
-            tmp = 15 * value / 100;
-            mas_writereg(MAS_REG_KBASS, bass_table[tmp]);
+            mas_writereg(MAS_REG_KBASS, bass_table[value]);
 #endif
             break;
 
         case SOUND_TREBLE:
-            value *= 2; /* Convert to percent */
-
 #ifdef ARCHOS_RECORDER
-            tmp = 0x6000 * value / 100;
+            tmp = (((value-12) * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
-            tmp = 15 * value / 100;
-            mas_writereg(MAS_REG_KTREBLE, treble_table[tmp]);
+            mas_writereg(MAS_REG_KTREBLE, treble_table[value]);
 #endif
             break;
     }
@@ -754,11 +808,19 @@ int mpeg_val2phys(int setting, int value)
             break;
         
         case SOUND_BASS:
-            result = value * 2;
+#ifdef ARCHOS_RECORDER
+            result = value - 12;
+#else
+            result = value - 15;
+#endif
             break;
         
         case SOUND_TREBLE:
-            result = value * 2;
+#ifdef ARCHOS_RECORDER
+            result = value - 12;
+#else
+            result = value - 15;
+#endif
             break;
     }
     return result;
