@@ -2,7 +2,7 @@
 
 if(!$ARGV[0]) {
     print <<MOO
-Usage: lang.pl [-p=<prefix>] <language file>
+Usage: genlang [-p=<prefix>] <language file>
 
 When running this program. <prefix>.h and <prefix>.c will be created in the
 "current directory". <prefix> is "lang" by default.
@@ -77,7 +77,9 @@ while(<LANG>) {
                 $value = $set{'eng'};
             }
 #            print "VOICE: ".$set{'voice'}." VALUE: $value\n";
-            if(($value eq "\"\"") && $set{'voice'}) {
+            # Note: if both entries are "", the string is deprecated,
+            # but must be included to maintain compatibility
+            if(($value eq "\"\"") && $set{'voice'} ne "\"\"") {
                 # voice-only
                 push @vfile, $set{'id'};
             }
