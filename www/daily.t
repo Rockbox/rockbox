@@ -45,6 +45,10 @@ The batch timestamp is GMT.
 <a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a><br>
 <a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a><br>
 </td>
+<td>
+<a href="auto/build-fmrecorder/ajbrec.ajz">FM Recorder</a><br>
+<a href="auto/build-recorder8mb/ajbrec.ajz">8MB Recorder</a><br>
+</td>
 </tr></table>
 
 #include "foot.t"

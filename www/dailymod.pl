@@ -17,7 +17,7 @@ sub list {
     print "</ul>\n";
 }
 
-print "<table class=rockbox><tr><th>player</th><th>recorder</th><th>fmrecorder</th></tr>\n";
+print "<table class=rockbox><tr><th>player</th><th>recorder</th><th>fm recorder</th><th>8MB recorder</th></tr>\n";
 print "<tr><td>\n";
 &list("player");
 
@@ -26,5 +26,8 @@ print "</td><td>\n";
 
 print "</td><td>\n";
 &list("fmrecorder");
+
+print "</td><td>\n";
+&list("recorder8mb");
 
 print "</td></tr></table>\n";
