@@ -23,13 +23,11 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#include "grayscale.h"
 
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb; /* global api struct pointer */
-static char pbuf[32];         /* global printf buffer */
-static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
 
 /*********************** Begin grayscale framework *************************/
 
@@ -54,43 +52,6 @@ static unsigned int gbuf_size = 0;
  * You can cut out functions from the third section that you do not need in
  * order to not waste space. Don't forget to cut the prototype as well.
  */
-
-/**** internal core functions and definitions ****/
-
-/* You do not want to touch these if you don't know exactly what you're
- * doing. */
-
-#define GRAY_RUNNING          0x0001  /* grayscale overlay is running */
-#define GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
-
-/* unsigned 16 bit multiplication (a single instruction on the SH) */
-#define MULU16(a, b) (((unsigned short) (a)) * ((unsigned short) (b)))
-
-typedef struct
-{
-    int x;
-    int by;        /* 8-pixel units */
-    int width;
-    int height;
-    int bheight;   /* 8-pixel units */
-    int plane_size;
-    int depth;     /* number_of_bitplanes  = (number_of_grayscales - 1) */
-    int cur_plane; /* for the timer isr */
-    unsigned long randmask; /* mask for random value in graypixel() */
-    unsigned long flags;    /* various flags, see #defines */
-    unsigned char *data;    /* pointer to start of bitplane data */
-    unsigned long *bitpattern; /* pointer to start of pattern table */
-} tGraybuf;
-
-static tGraybuf *graybuf = NULL;
-static short gray_random_buffer;
-
-/** prototypes **/
-
-void gray_timer_isr(void);
-void graypixel(int x, int y, unsigned long pattern);
-void grayblock(int x, int by, unsigned char* src, int stride);
-void grayinvertmasked(int x, int by, unsigned char mask);
 
 /** implementation **/
 
@@ -173,7 +134,7 @@ void graypixel(int x, int y, unsigned long pattern)
         "mova    .pp_table,%3    \n"  /* get address of mask table in r0 */
         "bra     .pp_end         \n"  /* skip the table */
         "mov.b   @(%3,%1),%1     \n"  /* get entry from mask table */
-        
+
         ".align  2               \n"
     ".pp_table:                  \n"  /* mask table */
         ".byte   0x01            \n"
@@ -187,7 +148,7 @@ void graypixel(int x, int y, unsigned long pattern)
 
     ".pp_end:                    \n"
         : /* outputs */
-        /* %0 */ "=&r"(address),    
+        /* %0 */ "=&r"(address),
         /* %1 */ "=&r"(mask)
         : /* inputs */
         /* %2 */ "r"(graybuf->width),
@@ -205,7 +166,7 @@ void graypixel(int x, int y, unsigned long pattern)
         /* it's sufficient to do this once, since the mask guarantees
          * random < 2 * depth */
     ".p_ntrim:                   \n"
-    
+
         /* calculate some addresses */
         "mulu    %4,%1           \n"  /* end address offset */
         "not     %3,r1           \n"  /* get inverse mask (for "and") */
@@ -230,7 +191,7 @@ void graypixel(int x, int y, unsigned long pattern)
     ".p_start1:                  \n"
         "cmp/hi  r2,%1           \n"  /* address < end address ? */
         "bt      .p_loop1        \n"
-        
+
         "bra     .p_start2       \n"
         "nop                     \n"
 
@@ -268,7 +229,7 @@ void graypixel(int x, int y, unsigned long pattern)
 void grayblock(int x, int by, unsigned char* src, int stride)
 {
     /* precalculate the bit patterns with random shifts (same RNG as graypixel,
-     * see there for an explanation) for all 8 pixels and put them on the 
+     * see there for an explanation) for all 8 pixels and put them on the
      * stack (!) */
     asm(
         "mova    .gb_reload,r0   \n"  /* set default loopback address */
@@ -320,7 +281,7 @@ void grayblock(int x, int by, unsigned char* src, int stride)
 
         "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
         "mov.l   r0,@-r15        \n"  /* push pattern */
-        
+
         "cmp/pl  r3              \n"  /* loop count > 0? */
         "bf      .gb_patdone     \n"  /* no: done */
 
@@ -404,7 +365,7 @@ void grayinvertmasked(int x, int by, unsigned char mask)
         "mov     #0,r1           \n"  /* current_plane = 0 */
         "sts     macl,r2         \n"  /* get mulu result */
         "add     r2,%1           \n"  /* -> address in 1st bitplane */
-        
+
     ".i_loop:                    \n"
         "mov.b   @%1,r2          \n"  /* get data byte */
         "add     #1,r1           \n"  /* current_plane++; */
@@ -425,16 +386,6 @@ void grayinvertmasked(int x, int by, unsigned char mask)
         "r1", "r2", "macl"
     );
 }
-
-/*** public core functions ***/
-
-/** prototypes **/
-
-int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
-                     int bheight, int depth);
-void gray_release_buffer(void);
-void gray_position_display(int x, int by);
-void gray_show_display(bool enable);
 
 /** implementation **/
 
@@ -472,13 +423,13 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     int possible_depth, plane_size;
     int i, j;
 
-    if ((unsigned) width > LCD_WIDTH 
-        || (unsigned) bheight > (LCD_HEIGHT >> 3) 
+    if ((unsigned) width > LCD_WIDTH
+        || (unsigned) bheight > (LCD_HEIGHT >> 3)
         || depth < 1)
         return 0;
 
     while ((unsigned long)gbuf & 3)  /* the buffer has to be long aligned */
-    { 
+    {
         gbuf++;
         gbuf_size--;
     }
@@ -505,9 +456,9 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     graybuf->cur_plane = 0;
     graybuf->flags = 0;
     graybuf->data = gbuf + sizeof(tGraybuf);
-    graybuf->bitpattern = (unsigned long *) (graybuf->data 
+    graybuf->bitpattern = (unsigned long *) (graybuf->data
                            + depth * plane_size);
-    
+
     i = depth;
     j = 8;
     while (i != 0)
@@ -519,7 +470,7 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
 
     /* initial state is all white */
     rb->memset(graybuf->data, 0, depth * plane_size);
-    
+
     /* Precalculate the bit patterns for all possible pixel values */
     for (i = 0; i <= depth; i++)
     {
@@ -535,12 +486,12 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
                 value -= depth;   /* "white" bit */
             else
                 pattern |= 1;     /* "black" bit */
-        }  
+        }
         /* now the lower <depth> bits contain the pattern */
 
         graybuf->bitpattern[i] = pattern;
     }
-    
+
     return depth;
 }
 
@@ -564,7 +515,7 @@ void gray_release_buffer(void)
  *   by = top margin in 8-pixel units
  *
  * You may set this in a way that the overlay spills across the right or
- * bottom display border. In this case it will simply be clipped by the 
+ * bottom display border. In this case it will simply be clipped by the
  * LCD controller. You can even set negative values, this will clip at the
  * left or top border. I did not test it, but the limits may be +127 / -128
  *
@@ -578,7 +529,7 @@ void gray_position_display(int x, int by)
 
     graybuf->x = x;
     graybuf->by = by;
-    
+
     if (graybuf->flags & GRAY_RUNNING)
         graybuf->flags |= GRAY_DEFERRED_UPDATE;
 }
@@ -592,7 +543,7 @@ void gray_position_display(int x, int by)
  *
  * DO NOT call lcd_update() or any other api function that directly accesses
  * the lcd while the grayscale overlay is running! If you need to do
- * lcd_update() to update something outside the grayscale overlay area, use 
+ * lcd_update() to update something outside the grayscale overlay area, use
  * gray_deferred_update() instead.
  *
  * Other functions to avoid are:
@@ -629,39 +580,6 @@ void gray_show_display(bool enable)
 
 /** prototypes **/
 
-/* functions affecting the whole display */
-void gray_clear_display(void);
-void gray_black_display(void);
-void gray_deferred_update(void);
-
-/* scrolling functions */
-void gray_scroll_left(int count, bool black_border);
-void gray_scroll_right(int count, bool black_border);
-void gray_scroll_up8(bool black_border);
-void gray_scroll_down8(bool black_border);
-void gray_scroll_up(int count, bool black_border);
-void gray_scroll_down(int count, bool black_border);
-
-/* pixel functions */
-void gray_drawpixel(int x, int y, int brightness);
-void gray_invertpixel(int x, int y);
-
-/* line functions */
-void gray_drawline(int x1, int y1, int x2, int y2, int brightness);
-void gray_invertline(int x1, int y1, int x2, int y2);
-
-/* rectangle functions */
-void gray_drawrect(int x1, int y1, int x2, int y2, int brightness);
-void gray_fillrect(int x1, int y1, int x2, int y2, int brightness);
-void gray_invertrect(int x1, int y1, int x2, int y2);
-
-/* bitmap functions */
-void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
-                      int stride);
-void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
-                     int stride, bool draw_bg, int fg_brightness,
-                     int bg_brightness);
-
 /** implementation **/
 
 /* Clear the grayscale display (sets all pixels to white)
@@ -685,7 +603,7 @@ void gray_black_display(void)
 }
 
 /* Do an lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
- * of the screen not covered by the grayscale overlay). If the grayscale 
+ * of the screen not covered by the grayscale overlay). If the grayscale
  * overlay is running, the update will be done in the next call of the
  * interrupt routine, otherwise it will be performed right away. See also
  * comment for the gray_show_display() function.
@@ -701,7 +619,7 @@ void gray_deferred_update(void)
 /* Scroll the whole grayscale buffer left by <count> pixels
  *
  * black_border determines if the pixels scrolled in at the right are black
- * or white 
+ * or white
  *
  * Scrolling left/right by an even pixel count is almost twice as fast as
  * scrolling by an odd pixel count.
@@ -714,7 +632,7 @@ void gray_scroll_left(int count, bool black_border)
 
     if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
         return;
-        
+
     if (black_border)
         filler = 0xFF;
     else
@@ -725,7 +643,7 @@ void gray_scroll_left(int count, bool black_border)
     {
         ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
-        {   
+        {
             if (count & 1)  /* odd count: scroll byte-wise */
                 asm volatile (
                 ".sl_loop1:                   \n"
@@ -843,7 +761,7 @@ void gray_scroll_up8(bool black_border)
 
     if (graybuf == NULL)
         return;
-        
+
     if (black_border)
         filler = 0xFF;
     else
@@ -861,7 +779,7 @@ void gray_scroll_up8(bool black_border)
     }
     /* fill last row */
     ptr = graybuf->data + graybuf->plane_size - graybuf->width;
-    for (d = 0; d < graybuf->depth; d++) 
+    for (d = 0; d < graybuf->depth; d++)
     {
         rb->memset(ptr, filler, graybuf->width);
         ptr += graybuf->plane_size;
@@ -883,7 +801,7 @@ void gray_scroll_down8(bool black_border)
 
     if (graybuf == NULL)
         return;
-        
+
     if (black_border)
         filler = 0xFF;
     else
@@ -901,7 +819,7 @@ void gray_scroll_down8(bool black_border)
     }
     /* fill first row */
     ptr = graybuf->data;
-    for (d = 0; d < graybuf->depth; d++) 
+    for (d = 0; d < graybuf->depth; d++)
     {
         rb->memset(ptr, filler, graybuf->width);
         ptr += graybuf->plane_size;
@@ -928,7 +846,7 @@ void gray_scroll_up(int count, bool black_border)
         filler = 0xFF;
     else
         filler = 0;
-    
+
     /* scroll column by column to minimize flicker */
     asm(
         "mov     #0,r6           \n"  /* x = 0 */
@@ -951,12 +869,12 @@ void gray_scroll_up(int count, bool black_border)
     ".su_cloop:                  \n"  /* repeat for every column */
         "mov     %1,r2           \n"  /* get start address */
         "mov     #0,r3           \n"  /* current_plane = 0 */
-        
+
     ".su_oloop:                  \n"  /* repeat for every bitplane */
         "mov     r2,r4           \n"  /* get start address */
         "mov     #0,r5           \n"  /* current_row = 0 */
         "mov     %5,r1           \n"  /* get filler bits */
-        
+
     ".su_iloop:                  \n"  /* repeat for all rows */
         "sub     %2,r4           \n"  /* address -= width */
         "mov.b   @r4,r0          \n"  /* get data byte */
@@ -965,7 +883,7 @@ void gray_scroll_up(int count, bool black_border)
         "or      r1,r0           \n"  /* combine old data */
         "jmp     @%6             \n"  /* jump into shift "path" */
         "extu.b  r0,r1           \n"  /* store data for next round */
-        
+
     ".su_shift6:                 \n"  /* shift right by 0..7 bits */
         "shlr2   r0              \n"
     ".su_shift4:                 \n"
@@ -1031,7 +949,7 @@ void gray_scroll_down(int count, bool black_border)
         filler = 0xFF << count; /* calculate filler bits */
     else
         filler = 0;
-    
+
     /* scroll column by column to minimize flicker */
     asm(
         "mov     #0,r6           \n"  /* x = 0 */
@@ -1039,7 +957,7 @@ void gray_scroll_down(int count, bool black_border)
         "mov.b   @(r0,%6),%6     \n"  /*   shift amount from table */
         "bra     .sd_cloop       \n"  /* skip table */
         "add     r0,%6           \n"
-        
+
         ".align  2               \n"
     ".sd_shifttbl:               \n"  /* shift jump offset table */
         ".byte   .sd_shift0 - .sd_shifttbl \n"
@@ -1054,18 +972,18 @@ void gray_scroll_down(int count, bool black_border)
     ".sd_cloop:                  \n"  /* repeat for every column */
         "mov     %1,r2           \n"  /* get start address */
         "mov     #0,r3           \n"  /* current_plane = 0 */
-        
+
     ".sd_oloop:                  \n"  /* repeat for every bitplane */
         "mov     r2,r4           \n"  /* get start address */
         "mov     #0,r5           \n"  /* current_row = 0 */
         "mov     %5,r1           \n"  /* get filler bits */
-        
+
     ".sd_iloop:                  \n"  /* repeat for all rows */
         "shlr8   r1              \n"  /* shift right to get residue */
         "mov.b   @r4,r0          \n"  /* get data byte */
         "jmp     @%6             \n"  /* jump into shift "path" */
         "extu.b  r0,r0           \n"  /* extend unsigned */
-        
+
     ".sd_shift6:                 \n"  /* shift left by 0..7 bits */
         "shll2   r0              \n"
     ".sd_shift4:                 \n"
@@ -1119,7 +1037,7 @@ void gray_scroll_down(int count, bool black_border)
  */
 void gray_drawpixel(int x, int y, int brightness)
 {
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height
         || (unsigned) brightness > 255)
@@ -1136,7 +1054,7 @@ void gray_drawpixel(int x, int y, int brightness)
  */
 void gray_invertpixel(int x, int y)
 {
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height)
         return;
@@ -1158,7 +1076,7 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
     int y, yinc1, yinc2;
     unsigned long pattern;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
@@ -1241,7 +1159,7 @@ void gray_invertline(int x1, int y1, int x2, int y2)
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
@@ -1318,7 +1236,7 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
     unsigned long pattern;
     unsigned char srcpixel;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
@@ -1335,7 +1253,7 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
     if (x1 > x2)
     {
         x = x1;
-        x1 = x2; 
+        x1 = x2;
         x2 = x;
     }
 
@@ -1366,7 +1284,7 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
     }
 }
 
-/* Fill a rectangle with a specific gray value 
+/* Fill a rectangle with a specific gray value
  * corners are (x1, y1) and (x2, y2)
  *
  * brightness is 0..255 (black to white) regardless of real bit depth
@@ -1377,14 +1295,14 @@ void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
     unsigned long pattern;
     unsigned char srcpixel;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
         || (unsigned) y2 >= (unsigned) graybuf->height
         || (unsigned) brightness > 255)
         return;
-        
+
     if (y1 > y2)
     {
         y = y1;
@@ -1394,7 +1312,7 @@ void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
     if (x1 > x2)
     {
         x = x1;
-        x1 = x2; 
+        x1 = x2;
         x2 = x;
     }
 
@@ -1435,7 +1353,7 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
     int x, yb, yb1, yb2;
     unsigned char mask;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
@@ -1451,10 +1369,10 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
     if (x1 > x2)
     {
         x = x1;
-        x1 = x2; 
+        x1 = x2;
         x2 = x;
     }
-    
+
     yb1 = y1 >> 3;
     yb2 = y2 >> 3;
 
@@ -1472,13 +1390,13 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
 
         for (x = x1; x <= x2; x++)
             grayinvertmasked(x, yb1, mask);
-            
+
         for (yb = yb1 + 1; yb < yb2; yb++)
         {
             for (x = x1; x <= x2; x++)
                 grayinvertmasked(x, yb, 0xFF);
         }
-        
+
         mask = 0xFF >> (7 - (y2 & 7));
 
         for (x = x1; x <= x2; x++)
@@ -1487,7 +1405,7 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
 }
 
 /* Copy a grayscale bitmap into the display
- * 
+ *
  * A grayscale bitmap contains one byte for every pixel that defines the
  * brightness of the pixel (0..255). Bytes are read in row-major order.
  * The <stride> parameter is useful if you want to show only a part of a
@@ -1500,11 +1418,11 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
     int xi, yi;
     unsigned char *row;
 
-    if (graybuf == NULL 
+    if (graybuf == NULL
         || (unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height)
         return;
-    
+
     if ((y + ny) >= graybuf->height) /* clip bottom */
         ny = graybuf->height - y;
 
@@ -1610,6 +1528,11 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
 
 /*********************** end grayscale framework ***************************/
 
+#ifdef GRAYSCALE_PLUGIN
+static char pbuf[32];         /* global printf buffer */
+static unsigned char *gbuf;
+static unsigned int gbuf_size = 0;
+
 /**************************** main function ********************************/
 
 /* this is only a demo of what the framework can do */
@@ -1636,7 +1559,7 @@ int main(void)
        0x00, 0x1C, 0x22, 0x22, 0x22, 0x1C, 0x00, 0x22, 0x14, 0x08,
        0x14, 0x22, 0x00
     };
-    
+
     static unsigned char showing[] = {
     /* .......................................
      * ..####.#...#..###..#...#.#.#...#..####.
@@ -1652,7 +1575,7 @@ int main(void)
        0x20, 0x18, 0x20, 0x1E, 0x00, 0x3E, 0x00, 0x3E, 0x04, 0x08,
        0x10, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x2A, 0x3A, 0x00
     };
-    
+
     static unsigned char grayscale_gray[] = {
     /* .......................................................
      * ..####.####...###..#...#..####..###...###..#.....#####.
@@ -1732,7 +1655,7 @@ int main(void)
     gray_drawrect(0, 0, 111, 55, 0);   /* black border */
 
     /* draw gray tones */
-    for (i = 0; i < 86; i++)           
+    for (i = 0; i < 86; i++)
     {
         x = 13 + i;
         gray_fillrect(x, 6, x, 49, 3 * i); /* gray rectangles */
@@ -1740,7 +1663,7 @@ int main(void)
 
     gray_invertrect(13, 29, 98, 49);   /* invert rectangle (lower half) */
     gray_invertline(13, 27, 98, 27);   /* invert a line */
-    
+
     /* show bitmaps (1 bit and 8 bit) */
     gray_drawbitmap(rockbox, 14, 13, 43, 7, 43, true, 255, 100);   /* opaque */
     gray_drawbitmap(showing, 58, 13, 39, 7, 39, false, 0, 0); /* transparent */
@@ -1753,7 +1676,7 @@ int main(void)
     rb->lcd_puts(0, 0, pbuf);
     gray_deferred_update();             /* schedule an lcd_update() */
 
-    /* drawing is now finished, play around with scrolling 
+    /* drawing is now finished, play around with scrolling
      * until you press OFF or connect USB
      */
     while (true)
@@ -1773,7 +1696,7 @@ int main(void)
 
         if (button & BUTTON_ON)
             black_border = true;
-            
+
         if (button & BUTTON_REPEAT)
             scroll_amount = 4;
 
@@ -1810,7 +1733,6 @@ int main(void)
 }
 
 /*************************** Plugin entry point ****************************/
-
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int ret;
@@ -1821,13 +1743,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; // copy to global api pointer
     (void)parameter;
-    
+
     ret = main();
 
     if (ret == PLUGIN_USB_CONNECTED)
         rb->usb_screen();
     return ret;
 }
+#endif /* GRAYSCALE_PLUGIN */
 
 #endif // #ifdef HAVE_LCD_BITMAP
 #endif // #ifndef SIMULATOR
