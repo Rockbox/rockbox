@@ -141,8 +141,15 @@ void init(void)
     if ( i==4 ) {
         DEBUGF("No partition found, trying to mount sector 0.\n");
         rc = fat_mount(0);
-        if(rc)
-            panicf("No FAT32 partition!");
+        if(rc) {
+            lcd_clear_display();
+            lcd_puts(0,0,"No FAT32");
+            lcd_puts(0,1,"partition!");
+            lcd_update();
+            sleep(HZ);
+            while(1)
+                dbg_partitions();
+        }
     }
     
     settings_load();

@@ -27,5 +27,6 @@ extern bool dbg_ports(void);
 extern bool dbg_rtc(void);
 #endif
 #endif
+extern bool dbg_partitions(void);
 
 #endif

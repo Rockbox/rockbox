@@ -30,5 +30,6 @@ struct partinfo {
 
 /* returns a pointer to an array of 8 partinfo structs */
 struct partinfo* disk_init(void);
+struct partinfo* disk_partinfo(int partition);
 
 #endif

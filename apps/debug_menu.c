@@ -36,6 +36,7 @@
 #include "powermgmt.h"
 #include "system.h"
 #include "font.h"
+#include "disk.h"
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -260,6 +261,62 @@ bool dbg_hw_info(void)
     return false;
 }
 #endif
+
+bool dbg_partitions(void)
+{
+    int partition=0;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, "Partition");
+    lcd_puts(0, 1, "list");
+    lcd_update();
+    sleep(HZ);
+
+    while(1)
+    {
+        char buf[32];
+        int button;
+        struct partinfo* p = disk_partinfo(partition);
+
+        lcd_clear_display();
+        snprintf(buf, sizeof buf, "P%d: S:%x", partition, p->start);
+        lcd_puts(0, 0, buf);
+        snprintf(buf, sizeof buf, "T:%x %d MB", p->type, p->size / 2048);
+        lcd_puts(0, 1, buf);
+        lcd_update();
+        
+        button = button_get(true);
+
+        switch(button)
+        {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF:
+#else
+            case BUTTON_STOP:
+#endif
+                return false;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#endif
+            case BUTTON_LEFT:
+                partition--;
+                if (partition < 0)
+                    partition = 3;
+                break;
+                
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#endif
+            case BUTTON_RIGHT:
+                partition++;
+                if (partition > 3)
+                    partition = 0;
+                break;
+        }
+    }
+    return false;
+}
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
@@ -910,6 +967,7 @@ bool debug_menu(void)
         { "View battery", view_battery },
 #endif
         { "View HW info", dbg_hw_info },
+        { "View partitions", dbg_partitions },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

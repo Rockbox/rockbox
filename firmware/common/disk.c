@@ -73,3 +73,9 @@ struct partinfo* disk_init(void)
 
     return part;
 }
+
+struct partinfo* disk_partinfo(int partition)
+{
+    return &part[partition];
+}
+
