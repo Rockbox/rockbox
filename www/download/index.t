@@ -45,9 +45,9 @@
 <p><a href="rockbox-2.3-ondiosp.zip">rockbox-2.3-ondiosp.zip</a>
 <br>(535 KB)</td>
 
-<td><img border=0 src=/docs/install.png></a><br clear=all>Windows installer (not for ondio yet)
+<td><img border=0 src=/docs/install.png></a><br clear=all>Windows installer
 <p><a href="rockbox-2.3-install.exe">rockbox-2.3-install.exe</a>
-<br>(922 KB)</td>
+<br>(1.2 MB)</td>
 
 </tr></table>
 
