@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
 #include "system.h"
