@@ -41,7 +41,7 @@
 
 /* -- -- */
 
-static GC draw_gc, erase_gc;
+GC draw_gc, erase_gc;
 static Colormap cmap;
 static XColor color_track, color_car;
 
@@ -163,6 +163,27 @@ void drawline(int color, int x1, int y1, int x2, int y2)
             (int)(y2*track_zoom));
 }
 
+void drawdot(int color, int x, int y)
+{
+  if (color==0) {
+    XSetForeground(dpy, draw_gc,
+                   get_pixel_resource("background", "Background", dpy, cmap));
+  }
+  else
+    XSetForeground(dpy, draw_gc,
+                   get_pixel_resource("foreground", "Foreground", dpy, cmap));
+
+  XDrawPoint(dpy, window, draw_gc, x, y);
+}
+
+void drawdots(XPoint *points, int count)
+{
+  XSetForeground(dpy, draw_gc,
+                 get_pixel_resource("foreground", "Foreground", dpy, cmap));
+  
+  XDrawPoints(dpy, window, draw_gc, points, count, CoordModeOrigin);
+}
+
 void drawtext(int color, int x, int y, char *text)
 {
   if (color==0) {
@@ -199,10 +220,9 @@ screenhack (Display *the_dpy, Window the_window)
 
   init_window();
 
-  drawtext(1, 20, 20, PROGNAME);
-  drawline(1, 0, 0, 40, 50);
-
   Logf("Rockbox will kill ya!");
+
+  lcd_string( PROGNAME, 0);
 
   while (1) {
     /* deal with input here */
@@ -214,7 +234,18 @@ screenhack (Display *the_dpy, Window the_window)
 
 void screen_redraw()
 {
-  /* does nothing yet */
-  drawtext(1, 20, 20, PROGNAME);
-  drawline(1, 0, 0, 40, 50);
+  int y, x;
+
+  lcd_update();
+
+#if 0
+  /* does nothing "real" yet */
+  /*  drawtext(1, 20, 20, PROGNAME);*/
+
+  for(y=0; y< 112; y++)
+    for(x=0; x<64; x++)
+      drawdot(1, x+16, y+16);
+  /*  drawline(1, 0, 0, 40, 50); */
+#endif
 }
+

@@ -17,50 +17,10 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <errno.h>
-#include <ctype.h>
-#include <time.h>
-
-#include "screenhack.h"
-
 /*
- * Specific implementations for X11, using the generic LCD API and data.
+ * This file is meant for generic LCD defines
  */
 
-#include "lcd.h"
+#define	LCD_WIDTH  112		/* Display width in pixels */
+#define	LCD_HEIGHT 64		/* Display height in pixels */
 
-extern unsigned char display[LCD_WIDTH/8][LCD_HEIGHT];
-
-void lcd_update (void)
-{
-  int x, y;
-  int p=0;
-  int bit;
-  XPoint points[LCD_WIDTH * LCD_HEIGHT];
-
-  for(y=0; y<LCD_HEIGHT; y+=8) {
-    for(x=0; x<LCD_WIDTH; x++) {
-      if(display[y/8][x]) {
-        /* one or more bits/pixels are set */
-        for(bit=0; bit<8; bit++) {
-          if(display[y/8][x]&(1<<bit)) {
-            points[p].x = x;
-            points[p].y = y+bit;
-            p++; /* increase the point counter */
-          }
-        }
-        
-      }
-    }
-  }
-  drawdots(&points[0], p);
-}

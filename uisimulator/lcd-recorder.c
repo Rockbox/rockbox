@@ -79,6 +79,7 @@ void lcd_update (void)
   }
 }
 
+#if 0
 /*
  * Display a string at current position
  */
@@ -107,42 +108,8 @@ void lcd_string (const char *text, BOOL invert)
     }
   }
 }
+#endif
 
-/*
- * Display a character.
- * This writes a 5x8 character within a 6x8 cell.
- * The cell does not have to be aligned to a display byte.
- * The top left of the cell is displayed at the current position.
- * invert is TRUE to display in reverse video.
- */
-void lcd_char (int ch, BOOL invert)
-{
-  uchar (*dp)[DISP_X] = (void *) &display[lcd_y/8][lcd_x];
-  uint32 shift, mask, col;
-
-  /* Limit to char generation table */
-  if (ch < ASCII_MIN || ch > ASCII_MAX)
-    ch = ASCII_MAX;
-  
-  /* Calculate shift and masks for cell bit position */
-  shift = (lcd_y & 0x7);
-  mask = ~(COL_MASK << shift);
-  if (invert)
-    invert = ~mask;
-
-  /* Write each char column */
-  for (col = 0; col < CHAR_X-1; col++) {
-    uint32 data = (char_gen[ch-ASCII_MIN][col] << shift) ^ invert;
-    dp[0][col] = (dp[0][col] & mask) | data;
-    if (lcd_y < DISP_Y-8)
-      dp[1][col] = (dp[1][col] & (mask >> 8)) | (data >> 8);
-  }
-
-  /* Column after char */
-  dp[0][CHAR_X-1] = (dp[0][CHAR_X-1] & mask) | invert;
-  if (lcd_y < DISP_Y-8)
-    dp[1][CHAR_X-1] = (dp[1][CHAR_X-1] & (mask >> 8)) | (invert >> 8);
-}
 
 /*
  * Write a byte to LCD controller.

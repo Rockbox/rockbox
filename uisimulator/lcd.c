@@ -21,8 +21,10 @@
  * This file is meant for generic LCD defines and global variables etc.
  */
 
-#define	DISP_X 112		/* Display width in pixels */
-#define	DISP_Y 64		/* Display height in pixels */
+#include "lcd.h"
+
+#define	DISP_X LCD_WIDTH	/* Display width in pixels */
+#define	DISP_Y LCD_HEIGHT       /* Display height in pixels */
 
 #define	CHAR_X   6		/* Character width in pixels */
 #define	CHAR_Y   8		/* Character height in pixels */
@@ -38,7 +40,7 @@
 #define	ASCII_MIN			0x20	/* First char in table */
 #define	ASCII_MAX			0x7f	/* Last char in table */
 
-static const uchar char_gen[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
+static const unsigned char char_gen[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
 {
   0x00, 0x00, 0x00, 0x00, 0x00,	/* 0x20-0x2f */
   0x00, 0x00, 0x4f, 0x00, 0x00,
@@ -150,30 +152,93 @@ static const uchar char_gen[ASCII_MAX-ASCII_MIN+1][CHAR_X-1] =
  * Bits within a byte are arranged veritcally, LSB at top.
  * Byte 0 is top left, byte 1 is 2nd left, byte DISP_X starts 2nd row.
  */
-static uchar display[DISP_Y/8][DISP_X];
+unsigned char display[LCD_HEIGHT/8][LCD_WIDTH];
 
-static uint16 lcd_y;	/* Current pixel row */
-static uint16 lcd_x;	/* Current pixel column */
+static unsigned char lcd_y;	/* Current pixel row */
+static unsigned char lcd_x;	/* Current pixel column */
 
 /*
  * Set current x,y position
  */
-void lcd_position (int x, int y)
+void lcd_position(int x, int y)
 {
-  if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y)
-    {
-      lcd_x = x;
-      lcd_y = y;
-    }
+  if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y) {
+    lcd_x = x;
+    lcd_y = y;
+  }
 }
 
 /*
  * Clear the display
  */
-void lcd_clear (void)
+void lcd_clear(void)
 {
   lcd_x = 0;
   lcd_y = 0;
   memset (display, 0, sizeof display);
 }
 
+/*
+ * Display a character at current position.
+ * This writes a 5x8 character within a 6x8 cell.
+ * The cell does not have to be aligned to a display byte.
+ * The top left of the cell is displayed at the current position.
+ * invert is TRUE to display in reverse video.
+ */
+void lcd_char (int ch, char invert)
+{
+  unsigned char (*dp)[DISP_X] = (void *) &display[lcd_y/8][lcd_x];
+  unsigned long shift, mask, col;
+
+  /* Limit to char generation table */
+  if (ch < ASCII_MIN || ch > ASCII_MAX)
+    ch = ASCII_MAX;
+  
+  /* Calculate shift and masks for cell bit position */
+  shift = (lcd_y & 0x7);
+  mask = ~(COL_MASK << shift);
+  if (invert)
+    invert = ~mask;
+
+  /* Write each char column */
+  for (col = 0; col < CHAR_X-1; col++) {
+    unsigned long data = (char_gen[ch-ASCII_MIN][col] << shift) ^ invert;
+    dp[0][col] = (dp[0][col] & mask) | data;
+    if (lcd_y < DISP_Y-8)
+      dp[1][col] = (dp[1][col] & (mask >> 8)) | (data >> 8);
+  }
+
+  /* Column after char */
+  dp[0][CHAR_X-1] = (dp[0][CHAR_X-1] & mask) | invert;
+  if (lcd_y < DISP_Y-8)
+    dp[1][CHAR_X-1] = (dp[1][CHAR_X-1] & (mask >> 8)) | (invert >> 8);
+}
+
+/*
+ * Output a string at current position
+ */
+void lcd_string(const char *text, char invert)
+{
+  int ch;
+
+  while ((ch = *text++) != '\0') {
+    if (lcd_y > DISP_Y-CHAR_Y) {
+      /* Scroll (8 pixels) */
+      memcpy (display[0], display[1], DISP_X*(DISP_Y/8-1));
+      lcd_y -= 8;
+    }
+
+    if (ch == '\n')
+      lcd_x = DISP_X;
+    else {
+      lcd_char (ch, invert);
+      lcd_x += CHAR_X;
+    }
+
+    if (lcd_x > DISP_X-CHAR_X) {
+      /* Wrap to next line */
+      lcd_x = 0;
+      lcd_y += CHAR_Y;
+    }
+  }
+}
