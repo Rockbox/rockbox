@@ -2,3 +2,4 @@ FILES
 Makefile
 *.[ch]
 recorder/*.[ch]
+win32.mak
