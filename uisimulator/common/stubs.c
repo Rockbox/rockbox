@@ -21,6 +21,7 @@
 
 #include "usb.h"
 #include "button.h"
+#include "menu.h"
 
 void backlight_on(void)
 {
@@ -88,8 +89,9 @@ void ata_flush(void)
 {
 }
 
-void simulate_usb(void)
+Menu simulate_usb(void)
 {
     usb_display_info();
     while (button_get(true) & BUTTON_REL);
+    return MENU_OK;
 }
