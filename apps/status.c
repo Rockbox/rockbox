@@ -57,7 +57,6 @@ void status_draw(void)
         lcd_icon(ICON_BATTERY_3, false);
 
 
-    DEBUGF("vol: %d\n", volume);
     lcd_icon(ICON_VOLUME, true);
     if(volume > 10)
         lcd_icon(ICON_VOLUME_1, true);
