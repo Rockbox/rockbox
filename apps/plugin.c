@@ -232,6 +232,7 @@ static struct plugin_api rockbox_api = {
 #endif
 #endif
     battery_level,
+    set_time,
 };
 
 int plugin_load(char* plugin, void* parameter)
