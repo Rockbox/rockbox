@@ -41,7 +41,7 @@ struct x11_dirent *x11_readdir(MYDIR *dir)
   struct dirent *x11 = (readdir)(dir->dir);
 
   if(!x11)
-    return NULL;
+    return (struct x11_dirent *)0;
 
   strcpy(secret.d_name, x11->d_name);
 
