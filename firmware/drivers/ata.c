@@ -824,10 +824,12 @@ int ata_init(void)
                 return -2;
         }
 
-        if (rc = master_slave_detect())
+        rc = master_slave_detect();
+        if (rc)
             return -10 + rc;
-    
-        if (rc = io_address_detect())
+
+        rc = io_address_detect();
+        if (rc)
             return -20 + rc;
 
         /* symptom fix: else check_registers() below may fail */
@@ -836,13 +838,16 @@ int ata_init(void)
             return -29;
         }
 
-        if (rc = check_registers())
+        rc = check_registers();
+        if (rc)
             return -30 + rc;
-    
-        if (rc = freeze_lock())
+
+        rc = freeze_lock();
+        if (rc)
             return -40 + rc;
 
-        if (rc = identify())
+        rc = identify();
+        if (rc)
             return -50 + rc;
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
@@ -852,7 +857,8 @@ int ata_init(void)
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
     }
-    if (rc = set_multiple_mode(multisectors))
+    rc = set_multiple_mode(multisectors);
+    if (rc)
         return -60 + rc;
 
     return 0;
