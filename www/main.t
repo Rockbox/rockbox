@@ -16,6 +16,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-12-16</i>: The <a href=http://www.rockbox.org/twiki/bin/view/Main/RockboxManual>Rockbox 2.3 manual</a> is out. Thanks go to Christi Alice Scarborough for her outstanding work!
+
 <p><i>2004-11-09</i>: Some downtime due to planned server maintenance (replaced a harddisk).
 
 <p><i>2004-11-01</i>: The site was down nearly four days due to hardware failure while the admins were away.
