@@ -354,62 +354,64 @@ static void mpeg_thread(void)
                    read too large chunks because the bitswapping will take
                    too much time. We must keep the DMA happy and also give
                    the other threads a chance to run. */
-                DEBUGF("R\n");
-                len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
-                if(len)
+                if(filling)
                 {
-                    DEBUGF("B\n");
-                    bitswap(mp3buf + mp3buf_write, len);
+                    DEBUGF("R\n");
+                    len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
+                    if(len)
+                    {
+                        DEBUGF("B\n");
+                        bitswap(mp3buf + mp3buf_write, len);
                     
-                    mp3buf_write += len;
-                    if(mp3buf_write >= mp3buflen)
-                    {
-                        mp3buf_write = 0;
-                        DEBUGF("W\n");
-                    }
+                        mp3buf_write += len;
+                        if(mp3buf_write >= mp3buflen)
+                        {
+                            mp3buf_write = 0;
+                            DEBUGF("W\n");
+                        }
 
-                    /* Tell ourselves that we want more data */
-                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        /* Tell ourselves that we want more data */
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-                    /* And while we're at it, see if we have startet playing
-                       yet. If not, do it. */
-                    if(play_pending)
-                    {
-                        play_pending = false;
-                        playing = true;
+                        /* And while we're at it, see if we have started
+                           playing yet. If not, do it. */
+                        if(play_pending)
+                        {
+                            play_pending = false;
+                            playing = true;
                 
-                        init_dma();
-                        start_dma();
-                    }
-                }
-                else
-                {
-                    close(mpeg_file);
-                    
-                    /* Make sure that the write pointer is at a word
-                       boundary */
-                    mp3buf_write &= 0xfffffffe;
-
-#if 1
-                    /* No more data to play */
-                    DEBUGF("Finished playing\n");
-                    playing = false;
-                    filling = false;
-#else
-                    next_track();
-                    if(new_file() < 0)
-                    {
-                        /* No more data to play */
-                        DEBUGF("Finished playing\n");
-                        playing = false;
-                        filling = false;
+                            init_dma();
+                            start_dma();
+                        }
                     }
                     else
                     {
-                        /* Tell ourselves that we want more data */
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-                    }
+                        close(mpeg_file);
+                    
+                        /* Make sure that the write pointer is at a word
+                           boundary */
+                        mp3buf_write &= 0xfffffffe;
+
+#if 1
+                        /* No more data to play */
+                        DEBUGF("Finished playing\n");
+                        filling = false;
+#else
+                        next_track();
+                        if(new_file() < 0)
+                        {
+                            /* No more data to play */
+                            DEBUGF("Finished playing\n");
+                            playing = false;
+                            filling = false;
+                        }
+                        else
+                        {
+                            /* Tell ourselves that we want more data */
+                            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        }
 #endif
+                    }
                 }
                 break;
         }
@@ -482,7 +484,7 @@ void mpeg_resume(void)
 
 void mpeg_volume(int percent)
 {
-    int volume = 0x2c * percent / 100;
+    int volume = 0x38 * percent / 100;
     dac_volume(volume);
 }
 
