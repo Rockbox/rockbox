@@ -125,6 +125,9 @@ $(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
 $(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
+$(OBJDIR)/blank.o: $(RECDIR)/blank.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
