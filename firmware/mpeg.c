@@ -888,9 +888,10 @@ static void mpeg_thread(void)
                 if (id3->vbr && (id3->vbrflags & VBR_TOC_FLAG))
                 {
                     /* Use the TOC to find the new position */
-                    int percent = (newtime*100)/id3->length;
-                    int curtoc, nexttoc, nextpos, remainder;
+                    unsigned int percent, remainder;
+                    int curtoc, nexttoc, nextpos;
 
+                    percent = (newtime*100)/id3->length; 
                     if (percent > 99)
                         percent = 99;
 
@@ -901,12 +902,13 @@ static void mpeg_thread(void)
                     else
                         nexttoc = 256;
 
-                    newpos = (curtoc*id3->filesize)/256;
+                    newpos = (id3->filesize/256)*curtoc;
 
                     /* Use the remainder to get a more accurate position */
-                    nextpos = (nexttoc*id3->filesize)/256;
-                    remainder = (newtime*10000)/id3->length - (percent*100);
-                    newpos += ((nextpos-newpos)*remainder)/100;
+                    remainder   = (newtime*100)%id3->length;
+                    remainder   = (remainder*100)/id3->length;
+                    nextpos     = (id3->filesize/256)*nexttoc;
+                    newpos     += ((nextpos-newpos)*remainder)/100;
                 }
                 else if (id3->bpf && id3->tpf)
                     newpos = (newtime*id3->bpf)/id3->tpf;
