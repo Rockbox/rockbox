@@ -21,6 +21,56 @@
 #include "sh7034.h"
 #include "debug.h"
 
+extern char mp3data[];
+extern int mp3datalen;
+
+unsigned char *mp3dataptr;
+
+void setup_sci0(void)
+{
+    /* set PB12 to output */
+    PBIOR |= 0x1000;
+
+    /* Disable serial port */
+    SCR0 = 0x00;
+
+    /* Syncronous, 8N1, no prescale */
+    SMR0 = 0x80;
+
+    /* Set baudrate 1Mbit/s */
+    BRR0 = 0x03;
+
+    /* use SCK as serial clock output */
+    SCR0 = 0x01;
+
+    /* Clear FER and PER */
+    SSR0 &= 0xe7;
+
+    /* Set interrupt D priority to 0 */
+//    IPRD &= 0x0ff0;
+
+    /* set IRQ6 and IRQ7 to edge detect */
+//    ICR |= 0x03;
+
+    /* set PB15 and PB14 to inputs */
+    PBIOR &= 0x7fff;
+    PBIOR &= 0xbfff;
+
+    /* set IRQ6 prio 8 and IRQ7 prio 0 */
+//    IPRB = ( IPRB & 0xff00 ) | 0x80;
+
+    IPRB = 0;
+    
+    /* Enable Tx (only!) */
+    SCR0 = 0x20;
+}
+
+int mas_tx_ready(void)
+{
+    return (SSR0 & SCI_TDRE);
+}
+
+
 int main(void)
 {
    char buf[40];
@@ -105,6 +155,44 @@ int main(void)
    }
 
    debugf("Register 0xaa: %x\n", i);
+
+   i=mas_writereg(0x3b, 0x20);
+   if (i < 0) {
+       debugf("Error - mas_writereg() returned %d\n", i);
+       while(1);
+   }
+
+   i = mas_run(1);
+   if (i < 0) {
+       debugf("Error - mas_run() returned %d\n", i);
+       while(1);
+   }
+
+   
+   setup_sci0();
+
+   mp3dataptr = mp3data;
+   i = 0;
+   
+   while(1)
+   {
+       if(PBDR & 0x4000)
+       {
+	   if(i < mp3datalen)
+	   {
+	       while(!mas_tx_ready()){};
+	       /*
+		* Write data into TDR and clear TDRE
+		*/
+	       TDR0 = mp3dataptr[i++];
+	       SSR0 &= ~SCI_TDRE;
+	   }
+       }
+       else
+       {
+	   debugf("MAS not ready\n");
+       }
+   }
    
    while(1);
 }

@@ -10,7 +10,7 @@ CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builti
 AFLAGS += -small -relax
 
 OBJS= crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o ../../debug.o \
-	../../common/sprintf.o
+	../../common/sprintf.o mp3data.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
