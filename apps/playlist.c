@@ -875,7 +875,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
     {
         /* handle dos style drive letter */
         if (':' == src[1])
-            strcpy(src, &dest[2]);
+            strncpy(dest, &src[2], buf_length);
         else if ('.' == src[0] && '.' == src[1] && '/' == src[2])
         {
             /* handle relative paths */
