@@ -91,7 +91,7 @@ while(<LANG>) {
             }
             else {
                 push @hfile, $set{'id'};
-                $value =~ s/\"$/\\0\"/;
+                $value =~ s/^\"(.*)\"\W*$/\"$1\\0\"/;
                 print CFILE "    $value\n";
             }
 
