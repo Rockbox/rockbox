@@ -478,7 +478,6 @@ id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 new: "Listan slut"
-### LANG_END_CONFIRM_PLAYER was not found in the english file!
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
@@ -604,7 +603,6 @@ id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Tor"
-### LANG_CUBE was not found in the english file!
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
@@ -1449,7 +1447,7 @@ new: "Se aktuell spellista"
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-new: "Upp och Ner"
+new: "Upp-och-ner"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1524,7 +1522,7 @@ new: "Bokmärke"
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
-new: "ON+Play = Ta Bort"
+new: "ON+Play = Ta bort"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
@@ -1559,7 +1557,7 @@ new: "Sätt bokmärken"
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
-new: "Bokmärke vid Stop"
+new: "Bokmärke vid stop"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
@@ -1569,7 +1567,7 @@ new: "Ladda senaste bokmärket"
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
-new: "Spara en Lista av Nya Bokmärken?"
+new: "Spara en lista av nya bokmärken?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
@@ -1640,3 +1638,39 @@ id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
 new: "Katalog"
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+new: "Hela sökvägen"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+new: "Endast spårnamnet"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+new: "Filalternativ"
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+new: "Ta bort"
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+new: "Visa index"
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+new: "Spårvisning"
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+new: "Visa"
+
