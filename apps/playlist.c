@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
-#include <time.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include "playlist.h"
@@ -135,11 +135,7 @@ void add_indices_to_playlist( playlist_info_t *playlist )
     int i = 0;
     int store_index = 0;
     int count = 0;
-#ifdef SIMULATOR
-    int next_tick = time(NULL);
-#else
     int next_tick = current_tick + HZ;
-#endif
 
     unsigned char *p;
     unsigned char buf[512];
@@ -181,13 +177,8 @@ void add_indices_to_playlist( playlist_info_t *playlist )
                 }
 
                 store_index = 0;
-#ifdef SIMULATOR
-                if ( time(NULL) >= next_tick ) {
-                    next_tick = time(NULL) + 1;
-#else
                 if ( current_tick >= next_tick ) {
                     next_tick = current_tick + HZ;
-#endif
                     snprintf(line, sizeof line, "%d files", playlist->amount);
                     lcd_puts(0,1,line);
                     lcd_update();
