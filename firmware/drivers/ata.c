@@ -168,8 +168,6 @@ static void copy_read_sectors(unsigned char* buf,
                          __attribute__ ((section (".icode")));
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
-    int j;
-
     if (wordcount <= 0)
         return; /* should never happen, but to protect my tail loop */
 
