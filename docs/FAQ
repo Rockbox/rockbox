@@ -279,3 +279,19 @@ A36: STOP!  We have put together a completely different FAQ for battery
      related questions.  
      Check out: http://rockbox.haxx.se/docs/battery-faq.html
 
+Q37: What is the WPS?
+A37: That is the 'While Playing Screen'.  Basically this is what is shown on
+     your player's display while we are playing your song.
+
+Q38: What good is the WPS?  How usable/flexible is it?
+A38: It is very good if you want information about the current item playing ;)
+     Currently the WPS on the Player is very flexible.  By using the file  
+     'wps.config' you can manage exactly how/what you want data displayed on 
+     your Archos Player.  Currently this feature has not yet been added to the
+     Recorder version of Rockbox.  Please see 
+     http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
+
+
+
+
+
