@@ -40,7 +40,9 @@
 #include "icons.h"
 
 #ifndef SIMULATOR
+#ifdef ARCHOS_RECORDER
 #include "adc.h"
+#endif
 #endif
 #endif
 
@@ -141,7 +143,9 @@ void main_menu(void)
 #endif
         { "Version",            show_credits      },
 #ifndef SIMULATOR
+#ifdef ARCHOS_RECORDER
         { "Debug (keep out!)",  dbg_ports         },
+#endif
 #endif
     };
 
@@ -154,6 +158,7 @@ void main_menu(void)
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
 #ifndef SIMULATOR
+#ifdef ARCHOS_RECORDER
 /* Test code!!! */
 void dbg_ports(void)
 {
@@ -209,4 +214,5 @@ void dbg_ports(void)
 	}
     }
 }
+#endif
 #endif
