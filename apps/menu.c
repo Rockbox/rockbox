@@ -260,7 +260,12 @@ Menu menu_run(int m)
                                        are gonna clear the screen anyway */
                 lcd_clear_display();
             
-                menus[m].items[menus[m].cursor].function();
+                /* if a child returns that the contents is changed, we
+                   must remember this, even if we perhaps invoke other
+                   children too before returning back */
+                if(MENU_DISK_CHANGED ==
+                   menus[m].items[menus[m].cursor].function())
+                  result = MENU_DISK_CHANGED;
             
                 /* Return to previous display state */
                 menu_draw(m);
@@ -293,12 +298,12 @@ Menu menu_run(int m)
 #endif
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&button_queue);
-                menu_draw(m);
 #ifdef HAVE_LCD_BITMAP
                 statusbar(laststate);
 #else
                 lcd_icon(ICON_PARAM, true);
 #endif
+                menu_draw(m);
                 result = MENU_DISK_CHANGED;
                 break;
 #endif
