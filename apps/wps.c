@@ -221,11 +221,11 @@ int wps_load_custom_config(void)
     int i;
     int fd;
     struct mp3entry* id3 = NULL;
-
-    id3 = mpeg_current_track();
     char ch = '/';
-    char* szLast = strrchr(id3->path, ch);
+    char* szLast;
 
+    szLast = strrchr(id3->path, ch);
+    id3 = mpeg_current_track();
     snprintf(buffer, sizeof(buffer), "");
     lcd_stop_scroll();
     fd = open("/wps.config", O_RDONLY);
