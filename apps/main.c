@@ -58,6 +58,7 @@ void init(void)
     init_threads();
     lcd_init();
     show_logo();
+    reset_settings(&global_settings);
     sleep(HZ/2);
 }
 
