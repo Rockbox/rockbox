@@ -40,6 +40,7 @@ SRC := $(wildcard *.c)
 
 ifeq ($(TARGET),-DARCHOS_RECORDER)
    SRC += $(wildcard recorder/*.c)
+   CFLAGS += -Irecorder
 endif
 
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
@@ -50,7 +51,7 @@ $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
+	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
 
 $(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
 	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
