@@ -34,14 +34,14 @@
 extern void tetris(void);
 #endif
 
-int show_logo(void)
+int show_logo( void )
 {
 #ifdef HAVE_LCD_BITMAP
     unsigned char buffer[112 * 8];
+    char version[32];
 
     int failure;
-    int width=0;
-    int height=0;
+    int height, width, font_h, font_w;
 
     failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
 
@@ -58,19 +58,30 @@ int show_logo(void)
 
         lcd_clear_display();
 
-        for(i=0, eline=0; i< height; i+=8, eline++) {
+        for(i=0, eline=0; i < height; i+=8, eline++) {
             /* the bitmap function doesn't work with full-height bitmaps
                so we "stripe" the logo output */
             lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
                        (height-i)>8?8:height-i, false);
         }
     }
-    lcd_update();
 
+    snprintf(version, sizeof(version), "Ver. %s", appsversion);
+    lcd_getfontsize(0, &font_w, &font_h);
+
+    /* lcd_puts needs line height in Chars on screen not pixels */
+    width = ((LCD_WIDTH/font_w) - strlen(version)) / 2;
+    height = ((height+10)/font_h)+1;
+
+    lcd_puts(width, height, version);
 #else
     char *rockbox = "ROCKbox!";
     lcd_puts(0, 0, rockbox);
+    lcd_puts(0, 1, appsversion);
 #endif
+
+    lcd_update();
+
 
     return 0;
 }
@@ -80,14 +91,6 @@ void show_splash(void)
     if (show_logo() != 0) 
         return;
 
-    sleep(HZ*2);
-}
-
-void version(void)
-{
-    lcd_clear_display();
-    lcd_puts(0,0,appsversion);
-    lcd_update();
     button_get(true);
 }
 
@@ -95,7 +98,7 @@ void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Splash, Credits, Sound, Version
+        Tetris, Screen_Saver, Splash, Credits, Sound
     };
 
     /* main menu */
@@ -107,10 +110,12 @@ void main_menu(void)
 #endif
         { Splash,       "Splash",       show_splash },
         { Credits,      "Credits",      show_credits },
-        { Version,      "Version",      version }
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
     menu_run(m);
     menu_exit(m);
 }
+
+
+
