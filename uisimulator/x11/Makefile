@@ -20,6 +20,7 @@
 TARGET = rockboxui
 
 APPDIR = ../../apps
+RECDIR = $(APPDIR)/recorder
 
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
@@ -42,7 +43,7 @@ $(KEYPAD) $(DISPLAY)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
-INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR) -I$(APPDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
 
 LIBS = 
 
@@ -128,19 +129,19 @@ endif
 menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-icons.o: $(APPDIR)/icons.c
+icons.o: $(RECDIR)/icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-tetris.o: $(APPDIR)/tetris.c
+tetris.o: $(RECDIR)/tetris.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-screensaver.o: $(APPDIR)/screensaver.c
+screensaver.o: $(RECDIR)/screensaver.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 app.o: $(APPDIR)/app.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-bmp.o: $(APPDIR)/bmp.c
+bmp.o: $(RECDIR)/bmp.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 play.o: $(APPDIR)/play.c
