@@ -463,3 +463,9 @@ A55: If we were better programmers we would take that as an insult.  But we
      to the mailing list, and bugs in released versions of Rockbox to be
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
+
+Q56: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
+     STOP (Player) key be locked?
+A56: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
+     hardware. The firmware can read the keys, but can't prevent them from
+     shutting off the player.
