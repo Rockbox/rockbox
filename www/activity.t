@@ -28,10 +28,10 @@ STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/vi
 STATUS(YELLOW,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Final touches)
 STATUS(YELLOW,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn & Linus,In progress)
 STATUS(YELLOW,Playlist handling,-,"", Stuart,Planning)
-STATUS(YELLOW,X11 simulator,uisimulator/, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/", Daniel,Progressing)
+STATUS(YELLOW,X11 simulator,uisimulator/x11, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/x11/", Daniel,Progressing)
 STATUS(YELLOW,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
 STATUS(RED,Newlib port,-,"", -,-)
 STATUS(RED,Directory browser UI,-,"", -,-)
-STATUS(RED,Application...,-,"",-,-)
+STATUS(RED,Application...,-,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
