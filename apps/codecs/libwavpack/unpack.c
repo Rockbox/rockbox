@@ -17,6 +17,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 #define LOSSY_MUTE
 
@@ -513,6 +514,7 @@ static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
 
     if (flags & HYBRID_FLAG) {
 	long min_value, max_value, min_shifted, max_shifted;
+        min_value = max_value = min_shifted = max_shifted = 0;
 
 	switch (flags & BYTES_STORED) {
 	    case 0:
@@ -531,8 +533,9 @@ static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
 		break;
 
 	    case 3:
-		min_shifted = (min_value = -(long)2147483648 >> shift) << shift;
-		max_shifted = (max_value = (long) 2147483647 >> shift) << shift;
+                // 0x80000000 is the same as 2147483648
+                min_shifted = (min_value = -0x80000000 >> shift) << shift;
+                max_shifted = (max_value = 0x80000000 >> shift) << shift;
 		break;
 	}
 

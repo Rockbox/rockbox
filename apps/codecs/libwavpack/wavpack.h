@@ -8,18 +8,15 @@
 
 // wavpack.h
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 // This header file contains all the definitions required by WavPack.
 
+// not sure about them.. testing will bring more light into it..
 typedef unsigned char	uchar;
-#if !defined(__GNUC__) || defined(WIN32)
 typedef unsigned short	ushort;
 typedef unsigned long	ulong;
 typedef unsigned int	uint;
-#elif defined(__APPLE__)
-typedef unsigned long	ulong;
-#endif
 
 // This structure is used to access the individual fields of 32-bit ieee
 // floating point numbers. This will not be compatible with compilers that

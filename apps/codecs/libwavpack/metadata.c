@@ -40,7 +40,7 @@ int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
 	wpmd->byte_length--;
     }
 
-    if (wpmd->byte_length && wpmd->byte_length <= sizeof (wpc->read_buffer)) {
+    if (wpmd->byte_length && wpmd->byte_length <= (long)sizeof (wpc->read_buffer)) {
 	ulong bytes_to_read = wpmd->byte_length + (wpmd->byte_length & 1);
 
 	if (wpc->infile (wpc->read_buffer, bytes_to_read) != (long) bytes_to_read) {
