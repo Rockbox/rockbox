@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -38,11 +39,10 @@
 void playtune(char *dir, char *file)
 {
     char buffer[256];
-    int fd;
     mp3entry mp3;
     bool good=1;
 
-    sprintf(buffer, "%s/%s", dir, file);
+    snprintf(buffer, sizeof(buffer), "%s/%s", dir, file);
 
     if(mp3info(&mp3, buffer)) {
         DEBUGF("id3 failure!");
@@ -64,23 +64,26 @@ void playtune(char *dir, char *file)
         lcd_puts(0, LINE_Y+1, mp3.album?mp3.album:"");
         lcd_puts(0, LINE_Y+2, mp3.artist?mp3.artist:"");
     
-        sprintf(buffer, "%d ms", mp3.length);
+        snprintf(buffer,sizeof(buffer), "%d ms", mp3.length);
         lcd_puts(0, LINE_Y+3, buffer);
     
-        sprintf(buffer, "%d kbits", mp3.bitrate);
+        snprintf(buffer,sizeof(buffer), "%d kbits", mp3.bitrate);
         lcd_puts(0, LINE_Y+4, buffer);
     
-        sprintf(buffer, "%d Hz", mp3.frequency);
+        snprintf(buffer,sizeof(buffer), "%d Hz", mp3.frequency);
         lcd_puts(0, LINE_Y+5, buffer);
 #else
         lcd_puts(0, 0, mp3.artist?mp3.artist:"<no artist>");
         lcd_puts(0, 1, mp3.title?mp3.title:"<no title>");
 #endif
     }
+
+#ifdef HAVE_LCD_BITMAP
     lcd_update();
+#endif
 
 #ifdef MPEG_PLAY
-    sprintf(buffer, "%s/%s", dir, file);
+    snprintf(buffer,sizeof(buffer), "%s/%s", dir, file);
     mpeg_play(buffer);
     return;
 #endif
@@ -93,8 +96,12 @@ void playtune(char *dir, char *file)
             continue;
         }
         switch(key) {
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
             case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+#endif
                 return;
                 break;
         }
