@@ -201,6 +201,12 @@ void main_menu(void)
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_PARAM, true);
+#endif
     menu_run(m);
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_PARAM, false);
+#endif
     menu_exit(m);
 }
