@@ -90,7 +90,7 @@ int open(const char* pathname, int flags)
         case O_WRONLY:
             openfiles[fd].write = true;
             break;
-            
+
         default:
             DEBUGF("Only O_RDONLY and O_WRONLY is supported\n");
             errno = EROFS;
@@ -212,6 +212,31 @@ int remove(const char* name)
     close(fd);
 
     return rc;
+}
+
+int ftruncate(int fd, unsigned int size)
+{
+    int rc, sector;
+
+    sector = size / SECTOR_SIZE;
+    if (size % SECTOR_SIZE)
+        sector++;
+
+    rc = fat_seek(&(openfiles[fd].fatfile), sector);
+    if (rc < 0) {
+        errno = EIO;
+        return -1;
+    }
+
+    rc = fat_truncate(&(openfiles[fd].fatfile));
+    if (rc < 0) {
+        errno = EIO;
+        return -2;
+    }
+
+    openfiles[fd].size = size;
+
+    return 0;
 }
 
 static int readwrite(int fd, void* buf, int count, bool write)

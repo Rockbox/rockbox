@@ -1002,12 +1002,15 @@ int fat_truncate(struct fat_file *file)
 {
     /* truncate trailing clusters */
     int next;
-    int last = get_next_cluster(file->lastcluster);
-    while ( last && last != FAT_EOF_MARK ) {
+    int last = file->lastcluster;
+
+    LDEBUGF("fat_truncate(%x, %x)\n", file->firstcluster, last);
+
+    for ( last = get_next_cluster(last); last; last = next ) {
         next = get_next_cluster(last);
         update_fat_entry(last,0);
-        last = next;
     }
+    update_fat_entry(file->lastcluster,FAT_EOF_MARK);
 
     return 0;
 }
