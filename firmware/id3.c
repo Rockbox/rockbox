@@ -40,9 +40,9 @@
 #define BYTE2(x) ((x >> 8)  & 0xFF)
 #define BYTE3(x) ((x >> 0)  & 0xFF)
 
-#define UNSYNC(b1,b2,b3,b4) (((b1 & 0x7F) << (3*7)) + \
-                             ((b2 & 0x7F) << (2*7)) + \
-                             ((b3 & 0x7F) << (1*7)) + \
+#define UNSYNC(b1,b2,b3,b4) (((b1 & 0x7F) << (3*7)) | \
+                             ((b2 & 0x7F) << (2*7)) | \
+                             ((b3 & 0x7F) << (1*7)) | \
                              ((b4 & 0x7F) << (0*7)))
 
 #define HASID3V2(entry) entry->id3v2len > 0
@@ -92,7 +92,7 @@ stripspaces(char *buffer)
     int i = 0;
     while(*(buffer + i) != '\0')
         i++;
-	
+    
     for(;i >= 0; i--) {
         if(*(buffer + i) == ' ')
             *(buffer + i) = '\0';
@@ -111,8 +111,7 @@ stripspaces(char *buffer)
  *
  * Returns: true if a title was found and created, else false
  */
-static bool 
-setid3v1title(int fd, struct mp3entry *entry) 
+static bool setid3v1title(int fd, struct mp3entry *entry) 
 {
     char buffer[31];
     int offsets[3] = {-95,-65,-125};
@@ -156,8 +155,7 @@ setid3v1title(int fd, struct mp3entry *entry)
  *
  * Returns: true if a title was found and created, else false
  */
-static void
-setid3v2title(int fd, struct mp3entry *entry) 
+static void setid3v2title(int fd, struct mp3entry *entry) 
 {
     unsigned int minframesize;
     int size;
@@ -292,8 +290,7 @@ setid3v2title(int fd, struct mp3entry *entry)
  *
  * Returns: the size of the tag or 0 if none was found
  */
-static int 
-getid3v2len(int fd) 
+static int getid3v2len(int fd) 
 {
     char buf[6];
     int offset;
@@ -303,17 +300,17 @@ getid3v2len(int fd)
        (read(fd, buf, 6) != 6) ||
        (strncmp(buf, "ID3", strlen("ID3")) != 0))
         offset = 0;
+
     /* Now check what the ID3v2 size field says */
     else if(read(fd, buf, 4) != 4)
         offset = 0;
     else
         offset = UNSYNC(buf[0], buf[1], buf[2], buf[3]) + 10;
-	
+
     return offset;
 }
 
-static int
-getfilesize(int fd)
+static int getfilesize(int fd)
 {
     int size;
     
@@ -332,8 +329,7 @@ getfilesize(int fd)
  *
  * Returns: the size of the tag or 0 if none was found
  */
-static int 
-getid3v1len(int fd) 
+static int getid3v1len(int fd) 
 {
     char buf[3];
     int offset;
@@ -363,8 +359,7 @@ getid3v1len(int fd)
  * Returns: the song length in milliseconds, 
  *          -1 means that it couldn't be calculated
  */
-static int 
-getsonglength(int fd, struct mp3entry *entry)
+static int getsonglength(int fd, struct mp3entry *entry)
 {
     unsigned int filetime = 0;
     unsigned long header=0;
@@ -530,8 +525,7 @@ getsonglength(int fd, struct mp3entry *entry)
  *
  * Returns: void
  */
-bool
-mp3info(struct mp3entry *entry, char *filename) 
+bool mp3info(struct mp3entry *entry, char *filename) 
 {
     int fd;
     fd = open(filename, O_RDONLY);
@@ -547,6 +541,10 @@ mp3info(struct mp3entry *entry, char *filename)
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
 
+    /* Ignore the tag if it is too big */
+    if(entry->id3v2len > sizeof(entry->id3v2buf))
+        entry->id3v2len = 0;
+    
     if(HASID3V2(entry))
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
