@@ -39,7 +39,8 @@
 
 #ifdef HAVE_CHARGE_CTRL
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
-#define CHARGE_MAX_TIME   8*60   /* minutes: maximum charging time */
+#define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
+                                 /* actual max time depends also on BATTERY_CAPACITY! */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
 #define CHARGE_RESTART_HI 85     /* %: when to restart charging in 'charge' mode */
                                  /* attention: if set too high, normal charging is started in trickle mode */

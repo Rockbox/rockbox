@@ -466,10 +466,11 @@ static void power_thread(void)
                         snprintf(power_message, POWER_MESSAGE_LEN, "chg pause %d min", charge_pause);
                     } else {
                         /* calculate max charge time depending on current battery level */
-                        /* take 20% more because battery level is not linear */
-                        charge_max_time_now = CHARGE_MAX_TIME * (100 + 30 - battery_level()) / 100;
-                        if (charge_max_time_now > CHARGE_MAX_TIME) {
-                          charge_max_time_now = CHARGE_MAX_TIME;
+                        /* take 35% more because battery level is not linear */
+                        i = CHARGE_MAX_TIME_1500 * BATTERY_CAPACITY / 1500;
+                        charge_max_time_now = i * (100 + 35 - battery_level()) / 100;
+                        if (charge_max_time_now > i) {
+                          charge_max_time_now = i;
                         }
                         snprintf(power_message, POWER_MESSAGE_LEN, "ChgAt %d%% max %dm", battery_level(), charge_max_time_now);
 
