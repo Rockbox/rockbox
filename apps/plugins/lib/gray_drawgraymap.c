@@ -49,6 +49,7 @@ static void _writearray(unsigned char *address, unsigned char *src, int stride,
      * _writepixel, see there for an explanation) for all 8 pixels and put them
      * on an extra "stack" */
     asm (
+        "sts.l   pr,@-r15        \n"  /* save pr (fix GCC331 build, cleaner) */
         "mov     #8,r3           \n"  /* loop count in r3: 8 pixels */
         "mov     %7,r2           \n"  /* copy mask */
 
@@ -98,6 +99,7 @@ static void _writearray(unsigned char *address, unsigned char *src, int stride,
         "add     #-1,r3          \n"  /* decrease loop count */
         "cmp/pl  r3              \n"  /* loop count > 0? */
         "bt      .wa_loop        \n"  /* yes: loop */
+        "lds.l   @r15+,pr        \n"  /* restore pr */
         : /* outputs */
         /* %0, in & out */ "+r"(_gray_random_buffer),
         /* %1, in & out */ "+r"(pat_ptr)
