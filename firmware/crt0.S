@@ -95,8 +95,21 @@ start:
 start_l:
 	mov.l	r2,@r0
 	add	#4,r0
-	cmp/ge	r0,r1
-	bt	start_l
+	cmp/ge	r1,r0
+	bf	start_l
+	nop
+
+	/* copy the .iram section */
+	mov.l	iramcopy_k,r0
+	mov.l	iram_k,r1
+	mov.l	iramend_k,r2
+copy_l:
+	mov.l	@r0,r3
+	mov.l	r3,@r1
+	add	#4,r0
+	add	#4,r1
+	cmp/ge	r2,r1
+	bf	copy_l
 	nop
 
 	/* Munge the main thread stack */
@@ -106,8 +119,8 @@ start_l:
 munge_loop:
 	mov.l	r0,@r1
 	add	#4,r1
-	cmp/ge	r1,r2
-	bt	munge_loop
+	cmp/ge	r2,r1
+	bf	munge_loop
 	nop
 
 	mov     #0,r0
@@ -131,6 +144,12 @@ edata_k:
 	.long	_edata
 end_k:
 	.long	_end
+iramcopy_k:
+	.long	_iramcopy
+iram_k:
+	.long	_iramstart
+iramend_k:
+	.long	_iramend
 main_k:
 	.long	_main
 vbr_k:
