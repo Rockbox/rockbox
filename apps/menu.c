@@ -113,8 +113,8 @@ static void menu_draw(int m)
     int menu_lines = MENU_LINES;
 #endif
 
-    lcd_clear_display(); 
-    lcd_stop_scroll();
+    lcd_scroll_pause();  /* halt scroll first... */
+    lcd_clear_display(); /* ...then clean the screen */
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
         lcd_setmargins(0, STATUSBAR_HEIGHT);
@@ -248,7 +248,8 @@ void menu_run(int m)
 #endif
             case BUTTON_PLAY:
                 /* Erase current display state */
-                lcd_stop_scroll();
+                lcd_scroll_pause(); /* pause is better than stop when
+                                       are gonna clear the screen anyway */
                 lcd_clear_display();
             
                 menus[m].items[menus[m].cursor].function();
