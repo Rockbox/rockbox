@@ -50,12 +50,12 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 #SRCS = $(wildcard *.c)
 
-FIRMSRCS = chartables.c lcd.c sprintf.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c
 
-APPS = tetris.c screensaver.c 
+APPS = tetris.c screensaver.c tree.c app.c play.c
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
-        button-x11.c app.c tree.c io.c sleep.c $(APPS) $(FIRMSRCS)
+        button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
 OBJS := $(SRCS:c=o)
 
@@ -77,6 +77,9 @@ screensaver.o: $(APPDIR)/screensaver.c
 app.o: $(APPDIR)/app.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+play.o: $(APPDIR)/play.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 tree.o: $(APPDIR)/tree.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -84,6 +87,9 @@ lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 chartables.o: $(FIRMWAREDIR)/chartables.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+id3.o: $(FIRMWAREDIR)/id3.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 sprintf.o: $(COMMON)/sprintf.c
