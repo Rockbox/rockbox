@@ -2,6 +2,7 @@
 #define OLDRELEASES_PAGE
 #include "head.t"
 
+<p><a href="rockbox-2.2-notes.txt">2.2 release notes</a>.
 <p><a href="rockbox-2.1-notes.txt">2.1 release notes</a>.
 <p><a href="rockbox-2.0-notes.txt">2.0 release notes</a>.
 <p><a href="rockbox-1.4-notes.txt">1.4 release notes</a>.

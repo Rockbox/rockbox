@@ -4,7 +4,8 @@ require "rockbox.pm";
 
 my $basedir = "/home/dast/rockbox-build/daily-build";
 
-my @list=("player", "recorder", "fmrecorder", "recorderv2", "recorder8mb", "fmrecorder8mb");
+my @list=("player", "recorder", "fmrecorder", "recorderv2",
+          "recorder8mb", "fmrecorder8mb", "ondiofm", "ondiosp");
 
 for(@list) {
     my $dir = $_;

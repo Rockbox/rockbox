@@ -2,6 +2,10 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2004-09-13</i>: Call for help! Please donate your broken iRiver iHP-1xx to the project!
+
+<p><i>2004-07-08</i>: Good news for Windows users! You can now install the <a href=/daily.shtml>daily builds</a> with an installer executable. Thanks to Christi Scarborough for that.
+
 <p><i>2004-06-17</i>: We now have a <a href="/twiki">Wiki</a> for the documentation. Feel free to join the documentation frenzy!
 
 <p><i>2004-05-07</i>: The CVS repository has <a href="/cvs.html">moved</a>

@@ -2,79 +2,82 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<h2>Latest version is 2.2 (2004-03-11)</h2>
+<h2>Latest version is 2.3 (2004-10-26)</h2>
 
-<p>Please read the <a href="rockbox-2.2-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
+<p>Please read the <a href="rockbox-2.3-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
-<p>Make sure you download the correct file for your specific archos model:
+<p>Make sure you download the correct file for your device:
 <table class=rockbox><tr>
 <th>player</th>
 <th>recorder</th>
-<th>fm recorder</th>
 <th>recorder v2</th>
-</tr><tr  valign=top>
+<th>fm recorder</th>
+</tr><tr valign=top>
+
+<td><a href=/docs/newplayer.jpg><img border=0 src=/docs/newplayer_t.jpg></a><br clear=all>Archos Jukebox 5000, 6000 and Studio models
+<p><a href="rockbox-2.3-player.zip">rockbox-2.3-player.zip</a>
+<br>(210 KB)</td>
+
 <td>
-<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg align=left></a><br>
-Archos Jukebox 5000, 6000 and Studio models
+<a href=/docs/recorder.jpg><img border=0 src=/docs/recorder_t.jpg></a><br clear=all>Archos Jukebox Recorder 6, 10, 15 and 20
+<p><a href="rockbox-2.3-recorder.zip">rockbox-2.3-recorder.zip</a>
+<br>(593 KB)</td>
 
-<br clear=all><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
-<br>(189 KB)
+<td><a href=/docs/fmrecorder.jpg><img border=0 src=/docs/fmrecorder_t.jpg></a><br clear=all>Archos Jukebox Recorder V2
+<p><a href="rockbox-2.3-recorderv2.zip">rockbox-2.3-recorderv2.zip</a>
+<br>(601 KB)</td>
 
-</td><td>
-<a href=/docs/recorder.jpg><img src=/docs/recorder_t.jpg align=left></a><br>
-Archos Jukebox Recorder 6, 10, 15 and 20
+<td><a href=/docs/fmrecorder.jpg><img border=0 src=/docs/fmrecorder_t.jpg></a><br clear=all>Archos Jukebox FM Recorder
+<p><a href="rockbox-2.3-fmrecorder.zip">rockbox-2.3-fmrecorder.zip</a>
+<br>(491 KB)</td>
 
-<br clear=all><a href="rockbox-2.2-recorder.zip">rockbox-2.2-recorder.zip</a>
-<br>(439 KB)
+</tr><tr>
+<th>ondio fm</th>
+<th>ondio sp</th>
+<th>installer</th>
+</tr><tr>
 
-</td>
-<td>
-<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg align=left></a><br>
-Archos Jukebox FM Recorder
+<td><a href=/docs/ondiofm.jpg><img border=0 src=/docs/ondiofm_t.jpg></a><br clear=all>Archos Ondio 128 & 128 FM
+<p><a href="rockbox-2.3-ondiofm.zip">rockbox-2.3-ondiofm.zip</a>
+<br clear=all>(460 KB)</td>
 
-<br clear=all><a href="rockbox-2.2-fmrecorder.zip">rockbox-2.2-fmrecorder.zip</a>
-<br>(443 KB)
+<td><a href=/docs/ondiosp.jpg><img border=0 src=/docs/ondiosp_t.jpg></a><br clear=all>Archos Ondio 128 SP
+<p><a href="rockbox-2.3-ondiosp.zip">rockbox-2.3-ondiosp.zip</a>
+<br>(535 KB)</td>
 
-</td>
-<td>
-<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg align=left></a><br>
-Archos Jukebox Recorder V2
+<td><img border=0 src=/docs/install.png></a><br clear=all>Windows installer (not for ondio yet)
+<p><a href="rockbox-2.3-install.exe">rockbox-2.3-install.exe</a>
+<br>(922 KB)</td>
 
-<br clear=all><a href="rockbox-2.2-recorderv2.zip">rockbox-2.2-recorderv2.zip</a>
-<br>(443 KB)
-
-</td>
 </tr></table>
 
 <h2>Installation</h2>
 
-<p>Unpack the zip archive in the root (top) directory of your Archos disk. Make sure you 'eject' (unmount) the usb disk before you unplug it.
+<p>Unpack the zip archive in the root (top) directory of your Archos disk. Make sure you stop/eject/unmount the usb disk before you unplug it.
 
-<p>Windows users: If you choose not to unzip the archive directly onto the Archos, you can create the .rockbox directory by entering "mkdir j:\.rockbox" on a command prompt. Windows Explorer refuses to create this directory, so you must use a command prompt.
+<p>Windows users can also use the the installer: Simply select your model and destination drive.
 
-<h2>Download more Fonts and Languages</h2>
-<p>
- <a href="/fonts/">Fonts for Rockbox</a>
-<p>
- <a href="/lang/">Language files for Rockbox</a>
-<p>
- <a href="/twiki/bin/view/Main/VoiceFiles">Voice files for Rockbox</a>
- (<a href=/daily.shtml>daily builds</a> only)
+<h2>Download voice files, fonts and languages</h2>
+<ul>
+<li><a href="/twiki/bin/view/Main/VoiceFiles">Voice files</a>
+<li><a href="/fonts/">Fonts</a>
+<li><a href="/lang/">Language files</a>
+</ul>
 
 <h2>Uninstallation</h2>
 
 <p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) from the root of your Archos disk.
 
 <h2>Source code</h2>
-<p><a href="rockbox-2.2.tar.gz">rockbox-2.2.tar.gz</a>
+<p><a href="rockbox-2.3.tar.gz">rockbox-2.3.tar.gz</a>
 <p>
 ... or get the source directly off the <a href="/cvs.html">CVS server</a>.
 
 <h2>Manual</h2>
 
-<p>We have a <a href="/manual/manual.pdf">manual in PDF format</a>. Please
-read it. Check out the <a href="/docs/">documentation</a> page for further
-info.
+<p>We have a <a href="/manual/manual.pdf">manual in PDF format</a>. It's not
+yet updated with 2.3-specific features, but it is still very informative.
+Please read it. Check out the <a href="/docs/">documentation</a> page for further info.
 
 <h2>Bug reports</h2>
 

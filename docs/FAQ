@@ -11,13 +11,13 @@ A3. The purpose of this project is to write an Open Source replacement
     firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
 Q4. I want to write code for my Archos, how do I proceed?
-A4. Our guide on first time (http://rockbox.haxx.se/docs/firsttime.html) 
+A4. Our guide on first time (http://www.rockbox.org/docs/firsttime.html) 
     Rockbox development should answer most of your questions.
 
 Q5: What is CVS?
 A5: Concurrent Versions System (http://www.cvshome.org).  We have a small
     help page about how to use this to get, update and commit files on the web
-    at http://rockbox.haxx.se/cvs.html
+    at http://www.rockbox.org/cvs.html
 
 Q6. What exactly is the CONTRIBUTING file? 
 A6. Just like the name implies, it lists conventions that the project follows, 
@@ -33,7 +33,7 @@ A7. Start by reading up on the information about the jukeboxes on our web page.
 Q8. I want to join the development team, but don't have a SourceForge account,
     what should I do?
 A8. You don't need a SourceForge account to help developing Rockbox. Just
-    submit patches (http://rockbox.haxx.se/twiki/bin/view/Main/WorkingWithPatches)
+    submit patches (http://www.rockbox.org/twiki/bin/view/Main/WorkingWithPatches)
 
     If your patches are consistently well-written and thus accepted, you may
     ultimately be offered CVS commit access. If that should happen, you will
@@ -42,12 +42,12 @@ A8. You don't need a SourceForge account to help developing Rockbox. Just
 
 Q9. Do you have a mailing list?
 A9. Sure do!  As a matter of fact, we have several of them for specific things.
-    Please check out: http://rockbox.haxx.se/mail/, and please see FAQ entry
+    Please check out: http://www.rockbox.org/mail/, and please see FAQ entry
     75.
 
 Q10. Great you have a mailing list!  Is there anyway for me to catch up on
      past posts?
-A10. Check out the archives at: http://rockbox.haxx.se/mail/
+A10. Check out the archives at: http://www.rockbox.org/mail/
 
 Q11. How can I meet the developers working on the project?
 A11. One way is by visiting us on IRC.  Head on over to the server
@@ -58,7 +58,7 @@ A11. One way is by visiting us on IRC.  Head on over to the server
 
 Q12: Wow, you guys talk on IRC a lot?  I wish I had been around for those 
      conversations to see what happened.
-A12: We are glad you mentioned that!  http://rockbox.haxx.se/irc happens
+A12: We are glad you mentioned that!  http://www.rockbox.org/irc happens
      to have a list of various logs we have recorded of events in the channel.
      Feel free to read up, and ask questions on what you find.
 
@@ -77,7 +77,7 @@ A14. All firmware mods that are presented are still highly experimental.
 Q15. I want to see what the inside of my player looks like, but I would really
      like to avoid voiding my warranty.  Is there anything you can suggest?
 A15. We have a collection of photos of both the player and recorder. Look at
-     http://rockbox.haxx.se/internals/
+     http://www.rockbox.org/internals/
 
 Q16. What exactly are you trying to achieve with this line of development?
      (A.K.A. what's your purpose for being here?)
@@ -124,9 +124,9 @@ A19: Okay, last time.  No.  We have no problems whatsoever reading different
 
 Q20. What is the most recent version of Rockbox?
 A20. We recently released version 2.2, so head on over to 
-     http://rockbox.haxx.se/download/ and pull it down.
+     http://www.rockbox.org/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-2.2-notes.txt).  
+     (http://www.rockbox.org/download/rockbox-2.2-notes.txt).  
 
 Q21. What do you plan to add to coming versions?
 A21. We don't plan versions in detail. We just write code, and when it feels
@@ -138,7 +138,7 @@ Q22. I tried one of your firmware files and now I can't access my hard disk!
                      Pls Chck HD
 A22. Your hard disk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
-     http://rockbox.haxx.se/lock.html
+     http://www.rockbox.org/lock.html
 
      Note: This is a very rare problem. Most people who think they have a
      locked disk actually just experience hardware and/or driver problems.
@@ -148,8 +148,8 @@ A23: You have a couple options here.  You could forget the question, find an
      easier question, or accept '42' as the answer no matter what.  We don't
      really recommend any of these (though I do opt for '42' often myself).
      What we do recommend is stopping by IRC, visiting the web site
-     (http://rockbox.haxx.se) to see if the question was answered else where
-     (like our nodo http://rockbox.haxx.se/twiki/bin/view/Main/NoDo FAQ)
+     (http://www.rockbox.org) to see if the question was answered else where
+     (like our nodo http://www.rockbox.org/twiki/bin/view/Main/NoDo FAQ)
      and just not included here, or ultimately dropping an email to the
      mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the
      project home page.
@@ -202,7 +202,7 @@ A30: Don't confuse the terms.  Reverse engineering means examining a product
 
 Q31: This FAQ is great, but do you have anything with a bit more detail?
 A31: Check out our website and it's documentation.  Rockbox also has a user
-     manual you can read.  http://rockbox.haxx.se/manual/manual.pdf
+     manual you can read.  http://www.rockbox.org/manual/manual.pdf
 
 Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
@@ -220,7 +220,7 @@ A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
 
 Q33: Can I use the Archos as an USB hard disk to store data from my PDA/
      digital camera/phone etc.
-A33: No.  See http://rockbox.haxx.se/twiki/bin/view/Main/NoDo#4_Interfacing_with_other_USB_dev
+A33: No.  See http://www.rockbox.org/twiki/bin/view/Main/NoDo#4_Interfacing_with_other_USB_dev
 
 Q34: When I use Rockbox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
@@ -230,10 +230,10 @@ A34: Rockbox uses the red LED as harddisk activity light, not as an error
 Q35: I have a question about the batteries...
 A35: STOP!  We have put together a completely different FAQ for battery 
      related questions.  
-     Check out: http://rockbox.haxx.se/docs/battery-faq.html
+     Check out: http://www.rockbox.org/twiki/bin/view/Main/BatteryFAQ
 
 Q36. I have a question about patches...
-A36. Check out http://rockbox.haxx.se/twiki/bin/view/Main/WorkingWithPatches
+A36. Check out http://www.rockbox.org/twiki/bin/view/Main/WorkingWithPatches
      as it should answer any patch related questions you may have.
 
 Q37: What is the WPS?
@@ -245,22 +245,22 @@ A38: It is very good if you want information about the current item playing ;)
      By using a WPS configuration file you can manage exactly how/what you 
      want displayed on your Archos Player.  (Even better yet, if you want 
      a feature that's not there, we are _always_ open to suggestions!) 
-     Please see http://rockbox.haxx.se/manual/wps.html for information.
+     Please see http://www.rockbox.org/manual/wps.html for information.
 
 Q40: So how do I load/make a .wps file?
-A40: You check out http://rockbox.haxx.se/twiki/bin/view/Main/CustomWPS
+A40: You check out http://www.rockbox.org/twiki/bin/view/Main/CustomWPS
      to learn the format/features of a .wps file, and read the manual to
      learn how to load it ;)
 
 Q41: Does Rockbox support other languages? How do I load/use different 
      languages?
-A41: See: http://rockbox.haxx.se/lang
+A41: See: http://www.rockbox.org/lang
 
 Q42: Does Rockbox support other fonts/character sets?
 A42: Recorders do, Players don't.
 
 Q43: How do I use the loadable fonts?
-A43: If you own a Recorder see: http://rockbox.haxx.se/fonts/  Players
+A43: If you own a Recorder see: http://www.rockbox.org/fonts/  Players
      cannot make use of loadable fonts.
 
 Q44: Why can't I use loadable fonts on the Player? 
@@ -284,7 +284,7 @@ A46: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
 
 Q47: Can I record with Rockbox?
 A47: You sure can.  Take a look at our manual.  
-     http://rockbox.haxx.se/manual/manual.pdf
+     http://www.rockbox.org/manual/manual.pdf
 
 Q48: Now that I can record, can I use custom codecs (like LAME)?
 A48: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
@@ -302,13 +302,13 @@ A51: Rockbox supports both id3v1 and id3v2.  If you have problems,
 
 Q52: Where exactly did the name 'Rockbox' come from?
 A52: Well you can follow the full line of emails at 
-     http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0062.shtml
+     http://www.rockbox.org/mail/archive/rockbox-archive-2002-01/0062.shtml
      However, the brief rundown is that it was recommended first by 
      Tome Cvitan, and put to a vote (which it lost). 
 
      Funny thing about democracies.  This isn't one ;)  Our beloved project
      leader vetoed the winning name and chose Rockbox instead.
-     http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
+     http://www.rockbox.org/mail/archive/rockbox-archive-2002-01/0134.shtml
      
      There you have it.  Recommended by users, decision by dictator.
 
@@ -350,20 +350,20 @@ Q57: How can I find out about all the neat features that Rockbox has?
 A57: This information is in our manual (It sometimes gets a bit out of
      date, so please bear with us.)  The information you are most likely 
      looking for is a bit down the tree, so the here is the url:
-     http://rockbox.haxx.se/manual/rec-general.html
+     http://www.rockbox.org/manual/rec-general.html
 
      Also, check out the features-list at:
-     http://rockbox.haxx.se/docs/features.html
+     http://www.rockbox.org/docs/features.html
 
 Q58: How can I see what bugs are currently open/being worked on?
-A58: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
+A58: Check out http://www.rockbox.org/bugs.shtml for a listing of bugs
      that have been reported.
 
 Q59: How can I report about bugs in Rockbox?
 A59: If we were better programmers we would take that as an insult.  But we
      aren't, so we won't.  The first step in reporting a bug is to review 
      the rules we ask you to follow in your submission (listed at: 
-     http://rockbox.haxx.se/bugs.shtml#rules).
+     http://www.rockbox.org/bugs.shtml#rules).
 
      Please note that we ask reports of bugs in CVS/daily builds to be sent
      to the mailing list, and bugs in released versions of Rockbox to be
@@ -382,12 +382,12 @@ A60: We currently support four different hardware platforms: Players, Recorder
      within the code for that version. This is the version for the common
      user.
 
-     The Daily Builds (http://rockbox.haxx.se/daily.shtml) are automated
+     The Daily Builds (http://www.rockbox.org/daily.shtml) are automated
      daily builds of the CVS (development) code.  As such they contain all the
      new features (and bugs) that have been introduced after the last official
      release, up to this morning.
 
-     The Bleeding Edge builds (http://rockbox.haxx.se/daily.shtml#bleeding_edge)
+     The Bleeding Edge builds (http://www.rockbox.org/daily.shtml#bleeding_edge)
      are built from the CVS code every 20 minutes. The purpose of these builds
      is to verify the code builds properly on all platforms (and simulators)
      and also to allow testers to try out new features and bug fixes without
@@ -424,7 +424,7 @@ A63: Other than the 4 currently supported models: no, probably not. If Archos
      by rockbox unless someone enthusiastically reverse engineers them and
      submits patches to make it happen.
 
-     See also: http://rockbox.haxx.se/docs/nodo.html#7
+     See also: http://www.rockbox.org/docs/nodo.html#7
 
 Q64: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
      safely and rebooted. But Rockbox still didn't load. What is wrong?
@@ -533,7 +533,7 @@ A66: If your device is off and you connect the charger, the Archos charger code
      you see the Rockbox logo!
 
 Q67: Why can't you implement a cross-fader? That would be so cool!
-A67: Please read our NODO faq. http://rockbox.haxx.se/twiki/bin/view/Main/NoDo#3_Crossfade_between_tracks_
+A67: Please read our NODO faq. http://www.rockbox.org/twiki/bin/view/Main/NoDo#3_Crossfade_between_tracks_
 
 Q68: My screen is all black/white when I run Rockbox on my Recorder!
 A68: This bug has been fixed in the later versions of Rockbox. Upgrade!
@@ -633,7 +633,7 @@ Q73: How do I unsubscribe from the rockbox mailing list?
 A73: The same way you subscribed, but you send an 'unsubscribe' request to the
      mailing list server instead of the 'subscribe' one you sent before.
 
-     This is all mentioned on the same web page: http://rockbox.haxx.se/mail/
+     This is all mentioned on the same web page: http://www.rockbox.org/mail/
 
      Please please please pretty please with sugar on top, DO NOT attempt to
      mail unsubscribe requests to the mailing list itself. That will only
@@ -713,7 +713,7 @@ Q78: How do I control the recording frequency and quality?
 A78: Linus Nielsen Feltzing replied to a similar question on April 17th 2004,
      and this is a cut'n paste of his reply that can be read on the following
      URL:
-     http://rockbox.haxx.se/mail/archive/rockbox-archive-2004-04/0814.shtml
+     http://www.rockbox.org/mail/archive/rockbox-archive-2004-04/0814.shtml
 
      SAMPLE RATE
 
