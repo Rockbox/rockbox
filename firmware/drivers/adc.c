@@ -22,6 +22,27 @@
 #include "thread.h"
 #include "adc.h"
 
+/**************************************************************************
+ ** The A/D conversion is done every tick, in three steps:
+ **
+ ** 1) On the tick interrupt, the conversion of channels 0-3 is started, and
+ **    the A/D interrupt is enabled.
+ **
+ ** 2) After the conversion is done (approx. 256*4 cycles later), an interrupt
+ **    is generated at level 1, which is the same level as the tick interrupt
+ **    itself. This interrupt will be pending until the tick interrupt is
+ **    finished.
+ **    When the A/D interrupt is finally served, it will read the results
+ **    from the first conversion and start the conversion of channels 4-7.
+ **
+ ** 3) When the conversion of channels 4-7 is finished, the interrupt is
+ **    triggered again, and the results are read. This time, no new
+ **    conversion is started, it will be done in the next tick interrupt.
+ **
+ ** Thus, each channel will be updated HZ times per second.
+ **
+ *************************************************************************/
+
 static int current_channel;
 static unsigned short adcdata[NUM_ADC_CHANNELS];
 static const unsigned int adcreg[NUM_ADC_CHANNELS] =
@@ -32,15 +53,39 @@ static const unsigned int adcreg[NUM_ADC_CHANNELS] =
 
 static void adc_tick(void)
 {
-    /* Read the data that has bee converted since the last tick */
-    adcdata[current_channel] =
-    *(unsigned short *)adcreg[current_channel] >> 6;
+    /* Start a conversion of channel group 0. This will trigger an interrupt,
+       and the interrupt handler will take care of group 1. */
 
-    /* Start a conversion on the next channel */
-    current_channel++;
-    if(current_channel == NUM_ADC_CHANNELS)
-        current_channel = 0;
-    ADCSR = ADCSR_ADST | current_channel;
+    current_channel = 0;
+    ADCSR = ADCSR_ADST | ADCSR_ADIE | ADCSR_SCAN | 3;
+}
+
+#pragma interrupt
+void ADITI(void)
+{
+    if(ADCSR & ADCSR_ADF)
+    {
+        ADCSR = 0;
+
+        if(current_channel == 0)
+        {
+            adcdata[0] = ADDRA >> 6;
+            adcdata[1] = ADDRB >> 6;
+            adcdata[2] = ADDRC >> 6;
+            adcdata[3] = ADDRD >> 6;
+            current_channel = 4;
+            
+            /* Convert the next group */
+            ADCSR = ADCSR_ADST | ADCSR_ADIE | ADCSR_SCAN | 7;
+        }
+        else
+        {
+            adcdata[4] = ADDRA >> 6;
+            adcdata[5] = ADDRB >> 6;
+            adcdata[6] = ADDRC >> 6;
+            adcdata[7] = ADDRD >> 6;
+        }
+    }
 }
 
 unsigned short adc_read(int channel)
@@ -48,44 +93,17 @@ unsigned short adc_read(int channel)
     return adcdata[channel];
 }
 
-/* Batch convert 4 analog channels. If lower is true, convert AN0-AN3, 
- * otherwise AN4-AN7. 
- */
-static void adc_batch_convert(bool lower)
-{
-    int reg = lower ? 0 : 4;
-    volatile unsigned short* ANx = ((unsigned short*) ADDRAH_ADDR);
-    int i;
-
-    ADCSR = ADCSR_ADST | ADCSR_SCAN | reg | 3;
-
-    /* Busy wait until conversion is complete. A bit ugly perhaps, but 
-     * we should only need to wait about 4 * 14 µs  */
-    while(!(ADCSR & ADCSR_ADF))
-    {
-    }
-
-    /* Stop scanning */
-    ADCSR = 0;
-
-    for (i = 0; i < 4; i++)
-    {
-        /* Read converted values */
-        adcdata[reg++] = ANx[i] >> 6;
-    }
-}
-
 void adc_init(void)
 {
-    ADCR  = 0x7f; /* No external trigger; other bits should be 1 according to the manual... */
+    ADCR  = 0x7f; /* No external trigger; other bits should be 1 according
+                     to the manual... */
 
+    ADCSR = 0;
+    
     current_channel = 0;
 
-    /* Do a first scan to initialize all values */
-    /* AN4 to AN7 */
-    adc_batch_convert(false);
-    /* AN0 to AN3 */
-    adc_batch_convert(true);
+    /* Enable the A/D IRQ on level 1 */
+    IPRE = (IPRE & 0xf0ff) | 0x0100;
     
     tick_add_task(adc_tick);
 }
