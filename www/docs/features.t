@@ -22,7 +22,7 @@ YES
 UNKNOWN
 EFEAT
 
-NAME Background noise ENAME
+NAME Background noise during playback ENAME
 GOODNO
 BADYES
 EFEAT
