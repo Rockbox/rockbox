@@ -211,9 +211,9 @@ static void mp3_callback(unsigned char** start, int* size)
         sent = MIN(queue[queue_read].len, 0xFFFF);
         *start = p_lastclip = queue[queue_read].buf;
         *size = sent;
-        curr_hd[0] = *start[1];
-        curr_hd[1] = *start[2];
-        curr_hd[2] = *start[3];
+        curr_hd[0] = (*start)[1];
+        curr_hd[1] = (*start)[2];
+        curr_hd[2] = (*start)[3];
     }
     else if (silence_add && p_silence != NULL /* want and can add silence */
           && p_lastclip < p_thumbnail) /* and wasn't playing thumbnail file */
