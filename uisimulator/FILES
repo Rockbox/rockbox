@@ -1,5 +1,4 @@
 FILES
-HACKING
 README
 common/*.[ch]
 win32/*.[ch]
