@@ -35,6 +35,7 @@
 
 extern Menu bounce(void);
 extern Menu snow(void);
+extern Menu oscillograph(void);
 
 Menu demo_menu(void)
 {
@@ -44,6 +45,9 @@ Menu demo_menu(void)
     struct menu_items items[] = {
         { str(LANG_BOUNCE), bounce },
         { str(LANG_SNOW), snow },
+#ifndef SIMULATOR
+        { "Oscillograph", oscillograph },
+#endif
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -1163,6 +1163,23 @@ static void scroll_thread(void)
     }
 }
 
+#ifndef SIMULATOR
+#ifdef HAVE_LCD_BITMAP 
+/**
+ * Rolls up the lcd display by the specified amount of lines.
+ * Lines that are rolled out over the top of the screen are
+ * rolled in from the bottom again. This is a hardware 
+ * remapping only and all operations on the lcd are affected.
+ * -> 
+ * @param int lines - The number of lines that are rolled. 
+ *  The value must be 0 <= pixels < LCD_HEIGHT.
+ */
+void lcd_roll(int lines)
+{
+    lcd_write(true, LCD_SET_DISPLAY_START_LINE | (lines & (LCD_HEIGHT-1)));
+}
+#endif
+#endif
 
 /* -----------------------------------------------------------------
  * local variables:

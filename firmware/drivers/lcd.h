@@ -116,6 +116,7 @@ extern void lcd_clearline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 extern void lcd_invertpixel(int x, int y);
+extern void lcd_roll(int pixels);
 
 #endif /* CHARCELLS / BITMAP */
 
