@@ -195,6 +195,8 @@ struct user_settings
     bool fm_force_mono;  /* Forces Mono mode if true */
     bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
                             only 88MHz-108MHz */
+    int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
+                            relative to MIN_FREQ */
 #endif
 
     int max_files_in_dir; /* Max entries in directory (file browser) */

@@ -68,7 +68,7 @@ static int fm_in1 = DEFAULT_IN1;
 static int fm_in2 = DEFAULT_IN2;
 
 static int curr_preset = -1;
-static int curr_freq = 99400000;
+static int curr_freq;
 static int pll_cnt;
 
 #define MAX_PRESETS 32
@@ -159,6 +159,12 @@ static int find_preset(int freq)
     return -1;
 }
 
+static void remember_frequency(void)
+{
+    global_settings.last_frequency = (curr_freq - MIN_FREQ) / FREQ_STEP;
+    settings_save();
+}
+
 bool radio_screen(void)
 {
     char buf[MAX_PATH];
@@ -224,6 +230,8 @@ bool radio_screen(void)
     mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
                             mpeg_sound_default(SOUND_RIGHT_GAIN), false);
 #endif
+
+    curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
     
     fmradio_set(1, DEFAULT_IN1);
     fmradio_set(2, DEFAULT_IN2);
@@ -266,6 +274,7 @@ bool radio_screen(void)
             {
                 search_dir = 0;
                 curr_preset = find_preset(curr_freq);
+                remember_frequency();
             }
             
             update_screen = true;
@@ -322,6 +331,7 @@ bool radio_screen(void)
 
                 radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
+                remember_frequency();
                 search_dir = 0;
                 update_screen = true;
                 break;
@@ -333,6 +343,7 @@ bool radio_screen(void)
                 
                 radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
+                remember_frequency();
                 search_dir = 0;
                 update_screen = true;
                 break;
@@ -765,6 +776,7 @@ bool handle_radio_presets(void)
             i = menu_cursor(preset_menu);
             curr_freq = presets[i].frequency;
             radio_set(RADIO_FREQUENCY, curr_freq);
+            remember_frequency();
         }
     }
     
