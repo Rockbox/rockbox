@@ -29,6 +29,7 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "status.h"
+#include "debug.h"
 
 #include "lang.h"
 
@@ -49,6 +50,8 @@ bool sleeptimer_screen(void)
     char buf[32];
     int oldtime, newtime;
     int amount = 0;
+    int org_timer=get_sleep_timer();
+    bool changed=false;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
@@ -56,19 +59,42 @@ bool sleeptimer_screen(void)
     lcd_setmargins(w, 8);
 #endif
     
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, str(LANG_SLEEP_TIMER));
+
     while(!done)
     {
-        button = button_get_w_tmo(HZ/20);
+        button = button_get_w_tmo(HZ);
         switch(button)
         {
-#ifdef HAVE_PLAYER_KEYPAD
-        case BUTTON_STOP:
-#else
-        case BUTTON_OFF:
+#ifdef HAVE_RECORDER_KEYPAD
         case BUTTON_LEFT:
+        case BUTTON_PLAY:
+#else
+        case BUTTON_PLAY:
 #endif
-            done = true;
-            break;
+          done = true;
+          if (changed) {
+            lcd_stop_scroll();
+            lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
+            sleep(HZ/2);
+          }
+          break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+        case BUTTON_OFF:
+#else
+        case BUTTON_STOP:
+        case BUTTON_MENU:
+#endif
+          if (changed) {
+            lcd_stop_scroll();
+            lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+            set_sleep_timer(org_timer);
+            sleep(HZ/2);
+          }
+          done = true;
+          break;
 
 #ifdef HAVE_PLAYER_KEYPAD
         case BUTTON_RIGHT:
@@ -76,7 +102,6 @@ bool sleeptimer_screen(void)
         case BUTTON_UP:
 #endif
             oldtime = (get_sleep_timer()+59) / 60;
-            
             if(oldtime < THRESHOLD)
                 amount = SMALL_STEP_SIZE;
             else
@@ -85,7 +110,8 @@ bool sleeptimer_screen(void)
             newtime = oldtime * 60 + amount;
             if(newtime > MAX_TIME)
                 newtime = MAX_TIME;
-            
+
+            changed=true;
             set_sleep_timer(newtime);
             break;
                 
@@ -95,7 +121,6 @@ bool sleeptimer_screen(void)
         case BUTTON_DOWN:
 #endif
             oldtime = (get_sleep_timer()+59) / 60;
-            
             if(oldtime <= THRESHOLD)
                 amount = SMALL_STEP_SIZE;
             else
@@ -105,14 +130,13 @@ bool sleeptimer_screen(void)
             if(newtime < 0)
                 newtime = 0;
             
+            changed=true;
             set_sleep_timer(newtime);
             break;
         }
 
         seconds = get_sleep_timer();
 
-        lcd_clear_display();
-        lcd_puts(0, 0, str(LANG_SLEEP_TIMER));
         if(seconds)
         {
             seconds += 59; /* Round up for a "friendlier" display */
@@ -131,5 +155,6 @@ bool sleeptimer_screen(void)
 
         lcd_update();
     }
+    lcd_stop_scroll();
     return false;
 }

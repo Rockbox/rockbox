@@ -934,6 +934,7 @@ bool set_int(char* string,
 {
     bool done = false;
     int button;
+    int org_value=*variable;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -978,10 +979,30 @@ bool set_int(char* string,
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
+            case BUTTON_PLAY:
+#else
+            case BUTTON_PLAY:
+#endif
+                done = true;
+                if (*variable != org_value) {
+                   lcd_stop_scroll();
+                   lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
+                   sleep(HZ/2);
+                }
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF:
 #else
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
+                if (*variable != org_value) {
+                   *variable=org_value;
+                   lcd_stop_scroll();
+                   lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+                   sleep(HZ/2);
+                }
                 done = true;
                 break;
 
@@ -1009,6 +1030,7 @@ bool set_option(char* string, int* variable, char* options[],
 {
     bool done = false;
     int button;
+    int org_value=*variable;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -1016,6 +1038,7 @@ bool set_option(char* string, int* variable, char* options[],
     else
         lcd_setmargins(0, 0);
 #endif
+
     lcd_clear_display();
     lcd_puts_scroll(0, 0, string);
 
@@ -1056,10 +1079,30 @@ bool set_option(char* string, int* variable, char* options[],
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
+            case BUTTON_PLAY:
+#else
+            case BUTTON_PLAY:
+#endif
+                done = true;
+                if (*variable != org_value) {
+                   lcd_stop_scroll();
+                   lcd_puts(0, 0, str(LANG_MENU_SETTING_OK));
+                   sleep(HZ/2);
+                }
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF:
 #else
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
+                if (*variable != org_value) {
+                   *variable=org_value;
+                   lcd_stop_scroll();
+                   lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
+                   sleep(HZ/2);
+                }
                 done = true;
                 break;
 
