@@ -47,7 +47,8 @@ struct regs
 };
 #endif
 
-#define DEADBEEF ((int)0xdeadbeef)
+#define DEADBEEF ((unsigned int)0xdeadbeef)
+/* Cast to the the machine int type, whose size could be < 4. */
 
 
 int num_threads;
