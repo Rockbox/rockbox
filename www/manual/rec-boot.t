@@ -8,3 +8,4 @@ the root (toplevel) directory of your Archos.
 <p>
 <img src="rec-boot.png" width=120 height=70 alt="Rockbox Logo">
 
+#include "foot.t"

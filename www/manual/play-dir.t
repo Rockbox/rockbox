@@ -51,3 +51,5 @@ Buttons:
   Switches to the <a href="play-menu.html">main menu</a>.
 </td></tr>
 </table>
+
+#include "foot.t"

@@ -24,3 +24,6 @@ Buttons:
 </td></tr>
 
 </table>
+
+#include "foot.t"
+
