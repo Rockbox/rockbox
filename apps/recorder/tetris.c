@@ -38,23 +38,19 @@
 #define TETRIS_TITLE_XLOC  43
 #define TETRIS_TITLE_YLOC  15
 
-int start_x = 2;
-int start_y = 1;
-int max_x = 28;
-int max_y = 48;
-int current_x = 0;
-int current_y = 0;
-int current_f = 0;
-int current_b = 0;
-int level = 0;
-short lines = 0;
-int score = 0;
-int next_b = 0;
-int next_f = 0;
-char virtual[LCD_WIDTH*LCD_HEIGHT];
-short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
-int blocks = 7;
-int block_frames[7] = {1,2,2,2,4,4,4};
+static const int start_x = 2;
+static const int start_y = 1;
+static const int max_x = 28;
+static const int max_y = 48;
+static const short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
+static const int blocks = 7;
+static const int block_frames[7] = {1,2,2,2,4,4,4};
+
+static int current_x, current_y, current_f, current_b;
+static int level, score;
+static int next_b, next_f;
+static short lines;
+static char virtual[LCD_WIDTH*LCD_HEIGHT];
 
 /*
  block_data is built up the following way
@@ -70,7 +66,7 @@ int block_frames[7] = {1,2,2,2,4,4,4};
  with block_data
 */
 
-int block_data[7][4][2][4] =
+static const char block_data[7][4][2][4] =
 {
     {
         {{0,1,0,1},{0,0,1,1}}
@@ -332,11 +328,11 @@ void game_loop(void)
     {
 	int b=0;
 	int count = 0;
-	/*  while(count*20 < level_speeds[level]) */
+	while(count*300 < level_speeds[level])
 	{
 	    b = button_get(false);
 	    if ( b & BUTTON_OFF )
-              return; /* get out of here */
+                return; /* get out of here */
 
 	    if ( b & BUTTON_LEFT ) {
 		move_block(-2,0,0);
@@ -353,19 +349,19 @@ void game_loop(void)
 	    count++;
 	    sleep(HZ/10);
 	}
-    if(gameover()) {
-        int w, h;
+        if(gameover()) {
+            int w, h;
 
-        lcd_getfontsize(TETRIS_TITLE_FONT, &w, &h);
-        lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
-                      TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
-                      TETRIS_TITLE_YLOC-h);
-        lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
-                   TETRIS_TITLE_FONT);
-        lcd_update();
-        sleep(HZ);
-        return;
-    }
+            lcd_getfontsize(TETRIS_TITLE_FONT, &w, &h);
+            lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
+                          TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
+                          TETRIS_TITLE_YLOC-h);
+            lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
+                       TETRIS_TITLE_FONT);
+            lcd_update();
+            sleep(HZ);
+            return;
+        }
 	move_down();
     }
 }
@@ -373,10 +369,6 @@ void game_loop(void)
 void init_tetris(void)
 {
     memset(&virtual, 0, sizeof(virtual));
-    start_x = 2;
-    start_y = 1;
-    max_x = 28;
-    max_y = 48;
     current_x = 0;
     current_y = 0;
     current_f = 0;
