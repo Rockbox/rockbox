@@ -49,6 +49,8 @@ void button_init()
 
 extern int screenhack_handle_events(bool *release, bool *repeat);
 
+int button_state = 0;
+
 static int get_raw_button (void)
 {
     int k;
@@ -144,13 +146,22 @@ static int get_raw_button (void)
             break;
     }
 
-    if(release)
+    if(release) {
         /* return a release event */
+        button_state &= ~k;
         k |= BUTTON_REL;
+    } else {
+        if(k) {
+            button_state |= k;
+            k = button_state;
+        }
+    }
 
     if(repeat)
         k |= BUTTON_REPEAT;
 
+    if(k)
+        DEBUGF("key: %08x\n", k);
     return k;
 }
 
