@@ -1099,6 +1099,7 @@ static bool dirbrowse(void)
 #ifdef HAVE_LCD_BITMAP
             tree_max_on_screen = recalc_screen_height();
 #endif
+            id3db = check_changed_id3mode(id3db);
             restore = true;
             start_wps=false;
         }
