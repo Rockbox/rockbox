@@ -499,6 +499,33 @@ static bool menu(void)
 
     while (!exit) {
         int button = button_get(true);
+
+        /* these are never locked */
+        switch (button)
+        {
+            /* key lock */
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1 | BUTTON_DOWN:
+#else
+            case BUTTON_MENU | BUTTON_STOP:
+#endif
+                keys_locked = !keys_locked;
+                display_keylock_text(keys_locked);
+                exit = true;
+                while (button_get(false)); /* clear button queue */
+                break;
+
+            case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
+                usb_screen();
+                keys_locked = false;
+                return true;
+        }
+
+        if (keys_locked) {
+            display_keylock_text(true);
+            break;
+        }
         
         switch ( button ) {
             /* go into menu */
@@ -539,18 +566,6 @@ static bool menu(void)
                 display_mute_text(muted);
                 break;
 
-                /* key lock */
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_DOWN:
-#else
-            case BUTTON_MENU | BUTTON_STOP:
-#endif
-                keys_locked = !keys_locked;
-                display_keylock_text(keys_locked);
-                exit = true;
-                while (button_get(false)); /* clear button queue */
-                break;
-
 #ifdef BUTTON_MENU
                 /* change volume */
             case BUTTON_MENU | BUTTON_LEFT:
@@ -584,11 +599,6 @@ static bool menu(void)
 #endif
                 exit = true;
                 break;
-
-            case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
-                usb_screen();
-                return true;
         }
         last_button = button;
     }
