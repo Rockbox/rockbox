@@ -15,13 +15,11 @@ for ( @tarballs ) {
     if (/-(\d+)/) {
         $date = $1;
         if ( -f "$basedir/changes-$date.txt") {
-            $log = "<a href=\"daily/changes-$date.txt\">Changelog</a>";
-        }
-        elsif ( -f "$basedir/changes-$date.log") {
-            $log = "<a href=\"daily/changes-$date.log\">Changelog</a>";
+            $lines = `grep "Number of changes:" $basedir/changes-$date.txt | cut "-d " -f4` + 0;
+            $log = "<a href=\"daily/changes-$date.txt\">Changelog</a> <small>($lines changes)</small>";
         }
     }
-    print "<li><a href=\"daily/$_\">$_</a> ($size bytes) $log\n";
+    print "<li><a href=\"daily/$_\">$_</a> <small>($size bytes)</small> $log\n";
 }
 
 print "</ul>\n";

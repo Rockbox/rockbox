@@ -73,6 +73,19 @@ A {
  background-color: #ff8080;
 }
 
+.faqq {
+ font-weight: bold;
+}
+
+.faqa {
+ margin-left: 2em;
+}
+
+PRE {
+ font-size: 9pt;
+}
+
+
 .changetable, .bugs, .dailymod, .buildstatus, .archive {
  border: outset 2px #ffffff;
 }

@@ -17,9 +17,9 @@ describing how to compile Rockbox
 <h2>Target builds</h2>
 
 <p>These are automated daily builds of the CVS code.
-They are <i>not</i> official releases, they are in fact almost guaranteed to not work properly!
+They are <i>not</i> official releases and are in fact almost guaranteed to contain bugs!
 
-<p>These builds are discussed in IRC only. <font color="red"><big><b>DO NOT FILE BUG REPORTS FOR THEM!</b></big></font>
+<p>These builds are discussed in IRC or mail only. <font color="red"><big><b>DO NOT FILE BUG REPORTS FOR THEM!</b></big></font>
 
 <p>There are three versions of each build:
 

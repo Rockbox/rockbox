@@ -41,7 +41,7 @@ If you like living on the edge, <a href="daily.shtml">here are daily builds</a>.
 <p><i>2002-04-11</i>: The <a href="codes_rec.png">Recorder charset</a> has been mapped.
 
 <p><i>2002-03-28</i>: Lots of new stuff on the web page:
-<a href="docs/FAQ">faq</a>,
+<a href="docs/faq.html">faq</a>,
 <a href="irc/">irc logs</a>,
 <a href="tools.html">tools</a> and
 <a href="internals/">photos</a>.
