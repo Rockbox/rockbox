@@ -52,6 +52,12 @@ Archos Jukebox Recorder V2
 
 <p>Windows users: If you choose not to unzip the archive directly onto the Archos, you can create the .rockbox directory by entering "mkdir j:\.rockbox" on a command prompt. Windows Explorer refuses to create this directory, so you must use a command prompt.
 
+<h2>Download more Fonts and Languages</h2>
+<p>
+ <a href="/fonts/">Fonts for Rockbox</a>
+<p>
+ <a href="/langs/">Language files for Rockbox</a>
+
 <h2>Uninstallation</h2>
 
 <p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) from the root of your Archos disk.
