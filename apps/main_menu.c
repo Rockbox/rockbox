@@ -135,9 +135,7 @@ void main_menu(void)
 #endif
         { "Version",            show_credits      },
 #ifndef SIMULATOR
-#ifdef ARCHOS_RECORDER
         { "Debug (keep out!)",  dbg_ports         },
-#endif
 #endif
     };
 

@@ -28,13 +28,11 @@ static char debugbuf[200];
 #endif
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
-#ifdef ARCHOS_RECORDER
 #include "kernel.h"
 #include "button.h"
 #include "system.h"
 #include "lcd.h"
 #include "adc.h"
-#endif
 
 void debug_init(void)
 {
@@ -217,10 +215,10 @@ void debugf(char *fmt, ...)
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
-#ifdef ARCHOS_RECORDER
 extern int ata_device;
 extern int ata_io_address;
 
+#ifdef ARCHOS_RECORDER
 /* Test code!!! */
 void dbg_ports(void)
 {
@@ -236,59 +234,165 @@ void dbg_ports(void)
 
     while(1)
     {
-	porta = PADR;
-	portb = PBDR;
-	portc = PCDR;
+        porta = PADR;
+        portb = PBDR;
+        portc = PCDR;
 
-	snprintf(buf, 32, "PADR: %04x", porta);
-	lcd_puts(0, 0, buf);
-	snprintf(buf, 32, "PBDR: %04x", portb);
-	lcd_puts(0, 1, buf);
+        snprintf(buf, 32, "PADR: %04x", porta);
+        lcd_puts(0, 0, buf);
+        snprintf(buf, 32, "PBDR: %04x", portb);
+        lcd_puts(0, 1, buf);
 
-	snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
-	lcd_puts(0, 2, buf);
-	snprintf(buf, 32, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
-	lcd_puts(0, 3, buf);
-	snprintf(buf, 32, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
-	lcd_puts(0, 4, buf);
-	snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
-	lcd_puts(0, 5, buf);
+        snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
+        lcd_puts(0, 2, buf);
+        snprintf(buf, 32, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
+        lcd_puts(0, 3, buf);
+        snprintf(buf, 32, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
+        lcd_puts(0, 4, buf);
+        snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
+        lcd_puts(0, 5, buf);
 
-    battery_voltage = (adc_read(6) * 6465) / 10000;
-    batt_int = battery_voltage / 100;
-    batt_frac = battery_voltage % 100;
+        battery_voltage = (adc_read(6) * BATTERY_SCALE_FACTOR) / 10000;
+        batt_int = battery_voltage / 100;
+        batt_frac = battery_voltage % 100;
     
-	snprintf(buf, 32, "Battery: %d.%02dV", batt_int, batt_frac);
-	lcd_puts(0, 6, buf);
+        snprintf(buf, 32, "Battery: %d.%02dV", batt_int, batt_frac);
+        lcd_puts(0, 6, buf);
 
-	snprintf(buf, 32, "ATA: %s, 0x%x",
-             ata_device?"slave":"master", ata_io_address);
-	lcd_puts(0, 7, buf);
+        snprintf(buf, 32, "ATA: %s, 0x%x",
+                 ata_device?"slave":"master", ata_io_address);
+        lcd_puts(0, 7, buf);
 	
-	lcd_update();
-	sleep(HZ/10);
+        lcd_update();
+        sleep(HZ/10);
 
-	button = button_get(false);
+        button = button_get(false);
 
-	switch(button)
-	{
-	case BUTTON_ON:
-	    /* Toggle the charger */
-	    PBDR ^= 0x20;
-	    break;
+        switch(button)
+        {
+            case BUTTON_ON:
+                /* Toggle the charger */
+                PBDR ^= 0x20;
+                break;
 
-	case BUTTON_UP:
-	    /* Toggle the IDE power */
-	    PADR ^= 0x20;
-	    break;
+            case BUTTON_UP:
+                /* Toggle the IDE power */
+                PADR ^= 0x20;
+                break;
 
-	case BUTTON_OFF:
-	    /* Disable the charger */
-	    PBDR |= 0x20;
-	    /* Enable the IDE power */
-	    PADR |= 0x20;
-	    return;
-	}
+            case BUTTON_OFF:
+                /* Disable the charger */
+                PBDR |= 0x20;
+                /* Enable the IDE power */
+                PADR |= 0x20;
+                return;
+        }
+    }
+}
+#else
+void dbg_ports(void)
+{
+    unsigned short porta;
+    unsigned short portb;
+    unsigned char portc;
+    char buf[32];
+    int button;
+    int battery_voltage;
+    int batt_int, batt_frac;
+    int currval = 0;
+
+    lcd_clear_display();
+
+    while(1)
+    {
+        porta = PADR;
+        portb = PBDR;
+        portc = PCDR;
+
+        switch(currval)
+        {
+            case 0:
+                snprintf(buf, 32, "PADR: %04x  ", porta);
+                break;
+            case 1:
+                snprintf(buf, 32, "PBDR: %04x  ", portb);
+                break;
+            case 2:
+                snprintf(buf, 32, "AN0: %03x  ", adc_read(0));
+                break;
+            case 3:
+                snprintf(buf, 32, "AN1: %03x  ", adc_read(1));
+                break;
+            case 4:
+                snprintf(buf, 32, "AN2: %03x  ", adc_read(2));
+                break;
+            case 5:
+                snprintf(buf, 32, "AN3: %03x  ", adc_read(3));
+                break;
+            case 6:
+                snprintf(buf, 32, "AN4: %03x  ", adc_read(4));
+                break;
+            case 7:
+                snprintf(buf, 32, "AN5: %03x  ", adc_read(5));
+                break;
+            case 8:
+                snprintf(buf, 32, "AN6: %03x  ", adc_read(6));
+                break;
+            case 9:
+                snprintf(buf, 32, "AN7: %03x  ", adc_read(7));
+                break;
+            case 10:
+                snprintf(buf, 32, "%s, 0x%x ",
+                         ata_device?"slv":"mst", ata_io_address);
+                break;
+        }
+        lcd_puts(0, 0, buf);
+        
+        battery_voltage = (adc_read(6) * BATTERY_SCALE_FACTOR) / 10000;
+        batt_int = battery_voltage / 100;
+        batt_frac = battery_voltage % 100;
+    
+        snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
+        lcd_puts(0, 1, buf);
+        
+        sleep(HZ/5);
+
+        button = button_get(false);
+
+        switch(button)
+        {
+#ifndef ARCHOS_PLAYER_OLD
+            case BUTTON_ON:
+                /* Toggle the charger */
+                PBDR ^= 0x20;
+                break;
+
+            case BUTTON_PLAY:
+                /* Toggle the IDE power */
+                PADR ^= 0x20;
+                break;
+#endif
+            case BUTTON_STOP:
+#ifndef ARCHOS_PLAYER_OLD
+                /* Disable the charger */
+                PBDR |= 0x20;
+                /* Enable the IDE power */
+                PADR |= 0x20;
+#endif
+                return;
+
+            case BUTTON_LEFT:
+                currval--;
+                if(currval < 0)
+                    currval = 10;
+                break;
+
+            case BUTTON_RIGHT:
+                currval++;
+                if(currval > 10)
+                    currval = 0;
+                break;
+        }
     }
 }
 #endif
