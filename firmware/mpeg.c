@@ -416,7 +416,6 @@ static void mpeg_thread(void)
                         {
                             /* No more data to play */
                             DEBUGF("Finished playing\n");
-                            playing = false;
                             filling = false;
                         }
                         else
