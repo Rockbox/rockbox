@@ -23,7 +23,7 @@ LDS := $(TARGET).lds
 ifndef PLATFORM 
 not_configured:
 	@echo "No platform given."
-	@echo "Use make PLATFORM=PLAYER|RECORDER|RECORDER|FM {NO_ROM=1}"
+	@echo "Use make PLATFORM=PLAYER|RECORDER|RECORDER|FM|ONDIO {NO_ROM=1}"
 ##else
 ##configured:
 ##	@echo "Building bootloader for platform "$(PLATFORM)

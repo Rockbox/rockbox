@@ -57,6 +57,14 @@ typedef struct
 #define F2_UPPER 544
 #define F3_LOWER 700
 #define F3_UPPER 1023
+#elif defined PLATFORM_ONDIO
+#define CHANNEL 4
+#define F1_LOWER 0x2EF // Ondio has no F1 button,
+#define F1_UPPER 0x3FF //  so we use "Right".
+#define F2_LOWER 0x19D // Ondio has no F2 button,
+#define F2_UPPER 0x245 //  so we use "Up".
+#define F3_LOWER 0x246 // Ondio has no F3 button,
+#define F3_UPPER 0x2EE //  so we use "Left".
 #else
 #error ("No platform given!")
 #endif

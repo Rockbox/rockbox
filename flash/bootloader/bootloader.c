@@ -143,6 +143,10 @@ void PlatformInit(void)
 		PACR2 &= 0xFBFF; // GPIO for PA5
 		PAIOR |= 0x20;	 // make PA5 an output (low by default)
 	}
+#elif defined PLATFORM_ONDIO
+	BRR1  =  0x0019; // 14400 Baud for monitor
+	PBDR |= 0x20; // set PB5 to keep power (fixes the ON-holding problem)
+	PBIOR |= 0x20; // make PB5 an output
 #endif
 
 	// platform-independent inits
