@@ -45,10 +45,11 @@
 #include "settings.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 10
+#define PLUGIN_API_VERSION 11
 
 /* update this to latest version if a change to the api struct breaks
-   backwards compatibility */
+   backwards compatibility (and please take the opportunity to sort in any 
+   new function which are "waiting" at the end of the function table) */
 #define PLUGIN_MIN_API_VERSION 9
 
 /* plugin return codes */
@@ -187,7 +188,6 @@ struct plugin_api {
     /* new stuff, sort in next time the API gets broken! */
 #ifndef HAVE_LCD_CHARCELLS
     unsigned char* lcd_framebuffer;
-    /* performance function */
     void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
 #endif
     void (*yield)(void);
@@ -204,6 +204,9 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     void (*backlight_set_timeout)(int index);
+#ifndef SIMULATOR
+    void (*ata_sleep)(void);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */

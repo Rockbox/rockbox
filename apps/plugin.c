@@ -37,6 +37,7 @@
 #include "buffer.h"
 #include "mp3_playback.h"
 #include "backlight.h"
+#include "ata.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -180,6 +181,9 @@ static struct plugin_api rockbox_api = {
 #endif
     &global_settings,
     backlight_set_timeout,
+#ifndef SIMULATOR
+    ata_sleep,
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)
