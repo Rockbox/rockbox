@@ -55,6 +55,11 @@ A {
  width: 3em;
 }
 
+.buildwarn {
+ background-color: yellow;
+ width: 3em;
+}
+
 .buildfail {
  background-color: #ff8080;
  width: 3em;
