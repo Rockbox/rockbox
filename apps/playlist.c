@@ -727,7 +727,7 @@ static int randomise_playlist(struct playlist_info* playlist,
     for(count = playlist->amount - 1; count >= 0; count--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
-        candidate = rand() / (RAND_MAX / (count + 1));
+        candidate = rand() % (count + 1);
 
         /* now swap the values at the 'count' and 'candidate' positions */
         store = playlist->indices[candidate];
