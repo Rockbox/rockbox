@@ -104,8 +104,8 @@ enum plugin_status loop(void)
 #endif
                 )
                 return PLUGIN_OK;
-            if (button==SYS_USB_CONNECTED) {
-                rb->usb_screen();
+            
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
                 return PLUGIN_USB_CONNECTED;
             }
         } while (!(button&(BUTTON_REL|BUTTON_REPEAT)));
