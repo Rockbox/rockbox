@@ -30,13 +30,20 @@ INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON)
 LIBS = gdi32.lib user32.lib
 
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fo"Release/" /Fd"Release/vc70.pdb"
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 
 #SRCS = $(wildcard *.c)
 
-SRCS = lcd-win32.c tetris.c uisw32.c $(DRIVERS)/lcd.c button.c  $(FIRMWAREDIR)/chartables.c kernel.c Release/uisw32.res
+SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c \
+  chartables.c kernel.c Release/uisw32.res 
 
-OBJS = $(SRCS:.c=.o)
+OBJS = $(SRCS:.c=.obj)
 
-all:
- $(CC) $(CFLAGS) $(SRCS) $(LIBS) $(LDFLAGS)
+uisw32.exe: $(OBJS)
+ $(CC) $(CFLAGS) $(LIBS) $(LDFLAGS) $(OBJS)
+ 
+lcd.obj: $(DRIVERS)/lcd.c
+ $(CC) $(CFLAGS) -c $(DRIVERS)/lcd.c -olcd.obj
+ 
+chartables.obj: $(FIRMWAREDIR)/chartables.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/chartables.c -ochartables.obj
