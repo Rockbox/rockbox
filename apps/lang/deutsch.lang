@@ -1466,13 +1466,13 @@ id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
 voice: ""
-new: "Inkompatible Version"
+new: "Inkompatibles Modell"
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "Warteschlange als Nächsten"
+new: "Inkompatible Version"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
