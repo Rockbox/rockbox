@@ -42,6 +42,7 @@
 #include "settings.h"
 #include "ata.h"
 #include "fat.h"
+#include "radio.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1377,6 +1378,46 @@ bool dbg_save_roms(void)
     return false;
 }
 
+#ifdef HAVE_FMRADIO
+extern int debug_fm_detection;
+
+bool dbg_fm_radio(void)
+{
+    char buf[32];
+    int button;
+    bool fm_detected;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
+
+    while(1)
+    {
+        lcd_clear_display();
+        fm_detected = radio_hardware_present();
+        
+        snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
+        lcd_puts(0, 0, buf);
+        snprintf(buf, sizeof buf, "Result: %08x", debug_fm_detection);
+        lcd_puts(0, 1, buf);
+        lcd_update();
+        
+        button = button_get(true);
+
+        switch(button)
+        {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF:
+#else
+            case BUTTON_STOP:
+#endif
+                return false;
+        }
+    }
+    return false;
+}
+#endif
+
 bool debug_menu(void)
 {
     int m;
@@ -1411,6 +1452,9 @@ bool debug_menu(void)
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
         { "View runtime", view_runtime },
+#ifdef HAVE_FMRADIO
+        { "FM Radio", dbg_fm_radio },
+#endif
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -64,6 +64,8 @@ static struct fmstation presets[MAX_PRESETS];
 
 static char default_filename[] = "/.rockbox/fm-presets-default.fmr";
 
+int debug_fm_detection;
+
 void radio_load_presets(void);
 bool radio_preset_select(void);
 bool radio_menu(void);
@@ -81,6 +83,7 @@ bool radio_hardware_present(void)
     
     fmradio_set(2, 0x140885); /* 5kHz, 7.2MHz crystal, test mode 1 */
     val = fmradio_read(0);
+    debug_fm_detection = val;
     if(val == 0x140885)
         return true;
     else
@@ -554,7 +557,7 @@ void radio_load_presets(void)
         if(fd >= 0)
         {
             i = 0;
-            while(!done)
+            while(!done && num_presets < MAX_PRESETS)
             {
                 rc = read_line(fd, buf, 128);
                 if(rc > 0)
