@@ -434,9 +434,11 @@ static bool ask_resume(bool ask_once)
         default_event_handler(SYS_USB_CONNECTED);
         return false;
     }
-    
+
+#ifdef HAVE_ALARM_MOD
     if ( rtc_check_alarm_started(true) ) 
        return true;
+#endif
 
     /* always resume? */
     if ( global_settings.resume == RESUME_ON)
