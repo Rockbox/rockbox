@@ -21,9 +21,7 @@
 ****************************************************************************/
 #include "plugin.h"
 
-#ifndef ARCHOS_RECORDERV2
-
-#ifndef SIMULATOR
+#ifndef SIMULATOR /* only for target */
 
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
@@ -40,15 +38,28 @@
 #define UINT32 unsigned long
 #endif
 
+/* platform IDs as I have used them in my firmware templates */
+#define ID_RECORDER 0
+#define ID_FM       1
+#define ID_PLAYER   2
+#define ID_REC_V2   3
+
 #if defined(ARCHOS_PLAYER)
 #define FILE_TYPE "player"
 #define KEEP VERSION_ADR /* keep the firmware version */
+#define PLATFORM_ID ID_PLAYER
 #elif defined(ARCHOS_RECORDER)
 #define FILE_TYPE "rec"
 #define KEEP MASK_ADR /* keep the mask value */
+#define PLATFORM_ID ID_RECORDER
+#elif defined(ARCHOS_RECORDERV2)
+#define FILE_TYPE "v2"
+#define KEEP MASK_ADR /* keep the mask value */
+#define PLATFORM_ID ID_REC_V2
 #elif defined(ARCHOS_FMRECORDER)
 #define FILE_TYPE "fm"
 #define KEEP MASK_ADR /* keep the mask value */
+#define PLATFORM_ID ID_FM
 #else
 #error ("No known platform given!")
 #endif
@@ -63,6 +74,7 @@ typedef enum
     eReadErr,
     eBadContent,
     eCrcErr,
+    eBadPlatform,
 } tCheckResult;
 
 /* result of the CheckBootROM() function */
@@ -83,8 +95,9 @@ typedef struct
 
 static struct plugin_api* rb; /* here is a global api struct pointer */
 
-#define MASK_ADR    0xFC /* position of hardware mask value in Flash */
-#define VERSION_ADR 0xFE /* position of firmware version value in Flash */
+#define MASK_ADR     0xFC /* position of hardware mask value in Flash */
+#define VERSION_ADR  0xFE /* position of firmware version value in Flash */
+#define PLATFORM_ADR 0xFB /* position of my platform ID value in Flash */
 #define SEC_SIZE 4096 /* size of one flash sector */
 static UINT8* sector; /* better not place this on the stack... */
 static volatile UINT8* FB = (UINT8*)0x02000000; /* Flash base address */
@@ -252,7 +265,27 @@ unsigned crc_32(unsigned char* buf, unsigned len, unsigned crc32)
 }
 
 
-/*********** Firmware File Functions ************/
+/*********** Firmware File Functions + helpers ************/
+
+/* test if the version number is consistent with the platform */
+bool CheckPlatform(int platform_id, UINT16 version)
+{
+    if (version == 123)
+    {   /* it can be a FM or V2 recorder */
+        return (platform_id == ID_FM || platform_id == ID_REC_V2);
+    }
+    else if ((version >= 124 && version <= 128) || version == 200)
+    {   /* for my very first firmware, I foolishly changed it to 200 */
+        return (platform_id == ID_RECORDER);
+    }
+    else if (version == 0 || (version >= 300 && version <= 506))
+    {   /* for very old players, I've seen zero */
+        return (platform_id == ID_PLAYER);
+    }
+
+    return false; /* unknown */
+}
+
 
 tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
 {
@@ -283,7 +316,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
     }
     
     if (fileleft == 256*1024)
-    {   // original dumped firmware file has no CRC
+    {   // original dumped firmware file has no CRC nor platform ID
         has_crc = false;
     }
     else
@@ -303,8 +336,24 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
         return eReadErr;
     }
 
+    // version number in file plausible with this hardware?
+    if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(sector + VERSION_ADR)))
+    {
+        rb->close(fd);
+        return eBadPlatform;
+    }
+    
     if (has_crc)
+    {
         crc32 = crc_32(sector, SEC_SIZE, crc32); /* checksum */
+        
+        /* in addition to the CRC, my files also have a platform ID */
+        if (sector[PLATFORM_ADR] != PLATFORM_ID) /* for our hardware? */
+        {
+            rb->close(fd);
+            return eBadPlatform;
+        }
+    }
 
     if (is_romless)
     {   /* in this case, there is not much we can check */
@@ -419,6 +468,7 @@ unsigned ProgramFirmwareFile(char* filename, int chipsize)
     return failures;
 }
 
+
 /* returns the # of failures, 0 on success */
 unsigned VerifyFirmwareFile(char* filename)
 {
@@ -451,6 +501,7 @@ unsigned VerifyFirmwareFile(char* filename)
     
     return failures;
 }
+
 
 /***************** Support Functions *****************/
 
@@ -544,6 +595,13 @@ void DoUserDialog(char* filename)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
+    /* test if the user is running the correct plugin for this box */
+    if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
+    {
+        rb->splash(HZ*3, 0, true, "Wrong plugin");
+        return; /* exit */
+    }
+
     /* check boot ROM */
     result = CheckBootROM();
     if (result == eUnknown)
@@ -628,6 +686,10 @@ void DoUserDialog(char* filename)
         rb->lcd_puts(0, 1, "File invalid.");
         rb->lcd_puts(0, 2, "CRC check failed,");
         rb->lcd_puts(0, 3, "checksum mismatch.");
+        break;
+    case eBadPlatform:
+        rb->lcd_puts(0, 1, "Wrong file for");
+        rb->lcd_puts(0, 2, "this hardware.");
         break;
     default:
         rb->lcd_puts(0, 1, "Check failed.");
@@ -754,6 +816,13 @@ void DoUserDialog(char* filename)
     tCheckROM result;
     bool is_romless;
 
+    /* test if the user is running the correct plugin for this box */
+    if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
+    {
+        rb->splash(HZ*3, 0, true, "Wrong plugin");
+        return; /* exit */
+    }
+
     /* check boot ROM */
     result = CheckBootROM();
     if (result == eUnknown)
@@ -832,6 +901,10 @@ void DoUserDialog(char* filename)
     case eCrcErr:
         rb->lcd_puts_scroll(0, 0, "File invalid.");
         rb->lcd_puts_scroll(0, 1, "CRC check failed.");
+        break;
+    case eBadPlatform:
+        rb->lcd_puts_scroll(0, 0, "Wrong file for");
+        rb->lcd_puts_scroll(0, 1, "this hardware.");
         break;
     default:
         rb->lcd_puts_scroll(0, 0, "Check failed.");
@@ -924,5 +997,3 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 }
 
 #endif /* #ifndef SIMULATOR */
-
-#endif /* model */
