@@ -1,9 +1,6 @@
-Solaris
+To build:
 
+ $ ../tools/configure
+ [answer questions]
  $ make
- $ ./rockboxui
-
-Linux
-
- $ make LIBDIRS=-L/usr/X11R6/lib
  $ ./rockboxui
