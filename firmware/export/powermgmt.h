@@ -24,7 +24,11 @@
 #define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
 #define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
 #define BATTERY_LEVEL_FULL       400 /* 4.00V */
-
+#elif CONFIG_BATTERY == BATT_3AAA_ALKALINE /* Ondio, Alkalines */
+#define BATTERY_LEVEL_SHUTDOWN   250 /* 2.50V */
+#define BATTERY_LEVEL_EMPTY      260 /* 2.60V */
+#define BATTERY_LEVEL_DANGEROUS  270 /* 2.80V */
+#define BATTERY_LEVEL_FULL       450 /* 4.50V */
 #else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */

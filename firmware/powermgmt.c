@@ -95,6 +95,9 @@ static const int percent_to_volt_decharge[11] =
 #if CONFIG_BATTERY == BATT_LIION2200
     /* measured values */
     260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400
+#elif CONFIG_BATTERY == BATT_3AAA_ALKALINE
+    /* taken from a textbook alkaline discharge graph, not measured */
+    270, 303, 324, 336, 348, 357, 366, 378, 390, 408, 450
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
