@@ -203,7 +203,7 @@ int kbd_input(char* text, int buflen)
                     case BUTTON_ON:
                         if (len < buflen) {
                             /* ON insert the char */
-                            for (i=len; i>cursor_pos; i--) {
+                            for (i=len+1; i>cursor_pos; i--) {
                                 text[i]=text[i-1];
                             }
                             text[cursor_pos]=line[x];
