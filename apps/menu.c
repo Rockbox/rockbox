@@ -66,7 +66,7 @@ void put_cursorxy(int x, int y, bool on)
     else {
 #ifdef HAVE_LCD_BITMAP
         /* I use xy here since it needs to disregard the margins */
-      lcd_clearrect (x*6, y*6, 4, 8);
+        lcd_clearrect (x*6, y*8, 4, 8);
 #else
         lcd_puts(x, y, " ");
 #endif
