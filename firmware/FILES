@@ -11,6 +11,7 @@ malloc/README
 malloc/THOUGHTS
 malloc/Makefile
 drivers/*.[ch]
+export/*.h
 include/*.h
 include/sys/*.h
 win32.mak
