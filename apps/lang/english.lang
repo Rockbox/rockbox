@@ -467,7 +467,7 @@ new:
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key Lock is OFF"
+eng: "Key Lock Is OFF"
 new:
 
 id: LANG_MUTE_ON_PLAYER
