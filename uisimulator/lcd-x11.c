@@ -39,29 +39,33 @@
 #include "lcd-x11.h"
 
 extern unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
+extern void screen_resized(int width, int height);
+extern Display *dpy;
 
 void lcd_update (void)
 {
-  int x, y;
-  int p=0;
-  int bit;
-  XPoint points[LCD_WIDTH * LCD_HEIGHT];
+    int x, y;
+    int p=0;
+    int bit;
+    XPoint points[LCD_WIDTH * LCD_HEIGHT];
 
-  for(y=0; y<LCD_HEIGHT; y+=8) {
-    for(x=0; x<LCD_WIDTH; x++) {
-      if(display[x][y/8]) {
-        /* one or more bits/pixels are set */
-        for(bit=0; bit<8; bit++) {
-          if(display[x][y/8]&(1<<bit)) {
-            points[p].x = x + MARGIN_X;
-            points[p].y = y+bit + MARGIN_Y;
-            p++; /* increase the point counter */
-          }
+    screen_resized(LCD_WIDTH, LCD_HEIGHT);
+
+    for(y=0; y<LCD_HEIGHT; y+=8) {
+        for(x=0; x<LCD_WIDTH; x++) {
+            if(display[x][y/8]) {
+                /* one or more bits/pixels are set */
+                for(bit=0; bit<8; bit++) {
+                    if(display[x][y/8]&(1<<bit)) {
+                        points[p].x = x + MARGIN_X;
+                        points[p].y = y+bit + MARGIN_Y;
+                        p++; /* increase the point counter */
+                    }
+                }
+            }
         }
-        
-      }
     }
-  }
-  drawdots(&points[0], p);
-  fprintf(stderr, "lcd_update: Draws %d pixels\n", p);
+    drawdots(&points[0], p);
+    fprintf(stderr, "lcd_update: Draws %d pixels\n", p);
+    XSync(dpy,False);
 }
