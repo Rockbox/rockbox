@@ -105,3 +105,9 @@ void start( user_settings_t *settings, playlist_info_t *playlist )
     display_playlist_track( &track );
 }
 
+#ifdef SIMULATOR
+void app_main ()
+{
+    main (0, NULL);
+}
+#endif // SIMULATOR
