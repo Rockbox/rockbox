@@ -49,6 +49,7 @@
 #include "viewer.h"
 #include "language.h"
 #include "screens.h"
+#include "keyboard.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -73,6 +74,7 @@ static int cursorpos[MAX_DIR_LEVELS];
 static char lastdir[MAX_PATH];
 static char lastfile[MAX_PATH];
 static char currdir[MAX_PATH];
+static bool reload_dir = false;
 
 void browse_root(void)
 {
@@ -203,7 +205,7 @@ static int showdir(char *path, int start)
 #endif
 
     /* new dir? cache it */
-    if (strncmp(path,lastdir,sizeof(lastdir))) {
+    if (strncmp(path,lastdir,sizeof(lastdir)) || reload_dir) {
         DIR *dir = opendir(path);
         if(!dir)
             return -1; /* not a directory */
@@ -455,36 +457,6 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
-static void show_queue_display(int queue_count, char *filename)
-{
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height(false);
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,0);
-#endif
-
-    lcd_clear_display();
-    if (queue_count > 0)
-    {
-        char s[32];
-
-        snprintf(s, sizeof(s), str(LANG_QUEUE_QUEUED), filename);
-        lcd_puts(0,0,s);
-
-        snprintf(s, sizeof(s), str(LANG_QUEUE_TOTAL), queue_count);
-        lcd_puts(0,1,s);
-    }
-    else
-    {
-        lcd_puts(0,0,str(LANG_QUEUE_FULL));
-    }
-    lcd_update();
-    sleep(HZ);
-    lcd_clear_display();
-}
-
 bool ask_resume(void)
 {
 #ifdef HAVE_LCD_CHARCELLS
@@ -649,20 +621,156 @@ void set_current_file(char *path)
     }
 }
 
-#ifdef HAVE_RECORDER_KEYPAD
-bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
+static int onplay_screen(char* dir, char* file)
 {
     bool exit = false;
     bool used = false;
+    bool playing = mpeg_status() & MPEG_STATUS_PLAY;
+    char buf[MAX_PATH];
+
+    if ((dir[0]=='/') && (dir[1]==0))
+        snprintf(buf, sizeof buf, "%s%s", dir, file);
+    else
+        snprintf(buf, sizeof buf, "%s/%s", dir, file);
+
+    lcd_stop_scroll();
+    lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+    {
+        int w,h;
+        char* ptr;
+
+        lcd_setfont(FONT_SYSFIXED);
+
+        if (playing) {
+            ptr = str(LANG_QUEUE);
+            lcd_getstringsize(ptr,&w,&h);
+            lcd_putsxy((LCD_WIDTH-w)/2, h*2, ptr);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Play],
+                       LCD_WIDTH/2 - 3, LCD_HEIGHT/2 - 4, 7, 8, true);
+        }
+
+        ptr = str(LANG_DELETE);
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h/2, ptr);
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+
+        lcd_putsxy(0, LCD_HEIGHT/2 - h/2, str(LANG_RENAME));
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+    }
+#else
+    lcd_puts(0,0,str(LANG_PLAYER_ONPLAY_1));
+    lcd_puts(0,1,str(LANG_PLAYER_ONPLAY_2));
+#endif
+    lcd_update();
+
     
+    while (!exit) {
+        switch (button_get(true)) {
+            case BUTTON_LEFT:
+            case BUTTON_ON | BUTTON_LEFT: {
+                char newname[MAX_PATH];
+                char* ptr = strrchr(buf, '/') + 1;
+                int pathlen = (ptr - buf);
+                strncpy(newname, buf, sizeof newname);
+                if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
+                    if (rename(buf, newname) < 0) {
+                        lcd_clear_display();
+                        lcd_puts(0,0,str(LANG_RENAME));
+                        lcd_puts(0,1,str(LANG_FAILED));
+                        lcd_update();
+                        sleep(HZ*2);
+                    }
+                    else
+                        reload_dir = true;
+                }
+                exit = true;
+                break;
+            }
+
+            case BUTTON_RIGHT:
+            case BUTTON_ON | BUTTON_RIGHT:
+                lcd_clear_display();
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_puts(0,0,file);
+                lcd_puts(0,1,str(LANG_REALLY_DELETE));
+#else
+                lcd_puts(0,0,str(LANG_REALLY_DELETE));
+                lcd_puts(0,1,file);
+                lcd_puts(0,3,str(LANG_RESUME_CONFIRM_RECORDER));
+                lcd_puts(0,4,str(LANG_RESUME_CANCEL_RECORDER));
+#endif
+                lcd_update();
+                while (!exit) {
+                    int btn = button_get(true);
+                    switch (btn) {
+                        case BUTTON_PLAY:
+                        case BUTTON_PLAY | BUTTON_REL:
+                            if (!remove(buf)) {
+                                reload_dir = true;
+                                lcd_clear_display();
+                                lcd_puts(0,0,file);
+                                lcd_puts(0,1,str(LANG_DELETED));
+                                lcd_update();
+                                sleep(HZ);
+                                exit = true;
+                                break;
+                            }
+
+                        default:
+                            /* ignore button releases */
+                            if (!(btn & BUTTON_REL))
+                                exit = true;
+                            break;
+                    }
+                }
+                break;
+
+            case BUTTON_PLAY:
+            case BUTTON_ON | BUTTON_PLAY: {
+                if (playing)
+                    queue_add(buf);
+                exit = true;
+                break;
+            }
+
+            case BUTTON_ON | BUTTON_REL:
+                used = true;
+                break;
+
+            case BUTTON_ON:
+                if (used)
+                    exit = true;
+                break;
+
+            case BUTTON_OFF:
+                exit = true;
+                break;
+        }
+    }
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_UI);
+#endif
+
+    return false;
+}
+
+static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
+{
+    bool exit = false;
+    bool used = false;
+
     int dirstart = *ds;
     int dircursor = *dc;
 
     while (!exit) {
         switch (button_get(true)) {
-            case BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
+            case TREE_PREV:
+            case BUTTON_ON | TREE_PREV:
+            case BUTTON_ON | TREE_PREV | BUTTON_REPEAT:
                 used = true;
                 if ( dirstart ) {
                     dirstart -= tree_max_on_screen;
@@ -673,9 +781,9 @@ bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
                     dircursor = 0;
                 break;
                 
-            case BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
+            case TREE_NEXT:
+            case BUTTON_ON | TREE_NEXT:
+            case BUTTON_ON | TREE_NEXT | BUTTON_REPEAT:
                 used = true;
                 if ( dirstart < numentries - tree_max_on_screen ) {
                     dirstart += tree_max_on_screen;
@@ -686,18 +794,22 @@ bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
                 else
                     dircursor = numentries - dirstart - 1;
                 break;
+
+
+            case BUTTON_PLAY:
+            case BUTTON_ON | BUTTON_PLAY:
+                onplay_screen(currdir, dircache[dircursor+dirstart].name);
+                exit = true;
+                used = true;
+                break;
                 
-#ifdef SIMULATOR
-            case BUTTON_ON:
-#else
             case BUTTON_ON | BUTTON_REL:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
-#endif
+            case BUTTON_ON | TREE_PREV | BUTTON_REL:
+            case BUTTON_ON | TREE_NEXT | BUTTON_REL:
                 exit = true;
                 break;
         }
-        if ( used ) {
+        if ( used && !exit ) {
             showdir(currdir, dirstart);
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
             lcd_update();
@@ -708,7 +820,6 @@ bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
 
     return used;
 }
-#endif
 
 static void storefile(char* filename, char* setting, int maxlen)
 {
@@ -814,10 +925,10 @@ bool dirbrowse(char *root)
                 break;
                 
 
-            case TREE_ENTER | BUTTON_REL:
+            case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_PLAY | BUTTON_REL:
+            case BUTTON_PLAY:
             case BUTTON_PLAY | BUTTON_REPEAT: 
 #endif
                 if ( !numentries )
@@ -838,7 +949,6 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     dirstart=0;
                 } else {
-                    static int repeat_count = 0;
                     int seed = current_tick;
                     bool play = false;
                     int start_index=0;
@@ -857,34 +967,18 @@ bool dirbrowse(char *root)
                             break;
 
                         case TREE_ATTR_MPA:
-                            if (button & BUTTON_REPEAT &&
-                                mpeg_status() & MPEG_STATUS_PLAY)
-                            {
-                                int queue_count = queue_add(buf);
-                                show_queue_display(queue_count,
-                                                   file->name);
-                                
-                                while( !(button_get(true) & BUTTON_REL) ) ;
-                                
-                                repeat_count = 0;
-                                restore = true;
-                            }
-                            else
-                            {
-                                repeat_count = 0;
-                                if ( global_settings.resume )
-                                    strncpy(global_settings.resume_file,
-                                            currdir, MAX_PATH);
-                                start_index =
-                                    build_playlist(dircursor+dirstart);
-                                
+                            if ( global_settings.resume )
+                                strncpy(global_settings.resume_file,
+                                        currdir, MAX_PATH);
+                            start_index =
+                                build_playlist(dircursor+dirstart);
+                            
                                 /* it is important that we get back the index
                                    in the (shuffled) list and store that */
-                                start_index = play_list(currdir, NULL,
-                                                        start_index, false,
-                                                        0, seed, 0, 0, -1);
-                                play = true;
-                            }
+                            start_index = play_list(currdir, NULL,
+                                                    start_index, false,
+                                                    0, seed, 0, 0, -1);
+                            play = true;
                             break;
 
                             /* wps config file */
@@ -1073,15 +1167,13 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_ON:
-#ifdef HAVE_RECORDER_KEYPAD
-                if (pageupdown(&dirstart, &dircursor, numentries, 
-                               tree_max_on_screen))
+                if (handle_on(&dirstart, &dircursor, numentries,
+                              tree_max_on_screen))
                 {
                     /* start scroll */
                     restore = true;
                 }
                 else
-#endif
                 {
                     if (mpeg_status() & MPEG_STATUS_PLAY)
                     {
@@ -1146,7 +1238,7 @@ bool dirbrowse(char *root)
             restore = true;
         }
 
-        if ( restore ) {
+        if (restore || reload_dir) {
             /* restore display */
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
@@ -1163,6 +1255,7 @@ bool dirbrowse(char *root)
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
             
             need_update = true;
+            reload_dir = false;
         }
 
         if ( numentries ) {

@@ -1247,3 +1247,42 @@ desc: Visual confirmation of changing a setting
 eng: "OK"
 new:
 
+id: LANG_PLAYER_ONPLAY_1
+desc: Line #1 of player ON+PLAY screen
+eng: "\x81 Queue"
+new:
+
+id: LANG_PLAYER_ONPLAY_2
+desc: Line #2 of player ON+PLAY screen
+eng: "- Ren + Del"
+new:
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+new:
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+new:
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+new:
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+new:
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+new:
+
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "failed"
+new: 
