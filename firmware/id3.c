@@ -396,6 +396,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     int freqindex;
     int frequency;
     int chmode;
+    int bytecount;
 
     long bpf;
     long tpf;
@@ -413,12 +414,18 @@ static int getsonglength(int fd, struct mp3entry *entry)
     }
 	
     /* Loop trough file until we find a frame header */
+    bytecount = 0;
  restart:
     do {
         header <<= 8;
         if(!read(fd, &tmp, 1))
             return -1;
         header |= tmp;
+
+        /* Quit if we haven't found a valid header within 128K */
+        bytecount++;
+        if(bytecount > 0x20000)
+            return -1;
     } while(!mp3frameheader(header));
 	
     /* 
@@ -444,7 +451,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
         version = 1;
         break;
     default:
-        return -1;
+        goto restart;
     }
 
     /* Layer */
@@ -459,20 +466,20 @@ static int getsonglength(int fd, struct mp3entry *entry)
         layer = 1;
         break;
     default:
-        return -1;
+        goto restart;
     }
 
     /* Bitrate */
     bitindex = (header & 0xF000) >> 12;
     bitrate = bitrate_table[version-1][layer-1][bitindex];
     if(bitrate == 0)
-        return -1;
+        goto restart;
 
     /* Sampling frequency */
     freqindex = (header & 0x0C00) >> 10;
     frequency = freqtab[version-1][freqindex];
     if(frequency == 0)
-        return -1;
+        goto restart;
 
 #ifdef DEBUG_VERBOSE
     DEBUGF( "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i, chmode %d\n", 
@@ -500,7 +507,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     }
 	
     /* Calculate time per frame */
-    tpf = bs[layer] / freqtab[version-1][freqindex] << (version - 1);
+    tpf = bs[layer] / (freqtab[version-1][freqindex] << (version - 1));
         
     /* OK, we have found a frame. Let's see if it has a Xing header */
     if(read(fd, frame, sizeof frame) < 0)
