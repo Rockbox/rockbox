@@ -100,10 +100,11 @@ void player_change_volume(int button)
         lcd_puts(2, 3, buffer);
         lcd_update();
 #endif
+        status_draw(false);
+
         if (!exit)
             button = button_get(true);
     }
-    status_draw(false);
     wps_refresh(id3,0, WPS_REFRESH_ALL);
 }
 #endif
