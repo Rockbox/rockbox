@@ -248,16 +248,15 @@ A32: In simple terms, the first release was called 1.0 because it had a basic
 
 Q33: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
-A33: The developers have discussed the possibility of a boot loader.  (Mainly
-     because having one sounds cool, and isn't Rolo just a great name?)
-     The idea would be that a user could use the load to choose between
-     different verions of Rockbox or the Archo firmware itself.  We have a 
-     working version of ROLO implimented for the players, and a version in 
-     development for the recorders.  However, at this time, the patch for ROLO
-     is not optimal for use and is not part of the main branch of the CVS.
-     Once this improves and has been tested sufficently, it will become part of
-     the main release.  Please check the mailing list logs and irc logs for 
-     more information.  
+A33: Rolo is our bootloader.  Currently it is only available in CVS and daily
+     builds, but will be standard in release 1.4.  It works by basically 
+     having a file with the same extension of the firmware (.ajz on Recorder, 
+     .mod on Player) 'run' from within Rockbox.  Just scroll to the firmware
+     you wish to switch to and press play.  
+
+     *Poof* You will reboot to that firmware.  (Note that in order to return
+     to Rockbox you may need to reboot manually if the new firmware you loaded
+     does not have a bootloader itself.)
 
 Q34: I was thinking about making the USB a bit more usable.  What are the
      chances of using the USB port to [play games / share files / list
@@ -356,4 +355,63 @@ A46: Well you can follow the full line of emails at
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
      
      There you have it.  Recommeded by users, decision by dictator.
+
+Q47: Why is there a limit of 400 files in a directory?
+A47: We have answered this question numerous times.  It is mentioned in the
+     release notes, and in the mailing list archives 
+     (http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-08/0448.shtml).
+     But, hey, we wouldn't want people to have to work to get an answer.  
+     (If you are reading this, feel proud, for you are the exception).
+
+     We settled on 400 files in a directory because file listings take up
+     memory on the unit, and we felt that 400 is significantly large enough 
+     for a majority of the populace.  We prefer the optiono of limiting 
+     file limits in order to provide a greater amount of memory for buffering 
+     of files being played.
+
+Q48: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
+     have this be dynamically allocated?
+A48: Because it's useless.  Dynamic memory is only ever useful if you have 
+     memory consumers (tasks) that run at different points in time, and thus 
+     can reuse the same memory for different purposes. 
+
+     We don't have that.  We must be able to show a big dir, index a big 
+     playlist and play a big mp3 file, all at the same time. They cannot use 
+     the same memory, and thus dynamic memory buys us nothing but extra 
+     complexity.  If we used dynamic memory for this, we would get all kinds 
+     of odd bugs. Playlists that only got half-loaded if placed in certain 
+     directories. Parts of the disk you couldn't go to if playing a certain 
+     playlist etc. 
+
+     We have a number of tasks that consume memory. They can all run at the 
+     same time, using all of their alotted memory. Therefore it is much better
+     to allocate that memory to them beforehand and not pretend that anyone 
+     else is able to use it. This is standard practice in memory-limited 
+     systems. 
+
+Q49: Why is there a 10,000 song limit on playlists?
+A49: This is another hardcoded limit.  We feel that as bigger disks arrive 
+     that this limit will increase.  Because of the way that playlists are
+     stored, it tends to be a bit more maleable then the directory file limit.
+     For further detail, look at questions 47 and 48 and replace any instances
+     of '200' with '10,000'.
+
+Q50: You don't understand! I _really_ need to have more then 400 files
+     in a directory!
+A50: Thats it.  I'm sending your email address to the guy that asked
+     question 25 and tell him that you are a developer.  If you don't want
+     that to happen either let happy coders code, find a better solution 
+     (this means impliment it, document it, and send us the patch), or 
+     try taking some time and organizing your files a bit better.  Just
+     because <insert your favorite file music stealing program here> puts
+     all your files in one directory does not mean you have to leave them
+     there!
+
+Q51: Can I ask one more question?
+A51: You just did.  Thank you for your time.  That completes your alotment of
+     stupid question for the year.  Please insert another 35 cents to
+     continue.   
+
+
+
 
