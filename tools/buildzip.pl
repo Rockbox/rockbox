@@ -46,6 +46,7 @@ sub buildzip {
     
     if($notplayer) {
         `cp ../apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
+        `cp ../apps/plugins/snake2.levels .rockbox/`; # snake2 levels
 
         mkdir ".rockbox/fonts", 0777;
 
