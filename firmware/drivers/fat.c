@@ -1122,7 +1122,7 @@ static int create_dos_name(unsigned char *name, unsigned char *newname)
     return 0;
 }
 
-static int update_file_size( struct fat_file* file, int size )
+static int update_short_entry( struct fat_file* file, int size, int attr )
 {
     unsigned char buf[SECTOR_SIZE];
     int sector = file->direntry / DIR_ENTRIES_PER_SECTOR;
@@ -1152,6 +1152,8 @@ static int update_file_size( struct fat_file* file, int size )
     if (!entry[0] || entry[0] == 0xe5)
         panicf("Updating size on empty dir entry %d\n", file->direntry);
         
+    entry[FATDIR_ATTR] = attr & 0xFF;
+
     clusptr = (short*)(entry + FATDIR_FSTCLUSHI);
     *clusptr = SWAB16(file->firstcluster >> 16);
     
@@ -1264,7 +1266,7 @@ int fat_truncate(struct fat_file *file)
     return 0;
 }
 
-int fat_closewrite(struct fat_file *file, int size)
+int fat_closewrite(struct fat_file *file, int size, int attr)
 {
     LDEBUGF("fat_closewrite(size=%d)\n",size);
 
@@ -1277,7 +1279,7 @@ int fat_closewrite(struct fat_file *file, int size)
     }
 
     if (file->dircluster)
-        if (update_file_size(file, size) < 0)
+        if (update_short_entry(file, size, attr) < 0)
             return -1;
 
     flush_fat();
@@ -1392,7 +1394,8 @@ int fat_remove(struct fat_file* file)
 
 int fat_rename(struct fat_file* file, 
                unsigned char* newname,
-               int size)
+               int size,
+               int attr)
 {
     int err;
     struct fat_dir dir;
@@ -1414,7 +1417,7 @@ int fat_rename(struct fat_file* file,
         return -3;
 
     /* write size and cluster link */
-    err = update_file_size(&newfile, size);
+    err = update_short_entry(&newfile, size, attr);
     if (err<0)
         return -4;
 

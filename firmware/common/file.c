@@ -40,6 +40,7 @@ struct filedesc {
     int cacheoffset;
     int fileoffset;
     int size;
+    int attr;
     struct fat_file fatfile;
     bool busy;
     bool write;
@@ -122,6 +123,7 @@ int open(const char* pathname, int flags)
                      &(file->fatfile),
                      &(dir->fatdir));
             file->size = entry->size;
+            file->attr = entry->attribute;
             break;
         }
     }
@@ -139,6 +141,7 @@ int open(const char* pathname, int flags)
                 return -5;
             }
             file->size = 0;
+            file->attr = 0;
         }
         else {
             DEBUGF("Couldn't find %s in %s\n",name,pathname);
@@ -190,7 +193,7 @@ int close(int fd)
         }
 
         /* tie up all loose ends */
-        if (fat_closewrite(&(file->fatfile), file->size) < 0)
+        if (fat_closewrite(&(file->fatfile), file->size, file->attr) < 0)
             return -3;
     }
     file->busy = false;
@@ -257,7 +260,7 @@ int rename(const char* path, const char* newpath)
         nameptr = (char*)newpath;
 
     file = &openfiles[fd];
-    rc = fat_rename(&file->fatfile, nameptr, file->size);
+    rc = fat_rename(&file->fatfile, nameptr, file->size, file->attr);
     if ( rc < 0 ) {
         DEBUGF("Failed renaming file: %d\n", rc);
         errno = EIO;
