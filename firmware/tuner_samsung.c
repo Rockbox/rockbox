@@ -96,9 +96,9 @@ int samsung_get(int setting)
             val = (val == 0x140885);
             break;
 
-        case RADIO_IF_MEASURED:
+        case RADIO_DEVIATION:
             val = fmradio_read(3);
-            val = (val & 0x7ffff) / 80; /* convert to kHz */
+            val = 10700 - ((val & 0x7ffff) / 8); /* convert to kHz */
             break;
 
         case RADIO_STEREO:

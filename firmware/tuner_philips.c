@@ -29,7 +29,6 @@ static unsigned char write_bytes[5];
 /* tuner abstraction layer: set something to the tuner */
 void philips_set(int setting, int value)
 {
-    (void)value;
     switch(setting)
     {
         case RADIO_INIT:
@@ -42,33 +41,31 @@ void philips_set(int setting, int value)
                 n = (4 * (value - 225000)) / 50000;
                 write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
                 write_bytes[1] = n & 0xFF;
-                fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             }
             break;
 
         case RADIO_MUTE:
             write_bytes[0] = (write_bytes[0] & 0x7F) | (value ? 0x80 : 0);
-            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
-            break;
-
-        case RADIO_IF_MEASUREMENT:
-            break;
-
-        case RADIO_SENSITIVITY:
             break;
 
         case RADIO_FORCE_MONO:
             write_bytes[2] = (write_bytes[2] & 0xF7) | (value ? 0x08 : 0);
             fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
+
+        case RADIO_IF_MEASUREMENT:
+        case RADIO_SENSITIVITY:
+        default:
+            return;
     }
+    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
 }
 
 /* tuner abstraction layer: read something from the tuner */
 int philips_get(int setting)
 {
     unsigned char read_bytes[5];
-    int val = -1;
+    int val = -1; /* default for unsupported query */
 
     fmradio_i2c_read(I2C_ADR, read_bytes, sizeof(read_bytes));
 
@@ -78,9 +75,9 @@ int philips_get(int setting)
             val = 1; /* true */
             break;
 
-        case RADIO_IF_MEASURED:
+        case RADIO_DEVIATION:
             val = read_bytes[2] & 0x7F;
-            val = 1070 + (val-55)/2;
+            val = 222 - val*4; /* convert to kHz */
             break;
 
         case RADIO_STEREO:

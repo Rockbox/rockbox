@@ -20,6 +20,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "sprintf.h"
 #include "lcd.h"
 #include "mas.h"
@@ -160,7 +161,7 @@ bool radio_screen(void)
     bool done = false;
     int button;
     int freq;
-    int i_freq;
+    int freq_diff;
     bool stereo = false;
     int search_dir = 0;
     int fw, fh;
@@ -254,10 +255,10 @@ bool radio_screen(void)
             sleep(1);
 
             /* Now check how close to the IF frequency we are */
-            i_freq = radio_get(RADIO_IF_MEASURED);
+            freq_diff = radio_get(RADIO_DEVIATION);
 
-            /* Stop searching if the IF frequency is close to 10.7MHz */
-            if(i_freq > 1065 && i_freq < 1075)
+            /* Stop searching if the tuning is close */
+            if(abs(freq_diff) < 50)
             {
                 search_dir = 0;
                 curr_preset = find_preset(curr_freq);

@@ -29,7 +29,7 @@
 #define RADIO_FORCE_MONO 5
 /* readback from the tuner layer */
 #define RADIO_PRESENT 0
-#define RADIO_IF_MEASURED 1
+#define RADIO_DEVIATION 1
 #define RADIO_STEREO 2
 
 #ifdef CONFIG_TUNER
