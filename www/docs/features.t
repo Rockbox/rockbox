@@ -128,7 +128,7 @@ YES
 EFEAT
 
 NAME Playlist Building ENAME
-NO
+YES
 YES
 EFEAT
 
