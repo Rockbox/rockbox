@@ -1,7 +1,15 @@
+FILES
 HACKING
 README
 common/*.[ch]
 win32/*.[ch]
+win32/makefile.vc6
+win32/uisw32.aps
+win32/makefile
+win32/uisw32.sln
+win32/uisw32.suo
+win32/UI.bmp
+win32/uisw32.vcproj
 x11/*.[ch]
 x11/Makefile
 x11/archos/rockbox112.bmp
