@@ -1185,6 +1185,10 @@ static bool battery_settings_menu(void)
 #endif
 #ifndef SIMULATOR
         { STR(LANG_BATTERY_CAPACITY), battery_capacity },
+#else
+#ifndef HAVE_CHARGE_CTRL
+        { "Dummy", -1, NULL }, /* to have an entry at all, in the simulator */
+#endif
 #endif
     };
 
