@@ -425,6 +425,7 @@ void settings_apply(void)
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
+    ata_poweroff(global_settings.disk_poweroff);
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? 
