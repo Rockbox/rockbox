@@ -55,6 +55,7 @@
 #include "powermgmt.h"
 #include "sprintf.h"
 #include "keyboard.h"
+#include "version.h"
 
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
@@ -1110,7 +1111,7 @@ bool settings_save_config(void)
         return false;
     }
 
-    fprintf(fd, "# >>> .cfg file created by rockbox <<<\r\n");
+    fprintf(fd, "# >>> .cfg file created by rockbox %s <<<\r\n", appsversion);
     fprintf(fd, "# >>>    http://rockbox.haxx.se    <<<\r\n#\r\n");
     fprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
 
