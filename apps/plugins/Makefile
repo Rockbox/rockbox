@@ -58,8 +58,13 @@ $(OBJDIR)/%.o: %.c  ../plugin.h Makefile
 	@echo "CC $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+ifeq ($(ANYONDIO), ONDIO)
+all:
+	@echo "no plugin support yet"
+else
 all: $(OBJDIR)/libplugin.a $(ROCKS)
 	@echo "plugins done"
+endif
 
 $(OBJDIR)/libplugin.a:
 	@echo "MAKE in lib"
