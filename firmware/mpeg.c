@@ -41,6 +41,7 @@
 
 extern char* peek_next_track(int type);
 
+#ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
 {
     0,
@@ -80,6 +81,7 @@ static unsigned int treble_table[] =
     0x58400, /* 14dB */
     0x5f800  /* 15dB */
 };
+#endif
 
 static unsigned char fliptable[] =
 {
@@ -159,8 +161,8 @@ static void mas_poll_start(int interval_in_ms)
     GRA1 = count;
     TCR1 = 0x23; /* Clear at GRA match, sysclock/8 */
 
-    /* Enable interrupt on level 2 */
-    IPRC = (IPRC & ~0x000f) | 0x0002;
+    /* Enable interrupt on level 5 */
+    IPRC = (IPRC & ~0x000f) | 0x0005;
     
     TSR1 &= ~0x02;
     TIER1 = 0xf9; /* Enable GRA match interrupt */
@@ -492,132 +494,123 @@ static void setup_sci0(void)
 
 void mpeg_play(char* trackname)
 {
-#ifdef ARCHOS_RECORDER
-    DEBUGF("mpeg_play(%s)\n", trackname);
-    return;
-#endif
-    
     queue_post(&mpeg_queue, MPEG_PLAY, trackname);
 }
 
 void mpeg_stop(void)
 {
-#ifdef ARCHOS_RECORDER
-    DEBUGF("mpeg_stop()\n");
-    return;
-#endif
-    
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
 }
 
 void mpeg_pause(void)
 {
-#ifdef ARCHOS_RECORDER
-    return;
-#endif
-    
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
 }
 
 void mpeg_resume(void)
 {
-#ifdef ARCHOS_RECORDER
-    return;
-#endif
-    
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
 }
 
 void mpeg_volume(int percent)
 {
-#ifdef ARCHOS_RECORDER
-    return;
-#endif
+    int volume;
     
-    int volume = 0x38 * percent / 100;
+#ifdef ARCHOS_RECORDER
+    volume = 0x7f00 * percent / 100;
+    mas_codec_writereg(0x10, volume & 0xff00);
+#else
+    volume = 0x38 * percent / 100;
     dac_volume(volume);
+#endif
 }
 
 void mpeg_bass(int percent)
 {
-#ifdef ARCHOS_RECORDER
-    return;
-#endif
+    int bass;
     
-    int bass = 15 * percent / 100;
+#ifdef ARCHOS_RECORDER
+    bass = 0x6000 * percent / 100;
+    mas_codec_writereg(0x14, bass & 0xff00);
+#else    
+    bass = 15 * percent / 100;
     mas_writereg(MAS_REG_KBASS, bass_table[bass]);
+#endif
 }
 
 void mpeg_treble(int percent)
 {
+    int treble;
+
 #ifdef ARCHOS_RECORDER
-    return;
-#endif
-    
-    int treble = 15 * percent / 100;
+    treble = 0x6000 * percent / 100;
+    mas_codec_writereg(0x15, treble & 0xff00);
+#else    
+    treble = 15 * percent / 100;
     mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
+#endif
 }
 
 void mpeg_init(void)
 {
     int rc;
+    unsigned long val;
 
     setup_sci0();
     i2c_init();
 
 #ifdef ARCHOS_RECORDER
-    return;
+    /* Reset the MAS */
+    PAIOR |= 0x100;
+    PADR &= ~0x100;
+    sleep(HZ/100);
+    PADR |= 0x100;
+    sleep(HZ/10);
+
+    /* Enable the audio CODEC and the DSP core, max analog voltage range */
+    mas_direct_config_write(MAS_CONTROL, 0x8c00);
+
+    /* Max volume on both ears */
+    val = 0x80000;
+    mas_writemem(MAS_BANK_D0,0x7fc,&val,1);
+    mas_writemem(MAS_BANK_D0,0x7ff,&val,1);
+
+    /* Enable the D/A Converter */
+    mas_codec_writereg(0x0, 0x0001);
+
+    /* DSP scale 100% */
+    rc = mas_codec_writereg(7, 0x4000);
+
+    /* Disable S/PDIF, SDO and SDI */
+    val = 0x2d;
+    mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
+
+    /* Set Demand mode and validate all settings */
+    val = 0x25;
+    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+
+    /* Start the Layer2/3 decoder applications */
+    val = 0x0c;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
 #endif
     
-#ifdef DEBUG
-    {
-        unsigned char buf[32];
-        unsigned char str[32];
-        int i;
-
-        rc = mas_readmem(MAS_BANK_D1,0xff6,(unsigned long*)buf,2);
-        if (rc)
-            panicf("Error - mas_readmem(0xff6) returned %d\n", rc);
-
-        i = buf[0] | buf[1] << 8;
-        DEBUGF("MAS version: %x\n", i);
-        i = buf[4] | buf[5] << 8;
-        DEBUGF("MAS revision: %x\n", i);
-
-        rc = mas_readmem(MAS_BANK_D1,0xff9,(unsigned long*)buf,7);
-        if (rc)
-            panicf("Error - mas_readmem(0xff9) returned %d\n", rc);
-
-        for (i = 0;i < 7;i++) {
-            str[i*2+1] = buf[i*4];
-            str[i*2] = buf[i*4+1];
-        }
-        str[i*2] = 0;
-        DEBUGF("Description: %s\n", str);
-    }
-#endif
-
-    rc = mas_writereg(0x3b, 0x20);
-    if (rc < 0)
-        panicf("Error - mas_writereg(0x3b) returned %d\n", rc);
-
-    rc = mas_run(1);
-    if (rc < 0)
-        panicf("Error - mas_run(1) returned %d\n", rc);
-
-    queue_init(&mpeg_queue);
-    create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
-    mas_poll_start(2);
-
+#ifdef ARCHOS_RECORDER
+#else
+    mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
+    mas_run(1);
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
+
+    dac_config(0x04); /* DAC on, all else off */
+#endif
+    
+    mpeg_bass(DEFAULT_BASS_SETTING);
+    mpeg_treble(DEFAULT_TREBLE_SETTING);
+    mpeg_volume(DEFAULT_VOLUME_SETTING);
 
     mp3buflen = mp3end - mp3buf;
 
-    if(dac_config(0x04) < 0) {
-        DEBUGF("dac_config() failed\n");
-    }
+    queue_init(&mpeg_queue);
+    create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
 
-    mpeg_volume(DEFAULT_VOLUME_SETTING);
-    mpeg_bass(DEFAULT_BASS_SETTING);
-    mpeg_treble(DEFAULT_TREBLE_SETTING);
+    mas_poll_start(2);
 }
