@@ -354,7 +354,7 @@ void lcd_clear_display(void)
         lcd_write(false,lcd_ascii[' ']);
 }
 
-void lcd_puts(int x, int y, char *string)
+void lcd_puts(int x, int y, unsigned char *string)
 {
     lcd_write(true,LCD_CURSOR(x,y));
     while (*string && x++<11)
