@@ -60,7 +60,7 @@
 
 #define SCROLL_SPACING 3
 
-#define SCROLLABLE_LINES 13
+#define SCROLLABLE_LINES 26
 
 struct scrollinfo {
     char line[MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2];
