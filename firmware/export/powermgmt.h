@@ -57,12 +57,13 @@
 #ifndef SIMULATOR
 
 #ifdef HAVE_CHARGE_CTRL
+#define START_TOPOFF_CHG    85  /* Battery % to start at top-off */
+#define START_TRICKLE_CHG   95  /* Battery % to start at trickle */
+
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
 #define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
                                  /* actual max time depends also on BATTERY_CAPACITY! */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define CHARGE_RESTART    85     /* %: when to restart charging in 'charge' mode */
-                                 /* attention: if set too high, normal charging is started in trickle mode */
 #define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
 #define TOPOFF_VOLTAGE    565    /* which voltage is best? (centivolts) */
 #define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
@@ -70,6 +71,9 @@
 
 #define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
 #define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
+
+#define PID_PCONST          2   /* PID proportional constant */
+#define PID_DEADZONE        2   /* PID proportional deadzone */
 
 extern char power_message[POWER_MESSAGE_LEN];
 
@@ -79,6 +83,8 @@ extern int short_delta;         /* short term delta battery voltage */
 extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
 extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
 
+extern int pid_p;                /* PID proportional term */
+extern int pid_i;                /* PID integral term */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
 #endif /* HAVE_CHARGE_CTRL */

@@ -1247,9 +1247,10 @@ bool view_battery(void)
                 lcd_puts(0, 3, buf);
 #endif
 #ifdef HAVE_CHARGE_CTRL
-                snprintf(buf, 30, "Charging: %s", 
-                         charger_enabled ? "yes" : "no");
-                lcd_puts(0, 4, buf);
+                snprintf(buf, 30, "Chgr: %s %s", 
+                         charger_inserted() ? "present" : "absent",
+                         charger_enabled ? "on" : "off");
+                lcd_puts(0, 3, buf);
                 snprintf(buf, 30, "short delta: %d", short_delta);
                 lcd_puts(0, 5, buf);
                 snprintf(buf, 30, "long delta: %d", long_delta);
@@ -1271,7 +1272,7 @@ bool view_battery(void)
                 }
                 break;
 
-            case 3: /* remeining time estimation: */
+            case 3: /* remaining time estimation: */
                 lcd_clear_display();
 
 #ifdef HAVE_CHARGE_CTRL
@@ -1283,23 +1284,24 @@ bool view_battery(void)
 
                 snprintf(buf, 30, "Lvl@cyc st: %d%%", powermgmt_last_cycle_level);
                 lcd_puts(0, 2, buf);
+
+                snprintf(buf, 30, "P=%2d I=%2d", pid_p, pid_i);
+                lcd_puts(0, 3, buf);
+
+                snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
+                lcd_puts(0, 4, buf);
 #endif
 
                 snprintf(buf, 30, "Last PwrHist: %d.%02d V",
                     power_history[0] / 100,
                     power_history[0] % 100);
-                lcd_puts(0, 3, buf);
-
-                snprintf(buf, 30, "battery level: %d%%", battery_level());
                 lcd_puts(0, 5, buf);
 
-                snprintf(buf, 30, "Est. remain: %d m", battery_time());
+                snprintf(buf, 30, "battery level: %d%%", battery_level());
                 lcd_puts(0, 6, buf);
 
-#ifdef HAVE_CHARGE_CTRL
-                snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
+                snprintf(buf, 30, "Est. remain: %d m", battery_time());
                 lcd_puts(0, 7, buf);
-#endif                
                 break;
         }
         
