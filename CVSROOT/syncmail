@@ -49,6 +49,9 @@ Use <path> as the environment variable CVSROOT.  Otherwise this
     -u
         Produce a unified diff (smaller, but harder to read).
 
+    -U user
+        Mark diff as made by user.
+
     <%%S>
 CVS %%s loginfo expansion.  When invoked by CVS, this will be a single
         string containing the directory the checkin is being made in, relative
@@ -174,6 +177,8 @@ def main():
                 contextlines = 2
         elif opt == '-u':
             contextlines = 0
+        elif opt == '-U':
+            username = arg
 
     # What follows is the specification containing the files that were
     # modified.  The argument actually must be split, with the first component
@@ -198,8 +203,8 @@ def main():
         return
     if specs[-3:] == ['-', 'New', 'directory']:
         del specs[-3:]
-    print 'Generating notification message...'
-    blast_mail(mailcmd, specs[1:], contextlines)
+    print '%s generating notification message...' % username
+    # blast_mail(mailcmd, specs[1:], contextlines)
     print 'Generating notification message... done.'
 
 
