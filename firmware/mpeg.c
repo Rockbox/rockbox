@@ -35,7 +35,7 @@
 #include "file.h"
 #endif
 
-extern void bitswap(unsigned short *data, int length);
+extern void bitswap(unsigned char *data, int length);
 
 #define MPEG_CHUNKSIZE  0x180000
 #define MPEG_SWAP_CHUNKSIZE  0x8000
@@ -465,8 +465,29 @@ static void mas_poll_start(int interval_in_ms)
     TSR1 &= ~0x02;
     TIER1 = 0xf9; /* Enable GRA match interrupt */
 
-    TSTR |= 0x02; /* Start timer 2 */
+    TSTR |= 0x02; /* Start timer 1 */
 }
+
+#ifdef DEBUG
+static void dbg_timer_start(void)
+{
+    /* We are using timer 2 */
+    
+    TSTR &= ~0x04; /* Stop the timer */
+    TSNC &= ~0x04; /* No synchronization */
+    TMDR &= ~0x44; /* Operate normally */
+
+    TCNT1 = 0;   /* Start counting at 0 */
+    TCR1 = 0x03; /* Sysclock/8 */
+
+    TSTR |= 0x04; /* Start timer 2 */
+}
+
+static int dbg_cnt2us(unsigned int cnt)
+{
+    return (cnt * 10000) / (FREQ/800);
+}
+#endif
 
 static int get_unplayed_space(void)
 {
@@ -704,7 +725,7 @@ static int new_file(int steps)
             }
             else
             {
-                /* skip past id3v2 tag (to an even byte) */
+                /* skip past id3v2 tag */
                 lseek(mpeg_file, 
                       id3tags[new_tag_idx]->id3.id3v2len,
                       SEEK_SET);
@@ -827,9 +848,9 @@ static void mpeg_thread(void)
                     set_elapsed(id3);
                 }
                 else {
-                    /* skip past id3v2 tag (to an even byte) */
+                    /* skip past id3v2 tag */
                     lseek(mpeg_file, 
-                          id3tags[tag_read_idx]->id3.id3v2len & ~1, 
+                          id3tags[tag_read_idx]->id3.id3v2len, 
                           SEEK_SET);
 
                 }
@@ -1046,8 +1067,6 @@ static void mpeg_thread(void)
                     newpos = id3->id3v2len;
                 }
 
-                newpos = newpos & ~1;
-
                 if (mpeg_file >= 0)
                     curpos = lseek(mpeg_file, 0, SEEK_CUR);
                 else
@@ -1196,8 +1215,7 @@ static void mpeg_thread(void)
                 
                 DEBUGF("B %x\n", amount_to_swap);
                 t1 = current_tick;
-                bitswap((unsigned short *)(mp3buf + mp3buf_swapwrite),
-                        (amount_to_swap+1)/2);
+                bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
                 t2 = current_tick;
                 DEBUGF("time: %d\n", t2 - t1);
 
@@ -2054,6 +2072,10 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);
+
+#ifdef DEBUG
+    dbg_timer_start();
+#endif
 }
 
 /* -----------------------------------------------------------------
