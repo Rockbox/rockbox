@@ -353,14 +353,11 @@ int menu_show(int m)
                 return menus[m].cursor;
 
             case MENU_EXIT:
-            case MENU_EXIT | BUTTON_REPEAT:
 #ifdef MENU_EXIT2
             case MENU_EXIT2:
-            case MENU_EXIT2 | BUTTON_REPEAT:
 #endif
 #ifdef MENU_EXIT3
             case MENU_EXIT3:
-            case MENU_EXIT3 | BUTTON_REPEAT:
 #endif
                 lcd_stop_scroll();
                 exit = true;
