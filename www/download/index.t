@@ -73,7 +73,7 @@
 
 <h2>Manual</h2>
 
-<p>We have a very nice <a href="/manual/manual.pdf">manual in PDF format</a>, written by Christi Scarborough. It's updated with all the 2.3 features and since not a whole lot has changed interface wise in 2.4, it is still very useful. Please read it. Check out the <a href="/docs/">documentation</a> page for further info.
+<p>We have a very nice <a href="/twiki/bin/view/Main/RockboxManual">manual</a> written by Christi Scarborough. Please read it. Check out the <a href="/docs/">documentation</a> page for further info.
 
 <h2>Bug reports</h2>
 
