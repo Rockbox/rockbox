@@ -819,6 +819,12 @@ int wps_show(void)
                     case 1:
                         /* was on_screen used? */
                         restore = true;
+
+                        /* pause may have been turned off by pitch screen */
+                        if (paused && !(mpeg_status() & MPEG_STATUS_PAUSE)) {
+                            paused = false;
+                            status_set_playmode(STATUS_PLAY);
+                        }
                         break;
 
                     case 0:
