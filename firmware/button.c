@@ -21,12 +21,10 @@
  */
 
 #include "config.h"
-
-#ifdef HAVE_RECORDER_KEYPAD
-
-#include "types.h"
 #include "sh7034.h"
 #include "button.h"
+
+#ifdef HAVE_RECORDER_KEYPAD
 
 /* AJBR buttons are connected to the CPU as follows:
  *
@@ -148,7 +146,49 @@ int button_get(void)
     return ret;
 }
 
-#endif /* HAVE_RECORDER_KEYPAD */
+#elif HAVE_PLAYER_KEYPAD
+
+/* The player has all buttons on port pins:
+
+   LEFT:  PC0
+   RIGHT: PC2
+   PLAY:  PC3
+   STOP:  PA11
+   ON:    PA5
+   MENU:  PC1
+*/
+
+void button_init(void)
+{
+    /* set port pins as input */
+    PAIOR &= ~0x820;
+}
+
+int button_get(void)
+{
+    int porta = PADR;
+    int portc = PCDR;
+    int btn = 0;
+    
+    if ( portc & 1 )
+        btn |= BUTTON_LEFT;
+    if ( portc & 2 )
+        btn |= BUTTON_MENU;
+    if ( portc & 4 )
+        btn |= BUTTON_RIGHT;
+    if ( portc & 8 )
+        btn |= BUTTON_PLAY | BUTTON_UP;
+    if ( porta & 0x20 )
+        btn |= BUTTON_ON;
+    if ( porta & 0x800 )
+        btn |= BUTTON_STOP | BUTTON_DOWN;
+
+    return btn;
+}
+
+#endif
+
+
 
 /* -----------------------------------------------------------------
  * local variables:
