@@ -527,7 +527,7 @@ void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 void lcd_putspropxy(int x, int y, char *str, int thisfont)
 {
     int ch;
-    int nx;
+    int nx = char_dw_8x8_prop[*str][8] >> 4;
     int ny=8;
     unsigned char *src;
     int lcd_x = x;
