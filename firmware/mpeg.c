@@ -943,7 +943,7 @@ static void mpeg_thread(void)
 
                 diffpos = curpos - newpos;
 
-                if(diffpos >= 0 && diffpos < mp3buflen)
+                if(!filling && diffpos >= 0 && diffpos < mp3buflen)
                 {
                     /* We are changing to a position that's already in
                        memory */
