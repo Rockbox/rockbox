@@ -430,7 +430,7 @@ bool dbg_ports(void)
         lcd_puts(0, 7, buf);
 	
         lcd_update();
-        button = button_get(HZ/10);
+        button = button_get_w_tmo(HZ/10);
 
         switch(button)
         {
