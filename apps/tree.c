@@ -333,8 +333,11 @@ static int showdir(char *path, int start)
                        CURSOR_X * 6 + CURSOR_WIDTH, 
                        MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #else
-        lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
-        lcd_putc(LINE_X-1, i-start, i-start);
+        if(icon_type!=0)
+        {
+            lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
+            lcd_putc(LINE_X-1, i-start, i-start);
+        }
 #endif
 
         /* if MP3 filter is on, cut off the extension */
