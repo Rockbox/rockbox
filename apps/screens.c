@@ -51,6 +51,8 @@ int on_screen(void)
     bool exit = false;
     bool used = false;
 
+    lcd_setfont(FONT_SYSFIXED);
+
     while (!exit) {
 
         if ( used ) {
@@ -148,6 +150,8 @@ int on_screen(void)
         }
     }
 
+    lcd_setfont(FONT_UI);
+
     if ( used )
         return 1;
     else
@@ -164,6 +168,7 @@ bool f2_screen(void)
     /* Get the font height */
     lcd_getstringsize("A",&w,&h);
 
+    lcd_setfont(FONT_SYSFIXED);
     lcd_stop_scroll();
 
     while (!exit) {
@@ -241,6 +246,7 @@ bool f2_screen(void)
     }
 
     settings_save();
+    lcd_setfont(FONT_UI);
 
     return false;
 }
@@ -251,6 +257,7 @@ bool f3_screen(void)
     bool used = false;
 
     lcd_stop_scroll();
+    lcd_setfont(FONT_SYSFIXED);
 
     while (!exit) {
         int w,h;
@@ -309,6 +316,7 @@ bool f3_screen(void)
         lcd_setmargins(0, STATUSBAR_HEIGHT);
     else
         lcd_setmargins(0, 0);
+    lcd_setfont(FONT_UI);
 
     return false;
 }
