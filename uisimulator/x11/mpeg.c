@@ -40,6 +40,14 @@ void mpeg_stop(void)
 {
 }
 
+void mpeg_prev(void)
+{
+}
+
+void mpeg_next(void)
+{
+}
+
 #ifndef MPEGPLAY
 void mpeg_play(char *tune)
 {
