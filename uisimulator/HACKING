@@ -18,20 +18,29 @@ Terminology
 
 1. Get Sources
 
-  The the very latest sources off the CVS server. Get the 'firmware' dir and
-  the 'uisimulator' dir on the same dir level, to make it easier to build
-  things (some of the files assume this hierarchy).
+  The the very latest sources off the CVS server. Get the 'tools' dir,
+  'firmware' dir, the 'apps' dir and the 'uisimulator' dir on the same dir
+  level, to make it easier to build things (some of the files assume this
+  hierarchy).
 
   All CVS details can be found here: http://bjorn.haxx.se/rockbox/cvs.html
 
 2. Build Uisimulator
 
-  For the X11 simulator, change directory to uisimulator/x11.
- 
-  Edit the "DISPLAY" variable in the Makefile to match the target LCD you want
-  to build the simulator for.
+  For the X11 simulator:
 
-  Run 'make'.
+    (This has been compiled and run on at least Solaris and Linux. It should
+    work on other unixes too but we haven't tried any other yet.)
+
+    Create a new directory and run the 'tools/configure'
+    script. Select target to simulate and select simulation. The script will
+    then generate a Makefile for you.
+ 
+    Run 'make'.
+
+  For the Win32 simulator:
+
+    No info yet.
 
 3. Run Uisimulator
 
