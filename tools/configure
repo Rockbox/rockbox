@@ -17,22 +17,43 @@ input() {
 }
 
 simul () {
+
+if [ -z "$simver" ]; then
+
+  ##################################################################
+  # Figure out win32/x11 GUI
+  #
+  echo ""
+  echo "Build (W)in32 or  (X)11 GUI version? (X)"
+
+  option=`input`;
+
+  case $option in
+   [Ww])
+     simver="win32"
+     ;;
+   *)
+     simver="x11"
+     ;;
+   esac
+fi
+
  ##################################################################
  # Figure out where the firmware code is!
  #
 
- simfile="x11/lcd-x11.c" # a file to check for in the uisimulator root dir
+ simfile="$simver/lcd-$simver.c" # a file to check for in the uisimulator root dir
 
  for dir in uisimulator . .. ../uisimulator ../../uisimulator; do
    if [ -f "$dir/$simfile" ]; then
-     simdir="$dir/x11"
+     simdir="$dir/$simver"
      break
    fi
  done
 
  if [ -z "$simdir" ]; then
-   echo "This script couldn't find your uisimulator/x11 directory. Please enter the"
-   echo "full path to your uisimulator/x11 directory here:"
+   echo "This script couldn't find your uisimulator/$simver directory. Please enter the"
+   echo "full path to your uisimulator/$simver directory here:"
 
    simdir=`input`
  fi
@@ -44,6 +65,7 @@ sed > Makefile \
  -e "s,@DISPLAY@,${display},g" \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
+ -e "s,@SIMVER@,${simver},g" \
 <<EOF 
 ## Automaticly generated. http://bjorn.haxx.se/rockbox/
 
@@ -53,6 +75,7 @@ TARGET=@TARGET@
 DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
+SIMVER=@SIMVER@
 VERSION=\$(shell date +%y%m%d-%H%M)
 
 .PHONY: 
@@ -103,6 +126,7 @@ if [ "$target" = "update" ]; then
         simulator="yes"
         display=`grep "^DISPLAY=" Makefile | cut -d= -f2-`
         keypad=`grep "^KEYPAD=" Makefile | cut -d= -f2-`
+        simver=`grep "^SIMVER=" Makefile | cut -d= -f2-`
       fi
     fi
   fi
