@@ -37,6 +37,11 @@ static struct event_queue backlight_queue;
 static int backlight_timer;
 static int backlight_timeout = 5;
 
+static char timeout_value[19] =
+{
+    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
+};
+
 void backlight_thread(void)
 {
     struct event ev;
@@ -47,8 +52,17 @@ void backlight_thread(void)
         switch(ev.id)
         {
             case BACKLIGHT_ON:
-                backlight_timer = HZ*backlight_timeout;
-                if(backlight_timer)
+                backlight_timer = HZ*timeout_value[backlight_timeout];
+                if(backlight_timer < 0)
+                {
+#ifdef HAVE_RTC
+                    /* Disable square wave */
+                    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
+#else
+                    PADR |= 0x4000;
+#endif  
+                }
+                else if(backlight_timer)
                 {
 #ifdef HAVE_RTC
                     /* Enable square wave */
@@ -65,7 +79,7 @@ void backlight_thread(void)
                 rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
                 PADR |= 0x4000;
-#endif                
+#endif
                 break;
                 
             case SYS_USB_CONNECTED:
@@ -91,9 +105,9 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
-void backlight_time(int seconds)
+void backlight_time(int value)
 {
-    backlight_timeout = seconds;
+    backlight_timeout = value;
     backlight_on();
 }
 

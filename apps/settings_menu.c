@@ -59,9 +59,13 @@ static void sort_case(void)
 
 static void backlight_timer(void)
 {
-    set_int( "[Backlight]", "s", &global_settings.backlight, 
-             backlight_time, 1, 0, 60 );
-    backlight_on();
+    char* names[] = { "off", "on ",
+                      "1s ", "2s ", "3s ", "4s ", "5s ",
+                      "6s ", "7s ", "8s ", "9s ", "10s",
+                      "15s", "20s", "25s", "30s", "45s",
+                      "60s", "90s"};
+    set_option("[Backlight]", &global_settings.backlight, names, 19 );
+    backlight_time(global_settings.backlight);
 }
 
 static void scroll_speed(void)
