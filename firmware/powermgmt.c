@@ -42,7 +42,7 @@
 
 int battery_level(void)
 {
-    return 100;
+    return 75;
 }
 
 int battery_time(void)
@@ -52,7 +52,7 @@ int battery_time(void)
 
 bool battery_level_safe(void)
 {
-    return true;
+    return battery_level() >= 10;
 }
 
 void set_poweroff_timeout(int timeout)
