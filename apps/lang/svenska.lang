@@ -2758,3 +2758,34 @@ desc: in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new: "Superbas"
+
+id: LANG_CONFIRM_SHUTDOWN
+desc: in shutdown screen
+eng: "Press OFF to shut down"
+new: "Tryck på AV för att avsluta"
+
+id: LANG_ID3_ORDER
+desc: in playback settings screen
+eng: "ID3 tag priority"
+new: "ID3-tag-prioritet"
+
+id: LANG_ID3_V1_FIRST
+desc: in playback settings screen
+eng: "V1 then V2"
+new: "V1 följt av V2"
+
+id: LANG_ID3_V2_FIRST
+desc: in playback settings screen
+eng: "V2 then V1"
+new: "V2 följt av V1"
+
+id: LANG_SHUTDOWN
+desc: in main menu
+eng: "Shut down"
+new: "Avsluta"
+
+id: LANG_SHUTTINGDOWN
+desc: in main menu
+eng: "Shutting down..."
+new: "Avslutar..."
+
