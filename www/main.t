@@ -10,7 +10,7 @@
 <a href="http://bjorn.haxx.se/rockbox/mail.cgi">mail list archive</a> &middot;
 <a href="irc/">irc logs</a> &middot;
 <a href="tools.html">tools</a> &middot;
-<a href="internals/">archos internals</a> &middot;
+<a href="internals/">photos</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a> &middot;
 <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">browse cvs</a>
 </small>
@@ -38,7 +38,7 @@ Try them on your own risk. If you are not 100% sure of what you are doing, keep 
 <a href="docs/FAQ">faq</a>,
 <a href="irc/">irc logs</a>,
 <a href="tools.html">tools</a> and
-<a href="internals/">archos internals</a>.
+<a href="internals/">photos</a>.
 
 <p><i>2002-03-25</i>: New section for
 <a href="mods/">hardware modifications</a>.

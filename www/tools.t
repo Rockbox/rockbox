@@ -40,4 +40,7 @@
 <a href="http://www.sh-linux.org/rpm/RPMS/i386/RedHat7.1/">
 pre-cooked RH7.1 RPMs</a> available from sh-linux.org
 
+<p>Felix Arends has written a page about
+<a href="sh-win/">setting up an SH-1 compiler for Windows</a>.
+
 #include "foot.t"

@@ -38,7 +38,7 @@ The GCC configuration script finds the newlib and libgloss files if they are in 
  /home/linus/gcc-3.0.3> ln -s ../newlib-1.10.0/newlib .
  /home/linus/gcc-3.0.3> ln -s ../newlib-1.10.0/libgloss .
 </pre>
-<h2>Make up your mind</h2>
+<h2>Choose location</h2>
 <p>
 Now is the time to decide where you want the tools to be installed. This is
 the directory where all binaries, libraries, man pages and stuff end up when
