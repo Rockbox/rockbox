@@ -21,6 +21,7 @@
     </th>
     <th valign=top>
      <a href=fmrecorder.jpg><img src=fmrecorder_t.jpg></a><br>V2 Recorder
+     <a href=#footnote4>(4)</a>
     </th>
 </tr>
 <tr><th><b>USB</b></th>
@@ -197,6 +198,9 @@
  <br>
  <a name=footnote3></a><i>(3) The early V2 models were in fact FM
    Recorders in disguise, so they had the FM radio still mounted.</i>
+ <br>
+ <a name=footnote4></a><i>(4) The picture shows an FM Recorder, but
+   they look exactly the same, apart from the printed text.</i>
 
 
 #include "foot.t"
