@@ -29,7 +29,6 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
-    bool vbr;
     unsigned int bitrate;
     unsigned int frequency;
     unsigned int id3v2len;
@@ -37,11 +36,22 @@ struct mp3entry {
     unsigned int filesize; /* in bytes */
     unsigned int length;   /* song length */
     unsigned int elapsed;  /* ms played */
+    long bpf;              /* bytes per frame */
+    long tpf;              /* time per frame */
+
+    /* Xing VBR fields */
+    bool vbr;
+    unsigned char vbrflags;
+    unsigned char toc[100];/* table of contents */
 
     /* these following two fields are used for local buffering */
     char id3v2buf[300];
     char id3v1buf[3][32];
 };
+
+#define VBR_FRAMES_FLAG 0x01
+#define VBR_BYTES_FLAG  0x02
+#define VBR_TOC_FLAG    0x04
 
 bool mp3info(struct mp3entry *entry, char *filename);
 

@@ -383,7 +383,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     unsigned int filetime = 0;
     unsigned long header=0;
     unsigned char tmp;
-    unsigned char frame[64];
+    unsigned char frame[156];
     unsigned char* xing;
     
     int version;
@@ -412,7 +412,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 	
     /* Loop trough file until we find a frame header */
     bytecount = 0;
- restart:
+  restart:
     do {
         header <<= 8;
         if(!read(fd, &tmp, 1))
@@ -441,29 +441,29 @@ static int getsonglength(int fd, struct mp3entry *entry)
 #endif
     /* MPEG Audio Version */
     switch((header & 0x180000) >> 19) {
-    case 2:
-        version = 2;
-        break;
-    case 3:
-        version = 1;
-        break;
-    default:
-        goto restart;
+        case 2:
+            version = 2;
+            break;
+        case 3:
+            version = 1;
+            break;
+        default:
+            goto restart;
     }
 
     /* Layer */
     switch((header & 0x060000) >> 17) {
-    case 1:
-        layer = 3;
-        break;
-    case 2:
-        layer = 2;
-        break;
-    case 3:
-        layer = 1;
-        break;
-    default:
-        goto restart;
+        case 1:
+            layer = 3;
+            break;
+        case 2:
+            layer = 2;
+            break;
+        case 3:
+            layer = 1;
+            break;
+        default:
+            goto restart;
     }
 
     /* Bitrate */
@@ -488,24 +488,27 @@ static int getsonglength(int fd, struct mp3entry *entry)
 	
     /* Calculate bytes per frame, calculation depends on layer */
     switch(layer) {
-    case 1:
-        bpf = bitrate_table[version - 1][layer - 1][bitindex];
-        bpf *= 48000;
-        bpf /= freqtab[version-1][freqindex] << (version - 1);
-        break;
-    case 2:
-    case 3:
-        bpf = bitrate_table[version - 1][layer - 1][bitindex];
-        bpf *= 144000;
-        bpf /= freqtab[version-1][freqindex] << (version - 1);
-        break;
-    default:
-        bpf = 1;
+        case 1:
+            bpf = bitrate_table[version - 1][layer - 1][bitindex];
+            bpf *= 48000;
+            bpf /= freqtab[version-1][freqindex] << (version - 1);
+            break;
+        case 2:
+        case 3:
+            bpf = bitrate_table[version - 1][layer - 1][bitindex];
+            bpf *= 144000;
+            bpf /= freqtab[version-1][freqindex] << (version - 1);
+            break;
+        default:
+            bpf = 1;
     }
 	
     /* Calculate time per frame */
     tpf = bs[layer] / (freqtab[version-1][freqindex] << (version - 1));
         
+    entry->bpf = bpf;
+    entry->tpf = tpf;
+ 
     /* OK, we have found a frame. Let's see if it has a Xing header */
     if(read(fd, frame, sizeof frame) < 0)
         return -1;
@@ -535,21 +538,26 @@ static int getsonglength(int fd, struct mp3entry *entry)
         /* Yes, it is a VBR file */
         entry->vbr = true;
         
-        if (xing[7] & 0x01) /* Is the frame count there? */
+        if (entry->vbrflags & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
             int framecount = (xing[8] << 24) | (xing[9] << 16) |
                 (xing[10] << 8) | xing[11];
-
+ 
             filetime = framecount * tpf;
         }
-        if (xing[7] & 0x02) /* is byte count there? */
+
+        if (entry->vbrflags & VBR_BYTES_FLAG) /* is byte count there? */
         {
             int bytecount = (xing[12] << 24) | (xing[13] << 16) |
                 (xing[14] << 8) | xing[15];
-
+ 
             bitrate = bytecount * 8 / filetime;
         }
-        /* We don't care about the TOC just yet. Maybe another time. */
+
+        if (entry->vbrflags & VBR_TOC_FLAG) /* is table-of-contents there? */
+        {
+            memcpy( entry->toc, xing+16, 100 );
+        }
     }
 
     entry->bitrate = bitrate;

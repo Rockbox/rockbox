@@ -47,6 +47,7 @@
 #define MPEG_RESUME       4
 #define MPEG_NEXT         5
 #define MPEG_PREV         6
+#define MPEG_FF_REWIND    7
 #define MPEG_NEED_DATA    100
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
@@ -214,6 +215,22 @@ static void remove_current_tag(void)
         id3tags[oldidx] = NULL;
         debug_tags();
     }
+}
+
+static void remove_all_non_current_tags(void)
+{
+    int i = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+
+    while (i != tag_write_idx)
+    {
+        id3tags[i]->used = false;
+        id3tags[i] = NULL;
+
+        i = (i+1) & MAX_ID3_TAGS_MASK;
+    }
+
+    tag_write_idx = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+    debug_tags();
 }
 
 static void remove_all_tags(void)
@@ -823,6 +840,112 @@ static void mpeg_thread(void)
                 break;
             }
 
+            case MPEG_FF_REWIND: {
+                struct mp3entry *id3 = mpeg_current_track();
+                int newtime  = id3->elapsed + (int)ev.data;
+                int curpos, newpos, diffpos;
+                DEBUGF("MPEG_FF_REWIND\n");
+
+                if (id3->vbr && (id3->vbrflags & VBR_TOC_FLAG))
+                {
+                    /* Use the TOC to find the new position */
+                    int percent = (newtime*100)/id3->length;
+                    int curtoc, nexttoc, nextpos, remainder;
+
+                    if (percent > 99)
+                        percent = 99;
+
+                    curtoc = id3->toc[percent];
+
+                    if (percent < 99)
+                        nexttoc = id3->toc[percent+1];
+                    else
+                        nexttoc = 256;
+
+                    newpos = (curtoc*id3->filesize)/256;
+
+                    /* Use the remainder to get a more accurate position */
+                    nextpos = (nexttoc*id3->filesize)/256;
+                    remainder = (newtime*10000)/id3->length - (percent*100);
+                    newpos += ((nextpos-newpos)*remainder)/100;
+                }
+                else if (id3->bpf && id3->tpf)
+                    newpos = (newtime*id3->bpf)/id3->tpf;
+                else
+                    /* Not enough information to FF/Rewind */
+                    break;
+
+                newpos = newpos & ~1;
+                curpos = lseek(mpeg_file, 0, SEEK_CUR);
+
+                if (num_tracks_in_memory() > 1)
+                {
+                    /* We have started loading other tracks that need to be
+                       accounted for */
+                    int i = tag_read_idx;
+                    int j = tag_write_idx - 1;
+
+                    if (j < 0)
+                        j = MAX_ID3_TAGS - 1;
+
+                    while (i != j)
+                    {
+                        curpos += id3tags[i]->id3.filesize;
+                        i = (i+1) & MAX_ID3_TAGS_MASK;
+                    }
+                }
+
+                diffpos = curpos - newpos;
+
+#warning "Borde inte mp3buflen vara mp3buf_write?"
+                if(diffpos >= 0 && diffpos < mp3buflen)
+                {
+                    /* We are changing to a position that's already in
+                       memory */
+                    mp3buf_read = mp3buf_write - diffpos;
+                    if (mp3buf_read < 0)
+                    {
+                        mp3buf_read += mp3buflen;
+                    }
+
+                    playing = true;
+                    last_dma_tick = current_tick;
+                    init_dma();
+                    start_dma();
+                }
+                else
+                {
+                    /* Move to the new position in the file and start
+                       loading data */
+                    reset_mp3_buffer();
+
+                    if (num_tracks_in_memory() > 1)
+                    {
+                        /* We have to reload the current track */
+                        close(mpeg_file);
+                        remove_all_non_current_tags();
+
+                        mpeg_file = open(id3->path, O_RDONLY);
+                        if (mpeg_file < 0)
+                            break;
+                    }
+
+                    if(-1 == lseek(mpeg_file, newpos, SEEK_SET))
+                        break;
+
+                    filling = true;
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+                    /* Tell the file loading code that we want to start playing
+                       as soon as we have some data */
+                    play_pending = true;
+                }
+
+                id3->elapsed = newtime;
+
+                break;
+            }
+
             case MPEG_SWAP_DATA:
                 free_space_left = mp3buf_write - mp3buf_swapwrite;
 
@@ -1125,6 +1248,15 @@ void mpeg_prev(void)
     mp3info(&taginfo, file);
     current_track_counter--;
     playing = true;
+#endif
+}
+
+void mpeg_ff_rewind(int change)
+{
+#ifndef SIMULATOR
+    queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)change);
+#else
+    (void)change;
 #endif
 }
 

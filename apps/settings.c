@@ -357,6 +357,7 @@ void settings_reset(void) {
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
+    global_settings.ff_rewind    = DEFAULT_FF_REWIND_SETTING;
 }
 
 

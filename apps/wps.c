@@ -54,12 +54,13 @@
 #define PLAY_DISPLAY_TRACK_TITLE     2 
 
 #ifdef HAVE_RECORDER_KEYPAD
-#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN)
+#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT)
 #else
-#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP)
+#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT)
 #endif
 
 bool keys_locked = false;
+static bool ff_rewind = false;
 
 static void draw_screen(struct mp3entry* id3)
 {
@@ -291,6 +292,39 @@ int player_id3_show(void)
     return(0);
 }
 
+static void display_file_time(unsigned int elapsed, unsigned int length)
+{
+    char buffer[32];
+
+#ifdef HAVE_LCD_BITMAP
+    snprintf(buffer,sizeof(buffer),
+             "Time:%3d:%02d/%d:%02d",
+             elapsed / 60000,
+             elapsed % 60000 / 1000,
+             length / 60000,
+             length % 60000 / 1000 );
+
+    lcd_puts(0, 6, buffer);
+    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, elapsed*100/length, Grow_Right);
+    lcd_update();
+#else
+    /* Display time with the filename scroll only because
+       the screen has room. */
+    if ((global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL) ||
+        ff_rewind )
+    {
+        snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
+                 elapsed / 60000,
+                 elapsed % 60000 / 1000,
+                 length / 60000,
+                 length % 60000 / 1000 );
+
+        lcd_puts(0, 1, buffer);
+        lcd_update();
+    }
+#endif
+}
+
 void display_keylock_text(bool locked)
 {
     lcd_stop_scroll();
@@ -354,7 +388,7 @@ int wps_show(void)
     bool pending_keylock = true; /* Keylock will go ON next time */
     int old_release_mask;
     int button;
-    char buffer[32];
+    int ff_rewind_count = 0;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -461,26 +495,112 @@ int wps_show(void)
                 status_draw();
                 break;
 
-            case BUTTON_LEFT:
-                if (keys_locked)
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if (!keys_locked)
                 {
-                    display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    break;
+                    if (ff_rewind)
+                    {
+                        ff_rewind_count -= global_settings.ff_rewind*1000;
+                    }
+                    else
+                    {
+                        if ( mpeg_is_playing() && id3 && id3->length )
+                        {
+                            mpeg_pause();
+                            status_set_playmode(STATUS_FASTBACKWARD);
+                            status_draw();
+                            ff_rewind = true;
+                            ff_rewind_count = -global_settings.ff_rewind*1000;
+                        }
+                        else
+                            break;
+                    }
+
+                    if ((int)(id3->elapsed + ff_rewind_count) < 0)
+                        ff_rewind_count = -id3->elapsed;
+
+                    display_file_time(id3->elapsed + ff_rewind_count,
+                                      id3->length);
                 }
-                mpeg_prev();
-                status_set_playmode(STATUS_PLAY);
                 break;
 
-            case BUTTON_RIGHT:
-                if (keys_locked)
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if (!keys_locked)
                 {
-                    display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    break;
+                    if (ff_rewind)
+                    {
+                        ff_rewind_count += global_settings.ff_rewind*1000;
+                    }
+                    else
+                    {
+                        if ( mpeg_is_playing() && id3 && id3->length )
+                        {
+                            mpeg_pause();
+                            status_set_playmode(STATUS_FASTFORWARD);
+                            status_draw();
+                            ff_rewind = true;
+                            ff_rewind_count = global_settings.ff_rewind*1000;
+                        }
+                        else
+                            break;
+                    }
+
+                    if ((id3->elapsed + ff_rewind_count) > id3->length)
+                        ff_rewind_count = id3->length - id3->elapsed;
+
+                    display_file_time(id3->elapsed + ff_rewind_count,
+                                      id3->length);
                 }
-                mpeg_next();
-                status_set_playmode(STATUS_PLAY);
+                break;
+
+            case BUTTON_LEFT | BUTTON_REL:
+                if (ff_rewind)
+                {
+                    /* rewind */
+                    mpeg_ff_rewind(ff_rewind_count);
+                    ff_rewind_count = 0;
+                    ff_rewind = false;
+                    status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_LCD_CHARCELLS
+                    draw_screen(id3);
+#endif
+                }
+                else
+                {
+                    if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
+                        break;
+                    }
+                    mpeg_prev();
+                    status_set_playmode(STATUS_PLAY);
+                }
+                break;
+
+            case BUTTON_RIGHT | BUTTON_REL:
+                if (ff_rewind)
+                {
+                    /* fast forward */
+                    mpeg_ff_rewind(ff_rewind_count);
+                    ff_rewind_count = 0;
+                    ff_rewind = false;
+                    status_set_playmode(STATUS_PLAY);
+#ifdef HAVE_LCD_CHARCELLS
+                    draw_screen(id3);
+#endif
+                }
+                else
+                {
+                    if (keys_locked)
+                    {
+                        display_keylock_text(keys_locked);
+                        draw_screen(id3);
+                        break;
+                    }
+                    mpeg_next();
+                    status_set_playmode(STATUS_PLAY);
+                }
                 break;
 
 #ifdef HAVE_PLAYER_KEYPAD
@@ -683,39 +803,7 @@ int wps_show(void)
 #endif
             case BUTTON_NONE: /* Timeout */
                 if (mpeg_is_playing() && id3)
-                {
-#ifdef HAVE_LCD_BITMAP
-                    snprintf(buffer,sizeof(buffer),
-                             "Time:%3d:%02d/%d:%02d",
-                             id3->elapsed / 60000,
-                             id3->elapsed % 60000 / 1000,
-                             id3->length / 60000,
-                             id3->length % 60000 / 1000 );
-                        
-                    lcd_puts(0, 6, buffer);
-                        
-                    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6,
-                             id3->elapsed*100/id3->length,
-                             Grow_Right);
-                        
-                    lcd_update();
-#else
-                    /* Display time with the filename scroll only because
-                       the screen has room. */
-                    if (global_settings.wps_display ==
-                        PLAY_DISPLAY_FILENAME_SCROLL)
-                    { 
-                        snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
-                                 id3->elapsed / 60000,
-                                 id3->elapsed % 60000 / 1000,
-                                 id3->length / 60000,
-                                 id3->length % 60000 / 1000 );
-                            
-                        lcd_puts(0, 1, buffer);
-                        lcd_update();
-                    }
-#endif
-                }
+                    display_file_time(id3->elapsed, id3->length);
                 
                 status_draw();
                 break;

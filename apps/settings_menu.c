@@ -132,6 +132,12 @@ static void timedate_set(void)
 }
 #endif
 
+static void ff_rewind(void)
+{
+    set_int("[FF/Rewind Step Size]", "s", &global_settings.ff_rewind,
+            NULL, 1, 1, 999 );
+}
+
 void settings_menu(void)
 {
     int m;
@@ -152,6 +158,7 @@ void settings_menu(void)
 #ifdef HAVE_RTC
         { "Time/Date",       timedate_set    },
 #endif
+        { "FF/Rewind",       ff_rewind       },
     };
     bool old_shuffle = global_settings.playlist_shuffle;
     

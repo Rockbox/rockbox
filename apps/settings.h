@@ -69,6 +69,9 @@ struct user_settings
     
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
+
+    /* FF/Rewind step size (in seconds) */
+    int ff_rewind;
 };
 
 /* prototypes */
@@ -112,5 +115,6 @@ extern struct user_settings global_settings;
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5
 #define DEFAULT_WPS_DISPLAY         0 
+#define DEFAULT_FF_REWIND_SETTING   2
 
 #endif /* __SETTINGS_H__ */
