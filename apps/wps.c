@@ -33,6 +33,7 @@
 #include "usb.h"
 #include "power.h"
 #include "status.h"
+#include "main_menu.h"
 
 #define LINE_Y      1 /* initial line */
 
@@ -141,6 +142,7 @@ int wps_show(void)
              ( (id3->album?id3->album[0]:0) != lastalbum ) ||
              ( (id3->title?id3->title[0]:0) != lasttitle ) )
         {
+	    lcd_stop_scroll();
             draw_screen(id3);
             lastlength = id3->length;
             lastsize = id3->filesize;
@@ -184,7 +186,7 @@ int wps_show(void)
 #ifdef HAVE_LCD_BITMAP
         /* draw battery indicator line */
         lcd_clearline(0,LCD_HEIGHT-1,LCD_WIDTH-1, LCD_HEIGHT-1);
-        lcd_drawline(0,LCD_HEIGHT-1,battery_level() * LCD_WIDTH / 100, LCD_HEIGHT-1);
+        lcd_drawline(0,LCD_HEIGHT-1,battery_level() * (LCD_WIDTH-1) / 100, LCD_HEIGHT-1);
 #endif
 
         for ( i=0;i<5;i++ ) {
@@ -233,6 +235,16 @@ int wps_show(void)
 
                 case BUTTON_RIGHT:
                     mpeg_next();
+                    break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+                case BUTTON_F1:
+#else
+                case BUTTON_MENU:
+#endif
+                    lcd_stop_scroll();
+                    main_menu();
+                    draw_screen(id3);
                     break;
 
 #ifdef HAVE_RECORDER_KEYPAD                
