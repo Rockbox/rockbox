@@ -52,106 +52,106 @@ static int format(
 
     while ((ch = *fmt++) != '\0' && ok)
     {
-	if (ch == '%')
-	{
-	    ch = *fmt++;
-	    pad = ' ';
-	    if (ch == '0')
-		pad = '0';
+    if (ch == '%')
+    {
+        ch = *fmt++;
+        pad = ' ';
+        if (ch == '0')
+        pad = '0';
 
-	    width = 0;
-	    while (ch >= '0' && ch <= '9')
-	    {
-		width = 10*width + ch - '0';
-		ch = *fmt++;
-	    }
+        width = 0;
+        while (ch >= '0' && ch <= '9')
+        {
+        width = 10*width + ch - '0';
+        ch = *fmt++;
+        }
 
-	    str = tmpbuf + sizeof tmpbuf - 1;
-	    switch (ch)
-	    {
-		case 'c':
-		    *--str = va_arg (ap, int);
-		    break;
+        str = tmpbuf + sizeof tmpbuf - 1;
+        switch (ch)
+        {
+        case 'c':
+            *--str = va_arg (ap, int);
+            break;
 
-		case 's':
-		    str = va_arg (ap, char*);
-		    break;
+        case 's':
+            str = va_arg (ap, char*);
+            break;
 
-		case 'd':
-		    val = sign = va_arg (ap, int);
-		    if (val < 0)
-			val = -val;
-		    do
-		    {
-			*--str = (val % 10) + '0';
-			val /= 10;
-		    }
-		    while (val > 0);
-		    if (sign < 0)
-			*--str = '-';
-		    break;
+        case 'd':
+            val = sign = va_arg (ap, int);
+            if (val < 0)
+            val = -val;
+            do
+            {
+            *--str = (val % 10) + '0';
+            val /= 10;
+            }
+            while (val > 0);
+            if (sign < 0)
+            *--str = '-';
+            break;
 
-		case 'x':
-		case 'X':
-		    uval = va_arg (ap, int);
-		    do
-		    {
-			*--str = hexdigit[uval & 0xf];
-			uval >>= 4;
-		    }
-		    while (uval);
-		    break;
-		    
-                case 'l':
-                    ch = *fmt++;
-                    switch(ch) {
-                        case 'x':
-                        case 'X':
-                            ulval = va_arg (ap, long);
-                            do
-                            {
-                                *--str = hexdigit[ulval & 0xf];
-                                ulval >>= 4;
-                            }
-                            while (ulval);
-                            break;
-                        case 'd':
-                            lval = sign = va_arg (ap, long);
-                            if (lval < 0)
-                                lval = -lval;
-                            do
-                            {
-                                *--str = (lval % 10) + '0';
-                                lval /= 10;
-                            }
-                            while (lval > 0);
-                            if (sign < 0)
-                                *--str = '-';
-                            break;
-                            
-                        default:
-                            *--str = 'l';
-                            *--str = ch;
+        case 'x':
+        case 'X':
+            uval = va_arg (ap, int);
+            do
+            {
+            *--str = hexdigit[uval & 0xf];
+            uval >>= 4;
+            }
+            while (uval);
+            break;
+
+        case 'l':
+            ch = *fmt++;
+            switch(ch) {
+                case 'x':
+                case 'X':
+                    ulval = va_arg (ap, long);
+                    do
+                    {
+                        *--str = hexdigit[ulval & 0xf];
+                        ulval >>= 4;
                     }
-                    
+                    while (ulval);
                     break;
-                    
-		default:
-		    *--str = ch;
-		    break;
-	    }
+                case 'd':
+                    lval = sign = va_arg (ap, long);
+                    if (lval < 0)
+                        lval = -lval;
+                    do
+                    {
+                        *--str = (lval % 10) + '0';
+                        lval /= 10;
+                    }
+                    while (lval > 0);
+                    if (sign < 0)
+                        *--str = '-';
+                    break;
 
-	    if (width > 0)
-	    {
-		width -= strlen (str);
-		while (width-- > 0 && ok)
-		    ok=push(userp, pad);
-	    }
-	    while (*str != '\0' && ok)
+                default:
+                    *--str = 'l';
+                    *--str = ch;
+            }
+
+            break;
+
+        default:
+            *--str = ch;
+            break;
+        }
+
+        if (width > 0)
+        {
+        width -= strlen (str);
+        while (width-- > 0 && ok)
+            ok=push(userp, pad);
+        }
+        while (*str != '\0' && ok)
                 ok=push(userp, *str++);
-	}
-	else
-	    ok=push(userp, ch);
+    }
+    else
+        ok=push(userp, ch);
     }
     return ok; /* true means good */
 }
