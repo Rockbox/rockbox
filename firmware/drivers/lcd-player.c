@@ -74,13 +74,13 @@ struct scrollinfo {
 
 #define MAX_CURSOR_CHARS 8
 struct cursorinfo {
-  int len;
-  char text[MAX_CURSOR_CHARS];
-  int textpos;
-  int y_pos;
-  int x_pos;
-  int divider;
-  int downcount;
+    int len;
+    char text[MAX_CURSOR_CHARS];
+    int textpos;
+    int y_pos;
+    int x_pos;
+    int divider;
+    int downcount;
 } cursor;
 
 static void scroll_thread(void);
@@ -124,25 +124,25 @@ static void lcd_free_pat(int map_ch)
     pat=extended_chars_mapped[map_ch];
     if (pat!=NO_CHAR) {
 
-      substitute_char=lcd_player_extended_lcd_to_rocklatin1[map_ch];
+        substitute_char=lcd_player_extended_lcd_to_rocklatin1[map_ch];
 
-      for (x=0; x<11; x++) {
-        for (y=0; y<2; y++)  {
-          if (map_ch==lcd_ascii[buffer_xlcd[x][y]]-512) {
-            buffer_xlcd[x][y]=substitute_char;
-            buffer_lcd_mirror[x][y]=substitute_char;
+        for (x=0; x<11; x++) {
+            for (y=0; y<2; y++)  {
+                if (map_ch==lcd_ascii[buffer_xlcd[x][y]]-512) {
+                    buffer_xlcd[x][y]=substitute_char;
+                    buffer_lcd_mirror[x][y]=substitute_char;
 #ifdef SIMULATOR
-            hardware_buffer_lcd[x][y]=substitute_char;
+                    hardware_buffer_lcd[x][y]=substitute_char;
 #else
-            lcd_write(true, LCD_CURSOR(x, y));
-            lcd_write(false, substitute_char);
+                    lcd_write(true, LCD_CURSOR(x, y));
+                    lcd_write(false, substitute_char);
 #endif
-          }
+                }
+            }
         }
-      }
-      extended_chars_mapped[map_ch]=NO_CHAR;
-      extended_pattern_content[pat]=NO_CHAR;
-      extended_pattern_usage[pat]=0;
+        extended_chars_mapped[map_ch]=NO_CHAR;
+        extended_pattern_content[pat]=NO_CHAR;
+        extended_pattern_usage[pat]=0;
     }
 #ifdef SIMULATOR
     lcd_update();
@@ -197,18 +197,22 @@ void xlcd_update(void)
                 int map_ch=lcd_ascii[ch];
                 if (map_ch<512) {
                     hw_ch=map_ch;
-                } else {
+                }
+                else {
                     map_ch=map_ch-512;
                     if (extended_chars_mapped[map_ch]!=NO_CHAR) {
                         hw_ch=extended_chars_mapped[map_ch];
                         extended_pattern_usage[hw_ch]++;
-                    } else {
+                    }
+                    else {
                         int pat;
                         pat=lcd_get_free_pat(map_ch);
                         if (pat<0) {
-                            DEBUGF("Substitute for %02x (map 0x%02x) is used.\n", ch, map_ch);
+                            DEBUGF("Substitute for %02x (map 0x%02x)"
+                                   " is used.\n", ch, map_ch);
                             /* Find substitute char */
-                            map_ch=lcd_player_extended_lcd_to_rocklatin1[map_ch];
+                            map_ch=
+                                lcd_player_extended_lcd_to_rocklatin1[map_ch];
                             hw_ch=lcd_ascii[map_ch];
                         } else {
 #ifdef DEBUG
@@ -220,7 +224,8 @@ void xlcd_update(void)
                             extended_pattern_content[pat]=map_ch;
                             extended_pattern_usage[pat]=1;
                             lcd_define_hw_pattern(pat*8, 
-                                                  extended_font_player[map_ch], 8);
+                                                  extended_font_player[map_ch],
+                                                  8);
                             hw_ch=pat;
                         }
                     }
@@ -239,35 +244,35 @@ void xlcd_update(void)
 
 bool lcdx_putc(int x, int y, unsigned short ch)
 {
-  int lcd_char;
-  if (buffer_xlcd[x][y]==ch)
-    return false; /* Same char, ignore any update */
-  lcd_char=lcd_ascii[buffer_xlcd[x][y]];
-  if (lcd_char>=512) {
-    /* The removed char is a defined pattern, count down the reference. */
-    extended_pattern_usage[(int)extended_chars_mapped[lcd_char-512]]--;
+    int lcd_char;
+    if (buffer_xlcd[x][y]==ch)
+        return false; /* Same char, ignore any update */
+    lcd_char=lcd_ascii[buffer_xlcd[x][y]];
+    if (lcd_char>=512) {
+        /* The removed char is a defined pattern, count down the reference. */
+        extended_pattern_usage[(int)extended_chars_mapped[lcd_char-512]]--;
 #ifdef DEBUG
-    if (extended_pattern_usage[(int)extended_chars_mapped[lcd_char]]<0) {
-        DEBUGF("**** Mapped char %02x is less than 0!\n", lcd_char);
+        if (extended_pattern_usage[(int)extended_chars_mapped[lcd_char]]<0) {
+            DEBUGF("**** Mapped char %02x is less than 0!\n", lcd_char);
+        }
+#endif
     }
-#endif
-  }
 
-  buffer_xlcd[x][y]=ch;
+    buffer_xlcd[x][y]=ch;
 
-  lcd_char=lcd_ascii[ch];
-  if (lcd_char>=256)
-    return true; /* Caller shall call xlcd_update() when done */
+    lcd_char=lcd_ascii[ch];
+    if (lcd_char>=256)
+        return true; /* Caller shall call xlcd_update() when done */
 
-  buffer_lcd_mirror[x][y]=lcd_char;
+    buffer_lcd_mirror[x][y]=lcd_char;
 #ifdef SIMULATOR
-  hardware_buffer_lcd[x][y]=lcd_char;
-  lcd_update();
+    hardware_buffer_lcd[x][y]=lcd_char;
+    lcd_update();
 #else
-  lcd_write(true, LCD_CURSOR(x, y));
-  lcd_write(false, lcd_char);
+    lcd_write(true, LCD_CURSOR(x, y));
+    lcd_write(false, lcd_char);
 #endif
-  return false;
+    return false;
 }
 
 void lcd_clear_display(void)
@@ -278,9 +283,9 @@ void lcd_clear_display(void)
     lcd_stop_scroll();
     cursor.len=0; /* Stop cursor */
     for (i=0;i<22;i++)
-      update|=lcdx_putc(i%11, i/11, ' ');
+        update|=lcdx_putc(i%11, i/11, ' ');
     if (update)
-      xlcd_update();
+        xlcd_update();
 }
 
 static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
@@ -289,22 +294,26 @@ static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
     DEBUGF("lcd_puts_cont_scroll(%d, %d, \"", x, y);
 
     for (; *string && x<11; x++)
-        {
+    {
 #ifdef DEBUGF
         if (*string>=32 && *string<128)
-            {DEBUGF("%c", *string);}
+        {
+            DEBUGF("%c", *string);
+        }
         else
-            {DEBUGF("(0x%02x)", *string);}
+        {
+            DEBUGF("(0x%02x)", *string);
+        }
 #endif
         /* We should check if char is over 256 */
         update|=lcdx_putc(x, y, *(unsigned char*)string++);
-        }
+    }
     DEBUGF("\")\n");
     
     for (; x<11; x++)
         update|=lcdx_putc(x, y, ' ');
     if (update)
-      xlcd_update();
+        xlcd_update();
 }
 void lcd_puts(int x, int y, unsigned char *string)
 {
@@ -315,25 +324,28 @@ void lcd_puts(int x, int y, unsigned char *string)
 
 void lcd_put_cursor(int x, int y, char cursor_char)
 {
-  if (cursor.len==0) {
-    cursor.text[0]=buffer_xlcd[x][y];
-    cursor.text[1]=cursor_char;
-    cursor.len=2;
-    cursor.textpos=0;
-    cursor.y_pos=y;
-    cursor.x_pos=x;
-    cursor.downcount=0;
-    cursor.divider=4;
-  }
+    if (cursor.len == 0) {
+        cursor.text[0]=buffer_xlcd[x][y];
+        cursor.text[1]=cursor_char;
+        cursor.len=2;
+        cursor.textpos=0;
+        cursor.y_pos=y;
+        cursor.x_pos=x;
+        cursor.downcount=0;
+        cursor.divider=4;
+    }
 }
 
 void lcd_remove_cursor(void)
 {
-  if (cursor.len!=0) {
-    cursor.len=0;
-    if (lcdx_putc(cursor.x_pos, cursor.y_pos, cursor.text[0]))
-      lcd_update();
-  }
+    if (cursor.len!=0) {
+        bool up;
+        cursor.len=0;
+        up = lcdx_putc(cursor.x_pos, cursor.y_pos, cursor.text[0]);
+#ifdef SIMULATOR
+        lcd_update();
+#endif
+    }
 }
 
 void lcd_putc(int x, int y, unsigned short ch)
@@ -341,42 +353,42 @@ void lcd_putc(int x, int y, unsigned short ch)
     bool update;
     DEBUGF("lcd_putc(%d, %d, %d '0x%02x')\n", x, y, ch, ch);
     if (x<0 || y<0) {
-      return;
+        return;
     }
     update=lcdx_putc(x, y, ch);
 
     if (update)
-      xlcd_update();
+        xlcd_update();
 }
 
 unsigned char lcd_get_locked_pattern(void)
 {
     unsigned char pat=1;
     while (pat<LAST_RESERVED_CHAR) {
-      if (lcd_ascii[pat]==RESERVED_CHAR) {
-        lcd_ascii[pat]=0x200+pat;
-        return pat;
-      }
-      pat++;
+        if (lcd_ascii[pat]==RESERVED_CHAR) {
+            lcd_ascii[pat]=0x200+pat;
+            return pat;
+        }
+        pat++;
     }
     return 0;
 }
 
 void lcd_unlock_pattern(unsigned char pat)
 {
-  lcd_ascii[pat]=RESERVED_CHAR;
-  lcd_free_pat(pat);
+    lcd_ascii[pat]=RESERVED_CHAR;
+    lcd_free_pat(pat);
 }
 
 void lcd_define_pattern(int pat, char *pattern)
 {
-  int i;
-  for (i=0; i<7; i++) {
-    extended_font_player[pat][i]=pattern[i];
-  }
-  if (extended_chars_mapped[pat]!=NO_CHAR) {
-      lcd_define_hw_pattern(extended_chars_mapped[pat]*8, pattern, 7);
-  }
+    int i;
+    for (i=0; i<7; i++) {
+        extended_font_player[pat][i]=pattern[i];
+    }
+    if (extended_chars_mapped[pat]!=NO_CHAR) {
+        lcd_define_hw_pattern(extended_chars_mapped[pat]*8, pattern, 7);
+    }
 }
 
 #ifndef SIMULATOR
@@ -471,7 +483,8 @@ void lcd_init (void)
         lcd_pram = NEW_LCD_PRAM;
         lcd_iram = NEW_LCD_IRAM;
         pattern_size=7; /* Last pattern, 3 for old LCD, 7 for new LCD */
-    } else {
+    }
+    else {
         lcd_ascii = old_lcd_rocklatin1_to_xlcd;
         lcd_contrast_set = OLD_LCD_CONTRAST_SET;
         lcd_cram = OLD_LCD_CRAM;
@@ -512,15 +525,18 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
         s->turn_offset=-1;
         if (bidir_limit && (s->textlen < ((11-x)*(100+bidir_limit))/100)) {
             s->turn_offset=s->textlen+x-11;
-        } else {
-            for (i=0; i<scroll_spacing && s->textlen<(int)sizeof(s->text); i++) {
+        }
+        else {
+            for (i=0; i<scroll_spacing &&
+                     s->textlen<(int)sizeof(s->text); i++) {
                 s->text[s->textlen++]=' ';
             }
         }
         if (s->textlen<(int)sizeof(s->text))
             s->text[s->textlen]=' ';
         s->text[sizeof s->text - 1] = 0;
-    } else
+    }
+    else
         s->mode = SCROLL_MODE_OFF;
 }
 
@@ -590,7 +606,7 @@ static void scroll_thread(void)
                         }
                     }
                     else {
-                            s->offset = 0;
+                        s->offset = 0;
                     }
 
                     i=0;
@@ -609,14 +625,14 @@ static void scroll_thread(void)
                 }
             }
             if (cursor.len>0) {
-              if (cursor.downcount--<0) {
-                cursor.downcount=cursor.divider;
-                cursor.textpos++;
-                if (cursor.textpos>=cursor.len)
-                  cursor.textpos=0;
-                update|=lcdx_putc(cursor.x_pos, cursor.y_pos,
-                                  cursor.text[cursor.textpos]);
-              }
+                if (cursor.downcount--<0) {
+                    cursor.downcount=cursor.divider;
+                    cursor.textpos++;
+                    if (cursor.textpos>=cursor.len)
+                        cursor.textpos=0;
+                    update|=lcdx_putc(cursor.x_pos, cursor.y_pos,
+                                      cursor.text[cursor.textpos]);
+                }
             }
             if (update) {
                 lcd_update();
