@@ -22,6 +22,8 @@
 #include "button.h"
 #include "kernel.h"
 
+#include "tree.h"
+
 #ifdef SIMULATOR
 #include <stdio.h>
 #endif
@@ -39,8 +41,10 @@ void menu_init(void)
 {
   lcd_puts(6, 0,  "Rockabox", 0);
   lcd_puts(6, 8,  "Boxrock", 0);
-  lcd_puts(6, 16, "Robkoxx", 0);
+  lcd_puts(6, 16, "Browse", 0);
+#define LINE_BROWSE 2
   lcd_puts(6, 24, "Tetris", 0);
+#define LINE_TETRIS 3
   lcd_puts(8, 38, "Rockbox!", 2);
 
   lcd_puts(0, cursor, "-", 0);
@@ -75,23 +79,25 @@ void app_main(void)
       }
       break;
     case BUTTON_RIGHT:      
-      if(cursor == (MAX_LINE * LINE_HEIGHT)) {
+    case BUTTON_PLAY:      
+      switch(cursor) {
+      case (LINE_TETRIS * LINE_HEIGHT):
         lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         tetris();
         lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         menu_init();
+        break;
+      case (LINE_BROWSE * LINE_HEIGHT):
+        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+        dirbrowse("/");
+        lcd_update();
+        while((!button_get()));
+        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+        menu_init();
+        break;
       }
       break;
     }
     lcd_update();
   }
 }
-
-
-#ifdef _WIN32
-// for win32 simulator compability
-void main (void)
-{
-    app_main ();
-}
-#endif
