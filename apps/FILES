@@ -9,3 +9,4 @@ lang/*.lang
 plugins/*.[ch]
 plugins/Makefile
 plugins/plugin.lds
+plugins/*.txt
