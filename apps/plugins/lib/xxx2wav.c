@@ -19,6 +19,9 @@
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
+#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
+/* software codec platforms, not for simulator */
+
 #include "plugin.h"
 #include "xxx2wav.h"
 
@@ -222,3 +225,4 @@ void close_wav(file_info_struct* file_info) {
   local_rb->write(file_info->outfile,wav_header,sizeof(wav_header));
   local_rb->close(file_info->outfile);
 }
+#endif /* CONFIG_HWCODEC == MASNONE */
