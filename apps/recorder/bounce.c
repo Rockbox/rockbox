@@ -243,15 +243,13 @@ static int scrollit(void)
     char rock[]="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
     int letter;
 
-    while(button_get(false) & BUTTON_REL);
-
     lcd_clear_display();
     while(1)
     {
         b = button_get_w_tmo(HZ/10);
-        if ( b & BUTTON_OFF )
+        if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
-        else if ( b & BUTTON_ON )
+        else if ( b == (BUTTON_ON|BUTTON_REL) )
             return 1;
 
         lcd_clear_display();
@@ -297,15 +295,13 @@ static int loopit(void)
     int timeout=0;
     char buffer[30];
 
-    while(button_get(false) & BUTTON_REL);
-
     lcd_clear_display();
     while(1)
     {
         b = button_get_w_tmo(HZ/10);
-        if ( b & BUTTON_OFF )
+        if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
-        if ( b & BUTTON_ON )
+        if ( b == (BUTTON_ON|BUTTON_REL) )
             return 1;
         else if(b != BUTTON_NONE)
             timeout=20;
