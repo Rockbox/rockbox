@@ -1343,8 +1343,8 @@ int fat_create_dir(char* name,
 
     LDEBUGF("fat_create_dir(\"%s\",%x,%x)\n",name,newdir,dir);
 
-    memset(newdir, sizeof(struct fat_dir), 0);
-    memset(&dummyfile, sizeof(struct fat_file), 0);
+    memset(newdir, 0, sizeof(struct fat_dir));
+    memset(&dummyfile, 0, sizeof(struct fat_file));
 
     /* First, add the entry in the parent directory */
     rc = add_dir_entry(dir, &newdir->file, name, true, false);
