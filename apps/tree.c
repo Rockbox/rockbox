@@ -308,7 +308,8 @@ struct entry* load_and_sort_directory(char *dirname, int dirfilter,
                 dptr->attr |= TREE_ATTR_MOD;
             else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
                 dptr->attr |= TREE_ATTR_ROCK;
-        }
+            else if (!strcasecmp(&entry->d_name[len-4], ".ucl"))
+                dptr->attr |= TREE_ATTR_UCL; }
         
         /* memorize/compare details about the boot file */
         if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
@@ -496,6 +497,10 @@ static int showdir(char *path, int start)
                 icon_type = Mod_Ajz;
                 break;
 
+            case TREE_ATTR_UCL:
+                icon_type = Flashfile;
+                break;
+ 
             case TREE_ATTR_ROCK:
                 icon_type = Plugin;
                 break;
@@ -1026,6 +1031,11 @@ static bool dirbrowse(char *root)
                         case TREE_ATTR_MOD:
                             rolo_load(buf);
                             break;
+
+                            /* ucl flash file */
+                        case TREE_ATTR_UCL:
+                            plugin_load("/.rockbox/rocks/rockbox_flash.rock",buf);
+                            break; 
 #endif
 
                             /* plugin file */
