@@ -36,6 +36,7 @@ typedef struct {
 } DIR;
 #else // SIMULATOR
 #ifdef WIN32
+#include <io.h>
 typedef struct DIRtag
 {
     struct dirent   fd;
