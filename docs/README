@@ -5,7 +5,7 @@
      Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                        \/            \/     \/    \/            \/
 
-Build your own archos.mod.
+Build your own archos.mod (or ajbrec.ajz)
 
 1. Check out 'firmware', 'apps', 'docs' and 'tools' from CVS (or possibly from
    a downloaded archive). You may possibly want 'uisimulator' too (for trying
@@ -24,13 +24,17 @@ Build your own archos.mod.
    prompt you. The debug version is for making a gdb version out of it. It is
    only useful if you run gdb towards your target Archos.
 
-5. Make sure you have sh-elf-gcc and siblings in the PATH.
+5. *ploink*. Now you have got a Makefile generated for you. 
 
-6. *ploink*. Now you have got a Makefile generated for you. Run 'make' and
-   soon the necessary pieces from the firmware and the apps directories have
-   been compiled and linked.
+6. Make sure you have sh-elf-gcc and siblings in the PATH. Make sure that you
+   have 'perl' in your PATH too.
 
-7. Copy the archos.mod file to your archos, reboot it and *smile*.
+7. Run 'make' and soon the necessary pieces from the firmware and the apps
+   directories have been compiled, linked and scrambled for you.
+
+8. Copy the archos.mod/ajbrec.ajz file to your archos, reboot it and *smile*.
+   Recent Rockbox versions need no reboots, just PLAY a new rockbox version
+   and that'll be loaded and replace the currently running version.
 
 Whenever the tools/configure script gets updated, you can make your makefile
 updated too by running 'tools/configure update'
