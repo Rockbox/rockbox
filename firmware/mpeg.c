@@ -1267,6 +1267,16 @@ static const unsigned char empty_id3_header[] =
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
 
+static unsigned long get_last_recorded_header(void)
+{
+    unsigned long tmp[2];
+
+    /* Read the frame data from the MAS and reconstruct it with the
+       frame sync and all */
+    mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
+    return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
+}
+
 static void mpeg_thread(void)
 {
     static int pause_tick = 0;
@@ -1282,7 +1292,7 @@ static void mpeg_thread(void)
     int amount_to_save;
     int writelen;
     int framelen;
-    unsigned long saved_header;
+    unsigned long saved_header = 0;
     int startpos;
     int rc;
     int offset;
@@ -1899,6 +1909,11 @@ static void mpeg_thread(void)
                 case MPEG_STOP:
                     DEBUGF("MPEG_STOP\n");
                     demand_irq_enable(false);
+
+                    /* Store the last recorded header for later use by the
+                       Xing header generation */
+                    saved_header = get_last_recorded_header();
+                    
                     stop_recording();
                     
                     /* Save the remaining data in the buffer */
@@ -1924,18 +1939,9 @@ static void mpeg_thread(void)
                            reached 0x7ffff, we can no longer trust it */
                         if(num_recorded_frames == 0x7ffff)
                             num_recorded_frames = 0;
-                        
-                        /* Read the first MP3 frame from the recorded stream */
-                        lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE, SEEK_SET);
-                        rc = read(mpeg_file, &saved_header, 4);
-                        if(rc <= 0)
-                        {
-                            close(mpeg_file);
-                            mpeg_file = -1;
-                            mpeg_stop_done = true;
-                            break;
-                        }
-                        
+
+                        /* saved_header is saved right before stopping
+                           the MAS */
                         framelen = create_xing_header(mpeg_file, 0,
                                                       num_rec_bytes, mp3buf,
                                                       num_recorded_frames,
@@ -1984,16 +1990,8 @@ static void mpeg_thread(void)
                         startpos = mp3buf_write - 1800;
                         if(startpos < 0)
                             startpos += mp3buflen;
-                        
-                        {
-                            unsigned long tmp[2];
-                            /* Find out how the mp3 header should look like */
-                            mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
-                            saved_header = 0xffe00000 |
-                                ((tmp[0] & 0x7c00) << 6) |
-                                (tmp[1] & 0xffff);
-                            DEBUGF("Header: %08x\n", saved_header);
-                        }
+
+                        saved_header = get_last_recorded_header();
                         
                         rc = mem_find_next_frame(startpos, &offset, 1800,
                                                  saved_header);
