@@ -21,8 +21,7 @@
 Solitaire by dionoea
 
 use arrows to move the cursor
-use ON to select cards in the columns, move cards inside the columns,
-    reveal hidden cards, ...
+use ON to select cards, move cards, reveal hidden cards, ...
 use PLAY to move a card from the remains' stack to the top of the cursor
 use F1 to put card under cursor on one of the 4 final color stacks
 use F2 to un-select card if a card was selected, else draw 3 new cards
@@ -57,7 +56,7 @@ static struct plugin_api* rb;
 #define HELP_BUTTON_F2 "Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_BUTTON_F3 "Put the card on top of the remains' stack on one of the 4 final color stacks."
 #define HELP_BUTTON_PLAY "Put the card on top of the remains' stack on top of the cursor."
-#define HELP_BUTTON_ON "Select cards in the columns, Move cards inside the columns, reveal hidden cards ..."
+#define HELP_BUTTON_ON "Select cards, Move cards, reveal hidden cards ..."
 
 static unsigned char colors[4][8] = {
 /* Spades */
@@ -229,6 +228,14 @@ static unsigned char numbers[13][8] = {
 /* number of columns */
 #define COL_NUM 7
 
+/* pseudo column numbers to be used for cursor coordinates */
+/* columns COL_NUM t COL_NUM + COLORS - 1 correspond to the color stacks */
+#define STACKS_COL COL_NUM
+/* column COL_NUM + COLORS corresponds to the remains' stack */
+#define REM_COL (STACKS_COL + COLORS)
+
+#define NOT_A_COL 255
+
 /* number of cards that are drawn on the remains' stack (by pressing F2) */
 #define CARDS_PER_DRAW 3
 
@@ -261,14 +268,17 @@ unsigned char next_random_card(card *deck){
 }
 
 /* help for the not so intuitive interface */
-void solitaire_help(void)
-{
+void solitaire_help(void){
+
     rb->lcd_clear_display();
 
     rb->lcd_putsxy(0, 0, "Press a key to see");
     rb->lcd_putsxy(0, 7, "it's role.");
     rb->lcd_putsxy(0, 21, "Press OFF to");
-    rb->lcd_putsxy(0, 28, "return to menu");
+    rb->lcd_putsxy(0, 28, "return to menu.");
+    rb->lcd_putsxy(0, 42, "All actions can");
+    rb->lcd_putsxy(0, 49, "be done using");
+    rb->lcd_putsxy(0, 56, "arrows, ON and F2.");
 
     rb->lcd_update();
     
@@ -363,6 +373,7 @@ int solitaire_menu(unsigned char when) {
                         solitaire_help();
                         break;
                 }
+                break;
             
             case BUTTON_F1:
             case BUTTON_F2:
@@ -410,7 +421,7 @@ void solitaire_init(void){
         for(j=0;j<CARDS_PER_COLOR;j++){
             deck[i*CARDS_PER_COLOR+j].color = i;
             deck[i*CARDS_PER_COLOR+j].num = j;
-            deck[i*CARDS_PER_COLOR+j].known = 0;
+            deck[i*CARDS_PER_COLOR+j].known = 1;
             deck[i*CARDS_PER_COLOR+j].used = 0;
             deck[i*CARDS_PER_COLOR+j].next = NOT_A_CARD;
         }
@@ -428,7 +439,7 @@ void solitaire_init(void){
                 deck[c].next = next_random_card(deck);
                 c = deck[c].next;
             }
-            if(j==i) deck[c].known = 1;
+            if(j<i) deck[c].known = 0;
         }
     }
 
@@ -459,15 +470,187 @@ void solitaire_init(void){
     cur_rem = NOT_A_CARD;
 } 
 
+/* find the column number in which 'card' can be found */
+unsigned char find_card_col(unsigned char card){
+    int i;
+    unsigned char c;
+
+    if(card == NOT_A_CARD) return NOT_A_COL;
+
+    for(i=0; i<COL_NUM; i++){
+        c = cols[i];
+        while(c!=NOT_A_CARD){
+            if(c == card) return i;
+            c = deck[c].next;
+        }
+    }
+
+    for(i=0; i<COLORS; i++){
+        c = stacks[i];
+        while(c!=NOT_A_CARD){
+            if(c == card) return STACKS_COL + i;
+            c = deck[c].next;
+        }
+    }
+
+    return REM_COL;
+}
+
+/* find the card preceding 'card' */
+/* if it doesn't exist, return NOT_A_CARD */
+unsigned char find_prev_card(unsigned char card){
+    int i;
+
+    for(i=0; i<COLORS*CARDS_PER_COLOR; i++){
+        if(deck[i].next == card) return i;
+    }
+
+    return NOT_A_CARD;
+}
+
+/* find the last card of a given column */
+unsigned char find_last_card(unsigned char col){
+    unsigned char c;
+
+    if(col < COL_NUM){
+        c = cols[col];
+    } else if(col < REM_COL){
+        c = stacks[col - STACKS_COL];
+    } else {
+        c = rem;
+    }
+
+    if(c == NOT_A_CARD)
+        return c;
+    else {
+        while(deck[c].next != NOT_A_CARD){
+            c = deck[c].next;
+        }
+        return c;
+    }
+}
+
+#define MOVE_OK 0
+#define MOVE_NOT_OK 1
+unsigned char move_card(unsigned char dest_col, unsigned char src_card){
+    /* the column on which to take src_card */
+    unsigned char src_col;
+
+    /* the last card of dest_col */
+    unsigned char dest_card;
+    
+    /* the card under src_card */
+    unsigned char src_card_prev;
+    
+    /* you can't move no card (at least, it doesn't have any consequence) */
+    if(src_card == NOT_A_CARD) return MOVE_NOT_OK;
+    /* you can't put a card back on the remains' stack */
+    if(dest_col == REM_COL) return MOVE_NOT_OK;
+    
+    src_col = find_card_col(src_card);
+    dest_card = find_last_card(dest_col);
+    src_card_prev = find_prev_card(src_card);
+
+    /* you can't move more than one card at a time from the colors stack */
+    /* to the rest of the game */
+    if(src_col >= COL_NUM && src_col < REM_COL
+       && deck[src_card].next != NOT_A_CARD){
+        return MOVE_NOT_OK;
+    }
+    
+    /* if we (that means dest) are on one of the 7 columns ... */
+    if(dest_col < COL_NUM){
+        /* ... check is we are on an empty color and that the src is a king */
+        if(dest_card == NOT_A_CARD
+           && deck[src_card].num == CARDS_PER_COLOR - 1){
+            /* this is a winning combination */
+            cols[dest_col] = src_card;
+        }
+        /* ... or check if the cards follow one another and have same color */
+        else if((deck[dest_card].color + deck[src_card].color)%2==1
+           && deck[dest_card].num == deck[src_card].num + 1){
+            /* this is a winning combination */
+            deck[dest_card].next = src_card;
+        }
+        /* ... or, humpf, well that's not good news */
+        else {
+            /* this is not a winning combination */
+            return MOVE_NOT_OK;
+        }
+    }
+    /* if we are on one of the 4 color stacks ... */
+    else if(dest_col < REM_COL){
+        /* ... check if we are on an empty stack, that the src is an
+         * ace and that this is the good color stack */
+        if(dest_card == NOT_A_CARD
+           && deck[src_card].num == 0
+           && deck[src_card].color == dest_col - STACKS_COL){
+            /* this is a winning combination */
+            stacks[dest_col - STACKS_COL] = src_card;
+        }
+        /* ... or check if the cards follow one another, have the same 
+         * color and {that src has no .next element or is from the remains'
+         * stack} */
+        else if(deck[dest_card].color == deck[src_card].color
+           && deck[dest_card].num + 1 == deck[src_card].num
+           && (deck[src_card].next == NOT_A_CARD || src_col == REM_COL) ){
+            /* this is a winning combination */
+            deck[dest_card].next = src_card;
+        }
+        /* ... or, well that's not good news */
+        else {
+            /* this is not a winnong combination */
+            return MOVE_NOT_OK;
+        }
+    }
+    /* if we are on the remains' stack */
+    else {
+        /* you can't move a card back to the remains' stack */
+        return MOVE_NOT_OK;
+    }
+    
+    /* if the src card is from the remains' stack, we don't want to take
+     * the following cards */
+    if(src_col == REM_COL){
+        /* if src card is the first card from the stack */
+        if(src_card_prev == NOT_A_CARD){
+            rem = deck[src_card].next;
+        }
+        /* if src card is not the first card from the stack */
+        else {
+            deck[src_card_prev].next = deck[src_card].next;
+        }
+        cur_rem = src_card_prev;
+        deck[src_card].next = NOT_A_CARD;
+    }
+    /* if the src card is from somewhere else, just take everything */
+    else {
+        if(src_card_prev == NOT_A_CARD){
+            if(src_col < COL_NUM){
+                cols[src_col] = NOT_A_CARD;
+            } else {
+                stacks[src_col - STACKS_COL] = NOT_A_CARD;
+            }
+        } else {
+            deck[src_card_prev].next = NOT_A_CARD;
+        }
+    }
+
+    /* tada ! */
+    return MOVE_OK;
+}
+
+#define SOLITAIRE_WIN 0
+#define SOLITAIRE_QUIT 1
 
 /* the game */
-void solitaire(void){
+int solitaire(void){
     
     int i,j;
     unsigned char c;
     int biggest_col_length;
     
-    if(solitaire_menu(MENU_BEFOREGAME) == MENU_QUIT) return;
+    if(solitaire_menu(MENU_BEFOREGAME) == MENU_QUIT) return SOLITAIRE_QUIT;
     solitaire_init();
    
     while(true){
@@ -491,7 +674,7 @@ void solitaire(void){
         /* if there aren't any, that means you won :) */
         if(biggest_col_length == 0 && rem == NOT_A_CARD){
             rb->splash(HZ*2, true, "You Won :)");
-            return;
+            return SOLITAIRE_WIN;
         }
         
         /* draw the columns */
@@ -499,59 +682,48 @@ void solitaire(void){
             c = cols[i];
             j = 0;
             while(true){
-                if(c==NOT_A_CARD) break;
+                if(c==NOT_A_CARD) {
+                    /* draw the cursor on empty columns */
+                    if(cur_col == i){
+                        rb->lcd_invertrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+2, 2, CARD_WIDTH-3, CARD_HEIGHT-1);
+                    }
+                    break;
+                }
                 /* clear the card's spot */
-                rb->lcd_clearrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM,
-                                  j+1, CARD_WIDTH, CARD_HEIGHT-1);
+                rb->lcd_clearrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM, j+1, CARD_WIDTH, CARD_HEIGHT-1);
                 /* known card */
-                if(deck[c].known) {
-                    rb->lcd_bitmap(numbers[deck[c].num],
-                                   i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,
-                                   j, 8, 8, true);
-                    rb->lcd_bitmap(colors[deck[c].color],
-                                   i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7,
-                                   j, 8, 8, true);
+                if(deck[c].known){
+                    rb->lcd_bitmap(numbers[deck[c].num], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j, 8, 8, true);
+                    rb->lcd_bitmap(colors[deck[c].color], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7, j, 8, 8, true);
                 }
                 /* draw top line of the card */
-                rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,
-                                 j,i*(LCD_WIDTH - CARD_WIDTH)/
-                                 COL_NUM+CARD_WIDTH-1,j);
+                rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,j,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH-1,j);
                 /* selected card */
                 if(c == sel_card && sel_card != NOT_A_CARD){
-                    rb->lcd_drawrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,
-                                     j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                     rb->lcd_drawrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
                 }
                 /* cursor (or not) */
                 if(c == cur_card){
-                    rb->lcd_invertrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,
-                                       j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                    rb->lcd_invertrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
                     /* go to the next card */
                     c = deck[c].next;
-                    if(c == NOT_A_CARD)
-                        break;
+                    if(c == NOT_A_CARD) break;
                     j += CARD_HEIGHT - 2;
-                }
-                else {
+                } else {
                     /* go to the next card */
                     c = deck[c].next;
-                    if(c == NOT_A_CARD)
-                        break;
-                    j += min(CARD_HEIGHT - 2,
-                             (LCD_HEIGHT - CARD_HEIGHT)/biggest_col_length);
+                    if(c == NOT_A_CARD) break;
+                    j += min(CARD_HEIGHT - 2, (LCD_HEIGHT - CARD_HEIGHT)/biggest_col_length);
                 }
             }
-            /* draw line to the left of the column */
-            rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM,
-                             1,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM,
-                             j+CARD_HEIGHT-1);
-            /* draw line to the right of the column */
-            rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH,
-                             1,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH,
-                             j+CARD_HEIGHT-1);
-            /* draw bottom of the last card */
-            rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,
-                             j+CARD_HEIGHT,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+
-                             CARD_WIDTH-1,j+CARD_HEIGHT);
+            if(cols[i]!=NOT_A_CARD){
+                /* draw line to the left of the column */
+                rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM,1,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM,j+CARD_HEIGHT-1);
+                /* draw line to the right of the column */
+                rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH,1,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH,j+CARD_HEIGHT-1);
+                /* draw bottom of the last card */
+                rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,j+CARD_HEIGHT,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH-1,j+CARD_HEIGHT);
+            }
         }
 
         /* draw the stacks */
@@ -563,32 +735,43 @@ void solitaire(void){
                 }
             }
             if(c != NOT_A_CARD) {
-                rb->lcd_bitmap(numbers[deck[c].num], LCD_WIDTH - CARD_WIDTH+1,
-                               i*CARD_HEIGHT, 8, 8, true);
+                rb->lcd_bitmap(numbers[deck[c].num], LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8, true);
             }
-            rb->lcd_bitmap(colors[i], LCD_WIDTH - CARD_WIDTH+7,
-                           i*CARD_HEIGHT, 8, 8, true);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,
-                             i*CARD_HEIGHT,LCD_WIDTH - 1,i*CARD_HEIGHT);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,
-                             (i+1)*CARD_HEIGHT,LCD_WIDTH - 1,
-                             (i+1)*CARD_HEIGHT);
+            rb->lcd_bitmap(colors[i], LCD_WIDTH - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8, true);
+            /* draw a selected card */
+            if(c != NOT_A_CARD) {
+                if(sel_card == c){
+                    rb->lcd_drawrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                }
+            }
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,i*CARD_HEIGHT,LCD_WIDTH - 1,i*CARD_HEIGHT);
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH,i*CARD_HEIGHT+1,LCD_WIDTH - CARD_WIDTH,(i+1)*CARD_HEIGHT-1);
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,(i+1)*CARD_HEIGHT,LCD_WIDTH - 1,(i+1)*CARD_HEIGHT);
+            /* draw the cursor on one of the stacks */
+            if(cur_col == STACKS_COL + i){
+                rb->lcd_invertrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+            }
         }
 
         /* draw the remains */
-        rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,
-                         LCD_HEIGHT-CARD_HEIGHT-1,
-                         LCD_WIDTH - 1,LCD_HEIGHT-CARD_HEIGHT-1);
-        rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,
-                         LCD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-1);
-        if(cur_rem != NOT_A_CARD){
-            rb->lcd_bitmap(numbers[deck[cur_rem].num],
-                           LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,
-                           8, 8, true);
-             rb->lcd_bitmap(colors[deck[cur_rem].color],
-                            LCD_WIDTH - CARD_WIDTH+7,
-                            LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+        if(rem != NOT_A_CARD) {
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,LCD_HEIGHT-CARD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-CARD_HEIGHT-1);
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH - CARD_WIDTH,LCD_HEIGHT-2);
+            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,LCD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-1);
+            if(cur_rem != NOT_A_CARD){
+                rb->lcd_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+                 rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+                 /* draw a selected card */
+                 if(sel_card == cur_rem){
+                    rb->lcd_drawrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+                 }
+            }
         }
+        /* draw the cursor */
+        if(cur_col == REM_COL){
+            rb->lcd_invertrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+        }
+            
 
         rb->lcd_update();
         
@@ -596,269 +779,139 @@ void solitaire(void){
         switch(rb->button_get(true)){
             
             /* move cursor to the last card of the previous column */
+            /* or to the previous color stack */
+            /* or to the remains stack */
             case BUTTON_RIGHT:
-                cur_col = (cur_col+1)%COL_NUM;
-                cur_card = cols[cur_col];
-                if(cur_card != NOT_A_CARD){
-                    while(deck[cur_card].next != NOT_A_CARD){
-                        cur_card = deck[cur_card].next;
-                    }
+                if(cur_col >= COL_NUM){
+                    cur_col = 0;
+                } else if(cur_col == COL_NUM - 1){
+                    cur_col = REM_COL;
+                } else {
+                    cur_col = (cur_col+1)%(REM_COL+1);
                 }
+                if(cur_col == REM_COL){
+                    cur_card = cur_rem;
+                    break;
+                }
+                cur_card  = find_last_card(cur_col);
                 break;
             
-                /* move cursor to the last card of the next column */
+            /* move cursor to the last card of the next column */
+            /* or to the next color stack */
+            /* or to the remains stack */
             case BUTTON_LEFT:
-                cur_col = (cur_col + COL_NUM - 1)%COL_NUM;
-                cur_card = cols[cur_col];
-                if(cur_card != NOT_A_CARD){
-                    while(deck[cur_card].next != NOT_A_CARD){
-                        cur_card = deck[cur_card].next;
-                    }
+                if(cur_col == 0){
+                    cur_col = REM_COL;
+                } else if(cur_col >= COL_NUM) {
+                    cur_col = COL_NUM - 1;
+                } else {
+                    cur_col = (cur_col + REM_COL)%(REM_COL+1);
                 }
+                if(cur_col == REM_COL){
+                    cur_card = cur_rem;
+                    break;
+                }
+                cur_card = find_last_card(cur_col);
                 break;
             
-                /* move cursor to card that's bellow */
+            /* move cursor to card that's bellow */
             case BUTTON_DOWN:
+                if(cur_col >= COL_NUM) {
+                    cur_col = (cur_col - COL_NUM + 1)%(COLORS + 1) + COL_NUM;
+                    if(cur_col == REM_COL){
+                        cur_card = cur_rem;
+                    } else {
+                        cur_card = find_last_card(cur_col);
+                    }
+                    break;
+                }
                 if(cur_card == NOT_A_CARD) break;
                 if(deck[cur_card].next != NOT_A_CARD){
                     cur_card = deck[cur_card].next;
                 } else {
                     cur_card = cols[cur_col];
-                }
-                break;
-            
-                /* move cursor to card that's above */
-            case BUTTON_UP:
-                if(cur_card == NOT_A_CARD) break;
-                if(cols[cur_col] == cur_card){
-                    while(deck[cur_card].next != NOT_A_CARD){
+                    while(deck[cur_card].known == 0
+                          && deck[cur_card].next != NOT_A_CARD){
                         cur_card = deck[cur_card].next;
                     }
-                } else {
-                    c = cols[cur_col];
-                    while(deck[c].next != cur_card){
-                        c = deck[c].next;
-                    }
-                    cur_card = c;
                 }
                 break;
             
-                /* Try to put card under cursor on one of the stacks */
+            /* move cursor to card that's above */
+            case BUTTON_UP:
+                if(cur_col >= COL_NUM) {
+                    cur_col = (cur_col - COL_NUM + COLORS)%(COLORS + 1) + COL_NUM;
+                    if(cur_col == REM_COL){
+                        cur_card = cur_rem;
+                    } else {
+                        cur_card = find_last_card(cur_col);
+                    }
+                    break;
+                }
+                if(cur_card == NOT_A_CARD) break;
+                do{
+                    cur_card = find_prev_card(cur_card);
+                    if(cur_card == NOT_A_CARD){
+                        cur_card = find_last_card(cur_col);
+                    }
+                } while (deck[cur_card].next != NOT_A_CARD
+                         && deck[cur_card].known == 0);
+                break;
+            
+            /* Try to put card under cursor on one of the stacks */
             case BUTTON_F1:
-                /* check if a card is selected */
-                /* else there would be nothing to move on the stacks ! */
                 if(cur_card != NOT_A_CARD){
-                    /* find the last card in the color's stack and put it's number in 'c'. */
-                    c = stacks[deck[cur_card].color];
-                    if(c!=NOT_A_CARD){
-                        while(deck[c].next!=NOT_A_CARD){
-                            c = deck[c].next;
-                        }
-                    }
-                    /* if 'c' isn't a card, that means that the stack is empty */
-                    /* which implies that only an ace can be moved */
-                    if(c == NOT_A_CARD){
-                        /* check if the selected card is an ace */
-                        /* we don't have to check if any card is in the *.next */
-                        /* position since the ace is the last possible card */
-                        if(deck[cur_card].num == 0){
-                            /* remove 'cur_card' from any *.next postition ... */
-                            /* ... by looking in the columns */
-                            for(i=0;i<COL_NUM;i++){
-                                if(cols[i]==cur_card) cols[i] = NOT_A_CARD;
-                            }
-                            /* ... and in the entire deck */
-                            /* TODO : check if looking in the cols is really needed */
-                            for(i=0;i<COLORS*CARDS_PER_COLOR;i++){
-                                if(deck[i].next==cur_card) deck[i].next = NOT_A_CARD;
-                            }
-                            /* move cur_card on top of the stack */
-                            stacks[deck[cur_card].color] = cur_card;
-                            /* assign the card at the bottom of cur_col to cur_card */
-                            cur_card = cols[cur_col];
-                            if(cur_card != NOT_A_CARD){
-                                while(deck[cur_card].next != NOT_A_CARD){
-                                    cur_card = deck[cur_card].next;
-                                }
-                            }
-                            /* clear the selection indicator */
-                            sel_card = NOT_A_CARD;
-                        }
-                    }
-                    /* the stack is not empty */
-                    /* so we can move any card other than an ace */
-                    /* we thus check that the card we are moving is the next on the stack and that it isn't under any card */
-                    else if(deck[cur_card].num == deck[c].num + 1 &&
-                            deck[cur_card].next == NOT_A_CARD) {
-                        /* same as above */
-                        for(i=0;i<COL_NUM;i++) {
-                            if(cols[i]==cur_card)
-                                cols[i] = NOT_A_CARD;
-                        }
-                        /* re same */
-                        for(i=0;i<COLORS*CARDS_PER_COLOR;i++){
-                            if(deck[i].next==cur_card)
-                                deck[i].next = NOT_A_CARD;
-                        }
-                        /* ... */
-                        deck[c].next = cur_card;
-                        cur_card = cols[cur_col];
-                        if(cur_card != NOT_A_CARD){
-                            while(deck[cur_card].next != NOT_A_CARD){
-                                cur_card = deck[cur_card].next;
-                            }
-                        }
-                        sel_card = NOT_A_CARD;
-                    }
+                    move_card(deck[cur_card].color + STACKS_COL, cur_card);
                 }
                 break;
             
-                /* Move cards arround, Uncover cards, ... */
+            /* Move cards arround, Uncover cards, ... */
             case BUTTON_ON:
                 if(sel_card == NOT_A_CARD) {
-                    if((cur_card != NOT_A_CARD?
-                        deck[cur_card].next == NOT_A_CARD &&
-                        deck[cur_card].known==0:0)) {
-                        deck[cur_card].known = 1;
-                    } else {
-                        sel_card = cur_card;
-                    }
-                } else if(sel_card == cur_card) {
-                    sel_card = NOT_A_CARD;
-                } else if(cur_card != NOT_A_CARD){
-                    if(deck[cur_card].num == deck[sel_card].num + 1 &&
-                       (deck[cur_card].color + deck[sel_card].color)%2 == 1 ){
-                        for(i=0;i<COL_NUM;i++){
-                            if(cols[i]==sel_card)
-                                cols[i] = NOT_A_CARD;
-                        }
-                        for(i=0;i<COLORS*CARDS_PER_COLOR;i++){
-                            if(deck[i].next==sel_card)
-                                deck[i].next = NOT_A_CARD;
-                        }
-                        deck[cur_card].next = sel_card;
-                        sel_card = NOT_A_CARD;
-                    }
-                } else if(cur_card == NOT_A_CARD){
-                    if(deck[sel_card].num == CARDS_PER_COLOR - 1){
-                        for(i=0;i<COL_NUM;i++){
-                            if(cols[i]==sel_card)
-                                cols[i] = NOT_A_CARD;
-                        }
-                        for(i=0;i<COLORS*CARDS_PER_COLOR;i++){
-                            if(deck[i].next==sel_card)
-                                deck[i].next = NOT_A_CARD;
-                        }
-                        cols[cur_col] = sel_card;
-                        sel_card = NOT_A_CARD;
-                    }
-                }
-                break;
-            
-                /* If the card on the top of the remains can be put where */
-                /* the cursor is, go ahead */
-            case BUTTON_PLAY:
-                /* check if a card is face up on the remains' stack */
-                if(cur_rem != NOT_A_CARD){
-                    /* if no card is selected, it means the col is empty */
-                    /* thus, only a king can be moved */
-                    if(cur_card == NOT_A_CARD){
-                        /* check if selcted card is a king */
-                        if(deck[cur_rem].num == CARDS_PER_COLOR - 1){
-                            /* find the previous card on the remains' stack */
-                            c = rem;
-                            /* if the current card on the remains' stack */
-                            /* is the first card of the stack, then ... */
-                            if(c == cur_rem){
-                                c = NOT_A_CARD;
-                                rem = deck[cur_rem].next;
-                            }
-                            /* else ... */
-                            else {
-                                while(deck[c].next != cur_rem){
-                                    c = deck[c].next;
-                                }
-                                deck[c].next = deck[cur_rem].next;
-                            }
-                            cols[cur_col] = cur_rem;
-                            deck[cur_rem].next = NOT_A_CARD;
-                            deck[cur_rem].known = 1;
-                            cur_rem = c;
-                        }
-                    } else if(deck[cur_rem].num + 1 == deck[cur_card].num &&
-                              (deck[cur_rem].color +
-                               deck[cur_card].color)%2==1) {
-                        c = rem;
-                        if(c == cur_rem){
-                            c = NOT_A_CARD;
-                            rem = deck[cur_rem].next;
+                    if(cur_card != NOT_A_CARD){
+                        /* reveal a hidden card */
+                        if(deck[cur_card].next == NOT_A_CARD && deck[cur_card].known==0){
+                            deck[cur_card].known = 1;
+                        /* select a card */
                         } else {
-                            while(deck[c].next != cur_rem){
-                                c = deck[c].next;
-                            }
-                            deck[c].next = deck[cur_rem].next;
+                            sel_card = cur_card;
                         }
-                        deck[cur_card].next = cur_rem;
-                        deck[cur_rem].next = NOT_A_CARD;
-                        deck[cur_rem].known = 1;
-                        cur_rem = c;
+                    }
+                /* unselect card or try putting card on one of the 4 stacks */
+                } else if(sel_card == cur_card) {
+                    move_card(deck[sel_card].color + COL_NUM, sel_card);
+                    sel_card = NOT_A_CARD;
+                /* try moving cards */
+                } else {
+                    if(move_card(cur_col, sel_card) == MOVE_OK){
+                        sel_card = NOT_A_CARD;
                     }
                 }
                 break;
             
-                /* If the card on top of the remains can be put on one */
-                /* of the stacks, do so */
+            /* If the card on the top of the remains can be put where */
+            /* the cursor is, go ahead */
+            case BUTTON_PLAY:
+                move_card(cur_col, cur_rem);
+                break;
+            
+            /* If the card on top of the remains can be put on one */
+            /* of the stacks, do so */
             case BUTTON_F3:
                 if(cur_rem != NOT_A_CARD){
-                    if(deck[cur_rem].num == 0){
-                        c = rem;
-                        if(c == cur_rem){
-                            c = NOT_A_CARD;
-                            rem = deck[cur_rem].next;
-                        } else {
-                            while(deck[c].next != cur_rem){
-                                c = deck[c].next;
-                            }
-                            deck[c].next = deck[cur_rem].next;
-                        }
-                        deck[cur_rem].next = NOT_A_CARD;
-                        deck[cur_rem].known = 1;
-                        stacks[deck[cur_rem].color] = cur_rem;
-                        cur_rem = c;
-                    } else {
-                        
-                        i = stacks[deck[cur_rem].color];
-                        if(i==NOT_A_CARD) break;
-                        while(deck[i].next != NOT_A_CARD){
-                            i = deck[i].next;
-                        }
-                        if(deck[i].num + 1 == deck[cur_rem].num){
-                            c = rem;
-                            if(c == cur_rem){
-                                c = NOT_A_CARD;
-                                rem = deck[cur_rem].next;
-                            } else {
-                                while(deck[c].next != cur_rem){
-                                    c = deck[c].next;
-                                }
-                                deck[c].next = deck[cur_rem].next;
-                            }
-                            deck[i].next = cur_rem;
-                            deck[cur_rem].next = NOT_A_CARD;
-                            deck[cur_rem].known = 1;
-                            cur_rem = c;
-                        }
-                    }
+                    move_card(deck[cur_rem].color + COL_NUM, cur_rem);
                 }
-                break;   
+                break;
             
-                /* unselect selected card or ... */
-                /* draw new cards from the remains of the deck */
+            /* unselect selected card or ... */
+            /* draw new cards from the remains of the deck */
             case BUTTON_F2:
                 if(sel_card != NOT_A_CARD){
                     /* unselect selected card */
                     sel_card = NOT_A_CARD;
-                } else if(rem != NOT_A_CARD) {
+                    break;
+                }
+                if(rem != NOT_A_CARD) {
                     /* draw new cards form the remains of the deck */
                     if(cur_rem == NOT_A_CARD){
                         cur_rem = rem;
@@ -870,24 +923,30 @@ void solitaire(void){
                         cur_rem = deck[cur_rem].next;
                         i--;
                     }
-                    /* test if any cards are really left on the remains' stack */
+                    /* test if any cards are really left on */
+                    /* the remains' stack */
                     if(i == CARDS_PER_DRAW){
                         cur_rem = NOT_A_CARD;
                     }
                 }
                 break;
             
-                /* Show the menu */
+            /* Show the menu */
             case BUTTON_OFF:
                 switch(solitaire_menu(MENU_DURINGGAME)){
                     case MENU_QUIT:
-                        return;
+                        return SOLITAIRE_QUIT;
 
                     case MENU_RESTART:
                         solitaire_init();
                         break;
                 }
         }
+
+        /* fix incoherences concerning cur_col and cur_card */
+        c = find_card_col(cur_card);
+        if(c != NOT_A_COL && c != cur_col)
+            cur_card = find_last_card(cur_col);
     }
 }
 
@@ -903,7 +962,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->splash(HZ*2, true, "Welcome to Solitaire !");
     
     /* play the game :) */
-    solitaire();
+    /* Keep playing if a game was won (that means display the menu after */
+    /* winning instead of quiting) */
+    while(solitaire() == SOLITAIRE_WIN);
 
     /* Exit the plugin */
     return PLUGIN_OK;
