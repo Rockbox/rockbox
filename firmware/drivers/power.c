@@ -37,6 +37,7 @@ void power_init(void)
     charger_enable(false); /* Default to charger OFF */
 #endif
 #ifdef HAVE_ATA_POWER_OFF
+    or_b(0x20, &PADRL); /* leave the disk on */
     or_b(0x20, &PAIORL);
     PACR2 &= 0xFBFF;
 #endif
