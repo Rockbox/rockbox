@@ -142,26 +142,23 @@ void show_info(void)
     lcd_puts(0, 0, "Rockbox info:");
     /* TODO: add disk size/usage info, battery charge etc here? */
 
-#ifdef HAVE_RTC
-    snprintf(s, sizeof(s), "Booted: %d times", global_settings.total_boots);
-    lcd_puts(0, 2, s);
-#endif
-
     integer = buflen / 100;
     decimal = buflen % 100;
 #ifdef HAVE_LCD_CHARCELLS
-    snprintf(s, sizeof(s), "Buf: %d.%02dM", integer, decimal);
+    snprintf(s, sizeof(s), "Buf: %d.%02dMb", integer, decimal);
+    lcd_puts(0, 0, s);
 #else
     snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
+    lcd_puts(0, 2, s);
 #endif
-    lcd_puts(0, 3, s);
     
 #ifdef HAVE_LCD_CHARCELLS
     snprintf(s, sizeof(s), "Batt: %d%%", battery_level());
+    lcd_puts(0, 1, s);
 #else
     snprintf(s, sizeof(s), "Battery: %d%%", battery_level());
+    lcd_puts(0, 3, s);
 #endif
-    lcd_puts(0, 4, s);
     
     lcd_update();
 
