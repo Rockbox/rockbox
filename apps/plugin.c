@@ -177,7 +177,6 @@ static struct plugin_api rockbox_api = {
     plugin_get_mp3_buffer,
     mpeg_sound_set,
 #ifndef SIMULATOR
-    mp3_play_init,
     mp3_play_data,
     mp3_play_pause,
     mp3_play_stop,

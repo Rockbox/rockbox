@@ -65,7 +65,7 @@
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 10
+#define PLUGIN_MIN_API_VERSION 18
 
 /* plugin return codes */
 enum plugin_status {
@@ -206,7 +206,6 @@ struct plugin_api {
     void* (*plugin_get_mp3_buffer)(int* buffer_size);
     void (*mpeg_sound_set)(int setting, int value);
 #ifndef SIMULATOR
-    void (*mp3_play_init)(void); /* FIXME: remove this next time we break compatibility */
     void (*mp3_play_data)(unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
