@@ -35,7 +35,7 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 /***************** Constants *****************/
 
-#define QUEUE_SIZE 20
+#define QUEUE_SIZE 50
 const char* voicefont_file = "/.rockbox/langs/english.voice";
 const char* dir_thumbnail_name = ".dirname.mp3";
 
@@ -487,3 +487,33 @@ int talk_value(int n, int unit, bool enqueue)
     return 0;
 }
 
+/* spell a string */
+int talk_spell(char* spell, bool enqueue) 
+{
+    char c; /* currently processed char */
+    
+    if (mpeg_status()) /* busy, buffer in use */
+        return -1; 
+
+    if (!enqueue)
+        shutup(); /* cut off all the pending stuff */
+    
+    while ((c = *spell++) != '\0')
+    {
+        /* if this grows into too many cases, I should use a table */
+        if (c >= 'A' && c <= 'Z')
+            talk_id(VOICE_CHAR_A + c - 'A', true);
+        else if (c >= 'a' && c <= 'z')
+            talk_id(VOICE_CHAR_A + c - 'a', true);
+        else if (c >= '0' && c <= '9')
+            talk_id(VOICE_ZERO + c - '0', true);
+        else if (c == '-')
+            talk_id(VOICE_MINUS, true);
+        else if (c == '+')
+            talk_id(VOICE_PLUS, true);
+        else if (c == '.')
+            talk_id(VOICE_POINT, true);
+    }
+
+    return 0;
+}

@@ -2427,3 +2427,219 @@ eng: ""
 voice: "folder"
 new:
 
+id: LANG_VOICE_SPELL
+desc: "talkbox" mode for files+directories
+eng: "Spell"
+voice: "Spell"
+new:
+
+id: VOICE_CHAR_A
+desc: spoken only, for spelling
+eng: ""
+voice: "A"
+new:
+
+id: VOICE_CHAR_B
+desc: spoken only, for spelling
+eng: ""
+voice: "B"
+new:
+
+id: VOICE_CHAR_C
+desc: spoken only, for spelling
+eng: ""
+voice: "C"
+new:
+
+id: VOICE_CHAR_D
+desc: spoken only, for spelling
+eng: ""
+voice: "D"
+new:
+
+id: VOICE_CHAR_E
+desc: spoken only, for spelling
+eng: ""
+voice: "E"
+new:
+
+id: VOICE_CHAR_F
+desc: spoken only, for spelling
+eng: ""
+voice: "F"
+new:
+
+id: VOICE_CHAR_G
+desc: spoken only, for spelling
+eng: ""
+voice: "G"
+new:
+
+id: VOICE_CHAR_H
+desc: spoken only, for spelling
+eng: ""
+voice: "H"
+new:
+
+id: VOICE_CHAR_I
+desc: spoken only, for spelling
+eng: ""
+voice: "I"
+new:
+
+id: VOICE_CHAR_J
+desc: spoken only, for spelling
+eng: ""
+voice: "J"
+new:
+
+id: VOICE_CHAR_K
+desc: spoken only, for spelling
+eng: ""
+voice: "K"
+new:
+
+id: VOICE_CHAR_L
+desc: spoken only, for spelling
+eng: ""
+voice: "L"
+new:
+
+id: VOICE_CHAR_M
+desc: spoken only, for spelling
+eng: ""
+voice: "M"
+new:
+
+id: VOICE_CHAR_N
+desc: spoken only, for spelling
+eng: ""
+voice: "N"
+new:
+
+id: VOICE_CHAR_O
+desc: spoken only, for spelling
+eng: ""
+voice: "O"
+new:
+
+id: VOICE_CHAR_P
+desc: spoken only, for spelling
+eng: ""
+voice: "P"
+new:
+
+id: VOICE_CHAR_Q
+desc: spoken only, for spelling
+eng: ""
+voice: "Q"
+new:
+
+id: VOICE_CHAR_R
+desc: spoken only, for spelling
+eng: ""
+voice: "R"
+new:
+
+id: VOICE_CHAR_S
+desc: spoken only, for spelling
+eng: ""
+voice: "S"
+new:
+
+id: VOICE_CHAR_T
+desc: spoken only, for spelling
+eng: ""
+voice: "T"
+new:
+
+id: VOICE_CHAR_U
+desc: spoken only, for spelling
+eng: ""
+voice: "U"
+new:
+
+id: VOICE_CHAR_V
+desc: spoken only, for spelling
+eng: ""
+voice: "V"
+new:
+
+id: VOICE_CHAR_W
+desc: spoken only, for spelling
+eng: ""
+voice: "W"
+new:
+
+id: VOICE_CHAR_X
+desc: spoken only, for spelling
+eng: ""
+voice: "X"
+new:
+
+id: VOICE_CHAR_Y
+desc: spoken only, for spelling
+eng: ""
+voice: "Y"
+new:
+
+id: VOICE_CHAR_Z
+desc: spoken only, for spelling
+eng: ""
+voice: "Z"
+new:
+
+id: VOICE_EXT_MPA
+desc: spoken only, for file extension
+eng: ""
+voice: "audio"
+new:
+
+id: VOICE_EXT_CFG
+desc: spoken only, for file extension
+eng: ""
+voice: "configuration"
+new:
+
+id: VOICE_EXT_WPS
+desc: spoken only, for file extension
+eng: ""
+voice: "while-playing-screen"
+new:
+
+id: VOICE_EXT_TXT
+desc: spoken only, for file extension
+eng: ""
+voice: "text"
+new:
+
+id: VOICE_EXT_ROCK
+desc: spoken only, for file extension
+eng: ""
+voice: "plug-in"
+new:
+
+id: VOICE_EXT_FONT
+desc: spoken only, for file extension
+eng: ""
+voice: "font"
+new:
+
+id: VOICE_EXT_BMARK
+desc: spoken only, for file extension
+eng: ""
+voice: "bookmark"
+new:
+
+id: VOICE_EXT_UCL
+desc: spoken only, for file extension
+eng: ""
+voice: "flash"
+new:
+
+id: VOICE_EXT_AJZ
+desc: spoken only, for file extension
+eng: ""
+voice: "firmware"
+new:
+

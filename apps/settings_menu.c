@@ -891,21 +891,23 @@ static bool voice_dirs(void)
     struct opt_items names[] = {
         { STR(LANG_OFF) }, 
         { STR(LANG_VOICE_NUMBER) },
+        { STR(LANG_VOICE_SPELL) },
         { STR(LANG_VOICE_DIR_ENTER) },
         { STR(LANG_VOICE_DIR_HOVER) }
     };
     return set_option( str(LANG_VOICE_DIR), 
-                       &global_settings.talk_dir, INT, names, 4, NULL);
+                       &global_settings.talk_dir, INT, names, 5, NULL);
 }
 
 static bool voice_files(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) }, 
-        { STR(LANG_VOICE_NUMBER) }
+        { STR(LANG_VOICE_NUMBER) },
+        { STR(LANG_VOICE_SPELL) }
     };
-    return set_option( str(LANG_VOICE_DIR), 
-                       &global_settings.talk_file, INT, names, 2, NULL);
+    return set_option( str(LANG_VOICE_FILE), 
+                       &global_settings.talk_file, INT, names, 3, NULL);
 }
 
 static bool voice_menu(void)

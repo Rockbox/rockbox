@@ -1203,13 +1203,13 @@ bool settings_load_config(char* file)
         }
         else if (!strcasecmp(name, "talk dir"))
         {
-            static char* options[] = {"off", "number", "enter", "hover"};
-            set_cfg_option(&global_settings.talk_dir, value, options, 4);
+            static char* options[] = {"off", "number", "spell", "enter", "hover"};
+            set_cfg_option(&global_settings.talk_dir, value, options, 5);
         }
         else if (!strcasecmp(name, "talk file"))
         {
-            static char* options[] = {"off", "number"};
-            set_cfg_option(&global_settings.talk_dir, value, options, 2);
+            static char* options[] = {"off", "number", "spell"};
+            set_cfg_option(&global_settings.talk_file, value, options, 3);
         }
         else if (!strcasecmp(name, "talk menu"))
         {
@@ -1563,11 +1563,11 @@ bool settings_save_config(void)
     }
     fprintf(fd, "#\r\n# Voice\r\n#\r\n");
     {
-        static char* options[] = {"off", "number", "enter", "hover"};
+        static char* options[] = {"off", "number", "spell", "enter", "hover"};
         fprintf(fd, "talk dir: %s\r\n",
             options[global_settings.talk_dir]);
         fprintf(fd, "talk file: %s\r\n", /* recycle the options, */
-            options[global_settings.talk_file]); /* first 2 are alike */
+            options[global_settings.talk_file]); /* first 3 are alike */
         fprintf(fd, "talk menu: %s\r\n",
             boolopt[global_settings.talk_menu]);
     }

@@ -64,5 +64,6 @@ int talk_id(int id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(char* filename, bool enqueue); /* play a thumbnail from file */
 int talk_number(int n, bool enqueue); /* say a number */
 int talk_value(int n, int unit, bool enqueue); /* say a numeric value */
+int talk_spell(char* spell, bool enqueue); /* spell a string */
 
 #endif /* __TALK_H__ */

@@ -70,32 +70,33 @@ static struct
     char* extension; /* extension for which the file type is recognized */
     int tree_attr; /* which identifier */
     int icon; /* the icon which shall be used for it, -1 if unknown */
+    int voiceclip; /* spoken extension */
     /* To have it extendable, there could be more useful stuff in here,
        like handler functions, plugin name, etc. */
 } filetypes[] = {
-    { ".mp3", TREE_ATTR_MPA, File     },
-    { ".mp2", TREE_ATTR_MPA, File     },
-    { ".mpa", TREE_ATTR_MPA, File     },
-    { ".m3u", TREE_ATTR_M3U, Playlist },
-    { ".cfg", TREE_ATTR_CFG, Config   },
-    { ".wps", TREE_ATTR_WPS, Wps,     },
-    { ".txt", TREE_ATTR_TXT, Text     },
-    { ".lng", TREE_ATTR_LNG, Language },
-    { ".rock",TREE_ATTR_ROCK,Plugin   },
+    { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYINDICES_PLAYLIST },
+    { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },
+    { ".wps", TREE_ATTR_WPS, Wps, VOICE_EXT_WPS },
+    { ".txt", TREE_ATTR_TXT, Text, VOICE_EXT_TXT },
+    { ".lng", TREE_ATTR_LNG, Language, LANG_LANGUAGE },
+    { ".rock",TREE_ATTR_ROCK,Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
-    { ".fnt", TREE_ATTR_FONT,Font     },
-    { ".ch8", TREE_ATTR_CH8, Chip8    },
-    { ".rvf", TREE_ATTR_RVF, Video    },
-    { ".bmark",TREE_ATTR_BMARK,Bookmark   },
+    { ".fnt", TREE_ATTR_FONT,Font, VOICE_EXT_FONT },
+    { ".ch8", TREE_ATTR_CH8, Chip8, -1 },
+    { ".rvf", TREE_ATTR_RVF, Video, -1 },
+    { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
 #else
-   {  ".bmark", TREE_ATTR_BMARK, -1       },
+    {  ".bmark", TREE_ATTR_BMARK, -1, VOICE_EXT_BMARK },
 #endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
-    { ".ucl", TREE_ATTR_UCL, Flashfile},
-    { ".ajz", TREE_ATTR_MOD, Mod_Ajz  },
+    { ".ucl", TREE_ATTR_UCL, Flashfile, VOICE_EXT_UCL },
+    { ".ajz", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #else
-    { ".mod", TREE_ATTR_MOD, Mod_Ajz  },
+    { ".mod", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #endif
 #endif /* #ifndef SIMULATOR */
 };
@@ -195,7 +196,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #endif /* HAVE_RECORDER_KEYPAD */
 
 /* talkbox hovering delay, to avoid immediate disk activity */
-#define HOVER_DELAY (HZ)
+#define HOVER_DELAY (HZ/2)
 
 static int build_playlist(int start_index)
 {
@@ -1061,7 +1062,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                     snprintf(buf,sizeof(buf),"/%s",file->name);
 
                 if (file->attr & ATTR_DIRECTORY) {
-                    if (global_settings.talk_dir == 2) /* enter */
+                    if (global_settings.talk_dir == 3) /* enter */
                     {
                         /* play_dirname */
                         DEBUGF("Playing directory thumbnail: %s", currdir);
@@ -1493,7 +1494,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 if (dircache[i].attr & ATTR_DIRECTORY) /* directory? */
                 {
                     /* play directory thumbnail */
-                    if (global_settings.talk_dir == 3) /* hover */
+                    if (global_settings.talk_dir == 4) /* hover */
                     {   /* "schedule" a thumbnail, to have a little dalay */
                         thumbnail_time = current_tick + HOVER_DELAY;
                     }
@@ -1502,12 +1503,35 @@ static bool dirbrowse(char *root, int *dirfilter)
                         talk_id(VOICE_DIR, false);
                         talk_number(i+1, true);
                     }
+                    else if (global_settings.talk_dir == 2) /* dirs spelled */
+                    {
+                        talk_spell(dircache[i].name, false);
+                    }
                 }
                 else if (global_settings.talk_file == 1) /* files as numbers */
                 {
+                    /* try to find a voice ID for the extension, if known */
+                    int j;
+                    int ext_id = -1; /* default to none */
+                    for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
+                    {
+                        if ((dircache[i].attr & TREE_ATTR_MASK) == filetypes[j].tree_attr)
+                        {
+                            ext_id = filetypes[j].voiceclip;
+                            break;
+                        }
+                    }
+
                     /* enqueue_next is true if still talking the dir name */
                     talk_id(VOICE_FILE, enqueue_next);
                     talk_number(i-dirsindir+1, true);
+                    talk_id(ext_id, true);
+                    enqueue_next = false;
+                }
+                else if (global_settings.talk_file == 2) /* files spelled */
+                {
+                    /* enqueue_next is true if still talking the dir name */
+                    talk_spell(dircache[i].name, enqueue_next);
                     enqueue_next = false;
                 }
 
