@@ -43,12 +43,12 @@ new:
 
 id: LANG_DEBUG
 desc: in the main menu
-eng: "Debug (keep out!)"
+eng: "Debug (Keep Out!)"
 new:
 
 id: LANG_USB
 desc: in the main menu
-eng: "USB (sim)"
+eng: "USB (Sim)"
 new:
 
 id: LANG_ROCKBOX_INFO
@@ -78,7 +78,7 @@ new:
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
+eng: "Battery: Charging"
 new:
 
 id: LANG_BOUNCE
@@ -133,42 +133,42 @@ new:
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-eng: "buffer full"
+eng: "Buffer Full"
 new:
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
-eng: "%d files"
+eng: "%d Files"
 new:
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new:
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. low?"
+eng: "Batt. Low?"
 new:
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new:
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is battery low?"
+eng: "Is Battery Low?"
 new:
 
 id: LANG_TIME_SET
 dec: used in set_time()
-eng: "ON to set"
+eng: "ON To Set"
 new:
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-eng: "OFF to revert"
+eng: "OFF To Revert"
 new:
 
 id: LANG_HIDDEN
@@ -285,7 +285,7 @@ new:
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-eng: "Are you sure?"
+eng: "Are You Sure?"
 new: 
 
 # depreciated
@@ -327,7 +327,7 @@ new:
 
 id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Reset settings"
+eng: "Reset Settings"
 new:
 
 id: LANG_PLAYBACK
@@ -427,7 +427,7 @@ new:
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
+eng: "Is Full!"
 new:
 
 id: LANG_RESUME_ASK
@@ -452,22 +452,22 @@ new:
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-eng: "Keylock ON"
+eng: "Key Lock ON"
 new:
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-eng: "Keylock OFF"
+eng: "Key Lock OFF"
 new:
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key lock is ON"
+eng: "Key Lock Is ON"
 new:
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
+eng: "Key Lock is OFF"
 new:
 
 id: LANG_MUTE_ON_PLAYER
@@ -482,12 +482,12 @@ new:
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-eng: "Mute is ON"
+eng: "Mute Is ON"
 new:
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-eng: "Mute is OFF"
+eng: "Mute Is OFF"
 new:
 
 id: LANG_ID3_INFO
@@ -507,7 +507,7 @@ new:
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
+eng: "<No Title>"
 new:
 
 id: LANG_ID3_ARTIST
@@ -517,7 +517,7 @@ new:
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
+eng: "<No Artist>"
 new:
 
 id: LANG_ID3_ALBUM
@@ -527,7 +527,7 @@ new:
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
+eng: "<No Album>"
 new:
 
 id: LANG_ID3_TRACKNUM
@@ -537,7 +537,7 @@ new:
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
+eng: "<No Tracknum>"
 new:
 
 id: LANG_ID3_LENGHT
@@ -567,12 +567,12 @@ new:
 
 id: LANG_PITCH_UP
 desc: in wps
-eng: "Pitch up"
+eng: "Pitch Up"
 new:
 
 id: LANG_PITCH_DOWN
 desc: in wps
-eng: "Pitch down"
+eng: "Pitch Down"
 new:
 
 id: LANG_PAUSE
@@ -582,7 +582,7 @@ new:
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-eng: "mode:"
+eng: "Mode:"
 new:
 
 id: LANG_DIR_FILTER
@@ -602,12 +602,12 @@ new:
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-eng: "bar"
+eng: "Bar"
 new:
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End of list"
+eng: "End Of List"
 new:
 
 id: LANG_END_CONFIRM_PLAYER
@@ -617,7 +617,7 @@ new:
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "End of song list"
+eng: "End Of Song List"
 new: 
 
 id: LANG_END_CONFIRM_RECORDER
@@ -647,12 +647,12 @@ new:
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[PLAY] to resume"
+eng: "[PLAY] To Resume"
 new:
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[OFF] to quit"
+eng: "[OFF] To Quit"
 new:
 
 id: LANG_SNAKE_LEVEL
@@ -662,12 +662,12 @@ new:
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
-eng: "(1 - slow, 9 - fast)"
+eng: "(1 - Slow, 9 - Fast)"
 new:
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[PLAY] to start/pause"
+eng: "[PLAY] To Start/Pause"
 new:
 
 id: LANG_SOKOBAN_LEVEL
@@ -687,22 +687,22 @@ new:
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] to stop"
+eng: "[OFF] To Stop"
 new:
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - level"
+eng: "[F1] - Level"
 new:
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] same level"
+eng: "[F2] Same Level"
 new:
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + level"
+eng: "[F3] + Level"
 new:
 
 # Next ids are for Worlmet Game.
@@ -761,34 +761,34 @@ new:
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote control F1"
+eng: "Remote Control F1"
 new:
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No rem. control F1"
+eng: "No Rem. Control F1"
 new:
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 key control   F1"
+eng: "2 Key Control   F1"
 new:
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 key control   F1"
+eng: "4 Key Control   F1"
 new:
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out of control"
+eng: "Out Of Control"
 new:
 
 # Wormlet game ids ended
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You lose!"
+eng: "You Lose!"
 new:
 
 id: LANG_TETRIS_LEVEL
@@ -803,7 +803,7 @@ new:
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-eng: "new language"
+eng: "New Language"
 new:
 
 id: LANG_FILTER
@@ -905,12 +905,12 @@ new:
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-eng: "12 hour clock"
+eng: "12 Hour Clock"
 new:
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-eng: "24 hour clock"
+eng: "24 Hour Clock"
 new:
 
 id: LANG_WEEKDAY_SUNDAY
@@ -1055,12 +1055,12 @@ new:
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-eng: "Save energy"
+eng: "Save Energy"
 new:
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
+eng: "dBfs <-> Linear"
 new:
 
 id: LANG_PM_DBFS
@@ -1070,17 +1070,17 @@ new:
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "linear"
+eng: "Linear"
 new:
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-eng: "Minimum of range"
+eng: "Minimum Of Range"
 new:
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-eng: "Maximum of range"
+eng: "Maximum Of Range"
 new:
 id: LANG_RECORDING
 desc: in the main menu
@@ -1139,7 +1139,7 @@ new:
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-eng: "Recording settings"
+eng: "Recording Settings"
 new:
 
 id: LANG_DISK_STAT
@@ -1169,12 +1169,12 @@ new:
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-eng: "Sleep timer"
+eng: "Sleep Timer"
 new:
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
+eng: "Anti-Skip Buffer"
 new:
 
 id: LANG_BIDIR_SCROLL
@@ -1229,12 +1229,12 @@ new:
 
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
-eng: "Total queued: %d"
+eng: "Total Queued: %d"
 new:
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full
-eng: "Queue buffer full"
+eng: "Queue Buffer Full"
 new:
 
 id: LANG_MENU_SETTING_CANCEL
@@ -1284,7 +1284,7 @@ new:
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-eng: "failed"
+eng: "Failed"
 new: 
 
 id: LANG_ALARM_MOD_ALARM_MENU
@@ -1294,22 +1294,22 @@ new:
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm time: %02d:%02d"
+eng: "Alarm Time: %02d:%02d"
 new: 
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking up in %d:%02d"
+eng: "Waking Up In %d:%02d"
 new: 
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting down..."
+eng: "Shutting Down..."
 new: 
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm time is too soon!"
+eng: "Alarm Time Is Too Soon!"
 new: 
 
 id: LANG_ALARM_MOD_KEYS
@@ -1364,7 +1364,7 @@ new:
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
-eng: "<no info>"
+eng: "<No Info>"
 new:
 
 id: LANG_RECORDING_TIME
@@ -1389,7 +1389,7 @@ new:
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
-eng: "loaded"
+eng: "Loaded"
 new: 
 
 id: LANG_FADE_ON_STOP
@@ -1399,5 +1399,5 @@ new:
 
 id: LANG_SOKOBAN_ON
 desc: how to undo move 
-eng: "[ON] to undo"
+eng: "[ON] To Undo"
 new:
