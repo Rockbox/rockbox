@@ -412,9 +412,10 @@ Q51: How can I make playlists on my PC?
 A51: There are many programs that can create .m3u playlists. WinAmp is one.
      Another simple method, that requires no extra software, is to use dir:
 
-       cd f:\jukebox
-       dir /b /s > allfiles.m3u
-       dir /b /s \Pop > pop.m3u
+       dir /b /s X:\ > X:\allfiles.m3u
+       dir /b /s X:\Pop > X:\pop.m3u
+
+     ...where X: is your archos drive.
 
      Linux users can use the 'find' command:
 
