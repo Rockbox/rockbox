@@ -953,11 +953,18 @@ static void mpeg_thread(void)
                         mp3buf_read += mp3buflen;
                     }
 
-                    playing = true;
-                    last_dma_tick = current_tick;
-                    init_dma();
-                    if (!paused)
-                        start_dma();
+                    if (get_unplayed_space() < MPEG_LOW_WATER)
+                    {
+                        /* We need to load more data before starting */
+                        filling = true;
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);                        
+                        play_pending = true;
+                    }
+                    else
+                    {
+                        /* resume will start at new position */
+                        init_dma();
+                    }
                 }
                 else
                 {
