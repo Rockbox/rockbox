@@ -255,8 +255,6 @@ int menu_show(int m)
         menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
     else
         menu_lines = LCD_HEIGHT/fh;
-#else
-    int menu_lines = MENU_LINES;
 #endif
 
     menu_draw(m);
