@@ -197,7 +197,7 @@ Menu settings_menu(void)
         { "Time/Date",       timedate_set    },
 #endif
         { "Show hidden files", show_hidden_files },
-        { "FF/Rewind",       ff_rewind_min_step },
+        { "FF/Rewind Min Step", ff_rewind_min_step },
         { "FF/Rewind Accel", ff_rewind_accel },
         { "Resume",          resume          },
         { "Disk spindown",   spindown        },
