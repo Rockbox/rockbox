@@ -86,7 +86,7 @@ void queue_post(struct event_queue *q, int id, void *data)
     int wr;
     int oldlevel;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = set_irq_level(15<<4);
     wr = (q->write++) & QUEUE_LENGTH_MASK;
 
     q->events[wr].id = id;
