@@ -54,7 +54,7 @@ static bool flipped; /* bottons can be flipped to match the LCD flip */
 #define REPEAT_INTERVAL_FINISH  5
 
 /* Number of repeated keys before shutting off */
-#define POWEROFF_COUNT 40
+#define POWEROFF_COUNT 10
 
 static int button_read(void);
 
@@ -116,12 +116,13 @@ static void button_tick(void)
                             
                             repeat_count++;
                             
-                            /* Shutdown if we have a device which doesn't shut
-                               down easily with the OFF key */
-#ifdef HAVE_POWEROFF_ON_PB5
+                            /* Send a SYS_POWEROFF event if we have a device
+                               which doesn't shut down easily with the OFF
+                               key */
+#ifdef HAVE_SW_POWEROFF
                             if(btn == BUTTON_OFF && !charger_inserted() &&
                                repeat_count > POWEROFF_COUNT)
-                                power_off();
+                                queue_post(&button_queue, SYS_POWEROFF, NULL);
 #endif
                         }
                     }

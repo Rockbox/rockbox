@@ -946,21 +946,25 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 break;
 
 #ifdef TREE_OFF
+#ifndef HAVE_SW_POWEROFF
             case TREE_OFF:
-                /* Stop the music if it is playing, else show the shutdown
-                   screen */
-                if(mpeg_status())
-                    mpeg_stop();
-                else {
-                    if (!charger_inserted()) {
-                        shutdown_screen();
-                    } else {
-                        charging_splash();
+                if (*dirfilter < NUM_FILTER_MODES)
+                {
+                    /* Stop the music if it is playing, else show the shutdown
+                       screen */
+                    if(mpeg_status())
+                        mpeg_stop();
+                    else {
+                        if (!charger_inserted()) {
+                            shutdown_screen();
+                        } else {
+                            charging_splash();
+                        }
+                        restore = true;
                     }
-                    restore = true;
                 }
                 break;
-
+#endif
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();

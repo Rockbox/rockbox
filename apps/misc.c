@@ -217,6 +217,7 @@ bool clean_shutdown(void)
     {
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
+        sleep(HZ);
         mpeg_stop();
         ata_flush();
         ata_spindown(1);
@@ -239,6 +240,10 @@ int default_event_handler(int event)
 #endif
                 usb_screen();
             return SYS_USB_CONNECTED;
+        case SYS_POWEROFF:
+            if (!clean_shutdown())
+                return SYS_POWEROFF;
+            break;
     }
     return 0;
 }

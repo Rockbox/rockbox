@@ -73,4 +73,7 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #endif /* SIMULATOR */

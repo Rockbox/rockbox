@@ -70,4 +70,7 @@
 /* Define this if the MAS SIBI line can be controlled via PB8 */
 #define HAVE_MAS_SIBI_CONTROL
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #endif /* SIMULATOR */
