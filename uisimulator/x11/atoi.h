@@ -1,0 +1,2 @@
+
+int atoi(const char *);

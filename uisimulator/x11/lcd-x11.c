@@ -46,6 +46,8 @@ extern Display *dpy;
 #ifdef HAVE_LCD_BITMAP
 unsigned char lcd_framebuffer_copy[LCD_WIDTH][LCD_HEIGHT/8];
 
+static int counter;
+
 void lcd_update (void)
 {
     int x, y;
@@ -54,6 +56,8 @@ void lcd_update (void)
     struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
     int cp=0;
     struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
+
+    fprintf(stderr, "%04d: lcd_update()\n", counter++);
 
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
@@ -103,6 +107,9 @@ void lcd_update_rect(int x_start, int y_start,
     int ymax;
     struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
     struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
+
+    fprintf(stderr, "%04d: lcd_update_rect(%d, %d, %d, %d)\n",
+            counter++, x_start, y_start, width, height);
 
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (yline + height)/8;

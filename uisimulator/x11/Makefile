@@ -32,7 +32,6 @@ endif
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
-COMMON = $(FIRMWAREDIR)/common
 LIBMADDIR = $(PREVAPPDIR)/common/libmad
 TOOLSDIR = ../../tools
 DOCSDIR = ../../docs
@@ -53,11 +52,12 @@ $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES) $(RTC)
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(OBJDIR)
-SRCDIRS = . $(DRIVERS) $(COMMON) $(FIRMWAREDIR) $(APPDIR) $(MACHINEDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)/export -I$(APPDIR) \
+-I$(MACHINEDIR) -I../common -I$(OBJDIR)
+SRCDIRS = . $(DRIVERS) $(FIRMWAREDIR)/export $(APPDIR) $(MACHINEDIR)
 
 # The true Rockbox Applications should use this include path:
-APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
+APPINCLUDES = $(INCLUDES)
 
 LIBS = -lpthread
 
@@ -85,8 +85,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c font-player.c lcd-player-charset.c
 endif
-FIRMSRCS = $(LCDSRSC) sprintf.c id3.c debug.c usb.c mpeg.c power.c\
-  powermgmt.c panic.c ctype.c
+FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c power.c\
+  powermgmt.c panic.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
@@ -284,7 +284,7 @@ $(OBJDIR)/ctype.o: $(COMMON)/ctype.c
 	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sim_icons.o: ../common/sim_icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
