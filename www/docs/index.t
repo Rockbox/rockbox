@@ -6,6 +6,7 @@
 <li> <a href="/manual/manual.pdf">User manual</a> (pdf, ~300 KB) (<a href="/manual/manual.txt">plain text version</a>, 105KB)
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
+<li> <a href="battery-faq-liion.html">Frequently Asked Questions about V2/FM Batteries</a>
 <li> <a href="/screenshots/">Screenshots</a> of Rockbox.
 <li> <a href="/fonts/">Fonts to download</a>
 <li> <a href="/lang/">Language files and voice clips to download</a>

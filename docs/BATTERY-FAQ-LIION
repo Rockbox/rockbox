@@ -1,0 +1,60 @@
+Q1. What kind of batteries are in my V2/FMR?
+A1. They are 2200 mAh LiIon rechargeable batteries. Specifically, it is
+    two 1100 mAh LiIon cells in parallel, physically taped together.
+
+Q2. Can I change the batteries?
+A2. Yes, if you can find replacements. Archos does not sell them. One site
+    that does is: http://www.pdainternalbattery.com/archospdabattery.html.
+    Alternately, there are companies who make replacement battery assemblies
+    that might be able to help.
+
+Q3. Ok, I got a replacement, now how do I put it in?
+A3. Remove the two small screws on the top of your V2/FMR, and pry the lid off.
+    Now turn it upside down and shake it a little. It should just slide out.
+    Take note of the position it's in, and put the replacement in the same
+    way. Replace the cover.
+
+Q4. How long should fully charged batteries run for?
+A4. It depends on how you use it. If you're doing hard drive intensive
+    activities like formatting or transfering large amounts of data, probably
+    only a few hours. If you're only using it as an mp3 player it will depend
+    on the bitrate of the mp3s. Playing 128kbit mp3s, it should last around 8
+    hours. Playing lower quality recordings (32-64kbit) like audio books it
+    could be more like 12 or 14. Playing very high quality files (256kbit+)
+    it could be more like 4 or 6 hours. Also, doing the 8MB RAM mod will
+    significantly increase battery life.
+
+Q5. How long does it take to fully charge the battery?
+A5. About 50% charge is applied in the first hour. The rest takes up to 3
+    more hours.
+
+Q6. I want/need a replacement charger. What kind should I get?
+A6. A charger/adapter that outputs 6VDC at 700mAh and has a power plug with a
+    3.4mm O.D. x 1.3mm I.D., with positive center will have the same specs as
+    the original.
+
+Q7. I've heard about options like deep discharge, but can't find them in the
+    menu. Where are they?
+A7. These options are for the recorder (V1) only. Charging for the recorders is
+    done by software, but charging of the V2/FMR is controlled completely by
+    hardware.
+
+Q8. Can the FMR/V2 charge its batteries through the USB port?
+A8. Yes, though slowly since USB is limited to 500 mA. Charging is reduced or
+    eliminated when the FMR/V2 is connected through a passive hub. If a PCMCIA
+    USB adapter is being used in a laptop or similar device, it is very
+    important to connect the external power supply if one is provided. 
+
+    The PCMCIA port cannot supply sufficient power by itself. The Belkin USB
+    2.0 adapter, for example, comes with a "wall wart" power supply that can
+    be plugged into the PCMCIA card.
+
+Q9. Can I run my V2/FMR constantly with the power adapter plugged in without
+    any negative effects?
+A9. Yes, as long as you aren't draining the battery faster than you're
+    charging it (like reading/writing a lot in USB mode).
+
+Q10. Is it ok if I recharge the battery when I've only drained it part of the
+     way? Will that reduce the life of the battery?
+A10. You can recharge at any time. Li-Ion batteries have virtually no
+     memory effect.

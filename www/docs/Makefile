@@ -31,6 +31,12 @@ battery-faq.raw: $(DOCS)/BATTERY-FAQ $(FAQ2HTML)
 battery-faq.html: battery-faq.t battery-faq.raw $(FAQ2HTML)
 	$(ACTION) $<
 
+battery-faq-liion.raw: $(DOCS)/BATTERY-FAQ-LIION $(FAQ2HTML)
+	$(FAQ2HTML) < $< > $@
+
+battery-faq-liion.html: battery-faq-liion.t battery-faq-liion.raw $(FAQ2HTML)
+	$(ACTION) $<
+
 contributing.raw: $(DOCS)/CONTRIBUTING $(TXT2HTML)
 	$(TXT2HTML) < $< > $@
 
