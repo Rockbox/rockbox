@@ -78,7 +78,7 @@ static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
 
 static int plugin_test(int api_version, int model, int memsize);
 
-static struct plugin_api rockbox_api = {
+static const struct plugin_api rockbox_api = {
     PLUGIN_API_VERSION,
 
     plugin_test,
@@ -331,7 +331,8 @@ int plugin_load(char* plugin, void* parameter)
 #endif
 
     plugin_loaded = true;
-    rc = plugin_start(&rockbox_api, parameter);
+    rc = plugin_start((struct plugin_api*) &rockbox_api, parameter);
+         /* explicitly casting the pointer here to avoid touching every plugin. */
     plugin_loaded = false;
 
     switch (rc) {

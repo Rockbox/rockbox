@@ -33,7 +33,7 @@
 extern void reset_pc (void);
 extern void reset_sp (void);
 
-static const char* irqname[] = {
+static const char* const irqname[] = {
     "", "", "", "", "IllInstr", "", "IllSltIn","","",
     "CPUAdrEr", "DMAAdrEr", "NMI", "UserBrk",
     "","","","","","","","","","","","","","","","","","","",
