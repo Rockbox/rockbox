@@ -38,9 +38,6 @@
 
 #define LCDR (PBDR_ADDR+1)
 
-/* PA14 : /LCD-BL --- backlight */
-#define LCD_BL 6
-
 #ifdef HAVE_LCD_CHARCELLS
 
 #define LCD_DS  1 // PB0 = 1 --- 0001 ---  LCD-DS
@@ -323,18 +320,7 @@ static void lcd_write(bool command, int byte)
     PBDR |= LCD_CS; /* disable lcd chip select */
 }
 #endif /* ASM_IMPLEMENTATION */
-
-/*** BACKLIGHT ***/
-
-void lcd_backlight(bool on)
-{
-    if ( on )
-    PAIOR |= LCD_BL;
-    else
-    PAIOR &= ~LCD_BL;
-}
-
-#endif /* SIMULATOR */
+#endif /* !SIMULATOR */
 
 unsigned char icon_mirror[11];
 
@@ -524,6 +510,26 @@ void lcd_init (void)
 }
 #endif
 
+#ifdef SIMULATOR
+void lcd_set_contrast(int val)
+{
+    val = val;
+}
+#else
+#ifdef HAVE_LCD_BITMAP
+void lcd_set_contrast(int val)
+{
+    lcd_write(true, LCD_CNTL_CONTRAST);
+    lcd_write(true, val);
+}
+#else
+void lcd_set_contrast(int val)
+{
+    lcd_write(true, LCD_CONTRAST_SET);
+    lcd_write(false, 31-val);
+}
+#endif
+#endif
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR) /* not CHARCELLS */
 

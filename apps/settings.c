@@ -276,6 +276,8 @@ int settings_save( void )
     
     rtc_config_block[0x11] = (unsigned char)global_settings.avc;
     
+    rtc_config_block[0x12] = (unsigned char)global_settings.contrast;
+    
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
     
     if(save_config_buffer())
@@ -350,9 +352,13 @@ void settings_load(void)
         if (rtc_config_block[0x11] != 0xFF)
             global_settings.avc = rtc_config_block[0x11];
 
+        if (rtc_config_block[0x12] != 0xff)
+            global_settings.contrast = rtc_config_block[0x12];
+
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
     }
+    lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_time(global_settings.backlight);
 #ifdef HAVE_CHARGE_CTRL

@@ -35,6 +35,7 @@ extern void lcd_puts_scroll(int x, int y, unsigned char* string );
 extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);
 extern void lcd_scroll_speed( int speed );
+extern void lcd_set_contrast(int val);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 extern void lcd_update(void);

@@ -35,6 +35,13 @@
 #include "powermgmt.h"
 #include "rtc.h"
 
+
+static void contrast(void)
+{
+    set_int( "[Contrast]", "", &global_settings.contrast, 
+             lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
+}
+
 static void shuffle(void)
 {
     set_bool( "[Shuffle]", &global_settings.playlist_shuffle );
@@ -133,6 +140,7 @@ void settings_menu(void)
         { "MP3/M3U filter",  mp3_filter      },
         { "Sort mode",       sort_case       },
         { "Backlight Timer", backlight_timer },
+        { "Contrast",    contrast    },  
         { "Scroll speed",    scroll_speed    },  
         { "While Playing",   wps_set         },
 #ifdef HAVE_CHARGE_CTRL
