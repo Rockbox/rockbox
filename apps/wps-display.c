@@ -524,9 +524,9 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     char buf[MAX_PATH];
     unsigned char flags;
     int i;
-    int h = font_get(FONT_UI)->height;
     bool update_line;
 #ifdef HAVE_LCD_BITMAP
+    int h = font_get(FONT_UI)->height;
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
        the peak meter. We can't use peak_meter_enabled itself
@@ -598,8 +598,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
             {
                 if (refresh_mode & WPS_REFRESH_SCROLL) 
                 {
-                lcd_puts_scroll(0, i, buf);
-            }
+                    lcd_puts_scroll(0, i, buf);
+                }
             }
 
             /* dynamic / static line */
@@ -610,9 +610,11 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
                 lcd_puts(0, i, buf);
             }
         }
+#ifdef HAVE_LCD_BITMAP
         if (update_line) {
             lcd_update_rect(0, i * h, LCD_WIDTH, h);
         }
+#endif
     }
 #ifdef HAVE_LCD_BITMAP
     /* Now we know wether the peak meter is used. 
@@ -699,3 +701,10 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
     return true;
 }
 #endif
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * end:
+ * vim: et sw=4 ts=8 sts=4 tw=78
+ */
