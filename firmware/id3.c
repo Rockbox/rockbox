@@ -232,37 +232,27 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 {
     int minframesize;
     int size;
-    int readsize = 0, headerlen;
-    char *title = NULL;
-    char *artist = NULL;
-    char *album = NULL;
-    char *tracknum = NULL;
+    int bufferpos = 0, totframelen, framelen;
     char header[10];
     unsigned short int version;
-    int titlen=0, artistn=0, albumn=0, tracknumn=0;   
     char *buffer = entry->id3v2buf;
+    char *tracknum = NULL;
+    int bytesread = 0;
+    int buffersize = sizeof(entry->id3v2buf);
 	
-    /* 10 = headerlength */
+    /* Bail out if the tag is shorter than 10 bytes */
     if(entry->id3v2len < 10)
         return;
 
-    /* Check version */
+    /* Read the ID3 tag version from the header */
     lseek(fd, 0, SEEK_SET);
     if(10 != read(fd, header, 10))
         return;
 
     version = (unsigned short int)header[3];
     
-    /* Read all frames in the tag */
+    /* Get the total ID3 tag size */
     size = entry->id3v2len - 10;
-
-    if(size >= (int)sizeof(entry->id3v2buf))
-        size = sizeof(entry->id3v2buf)-1;
-
-    if(size != read(fd, buffer, size))
-        return;
-
-    *(buffer + size) = '\0';
 
     /* Set minimum frame size according to ID3v2 version */
     if(version > 2)
@@ -274,86 +264,79 @@ static void setid3v2title(int fd, struct mp3entry *entry)
      * We must have at least minframesize bytes left for the 
      * remaining frames to be interesting 
      */
-    while(size - readsize > minframesize) {
-        
+    while(size > minframesize) {
         /* Read frame header and check length */
         if(version > 2) {
-            memcpy(header, (buffer + readsize), 10);
-            readsize += 10;
+            if(10 != read(fd, header, 10))
+                return;
+            /* Adjust for the 10 bytes we read */
+            size -= 10;
+            
             if (version > 3) {
-                headerlen = UNSYNC(header[4], header[5], 
-                                   header[6], header[7]);
+                framelen = UNSYNC(header[4], header[5], 
+                                  header[6], header[7]);
             } else {
                 /* version .3 files don't use synchsafe ints for
                  * size */
-                headerlen = BYTES2INT(header[4], header[5], 
-                                      header[6], header[7]);
+                framelen = BYTES2INT(header[4], header[5], 
+                                     header[6], header[7]);
             }
         } else {
-            memcpy(header, (buffer + readsize), 6);			
-            readsize += 6;
-            headerlen = (header[3] << 16) + 
-                (header[4] << 8) + 
-                (header[5]);
+            if(6 != read(fd, header, 6))
+                return;
+            /* Adjust for the 6 bytes we read */
+            size -= 6;
+            
+            framelen = BYTES2INT(0, header[3], header[4], header[5]);
         }
 
-        /* Get only the part of the header that is within our buffer */
-        if(headerlen > (size-readsize))
-            headerlen = (size - readsize);
+        /* Keep track of the total size */
+        totframelen += framelen;
+
+        if(framelen == 0)
+            return;
+
+        /* If the frame is larger than the remaining buffer space we try
+           to read as much as would fit in the buffer */
+        if(framelen >= buffersize - bufferpos)
+            framelen = buffersize - bufferpos - 1;
         
         /* Check for certain frame headers */
         if(!strncmp(header, "TPE1", strlen("TPE1")) || 
            !strncmp(header, "TP1", strlen("TP1"))) {
-            readsize++;
-            headerlen--;
-            artist = buffer + readsize;
-            artistn = headerlen;
-            unicode_munge(&artist, &artistn);
+            bytesread = read(fd, buffer + bufferpos, framelen);
+            entry->artist = buffer + bufferpos;
+            unicode_munge(&entry->artist, &bytesread);
+            entry->artist[bytesread + 1] = '\0';
+            bufferpos += bytesread + 2;
+            size -= bytesread;
         }
         else if(!strncmp(header, "TIT2", strlen("TIT2")) || 
                 !strncmp(header, "TT2", strlen("TT2"))) {
-            readsize++;
-            headerlen--;
-            title = buffer + readsize;
-            titlen = headerlen;
-            unicode_munge(&title, &titlen);
+            bytesread = read(fd, buffer + bufferpos, framelen);
+            entry->title = buffer + bufferpos;
+            unicode_munge(&entry->title, &bytesread);
+            entry->title[bytesread + 1] = '\0';
+            bufferpos += bytesread + 2;
+            size -= bytesread;
         }
         else if(!strncmp(header, "TALB", strlen("TALB"))) {
-            readsize++;
-            headerlen--;
-            album = buffer + readsize;
-            albumn = headerlen;
-            unicode_munge(&album, &albumn);
+            bytesread = read(fd, buffer + bufferpos, framelen);
+            entry->album = buffer + bufferpos;
+            unicode_munge(&entry->album, &bytesread);
+            entry->album[bytesread + 1] = '\0';
+            bufferpos += bytesread + 2;
+            size -= bytesread;
         }
         else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
-            readsize++;
-            headerlen--;
-            tracknum = buffer + readsize;
-            tracknumn = headerlen;
-            unicode_munge(&tracknum, &tracknumn);
+            bytesread = read(fd, buffer + bufferpos, framelen);
+            tracknum = buffer + bufferpos;
+            unicode_munge(&tracknum, &bytesread);
+            tracknum[bytesread + 1] = '\0';
+            entry->tracknum = atoi(tracknum);
+            bufferpos += bytesread + 1;
+            size -= bytesread;
         }
-        
-        readsize += headerlen;
-    }
-    
-    if(artist) {
-        entry->artist = artist;
-        artist[artistn]=0;
-    }
-  
-    if(title) {
-        entry->title = title;
-        title[titlen]=0;
-    }
-
-    if(album) {
-        entry->album = album;
-        album[albumn]=0;
-    }
-
-    if(tracknum) {
-        tracknum[tracknumn] = 0;
-        entry->tracknum = atoi(tracknum);
     }
 }
 
