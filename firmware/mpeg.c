@@ -2973,10 +2973,10 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     loudness = bass_boost = avc;
 #endif
 
-    PAIOR |= 0x0800; /* output for /PR */
     setup_sci0();
 
 #ifdef HAVE_MAS3587F
+    PAIOR |= 0x0800; /* output for /PR */
     init_playback();
     
     mas_version_code = mas_readver();
