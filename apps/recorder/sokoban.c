@@ -486,7 +486,7 @@ void load_level(int level_to_load) {
     int a = 0;
     int b = 0;
     int c = 0;
-
+    current_spot=1;
     boxes_to_go = 0;
     /* load level into board */
     /* get to the current level in the level array */
