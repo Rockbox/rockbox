@@ -179,16 +179,16 @@ $(OBJDIR)/settings.o: $(APPDIR)/settings.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/font.o: $(FIRMWAREDIR)/id3.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+$(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/loadfont.o: $(FIRMWAREDIR)/loadfont.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/X5x8.o: $(FIRMWAREDIR)/X5x8.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/status.o: $(APPDIR)/status.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
@@ -203,10 +203,10 @@ $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/strtok.o: $(COMMON)/strtok.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@
