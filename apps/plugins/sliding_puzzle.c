@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: puzzle.c,v 1.1 2003/01/19 00:19:56
+ * $Id$
  *
  * Copyright (C) 2002 Vicentini Martin
  *
@@ -128,7 +128,8 @@ static unsigned char picture[20][32] = {
 };
 
 /* draws a spot at the coordinates (x,y), range of p is 1-20 */
-static void draw_spot(int p, int x, int y) {
+static void draw_spot(int p, int x, int y)
+{
     if (pic || p==20) {
         ptr = picture[p-1];
         rb->lcd_bitmap (ptr, x, y, 16, 8, true);
@@ -143,7 +144,8 @@ static void draw_spot(int p, int x, int y) {
 }
     
 /* check if the puzzle is solved */
-static bool puzzle_finished(void) {
+static bool puzzle_finished(void)
+{
     int i;
     for (i=0; i<20; i++)
     if (spots[i] != (i+1))
@@ -152,7 +154,8 @@ static bool puzzle_finished(void) {
 }
     
 /* move a piece in any direction */
-static void move_spot(int x, int y) {
+static void move_spot(int x, int y)
+{
     int i;
     spots[hole] = spots[hole-x-5*y];
     hole -= (x+5*y);
@@ -169,7 +172,8 @@ static void move_spot(int x, int y) {
 }
     
 /* initializes the puzzle */
-static void puzzle_init(void) {
+static void puzzle_init(void)
+{
     int i, r, temp, tsp[20];
     moves = 0;
     rb->lcd_clear_display();
@@ -178,7 +182,7 @@ static void puzzle_init(void) {
     rb->snprintf(s, sizeof(s), "%d", moves);
     rb->lcd_putsxy(85, 20, s);
     
-    // shuffle spots
+    /* shuffle spots */
     for (i=19; i>=0; i--) {
         r = (*rb->current_tick % (i+1));
     
@@ -190,7 +194,7 @@ static void puzzle_init(void) {
             hole = i;
     }
     
-    // test if the puzzle is solvable
+    /* test if the puzzle is solvable */
     for (i=0; i<20; i++)
     tsp[i] = spots[i];
     r=0;
@@ -205,7 +209,7 @@ static void puzzle_init(void) {
         }
     }
     
-    // if the random puzzle isn't solvable just change two spots
+    /* if the random puzzle isn't solvable just change two spots */
     if (r%2 == 1) {
         if (spots[0]!=20 && spots[1]!=20) {
             temp = spots[0];
@@ -218,14 +222,15 @@ static void puzzle_init(void) {
         }
     }
     
-    // draw spots to the lcd 
+    /* draw spots to the lcd */
     for (i=0; i<20; i++)
         draw_spot(spots[i], (i%5)*16, (i/5)*16);
     rb->lcd_update();
 }
 
 /* the main game loop */
-static int puzzle_loop(void) {
+static int puzzle_loop(void)
+{
     int i;
     puzzle_init();
     while(true) {
