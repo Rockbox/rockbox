@@ -153,14 +153,14 @@
 </tr>
 </table>
 <p>
- <a name=footnote1></a><i>(1) The old recorders have firmware 1.17 or earlier</i>
+ <a name=footnote1></a><i>(1) It is hard to tell if the recorder is old, but the Rec6 and Rec10 are old. I don't yet know about the Rec15.</i>
  <br>
  <a name=footnote2></a><i>(2) The old player has a limited LCD with no
    support for double line height and only four user definable characters
-   instead of eight</i>
+   instead of eight.</i>
  <br>
  <a name=footnote3></a><i>(3) The early V2 models were in fact FM
-   Recorders in disguise, so they had the FM radio still mounted</i>
+   Recorders in disguise, so they had the FM radio still mounted.</i>
 
 
 #include "foot.t"
