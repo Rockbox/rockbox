@@ -11,12 +11,15 @@
 <li><a href="sh-win/">Setting up an SH1 cross compiler for Windows</a>
 <li><a href="firmware/README">README from the firmware directory</a>,
 describing how to compile Rockbox
+<lI><a href="manual/">The Rockbox Manual</a>
 </ul>
 
 <h2>Target builds</h2>
 
 <p>These are automated daily builds of the CVS code.
-They are <i>not</i> official releases, they are in fact almost guaranteed to not work properly! These builds are discussed in IRC only, <b>do not file bug reports for them.</b>
+They are <i>not</i> official releases, they are in fact almost guaranteed to not work properly!
+
+<p>These builds are discussed in IRC only. <font color="red"><big><b>DO NOT FILE BUG REPORTS FOR THEM!</b></big></font>
 
 <p>There are three versions of each build:
 
@@ -42,6 +45,7 @@ The batch timestamp is GMT.
 <a href="auto/build-player/archos.mod">Player</a><br>
 <a href="auto/build-playerdebug/archos.mod">Player debug</a><br>
 <a href="auto/build-playersim/rockboxui">Player simulator (linux)</a><br>
+<a href="http://codeforce.d2g.com/rockbox/autocvs">Player simulator (win32)</a><br>
 </td>
 <td>
 <a href="auto/build-playerold/archos.mod">Player-old</a><br>
@@ -52,6 +56,7 @@ The batch timestamp is GMT.
 <a href="auto/build-recorder/ajbrec.ajz">Recorder</a><br>
 <a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a><br>
 <a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a><br>
+<a href="http://codeforce.d2g.com/rockbox/autocvs">Recorder simulator (win32)</a><br>
 </td>
 </tr></table>
 
