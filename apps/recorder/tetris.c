@@ -38,9 +38,9 @@
 #define TETRIS_TITLE_XLOC  43
 #define TETRIS_TITLE_YLOC  15
 
-static const int start_x = 2;
-static const int start_y = 1;
-static const int max_x = 28;
+static const int start_x = 1;
+static const int start_y = 2;
+static const int max_x = 104;
 static const int max_y = 48;
 static const short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
 static const int blocks = 7;
@@ -50,7 +50,7 @@ static int current_x, current_y, current_f, current_b;
 static int level, score;
 static int next_b, next_f;
 static short lines;
-static char virtual[LCD_WIDTH*LCD_HEIGHT];
+static char virtual[LCD_WIDTH * LCD_HEIGHT];
 
 /*
  block_data is built up the following way
@@ -117,62 +117,47 @@ void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
     lcd_drawline(fstop_x, fstart_y, fstop_x, fstop_y);
 }
 
-void draw_block(int x,int y,int block,int frame,bool clear)
+void draw_block(int x, int y, int block, int frame, bool clear)
 {
-    int i;
+    int i, a, b;
     for(i=0;i < 4;i++) {
         if (clear)
         {
-            lcd_clearpixel(start_x+x+block_data[block][frame][0][i] * 2,
-                           start_y+y+block_data[block][frame][1][i] * 2);
-            lcd_clearpixel(start_x+x+block_data[block][frame][0][i] * 2 + 1,
-                           start_y+y+block_data[block][frame][1][i] * 2);
-            lcd_clearpixel(start_x+x+block_data[block][frame][0][i] * 2,
-                           start_y+y+block_data[block][frame][1][i] * 2 + 1);
-            lcd_clearpixel(start_x+x+block_data[block][frame][0][i] * 2 + 1,
-                           start_y+y+block_data[block][frame][1][i] * 2 + 1);
+            for (a = 0; a < 4; a++)
+                for (b = 0; b < 4; b++)
+                    lcd_clearpixel(start_x + x + block_data[block][frame][1][i] * 4 + b,
+                                   start_y + y + block_data[block][frame][0][i] * 4 + a);
         }
         else
         {
-            lcd_drawpixel(start_x+x+block_data[block][frame][0][i] * 2,
-                          start_y+y+block_data[block][frame][1][i] * 2);
-            lcd_drawpixel(start_x+x+block_data[block][frame][0][i] * 2 + 1,
-                          start_y+y+block_data[block][frame][1][i] * 2);
-            lcd_drawpixel(start_x+x+block_data[block][frame][0][i] * 2,
-                          start_y+y+block_data[block][frame][1][i] * 2 + 1);
-            lcd_drawpixel(start_x+x+block_data[block][frame][0][i] * 2 + 1,
-                          start_y+y+block_data[block][frame][1][i] * 2 + 1);
+            for (a = 0; a < 4; a++)
+                for (b = 0; b < 4; b++)
+                    lcd_drawpixel(start_x+x+block_data[block][frame][1][i] * 4 + b,
+                                  start_y+y+block_data[block][frame][0][i] * 4 + a);
         }
     }
 }
 
 void to_virtual(void)
 {
-    int i;
+    int i,a,b;
     for(i = 0; i < 4; i++)
     {
-        *(virtual + 
-          (current_y + block_data[current_b][current_f][1][i] * 2) * max_x +
-          current_x + block_data[current_b][current_f][0][i] * 2) = current_b + 1;
-        *(virtual +
-          (current_y + block_data[current_b][current_f][1][i] * 2 + 1) * max_x +
-          current_x + block_data[current_b][current_f][0][i] * 2) = current_b + 1;
-        *(virtual +
-          (current_y + block_data[current_b][current_f][1][i] * 2) * max_x +
-          current_x + block_data[current_b][current_f][0][i] * 2 + 1) = current_b + 1;
-        *(virtual +
-          (current_y + block_data[current_b][current_f][1][i] * 2 + 1) * max_x +
-          current_x + block_data[current_b][current_f][0][i] * 2 + 1) = current_b + 1;
+        for (a = 0; a < 4; a++)
+            for (b = 0; b < 4; b++)
+                *(virtual + 
+                (current_y + block_data[current_b][current_f][0][i] * 4 + a) * max_x +
+                current_x + block_data[current_b][current_f][1][i] * 4 + b) = current_b + 1;
     }
 }
 
 bool block_touch (int x, int y)
 {
-    if (*(virtual + y * max_x + x) != 0 ||
-        *(virtual + y * max_x + x + 1) != 0  ||
-        *(virtual + (y + 1) * max_x + x) != 0  ||
-        *(virtual + (y + 1) * max_x + x + 1) != 0)
-        return true;
+    int a,b;
+    for (a = 0; a < 4; a++)
+        for (b = 0; b < 4; b++)
+            if (*(virtual + (y + b) * max_x + (x + a)) != 0)
+                return true;
     return false;
 }
 
@@ -186,12 +171,12 @@ bool gameover(void)
     block = current_b;
     frame = current_f;
 
-    for(i=0;i < 4; i++){
+    for(i = 0; i < 4; i++){
         /* Do we have blocks touching? */
-        if(block_touch(x + block_data[block][frame][0][i] * 2, y + block_data[block][frame][1][i] * 2)) 
+        if(block_touch(x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 4)) 
         {
             /* Are we at the top of the frame? */
-            if(y + block_data[block][frame][1][i] * 2 < start_y)
+            if(y + block_data[block][frame][1][i] * 4 < start_y)
             {
                 /* Game over ;) */
                 return true;
@@ -201,15 +186,15 @@ bool gameover(void)
     return false;
 }
 
-bool valid_position(int x,int y,int block,int frame)
+bool valid_position(int x, int y, int block, int frame)
 {
     int i;
     for(i=0;i < 4;i++)
-        if ((y + block_data[block][frame][1][i] * 2 > max_y - 2) ||
-            (x + block_data[block][frame][0][i] * 2 > max_x - 2) ||
-            (y + block_data[block][frame][1][i] * 2 < 0) ||
-            (x + block_data[block][frame][0][i] * 2 < 0) ||
-            block_touch (x + block_data[block][frame][0][i] * 2, y + block_data[block][frame][1][i] * 2))
+        if ((y + block_data[block][frame][0][i] * 4 > max_y - 4) ||
+            (x + block_data[block][frame][1][i] * 4 > max_x) ||
+            (y + block_data[block][frame][0][i] * 4 < 0) ||
+            (x + block_data[block][frame][1][i] * 4 < 0) ||
+            block_touch (x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 4))
             return false;
     return true;
 }
@@ -218,7 +203,7 @@ void from_virtual(void)
 {
     int x,y;
     for(y = 0; y < max_y; y++)
-        for(x = 1; x < max_x - 1; x ++)
+        for(x = 1; x < max_x - 1; x++)
             if(*(virtual + (y * max_x) + x) != 0)
                 lcd_drawpixel(start_x + x, start_y + y);
             else
@@ -237,7 +222,7 @@ void move_block(int x,int y,int f)
             current_f = block_frames[current_b]-1;
     }
 
-    if(valid_position(current_x+x,current_y+y,current_b,current_f))
+    if(valid_position(current_x + x, current_y + y, current_b, current_f))
     {
         draw_block(current_x,current_y,current_b,last_frame,true);
         current_x += x;
@@ -253,51 +238,59 @@ void new_block(void)
 {
     current_b = next_b;
     current_f = next_f;
-    current_x = (int)((max_x)/2)-1;
-    current_y = 0;
+    current_x = max_x - 15;
+    current_y = (int)((max_y)/2);
     next_b = t_rand(blocks);
     next_f = t_rand(block_frames[next_b]);
-    draw_block(max_x+2,start_y-1,current_b,current_f,true);
-    draw_block(max_x+2,start_y-1,next_b,next_f,false);
-    if(!valid_position(current_x,current_y,current_b,current_f))
+    // draw_block(max_x + 2, start_y - 1, current_b, current_f, true);
+    // draw_block(max_x + 2, start_y - 1, next_b, next_f, false);
+    if(!valid_position(current_x, current_y, current_b, current_f))
     {
-        draw_block(current_x,current_y,current_b,current_f,false);
+        draw_block(current_x, current_y, current_b, current_f, false);
         lcd_update();
     }
     else
-        draw_block(current_x,current_y,current_b,current_f,false);
+        draw_block(current_x, current_y, current_b, current_f, false);
 }
 
 int check_lines(void)
 {
-    int x,y,i;
+    int x,y,i,j,a,b;
     bool line;
     int lines = 0;
-    for(y = 0; y < max_y; y++)
+    for(x = 0; x < max_x; x++)
     {
         line = true;
-        for(x = 1; x < max_x - 1; x++)
+        for(y = 0; y < max_y; y++)
+        {
             if(*(virtual + y * max_x + x) == 0)
             {
                 line = false;
                 break;
             }
+        }
+
         if(line)
         {
             lines++;
-            for(i = y; i > 1; i--)
-		        memcpy(virtual + i * max_x + 1, virtual + (i-1) * max_x + 1, max_x - 2);
-		    memset (&virtual[max_x] + 1, 0, max_x - 2);
+            // move rows down
+            for(i = x; i < max_x - 1; i++)
+                for (j = 0; j < max_y; j++)
+		            *(virtual + j * max_x + i) = *(virtual + j * max_x + (i + 1));
+
+            x--; // re-check this line
         }
     }
-    return lines / 2;
+
+    return lines / 4;
 }
 
 void move_down(void)
 {
     int l;
     char s[25];
-    if(!valid_position(current_x,current_y+1,current_b,current_f))
+
+    if(!valid_position(current_x - 4, current_y, current_b, current_f))
     {
         to_virtual();
         l = check_lines();
@@ -310,62 +303,68 @@ void move_down(void)
             from_virtual();
             score += l*l;
         }
+
         snprintf (s, sizeof(s), "%d Rows - Level %d", lines, level);
         lcd_putsxy (2, 52, s, 0);
+
         new_block();
         move_block(0,0,0);
     }
     else
-        move_block(0,2,0);
+        move_block(-4,0,0);
 } 
 
 void game_loop(void)
 {
     while(1)
     {
-	int b=0;
-	int count = 0;
-	while(count*300 < level_speeds[level])
-	{
-	    b = button_get(false);
-	    if ( b & BUTTON_OFF )
+	    int b=0;
+	    int count = 0;
+	    while(count * 300 < level_speeds[level])
+	    {
+	        b = button_get(false);
+	        if ( b & BUTTON_OFF )
                 return; /* get out of here */
 
-	    if ( b & BUTTON_LEFT ) {
-		move_block(-2,0,0);
+	        if ( b & BUTTON_UP )
+		        move_block(0,-4,0);
+
+            if ( b & BUTTON_DOWN )
+		        move_block(0,4,0);
+
+            if ( b & BUTTON_RIGHT )
+		        move_block(0,0,-1);
+
+            if ( b & BUTTON_LEFT )
+		        move_down();
+
+            count++;
+	        sleep(HZ/10);
 	    }
-	    if ( b & BUTTON_RIGHT ) {
-		move_block(2,0,0);
-	    }
-	    if ( b & BUTTON_UP ) {
-		move_block(0,0,-1);
-	    }
-	    if ( b & BUTTON_DOWN ) {
-		move_down();
-	    }
-	    count++;
-	    sleep(HZ/10);
-	}
-        if(gameover()) {
+        
+        if(gameover())
+        {
             int w, h;
 
             lcd_getfontsize(TETRIS_TITLE_FONT, &w, &h);
             lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
-                          TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
-                          TETRIS_TITLE_YLOC-h);
+                            TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
+                            TETRIS_TITLE_YLOC-h);
             lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
-                       TETRIS_TITLE_FONT);
+                        TETRIS_TITLE_FONT);
             lcd_update();
             sleep(HZ);
             return;
         }
-	move_down();
+
+	    move_down();
     }
 }
 
 void init_tetris(void)
 {
     memset(&virtual, 0, sizeof(virtual));
+
     current_x = 0;
     current_y = 0;
     current_f = 0;
@@ -381,11 +380,7 @@ void tetris(void)
 {
     init_tetris();
 
-    draw_frame(start_x,start_x + max_x - 1, start_y - 1, start_y + max_y);
-    lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, TETRIS_TITLE,
-               TETRIS_TITLE_FONT);
-    lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC + 16, "*******",
-               TETRIS_TITLE_FONT);
+    draw_frame(start_x, start_x + max_x - 1, start_y - 1, start_y + max_y);
     lcd_putsxy (2, 52, "0 Rows - Level 0", 0);
     lcd_update();
 
