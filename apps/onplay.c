@@ -507,6 +507,34 @@ static bool vbr_fix(void)
     return false;
 }
 
+bool create_dir(void)
+{
+    char dirname[MAX_PATH];
+    char *cwd;
+    int rc;
+    int pathlen;
+
+    cwd = getcwd(NULL, 0);
+    memset(dirname, 0, sizeof dirname);
+    
+    snprintf(dirname, sizeof dirname, "%s/",
+             cwd[1] ? cwd : "");
+
+    pathlen = strlen(dirname);
+    rc = kbd_input(dirname + pathlen, (sizeof dirname)-pathlen);
+    if(rc < 0)
+        return false;
+
+    rc = mkdir(dirname, 0);
+    if(rc < 0) {
+        splash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
+    } else {
+        onplay_result = ONPLAY_RELOAD_DIR;
+    }
+
+    return true;
+}
+
 int onplay(char* file, int attr)
 {
     struct menu_items menu[5]; /* increase this if you add entries! */
@@ -514,35 +542,42 @@ int onplay(char* file, int attr)
 
     onplay_result = ONPLAY_OK;
 
-    selected_file = file;
-    selected_file_attr = attr;
-
-    if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
-         (attr & ATTR_DIRECTORY) ||
-        ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
+    if(file)
     {
-        menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
-        menu[i].function = playlist_options;
+        selected_file = file;
+        selected_file_attr = attr;
+        
+        if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
+            (attr & ATTR_DIRECTORY) ||
+            ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
+        {
+            menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
+            menu[i].function = playlist_options;
+            i++;
+        }
+        
+        menu[i].desc = str(LANG_RENAME);
+        menu[i].function = rename_file;
         i++;
+        
+        if (!(attr & ATTR_DIRECTORY))
+        {
+            menu[i].desc = str(LANG_DELETE);
+            menu[i].function = delete_file;
+            i++;
+        }
+        
+        if ((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        {
+            menu[i].desc = str(LANG_VBRFIX);
+            menu[i].function = vbr_fix;
+            i++;
+        }
     }
 
-    menu[i].desc = str(LANG_RENAME);
-    menu[i].function = rename_file;
+    menu[i].desc = str(LANG_CREATE_DIR);
+    menu[i].function = create_dir;
     i++;
-
-    if (!(attr & ATTR_DIRECTORY))
-    {
-        menu[i].desc = str(LANG_DELETE);
-        menu[i].function = delete_file;
-        i++;
-    }
-
-    if ((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
-    {
-        menu[i].desc = str(LANG_VBRFIX);
-        menu[i].function = vbr_fix;
-        i++;
-    }
 
     /* DIY menu handling, since we want to exit after selection */
     m = menu_init( menu, i );
