@@ -120,26 +120,26 @@ static const unsigned char ones[8]  = { 0xff, 0xff, 0xff, 0xff,
    There is probably is a better way (ie. do only one mask operation)
 */
 void lcd_write_command(int cmd) {
-  P2 &= 0xF7;
-  P2 &= 0xDF;
-  P2 &= 0xFB;
-  P0 = cmd;
-  P2 |= 0x04;
-  P2 |= 0x08;
-  P2 |= 0x20;
-}
-
-void lcd_write_data( const unsigned char* data, int count ) {
-  int i;
-  for (i=0; i < count; i++) {
-    P2 |= 0x08;
+    P2 &= 0xF7;
     P2 &= 0xDF;
     P2 &= 0xFB;
-    P0 = data[i];
+    P0 = cmd;
     P2 |= 0x04;
     P2 |= 0x08;
     P2 |= 0x20;
-  }
+}
+
+void lcd_write_data( const unsigned char* data, int count ) {
+    int i;
+    for (i=0; i < count; i++) {
+        P2 |= 0x08;
+        P2 &= 0xDF;
+        P2 &= 0xFB;
+        P0 = data[i];
+        P2 |= 0x04;
+        P2 |= 0x08;
+        P2 |= 0x20;
+    }
 }
 #endif
 
@@ -169,13 +169,13 @@ void lcd_init(void)
 void lcd_init (void)
 {
 #if CONFIG_CPU == TCC730
-  /* Initialise P0 & some P2 output pins:
-     P0 -> all pins normal cmos output 
-     P2 -> pins 1 to 5 normal cmos output. */
-  P0CON = 0xff;
-  P2CONL |= 0x5a;
-  P2CONL &= 0x5b;
-  P2CONH |= 1;
+    /* Initialise P0 & some P2 output pins:
+       P0 -> all pins normal cmos output 
+       P2 -> pins 1 to 5 normal cmos output. */
+    P0CON = 0xff;
+    P2CONL |= 0x5a;
+    P2CONL &= 0x5b;
+    P2CONH |= 1;
 #else
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
@@ -295,15 +295,15 @@ void lcd_set_flip(bool yesno)
     if (yesno) 
 #endif
 #if CONFIG_LCD == LCD_GMINI100
-  {
-    lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
-    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
-    xoffset = 132 - LCD_WIDTH;
-  } else {
-    lcd_write_command(LCD_SET_SEGMENT_REMAP);
-    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
-    xoffset = 0;
-  }
+    {
+        lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
+        xoffset = 132 - LCD_WIDTH;
+    } else {
+        lcd_write_command(LCD_SET_SEGMENT_REMAP);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
+        xoffset = 0;
+    }
 #else
 
     {
