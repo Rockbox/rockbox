@@ -165,7 +165,7 @@ static void button_tick(void)
     backlight_tick();
 }
 
-int button_get(bool block)
+long button_get(bool block)
 {
     struct event ev;
 
@@ -177,7 +177,7 @@ int button_get(bool block)
     return BUTTON_NONE;
 }
 
-int button_get_w_tmo(int ticks)
+long button_get_w_tmo(int ticks)
 {
     struct event ev;
     queue_wait_w_tmo(&button_queue, &ev, ticks);

@@ -26,8 +26,8 @@
 extern struct event_queue button_queue;
 
 void button_init (void);
-int button_get (bool block);
-int button_get_w_tmo(int ticks);
+long button_get (bool block);
+long button_get_w_tmo(int ticks);
 int button_status(void);
 void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
