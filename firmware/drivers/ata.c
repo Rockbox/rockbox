@@ -62,7 +62,8 @@
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
 static struct mutex ata_mtx;
-static char device; /* device 0 (master) or 1 (slave) */
+char ata_device; /* device 0 (master) or 1 (slave) */
+int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
 
 static volatile unsigned char* ata_control;
 
@@ -126,7 +127,7 @@ int ata_read_sectors(unsigned long start,
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | device;
+    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
     ATA_COMMAND = CMD_READ_SECTORS;
 
     for (i=0; i<count; i++) {
@@ -177,7 +178,7 @@ int ata_write_sectors(unsigned long start,
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | device;
+    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | ata_device;
     ATA_COMMAND = CMD_WRITE_SECTORS;
 
     for (i=0; i<count; i++) {
@@ -299,7 +300,7 @@ int ata_soft_reset(void)
     
     mutex_lock(&ata_mtx);
     
-    ATA_SELECT = SELECT_LBA | device;
+    ATA_SELECT = SELECT_LBA | ata_device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
 
@@ -325,14 +326,14 @@ static int master_slave_detect(void)
     /* master? */
     ATA_SELECT = 0;
     if ( ATA_STATUS & STATUS_RDY ) {
-        device = 0;
+        ata_device = 0;
         DEBUGF("Found master harddisk\n");
     }
     else {
         /* slave? */
         ATA_SELECT = SELECT_DEVICE1;
         if ( ATA_STATUS & STATUS_RDY ) {
-            device = SELECT_DEVICE1;
+            ata_device = SELECT_DEVICE1;
             DEBUGF("Found slave harddisk\n");
         }
         else
@@ -360,12 +361,14 @@ static int io_address_detect(void)
     if(tmp == ((*ATA_CONTROL2) & 0xf9))
     {
         DEBUGF("CONTROL is at 0x306\n");
+        ata_io_address = 0x300; /* For debug purposes only */
         old_recorder = true;
         ata_control = ATA_CONTROL2;
     }
     else
     {
         DEBUGF("CONTROL is at 0x206\n");
+        ata_io_address = 0x200; /* For debug purposes only */
         old_recorder = false;
         ata_control = ATA_CONTROL1;
     }
