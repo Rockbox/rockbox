@@ -32,7 +32,7 @@ FIRMWARE := ../firmware
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
 
 # Pick a target to build for
-TARGET = -DARCHOS_RECORDER=1 # standard setting
+TARGET=-DARCHOS_RECORDER=1
 ifdef RECORDER
     TARGET=-DARCHOS_RECORDER=1
 else

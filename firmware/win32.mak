@@ -16,6 +16,7 @@ OC    = sh-elf-objcopy
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
 # Pick a target to build for
+TARGET=-DARCHOS_RECORDER=1
 ifdef RECORDER
     TARGET=-DARCHOS_RECORDER=1
 else
