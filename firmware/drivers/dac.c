@@ -16,23 +16,26 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "stdbool.h"
 #include "i2c.h"
 #include "debug.h"
 #include "dac.h"
 
-int dac_volume(unsigned int volume)
+int dac_volume(unsigned int left, unsigned int right, bool deemph)
 {
     int ret = 0;
     unsigned char buf[3];
 
     i2c_begin();
 
-    if(volume > 0x38)
-        volume = 0x38;
+    if (left > 0x38)
+        left = 0x38;
+    if (right > 0x38)
+        right = 0x38;
 
     buf[0] = DAC_REG_WRITE | DAC_AVOL;
-    buf[1] = (volume & 0x3f) | 0x40; /* Deemphasis ON */
-    buf[2] = volume & 0x3f;
+    buf[1] = (left & 0x3f) | (deemph ? 0x40 : 0);
+    buf[2] = right & 0x3f;
 
     /* send read command */
     if (i2c_write(DAC_DEV_WRITE,buf,3))
