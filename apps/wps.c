@@ -44,75 +44,88 @@
 static void draw_screen(struct mp3entry* id3)
 {
     lcd_clear_display();
-    switch ( global_settings.wps_display ) {
-        case PLAY_DISPLAY_TRACK_TITLE:
-        {
-            char ch = '/';
-            char* end;
-            char* szTok;
-            char* szDelimit;
-            char* szPeriod;
-            char szArtist[26];
-            char szBuff[257];
-            szBuff[sizeof(szBuff)-1] = 0;
+    if(!id3)
+    {
+#ifdef HAVE_LCD_CHARCELLS
+        lcd_puts(0, 0, "End of list");
+        lcd_puts(0, 1, "<Press ON>");
+#else
+        lcd_puts(0, 2, "<End of song list>");
+        lcd_puts(5, 4, "Press ON");
+#endif
+    }
+    else
+    {
+        switch ( global_settings.wps_display ) {
+            case PLAY_DISPLAY_TRACK_TITLE:
+            {
+                char ch = '/';
+                char* end;
+                char* szTok;
+                char* szDelimit;
+                char* szPeriod;
+                char szArtist[26];
+                char szBuff[257];
+                szBuff[sizeof(szBuff)-1] = 0;
 
-            strncpy(szBuff, id3->path, sizeof(szBuff));
+                strncpy(szBuff, id3->path, sizeof(szBuff));
 
-            szTok = strtok_r(szBuff, "/", &end);
-            szTok = strtok_r(NULL, "/", &end);
+                szTok = strtok_r(szBuff, "/", &end);
+                szTok = strtok_r(NULL, "/", &end);
 
-            // Assume path format of: Genre/Artist/Album/Mp3_file
-            strncpy(szArtist,szTok,sizeof(szArtist));
-            szArtist[sizeof(szArtist)-1] = 0;
-            szDelimit = strrchr(id3->path, ch);
-            lcd_puts(0,0, szArtist?szArtist:"<nothing>");
+                // Assume path format of: Genre/Artist/Album/Mp3_file
+                strncpy(szArtist,szTok,sizeof(szArtist));
+                szArtist[sizeof(szArtist)-1] = 0;
+                szDelimit = strrchr(id3->path, ch);
+                lcd_puts(0,0, szArtist?szArtist:"<nothing>");
 
-            // removes the .mp3 from the end of the display buffer
-            szPeriod = strrchr(szDelimit, '.');
-            if (szPeriod != NULL)
-                *szPeriod = 0;
+                // removes the .mp3 from the end of the display buffer
+                szPeriod = strrchr(szDelimit, '.');
+                if (szPeriod != NULL)
+                    *szPeriod = 0;
 
-            lcd_puts_scroll(0,LINE_Y,(++szDelimit));
-            break;
-        }
-        case PLAY_DISPLAY_FILENAME_SCROLL:
-        {
-            char ch = '/';
-            char* szLast = strrchr(id3->path, ch);
+                lcd_puts_scroll(0,LINE_Y,(++szDelimit));
+                break;
+            }
+            case PLAY_DISPLAY_FILENAME_SCROLL:
+            {
+                char ch = '/';
+                char* szLast = strrchr(id3->path, ch);
 
-            if (szLast)
-                lcd_puts_scroll(0,0, (++szLast));
-            else
-                lcd_puts_scroll(0,0, id3->path);
-            break;
-        }
-        case PLAY_DISPLAY_DEFAULT:
-        {
-            int l = 0;
+                if (szLast)
+                    lcd_puts_scroll(0,0, (++szLast));
+                else
+                    lcd_puts_scroll(0,0, id3->path);
+                break;
+            }
+            case PLAY_DISPLAY_DEFAULT:
+            {
+                int l = 0;
 #ifdef HAVE_LCD_BITMAP
-            char buffer[64];
+                char buffer[64];
 
-            lcd_puts_scroll(0, l++, id3->path);
-            lcd_puts(0, l++, id3->title?id3->title:"");
-            lcd_puts(0, l++, id3->album?id3->album:"");
-            lcd_puts(0, l++, id3->artist?id3->artist:"");
+                lcd_puts_scroll(0, l++, id3->path);
+                lcd_puts(0, l++, id3->title?id3->title:"");
+                lcd_puts(0, l++, id3->album?id3->album:"");
+                lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-            if(id3->vbr)
-                snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
-                         id3->bitrate);
-            else
-                snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
+                if(id3->vbr)
+                    snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
+                             id3->bitrate);
+                else
+                    snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
 
-            lcd_puts(0, l++, buffer);
+                lcd_puts(0, l++, buffer);
 
-            snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
-            lcd_puts(0, l++, buffer);
+                snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
+                lcd_puts(0, l++, buffer);
 #else
 
-            lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
-            lcd_puts_scroll(0, l++, id3->title?id3->title:"<no title>");
+                lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
+                lcd_puts_scroll(0, l++, id3->title?id3->title:"<no title>");
 #endif
-            break;
+                break;
+            }
         }
     }
     status_draw();
@@ -128,6 +141,7 @@ int wps_show(void)
     bool dont_go_to_menu = false;
 
     lcd_clear_display();
+    draw_screen(id3);
 
     while ( 1 ) {
         int i;
@@ -135,11 +149,12 @@ int wps_show(void)
 
         if(mpeg_has_changed_track())
         {
-	    lcd_stop_scroll();
+            lcd_stop_scroll();
+            id3 = mpeg_current_track();
             draw_screen(id3);
         }
         
-        if (playing)
+        if (playing && id3)
         {
 #ifdef HAVE_LCD_BITMAP
             snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
@@ -154,13 +169,12 @@ int wps_show(void)
             // Display time with the filename scroll only because the screen has room. 
             if (global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL)
             { 
-
                 snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
                          id3->elapsed / 60000,
                          id3->elapsed % 60000 / 1000,
                          id3->length / 60000,
                          id3->length % 60000 / 1000 );
-
+                
                 lcd_puts(0, 1, buffer);
                 lcd_update();
            }
@@ -289,6 +303,7 @@ int wps_show(void)
                     {
                         lcd_stop_scroll();
                         main_menu();
+                        id3 = mpeg_current_track();
                         draw_screen(id3);
                         /* Prevent any stray BUTTON_REL events from going
                            back to the main menu until we get a new
