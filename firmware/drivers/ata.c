@@ -125,7 +125,6 @@ int ata_read_sectors(unsigned long start,
 
     if ( sleeping ) {
         if (ata_soft_reset()) {
-            mutex_unlock(&ata_mtx);
             return -1;
         }
     }
@@ -184,7 +183,6 @@ int ata_write_sectors(unsigned long start,
 
     if ( sleeping ) {
         if (ata_soft_reset()) {
-            mutex_unlock(&ata_mtx);
             return -1;
         }
     }
@@ -307,14 +305,14 @@ static void ata_thread(void)
     while (1) {
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
-	    case SYS_USB_CONNECTED:
-		/* Tell the USB thread that we are safe */
-		DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
-		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            case SYS_USB_CONNECTED:
+                /* Tell the USB thread that we are safe */
+                DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-		/* Wait until the USB cable is extracted again */
-		usb_wait_for_disconnect(&ata_queue);
-		break;
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&ata_queue);
+                break;
 
             case Q_SLEEP:
                 ata_perform_sleep();
@@ -372,7 +370,7 @@ int ata_soft_reset(void)
     retry_count = 8;
     do
     {
-	ret = wait_for_rdy();
+        ret = wait_for_rdy();
     } while(!ret && retry_count--);
 
     /* Massage the return code so it is 0 on success and -1 on failure */
@@ -447,9 +445,9 @@ static int io_address_detect(void)
 void ata_enable(bool on)
 {
     if(on)
-	PADR &= ~0x80; /* enable ATA */
+        PADR &= ~0x80; /* enable ATA */
     else
-	PADR |= 0x80;   /* disable ATA */
+        PADR |= 0x80;   /* disable ATA */
 
     PAIOR |= 0x80;
 }
@@ -462,19 +460,19 @@ int ata_init(void)
 
     ata_enable(true);
 
-    if (master_slave_detect())
-        return -1;
-
-    if (io_address_detect())
-        return -2;
-
-    if (check_registers())
-        return -3;
-
-    if (freeze_lock())
-        return -4;
-
     if ( !initialized ) {
+        if (master_slave_detect())
+            return -1;
+        
+        if (io_address_detect())
+            return -2;
+        
+        if (check_registers())
+            return -3;
+        
+        if (freeze_lock())
+            return -4;
+        
         queue_init(&ata_queue);
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name);

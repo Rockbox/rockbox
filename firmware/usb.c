@@ -32,9 +32,7 @@
 #include "button.h"
 #include "sprintf.h"
 
-#ifdef ARCHOS_RECORDER
-extern void dbg_ports(void);
-#endif
+extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
 #define USB_REALLY_BRAVE
 
@@ -86,6 +84,7 @@ static void usb_slave_mode(bool on)
     if(on)
     {
         DEBUGF("Entering USB slave mode\n");
+        ata_soft_reset();
         ata_enable(false);
         usb_enable(true);
     }
@@ -101,16 +100,14 @@ static void usb_slave_mode(bool on)
         rc = ata_init();
         if(rc)
         {
-#ifdef ARCHOS_RECORDER
             char str[32];
             lcd_clear_display();
             snprintf(str, 31, "ATA error: %d", rc);
-            lcd_puts(0, 1, str);
-            lcd_puts(0, 3, "Press ON to debug");
+            lcd_puts(0, 0, str);
+            lcd_puts(0, 1, "Press ON to debug");
             lcd_update();
             while(button_get(true) != BUTTON_ON) {};
             dbg_ports();
-#endif
             panicf("ata: %d",rc);
         }
     
@@ -248,7 +245,7 @@ static void usb_tick(void)
 
 void usb_acknowledge(int id)
 {
-   queue_post(&usb_queue, id, NULL);
+    queue_post(&usb_queue, id, NULL);
 }
 
 void usb_init(void)
