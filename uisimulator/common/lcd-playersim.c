@@ -39,11 +39,10 @@
 #define CHAR_PIXEL 4
 #define BORDER_MARGIN 5
 
-unsigned char lcd_buffer[2][11];
-
 static int double_height=1;
 extern bool lcd_display_redraw;
-extern unsigned const char *lcd_ascii;
+extern const unsigned short *lcd_ascii;
+extern unsigned char hardware_buffer_lcd[11][2];
 
 
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
@@ -96,7 +95,7 @@ void lcd_print_char(int x, int y)
   int p=0, cp=0;
   struct rectangle points[CHAR_HEIGHT*CHAR_WIDTH];
   struct rectangle clearpoints[CHAR_HEIGHT*CHAR_WIDTH];
-  unsigned char ch=lcd_buffer[y][x];
+  unsigned char ch=hardware_buffer_lcd[x][y];
 
   if (double_height == 2 && y == 1)
     return; /* Second row can't be printed in double height. ??*/
@@ -204,35 +203,7 @@ void lcd_invertpixel(int x, int y)
     (void)y;
 }
 
-void lcd_clear_display(void)
-{
-    int x, y;
-    for (y=0; y<2; y++) {
-      for (x=0; x<11; x++) {
-        lcd_buffer[y][x]=lcd_ascii[' '];
-      }
-    }
-    lcd_update();
-}
 
-void lcd_puts(int x, int y, unsigned char *str)
-{
-    int i;
-    DEBUGF("lcd_puts(%d, %d, \"", x, y);
-    for (i=0; *str && x<11; i++) {
-#ifdef DEBUGF
-        if (*str>=32 && *str<128)
-            {DEBUGF("%c", *str);}
-        else
-            {DEBUGF("(0x%02x)", *str);}
-#endif
-      lcd_buffer[y][x++]=lcd_ascii[*str++];
-    }
-    DEBUGF("\")\n");
-    for (; x<11; x++)
-        lcd_buffer[y][x]=lcd_ascii[' '];
-    lcd_update();
-}
 
 void lcd_double_height(bool on)
 {
@@ -243,11 +214,11 @@ void lcd_double_height(bool on)
     lcd_update();
 }
 
-void lcd_define_pattern(int which, char *pattern, int length)
+void lcd_define_hw_pattern(int which, char *pattern, int length)
 {
     int i, j;
     int pat = which / 8;
-    char icon[8];
+    unsigned char icon[8];
     memset(icon, 0, sizeof icon);
 
     DEBUGF("Defining pattern %d:", pat);
@@ -267,11 +238,3 @@ void lcd_define_pattern(int which, char *pattern, int length)
     lcd_update();
 }
 
-extern void lcd_puts(int x, int y, unsigned char *str);
-
-void lcd_putc(int x, int y, unsigned char ch)
-{
-    DEBUGF("lcd_putc(%d, %d, %d '0x%02x')\n", x, y, ch, ch);
-    lcd_buffer[y][x]=lcd_ascii[ch];
-    lcd_update();
-}
