@@ -35,6 +35,7 @@
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
+#include "lcd.h"
 #ifdef CONFIG_TUNER
 #include "fmradio.h"
 #endif
