@@ -54,12 +54,13 @@
 #define PLAY_DISPLAY_TRACK_TITLE     2 
 
 #ifdef HAVE_RECORDER_KEYPAD
-#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT)
+#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP)
 #else
-#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT)
+#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_PLAY)
 #endif
 
 bool keys_locked = false;
+bool device_muted = false;
 static bool ff_rewind = false;
 
 static void draw_screen(struct mp3entry* id3)
@@ -386,6 +387,7 @@ int wps_show(void)
     bool dont_go_to_menu = false;
     bool menu_button_is_down = false;
     bool pending_keylock = true; /* Keylock will go ON next time */
+    bool pending_mute = true; /* Mute will go ON next time */
     int old_release_mask;
     int button;
     int ff_rewind_count = 0;
@@ -629,11 +631,14 @@ int wps_show(void)
                     draw_screen(id3);
                     break;
                 }
-                dont_go_to_menu = true;
                 lcd_stop_scroll();
+                lcd_icon(ICON_PARAM, true);
+                lcd_icon(ICON_AUDIO, true);
                 retval = player_id3_show();
                 if(retval == SYS_USB_CONNECTED)
                     return SYS_USB_CONNECTED;
+                lcd_icon(ICON_PARAM, false);
+                lcd_icon(ICON_AUDIO, true);
                 draw_screen(id3);
                 break;
 
@@ -641,6 +646,13 @@ int wps_show(void)
                 lcd_icon(ICON_PARAM, true);
                 lcd_icon(ICON_AUDIO, false);
                 menu_button_is_down = true;
+                break;
+
+            case BUTTON_PLAY | BUTTON_REL:
+                /* The PLAY key has been release while the MENU key
+                   was held */
+                if(menu_button_is_down)
+                    pending_mute = !pending_mute;
                 break;
 
             case BUTTON_STOP | BUTTON_REL:
@@ -653,7 +665,17 @@ int wps_show(void)
             case BUTTON_F1:
                 menu_button_is_down = true;
                 break;
-                
+ 
+            case BUTTON_UP | BUTTON_REL:
+                /* The UP key has been release while the F1 key
+                   was held */
+                if(menu_button_is_down)
+                {
+                    pending_mute = !pending_mute;
+                    debugf("pending: %d\n", pending_mute);
+                }
+                break; 
+              
             case BUTTON_DOWN | BUTTON_REL:
                 /* The DOWN key has been release while the F1 key
                    was held */
@@ -668,7 +690,7 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F1 | BUTTON_UP:
 #else
-            case BUTTON_MENU | BUTTON_UP:
+            case BUTTON_MENU | BUTTON_PLAY:
 #endif
                 if(keys_locked)
                 {
@@ -676,22 +698,19 @@ int wps_show(void)
                     draw_screen(id3);
                     break;
                 }
-                dont_go_to_menu = true;
 
-                if(global_settings.muted == false)
+                if(device_muted != pending_mute)
                 {
-                    global_settings.muted = true;
-                    mpeg_sound_set(SOUND_VOLUME, 0);
-                    display_mute_text(global_settings.muted);
+                    device_muted = pending_mute;
+
+                    if(device_muted)
+                        mpeg_sound_set(SOUND_VOLUME, 0);
+                    else
+                        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                    display_mute_text(device_muted);
                     draw_screen(id3);
                 }
-                else
-                {
-                    global_settings.muted = false;
-                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                    display_mute_text(global_settings.muted);
-                    draw_screen(id3);
-                }
+                dont_go_to_menu = true;
                 break;
                     
 #ifdef HAVE_RECORDER_KEYPAD
