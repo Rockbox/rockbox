@@ -259,6 +259,8 @@ if($db) {
     $pathindex = 48; # paths always start at index 48
 
     $songindex = $pathindex + $fc; # fc is size of all paths
+    $songindex++ while ($songindex & 3); # align to 32 bits
+
     dumpint($songindex); # file position index of song table
     dumpint(scalar(keys %entries)); # number of songs
     dumpint($maxsonglen); # length of song name field
@@ -291,6 +293,10 @@ if($db) {
         $filenamepos{$f}= $l;
         $l += length($f)+1;
     }
+    while ($l & 3) {
+        print DB "\x00";
+        $l++;
+    }
 
     #### TABLE of songs ###
     # title of song1
@@ -314,7 +320,7 @@ if($db) {
         dumpint($a + $albumindex); # pointer to album of this song
 
         # pointer to filename of this song
-        dumpint($filenamepos{$id3->{'FILE'}} + $pathindex);
+        dumpint($filenamepos{$f} + $pathindex);
 
         $$id3{'songoffset'} = $offset;
         $offset += $songentrysize;
@@ -356,7 +362,7 @@ if($db) {
 
         for (sort keys %{$artist2albums{$artist}}) {
             my $id3 = $artist2albums{$artist}{$_};
-            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'ARTIST'}"} * albumentrysize;
+            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'ARTIST'}"} * $albumentrysize;
             dumpint($a + $albumindex);
         }
 
