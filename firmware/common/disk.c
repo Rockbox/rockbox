@@ -39,9 +39,9 @@
    12-15: nr of sectors in partition
 */
 
-#define BYTES2INT32(array,pos) \
-          (array[pos] | (array[pos+1] << 8 ) | \
-          (array[pos+2] << 16 ) | (array[pos+3] << 24 ))
+#define BYTES2INT32(array,pos)					\
+    ((long)array[pos] | (long)(array[pos+1] << 8 ) |		\
+     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
 static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
 
@@ -76,7 +76,7 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
         pinfo[i].start = BYTES2INT32(ptr, 8);
         pinfo[i].size  = BYTES2INT32(ptr, 12);
 
-        DEBUGF("Part%d: Type %02x, start: %08x size: %08x\n",
+        DEBUGF("Part%d: Type %02x, start: %08lx size: %08lx\n",
                i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
 
         /* extended? */

@@ -86,7 +86,7 @@ extern ssize_t write(int fd, const void *buf, size_t count);
 extern int remove(const char* pathname);
 extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
-extern int filesize(int fd);
+extern off_t filesize(int fd);
 #endif /* SIMULATOR */
 
 #endif

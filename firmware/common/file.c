@@ -37,9 +37,9 @@
 
 struct filedesc {
     unsigned char cache[SECTOR_SIZE];
-    int cacheoffset;
-    int fileoffset;
-    int size;
+    int cacheoffset; /* invariant: 0 <= cacheoffset <= SECTOR_SIZE */
+    long fileoffset;
+    long size;
     int attr;
     struct fat_file fatfile;
     bool busy;
@@ -380,7 +380,7 @@ static int flush_cache(int fd)
 {
     int rc;
     struct filedesc* file = &openfiles[fd];
-    int sector = file->fileoffset / SECTOR_SIZE;
+    long sector = file->fileoffset / SECTOR_SIZE;
       
     DEBUGF("Flushing dirty sector cache\n");
         
@@ -404,10 +404,10 @@ static int flush_cache(int fd)
     return 0;
 }
 
-static int readwrite(int fd, void* buf, int count, bool write)
+static int readwrite(int fd, void* buf, long count, bool write)
 {
-    int sectors;
-    int nread=0;
+    long sectors;
+    long nread=0;
     struct filedesc* file = &openfiles[fd];
     int rc;
 
@@ -416,8 +416,8 @@ static int readwrite(int fd, void* buf, int count, bool write)
         return -1;
     }
 
-    LDEBUGF( "readwrite(%d,%x,%d,%s)\n",
-             fd,buf,count,write?"write":"read");
+    LDEBUGF( "readwrite(%d,%lx,%ld,%s)\n",
+             fd,(long)buf,count,write?"write":"read");
 
     /* attempt to read past EOF? */
     if (!write && count > file->size - file->fileoffset)
@@ -469,7 +469,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
         int rc = fat_readwrite(&(file->fatfile), sectors,
             (unsigned char*)buf+nread, write );
         if ( rc < 0 ) {
-            DEBUGF("Failed read/writing %d sectors\n",sectors);
+            DEBUGF("Failed read/writing %ld sectors\n",sectors);
             errno = EIO;
             if(write && file->fatfile.eof) {
                 DEBUGF("No space left on device\n");
@@ -545,7 +545,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
     }
 
     file->fileoffset += nread;
-    LDEBUGF("fileoffset: %d\n", file->fileoffset);
+    LDEBUGF("fileoffset: %ld\n", file->fileoffset);
 
     /* adjust file size to length written */
     if ( write && file->fileoffset > file->size )
@@ -571,14 +571,14 @@ ssize_t read(int fd, void* buf, size_t count)
 
 off_t lseek(int fd, off_t offset, int whence)
 {
-    int pos;
-    int newsector;
-    int oldsector;
+    off_t pos;
+    long newsector;
+    long oldsector;
     int sectoroffset;
     int rc;
     struct filedesc* file = &openfiles[fd];
 
-    LDEBUGF("lseek(%d,%d,%d)\n",fd,offset,whence);
+    LDEBUGF("lseek(%d,%ld,%d)\n",fd,offset,whence);
 
     if ( !file->busy ) {
         errno = EBADF;
@@ -649,7 +649,7 @@ off_t lseek(int fd, off_t offset, int whence)
     return pos;
 }
 
-int filesize(int fd)
+off_t filesize(int fd)
 {
     struct filedesc* file = &openfiles[fd];
 

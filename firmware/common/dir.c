@@ -128,7 +128,7 @@ DIR* opendir(const char* name)
                                  &pdir->fatdir,
                                  entry.firstcluster,
                                  &pdir->parent_dir) < 0 ) {
-                    DEBUGF("Failed opening dir '%s' (%d)\n",
+                    DEBUGF("Failed opening dir '%s' (%ld)\n",
                            part, entry.firstcluster);
                     pdir->busy = false;
                     return NULL;
