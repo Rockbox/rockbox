@@ -30,6 +30,7 @@
 #include "dmalloc.h"
 #include "bmalloc.h"
 #include "mpeg.h"
+#include "main_menu.h"
 
 void app_main(void)
 {

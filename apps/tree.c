@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "tree.h"
 #include "play.h"
+#include "main_menu.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
