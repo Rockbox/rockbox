@@ -1,11 +1,14 @@
 ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -I.. -Uunix -H -C -V -LL >$@
 
 SRC := $(wildcard *.t)
-OBJS := $(SRC:%.t=%.html)
+OBJS := $(SRC:%.t=%.shtml)
 
 all: $(OBJS)
 
 %.html : %.t
 	$(ACTION) $<
 
-index.html: index.t nicks.txt
+%.shtml : %.t
+	$(ACTION) $<
+
+index.shtml: index.t nicks.txt
