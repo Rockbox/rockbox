@@ -655,7 +655,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     if (((unsigned)(y + ny)) >= LCD_HEIGHT)
         ny = LCD_HEIGHT - y;      
 
-    shift = y & 2;
+    shift = y & 7;
     dst2 = &display[x][y/8];
     ny += shift;
 
