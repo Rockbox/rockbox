@@ -15,7 +15,7 @@ CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-
 AFLAGS += -small -relax
 
 OBJS= ../../crt0.o ../../system.o main.o timer.o \
-	../../thread.o ../../kernel.o ../../debug.o
+	../../thread.o ../../kernel.o ../../drivers/led.o ../../debug.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
