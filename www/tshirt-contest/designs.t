@@ -264,6 +264,106 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 18 -->
+<tr><td>(18)</td>
+    <td colspan=2>Magnus &Ouml;man</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="dw-rbox3-front.png"><img border=0 src="design18f2.jpg" width=300 height=252></a></td>
+    <td><a href="dw-rbox3-back.png"><img border=0 src="design18b.jpg" width=300 height=151></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+
+<!-- Entry 19 -->
+<tr><td>(19)</td>
+    <td colspan=2>Pedro Eisman</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Pedro-Eisman-01-blackradical.jpg"><img border=0 src="design19.jpg" width=300 height=137></a></td>
+    <td></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 20 -->
+<tr><td>(20)</td>
+    <td colspan=2>Pedro Eisman</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Pedro-Eisman-02-blackfront.jpg"><img border=0 src="design20f.jpg" width=300 height=92></a></td>
+    <td><a href="Pedro-Eisman-02-blackback.jpg"><img border=0 src="design20b.jpg" width=300 height=92></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 21 -->
+<tr><td>(21)</td>
+    <td colspan=2>Pedro Eisman</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Pedro-Eisman-03-bluefront.jpg"><img border=0 src="design21f.jpg" width=300 height=143></a></td>
+    <td><a href="Pedro-Eisman-03-blueback.jpg"><img border=0 src="design21b.jpg" width=300 height=143></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 22 -->
+<tr><td>(22)</td>
+    <td colspan=2>Pedro Eisman</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Pedro-Eisman-04-whitefront.gif"><img border=0 src="design22f.jpg" width=300 height=143></a></td>
+    <td><a href="Pedro-Eisman-04-whiteback.gif"><img border=0 src="design22b.jpg" width=300 height=143></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 23 -->
+<tr><td>(23)</td>
+    <td colspan=2>Tom Wozniak</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Tom-Wozniak-rockbox01.jpg"><img border=0 src="design23.jpg" width=300 height=207></a></td>
+    <td></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 24 -->
+<tr><td>(24)</td>
+    <td colspan=2>Tom Wozniak</td>
+    <td colspan=2></td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Tom-Wozniak-rockbox02.jpg"><img border=0 src="design24.jpg" width=300 height=259></a></td>
+    <td></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+
 <!-- End Entries -->
 
 </table>
