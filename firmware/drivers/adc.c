@@ -22,25 +22,38 @@
 #include "thread.h"
 #include "adc.h"
 
-static int current_channel;
+/* This driver updates the adcdata[] array by converting one A/D channel
+   group on each system tick. Each group is 4 channels, which means that
+   it takes 2 ticks to convert all 8 channels. */
+
+static int current_group;
 static unsigned short adcdata[NUM_ADC_CHANNELS];
-static unsigned int adcreg[NUM_ADC_CHANNELS] =
-{
-    ADDRAH_ADDR, ADDRBH_ADDR, ADDRCH_ADDR, ADDRDH_ADDR,
-    ADDRAH_ADDR, ADDRBH_ADDR, ADDRCH_ADDR, ADDRDH_ADDR
-};
 
 static void adc_tick(void)
 {
-    /* Read the data that has bee converted since the last tick */
-    adcdata[current_channel] =
-    *(unsigned short *)adcreg[current_channel] >> 6;
+    /* Copy the data from the previous conversion */
+    if(current_group)
+    {
+        adcdata[4] = ADDRA >> 6;
+        adcdata[5] = ADDRB >> 6;
+        adcdata[6] = ADDRC >> 6;
+        adcdata[7] = ADDRD >> 6;
+    }
+    else
+    {
+        adcdata[0] = ADDRA >> 6;
+        adcdata[1] = ADDRB >> 6;
+        adcdata[2] = ADDRC >> 6;
+        adcdata[3] = ADDRD >> 6;
+    }
 
-    /* Start a conversion on the next channel */
-    current_channel++;
-    if(current_channel == NUM_ADC_CHANNELS)
-        current_channel = 0;
-    ADCSR = ADCSR_ADST | current_channel;
+    /* Start converting the next group */
+    current_group = !current_group;
+    ADCSR = ADCSR_ADST | ADCSR_SCAN | (current_group?4:0) | 3;
+
+    /* The conversion will be ready when we serve the next tick interrupt.
+       No need to check ADCSR for finished conversion since the conversion
+       will be ready long before the next tick. */
 }
 
 unsigned short adc_read(int channel)
@@ -48,44 +61,20 @@ unsigned short adc_read(int channel)
     return adcdata[channel];
 }
 
-/* Batch convert 4 analog channels. If lower is true, convert AN0-AN3, 
- * otherwise AN4-AN7. 
- */
-static void adc_batch_convert(bool lower)
-{
-    int reg = lower ? 0 : 4;
-    volatile unsigned short* ANx = ((unsigned short*) ADDRAH_ADDR);
-    int i;
-
-    ADCSR = ADCSR_ADST | ADCSR_SCAN | ADCSR_CKS | reg | 3;
-
-    /* Busy wait until conversion is complete. A bit ugly perhaps, but 
-     * we should only need to wait about 4 * 14 µs  */
-    while(!(ADCSR & ADCSR_ADF))
-    {
-    }
-
-    /* Stop scanning */
-    ADCSR = 0;
-
-    for (i = 0; i < 4; i++)
-    {
-        /* Read converted values */
-        adcdata[reg++] = ANx[i] >> 6;
-    }
-}
-
 void adc_init(void)
 {
-    ADCR  = 0x7f; /* No external trigger; other bits should be 1 according to the manual... */
+    ADCR  = 0x7f; /* No external trigger; other bits should be 1 according
+                     to the manual... */
 
-    current_channel = 0;
+    /* Make sure that there is no conversion running */
+    ADCSR = 0;
 
-    /* Do a first scan to initialize all values */
-    /* AN4 to AN7 */
-    adc_batch_convert(false);
-    /* AN0 to AN3 */
-    adc_batch_convert(true);
+    /* Start with converting group 0 by setting current_group to 1 */
+    current_group = 1;
     
     tick_add_task(adc_tick);
+
+    /* Wait until both groups have been converted before we continue,
+     so adcdata[] contains valid data */
+    sleep(2);
 }
