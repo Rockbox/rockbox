@@ -1124,7 +1124,7 @@ static void start_playback_if_ready(void)
         /* If the filling has stopped, and we still haven't reached
            the watermark, the file must be smaller than the
            watermark. We must still play it. */
-        if((playable_space >= low_watermark) ||
+        if((playable_space >= MPEG_PLAY_PENDING_THRESHOLD) ||
            !filling || dma_underrun)
         {
             DEBUGF("P\n");
@@ -1159,10 +1159,16 @@ static bool swap_one_chunk(void)
 
     /* Swap in larger chunks when the user is waiting for the playback
        to start, or when there is dangerously little playable data left */
-    if(play_pending || get_playable_space() < MPEG_LOW_WATER_SWAP_CHUNKSIZE)
-        amount_to_swap = MIN(MPEG_LOW_WATER_SWAP_CHUNKSIZE, free_space_left);
+    if(play_pending)
+        amount_to_swap = MIN(MPEG_PLAY_PENDING_SWAPSIZE, free_space_left);
     else
-        amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+    {
+        if(get_playable_space() < low_watermark)
+            amount_to_swap = MIN(MPEG_LOW_WATER_SWAP_CHUNKSIZE,
+                                 free_space_left);
+        else
+            amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+    }
     
     if(mp3buf_write < mp3buf_swapwrite)
         amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
