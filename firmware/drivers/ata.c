@@ -191,6 +191,9 @@ int ata_read_sectors(unsigned long start,
         }
     }
 
+    timeout = current_tick + READ_TIMEOUT;
+
+ retry:
     ATA_SELECT = ata_device;
     if (!wait_for_rdy())
     {
@@ -198,9 +201,6 @@ int ata_read_sectors(unsigned long start,
         return -2;
     }
 
-    timeout = current_tick + READ_TIMEOUT;
-
- retry:
     buf = inbuf;
     count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
@@ -228,6 +228,8 @@ int ata_read_sectors(unsigned long start,
 
             if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) ) {
                 ret = -5;
+                if (perform_soft_reset())
+                    break;
                 goto retry;
             }
              
