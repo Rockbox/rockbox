@@ -103,7 +103,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
 	misc.c plugin.c
 
-MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c playlist_menu.c
+MENUS = settings_menu.c sound_menu.c playlist_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += bmp.c widgets.c
@@ -156,12 +156,6 @@ $(OBJDIR)/language.o: $(APPDIR)/language.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/games_menu.o: $(APPDIR)/games_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/demo_menu.o: $(APPDIR)/demo_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings_menu.o: $(APPDIR)/settings_menu.c
