@@ -28,7 +28,7 @@ enum icons_6x8 {
     Box_Filled, Box_Empty, Slider_Horizontal, File, 
     Folder,     Directory, Playlist,          Repeat,
     Selected,   Cursor,    Wps,               Mod_Ajz, 
-    Font,       Language,
+    Font,       Language,  Text,              Config,
     LastIcon
 };
 

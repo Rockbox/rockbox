@@ -256,7 +256,7 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_MPA;
                 else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
                     dptr->attr |= TREE_ATTR_M3U;
-                else if (!strcasecmp(&entry->d_name[len-3], ".cfg"))
+                else if (!strcasecmp(&entry->d_name[len-4], ".cfg"))
                     dptr->attr |= TREE_ATTR_CFG;
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
@@ -384,11 +384,11 @@ static int showdir(char *path, int start)
                 break;
 
             case TREE_ATTR_CFG:
-                icon_type = Wps;
+                icon_type = Config;
                 break;
 
             case TREE_ATTR_TXT:
-                icon_type = Wps;
+                icon_type = Text;
                 break;
 
             case TREE_ATTR_LNG:
