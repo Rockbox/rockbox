@@ -240,6 +240,7 @@ bool bookmark_autobookmark(void)
     /* Prompting user to confirm bookmark creation */
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, STATUSBAR_HEIGHT);
     lcd_puts(0,0, str(LANG_AUTO_BOOKMARK_QUERY));
     lcd_puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
     lcd_puts(0,2, str(LANG_CANCEL_WITH_ANY_RECORDER));
@@ -494,6 +495,7 @@ bool bookmark_autoload(char* file)
         /* Prompting user to confirm bookmark load */
         lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
         lcd_puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
         lcd_puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
         lcd_puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
