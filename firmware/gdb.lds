@@ -31,6 +31,7 @@ SECTIONS
     .rodata :
     {
         *(.rodata)
+        *(.rodata.str1.4)
     } > DRAM
 
     .stack :
