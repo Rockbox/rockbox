@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <stdlib.h>
 #include "config.h"
 #include "debug.h"
 #include "panic.h"
@@ -855,10 +856,13 @@ static int new_file(int steps)
         mpeg_file = open(trackname, O_RDONLY);
         if(mpeg_file < 0) {
             DEBUGF("Couldn't open file: %s\n",trackname);
-            steps++;
+            if(steps < 0)
+               steps--;
+            else
+               steps++;
 
             /* Bail out if no file could be opened */
-            if(steps > max_steps)
+            if(abs(steps) > max_steps)
                 return -1;
         }
         else
