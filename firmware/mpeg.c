@@ -54,7 +54,6 @@ extern void bitswap(unsigned char *data, int length);
 #define MPEG_NEED_DATA    100
 #define MPEG_SWAP_DATA    101
 #define MPEG_TRACK_CHANGE 102
-#define MPEG_DMA_UNDERRUN 103
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
@@ -434,6 +433,8 @@ static bool playing; /* We are playing an MP3 stream */
 static bool play_pending; /* We are about to start playing */
 static bool is_playing; /* We are (attempting to) playing MP3 files */
 static bool filling; /* We are filling the buffer with data from disk */
+static bool dma_underrun; /* True when the DMA has stopped because of
+                             slow disk reading (read error, shaking) */
 
 static int mpeg_file;
 
@@ -490,7 +491,7 @@ static int dbg_cnt2us(unsigned int cnt)
 }
 #endif
 
-static int get_unplayed_space(void)
+int get_unplayed_space(void)
 {
     int space = mp3buf_write - mp3buf_read;
     if (space < 0)
@@ -537,6 +538,7 @@ static void init_dma(void)
     DTCR3 = last_dma_chunk_size & 0xffff;
     DMAOR = 0x0001; /* Enable DMA */
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
+    dma_underrun = false;
 }
 
 static void start_dma(void)
@@ -639,13 +641,19 @@ void DEI3(void)
         }
         else
         {
-            DEBUGF("No more MP3 data. Stopping.\n");
-
-            /* Check if the end of data is because of a hard disk error */
-            if(filling)
-                queue_post(&mpeg_queue, MPEG_DMA_UNDERRUN, 0);
+            /* Check if the end of data is because of a hard disk error.
+               If there is an open file handle, we are still playing music.
+               If not, the last file has been loaded, and the file handle is
+               closed. */
+            if(mpeg_file >= 0)
+            {
+                DEBUGF("DMA underrun.\n");
+                dma_underrun = true;
+            }
             else
             {
+                DEBUGF("No more MP3 data. Stopping.\n");
+
                 queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
                 playing = false;
                 is_playing = false;
@@ -1239,7 +1247,7 @@ static void mpeg_thread(void)
 
                 /* And while we're at it, see if we have started
                    playing yet. If not, do it. */
-                if(play_pending)
+                if(play_pending || dma_underrun)
                 {
                     /* If the filling has stopped, and we still haven't reached
                        the watermark, the file must be smaller than the
@@ -1305,6 +1313,7 @@ static void mpeg_thread(void)
                     DEBUGF("R\n");
                     t1 = current_tick;
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
+
                     if(len > 0)
                     {
                         t2 = current_tick;
@@ -1363,10 +1372,6 @@ static void mpeg_thread(void)
                 
             case MPEG_TRACK_CHANGE:
                 track_change();
-                break;
-                
-            case MPEG_DMA_UNDERRUN:
-                CHCR3 |= 0x0001; /* Enable the DMA interrupt */
                 break;
                 
             case SYS_USB_CONNECTED:
