@@ -1887,6 +1887,7 @@ void mpeg_stop(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
+    yield();
 #else
     is_playing = false;
     playing = false;
