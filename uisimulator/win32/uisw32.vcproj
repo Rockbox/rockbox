@@ -65,7 +65,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
+				AdditionalIncludeDirectories="&quot;..\..\firmware\drivers&quot;;&quot;..\..\firmware&quot;;&quot;..\..\firmware\common&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;WIN32"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
