@@ -19,6 +19,8 @@
 
 #include <windows.h>
 #include <process.h>
+#include <stdlib.h>
+#include <fcntl.h>
 #include "uisw32.h"
 #include "resource.h"
 #include "button.h"
@@ -35,6 +37,8 @@ extern void                 app_main (void *); // mod entry point
 extern void					new_key(int key);
 
 void button_event(int key, bool pressed);
+
+extern int _fmode;
 
 // variables
 HWND                                hGUIWnd; // the GUI window handle
@@ -307,6 +311,9 @@ int WINAPI WinMain (
     (void)hPrevInstance;
     (void)lpCmd;
     (void)nShowCmd;
+
+    /* default file mode should be O_BINARY to be consistent with rockbox */
+    _fmode = _O_BINARY;
 
     if (!GUIStartup ())
         return 0;
