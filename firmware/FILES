@@ -1,6 +1,4 @@
-*.c
-*.h
-*.S
+*.[chS]
 Makefile
 README
 FILES
