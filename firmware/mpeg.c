@@ -2242,20 +2242,10 @@ static void pause_recording(void)
     unsigned long val;
 
     pause_start_time = current_tick;
-    
+
     /* Set the pause bit */
     shadow_7f9 |= 2;
     mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
-    
-    /* Tell the MAS that something has changed */
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
-    
-    /* Wait until the DSP has accepted the settings */
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
-    } while(val & 1);
 
     paused = true;
 }
@@ -2269,16 +2259,6 @@ static void resume_recording(void)
     /* Clear the pause bit */
     shadow_7f9 &= ~2;
     mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
-    
-    /* Tell the MAS that something has changed */
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
-    
-    /* Wait until the DSP has accepted the settings */
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
-    } while(val & 1);
 
     /* Compensate for the time we have been paused */
     if(pause_start_time)
