@@ -230,8 +230,6 @@ static inline void cli (void)
     asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
   }
 
-#endif
-
 /* Compare And Swap */
 static inline int cas (volatile int *pointer,int requested_value,int new_value)
   {
@@ -259,6 +257,8 @@ static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int reques
     sti ();
     return 0;
   }
+
+#endif
 
 extern void system_reboot (void);
 extern void system_init(void);
