@@ -61,7 +61,7 @@ SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
-  SRCS += mpegplay.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
+  SRCS += mpegplay.c oss_sound.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
   DEFINES += -DMPEG_PLAY -DFPM_DEFAULT -DHAVE_CONFIG_H
   INCLUDES += -I$(LIBMADDIR)
 endif

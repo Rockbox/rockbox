@@ -33,10 +33,8 @@
 
 #include <stdio.h>
 #include <mad.h>
-#include <linux/soundcard.h>
 
-/* We want to use the "real" open in some cases */
-#undef open
+#include "oss_sound.h"
 
 /* The "dither" code to convert the 24-bit samples produced by libmad was
    taken from the coolplayer project - coolplayer.sourceforge.net */
@@ -52,7 +50,6 @@ struct mad_stream  Stream;
 struct mad_frame  Frame;
 struct mad_synth  Synth;
 mad_timer_t      Timer;
-int sound;
 
 /*
  * NAME:		prng()
@@ -169,29 +166,6 @@ void pack_pcm(unsigned char **pcm, unsigned int nsamples,
   }
 }
 
-void init_oss(int sound, int sound_freq, int channels) {
-  int format=AFMT_U16_LE;
-  int setting=0x000C000D;  // 12 fragments size 8kb ? WHAT IS THIS?
-
-  if (ioctl(sound,SNDCTL_DSP_SETFRAGMENT,&setting)==-1) {
-    perror("SNDCTL_DSP_SETFRAGMENT");
-  }
-
-  if (ioctl(sound,SNDCTL_DSP_STEREO,&channels)==-1) {
-    perror("SNDCTL_DSP_STEREO");
-  }
-  if (channels==0) { fprintf(stderr,"Warning, only mono supported\n"); }
-
-  if (ioctl(sound,SNDCTL_DSP_SETFMT,&format)==-1) {
-    perror("SNDCTL_DSP_SETFMT");
-  }
-
-//  fprintf(stderr,"SETTING /dev/dsp to %dHz\n",sound_freq);
-  if (ioctl(sound,SNDCTL_DSP_SPEED,&sound_freq)==-1) {
-    perror("SNDCTL_DSP_SPEED");
-  }
-}
-
 #define INPUT_BUFFER_SIZE  (5*8192)
 #define OUTPUT_BUFFER_SIZE  8192 /* Must be an integer multiple of 4. */
 int mpeg_play(char* fname)
@@ -203,22 +177,19 @@ int mpeg_play(char* fname)
   int          Status=0,
             i;
   unsigned long    FrameCount=0;
-  int sound,fd;
+  sound_t sound;
+  int fd;
   mp3entry mp3;
   register signed int s0, s1;
   static struct dither d0, d1;
   
   mp3info(&mp3, fname);
 
-  #undef open
-  sound=open("/dev/dsp", O_WRONLY);
+  init_sound(&sound);
 
-  if (sound < 0) {
-    fprintf(stderr,"Can not open /dev/dsp - Aborting - sound=%d\n",sound);
-    exit(-1);
-  }
-
-  init_oss(sound,mp3.frequency,2);
+  /* Configure sound device for this file - always select Stereo because
+     some sound cards don't support mono */
+  config_sound(&sound,mp3.frequency,2);
 
   fd=x11_open(fname,O_RDONLY);
   if (fd < 0) {
@@ -306,7 +277,7 @@ int mpeg_play(char* fname)
       /* Flush the buffer if it is full. */
       if(OutputPtr==OutputBufferEnd)
       {
-        if(write(sound,OutputBuffer,OUTPUT_BUFFER_SIZE)!=OUTPUT_BUFFER_SIZE)
+        if(output_sound(&sound,OutputBuffer,OUTPUT_BUFFER_SIZE)!=OUTPUT_BUFFER_SIZE)
         {
           fprintf(stderr,"PCM write error.\n");
           Status=2;
@@ -348,7 +319,7 @@ int mpeg_play(char* fname)
     fprintf(stderr,"%lu frames decoded (%s).\n",FrameCount,Buffer);
   }
 
-  close(sound);
+  close_sound(&sound);
   /* That's the end of the world (in the H. G. Wells way). */
   return(Status);
 }
