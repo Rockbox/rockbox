@@ -20,15 +20,20 @@
 #include "debug.h"
 #include "mas.h"
 
-int mas_run(int prognum)
+int mas_default_read(unsigned long *buf)
+{
+    return mas_devread(buf, 1);
+}
+
+int mas_run(unsigned short address)
 {
     int i;
     unsigned char buf[16];
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = 0x00;
-    buf[i++] = prognum;
+    buf[i++] = address << 8;
+    buf[i++] = address & 0xff;
 
     /* send run command */
     if (i2c_write(MAS_DEV_WRITE,buf,i))
