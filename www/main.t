@@ -14,7 +14,12 @@ remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
+
+<p><i>2004-03-14</i>: Rockbox can <a href="/lang/">talk</a> to you
+
 <p><i>2004-03-11</i>: Version 2.2 is <a href="/download/">released</a>
+
+<p><i>2004-02-05</i>: Rockbox can play <a href="/docs/rvf.html">video</a>, with sound 
 
 <p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
 
