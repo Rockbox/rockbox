@@ -62,7 +62,6 @@ void menu_init(void)
     add_menu_item(ITEM_TETRIS, "Tetris");
 
     lcd_puts(8, 38, "Rockbox!", 2);
-    put_cursor(0, 0);
 }
 
 /* Move the cursor to a particular id */
@@ -79,6 +78,7 @@ void app_main(void)
     int cursor = 0;
 
     menu_init();
+    cursor = put_cursor(menu_top, menu_top);
 
     while(1) {
         key = button_get();
@@ -87,15 +87,14 @@ void app_main(void)
             sleep(1);
             continue;
         }
+
         switch(key) {
         case BUTTON_UP:
             if(cursor == menu_top ){
                 /* wrap around to menu bottom */
-                printf("from (%d) to (%d)\n", cursor, menu_bottom);
                 cursor = put_cursor(cursor, menu_bottom);
             } else {
                 /* move up */
-                printf("from (%d) to (%d)\n", cursor, cursor-1);
                 cursor = put_cursor(cursor, cursor-1);
             }
             break;
@@ -125,13 +124,24 @@ void app_main(void)
             case ITEM_SCREENSAVER:
                 screensaver();
                 break;
+            default:
+                continue;
             }
 
             /* Return to previous display state */
             lcd_clear_display();
             menu_init();
+            cursor = put_cursor(cursor, cursor);
+            break;
+        case BUTTON_OFF:
+            return;
+        default:
             break;
         }
+
         lcd_update();
     }
 }
+
+
+
