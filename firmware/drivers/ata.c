@@ -145,6 +145,8 @@ int ata_read_sectors(unsigned long start,
     int i;
     int ret = 0;
 
+    DEBUGF("ata_read(%X,%d,%X)\n",start,count,buf);
+
 #ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
@@ -184,8 +186,19 @@ int ata_read_sectors(unsigned long start,
             return -1;
         }
 
-        for (j=0; j<SECTOR_SIZE/2; j++)
-            ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
+        /* if destination address is odd, use byte copying,
+           otherwise use word copying */
+        if ( (unsigned int)buf & 1 ) {
+            for (j=0; j<SECTOR_SIZE/2; j++) {
+                unsigned short tmp = SWAB16(ATA_DATA);
+                ((unsigned char*)buf)[j*2] = tmp >> 8;
+                ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
+            }
+        }
+        else {
+            for (j=0; j<SECTOR_SIZE/2; j++)
+                ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
+        }
 
 #ifdef USE_INTERRUPT
         /* reading the status register clears the interrupt */
