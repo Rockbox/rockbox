@@ -523,16 +523,20 @@ static void ata_thread(void)
     }
 }
 
+/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
 int ata_hard_reset(void)
 {
     int ret;
     
-    PADR &= ~0x0200;
+    /* state HRR0 */
+    PADR &= ~0x0200; /* assert _RESET */
+    sleep(1); /* > 25us */
 
-    sleep(2);
+    /* state HRR1 */
+    PADR |= 0x0200; /* negate _RESET */
+    sleep(1); /* > 2ms */
 
-    PADR |= 0x0200;
-
+    /* state HRR2 */
     ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
