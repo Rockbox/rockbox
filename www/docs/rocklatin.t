@@ -49,7 +49,7 @@ be switched to a substitute character.
 <h2>Accessing hardware</h2>
 The Rockbox software can access a HW-LCD-character by doing a lcd_putc(0x100-0x1ff). That would of course make it 100% hardware depended (=not good).
 <p>
-The Rockbox software can also define 23 own patterns, even though hardware only
+The Rockbox software can also define 22 own patterns, even though hardware only
 allows 4 or 8. The software should of course not try to display more than 4
 or 8 of such characters. This code example shows how to define a pattern:
 <pre>
@@ -68,7 +68,7 @@ or 8 of such characters. This code example shows how to define a pattern:
   lcd_unlock_pattern(handle);
 }
 </pre>
-The handle is very likely to be between 0x01 to 0x17, which in software will
+The handle is very likely to be between 0x01 to 0x16, which in software will
 be handled as a prioritized character (even higher than the icons).
 
 <h2>Some notes</h2>
