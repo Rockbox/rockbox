@@ -67,7 +67,11 @@ void browse_root(void)
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      2 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
-#define CURSOR_CHAR "-"
+
+#define CURSOR_Y    1 /* the cursor is not positioned in regard to
+                         the margins, so this is the amount of lines
+                         we add to the cursor Y position to position
+                         it on a line */
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
@@ -78,11 +82,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      1 /* X position the entry-list starts at */
 
-#ifdef HAVE_NEW_CHARCELL_LCD
-#define CURSOR_CHAR "\x7e"
-#else
-#define CURSOR_CHAR "\x89"
-#endif
+#define CURSOR_Y    0 /* not really used for players */
 
 #endif /* HAVE_LCD_BITMAP */
 
@@ -239,7 +239,7 @@ bool dirbrowse(char *root)
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
-    lcd_puts(0, dircursor, CURSOR_CHAR);
+    put_cursorxy(0, CURSOR_Y + dircursor, true);
     if ( numentries )
         lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
                         dircacheptr[start+dircursor]->name);
@@ -266,7 +266,7 @@ bool dirbrowse(char *root)
                     else
                         start = dircursor = 0;
                     numentries = showdir(currdir, start);
-                    lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                 }
                 else
                     mpeg_stop();
@@ -310,21 +310,21 @@ bool dirbrowse(char *root)
                     }
                 }
                 numentries = showdir(currdir, start);  
-                lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                 break;
                 
             case TREE_PREV:
                 if(dircursor) {
-                    lcd_puts(0, LINE_Y+dircursor, " ");
+                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
                     dircursor--;
-                    lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     lcd_update();
                 }
                 else {
                     if (start) {
                         start--;
                         numentries = showdir(currdir, start);
-                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     }
                 }
                 break;
@@ -332,14 +332,14 @@ bool dirbrowse(char *root)
             case TREE_NEXT:
                 if (dircursor + start + 1 < numentries ) {
                     if(dircursor+1 < TREE_MAX_ON_SCREEN) {
-                        lcd_puts(0, LINE_Y+dircursor, " ");
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
                         dircursor++;
-                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     } 
                     else {
                         start++;
                         numentries = showdir(currdir, start);
-                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                     }
                 }
                 break;
@@ -352,7 +352,7 @@ bool dirbrowse(char *root)
                 /* TODO: this is just a copy from BUTTON_STOP, fix it */
                 lcd_clear_display();
                 numentries = showdir(currdir, start);
-                lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
+                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
 
                 break;
         }

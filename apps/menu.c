@@ -23,6 +23,10 @@
 #include "kernel.h"
 #include "debug.h"
 
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#endif
+
 struct menu {
     int top;
     int cursor;
@@ -38,18 +42,36 @@ struct menu {
 #define MENU_LINES 2
 #endif
 
-#ifdef HAVE_LCD_BITMAP
-#define CURSOR_CHAR "-"
-#else
 #ifdef HAVE_NEW_CHARCELL_LCD
 #define CURSOR_CHAR "\x7e"
 #else
 #define CURSOR_CHAR "\x89"
 #endif
-#endif
 
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
+
+/* count in letter posistions, NOT pixels */
+void put_cursorxy(int x, int y, bool on)
+{
+    /* place the cursor */
+    if(on) {
+#ifdef HAVE_LCD_BITMAP
+        lcd_bitmap ( bitmap_icons_6x8[Cursor], 
+                     x*6, y*8, 6, 8, true);
+#else
+        lcd_puts(x, y, CURSOR_CHAR);
+#endif
+    }
+    else {
+#ifdef HAVE_LCD_BITMAP
+        /* I use xy here since it needs to disregard the margins */
+        lcd_putsxy (x*6, y*8, " ", 0);
+#else
+        lcd_puts(x, y, " ");
+#endif
+    }
+}
 
 static void menu_draw(int m)
 {
@@ -66,8 +88,8 @@ static void menu_draw(int m)
         lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
     }
 
-	/* place the cursor */
-    lcd_puts(0, menus[m].cursor - menus[m].top, CURSOR_CHAR);
+    /* place the cursor */
+    put_cursorxy(0, menus[m].cursor - menus[m].top, true);
 
     lcd_update();
 }
@@ -80,7 +102,7 @@ static void put_cursor(int m, int target)
 {
     bool do_update = true;
 
-    lcd_puts(0, menus[m].cursor - menus[m].top, " ");    
+    put_cursorxy(0, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
 
     if ( target < menus[m].top ) {
@@ -95,7 +117,7 @@ static void put_cursor(int m, int target)
     }
 
     if (do_update) {
-        lcd_puts(0, menus[m].cursor - menus[m].top, CURSOR_CHAR); 
+        put_cursorxy(0, menus[m].cursor - menus[m].top, true); 
         lcd_update();
     }
 
