@@ -1967,9 +1967,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
     } while (button != BUTTON_PLAY && 
              button != BUTTON_OFF  && button != BUTTON_ON);

@@ -17,9 +17,49 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#ifdef HAVE_LCD_CHARCELLS
-/* We only support players at a start. I don't have simulator capacity at
-   the time. */
+
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define CHC_QUIT BUTTON_OFF
+#define CHC_STARTSTOP BUTTON_PLAY
+#define CHC_RESET BUTTON_LEFT
+#define CHC_MENU BUTTON_F1
+#define CHC_SETTINGS_INC BUTTON_UP
+#define CHC_SETTINGS_DEC BUTTON_DOWN
+#define CHC_SETTINGS_OK BUTTON_PLAY
+#define CHC_SETTINGS_OK2 BUTTON_LEFT
+#define CHC_SETTINGS_CANCEL BUTTON_OFF
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define CHC_QUIT BUTTON_OFF
+#define CHC_STARTSTOP BUTTON_RIGHT
+#define CHC_RESET BUTTON_LEFT
+#define CHC_MENU BUTTON_MENU
+#define CHC_SETTINGS_INC BUTTON_UP
+#define CHC_SETTINGS_DEC BUTTON_DOWN
+#define CHC_SETTINGS_OK BUTTON_RIGHT
+#define CHC_SETTINGS_OK2 BUTTON_LEFT
+#define CHC_SETTINGS_CANCEL BUTTON_MENU
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define CHC_QUIT BUTTON_ON
+#define CHC_STARTSTOP BUTTON_PLAY
+#define CHC_RESET BUTTON_STOP
+#define CHC_MENU BUTTON_MENU
+#define CHC_SETTINGS_INC BUTTON_RIGHT
+#define CHC_SETTINGS_DEC BUTTON_LEFT
+#define CHC_SETTINGS_OK BUTTON_PLAY
+#define CHC_SETTINGS_CANCEL BUTTON_STOP
+#define CHC_SETTINGS_CANCEL2 BUTTON_MENU
+
+#endif
+
+/* leave first line blank on bitmap display, for pause icon */
+#ifdef HAVE_LCD_BITMAP
+#define FIRST_LINE 1
+#else
+#define FIRST_LINE 0
+#endif
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
@@ -99,7 +139,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
         }
         if (res==-1) {
-            rb->usb_screen();
             return PLUGIN_USB_CONNECTED;
         }
         if (res==0) {
@@ -140,7 +179,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 done=true;
                 break;
             case 3:
-                rb->usb_screen();
                 return PLUGIN_USB_CONNECTED;
             case 1:
                 nr++;
@@ -156,6 +194,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     } while (!done);
     return PLUGIN_OK;
 }
+
+#ifdef HAVE_LCD_BITMAP
+static void show_pause_mode(bool enabled)
+{
+    static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
+    
+    if (enabled)
+        rb->lcd_bitmap(pause_icon, 52, 0, 7, 8, true);
+    else
+        rb->lcd_clearrect(52, 0, 7, 8);
+}
+#endif
 
 /*
   -1= exit
@@ -173,15 +223,19 @@ static int run_timer(int nr)
     long max_ticks=timer_holder[nr].total_time*HZ-timer_holder[nr].used_time;
     long ticks=0;
     bool round_time=false;
-    
+
+#ifdef HAVE_LCD_CHARCELLS
     rb->lcd_icon(ICON_PAUSE, pause);
+#else
+    show_pause_mode(pause);
+#endif
 
     if (settings.round_time*HZ<max_ticks) {
         max_ticks=settings.round_time*HZ;
         round_time=true;
     }
     rb->snprintf(player_info, sizeof(player_info), "Player %d", nr+1);
-    rb->lcd_puts(0, 0, player_info);
+    rb->lcd_puts(0, FIRST_LINE, player_info);
     last_tick=*rb->current_tick;
 
     while (!done) {
@@ -189,19 +243,19 @@ static int run_timer(int nr)
         long now;
         if (ticks>max_ticks) {
             if (round_time) 
-                rb->lcd_puts(0, 1, "ROUND UP!");
+                rb->lcd_puts(0, FIRST_LINE+1, "ROUND UP!");
             else
-                rb->lcd_puts(0, 1, "TIME OUT!");
+                rb->lcd_puts(0, FIRST_LINE+1, "TIME OUT!");
             rb->backlight_on();
         } else {
             /*
             if (((int)(rb->current_tick - start_ticks)/HZ)&1) {
-                rb->lcd_puts(0, 0, player_info);
+                rb->lcd_puts(0, FIRST_LINE, player_info);
             } else {
-                rb->lcd_puts(0, 0, player_info);
+                rb->lcd_puts(0, FIRST_LINE, player_info);
             }
             */
-            rb->lcd_puts(0, 0, player_info);
+            rb->lcd_puts(0, FIRST_LINE, player_info);
             now=*rb->current_tick;
             if (!pause) {
                 ticks+=now-last_tick;
@@ -219,34 +273,37 @@ static int run_timer(int nr)
                            show_time((timer_holder[nr].total_time*HZ-
                                       timer_holder[nr].used_time-
                                       ticks+HZ-1)/HZ));
-                rb->lcd_puts(0, 1, buf);
+                rb->lcd_puts(0, FIRST_LINE+1, buf);
             } else {
-                rb->lcd_puts(0, 1, show_time((max_ticks-ticks+HZ-1)/HZ));
+                rb->lcd_puts(0, FIRST_LINE+1, show_time((max_ticks-ticks+HZ-1)/HZ));
             }
         }
-        button = rb->button_get_w_tmo(10);
-        switch (button) {
-            /* OFF/MENU key to exit */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_ON:
+#ifdef HAVE_LCD_BITMAP
+        rb->lcd_update();
 #endif
+        button = rb->button_get(false);
+        switch (button) {
+            /* OFF/ON key to exit */
+            case CHC_QUIT:
                 return -1; /* Indicate exit */
 
             /* PLAY = Stop/Start toggle */
-            case BUTTON_PLAY:
+            case CHC_STARTSTOP:
                 pause=!pause;
+#ifdef HAVE_LCD_CHARCELLS
                 rb->lcd_icon(ICON_PAUSE, pause);
+#else
+                show_pause_mode(pause);
+#endif
                 break;
 
             /* LEFT = Reset timer */
-            case BUTTON_STOP:
+            case CHC_RESET:
                 ticks=0;
                 break;
 
                 /* MENU  */
-            case BUTTON_MENU:
+            case CHC_MENU:
             {
                 int ret;
                 char *menu[]={"Delete player", "Restart round",
@@ -299,35 +356,29 @@ static int run_timer(int nr)
             break;
 
             /* UP (RIGHT/+) = Scroll Lap timer up */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_UP:
-#else
-            case BUTTON_RIGHT:
-#endif
+            case CHC_SETTINGS_INC:
                 retval = 1;
                 done = true;
                 break;
 
             /* DOWN (LEFT/-) = Scroll Lap timer down */
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-#endif
+            case CHC_SETTINGS_DEC:
                 retval = 2;
                 done = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                retval = 3;
-                done=true;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                    done = true;
+                    return 3; /* been in usb mode */
+                }
                 break;
         }
         rb->sleep(HZ/4); /* Sleep 1/4 of a second */
     }
 
     timer_holder[nr].used_time+=ticks;
-    
+
     return retval;
 }
 
@@ -341,15 +392,8 @@ static int chessclock_set_int(char* string,
     bool done = false;
     int button;
 
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        rb->lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        rb->lcd_setmargins(0, 0);
-#endif
-
     rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, string);
+    rb->lcd_puts_scroll(0, FIRST_LINE, string);
 
     while (!done) {
         char str[32];
@@ -357,53 +401,40 @@ static int chessclock_set_int(char* string,
             rb->snprintf(str, sizeof str,"%s (m:s)", show_time(*variable));
         else
             rb->snprintf(str, sizeof str,"%d", *variable);
-        rb->lcd_puts(0, 1, str);
+        rb->lcd_puts(0, FIRST_LINE+1, str);
 #ifdef HAVE_LCD_BITMAP
-        rb->status_draw(true);
         rb->lcd_update();
 #endif
-        button = rb->button_get_w_tmo(HZ/2);
+        button = rb->button_get(true);
         switch(button) {
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-#endif
+            case CHC_SETTINGS_INC:
+            case CHC_SETTINGS_INC | BUTTON_REPEAT:
                 *variable += step;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case CHC_SETTINGS_DEC:
+            case CHC_SETTINGS_DEC | BUTTON_REPEAT:
                 *variable -= step;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_LEFT:
-            case BUTTON_PLAY:
-#else
-            case BUTTON_PLAY:
+            case CHC_SETTINGS_OK:
+#ifdef CHC_SETTINGS_OK2
+            case CHC_SETTINGS_OK2:
 #endif
                 done = true;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
+            case CHC_SETTINGS_CANCEL:
+#ifdef CHC_SETTINGS_CANCEL2
+            case CHC_SETTINGS_CANCEL2:
 #endif
                 return 0; /* cancel */
                 break;
 
-            case SYS_USB_CONNECTED:
-                return -1;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return -1; /* been in usb mode */
+                break;
 
         }
         if(*variable > max )
@@ -439,51 +470,41 @@ static int simple_menu(int nr, char **strarr)
             show=0;
         if (show<0)
             show=nr-1;
-        rb->lcd_puts_scroll(0, 0, strarr[show]);
-        button = rb->button_get(false);
-        switch(button) {
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+        rb->lcd_puts_scroll(0, FIRST_LINE, strarr[show]);
+#ifdef HAVE_LCD_BITMAP
+        rb->lcd_update();
 #endif
+        button = rb->button_get(true);
+        switch(button) {
+            case CHC_SETTINGS_INC:
+            case CHC_SETTINGS_INC | BUTTON_REPEAT:
                 show++;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-#endif
+            case CHC_SETTINGS_DEC:
+            case CHC_SETTINGS_DEC | BUTTON_REPEAT:
                 show--;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_LEFT:
-            case BUTTON_PLAY:
-#else
-            case BUTTON_PLAY:
+            case CHC_SETTINGS_OK:
+#ifdef CHC_SETTINGS_OK2
+            case CHC_SETTINGS_OK2:
 #endif
                 return show;
                 break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_OFF:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
+            case CHC_SETTINGS_CANCEL:
+#ifdef CHC_SETTINGS_CANCEL2
+            case CHC_SETTINGS_CANCEL2:
 #endif
                 return -2; /* cancel */
                 break;
 
-            case SYS_USB_CONNECTED:
-                return -1;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return -1; /* been in usb mode */
+                break;
         }
     }
 }
 
-#endif /* HAVE_LCD_CHARCELLS */
