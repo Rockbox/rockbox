@@ -37,6 +37,7 @@ void app_main(void)
     int key;
     
     menu_init();
+    menu_draw();
     put_cursor_menu_top();
     
     while(1) {
@@ -75,7 +76,7 @@ void app_main(void)
             
             /* Return to previous display state */
             lcd_clear_display();
-            menu_init();
+            menu_draw();
             break;
         case BUTTON_OFF:
             return;

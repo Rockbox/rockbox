@@ -40,6 +40,7 @@ int is_cursor_menu_bottom(void);
 /* Menu calls */
 void add_menu_item(int location, char *string);
 void menu_init(void);
+void menu_draw(void);
 void execute_menu_item(void);
 
 #endif /* End __MENU_H__ */

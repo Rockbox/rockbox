@@ -120,12 +120,15 @@ void add_menu_item(int location, char *string)
 
 void menu_init(void)
 {
-    int i = 0;
-
     menu_top = Tetris;
     menu_bottom = Last_Id-1;
     menu_line_height = MENU_LINE_HEIGHT;
     cursor = menu_top;
+}
+
+void menu_draw(void)
+{
+    int i = 0;
 
     for (i = i; i < Last_Id; i++)
         add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
