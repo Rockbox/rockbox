@@ -242,16 +242,17 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    PBCR1 &= ~0x0C00; /* use PB13 as GPIO, if not modified below */
+    PBCR1 &= ~0x0CC0; /* PB13 and TxD1 become GPIOs, if not modified below */
     if (on)
     {
         /* serial setup */
-        PBCR1 |=  0x0800; /* as SCK1 */
+        PBCR1 |= 0x0880; /* as SCK1, TxD1 */
     }
     else
     {
         PBDR |= 0x2000; /* drive PB13 high */
         PBIOR |= 0x2000; /* output PB13 */
+        PBIOR &= ~0x0800; /* high impedance for TxD1 GPIO */
     }
 }
 
@@ -275,10 +276,12 @@ int ata_init(void)
     if(adc_read(ADC_MMC_SWITCH) < 0x200)
     {   /* MMC inserted */
         PADR &= ~0x1000; /* clear PA12 */
+        PADR |= 0x0400; /* chip select internal flash */
     }
     else
     {   /* no MMC, use internal memory */
         PADR |= 0x1000; /* set PA12 */
+        PADR |= 0x0200; /* chip select external flash */
     }
 
     sleeping = false;
