@@ -307,4 +307,4 @@ Q40: Why don't you have any games available for the Players?
 A40: The display on the Players is character cell and not bitmap based.  
      This means we can only control what characters get displayed, not
      what pixels are shown.  This makes the prospect of game play very 
-     slim (atleast for anything graphic involved).
+     slim (at least for anything involving graphics).
