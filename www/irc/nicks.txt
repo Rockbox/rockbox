@@ -1,7 +1,9 @@
-Zagor   => Björn Stenberg
-linus   => Linus Nielsen Feltzing
-Bagder  => Daniel Stenberg
-Wavey   => Stuart Martin
-alkorr  => Alan Korr
-adiamas => Robert Hak
-edx     => Felix Arends
+Zagor       => Björn Stenberg
+Linus       => Linus Nielsen Feltzing
+Bagder      => Daniel Stenberg
+Wavey       => Stuart Martin
+alkorr      => Alan Korr
+adiamas     => Robert Hak
+edx         => Felix Arends
+calpefrosch => Stefan Meyer
+PsycoXul    => Grant Wier
