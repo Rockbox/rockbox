@@ -31,7 +31,7 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 <h2>Vacations</h2>
 <p>Parts of the core team is currently away on vacation:
 <ul>
-<li>Björn Stenberg (Zagor): Back friday july 5, reads mail
+<li>Linus Nielsen (Linus): Back monday july 22, reads mail
 <li>Daniel Stenberg (Bagder): Back thursday july 25, does not read mail
 </ul>
 
