@@ -240,6 +240,8 @@ static struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon,
 #endif
+
+    reset_poweroff_timer,
 };
 
 int plugin_load(char* plugin, void* parameter)

@@ -276,6 +276,8 @@ struct plugin_api {
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_icon)(int icon, bool enable);
 #endif
+
+    void (*reset_poweroff_timer)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */

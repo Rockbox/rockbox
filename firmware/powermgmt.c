@@ -38,6 +38,13 @@
 #include "fmradio.h"
 #endif
 
+long last_event_tick;
+
+void reset_poweroff_timer(void)
+{
+    last_event_tick = current_tick;
+}
+
 #ifdef SIMULATOR
 
 int battery_level(void)
@@ -316,7 +323,7 @@ static void handle_auto_poweroff(void)
         ((mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)) &&
          !sleeptimer_active)))
     {
-        if(TIME_AFTER(current_tick, last_keypress + timeout) &&
+        if(TIME_AFTER(current_tick, last_event_tick + timeout) &&
            TIME_AFTER(current_tick, last_disk_activity + timeout) &&
            TIME_AFTER(current_tick, last_charge_time + timeout))
         {

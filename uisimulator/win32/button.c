@@ -33,7 +33,6 @@
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
 
-long last_keypress;
 struct event_queue button_queue;
 
 void button_event(int key, bool pressed)
@@ -160,8 +159,6 @@ void button_event(int key, bool pressed)
                 queue_post(&button_queue, btn, NULL);
 
             backlight_on();
-
-            last_keypress = current_tick;
         }
         }
     else
@@ -175,7 +172,6 @@ void button_event(int key, bool pressed)
 
 void button_init(void)
 {
-	last_keypress = 0;
 }
 
 /* Again copied from real button.c... */

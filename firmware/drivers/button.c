@@ -31,10 +31,10 @@
 #include "serial.h"
 #include "power.h"
 #include "system.h"
+#include "powermgmt.h"
 
 struct event_queue button_queue;
 
-long last_keypress;
 static int lastbtn;
 #ifdef HAVE_RECORDER_KEYPAD
 static bool flipped; /* bottons can be flipped to match the LCD flip */
@@ -141,7 +141,7 @@ static void button_tick(void)
                     queue_post(&button_queue, btn, NULL);
                 backlight_on();
 
-                last_keypress = current_tick;
+                reset_poweroff_timer();
             }
         }
         else
@@ -216,7 +216,7 @@ void button_init()
     queue_init(&button_queue);
     lastbtn = 0;
     tick_add_task(button_tick);
-    last_keypress = current_tick;
+    reset_poweroff_timer();
     flipped = false;
 }
 
@@ -359,7 +359,7 @@ void button_init(void)
     lastbtn = 0;
     tick_add_task(button_tick);
 
-    last_keypress = current_tick;
+    reset_poweroff_timer();
 }
 
 static int button_read(void)
@@ -396,7 +396,7 @@ void button_init(void)
     lastbtn = 0;
     tick_add_task(button_tick);
 
-    last_keypress = current_tick;
+    reset_poweroff_timer();
 }
 int button_read(void)
 {
