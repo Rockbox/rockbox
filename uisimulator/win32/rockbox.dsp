@@ -369,6 +369,10 @@ SOURCE=..\..\apps\playlist.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\apps\plugin.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\apps\screens.c
 # End Source File
 # Begin Source File
@@ -475,10 +479,6 @@ SOURCE=".\mpeg-win32.c"
 # Begin Source File
 
 SOURCE=".\panic-win32.c"
-# End Source File
-# Begin Source File
-
-SOURCE=".\plugin-win32.c"
 # End Source File
 # Begin Source File
 
