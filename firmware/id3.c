@@ -365,6 +365,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     unsigned long header=0;
     unsigned char tmp;
     unsigned char frame[64];
+    unsigned char* xing;
     
     int version;
     int layer;
@@ -372,6 +373,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     int bitrate;
     int freqindex;
     int frequency;
+    int chmode;
 
     long bpf;
     long tpf;
@@ -437,7 +439,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     default:
         return -1;
     }
-    
+
     /* Bitrate */
     bitindex = (header & 0xF000) >> 12;
     bitrate = bitrate_table[version-1][layer-1][bitindex];
@@ -451,9 +453,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
         return -1;
 
 #ifdef DEBUG_VERBOSE
-    fprintf(stderr,
-            "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i\n", 
-            version, layer, bitindex, bitrate, freqindex, frequency);
+    DEBUGF( "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i, chmode %d\n", 
+            version, layer, bitindex, bitrate, freqindex, frequency, chmode);
 #endif
     entry->version = version;
     entry->layer = layer;
@@ -483,25 +484,42 @@ static int getsonglength(int fd, struct mp3entry *entry)
     if(read(fd, frame, sizeof frame) < 0)
         return -1;
 
-    if(frame[32] == 'X' &&
-       frame[33] == 'i' &&
-       frame[34] == 'n' &&
-       frame[35] == 'g')
+    /* Channel mode (stereo/mono) */
+    chmode = (header & 0xc0) >> 6;
+
+    /* calculate position of Xing VBR header */
+    if ( version == 1 ) {
+        if ( chmode == 3 ) /* mono */
+            xing = frame + 17;
+        else
+            xing = frame + 32;
+    }
+    else {
+        if ( chmode == 3 ) /* mono */
+            xing = frame + 9;
+        else
+            xing = frame + 17;
+    }
+
+    if (xing[0] == 'X' &&
+        xing[1] == 'i' &&
+        xing[2] == 'n' &&
+        xing[3] == 'g')
     {
         /* Yes, it is a VBR file */
         entry->vbr = true;
         
-        if(frame[39] & 0x01) /* Is the frame count there? */
+        if (xing[7] & 0x01) /* Is the frame count there? */
         {
-            int framecount = (frame[40] << 24) | (frame[41] << 16) |
-                (frame[42] << 8) | frame[43];
+            int framecount = (xing[8] << 24) | (xing[9] << 16) |
+                (xing[10] << 8) | xing[11];
 
             filetime = framecount * tpf;
         }
-        if (frame[39] & 0x02) /* is byte count there? */
+        if (xing[7] & 0x02) /* is byte count there? */
         {
-            int bytecount = (frame[44] << 24) | (frame[45] << 16) |
-                (frame[46] << 8) | frame[47];
+            int bytecount = (xing[12] << 24) | (xing[13] << 16) |
+                (xing[14] << 8) | xing[15];
 
             bitrate = bytecount * 8 / filetime;
         }
