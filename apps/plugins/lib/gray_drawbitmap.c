@@ -48,12 +48,13 @@
  The <stride> parameter is useful if you want to show only a part of a
  bitmap. It should always be set to the "row length" of the bitmap.
  */
-void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
+void gray_drawbitmap(const unsigned char *src, int x, int y, int nx, int ny,
                      int stride)
 {
     int shift;
     unsigned bits, mask_top, mask_bottom;
-    unsigned char *src_col, *dst, *dst_col;
+    const unsigned char *src_col;
+    unsigned char *dst, *dst_col;
     void (*blockfunc)(unsigned char *address, unsigned mask, unsigned bits);
 
     if ((unsigned) x >= (unsigned) _graybuf->width

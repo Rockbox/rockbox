@@ -42,7 +42,7 @@ int main(void)
     int button, scroll_amount;
     bool black_border;
 
-    static unsigned char rockbox[] = {
+    static const unsigned char rockbox[] = {
     /* ...........................................
      * .####...###...###..#...#.####...###..#...#.
      * .#...#.#...#.#...#.#..#..#...#.#...#..#.#..
@@ -59,7 +59,7 @@ int main(void)
        0x14, 0x22, 0x00
     };
     
-    static unsigned char showing[] = {
+    static const unsigned char showing[] = {
     /* .......................................
      * ..####.#...#..###..#...#.#.#...#..####.
      * .#.....#...#.#...#.#...#.#.##..#.#.....
@@ -75,7 +75,7 @@ int main(void)
        0x10, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x2A, 0x3A, 0x00
     };
     
-    static unsigned char grayscale_gray[] = {
+    static const unsigned char grayscale_gray[] = {
     /* .......................................................
      * ..####.####...###..#...#..####..###...###..#.....#####.
      * .#.....#...#.#...#.#...#.#.....#...#.#...#.#.....#.....

@@ -34,7 +34,7 @@ static void _writepixel(int x, int y, unsigned long pattern);
 static void _invertpixel(int x, int y, unsigned long pattern);
 
 /* function pointer array */
-void (*_gray_pixelfuncs[4])(int x, int y, unsigned long pattern) = {
+void (* const _gray_pixelfuncs[4])(int x, int y, unsigned long pattern) = {
     _invertpixel, _writepixel, _writepixel, _writepixel
 };
 

@@ -36,8 +36,8 @@ static void _writeblockfg(unsigned char *address, unsigned mask, unsigned bits);
 static void _writeblockbg(unsigned char *address, unsigned mask, unsigned bits);
 
 /* Block function pointer array */
-void (*_gray_blockfuncs[4])(unsigned char *address, unsigned mask,
-                              unsigned bits) = {
+void (* const _gray_blockfuncs[4])(unsigned char *address, unsigned mask,
+                                   unsigned bits) = {
     _invertblock, _writeblockfg, _writeblockbg, _writeblock
 };
 

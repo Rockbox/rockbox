@@ -34,7 +34,7 @@
  ----------------------------------------------------------------------------
  The drawmode is used as described for gray_set_drawmode()
  */
-void gray_putsxy(int x, int y, unsigned char *str)
+void gray_putsxy(int x, int y, const unsigned char *str)
 {
     int ch, width;
     bitmap_t *bits;
@@ -56,7 +56,7 @@ void gray_putsxy(int x, int y, unsigned char *str)
         bits = pf->bits + (pf->offset ? pf->offset[ch] 
                                       : MULU16(pf->height, ch));
 
-        gray_drawbitmap((unsigned char*) bits, x, y, width, pf->height,
+        gray_drawbitmap((const unsigned char*) bits, x, y, width, pf->height,
                         width);
         x += width;
     }

@@ -30,16 +30,16 @@
 #include "gray.h"
 
 /* Prototypes */
-static void _writearray(unsigned char *address, unsigned char *src, int stride,
-                        unsigned mask);
+static void _writearray(unsigned char *address, const unsigned char *src,
+                        int stride, unsigned mask);
 
 /* Write an 8-pixel block, defined by their brightnesses in a graymap.
  * Address is the byte in the first bitplane, src is the graymap start address,
  * stride is the increment for the graymap to get to the next pixel, mask
  * determines which pixels of the destination block are changed. For "0" bits,
  * the src address is not incremented! */
-static void _writearray(unsigned char *address, unsigned char *src, int stride,
-                        unsigned mask)
+static void _writearray(unsigned char *address, const unsigned char *src,
+                        int stride, unsigned mask)
 {
     unsigned long pat_stack[8];
     register unsigned char *end_addr;
@@ -217,12 +217,13 @@ asm (
 
  This is the only drawing function NOT using the drawinfo.
  */
-void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
+void gray_drawgraymap(const unsigned char *src, int x, int y, int nx, int ny,
                       int stride)
 {
     int shift;
     unsigned mask_top, mask_bottom;
-    unsigned char *src_row, *dst, *dst_row;
+    const unsigned char *src_row;
+    unsigned char *dst, *dst_row;
 
     if ((unsigned) x >= (unsigned) _graybuf->width
         || (unsigned) y >= (unsigned) _graybuf->height)

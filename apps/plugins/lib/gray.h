@@ -362,7 +362,7 @@ void gray_fillrect(int x, int y, int nx, int ny);
  
  This is the only drawing function NOT using the drawinfo.
  */
-void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
+void gray_drawgraymap(const unsigned char *src, int x, int y, int nx, int ny,
                       int stride);
 
 /*---------------------------------------------------------------------------
@@ -384,7 +384,7 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
  The <stride> parameter is useful if you want to show only a part of a
  bitmap. It should always be set to the "row length" of the bitmap.
  */
-void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
+void gray_drawbitmap(const unsigned char *src, int x, int y, int nx, int ny,
                      int stride);
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -409,14 +409,14 @@ void gray_setfont(int newfont);
  This works exactly the same way as the core lcd_getstringsize(), only that
  it uses the selected font for grayscale.
  */
-int gray_getstringsize(unsigned char *str, int *w, int *h);
+int gray_getstringsize(const unsigned char *str, int *w, int *h);
 
 /*---------------------------------------------------------------------------
  Display text starting at (x, y) with the current font and drawinfo
  ----------------------------------------------------------------------------
  The drawmode is used as described for gray_set_drawmode()
  */
-void gray_putsxy(int x, int y, unsigned char *str);
+void gray_putsxy(int x, int y, const unsigned char *str);
 
 /*===========================================================================
  Private functions and definitions, for use within the grayscale core only
@@ -458,9 +458,9 @@ extern _tGraybuf *_graybuf;
 extern short _gray_random_buffer;
 
 /* Global function pointers */
-extern void (*_gray_pixelfuncs[4])(int x, int y, unsigned long pattern);
-extern void (*_gray_blockfuncs[4])(unsigned char *address, unsigned mask,
-                                   unsigned bits);
+extern void (* const _gray_pixelfuncs[4])(int x, int y, unsigned long pattern);
+extern void (* const _gray_blockfuncs[4])(unsigned char *address, unsigned mask,
+                                          unsigned bits);
 
 #endif /* HAVE_LCD_BITMAP */
 #endif /* SIMULATOR */

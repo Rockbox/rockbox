@@ -36,7 +36,7 @@
  This works exactly the same way as the core lcd_getstringsize(), only that
  it uses the selected font for grayscale.
  */
-int gray_getstringsize(unsigned char *str, int *w, int *h)
+int gray_getstringsize(const unsigned char *str, int *w, int *h)
 {
     int ch;
     int width = 0;
