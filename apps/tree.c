@@ -256,6 +256,7 @@ bool dirbrowse(char *root)
     char buf[255];
     int i;
     int button;
+    int rc;
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -341,7 +342,13 @@ bool dirbrowse(char *root)
                         mpeg_play(buf);
                     }
                     lcd_stop_scroll();
-                    wps_show();
+                    rc = wps_show();
+                    if(rc == SYS_USB_CONNECTED)
+                    {
+                        /* Force a re-read of the root directory */
+                        strcpy(currdir, "/");
+                        lastdir[0] = 0;
+                    }
                 }
                 restore = true;
                 break;
@@ -391,27 +398,31 @@ bool dirbrowse(char *root)
             case BUTTON_ON:
                 if ( play_mode ) {
                     lcd_stop_scroll();
-                    wps_show();
+                    rc = wps_show();
+                    if(rc == SYS_USB_CONNECTED)
+                    {
+                        /* Force a re-read of the root directory */
+                        strcpy(currdir, "/");
+                        lastdir[0] = 0;
+                    }
                     restore = true;
                 }
                 break;
 
 #ifndef SIMULATOR
-	    case SYS_USB_CONNECTED:
-		/* Tell the USB thread that we are safe */
-		DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
-		usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
-		usb_display_info();
-		
-		/* Wait until the USB cable is extracted again */
-		usb_wait_for_disconnect(&button_queue);
-
-		/* Force a re-read of the root directory */
-		restore = 1;
-		strcpy(currdir, "/");
-		lastdir[0] = 0;
-		break;
+            case SYS_USB_CONNECTED:
+                /* Tell the USB thread that we are safe */
+                DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&button_queue);
+                
+                /* Force a re-read of the root directory */
+                restore = true;
+                strcpy(currdir, "/");
+                lastdir[0] = 0;
+                break;
 #endif
         }
 

@@ -21,6 +21,6 @@
 #include "id3.h"
 #include "playlist.h" 
 
-void wps_show(void);
+int wps_show(void);
 
 #endif

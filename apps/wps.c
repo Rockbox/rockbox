@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "wps.h"
 #include "mpeg.h"
+#include "usb.h"
 
 
 #define LINE_Y      1 /* initial line */
@@ -112,7 +113,7 @@ static void draw_screen(struct mp3entry* id3)
 }
 
 /* demonstrates showing different formats from playtune */
-void wps_show(void)
+int wps_show(void)
 {
     static bool playing = true;
     struct mp3entry* id3 = mpeg_current_track();
@@ -159,7 +160,7 @@ void wps_show(void)
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
-                    return;
+                    return 0;
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_PLAY:
@@ -205,6 +206,22 @@ void wps_show(void)
 #endif
                     mpeg_stop();
                     break;
+
+#ifndef SIMULATOR
+                case SYS_USB_CONNECTED:
+                    /* Tell the USB thread that we are safe */
+                    DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
+                    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                    
+                    usb_display_info();
+                    
+                    /* Wait until the USB cable is extracted again */
+                    usb_wait_for_disconnect(&button_queue);
+
+                    /* Signal to our caller that we have been in USB mode */
+                    return SYS_USB_CONNECTED;
+                    break;
+#endif
             }
             sleep(HZ/10);
         }
