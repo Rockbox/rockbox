@@ -299,8 +299,6 @@ extern void lcd_pattern (int which,char const *pattern,int count);
 static inline void lcd_goto (int x,int y)
   { lcd_instruction (LCD_CURSOR(x,y)); }
 
-#endif
-
 /*** BACKLIGHT ***/
 
 static inline void lcd_toggle_backlight (void)
@@ -313,5 +311,7 @@ static inline void lcd_turn_off_backlight (void)
   { clear_bit (LCD_BL,PAIOR); }
 
 /*** ICONS ***/
+
+#endif /* HAVE_LCD_CHARCELLS */
 
 #endif
