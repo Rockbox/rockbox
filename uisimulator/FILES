@@ -1,6 +1,7 @@
 FILES
 README
 common/*.[ch]
+common/Makefile
 win32/*.[ch]
 win32/Makefile
 win32/Makefile.vc6
