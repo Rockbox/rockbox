@@ -235,6 +235,9 @@ void power_init(void)
 {
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
+    /* initialize the history with a single sample to prevent level
+       flickering during the first minute of execution */
+    power_history[POWER_HISTORY_LEN-1] = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
 
 #ifdef HAVE_CHARGE_CTRL
     snprintf(power_message, POWER_MESSAGE_LEN, "Powermgmt started");
