@@ -127,6 +127,9 @@ int wps_show(void)
     unsigned int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
     bool lastvbr = false;
+#ifdef HAVE_PLAYER_KEYPAD
+    bool dont_quit = true;
+#endif
 
     lcd_clear_display();
 
@@ -192,7 +195,13 @@ int wps_show(void)
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
+#ifdef HAVE_PLAYER_KEYPAD
+                    /* We don't want to quit just yet. Let's wait until
+                       the key is released. */
+                    break;
+#else
                     return 0;
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_PLAY:
@@ -248,6 +257,33 @@ int wps_show(void)
                     mpeg_next();
                     break;
 
+#ifdef HAVE_PLAYER_KEYPAD
+                case BUTTON_LEFT | BUTTON_ON:
+                    dont_quit = true;
+                    global_settings.volume--;
+                    if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
+                        global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                    break;
+
+                case BUTTON_RIGHT | BUTTON_ON:
+                    dont_quit = true;
+                    global_settings.volume++;
+                    if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
+                        global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                    break;
+                    
+                case BUTTON_ON | BUTTON_REL:
+                    /* Quit if ON has been pressed without changing
+                       the volume */
+                    if(!dont_quit)
+                        return 0;
+
+                    dont_quit = false;
+                    break;
+#endif
+                    
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_F1:
 #else
