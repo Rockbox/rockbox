@@ -29,6 +29,7 @@ all: $(OBJS) head.tmpl
 	@(cd tshirt-contest; $(MAKE))
 	@(cd screenshots; $(MAKE))
 	@(cd digest; $(MAKE))
+	@(cd playerhistory; $(MAKE))
 
 head.tmpl: head.t
 	$(ACTION) -DTWIKI $<
