@@ -335,7 +335,7 @@ if [ -z "$archos" ]; then
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!
-    output="rockboxgmini"
+    output="rockbox.gmini"
     appextra="recorder"
     archosrom=""
     flash=""
