@@ -74,7 +74,7 @@ void browse_root(void)
  
 #define MARGIN_Y      0  /* Y pixel margin */
 #define MARGIN_X      10 /* X pixel margin */
-#define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
+#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
 #define LINE_X      0 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
@@ -522,10 +522,9 @@ bool dirbrowse(char *root)
             case BUTTON_F3:
 #endif
 #ifdef HAVE_LCD_BITMAP
-                if(global_settings.statusbar) {
-                    statusbar_toggle();
-                    restore = true;
-                }
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                restore = true;
 #endif
                 break;
 

@@ -44,7 +44,7 @@
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
+#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
 #else /* HAVE_LCD_BITMAP */
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #endif /* HAVE_LCD_BITMAP */
@@ -787,10 +787,9 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
 #ifdef HAVE_LCD_BITMAP
-                if(global_settings.statusbar) {
-                    statusbar_toggle();
-                    draw_screen(id3);
-                }
+                global_settings.statusbar = !global_settings.statusbar;
+                settings_save();
+                draw_screen(id3);
 #endif
                 break;
 #endif

@@ -59,11 +59,6 @@ bool statusbar(bool state)
 
     return(laststate);
 }
-
-void statusbar_toggle(void)
-{
-    statusbar_enabled = !statusbar_enabled;
-}
 #endif
 
 void status_draw(void)

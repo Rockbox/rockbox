@@ -35,7 +35,6 @@ void status_set_playmode(enum playmode mode);
 #ifdef HAVE_LCD_BITMAP
 extern bool statusbar_enabled;
 bool statusbar(bool state);
-void statusbar_toggle(void);
 #endif
 void status_draw(void);
 
