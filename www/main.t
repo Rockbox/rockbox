@@ -41,6 +41,13 @@ Try them on your own risk. If you are not 100% sure of what you are doing, keep 
 
 <h2>News</h2>
 
+<p><i>2002-04-25</i>: Grant Wier has tested the Player LCD's double-height capability:
+<a href="archos-text-DH1.jpg"><img align=center src="archos-text-DH2_sm.jpg"></a>
+
+<p><i>2002-04-23</i>: Report from the <a href="devcon/">Rockbox Spring Developer Conference 2002</a> ;-)
+
+<p><i>2002-04-22</i>: Gentlemen, we have <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c">threading</a>.
+
 <p><i>2002-04-11</i>: The <a href="codes_rec.png">Recorder charset</a> has been mapped.
 
 <p><i>2002-03-28</i>: Lots of new stuff on the web page:
