@@ -568,7 +568,7 @@ void radio_save_presets(void)
     {
         for(i = 0;i < num_presets;i++)
         {
-            fprintf(fd, "%d:%s\n", presets[i].frequency, presets[i].name);
+            fdprintf(fd, "%d:%s\n", presets[i].frequency, presets[i].name);
         }
         close(fd);
     }
