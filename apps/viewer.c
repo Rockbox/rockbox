@@ -42,6 +42,8 @@ static int file_size;
 static char buffer[BUFFER_SIZE+1];
 static int buffer_pos; /* Position of the buffer in the file */
 
+static char display_lines; /* number of lines on the display */
+static char display_columns; /* number of columns on the display */
 static int begin_line; /* Index of the first line displayed on the lcd */
 static int end_line;   /* Index of the last line displayed on the lcd */
 static int begin_line_pos; /* Position of the first_line in the bufffer */
@@ -53,17 +55,16 @@ static int end_line_pos; /* Position of the last_line in the buffer */
  * buffer size (only happens with very long lines).
  */
 
-static int display_line_count(void)
+static void display_line_count(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    int fh;
-    fh = font_get(FONT_UI)->height;
-    if (global_settings.statusbar)
-        return (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
-    else
-        return LCD_HEIGHT/fh;
+    int w,h;
+    lcd_getstringsize("M", &w, &h);
+    display_lines = LCD_HEIGHT / h;
+    display_columns = LCD_WIDTH / w;
 #else
-    return 2;
+    display_lines = 2;
+    display_columns = 11;
 #endif
 }
 
@@ -127,11 +128,10 @@ static void viewer_draw(int col)
 
     line_pos = begin_line_pos;
 
-    for (i=0;
-         i<=end_line-begin_line &&
-         line_pos!=OUTSIDE_BUFFER &&
-         line_pos!=OUTSIDE_FILE;
-         i++) {
+    for (i=0; i <= end_line - begin_line; i++) {
+        if (line_pos == OUTSIDE_BUFFER ||
+            line_pos == OUTSIDE_FILE)
+            break;
         str = buffer + line_pos + 1;
         for (j=0; j<col && *str!=0; ++j)
             str++;
@@ -178,7 +178,6 @@ static bool viewer_init(char* file)
 {
     int i;
     int ret;
-    int disp_lines;
 
     fd = open(file, O_RDONLY);
     if (fd==-1)
@@ -192,8 +191,8 @@ static bool viewer_init(char* file)
     end_line = -1;
     end_line_pos = -1;
     fill_buffer(0);
-    disp_lines = display_line_count();
-    for (i=0; i<disp_lines; ++i) {
+    display_line_count();
+    for (i=0; i<display_lines; ++i) {
         ret = find_next_line(end_line_pos);
         if (ret!=OUTSIDE_FILE && ret!=OUTSIDE_BUFFER) {
             end_line_pos = ret;
@@ -214,15 +213,20 @@ static void viewer_scroll_down(void)
     int ret;
 
     ret = find_next_line(end_line_pos);
-    if (ret==OUTSIDE_BUFFER) {
-        begin_line_pos = find_next_line(begin_line_pos);
-        fill_buffer(begin_line_pos+buffer_pos);
-        end_line_pos = find_next_line(end_line_pos);
-    } else if (ret==OUTSIDE_FILE) {
-        return;
-    } else {
-        begin_line_pos = find_next_line(begin_line_pos);
-        end_line_pos = ret;
+    switch ( ret ) {
+        case OUTSIDE_BUFFER:
+            begin_line_pos = find_next_line(begin_line_pos);
+            fill_buffer(begin_line_pos+buffer_pos);
+            end_line_pos = find_next_line(end_line_pos);
+            break;
+
+        case OUTSIDE_FILE:
+            return;
+
+        default:
+            begin_line_pos = find_next_line(begin_line_pos);
+            end_line_pos = ret;
+            break;
     }
     begin_line++;
     end_line++;
@@ -233,30 +237,109 @@ static void viewer_scroll_up(void)
     int ret;
 
     ret = find_prev_line(begin_line_pos);
-    if (ret==OUTSIDE_BUFFER) {
-        end_line_pos = find_prev_line(end_line_pos);
-        fill_buffer(buffer_pos+end_line_pos-BUFFER_SIZE);
-        begin_line_pos = find_prev_line(begin_line_pos);
-    } else if (ret==OUTSIDE_FILE) {
-        return;
-    } else {
-        end_line_pos = find_prev_line(end_line_pos);
-        begin_line_pos = ret;
+    switch ( ret ) {
+        case OUTSIDE_BUFFER:
+            end_line_pos = find_prev_line(end_line_pos);
+            fill_buffer(buffer_pos+end_line_pos-BUFFER_SIZE);
+            begin_line_pos = find_prev_line(begin_line_pos);
+            break;
+
+        case OUTSIDE_FILE:
+            return;
+
+        default:
+            end_line_pos = find_prev_line(end_line_pos);
+            begin_line_pos = ret;
+            break;
     }
     begin_line--;
     end_line--;
 }
 
+static int pagescroll(int col)
+{
+    bool exit = false;
+    int i;
+
+    while (!exit) {
+        switch (button_get(true)) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_ON | BUTTON_UP:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
+#else
+            case BUTTON_ON | BUTTON_LEFT:
+            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
+#endif
+                for (i=0; i<display_lines; i++)
+                    viewer_scroll_up();
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_ON | BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
+#else
+            case BUTTON_ON | BUTTON_RIGHT:
+            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
+#endif
+                for (i=0; i<display_lines; i++)
+                    viewer_scroll_down();
+                break;
+                            
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_ON | BUTTON_LEFT:
+            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
+#else
+            case BUTTON_ON | BUTTON_MENU | BUTTON_LEFT:
+            case BUTTON_ON | BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
+#endif
+                col -= display_columns;
+                if (col < 0)
+                    col = 0;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_ON | BUTTON_RIGHT:
+            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
+#else
+            case BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT:
+            case BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
+#endif
+                col += display_columns;
+                break;
+
+            case BUTTON_ON | BUTTON_REL: 
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
+#else
+            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REL:
+            case BUTTON_ON | BUTTON_LEFT | BUTTON_REL:
+            case BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT | BUTTON_REL:
+            case BUTTON_ON | BUTTON_MENU | BUTTON_LEFT | BUTTON_REL:
+#endif
+                exit = true;
+                break;
+        }
+        if ( !exit )
+            viewer_draw(col);
+    }
+
+    return col;
+}
 bool viewer_run(char* file)
 {
+    bool exit=false;
     int button;
     int col = 0;
     int ok;
+    int oldmask;
 
 #ifdef HAVE_LCD_BITMAP
     /* no margins */
     lcd_setmargins(0, 0);
 #endif
+
+    oldmask = button_set_release(~0);
 
     ok = viewer_init(file);
     if (!ok) {
@@ -269,20 +352,19 @@ bool viewer_run(char* file)
     }
 
     viewer_draw(col);
-    while(1) {
+    while (!exit) {
         button = button_get(true);
 
         switch ( button ) {
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F1:
-            case BUTTON_ON:
+            case BUTTON_OFF:
 #else
             case BUTTON_STOP:
-            case BUTTON_ON:
 #endif
                 viewer_exit();
-                return true;
+                exit = true;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -315,6 +397,8 @@ bool viewer_run(char* file)
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
 #endif
                 col--;
+                if (col < 0)
+                    col = 0;
                 viewer_draw(col);
                 break;
 
@@ -329,6 +413,13 @@ bool viewer_run(char* file)
                 viewer_draw(col);
                 break;
 
+            case BUTTON_ON:
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_ON | BUTTON_MENU:
+#endif
+                col = pagescroll(col);
+                break;
+
             case SYS_USB_CONNECTED:
                 usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
@@ -338,5 +429,7 @@ bool viewer_run(char* file)
                 return true;
         }
     }
+    button_set_release(oldmask);
+    return false;
 }
 
