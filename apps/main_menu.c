@@ -252,6 +252,11 @@ static bool plugin_browse(void)
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
 }
 
+static bool recording_settings(void)
+{
+    return recording_menu(false);
+}
+
 bool main_menu(void)
 {
     int m;
@@ -262,11 +267,11 @@ bool main_menu(void)
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
 #ifdef HAVE_FMRADIO
-        { "FM Radio",   radio_screen     },
+        { str(LANG_FM_RADIO),   radio_screen     },
 #endif
 #ifdef HAVE_MAS3587F
         { str(LANG_RECORDING),          recording_screen  },
-        { str(LANG_RECORDING_SETTINGS), recording_menu    },
+        { str(LANG_RECORDING_SETTINGS), recording_settings},
 #endif
         { str(LANG_PLAYLIST_MENU),      playlist_menu     },
         { str(LANG_MENU_SHOW_ID3_INFO), browse_id3        },

@@ -1817,3 +1817,13 @@ id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
 eng: "The preset list is full"
 new:
+
+id: LANG_FM_RADIO
+desc:  in main menu
+eng: "FM Radio"
+new:
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc:  in main menu
+eng: "Record"
+new:

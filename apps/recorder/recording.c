@@ -45,16 +45,6 @@
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
 
-extern int recording_peak_left;
-extern int recording_peak_right;
-
-extern int mp3buf_write;
-extern int mp3buf_read;
-extern bool recording;
-
-extern unsigned long record_start_frame; /* Frame number where
-                                            recording started */
-
 #define SOURCE_MIC 0
 #define SOURCE_LINE 1
 #define SOURCE_SPDIF 2
@@ -87,25 +77,6 @@ static char *fmtstr[] =
     "",                 /* no decimals */
     "%d.%d %s  ",       /* 1 decimal */
     "%d.%02d %s  "      /* 2 decimals */
-};
-
-/* This array holds the record timer interval lengths, in seconds */
-static unsigned long rec_timer_seconds[] =
-{
-    0,        /* off */
-    5*60,     /* 00:05 */
-    10*60,    /* 00:10 */
-    15*60,    /* 00:15 */
-    30*60,    /* 00:30 */
-    60*60,    /* 01:00 */
-    2*60*60,  /* 02:00 */
-    4*60*60,  /* 04:00 */
-    6*60*60,  /* 06:00 */
-    8*60*60,  /* 08:00 */
-    10*60*60, /* 10:00 */
-    12*60*60, /* 12:00 */
-    18*60*60, /* 18:00 */
-    24*60*60  /* 24:00 */
 };
 
 char *fmt_gain(int snd, int val, char *str, int len)
@@ -169,8 +140,8 @@ bool recording_screen(void)
     int w, h;
     int update_countdown = 1;
     bool have_recorded = false;
-    unsigned long seconds;
-    unsigned long last_seconds = 0;
+    unsigned int seconds;
+    unsigned int last_seconds = 0;
     int hours, minutes;
 
     cursor = 0;
@@ -225,13 +196,13 @@ bool recording_screen(void)
                     mpeg_record(rec_create_filename());
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
-                    last_seconds = 0;
                 }
                 else
                 {
                     mpeg_new_file(rec_create_filename());
                     update_countdown = 1; /* Update immediately */
                 }
+                last_seconds = 0;
                 break;
 
             case BUTTON_UP:
@@ -331,7 +302,7 @@ bool recording_screen(void)
                 break;
                 
             case BUTTON_F1:
-                if (recording_menu())
+                if (recording_menu(false))
                     return SYS_USB_CONNECTED;
                 settings_save();
                 mpeg_set_recording_options(global_settings.rec_frequency,
@@ -348,8 +319,12 @@ bool recording_screen(void)
                 if(!mpeg_status())
                 {
                     if (f2_rec_screen())
-                        return SYS_USB_CONNECTED;
-                    update_countdown = 1; /* Update immediately */
+                    {
+                        have_recorded = true;
+                        done = true;
+                    }
+                    else
+                        update_countdown = 1; /* Update immediately */
                 }
                 break;
 
@@ -357,11 +332,24 @@ bool recording_screen(void)
                 if(!mpeg_status())
                 {
                     if (f3_rec_screen())
-                        return SYS_USB_CONNECTED;
-                    update_countdown = 1; /* Update immediately */
+                    {
+                        have_recorded = true;
+                        done = true;
+                    }
+                    else
+                        update_countdown = 1; /* Update immediately */
                 }
                 break;
 
+            case SYS_USB_CONNECTED:
+                /* Only accept USB connection when not recording */
+                if(!mpeg_status())
+                {
+                    usb_screen();
+                    have_recorded = true; /* Refreshes the browser later on */
+                    done = true;
+                }
+                break;
         }
 
         peak_meter_peek();
@@ -377,6 +365,7 @@ bool recording_screen(void)
             update_countdown--;
             if(update_countdown == 0 || seconds > last_seconds)
             {
+                unsigned int dseconds, dhours, dminutes;
                 int pos = 0;
 
                 update_countdown = 5;
@@ -390,21 +379,13 @@ bool recording_screen(void)
                          str(LANG_RECORDING_TIME),
                          hours, minutes, seconds%60);
                 lcd_puts(0, 0, buf);
-                
-                /* if the record timesplit is active */
+
+                dseconds = rec_timesplit_seconds(); 
+
+                /* Display the split interval if the record timesplit
+                   is active */
                 if (global_settings.rec_timesplit)
                 {
-                    unsigned long dseconds, dhours, dminutes;
-                    int rti = global_settings.rec_timesplit;
-                    dseconds = rec_timer_seconds[rti]; 
-
-                    if (mpeg_status() && (seconds >= dseconds))
-                    {
-                        mpeg_new_file(rec_create_filename());
-                        update_countdown = 1;
-                        last_seconds = 0;
-                    }
-
                     /* Display the record timesplit interval rather than 
                        the file size if the record timer is active */
                     dhours = dseconds / 3600;
@@ -417,6 +398,16 @@ bool recording_screen(void)
                     snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
                              num2max5(mpeg_num_recorded_bytes(), buf2));
                 lcd_puts(0, 1, buf);
+
+                /* We will do file splitting regardless, since the OFF
+                   setting really means 24 hours. This is to make sure
+                   that the recorded files don't get too big. */
+                if (mpeg_status() && (seconds >= dseconds))
+                {
+                    mpeg_new_file(rec_create_filename());
+                    update_countdown = 1;
+                    last_seconds = 0;
+                }
 
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
@@ -518,12 +509,10 @@ bool recording_screen(void)
     mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-    
-#ifdef HAVE_MAS3587F
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
     mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
-#endif
+
     lcd_setfont(FONT_UI);
     return have_recorded;
 }

@@ -1988,3 +1988,29 @@ bool set_time(char* string, int timedate[])
     return false;
 }
 #endif
+
+#ifdef HAVE_MAS3587F
+/* This array holds the record timer interval lengths, in seconds */
+static unsigned long rec_timer_seconds[] =
+{
+    24*60*60, /* OFF really means 24 hours, to avoid >2Gbyte files */
+    5*60,     /* 00:05 */
+    10*60,    /* 00:10 */
+    15*60,    /* 00:15 */
+    30*60,    /* 00:30 */
+    60*60,    /* 01:00 */
+    2*60*60,  /* 02:00 */
+    4*60*60,  /* 04:00 */
+    6*60*60,  /* 06:00 */
+    8*60*60,  /* 08:00 */
+    10*60*60, /* 10:00 */
+    12*60*60, /* 12:00 */
+    18*60*60, /* 18:00 */
+    24*60*60  /* 24:00 */
+};
+
+unsigned int rec_timesplit_seconds(void)
+{
+    return rec_timer_seconds[global_settings.rec_timesplit];
+}
+#endif

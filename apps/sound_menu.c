@@ -290,20 +290,29 @@ bool sound_menu(void)
 }
 
 #ifdef HAVE_MAS3587F
-bool recording_menu(void)
+bool recording_menu(bool no_source)
 {
     int m;
+    int i = 0;
+    struct menu_items menu[6];
     bool result;
-    struct menu_items items[] = {
-        { str(LANG_RECORDING_QUALITY), recquality },
-        { str(LANG_RECORDING_FREQUENCY), recfrequency },
-        { str(LANG_RECORDING_SOURCE), recsource },
-        { str(LANG_RECORDING_CHANNELS), recchannels },
-        { str(LANG_RECORDING_EDITABLE), receditable },
-        { str(LANG_RECORD_TIMESPLIT), rectimesplit },
-    };
-    
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+
+    menu[i].desc = str(LANG_RECORDING_QUALITY);
+    menu[i++].function = recquality;
+    menu[i].desc = str(LANG_RECORDING_FREQUENCY);
+    menu[i++].function = recfrequency;
+    if(!no_source) {
+        menu[i].desc = str(LANG_RECORDING_SOURCE);
+        menu[i++].function = recsource;
+    }
+    menu[i].desc = str(LANG_RECORDING_CHANNELS);
+    menu[i++].function = recchannels;
+    menu[i].desc = str(LANG_RECORDING_EDITABLE);
+    menu[i++].function = receditable;
+    menu[i].desc = str(LANG_RECORD_TIMESPLIT);
+    menu[i++].function = rectimesplit;
+        
+    m=menu_init( menu, i );
     result = menu_run(m);
     menu_exit(m);
 

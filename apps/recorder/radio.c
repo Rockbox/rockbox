@@ -43,6 +43,8 @@
 #include "peakmeter.h"
 #include "lang.h"
 #include "font.h"
+#include "sound_menu.h"
+#include "recording.h"
 
 #ifdef HAVE_FMRADIO
 
@@ -116,6 +118,11 @@ bool radio_screen(void)
     bool update_screen = true;
     int timeout = current_tick + HZ/10;
     bool screen_freeze = false;
+    bool have_recorded = false;
+    unsigned int seconds;
+    unsigned int last_seconds = 0;
+    int hours, minutes;
+    bool keep_playing = false;
 
     lcd_clear_display();
     lcd_setmargins(0, 8);
@@ -133,11 +140,27 @@ bool radio_screen(void)
 
     mpeg_stop();
     
-    /* Enable the Left and right A/D Converter */
-    mas_codec_writereg(0x0, 0x2227);
+    mpeg_init_recording();
 
-    mas_codec_writereg(6, 0x4000);
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    
+    status_set_playmode(STATUS_STOP);
 
+    /* Yes, we use the D/A for monitoring */
+    peak_meter_playback(true);
+    
+    peak_meter_enabled = true;
+
+    mpeg_set_recording_options(global_settings.rec_frequency,
+                               global_settings.rec_quality,
+                               1 /* Line In */,
+                               global_settings.rec_channels,
+                               global_settings.rec_editable);
+
+    
+    mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
+                            mpeg_sound_default(SOUND_RIGHT_GAIN), false);
+    
     fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
     radio_set_frequency(curr_freq);
     curr_preset = find_preset(curr_freq);
@@ -147,7 +170,7 @@ bool radio_screen(void)
     peak_meter_enabled = true;
 
     buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
-                  NULL);
+                  str(LANG_FM_BUTTONBAR_RECORD));
 
     while(!done)
     {
@@ -188,16 +211,39 @@ bool radio_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
-                radio_stop();
-
-                /* Turn off the ADC gain */
-                mas_codec_writereg(6, 0x0000);
-                
-                done = true;
+                if(mpeg_status())
+                {
+                    mpeg_stop();
+                    status_set_playmode(STATUS_STOP);
+                }
+                else
+                {
+                    radio_stop();
+                    done = true;
+                }
+                update_screen = true;
                 break;
-                
+
+            case BUTTON_F3:
+                /* Only act if the mpeg is stopped */
+                if(!mpeg_status())
+                {
+                    have_recorded = true;
+                    mpeg_record(rec_create_filename());
+                    status_set_playmode(STATUS_RECORD);
+                    update_screen = true;
+                }
+                else
+                {
+                    mpeg_new_file(rec_create_filename());
+                    update_screen = true;
+                }
+                last_seconds = 0;
+                break;
+
             case BUTTON_ON | BUTTON_REL:
                 done = true;
+                keep_playing = true;
                 break;
                 
             case BUTTON_LEFT:
@@ -257,7 +303,7 @@ bool radio_screen(void)
                 lcd_setmargins(0, 8);
                 buttonbar_set(str(LANG_BUTTONBAR_MENU),
                               str(LANG_FM_BUTTONBAR_PRESETS),
-                              NULL);
+                              str(LANG_FM_BUTTONBAR_RECORD));
                 update_screen = true;
                 break;
                 
@@ -268,11 +314,11 @@ bool radio_screen(void)
                 lcd_setmargins(0, 8);
                 buttonbar_set(str(LANG_BUTTONBAR_MENU),
                               str(LANG_FM_BUTTONBAR_PRESETS),
-                              NULL);
+                              str(LANG_FM_BUTTONBAR_RECORD));
                 update_screen = true;
                 break;
                 
-            case BUTTON_F3:
+            case BUTTON_PLAY:
                 if(!screen_freeze)
                 {
                     splash(0, 0, true, "Screen frozen");
@@ -287,9 +333,15 @@ bool radio_screen(void)
                 break;
                 
             case SYS_USB_CONNECTED:
-                usb_screen();
-                fmradio_set_status(0);
-                return true;
+                /* Only accept USB connection when not recording */
+                if(!mpeg_status())
+                {
+                    usb_screen();
+                    fmradio_set_status(0);
+                    have_recorded = true; /* Refreshes the browser later on */
+                    done = true;
+                }
+                break;
         }
 
         peak_meter_peek();
@@ -297,9 +349,12 @@ bool radio_screen(void)
         if(!screen_freeze)
         {
             lcd_setmargins(0, 8);
-            lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
-            peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
-            lcd_update_rect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+            if(!mpeg_status())
+            {
+                lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+                peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+                lcd_update_rect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+            }
             
             if(TIME_AFTER(current_tick, timeout))
             {
@@ -314,8 +369,12 @@ bool radio_screen(void)
                 }
             }
             
-            if(update_screen)
+            seconds = mpeg_recorded_time() / HZ;
+            
+            if(update_screen || seconds > last_seconds)
             {
+                last_seconds = seconds;
+                
                 lcd_setfont(FONT_UI);
                 
                 if(curr_preset >= 0)
@@ -336,6 +395,16 @@ bool radio_screen(void)
                          stereo?str(LANG_CHANNEL_STEREO):
                          str(LANG_CHANNEL_MONO));
                 lcd_puts(0, top_of_screen + 2, buf);
+
+                if(mpeg_status())
+                {
+                    hours = seconds / 3600;
+                    minutes = (seconds - (hours * 3600)) / 60;
+                    snprintf(buf, 32, "%s %02d:%02d:%02d",
+                             str(LANG_RECORDING_TIME),
+                             hours, minutes, seconds%60);
+                    lcd_puts(0, top_of_screen + 3, buf);
+                }
                 
                 /* Only force the redraw if update_screen is true */
                 status_draw(update_screen);
@@ -347,10 +416,51 @@ bool radio_screen(void)
                 update_screen = false;
             }
         }
+
+        if(mpeg_status() & MPEG_STATUS_ERROR)
+        {
+            done = true;
+        }
     }
 
+    
+    if(mpeg_status() & MPEG_STATUS_ERROR)
+    {
+        status_set_playmode(STATUS_STOP);
+        splash(0, 0, true, str(LANG_DISK_FULL));
+        status_draw(true);
+        lcd_update();
+        mpeg_error_clear();
+
+        while(1)
+        {
+            button = button_get(true);
+            if(button == (BUTTON_OFF | BUTTON_REL))
+                break;
+        }
+    }
+    
+    mpeg_init_playback();
+
+    mpeg_sound_channel_config(global_settings.channel_config);
+    mpeg_sound_set(SOUND_BASS, global_settings.bass);
+    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
+    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
+    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+
     fmradio_set_status(0);
-    return false;
+
+    if(keep_playing)
+    {
+        /* Enable the Left and right A/D Converter */
+        mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
+                                mpeg_sound_default(SOUND_RIGHT_GAIN), false);
+        mas_codec_writereg(6, 0x4000);
+    }
+    return have_recorded;
 }
 
 static bool parseline(char* line, char** freq, char** name)
@@ -556,11 +666,17 @@ bool radio_delete_preset(void)
     return reload_dir;
 }
 
+static bool fm_recording_settings(void)
+{
+    return recording_menu(true);
+}
+
 bool radio_menu(void)
 {
     struct menu_items radio_menu_items[] = {
         { str(LANG_FM_SAVE_PRESET), radio_add_preset },
-        { str(LANG_FM_DELETE_PRESET), radio_delete_preset }
+        { str(LANG_FM_DELETE_PRESET), radio_delete_preset },
+        { str(LANG_RECORDING_SETTINGS), fm_recording_settings }
     };
     int m;
     bool result;

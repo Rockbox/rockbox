@@ -199,6 +199,10 @@ bool set_int(char* string, char* unit, int* variable,
 bool set_time(char* string, int timedate[]);
 void set_file(char* filename, char* setting, int maxlen);
 
+#ifdef HAVE_MAS3587F
+unsigned int rec_timesplit_seconds(void);
+#endif
+
 /* global settings */
 extern struct user_settings global_settings;
 /* name of directory where configuration, fonts and other data

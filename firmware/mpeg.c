@@ -167,7 +167,7 @@ static int defaultval[] =
     0,    /* AVC */
     0,    /* Channels */
     8,    /* Left gain */
-    2,    /* Right gain */
+    8,    /* Right gain */
     2,    /* Mic gain */
 };
 
@@ -2156,6 +2156,21 @@ static void mpeg_thread(void)
                 case MPEG_INIT_PLAYBACK:
                     init_playback();
                     init_playback_done = true;
+                    break;
+
+                case SYS_USB_CONNECTED:
+                    is_playing = false;
+                    paused = false;
+                    stop_playing();
+#ifndef SIMULATOR
+                
+                    /* Tell the USB thread that we are safe */
+                    DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
+                    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                    
+                    /* Wait until the USB cable is extracted again */
+                    usb_wait_for_disconnect(&mpeg_queue);
+#endif
                     break;
             }
         }
