@@ -308,6 +308,15 @@ clean-apps:
 clean:
 	\$(MAKE) clean-firmware clean-apps
 
+tags-firmware:
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) tags
+
+tags-apps:
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) tags
+
+tags:
+	@rm -f TAGS
+	\$(MAKE) tags-firmware tags-apps
 EOF
 
 echo "Created Makefile"
