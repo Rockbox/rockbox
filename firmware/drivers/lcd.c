@@ -19,6 +19,9 @@
 
 #include "config.h"
 #include "lcd.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 /*** definitions ***/
 
