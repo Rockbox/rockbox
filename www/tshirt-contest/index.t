@@ -4,6 +4,10 @@
 <p>
  <a href="designs.html">Designs Submitted So Far</a>
 
+<p>
+ <big>Submissions are not accepted any more, the submission period is
+over!</big>
+
 <p> <b>Mission:</b> Make a single-side T-shirt design for <a
 href="http://rockbox.haxx.se/">Project Rockbox</a>. Please produce a
 high resolution image in a suitable format and mail it to <a
@@ -27,10 +31,9 @@ href="http://www.haxx.se/">Haxx</a>.
 <p> <b>Conditions:</b> All graphics used in the design must be your creation
 or otherwise free for us to use in this purpose.
 
-<p> <b>Dates:</b> The design submission period starts now, and will be open
-until August 31, 2002. After that, the voting period will take place and it
-will proceed until Sunday September 15, 2002 with the winner announced in the
-following week.
+<p> <b>Dates:</b> The design submission period was open until August 31,
+2002. After that, the voting period will take place and it will proceed until
+Sunday September 15, 2002 with the winner announced in the following week.
 
 <p> <b>T-Shirts:</b> <a href="http://www.haxx.se/">Haxx</a> will donate a
 number of T-shirts to selected people who contribute to the project. We're
