@@ -149,6 +149,8 @@ int rolo_load(const char* filename)
 int rolo_load(const char* filename)
 {
     /* dummy */
+    (void)filename;
+    return 0;
 }
 
 #endif /* CONFIG_CPU == MCF5249 */

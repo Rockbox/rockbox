@@ -292,6 +292,8 @@ unsigned long mpeg_get_last_header(void)
        frame sync and all */
     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
+#else
+    return 0;
 #endif
 }
 
@@ -2468,6 +2470,8 @@ void bitswap(unsigned char *data, int length)
 {
     /* a dummy */
     /* this ought to be useless */
+    (void)data;
+    (void)length;
 }
 
 void mpeg_init_playback(void)
@@ -2477,10 +2481,12 @@ void mpeg_init_playback(void)
 unsigned long mpeg_recorded_time(void)
 {
     /* a dummy */
+    return 0;
 }
 void mpeg_beep(int duration)
 {
     /* a dummy */
+    (void)duration;
 }
 void mpeg_pause_recording(void)
 {
@@ -2493,19 +2499,25 @@ void mpeg_resume_recording(void)
 unsigned long mpeg_num_recorded_bytes(void)
 {
     /* a dummy */
+    return 0;
 }
 void mpeg_record(const char *filename)
 {
     /* a dummy */
+    (void)filename;
 }
 void mpeg_new_file(const char *filename)
 {
     /* a dummy */
+    (void)filename;
 }
 
 void mpeg_set_recording_gain(int left, int right, bool use_mic)
 {
     /* a dummy */
+    (void)left;
+    (void)right;
+    (void)use_mic;
 }
 void mpeg_init_recording(void)
 {
@@ -2516,6 +2528,12 @@ void mpeg_set_recording_options(int frequency, int quality,
                                 bool editable, int prerecord_time)
 {
     /* a dummy */
+    (void)frequency;
+    (void)quality;
+    (void)source;
+    (void)channel_mode;
+    (void)editable;
+    (void)prerecord_time;
 }
 #endif
 

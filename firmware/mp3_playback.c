@@ -1189,6 +1189,27 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               bool superbass)
 {
     /* a dummy */
+    (void)volume;
+    (void)bass;
+    (void)treble;
+    (void)balance;
+    (void)loudness;
+    (void)avc;
+    (void)channel_config;
+    (void)stereo_width;
+    (void)mdb_strength;
+    (void)mdb_harmonics;
+    (void)mdb_center;
+    (void)mdb_shape;
+    (void)mdb_enable;
+    (void)superbass;
+
+    paused = false;
+    playing = false;
+    playstart_tick = 0;
+    cumulative_ticks = 0;
+    callback_for_more = 0;
+    mpeg_is_initialized = false;
 }
 void mp3_shutdown(void)
 {
@@ -1198,6 +1219,9 @@ void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, int* size))
 {
     /* a dummy */
+    (void)start;
+    (void)size;
+    (void)get_more;
 }
 
 void mp3_play_stop(void)
@@ -1208,24 +1232,30 @@ void mp3_play_stop(void)
 void mp3_play_pause(bool play)
 {
     /* a dummy */
+    (void)play;
 }
 
 void mpeg_sound_set(int setting, int value)
 {
     /* a dummy */
+    (void)setting;
+    (void)value;
 }
 bool mp3_is_playing(void)
 {
     /* a dummy */
+    return false;
 }
 
 int mpeg_val2phys(int setting, int value)
 {
+    (void) setting;
+    (void) value;
     return value; /* FIX dummy */
 }
 unsigned char* mp3_get_pos(void)
 {
     /* a dummy */
-    return 0x1234;
+    return (unsigned char *)0x1234;
 }
 #endif /* CONFIG_HWCODEC == MASNONE */
