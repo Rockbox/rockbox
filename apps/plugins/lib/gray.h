@@ -181,6 +181,17 @@ void gray_set_background(int brightness);
  */
 void gray_set_drawinfo(int drawmode, int fg_brightness, int bg_brightness);
 
+/*---------------------------------------------------------------------------
+ Save the current display content (b&w and grayscale overlay) to an 8-bit
+ BMP file in the root directory
+ ----------------------------------------------------------------------------
+ *
+ * This one is rather slow if used with larger bit depths, but it's intended
+ * primary use is for documenting the grayscale plugins. A much faster version
+ * would be possible, but would take more than twice the RAM
+ */
+void gray_screendump(void);
+
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  Functions affecting the whole display
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
