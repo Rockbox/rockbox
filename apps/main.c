@@ -68,7 +68,7 @@ void init(void)
     show_logo();
     settings_reset();
     settings_load();
-    font_load(ROCKBOX_DIR "/default.fon");
+    font_load(ROCKBOX_DIR "/default.fnt");
     sleep(HZ/2);
 }
 
