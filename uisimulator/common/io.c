@@ -251,11 +251,16 @@ long sim_lseek(int fildes, long offset, int whence)
 
 long sim_filesize(int fd)
 {
-    long old = lseek(fd, 0, SEEK_CUR);
-    long size = lseek(fd, 0, SEEK_END);
-    lseek(fd, old, SEEK_SET);
-
-    return size;
+#ifdef WIN32
+    return _filelength(fd);
+#else
+    struct stat buf;
+    
+    if (!fstat(fd, &buf))
+        return buf.st_size;
+    else
+        return -1;
+#endif
 }
 
 void fat_size(unsigned int* size, unsigned int* free)
