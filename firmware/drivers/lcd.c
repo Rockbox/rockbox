@@ -46,7 +46,6 @@
 #  define LCD_PRAM         ((char)0x80) /*  Patterns  */
 #  define LCD_IRAM         ((char)0xE0) /*    Icons   */
 #endif
-#define LCD_ASCII(c)       (lcd_ascii[(c)&255])
 #define LCD_CURSOR(x,y)    ((char)(LCD_CRAM+((y)*16+(x))))
 #define LCD_ICON(i)        ((char)(LCD_IRAM+i))          
 
@@ -331,14 +330,14 @@ void lcd_clear_display(void)
     int i;
     lcd_write(true,LCD_CURSOR(0,0));
     for (i=0;i<32;i++)
-        lcd_write(false,0);
+        lcd_write(false,lcd_ascii[' ']);
 }
 
 void lcd_puts(int x, int y, char *string)
 {
     lcd_write(true,LCD_CURSOR(x,y));
-    while (*string)
-        lcd_write(false,LCD_ASCII(*string++));
+    while (*string && x++<11)
+        lcd_write(false,lcd_ascii[*string++]);
 }
 
 void lcd_define_pattern (int which,char *pattern,int length)
