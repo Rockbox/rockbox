@@ -537,6 +537,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     {
         /* Yes, it is a VBR file */
         entry->vbr = true;
+        entry->vbrflags = xing[7];
         
         if (entry->vbrflags & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
