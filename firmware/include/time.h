@@ -41,46 +41,6 @@ struct tm
   int	tm_isdst;
 };
 
-clock_t	   _EXFUN(clock,    (void));
-double	   _EXFUN(difftime, (time_t _time2, time_t _time1));
-time_t	   _EXFUN(mktime,   (struct tm *_timeptr));
-time_t	   _EXFUN(time,     (time_t *_timer));
-#ifndef _REENT_ONLY
-char	  *_EXFUN(asctime,  (const struct tm *_tblock));
-char	  *_EXFUN(ctime,    (const time_t *_time));
-struct tm *_EXFUN(gmtime,   (const time_t *_timer));
-struct tm *_EXFUN(localtime,(const time_t *_timer));
-#endif
-size_t	   _EXFUN(strftime, (char *_s, size_t _maxsize, const char *_fmt, const struct tm *_t));
-
-char	  *_EXFUN(asctime_r,	(const struct tm *, char *));
-char	  *_EXFUN(ctime_r,	(const time_t *, char *));
-struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
-struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
-
-#ifdef __CYGWIN__
-#ifndef __STRICT_ANSI__
-extern __IMPORT time_t _timezone;
-extern __IMPORT int _daylight;
-extern __IMPORT char *_tzname[2];
-/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
-#ifndef tzname
-#define tzname _tzname
-#endif
-#ifndef daylight
-#define daylight _daylight
-#endif
-#if timezonevar
-#ifndef timezone
-#define timezone ((long int) _timezone)
-#endif
-#else
-char *_EXFUN(timezone, (void));
-#endif
-void _EXFUN(tzset, (void));
-#endif
-#endif /* __CYGWIN__ */
-
 #ifdef __cplusplus
 }
 #endif
