@@ -184,8 +184,10 @@ bool dirbrowse(char *root)
             continue;
         }
         switch(key) {
+#ifdef HAVE_RECODER_KEYPAD
             case BUTTON_OFF:
                 return false;
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
