@@ -82,11 +82,11 @@ static int defaultval[] =
 {
     70/2,    /* Volume */
 #ifdef ARCHOS_RECORDER
-    12,      /* Bass */
-    12       /* Treble */
+    12+6,    /* Bass */
+    12+6     /* Treble */
 #else
-    15,      /* Bass */
-    15       /* Treble */
+    15+7,    /* Bass */
+    15+7     /* Treble */
 #endif
 };
 
