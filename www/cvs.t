@@ -59,7 +59,7 @@ This operation is called "update":
 
 
 <h2>Adding a new file</h2>
-n
+
 <p>Adding a file is very simple:
 
 <p><tt>cvs add <b>filename</b></tt>
