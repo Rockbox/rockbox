@@ -49,3 +49,13 @@ A {
  color: #f0f0f0;
  line-height: 140%;
 }
+
+.buildok {
+ background-color: #00ff00;
+ width: 3em;
+}
+
+.buildfailed {
+ background-color: #ff0000;
+ width: 3em;
+}
