@@ -48,7 +48,9 @@ your native system.
 
 <h2>Change Rockbox</h2>
 <p>
- You fixed any bugs? You added any features? Then <a href="patch.html">make a
+ Before you change any code, make sure to read the <a href="contributing.html">contributing</a> information if you want to have any hope of having your changes accepted.
+<p>
+ Now, you fixed any bugs? You added any features? Then <a href="patch.html">make a
 patch</a> and head over to the <a
 href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch-tracker</a>
 and submit it. Of course, you can also check the <a href="/bugs.shtml">open
