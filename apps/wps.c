@@ -107,13 +107,13 @@ static void draw_screen(struct mp3entry* id3)
                 szTok = strtok_r(szBuff, "/", &end);
                 szTok = strtok_r(NULL, "/", &end);
 
-                // Assume path format of: Genre/Artist/Album/Mp3_file
+                /* Assume path format of: Genre/Artist/Album/Mp3_file */
                 strncpy(szArtist,szTok,sizeof(szArtist));
                 szArtist[sizeof(szArtist)-1] = 0;
                 szDelimit = strrchr(id3->path, ch);
                 lcd_puts(0, 0, szArtist?szArtist:"<nothing>");
 
-                // removes the .mp3 from the end of the display buffer
+                /* removes the .mp3 from the end of the display buffer */
                 szPeriod = strrchr(szDelimit, '.');
                 if (szPeriod != NULL)
                     *szPeriod = 0;
@@ -160,7 +160,8 @@ static void draw_screen(struct mp3entry* id3)
                         snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
                                  id3->bitrate);
                     else
-                        snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
+                        snprintf(buffer, sizeof(buffer), "%d kbit", 
+								 id3->bitrate);
 
                     lcd_puts(0, l++, buffer);
                     snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
@@ -234,6 +235,7 @@ int wps_load_custom_config(void)
 
     buffer[0]=0;
     lcd_stop_scroll();
+
     fd = open("/wps.config", O_RDONLY);
     if(-1 == fd)
     {
@@ -509,7 +511,7 @@ void display_volume_level(int vol_level)
     char buffer[32];
 
     lcd_stop_scroll();
-    snprintf(buffer,sizeof(buffer),"Vol: %d %s       ", vol_level * 2, "%");
+    snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", vol_level * 2);
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_puts(0, 0, buffer);
@@ -1113,7 +1115,8 @@ int wps_show(void)
                 if ( id3 && 
                      global_settings.resume &&
                      global_settings.resume_offset != id3->offset ) {
-                    DEBUGF("R%X,%X (%X)\n",global_settings.resume_offset,id3->offset,id3);
+                    DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
+						   id3->offset,id3);
                     global_settings.resume_index = id3->index;
                     global_settings.resume_offset = id3->offset;
                     settings_save();
