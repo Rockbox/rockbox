@@ -39,12 +39,25 @@
 
 char appsversion[]=APPSVERSION;
 
+int init(void);
+
 void app_main(void)
 {
+    init();
     browse_root();
 }
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+
+int init(void)
+{
+    init_threads();
+    lcd_init();
+    show_logo();
+    sleep(HZ/2);
+}
+
+#else
 
 /* defined in linker script */
 extern int poolstart[];
@@ -90,7 +103,6 @@ int init(void)
 
 int main(void)
 {
-    init();
     app_main();
 
     while(1) {
