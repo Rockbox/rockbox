@@ -111,10 +111,11 @@ int i2c_getack(void)
        before it can send the acknowledge. Therefore it forces the clock
        low until it is ready. We need to poll the clock line until it goes
        high before we read the ack. */
-    
+
+#ifndef ARCHOS_RECORDER
     SDA_LO;      /* First, discharge the data line */
+#endif
     SDA_INPUT;   /* And set to input */
-    SCL_LO;      /* Set the clock low */
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
         yield();
@@ -154,9 +155,11 @@ unsigned char i2c_inb(int ack)
 
    /* clock in each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
+#ifndef ARCHOS_RECORDER
        /* Tricky business. Here we discharge the data line by driving it low
           and then set it to input to see if it stays low or goes high */
        SDA_LO;      /* First, discharge the data line */
+#endif
        SDA_INPUT;   /* And set to input */
        SCL_HI;
        if ( SDA )
