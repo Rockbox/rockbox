@@ -633,3 +633,9 @@ A69: There are several types of microphones.
      If you want to know more on microphone powering, read this:
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
      (As described, you need also amplification.)
+
+Q70: I can't start rockbox when the charger is connected. What am I doing wrong?
+A70: If your device is off and you connect the charger, the Archos charger code
+     is started immediately. You can then start Rockbox with holding down the
+     ON key for several seconds. Hold the key down a really long time, until
+     you see the Rockbox logo!
