@@ -1136,9 +1136,13 @@ int wps_show(void)
                         if (!id3 || (id3->elapsed < 3*1000))
                             mpeg_prev();
                         else {
-                            mpeg_pause();
+                            if (!paused)
+                                mpeg_pause();
+
                             mpeg_ff_rewind(-(id3->elapsed));
-                            mpeg_resume();
+
+                            if (!paused)
+                                mpeg_resume();
                         }
                     }
                 }
