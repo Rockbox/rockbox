@@ -949,7 +949,7 @@ next:
             int fd;
 	    blockcount++;
             snprintf(meow,499,"/dyna_0x%x_run.rb",PC);
-	    fd=open(meow,O_WRONLY|O_CREAT);
+	    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
 	    if(fd>=0) {
 		fdprintf(fd,"Block 0x%x Blockcount: %d\n",PC,blockcount);
 		fdprintf(fd,"before: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",

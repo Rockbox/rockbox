@@ -384,7 +384,7 @@ void dynamic_recompile (struct dynarec_block *newblock) {
     newblock->block=dynapointer;
 #ifdef DYNA_DEBUG
     snprintf(meow,499,"/dyna_0x%x_asm.rb",PC);
-    fd=open(meow,O_WRONLY|O_CREAT);
+    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
     if(fd<0) {
 	die("couldn't open dyna debug file");
         return;
@@ -915,6 +915,7 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	    DYNA_BTST_l_r(8,7); /* btst #8,d7 */
 	    DYNA_DUMMYBRANCH(2,0);
 	    DYNA_MOVEA_l_i_to_r(&blockclen,3);
+	    DYNA_MOVE_l_i_to_m(tclen,3);
 	    DYNA_MOVEA_l_i_to_r(readw(PC),1);
 	    DYNA_RET();
 	    DYNA_BCC_c(0x6,2,0); /* jump here if bit is not zero */
@@ -974,7 +975,7 @@ void dynamic_recompile (struct dynarec_block *newblock) {
     newblock->length=dynapointer-newblock->block;
     invalidate_icache();
     snprintf(meow,499,"/dyna_0x%x_code.rb",PC);
-    fd=open(meow,O_WRONLY|O_CREAT);
+    fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
     if(fd>=0) {
         write(fd,newblock->block,newblock->length);
 	close(fd);
