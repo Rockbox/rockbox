@@ -275,15 +275,9 @@ int settings_save( void )
     
     config_block[0xa] = (unsigned char)global_settings.contrast;
 
-#ifdef HAVE_CHARGE_CTRL
-    if( global_settings.backlight_on_when_charging ) {
-        config_block[0xb] = (unsigned char) (global_settings.backlight_timeout + 128);
-    } else {
-        config_block[0xb] = (unsigned char)global_settings.backlight_timeout;
-    }
-#else
-    config_block[0xb] = (unsigned char)global_settings.backlight_timeout;
-#endif
+    config_block[0xb] = (unsigned char)
+        ((global_settings.backlight_on_when_charging?0x40:0) |
+         (global_settings.backlight_timeout & 0x3f));
     config_block[0xc] = (unsigned char)global_settings.poweroff;
     config_block[0xd] = (unsigned char)global_settings.resume;
     
@@ -408,15 +402,14 @@ void settings_load(void)
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
                 global_settings.contrast = DEFAULT_CONTRAST_SETTING;
         }
-#ifdef HAVE_CHARGE_CTRL
+
         if (config_block[0xb] != 0xFF) {
-            global_settings.backlight_timeout = config_block[0xb] & 127;
-            global_settings.backlight_on_when_charging = config_block[0xb] & 128 ? 1 : 0;
+            /* Bit 7 is unused to be able to detect uninitialized entry */
+            global_settings.backlight_timeout = config_block[0xb] & 0x3f;
+            global_settings.backlight_on_when_charging =
+                config_block[0xb] & 0x40 ? true : false;
         }
-#else
-        if (config_block[0xb] != 0xFF)
-            global_settings.backlight_timeout = config_block[0xb];
-#endif
+
         if (config_block[0xc] != 0xFF)
             global_settings.poweroff = config_block[0xc];
         if (config_block[0xd] != 0xFF)
