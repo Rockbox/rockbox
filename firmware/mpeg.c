@@ -1482,6 +1482,9 @@ static void mpeg_thread(void)
 #if MEM == 8    
                 amount_to_read = MIN(0x100000, amount_to_read);
 #endif /* #if MEM == 8 */
+#ifdef HAVE_MMC /* MMC is slow, so don't read too large chunks */
+                amount_to_read = MIN(0x40000, amount_to_read);
+#endif
 
                 /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
