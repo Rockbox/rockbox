@@ -196,7 +196,6 @@ int ata_read_sectors(unsigned long start,
 
     timeout = current_tick + READ_TIMEOUT;
 
- retry:
     ATA_SELECT = ata_device;
     if (!wait_for_rdy())
     {
@@ -205,6 +204,7 @@ int ata_read_sectors(unsigned long start,
         return -2;
     }
 
+ retry:
     buf = inbuf;
     count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
@@ -363,10 +363,9 @@ int ata_write_sectors(unsigned long start,
 
     for (i=0; i<count; i++) {
         int j;
-        if (!wait_for_start_of_transfer())
-        {
-            mutex_unlock(&ata_mtx);
-            return 0;
+        if (!wait_for_start_of_transfer()) {
+            ret = -3;
+            break;
         }
 
         if (spinup) {
@@ -391,8 +390,8 @@ int ata_write_sectors(unsigned long start,
         last_disk_activity = current_tick;
     }
 
-    if(!wait_for_end_of_transfer())
-        ret = -3;
+    if(!ret && !wait_for_end_of_transfer())
+        ret = -4;
 
     led(false);
 
