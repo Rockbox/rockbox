@@ -45,11 +45,19 @@ struct svar svars[] =
 	
 	I2("PC  ", &PC),
 	I2("SP  ", &SP),
+	I2("HL  ", &HL),
+#ifdef DYNAREC
+	I1("A   ", &A),
+	I1("B   ", &A),
+	I1("C   ", &A),
+	I1("D   ", &A),
+	I1("E   ", &A),
+	I1("F   ", &A),
+#else
 	I2("BC  ", &BC),
 	I2("DE  ", &DE),
-	I2("HL  ", &HL),
 	I2("AF  ", &AF),
-	
+#endif	
 	I4("IME ", &cpu.ime),
 	I4("ima ", &cpu.ima),
 	I4("spd ", &cpu.speed),

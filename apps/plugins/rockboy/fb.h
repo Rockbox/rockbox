@@ -22,6 +22,7 @@ struct fb
 	int yuv;
 	int enabled;
 	int dirty;
+	int mode;
 };
 
 

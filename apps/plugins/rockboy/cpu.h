@@ -17,7 +17,11 @@ union reg
 
 struct cpu
 {
+#ifdef DYNAREC
+	union reg a,b,c,d,e,hl,f,sp,pc;
+#else
 	union reg pc, sp, bc, de, hl, af;
+#endif
 	int ime, ima;
 	int speed;
 	int halt;
@@ -28,6 +32,20 @@ struct cpu
 
 extern struct cpu cpu;
 
+#ifdef DYNAREC
+struct dynarec_block {
+    union reg address;
+    void *block;
+    int length;
+    struct dynarec_block *next;
+};
+
+#define HASH_SIGNIFICANT_LOWER_BITS 8
+#define HASH_BITMASK ((1<<HASH_SIGNIFICANT_LOWER_BITS)-1)
+
+extern struct dynarec_block *address_map[1<<HASH_SIGNIFICANT_LOWER_BITS];
+extern int blockclen;
+#endif
 
 void cpu_reset(void);
 void div_advance(int cnt);

@@ -21,9 +21,14 @@ DEPFILE = $(OBJDIR)/dep-rockboy
 SRC = cpu.c emu.c events.c exports.c fastmem.c hw.c lcd.c lcdc.c loader.c \
 	main.c mem.c nosound.c rccmds.c rcvars.c rtc.c save.c sound.c split.c \
 	sys_rockbox.c rockboy.c
+
+#CFLAGS += -DDYNAREC
+#SRC += dynarec.c
+
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DIRS = .
+
 
 ifndef SIMVER
 ifneq (,$(findstring RECORDER,$(TARGET))) ## Archos recorder targets

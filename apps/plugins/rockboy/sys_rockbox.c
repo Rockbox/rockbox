@@ -81,7 +81,7 @@ void ev_poll(void)
     released = ~newbuttonstate & oldbuttonstate;
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
-
+    fb.mode=rb->button_hold();
     if(released) {
         ev.type = EV_RELEASE;
         if(released & BUTTON_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
@@ -144,6 +144,7 @@ void vid_begin(void)
     fb.enabled=1;
     fb.dirty=0;
     video_base_buf=fb.ptr=(byte *)frameb;
+    fb.mode=0;
 }
 
 void vid_update(int scanline) 
@@ -152,8 +153,8 @@ void vid_update(int scanline)
     byte *frameb;
 #if LCD_HEIGHT == 64 /* Archos */
     int balance = 0;
-    if (scanline >= 128)
-          return;
+    if (fb.mode==1)
+	  scanline-=16;
     scanline_remapped = scanline / 16;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
@@ -225,8 +226,8 @@ void vid_update(int scanline)
     }
     rb->lcd_update_rect(0, (scanline/2) & ~7, LCD_WIDTH, 8);
 #else /* LCD_HEIGHT != 64, iRiver */
-    if (scanline >= 128)
-          return;
+    if (fb.mode==1)
+      scanline-=16;
     scanline_remapped = scanline / 8;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {

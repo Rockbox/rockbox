@@ -93,6 +93,6 @@ void ev_poll(void);
 #define atoi(a)         rb->atoi((a))
 #define strcat(a,b)     rb->strcat((a),(b))
 #define snprintf(...)   rb->snprintf(__VA_ARGS__)
-#define fprintf(...)    rb->fdprintf(__VA_ARGS__)
+#define fdprintf(...)    rb->fdprintf(__VA_ARGS__)
 #define tolower(_A_)    (isupper(_A_) ? (_A_ - 'A' + 'a') : _A_)
 

@@ -237,11 +237,23 @@ label: op(b); break;
 #define PRE_INT ( DI, PUSH(PC) )
 #define THROW_INT(n) ( (IF &= ~(1<<(n))), (PC = 0x40+((n)<<3)) )
 
+#ifdef DYNAREC
+un32 reg_backup[16];
+struct dynarec_block *address_map[1<<HASH_SIGNIFICANT_LOWER_BITS];
+extern void *dynapointer;
+int blockcount;
+#define MAXBLOCK 3
+#endif
 
 
 
 void cpu_reset(void)
 {
+	union reg acc;
+#ifdef DYNAREC
+        int i;
+        dynapointer=0;
+#endif
 	cpu.speed = 0;
 	cpu.halt = 0;
 	cpu.div = 0;
@@ -253,13 +265,23 @@ void cpu_reset(void)
 	
 	PC = 0x0100;
 	SP = 0xFFFE;
-	AF = 0x01B0;
-	BC = 0x0013;
-	DE = 0x00D8;
+	W(acc) = 0x01B0;
+	A=HB(acc);
+	F=LB(acc);
+	W(acc) = 0x0013;
+	B=HB(acc);
+	C=LB(acc);
+	W(acc) = 0x00D8;
+	D=HB(acc);
+	E=LB(acc);
 	HL = 0x014D;
 
         if (hw.cgb) A = 0x11;
         if (hw.gba) B = 0x01;
+#ifdef DYNAREC
+        for(i=0;i<(1<<HASH_SIGNIFICANT_LOWER_BITS);i++)
+           address_map[i]=0;
+#endif
 }
 
 
@@ -365,6 +387,10 @@ int cpu_emulate(int cycles)
 
 	i = cycles;
 next:
+#ifdef DYNAREC
+	if(shut)
+	    return cycles-i;
+#endif
 	if ((clen = cpu_idle(i)))
 	{
 		i -= clen;
@@ -395,8 +421,10 @@ next:
 	}
 	IME = IMA;
 	
-//	if (debug_trace) debug_disassemble(PC, 1);
-	                        
+/*	if (debug_trace) debug_disassemble(PC, 1); */
+#ifdef DYNAREC
+	    if(PC&0x8000) {
+#endif
 	op = FETCH;
 	clen = cycles_table[op];
 
@@ -536,9 +564,25 @@ next:
 		A = readb(xHL); break;
 
 	case 0x01: /* LD BC,imm */
-		BC = readw(xPC); PC += 2; break;
+#ifdef DYNAREC
+		W(acc) = readw(xPC);
+		B=HB(acc);
+		C=LB(acc);
+#else
+		BC = readw(xPC);
+#endif
+		PC += 2;
+		break;
 	case 0x11: /* LD DE,imm */
-		DE = readw(xPC); PC += 2; break;
+#ifdef DYNAREC
+		W(acc) = readw(xPC);
+		D=HB(acc);
+		E=LB(acc);
+#else		
+		DE = readw(xPC); 
+#endif
+		PC += 2; 
+		break;
 	case 0x21: /* LD HL,imm */
 		HL = readw(xPC); PC += 2; break;
 	case 0x31: /* LD SP,imm */
@@ -643,9 +687,23 @@ next:
 		INC(A); break;
 			
 	case 0x03: /* INC BC */
-		INCW(BC); break;
+#ifdef DYNAREC
+		W(acc)=((B<<8)|C)+1;
+		B=HB(acc);
+		C=LB(acc);
+#else
+		INCW(BC); 
+#endif
+		break;
 	case 0x13: /* INC DE */
-		INCW(DE); break;
+#ifdef DYNAREC
+                W(acc)=((D<<8)|E)+1;
+                D=HB(acc);
+                E=LB(acc);
+#else
+		INCW(DE); 
+#endif
+		break;
 	case 0x23: /* INC HL */
 		INCW(HL); break;
 	case 0x33: /* INC SP */
@@ -672,9 +730,23 @@ next:
 		DEC(A); break;
 
 	case 0x0B: /* DEC BC */
-		DECW(BC); break;
+#ifdef DYNAREC
+		W(acc)=((B<<8)|C)-1;
+		B=HB(acc);
+		C=LB(acc);
+#else
+		DECW(BC); 
+#endif
+		break;
 	case 0x1B: /* DEC DE */
-		DECW(DE); break;
+#ifdef DYNAREC
+                W(acc)=((D<<8)|E)-1;
+                D=HB(acc);
+                E=LB(acc);
+#else				
+		DECW(DE); 
+#endif
+		break;
 	case 0x2B: /* DEC HL */
 		DECW(HL); break;
 	case 0x3B: /* DEC SP */
@@ -766,11 +838,25 @@ next:
 		RST(b); break;
 			
 	case 0xC1: /* POP BC */
-		POP(BC); break;
+#ifdef DYNAREC
+		POP(W(acc));
+		B=HB(acc);
+		C=LB(acc);
+#else
+		POP(BC); 
+#endif
+		break;
 	case 0xC5: /* PUSH BC */
 		PUSH(BC); break;
 	case 0xD1: /* POP DE */
-		POP(DE); break;
+#ifdef DYNAREC
+		POP(W(acc));
+		D=HB(acc);
+		E=LB(acc);
+#else
+		POP(DE); 
+#endif
+		break;
 	case 0xD5: /* PUSH DE */
 		PUSH(DE); break;
 	case 0xE1: /* POP HL */
@@ -778,7 +864,14 @@ next:
 	case 0xE5: /* PUSH HL */
 		PUSH(HL); break;
 	case 0xF1: /* POP AF */
-		POP(AF); break;
+#ifdef DYNAREC
+		POP(W(acc));
+		A=HB(acc);
+		F=LB(acc);
+#else
+		POP(AF); 
+		break;
+#endif
 	case 0xF5: /* PUSH AF */
 		PUSH(AF); break;
 
@@ -840,7 +933,65 @@ next:
 			op, (PC-1) & 0xffff, mbc.rombank);
 		break;
 	}
-
+#ifdef DYNAREC
+    } else {   // ROM, dynarec.
+        struct dynarec_block *p=0,*b=address_map[PC&HASH_BITMASK];
+	char meow[500];
+        byte *ptr=mbc.rmap[PC>>12];
+        snprintf(meow,499,"PC: 0x%x 0x%x a: 0x%x\n",
+	              ptr,PC, b ? b->address.d : 0);
+	rb->splash(HZ*2,true,meow);
+	while(b&&b->address.d!=(ptr+PC)) {
+            p=b;
+            snprintf(meow,499,"next: 0x%x",b->next ? b->next->address.d : 0);
+            rb->splash(HZ*2,true,meow);
+            b=b->next;
+	}
+        if(b) { // call block
+            int fd;
+	    blockcount++;
+            snprintf(meow,499,"/dyna_0x%x.rb",PC);
+	    fd=open(meow,O_WRONLY|O_CREAT);
+	    if(fd>=0) {
+	        fdprintf(fd,"Block 0x%x\n",PC);
+		write(fd,b->block,b->length);
+		fdprintf(fd,"before: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
+		cpu.a,cpu.b,cpu.c,cpu.d,cpu.e,cpu.hl,cpu.f,cpu.sp,cpu.pc,
+		cpu.ime);
+		if(blockcount<MAXBLOCK) {
+		    asm volatile ("movem.l (%0),%%d1-%%d7/%%a0-%%a1\n\t"
+				   "jsr (%1)\n\t"
+				   "movem.l %%d1-%%d7/%%a0-%%a1,(%0)\n\t"
+				   :
+				   : "a" (&cpu.a), "a" (b->block)
+				   : "d0", "d1", "d2", "d3", "d4", "d5", "d6", 
+				     "d7", "a0","a1", "a2","a3","a4");
+                    clen=blockclen;
+		    fdprintf(fd,"after: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
+		           cpu.a,cpu.b,cpu.c,cpu.d,cpu.e,cpu.hl,cpu.f,cpu.sp,
+			   cpu.pc,cpu.ime);	   
+		}
+		else
+		   die("end");
+		close(fd);
+	    }
+	}
+	else { // Hash miss -> not found -> recompile block and add it
+            struct dynarec_block *newblock;
+	    newblock=malloc(sizeof(struct dynarec_block));
+	    memset(newblock,0,sizeof(struct dynarec_block));
+	    newblock->address.d=ptr+PC;
+	    dynamic_recompile(newblock);
+	    if(p)
+	       p->next=newblock;
+	    else
+	      address_map[PC&HASH_BITMASK]=newblock;
+	}
+    }
+#endif
+	    
+						      
+												
 	clen <<= 1;
 	div_advance(clen);
 	timer_advance(clen);

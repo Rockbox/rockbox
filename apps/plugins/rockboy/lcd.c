@@ -740,9 +740,11 @@ void lcd_refreshline(void)
 		return; /* should not happen... */
 
 #if LCD_HEIGHT == 64
-	if (R_LY >= 128 || R_LY & 1) /* calculate only even lines */
+	if ( ((fb.mode==0)&&(R_LY >= 128 || R_LY & 1)) ||
+            ((fb.mode==1)&&(R_LY < 16 || R_LY & 1))) /* calculate only even lines */
 #else
-	if (R_LY >= 128)
+	if ( ((fb.mode==0)&&(R_LY >= 128)) || 
+            ((fb.mode==1)&&(R_LY < 16)))
 #endif
 		return;
 
