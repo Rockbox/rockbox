@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _X11_DIR_H_
+#define _X11_DIR_H_
 
 #include <sys/types.h>
 typedef void DIR;
@@ -29,7 +31,9 @@ typedef void * MYDIR;
 
 extern MYDIR *x11_opendir(char *name);
 extern struct x11_dirent* x11_readdir(MYDIR* dir);
-extern void x11_closedir(MYDIR *dir);
+extern int x11_closedir(MYDIR *dir);
+
+#ifndef NO_REDEFINES_PLEASE
 
 #define DIR MYDIR
 #define dirent x11_dirent
@@ -37,3 +41,6 @@ extern void x11_closedir(MYDIR *dir);
 #define readdir(x) x11_readdir(x)
 #define closedir(x) x11_closedir(x)
 
+#endif
+
+#endif

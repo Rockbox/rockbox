@@ -19,6 +19,10 @@
 
 #include "../../firmware/export/kernel.h"
 
+#ifndef NO_REDEFINES_PLEASE
+
 #define sleep(x) x11_sleep(x)
+
+#endif
 
 void x11_sleep(int);

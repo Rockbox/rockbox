@@ -92,26 +92,33 @@ FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c power.c\
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
-	screens.c peakmeter.c viewer.c sleeptimer.c keyboard.c onplay.c\
-	misc.c
+	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
+	misc.c plugin.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c bounce.c snow.c bmp.c widgets.c wormlet.c cube.c
+   APPS += bmp.c widgets.c
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
         button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS)
 
+ROCKSRC := $(wildcard $(APPDIR)/plugins/*.c)
+ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
+
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
-all: $(TARGET) $(EXTRA_TARGETS)
+all: $(TARGET) $(EXTRA_TARGETS) $(ROCKS)
 
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/lang.[cho] \
-	$(OBJDIR)/build.lang $(OBJDIR)/*.o $(OBJDIR)/sysfont.c
+		$(OBJDIR)/build.lang $(OBJDIR)/*.o $(OBJDIR)/sysfont.c \
+		$(ROCKS) $(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
+
+$(OBJDIR)/%.rock: $(APPDIR)/plugins/%.c $(APPDIR)/plugin.h
+	$(CC) $(APPCFLAGS) -DPLUGIN -shared $< -o $@
 
 distclean: clean
 	$(RM) config.cache
@@ -126,6 +133,9 @@ $(OBJDIR)/menu.o: $(APPDIR)/menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/plugin.o: $(APPDIR)/plugin.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/keyboard.o: $(MACHINEDIR)/keyboard.c
@@ -152,24 +162,6 @@ $(OBJDIR)/icons.o: $(MACHINEDIR)/icons.c
 $(OBJDIR)/widgets.o: $(RECDIR)/widgets.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/wormlet.o: $(RECDIR)/wormlet.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/cube.o: $(RECDIR)/cube.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/snow.o: $(RECDIR)/snow.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
 $(OBJDIR)/main.o: $(APPDIR)/main.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
@@ -180,9 +172,6 @@ $(OBJDIR)/wps.o: $(APPDIR)/wps.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sleeptimer.o: $(APPDIR)/sleeptimer.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/viewer.o: $(APPDIR)/viewer.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/wps-display.o: $(APPDIR)/wps-display.c

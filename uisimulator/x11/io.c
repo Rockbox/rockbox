@@ -97,7 +97,7 @@ void x11_closedir(MYDIR *dir)
 }
 
 
-int x11_open(char *name, int opts)
+int x11_open(const char *name, int opts)
 {
     char buffer[256]; /* sufficiently big */
 

@@ -165,12 +165,6 @@ int rtc_write(int address, int value)
   return 0;
 }
 
-bool oscillograph(void)
-{
-  /* does nothing */
-  return false;
-}
-
 bool has_new_lcd(void)
 {
     return having_new_lcd;

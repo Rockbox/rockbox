@@ -23,25 +23,28 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-int x11_open(char *name, int opts);
+int x11_open(const char *name, int opts);
 int x11_close(int fd);
 int x11_filesize(int fd);
 int x11_creat(char *name, int mode);
 int x11_remove(char *name);
 int x11_rename(char *oldpath, char *newpath);
 
+#ifndef NO_REDEFINES_PLEASE
 #define open(x,y) x11_open(x,y)
 #define close(x) x11_close(x)
 #define filesize(x) x11_filesize(x)
 #define creat(x,y) x11_creat(x,y)
 #define remove(x) x11_remove(x)
 #define rename(x,y) x11_rename(x,y)
+#endif
 
 #include "../../firmware/include/file.h"
 
-extern int open(char* pathname, int flags);
-extern int close(int fd);
-extern int printf(const char *format, ...);
+int open(const char* pathname, int flags);
+int close(int fd);
+int printf(const char *format, ...);
+int ftruncate(int fd, off_t length);
 
 off_t lseek(int fildes, off_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
