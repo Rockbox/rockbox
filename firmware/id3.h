@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef ID3_H
+#define ID3_H
+
 struct mp3entry {
     char *path;
     char *title;
@@ -38,3 +41,5 @@ struct mp3entry {
 typedef struct mp3entry mp3entry;
 
 bool mp3info(mp3entry *entry, char *filename);
+
+#endif
