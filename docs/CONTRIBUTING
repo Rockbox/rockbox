@@ -27,6 +27,10 @@ Names
 Variables and function names should be all lower case.
 Preprocessor symbols should be all uppercase.
 
+Comments
+--------
+We only use plain old /* C standard comments */.
+
 Style
 -----
 When changing code, follow the code style of the file you are editing.
