@@ -1,4 +1,4 @@
-ACTION=@echo preprocessing $@; rm -f $@; fcpp -WWW -I.. -Uunix -H -C -V -LL >$@
+ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -I.. -Uunix -H -C -V -LL >$@
 
 SRC := $(wildcard *.t)
 OBJS := $(SRC:%.t=%.html)
