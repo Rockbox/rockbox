@@ -15,8 +15,11 @@ viewer.c
 #endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
 
 #ifdef HAVE_LCD_BITMAP /* recorder model only */
+grayscale.c
+jpeg.c
 rockblox.c
 snow.c
+video.c
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */
 bounce.c
@@ -26,8 +29,6 @@ chip8.c
 clock.c
 cube.c
 flipit.c
-grayscale.c
-jpeg.c
 mandelbrot.c
 minesweeper.c
 mosaique.c
@@ -40,7 +41,6 @@ sokoban.c
 solitaire.c
 splitedit.c
 star.c
-video.c
 vu_meter.c
 wormlet.c
 #endif /* #if CONFIG_KEYPAD != ONDIO_PAD */

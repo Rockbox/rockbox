@@ -29,6 +29,16 @@
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #include "gray.h"
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define JPEG_ZOOM_IN BUTTON_PLAY
+#define JPEG_ZOOM_OUT BUTTON_ON
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define JPEG_ZOOM_PRE BUTTON_MENU
+#define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
+#define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+#endif
+
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb;
@@ -1494,9 +1504,19 @@ int root_size;
 #define ZOOM_IN  100 // return codes for below function
 #define ZOOM_OUT 101
 
+/* switch off overlay, for handling SYS_ events */
+void cleanup(void *parameter)
+{
+    (void)parameter;
+    
+    gray_show_display(false); 
+}
+
 /* interactively scroll around the image */
 int scroll_bmp(struct t_disp* pdisp)
 {
+    int lastbutton = 0;
+
     /*empty the button queue first, to avoid unwanted scrolling */
     while(rb->button_get(false) != BUTTON_NONE);
 
@@ -1506,13 +1526,15 @@ int scroll_bmp(struct t_disp* pdisp)
         int move;
 
         button = rb->button_get(true);
-
-        if (button == SYS_USB_CONNECTED)
+        
+        if (rb->default_event_handler_ex(button, cleanup, NULL)
+            == SYS_USB_CONNECTED)
             return PLUGIN_USB_CONNECTED;
 
-        switch(button & ~(BUTTON_REPEAT))
+        switch(button)
         {
         case BUTTON_LEFT:
+        case BUTTON_LEFT | BUTTON_REPEAT:
             move = MIN(10, pdisp->x);
             if (move > 0)
             {
@@ -1527,6 +1549,7 @@ int scroll_bmp(struct t_disp* pdisp)
             break;
 
         case BUTTON_RIGHT:
+        case BUTTON_RIGHT | BUTTON_REPEAT:
             move = MIN(10, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
             {
@@ -1541,6 +1564,7 @@ int scroll_bmp(struct t_disp* pdisp)
             break;
 
         case BUTTON_UP:
+        case BUTTON_UP | BUTTON_REPEAT:
             move = MIN(8, pdisp->y);
             if (move > 0)
             {
@@ -1558,6 +1582,7 @@ int scroll_bmp(struct t_disp* pdisp)
             break;
 
         case BUTTON_DOWN:
+        case BUTTON_DOWN | BUTTON_REPEAT:
             move = MIN(8, pdisp->height - pdisp->y - LCD_HEIGHT);
             if (move > 0)
             {
@@ -1574,17 +1599,28 @@ int scroll_bmp(struct t_disp* pdisp)
             }
             break;
 
-        case BUTTON_PLAY:
+        case JPEG_ZOOM_IN:
+#ifdef JPEG_ZOOM_PRE
+            if (lastbutton != JPEG_ZOOM_PRE)
+                break;
+#endif
             return ZOOM_IN;
             break;
 
-        case BUTTON_ON:
+        case JPEG_ZOOM_OUT:
+#ifdef JPEG_ZOOM_PRE
+            if (lastbutton != JPEG_ZOOM_PRE)
+                break;
+#endif
             return ZOOM_OUT;
             break;
 
         case BUTTON_OFF:
             return PLUGIN_OK;
         } /* switch */
+
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     } /* while (true) */
 }
 
@@ -1913,7 +1949,6 @@ int main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int ret;
     /* this macro should be called as the first thing you do in the plugin.
     it test that the api version and model the plugin was compiled for
     matches the machine it is running on */
@@ -1923,11 +1958,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* This plugin uses the grayscale framework, so initialize */
     gray_init(api);
-    ret = main((char*)parameter);
 
-    if (ret == PLUGIN_USB_CONNECTED)
-        rb->usb_screen();
-    return ret;
+    return main((char*)parameter);
 }
 
 #endif /* #ifdef HAVE_LCD_BITMAP */

@@ -25,6 +25,12 @@
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #include "gray.h"
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define GRAYSCALE_SHIFT BUTTON_ON
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define GRAYSCALE_SHIFT BUTTON_MENU
+#endif
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb; /* global api struct pointer */
@@ -33,6 +39,15 @@ static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
 
 /**************************** main function ********************************/
+
+void cleanup(void *parameter)
+{
+    (void)parameter;
+
+    gray_release_buffer(); /* switch off overlay and deinitialize */
+    /* restore normal backlight setting */
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+}
 
 /* this is only a demo of what the framework can do */
 int main(void)
@@ -193,21 +208,17 @@ int main(void)
 
         button = rb->button_get(true);
 
-        if (button == SYS_USB_CONNECTED)
-        {
-            gray_release_buffer(); /* switch off overlay and deinitialize */
-            /* restore normal backlight setting */
-            rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+        if (rb->default_event_handler_ex(button, cleanup, NULL) 
+            == SYS_USB_CONNECTED)
             return PLUGIN_USB_CONNECTED;
-        }
 
-        if (button & BUTTON_ON)
+        if (button & GRAYSCALE_SHIFT)
             black_border = true;
             
         if (button & BUTTON_REPEAT)
             scroll_amount = 4;
 
-        switch(button & ~(BUTTON_ON | BUTTON_REPEAT))
+        switch(button & ~(GRAYSCALE_SHIFT | BUTTON_REPEAT))
         {
             case BUTTON_LEFT:
 
@@ -231,9 +242,7 @@ int main(void)
 
             case BUTTON_OFF:
 
-                gray_release_buffer(); /* switch off overlay and deinitialize */
-                /* restore normal backlight setting */
-                rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+                cleanup(NULL);
                 return PLUGIN_OK;
         }
     }
@@ -243,7 +252,6 @@ int main(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int ret;
     /* this macro should be called as the first thing you do in the plugin.
     it test that the api version and model the plugin was compiled for
     matches the machine it is running on */
@@ -255,11 +263,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* This plugin uses the grayscale framework, so initialize */
     gray_init(api);
 
-    ret = main();
-
-    if (ret == PLUGIN_USB_CONNECTED)
-        rb->usb_screen();
-    return ret;
+    return main();
 }
 
 #endif // #ifdef HAVE_LCD_BITMAP

@@ -32,6 +32,14 @@
 #ifndef SIMULATOR // not for simulator by now
 #ifdef HAVE_LCD_BITMAP // and definitely not for the Player, haha
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define VIDEO_STOP_SEEK BUTTON_PLAY
+#define VIDEO_RESUME BUTTON_PLAY
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define VIDEO_STOP_SEEK BUTTON_MENU
+#define VIDEO_RESUME BUTTON_RIGHT
+#endif
 /****************** constants ******************/
 
 #define INT_MAX ((int)(~(unsigned)0 >> 1))
@@ -274,6 +282,7 @@ void ChangeVolume(int delta)
 }
 
 
+#if CONFIG_KEYPAD == RECORDER_PAD
 // helper function to change the LCD contrast by a certain amount, +/-
 void ChangeContrast(int delta)
 {
@@ -301,6 +310,7 @@ void ChangeContrast(int delta)
         }
     }
 }
+#endif
 
 
 // sync the video to the current audio
@@ -440,6 +450,7 @@ int WaitForButton(void)
     do
     {
         button = rb->button_get(true);
+        rb->default_event_handler(button);
     } while ((button & BUTTON_REL) && button != SYS_USB_CONNECTED);
     
     return button;
@@ -459,7 +470,7 @@ bool WantResume(int fd)
     rb->lcd_update();
 
     button = WaitForButton();
-    return (button == BUTTON_PLAY);
+    return (button == VIDEO_RESUME);
 }
 
 
@@ -523,6 +534,23 @@ int SeekTo(int fd, int nPos)
     return 0;
 }
 
+// called from default_event_handler_ex() or at end of playback
+void Cleanup(void *fd)
+{
+    rb->close(*(int*)fd); // close the file
+
+    if (gPlay.bHasVideo)
+        rb->plugin_unregister_timer(); // stop video ISR, now I can use the display again
+
+    if (gPlay.bHasAudio)
+        rb->mp3_play_stop(); // stop audio ISR
+
+    // restore normal backlight setting
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
+    // restore normal contrast
+    rb->lcd_set_contrast(rb->global_settings->contrast);
+}
 
 // returns >0 if continue, =0 to stop, <0 to abort (USB)
 int PlayTick(int fd)
@@ -631,6 +659,11 @@ int PlayTick(int fd)
             filepos -= Available(gBuf.pReadVideo); // take video position
         else
             filepos -= Available(gBuf.pReadAudio); // else audio
+            
+        if (rb->default_event_handler_ex(button, Cleanup, &fd)
+            == SYS_USB_CONNECTED)
+            retval = -1; // signal "aborted" to caller
+            // SYS_USB_CONNECTED won't be catched again by the switch()
 
         switch (button)
         {   // set exit conditions
@@ -642,12 +675,10 @@ int PlayTick(int fd)
                 rb->lseek(fd, 0, SEEK_SET); // save resume position
                 rb->write(fd, &gFileHdr, sizeof(gFileHdr));
             }
-            retval = 0; // signal "stop" to caller
+            Cleanup(&fd);
+            retval = 0; // signal "stopped" to caller
             break;
-        case SYS_USB_CONNECTED:
-            retval = -1; // signal "abort" to caller
-            break;
-        case BUTTON_PLAY:
+        case VIDEO_STOP_SEEK:
             if (gPlay.bSeeking)
             {
                 gPlay.bSeeking = false;
@@ -714,6 +745,7 @@ int PlayTick(int fd)
             else
                 gPlay.nSeekAcc++;
             break;
+#if CONFIG_KEYPAD == RECORDER_PAD
         case BUTTON_F1: // debug key
         case BUTTON_F1 | BUTTON_REPEAT:
             DrawBuf(); // show buffer status
@@ -730,6 +762,7 @@ int PlayTick(int fd)
             if (gPlay.bHasVideo)
                 ChangeContrast(1);
             break;
+#endif
         }
     } /*  if (button != BUTTON_NONE) */
 
@@ -832,7 +865,13 @@ int main(char* filename)
         gFileHdr.video_frametime = FREQ / FPS;
         gFileHdr.bps_peak = gFileHdr.bps_average = LCD_WIDTH * LCD_HEIGHT * FPS;
     }
-    
+#if FREQ == 12000000  
+/* temporary sync fix for Ondio, as .rvf is tailored to the recorder CPU freq
+ * 625 / 576 == 12000000 / 11059200 */
+    else
+        gFileHdr.video_frametime = (gFileHdr.video_frametime * 625) / 576;
+#endif
+
     // continue buffer init: align the end, calc low water, read sizes
     gBuf.granularity = gFileHdr.blocksize;
     while (gBuf.granularity % 512) // common multiple of sector size
@@ -877,20 +916,6 @@ int main(char* filename)
         retval = PlayTick(fd);
     } while (retval > 0);
 
-    rb->close(fd); // close the file
-
-    if (gPlay.bHasVideo)
-        rb->plugin_unregister_timer(); // stop video ISR, now I can use the display again
-
-    if (gPlay.bHasAudio)
-        rb->mp3_play_stop(); // stop audio ISR
-
-    // restore normal backlight setting
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-
-    // restore normal contrast
-    rb->lcd_set_contrast(rb->global_settings->contrast);
-
     if (retval < 0) // aborted?
     {
         return PLUGIN_USB_CONNECTED;
@@ -930,7 +955,6 @@ int main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int ret;
     /* this macro should be called as the first thing you do in the plugin.
     it test that the api version and model the plugin was compiled for
     matches the machine it is running on */
@@ -945,10 +969,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     // now go ahead and have fun!
-    ret = main((char*) parameter);
-    if (ret==PLUGIN_USB_CONNECTED)
-        rb->usb_screen();
-    return ret;
+    return main((char*) parameter);
 }
 
 #endif // #ifdef HAVE_LCD_BITMAP
