@@ -36,124 +36,124 @@
 #define SIMULATOR_ARCHOS_ROOT "archos"
 
 struct mydir {
-  DIR *dir;
-  char *name;
+    DIR *dir;
+    char *name;
 };
 
 typedef struct mydir MYDIR;
 
 MYDIR *x11_opendir(char *name)
 {
-  char buffer[256]; /* sufficiently big */
-  DIR *dir;
+    char buffer[256]; /* sufficiently big */
+    DIR *dir;
 
-  if(name[0] == '/') {
-    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
-    dir=(DIR *)opendir(buffer);
-  }
-  else
-    dir=(DIR *)opendir(name);
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
+        dir=(DIR *)opendir(buffer);
+    }
+    else
+        dir=(DIR *)opendir(name);
+    
+    if(dir) {
+        MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
+        my->dir = dir;
+        my->name = (char *)strdup(name);
 
-  if(dir) {
-    MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
-    my->dir = dir;
-    my->name = (char *)strdup(name);
-
-    return my;
-  }
-  /* failed open, return NULL */
-  return (MYDIR *)0;
+        return my;
+    }
+    /* failed open, return NULL */
+    return (MYDIR *)0;
 }
 
 struct x11_dirent *x11_readdir(MYDIR *dir)
 {
-  char buffer[512]; /* sufficiently big */
-  static struct x11_dirent secret;
-  struct stat s;
-  struct dirent *x11 = (readdir)(dir->dir);
+    char buffer[512]; /* sufficiently big */
+    static struct x11_dirent secret;
+    struct stat s;
+    struct dirent *x11 = (readdir)(dir->dir);
 
-  if(!x11)
-    return (struct x11_dirent *)0;
+    if(!x11)
+        return (struct x11_dirent *)0;
 
-  strcpy(secret.d_name, x11->d_name);
+    strcpy(secret.d_name, x11->d_name);
 
-  /* build file name */
-  sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
-          dir->name, x11->d_name);
-  stat(buffer, &s); /* get info */
+    /* build file name */
+    sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
+            dir->name, x11->d_name);
+    stat(buffer, &s); /* get info */
 
-  secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
-  secret.size = s.st_size;
+    secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
+    secret.size = s.st_size;
 
-  return &secret;
+    return &secret;
 }
 
 void x11_closedir(MYDIR *dir)
 {
-  free(dir->name);
-  (closedir)(dir->dir);
+    free(dir->name);
+    (closedir)(dir->dir);
 
-  free(dir);
+    free(dir);
 }
 
 
 int x11_open(char *name, int opts)
 {
-  char buffer[256]; /* sufficiently big */
+    char buffer[256]; /* sufficiently big */
 
-  if(name[0] == '/') {
-    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-
-    debugf("We open the real file '%s'\n", buffer);
-    return (open)(buffer, opts);
-  }
-  return (open)(name, opts);
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        
+        debugf("We open the real file '%s'\n", buffer);
+        return (open)(buffer, opts);
+    }
+    return (open)(name, opts);
 }
 
 int x11_close(int fd)
 {
-  return (close)(fd);
+    return (close)(fd);
 }
 
 int x11_creat(char *name, int mode)
 {
-  char buffer[256]; /* sufficiently big */
-
-  if(name[0] == '/') {
-    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-
-    debugf("We create the real file '%s'\n", buffer);
-    return (creat)(buffer, 0666);
-  }
-  return (creat)(name, 0666);
+    char buffer[256]; /* sufficiently big */
+    (void)mode;
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        
+        debugf("We create the real file '%s'\n", buffer);
+        return (creat)(buffer, 0666);
+    }
+    return (creat)(name, 0666);
 }
 
 int x11_remove(char *name)
 {
-  char buffer[256]; /* sufficiently big */
+    char buffer[256]; /* sufficiently big */
 
-  if(name[0] == '/') {
-    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
-    debugf("We remove the real file '%s'\n", buffer);
-    return (remove)(buffer);
-  }
-  return (remove)(name);
+        debugf("We remove the real file '%s'\n", buffer);
+        return (remove)(buffer);
+    }
+    return (remove)(name);
 }
 
 int x11_rename(char *oldpath, char* newpath)
 {
-  char buffer1[256];
-  char buffer2[256];
+    char buffer1[256];
+    char buffer2[256];
 
-  if(oldpath[0] == '/') {
-      sprintf(buffer1, "%s%s", SIMULATOR_ARCHOS_ROOT, oldpath);
-      sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
+    if(oldpath[0] == '/') {
+        sprintf(buffer1, "%s%s", SIMULATOR_ARCHOS_ROOT, oldpath);
+        sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
 
-      debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
-      return (rename)(buffer1, buffer2);
-  }
-  return -1;
+        debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
+        return (rename)(buffer1, buffer2);
+    }
+    return -1;
 }
 
 void fat_size(unsigned int* size, unsigned int* free)
