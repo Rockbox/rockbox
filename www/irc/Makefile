@@ -7,3 +7,5 @@ all: $(OBJS)
 
 %.html : %.t
 	$(ACTION) $<
+
+index.html: index.t nicks.txt
