@@ -352,7 +352,7 @@ new: "Aïgues"
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Opimisation des graves (Loudness)"
+new: "Optimisation des graves (Loudness)"
 
 id: LANG_BBOOST
 desc: in sound settings
@@ -1042,7 +1042,7 @@ new: "Minimum du spectre"
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
 eng: "Performance"
-new:  "Performance"
+new: "Performance"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -1053,3 +1053,73 @@ id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 new: "Affichage du Volume"
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new: "Libre : %d.%dGo"
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+new: "Disque : %d.%dGo" 
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new:  "Enregistrement"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+new: "Canaux"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new:  "Fréquence"
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+new:  "Gain"
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new: "Gauche"
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new:  "Qualité"
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new: "Droit"
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
+new: "Options d'enregistrement"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new: "Source"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new: "Numérique"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new: "Entrée Analogique"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new: "Micro"
