@@ -126,6 +126,7 @@ bool recording_screen(void)
     int gain;
     int w, h;
     int update_countdown = 1;
+    bool have_recorded = false;
 
     cursor = 0;
     mpeg_init_recording();
@@ -168,6 +169,7 @@ bool recording_screen(void)
                 /* Only act if the mpeg is stopped */
                 if(!mpeg_status())
                 {
+                    have_recorded = true;
                     mpeg_record("");
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
@@ -368,7 +370,7 @@ bool recording_screen(void)
     
     mpeg_init_playback();
 
-    return false;
+    return have_recorded;
 }
 
 bool f2_rec_screen(void)
