@@ -1,4 +1,3 @@
-# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -162,18 +161,18 @@ new: "AV flr att återgå"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
-new: "Dolda filer"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
-new: "Visa"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
-new: "Dölj"
+eng: ""
+new: ""
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -192,8 +191,8 @@ new: "Spela den valda först"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
-new: "Musikfilter"
+eng: ""
+new: ""
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -212,8 +211,8 @@ new: "Av"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
-new: "fråga"
+eng: "Ask"
+new: "Fråga"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -224,9 +223,6 @@ id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 new: "Skärmljus"
-
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu, 
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -575,8 +571,8 @@ new: "läge:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
-new: "Dir filter: %s"
+eng: ""
+new: ""
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -746,7 +742,6 @@ new: "Fjärrkontroll F1"
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-### Not previously translated
 new: 
 
 id: LANG_WORMLET_2_KEY_CTRL
@@ -777,7 +772,7 @@ new: "0 Rader - Nivå 0"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new: "Poweroff av"
+new: "Autoavstängning"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -814,4 +809,57 @@ desc: bool false representation
 eng: "No"
 new: "Nej"
 
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Belysning vid laddning"
 
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+### Not previously translated
+new: 
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+### Not previously translated
+new: 
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+### Not previously translated
+new: 
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+### Not previously translated
+new: 
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+### Not previously translated
+new: 
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Enheter per läsning"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Repetera"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Alla"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "En"
