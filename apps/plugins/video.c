@@ -34,8 +34,6 @@
 
 /****************** constants ******************/
 
-#define IMIA4 (*((volatile unsigned long*)0x09000180)) // timer 4
-
 #define INT_MAX ((int)(~(unsigned)0 >> 1))
 #define INT_MIN (-INT_MAX-1)
 
@@ -51,8 +49,7 @@
 
 
 /****************** prototypes ******************/
-void timer_set(unsigned period); // setup ISR and timer registers
-void timer4_isr(void) __attribute__((interrupt_handler)); // IMIA4 ISR
+void timer4_isr(void); // IMIA4 ISR
 int check_button(void); // determine next relative frame
 
 
@@ -63,7 +60,6 @@ int check_button(void); // determine next relative frame
 #define HEADER_MAGIC 0x52564668 // "RVFh" at file start 
 #define AUDIO_MAGIC  0x41756446 // "AudF" for each audio block
 #define FILEVERSION  100 // 1.00
-#define CLOCK 11059200 // SH CPU clock
 
 // format type definitions
 #define VIDEOFORMAT_NO_VIDEO       0
@@ -298,35 +294,8 @@ void SyncVideo(void)
 }
 
 
-// setup ISR and timer registers
-void timer_set(unsigned period)
-{
-    if (period)
-    {
-        and_b(~0x10, &TSTR); // Stop the timer 4
-        and_b(~0x10, &TSNC); // No synchronization
-        and_b(~0x10, &TMDR); // Operate normally
-
-        IMIA4 = (unsigned long)timer4_isr; // install ISR
-
-        TSR4 &= ~0x01;
-        TIER4 = 0xF9; // Enable GRA match interrupt
-
-        GRA4 = (unsigned short)(period/4 - 1);
-        TCR4 = 0x22; // clear at GRA match, sysclock/4
-        IPRD = (IPRD & 0xFF0F) | 0x0010; // interrupt priority 1 (lowest)
-        or_b(0x10, &TSTR); // start timer 4
-    }
-    else
-    {
-        and_b(~0x10, &TSTR); // stop the timer 4
-        IPRD = (IPRD & 0xFF0F); // disable interrupt
-    }
-}
-
-
 // timer interrupt handler to display a frame
-void timer4_isr(void) // IMIA4
+void timer4_isr(void)
 {
     int available;
     tAudioFrameHeader* pAudioBuf;
@@ -379,7 +348,7 @@ void timer4_isr(void) // IMIA4
             else
             {
                 gPlay.bVideoUnderrun = true;
-                timer_set(0); // disable ourselves
+                rb->plugin_unregister_timer(); // disable ourselves
                 return; // no data available
             }
         }
@@ -480,7 +449,7 @@ int SeekTo(int fd, int nPos)
     if (gPlay.bHasAudio)
         rb->mp3_play_stop(); // stop audio ISR
     if (gPlay.bHasVideo)
-        timer_set(0); // stop the timer 4
+        rb->plugin_unregister_timer(); // stop the timer
 
     rb->lseek(fd, nPos, SEEK_SET);
 
@@ -526,7 +495,8 @@ int SeekTo(int fd, int nPos)
     if (gPlay.bHasVideo)
     {
         gPlay.bVideoUnderrun = false;
-        timer_set(gFileHdr.video_frametime); // start display interrupt
+        // start display interrupt
+        rb->plugin_register_timer(gFileHdr.video_frametime, 1, timer4_isr);
     }
 
     return 0;
@@ -805,7 +775,7 @@ int main(char* filename)
         gFileHdr.video_format = VIDEOFORMAT_RAW;
         gFileHdr.video_width = LCD_WIDTH;
         gFileHdr.video_height = LCD_HEIGHT;
-        gFileHdr.video_frametime = CLOCK / FPS;
+        gFileHdr.video_frametime = FREQ / FPS;
         gFileHdr.bps_peak = gFileHdr.bps_average = LCD_WIDTH * LCD_HEIGHT * FPS;
     }
     
@@ -855,7 +825,7 @@ int main(char* filename)
     rb->close(fd); // close the file
 
     if (gPlay.bHasVideo)
-        timer_set(0); // stop video ISR, now I can use the display again
+        rb->plugin_unregister_timer(); // stop video ISR, now I can use the display again
 
     if (gPlay.bHasAudio)
         rb->mp3_play_stop(); // stop audio ISR
