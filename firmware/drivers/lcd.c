@@ -101,8 +101,6 @@
 
 /*** generic code ***/
 
-#define SCROLL_DELAY 10 /* number of "scroll ticks" until scroll starts */
-
 struct scrollinfo {
     char text[128];
     int textlen;
@@ -436,15 +434,6 @@ void lcd_init (void)
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
-
-    /* Initialize LCD */
-    lcd_write (true, LCD_CNTL_RESET);
-    lcd_write (true, LCD_CNTL_POWER);
-    lcd_write (true, LCD_CNTL_SEGREMAP);
-    lcd_write (true, LCD_CNTL_OUTSCAN);
-    lcd_write (true, LCD_CNTL_CONTRAST);
-    lcd_write (true, 0x20); /* Contrast parameter */
-    lcd_write (true, LCD_CNTL_DISPON);
 
     lcd_clear_display();
     lcd_update();
@@ -817,7 +806,8 @@ static void scroll_thread(void)
             yield();
             continue;
         }
-        if ( scroll_count < SCROLL_DELAY )
+        /* wait 1s before starting scroll */
+        if ( scroll_count < scroll_speed )
             scroll_count++;
         else {
             lcd_puts(s->xpos,s->starty,s->text + s->offset);
@@ -831,7 +821,7 @@ static void scroll_thread(void)
                 s->offset++;
             
             if (s->offset > s->textlen) {
-                scroll_count = SCROLL_DELAY; /* prevent wrap */
+                scroll_count = scroll_speed; /* prevent wrap */
                 s->offset=0;
                 s->xpos = s->space;
             }
