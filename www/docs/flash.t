@@ -192,19 +192,21 @@ The second image is the working copy, the "rockbox_flash.rock" plugin from this
 package reprograms it. I suggest to place the plugin to where you keep the
 others, "/.rockbox/rocks/". The plugin needs to be consistant with the Rockbox
 plugin API version, otherwise it will detect mismatch and won't run.
-<p>
-It currently requires an exotic input, a UCL-compressed image, because that's
-my internal format. UCL is a nice open-source compression library I found and
-use. The decompression is very fast and less than a page of C-code. The
-efficiency is even better than Zip with maximum compression, cooks it down to
-about 58% of the original size. For details on UCL, see:
-http://www.oberhumer.com/opensource/ucl/
-<p>
-Linux users will have to download it from there and compile it, for Win32 and
-Cygwin I can do that, so the executables are in the package. The sample program
-from that download is called "uclpack". We'll use that to compress
-"rockbox.bin" which is the result of the compilation. If flashing becomes very
-popular, this could be a part of the build process.
+
+<p> It currently requires an exotic input, a UCL-compressed image, because
+that's my internal format. UCL is a nice open-source compression library I
+found and use. The decompression is very fast and less than a page of
+C-code. The efficiency is even better than Zip with maximum compression, cooks
+it down to about 58% of the original size. For details on UCL, see: <a
+href="http://www.oberhumer.com/opensource/ucl/">www.oberhumer.com/opensource/ucl/</a>
+
+<p> Linux users will have to download it from there and compile it, for Win32
+and Cygwin I can do that, so the executables are in <a
+href="http://joerg.hohensohn.bei.t-online.de/archos/">the package</a>. The
+sample program from that download is called "uclpack". We'll use that to
+compress "rockbox.bin" which is the result of the compilation. If flashing
+becomes very popular, this could be a part of the build process.
+
 <p>
 Don't flash any "old" builds which don't have the latest coldstart ability I
 brought into cvs these days. They won't boot. These instructions refer to
