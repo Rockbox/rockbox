@@ -100,6 +100,12 @@ static int get_next_index(int steps)
     return next_index;
 }
 
+/* the mpeg thread might ask us */
+int playlist_amount(void)
+{
+    return playlist.amount;
+}
+
 int playlist_next(int steps)
 {
     playlist.index = get_next_index(steps);
@@ -118,13 +124,9 @@ char* playlist_peek(int steps)
     char *dir_end;
     int index;
 
-    if(abs(steps) > playlist.amount)
-        /* prevent madness when all files are empty/bad */
-        return NULL;
-
     index = get_next_index(steps);
     if (index >= 0)
-    seek = playlist.indices[index];
+        seek = playlist.indices[index];
     else
         return NULL;
 
