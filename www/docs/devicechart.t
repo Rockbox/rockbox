@@ -197,8 +197,8 @@
     <td>top</td>
     <td>top</td>
     <td>top</td>
-    <td>(which?) side</td>
-    <td>(which?) side</td>
+    <td>left side</td>
+    <td>left side</td>
 </tr>
 </table>
 <p>
