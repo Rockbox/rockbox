@@ -21,13 +21,17 @@
 
 #include "types.h"
 #include "lcd.h"
-#define HAVE_RECORDER_KEYPAD
 #include "button.h"
+#include "kernel.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
 #endif
+#endif
+
+extern void tetris(void);
 
 #define LINE_HEIGHT 8
 
@@ -87,3 +91,12 @@ void app_main(void)
     lcd_update();
   }
 }
+
+
+#ifdef _WIN32
+// for win32 simulator compability
+void main (void)
+{
+    app_main ();
+}
+#endif

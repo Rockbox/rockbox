@@ -21,12 +21,14 @@
 
 #include "types.h"
 #include "lcd.h"
-#define HAVE_RECORDER_KEYPAD
 #include "button.h"
+#include "kernel.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #endif
 
 int start_x = 1;
