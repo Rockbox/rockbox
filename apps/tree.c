@@ -59,6 +59,7 @@
 #include "misc.h"
 #include "filetree.h"
 #include "dbtree.h"
+#include "recorder/recording.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -641,9 +642,22 @@ static bool dirbrowse(void)
     lastextra = -1;
     lastfirstpos = 0;
 
-    if (*tc.dirfilter < NUM_FILTER_MODES)
+    if (*tc.dirfilter < NUM_FILTER_MODES) {
         start_resume(true);
 
+#ifdef HAVE_RECORDING
+#ifndef SIMULATOR
+        if (global_settings.rec_startup && ! start_wps) {
+            /* We fake being in the menu structure by calling the appropriate */
+            /* parent when we drop out of each screen */
+            recording_screen();
+            rec_menu();
+            main_menu();
+        }
+#endif
+#endif
+    }
+    
     if (!start_wps) {
         numentries = showdir();
         if (numentries == -1)

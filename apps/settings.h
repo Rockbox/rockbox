@@ -169,6 +169,7 @@ struct user_settings
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     int rec_directory; /* 0=base dir, 1=current dir */
+    bool rec_startup; /* true means start Rockbox in recording screen */
     
     /* device settings */
 

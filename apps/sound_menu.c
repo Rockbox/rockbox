@@ -374,6 +374,12 @@ static bool recdirectory(void)
                       names, 2, NULL );
 }
 
+static bool reconstartup(void)
+{
+    return set_bool(str(LANG_RECORD_STARTUP),
+		    &global_settings.rec_startup);
+}
+
 #endif /* MAS3587F */
 
 static void set_chanconf(int val)
@@ -437,7 +443,7 @@ bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_item items[8];
+    struct menu_item items[9];
     bool result;
 
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
@@ -458,6 +464,8 @@ bool recording_menu(bool no_source)
     items[i++].function = recprerecord;
     items[i].desc = ID2P(LANG_RECORD_DIRECTORY);
     items[i++].function = recdirectory;
+    items[i].desc = ID2P(LANG_RECORD_STARTUP);
+    items[i++].function = reconstartup;
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL);
     result = menu_run(m);

@@ -23,5 +23,6 @@
 
 extern int show_logo(void);
 extern bool main_menu(void);
+extern bool rec_menu(void);
 
 #endif
