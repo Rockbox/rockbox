@@ -1492,11 +1492,17 @@ static bool dbg_sound(void)
     lcd_setmargins(0, 0);
 #endif
 
-    /* Narrow stereo */
-    ll = 0xa0000;
-    lr = 0xe0000;
-    rr = 0xa0000;
-    rl = 0xe0000;
+    /* Normal stereo */
+    ll = 0x80000;
+    lr = 0x00000;
+    rr = 0x80000;
+    rl = 0x00000;
+
+    /* Set the MDB to the Archos "flat" setting, but not activated */
+    mas_codec_writereg(MAS_REG_KMDB_STR, 0);
+    mas_codec_writereg(MAS_REG_KMDB_HAR, 0x3000);
+    mas_codec_writereg(MAS_REG_KMDB_FC, 0x0600);
+    mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0);
     
     while(!done)
     {
@@ -1512,9 +1518,10 @@ static bool dbg_sound(void)
         snprintf(buf, sizeof buf, "LL: -%d.%02d (%05x)", i, d % 100, ll);
         lcd_puts(0, 0, buf);
 
-        d = 200 - lr * 100 / 0x80000;
+        d = - lr * 100 / 0x80000;
         i = d / 100;
-        snprintf(buf, sizeof buf, "LR: -%d.%02d (%05x)", i, d % 100, lr);
+        snprintf(buf, sizeof buf, "LR: -%d.%02d (%05x)", i, d % 100,
+                 lr & 0x000fffff);
         lcd_puts(0, 1, buf);
         
 #ifdef HAVE_MAS3587F
@@ -1571,6 +1578,10 @@ static bool dbg_sound(void)
                 val = mas_codec_readreg(MAS_REG_KLOUDNESS);
                 val ^= 0x0004;
                 mas_codec_writereg(MAS_REG_KLOUDNESS, val);
+                if(val)
+                    mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0x0902);
+                else
+                    mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0);
                 break;
 #endif
         }
