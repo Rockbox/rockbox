@@ -123,8 +123,19 @@ static bool dirbrowse(const char *root, const int *dirfilter);
 void browse_root(void)
 {
     filetype_init();
+
 #ifndef SIMULATOR
+    DIR *dir = opendir(ROCKBOX_DIR);
+    if(!dir)
+    {
+        lcd_clear_display();
+        splash(HZ*5, true, str(LANG_NO_ROCKBOX_DIR));
+        lcd_clear_display();
+        splash(HZ*5, true, str(LANG_INSTALLATION_INCOMPLETE));
+    }
+    closedir(dir);
     dirbrowse("/", &global_settings.dirfilter);
+
 #else
     if (!dirbrowse("/", &global_settings.dirfilter)) {
         DEBUGF("No filesystem found. Have you forgotten to create it?\n");
