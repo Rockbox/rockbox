@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include "config.h"
 #include <stdbool.h>
+#include "lcd.h"
+#include "font.h"
 
 #if CONFIG_CPU == MCF5249
 
@@ -140,12 +142,24 @@ void UIE (void) /* Unexpected Interrupt or Exception */
 {
     unsigned int format_vector, pc;
     int vector;
+    char str[32];
     
-    asm volatile ("move.l (0,%%sp),%0": "=r"(format_vector));
-    asm volatile ("move.l (4,%%sp),%0": "=r"(pc));
+    asm volatile ("move.l (52,%%sp),%0": "=r"(format_vector));
+    asm volatile ("move.l (56,%%sp),%0": "=r"(pc));
 
-    vector = (format_vector >> 16) & 0xff;
+    vector = (format_vector >> 18) & 0xff;
     
+    /* clear screen */
+    lcd_clear_display ();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_SYSFIXED);
+#endif
+    snprintf(str,sizeof(str),"I%02x:%s",vector,irqname[vector]);
+    lcd_puts(0,0,str);
+    snprintf(str,sizeof(str),"at %08x",pc);
+    lcd_puts(0,1,str);
+    lcd_update();
+
     while (1)
     {
     }
@@ -193,8 +207,6 @@ void system_init(void)
 }
 
 #elif CONFIG_CPU == SH7034
-#include "lcd.h"
-#include "font.h"
 #include "led.h"
 #include "system.h"
 #include "rolo.h"
