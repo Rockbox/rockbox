@@ -33,15 +33,25 @@
 
 #define MAX_LINE 3 /* the last index with info, starting on 0 */
 
-void app_main(void)
+/* global cursor */
+int cursor = 0;
+
+void menu_init(void)
 {
-  lcd_puts(0, 0,  "-Rockabox", 0);
+  lcd_puts(6, 0,  "Rockabox", 0);
   lcd_puts(6, 8,  "Boxrock", 0);
   lcd_puts(6, 16, "Robkoxx", 0);
   lcd_puts(6, 24, "Tetris", 0);
   lcd_puts(8, 38, "Rockbox!", 2);
-  int cursor = 0;
+
+  lcd_puts(0, cursor, "-", 0);
+}
+
+void app_main(void)
+{
   int key;
+
+  menu_init();
 
   while(1) {
     key = button_get();
@@ -65,6 +75,8 @@ void app_main(void)
       if(cursor == (MAX_LINE * LINE_HEIGHT)) {
         lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
         tetris();
+        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+        menu_init();
       }
       break;
     }

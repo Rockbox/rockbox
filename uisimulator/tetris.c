@@ -253,20 +253,19 @@ void game_loop(void)
 	/*  while(count*20 < level_speeds[level]) */
 	{
 	    b = button_get();
+	    if ( b & BUTTON_OFF )
+              return; /* get out of here */
+
 	    if ( b & BUTTON_LEFT ) {
-		printf("Left\n");
 		move_block(-1,0,0);
 	    }
 	    if ( b & BUTTON_RIGHT ) {
-		printf("Right\n");
 		move_block(1,0,0);
 	    }
 	    if ( b & BUTTON_UP ) {
-		printf("Up\n");
 		move_block(0,0,1);
 	    }
 	    if ( b & BUTTON_DOWN ) {
-		printf("Down\n");
 		move_down();
 	    }
 	    count++;
@@ -279,6 +278,7 @@ void game_loop(void)
 void tetris(void)
 {
     draw_frame(start_x-1,start_x+max_x,start_y-1,start_y+max_y);
+    lcd_puts(10, 32, "Tetris!", 2);
     lcd_update();
 
     next_b = rand(blocks);
