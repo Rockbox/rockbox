@@ -38,10 +38,10 @@
 #define TETRIS_TITLE_XLOC  43
 #define TETRIS_TITLE_YLOC  15
 
-static const int start_x = 1;
-static const int start_y = 2;
-static const int max_x = 104;
-static const int max_y = 48;
+static const int start_x = 5;
+static const int start_y = 5;
+static const int max_x = 4 * 17;
+static const int max_y = 3 * 10;
 static const short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
 static const int blocks = 7;
 static const int block_frames[7] = {1,2,2,2,4,4,4};
@@ -115,6 +115,9 @@ void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
 
     lcd_drawline(fstart_x, fstart_y, fstart_x, fstop_y);
     lcd_drawline(fstop_x, fstart_y, fstop_x, fstop_y);
+
+    lcd_drawline(fstart_x - 1, fstart_y + 1, fstart_x - 1, fstop_y + 1);
+    lcd_drawline(fstart_x - 1, fstop_y + 1, fstop_x - 1, fstop_y + 1);
 }
 
 void draw_block(int x, int y, int block, int frame, bool clear)
@@ -123,17 +126,17 @@ void draw_block(int x, int y, int block, int frame, bool clear)
     for(i=0;i < 4;i++) {
         if (clear)
         {
-            for (a = 0; a < 4; a++)
+            for (a = 0; a < 3; a++)
                 for (b = 0; b < 4; b++)
-                    lcd_clearpixel(start_x + x + block_data[block][frame][1][i] * 4 + b,
-                                   start_y + y + block_data[block][frame][0][i] * 4 + a);
+                    lcd_clearpixel(start_x + x + block_data[block][frame][1][i] * 4 - b,
+                                   start_y + y + block_data[block][frame][0][i] * 3 + a);
         }
         else
         {
-            for (a = 0; a < 4; a++)
+            for (a = 0; a < 3; a++)
                 for (b = 0; b < 4; b++)
-                    lcd_drawpixel(start_x+x+block_data[block][frame][1][i] * 4 + b,
-                                  start_y+y+block_data[block][frame][0][i] * 4 + a);
+                    lcd_drawpixel(start_x+x+block_data[block][frame][1][i] * 4 - b,
+                                  start_y+y+block_data[block][frame][0][i] * 3 + a);
         }
     }
 }
@@ -141,22 +144,21 @@ void draw_block(int x, int y, int block, int frame, bool clear)
 void to_virtual(void)
 {
     int i,a,b;
+
     for(i = 0; i < 4; i++)
-    {
-        for (a = 0; a < 4; a++)
+        for (a = 0; a < 3; a++)
             for (b = 0; b < 4; b++)
                 *(virtual + 
-                (current_y + block_data[current_b][current_f][0][i] * 4 + a) * max_x +
-                current_x + block_data[current_b][current_f][1][i] * 4 + b) = current_b + 1;
-    }
+                (current_y + block_data[current_b][current_f][0][i] * 3 + a) * max_x +
+                current_x + block_data[current_b][current_f][1][i] * 4 - b) = current_b + 1;
 }
 
 bool block_touch (int x, int y)
 {
     int a,b;
     for (a = 0; a < 4; a++)
-        for (b = 0; b < 4; b++)
-            if (*(virtual + (y + b) * max_x + (x + a)) != 0)
+        for (b = 0; b < 3; b++)
+            if (*(virtual + (y + b) * max_x + (x - a)) != 0)
                 return true;
     return false;
 }
@@ -173,7 +175,7 @@ bool gameover(void)
 
     for(i = 0; i < 4; i++){
         /* Do we have blocks touching? */
-        if(block_touch(x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 4)) 
+        if(block_touch(x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 3)) 
         {
             /* Are we at the top of the frame? */
             if(y + block_data[block][frame][1][i] * 4 < start_y)
@@ -190,11 +192,11 @@ bool valid_position(int x, int y, int block, int frame)
 {
     int i;
     for(i=0;i < 4;i++)
-        if ((y + block_data[block][frame][0][i] * 4 > max_y - 4) ||
-            (x + block_data[block][frame][1][i] * 4 > max_x) ||
-            (y + block_data[block][frame][0][i] * 4 < 0) ||
-            (x + block_data[block][frame][1][i] * 4 < 0) ||
-            block_touch (x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 4))
+        if ((y + block_data[block][frame][0][i] * 3 > max_y - 3) ||
+            (x + block_data[block][frame][1][i] * 4 > max_x - 4) ||
+            (y + block_data[block][frame][0][i] * 3 < 0) ||
+            (x + block_data[block][frame][1][i] * 4 < 4) ||
+            block_touch (x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 3))
             return false;
     return true;
 }
@@ -238,12 +240,20 @@ void new_block(void)
 {
     current_b = next_b;
     current_f = next_f;
-    current_x = max_x - 15;
-    current_y = (int)((max_y)/2);
+    current_x = max_x - 16;
+    current_y = (int)12;
     next_b = t_rand(blocks);
     next_f = t_rand(block_frames[next_b]);
-    // draw_block(max_x + 2, start_y - 1, current_b, current_f, true);
-    // draw_block(max_x + 2, start_y - 1, next_b, next_f, false);
+
+    lcd_drawline (max_x + 7, start_y - 1, max_x + 29, start_y - 1);
+    lcd_drawline (max_x + 29, start_y, max_x + 29, start_y + 14);
+    lcd_drawline (max_x + 29, start_y + 14, max_x + 7, start_y + 14);
+    lcd_drawline (max_x + 7, start_y + 14, max_x + 7, start_y - 1);
+    lcd_drawline (max_x + 6, start_y + 15, max_x + 6, start_y);
+    lcd_drawline (max_x + 6, start_y + 15, max_x + 28, start_y + 15);
+
+    draw_block(max_x + 9, start_y - 4, current_b, current_f, true);
+    draw_block(max_x + 9, start_y - 4, next_b, next_f, false);
     if(!valid_position(current_x, current_y, current_b, current_f))
     {
         draw_block(current_x, current_y, current_b, current_f, false);
@@ -327,13 +337,13 @@ void game_loop(void)
                 return; /* get out of here */
 
 	        if ( b & BUTTON_UP )
-		        move_block(0,-4,0);
+		        move_block(0,-3,0);
 
             if ( b & BUTTON_DOWN )
-		        move_block(0,4,0);
+		        move_block(0,3,0);
 
             if ( b & BUTTON_RIGHT )
-		        move_block(0,0,-1);
+		        move_block(0,0,1);
 
             if ( b & BUTTON_LEFT )
 		        move_down();
