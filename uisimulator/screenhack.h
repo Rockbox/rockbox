@@ -89,8 +89,8 @@ extern XrmOptionDescRec options [];
 extern char *defaults [];
 
 extern void screenhack (Display*,Window);
-extern void screenhack_handle_event (Display*, XEvent*);
-extern void screenhack_handle_events (Display*);
+extern int screenhack_handle_event (Display*, XEvent*);
+extern int screenhack_handle_events (void);
 extern void screen_redraw();
 extern void screen_resized();
 

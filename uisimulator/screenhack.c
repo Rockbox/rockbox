@@ -91,6 +91,8 @@ static char *default_defaults[] = {
   0
 };
 
+extern Display* dpy;
+
 static XrmOptionDescRec *merged_options;
 static int merged_options_size;
 static char **merged_defaults;
@@ -179,83 +181,82 @@ static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 /* Dead-trivial event handling: exits if "q" or "ESC" are typed.
    Exit if the WM_PROTOCOLS WM_DELETE_WINDOW ClientMessage is received.
  */
-void
+int
 screenhack_handle_event (Display *dpy, XEvent *event)
 {
-  switch (event->xany.type)
+    int key=0;
+    switch (event->xany.type)
     {
-    case KeyPress:
-      {
-        KeySym keysym;
-        unsigned char c = 0;
-        XLookupString (&event->xkey, &c, 1, &keysym, 0);
-        if (c == 'q' ||
-            c == 'Q' ||
-            c == 3 ||	/* ^C */
-            c == 27)	/* ESC */
-          exit (0);
-        else if (! (keysym >= XK_Shift_L && keysym <= XK_Hyper_R))
-          XBell (dpy, 0);  /* beep for non-chord keys */
-
-        fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c);
-      }
-      break;
-    case ResizeRequest:
-      screen_resized(event->xresizerequest.width, event->xresizerequest.height);
-      screen_redraw();
-      fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
-              event->xresizerequest.width, event->xresizerequest.height);
-      break;
-    default:
-      fprintf(stderr, "EVENT: %d (see /usr/include/X11/X.h)\n", 
-              event->xany.type);
-      break;
-    case Expose:
-      screen_redraw();
-      fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
-              event->xexpose.x, event->xexpose.y,
-              event->xexpose.width, event->xexpose.height);
-      break;
-    case ButtonPress:
-      fprintf(stderr, "BUTTON PRESSED\n");
-      break;
-    case ClientMessage:
-      {
-        if (event->xclient.message_type != XA_WM_PROTOCOLS)
-          {
-            char *s = XGetAtomName(dpy, event->xclient.message_type);
-            if (!s) s = "(null)";
-            fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
-                     progname, s);
-          }
-        else if (event->xclient.data.l[0] != XA_WM_DELETE_WINDOW)
-          {
-            char *s1 = XGetAtomName(dpy, event->xclient.message_type);
-            char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
-            if (!s1) s1 = "(null)";
-            if (!s2) s2 = "(null)";
-            fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
-                     progname, s1, s2);
-          }
-        else
-          {
-            exit (0);
-          }
-      }
-      break;
+	case KeyPress:
+	{
+	    KeySym keysym;
+	    unsigned char c = 0;
+	    XLookupString (&event->xkey, &c, 1, &keysym, 0);
+	    if (! (keysym >= XK_Shift_L && keysym <= XK_Hyper_R))
+		XBell (dpy, 0);  /* beep for non-chord keys */
+	    key = keysym;
+	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c);
+	}
+	break;
+	case ResizeRequest:
+	    screen_resized(event->xresizerequest.width, event->xresizerequest.height);
+	    screen_redraw();
+	    fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
+		    event->xresizerequest.width, event->xresizerequest.height);
+	    break;
+	default:
+	    fprintf(stderr, "EVENT: %d (see /usr/include/X11/X.h)\n", 
+		    event->xany.type);
+	    break;
+	case Expose:
+	    screen_redraw();
+	    fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
+		    event->xexpose.x, event->xexpose.y,
+		    event->xexpose.width, event->xexpose.height);
+	    break;
+	case ButtonPress:
+	    fprintf(stderr, "BUTTON PRESSED\n");
+	    break;
+	case ClientMessage:
+	{
+	    if (event->xclient.message_type != XA_WM_PROTOCOLS)
+	    {
+		char *s = XGetAtomName(dpy, event->xclient.message_type);
+		if (!s) s = "(null)";
+		fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
+			 progname, s);
+	    }
+	    else if (event->xclient.data.l[0] != XA_WM_DELETE_WINDOW)
+	    {
+		char *s1 = XGetAtomName(dpy, event->xclient.message_type);
+		char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
+		if (!s1) s1 = "(null)";
+		if (!s2) s2 = "(null)";
+		fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
+			 progname, s1, s2);
+	    }
+	    else
+	    {
+		exit (0);
+	    }
+	}
+	break;
     }
+    return key;
 }
 
 
-void
-screenhack_handle_events (Display *dpy)
+int
+screenhack_handle_events (void)
 {
-  while (XPending (dpy))
+    int key=0;
+    while (XPending (dpy))
     {
-      XEvent event;
-      XNextEvent (dpy, &event);
-      screenhack_handle_event (dpy, &event);
+	XEvent event;
+	XNextEvent (dpy, &event);
+	key=screenhack_handle_event (dpy, &event);
     }
+    return key;
 }
 
 
