@@ -94,93 +94,102 @@ int read_bmp_file(char* filename,
                   int *get_height, /* in pixels */
                   char **bitmap)
 {
-   struct Fileheader fh;
-   struct RGBQUAD palette[2]; /* two colors only */
+    struct Fileheader fh;
+    struct RGBQUAD palette[2]; /* two colors only */
 
-   unsigned int bitmap_width, bitmap_height;
+    unsigned int bitmap_width, bitmap_height;
 
-   long PaddedWidth;
-   int background;
-   int fd = open(filename, O_RDONLY);
-   long size;
-   unsigned int row, col;
-   int l;
-   unsigned char *bmp;
-   int width;
+    long PaddedWidth;
+    int background;
+    int fd = open(filename, O_RDONLY);
+    long size;
+    unsigned int row, col;
+    int l;
+    unsigned char *bmp;
+    int width;
+    int depth;
 
-   if(fd == -1)
-   {
-      debugf("error - can't open '%s'\n", filename);
-      return 1;
-   }
-   else
+    if(fd == -1)
+    {
+        debugf("error - can't open '%s'\n", filename);
+        return 1;
+    }
+    else
    {
      if(read(fd, &fh, sizeof(struct Fileheader)) !=
         sizeof(struct Fileheader))
-      {
-	debugf("error - can't Read Fileheader Stucture\n");
-        close(fd);
-        return 2;
-      }
+     {
+         debugf("error - can't Read Fileheader Stucture\n");
+         close(fd);
+         return 2;
+     }
 
-      /* Exit if not monochrome */
-      if(readshort(fh.BitCount) > 8)
-      {
-	debugf("error - Bitmap must be less than 8, got %d\n",
-               readshort(fh.BitCount));
-        close(fd);
-        return 2;
-      }
+     /* Exit if more than 8 bits */
+     depth = readshort(fh.BitCount);
+     if(depth > 8)
+     {
+         debugf("error - Bitmap uses more than 8 bit depth, got %d\n",
+                depth);
+         close(fd);
+         return 2;
+     }
 
-      /* Exit if too wide */
-      if(readlong(fh.Width) > 112)
-      {
-	debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
-               readlong(fh.Width));
-        close(fd);
-        return 3;
-      }
+     /* Exit if too wide */
+     if(readlong(fh.Width) > 112)
+     {
+         debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
+                readlong(fh.Width));
+         close(fd);
+         return 3;
+     }
 
-      /* Exit if too high */
-      if(readlong(fh.Height) > 64)
-      {
-	debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
-               readlong(fh.Height));
-        close(fd);
-	return 4;
-      }
+     /* Exit if too high */
+     if(readlong(fh.Height) > 64)
+     {
+         debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
+                readlong(fh.Height));
+         close(fd);
+         return 4;
+     }
+     
+     for(l=0;l < 2;l++)
+     {
+         if(read(fd, &palette[l],sizeof(struct RGBQUAD)) !=
+            sizeof(struct RGBQUAD))
+         {
+             debugf("error - Can't read bitmap's color palette\n");
+             close(fd);
+             return 5;
+         }
+     }
+     if(depth == 8 ) {
+         /* pass the other palettes */
+         lseek(fd, 254*sizeof(struct RGBQUAD), SEEK_CUR);
+     }
 
-      for(l=0;l < 2;l++)
-      {
-	if(read(fd, &palette[l],sizeof(struct RGBQUAD)) !=
-           sizeof(struct RGBQUAD))
-	{
-          debugf("error - Can't read bitmap's color palette\n");
-          close(fd);
-          return 5;
-	}
-      }
-      /* pass the other palettes */
-      lseek(fd, 254*sizeof(struct RGBQUAD), SEEK_CUR);
-
-      /* Try to guess the foreground and background colors.
-         We assume that the foreground color is the darkest. */
-      if(((int)palette[0].rgbRed +
-          (int)palette[0].rgbGreen +
-          (int)palette[0].rgbBlue) >
-          ((int)palette[1].rgbRed +
-          (int)palette[1].rgbGreen +
-          (int)palette[1].rgbBlue))
-      {
+     /* Try to guess the foreground and background colors.
+        We assume that the foreground color is the darkest. */
+     if(((int)palette[0].rgbRed +
+         (int)palette[0].rgbGreen +
+         (int)palette[0].rgbBlue) >
+        ((int)palette[1].rgbRed +
+         (int)palette[1].rgbGreen +
+         (int)palette[1].rgbBlue))
+     {
          background = 0;
-      }
-      else
-      {
+     }
+     else
+     {
          background = 1;
-      }
+     }
 
       width = readlong(fh.Width);
-      PaddedWidth = ((width+3)&(~0x3));
+
+      if(depth == 8)
+          PaddedWidth = ((width+3)&(~0x3)); /* aligned 4-bytes boundaries */
+      else
+          PaddedWidth = ((width+31)&(~0x1f))/8;
+
       size = PaddedWidth*readlong(fh.Height);
 
       bmp = (unsigned char *)malloc(size);
@@ -207,18 +216,50 @@ int read_bmp_file(char* filename,
       *get_width = bitmap_width;
       *get_height = bitmap_height;
 
-      /* Now convert the bitmap into an array with 1 byte per pixel,
-         exactly the size of the image */
-
-      for(row = 0;row < bitmap_height;row++) {
-	for(col = 0;col < bitmap_width;col++) {
-          if(bmp[(bitmap_height-1 -row) * PaddedWidth + col]) {
-            (*bitmap)[ (row/8) * bitmap_width + col ] &= ~ (1<<(row&7));
+      if(depth == 8)
+      {
+          /* Now convert the bitmap into an array with 1 byte per pixel,
+             exactly the size of the image */
+          for(row = 0;row < bitmap_height;row++) {
+              for(col = 0;col < bitmap_width;col++) {
+                  if(bmp[(bitmap_height-1 -row) * PaddedWidth + col]) {
+                      (*bitmap)[ (row/8) * bitmap_width + col ] &=
+                        ~ (1<<(row&7));
+                  }
+                  else {
+                      (*bitmap)[ (row/8) * bitmap_width + col ] |=
+                        1<<(row&7);
+                  }
+              }
           }
-          else {
-            (*bitmap)[ (row/8) * bitmap_width + col ] |= 1<<(row&7);
+      }
+      else
+      {
+          int bit;
+          int byte;
+          /* monocrome BMP conversion uses 8 pixels per byte */
+          for(row = 0; row < bitmap_height; row++) {
+              bit = 7;
+              byte = 0;
+              for(col = 0;col < bitmap_width;col++) {
+                  if((bmp[(bitmap_height - row - 1) * PaddedWidth + byte] &
+                      (1 << bit))) {
+                      (*bitmap)[(row/8) * bitmap_width + col ] &=
+                        ~(1<<(row&7));
+                  }
+                  else {
+                      (*bitmap)[(row/8) * bitmap_width + col ] |= 
+                        1<<(row&7);
+                  }
+                  if(bit) {
+                      bit--;
+                  }
+                  else {
+                      bit = 7;
+                      byte++;
+                  }
+              }
           }
-	}
       }
 
       free(bmp);
