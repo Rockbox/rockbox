@@ -94,6 +94,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         else
         {
             button = rb->button_get_w_tmo(10);
+
+            /* Make sure that the jukebox isn't powered off
+               automatically */
+            rb->reset_poweroff_timer();
         }
         switch (button)
         {
