@@ -633,15 +633,10 @@ int on_screen(void)
     static int pitch = 100;
     bool exit = false;
     bool used = false;
-#ifdef SIMULATOR
-    bool draw = true;
-#else
-    bool draw = false;
-#endif
 
     while (!exit) {
 
-        if ( draw ) {
+        if ( used ) {
             char* ptr;
             char buf[32];
             int w, h;
@@ -720,7 +715,6 @@ int on_screen(void)
                 break;
 
             case BUTTON_ON | BUTTON_REPEAT:
-                draw = true;
                 used = true;
                 break;
 
