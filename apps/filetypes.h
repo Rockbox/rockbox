@@ -33,7 +33,7 @@ char* filetype_get_plugin(struct entry*);
 void  filetype_init(void);
 bool  filetype_supported(int);
 int   filetype_load_menu(struct menu_item*, int);
-void  filetype_load_plugin(char*,char*);
+int   filetype_load_plugin(char*,char*);
 
 struct file_type {
 #ifdef HAVE_LCD_BITMAP

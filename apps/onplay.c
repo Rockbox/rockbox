@@ -44,6 +44,7 @@
 #include "talk.h"
 #include "onplay.h"
 #include "filetypes.h"
+#include "plugin.h"
 
 static char* selected_file = NULL;
 static int selected_file_attr = 0;
@@ -53,6 +54,7 @@ static bool list_viewers(void)
 {
     struct menu_item menu[8];
     int m, i, result;
+    int ret = 0;
 
     i=filetype_load_menu(menu,sizeof(menu)/sizeof(*menu));
     if (i)
@@ -61,12 +63,16 @@ static bool list_viewers(void)
         result = menu_show(m);
         menu_exit(m);
         if (result >= 0)
-            filetype_load_plugin(menu[result].desc,selected_file);
+            ret = filetype_load_plugin(menu[result].desc,selected_file);
     }
     else
     {
         splash(HZ*2, true, "No viewers found");
     }
+
+    if(ret == PLUGIN_USB_CONNECTED)
+       onplay_result = ONPLAY_RELOAD_DIR;
+
     return false;
 }
 

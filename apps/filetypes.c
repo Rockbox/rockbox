@@ -239,11 +239,11 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
 }
 
 /* start a plugin with an argument (called from onplay.c) */
-void filetype_load_plugin(char* plugin, char* file)
+int filetype_load_plugin(char* plugin, char* file)
 {
     snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
              VIEWERS_DIR,plugin);
-    plugin_load(plugin_name,file);
+    return plugin_load(plugin_name,file);
 }
 
 /* get index to filetypes[] from the file attribute */
