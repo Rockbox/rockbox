@@ -21,7 +21,7 @@ int x11_open(char *name, int opts)
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
-    Logf("We open the real file '%s'", buffer);
+    debugf("We open the real file '%s'", buffer);
     return open(buffer, opts);
   }
   return open(name, opts);

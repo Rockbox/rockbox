@@ -42,7 +42,7 @@ void playtune(char *dir, char *file)
   sprintf(buffer, "%s/%s", dir, file);
 
   if(mp3info(&mp3, buffer)) {
-    Logf("Failure!");
+    debugf("id3 failure!");
     good=0;
   }
 #ifdef HAVE_LCD_BITMAP

@@ -67,34 +67,6 @@ char *defaults [] = {
   0
 };
 
-#define LOGFILE "xgui.log"
-void Logf(char *fmt, ...)
-{
-  va_list args;
-  FILE *log;
-  struct tm *t;
-  time_t now=time(NULL);
-
-  va_start(args, fmt);
-
-  t = localtime(&now);
-  log = fopen(LOGFILE, "a");
-  if(log) {
-    fprintf(log, "%02d:%02d:%02d ",
-            t->tm_hour, t->tm_min, t->tm_sec);
-    vfprintf(log, fmt, args);
-    fprintf(log, "\n");
-
-    fclose(log);
-  }
-
-  fprintf(stderr, "%02d:%02d:%02d ",
-          t->tm_hour, t->tm_min, t->tm_sec);
-  vfprintf(stderr, fmt, args);
-  fprintf(stderr, "\n");
-  va_end(args);
-}
-
 void init_window ()
 {
   XGCValues gcv;
