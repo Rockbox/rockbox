@@ -148,6 +148,7 @@ static struct {
 #ifndef SIMULATOR
 static int last_tag = 0;
 static int last_dma_tick = 0;
+static int pause_tick = 0;
 
 #ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
@@ -592,13 +593,16 @@ static void mpeg_thread(void)
                 DEBUGF("MPEG_PAUSE\n");
                 /* Stop the current stream */
                 playing = false;
+                pause_tick = current_tick;
                 stop_dma();
                 break;
 
             case MPEG_RESUME:
                 DEBUGF("MPEG_RESUME\n");
-                /* Stop the current stream */
+                /* Continue the current stream */
                 playing = true;
+                last_dma_tick += current_tick - pause_tick;
+                pause_tick = 0;
                 start_dma();
                 break;
 
