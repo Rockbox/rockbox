@@ -362,9 +362,10 @@ void set_car_adapter_mode(bool setting)
     car_adapter_mode_enabled = setting;
 }
 
+static bool charger_power_is_on;
+
 static void car_adapter_mode_processing(void)
 {
-    static bool charger_power_is_on = false;
     static bool waiting_to_resume_play = false;
     static long play_resume_time;
     
@@ -834,6 +835,8 @@ void powermgmt_init(void)
 #endif
 #endif
 
+    charger_power_is_on = charger_inserted();
+    
     create_thread(power_thread, power_stack, sizeof(power_stack),
                   power_thread_name);
 }
