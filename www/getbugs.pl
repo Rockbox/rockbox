@@ -12,7 +12,7 @@ for ( @entries ) {
         $submit = "<a href=http://sourceforge.net/users/$submit>$submit</a>" if ( $submit ne "nobody" );
         $assigned = "<a href=http://sourceforge.net/users/$assigned>$assigned</a>" if ( $assigned ne "nobody" );
             
-        print "<tr><td>$date</td><td><a href=\"http://www.sourceforge.net$id\">$num</a></td><td>$summary</td><td>$submit</t><td>$assigned</td></tr>\n";
+        print "<tr><td>$date</td><td><a href=\"http://www.sourceforge.net$id\">$num</a></td><td>$summary</td><td>$submit</td><td>$assigned</td></tr>\n";
     }
 }
 print "</table>\n";
