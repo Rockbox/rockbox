@@ -66,12 +66,13 @@ void emu_step(void)
 void emu_run(void)
 {
 	void *timer = sys_timer();
-	char meow[500];
 	int delay;
-	int framecount=0;
 
 	vid_begin();
 	lcd_begin();
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+	rb->cpu_boost(true);
+#endif
 	while(shut==0)
 	{
 		cpu_emulate(2280);
@@ -96,12 +97,12 @@ void emu_run(void)
 		
 		while (R_LY > 0) /* wait for next frame */
 			emu_step();
-		framecount++;
-		snprintf(meow,499,"%d",framecount);
-		rb->lcd_putsxy(0,0,meow);
-		rb->lcd_update_rect(0,0,LCD_WIDTH,8);
 		rb->yield();
 	}
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(false);
+#endif
+		
 }
 
 
