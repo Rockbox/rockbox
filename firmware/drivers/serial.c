@@ -27,6 +27,8 @@
 #include "lcd.h"
 #include "serial.h"
 
+#ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
+
 /* Received byte identifiers */
 #define PLAY  0xC1
 #define STOP  0xC2
@@ -133,3 +135,5 @@ int remote_control_rx(void)
 
     return ret;
 }
+
+#endif /* HAVE_MMC */

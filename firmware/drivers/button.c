@@ -67,12 +67,14 @@ static void button_tick(void)
     int diff;
     int btn;
 
+#ifndef HAVE_MMC
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
     {
         queue_post(&button_queue, btn, NULL);
     }   
+#endif
     
     /* only poll every X ticks */
     if ( ++tick >= POLL_FREQUENCY )

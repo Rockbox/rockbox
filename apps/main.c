@@ -127,7 +127,10 @@ void init(void)
 #ifdef DEBUG
     debug_init();
 #else
+#ifndef HAVE_MMC  /* FIXME: This is also necessary for debug builds
+                   * (do debug builds on the Ondio make sense?) */
     serial_setup();
+#endif
 #endif
 
     i2c_init();
@@ -174,7 +177,7 @@ void init(void)
 #endif
         panicf("ata: %d", rc);
     }
-    
+
     usb_start_monitoring();
 
 /* temporary hack for Ondio, which can't browse without disk I/O */
