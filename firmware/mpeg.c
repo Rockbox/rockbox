@@ -48,6 +48,8 @@ static void start_prerecording(void);
 static void start_recording(void);
 static void stop_recording(void);
 static int get_unsaved_space(void);
+static void pause_recording(void);
+static void resume_recording(void);
 #endif /* #ifdef HAVE_MAS3587F */
 
 #ifndef SIMULATOR
@@ -68,6 +70,8 @@ static int get_unswapped_space(void);
 #define MPEG_INIT_RECORDING 10
 #define MPEG_INIT_PLAYBACK 11
 #define MPEG_NEW_FILE    12
+#define MPEG_PAUSE_RECORDING 13
+#define MPEG_RESUME_RECORDING 14
 #define MPEG_NEED_DATA    100
 #define MPEG_TRACK_CHANGE 101
 #define MPEG_SAVE_DATA    102
@@ -287,6 +291,8 @@ static bool is_recording; /* We are recording */
 static bool stop_pending;
 unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
+unsigned long pause_start_time; /* Value of current_tick when pause was
+                                   started */
 static bool saving; /* We are saving the buffer to disk */
 static char recording_filename[MAX_PATH]; /* argument to thread */
 static char delayed_filename[MAX_PATH]; /* internal copy of above */
@@ -1653,6 +1659,12 @@ static void mpeg_thread(void)
                     }
 
                     start_recording();
+
+                    /* Wait until at least one frame is encoded and get the
+                       frame header, for later use by the Xing header
+                       generation */
+                    sleep(HZ/10);
+                    saved_header = get_last_recorded_header();
                     
                     /* delayed until buffer is saved, don't open yet */
                     strcpy(delayed_filename, recording_filename);
@@ -1663,10 +1675,6 @@ static void mpeg_thread(void)
                 case MPEG_STOP:
                     DEBUGF("MPEG_STOP\n");
 
-                    /* Store the last recorded header for later use by the
-                       Xing header generation */
-                    saved_header = get_last_recorded_header();
-                    
                     stop_recording();
 
                     /* Save the remaining data in the buffer */
@@ -1754,8 +1762,6 @@ static void mpeg_thread(void)
                         if(startpos < 0)
                             startpos += mp3buflen;
 
-                        saved_header = get_last_recorded_header();
-                        
                         rc = mem_find_next_frame(startpos, &offset, 1800,
                                                  saved_header);
                         if(rc) /* Header found? */
@@ -1864,6 +1870,7 @@ static void mpeg_thread(void)
                     
                     DEBUGF("r: %x w: %x\n", mp3buf_read, mp3buf_write);
                     DEBUGF("ats: %x\n", amount_to_save);
+
                     /* Save data only if the buffer is getting full,
                        or if we should stop recording */
                     if(amount_to_save)
@@ -1938,7 +1945,15 @@ static void mpeg_thread(void)
                     mp3_play_init();
                     init_playback_done = true;
                     break;
-
+                    
+                case MPEG_PAUSE_RECORDING:
+                   pause_recording();
+                   break;
+                   
+                case MPEG_RESUME_RECORDING:
+                   resume_recording();
+                   break;
+                   
                 case SYS_USB_CONNECTED:
                     /* We can safely go to USB mode if no recording
                        is taking place */
@@ -2136,6 +2151,16 @@ void mpeg_record(char *filename)
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
+void mpeg_pause_recording(void)
+{
+    queue_post(&mpeg_queue, MPEG_PAUSE_RECORDING, NULL);
+}
+
+void mpeg_resume_recording(void)
+{
+    queue_post(&mpeg_queue, MPEG_RESUME_RECORDING, NULL);
+}
+
 static void start_prerecording(void)
 {
     unsigned long val;
@@ -2199,13 +2224,16 @@ static void start_recording(void)
     is_recording = true;
     stop_pending = false;
     saving = false;
+    paused = false;
 
     /* Store the current time */
     if(prerecording)
         record_start_time = current_tick - prerecord_count * HZ;
     else
         record_start_time = current_tick;
-        
+
+    pause_start_time = 0;
+    
     demand_irq_enable(true);
 }
 
@@ -2213,6 +2241,8 @@ static void pause_recording(void)
 {
     unsigned long val;
 
+    pause_start_time = current_tick;
+    
     /* Set the pause bit */
     shadow_7f9 |= 2;
     mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
@@ -2226,12 +2256,16 @@ static void pause_recording(void)
     {
         mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
     } while(val & 1);
+
+    paused = true;
 }
 
 static void resume_recording(void)
 {
     unsigned long val;
 
+    paused = false;
+    
     /* Clear the pause bit */
     shadow_7f9 &= ~2;
     mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
@@ -2245,6 +2279,14 @@ static void resume_recording(void)
     {
         mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
     } while(val & 1);
+
+    /* Compensate for the time we have been paused */
+    if(pause_start_time)
+    {
+       record_start_time =
+          current_tick - (pause_start_time - record_start_time);
+       pause_start_time = 0;
+    }
 }
 
 static void stop_recording(void)
@@ -2252,7 +2294,8 @@ static void stop_recording(void)
     unsigned long val;
 
     /* Let it finish the last frame */
-    pause_recording();
+    if(!paused)
+       pause_recording();
     sleep(HZ/5);
     
     demand_irq_enable(false);
@@ -2372,7 +2415,12 @@ unsigned long mpeg_recorded_time(void)
         return prerecord_count * HZ;
     
     if(is_recording)
-        return current_tick - record_start_time;
+    {
+       if(paused)
+          return pause_start_time - record_start_time;
+       else
+          return current_tick - record_start_time;
+    }
 
     return 0;
 }

@@ -231,13 +231,22 @@ bool recording_screen(void)
                     mpeg_record(rec_create_filename(path_buffer));
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
+                    last_seconds = 0;
                 }
                 else
                 {
-                    mpeg_new_file(rec_create_filename(path_buffer));
+                    if(mpeg_status() & MPEG_STATUS_PAUSE)
+                    {
+                        mpeg_resume_recording();
+                        status_set_playmode(STATUS_RECORD);
+                    }
+                    else
+                    {
+                        mpeg_pause_recording();
+                        status_set_playmode(STATUS_PAUSE);
+                    }
                     update_countdown = 1; /* Update immediately */
                 }
-                last_seconds = 0;
                 break;
 
             case BUTTON_UP:
@@ -373,15 +382,23 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_F3:
-                if(mpeg_status() != MPEG_STATUS_RECORD)
+                if(mpeg_status() & MPEG_STATUS_RECORD)
                 {
-                    if (f3_rec_screen())
+                    mpeg_new_file(rec_create_filename(path_buffer));
+                    last_seconds = 0;
+                }
+                else
+                {
+                    if(mpeg_status() != MPEG_STATUS_RECORD)
                     {
-                        have_recorded = true;
-                        done = true;
+                        if (f3_rec_screen())
+                        {
+                            have_recorded = true;
+                            done = true;
+                        }
+                        else
+                            update_countdown = 1; /* Update immediately */
                     }
-                    else
-                        update_countdown = 1; /* Update immediately */
                 }
                 break;
 
@@ -436,8 +453,9 @@ bool recording_screen(void)
                        is active */
                     if (global_settings.rec_timesplit)
                     {
-                        /* Display the record timesplit interval rather than 
-                           the file size if the record timer is active */
+                        /* Display the record timesplit interval rather
+                           than the file size if the record timer is
+                           active */
                         dhours = dseconds / 3600;
                         dminutes = (dseconds - (dhours * 3600)) / 60;
                         snprintf(buf, 32, "%s %02d:%02d",
@@ -445,8 +463,10 @@ bool recording_screen(void)
                                  dhours, dminutes);
                     }
                     else
-                        snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
-                                 num2max5(mpeg_num_recorded_bytes(), buf2));
+                        snprintf(buf, 32, "%s %s",
+                                 str(LANG_RECORDING_SIZE),
+                                 num2max5(mpeg_num_recorded_bytes(),
+                                          buf2));
                 }
                 lcd_puts(0, 1, buf);
 

@@ -85,6 +85,8 @@ void mpeg_set_recording_options(int frequency, int quality,
 void mpeg_set_recording_gain(int left, int right, bool use_mic);
 unsigned long mpeg_recorded_time(void);
 unsigned long mpeg_num_recorded_bytes(void);
+void mpeg_pause_recording(void);
+void mpeg_resume_recording(void);
 #endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 void mpeg_set_buffer_margin(int seconds);
