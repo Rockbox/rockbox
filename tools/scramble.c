@@ -50,6 +50,8 @@ int main (int argc, char** argv)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
+    length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
+    
     fseek(file,0,SEEK_SET); 
     inbuf = malloc(length);
     outbuf = malloc(length);
