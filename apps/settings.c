@@ -707,6 +707,8 @@ void set_option(char* string, int* variable, char* options[],
 #endif
                 if ( *variable < (numoptions-1) )
                     (*variable)++;
+				else
+                    (*variable) -= (numoptions-1);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -718,6 +720,8 @@ void set_option(char* string, int* variable, char* options[],
 #endif
                 if ( *variable > 0 )
                     (*variable)--;
+                else
+                    (*variable) += (numoptions-1);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
