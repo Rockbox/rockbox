@@ -132,7 +132,7 @@ TD Soon ETD
 NO
 EFEAT
 
-NAME Supports Very Low Volume ENAME
+NAME Hight Resolution Volume Control ENAME
 YES
 NO
 EFEAT
