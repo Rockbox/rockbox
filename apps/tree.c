@@ -482,10 +482,6 @@ bool dirbrowse(char *root)
 #ifdef HAVE_LCD_BITMAP
                 if(global_settings.statusbar) {
                     statusbar_toggle();
-                    if(CURSOR_Y+LINE_Y+dircursor>TREE_MAX_ON_SCREEN) {
-                        start++;
-                        dircursor--;
-                    }
                     restore = true;
                 }
 #endif
@@ -520,6 +516,12 @@ bool dirbrowse(char *root)
 
         if ( restore ) {
             /* restore display */
+            /* We need to adjust if the number of lines on screen have
+               changed because of a status bar change */
+            if(CURSOR_Y+LINE_Y+dircursor>TREE_MAX_ON_SCREEN) {
+                start++;
+                dircursor--;
+            }
             numentries = showdir(currdir, start);
             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
         }
