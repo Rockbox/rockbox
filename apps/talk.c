@@ -486,7 +486,7 @@ int talk_number(int n, bool enqueue)
 int talk_value(int n, int unit, bool enqueue)
 {
     int unit_id;
-    const int unit_voiced[] = 
+    static const int unit_voiced[] = 
     {   /* lookup table for the voice ID of the units */
         -1, -1, -1, /* regular ID, int, signed */
         VOICE_MILLISECONDS, /* here come the "real" units */
@@ -532,7 +532,7 @@ int talk_value(int n, int unit, bool enqueue)
 }
 
 /* spell a string */
-int talk_spell(const char* spell, bool enqueue) 
+int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
     
