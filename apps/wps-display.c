@@ -662,50 +662,52 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
             format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
             line_type[i] = flags;
             
+#ifdef HAVE_LCD_BITMAP
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-#ifdef HAVE_LCD_CHARCELLS
-                draw_player_progress(id3, ff_rewind_count);
-#else
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
                 slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
                          (id3->elapsed + ff_rewind_count) * 100 / id3->length,
                          Grow_Right);
-#endif
                 update_line = true;
-            } else 
+            } else  if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
+              /* peak meter */
+              int peak_meter_y;
+              int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
 
-#ifdef HAVE_LCD_BITMAP
-            /* peak meter */
-            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
-                int peak_meter_y;
-                int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+              update_line = true;
+              peak_meter_y = i * h + offset;
 
-                update_line = true;
-                peak_meter_y = i * h + offset;
-
-                /* The user might decide to have the peak meter in the last 
-                   line so that it is only displayed if no status bar is 
-                   visible. If so we neither want do draw nor enable the
-                   peak meter. */
-                if (peak_meter_y + h <= LCD_HEIGHT) {
-                    /* found a line with a peak meter -> remember that we must
-                       enable it later */
-                    enable_pm = true;
-                    peak_meter_draw(0, peak_meter_y, LCD_WIDTH,
-                                    MIN(h, LCD_HEIGHT - peak_meter_y));
-                }
-            } else
-#endif
-
-            /* scroll line */
-            if (flags & WPS_REFRESH_SCROLL)
-            {
-                if (refresh_mode & WPS_REFRESH_SCROLL) 
-                {
-                    lcd_puts_scroll(0, i, buf);
+              /* The user might decide to have the peak meter in the last 
+                 line so that it is only displayed if no status bar is 
+                 visible. If so we neither want do draw nor enable the
+                 peak meter. */
+              if (peak_meter_y + h <= LCD_HEIGHT) {
+                /* found a line with a peak meter -> remember that we must
+                   enable it later */
+                enable_pm = true;
+                peak_meter_draw(0, peak_meter_y, LCD_WIDTH,
+                                MIN(h, LCD_HEIGHT - peak_meter_y));
+              }
+            } else if (flags & WPS_REFRESH_SCROLL) {
+              /* scroll line */
+              if (refresh_mode & WPS_REFRESH_SCROLL)  {
+                  lcd_puts_scroll(0, i, buf);
                 }
             }
+#else
+            /* progress */
+            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
+                draw_player_progress(id3, ff_rewind_count);
+            }
+            if (flags & WPS_REFRESH_SCROLL) {
+              /* scroll line */
+              if (refresh_mode & WPS_REFRESH_SCROLL)  {
+                lcd_puts_scroll(0, i, buf);
+              }
+              flags=0;
+            }
+#endif
 
             /* dynamic / static line */
             if ((flags & refresh_mode & WPS_REFRESH_DYNAMIC) ||
