@@ -48,6 +48,7 @@ void status_init(void)
 void status_set_playmode(enum playmode mode)
 {
     current_mode = mode;
+    status_draw();
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -63,10 +64,10 @@ bool statusbar(bool state)
 
 void status_draw(void)
 {
-#if defined(HAVE_LCD_CHARCELLS)
     int battlevel = battery_level();
     int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
     
+#if defined(HAVE_LCD_CHARCELLS)
     lcd_icon(ICON_BATTERY, true);
     if(battlevel > 25)
         lcd_icon(ICON_BATTERY_1, true);
@@ -126,9 +127,6 @@ void status_draw(void)
     }
 #endif
 #ifdef HAVE_LCD_BITMAP
-    int battlevel = battery_level();
-    int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-
     if(global_settings.statusbar && statusbar_enabled) {
         statusbar_wipe();
 #ifdef HAVE_CHARGE_CTRL
@@ -155,7 +153,8 @@ void status_draw(void)
                 }
         }
                 
-        if(battery_state) statusbar_icon_battery(battlevel, plug_state);
+        if (battery_state)
+            statusbar_icon_battery(battlevel, plug_state);
 #else
         statusbar_icon_battery(battlevel, false);
 #endif
@@ -170,8 +169,9 @@ void status_draw(void)
         if (keys_locked)
             statusbar_icon_lock();
 #ifdef HAVE_RTC
-        statusbar_time();
+        statusbar_time( rtc_read(3)*60 + rtc_read(2) );
 #endif
+
 #ifdef SIMULATOR
         lcd_update();
 #else
