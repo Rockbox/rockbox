@@ -103,14 +103,14 @@ static unsigned int ticks_per_redraw[TICKS_PER_DRAW_SIZE];
 #endif
 
 /* time out values for max */
-static long max_time_out[] = {
+static const long max_time_out[] = {
     0 * HZ, HZ / 5, 30, HZ / 2, HZ, 2 * HZ, 
     3 * HZ, 4 * HZ, 5 * HZ, 6 * HZ, 7 * HZ, 8 * HZ,
     9 * HZ, 10 * HZ, 15 * HZ, 20 * HZ, 30 * HZ, 60 * HZ
 };
 
 /* time out values for clip */
-static long clip_time_out[] = {
+static const long clip_time_out[] = {
     0 * HZ, 1  * HZ, 2 * HZ, 3 * HZ, 4 * HZ, 5 * HZ, 
     6 * HZ, 7 * HZ, 8 * HZ, 9 * HZ, 10 * HZ, 15 * HZ,
     20 * HZ, 25 * HZ, 30 * HZ, 45 * HZ, 60 * HZ, 90 * HZ,

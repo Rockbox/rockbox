@@ -48,7 +48,7 @@ struct filetype {
 #define TREE_ATTR_MOD   0x0900 /* firmware file */
 #define TREE_ATTR_MASK  0xFFC0 /* which bits tree.c uses (above) */
 
-void tree_get_filetypes(struct filetype**, int*);
+void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
 void set_current_file(char *path);

@@ -35,7 +35,7 @@
 #include "talk.h"
 #include "misc.h"
 
-static char *fmt[] =
+static const char* const fmt[] =
 {
     "",                 /* no decimals */
     "%d.%d %s  ",       /* 1 decimal */

@@ -38,7 +38,7 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 #define QUEUE_SIZE 64 /* must be a power of two */
 #define QUEUE_MASK (QUEUE_SIZE-1)
-const char* dir_thumbnail_name = "_dirname.talk";
+const char* const dir_thumbnail_name = "_dirname.talk";
 
 /***************** Functional Macros *****************/
 

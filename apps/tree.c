@@ -70,7 +70,7 @@
 extern bool language_changed;
 
 /* a table for the know file types */
-struct filetype filetypes[] = {
+const struct filetype filetypes[] = {
     { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
@@ -132,7 +132,7 @@ void browse_root(void)
 #endif
 }
 
-void tree_get_filetypes(struct filetype** types, int* count)
+void tree_get_filetypes(const struct filetype** types, int* count)
 {
     *types = filetypes;
     *count = sizeof(filetypes) / sizeof(*filetypes);

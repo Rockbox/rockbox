@@ -84,7 +84,7 @@ static void   scan_plugins(void);
 void filetype_init(void)
 {
     int cnt,i,ix;
-    struct filetype* ftypes;
+    const struct filetype* ftypes;
 
     memset(exttypes,0,sizeof(exttypes));
     memset(filetypes,0,sizeof(filetypes));

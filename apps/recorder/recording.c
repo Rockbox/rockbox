@@ -56,7 +56,7 @@ bool f3_rec_screen(void);
 #define SOURCE_LINE 1
 #define SOURCE_SPDIF 2
 
-char *freq_str[6] =
+const char* const freq_str[6] =
 {
     "44.1kHz",
     "48kHz",
@@ -79,7 +79,7 @@ static void set_gain(void)
     }
 }
 
-static char *fmtstr[] =
+static const char* const fmtstr[] =
 {
     "",                 /* no decimals */
     "%d.%d %s  ",       /* 1 decimal */
@@ -632,7 +632,7 @@ bool f2_rec_screen(void)
     lcd_getstringsize("A",&w,&h);
 
     while (!exit) {
-        char* ptr=NULL;
+        const char* ptr=NULL;
 
         lcd_clear_display();
 

@@ -55,7 +55,7 @@ enum {
 #define STR(id) ID2P(id), id
 
 /* publish this string, so it's stored only once (better than #define) */
-extern const char* dir_thumbnail_name;
+extern const char* const dir_thumbnail_name;
 
 
 void talk_init(void);
