@@ -1374,6 +1374,8 @@ static bool dirbrowse(char *root, int *dirfilter)
         if (restore || reload_dir) {
             /* restore display */
 
+            tree_max_on_screen = recalc_screen_height();
+            
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
             if(CURSOR_Y+LINE_Y+dircursor>tree_max_on_screen) {
