@@ -18,7 +18,7 @@
  ****************************************************************************/
 
     .section    .icode,"ax",@progbits
-    .align      4
+    .align      2
     .global     _bitswap
     .type       _bitswap,@function
 
@@ -26,68 +26,69 @@
  *
  * r0   Temporary (required by some instructions)
  * r1   Low byte
- * r2   High byte
- * r3   Result after flip
- * r4   Data
+ * r2   High byte / final result
+ * r4   &Data
  * r5   Length
- * r6   1
  * r7   Flip table
+ */
+
+/* The instruction order below is a bit strange, because:
+ * 1) Keeping load/stores on longword boundaries means the instruction fetch
+ *    won't compete with the memory access (because instructions are fetched
+ *    in pairs).
+ * 2) Using the result of a fetch in the next instruction causes a stall
+ *    (except in certain circumstances).
+ * See the SH-1 programming manual for details.
  */
 
 _bitswap:
     mov.l   .fliptable,r7
-    mov     #1,r6
+    add     #-2,r4          /* ptr is used shifted by 2 */
+    add     r4,r5           /* r5 = end_address - 2 */
+    add     #-1,r5          /* r5 = &last_byte - 2 */
     mov     r4,r0
-    tst     #1,r0           /* odd address? */
-    bt      .init           /* no, address is even */
+    tst     #1,r0           /* even address? */
+    bt      .init           /* yes */
 
-    mov.b   @r4,r0          /* swap first byte */
+    add     #1,r4           /* r4 now even */
+    mov.b   @(1,r4),r0      /* no, swap first byte */
     extu.b  r0,r0
     mov.b   @(r0,r7),r0
-    mov.b   r0,@r4
-    add     #1,r4
-    add     #-1,r5
-    bra     .init 
+    mov.b   r0,@(1,r4)
 
-    /* The instruction order below is a bit strange, because:
-     * 1) Keeping load/stores on longword boundaries means the instruction
-     *    fetch won't compete with the memory access (because instructions
-     *    are fetched in pairs).
-     * 2) Using the result of a fetch in the next instruction causes a 
-     *    stall (except in certain circumstances).
-     * See the SH-1 programming manual for details.
-     */
+.init:
+    cmp/hi  r4,r5           /* at least 2 bytes to swap? */
+    bf      .last           /* no, skip main loop */
 
 .loop:
-    mov.w   @r4,r1          /* data to flip */
-    add     #-2,r5
-    swap.b  r1,r2           /* get high byte */
+    mov.w   @(2,r4),r0      /* data to flip */
+    add     #2,r4           /* early increment */
+    swap.b  r0,r2           /* get high byte */
+    extu.b  r0,r0           /* prepare low byte */
+    mov.b   @(r0,r7),r1     /* swap low byte */
     extu.b  r2,r0           /* prepare high byte */
     mov.b   @(r0,r7),r2     /* swap high byte */
-    extu.b  r1,r0           /* perpare low byte */
-    mov.b   @(r0,r7),r1     /* swap low byte */
-    extu.b  r2,r2           /* zero extend high byte */
-    swap.b  r2,r3           /* put high byte in result */
-    extu.b  r1,r0           /* zero extend low byte */
-    or      r0,r3           /* put low byte in result */
-    mov.w   r3,@r4          /* store result */
-    add     #2,r4
-.init:
-    cmp/gt  r6,r5           /* while [bytes remaining] > 1 */
-    bt      .loop           /* (at least 2 bytes left) */
+    extu.b  r1,r1           /* zero extend low byte */
+    shll8   r2              /* shift high byte, low byte zeroed */
+    or      r1,r2           /* put low byte in result */
+    mov.w   r2,@r4          /* store result, ptr already incr'd */
+    cmp/hi  r4,r5           /* while &last_byte > data */
+    bt      .loop
 
-    cmp/eq  r6,r5
-    bf  .exit               /* if not 1 byte left, exit */
+.last:
+    cmp/eq  r4,r5           /* if behind (&last_byte - 2), exit */
+    bf      .exit
 
-    mov.b   @r4,r0          /* swap last byte */
+    mov.b   @(2,r4),r0      /* swap last byte */
     extu.b  r0,r0
     mov.b   @(r0,r7),r0
-    mov.b   r0,@r4
+    mov.b   r0,@(2,r4)
+
 .exit:
     rts
     nop
 
-    .align  4
+    .align  2
 
 .fliptable:
     .long   _fliptable
