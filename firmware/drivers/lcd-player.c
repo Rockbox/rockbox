@@ -271,10 +271,10 @@ void lcd_clear_display(void)
       xlcd_update();
 }
 
-static void lcd_do_puts(int x, int y, unsigned char *string)
+static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
 {
     bool update=false; 
-    DEBUGF("lcd_do_puts(%d, %d, \"", x, y);
+    DEBUGF("lcd_puts_cont_scroll(%d, %d, \"", x, y);
 
     for (; *string && x<11; x++)
         {
@@ -296,9 +296,9 @@ static void lcd_do_puts(int x, int y, unsigned char *string)
 }
 void lcd_puts(int x, int y, unsigned char *string)
 {
-    DEBUGF("lcd_puts(%d, %d)", x, y);
+    DEBUGF("lcd_puts(%d, %d) -> ", x, y);
     scroll[y].mode=SCROLL_MODE_OFF;
-    return lcd_do_puts(x, y, string);
+    return lcd_puts_cont_scroll(x, y, string);
 }
 
 void lcd_putc(int x, int y, unsigned short ch)
@@ -463,7 +463,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 
     s = &scroll[y];
 
-    lcd_do_puts(x,y,string);
+    lcd_puts_cont_scroll(x,y,string);
     s->textlen = strlen(string);
 
     if ( s->textlen > 11-x ) {
@@ -629,7 +629,7 @@ static void scroll_thread(void)
                         buffer[i++]=s->text[o++];
                     }
                     buffer[11]=0;
-                    lcd_do_puts(s->startx, s->starty, buffer);
+                    lcd_puts_cont_scroll(s->startx, s->starty, buffer);
                 }
             }
 
