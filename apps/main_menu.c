@@ -185,8 +185,12 @@ bool show_info(void)
             lcd_puts(0, y++, s);
             
 #ifdef HAVE_CHARGE_CTRL
-            if (charger_enabled)
+            if (charge_state == 1)
                 snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
+            else if (charge_state == 2)
+                snprintf(s, sizeof(s), str(LANG_BATTERY_TOPOFF_CHARGE));
+            else if (charge_state == 3)
+                snprintf(s, sizeof(s), str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
             snprintf(s, sizeof(s), str(LANG_BATTERY_TIME), battery_level(),
