@@ -256,4 +256,8 @@ void lcd_string(const char *text, char invert)
       lcd_y += CHAR_Y;
     }
   }
+#ifdef LCD_DEBUG
+  fprintf(stderr, "lcd_string: position after write: %d, %d\n",
+          lcd_x, lcd_y);
+#endif
 }

@@ -225,13 +225,15 @@ screenhack (Display *the_dpy, Window the_window)
   Logf("Rockbox will kill ya!");
 
   lcd_position(1, 1);
-  lcd_string( "RockBoxx", 0);
-
-  lcd_position(8, 16);
   lcd_string( "R", 0);
 
+  lcd_position(0, 16);
+  lcd_string( "R", 0);
+
+#if 0
   lcd_position(8, 24);
   lcd_string( "2", 0);
+#endif
 
   while (1) {
     /* deal with input here */
@@ -247,6 +249,8 @@ void screen_redraw()
 
   lcd_update();
 
+  /* draw a border around the "Recorder" screen */
+
 #define X1 0
 #define Y1 0
 #define X2 (LCD_WIDTH + MARGIN_X*2)
@@ -257,14 +261,4 @@ void screen_redraw()
   drawline(1, X1, Y2, X2, Y2);
   drawline(1, X1, Y1, X1, Y2);
 
-#if 0
-  /* does nothing "real" yet */
-  /*  drawtext(1, 20, 20, PROGNAME);*/
-
-  for(y=0; y< 112; y++)
-    for(x=0; x<64; x++)
-      drawdot(1, x+16, y+16);
-  /*  drawline(1, 0, 0, 40, 50); */
-#endif
 }
-
