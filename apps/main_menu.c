@@ -171,12 +171,8 @@ void shuffle(void)
     if(playlist.amount) {
         lcd_puts(0,0,"Shuffling...");
         lcd_update();
-#ifdef SIMULATOR
-        randomise_playlist( &playlist, time() );
-#else
         randomise_playlist( &playlist, current_tick );
-#endif
-        lcd_puts(0,1,"Done.");
+       lcd_puts(0,1,"Done.");
     }
     else {
         lcd_puts(0,0,"No playlist");
