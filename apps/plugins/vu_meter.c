@@ -53,7 +53,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         #define MAX_RIGHT_L 57
         #define MAX_RIGHT_R 111
 
-        #define MAX_PEAK 0x8FFF
+        #define MAX_PEAK 0x7FFF
 
         left_needle_top_x =
             (rb->mas_codec_readreg(0xC) *
@@ -83,7 +83,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_drawline(1, 53, 112, 53);
 
         /* These are the needle "covers" - we're going for that
-           "old fasioned" look */
+           "old fashioned" look */
 
         /* The left needle cover - organized from the top line to the bottom */
         rb->lcd_drawline(27, 48, 29, 48);
@@ -102,10 +102,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         rb->lcd_update();
 
-        switch (rb->button_get(false))
+        /* We must yield once in a while to make sure that the MPEG thread
+           isn't starved, but we use the shortest possible timeout for best
+           performance */
+        switch (rb->button_get_w_tmo(HZ/HZ))
         {
             case BUTTON_OFF:
-                return false;
+                return PLUGIN_OK;
         }
     }
 }
