@@ -90,11 +90,10 @@ static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
 
-#ifdef SIMULATOR
-unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
-#else
-static unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+#ifndef SIMULATOR
+static
 #endif
+unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
 /* All zeros and ones bitmaps for area filling */
 static unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
