@@ -17,10 +17,10 @@ faq.html: faq.t faq.raw $(TXT2PLAIN)
 faq.raw: $(DOCS)/FAQ $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
 
-battery.raw: $(DOCS)/BATTERY $(TXT2PLAIN)
+battery-faq.raw: $(DOCS)/BATTERY-FAQ $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
 
-battery.html: battery.t battery.raw $(TXT2PLAIN)
+battery-faq.html: battery-faq.t battery-faq.raw $(TXT2PLAIN)
 	$(ACTION) $<
 
 %.html : %.t
