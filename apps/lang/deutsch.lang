@@ -1193,3 +1193,18 @@ id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
 new: "Akkukapazität"
+
+id: LANG_QUEUE_FULL
+desc: queue buffer full
+eng: "Queue buffer full"
+new: "Warteschlange voll"
+
+id: LANG_QUEUE_QUEUED
+desc: queued track name %s
+eng: "Queued: %s"
+new: "Vorgemerkt: %s"
+
+id: LANG_QUEUE_TOTAL
+desc: number of queued tracks %d
+eng: "Total queued: %d"
+new: "Anzahl: %d"
