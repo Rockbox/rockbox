@@ -28,7 +28,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
-#include "power.h"
+#include "powermgmt.h"
 
 static enum playmode current_mode;
 
