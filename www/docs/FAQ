@@ -272,3 +272,12 @@ A32: You really don't want to know what I think, it involves road flares,
 Q33: When I use RockBox my jukebox's red "error" light turns on a lot, but this     doesn't happen on the factory firmware.  Why?
 A33: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
+
+
+Q34: How do I use the loadable fonts?
+A34: Loadable fonts are a work in progress.  We do not have full documentation
+     for it.  The best we can do now is tell you that you need a valid .bdf
+     font, and to use the tool "bdf2ajf" from CVS to conver to the .ajf format.
+     The final .ajf font must be stored in the archos root as 'system.ajf'
+     We do expect more documentation on this process shortly.
+
