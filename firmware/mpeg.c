@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include "config.h"
 #include "i2c.h"
 #include "mas.h"
 #include "dac.h"
@@ -481,38 +482,66 @@ static void setup_sci0(void)
 
 void mpeg_play(char* trackname)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     queue_post(&mpeg_queue, MPEG_PLAY, trackname);
 }
 
 void mpeg_stop(void)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
 }
 
 void mpeg_pause(void)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
 }
 
 void mpeg_resume(void)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
 }
 
 void mpeg_volume(int percent)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     int volume = 0x38 * percent / 100;
     dac_volume(volume);
 }
 
 void mpeg_bass(int percent)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     int bass = 15 * percent / 100;
     mas_writereg(MAS_REG_KBASS, bass_table[bass]);
 }
 
 void mpeg_treble(int percent)
 {
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
     int treble = 15 * percent / 100;
     mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
 }
@@ -524,6 +553,10 @@ void mpeg_init(void)
     setup_sci0();
     i2c_init();
 
+#ifdef ARCHOS_RECORDER
+    return;
+#endif
+    
 #ifdef DEBUG
     {
         unsigned char buf[32];
