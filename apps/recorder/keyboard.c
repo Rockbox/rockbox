@@ -33,7 +33,27 @@
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
 
+
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+#define KBD_CURSOR_LEFT (BUTTON_ON | BUTTON_LEFT)
+#define KBD_SELECT BUTTON_PLAY
+#define KBD_PAGE_FLIP BUTTON_F1
+#define KBD_DONE BUTTON_F2
+#define KBD_ABORT BUTTON_OFF
+#define KBD_BACKSPACE BUTTON_F3
+#elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
+#define KBD_CURSOR_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
+#define KBD_CURSOR_LEFT (BUTTON_MENU | BUTTON_LEFT)
+#define KBD_SELECT (BUTTON_MENU | BUTTON_REL)
+#define KBD_SELECT_PRE BUTTON_MENU
+#define KBD_PAGE_FLIP (BUTTON_MENU | BUTTON_UP)
+#define KBD_DONE (BUTTON_OFF | BUTTON_REL)
+#define KBD_ABORT (BUTTON_OFF | BUTTON_REPEAT)
+#define KBD_BACKSPACE (BUTTON_MENU | BUTTON_DOWN)
+#endif
+
+
 static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
 {
     switch (page) {
@@ -59,7 +79,6 @@ static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
         break;
     }
 }
-#endif
 
 /* helper function to spell a char if voice UI is enabled */
 void kbd_spellchar(char c)
@@ -77,12 +96,6 @@ void kbd_spellchar(char c)
 
 int kbd_input(char* text, int buflen)
 {
-#if CONFIG_KEYPAD != RECORDER_PAD
-    (void)text;
-    (void)buflen;
-    splash(HZ*2, true, "Keyboard not implemented yet");
-    return 0;
-#else
     bool done = false;
     int page = 0;
 
@@ -98,7 +111,7 @@ int kbd_input(char* text, int buflen)
     char outline[256];
     char c = 0;
     struct font* font = font_get(FONT_SYSFIXED);
-    int button;
+    int button, lastbutton = 0;
 
     lcd_setfont(FONT_SYSFIXED);
     font_w = font->maxwidth;
@@ -189,10 +202,11 @@ int kbd_input(char* text, int buflen)
             /* cursor */
             lcd_drawline(curpos, main_y, curpos, main_y + font_h);
             
+#if CONFIG_KEYPAD == RECORDER_PAD
             /* draw the status bar */
             buttonbar_set("Shift", "OK", "Del");
             buttonbar_draw();
-            
+#endif            
             /* highlight the key that has focus */
             lcd_invertrect(font_w * x, 8 + font_h * y, font_w, font_h);
             
@@ -207,14 +221,12 @@ int kbd_input(char* text, int buflen)
         button = button_get_w_tmo(HZ/2);
         switch ( button ) {
 
-            case BUTTON_OFF:
-                /* abort */
+            case KBD_ABORT:
                 lcd_setfont(FONT_UI);
                 return -1;
                 break;
 
-            case BUTTON_F1:
-                /* Page */
+            case KBD_PAGE_FLIP:
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
                 kbd_setupkeys(line, page);
@@ -257,9 +269,8 @@ int kbd_input(char* text, int buflen)
                 kbd_spellchar(line[y][x]);
                 break;
 
-            case BUTTON_F3:
-            case BUTTON_F3 | BUTTON_REPEAT:
-                /* backspace */
+            case KBD_BACKSPACE:
+            case KBD_BACKSPACE | BUTTON_REPEAT:
                 if (editpos > 0)
                 {
                     for (i = editpos; i <= (len - 1);i++)
@@ -273,13 +284,17 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-            case BUTTON_F2:
-                /* F2 accepts what was entered and continues */
+            case KBD_DONE:
+                /* accepts what was entered and continues */
                 done = true;
                 break;
 
-            case BUTTON_PLAY:
-                /* PLAY inserts the selected char */
+            case KBD_SELECT:
+                /* inserts the selected char */
+#ifdef KBD_SELECT_PRE
+                if (lastbutton != KBD_SELECT_PRE)
+                    break;
+#endif
                 if (len<buflen)
                 {
                     c = line[y][x];
@@ -300,9 +315,8 @@ int kbd_input(char* text, int buflen)
                     talk_spell(text, false); /* speak revised text */
                 break;
 
-            case BUTTON_ON | BUTTON_RIGHT:
-            case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
-                /* moved cursor right */
+            case KBD_CURSOR_RIGHT:
+            case KBD_CURSOR_RIGHT | BUTTON_REPEAT:
                 editpos++;
                 if (editpos > len)
                     editpos = len;
@@ -310,9 +324,8 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(text[editpos]);
                 break;
 
-            case BUTTON_ON | BUTTON_LEFT:
-            case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
-                /* moved cursor left */
+            case KBD_CURSOR_LEFT:
+            case KBD_CURSOR_LEFT | BUTTON_REPEAT:
                 editpos--;
                 if (editpos < 0)
                     editpos = 0;
@@ -331,9 +344,10 @@ int kbd_input(char* text, int buflen)
                 break;
 
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
     lcd_setfont(FONT_UI);
 
     return 0;
-#endif /* ONDIO */
 }
