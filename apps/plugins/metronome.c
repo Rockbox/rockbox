@@ -18,7 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifndef SIMULATOR 
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+/* only do this for targets with MAS */
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
