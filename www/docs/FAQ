@@ -11,6 +11,17 @@ A. The purpose of this project is to write an Open Source replacement
    firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
 Q. I want to write code for my Archos, how do I proceed?
+A. First make sure to read the file CONTRIBUTING in the firmware directory
+   on Sourceforge.  See http://bjorn.haxx.se/rockbox/firmware/CONTRIBUTING
+   if you do not want to have to wade through the CVS directories.
+
+Q. What exactly is the CONTRIBUTING file? 
+A. Just like the name implies, it lists conventions that the project follows, 
+   and in turn asks you to follow, for the formating of source code in
+   general.
+
+Q. Okay, so I read CONTRIBUTING and although I don't agree with all your 
+   conventions, I am going to be sensible and follow them anyway.  Now what?
 A. Start by reading up on the information about the jukeboxes on our web page.
    Then go into CVS and look at the code we've written. Then take what you
    need and start writing.
