@@ -72,7 +72,6 @@ static unsigned char usb_logo[] = {
 
 void usb_display_info(void)
 {
-    lcd_stop_scroll();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
@@ -132,7 +131,6 @@ int on_screen(void)
             char buf[32];
             int w, h;
 
-            lcd_scroll_pause();
             lcd_clear_display();
             lcd_setfont(FONT_SYSFIXED);
     
@@ -265,7 +263,6 @@ bool f2_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("A",&w,&h);
-    lcd_stop_scroll();
 
     while (!exit) {
         char* ptr=NULL;
@@ -390,7 +387,6 @@ bool f3_screen(void)
     bool exit = false;
     bool used = false;
 
-    lcd_stop_scroll();
     lcd_setfont(FONT_SYSFIXED);
 
     while (!exit) {

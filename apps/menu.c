@@ -134,7 +134,6 @@ static void menu_draw(int m)
     int menu_lines = MENU_LINES;
 #endif
 
-    lcd_scroll_pause();  /* halt scroll first... */
     lcd_clear_display(); /* ...then clean the screen */
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
@@ -289,14 +288,12 @@ bool menu_run(int m)
 #endif
             case BUTTON_PLAY:
                 /* Erase current display state */
-                lcd_scroll_pause(); /* pause is better than stop when
-                                       are gonna clear the screen anyway */
                 lcd_clear_display();
             
                 /* if a child returns that USB was used, 
                    we return immediately */
                 if (menus[m].items[menus[m].cursor].function()) {
-                    lcd_scroll_pause(); /* just in case */
+                    lcd_stop_scroll(); /* just in case */
                     return true;
                 }
             
@@ -311,7 +308,7 @@ bool menu_run(int m)
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
-                lcd_scroll_pause();
+                lcd_stop_scroll();
                 exit = true;
                 break;
 

@@ -636,7 +636,6 @@ static int onplay_screen(char* dir, char* file)
     else
         snprintf(buf, sizeof buf, "%s/%s", dir, file);
 
-    lcd_stop_scroll();
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     {
@@ -770,6 +769,8 @@ static int onplay_screen(char* dir, char* file)
     return false;
 }
 
+
+
 static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 {
     bool exit = false;
@@ -864,6 +865,7 @@ bool dirbrowse(char *root)
     bool reload_root = false;
     int lastfilter = global_settings.dirfilter;
     bool lastsortcase = global_settings.sort_case;
+    int lastdircursor=-1;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     lcd_getstringsize("A", &fw, &fh);
@@ -1275,8 +1277,11 @@ bool dirbrowse(char *root)
 
             /* if MP3 filter is on, cut off the extension */
             if(lasti!=i || restore) {
-                lasti=i;
                 lcd_stop_scroll();
+                if (lastdircursor!=-1)
+                    lcd_puts(LINE_X, lastdircursor, dircache[lasti].name);
+                lasti=i;
+                lastdircursor=dircursor;
                 if (global_settings.dirfilter == SHOW_MUSIC && 
                     (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
                 {

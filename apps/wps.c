@@ -110,7 +110,6 @@ void player_change_volume(int button)
 
 void display_keylock_text(bool locked)
 {
-    lcd_stop_scroll();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -131,7 +130,6 @@ void display_keylock_text(bool locked)
 
 void display_mute_text(bool muted)
 {
-    lcd_stop_scroll();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -158,7 +156,6 @@ static int browse_id3(void)
     bool exit = false;
     char scroll_text[MAX_PATH];
 
-    lcd_stop_scroll();
     lcd_clear_display();
     lcd_puts(0, 0, str(LANG_ID3_INFO));
     lcd_puts(0, 1, str(LANG_ID3_SCREEN));
@@ -167,7 +164,6 @@ static int browse_id3(void)
  
     while (!exit)
     {
-        lcd_stop_scroll();
         lcd_clear_display();
 
         switch (menu_pos)

@@ -458,7 +458,6 @@ bool f2_rec_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("A",&w,&h);
-    lcd_stop_scroll();
 
     while (!exit) {
         char* ptr=NULL;
@@ -573,7 +572,6 @@ bool f3_rec_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("A",&w,&h);
-    lcd_stop_scroll();
 
     while (!exit) {
         char* ptr=NULL;
