@@ -215,18 +215,18 @@ bool settings_parseline(char* line, char** name, char** value)
 
 bool clean_shutdown(void)
 {
-    lcd_clear_display();
-    splash(0, true, str(LANG_SHUTTINGDOWN));
-    mpeg_stop();
-    settings_save();
-    ata_flush();
-    ata_spindown(1);
 #ifndef SIMULATOR
-    while(ata_disk_is_active())
-        sleep(HZ/10);
     if(!charger_inserted())
     {
-       mp3_shutdown();
+        lcd_clear_display();
+        splash(0, true, str(LANG_SHUTTINGDOWN));
+        mpeg_stop();
+        settings_save();
+        ata_flush();
+        ata_spindown(1);
+        while(ata_disk_is_active())
+            sleep(HZ/10);
+        mp3_shutdown();
         power_off();
     }
 #endif
