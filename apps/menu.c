@@ -214,8 +214,10 @@ void menu_exit(int m)
 
 void menu_run(int m)
 {
+#ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
     bool laststate;
+#endif
 #endif
 
     menu_draw(m);
