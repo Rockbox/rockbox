@@ -60,12 +60,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 18
+#define PLUGIN_API_VERSION 19
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 18
+#define PLUGIN_MIN_API_VERSION 19
 
 /* plugin return codes */
 enum plugin_status {
@@ -176,6 +176,9 @@ struct plugin_api {
     size_t (*strlen)(const char *str);
     void*  (*memset)(void *dst, int c, size_t length);
     void*  (*memcpy)(void *out, const void *in, size_t n);
+#ifndef SIMULATOR
+    char *_ctype_;
+#endif
 
     /* sound */
 #ifndef SIMULATOR
@@ -240,6 +243,7 @@ struct plugin_api {
     struct mp3entry* (*mpeg_next_track)(void);
     int (*playlist_amount)(void);
     int (*mpeg_status)(void);
+    bool (*mpeg_has_changed_track)(void);
     
 #ifdef HAVE_LCD_BITMAP
     struct font* (*font_get)(int font);
@@ -267,6 +271,7 @@ struct plugin_api {
 #endif
     int  (*battery_level)(void);
     int  (*set_time)(struct tm *tm);
+    void (*reset_poweroff_timer)(void);
 
     void (*backlight_on)(void);
     void (*backlight_off)(void);
@@ -274,9 +279,6 @@ struct plugin_api {
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_icon)(int icon, bool enable);
 #endif
-
-    void (*reset_poweroff_timer)(void);
-    bool (*mpeg_has_changed_track)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */

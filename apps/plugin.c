@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <atoi.h>
 #include <timefuncs.h>
+#include <ctype.h>
 #include "debug.h"
 #include "button.h"
 #include "lcd.h"
@@ -147,6 +148,9 @@ static struct plugin_api rockbox_api = {
     strlen,
     memset,
     memcpy,
+#ifndef SIMULATOR
+    _ctype_,
+#endif
 
     /* sound */
 #ifndef SIMULATOR
@@ -209,6 +213,7 @@ static struct plugin_api rockbox_api = {
     mpeg_next_track,
     playlist_amount,
     mpeg_status,
+    mpeg_has_changed_track,
 #ifdef HAVE_LCD_BITMAP
     font_get,
 #endif
@@ -230,6 +235,7 @@ static struct plugin_api rockbox_api = {
 #endif
     battery_level,
     set_time,
+    reset_poweroff_timer,
 
     backlight_on,
     backlight_off,
@@ -237,9 +243,6 @@ static struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon,
 #endif
-
-    reset_poweroff_timer,
-    mpeg_has_changed_track,
 };
 
 int plugin_load(char* plugin, void* parameter)
