@@ -232,7 +232,6 @@ void statusbar_icon_volume(int percent)
     else {
         if (last_volume != volume) {
             switch_tick = current_tick + HZ;
-            last_volume = volume;
         }
 
         /* display volume level numerical? */
@@ -258,6 +257,7 @@ void statusbar_icon_volume(int percent)
             }
         }
     }
+    last_volume = volume;
 }
 
 /*
