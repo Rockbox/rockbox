@@ -634,13 +634,11 @@ int create_xing_header(int fd, int startpos, int filesize,
                 filepos += info.frame_size;
             }
 
-            /* Save a header for later use. Yes, we may be passed a header
-               template in the header_template argument, but since we are
-               reading headers from the stream anyway, we might as well
-               use the ones we find. However, we only save one header, and
-               we want to save one in te middle of the stream, just in case
-               the first and the last headers are corrupt. */
-            if(i == 1)
+            /* Save a header for later use if header_template is empty.
+               We only save one header, and we want to save one in the
+               middle of the stream, just in case the first and the last
+               headers are corrupt. */
+            if(!header_template && i == 1)
                 header_template = header;
             
             if(progressfunc)
