@@ -386,14 +386,6 @@ charging problems even with F1, they had to revert to the original
 flash content.
 </p>
 <p>
-For FM and V2, the disk is not shutdown in the Rockbox charging screen.
-For these, we also recommend to charge using the Archos software.
-Because of some disks brief spinup attempt before reaching the charge
-screen, please avoid to discharge your battery flat, else
-it may be too weak to even get there, locking you out and requiring 
-external charging.
-</p>
-<p>
 If the plugin API is changed, new builds may render the plugins
 incompatible. When updating, make sure you grab those too, and rolo
 into the new version before flashing it.
