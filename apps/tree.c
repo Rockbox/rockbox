@@ -34,6 +34,7 @@
 #include "playlist.h"
 #include "menu.h"
 #include "wps.h"
+#include "settings.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -44,13 +45,14 @@
 #define MAX_DIR_LEVELS 10
 
 struct entry {
-  bool file; /* true if file, false if dir */
-  char name[TREE_MAX_FILENAMELEN];
+    bool file; /* true if file, false if dir */
+    char name[TREE_MAX_FILENAMELEN];
 };
 
 static struct entry dircache[MAX_FILES_IN_DIR];
 static struct entry* dircacheptr[MAX_FILES_IN_DIR];
 static int filesindir;
+static char lastdir[256] = {0};
 
 void browse_root(void)
 {
@@ -109,8 +111,6 @@ static int compare(const void* e1, const void* e2)
 
 static int showdir(char *path, int start)
 {
-    static char lastdir[256] = {0};
-
 #ifdef HAVE_LCD_BITMAP
     int icon_type = 0;
 #endif
@@ -123,6 +123,7 @@ static int showdir(char *path, int start)
             return -1; /* not a directory */
         memset(dircacheptr,0,sizeof(dircacheptr));
         for ( i=0; i<MAX_FILES_IN_DIR; i++ ) {
+            int len;
             struct dirent *entry = readdir(dir);
             if (!entry)
                 break;
@@ -132,6 +133,18 @@ static int showdir(char *path, int start)
                 continue;
             }
             dircache[i].file = !(entry->attribute & ATTR_DIRECTORY);
+
+            /* show only dir/m3u/mp3 ? */
+            len = strlen(entry->d_name);
+            if ( global_settings.mp3filter &&
+                 dircache[i].file &&
+                 (len > 4) &&
+                 (strcasecmp(&entry->d_name[len-4], ".m3u") &&
+                  strcasecmp(&entry->d_name[len-4], ".mp3"))) {
+                i--;
+                continue;
+            }
+
             strncpy(dircache[i].name,entry->d_name,TREE_MAX_FILENAMELEN);
             dircache[i].name[TREE_MAX_FILENAMELEN-1]=0;
             dircacheptr[i] = &dircache[i];
@@ -362,11 +375,16 @@ bool dirbrowse(char *root)
                 }
                 break;
 
-            case TREE_MENU:
+            case TREE_MENU: {
+                bool lastfilter = global_settings.mp3filter;
                 lcd_stop_scroll();
                 main_menu();
+                /* do we need to rescan dir? */
+                if ( lastfilter != global_settings.mp3filter )
+                    lastdir[0] = 0;
                 restore = true;
                 break;
+            }
 
             case BUTTON_ON:
                 if ( play_mode ) {

@@ -75,6 +75,8 @@ void reset_settings( struct user_settings *settings ) {
     settings->poweroff    = DEFAULT_POWEROFF_SETTING;
     settings->backlight   = DEFAULT_BACKLIGHT_SETTING;
     settings->wps_display = DEFAULT_WPS_DISPLAY;
+    settings->mp3filter   = true;
+    settings->playlist_shuffle = false;
 }
 
 
