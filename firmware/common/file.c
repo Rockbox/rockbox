@@ -409,7 +409,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
     if (count && file->dirty) {
         rc = flush_cache(fd);
         if (rc < 0)
-            return rc * 10 - 3;
+            return nread ? nread : rc * 10 - 3;
     }
 
     /* read whole sectors right into the supplied buffer */
@@ -420,7 +420,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
-            return rc * 10 - 4;
+            return nread ? nread : rc * 10 - 4;
         }
         else {
             if ( rc > 0 ) {
@@ -452,7 +452,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("Failed writing\n");
                     errno = EIO;
-                    return rc * 10 - 5;
+                    return nread ? nread : rc * 10 - 5;
                 }
                 /* seek back one sector to put file position right */
                 rc = fat_seek(&(file->fatfile), 
@@ -461,7 +461,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
                     errno = EIO;
-                    return rc * 10 - 6;
+                    return nread ? nread : rc * 10 - 6;
                 }
             }
             memcpy( file->cache, buf + nread, count );
@@ -472,7 +472,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
             if (rc < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
-                return rc * 10 - 7;
+                return nread ? nread : rc * 10 - 7;
             }
             memcpy( buf + nread, file->cache, count );
         }
