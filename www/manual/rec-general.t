@@ -1,4 +1,4 @@
-#define _PAGE_ Rockbox Sound Settings
+#define _PAGE_ Rockbox General Settings
 #include "head.t"
 #include "manual.t"
 The general settings menu offers:
