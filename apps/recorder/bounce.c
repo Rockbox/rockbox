@@ -20,7 +20,7 @@
 #include "config.h"
 #include "options.h"
 
-#ifdef USE_SCREENSAVERS
+#ifdef USE_DEMOS
 
 #include "lcd.h"
 #include "button.h"

@@ -45,9 +45,9 @@
 #include "games_menu.h"
 #endif /* End USE_GAMES */
 
-#ifdef USE_SCREENSAVERS
-#include "screensavers_menu.h"
-#endif /* End USE_SCREENSAVERS */
+#ifdef USE_DEMOS
+#include "demo_menu.h"
+#endif /* End USE_DEMOS */
 
 #endif /* End HAVE_LCD_BITMAP */
 
@@ -211,9 +211,9 @@ Menu main_menu(void)
 #ifdef USE_GAMES
         { "Games",              games_menu        },
 #endif
-#ifdef USE_SCREENSAVERS
-        { "Screensavers",       screensavers_menu },
-#endif /* end USE_SCREENSAVERS */
+#ifdef USE_DEMOS
+        { "Demos",              demo_menu },
+#endif /* end USE_DEMOS */
 #endif
         { "Info",               show_info         },
         { "Version",            show_credits      },

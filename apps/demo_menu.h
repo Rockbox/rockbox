@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Robert E. Hak
+ * Copyright (C) 2002 Robert Hak
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,13 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _DEMOS_MENU_H
+#define _DEMOS_MENU_H
 
-#ifndef __BOXES_H__
-#define __BOXES_H__
+Menu demo_menu(void);
 
-#include "menu.h"
-
-Menu boxes(void);
-
-#endif /* __BOXES_H__ */
+#endif
 

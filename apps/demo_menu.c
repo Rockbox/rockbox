@@ -20,30 +20,28 @@
 #include "options.h"
 
 #ifdef HAVE_LCD_BITMAP
-#ifdef USE_SCREENSAVERS
+#ifdef USE_DEMOS
 
 #include <stdio.h>
 #include <stdbool.h>
 #include "lcd.h"
 #include "menu.h"
-#include "screensavers_menu.h"
+#include "demo_menu.h"
 #include "button.h"
 #include "kernel.h"
 #include "sprintf.h"
 
-#include "boxes.h"
 extern Menu bounce(void);
-extern Menu blank(void);
+extern Menu snow(void);
 
-Menu screensavers_menu(void)
+Menu demo_menu(void)
 {
     int m;
     Menu result;
 
     struct menu_items items[] = {
-        { "Boxes", boxes },
         { "Bounce", bounce },
-        { "Blank", blank },
+        { "Snow", snow },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
