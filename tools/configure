@@ -74,6 +74,7 @@ sed > Makefile \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@TARGET@,${target},g" \
+ -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@SIMVER@,${simver},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
@@ -93,6 +94,7 @@ export SIMVER=@SIMVER@
 export TARGET=@TARGET@
 export LANGUAGE=@LANGUAGE@
 export VERSION=\$(shell date +%y%m%d-%H%M)
+export ENABLEDPLUGINS=@PLUGINS@
 
 .PHONY: 
 

@@ -135,9 +135,9 @@ SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
-ifneq ($(ISONDIO),ONDIO)
-ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
-PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
+ifdef ENABLEDPLUGINS
+  ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
+  PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
 endif
 
 all: $(TOOLSDIR)/convbdf $(EXEFILE) $(ROCKS)
