@@ -81,8 +81,13 @@ static void scroll_speed(void)
 
 static void wps_set(void)
 {
-    char* names[] = { "Id3  ", "File ", "Parse" };
+#ifdef HAVE_LCD_BITMAP
+    char* names[] = { "ID3 Tags", "File     ", "Parse    " };
     set_option("[WPS display]", &global_settings.wps_display, names, 3 );
+#else
+    char* names[] = { "1 Line ID3", "2 Line ID3", "File      ", "Parse     " };
+    set_option("[WPS display]", &global_settings.wps_display, names, 4 );
+#endif
 }
 
 #ifdef HAVE_CHARGE_CTRL
