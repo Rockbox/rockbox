@@ -81,7 +81,7 @@ id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "Mélange en Cours..."
+new: "Mélange en cours..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
@@ -117,7 +117,7 @@ id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "Pas de partitions?"
+new: "Pas de partition?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -2776,8 +2776,8 @@ new: "Freq. centrale MDB"
 id: LANG_MDB_SHAPE
 desc: in sound settings
 eng: "MDB Shape"
-voice: "Modéle MDB"
-new: "Modéle MDB"
+voice: "Modèle MDB"
+new: "Modèle MDB"
 
 id: LANG_MDB_ENABLE
 desc: in sound settings
