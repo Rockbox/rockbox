@@ -66,8 +66,6 @@ extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
 
 extern const unsigned char rockbox112x37[];
 
-extern const unsigned char slider_bar[];
-
 #define STATUSBAR_X_POS       0
 #define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */
 #define STATUSBAR_HEIGHT      8
