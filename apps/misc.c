@@ -21,6 +21,9 @@
 #include "file.h"
 #include "lcd.h"
 #include "sprintf.h"
+#include "errno.h"
+#include "system.h"
+
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
 
@@ -47,6 +50,42 @@ char *num2max5(unsigned int bytes, char *max5)
     }
     snprintf(max5, 6, "%4dM", bytes/ONE_MEGABYTE);
     return max5;
+}
+
+/* Read (up to) a line of text from fd into buffer and return number of bytes
+ * read (which may be larger than the number of bytes stored in buffer). If 
+ * an error occurs, -1 is returned (and buffer contains whatever could be 
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are 
+ * stored in buffer.
+ */
+int read_line(int fd, char* buffer, int buffer_size)
+{
+    int count = 0;
+    int num_read = 0;
+    
+    errno = 0;
+
+    while (count < buffer_size)
+    {
+        unsigned char c;
+
+        if (1 != read(fd, &c, 1))
+            break;
+        
+        num_read++;
+            
+        if ( c == '\n' )
+            break;
+
+        if ( c == '\r' )
+            continue;
+
+        buffer[count++] = c;
+    }
+
+    buffer[MIN(count, buffer_size - 1)] = 0;
+
+    return errno ? -1 : num_read;
 }
 
 #ifdef TEST_MAX5

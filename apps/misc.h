@@ -22,3 +22,11 @@
    Make sure to have space for 6 bytes in the buffer. 5 letters plus the
    terminating zero byte. */
 char *num2max5(unsigned int bytes, char *max5);
+
+/* Read (up to) a line of text from fd into buffer and return number of bytes
+ * read (which may be larger than the number of bytes stored in buffer). If 
+ * an error occurs, -1 is returned (and buffer contains whatever could be 
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are 
+ * stored in buffer.
+ */
+int read_line(int fd, char* buffer, int buffer_size);
