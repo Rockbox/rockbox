@@ -8,6 +8,8 @@
 # $Id$
 #
 
+# global CC options for all platforms
+CCOPTS="-W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
 #
 # Begin Function Definitions
@@ -23,6 +25,7 @@ shcc () {
  AR=sh-elf-ar
  AS=sh-elf-as
  OC=sh-elf-objcopy
+ GCCOPTS="$CCOPTS -m1"
 }
 
 coldfirecc () {
@@ -31,6 +34,7 @@ coldfirecc () {
  AR=m68k-elf-ar
  AS=m68k-elf-as
  OC=m68k-elf-objcopy
+ GCCOPTS="$CCOPTS -m5200"
 }
 
 whichsim () {
@@ -376,10 +380,12 @@ if [ -z "$debug" ]; then
     [Dd])
       debug="1"
       echo "Debug build selected"
+      GCCOPTS="$GCCOPTS -g -DDEBUG"
       ;;
     *)
       debug=""
       echo "Normal build selected"
+      GCCOPTS="$GCCOPTS -fomit-frame-pointer -fschedule-insns"
       ;;
 
   esac
@@ -424,6 +430,7 @@ sed > Makefile \
  -e "s,@APPEXTRA@,${appextra},g" \
  -e "s,@ARCHOSROM@,${archosrom},g" \
  -e "s,@PLUGINS@,${plugins},g" \
+ -e "s,@GCCOPTS@,${GCCOPTS},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
@@ -449,6 +456,7 @@ export LD=@LD@
 export AR=@AR@
 export AS=@AS@
 export OC=@OC@
+export GCCOPTS=@GCCOPTS@
 
 .PHONY: all clean tags zip
 
