@@ -48,6 +48,10 @@
 <input type=hidden name=as_sitesearch value="rockbox.haxx.se">
 </form>
 <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+
+<p class=menutext>Bandwidth and server sponsored by:<br>
+<a href="http://www.contactor.se"><img border=0 src="cont.png" width=101 height=36></a>
+
 </div>
 
 </td>
