@@ -17,6 +17,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-12-23</i>: Rockbox v2.4 is <a href="download/">released</a>.
+
 <p><i>2004-12-17</i>: Rockbox started from <a href="/twiki/bin/view/Main/FlashingRockbox">flash ROM</a> finally available for players.
 
 <p><i>2004-12-16</i>: The <a href="/twiki/bin/view/Main/RockboxManual">Rockbox 2.3 manual</a> is out. Thanks go to Christi Alice Scarborough for her outstanding work!
