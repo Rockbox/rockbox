@@ -28,4 +28,8 @@ bool f2_screen(void);
 bool f3_screen(void);
 #endif
 
+void splash(char *text, /* what to say */
+            int ticks,  /* fow how long */
+            int button);/* what keymask aborts the waiting (if any) */
+
 #endif

@@ -467,3 +467,63 @@ bool f3_screen(void)
     return false;
 }
 #endif
+
+#ifdef HAVE_LCD_BITMAP
+#define SPACE 4 /* pixels between words */
+#else
+#define SPACE 1 /* one letter space */
+#undef LCD_WIDTH
+#define LCD_WIDTH 11
+#undef LCD_HEIGHT
+#define LCD_HEIGHT 2
+#endif
+
+void splash(char *text, /* what to say */
+            int ticks,  /* fow how long */
+            int keymask) /* what keymask aborts the waiting (if any) */
+{
+    char *next;
+    char *store=NULL;
+    int x=0;
+    int y=0;
+    int w, h;
+    lcd_clear_display();
+    
+    next = strtok_r(text, " ", &store);
+    while (next) {
+#ifdef HAVE_LCD_BITMAP
+        lcd_getstringsize(next, &w, &h);
+#else
+        w = strlen(next);
+        h = 1;
+#endif
+        if(x) {
+            if(x+w> LCD_WIDTH) {
+                /* too wide */
+                y+=h;
+                if(y > (LCD_HEIGHT-h))
+                    /* STOP */
+                    break;
+                x=0;
+            }
+        }
+#ifdef HAVE_LCD_BITMAP
+        lcd_putsxy(x, y, next);
+        lcd_update(); /* DURING DEBUG ONLY */
+#else
+        lcd_puts(x, y, next);
+#endif
+        x += w+SPACE; /*  pixels space! */
+        next = strtok_r(NULL, " ", &store);
+    }
+    lcd_update();
+
+    if(ticks) {
+        int done = ticks + current_tick + 1;
+        while (TIME_BEFORE( current_tick, done)) {
+            int button = button_get_w_tmo(ticks);
+            if((button & keymask) == keymask)
+                break;
+        }
+    }
+}
