@@ -496,6 +496,14 @@ static int get_unplayed_space_current_song(void)
     return space;
 }
 
+static int get_unswapped_space(void)
+{
+    int space = mp3buf_write - mp3buf_swapwrite;
+    if (space < 0)
+        space += mp3buflen;
+    return space;
+}
+
 static void init_dma(void)
 {
     SAR3 = (unsigned int) mp3buf + mp3buf_read;
@@ -884,9 +892,7 @@ static void mpeg_thread(void)
                     last_dma_tick = current_tick;
 
                     unplayed_space_left  = get_unplayed_space();
-                    unswapped_space_left = mp3buf_write - mp3buf_swapwrite;
-                    if (unswapped_space_left < 0)
-                        unswapped_space_left += mp3buflen;
+                    unswapped_space_left = get_unswapped_space();
 
                     /* should we start reading more data? */
                     if(!filling && (unplayed_space_left < MPEG_LOW_WATER)) {
@@ -1050,6 +1056,8 @@ static void mpeg_thread(void)
 
                 if(!filling && diffpos >= 0 && diffpos < mp3buflen)
                 {
+                    int unplayed_space_left, unswapped_space_left;
+
                     /* We are changing to a position that's already in
                        memory */
                     mp3buf_read = mp3buf_write - diffpos;
@@ -1058,11 +1066,19 @@ static void mpeg_thread(void)
                         mp3buf_read += mp3buflen;
                     }
 
-                    if (get_unplayed_space() < MPEG_LOW_WATER)
+                    unplayed_space_left  = get_unplayed_space();
+                    unswapped_space_left = get_unswapped_space();
+
+                    if (unplayed_space_left < MPEG_LOW_WATER)
                     {
                         /* We need to load more data before starting */
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);                        
+                        play_pending = true;
+                    }
+                    else if (unswapped_space_left > unplayed_space_left)
+                    {
+                        mp3buf_swapwrite = mp3buf_read;
                         play_pending = true;
                     }
                     else
@@ -1143,14 +1159,11 @@ static void mpeg_thread(void)
             }
 
             case MPEG_SWAP_DATA:
-                free_space_left = mp3buf_write - mp3buf_swapwrite;
+                free_space_left = get_unswapped_space();
 
                 if(free_space_left == 0)
                     break;
                 
-                if(free_space_left < 0)
-                    free_space_left = mp3buflen + free_space_left;
-
                 amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
                 if(mp3buf_write < mp3buf_swapwrite)
                     amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
