@@ -68,7 +68,7 @@ static void button_tick(void)
     int diff;
     int btn;
 
-#if !defined(HAVE_MMC) && !defined(IRIVER_H100_PAD)
+#if !defined(HAVE_MMC) && (CONFIG_KEYPAD != IRIVER_H100_PAD)
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
