@@ -576,7 +576,7 @@ void DoUserDialog(void)
 	button = rb->button_get(true);
 	button = rb->button_get(true);
 	
-	if (button != BUTTON_F2)
+	if (rc != eOK || button != BUTTON_F2)
 	{
 		return;
 	}
