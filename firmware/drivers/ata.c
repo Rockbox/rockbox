@@ -31,9 +31,9 @@
 #include "hwcompat.h"
 
 /* use plain C code in copy_read_sectors(), instead of tweaked assembler */
-#define PREFER_C /* mystery: assembler caused problems with some disks */
+#define PREFER_C
 /* use plain C code in copy_write_sectors(), instead of tweaked assembler */
-#define PREFER_C_WRITING /* we don't know yet about this one */
+#define PREFER_C_WRITING
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -184,7 +184,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         unsigned char* bufend = buf + wordcount*2;
         do
         {   /* loop compiles to 9 assembler instructions */
-            /* takes 13 clock cycles because of 2 pipeline stalls */
+            /* takes 14 clock cycles (2 pipeline stalls, 1 wait) */
             tmp = ATA_DATA;
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
@@ -196,7 +196,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         unsigned short* wbufend = wbuf + wordcount;
         do
         {   /* loop compiles to 7 assembler instructions */
-            /* takes 11 clock cycles because of 2 pipeline stalls */
+            /* takes 12 clock cycles (2 pipeline stalls, 1 wait) */
             *wbuf = SWAB16(ATA_DATA);
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
@@ -247,8 +247,8 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "or      r2,r0       \n"  /* combine with high byte of third word */
         "mov.w   r0,@(2,%0)  \n"  /* store at buf[2] */
         "bt      .loop4_b    \n"
-        /* 24 instructions for 4 copies, takes 26 clock cycles */
-        /* avg. 6.5 cycles per word - 100% faster */
+        /* 24 instructions for 4 copies, takes 30 clock cycles (4 wait) */
+        /* avg. 7.5 cycles per word - 86% faster */
 
         "swap.b  r1,r0       \n"  /* get high byte of last word */
         "bra     .exit       \n"
@@ -280,8 +280,8 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "swap.b  r2,r0       \n"  /* swap third word */
         "mov.w   r0,@(2,%0)  \n"  /* store third word */
         "bt      .loop4_w    \n"
-        /* 16 instructions for 4 copies, takes 18 clock cycles */
-        /* avg. 4.5 cycles per word - 144% faster */
+        /* 16 instructions for 4 copies, takes 22 clock cycles (4 wait) */
+        /* avg. 5.5 cycles per word - 118% faster */
 
         "swap.b  r1,r0       \n"  /* swap fourth word (last round) */
         "mov.w   r0,@(4,%0)  \n"  /* and store it */
@@ -460,9 +460,9 @@ static void copy_write_sectors(unsigned char* buf, int wordcount)
         unsigned short tmp = 0;
         unsigned char* bufend = buf + wordcount*2;
         do
-        {   /* loop compiles to 8 assembler instructions */
-            /* takes 12 clock cycles because of 2 pipeline stalls */
-            tmp = (unsigned short) *buf++;       
+        {   /* loop compiles to 9 assembler instructions */
+            /* takes 13 clock cycles (2 pipeline stalls) */
+            tmp = (unsigned short) *buf++;
             tmp |= (unsigned short) *buf++ << 8; /* I assume big endian */
             ATA_DATA = tmp;           /* and don't use the SWAB16 macro */
         } while (buf < bufend); /* tail loop is faster */
@@ -472,8 +472,8 @@ static void copy_write_sectors(unsigned char* buf, int wordcount)
         unsigned short* wbuf = (unsigned short*)buf;
         unsigned short* wbufend = wbuf + wordcount;
         do
-        {   /* loop compiles to 5 assembler instructions */
-            /* takes 9 clock cycles because of 2 pipeline stalls */
+        {   /* loop compiles to 6 assembler instructions */
+            /* takes 10 clock cycles (2 pipeline stalls) */
             ATA_DATA = SWAB16(*wbuf);
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
@@ -520,7 +520,7 @@ static void copy_write_sectors(unsigned char* buf, int wordcount)
         "mov.w   r3,@%2      \n"  /* write that */
         "bt      .w_loop2_b  \n"
         /* 12 instructions for 2 copies, takes 14 clock cycles */
-        /* avg. 7 cycles per word - 71% faster */
+        /* avg. 7 cycles per word - 85% faster */
 
         /* the loop "overreads" 1 byte past the buffer end, however, the last */
         /* byte is not written to disk */
@@ -547,7 +547,7 @@ static void copy_write_sectors(unsigned char* buf, int wordcount)
         "mov.w   r0,@%2      \n"  /* write first word */
         "bt      .w_loop2_w  \n"
         /* 8 instructions for 2 copies, takes 10 clock cycles */
-        /* avg. 5 cycles per word - 80% faster */
+        /* avg. 5 cycles per word - 100% faster */
 
         "swap.b  r1,r0       \n"  /* swap second word (last round) */
         "mov.w   r0,@%2      \n"  /* and write it */
@@ -1040,7 +1040,7 @@ static int set_features(void)
         unsigned char subcommand;
         unsigned char parameter;
     } features[] = {
-        { 83, 3, 0x05, 1 },    /* power management: lowest power */
+        { 83, 3, 0x05, 0x80 }, /* power management: lowest power without standby */
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
         { 83, 14, 0x03, 0 },   /* force PIO mode */
