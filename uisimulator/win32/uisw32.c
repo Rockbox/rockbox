@@ -51,7 +51,6 @@ LRESULT GUIWndProc (
                     )
 {
     static HBITMAP hBkgnd;
-    static lpBmp [UI_WIDTH * UI_HEIGHT * 3];
     static HDC hMemDc;
 
     switch (uMsg)
@@ -290,6 +289,12 @@ int WINAPI WinMain (
                     )
 {
     DWORD           dwThreadID;
+
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmd;
+    (void)nShowCmd;
+
     if (!GUIStartup ())
         return 0;
 

@@ -36,6 +36,9 @@ int create_thread(void* fp, void* sp, int stk_size)
 {
     DWORD dwThreadID;
 
+    (void)sp;
+    (void)stk_size;
+
     if (nThreads == 256)
         return -1;
 

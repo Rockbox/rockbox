@@ -32,11 +32,15 @@ char                bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 
 BITMAPINFO2 bmi =
 {
-	sizeof (BITMAPINFOHEADER),
-	LCD_WIDTH, -LCD_HEIGHT, 1, 8,
-	BI_RGB, 0, 0, 0, 2, 2,
-	UI_LCD_BGCOLOR, 0, // green background color
-	UI_LCD_BLACK, 0 // black color
+  {sizeof (BITMAPINFOHEADER),
+   LCD_WIDTH, -LCD_HEIGHT, 1, 8,
+   BI_RGB, 0, 0, 0, 2, 2,
+  },
+  {
+    {UI_LCD_BGCOLOR, 0}, // green background color
+    {UI_LCD_BLACK, 0} // black color
+  }
+  
 }; // bitmap information
 
 
