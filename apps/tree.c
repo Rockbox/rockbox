@@ -185,7 +185,7 @@ static int start=0;
 static int dirpos[MAX_DIR_LEVELS];
 static int cursorpos[MAX_DIR_LEVELS];
 static int dirlevel=0;
-static int playing = 0;
+static int play_mode = 0;
 static char currdir[255];
 
 /* QUICK HACK! this should be handled by the playlist code later */
@@ -193,12 +193,7 @@ char* peek_next_track(int steps)
 {
     static char buf[256];
 
-    /* next-song only works when playing */
-    if (!playing)
-        return NULL;
-
-    switch(playing) {
-        default:
+    switch(play_mode) {
         case 1:
             /* play-full-dir mode */
       
@@ -264,6 +259,7 @@ bool dirbrowse(char *root)
 
         switch(button) {
             case TREE_EXIT:
+                play_mode = 0;
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -285,7 +281,6 @@ bool dirbrowse(char *root)
                 }
                 else
                     mpeg_stop();
-
                 break;
 
             case TREE_ENTER:
@@ -303,6 +298,8 @@ bool dirbrowse(char *root)
                 }
 
                 if (!dircacheptr[dircursor+start]->file) {
+                    if ( play_mode == 1 )
+                        play_mode = 0;
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                       dirpos[dirlevel] = start;
@@ -318,16 +315,15 @@ bool dirbrowse(char *root)
                        !strcasecmp(&dircacheptr[dircursor+start]->name[len-4],
                                ".m3u")) 
                     {
-                        playing = 2;
+                        play_mode = 2;
                         play_list(currdir, dircacheptr[dircursor+start]->name);
                     }
                     
                     else {
-                        playing = 1;
+                        play_mode = 1;
                         mpeg_play(buf);
                         lcd_stop_scroll();
                         wps_show();
-                        playing = 0;
                     }
                 }
                 restore = true;
@@ -371,9 +367,11 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_ON:
-                lcd_stop_scroll();
-                wps_show();
-                restore = true;
+                if ( play_mode ) {
+                    lcd_stop_scroll();
+                    wps_show();
+                    restore = true;
+                }
                 break;
 
         }
