@@ -25,26 +25,34 @@
 #include "kernel.h"
 #include "button.h"
 #include "tree.h"
+#include "panic.h"
+#include "menu.h"
 
+void app_main(void)
+{
+    show_splash();
+    browse_root();
+}
+
+#ifndef SIMULATOR
 int init(void)
 {
+    int rc;
     debug_init();
     kernel_init();
     set_irq_level(0);
 
-    if(ata_init()) {
-        DEBUGF("*** Warning! The disk is uninitialized\n");
-    }
-    DEBUGF("ATA initialized\n");
+    rc = ata_init();
+    if(rc)
+        panicf("ata: %d",rc);
 
-    if (disk_init()) {
-        DEBUGF("*** Failed reading partitions\n");
-        return -1;
-    }
+    rc = disk_init();
+    if (rc)
+        panicf("disk: %d",rc);
 
-    if(fat_mount(part[0].start)) {
-        DEBUGF("*** Failed mounting fat\n");
-    }
+    rc = fat_mount(part[0].start);
+    if(rc)
+        panicf("mount: %d",rc);
 
     button_init();
 
@@ -54,8 +62,7 @@ int init(void)
 int main(void)
 {
     init();
-
-    browse_root();
+    app_main();
 
     while(1) {
         led(true); sleep(HZ/10);
@@ -63,3 +70,4 @@ int main(void)
     }
     return 0;
 }
+#endif
