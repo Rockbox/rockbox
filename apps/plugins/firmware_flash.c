@@ -608,6 +608,13 @@ void DoUserDialog(char* filename)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
+    /* this can only work if Rockbox runs in DRAM, not flash ROM */
+    if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
+    {   /* we're running from flash */
+        rb->splash(HZ*3, true, "Not from ROM");
+        return; /* exit */
+    }
+
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
@@ -828,6 +835,13 @@ void DoUserDialog(char* filename)
     int memleft;
     tCheckROM result;
     bool is_romless;
+
+    /* this can only work if Rockbox runs in DRAM, not flash ROM */
+    if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
+    {   /* we're running from flash */
+        rb->splash(HZ*3, true, "Not from ROM");
+        return; /* exit */
+    }
 
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))

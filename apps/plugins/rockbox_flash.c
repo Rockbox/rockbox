@@ -603,6 +603,13 @@ void DoUserDialog(char* filename, bool show_greet)
     
     rb->lcd_setfont(FONT_SYSFIXED);
 
+    /* this can only work if Rockbox runs in DRAM, not flash ROM */
+    if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
+    {   /* we're running from flash */
+        rb->splash(HZ*3, true, "Not from ROM");
+        return; /* exit */
+    }
+
     /* "allocate" memory */
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
@@ -800,6 +807,13 @@ void DoUserDialog(char* filename, bool show_greet)
     UINT8* pos;
     int memleft;
     UINT32 crc;
+
+    /* this can only work if Rockbox runs in DRAM, not flash ROM */
+    if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
+    {   /* we're running from flash */
+        rb->splash(HZ*3, true, "Not from ROM");
+        return; /* exit */
+    }
 
     /* "allocate" memory */
     sector = rb->plugin_get_buffer(&memleft);
