@@ -271,7 +271,7 @@ int db_load(struct tree_context* c)
 
         case songs4artist:
             /* 'extra' is offset to the artist, used as filter */
-            offset = songstart;
+            offset = songstart + c->firstpos * (songlen + 12);
             itemcount = songcount;
             stringlen = songlen;
             break;
@@ -507,6 +507,7 @@ int db_enter(struct tree_context* c)
 
         case allsongs:
         case songs4album:
+        case songs4artist:
         case searchsongs:
             c->dirlevel--;
             if (db_play_folder(c) >= 0)
