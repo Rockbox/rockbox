@@ -32,6 +32,7 @@
 #include "ata.h"
 #include "power.h"
 #include "backlight.h"
+#include "powermgmt.h"
 
 struct user_settings global_settings;
 
@@ -57,12 +58,12 @@ offset  abs
 0x0f    0x23    <scroll speed & WPS display byte>
 0x10    0x24    <playlist options byte>
 0x11    0x25    <AVC byte>
-  
+
         <all unused space filled with 0xff>
 
   the geeky but useless statistics part:
 0x24    <total uptime in seconds: 32 bits uint, actually unused for now>
-  
+
 0x2a    <checksum 2 bytes: xor of 0x0-0x29>
 
 Config memory is reset to 0xff and initialized with 'factory defaults' if
@@ -265,7 +266,8 @@ int settings_save( void )
     rtc_config_block[0xe] = (unsigned char)
         ((global_settings.playlist_shuffle & 1) |
          ((global_settings.mp3filter & 1) << 1) |
-         ((global_settings.sort_case & 1) << 2));
+         ((global_settings.sort_case & 1) << 2) |
+         ((global_settings.discharge & 1) << 3));
 
     rtc_config_block[0xf] = (unsigned char)
         ((global_settings.scroll_speed << 3) |
@@ -332,8 +334,9 @@ void settings_load(void)
             global_settings.playlist_shuffle = rtc_config_block[0xe] & 1;
             global_settings.mp3filter = (rtc_config_block[0xe] >> 1) & 1;
             global_settings.sort_case = (rtc_config_block[0xe] >> 2) & 1;
+            global_settings.discharge = (rtc_config_block[0xe] >> 3) & 1;
         }
-    
+        
         c = rtc_config_block[0xf] >> 3;
         if (c != 31)
             global_settings.scroll_speed = c;
@@ -350,6 +353,9 @@ void settings_load(void)
     }
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_time(global_settings.backlight);
+#ifdef HAVE_CHARGE_CTRL
+    charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+#endif
 }
 
 /*
@@ -373,6 +379,7 @@ void settings_reset(void) {
     global_settings.mp3filter   = true;
     global_settings.sort_case   = false;
     global_settings.playlist_shuffle = false;
+    global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
 }

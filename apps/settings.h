@@ -45,6 +45,7 @@ struct user_settings
     int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
     int poweroff;   /* power off timer:      0-100 0=never:each 1% = 60 secs */
     int backlight;  /* backlight off timer:  0-100 0=never:each 1% = 10 secs */
+    bool discharge; /* maintain charge of at least: false = 90%, true = 10%  */
 
     /* resume settings */
 

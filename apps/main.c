@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "system.h"
 #include "usb.h"
+#include "powermgmt.h"
 #include "adc.h"
 #include "i2c.h"
 #ifndef SIMULATOR
@@ -157,6 +158,8 @@ void init(void)
 
     status_init();
     usb_start_monitoring();
+    
+    power_init();
 }
 
 int main(void)

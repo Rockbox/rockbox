@@ -32,6 +32,7 @@
 #include "settings_menu.h"
 #include "backlight.h"
 #include "playlist.h"  /* for playlist_shuffle */
+#include "powermgmt.h"
 
 static void shuffle(void)
 {
@@ -67,6 +68,14 @@ static void wps_set(void)
     set_option("[WPS display]", &global_settings.wps_display, names, 3 );
 }
 
+#ifdef HAVE_CHARGE_CTRL
+static void deep_discharge(void)
+{
+    set_bool( "[Deep discharge]", &global_settings.discharge );
+    charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+}
+#endif
+
 void settings_menu(void)
 {
     int m;
@@ -76,7 +85,10 @@ void settings_menu(void)
         { "Sort mode",       sort_case       },
         { "Backlight Timer", backlight_timer },
         { "Scroll speed",    scroll_speed    },  
-        { "While Playing",   wps_set },
+        { "While Playing",   wps_set         },
+#ifdef HAVE_CHARGE_CTRL
+        { "Deep discharge",  deep_discharge  },
+#endif
     };
     bool old_shuffle = global_settings.playlist_shuffle;
     
