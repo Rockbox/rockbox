@@ -47,5 +47,7 @@ int menu_count(int menu);
 bool menu_moveup(int menu);
 bool menu_movedown(int menu);
 void menu_draw(int menu);
+void menu_insert(int menu, int position, char *desc, int voice_id,
+                 bool (*function) (void));
 
 #endif /* End __MENU_H__ */

@@ -440,6 +440,27 @@ void menu_delete(int menu, int position)
         menus[menu].cursor = menus[menu].itemcount - 1;
 }
 
+void menu_insert(int menu, int position, char *desc, int voice_id,
+                 bool (*function) (void))
+{
+    int i;
+
+    if(position < 0)
+       position = menus[menu].itemcount;
+
+    /* Move the items below one position forward */
+    for( i = menus[menu].itemcount; i > position; i--)
+       menus[menu].items[i] = menus[menu].items[i - 1];
+
+    /* Increase the count */
+    menus[menu].itemcount++;
+    
+    /* Update the current item */
+    menus[menu].items[position].desc = desc;
+    menus[menu].items[position].voice_id = voice_id;
+    menus[menu].items[position].function = function;
+}
+
 /*  
  *  Property function - return the "count" of menu items in "menu" 
  */
