@@ -406,8 +406,15 @@ int main(int argc, char **argv)
 
    if (!id)
    {
-      id = strdup(bmp_filename);
-      for (i = 0; id[i]; i++) if (id[i] == '.') id[i] = '\0';
+       char *ptr=strrchr(bmp_filename, '/');
+       if(ptr)
+           ptr++;
+       else
+           ptr = bmp_filename;
+       id = strdup(ptr);
+       for (i = 0; id[i]; i++)
+           if (id[i] == '.')
+               id[i] = '\0';
    }
 
    if (read_bmp_file(bmp_filename, &width, &height, &bitmap))
