@@ -43,60 +43,15 @@
 
 #include "version.h"
 
-#include "sh7034.h"
 #include "sprintf.h"
 
 char appsversion[]=APPSVERSION;
 
 void init(void);
 
-#ifndef SIMULATOR
-/* Test code!!! */
-void dbg_ports(void)
-{
-    unsigned short porta;
-    unsigned short portb;
-    unsigned char portc;
-    char buf[32];
-
-    lcd_clear_display();
-
-    while(1)
-    {
-	porta = PADR;
-	portb = PBDR;
-	portc = PCDR;
-
-	snprintf(buf, 32, "PADR: %04x", porta);
-	lcd_puts(0, 0, buf);
-	snprintf(buf, 32, "PBDR: %04x", portb);
-	lcd_puts(0, 1, buf);
-	snprintf(buf, 32, "PCDR: %02x", portc);
-	lcd_puts(0, 2, buf);
-
-	snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
-	lcd_puts(0, 3, buf);
-	snprintf(buf, 32, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
-	lcd_puts(0, 4, buf);
-	snprintf(buf, 32, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
-	lcd_puts(0, 5, buf);
-	snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
-	lcd_puts(0, 6, buf);
-	
-	lcd_update();
-	sleep(HZ/10);
-
-	/* Toggle the charger */
-	if ((portb & PBDR_BTN_ON) == 0)
-	    PBDR ^= 0x20;
-    }
-}
-#endif
-
 void app_main(void)
 {
     init();
-//    dbg_ports();
     browse_root();
 }
 
