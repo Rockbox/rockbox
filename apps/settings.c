@@ -526,58 +526,208 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
-char *dayname[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-char *monthname[]={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-char cursor[][3]={{0, 1, 2}, {3, 1, 2}, {6, 1, 2}, {4, 2, 4}, {9, 2, 3}, {13, 2, 2}};
-char daysinmonth[]={31,28,31,30,31,30,31,31,30,31,30,31};
+char *dayname[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
+                    {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
+char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 void set_time(char* string, int timedate[])
 {
     bool done = false;
     int button;
-    int min=0,steps=0;
-    int cursorpos=0;
-    int lastcursorpos=!cursorpos;
+    int min = 0, steps = 0;
+    int cursorpos = 0;
+    int lastcursorpos = !cursorpos;
     unsigned char buffer[19];
     int realyear;
     int julianday;
     int i;
+#if defined(LOADABLE_FONTS) || defined(LCD_PROPFONTS)
+    unsigned char reffub[5];
+    unsigned int width, height;
+    unsigned int separator_width, weekday_width;
+    unsigned int line_height, prev_line_height;
+#if defined(LOADABLE_FONTS)
+    unsigned char *font = lcd_getcurrentldfont();
+#endif
+#endif
 
     lcd_clear_display();
-    lcd_puts_scroll(0,0,string);
+    lcd_puts_scroll(0, 0, string);
 
     while ( !done ) {
         /* calculate the number of days in febuary */
-        realyear=timedate[3]+2000;
-        if((realyear%4==0 && !(realyear%100 == 0)) || realyear%400 == 0) /* for february depends on year */
-            daysinmonth[1]=29;
+        realyear = timedate[3] + 2000;
+        if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
+            daysinmonth[1] = 29;
         else
-            daysinmonth[1]=28;
+            daysinmonth[1] = 28;
 
         /* fix day if month or year changed */
-        timedate[5]=timedate[5]<daysinmonth[timedate[4]-1]?timedate[5]:daysinmonth[timedate[4]-1];
+        if (timedate[5] > daysinmonth[timedate[4] - 1])
+            timedate[5] = daysinmonth[timedate[4] - 1];
 
         /* calculate day of week */
-        julianday=0;
-        for(i=0;i<timedate[4]-1;i++) {
-           julianday+=daysinmonth[i];
+        julianday = 0;
+        for(i = 0; i < timedate[4] - 1; i++) {
+           julianday += daysinmonth[i];
         }
-        julianday+=timedate[5];
-        timedate[6]=(realyear+julianday+(realyear-1)/4-(realyear-1)/100+(realyear-1)/400+7-1)%7;
+        julianday += timedate[5];
+        timedate[6] = (realyear + julianday + (realyear - 1) / 4 -
+                       (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
-        snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d",
+        snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d ",
                  timedate[0],
                  timedate[1],
                  timedate[2]);
-        lcd_puts(0,1,buffer);
+        lcd_puts(0, 1, buffer);
+#if defined(LCD_PROPFONTS)
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(string, 0, &width, &prev_line_height);
+        lcd_getstringsize(buffer, 0, &width, &line_height);
+        lcd_getstringsize(":", 0, &separator_width, &height);
 
-        snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d",
+        strncpy(reffub, buffer, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[0][INDEX_X] = 0;
+        cursor[0][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[0][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        strncpy(reffub, buffer + 3, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + 1 + separator_width + 1;
+        cursor[1][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[1][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        strncpy(reffub, buffer + 6, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + 1 + separator_width + 1 +
+                             cursor[1][INDEX_WIDTH] + 1 + separator_width + 1;
+        cursor[2][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[2][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        lcd_getstringsize(buffer, 0, &width, &prev_line_height);
+#elif defined(LOADABLE_FONTS)
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(string, font, &width, &prev_line_height);
+        lcd_getstringsize(buffer, font, &width, &line_height);
+        lcd_getstringsize(":", font, &separator_width, &height);
+        
+        strncpy(reffub, buffer, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[0][INDEX_X] = 0;
+        cursor[0][INDEX_Y] = prev_line_height;
+        cursor[0][INDEX_WIDTH] = width;
+
+        strncpy(reffub, buffer + 3, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
+        cursor[1][INDEX_Y] = prev_line_height;
+        cursor[1][INDEX_WIDTH] = width;
+
+        strncpy(reffub, buffer + 6, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
+                             cursor[1][INDEX_WIDTH] + separator_width;
+        cursor[2][INDEX_Y] = prev_line_height;
+        cursor[2][INDEX_WIDTH] = width;
+
+        lcd_getstringsize(buffer, font, &width, &prev_line_height);
+#endif
+
+        snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
                  dayname[timedate[6]],
                  timedate[3],
-                 monthname[timedate[4]-1],
+                 monthname[timedate[4] - 1],
                  timedate[5]);
-        lcd_puts(0,2,buffer);
-        lcd_invertrect(cursor[cursorpos][INDEX_X]*6,cursor[cursorpos][INDEX_Y]*8,cursor[cursorpos][INDEX_WIDTH]*6,8);
+        lcd_puts(0, 2, buffer);
+#if defined(LCD_PROPFONTS)
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(buffer, 0, &width, &line_height);
+        strncpy(reffub, buffer, 3);
+        reffub[3] = '\0';
+        lcd_getstringsize(reffub, 0, &weekday_width, &height);
+        weekday_width += strlen(reffub) - 1;
+        lcd_getstringsize(" ", 0, &separator_width, &height);
+
+        strncpy(reffub, buffer + 4, 4);
+        reffub[4] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[3][INDEX_X] = weekday_width + 1 + separator_width + 1;
+        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[3][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        strncpy(reffub, buffer + 9, 3);
+        reffub[3] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[4][INDEX_X] = weekday_width + 1 + separator_width + 1 +
+                             cursor[3][INDEX_WIDTH] + 1 + separator_width + 1;
+        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[4][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        strncpy(reffub, buffer + 13, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, 0, &width, &height);
+        cursor[5][INDEX_X] = weekday_width + 1 + separator_width + 1 +
+                             cursor[3][INDEX_WIDTH] + 1 + separator_width + 1 +
+                             cursor[4][INDEX_WIDTH] + 1 + separator_width + 1;
+        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[5][INDEX_WIDTH] = width + strlen(reffub) - 1;
+
+        lcd_invertrect(cursor[cursorpos][INDEX_X],
+                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_WIDTH],
+                       line_height);
+#elif defined(LOADABLE_FONTS)
+        /* recalculate the positions and offsets */
+        lcd_getstringsize(buffer, font, &width, &line_height);
+        strncpy(reffub, buffer, 3);
+        reffub[3] = '\0';
+        lcd_getstringsize(reffub, font, &weekday_width, &height);
+        lcd_getstringsize(" ", font, &separator_width, &height);
+
+        strncpy(reffub, buffer + 4, 4);
+        reffub[4] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[3][INDEX_X] = weekday_width + separator_width;
+        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[3][INDEX_WIDTH] = width;
+
+        strncpy(reffub, buffer + 9, 3);
+        reffub[3] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[4][INDEX_X] = weekday_width + separator_width +
+                             cursor[3][INDEX_WIDTH] + separator_width;
+        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[4][INDEX_WIDTH] = width;
+
+        strncpy(reffub, buffer + 13, 2);
+        reffub[2] = '\0';
+        lcd_getstringsize(reffub, font, &width, &height);
+        cursor[5][INDEX_X] = weekday_width + separator_width +
+                             cursor[3][INDEX_WIDTH] + separator_width +
+                             cursor[4][INDEX_WIDTH] + separator_width;
+        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+        cursor[5][INDEX_WIDTH] = width;
+
+        lcd_invertrect(cursor[cursorpos][INDEX_X],
+                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_WIDTH],
+                       line_height);
+#else
+        lcd_invertrect(cursor[cursorpos][INDEX_X],
+                       cursor[cursorpos][INDEX_Y],
+                       cursor[cursorpos][INDEX_WIDTH],
+                       8);
+#endif
         lcd_puts(0,4,"ON  to set");
         lcd_puts(0,5,"OFF to revert");
         lcd_update();
@@ -587,25 +737,25 @@ void set_time(char* string, int timedate[])
             lastcursorpos=cursorpos;
             switch(cursorpos) {
                 case 0: /* hour */
-                    min=0;
-                    steps=24;
+                    min = 0;
+                    steps = 24;
                     break;
                 case 1: /* minute */
                 case 2: /* second */
-                    min=0;
-                    steps=60;
+                    min = 0;
+                    steps = 60;
                     break;
                 case 3: /* year */
-                    min=0;
-                    steps=100;
+                    min = 0;
+                    steps = 100;
                     break;
                 case 4: /* month */
-                    min=1;
-                    steps=12;
+                    min = 1;
+                    steps = 12;
                     break;
                 case 5: /* day */
-                    min=1;
-                    steps=daysinmonth[timedate[4]-1];
+                    min = 1;
+                    steps = daysinmonth[timedate[4] - 1];
                     break;
             }
         }
@@ -613,26 +763,29 @@ void set_time(char* string, int timedate[])
         button = button_get(true);
         switch ( button ) {
             case BUTTON_LEFT:
-                cursorpos=(cursorpos+6-1)%6;
+                cursorpos = (cursorpos + 6 - 1) % 6;
                 break;
             case BUTTON_RIGHT:
-                cursorpos=(cursorpos+6+1)%6;
+                cursorpos = (cursorpos + 6 + 1) % 6;
                 break;
             case BUTTON_UP:
-                timedate[cursorpos]=(timedate[cursorpos]+steps-min+1)%steps+min;
-                if(timedate[cursorpos] == 0) timedate[cursorpos]+=min;
+                timedate[cursorpos] = (timedate[cursorpos] + steps - min + 1) % steps + min;
+                if(timedate[cursorpos] == 0)
+                    timedate[cursorpos] += min;
                 break;
             case BUTTON_DOWN:
-                timedate[cursorpos]=(timedate[cursorpos]+steps-min-1)%steps+min;
-                if(timedate[cursorpos] == 0) timedate[cursorpos]+=min;
+                timedate[cursorpos]=(timedate[cursorpos]+steps - min - 1) % steps + min;
+                if(timedate[cursorpos] == 0)
+                    timedate[cursorpos] += min;
                 break;
             case BUTTON_ON:
-                done=true;
-                if (timedate[6] == 0) timedate[6]=7; /* rtc needs 1 .. 7 */
+                done = true;
+                if (timedate[6] == 0) /* rtc needs 1 .. 7 */
+                    timedate[6] = 7;
                 break;
             case BUTTON_OFF:
-                done=true;
-                timedate[0]=-1;
+                done = true;
+                timedate[0] = -1;
                 break;
             default:
                 break;

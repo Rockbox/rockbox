@@ -121,4 +121,8 @@ extern void lcd_setldfont(unsigned char* f);
 extern unsigned char* lcd_getcurrentldfont(void);
 #endif
 
+#ifdef LCD_PROPFONTS
+extern int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h);
+#endif
+
 #endif /* __LCD_H__ */
