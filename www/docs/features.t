@@ -137,7 +137,7 @@ TD Soon ETD
 NO
 EFEAT
 
-NAME Hight Resolution Volume Control ENAME
+NAME High Resolution Volume Control ENAME
 YES
 NO
 EFEAT
