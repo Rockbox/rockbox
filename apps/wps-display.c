@@ -913,11 +913,10 @@ bool wps_refresh(struct mp3entry* id3,
 #ifdef HAVE_LCD_BITMAP
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                int percent=
-                    id3->length?
-                    (id3->elapsed + ff_rewind_count) * 100 / id3->length:0;
-                scrollbar(0, i*h + offset + 1, LCD_WIDTH, 6, 100, 0,
-                          percent, HORIZONTAL);
+                scrollbar(0, i*h + offset + 1, LCD_WIDTH, 6,
+                          id3->length?id3->length:1, 0,
+                          id3->length?id3->elapsed + ff_rewind_count:0,
+                          HORIZONTAL);
                 update_line = true;
             }
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
