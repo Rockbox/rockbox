@@ -262,7 +262,6 @@ unsigned int rec_timesplit_seconds(void);
 extern struct user_settings global_settings;
 /* name of directory where configuration, fonts and other data
  * files are stored */
-extern char rockboxdir[];
 extern long lasttime;
 
 /* Recording base directory */

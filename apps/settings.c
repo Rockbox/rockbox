@@ -67,7 +67,6 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
-char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
@@ -152,7 +151,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 /* the part of the settings which ends up in the RTC RAM, where available 
    (those we either need early, save frequently, or without spinup) */
-static struct bit_entry rtc_bits[] = 
+static const struct bit_entry rtc_bits[] =
 {
     /* placeholder, containing the size information */
     {9, 0, 0, 0, NULL, NULL }, /* 9 bit to tell how far this is populated */
@@ -231,7 +230,7 @@ static struct bit_entry rtc_bits[] =
 
 
 /* the part of the settings which ends up in HD sector only */
-static struct bit_entry hd_bits[] = 
+static const struct bit_entry hd_bits[] =
 {
     /* This table starts after the 44 RTC bytes = 352 bits. */
     /* Here we need 11 bits to tell how far this is populated. */
