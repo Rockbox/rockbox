@@ -121,15 +121,30 @@ void show_credits(void)
     roll_credits();
 }
 
+/* defined in linker script */
+extern unsigned char mp3buf[];
+extern unsigned char mp3end[];
+
 void show_info(void)
 {
     char s[32];
+    int buflen = ((mp3end - mp3buf) * 100) / 0x100000;
+    int integer, decimal;
     
     lcd_clear_display();
     lcd_puts(0, 0, "Rockbox info:");
     /* TODO: add disk size/usage info, battery charge etc here? */
+
+#ifdef HAVE_RTC
     snprintf(s, sizeof(s), "Booted: %d times", global_settings.total_boots);
     lcd_puts(0, 2, s);
+#endif
+
+    integer = buflen / 100;
+    decimal = buflen % 100;
+    snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
+    lcd_puts(0, 3, s);
+    
     lcd_update();
     
     button_get(true);
