@@ -507,6 +507,7 @@ bool dirbrowse(char *root)
                         play_list(currdir,
                                   dircache[dircursor+start].name, 
                                   0, 0, seed );
+                        start_index = 0;
                     }
                     else {
                         if ( global_settings.resume )
@@ -517,7 +518,7 @@ bool dirbrowse(char *root)
                     }
 
                     if ( global_settings.resume ) {
-                        global_settings.resume_index = 0;
+                        global_settings.resume_index = start_index;
                         global_settings.resume_offset = 0;
                         global_settings.resume_seed = seed;
                         settings_save();
