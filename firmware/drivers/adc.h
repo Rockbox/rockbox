@@ -40,6 +40,8 @@
 #define BATTERY_SCALE_FACTOR 6546
 #endif
 
+#define EXT_SCALE_FACTOR 14800
+
 unsigned short adc_read(int channel);
 void adc_init(void);
 

@@ -22,12 +22,16 @@
 #include "adc.h"
 #include "power.h"
 
+#ifdef HAVE_CHARGE_CTRL
+bool charger_enabled = 0;
+#endif
+
 #ifndef SIMULATOR
 
 bool charger_inserted(void)
 {
 #ifdef ARCHOS_RECORDER
-    return adc_read(ADC_EXT_POWER) > 0x200;
+    return adc_read(ADC_EXT_POWER) > 0x100;
 #else
     return (PADR & 1) == 0;
 #endif
@@ -58,11 +62,14 @@ bool battery_level_safe(void)
 
 void charger_enable(bool on)
 {
-#ifdef ARCHOS_RECORDER
-    if(on)
+#ifdef HAVE_CHARGE_CTRL
+    if(on) {
         PBDR &= ~0x20;
-    else
+        charger_enabled = 1;
+    } else {
         PBDR |= 0x20;
+        charger_enabled = 0;
+    }
 #else
     on = on;
 #endif

@@ -26,6 +26,10 @@
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
 
+#ifdef HAVE_CHARGE_CTRL
+extern bool charger_enabled;
+#endif
+
 bool charger_inserted(void);
 void charger_enable(bool on);
 void ide_power_enable(bool on);
