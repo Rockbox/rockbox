@@ -501,15 +501,19 @@ void view_battery(void)
                 lcd_puts(0, 4, buf);
 #endif                
                 y = ( power_history[POWER_HISTORY_LEN-1] * 100
+                    + power_history[POWER_HISTORY_LEN-2] * 100
+                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD+1] * 100
                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
-                    / CHARGE_END_NEGD;
+                    / CHARGE_END_NEGD / 2;
                 
                 snprintf(buf, 30, "short delta: %d", y);
                 lcd_puts(0, 5, buf);
                 
                 y = ( power_history[POWER_HISTORY_LEN-1] * 100
+                    + power_history[POWER_HISTORY_LEN-2] * 100
+                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD+1] * 100
                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
-                    / CHARGE_END_ZEROD;
+                    / CHARGE_END_ZEROD / 2;
                 
                 snprintf(buf, 30, "long delta: %d", y);
                 lcd_puts(0, 6, buf);
