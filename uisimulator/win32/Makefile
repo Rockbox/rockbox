@@ -81,6 +81,7 @@ else
   CFLAGS += -mwindows
   LDFLAGS += -mwindows
   APPCFLAGS += -mwindows
+  EXTRAFIRMSRC = sprintf.c
 endif
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
@@ -88,7 +89,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
-FIRMSRCS = $(LCDSRSC) id3.c usb.c mpeg.c powermgmt.c power.c
+FIRMSRCS = $(LCDSRSC) id3.c usb.c mpeg.c powermgmt.c power.c $(EXTRAFIRMSRC)
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
@@ -118,7 +119,7 @@ $(OBJDIR)/uisw32-res.o: uisw32.rc
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
-	$(OBJDIR)/sysfont.c
+	$(OBJDIR)/sysfont.c $(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
 
 distclean: clean
