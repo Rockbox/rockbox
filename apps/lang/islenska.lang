@@ -1676,7 +1676,7 @@ new: "AF til að slíta vinnslu"
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
-new: "STOP til að slíta vinnslu"
+new: "STOPP til að hætta vinnslu"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
@@ -1748,3 +1748,400 @@ desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 new: "Bíla tengi stilling"
 
+id: LANG_LINE_IN
+desc:  in settings_menu
+eng: "Line In"
+voice: "Line In"
+new: "Lína inn"
+
+id: LANG_NO_FILES
+desc:  in settings_menu
+eng: "No files"
+voice: ""
+new: "Eingar Skrár"
+
+id: LANG_BUTTONBAR_MENU
+desc:  in button bar
+eng: "Menu"
+voice: ""
+new: "Valmynd"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc:  in button bar
+eng: "Preset"
+voice: ""
+new: "Forstilling"
+
+id: LANG_FM_SAVE_PRESET
+desc:  in radio screen
+eng: "Save preset"
+voice: "Save preset"
+new: "Vista forstillingu"
+
+id: LANG_FM_DELETE_PRESET
+desc:  in radio screen
+eng: "Remove preset"
+voice: "Remove preset"
+new: "Eyða forstillingu"
+
+id: LANG_FM_STATION
+desc:  in radio screen
+eng: "Station: %d.%dMHz"
+voice: ""
+new: "Stöð: %d.%dMHz
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc:  in radio screen
+eng: "Preset save failed"
+voice: ""
+new: "Forstillinga vistun mislukkuð" 
+
+id: LANG_FM_NO_PRESETS
+desc:  in radio screen
+eng: "The preset list is empty"
+voice: "Forstillingarlisti er tómur"
+new: "Forstillingarlisti er tómur"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc:  in radio screen
+eng: "The preset list is full"
+voice: "Forstillingarlisti er fullur"
+new: "Forstillingarlisti er fullur"
+
+id: LANG_FM_RADIO
+desc:  in main menu
+eng: "FM Radio"
+voice: "FM Útvarp"
+new: "FM útvarp"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc:  in main menu
+eng: "Record"
+voice: "Hljóðrita"
+new: "Hljóðrita"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+voice: "View Current Playlist"
+new: "Skoða núgildandi lagalista"
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+voice: "Move"
+new: "Færa"
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+voice: ""
+new: "Færsla mislukkuð"
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+voice: "Upside Down"
+new: "Á hvolf"
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+voice: ""
+new: "Forhljóðritun"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+voice: "Pre-Record time"
+new: "Forhljóðritunar tími"
+
+#Auto bookmark prompts
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+voice: ""
+eng: "Load Last Bookmark?"
+new: "Hlaða síðasta bókamerki?"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+voice: ""
+eng: "Create a Bookmark?"
+new: "Skapa nýtt bókamerki?"
+
+# Bookmark Select Menu Text
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+voice: ""
+new: "Niður = Listi"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+voice: ""
+new: "Af = Hætta"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+voice: ""
+new: "Bókamerki"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+voice: ""
+new: "Vísitala"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+voice: ""
+new: "Tími"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+voice: ""
+new: "Spila = Velja"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+voice: ""
+new: "Á+Spila = Eyða"
+
+# Bookmark creation/failure text
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+voice: ""
+new: "Bókamerki skapað"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+voice: ""
+new: "Bókamerki mislukkað"
+
+# Bookmark creation/failure text
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+voice: ""
+new: "Bókamerki tómt"
+
+# Bookmark Settings Text
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+voice: "Bookmarking"
+new: "Bókamerki"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+voice: "Load Last Bookmark"
+new: "Hlaða síðdasta Bókamerki"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+voice: "Bookmark on Stop"
+new: "Skapa bókamark ef stoppað"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+voice: "Maintain a List of Recent Bookmarks?"
+new: "Halda við lista af nýum Bókamerkjum?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+voice: "Yes - Recent only"
+new: "Já - Bara ný"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+voice: "Ask - Recent only"
+new: "Spyrja - Bara ný"
+
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+voice: "Unique only"
+eng: "Unique only"
+new: "Bara einstæð"
+
+# Main Bookmarks Menu
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+voice: "Bookmarks"
+new: "Bókamerki"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+voice: "Create Bookmark"
+new: "Skapa bókamerki"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+voice: "List Bookmarks"
+new: "Sýna bókamerki"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+voice: "Recent Bookmarks"
+new: "Ný bókamerki"
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+voice: "Rockbox Info"
+new: "Rockbox upplýsingar"
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+voice: "Start Recording"
+new: "Hefja hsljóðritun"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+voice: "Fast forward and Rewind"
+new: "Spóla áfram/aftur á bak
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+voice: "LCD Settings"
+new: "Kristallskjáar stillingar"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+voice: "Status- and Scrollbar"
+new: "Stöðu-/flettistik
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+voice: "Battery"
+new: "Batterí"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+voice: "Disk"
+new: "Diskur"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+voice: "Time and Date"
+new: "Tíminn & dagsetning"
+
+# Limits
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+voice: "Limits"
+new: "Takmörk"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+voice: "Manage Settings"
+new: "Halda við stillingar"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+voice: "Directory"
+new: "Skrá"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+voice: "Current directory"
+new:
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+voice: "Create directory"
+new: "Skapa skrá"
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+voice: "View"
+new: "Skoða"
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+voice: "Show Indices"
+new: "Sýna Vísitölur"
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+voice: "Track Display"
+new: "Laga Skjár"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+voice: "Track name only"
+new: "Bara laga nafn"
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+voice: "Full path"
+new: "fullt skrár nafn"
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+voice: "Remove"
+new: "Eyða"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+voice: "File Options"
+new: "Skráar Stillingar"
+
+id: LANG_BUTTON_BAR
+desc: in settings menu
+eng: "Button bar"
+voice: "Button bar"
+new: "Hnappa stik"
+
+id: LANG_DIRBROWSE_F1
+desc: in dir browser, F1 button bar text
+eng: "Menu"
+voice: ""
+new: "Valmynd"
+
+id: LANG_DIRBROWSE_F2
+desc: in dir browser, F2 button bar text
+eng: "Option"
+voice: ""
+new: "Stilling"
+
+id: LANG_DIRBROWSE_F3
+desc: in dir browser, F3 button bar text
+eng: "LCD"
+voice: ""
+new: "kristalskjár
