@@ -112,6 +112,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 static int build_playlist(int start_index)
 {
     int i;
+    int start=start_index;
 
     playlist_clear();
 
@@ -125,7 +126,7 @@ static int build_playlist(int start_index)
         else
         {
             /* Adjust the start index when se skip non-MP3 entries */
-            if(i < start_index)
+            if(i < start)
                 start_index--;
         }
     }
