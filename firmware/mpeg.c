@@ -2460,7 +2460,7 @@ unsigned long mpeg_num_recorded_bytes(void)
         return 0;
 }
 
-#else /* CONFIG_HWCODEC == MAS3587F */
+#elif CONFIG_HWCODEC == MASNONE
 
 /* dummies coming up */
 
