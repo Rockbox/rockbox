@@ -547,6 +547,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                          (id3->elapsed + ff_rewind_count) / 60000,
                                          (id3->elapsed + ff_rewind_count) % 60000 / 1000);
                                 break;
+                            case 'r': /* Remaining Time in Song */
+                                snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
+                                         (id3->length - (id3->elapsed + ff_rewind_count)) / 60000,
+                                         (id3->length - (id3->elapsed + ff_rewind_count)) % 60000 / 1000);
+                                break;
                             case 't':  /* Total Time */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
                                          id3->length / 60000,
@@ -1019,7 +1024,9 @@ static bool ffwd_rew(int button)
         if (!exit)
             button = button_get(true);
     }
-
+#ifdef CUSTOM_WPS
+    refresh_wps(true);
+#endif
     return usb;
 }
 

@@ -45,6 +45,7 @@ Playlist/Song Info Tags:
   %pp : Playlist Position
   %pe : Playlist Total Entries
   %pc : Current Time In Song
+  %pr : Remaining Time In Song
   %pt : Total Track Time
 Other Tags:
   %% : Displays a %
