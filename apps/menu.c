@@ -57,12 +57,14 @@ static bool inuse[MAX_MENUS] = { false };
 /* count in letter posistions, NOT pixels */
 void put_cursorxy(int x, int y, bool on)
 {
+#ifdef HAVE_LCD_BITMAP
 #ifdef LOADABLE_FONTS
     int fh;
     unsigned char* font = lcd_getcurrentldfont();
     fh = ajf_get_fontheight(font);
 #else 
     int fh = 8;
+#endif
 #endif
 
     /* place the cursor */
