@@ -44,7 +44,7 @@ static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
     case 1:
         line[0] = "abcdefg ¢£¤¥¦§©®¬";
         line[1] = "hijklmn «»°ºª¹²³¶";
-        line[2] = "opqrsty ¯±×÷¡¿µ·¨";
+        line[2] = "opqrstu ¯±×÷¡¿µ·¨";
         line[3] = "vwxyz   ¼½¾      ";
         break;
 
