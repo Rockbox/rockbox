@@ -23,6 +23,8 @@ PLAYDIR = $(APPDIR)/player
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 	MACHINEDIR = $(RECDIR)
+        # not very nice to set RTC like this, but...
+        RTC += -DHAVE_RTC
 else
 	MACHINEDIR = $(PLAYDIR)
 endif
@@ -45,7 +47,7 @@ TARGET = $(OBJDIR)/rockboxui
 LANGUAGE = english
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
-$(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
+$(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES) $(RTC)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 

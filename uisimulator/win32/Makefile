@@ -23,6 +23,8 @@ PLAYDIR = $(APPDIR)/player
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
      MACHINEDIR = $(RECDIR)
+     # not very nice to set RTC like this, but...
+     RTC += -DHAVE_RTC
 else
      MACHINEDIR = $(PLAYDIR)
 endif
@@ -46,7 +48,7 @@ LANGUAGE = english
 TARGET = $(OBJDIR)/uisw32.exe
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
-$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\"
+$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) $(RTC)
 
 LDFLAGS =  -lgdi32 -luser32  -mwindows
 
