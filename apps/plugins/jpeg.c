@@ -1269,13 +1269,18 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
 
 /**************** end grayscale framework ********************/
 
-#define MEMSET(p,v,c) rb->memset(p,v,c) // for portability of below
+/* for portability of below JPEG code */
+#define MEMSET(p,v,c) rb->memset(p,v,c)
 #define INLINE static inline
+#define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
+
+
 
 /**************** begin JPEG code ********************/
 
 /* LUT for IDCT, this could also be used for gamma correction */
-const unsigned char range_limit[1024] = {
+const unsigned char range_limit[1024] = 
+{
     128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
     144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
     160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,
@@ -1663,7 +1668,8 @@ void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
     /* and also undo the PASS1_BITS scaling. */
 
     wsptr = workspace;
-    for (ctr = 0; ctr < 8; ctr++) {
+    for (ctr = 0; ctr < 8; ctr++) 
+    {
         outptr = p_byte + (ctr*skip_line);
         /* Rows of zeroes can be exploited in the same way as we did with columns.
         * However, the column calculation has created many nonzero AC terms, so
@@ -1868,17 +1874,11 @@ struct jpeg
 int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
 {
     unsigned char* p_src = p_bytes;
-    unsigned char* p_temp;
-
     /* write without markers nor stuffing in same buffer */
-    unsigned short* p_dest = (unsigned short*) p_bytes;
+    unsigned char* p_dest;
     int marker_size; /* variable length of marker segment */
     int i, j, n;
-    unsigned char highbyte, lowbyte;
     int ret = 0; /* returned flags */
-
-    /* memory location for later decompress */
-    p_jpeg->p_entropy_data = (unsigned short*)p_bytes;
 
     while (p_src < p_bytes + size)
     {
@@ -2005,6 +2005,8 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
 
         case 0xC4: /* Define Huffman Table(s) */
             {
+                unsigned char* p_temp;
+
                 ret |= DHT;
                 marker_size = *p_src++ << 8; /* Highbyte */
                 marker_size |= *p_src++; /* Lowbyte */
@@ -2019,12 +2021,12 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
                     }
                     if (*p_src++ & 0xF0) /* AC table */
                     {
-                        for (j=0; j<AC_LEN; j++)
+                        for (j=0; j<MIN(AC_LEN, marker_size-3); j++)
                             p_jpeg->hufftable[i].huffmancodes_ac[j] = *p_src++;
                     }
                     else /* DC table */
                     {
-                        for (j=0; j<DC_LEN; j++)
+                        for (j=0; j<MIN(DC_LEN, marker_size-3); j++)
                             p_jpeg->hufftable[i].huffmancodes_dc[j] = *p_src++;
                     }
                 } /* while */
@@ -2129,22 +2131,36 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
         } /* switch */
     } /* while */
 
-    /* undo byte stuffing, endian conversion */
-    /* ToDo: remove restart markers, if present */
+
+    /* memory location for later decompress (16-bit aligned) */
+    p_dest = (unsigned char*)((int)p_bytes + 1 & ~1);
+    p_jpeg->p_entropy_data = (unsigned short*)p_dest;
+
+    
+    /* remove byte stuffing and restart markers, if present */
     while (p_src < p_bytes + size)
     {
-        highbyte = *p_src++;
-        if (highbyte==0xFF && *p_src++) break; /* end on marker */
-        lowbyte = *p_src++;
-        if (lowbyte==0xFF && *p_src++)
+        if ((*p_dest++ = *p_src++) != 0xFF)
+            continue;
+
+        /* 0xFF marker found, have a closer look at the next byte */
+
+        if (*p_src == 0x00)
         {
-            *p_dest++ = highbyte<<8; /* write remaining */
-            break; /* end on marker */
+            p_src++; /* continue reading after marker */
+            continue; /* stuffing byte, a true 0xFF */
         }
-        *p_dest++ = highbyte<<8 | lowbyte;
+        else if (*p_src >= 0xD0 && *p_src <= 0xD7) /* restart marker */
+        {
+            p_src++; /* continue reading after marker */
+            p_dest--; /* roll back, don't copy it */
+            continue; /* ignore */
+        }
+        else
+            break; /* exit on any other marker */
     }
-    MEMSET(p_dest, 0, size-((unsigned char*)p_dest-p_bytes)); /* fill tail with zeros */
-    p_jpeg->words_in_buffer = p_dest-(unsigned short*)p_bytes;
+    MEMSET(p_dest, 0, size - (p_dest - p_bytes)); /* fill tail with zeros */
+    p_jpeg->words_in_buffer = (p_dest - p_bytes) / sizeof(unsigned short);
     return (ret); /* return flags with seen markers */
 }
 
@@ -2292,7 +2308,8 @@ void fix_huff_tbl(int* htbl, struct derived_tbl* dtbl)
  * reference values beyond the end of the array.  To avoid a wild store,
  * we put some extra zeroes after the real entries.
  */
-static const int zag[] = {
+static const int zag[] = 
+{
      0,  1,  8, 16,  9,  2,  3, 10,
     17, 24, 32, 25, 18, 11,  4,  5,
     12, 19, 26, 33, 40, 48, 41, 34,
@@ -2347,7 +2364,8 @@ INLINE void check_bit_buffer(struct bitstream* pb, int nbits)
     if (pb->bits_left < nbits)
     {
         pb->words_left--;
-        pb->get_buffer = (pb->get_buffer << 16) | *pb->next_input_word++;
+        pb->get_buffer = (pb->get_buffer << 16)
+                       | ENDIAN_SWAP16(*pb->next_input_word++);
         pb->bits_left += 16;
     }
 }
@@ -2619,8 +2637,8 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     return 0; /* success */
 }
 
-
 /**************** end JPEG code ********************/
+
 
 
 /**************** begin Application ********************/
