@@ -244,10 +244,69 @@ void charging_display_info(bool animate)
     lcd_update();
 }
 #else /* not HAVE_LCD_BITMAP */
+
+static unsigned char logo_chars[5];
+static const unsigned char logo_pattern[] = {
+    0x07, 0x04, 0x1c, 0x14, 0x1c, 0x04, 0x07, /* char 1 */
+    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, /* char 2 */
+    0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, /* char 3 */
+    0x1f, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1f, /* char 4 */
+};
+
+static void logo_lock_patterns(bool on)
+{
+    int i; 
+
+    if (on)
+    {
+        for (i = 0; i < 4; i++)
+            logo_chars[i] = lcd_get_locked_pattern();
+        logo_chars[4] = '\0';
+    }
+    else
+    {
+        for (i = 0; i < 4; i++)
+            lcd_unlock_pattern(logo_chars[i]);
+    }
+}
+
 void charging_display_info(bool animate)
 {
-    /* ToDo for Player */
-    (void)animate;
+    int battery_voltage;
+    unsigned i, ypos;
+    static unsigned phase = 3;
+    char buf[28];
+
+    battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR)
+                      / 10000;
+    snprintf(buf, sizeof(buf), "%s %d.%02dV", logo_chars,
+             battery_voltage / 100, battery_voltage % 100);
+    lcd_puts(0, 1, buf);
+    
+    memcpy(buf, logo_pattern, 28); /* copy logo patterns */
+
+    if (!animate) /* build the screen */
+    {
+        lcd_double_height(false);
+        lcd_puts(0, 0, "[Charging]");
+    }
+    else          /* animate the logo */
+    {
+        for (i = 3; i < MIN(19, phase); i++)
+        {
+            if ((i - phase) % 5 == 0)
+            {    /* draw a "bubble" here */
+                ypos = (phase + i/5) % 9; /* "bounce" effect */
+                if (ypos > 4)
+                    ypos = 8 - ypos;
+                buf[5 - ypos + 7 * (i/5)] |= 0x10 >> (i%5);
+            }
+        }
+        phase++;
+    }
+    
+    for (i = 0; i < 4; i++)
+        lcd_define_pattern(logo_chars[i], buf + 7 * i);
 }
 #endif
 
@@ -274,13 +333,11 @@ int charging_screen(void)
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     status_draw(true);
 
-#ifdef HAVE_LCD_BITMAP
-    charging_display_info(false);
-#else
-    lcd_double_height(false);
-    lcd_puts(0, 1, "[charging]");
+#ifdef HAVE_LCD_CHARCELLS
+    logo_lock_patterns(true);
 #endif
-    
+    charging_display_info(false);
+
     do
     {
         status_draw(false);
@@ -303,6 +360,9 @@ int charging_screen(void)
         }
     } while (!rc);
 
+#ifdef HAVE_LCD_CHARCELLS
+    logo_lock_patterns(false);
+#endif
     return rc;
 }
 #endif /* HAVE_CHARGING */
