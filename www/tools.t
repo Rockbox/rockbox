@@ -3,6 +3,23 @@
 
 <h2>Descrambler / Scrambler</h2>
 
+<p>The archos.mod file is scrambled, but luckily not using encryption.
+
+<p>Each data byte is inverted and ROLed 1 bit.
+The data is then spread over four memory segments. The two least significant bits of the address is used as segment number and the rest as offset in the segment. So, basically:
+
+<ul>
+<li>segment number = address % 4
+<li>segment offset = address / 4
+<li>segment length = imgsize / 4
+</ul>
+
+<p>A 6-byte header is added to the beginning of the scrambled image:
+<ul>
+<li>32 bit length (big-endian)
+<li>16 bit checksum
+</ul>
+
 <p>I've written a small utility to descramble the firmware files:
 <ul>
 <li><a href="descramble.c">descramble.c</a> - 1835 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.

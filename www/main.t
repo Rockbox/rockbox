@@ -113,9 +113,11 @@ To subscribe, send a message to <a href="mailto:majordomo@cool.haxx.se">majordom
 
 <h2>About the hardware</h2>
 
-<p>I wrote a <a href="/isd200/archos.html">"dissection" page</a> some months ago,
+<p>I wrote a <a href="internals/bjorn.html">"dissection" page</a> some months ago,
 showing the inside of the Archos and listing the main components.
 I have also collected a couple of <a href="docs/">data sheets</a>.
+Also, don't miss the <a href="notes.html">research notes</a>
+from my reverse-engineering the firmware.
 
 <h2>About the software</h2>
 
@@ -124,24 +126,6 @@ The first thing this version does after boot is to look for a file called
 "archos.mod" in the root directory of the harddisk. 
 If it exists, it is loaded into RAM and started.
 This is how firmware upgrades are loaded.
-
-<h3>File format</h3>
-<p>The archos.mod file is scrambled, but luckily not using encryption.
-
-<p>Each data byte is inverted and ROLed 1 bit.
-The data is then spread over four memory segments. The two least significant bits of the address is used as segment number and the rest as offset in the segment. So, basically:
-
-<ul>
-<li>segment number = address % 4
-<li>segment offset = address / 4
-<li>segment length = imgsize / 4
-</ul>
-
-<p>A 6-byte header is added to the beginning of the scrambled image:
-<ul>
-<li>32 bit length (big-endian)
-<li>16 bit checksum
-</ul>
 
 <h2>Dreams</h2>
 <p>Ok, forget about reality, what could we do with this?
