@@ -58,6 +58,10 @@ static void empty_playlist(bool queue_resume)
     int fd;
 
     playlist.filename[0] = '\0';
+    if(-1 != playlist.fd)
+        /* If there is an already open playlist, close it. */
+        close(playlist.fd);
+    playlist.fd = -1;
     playlist.index = 0;
     playlist.queue_index = 0;
     playlist.last_queue_index = 0;
@@ -390,8 +394,8 @@ char* playlist_peek(int steps)
 {
     int seek;
     int max;
-    int fd;
     int i;
+    int fd;
     char *buf;
     char dir_buf[MAX_PATH+1];
     char *dir_end;
@@ -427,13 +431,14 @@ char* playlist_peek(int steps)
         }
         else
         {
-            fd = open(playlist.filename, O_RDONLY);
-            if(-1 != fd)
+            if(-1 == playlist.fd)
+                playlist.fd = open(playlist.filename, O_RDONLY);
+
+            if(-1 != playlist.fd)
             {
                 buf = playlist_buffer;
-                lseek(fd, seek, SEEK_SET);
-                max = read(fd, buf, MAX_PATH);
-                close(fd);
+                lseek(playlist.fd, seek, SEEK_SET);
+                max = read(playlist.fd, buf, MAX_PATH);
             }
             else
                 return NULL;
@@ -642,7 +647,6 @@ int play_list(char *dir,         /* "current directory" */
 void add_indices_to_playlist(void)
 {
     int nread;
-    int fd = -1;
     int i = 0;
     int count = 0;
     unsigned char* buffer = playlist_buffer;
@@ -651,10 +655,11 @@ void add_indices_to_playlist(void)
     unsigned char *p;
 
     if(!playlist.in_ram) {
-        fd = open(playlist.filename, O_RDONLY);
-        if(-1 == fd)
+        if(-1 == playlist.fd)
+            playlist.fd = open(playlist.filename, O_RDONLY);
+        if(-1 == playlist.fd)
             return; /* failure */
-
+        
 #ifndef SIMULATOR
         /* use mp3 buffer for maximum load speed */
         buflen = (&mp3end - &mp3buf[0]);
@@ -671,7 +676,7 @@ void add_indices_to_playlist(void)
         if(playlist.in_ram) {
             nread = playlist_end_pos;
         } else {
-            nread = read(fd, buffer, buflen);
+            nread = read(playlist.fd, buffer, buflen);
             /* Terminate on EOF */
             if(nread <= 0)
                 break;
@@ -696,9 +701,6 @@ void add_indices_to_playlist(void)
                     playlist.indices[ playlist.amount ] = i+count;
                     playlist.amount++;
                     if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
-                        if(!playlist.in_ram)
-                            close(fd);
-
                         lcd_clear_display();
                         lcd_puts(0,0,str(LANG_PLAYINDICES_PLAYLIST));
                         lcd_puts(0,1,str(LANG_PLAYINDICES_BUFFER));
@@ -717,9 +719,6 @@ void add_indices_to_playlist(void)
         if(playlist.in_ram)
             break;
     }
-
-    if(!playlist.in_ram)
-        close(fd);
 }
 
 /*

@@ -29,6 +29,7 @@
 struct playlist_info
 {
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
+    int  fd;             /* file descriptor of the open playlist    */
     int  dirlen;         /* Length of the path to the playlist file */
     int  indices[MAX_PLAYLIST_SIZE]; /* array of indices            */
     int  index;          /* index of current playing track          */
