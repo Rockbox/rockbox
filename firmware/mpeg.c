@@ -1239,7 +1239,7 @@ static bool swap_one_chunk(void)
     else
         amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
                              amount_to_swap);
-                
+
     bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
 
     mp3buf_swapwrite += amount_to_swap;
@@ -1583,7 +1583,7 @@ static void mpeg_thread(void)
                     int unplayed_space_left, unswapped_space_left;
 
                     /* We are changing to a position that's already in
-                       memory */
+                       memory, so we just move the DMA read pointer. */
                     mp3buf_read = mp3buf_write - diffpos;
                     if (mp3buf_read < 0)
                     {
@@ -1593,16 +1593,24 @@ static void mpeg_thread(void)
                     unplayed_space_left  = get_unplayed_space();
                     unswapped_space_left = get_unswapped_space();
 
+                    /* If unswapped_space_left is larger than
+                       unplayed_space_left, it means that the swapwrite pointer
+                       hasn't yet advanced up to the new location of the read
+                       pointer. We just move it, there is no need to swap
+                       data that won't be played anyway. */
+                    
+                    if (unswapped_space_left > unplayed_space_left)
+                    {
+                        DEBUGF("Moved swapwrite\n");
+                        mp3buf_swapwrite = mp3buf_read;
+                        play_pending = true;
+                    }
+
                     if (mpeg_file>=0 && unplayed_space_left < low_watermark)
                     {
                         /* We need to load more data before starting */
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-                        play_pending = true;
-                    }
-                    else if (unswapped_space_left > unplayed_space_left)
-                    {
-                        mp3buf_swapwrite = mp3buf_read;
                         play_pending = true;
                     }
                     else
