@@ -105,7 +105,8 @@ offset  abs
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
-0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3)>
+0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3),
+                 Trickle charge flag (bit 4)>
 0x26    0x40    <runtime low byte>
 0x27    0x41    <runtime high byte>
 0x28    0x42    <topruntime low byte>
@@ -349,7 +350,8 @@ int settings_save( void )
     config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
     config_block[0x25] = (unsigned char)
         ((global_settings.disk_poweroff & 1) |
-         ((global_settings.buffer_margin & 7) << 1));
+         ((global_settings.buffer_margin & 7) << 1) |
+         ((global_settings.trickle_charge & 1) << 4));
 
     {
         static long lasttime = 0;
@@ -461,6 +463,7 @@ void settings_apply(void)
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? 
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+    enable_trickle_charge(global_settings.trickle_charge);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -500,8 +503,6 @@ void settings_apply(void)
                  global_settings.lang_file);
         lang_load(buf);
     }
-
-
 }
 
 /*
@@ -636,6 +637,7 @@ void settings_load(void)
         {
             global_settings.disk_poweroff = config_block[0x25] & 1;
             global_settings.buffer_margin = (config_block[0x25] >> 1) & 7;
+            global_settings.trickle_charge = (config_block[0x25] >> 4) & 1;
         }
 
         if (config_block[0x27] != 0xff)
@@ -829,6 +831,7 @@ void settings_reset(void) {
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
     global_settings.backlight_on_when_charging   = 
         DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
+    global_settings.trickle_charge = true;
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
