@@ -21,24 +21,11 @@
 #define _TIMEFUNCS_H_
 
 #include "config.h"
-
-#ifndef SIMULATOR
-
-struct tm
-{
-    int     tm_sec;         /* seconds */
-    int     tm_min;         /* minutes */
-    int     tm_hour;        /* hours */
-    int     tm_mday;        /* day of the month */
-    int     tm_mon;         /* month */
-    int     tm_year;        /* year since 1900 */
-    int     tm_wday;        /* day of the week */
-    int     tm_yday;        /* day in the year */
-    int     tm_isdst;       /* daylight saving time */
-};
-
-#endif
+#include <stdbool.h>
+#include "time.h"
 
 struct tm *get_time(void);
+int set_time(struct tm *tm);
+bool valid_time(struct tm *tm);
 
 #endif /* _TIMEFUNCS_H_ */

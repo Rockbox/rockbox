@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "lcd.h"
 #include "menu.h"
@@ -41,6 +42,7 @@
 #include "tree.h"
 #include "screens.h"
 #include "talk.h"
+#include "timefuncs.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -685,7 +687,8 @@ static bool trickle_charge(void)
 #ifdef HAVE_RTC
 static bool timedate_set(void)
 {
-    int timedate[7]; /* hour,minute,second,year,month,day,dayofweek */
+    struct tm tm;
+    int timedate[8];
     bool result;
 
     timedate[0] = rtc_read(0x03); /* hour   */
@@ -695,67 +698,27 @@ static bool timedate_set(void)
     timedate[4] = rtc_read(0x06); /* month  */
     timedate[5] = rtc_read(0x05); /* day    */
 
-    /* day of week not read, calculated in set_time() */
-    /* hour   */
-    timedate[0] = ((timedate[0] & 0x30) >> 4) * 10 + (timedate[0] & 0x0f); 
-    /* minute */
-    timedate[1] = ((timedate[1] & 0x70) >> 4) * 10 + (timedate[1] & 0x0f); 
-    /* second */
-    timedate[2] = ((timedate[2] & 0x70) >> 4) * 10 + (timedate[2] & 0x0f); 
-    /* year   */
-    timedate[3] = ((timedate[3] & 0xf0) >> 4) * 10 + (timedate[3] & 0x0f); 
-    /* month  */
-    timedate[4] = ((timedate[4] & 0x10) >> 4) * 10 + (timedate[4] & 0x0f); 
-    /* day    */
-    timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
+    /* Make a local copy of the time struct */
+    memcpy(&tm, get_time(), sizeof(struct tm));
 
     /* do some range checks */
     /* This prevents problems with time/date setting after a power loss */
-    if (timedate[0] < 0 || timedate[0] > 23 ||
-        timedate[1] < 0 || timedate[1] > 59 || 
-        timedate[2] < 0 || timedate[2] > 59 ||
-        timedate[3] < 0 || timedate[3] > 99 ||
-        timedate[4] < 1 || timedate[4] > 12 ||
-        timedate[5] < 1 || timedate[5] > 31)
+    if (!valid_time(&tm))
     {
         /* hour   */
-        timedate[0] = 0;
-        /* minute */
-        timedate[1] = 0;
-        /* second */
-        timedate[2] = 0;
-        /* year   */
-        timedate[3] = 3;
-        /* month  */
-        timedate[4] = 1;
-        /* day    */
-        timedate[5] = 1;
+        tm.tm_hour = 0;
+        tm.tm_min = 0;
+        tm.tm_sec = 0;
+        tm.tm_mday = 1;
+        tm.tm_mon = 0;
+        tm.tm_wday = 1;
+        tm.tm_year = 100;
     }
 
-    result = set_time(str(LANG_TIME),timedate);
+    result = set_time_screen(str(LANG_TIME), &tm);
 
-    if(timedate[0] != -1) {
-        /* hour   */
-        timedate[0] = ((timedate[0]/10) << 4 | timedate[0]%10) & 0x3f; 
-        /* minute */
-        timedate[1] = ((timedate[1]/10) << 4 | timedate[1]%10) & 0x7f; 
-        /* second */
-        timedate[2] = ((timedate[2]/10) << 4 | timedate[2]%10) & 0x7f; 
-        /* year   */
-        timedate[3] = ((timedate[3]/10) << 4 | timedate[3]%10) & 0xff; 
-        /* month  */
-        timedate[4] = ((timedate[4]/10) << 4 | timedate[4]%10) & 0x1f; 
-        /* day    */
-        timedate[5] = ((timedate[5]/10) << 4 | timedate[5]%10) & 0x3f; 
-
-        rtc_write(0x03, timedate[0] | (rtc_read(0x03) & 0xc0)); /* hour */
-        rtc_write(0x02, timedate[1] | (rtc_read(0x02) & 0x80)); /* minute */
-        rtc_write(0x01, timedate[2] | (rtc_read(0x01) & 0x80)); /* second */
-        rtc_write(0x07, timedate[3]);                           /* year */
-        rtc_write(0x06, timedate[4] | (rtc_read(0x06) & 0xe0)); /* month */
-        rtc_write(0x05, timedate[5] | (rtc_read(0x05) & 0xc0)); /* day */
-        rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0xf8)); /* dayofweek */
-        rtc_write(0x00, 0x00); /* 0.1 + 0.01 seconds */
+    if(tm.tm_year != -1) {
+        set_time(&tm);
     }
     return result;
 }

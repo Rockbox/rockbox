@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "file.h"
+#include "timefuncs.h"
 
 #define ROCKBOX_DIR "/.rockbox"
 #define FONT_DIR "/fonts"
@@ -237,7 +238,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
                 struct opt_items* options, int numoptions, void (*function)(int));
 bool set_int(char* string, char* unit, int voice_unit, int* variable,
              void (*function)(int), int step, int min, int max );
-bool set_time(char* string, int timedate[]);
+bool set_time_screen(char* string, struct tm *tm);
 int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 

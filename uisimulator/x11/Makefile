@@ -97,7 +97,7 @@ else
 	LCDSRSC = lcd-playersim.c lcd-player.c font-player.c lcd-player-charset.c
 endif
 FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c mp3_playback.c power.c\
-  powermgmt.c panic.c mp3data.c sprintf.c buffer.c
+  powermgmt.c panic.c mp3data.c sprintf.c buffer.c timefuncs.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
@@ -262,6 +262,9 @@ $(OBJDIR)/buffer.o: $(FIRMWAREDIR)/buffer.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/ctype.o: $(COMMON)/ctype.c
+	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
+
+$(OBJDIR)/timefuncs.o: $(COMMON)/timefuncs.c
 	$(CC) $(CFLAGS) $(APPINCLUDES) -c $< -o $@
 
 $(OBJDIR)/stubs.o: $(SIMCOMMON)/stubs.c

@@ -17,7 +17,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <stdio.h>
 #include "config.h"
 #include "kernel.h"
@@ -47,6 +46,7 @@
 #include "errno.h"
 #include "system.h"
 #include "misc.h"
+#include "timefuncs.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -1963,17 +1963,33 @@ bool set_option(char* string, void* variable, enum optiontype type,
 #ifdef HAVE_LCD_BITMAP
 
 /* little helper function for voice output */
-static void say_time(int cursorpos, int timedate[])
+static void say_time(int cursorpos, struct tm *tm)
 {
     const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
-    int value = timedate[cursorpos];
+    int value = 0;
 
     if (!global_settings.talk_menu)
         return;
 
-    if (cursorpos == 3) /* year */
-        value += 2000;
-
+    switch(cursorpos)
+    {
+    case 0:
+        value = tm->tm_hour;
+        break;
+    case 1:
+        value = tm->tm_min;
+        break;
+    case 2:
+        value = tm->tm_sec;
+        break;
+    case 3:
+        value = tm->tm_year + 1900;
+        break;
+    case 5:
+        value = tm->tm_mday;
+        break;
+    }
+    
     if (cursorpos == 4) /* month */
         talk_id(LANG_MONTH_JANUARY + value - 1, false);
     else
@@ -1984,7 +2000,7 @@ static void say_time(int cursorpos, int timedate[])
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
-bool set_time(char* string, int timedate[])
+bool set_time_screen(char* string, struct tm *tm)
 {
     bool done = false;
     int button;
@@ -2024,6 +2040,7 @@ bool set_time(char* string, int timedate[])
     
     int monthname_len = 0, dayname_len = 0;
 
+    int *valptr = NULL;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -2036,27 +2053,27 @@ bool set_time(char* string, int timedate[])
 
     while ( !done ) {
         /* calculate the number of days in febuary */
-        realyear = timedate[3] + 2000;
+        realyear = tm->tm_year + 1900;
         if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
             daysinmonth[1] = 29;
         else
             daysinmonth[1] = 28;
 
         /* fix day if month or year changed */
-        if (timedate[5] > daysinmonth[timedate[4] - 1])
-            timedate[5] = daysinmonth[timedate[4] - 1];
+        if (tm->tm_mday > daysinmonth[tm->tm_mon])
+            tm->tm_mday = daysinmonth[tm->tm_mon];
 
         /* calculate day of week */
         julianday = 0;
-        for(i = 0; i < timedate[4] - 1; i++) {
+        for(i = 0; i < tm->tm_mon; i++) {
            julianday += daysinmonth[i];
         }
-        julianday += timedate[5];
-        timedate[6] = (realyear + julianday + (realyear - 1) / 4 -
+        julianday += tm->tm_mday;
+        tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
         snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d ",
-                 timedate[0], timedate[1], timedate[2]);
+                 tm->tm_hour, tm->tm_min, tm->tm_sec);
         lcd_puts(0, 1, buffer);
 
         /* recalculate the positions and offsets */
@@ -2091,17 +2108,17 @@ bool set_time(char* string, int timedate[])
 
         lcd_getstringsize(buffer, &width, &prev_line_height);
 
-        snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
-                 str(dayname[timedate[6]]), timedate[3],
-                 str(monthname[timedate[4] - 1]), timedate[5]);
+        snprintf(buffer, sizeof(buffer), "%s %04d %s %02d ",
+                 str(dayname[tm->tm_wday]), tm->tm_year+1900,
+                 str(monthname[tm->tm_mon]), tm->tm_mday);
         lcd_puts(0, 2, buffer);
 
         /* recalculate the positions and offsets */
         lcd_getstringsize(buffer, &width, &line_height);
 
         /* store these 2 to prevent _repeated_ strlen calls */
-        monthname_len = strlen(str(monthname[timedate[4] - 1]));
-        dayname_len = strlen(str(dayname[timedate[6]]));
+        monthname_len = strlen(str(monthname[tm->tm_mon]));
+        dayname_len = strlen(str(dayname[tm->tm_wday]));
 
         /* weekday */
         strncpy(reffub, buffer, dayname_len);
@@ -2155,26 +2172,35 @@ bool set_time(char* string, int timedate[])
                 case 0: /* hour */
                     min = 0;
                     steps = 24;
+                    valptr = &tm->tm_hour;
                     break;
                 case 1: /* minute */
+                    min = 0;
+                    steps = 60;
+                    valptr = &tm->tm_min;
+                    break;
                 case 2: /* second */
                     min = 0;
                     steps = 60;
+                    valptr = &tm->tm_sec;
                     break;
                 case 3: /* year */
-                    min = 0;
-                    steps = 100;
+                    min = 1;
+                    steps = 200;
+                    valptr = &tm->tm_year;
                     break;
                 case 4: /* month */
-                    min = 1;
+                    min = 0;
                     steps = 12;
+                    valptr = &tm->tm_mon;
                     break;
                 case 5: /* day */
                     min = 1;
-                    steps = daysinmonth[timedate[4] - 1];
+                    steps = daysinmonth[tm->tm_mon];
+                    valptr = &tm->tm_mday;
                     break;
             }
-            say_time(cursorpos, timedate);
+            say_time(cursorpos, tm);
         }
 
         button = button_get_w_tmo(HZ/2);
@@ -2187,43 +2213,27 @@ bool set_time(char* string, int timedate[])
                 break;
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
-                timedate[cursorpos] = (timedate[cursorpos] + steps - min + 1) %
+                *valptr = (*valptr + steps - min + 1) %
                     steps + min;
-                if(timedate[cursorpos] == 0)
-                    timedate[cursorpos] += min;
-                    say_time(cursorpos, timedate);
+                if(*valptr == 0)
+                    *valptr = min;
+                say_time(cursorpos, tm);
                 break;
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-                timedate[cursorpos]=(timedate[cursorpos]+steps - min - 1) % 
+                *valptr = (*valptr + steps - min - 1) % 
                     steps + min;
-                if(timedate[cursorpos] == 0)
-                    timedate[cursorpos] += min;
-                say_time(cursorpos, timedate);
+                if(*valptr == 0)
+                    *valptr = min;
+                say_time(cursorpos, tm);
                 break;
             case BUTTON_ON:
                 done = true;
-                if (timedate[6] == 0) /* rtc needs 1 .. 7 */
-                    timedate[6] = 7;
                 break;
             case BUTTON_OFF:
                 done = true;
-                timedate[0] = -1;
+                tm->tm_year = -1;
                 break;
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-                lcd_clear_display();
-                lcd_puts_scroll(0, 0, string);
-#endif
-                break;
-#endif
 
             case SYS_USB_CONNECTED:
                 usb_screen();
