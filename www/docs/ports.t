@@ -118,7 +118,7 @@
     <td><b>GP Out</b></td><td>LCD Chip Select (0=active) / FM Radio Chip Enable (1=active)</td>
 </tr>
 <tr><th><b>PB4</b></th>
-    <td><b>GP Out</b></td><td>Hard disk power (0=on) <b>NewPlayer only</b></td>
+    <td><b>GP Out</b></td><td>Hard disk power (1=on) <b>NewPlayer only</b></td>
     <td><b>GP In</b></td><td>OFF key (0=pressed)</td>
     <td><b>GP In</b></td><td>FM Radio Data Out</td>
 </tr>
