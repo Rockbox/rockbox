@@ -219,6 +219,7 @@ static const struct plugin_api rockbox_api = {
 
     /* MAS communication */
 #ifndef SIMULATOR
+#if CONFIG_HWCODEC != MASNONE
     mas_readmem,
     mas_writemem,
     mas_readreg,
@@ -227,6 +228,7 @@ static const struct plugin_api rockbox_api = {
     mas_codec_writereg,
     mas_codec_readreg,
 #endif
+#endif /* HWCODEC != MASNONE */
 #endif
 
     /* misc */
@@ -438,7 +440,7 @@ int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
 
     if (prescale > 8 || cycles == 0 || prio < 1 || prio > 15)
         return 0; /* error, we can't do such period, bad argument */
-
+#if CONFIG_CPU == SH7034
     and_b(~0x10, &TSTR); /* Stop the timer 4 */
     and_b(~0x10, &TSNC); /* No synchronization */
     and_b(~0x10, &TMDR); /* Operate normally */
@@ -452,18 +454,21 @@ int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
     TCR4 = 0x20 | phi; /* clear at GRA match, set prescaler */
     IPRD = (IPRD & 0xFF0F) | prio << 4; /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
-
+#endif
     return cycles * prescale; /* return the actual period, in CPU clocks */
 }
 
 /* disable the user timer */
 void plugin_unregister_timer(void)
 {
+#if CONFIG_CPU == SH7034
     and_b(~0x10, &TSTR); /* stop the timer 4 */
     IPRD = (IPRD & 0xFF0F); /* disable interrupt */
     pfn_timer = NULL;
+#endif
 }
 
+#if CONFIG_CPU == SH7034
 /* interrupt handler for user timer */
 #pragma interrupt
 void IMIA4(void)
@@ -472,6 +477,7 @@ void IMIA4(void)
         pfn_timer(); /* call the user timer function */
     and_b(~0x01, &TSR4); /* clear the interrupt */
 }
+#endif /* CONFIG_CPU == SH7034 */
 #endif /* #ifndef SIMULATOR */
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
