@@ -709,3 +709,57 @@ A77: You make the common mistake of confusing Rockbox development with that of
      sufficiently useful feature, it will be written.
 
      (That could be you.)
+
+Q78: How do I control the recording frequency and quality?
+A78: Linus Nielsen Feltzing replied to a similar question on April 17th 2004,
+     and this is a cut'n paste of his reply that can be read on the following
+     URL:
+     http://rockbox.haxx.se/mail/archive/rockbox-archive-2004-04/0814.shtml
+
+     SAMPLE RATE
+
+     Controls the amount of samples per secod, basically which frequencies
+     that can accurately be reproduced buring playback. Lower frequencies
+     produce smaller files, for two reasons: 1) The amount of data to be
+     compressed is smaller and 2) the data is easier to compress, since higher
+     frequencies are not present.
+
+     BIT RATE
+
+     Controls how many bits per second that is required for accurate live
+     transmission of the compressed audio. When you compress the data harder
+     (meaning worse sound quality), the bitrate gets lower.
+
+     STEREO VS MONO
+
+     A mono file doesn't necessarily have to be smaller than a stereo file.
+     It all depends on the encoder. The MAS does produce smaller files with
+     mono.
+
+     MAS QUALITY
+
+     The MAS uses VBR for compression (yes always), which means that the
+     bitrate varies from frame to frame, depending on how compressable the
+     data was at that point in time. This allows for a more even quality, and
+     also smaller files if the data is easily compressed. The MAS can generate
+     frames with bit rates ranging from 32kbit/s to 192kbit/s (MPEG1) or
+     8kbit/s to 160kbit/s (MPEG2).
+
+     The MAS quality setting is just a way of selecting an average bit rate
+     according to the following table (quality 0 is on the far left):
+
+     FREQUENCY        BITRATE IN KBIT/S
+     ------------------------------------------------------
+     44100Hz stereo:  75, 80, 90, 100, 120, 140, 160, 170
+     22050Hz stereo:  39, 41, 45, 50, 60, 80, 110, 130
+     44100Hz mono:    65, 68, 73, 80, 90, 105, 125, 140
+     22050Hz mono:    35, 38, 40, 45, 50, 60, 75, 90
+
+     (This table can be found on page 38 in the MAS3587 data sheet.)
+
+     MPEG VERSIONS
+
+     The different MPEG versions use different sample rates:
+     44100, 48000, 32000: MPEG version 1
+     22050, 24000, 16000: MPEG version 2
+     11025, 12000, 8000: MPEG version 2.5 (not an official standard)
