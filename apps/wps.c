@@ -110,22 +110,20 @@ void player_change_volume(int button)
 
 void display_keylock_text(bool locked)
 {
-    lcd_clear_display();
-
+    char* s;
+    lcd_stop_scroll();
 #ifdef HAVE_LCD_CHARCELLS
     if(locked)
-        lcd_puts(0, 0, str(LANG_KEYLOCK_ON_PLAYER));
+        s = str(LANG_KEYLOCK_ON_PLAYER);
     else
-        lcd_puts(0, 0, str(LANG_KEYLOCK_OFF_PLAYER));
+        s = str(LANG_KEYLOCK_OFF_PLAYER);
 #else
     if(locked)
-        lcd_puts(2, 3, str(LANG_KEYLOCK_ON_RECORDER));
+        s = str(LANG_KEYLOCK_ON_RECORDER);
     else
-        lcd_puts(2, 3, str(LANG_KEYLOCK_OFF_RECORDER));
-    lcd_update();
+        s = str(LANG_KEYLOCK_OFF_RECORDER);
 #endif
-    
-    sleep(HZ);
+    splash(HZ, 0, true, s);
 }
 
 void display_mute_text(bool muted)
@@ -469,89 +467,6 @@ static bool update(void)
     return retcode;
 }
 
-
-static bool keylock(void)
-{
-    bool exit = false;
-
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_record(true);
-    status_set_param(false);
-#endif
-    display_keylock_text(true);
-    keys_locked = true;
-    wps_refresh(id3, 0, WPS_REFRESH_ALL);
-    if (wps_display(id3)) {
-        keys_locked = false;
-#ifdef HAVE_LCD_CHARCELLS
-        status_set_record(false);
-#endif
-        return false;
-    }
-    status_draw(false);
-    while (button_get(false)); /* clear button queue */
-
-    while (!exit) {
-        switch ( button_get_w_tmo(HZ/5) ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_DOWN:
-            case BUTTON_F1 | BUTTON_REPEAT | BUTTON_DOWN:
-#else
-            case BUTTON_MENU | BUTTON_STOP:
-            case BUTTON_MENU | BUTTON_REPEAT | BUTTON_STOP:
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_record(false);
-#endif
-                display_keylock_text(false);
-                keys_locked = false;
-                exit = true;
-                while (button_get(false)); /* clear button queue */
-                break;
-
-            case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
-                usb_screen();
-                return true;
-
-            case BUTTON_NONE:
-                if(update()) {
-                    keys_locked = false;
-#ifdef HAVE_LCD_CHARCELLS
-                    status_set_record(false);
-#endif
-                    exit = true;
-                }
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1:
-            case BUTTON_F1 | BUTTON_REPEAT:
-#else
-            case BUTTON_MENU:
-            case BUTTON_MENU | BUTTON_REPEAT:
-#endif
-                /* ignore menu key, to avoid displaying "Keylock ON"
-                   every time we unlock the keys */
-                break;
-
-            default:
-                display_keylock_text(true);
-                while (button_get(false)); /* clear button queue */
-                wps_refresh(id3, 0, WPS_REFRESH_ALL);
-                if (wps_display(id3)) {
-                    keys_locked = false;
-#ifdef HAVE_LCD_CHARCELLS
-                    status_set_record(false);
-#endif
-                    exit = true;
-                }
-                break;
-        }
-    }
-    return false;
-}
-
 static bool menu(void)
 {
     static bool muted = false;
@@ -611,9 +526,10 @@ static bool menu(void)
 #else
             case BUTTON_MENU | BUTTON_STOP:
 #endif
-                if (keylock())
-                    return true;
+                keys_locked = !keys_locked;
+                display_keylock_text(keys_locked);
                 exit = true;
+                while (button_get(false)); /* clear button queue */
                 break;
 
 #ifdef HAVE_PLAYER_KEYPAD
@@ -814,9 +730,15 @@ int wps_show(void)
 #else
             ! ((button & BUTTON_MENU) ||
 #endif
+               (button == BUTTON_NONE) ||
                (button == SYS_USB_CONNECTED) ||
                (button & BUTTON_REMOTE)))
+        {
+            while (button_get(false)); /* clear button queue */
+            display_keylock_text(true);
+            restore = true;
             continue;
+        }
 
         switch(button)
         {
