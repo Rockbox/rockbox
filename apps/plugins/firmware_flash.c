@@ -39,13 +39,13 @@
 #endif
 
 #if defined(ARCHOS_PLAYER)
-#define FILENAME "/firmware_play.bin"
+#define FILE_TYPE "player"
 #define KEEP VERSION_ADR /* keep the firmware version */
 #elif defined(ARCHOS_RECORDER)
-#define FILENAME "/firmware_rec.bin"
+#define FILE_TYPE "rec"
 #define KEEP MASK_ADR /* keep the mask value */
 #elif defined(ARCHOS_FMRECORDER)
-#define FILENAME "/firmware_fm.bin"
+#define FILE_TYPE "fm"
 #define KEEP MASK_ADR /* keep the mask value */
 #else
 #error ("No known platform given!")
@@ -62,6 +62,14 @@ typedef enum
     eBadContent,
     eCrcErr,
 } tCheckResult;
+
+/* result of the CheckBootROM() function */
+typedef enum
+{
+    eBootROM, /* the supported boot ROM */
+    eUnknown, /* unknown boot ROM */
+    eROMless, /* flash mapped to zero */
+} tCheckROM;
 
 typedef struct 
 {
@@ -244,7 +252,7 @@ unsigned crc_32(unsigned char* buf, unsigned len, unsigned crc32)
 
 /*********** Firmware File Functions ************/
 
-tCheckResult CheckFirmwareFile(char* filename, int chipsize)
+tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
 {
     int i;
     int fd;
@@ -296,19 +304,30 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize)
     if (has_crc)
         crc32 = crc_32(sector, SEC_SIZE, crc32); /* checksum */
 
-    /* compare some bytes which have to be identical */
-    if (*(UINT32*)sector != 0x41524348) /* "ARCH" */
-    {
-        rb->close(fd);
-        return eBadContent;
-    }
-    
-    for (i = 0x30; i<MASK_ADR-1; i++) /* leave one byte for me */
-    {
-        if (sector[i] != FB[i])
+    if (is_romless)
+    {   /* in this case, there is not much we can check */
+        if (*(UINT32*)sector != 0x00000200) /* reset vector */
         {
             rb->close(fd);
             return eBadContent;
+        }
+    }
+    else
+    {
+        /* compare some bytes which have to be identical */
+        if (*(UINT32*)sector != 0x41524348) /* "ARCH" */
+        {
+            rb->close(fd);
+            return eBadContent;
+        }
+    
+        for (i = 0x30; i<MASK_ADR-1; i++) /* leave one byte for me */
+        {
+            if (sector[i] != FB[i])
+            {
+                rb->close(fd);
+                return eBadContent;
+            }
         }
     }
     
@@ -431,6 +450,32 @@ unsigned VerifyFirmwareFile(char* filename)
     return failures;
 }
 
+/***************** Support Functions *****************/
+
+/* check if we have "normal" boot ROM or flash mirrored to zero */
+tCheckROM CheckBootROM(void)
+{
+    unsigned boot_crc;
+    unsigned* pFlash = (unsigned*)FB;
+    unsigned* pRom = (unsigned*)0x0;
+    unsigned i;
+
+    boot_crc = crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
+    if (boot_crc == 0x56DBA4EE) /* the known boot ROM */
+        return eBootROM;
+
+    /* check if ROM is a flash mirror */
+    for (i=0; i<256*1024/sizeof(unsigned); i++)
+    {
+        if (*pRom++ != *pFlash++)
+        {   /* difference means no mirror */
+            return eUnknown;
+        }
+    }
+
+    return eROMless;
+}
+
 
 /***************** User Interface Functions *****************/
 
@@ -484,23 +529,38 @@ void ShowFlashInfo(tFlashInfo* pInfo)
 
 
 /* Kind of our main function, defines the application flow. */
-void DoUserDialog(void)
+void DoUserDialog(char* filename)
 {
     tFlashInfo FlashInfo;
     char buf[32];
+    char default_filename[32];
     int button;
     int rc; /* generic return code */
     int memleft;
-    unsigned boot_crc;
+    tCheckROM result;
+    bool is_romless;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
     /* check boot ROM */
-    boot_crc = crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
-    if (boot_crc != 0x56DBA4EE) /* Version 1 */
+    result = CheckBootROM();
+    if (result == eUnknown)
     {   /* no support for any other yet */
         rb->splash(HZ*3, 0, true, "Wrong boot ROM");
         return; /* exit */
+    }
+    is_romless = (result == eROMless);
+
+    /* compose filename if none given */
+    if (filename == NULL)
+    {
+        rb->snprintf(
+            default_filename, 
+            sizeof(default_filename),
+            "/firmware_%s%s.bin",
+            FILE_TYPE,
+            is_romless ? "_norom" : "");
+        filename = default_filename;
     }
 
     /* "allocate" memory */
@@ -520,7 +580,7 @@ void DoUserDialog(void)
     }
     
     rb->lcd_puts(0, 3, "using file:");
-    rb->lcd_puts(0, 4, FILENAME);
+    rb->lcd_puts_scroll(0, 4, filename);
     rb->lcd_puts(0, 6, "[F1] to check file");
     rb->lcd_puts(0, 7, "other key to exit");
     rb->lcd_update();
@@ -535,7 +595,7 @@ void DoUserDialog(void)
     rb->lcd_puts(0, 0, "checking...");
     rb->lcd_update();
     
-    rc = CheckFirmwareFile(FILENAME, FlashInfo.size);
+    rc = CheckFirmwareFile(filename, FlashInfo.size, is_romless);
     rb->lcd_puts(0, 0, "checked:");
     switch (rc)
     {
@@ -545,7 +605,7 @@ void DoUserDialog(void)
     case eFileNotFound:
         rb->lcd_puts(0, 1, "File not found.");
         rb->lcd_puts(0, 2, "Put this in root:");
-        rb->lcd_puts(0, 4, FILENAME);
+        rb->lcd_puts_scroll(0, 4, filename);
         break;
     case eTooBig:
         rb->lcd_puts(0, 1, "File too big,");
@@ -611,7 +671,7 @@ void DoUserDialog(void)
     rb->lcd_puts(0, 0, "Programming...");
     rb->lcd_update();
     
-    rc = ProgramFirmwareFile(FILENAME, FlashInfo.size);
+    rc = ProgramFirmwareFile(filename, FlashInfo.size);
     if (rc)
     {   /* errors */
         rb->lcd_clear_display();
@@ -627,7 +687,7 @@ void DoUserDialog(void)
     rb->lcd_puts(0, 0, "Verifying...");
     rb->lcd_update();
     
-    rc = VerifyFirmwareFile(FILENAME);
+    rc = VerifyFirmwareFile(filename);
     
     rb->lcd_clear_display();
     if (rc == 0)
@@ -681,21 +741,36 @@ void ShowFlashInfo(tFlashInfo* pInfo)
 }
 
 
-void DoUserDialog(void)
+void DoUserDialog(char* filename)
 {
     tFlashInfo FlashInfo;
     char buf[32];
+    char default_filename[32];
     int button;
     int rc; /* generic return code */
     int memleft;
-    unsigned boot_crc;
+    tCheckROM result;
+    bool is_romless;
 
     /* check boot ROM */
-    boot_crc = crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
-    if (boot_crc != 0x56DBA4EE) /* Version 1 */
+    result = CheckBootROM();
+    if (result == eUnknown)
     {   /* no support for any other yet */
         rb->splash(HZ*3, 0, true, "Wrong boot ROM");
         return; /* exit */
+    }
+    is_romless = (result == eROMless);
+
+    /* compose filename if none given */
+    if (filename == NULL)
+    {
+        rb->snprintf(
+            default_filename, 
+            sizeof(default_filename),
+            "/firmware_%s%s.bin",
+            FILE_TYPE,
+            is_romless ? "_norom" : "");
+        filename = default_filename;
     }
 
     /* "allocate" memory */
@@ -714,7 +789,7 @@ void DoUserDialog(void)
         return; /* exit */
     }
     
-    rb->lcd_puts_scroll(0, 0, FILENAME);
+    rb->lcd_puts_scroll(0, 0, filename);
     rb->lcd_puts_scroll(0, 1, "[Menu] to check");
     
     button = WaitForButton();
@@ -726,7 +801,7 @@ void DoUserDialog(void)
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Checking...");
     
-    rc = CheckFirmwareFile(FILENAME, FlashInfo.size);
+    rc = CheckFirmwareFile(filename, FlashInfo.size, is_romless);
     rb->lcd_puts(0, 0, "Checked:");
     switch (rc)
     {
@@ -735,7 +810,7 @@ void DoUserDialog(void)
         break;
     case eFileNotFound:
         rb->lcd_puts_scroll(0, 0, "File not found:");
-        rb->lcd_puts_scroll(0, 1, FILENAME);
+        rb->lcd_puts_scroll(0, 1, filename);
         break;
     case eTooBig:
         rb->lcd_puts_scroll(0, 0, "File too big,");
@@ -794,7 +869,7 @@ void DoUserDialog(void)
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Programming...");
     
-    rc = ProgramFirmwareFile(FILENAME, FlashInfo.size);
+    rc = ProgramFirmwareFile(filename, FlashInfo.size);
     
     if (rc)
     {   /* errors */
@@ -808,7 +883,7 @@ void DoUserDialog(void)
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Verifying...");
     
-    rc = VerifyFirmwareFile(FILENAME);
+    rc = VerifyFirmwareFile(filename);
     
     rb->lcd_clear_display();
     
@@ -838,14 +913,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     matches the machine it is running on */
     TEST_PLUGIN_API(api);
     
-    /* if you don't use the parameter, you can do like
-    this to avoid the compiler warning about it */
-    (void)parameter;
-    
     rb = api; /* copy to global api pointer */
     
     /* now go ahead and have fun! */
-    DoUserDialog();
+    DoUserDialog((char*) parameter);
 
     return PLUGIN_OK;
 }
