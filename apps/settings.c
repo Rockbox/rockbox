@@ -904,11 +904,11 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "play selected"))
             set_cfg_bool(&global_settings.play_selected, value);
         else if (!strcasecmp(name, "volume display")) {
-            static char* options[] = {"numeric", "graphic"};
+            static char* options[] = {"graphic", "numeric"};
             set_cfg_option(&global_settings.volume_type, value, options, 2);
         }
         else if (!strcasecmp(name, "battery display")) {
-            static char* options[] = {"numeric", "graphic"};
+            static char* options[] = {"graphic", "numeric"};
             set_cfg_option(&global_settings.battery_type, value, options, 2);
         }
         else if (!strcasecmp(name, "time format")) {
