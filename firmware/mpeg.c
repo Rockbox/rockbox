@@ -482,8 +482,8 @@ static int lowest_watermark_level; /* Debug value to observe the buffer
 #ifdef HAVE_MAS3587F
 static bool is_recording; /* We are recording */
 static bool stop_pending;
-unsigned long record_start_frame; /* Frame number where
-                                     recording started */
+unsigned long record_start_time; /* Value of current_tick when recording
+                                    was started */
 static bool saving; /* We are saving the buffer to disk */
 #endif
 
@@ -2133,7 +2133,6 @@ static void init_playback(void)
 void mpeg_record(char *filename)
 {
     num_rec_bytes = 0;
-    is_recording = true;
     queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
 }
 
@@ -2155,9 +2154,10 @@ static void start_recording(void)
 
     sleep(20);
     
-    /* Read the current frame */
-    mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
+    /* Store the current time */
+    record_start_time = current_tick;
 
+    is_recording = true;
     stop_pending = false;
     saving = false;
 }
@@ -2182,21 +2182,12 @@ static void stop_recording(void)
     drain_dma_buffer();
 }
 
-unsigned long mpeg_num_recorded_frames(void)
+unsigned long mpeg_recorded_time(void)
 {
-    unsigned long val;
-
     if(is_recording)
-    {
-        /* Read the current frame */
-        mas_readmem(MAS_BANK_D0, 0xfd0, &val, 1);
-
-        return val - record_start_frame;
-    }
+        return current_tick - record_start_time;
     else
-    {
         return 0;
-    }
 }
 
 unsigned long mpeg_num_recorded_bytes(void)

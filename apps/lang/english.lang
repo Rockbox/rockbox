@@ -1366,3 +1366,13 @@ id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<no info>"
 new:
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+new:
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+new:

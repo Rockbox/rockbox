@@ -125,16 +125,6 @@ void adjust_cursor(void)
     }
 }
 
-unsigned int frame_times[] =
-{
-    2612, /* 44.1kHz */
-    2400, /* 48kHz */
-    3600, /* 32kHz */
-    2612, /* 22.05kHz */
-    2400, /* 24kHz */
-    3200  /* 16kHz */
-};
-
 static char *create_filename(void)
 {
     static char fname[32];
@@ -165,7 +155,6 @@ bool recording_screen(void)
     unsigned long seconds;
     unsigned long last_seconds = 0;
     int hours, minutes;
-    unsigned long val;
 
     cursor = 0;
     mpeg_init_recording();
@@ -349,9 +338,7 @@ bool recording_screen(void)
         {
             timeout = current_tick + HZ/10;
 
-            seconds = mpeg_num_recorded_frames();
-            seconds *= frame_times[global_settings.rec_frequency];
-            seconds /= 100000;
+            seconds = mpeg_recorded_time() / HZ;
 
             update_countdown--;
             if(update_countdown == 0 || seconds > last_seconds)
@@ -361,19 +348,17 @@ bool recording_screen(void)
 
                 lcd_clear_display();
 
-                /* DEBUG: Read the current frame */
-                mas_readmem(MAS_BANK_D0, 0xfd0, &val, 1);
-                
-                snprintf(buf, 32, "%05x:%05x:%05x",
-                         mpeg_num_recorded_frames(), val, record_start_frame);
-                lcd_puts(0, 0, buf);
-
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;
-                snprintf(buf, 32, "%02d:%02d:%02d   %s",
-                         hours, minutes, seconds%60,
+                snprintf(buf, 32, "%s %02d:%02d:%02d",
+                         str(LANG_RECORDING_TIME),
+                         hours, minutes, seconds%60);
+                lcd_puts(0, 0, buf);
+                
+                snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
                          num2max5(mpeg_num_recorded_bytes(), buf2));
                 lcd_puts(0, 1, buf);
+
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
                 /* Show mic gain if input source is Mic */
