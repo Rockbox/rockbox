@@ -1,10 +1,11 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
-INPUT(crt0.o system.o)
+INPUT(crt0.o)
 SECTIONS
 {
     .vectors 0x09010000 :
     {
+        *(.resetvectors);
         *(.vectors);
         . = ALIGN(0x200);
         *(.init.text)

@@ -120,7 +120,7 @@ vbr_k:
 orig_vbr_k:
 	.long 0x9000000
 
-	.section .vectors
+	.section .resetvectors
 vectors:
 	.long start
 	.long _stack
