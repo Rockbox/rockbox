@@ -41,19 +41,24 @@
 bool alarm_screen(void)
 {
     /* get alarm time from RTC */
-    
+
     int h, m, hour, minute;
-    
+
     rtc_get_alarm(&h, &m);
-    
-    m = m / 5 * 5; /* 5 min accuracy should be enough */
-    
+
+    if (m > 60 || h > 24) {	/* after battery-change RTC-values are out of range */
+        m = 0;
+        h = 12;
+    } else {
+        m = m / 5 * 5; /* 5 min accuracy should be enough */
+    }
+
     bool done=false;
     char buf[32]; 
- 
+
     lcd_clear_display();
     lcd_puts(0,1, str(LANG_ALARM_MOD_KEYS));
-     
+    
     while(!done) {
         snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
         lcd_puts(0,0, buf);
