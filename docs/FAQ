@@ -136,7 +136,6 @@ A18. Pessimist's Answer: At the current time we belive this is not very likely
      MAS DSP code and Intermetall is very secretive about it.  If anyone can 
      help, please get in touch!
 
-
 Q19. What about supporting playing of WMA files?
 A19. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
      your own project.
@@ -230,13 +229,13 @@ A31: In simple terms, the first release was called 1.0 because it had a basic
      working feature set that worked and had no known bugs. That is what 1.0 
      meant.  It is true that Rockbox 1.0 lacked most of the feature set that 
      every sane user wanted.  However, we never said it was more 
-     feature-complete or better in any way then the original firmware that early
-     in the project.  The first release was done as a proof of concept that our 
-     ideas are moving in the right direction.  We also hoped that it would help
-     bring the project some attention, and some additional developers.  
-     Adding the missing features was just a matter of time.  In more recently
-     releases we have completed many of our desired goals, and several new ones
-     that were implimented to fullfill user requests.
+     feature-complete or better in any way then the original firmware that 
+     early in the project.  The first release was done as a proof of concept 
+     that our ideas are moving in the right direction.  We also hoped that it 
+     would help bring the project some attention, and some additional 
+     developers.  Adding the missing features was just a matter of time.  In 
+     more recent releases we have completed many of our desired goals, and 
+     several new ones that were implimented to fullfill user requests.
 
 Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
@@ -248,8 +247,8 @@ A32: The developers have discussed the possibility of a boot loader.  (Mainly
      development for the recorders.  However, at this time, the patch for ROLO
      is not optimal for use and is not part of the main branch of the CVS.
      Once this improves and has been tested sufficently, it will become part of
-     the main release.  Please check the mailing list logs and irc logs for more
-     information.  
+     the main release.  Please check the mailing list logs and irc logs for 
+     more information.  
 
 Q33: I was thinking about making the USB a bit more usable.  What are the
      chances of using the USB port to [play games / share files / list
