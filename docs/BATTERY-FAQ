@@ -218,3 +218,12 @@ A15: That depends on who you ask. ;-) NiMH sellers say NiMHs are better and
      
      However, if you use your AJB connected to the charger all the time,
      we recommend you to use the deep discharge option.
+
+Q16: When I start my Jukebox, (dis)connect the charger and browse through the 
+     directories, the battery level changes a little bit. Sometimes it's even 
+     going up without the charger is connected! What's wrong?
+A16: Nothing's wrong. The battery level is calculated out of the voltage. 
+     Because disk spinning, LED backlight, charger all influence the actual 
+     battery voltage, it is usual that the battery level is going a little bit 
+     up and down sometimes. This cannot be avoided although we tried to make the 
+     battery level display as little confusing as we could.
