@@ -595,13 +595,19 @@ static bool menu(void)
 bool f2_screen(void)
 {
     bool exit = false;
+    int w, h;
+    char buf[32];
+
+    /* Get the font height */
+#ifdef LCD_PROPFONTS
+        lcd_getstringsize("A",0,&w,&h);
+#else
+        lcd_getfontsize(0,&w,&h);
+#endif
 
     lcd_stop_scroll();
 
     while (!exit) {
-        int w,h;
-        char buf[32];
-
         lcd_clear_display();
 
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Shuffle", 0);
@@ -613,6 +619,8 @@ bool f2_screen(void)
 
         snprintf(buf, sizeof buf, "Dir filter: %s",
                  global_settings.mp3filter ? "on" : "off");
+
+        /* Get the string width and height */
 #ifdef LCD_PROPFONTS
         lcd_getstringsize(buf,0,&w,&h);
 #else
