@@ -500,6 +500,7 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
     dbgdata->lowest_watermark_level = lowest_watermark_level;
 }
 
+#ifdef HAVE_MAS3507D
 static void mas_poll_start(int interval_in_ms)
 {
     unsigned int count;
@@ -531,6 +532,7 @@ static void mas_poll_start(int interval_in_ms)
 
     TSTR |= 0x02; /* Start timer 1 */
 }
+#endif
 
 #ifdef DEBUG
 static void dbg_timer_start(void)
@@ -618,11 +620,10 @@ static void stop_dma(void)
 long current_dma_tick = 0;
 long timing_info_index = 0;
 long timing_info[1024];
+bool inverted_pr;
 
 static void dma_tick(void)
 {
-    current_dma_tick++;
-
 #ifdef HAVE_MAS3587F
     if(mpeg_mode == MPEG_DECODER)
     {
@@ -644,58 +645,41 @@ static void dma_tick(void)
     else
     {
         int i;
-        int x;
         int num_bytes = 0;
         if(recording && (PBDR & 0x4000))
         {
-            timing_info[timing_info_index++] = current_dma_tick;
+#ifdef DEBUG
+            timing_info[timing_info_index++] = current_tick;
             TCNT2 = 0;
+#endif
             for(i = 0;i < 30 && (PBDR & 0x4000);i++)
             {
-                if(read_hw_mask() & PR_ACTIVE_HIGH)
+                if(inverted_pr)
                     PADR |= 0x800;
                 else
                     PADR &= ~0x800;
 
-                for(x = 2000;PBDR & 0x8000 && x;x--) {};
-
-                if(x == 0)
-                {
-                    queue_post(&mpeg_queue, MPEG_REC_TIMEOUT, (void *)0);
-                    if(read_hw_mask() & PR_ACTIVE_HIGH)
-                        PADR &= ~0x800;
-                    else
-                        PADR |= 0x800;
-                    break;
-                }
-                    
+                /* It must take at least 5 cycles before the data is read */
+                
                 mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
                 
-                if(read_hw_mask() & PR_ACTIVE_HIGH)
+                if(inverted_pr)
                     PADR &= ~0x800;
                 else
                     PADR |= 0x800;
+                
+                /* It must take at least 4 cycles before the next loop */
                 
                 mp3buf_write++;
                 if(mp3buf_write >= mp3buflen)
                     mp3buf_write = 0;
                 
                 num_bytes++;
-                
-                for(x = 2000;!(PBDR & 0x8000) && x;x--) {};
-                if(x == 0)
-                {
-                    queue_post(&mpeg_queue, MPEG_REC_TIMEOUT, (void *)1);
-                    if(read_hw_mask() & PR_ACTIVE_HIGH)
-                        PADR &= ~0x800;
-                    else
-                        PADR |= 0x800;
-                    break;
-                }
             }
+#ifdef DEBUG
             timing_info[timing_info_index++] = TCNT2 + (num_bytes << 16);
-
             timing_info_index &= 0x3ff;
+#endif
 
             /* Signal to save the data if we are running out of buffer
                space */
@@ -716,12 +700,6 @@ static void reset_mp3_buffer(void)
     mp3buf_write = 0;
     mp3buf_swapwrite = 0;
     lowest_watermark_level = mp3buflen;
-}
-
-#pragma interrupt
-void IRQ6(void)
-{
-    stop_dma();
 }
 
 #pragma interrupt
@@ -811,12 +789,50 @@ void DEI3(void)
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
 }
 
+#ifdef HAVE_MAS3507D
 #pragma interrupt
 void IMIA1(void)
 {
     dma_tick();
     TSR1 &= ~0x01;
 }
+#endif
+
+#ifdef HAVE_MAS3587F
+static void demand_irq_enable(bool on)
+{
+    int oldlevel = set_irq_level(15);
+    
+    if(on)
+        IPRA = (IPRA & 0xfff0) | 0x000b;
+    else
+        IPRA &= 0xfff0;
+
+    set_irq_level(oldlevel);
+}
+#endif
+
+#pragma interrupt
+void IRQ6(void)
+{
+    stop_dma();
+    
+#ifdef HAVE_MAS3587F
+    /* Enable IRQ to trap the next DEMAND */
+    demand_irq_enable(true);
+#endif
+}
+
+#ifdef HAVE_MAS3587F
+#pragma interrupt
+void IRQ3(void)
+{
+    dma_tick();
+
+    /* Disable IRQ until DEMAND goes low again */
+    demand_irq_enable(false);
+}
+#endif
 
 static int add_track_to_tag_list(char *filename)
 {
@@ -908,6 +924,9 @@ static int new_file(int steps)
 static void stop_playing(void)
 {
     /* Stop the current stream */
+#ifdef HAVE_MAS3587F
+    demand_irq_enable(false);
+#endif
     playing = false;
     filling = false;
     if(mpeg_file >= 0)
@@ -980,6 +999,9 @@ static void start_playback_if_ready(void)
             {
                 last_dma_tick = current_tick;
                 start_dma();
+#ifdef HAVE_MAS3587F
+                demand_irq_enable(true);
+#endif
             }
 
             /* Tell ourselves that we need more data */
@@ -1583,6 +1605,7 @@ static void mpeg_thread(void)
                             panicf("recfile: %d", mpeg_file);
                         reset_mp3_buffer();
                         start_recording();
+                        demand_irq_enable(true);
                         break;
 
                     case MPEG_STOP:
@@ -1596,6 +1619,7 @@ static void mpeg_thread(void)
                         break;
 
                     case MPEG_REC_TIMEOUT:
+                        demand_irq_enable(false);
                         if(mpeg_file >= 0)
                             close(mpeg_file);
                         panicf("Timeout: %d", (int)ev.data);
@@ -1604,6 +1628,7 @@ static void mpeg_thread(void)
                     case MPEG_STOP_DONE:
                         DEBUGF("MPEG_STOP_DONE\n");
 
+                        demand_irq_enable(false);
                         if(mpeg_file >= 0)
                             close(mpeg_file);
 
@@ -2509,7 +2534,15 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
+
+#ifdef HAVE_MAS3507D
     mas_poll_start(1);
+#endif
+
+#ifdef HAVE_MAS3587F
+    ICR &= ~0x0010; /* IRQ3 level sensitive */
+    PACR1 = (PACR1 & 0x3fff) | 0x4000; /* PA15 is IRQ3 */
+#endif
 
 #ifdef HAVE_MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
@@ -2536,6 +2569,11 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);
+
+    if(read_hw_mask() & PR_ACTIVE_HIGH)
+        inverted_pr = true;
+    else
+        inverted_pr = false;
 
 #ifdef DEBUG
     dbg_timer_start();
