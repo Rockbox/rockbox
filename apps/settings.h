@@ -105,6 +105,8 @@ void settings_load(void);
 void settings_reset(void);
 void settings_display(void);
 
+bool settings_load_eq(char* file);
+
 void set_bool(char* string, bool* variable );
 void set_option(char* string, int* variable, char* options[], int numoptions );
 void set_int(char* string, 

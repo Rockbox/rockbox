@@ -132,6 +132,9 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* playlist */
 #define TREE_ATTR_WPS 0x100 /* wps config file */
 #define TREE_ATTR_MOD 0x200 /* firmware file */
+#ifdef CUSTOM_EQ
+#define TREE_ATTR_EQ  0x300 /* EQ config file */
+#endif
 #define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 static int build_playlist(int start_index)
@@ -239,6 +242,10 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_MPA;
                 else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
                     dptr->attr |= TREE_ATTR_M3U;
+#ifdef CUSTOM_EQ
+                else if (!strcasecmp(&entry->d_name[len-3], ".eq"))
+                    dptr->attr |= TREE_ATTR_EQ;
+#endif
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
 #ifdef HAVE_RECORDER_KEYPAD
@@ -319,6 +326,12 @@ static int showdir(char *path, int start)
             case TREE_ATTR_WPS:
                 icon_type = Wps;
                 break;
+
+#ifdef CUSTOM_EQ
+            case TREE_ATTR_EQ:
+                icon_type = Wps;
+                break;
+#endif
 
             case TREE_ATTR_MOD:
                 icon_type = Mod_Ajz;
@@ -607,6 +620,15 @@ bool dirbrowse(char *root)
                             wps_load_custom(buf);
                             restore = true;
                             break;
+
+#ifdef CUSTOM_EQ
+                        case TREE_ATTR_EQ:
+                            snprintf(buf, sizeof buf, "%s/%s",
+                                     currdir, file->name);
+                            settings_load_eq(buf);
+                            restore = true;
+                            break;
+#endif
 
 #ifndef SIMULATOR
                             /* firmware file */

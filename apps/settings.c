@@ -394,6 +394,75 @@ void settings_load(void)
 #endif
 }
 
+#ifdef CUSTOM_EQ
+/ *
+  * Loads a .eq file
+  * /
+bool settings_load_eq(char* file)
+{
+    char buffer[128];
+    char buf_set[16];
+    char buf_val[8];
+    int fd;
+    int i;
+    unsigned int j;
+    int d = 0;
+    int vtype = 0;
+
+    fd = open(file, O_RDONLY);
+    
+    if (-1 != fd)
+    {
+        int numread = read(fd, buffer, sizeof(buffer) - 1);
+        
+        if (numread > 0) {
+            buffer[numread] = 0;
+            for(i=0;i<numread;i++) {
+                switch(buffer[i]) {
+                    case '[':
+                        vtype = 1;
+                        buf_set[0] = 0;
+                        d = 0;
+                        break;
+                    case ']':
+                        vtype = 2;
+                        buf_set[d] = 0;
+                        buf_val[0] = 0;
+                        d = 0;
+                        break;
+                    case '#':
+                        buf_val[d] = 0;
+                        vtype = 3;
+                        break;
+                    default:
+                        switch(vtype) {
+                            case 1:
+                                buf_set[d++] = buffer[i];
+                                break;
+                            case 2:
+                                buf_val[d++] = buffer[i];
+                                break;
+                            case 3:
+                                if(strcasecmp(buf_set,"volume"))
+                                {
+                                   global_settings.volume = 0;
+                                   for(j=0;j<strlen(buf_val);j++)
+                                       global_settings.volume = global_settings.volume *
+                                           10 + (buf_val[j] - '0');
+                                }
+                                vtype = 0;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+        close(fd);
+    }
+    return(false);
+}
+#endif
+
 /*
  * reset all settings to their default value 
  */
