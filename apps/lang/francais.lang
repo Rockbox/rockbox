@@ -1,6 +1,6 @@
-# francais.lang 2003/06/09
+# francais.lang 2003/11/05
 #
-# Based on file english.lang,v 1.77 2003/06/05 09:38:26 zagor Exp $
+# Based on file english.lang,v 1.91 2003/11/04 16:47:05 linusnielsen Exp $
 #
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -75,7 +75,7 @@ new: "Batterie en charge"
 id: LANG_BOUNCE
 desc: in the demos menu
 eng: "Bounce"
-new: "Texte rebondissant"
+new: "Texte bondissant"
 
 id: LANG_SNOW
 desc: in the demos menu
@@ -148,7 +148,7 @@ new: "Bat faible?"
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-new: "Echec de l'enregistrement"
+new: "Echec de l'enreg!"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -193,7 +193,7 @@ new: "Aléatoire"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new: "Lire fichier selectionné en 1er"
+new: "Lire fichier courant en 1er"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -372,7 +372,7 @@ new: "Basse ampli (Loudness)"
 id: LANG_BBOOST
 desc: in sound settings
 eng: "Bass Boost"
-new: "Maximalisation des graves"
+new: "Ampli. des graves"
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -457,7 +457,7 @@ new: "Déverrouill"
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-new: "Touches protégées"
+new: "Touches désactivées"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
@@ -868,7 +868,7 @@ new: "Rétro-éclairage pendant charge"
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
-new: "Répétition"
+new: "Répéter"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
@@ -1138,7 +1138,7 @@ new: "Digital In/Out"
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
-new: "Options d'enregistrement"
+new: "Options d'enreg."
 
 id: LANG_DISK_STAT
 desc: disk size info
@@ -1258,7 +1258,7 @@ new: "- Ren + Eff"
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-new: "Mettre en queue"
+new: "File d'attente"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1388,7 +1388,7 @@ new: "Configuration"
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
-new: "Chargée"
+new: "Chargé"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1439,7 +1439,7 @@ new: "Configuration"
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
-new: "Enregistrée"
+new: "Enregistré"
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: Tells the user to stop the playback
@@ -1529,19 +1529,282 @@ new: "Toujours"
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-new: "Délai avant saut"
+new: "Délai avant défil."
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
-new: "Temps de coupure (hh:mm)"
+new: "Temps de coupure"
 
 id: LANG_RECORD_TIMESPLIT_REC
 decs: Display of record timer interval setting, on the record screen
 eng: "Split time:"
-new: "Tmps coupe:"
+new: "Tps coupe:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 new: "Afficher les icônes"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "Disque plein. Presser OFF pour continuer."
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "PLAY = Oui"
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Autres = Non"
+
+##
+## Strings used in the plugin loader:
+##
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Impossible d'ouvrir %s"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Erreur de Lecture %s"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "Modèle Incompatible"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "Mauvaise version"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Erreur retourné par le Plugin"
+
+##
+## boot change detection
+##
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new: "Démarrage Modifié"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "Redémarrer?"
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "Flipit"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othelo"
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Puzzle taquin"
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Star"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "En fin de file"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Insérer"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Insérer Dernier"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Suivant en file"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Insérer suivant"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "Enreg. list musiq. dynamique"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Options Liste musicale"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "%d pistes Insérées (%s)"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "%d pistes (%s) en file d'attente"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "%d pistes (%s) enreg."
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "OFF pour annuler"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STOP pour annuler"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Erreur de mise à jour du fichier control de liste musicale"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Erreur d'accés à la liste musicale"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Erreur d'accés au fichier control de liste musicale"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Erreur d'accés au répertoire"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Fichier control de liste musicale invalide"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Insertion récursive des répertoires"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Récursivement?"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Polices"
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Firmware"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Langue"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "Durant l'écran de lecture"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Configurations"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Plugins"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Mode Adaptateur Voiture"
+
+id: LANG_LINE_IN
+desc:  in settings_menu
+eng: "Line In"
+new: "Entrée(in)"
+
+id: LANG_NO_FILES
+desc:  in settings_menu
+eng: "No files"
+new: "Pas de Fichiers"
+
+id: LANG_BUTTONBAR_MENU
+desc:  in button bar
+eng: "Menu"
+new: "Menu"
+
+id: LANG_BUTTONBAR_OPTIONS
+desc:  in button bar
+eng: "Option"
+new: "Option"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc:  in button bar
+eng: "Preset"
+new: "Pré-selections"
+
+id: LANG_FM_SAVE_PRESET
+desc:  in radio screen
+eng: "Save preset"
+new: "Enreg. pré-selection"
+
+id: LANG_FM_DELETE_PRESET
+desc:  in radio screen
+eng: "Remove preset"
+new: "Suppr. pré-selection"
+
+id: LANG_FM_STATION
+desc:  in radio screen
+eng: "Station: %d.%dMHz"
+new: "Station: %d.%dMHz"
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc:  in radio screen
+eng: "Preset save failed"
+new: "Echec d'enreg. pré-selection"
+
+id: LANG_FM_NO_PRESETS
+desc:  in radio screen
+eng: "The preset list is empty"
+new: "liste de pré-selections vide"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc:  in radio screen
+eng: "The preset list is full"
+new: "liste de pré-selections pleine"
