@@ -47,7 +47,7 @@
 #define MAX_DIR_LEVELS 10
 
 struct entry {
-    bool file; /* true if file, false if dir */
+    char attr; /* FAT attributes */
     char name[TREE_MAX_FILENAMELEN];
 };
 
@@ -105,6 +105,8 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_MENU  BUTTON_MENU
 #endif /* HAVE_RECORDER_KEYPAD */
 
+#define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
+
 static int compare(const void* e1, const void* e2)
 {
     return strncmp((*(struct entry**)e1)->name, (*(struct entry**)e2)->name,
@@ -129,22 +131,40 @@ static int showdir(char *path, int start)
             struct dirent *entry = readdir(dir);
             if (!entry)
                 break;
-            if(entry->d_name[0] == '.') {
-                /* skip names starting with a dot */
+
+            /* skip directories . and .. */
+            if (!strncmp(entry->d_name, ".", 1) ||
+                !strncmp(entry->d_name, "..", 2)) {
                 i--;
                 continue;
             }
-            dircache[i].file = !(entry->attribute & ATTR_DIRECTORY);
+            dircache[i].attr = entry->attribute;
 
-            /* show only dir/m3u/mp3 ? */
             len = strlen(entry->d_name);
-            if ( global_settings.mp3filter &&
-                 dircache[i].file &&
-                 (len > 4) &&
-                 (strcasecmp(&entry->d_name[len-4], ".m3u") &&
-                  strcasecmp(&entry->d_name[len-4], ".mp3"))) {
-                i--;
-                continue;
+            if ( global_settings.mp3filter ) {
+
+                /* filter hidden files and directories */
+                if ( dircache[i].attr & ATTR_HIDDEN ) {
+                    i--;
+                    continue;
+                }
+
+                if ( !(dircache[i].attr & ATTR_DIRECTORY) ) {
+                    /* if not an mp3 or m3u, skip this file */
+                    if ( (len > 4) &&
+                         (strcasecmp(&entry->d_name[len-4], ".m3u") &&
+                          strcasecmp(&entry->d_name[len-4], ".mp3"))) {
+                        i--;
+                        continue;
+                    }
+                    else if ( len > 4 ) {
+                        /* mark m3u files as playlists */
+                        if ( !strcasecmp(&entry->d_name[len-4], ".m3u") )
+                            dircache[i].attr |= TREE_ATTR_M3U;
+                        /* cut off .mp3 and .m3u extensions */
+                        entry->d_name[len-4] = 0;
+                    }
+                }
             }
 
             strncpy(dircache[i].name,entry->d_name,TREE_MAX_FILENAMELEN);
@@ -177,11 +197,12 @@ static int showdir(char *path, int start)
         len = strlen(dircacheptr[i]->name);
 
 #ifdef HAVE_LCD_BITMAP
-        if ( dircacheptr[i]->file ) {
-            if(!strcasecmp(&dircacheptr[i]->name[len-4], ".m3u")) 
+        if ( !(dircacheptr[i]->attr & ATTR_DIRECTORY) ) {
+            if ( (dircacheptr[i]->attr & TREE_ATTR_M3U) ||
+                 !strcasecmp(&dircacheptr[i]->name[len-4], ".m3u"))
                 icon_type = Playlist;
             else
-                icon_type=File;
+                icon_type = File;
         } else
             icon_type=Folder;
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
@@ -219,7 +240,7 @@ char* peek_next_track(int steps)
                         dircursor++;
                     else
                         start++;
-                    if ( dircacheptr[dircursor+start]->file &&
+                    if ( !(dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) &&
                          dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
                         snprintf(buf,sizeof buf,"%s/%s",
                                  currdir, dircacheptr[dircursor+start]->name );
@@ -233,7 +254,7 @@ char* peek_next_track(int steps)
                         dircursor--;
                     else
                         start--;
-                    if ( dircacheptr[dircursor+start]->file &&
+                    if ( !(dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) &&
                          dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
                         snprintf(buf, sizeof(buf), "%s/%s",
                                  currdir, dircacheptr[dircursor+start]->name);
@@ -316,7 +337,7 @@ bool dirbrowse(char *root)
                              dircacheptr[dircursor+start]->name);
                 }
 
-                if (!dircacheptr[dircursor+start]->file) {
+                if (dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) {
                     if ( play_mode == 1 )
                         play_mode = 0;
                     memcpy(currdir,buf,sizeof(currdir));
