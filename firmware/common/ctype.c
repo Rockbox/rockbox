@@ -1,7 +1,8 @@
 #include <ctype.h>
 
 char    _ctype_[257]={
-	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
+	0,
+    _C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
 	_C,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C|_S,	_C,	_C,
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C,
