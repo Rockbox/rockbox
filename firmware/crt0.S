@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-	.section .text
+	.section .init.text
 	.global	start
 start:
 	/* We begin with some tricks. If we have built our code to be loaded
