@@ -39,6 +39,11 @@ BITMAPINFO2 bmi =
 }; /* bitmap information */
 
 
+void lcd_set_invert_display(bool invert)
+{
+    (void)invert;
+}
+
 /* lcd_update()
    update lcd */
 void lcd_update()
