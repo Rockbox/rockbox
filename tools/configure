@@ -16,7 +16,7 @@ input() {
     echo $response
 }
 
-simulator() {
+simul () {
  ##################################################################
  # Figure out where the firmware code is!
  #
@@ -69,14 +69,14 @@ clean:
 
 EOF
 
-echo "Created Makefile"
+  echo "Created Makefile"
 
-if [ -d "archos" ]; then
- echo "sub directory archos already present"
-else
- mkdir archos
- echo "created an archos subdirectory for simulating the hard disk"
-fi
+  if [ -d "archos" ]; then
+    echo "sub directory archos already present"
+  else
+    mkdir archos
+    echo "created an archos subdirectory for simulating the hard disk"
+  fi
 
 }
 
@@ -175,9 +175,9 @@ if [ -z "$debug" ]; then
   esac
 fi
 
-if [ -n "$simulator" ]; then
+if [ "yes" = "$simulator" ]; then
   # we deal with the simulator Makefile separately
-  simulator
+  simul
   exit
 fi
 
