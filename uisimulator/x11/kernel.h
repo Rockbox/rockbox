@@ -17,9 +17,8 @@
  *
  ****************************************************************************/
 
-#include "../../firmware/kernel.h"
+#include "../../firmware/include/kernel.h"
 
 #define sleep(x) x11_sleep(x)
 
 void x11_sleep(int);
-
