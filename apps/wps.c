@@ -339,11 +339,7 @@ bool load_custom_wps(void)
     }
     l = 0;
 
-#ifdef SIMULATOR
-    fd = x11_open(WPS_CONFIG, O_RDONLY);
-#else
     fd = open(WPS_CONFIG, O_RDONLY);
-#endif
     if(-1 == fd)
     {
         close(fd);
