@@ -815,6 +815,7 @@ static void mpeg_thread(void)
                 paused = false;
 
                 current_track_counter++;
+                update_playlist();
                 break;
 
             case MPEG_STOP:
@@ -954,30 +955,38 @@ static void mpeg_thread(void)
 
                 id3->elapsed = newtime;
 
-                if (id3->vbr && (id3->vbrflags & VBR_TOC_FLAG))
+                if (id3->vbr)
                 {
-                    /* Use the TOC to find the new position */
-                    unsigned int percent, remainder;
-                    int curtoc, nexttoc, plen;
-
-                    percent = (newtime*100)/id3->length; 
-                    if (percent > 99)
-                        percent = 99;
-
-                    curtoc = id3->toc[percent];
-
-                    if (percent < 99)
-                        nexttoc = id3->toc[percent+1];
+                    if (id3->vbrflags & VBR_TOC_FLAG)
+                    {
+                        /* Use the TOC to find the new position */
+                        unsigned int percent, remainder;
+                        int curtoc, nexttoc, plen;
+                        
+                        percent = (newtime*100)/id3->length; 
+                        if (percent > 99)
+                            percent = 99;
+                        
+                        curtoc = id3->toc[percent];
+                        
+                        if (percent < 99)
+                            nexttoc = id3->toc[percent+1];
+                        else
+                            nexttoc = 256;
+                        
+                        newpos = (id3->filesize/256)*curtoc;
+                        
+                        /* Use the remainder to get a more accurate position */
+                        remainder   = (newtime*100)%id3->length;
+                        remainder   = (remainder*100)/id3->length;
+                        plen        = (nexttoc - curtoc)*(id3->filesize/256);
+                        newpos     += (plen/100)*remainder;
+                    }
                     else
-                        nexttoc = 256;
-
-                    newpos = (id3->filesize/256)*curtoc;
-
-                    /* Use the remainder to get a more accurate position */
-                    remainder   = (newtime*100)%id3->length;
-                    remainder   = (remainder*100)/id3->length;
-                    plen        = (nexttoc - curtoc)*(id3->filesize/256);
-                    newpos     += (plen/100)*remainder;
+                    {
+                        /* No TOC exists, estimate the new position */
+                        newpos = (id3->filesize/id3->length)*newtime;
+                    }
                 }
                 else if (id3->bpf && id3->tpf)
                     newpos = (newtime/id3->tpf)*id3->bpf;
