@@ -90,7 +90,11 @@ ifndef TOOLSDIR
 	TOOLSDIR=../tools
 endif
 
+ifdef DEBUG
+all : $(OBJDIR)/rockbox.elf rocks
+else
 all : $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.ucl rocks
+endif
 
 rocks:
 	$(MAKE) -C plugins TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
