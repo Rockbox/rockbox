@@ -42,7 +42,6 @@ The batch timestamp is GMT.
 <a href="auto/build-player/archos.mod">Player</a><br>
 <a href="auto/build-playerdebug/archos.mod">Player debug</a><br>
 <a href="auto/build-playersim/rockboxui">Player simulator (linux)</a><br>
-<a href="auto/build-playersimwin32/uisw32.exe">Player simulator (win32)</a>
 </td>
 <td>
 <a href="auto/build-playerold/archos.mod">Player-old</a><br>
@@ -53,7 +52,6 @@ The batch timestamp is GMT.
 <a href="auto/build-recorder/ajbrec.ajz">Recorder</a><br>
 <a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a><br>
 <a href="auto/build-recordersim/rockboxui">Recorder simulator (linux)</a><br>
-<a href="auto/build-recordersimwin32/uisw32.exe">Recorder simulator (win32)</a>
 </td>
 </tr></table>
 

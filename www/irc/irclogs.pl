@@ -24,10 +24,15 @@ for ( @logs ) {
             $mname = ucfirst MonthNameEng($m);
             if ( $m != $lastm ) {
                 print "</ul></td>\n" if $lastm != 0;
+#                if ( $m % 6 == 0 ) {
+#                    print "</tr><tr valign=top>\n";
+#                }
                 print "<td align=\"right\"><b>$mname $y</b>\n";
                 print "<ul>\n";
                 $lastm = $m;
             }
+#            $lines = `wc -l $file` + 0;
+#            print "<li><a test href=\"$file\">$mname $d</a> <small>($lines lines)</small>\n";
             print "<li><a test href=\"$file\">$mname $d</a>\n";
         }
     }

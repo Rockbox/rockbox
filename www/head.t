@@ -29,8 +29,9 @@
 <p align="right">
 <a class="menulink" href="/">main page</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/tshirt-contest/">t-shirt contest</a><br>
+<a class="menulink" href="/manual/">manual</a><br>
 <a class="menulink" href="/docs/FAQ">FAQ</a><br>
+<a class="menulink" href="/tshirt-contest/">t-shirt contest</a><br>
 <a class="menulink" href="/notes.html">research notes</a><br>
 <a class="menulink" href="/docs/">data sheets</a><br>
 <a class="menulink" href="/schematics/">schematics</a><br>

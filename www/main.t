@@ -10,22 +10,13 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
-<p><i>2002-08-09</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
+<p><i>2002-08-09</i>: Version 1.2 is released. <a href="download/">Download it here</a>.
 
-<p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>. Bear with us while we chase down the last bad links.
+<p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>.
 
 <p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
 
 <p><i>2002-08-02</i>: <a href="tshirt-contest">Rockbox T-Shirt Design Contest</a>
-
-<p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk
-is not yet enabled on the players by default.
-
-<p><i>2002-06-30</i>: USB cable detection added.
-
-<p><i>2002-06-27</i>: MP3 playback now works for Recorder 6000 and Recorder 10 too.
-
-<p><i>2002-06-19</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
@@ -45,14 +36,8 @@ included in which versions. Naturally, this is all subject to change without
 notice.
 
 <dl>
-<dt><b>Version 1.1</b>
-<dd>Playlist support, scrolling, recorder support
-
-<dt><b>Version 1.2</b>
-<dd>UI improvements
-
 <dt><b>Version 1.3</b>
-<dd>Resume, persistent settings, autobuild playlists, UI improvements
+<dd>Resume, persistent settings, autobuild playlists, proportional fonts
 </dl>
 
 <h2>About the hardware</h2>

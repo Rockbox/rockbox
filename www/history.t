@@ -2,6 +2,15 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk
+is not yet enabled on the players by default.
+
+<p><i>2002-06-30</i>: USB cable detection added.
+
+<p><i>2002-06-27</i>: MP3 playback now works for Recorder 6000 and Recorder 10 too.
+
+<p><i>2002-06-19</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
+
 <p><i>2002-06-19</i>: Recorder sound support checked into CVS. Good news: No background noise!
 
 <p><i>2002-06-10</i>: Playlist and scroll support added. Testing for release v1.1.
