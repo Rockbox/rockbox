@@ -28,6 +28,7 @@ AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
 FIRMWARE := ../firmware
+TOOLS := ../tools
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
 
@@ -80,12 +81,12 @@ else
    OUTNAME = archos.mod
 endif
 
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
 
 all : $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/librockbox.a:
-	make -C $(FIRMWARE) -f win32.mak TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
+	make -C $(FIRMWARE) -f win32.mak TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) PLAYER=$(PLAYER) PLAYER_OLD=$(PLAYER_OLD)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
@@ -97,19 +98,26 @@ $(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
 	../tools/sh2d -sh1 $(OBJDIR)/archos.bin > $(OBJDIR)/archos.asm
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
-	scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
+	$(TOOLS)/scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(TARGET) -c $< -o $@
+
+$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang
+	perl ../tools/uplang lang/english.lang $< > $@
+
+$(OBJDIR)/lang.o: $(OBJDIR)/build.lang
+	perl -s ../tools/genlang -p=$(OBJDIR)/lang $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
-	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map
-	-$(RM) -r $(OBJDIR)/$(DEPS)
-	make -f ../firmware/win32.mak clean
+	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map \
+	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]
+	make -C $(FIRMWARE) -f win32.mak TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) clean
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/recorder
