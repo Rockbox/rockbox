@@ -10,6 +10,7 @@
 <li><a href="sh1_2p.pdf">Hitachi SH-1 Programming Manual r4.0</a> 1600 kB
 <li><a href="sh7032h.pdf">Hitachi SH-1 Hardware Manual r5.0</a> 2300 kB
 <li><a href="flash_SST37VF512.pdf">SST SST37VF020 256kB Flash ROM</a> 172 kB
+<li><a href="ata-atapi-v5.pdf">ATA-ATAPI-5</a> 2772 kB
 </ul>
 
 <h2>Player specific</h2>
@@ -18,6 +19,7 @@
 <li><a href="dsp_mas3507d_3pd.pdf">Micronas MAS 3507D MPEG Audio Decoder</a> 872 kB
 <li><a href="dac_dac3550a_1ds.pdf">Micronas DAC 3550A Stereo Audio DAC</a> 592 kB
 <li><a href="dram_41c16105.pdf">ISSI IS41LV16105 Fast Page DRAM</a> 148 kB
+<li><a href="isd200.pdf">ISD-200 USB/ATA bridge</a> 376 kB
 </ul>
 
 <h2>Recorder specific</h2>
@@ -31,6 +33,7 @@
 <li><a href="dc2dc_MC34063A.pdf">Fairchild MC34064A DC/DC converter</a> 45 kB
 <li><a href="fet_FZT849.pdf">FZT824 High Current Transistor</a> 60 kB
 <li><a href="rtc_tm41st84w.pdf">ST M41ST84W Real Time Clock</a> 180 kB
+<li><a href="isd300.pdf">ISD-300 USB/ATA bridge</a> 376 kB
 </ul>
 
 #include "foot.t"
