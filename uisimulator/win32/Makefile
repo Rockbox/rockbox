@@ -62,7 +62,6 @@ APPS = main.c tree.c menu.c credits.c main_menu.c\
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   DEFINES += -DLCD_PROPFONTS
    APPS += tetris.c sokoban.c blank.c bounce.c boxes.c icons.c bmp.c \
 	widgets.c wormlet.c
 endif

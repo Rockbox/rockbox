@@ -41,10 +41,6 @@ OUTPUT = $(OBJDIR)/librockbox.a
 
 ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(CFLAGS)))
 	EXTRA_TARGETS = $(OBJDIR)/system.ajf
-else
-ifeq ($(TARGET),-DARCHOS_RECORDER)
-	CFLAGS += -DLCD_PROPFONTS
-endif
 endif
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
