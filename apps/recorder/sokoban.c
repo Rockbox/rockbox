@@ -970,9 +970,9 @@ void update_screen(void) {
     
 
     snprintf (s, sizeof(s), "%d", current_level+1);
-    lcd_putsxy (86, 20, s, 0);
+    lcd_putsxy (86, 22, s, 0);
     snprintf (s, sizeof(s), "%d", moves);
-    lcd_putsxy (86, 52, s, 0);
+    lcd_putsxy (86, 54, s, 0);
 
     lcd_drawrect (80,0,111,31);
     lcd_drawrect (80,32,111,63);
