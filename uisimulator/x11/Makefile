@@ -50,7 +50,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 #SRCS = $(wildcard *.c)
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
 APPS = tetris.c screensaver.c tree.c app.c play.c menu.c
 
@@ -93,6 +93,9 @@ chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 id3.o: $(FIRMWAREDIR)/id3.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 sprintf.o: $(COMMON)/sprintf.c
