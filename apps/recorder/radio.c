@@ -580,7 +580,7 @@ void radio_load_presets(void)
 
 bool radio_preset_select(void)
 {
-    struct menu_items menu[MAX_PRESETS];
+    struct menu_item menu[MAX_PRESETS];
     int m, result;
     int i;
     bool reload_dir = false;
@@ -605,7 +605,7 @@ bool radio_preset_select(void)
         if(num_presets)
         {
             /* DIY menu handling, since we want to exit after selection */
-            m = menu_init( menu, num_presets, NULL );
+            m = menu_init( menu, num_presets, NULL, NULL, NULL, NULL );
             result = menu_show(m);
             menu_exit(m);
             if (result == MENU_SELECTED_EXIT)
@@ -655,7 +655,7 @@ static bool radio_add_preset(void)
 
 bool radio_delete_preset(void)
 {
-    struct menu_items menu[MAX_PRESETS];
+    struct menu_item menu[MAX_PRESETS];
     int m, result;
     int i;
     bool reload_dir = false;
@@ -678,7 +678,7 @@ bool radio_delete_preset(void)
         }
         
         /* DIY menu handling, since we want to exit after selection */
-        m = menu_init( menu, num_presets, NULL );
+        m = menu_init( menu, num_presets, NULL, NULL, NULL, NULL );
         result = menu_show(m);
         menu_exit(m);
         if (result == MENU_SELECTED_EXIT)
@@ -716,7 +716,7 @@ static bool fm_recording_settings(void)
 
 bool radio_menu(void)
 {
-    struct menu_items radio_menu_items[] = {
+    struct menu_item radio_menu_items[] = {
         { STR(LANG_FM_SAVE_PRESET), radio_add_preset },
         { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
         { STR(LANG_SOUND_SETTINGS), sound_menu },
@@ -726,7 +726,8 @@ bool radio_menu(void)
     bool result;
 
     m = menu_init( radio_menu_items,
-                   sizeof radio_menu_items / sizeof(struct menu_items), NULL );
+                   sizeof radio_menu_items / sizeof(struct menu_item), NULL,
+                   NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
