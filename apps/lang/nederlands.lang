@@ -212,7 +212,7 @@ new: "Uit"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "ask"
+eng: "Ask"
 new: "Vraag"
 
 id: LANG_ON
@@ -844,3 +844,18 @@ id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight on when charging"
 new: "Verlichting tijdens opladen"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Herhaal" 
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Alles" 
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Een"
