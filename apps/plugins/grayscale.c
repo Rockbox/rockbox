@@ -126,7 +126,7 @@ int main(void)
     /* initialize the grayscale buffer:
      * 112 pixels wide, 7 rows (56 pixels) high, (try to) reserve
      * 32 bitplanes for 33 shades of gray. (uses 25268 bytes)*/
-    shades = gray_init_buffer(gbuf, gbuf_size, 112, 7, 32) + 1;
+    shades = gray_init_buffer(gbuf, gbuf_size, 112, 7, 32, NULL) + 1;
 
     /* place grayscale overlay 1 row down */
     gray_position_display(0, 1);
