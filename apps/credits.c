@@ -58,13 +58,14 @@ struct credit credits[] = {
 #define DISPLAY_TIME  HZ
 #endif
 
-void show_credits(void)
+void roll_credits(void)
 {
     unsigned int i;
     int j;
     int line = 0;
 
     lcd_clear_display();
+
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0,9);
 #endif

@@ -82,19 +82,27 @@ int show_logo( void )
     return 0;
 }
 
-void show_splash(void)
+void show_credits(void)
 {
-    if (show_logo() != 0) 
-        return;
+    int j = 0;
 
-    button_get(true);
+    show_logo();
+    
+    for (j = 0; j < 10; j++) {
+        sleep((HZ*2)/10);
+
+        if (button_get(false))
+            return;	
+    }
+
+    roll_credits();
 }
 
 void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Splash, Credits, Sound
+        Tetris, Screen_Saver, Version, Sound
     };
 
     /* main menu */
@@ -104,14 +112,10 @@ void main_menu(void)
         { Tetris,       "Tetris",       tetris      },
         { Screen_Saver, "Screen Saver", screensaver },
 #endif
-        { Splash,       "Splash",       show_splash },
-        { Credits,      "Credits",      show_credits },
+        { Version,      "Version",      show_credits },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
     menu_run(m);
     menu_exit(m);
 }
-
-
-

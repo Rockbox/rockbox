@@ -21,7 +21,7 @@
 #define __ROCKBOX_CREDITS_H__
 
 /* Show who worked on the project */
-void show_credits(void);
+void roll_credits(void);
 
 #endif
 
