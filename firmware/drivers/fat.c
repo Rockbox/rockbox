@@ -802,10 +802,10 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
         LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
 
         if (entry==val)
-            panicf("Creating FAT loop: %x,%x\n",entry,val);
+            panicf("Creating FAT loop: %lx,%lx\n",entry,val);
 
         if ( entry < 2 )
-            panicf("Updating reserved FAT entry %d.\n",entry);
+            panicf("Updating reserved FAT entry %ld.\n",entry);
 
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
