@@ -64,6 +64,10 @@
 #define BOOTFILE "archos.mod"
 #endif
 
+/* This flag is set by dirbrowse() if a new language is loaded.
+   It is defined in settings_menu.c */
+extern bool language_changed;
+
 /* a table for the know file types */
 static struct
 {
@@ -1179,6 +1183,8 @@ static bool dirbrowse(char *root, int *dirfilter)
                                 talk_init(); /* use voice of same language */
                                 splash(HZ, true, str(LANG_LANGUAGE_LOADED));
                                 restore = true;
+
+                                language_changed = true;
                             }
                             break;
 
