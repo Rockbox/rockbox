@@ -1285,10 +1285,11 @@ int fat_closewrite(struct fat_file *file, int size, int attr)
         }
     }
 
-    if (file->dircluster)
+    if (file->dircluster) {
         rc = update_short_entry(file, size, attr);
         if (rc < 0)
             return rc * 10 - 1;
+    }
 
     flush_fat();
 
