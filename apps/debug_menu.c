@@ -341,38 +341,53 @@ void dbg_rtc(void)
 }
 #endif
 
+#ifdef HAVE_LCD_CHARCELLS
+#define NUMROWS 1
+#else
+#define NUMROWS 4
+#endif
 /* Read MAS registers and display them */
 void dbg_mas(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
-    int button;
 
     lcd_clear_display();
     lcd_puts(0, 0, "MAS register read:");
 
     while(1)
     {
-        for (r = 0; r < 4; r++) {
+        for (r = 0; r < NUMROWS; r++) {
             i = mas_readreg(addr + r);
-            snprintf(buf, 30, "0x%02x: %08x", addr + r, i);
-            lcd_puts(1, r+1, buf);
+            snprintf(buf, 30, "%02x %08x", addr + r, i);
+            lcd_puts(0, r+1, buf);
         }
-        
+
         lcd_update();
         sleep(HZ/16);
 
-        button = button_get(false);
-
-        switch(button)
+        switch(button_get(false))
         {
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
-                addr += 4;
+#else
+            case BUTTON_RIGHT:
+#endif
+                addr += NUMROWS;
                 break;
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
-                if (addr) { addr -= 4; }
-                break;
+#else
             case BUTTON_LEFT:
+#endif
+                if(addr)
+                    addr -= NUMROWS;
+                break;
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_DOWN:
+#endif
                 return;
         }
     }
@@ -383,7 +398,6 @@ void dbg_mas_codec(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
-    int button;
 
     lcd_clear_display();
     lcd_puts(0, 0, "MAS codec reg read:");
@@ -399,9 +413,7 @@ void dbg_mas_codec(void)
         lcd_update();
         sleep(HZ/16);
 
-        button = button_get(false);
-
-        switch(button)
+        switch(button_get(false))
         {
             case BUTTON_DOWN:
                 addr += 4;
