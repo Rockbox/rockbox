@@ -25,8 +25,8 @@ bool bookmark_menu(void);
 bool bookmark_autobookmark(void);
 bool bookmark_create_menu(void);
 bool bookmark_mrb_load(void);
-bool bookmark_autoload(char* file);
-bool bookmark_load(char* file, bool autoload);
+bool bookmark_autoload(const char* file);
+bool bookmark_load(const char* file, bool autoload);
 void bookmark_play(char* resume_file, int index, int offset, int seed);
 
 #endif /* __BOOKMARK_H__ */

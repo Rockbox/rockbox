@@ -36,8 +36,7 @@
 bool wps_refresh(struct mp3entry* id3, struct mp3entry* nid3,
                  int ffwd_offset, unsigned char refresh_mode);
 bool wps_display(struct mp3entry* id3, struct mp3entry* nid3);
-bool wps_load(char* file, bool display);
+bool wps_load(const char* file, bool display);
 void wps_reset(void);
-char* wps_get_genre(struct mp3entry* id3);
 
 #endif

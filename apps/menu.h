@@ -28,7 +28,7 @@ struct menu_item {
 };
 
 int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
-              char *button1, char *button2, char *button3);
+              const char *button1, const char *button2, const char *button3);
 void menu_exit(int menu);
 
 void put_cursorxy(int x, int y, bool on);

@@ -68,9 +68,9 @@ struct playlist_track_info
 
 /* Exported functions only for current playlist. */
 void playlist_init(void);
-int playlist_create(char *dir, char *file);
+int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
-int playlist_add(char *filename);
+int playlist_add(const char *filename);
 int playlist_shuffle(int random_seed, int start_index);
 int playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
@@ -82,15 +82,17 @@ int playlist_amount(void);
 
 /* Exported functions for all playlists.  Pass NULL for playlist_info
    structure to work with current playlist. */
-int playlist_create_ex(struct playlist_info* playlist, char* dir, char* file,
+int playlist_create_ex(struct playlist_info* playlist,
+                       const char* dir, const char* file,
                        void* index_buffer, int index_buffer_size,
                        void* temp_buffer, int temp_buffer_size);
 int playlist_set_current(struct playlist_info* playlist);
 void playlist_close(struct playlist_info* playlist);
-int playlist_insert_track(struct playlist_info* playlist, char *filename,
+int playlist_insert_track(struct playlist_info* playlist, const char *filename,
                           int position, bool queue);
-int playlist_insert_directory(struct playlist_info* playlist, char *dirname,
-                              int position, bool queue, bool recurse);
+int playlist_insert_directory(struct playlist_info* playlist,
+                              const char *dirname, int position, bool queue,
+                              bool recurse);
 int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
                              int position, bool queue);
 int playlist_delete(struct playlist_info* playlist, int index);
@@ -98,12 +100,13 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index);
 int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
                        bool start_current);
 int playlist_sort(struct playlist_info* playlist, bool start_current);
-bool playlist_modified(struct playlist_info* playlist);
-int playlist_get_first_index(struct playlist_info* playlist);
-int playlist_get_seed(struct playlist_info* playlist);
-int playlist_amount_ex(struct playlist_info* playlist);
-char *playlist_name(struct playlist_info* playlist, char *buf, int buf_size);
-char *playlist_get_name(struct playlist_info* playlist, char *buf,
+bool playlist_modified(const struct playlist_info* playlist);
+int playlist_get_first_index(const struct playlist_info* playlist);
+int playlist_get_seed(const struct playlist_info* playlist);
+int playlist_amount_ex(const struct playlist_info* playlist);
+char *playlist_name(const struct playlist_info* playlist, char *buf,
+                    int buf_size);
+char *playlist_get_name(const struct playlist_info* playlist, char *buf,
                         int buf_size);
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);

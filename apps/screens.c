@@ -656,10 +656,10 @@ bool quick_screen(int context, int button)
 #define MAXLINES 2
 #endif
 
-void splash(int ticks,   /* how long the splash is displayed */
-            bool center, /* FALSE means left-justified, TRUE means
-                            horizontal and vertical center */
-            char *fmt,   /* what to say *printf style */
+void splash(int ticks,       /* how long the splash is displayed */
+            bool center,     /* FALSE means left-justified, TRUE means
+                                horizontal and vertical center */
+            const char *fmt, /* what to say *printf style */
             ...)
 {
     char *next;
@@ -813,7 +813,7 @@ void charging_splash(void)
 #ifdef HAVE_LCD_BITMAP
 
 /* little helper function for voice output */
-static void say_time(int cursorpos, struct tm *tm)
+static void say_time(int cursorpos, const struct tm *tm)
 {
     const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
     int value = 0;
@@ -850,7 +850,7 @@ static void say_time(int cursorpos, struct tm *tm)
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
-bool set_time_screen(char* string, struct tm *tm)
+bool set_time_screen(const char* string, struct tm *tm)
 {
     bool done = false;
     int button;

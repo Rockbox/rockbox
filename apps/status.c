@@ -268,7 +268,7 @@ void status_draw(bool force_redraw)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static void draw_buttonbar_btn(int num, char* caption)
+static void draw_buttonbar_btn(int num, const char* caption)
 {
     int xpos, ypos, button_width, text_width;
     int fw, fh;
@@ -294,7 +294,8 @@ static char stored_caption1[8];
 static char stored_caption2[8];
 static char stored_caption3[8];
 
-void buttonbar_set(char* caption1, char *caption2, char *caption3)
+void buttonbar_set(const char* caption1, const char *caption2,
+                   const char *caption3)
 {
     buttonbar_unset();
     if(caption1)

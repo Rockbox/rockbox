@@ -123,8 +123,8 @@ static bool initialize(char* filename, bool reload);
 static void load_playlist_entries(int start_index);
 static void load_playlist_entries_r(int end_index);
 static int  load_entry(int index, int pos, char* p, int size);
-static void format_name(char* dest, char* src);
-static void format_line(struct playlist_entry* track, char* str, int len);
+static void format_name(char* dest, const char* src);
+static void format_line(const struct playlist_entry* track, char* str, int len);
 static void display_playlist(void);
 static void update_display_line(int line, bool scroll);
 static void scroll_display(int lines);
@@ -392,7 +392,7 @@ static int load_entry(int index, int pos, char* p, int size)
 }
 
 /* Format trackname for display purposes */
-static void format_name(char* dest, char* src)
+static void format_name(char* dest, const char* src)
 {
     switch (global_settings.playlist_viewer_track_display)
     {
@@ -422,7 +422,7 @@ static void format_name(char* dest, char* src)
 }
 
 /* Format display line */
-static void format_line(struct playlist_entry* track, char* str, int len)
+static void format_line(const struct playlist_entry* track, char* str, int len)
 {
     char name[MAX_PATH];
 

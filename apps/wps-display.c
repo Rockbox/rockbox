@@ -68,9 +68,11 @@
 #ifdef HAVE_LCD_CHARCELLS
 static unsigned char wps_progress_pat[8]={0,0,0,0,0,0,0,0};
 static bool full_line_progressbar=0;
-static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count);
+static bool draw_player_progress(const struct mp3entry* id3,
+                                 int ff_rewwind_count);
 static void draw_player_fullbar(char* buf, int buf_size,
-                                struct mp3entry* id3, int ff_rewwind_count);
+                                const struct mp3entry* id3,
+                                int ff_rewwind_count);
 static char map_fullbar_char(char ascii_val);
 #endif
 
@@ -86,7 +88,7 @@ bool wps_time_countup = true;
 static bool wps_loaded = false;
 
 /* Set format string to use for WPS, splitting it into lines */
-static void wps_format(char* fmt)
+static void wps_format(const char* fmt)
 {
     char* buf = format_buffer;
     char* start_of_line = format_buffer;
@@ -170,7 +172,7 @@ void wps_reset(void)
     memset(&format_buffer, 0, sizeof format_buffer);
 }
 
-bool wps_load(char* file, bool display)
+bool wps_load(const char* file, bool display)
 {
     int i, s;
     char buffer[FORMAT_BUFFER_SIZE];
@@ -256,10 +258,10 @@ static void format_time(char* buf, int buf_size, int time)
  *
  * Returns buf if the desired level was found, NULL otherwise.
  */
-static char* get_dir(char* buf, int buf_size, char* path, int level)
+static char* get_dir(char* buf, int buf_size, const char* path, int level)
 {
-    char* sep;
-    char* last_sep;
+    const char* sep;
+    const char* last_sep;
     int len;
 
     sep = path + strlen(path);
@@ -304,7 +306,7 @@ static char* get_dir(char* buf, int buf_size, char* path, int level)
  */
 static char* get_tag(struct mp3entry* cid3,
                      struct mp3entry* nid3,
-                     char* tag,
+                     const char* tag,
                      char* buf,
                      int buf_size,
                      unsigned char* tag_len,
@@ -622,7 +624,7 @@ static char* get_tag(struct mp3entry* cid3,
  *
  * Returns the new position in fmt.
  */
-static char* skip_conditional(char* fmt, bool to_else)
+static const char* skip_conditional(const char* fmt, bool to_else)
 {
     int level = 1;
 
@@ -693,7 +695,7 @@ static void format_display(char* buf,
                            int buf_size,
                            struct mp3entry* id3,
                            struct mp3entry* nid3, /* next song's id3 */
-                           char* fmt,
+                           const char* fmt,
                            unsigned char* subline_time_mult,
                            unsigned char* flags)
 {
@@ -1051,7 +1053,8 @@ bool wps_display(struct mp3entry* id3,
 }
 
 #ifdef HAVE_LCD_CHARCELLS
-static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
+static bool draw_player_progress(const struct mp3entry* id3,
+                                 int ff_rewwind_count)
 {
     char player_progressbar[7];
     char binline[36];
@@ -1087,7 +1090,8 @@ static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 }
 
 static void draw_player_fullbar(char* buf, int buf_size,
-                                struct mp3entry* id3, int ff_rewwind_count)
+                                const struct mp3entry* id3,
+                                int ff_rewwind_count)
 {
     int i,j,lcd_char_pos;
 

@@ -153,7 +153,7 @@ struct plugin_api {
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
-    void (*splash)(int ticks, bool center, char *fmt, ...);
+    void (*splash)(int ticks, bool center, const char *fmt, ...);
 
     /* button */
     int (*button_get)(bool block);
@@ -298,7 +298,7 @@ struct plugin_api {
 };
 
 /* defined by the plugin loader (plugin.c) */
-int plugin_load(char* plugin, void* parameter);
+int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_mp3_buffer(int *buffer_size);
 int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void));

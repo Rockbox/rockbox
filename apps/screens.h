@@ -31,14 +31,14 @@ int on_screen(void);
 bool quick_screen(const int, const int);
 #endif
 
-void splash(int ticks,  /* how long */
-            bool center, /* FALSE means left-justified, TRUE means
-                            horizontal and vertical center */
-            char *fmt,  /* what to say *printf style */
+void splash(int ticks,       /* how long */
+            bool center,     /* FALSE means left-justified, TRUE means
+                                horizontal and vertical center */
+            const char *fmt, /* what to say *printf style */
             ...);
 
 #ifdef HAVE_RTC
-bool set_time_screen(char* string, struct tm *tm);
+bool set_time_screen(const char* string, struct tm *tm);
 #endif
 
 bool shutdown_screen(void);

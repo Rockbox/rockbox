@@ -118,7 +118,7 @@ static int boot_cluster;
 static bool boot_changed = false;
 
 static bool start_wps = false;
-static bool dirbrowse(char *root, int *dirfilter);
+static bool dirbrowse(const char *root, const int *dirfilter);
 
 void browse_root(void)
 {
@@ -293,7 +293,7 @@ static int compare(const void* p1, const void* p2)
     return 0; /* never reached */
 }
 
-static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
+static void showfileline(int line, int direntry, bool scroll, const int *dirfilter)
 {
     char* name = dircache[direntry].name;
     int xpos = LINE_X;
@@ -331,7 +331,7 @@ static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
 }
 
 /* load sorted directory into dircache.  returns NULL on failure. */
-struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
+struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
                                       int *num_files, bool *buffer_full)
 {
     int i;
@@ -453,7 +453,7 @@ static int recalc_screen_height(void)
 }
 #endif
 
-static int showdir(char *path, int start, int *dirfilter)
+static int showdir(const char *path, int start, const int *dirfilter)
 {
     int i;
     int tree_max_on_screen;
@@ -652,7 +652,7 @@ static bool ask_resume(bool ask_once)
 }
 
 /* load tracks from specified directory to resume play */
-void resume_directory(char *dir)
+void resume_directory(const char *dir)
 {
     bool buffer_full;
 
@@ -753,7 +753,8 @@ void set_current_file(char *path)
 }
 
 #ifdef BUTTON_ON
-static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, int *dirfilter)
+static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen,
+                      const int *dirfilter)
 {
     bool exit = false;
     bool used = false;
@@ -878,7 +879,7 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
 }
 #endif
 
-static bool dirbrowse(char *root, int *dirfilter)
+static bool dirbrowse(const char *root, const int *dirfilter)
 {
     int numentries=0;
     char buf[MAX_PATH];
@@ -1643,7 +1644,7 @@ bool create_playlist(void)
     return true;
 }
 
-bool rockbox_browse(char *root, int dirfilter)
+bool rockbox_browse(const char *root, int dirfilter)
 {
     bool rc;
     int dircursor_save = dircursor;

@@ -25,4 +25,4 @@
 #define LANGUAGE_VERSION 0x02
 
 /* load a given language file */
-int lang_load(char *filename);
+int lang_load(const char *filename);

@@ -42,7 +42,7 @@ static const char* const fmt[] =
     "%d.%02d %s  "      /* 2 decimals */
 };
 
-bool set_sound(char* string, 
+bool set_sound(const char* string,
                int* variable,
                int setting)
 {

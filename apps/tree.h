@@ -52,12 +52,12 @@ void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
 void set_current_file(char *path);
-bool rockbox_browse(char *root, int dirfilter);
+bool rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);
-void resume_directory(char *dir);
+void resume_directory(const char *dir);
 char *getcwd(char *buf, int size);
 void reload_directory(void);
-struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
+struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
                                       int *num_files, bool *buffer_full);
 
 #endif

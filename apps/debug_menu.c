@@ -202,7 +202,7 @@ bool dbg_mpeg_thread(void)
 
 
 /* Tool function to calculate a CRC16 across some buffer */
-unsigned short crc_16(unsigned char* buf, unsigned len)
+unsigned short crc_16(const unsigned char* buf, unsigned len)
 {
     /* CCITT standard polynomial 0x1021 */
     static const unsigned short crc16_lookup[16] = 

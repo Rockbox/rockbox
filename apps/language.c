@@ -28,7 +28,7 @@ extern int printf(const char *format, ...);
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
 
-int lang_load(char *filename)
+int lang_load(const char *filename)
 {
     int filesize;
     int fd = open(filename, O_RDONLY);

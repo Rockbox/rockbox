@@ -378,7 +378,7 @@ int talk_id(int id, bool enqueue)
 
 
 /* play a thumbnail from file */
-int talk_file(char* filename, bool enqueue)
+int talk_file(const char* filename, bool enqueue)
 {
     int fd;
     int size;
@@ -532,7 +532,7 @@ int talk_value(int n, int unit, bool enqueue)
 }
 
 /* spell a string */
-int talk_spell(char* spell, bool enqueue) 
+int talk_spell(const char* spell, bool enqueue) 
 {
     char c; /* currently processed char */
     

@@ -339,7 +339,7 @@ static const struct bit_entry hd_bits[] =
 
 /* helper function to extract n (<=32) bits from an arbitrary position */
 static unsigned long get_bits(
-    unsigned long* p, /* the start of the bitfield array */
+    const unsigned long* p, /* the start of the bitfield array */
     unsigned int from, /* bit no. to start reading from */
     unsigned int size) /* how many bits to read */
 {
@@ -418,7 +418,7 @@ static void set_bits(
  * Calculates the checksum for the config block and returns it
  */
 
-static unsigned short calculate_config_checksum(unsigned char* buf)
+static unsigned short calculate_config_checksum(const unsigned char* buf)
 {
     unsigned int i;
     unsigned char cksum[2];
@@ -890,8 +890,8 @@ void set_file(char* filename, char* setting, int maxlen)
 static int load_cfg_table(
     const struct bit_entry* p_table, /* the table which describes the entries */
     int count, /* number of entries in the table, including the first */
-    char* name, /* the item to be searched */
-    char* value, /* the value which got loaded for that item */
+    const char* name, /* the item to be searched */
+    const char* value, /* the value which got loaded for that item */
     int hint) /* position to start looking */
 {
     int i = hint;
@@ -963,7 +963,7 @@ static int load_cfg_table(
 }
 
 
-bool settings_load_config(char* file)
+bool settings_load_config(const char* file)
 {
     int fd;
     char line[128];
@@ -1238,7 +1238,7 @@ void settings_reset(void) {
 
 }
 
-bool set_bool(char* string, bool* variable )
+bool set_bool(const char* string, bool* variable )
 {
     return set_bool_options(string, variable, 
         STR(LANG_SET_BOOL_YES), 
@@ -1256,9 +1256,9 @@ void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
-bool set_bool_options(char* string, bool* variable,
-                      char* yes_str, int yes_voice,
-                      char* no_str, int no_voice,
+bool set_bool_options(const char* string, bool* variable,
+                      const char* yes_str, int yes_voice,
+                      const char* no_str, int no_voice,
                       void (*function)(bool))
 {
     struct opt_items names[] = { {no_str, no_voice}, {yes_str, yes_voice} };
@@ -1270,8 +1270,8 @@ bool set_bool_options(char* string, bool* variable,
     return result;
 }
 
-bool set_int(char* string, 
-             char* unit,
+bool set_int(const char* string,
+             const char* unit,
              int voice_unit,
              int* variable,
              void (*function)(int),
@@ -1391,7 +1391,7 @@ bool set_int(char* string,
    different and bit-incompatible types and can not share the same access
    code. */
 
-bool set_option(char* string, void* variable, enum optiontype type,
+bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
 {
     bool done = false;

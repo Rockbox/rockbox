@@ -264,19 +264,19 @@ void settings_apply(void);
 void settings_apply_pm_range(void);
 void settings_display(void);
 
-bool settings_load_config(char* file);
+bool settings_load_config(const char* file);
 bool settings_save_config(void);
-bool set_bool_options(char* string, bool* variable, 
-                      char* yes_str, int yes_voice,
-                      char* no_str, int no_voice,
+bool set_bool_options(const char* string, bool* variable,
+                      const char* yes_str, int yes_voice,
+                      const char* no_str, int no_voice,
                       void (*function)(bool));
 
-bool set_bool(char* string, bool* variable );
-bool set_option(char* string, void* variable, enum optiontype type,
+bool set_bool(const char* string, bool* variable );
+bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
-bool set_int(char* string, char* unit, int voice_unit, int* variable,
+bool set_int(const char* string, const char* unit, int voice_unit, int* variable,
              void (*function)(int), int step, int min, int max );
-bool set_time_screen(char* string, struct tm *tm);
+bool set_time_screen(const char* string, struct tm *tm);
 int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 

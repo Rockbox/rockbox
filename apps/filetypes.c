@@ -72,11 +72,11 @@ static char   string_buffer[STRING_BUFFER_SIZE];
 
 /* prototypes */
 #ifdef HAVE_LCD_BITMAP
-static char*  string2icon(char*);
+static char*  string2icon(const char*);
 #endif
-static char*  get_string(char*);
+static char*  get_string(const char*);
 static int    find_attr_index(int);
-static bool   read_config(char*);
+static bool   read_config(const char*);
 static void   rm_whitespaces(char*);
 static void   scan_plugins(void);
 
@@ -160,7 +160,7 @@ int   filetype_get_icon(int attr)
 }
 
 /* get plugin */
-char* filetype_get_plugin(struct entry* file)
+char* filetype_get_plugin(const struct entry* file)
 {
     int ix;
 
@@ -197,7 +197,7 @@ bool filetype_supported(int attr)
 }
 
 /* get the "dynamic" attribute for an extension */
-int filetype_get_attr(char* name)
+int filetype_get_attr(const char* name)
 {
     int i;
 
@@ -239,7 +239,7 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
 }
 
 /* start a plugin with an argument (called from onplay.c) */
-int filetype_load_plugin(char* plugin, char* file)
+int filetype_load_plugin(const char* plugin, char* file)
 {
     snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
              VIEWERS_DIR,plugin);
@@ -427,7 +427,7 @@ static void scan_plugins(void)
 }
 
 /* read config file (or cahe file) */
-bool read_config(char* file)
+bool read_config(const char* file)
 {
     enum {extension,
           plugin,
@@ -584,7 +584,7 @@ bool read_config(char* file)
 
 #ifdef HAVE_LCD_BITMAP
 /* convert an ascii hexadecimal icon to a binary icon */
-static char* string2icon(char* str)
+static char* string2icon(const char* str)
 {
     char tmp[ICON_LENGTH*2];
     char *cp;
@@ -634,7 +634,7 @@ static char* string2icon(char* str)
 #endif
 
 /* get string from buffer */
-static char* get_string(char* str)
+static char* get_string(const char* str)
 {
     unsigned int l=strlen(str)+1;
     char* cp;

@@ -261,7 +261,7 @@ static const struct plugin_api rockbox_api = {
     mpeg_get_last_header,
 };
 
-int plugin_load(char* plugin, void* parameter)
+int plugin_load(const char* plugin, void* parameter)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int rc;

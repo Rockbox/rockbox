@@ -51,19 +51,19 @@
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
 
-static bool  add_bookmark(char* bookmark_file_name, char* bookmark);
+static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark);
 static bool  bookmark_load_menu(void);
-static bool  check_bookmark(char* bookmark);
+static bool  check_bookmark(const char* bookmark);
 static char* create_bookmark(void);
-static bool  delete_bookmark(char* bookmark_file_name, int bookmark_id);
-static void  display_bookmark(char* bookmark,
+static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
+static void  display_bookmark(const char* bookmark,
                               int bookmark_id, 
                               int bookmark_count);
-static void  say_bookmark(char* bookmark,
+static void  say_bookmark(const char* bookmark,
                           int bookmark_id);
-static bool  generate_bookmark_file_name(char *in);
-static char* get_bookmark(char* bookmark_file, int bookmark_count);
-static bool  parse_bookmark(char *bookmark,
+static bool  generate_bookmark_file_name(const char *in);
+static char* get_bookmark(const char* bookmark_file, int bookmark_count);
+static bool  parse_bookmark(const char *bookmark,
                             int *resume_index,
                             int *resume_offset,
                             int *resume_seed,
@@ -75,10 +75,10 @@ static bool  parse_bookmark(char *bookmark,
                             bool *shuffle,
                             char* file_name,
                             unsigned int max_file_name_size);
-static char* select_bookmark(char* bookmark_file_name);
+static char* select_bookmark(const char* bookmark_file_name);
 static bool  system_check(void);
 static bool  write_bookmark(bool create_bookmark_file);
-static int   get_bookmark_count(char* bookmark_file_name);
+static int   get_bookmark_count(const char* bookmark_file_name);
 
 static char global_temp_buffer[MAX_PATH+1];
 static char global_bookmark_file_name[MAX_PATH];
@@ -332,7 +332,7 @@ static bool write_bookmark(bool create_bookmark_file)
 /* ----------------------------------------------------------------------- */
 /* This function adds a bookmark to a file.                                */
 /* ------------------------------------------------------------------------*/
-static bool add_bookmark(char* bookmark_file_name, char* bookmark)
+static bool add_bookmark(const char* bookmark_file_name, const char* bookmark)
 {
     int    temp_bookmark_file = 0;
     int    bookmark_file = 0;
@@ -447,7 +447,7 @@ static char* create_bookmark()
         return NULL;
 }
 
-static bool check_bookmark(char* bookmark)
+static bool check_bookmark(const char* bookmark)
 {
     return parse_bookmark(bookmark,
                           NULL,NULL,NULL, NULL,
@@ -459,7 +459,7 @@ static bool check_bookmark(char* bookmark)
 /* This function will determine if an autoload is necessary.  This is an   */
 /* interface function.                                                     */
 /* ------------------------------------------------------------------------*/
-bool bookmark_autoload(char* file)
+bool bookmark_autoload(const char* file)
 {
     int  key;
     int  fd;
@@ -537,7 +537,7 @@ bool bookmark_autoload(char* file)
 /* This function loads the bookmark information into the resume memory.    */
 /* This is an interface function.                                          */
 /* ------------------------------------------------------------------------*/
-bool bookmark_load(char* file, bool autoload)
+bool bookmark_load(const char* file, bool autoload)
 {
     int  fd;
     bool success = true;
@@ -587,7 +587,7 @@ bool bookmark_load(char* file, bool autoload)
 }
 
 
-static int get_bookmark_count(char* bookmark_file_name)
+static int get_bookmark_count(const char* bookmark_file_name)
 {
     int read_count = 0;
     int file = open(bookmark_file_name, O_RDONLY);
@@ -613,7 +613,7 @@ static int get_bookmark_count(char* bookmark_file_name)
 /* This displays a the bookmarks in a file and allows the user to          */
 /* select one to play.                                                     */
 /* ------------------------------------------------------------------------*/
-static char* select_bookmark(char* bookmark_file_name)
+static char* select_bookmark(const char* bookmark_file_name)
 {
     int bookmark_id = 0;
     int bookmark_id_prev = -1;
@@ -732,7 +732,7 @@ static char* select_bookmark(char* bookmark_file_name)
 /* This function takes a location in a bookmark file and deletes that      */
 /* bookmark.                                                               */
 /* ------------------------------------------------------------------------*/
-static bool delete_bookmark(char* bookmark_file_name, int bookmark_id)
+static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
 {
     int temp_bookmark_file = 0;
     int bookmark_file = 0;
@@ -784,7 +784,7 @@ static bool delete_bookmark(char* bookmark_file_name, int bookmark_id)
 /* ----------------------------------------------------------------------- */
 /* This function parses a bookmark and displays it for the user.           */
 /* ------------------------------------------------------------------------*/
-static void display_bookmark(char* bookmark,
+static void display_bookmark(const char* bookmark,
                              int bookmark_id,
                              int bookmark_count)
 {
@@ -908,7 +908,7 @@ static void display_bookmark(char* bookmark,
 /* ----------------------------------------------------------------------- */
 /* This function parses a bookmark, says the voice UI part of it.          */
 /* ------------------------------------------------------------------------*/
-static void say_bookmark(char* bookmark,
+static void say_bookmark(const char* bookmark,
                          int bookmark_id)
 {
     int resume_index;
@@ -952,7 +952,7 @@ static void say_bookmark(char* bookmark,
 /* in the file, it will return the last one.                               */
 /* It also returns the index number of the bookmark in the file            */
 /* ------------------------------------------------------------------------*/
-static char* get_bookmark(char* bookmark_file, int bookmark_count)
+static char* get_bookmark(const char* bookmark_file, int bookmark_count)
 {
     int read_count = -1;
     int result = 0;
@@ -989,7 +989,7 @@ static char* get_bookmark(char* bookmark_file, int bookmark_count)
 /* validates the bookmark.  Passing in NULL for an output variable         */
 /* indicates that value is not requested.                                  */
 /* ----------------------------------------------------------------------- */
-static bool parse_bookmark(char *bookmark,
+static bool parse_bookmark(const char *bookmark,
                            int *resume_index,
                            int *resume_offset,
                            int *resume_seed,
@@ -1123,7 +1123,7 @@ static bool parse_bookmark(char *bookmark,
 /* it would be here that the centralized/decentralized bookmark code       */
 /* could be placed.                                                        */
 /* ----------------------------------------------------------------------- */
-static bool generate_bookmark_file_name(char *in)
+static bool generate_bookmark_file_name(const char *in)
 {
     int len = strlen(in);
 

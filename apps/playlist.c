@@ -128,19 +128,19 @@ static struct playlist_info current_playlist;
 static char now_playing[MAX_PATH+1];
 
 static void empty_playlist(struct playlist_info* playlist, bool resume);
-static void new_playlist(struct playlist_info* playlist, char *dir,
-                         char *file);
+static void new_playlist(struct playlist_info* playlist, const char *dir,
+                         const char *file);
 static void create_control(struct playlist_info* playlist);
 static int  check_control(struct playlist_info* playlist);
 static void update_playlist_filename(struct playlist_info* playlist,
-                                     char *dir, char *file);
+                                     const char *dir, const char *file);
 static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, int buflen);
 static int add_track_to_playlist(struct playlist_info* playlist,
-                                 char *filename, int position, bool queue,
-                                 int seek_pos);
+                                 const char *filename, int position, 
+                                 bool queue, int seek_pos);
 static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     char *dirname, int *position, bool queue,
+                                     const char *dirname, int *position, bool queue,
                                      int *count, bool recurse);
 static int remove_track_from_playlist(struct playlist_info* playlist,
                                       int position, bool write);
@@ -149,18 +149,18 @@ static int randomise_playlist(struct playlist_info* playlist,
                               bool write);
 static int sort_playlist(struct playlist_info* playlist, bool start_current,
                          bool write);
-static int get_next_index(struct playlist_info* playlist, int steps);
+static int get_next_index(const struct playlist_info* playlist, int steps);
 static void find_and_set_playlist_index(struct playlist_info* playlist,
                                         unsigned int seek);
 static int compare(const void* p1, const void* p2);
 static int get_filename(struct playlist_info* playlist, int seek,
                         bool control_file, char *buf, int buf_length);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             char *dir);
-static void display_playlist_count(int count, char *fmt);
+                             const char *dir);
+static void display_playlist_count(int count, const char *fmt);
 static void display_buffer_full(void);
 static int flush_pending_control(struct playlist_info* playlist);
-static int rotate_index(struct playlist_info* playlist, int index);
+static int rotate_index(const struct playlist_info* playlist, int index);
 
 /*
  * remove any files and indices associated with the playlist
@@ -212,8 +212,8 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
  * Initialize a new playlist for viewing/editing/playing.  dir is the
  * directory where the playlist is located and file is the filename.
  */
-static void new_playlist(struct playlist_info* playlist, char *dir,
-                         char *file)
+static void new_playlist(struct playlist_info* playlist, const char *dir,
+                         const char *file)
 {
     empty_playlist(playlist, false);
 
@@ -291,7 +291,7 @@ static int check_control(struct playlist_info* playlist)
  * store directory and name of playlist file
  */
 static void update_playlist_filename(struct playlist_info* playlist,
-                                     char *dir, char *file)
+                                     const char *dir, const char *file)
 {
     char *sep="";
     int dirlen = strlen(dir);
@@ -400,8 +400,8 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
  *     PLAYLIST_INSERT_LAST  - Add track to end of playlist
  */
 static int add_track_to_playlist(struct playlist_info* playlist,
-                                 char *filename, int position, bool queue,
-                                 int seek_pos)
+                                 const char *filename, int position,
+                                 bool queue, int seek_pos)
 {
     int insert_position = position;
     unsigned int flags = PLAYLIST_INSERT_TYPE_INSERT;
@@ -523,7 +523,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
  * Insert directory into playlist.  May be called recursively.
  */
 static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     char *dirname, int *position, bool queue,
+                                     const char *dirname, int *position, bool queue,
                                      int *count, bool recurse)
 {
     char buf[MAX_PATH+1];
@@ -791,7 +791,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
  * returns the index of the track that is "steps" away from current playing
  * track.
  */
-static int get_next_index(struct playlist_info* playlist, int steps)
+static int get_next_index(const struct playlist_info* playlist, int steps)
 {
     int current_index = playlist->index;
     int next_index    = -1;
@@ -972,7 +972,7 @@ static int get_filename(struct playlist_info* playlist, int seek,
  * Returns absolute path of track
  */
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             char *dir)
+                             const char *dir)
 {
     int i = 0;
     int j;
@@ -1037,7 +1037,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
  * Display splash message showing progress of playlist/directory insertion or
  * save.
  */
-static void display_playlist_count(int count, char *fmt)
+static void display_playlist_count(int count, const char *fmt)
 {
     lcd_clear_display();
 
@@ -1120,7 +1120,7 @@ static int flush_pending_control(struct playlist_info* playlist)
 /*
  * Rotate indices such that first_index is index 0
  */
-static int rotate_index(struct playlist_info* playlist, int index)
+static int rotate_index(const struct playlist_info* playlist, int index)
 {
     index -= playlist->first_index;
     if (index < 0)
@@ -1153,7 +1153,7 @@ void playlist_init(void)
 /*
  * Create new playlist
  */
-int playlist_create(char *dir, char *file)
+int playlist_create(const char *dir, const char *file)
 {
     struct playlist_info* playlist = &current_playlist;
 
@@ -1555,7 +1555,7 @@ int playlist_resume(void)
 /* 
  * Add track to in_ram playlist.  Used when playing directories.
  */
-int playlist_add(char *filename)
+int playlist_add(const char *filename)
 {
     struct playlist_info* playlist = &current_playlist;
     int len = strlen(filename);
@@ -1780,7 +1780,8 @@ int playlist_amount(void)
  * playlist indices (required for and only used if !current playlist).  The
  * temp_buffer (if not NULL) is used as a scratchpad when loading indices.
  */
-int playlist_create_ex(struct playlist_info* playlist, char* dir, char* file,
+int playlist_create_ex(struct playlist_info* playlist,
+                       const char* dir, const char* file,
                        void* index_buffer, int index_buffer_size,
                        void* temp_buffer, int temp_buffer_size)
 {
@@ -1897,7 +1898,7 @@ void playlist_close(struct playlist_info* playlist)
  * Insert track into playlist at specified position (or one of the special
  * positions).  Returns position where track was inserted or -1 if error.
  */
-int playlist_insert_track(struct playlist_info* playlist, char *filename,
+int playlist_insert_track(struct playlist_info* playlist, const char *filename,
                           int position, bool queue)
 {
     int result;
@@ -1925,8 +1926,9 @@ int playlist_insert_track(struct playlist_info* playlist, char *filename,
 /*
  * Insert all tracks from specified directory into playlist.
  */
-int playlist_insert_directory(struct playlist_info* playlist, char *dirname,
-                              int position, bool queue, bool recurse)
+int playlist_insert_directory(struct playlist_info* playlist,
+                              const char *dirname, int position, bool queue,
+                              bool recurse)
 {
     int count = 0;
     int result;
@@ -2226,7 +2228,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
 }
 
 /* returns true if playlist has been modified */
-bool playlist_modified(struct playlist_info* playlist)
+bool playlist_modified(const struct playlist_info* playlist)
 {
     if (!playlist)
         playlist = &current_playlist;
@@ -2240,7 +2242,7 @@ bool playlist_modified(struct playlist_info* playlist)
 }
 
 /* returns index of first track in playlist */
-int playlist_get_first_index(struct playlist_info* playlist)
+int playlist_get_first_index(const struct playlist_info* playlist)
 {
     if (!playlist)
         playlist = &current_playlist;
@@ -2249,7 +2251,7 @@ int playlist_get_first_index(struct playlist_info* playlist)
 }
 
 /* returns shuffle seed of playlist */
-int playlist_get_seed(struct playlist_info* playlist)
+int playlist_get_seed(const struct playlist_info* playlist)
 {
     if (!playlist)
         playlist = &current_playlist;
@@ -2258,7 +2260,7 @@ int playlist_get_seed(struct playlist_info* playlist)
 }
 
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
-int playlist_amount_ex(struct playlist_info* playlist)
+int playlist_amount_ex(const struct playlist_info* playlist)
 {
     if (!playlist)
         playlist = &current_playlist;
@@ -2267,7 +2269,8 @@ int playlist_amount_ex(struct playlist_info* playlist)
 }
 
 /* returns full path of playlist (minus extension) */
-char *playlist_name(struct playlist_info* playlist, char *buf, int buf_size)
+char *playlist_name(const struct playlist_info* playlist, char *buf,
+                    int buf_size)
 {
     char *sep;
 
@@ -2288,7 +2291,7 @@ char *playlist_name(struct playlist_info* playlist, char *buf, int buf_size)
 }
 
 /* returns the playlist filename */
-char *playlist_get_name(struct playlist_info* playlist, char *buf,
+char *playlist_get_name(const struct playlist_info* playlist, char *buf,
                         int buf_size)
 {
     if (!playlist)

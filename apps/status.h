@@ -34,7 +34,8 @@ void status_init(void);
 void status_set_ffmode(enum playmode mode);
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
-void buttonbar_set(char* caption1, char* caption2, char* caption3);
+void buttonbar_set(const char* caption1, const char* caption2, 
+                   const char* caption3);
 void buttonbar_unset(void);
 bool buttonbar_isset(void);
 void buttonbar_draw(void);
