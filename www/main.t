@@ -41,7 +41,7 @@ notice.
 <dt><b>Version 1.2</b>
 <dd>UI improvements
 
-<dt><b>Version 1.2</b>
+<dt><b>Version 1.3</b>
 <dd>Resume, persistent settings, autobuild playlists, UI improvements
 </dl>
 
