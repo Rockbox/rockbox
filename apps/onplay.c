@@ -56,7 +56,7 @@ static bool list_viewers(void)
     int m, i, result;
     int ret = 0;
 
-    i=filetype_load_menu(menu,sizeof(menu)/sizeof(*menu),selected_file);
+    i=filetype_load_menu(menu,sizeof(menu)/sizeof(*menu));
     if (i)
     {
         m = menu_init( menu, i, NULL, NULL, NULL, NULL );
