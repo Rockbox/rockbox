@@ -966,12 +966,9 @@ int fat_getnext(struct bpb *bpb,
                             /* current or cached sector? */
                             if ( sectoridx >= SECTOR_SIZE ) {
                                 if ( sectoridx >= SECTOR_SIZE*2 ) {
-                                    if ( index >= SECTOR_SIZE ) {
-                                        if ( index >= SECTOR_SIZE*2 )
-                                            ptr = ent->cached_buf;
-                                        else
-                                            ptr = lastsector;
-                                    }
+                                    if ( ( index >= SECTOR_SIZE ) &&
+                                         ( index < SECTOR_SIZE*2 ))
+                                        ptr = lastsector;
                                     else
                                         ptr = lastsector2;
                                 }
