@@ -824,3 +824,13 @@ id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 new:
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new:
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new:

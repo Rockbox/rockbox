@@ -804,3 +804,14 @@ desc: show all files
 eng: "All"
 new: "Alla"
 
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Ja"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Nej"
+
+
