@@ -171,23 +171,21 @@ bool uda1380_test(void)
     long button;
     int vol = 0x50;
     bool done = false;
+    char buf[80];
+    bool play = true;
 
     lcd_setmargins(0, 0);
     lcd_clear_display(); 
     lcd_update();
-    cpu_boost(true);
 
+    line = 0;
+    
     if (load_wave("/sample.wav") == -1)
         goto exit;
 
     audio_pos = 0;
 
     puts("Playing..");
-    puts("uda1380_init");
-    if (uda1380_init() == -1)
-    {
-        puts("UDA1380 init failed");
-    }
 
     audio_pos = 0;
     pcm_set_frequency(44100);
@@ -197,9 +195,26 @@ bool uda1380_test(void)
 
     while(!done)
     {
+        snprintf(buf, sizeof(buf), "SAR0: %08lx", SAR0);
+        lcd_puts(0, line, buf);
+        snprintf(buf, sizeof(buf), "DAR0: %08lx", DAR0);
+        lcd_puts(0, line+1, buf);
+        snprintf(buf, sizeof(buf), "BCR0: %08lx", BCR0);
+        lcd_puts(0, line+2, buf);
+        snprintf(buf, sizeof(buf), "DCR0: %08lx", DCR0);
+        lcd_puts(0, line+3, buf);
+        snprintf(buf, sizeof(buf), "DSR0: %02x", DSR0);
+        lcd_puts(0, line+4, buf);
+        lcd_update();
+
         button = button_get_w_tmo(HZ/2);
         switch(button)
         {
+        case BUTTON_ON:
+            play = !play;
+            pcm_play_pause(play);
+            break;
+            
         case BUTTON_UP:
             if (vol)
                 vol--;
@@ -222,11 +237,9 @@ bool uda1380_test(void)
     }
      
     pcm_play_stop();
-    uda1380_mute(1);
 
 exit:
     sleep(HZ >> 1);  /* Sleep 1/2 second to fade out sound */
-    cpu_boost(false);
 
     return false;
 }
