@@ -24,11 +24,9 @@
 
 #include <codecs/libmad/mad.h>
 
+#include "lib/xxx2wav.h" /* Helper functions common to test decoders */
+
 static struct plugin_api* rb;
-
-/* Helper functions common to all decoder test viewers (uses rb) */
-
-#include "xxx2wav.h"
 
 struct mad_stream  Stream;
 struct mad_frame  Frame;
@@ -149,7 +147,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   /* This function sets up the buffers and reads the file into RAM */
 
-  if (local_init(file,"/libmadtest.wav",&file_info)) {
+  if (local_init(file,"/libmadtest.wav",&file_info,api)) {
     return PLUGIN_ERROR;
   }
 

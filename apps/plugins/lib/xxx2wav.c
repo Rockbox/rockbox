@@ -17,30 +17,12 @@
  *
  ****************************************************************************/
 
-/* Various "helper functions" common to all the xxx2wav decoder plugins 
+/* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
-   We include them as a .h because the plugin build system links
-   exactly one .c file with exactly one .rock file. 
- */
+#include "plugin.h"
+#include "xxx2wav.h"
 
-
-/* the main data structure of the program */
-typedef struct {
-    int infile;
-    int outfile;
-    off_t curpos;
-    off_t filesize;
-    int samplerate;
-    int channels;
-    int frames_decoded;
-    unsigned long total_samples;
-    unsigned long current_sample;
-    unsigned long start_tick;
-} file_info_struct;
-
-file_info_struct file_info;
-
-#define MALLOC_BUFSIZE (512*1024)
+static struct plugin_api* local_rb;
 
 int mem_ptr;
 int bufsize;
@@ -55,16 +37,16 @@ void* malloc(size_t size) {
   x=&mallocbuf[mem_ptr];
   mem_ptr+=size+(size%4); // Keep memory 32-bit aligned (if it was already?)
 
-  rb->snprintf(s,30,"Memory used: %d",mem_ptr);
-  rb->lcd_putsxy(0,80,s);
-  rb->lcd_update();
+  local_rb->snprintf(s,30,"Memory used: %d",mem_ptr);
+  local_rb->lcd_putsxy(0,80,s);
+  local_rb->lcd_update();
   return(x);
 }
 
 void* calloc(size_t nmemb, size_t size) {
   void* x;
   x=malloc(nmemb*size);
-  rb->memset(x,0,nmemb*size);
+  local_rb->memset(x,0,nmemb*size);
   return(x);
 }
 
@@ -80,15 +62,15 @@ void* realloc(void* ptr, size_t size) {
 }
 
 void *memcpy(void *dest, const void *src, size_t n) {
-  return(rb->memcpy(dest,src,n));
+  return(local_rb->memcpy(dest,src,n));
 }
 
 void *memset(void *s, int c, size_t n) {
-  return(rb->memset(s,c,n));
+  return(local_rb->memset(s,c,n));
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
-  return(rb->memcmp(s1,s2,n));
+  return(local_rb->memcmp(s1,s2,n));
 }
 
 void* memmove(const void *s1, const void *s2, size_t n) {
@@ -102,7 +84,7 @@ void* memmove(const void *s1, const void *s2, size_t n) {
 }
 
 void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *)) {
-  rb->qsort(base,nmemb,size,compar);
+  local_rb->qsort(base,nmemb,size,compar);
 }
 
 void display_status(file_info_struct* file_info) {
@@ -111,14 +93,14 @@ void display_status(file_info_struct* file_info) {
   unsigned long long speed;
   unsigned long xspeed;
 
-  rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
-  rb->lcd_putsxy(0,0,s);
-  rb->snprintf(s,32,"Samples Decoded: %d",file_info->current_sample);
-  rb->lcd_putsxy(0,20,s);
-  rb->snprintf(s,32,"Frames Decoded: %d",file_info->frames_decoded);
-  rb->lcd_putsxy(0,40,s);
+  local_rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
+  local_rb->lcd_putsxy(0,0,s);
+  local_rb->snprintf(s,32,"Samples Decoded: %d",file_info->current_sample);
+  local_rb->lcd_putsxy(0,20,s);
+  local_rb->snprintf(s,32,"Frames Decoded: %d",file_info->frames_decoded);
+  local_rb->lcd_putsxy(0,40,s);
 
-  ticks_taken=*(rb->current_tick)-file_info->start_tick;
+  ticks_taken=*(local_rb->current_tick)-file_info->start_tick;
 
   /* e.g.:
    ticks_taken=500
@@ -132,10 +114,10 @@ void display_status(file_info_struct* file_info) {
 
   speed=(100*file_info->current_sample)/file_info->samplerate;
   xspeed=(speed*10000)/ticks_taken;
-  rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100); 
-  rb->lcd_putsxy(0,60,s);
+  local_rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100); 
+  local_rb->lcd_putsxy(0,60,s);
 
-  rb->lcd_update();
+  local_rb->lcd_update();
 }
 
 static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
@@ -154,59 +136,61 @@ static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                              };
 
 
-int local_init(char* infilename, char* outfilename, file_info_struct* file_info) {
+int local_init(char* infilename, char* outfilename, file_info_struct* file_info, struct plugin_api* rb) {
   char s[32];
   int i,n,bytesleft;
 
+  local_rb=rb;
+
   mem_ptr=0;
-  mp3buf=rb->plugin_get_mp3_buffer(&bufsize);
+  mp3buf=local_rb->plugin_get_mp3_buffer(&bufsize);
   mallocbuf=mp3buf;
   filebuf=&mp3buf[MALLOC_BUFSIZE];
 
-  rb->snprintf(s,32,"mp3 bufsize: %d",bufsize);
-  rb->lcd_putsxy(0,100,s);
-  rb->lcd_update();
+  local_rb->snprintf(s,32,"mp3 bufsize: %d",bufsize);
+  local_rb->lcd_putsxy(0,100,s);
+  local_rb->lcd_update();
 
-  file_info->infile=rb->open(infilename,O_RDONLY);
-  file_info->outfile=rb->creat(outfilename,O_WRONLY);
-  rb->write(file_info->outfile,wav_header,sizeof(wav_header));
+  file_info->infile=local_rb->open(infilename,O_RDONLY);
+  file_info->outfile=local_rb->creat(outfilename,O_WRONLY);
+  local_rb->write(file_info->outfile,wav_header,sizeof(wav_header));
   file_info->curpos=0;
   file_info->current_sample=0;
   file_info->frames_decoded=0;
-  file_info->filesize=rb->filesize(file_info->infile);
+  file_info->filesize=local_rb->filesize(file_info->infile);
 
   if (file_info->filesize > (bufsize-MALLOC_BUFSIZE)) {
-    rb->close(file_info->infile);
-    rb->splash(HZ*2, true, "File too large");
+    local_rb->close(file_info->infile);
+    local_rb->splash(HZ*2, true, "File too large");
     return(1);
   }
 
-  rb->snprintf(s,32,"Loading file...");
-  rb->lcd_putsxy(0,0,s);
-  rb->lcd_update();
+  local_rb->snprintf(s,32,"Loading file...");
+  local_rb->lcd_putsxy(0,0,s);
+  local_rb->lcd_update();
 
   bytesleft=file_info->filesize;
   i=0;
   while (bytesleft > 0) {
-    n=rb->read(file_info->infile,&filebuf[i],bytesleft);
+    n=local_rb->read(file_info->infile,&filebuf[i],bytesleft);
     if (n < 0) {
-      rb->close(file_info->infile);
-      rb->splash(HZ*2, true, "ERROR READING FILE");
+      local_rb->close(file_info->infile);
+      local_rb->splash(HZ*2, true, "ERROR READING FILE");
       return(1);
     }      
     i+=n; bytesleft-=n;
   }
-  rb->close(file_info->infile);
+  local_rb->close(file_info->infile);
   return(0);
 }
 
 void close_wav(file_info_struct* file_info) {
   int x;
-  int filesize=rb->filesize(file_info->outfile);
+  int filesize=local_rb->filesize(file_info->outfile);
 
   /* We assume 16-bit, Stereo */
 
-  rb->lseek(file_info->outfile,0,SEEK_SET);
+  local_rb->lseek(file_info->outfile,0,SEEK_SET);
 
   // ChunkSize
   x=filesize-8;
@@ -235,7 +219,6 @@ void close_wav(file_info_struct* file_info) {
   wav_header[42]=(x&0xff0000)>>16;
   wav_header[43]=(x&0xff000000)>>24;
 
-  rb->write(file_info->outfile,wav_header,sizeof(wav_header));
-  rb->close(file_info->outfile);
+  local_rb->write(file_info->outfile,wav_header,sizeof(wav_header));
+  local_rb->close(file_info->outfile);
 }
-
