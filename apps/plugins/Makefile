@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lFLAC -lTremor
+   CODECLIBS = -lmad -la52 -lFLAC -lTremor -lwavpack
 endif
 
 LDS := plugin.lds
