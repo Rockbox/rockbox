@@ -1470,7 +1470,7 @@ new:
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
-eng: "Editable files"
+eng: "Independent frames"
 new:
 
 id: LANG_STATUS_BAR
