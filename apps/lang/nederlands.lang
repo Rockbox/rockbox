@@ -201,9 +201,9 @@ eng: "Canceled"
 new: "Gestopt"
 
 id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-new: "Sorteer mode"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -1041,9 +1041,9 @@ eng: "Loaded"
 new: "Geladen" 
 
 id: LANG_SOKOBAN_ON
-desc: how to undo move 
-eng: "[ON] To Undo"
-new: "[ON] Ongedaan maken" 
+desc: DEPRECATED
+eng: ""
+new: "" 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1086,19 +1086,19 @@ eng: "Saved"
 new: "Opgeslagen" 
 
 id: LANG_VBRFIX_NOT_VBR
-desc: Tells the user that the selected file is not a VBR file
-eng: "Not a VBR file"
-new: "Geen VBR bestand"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_VBRFIX_STOP_PLAY
-desc: Tells the user to stop the playback
-eng: "Stop the playback first"
-new: "Stop afspelen eerst"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_VBRFIX
-desc: The context menu entry
-eng: "Update VBR file"
-new: "Update VBR bestand"
+desc: DEPRECATED
+eng: ""
+new: ""
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1181,7 +1181,7 @@ eng: "Time Split"
 new: "Tijdsdeel" 
 
 id: LANG_RECORD_TIMESPLIT_REC
-desc: 
+desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 new: "Splits tijd:" 
 
@@ -1328,7 +1328,7 @@ new: "Sla huidige speellijst op"
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
-new: "STOP om af te breken" 
+new: 'STOP om af te breken" 
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
@@ -1423,7 +1423,7 @@ new: "Geen bestanden"
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-new: "Onderste Boven"
+new: Onderste Boven
 
 id: LANG_FM_BUTTONBAR_RECORD
 desc: in main menu
@@ -1568,7 +1568,7 @@ new: "Laad laatste Bookmark"
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
-new: "Lijst van recente bladwijzers bijhouden?"
+new: "Lijst van recente bladwijzers bijhouden?
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
@@ -1612,7 +1612,7 @@ new: "Beheer instellingen"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
-eng: "Start Recording"
+eng: "Recording screen"
 new: "Start opname" 
 
 id: LANG_TIME_MENU
@@ -1648,7 +1648,7 @@ new: "Volledig pad"
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-new: "Enkel track naam" 
+new: "Enkel track naam 
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
@@ -1668,7 +1668,7 @@ new: "Toon Indexen"
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
-new: "Track weergave" 
+new: :Track weergave" 
 
 id: LANG_VIEW
 desc: in on+play menu
@@ -1831,7 +1831,7 @@ eng: ""
 new: 
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix
+desc: spoken only, a unit postfix, currently not used
 eng: ""
 new: 
 
@@ -1992,5 +1992,250 @@ new:
 
 id: VOICE_ZERO
 desc: spoken only, for composing numbers
+eng: ""
+new: 
+
+id: LANG_DELETE_DIR
+desc: in on+play menu
+eng: "Delete directory"
+new: "Verwijder directorie" 
+
+id: LANG_FILETYPES_EXTENSION_FULL
+desc: Extension array full
+eng: "Extension array full"
+new: "Extensies lijst vol" 
+
+id: LANG_FILETYPES_FULL
+desc: Filetype array full
+eng: "Filetype array full"
+new: "Bestandstype lijst vol" 
+
+id: LANG_FILETYPES_PLUGIN_NAME_LONG
+desc: Viewer plugin name too long
+eng: "Plugin name too long"
+new: "Plugin naam is te lang" 
+
+id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+desc: Filetype string buffer empty
+eng: "Filetype string buffer empty"
+new: "Bestandstype omschrijving leeg" 
+
+id: LANG_ONPLAY_OPEN_WITH
+desc: Onplay open with
+eng: "Open with"
+new: "Open met" 
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+new: "Alfabetisch" 
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+new: "Op datum" 
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+new: "op nieuwste datum" 
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+new: "Sorteer folders" 
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+new: "Sorteer bestanden" 
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+new: "op type" 
+
+id: LANG_VOICE_SPELL
+desc: "talkbox" mode for files+directories
+eng: "Spell"
+new: "Spellen" 
+
+id: VOICE_CHAR_A
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_B
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_C
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_D
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_E
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_F
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_G
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_H
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_I
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_J
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_K
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_L
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_M
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_N
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_O
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_P
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_Q
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_R
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_S
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_T
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_U
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_V
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_W
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_X
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_Y
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CHAR_Z
+desc: spoken only, for spelling
+eng: ""
+new: 
+
+id: VOICE_CURRENT_TIME
+desc: spoken only, for wall clock announce
+eng: ""
+new: 
+
+id: VOICE_EXT_AJZ
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_BMARK
+desc: spoken only, for file extension and the word in general
+eng: ""
+new: 
+
+id: VOICE_EXT_CFG
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_FONT
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_MPA
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_ROCK
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_TXT
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_UCL
+desc: spoken only, for file extension
+eng: ""
+new: 
+
+id: VOICE_EXT_WPS
+desc: spoken only, for file extension
 eng: ""
 new: 
