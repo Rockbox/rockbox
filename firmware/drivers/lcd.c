@@ -112,7 +112,7 @@ struct scrollinfo {
 };
 
 static void scroll_thread(void);
-static char scroll_stack[0x100];
+static char scroll_stack[0x800];
 static char scroll_speed = 8; /* updates per second */
 static char scroll_spacing = 3; /* spaces between end and start of text */
 
