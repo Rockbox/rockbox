@@ -68,7 +68,7 @@ or 8 of such characters. This code example shows how to define a pattern:
   lcd_unlock_pattern(handle);
 }
 </pre>
-The handle is very likely to be between 0x01 to 0x16, which in software will
+The handle is very likely to be between 0x01 to 0x15, which in software will
 be handled as a prioritized character (even higher than the icons).
 
 <h2>Some notes</h2>

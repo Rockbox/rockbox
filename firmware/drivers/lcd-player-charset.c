@@ -25,28 +25,28 @@
 unsigned short new_lcd_rocklatin1_to_xlcd[] =
 {
    NOCHAR_NEW,    /* 0x00 reserved never to be used */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   0x216, /* 0x16 .. "bookmark" icon */
    0x217, /* 0x17 .. "plugin" icon */
    0x218, /* 0x18 .. "folder" icon */
    0x219, /* 0x19 .. "MOD/AJZ" icon (winlatin o (dote in the middle) */
@@ -287,28 +287,28 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
 {
    /* OLD LCD */
    NOCHAR_OLD, /* 0x00 reserved never to be used */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
-   RESERVED_CHAR, /* 0x01-0x16 reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   RESERVED_CHAR, /* reserved */
+   0x216, /* 0x16 .. "bookmark" icon */
    0x217, /* 0x17 .. "plugin" icon */
    0x218, /* 0x18 .. "folder" icon */
    0x219, /* 0x19 .. "MOD/AJZ" icon (winlatin o (dote in the middle) */
@@ -563,13 +563,13 @@ unsigned char lcd_player_extended_lcd_to_rocklatin1[NO_EXTENDED_LCD_CHARS] =
 /* 0d */ NOCHAR_NEW,  /* 0-16 user defined */
 /* 0e */ NOCHAR_NEW,  /* 0-16 user defined */
 /* 0f */ NOCHAR_NEW,  /* 0-16 user defined */
-/* 10 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 11 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 12 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 13 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 14 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 15 */ NOCHAR_NEW,  /* 16-31 reserved */
-/* 16 */ NOCHAR_NEW,  /* 16-31 reserved */
+/* 10 */ NOCHAR_NEW,  /* reserved */
+/* 11 */ NOCHAR_NEW,  /* reserved */
+/* 12 */ NOCHAR_NEW,  /* reserved */
+/* 13 */ NOCHAR_NEW,  /* reserved */
+/* 14 */ NOCHAR_NEW,  /* reserved */
+/* 15 */ NOCHAR_NEW,  /* reserved */
+/* 16 */ 0x91,  /* bookmark icon */
 /* 17 */ 0x29,  /* plugin icon */
 /* 18 */ 0x93, /* folder icon */
 /* 19 */ 'x', /* MOD/AJZ icon */
@@ -667,7 +667,7 @@ unsigned char extended_font_player[NO_EXTENDED_LCD_CHARS][8] = {
   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /* 13 */
   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /* 14 */
   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /* 15 */
-  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /* 16 */
+  { 0x00, 0x03, 0x07, 0x0e, 0x1c, 0x08, 0x00, 0x00}, /* 16 Bookmark icon */
   { 0x04, 0x1e, 0x07, 0x1f, 0x05, 0x01, 0x06, 0x00}, /* 17 Plugin file icon */
   { 0x0c, 0x13, 0x11, 0x11, 0x11, 0x11, 0x1f, 0x00}, /* 18 Folder icon */
   { 0x1f, 0x11, 0x1b, 0x15, 0x1b, 0x11, 0x1f, 0x00}, /* 19 MOD/AJZ icon */

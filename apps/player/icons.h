@@ -29,8 +29,8 @@
 
 enum {
     Unknown = 0x90,
-    Plugin = 0x17,
-    Folder, Mod_Ajz, Language, File, Wps, Playlist, Text, Config,
+    Bookmark = 0x16,
+    Plugin, Folder, Mod_Ajz, Language, File, Wps, Playlist, Text, Config,
 };
 
 #endif

@@ -80,10 +80,8 @@ struct filetype filetypes[] = {
     { ".rock",TREE_ATTR_ROCK,Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
     { ".fnt", TREE_ATTR_FONT,Font, VOICE_EXT_FONT },
-    { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
-#else
-    { ".bmark", TREE_ATTR_BMARK, -1, VOICE_EXT_BMARK },
 #endif
+    { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
     { ".ajz", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
