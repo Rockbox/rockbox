@@ -340,6 +340,7 @@ bool usb_inserted(void)
 #ifdef USB_NONE
 bool usb_inserted(void)
 {
+    return false;
 }
 #endif
 
