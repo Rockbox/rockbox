@@ -39,9 +39,7 @@
 #include "sound_menu.h"
 #include "timefuncs.h"
 #include "debug.h"
-#include "string.h"
-
-extern char *num2max5(unsigned int bytes, char *max5);
+#include "misc.h"
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
