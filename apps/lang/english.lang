@@ -2236,7 +2236,7 @@ new:
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
-voice: "hunded"
+voice: "hundred"
 new:
 
 id: VOICE_BILLION
