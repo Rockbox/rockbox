@@ -354,8 +354,6 @@ static void set_elapsed(struct mp3entry* id3)
 
 static bool paused; /* playback is paused */
 
-static unsigned char xingbuf[417];
-
 #ifdef SIMULATOR
 static bool is_playing = false;
 static bool playing = false;
@@ -490,6 +488,7 @@ unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
 static bool saving; /* We are saving the buffer to disk */
 static char recording_filename[MAX_PATH];
+
 #endif
 
 static int mpeg_file;
@@ -1869,16 +1868,17 @@ static void mpeg_thread(void)
                     if(mpeg_file >= 0)
                         close(mpeg_file);
 
+                    /* Create the Xing header */
                     mpeg_file = open(recording_filename, O_RDWR);
                     if(mpeg_file < 0)
                         panicf("rec upd: %d", mpeg_file);
 
                     create_xing_header(mpeg_file, 0, num_rec_bytes,
-                                       xingbuf, num_recorded_frames, NULL,
+                                       mp3buf, num_recorded_frames, NULL,
                                        false);
                     
                     lseek(mpeg_file, 4096, SEEK_SET);
-                    write(mpeg_file, xingbuf, 417);
+                    write(mpeg_file, mp3buf, 417);
                     close(mpeg_file);
                     
                     mpeg_file = -1;
