@@ -30,54 +30,6 @@
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
-/* test code, to be removed later */
-extern union /* defined in main.c */
-{
-    unsigned char  port8 [512];
-    unsigned short port16[256];
-    unsigned       port32[128];
-} startup_io;
-
-
-bool rolo_io_load(char* filename)
-{
-    int fd;
-    fd = open(filename, O_RDONLY);
-    if(fd >= 0) /* no complaint if it doesn't exit */
-    {
-        read(fd, (void *)&startup_io, sizeof(startup_io));
-        close(fd);
-        return true; /* success */
-    }
-    return false; /* not found */
-}
-
-void rolo_io_restore(void)
-{
-    int i;
-    for (i = 0; i < 512; i++)
-    {   /* most can be written with 8 bit access */
-        *((volatile unsigned char*)0x5FFFE00 + i) = startup_io.port8[i];
-    }
-    /* some don't allow that, write with 32 bit if aligned */
-    *((volatile unsigned char*)0x5FFFF40) = startup_io.port32[0x140/4];
-    *((volatile unsigned char*)0x5FFFF44) = startup_io.port32[0x144/4];
-    *((volatile unsigned char*)0x5FFFF50) = startup_io.port32[0x150/4];
-    *((volatile unsigned char*)0x5FFFF54) = startup_io.port32[0x154/4];
-    *((volatile unsigned char*)0x5FFFF60) = startup_io.port32[0x160/4];
-    *((volatile unsigned char*)0x5FFFF70) = startup_io.port32[0x170/4];
-    *((volatile unsigned char*)0x5FFFF74) = startup_io.port32[0x174/4];
-
-    /* write the rest with 16 bit */
-    *((volatile unsigned short*)0x5FFFF4A) = startup_io.port16[0x14A/2];
-    *((volatile unsigned short*)0x5FFFF5A) = startup_io.port16[0x15A/2];
-    *((volatile unsigned short*)0x5FFFF6A) = startup_io.port16[0x16A/2];
-    *((volatile unsigned short*)0x5FFFF7A) = startup_io.port16[0x17A/2];
-}
-/* end of test code */
-
-
-
 static void rolo_error(char *text)
 {
     lcd_clear_display();
@@ -107,7 +59,6 @@ int rolo_load(char* filename)
     unsigned long file_length;
     unsigned short checksum,file_checksum;
     unsigned char* ramstart = (void*)0x09000000;
-    bool restore_io; /* debug value */
 
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO...");
@@ -165,8 +116,6 @@ int rolo_load(char* filename)
         return -1;
     }
 
-    restore_io = rolo_io_load("/startup_io.bin"); /* test code */
-
     lcd_puts(0, 1, "Executing     ");
     lcd_update();
 
@@ -182,9 +131,6 @@ int rolo_load(char* filename)
 #ifndef ARCHOS_PLAYER        /* player is to be checked later */
 	PAIOR = 0x0FA0;          /* needed when flashed, probably model-specific */
 #endif
-
-    if (restore_io) /* test code */
-        rolo_io_restore(); /* restore the I/Os from the file content */
 
     rolo_restart(mp3buf, ramstart, length);
 

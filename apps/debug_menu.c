@@ -1357,30 +1357,6 @@ bool dbg_save_roms(void)
     return false;
 }
 
-
-/* test code, to be removed later */
-extern union /* defined in main.c */
-{
-    unsigned char  port8 [512];
-    unsigned short port16[256];
-    unsigned       port32[128];
-} startup_io;
-
-bool dbg_save_io(void) /* dump the initial I/O space to disk */
-{
-    int fd;
-
-    fd = creat("/startup_io.bin", O_WRONLY);
-    if(fd >= 0)
-    {
-        write(fd, (void *)&startup_io, sizeof(startup_io));
-        close(fd);
-    }
-    
-    return false;
-}
-/* end of test code */
-
 bool debug_menu(void)
 {
     int m;
@@ -1388,7 +1364,6 @@ bool debug_menu(void)
 
     struct menu_items items[] = {
         { "Dump ROM contents", dbg_save_roms },
-        { "Dump startup I/O", dbg_save_io },
         { "View I/O ports", dbg_ports },
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC

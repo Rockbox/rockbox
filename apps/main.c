@@ -54,16 +54,6 @@
 #include "screens.h"
 #include "power.h"
 
-/* diagnostic, to be removed later: */
-/* snapshot of the I/O space on startup, to compare initialisations */
-union
-{
-    unsigned char  port8 [512];
-    unsigned short port16[256];
-    unsigned       port32[128];
-} startup_io;
-
-
 char appsversion[]=APPSVERSION;
 
 void init(void);
@@ -235,28 +225,6 @@ void init(void)
 
 int main(void)
 {
-    /* diagnostic, to be removed later: dump I/O space */
-    int i;
-    for (i = 0; i < 512; i++)
-    {   // most can be read with 8 bit access
-        startup_io.port8[i] = *((volatile unsigned char*)0x5FFFE00 + i);
-    }
-    // some don't allow that, read with 32 bit if aligned
-    startup_io.port32[0x140/4] = *((volatile unsigned char*)0x5FFFF40);
-    startup_io.port32[0x144/4] = *((volatile unsigned char*)0x5FFFF44);
-    startup_io.port32[0x150/4] = *((volatile unsigned char*)0x5FFFF50);
-    startup_io.port32[0x154/4] = *((volatile unsigned char*)0x5FFFF54);
-    startup_io.port32[0x160/4] = *((volatile unsigned char*)0x5FFFF60);
-    startup_io.port32[0x170/4] = *((volatile unsigned char*)0x5FFFF70);
-    startup_io.port32[0x174/4] = *((volatile unsigned char*)0x5FFFF74);
-
-    // read the rest with 16 bit
-    startup_io.port16[0x14A/2] = *((volatile unsigned short*)0x5FFFF4A);
-    startup_io.port16[0x15A/2] = *((volatile unsigned short*)0x5FFFF5A);
-    startup_io.port16[0x16A/2] = *((volatile unsigned short*)0x5FFFF6A);
-    startup_io.port16[0x17A/2] = *((volatile unsigned short*)0x5FFFF7A);
-    /* end of diagnostic */
-    
     app_main();
 
     while(1) {
