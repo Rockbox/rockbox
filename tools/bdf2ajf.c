@@ -24,9 +24,7 @@
 
 int _font_error_code = 0;
 char _font_error_msg[1024];
-#ifndef VC
-#define strcmpi(x,y) strcasecmp(x,y)
-#endif
+
 
 short win_alt_map[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 00 - 0f */
@@ -103,26 +101,26 @@ int main(int argc, char** argv)
 
     for(i=1;i<argc;i++)
     {
-        if (!strcmpi(argv[i], "-f"))
+        if (!strcmp(argv[i], "-f"))
         {
             i++;
             if (i==argc) usage();
             strcpy(in_file, argv[i]);
         }
-        else if (!strcmpi(argv[i], "-o"))
+        else if (!strcmp(argv[i], "-o"))
         {
             i++;
             if (i==argc) usage();
             strcpy(out_file, argv[i]);
         }
-        else if (!strcmpi(argv[i], "-t"))
+        else if (!strcmp(argv[i], "-t"))
         {
             i++;
             if (i==argc) usage();
             do_test1 = 1;
             strcpy(test_str1, argv[i]);
         }
-        else if (!strcmpi(argv[i], "-t2"))
+        else if (!strcmp(argv[i], "-t2"))
         {
             i++;
             if (i==argc) usage();
