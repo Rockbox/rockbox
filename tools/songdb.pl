@@ -297,6 +297,7 @@ if ($db) {
     print "Database version: $dbver\n" if ($verbose);
 
     open(DB, ">$db") || die "couldn't make $db";
+    binmode(DB);
     printf DB "RDB%c", $dbver;
     
     $pathindex = 48; # paths always start at index 48
