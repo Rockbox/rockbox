@@ -16,6 +16,8 @@ upgrade your ordinary Archos firmware.
 <h2>News</h2>
 <p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works!
 
+<p><i>2003-06-30</i>: The plugin loader is now <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-06/0707.shtml">alive</a>!
+
 <p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
 
 <p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
@@ -36,12 +38,10 @@ notice.
 <dl>
 <dt><b>Version 2.1</b>
 <dd> Lots of features and fixes that were held off for 2.0
+<br> Plugin loader, opening the door for a bucketful of new applications
 
 <dt><b>Version 2.2</b>
 <dd> User interface overhaul
-
-<dt><b>Version 2.3</b>
-<dd> Plugin loader, opening the door for a bucketful of new applications
 
 </dl>
 
