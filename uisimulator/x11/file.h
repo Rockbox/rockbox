@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include <sys/types.h>
-#include <dirent.h>
 
 #define open(x,y) x11_open(x,y)
 

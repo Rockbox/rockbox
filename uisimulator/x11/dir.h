@@ -17,39 +17,23 @@
  *
  ****************************************************************************/
 
-#define dirent x11_dirent
-#define readdir(x) x11_readdir(x)
-#define opendir(x) x11_opendir(x)
-#define closedir(x) x11_closedir(x)
-
-/*
- * The defines above should let us use the readdir() and opendir() in target
- * code just as they're defined to work in target. They will then call our
- * x11_* versions of the functions that'll work as wrappers for the actual
- * host functions.
- */
-
 #include <sys/types.h>
-#include <dirent.h>
-
-#undef dirent
-
+typedef void DIR;
 
 #define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
-
+#define dirent x11_dirent
 #include "../../firmware/common/dir.h"
+#undef dirent
 
-#define SIMULATOR_ARCHOS_ROOT "archos"
-
-struct mydir {
-  DIR *dir;
-  char *name;
-};
-
-typedef struct mydir MYDIR;
+typedef void * MYDIR;
 
 extern MYDIR *x11_opendir(char *name);
-extern struct dirent* x11_readdir(MYDIR* dir);
+extern struct x11_dirent* x11_readdir(MYDIR* dir);
 extern void x11_closedir(MYDIR *dir);
 
 #define DIR MYDIR
+#define dirent x11_dirent
+#define opendir(x) x11_opendir(x)
+#define readdir(x) x11_readdir(x)
+#define closedir(x) x11_closedir(x)
+

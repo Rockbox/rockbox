@@ -1,8 +1,20 @@
 
 #include <sys/stat.h>
-#include "dir.h"
+#include <dirent.h>
 
-#undef DIR
+#define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
+#define dirent x11_dirent
+#include "../../firmware/common/dir.h"
+#undef dirent
+
+#define SIMULATOR_ARCHOS_ROOT "archos"
+
+struct mydir {
+  DIR *dir;
+  char *name;
+};
+
+typedef struct mydir MYDIR;
 
 MYDIR *x11_opendir(char *name)
 {
@@ -21,13 +33,15 @@ MYDIR *x11_opendir(char *name)
   return my;
 }
 
-struct dirent *x11_readdir(MYDIR *dir)
+struct x11_dirent *x11_readdir(MYDIR *dir)
 {
   char buffer[512]; /* sufficiently big */
-  static struct dirent secret;
+  static struct x11_dirent secret;
   struct stat s;
+  struct dirent *x11 = (readdir)(dir->dir);
 
-  struct x11_dirent *x11 = (readdir)(dir->dir);
+  if(!x11)
+    return NULL;
 
   strcpy(secret.d_name, x11->d_name);
 
