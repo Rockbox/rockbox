@@ -32,16 +32,16 @@
 #define QUEUE_LENGTH 16 /* MUST be a power of 2 */
 #define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
-/* System defined message ID's */
-#define SYS_USB_CONNECTED         -1
-#define SYS_USB_CONNECTED_ACK     -2
-#define SYS_USB_DISCONNECTED      -3
-#define SYS_USB_DISCONNECTED_ACK  -4
-#define SYS_TIMEOUT               -5
-
-/* MMC based systems only */
-#define SYS_MMC_INSERTED          -6
-#define SYS_MMC_EXTRACTED         -7
+/* System defined message ID's, occupying the top 5 bits of the event ID */
+#define SYS_EVENT                 0x80000000 /* SYS events are negative */
+#define SYS_USB_CONNECTED         ((int)(SYS_EVENT | (1 << 27)))
+#define SYS_USB_CONNECTED_ACK     ((int)(SYS_EVENT | (2 << 27)))
+#define SYS_USB_DISCONNECTED      ((int)(SYS_EVENT | (3 << 27)))
+#define SYS_USB_DISCONNECTED_ACK  ((int)(SYS_EVENT | (4 << 27)))
+#define SYS_TIMEOUT               ((int)(SYS_EVENT | (5 << 27)))
+#define SYS_MMC_INSERTED          ((int)(SYS_EVENT | (6 << 27)))
+#define SYS_MMC_EXTRACTED         ((int)(SYS_EVENT | (7 << 27)))
+#define SYS_POWEROFF              ((int)(SYS_EVENT | (8 << 27)))
 
 struct event
 {
