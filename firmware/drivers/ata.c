@@ -1371,6 +1371,10 @@ int ata_init(void)
     GPIO_OUT |= 0x00080000;
     GPIO_ENABLE |= 0x00080000;
     GPIO_FUNCTION |= 0x00080000;
+
+    /* ATA controller interface */
+    IDECONFIG1 = 0x00107000;
+    IDECONFIG2 = 0x00040000;
 #endif
 
     sleeping = false;
