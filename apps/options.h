@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef __FEATURES_H__
-#define __FEATURES_H__
+#ifndef __OPTIONS_H__
+#define __OPTIONS_H__
 
 #ifndef DISABLE_SCREENSAVERS
 #define USE_SCREENSAVERS
@@ -28,4 +28,4 @@
 #define USE_GAMES
 #endif
 
-#endif /* End __FEATURES_H__ */
+#endif /* End __OPTIONS_H__ */
