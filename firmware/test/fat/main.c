@@ -488,17 +488,14 @@ int dbg_trunc(char* name, int size)
 
 int dbg_mkdir(char* name)
 {
-    char text[BUFSIZE+1];
-    int i;
     int fd;
-    int x=0;
-    bool stop = false;
 
-    fd = mkdir(name);
+    fd = mkdir(name, 0);
     if (fd<0) {
         DEBUGF("Failed creating directory\n");
         return -1;
     }
+    return 0;
 }
 
 int dbg_cmd(int argc, char *argv[])
@@ -613,12 +610,6 @@ int dbg_cmd(int argc, char *argv[])
             else
                 return dbg_dump(arg1, 0);
         }
-    }
-
-    if (!strcasecmp(cmd, "dump"))
-    {
-        if (arg1)
-            return mkdir(arg1);
     }
 
     if (!strcasecmp(cmd, "wrtest"))
