@@ -2164,7 +2164,7 @@ static void start_prerecording(void)
         mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
     } while(val & 1);
     
-    sleep(20);
+    sleep(HZ/100);
 
     is_recording = true;
     stop_pending = false;
