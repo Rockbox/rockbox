@@ -24,14 +24,15 @@
 #include "button.h"
 #include "kernel.h"
 #include "main_menu.h"
-#include "sound_menu.h"
+/*#include "sound_menu.h"*/
 #include "version.h"
 #include "debug.h"
 #include "sprintf.h"
 #include <string.h>
 #include "playlist.h"
 #include "settings.h"
-#include "backlight.h"
+#include "settings_menu.h"
+#include "sound_menu.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "games_menu.h"
@@ -121,145 +122,22 @@ void show_credits(void)
     roll_credits();
 }
 
-void scroll_speed(void)
-{
-    bool done=false;
-    int speed=10;
-    char str[16];
-
-    lcd_clear_display();
-    lcd_puts_scroll(0,0,"Scroll speed indicator");
-
-    while (!done) {
-        snprintf(str,sizeof str,"Speed: %d ",speed);
-        lcd_puts(0,1,str);
-        lcd_update();
-        lcd_scroll_speed(speed);
-        switch( button_get(true) ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#else
-            case BUTTON_RIGHT:
-#endif
-                speed++;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-#endif
-                speed--;
-                if ( speed < 1 )
-                    speed = 1;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-#endif
-                done = true;
-                lcd_stop_scroll();
-                break;
-        }
-    }
-}
-
-void backlight_timer(void)
-{
-    bool done = false;
-    int timer = global_settings.backlight;
-    char str[16];
-
-    lcd_clear_display();
-    lcd_puts_scroll(0,0,"Backlight");
-
-    while (!done) {
-        snprintf(str,sizeof str,"Timeout: %d s  ", timer);
-        lcd_puts(0,1,str);
-        lcd_update();
-        switch( button_get(true) ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#else
-            case BUTTON_RIGHT:
-#endif
-                timer++;
-                if(timer > 60)
-                    timer = 60;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-#endif
-                timer--;
-                if ( timer < 0 )
-                    timer = 0;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-#endif
-                done = true;
-                global_settings.backlight = timer;
-                backlight_on();
-                break;
-        }
-    }
-}
-
-void shuffle(void)
-{
-    bool done = false;
-
-    lcd_clear_display();
-    lcd_puts(0,0,"[Shuffle]");
-
-    while ( !done ) {
-        lcd_puts(0,1,playlist_shuffle ? "on " : "off");
-        lcd_update();
-
-        switch ( button_get(true) ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-#endif
-                done = true;
-                break;
-
-            default:
-                playlist_shuffle = !playlist_shuffle;
-                break;
-        }
-    }
-}
-
 void main_menu(void)
 {
     int m;
     enum {
-        Games, Screensavers, Version, Sound, Scroll, Shuffle, Backlight
+        Games, Screensavers, Version, Gen_Settings, Sound_Settings, 
     };
 
     /* main menu */
     struct menu_items items[] = {
-        { Shuffle,      "Shuffle",      shuffle           },
-        { Sound,        "Sound",        sound_menu        },
-        { Backlight,    "Backlight",    backlight_timer   },
-        { Scroll,       "Scroll speed", scroll_speed      },
+		{ Sound_Settings,  "Sound Settings",     sound_menu        },
+		{ Gen_Settings,    "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
-        { Games,        "Games",        games_menu        },
-        { Screensavers, "Screensavers", screensavers_menu },
+        { Games,           "Games",              games_menu        },
+        { Screensavers,    "Screensavers",       screensavers_menu },
 #endif
-        { Version,      "Version",      show_credits },
+        { Version,         "Version",            show_credits      },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
