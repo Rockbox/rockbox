@@ -334,7 +334,7 @@ if [ -z "$archos" ]; then
     target="-DARCHOS_GMINI120 -DLOADADDRESS=\$(LOADADDRESS)"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
-    tool="$rootdir/tools/scramble" # not correct but...
+    tool="cp" # might work for now!
     output="rockboxgmini"
     appextra="recorder"
     archosrom=""
