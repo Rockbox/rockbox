@@ -85,7 +85,7 @@ struct fat_direntry
 #define FAT_ATTR_DIRECTORY   0x10
 #define FAT_ATTR_ARCHIVE     0x20
 
-struct fat_dirent
+struct fat_dir
 {
     int entry;
     unsigned int cached_sec;
@@ -93,7 +93,7 @@ struct fat_dirent
     unsigned char cached_buf[SECTOR_SIZE];
 };
 
-struct fat_fileent
+struct fat_file
 {
     int firstcluster;    /* first cluster in file */
     int nextcluster;     /* cluster of last access */
@@ -101,32 +101,20 @@ struct fat_fileent
     int sectornum;       /* sector number in this cluster */
 };
 
-extern int fat_mount(struct bpb *bpb, int startsector);
+/* global FAT info struct */
+extern struct bpb fat_bpb;
+
+extern int fat_mount(int startsector);
 
 #ifdef DISK_WRITE
-extern int fat_create_file(struct bpb *bpb, 
-                           unsigned int currdir, 
-                           char *name);
-extern int fat_create_dir(struct bpb *bpb, 
-                          unsigned int currdir,
-                          char *name);
+extern int fat_create_file(unsigned int currdir, char *name);
+extern int fat_create_dir(unsigned int currdir, char *name);
 #endif
-extern int fat_open(struct bpb *bpb, 
-                    unsigned int cluster,
-                    struct fat_fileent *ent);
-extern int fat_read(struct bpb *bpb, 
-                    struct fat_fileent *ent,
-                    int sectorcount,
-                    void* buf );
-extern int fat_seek(struct bpb *bpb, 
-                    struct fat_fileent *ent,
-                    int sector );
+extern int fat_open(unsigned int cluster, struct fat_file *ent);
+extern int fat_read(struct fat_file *ent, int sectorcount, void* buf );
+extern int fat_seek(struct fat_file *ent, int sector );
 
-extern int fat_opendir(struct bpb *bpb, 
-                       struct fat_dirent *ent, 
-                       unsigned int currdir);
-extern int fat_getnext(struct bpb *bpb, 
-                       struct fat_dirent *ent,
-                       struct fat_direntry *entry);
+extern int fat_opendir(struct fat_dir *ent, unsigned int currdir);
+extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 
 #endif
