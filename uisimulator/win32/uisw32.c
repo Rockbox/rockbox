@@ -50,12 +50,12 @@ char having_new_lcd=true; // Used for player simulator
 
 // GUIWndProc
 // window proc for GUI simulator
-LRESULT GUIWndProc (
-                    HWND hWnd,
-                    UINT uMsg,
-                    WPARAM wParam,
-                    LPARAM lParam
-                    )
+LRESULT CALLBACK GUIWndProc (
+                             HWND hWnd,
+                             UINT uMsg,
+                             WPARAM wParam,
+                             LPARAM lParam
+                            )
 {
     static HBITMAP hBkgnd;
     static HDC hMemDc;
@@ -234,7 +234,7 @@ BOOL GUIStartup ()
     wc.hbrBackground = GetSysColorBrush (COLOR_WINDOW);
     wc.hCursor = LoadCursor (NULL, IDC_ARROW);
     wc.hInstance = GetModuleHandle (NULL);
-    wc.lpfnWndProc = (WNDPROC)GUIWndProc;
+    wc.lpfnWndProc = GUIWndProc;
     wc.lpszClassName = "RockBoxUISimulator";
     wc.style = CS_HREDRAW | CS_VREDRAW;
 
