@@ -40,9 +40,6 @@
 #include "ata_mmc.h"
 #endif
 
-#define ONE_KILOBYTE 1024
-#define ONE_MEGABYTE (1024*1024)
-
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -66,28 +63,23 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     if (bin_scale)
         fraction = fraction * 1000 / 1024;
 
+    if (value >= 100 || !unit_no)
+        tbuf[0] = '\0';
+    else if (value >= 10)
+        snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
+    else
+        snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
+    
     if (buf)
     {
-        if (value >= 100 || !unit_no)
-            snprintf(tbuf, sizeof(tbuf), "%d", value);
-        else if (value >= 10)
-            snprintf(tbuf, sizeof(tbuf), "%d%s%01d", value, str(LANG_POINT),
-                     fraction / 100);
+        if (strlen(tbuf))
+            snprintf(buf, buf_size, "%d%s%s%s", value, str(LANG_POINT),
+                     tbuf, P2STR(units[unit_no]));
         else
-            snprintf(tbuf, sizeof(tbuf), "%d%s%02d", value, str(LANG_POINT),
-                     fraction / 10);
-
-        snprintf(buf, buf_size, "%s%s", tbuf, P2STR(units[unit_no]));
+            snprintf(buf, buf_size, "%d%s", value, P2STR(units[unit_no]));
     }
     else
     {
-        if (value >= 100 || !unit_no)
-            tbuf[0] = '\0';
-        else if (value >= 10)
-            snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
-        else
-            snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
-        
         /* strip trailing zeros from the fraction */
         for (i = strlen(tbuf) - 1; (i >= 0) && (tbuf[i] == '0'); i--)
             tbuf[i] = '\0';
@@ -138,20 +130,6 @@ int read_line(int fd, char* buffer, int buffer_size)
 
     return errno ? -1 : num_read;
 }
-
-#ifdef TEST_MAX5
-int main(int argc, char **argv)
-{
-    char buffer[32];
-    if(argc>1) {
-        printf("%d => %s\n",
-               atoi(argv[1]),
-               num2max5(atoi(argv[1]), buffer));
-    }
-    return 0;
-}
-
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
