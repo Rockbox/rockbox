@@ -76,7 +76,7 @@ void panicf( const char *fmt, ...)
     DEBUGF(panic_buf);
     while (1)
     {
-#if !defined(SIMULATOR) && defined(HAVE_LED)
+#ifndef SIMULATOR
         volatile int i;
         led (state);
         state = state?false:true;
