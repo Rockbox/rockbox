@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Daniel Stenberg
+ * Copyright (C) 2002 by Felix Arends
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,29 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef ID3_H
-#define ID3_H
 
-struct mp3entry {
-    char *path;
-    char *title;
-    char *artist;
-    char *album;
-    int tracknum;
-    int version;
-    int layer;
-    int bitrate;
-    int frequency;
-    int id3v2len;
-    int id3v1len;
-    int filesize; /* in bytes */
-    int length;   /* song length */
+#ifndef __ATOI_H__ 
+#define __ATOI_H__ 
 
-    /* these following two fields are used for local buffering */
-    char id3v2buf[300];
-    char id3v1buf[3][32];
-};
+int atoi (const char *str);
 
-bool mp3info(struct mp3entry *entry, char *filename);
-
-#endif
+#endif /* __ATOI_H__ */

@@ -29,6 +29,7 @@
 #include <stdbool.h>
 #include "file.h"
 #include "debug.h"
+#include "atoi.h"
 
 #include "id3.h"
 
@@ -164,9 +165,10 @@ setid3v2title(int fd, struct mp3entry *entry)
     char *title = NULL;
     char *artist = NULL;
     char *album = NULL;
+    char *tracknum = NULL;
     char header[10];
     unsigned short int version;
-    int titlen=0, artistn=0, albumn=0;   
+    int titlen=0, artistn=0, albumn=0, tracknumn=0;   
     char *buffer = entry->id3v2buf;
 	
     /* 10 = headerlength */
@@ -249,6 +251,17 @@ setid3v2title(int fd, struct mp3entry *entry)
             albumn = headerlen;
             readsize += headerlen;
         }
+        else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
+            readsize++;
+            headerlen--;
+            if(headerlen > (size - readsize))
+                headerlen = (size - readsize);
+            tracknum = buffer + readsize;
+            tracknumn = headerlen;
+            readsize += headerlen;
+        } else {
+            readsize += headerlen;
+        }
     }
     
     if(artist) {
@@ -264,6 +277,11 @@ setid3v2title(int fd, struct mp3entry *entry)
     if(album) {
         entry->album = album;
         album[albumn]=0;
+    }
+
+    if(tracknum) {
+        tracknum[tracknumn] = 0;
+        entry->tracknum = atoi(tracknum);
     }
 }
 
@@ -493,6 +511,8 @@ mp3info(struct mp3entry *entry, char *filename)
     entry->title = NULL;
     entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
+    entry->tracknum = 0;
+
     if(HASID3V2(entry))
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
