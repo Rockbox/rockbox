@@ -40,16 +40,6 @@ static int line_end;   /* Index of the end of line */
 char resultfile[MAX_PATH];
 char path[MAX_PATH];
 
-static int strpcasecmp(const char *s1, const char *s2)
-{
-    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) {
-        s1++;
-        s2++;
-    }
-    
-    return (*s1 == '\0') ;
-}
-
 static void fill_buffer(int pos)
 {
     int numread;
@@ -94,7 +84,7 @@ static void fill_buffer(int pos)
             default:
 	    	if (!found && tolower(buffer[i]) == tolower(search_string[0]))
 		{
-                    found = strpcasecmp(&search_string[0],&buffer[i]) ;
+                    found = rb->strcasecmp(&search_string[0],&buffer[i]) ;
 		}
 		break;
 	}
@@ -152,7 +142,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     /* Check the extension. We only allow .m3u files. */
-    if(!strpcasecmp(&filename[rb->strlen(filename)-4], ".m3u")) {
+    if(!rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u")) {
         rb->splash(HZ, true, "Not a .m3u file");
         return PLUGIN_ERROR;
     }

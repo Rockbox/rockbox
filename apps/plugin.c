@@ -256,6 +256,7 @@ static const struct plugin_api rockbox_api = {
     button_status,
     button_clear_queue,
     strncpy,
+    strcasecmp,
 };
 
 int plugin_load(char* plugin, void* parameter)
