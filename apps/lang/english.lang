@@ -2986,3 +2986,8 @@ eng: "Free:"
 voice: "Free diskspace:"
 new:
 
+id: LANG_ID3DB_ALL_SONGS
+desc: ID3 virtual folder name
+eng: "<All songs>"
+voice: ""
+new:

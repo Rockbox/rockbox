@@ -130,7 +130,7 @@ int db_load(struct tree_context* c)
 {
     int i, offset, rc;
     int dcachesize = global_settings.max_files_in_dir * sizeof(struct entry);
-    int max_items, itemcount, stringlen;
+    int itemcount, stringlen, hits=0;
     unsigned int* nptr = (void*) c->name_buffer;
     unsigned int* dptr = c->dircache;
     unsigned int* safeplace = NULL;
@@ -269,33 +269,30 @@ int db_load(struct tree_context* c)
             stringlen = songlen;
             break;
 
+        case songs4artist:
+            /* 'extra' is offset to the artist, used as filter */
+            offset = songstart;
+            itemcount = songcount;
+            stringlen = songlen;
+            break;
+            
         default:
             DEBUGF("Unsupported table %d\n", table);
             return -1;
     }
-    max_items = dcachesize / (c->dentry_size * sizeof(int));
     end_of_nbuf -= safeplacelen;
 
     c->dirlength = itemcount;
     itemcount -= c->firstpos;
 
-    if (!safeplace) {
-        //DEBUGF("Seeking to %x\n", offset);
+    if (!safeplace)
         lseek(fd, offset, SEEK_SET);
-    }
 
     /* name_buffer (nptr) contains only names, null terminated.
        the first word of dcache (dptr) is a pointer to the name,
        the rest is table specific. see below. */
 
-    if (itemcount > max_items)
-        c->dirfull = true;
-    
-    if (max_items > itemcount) {
-        max_items = itemcount;
-    }
-    
-    for ( i=0; i < max_items; i++ ) {
+    for ( i=0; i < itemcount; i++ ) {
         int rc, skip=0;
         int intbuf[4];
 
@@ -316,17 +313,19 @@ int db_load(struct tree_context* c)
             return -1;
         }
 
-        /* store name pointer in dir cache */
-        dptr[0] = (unsigned int)nptr;
-
         switch (table) {
             case allsongs:
             case songs4album:
+            case songs4artist:
                 rc = read(fd, intbuf, 12);
                 if (rc < 12) {
                     DEBUGF("%d read(%d) returned %d\n", i, 12, rc);
                     return -1;
                 }
+                /* continue to next song if wrong artist */
+                if (table == songs4artist && (int)BE32(intbuf[0]) != extra)
+                    continue;
+
                 /* save offset of filename */
                 dptr[1] = BE32(intbuf[2]);
                 break;
@@ -345,8 +344,13 @@ int db_load(struct tree_context* c)
                 break;
         }
 
+        /* store name pointer in dir cache */
+        dptr[0] = (unsigned int)nptr;
+
         if (skip)
             lseek(fd, skip, SEEK_CUR);
+
+        hits++;
         
         /* next name is stored immediately after this */
         nptr = (void*)nptr + strlen((char*)nptr) + 1;
@@ -354,15 +358,30 @@ int db_load(struct tree_context* c)
             c->dirfull = true;
             break;
         }
+
+        /* limit dir buffer */
         dptr = (void*)dptr + c->dentry_size * sizeof(int);
+        if ((void*)(dptr + c->dentry_size) >
+            (void*)(c->dircache + dcachesize))
+        {
+            c->dirfull = true;
+            break;
+        }
 
         if (!safeplace)
             offset += stringlen + skip;
     }
 
-    c->filesindir = i;
+    if (c->currtable == albums4artist && !c->dirfull) {
+        strcpy((char*)nptr, str(LANG_ID3DB_ALL_SONGS));
+        dptr[0] = (unsigned int)nptr;
+        dptr[1] = extra; /* offset to artist */
+        hits++;
+    }
+    
+    c->filesindir = hits;
 
-    return i;
+    return hits;
 }
 
 static int db_search(struct tree_context* c, char* string)
@@ -476,7 +495,13 @@ int db_enter(struct tree_context* c)
         case allalbums:
         case albums4artist:
         case searchalbums:
-            c->currtable = songs4album;
+            /* virtual <all albums> entry points to the artist,
+               all normal entries point to the album */
+            if (newextra >= artiststart)
+                c->currtable = songs4artist;
+            else
+                c->currtable = songs4album;
+
             c->currextra = newextra;
             break;
 
@@ -563,6 +588,7 @@ int   db_get_icon(struct tree_context* c)
     {
         case allsongs:
         case songs4album:
+        case songs4artist:
         case searchsongs:
             icon = File;
             break;
