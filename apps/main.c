@@ -201,7 +201,12 @@ void init(void)
 #endif
 
 #ifdef HAVE_CHARGING
-    if (coldstart && charger_inserted() && !global_settings.car_adapter_mode)
+    if (coldstart && charger_inserted()
+        && !global_settings.car_adapter_mode
+#ifdef ATA_POWER_PLAYERSTYLE
+        && !ide_powered() /* relies on probing result from bootloader */
+#endif
+        )
     {
         rc = charging_screen(); /* display a "charging" screen */
         if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
