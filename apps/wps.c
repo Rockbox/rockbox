@@ -53,6 +53,7 @@
     #define PLAY_DISPLAY_2LINEID3        1 
     #define PLAY_DISPLAY_FILENAME_SCROLL 2 
     #define PLAY_DISPLAY_TRACK_TITLE     3 
+    #define PLAY_DISPLAY_CUSTOM_WPS      4
 #endif
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -189,22 +190,20 @@ static void draw_screen(struct mp3entry* id3)
                 char* szLast = strrchr(id3->path, ch);
 
                 if(id3->artist && id3->title)
-                {
                     snprintf(buffer, sizeof(buffer), "%d/%d: %s - %s",
-                            id3->index + 1,
-                            playlist.amount,
+                            id3->index + 1, playlist.amount,
                             id3->artist?id3->artist:"<no artist>",
                             id3->title?id3->title:"<no title>");
-                }
                 else
-                {
                     snprintf(buffer, sizeof(buffer), "%d/%d: %s",
-                            id3->index + 1,
-                            playlist.amount,
+                            id3->index + 1, playlist.amount,
                             szLast?++szLast:id3->path);
-                }
                 lcd_puts_scroll(0, 0, buffer);
                 break;
+            }
+            case PLAY_DISPLAY_CUSTOM_WPS:
+            {
+                wps_load_custom_config();
             }
 #endif
         }
@@ -212,6 +211,121 @@ static void draw_screen(struct mp3entry* id3)
     status_draw();
     lcd_update();
 }
+
+int wps_load_custom_config(void)
+{
+    char buffer[128];
+    char tmpbuf[64];
+    char cchr1[0] = "";
+    char cchr2[0] = "";
+    int i;
+    int fd;
+    struct mp3entry* id3 = NULL;
+
+    id3 = mpeg_current_track();
+    char ch = '/';
+    char* szLast = strrchr(id3->path, ch);
+
+    snprintf(buffer, sizeof(buffer), "");
+    lcd_stop_scroll();
+    fd = open("/wps.config", O_RDONLY);
+    if(-1 == fd)
+    {
+        lcd_puts(0, 0, "  *Error*  ");
+        sleep(HZ);
+        lcd_puts_scroll(0, 1, "--Couldn't Load wps.config--");
+        sleep(HZ*5);
+        global_settings.wps_display = 0;
+        settings_save();
+        draw_screen(id3);
+        return(-1);
+    }
+    while(1)
+    {
+        i = read(fd, cchr1, 1);
+        if(i <= 0)
+        {
+            close(fd);
+            lcd_puts_scroll(0, 0, buffer);
+            return(1);
+        }
+        switch(cchr1[0])
+        {
+            case '%':
+                i = read(fd, cchr2, 1);
+                if(i <= 0)
+                {
+                    close(fd);
+                    lcd_puts_scroll(0, 0, buffer);
+                    return(1);
+                }
+                switch(cchr2[0])
+                {
+                    case 't':  /* ID3 Title */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->title);
+                        break;
+                    case 'a':  /* ID3 Artist */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->artist);
+                        break;
+                    case 'n':  /* ID3 Track Number */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->tracknum);
+                        break;
+                    case 'u':  /* ID3 Album */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->album);
+                        break;
+                    case 'c':  /* Conditional Filename \ ID3 Artist-Title */
+                        if(id3->artist && id3->title)
+                            snprintf(tmpbuf, sizeof(tmpbuf), "%s - %s",
+                                    id3->artist?id3->artist:"<no artist>",
+                                    id3->title?id3->title:"<no title>");
+                        else
+                            snprintf(tmpbuf, sizeof(tmpbuf), "%s",
+                                    szLast?++szLast:id3->path);
+                        break;
+                    case 'b':  /* File Bitrate */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->bitrate);
+                        break;
+                    case 'f':  /* File Frequency */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->frequency);
+                        break;
+                    case 'p':  /* File Path */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->path);
+                        break;
+                    case 'm':  /* File Name */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%s", 
+                                szLast?++szLast:id3->path);
+                        break;
+                    case 's':  /* File Size (In Kilobytes) */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d",
+                                id3->filesize / 1024);
+                        break;
+                    case 'i':  /* Playlist Position */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->index + 1);
+                        break;
+                    case 'l':  /* Playlist Total Entries */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d", playlist.amount);
+                        break;
+                    case 'e':  /* Elapsed Time */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
+                                id3->elapsed / 60000,
+                                id3->elapsed % 60000 / 1000);
+                        break;
+                    case 'o':  /* Total Time */
+                        snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
+                                id3->elapsed / 60000,
+                                id3->elapsed % 60000 / 1000);
+                        break;
+                    
+                }
+                break;
+            default:
+                snprintf(tmpbuf, sizeof(tmpbuf), "%s", cchr1); 
+                break;
+        }
+    snprintf(buffer, sizeof(buffer), "%s%s", buffer, tmpbuf);
+    }
+}
+
 
 int player_id3_show(void)
 {
@@ -358,6 +472,7 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
        the screen has room. */
     if ((global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL) ||
         global_settings.wps_display == PLAY_DISPLAY_1LINEID3 ||
+        global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS ||
         ff_rewind)
     {
         snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
