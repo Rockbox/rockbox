@@ -16,10 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "types.h"
 #include "i2c.h"
 #include "mas.h"
 #include "sh7034.h"
 #include "debug.h"
+#include "kernel.h"
 
 unsigned char fliptable[] =
 {
@@ -59,10 +61,14 @@ unsigned char fliptable[] =
 
 extern unsigned char mp3data[];
 extern int mp3datalen;
+unsigned char *mp3dataptr;
+int mp3_transmitted;
+
+bool dma_on;
 
 void setup_sci0(void)
 {
-    PBCR1 = (PBCR1 & 0xccff) | 0x0200;
+    PBCR1 = (PBCR1 & 0xccff) | 0x1200;
     
     /* set PB12 to output */
     PBIOR |= 0x1000;
@@ -86,19 +92,20 @@ void setup_sci0(void)
     IPRD &= 0x0ff0;
 
     /* set IRQ6 and IRQ7 to edge detect */
-//    ICR |= 0x03;
+    ICR |= 0x03;
 
     /* set PB15 and PB14 to inputs */
     PBIOR &= 0x7fff;
     PBIOR &= 0xbfff;
 
     /* set IRQ6 prio 8 and IRQ7 prio 0 */
-//    IPRB = ( IPRB & 0xff00 ) | 0x80;
+    IPRB = ( IPRB & 0xff00 ) | 0x0080;
 
-    IPRB = 0;
+    /* Enable End of DMA interrupt at prio 8 */
+    IPRC = (IPRC & 0xf0ff) | 0x0800;
     
     /* Enable Tx (only!) */
-    SCR0 |= 0xa0;
+//    SCR0 |= 0xa0;
 }
 
 int mas_tx_ready(void)
@@ -109,160 +116,142 @@ int mas_tx_ready(void)
 void init_dma(void)
 {
     SAR3 = (unsigned int) mp3data;
-    DAR3 = 0xFFFFEC3;
-    CHCR3 = 0x1500; /* Single address destination, TXI0 */
+    DAR3 = 0x5FFFEC3;
+    CHCR3 &= ~0x0002; /* Clear interrupt */
+    CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
     DTCR3 = 64000;
     DMAOR = 0x0001; /* Enable DMA */
 }
 
 void start_dma(void)
 {
-    CHCR3 |= 1;
+    SCR0 |= 0x80;
+    dma_on = TRUE;
 }
 
 void stop_dma(void)
 {
-    CHCR3 &= ~1;
+    SCR0 &= 0x7f;
+    dma_on = FALSE;
 }
 
+void dma_tick(void)
+{
+    if(!dma_on)
+    {
+        if(PBDR & 0x4000)
+        {
+            if(!(SCR0 & 0x80))
+                start_dma();
+        }
+    }
+}
 
 int main(void)
 {
-   char buf[40];
-   char str[32];
-   int i=0;
-   int dma_on = 0;
+    char buf[40];
+    char str[32];
+    int i=0;
 
-   /* Clear it all! */
+    /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
 
     /* This enables the serial Rx interrupt, to be able to exit into the
        debugger when you hit CTRL-C */
     SCR1 |= 0x40;
     SCR1 &= ~0x80;
-    asm ("ldc\t%0,sr" : : "r"(0<<4));
 
-    debugf("Olle: %d\n", 7);
+    i2c_init();
+
+    dma_on = TRUE;
     
-   i2c_init();
-   debugf("I2C Init done\n");
-   i=mas_readmem(MAS_BANK_D1,0xff6,(unsigned long*)buf,2);
-   if (i) {
-       debugf("Error - mas_readmem() returned %d\n", i);
-       while(1);
-   }
+    kernel_init();
+    tick_add_task(dma_tick);
 
-   i = buf[0] | buf[1] << 8;
-   debugf("MAS version: %x\n", i);
-   i = buf[4] | buf[5] << 8;
-   debugf("MAS revision: %x\n", i);
+    set_irq_level(0);
 
-   i=mas_readmem(MAS_BANK_D1,0xff9,(unsigned long*)buf,7);
-   if (i) {
-       debugf("Error - mas_readmem() returned %d\n", i);
-       while(1);
-   }
+    setup_sci0();
 
-   for(i = 0;i < 7;i++)
-   {
-       str[i*2+1] = buf[i*4];
-       str[i*2] = buf[i*4+1];
-   }
-   str[i*2] = 0;
-   debugf("Description: %s\n", str);
+    i=mas_readmem(MAS_BANK_D1,0xff6,(unsigned long*)buf,2);
+    if (i) {
+        debugf("Error - mas_readmem() returned %d\n", i);
+        while(1);
+    }
 
-   i=mas_readreg(0xe6);
-   if (i < 0) {
-       debugf("Error - mas_readreg() returned %d\n", i);
-       while(1);
-   }
+    i = buf[0] | buf[1] << 8;
+    debugf("MAS version: %x\n", i);
+    i = buf[4] | buf[5] << 8;
+    debugf("MAS revision: %x\n", i);
 
-   debugf("Register 0xe6: %x\n", i);
-   
+    i=mas_readmem(MAS_BANK_D1,0xff9,(unsigned long*)buf,7);
+    if (i) {
+        debugf("Error - mas_readmem() returned %d\n", i);
+        while(1);
+    }
 
-   debugf("Writing register 0xaa\n");
-   
-   i=mas_writereg(0xaa, 0x1);
-   if (i < 0) {
-       debugf("Error - mas_writereg() returned %d\n", i);
-       while(1);
-   }
+    for(i = 0;i < 7;i++)
+    {
+        str[i*2+1] = buf[i*4];
+        str[i*2] = buf[i*4+1];
+    }
+    str[i*2] = 0;
+    debugf("Description: %s\n", str);
 
-   i=mas_readreg(0xaa);
-   if (i < 0) {
-       debugf("Error - mas_readreg() returned %d\n", i);
-       while(1);
-   }
+    i=mas_writereg(0x3b, 0x20);
+    if (i < 0) {
+        debugf("Error - mas_writereg() returned %d\n", i);
+        while(1);
+    }
 
-   debugf("Register 0xaa: %x\n", i);
-   
-   debugf("Writing register 0xaa again\n");
-   
-   i=mas_writereg(0xaa, 0);
-   if (i < 0) {
-       debugf("Error - mas_writereg() returned %d\n", i);
-       while(1);
-   }
-
-   i=mas_readreg(0xaa);
-   if (i < 0) {
-       debugf("Error - mas_readreg() returned %d\n", i);
-       while(1);
-   }
-
-   debugf("Register 0xaa: %x\n", i);
-
-   i=mas_readreg(0xed);
-   if (i < 0) {
-       debugf("Error - mas_readreg(ed) returned %d\n", i);
-       while(1);
-   }
-
-   debugf("Register 0xed: %x\n", i);
-
-   i=mas_writereg(0x3b, 0x20);
-   if (i < 0) {
-       debugf("Error - mas_writereg() returned %d\n", i);
-       while(1);
-   }
-
-   i = mas_run(1);
-   if (i < 0) {
-       debugf("Error - mas_run() returned %d\n", i);
-       while(1);
-   }
+    i = mas_run(1);
+    if (i < 0) {
+        debugf("Error - mas_run() returned %d\n", i);
+        while(1);
+    }
 
    
-   setup_sci0();
+    for(i = 0;i < mp3datalen;i++)
+    {
+        mp3data[i] = fliptable[mp3data[i]];
+    }
 
-   i = 0;
+    while(1)
+    {
+        debugf("let's play...\n");
+        init_dma();
+    
+        mp3dataptr = mp3data;
+        mp3_transmitted = 0;
+        
+        dma_on = TRUE;
+        
+        /* Enable Tx (only!) */
+        SCR0 |= 0xa0;
+        
+        CHCR3 |= 1;
 
-   init_dma();
+        debugf("sleeping...\n");
+        sleep(10000);
+    }
+}
 
-   while(1)
-   {
-       /* Demand pin high? */
-       if(PBDR & 0x4000)
-       {
-           start_dma();
-#if 0
-           /* More data to write? */
-           if(i < mp3datalen)
-           {
-               /* Transmitter ready? */
-               while(!mas_tx_ready()){};
-               
-                /* Write data into TDR and clear TDRE */
-               TDR0 = fliptable[mp3data[i++]];
-               SSR0 &= ~SCI_TDRE;
-           }
-#endif
-       }
-       else
-       {
-           stop_dma();
-       }
-   }
-   
-   while(1);
+#pragma interrupt
+void IRQ6(void)
+{
+    stop_dma();
+}
+
+#pragma interrupt
+void DEI3(void)
+{
+    mp3_transmitted += 64000;
+    if(mp3_transmitted < mp3datalen)
+    {
+        DTCR3 = 64000;
+        CHCR3 &= ~0x0002;
+    }
+    else
+    {
+        CHCR3 = 0;
+    }
 }
