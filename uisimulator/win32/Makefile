@@ -25,9 +25,8 @@ SIMCOMMON = ../common
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
      MACHINEDIR = $(RECDIR)
-     # not very nice to set RTC like this, but...
+     # not very nice to set config stuff like this, but...
      RTC += -DHAVE_RTC
-     # not very nice to set RADIO like this, but...
      RADIO += -DHAVE_FMRADIO
 else
      MACHINEDIR = $(PLAYDIR)
@@ -48,8 +47,15 @@ DOCSDIR = ../../docs
 RM = rm -f
 DEBUG = -g
 
-# where to put all output files
-OBJDIR = .
+ifndef OBJDIR
+no_configure:
+	@echo "Don't run make here. Run the tools/configure script from your own build"
+	@echo "directory, then run make there."
+	@echo
+	@echo "More help on how to build rockbox can be found here:"
+	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
+endif
+
 LANGUAGE = english
 
 TARGET = $(OBJDIR)/uisw32.exe
@@ -81,9 +87,7 @@ ifeq ($(UNAME),CYGWIN)
   DLLTOOL = dlltool
   DLLWRAP = dllwrap
   DEFINES += -DNOCYGWIN
-  CFLAGS += -mno-cygwin
   LDFLAGS += -mno-cygwin
-  APPCFLAGS += -mno-cygwin
 else
   CC = i386-mingw32msvc-gcc
   WINDRES = i386-mingw32msvc-windres
@@ -99,46 +103,38 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
-COMMONSRCS = io.c
+COMMONSRCS = io.c stubs.c lcd-common.c sim_icons.c fmradio.c
 
 FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c mp3_playback.c \
-	powermgmt.c power.c sprintf.c buffer.c lcd-common.c strtok.c random.c \
+	powermgmt.c power.c sprintf.c buffer.c strtok.c random.c \
 	timefuncs.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
-	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
-	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c
-
-MENUS = settings_menu.c sound_menu.c playlist_menu.c
+	screens.c sleeptimer.c keyboard.c onplay.c\
+	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c \
+	settings_menu.c sound_menu.c playlist_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += bmp.c widgets.c radio.c
+   APPS += peakmeter.c bmp.c widgets.c radio.c
 endif
 
 SRCS = button.c lcd-win32.c panic-win32.c thread-win32.c \
-	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) $(COMMONSRCS) sim_icons.c fmradio.c
+	debug-win32.c kernel.c string-win32.c uisw32.c \
+	$(APPS) $(FIRMSRCS) $(COMMONSRCS)
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
-ROCKSRCS := $(patsubst $(PLUGINDIR)/%.c,%.c,$(wildcard $(PLUGINDIR)/*.c))
-
-ROCKS := $(ROCKSRCS:%.c=$(OBJDIR)/%.rock)
+ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
+PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
 
 all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
 
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
-$(OBJDIR)/libplugin.a:
-	$(MAKE) -C $(PLUGINDIR)/lib DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" SIMULATOR=1
-
-$(TARGET): $(OBJS) $(OBJDIR)/libplugin.a
+$(TARGET): $(OBJDIR)/lang.o $(OBJS) $(OBJDIR)/libplugin.a
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
-
-$(OBJDIR)/uisw32-res.o: uisw32.rc
-	$(WINDRES) -i $< -o $@
 
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
@@ -146,83 +142,18 @@ clean:
 	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
 	$(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
-	$(MAKE) -C $(PLUGINDIR)/lib clean
 
-distclean: clean
-	$(RM) config.cache
-
+################## Specific dependencies ##################
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl $(APPDIR)/credits.pl < $< > $@
 
+$(OBJDIR)/uisw32-res.o: uisw32.rc
+	$(WINDRES) -i $< -o $@
+
 $(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.raw
-	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/menu.o: $(APPDIR)/menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/language.o: $(APPDIR)/language.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/settings_menu.o: $(APPDIR)/settings_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/playlist_menu.o: $(APPDIR)/playlist_menu.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/icons.o: $(MACHINEDIR)/icons.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/widgets.o: $(RECDIR)/widgets.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/keyboard.o: $(MACHINEDIR)/keyboard.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/main.o: $(APPDIR)/main.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/misc.o: $(APPDIR)/misc.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/wps.o: $(APPDIR)/wps.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/sleeptimer.o: $(APPDIR)/sleeptimer.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/wps-display.o: $(APPDIR)/wps-display.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/bmp.o: $(RECDIR)/bmp.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/tree.o: $(APPDIR)/tree.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/onplay.o: $(APPDIR)/onplay.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/filetypes.o: $(APPDIR)/filetypes.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/playlist_viewer.o: $(APPDIR)/playlist_viewer.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/bookmark.o: $(APPDIR)/bookmark.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
+$(OBJDIR)/button.o: button.c
 $(OBJDIR)/plugin.o: $(APPDIR)/plugin.c plugin-win32.h
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
 $(OBJDIR)/build.lang: $(APPDIR)/lang/$(LANGUAGE).lang
 	perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
 
@@ -230,107 +161,16 @@ $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
 	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-$(OBJDIR)/lcd-recorder.o: $(DRIVERS)/lcd-recorder.c
-	$(CC) $(APPCFLAGS) -DHAVE_LCD_BITMAP -c $< -o $@
-
-$(OBJDIR)/power.o: $(DRIVERS)/power.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/panic.o: $(FIRMWAREDIR)/panic.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/powermgmt.o: $(FIRMWAREDIR)/powermgmt.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/lcd-player-charset.o: $(DRIVERS)/lcd-player-charset.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/settings.o: $(APPDIR)/settings.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/mp3data.o: $(FIRMWAREDIR)/mp3data.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
 $(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
 	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
 	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
-$(OBJDIR)/status.o: $(APPDIR)/status.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+################## Plugins ##################
+$(OBJDIR)/libplugin.a:  $(PLUGINLIBOBJS)
+	$(AR) ruv $@ $+
 
-$(OBJDIR)/screens.o: $(APPDIR)/screens.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/peakmeter.o: $(RECDIR)/peakmeter.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/version.o: $(FIRMWAREDIR)/version.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/mp3_playback.o: $(FIRMWAREDIR)/mp3_playback.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/buffer.o: $(FIRMWAREDIR)/buffer.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/random.o: $(COMMON)/random.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/strtok.o: $(COMMON)/strtok.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/timefuncs.o: $(COMMON)/timefuncs.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/stubs.o: $(SIMCOMMON)/stubs.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/lcd-common.o: $(SIMCOMMON)/lcd-common.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/font-player.o: $(SIMCOMMON)/font-player.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/sim_icons.o: $(SIMCOMMON)/sim_icons.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/io.o: $(SIMCOMMON)/io.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/fmradio.o: $(SIMCOMMON)/fmradio.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/radio.o: $(RECDIR)/radio.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-# these ones are simulator-specific
-
-$(OBJDIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
+	$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
 
 $(OBJDIR)/%.po : $(PLUGINDIR)/%.c
 	$(CC) $(APPCFLAGS) -DPLUGIN -c $< -o $@
@@ -339,6 +179,29 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.po
 	$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
 
+################## Patterns for building objects ##################
+$(OBJDIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(SIMCOMMON)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(MACHINEDIR)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(DRIVERS)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(FIRMWAREDIR)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(COMMON)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: $(APPDIR)/%.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+################## Auto-dependencies ##################
 DEPS:=$(OBJDIR)/.deps
 
 $(DEPS)/%.d: %.c
