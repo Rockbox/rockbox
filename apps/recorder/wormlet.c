@@ -33,7 +33,6 @@
 #include "kernel.h"
 #include "menu.h"
 #include "rtc.h"
-#include "lang.h"
 #include "screens.h"
 
 /* size of the field the worm lives in */

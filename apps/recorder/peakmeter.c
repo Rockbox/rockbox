@@ -27,7 +27,6 @@
 #include "system.h"
 #include "font.h"
 #include "icons.h"
-#include "lang.h"
 #include "peakmeter.h"
 
 /* buffer the read peak value */
@@ -55,7 +54,9 @@ static int peak_meter_src_r = MAS_REG_DQPEAK_R;
 #endif
 
 /* temporarily en- / disables peak meter. This is
+
    especially for external applications to detect 
+
    if the peak_meter is in use and needs drawing at all */
 bool peak_meter_enabled = true;
 
@@ -211,6 +212,7 @@ void peak_meter_draw(int x, int y, int width, int height) {
         /* read the volume info from MAS */
         left  = peak_meter_read_l(); 
         right = peak_meter_read_r(); 
+
         peak_meter_peek();
 
 
