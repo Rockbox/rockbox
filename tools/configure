@@ -36,7 +36,7 @@ crosswincc () {
  # naive approach to selecting a mingw cross-compiler on linux/*nix
  echo "Enabling win32 crosscompiling"
 
- prefixtools i386-mingw32msvc-
+ prefixtools i586-mingw32msvc-
 
  LDOPTS="-lgdi32 -luser32 -mwindows"
  # add cross-compiler option(s)
