@@ -326,9 +326,7 @@ bool set_time_screen(const char* string, struct tm *tm);
 int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 
-#if CONFIG_HWCODEC == MAS3587F
 unsigned int rec_timesplit_seconds(void);
-#endif
 
 /* global settings */
 extern struct user_settings global_settings;
