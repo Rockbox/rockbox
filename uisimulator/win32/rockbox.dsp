@@ -333,14 +333,6 @@ SOURCE=..\..\apps\debug_menu.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\apps\demo_menu.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\apps\games_menu.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\apps\language.c
 # End Source File
 # Begin Source File
