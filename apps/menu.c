@@ -47,7 +47,7 @@ struct menu {
     struct menu_item* items;
     int itemcount;
     int (*callback)(int, int);
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
     bool use_buttonbar; /* true if a buttonbar is defined */
     const char *buttonbar[3];
 #endif
@@ -248,7 +248,7 @@ int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, in
     menus[i].top = 0;
     menus[i].cursor = 0;
     menus[i].callback = callback;
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
     menus[i].buttonbar[0] = button1;
     menus[i].buttonbar[1] = button2;
     menus[i].buttonbar[2] = button3;

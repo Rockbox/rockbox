@@ -594,9 +594,11 @@ static int recalc_screen_height(void)
     lcd_getstringsize("A", &fw, &fh);
     if(global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
-    
+
+#if CONFIG_KEYPAD == RECORDER_PAD
     if(global_settings.buttonbar)
         height -= BUTTONBAR_HEIGHT;
+#endif        
 
     return height / fh;
 }
