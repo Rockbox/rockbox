@@ -1787,6 +1787,26 @@ void mpeg_sound_channel_config(int configuration)
 #endif
 }
 
+#ifdef HAVE_MAS3587F
+/* This function works by telling the decoder that we have another
+   crystal frequency than we actually have. It will adjust its internal
+   parameters and the result is that the audio is played at another pitch */
+void mpeg_set_pitch(int percent)
+{
+    unsigned long val;
+
+    /* Calculate the new (bogus) frequency */
+    val = 18432 + (18432*percent/100);
+    
+    mas_writemem(MAS_BANK_D0,0x7f3,&val,1);
+
+    /* We must tell the MAS that the frequency has changed.
+       This will unfortunately cause a short silence. */
+    val = 0x25;
+    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+}
+#endif
+
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR

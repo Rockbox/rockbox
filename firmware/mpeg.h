@@ -41,6 +41,9 @@ char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
 bool mpeg_has_changed_track(void);
+#ifdef HAVE_MAS3587F
+void mpeg_set_pitch(int percent);
+#endif
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1
