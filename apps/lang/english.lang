@@ -2833,11 +2833,11 @@ new:
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
-voice: "No .rockbox directory"
+voice: ""
 new:
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
-voice: "Installation incomplete"
+voice: ""
 new:
