@@ -326,7 +326,7 @@ bool main_menu(void)
     items[i++].function = simulate_usb;
 #endif
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, i );
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
 #endif
