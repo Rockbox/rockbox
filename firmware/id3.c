@@ -223,7 +223,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
 /*
  * Sets the title of an MP3 entry based on its ID3v2 tag.
  *
- * Arguments: file - the MP3 file to scen for a ID3v2 tag
+ * Arguments: file - the MP3 file to scan for a ID3v2 tag
  *            entry - the entry to set the title in
  *
  * Returns: true if a title was found and created, else false
@@ -291,7 +291,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         }
 
         /* Keep track of the total size */
-        totframelen += framelen;
+        totframelen = framelen;
 
         if(framelen == 0)
             return;
@@ -300,7 +300,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
            to read as much as would fit in the buffer */
         if(framelen >= buffersize - bufferpos)
             framelen = buffersize - bufferpos - 1;
-        
+
         /* Check for certain frame headers */
         if(!strncmp(header, "TPE1", strlen("TPE1")) || 
            !strncmp(header, "TP1", strlen("TP1"))) {
@@ -336,6 +336,12 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             entry->tracknum = atoi(tracknum);
             bufferpos += bytesread + 1;
             size -= bytesread;
+        }
+        else {
+            /* Unknown frame, skip it using the total size in case
+               it was truncated */
+            size -= totframelen;
+            lseek(fd, totframelen, SEEK_CUR);
         }
     }
 }
