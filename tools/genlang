@@ -76,8 +76,8 @@ while(<LANG>) {
                 $value = $set{'eng'};
             }
 
-            print HFILE " ".$set{'id'}.",\n";
-            print CFILE "   $value,\n";
+            print HFILE "    ".$set{'id'}.",\n";
+            print CFILE "    $value,\n";
 
             undef %set;
         }
@@ -89,6 +89,7 @@ close(LANG);
 
 
 print HFILE <<MOO
+    LANG_LAST_INDEX_IN_ARRAY /* this is not a string, this is a marker */
 };
 /* end of generated enum list */
 MOO
