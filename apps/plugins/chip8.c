@@ -21,6 +21,7 @@
 
 /* Only build for (correct) target */
 #ifdef HAVE_LCD_BITMAP 
+#ifndef SIMULATOR /* not unless lcd_blit() is implemented and mp3_xx stubbed */
 
 static struct plugin_api* rb; /* here is a global api struct pointer */
 unsigned char lcd_framebuf[8][64]; /* frame buffer in hardware fomat */
@@ -599,4 +600,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return chip8_run(filename) ? PLUGIN_OK : PLUGIN_ERROR;
 }
 
+#endif /* #ifndef SIMULATOR */
 #endif /* #ifdef HAVE_LCD_BITMAP */
