@@ -46,17 +46,10 @@
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 
-#ifdef HAVE_RECORDER_KEYPAD
-#define RELEASE_MASK (BUTTON_F1 | BUTTON_F2 | BUTTON_F3 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP | BUTTON_ON | BUTTON_PLAY )
-#else
-#define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_PLAY)
-#endif
-
 bool keys_locked = false;
 static bool ff_rewind = false;
 static bool paused = false;
 static struct mp3entry* id3 = NULL;
-static int old_release_mask;
 
 #ifdef HAVE_PLAYER_KEYPAD
 void player_change_volume(int button)
@@ -538,7 +531,7 @@ static bool menu(void)
                 exit = true;
                 if ( !last_button ) {
                     lcd_stop_scroll();
-                    button_set_release(old_release_mask);
+
                     if (main_menu())
                         return true;
 #ifdef HAVE_LCD_BITMAP
@@ -547,7 +540,6 @@ static bool menu(void)
                     else
                         lcd_setmargins(0, 0);
 #endif
-                    old_release_mask = button_set_release(RELEASE_MASK);
                 }
                 break;
 
@@ -627,14 +619,10 @@ static bool menu(void)
 int wps_show(void)
 {
     int button = 0, lastbutton = 0;
-    int old_repeat_mask;
     bool ignore_keyup = true;
     bool restore = false;
 
     id3 = NULL;
-
-    old_release_mask = button_set_release(RELEASE_MASK);
-    old_repeat_mask = button_set_repeat(~0);
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon(ICON_AUDIO, true);
@@ -715,8 +703,6 @@ int wps_show(void)
                         if (global_settings.browse_current && id3)
                             set_current_file(id3->path);
                         
-                        button_set_release(old_release_mask);
-                        button_set_repeat(old_repeat_mask);
                         return 0;
 #ifdef HAVE_RECORDER_KEYPAD
                 }
@@ -852,7 +838,6 @@ int wps_show(void)
 
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
-                button_set_release(old_release_mask);
                 return 0;
                     
             case SYS_USB_CONNECTED:

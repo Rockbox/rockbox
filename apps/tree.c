@@ -126,14 +126,12 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_EXIT  BUTTON_LEFT
 #define TREE_ENTER BUTTON_RIGHT
 #define TREE_MENU  BUTTON_F1
-#define RELEASE_MASK (BUTTON_OFF | BUTTON_ON | BUTTON_F2 | BUTTON_F3)
 #else
 #define TREE_NEXT  BUTTON_RIGHT
 #define TREE_PREV  BUTTON_LEFT
 #define TREE_EXIT  BUTTON_STOP
 #define TREE_ENTER BUTTON_PLAY
 #define TREE_MENU  BUTTON_MENU
-#define RELEASE_MASK (BUTTON_STOP)
 #endif /* HAVE_RECORDER_KEYPAD */
 
 /* using attribute not used by FAT */
@@ -704,8 +702,6 @@ bool dirbrowse(char *root)
     memcpy(currdir,root,sizeof(currdir));
 
     start_resume();
-    button_set_release(RELEASE_MASK);
-    button_set_repeat(~0);
 
     numentries = showdir(currdir, dirstart);
     if (numentries == -1) 
