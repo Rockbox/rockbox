@@ -56,7 +56,7 @@ int ata_init(char* filename)
     if (!filename)
         filename = "disk.img";
     /* check disk size */
-    file=fopen(filename,"r+");
+    file=fopen(filename,"rb+");
     if(!file) {
         fprintf(stderr, "read_disk() - Could not find \"%s\"\n",filename);
         return -1;

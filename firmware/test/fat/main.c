@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
-#include <sys/time.h>
 #include "fat.h"
 #include "debug.h"
 #include "disk.h"
@@ -266,7 +265,7 @@ int dbg_wrtest(char* name)
 void dbg_type(char* name)
 {
     const int size = SECTOR_SIZE*5;
-    unsigned char buf[size+1];
+    unsigned char buf[SECTOR_SIZE*5+1];
     int fd,rc;
 
     fd = open(name,O_RDONLY);
@@ -658,10 +657,8 @@ int main(int argc, char *argv[])
 {
     int rc,i;
     struct partinfo* pinfo;
-    struct timeval tv;
 
-    gettimeofday(&tv, NULL);
-    srand(tv.tv_usec);
+    srand(clock());
 
     if(ata_init("disk.img")) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
@@ -674,7 +671,11 @@ int main(int argc, char *argv[])
     }
 
     for ( i=0; i<4; i++ ) {
-        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ) {
+        if ( pinfo[i].type == PARTITION_TYPE_FAT32 
+#ifdef HAVE_FAT16SUPPORT
+          || pinfo[i].type == PARTITION_TYPE_FAT16
+#endif
+        ) {
             DEBUGF("*** Mounting at block %ld\n",pinfo[i].start);
             rc = fat_mount(pinfo[i].start);
             if(rc) {
