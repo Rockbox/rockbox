@@ -12,7 +12,8 @@
 <p>The examples below use the 'firmware' module, since that's what most people are interested in. Here is a complete list of the available modules:
 
 <ul>
-<li>firmware - the source code to the actual firmware
+<li>apps - the source code to the applications
+<li>firmware - the source code to the firmware library
 <li>gdb - the gdb stub to use for remote debugging
 <li>tools - tools for building the firmware
 <li>uisimulator - a user interface simulator for X11
