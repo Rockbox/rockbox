@@ -124,6 +124,10 @@ void init(void)
     system_init();
     kernel_init();
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    set_cpu_frequency(CPUFREQ_NORMAL);
+#endif
+    
     buffer_init();
 
     settings_reset();
