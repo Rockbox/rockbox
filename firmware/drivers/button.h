@@ -26,6 +26,7 @@ extern struct event_queue button_queue;
 
 void button_init (void);
 int button_get (bool block);
+int button_set_repeat(int newmask);
 
 /* Shared button codes */
 #define	BUTTON_NONE		0x0000
@@ -39,7 +40,6 @@ int button_get (bool block);
 #define	BUTTON_HELD		0x4000
 #define	BUTTON_REL		0x8000
 
-
 #ifdef HAVE_RECORDER_KEYPAD
 
 /* Recorder specific button codes */
@@ -49,12 +49,17 @@ int button_get (bool block);
 #define	BUTTON_F2		0x0200
 #define	BUTTON_F3		0x0400
 
+#define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT | \
+                             BUTTON_UP | BUTTON_DOWN)
+    
 #elif HAVE_PLAYER_KEYPAD
 
 /* Jukebox 6000 and Studio specific button codes */
 #define	BUTTON_MENU		0x0002
 #define	BUTTON_PLAY		BUTTON_UP
 #define	BUTTON_STOP		BUTTON_DOWN
+
+#define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT)
 
 #endif
 

@@ -35,6 +35,8 @@ struct event_queue button_queue;
 #define REPEAT_START      6
 #define REPEAT_INTERVAL   4
 
+static int repeat_mask = DEFAULT_REPEAT_MASK;
+
 static int button_read(void);
 
 static void button_tick(void)
@@ -63,9 +65,13 @@ static void button_tick(void)
                     }
                 }
                 else if (count++ > REPEAT_START) {
-                    post = true;
-                    repeat = true;
-                    count = REPEAT_INTERVAL;
+                    /* Only repeat if a repeatable key is pressed */
+                    if(btn & repeat_mask)
+                    {
+                        post = true;
+                        repeat = true;
+                        count = REPEAT_INTERVAL;
+                    }
                     /* If the OFF button is pressed long enough, and we are
                        still alive, then the unit must be connected to a
                        charger. Therefore we will reboot and let the original
@@ -143,6 +149,13 @@ void button_init()
 #endif
     queue_init(&button_queue);
     tick_add_task(button_tick);
+}
+
+int button_set_repeat(int newmask)
+{
+    int oldmask = repeat_mask;
+    repeat_mask = newmask;
+    return oldmask;
 }
 
 /*
