@@ -196,6 +196,10 @@ int button_get(bool block)
             break;
     } while(1);
 
+    if(!block)
+      /* delay a bit */
+      x11_sleep(1);
+
     return bits;
 }
 
