@@ -42,21 +42,24 @@
 #define O_TRUNC  0x10
 #endif
 
-#if !defined(__ssize_t_defined) && !defined(_SSIZE_T_)
+#if !defined(__ssize_t_defined) && !defined(_SSIZE_T_) && !defined(ssize_t)
 #define __ssize_t_defined
 #define _SSIZE_T_
+#define ssize_t ssize_t
 typedef signed long ssize_t;
 #endif
 
-#if !defined(__off_t_defined) && !defined(_OFF_T_)
+#if !defined(__off_t_defined) && !defined(_OFF_T_) && !defined(off_t)
 #define __off_t_defined
 #define _OFF_T_
+#define off_t off_t
 typedef signed long off_t;
 #endif
 
-#if !defined(__mode_t_defined) && !defined(_MODE_T_)
+#if !defined(__mode_t_defined) && !defined(_MODE_T_) && !defined(mode_t)
 #define __mode_t_defined
 #define _MODE_T_
+#define mode_t mode_t
 typedef unsigned int mode_t;
 #endif
 
