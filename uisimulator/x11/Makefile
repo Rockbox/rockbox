@@ -80,7 +80,8 @@ FIRMSRCS = lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c X5x8.c loadfont.c panic.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c
+	playlist.c showtext.c wps.c wps-display.c settings.c status.c icons.c \
+	lang.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -211,6 +212,9 @@ $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/lang.o: $(APPDIR)/lang.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
