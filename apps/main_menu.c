@@ -163,13 +163,15 @@ bool show_info(void)
 
     if (global_settings.talk_menu)
     {   /* say whatever is reasonable, no real connection to the screen */
+        bool enqueue = false; /* enqueue all but the first */
         if (battery_level() >= 0)
         {
-            talk_id(LANG_BATTERY_TIME, true);
+            talk_id(LANG_BATTERY_TIME, enqueue);
+            enqueue = true;
             talk_value(battery_level(), UNIT_PERCENT, true);
         }
 
-        talk_id(LANG_DISK_FREE_STAT, false);
+        talk_id(LANG_DISK_FREE_STAT, enqueue);
         talk_number(free / 1024, true);
         decimal = free % 1024 / 100;
         talk_id(VOICE_POINT, true);
