@@ -51,7 +51,7 @@ int blockclen;
 #define CALL_NATIVE(n) \
     DYNA_MOVEA_l_i_to_r(&cpu.a,3); \
     DYNA_MOVEM(3,0x3FE,0); \
-    DYNA_JSR(&writehi); \
+    DYNA_JSR((n)); \
     DYNA_MOVEA_l_i_to_r(&cpu.a,3); \
     DYNA_MOVEM(3,0x3FE,1);
     
@@ -362,8 +362,17 @@ void DYNA_SET_b_r(un8 src, un8 cond) {
     DWRITEW(0x50C0|((cond)&0xF)<<8|(src&0x7));
 }
 
+void DYNA_INC_l_r(un8 dest,int is_areg) {
+    DYNA_ADDQ_l_i_to_r(1,dest,is_areg);
+}
+
+void DYNA_DEC_l_r(un8 dest,int is_areg) {
+    DYNA_SUBQ_l_i_to_r(1,dest,is_areg);
+}
+
+
 void dynamic_recompile (struct dynarec_block *newblock) {
-    int done=0;
+    int done=0,writepc=1;
     byte op;
     unsigned int oldpc=PC;
     unsigned short temp;
@@ -373,7 +382,7 @@ void dynamic_recompile (struct dynarec_block *newblock) {
     newblock->block=dynapointer;
 
     snprintf(meow,499,"Recompiling 0x%x",oldpc);
-    rb->splash(HZ*3,1,meow);
+    rb->splash(HZ*1,1,meow);
     while(!done) {
       op=FETCH;
       clen = cycles_table[op];
@@ -388,6 +397,14 @@ void dynamic_recompile (struct dynarec_block *newblock) {
           case 0x6D: /* LD L,L */
           case 0x7F: /* LD A,A */
               break;
+
+	  case 0x0B: /* DEC BC*
+	      DYNA_TST_b_r(3); // test C
+	      DYNA_DUMMYBRANCH(2,0);
+	      DYNA_DEC_l_r(2,0); // dec B
+	      DYNA_BCC_c(0x6,2,0); //jump here if not zero
+	      DYNA_DEC_l_r(3,0); // dec C
+	      break;
           case 0x41: /* LD B,C */
               DYNA_MOVE_b_r_to_r(3,2); 
               break;
@@ -548,6 +565,13 @@ void dynamic_recompile (struct dynarec_block *newblock) {
                  PC += 2;
               }
               break;
+	  case 0x22: /* LDI (HL), A */
+              DYNA_PUSH_l_r(1,0);
+              DYNA_PUSH_l_r(6,0);
+              CALL_NATIVE(&writeb);
+              DYNA_ADDQ_l_i_to_r(0,7,1);
+	      DYNA_INC_l_r(6,0);
+	      break;
           case 0x31: /* LD SP,imm */
               DYNA_MOVEA_l_i_to_r(readw(xPC),0);
               PC += 2; 
@@ -654,16 +678,58 @@ void dynamic_recompile (struct dynarec_block *newblock) {
             DYNA_MOVEA_l_i_to_r(&blockclen,3);
             DYNA_MOVE_l_i_to_m(tclen,3);
             DYNA_RET();
-            DYNA_BCC_c(0x6,2,0); /* jump here if not zero (not zero = C) */
+            DYNA_BCC_c(0x6,2,0); /* jump here if bit is not zero */
             tclen-=3;
             break;
+	case 0xC9: /* RET */
+	    POPA(1);
+	    writepc=0;
+	    done=1;
+	    break;
+	case 0x20: /* JR NZ */
+	    DYNA_BTST_l_r(8,7); /* btst #8,d7 */
+	    DYNA_DUMMYBRANCH(2,0);
+	    DYNA_MOVEA_l_i_to_r(&blockclen,3);
+	    DYNA_MOVE_l_i_to_m(tclen,3);
+	    DYNA_MOVEA_l_i_to_r(PC+1+(signed char)readb(PC),1);
+	    DYNA_RET();
+	    DYNA_BCC_c(0x6,2,0); /* jump here if bit is not zero */
+	    tclen--;
+	    PC++;
+	    break;
+	case 0xC2: /* JP NZ */
+	    DYNA_BTST_l_r(8,7); /* btst #8,d7 */
+	    DYNA_DUMMYBRANCH(2,0);
+	    DYNA_MOVEA_l_i_to_r(&blockclen,3);
+	    DYNA_MOVEA_l_i_to_r(readw(PC),1);
+	    DYNA_RET();
+	    DYNA_BCC_c(0x6,2,0); /* jump here if bit is not zero */
+	    tclen--;
+	    PC+=2;
+	    break;
+/*	case 0xFA: /* LD A, (imm) 
+	    DYNA_PEA_w_i(readw(xPC));
+	    PC+=2; \
+	    CALL_NATIVE(&readb); \
+	    DYNA_ADDQ_l_i_to_r(4,7,1); \
+	    DYNA_MOVE_l_r_to_r(0,1,0);
+	    break; */
+		
 	case 0xFE: /* CMP #<imm> TODO: can be (much) more efficient.*/
             DYNA_MOVEA_l_r_to_r(2,3,0); /* movea.l %d2, %a3 */
             DYNA_MOVEQ_l_i_to_r(FETCH,2); /* moveq.l #<FETCH>,%d2 */
             CMP(2);
             DYNA_MOVE_l_r_to_r(3,2,1); /* move.l %a3, %d2 */
             break;
-            
+
+	case 0xB1: /* OR C */
+	    DYNA_OR_l_r_to_r(3,1); // or %d3,%d1
+            DYNA_MOVEQ_l_i_to_r(0,7); 
+            DYNA_TST_b_r(1,0);
+	    DYNA_DUMMYBRANCH(2,0);
+	    DYNA_MOVEQ_l_i_to_r(0x80,7);
+	    DYNA_BCC_c(0x6,2,0);
+            break;
         default:
            snprintf(meow,499,"unimplemented opcode %d / 0x%x",op,op);
            die(meow);
@@ -671,11 +737,10 @@ void dynamic_recompile (struct dynarec_block *newblock) {
            break;
       }  
     }
-    snprintf(meow,499,"end of block, pc:0x%x",PC);
-    rb->splash(HZ*2,true,meow);
     DYNA_MOVEA_l_i_to_r(&blockclen,3);
     DYNA_MOVE_l_i_to_m(tclen,3);
-    DYNA_MOVEA_l_i_to_r(PC,1);
+    if(writepc)
+      DYNA_MOVEA_l_i_to_r(PC,1);
     DYNA_RET();
     PC=oldpc;
     setmallocpos(dynapointer);

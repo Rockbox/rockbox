@@ -242,7 +242,7 @@ un32 reg_backup[16];
 struct dynarec_block *address_map[1<<HASH_SIGNIFICANT_LOWER_BITS];
 extern void *dynapointer;
 int blockcount;
-#define MAXBLOCK 3
+#define MAXBLOCK 10
 #endif
 
 
@@ -943,8 +943,6 @@ next:
 	rb->splash(HZ*2,true,meow);
 	while(b&&b->address.d!=(ptr+PC)) {
             p=b;
-            snprintf(meow,499,"next: 0x%x",b->next ? b->next->address.d : 0);
-            rb->splash(HZ*2,true,meow);
             b=b->next;
 	}
         if(b) { // call block
