@@ -374,6 +374,7 @@ void timer4_isr(void) // IMIA4
             if (gBuf.bEOF && (gFileHdr.flags & FLAG_LOOP))
             {   // loop now, assuming the looped clip fits in memory
                 gBuf.pReadVideo = gBuf.pBufStart + gFileHdr.video_1st_frame;
+                // FixMe: pReadVideo is incremented below
             }
             else
             {
@@ -382,11 +383,13 @@ void timer4_isr(void) // IMIA4
                 return; // no data available
             }
         }
-
-        gBuf.pReadVideo += gFileHdr.blocksize;
-        if (gBuf.pReadVideo >= gBuf.pBufEnd)
-            gBuf.pReadVideo -= gBuf.bufsize; // wraparound
-        available -= gFileHdr.blocksize;
+        else // normal advance for next time
+        {
+            gBuf.pReadVideo += gFileHdr.blocksize;
+            if (gBuf.pReadVideo >= gBuf.pBufEnd)
+                gBuf.pReadVideo -= gBuf.bufsize; // wraparound
+            available -= gFileHdr.blocksize;
+        }
 
         if (!gPlay.bHasAudio)
             break; // no need to skip any audio
@@ -425,7 +428,7 @@ void GetMoreMp3(unsigned char** start, int* size)
     if (!gBuf.bEOF && available < gStats.minAudioAvail)
         gStats.minAudioAvail = available;
     
-    if (available < advance + gFileHdr.blocksize || advance == 0)
+    if (available < advance + (int)gFileHdr.blocksize || advance == 0)
     {
         gPlay.bAudioUnderrun = true;
         return; // no data available
