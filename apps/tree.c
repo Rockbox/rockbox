@@ -1325,7 +1325,7 @@ bool create_playlist(void)
 void tree_init(void)
 {
     /* We copy the settings value in case it is changed by the user. We can't
-       use the next reboot. */
+       use it until the next reboot. */
     max_files_in_dir = global_settings.max_files_in_dir;
     name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files_in_dir;
     
