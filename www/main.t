@@ -14,6 +14,8 @@ firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> M
 
 <h2>News</h2>
 
+<p><i>2002-05-27</i>: All v1.0 code is written. We are now entering debug phase.
+
 <p><i>2002-05-26</i>: New web design. First player release drawing closer.
 
 <p><i>2002-05-03</i>: <b>SOUND!</b> Linus' experimental MAS code has 
