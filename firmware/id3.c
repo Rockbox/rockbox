@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 /*
  * Parts of this code has been stolen from the Ample project and was written
  * by David Härdeman. It has since been extended and enhanced pretty much by
@@ -552,9 +551,16 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         {
             skip = 0;
             
-            if(flags & 0x0040) { /* Grouping identity */
-                lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
-                framelen--;
+            if (version >= ID3_VER_2_4) {
+                if(flags & 0x0040) { /* Grouping identity */
+                    lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
+                    framelen--;
+                }
+            } else {
+                if(flags & 0x0020) { /* Grouping identity */
+                    lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
+                    framelen--;
+                }
             }
             
             if(flags & 0x000c) /* Compression or encryption */
@@ -569,12 +575,14 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             if(flags & 0x0002) /* Unsynchronization */
                 unsynch = true;
 
-            if(flags & 0x0001) { /* Data length indicator */
-                if(4 != read(fd, tmp, 4))
-                    return;
+            if (version >= ID3_VER_2_4) {
+                if(flags & 0x0001) { /* Data length indicator */
+                    if(4 != read(fd, tmp, 4))
+                        return;
 
-                data_length_ind = UNSYNC(tmp[0], tmp[1], tmp[2], tmp[3]);
-                framelen -= 4;
+                    data_length_ind = UNSYNC(tmp[0], tmp[1], tmp[2], tmp[3]);
+                    framelen -= 4;
+                }
             }
         }
         
