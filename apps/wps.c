@@ -391,7 +391,7 @@ int wps_show(void)
     int old_release_mask;
     int button;
     int ff_rewind_count = 0;
-    bool ignore_keyup;
+    bool ignore_keyup = true;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -403,7 +403,6 @@ int wps_show(void)
 #endif
 
     ff_rewind = false;
-    ignore_keyup = true;
     
     if(mpeg_is_playing())
     {
@@ -415,11 +414,12 @@ int wps_show(void)
     {
         button = button_get_w_tmo(HZ/5);
 
-        /* Discard stray key-up events */
-        if(ignore_keyup && (button & BUTTON_REL))
+        /* discard first event if it's a button release */
+        if (button && ignore_keyup)
         {
             ignore_keyup = false;
-            continue;
+            if (button & BUTTON_REL)
+                continue;
         }
         
         if(mpeg_has_changed_track())
