@@ -27,10 +27,16 @@ RM = rm
 CFLAGS = -g
 CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP -I$(FIRMWAREDIR)
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
-INCLUDES = 
-LIBDIRS = 
+UNAME := $(shell uname)
+ifeq ($(UNAME),Linux)
+  INCLUDES = -I/usr/X11R6/include
+  LIBDIRS = -L/usr/X11R6/lib
+else
+  INCLUDES = 
+  LIBDIRS = 
+endif
 
-OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o chartables.o
+OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o button-x11.o chartables.o tetris.o 
 
 SRCS = $(OBJS:%.o=%.c)
 HDRS = $(OBJS:%.o=%.h)

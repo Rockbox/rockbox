@@ -223,20 +223,7 @@ screenhack (Display *the_dpy, Window the_window)
 
   Logf("Rockbox will kill ya!");
 
-  lcd_position(0, 6, 0);
-  lcd_string( "Rock the box");
-
-  lcd_position(8, 24, 0);
-  lcd_string( "Roolz" );
-
-  lcd_update();
-
-  while (1) {
-    /* deal with input here */
-    
-    XSync (dpy, False);
-    screenhack_handle_events (dpy);
-  }
+  tetris();
 }
 
 void screen_redraw()
