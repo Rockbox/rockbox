@@ -154,7 +154,7 @@ static void draw_screen(void)
                 for(tmpcnt=2;tmpcnt<=5;tmpcnt++)
                     wps_display[tmpcnt][0] = 0;
                 scroll_line = 0;
-                refresh_wps(true);
+                refresh_wps(false);
 #else
                 lcd_puts_scroll(0, 1, (++szDelimit));
 #endif
@@ -170,7 +170,7 @@ static void draw_screen(void)
                         "%pc/%pt");
 #endif
                 scroll_line = 0;
-                refresh_wps(true);
+                refresh_wps(false);
 #else
                 char buffer[64];
                 char ch = '/';
@@ -225,7 +225,7 @@ static void draw_screen(void)
                                 "%fb kbit    %ffHz");
                 }
                 scroll_line = 0;
-                refresh_wps(true);
+                refresh_wps(false);
 #else
                 char buffer[64];
 
@@ -262,7 +262,7 @@ static void draw_screen(void)
                 snprintf(wps_display[0],sizeof(wps_display[0]),"%s","%ia");
                 snprintf(wps_display[1],sizeof(wps_display[1]),"%s","%it");
                 scroll_line = 1;
-                refresh_wps(true);
+                refresh_wps(false);
 #else
                 lcd_puts(0, 0, id3->artist?id3->artist:"<no artist>");
                 lcd_puts_scroll(0, 1, id3->title?id3->title:"<no title>");
@@ -279,7 +279,7 @@ static void draw_screen(void)
                 snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
                         "%pc/%pt");
                 scroll_line = 0;
-                refresh_wps(true);
+                refresh_wps(false);
 #else
                 char buffer[64];
                 char ch = '/';
@@ -309,7 +309,7 @@ static void draw_screen(void)
                     snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
                             "%pc/%pt");
                 }
-                refresh_wps(true);
+                refresh_wps(false);
                 break;
             }
 #endif
@@ -354,10 +354,9 @@ bool refresh_wps(bool refresh_scroll)
         else
         {
             if(scroll_line != l)
-                    display_custom_wps(0, l, false, wps_display[l]);                
-            else
-                if(refresh_scroll)
-                        display_custom_wps(0, l, true, wps_display[l]);                
+                    display_custom_wps(0, l, false, wps_display[l]);
+            if(scroll_line == l && refresh_scroll)
+                    display_custom_wps(0, l, true, wps_display[l]);                
         }
     }
 #ifdef HAVE_LCD_BITMAP
@@ -1031,6 +1030,9 @@ static void update(void)
         lcd_stop_scroll();
         id3 = mpeg_current_track();
         draw_screen();
+#ifdef CUSTOM_WPS
+        refresh_wps(true);
+#endif
     }
 
     if (id3) {
@@ -1066,6 +1068,9 @@ static bool keylock(void)
 #endif
     display_keylock_text(true);
     keys_locked = true;
+#ifdef CUSTOM_WPS
+    refresh_wps(true);
+#endif
     draw_screen();
     status_draw();
     while (button_get(false)); /* clear button queue */
@@ -1106,6 +1111,9 @@ static bool keylock(void)
             default:
                 display_keylock_text(true);
                 while (button_get(false)); /* clear button queue */
+#ifdef CUSTOM_WPS
+                refresh_wps(true);
+#endif
                 draw_screen();
                 break;
         }
@@ -1144,17 +1152,17 @@ static bool menu(void)
 
                 /* mute */
 #ifdef HAVE_PLAYER_KEYPAD
-            case BUTTON_PLAY:
+            case BUTTON_MENU | BUTTON_PLAY:
 #else
-            case BUTTON_UP:
+            case BUTTON_MENU | BUTTON_UP:
 #endif
                 if ( muted )
                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 else
                     mpeg_sound_set(SOUND_VOLUME, 0);
                 muted = !muted;
+                lcd_icon(ICON_PARAM, false);
                 display_mute_text(muted);
-                exit = true;
                 break;
 
                 /* key lock */
@@ -1221,7 +1229,9 @@ static bool menu(void)
 #endif
 
     draw_screen();
-
+#ifdef CUSTOM_WPS
+    refresh_wps(true);
+#endif
     return false;
 }
 
@@ -1259,7 +1269,7 @@ int wps_show(void)
         if (id3) {
             draw_screen();
 #ifdef CUSTOM_WPS
-            refresh_wps(false);
+            refresh_wps(true);
 #else
             display_file_time();
 #endif
