@@ -354,60 +354,71 @@ bool dirbrowse(char *root)
                 break;
                 
             case TREE_PREV:
-                if(dircursor) {
-                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
-                    dircursor--;
-                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                }
-                else {
-                    if (start) {
-                        start--;
-                        numentries = showdir(currdir, start);
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    }
-                    else {
-                        if (numentries < TREE_MAX_ON_SCREEN) {
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
-                            dircursor = numentries - 1;
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                        }
-                        else {
-                            start = numentries - TREE_MAX_ON_SCREEN;
-                            dircursor = TREE_MAX_ON_SCREEN - 1;
-                            numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + LINE_Y + TREE_MAX_ON_SCREEN - 1, true);
-                        }
-                    }
-                }
-                lcd_update();
+		if(filesindir)
+		{
+		    if(dircursor) {
+			put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
+			dircursor--;
+			put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+		    }
+		    else {
+			if (start) {
+			    start--;
+			    numentries = showdir(currdir, start);
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+			}
+			else {
+			    if (numentries < TREE_MAX_ON_SCREEN) {
+				put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+					     false);
+				dircursor = numentries - 1;
+				put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+					     true);
+			    }
+			    else {
+				start = numentries - TREE_MAX_ON_SCREEN;
+				dircursor = TREE_MAX_ON_SCREEN - 1;
+				numentries = showdir(currdir, start);
+				put_cursorxy(0, CURSOR_Y + LINE_Y +
+					     TREE_MAX_ON_SCREEN - 1, true);
+			    }
+			}
+		    }
+		    lcd_update();
+		}
                 break;
 
             case TREE_NEXT:
-                if (dircursor + start + 1 < numentries ) {
-                    if(dircursor+1 < TREE_MAX_ON_SCREEN) {
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
-                        dircursor++;
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    } 
-                    else {
-                        start++;
-                        numentries = showdir(currdir, start);
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    }
-                }
-                else {
-                    if(numentries < TREE_MAX_ON_SCREEN) {
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
-                        start = dircursor = 0;
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    } 
-                    else {
-                        start = dircursor = 0;
-                        numentries = showdir(currdir, start);
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-                    }
-                }
-                lcd_update();
+		if(filesindir)
+		{
+		    if (dircursor + start + 1 < numentries ) {
+			if(dircursor+1 < TREE_MAX_ON_SCREEN) {
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+					 false);
+			    dircursor++;
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+			} 
+			else {
+			    start++;
+			    numentries = showdir(currdir, start);
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+			}
+		    }
+		    else {
+			if(numentries < TREE_MAX_ON_SCREEN) {
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+					 false);
+			    start = dircursor = 0;
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+			} 
+			else {
+			    start = dircursor = 0;
+			    numentries = showdir(currdir, start);
+			    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+			}
+		    }
+		    lcd_update();
+		}
                 break;
 
             case TREE_MENU: {
