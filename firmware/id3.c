@@ -419,7 +419,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     }
 	
     /* Loop trough file until we find a frame header */
-    bytecount = 0;
+    bytecount = entry->id3v2len - 1;
   restart:
     do {
         header <<= 8;
@@ -557,28 +557,45 @@ static int getsonglength(int fd, struct mp3entry *entry)
         /* Yes, it is a VBR file */
         entry->vbr = true;
         entry->vbrflags = xing[7];
+        int i = 8; /* Where to start parsing info */
         
         if (entry->vbrflags & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
-            int framecount = (xing[8] << 24) | (xing[9] << 16) |
-                (xing[10] << 8) | xing[11];
+            int framecount = (xing[i] << 24) | (xing[i+1] << 16) |
+                (xing[i+2] << 8) | xing[i+3];
  
             filetime = framecount * tpf;
+            i += 4;
         }
 
         if (entry->vbrflags & VBR_BYTES_FLAG) /* is byte count there? */
         {
-            int bytecount = (xing[12] << 24) | (xing[13] << 16) |
-                (xing[14] << 8) | xing[15];
+            int bytecount = (xing[i] << 24) | (xing[i+1] << 16) |
+                (xing[i+2] << 8) | xing[i+3];
  
             bitrate = bytecount * 8 / filetime;
+            i += 4;
         }
 
         if (entry->vbrflags & VBR_TOC_FLAG) /* is table-of-contents there? */
         {
-            memcpy( entry->toc, xing+16, 100 );
+            memcpy( entry->toc, xing+i, 100 );
         }
+
+        /* Make sure we skip this frame in playback */
+        bytecount += bpf;
     }
+
+    /* Is it a LAME Info frame? */
+    if (xing[0] == 'I' &&
+        xing[1] == 'n' &&
+        xing[2] == 'f' &&
+        xing[3] == 'o')
+    {
+        /* Make sure we skip this frame in playback */
+        bytecount += bpf;
+    }
+
 
     entry->bitrate = bitrate;
 
@@ -593,6 +610,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
         filetime = entry->filesize/bpf*tpf;
     }
 
+    DEBUGF("Old ID3V2 length: %x\n", entry->id3v2len);
+    entry->id3v2len = bytecount;
+    DEBUGF("New ID3V2 length: %x\n", bytecount);
+    
     return filetime;
 }
 
