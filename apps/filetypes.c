@@ -220,21 +220,28 @@ int filetype_get_attr(const char* name)
 }
 
 /* fill a menu list with viewers (used in onplay.c) */
-int filetype_load_menu(struct menu_item*  menu,int max_items)
+int filetype_load_menu(struct menu_item*  menu, int max_items,
+      char *filename)
 {
     int i;
     int cnt=0;
 
-    for (i=0; i < cnt_filetypes; i++)
+    for (i=0; i < cnt_exttypes; i++)
     {
-        if (filetypes[i].plugin)
+        if(exttypes[i].type->plugin)
         {
-            menu[cnt].desc = filetypes[i].plugin;
-            cnt++;
-            if (cnt == max_items)
-                break;
+            if (strcasecmp(&filename[strlen(filename)-
+                            strlen(exttypes[i].extension)],
+                            exttypes[i].extension) == 0)
+            {
+                menu[cnt].desc = exttypes[i].type->plugin;
+                cnt++;
+                if (cnt == max_items)
+                  break;
+            }
         }
     }
+    
     return cnt;
 }
 

@@ -32,7 +32,7 @@ int   filetype_get_icon(int);
 char* filetype_get_plugin(const struct entry*);
 void  filetype_init(void);
 bool  filetype_supported(int);
-int   filetype_load_menu(struct menu_item*, int);
+int   filetype_load_menu(struct menu_item*, int, char*);
 int   filetype_load_plugin(const char*, char*);
 
 struct file_type {
