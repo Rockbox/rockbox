@@ -377,19 +377,22 @@ void settings_apply(void)
     charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
 #endif
 
-    if ( global_settings.wps_file[0] ) {
+    if ( global_settings.wps_file[0] && 
+         global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.wps",
                  global_settings.wps_file);
         wps_load(buf, false);
     }
 #ifdef HAVE_LCD_BITMAP
-    if ( global_settings.font_file[0] ) {
+    if ( global_settings.font_file[0] &&
+         global_settings.font_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.fnt",
                  global_settings.font_file);
         font_load(buf);
     }
 #endif
-    if ( global_settings.lang_file[0] ) {
+    if ( global_settings.lang_file[0] &&
+         global_settings.lang_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.lng",
                  global_settings.lang_file);
         lang_load(buf);
