@@ -38,7 +38,7 @@ typedef struct
     ctx_t ctx[MAXTHREADS];
 } thread_t;
 
-static thread_t threads = {1, 0};
+static thread_t threads;
 
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
