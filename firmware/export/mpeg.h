@@ -92,6 +92,8 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 void mpeg_set_buffer_margin(int seconds);
 unsigned int mpeg_error(void);
 void mpeg_error_clear(void);
+int mpeg_get_file_pos(void);
+unsigned long mpeg_get_last_header(void);
 
 /* in order to keep the recording here, I have to expose this */
 void rec_tick(void);

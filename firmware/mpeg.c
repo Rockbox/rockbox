@@ -257,6 +257,84 @@ static void set_elapsed(struct mp3entry* id3)
         id3->elapsed = id3->offset / id3->bpf * id3->tpf;
 }
 
+int mpeg_get_file_pos(void)
+{
+    int pos = -1;
+    struct mp3entry *id3 = mpeg_current_track();
+    
+    if (id3->vbr)
+    {
+        if (id3->has_toc)
+        {
+            /* Use the TOC to find the new position */
+            unsigned int percent, remainder;
+            int curtoc, nexttoc, plen;
+                        
+            percent = (id3->elapsed*100)/id3->length; 
+            if (percent > 99)
+                percent = 99;
+                        
+            curtoc = id3->toc[percent];
+                        
+            if (percent < 99)
+                nexttoc = id3->toc[percent+1];
+            else
+                nexttoc = 256;
+                        
+            pos = (id3->filesize/256)*curtoc;
+                        
+            /* Use the remainder to get a more accurate position */
+            remainder   = (id3->elapsed*100)%id3->length;
+            remainder   = (remainder*100)/id3->length;
+            plen        = (nexttoc - curtoc)*(id3->filesize/256);
+            pos     += (plen/100)*remainder;
+        }
+        else
+        {
+            /* No TOC exists, estimate the new position */
+            pos = (id3->filesize / (id3->length / 1000)) *
+                (id3->elapsed / 1000);
+        }
+    }
+    else if (id3->bpf && id3->tpf)
+        pos = (id3->elapsed/id3->tpf)*id3->bpf;
+    else
+    {
+        return -1;
+    }
+
+    if (pos >= (int)(id3->filesize - id3->id3v1len))
+    {
+        /* Don't seek right to the end of the file so that we can
+           transition properly to the next song */
+        pos = id3->filesize - id3->id3v1len - 1;
+    }
+    else if (pos < (int)id3->first_frame_offset)
+    {
+        /* skip past id3v2 tag and other leading garbage */
+        pos = id3->first_frame_offset;
+    }
+    return pos;    
+}
+
+unsigned long mpeg_get_last_header(void)
+{
+#ifdef SIMULATOR
+    return 0;
+#else
+    unsigned long tmp[2];
+
+    /* Read the frame data from the MAS and reconstruct it with the
+       frame sync and all */
+#ifdef HAVE_MAS3587F
+    mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
+#else
+    mas_readmem(MAS_BANK_D0, 0x301, tmp, 2);
+#endif
+    return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
+#endif
+}
+
 static bool paused; /* playback is paused */
 
 static unsigned int mpeg_errno;
@@ -960,18 +1038,6 @@ static const unsigned char empty_id3_header[] =
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
 
-#ifdef HAVE_MAS3587F
-static unsigned long get_last_recorded_header(void)
-{
-    unsigned long tmp[2];
-
-    /* Read the frame data from the MAS and reconstruct it with the
-       frame sync and all */
-    mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
-    return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
-}
-#endif /* #ifdef HAVE_MAS3587F */
-
 static void mpeg_thread(void)
 {
     static int pause_tick = 0;
@@ -1230,61 +1296,13 @@ static void mpeg_thread(void)
 
                 id3->elapsed = newtime;
 
-                if (id3->vbr)
+                newpos = mpeg_get_file_pos();
+                if(newpos < 0)
                 {
-                    if (id3->has_toc)
-                    {
-                        /* Use the TOC to find the new position */
-                        unsigned int percent, remainder;
-                        int curtoc, nexttoc, plen;
-                        
-                        percent = (newtime*100)/id3->length; 
-                        if (percent > 99)
-                            percent = 99;
-                        
-                        curtoc = id3->toc[percent];
-                        
-                        if (percent < 99)
-                            nexttoc = id3->toc[percent+1];
-                        else
-                            nexttoc = 256;
-                        
-                        newpos = (id3->filesize/256)*curtoc;
-                        
-                        /* Use the remainder to get a more accurate position */
-                        remainder   = (newtime*100)%id3->length;
-                        remainder   = (remainder*100)/id3->length;
-                        plen        = (nexttoc - curtoc)*(id3->filesize/256);
-                        newpos     += (plen/100)*remainder;
-                    }
-                    else
-                    {
-                        /* No TOC exists, estimate the new position */
-                        newpos = (id3->filesize / (id3->length / 1000)) *
-                            (newtime / 1000);
-                    }
-                }
-                else if (id3->bpf && id3->tpf)
-                    newpos = (newtime/id3->tpf)*id3->bpf;
-                else
-                {
-                    /* Not enough information to FF/Rewind */
                     id3->elapsed = oldtime;
                     break;
                 }
-
-                if (newpos >= (int)(id3->filesize - id3->id3v1len))
-                {
-                    /* Don't seek right to the end of the file so that we can
-                       transition properly to the next song */
-                    newpos = id3->filesize - id3->id3v1len - 1;
-                }
-                else if (newpos < (int)id3->first_frame_offset)
-                {
-                    /* skip past id3v2 tag and other leading garbage */
-                    newpos = id3->first_frame_offset;
-                }
-
+                
                 if (mpeg_file >= 0)
                     curpos = lseek(mpeg_file, 0, SEEK_CUR);
                 else
@@ -1601,7 +1619,7 @@ static void mpeg_thread(void)
                         DEBUGF("Start looking at address %x (%x)\n",
                                mp3buf+startpos, startpos);
 
-                        saved_header = get_last_recorded_header();
+                        saved_header = mpeg_get_last_header();
                         
                         mem_find_next_frame(startpos, &offset, 5000,
                                             saved_header);
@@ -1668,7 +1686,7 @@ static void mpeg_thread(void)
                        frame header, for later use by the Xing header
                        generation */
                     sleep(HZ/10);
-                    saved_header = get_last_recorded_header();
+                    saved_header = mpeg_get_last_header();
                     
                     /* delayed until buffer is saved, don't open yet */
                     strcpy(delayed_filename, recording_filename);
