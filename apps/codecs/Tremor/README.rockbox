@@ -2,16 +2,16 @@ Library: Tremor-1.1.2 (Released 2002-05-17)
 Imported: 2005-02-16 by Marcoen Hirschberg
 
 This directory contains a local version of Tremor for use by Rockbox
-for software decoding and encoding of Ogg Vorbis files.
+for software decoding of Ogg Vorbis files.
 
 LICENSING INFORMATION
 
 Tremor is distributed under Xiph.Org's BSD-like license - see the file COPYING
 in this directory for details.
 
-
 IMPORT DETAILS
 
 The base version first imported into Rockbox was the SVN version of
 Tremor-1.0.2 which was checked out on 2005-02-16.
 
+The autoconf/automake files were removed, as well as the doc and debian directories.
