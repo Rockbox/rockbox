@@ -64,6 +64,31 @@
 # define _tolower(c)  ((c) - 'A' + 'a')
 #endif
 
+#define KEYBOARD_GENERIC \
+  "Keyboard   Rockbox\n" \
+  "--------   --------------\n" \
+  "+          ON\n" \
+  "8          UP\n" \
+  "2          DOWN\n" \
+  "4          LEFT\n" \
+
+#ifdef HAVE_LCD_BITMAP
+#define KEYBOARD_SPECIFIC  \
+  "6          RIGHT\n" \
+  "Enter      OFF\n" \
+  "5          PLAY\n" \
+  "/          F1\n" \
+  "*          F2\n" \
+  "-          F3\n"
+#else 
+#define KEYBOARD_SPECIFIC  \
+  "6          RIGHT/PLAY  (there's no separation between PLAY and RIGHT)\n" \
+  "Enter      MENU\n"
+#endif    
+
+
+
+
 char having_new_lcd=True;
 
 char *progname;
@@ -358,6 +383,7 @@ int main (int argc, char **argv)
 	  printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
 	  printf("  --player_zoom \t [Player] window zoom\n");
 	  printf("  --recorder_zoom \t [Recorder] window zoom\n");
+          printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
 	  exit(0);
 	}
       }
@@ -371,6 +397,7 @@ int main (int argc, char **argv)
 #endif
       default_defaults[GEOMETRY_POSITION]=geometry;
     }
+    printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
 
 
     merge_options ();
