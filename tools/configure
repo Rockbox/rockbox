@@ -62,7 +62,7 @@ simcc () {
        LDOPTS="-lgdi32 -luser32 -mno-cygwin"
    else
        # x11 version
-       GCCOPTS="$GCCOPTS -DNOCYGWIN"
+       GCCOPTS="$GCCOPTS"
        LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
    fi
    output="rockboxui.exe" # use this as output binary name
