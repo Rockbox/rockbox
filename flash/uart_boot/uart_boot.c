@@ -246,11 +246,11 @@ int main(int argc, char* argv[])
         }
         else
         {   // new Players have disk power control on PB4
-		    reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PBIOR
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC6); // PBIOR
 		    reg |= 0x0010; // set bit 4: output
 		    WriteHalfword(serial_handle, 0x05FFFFC6, reg);
 
-		    reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PBDR
+		    reg = ReadHalfword(serial_handle, 0x05FFFFC2); // PBDR
 		    reg &= ~0x0010; // clear PB4 to power down
 		    WriteHalfword(serial_handle, 0x05FFFFC2, reg);
         }
