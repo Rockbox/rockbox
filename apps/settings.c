@@ -919,11 +919,13 @@ void set_time(char* string, int timedate[])
                 cursorpos = (cursorpos + 6 + 1) % 6;
                 break;
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
                 timedate[cursorpos] = (timedate[cursorpos] + steps - min + 1) % steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
                 break;
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
                 timedate[cursorpos]=(timedate[cursorpos]+steps - min - 1) % steps + min;
                 if(timedate[cursorpos] == 0)
                     timedate[cursorpos] += min;
