@@ -1354,7 +1354,7 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Caption backlight"
-new: "Tekst skærmlys" 
+new: "Lys ved sangskift"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1852,7 +1852,7 @@ id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Vedligehold liste a seneste bogmærker?"
+new: "Vedligehold liste af seneste bogmærker?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
@@ -2686,13 +2686,13 @@ id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "by newest date"
-new: "efter nyeste dato"
+new: "Efter nyeste dato"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
 voice: "by type"
-new: "efter type"
+new: "Efter type"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
