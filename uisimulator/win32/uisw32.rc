@@ -57,6 +57,7 @@ END
 //
 
 IDB_UI                  BITMAP                  "UI256.bmp"
+IDI_ICON1 		ICON DISCARDABLE 	"rockbox.ico"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
