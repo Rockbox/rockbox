@@ -8,34 +8,10 @@
 # $Id$
 #
 
-target=$1
-debug=$2
 
-if test "$1" = "--help"; then
-  echo "Rockbox configure script."
-  echo "Invoke this in a directory to generate a Makefile to build Rockbox"
-  echo "Do *NOT* run this within the tools directory!"
-  exit
-fi
-
-if test -r "configure"; then
- # this is a check for a configure script in the current directory, it there
- # is one, try to figure out if it is this one!
-
- if { grep "^#   Jukebox" configure >/dev/null 2>&1 ; } then
-   echo "WEEEEEEEEP. Don't run this configure script within the tools directory."
-   echo "It will only cause you pain and grief. Instead do this:"
-   echo ""
-   echo " cd .."
-   echo " mkdir build-dir"
-   echo " cd build-dir"
-   echo " ../tools/configure"
-   echo ""
-   echo "Much happiness will arise from this. Enjoy"
-   exit
- fi
-fi
-
+#
+# Begin Function Definitions
+#
 input() {
     read response
     echo $response
@@ -67,7 +43,8 @@ fi
  # Figure out where the firmware code is!
  #
 
- simfile="$simver/lcd-$simver.c" # a file to check for in the uisimulator root dir
+ # a file to check for in the uisimulator root dir
+ simfile="$simver/lcd-$simver.c" 
 
  for dir in uisimulator . .. ../uisimulator ../../uisimulator; do
    if [ -f "$dir/$simfile" ]; then
@@ -133,6 +110,67 @@ EOF
   fi
 
 }
+
+picklang() {
+    # figure out which languages that are around
+    for file in $appsdir/lang/*.lang; do
+        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
+        langs="$langs $clean"
+    done
+
+    num=1
+    for one in $langs; do
+        echo "$num. $one"
+        num=`expr $num + 1`
+    done
+
+    read pick
+    return $pick;
+}
+
+whichlang() {
+    num=1
+    for one in $langs; do
+        if [ "$num" = "$pick" ]; then
+            echo $one
+            return
+        fi
+        num=`expr $num + 1`
+    done
+}
+
+
+#
+# Beging Build Script
+#
+
+target=$1
+debug=$2
+
+if test "$1" = "--help"; then
+  echo "Rockbox configure script."
+  echo "Invoke this in a directory to generate a Makefile to build Rockbox"
+  echo "Do *NOT* run this within the tools directory!"
+  exit
+fi
+
+if test -r "configure"; then
+ # this is a check for a configure script in the current directory, it there
+ # is one, try to figure out if it is this one!
+
+ if { grep "^#   Jukebox" configure >/dev/null 2>&1 ; } then
+   echo "WEEEEEEEEP. Don't run this configure script within the tools directory."
+   echo "It will only cause you pain and grief. Instead do this:"
+   echo ""
+   echo " cd .."
+   echo " mkdir build-dir"
+   echo " cd build-dir"
+   echo " ../tools/configure"
+   echo ""
+   echo "Much happiness will arise from this. Enjoy"
+   exit
+ fi
+fi
 
 if [ "$target" = "--help" -o \
      "$target" = "-h" ]; then
@@ -286,33 +324,11 @@ if [ -z "$appsdir" ]; then
     appsdir=`input`
 fi
 
-picklang() {
-    # figure out which languages that are around
-    for file in $appsdir/lang/*.lang; do
-        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
-        langs="$langs $clean"
-    done
-
-    num=1
-    for one in $langs; do
-        echo "$num. $one"
-        num=`expr $num + 1`
-    done
-
-    read pick
-    return $pick;
-}
-
-whichlang() {
-    num=1
-    for one in $langs; do
-        if [ "$num" = "$pick" ]; then
-            echo $one
-            return
-        fi
-        num=`expr $num + 1`
-    done
-}
+if [ "yes" = "$simulator" ]; then
+    # we have already dealt with the simulator Makefile separately
+    simul
+    exit
+fi
 
 if [ -z "$language" ]; then
 
@@ -325,13 +341,6 @@ if [ -z "$language" ]; then
         # pick a default
         language="english"
     fi
-fi
-
-
-if [ "yes" = "$simulator" ]; then
-  # we deal with the simulator Makefile separately
-  simul
-  exit
 fi
 
 sed > Makefile \
@@ -385,3 +394,17 @@ tags:
 EOF
 
 echo "Created Makefile"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
