@@ -23,7 +23,7 @@ us developers.
 
 <ol>
 <li>Grab 
-<a href="http://www.upsystems.com.ua/support/alexmina/atapwd.zip">atapwd</a>
+<a href="atapwd.zip">atapwd</a>
 (written by
 <a href="http://www.upsystems.com.ua/support/alexmina/">Alex Mina</a>)
 <li>Create a bootable DOS floppy disk, and put atapwd.exe on it
@@ -31,7 +31,7 @@ us developers.
 <li>Boot from the floppy and run atapwd.exe
 <li>Select the locked harddrive and press enter for the menu
 <li>For Fujitsu disks: Choose "unlock with user password", then "disable with user password". The password is empty, so just press enter at the prompt.
-<li>For Toshiba disks, if the above doesn't work: Choose "unlock with master password", then "disable with master password". The password is all spaces.
+<li>For Toshiba and Hitachi disks, if the above doesn't work: Choose "unlock with master password", then "disable with master password". The password is all spaces.
 <li>Your disk is now unlocked. Shut down the computer and remove the disk.
 </ol>
 

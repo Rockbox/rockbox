@@ -20,7 +20,7 @@
 
 <ul>
 <li><a href="http://www.in-system.com/200_silicon.html">In-Systems ISD200</a> ATA to USB bridge
-<li><a href="http://www.ssti.com/products/37vfxxx.html">SST 37VF020</a> 2MB flash ROM
+<li><a href="http://www.sst.com/products.xhtml/parallel_flash/37/SST37VF020">SST 37VF020</a> 2MB flash ROM
 <li><a href="http://www.issiusa.com/pdf/41c16105.pdf">ISSI IS41LV16105</a> 2MB fast page DRAM
 <li><a href="http://www.sipex.com/products/pdf/SP690_805ALM.pdf">Sipex SP692ACN</a> Low Power Microprocessor Supervisory with Battery Switch-Over (partly covered with white insulation in the photo)
 <li>A standard Motorola AC139 logic IC (text unreadable in the photo)

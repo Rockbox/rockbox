@@ -9,6 +9,8 @@
 
 <h2>News</h2>
 
+<p><i>2002-12-21</i>: You can now donate to the Rockbox project via PayPal. See the new button in the left menu.
+
 <p><i>2002-11-10</i>: Added recording functionality.
 
 <p><i>2002-10-15</i>: Now the Player/Studio models run the same firmware. No more Old and New player firmware.

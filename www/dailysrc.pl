@@ -16,7 +16,7 @@ for ( @tarballs ) {
         $date = $1;
         if ( -f "$basedir/changes-$date.txt") {
             $lines = `grep "Number of changes:" $basedir/changes-$date.txt | cut "-d " -f4` + 0;
-            $log = "<a href=\"daily/changes-$date.txt\">Changelog</a> <small>($lines changes)</small>";
+            $log = "<a href=\"daily/changes-$date.html\">Changelog</a> <small>($lines changes)</small>";
         }
     }
     print "<li><a href=\"daily/$_\">$_</a> <small>($size bytes)</small> $log\n";

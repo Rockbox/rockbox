@@ -15,12 +15,17 @@
 
 <li>Build yourself an <a href="rs232.html">rs232 converter</a>, so your PC can talk to your Archos
 
+<li>Matthias Wächter modified his player to get 
+<a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-09/0769.shtml">8MB RAM</a>!
+
 </ul>
 
 <h2>External pages</h2>
 <ul>
 <li><a href="http://www.geocities.com/notching/Sony-archos-remote.html">Nick Robinson's Sony Remote Joystick RM-X4S interface</a>
 <li><a href="http://mywebpages.comcast.net/jstewart228368/archos-modification.html">James Stewart's Jukebox 6000 Bass and Volume improvement</a>
+<li><a href="http://www2.funmp3players.com/reviews/modify/">Upgrading the Hard Drive in the Archos Jukebox 6000</a>
+<li><a href="http://www.mctubster.com/hd.html">Another page describing hard drive update</a>
 </ul>
 
 <p><img src="esd.jpg">

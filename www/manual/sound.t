@@ -26,7 +26,7 @@
 <dd>Loudness is an effect which emphasises bass and treble.
 
 <dt><b>Bass Boost (Recorder only)</b>
-<dd>Bass boost is an effect which emphasises low bass frequencies.
+<dd>Bass Boost exploits the psychoacoustic phenomenon of the "missing fundamental" by creating harmonics of the frequencies below the center frequency of the bandpass filter. This enables a loudspeaker to display frequencies that are below its cutoff frequency.
 
 <dt><b>Auto Volume (Recorder only)</b>
 <dd>Auto volume is a feature that automaticly lowers the volume on loud parts,

@@ -48,11 +48,21 @@
 <input value="Search" type=submit>
 <input type=hidden name=as_sitesearch value="rockbox.haxx.se">
 </form>
-<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+<a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
 <a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36></a>
 
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="business" value="bjorn@haxx.se">
+<input type="hidden" name="item_name" value="Donation to the Rockbox project">
+<input type="hidden" name="no_shipping" value="1">
+<input type="hidden" name="cn" value="Note to the Rockbox team">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="tax" value="0">
+<input type="image" src="/paypal-donate.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
+</form>
 </div>
 
 </td>

@@ -48,7 +48,9 @@ This version is for all Archos Jukebox Recorder models.
 
 <h2>Installation</h2>
 
-<p>Unpack the zip archive in the root of your Archos disk. Make sure you 'eject' (unmount) the usb disk before you unplug it.
+<p>Unpack the zip archive in the root (top) directory of your Archos disk. Make sure you 'eject' (unmount) the usb disk before you unplug it.
+
+<p>Windows users: If you choose not to unzip the archive directly onto the Archos, you can create the .rockbox directory by entering "mkdir j:\.rockbox" on a command prompt. Windows Explorer refuses to create this directory, so you must use a command prompt.
 
 <h2>Uninstallation</h2>
 

@@ -36,4 +36,10 @@
 <li><a href="isd300.pdf">ISD-300 USB/ATA bridge</a> 376 kB
 </ul>
 
+<h2>FM Recorder specific</h2>
+<ul>
+<li><a href="S1A0903X01.pdf">Samsung S1A0903X01 AM/FM 1chip tuner with PLL</a> 547 kB
+<li><a href="S1A0905X01.pdf">Samsung S1A0905X01 RDS (Radio Data System) demodulator</a> 35 kB
+</ul>
+
 #include "foot.t"
