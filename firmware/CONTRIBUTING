@@ -6,8 +6,8 @@ contributors adhere to a few simple conventions:
 - Write all code in C. Sometimes assembly is faster, but C is always more
   readable and maintainable.
 
-- Write C code. Don't redefine the language. No new types, no C++isms or
-  Javaisms.
+- Write normal C code. Don't redefine the language. No new types,
+  no C++isms or Javaisms. Also, do not use "const".
 
 - Variables and function names should be all lower case.
   Preprocessor symbols should be all uppercase.
@@ -16,3 +16,4 @@ contributors adhere to a few simple conventions:
   four spaces. Don't use TAB characters, as that will mess up code display in
   CVS, printing, and a zillion other places.
 
+- Use "unix style" line feeds: "LF" only. Do not use "CR+LF".
