@@ -625,7 +625,7 @@ void settings_load(void)
         if (config_block[0x1c] != 0xFF) {
             global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
             global_settings.rec_editable =
-                config_block[0x1c]?true:false;
+                (config_block[0x1c] & 0x80)?true:false;
         }
 
         if (config_block[0x1d] != 0xFF)
