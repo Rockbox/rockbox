@@ -28,6 +28,13 @@ static char debugbuf[200];
 #endif
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
+#ifdef ARCHOS_RECORDER
+#include "kernel.h"
+#include "button.h"
+#include "system.h"
+#include "lcd.h"
+#include "adc.h"
+#endif
 
 void debug_init(void)
 {
@@ -206,6 +213,69 @@ void debugf(char *fmt, ...)
     (void)fmt;
 #endif
 }
+
+/*---------------------------------------------------*/
+/*    SPECIAL DEBUG STUFF                            */
+/*---------------------------------------------------*/
+#ifdef ARCHOS_RECORDER
+extern int ata_device;
+extern int ata_io_address;
+
+/* Test code!!! */
+void dbg_ports(void)
+{
+    unsigned short porta;
+    unsigned short portb;
+    unsigned char portc;
+    char buf[32];
+    int button;
+
+    lcd_clear_display();
+
+    while(1)
+    {
+	porta = PADR;
+	portb = PBDR;
+	portc = PCDR;
+
+	snprintf(buf, 32, "PADR: %04x", porta);
+	lcd_puts(0, 0, buf);
+	snprintf(buf, 32, "PBDR: %04x", portb);
+	lcd_puts(0, 1, buf);
+
+	snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
+	lcd_puts(0, 3, buf);
+	snprintf(buf, 32, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
+	lcd_puts(0, 4, buf);
+	snprintf(buf, 32, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
+	lcd_puts(0, 5, buf);
+	snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
+	lcd_puts(0, 6, buf);
+
+	snprintf(buf, 32, "%s : 0x%x",
+             ata_device?"slave":"master", ata_io_address);
+	lcd_puts(0, 7, buf);
+	
+	lcd_update();
+	sleep(HZ/10);
+
+	button = button_get(false);
+
+	switch(button)
+	{
+	case BUTTON_ON:
+	    /* Toggle the charger */
+	    PBDR ^= 0x20;
+	    break;
+
+	case BUTTON_OFF:
+	    /* Disable the charger */
+	    PBDR |= 0x20;
+	    return;
+	}
+    }
+}
+#endif
 
 #else /* SIMULATOR code coming up */
 
