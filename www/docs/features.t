@@ -119,7 +119,7 @@ YES
 EFEAT
 
 NAME Games (Recorder) ENAME
-TD Tetris, Sokoban, Snake ETD
+TD 7 ETD
 NO
 EFEAT
 
