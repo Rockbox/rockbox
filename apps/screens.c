@@ -337,10 +337,13 @@ bool f2_screen(void)
                 global_settings.playlist_shuffle =
                     !global_settings.playlist_shuffle;
 
-                if (global_settings.playlist_shuffle)
-                    randomise_playlist(current_tick);
-                else
-                    sort_playlist(true);
+                if(mpeg_status() & MPEG_STATUS_PLAY)
+                {
+                    if (global_settings.playlist_shuffle)
+                        randomise_playlist(current_tick);
+                    else
+                        sort_playlist(true);
+                }
                 used = true;
                 break;
 
