@@ -574,6 +574,7 @@ bool settings_load_eq(char* file)
     }
 
     close(fd);
+    settings_save();
     return true;
 }
 
