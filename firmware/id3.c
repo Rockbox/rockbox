@@ -592,6 +592,35 @@ static int getsonglength(int fd, struct mp3entry *entry)
         header_found = true;
     }
 
+    if (xing[0] == 'V' &&
+        xing[1] == 'B' &&
+        xing[2] == 'R' &&
+        xing[3] == 'I')
+    {
+        int framecount;
+        int bytecount;
+        
+        /* Yes, it is a FhG VBR file */
+        entry->vbr = true;
+        entry->vbrflags = 0;
+
+        bytecount = (xing[10] << 24) | (xing[11] << 16) |
+            (xing[12] << 8) | xing[13];
+ 
+        framecount = (xing[14] << 24) | (xing[15] << 16) |
+            (xing[16] << 8) | xing[17];
+ 
+        filetime = framecount * tpf;
+        bitrate = bytecount * 8 / filetime;
+
+        /* We don't parse the TOC, since we don't yet know how to (FIXME) */
+
+        /* Make sure we skip this frame in playback */
+        bytecount += bpf;
+
+        header_found = true;
+    }
+
     /* Is it a LAME Info frame? */
     if (xing[0] == 'I' &&
         xing[1] == 'n' &&
