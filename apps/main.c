@@ -20,6 +20,7 @@
 #include "disk.h"
 #include "fat.h"
 #include "lcd.h"
+#include "rtc.h"
 #include "debug.h"
 #include "led.h"
 #include "kernel.h"
@@ -36,6 +37,7 @@
 #include "main_menu.h"
 #include "thread.h"
 #include "settings.h"
+#include "backlight.h"
 
 #include "version.h"
 
@@ -97,6 +99,8 @@ void init(void)
     rc = fat_mount(pinfo[0].start);
     if(rc)
         panicf("mount: %d",rc);
+
+    backlight_init();
 
     button_init();
     mpeg_init();
