@@ -116,8 +116,6 @@ bool wps_load(char* file, bool display)
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
 
-    wps_loaded = true;
-
     fd = open(file, O_RDONLY);
     
     if (-1 != fd)
@@ -143,6 +141,8 @@ bool wps_load(char* file, bool display)
             lcd_update();
             sleep(HZ);
         }
+
+        wps_loaded = true;
 
         return numread > 0;
     }
