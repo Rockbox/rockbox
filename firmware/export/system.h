@@ -235,7 +235,7 @@ static inline unsigned long SWAB32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned short hi = SWAB16(value >> 16);
+    unsigned long hi = SWAB16(value >> 16);
     unsigned long lo = SWAB16(value & 0xffff);
     return (lo << 16) | hi;
 }
