@@ -1734,6 +1734,7 @@ static void mpeg_thread(void)
                                time to stop for real */
                             if(stop_pending)
                                 queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                            saving = false;
                         }
                         break;
                         
@@ -1980,6 +1981,7 @@ void mpeg_record(char *filename)
 static void start_recording(void)
 {
     stop_pending = false;
+    saving = false;
 }
 
 unsigned long mpeg_num_recorded_frames(void)
