@@ -173,21 +173,21 @@ static unsigned char lcd_buffer_copy[11][2];
 
 void lcd_update (void)
 {
-  bool changed=false;
-  int x, y;
-  for (y=0; y<2; y++) {
-    for (x=0; x<11; x++) {
-      if (lcd_display_redraw ||
-          lcd_buffer_copy[x][y] != hardware_buffer_lcd[x][y]) {
-        lcd_buffer_copy[x][y] = hardware_buffer_lcd[x][y];
-        lcd_print_char(x, y);
-        changed=true;
-      }
+    bool changed=false;
+    int x, y;
+    for (y=0; y<2; y++) {
+        for (x=0; x<11; x++) {
+            if (lcd_display_redraw ||
+                lcd_buffer_copy[x][y] != hardware_buffer_lcd[x][y]) {
+                lcd_buffer_copy[x][y] = hardware_buffer_lcd[x][y];
+                lcd_print_char(x, y);
+                changed=true;
+            }
+        }
     }
-  }
-  if (changed)
-    XSync(dpy,False);
-  lcd_display_redraw=false;
+    if (changed)
+        XSync(dpy,False);
+    lcd_display_redraw=false;
 }
 
 #endif

@@ -60,109 +60,109 @@ static int get_raw_button (void)
     int ev=screenhack_handle_events(&release, &repeat);
     switch(ev)
     {
-    case XK_KP_Left:
-    case XK_Left:
-    case XK_KP_4:
-        k = BUTTON_LEFT;
+        case XK_KP_Left:
+        case XK_Left:
+        case XK_KP_4:
+            k = BUTTON_LEFT;
             break;
 
-    case XK_KP_Right:
-    case XK_Right:
-    case XK_KP_6:
-        k = BUTTON_RIGHT;
+        case XK_KP_Right:
+        case XK_Right:
+        case XK_KP_6:
+            k = BUTTON_RIGHT;
             break;
 
-    case XK_KP_Up:
-    case XK_Up:
-    case XK_KP_8:
+        case XK_KP_Up:
+        case XK_Up:
+        case XK_KP_8:
 #ifdef BUTTON_UP
-        k = BUTTON_UP;
+            k = BUTTON_UP;
 #elif defined BUTTON_PLAY
-        k = BUTTON_PLAY;
+            k = BUTTON_PLAY;
 #endif
             break;
 
-    case XK_KP_Down:
-    case XK_Down:
-    case XK_KP_2:
+        case XK_KP_Down:
+        case XK_Down:
+        case XK_KP_2:
 #ifdef BUTTON_DOWN
-        k = BUTTON_DOWN;
+            k = BUTTON_DOWN;
 #elif defined BUTTON_STOP
-        k = BUTTON_STOP;
+            k = BUTTON_STOP;
 #endif
             break;
 
 #ifdef BUTTON_ON
-    case XK_KP_Add:
-    case XK_Q:
-    case XK_q:
-        k = BUTTON_ON;
+        case XK_KP_Add:
+        case XK_Q:
+        case XK_q:
+            k = BUTTON_ON;
             break;
 #endif
 
 #ifdef BUTTON_OFF
-    case XK_KP_Enter:
-    case XK_A:
-    case XK_a:
-        k = BUTTON_OFF;
+        case XK_KP_Enter:
+        case XK_A:
+        case XK_a:
+            k = BUTTON_OFF;
             break;
 #endif
 
 #ifdef BUTTON_F1
-    case XK_KP_Divide:
-    case XK_1:
-        k = BUTTON_F1;
+        case XK_KP_Divide:
+        case XK_1:
+            k = BUTTON_F1;
             break;
 
-    case XK_KP_Multiply:
-    case XK_2:
-        k = BUTTON_F2;
+        case XK_KP_Multiply:
+        case XK_2:
+            k = BUTTON_F2;
             break;
 
-    case XK_KP_Subtract:
-    case XK_3:
-        k = BUTTON_F3;
+        case XK_KP_Subtract:
+        case XK_3:
+            k = BUTTON_F3;
             break;
 #elif defined(BUTTON_REC)
-    case XK_KP_Divide:
-    case XK_1:
-        k = BUTTON_REC;
-        break;
+        case XK_KP_Divide:
+        case XK_1:
+            k = BUTTON_REC;
+            break;
 #endif
 
-    case XK_KP_Space:
-    case XK_KP_5:
-    case XK_KP_Begin:
-    case XK_space:
+        case XK_KP_Space:
+        case XK_KP_5:
+        case XK_KP_Begin:
+        case XK_space:
 #ifdef BUTTON_PLAY
-        k = BUTTON_PLAY;
+            k = BUTTON_PLAY;
 #elif defined(BUTTON_SELECT)
-        k = BUTTON_SELECT;
+            k = BUTTON_SELECT;
 #endif
             break;
 
 #ifdef HAVE_LCD_BITMAP
-    case XK_5:
-        if(!release)
-        {
-            screen_dump();
-            return 0;
-        }
-        break;
+        case XK_5:
+            if(!release)
+            {
+                screen_dump();
+                return 0;
+            }
+            break;
 #endif
 
-    case XK_KP_Separator:
-    case XK_KP_Insert:
-    case XK_Insert:
+        case XK_KP_Separator:
+        case XK_KP_Insert:
+        case XK_Insert:
 #ifdef BUTTON_MENU
-        k = BUTTON_MENU;
+            k = BUTTON_MENU;
 #elif defined(BUTTON_MODE)
-        k = BUTTON_MODE;
+            k = BUTTON_MODE;
 #endif
             break;
 
-    default:
-        k = 0;
+        default:
+            k = 0;
             if(ev)
                 DEBUGF("received ev %d\n", ev);
             break;
@@ -172,7 +172,8 @@ static int get_raw_button (void)
         /* return a release event */
         button_state &= ~k;
         k |= BUTTON_REL;
-    } else {
+    } 
+    else {
         if(k) {
             button_state |= k;
             k = button_state;
@@ -222,8 +223,8 @@ long button_get(bool block)
     } while(1);
 
     if(!block)
-      /* delay a bit */
-      sim_sleep(1);
+        /* delay a bit */
+        sim_sleep(1);
 
     return bits;
 }

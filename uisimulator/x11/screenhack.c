@@ -41,7 +41,7 @@
 #include <X11/keysym.h>
 
 #ifdef __sgi
-# include <X11/SGIScheme.h>	/* for SgiUseSchemes() */
+# include <X11/SGIScheme.h>    /* for SgiUseSchemes() */
 #endif /* __sgi */
 
 #ifdef HAVE_XMU
@@ -128,31 +128,31 @@ XtAppContext app;
 Bool mono_p;
 
 static XrmOptionDescRec default_options [] = {
-  { "-root",	".root",		XrmoptionNoArg, "True" },
-  { "-window",	".root",		XrmoptionNoArg, "False" },
-  { "-mono",	".mono",		XrmoptionNoArg, "True" },
-  { "-install",	".installColormap",	XrmoptionNoArg, "True" },
-  { "-noinstall",".installColormap",	XrmoptionNoArg, "False" },
-  { "-visual",	".visualID",		XrmoptionSepArg, 0 },
-  { "-window-id", ".windowID",		XrmoptionSepArg, 0 },
-  { 0, 0, 0, 0 }
+    { "-root",      ".root",            XrmoptionNoArg, "True" },
+    { "-window",    ".root",            XrmoptionNoArg, "False" },
+    { "-mono",      ".mono",            XrmoptionNoArg, "True" },
+    { "-install",   ".installColormap", XrmoptionNoArg, "True" },
+    { "-noinstall", ".installColormap", XrmoptionNoArg, "False" },
+    { "-visual",    ".visualID",        XrmoptionSepArg, 0 },
+    { "-window-id", ".windowID",        XrmoptionSepArg, 0 },
+    { 0, 0, 0, 0 }
 };
 
 static char *default_defaults[] = {
-  ".root:		false",
+    ".root:            false",
 #define GEOMETRY_POSITION 1
-  "*geometry:		"
+    "*geometry:        "
 #ifdef HAVE_LCD_BITMAP
-  "120x68"
+    "120x68"
 #else
-  "280x132" /* A bit larger that necessary */
+    "280x132" /* A bit larger that necessary */
 #endif
-  , /* this should be .geometry, but nooooo... */
-  "*mono:		false",
-  "*installColormap:	false",
-  "*visualID:		default",
-  "*windowID:		",
-  0
+    , /* this should be .geometry, but nooooo... */
+    "*mono:            false",
+    "*installColormap: false",
+    "*visualID:        default",
+    "*windowID:        ",
+    0
 };
 
 extern Display* dpy;
@@ -261,71 +261,70 @@ int screenhack_handle_event(Display *dpy, XEvent *event,
     *repeat = false;
 
     switch (event->xany.type) {
-    case KeyPress:
-      {
-          KeySym keysym;
-          unsigned char c = 0;
-          XLookupString (&event->xkey, &c, 1, &keysym, 0);
-          key = keysym;
+        case KeyPress:
+            {
+                KeySym keysym;
+                unsigned char c = 0;
+                XLookupString (&event->xkey, &c, 1, &keysym, 0);
+                key = keysym;
 #if 0
-          DEBUGF("Got keypress: %02x %x, time %lx\n", c,
-                 event->xkey.keycode,
-                 event->xkey.time);
+                DEBUGF("Got keypress: %02x %x, time %lx\n", c,
+                       event->xkey.keycode,
+                       event->xkey.time);
 #endif
-          if(lastkeycode == event->xkey.keycode)
-              *repeat = checkrepeat(lasttime, event->xkey.time);
-          lasttime = event->xkey.time;
-          lastkeycode = event->xkey.keycode;
-      }
-      break;
-    case KeyRelease:
-      {
-          KeySym keysym;
-          unsigned char c = 0;
-          XLookupString (&event->xkey, &c, 1, &keysym, 0);
-          key = keysym;
+                if(lastkeycode == event->xkey.keycode)
+                    *repeat = checkrepeat(lasttime, event->xkey.time);
+                lasttime = event->xkey.time;
+                lastkeycode = event->xkey.keycode;
+            }
+            break;
+        case KeyRelease:
+            {
+                KeySym keysym;
+                unsigned char c = 0;
+                XLookupString (&event->xkey, &c, 1, &keysym, 0);
+                key = keysym;
 #if 0
-          DEBUGF("Got keyrelease: %c (%02x) %x\n", c, c,
-                 event->xkey.keycode);
+                DEBUGF("Got keyrelease: %c (%02x) %x\n", c, c,
+                       event->xkey.keycode);
 #endif
-          if(lastkeycode == event->xkey.keycode)
-              *repeat = checkrepeat(lasttime, event->xkey.time);          
-          lasttime = event->xkey.time;
-          lastkeycode = event->xkey.keycode;
-          if(*repeat)
-              return 0; /* on repeats, return nothing on release */
+                if(lastkeycode == event->xkey.keycode)
+                    *repeat = checkrepeat(lasttime, event->xkey.time);
+                lasttime = event->xkey.time;
+                lastkeycode = event->xkey.keycode;
+                if(*repeat)
+                    return 0; /* on repeats, return nothing on release */
               
-          *release = TRUE;
-      }
-      break;
-    case Expose:
-      {
-	screen_redraw();
-      }
-      break;
-    default:
-      break;
-    case ClientMessage:
-      {
-          if (event->xclient.message_type != XA_WM_PROTOCOLS) {
-              char *s = XGetAtomName(dpy, event->xclient.message_type);
-              if (!s) s = "(null)";
-              fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
-                       progname, s);
-          }
-          else if (event->xclient.data.l[0] != (int)XA_WM_DELETE_WINDOW) {
-              char *s1 = XGetAtomName(dpy, event->xclient.message_type);
-              char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
-              if (!s1) s1 = "(null)";
-              if (!s2) s2 = "(null)";
-              fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
-                       progname, s1, s2);
-          }
-          else {
-              exit (0);
-          }
-      }
-      break;
+                *release = TRUE;
+            }
+            break;
+        case Expose:
+            screen_redraw();
+            break;
+        case ClientMessage:
+            if (event->xclient.message_type != XA_WM_PROTOCOLS) {
+                char *s = XGetAtomName(dpy, event->xclient.message_type);
+                if (!s)
+                    s = "(null)";
+                fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
+                         progname, s);
+            }
+            else if (event->xclient.data.l[0] != (int)XA_WM_DELETE_WINDOW) {
+                char *s1 = XGetAtomName(dpy, event->xclient.message_type);
+                char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
+                if (!s1)
+                    s1 = "(null)";
+                if (!s2)
+                    s2 = "(null)";
+                fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
+                         progname, s1, s2);
+            }
+            else {
+                exit (0);
+            }
+            break;
+        default:
+            break;
     }
     return key;
 }
@@ -344,8 +343,7 @@ int screenhack_handle_events(bool *release, bool *repeat)
 }
 
 
-static Visual *
-pick_visual (Screen *screen)
+static Visual *pick_visual (Screen *screen)
 {
 #ifdef USE_GL
     /* If we're linking against GL (that is, this is the version of 
@@ -367,7 +365,7 @@ pick_visual (Screen *screen)
         !strcmp (string, "best") ||
         !strcmp (string, "color") ||
         !strcmp (string, "default"))
-        v = get_gl_visual (screen);		/* from ../utils/visual-gl.c */
+        v = get_gl_visual (screen);        /* from ../utils/visual-gl.c */
 
     if (string)
         free (string);
@@ -393,63 +391,63 @@ int main (int argc, char **argv)
 #ifdef HAVE_LCD_BITMAP
     display_zoom=2;
     {
-      char *env=getenv("RECORDER_ZOOM");
-      if (env) {
-        display_zoom=atoi(env);
-      }
+        char *env=getenv("RECORDER_ZOOM");
+        if (env) {
+            display_zoom=atoi(env);
+        }
     }
 #else
     display_zoom=1;
     {
-      char *env=getenv("PLAYER_ZOOM");
-      if (env) {
-        display_zoom=atoi(env);
-      }
+        char *env=getenv("PLAYER_ZOOM");
+        if (env) {
+            display_zoom=atoi(env);
+        }
     }
 #endif
 
     if (argc > 1)
     {
-      int x;
-      for (x=1; x<argc; x++) {
-	if (!strcmp("--old_lcd", argv[x])) {
-	  having_new_lcd=FALSE;
-	  printf("Using old LCD layout.\n");
-	} else if (!strcmp("--recorder_zoom", argv[x])) {
-          x++;
+        int x;
+        for (x=1; x<argc; x++) {
+            if (!strcmp("--old_lcd", argv[x])) {
+                having_new_lcd=FALSE;
+                printf("Using old LCD layout.\n");
+            } else if (!strcmp("--recorder_zoom", argv[x])) {
+                x++;
 #ifdef HAVE_LCD_BITMAP
-	  display_zoom=atoi(argv[x]);
-          printf("Window zoom is %d\n", display_zoom);
+                display_zoom=atoi(argv[x]);
+                printf("Window zoom is %d\n", display_zoom);
 #endif
-	} else if (!strcmp("--player_zoom", argv[x])) {
-          x++;
+            } else if (!strcmp("--player_zoom", argv[x])) {
+                x++;
 #ifndef HAVE_LCD_BITMAP
-	  display_zoom=atoi(argv[x]);
-          printf("Window zoom is %d\n", display_zoom);
+                display_zoom=atoi(argv[x]);
+                printf("Window zoom is %d\n", display_zoom);
 #endif
-	} else {
-	  printf("rockboxui\n");
-	  printf("Arguments:\n");
-	  printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
-	  printf("  --player_zoom \t [Player] window zoom\n");
-	  printf("  --recorder_zoom \t [Recorder] window zoom\n");
-          printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
-	  exit(0);
-	}
-      }
+            } else {
+                printf("rockboxui\n");
+                printf("Arguments:\n");
+                printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
+                printf("  --player_zoom \t [Player] window zoom\n");
+                printf("  --recorder_zoom \t [Recorder] window zoom\n");
+                printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
+                exit(0);
+            }
+        }
     }
     {
-      static char geometry[40];
+        static char geometry[40];
 #ifdef HAVE_LCD_BITMAP
-      snprintf(geometry, 40, "*geometry: %dx%d",
-               LCD_WIDTH*display_zoom+14, LCD_HEIGHT*display_zoom+8);
+        snprintf(geometry, 40, "*geometry: %dx%d",
+                 LCD_WIDTH*display_zoom+14, LCD_HEIGHT*display_zoom+8);
 #else
-      snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom, 132*display_zoom);
+        snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom,
+                 132*display_zoom);
 #endif
-      default_defaults[GEOMETRY_POSITION]=geometry;
+        default_defaults[GEOMETRY_POSITION]=geometry;
     }
     printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
-
 
     merge_options ();
 
