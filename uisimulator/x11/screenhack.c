@@ -241,12 +241,18 @@ static Bool MapNotify_event_p (Display *dpy, XEvent *event, XPointer window)
 static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 
 
-void kb_disable_auto_repeat(bool on)
+static void kb_disable_auto_repeat(bool on)
 {
     XKeyboardControl kb;
 
     kb.auto_repeat_mode = on ? AutoRepeatModeOff : AutoRepeatModeDefault;
     XChangeKeyboardControl(dpy, KBAutoRepeatMode, &kb);
+}
+
+static void kb_restore_auto_repeat(void) /* registered as an exit handler */
+{
+    kb_disable_auto_repeat(false);
+    XSync(dpy, false); /* force the X server to process that */
 }
 
 /* Dead-trivial event handling.
@@ -312,8 +318,6 @@ int screenhack_handle_event(XEvent *event, bool *release)
                          progname, s1, s2);
             }
             else {
-                kb_disable_auto_repeat(false);
-                XSync(dpy, false); /* force the X server to process that */
                 exit (0);
             }
             break;
@@ -569,6 +573,7 @@ int main (int argc, char **argv)
 
     XSync (dpy, False);
 
+    atexit(kb_restore_auto_repeat);
     kb_disable_auto_repeat(true);
     screenhack(); /* doesn't return */
     return 0;
