@@ -37,7 +37,7 @@
 #define MPEG_CHUNKSIZE  0x180000
 #define MPEG_SWAP_CHUNKSIZE  0x8000
 #define MPEG_HIGH_WATER  2
-#define MPEG_LOW_WATER  0x30000
+#define MPEG_LOW_WATER  0x40000
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
