@@ -62,6 +62,7 @@ char* credits[] = {
     "Nick Robinson",
     "Chad Lockwood",
     "John Pybus",
+    "Randy Wood",
 };
 
 #ifdef HAVE_LCD_BITMAP
