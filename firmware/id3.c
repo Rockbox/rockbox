@@ -269,7 +269,7 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
     }
 }
 
-static struct tag_resolver taglist[] = {
+static const struct tag_resolver taglist[] = {
     { "TPE1", 4, offsetof(struct mp3entry, artist), NULL },
     { "TP1",  3, offsetof(struct mp3entry, artist), NULL },
     { "TIT2", 4, offsetof(struct mp3entry, title), NULL },
@@ -383,7 +383,7 @@ static int unicode_munge(char** string, int *len) {
 static bool setid3v1title(int fd, struct mp3entry *entry) 
 {
     unsigned char buffer[128];
-    static char offsets[] = {3, 33, 63, 93, 125, 127};
+    static const char offsets[] = {3, 33, 63, 93, 125, 127};
     int i, j;
 
     if (-1 == lseek(fd, -128, SEEK_END))
@@ -649,7 +649,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
            processing function will be called via a pointer to function. */
 
         for (i=0; i<TAGLIST_SIZE; i++) {
-            struct tag_resolver* tr = &taglist[i];
+            const struct tag_resolver* tr = &taglist[i];
             char** ptag =  (char**) (((char*)entry) + tr->offset);
             char* tag;
             
@@ -682,7 +682,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         }
         
         if( i == TAGLIST_SIZE ) {
-            /* no tag in tagList was found, or it was a repeat. 
+            /* no tag in tagList was found, or it was a repeat.
                skip it using the total size */
 
             if(global_unsynch && version <= ID3_VER_2_3) {

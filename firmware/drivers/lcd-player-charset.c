@@ -545,7 +545,8 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
 };
 
 /* second table -- substitute */
-unsigned char lcd_player_extended_lcd_to_rocklatin1[NO_EXTENDED_LCD_CHARS] =
+const unsigned char 
+      lcd_player_extended_lcd_to_rocklatin1[NO_EXTENDED_LCD_CHARS] =
 {
 /* 00 */ NOCHAR_NEW,  /* 0-16 user defined */
 /* 01 */ NOCHAR_NEW,  /* 0-16 user defined */

@@ -240,7 +240,7 @@ unsigned long mas_version_code;
 
 #ifdef HAVE_MAS3507D
 
-static unsigned int bass_table[] =
+static const unsigned int bass_table[] =
 {
     0x9e400, /* -15dB */
     0xa2800, /* -14dB */
@@ -275,7 +275,7 @@ static unsigned int bass_table[] =
     0x61800  /* 15dB */
 };
 
-static unsigned int treble_table[] =
+static const unsigned int treble_table[] =
 {
     0xb2c00, /* -15dB */
     0xbb400, /* -14dB */
@@ -310,7 +310,7 @@ static unsigned int treble_table[] =
     0x5f800  /* 15dB */
 };
 
-static unsigned int prescale_table[] =
+static const unsigned int prescale_table[] =
 {
     0x80000,  /* 0db */
     0x8e000,  /* 1dB */

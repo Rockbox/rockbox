@@ -349,7 +349,7 @@ extern unsigned long mas_version_code;
 
 static struct event_queue mpeg_queue;
 static char mpeg_stack[DEFAULT_STACK_SIZE + 0x1000];
-static char mpeg_thread_name[] = "mpeg";
+static const char mpeg_thread_name[] = "mpeg";
 
 static int mp3buflen;
 static int mp3buf_write;
@@ -2637,7 +2637,7 @@ void mpeg_error_clear(void)
 
 #ifdef SIMULATOR
 static char mpeg_stack[DEFAULT_STACK_SIZE];
-static char mpeg_thread_name[] = "mpeg";
+static const char mpeg_thread_name[] = "mpeg";
 static void mpeg_thread(void)
 {
     struct mp3entry* id3;

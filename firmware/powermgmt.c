@@ -84,12 +84,12 @@ int battery_level_cached = -1; /* battery level of this minute, updated once
                                   per minute */
 static bool car_adapter_mode_enabled = false;
 
-static int poweroff_idle_timeout_value[15] =
+static const int poweroff_idle_timeout_value[15] =
 {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
-static int percent_to_volt_decharge[11] =
+static const int percent_to_volt_decharge[11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
 #ifdef HAVE_LIION
@@ -133,8 +133,8 @@ int trickle_sec = 0;                           /* how many seconds should the
                                                   charger be enabled per
                                                   minute for trickle
                                                   charging? */
-static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%,
-                                           ... 100% when charging enabled */
+static const int percent_to_volt_charge[11] = 
+/* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     /* values guessed, see
        http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
@@ -149,7 +149,7 @@ void enable_trickle_charge(bool on)
 #endif /* HAVE_CHARGE_CTRL */
 
 static char power_stack[DEFAULT_STACK_SIZE];
-static char power_thread_name[] = "power";
+static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
 static long last_charge_time = 0;
@@ -167,7 +167,7 @@ int battery_time(void)
 
 /* look into the percent_to_volt_* table and get a realistic battery level
        percentage */
-int voltage_to_percent(int voltage, int* table)
+int voltage_to_percent(int voltage, const int* table)
 {
     if (voltage <= table[0])
         return 0;

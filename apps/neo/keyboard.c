@@ -36,13 +36,13 @@ extern int button_add(unsigned int button);
 
 #define KEYBOARD_MAX_LENGTH 255
 
-static unsigned char* kbd_screens[3] = {
+static const unsigned char* const kbd_screens[3] = {
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   "abcdefghijklmnopqrstuvwxyz",
   " !\"#$%&'()*+,-./0123456789;<=>?@[]^_`{|}"
 };
 
-static unsigned char* kbd_screens_names[3] = {
+static const unsigned char* const kbd_screens_names[3] = {
   "Capitals",
   "Small",
   "Others"
@@ -77,7 +77,7 @@ int kbd_input(char* text, int buflen)
   int key;
   int screen = 0;
   int screenidx = -1;
-  unsigned char * pcurscreen = kbd_screens[0];
+  const unsigned char * pcurscreen = kbd_screens[0];
   bool ctl;
 
   bufferlen = strlen(text);

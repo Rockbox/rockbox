@@ -55,7 +55,7 @@
 
 extern unsigned short new_lcd_rocklatin1_to_xlcd[];
 extern unsigned short old_lcd_rocklatin1_to_xlcd[];
-extern unsigned char lcd_player_extended_lcd_to_rocklatin1[];
+extern const unsigned char lcd_player_extended_lcd_to_rocklatin1[];
 extern unsigned char extended_font_player[NO_EXTENDED_LCD_CHARS][8];
 
 /*** generic code ***/

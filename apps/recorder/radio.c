@@ -75,7 +75,7 @@ static int pll_cnt;
 static bool presets_loaded = false;
 static struct fmstation presets[MAX_PRESETS];
 
-static char default_filename[] = "/.rockbox/fm-presets-default.fmr";
+static const char default_filename[] = "/.rockbox/fm-presets-default.fmr";
 
 int debug_fm_detection;
 

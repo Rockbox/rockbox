@@ -39,7 +39,7 @@ static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")
 const char *thread_name[MAXTHREADS];
 void *thread_stack[MAXTHREADS];
 int thread_stack_size[MAXTHREADS];
-static char main_thread_name[] = "main";
+static const char main_thread_name[] = "main";
 
 extern int stackbegin[];
 extern int stackend[];
