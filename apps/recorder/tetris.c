@@ -337,18 +337,22 @@ void game_loop(void)
                 return;
                 
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
                 move_block(0,-3,0);
                 break;
                 
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
                 move_block(0,3,0);
                 break;
                 
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
                 move_block(0,0,1);
                 break;
                 
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
                 move_down();
                 break;
             }
