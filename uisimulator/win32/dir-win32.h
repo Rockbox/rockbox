@@ -17,13 +17,10 @@
  *
  ****************************************************************************/
 
-#ifndef __FILE_WIN32_H__
-#define __FILE_WIN32_H__
-
-#define mkdir(x, y) dos_mkdir(x)
+#ifndef __DIR_WIN32_H__
+#define __DIR_WIN32_H__
 
 #include <io.h>
 #include "../../firmware/include/dir.h"
 
-
-#endif // #ifndef __FILE_WIN32_H__
+#endif // #ifndef __DIR_WIN32_H__

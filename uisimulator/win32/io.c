@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include <stdio.h>
-
 #include "file.h"
 #include "debug.h"
 
@@ -46,4 +45,19 @@ int win32_filesize(int fd)
     lseek(fd, old, SEEK_SET);
 
     return(size);
+}
+
+extern (mkdir)(const char *name);
+
+int win32_mkdir(const char *name, int mode)
+{
+    char buffer[256]; /* sufficiently big */
+    (void)mode;
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        
+        debugf("We create the real directory '%s'\n", buffer);
+        return (mkdir)(buffer);
+    }
+    return (mkdir)(name);
 }

@@ -38,6 +38,6 @@ int win32_filesize(int fd);
 #include "../../firmware/include/file.h"
 
 #undef rename
-
+#define mkdir(x,y) win32_mkdir(x,y)
 
 #endif
