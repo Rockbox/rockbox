@@ -73,20 +73,41 @@ start:
                                   We have to be careful with the access times,
                                   since IORDY isn't connected to the HDD. */
         
-        
-        /* Test code: blink the backlight */
-        move.l #0x00020000,%d0
-        move.l %d0,(0xbc,%a1) /* Function = 1 */
-        move.l %d0,(0xb8,%a1) /* Enable = 1 */
-        
-.blinkloop:
-        eor.l %d0,(0xb4,%a1)
-        
-        move.l #2000000,%d2
-.delay:  
-        subq.l #1,%d2
-        bne .delay
-        jmp .blinkloop
+
+        /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
+           clock (5.6448MHz bus frequency). We haven't yet started the PLL */
+        move.l #0x80050000,%d0
+        move.l %d0,(0x100,%a0) /* DCR - Synchronous, 80 cycle refresh */
+        move.l #0x3000a520,%d0
+        move.l %d0,(0x108,%a0) /* DACR0 - Base 0x30000000, Banks on 23 and up,
+                                  CAS latency 3, Refresh enable */
+        move.l #0x01fc0001,%d0
+        move.l %d0,(0x10c,%a0) /* DMR0 - 32Mb */
+
+        lea    _iramcopy,%a2
+        lea    _iramstart,%a3
+        lea    _iramend,%a4        
+.iramloop:
+        cmp.l  %a3,%a4
+        beq    .iramloopend
+        move.w (%a2)+,(%a3)+
+        bra    .iramloop
+.iramloopend:
+
+        lea    _datacopy,%a2
+        lea    _datastart,%a3
+        lea    _dataend,%a4        
+.dataloop:
+        cmp.l  %a3,%a4
+        beq    .dataloopend
+        move.w (%a2)+,(%a3)+
+        bra    .dataloop
+.dataloopend:
+
+        lea    stackend,%sp
+        jsr    main
+.hoo:
+        bra    .hoo
 
 	.section .resetvectors
 vectors:
