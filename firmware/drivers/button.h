@@ -76,7 +76,7 @@ int button_set_release(int newmask);
 #define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT)
 
 #define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
-                     BUTTON_RIGHT | BUTTON_OFF | BUTTON_MENU)
+                     BUTTON_RIGHT | BUTTON_MENU)
 
 #endif /* HAVE_PLAYER_KEYPAD */
 
