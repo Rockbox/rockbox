@@ -126,6 +126,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_BROWSE  (BUTTON_MENU | BUTTON_REL)
 #define WPS_BROWSE_PRE BUTTON_MENU
 #define WPS_KEYLOCK (BUTTON_MENU | BUTTON_DOWN)
+#define WPS_EXIT    (BUTTON_OFF | BUTTON_REPEAT)
 
 #endif
 
