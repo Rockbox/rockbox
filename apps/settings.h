@@ -23,6 +23,9 @@
 #include <stdbool.h>
 #include "file.h"
 
+/* Custom WPS Parsing - Uncomment to enable - PLAYER ONLY */
+/* #define CUSTOM_WPS */
+
 /* data structures */
 
 #define RESUME_OFF 0
@@ -63,6 +66,10 @@ struct user_settings
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
+#ifdef CUSTOM_WPS
+    char custom_wps[64];  /* custom WPS string */
+    bool wps_changed;  /* to reload Custom WPS if changed to it */
+#endif
 
     /* while playing screen settings  */
     int wps_display;   /* 0=id3, 1=file, 2=parse */

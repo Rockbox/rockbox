@@ -28,7 +28,8 @@ extern bool keys_locked;
 int wps_show(void);
 
 #ifdef CUSTOM_WPS
-int wps_load_custom_config(void);
+bool load_custom_wps(void);
+bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string);
 #endif
 
 #endif

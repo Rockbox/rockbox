@@ -103,6 +103,7 @@ static Menu wps_set(void)
     char* names[] = { "1 Line ID3", "2 Line ID3", "File      ",
         "Parse     ", "Custom WPS " };
     set_option("[WPS display]", &global_settings.wps_display, names, 5 );
+    global_settings.wps_changed = true;
 #else
     char* names[] = { "1 Line ID3", "2 Line ID3", "File      ",
         "Parse     " };
