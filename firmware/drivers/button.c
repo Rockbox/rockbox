@@ -69,7 +69,9 @@ static void button_tick(void)
     int diff;
     int btn;
 
-#if !defined(HAVE_MMC) && (CONFIG_KEYPAD != IRIVER_H100_PAD)
+#if !defined(HAVE_MMC) && (CONFIG_KEYPAD != IRIVER_H100_PAD) \
+  && (CONFIG_KEYPAD != GMINI100_PAD)
+
     /* Post events for the remote control */
     btn = remote_control_rx();
     if(btn)
@@ -83,7 +85,7 @@ static void button_tick(void)
     {
         bool post = false;
         btn = button_read();
-        
+
         /* Find out if a key has been released */
         diff = btn ^ lastbtn;
         if(diff && (btn & diff) == 0)
@@ -100,7 +102,7 @@ static void button_tick(void)
                     post = true;
                     repeat = false;
                     repeat_speed = REPEAT_INTERVAL_START;
-                    
+
                 }
                 else /* repeat? */
                 {
@@ -114,9 +116,9 @@ static void button_tick(void)
                             if (repeat_speed < REPEAT_INTERVAL_FINISH)
                                 repeat_speed = REPEAT_INTERVAL_FINISH;
                             count = repeat_speed;
-                            
+
                             repeat_count++;
-                            
+
                             /* Send a SYS_POWEROFF event if we have a device
                                which doesn't shut down easily with the OFF
                                key */
@@ -135,7 +137,7 @@ static void button_tick(void)
                             repeat = true;
                             repeat_count = 0;
                             /* initial repeat */
-                            count = REPEAT_INTERVAL_START; 
+                            count = REPEAT_INTERVAL_START;
                         }
                     }
                 }
@@ -146,7 +148,7 @@ static void button_tick(void)
                     else
                         queue_post(&button_queue, btn, NULL);
                     backlight_on();
-                    
+
                     reset_poweroff_timer();
                 }
             }
@@ -159,7 +161,7 @@ static void button_tick(void)
         lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
         tick = 0;
     }
-        
+
     backlight_tick();
 }
 
@@ -167,7 +169,7 @@ int button_get(bool block)
 {
     struct event ev;
 
-    if ( block || !queue_empty(&button_queue) ) 
+    if ( block || !queue_empty(&button_queue) )
     {
         queue_wait(&button_queue, &ev);
         return ev.id;
@@ -201,6 +203,8 @@ void button_init(void)
     PAIOR &= ~0x0820; /* Inputs */
 #elif CONFIG_KEYPAD == ONDIO_PAD
     /* nothing to initialize here */
+#elif CONFIG_KEYPAD == GMINI100_PAD
+    /* nothing to initialize here */
 #endif /* CONFIG_KEYPAD */
 
     queue_init(&button_queue);
@@ -221,7 +225,7 @@ static int button_flip(int button)
 {
     int newbutton;
 
-    newbutton = button & 
+    newbutton = button &
         ~(BUTTON_UP | BUTTON_DOWN
         | BUTTON_LEFT | BUTTON_RIGHT
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -257,14 +261,14 @@ void button_set_flip(bool flip)
     {
         /* avoid race condition with the button_tick() */
         int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        lastbtn = button_flip(lastbtn); 
+        lastbtn = button_flip(lastbtn);
         flipped = flip;
         set_irq_level(oldlevel);
     }
 }
 #endif /* HAVE_LCD_BITMAP */
 
-/* 
+/*
  Archos hardware button hookup
  =============================
 
@@ -288,7 +292,7 @@ void button_set_flip(bool flip)
 
  STOP:   PA11
  ON:     PA5
- 
+
  All buttons are low active
 
  Ondio
@@ -369,7 +373,7 @@ static int button_read(void)
             else
                 if (data < 0xf0)
                     btn = BUTTON_REC;
-        
+
     data = GPIO1_READ;
     if ((data & 0x20) == 0)
         btn |= BUTTON_ON;
@@ -409,7 +413,7 @@ static int button_read(void)
     {
         /* check DOWN, PLAY, LEFT, RIGHT */
         data = adc_read(ADC_BUTTON_ROW2);
-    
+
         if (data >= LEVEL4)
             btn |= BUTTON_DOWN;
         else if (data >= LEVEL3)
@@ -457,6 +461,25 @@ static int button_read(void)
         btn |= BUTTON_UP;
     else if (data >= LEVEL1)
         btn |= BUTTON_DOWN;
+
+#elif CONFIG_KEYPAD == GMINI100_PAD
+
+    if (adc_read(7) < 0x80)
+      btn |= BUTTON_LEFT;
+    else if (adc_read(7) < 0x168)
+      btn |= BUTTON_DOWN;
+    else if (adc_read(7) < 0x260)
+      btn |= BUTTON_RIGHT;
+    else if (adc_read(7) < 0x360)
+      btn |= BUTTON_UP;
+
+    if (adc_read(6) < 0x240)
+      btn |= BUTTON_CANCEL;
+    else if (adc_read(6) < 0x280)
+      btn |= BUTTON_PLAY;
+    else if (adc_read(6) < 0x300)
+      btn |= BUTTON_MENU;
+
 
 #endif /* CONFIG_KEYPAD */
 
