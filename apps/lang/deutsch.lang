@@ -73,10 +73,10 @@ voice: ""
 new: "Mische..."
 
 id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
-voice: "Abspielliste"
-new: "Playliste"
+voice: ""
+new: "Playlist"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -508,7 +508,7 @@ id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
 voice: ""
-new: "[Playliste]"
+new: "[Playlist]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -1578,7 +1578,7 @@ id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Fehler beim Zugriff auf Playliste"
+new: "Fehler beim Zugriff auf Playlist"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
@@ -1728,7 +1728,7 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "Zeige aktuelle Abspielliste"
-new: "Zeige aktuelle Playliste"
+new: "Zeige aktuelle Playlist"
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -2982,6 +2982,12 @@ new: "Frei:"
 
 id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
-eng: "<Alle Titel>"
+eng: "<All songs>"
 voice: ""
-new:
+new: "<Alle Titel>"
+
+id: LANG_PLAYLIST
+desc: Used when you need to say playlist, also voiced
+eng: "Playlist"
+voice: "Abspielliste"
+new: "Playlist"
