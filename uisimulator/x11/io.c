@@ -1,3 +1,21 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2002 Daniel Stenberg
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include <sys/stat.h>
 #include <dirent.h>
@@ -78,7 +96,7 @@ int x11_open(char *name, int opts)
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
-    debugf("We open the real file '%s'", buffer);
+    debugf("We open the real file '%s'\n", buffer);
     return open(buffer, opts);
   }
   return open(name, opts);
