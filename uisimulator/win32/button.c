@@ -105,6 +105,7 @@ void button_event(int key, bool pressed)
         break;
 #elif defined(BUTTON_REC)
     case VK_DIVIDE:
+    case VK_F1:
         new_btn = BUTTON_REC;
         break;
 #endif
@@ -130,6 +131,7 @@ void button_event(int key, bool pressed)
 #endif
 
     case VK_DECIMAL:
+    case VK_INSERT:
 #ifdef BUTTON_MENU
         new_btn = BUTTON_MENU;
 #elif defined(BUTTON_MODE)
