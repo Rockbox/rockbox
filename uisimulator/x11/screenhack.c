@@ -83,7 +83,13 @@ static XrmOptionDescRec default_options [] = {
 
 static char *default_defaults[] = {
   ".root:		false",
-  "*geometry:		120x70", /* this should be .geometry, but nooooo... */
+  "*geometry:		"
+#ifdef HAVE_LCD_BITMAP
+  "120x68"
+#else
+  "138x54"
+#endif
+  , /* this should be .geometry, but nooooo... */
   "*mono:		false",
   "*installColormap:	false",
   "*visualID:		default",
