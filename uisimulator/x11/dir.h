@@ -39,4 +39,5 @@
 #include "../../firmware/common/dir.h"
 
 extern DIR *x11_opendir(char *name);
+extern struct dirent* x11_readdir(DIR* dir);
 
