@@ -158,7 +158,7 @@ irq_handler:
         move.l %d0,(0x08c,%a0)
         move.l #0x00000075,%d0 /* CSMR1 - 64K, Only data access */
         move.l %d0,(0x090,%a0)
-        move.l #0x00002180,%d0 /* CSCR1 - 8 wait states, 16 bits, no bursts */
+        move.l #0x00000180,%d0 /* CSCR1 - 0 wait states, 16 bits, no bursts */
         move.l %d0,(0x094,%a0)
         
         /* Chip select 2 - ATA controller */
@@ -235,6 +235,20 @@ irq_handler:
         move.l %d0,(0x108,%a0)
 #endif
 
+        /* Invalicate cache */
+        move.l  #0x01000000,%d0
+        movec.l %d0,%cacr
+        
+        /* Enable cache, default=non-cacheable,no buffered writes */
+        move.l  #0x80000000,%d0
+        movec.l %d0,%cacr
+
+        /* Cache enabled in SDRAM only, buffered writes enabled */
+        move.l  #0x3103c020,%d0
+        movec.l %d0,%acr0
+        move.l  #0,%d0
+        movec.l %d0,%acr1
+        
 #ifndef BOOTLOADER        
         lea    _iramcopy,%a2
         lea    _iramstart,%a3
@@ -266,6 +280,17 @@ irq_handler:
         move.w (%a2)+,(%a3)+
         bra    .dataloop
 .dataloopend:
+
+        /* Munge the main stack */
+        lea    _stackbegin,%a2
+        lea    _stackend,%a4
+        move.l #0xdeadbeef,%d0
+.mungeloop:
+        cmp.l  %a2,%a4
+        beq    .mungeloopend
+        move.l %d0,(%a2)+
+        bra    .mungeloop
+.mungeloopend:
 
         lea    stackend,%sp
         jsr    main
