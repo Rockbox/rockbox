@@ -65,7 +65,7 @@ ifdef MPEG_PLAY
   INCLUDES += -I$(PREVAPPDIR)/common
 endif
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
