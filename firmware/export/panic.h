@@ -20,6 +20,8 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
-void panicf( const char *fmt, ... );
+#include "_ansi.h"
+
+void panicf( const char *fmt, ... ) ATTRIBUTE_PRINTF(1, 2);
 
 #endif /* __PANIC_H__ */

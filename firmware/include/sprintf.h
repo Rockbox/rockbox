@@ -22,12 +22,7 @@
 
 #include <stddef.h>
 #include <stdarg.h>
-
-#ifdef __GNUC__
-#define ATTRIBUTE_PRINTF(fmt, arg1) __attribute__ ( ( format( printf, fmt, arg1 ) ) )
-#else
-#define ATTRIBUTE_PRINTF(fmt, arg1)
-#endif
+#include <_ansi.h>
 
 int snprintf (char *buf, size_t size, const char *fmt, ...)
     ATTRIBUTE_PRINTF(3, 4);
