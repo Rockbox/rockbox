@@ -509,7 +509,7 @@ static void recalculate_watermark(int bitrate)
     /* A bitrate of 0 probably means empty VBR header. We play safe
        and set a high threshold */
     if(bitrate == 0)
-        bitrate = 320000;
+        bitrate = 320;
     
     bytes_per_sec = bitrate * 1000 / 8;
     
