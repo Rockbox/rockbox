@@ -26,7 +26,7 @@
 #include <string.h>
 #include <debug.h>
 
-#define XPOS_volume 105
+#define XPOS_volume 85
 #define XPOS_volume1 XPOS_volume + 15
 #define XPOS_volume2 XPOS_volume1 + 2
 #define XPOS_volume3 XPOS_volume2 + 2
@@ -118,6 +118,19 @@ const unsigned char param[] = {
 
 };
 
+#define BMPHEIGHT_repeat 7
+#define BMPWIDTH_repeat 12
+const unsigned char repeat[] = {
+0x1c, 0x22, 0x41, 0x41, 0x41, 0x41, 0x71, 0x71, 0x61, 0x61, 0x41, 0x40, 
+
+};
+
+#define BMPHEIGHT_repeat1 7
+#define BMPWIDTH_repeat1 3
+const unsigned char repeat1[] = {
+0x42, 0x7f, 0x40, 
+
+};
 
 struct icon_info
 {
@@ -135,12 +148,13 @@ static struct icon_info icons [] =
     { battery_bit, 5, 2, BMPWIDTH_battery_bit, BMPHEIGHT_battery_bit },    /* ICON_BATTERY_2 */
     { battery_bit, 8, 2, BMPWIDTH_battery_bit, BMPHEIGHT_battery_bit },    /* ICON_BATTERY_3 */
     { usb, 0, 40, BMPWIDTH_usb, BMPHEIGHT_usb },                           /* ICON_USB */
-    { play, 40, 0, BMPWIDTH_play, BMPHEIGHT_play },                        /* ICON_PLAY */
-    { record, 48, 0, BMPWIDTH_record, BMPHEIGHT_record },                  /* ICON_RECORD */
-    { pause, 60, 0, BMPWIDTH_pause, BMPHEIGHT_pause },                     /* ICON_PAUSE */
+    { play, 20, 0, BMPWIDTH_play, BMPHEIGHT_play },                        /* ICON_PLAY */
+    { record, 35, 0, BMPWIDTH_record, BMPHEIGHT_record },                  /* ICON_RECORD */
+    { pause, 50, 0, BMPWIDTH_pause, BMPHEIGHT_pause },                     /* ICON_PAUSE */
     { audio, 40, 40, BMPWIDTH_audio, BMPHEIGHT_audio },                    /* ICON_AUDIO */
-    { 0, 0, 0, 0, 0 },                                                     /* ICON_REPEAT */
-    { 0, 0, 0, 0, 0 },                                                     /* ICON_1 */
+    { repeat, XPOS_volume-13-BMPWIDTH_repeat,
+      0, BMPWIDTH_repeat, BMPHEIGHT_repeat },                              /* ICON_REPEAT */
+    { repeat1, XPOS_volume-10, 0, BMPWIDTH_repeat1, BMPHEIGHT_repeat1 },   /* ICON_1 */
     { volume, XPOS_volume, 0, BMPWIDTH_volume, BMPHEIGHT_volume },         /* ICON_VOLUME */
     { volume1, XPOS_volume1, 0, BMPWIDTH_volume1, BMPHEIGHT_volume1 },     /* ICON_VOLUME1 */
     { volume2, XPOS_volume2, 0, BMPWIDTH_volume2, BMPHEIGHT_volume2 },     /* ICON_VOLUME2 */
@@ -182,12 +196,6 @@ lcd_icon(int icon, bool enable)
     case ICON_BATTERY_3:
         sim_battery_icon(icon, enable);
         break;
-
-    /* Ignore. Don't know these icons yet */
-    case ICON_REPEAT:
-    case ICON_1:
-        break;
-
     default:
         display_icon(icon, enable);
         break;
