@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "panic.h"
 #include "system.h"
+#include "timefuncs.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
@@ -637,6 +638,26 @@ static int flush_fat(void)
     return 0;
 }
 
+static void fat_time(unsigned short* date,
+                     unsigned short* time,
+                     unsigned short* tenth )
+{
+    struct tm* tm = get_time();
+
+    if (date)
+        *date = ((tm->tm_year - 80) << 9) |
+            ((tm->tm_mon + 1) << 5) |
+            tm->tm_mday;
+
+    if (time)
+        *time = (tm->tm_hour << 11) |
+            (tm->tm_min << 5) |
+            (tm->tm_sec >> 1);
+
+    if (tenth)
+        *tenth = (tm->tm_sec & 1) * 100;
+}
+
 static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
                            unsigned int numentries,
@@ -745,10 +766,21 @@ static int write_long_name(struct fat_file* file,
         }
         else {
             /* shortname entry */
+            unsigned short date=0, time=0, tenth=0;
             LDEBUGF("Shortname entry: %.13s\n", shortname);
             strncpy(entry + FATDIR_NAME, shortname, 11);
             entry[FATDIR_ATTR] = 0;
             entry[FATDIR_NTRES] = 0;
+
+#ifdef HAVE_RTC
+            fat_time(&date, &time, &tenth);
+#endif
+            entry[FATDIR_CRTTIMETENTH] = tenth;
+            *(unsigned short*)(entry + FATDIR_CRTTIME) = SWAB16(time);
+            *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
+            *(unsigned short*)(entry + FATDIR_CRTDATE) = SWAB16(date);
+            *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
+            *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
         }
         idx++;
         nameidx -= NAME_BYTES_PER_ENTRY;
@@ -1012,6 +1044,7 @@ static int update_file_size( struct fat_file* file, int size )
     unsigned int* sizeptr;
     unsigned short* clusptr;
     struct fat_file dir;
+    unsigned short date=0, time=0;
     int err;
 
     LDEBUGF("update_file_size(cluster:%x entry:%d size:%d)\n",
@@ -1041,6 +1074,13 @@ static int update_file_size( struct fat_file* file, int size )
 
     sizeptr = (int*)(entry + FATDIR_FILESIZE);
     *sizeptr = SWAB32(size);
+
+#ifdef HAVE_RTC
+    fat_time(&date, &time, NULL);
+    *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
+    *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
+    *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
+#endif
 
     err = fat_seek( &dir, sector );
     if (err<0)
