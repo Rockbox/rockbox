@@ -1690,3 +1690,820 @@ id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
 new: "Datiioptione"
+
+id: LANG_BUTTON_BAR
+desc: in settings menu
+eng: "Button bar"
+new: "Taschtuliischta"
+
+id: LANG_DIRBROWSE_F1
+desc: in dir browser, F1 button bar text
+eng: "Menu"
+new: "Mönü"
+
+id: LANG_DIRBROWSE_F2
+desc: in dir browser, F2 button bar text
+eng: "Option"
+new: "Option"
+
+id: LANG_DIRBROWSE_F3
+desc: in dir browser, F3 button bar text
+eng: "LCD"
+new: "LCD"
+
+#digits and units for voice, the order is important
+
+id: VOICE_ZERO
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_ONE
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_TWO
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_THREE
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FOUR
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FIFE
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SIX
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SEVEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EIGHT
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_NINE
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_TEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_ELEVEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_TWELVE
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_THIRTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FOURTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FIFTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SIXTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SEVENTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EIGHTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_NINETEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_TWENTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_THIRTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FORTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_FIFTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SIXTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SEVENTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EIGHTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_NINETY
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_HUNDRED
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_BILLION
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MILLION
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_THOUSAND
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MINUS
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_PLUS
+desc: spoken only, for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_POINT
+desc: spoken only, decimal separator for composing numbers
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MILLISECONDS
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SECOND
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_SECONDS
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MINUTE
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MINUTES
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_HOUR
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_HOURS
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_KHZ
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_DB
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_PERCENT
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MEGABYTE
+desc: spoken only, a unit postfix, currently not used
+eng: ""
+voice: ""
+new:
+
+id: VOICE_GIGABYTE
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_MILLIAMPHOURS
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_PIXEL
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_PER_SEC
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+id: VOICE_HERTZ
+desc: spoken only, a unit postfix
+eng: ""
+voice: ""
+new:
+
+#carry on adding normal LANG_ strings below
+
+id: LANG_VOICE
+desc: root of voice menu
+eng: "Voice"
+voice: ""
+new: "Spraachüsgab"
+
+id: LANG_VOICE_MENU
+desc: item of voice menu, enable/disable the voice UI
+eng: "Voice Menus"
+voice: ""
+new: "Mönüs"
+
+id: LANG_VOICE_DIR
+desc: item of voice menu, set the "talkbox" mode for directories
+eng: "Voice Directories"
+voice: ""
+new: "Verzeichnis"
+
+id: LANG_VOICE_FILE
+desc: item of voice menu, set the voive mode for files
+eng: "Voice Filenames"
+voice: ""
+new: "Datiiname"
+
+id: LANG_VOICE_NUMBER
+desc: "talkbox" mode for files+directories
+eng: "Numbers"
+voice: ""
+new: "Zahle"
+
+id: LANG_VOICE_DIR_ENTER
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
+
+id: LANG_VOICE_DIR_HOVER
+desc: "talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: ""
+new: ".talk mp3 Datii"
+
+id: VOICE_FILE
+desc: spoken only, prefix for file number
+eng: ""
+voice: ""
+new:
+
+id: VOICE_DIR
+desc: spoken only, prefix for directory number
+eng: ""
+voice: ""
+new:
+
+id: LANG_VOICE_SPELL
+desc: "talkbox" mode for files+directories
+eng: "Spell"
+voice: ""
+new: "büechschtabieru"
+
+id: VOICE_CHAR_A
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_B
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_C
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_D
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_E
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_F
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_G
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_H
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_I
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_J
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_K
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_L
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_M
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_N
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_O
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_P
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_Q
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_R
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_S
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_T
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_U
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_V
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_W
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_X
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_Y
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_CHAR_Z
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_MPA
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_CFG
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_WPS
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_TXT
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_ROCK
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_FONT
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_BMARK
+desc: spoken only, for file extension and the word in general
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_UCL
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: VOICE_EXT_AJZ
+desc: spoken only, for file extension
+eng: ""
+voice: ""
+new:
+
+id: LANG_DELETE_DIR
+desc: in on+play menu
+eng: "Delete directory"
+voice: ""
+new: "Verzeichnis leschu"
+
+id: VOICE_CURRENT_TIME
+desc: spoken only, for wall clock announce
+eng: ""
+voice: ""
+new:
+
+#Filetypes
+id: LANG_FILETYPES_EXTENSION_FULL
+desc: Extension array full
+eng: "Extension array full"
+voice: ""
+new: "Erwitrigslischta voll"
+
+id: LANG_FILETYPES_FULL
+desc: Filetype array full
+eng: "Filetype array full"
+voice: ""
+new: "Datiitypulischta voll"
+
+id: LANG_FILETYPES_PLUGIN_NAME_LONG
+desc: Viewer plugin name too long
+eng: "Plugin name too long"
+voice: ""
+new: "Plugin-Namu z'lenge"
+
+id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+desc: Filetype string buffer empty
+eng: "Filetype string buffer empty"
+voice: ""
+new: "Datiitypu-Zeichubuffer läär"
+
+id: LANG_ONPLAY_OPEN_WITH
+desc: Onplay open with
+eng: "Open with"
+voice: ""
+new: "Öffnu mit"
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+voice: ""
+new: "Verzeichnis sortieru"
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+voice: ""
+new: "Datije sortieru"
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+voice: ""
+new: "aphabetisch"
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+voice: ""
+new: "nach Datum"
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+voice: ""
+new: "nach nöüschtum Datum"
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+voice: ""
+new: "nach Typ"
+
+id: LANG_FM_EDIT_PRESET
+desc:  in radio screen
+eng: "Edit preset"
+voice: ""
+new: "Sender biarbeitu"
+
+id: LANG_FM_MONO_MODE
+desc:  in radio screen
+eng: "Force mono"
+voice: ""
+new: "Mono erzwingu"
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc:  in radio screen
+eng: "Exit"
+voice: ""
+new: "Exit"
+
+id: LANG_FM_BUTTONBAR_EDIT
+desc:  in radio screen
+eng: "Edit"
+voice: ""
+new: "Biarb."
+
+id: LANG_FM_BUTTONBAR_ADD
+desc:  in radio screen
+eng: "Add"
+voice: ""
+new: "Derzüe"
+
+id: LANG_FM_BUTTONBAR_ACTION
+desc:  in radio screen
+eng: "Action"
+voice: ""
+new: "Aktion"
+
+id: LANG_MDB_STRENGTH
+desc:  in sound settings
+eng: "MDB Strength"
+voice: ""
+new: "MDB Sterchi"
+
+id: LANG_MDB_HARMONICS
+desc:  in sound settings
+eng: "MDB Harmonics"
+voice: ""
+new: "MDB Oberteen"
+
+id: LANG_MDB_CENTER
+desc:  in sound settings
+eng: "MDB Center frequency"
+voice: ""
+new: "MDB Mittufrequänz"
+
+id: LANG_MDB_SHAPE
+desc:  in sound settings
+eng: "MDB Shape"
+voice: ""
+new: "MDB Form"
+
+id: LANG_MDB_ENABLE
+desc:  in sound settings
+eng: "MDB Enable"
+voice: ""
+new: "MDB aktivieru"
+
+id: LANG_SUPERBASS
+desc:  in sound settings
+eng: "Super bass"
+voice: ""
+new: "Superbass"
+
+id: LANG_SHUTDOWN
+desc:  in main menu
+eng: "Shut down"
+voice: ""
+new: "Üsschaltu"
+
+id: LANG_SHUTTINGDOWN
+desc:  in main menu
+eng: "Shutting down..."
+voice: ""
+new: "am Üsschaltu..."
+
+id: LANG_CONFIRM_SHUTDOWN
+desc:  in shutdown screen
+eng: "Press OFF to shut down"
+voice: ""
+new: "OFF fer Üszschaltu"
+
+id: LANG_ID3_ORDER
+desc:  in playback settings screen
+eng: "ID3 tag priority"
+voice: ""
+new: "Bivorzugte ID3 tag"
+
+id: LANG_ID3_V1_FIRST
+desc:  in playback settings screen
+eng: "V1 then V2"
+voice: ""
+new: "V1 vor V2"
+
+id: LANG_ID3_V2_FIRST
+desc:  in playback settings screen
+eng: "V2 then V1"
+voice: ""
+new: "V2 vor V1"
+
+id: LANG_NO_ROCKBOX_DIR
+desc: in browse root
+eng: "No .rockbox directory"
+voice: ""
+new: "Verzeichnis .rockbox fählt"
+
+id: LANG_INSTALLATION_INCOMPLETE
+desc: in browse root
+eng: "Installation incomplete"
+voice: ""
+new: "Inschtallation unvollschtändig"
+
+id: LANG_REMOVE_MMC
+desc: before acknowledging usb in case an MMC is inserted (Ondio)
+eng: "Please remove inserted MMC"
+voice: ""
+new: "Bitte MMC üsanäh"
+
+id: VOICE_DOT
+desc: spoken only, for spelling
+eng: ""
+voice: ""
+new:
+
+id: VOICE_PAUSE
+desc: spoken only, for spelling, a split second of silence (difficult to author)
+eng: ""
+voice: ""
+new:
