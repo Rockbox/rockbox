@@ -562,7 +562,11 @@ void splash(int ticks,   /* how long */
     va_end( ap );
 
     if(center)
+    {
         x = (LCD_WIDTH-widths[0])/2;
+        if(x < 0)
+            x = 0;
+    }
 
 #ifdef HAVE_LCD_BITMAP
     /* If we center the display and it wouldn't cover the full screen,
