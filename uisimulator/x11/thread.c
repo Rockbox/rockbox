@@ -85,7 +85,7 @@ int create_thread(void* fp, void* sp, int stk_size)
 }
 
 /* ticks is HZ per second */
-void x11_sleep(int ticks)
+void sim_sleep(int ticks)
 {
     current_tick+=5;
     pthread_mutex_unlock(&mp); /* return */

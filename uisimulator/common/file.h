@@ -17,30 +17,46 @@
  *
  ****************************************************************************/
 
-#ifndef ROCKBOX_FILE_H
-#define ROCKBOX_FILE_H
+#ifndef _SIM_FILE_H_
+#define _SIM_FILE_H_
 
+#ifdef WIN32
+#include <io.h>
+#include <fcntl.h>
+#else
 #include <stdio.h>
+#endif
+
 #include <sys/types.h>
 
-int x11_open(const char *name, int opts);
-int x11_close(int fd);
-int x11_filesize(int fd);
-int x11_creat(const char *name, mode_t mode);
-int x11_remove(char *name);
-int x11_rename(char *oldpath, char *newpath);
+#ifdef WIN32
+#ifndef _commit
+extern int _commit( int handle );
+#endif
+#endif
+
+int sim_open(const char *name, int opts);
+int sim_close(int fd);
+int sim_rename(const char *oldpath, const char *newpath);
+int sim_filesize(int fd);
+int sim_creat(const char *name, mode_t mode);
+int sim_remove(const char *name);
 
 #ifndef NO_REDEFINES_PLEASE
-#define open(x,y) x11_open(x,y)
-#define close(x) x11_close(x)
-#define filesize(x) x11_filesize(x)
-#define creat(x,y) x11_creat(x,y)
-#define remove(x) x11_remove(x)
-#define rename(x,y) x11_rename(x,y)
+#define open(x,y) sim_open(x,y)
+#define close(x) sim_close(x)
+#define filesize(x) sim_filesize(x)
+#define creat(x,y) sim_creat(x,y)
+#define remove(x) sim_remove(x)
+#define rename(x,y) sim_rename(x,y)
+#ifdef WIN32
+#define fsync _commit
+#endif
 #endif
 
 #include "../../firmware/include/file.h"
 
+#ifndef WIN32
 int open(const char* pathname, int flags);
 int close(int fd);
 int printf(const char *format, ...);
@@ -50,5 +66,6 @@ int fsync(int fd);
 off_t lseek(int fildes, off_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
+#endif
 
 #endif

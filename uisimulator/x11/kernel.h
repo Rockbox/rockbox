@@ -21,11 +21,11 @@
 
 #ifndef NO_REDEFINES_PLEASE
 
-#define sleep(x) x11_sleep(x)
+#define sleep(x) sim_sleep(x)
 #define mutex_init(x) (void)x
 #define mutex_lock(x) (void)x
 #define mutex_unlock(x) (void)x
 
 #endif
 
-void x11_sleep(int);
+void sim_sleep(int);

@@ -18,3 +18,9 @@
  ****************************************************************************/
 
 #include "../../firmware/export/kernel.h"
+
+#ifndef NO_REDEFINES_PLEASE
+#define sleep(x) sim_sleep(x)
+#endif
+
+void sim_sleep(int);

@@ -96,6 +96,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
+COMMONSRCS = io.c
+
 FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c mp3_playback.c \
 	powermgmt.c power.c sprintf.c buffer.c lcd-common.c strtok.c random.c \
 	timefuncs.c
@@ -111,9 +113,9 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += bmp.c widgets.c
 endif
 
-SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
+SRCS = button.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) sim_icons.c io.c
+	$(APPS) $(MENUS) $(FIRMSRCS) $(COMMONSRCS) sim_icons.c
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
@@ -303,6 +305,9 @@ $(OBJDIR)/font-player.o: $(SIMCOMMON)/font-player.c
 $(OBJDIR)/sim_icons.o: $(SIMCOMMON)/sim_icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/io.o: $(SIMCOMMON)/io.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -315,7 +320,7 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.po : $(PLUGINDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -DPLUGIN -c $< -o $@
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.po
 	$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<

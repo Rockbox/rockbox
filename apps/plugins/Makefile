@@ -15,7 +15,7 @@ FIRMWARE = ../../firmware
 INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common \
 -I$(FIRMWARE)/drivers -I.. -Ilib
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds

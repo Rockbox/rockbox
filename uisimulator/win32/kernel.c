@@ -34,7 +34,7 @@ int set_irq_level (int level)
     return (_lv = level);
 }
 
-void sleep(int ticks)
+void sim_sleep(int ticks)
 {
     Sleep (1000 / HZ * ticks);
 }

@@ -75,18 +75,6 @@ typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
 typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
                            int(*_compar)(const void *, const void *));
 
-
-#if defined(__MINGW32__) && defined(SIMULATOR)
-extern int open(const char*, int flags, ...);
-extern int close(int fd);
-extern int read(int, void*, unsigned int);
-extern long lseek(int, long, int);
-extern int creat(const char *, int);
-extern int write(int, const void*, unsigned int);
-extern int remove(const char*);
-
-#else
-
 #ifndef SIMULATOR
 extern int open(const char* pathname, int flags);
 extern int close(int fd);
@@ -100,6 +88,5 @@ extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern int filesize(int fd);
 #endif /* SIMULATOR */
-#endif /* __MINGW32__ */
 
 #endif

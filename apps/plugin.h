@@ -45,6 +45,16 @@
 #include "settings.h"
 #include "thread.h"
 
+#ifdef PLUGIN
+#if defined(DEBUG) || defined(SIMULATOR)
+#define DEBUGF	rb->debugf
+#define LDEBUGF rb->debugf
+#else
+#define DEBUGF(...)
+#define LDEBUGF(...)
+#endif
+#endif
+
 /* increase this every time the api struct changes */
 #define PLUGIN_API_VERSION 14
 
@@ -235,6 +245,16 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     struct font* (*font_get)(int font);
 #endif
+#if defined(DEBUG) || defined(SIMULATOR)
+   void (*debugf)(char *fmt, ...);
+#endif
+   bool (*mp3info)(struct mp3entry *entry, char *filename) ;
+   int (*count_mp3_frames)(int fd, int startpos, int filesize,
+                           void (*progressfunc)(int));
+   int (*create_xing_header)(int fd, int startpos, int filesize,
+                             unsigned char *buf, int num_frames,
+                             unsigned long header_template,
+                             void (*progressfunc)(int), bool generate_toc);
 };
 
 /* defined by the plugin loader (plugin.c) */

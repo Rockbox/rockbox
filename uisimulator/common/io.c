@@ -24,7 +24,7 @@
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/mount.h>
-#else
+#elif !defined(WIN32)
 #include <sys/vfs.h>
 #endif
 #include <dirent.h>
@@ -34,9 +34,11 @@
 #include "debug.h"
 
 #define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
-#define dirent x11_dirent
+#define dirent sim_dirent
+#define DIR SIMDIR
 #include "../../firmware/include/dir.h"
 #undef dirent
+#undef DIR
 
 #define SIMULATOR_ARCHOS_ROOT "archos"
 
@@ -47,7 +49,7 @@ struct mydir {
 
 typedef struct mydir MYDIR;
 
-MYDIR *x11_opendir(const char *name)
+MYDIR *sim_opendir(const char *name)
 {
     char buffer[256]; /* sufficiently big */
     DIR *dir;
@@ -70,15 +72,15 @@ MYDIR *x11_opendir(const char *name)
     return (MYDIR *)0;
 }
 
-struct x11_dirent *x11_readdir(MYDIR *dir)
+struct sim_dirent *sim_readdir(MYDIR *dir)
 {
     char buffer[512]; /* sufficiently big */
-    static struct x11_dirent secret;
+    static struct sim_dirent secret;
     struct stat s;
     struct dirent *x11 = (readdir)(dir->dir);
 
     if(!x11)
-        return (struct x11_dirent *)0;
+        return (struct sim_dirent *)0;
 
     strcpy(secret.d_name, x11->d_name);
 
@@ -93,7 +95,7 @@ struct x11_dirent *x11_readdir(MYDIR *dir)
     return &secret;
 }
 
-void x11_closedir(MYDIR *dir)
+void sim_closedir(MYDIR *dir)
 {
     free(dir->name);
     (closedir)(dir->dir);
@@ -102,7 +104,7 @@ void x11_closedir(MYDIR *dir)
 }
 
 
-int x11_open(const char *name, int opts)
+int sim_open(const char *name, int opts)
 {
     char buffer[256]; /* sufficiently big */
 
@@ -115,12 +117,12 @@ int x11_open(const char *name, int opts)
     return (open)(name, opts);
 }
 
-int x11_close(int fd)
+int sim_close(int fd)
 {
     return (close)(fd);
 }
 
-int x11_creat(const char *name, mode_t mode)
+int sim_creat(const char *name, mode_t mode)
 {
     char buffer[256]; /* sufficiently big */
     (void)mode;
@@ -133,20 +135,22 @@ int x11_creat(const char *name, mode_t mode)
     return (creat)(name, 0666);
 }
 
-int x11_mkdir(const char *name, mode_t mode)
+int sim_mkdir(const char *name, mode_t mode)
 {
     char buffer[256]; /* sufficiently big */
     (void)mode;
-    if(name[0] == '/') {
-        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+
+    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
-        debugf("We create the real directory '%s'\n", buffer);
-        return (mkdir)(buffer, 0666);
-    }
-    return (mkdir)(name, 0666);
+    debugf("We create the real directory '%s'\n", buffer);
+#ifdef WIN32
+    return (mkdir)(buffer);
+#else
+    return (mkdir)(buffer, 0666);
+#endif
 }
 
-int x11_rmdir(const char *name)
+int sim_rmdir(const char *name)
 {
     char buffer[256]; /* sufficiently big */
     if(name[0] == '/') {
@@ -158,7 +162,7 @@ int x11_rmdir(const char *name)
     return (rmdir)(name);
 }
 
-int x11_remove(char *name)
+int sim_remove(const char *name)
 {
     char buffer[256]; /* sufficiently big */
 
@@ -171,7 +175,7 @@ int x11_remove(char *name)
     return (remove)(name);
 }
 
-int x11_rename(char *oldpath, char* newpath)
+int sim_rename(const char *oldpath, const char* newpath)
 {
     char buffer1[256];
     char buffer2[256];
@@ -186,7 +190,7 @@ int x11_rename(char *oldpath, char* newpath)
     return -1;
 }
 
-int x11_filesize(int fd)
+int sim_filesize(int fd)
 {
     int old = lseek(fd, 0, SEEK_CUR);
     int size = lseek(fd, 0, SEEK_END);
@@ -197,6 +201,10 @@ int x11_filesize(int fd)
 
 void fat_size(unsigned int* size, unsigned int* free)
 {
+#ifdef WIN32
+    *size = 2049;
+    *free = 1037;
+#else
     struct statfs fs;
 
     if (!statfs(".", &fs)) {
@@ -213,4 +221,5 @@ void fat_size(unsigned int* size, unsigned int* free)
         if (free)
             *free = 0;
     }
+#endif
 }

@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <atoi.h>
 #include <timefuncs.h>
+#include "debug.h"
 #include "button.h"
 #include "lcd.h"
 #include "dir.h"
@@ -39,6 +40,7 @@
 #include "backlight.h"
 #include "ata.h"
 #include "talk.h"
+#include "mp3data.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -48,11 +50,10 @@
   #include <debug.h>
   #ifdef WIN32
     #include "plugin-win32.h"
-    #define PREFIX(_x_) _x_
   #else
     #include <dlfcn.h>
-    #define PREFIX(_x_) x11_ ## _x_
   #endif
+  #define PREFIX(_x_) sim_ ## _x_
 #else
 #define PREFIX(_x_) _x_
 #endif
@@ -213,6 +214,12 @@ static struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     font_get,
 #endif
+#if defined(DEBUG) || defined(SIMULATOR)
+    debugf,
+#endif
+    mp3info,
+    count_mp3_frames,
+    create_xing_header,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -246,11 +253,8 @@ int plugin_load(char* plugin, void* parameter)
     lcd_clear_display();
 #endif
 #ifdef SIMULATOR
-#ifdef WIN32
-    snprintf(path, sizeof path, "%s", plugin);
-#else
     snprintf(path, sizeof path, "archos%s", plugin);
-#endif
+
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
         snprintf(buf, sizeof buf, "Can't open %s", plugin);

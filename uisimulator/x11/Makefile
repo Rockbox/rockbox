@@ -96,6 +96,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c font-player.c lcd-player-charset.c
 endif
+COMMONSRCS = io.c
+
 FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c mp3_playback.c power.c\
   powermgmt.c panic.c mp3data.c sprintf.c buffer.c timefuncs.c
 
@@ -111,8 +113,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
-       button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS) \
-       lcd-common.c
+       button-x11.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS) \
+       $(COMMONSRCS) lcd-common.c
 
 ROCKSRC := $(wildcard $(APPDIR)/plugins/*.c)
 ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
@@ -274,6 +276,9 @@ $(OBJDIR)/stubs.o: $(SIMCOMMON)/stubs.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sim_icons.o: $(SIMCOMMON)/sim_icons.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/io.o: $(SIMCOMMON)/io.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c

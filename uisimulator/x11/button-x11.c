@@ -172,7 +172,7 @@ int button_get_w_tmo(int ticks)
     for(i=0; i< ticks; i++) {
         bits = get_raw_button();
         if(!bits)
-            x11_sleep(1);
+            sim_sleep(1);
         else
             break;
     }
@@ -193,14 +193,14 @@ int button_get(bool block)
     do {
         bits = get_raw_button();
         if(block && !bits)
-            x11_sleep(HZ/10);
+            sim_sleep(HZ/10);
         else
             break;
     } while(1);
 
     if(!block)
       /* delay a bit */
-      x11_sleep(1);
+      sim_sleep(1);
 
     return bits;
 }

@@ -16,28 +16,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _SIM_DIR_H_
+#define _SIM_DIR_H_
 
-#ifndef _FILE_H_
+#include <sys/types.h>
 
-#ifndef __MINGW32__
-#include <io.h>
-#include <fcntl.h>
-#endif
+#define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
+#define dirent sim_dirent
+#include "../../firmware/include/dir.h"
+#undef dirent
 
-#ifndef _commit
-extern int _commit( int handle );
-#endif
+typedef void * MYDIR;
 
-int win32_rename(char *oldpath, char *newpath);
-int win32_filesize(int fd);
+extern MYDIR *sim_opendir(const char *name);
+extern struct sim_dirent* sim_readdir(MYDIR* dir);
+extern int sim_closedir(MYDIR *dir);
+extern int sim_mkdir(char *name, int mode);
+extern int sim_rmdir(char *name);
 
-#define rename win32_rename
-#define filesize win32_filesize
-#define fsync _commit
-
-#include "../../firmware/include/file.h"
-
-#undef rename
-#define mkdir(x,y) win32_mkdir(x,y)
+#define DIR MYDIR
+#define dirent sim_dirent
+#define opendir(x) sim_opendir(x)
+#define readdir(x) sim_readdir(x)
+#define closedir(x) sim_closedir(x)
+#define mkdir(x, y) sim_mkdir(x, y)
+#define rmdir(x) sim_rmdir(x)
 
 #endif
