@@ -16,4 +16,6 @@ plugins/viewers.config
 SOURCES
 plugins/SOURCES
 plugins/lib/SOURCES
+codecs/Makefile
+codecs/liba52/*
 codecs/libmad/*
