@@ -21,14 +21,6 @@
 #include "sh7034.h"
 #include "debug.h"
 
-int strlen(unsigned char* str)
-{
-   int i=0;
-   while (*str++)
-      i++;
-   return i;
-}
-
 int main(void)
 {
    char buf[40];
