@@ -37,7 +37,7 @@ struct menu {
 #define MAX_MENUS 4
 
 #ifdef HAVE_LCD_BITMAP
-#define MENU_LINES 6
+#define MENU_LINES 8
 #else
 #define MENU_LINES 2
 #endif
