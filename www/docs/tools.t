@@ -65,7 +65,7 @@
 <tr>
   <td><a href="http://www.exactaudiocopy.de/">Exact Audio Copy</a> (Cardware)
     <ul>
-    <li><a href="http://www.ping.be/satcp/tutorials.htm">The Coaster Factory Exact Audio Copy Tutorial</a></li>
+    <li><a href="http://users.pandora.be/satcp/eac00.htm">The Coaster Factory Exact Audio Copy Tutorial</a></li>
     <li><a href="http://mp3.radified.com/">Radified Guide to Ripping &amp; Encoding CD Audio</a></li>
     </ul></td>
   <td align="center">&nbsp;</td>
@@ -305,13 +305,6 @@
   <th width="100">Windows</th>
   <th width="100">Open Source</th>
   <th width="100">Freeware</th>
-</tr>
-<tr>
-  <td><a href="http://www.willwap.co.uk/Programs/vbrfix.html">VBRFix</a></td>
-  <td align="center">X</td>
-  <td align="center">X</td>
-  <td align="center">X</td>
-  <td align="center">&nbsp;</td>
 </tr>
 <tr>
   <td><a href="http://hem.bredband.net/isrmat/mp3page.htm">MP3Fixer</a></td>
