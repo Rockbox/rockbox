@@ -151,11 +151,15 @@ A21. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
-     Version 1.3 
-         Persistent settings for Player, UI improvements
+     Version 1.3
+          Resume, persistent settings, proportional fonts, UI improvements,
+          Improved charging
 
      Version 1.4
-         Recording?
+           Autobuild playlists, Recording, Loadable fonts, Customizable WPS
+
+     Version 1.5
+            File/directory management
 
 Q22. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
