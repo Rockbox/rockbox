@@ -1,6 +1,6 @@
-# francais.lang 2003/05/09
+# francais.lang 2003/06/09
 #
-# Based on file english.lang,v 1.73 2003/05/09 16:01:20 linusnielsen Exp $
+# Based on file english.lang,v 1.77 2003/06/05 09:38:26 zagor Exp $
 #
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -1510,3 +1510,38 @@ id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 new: "Max fichiers par liste musicale"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+new: "Défil. par sauts"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time"
+eng: "One time"
+new: "Une fois"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always"
+eng: "Always"
+new: "Toujours"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new: "Délai avant saut"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Temps de coupure (hh:mm)"
+
+id: LANG_RECORD_TIMESPLIT_REC
+decs: Display of record timer interval setting, on the record screen
+eng: "Split time:"
+new: "Tmps coupe:"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Afficher les icônes"
