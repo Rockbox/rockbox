@@ -9,7 +9,7 @@
 <li> <a href="features.html">Feature Comparison Chart</a>
 <li> <a href="nodo.html">Features We Will Not Implement</a>
 <li> <a href="custom_wps_format.html">How to make a custom WPS</a>
-<li> <a href="custom_wps_format.html">How to make a custom config file</a>
+<li> <a href="custom_cfg_format.html">How to make a custom config file</a>
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
 </ul>
 
