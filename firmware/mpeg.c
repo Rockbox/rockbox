@@ -54,9 +54,9 @@ static char *units[] =
 
 static int numdecimals[] =
 {
-    1,    /* Volume */
-    2,    /* Bass */
-    1     /* Treble */
+    0,    /* Volume */
+    0,    /* Bass */
+    0     /* Treble */
 };
 
 static int minval[] =
@@ -750,15 +750,15 @@ int mpeg_val2phys(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            result = value * 20;
+            result = value * 2;
             break;
         
         case SOUND_BASS:
-            result = value * 200;
+            result = value * 2;
             break;
         
         case SOUND_TREBLE:
-            result = value * 20;
+            result = value * 2;
             break;
     }
     return result;
