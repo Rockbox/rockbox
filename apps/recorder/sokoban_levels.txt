@@ -1,3 +1,14 @@
+# Map legend:
+#
+#   white space is clear back ground
+#   X = black back ground
+#   # = wall
+#   . = block destination 
+#   @ = starting position
+#   $ = movable block
+
+
+
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
