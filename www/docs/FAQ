@@ -286,3 +286,7 @@ A34: Loadable fonts are a work in progress.  We do not have full documentation
      The final .ajf font must be stored in the archos root as 'system.ajf'
      We do expect more documentation on this process shortly.
 
+Q35: I have a question about the batteries...
+A35: STOP!  We have put togeather a completely different FAQ for battery 
+     related questions.  Check out: http://rockbox.haxx.se/docs/battery.html
+
