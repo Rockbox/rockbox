@@ -30,4 +30,7 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600
 
+/* Define this if you have ATA power-off control */
+#define HAVE_ATA_POWER_OFF
+
 #endif
