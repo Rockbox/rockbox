@@ -67,71 +67,96 @@ extern int screenhack_handle_events (void);
 
 static int get_raw_button (void)
 {
-    int k = screenhack_handle_events();
-    switch(k)
+    int k;
+    static int next = 0;
+    if ( next ) {
+        k = next;
+        next = 0;
+        return k;
+    }
+
+    switch(screenhack_handle_events())
     {
 	case XK_KP_Left:
 	case XK_Left:
 	case XK_KP_4:
-	    return BUTTON_LEFT;
+	    k = BUTTON_LEFT;
+            break;
 
 	case XK_KP_Right:
 	case XK_Right:
 	case XK_KP_6:
-	    return BUTTON_RIGHT;
+	    k = BUTTON_RIGHT;
+            break;
 
 	case XK_KP_Up:
 	case XK_Up:
 	case XK_KP_8:
-	    return BUTTON_UP;
+	    k = BUTTON_UP;
+            break;
 
 	case XK_KP_Down:
 	case XK_Down:
 	case XK_KP_2:
-	    return BUTTON_DOWN;
+	    k = BUTTON_DOWN;
+            break;
 
 #ifdef HAVE_RECORDER_KEYPAD
 	case XK_KP_Space:
 	case XK_KP_5:
 	case XK_KP_Begin:
 	case XK_space:
-	    return BUTTON_PLAY;
+	    k = BUTTON_PLAY;
+            break;
 
 	case XK_KP_Enter:
 	case XK_A:
 	case XK_a:
-	    return BUTTON_OFF;
+	    k = BUTTON_OFF;
+            break;
 
 	case XK_KP_Add:
 	case XK_Q:
 	case XK_q:
-	    return BUTTON_ON;
+	    k = BUTTON_ON;
+            break;
 
 	case XK_KP_Divide:
 	case XK_1:
-	    return BUTTON_F1;
+	    k = BUTTON_F1;
+            break;
 
 	case XK_KP_Multiply:
 	case XK_2:
-	    return BUTTON_F2;
+	    k = BUTTON_F2;
+            break;
 
 	case XK_KP_Subtract:
 	case XK_3:
-	    return BUTTON_F3;
+	    k = BUTTON_F3;
+            break;
 #else
 	case XK_KP_Add:
 	case XK_Q:
 	case XK_q:
-	    return BUTTON_ON;
+	    k = BUTTON_ON;
+            break;
 
 	case XK_KP_Enter:
 	case XK_Return:
-	    return BUTTON_MENU;
+	    k = BUTTON_MENU;
+            break;
 #endif
 
 	default:
-	    return 0;
+	    k = 0;
+            break;
     }
+
+    if ( k )
+        next = k | BUTTON_REL;
+
+    return k;
 }
 
 /*
@@ -148,7 +173,7 @@ int button_get_w_tmo(int ticks)
             x11_sleep(1);
         else
             break;
-    };
+    }
 
     return bits;
 }
