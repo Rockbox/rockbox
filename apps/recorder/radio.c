@@ -193,10 +193,6 @@ bool radio_screen(void)
     radio_set_frequency(curr_freq);
     curr_preset = find_preset(curr_freq);
 
-    /* We use the A/D pseudo peak */
-    peak_meter_playback(false);
-    peak_meter_enabled = true;
-
     buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
                   str(LANG_FM_BUTTONBAR_RECORD));
 
