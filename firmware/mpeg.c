@@ -53,6 +53,7 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
+static int shadow_codec_reg0;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 #ifndef SIMULATOR
@@ -2090,7 +2091,8 @@ static void init_recording(void)
     }
 
     /* Enable A/D Converters */
-    mas_codec_writereg(0x0, 0xcccd);
+    shadow_codec_reg0 = 0xcccd;
+    mas_codec_writereg(0x0, shadow_codec_reg0);
 
     /* Copy left channel to right (mono mode) */
     mas_codec_writereg(8, 0x8000);
@@ -2366,12 +2368,26 @@ void mpeg_set_recording_options(int frequency, int quality,
 void mpeg_set_recording_gain(int left, int right, bool use_mic)
 {
     /* Enable both left and right A/D */
-    mas_codec_writereg(0x0,
-                       (left << 12) |
-                       (right << 8) |
-                       (left << 4) |
-                       (use_mic?0x0008:0) | /* Connect left A/D to mic */
-                       0x0007);
+    shadow_codec_reg0 = (left << 12) |
+                        (right << 8) |
+                        (left << 4) |
+                        (use_mic?0x0008:0) | /* Connect left A/D to mic */
+                        0x0007;
+    mas_codec_writereg(0x0, shadow_codec_reg0);
+}
+
+/* try to make some kind of beep, also in recording mode */
+void mpeg_beep(int freq, int duration)
+{
+    (void)freq; /* not used yet */
+    long starttick = current_tick;
+    do
+    {
+        mas_codec_writereg(0, 0); /* some little-understood sequence, */
+        mas_codec_writereg(0, 1); /*  there may be better ways */
+    }
+    while (current_tick - starttick < duration);
+    mas_codec_writereg(0, shadow_codec_reg0); /* restore it */
 }
 
 void mpeg_new_file(const char *filename)
