@@ -5,11 +5,12 @@
 #include "ata.h"
 #include "debug.h"
 #include "disk.h"
+#include "dir.h"
 
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf);
 void dbg_print_bpb(struct bpb *bpb);
-void dbg_console(struct bpb *bpb);
+void dbg_console(void);
 
 void dbg_dump_sector(int sec)
 {
@@ -79,34 +80,38 @@ void dbg_print_bpb(struct bpb *bpb)
     printf("fat_type = FAT32\n");
 }
 
-void dbg_dir(struct bpb *bpb, int currdir)
+void dbg_dir(char* currdir)
 {
-    struct fat_dirent dent;
-    struct fat_direntry de;
+    DIR* dir;
+    struct dirent* entry;
 
-    if(fat_opendir(bpb, &dent, currdir) >= 0)
+    dir = opendir(currdir);
+    if (dir)
     {
-        while(fat_getnext(bpb, &dent, &de) >= 0)
+        for ( entry = readdir(dir); 
+              entry; 
+              entry = readdir(dir) )
         {
-            printf("%s (%d)\n", de.name,de.firstcluster);
+            printf("%s (%08x)\n", entry->d_name, entry->size);
         }
     }
     else
     {
-        fprintf(stderr, "Could not read dir on cluster %d\n", currdir);
+        fprintf(stderr, "Could not open dir %s\n", currdir);
     }
+    closedir(dir);
 }
 
-void dbg_type(struct bpb *bpb, int cluster)
+void dbg_type(int cluster)
 {
     unsigned char buf[SECTOR_SIZE*5];
-    struct fat_fileent ent;
+    struct fat_file ent;
     int i;
 
-    fat_open(bpb,cluster,&ent);
+    fat_open(cluster,&ent);
     
     for (i=0;i<5;i++)
-        if(fat_read(bpb, &ent, 1, buf) >= 0)
+        if(fat_read(&ent, 1, buf) >= 0)
         {
             buf[SECTOR_SIZE]=0;
             printf("%s\n", buf);
@@ -125,7 +130,7 @@ void dbg_prompt(void)
     printf("C:%s> ", current_directory);
 }
 
-void dbg_console(struct bpb* bpb)
+void dbg_console(void)
 {
     char cmd[32] = "";
     char last_cmd[32] = "";
@@ -148,12 +153,10 @@ void dbg_console(struct bpb* bpb)
             {
                 if(!strcasecmp(s, "dir"))
                 {
-                    int secnum = 0;
-                    if((s = strtok(NULL, " \n")))
-                    {
-                        secnum = atoi(s);
-                    }
-                    dbg_dir(bpb, secnum);
+                    s = strtok(NULL, " \n");
+                    if (!s)
+                        s = "/";
+                    dbg_dir(s);
                     continue;
                 }
 
@@ -182,7 +185,7 @@ void dbg_console(struct bpb* bpb)
                     {
                         cluster = atoi(s);
                     }
-                    dbg_type(bpb,cluster);
+                    dbg_type(cluster);
                     continue;
                 }
             
@@ -198,8 +201,6 @@ void dbg_console(struct bpb* bpb)
 
 int main(int argc, char *argv[])
 {
-    struct bpb bpb;
-    
     if(ata_init()) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
         return -1;
@@ -209,11 +210,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if(fat_mount(&bpb,part[0].start)) {
+    if(fat_mount(part[0].start)) {
         DEBUGF("*** Failed mounting fat\n");
     }
 
-    dbg_console(&bpb);
+    dbg_console();
     return 0;
 }
 

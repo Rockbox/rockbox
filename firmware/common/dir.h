@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef _DIR_H_
 #define _DIR_H_
 
@@ -31,10 +30,16 @@ struct dirent {
 
 
 #ifndef SIMULATOR
+
+#include "fat.h"
+
 typedef struct {
-    int offset;
+    int startcluster;
+    struct fat_dir fatdir;
 } DIR;
+
 #else // SIMULATOR
+
 #ifdef WIN32
 #include <io.h>
 typedef struct DIRtag
