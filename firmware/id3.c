@@ -401,6 +401,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     int frequency;
     int chmode;
     int bytecount;
+    int bytelimit;
     int bittable; /* which bitrate table to use */
     bool header_found = false;
 
@@ -421,6 +422,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 	
     /* Loop trough file until we find a frame header */
     bytecount = entry->id3v2len - 1;
+    bytelimit = entry->id3v2len + 0x20000;
   restart:
     do {
         header <<= 8;
@@ -430,7 +432,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
         /* Quit if we haven't found a valid header within 128K */
         bytecount++;
-        if(bytecount > 0x20000)
+        if(bytecount > bytelimit)
             return 0;
     } while(!mp3frameheader(header));
 	
