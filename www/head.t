@@ -44,7 +44,7 @@
 <a class="menulink" href="/cvs.html">CVS</a><br>
 <a class="menulink" href="http://sourceforge.net/projects/rockbox/">sourceforge</a><br>
 <a class="menulink" href="http://sourceforge.net/tracker/?atid=439118&group_id=44306&func=browse">bug reports</a><br>
-<a class="menulink" href="http://sourceforge.net/tracker/?atid=439121&group_id=44306&func=browse">feature requests</a><br>
+<a class="menulink" href="http://sourceforge.net/tracker/?atid=439121&group_id=44306&func=browse">feature&nbsp;requests</a><br>
 <a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
