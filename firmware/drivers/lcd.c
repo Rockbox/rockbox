@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "kernel.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -396,7 +397,13 @@ static unsigned char ones[]  = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 static char fonts[] = { 6,8,12 };
 static char fontheight[] = { 8,12,16 };
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+
+void lcd_init (void)
+{
+    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
+}
+#else
 
 /*
  * Initialize LCD
@@ -418,6 +425,7 @@ void lcd_init (void)
 
     lcd_clear_display();
     lcd_update();
+    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
 }
 
 /*
@@ -476,8 +484,8 @@ void lcd_puts(int x, int y, char *str)
        as otherwise it'll wrap. The real target doesn't wrap. */
 
     char buffer[12];
-    if((x < 11) && (strlen(str) > (11-x)) ) {
-        memcpy(str, buffer, 11-x);
+    if(strlen(str)+x > 11 ) {
+        strncpy(buffer, str, sizeof buffer);
         buffer[11-x]=0;
         str = buffer;
     }
@@ -506,15 +514,8 @@ void lcd_putsxy(int x, int y, char *str, int thisfont)
     int lcd_x = x;
     int lcd_y = y;
 
-    while ((ch = *str++) != '\0')
+    while (((ch = *str++) != '\0') && (lcd_x + nx < LCD_WIDTH))
     {
-        if (ch == '\n' || lcd_x + nx > LCD_WIDTH)
-        {
-            /* Wrap to next line */
-            lcd_x = x;
-            lcd_y += ny;
-        }
-
         if (lcd_y + ny > LCD_HEIGHT)
             return;
 
@@ -744,6 +745,89 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
 #else
 /* no LCD defined, no code to use */
 #endif
+
+
+struct scrollinfo {
+    char text[128];
+    int textlen;
+    char offset;
+    char xpos;
+    char startx;
+    char starty;
+    char space;
+};
+
+static void scroll_thread(void);
+static char scroll_stack[0x100];
+static char scroll_speed = 10; /* updates per second */
+
+static struct scrollinfo scroll; /* only one scroll line at the moment */
+static bool run_scroll = false;
+
+void lcd_puts_scroll(int x, int y, char* string )
+{
+    struct scrollinfo* s = &scroll;
+#ifdef HAVE_LCD_CHARCELLS
+    s->space = 11 - x;
+#else
+    int width, height;
+    lcd_getfontsize(font, &width, &height);
+    s->space = (LCD_WIDTH - xmargin - x) / width;
+#endif
+    s->offset=0;
+    s->xpos=x;
+    s->startx=x;
+    s->starty=y;
+    s->textlen = strlen(string);
+    strncpy(s->text,string,sizeof s->text);
+    s->text[sizeof s->text - 1] = 0;
+
+    run_scroll = true;
+    lcd_puts(s->xpos,y,s->text + s->offset);
+    lcd_update();
+}
+
+void lcd_stop_scroll(void)
+{
+    struct scrollinfo* s = &scroll;
+    run_scroll = false;
+
+    /* restore scrolled row */
+    lcd_puts(s->startx,s->starty,s->text);
+    lcd_update();
+}
+
+void lcd_scroll_speed(int speed)
+{
+    scroll_speed = speed;
+}
+
+static void scroll_thread(void)
+{
+    struct scrollinfo* s = &scroll;
+    while ( 1 ) {
+        if ( !run_scroll ) {
+            yield();
+            continue;
+        }
+        lcd_puts(s->xpos,s->starty,s->text + s->offset);
+        if ( s->textlen - s->offset < s->space )
+            lcd_puts(s->startx + s->textlen - s->offset, s->starty," ");
+        lcd_update();
+        
+        if ( s->xpos > s->startx )
+            s->xpos--;
+        else
+            s->offset++;
+        
+        if (s->offset > s->textlen) {
+            s->offset=0;
+            s->xpos = s->space-1;
+        }
+        sleep(HZ/scroll_speed);
+    }
+}
+
 
 /* -----------------------------------------------------------------
  * local variables:

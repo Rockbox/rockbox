@@ -29,6 +29,9 @@ extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, char *string);
+extern void lcd_puts_scroll(int x, int y, char* string );
+extern void lcd_stop_scroll(void);
+extern void lcd_scroll_speed( int speed );
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
   extern void lcd_update(void);
