@@ -103,7 +103,7 @@ extern struct user_settings global_settings;
 #define DEFAULT_AVC_SETTING         0
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_CONTRAST_SETTING    31
-#define DEFAULT_CONTRAST_SETTING    15
+#define DEFAULT_CONTRAST_SETTING    30
 #else
 #define MAX_CONTRAST_SETTING    63
 #define DEFAULT_CONTRAST_SETTING    32
