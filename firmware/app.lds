@@ -33,14 +33,6 @@ SECTIONS
         *(.rodata)
     } > DRAM
 
-    .bss :
-    {
-       _edata = .;
-        *(.bss)
-        *(COMMON)
-       _end = .;
-    } > DRAM
-
     .stack :
     {
        *(.stack)
@@ -49,6 +41,14 @@ SECTIONS
        _iramcopy = .;
        . = 0x2000;
        _stackend = .;
+    } > DRAM
+
+    .bss :
+    {
+       _edata = .;
+        *(.bss)
+        *(COMMON)
+       _end = .;
     } > DRAM
 
     .heap :
@@ -68,7 +68,7 @@ SECTIONS
         _mp3end = .;
     } > DRAM
 
-    .iram 0xf000000 : AT ( _end )
+    .iram 0xf000000 : AT ( _iramcopy )
     {
         _iramstart = .;
         *(.icode)

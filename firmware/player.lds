@@ -73,7 +73,7 @@ SECTIONS
 	   LONG(0);
     } > DRAM
 
-    .iram 0xf000000 : AT ( _end )
+    .iram 0xf000000 : AT ( _iramcopy )
     {
         _iramstart = .;
         *(.icode)
