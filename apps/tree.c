@@ -1132,8 +1132,7 @@ bool dirbrowse(char *root)
 
                         case TREE_ATTR_LNG:
                             if(!lang_load(buf)) {
-                                set_file(file->name,
-                                         global_settings.lang_file,
+                                set_file(buf, global_settings.lang_file,
                                          MAX_FILENAME);
 
                                 lcd_clear_display();
@@ -1159,7 +1158,7 @@ bool dirbrowse(char *root)
 #ifdef HAVE_LCD_BITMAP
                         case TREE_ATTR_FONT:
                             font_load(buf);
-                            set_file(file->name, global_settings.font_file,
+                            set_file(buf, global_settings.font_file,
                                      MAX_FILENAME);
 
                             lcd_getstringsize("A", &fw, &fh);
