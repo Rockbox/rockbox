@@ -691,8 +691,11 @@ static bool sokoban_loop(void)
         if (current_info.level.boxes_to_go == 0) {
             current_info.level.level++;
 
-            lcd_clear_display();
+			/* clear undo stats */
+			init_undo();
 
+            lcd_clear_display();
+			
             if (current_info.level.level == NUM_LEVELS) {
                 lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
 
