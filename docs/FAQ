@@ -288,61 +288,84 @@ Q35: When I use RockBox my jukebox's red "error" light turns on a lot, but this
 A35: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
 
-Q36: How do I use the loadable fonts? (Recorder-only)
-A36: They are files using an .fnt extension. Just press PLAY on a font you
-     want to use and voila, Rockbox will use it. If the font is put in your
-     /.rockbox directory, your choice will be remembered by Rockbox and thus
-     become your selected font every time you start it in the future.
-     Download fonts from http://rockbox.haxx.se/fonts/
-
-     You can also make your own font. Create one using the "standard" BDF
-     format and then convert that into the Rockbox .fnt format using the
-     convbdf tool.
-
-     Loadable fonts are only available in 1.4 and later releases.
-
-Q37: I have a question about the batteries...
-A37: STOP!  We have put together a completely different FAQ for battery 
+Q36: I have a question about the batteries...
+A36: STOP!  We have put together a completely different FAQ for battery 
      related questions.  
      Check out: http://rockbox.haxx.se/docs/battery-faq.html
 
-Q38: What is the WPS?
-A38: That is the 'While Playing Screen'.  Basically this is what is shown on
+Q37: What is the WPS?
+A37: That is the 'While Playing Screen'.  Basically this is what is shown on
      your player's display while we are playing your song.
 
-Q39: What good is the WPS?  How usable/flexible is it?
-A39: It is very good if you want information about the current item playing ;)
-     Currently the WPS on the Player is very flexible.  By using a file with a
-     '.wps' extension you can manage exactly how/what you want data displayed
-     on your Archos Player. If you PLAY such a file, it'll be used. If the
-     file is placed in your /.rockbox directory, the file name will be
-     remembered and used on subsequent restarts.
-     Please see http://rockbox.haxx.se/manual/wps.html for more information.
+Q38: What good is the WPS?  How usable/flexible is it?
+A38: It is very good if you want information about the current item playing ;)
+     By using a WPS configuration file you can manage exactly how/what you 
+     want displayed on your Archos Player.  (Even better yet, if you want 
+     a feature that's not there, we are _always_ open to suggestions!) 
+     Please see http://rockbox.haxx.se/manual/wps.html for information.
 
-Q40: Can the Player LCD font be modified?
-A40: The simple answer is no.  This is because the Player font is character
-     cell based (as opposed to the Recorder's bitmap based display).  This
+Q39: So how do I load/make a .wps file?
+A39: You check out http://rockbox.haxx.se/docs/custom_wps_format.html to learn
+     the format/features of a .wps file, and you visit 
+     http://rockbox.haxx.se/manual/wps.html to learn how to load it ;)
+
+Q40: Does Rockbox support other languages?
+A40: Sure do.  See the next question.
+
+Q41: How do I load/use different languages? (Recorder-only)
+A41: In the sense of brevity (wouldn't that be a first), check out:
+     http://rockbox.haxx.se/lang
+
+Q42: Why can't I use other languages on the Player?
+A42: See the answer to question 45.  
+
+Q43: Does Rockbox support other fonts/character sets?
+A43: Yuppers.  See the next question.
+
+Q44: How do I use the loadable fonts? (Recorder-only)
+A44: That's and easy one.  To use a loadable font you load it.
+     For less sarcasm check out: http://rockbox.haxx.se/fonts/
+
+Q45: Why can't I use loadable fonts on the Player? 
+A45: This is because the Player font is character cell based (as opposed to 
+     the Recorder's bitmap based display).  This
      means that we are able to choose what characters to display, but not how
      to display them.  We do have the ability to change/create up to 4 chars 
      on one model and 8 on another, however we are currently using several of 
      these 'letters' to store icons for the player.
 
-Q41: Why don't you have any games available for the Players?
-A41: The display on the Players is character cell and not bitmap based.  
+Q46: Why don't you have any games available for the Players?
+A46: The display on the Players is character cell and not bitmap based.  
      This means we can only control what characters get displayed, not
      what pixels are shown.  This makes the prospect of game play very 
-     slim (at least for anything involving graphics).
+     slim (at least for anything involving graphics, so if you have text
+     based games that only use 2 lines send them on in!).
 
-Q42: When recording is finally implimented in Rockbox, will it be possible to
+Q47: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
+     STOP (Player) key be locked?
+A47: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
+     hardware. The firmware can read the keys, but can't prevent them from
+     shutting off the player.
+
+Q48: Where's the recording option?  Why can't I record?!!
+A48: I'd like to say we hid it because we don't like you, but you seem to be
+     a good person so here's the truth.  It's just not implimented in Rockbox
+     yet.  But stress not, you can still use Rolo to boot the default Archos
+     firmware and record from there.  (Check out question #33).
+
+Q49: When recording is finally implimented in Rockbox, will it be possible to
      use custom codecs (like LAME) or is there a built in codec in the Archos?
-A42: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
+A49: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
 
-Q43: What are the max/min bitrates for recording on the Recorder's encoder?
-A43: The builtin encoder is variable bit rate only with a max of 192kbit/s,
+Q50: What are the max/min bitrates for recording on the Recorder's encoder?
+A50: The builtin encoder is variable bit rate only with a max of 192kbit/s,
      and a min of 32kbit/s.
 
-Q44: I have a question about the id3v1 and id3v2 tags...
-A44: Stop!  Here is all the information about that (if you still have
+Q51: Would it be possible to record from line in on the player?
+A51: No.
+
+Q52: I have a question about the id3v1 and id3v2 tags...
+A52: Stop!  Here is all the information about that (if you still have
      questions when done, ask then.)
 
      - Rockbox supports both id3v1 and id3v2
@@ -357,11 +380,8 @@ A44: Stop!  Here is all the information about that (if you still have
 
      - The 300-byte limit is subject to be removed in a future version
 
-Q45: Would it be possible to record from line in on the player?
-A45: No.
-
-Q46: Where exactly did the name 'Rockbox' come from?
-A46: Well you can follow the full line of emails at 
+Q53: Where exactly did the name 'Rockbox' come from?
+A53: Well you can follow the full line of emails at 
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0062.shtml
      However, the brief rundown is that it was recommended first by 
      Tome Cvitan, and put to a vote (which it lost). 
@@ -372,8 +392,8 @@ A46: Well you can follow the full line of emails at
      
      There you have it.  Recommeded by users, decision by dictator.
 
-Q47: Why is there a limit of 400 files in a directory?
-A47: We have answered this question numerous times.  It is mentioned in the
+Q54: Why is there a limit of 400 files in a directory?
+A54: We have answered this question numerous times.  It is mentioned in the
      release notes, and in the mailing list archives 
      (http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-08/0448.shtml).
      But, hey, we wouldn't want people to have to work to get an answer.  
@@ -385,9 +405,9 @@ A47: We have answered this question numerous times.  It is mentioned in the
      file limits in order to provide a greater amount of memory for buffering 
      of files being played.
 
-Q48: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
+Q55: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
      have this be dynamically allocated?
-A48: Because it's useless.  Dynamic memory is only ever useful if you have 
+A55: Because it's useless.  Dynamic memory is only ever useful if you have 
      memory consumers (tasks) that run at different points in time, and thus 
      can reuse the same memory for different purposes. 
 
@@ -405,22 +425,22 @@ A48: Because it's useless.  Dynamic memory is only ever useful if you have
      else is able to use it. This is standard practice in memory-limited 
      systems. 
 
-Q49: Why is there a 10,000 song limit on playlists?
-A49: This is another hardcoded limit.  We feel that as bigger disks arrive 
+Q56: Why is there a 10,000 song limit on playlists?
+A56: This is another hardcoded limit.  We feel that as bigger disks arrive 
      that this limit will increase.  Because of the way that playlists are
      stored, it tends to be a bit more maleable then the directory file limit.
      For further detail, look at questions 47 and 48 and replace any instances
      of '200' with '10,000'.
 
-Q50: You don't understand! I _really_ need to have more then 400 files
+Q57: You don't understand! I _really_ need to have more then 400 files
      in a directory!
-A50: The use of really big directories was a workaround for the poor playlist
+A57: The use of really big directories was a workaround for the poor playlist
      capabilities of the original Archos firmware. With Rockbox, you no longer
      need this workaround. Organize your files in directories, then build
      playlists for all collections you want to shuffle-play.
 
-Q51: How can I make playlists on my PC?
-A51: There are many programs that can create .m3u playlists. WinAmp is one.
+Q58: How can I make playlists on my PC?
+A58: There are many programs that can create .m3u playlists. WinAmp is one.
      Another simple method, that requires no extra software, is to use dir:
 
        dir /b /s X:\ > X:\allfiles.m3u
@@ -436,14 +456,8 @@ A51: There are many programs that can create .m3u playlists. WinAmp is one.
      Remember that playlists are simple text files. You can edit them with any
      normal text editor.
 
-Q52: How can I find out about all the neat features that Rockbox has?
-A52: This information is in our manual (It sometimes gets a bit out of
-     date, so please bear with us.)  The information you are most likely 
-     looking for is a bit down the tree, so the here is the url:
-     http://rockbox.haxx.se/manual/rec-general.html
-
-Q53: How does the shuffle work?
-A53: It sees the playlist as a deck of cards, shuffling the entries using a
+Q59: How does the shuffle work?
+A59: It sees the playlist as a deck of cards, shuffling the entries using a
      pseudo-random generator called the Mersenne Twister. After shuffling,
      the list is never changed again until you reshuffle the list, by
      stopping the playback and restarting. If the repeat mode is enabled,
@@ -453,12 +467,18 @@ A53: It sees the playlist as a deck of cards, shuffling the entries using a
      resume feature can shuffle the playlist in exactly the same way when
      resuming.
 
-Q54: How can I see what bugs are currently open/being worked on?
-A54: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
+Q60: How can I find out about all the neat features that Rockbox has?
+A60: This information is in our manual (It sometimes gets a bit out of
+     date, so please bear with us.)  The information you are most likely 
+     looking for is a bit down the tree, so the here is the url:
+     http://rockbox.haxx.se/manual/rec-general.html
+
+Q61: How can I see what bugs are currently open/being worked on?
+A61: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
      that have been reported.
 
-Q55: How can I report about bugs in Rockbox?
-A55: If we were better programmers we would take that as an insult.  But we
+Q62: How can I report about bugs in Rockbox?
+A62: If we were better programmers we would take that as an insult.  But we
      aren't, so we won't.  The first step in reporting a bug is to review 
      the rules we ask you to follow in your submission (listed at: 
      http://rockbox.haxx.se/bugs.shtml#rules).
@@ -468,14 +488,8 @@ A55: If we were better programmers we would take that as an insult.  But we
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
 
-Q56: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
-     STOP (Player) key be locked?
-A56: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
-     hardware. The firmware can read the keys, but can't prevent them from
-     shutting off the player.
-
-Q57: Could you tell me how to apply a patch?
-A57: There are a ton of ways to apply a patch.  One way is to use the (GNU)
+Q63: Could you tell me how to apply a patch?
+A63: There are a ton of ways to apply a patch.  One way is to use the (GNU)
      'patch' program.  It used like this:
 
        $ cd rockbox-root
