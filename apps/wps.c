@@ -307,6 +307,7 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                status_draw();
                 break;
 
             case BUTTON_DOWN:
@@ -322,6 +323,7 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                status_draw();
                 break;
 #endif
 
