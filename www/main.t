@@ -12,7 +12,8 @@
 <a href="tools.html">tools</a> &middot;
 <a href="internals/">photos</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a> &middot;
-<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">browse cvs</a>
+<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">browse cvs</a> &middot;
+<a href="/isd200/">linux driver</a>
 </small>
 
 <h2>Purpose</h2>
@@ -33,6 +34,8 @@ Try them on your own risk. If you are not 100% sure of what you are doing, keep 
 #include "activity.html"
 
 <h2>News</h2>
+
+<p><i>2002-04-11</i>: The <a href="codes_rec.png">Recorder charset</a> has been mapped.
 
 <p><i>2002-03-28</i>: Lots of new stuff on the web page:
 <a href="docs/FAQ">faq</a>,

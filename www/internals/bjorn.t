@@ -31,7 +31,9 @@
 The board is connected via two pin connectors, one at each end.
 <p><a href="archos_bottom2.jpg"><img src="archos_b2.jpg"></a> (211kB). ICs:
 <ul>
-<li>Archos DCMP3J, most likely an <a href="http://www.hitachi.co.jp/Sicd/English/Products/micom_all/l016e.htm">SH7034</a> SH-1 RISC with custom mask rom. (Thanks to Sven Karlsson.)
+<li>Archos DCMP3J, most likely an 
+<a href="http://www.hitachisemiconductor.com/sic/jsp/japan/eng/products/mpumcu/32bit/superh/sh7032_e.html">SH7034</a>
+SH-1 RISC with custom mask rom. (Thanks to Sven Karlsson.)
 <li><a href="http://focus.ti.com/docs/prod/folders/print/cd54hc573.html">TI HC573M</a> Latch (appears unlabeled in the photo)
 <li><a href="http://www.fairchildsemi.com/pf/74/74LCX245.html">Fairchild LCX245</a> Bidirectional Transceiver
 <li>A standard Motorola AC32 logic IC (xor)

@@ -350,7 +350,7 @@ of the SH1."
 <tr><td>PB3</td><td>CS1</td></tr>
 </table>
 
-<a name="charsets"><p>The charsets:
+<a name="charsets"><p>The player charsets:
 
 <p><table border=0><tr>
 <td><img src="codes_old.png" width=272 height=272><br>
@@ -358,6 +358,9 @@ of the SH1."
 <td><img src="codes_new.png" width=272 height=272><br>
 <small>New LCD charset (after v4.50)</small></td></tr></table>
 
+<p>And the Recorder charset looks like this:
+<br>
+<img src="codes_rec.png">
 
 <h3>Code</h3>
 
@@ -407,5 +410,7 @@ bytes to be loaded by newer firmware ROMs.
 So my "first program" only works on players with older firmware in ROM
 (my has 3.18). Joachim posted a
 <a href="mail/jukebox-archive-2001-12/att-0087/01-AJBREC.ajz">padded version</a> that works everywhere.
+
+<p>Tests have shown that firmware sizes above 200K won't load.
 
 #include "foot.t"
