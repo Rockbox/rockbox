@@ -780,15 +780,16 @@ void lcd_puts_scroll(int x, int y, char* string )
     s->space = (LCD_WIDTH - xmargin - x) / width;
 #endif
     lcd_puts(x,y,string);
-    s->offset=0;
-    s->xpos=x;
-    s->startx=x;
-    s->starty=y;
     s->textlen = strlen(string);
-    strncpy(s->text,string,sizeof s->text);
-    s->text[sizeof s->text - 1] = 0;
-
-    scroll_count = 1;
+    if ( s->textlen > s->space ) {
+        s->offset=0;
+        s->xpos=x;
+        s->startx=x;
+        s->starty=y;
+        strncpy(s->text,string,sizeof s->text);
+        s->text[sizeof s->text - 1] = 0;
+        scroll_count = 1;
+    }
 }
 
 void lcd_stop_scroll(void)
