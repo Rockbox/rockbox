@@ -368,17 +368,15 @@ void start_resume(void)
             }
         }
         else {
-            int start_index;
-
             if (!ask_resume())
                 return;
 
             if (showdir(global_settings.resume_file, 0) < 0 )
                 return;
-            start_index = build_playlist(global_settings.resume_index);
+            build_playlist(global_settings.resume_index);
             play_list(global_settings.resume_file,
                       NULL, 
-                      start_index, 
+                      global_settings.resume_index, 
                       global_settings.resume_offset,
                       global_settings.resume_seed);
         }
