@@ -868,6 +868,10 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
         button = button_get_w_tmo(HZ/5);
 
+        /* ignore leftover release event */
+        if (!lastbutton && (button & BUTTON_REL))
+            continue;
+
 #ifndef SIMULATOR
         if (boot_changed) {
             bool stop = false;
