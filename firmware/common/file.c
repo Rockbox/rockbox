@@ -468,7 +468,8 @@ static int readwrite(int fd, void* buf, int count, bool write)
     /* read/write whole sectors right into/from the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        int rc = fat_readwrite(&(file->fatfile), sectors, buf+nread, write );
+        int rc = fat_readwrite(&(file->fatfile), sectors, 
+            (unsigned char*)buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
@@ -526,7 +527,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                     return nread ? nread : rc * 10 - 6;
                 }
             }
-            memcpy( file->cache, buf + nread, count );
+            memcpy( file->cache, (unsigned char*)buf + nread, count );
             file->dirty = true;
         }
         else {
@@ -538,7 +539,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 file->cacheoffset = -1;
                 return nread ? nread : rc * 10 - 7;
             }
-            memcpy( buf + nread, file->cache, count );
+            memcpy( (unsigned char*)buf + nread, file->cache, count );
         }
             
         nread += count;
