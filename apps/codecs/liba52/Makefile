@@ -17,7 +17,7 @@ endif
 A52OPTS =  
 CFLAGS = $(GCCOPTS) $(A52OPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))

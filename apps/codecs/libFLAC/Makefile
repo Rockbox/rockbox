@@ -29,7 +29,7 @@ CFLAGS = $(GCCOPTS) $(FLACOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
-$(TARGET) $(DEFINES) -E -P -include "config.h" - )
+$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
