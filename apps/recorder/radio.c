@@ -40,11 +40,13 @@
 #include "misc.h"
 #include "keyboard.h"
 #include "screens.h"
+#include "peakmeter.h"
+#include "lang.h"
 
 #ifdef HAVE_FMRADIO
 
-#define MAX_FREQ (110000000)
-#define MIN_FREQ (80000000)
+#define MAX_FREQ (108000000)
+#define MIN_FREQ (87500000)
 #define PLL_FREQ_STEP 10000
 #define FREQ_STEP 100000
 
@@ -110,9 +112,12 @@ bool radio_screen(void)
     int search_dir = 0;
     int fw, fh;
     
+    bool update_screen = true;
+    int timeout = current_tick + HZ/10;
+
     lcd_clear_display();
     lcd_setmargins(0, 8);
-    status_draw(false);
+    status_draw(true);
     fmradio_set_status(FMRADIO_PLAYING);
     lcd_getstringsize("A", &fw, &fh);
 
@@ -129,6 +134,11 @@ bool radio_screen(void)
     radio_set_frequency(curr_freq);
     curr_preset = find_preset(curr_freq);
     
+    peak_meter_playback(true);
+
+    buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
+                  NULL);
+
     while(!done)
     {
         if(search_dir)
@@ -141,19 +151,15 @@ bool radio_screen(void)
 
             /* Tune in and delay */
             radio_set_frequency(curr_freq);
-            sleep(10);
+            sleep(1);
             
             /* Start IF measurement */
             fmradio_set(1, 0x100006 | pll_cnt << 3);
-            sleep(10);
+            sleep(1);
 
             /* Now check how close to the IF frequency we are */
             val = fmradio_read(3);
             i_freq = (val & 0x7ffff) / 80;
-            lcd_puts(0, 5, "Debug data:");
-            snprintf(buf, 128, "IF: %d.%dMHz",
-                     i_freq / 100, (i_freq % 100) / 10);
-            lcd_puts(0, 6, buf);
 
             /* Stop searching if the IF frequency is close to 10.7MHz */
             if(i_freq > 1065 && i_freq < 1075)
@@ -161,33 +167,14 @@ bool radio_screen(void)
                 search_dir = 0;
                 curr_preset = find_preset(curr_freq);
             }
+            
+            update_screen = true;
         }
-
-        freq = curr_freq / 100000;
-        snprintf(buf, 128, "Freq: %d.%dMHz", freq / 10, freq % 10);
-        lcd_puts(0, 2, buf);
-        
-        val = fmradio_read(3);
-        stereo = (val & 0x100000)?true:false;
-        lock = (val & 0x80000)?true:false;
-        snprintf(buf, 128, "Mode: %s", stereo?"Stereo":"Mono");
-        lcd_puts(0, 3, buf);
-
-        if(curr_preset >= 0)
-        {
-            lcd_puts_scroll(0, 1, presets[curr_preset].name);
-        }
-        else
-        {
-            lcd_clearrect(0, 8+fh*1, LCD_WIDTH, fh);
-        }
-        
-        lcd_update();
 
         if(search_dir)
             button = button_get(false);
         else
-            button = button_get_w_tmo(HZ/2);
+            button = button_get_w_tmo(HZ / peak_meter_fps);
         switch(button)
         {
             case BUTTON_OFF:
@@ -237,7 +224,7 @@ bool radio_screen(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw(false);
+                update_screen = true;
                 settings_save();
                 break;
 
@@ -247,7 +234,7 @@ bool radio_screen(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw(false);
+                update_screen = true;
                 settings_save();
                 break;
 
@@ -256,7 +243,10 @@ bool radio_screen(void)
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
-                status_draw(false);
+                buttonbar_set(str(LANG_BUTTONBAR_MENU),
+                              str(LANG_FM_BUTTONBAR_PRESETS),
+                              NULL);
+                update_screen = true;
                 break;
                 
             case BUTTON_F2:
@@ -264,17 +254,55 @@ bool radio_screen(void)
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
-                status_draw(false);
+                buttonbar_set(str(LANG_BUTTONBAR_MENU),
+                              str(LANG_FM_BUTTONBAR_PRESETS),
+                              NULL);
+                update_screen = true;
                 break;
                 
-            case BUTTON_NONE:
-                status_draw(true);
-                break;
-
             case SYS_USB_CONNECTED:
                 usb_screen();
                 fmradio_set_status(0);
                 return true;
+        }
+
+        peak_meter_peek();
+
+        lcd_clearrect(0, 8 + fh*4, LCD_WIDTH, fh);
+        peak_meter_draw(0, 8 + fh*4, LCD_WIDTH, fh);
+        lcd_update_rect(0, 8 + fh*4, LCD_WIDTH, fh);
+        
+        if(update_screen || TIME_AFTER(current_tick, timeout))
+        {
+            update_screen = false;
+
+            timeout = current_tick + HZ/2;
+
+            freq = curr_freq / 100000;
+            snprintf(buf, 128, str(LANG_FM_STATION), freq / 10, freq % 10);
+            lcd_puts(0, 2, buf);
+
+            val = fmradio_read(3);
+            stereo = (val & 0x100000)?true:false;
+            lock = (val & 0x80000)?true:false;
+            snprintf(buf, 128,
+                     stereo?str(LANG_CHANNEL_STEREO):str(LANG_CHANNEL_MONO));
+            lcd_puts(0, 3, buf);
+
+            if(curr_preset >= 0)
+            {
+                lcd_puts_scroll(0, 1, presets[curr_preset].name);
+            }
+            else
+            {
+                lcd_clearrect(0, 8+fh*1, LCD_WIDTH, fh);
+            }
+
+            status_draw(true);
+            
+            buttonbar_draw();
+
+            lcd_update();
         }
     }
 
@@ -321,7 +349,7 @@ void radio_save_presets(void)
     }
     else
     {
-        splash(HZ*2, 0, true, "Preset save failed");
+        splash(HZ*2, 0, true, str(LANG_FM_PRESET_SAVE_FAILED));
     }
 }
 
@@ -411,7 +439,7 @@ bool radio_preset_select(void)
         }
         else
         {
-            splash(HZ*2, 0, true, "No presets");
+            splash(HZ*2, 0, true, str(LANG_FM_NO_PRESETS));
         }
     }
 
@@ -437,7 +465,7 @@ static bool radio_add_preset(void)
     }
     else
     {
-        splash(HZ*2, 0, true, "No free preset entries");
+        splash(HZ*2, 0, true, str(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }
@@ -485,13 +513,12 @@ bool radio_delete_preset(void)
     return reload_dir;
 }
 
-static struct menu_items radio_menu_items[] = {
-    { "Add preset", radio_add_preset },
-    { "Delete preset", radio_delete_preset }
-};
-    
 bool radio_menu(void)
 {
+    struct menu_items radio_menu_items[] = {
+        { str(LANG_FM_SAVE_PRESET), radio_add_preset },
+        { str(LANG_FM_DELETE_PRESET), radio_delete_preset }
+    };
     int m;
     bool result;
 
