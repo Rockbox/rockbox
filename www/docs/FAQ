@@ -25,13 +25,13 @@ A2. The purpose of this project is to write an Open Source replacement
 
 Q3. I want to write code for my Archos, how do I proceed?
 A3. First make sure to read the file CONTRIBUTING in the firmware directory
-    on Sourceforge.  See http://bjorn.haxx.se/rockbox/firmware/CONTRIBUTING
+    on Sourceforge.  See http://rockbox.haxx.se/firmware/CONTRIBUTING
     if you do not want to have to wade through the CVS directories.
 
 Q4: Whats CVS?
 A4: Concurrent Versions System (http://www.cvshome.org).  We have a small
     help page about how to use this to get, update and commit files on the web
-    at http://bjorn.haxx.se/rockbox/cvs.html
+    at http://rockbox.haxx.se/cvs.html
 
 Q5. What exactly is the CONTRIBUTING file? 
 A5. Just like the name implies, it lists conventions that the project follows, 
@@ -65,7 +65,7 @@ A9. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, you need to
 
 Q10. Great you have a mailing list!  Is there anyway for me to catch up on
      past posts?
-A10. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
+A10. Check out the archives at: http://rockbox.haxx.se/mail.cgi
 
 Q11. How can I meet the developers working on the project?
 A11. One way is by visiting us on IRC.  Head on over to the server
@@ -76,7 +76,7 @@ A11. One way is by visiting us on IRC.  Head on over to the server
 
 Q12: Wow, you guys talk on IRC alot?  I wish I had been around for those 
      conversations to see what happened.
-A12: We are glad you mentioned that!  http://bjorn.haxx.se/rockbox/irc happens
+A12: We are glad you mentioned that!  http://rockbox.haxx.se/irc happens
      to have a list of various logs we have recorded of events in the channel.
      Feel free to read up, and ask questions on what you find.
 
@@ -95,7 +95,7 @@ A14. All firmware mods that are presented are still highly experimental.
 Q15. I want to see what the inside of my player looks like, but I would really
      like to avoid voiding my warranty.  Is there anything you can suggest?
 A15. We have a collection of photos of both the player and recorder. Look at
-     http://bjorn.haxx.se/rockbox/internals/
+     http://rockbox.haxx.se/internals/
 
 Q16. What exactly are you trying to achieve with this line of development?
      (A.K.A. whats your purpose for being here?)
@@ -151,24 +151,21 @@ A18. Dear Mr. Gates, you have two options.  Re-read question #17, or go buy
      your own project.
 
 Q19. When do you think there will be a version available for my Archos?
-A19. We recently released version 1.1, so head on over to 
-     http://bjorn.haxx.se/rockbox/download.html and pull it down.  This 
-     versions major changes/improvements include:
-         - Recorder support
-         - Playlist support (max 10000 files, approx 1000 files/sec load time)
-         - Scrolling
+A19. We recently released version 1.2, so head on over to 
+     http://rockbox.haxx.se/download.html and pull it down.
      Make sure to read the release notes.
-     (http://bjorn.haxx.se/rockbox/download/rockbox-1.1-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-1.2-notes.txt).  
 
 Q20. What do you plan to add to coming versions?
 A20. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
-     Version 1.2 
-         UI improvements 
      Version 1.3 
-         Resume, persistent settings, autobuild playlists, UI improvements 
+         Persistent settings for Player, UI improvements
+
+     Version 1.4
+         Recording?
 
 Q21. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
@@ -183,7 +180,7 @@ A22: You have a couple options here.  You could forget the question, find an
      easier question, or accept '42' as the answer no matter what.  We don't 
      really recommend any of these (though I do opt for '42' often myself).
      What we do recommend is stopping by IRC, reading 
-     http://bjorn.haxx.se/rockbox to see if the question was answered else 
+     http://rockbox.haxx.se to see if the question was answered else 
      where and just not included here, or ultimatly dropping an email to the 
      mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the 
      project homepage.
