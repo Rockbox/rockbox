@@ -259,7 +259,8 @@ bool dirbrowse(char *root)
 
         switch(button) {
             case TREE_EXIT:
-                play_mode = 0;
+                if ( play_mode == 1 )
+                    play_mode = 0;
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -279,8 +280,10 @@ bool dirbrowse(char *root)
                         start = dircursor = 0;
                     restore = true;
                 }
-                else
+                else {
                     mpeg_stop();
+                    play_mode = 0;
+                }
                 break;
 
             case TREE_ENTER:
