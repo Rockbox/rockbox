@@ -1176,6 +1176,7 @@ int playlist_resume(void)
     int buflen;
     int nread;
     int total_read = 0;
+    int control_file_size = 0;
     bool first = true;
     bool sorted = true;
 
@@ -1204,6 +1205,13 @@ int playlist_resume(void)
         return -1;
     }
     playlist->control_created = true;
+
+    control_file_size = filesize(playlist->control_fd);
+    if (control_file_size <= 0)
+    {
+        splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
 
     /* read a small amount first to get the header */
     nread = read(playlist->control_fd, buffer,
@@ -1492,10 +1500,15 @@ int playlist_resume(void)
 
         if (!newline || (exit_loop && count<nread))
         {
+            if ((total_read + count) >= control_file_size)
+            {
+                /* no newline at end of control file */
+                splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_INVALID));
+                return -1;
+            }
+
             /* We didn't end on a newline or we exited loop prematurely.
-               Either way, re-read the remainder.
-               NOTE: because of this, control file must always end with a
-                     newline */
+               Either way, re-read the remainder. */
             count = last_newline;
             lseek(playlist->control_fd, total_read+count, SEEK_SET);
         }
