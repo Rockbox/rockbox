@@ -119,30 +119,22 @@ void ide_power_enable(bool on)
     if(on)
     {
 #ifdef ATA_POWER_PLAYERSTYLE
-        if (is_new_player())
-        {
-            or_b(0x10, &PBDRL);
-            touched = true;
-        }
+        or_b(0x10, &PBDRL);
 #else
         or_b(0x20, &PADRL);
-        touched = true;
 #endif
+        touched = true;
     }
 #endif
 #ifdef HAVE_ATA_POWER_OFF
     if(!on)
     {
 #ifdef ATA_POWER_PLAYERSTYLE
-        if (is_new_player())
-        {
-            and_b(~0x10, &PBDRL);
-            touched = true;
-        }
+        and_b(~0x10, &PBDRL);
 #else
         and_b(~0x20, &PADRL);
-        touched = true;
 #endif
+        touched = true;
     }
 #endif
 
@@ -166,20 +158,18 @@ bool ide_powered(void)
 {
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
-    if (is_new_player())
-    {
-        if ((PBCR2 & 0x0300) || !(PBIOR & 0x0010)) /* not configured for output */
-            return false; /* would be floating low, disk off */
-        else
-            return (PBDR & 0x0010) != 0;
-    }
+    /* This is not correct for very old players, since these are unable to
+     * control hd power. However, driving the pin doesn't hurt, because it
+     * is not connected anywhere */
+    if ((PBCR2 & 0x0300) || !(PBIORL & 0x10)) /* not configured for output */
+        return false; /* would be floating low, disk off */
     else
-        return true; /* old player: always on */
+        return (PBDRL & 0x10) != 0;
 #else
-    if ((PACR2 & 0x0400) || !(PAIOR & 0x0020)) /* not configured for output */
+    if ((PACR2 & 0x0400) || !(PAIORL & 0x20)) /* not configured for output */
         return true; /* would be floating high, disk on */
     else
-        return (PADR & 0x0020) != 0;
+        return (PADRL & 0x20) != 0;
 #endif /* ATA_POWER_PLAYERSTYLE */
 #else
     return true; /* pretend always powered if not controlable */
