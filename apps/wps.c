@@ -417,6 +417,9 @@ static bool ffwd_rew(int button)
         if (!exit)
             button = button_get(true);
     }
+
+    /* let mpeg thread update id3->elapsed before calling wps_refresh */
+    yield(); 
     wps_refresh(id3, 0, WPS_REFRESH_ALL);
     return usb;
 }
