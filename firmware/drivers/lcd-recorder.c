@@ -244,8 +244,10 @@ int lcd_getstringsize(unsigned char *str, int *w, int *h)
         /* get proportional width and glyph bits*/
         width += pf->width? pf->width[ch]: pf->maxwidth;
     }
-    *w = width;
-    *h = pf->height;
+    if ( w )
+        *w = width;
+    if ( h )
+        *h = pf->height;
 
     return width;
 }
