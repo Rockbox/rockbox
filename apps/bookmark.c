@@ -1004,8 +1004,6 @@ static bool parse_bookmark(char *bookmark,
     if (end)
     {
         local_resume_file = strtok_r(NULL, ";", &end);
-        if (local_resume_file[strlen(local_resume_file) - 1] == '/')
-            local_resume_file[strlen(local_resume_file) - 1] = '\0';
 
         if (end)
             local_file_name = strtok_r(NULL, ";", &end);
