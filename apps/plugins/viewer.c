@@ -356,7 +356,7 @@ static void fill_buffer(long pos, unsigned char* buf, unsigned size)
 
     rb->lseek(fd, pos, SEEK_SET);
     numread = rb->read(fd, buf, size);
-    while (rb->button_get(false)); /* clear button queue */
+    rb->button_clear_queue(); /* clear button queue */
 
     for(i = 0; i < numread; i++) {
         switch(buf[i]) {

@@ -901,7 +901,7 @@ void splash(int ticks,       /* how long the splash is displayed */
 void charging_splash(void)
 {
     splash(2*HZ, true, str(LANG_BATTERY_CHARGE));
-    while (button_get(false));
+    button_clear_queue();
 }
 
 

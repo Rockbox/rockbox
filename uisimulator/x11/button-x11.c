@@ -235,4 +235,5 @@ int button_status(void)
 
 void button_clear_queue(void)
 {
+    while (get_raw_button());
 }

@@ -397,7 +397,7 @@ void cal_initial (void)
     printResult();
 
     /* clear button queue */
-    while (rb->button_get(false));
+    rb->button_clear_queue();
 }
 
 /* -----------------------------------------------------------------------
@@ -1357,7 +1357,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     } /* while (calStatus != cal_exit ) */
 
     /*  rb->splash(HZ*2, true, "Hello world!"); */
-    while (rb->button_get(false));
+    rb->button_clear_queue();
     return PLUGIN_OK;
 }
 

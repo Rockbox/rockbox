@@ -437,7 +437,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     load_config();
 
     /*Empty the event queue*/
-    while (rb->button_get(false)!=BUTTON_NONE) ;
+    rb->button_clear_queue();
 
     display(e,h,false);
     show_abbrev();

@@ -1520,7 +1520,7 @@ int scroll_bmp(struct t_disp* pdisp)
     int lastbutton = 0;
 
     /*empty the button queue first, to avoid unwanted scrolling */
-    while(rb->button_get(false) != BUTTON_NONE);
+    rb->button_clear_queue();
 
     while (true)
     {

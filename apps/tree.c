@@ -1127,7 +1127,7 @@ static bool dirbrowse(void)
             lastfilter = *tc.dirfilter;
             lastsortcase = global_settings.sort_case;
             restore = true;
-            while (button_get(false)); /* clear button queue */
+            button_clear_queue(); /* clear button queue */
         }
 
         if (exit_func)

@@ -125,7 +125,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_puts_scroll(0,1,"PLAY to begin");
 
     /*Empty the event queue*/
-    while (rb->button_get(false)!=BUTTON_NONE);
+    rb->button_clear_queue();
 
     /* Define the start pattern */
     s[0]=(rb->rand()%9)*7;

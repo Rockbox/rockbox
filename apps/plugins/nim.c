@@ -174,7 +174,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         min=0;
 
         /*Empty the event queue*/
-        while (rb->button_get(false)!=BUTTON_NONE);
+        rb->button_clear_queue();
 
         /* Game loop */
         while(end!=true)

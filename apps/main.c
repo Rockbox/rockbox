@@ -149,8 +149,7 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     mpeg_init();
-    while (button_get(false) != 0)
-      ; /* Empty the keyboard buffer */
+    button_clear_queue(); /* Empty the keyboard buffer */
 }
 
 #else
