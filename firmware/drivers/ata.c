@@ -111,7 +111,7 @@ static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*10;
     last_disk_activity = timeout;
-    while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
+    while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY))
         yield();
 
     if (TIME_BEFORE(current_tick, timeout))
@@ -676,14 +676,14 @@ static int master_slave_detect(void)
 {
     /* master? */
     ATA_SELECT = 0;
-    if ( ATA_STATUS & STATUS_RDY ) {
+    if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
         ata_device = 0;
         DEBUGF("Found master harddisk\n");
     }
     else {
         /* slave? */
         ATA_SELECT = SELECT_DEVICE1;
-        if ( ATA_STATUS & STATUS_RDY ) {
+        if ( ATA_STATUS & (STATUS_RDY|STATUS_BSY) ) {
             ata_device = SELECT_DEVICE1;
             DEBUGF("Found slave harddisk\n");
         }
@@ -697,7 +697,7 @@ static int io_address_detect(void)
 {
     unsigned char tmp = ATA_STATUS & 0xf9; /* Mask the IDX and CORR bits */
     unsigned char dummy;
-    
+        
     /* We compare the STATUS register with the ALT_STATUS register, which
        is located at the same address as CONTROL. If they are the same, we
        assume that we have the correct address.
@@ -725,7 +725,7 @@ static int io_address_detect(void)
     }
 
     /* Let's check again, to be sure */
-    if(tmp != ATA_CONTROL)
+    if(tmp != (ATA_ALT_STATUS & 0xf9))
     {
         DEBUGF("ATA I/O address detection failed\n");
         return -1;
@@ -797,10 +797,10 @@ unsigned short* ata_get_identify(void)
 
 int ata_init(void)
 {
-	int rc;
-	bool coldstart = (PACR2 & 0x4000) != 0; 
+    int rc;
+    bool coldstart = (PACR2 & 0x4000) != 0; 
 
-	mutex_init(&ata_mtx);
+    mutex_init(&ata_mtx);
 
     led(false);
 
