@@ -7,6 +7,9 @@
 Since there is a great deal of technical discussion, we log these sessions
 for later reference.
 
+<p>If you are lazy and don't want to download and install an IRC client, try visiting
+Roland's <a href=http://rockbox.my-vserver.de/chat/chat.html>Java IRC page</a>.
+
 <h2>Nick reference</h2>
 <pre>
 #include "nicks.txt"
