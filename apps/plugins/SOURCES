@@ -67,4 +67,5 @@ alpine_cdc.c
 mpa2wav.c
 a52towav.c
 flac2wav.c
+vorbis2wav.c
 #endif

@@ -53,6 +53,12 @@ void* calloc(size_t nmemb, size_t size) {
   return(x);
 }
 
+void* alloca(size_t size) {
+  void* x;
+  x=malloc(size);
+  return(x);
+}
+
 void free(void* ptr) {
   (void)ptr;
 }
@@ -74,6 +80,14 @@ void *memset(void *s, int c, size_t n) {
 
 int memcmp(const void *s1, const void *s2, size_t n) {
   return(local_rb->memcmp(s1,s2,n));
+}
+
+void* memchr(const void *s, int c, size_t n) {
+  /* TO DO: Implement for Tremor */
+  (void)s;
+  (void)c;
+  (void)n;
+  return(NULL);
 }
 
 void* memmove(const void *s1, const void *s2, size_t n) {
