@@ -5,7 +5,7 @@
 ;;
 ;;   /* -----------------------------------------------------------------
 ;;    * local variables:
-;;    * eval: (load-file "../curl-mode.el")
+;;    * eval: (load-file "rockbox-mode.el")
 ;;    * end:
 ;;    */
 ;;
@@ -14,7 +14,7 @@
 
 ;;; The rockbox hacker's C conventions
 
-;;; we use intent-level 2
+;;; we use intent-level 4
 (setq c-basic-offset 4)
 ;;; never ever use tabs to indent!
 (setq indent-tabs-mode nil)
