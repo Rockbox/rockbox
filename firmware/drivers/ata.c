@@ -82,7 +82,7 @@ static volatile unsigned char* ata_control;
 bool old_recorder = false;
 int ata_spinup_time = 0;
 static bool spinup = false;
-static bool sleeping = false;
+static bool sleeping = true;
 static int sleep_timeout = 5*HZ;
 static bool poweroff = false;
 #ifdef HAVE_ATA_POWER_OFF
@@ -812,6 +812,7 @@ int ata_init(void)
     PADR |= 0x0200; /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 
+    sleeping = false;
     ata_enable(true);
 
     if ( !initialized ) {
