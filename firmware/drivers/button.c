@@ -25,6 +25,7 @@
 #include "sh7034.h"
 #include "button.h"
 #include "kernel.h"
+#include "backlight.h"
 
 static struct event_queue button_queue;
 
@@ -66,7 +67,10 @@ static void button_tick(void)
                 }
             }
             if ( post )
+            {
                 queue_post(&button_queue, btn, NULL);
+                backlight_on();
+            }
         }
         else {
             repeat = false;
@@ -76,6 +80,8 @@ static void button_tick(void)
         lastbtn = btn;
         tick = 0;
     }
+
+    backlight_tick();
 }
 
 int button_get(bool block)
