@@ -2334,16 +2334,16 @@ voice: "Voice Directories"
 new: "Röstkataloger"
 
 id: LANG_VOICE_DIR_ENTER
-desc: "talkbox" mode for directories
-eng: "on enter"
-voice: "on enter"
-new: "vid ingång"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_VOICE_DIR_HOVER
-desc: "talkbox" mode for directories
-eng: "while hovering"
-voice: "while hovering"
-new: "under svävning"
+desc: "talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: "talk mp3 clip"
+new: "säg mp3-klippet"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
@@ -2798,9 +2798,11 @@ new: "Avslutar..."
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
+voice: ""
 new: "Installationen ofullständig" 
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
+voice: ""
 new: "Ingen .rockbox katalog"
