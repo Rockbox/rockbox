@@ -30,6 +30,9 @@
 
 #ifdef SIMULATOR
 #include <stdio.h>
+#ifdef WIN32
+#include "sprintf.h"
+#endif // need that for win32 as snprintf is defined nowhere
 #else
 #include "sprintf.h"
 #endif
