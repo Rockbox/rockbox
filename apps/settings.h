@@ -73,6 +73,7 @@ struct user_settings
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* random seed for playlist shuffle */
+    int resume_first_index; /* first index of playlist */
     unsigned char resume_file[MAX_PATH+1]; /* playlist name (or dir) */
 
     /* misc options */

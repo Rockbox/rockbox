@@ -505,7 +505,8 @@ void start_resume(void)
                           global_settings.resume_index,
                           true, /* the index is AFTER shuffle */
                           global_settings.resume_offset,
-                          global_settings.resume_seed );
+                          global_settings.resume_seed,
+                          global_settings.resume_first_index);
                 *slash='/';
             }
             else {
@@ -523,7 +524,8 @@ void start_resume(void)
                           global_settings.resume_index,
                           true,
                           global_settings.resume_offset,
-                          global_settings.resume_seed );
+                          global_settings.resume_seed,
+                          global_settings.resume_first_index);
             }
         }
         else {
@@ -541,7 +543,8 @@ void start_resume(void)
                       global_settings.resume_index,
                       true,
                       global_settings.resume_offset,
-                      global_settings.resume_seed);
+                      global_settings.resume_seed,
+                      global_settings.resume_first_index);
         }
 
         status_set_playmode(STATUS_PLAY);
@@ -775,7 +778,8 @@ bool dirbrowse(char *root)
                                 snprintf(global_settings.resume_file,
                                          MAX_PATH, "%s/%s",
                                          currdir, file->name);
-                            play_list(currdir, file->name, 0, false, 0, seed );
+                            play_list(currdir, file->name, 0, false, 0,
+                                      seed, 0);
                             start_index = 0;
                             play = true;
                             break;
@@ -790,7 +794,7 @@ bool dirbrowse(char *root)
                                the (shuffled) list and stor that */
                             start_index = play_list(currdir, NULL,
                                                     start_index, false,
-                                                    0, seed);
+                                                    0, seed, 0);
                             play = true;
                             break;
 
@@ -872,6 +876,7 @@ bool dirbrowse(char *root)
                                shuffled list in case shuffle is enabled */
                             global_settings.resume_index = start_index;
                             global_settings.resume_offset = 0;
+                            global_settings.resume_first_index = start_index;
                             global_settings.resume_seed = seed;
                             settings_save();
                         }

@@ -68,23 +68,30 @@ int playlist_add(char *filename)
 
 static int get_next_index(int steps)
 {
-    int next_index = -1;
+    int current_index = playlist.index;
+    int next_index    = -1;
 
     switch (global_settings.repeat_mode)
     {
         case REPEAT_OFF:
-            next_index = playlist.index+steps;
+            if (current_index < playlist.first_index)
+                current_index += playlist.amount;
+            current_index -= playlist.first_index;
+
+            next_index = current_index+steps;
             if ((next_index < 0) || (next_index >= playlist.amount))
                 next_index = -1;
+            else
+                next_index = (next_index+playlist.first_index)%playlist.amount;
             break;
 
         case REPEAT_ONE:
-            next_index = playlist.index;
+            next_index = current_index;
             break;
 
         case REPEAT_ALL:
         default:
-            next_index = (playlist.index+steps) % playlist.amount;
+            next_index = (current_index+steps) % playlist.amount;
             while (next_index < 0)
                 next_index += playlist.amount;
             break;
@@ -212,13 +219,15 @@ int play_list(char *dir,         /* "current directory" */
               bool shuffled_index, /* if TRUE the specified index is for the
                                        playlist AFTER the shuffle */
               int start_offset,  /* offset in the file */
-              int random_seed )  /* used for shuffling */
+              int random_seed,   /* used for shuffling */
+              int first_index )  /* first index of playlist */
 {
     char *sep="";
     int dirlen;
     empty_playlist();
 
     playlist.index = start_index;
+    playlist.first_index = first_index;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -283,6 +292,7 @@ int play_list(char *dir,         /* "current directory" */
                     if(seek_pos == playlist.indices[i]) {
                         /* here's the start song! yiepee! */
                         playlist.index = i;
+                        playlist.first_index = i;
                         break; /* now stop searching */
                     }
                 }

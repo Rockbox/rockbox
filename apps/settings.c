@@ -112,6 +112,7 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 
+0xF4  (int) Playlist first index
 0xF8  (int) Playlist shuffle seed
 0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
 
@@ -316,9 +317,11 @@ int settings_save( void )
     config_block[0x1e] = (unsigned char)global_settings.peak_meter_release;
     config_block[0x1f] = (unsigned char)global_settings.repeat_mode;
 
+    memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
+
+    memcpy(&config_block[0xF4], &global_settings.resume_first_index, 4);
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
-    memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
     strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
     
     DEBUGF("+Resume file %s\n",global_settings.resume_file);
@@ -471,10 +474,11 @@ void settings_load(void)
         if (config_block[0x1f] != 0xFF)
             global_settings.repeat_mode = config_block[0x1f];
 
-        memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
-
         if (config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &config_block[0x24], 4);
+
+        memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
+        memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
         global_settings.resume_file[MAX_PATH]=0;
