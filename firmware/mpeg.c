@@ -301,6 +301,7 @@ static void set_elapsed(struct mp3entry* id3)
 
 static bool paused; /* playback is paused */
 #ifdef SIMULATOR
+static bool is_playing = false;
 static bool playing = false;
 static bool play_pending = false;
 #else
@@ -1303,7 +1304,7 @@ void mpeg_play(int offset)
     int steps=0;
 
     do {
-        trackname = playlist_next( steps, NULL );
+        trackname = playlist_peek( steps );
         if (!trackname)
             break;
         if(mp3info(&taginfo, trackname)) {
@@ -1311,8 +1312,10 @@ void mpeg_play(int offset)
             steps++;
             continue;
         }
+        playlist_next(steps);
         taginfo.offset = offset;
         set_elapsed(&taginfo);
+        is_playing = true;
         playing = true;
         break;
     } while(1);
@@ -1326,6 +1329,7 @@ void mpeg_stop(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
 #else
+    is_playing = false;
     playing = false;
 #endif
 }
@@ -1335,6 +1339,7 @@ void mpeg_pause(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
 #else
+    is_playing = false;
     playing = false;
     paused = true;
 #endif
@@ -1345,6 +1350,7 @@ void mpeg_resume(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
 #else
+    is_playing = true;
     playing = true;
     paused = false;
 #endif
@@ -1360,15 +1366,17 @@ void mpeg_next(void)
     int index;
 
     do {
-        file = playlist_next(steps, &index);
+        file = playlist_peek(steps);
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
             steps++;
             continue;
         }
+        index = playlist_next(steps);
         current_track_counter++;
         taginfo.index = index;
+        is_playing = true;
         playing = true;
         break;
     } while(1);
@@ -1385,15 +1393,17 @@ void mpeg_prev(void)
     int index;
 
     do {
-        file = playlist_next(steps, &index);
+        file = playlist_peek(steps);
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
             steps--;
             continue;
         }
+        index = playlist_next(steps);
         current_track_counter++;
         taginfo.index = index;
+        is_playing = true;
         playing = true;
         break;
     } while(1);
