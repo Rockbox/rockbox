@@ -1985,16 +1985,19 @@ void mpeg_sound_channel_config(int configuration)
 #ifdef HAVE_MAS3587F
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
-   parameters and the result is that the audio is played at another pitch */
-void mpeg_set_pitch(int percent)
+   parameters and the result is that the audio is played at another pitch.
+
+   The pitch value is in tenths of percent.
+*/
+void mpeg_set_pitch(int pitch)
 {
     unsigned long val;
 
-    /* invert percent value */
-    percent = 10000/percent;
+    /* invert pitch value */
+    pitch = 1000000/pitch;
 
     /* Calculate the new (bogus) frequency */
-    val = 18432*percent/100;
+    val = 18432*pitch/1000;
     
     mas_writemem(MAS_BANK_D0,0x7f3,&val,1);
 

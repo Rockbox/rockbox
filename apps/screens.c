@@ -116,11 +116,9 @@ void usb_screen(void)
    2 if USB was connected */
 int on_screen(void)
 {
-    static int pitch = 100;
+    static int pitch = 1000;
     bool exit = false;
     bool used = false;
-
-    lcd_setfont(FONT_SYSFIXED);
 
     while (!exit) {
 
@@ -131,14 +129,15 @@ int on_screen(void)
 
             lcd_scroll_pause();
             lcd_clear_display();
-
+            lcd_setfont(FONT_SYSFIXED);
+    
             ptr = str(LANG_PITCH_UP);
             lcd_getstringsize(ptr,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_UpArrow],
                        LCD_WIDTH/2 - 3, h*2, 7, 8, true);
 
-            snprintf(buf, sizeof buf, "%d%%", pitch);
+            snprintf(buf, sizeof buf, "%d.%d%%", pitch / 10, pitch % 10 );
             lcd_getstringsize(buf,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, h, buf);
 
@@ -165,8 +164,8 @@ int on_screen(void)
             case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
                 used = true;
                 pitch++;
-                if ( pitch > 200 )
-                    pitch = 200;
+                if ( pitch > 2000 )
+                    pitch = 2000;
 #ifdef HAVE_MAS3587F
                 mpeg_set_pitch(pitch);
 #endif
@@ -177,8 +176,8 @@ int on_screen(void)
             case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
                 used = true;
                 pitch--;
-                if ( pitch < 50 )
-                    pitch = 50;
+                if ( pitch < 500 )
+                    pitch = 500;
 #ifdef HAVE_MAS3587F
                 mpeg_set_pitch(pitch);
 #endif
@@ -197,6 +196,34 @@ int on_screen(void)
             case BUTTON_ON | BUTTON_PLAY | BUTTON_REL:
                 mpeg_resume();
                 exit = true;
+                break;
+
+            case BUTTON_ON | BUTTON_RIGHT:
+                if ( pitch < 2000 ) {
+                    pitch += 20;
+                    mpeg_set_pitch(pitch);
+                }
+                break;
+
+            case BUTTON_RIGHT | BUTTON_REL:
+                if ( pitch > 500 ) {
+                    pitch -= 20;
+                    mpeg_set_pitch(pitch);
+                }
+                break;
+
+            case BUTTON_ON | BUTTON_LEFT:
+                if ( pitch > 500 ) {
+                    pitch -= 20;
+                    mpeg_set_pitch(pitch);
+                }
+                break;
+
+            case BUTTON_LEFT | BUTTON_REL:
+                if ( pitch < 2000 ) {
+                    pitch += 20;
+                    mpeg_set_pitch(pitch);
+                }
                 break;
 
 #ifdef SIMULATOR
