@@ -396,8 +396,7 @@ int wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
                     lcd_icon(ICON_PARAM, false);
 #endif
-                    menu_button_is_down = false;
-                    if(!keys_locked && !dont_go_to_menu)
+                    if(!keys_locked && !dont_go_to_menu && menu_button_is_down)
                     {
                         lcd_stop_scroll();
                         button_set_release(old_release_mask);
@@ -410,6 +409,7 @@ int wps_show(void)
                     {
                         dont_go_to_menu = false;
                     }
+                    menu_button_is_down = false;
                     break;
 
 #ifdef HAVE_RECORDER_KEYPAD
