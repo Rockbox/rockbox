@@ -4,14 +4,18 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I../.. -I../../drivers
+INCLUDES=-I../../common -I../.. -I../../drivers
 
-CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) -DDEBUG
+TARGET = -DARCHOS_PLAYER_OLD=1
+
+CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
 OBJS= ../../crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o \
-	 ../../debug.o ../../kernel.o thread.o ../../common/sprintf.o \
-	 ../../panic.o ../../system.o ../../drivers/led.o mp3data.o
+	../../debug.o ../../kernel.o thread.o ../../common/sprintf.o \
+	../../panic.o ../../system.o ../../drivers/led.o \
+	../../drivers/lcd.o ../../drivers/ata.o ../../drivers/fat.o \
+	../../common/disk.o ../../common/file.o ../../common/dir.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
