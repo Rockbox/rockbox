@@ -186,7 +186,11 @@ SECTIONS
        *(.stack)
        _stackbegin = . - SIZEOF(.iram);
        stackbegin = . - SIZEOF(.iram);
+#if MEMORYSIZE >= 32
+       . += 0x8000 - SIZEOF(.iram);
+#else
        . += 0x2000 - SIZEOF(.iram);
+#endif
        _stackend = .;
        stackend = .;
     } > DRAM
