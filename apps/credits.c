@@ -68,7 +68,7 @@ void roll_credits(void)
     int numnames = sizeof(credits)/sizeof(char*);
     char buffer[40];
 
-    int y=64;
+    int y=LCD_HEIGHT;
 
     int height;
     int width;
@@ -79,7 +79,7 @@ void roll_credits(void)
 
     while(1) {
         lcd_clear_display();
-        for ( i=0; i <= (64-y)/height; i++ )
+        for ( i=0; i <= (LCD_HEIGHT-y)/height; i++ )
             lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"");
         snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
                  line+1, numnames);
