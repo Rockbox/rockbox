@@ -305,6 +305,7 @@ Menu menu_run(int m)
             case BUTTON_MENU:
 #endif
                 lcd_stop_scroll();
+                while (button_get(false)); /* clear button queue */
                 return result;
 
 #ifdef HAVE_RECORDER_KEYPAD
