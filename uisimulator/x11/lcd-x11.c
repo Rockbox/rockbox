@@ -113,9 +113,10 @@ void lcd_update_rect(int x_start, int y_start,
     struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
     struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
+#if 0
     fprintf(stderr, "%04d: lcd_update_rect(%d, %d, %d, %d)\n",
             counter++, x_start, y_start, width, height);
-
+#endif
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (yline + height)/8;
     yline /= 8;
