@@ -301,9 +301,9 @@ void add_indices_to_playlist(void)
     int nread;
     int fd = -1;
     int i = 0;
-    int store_index = 0;
     int count = 0;
     int next_tick = current_tick + HZ;
+    bool store_index = true;
 
     unsigned char *p = playlist_buffer;
     char line[16];
@@ -314,7 +314,7 @@ void add_indices_to_playlist(void)
             return; /* failure */
     }
 
-    store_index = 1;
+    store_index = true;
 
     while(1)
     {
@@ -334,47 +334,42 @@ void add_indices_to_playlist(void)
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
             {
-                store_index = 1;
+                store_index = true;
             } 
-            else if(!playlist.in_ram && (*p == '#') && store_index)
-            {
-                /* If the first character on a new line is a hash
-                   sign, we treat it as a comment. So called winamp
-                   style playlist.
-                   This applies only to playlist files, of course */
-                store_index = 0;
-            }
             else if(store_index) 
             {
-                
-                /* Store a new entry */
-                playlist.indices[ playlist.amount ] = i+count;
-                playlist.amount++;
-                if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
-                    if(!playlist.in_ram)
-                        close(fd);
+				store_index = false;
 
-                    lcd_clear_display();
-                    lcd_puts(0,0,"Playlist");
-                    lcd_puts(0,1,"buffer full");
-                    lcd_update();
-                    sleep(HZ*2);
-                    lcd_clear_display();
+                if(playlist.in_ram || (*p != '#'))
+                {
+                    /* Store a new entry */
+                    playlist.indices[ playlist.amount ] = i+count;
+                    playlist.amount++;
+                    if ( playlist.amount >= MAX_PLAYLIST_SIZE ) {
+                        if(!playlist.in_ram)
+                            close(fd);
 
-                    return;
-                }
-
-                store_index = 0;
-                /* Update the screen if it takes very long */
-                if(!playlist.in_ram) {
-                    if ( current_tick >= next_tick ) {
-                        next_tick = current_tick + HZ;
-                        snprintf(line, sizeof line, "%d files",
-                                 playlist.amount);
-                        lcd_puts(0,1,line);
-                        status_draw();
+                        lcd_clear_display();
+                        lcd_puts(0,0,"Playlist");
+                        lcd_puts(0,1,"buffer full");
                         lcd_update();
+                        sleep(HZ*2);
+                        lcd_clear_display();
+
+                        return;
                     }
+
+                    /* Update the screen if it takes very long */
+                    if(!playlist.in_ram) {
+                        if ( current_tick >= next_tick ) {
+                            next_tick = current_tick + HZ;
+                            snprintf(line, sizeof line, "%d files",
+                                     playlist.amount);
+                            lcd_puts(0,1,line);
+                            status_draw();
+                            lcd_update();
+                        }
+			        }
                 }
             }
         }
