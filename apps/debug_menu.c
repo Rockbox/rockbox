@@ -815,13 +815,7 @@ bool view_battery(void)
                     power_history[POWER_HISTORY_LEN-1] % 100);
                 lcd_puts(0, 3, buf);
 
-                snprintf(buf, 30, "Lazy time amount: %d%%",
-                    (powermgmt_last_cycle_startstop_min < 20)
-                    ? battery_lazyness[powermgmt_last_cycle_startstop_min]
-                    : 0);
-                lcd_puts(0, 4, buf);
-
-                snprintf(buf, 30, "resulting act.lev: %d%%", battery_level());
+                snprintf(buf, 30, "battery level: %d%%", battery_level());
                 lcd_puts(0, 5, buf);
 
                 snprintf(buf, 30, "Est. remaining: %d m", battery_time());

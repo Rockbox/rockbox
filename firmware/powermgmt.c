@@ -63,35 +63,39 @@ void set_battery_capacity(int capacity)
 }
 #else /* not SIMULATOR */
 
+int battery_capacity = 1500;                   /* only a default value */
+int battery_level_cached = -1;                 /* battery level of this minute, updated once per minute */
+
 static int poweroff_idle_timeout_value[15] =
 {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
-static int percent_to_volt_nocharge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
+static int percent_to_volt_decharge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
-    450, 481, 491, 497, 503, 507, 512, 514, 517, 528, 560
+    /* original values were taken directly after charging, */
+    /* but it should show 100% after turning off the device for some hours, too */
+    450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 /* orig. values: ...,528,560 */
 };
-
-int battery_capacity = 1500;                 /* only a default value */
 
 void set_battery_capacity(int capacity)
 {
     battery_capacity = capacity;
-    if ((battery_capacity > BATTERY_CAPACITY_MAX) || (battery_capacity < 1500))
+    if (battery_capacity > BATTERY_CAPACITY_MAX)
+        battery_capacity = BATTERY_CAPACITY_MAX;
+    if (battery_capacity < 1500)
         battery_capacity = 1500;
 }
 
 #ifdef HAVE_CHARGE_CTRL
 
-char power_message[POWER_MESSAGE_LEN] = "";
-char charge_restart_level = CHARGE_RESTART_HI;
-
-int powermgmt_last_cycle_startstop_min = 20; /* how many minutes ago was the charging started or stopped? */
-int powermgmt_last_cycle_level = 0;          /* which level had the batteries at this time? */
+char power_message[POWER_MESSAGE_LEN] = "";    /* message that's shown in debug menu */
+char charge_restart_level = CHARGE_RESTART_HI; /* level at which charging starts */
+int powermgmt_last_cycle_startstop_min = 25;   /* how many minutes ago was the charging started or stopped? */
+int powermgmt_last_cycle_level = 0;            /* which level had the batteries at this time? */
 bool trickle_charge_enabled = true;
-int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
-int charge_state = 0;                        /* at the beginning, the charger does nothing */
+int trickle_sec = 0;                           /* how many seconds should the charger be enabled per minute for trickle charging? */
+int charge_state = 0;                          /* at the beginning, the charger does nothing */
 
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
@@ -104,11 +108,6 @@ void enable_trickle_charge(bool on)
 }
 #endif /* HAVE_CHARGE_CTRL */
 
-int battery_lazyness[20] = /* how does the battery react when plugging in/out the charger */
-{
-    0, 17, 31, 42, 52, 60, 67, 72, 77, 81, 84, 87, 89, 91, 92, 94, 95, 95, 96, 97  
-};
-
 static char power_stack[DEFAULT_STACK_SIZE];
 static char power_thread_name[] = "power";
 
@@ -120,7 +119,6 @@ static bool sleeptimer_active = false;
 static unsigned long sleeptimer_endtick;
 
 unsigned short power_history[POWER_HISTORY_LEN];
-
 
 int battery_time(void)
 {
@@ -146,8 +144,8 @@ int voltage_to_percent(int voltage, int* table)
     }
 }
 
-/* Returns battery level in percent */
-int battery_level(void)
+/* update battery level, called only once per minute */
+void battery_level_update(void)
 {
     int level = 0;
     int c = 0;
@@ -171,33 +169,42 @@ int battery_level(void)
     if(level < BATTERY_LEVEL_EMPTY)
         level = BATTERY_LEVEL_EMPTY;
 
-    /* level now stores the voltage in centivolts */
-    /* let's calculate a percentage now with using the voltage arrays */
-
 #ifdef HAVE_CHARGE_CTRL
-    if (powermgmt_last_cycle_startstop_min < 20) {
-        /* the batteries are lazy, so take a value between the result of the two table lookups */
-        if (charge_state == 1)
-            level = (voltage_to_percent(level, percent_to_volt_charge)
-                     * battery_lazyness[powermgmt_last_cycle_startstop_min]
-                     + voltage_to_percent(level, percent_to_volt_nocharge)
-                     * (100 - battery_lazyness[powermgmt_last_cycle_startstop_min])) / 100;
-        else
-            level = (voltage_to_percent(level, percent_to_volt_nocharge)
-                     * battery_lazyness[powermgmt_last_cycle_startstop_min]
-                     + voltage_to_percent(level, percent_to_volt_charge)
-                     * (100 - battery_lazyness[powermgmt_last_cycle_startstop_min])) / 100;
-    } else {
-        if (charge_state == 1)
-            level = voltage_to_percent(level, percent_to_volt_charge);
-        else
-            level = voltage_to_percent(level, percent_to_volt_nocharge);
+    if (charge_state == 0) { /* decharge */
+        level = voltage_to_percent(level, percent_to_volt_decharge);
+    } else if (charge_state == 1) { /* charge */
+      level = voltage_to_percent(level, percent_to_volt_charge);
+    } else {/* in trickle charge, the battery is per definition 100% full */
+        battery_level_cached = level = 100;
     }
 #else
-    level = voltage_to_percent(level, percent_to_volt_nocharge); /* always use the nocharge table */
+    level = voltage_to_percent(level, percent_to_volt_decharge); /* always use the decharge table */
 #endif
 
-    return level;
+    if (battery_level_cached == -1) { /* first run of this procedure */
+        /* the battery voltage is usually a little lower directly after turning on, because the disk was used heavily */
+        /* raise it by 5 % */
+        battery_level_cached = (level > 95) ? 100 : level + 5;
+    } else {
+        /* the level is allowed to be +1/-1 of the last value when usb not connected */
+        /*                  and to be +1/-3 of the last value when usb is connected */
+        if (level > battery_level_cached + 1)
+            level = battery_level_cached + 1;
+        if (usb_inserted()) {
+            if (level < battery_level_cached - 3)
+                level = battery_level_cached - 3;
+        } else {
+            if (level < battery_level_cached - 1)
+                level = battery_level_cached - 1;
+        }
+        battery_level_cached = level;
+    }
+}
+
+/* Returns battery level in percent */
+int battery_level(void)
+{
+    return battery_level_cached;
 }
 
 /* Tells if the battery level is safe for disk writes */
@@ -301,7 +308,6 @@ static void handle_auto_poweroff(void)
  * docs/CHARGING_ALGORITHM.
  */
 
-
 static void power_thread(void)
 {
     int i;
@@ -310,7 +316,7 @@ static void power_thread(void)
 #ifdef HAVE_CHARGE_CTRL
     int delta;
     int charged_time = 0;
-    int charge_max_time_now = 0;
+    int charge_max_time_now = 0;  /* max. charging duration, calculated at beginning of charging */
     int charge_pause = 0;         /* no charging pause at the beginning */
     int trickle_time = 0;         /* how many minutes trickle charging already? */
 #endif
@@ -340,7 +346,7 @@ static void power_thread(void)
             sleep(HZ*POWER_AVG_SLEEP);
         }
         avg = avg / ((ok_samples) ? ok_samples : spin_samples);
-        
+
         /* rotate the power history */
         for (i = 0; i < POWER_HISTORY_LEN-1; i++)
             power_history[i] = power_history[i+1];
@@ -348,20 +354,19 @@ static void power_thread(void)
         /* insert new value in the end, in centivolts 8-) */
         power_history[POWER_HISTORY_LEN-1] = (avg * BATTERY_SCALE_FACTOR) / 10000;
         
+        /* update battery level every minute, ignoring first 15 minutes after start charge/decharge */
+#ifdef HAVE_CHARGE_CTRL
+        if ((powermgmt_last_cycle_startstop_min > 25) || (charge_state > 1))
+#endif
+            battery_level_update();
+
         /* calculate estimated remaining running time */
-        /* not charging: remaining running time */
-        /* charging:     remaining charging time */
+        /* decharging: remaining running time */
+        /* charging:   remaining charging time */
 
 #ifdef HAVE_CHARGE_CTRL
         if (charge_state == 1)
-            /* if taking the nocharge battery level, charging lasts 30% longer than the value says */
-            /* so consider it because there's the battery lazyness inside the the battery_level */
-            if (powermgmt_last_cycle_startstop_min < 20) {
-                i = (100 - battery_lazyness[powermgmt_last_cycle_startstop_min]) * 30 / 100 ; /* 0..30 */
-                powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * (100 + i) / 100 * 60 / CURRENT_CHARGING;
-            } else {
-                powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * 60 / CURRENT_CHARGING;
-            }
+            powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * 60 / CURRENT_CHARGING;
         else {
             current = CURRENT_NORMAL;
             if ((backlight_get_timeout() == 1) || (charger_inserted() && backlight_get_on_when_charging()))
@@ -479,6 +484,7 @@ static void power_thread(void)
                 if (trickle_time++ > TRICKLE_MAX_TIME + TOPOFF_MAX_TIME) {
                     trickle_sec = 0; /* show in debug menu that trickle is off */
                     charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                    powermgmt_last_cycle_startstop_min = 0;
                 }
 
                 if ((charge_state == 2) && (trickle_time > TOPOFF_MAX_TIME)) /* change state? */
@@ -492,13 +498,15 @@ static void power_thread(void)
                     charger_enable(false);
 
                 /* if battery is not full, enable charging */
-                if (battery_level() < charge_restart_level) {
+                /* make sure charging starts if 1%-lazyness in battery_level_update() is too slow */
+                if (    (battery_level() < charge_restart_level)
+                     || (power_history[POWER_HISTORY_LEN-1] < BATTERY_LEVEL_DANGEROUS)) {
                     if (charge_pause) {
                         DEBUGF("power: batt level < restart level, but charge pause, not enabling\n");
                         snprintf(power_message, POWER_MESSAGE_LEN, "chg pause %d min", charge_pause);
                     } else {
                         /* calculate max charge time depending on current battery level */
-                        /* take 35% more because battery level is not linear */
+                        /* take 35% more because some more energy is used for heating up the battery */
                         i = CHARGE_MAX_TIME_1500 * battery_capacity / 1500;
                         charge_max_time_now = i * (100 + 35 - battery_level()) / 100;
                         if (charge_max_time_now > i) {
@@ -529,10 +537,7 @@ static void power_thread(void)
                 /* charger not inserted but was enabled */
                 DEBUGF("power: charger disconnected, disabling\n");
                 powermgmt_last_cycle_level = battery_level();
-                /* if the user only charged some minutes, we don't really have */
-                /* a battery level that's usual for charging */
-                /* the next line prevents the battery level being too low when the charger is connected for only some minutes */
-                powermgmt_last_cycle_startstop_min = (powermgmt_last_cycle_startstop_min > 10) ? 0 : 20;
+                powermgmt_last_cycle_startstop_min = 0;
                 /* show in debug menu that trickle is off */
                 trickle_sec = 0;
                 charger_enable(false);
@@ -565,9 +570,11 @@ void power_init(void)
     /* initialize the history with a single sample to prevent level
        flickering during the first minute of execution */
     power_history[POWER_HISTORY_LEN-1] = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+    /* calculate the first battery level */
+    battery_level_update();
     /* calculate the remaining time to that the info screen displays something useful */
     powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / CURRENT_NORMAL;
-
+    
 #ifdef HAVE_CHARGE_CTRL
     snprintf(power_message, POWER_MESSAGE_LEN, "Powermgmt started");
     
@@ -575,6 +582,7 @@ void power_init(void)
     if (power_history[POWER_HISTORY_LEN-1] < BATTERY_LEVEL_DANGEROUS)
         charger_enable(true);
 #endif
+
     create_thread(power_thread, power_stack, sizeof(power_stack), power_thread_name);
 }
 
