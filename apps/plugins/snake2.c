@@ -33,6 +33,9 @@ Head and Tail are stored
 #define WIDTH  28
 #define HEIGHT 16
 
+static int max_levels = 0;
+static char (*level_cache)[HEIGHT][WIDTH];
+
 /*Board itself - 2D int array*/
 static int board[WIDTH][HEIGHT];
 /*
@@ -41,13 +44,14 @@ static int board[WIDTH][HEIGHT];
 */
 static int ardirectionbuffer[2];
 static unsigned int score, hiscore = 0;
-static short applex;
-static short appley;
-static short dir;
-static short frames;
-static short apple;
-static short level = 4, speed = 5,dead = 0, quit = 0, sillydir = 0, num_levels=0; 
-static short level_from_file = 1;
+static int applex;
+static int appley;
+static int dir;
+static int frames;
+static int apple;
+static int level = 4, speed = 5,dead = 0, quit = 0;
+static int sillydir = 0, num_levels = 0; 
+static int level_from_file = 1;
 static struct plugin_api* rb;
 static int headx, heady, tailx, taily, applecountdown = 5;
 static int game_type = 0;
@@ -73,37 +77,50 @@ static int game_b_level=1;
 
 #define LEVELS_FILE         "/.rockbox/snake2.levels"
 
-static void set_level_count(void) 
+int load_all_levels(void)
 {
-    int line_count=0;
-    int fd = 0;
-    char buffer[WIDTH+2]; /* WIDTH plus CR/LF and \0 */
-    
-    if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0) 
-    {
-        rb->splash(0, true, "Unable to open %s", LEVELS_FILE);
-    }
-    
-    if(!(fd < 0))
-    {
-        while(1)
-        {
-            int len = rb->read_line(fd, buffer, sizeof(buffer));
-            if(len <= 0)
-                break;
-            else
-                line_count++;
+    int linecnt = 0;
+    int fd;
+    int size;
+    char buf[64]; /* Larger than WIDTH, to allow for whitespace after the
+                     lines */
 
-            if(line_count==HEIGHT)
+    /* Init the level_cache pointer and
+       calculate how many levels that will fit */
+    level_cache = rb->plugin_get_buffer(&size);
+    max_levels = size / (HEIGHT*WIDTH);
+
+    num_levels = 0;
+    
+    /* open file */
+    if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0)
+    {
+        return -1;
+    }
+
+    while(rb->read_line(fd, buf, 64))
+    {
+        if(buf[0] == '-') /* Separator? */
+        {
+            num_levels++;
+            if(num_levels > max_levels)
             {
-                num_levels++;
-                line_count=0;
+                rb->splash(HZ, true, "Too many levels in file");
+                break;
             }
+            continue;
         }
 
-        rb->close(fd);
+        rb->memcpy(level_cache[num_levels][linecnt], buf, WIDTH);
+        linecnt++;
+        if(linecnt == HEIGHT)
+        {
+            linecnt = 0;
+        }
     }
 
+    rb->close(fd);
+    return 0;
 }
 
 /*
@@ -124,51 +141,29 @@ void clear_board( void)
 
 int load_level( int level_number )
 {
-    int fd = 0;
-    int x,y, len;
-    unsigned char buffer[WIDTH+2];
-
-    /* open file */
-    if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0)
-    {
-        return -1;
-    }
-       
-    rb->lseek(fd, level_number*(WIDTH+2)*(HEIGHT+1), SEEK_SET);
-    
+    int x,y;
     clear_board();
-
-    for(y=0; y < HEIGHT; y++)
+    for(y = 0;y < HEIGHT;y++)
     {
-        len = rb->read_line(fd, buffer, WIDTH+2);
-        if(len <= 0)
+        for(x = 0;x < WIDTH;x++)
         {
-            rb->close(fd);
-            return -1;
-        }
-        else
-        {
-             /*Read a line in, now add to the array:*/
-             for(x=0;x < WIDTH;x++)
-             {
-                 switch(buffer[x])
-                 {
-                     case '1':
-                         board[x][y] = NORTH;
-                     break;
+            switch(level_cache[level_number][y][x])
+            {
+                case '1':
+                    board[x][y] = NORTH;
+                    break;
 
-                     case '2':
-                         board[x][y] = EAST;
-                     break;
+                case '2':
+                    board[x][y] = EAST;
+                    break;
 
-                     case 'H':
-                         board[x][y] = HEAD;
-                         break;
-                 }
-             }
+                case 'H':
+                    board[x][y] = HEAD;
+                    break;
+            }
+            
         }
     }
-    rb->close(fd);
     return 1;
 }
 
@@ -219,8 +214,10 @@ void set_direction(int newdir)
     }
 }
 
-void init_snake( void )
+void new_level(int level)
 {
+    load_level(level);
+
     ardirectionbuffer[0] = -1;
     ardirectionbuffer[1] = -1;
     dir   = EAST;
@@ -236,9 +233,14 @@ void init_snake( void )
     board[headx-3][heady] = dir;
     board[headx-4][heady] = dir;
     num_apples_to_got=0;
+}
+
+void init_snake(void)
+{
     num_apples_to_get=1;
     level_from_file = 1;
     game_b_level=1;
+    new_level(level_from_file);
 }
 
 /*
@@ -247,7 +249,7 @@ void init_snake( void )
 */
 void draw_apple( void )
 {
-    short x,y;
+    int x,y;
     if (!apple)
     {
           do
@@ -412,7 +414,7 @@ void draw_boundary ( void )
 */
 void redraw (void)
 {
-    short x,y;
+    int x,y;
     rb->lcd_clear_display();
    
     for (x = 0; x < WIDTH; x++) 
@@ -607,12 +609,9 @@ void collision ( int x, int y )
                         num_apples_to_get+=2;
                         game_b_level++;
                     }
-                    rb->splash(0, true, "Level Completed!");
-                    rb->sleep(HZ);
+                    rb->splash(HZ, true, "Level Completed!");
                     rb->lcd_clear_display();
-                    num_apples_to_got=0;
-                    load_level(level_from_file);
-                    init_snake();
+                    new_level(level_from_file);
                     redraw();
                 }
                 else
@@ -925,18 +924,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
-    set_level_count();
+
+    /* Lets use the default font */
+    rb->lcd_setfont(FONT_SYSFIXED);
+    load_all_levels();
 
     if (num_levels == 0) {
         rb->splash(HZ*2, true, "Failed loading levels!");
         return PLUGIN_OK;
     }
 
-    /* Lets use the default font */
-    rb->lcd_setfont(FONT_SYSFIXED);
     /*load the 1st level in*/
     load_level( level_from_file );
-                
+
     while(quit==0)
     {
       game_init(); 
@@ -945,13 +945,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
       
       if(quit==0)
       {
-        load_level( level_from_file );
-        init_snake();
-        /*Start Game:*/
-        game();
-        /* Game over, reload level*/
-        init_snake();
-        load_level( level_from_file );
+          init_snake();
+          
+          /*Start Game:*/
+          game();
+
+          clear_board();
       }
     }
     

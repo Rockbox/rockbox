@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 19
+#define PLUGIN_API_VERSION 20
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -279,6 +279,9 @@ struct plugin_api {
 
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_icon)(int icon, bool enable);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    void (*lcd_puts_style)(int x, int y, unsigned char *str, int style);
 #endif
 };
 
