@@ -49,6 +49,7 @@ LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 # Use this for simulator-only files
 INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
+SRCDIRS = . $(DRIVERS) $(COMMON) $(FIRMWAREDIR) $(APPDIR) $(RECDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
@@ -279,3 +280,7 @@ $(DEPS)/%.d: %.c
 	[ -s $@ ] || rm -f $@'
 
 -include $(SRCS:%.c=$(DEPS)/%.d)
+
+tags:
+	@$(SHELL) -c 'for d in $(SRCDIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
+
