@@ -297,7 +297,7 @@ void settings_load(void)
         if (rtc_config_block[0xa] != 0xFF) {
             global_settings.contrast = rtc_config_block[0xa];
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
-                global_settings.contrast < DEFAULT_CONTRAST_SETTING;
+                global_settings.contrast = DEFAULT_CONTRAST_SETTING;
         }
         if (rtc_config_block[0xb] != 0xFF)
             global_settings.backlight = rtc_config_block[0xb];
