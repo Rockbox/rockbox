@@ -428,8 +428,8 @@ static void init_config_buffer( void )
 {
     DEBUGF( "init_config_buffer()\n" );
     
-    /* reset to 0xff - all unused */
-    memset(config_block, 0xff, CONFIG_BLOCK_SIZE);
+    /* reset to 0 - all unused */
+    memset(config_block, 0, CONFIG_BLOCK_SIZE);
     /* insert header */
     config_block[0] = 'R';
     config_block[1] = 'o';
@@ -480,33 +480,32 @@ static int save_config_buffer( void )
 /*
  * load the config block buffer from disk or RTC RAM
  */
-static int load_config_buffer( void )
+static int load_config_buffer(int which)
 {
     unsigned short chksum;
     bool correct = false;
 
-#ifdef HAVE_RTC
-    unsigned int i;
-    unsigned char rtc_block[RTC_BLOCK_SIZE];
-#endif
-    
+   
     DEBUGF( "load_config_buffer()\n" );
 
-    if (fat_startsector() != 0) {
-        ata_read_sectors( 61, 1,  config_block);
+    if (which & SETTINGS_HD)
+    {
+        if (fat_startsector() != 0) {
+            ata_read_sectors( 61, 1,  config_block);
 
-        /* calculate the checksum, check it and the header */
-        chksum = calculate_config_checksum(config_block);
+            /* calculate the checksum, check it and the header */
+            chksum = calculate_config_checksum(config_block);
         
-        if (config_block[0] == 'R' &&
-            config_block[1] == 'o' &&
-            config_block[2] == 'c' &&
-            config_block[3] == CONFIG_BLOCK_VERSION &&
-            (chksum >> 8) == config_block[RTC_BLOCK_SIZE - 2] &&
-            (chksum & 0xff) == config_block[RTC_BLOCK_SIZE - 1])
-        {
-            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
-            correct = true;
+            if (config_block[0] == 'R' &&
+                config_block[1] == 'o' &&
+                config_block[2] == 'c' &&
+                config_block[3] == CONFIG_BLOCK_VERSION &&
+                (chksum >> 8) == config_block[RTC_BLOCK_SIZE - 2] &&
+                (chksum & 0xff) == config_block[RTC_BLOCK_SIZE - 1])
+            {
+                DEBUGF( "load_config_buffer: header & checksum test ok\n" );
+                correct = true;
+            }
         }
     }
 
@@ -514,24 +513,31 @@ static int load_config_buffer( void )
     if(!correct)
     {
         /* If the disk sector was incorrect, reinit the buffer */
-        memset(config_block, 0xff, CONFIG_BLOCK_SIZE);
+        memset(config_block, 0, CONFIG_BLOCK_SIZE);
     }
-    /* read rtc block */
-    for (i=0; i < RTC_BLOCK_SIZE; i++ )
-        rtc_block[i] = rtc_read(0x14+i);
 
-    chksum = calculate_config_checksum(rtc_block);
-    
-    /* if rtc block is ok, use that */
-    if (rtc_block[0] == 'R' &&
-        rtc_block[1] == 'o' &&
-        rtc_block[2] == 'c' &&
-        rtc_block[3] == CONFIG_BLOCK_VERSION &&
-        (chksum >> 8) == rtc_block[RTC_BLOCK_SIZE - 2] &&
-        (chksum & 0xff) == rtc_block[RTC_BLOCK_SIZE - 1])
+    if (which & SETTINGS_RTC)
     {
-        memcpy(config_block, rtc_block, RTC_BLOCK_SIZE);
-        correct = true;
+        unsigned int i;
+        unsigned char rtc_block[RTC_BLOCK_SIZE];
+
+        /* read rtc block */
+        for (i=0; i < RTC_BLOCK_SIZE; i++ )
+            rtc_block[i] = rtc_read(0x14+i);
+
+        chksum = calculate_config_checksum(rtc_block);
+    
+        /* if rtc block is ok, use that */
+        if (rtc_block[0] == 'R' &&
+            rtc_block[1] == 'o' &&
+            rtc_block[2] == 'c' &&
+            rtc_block[3] == CONFIG_BLOCK_VERSION &&
+            (chksum >> 8) == rtc_block[RTC_BLOCK_SIZE - 2] &&
+            (chksum & 0xff) == rtc_block[RTC_BLOCK_SIZE - 1])
+        {
+            memcpy(config_block, rtc_block, RTC_BLOCK_SIZE);
+            correct = true;
+        }
     }
 #endif
     
@@ -831,18 +837,15 @@ static void load_bit_table(const struct bit_entry* p_table, int count, int bitst
 /*
  * load settings from disk or RTC RAM
  */
-void settings_load(void)
+void settings_load(int which)
 {
     int restore[6]; /* recover, FIXME: get rid of this */
     
     DEBUGF( "reload_all_settings()\n" );
 
-    /* populate settings with default values */
-    settings_reset();
-    
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
-    if (!load_config_buffer()) 
+    if (!load_config_buffer(which)) 
     {
         /* While the mpeg_val2phys business still exists: ( FIXME: to be removed) */
         /* temporarily put markers into the values to detect if they got loaded */
@@ -862,8 +865,15 @@ void settings_load(void)
 #endif
         
         /* load scalar values from RTC and HD sector, specified via table */
-        load_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
-        load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
+        if (which & SETTINGS_RTC)
+        {
+            load_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
+        }
+        if (which & SETTINGS_HD)
+        {
+            load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), 
+                RTC_BLOCK_SIZE*8);
+        }
         
         /* FIXME, to be removed with mpeg_val2phys: */
         /* if a value got loaded, convert it, else restore it */
@@ -888,9 +898,7 @@ void settings_load(void)
         strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
-   }
-
-    settings_apply();
+    }
 }
 
 /* parse a line from a configuration file. the line format is: 

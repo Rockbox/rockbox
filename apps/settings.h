@@ -220,7 +220,7 @@ struct opt_items {
 /* prototypes */
 
 int settings_save(void);
-void settings_load(void);
+void settings_load(int which);
 void settings_reset(void);
 void settings_apply(void);
 void settings_apply_pm_range(void);
@@ -266,6 +266,11 @@ extern char rec_base_directory[];
 #define DEFAULT_CONTRAST_SETTING    38
 #endif
 #define MIN_CONTRAST_SETTING        5
+
+/* argument bits for settings_load() */
+#define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
+#define SETTINGS_HD  2 /* only the settings fron the disk sector */
+#define SETTINGS_ALL 3 /* both */
 
 /* repeat mode options */
 enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };

@@ -55,6 +55,9 @@
 #include "screens.h"
 #include "power.h"
 #include "talk.h"
+#include "plugin.h"
+
+/*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 char appsversion[]=APPSVERSION;
 
@@ -76,7 +79,8 @@ void init(void)
     font_init();
     show_logo();
     settings_reset();
-    settings_load();
+    settings_load(SETTINGS_ALL);
+    settings_apply();
     sleep(HZ/2);
     tree_init();
     playlist_init();
@@ -129,6 +133,7 @@ void init(void)
 
 #ifdef HAVE_RTC
     rtc_init();
+    settings_load(SETTINGS_RTC); /* early load parts of global_settings */
 #endif
 
     adc_init();
@@ -142,7 +147,7 @@ void init(void)
     powermgmt_init();
 
 #ifdef HAVE_BATTERIES
-    if (coldstart && charger_inserted())
+    if (coldstart && charger_inserted() && !global_settings.car_adapter_mode)
     {
         rc = charging_screen(); /* display a "charging" screen */
         if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
@@ -196,7 +201,8 @@ void init(void)
         }
     }
 
-    settings_load();
+    settings_load(SETTINGS_ALL);
+    settings_apply();
     
     status_init();
     playlist_init();
@@ -215,24 +221,20 @@ void init(void)
     mpeg_init();
     talk_init();
 
-    /* no auto-rolo on startup any more, but I leave it here for reference */
-#if 0
-    if (coldstart && !usb_detect())
-    {   /* when starting from flash, this time _we_ have to yield */
+#ifdef AUTOROCK
+    if (!usb_detect())
+    {   
         int fd;
-#ifdef ARCHOS_PLAYER
-        static const char filename[] = "/archos.mod"; 
-#else
-        static const char filename[] = "/ajbrec.ajz";
-#endif
+        static const char filename[] = PLUGIN_DIR "/autostart.rock"; 
+
         fd = open(filename, O_RDONLY);
         if(fd >= 0) /* no complaint if it doesn't exit */
         {
             close(fd);
-            rolo_load((char*)filename); /* start if it does */
+            plugin_load((char*)filename, NULL); /* start if it does */
         }
     }
-#endif // #if 0
+#endif /* #ifdef AUTOROCK */
 }
 
 int main(void)
