@@ -1879,6 +1879,7 @@ static void init_recording(void)
     int rc;
 
     stop_playing();
+    is_playing = false;
     paused = false;
 
     reset_mp3_buffer();
