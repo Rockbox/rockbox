@@ -1218,6 +1218,7 @@ int fat_open(unsigned int startcluster,
     file->firstcluster = startcluster;
     file->lastcluster = startcluster;
     file->lastsector = 0;
+    file->clusternum = 0;
     file->sectornum = 0;
     file->eof = false;
 
@@ -1243,6 +1244,7 @@ int fat_create_file(char* name,
         file->firstcluster = 0;
         file->lastcluster = 0;
         file->lastsector = 0;
+        file->clusternum = 0;
         file->sectornum = 0;
         file->eof = false;
     }
@@ -1508,6 +1510,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 {
     int cluster = file->lastcluster;
     int sector = file->lastsector;
+    int clusternum = file->clusternum;
     int numsec = file->sectornum;
     bool eof = file->eof;
     int first=0, last=0;
@@ -1533,17 +1536,21 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
                 cluster = get_next_cluster(cluster);
                 sector = cluster2sec(cluster);
             }
+
+            clusternum++;
+            numsec=1;
+
             if (!cluster) {
                 eof = true;
                 if ( write ) {
                     /* remember last cluster, in case 
                        we want to append to the file */
                     cluster = oldcluster;
+                    clusternum--;
                 }
             }
             else
                 eof = false;
-            numsec=1;
         }
         else {
             if (sector)
@@ -1583,6 +1590,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
     file->lastcluster = cluster;
     file->lastsector = sector;
+    file->clusternum = clusternum;
     file->sectornum = numsec;
     file->eof = eof;
 
@@ -1595,7 +1603,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
 int fat_seek(struct fat_file *file, unsigned int seeksector )
 {
-    int clusternum=0, sectornum=0, sector=0;
+    int clusternum=0, numclusters=0, sectornum=0, sector=0;
     int cluster = file->firstcluster;
     int i;
 
@@ -1604,10 +1612,16 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
         /* we need to find the sector BEFORE the requested, since
            the file struct stores the last accessed sector */
         seeksector--;
-        clusternum = seeksector / fat_bpb.bpb_secperclus;
+        numclusters = clusternum = seeksector / fat_bpb.bpb_secperclus;
         sectornum = seeksector % fat_bpb.bpb_secperclus;
 
-        for (i=0; i<clusternum; i++) {
+        if (file->clusternum && clusternum >= file->clusternum)
+        {
+            cluster = file->lastcluster;
+            numclusters -= file->clusternum;
+        }
+
+        for (i=0; i<numclusters; i++) {
             cluster = get_next_cluster(cluster);
             if (!cluster) {
                 DEBUGF("Seeking beyond the end of the file! "
@@ -1627,6 +1641,7 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
 
     file->lastcluster = cluster;
     file->lastsector = sector;
+    file->clusternum = clusternum;
     file->sectornum = sectornum + 1;
     return 0;
 }

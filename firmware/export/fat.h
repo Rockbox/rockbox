@@ -51,6 +51,7 @@ struct fat_file
     int firstcluster;    /* first cluster in file */
     int lastcluster;     /* cluster of last access */
     int lastsector;      /* sector of last access */
+    int clusternum;      /* current clusternum */
     int sectornum;       /* sector number in this cluster */
     unsigned int direntry;   /* short dir entry index from start of dir */
     unsigned int direntries; /* number of dir entries used by this file */
