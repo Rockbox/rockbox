@@ -73,7 +73,7 @@ void savestate(int fd);
 #define mkdir(a,b)      rb->mkdir((a),(b))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))
 #define USE_IRAM	1
