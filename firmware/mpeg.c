@@ -1665,6 +1665,9 @@ int mpeg_val2phys(int setting, int value)
 
 void mpeg_sound_channel_config(int configuration)
 {
+#ifdef SIMULATOR
+    (void)configuration;
+#else
     unsigned long val_on = 0x80000;
     unsigned long val_off = 0;
     
@@ -1727,6 +1730,7 @@ void mpeg_sound_channel_config(int configuration)
 #endif
             break;
     }
+#endif
 }
 
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
