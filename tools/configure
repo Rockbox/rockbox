@@ -79,7 +79,7 @@ if [ -z "$debug" ]; then
       debug="DEBUG=1"
       ;;
     *)
-      debug=""
+      debug="NODEBUG=1"
       ;;
 
   esac
