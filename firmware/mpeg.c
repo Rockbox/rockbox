@@ -2284,7 +2284,7 @@ static void stop_recording(void)
 
     /* Start monitoring */
     shadow_7f1 |= (1 << 10);
-    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
     
     /* Wait until the DSP has accepted the settings */
