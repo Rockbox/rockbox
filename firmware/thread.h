@@ -21,7 +21,7 @@
 
 #define MAXTHREADS	16
 
-int create_thread(void* fp, void* sp, int stk_size);
+int create_thread(void* function, void* stack, int stack_size);
 void switch_thread(void);
 void init_threads(void);
 

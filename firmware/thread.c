@@ -18,33 +18,25 @@
  ****************************************************************************/
 #include "thread.h"
 
-typedef union
+struct regs
 {
-    struct regs_t
-    {
-        unsigned int  r[7]; /* Registers r8 thru r14 */
-        void          *sp;  /* Stack pointer (r15) */
-        unsigned int  mach;
-        unsigned int  macl;
-        unsigned int  sr;   /* Status register */
-        void*         pr;   /* Procedure register */
-    } regs;
-} ctx_t;
+    unsigned int  r[7]; /* Registers r8 thru r14 */
+    void          *sp;  /* Stack pointer (r15) */
+    unsigned int  mach;
+    unsigned int  macl;
+    unsigned int  sr;   /* Status register */
+    void*         pr;   /* Procedure register */
+};
 
-typedef struct
-{
-    int   num_threads;
-    int   current;
-    ctx_t ctx[MAXTHREADS];
-} thread_t;
-
-static thread_t threads;
+static int num_threads;
+static int current_thread;
+static struct regs thread_contexts[MAXTHREADS];
 
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
-static inline void stctx(void* addr)
+static inline void store_context(void* addr)
 {
     asm volatile ("add #48, %0\n\t"
                   "sts.l pr,  @-%0\n\t"
@@ -65,7 +57,7 @@ static inline void stctx(void* addr)
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
-static inline void ldctx(void* addr)
+static inline void load_context(void* addr)
 {
     asm volatile ("mov.l @%0+,r8\n\t"
                   "mov.l @%0+,r9\n\t"
@@ -89,16 +81,15 @@ static inline void ldctx(void* addr)
  */
 void switch_thread(void)
 {
-    int        ct;
-    int        nt;
-    thread_t*  t = &threads;
+    int current;
+    int next;
 
-    nt = ct = t->current;
-    if (++nt >= t->num_threads)
-        nt = 0;
-    t->current = nt;
-    stctx(&t->ctx[ct]);
-    ldctx(&t->ctx[nt]);
+    next = current = current_thread;
+    if (++next >= num_threads)
+        next = 0;
+    current_thread = next;
+    store_context(&thread_contexts[current]);
+    load_context(&thread_contexts[next]);
 }
 
 /*--------------------------------------------------------------------------- 
@@ -106,27 +97,25 @@ void switch_thread(void)
  * Return 0 if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread(void* fp, void* sp, int stk_size)
+int create_thread(void* function, void* stack, int stack_size)
 {
-    thread_t* t = &threads;
-
-    if (t->num_threads >= MAXTHREADS)
+    if (num_threads >= MAXTHREADS)
         return -1;
     else
     {
-        ctx_t* ctxp = &t->ctx[t->num_threads++];
-        stctx(ctxp);
+        struct regs* regs = &thread_contexts[num_threads++];
+        store_context(regs);
         /* Subtract 4 to leave room for the PR push in ldctx()
            Align it on an even 32 bit boundary */
-        ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size - 4) & ~3);
-        ctxp->regs.sr = 0;
-        ctxp->regs.pr = fp;
+        regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
+        regs->sr = 0;
+        regs->pr = function;
     }
     return 0;
 }
 
 void init_threads(void)
 {
-    threads.num_threads = 1; /* We have 1 thread to begin with */
-    threads.current = 0;     /* The current thread is number 0 */
+    num_threads = 1; /* We have 1 thread to begin with */
+    current_thread = 0; /* The current thread is number 0 */
 }
