@@ -269,7 +269,7 @@ int mpeg_play(char* fname)
        * the right output channel is the same as the left one.
        */
       if(MAD_NCHANNELS(&Frame.header)==2)
-        Sample=scale(Synth.pcm.samples[1][i],&d0);
+        Sample=scale(Synth.pcm.samples[1][i],&d1);
       *(OutputPtr++)=Sample&0xff;
       *(OutputPtr++)=Sample>>8;
 
