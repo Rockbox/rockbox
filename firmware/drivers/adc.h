@@ -25,11 +25,12 @@
                                      silly scaling */
 #ifdef HAVE_FMADC
 #define ADC_CHARGE_REGULATOR    0 /* Uh, we read the battery voltage? */
+#define ADC_USB_POWER           1 /* USB, reads 0x000 when USB is inserted */
 #else
 #define ADC_CHARGE_REGULATOR    1 /* Regulator reference voltage, should read
                                      about 0x1c0 when charging, else 0x3FF */
-#endif
 #define ADC_USB_POWER           2 /* USB, reads 0x3FF when USB is inserted */
+#endif
 
 #define ADC_BUTTON_ROW1         4 /* Used for scanning the keys, different
                                      voltages for different keys */
