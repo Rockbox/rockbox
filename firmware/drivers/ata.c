@@ -221,25 +221,22 @@ int ata_read_sectors(unsigned long start,
             int j;
             int sectors;
             int wordcount;
+            int status;
 
             if (!wait_for_start_of_transfer()) {
                 ret = -4;
                 goto retry;
             }
 
-            if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) ) {
-                ret = -5;
-                if (perform_soft_reset())
-                    break;
-                goto retry;
-            }
-             
             if (spinup) {
                 ata_spinup_time = current_tick - last_disk_activity;
                 spinup = false;
                 sleeping = false;
                 poweroff = false;
             }
+
+            /* read the status register exactly once per loop */
+            status = ATA_STATUS;
 
             /* if destination address is odd, use byte copying,
                otherwise use word copying */
@@ -263,10 +260,18 @@ int ata_read_sectors(unsigned long start,
                     ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
             }
 
-#ifdef USE_INTERRUPT
-            /* reading the status register clears the interrupt */
-            j = ATA_STATUS;
-#endif
+            /*
+              "Device errors encountered during READ MULTIPLE commands are
+              posted at the beginning of the block or partial block transfer,
+              but the DRQ bit is still set to one and the data transfer shall
+              take place, including transfer of corrupted data, if any."
+                -- ATA specification
+            */
+            if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
+                ret = -5;
+                goto retry;
+            }
+             
             buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
             count -= sectors;
 
