@@ -59,6 +59,8 @@ if(! -d $dir or $help) {
 sub getdir {
     my ($dir) = @_;
 
+    $dir =~ s|/$|| if ($dir ne "/");
+
     if (opendir(DIR, $dir)) {
         #   my @mp3 = grep { /\.mp3$/ && -f "$dir/$_" } readdir(DIR);
         my @all = readdir(DIR);
@@ -83,6 +85,7 @@ sub extractmp3 {
 
 sub extractdirs {
     my ($dir, @files) = @_;
+    $dir =~ s|/$||;
     my @dirs;
     for(@files) {
         if( -d "$dir/$_" && ($_ !~ /^\.(|\.)$/)) {
@@ -175,7 +178,7 @@ sub dodir {
     my @d = extractdirs($dir, @a);
 
     for $d (sort @d) {
-        #print "Subdir: $d\n";
+        $dir =~ s|/$||;
         dodir("$dir/$d");
     }
 }
