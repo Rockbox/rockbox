@@ -35,7 +35,12 @@
 #endif
 
 #define MPEG_CHUNKSIZE  0x20000
+#ifdef ARCHOS_RECORDER
+/* recorder is slower and needs more load time */
+#define MPEG_LOW_WATER  0x40000
+#else
 #define MPEG_LOW_WATER  0x30000
+#endif
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -450,25 +455,28 @@ static int new_file(bool next_track)
 {
     char *trackname;
 
-    trackname = peek_next_track( next_track ? 1 : -1 );
-    if ( !trackname )
-        return -1;
+    do {
+        trackname = peek_next_track( next_track ? 1 : -1 );
+        if ( !trackname )
+            return -1;
+        
+        DEBUGF("playing %s\n", trackname);
+        
+        mpeg_file = open(trackname, O_RDONLY);
+        if(mpeg_file < 0) {
+            DEBUGF("Couldn't open file: %s\n",trackname);
+        }
+        else {
+            /* grab id3 tag of new file and remember where 
+               in memory it starts */
+            if ( last_tag < MAX_ID3_TAGS ) {
+                mp3info(&(id3tags[last_tag].id3), trackname);
+                id3tags[last_tag].mempos = mp3buf_write;
+                last_tag++;
+            }
+        }
+    } while ( mpeg_file < 0 );
 
-    DEBUGF("playing %s\n", trackname);
-
-    /* grab id3 tag of new file and remember where in memory it starts */
-    if ( last_tag < MAX_ID3_TAGS ) {
-        mp3info(&(id3tags[last_tag].id3), trackname);
-        id3tags[last_tag].mempos = mp3buf_write;
-        last_tag++;
-    }
-
-    mpeg_file = open(trackname, O_RDONLY);
-    if(mpeg_file < 0)
-    {
-        debugf("Couldn't open file\n");
-        return -1;
-    }
     return 0;
 }
 
@@ -513,10 +521,10 @@ static void mpeg_thread(void)
                     close(mpeg_file);
 
                 mpeg_file = open((char*)ev.data, O_RDONLY);
-                if(mpeg_file < 0)
-                {
-                    DEBUGF("Couldn't open %s\n",ev.data);
-                    break;
+                while (mpeg_file < 0) {
+                    DEBUGF("Couldn't open file: %s\n",ev.data);
+                    if ( new_file(true) == -1 )
+                        return;
                 }
                 
                 /* grab id3 tag of new file and
