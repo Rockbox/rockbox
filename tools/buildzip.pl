@@ -56,7 +56,7 @@ sub buildzip {
 
     open VIEWERS, ">.rockbox/viewers.config" or
         die "can't create .rockbox/viewers.config";
-    mkdir ".rockbox/viewers";
+    mkdir ".rockbox/viewers", 0777;
     for (@viewers) {
         if (/,(.+),/) {
             if(-e ".rockbox/rocks/$1") {
