@@ -36,7 +36,7 @@ File Info Tags:
   %fv : "(vbr)" if variable bit rate or "" if constant bit rate
   %d1 : First directory from end of file path.
   %d2 : Second directory from end of file path.
-  %d2 : Third directory from end of file path.
+  %d3 : Third directory from end of file path.
 
 Example for the the %dN commands: If the path is "/Rock/Kent/Isola/11 -
 747.mp3", %d1 is "Isola", %d2 is "Kent"... You get the picture.
