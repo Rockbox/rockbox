@@ -1707,6 +1707,10 @@ bool set_time(char* string, int timedate[])
     while ( !done ) {
         /* calculate the number of days in febuary */
         realyear = timedate[3] + 2000;
+
+        if(realyear > 2030)
+            realyear = 2003; /* yeah, I believe this is now */
+        
         if((realyear % 4 == 0 && !(realyear % 100 == 0)) || realyear % 400 == 0)
             daysinmonth[1] = 29;
         else
@@ -1761,8 +1765,8 @@ bool set_time(char* string, int timedate[])
 
         lcd_getstringsize(buffer, &width, &prev_line_height);
 
-        snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
-                 str(dayname[timedate[6]]), timedate[3],
+        snprintf(buffer, sizeof(buffer), "%s %04d %s %02d ",
+                 str(dayname[timedate[6]]), realyear,
                  str(monthname[timedate[4] - 1]), timedate[5]);
         lcd_puts(0, 2, buffer);
 
