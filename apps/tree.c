@@ -303,16 +303,33 @@ static int showdir(char *path, int start)
 
     if (start == -1)
     {
+        int diff_files;
+
         /* use lastfile to determine start (default=0) */
-        start = dirstart = 0;
+        start = 0;
+
         for (i=0; i<filesindir; i++)
         {
             if (!strcasecmp(dircache[i].name, lastfile))
             {
-                start = dirstart = i;
+                start = i;
                 break;
             }
         }
+
+        diff_files = filesindir - start;
+        if (diff_files < tree_max_on_screen)
+        {
+            int oldstart = start;
+
+            start -= (tree_max_on_screen - diff_files);
+            if (start < 0)
+                start = 0;
+
+            dircursor = oldstart - start;
+        }
+
+        dirstart = start;
     }
 
     lcd_stop_scroll();
@@ -482,6 +499,9 @@ void start_resume(void)
 
             if (showdir(global_settings.resume_file, 0) < 0 )
                 return;
+
+            lastdir[0] = '\0';
+
             build_playlist(global_settings.resume_index);
             play_list(global_settings.resume_file,
                       NULL, 
@@ -562,17 +582,18 @@ bool dirbrowse(char *root)
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
 
-    start_resume();
-    button_set_release(RELEASE_MASK);
-
     dircursor=0;
     dirstart=0;
     dirlevel=0;
 
     memcpy(currdir,root,sizeof(currdir));
-    numentries = showdir(root, dirstart);
+
+    start_resume();
+    button_set_release(RELEASE_MASK);
+
+    numentries = showdir(currdir, dirstart);
     if (numentries == -1) 
-        return -1;  /* root is not a directory */
+        return -1;  /* currdir is not a directory */
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
 
