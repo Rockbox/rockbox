@@ -120,12 +120,6 @@ vbr_k:
 orig_vbr_k:
 	.long 0x9000000
 
-#ifdef __ELF__
-	.section .stack,"aw"
-#else
-	.section .stack
-#endif
-
 	.section .vectors
 vectors:
 	.long start
