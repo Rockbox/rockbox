@@ -783,6 +783,7 @@ bool wps_display(struct mp3entry* id3)
         lcd_puts(0, 2, str(LANG_END_PLAYLIST_RECORDER));
         lcd_update();
 #endif
+        global_settings.resume_index = -1;
         status_set_playmode(STATUS_STOP);
         status_draw();
         sleep(HZ);
