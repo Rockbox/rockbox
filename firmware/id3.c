@@ -446,7 +446,7 @@ getsonglength(int fd, mp3entry *entry)
     switch(layer) {
     case 1:
         bpf = bitrate_table[version - 1][layer - 1][bitindex];
-        bpf *= 12000.0 * 4.0;
+        bpf *= 48000;
         bpf /= freqtab[version-1][freqindex] << (version - 1);
         break;
     case 2:
@@ -456,7 +456,7 @@ getsonglength(int fd, mp3entry *entry)
         bpf /= freqtab[version-1][freqindex] << (version - 1);
         break;
     default:
-        bpf = 1.0;
+        bpf = 1;
     }
 	
     /* Calculate time per frame */
