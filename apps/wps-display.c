@@ -855,7 +855,8 @@ static void draw_player_fullbar(char* buf, int buf_size,
 
     int songpos = 0;
     int digits[5];
-
+    int time;
+    
     for (i=0; i < buf_size; i++)
         buf[i] = ' ';
            
@@ -868,7 +869,7 @@ static void draw_player_fullbar(char* buf, int buf_size,
             songpos = ((id3->elapsed + ff_rewwind_count) * 55) / id3->length;
     }
 
-    int time=(id3->elapsed + ff_rewind_count);
+    time=(id3->elapsed + ff_rewind_count);
    
     digits[4]=(time % 60000 / 1000 ) % 10;
     digits[3]=(time % 60000 / 10000) % 10;
