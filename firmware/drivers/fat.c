@@ -725,11 +725,11 @@ static int flush_fat(void)
     return 0;
 }
 
-#ifdef HAVE_RTC
 static void fat_time(unsigned short* date,
                      unsigned short* time,
                      unsigned short* tenth )
 {
+#ifdef HAVE_RTC
     struct tm* tm = get_time();
 
     if (date)
@@ -744,8 +744,68 @@ static void fat_time(unsigned short* date,
 
     if (tenth)
         *tenth = (tm->tm_sec & 1) * 100;
+#else
+    /* non-RTC version returns an increment from the supplied time, or a
+     * fixed standard time/date if no time given as input */
+    bool next_day = false;
+    
+    if (time)
+    {
+        if (0 == *time)
+        {
+            /* set to 00:15:00 */
+            *time = (15 << 5);
+        }
+        else
+        {
+            unsigned short mins = (*time >> 5) & 0x003F;
+            unsigned short hours = (*time >> 11) & 0x001F;
+            if ((mins += 10) >= 60)
+            {
+                mins = 0;
+                hours++;
+            }
+            if ((++hours) >= 24)
+            {
+                hours = hours - 24;
+                next_day = true;
+            }
+            *time = (hours << 11) | (mins << 5);
+        }
+    }
+    
+    if (date)
+    {
+        if (0 == *date)
+        {
+            /* set to 1 August 2003 */
+            *date = ((2003 - 1980) << 9) | (8 << 5) | 1;
+        }
+        else
+        {
+            unsigned short day = *date & 0x001F;
+            unsigned short month = (*date >> 5) & 0x000F;
+            unsigned short year = (*date >> 9) & 0x007F;
+            if (next_day)
+            {
+                /* do a very simple day increment - never go above 28 days */
+                if (++day > 28)
+                {
+                    day = 1;
+                    if (++month > 12)
+                    {
+                        month = 1;
+                        year++;
+                    }
+                }
+                *date = (year << 9) | (month << 5) | day;
+            }
+        }
+    }
+    if (tenth)
+        *tenth = 0;
+#endif /* HAVE_RTC */
 }
-#endif
 
 static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
@@ -861,9 +921,7 @@ static int write_long_name(struct fat_file* file,
             entry[FATDIR_ATTR] = 0;
             entry[FATDIR_NTRES] = 0;
 
-#ifdef HAVE_RTC
             fat_time(&date, &time, &tenth);
-#endif
             entry[FATDIR_CRTTIMETENTH] = tenth;
             *(unsigned short*)(entry + FATDIR_CRTTIME) = SWAB16(time);
             *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
@@ -1167,15 +1225,20 @@ static int update_short_entry( struct fat_file* file, int size, int attr )
     sizeptr = (int*)(entry + FATDIR_FILESIZE);
     *sizeptr = SWAB32(size);
 
-#ifdef HAVE_RTC
     {
-        unsigned short date=0, time=0;
+#ifdef HAVE_RTC
+        unsigned short time = 0;
+        unsigned short date = 0;
+#else
+        /* get old time to increment from */
+        unsigned short time = SWAB16(*(unsigned short*)(entry + FATDIR_WRTTIME));
+        unsigned short date = SWAB16(*(unsigned short*)(entry + FATDIR_WRTDATE));
+#endif
         fat_time(&date, &time, NULL);
         *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
         *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
         *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
     }
-#endif
 
     rc = fat_seek( &dir, sector );
     if (rc < 0)
