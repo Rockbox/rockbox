@@ -889,7 +889,7 @@ bool settings_load_config(char* file)
             set_cfg_int(&global_settings.bidir_limit, value, 0, 200);
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font")) {
-            if (!font_load(value))
+            if (font_load(value))
                 set_file(value, global_settings.font_file, MAX_FILENAME);
         }
         else if (!strcasecmp(name, "scroll step"))
