@@ -49,8 +49,8 @@ DIR* opendir(char* name)
     }
 
     /* fixme: strtok() is not thread safe, and fat_getnext() calls yield() */
-    for ( part = strtok(name, "/"); part;
-          part = strtok(NULL, "/") ) {
+    for ( part = strtok(name, "/"); part;
+          part = strtok(NULL, "/")) {
         int partlen = strlen(part);
         /* scan dir for name */
         while (1) {
