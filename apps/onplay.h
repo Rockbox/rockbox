@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Daniel Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,25 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _TREE_H_
-#define _TREE_H_
+#ifndef _ONPLAY_H_
+#define _ONPLAY_H_
 
-#include <stdbool.h>
-
-/* using attribute not used by FAT */
-#define TREE_ATTR_MPA 0x40 /* mpeg audio file */
-#define TREE_ATTR_M3U 0x80 /* playlist */
-#define TREE_ATTR_WPS 0x100 /* wps config file */
-#define TREE_ATTR_MOD 0x200 /* firmware file */
-#define TREE_ATTR_CFG 0x400 /* config file */
-#define TREE_ATTR_TXT 0x500 /* text file */
-#define TREE_ATTR_FONT 0x800 /* font file */
-#define TREE_ATTR_LNG  0x1000 /* binary lang file */
-#define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
-
-void browse_root(void);
-void set_current_file(char *path);
-bool dirbrowse(char *root);
-bool create_playlist(void);
+int onplay(char* file, int attr);
 
 #endif

@@ -50,6 +50,7 @@
 #include "language.h"
 #include "screens.h"
 #include "keyboard.h"
+#include "onplay.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -141,17 +142,6 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ENTER BUTTON_PLAY
 #define TREE_MENU  BUTTON_MENU
 #endif /* HAVE_RECORDER_KEYPAD */
-
-/* using attribute not used by FAT */
-#define TREE_ATTR_MPA 0x40 /* mpeg audio file */
-#define TREE_ATTR_M3U 0x80 /* playlist */
-#define TREE_ATTR_WPS 0x100 /* wps config file */
-#define TREE_ATTR_MOD 0x200 /* firmware file */
-#define TREE_ATTR_CFG 0x400 /* config file */
-#define TREE_ATTR_TXT 0x500 /* text file */
-#define TREE_ATTR_FONT 0x800 /* font file */
-#define TREE_ATTR_LNG  0x1000 /* binary lang file */
-#define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 static int build_playlist(int start_index)
 {
@@ -652,289 +642,6 @@ void set_current_file(char *path)
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
-extern int d_1;
-extern int d_2;
-
-void xingupdate(int percent)
-{
-    char buf[32];
-
-    snprintf(buf, 32, "%d%%", percent);
-    lcd_puts(0, 3, buf);
-    snprintf(buf, 32, "%x", d_1);
-    lcd_puts(0, 4, buf);
-    snprintf(buf, 32, "%x", d_2);
-    lcd_puts(0, 5, buf);
-    lcd_update();
-}
-
-void do_xing(char *filename)
-{
-    char buf2[32];
-    unsigned long start_tick;
-    unsigned long end_tick;
-
-    lcd_clear_display();
-    lcd_puts(0, 0, filename);
-    lcd_update();
-    start_tick = current_tick;
-    mpeg_create_xing_header(filename, xingupdate);
-    end_tick = current_tick;
-    snprintf(buf2, 32, "%d ticks", (int)(end_tick - start_tick));
-    lcd_puts(0, 1, buf2);
-    snprintf(buf2, 32, "%d seconds", (int)(end_tick - start_tick)/HZ);
-    lcd_puts(0, 2, buf2);
-    lcd_update();
-}
-
-static int onplay_screen(char* dir, char* file)
-{
-    bool exit = false;
-    bool used = false;
-    bool playing = mpeg_status() & MPEG_STATUS_PLAY;
-    char buf[MAX_PATH];
-    struct entry* f = &dircache[dirstart + dircursor];
-    bool isdir = f->attr & ATTR_DIRECTORY;
-        
-    if (dir[1])
-        snprintf(buf, sizeof buf, "%s/%s", dir, file);
-    else
-        snprintf(buf, sizeof buf, "/%s", file);
-
-    lcd_clear_display();
-
-    {
-        int w,h;
-        char* ptr;
-
-        lcd_setfont(FONT_SYSFIXED);
-
-        if (playing) {
-            ptr = str(LANG_QUEUE);
-            lcd_getstringsize(ptr,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, h*2, ptr);
-            lcd_bitmap(bitmap_icons_7x8[Icon_Play],
-                       LCD_WIDTH/2 - 3, LCD_HEIGHT/2 - 4, 7, 8, true);
-        }
-
-        /* don't delete directories */
-        if (!isdir) {
-            ptr = str(LANG_DELETE);
-            lcd_getstringsize(ptr,&w,&h);
-            lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h/2, ptr);
-            lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
-                       LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
-        }
-
-        ptr = str(LANG_RENAME);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy(0, LCD_HEIGHT/2 - h/2, ptr);
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
-
-        ptr = "VBR Fix";
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-        lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
-    }
-    lcd_update();
-
-    
-    while (!exit) {
-        switch (button_get(true)) {
-            case BUTTON_LEFT:
-            case BUTTON_ON | BUTTON_LEFT: {
-                char newname[MAX_PATH];
-                char* ptr = strrchr(buf, '/') + 1;
-                int pathlen = (ptr - buf);
-                strncpy(newname, buf, sizeof newname);
-                if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
-                    if (!strlen(buf+pathlen) || (rename(buf, newname) < 0)) {
-                        lcd_clear_display();
-                        lcd_puts(0,0,str(LANG_RENAME));
-                        lcd_puts(0,1,str(LANG_FAILED));
-                        lcd_update();
-                        sleep(HZ*2);
-                    }
-                    else
-                        reload_dir = true;
-                }
-                exit = true;
-                break;
-            }
-
-            case BUTTON_RIGHT:
-            case BUTTON_ON | BUTTON_RIGHT:
-                /* don't delete directories */
-                if (isdir)
-                    break;
-                lcd_clear_display();
-                lcd_puts(0,0,str(LANG_REALLY_DELETE));
-                lcd_puts_scroll(0,1,file);
-                lcd_puts(0,3,str(LANG_RESUME_CONFIRM_RECORDER));
-                lcd_puts(0,4,str(LANG_RESUME_CANCEL_RECORDER));
-                lcd_update();
-                while (!exit) {
-                    int btn = button_get(true);
-                    switch (btn) {
-                        case BUTTON_PLAY:
-                        case BUTTON_PLAY | BUTTON_REL:
-                            if (!remove(buf)) {
-                                reload_dir = true;
-                                lcd_clear_display();
-                                lcd_puts_scroll(0,0,file);
-                                lcd_puts(0,1,str(LANG_DELETED));
-                                lcd_update();
-                                sleep(HZ);
-                                exit = true;
-                            }
-                            break;
-
-                        default:
-                            /* ignore button releases */
-                            if (!(btn & BUTTON_REL))
-                                exit = true;
-                            break;
-                    }
-                }
-                break;
-
-            case BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN:
-                do_xing(buf);
-//                exit = true;
-                break;
-                
-            case BUTTON_PLAY:
-            case BUTTON_ON | BUTTON_PLAY: {
-                if (playing)
-                    queue_add(buf);
-                exit = true;
-                break;
-            }
-
-            case BUTTON_ON | BUTTON_REL:
-                used = true;
-                break;
-
-            case BUTTON_ON:
-                if (used)
-                    exit = true;
-                break;
-
-            case BUTTON_OFF:
-                exit = true;
-                break;
-        }
-    }
-
-    lcd_setfont(FONT_UI);
-
-    return false;
-}
-
-#else
-
-static int onplay_screen(char* dir, char* file)
-{
-    bool exit = false;
-    bool playing = mpeg_status() & MPEG_STATUS_PLAY;
-    char buf[MAX_PATH];
-    struct entry* f = &dircache[dirstart + dircursor];
-    bool isdir = f->attr & ATTR_DIRECTORY;
-    struct menu_items items[3];
-    int ids[3];
-    int lastitem=0;
-    int m_handle;
-    int selected;
-
-    if (dir[1])
-        snprintf(buf, sizeof buf, "%s/%s", dir, file);
-    else
-        snprintf(buf, sizeof buf, "/%s", file);
-    
-    if (playing) {
-        items[lastitem].desc=str(LANG_QUEUE);
-        ids[lastitem]=1;
-        lastitem++;
-    }
-    
-    items[lastitem].desc=str(LANG_RENAME);
-    ids[lastitem]=2;
-    lastitem++;
-
-    /* don't delete directories */
-    if (!isdir) {
-        items[lastitem].desc=str(LANG_DELETE);
-        ids[lastitem]=3;
-        lastitem++;
-    }
-    m_handle=menu_init(items, lastitem);
-
-    selected=menu_show(m_handle);
-    if (selected>=0) {
-        switch(ids[selected]) {
-            case 1:
-                if (playing)
-                    queue_add(buf);
-                break;
-
-            case 2: {
-                char newname[MAX_PATH];
-                char* ptr = strrchr(buf, '/') + 1;
-                int pathlen = (ptr - buf);
-                strncpy(newname, buf, sizeof newname);
-                if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
-                    if (rename(buf, newname) < 0) {
-                        lcd_clear_display();
-                        lcd_puts(0,0,str(LANG_RENAME));
-                        lcd_puts(0,1,str(LANG_FAILED));
-                        lcd_update();
-                        sleep(HZ*2);
-                    }
-                    else
-                        reload_dir = true;
-                }
-            }
-            break;
-
-            case 3:
-                lcd_clear_display();
-                lcd_puts_scroll(0,0,file);
-                lcd_puts(0,1,str(LANG_REALLY_DELETE));
-                lcd_update();
-                while (!exit) {
-                    int btn = button_get(true);
-                    switch (btn) {
-                        case BUTTON_PLAY:
-                            if (!remove(buf)) {
-                                reload_dir = true;
-                                lcd_clear_display();
-                                lcd_puts_scroll(0,0,file);
-                                lcd_puts(0,1,str(LANG_DELETED));
-                                lcd_update();
-                                sleep(HZ);
-                                exit = true;
-                            }
-                            break;
-          
-                        default:
-                            /* ignore button releases */
-                            if (!(btn & BUTTON_REL))
-                                exit = true;
-                            break;
-                    }
-                }
-                break;
-        }
-    }
-    menu_exit(m_handle);
-    return false;
-}
-#endif
-
 static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 {
     bool exit = false;
@@ -942,6 +649,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 
     int dirstart = *ds;
     int dircursor = *dc;
+    char buf[MAX_PATH];
 
     while (!exit) {
         switch (button_get(true)) {
@@ -975,7 +683,14 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 
             case BUTTON_PLAY:
             case BUTTON_ON | BUTTON_PLAY:
-                onplay_screen(currdir, dircache[dircursor+dirstart].name);
+                if (currdir[1])
+                    snprintf(buf, sizeof buf, "%s/%s",
+                             currdir, dircache[dircursor+dirstart].name);
+                else
+                    snprintf(buf, sizeof buf, "/%s",
+                             dircache[dircursor+dirstart].name);
+                if (onplay(buf, dircache[dircursor+dirstart].attr))
+                    reload_dir = 1;
                 exit = true;
                 used = true;
                 break;
