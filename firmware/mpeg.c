@@ -460,47 +460,40 @@ static int get_unsaved_space(void)
 static long timing_info_index = 0;
 static long timing_info[1024];
 #endif /* #ifdef DEBUG */
-static bool inverted_pr;
 static unsigned long num_rec_bytes;
 static unsigned long num_recorded_frames;
 
 static void drain_dma_buffer(void)
 {
-    if(inverted_pr)
-    {
-        while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
-        {
-            or_b(0x08, &PADRH);
-            
-            while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-                    
-            /* It must take at least 5 cycles before
-               the data is read */
-            asm(" nop\n nop\n nop\n");
-            asm(" nop\n nop\n nop\n");
-            and_b(~0x08, &PADRH);
+    asm (
+        "mov     #0x40,r2        \n" /* mask for EOD check */
+        "bra     .d_start        \n"
+        "mov.b   @%0,r1          \n" /* read PBDR (first time) */
 
-            while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
-        }
-    }
-    else
-    {
-        while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
-        {
-            and_b(~0x08, &PADRH);
-            
-            while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-            
-            /* It must take at least 5 cycles before
-               the data is read */
-            asm(" nop\n nop\n nop\n");
-            asm(" nop\n nop\n nop\n");
-                    
-            or_b(0x08, &PADRH);
+    ".d_loop:                    \n"
+        "xor.b   #0x08,@(r0,gbr) \n" /* set PR active */
+    ".d_wait1:                   \n"
+        "mov.b   @%0,r1          \n" /* read PBDR */
+        "cmp/pz  r1              \n" /* and wait for PRTW */
+        "bf      .d_wait1        \n"
 
-            while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
-        }
-    }
+        "xor.b   #0x08,@(r0,gbr) \n" /* reset PR to inactive */
+    ".d_wait2:                   \n"
+        "mov.b   @%0,r1          \n" /* read PBDR */
+        "cmp/pz  r1              \n" /* and wait for /PRTW */
+        "bt      .d_wait2        \n"
+            
+    ".d_start:                   \n"
+        "tst     r1,r2           \n" /* EOD low? */
+        "bf      .d_loop         \n" /* no: next pass */
+
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(PBDR_ADDR),
+        /* %1 = r0 */ "z"(&PADRH)
+        : /* clobbers */
+        "r1","r2"
+    );
 }
 
 #endif /* #ifdef HAVE_MAS3587F */
@@ -517,59 +510,61 @@ void rec_tick(void)
         timing_info[timing_info_index++] = current_tick;
         TCNT2 = 0;
 #endif /* #ifdef DEBUG */
-        /* We read as long as EOD is high, but max 30 bytes.
-           This code is optimized, and should probably be
-           written in assembler instead. */
-        if(inverted_pr)
-        {
-            i = 0;
-            while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
-                  && i < 30)
-            {
-                or_b(0x08, &PADRH);
+        /* We read as long as EOD is high, but max 30 bytes. */
+        asm (
+            "mov     #30,r3          \n" /* i_max = 30 */
+            "mov     #0x40,r2        \n" /* mask for EOD check */
+            "mov     #0,%0           \n" /* i = 0; */
+            "add     %2,%1           \n" /* mp3buf_write -> cur_addr */
+            "add     %2,%3           \n" /* mp3buflen -> end_addr */
+            "bra     .r_start        \n"
+            "mov.b   @%4,r1          \n" /* read PBDR (first time) */
 
-                while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-                
-                /* It must take at least 5 cycles before
-                   the data is read */
-                asm(" nop\n nop\n nop\n");
-                mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
-                
-                if(mp3buf_write >= mp3buflen)
-                    mp3buf_write = 0;
+            ".align  2               \n"
 
-                i++;
-                
-                and_b(~0x08, &PADRH);
+        ".r_loop:                    \n"
+            "xor.b   #0x08,@(r0,gbr) \n" /* set PR active */
+        ".r_wait1:                   \n"
+            "mov.b   @%4,r1          \n" /* read PBDR */
+            "cmp/pz  r1              \n" /* and wait for PRTW */
+            "bf      .r_wait1        \n"
+            
+            "mov.b   @%6,r1          \n" /* read byte from mas */
+            "add     #1,%0           \n" /* i++; */
+            "mov.b   r1,@%1          \n" /* store byte */
+            "add     #1,%1           \n" /* increment current address */
+            
+            "cmp/hi  %1,%3           \n" /* end address reached? */
+            "bt      .r_nowrap       \n" /* no: do nothing */
+            "mov     %2,%1           \n" /* yes: reset to start address */
+        ".r_nowrap:                  \n"
+            
+            "xor.b   #0x08,@(r0,gbr) \n" /* set PR inactive again */
+        ".r_wait2:                   \n"
+            "mov.b   @%4,r1          \n" /* read PBDR */
+            "cmp/pz  r1              \n" /* and wait for /PRTW */
+            "bt      .r_wait2        \n"
+            
+        ".r_start:                   \n"
+            "tst     r2,r1           \n" /* EOD low? */
+            "bt      .r_end          \n" /* yes: end of transfer */
+            "cmp/hi  %0,r3           \n" /* i < i_max? */
+            "bt      .r_loop         \n" /* yes: next pass */
 
-                /* No wait for /RTW, cause it's not necessary */
-            }
-        }
-        else /* !inverted_pr */
-        {
-            i = 0;
-            while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
-                  && i < 30)
-            {
-                and_b(~0x08, &PADRH);
-                
-                while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
-                
-                /* It must take at least 5 cycles before
-                   the data is read */
-                asm(" nop\n nop\n nop\n");
-                mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
-                
-                if(mp3buf_write >= mp3buflen)
-                    mp3buf_write = 0;
-
-                i++;
-                
-                or_b(0x08, &PADRH);
-
-                /* No wait for /RTW, cause it's not necessary */
-            }
-        }
+        ".r_end:                     \n"
+            "sub     %2,%1           \n" /* cur_addr -> mp3buf_write */
+            : /* outputs */
+            /* %0 */ "=&r"(i),
+            /* %1, in & out */ "+r"(mp3buf_write)
+            : /* inputs */
+            /* %2 */ "r"(mp3buf),
+            /* %3 */ "r"(mp3buflen),
+            /* %4 */ "r"(PBDR_ADDR),
+            /* %5 = r0 */ "z"(&PADRH),
+            /* %6 */ "r"(0x4000000)
+            : /* clobbers */
+            "r1","r2","r3"
+        );
 #ifdef DEBUG
         timing_info[timing_info_index++] = TCNT2 + (i << 16);
         timing_info_index &= 0x3ff;
@@ -2631,11 +2626,11 @@ void mpeg_init(void)
 
 #ifdef HAVE_MAS3587F
     if(read_hw_mask() & PR_ACTIVE_HIGH)
-        inverted_pr = true;
+        and_b(~0x08, &PADRH);
     else
-        inverted_pr = false;
+        or_b(0x08, &PADRH);
 #endif /* #ifdef HAVE_MAS3587F */
-    
+
 #ifdef DEBUG
     dbg_timer_start();
     dbg_cnt2us(0);
