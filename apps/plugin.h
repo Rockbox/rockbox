@@ -152,6 +152,7 @@ struct plugin_api {
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
+    void (*splash)(int ticks, bool center, char *fmt, ...);
 
     /* button */
     int (*button_get)(bool block);
@@ -173,6 +174,9 @@ struct plugin_api {
     int (*fprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
+#ifndef SIMULATOR
+    int (*ata_sleep)(void);
+#endif
     
     /* dir */
     DIR* (*opendir)(const char* name);
@@ -187,6 +191,7 @@ struct plugin_api {
     int (*default_event_handler)(int event);
     int (*create_thread)(void* function, void* stack, int stack_size, char *name);
     void (*remove_thread)(int threadnum);
+    void (*reset_poweroff_timer)(void);
 
     /* strings and memory */
     int    (*snprintf)(char *buf, size_t size, const char *fmt, ...);
@@ -201,6 +206,7 @@ struct plugin_api {
 #ifndef SIMULATOR
     const char *_ctype_;
 #endif
+    int (*atoi)(const char *str);
 
     /* sound */
     void (*mpeg_sound_set)(int setting, int value);
@@ -210,9 +216,6 @@ struct plugin_api {
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
     void (*bitswap)(unsigned char *data, int length);
-#ifdef HAVE_MAS3587F
-    int (*mas_codec_readreg)(int reg);
-#endif
 #endif
 
     /* playback control */
@@ -227,17 +230,28 @@ struct plugin_api {
     int (*playlist_amount)(void);
     int (*mpeg_status)(void);
     bool (*mpeg_has_changed_track)(void);
+    struct mp3entry* (*mpeg_current_track)(void);
+
+    /* MAS communication */
+#ifndef SIMULATOR
+    int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
+    int (*mas_writemem)(int bank, int addr, unsigned long* src, int len);
+    int (*mas_readreg)(int reg);
+    int (*mas_writereg)(int reg, unsigned int val);
+#ifdef HAVE_MAS3587F
+    int (*mas_codec_writereg)(int reg, unsigned int val);
+    int (*mas_codec_readreg)(int reg);
+#endif
+#endif
     
     /* misc */
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
-    void (*splash)(int ticks, bool center, char *fmt, ...);
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
-    struct mp3entry* (*mpeg_current_track)(void);
-    int (*atoi)(const char *str);
     struct tm* (*get_time)(void);
+    int  (*set_time)(struct tm *tm);
     void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_mp3_buffer)(int* buffer_size);
 #ifndef SIMULATOR
@@ -245,39 +259,23 @@ struct plugin_api {
     void (*plugin_unregister_timer)(void);
 #endif
     void (*plugin_tsr)(void (*exit_callback)(void));
-
-    /* new stuff, sort in next time the API gets broken! */
-
+#if defined(DEBUG) || defined(SIMULATOR)
+    void (*debugf)(char *fmt, ...);
+#endif
     struct user_settings* global_settings;
     void (*backlight_set_timeout)(int index);
-#ifndef SIMULATOR
-    int (*ata_sleep)(void);
-#endif
-
-
-#if defined(DEBUG) || defined(SIMULATOR)
-   void (*debugf)(char *fmt, ...);
-#endif
-   bool (*mp3info)(struct mp3entry *entry, char *filename, bool v1first);
-   int (*count_mp3_frames)(int fd, int startpos, int filesize,
-                           void (*progressfunc)(int));
-   int (*create_xing_header)(int fd, int startpos, int filesize,
-                             unsigned char *buf, int num_frames,
-                             unsigned long header_template,
-                             void (*progressfunc)(int), bool generate_toc);
-
-#ifndef SIMULATOR
-   int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
-   int (*mas_writemem)(int bank, int addr, unsigned long* src, int len);
-   int (*mas_readreg)(int reg);
-   int (*mas_writereg)(int reg, unsigned int val);
-#ifdef HAVE_MAS3587F
-   int (*mas_codec_writereg)(int reg, unsigned int val);
-#endif
-#endif
+    bool (*mp3info)(struct mp3entry *entry, char *filename, bool v1first);
+    int (*count_mp3_frames)(int fd, int startpos, int filesize,
+                            void (*progressfunc)(int));
+    int (*create_xing_header)(int fd, int startpos, int filesize,
+                              unsigned char *buf, int num_frames,
+                              unsigned long header_template,
+                              void (*progressfunc)(int), bool generate_toc);
     int  (*battery_level)(void);
-    int  (*set_time)(struct tm *tm);
-    void (*reset_poweroff_timer)(void);
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+    
 
 };
 

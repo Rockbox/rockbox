@@ -124,6 +124,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     backlight_on,
     backlight_off,
+    splash,
 
     /* button */
     button_get,
@@ -145,6 +146,9 @@ static const struct plugin_api rockbox_api = {
     fprintf,
     read_line,
     settings_parseline,
+#ifndef SIMULATOR
+    ata_sleep,
+#endif
 
     /* dir */
     PREFIX(opendir),
@@ -159,6 +163,7 @@ static const struct plugin_api rockbox_api = {
     default_event_handler,
     create_thread,
     remove_thread,
+    reset_poweroff_timer,
 
     /* strings and memory */
     snprintf,
@@ -173,6 +178,7 @@ static const struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     _ctype_,
 #endif
+    atoi,
 
     /* sound */
     mpeg_sound_set,
@@ -182,9 +188,6 @@ static const struct plugin_api rockbox_api = {
     mp3_play_stop,
     mp3_is_playing,
     bitswap,
-#ifdef HAVE_MAS3587F
-    mas_codec_readreg,
-#endif
 #endif
     
     /* playback control */
@@ -199,39 +202,9 @@ static const struct plugin_api rockbox_api = {
     playlist_amount,
     mpeg_status,
     mpeg_has_changed_track,
-
-    /* misc */
-    srand,
-    rand,
-    splash,
-    (qsort_func)qsort,
-    kbd_input,
     mpeg_current_track,
-    atoi,
-    get_time,
-    plugin_get_buffer,
-    plugin_get_mp3_buffer,
-#ifndef SIMULATOR
-    plugin_register_timer,
-    plugin_unregister_timer,
-#endif
-    plugin_tsr,
 
-    /* new stuff at the end, sort into place next time the API gets incompatible */
-
-
-    &global_settings,
-    backlight_set_timeout,
-#ifndef SIMULATOR
-    ata_sleep,
-#endif
-#if defined(DEBUG) || defined(SIMULATOR)
-    debugf,
-#endif
-    mp3info,
-    count_mp3_frames,
-    create_xing_header,
-
+    /* MAS communication */
 #ifndef SIMULATOR
     mas_readmem,
     mas_writemem,
@@ -239,11 +212,36 @@ static const struct plugin_api rockbox_api = {
     mas_writereg,
 #ifdef HAVE_MAS3587F
     mas_codec_writereg,
+    mas_codec_readreg,
 #endif
 #endif
-    battery_level,
+
+    /* misc */
+    srand,
+    rand,
+    (qsort_func)qsort,
+    kbd_input,
+    get_time,
     set_time,
-    reset_poweroff_timer,
+    plugin_get_buffer,
+    plugin_get_mp3_buffer,
+#ifndef SIMULATOR
+    plugin_register_timer,
+    plugin_unregister_timer,
+#endif
+    plugin_tsr,
+#if defined(DEBUG) || defined(SIMULATOR)
+    debugf,
+#endif
+    &global_settings,
+    backlight_set_timeout,
+    mp3info,
+    count_mp3_frames,
+    create_xing_header,
+    battery_level,
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 
 };
 
