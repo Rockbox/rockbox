@@ -31,6 +31,7 @@
 #include "playlist.h"
 #include "settings.h"
 #include "settings_menu.h"
+#include "power.h"
 #include "powermgmt.h"
 #include "sound_menu.h"
 
@@ -153,13 +154,21 @@ void show_info(void)
         snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
         lcd_puts(0, 2, s);
 #endif
-        
+
 #ifdef HAVE_LCD_CHARCELLS
         snprintf(s, sizeof(s), "Batt: %d%%%s", battery_level(), battery_level_safe() ? "" : "!");
         lcd_puts(0, 1, s);
 #else
+#ifdef HAVE_CHARGE_CTRL
+        if (charger_enabled)
+            snprintf(s, sizeof(s), "Battery: charging");
+        else
+            snprintf(s, sizeof(s), "Battery: %d%%%s", battery_level(), battery_level_safe() ? "" : " !!");
+        lcd_puts(0, 3, s);
+#else
         snprintf(s, sizeof(s), "Battery: %d%%%s", battery_level(), battery_level_safe() ? "" : " !!");
         lcd_puts(0, 3, s);
+#endif
 #endif
     
         lcd_update();
