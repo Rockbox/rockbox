@@ -497,9 +497,9 @@ static void recalculate_watermark(int bitrate)
 
     if(time)
     {
-        /* No drive spins up faster than 2.5s */
-        if(time < 250)
-            time = 250;
+        /* No drive spins up faster than 3.5s */
+        if(time < 350)
+            time = 350;
 
         time = time * 3;
         low_watermark = ((low_watermark_margin * HZ + time) *
