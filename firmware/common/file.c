@@ -83,17 +83,13 @@ int open(const char* pathname, int flags)
         errno = EMFILE;
         return -2;
     }
+    memset(&openfiles[fd], 0, sizeof (struct filedesc));
 
-    if (flags & O_RDONLY) {
-        openfiles[fd].write = false;
-    }
-    else {
-        if (flags & (O_RDWR | O_WRONLY)) {
-            openfiles[fd].write = true;
-
-            if (flags & O_TRUNC)
-                openfiles[fd].trunc = true;
-        }
+    if (flags & (O_RDWR | O_WRONLY)) {
+        openfiles[fd].write = true;
+        
+        if (flags & O_TRUNC)
+            openfiles[fd].trunc = true;
     }
     openfiles[fd].busy = true;
 
