@@ -290,6 +290,7 @@ bool dirbrowse(char *root)
     char buf[MAX_PATH];
     int i;
     int rc;
+    int button;
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -322,7 +323,8 @@ bool dirbrowse(char *root)
         }
         lcd_update();
 
-        switch ( button_get(true) ) {
+        button = button_get(true);
+        switch ( button & ~BUTTON_REPEAT) {
             case TREE_EXIT:
                 if ( play_mode == 1 )
                     play_mode = 0;
@@ -489,6 +491,11 @@ bool dirbrowse(char *root)
             }
 
             case BUTTON_ON:
+                /* The mpeg thread may have stopped playing, so we'd
+                   better update our status */
+                if(!mpeg_is_playing())
+                   play_mode = 0;
+                   
                 if ( play_mode ) {
                     lcd_stop_scroll();
                     rc = wps_show();
