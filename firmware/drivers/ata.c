@@ -69,7 +69,7 @@
 #define ATA_STATUS_IDX      ATA_COMMAND_IDX
 #define ATA_ALT_STATUS_IDX  ATA_CONTROL_IDX
 
-#define SET_REG(reg, value) (ide_write_register(reg, value))
+#define SET_REG(reg, value) (ide_write_register(reg ## _IDX, value))
 #define GET_REG(reg) (ide_read_register(reg))
 
 #define ATA_DATA        (GET_REG(ATA_DATA_IDX))
@@ -84,17 +84,6 @@
 #define ATA_STATUS      (GET_REG(ATA_STATUS_IDX))
 #define ATA_ALT_STATUS  (GET_REG(ATA_ALT_STATUS_IDX))
 #define ATA_FEATURE     (GET_REG(ATA_FEATURE_IDX))
-
-
-#define SET_ATA_DATA(v)        (SET_REG(ATA_DATA_IDX,v))
-#define SET_ATA_SELECT(v)      (SET_REG(ATA_SELECT_IDX,v))
-#define SET_ATA_NSECTOR(v)     (SET_REG(ATA_NSECTOR_IDX,v))
-#define SET_ATA_SECTOR(v)      (SET_REG(ATA_SECTOR_IDX,v))
-#define SET_ATA_LCYL(v)        (SET_REG(ATA_LCYL_IDX,v))
-#define SET_ATA_HCYL(v)        (SET_REG(ATA_HCYL_IDX,v))
-#define SET_ATA_COMMAND(v)     (SET_REG(ATA_COMMAND_IDX,v))
-#define SET_ATA_CONTROL(v)     (SET_REG(ATA_CONTROL_IDX,v))
-#define SET_ATA_FEATURE(v)     (SET_REG(ATA_FEATURE_IDX, v))
 
 
 extern int idatastart __attribute__ ((section(".idata")));
@@ -153,6 +142,8 @@ int ide_read_register(int reg) {
 
 #define SET_REG(reg, value) ((reg) = (value))
 
+#endif
+
 #define SET_ATA_DATA(v)        (SET_REG(ATA_DATA,v))
 #define SET_ATA_SELECT(v)      (SET_REG(ATA_SELECT,v))
 #define SET_ATA_NSECTOR(v)     (SET_REG(ATA_NSECTOR,v))
@@ -162,9 +153,6 @@ int ide_read_register(int reg) {
 #define SET_ATA_COMMAND(v)     (SET_REG(ATA_COMMAND,v))
 #define SET_ATA_CONTROL(v)     (SET_REG(ATA_CONTROL,v))
 #define SET_ATA_FEATURE(v)     (SET_REG(ATA_FEATURE, v))
-
-#endif
-
 
 
 #define SELECT_DEVICE1  0x10
