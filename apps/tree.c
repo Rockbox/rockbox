@@ -66,7 +66,6 @@ void browse_root(void)
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
-extern icons_6x8;
 
 #else /* HAVE_LCD_BITMAP */
 
