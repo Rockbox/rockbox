@@ -49,6 +49,7 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 {
     WavpackStream *wps = &wpc.stream;
     ulong bcount;
+    (void)error;
 
     CLEAR (wpc);
     wpc.infile = infile;
