@@ -28,8 +28,8 @@
 static struct plugin_api *pgfx_rb = NULL; /* global api struct pointer */
 static int char_width;
 static int char_height;
-static int pixel_height;
-static int pixel_width;
+static unsigned pixel_height;
+static unsigned pixel_width;
 static unsigned char gfx_chars[8];
 static unsigned char gfx_buffer[56];
 
@@ -200,19 +200,50 @@ void pgfx_invertrect (int x, int y, int nx, int ny)
 {
     int i, j;
 
-    if (x > pixel_width)
-        return;
-    if (y > pixel_height)
+    if (((unsigned) x >= pixel_width) || ((unsigned) y >= pixel_height))
         return;
 
-    if (x + nx > pixel_width)
+    if ((unsigned)(x + nx) > pixel_width)
         nx = pixel_width - x;
-    if (y + ny > pixel_height)
+    if ((unsigned)(y + ny) > pixel_height)
         ny = pixel_height - y;
 
     for (i = 0; i < nx; i++)
         for (j = 0; j < ny; j++)
             pgfx_invertpixel(x + i, y + j);
+}
+
+void pgfx_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
+                  bool clear)
+{
+    int stride, i, j;
+    unsigned data;
+
+    if (((unsigned) x >= pixel_width) || ((unsigned) y >= pixel_height))
+        return;
+
+    stride = nx;    /* otherwise right-clipping will destroy the image */
+
+    if (((unsigned)(x + nx)) >= pixel_width)
+        nx = pixel_width - x;
+    if (((unsigned)(y + ny)) >= pixel_height)
+        ny = pixel_height - y;
+
+    for (i = 0; i < nx; i++, src++)
+    {
+        data = src[0];
+        if (ny > 8)  /* ny is max. 14 */
+            data |= src[stride] << 8;  
+        for (j = 0; j < ny; j++)
+        {
+            if (data & 1)
+                pgfx_drawpixel(x + i, y + j);
+            else
+                if (clear)
+                    pgfx_clearpixel(x + i, y + j);
+            data >>= 1;
+        }
+    }
 }
 
 #endif /* HAVE_LCD_CHARCELLS */

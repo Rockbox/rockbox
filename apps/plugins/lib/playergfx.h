@@ -38,6 +38,8 @@ void pgfx_drawline(int x1, int y1, int x2, int y2);
 void pgfx_clearline(int x1, int y1, int x2, int y2);
 void pgfx_invertline(int x1, int y1, int x2, int y2);
 void pgfx_invertrect (int x, int y, int nx, int ny);
+void pgfx_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
+                  bool clear);
 
 #endif /* HAVE_LCD_CHARCELLS */
 #endif /* __PGFX_H__ */
