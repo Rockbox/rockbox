@@ -24,6 +24,7 @@
 #include <lcd.h>
 #include <debug.h>
 #include <font.h>
+#include "limits.h"
 #include "bookmark.h"
 #include "tree.h"
 #include "settings.h"
@@ -160,9 +161,9 @@ static int compare(const void* p1, const void* p2)
             int t2 = e2->attr & TREE_ATTR_MASK;
 
             if (!t1) /* unknown type */
-                t1 = 0x7FFFFFFF; /* gets a high number, to sort after known */
+                t1 = INT_MAX; /* gets a high number, to sort after known */
             if (!t2) /* unknown type */
-                t2 = 0x7FFFFFFF; /* gets a high number, to sort after known */
+                t2 = INT_MAX; /* gets a high number, to sort after known */
 
             if (t1 - t2) /* if different */
                 return t1 - t2;
@@ -276,7 +277,9 @@ int ft_load(struct tree_context* c, const char* tempdir)
             break;
         }
         dptr->name = &c->name_buffer[name_buffer_used];
-        dptr->time_write = entry->wrtdate<<16 | entry->wrttime; /* in one # */
+        dptr->time_write =
+            (long)entry->wrtdate<<16 |
+            (long)entry->wrttime; /* in one # */
         strcpy(dptr->name,entry->d_name);
         name_buffer_used += len + 1;
 

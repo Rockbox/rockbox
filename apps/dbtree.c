@@ -131,9 +131,9 @@ int db_load(struct tree_context* c)
     int i, offset, rc;
     int dcachesize = global_settings.max_files_in_dir * sizeof(struct entry);
     int itemcount, stringlen, hits=0;
-    unsigned int* nptr = (void*) c->name_buffer;
-    unsigned int* dptr = c->dircache;
-    unsigned int* safeplace = NULL;
+    unsigned long* nptr = (void*) c->name_buffer;
+    unsigned long* dptr = c->dircache;
+    unsigned long* safeplace = NULL;
     int safeplacelen = 0;
 
     int table = c->currtable;
@@ -169,7 +169,7 @@ int db_load(struct tree_context* c)
 
             for (i=0; i < 4; i++) {
                 strcpy(nbuf, labels[i]);
-                dptr[0] = (unsigned int)nbuf;
+                dptr[0] = (unsigned long)nbuf;
                 dptr[1] = tables[i];
                 nbuf += strlen(nbuf) + 1;
                 dptr += 2;
@@ -189,7 +189,7 @@ int db_load(struct tree_context* c)
 
             for (i=0; i < 3; i++) {
                 strcpy(nbuf, labels[i]);
-                dptr[0] = (unsigned int)nbuf;
+                dptr[0] = (unsigned long)nbuf;
                 dptr[1] = tables[i];
                 nbuf += strlen(nbuf) + 1;
                 dptr += 2;
@@ -345,7 +345,7 @@ int db_load(struct tree_context* c)
         }
 
         /* store name pointer in dir cache */
-        dptr[0] = (unsigned int)nptr;
+        dptr[0] = (unsigned long)nptr;
 
         if (skip)
             lseek(fd, skip, SEEK_CUR);
@@ -374,7 +374,7 @@ int db_load(struct tree_context* c)
 
     if (c->currtable == albums4artist && !c->dirfull) {
         strcpy((char*)nptr, str(LANG_ID3DB_ALL_SONGS));
-        dptr[0] = (unsigned int)nptr;
+        dptr[0] = (unsigned long)nptr;
         dptr[1] = extra; /* offset to artist */
         hits++;
     }
@@ -560,7 +560,7 @@ static int db_play_folder(struct tree_context* c)
         lseek(fd, pathoffset, SEEK_SET);
         rc = read(fd, buf, sizeof(buf));
         if (rc < songlen) {
-            DEBUGF("short path read(%d) = %d\n", sizeof(buf), rc);
+            DEBUGF("short path read(%ld) = %d\n", sizeof(buf), rc);
             return -2;
         }
 
