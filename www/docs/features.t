@@ -123,7 +123,7 @@ NO
 EFEAT
 
 NAME File Delete & Rename ENAME
-NO
+YES
 YES
 EFEAT
 
