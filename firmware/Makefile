@@ -25,12 +25,12 @@ TARGET = -DARCHOS_PLAYER=1
 # store output files in this directory:
 OBJDIR = .
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
+CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 else
-CFLAGS += -fomit-frame-pointer -fschedule-insns
+CFLAGS += -fomit-frame-pointer -fschedule-insns 
 endif
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
