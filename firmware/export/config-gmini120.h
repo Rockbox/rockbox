@@ -48,4 +48,6 @@
 
 #define HAVE_GMINI_I2C
 
+#define GMINI_ARCH
+
 #endif
