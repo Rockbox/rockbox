@@ -63,13 +63,13 @@ extern unsigned char extended_font_player[NO_EXTENDED_LCD_CHARS][8];
 struct scrollinfo {
     int mode;
     char text[MAX_PATH];
-    char line[32];
     int textlen;
     int offset;
+    int turn_offset;
     int startx;
     int starty;
-    int space;
     long scroll_start_tick;
+    int direction; /* +1 for right or -1 for left*/
 };
 
 static void scroll_thread(void);
@@ -444,29 +444,33 @@ void lcd_init (void)
 void lcd_puts_scroll(int x, int y, unsigned char* string )
 {
     struct scrollinfo* s;
+    int i;
 
     DEBUGF("lcd_puts_scroll(%d, %d, %s)\n", x, y, string);
 
     s = &scroll[y];
 
-    s->space = 11 - x;
-
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
 
-    if ( s->textlen > s->space ) {
+    if ( s->textlen > 11-x ) {
         s->mode = SCROLL_MODE_RUN;
         s->scroll_start_tick = current_tick + scroll_delay;
-        s->offset=s->space;
+        s->offset=0;
         s->startx=x;
         s->starty=y;
+        s->direction=+1;
         strncpy(s->text,string,sizeof s->text);
+        s->turn_offset=-1;
+        if ( s->textlen + x > 11+4)
+            s->turn_offset=s->textlen-x-11+4;
+
+        for (i=0; i<scroll_spacing && s->textlen<(int)sizeof(s->text); i++) {
+            s->text[s->textlen++]=' ';
+        }
+        if (s->textlen<(int)sizeof(s->text))
+            s->text[s->textlen]=' ';
         s->text[sizeof s->text - 1] = 0;
-        memset(s->line, 0, sizeof s->line);
-        strncpy(s->line,string,
-                s->space > (int)sizeof s->line ?
-                (int)sizeof s->line : s->space );
-        s->line[sizeof s->line - 1] = 0;
     } else
         s->mode = SCROLL_MODE_OFF;
 }
@@ -564,7 +568,7 @@ static void scroll_thread(void)
 {
     struct scrollinfo* s;
     int index;
-    int i;
+    int i, o;
     bool update;
 
     /* initialize scroll struct array */
@@ -577,26 +581,40 @@ static void scroll_thread(void)
         update = false;
 
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-          s = &scroll[index];
-          if ( s->mode == SCROLL_MODE_RUN ) {
-            if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
+            s = &scroll[index];
+            if ( s->mode == SCROLL_MODE_RUN ) {
+                if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
+                    char buffer[12];
                     update = true;
-
-                    for ( i = 0; i < s->space - 1; i++ )
-                        s->line[i] = s->line[i+1];
-
-                    if ( s->offset < s->textlen ) {
-                        s->line[(int)s->space - 1] = s->text[(int)s->offset];
-                        s->offset++;
+                    DEBUGF("offset=%d, turn_offset=%d, len=%d",
+                           s->offset, s->turn_offset, s->textlen);
+                    if ( s->offset < s->textlen-1 ) {
+                        s->offset+=s->direction;
+                        if (s->offset==0) {
+                            s->direction=+1;
+                            s->scroll_start_tick = current_tick + scroll_delay;
+                        } else if (s->offset==s->turn_offset) {
+                            s->direction=-1;
+                            s->scroll_start_tick = current_tick + scroll_delay;
+                        }
                     }
                     else {
-                        s->line[s->space - 1] = ' ';
-                        if ( s->offset < s->textlen + scroll_spacing - 1 )
-                            s->offset++;
-                        else
                             s->offset = 0;
                     }
-                    lcd_puts(s->startx,s->starty,s->line);
+
+                    i=0;
+                    o=s->offset;
+                    while (i<11) {
+                        buffer[i++]=s->text[o++];
+                        if (o==s->textlen)
+                            break;
+                    }
+                    o=0;
+                    while (i<11) {
+                        buffer[i++]=s->text[o++];
+                    }
+                    buffer[11]=0;
+                    lcd_puts(s->startx, s->starty, buffer);
                 }
             }
 
