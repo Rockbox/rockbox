@@ -750,9 +750,8 @@ void lcd_putsldfxy(int x, int y, unsigned char *str)
         if(lcd_x + nx > LCD_WIDTH)
             break;
 
-        lcd_clearrect (lcd_x, lcd_y, 1, ny);
         lcd_bitmap (&char_buf[0], lcd_x, lcd_y, nx, ny, true);
-        lcd_x += nx+1;
+        lcd_x += nx;
     }
 }
 #endif
