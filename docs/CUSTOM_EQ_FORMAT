@@ -1,0 +1,33 @@
+Custom EQ
+File Format Specifications
+
+Description / General Info
+--------------------------
+* The Custom EQ is used on both the Rockbox Player and Recorder, in order to
+  load, well, custom eq settings.
+* After editing the .eq file, you may need to reboot your Rockbox.
+
+File Location
+-------------
+The files may reside anywhere on the hard disk. The only restriction is that
+the filename must end in .eq
+
+Format Rules
+------------
+* Each setting must have it's own line
+* The setting you wish to change must be in brackets.
+* The value must be immediately after the end bracket, with no spaces.
+* There must be a # immediately after the value, with no spaces
+* Any text after the # will be ignored
+* If a value is out of the acceptable range for the device, which can vary 
+  depending on the model, a Syntax Error will be displayed and the value
+  will be set to the default value.
+
+Example File
+------------
+[volume]70#(0 to 100)
+[bass]11#(-15 to 15 [Range depends on MAS])
+[treble]12#(-15 to 15 [Range depends on MAS])
+[balance]0#(-100 to 100)
+
+This sets each line to the respective values after it. Notice that you can put comments after the #
