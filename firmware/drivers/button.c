@@ -116,17 +116,6 @@ static void button_tick(void)
                             repeat_count > POWEROFF_COUNT)
                             power_off();
 #endif
-                        
-                        /* Reboot if the OFF button is pressed long enough
-                           and we are connected to a charger. */
-#ifdef HAVE_RECORDER_KEYPAD
-                        if(btn == BUTTON_OFF && charger_inserted() &&
-                            repeat_count > POWEROFF_COUNT)
-#elif HAVE_PLAYER_KEYPAD
-                        if(btn == BUTTON_STOP && charger_inserted() &&
-                            repeat_count > POWEROFF_COUNT)
-#endif
-                            system_reboot();
                     }
                 }
                 else
