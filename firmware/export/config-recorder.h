@@ -67,4 +67,7 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Define this for S/PDIF output available */
+#define HAVE_SPDIF_OUT
+
 #endif /* SIMULATOR */

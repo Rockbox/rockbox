@@ -552,8 +552,11 @@ static void init_playback(void)
     mas_codec_writereg(6, 0x0000);
     mas_codec_writereg(7, 0x4000);
 
-    /* Disable SDO and SDI, low impedance S/PDIF outputs */
-    val = 0x09;
+#ifdef HAVE_SPDIF_OUT
+    val = 0x09; /* Disable SDO and SDI, low impedance S/PDIF outputs */
+#else
+    val = 0x2d; /* Disable SDO and SDI, disable S/PDIF output */
+#endif
     mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
 
     /* Set Demand mode and validate all settings */
