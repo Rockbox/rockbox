@@ -339,6 +339,10 @@ static void handle_auto_poweroff(void)
                 else
                 {
                     DEBUGF("Sleep timer timeout. Shutting off...\n");
+                    /* Make sure that the disk isn't spinning when
+                       we cut the power */
+                    while(ata_disk_is_active())
+                       sleep(HZ);
                     power_off();
                 }
             }
