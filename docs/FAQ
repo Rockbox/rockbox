@@ -52,10 +52,10 @@ Q11. How can I meet the developers working on the project?
 A11. One way is by visiting us on IRC.  Head on over to the server
      irc.openprojects.net, and then join "#rockbox".  There is usually at 
      least one person there.  If you don't see any activity, feel free to post 
-     questions anyway, serveral of us log the channel and will get you answers
+     questions anyway, several of us log the channel and will get you answers
      when we unidle.
 
-Q12: Wow, you guys talk on IRC alot?  I wish I had been around for those 
+Q12: Wow, you guys talk on IRC a lot?  I wish I had been around for those 
      conversations to see what happened.
 A12: We are glad you mentioned that!  http://rockbox.haxx.se/irc happens
      to have a list of various logs we have recorded of events in the channel.
@@ -71,7 +71,7 @@ A14. All firmware mods that are presented are still highly experimental.
      the hardware modifications we show, will not damage your player or void 
      your warranty.  That said, we have not been able to damage any of our 
      units by modifying only the firmware. You can accidentally password 
-     protect your harddisk, but there are ways around that. (See below.)
+     protect your hard disk, but there are ways around that. (See below.)
 
 Q15. I want to see what the inside of my player looks like, but I would really
      like to avoid voiding my warranty.  Is there anything you can suggest?
@@ -79,7 +79,7 @@ A15. We have a collection of photos of both the player and recorder. Look at
      http://rockbox.haxx.se/internals/
 
 Q16. What exactly are you trying to achieve with this line of development?
-     (A.K.A. whats your purpose for being here?)
+     (A.K.A. what's your purpose for being here?)
 A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
      it profusely. This is great fun!
      Secondly, we feel the firmware is lacking some features and contain a
@@ -111,12 +111,12 @@ A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
 Q17. You mention supporting Ogg Vorbis and other file types on your list of
      ideas. What is the status on that?
 A17. Pessimist's Answer: At the current time we believe this is not very
-     likely. The Micronas chip (MAS3507) decoder in the archos does not
+     likely. The Micronas chip (MAS3507) decoder in the Archos does not
      natively support decoding and there is very little program space in the
      player to implement it ourselves.  The alternative would be to write a
-     software decoder as part of the RockBox firmware.  However, as much as we
+     software decoder as part of the Rockbox firmware.  However, as much as we
      love our players, the computing power of the Archos (SH1 microcontroller)
-     is not fully sufficent for this need.
+     is not fully sufficient for this need.
 
      Optimist's Answer: We can play any format if only we can write code for 
      the DSP to decode it.  The MAS 3507 (and 3587) are generic DSPs that 
@@ -158,23 +158,24 @@ A21. We have a rough idea of which features we plan/expect/hope to be included
      Version 2.0
           Recording, Autobuild playlists, File/directory management
 
-Q22. I tried one of your firmware files and now I can't access my harddisk!
+Q22. I tried one of your firmware files and now I can't access my hard disk!
      When I turn on my jukebox, it says:
                      Part. Error
                      Pls Chck HD
-A22. Your harddisk has been password protected. We're not 100% sure why it
+A22. Your hard disk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
      http://rockbox.haxx.se/lock.html
 
 Q23: This FAQ doesn't answer the question I have.  What should I do?
 A23: You have a couple options here.  You could forget the question, find an
-     easier question, or accept '42' as the answer no matter what.  We don't 
+     easier question, or accept '42' as the answer no matter what.  We don't
      really recommend any of these (though I do opt for '42' often myself).
-     What we do recommend is stopping by IRC, visiting the website
-     (http://rockbox.haxx.se) to see if the question was answered else 
-     where (like our nodo http://rockbox.haxx.se/docs/nodo.html faq) and just 
-     not included here, or ultimatly dropping an email to the mailing list 
-     (rockbox@cool.haxx.se) or the FAQ maintainer listed on the project homepage.  
+     What we do recommend is stopping by IRC, visiting the web site
+     (http://rockbox.haxx.se) to see if the question was answered else where
+     (like our nodo http://rockbox.haxx.se/docs/nodo.html FAQ) and just not
+     included here, or ultimately dropping an email to the mailing list
+     (rockbox@cool.haxx.se) or the FAQ maintainer listed on the project home
+     page.
 
 Q24: Are there other ways to contact the developers?
 A24: Yes.
@@ -185,8 +186,8 @@ A25: No.  Post to the mailing list and we will get back to you.
 Q26: But I _really_ want to talk with you in person.
 A26: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
      doctors here won't let me have pens or pencils.  They say its some rule
-     about us not having sharp objects.  I'm sorry.  Now please stop calling me
-     here.
+     about us not having sharp objects.  I'm sorry.  Now please stop calling
+     me here.
 
 Q27: Will you ever port Quake II to the Archos?
 A27: If you ask that again, I'm sending your address and phone number to the 
@@ -205,7 +206,7 @@ A29: We believe we are in the green on this.  We are not violating anyone's
      but seeing as that _would_ have violated Archos' copyright, we didn't 
      follow that course of action.
 
-Q30: On the website [and various information postings] you state 
+Q30: On the web site [and various information postings] you state 
         "Every tiny bit was reverse engineered, disassembled and then 
          re-written from scratch".  
      If it was rewritten from scratch then why was it first reverse-engineered
@@ -223,8 +224,8 @@ A30: Don't confuse the terms.  Reverse engineering means examining a product
      software has ever been written from scratch.
 
 Q31: Wait a minute here.  When you released version 1.0 you did not have a 
-     single one of the ideas you have mentioned on your website actually 
-     implimented!  Calling this version 1.0 is really misleading.  Whats the 
+     single one of the ideas you have mentioned on your web site actually 
+     implemented!  Calling this version 1.0 is really misleading.  What's the 
      story?!
 A31: In simple terms, the first release was called 1.0 because it had a basic 
      working feature set that worked and had no known bugs. That is what 1.0 
@@ -236,7 +237,7 @@ A31: In simple terms, the first release was called 1.0 because it had a basic
      would help bring the project some attention, and some additional 
      developers.  Adding the missing features was just a matter of time.  In 
      more recent releases we have completed many of our desired goals, and 
-     several new ones that were implimented to fullfill user requests.
+     several new ones that were implemented to fulfill user requests.
 
 Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
@@ -250,11 +251,11 @@ A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
      to Rockbox you may need to reboot manually if the new firmware you loaded
      does not have a bootloader itself.)
 
-Q33: Can I use the Archos as an USB harddisk to store data from my PDA/
+Q33: Can I use the Archos as an USB hard disk to store data from my PDA/
      digital camera/phone etc.
 A33: No.  See: http://rockbox.haxx.se/docs/nodo.html#4
 
-Q34: When I use RockBox my jukebox's red "error" light turns on a lot, but this
+Q34: When I use Rockbox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
 A34: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
@@ -284,7 +285,7 @@ A40: You check out http://rockbox.haxx.se/docs/custom_wps_format.html to learn
      the format/features of a .wps file, and you visit 
      http://rockbox.haxx.se/manual/wps.html to learn how to load it ;)
 
-Q41: Does Rockobx support other languages? How do I load/use different 
+Q41: Does Rockbox support other languages? How do I load/use different 
      languages?
 A41: See: http://rockbox.haxx.se/lang
 
@@ -318,7 +319,7 @@ A46: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
 
 Q47: Where's the recording option?  Why can't I record?!!
 A47: I'd like to say we hid it because we don't like you, but you seem to be
-     a good person so here's the truth.  It's just not implimented in release 
+     a good person so here's the truth.  It's just not implemented in release 
      versions of Rockbox yet.  But stress not, you can still use Rolo to boot 
      the default Archos firmware and record from there.  (In order to do this
      you _must_ have a copy of the original firmware still on your player) 
@@ -327,7 +328,7 @@ A47: I'd like to say we hid it because we don't like you, but you seem to be
      Recording. If you're brave and want to help out, get one, try out and
      report your findings!
 
-Q48: When recording is finally implimented in Rockbox, will it be possible to
+Q48: When recording is finally implemented in Rockbox, will it be possible to
      use custom codecs (like LAME) or is there a built in codec in the Archos?
 A48: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
 
@@ -395,7 +396,7 @@ A54: Because it's useless.  Dynamic memory is only ever useful if you have
      playlist etc. 
 
      We have a number of tasks that consume memory. They can all run at the 
-     same time, using all of their alotted memory. Therefore it is much better
+     same time, using all of their allotted memory. Therefore it is much better
      to allocate that memory to them beforehand and not pretend that anyone 
      else is able to use it. This is standard practice in memory-limited 
      systems. 
@@ -421,7 +422,7 @@ A57: There are many programs that can create .m3u playlists. WinAmp is one.
        dir /b /s X:\ > X:\allfiles.m3u
        dir /b /s X:\Pop > X:\pop.m3u
 
-     ...where X: is your archos drive.
+     ...where X: is your Archos drive.
 
      Linux users can use the 'find' command:
 
@@ -434,10 +435,10 @@ A57: There are many programs that can create .m3u playlists. WinAmp is one.
 Q58: How does the shuffle work?
 A58: It sees the playlist as a deck of cards, shuffling the entries using a
      pseudo-random generator called the Mersenne Twister. After shuffling,
-     the list is never changed again until you reshuffle the list, by
+     the list is never changed again until you re-shuffle the list, by
      stopping the playback and restarting. If the repeat mode is enabled,
      the list will simply start over from the first file again, without
-     reshuffling.
+     re-shuffling.
      The random seed is stored in the persistent setting area, so that the
      resume feature can shuffle the playlist in exactly the same way when
      resuming.
@@ -466,7 +467,7 @@ A61: If we were better programmers we would take that as an insult.  But we
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
 
-Q62: Whats with all the different versions of Rockbox?
+Q62: What's with all the different versions of Rockbox?
 A62: There are really only two versions of Rockbox.  One for Players and one
      for Recorders.  However, we do have 3 other 'versions' of Rockbox 
      available for download.  These would be Releases, Daily Builds, and 
@@ -511,8 +512,8 @@ A64: Truth is, we don't need to fix anything.  If you are using OSX then you
      the Finder, then name the folder.  
          
 Q65: Will Rockbox work on an of Archos' other units?
-A65: Some development has recently occured on the Archos FM units, and is 
-     in the daily builds.  However the FM developement is not being done by 
+A65: Some development has recently occurred on the Archos FM units, and is 
+     in the daily builds.  However the FM development is not being done by 
      the core team, and so is progressing at a slower rate.  As yet, 
      no development is planned for any of Archos' other units.
 
@@ -523,7 +524,7 @@ A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
 
-     - Download and install Directory Snoop (version 4.03 in november 2002)
+     - Download and install Directory Snoop (version 4.03 in November 2002)
      from http://www.briggsoft.com/dsnoop.htm
      It's shareware, the trial version can be used 25 times.
 
@@ -535,9 +536,9 @@ A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
      - Launch Directory snoop
 
      - Click on the Jukebox drive letter in the [select drive] field in the
-     toolbar. The content of the jukebox harddrive appears in the main
+     toolbar. The content of the jukebox hard drive appears in the main
      window. Files which appear in red color don't seem to be present on the
-     harddrive, but they still here.
+     hard drive, but they still here.
 
      - Simply select the appropriate files (red color) and purge them
      (Purge button). Of course, don't erase the new archos.mod file and the
@@ -551,9 +552,9 @@ A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
 Q67: What kind of mic can I connect to my AJBR?
 A67: There are several types of microphones.
 
-     Dynamic: The one that's available from archos is a dynamic one.
+     Dynamic: The one that's available from Archos is a dynamic one.
      Their output level is high enough so that they don't need an
-     amplifier (that's the reason why the archos mic is of this type -
+     amplifier (that's the reason why the Archos mic is of this type -
      it's cheap).
               - cheap
               - no good sound quality of cheap dynamic mics (good enough for
@@ -570,11 +571,10 @@ A67: There are several types of microphones.
  
      Electret Condenser: These capsules are cheap and result in a good
      recording quality. They don't need phantom power voltage. They need power
-     for the FET (field effect transistor) that's inside. If you have
-     such a mic with a battery in it, it is mostly because of the FET
-     power, not because of an amplification circuit inside the mic.
-     These mics are in all the consumer products like mobile phones,
-     PC headsets and so on.
+     for the FET (field effect transistor) that's inside. If you have such a
+     mic with a battery in it, it is mostly because of the FET power, not
+     because of an amplification circuit inside the mic.  These mics are in
+     all the consumer products like mobile phones, PC headsets and so on.
               - cheap (2 EUR for a capsule)
               - good sound quality
               - need amplifier
@@ -590,18 +590,17 @@ A67: There are several types of microphones.
      Recommendation for others: Buy some mic + preamp combination which can be
      plugged into a line in of any amplifier. Maybe such a commercially
      available combination needs a power supply and doesn't work with
-     batteries. Some are very expensive. (If you know a cheap solution
-     with an electret condenser mic + preamp, please tell us!)
+     batteries. Some are very expensive. (If you know a cheap solution with an
+     electret condenser mic + preamp, please tell us!)
 
-     What does not work: Don't use an amplifier thing that is simply
-     connected between some mic cable. Maybe it sounds as if it could work, but
-     I doesn't. If the piece of (expensive) electronic doesn't have a
-     power source and your mic doen't either, it does not work!
-     A PC sound card or md player usually has a power output (same pin
-     where the sound goes through, dc value) for feeding the FET of
-     an electret condenser capsule (see above) (and this power could
-     also used to feed a mic amplifier), but the archos hasn't
-     (it's a line in and no mic in!).
+     What does not work: Don't use an amplifier thing that is simply connected
+     between some mic cable. Maybe it sounds as if it could work, but I
+     doesn't. If the piece of (expensive) electronic doesn't have a power
+     source and your mic doesn't either, it does not work!  A PC sound card or
+     md player usually has a power output (same pin where the sound goes
+     through, dc value) for feeding the FET of an electret condenser capsule
+     (see above) (and this power could also used to feed a mic amplifier), but
+     the Archos hasn't (it's a line in and no mic in!).
 
      If you want to know more on microphone powering, read this:
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
@@ -614,7 +613,7 @@ A68: If your device is off and you connect the charger, the Archos charger code
      ON key for several seconds. Hold the key down a really long time, until
      you see the Rockbox logo!
 
-Q69: Why can't you implement a crossfader? That would be so cool!
+Q69: Why can't you implement a cross-fader? That would be so cool!
 A69: Please read our NODO faq. http://rockbox.haxx.se/docs/nodo.html#3
 
 Q70: My screen is all black/white when I run Rockbox on my Recorder!
@@ -625,5 +624,5 @@ A70: We have no way of knowing the correct contrast setting from start and the
      you like the contrast)
 
 Q71: Where are the FM controls for the FM Recorder?
-A71: There aren't any.  This is not yet implimented under Rockbox.  FM Recorder
+A71: There aren't any.  This is not yet implemented under Rockbox.  FM Recorder
      support in general is new.  Be patient.
