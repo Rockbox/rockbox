@@ -19,6 +19,8 @@
 #include "ata.h"
 #include "kernel.h"
 #include "led.h"
+#include "sh7034.h"
+#include "system.h"
 
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
@@ -92,7 +94,7 @@ int ata_read_sectors(unsigned long start,
     if (!wait_for_rdy())
         return 0;
 
-    led_turn_on();
+    led(TRUE);
 
     ATA_NSECTOR = count;
     ATA_SECTOR  = start & 0xff;
@@ -115,11 +117,12 @@ int ata_read_sectors(unsigned long start,
 #endif
     }
 
-    led_turn_off();
+    led(FALSE);
 
     return wait_for_end_of_transfer();
 }
 
+#ifdef DISK_WRITE
 int ata_write_sectors(unsigned long start,
                       unsigned char count,
                       void* buf)
@@ -129,7 +132,7 @@ int ata_write_sectors(unsigned long start,
     if (!wait_for_rdy())
         return 0;
 
-    led_turn_on ();
+    led(TRUE);
 
     ATA_NSECTOR = count;
     ATA_SECTOR  = start & 0xff;
@@ -152,10 +155,11 @@ int ata_write_sectors(unsigned long start,
 #endif
     }
 
-    led_turn_off ();
+    led(FALSE);
 
     return wait_for_end_of_transfer();
 }
+#endif
 
 static int check_registers(void)
 {
@@ -250,7 +254,7 @@ int ata_soft_reset(void)
 
 int ata_init(void)
 {
-    led_turn_off();
+    led(FALSE);
 
     /* activate ATA */
     PADR |= 0x80;
