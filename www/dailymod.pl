@@ -8,7 +8,7 @@ for(@list) {
     my $dir = $_;
     opendir(DIR, "$basedir/$dir") or
         die "Can't opendir($basedir/$dir)";
-    my @files = sort grep { /^rockbox2/ } readdir(DIR);
+    my @files = sort grep { /^rockbox/ } readdir(DIR);
     closedir DIR;
 
     for(@files) {
@@ -33,13 +33,27 @@ for(reverse sort keys %date) {
     
     for(@list) {
         my $n=0;
+        my $m = $_;
         print "<td> ";
+        # old mod
         if( -f "daily/$_/rockbox${d}.mod") {
             print "<a href=\"daily/$_/rockbox${d}.mod\">mod</a>";
             $n++;
         }
-        if( -f "daily/$_/rockbox${d}.ajz") {            
+        # new mod
+        if( -f "daily/$_/rockbox-$m-${d}.mod") {
+            print "<a href=\"daily/$m/rockbox-$m-${d}.mod\">mod</a>";
+            $n++;
+        }
+        # old ajz
+        if( -f "daily/$_/rockbox${d}.ajz") {
             printf "%s<a href=\"daily/$_/rockbox${d}.ajz\">ajz</a>",
+            $n?", ":"";
+            $n++;
+        }
+        # new ajz
+        if( -f "daily/$m/rockbox-$m-${d}.ajz") {
+            printf "%s<a href=\"daily/$m/rockbox-$m-${d}.ajz\">ajz</a>",
             $n?", ":"";
             $n++;
         }
@@ -48,8 +62,15 @@ for(reverse sort keys %date) {
             $n?", ":"";
             $n++;
         }
+        # old-style full zip
         if( -f "daily/$_/rockbox-${d}.zip") {
             printf "%s<a href=\"daily/$_/rockbox-${d}.zip\">full</a>",
+            $n?", ":"";
+            $n++;
+        }
+        # new-style full zip:
+        if( -f "daily/$m/rockbox-${m}-${d}.zip") {
+            printf "%s<a href=\"daily/$_/rockbox-${m}-${d}.zip\">full</a>",
             $n?", ":"";
             $n++;
         }
