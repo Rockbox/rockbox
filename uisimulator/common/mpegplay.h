@@ -18,6 +18,6 @@
 
 #ifdef MPEG_PLAY
 
-int mpeg_play(char* fname);
+void mpeg_play(char* fname);
 
 #endif

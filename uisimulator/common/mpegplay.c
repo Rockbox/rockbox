@@ -119,160 +119,151 @@ signed int dither(mad_fixed_t sample, struct dither *dither)
 
 #define INPUT_BUFFER_SIZE  (5*8192)
 #define OUTPUT_BUFFER_SIZE  8192 /* Must be an integer multiple of 4. */
-int mpeg_play(char* fname)
+void mpeg_play(char* fname)
 {
-  unsigned char    InputBuffer[INPUT_BUFFER_SIZE],
-            OutputBuffer[OUTPUT_BUFFER_SIZE],
-            *OutputPtr=OutputBuffer;
-  const unsigned char  *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
-  int          Status=0,
-            i;
-  unsigned long    FrameCount=0;
-  sound_t sound;
-  int fd;
-  mp3entry mp3;
-  register signed int s0, s1;
-  static struct dither d0, d1;
+    unsigned char InputBuffer[INPUT_BUFFER_SIZE],
+        OutputBuffer[OUTPUT_BUFFER_SIZE],
+        *OutputPtr=OutputBuffer;
+    const unsigned char  *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
+    int Status=0, i, fd;
+    unsigned long FrameCount=0;
+    sound_t sound;
+    mp3entry mp3;
+    register signed int s0, s1;
+    static struct dither d0, d1;
   
-  mp3info(&mp3, fname);
+    mp3info(&mp3, fname);
 
-  init_sound(&sound);
+    init_sound(&sound);
 
-  /* Configure sound device for this file - always select Stereo because
-     some sound cards don't support mono */
-  config_sound(&sound,mp3.frequency,2);
+    /* Configure sound device for this file - always select Stereo because
+       some sound cards don't support mono */
+    config_sound(&sound,mp3.frequency,2);
 
-  fd=open(fname,O_RDONLY);
-  if (fd < 0) {
-    fprintf(stderr,"could not open %s\n",fname);
-    return 0;
-  }
-
-  /* First the structures used by libmad must be initialized. */
-  mad_stream_init(&Stream);
-  mad_frame_init(&Frame);
-  mad_synth_init(&Synth);
-  mad_timer_reset(&Timer);
-
-  do
-  {
-    if (button_get()) break; /* Return if a key is pressed */
-
-    if(Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN)
-    {
-      size_t ReadSize,Remaining;
-      unsigned char *ReadStart;
-
-      if(Stream.next_frame!=NULL)
-      {
-        Remaining=Stream.bufend-Stream.next_frame;
-        memmove(InputBuffer,Stream.next_frame,Remaining);
-        ReadStart=InputBuffer+Remaining;
-        ReadSize=INPUT_BUFFER_SIZE-Remaining;
-      }
-      else
-        ReadSize=INPUT_BUFFER_SIZE,
-          ReadStart=InputBuffer,
-          Remaining=0;
-      
-      ReadSize=read(fd,ReadStart,ReadSize);
-      if(ReadSize<=0)
-      {
-        fprintf(stderr,"end of input stream\n");
-        break;
-      }
-
-      mad_stream_buffer(&Stream,InputBuffer,ReadSize+Remaining);
-      Stream.error=0;
+    if ((fd=open(fname,O_RDONLY)) < 0) {
+        fprintf(stderr,"could not open %s\n",fname);
+        return;
     }
 
-    if(mad_frame_decode(&Frame,&Stream)) {
-      if(MAD_RECOVERABLE(Stream.error))
-      {
-        fprintf(stderr,"recoverable frame level error\n");
-        fflush(stderr);
-        continue;
-      }
-      else
-        if(Stream.error==MAD_ERROR_BUFLEN) {
-          continue;
-        } else {
-          fprintf(stderr,"unrecoverable frame level error\n");
-          Status=1;
-          break;
+    /* First the structures used by libmad must be initialized. */
+    mad_stream_init(&Stream);
+    mad_frame_init(&Frame);
+    mad_synth_init(&Synth);
+    mad_timer_reset(&Timer);
+
+    do {
+        if (button_get()) 
+            break; 
+
+        if (Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN) {
+            size_t ReadSize,Remaining;
+            unsigned char *ReadStart;
+
+            if(Stream.next_frame!=NULL) {
+                Remaining=Stream.bufend-Stream.next_frame;
+                memmove(InputBuffer,Stream.next_frame,Remaining);
+                ReadStart=InputBuffer+Remaining;
+                ReadSize=INPUT_BUFFER_SIZE-Remaining;
+            } else {
+                ReadSize=INPUT_BUFFER_SIZE,
+                    ReadStart=InputBuffer,
+                    Remaining=0;
+            }
+
+            if ((ReadSize=read(fd,ReadStart,ReadSize)) < 0) {
+                fprintf(stderr,"end of input stream\n");
+                break;
+            }
+
+            mad_stream_buffer(&Stream,InputBuffer,ReadSize+Remaining);
+            Stream.error=0;
         }
-    }
 
-    FrameCount++;
-    mad_timer_add(&Timer,Frame.header.duration);
+        if(mad_frame_decode(&Frame,&Stream)) {
+            if(MAD_RECOVERABLE(Stream.error)) {
+                fprintf(stderr,"recoverable frame level error\n");
+                fflush(stderr);
+                continue;
+            } else {
+                if(Stream.error==MAD_ERROR_BUFLEN) {
+                    continue;
+                } else {
+                    fprintf(stderr,"unrecoverable frame level error\n");
+                    Status=1;
+                    break;
+                }
+            }
+        }
+
+        FrameCount++;
+        mad_timer_add(&Timer,Frame.header.duration);
         
-    mad_synth_frame(&Synth,&Frame);
+        mad_synth_frame(&Synth,&Frame);
 
-    for(i=0;i<Synth.pcm.length;i++)
-    {
-      unsigned short  Sample;
+        for(i=0;i<Synth.pcm.length;i++) {
+            unsigned short  Sample;
+            
+            /* Left channel */
+            Sample=scale(Synth.pcm.samples[0][i],&d0);
+            *(OutputPtr++)=Sample&0xff;
+            *(OutputPtr++)=Sample>>8;
+            
+            /* Right channel. If the decoded stream is monophonic then
+             * the right output channel is the same as the left one.
+             */
+            if(MAD_NCHANNELS(&Frame.header)==2) {
+                Sample=scale(Synth.pcm.samples[1][i],&d1);
+            }
 
-      /* Left channel */
-      Sample=scale(Synth.pcm.samples[0][i],&d0);
-      *(OutputPtr++)=Sample&0xff;
-      *(OutputPtr++)=Sample>>8;
-
-      /* Right channel. If the decoded stream is monophonic then
-       * the right output channel is the same as the left one.
-       */
-      if(MAD_NCHANNELS(&Frame.header)==2)
-        Sample=scale(Synth.pcm.samples[1][i],&d1);
-      *(OutputPtr++)=Sample&0xff;
-      *(OutputPtr++)=Sample>>8;
-
-      /* Flush the buffer if it is full. */
-      if(OutputPtr==OutputBufferEnd)
-      {
-        if(output_sound(&sound,OutputBuffer,OUTPUT_BUFFER_SIZE)!=OUTPUT_BUFFER_SIZE)
-        {
-          fprintf(stderr,"PCM write error.\n");
-          Status=2;
-          break;
-        }
-        OutputPtr=OutputBuffer;
-      }
-    }
-  }while(1);
-
-  /* Mad is no longer used, the structures that were initialized must
+            *(OutputPtr++)=Sample&0xff;
+            *(OutputPtr++)=Sample>>8;
+            
+            /* Flush the buffer if it is full. */
+            if (OutputPtr==OutputBufferEnd) {
+                if (output_sound(&sound, OutputBuffer,
+                                 OUTPUT_BUFFER_SIZE)!=OUTPUT_BUFFER_SIZE) {
+                    fprintf(stderr,"PCM write error.\n");
+                    Status=2;
+                    break;
+                }
+                OutputPtr=OutputBuffer;
+            }
+            }
+    }while(1);
+    
+    /* Mad is no longer used, the structures that were initialized must
      * now be cleared.
-   */
-  mad_synth_finish(&Synth);
-  mad_frame_finish(&Frame);
-  mad_stream_finish(&Stream);
+     */
+    mad_synth_finish(&Synth);
+    mad_frame_finish(&Frame);
+    mad_stream_finish(&Stream);
 
-  /* If the output buffer is not empty and no error occured during
-     * the last write, then flush it.
-   */
-  if(OutputPtr!=OutputBuffer && Status!=2)
-  {
-    size_t  BufferSize=OutputPtr-OutputBuffer;
+    /* If the output buffer is not empty and no error occured during
+     * the last write, then flush it. */
+    if(OutputPtr!=OutputBuffer && Status!=2)
+        {
+            size_t  BufferSize=OutputPtr-OutputBuffer;
 
-    if(write(sound,OutputBuffer,1,BufferSize)!=BufferSize)
-    {
-      fprintf(stderr,"PCM write error\n");
-      Status=2;
-    }
-  }
+            if(write(sound,OutputBuffer,1,BufferSize)!=BufferSize)
+                {
+                    fprintf(stderr,"PCM write error\n");
+                    Status=2;
+                }
+        }
 
-  /* Accounting report if no error occured. */
-  if(!Status)
-  {
-    char  Buffer[80];
+    /* Accounting report if no error occured. */
+    if(!Status)
+        {
+            char  Buffer[80];
 
-    mad_timer_string(Timer,Buffer,"%lu:%02lu.%03u",
-             MAD_UNITS_MINUTES,MAD_UNITS_MILLISECONDS,0);
-    fprintf(stderr,"%lu frames decoded (%s).\n",FrameCount,Buffer);
-  }
+            mad_timer_string(Timer,Buffer,"%lu:%02lu.%03u",
+                             MAD_UNITS_MINUTES,MAD_UNITS_MILLISECONDS,0);
+            fprintf(stderr,"%lu frames decoded (%s).\n",FrameCount,Buffer);
+        }
 
-  close_sound(&sound);
-  /* That's the end of the world (in the H. G. Wells way). */
-  return(Status);
+    close_sound(&sound);
+    /* That's the end of the world (in the H. G. Wells way). */
+    return;
 }
 
 
