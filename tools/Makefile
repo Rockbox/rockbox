@@ -6,9 +6,10 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS := -O -ansi
+CFLAGS := -O -ansi -g
+LDFLAGS := -g
 
-TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
+TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin mkboot
 
 all: $(TARGETS)
 	@echo "tools done"
@@ -24,6 +25,9 @@ sh2d: sh2d.c
 
 bmp2rb:	bmp2rb.c
 	$(CC) -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
+
+mkboot:	mkboot.c
+	$(CC) -g $+ -o $@
 
 convbdf: convbdf.c
 	$(CC) -g $+ -o $@
