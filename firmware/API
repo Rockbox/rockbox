@@ -201,6 +201,10 @@ Various
 
   #include <kernel.h>
 
+  void kernel_init(void)
+
+     Inits the kernel and starts the tick interrupt
+
   void sleep(ticks)
 
      Sleep a specified number of ticks, we have HZ ticks per second.
@@ -211,3 +215,48 @@ Various
      for something or similar, and also if you do anything that takes "a long
      time". This function is the entire foundation that our "cooperative
      multitasking" is based on. Use it.
+
+  int set_irq_level(int level)
+
+     Sets the interrupt level (0 = lowest, 15 = highest) and returns the
+     previous level.
+
+  void queue_init(struct event_queue *q)
+
+     Initialize an event queue. The maximum number of events in a queue is
+     QUEUE_LENGTH-1.
+
+  void queue_wait(struct event_queue *q, struct event *ev)
+
+     Receive an event in a queue, blocking the thread if the queue is empty.
+
+  void queue_post(struct event_queue *q, int id, void *data)
+
+     Post an event to a queue.
+
+  bool queue_empty(struct event_queue* q)
+
+     Returns true if the queue is empty.
+
+  int tick_add_task(void (*f)(void))
+
+     Add a task to the tick task queue. The argument is a pointer to a
+     function that will be called every tick interrupt.
+     At most MAX_NUM_TICK_TASKS can be active at the same time.
+
+  int tick_remove_task(void (*f)(void))
+
+     Remove a task from the task queue.
+
+  void mutex_init(struct mutex *m)
+
+     Initialize a mutex.
+
+  void mutex_lock(struct mutex *m)
+
+     Lock a mutex. This will block the thread if the mutex is already locked.
+     Note that you will geta deadlock if you lock the mutex twice!
+
+void mutex_unlock(struct mutex *m)
+
+     Unlock a mutex.
