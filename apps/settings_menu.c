@@ -53,11 +53,10 @@ static bool contrast(void)
 
 static bool invert(void)
 {
-    char* names[] = { str(LANG_SET_BOOL_NO), 
-                      str(LANG_SET_BOOL_YES) };
+    bool rc = set_bool( str(LANG_INVERT), &global_settings.invert);
+    lcd_set_invert_display(global_settings.invert);
 
-    return set_option( str(LANG_INVERT), &global_settings.invert,
-                       names, 2, lcd_set_invert_display );
+    return rc;
 }
 
 /**
