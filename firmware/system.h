@@ -22,36 +22,12 @@
 
 #include "sh7034.h"
 
-/*
- *   11.059,200 MHz => 90.4224537037037037037037037037037... ns
- *   12.000,000 MHz => 83.3333333333333333333333333333333... ns 
- */
-
-#define FREQ     12000000
+#define FREQ     12000000 /* cycle time ~83.3ns */
 #define BAUDRATE 9600
-
-//#define PHI ((int)(11.059200 MHz))
-//#define BAUDRATE 115200 /* 115200 - 9600 */
 
 #ifdef LITTLE_ENDIAN
 #define SWAB16(x) (x)
 #define SWAB32(x) (x)
-#else
-#define SWAB16(x) \
-({ \
-        unsigned short __x = x; \
-        (((__x & 0x00ff) << 8) | \
-         ((__x & 0xff00) >> 8)); \
-})
-
-#define SWAB32(x) \
-({ \
-        unsigned long __x = x; \
-        (((__x & 0x000000ff) << 24) | \
-         ((__x & 0x0000ff00) << 8) | \
-         ((__x & 0x00ff0000) >> 8) | \
-         ((__x & 0xff000000) >> 24)); \
-})
 #endif
 
 #define nop \
@@ -188,38 +164,38 @@ extern char __swap_bit[256];
 
 #ifndef SIMULATOR
 
-static inline short swabHI (short value)
+static inline short SWAB16(short value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
   */    
-  {
+{
     short result;
     asm volatile ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
     return result;
-  }
+}
 
-static inline int swawSI (int value)
+static inline long SWAW32(long value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
   */    
-  {
-    int result;
+{
+    long result;
     asm volatile ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
     return result;
-  }
+}
 
-static inline int swabSI (int value) // should be avoided as much as possible
+static inline long SWAB32(long value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
     result[15.. 8] = value[23..16];
     result[ 7.. 0] = value[31..24];
   */    
-  {
-    return swabHI(swawSI(swabSI(value)));
-  }
+{
+    return SWAB16(SWAW32(SWAB16(value)));
+}
 
 /* Test And Set - UNTESTED */
 static inline int tas (volatile int *pointer)
