@@ -140,13 +140,6 @@ void browse_root(void)
     filetype_init();
     check_rockboxdir();
 
-/* temporary hack for Ondio */
-#ifdef HAVE_MMC
-    main_menu(); /* show the main menu once, since it is not yet callable
-                  * from the browser. The button handling needs a fix. */
-#endif
-/* end of Ondio hack */
-
 #ifndef SIMULATOR
     dirbrowse("/", &global_settings.dirfilter);
 
