@@ -1259,7 +1259,7 @@ bool create_playlist(void)
     lcd_update();
 
     fd = creat(filename,0);
-    if (!fd)
+    if (fd < 0)
         return false;
 
     plsize = 0;
@@ -1267,6 +1267,5 @@ bool create_playlist(void)
     close(fd);
     sleep(HZ);
     
-    return false;
+    return true;
 }
-
