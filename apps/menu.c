@@ -47,22 +47,22 @@ struct menu {
 
 #ifdef HAVE_LCD_BITMAP
 
-#define MARGIN_X    (global_settings.scrollbar ? SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH /* X pixel margin */
-#define MARGIN_Y    (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)  /* Y pixel margin */
+/* pixel margins */
+#define MARGIN_X (global_settings.scrollbar && \
+                  menu_lines < menus[m].itemcount ? SCROLLBAR_WIDTH : 0) +\
+                  CURSOR_WIDTH
+#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
-#define LINE_X      0 /* X position the entry-list starts at */
-#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
+/* position the entry-list starts at */
+#define LINE_X   0
+#define LINE_Y   (global_settings.statusbar ? 1 : 0)
 
-//FIXME remove
-#define LINE_HEIGTH 8 /* pixels for each text line */
-//FIXME remove
-#define MENU_LINES  (LCD_HEIGHT / LINE_HEIGTH - LINE_Y)
-
-#define CURSOR_X    (global_settings.scrollbar ? 1 : 0)
-#define CURSOR_Y    0 /* the cursor is not positioned in regard to
-                         the margins, so this is the amount of lines
-                         we add to the cursor Y position to position
-                         it on a line */
+#define CURSOR_X (global_settings.scrollbar && \
+                  menu_lines < menus[m].itemcount ? 1 : 0)
+#define CURSOR_Y 0 /* the cursor is not positioned in regard to
+                      the margins, so this is the amount of lines
+                      we add to the cursor Y position to position
+                      it on a line */
 #define CURSOR_WIDTH  4
 
 #define SCROLLBAR_X      0
@@ -165,7 +165,7 @@ static void menu_draw(int m)
     /* place the cursor */
     put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar) 
+    if (global_settings.scrollbar && menus[m].itemcount > menu_lines) 
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
                   LCD_HEIGHT - SCROLLBAR_Y, menus[m].itemcount, menus[m].top,
                   menus[m].top + menu_lines, VERTICAL);

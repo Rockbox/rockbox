@@ -81,21 +81,22 @@ void browse_root(void)
 
 #ifdef HAVE_LCD_BITMAP
 
-#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH)
-#define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
- 
-#define MARGIN_X      (global_settings.scrollbar ? SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH + ICON_WIDTH /* X pixel margin */
-#define MARGIN_Y      (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)  /* Y pixel margin */
+/* pixel margins */
+#define MARGIN_X (global_settings.scrollbar && \
+                  filesindir > tree_max_on_screen ? SCROLLBAR_WIDTH : 0) + \
+                  CURSOR_WIDTH + ICON_WIDTH
+#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
-#define LINE_X      0 /* X position the entry-list starts at */
-#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
-#define LINE_HEIGTH 8 /* pixels for each text line */
+/* position the entry-list starts at */
+#define LINE_X   0 
+#define LINE_Y   (global_settings.statusbar ? 1 : 0)
 
-#define CURSOR_X    (global_settings.scrollbar ? 1 : 0)
-#define CURSOR_Y    0 /* the cursor is not positioned in regard to
-                         the margins, so this is the amount of lines
-                         we add to the cursor Y position to position
-                         it on a line */
+#define CURSOR_X (global_settings.scrollbar && \
+                  filesindir > tree_max_on_screen ? 1 : 0)
+#define CURSOR_Y 0 /* the cursor is not positioned in regard to
+                      the margins, so this is the amount of lines
+                      we add to the cursor Y position to position
+                      it on a line */
 #define CURSOR_WIDTH  4
 
 #define ICON_WIDTH    6
@@ -191,7 +192,7 @@ static int showdir(char *path, int start)
     bool dir_buffer_full;
 
 #ifdef HAVE_LCD_BITMAP
-    int line_height = LINE_HEIGTH;
+    int line_height;
     int fw, fh;
     lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
@@ -428,7 +429,7 @@ static int showdir(char *path, int start)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar) 
+    if (global_settings.scrollbar && filesindir > tree_max_on_screen) 
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
                   LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
