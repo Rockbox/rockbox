@@ -528,20 +528,6 @@ void reset_settings(void)
     settings.fullscreen_invertseconds = false;
 }
 
-/**************
- * Exits plugin
- *************/
-bool quit(bool save)
-{
-    if(save)
-        save_settings();
-
-    /* restore set backlight timeout */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-
-    return PLUGIN_OK;
-}
-
 /********************************
  * Saves "saved_settings" to disk
  *******************************/
@@ -2419,7 +2405,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* set backlight timeout */
     rb->backlight_set_timeout(settings.backlight_on);
 
-    while (!PLUGIN_OK)
+    while (1)
     {
         /*********************
          * Time info
@@ -2645,8 +2631,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (rb->button_get_w_tmo(HZ/10))
         {
             case BUTTON_OFF: /* save and exit */
-                quit(true);
-                break;
+                save_settings();
+
+                /* restore set backlight timeout */
+                rb->backlight_set_timeout(
+                    rb->global_settings->backlight_timeout);
+                
+                return PLUGIN_OK;
 
             case BUTTON_ON | BUTTON_REL: /* credit roll */
                 show_credits();
