@@ -227,7 +227,7 @@ screenhack (Display *the_dpy, Window the_window)
 
   init_window();
 
-  Logf("Rockbox will kill ya!");
+  screen_redraw();
 
   app_main();
 }
@@ -235,8 +235,6 @@ screenhack (Display *the_dpy, Window the_window)
 void screen_redraw()
 {
   int y, x;
-
-  lcd_update();
 
   /* draw a border around the "Recorder" screen */
 
@@ -250,4 +248,5 @@ void screen_redraw()
   drawline(1, X1, Y2, X2, Y2);
   drawline(1, X1, Y1, X1, Y2);
 
+  lcd_update();
 }
