@@ -239,12 +239,12 @@ YES
 EFEAT
 
 NAME Bookmark positions in songs ENAME
-NO
+YES
 NO
 EFEAT
 
 NAME Number of available languages ENAME
-TD 22 ETD
+TD 23 ETD
 TD 3 ETD
 EFEAT
 
@@ -260,6 +260,11 @@ EFEAT
 
 NAME FF/FR with sound ENAME
 NO
+YES
+EFEAT
+
+NAME Pre-Recording (Recorders) ENAME
+YES
 YES
 EFEAT
 
