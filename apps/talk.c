@@ -242,9 +242,9 @@ static int shutup(void)
     {
         return 0;
     }
-
+#if CONFIG_CPU == SH7034
     CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
-
+#endif
     /* search next frame boundary and continue up to there */
     pos = search = mp3_get_pos();
     end = queue[queue_read].buf + queue[queue_read].len;
@@ -275,8 +275,10 @@ static int shutup(void)
             queue_write = (queue_read + 1) & QUEUE_MASK; /* will be empty after next callback */
             queue[queue_read].len = sent; /* current one ends after this */
 
+#if CONFIG_CPU == SH7034
             DTCR3 = sent; /* let the DMA finish this frame */
             CHCR3 |= 0x0001; /* re-enable DMA */
+#endif
             return 0;
         }
     }
@@ -299,10 +301,10 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
     
     if (!size)
         return 0; /* safety check */
-
+#if CONFIG_CPU == SH7034
     /* disable the DMA temporarily, to be safe of race condition */
     CHCR3 &= ~0x0001;
-
+#endif
     queue_level = QUEUE_LEVEL; /* check old level */
 
     if (queue_level < QUEUE_SIZE - 1) /* space left? */
@@ -324,7 +326,9 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
     }
     else
     {
+#if CONFIG_CPU == SH7034
         CHCR3 |= 0x0001; /* re-enable DMA */
+#endif
     }
 
     return 0;
