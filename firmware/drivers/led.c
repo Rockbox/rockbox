@@ -16,9 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "config.h"
 #include <stdbool.h>
-#include "sh7034.h"
+#include "cpu.h"
 #include "led.h"
 #include "system.h"
 
