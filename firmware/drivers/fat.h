@@ -54,6 +54,7 @@ struct fat_file
     int sectornum;       /* sector number in this cluster */
     int dirsector;       /* sector where the dir entry is located */
     int direntry;        /* dir entry index in sector */
+    bool eof;
 };
 
 struct fat_dir
@@ -63,6 +64,7 @@ struct fat_dir
     int num_sec;
     unsigned char cached_buf[SECTOR_SIZE];
     int startcluster;
+    struct fat_file file;
 };
 
 
