@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 by Magnus Holmgren
+ * Copyright (C) 2004 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -34,67 +34,59 @@
  *   r4 - source (unsigned char*)
  *   r5 - dest   (unsigned char*)
  *   r6 - len    (unsigned int)
- */
-
-/* Register usage:
- * i        - r0
- * i4       - r1
- * checksum - r2
- * addr     - r3
- * source   - r4
- * dest     - r5
- * len      - r6
- * len4     - r7
- * data     - r8
- * temp     - r9
+ *
+ * Register usage:
+ *   r0 - data
+ *   r1 - temp
+ *   r2 - checksum
+ *   r3 - current src address
+ *   r4 - source
+ *   r5 - dest
+ *   r6 - len -> source_end
+ *   r7 - dest_end
+ *   r8 - len / 4
  */
 
 _descramble:
     mov.l   r8,@-r15
-    mov.l   r9,@-r15
-    mov     #0,r0           /* i = 0 */
-    mov     #0,r1           /* i4 = i / 4 */
-    mov     #0,r2           /* checksum = 0 */
+    mov     r6,r8
+    shlr2   r8              /* r8 = len / 4 */
+    mov     r5,r7
+    add     r6,r7           /* dest_end = dest + len */
+    add     r4,r6           /* source_end = source + len */
     mov     r4,r3           /* addr = source */
-    mov     r6,r7
-    shlr2   r7              /* len4 = len / 4 */
+    mov     #0,r2           /* checksum = 0 */
 
 .loop:
-    mov.b   @r3,r8          /* data = source[addr] */
-    add     r7,r3           /* addr += len4 */
-    extu.b  r8,r8           /* we want the data extended unsigned */
-    shlr    r8              /* start rotate right of low byte */
-    movt    r9              /* get bit 0 that was shifted out */
-    shll8   r9
-    shlr    r9              /* move it to bit 7 */
-    or      r9,r8           /* finish rotate right */
-    not     r8,r8
-    extu.b  r8,r8
-    mov.b   r8,@(r0,r5)     /* dest[i] = data */
-    add     r8,r2           /* checksum += data[i] */
-    add     #1,r0           /* i++ */
-    tst     #3,r0           /* reset addr? */
-    bf      .loop
+    mov.b   @r3,r0          /* data = *addr */
+    add     r8,r3           /* addr += len / 4 */
+    extu.b  r0,r0           /* zero extend data byte */
+    swap.b  r0,r1           /* byte swap low word to temp */
+    or      r1,r0           /* r0's two lower bytes now identical */
+    shlr    r0              /* -> this equals "rotr.b r0" now */
+    not     r0,r0           /* negate */
+    extu.b  r0,r0           /* zero extend low byte (only needed for sum) */
+    mov.b   r0,@r5          /* *dest = data */
+    add     r0,r2           /* checksum += data */
+    add     #1,r5           /* dest++ */
+    cmp/hi  r3,r6           /* addr < source_end ? */
+    bt      .loop
 
-    add     #1,r1           /* i4++ */
-    mov     r4,r3
-    add     r1,r3           /* addr = source + i4 */
-    cmp/hs  r6,r0           /* all done? */
-    bf      .loop
-    
-    /* 17 cycles if no "reset," 22 if reset => average 18.25 cycles per
-     * byte, assuming no wait states from reads or writes. "Old" algorithm
-     * needed 24-26 cycles per byte, under the same assumptions.
-     */
+    add     #1,r4           /* source++ */
+    mov     r4,r3           /* addr = source */
+    cmp/hi  r5,r7           /* dest < dest_end */
+    bt      .loop
 
-    mov.l   @r15+,r9
+/* 15 clock cycles if no reset of source address, 19 if reset,
+ * avg. 16 cycles per byte. Magnus' Version needed 17-22 cycles per byte
+ */
+
     mov.l   @r15+,r8
     rts
     extu.w  r2,r0
 
 
-
-/* Move len bytes from source to dest (which must be suitably aligned for 
+/* Move len bytes from source to dest (which must be suitably aligned for
  * long moves) and jump to dest + 0x200.
  *
  * Arguments:
@@ -103,26 +95,25 @@ _descramble:
  *   r6 - len
  */
 
+    .align      2
     .global     _rolo_restart
     .type       _rolo_restart,@function
 
 _rolo_restart:
-    mov.w   .offset,r0
-    mov     r5,r7
-    add     r0,r7                       /* start_func() */
-    mov     r6,r0
-    shlr2   r0
-    add     #1,r0
-.copy:
-    mov.l   @r4+,r1
-    add     #-1,r0
-    mov.l   r1,@r5
-    add     #4,r5
-    cmp/eq  #0,r0
-    bf      .copy
+    mov     r5,r0
+    sub     r4,r0           /* r0 = dest - source */
+    add     #-4,r0          /* adjust for early increment */
+    add     r4,r6           /* r6 = source + len */
+    mov.w   .offset,r1
+    add     r1,r5           /* start_func() */
 
-    jmp     @r7
-    
+.copy:                      /* loop takes 6 cycles per longword */
+    mov.l   @r4+,r1
+    cmp/hi  r4,r6
+    mov.l   r1,@(r0,r4)
+    bt      .copy
+
+    jmp     @r5
     nop
 
 .offset:
