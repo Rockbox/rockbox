@@ -29,7 +29,9 @@ static bool busy=false;
 
 DIR* opendir(char* name)
 {
+    char namecopy[256];
     char* part;
+    char* end;
     struct fat_direntry entry;
     struct fat_dir* dir = &(thedir.fatdir);
 
@@ -48,9 +50,11 @@ DIR* opendir(char* name)
         return NULL;
     }
 
-    /* fixme: strtok() is not thread safe, and fat_getnext() calls yield() */
-    for ( part = strtok(name, "/"); part;
-          part = strtok(NULL, "/")) {
+    strncpy(namecopy,name,sizeof(namecopy));
+    namecopy[sizeof(namecopy)-1] = 0;
+
+    for ( part = strtok_r(namecopy, "/", &end); part;
+          part = strtok_r(NULL, "/", &end)) {
         int partlen = strlen(part);
         /* scan dir for name */
         while (1) {
