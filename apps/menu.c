@@ -21,25 +21,27 @@
 #include "menu.h"
 
 #include "tree.h"
+#include "credits.h"
 
 #ifdef HAVE_LCD_BITMAP
 
 #include "screensaver.h"
 extern void tetris(void);
 
-
 #define MENU_ITEM_FONT    0
 #define MENU_ITEM_Y_LOC   6
 #define MENU_LINE_HEIGHT  8
 
 enum Main_Menu_Ids {
-    Tetris, Screen_Saver, Browse, Last_Id
+    Tetris, Screen_Saver, Browse, Splash, Credits, Last_Id
 };
 
 struct main_menu_items items[] = {
     { Tetris,       "Tetris",       tetris      },
     { Screen_Saver, "Screen Saver", screensaver },
     { Browse,       "Browse",       browse_root },
+	{ Splash,       "Splash",       show_splash },
+	{ Credits,      "Credits",      show_credits },
 };
 
 /* Global values for menuing */
@@ -117,7 +119,7 @@ void add_menu_item(int location, char *string)
         menu_bottom = location;
 }
 
-void show_logo(void)
+int show_logo(void)
 {
   unsigned char buffer[112 * 8];
 
@@ -130,16 +132,21 @@ void show_logo(void)
   debugf("read_bmp_file() returned %d, width %d height %d\n",
          failure, width, height);
 
-  if(!failure) {
+  if (failure) {
+	  debugf("Unable to find \"/rockbox112.bmp\"\n");
+	  return -1;
+  } else {
+
     int i;
     int eline;
+
     for(i=0, eline=0; i< height; i+=8, eline++) {
       int x,y;
       
       /* the bitmap function doesn't work with full-height bitmaps
          so we "stripe" the logo output */
 
-      lcd_bitmap(&buffer[eline*width], 0, 24+i, width,
+      lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
                  (height-i)>8?8:height-i, false);
       
 #if 0
@@ -157,10 +164,9 @@ void show_logo(void)
       }
 #endif
     }
-
-    lcd_update();
   }
 
+  return 0;
 }
 
 void menu_init(void)
@@ -169,6 +175,8 @@ void menu_init(void)
     menu_bottom = Last_Id-1;
     menu_line_height = MENU_LINE_HEIGHT;
     cursor = menu_top;
+	lcd_clear_display();
+	lcd_update();
 }
 
 void menu_draw(void)
@@ -178,10 +186,28 @@ void menu_draw(void)
     for (i = i; i < Last_Id; i++)
         add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
 
-    show_logo();
     redraw_cursor();
+	lcd_update();
 }
 
 #endif /* end HAVE_LCD_BITMAP */
+
+
+
+void show_splash(void)
+{
+#ifdef HAVE_LCD_BITMAP
+	lcd_clear_display();
+
+	if (show_logo() == 0) {
+		lcd_update();
+		busy_wait();
+	}
+#else
+	char *rockbox = "ROCKbox!";
+	lcd_puts(0, 0, rockbox);
+	busy_wait();
+#endif
+}
 
 

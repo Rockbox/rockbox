@@ -25,27 +25,36 @@
 /* Apps to include */
 #include "tree.h"
 
+/* Wait on a key press.  Return the key pressed */
+int busy_wait(void)
+{
+    int key;
+
+    while(1) {
+        key = button_get();
+        
+        if(!key)
+            sleep(1);
+        else
+            break;
+    }
+
+    return key;
+}
+
 #ifdef HAVE_LCD_BITMAP
-
-/*#include "screensaver.h"*/
-
-/*extern void tetris(void);*/
-
 void app_main(void)
 {
     int key;
-    
+
+    show_splash();
+
     menu_init();
     menu_draw();
     put_cursor_menu_top();
     
     while(1) {
-        key = button_get();
-        
-        if(!key) {
-            sleep(1);
-            continue;
-        }
+        key = busy_wait();
         
         switch(key) {
         case BUTTON_UP:
@@ -94,11 +103,14 @@ void app_main(void)
     int key;
     int cursor = 0;
 
-    lcd_puts(0,0, "Mooo!");
-    lcd_puts(1,1, " Rockbox!");
+    show_splash();
 
     browse_root();
     
 }
 
 #endif
+
+
+
+

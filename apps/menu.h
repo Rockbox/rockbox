@@ -28,6 +28,13 @@ struct main_menu_items {
 
 int get_line_height(void);
 
+/* Reads in bmp file for logo */
+int show_logo(void);
+
+/* Shows the actual splash screen.  
+ * Wrapper around show_logo making use of lcd functions */
+void show_splash(void);
+
 /* Cursor calls */
 void put_cursor(int target);
 void put_cursor_menu_top(void);
@@ -44,8 +51,6 @@ void menu_draw(void);
 void execute_menu_item(void);
 
 #endif /* End __MENU_H__ */
-
-
 
 
 
