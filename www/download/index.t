@@ -57,6 +57,9 @@ Archos Jukebox Recorder V2
  <a href="/fonts/">Fonts for Rockbox</a>
 <p>
  <a href="/lang/">Language files for Rockbox</a>
+<p>
+ <a href="/twiki/bin/view/Main/VoiceFiles">Voice files for Rockbox</a>
+ (<a href=/daily.shtml>daily builds</a> only)
 
 <h2>Uninstallation</h2>
 
