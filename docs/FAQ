@@ -394,43 +394,14 @@ A53: We have answered this question numerous times.  It is mentioned in the
 
 Q54: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
      have this be dynamically allocated?
-A54: Because it's useless.  Dynamic memory is only ever useful if you have 
-     memory consumers (tasks) that run at different points in time, and thus 
-     can reuse the same memory for different purposes. 
-
-     We don't have that.  We must be able to show a big dir, index a big 
-     playlist and play a big mp3 file, all at the same time. They cannot use 
-     the same memory, and thus dynamic memory buys us nothing but extra 
-     complexity.  If we used dynamic memory for this, we would get all kinds 
-     of odd bugs. Playlists that only got half-loaded if placed in certain 
-     directories.  Parts of the disk you couldn't go to if playing a certain 
-     playlist etc. 
-
-     We have a number of tasks that consume memory. They can all run at the 
-     same time, using all of their allotted memory. Therefore it is much better
-     to allocate that memory to them beforehand and not pretend that anyone 
-     else is able to use it. This is standard practice in memory-limited 
-     systems. 
-
-     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+A54: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
 
 Q55: Why is there a 10,000 song limit on playlists?
-A55: This is another hardcoded limit.  We feel that as bigger disks arrive 
-     that this limit will increase.  Because of the way that playlists are
-     stored, it tends to be a bit more malleable than the directory file limit.
-     For further detail, look at questions 53 and 54 and replace any instances
-     of '400' with '10,000'.
-
-     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+A55: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
 
 Q56: You don't understand! I _really_ need to have more then 400 files
      in a directory!
-A56: The use of really big directories was a workaround for the poor playlist
-     capabilities of the original Archos firmware. With Rockbox, you no longer
-     need this workaround. Organize your files in directories, then build
-     playlists for all collections you want to shuffle-play.
-
-     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+A56: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
 
 Q57: How can I make playlists on my PC?
 A57: There are many programs that can create .m3u playlists. WinAmp is one.
@@ -739,7 +710,7 @@ A75: The same way you subscribed, but you send an 'unsubscribe' request to the
      mail unsubscribe requests to the mailing list itself. That will only
      annoy more than 400 readers and will have no effect on your subscription.
 
-     In fact, you NEVER unsuscribe to ANY mailing lists by mailing unsubscribe
+     In fact, you NEVER unsubscribe to ANY mailing lists by mailing unsubscribe
      to the list's address. You might as well take the opportunity to learn
      this right away.
 
