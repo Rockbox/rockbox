@@ -365,6 +365,7 @@ int main (int argc, char **argv)
     Boolean dont_clear /*, dont_map */;
     char version[255];
 
+    sprintf(version,"rockboxui %s",ROCKBOXUI_VERSION);
 #ifdef XLOCKMORE
     pre_merge_options ();
 #endif
