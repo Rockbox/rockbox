@@ -172,7 +172,7 @@ void status_draw(void)
 #ifdef SIMULATOR
         lcd_update();
 #else
-        lcd_update_rect(0,0,LCD_WIDTH,8);
+        lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
 #endif
     }
 #endif
