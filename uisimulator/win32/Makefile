@@ -41,8 +41,6 @@ EXPORT = $(FIRMWAREDIR)/export
 TOOLSDIR = ../../tools
 DOCSDIR = ../../docs
 
-CC = i386-mingw32msvc-gcc
-WINDRES = i386-mingw32msvc-windres
 RM = rm -f
 DEBUG = -g
 
@@ -52,10 +50,10 @@ LANGUAGE = english
 
 TARGET = $(OBJDIR)/uisw32.exe
 
-DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
+DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DNOCYGWIN \
 $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) $(RTC)
 
-LDFLAGS =  -lgdi32 -luser32  -mwindows
+LDFLAGS =  -lgdi32 -luser32
 
 # Use this for simulator-only files
 INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
@@ -65,17 +63,32 @@ APPINCLUDES =  $(INCLUDES)
 
 DEFINES += -DWIN32
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
-APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
+APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mno-cygwin
+
+UNAME := $(shell uname)
+ifeq ($(UNAME),CYGWIN_NT-5.1)
+  CC = gcc
+  WINDRES = windres
+  DEFINES += -DNOCYGWIN
+  CFLAGS += -mno-cygwin
+  LDFLAGS += -mno-cygwin
+  APPCFLAGS += -mno-cygwin
+else
+  CC = i386-mingw32msvc-gcc
+  WINDRES = i386-mingw32msvc-windres
+  CFLAGS += -mwindows
+  LDFLAGS += -mwindows
+  APPCFLAGS += -mwindows
+endif
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-	LCDSRSC = lcd-recorder.c
+	LCDSRSC = lcd-recorder.c sysfont.c font.c
 else
-	LCDSRSC = lcd-playersim.c lcd-player.c
+	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
-FIRMSRCS = $(LCDSRSC) power.c sprintf.c id3.c usb.c \
-        mpeg.c powermgmt.c font.c sysfont.c
+FIRMSRCS = $(LCDSRSC) id3.c usb.c mpeg.c powermgmt.c power.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
@@ -205,8 +218,14 @@ $(OBJDIR)/power.o: $(DRIVERS)/power.c
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
+$(OBJDIR)/panic.o: $(FIRMWAREDIR)/panic.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
 $(OBJDIR)/powermgmt.o: $(FIRMWAREDIR)/powermgmt.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/lcd-player-charset.o: $(DRIVERS)/lcd-player-charset.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings.o: $(APPDIR)/settings.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
@@ -249,6 +268,9 @@ $(OBJDIR)/strtok.o: $(COMMON)/strtok.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/font-player.o: ../common/font-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sim_icons.o: ../common/sim_icons.c

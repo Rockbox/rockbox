@@ -41,6 +41,7 @@ PBYTE                               lpKeys;
 bool                                bActive; // window active?
 HANDLE                              hGUIThread; // thread for GUI
 
+bool lcd_display_redraw=true; // Used for player simulator
 char having_new_lcd=true; // Used for player simulator
 
 // GUIWndProc

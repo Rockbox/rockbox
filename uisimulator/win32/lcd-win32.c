@@ -22,7 +22,7 @@
 #include "uisw32.h"
 #include "lcd.h"
 
-extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; /* the display */
+unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; /* the display */
 char bitmap[LCD_HEIGHT][LCD_WIDTH]; /* the ui display */
 
 BITMAPINFO2 bmi =
