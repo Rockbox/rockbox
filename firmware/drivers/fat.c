@@ -1725,7 +1725,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             if (rc < 0)
                 return rc * 10 - 1;
 
-            ((char*)buf) += count * SECTOR_SIZE;
+            buf = (char *)buf + count * SECTOR_SIZE;
             first = sector;
         }
 
