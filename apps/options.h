@@ -25,11 +25,6 @@
 #define USE_DEMOS
 #endif
 
-/* disable demos until plugins are added, to stay below 200KB */
-#ifdef USE_DEMOS
-#undef USE_DEMOS
-#endif
-
 #ifndef DISABLE_GAMES
 #undef USE_GAMES /* since older Makefiles set the define */
 #define USE_GAMES
