@@ -33,19 +33,19 @@
 #define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
 /* System defined message ID's, occupying the top 5 bits of the event ID */
-#define SYS_EVENT                 0x80000000 /* SYS events are negative */
-#define SYS_USB_CONNECTED         ((int)(SYS_EVENT | (1 << 27)))
-#define SYS_USB_CONNECTED_ACK     ((int)(SYS_EVENT | (2 << 27)))
-#define SYS_USB_DISCONNECTED      ((int)(SYS_EVENT | (3 << 27)))
-#define SYS_USB_DISCONNECTED_ACK  ((int)(SYS_EVENT | (4 << 27)))
-#define SYS_TIMEOUT               ((int)(SYS_EVENT | (5 << 27)))
-#define SYS_MMC_INSERTED          ((int)(SYS_EVENT | (6 << 27)))
-#define SYS_MMC_EXTRACTED         ((int)(SYS_EVENT | (7 << 27)))
-#define SYS_POWEROFF              ((int)(SYS_EVENT | (8 << 27)))
+#define SYS_EVENT                 (long)0x80000000 /* SYS events are negative */
+#define SYS_USB_CONNECTED         ((SYS_EVENT | ((long)1 << 27)))
+#define SYS_USB_CONNECTED_ACK     ((SYS_EVENT | ((long)2 << 27)))
+#define SYS_USB_DISCONNECTED      ((SYS_EVENT | ((long)3 << 27)))
+#define SYS_USB_DISCONNECTED_ACK  ((SYS_EVENT | ((long)4 << 27)))
+#define SYS_TIMEOUT               ((SYS_EVENT | ((long)5 << 27)))
+#define SYS_MMC_INSERTED          ((SYS_EVENT | ((long)6 << 27)))
+#define SYS_MMC_EXTRACTED         ((SYS_EVENT | ((long)7 << 27)))
+#define SYS_POWEROFF              ((SYS_EVENT | ((long)8 << 27)))
 
 struct event
 {
-    int id;
+    long id;
     void *data;
 };
 
