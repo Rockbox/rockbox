@@ -323,11 +323,18 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     asm volatile ("sts\tpr,%0" : "=r"(n));
 
+    /* clear screen */
+    lcd_clear_display ();
+    /* output exception */
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
     snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
     lcd_puts(0,0,str);
     snprintf(str,sizeof(str),"at %08x",pc);
     lcd_puts(0,1,str);
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_update ();
+#endif
 
     while (1)
     {
