@@ -1126,6 +1126,9 @@ static bool system_settings_menu(void)
 #endif
         { str(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },
         { str(LANG_SLEEP_TIMER),      sleeptimer_screen      },
+#ifdef HAVE_ALARM_MOD
+        { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
+#endif
         { str(LANG_LIMITS_MENU),      limits_settings_menu   },
 #ifdef HAVE_MAS3507D
         { str(LANG_LINE_IN),          line_in                },
