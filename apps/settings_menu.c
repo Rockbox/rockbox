@@ -443,7 +443,9 @@ static bool battery_capacity(void) {
     retval = set_option( str(LANG_BATTERY_CAPACITY), 
                        &global_settings.battery_capacity, names, 8, NULL);
 
+#ifndef SIMULATOR
     set_battery_capacity(global_settings.battery_capacity);
+#endif /* SIMULATOR */
 
     return retval;
 }
