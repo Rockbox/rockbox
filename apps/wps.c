@@ -915,6 +915,8 @@ int wps_show(void)
             case BUTTON_OFF:
 #else
             case BUTTON_STOP | BUTTON_REL:
+                if ( lastbutton != BUTTON_STOP )
+                    break; 
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
