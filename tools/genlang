@@ -61,8 +61,8 @@ while(<LANG>) {
 
         $set{$var} = $value;
 
-        if( (($var eq "new") && $value && ($value !~ /^\"(.*)\"$/)) ||
-            (($var eq "eng") && ($value !~ /^\"(.*)\"$/)) ) {
+        if( (($var eq "new") && $value && ($value !~ /^\"(.*)\" *$/)) ||
+            (($var eq "eng") && ($value !~ /^\"(.*)\" *$/)) ) {
             print "missing quotes on line $line for ".$set{'id'}."\n";
             next;
         }
