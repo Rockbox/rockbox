@@ -1159,6 +1159,16 @@ void lcd_stop_scroll(void)
     }
 }
 
+void lcd_scroll_pause(void)
+{
+    scroll_count = 0;
+}
+
+void lcd_scroll_resume(void)
+{
+    scroll_count = 1;
+}
+
 void lcd_scroll_speed(int speed)
 {
     scroll_speed = speed;

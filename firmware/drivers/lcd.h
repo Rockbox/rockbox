@@ -29,6 +29,8 @@ extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, unsigned char *string);
+extern void lcd_scroll_pause(void);
+extern void lcd_scroll_resume(void);
 extern void lcd_puts_scroll(int x, int y, unsigned char* string );
 extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);
