@@ -203,7 +203,7 @@ A26: If you ask that again, I'm sending your address and phone number to the
 Q27: Umm, was that sarcasm?
 A27: That's it, I'm mailing him now.
 
-Q28: Is that legal? I mean, I'd just hate to see something like that 
+Q28: Is this legal? I mean, I'd just hate to see something like that 
      challenged under the DMCA in all its ridiculousness. Any thoughts or 
      ideas?
 A28: We believe we are in the green on this.  We are not violating anyone's
@@ -220,16 +220,12 @@ Q29: On the website [and various information postings] you state
      and disassembled? Instead this sounds more like someone disassembled it
      then used the understanding that they gained to create a new version,
      which is not quite the same as "from scratch". 
-A29: Don't confuse the terms.  
-
-     Reverse engineering means examining a product to find out how it works.  
-     Disassembling the firmware is merely one tool used in that examination.  
-     Oscilloscopes and logic analyzers are other tools we have used.
-
-     We have written every single byte of the Rockbox firmware. But we could
-     not have written the software without first researching how the hardware
-     was put together, i.e. reverse engineer it.
-
+A29: Don't confuse the terms.  Reverse engineering means examining a product 
+     to find out how it works.  Disassembling the firmware is merely one tool 
+     used in that examination.  Oscilloscopes and logic analyzers are other 
+     tools we have used.  We have written every single byte of the Rockbox 
+     firmware. But we could not have written the software without first 
+     researching how the hardware was put together, i.e. reverse engineer it.
      All of this is completely legal.  If you define "from scratch" as writing
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
@@ -237,18 +233,13 @@ A29: Don't confuse the terms.
 Q30: Wait a minute here.  You have release version 1.0, but not a single one 
      of the ideas you have spoken about is actually implimented!  Calling this
      version 1.0 is really misleading.  Whats the story?!
-A30: It is true that Rockbox 1.0 lacks most of the feature set that every
-     sane user wants.  However, we never said it was more feature-complete or
-     better in any way then the original firmware at this early point.
-     This first release was done as a proof of concept that our ideas are 
-     moving in the right direction.  We also hope that it helps bring the 
-     project some attention, and some additional developers.  Adding the 
-     missing features is just a matter of time (and that time goes
+A30: In simple terms, the first release is called 1.0 because it has a basic 
+     working feature set that works and has no known bugs. That is what 1.0 
+     means.  It is true that Rockbox 1.0 lacks most of the feature set that 
+     every sane user wants.  However, we never said it was more 
+     feature-complete or better in any way then the original firmware at this 
+     early point.  This first release was done as a proof of concept that our 
+     ideas are moving in the right direction.  We also hope that it helps 
+     bring the project some attention, and some additional developers.  
+     Adding the missing features is just a matter of time (and that time goes
      faster if you, yes you, help too). 
-     
-
-
-
-
-
-
