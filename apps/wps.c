@@ -124,10 +124,11 @@ static void draw_screen(void)
                 char* szPeriod;
                 char szArtist[26];
                 char szBuff[257];
-                szBuff[sizeof(szBuff)-1] = 0;
 #ifdef CUSTOM_WPS
                 int tmpcnt = 0;
 #endif
+
+                szBuff[sizeof(szBuff)-1] = 0;
                 strncpy(szBuff, id3->path, sizeof(szBuff));
 
                 szTok = strtok_r(szBuff, "/", &end);
@@ -375,6 +376,16 @@ bool refresh_wps(bool refresh_scroll)
 
 bool load_custom_wps(void)
 {
+#ifdef SIMULATOR
+    snprintf(custom_wps[0],sizeof(custom_wps[0]),"%s","%s%pp/%pe: %?%it - %ia%:%fn%?");
+    snprintf(custom_wps[1],sizeof(custom_wps[1]),"%s","%pc/%pt");
+    snprintf(custom_wps[2],sizeof(custom_wps[2]),"%s","%it");
+    snprintf(custom_wps[3],sizeof(custom_wps[3]),"%s","%id");
+    snprintf(custom_wps[4],sizeof(custom_wps[4]),"%s","%ia");
+    snprintf(custom_wps[5],sizeof(custom_wps[5]),"%s","%id");
+    scroll_line_custom = 0;
+    return(true);
+#else
     int fd;
     int l = 0;
     int numread = 1;
@@ -419,6 +430,7 @@ bool load_custom_wps(void)
             scroll_line_custom = l;
     }
     return(true);
+#endif
 }
 
 bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
@@ -654,6 +666,7 @@ int player_id3_show(void)
             case BUTTON_STOP:
             case BUTTON_PLAY:
                 lcd_stop_scroll();
+                draw_screen();
                 return(0);
                 break;
 
@@ -1049,6 +1062,7 @@ static bool keylock(void)
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon(ICON_RECORD, true);
+    lcd_icon(ICON_PARAM, false);
 #endif
     display_keylock_text(true);
     keys_locked = true;
@@ -1140,6 +1154,7 @@ static bool menu(void)
                     mpeg_sound_set(SOUND_VOLUME, 0);
                 muted = !muted;
                 display_mute_text(muted);
+                exit = true;
                 break;
 
                 /* key lock */
@@ -1190,6 +1205,7 @@ static bool menu(void)
                 lcd_icon(ICON_PARAM, false);
                 lcd_icon(ICON_AUDIO, true);
                 draw_screen();
+                exit = true;
                 break;
 #endif
 
@@ -1242,7 +1258,11 @@ int wps_show(void)
         id3 = mpeg_current_track();
         if (id3) {
             draw_screen();
+#ifdef CUSTOM_WPS
+            refresh_wps(false);
+#else
             display_file_time();
+#endif
         }
         restore = true;
     }
