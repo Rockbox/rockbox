@@ -14,8 +14,6 @@
 /* When button.h is updated with gmini details, then fix this: */
 #define CONFIG_KEYPAD GMINI100_PAD
 
-#define CONFIG_LCD GMINI100_LCD
-
 #ifndef SIMULATOR
 
 /* Define this if you have a TCC730 (CalmRISC16) */
