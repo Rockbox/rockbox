@@ -28,7 +28,8 @@ SUFFIXES := .bmp
 BITMAPS = battery.bmp battery_bit.bmp \
 	pause.bmp play.bmp record.bmp \
 	volume.bmp volume1.bmp volume2.bmp volume3.bmp volume4.bmp volume5.bmp \
-	usb.bmp audio.bmp param.bmp
+	usb.bmp audio.bmp param.bmp \
+	repeat.bmp repeat1.bmp
 
 SRCS := $(BITMAPS:%.bmp=%.h)
 
