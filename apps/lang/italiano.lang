@@ -206,7 +206,7 @@ new: "Riprendere"
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "Off"
+new: "Disattivato"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -216,7 +216,7 @@ new: "Chiedi"
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-new: "On"
+new: "Attivo"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -364,7 +364,7 @@ new: "Loudness"
 id: LANG_BBOOST
 desc: in sound settings
 eng: "Bass Boost"
-new: "Bass Boost"
+new: "Enfasi Bassi"
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -379,7 +379,7 @@ new: "Canali"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel configuration"
-new: "Configurazione Canale"
+new: "Configurazione Canali"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -781,3 +781,10 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new: "0 Linee - Livello 0"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "Spegnimento per Inattività"
+
+
