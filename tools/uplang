@@ -57,10 +57,18 @@ while(<NEW>) {
             }
 
             print "\nid: ".$set{'id'}."\n";
+
+
+            if($set{'desc'} ne $all{$set{'id'}, 'desc'}) {
+                print "### Description changed! Previous description was:\n",
+                "### \"".$set{'desc'}."\"\n";
+                $set{'desc'} = $all{$set{'id'}, 'desc'};
+            }
+
             print "desc: ".$set{'desc'}."\n";
             if($set{'eng'} ne $all{$set{'id'}, 'eng'}) {
                 print "### English phrase was changed! Previous translation was made on:\n",
-                "### ".$all{$set{'id'}, 'eng'}."\n";
+                "### ".$set{'eng'}."\n";
                 $set{'eng'} = $all{$set{'id'}, 'eng'};
             }
             print "eng: ".$set{'eng'}."\n";
