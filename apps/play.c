@@ -44,7 +44,9 @@ void playtune(char *dir, char *file)
     bool good=1;
 
     snprintf(buffer, sizeof(buffer), "%s/%s", dir, file);
+#if !defined(SIMULATOR) || defined(MPEGPLAY)
     mpeg_play(buffer);
+#endif
 
     if(mp3info(&mp3, buffer)) {
         DEBUGF("id3 failure!");
