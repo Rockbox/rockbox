@@ -483,6 +483,8 @@ static int read_line(int fd, char* buffer, int buffer_size)
 
     if ( count < buffer_size )
         buffer[count] = 0;
+    else
+        buffer[buffer_size-1] = 0;
 
     return count;
 }
