@@ -252,10 +252,12 @@ static bool plugin_browse(void)
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
 }
 
+#ifdef HAVE_MAS3587F
 static bool recording_settings(void)
 {
     return recording_menu(false);
 }
+#endif
 
 bool main_menu(void)
 {
