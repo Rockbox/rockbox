@@ -2721,3 +2721,39 @@ desc: browser sorting setting
 eng: "by type"
 voice: "by type"
 new:
+
+id: LANG_FM_EDIT_PRESET
+desc:  in radio screen
+eng: "Edit preset"
+voice: "Edit preset"
+new:
+
+id: LANG_FM_MONO_MODE
+desc:  in radio screen
+eng: "Force mono"
+voice: "Force mono"
+new:
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc:  in radio screen
+eng: "Exit"
+voice: "Exit"
+new:
+
+id: LANG_FM_BUTTONBAR_EDIT
+desc:  in radio screen
+eng: "Edit"
+voice: "Edit"
+new:
+
+id: LANG_FM_BUTTONBAR_ADD
+desc:  in radio screen
+eng: "Add"
+voice: "Add"
+new:
+
+id: LANG_FM_BUTTONBAR_ACTION
+desc:  in radio screen
+eng: "Action"
+voice: "Action"
+new:

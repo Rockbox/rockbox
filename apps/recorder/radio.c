@@ -55,6 +55,18 @@
 #define PLL_FREQ_STEP 10000
 #define FREQ_STEP 100000
 
+#define RADIO_FREQUENCY 0
+#define RADIO_MUTE 1
+#define RADIO_IF_MEASUREMENT 2
+#define RADIO_SENSITIVITY 3
+#define RADIO_FORCE_MONO 4
+
+#define DEFAULT_IN1 0x100003 /* Mute */
+#define DEFAULT_IN2 0x140884 /* 5kHz, 7.2MHz crystal */
+
+static int fm_in1 = DEFAULT_IN1;
+static int fm_in2 = DEFAULT_IN2;
+
 static int curr_preset = -1;
 static int curr_freq = 99400000;
 static int pll_cnt;
@@ -67,15 +79,59 @@ static char default_filename[] = "/.rockbox/fm-presets-default.fmr";
 
 int debug_fm_detection;
 
+static int preset_menu; /* The menu index of the preset list */
+static struct menu_item preset_menu_items[MAX_PRESETS];
+static int num_presets; /* The number of presets in the preset list */
+
 void radio_load_presets(void);
-bool radio_preset_select(void);
+bool handle_radio_presets(void);
 bool radio_menu(void);
+
+void radio_set(int setting, int value)
+{
+    switch(setting)
+    {
+        case RADIO_FREQUENCY:
+            /* We add the standard Intermediate Frequency 10.7MHz
+            ** before calculating the divisor
+            ** The reference frequency is set to 50kHz, and the VCO
+            ** output is prescaled by 2.
+            */
+    
+            pll_cnt = (value + 10700000) / (PLL_FREQ_STEP/2) / 2;
+
+            /* 0x100000 == FM mode
+            ** 0x000002 == Microprocessor controlled Mute
+            */
+            fm_in1 = (fm_in1 & 0xfff00007) | (pll_cnt << 3);
+            fmradio_set(1, fm_in1);
+            break;
+
+        case RADIO_MUTE:
+            fm_in1 = (fm_in1 & 0xfffffffe) | (value?1:0);
+            fmradio_set(1, fm_in1);
+            break;
+
+        case RADIO_IF_MEASUREMENT:
+            fm_in1 = (fm_in1 & 0xfffffffb) | (value?4:0);
+            fmradio_set(1, fm_in1);
+            break;
+
+        case RADIO_SENSITIVITY:
+            fm_in2 = (fm_in2 & 0xffff9fff) | ((value & 3) << 13);
+            fmradio_set(2, fm_in2);
+            break;
+
+        case RADIO_FORCE_MONO:
+            fm_in2 = (fm_in2 & 0xfffffffb) | (value?0:4);
+            fmradio_set(2, fm_in2);
+            break;
+    }
+}
 
 void radio_stop(void)
 {
-    /* Mute the FM radio */
-    fmradio_set(1, 0x100003);
-
+    radio_set(RADIO_MUTE, 1);
 }
 
 bool radio_hardware_present(void)
@@ -89,22 +145,6 @@ bool radio_hardware_present(void)
         return true;
     else
         return false;
-}
-
-void radio_set_frequency(int freq)
-{
-    /* We add the standard Intermediate Frequency 10.7MHz before calculating
-    ** the divisor
-    ** The reference frequency is set to 50kHz, and the VCO output is prescaled
-    ** by 2.
-    */
-    
-    pll_cnt = (freq + 10700000) / (PLL_FREQ_STEP/2) / 2;
-
-    /* 0x100000 == FM mode
-    ** 0x000002 == Microprocessor controlled Mute
-    */
-    fmradio_set(1, 0x100002 | pll_cnt << 3);
 }
 
 static int find_preset(int freq)
@@ -192,8 +232,15 @@ bool radio_screen(void)
                             mpeg_sound_default(SOUND_RIGHT_GAIN), false);
 #endif
     
-    fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
-    radio_set_frequency(curr_freq);
+    fmradio_set(1, DEFAULT_IN1);
+    fmradio_set(2, DEFAULT_IN2);
+
+    radio_set(RADIO_FREQUENCY, curr_freq);
+    radio_set(RADIO_IF_MEASUREMENT, 0);
+    radio_set(RADIO_SENSITIVITY, 0);
+    radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+    radio_set(RADIO_MUTE, 0);
+    
     curr_preset = find_preset(curr_freq);
 
     buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
@@ -210,11 +257,11 @@ bool radio_screen(void)
                 curr_freq = MIN_FREQ;
 
             /* Tune in and delay */
-            radio_set_frequency(curr_freq);
+            radio_set(RADIO_FREQUENCY, curr_freq);
             sleep(1);
             
             /* Start IF measurement */
-            fmradio_set(1, 0x100006 | pll_cnt << 3);
+            radio_set(RADIO_IF_MEASUREMENT, 1);
             sleep(1);
 
             /* Now check how close to the IF frequency we are */
@@ -280,7 +327,7 @@ bool radio_screen(void)
                 if(curr_freq < MIN_FREQ)
                     curr_freq = MIN_FREQ;
 
-                radio_set_frequency(curr_freq);
+                radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
                 update_screen = true;
@@ -291,7 +338,7 @@ bool radio_screen(void)
                 if(curr_freq > MAX_FREQ)
                     curr_freq = MAX_FREQ;
                 
-                radio_set_frequency(curr_freq);
+                radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
                 search_dir = 0;
                 update_screen = true;
@@ -337,7 +384,7 @@ bool radio_screen(void)
                 break;
                 
             case BUTTON_F2:
-                radio_preset_select();
+                handle_radio_presets();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
@@ -393,7 +440,8 @@ bool radio_screen(void)
                 timeout = current_tick + HZ;
                 
                 val = fmradio_read(3);
-                stereo = (val & 0x100000)?true:false;
+                stereo = ((val & 0x100000)?true:false) &
+                    !global_settings.fm_force_mono;
                 if(stereo != last_stereo_status)
                 {
                     update_screen = true;
@@ -441,9 +489,12 @@ bool radio_screen(void)
                 }
                 else
                 {
-                    snprintf(buf, 32, "%s %02d",
-                             str(LANG_RECORD_PRERECORD), seconds%60);
-                    lcd_puts(0, top_of_screen + 3, buf);
+                    if(global_settings.rec_prerecord_time)
+                    {
+                        snprintf(buf, 32, "%s %02d",
+                                 str(LANG_RECORD_PRERECORD), seconds%60);
+                        lcd_puts(0, top_of_screen + 3, buf);
+                    }
                 }
                 
                 /* Only force the redraw if update_screen is true */
@@ -503,29 +554,6 @@ bool radio_screen(void)
     return have_recorded;
 }
 
-static bool parseline(char* line, char** freq, char** name)
-{
-    char* ptr;
-
-    while ( isspace(*line) )
-        line++;
-
-    if ( *line == '#' )
-        return false;
-
-    ptr = strchr(line, ':');
-    if ( !ptr )
-        return false;
-
-    *freq = line;
-    *ptr = 0;
-    ptr++;
-    while (isspace(*ptr))
-        ptr++;
-    *name = ptr;
-    return true;
-}
-
 void radio_save_presets(void)
 {
     int fd;
@@ -534,7 +562,7 @@ void radio_save_presets(void)
     fd = creat(default_filename, O_WRONLY);
     if(fd >= 0)
     {
-        for(i = 0;i < MAX_PRESETS;i++)
+        for(i = 0;i < num_presets;i++)
         {
             fprintf(fd, "%d:%s\n", presets[i].frequency, presets[i].name);
         }
@@ -555,10 +583,12 @@ void radio_load_presets(void)
     char *name;
     bool done = false;
     int i;
+    int f;
 
     if(!presets_loaded)
     {
         memset(presets, 0, sizeof(presets));
+        num_presets = 0;
     
         fd = open(default_filename, O_RDONLY);
         if(fd >= 0)
@@ -569,12 +599,16 @@ void radio_load_presets(void)
                 rc = read_line(fd, buf, 128);
                 if(rc > 0)
                 {
-                    if(parseline(buf, &freq, &name))
+                    if(settings_parseline(buf, &freq, &name))
                     {
-                        presets[i].frequency = atoi(freq);
-                        strncpy(presets[i].name, name, 27);
-                        presets[i].name[27] = 0;
-                        i++;
+                        f = atoi(freq);
+                        if(f) /* For backwards compatibility */
+                        {
+                            presets[num_presets].frequency = f;
+                            strncpy(presets[num_presets].name, name, 27);
+                            presets[num_presets].name[27] = 0;
+                            num_presets++;
+                        }
                     }
                 }
                 else
@@ -586,71 +620,35 @@ void radio_load_presets(void)
     presets_loaded = true;
 }
 
-bool radio_preset_select(void)
+static void rebuild_preset_menu(void)
 {
-    struct menu_item menu[MAX_PRESETS];
-    int m, result;
     int i;
-    bool reload_dir = false;
-    int num_presets;
-
-    if(presets_loaded)
+    for(i = 0;i < num_presets;i++)
     {
-        num_presets = 0;
-        
-        for(i = 0;i < MAX_PRESETS;i++)
-        {
-            if(presets[i].frequency)
-            {
-                menu[num_presets].desc = presets[i].name;
-                menu[num_presets].voice_id = -1;
-                /* We use the function pointer entry for the preset
-                   entry index */
-                menu[num_presets++].function = (void *)i;
-            }
-        }
-
-        if(num_presets)
-        {
-            /* DIY menu handling, since we want to exit after selection */
-            m = menu_init( menu, num_presets, NULL, NULL, NULL, NULL );
-            result = menu_show(m);
-            menu_exit(m);
-            if (result == MENU_SELECTED_EXIT)
-                return false;
-            else if (result == MENU_ATTACHED_USB)
-                reload_dir = true;
-            
-            if (result >= 0)
-            {
-                i = (int)menu[result].function;
-                curr_freq = presets[i].frequency;
-                radio_set_frequency(curr_freq);
-            }
-        }
-        else
-        {
-            splash(HZ*2, true, str(LANG_FM_NO_PRESETS));
-        }
+        preset_menu_items[i].desc = presets[i].name;
+        preset_menu_items[i].voice_id = -1;
     }
-
-    return reload_dir;
 }
 
 static bool radio_add_preset(void)
 {
     char buf[27];
-    int i = find_preset(0);
 
-    if(i >= 0)
+    if(num_presets < MAX_PRESETS)
     {
         memset(buf, 0, 27);
         
         if (!kbd_input(buf, 27))
         {
             buf[27] = 0;
-            strcpy(presets[i].name, buf);
-            presets[i].frequency = curr_freq;
+            strcpy(presets[num_presets].name, buf);
+            presets[num_presets].frequency = curr_freq;
+            menu_insert(preset_menu, -1,
+                        presets[num_presets].name, 0, 0);
+            /* We must still rebuild the menu table, since the
+               item name pointers must be updated */
+            rebuild_preset_menu();
+            num_presets++;
             radio_save_presets();
         }
     }
@@ -661,47 +659,129 @@ static bool radio_add_preset(void)
     return true;
 }
 
+static int handle_radio_presets_menu_cb(int key, int m)
+{
+    (void)m;
+    switch(key)
+    {
+        case BUTTON_F3:
+            key = BUTTON_LEFT; /* Fake an exit */
+            break;
+    }
+    return key;
+}
+
+static bool radio_edit_preset(void)
+{
+    int pos = menu_cursor(preset_menu);
+    char buf[27];
+
+    strncpy(buf, menu_description(preset_menu, pos), 27);
+        
+    if (!kbd_input(buf, 27))
+    {
+        buf[27] = 0;
+        strcpy(presets[pos].name, buf);
+        radio_save_presets();
+    }
+    return true;
+}
+
 bool radio_delete_preset(void)
 {
-    struct menu_item menu[MAX_PRESETS];
-    int m, result;
+    int pos = menu_cursor(preset_menu);
+    int i;
+
+    for(i = pos;i < num_presets;i++)
+        presets[i] = presets[i+1];
+    num_presets--;
+    
+    menu_delete(preset_menu, pos);
+    /* We must still rebuild the menu table, since the
+       item name pointers must be updated */
+    rebuild_preset_menu();
+    radio_save_presets();
+
+    return true; /* Make the menu return immediately */
+}
+
+bool handle_radio_presets_menu(void)
+{
+    struct menu_item preset_menu_items[] = {
+        { STR(LANG_FM_EDIT_PRESET), radio_edit_preset },
+        { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
+    };
+    int m;
+
+    m = menu_init( preset_menu_items,
+                   sizeof preset_menu_items / sizeof(struct menu_item),
+                   handle_radio_presets_menu_cb,
+                   NULL, NULL, str(LANG_FM_BUTTONBAR_EXIT));
+    menu_run(m);
+    menu_exit(m);
+    return false;
+}
+
+int handle_radio_presets_cb(int key, int m)
+{
+    bool ret;
+    
+    switch(key)
+    {
+        case BUTTON_F1:
+            radio_add_preset();
+            menu_draw(m);
+            key = BUTTON_NONE;
+            break;
+            
+        case BUTTON_F2:
+            menu_draw(m);
+            key = BUTTON_LEFT; /* Fake an exit */
+            break;
+            
+        case BUTTON_F3:
+            ret = handle_radio_presets_menu();
+            menu_draw(m);
+            if(ret)
+                key = MENU_ATTACHED_USB;
+            else
+                key = BUTTON_NONE;
+            break;
+    }
+    return key;
+}
+
+bool handle_radio_presets(void)
+{
+    int result;
     int i;
     bool reload_dir = false;
-    int num_presets;
 
     if(presets_loaded)
     {
-        num_presets = 0;
-        
-        for(i = 0;i < MAX_PRESETS;i++)
-        {
-            if(presets[i].frequency)
-            {
-                menu[num_presets].desc = presets[i].name;
-                menu[num_presets].voice_id = -1;
-                /* We use the function pointer entry for the preset
-                   entry index */
-                menu[num_presets++].function = (void *)i;
-            }
-        }
-        
+        rebuild_preset_menu();
+
         /* DIY menu handling, since we want to exit after selection */
-        m = menu_init( menu, num_presets, NULL, NULL, NULL, NULL );
-        result = menu_show(m);
-        menu_exit(m);
+        preset_menu = menu_init( preset_menu_items, num_presets,
+                                 handle_radio_presets_cb,
+                                 str(LANG_FM_BUTTONBAR_ADD),
+                                 str(LANG_FM_BUTTONBAR_EXIT),
+                                 str(LANG_FM_BUTTONBAR_ACTION));
+        result = menu_show(preset_menu);
+        menu_exit(preset_menu);
         if (result == MENU_SELECTED_EXIT)
             return false;
         else if (result == MENU_ATTACHED_USB)
             reload_dir = true;
         
-        if (result >= 0)
+        if (result >= 0) /* A preset was selected */
         {
-            i = (int)menu[result].function;
-            presets[i].frequency = 0;
-            radio_save_presets();
+            i = menu_cursor(preset_menu);
+            curr_freq = presets[i].frequency;
+            radio_set(RADIO_FREQUENCY, curr_freq);
         }
     }
-
+    
     return reload_dir;
 }
 
@@ -726,22 +806,42 @@ static bool fm_recording_settings(void)
     return ret;
 }
 #endif
+
+char monomode_menu_string[32];
+
+static void create_monomode_menu(void)
+{
+    snprintf(monomode_menu_string, 32, "%s: %s", str(LANG_FM_MONO_MODE),
+             global_settings.fm_force_mono?
+             str(LANG_SET_BOOL_YES):str(LANG_SET_BOOL_NO));
+}
+
+static bool toggle_mono_mode(void)
+{
+    global_settings.fm_force_mono = !global_settings.fm_force_mono;
+    radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+    settings_save();
+    create_monomode_menu();
+    return false;
+}
+
 bool radio_menu(void)
 {
-    struct menu_item radio_menu_items[] = {
-        { STR(LANG_FM_SAVE_PRESET), radio_add_preset },
-        { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
-        { STR(LANG_SOUND_SETTINGS), sound_menu },
-#ifndef SIMULATOR
-        { STR(LANG_RECORDING_SETTINGS), fm_recording_settings }
-#endif
-    };
+    struct menu_item items[3];
     int m;
     bool result;
 
-    m = menu_init( radio_menu_items,
-                   sizeof radio_menu_items / sizeof(struct menu_item), NULL,
-                   NULL, NULL, NULL);
+    m = menu_init(items, 0, NULL, NULL, NULL, NULL);
+
+    create_monomode_menu();
+    menu_insert(m, -1, monomode_menu_string, LANG_FM_MONO_MODE,
+                toggle_mono_mode);
+    menu_insert(m, -1, STR(LANG_SOUND_SETTINGS), sound_menu);
+    
+#ifndef SIMULATOR
+    menu_insert(m, -1, STR(LANG_RECORDING_SETTINGS), fm_recording_settings);
+#endif
+
     result = menu_run(m);
     menu_exit(m);
     return result;
