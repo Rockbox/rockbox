@@ -10,16 +10,6 @@ desc: in the main menu
 eng: "General Settings"
 new: "Algemene Instellingen"
 
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Spellen"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demonstraties"
-
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
@@ -55,50 +45,10 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 new: 
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: 
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Batterij: %d%%%s"
-
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 new: "Batterij: Opladen"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: 
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Sneeuw"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: 
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: 
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: 
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: 
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -110,11 +60,6 @@ desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Volgorde maken"
 
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Afspelen..."
-
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
@@ -124,11 +69,6 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new: "buffer Vol"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
-new: "%d Nummers"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -160,21 +100,6 @@ desc: used in set_time()
 eng: "OFF To Revert"
 new: "OFF om terug te zetten"
 
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: 
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: 
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: 
-
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
@@ -189,11 +114,6 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 new: "Speel Geselecteerde Eerst"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: 
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -260,30 +180,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "Volg Speellijst"
 
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: 
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: 
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 new: "Weet je het zeker?"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new: 
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF=Afbreken"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -307,7 +207,7 @@ new: "Sorteer mode"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new: 
 
 id: LANG_RESET
@@ -423,16 +323,6 @@ new: "Hervatten?"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
-new: 
-
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: 
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
 new: 
 
 id: LANG_KEYLOCK_ON_PLAYER
@@ -570,11 +460,6 @@ desc: in wps F2 pressed
 eng: "Mode:"
 new: 
 
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: 
-
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
@@ -595,180 +480,10 @@ desc: when playlist has finished
 eng: "End Of List"
 new: "Einde van de lijst"
 
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: 
-
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 new: "Einde van de titellijst"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: 
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Jouw score:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Hoogste Score: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Nieuwe Hoogste Score!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Spel gepauseerd"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new: "[PLAY] om door te gaan"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new: "[OFF] om te stoppen"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Niveau - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new: "(1 - langzaam, 9 - snel)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new: "[PLAY] om te starten/pauseren"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: ""
-new: 
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: ""
-new: 
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: ""
-new: 
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: ""
-new: 
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: ""
-new: 
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: ""
-new: 
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -985,11 +700,6 @@ desc: Battery type title
 eng: "Battery Display"
 new: "Batterij Tonen Als" 
 
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Kubus" 
-
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
@@ -999,11 +709,6 @@ id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 new: "Numerieke waarde" 
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oscilograaf" 
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -1195,21 +900,6 @@ desc: in settings_menu
 eng: "Trickle Charge"
 new: "Druppel Laden" 
 
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new: "Wachtrij buffer vol"
-
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "In Wachtrij: %s" 
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new: "Totaal In Wachtrij: %d" 
-
 id: LANG_DELETE
 desc: The verb/action Delete
 eng: "Delete"
@@ -1229,21 +919,6 @@ id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 new: "Afgebroken" 
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: 
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Wachtrij" 
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Hern + Verw"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1300,11 +975,6 @@ desc: Screen feedback during playlist creation
 eng: "Creating"
 new: "Creeëren..."
 
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: 
-
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
@@ -1358,7 +1028,7 @@ new: "Grootte:"
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
-new: "Tijd   :"
+new: "Tijd:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1570,11 +1240,6 @@ desc: Do you want to reboot?
 eng: "Reboot now?"
 new: "Opnieuw starten?"
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "Draai 'em" 
-
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
@@ -1594,11 +1259,6 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 new: "OFF om af te breken"
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othelo" 
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1662,23 +1322,13 @@ new: "Voeg ook subdirectories in"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
-new: "Sla dynamische speellijst op" 
-
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Schuifpuzzel" 
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Ster" 
+eng: "Save Current Playlist"
+new: "Sla huidige speellijst op" 
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
-new: 'STOP om af te breken" 
+new: "STOP om af te breken" 
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
@@ -1687,18 +1337,18 @@ new: "Ook sub-directories?"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
+eng: "Browse .cfg files"
 new: "Configuraties"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
+eng: "Browse Fonts"
 new: "Lettertypes"
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
-new: 
+eng: "Browse Firmwares"
+new: "Firmware"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
@@ -1707,23 +1357,18 @@ new: "Taal"
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
-new: 
+eng: "Browse Plugins"
+new: "Plugins"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
+eng: "Browse .wps files"
 new: "Afspeelscherm" 
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
 new: 
-
-id: LANG_BUTTONBAR_OPTIONS
-desc: in button bar
-eng: "Option"
-new: "Optie" 
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
@@ -1774,3 +1419,258 @@ id: LANG_NO_FILES
 desc: in settings_menu
 eng: "No files"
 new: "Geen bestanden" 
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+new: "Onderste Boven"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc: in main menu
+eng: "Record"
+new: "Opnemen"
+
+id: LANG_FM_RADIO
+desc: in main menu
+eng: "FM Radio"
+new: 
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new: "Verplaatsen" 
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+new: "Verplaatsen mislukt" 
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+new: "Bufferopname"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+new: "Bufferopname tijd" 
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new: "Toon Huidige  Speellijst"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Maak en bladwijzer?" 
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new: 
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new: "Batterij" 
+
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "Laad laatste bladwijzer?" 
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Bladwijzer maken mislukt!" 
+
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Bladwijzer gemaakt" 
+
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "Bladwijzer leeg"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Bladwijzers"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Maak een bladwijzer" 
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Toon bladwijzers" 
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "Recente bladwijzers"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Bladwijzer"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+new: "ON+Play = verwijderen" 
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+new: "OFF = Afbreken" 
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: 
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "Neer = Toon" 
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+new: "PLAY = Selecteer" 
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Tijd" 
+
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Bladwijzers" 
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Maak bladwijzer bij stop" 
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "Laad laatste Bookmark" 
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Lijst van recente bladwijzers bijhouden?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+new: "Vraag - Alleen recente"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+new: "Ja - Alleen recente"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "Enkel specifieke"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new: 
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new: 
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new: "Scherm instellingen"
+
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new: "Limieten"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+new: "Beheer instellingen" 
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new: "Start opname" 
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new: "Tijd en datum"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new: 
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new: "Maak directory" 
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new: "Huidige directory" 
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new: 
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+new: "Volledig pad"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+new: "Enkel track naam"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+new: "Bestands opties" 
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+new: "Verwijder" 
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+new: "Toon Indexen" 
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+new: "Track weergave" 
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+new: "Toon" 
