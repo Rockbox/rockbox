@@ -66,6 +66,8 @@ bool set_sound(char* string,
         talkunit = UNIT_DB;
     else if (*unit == '%')
         talkunit = UNIT_PERCENT;
+    else if (*unit == 'H')
+         talkunit = UNIT_HERTZ;
     
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -198,7 +200,7 @@ static bool mdb_center(void)
 
 static bool mdb_shape(void)
 {
-    return set_sound(str(LANG_MDB_SHAPE), &global_settings.mdb_shape, 
+    return set_sound(str(LANG_MDB_SHAPE), &global_settings.mdb_shape,
                      SOUND_MDB_SHAPE);
 }
 
