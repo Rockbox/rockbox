@@ -172,7 +172,7 @@ Q21. I tried one of your firmware files and now I can't access my harddisk!
                      Pls Chck HD
 A21. Your harddisk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
-     http://rockbox.sourceforge.net/rockbox/lock.html
+     http://rockbox.haxx.se/lock.html
 
 Q22: This FAQ doesn't answer the question I have.  What should I do?
 A22: You have a couple options here.  You could forget the question, find an
