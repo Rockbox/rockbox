@@ -110,6 +110,7 @@ static unsigned short identify_info[SECTOR_SIZE];
 static int ata_power_on(void);
 static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
+static int set_features(void);
 
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
@@ -753,6 +754,8 @@ int ata_soft_reset(void)
 
 static int ata_power_on(void)
 {
+    int rc;
+    
     ide_power_enable(true);
     if( ata_hard_reset() )
         return -1;
