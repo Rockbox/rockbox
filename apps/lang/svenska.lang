@@ -1,3 +1,4 @@
+# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -9,50 +10,40 @@ desc: in the main menu
 eng: "General Settings"
 new: "Huvudinställning"
 
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-new: "Automatvolym"
+id: LANG_GAMES
+desc: in the main menu
+eng: "Games"
+new: "Spel"
 
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-new: "Skärmljus"
+id: LANG_DEMOS
+desc: in the main menu
+eng: "Demos"
+new: "Demosar"
 
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-new: "Balans"
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+new: "Info"
 
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-new: "Bas"
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+new: "Version"
 
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
-new: "Batteri: laddar"
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+new: "Debug (rör ej!)"
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Batt: %d%%%s"
+id: LANG_USB
+desc: in the main menu
+eng: "USB (sim)"
+new: "USB (sim)"
 
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Batteri: %d%%%s"
-
-id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-new: "Basförstärkning"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Studsa"
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox info:"
+new: "Rockbox info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
@@ -64,460 +55,358 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%02dMb"
 new: "Buffert: %d.%02dMb"
 
-id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-new: "Sortera"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel configuration"
-new: "Kanalkonfigurering"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-new: "Mono vänster"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-new: "kanaler"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-new: "Mono"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-new: "Mono höger"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-new: "Stereo"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-new: "Kontrast"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (keep out!)"
-new: "Debug (rör ej!)"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV decay time"
-new: "AV falltid"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demosar"
-
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: "Dir filter: %s"
-new: "Dir filter: %s"
-
-id: LANG_DISCHARGE
-desc: in settings_menu
-eng: "Deep discharge"
-new: "Djup urladdning"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-new: "Skärm"
-
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: "<Press ON>"
-new: "<Tryck ON>"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: "Press ON"
-new: "Tryck ON"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End of list"
-new: "Listan slut"
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "<End of song list>"
-new: "<Slut på listan>"
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "mode:"
-new: "läge:"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "bar"
-new: "list"
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-new: "Rull-"
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-new: "Status-"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-new: "FF/RW Accel"
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-new: "FF/RW Min Step"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-new: "Filvy"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-new: "Följ Låtlistan"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Spel"
-
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: "Hidden Files"
-new: "Dolda filer"
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: "Hide"
-new: "Dölj"
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: "Show"
-new: "Visa"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-new: "[Album]"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-new: "[Artist]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-new: "[Bitrate]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-new: "[Frekvens]"
-
-id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
-new: "-ID3 Info- "
-
-id: LANG_ID3_LENGHT
-desc: in wps
-eng: "[Length]"
-new: "[Längd]"
-
-id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is available
-eng: "<no album>"
-new: "<inget album>"
-
-id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is available
-eng: "<no artist>"
-new: "<ingen artist>"
-
-id: LANG_ID3_NO_TITLE
-desc: in wps when no title is available
-eng: "<no title>"
-new: "<ingen titel>"
-
-id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is available
-eng: "<no tracknum>"
-new: "<inget spår>"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[PATH]"
-new: "[VÄG]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-new: "[Låtlista]"
-
-id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
-new: "--Skärm--"
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-new: "[Titel]"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-new: "[Spår]"
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-new: "Info"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Keylock OFF"
-new: "Tangentlås AV"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
-new: "Tangentlåset är AV"
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Keylock ON"
-new: "Tangentlås PÅ"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key lock is ON"
-new: "Tangentlåset är PÅ"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-new: "Loudness"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: "Music Filter"
-new: "Musikfilter"
-
-id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "MUTE OFF"
-new: "MUTE AV"
-
-id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute is OFF"
-new: "Mute är AV"
-
-id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
-new: "Mute PÅ"
-
-id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute is ON"
-new: "Mute är PÅ"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-new: "Av"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-new: "På"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-new: "Paus"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch down"
-new: "Tonhöjd ner"
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch up"
-new: "Tonhöjd upp"
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-new: "Återgivning"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d files"
-new: "%d filer"
-
-id: LANG_PLAYINDICES_BUFFER
-desc: in playlist.indices() when playlist is full
-eng: "buffer full"
-new: "bufferten är full"
-
-id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
-eng: "Playlist"
-new: "Låtlista"
+id: LANG_BATTERY_LEVEL_PLAYER
+desc: the battery level in percentage
+eng: "Batt: %d%%%s"
+new: "Batt: %d%%%s"
+
+id: LANG_BATTERY_LEVEL_RECORDER
+desc: the battery level in percentage
+eng: "Battery: %d%%%s"
+new: "Batteri: %d%%%s"
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: charging"
+new: "Batteri: laddar"
+
+id: LANG_BOUNCE
+desc: in the demos menu
+eng: "Bounce"
+new: "Studsa"
+
+id: LANG_SNOW
+desc: in the demos menu
+eng: "Snow"
+new: "Snö"
+
+id: LANG_TETRIS
+desc: in the games menu
+eng: "Tetris"
+new: "Tetris"
+
+id: LANG_SOKOBAN
+desc: in the games menu
+eng: "Sokoban"
+new: "Sokoban"
+
+id: LANG_WORMLET
+desc: in the games menu
+eng: "Wormlet"
+new: "Wormlet"
+
+id: LANG_SNAKE
+desc: in the games menu
+eng: "Snake"
+new: "Snake"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new: "Laddar..."
 
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Spelar..."
-
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Slumpar..."
 
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play selected first"
-new: "Spela den valda först"
+id: LANG_PLAYLIST_PLAY
+desc: displayed on screen when start playing a playlist
+eng: "Playing..."
+new: "Spelar..."
 
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset settings"
-new: "Återställ inställningar"
+id: LANG_PLAYINDICES_PLAYLIST
+desc: in playlist.indices() when playlist is full
+eng: "Playlist"
+new: "Låtlista"
 
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: "Really?"
-new: "Verkligen?"
+id: LANG_PLAYINDICES_BUFFER
+desc: in playlist.indices() when playlist is full
+eng: "buffer full"
+new: "bufferten är full"
 
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are you sure?"
-new: "Är du säker?"
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "Any Other = No"
-new: "Övriga = Nej"
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Spela/Stanna"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: "Play = Yes"
-new: "Spela = Ja"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancellation
-eng: "Canceled"
-new: "Avbruten"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-new: "Nollställd"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-new: "Inställningar"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-new: "Återuppta"
-
-id: LANG_RESUME_ASK
-desc: question asked at the beginning when resume is on
-eng: "Resume?"
-new: "Återuppta?"
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: "Any Other = No"
-new: "Övriga = Nej"
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: possible answers to resume question
-eng: "(PLAY/STOP)"
-new: "(Ja/Nej)"
-
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: "Play = Yes"
-new: "Spela = Ja"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "ask"
-new: "fråga"
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox info:"
-new: "Rockbox info:"
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-new: "Rullningshastighetsexempel"
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-new: "Rullningshastighet"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Batt. low?"
-new: "Batt. dåligt?"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "Is battery low?"
-new: "Är battiet dåligt?"
+id: LANG_PLAYINDICES_AMOUNT
+desc: number of files in playlist
+eng: "%d files"
+new: "%d filer"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
 new: "Spara misslyckades"
 
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. low?"
+new: "Batt. dåligt?"
+
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
 new: "Spara misslyckade"
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is battery low?"
+new: "Är battiet dåligt?"
+
+id: LANG_TIME_SET
+desc: 
+eng: "ON to set"
+new: "PÅ för att ställa"
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF to revert"
+new: "AV flr att återgå"
+
+id: LANG_HIDDEN
+desc: in settings_menu
+eng: "Hidden Files"
+new: "Dolda filer"
+
+id: LANG_HIDDEN_SHOW
+desc: in settings_menu 
+eng: "Show"
+new: "Visa"
+
+id: LANG_HIDDEN_HIDE
+desc: in settings_menu
+eng: "Hide"
+new: "Dölj"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+new: "Kontrast"
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+new: "Slumpa"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play selected first"
+new: "Spela den valda först"
+
+id: LANG_MP3FILTER
+desc: in settings_menu
+eng: "Music Filter"
+new: "Musikfilter"
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+new: "Sortera olika"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+new: "Återuppta"
+
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+new: "Av"
+
+id: LANG_RESUME_SETTING_ASK
+desc: in settings_menu
+eng: "ask"
+new: "fråga"
+
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+new: "På"
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+new: "Skärmljus"
+
+id: LANG_BACKLIGHT_ON
+desc: in settings_menu, 
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+new: "Rullningshastighetsexempel"
+
+id: LANG_DISCHARGE
+desc: in settings_menu
+eng: "Deep discharge"
+new: "Djup urladdning"
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+new: "Ställ Tid/Datum"
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+new: "Disk spindown"
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+new: "FF/RW Min Step"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+new: "FF/RW Accel"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+new: "Följ Låtlistan"
+
+id: LANG_RESET_ASK_PLAYER
+desc: confirm to reset settings
+eng: "Really?"
+new: "Verkligen?"
+
+id: LANG_RESET_CONFIRM_PLAYER
+desc: confirm to reset settings
+eng: "Play/Stop"
+new: "Spela/Stanna"
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are you sure?"
+new: "Är du säker?"
+
+id: LANG_RESET_CONFIRM_RECORDER
+desc: confirm to reset settings
+eng: "Play = Yes"
+new: "Spela = Ja"
+
+id: LANG_RESET_CANCEL_RECORDER
+desc: confirm to reset settings
+eng: "Any Other = No"
+new: "Övriga = Nej"
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+new: "Inställningar"
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+new: "Nollställd"
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancellation
+eng: "Canceled"
+new: "Avbruten"
+
+id: LANG_CASE_MENU
+desc: in fileview_settings_menu()
+eng: "Sort Mode"
+new: "Sortera"
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "Rullningshastighet"
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset settings"
+new: "Återställ inställningar"
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+new: "Återgivning"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+new: "Filvy"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+new: "Skärm"
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+new: "Systemet"
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+new: "Volym"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+new: "Balans"
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+new: "Bas"
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+new: "Diskant"
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+new: "Loudness"
+
+id: LANG_BBOOST
+desc: in sound settings
+eng: "Bass Boost"
+new: "Basförstärkning"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV decay time"
+new: "AV falltid"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+new: "kanaler"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel configuration"
+new: "Kanalkonfigurering"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+new: "Stereo"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+new: "Mono"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+new: "Mono vänster"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+new: "Mono höger"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+new: "Automatvolym"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -529,15 +418,205 @@ desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
 new: "är fullt!"
 
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-new: "Slumpa"
+id: LANG_RESUME_ASK
+desc: question asked at the beginning when resume is on
+eng: "Resume?"
+new: "Återuppta?"
 
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Snake"
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: possible answers to resume question
+eng: "(PLAY/STOP)"
+new: "(Ja/Nej)"
+
+id: LANG_RESUME_CONFIRM_RECORDER
+desc: possible answer to resume question
+eng: "Play = Yes"
+new: "Spela = Ja"
+
+id: LANG_RESUME_CANCEL_RECORDER
+desc: possible answer to resume question
+eng: "Any Other = No"
+new: "Övriga = Nej"
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Keylock ON"
+new: "Tangentlås PÅ"
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Keylock OFF"
+new: "Tangentlås AV"
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key lock is ON"
+new: "Tangentlåset är PÅ"
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key lock is OFF"
+new: "Tangentlåset är AV"
+
+id: LANG_MUTE_ON_PLAYER
+desc: displayed when mute is on
+eng: "Mute ON"
+new: "Mute PÅ"
+
+id: LANG_MUTE_OFF_PLAYER
+desc: displayed when mute is off
+eng: "MUTE OFF"
+new: "MUTE AV"
+
+id: LANG_MUTE_ON_RECORDER
+desc: displayed when mute is on
+eng: "Mute is ON"
+new: "Mute är PÅ"
+
+id: LANG_MUTE_OFF_RECORDER
+desc: displayed when mute is off
+eng: "Mute is OFF"
+new: "Mute är AV"
+
+id: LANG_ID3_INFO
+desc: in the browse_id3() function
+eng: "-ID3 Info- "
+new: "-ID3 Info- "
+
+id: LANG_ID3_SCREEN
+desc: in the browse_id3() function
+eng: "--Screen-- "
+new: "--Skärm--"
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+new: "[Titel]"
+
+id: LANG_ID3_NO_TITLE
+desc: in wps when no title is available
+eng: "<no title>"
+new: "<ingen titel>"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+new: "[Artist]"
+
+id: LANG_ID3_NO_ARTIST
+desc: in wps when no artist is available
+eng: "<no artist>"
+new: "<ingen artist>"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+new: "[Album]"
+
+id: LANG_ID3_NO_ALBUM
+desc: in wps when no album is available
+eng: "<no album>"
+new: "<inget album>"
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+new: "[Spår]"
+
+id: LANG_ID3_NO_TRACKNUM
+desc: in wps if no track number is available
+eng: "<no tracknum>"
+new: "<inget spår>"
+
+id: LANG_ID3_LENGHT
+desc: in wps
+eng: "[Length]"
+new: "[Längd]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+new: "[Låtlista]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+new: "[Bitrate]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+new: "[Frekvens]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[PATH]"
+new: "[VÄG]"
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch up"
+new: "Tonhöjd upp"
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch down"
+new: "Tonhöjd ner"
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+new: "Paus"
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "mode:"
+new: "läge:"
+
+id: LANG_DIR_FILTER
+desc: in wps F2 pressed
+eng: "Dir filter: %s"
+new: "Dir filter: %s"
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+new: "Status-"
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+new: "Rull-"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "bar"
+new: "list"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End of list"
+new: "Listan slut"
+
+id: LANG_END_CONFIRM_PLAYER
+desc: when playlist has finished
+eng: "<Press ON>"
+new: "<Tryck ON>"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "<End of song list>"
+new: "<Slut på listan>"
+
+id: LANG_END_CONFIRM_RECORDER
+desc: when playlist has finished
+eng: "Press ON"
+new: "Tryck ON"
+
+id: LANG_SNAKE_SCORE
+desc: when you die in snake game
+eng: "Your score :"
+new: "Din poäng:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
@@ -549,50 +628,55 @@ desc: new high score in snake game
 eng: "New High Score!"
 new: "Nytt rekord!"
 
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Nivå - %d"
-
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
 eng: "Game Paused"
 new: "Spelet pausat"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[Off] to quit"
-new: "[Av] för att avsluta"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - slow, 9 - fast)"
-new: "(1- långsamt, 9 - fort)"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[Play] to resume"
 new: "[Spela] för att återgå"
 
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score :"
-new: "Din poäng:"
+id: LANG_SNAKE_QUIT
+desc: how to quit game
+eng: "[Off] to quit"
+new: "[Av] för att avsluta"
+
+id: LANG_SNAKE_LEVEL
+desc: level of difficulty
+eng: "Level - %d"
+new: "Nivå - %d"
+
+id: LANG_SNAKE_RANGE
+desc: range of levels
+eng: "(1 - slow, 9 - fast)"
+new: "(1- långsamt, 9 - fort)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
 new: "[Spela] för att starta/pausa"
 
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Snö"
+id: LANG_SOKOBAN_LEVEL
+desc: must be smaller than 6 characters
+eng: "Level"
+new: "Nivå"
 
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Sokoban"
+id: LANG_SOKOBAN_MOVE
+desc: must be smaller than 6 characters
+eng: "Moves"
+new: "Drag"
+
+id: LANG_SOKOBAN_WIN
+desc: displayed when you win 
+eng: "YOU WIN!!"
+new: "DU VINNER!!"
+
+id: LANG_SOKOBAN_QUIT
+desc: how to quit game
+eng: "[Off] to stop"
+new: "[Av] för att stanna"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -609,105 +693,25 @@ desc: what does F3 do
 eng: "[F3] + level"
 new: "[F3] + nivå"
 
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: "Level"
-new: "Nivå"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Drag"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: "[Off] to stop"
-new: "[Av] för att stanna"
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "DU VINNER!!"
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-new: "Sortera olika"
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-new: "Disk spindown"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-new: "Systemet"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: "0 Rows - Level 0"
-new: "0 Rader - Nivå 0"
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: "You lose!"
-new: "Du förlorar!"
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-new: "Ställ Tid/Datum"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF to revert"
-new: "AV flr att återgå"
-
-id: LANG_TIME_SET
-desc: 
-eng: "ON to set"
-new: "PÅ för att ställa"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-new: "Diskant"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (sim)"
-new: "USB (sim)"
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-new: "Version"
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-new: "Volym"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Wormlet"
-
-id: LANG_WORMLET_2_KEY_CTRL
+id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "2 key control   F1"
-new: "2 tangentkontroll   F1"
+eng: "Len:%d"
+new: "Längd:%d"
 
-id: LANG_WORMLET_4_KEY_CTRL
+id: LANG_WORMLET_GROWING
+desc: wormlet game 
+eng: "Growing"
+new: "Växer"
+
+id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "4 key control   F1"
-new: "4 tangentkontroll   F1"
+eng: "Hungry"
+new: "Hungrig"
+
+id: LANG_WORMLET_WORMED
+desc: wormlet game
+eng: "Wormed"
+new: "Wormed"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
@@ -719,30 +723,25 @@ desc: wormlet game
 eng: "Crashed"
 new: "Krasch"
 
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: "Growing"
-new: "Växer"
-
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
 eng: "Hs: %d"
 new: "Hs: %d"
 
-id: LANG_WORMLET_HUNGRY
+id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "Hungry"
-new: "Hungrig"
+eng: "%d Players    up/dn"
+new: "%d Spelare  upp/ner"
 
-id: LANG_WORMLET_LENGTH
+id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "Len:%d"
-new: "Längd:%d"
+eng: "%d Worms        l/r"
+new: "%d Worms        h/v"
 
-id: LANG_WORMLET_NO_CONTROL
+id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Out of control"
-new: "Ingen kontroll"
+eng: "Remote control F1"
+new: "Fjärrkontroll F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
@@ -750,22 +749,58 @@ eng: "No rem. control F1"
 ### Not previously translated
 new: 
 
-id: LANG_WORMLET_PLAYERS
+id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "%d Players    up/dn"
-new: "%d Spelare  upp/ner"
+eng: "2 key control   F1"
+new: "2 tangentkontroll   F1"
 
-id: LANG_WORMLET_REMOTE_CTRL
+id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "Remote control F1"
-new: "Fjärrkontroll F1"
+eng: "4 key control   F1"
+new: "4 tangentkontroll   F1"
 
-id: LANG_WORMLET_WORMED
+id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Wormed"
-new: "Wormed"
+eng: "Out of control"
+new: "Ingen kontroll"
 
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: "%d Worms        l/r"
-new: "%d Worms        h/v"
+id: LANG_TETRIS_LOSE
+desc: tetris game
+eng: "You lose!"
+new: "Du förlorar!"
+
+id: LANG_TETRIS_LEVEL
+desc: tetris game
+eng: "0 Rows - Level 0"
+new: "0 Rader - Nivå 0"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "Poweroff av"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "Nytt språk"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Visa filer"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Musik"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Hanterade"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "Alla"
+
