@@ -109,7 +109,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
 #define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
 
-static void build_playlist(void)
+static int build_playlist(int start_index)
 {
     int i;
 
@@ -122,7 +122,15 @@ static void build_playlist(void)
             DEBUGF("Adding %s\n", dircacheptr[i]->name);
             playlist_add(dircacheptr[i]->name);
         }
+        else
+        {
+            /* Adjust the start index when se skip non-MP3 entries */
+            if(i < start_index)
+                start_index--;
+        }
     }
+
+    return start_index;
 }
 
 static int compare(const void* p1, const void* p2)
@@ -267,7 +275,7 @@ bool dirbrowse(char *root)
     int lasti=-1;
     int rc;
     int button;
-
+    int start_index;
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -342,8 +350,8 @@ bool dirbrowse(char *root)
                                   dircacheptr[dircursor+start]->name, 0);
                     }
                     else {
-                        build_playlist();
-                        play_list(currdir, NULL, dircursor+start);
+                        start_index = build_playlist(dircursor+start);
+                        play_list(currdir, NULL, start_index);
                     }
                     status_set_playmode(STATUS_PLAY);
                     status_draw();
