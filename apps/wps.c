@@ -676,7 +676,13 @@ int wps_show(void)
                     else
 #endif
                     {
-                        mpeg_prev();
+                        if (id3->elapsed < 2*1000)
+                            mpeg_prev();
+                        else {
+                            mpeg_pause();
+                            mpeg_ff_rewind(-(id3->elapsed));
+                            mpeg_resume();
+                        }
                     }
                 }
 #ifdef HAVE_PLAYER_KEYPAD
