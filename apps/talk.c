@@ -167,14 +167,11 @@ static int shutup(void)
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
-    unsigned char frame1, frame3;
-    unsigned char *firstclip = mp3buf + p_voicefont->index[0].offset;
-
-    /* We use the first frame in the thumbnail buffer as a template
-       for finding headers, assuming that all thumbnails are encoded
-       with the same parameters */
-    frame1 = firstclip[1]; /* second byte of the first mp3 header */
-    frame3 = firstclip[3]; /* last byte of the first mp3 header */
+    /* one silent bitswapped mp3 frame (22kHz), without bit reservoir */
+    static const unsigned char silent_frame[] = {
+        0xFF,0xCF,0x08,0x23,0x00,0x00,0x00,0xC0,0x12,0x80,0x01,0x00,0x00,
+        0x32,0x82,0xB2,0xA2,0xCC,0x74,0x9C,0xCC,0xAA,0xAA,0xAA,0xAA,0xAA,
+    };
 
     mp3_play_pause(false); /* pause */
 
@@ -188,11 +185,21 @@ static int shutup(void)
     /* Find the next frame boundary */
     while (search < end) /* search the remaining data */
     {
-        if(search[0] == 0xff && search[1] == frame1 && search[3] == frame3)
+        if (*search++ != 0xFF) /* search for frame sync byte */
         {
-            break;
+            continue;
         }
-        search++;
+            
+        /* look at the (bitswapped) 2nd byte of header candidate */
+        if ((*search & 0x07) == 0x07  /* rest of frame sync */
+         && (*search & 0x18) != 0x10  /* version != reserved */
+         && (*search & 0x60) != 0x00) /* layer != reserved */
+        {
+            search--; /* back to the sync byte */
+            break; /* From looking at the first 2 bytes, this is a header. */
+            /* this is not a sufficient condition to find header,
+               may give "false alert" (end too early), but a start */
+        }
     }
 
     queue_write = queue_read; /* reset the queue */
@@ -204,6 +211,7 @@ static int shutup(void)
 
     /* If the voice clips contain dependent frames (currently they don't),
        it may be a good idea to insert an independent dummy frame here. */
+    queue_clip((unsigned char*)silent_frame, sizeof(silent_frame), true);
     
     return 0;
 }
