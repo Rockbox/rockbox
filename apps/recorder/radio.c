@@ -142,8 +142,15 @@ bool radio_screen(void)
     
     mpeg_init_recording();
 
+    mpeg_sound_channel_config(global_settings.channel_config);
+    mpeg_sound_set(SOUND_BASS, global_settings.bass);
+    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
+    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-    
+    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
+    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+
     status_set_playmode(STATUS_STOP);
 
     /* Yes, we use the D/A for monitoring */
@@ -676,6 +683,7 @@ bool radio_menu(void)
     struct menu_items radio_menu_items[] = {
         { str(LANG_FM_SAVE_PRESET), radio_add_preset },
         { str(LANG_FM_DELETE_PRESET), radio_delete_preset },
+        { str(LANG_SOUND_SETTINGS), sound_menu },
         { str(LANG_RECORDING_SETTINGS), fm_recording_settings }
     };
     int m;
