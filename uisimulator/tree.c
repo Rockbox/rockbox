@@ -53,8 +53,11 @@ struct entry {
 bool is_dir(char* path)
 {
   DIR* dir = opendir(path);
-  closedir(dir);
-  return (dir!=0);
+  if(dir) {
+    closedir(dir);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 int static
