@@ -1340,6 +1340,7 @@ int fat_create_dir(char* name,
     LDEBUGF("fat_create_dir(\"%s\",%x,%x)\n",name,newdir,dir);
 
     memset(newdir, sizeof(struct fat_dir), 0);
+    memset(&dummyfile, sizeof(struct fat_file), 0);
 
     /* First, add the entry in the parent directory */
     rc = add_dir_entry(dir, &newdir->file, name, true, false);
@@ -1347,6 +1348,9 @@ int fat_create_dir(char* name,
         return rc * 10 - 1;
 
     /* Then add the "." entry */
+    newdir->file.firstcluster = find_free_cluster(fat_bpb.fsinfo.nextfree);
+    update_fat_entry(newdir->file.firstcluster, FAT_EOF_MARK);
+    
     rc = add_dir_entry(newdir, &dummyfile, ".", true, true);
     if (rc < 0)
         return rc * 10 - 2;

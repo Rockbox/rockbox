@@ -163,9 +163,11 @@ int mkdir(char *name)
         }
     }
 
-    closedir(dir);
+    memset(&newdir, sizeof(struct fat_dir), 0);
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
+    
+    closedir(dir);
     
     return rc;
 }
