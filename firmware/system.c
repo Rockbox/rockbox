@@ -31,6 +31,24 @@
 extern void reset_pc (void);
 extern void reset_sp (void);
 
+static const char* irqname[] = {
+    "", "", "", "", "IllInstr", "", "IllSltIn","","",
+    "CPUAdrEr", "DMAAdrEr", "NMI", "UserBrk",
+    "","","","","","","","","","","","","","","","","","","",
+    "Trap32","Trap33","Trap34","Trap35","Trap36","Trap37","Trap38","Trap39",
+    "Trap40","Trap41","Trap42","Trap43","Trap44","Trap45","Trap46","Trap47",
+    "Trap48","Trap49","Trap50","Trap51","Trap52","Trap53","Trap54","Trap55",
+    "Trap56","Trap57","Trap58","Trap59","Trap60","Trap61","Trap62","Trap63",
+    "Irq0","Irq1","Irq2","Irq3","Irq4","Irq5","Irq6","Irq7",
+    "Dma0","","Dma1","","Dma2","","Dma3","",
+    "IMIA0","IMIB0","OVI0","", "IMIA1","IMIB1","OVI1","",
+    "IMIA2","IMIB2","OVI2","", "IMIA3","IMIB3","OVI3","",
+    "IMIA4","IMIB4","OVI4","",
+    "Ser0Err","Ser0Rx","Ser0Tx","Ser0TE",
+    "Ser1Err","Ser1Rx","Ser1Tx","Ser1TE",
+    "ParityEr","A/D conv","","","Watchdog","DRAMRefr"
+};
+
 reserve_interrupt (          0);
 reserve_interrupt (          1);
 reserve_interrupt (          2);
@@ -306,7 +324,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     asm volatile ("sts\tpr,%0" : "=r"(n));
 
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
-    snprintf(str,sizeof(str),"** UIE%02x **",n);
+    snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
     lcd_puts(0,0,str);
     snprintf(str,sizeof(str),"at %08x",pc);
     lcd_puts(0,1,str);
