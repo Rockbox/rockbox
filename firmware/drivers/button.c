@@ -28,19 +28,51 @@
 
 static struct event_queue button_queue;
 
-#define POLL_FREQUENCY  HZ/10
+#define POLL_FREQUENCY    HZ/10
+#define REPEAT_START      3
+#define REPEAT_INTERVAL   3
 
 static int button_read(void);
 
 static void button_tick(void)
 {
-    static int counter=0;
+    static int tick=0;
+    static int count=0;
+    static int lastbtn=0;
+    static bool repeat=false;
 
     /* only poll every X ticks */
-    if ( counter++ > POLL_FREQUENCY ) {
+    if ( tick++ > POLL_FREQUENCY ) {
+        bool post = false;
         int btn = button_read();
-        queue_post(&button_queue, btn, NULL);
-        counter=0;
+
+        if ( btn ) {
+            /* normal keypress */
+            if ( btn != lastbtn ) {
+                post = true;
+            }
+            /* repeat? */
+            else {
+                if ( repeat ) {
+                    if ( ! --count ) {
+                        post = true;
+                        count = REPEAT_INTERVAL;
+                    }
+                }
+                else if (count++ > REPEAT_START) {
+                    post = true;
+                    repeat = true;
+                    count = REPEAT_INTERVAL;
+                }
+            }
+            if ( post )
+                queue_post(&button_queue, btn, NULL);
+        }
+        else
+            repeat = false;
+
+        lastbtn = btn;
+        tick = 0;
     }
 }
 
@@ -48,9 +80,11 @@ int button_get(void)
 {
     struct event ev;
 
-    if ( !queue_empty(&button_queue) )
+    if ( !queue_empty(&button_queue) ) {
         queue_wait(&button_queue, &ev);
-    return ev.id;
+        return ev.id;
+    }
+    return BUTTON_NONE;
 }
 
 #ifdef HAVE_RECORDER_KEYPAD
