@@ -23,6 +23,7 @@
 #include "kernel.h"
 #include <poll.h>
 
+long current_tick = 0;
 
 /*
  * We emulate the target threads by using pthreads. We have a mutex that only
@@ -38,6 +39,7 @@ void init_threads(void)
   /* get mutex to only allow one thread running at a time */
   pthread_mutex_lock(&mp);
 
+  current_tick = time(NULL); /* give it a boost from start! */
 }
 /* 
    int pthread_create(pthread_t *new_thread_ID,
@@ -45,16 +47,17 @@ void init_threads(void)
    void * (*start_func)(void *), void *arg);
 */
 
-void (yield)(void)
+void yield(void)
 {
+  current_tick+=3;
   pthread_mutex_unlock(&mp); /* return */
   pthread_mutex_lock(&mp); /* get it again */
 }
 
 void newfunc(void (*func)(void))
 {
-  yield();
-  func();
+    yield();
+    func();
 }
 
 
@@ -72,9 +75,9 @@ int create_thread(void* fp, void* sp, int stk_size)
                          (void *(*)(void *)) newfunc,   /* function to start */
                          fp      /* start argument */);
   if(0 != error)
-    fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
+      fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
   else 
-    fprintf(stderr, "Thread %ld is running\n", (long)tid);
+      fprintf(stderr, "Thread %ld is running\n", (long)tid);
 
   yield();
 
@@ -84,6 +87,7 @@ int create_thread(void* fp, void* sp, int stk_size)
 /* ticks is HZ per second */
 void x11_sleep(int ticks)
 {
+    current_tick+=5;
     pthread_mutex_unlock(&mp); /* return */
     /* portable subsecond "sleep" */
     poll((void *)0, 0, ticks * 1000/HZ);
