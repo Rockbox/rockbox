@@ -312,7 +312,7 @@ void system_reboot (void)
     ICR = 0;
 
     asm volatile ("jmp @%0; mov.l @%1,r15" : :
-		  "r"(*(char*)0),"r"(4));
+		  "r"(*(int*)0),"r"(4));
 }
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
