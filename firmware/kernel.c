@@ -25,7 +25,7 @@
 
 long current_tick = 0;
 
-void (*tick_funcs[NUM_TICK_TASKS])(void);
+void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 static void tick_start(unsigned int interval_in_ms);
 
@@ -37,7 +37,7 @@ void kernel_init(void)
     int i;
 
     /* Clear the tick task array */
-    for(i = 0;i < NUM_TICK_TASKS;i++)
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
         tick_funcs[i] = NULL;
     }
@@ -151,7 +151,7 @@ void IMIA0(void)
     int i;
 
     /* Run through the list of tick tasks */
-    for(i = 0;i < NUM_TICK_TASKS;i++)
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
         if(tick_funcs[i])
         {
@@ -170,7 +170,7 @@ int tick_add_task(void (*f)(void))
     int oldlevel = set_irq_level(15);
 
     /* Add a task if there is room */
-    for(i = 0;i < NUM_TICK_TASKS;i++)
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
         if(tick_funcs[i] == NULL)
         {
@@ -189,7 +189,7 @@ int tick_remove_task(void (*f)(void))
     int oldlevel = set_irq_level(15);
 
     /* Remove a task if it is there */
-    for(i = 0;i < NUM_TICK_TASKS;i++)
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
         if(tick_funcs[i] == f)
         {
@@ -208,20 +208,20 @@ int tick_remove_task(void (*f)(void))
  ****************************************************************************/
 void mutex_init(struct mutex *m)
 {
-    m->count = 0;
+    m->locked = false;
 }
 
 void mutex_lock(struct mutex *m)
 {
     /* Wait until the lock is open... */
-    while(m->count)
+    while(m->locked)
         yield();
 
     /* ...and lock it */
-    m->count++;
+    m->locked = true;
 }
 
 void mutex_unlock(struct mutex *m)
 {
-    m->count--;
+    m->locked = false;
 }

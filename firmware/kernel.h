@@ -27,7 +27,7 @@
 
 #define HZ      100 /* number of ticks per second */
 
-#define NUM_TICK_TASKS 4
+#define MAX_NUM_TICK_TASKS 4
 
 #define QUEUE_LENGTH 16 /* MUST be a power of 2 */
 #define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
@@ -47,7 +47,7 @@ struct event_queue
 
 struct mutex
 {
-    int count;
+    bool locked;
 };
 
 /* global tick variable */
