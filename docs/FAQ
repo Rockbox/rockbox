@@ -430,3 +430,14 @@ A52: This information is in our manual (It sometimes gets a bit out of
      date, so please bear with us.)  The information you are most likely 
      looking for is a bit down the tree, so the heres the url:
      http://rockbox.haxx.se/manual/rec-general.html
+
+Q53: How does the shuffle work?
+A53: It sees the playlist as a deck of cards, shuffling the entries using a
+     pseudo-random generator called the Mersenne Twister. After shuffling,
+     the list is never changed again until you reshuffle the list, by
+     stopping the playback and restarting. If the repeat mode is enabled,
+     the list will simply start over from the first file again, without
+     reshuffling.
+     The random seed is stored in the persistent setting area, so that the
+     resume feature can shuffle the playlist in exactly the same way when
+     resuming.
