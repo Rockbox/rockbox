@@ -7,9 +7,10 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Plugin for reprogramming only the second Rockbox image.
+* Plugin for reprogramming only the second image in Flash ROM.
+* !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SHURE WHAT YOU DO !!!
 *
-* Copyright (C) 2003 Jörg Hohensohn [IDC]Dragon
+* Copyright (C) 2003 Jörg Hohensohn aka [IDC]Dragon
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -78,8 +79,7 @@ typedef struct
 
 static struct plugin_api* rb; /* here is a global api struct pointer */
 
-#define SEC_SIZE 4096 /* size of one flash sector */
-static UINT8 sector[SEC_SIZE]; /* better not place this on the stack... */
+static UINT8* sector; /* better not place this on the stack... */
 
 /***************** Flash Functions *****************/
 
@@ -89,25 +89,25 @@ bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
 {
     UINT8 not_manu, not_id; /* read values before switching to ID mode */
     UINT8 manu, id; /* read values when in ID mode */
-	
+
     pBase = (UINT8*)((UINT32)pBase & 0xFFF80000); /* round down to 512k align,
                                                      to make sure */
-	
+
     not_manu = pBase[0]; /* read the normal content */
     not_id   = pBase[1]; /* should be 'A' (0x41) and 'R' (0x52) from the
                             "ARCH" marker */
-	
+
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
     pBase[0x5555] = 0x90; /* ID command */
     rb->sleep(HZ/50);     /* Atmel wants 20ms pause here */
-	
+
     manu = pBase[0];
     id   = pBase[1];
     
     pBase[0] = 0xF0;  /* reset flash (back to normal read mode) */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
-	
+
     /* I assume success if the obtained values are different from
        the normal flash content. This is not perfectly bulletproof, they 
        could theoretically be the same by chance, causing us to fail. */
@@ -120,46 +120,46 @@ bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
     return false; /* fail */
 }
 
-/* eraze the sector which contains the given address */
-bool ErazeSector(volatile UINT8* pAddr)
+/* erase the sector which contains the given address */
+bool EraseSector(volatile UINT8* pAddr)
 {
     volatile UINT8* pBase =
         (UINT8*)((UINT32)pAddr & 0xFFF80000); /* round down to 512k align */
     unsigned timeout = 43000; /* the timeout loop should be no less than
                                  25ms */
-	
+
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
-    pBase[0x5555] = 0x80; /* eraze command */
+    pBase[0x5555] = 0x80; /* erase command */
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
-    *pAddr = 0x30;        /* eraze the sector */
+    *pAddr = 0x30;        /* erase the sector */
 
     /* I counted 7 instructions for this loop -> min. 0.58 us per round
        Plus memory waitstates it will be much more, gives margin */
-    while (*pAddr != 0xFF && --timeout); /* poll for erazed */
+    while (*pAddr != 0xFF && --timeout); /* poll for erased */
 
     return (timeout != 0);
 }
 
-/* address must be in an erazed location */
+/* address must be in an erased location */
 inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 {
     unsigned timeout = 35; /* the timeout loop should be no less than 20us */
-	
+
     if (~*pAddr & data) /* just a safety feature, not really necessary */
         return false; /* can't set any bit from 0 to 1 */
-	
+
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
     FB[0x5555] = 0xA0; /* byte program command */
-	
+
     *pAddr = data;
-	
+
     /* I counted 7 instructions for this loop -> min. 0.58 us per round
        Plus memory waitstates it will be much more, gives margin */
     while (*pAddr != data && --timeout); /* poll for programmed */
-	
+
     return (timeout != 0);
 }
 
@@ -167,10 +167,10 @@ inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 bool GetFlashInfo(tFlashInfo* pInfo)
 {
     rb->memset(pInfo, 0, sizeof(tFlashInfo));
-	
+
     if (!ReadID(FB, &pInfo->manufacturer, &pInfo->id))
         return false;
-	
+
     if (pInfo->manufacturer == 0xBF) /* SST */
     {
         if (pInfo->id == 0xD6)
@@ -241,7 +241,7 @@ tImageHeader* GetSecondImage(void)
 
     if (pImage1->size != 0)
     {
-	/* success, we have a second image */
+        /* success, we have a second image */
         pos = (UINT32)pImage1 + sizeof(tImageHeader) + pImage1->size;
         if (((pos + SECTORSIZE-1) & ~(SECTORSIZE-1)) != pos)
         {	/* not sector-aligned */
@@ -264,7 +264,7 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
 
     int fileread = 0; /* total size as read from the file */
     int read; /* how many for this sector */
-	
+
     /* magic file header for compressed files */
     static const UINT8 magic[8] = { 0x00,0xe9,0x55,0x43,0x4c,0xff,0x01,0x1a };
     UINT8 ucl_header[UCL_HEADER];
@@ -272,7 +272,7 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return eFileNotFound;
-	
+
     filesize = rb->filesize(fd);
     if (filesize - (int)sizeof(ucl_header) - 8 > space)
     {
@@ -284,9 +284,9 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
         rb->close(fd);
         return eTooSmall;
     }
-	
+
     /* do some sanity checks */
-	
+
     read = rb->read(fd, ucl_header, sizeof(ucl_header));
     fileread += read;
     if (read != sizeof(ucl_header))
@@ -294,7 +294,7 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
         rb->close(fd);
         return eReadErr;
     }
-	
+
     /* compare the magic header */
     for (i=0; i<8; i++)
     {
@@ -304,7 +304,7 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
             return eNotUCL;
         }
     }
-	
+
     /* check for supported algorithm */
     if (ucl_header[12] != 0x2E)
     {
@@ -318,10 +318,10 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
         rb->close(fd);
         return eMultiBlocks;
     }
-	
+
     if (Read32(ucl_header + 18) > pHeader->size) /* compare with uncompressed
                                                     size */
-    {	/* normal case */
+    {   /* normal case */
         pHeader->flags = 0x00000001; /* flags for UCL compressed */
     }
     else
@@ -333,12 +333,12 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
     /* check if we can read the whole file */
     do
     {
-        read = rb->read(fd, sector, SEC_SIZE);
+        read = rb->read(fd, sector, SECTORSIZE);
         fileread += read;
-    } while (read == SEC_SIZE);
+    } while (read == SECTORSIZE);
     
     rb->close(fd);
-	
+
     if (fileread != filesize)
         return eReadErr;
     
@@ -358,7 +358,7 @@ unsigned ProgramImageFile(char* filename, UINT8* pos,
     int fd;
     int read; /* how many for this sector */
     unsigned failures = 0;
-	
+
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return false;
@@ -366,17 +366,17 @@ unsigned ProgramImageFile(char* filename, UINT8* pos,
     /* no error checking necessary here, we checked for minimum size
        already */
     rb->lseek(fd, start, SEEK_SET); /* go to start position */
-	
+
     *(tImageHeader*)sector = *pImageHeader; /* copy header into sector
                                                buffer */
     read = rb->read(fd, sector + sizeof(tImageHeader),
-                    SEC_SIZE - sizeof(tImageHeader)); /* payload behind */
+                    SECTORSIZE - sizeof(tImageHeader)); /* payload behind */
     size -= read;
     read += sizeof(tImageHeader); /* to be programmed, but not part of the
                                      file */
 
     do {
-        if (!ErazeSector(pos))
+        if (!EraseSector(pos))
         {
             /* nothing we can do, let the programming count the errors */
         }
@@ -389,14 +389,14 @@ unsigned ProgramImageFile(char* filename, UINT8* pos,
             }
         }
 
-        pos += SEC_SIZE;
-        read = rb->read(fd, sector, (size > SEC_SIZE) ? SEC_SIZE : size);
+        pos += SECTORSIZE;
+        read = rb->read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
         /* payload for next sector */
         size -= read;
     } while (read > 0);
     
     rb->close(fd);
-	
+
     return failures;
 }
 
@@ -408,7 +408,7 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
     int fd;
     int read; /* how many for this sector */
     unsigned failures = 0;
-	
+
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return false;
@@ -416,11 +416,11 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
     /* no error checking necessary here, we checked for minimum size
        already */
     rb->lseek(fd, start, SEEK_SET); /* go to start position */
-	
+
     *(tImageHeader*)sector = *pImageHeader; /* copy header into sector
                                                buffer */
     read = rb->read(fd, sector + sizeof(tImageHeader),
-                    SEC_SIZE - sizeof(tImageHeader)); /* payload behind */
+                    SECTORSIZE - sizeof(tImageHeader)); /* payload behind */
 
     size -= read;
     read += sizeof(tImageHeader); /* to be programmed, but not part of the
@@ -436,8 +436,8 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
             }
         }
         
-        pos += SEC_SIZE;
-        read = rb->read(fd, sector, (size > SEC_SIZE) ? SEC_SIZE : size);
+        pos += SECTORSIZE;
+        read = rb->read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
         /* payload for next sector */
         size -= read;
     } while (read);
@@ -455,7 +455,7 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
 void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 {
     char buf[32];
-	
+
     if (!pInfo->manufacturer)
     {
         rb->lcd_puts(0, 0, "Flash: M=?? D=??");
@@ -481,10 +481,10 @@ void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
                      ((UINT8*)pImageHeader - FB) / 1024);
         rb->lcd_puts(0, 1, buf);
     }
-	else
-	{
+    else
+    {
             rb->lcd_puts(0, 1, "No image found!");
-	}
+    }
     
     rb->lcd_update();
 }
@@ -500,9 +500,18 @@ void DoUserDialog(char* filename)
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
+    int memleft;
     
     rb->lcd_setfont(FONT_SYSFIXED);
-	
+
+    /* "allocate" memory */
+    sector = rb->plugin_get_buffer(&memleft);
+    if (memleft < SECTORSIZE) /* need buffer for a flash sector */
+    {
+        rb->splash(HZ*3, 0, true, "Out of memory");
+        return; /* exit */
+    }
+
     pos = (void*)GetSecondImage();
     rc = GetFlashInfo(&FlashInfo);
 
@@ -531,11 +540,11 @@ void DoUserDialog(char* filename)
     {
         return;
     }
-	
+
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "checking...");
     rb->lcd_update();
-	
+
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
     
@@ -545,43 +554,43 @@ void DoUserDialog(char* filename)
         case eOK:
             rb->lcd_puts(0, 1, "File OK.");
             break;
-	case eNotUCL:
+    case eNotUCL:
             rb->lcd_puts(0, 1, "File not UCL ");
             rb->lcd_puts(0, 2, "compressed.");
             rb->lcd_puts(0, 3, "Use uclpack --2e");
             rb->lcd_puts(0, 4, " --10 rockbox.bin");
             break;
-	case eWrongAlgorithm:
+    case eWrongAlgorithm:
             rb->lcd_puts(0, 1, "Wrong algorithm");
             rb->lcd_puts(0, 2, "for compression.");
             rb->lcd_puts(0, 3, "Use uclpack --2e");
             rb->lcd_puts(0, 4, " --10 rockbox.bin");
             break;
-	case eFileNotFound:
+    case eFileNotFound:
             rb->lcd_puts(0, 1, "File not found:");
             rb->lcd_puts_scroll(0, 2, filename);
             break;
-	case eTooBig:
+    case eTooBig:
             rb->lcd_puts(0, 1, "File too big,");
             rb->lcd_puts(0, 2, "won't fit in chip.");
             break;
-	case eTooSmall:
+    case eTooSmall:
             rb->lcd_puts(0, 1, "File too small.");
             rb->lcd_puts(0, 2, "Incomplete?");
             break;
-	case eReadErr:
+    case eReadErr:
             rb->lcd_puts(0, 1, "File read error.");
             break;
-	case eMultiBlocks:
+    case eMultiBlocks:
             rb->lcd_puts(0, 1, "File invalid.");
             rb->lcd_puts(0, 2, "Blocksize");
             rb->lcd_puts(0, 3, " too small?");
             break;
-	default:
+    default:
             rb->lcd_puts(0, 1, "Check failed.");
             break;
     }
-	
+
     if (rc == eOK)
     {	/* was OK */
         rb->lcd_puts(0, 6, "[F2] to program");
@@ -591,7 +600,7 @@ void DoUserDialog(char* filename)
     { /* error occured */
         rb->lcd_puts(0, 6, "Any key to exit");
     }
-	
+
     rb->lcd_update();
     
     button = rb->button_get(true);
@@ -613,7 +622,7 @@ void DoUserDialog(char* filename)
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Programming...");
     rb->lcd_update();
-	
+
     rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
     if (rc)
     {   /* errors */
@@ -630,9 +639,9 @@ void DoUserDialog(char* filename)
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Verifying...");
     rb->lcd_update();
-	
+
     rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
-	
+
     rb->lcd_clear_display();
     if (rc == 0)
     {
@@ -665,20 +674,20 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        it test that the api version and model the plugin was compiled for
        matches the machine it is running on */
     TEST_PLUGIN_API(api);
-	
+
     if (parameter == NULL)
         filename = DEFAULT_FILENAME;
     else
         filename = (char*) parameter; 
     
     rb = api; /* copy to global api pointer */
-	
+
     /* now go ahead and have fun! */
     DoUserDialog(filename);
 
     return PLUGIN_OK;
 }
 
-#endif
+#endif // #ifdef HAVE_LCD_BITMAP
 
-#endif
+#endif // #ifndef SIMULATOR
