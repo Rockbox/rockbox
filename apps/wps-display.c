@@ -327,7 +327,7 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'r': /* Remaining Time in Song */
                     flags->dynamic = true;
-                    format_time(buf, buf_size, id3->length - id3->elapsed + ff_rewind_count);
+                    format_time(buf, buf_size, id3->length - id3->elapsed - ff_rewind_count);
                     return buf;
 
                 case 't':  /* Total Time */
@@ -645,10 +645,15 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 
     memset(binline, 1, sizeof binline);
     memset(player_progressbar, 1, sizeof player_progressbar);
-    if(wps_time_countup == false)
-        songpos = ((id3->elapsed - ff_rewwind_count) * 36) / id3->length;
+    if(id3->elapsed >= id3->length)
+        songpos = 0;
     else
-        songpos = ((id3->elapsed + ff_rewwind_count) * 36) / id3->length;
+    {
+        if(wps_time_countup == false)
+            songpos = ((id3->elapsed - ff_rewwind_count) * 36) / id3->length;
+        else
+            songpos = ((id3->elapsed + ff_rewwind_count) * 36) / id3->length;
+    }
     for (i=0; i < songpos; i++)
         binline[i] = 0;
 

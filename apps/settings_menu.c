@@ -150,7 +150,7 @@ static Menu timedate_set(void)
 static Menu spindown(void)
 {
     set_int("[Disk spindown]", "s", &global_settings.disk_spindown,
-            ata_spindown, 1, 1, 254 );
+            ata_spindown, 1, 3, 254 );
     return MENU_OK;
 }
 
