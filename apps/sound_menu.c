@@ -119,6 +119,7 @@ bool set_sound(char* string,
 #else
             case BUTTON_STOP:
             case BUTTON_MENU:
+            case BUTTON_PLAY:
 #endif
                 done = true;
                 break;
