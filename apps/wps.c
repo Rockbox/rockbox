@@ -158,7 +158,7 @@ bool browse_id3(void)
 
     if (!(mpeg_status() & MPEG_STATUS_PLAY))
         return false;
-    
+
     while (!exit)
     {
         lcd_clear_display();
@@ -280,12 +280,14 @@ bool browse_id3(void)
                 break;
 
 #ifdef HAVE_PLAYER_KEYPAD
-            case BUTTON_STOP | BUTTON_REL:
+            case BUTTON_STOP:
 #else
-            case BUTTON_OFF | BUTTON_REL:
+            case BUTTON_OFF:
 #endif
-            case BUTTON_PLAY | BUTTON_REL:
+            case BUTTON_PLAY:
                 lcd_stop_scroll();
+                /* eat release event */
+                button_get(true);
                 exit = true;
                 break;
 
