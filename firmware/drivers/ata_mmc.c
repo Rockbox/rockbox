@@ -139,6 +139,7 @@ static int select_card(int card_no)
 {
     if (!card_info[card_no].initialized)
     {
+        setup_sci1(7); /* Initial rate: 375 kbps (need <= 400 per mmc specs) */
         write_transfer(dummy, 10); /* allow the card to synchronize */
         while (!(SSR1 & SCI_TEND));
     }
@@ -359,9 +360,6 @@ static int initialize_card(int card_no)
         1000000000, 100000000, 10000000, 1000000, 100000, 10000, 1000, 100
     };
 
-    card->initialized = false;
-    setup_sci1(7); /* Initial rate: 375 kBit/s (need <= 400 per mmc specs) */
-
     /* switch to SPI mode */
     send_cmd(CMD_GO_IDLE_STATE, 0, &response);
     if (response != 0x01)
@@ -425,7 +423,7 @@ static int initialize_card(int card_no)
     
     card->rev = (cxd[9] & 0xF0) >> 4;
     card->rev_fract = cxd[9] & 0x0F;
-    
+
     card->manuf_month = (cxd[14] & 0xF0) >> 4;
     card->manuf_year = (cxd[14] & 0x0F) + 1997;
     
