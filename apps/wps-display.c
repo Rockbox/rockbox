@@ -68,6 +68,7 @@ static char* format_lines[MAX_LINES];
 static bool dynamic_lines[MAX_LINES];
 static int ff_rewind_count;
 bool wps_time_countup = true;
+static bool wps_loaded = false;
 
 /* Set format string to use for WPS, splitting it into lines */
 static void wps_format(char* fmt)
@@ -148,6 +149,7 @@ bool wps_load_custom(char* file)
             sleep(HZ);
         }
 
+        wps_loaded = true;
         return numread > 0;
     }
     
@@ -637,11 +639,8 @@ void wps_display(struct mp3entry* id3)
     }
     else
     {
-        static bool wps_loaded = false;
-
         if (!wps_loaded) {
             wps_load_custom(NULL);
-            wps_loaded = true;
 
             if ( !format_buffer[0] ) {
 #ifdef HAVE_LCD_BITMAP
