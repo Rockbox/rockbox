@@ -90,7 +90,7 @@ fi
 # Figure out where the firmware code is!
 #
 
-firmfile="start.s" # a file to check for in the firmware root dir
+firmfile="crt0.S" # a file to check for in the firmware root dir
 
 for dir in firmware . .. ../firmware ../../firmware; do
   if [ -f $dir/$firmfile ]; then
