@@ -146,18 +146,15 @@ A19: Okay, last time.  No.  We have no problems whatsoever reading different
      data directly to the DAC.
 
 Q20. What is the most recent version of Rockbox?
-A20. We recently released version 2.0, so head on over to 
+A20. We recently released version 2.1, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-2.0-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-2.1-notes.txt).  
 
 Q21. What do you plan to add to coming versions?
 A21. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
-
-     Version 2.1
-          Lots of features and fixes that were held off for 2.0
 
      Version 2.2
           User interface overhaul
@@ -230,21 +227,9 @@ A30: Don't confuse the terms.  Reverse engineering means examining a product
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
 
-Q31: Wait a minute here.  When you released version 1.0 you did not have a 
-     single one of the ideas you have mentioned on your web site actually 
-     implemented!  Calling this version 1.0 is really misleading.  What's the 
-     story?!
-A31: In simple terms, the first release was called 1.0 because it had a basic 
-     working feature set that worked and had no known bugs. That is what 1.0 
-     meant.  It is true that Rockbox 1.0 lacked most of the feature set that 
-     every sane user wanted.  However, we never said it was more 
-     feature-complete or better in any way then the original firmware that 
-     early in the project.  The first release was done as a proof of concept 
-     that our ideas are moving in the right direction.  We also hoped that it 
-     would help bring the project some attention, and some additional 
-     developers.  Adding the missing features was just a matter of time.  In 
-     more recent releases we have completed many of our desired goals, and 
-     several new ones that were implemented to fulfill user requests.
+Q31: This FAQ is great, but do you have anything with a bit more detail?
+A31: Check out our website and it's documentation.  Rockbox also has a user
+     manual you can read.  http://rockbox.haxx.se/manual/manual.pdf
 
 Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
@@ -313,12 +298,11 @@ A44: This is because the Player font is character cell based (as opposed to
      on one model and 8 on another, however we are currently using several of 
      these 'letters' to store icons for the player.
 
-Q45: Why don't you have any games available for the Players?
+Q45: Why don't you have as many games available for the Players?
 A45: The display on the Players is character cell and not bitmap based.  
      This means we can only control what characters get displayed, not
-     what pixels are shown.  This makes the prospect of game play very 
-     slim (at least for anything involving graphics, so if you have text
-     based games that only use 2 lines send them on in!).
+     what pixels are shown.  This means that the prospect of game play are
+     limited, but we are always open for new submissions.
 
 Q46: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
      STOP (Player) key be locked?
@@ -326,19 +310,11 @@ A46: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
      hardware. The firmware can read the keys, but can't prevent them from
      shutting off the player.
 
-Q47: Where's the recording option?  Why can't I record?!!
-A47: I'd like to say we hid it because we don't like you, but you seem to be
-     a good person so here's the truth.  It's just not implemented in release 
-     versions of Rockbox yet.  But stress not, you can still use Rolo to boot 
-     the default Archos firmware and record from there.  (In order to do this
-     you _must_ have a copy of the original firmware still on your player) 
+Q47: Can I record with Rockbox?
+A47: You sure can.  Take a look at our manual.  
+     http://rockbox.haxx.se/manual/manual.pdf
 
-     Daily builds and bleeding edge versions have initial support for
-     Recording. If you're brave and want to help out, get one, try out and
-     report your findings!
-
-Q48: When recording is finally implemented in Rockbox, will it be possible to
-     use custom codecs (like LAME) or is there a built in codec in the Archos?
+Q48: Now that I can record, can I use custom codecs (like LAME)?
 A48: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
 
 Q49: What are the max/min bitrates for recording on the Recorder's encoder?
@@ -349,21 +325,8 @@ Q50: Would it be possible to record from line in on the player?
 A50: No.
 
 Q51: I have a question about the id3v1 and id3v2 tags...
-A51: Stop!  Here is all the information about that (if you still have
-     questions when done, ask then.)
-
-     - Rockbox supports both id3v1 and id3v2
-
-     - The id3v2 support is limited to the first 300 bytes of the file.  Some
-     ripper programs tend to add very big tags first and then the important
-     ones Rockbox wants to read end up beyond the first 300 bytes and then
-     they remain unknown.
-
-     - If you believe that the tags you don't see *are* within 300 bytes, then
-     please make the mp3 file available for one of the developers to try out.
-
-     - The 300-byte limit is subject to be removed in a future version
-       (Actually, it was removed in post-1.4 versions)
+A51: Stop!  Rockbox supports both id3v1 and id3v2.  If you have problems
+     report it to the developers and please provide an example.
 
 Q52: Where exactly did the name 'Rockbox' come from?
 A52: Well you can follow the full line of emails at 
@@ -378,33 +341,13 @@ A52: Well you can follow the full line of emails at
      There you have it.  Recommended by users, decision by dictator.
 
 Q53: Why is there a limit of 400 files in a directory?
-A53: We have answered this question numerous times.  It is mentioned in the
-     release notes, and in the mailing list archives 
-     (http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-08/0448.shtml).
-     But, hey, we wouldn't want people to have to work to get an answer.  
-     (If you are reading this, feel proud, for you are the exception).
+A53: This is a configurable value, 400 files is the default.
 
-     We settled on 400 files in a directory because file listings take up
-     memory on the unit, and we felt that 400 is significantly large enough 
-     for a majority of the populace.  We prefer the option of limiting 
-     file limits in order to provide a greater amount of memory for buffering 
-     of files being played.
+Q54: Why is there a 10,000 song limit on playlists?
+A54: This is a configurable value, 10,000 songs is the default.
 
-     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
-
-Q54: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
-     have this be dynamically allocated?
-A54: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
-
-Q55: Why is there a 10,000 song limit on playlists?
-A55: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
-
-Q56: You don't understand! I _really_ need to have more then 400 files
-     in a directory!
-A56: Newsflash! This limit is now configurable in the daily (post-2.0) builds.
-
-Q57: How can I make playlists on my PC?
-A57: There are many programs that can create .m3u playlists. WinAmp is one.
+Q55: How can I make playlists on my PC?
+A55: There are many programs that can create .m3u playlists. WinAmp is one.
      Another simple method, that requires no extra software, is to use dir:
 
        dir /b /s X:\ > X:\allfiles.m3u
@@ -420,8 +363,8 @@ A57: There are many programs that can create .m3u playlists. WinAmp is one.
      Remember that playlists are simple text files. You can edit them with any
      normal text editor.
 
-Q58: How does the shuffle work?
-A58: It sees the playlist as a deck of cards, shuffling the entries using a
+Q56: How does the shuffle work?
+A56: It sees the playlist as a deck of cards, shuffling the entries using a
      pseudo-random generator called the Mersenne Twister. After shuffling,
      the list is never changed again until you re-shuffle the list, by
      stopping the playback and restarting. If the repeat mode is enabled,
@@ -431,8 +374,8 @@ A58: It sees the playlist as a deck of cards, shuffling the entries using a
      resume feature can shuffle the playlist in exactly the same way when
      resuming.
 
-Q59: How can I find out about all the neat features that Rockbox has?
-A59: This information is in our manual (It sometimes gets a bit out of
+Q57: How can I find out about all the neat features that Rockbox has?
+A57: This information is in our manual (It sometimes gets a bit out of
      date, so please bear with us.)  The information you are most likely 
      looking for is a bit down the tree, so the here is the url:
      http://rockbox.haxx.se/manual/rec-general.html
@@ -440,12 +383,12 @@ A59: This information is in our manual (It sometimes gets a bit out of
      Also, check out the features-list at:
      http://rockbox.haxx.se/docs/features.html
 
-Q60: How can I see what bugs are currently open/being worked on?
-A60: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
+Q58: How can I see what bugs are currently open/being worked on?
+A58: Check out http://rockbox.haxx.se/bugs.shtml for a listing of bugs
      that have been reported.
 
-Q61: How can I report about bugs in Rockbox?
-A61: If we were better programmers we would take that as an insult.  But we
+Q59: How can I report about bugs in Rockbox?
+A59: If we were better programmers we would take that as an insult.  But we
      aren't, so we won't.  The first step in reporting a bug is to review 
      the rules we ask you to follow in your submission (listed at: 
      http://rockbox.haxx.se/bugs.shtml#rules).
@@ -455,8 +398,8 @@ A61: If we were better programmers we would take that as an insult.  But we
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
 
-Q62: What's with all the different versions of Rockbox?
-A62: There are really only two versions of Rockbox.  One for Players and one
+Q60: What's with all the different versions of Rockbox?
+A60: There are really only two versions of Rockbox.  One for Players and one
      for Recorders.  However, we do have 3 other 'versions' of Rockbox 
      available for download.  These would be Releases, Daily Builds, and 
      Bleeding Edge.
@@ -481,40 +424,38 @@ A62: There are really only two versions of Rockbox.  One for Players and one
      but would love to hear any reports you may have about Release or Daily
      build versions. (see "How can I report about bugs in Rockbox?")
             
-Q63: I am in Windows and can't create a .rockbox directory to store my
+Q61: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
-A63: We won't.  The limitations of your operating system is not reason 
+A61: We won't.  The limitations of your operating system is not reason 
      enough for us to change how we handle things.  And you _can_ create
      this directory.  Open a command line and type:
           mkdir j:\.rockbox
      You will need to correct the location for the drive letter that Windows
      assigns to your drive.
 
-Q64: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
+Q62: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
      fix this?
-A64: Truth is, we don't need to fix anything.  If you are using OSX then you
+A62: Truth is, we don't need to fix anything.  If you are using OSX then you
      can just open a console, change directories to the device and just:
           mkdir .rockbox
 
      If you are in another version then you should be able to do command-N in 
      the Finder, then name the folder.  
          
-Q65: Will Rockbox work on any of Archos' other units?
-A65: Some development has recently occurred on the Archos FM units, and is 
-     in the daily builds.  However the FM development is not being done by 
-     the core team, and so is progressing at a slower rate.  As yet, 
-     no development is planned for any of Archos' other units.
+Q63: Will Rockbox work on any of Archos' other units?
+A63: Right now Rockbox supports the Archos' Players, Recorders (v1 and v2)
+     and the FM Recorder.
 
-Q66: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
+Q64: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
      safely and rebooted. But Rockbox still didn't load. What is wrong?
      I am running Windows.
-A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
+A64: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
 
      - Download and install Directory Snoop (version 4.03 in November 2002)
-     from http://www.briggsoft.com/dsnoop.htm
-     It's shareware, the trial version can be used 25 times.
+       from http://www.briggsoft.com/dsnoop.htm
+       It's shareware, the trial version can be used 25 times.
 
      Directory Snoop can display true drive contents by bypassing the
      operating system and reading the raw drive sectors directly.
@@ -524,21 +465,21 @@ A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
      - Launch Directory snoop
 
      - Click on the Jukebox drive letter in the [select drive] field in the
-     toolbar. The content of the jukebox hard drive appears in the main
-     window. Files which appear in red color don't seem to be present on the
-     hard drive, but they still here.
+       toolbar. The content of the jukebox hard drive appears in the main
+       window. Files which appear in red color don't seem to be present on the
+       hard drive, but they still here.
 
      - Simply select the appropriate files (red color) and purge them
-     (Purge button). Of course, don't erase the new archos.mod file and the
-     .rockbox directory :)
+       (Purge button). Of course, don't erase the new archos.mod file and the
+       .rockbox directory :)
 
      - Safely remove (Windows unmount device function) the Jukebox.
      Power it up and ...voila... Rockbox is there!
 
      (Thanks to Olivier Rafidison for this info)
 
-Q67: What kind of mic can I connect to my AJBR?
-A67: There are several types of microphones.
+Q65: What kind of mic can I connect to my AJBR?
+A65: There are several types of microphones.
 
      Dynamic: The one that's available from Archos is a dynamic one.
      Their output level is high enough so that they don't need an
@@ -594,38 +535,38 @@ A67: There are several types of microphones.
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
      (As described, you also need amplification.)
 
-Q68: I can't start rockbox when the charger is connected. What am I doing
+Q66: I can't start rockbox when the charger is connected. What am I doing
      wrong?
-A68: If your device is off and you connect the charger, the Archos charger code
+A66: If your device is off and you connect the charger, the Archos charger code
      is started immediately. You can then start Rockbox with holding down the
      ON key for several seconds. Hold the key down a really long time, until
      you see the Rockbox logo!
 
-Q69: Why can't you implement a cross-fader? That would be so cool!
-A69: Please read our NODO faq. http://rockbox.haxx.se/docs/nodo.html#3
+Q67: Why can't you implement a cross-fader? That would be so cool!
+A67: Please read our NODO faq. http://rockbox.haxx.se/docs/nodo.html#3
 
-Q70: My screen is all black/white when I run Rockbox on my Recorder!
-A70: We have no way of knowing the correct contrast setting from start and the
+Q68: My screen is all black/white when I run Rockbox on my Recorder!
+A68: We have no way of knowing the correct contrast setting from start and the
      displays differ a lot. Change your contrast setting by doing this:
 
      F1, down, right, down, down, right, down, down, down, right, down (until
      you like the contrast)
 
-Q71: Where are the FM controls for the FM Recorder?
-A71: In Rockbox 2.0 and earlier, FM support was not yet developed. FM tuner
+Q69: Where are the FM controls for the FM Recorder?
+A69: In Rockbox 2.0 and earlier, FM support was not yet developed. FM tuner
      support is only available using the very latest versions of the Rockbox
      builds for the FM Recorder.
 
-Q72: I installed/renamed ajbrec.ajz (or archos.mod) but I am still booting
+Q70: I installed/renamed ajbrec.ajz (or archos.mod) but I am still booting
      with another version of firmware.
-A72: When looking on the hard disk the Archos firmware only matches the first
+A70: When looking on the hard disk the Archos firmware only matches the first
      ten characters of the file name.  Because of this files like 
      ajbrec.ajz.bak or ajbrec.ajz-20030404 match and are loaded.  To 
      prevent this from happening, give the it a file name that differs in 
      the first 10 characters, e.g., ajbrec.bak.ajz. 
 
-Q73: Help! My recorder crashes when I copy files to it!
-A73: Yes, the recorder can crash when you copy several gigabytes of
+Q71: Help! My recorder crashes when I copy files to it!
+A71: Yes, the recorder can crash when you copy several gigabytes of
      files to it. The explanation is simple: Copying several gigabytes
      of files through USB requires a long period of sustained disk
      activity and drains more power than the batteries of the recorder
@@ -641,16 +582,16 @@ A73: Yes, the recorder can crash when you copy several gigabytes of
 
      There is no solution, just some tips.
 
-     * Connect to the charger when copying lots of files. This will
+     - Connect to the charger when copying lots of files. This will
        not prevent the problem, but it will take longer to happen.
-     * Make sure you have "Deep Discharge" disabled.
-     * Switch off the "Backlight On When Plugged" option.
-     * Use USB 2.0. Transfers will be much faster.
-     * Copy incrementally. With fully charged standard batteries it
+     - Make sure you have "Deep Discharge" disabled.
+     - Switch off the "Backlight On When Plugged" option.
+     - Use USB 2.0. Transfers will be much faster.
+     - Copy incrementally. With fully charged standard batteries it
        should be capable of sustained copying for 2 - 2.5 hours.
 
-Q74: What should I know about digital I/O connector on my jukebox?
-A74: The Recorder models have a connector for digital audio output using the
+Q72: What should I know about digital I/O connector on my jukebox?
+A72: The Recorder models have a connector for digital audio output using the
      common S/PDIF standard (Sony/Phillips Digital Interface). This jack is
      not present on the Studio/Player/FM Recorder models. By using the digital
      output in combination with high class external equipment, you can get
@@ -700,8 +641,8 @@ A74: The Recorder models have a connector for digital audio output using the
      (for digital output from the Archos) or optical to electrical (for
      digital recording in to the Archos).
 
-Q75: How do I unsubscribe from the rockbox mailing list?
-A75: The same way you subscribed, but you send an 'unsubscribe' request to the
+Q73: How do I unsubscribe from the rockbox mailing list?
+A73: The same way you subscribed, but you send an 'unsubscribe' request to the
      mailing list server instead of the 'subscribe' one you sent before.
 
      This is all mentioned on the same web page: http://rockbox.haxx.se/mail/
@@ -724,8 +665,8 @@ A75: The same way you subscribed, but you send an 'unsubscribe' request to the
      mailing list: how to post, how to unsubscribe, where to find the mailing
      list archives etc. Sensible mail clients can display these headers.
 
-Q76  What is the Recorder V2?
-A76  The Recorder V2 is essentially an FM Recorder without the radio. It looks
+Q74: What is the Recorder V2?
+A74: The Recorder V2 is essentially an FM Recorder without the radio. It looks
      and works like the FM Recorder except for the radio, and has LiIon
      batteries. It is meant to replace the older Recorder model.
      NOTE! The first V2 Recorders were in fact real FM Recorders with the
