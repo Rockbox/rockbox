@@ -76,7 +76,6 @@ sed > Makefile \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@SIMVER@,${simver},g" \
- -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
@@ -91,14 +90,13 @@ THISDIR="@PWD@"
 SIMVER=@SIMVER@
 LANGUAGE=@LANGUAGE@
 VERSION=\$(shell date +%y%m%d-%H%M)
-EXTRA_DEFINES=@EXTRA_DEFINES@
 
 .PHONY: 
 
 all: sim
 
 sim:
-	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)"
+	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE)
 
 clean:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
@@ -202,7 +200,6 @@ if [ "$target" = "update" ]; then
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
       memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
-      extra_defines=`grep "^EXTRA_DEFINES=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
         simulator="yes"
@@ -289,34 +286,6 @@ if [ -z "$memory" ]; then
   esac
   echo "Memory size selected: $memory MB"
 fi
-
-if [ -z "$extra_defines" ]; then
-    if [  "player" != "$archos" ] ; then
-        disable_demos="-DDISABLE_NOTHING"
-        disable_games=""
-
-        echo "Do you want to use Demos? (Y)"
-        getit=`input`;
-        if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-            disable_demos="-DDISABLE_DEMOS"
-            echo "Demos disabled"
-        else
-            echo "Demos enabled"
-        fi
- 
-        echo "Do you want to play Games? (Y)"
-        getit=`input`;
-        if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-            disable_games=" -DDISABLE_GAMES"
-            echo "Games disabled"
-        else
-            echo "Games enabled"
-        fi
-
-        extra_defines="$disable_demos$disable_games"
-    fi
-fi
-
 
 if [ -z "$debug" ]; then
   ##################################################################
@@ -450,7 +419,6 @@ sed > Makefile \
  -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
- -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
@@ -466,16 +434,15 @@ LANGUAGE=@LANGUAGE@
 MEMORYSIZE=@MEMORY@
 VERSION=\$(shell date +%y%m%d-%H%M)
 
-EXTRA_DEFINES=@EXTRA_DEFINES@
 .PHONY: firmware apps
 
 all: firmware apps
 
 firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
 
 apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
