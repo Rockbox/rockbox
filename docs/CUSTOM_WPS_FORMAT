@@ -28,8 +28,8 @@ File Info Tags:
   %fb : File Bitrate (in kbps)
   %ff : File Frequency (in Hz)
   %fp : File Path
-  %fn : File Name
-  %fm : File Name (without extension)
+  %fn : File Name (without extension)
+  %fm : File Name
   %fs : File Size (In Kilobytes)
   %fv : "(vbr)" if variable bit rate or "" if constant bit rate
   %d1 : First directory from end of file path.
