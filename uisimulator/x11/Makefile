@@ -90,7 +90,7 @@ FIRMSRCS = $(LCDSRSC) sprintf.c id3.c debug.c usb.c mpeg.c power.c\
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
-	screens.c peakmeter.c viewer.c sleeptimer.c
+	screens.c peakmeter.c viewer.c sleeptimer.c keyboard.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -168,6 +168,9 @@ $(OBJDIR)/menu.o: $(APPDIR)/menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/keyboard.o: $(MACHINEDIR)/keyboard.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/language.o: $(APPDIR)/language.c
