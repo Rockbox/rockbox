@@ -71,7 +71,7 @@ ifeq ($(UNAME),CYGWIN)
   LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
-  DEFINES += -DHAVE_OSS
+  DEFINES += -DHAVE_OSS -D_SSIZE_T_
 else
 ifeq ($(UNAME),FreeBSD)
   LIBS = -pthread
