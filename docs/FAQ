@@ -83,31 +83,8 @@ Q16. What exactly are you trying to achieve with this line of development?
      (A.K.A. what's your purpose for being here?)
 A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
      it profusely. This is great fun!
-     Secondly, we feel the firmware is lacking some features and contain a
-     number of annoying bugs that we want to fix.
-     Some ideas would include (in no particular order):
-              - No pause between songs 
-              - Mid-song resume 
-              - Mid-playlist resume 
-              - No-scan playlists 
-              - Unlimited playlist size 
-              - Autobuild playlists (ie: "all songs in this directory tree") 
-              - Auto-continue play in the next directory 
-              - Current folder and all sub-folder random play 
-              - Full disk random play 
-              - REAL random
-              - Multi song queue
-       	      - Faster scroll speed
-              - More cool features with the wire remote control (including 
-                controlling your Archos from your car radio (req hw mod))
-              - Support playing of other files types (ie: Ogg Vorbis support)
-              - Support for megabass switch (req hw mod) 
-              - Player control via USB
-              - Memory expansion?
-     Note: Just because something is on this list, does not mean that it is
-     technically feasible. (But hey we can dream)  And something not
-     being on the list does not mean it isn't a neat idea.  Bring it to 
-     the list.
+     Secondly, we feel the original firmware is lacking some features and
+     contains a number of annoying bugs that we don't want to live with.
 
 Q17. You mention supporting Ogg Vorbis and other file types on your list of
      ideas. What is the status on that?
@@ -152,15 +129,8 @@ A20. We recently released version 2.1, so head on over to
      (http://rockbox.haxx.se/download/rockbox-2.1-notes.txt).  
 
 Q21. What do you plan to add to coming versions?
-A21. We have a rough idea of which features we plan/expect/hope to be included
-     in which versions.  Once again, remember that none of this is written in 
-     stone (noticing a pattern yet?) 
-
-     Version 2.2
-          User interface overhaul
-
-     Version 2.3
-          Plugin loader, opening the door for a bucketful of new applications
+A21. We don't plan versions in detail. We just write code, and when it feels
+     right we release a new version.
 
 Q22. I tried one of your firmware files and now I can't access my hard disk!
      When I turn on my jukebox, it says:
@@ -169,6 +139,9 @@ Q22. I tried one of your firmware files and now I can't access my hard disk!
 A22. Your hard disk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
      http://rockbox.haxx.se/lock.html
+
+     Note: This is a very rare problem. Most people who think they have a
+     locked disk actually just experience hardware and/or driver problems.
 
 Q23: This FAQ doesn't answer the question I have.  What should I do?
 A23: You have a couple options here.  You could forget the question, find an
@@ -454,8 +427,8 @@ A64: The old MOD/AJZ was not entirely deleted from the disk. It is still
      what you can do:
 
      - Download and install Directory Snoop (version 4.03 in November 2002)
-       from http://www.briggsoft.com/dsnoop.htm
-       It's shareware, the trial version can be used 25 times.
+     from http://www.briggsoft.com/dsnoop.htm.
+     It's shareware, the trial version can be used 25 times.
 
      Directory Snoop can display true drive contents by bypassing the
      operating system and reading the raw drive sectors directly.
@@ -465,13 +438,13 @@ A64: The old MOD/AJZ was not entirely deleted from the disk. It is still
      - Launch Directory snoop
 
      - Click on the Jukebox drive letter in the [select drive] field in the
-       toolbar. The content of the jukebox hard drive appears in the main
-       window. Files which appear in red color don't seem to be present on the
-       hard drive, but they still here.
+     toolbar. The content of the jukebox hard drive appears in the main
+     window. Files which appear in red color don't seem to be present on the
+     hard drive, but they still here.
 
      - Simply select the appropriate files (red color) and purge them
-       (Purge button). Of course, don't erase the new archos.mod file and the
-       .rockbox directory :)
+     (Purge button). Of course, don't erase the new archos.mod file and the
+     .rockbox directory :)
 
      - Safely remove (Windows unmount device function) the Jukebox.
      Power it up and ...voila... Rockbox is there!
@@ -485,18 +458,18 @@ A65: There are several types of microphones.
      Their output level is high enough so that they don't need an
      amplifier (that's the reason why the Archos mic is of this type -
      it's cheap).
-              - cheap
-              - no good sound quality of cheap dynamic mics (good enough for
-                speech)
-              - no amplifier needed
+      - cheap
+      - no good sound quality of cheap dynamic mics (good enough for
+        speech)
+      - no amplifier needed
 
      Backplate Condenser: These are the professional mics. They need phantom
      power (48V) for charging the condenser.
      They also need an amplifier, because their output level is low.
-              - good sound quality
-              - need phantom power (48V)
-              - need amplifier
-              - expensive              
+       - good sound quality
+       - need phantom power (48V)
+       - need amplifier
+       - expensive              
  
      Electret Condenser: These capsules are cheap and result in a good
      recording quality. They don't need phantom power voltage. They need power
@@ -504,10 +477,10 @@ A65: There are several types of microphones.
      mic with a battery in it, it is mostly because of the FET power, not
      because of an amplification circuit inside the mic.  These mics are in
      all the consumer products like mobile phones, PC headsets and so on.
-              - cheap (2 EUR for a capsule)
-              - good sound quality
-              - need amplifier
-              - need power for the FET (1,5 - 15V)
+       - cheap (2 EUR for a capsule)
+       - good sound quality
+       - need amplifier
+       - need power for the FET (1,5 - 15V)
 
      Recommendation for do-it-yourselfers: Use electret condenser mic capsules,
      solder an amplifier for them which both amplifies the output level
@@ -580,15 +553,19 @@ A71: Yes, the recorder can crash when you copy several gigabytes of
      system it can cause your system to crash as well, or confuse it
      to the point it needs a reboot.
 
-     There is no solution, just some tips.
+     There is no solution, just some tips:
 
      - Connect to the charger when copying lots of files. This will
-       not prevent the problem, but it will take longer to happen.
+     not prevent the problem, but it will take longer to happen.
+
      - Make sure you have "Deep Discharge" disabled.
+
      - Switch off the "Backlight On When Plugged" option.
+
      - Use USB 2.0. Transfers will be much faster.
+
      - Copy incrementally. With fully charged standard batteries it
-       should be capable of sustained copying for 2 - 2.5 hours.
+     should be capable of sustained copying for 2 - 2.5 hours.
 
 Q72: What should I know about digital I/O connector on my jukebox?
 A72: The Recorder models have a connector for digital audio output using the
