@@ -1,20 +1,21 @@
-#############################################################################
+##############################################################################
 ##             __________               __   ___.
 ##   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 ##   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 ##   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 ##   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 ##                     \/            \/     \/    \/            \/
-## Copyright Alan Korr, 2002. All rights reserved.
+## $Id:
 ##
-## Permission to use, copy, modify, and distribute this software for any
-## purpose is hereby granted without fee, provided that this copyright and
-## permissions notice appear in all copies and derivatives, and that no
-## charge may be made for the software and its documentation except to cover
-## cost of distribution.
+## Copyright (C) 2002 by Alan Korr
 ##
-## This software is provided "as is" without express or implied warranty.
-#############################################################################
+## All files in this archive are subject to the GNU General Public License.
+## See the file COPYING in the source tree root for full license agreement.
+##
+## This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+## KIND, either express or implied.
+##
+##############################################################################
 ARCH	= test
 PACKAGE = fat
 VERSION = 0.0.0

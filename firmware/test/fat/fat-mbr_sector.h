@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:
+ * $Id$
  *
  * Copyright (C) 2002 by Alan Korr
  *
@@ -16,11 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LIBRARY_FAT_H__
-#  error "This header file must be included ONLY from fat.h."
-#endif
-#ifndef __LIBRARY_FAT_TYPES_H__
-#  define __LIBRARY_FAT_TYPES_H__
+#ifndef __LIBRARY_FAT_MBR_SECTOR_H__
+#define __LIBRARY_FAT_MBR_SECTOR_H__
+#include "fat-partition.h"
 
 // [Alan]:
 // I would like to draw your attention about the fact that SH1
@@ -38,6 +36,34 @@
 // that way, I think.
 // By the way, SH1 is big endian, not little endian as PC is.
 
+///////////////////////////////////////////////////////////////////////////////////
+// MBR SECTOR :
+///////////////
+//
+// 
 
+struct __fat_mbr_sector /* Master Boot Record Sector */
+  {
+    struct
+      __fat_partition_info partition_table[4];
+    short
+      data[0x1BE/2];
+    short
+      end[0];
+    short
+      signature;
+  };
+
+int __fat_get_mbr_sector_callback (struct __fat_mbr_sector *mbr_sector);
+int __fat_put_mbr_sector_callback (struct __fat_mbr_sector *mbr_sector);
+
+static inline int __fat_get_mbr_sector (struct mbr_sector *__fat_mbr_sector)
+  { return ata_read_sectors (0,1,mbr_sector,(int(*)(void *))__fat_get_mbr_sector_callback); }
+
+static inline int __fat_put_mbr_sector (struct mbr_sector *__fat_mbr_sector)
+  { return ata_write_sectors (0,1,mbr_sector,(int(*)(void *))__fat_put_mbr_sector_callback); }
+
+//
+///////////////////////////////////////////////////////////////////////////////////
 
 #endif

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:
+ * $Id$
  *
  * Copyright (C) 2002 by Alan Korr
  *
@@ -16,11 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LIBRARY_FAT_H__
-#  error "This header file must be included ONLY from fat.h."
-#endif
-#ifndef __LIBRARY_FAT_TYPES_H__
-#  define __LIBRARY_FAT_TYPES_H__
+#include <fat.h>
+#include "fat-mbr_sector.h"
 
 // [Alan]:
 // I would like to draw your attention about the fact that SH1
@@ -36,8 +33,33 @@
 // 'partition_info', 'mbr_sector' and 'fsi_sector' for instance, but
 // not for structure 'bpb_sector' which is too much complex to handle
 // that way, I think.
-// By the way, SH1 is big endian, not little endian as PC is.
+// By the way, SH1 is big endian, not little endian as PC is. 
 
+///////////////////////////////////////////////////////////////////////////////////
+// MBR SECTOR :
+///////////////
+//
+// 
 
+int __fat_get_mbr_sector_callback (struct __fat_mbr_sector *mbr_sector)
+  {
+    short *data = mbr_sector->data,*end;
+    for (end = mbr_sector->end; data < end; ++data)
+      *data = ata_get_word (0);
+    __fat_get_partition_table (mbr_sector->partition_table);
+    mbr_sector->signature = HI(ATAR_DATA);
+    return FAT_RETURN_SUCCESS;
+  }
 
-#endif
+int __fat_put_mbr_sector_callback (struct __fat_mbr_sector *mbr_sector)
+  {
+    short const *data = mbr_sector->data,*end;
+    for (end = mbr_sector->end; data < end;)
+      HI(ATAR_DATA) = *data++;
+    __fat_put_partition_table (mbr_sector->partition_table);
+    ata_put_word (mbr_sector->signature,0);
+    return FAT_RETURN_SUCCESS;
+  }
+
+//
+///////////////////////////////////////////////////////////////////////////////////

@@ -21,4 +21,11 @@
 #endif
 #ifndef __LIBRARY_FAT_RETURN_VALUES_H__
 #  define __LIBRARY_FAT_RETURN_VALUES_H__
+
+enum
+  {
+    FAT_RETURN_SUCCESS = 1,
+    FAT_RETURN_FAILURE = 0
+  };
+
 #endif

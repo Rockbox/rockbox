@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:
+ * $Id$
  *
  * Copyright (C) 2002 by Alan Korr
  *
@@ -16,11 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LIBRARY_FAT_H__
-#  error "This header file must be included ONLY from fat.h."
-#endif
-#ifndef __LIBRARY_FAT_TYPES_H__
-#  define __LIBRARY_FAT_TYPES_H__
+#ifndef __LIBRARY_FAT_FSI_SECTOR_H__
+#define __LIBRARY_FAT_FSI_SECTOR_H__
 
 // [Alan]:
 // I would like to draw your attention about the fact that SH1
@@ -37,7 +34,47 @@
 // not for structure 'bpb_sector' which is too much complex to handle
 // that way, I think.
 // By the way, SH1 is big endian, not little endian as PC is.
+   
+///////////////////////////////////////////////////////////////////////////////////
+// FSI SECTOR :
+///////////////
+// 
+//
 
+struct __fat_fsi_sector /* File System Info Sector */
+  {
+    unsigned long
+      left_free_clusters;
+    unsigned long
+      next_free_cluster;
+    short
+      data[0];
+    long /* 0x61415252 - aARR */
+      fsi_signature0;
+    char
+      reserved0[480];
+    long /* 0x41617272 - Aarr */
+      fsi_signature1;
+    short
+      end0[0];
+    char
+      reserved1[12];
+    long /* 0x000055AA */
+      signature;
+    short
+      end1[0];
+  };
 
+int __fat_get_fsi_sector_callback (struct __fat_fsi_sector *fsi_sector);
+int __fat_put_fsi_sector_callback (struct __fat_fsi_sector *fsi_sector);
+
+static inline int __fat_get_fsi_sector (unsigned long partition_start,unsigned long lba,struct __fat_fsi_sector *fsi_sector)
+  { return ata_read_sectors (partition_start + lba,1,fsi_sector,(int(*)(void *))get_fsi_sector_callback); } 
+
+static inline int __fat_put_fsi_sector (unsigned long partition_start,unsigned long lba,struct __fat_fsi_sector *fsi_sector)
+  { return ata_write_sectors (partition_start + lba,1,fsi_sector,(int(*)(void *))put_fsi_sector_callback); } 
+
+// 
+///////////////////////////////////////////////////////////////////////////////////
 
 #endif
