@@ -337,9 +337,15 @@ static int flush_cache(int fd)
 {
     int rc;
     struct filedesc* file = &openfiles[fd];
-    
+    int sector = file->fileoffset / SECTOR_SIZE;
+      
     DEBUGF("Flushing dirty sector cache\n");
         
+    /* make sure we are on correct sector */
+    rc = fat_seek(&(file->fatfile), sector);
+    if ( rc < 0 )
+        return rc * 10 - 3;
+
     rc = fat_readwrite(&(file->fatfile), 1,
                        file->cache, true );
     if ( rc < 0 )
@@ -573,13 +579,6 @@ int lseek(int fd, int offset, int whence)
                 return rc * 10 - 6;
             }
             file->cacheoffset = sectoroffset;
-
-            /* seek back to current sector */
-            rc = fat_seek(&(file->fatfile), newsector);
-            if ( rc < 0 ) {
-                errno = EIO;
-                return rc * 10 - 7;
-            }
         }
         else
             file->cacheoffset = -1;
