@@ -20,9 +20,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include "config.h"
 
 char debugmembuf[100];
 char debugbuf[200];
+
+#ifndef CRT_DISPLAY /* allow non archos platforms to display output */
 
 static int debug_tx_ready(void)
 {
@@ -181,3 +184,22 @@ void debugf(char *fmt, ...)
     va_end(ap);
     debug(debugmembuf);
 }
+
+#else
+
+void debug( const char *message )
+{
+    printf( message );
+}
+
+void debugf(char *fmt, ...)
+{
+    va_list ap;
+    
+    va_start( ap, fmt );
+    vsprintf( debugmembuf, fmt, ap );
+    va_end( ap );
+    printf( debugmembuf );
+}
+#endif
+
