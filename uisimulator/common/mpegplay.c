@@ -117,54 +117,6 @@ signed int dither(mad_fixed_t sample, struct dither *dither)
   return output >> scalebits;
 }
 
-/*
- * NAME:    pack_pcm()
- * DESCRIPTION:  scale and dither MAD output
- */
-static
-void pack_pcm(unsigned char **pcm, unsigned int nsamples,
-        mad_fixed_t const *ch1, mad_fixed_t const *ch2)
-{
-  register signed int s0, s1;
-  static struct dither d0, d1;
-
-  if (ch2) {  /* stereo */
-    while (nsamples--) {
-      s0 = scale(*ch1++, &d0);
-      s1 = scale(*ch2++, &d1);
-# if SAMPLE_DEPTH == 16
-      (*pcm)[0 + 0] = s0 >> 0;
-      (*pcm)[0 + 1] = s0 >> 8;
-      (*pcm)[2 + 0] = s1 >> 0;
-      (*pcm)[2 + 1] = s1 >> 8;
-
-      *pcm += 2 * 2;
-# elif SAMPLE_DEPTH == 8
-      (*pcm)[0] = s0 ^ 0x80;
-      (*pcm)[1] = s1 ^ 0x80;
-
-      *pcm += 2;
-# else
-#  error "bad SAMPLE_DEPTH"
-# endif
-    }
-  }
-  else {  /* mono */
-    while (nsamples--) {
-      s0 = scale(*ch1++, &d0);
-
-# if SAMPLE_DEPTH == 16
-      (*pcm)[0] = s0 >> 0;
-      (*pcm)[1] = s0 >> 8;
-
-      *pcm += 2;
-# elif SAMPLE_DEPTH == 8
-      *(*pcm)++ = s0 ^ 0x80;
-# endif
-    }
-  }
-}
-
 #define INPUT_BUFFER_SIZE  (5*8192)
 #define OUTPUT_BUFFER_SIZE  8192 /* Must be an integer multiple of 4. */
 int mpeg_play(char* fname)
