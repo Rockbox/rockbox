@@ -26,77 +26,112 @@
 
 extern void tetris(void);
 
-#define LINE_HEIGHT 8
+#define MENU_ITEM_FONT    0
+#define MENU_ITEM_Y_LOC   6
+#define MENU_LINE_HEIGHT  8
 
-#define MAX_LINE 3 /* the last index with info, starting on 0 */
+/* menu ids */
+#define ITEM_TETRIS       0
+#define ITEM_SCREENSAVER  1
+#define ITEM_BROWSE       2
+#define ITEM_ROCKABOX     3
 
-/* global cursor */
-int cursor = 0;
+/* the last index with info, starting on 0 */
+#define MAX_LINE          3
+
+int menu_top = 0;
+int menu_bottom = MAX_LINE;
+
+void add_menu_item(int location, char *string)
+{
+    lcd_puts(MENU_ITEM_Y_LOC, MENU_LINE_HEIGHT*location,
+             string, MENU_ITEM_FONT);
+    if (location < menu_top)
+        menu_top = location;
+    if (location > menu_bottom)
+        menu_bottom = location;
+}
 
 void menu_init(void)
 {
-  lcd_puts(6, 0,  "Rockabox", 0);
-  lcd_puts(6, 8,  "Screen Saver", 0);
-#define LINE_SS 1
-  lcd_puts(6, 16, "Browse", 0);
-#define LINE_BROWSE 2
-  lcd_puts(6, 24, "Tetris", 0);
-#define LINE_TETRIS 3
-  lcd_puts(8, 38, "Rockbox!", 2);
+    /* x, y, string, font */
+    /*   lcd_puts(6, 0,  "Rockabox", 0);*/
+    add_menu_item(ITEM_ROCKABOX, "Rockabox");
+    add_menu_item(ITEM_SCREENSAVER, "Screen Saver");
+    add_menu_item(ITEM_BROWSE, "Browse");
+    add_menu_item(ITEM_TETRIS, "Tetris");
 
-  lcd_puts(0, cursor, "-", 0);
+    lcd_puts(8, 38, "Rockbox!", 2);
+    put_cursor(0, 0);
+}
+
+/* Move the cursor to a particular id */
+int put_cursor(int current, int target)
+{
+    lcd_puts(0, current*MENU_LINE_HEIGHT, " ", 0);
+    lcd_puts(0, target*MENU_LINE_HEIGHT, "-", 0);
+    return target;
 }
 
 void app_main(void)
 {
-  int key;
+    int key;
+    int cursor = 0;
 
-  menu_init();
+    menu_init();
 
-  while(1) {
-    key = button_get();
+    while(1) {
+        key = button_get();
 
-    if(!key) {
-      sleep(1);
-      continue;
+        if(!key) {
+            sleep(1);
+            continue;
+        }
+        switch(key) {
+        case BUTTON_UP:
+            if(cursor == menu_top ){
+                /* wrap around to menu bottom */
+                printf("from (%d) to (%d)\n", cursor, menu_bottom);
+                cursor = put_cursor(cursor, menu_bottom);
+            } else {
+                /* move up */
+                printf("from (%d) to (%d)\n", cursor, cursor-1);
+                cursor = put_cursor(cursor, cursor-1);
+            }
+            break;
+        case BUTTON_DOWN:
+            if(cursor == menu_bottom ){
+                /* wrap around to menu top */
+                printf("from (%d) to (%d)\n", cursor, menu_top);
+                cursor = put_cursor(cursor, menu_top);
+            } else {
+                /* move down */
+                printf("from (%d) to (%d)\n", cursor, cursor+1);
+                cursor = put_cursor(cursor, cursor+1);
+            }
+            break;
+        case BUTTON_RIGHT:      
+        case BUTTON_PLAY:      
+            /* Erase current display state */
+            lcd_clear_display();
+            
+            switch(cursor) {
+            case ITEM_TETRIS:
+                tetris();
+                break;
+            case ITEM_BROWSE:
+                dirbrowse("/");
+                break;
+            case ITEM_SCREENSAVER:
+                screensaver();
+                break;
+            }
+
+            /* Return to previous display state */
+            lcd_clear_display();
+            menu_init();
+            break;
+        }
+        lcd_update();
     }
-    switch(key) {
-    case BUTTON_UP:
-      if(cursor) {
-        lcd_puts(0, cursor, " ", 0);
-        cursor-= LINE_HEIGHT;
-        lcd_puts(0, cursor, "-", 0);
-      }
-      break;
-    case BUTTON_DOWN:
-      if(cursor<(MAX_LINE*LINE_HEIGHT)) {
-        lcd_puts(0, cursor, " ", 0);
-        cursor+=LINE_HEIGHT;
-        lcd_puts(0, cursor, "-", 0);
-      }
-      break;
-    case BUTTON_RIGHT:      
-    case BUTTON_PLAY:      
-      switch(cursor) {
-      case (LINE_TETRIS * LINE_HEIGHT):
-        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-        tetris();
-        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-        menu_init();
-        break;
-      case (LINE_BROWSE * LINE_HEIGHT):
-        dirbrowse("/");
-        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-        menu_init();
-        break;
-      case (LINE_SS * LINE_HEIGHT):
-        screensaver();
-        lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-        menu_init();
-        break;
-      }
-      break;
-    }
-    lcd_update();
-  }
 }
