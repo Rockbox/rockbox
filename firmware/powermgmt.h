@@ -59,12 +59,12 @@ extern int powermgmt_last_cycle_level;         /* which level had the batteries 
 
 extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
 void enable_trickle_charge(bool on);
+void set_battery_capacity(int capacity); /* set local battery capacity value */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
 
 #endif /* HAVE_CHARGE_CTRL */
 
-#define BATTERY_CAPACITY 1800    /* battery capacity in mAh for runtime estimation */
 #define CURRENT_NORMAL    145    /* usual current in mA when using the AJB including some disk/backlight/... activity */
 #define CURRENT_BACKLIGHT  30    /* additional current when backlight is always on */
 #define CURRENT_CHARGING  300    /* charging current */

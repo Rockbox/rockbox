@@ -79,11 +79,17 @@ int powermgmt_last_cycle_level = 0;          /* which level had the batteries at
 bool trickle_charge_enabled = true;
 int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
 int charge_state = 0;                        /* at the beginning, the charger does nothing */
+int battery_capacity = 1800;                 /* only a default value */
 
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
 };
+
+void set_battery_capacity(int capacity)
+{
+    battery_capacity = capacity;
+}
 
 void enable_trickle_charge(bool on)
 {
@@ -345,22 +351,22 @@ static void power_thread(void)
             /* so consider it because there's the battery lazyness inside the the battery_level */
             if (powermgmt_last_cycle_startstop_min < 20) {
                 i = (100 - battery_lazyness[powermgmt_last_cycle_startstop_min]) * 30 / 100 ; /* 0..30 */
-                powermgmt_est_runningtime_min = (100 - battery_level()) * BATTERY_CAPACITY / 100 * (100 + i) / 100 * 60 / CURRENT_CHARGING;
+                powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * (100 + i) / 100 * 60 / CURRENT_CHARGING;
             } else {
-                powermgmt_est_runningtime_min = (100 - battery_level()) * BATTERY_CAPACITY / 100 * 60 / CURRENT_CHARGING;
+                powermgmt_est_runningtime_min = (100 - battery_level()) * battery_capacity / 100 * 60 / CURRENT_CHARGING;
             }
         else {
             current = CURRENT_NORMAL;
             if ((backlight_get_timeout() == 1) || (charger_inserted() && backlight_get_on_when_charging()))
                                                        /* LED always on or LED on when charger connected */
                 current += CURRENT_BACKLIGHT;
-            powermgmt_est_runningtime_min = battery_level() * BATTERY_CAPACITY / 100 * 60 / current;
+            powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;
         }
 #else
         current = CURRENT_NORMAL;
         if (backlight_get_timeout() == 1) /* LED always on */
             current += CURRENT_BACKLIGHT;
-        powermgmt_est_runningtime_min = battery_level() * BATTERY_CAPACITY / 100 * 60 / current;
+        powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;
 #endif
         
 #ifdef HAVE_CHARGE_CTRL
@@ -479,7 +485,7 @@ static void power_thread(void)
                     } else {
                         /* calculate max charge time depending on current battery level */
                         /* take 35% more because battery level is not linear */
-                        i = CHARGE_MAX_TIME_1500 * BATTERY_CAPACITY / 1500;
+                        i = CHARGE_MAX_TIME_1500 * battery_capacity / 1500;
                         charge_max_time_now = i * (100 + 35 - battery_level()) / 100;
                         if (charge_max_time_now > i) {
                           charge_max_time_now = i;
@@ -542,7 +548,7 @@ void power_init(void)
        flickering during the first minute of execution */
     power_history[POWER_HISTORY_LEN-1] = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
     /* calculate the remaining time to that the info screen displays something useful */
-    powermgmt_est_runningtime_min = battery_level() * BATTERY_CAPACITY / 100 * 60 / CURRENT_NORMAL;
+    powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / CURRENT_NORMAL;
 
 #ifdef HAVE_CHARGE_CTRL
     snprintf(power_message, POWER_MESSAGE_LEN, "Powermgmt started");
