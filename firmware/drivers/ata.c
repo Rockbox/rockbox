@@ -327,10 +327,10 @@ int ata_write_sectors(unsigned long start,
         buf += SECTOR_SIZE;
     }
 
-    led(false);
-
     if(!wait_for_end_of_transfer())
         i = -3;
+
+    led(false);
 
     mutex_unlock(&ata_mtx);
 
