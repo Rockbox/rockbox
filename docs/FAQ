@@ -622,3 +622,7 @@ A70: We have no way of knowing the correct contrast setting from start and the
 
      F1, down, right, down, down, right, down, down, down, right, down (until
      you like the contrast)
+
+Q71: Where are the FM controls for the FM Recorder?
+A71: There aren't any.  This is not yet implimented under Rockbox.  FM Recorder
+     support in general is new.  Be patient.
