@@ -187,14 +187,14 @@ int main (int argc, char** argv)
         {
             int xorlen = strlen(xorstring);
 
-            /* calculate checksum */
-            for (i=0; i<slen; i++)
-                crc += outbuf[i];
-
             /* xor data */
             for (i=0; i<slen; i++)
                 outbuf[i] ^= xorstring[i & (xorlen-1)];
             
+            /* calculate checksum */
+            for (i=0; i<slen; i++)
+                crc += outbuf[i];
+
             header[0] = header[2] = 'Z';
             header[1] = header[3] = version;
             int2le(length, &header[4]);
