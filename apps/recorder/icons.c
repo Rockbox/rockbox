@@ -237,7 +237,6 @@ void statusbar_icon_volume(int percent)
             snprintf(buffer, sizeof(buffer), "%2d", percent);
 #if defined(LCD_PROPFONTS)
             lcd_getstringsize(buffer, 0, &width, &height);
-            width += strlen(buffer) - 1;
 #elif defined(LOADABLE_FONTS)
             font = lcd_getcurrentldfont();
             lcd_getstringsize(buffer, font, &width, &height);
@@ -320,7 +319,6 @@ void statusbar_time(void)
              minute & 0x0f);
 #if defined(LCD_PROPFONTS)
     lcd_getstringsize(buffer, 0, &width, &height);
-    width += strlen(buffer) - 1;
 #elif defined(LOADABLE_FONTS)
     font = lcd_getcurrentldfont();
     lcd_getstringsize(buffer, font, &width, &height);
