@@ -1286,6 +1286,7 @@ static void mpeg_thread(void)
     int startpos;
     int rc;
     int offset;
+    int countdown;
 #endif
     
     is_playing = false;
@@ -1964,67 +1965,81 @@ static void mpeg_thread(void)
 
                 case MPEG_NEW_FILE:
                     /* Make sure we have at least one complete frame
-                       in the buffer */
+                       in the buffer. If we haven't recorded a single
+                       frame within 200ms, the MAS is probably not recording
+                       anything, and we bail out. */
+                    countdown = 20;
                     amount_to_save = get_unsaved_space();
-                    while(amount_to_save < 1800)
+                    while(countdown-- && amount_to_save < 1800)
                     {
                         sleep(HZ/10);
                         amount_to_save = get_unsaved_space();
                     }
 
-                    /* Now find a frame boundary to split at */
-                    startpos = mp3buf_write - 1800;
-                    if(startpos < 0)
-                        startpos += mp3buflen;
-
+                    if(amount_to_save >= 1800)
                     {
-                        unsigned long tmp[2];
-                        /* Find out how the mp3 header should look like */
-                        mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
-                        saved_header = 0xffe00000 |
-                            ((tmp[0] & 0x7c00) << 6) |
-                            (tmp[1] & 0xffff);
-                        DEBUGF("Header: %08x\n", saved_header);
-                    }
-
-                    rc = mem_find_next_frame(startpos, &offset, 1800,
-                                             saved_header);
-                    if(rc) /* Header found? */
-                    {
-                        /* offset will now contain the number of bytes to
-                           add to startpos to find the frame boundary */
-                        startpos += offset;
-                        if(startpos >= mp3buflen)
-                            startpos -= mp3buflen;
+                        /* Now find a frame boundary to split at */
+                        startpos = mp3buf_write - 1800;
+                        if(startpos < 0)
+                            startpos += mp3buflen;
+                        
+                        {
+                            unsigned long tmp[2];
+                            /* Find out how the mp3 header should look like */
+                            mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
+                            saved_header = 0xffe00000 |
+                                ((tmp[0] & 0x7c00) << 6) |
+                                (tmp[1] & 0xffff);
+                            DEBUGF("Header: %08x\n", saved_header);
+                        }
+                        
+                        rc = mem_find_next_frame(startpos, &offset, 1800,
+                                                 saved_header);
+                        if(rc) /* Header found? */
+                        {
+                            /* offset will now contain the number of bytes to
+                               add to startpos to find the frame boundary */
+                            startpos += offset;
+                            if(startpos >= mp3buflen)
+                                startpos -= mp3buflen;
+                        }
+                        else
+                        {
+                            /* No header found. Let's save the whole buffer. */
+                            startpos = mp3buf_write;
+                        }
                     }
                     else
                     {
-                        /* No header found. Let's save the whole buffer. */
+                        /* Too few bytes recorded, timeout */
                         startpos = mp3buf_write;
                     }
-
+                    
                     amount_to_save = startpos - mp3buf_read;
-                    if(amount_to_save < 0)
-                        amount_to_save += mp3buflen;
+                        if(amount_to_save < 0)
+                            amount_to_save += mp3buflen;
 
                     /* First save up to the end of the buffer */
                     writelen = MIN(amount_to_save,
                                    mp3buflen - mp3buf_read);
                     
-                    rc = write(mpeg_file, mp3buf + mp3buf_read, writelen);
-                    if(rc < 0)
+                    if(writelen)
                     {
-                        if(errno == ENOSPC)
+                        rc = write(mpeg_file, mp3buf + mp3buf_read, writelen);
+                        if(rc < 0)
                         {
-                            mpeg_errno = MPEGERR_DISK_FULL;
-                            demand_irq_enable(false);
-                            stop_recording();
-                            queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
-                            break;
-                        }
-                        else
-                        {
-                            panicf("rec wrt: %d", rc);
+                            if(errno == ENOSPC)
+                            {
+                                mpeg_errno = MPEGERR_DISK_FULL;
+                                demand_irq_enable(false);
+                                stop_recording();
+                                queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                                break;
+                            }
+                            else
+                            {
+                                panicf("spt wrt: %d", rc);
+                            }
                         }
                     }
 
