@@ -108,9 +108,16 @@ struct tag_resolver {
 };
 
 /* parse numeric value from string */
-static int parsenum( struct mp3entry* entry, char* tag, int bufferpos )
+static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
 {
     entry->tracknum = atoi( tag );
+    return bufferpos;
+}
+
+/* parse numeric value from string */
+static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    entry->year = atoi( tag );
     return bufferpos;
 }
 
@@ -134,9 +141,9 @@ static struct tag_resolver taglist[] = {
     { "TIT2", 4, offsetof(struct mp3entry, title), NULL },
     { "TT2",  3, offsetof(struct mp3entry, title), NULL },
     { "TALB", 4, offsetof(struct mp3entry, album), NULL },
-    { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsenum },
-    { "TYER", 4, offsetof(struct mp3entry, year_string), &parsenum },
-    { "TYR",  3, offsetof(struct mp3entry, year_string), &parsenum },
+    { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum },
+    { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
+    { "TYR",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL }
 };
