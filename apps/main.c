@@ -36,6 +36,9 @@
 #ifndef SIMULATOR
 #include "dmalloc.h"
 #include "bmalloc.h"
+#ifndef DEBUG
+#include "serial.h"
+#endif
 #endif
 #include "mpeg.h"
 #include "main_menu.h"
@@ -49,6 +52,7 @@
 #ifdef LOADABLE_FONTS
 #include "unicode.h"
 #endif
+
 
 char appsversion[]=APPSVERSION;
 
@@ -98,6 +102,8 @@ void init(void)
 
 #ifdef DEBUG
     debug_init();
+#else
+    serial_setup();
 #endif
     set_irq_level(0);
 

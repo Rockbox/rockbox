@@ -20,12 +20,6 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
 
-#include <sh7034.h>
-#include <system.h>
-
-extern void serial_putc (char);
-extern void serial_puts (char const *); 
-extern int  serial_getc (void);
-extern void serial_setup (int); 
+extern void serial_setup (void);
 
 #endif

@@ -38,6 +38,10 @@ int button_set_release(int newmask);
 #define	BUTTON_LEFT		0x0040
 #define	BUTTON_RIGHT		0x0080
 
+/* remote control buttons */
+#define BUTTON_VOL_UP           0x1000
+#define BUTTON_VOL_DOWN         0x1001
+
 /* Button modifiers */
 #define	BUTTON_REPEAT		0x4000
 #define	BUTTON_REL		0x8000

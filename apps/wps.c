@@ -296,6 +296,9 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
+#else
+            case BUTTON_VOL_UP:
+#endif
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
@@ -310,8 +313,12 @@ int wps_show(void)
                 status_draw();
                 break;
 
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
+#else
+            case BUTTON_VOL_DOWN:
+#endif
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
@@ -325,7 +332,6 @@ int wps_show(void)
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 status_draw();
                 break;
-#endif
 
             case BUTTON_LEFT:
                 if (keys_locked)
