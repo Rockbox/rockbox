@@ -7,14 +7,13 @@
 
 <p>Useful links for do-it-yourselfers:
 <ul>
-<li><a href="cross-gcc.html">Building the SH1 cross compiler</a>
+<li><a href="cross-gcc.html">Building the SH1 cross compiler</a> (unix/linux/cygwin)
 <li><a href="sh-win/">Setting up an SH1 cross compiler for Windows</a>
-<li><a href="docs/how_to_compile.html">README from the docs directory</a>,
-describing how to compile Rockbox
-<lI><a href="manual/">The Rockbox Manual</a>
+<li><a href="docs/how_to_compile.html">How to compile Rockbox from source</a>
+<lI><a href="manual/">The Rockbox User's Manual</a>
 </ul>
 
-<a name="target_builds">
+<a name="target_builds"></a>
 <h2>Target builds</h2>
 
 <p>These are automated daily builds of the CVS code.
@@ -36,7 +35,7 @@ The batch timestamp is GMT.
 <p>
 <!--#include virtual="buildstatus.link" -->
 
-<a name="bleeding_edge">
+<a name="bleeding_edge"></a>
 <h2>Bleeding edge builds</h2>
 
 <p>These builds are as "bleeding edge" as you can get. Up-to-date builds of the latest CVS code (the top line from the above table):
