@@ -21,9 +21,29 @@
 #include <pthread.h>
 
 #include "kernel.h"
-#include <poll.h>
+#include <sys/time.h>
 
 long current_tick = 0;
+
+/*
+ * This is not a target thread, so it does not fall under the 1 thread at a
+ * time thing.
+ */
+static void update_tick_thread()
+{
+    struct timeval start, now, delay;
+
+    gettimeofday(&start, NULL);
+    while (1)
+    {
+        delay.tv_sec = 0;
+        delay.tv_usec = (1000000/HZ/4);  /* check 4 times per target tick */
+        select(0, NULL, NULL, NULL, &delay); /* portable sub-second sleep */
+        gettimeofday(&now, NULL);
+        current_tick = (now.tv_sec - start.tv_sec) * HZ
+                     + (now.tv_usec - start.tv_usec) * HZ / 1000000;
+    }
+}
 
 /*
  * We emulate the target threads by using pthreads. We have a mutex that only
@@ -35,11 +55,14 @@ pthread_mutex_t mp;
 
 void init_threads(void)
 {  
-  pthread_mutex_init(&mp, NULL);
-  /* get mutex to only allow one thread running at a time */
-  pthread_mutex_lock(&mp);
+    pthread_t tick_tid;
 
-  current_tick = time(NULL); /* give it a boost from start! */
+    pthread_mutex_init(&mp, NULL);
+    /* get mutex to only allow one thread running at a time */
+    pthread_mutex_lock(&mp);
+
+    pthread_create(&tick_tid, NULL, (void *(*)(void *)) update_tick_thread, 
+                   NULL);
 }
 /* 
    int pthread_create(pthread_t *new_thread_ID,
@@ -49,49 +72,49 @@ void init_threads(void)
 
 void yield(void)
 {
-  current_tick+=3;
-  pthread_mutex_unlock(&mp); /* return */
-  pthread_mutex_lock(&mp); /* get it again */
+    pthread_mutex_unlock(&mp); /* return */
+    pthread_mutex_lock(&mp); /* get it again */
 }
 
 void newfunc(void (*func)(void))
 {
-    yield();
+    pthread_mutex_lock(&mp);
     func();
+    pthread_mutex_unlock(&mp); 
 }
 
 
 int create_thread(void* fp, void* sp, int stk_size)
 {
-  pthread_t tid;
-  int i;
-  int error;
+    pthread_t tid;
+    int i;
+    int error;
 
-  /* we really don't care about these arguments */
-  (void)sp;
-  (void)stk_size;
-  error = pthread_create(&tid,
-                         NULL,   /* default attributes please */
-                         (void *(*)(void *)) newfunc,   /* function to start */
-                         fp      /* start argument */);
-  if(0 != error)
-      fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
-  else 
-      fprintf(stderr, "Thread %ld is running\n", (long)tid);
+    /* we really don't care about these arguments */
+    (void)sp;
+    (void)stk_size;
+    error = pthread_create(&tid,
+                           NULL,   /* default attributes please */
+                           (void *(*)(void *)) newfunc, /* function to start */
+                           fp      /* start argument */);
+    if(0 != error)
+        fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
+    else
+        fprintf(stderr, "Thread %ld is running\n", (long)tid);
 
-  yield();
+    yield();
 
-  return error;
+    return error;
 }
 
-/* ticks is HZ per second */
 void sim_sleep(int ticks)
 {
-    current_tick+=5;
-    pthread_mutex_unlock(&mp); /* return */
-    /* portable subsecond "sleep" */
-    poll((void *)0, 0, ticks * 1000/HZ);
+    struct timeval delay;
 
+    pthread_mutex_unlock(&mp); /* return */
+    delay.tv_sec = ticks / HZ;
+    delay.tv_usec = (ticks - HZ * delay.tv_sec) * (1000000/HZ);
+    select(0, NULL, NULL, NULL, &delay);   /* portable subsecond sleep */
     pthread_mutex_lock(&mp); /* get it again */
 }
 
