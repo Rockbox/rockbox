@@ -70,13 +70,3 @@ void t2(void)
       switch_thread();
    }
 }
-
-extern const void stack(void);
-
-const void* vectors[] __attribute__ ((section (".vectors"))) = 
-{
-   main,	/* Power-on reset */
-   stack,	/* Power-on reset (stack pointer) */
-   main,	/* Manual reset */
-   stack	/* Manual reset (stack pointer) */
-};

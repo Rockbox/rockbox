@@ -6,10 +6,15 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-I../../ -I../../drivers
 
-CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
+# Pick a target to build for
+#TARGET = -DARCHOS_PLAYER=1
+TARGET = -DARCHOS_PLAYER_OLD=1
+#TARGET = -DARCHOS_RECORDER=1
+
+CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET)
 AFLAGS += -small -relax
 
-OBJS= crt0.o main.o ../../thread.o ../../debug.o
+OBJS= ../../crt0.o ../../drivers/lcd.o ../../system.o main.o ../../thread.o ../../debug.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<

@@ -6,8 +6,7 @@ SECTIONS
     {
 	*(.vectors)
         . = ALIGN(0x200);
-        crt0.o(.text)
-        *(.rodata)
+        *(.init.text)
     }
 
     .text :
@@ -17,7 +16,13 @@ SECTIONS
 
     .data :
     {
+        *(.rodata)
         *(.data)
+    }
+
+    .rodata :
+    {
+        *(.rodata)
     }
 
     .bss :
