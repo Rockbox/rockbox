@@ -563,6 +563,13 @@ void set_current_file(char *path)
     char *name;
     unsigned int i;
 
+    /* in ID3DB mode it is a bad idea to call this function */
+    /* (only happens with `follow playlist') */
+    if( *tc.dirfilter == SHOW_ID3DB )
+    {
+        return;
+    }
+
     /* separate directory from filename */
     name = strrchr(path+1,'/');
     if (name)
