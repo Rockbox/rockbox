@@ -17,15 +17,12 @@ The GNU-SH Tool Chain for Windows
 </H2>
 <P>
 This is actually all you need to download. It includes the binutils, gcc and 
-newlib. The complete GNUSH Tool Chain (currently v0101) is 117MB but for you it 
-is enough to download the GNUSH Tool Chain for ELF format (45 MB).
+newlib. Download the GNUSH Tool Chain for ELF format (13 MB).
 
 <P>
-The GNUSH website can be found at <a href="http://www.kpit.com/download/downloadgnu.htm">
-http://www.kpit.com/download/downloadgnu.htm</a> (source code is also 
-available there) and the direct link to the file you need is <a href="http://www.kpit.com/download/elf.zip">
-http://www.kpit.com/download/elf.zip</a>. It uses the cygwin dll to emulate 
-a linux layer but you do not have to care about that.
+The GNUSH website can be found at <a href="http://www.kpit.com/download/downloadgnush.htm">
+http://www.kpit.com/download/downloadgnush.htm</a> (source code is also 
+available there). The new v0202 version now uses MinGW instead of Cygwin.
 
 <H2>
 Setting up&nbsp;the Compiler

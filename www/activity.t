@@ -3,11 +3,11 @@
 
 <table>
 <tr bgcolor="#cccccc"><th>Person</th><th>Activity</th><th>Current status</th></tr><tr>
-STATUS(Björn,Web page; I2C driver and MAS serial port,Janitor duty - trying to repair his Archos...)
-STATUS(Linus,Serial port GDB stub to bring remote debugging to the archos,Released)
-STATUS(Alan,FAT-32 file system and handling,Can create files. Not safe yet ;->)
+STATUS(Björn,Web page; I2C driver and MAS serial port,Waiting for a new jukebox)
+STATUS(Linus,I2C communication,Researching)
+STATUS(Alan,FAT-32 file system and memory manager,Developing)
 STATUS(Daniel,GUI simulator for X11,Compiles)
-STATUS(Rob,Assembling a FAQ,Just began)
+STATUS(Rob,Writing the FAQ,First version published)
 STATUS(Gary,Recorder lcd code and ui simulator,Writing code)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
