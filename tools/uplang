@@ -37,13 +37,24 @@ while(<ENG>) {
 close(ENG);
 
 undef %set;
+my $cblock = 1;
 open(NEW, "<$ARGV[1]");
 while(<NEW>) {
+    $_ =~ s/\r//g;
+
     if($_ =~ /^ *\#/) {
         # comment
+        if($_ !~ /^ *\#\#\#/) {
+            # no special ### comment -> keep it
+            if(!$cblock) {
+                print "\n";
+                $cblock = 1;
+            }
+            print $_;
+        }
         next;
     }
-    $_ =~ s/\r//g;
+    $cblock = 0;
 
     if($_ =~ /^ *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
@@ -54,7 +65,7 @@ while(<NEW>) {
             # the last one for a single phrase
 
             if(!$ids{$set{'id'}}) {
-                print "### ".$set{'id'}." was not found in the english file!\n";
+                print "\n### ".$set{'id'}." was not found in the english file!\n";
                 next;
             }
 
