@@ -345,6 +345,7 @@ void a52_imdct_256 (sample_t * data, sample_t * delay, sample_t bias)
     }
 }
 
+/*
 static double besselI0 (double x)
 {
     double bessel = 1;
@@ -355,11 +356,13 @@ static double besselI0 (double x)
     while (--i);
     return bessel;
 }
+*/
 
 void a52_imdct_init (uint32_t mm_accel)
 {
-    int i, k;
-/*    double sum;
+  (void)mm_accel;
+/*    int i, k;
+    double sum;
     double local_imdct_window[256];*/
 
     /* compute imdct window - kaiser-bessel derived window, alpha = 5.0 */

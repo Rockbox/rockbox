@@ -155,6 +155,6 @@ typedef int16_t quantizer_t;
 
 #define MUL_C(a,b) MUL_L (a, LEVEL (b))
 #define DIV(a,b) ((((int64_t)LEVEL (a)) << 26) / (b))
-#define BIAS(x) (x)
+#define BIAS(x) ((x) + (bias*0))
 
 #endif
