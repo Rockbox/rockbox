@@ -379,7 +379,7 @@ static bool mp3frameheader(unsigned long head)
  *            entry - the entry to update with the length
  *
  * Returns: the song length in milliseconds, 
- *          -1 means that it couldn't be calculated
+ *          0 means that it couldn't be calculated
  */
 static int getsonglength(int fd, struct mp3entry *entry)
 {
@@ -408,13 +408,13 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     /* Start searching after ID3v2 header */ 
     if(-1 == lseek(fd, entry->id3v2len, SEEK_SET))
-        return -1;
+        return 0;
 	
     /* Fill up header with first 24 bits */
     for(version = 0; version < 3; version++) {
         header <<= 8;
         if(!read(fd, &tmp, 1))
-            return -1;
+            return 0;
         header |= tmp;
     }
 	
@@ -424,13 +424,13 @@ static int getsonglength(int fd, struct mp3entry *entry)
     do {
         header <<= 8;
         if(!read(fd, &tmp, 1))
-            return -1;
+            return 0;
         header |= tmp;
 
         /* Quit if we haven't found a valid header within 128K */
         bytecount++;
         if(bytecount > 0x20000)
-            return -1;
+            return 0;
     } while(!mp3frameheader(header));
 	
     /* 
@@ -630,6 +630,11 @@ bool mp3info(struct mp3entry *entry, char *filename)
         setid3v1title(fd, entry);
 
     close(fd);
+
+    if(!entry->length || (entry->filesize < 8 ))
+        /* no song length or less than 8 bytes is hereby considered to be an
+           invalid mp3 and won't be played by us! */
+        return true;
 
     return false;
 }
