@@ -290,7 +290,7 @@ void statusbar_icon_lock(void)
 /*
  * Print time to status bar
  */
-void statusbar_time(int minutes)
+void statusbar_time(int hour, int minute)
 {
     unsigned char buffer[6];
     unsigned int width, height;
@@ -298,22 +298,13 @@ void statusbar_time(int minutes)
     unsigned char *font;
 #endif
 
-    int hour = minutes / 60;
-    int minute = minutes % 60;
-
     if ( hour >= 0 && 
          hour <= 23 &&
          minute >= 0 && 
-         minute <= 59 )
-    {
-        snprintf(buffer, sizeof(buffer), "%d%d:%d%d",
-                 (hour & 0x30) >> 4,
-                 hour & 0x0f,
-                 (minute & 0xf0) >> 4,
-                 minute & 0x0f);
+         minute <= 59 ) {
+        snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
     }
-    else
-    {
+    else {
         strncpy(buffer, "--:--", sizeof buffer);
     }
 

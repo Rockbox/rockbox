@@ -86,6 +86,6 @@ extern void statusbar_icon_play_mode(int mode);
 extern void statusbar_icon_shuffle(void);
 extern void statusbar_icon_lock(void);
 #ifdef HAVE_RTC
-extern void statusbar_time(int minutes);
+extern void statusbar_time(int hour, int minute);
 #endif
 #endif /* End HAVE_LCD_BITMAP */

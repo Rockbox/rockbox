@@ -69,6 +69,9 @@ void status_draw(void)
 {
     int battlevel = battery_level();
     int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+#ifdef HAVE_LCD_BITMAP
+    int hour, minute;
+#endif
     
 #if defined(HAVE_LCD_CHARCELLS)
     lcd_icon(ICON_BATTERY, true);
@@ -172,7 +175,11 @@ void status_draw(void)
         if (keys_locked)
             statusbar_icon_lock();
 #ifdef HAVE_RTC
-        statusbar_time( rtc_read(3)*60 + rtc_read(2) );
+        hour = rtc_read(3);
+        hour = ((hour & 0x30) >> 4) * 10 + (hour & 0x0f);
+        minute = rtc_read(2);
+        minute = ((minute & 0x70) >> 4) * 10 + (minute & 0x0f);
+        statusbar_time(hour, minute);
 #endif
 
 #ifdef SIMULATOR
