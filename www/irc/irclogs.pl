@@ -7,7 +7,7 @@ opendir(DIR, ".") or
 @logs = sort grep { /^rockbox-/ } readdir(DIR);
 closedir DIR;
 
-print "<table><tr valign=top>\n";
+print "<table class=archive>\n";
 
 $lasty = 0;
 $lastm = 0;
@@ -23,17 +23,16 @@ for ( @logs ) {
             $d = $3;
             $mname = ucfirst MonthNameEng($m);
             if ( $m != $lastm ) {
-                print "</ul></td>\n" if $lastm != 0;
+                print "</tr><tr>\n" if $lastm != 0;
 #                if ( $m % 6 == 0 ) {
 #                    print "</tr><tr valign=top>\n";
 #                }
-                print "<td align=\"right\"><b>$mname $y</b>\n";
-                print "<ul>\n";
+                print "<th>$mname</th>\n";
                 $lastm = $m;
             }
 #            $lines = `wc -l $file` + 0;
 #            print "<li><a test href=\"$file\">$mname $d</a> <small>($lines lines)</small>\n";
-            print "<li><a test href=\"$file\">$mname $d</a>\n";
+            print "<td><a test href=\"$file\">$d</a></td>\n";
         }
     }
     #print "<li><a href=\"daily/$_\">$_</a> ($size bytes) $log\n";

@@ -12,3 +12,4 @@ elinenbe    => Eric Linenberg
 dwihno      => Magnus Öman
 Ironi       => Tom Cvitan
 notch       => Nick Robinson
+Merwin      => Justin Heiner
