@@ -8,9 +8,9 @@
 #
 
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
--I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DPLUGIN
+ -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib
+CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)	\
+ -DMEM=${MEMORYSIZE} -DPLUGIN
 
 ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -20,7 +20,8 @@ LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
 
-SRC := $(wildcard *.c)
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE)	\
+ $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
 SOURCES = $(SRC)
 ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)

@@ -17,7 +17,7 @@ ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
+CFLAGS = $(GCCOPTS) \
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 ifdef DEBUG
@@ -26,7 +26,7 @@ else
 CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
-SRC := $(wildcard *.c)
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-pluginlib

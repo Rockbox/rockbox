@@ -18,21 +18,19 @@ ifdef DEBUG
     CFLAGS += -g
 endif
 
-SRC := $(wildcard *.c)
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
 # set the ROMTARGET here
 ROMTARGET := $(ARCHOSROM)
 
 ifdef APPEXTRA
-   SRC += $(wildcard $(APPEXTRA)/*.c)
    DIRS += $(APPEXTRA)
    INCLUDES += -I$(APPEXTRA)
 endif
 
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
--fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)	\
--DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES)			\
+ -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
 SOURCES = $(SRC)

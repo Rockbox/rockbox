@@ -9,19 +9,12 @@
 
 INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
-ifdef DEBUG
-CFLAGS += -g -DDEBUG
-else
-CFLAGS += -fomit-frame-pointer -fschedule-insns
-endif
-
-SRC := $(wildcard drivers/*.c common/*.c *.c)
-SRC_S := $(wildcard drivers/*.S common/*.S *.S)
-SOURCES = $(SRC) $(SRC_S)
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(SRC_S:%.S=$(OBJDIR)/%.o) $(OBJDIR)/sysfont.o
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+SOURCES = $(SRC)
+OBJS2 := $(patsubst %.c, $(OBJDIR)/%.o, $(SRC)) $(OBJDIR)/sysfont.o
+OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DIRS:=. drivers common
 OUTPUT = $(OBJDIR)/librockbox.a
 DEPFILE = $(OBJDIR)/dep-firmware

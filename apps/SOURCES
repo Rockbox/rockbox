@@ -1,0 +1,42 @@
+alarm_menu.c
+bookmark.c
+credits.c
+debug_menu.c
+filetypes.c
+language.c
+main.c
+main_menu.c
+menu.c
+misc.c
+onplay.c
+playlist.c
+playlist_menu.c
+playlist_viewer.c
+plugin.c
+screens.c
+settings.c
+settings_menu.c
+sleeptimer.c
+sound_menu.c
+status.c
+talk.c
+tree.c
+wps-display.c
+wps.c
+#ifdef HAVE_LCD_CHARCELLS
+player/icons.c
+player/keyboard.c
+#endif
+#ifdef HAVE_LCD_BITMAP
+recorder/bmp.c
+recorder/icons.c
+recorder/keyboard.c
+recorder/peakmeter.c
+recorder/widgets.c
+#endif
+#ifdef CONFIG_TUNER
+recorder/radio.c
+#endif
+#ifdef HAVE_RECORDING
+recorder/recording.c
+#endif
