@@ -17,18 +17,22 @@
  *
  ****************************************************************************/
 
+#include <string.h>
+#include <stdlib.h>
+
 #include <dir.h>
+#include <file.h>
 #include <types.h>
 #include <lcd.h>
 #include <button.h>
 #include "kernel.h"
 #include "tree.h"
-#ifdef WIN32
-#include <windows.h>
-#endif // WIN32
 
-#define TREE_MAX_LEN       15
-#define TREE_MAX_ON_SCREEN 7
+#include "play.h"
+
+#define TREE_MAX_FILENAMELEN 64
+#define TREE_MAX_ON_SCREEN   7
+#define TREE_MAX_LEN_DISPLAY 17 /* max length that fits on screen */
 
 int dircursor=0;
 
@@ -36,34 +40,80 @@ void browse_root(void) {
 	dirbrowse("/");
 }
 
-bool dirbrowse(char *root)
-{
-  DIR *dir = opendir(root);
-  int i;
-  struct dirent *entry;
-  char buffer[TREE_MAX_ON_SCREEN][20];
+struct entry {
+  int file; /* TRUE if file, FALSE if dir */
+  char name[TREE_MAX_FILENAMELEN];
+  int namelen;
+};
 
-  if(!dir)
-    return TRUE; /* failure */
+#define LINE_Y      8 /* Y position the entry-list starts at */
+#define LINE_X      6 /* X position the entry-list starts at */
+#define LINE_HEIGTH 8 /* pixels for each text line */
 
 #ifdef HAVE_LCD_BITMAP
-  lcd_clearrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 
-  lcd_puts(0,0, "[Browse]", 0);
+int static
+showdir(char *path, struct entry *buffer, int start)
+{
+  int i;
+  DIR *dir = opendir(path);
+  struct dirent *entry;
 
-  i=0;
+  if(!dir)
+    return 0; /* no entries */
+
+  i=start;
   while((entry = readdir(dir))) {
-    strncpy(buffer[i], entry->d_name, TREE_MAX_LEN);
-    buffer[i][TREE_MAX_LEN]=0;
-    lcd_puts(6, 8+i*8, buffer[i], 0);
+    int len;
+
+    if(entry->d_name[0] == '.')
+      /* skip names starting with a dot */
+      continue;
+
+    len = strlen(entry->d_name);
+    if(len < TREE_MAX_FILENAMELEN)
+      /* strncpy() is evil, we memcpy() instead, +1 includes the
+         trailing zero */
+      memcpy(buffer[i].name, entry->d_name, len+1);
+    else
+      memcpy(buffer[i].name, "too long", 9);
+
+    buffer[i].file = TRUE; /* files only for now */
+
+    if(len < TREE_MAX_LEN_DISPLAY)
+      lcd_puts(LINE_X, LINE_Y+i*LINE_HEIGTH, buffer[i].name, 0);
+    else {
+      char storage = buffer[i].name[TREE_MAX_LEN_DISPLAY];
+      buffer[i].name[TREE_MAX_LEN_DISPLAY]=0;
+      lcd_puts(LINE_X, LINE_Y+i*LINE_HEIGTH, buffer[i].name, 0);
+      buffer[i].name[TREE_MAX_LEN_DISPLAY]=storage;
+    }
 
     if(++i >= TREE_MAX_ON_SCREEN)
       break;
   }
+  i--; /* number of files on screen */
 
   closedir(dir);
 
-  lcd_puts(0, 8+dircursor, "-", 0);
+  return i;
+}
+
+#endif
+
+bool dirbrowse(char *root)
+{
+  struct entry buffer[TREE_MAX_ON_SCREEN];
+  int numentries;
+
+#ifdef HAVE_LCD_BITMAP
+  lcd_clear_display();
+
+  lcd_puts(0,0, "[Browse]", 0);
+
+  numentries = showdir(root, buffer, 0);  
+
+  lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
 
   lcd_update();
 
@@ -79,20 +129,31 @@ bool dirbrowse(char *root)
     case BUTTON_LEFT:
       return FALSE;
       break;
+
+    case BUTTON_RIGHT:
+    case BUTTON_PLAY:
+      playtune(root, buffer[dircursor].name);
+
+      lcd_clear_display();
+      lcd_puts(0,0, "[Browse]", 0);
+      numentries = showdir(root, buffer, 0);  
+      lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
+      lcd_update();
+      break;
       
     case BUTTON_UP:
       if(dircursor) {
-        lcd_puts(0, 8+dircursor, " ", 0);
-        dircursor -= 8;
-        lcd_puts(0, 8+dircursor, "-", 0);
+        lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, " ", 0);
+        dircursor--;
+        lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
         lcd_update();
       }
       break;
     case BUTTON_DOWN:
-      if(dircursor < (8 * TREE_MAX_ON_SCREEN)) {
-        lcd_puts(0, 8+dircursor, " ", 0);
-        dircursor += 8;
-        lcd_puts(0, 8+dircursor, "-", 0);
+      if(dircursor < numentries) {
+        lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, " ", 0);
+        dircursor++;
+        lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
         lcd_update();
       }
       break;
