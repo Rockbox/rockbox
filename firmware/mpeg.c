@@ -1107,10 +1107,12 @@ static void mpeg_thread(void)
                         play_pending = false;
                         playing = true;
 			
-                        last_dma_tick = current_tick;
                         init_dma();
                         if (!paused)
+                        {
+                            last_dma_tick = current_tick;
                             start_dma();
+                        }
 
                         /* Tell ourselves that we need more data */
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
