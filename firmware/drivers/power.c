@@ -36,11 +36,6 @@ void power_init(void)
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
 #endif
-#ifdef HAVE_ATA_POWER_OFF
-    or_b(0x20, &PADRL); /* leave the disk on */
-    or_b(0x20, &PAIORL);
-    PACR2 &= 0xFBFF;
-#endif
 }
 
 bool charger_inserted(void)
@@ -79,15 +74,46 @@ void charger_enable(bool on)
 
 void ide_power_enable(bool on)
 {
-#ifdef HAVE_ATA_POWER_OFF
+    (void)on;
+    bool touched = false;
+
+#ifdef NEEDS_ATA_POWER_ON
     if(on)
+    {
         or_b(0x20, &PADRL);
-    else
+        touched = true;
+    }
+#endif
+#ifdef HAVE_ATA_POWER_OFF
+    if(!on)
+    {
         and_b(~0x20, &PADRL);
+        touched = true;
+    }
+#endif
+
+/* late port preparation, else problems with read/modify/write 
+   of other bits on same port, while input and floating high */
+    if (touched)
+    {
+        or_b(0x20, &PAIORL); /* PA5 is an output */
+        PACR2 &= 0xFBFF; /* GPIO for PA5 */
+    }
+}
+
+
+bool ide_powered(void)
+{
+#if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
+    if ((PACR2 & 0x0400) || !(PAIOR & 0x0020)) // not configured for output
+        return true; // would be floating high, disk on
+    else
+        return (PADR & 0x0020) != 0;
 #else
-    on = on;
+    return TRUE; /* pretend always powered if not controlable */
 #endif
 }
+
 
 void power_off(void)
 {

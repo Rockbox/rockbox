@@ -139,8 +139,9 @@ void PlatformInit(void)
 	PBDR |= 0x20; // set PB5 to keep power (fixes the ON-holding problem)
 	PBIOR |= 0x20; // make PB5 an output
 	if (ReadADC(0) < 0x1FF) // charger plugged?
-	{
-		// how do we switch this off?
+	{	// switch off the HD, else a flat battery may not start
+		PACR2 &= 0xFBFF; // GPIO for PA5
+		PAIOR |= 0x20;	 // make PA5 an output (low by default)
 	}
 #endif
 

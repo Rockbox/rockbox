@@ -27,6 +27,7 @@ void power_init(void);
 bool charger_inserted(void);
 void charger_enable(bool on);
 void ide_power_enable(bool on);
+bool ide_powered(void);
 void power_off(void);
 
 #endif

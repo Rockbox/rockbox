@@ -795,6 +795,12 @@ int ata_init(void)
     ata_enable(true);
 
     if ( !initialized ) {
+        if (!ide_powered()) /* somebody has switched it off */
+        {
+            ide_power_enable(true);
+            sleep(HZ); /* allow voltage to build up */
+        }
+
         if (coldstart)
         {
             /* Reset both master and slave, we don't yet know what's in */

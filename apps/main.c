@@ -144,7 +144,6 @@ void init(void)
         if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
             power_off();
         /* "On" pressed or USB connected: proceed */
-        ide_power_enable(true);
     }
 
     rc = ata_init();
