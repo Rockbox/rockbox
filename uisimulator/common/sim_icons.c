@@ -26,7 +26,7 @@
 #include <string.h>
 #include <debug.h>
 
-#define XPOS_volume 85
+#define XPOS_volume 54
 #define XPOS_volume1 XPOS_volume + 15
 #define XPOS_volume2 XPOS_volume1 + 2
 #define XPOS_volume3 XPOS_volume2 + 2
@@ -152,7 +152,7 @@ static struct icon_info icons [] =
     { record, 35, 0, BMPWIDTH_record, BMPHEIGHT_record },                  /* ICON_RECORD */
     { pause, 50, 0, BMPWIDTH_pause, BMPHEIGHT_pause },                     /* ICON_PAUSE */
     { audio, 40, 40, BMPWIDTH_audio, BMPHEIGHT_audio },                    /* ICON_AUDIO */
-    { repeat, XPOS_volume-13-BMPWIDTH_repeat,
+    { repeat, XPOS_volume-4-BMPWIDTH_repeat,
       0, BMPWIDTH_repeat, BMPHEIGHT_repeat },                              /* ICON_REPEAT */
     { repeat1, XPOS_volume-10, 0, BMPWIDTH_repeat1, BMPHEIGHT_repeat1 },   /* ICON_1 */
     { volume, XPOS_volume, 0, BMPWIDTH_volume, BMPHEIGHT_volume },         /* ICON_VOLUME */
