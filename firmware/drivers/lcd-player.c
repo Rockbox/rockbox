@@ -169,7 +169,7 @@ static int lcd_get_free_pat(int ch)
 
 }
 
-void xlcd_update()
+void xlcd_update(void)
 {
     int x, y;
     for (x=0; x<11; x++) {
@@ -308,7 +308,7 @@ void lcd_putc(int x, int y, unsigned short ch)
       xlcd_update();
 }
 
-unsigned char lcd_get_locked_pattern()
+unsigned char lcd_get_locked_pattern(void)
 {
     unsigned char pat=1;
     while (pat<LAST_RESERVED_CHAR) {

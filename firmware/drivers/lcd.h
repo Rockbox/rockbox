@@ -85,7 +85,7 @@ enum
 extern void lcd_define_hw_pattern (int which,char *pattern,int length);
 extern void lcd_define_pattern (int which,char *pattern);
 extern void lcd_double_height (bool on);
-unsigned char lcd_get_locked_pattern();
+unsigned char lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned char pat);
 
 #endif
