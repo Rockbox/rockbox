@@ -178,7 +178,7 @@ bool gameover(void)
         if(block_touch(x + block_data[block][frame][1][i] * 4, y + block_data[block][frame][0][i] * 3)) 
         {
             /* Are we at the top of the frame? */
-            if(y + block_data[block][frame][1][i] * 4 < start_y)
+            if(x + block_data[block][frame][1][i] * 4 >= max_x - 16)
             {
                 /* Game over ;) */
                 return true;
@@ -354,16 +354,10 @@ void game_loop(void)
         
         if(gameover())
         {
-            int w, h;
-
-            lcd_getfontsize(TETRIS_TITLE_FONT, &w, &h);
-            lcd_clearrect(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, 
-                            TETRIS_TITLE_XLOC+(w*sizeof(TETRIS_TITLE)), 
-                            TETRIS_TITLE_YLOC-h);
-            lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
-                        TETRIS_TITLE_FONT);
+            lcd_clearrect(0, 52, LCD_WIDTH, LCD_HEIGHT - 52);
+            lcd_putsxy (2, 52, "You lose!", 0);
             lcd_update();
-            sleep(HZ);
+            sleep(HZ * 3);
             return;
         }
 
