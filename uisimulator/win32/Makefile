@@ -60,7 +60,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
 FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c backlight.c usb.c \
-        mpeg.c
+        mpeg.c powermgmt.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c status.c
@@ -159,6 +159,9 @@ $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/powermgmt.o: $(FIRMWAREDIR)/powermgmt.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings.o: $(APPDIR)/settings.c
