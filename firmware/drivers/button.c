@@ -34,6 +34,9 @@
 struct event_queue button_queue;
 
 long last_keypress;
+#ifdef HAVE_RECORDER_KEYPAD
+static bool flipped; /* bottons can be flipped to match the LCD flip */
+#endif
 
 /* how often we check to see if a button is pressed */
 #define POLL_FREQUENCY    HZ/20
@@ -212,6 +215,47 @@ void button_init()
 #endif
     queue_init(&button_queue);
     tick_add_task(button_tick);
+    last_keypress = current_tick;
+    flipped = false;
+}
+
+
+/*
+ * set the flip attribute
+ * better only call this when the queue is empty
+ */
+void button_set_flip(bool flip)
+{
+    flipped = flip;
+}
+
+
+/*
+ * helper function to swap UP/DOWN, LEFT/RIGHT, F1/F3
+ */
+static int button_flip(int button)
+{
+    int newbutton;
+
+    newbutton = button & 
+        ~(BUTTON_UP | BUTTON_DOWN
+        | BUTTON_LEFT | BUTTON_RIGHT 
+        | BUTTON_F1 | BUTTON_F3);
+
+    if (button & BUTTON_UP)
+        newbutton |= BUTTON_DOWN;
+    if (button & BUTTON_DOWN)
+        newbutton |= BUTTON_UP;
+    if (button & BUTTON_LEFT)
+        newbutton |= BUTTON_RIGHT;
+    if (button & BUTTON_RIGHT)
+        newbutton |= BUTTON_LEFT;
+    if (button & BUTTON_F1)
+        newbutton |= BUTTON_F3;
+    if (button & BUTTON_F3)
+        newbutton |= BUTTON_F1;
+
+    return newbutton;
 }
 
 /*
@@ -276,6 +320,9 @@ static int button_read(void)
 #endif
         }
     }
+
+    if (btn && flipped)
+        return button_flip(btn); /* swap upside down */
   
     return btn;
 }

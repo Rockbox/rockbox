@@ -29,6 +29,9 @@ extern long last_keypress;
 void button_init (void);
 int button_get (bool block);
 int button_get_w_tmo(int ticks);
+#ifdef HAVE_RECORDER_KEYPAD
+void button_set_flip(bool flip); /* turn 180 degrees */
+#endif
 
 #define	BUTTON_NONE		0x0000
 

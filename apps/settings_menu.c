@@ -107,6 +107,20 @@ static bool invert_cursor(void)
 }
 
 /**
+ * Menu to turn the display+buttons by 180 degrees
+ */
+static bool flip_display(void)
+{
+    bool rc = set_bool( str(LANG_FLIP_DISPLAY),
+                        &global_settings.flip_display);
+    
+    button_set_flip(global_settings.flip_display);
+    lcd_set_flip(global_settings.flip_display);
+
+    return rc;
+}
+
+/**
  * Menu to configure the battery display on status bar
  */
 static bool battery_type(void)
@@ -362,7 +376,7 @@ static bool peak_meter_menu(void)
         { str(LANG_PM_MAX)      , peak_meter_max       },
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -757,7 +771,7 @@ static bool playback_settings_menu(void)
 
     bool old_shuffle = global_settings.playlist_shuffle;
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
 
@@ -836,7 +850,7 @@ static bool fileview_settings_menu(void)
         { str(LANG_FOLLOW),       browse_current      },
     };
 
-    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -861,7 +875,7 @@ static bool scroll_settings_menu(void)
 #endif
     };
 
-    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -884,6 +898,7 @@ static bool display_settings_menu(void)
         { str(LANG_STATUS_BAR),      status_bar },
         { str(LANG_INVERT),          invert },
         { str(LANG_INVERT_CURSOR),   invert_cursor },
+        { str(LANG_FLIP_DISPLAY),    flip_display },
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },
@@ -892,7 +907,7 @@ static bool display_settings_menu(void)
         { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -929,7 +944,7 @@ static bool system_settings_menu(void)
         { str(LANG_RESET),          reset_settings },
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -954,7 +969,7 @@ bool settings_menu(void)
         { str(LANG_SAVE_SETTINGS),   settings_save_config   },
     };
     
-    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
     result = menu_run(m);
     menu_exit(m);
     return result;

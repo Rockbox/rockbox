@@ -41,3 +41,7 @@ void lcd_blit(unsigned char* p_data, int x, int y, int width, int height,
     (void)stride;
 }
     
+void lcd_set_flip(bool yesno)
+{
+    (void)yesno;
+}

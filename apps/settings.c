@@ -103,6 +103,7 @@ offset  abs
 0x1a    0x2e    <time until disk spindown>
 0x1b    0x2f    <browse current, play selected, recursive dir insert>
 0x1c    0x30    <peak meter hold timeout (bit 0-4),
+                 flip_display (bit 6)
                  rec_editable (bit 7)>
 0x1d    0x31    <(int) Resume shuffle seed, or -1 if no shuffle>
 0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
@@ -362,6 +363,7 @@ int settings_save( void )
          ((global_settings.recursive_dir_insert & 3) << 2));
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
+        (global_settings.flip_display ? 0x40 : 0) |
         (global_settings.rec_editable?0x80:0);
 
     memcpy(&config_block[0x1d], &global_settings.resume_seed, 4);
@@ -516,6 +518,9 @@ void settings_apply(void)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_set_invert_display(global_settings.invert);
+    lcd_set_flip(global_settings.flip_display);
+    button_set_flip(global_settings.flip_display);
+    lcd_update(); /* refresh after flipping the screen */
     settings_apply_pm_range();
     peak_meter_init_times(
         global_settings.peak_meter_release, global_settings.peak_meter_hold, 
@@ -660,6 +665,8 @@ void settings_load(void)
 
         if (config_block[0x1c] != 0xFF) {
             global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
+            global_settings.flip_display =
+                (config_block[0x1c] & 0x40)?true:false;
             global_settings.rec_editable =
                 (config_block[0x1c] & 0x80)?true:false;
         }
@@ -970,6 +977,8 @@ bool settings_load_config(char* file)
             set_cfg_bool(&global_settings.scrollbar, value);
         else if (!strcasecmp(name, "invert"))
             set_cfg_bool(&global_settings.invert, value);
+        else if (!strcasecmp(name, "flip diplay"))
+            set_cfg_bool(&global_settings.flip_display, value);
         else if (!strcasecmp(name, "invert cursor"))
             set_cfg_bool(&global_settings.invert_cursor, value);
         else if (!strcasecmp(name, "show icons"))
@@ -1295,6 +1304,8 @@ bool settings_save_config(void)
 #ifdef HAVE_LCD_BITMAP
     fprintf(fd, "invert: %s\r\n", boolopt[global_settings.invert]);
     
+    fprintf(fd, "flip display: %s\r\n", boolopt[global_settings.flip_display]);
+
     fprintf(fd, "invert cursor: %s\r\n",
             boolopt[global_settings.invert_cursor]);
 
@@ -1446,6 +1457,7 @@ void settings_reset(void) {
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = lcd_default_contrast();
     global_settings.invert      = DEFAULT_INVERT_SETTING;
+    global_settings.flip_display= false;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
     global_settings.invert_cursor = DEFAULT_INVERT_CURSOR_SETTING;

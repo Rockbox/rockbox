@@ -220,3 +220,8 @@ void cpu_sleep(bool enabled)
 {
     (void)enabled;
 }
+
+void button_set_flip(bool yesno)
+{
+    (void)yesno;
+}
