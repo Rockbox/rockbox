@@ -66,6 +66,12 @@ is low, for an empty one, it is a high value. The exact formula can be found in
 the source code. The battery capacity is also considered here.
 
 
+[LIION BATTERY IN FM RECORDER]
+
+(todo)
+http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf
+
+
 [DELTA PEAK - WHY DOES IT WORK?]
 
 Delta peak means to detect that the battery voltage goes down when the
