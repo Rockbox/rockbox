@@ -49,10 +49,10 @@
 
 #define N             (624)                /* length of state vector */
 #define M             (397)                /* a period parameter */
-#define K             (0x9908B0DFU)        /* a magic constant */
-#define hiBit(u)      ((u) & 0x80000000U)  /* mask all but highest bit of u */
-#define loBit(u)      ((u) & 0x00000001U)  /* mask all but lowest bit of u */
-#define loBits(u)     ((u) & 0x7FFFFFFFU)  /* mask the highest bit of u */
+#define K             (0x9908B0DFUL)        /* a magic constant */
+#define hiBit(u)      ((u) & 0x80000000UL)  /* mask all but highest bit of u */
+#define loBit(u)      ((u) & 0x00000001UL)  /* mask all but lowest bit of u */
+#define loBits(u)     ((u) & 0x7FFFFFFFUL)  /* mask the highest bit of u */
 #define mixBits(u, v) (hiBit(u)|loBits(v)) /* move highest bit of u to
                                               highest bit of v */
 
@@ -60,7 +60,7 @@ static unsigned long state[N+1]; /* state vector + 1 to not violate ANSI C */
 static unsigned long *next;     /* next random value is computed from here */
 static int left = -1;     /* can *next++ this many times before reloading */
 
-void srand(unsigned long seed)
+void srand(unsigned int seed)
 {
     /*
      * We initialize state[0..(N-1)] via the generator
@@ -108,37 +108,37 @@ void srand(unsigned long seed)
      * so-- that's why the only change I made is to restrict to odd seeds.
      */
 
-    unsigned long x = (seed | 1U) & 0xFFFFFFFFU, *s = state;
+    unsigned long x = (seed | 1UL) & 0xFFFFFFFFUL, *s = state;
     int j;
 
     for(left=0, *s++=x, j=N; --j;
-        *s++ = (x*=69069U) & 0xFFFFFFFFU);
+        *s++ = (x*=69069UL) & 0xFFFFFFFFUL);
 }
 
-static long rand_reload(void)
+static int rand_reload(void)
 {
     unsigned long *p0=state, *p2=state+2, *pM=state+M, s0, s1;
     int j;
   
     if(left < -1)
-        srand(4357U);
+        srand(4357UL);
   
     left=N-1, next=state+1;
   
     for(s0=state[0], s1=state[1], j=N-M+1; --j; s0=s1, s1=*p2++)
-        *p0++ = *pM++ ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0U);
+        *p0++ = *pM++ ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0UL);
   
     for(pM=state, j=M; --j; s0=s1, s1=*p2++)
-        *p0++ = *pM++ ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0U);
+        *p0++ = *pM++ ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0UL);
   
-    s1=state[0], *p0 = *pM ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0U);
+    s1=state[0], *p0 = *pM ^ (mixBits(s0, s1) >> 1) ^ (loBit(s1) ? K : 0UL);
     s1 ^= (s1 >> 11);
-    s1 ^= (s1 <<  7) & 0x9D2C5680U;
-    s1 ^= (s1 << 15) & 0xEFC60000U;
+    s1 ^= (s1 <<  7) & 0x9D2C5680UL;
+    s1 ^= (s1 << 15) & 0xEFC60000UL;
     return (long)s1 ^ (s1 >> 18);
 }
 
-long rand(void)
+int rand(void)
 {
     unsigned long y;
   
@@ -148,10 +148,12 @@ long rand(void)
     else {
         y  = *next++;
         y ^= (y >> 11);
-        y ^= (y <<  7) & 0x9D2C5680U;
-        y ^= (y << 15) & 0xEFC60000U;
+        y ^= (y <<  7) & 0x9D2C5680UL;
+        y ^= (y << 15) & 0xEFC60000UL;
         y ^= (y >> 18);
     }
 
-    return (y & 0xfffffffe) >> 1; /* 31-bit limit by Björn Stenberg*/
+    return ((unsigned int)y) >> 1;
+    /* 31-bit limit by Björn Stenberg*/
+    /* 16-bit architectures compatibility by Jean-Philippe Bernardy */
 }

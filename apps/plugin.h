@@ -259,8 +259,8 @@ struct plugin_api {
 #endif
 
     /* misc */
-    void (*srand)(unsigned long seed);
-    long  (*rand)(void);
+    void (*srand)(unsigned int seed);
+    int  (*rand)(void);
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
