@@ -52,7 +52,7 @@ ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
-  MPEG_PLAY = 1
+  #MPEG_PLAY = 1
 else
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
@@ -68,13 +68,13 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
-APPS = main.c tree.c play.c menu.c credits.c main_menu.c
+APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c screensaver.c icons.c bmp.c
 endif
 
-SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c mpeg.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
@@ -140,6 +140,9 @@ menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main_menu.o: $(APPDIR)/main_menu.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+sound_menu.o: $(APPDIR)/sound_menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 icons.o: $(RECDIR)/icons.c
