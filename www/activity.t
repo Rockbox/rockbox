@@ -30,6 +30,7 @@ STATUS(YELLOW,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/vi
 STATUS(YELLOW,Playlist handling,-,"", Stuart,Planning)
 STATUS(YELLOW,X11 simulator,uisimulator/x11, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/x11/", Daniel,Progressing)
 STATUS(YELLOW,Win32 simulator,uisimulator/win32/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
+STATUS(RED,Boot loader,-,"", -,-)
 STATUS(RED,Newlib port,-,"", -,-)
 STATUS(RED,Directory browser UI,-,"", -,-)
 STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
