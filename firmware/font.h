@@ -70,7 +70,7 @@
 
 /* MWIMAGEBITS helper macros*/
 #define MWIMAGE_WORDS(x)	(((x)+15)/16)	/* image size in words*/
-#define MWIMAGE_BYTES(x)	(((x)+7)/8)	/* image size in bytes*/
+#define MWIMAGE_BYTES(x)	(MWIMAGE_WORDS(x)*sizeof(MWIMAGEBITS))
 #define	MWIMAGE_BITSPERIMAGE	(sizeof(MWIMAGEBITS) * 8)
 #define	MWIMAGE_BITVALUE(n)	((MWIMAGEBITS) (((MWIMAGEBITS) 1) << (n)))
 #define	MWIMAGE_FIRSTBIT	(MWIMAGE_BITVALUE(MWIMAGE_BITSPERIMAGE - 1))

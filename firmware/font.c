@@ -49,6 +49,10 @@ struct corefont sysfonts[MAXFONTS] = {
     { NULL,       NULL	        }, /* no FONT_MP3*/
 };
 
+static void rotate_font_bits(PMWCFONT pf);
+static void rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
+                unsigned int height);
+
 void
 font_init(void)
 {
@@ -62,6 +66,10 @@ font_init(void)
                 DEBUGF("Font load failed: %s\n", cfp->diskname);
 #endif
         }
+
+        /* one-time rotate font bits to rockbox format*/
+        if (cfp->pf && cfp->pf->height)
+            rotate_font_bits(cfp->pf);
     }
 }
 
@@ -107,7 +115,6 @@ lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
     int width = 0;
 
     while((ch = *str++)) {
-
 	/* check input range*/
 	if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
 		ch = pf->defaultchar;
@@ -120,6 +127,70 @@ lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
     *h = pf->height;
 
     return width;
+}
+
+/*
+ * Put a string at specified bit position
+ */
+//FIXME rename font_putsxy?
+void
+lcd_putsxy(int x, int y, unsigned char *str, int font)
+{
+    int ch;
+    PMWCFONT pf = getfont(font);
+
+    while (((ch = *str++) != '\0')) {
+        MWIMAGEBITS *bits;
+        int width;
+
+        /* check input range*/
+        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
+            ch = pf->defaultchar;
+        ch -= pf->firstchar;
+
+        /* get proportional width and glyph bits*/
+        width = pf->width? pf->width[ch]: pf->maxwidth;
+        if(x + width > LCD_WIDTH)
+            break;
+        bits = pf->bits + (pf->offset? pf->offset[ch]: (pf->height * ch));
+
+        lcd_bitmap((unsigned char *)bits, x, y, width, pf->height, true);
+        x += width;
+    }
+}
+
+/* convert font bitmap data inplace to rockbox format*/
+static void
+rotate_font_bits(PMWCFONT pf)
+{
+    int i;
+    int defaultchar = pf->defaultchar - pf->firstchar;
+    int did_defaultchar = 0;
+    unsigned char buf[256];
+
+    for (i=0; i<pf->size; ++i) {
+        MWIMAGEBITS *bits = pf->bits +
+            (pf->offset? pf->offset[i]: (pf->height * i));
+        int width = pf->width? pf->width[i]: pf->maxwidth;
+        int src_bytes = MWIMAGE_BYTES(width) * pf->height;
+
+        /*
+         * Due to the way the offset map works,
+         * non-mapped characters are mapped to the default
+         * character, and shouldn't be rotated twice.
+         */
+        if (i == defaultchar) {
+            if (did_defaultchar)
+                continue;
+            did_defaultchar = 1;
+        }
+
+        /* rotate left for lcd_bitmap function input*/
+        rotleft(buf, bits, width, pf->height);
+
+        /* copy back into original location*/
+        memcpy(bits, buf, src_bytes);
+    }
 }
 
 /*
@@ -147,7 +218,7 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
     src_words = MWIMAGE_WORDS(width) * height;
 
     /* clear background*/
-    memset(dst, 0, dst_linelen*height);
+    memset(dst, 0, dst_linelen*width);
 
     for (i=0; i < src_words; i++) {
         MWIMAGEBITS srcmap;	/* current src input bit*/
@@ -178,45 +249,9 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
 		/* input column j becomes output row*/
                 dst[j*dst_linelen + dst_col] |= dstmap;
             }
-	    //printf((bit & src[i])? "*": ".");
+            /*debugf((bit & src[i])? "*": ".");*/
         }
-        //printf("\n");
-    }
-}
-
-/*
- * Put a string at specified bit position
- */
-//FIXME rename font_putsxy?
-void
-lcd_putsxy(int x, int y, unsigned char *str, int font)
-{
-    int ch;
-    unsigned char *src;
-    PMWCFONT pf = getfont(font);
-
-    while (((ch = *str++) != '\0')) {
-	MWIMAGEBITS *bits;
-	int width;
-	unsigned char outbuf[256];
-
-	/* check input range*/
-	if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-		ch = pf->defaultchar;
-	ch -= pf->firstchar;
-
-	/* get proportional width and glyph bits*/
-	width = pf->width? pf->width[ch]: pf->maxwidth;
-        if(x + width > LCD_WIDTH)
-            break;
-	bits = pf->bits + (pf->offset? pf->offset[ch]: (pf->height * ch));
-
-	/* rotate left for lcd_bitmap function input*/
-	rotleft(outbuf, bits, width, pf->height);
-	src = outbuf;
-
-        lcd_bitmap (src, x, y, width, pf->height, true);
-        x += width;
+        /*debugf("\n");*/
     }
 }
 #endif /* HAVE_LCD_BITMAP */
@@ -224,5 +259,6 @@ lcd_putsxy(int x, int y, unsigned char *str, int font)
 /* -----------------------------------------------------------------
  * local variables:
  * eval: (load-file "rockbox-mode.el")
+ * vim: et sw=4 ts=4 sts=4 tw=78
  * end:
  */
