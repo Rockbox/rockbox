@@ -223,7 +223,7 @@ new: "Ligar"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "Retro-iluminação
+new: "Retro-iluminação"
 
 id: LANG_BACKLIGHT_ON
 desc: in settings_menu
