@@ -1426,8 +1426,8 @@ new: "Stoppa uppspelningen först"
 
 id: LANG_VBRFIX
 desc: The context menu entry
-eng: "Updatera VBR-fil"
-new: 
+eng: "Update VBR file"
+new: "Uppdatera VBR-filen"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1437,4 +1437,14 @@ new: "Statuslist"
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new: "Rulllist"
+new: "Rullningslist"
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Invert cursor"
+new: "Invertera markören"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Editable files"
+new: "Redigerbara filer"
