@@ -191,7 +191,6 @@ void lcd_write_data(unsigned char* p_bytes, int count)
         unsigned int byte;
         unsigned int sda1;     /* precalculated SC=low,SD=1 */
         unsigned int clk0sda0; /* precalculated SC and SD low */
-        unsigned int oldlevel;
 
         byte = *p_bytes++ << 24; /* fetch to MSB position */
 
@@ -300,7 +299,6 @@ void lcd_write_data(unsigned char* p_bytes, int count)
     {
         unsigned byte;
         unsigned sda1;     /* precalculated SC=low,SD=1 */
-        unsigned int oldlevel;
 
         /* take inverse data, so I can use the NEGC instruction below, it is
            the only carry add/sub which does not destroy a source register */
