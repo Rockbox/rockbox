@@ -43,6 +43,8 @@
 #define ID_FM       1
 #define ID_PLAYER   2
 #define ID_REC_V2   3
+#define ID_ONDIO_FM 4
+#define ID_ONDIO_SP 5
 
 /* Here I have to check for ARCHOS_* defines in source code, which is 
    generally strongly discouraged. But here I'm not checking for a certain 
@@ -63,11 +65,35 @@
 #define FILE_TYPE "fm"
 #define KEEP MASK_ADR /* keep the mask value */
 #define PLATFORM_ID ID_FM
+#elif defined(ARCHOS_ONDIOFM)
+#define FILE_TYPE "ondiofm"
+#define KEEP MASK_ADR /* keep the mask value */
+#define PLATFORM_ID ID_ONDIO_FM
+#elif defined(ARCHOS_ONDIOSP)
+#define FILE_TYPE "ondiosp"
+#define KEEP MASK_ADR /* keep the mask value */
+#define PLATFORM_ID ID_ONDIO_SP
 #else
 #undef PLATFORM_ID /* this platform is not (yet) flashable */
 #endif
 
 #ifdef PLATFORM_ID
+
+#if CONFIG_KEYPAD == ONDIO_PAD /* limited keypad */
+#define KEY1 BUTTON_UP
+#define KEY2 BUTTON_RIGHT
+#define KEY3 BUTTON_DOWN
+#define KEYNAME1 "[UP]"
+#define KEYNAME2 "[RIGHT]"
+#define KEYNAME3 "[DOWN]"
+#else /* recorder keypad */
+#define KEY1 BUTTON_F1
+#define KEY2 BUTTON_F2
+#define KEY3 BUTTON_F3
+#define KEYNAME1 "[F1]"
+#define KEYNAME2 "[F2]"
+#define KEYNAME3 "[F3]"
+#endif
 
 /* result of the CheckFirmwareFile() function */
 typedef enum
@@ -284,8 +310,9 @@ bool CheckPlatform(int platform_id, UINT16 version)
         return (platform_id == ID_FM || platform_id == ID_REC_V2);
     }
     else if (version == 132)
-    {   /* seen on a V2 recorder */
-        return (platform_id == ID_REC_V2);
+    {   /* Ondio, and seen on a V2 recorder */
+        return (platform_id == ID_ONDIO_SP || platform_id == ID_ONDIO_FM
+            || platform_id == ID_REC_V2);
     }
     else if (version >= 115 && version <= 129)
     {   /* the range of Recorders seen so far */
@@ -385,7 +412,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
             return eBadContent;
         }
     
-        for (i = 0x30; i<MASK_ADR-1; i++) /* leave one byte for me */
+        for (i = 0x30; i<MASK_ADR-2; i++) /* leave two bytes for me */
         {
             if (sector[i] != FB[i])
             {
@@ -661,12 +688,12 @@ void DoUserDialog(char* filename)
     
     rb->lcd_puts(0, 3, "using file:");
     rb->lcd_puts_scroll(0, 4, filename);
-    rb->lcd_puts(0, 6, "[F1] to check file");
+    rb->lcd_puts(0, 6, KEYNAME1 " to check file");
     rb->lcd_puts(0, 7, "other key to exit");
     rb->lcd_update();
     
     button = WaitForButton();
-    if (button != BUTTON_F1)
+    if (button != KEY1)
     {
         return;
     }
@@ -718,7 +745,7 @@ void DoUserDialog(char* filename)
     
     if (rc == eOK)
     {
-        rb->lcd_puts(0, 6, "[F2] to program");
+        rb->lcd_puts(0, 6, KEYNAME2 " to program");
         rb->lcd_puts(0, 7, "other key to exit");
     }
     else
@@ -729,7 +756,7 @@ void DoUserDialog(char* filename)
     rb->lcd_update();
     
     button = WaitForButton();
-    if (button != BUTTON_F2 || rc != eOK)
+    if (button != KEY2 || rc != eOK)
     {
         return;
     }
@@ -741,12 +768,12 @@ void DoUserDialog(char* filename)
     rb->lcd_puts(0, 3, "it kills your box!");
     rb->lcd_puts(0, 4, "See documentation.");
     
-    rb->lcd_puts(0, 6, "[F3] to proceed");
+    rb->lcd_puts(0, 6, KEYNAME3 " to proceed");
     rb->lcd_puts(0, 7, "other key to exit");
     rb->lcd_update();
     
     button = WaitForButton();
-    if (button != BUTTON_F3)
+    if (button != KEY3)
     {
         return;
     }

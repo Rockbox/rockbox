@@ -3,6 +3,7 @@ chessclock.c
 favorites.c
 firmware_flash.c
 helloworld.c
+rockbox_flash.c
 search.c
 sort.c
 vbrfix.c
@@ -10,7 +11,6 @@ vbrfix.c
 /* gradually bring in the ones not working yet */
 battery_test.c
 metronome.c
-rockbox_flash.c
 stopwatch.c
 viewer.c
 #endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
