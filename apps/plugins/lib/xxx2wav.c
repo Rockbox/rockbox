@@ -109,6 +109,7 @@ void display_status(file_info_struct* file_info) {
   unsigned long ticks_taken;
   unsigned long long speed;
   unsigned long xspeed;
+  static long last_tick = 0;
 
   local_rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
   local_rb->lcd_putsxy(0,0,s);
@@ -129,12 +130,15 @@ void display_status(file_info_struct* file_info) {
 
   if (ticks_taken==0) { ticks_taken=1; } // Avoid fp exception.
 
-  speed=(100*file_info->current_sample)/file_info->samplerate;
-  xspeed=(speed*10000)/ticks_taken;
-  local_rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100); 
-  local_rb->lcd_putsxy(0,60,s);
+  if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
+      last_tick = *(local_rb->current_tick);
+      speed=(100*file_info->current_sample)/file_info->samplerate;
+      xspeed=(speed*10000)/ticks_taken;
+      local_rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100); 
+      local_rb->lcd_putsxy(0,60,s);
 
-  local_rb->lcd_update();
+      local_rb->lcd_update();
+  }
 }
 
 static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
@@ -176,6 +180,8 @@ int local_init(char* infilename, char* outfilename, file_info_struct* file_info,
   file_info->frames_decoded=0;
   file_info->filesize=local_rb->filesize(file_info->infile);
 
+  local_rb->splash(HZ, true, "in: %d, size: %d", file_info->infile, file_info->filesize);
+  
   if (file_info->filesize > (bufsize-MALLOC_BUFSIZE)) {
     local_rb->close(file_info->infile);
     local_rb->splash(HZ*2, true, "File too large");
