@@ -44,6 +44,7 @@ unsigned int                        uThreadID; // id of mod thread
 PBYTE                               lpKeys;
 bool                                bActive; // window active?
 HANDLE                              hGUIThread; // thread for GUI
+bool                                bIsWinNT; // Windows NT derivate?
 
 bool lcd_display_redraw=true; // Used for player simulator
 char having_new_lcd=true; // Used for player simulator
@@ -80,97 +81,74 @@ LRESULT CALLBACK GUIWndProc (
         SetTimer (hWnd, TIMER_EVENT, 1, NULL);
         
         // load background image
-        hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL), MAKEINTRESOURCE(IDB_UI),
-            IMAGE_BITMAP, 0, 0, LR_VGACOLOR);
+        hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL),
+                  MAKEINTRESOURCE(IDB_UI), IMAGE_BITMAP, 0, 0, LR_VGACOLOR);
         hMemDc = CreateCompatibleDC (GetDC (hWnd));
         SelectObject (hMemDc, hBkgnd);
         return TRUE;
     case WM_SIZING:
         {
             LPRECT r = (LPRECT)lParam;
-            RECT r2;
             char s[256];
             int v;
+            int h_add = GetSystemMetrics (SM_CXSIZEFRAME) * 2 + 4;
+            int v_add = GetSystemMetrics (SM_CYSIZEFRAME) * 2 
+                        + GetSystemMetrics (SM_CYCAPTION) + 4;
 
             switch (wParam)
             {
             case WMSZ_BOTTOM:
                 v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->bottom = r->top + v * UI_HEIGHT / 5;
-                r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                r->bottom = r->top + v * UI_HEIGHT / 5 + v_add;
+                r->right = r->left + v * UI_WIDTH / 5 + h_add;
                 break;
             case WMSZ_RIGHT:
                 v = (r->right - r->left) / (UI_WIDTH / 5);
-                r->bottom = r->top + v * UI_HEIGHT / 5;
-                r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                r->bottom = r->top + v * UI_HEIGHT / 5 + v_add;
+                r->right = r->left + v * UI_WIDTH / 5 + h_add;
                 break;
             case WMSZ_TOP:
                 v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->top = r->bottom - v * UI_HEIGHT / 5;
-                r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                r->top = r->bottom - v * UI_HEIGHT / 5 - v_add;
+                r->right = r->left + v * UI_WIDTH / 5 + h_add;
                 break;
             case WMSZ_LEFT:
                 v = (r->right - r->left) / (UI_WIDTH / 5);
-                r->bottom = r->top + v * UI_HEIGHT / 5;
-                r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                r->bottom = r->top + v * UI_HEIGHT / 5 + v_add;
+                r->left = r->right - v * UI_WIDTH / 5 - h_add;
                 break;
             case WMSZ_BOTTOMRIGHT:
-                GetWindowRect (hWnd, &r2);
-                if (r2.right - r->right > r2.bottom - r->bottom)
-                    v = (r->right - r->left) / (UI_WIDTH / 5);
-                else
-                    v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->bottom = r->top + v * UI_HEIGHT / 5;
-                r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                v = ((r->right - r->left) * UI_HEIGHT
+                     +(r->bottom - r->top) * UI_WIDTH)
+                    / (2 * UI_WIDTH * UI_HEIGHT / 5);
+                r->bottom = r->top + v * UI_HEIGHT / 5 + v_add;
+                r->right = r->left + v * UI_WIDTH / 5 + h_add;
                 break;
             case WMSZ_BOTTOMLEFT:
-                GetWindowRect (hWnd, &r2);
-                if (-(r2.left - r->left) > r2.bottom - r->bottom)
-                    v = (r->right - r->left) / (UI_WIDTH / 5);
-                else
-                    v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->bottom = r->top + v * UI_HEIGHT / 5;
-                r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->bottom += GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                v = ((r->right - r->left) * UI_HEIGHT
+                     +(r->bottom - r->top) * UI_WIDTH)
+                    / (2 * UI_WIDTH * UI_HEIGHT / 5);
+                r->bottom = r->top + v * UI_HEIGHT / 5 + v_add;
+                r->left = r->right - v * UI_WIDTH / 5 - h_add;
                 break;
             case WMSZ_TOPRIGHT:
-                GetWindowRect (hWnd, &r2);
-                if (r2.right - r->right > -(r2.top - r->top))
-                    v = (r->right - r->left) / (UI_WIDTH / 5);
-                else
-                    v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->top = r->bottom - v * UI_HEIGHT / 5;
-                r->right = r->left + v * UI_WIDTH / 5;
-                r->right += GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION) +4;
+                v = ((r->right - r->left) * UI_HEIGHT
+                     +(r->bottom - r->top) * UI_WIDTH)
+                    / (2 * UI_WIDTH * UI_HEIGHT / 5);
+                r->top = r->bottom - v * UI_HEIGHT / 5 - v_add;
+                r->right = r->left + v * UI_WIDTH / 5 + h_add;
                 break;
             case WMSZ_TOPLEFT:
-                GetWindowRect (hWnd, &r2);
-                if (-(r2.left - r->left) > -(r2.top - r->top))
-                    v = (r->right - r->left) / (UI_WIDTH / 5);
-                else
-                    v = (r->bottom - r->top) / (UI_HEIGHT / 5);
-                r->top = r->bottom - v * UI_HEIGHT / 5;
-                r->left = r->right - v * UI_WIDTH / 5;
-                r->left -= GetSystemMetrics (SM_CXSIZEFRAME) * 2+4;
-                r->top -= GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYCAPTION)+4;
+                v = ((r->right - r->left) * UI_HEIGHT
+                     +(r->bottom - r->top) * UI_WIDTH)
+                    / (2 * UI_WIDTH * UI_HEIGHT / 5);
+                r->top = r->bottom - v * UI_HEIGHT / 5 - v_add;
+                r->left = r->right - v * UI_WIDTH / 5 - h_add;
                 break;
             }
 
             wsprintf (s, UI_TITLE " @%d%%",
-                (r->right - r->left - GetSystemMetrics (SM_CXSIZEFRAME) * 2 -4)
-                * 100 / UI_WIDTH);
+                (r->right - r->left - h_add + 1) * 100 / UI_WIDTH);
             SetWindowText (hWnd, s);
 
             return TRUE;
@@ -182,6 +160,7 @@ LRESULT CALLBACK GUIWndProc (
 
             GetClientRect (hWnd, &r);
             // blit background image to screen
+            SetStretchBltMode(hDc, bIsWinNT ? HALFTONE : COLORONCOLOR);
             StretchBlt (hDc, 0, 0, r.right, r.bottom,
                 hMemDc, 0, 0, UI_WIDTH, UI_HEIGHT, SRCCOPY);
             return TRUE;
@@ -194,10 +173,11 @@ LRESULT CALLBACK GUIWndProc (
 
             GetClientRect (hWnd, &r);
             // draw lcd screen
+            SetStretchBltMode(hDc, bIsWinNT ? HALFTONE : COLORONCOLOR);
             StretchDIBits (hDc,
                            UI_LCD_POSX * r.right / UI_WIDTH,
                            UI_LCD_POSY * r.bottom / UI_HEIGHT,
-                           UI_LCD_WIDTH * r.right / UI_WIDTH, 
+                           UI_LCD_WIDTH * r.right / UI_WIDTH,
                            UI_LCD_HEIGHT * r.bottom / UI_HEIGHT,
                            0, 0, LCD_WIDTH, LCD_HEIGHT,
                            bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS,
@@ -318,6 +298,8 @@ int WINAPI WinMain (
 
     /* default file mode should be O_BINARY to be consistent with rockbox */
     _fmode = _O_BINARY;
+    
+    bIsWinNT = ((GetVersion() & 0x80000000) == 0);
 
     if (!GUIStartup ())
         return 0;
