@@ -16,6 +16,12 @@ plugins/viewers.config
 SOURCES
 plugins/SOURCES
 plugins/lib/SOURCES
+plugins/rockboy/*.[ch]
+plugins/rockboy/Makefile
+plugins/rockboy/*.lds
+plugins/rockboy/Version
+plugins/rockboy/README
+plugins/rockboy/COPYING
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
@@ -23,6 +29,7 @@ codecs/libFLAC/*
 codecs/libFLAC/include/private/*.h
 codecs/libFLAC/include/protected/*.h
 codecs/libFLAC/include/FLAC/*.h
+codecs/libFLAC/include/*.h
 codecs/libmad/*
 codecs/libwavpack/*
 codecs/Tremor/*
