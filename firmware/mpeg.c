@@ -42,7 +42,7 @@
 #include "mpegplay.h"
 #endif /* #ifndef SIMULATOR */
 
-extern void bitswap(unsigned char *data, int length);
+#include "bitswap.h"
 
 #ifdef HAVE_MAS3587F
 static void init_recording(void);

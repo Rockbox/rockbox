@@ -32,7 +32,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "id3.h"
-extern void bitswap(unsigned char *data, int length); /* no header for this */
+#include "bitswap.h"
 
 /***************** Constants *****************/
 

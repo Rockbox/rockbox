@@ -67,7 +67,7 @@
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 #else
 extern unsigned char pluginbuf[];
-extern void bitswap(unsigned char *data, int length);
+#include "bitswap.h"
 #endif
 
 static bool plugin_loaded = false;
