@@ -55,6 +55,7 @@ int play_list(char *dir, char *file, int start_index,
 char* playlist_peek(int steps);
 char* playlist_name(char *name, int name_size);
 int playlist_next(int steps);
+bool playlist_check(int steps);
 void randomise_playlist( unsigned int seed );
 void sort_playlist(bool start_current);
 void add_indices_to_playlist(void);

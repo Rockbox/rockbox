@@ -378,6 +378,14 @@ int playlist_next(int steps)
     return index;
 }
 
+/* Returns false if 'steps' is out of bounds, else true */
+bool playlist_check(int steps)
+{
+    bool queue;
+    int index = get_next_index(steps, &queue);
+    return (index >= 0);
+}
+
 char* playlist_peek(int steps)
 {
     int seek;

@@ -77,6 +77,7 @@ static enum
 #endif
 
 extern char* playlist_peek(int steps);
+extern bool playlist_check(int steps);
 extern int playlist_next(int steps);
 extern int playlist_amount(void);
 extern void update_file_pos( int id, int pos );
@@ -1415,7 +1416,7 @@ static void mpeg_thread(void)
                     }
                 }
                 else {
-                    if (!playlist_peek(1))
+                    if (!playlist_check(1))
                         break;
 
                     /* stop the current stream */
@@ -1450,8 +1451,10 @@ static void mpeg_thread(void)
 
             case MPEG_PREV: {
                 DEBUGF("MPEG_PREV\n");
-                if (!playlist_peek(-1))
+
+                if (!playlist_check(-1))
                     break;
+                
                 /* stop the current stream */
                 play_pending = false;
                 playing = false;
