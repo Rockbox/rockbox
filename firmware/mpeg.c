@@ -1218,6 +1218,8 @@ void mpeg_play(int offset)
     char* trackname = playlist_next( 0, NULL );
     if ( trackname ) {
         mp3info(&taginfo, trackname);
+        taginfo.offset = offset;
+        set_elapsed(&taginfo);
         playing = true;
     }
     (void)offset;
