@@ -204,6 +204,7 @@ int ata_read_sectors(unsigned long start,
     buf = inbuf;
     count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
+        ret = 0;
 
         if ( count == 256 )
             ATA_NSECTOR = 0; /* 0 means 256 sectors */
@@ -276,15 +277,14 @@ int ata_read_sectors(unsigned long start,
             ret = -3;
             goto retry;
         }
-
-        ret = 0;
         break;
     }
     led(false);
 
     mutex_unlock(&ata_mtx);
 
-    if ( delayed_write )
+    /* only flush if reading went ok */
+    if ( (ret == 0) && delayed_write )
         ata_flush();
 
     return ret;
@@ -373,7 +373,8 @@ int ata_write_sectors(unsigned long start,
 
     mutex_unlock(&ata_mtx);
 
-    if ( delayed_write )
+    /* only flush if writing went ok */
+    if ( (ret == 0) && delayed_write )
         ata_flush();
 
     return ret;
