@@ -155,7 +155,7 @@ typedef struct
 
 /******************************************************************************
 **
-** FUNCTION:    list_init_list
+** FUNCTION:    list_init
 **
 ** DESCRIPTION: Initiate a LIST structure.
 **
@@ -165,8 +165,8 @@ typedef struct
 **              list may be of any size
 *******************************************************************************
 */
-void list_init_list(LIST *list,               /* The list to initiate */
-		    int max_num_nodes);       /* Maximum number of nodes */
+void list_init(LIST *list,               /* The list to initiate */
+               int max_num_nodes);       /* Maximum number of nodes */
 
 /******************************************************************************
 **
