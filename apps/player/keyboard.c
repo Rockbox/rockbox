@@ -76,10 +76,11 @@ static unsigned short* kbd_setupkeys(int page, int* len)
 
 #define MENU_LINE_INPUT 0
 #define MENU_LINE_NEWCHARS 1
-#define MENU_LINE_DELETE 2
-#define MENU_LINE_ACCEPT 3
-#define MENU_LINE_QUIT 4
-#define MENU_LINE_LAST 4
+#define MENU_LINE_BACKSPACE 2
+#define MENU_LINE_DELETE 3
+#define MENU_LINE_ACCEPT 4
+#define MENU_LINE_QUIT 5
+#define MENU_LINE_LAST 5
 
 int kbd_input(char* text, int buflen)
 {
@@ -91,7 +92,6 @@ int kbd_input(char* text, int buflen)
     int cursor_pos=0;
     int button_pressed;
     unsigned char temptext[12];
-    bool cursor_on=true;                /* Blinking cursor control */
     int old_cursor_pos=0;               /* Windowed cursor movement */
     int left_pos=0;
 
@@ -110,17 +110,11 @@ int kbd_input(char* text, int buflen)
         p=0;
         i = left_pos;
         while (p<10 && line[i]) {
-            if (i == cursor_pos && cursor_on)
-            {
-                temptext[p++]=KEYBOARD_CURSOR;
-                i++;
-            } else {
-                temptext[p++]=text[i++];
-            }
+          temptext[p++]=text[i++];
         }
         temptext[p]=0;
         lcd_puts(1, 0, temptext);
-        cursor_on = !cursor_on;
+        lcd_put_cursor(cursor_pos-left_pos+1, 0, 0x7f);
         old_cursor_pos=cursor_pos;
 
         switch (menu_line) {
@@ -136,6 +130,9 @@ int kbd_input(char* text, int buflen)
                 temptext[p]=0;
                 lcd_puts(1, 1, temptext);
                 break;
+            case MENU_LINE_BACKSPACE:
+                lcd_puts_scroll(1, 1, "Backspace");
+                break;
             case MENU_LINE_DELETE:
                 lcd_puts_scroll(1, 1, "Delete");
                 break;
@@ -143,7 +140,7 @@ int kbd_input(char* text, int buflen)
                 lcd_puts_scroll(1, 1, "Accept");
                 break;
             case MENU_LINE_QUIT:
-                lcd_puts_scroll(1, 1, "Cancel");
+                lcd_puts_scroll(1, 1, "Abort");
                 break;
         }
         if (menu_line==MENU_LINE_INPUT) {
@@ -156,7 +153,7 @@ int kbd_input(char* text, int buflen)
           
         lcd_update();
 
-        button_pressed=button_get_w_tmo(HZ/2);
+        button_pressed=button_get(true);
         switch (menu_line) 
         {
             case MENU_LINE_INPUT:
@@ -167,14 +164,12 @@ int kbd_input(char* text, int buflen)
                         if (cursor_pos<len)
                             cursor_pos++;
                         button_pressed=BUTTON_NONE;
-                        cursor_on=true;
                         break;
                     case BUTTON_DOWN:
                     case BUTTON_DOWN | BUTTON_REPEAT:
                         if (cursor_pos>0)
                             cursor_pos--;
                         button_pressed=BUTTON_NONE;
-                        cursor_on=true;
                         break;
                 }
                 break;
@@ -214,6 +209,27 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
+            case MENU_LINE_BACKSPACE:
+                switch (button_pressed) {
+                    case BUTTON_ON:
+                    case BUTTON_PLAY:
+                    case BUTTON_PLAY | BUTTON_REPEAT:
+                        button_pressed=BUTTON_NONE;
+                        if (0 < cursor_pos) {
+                            for (i=--cursor_pos; i<=len; i++) {
+                                text[i]=text[i+1];
+                            }
+                        }
+                        break;
+                    case BUTTON_STOP:
+                    case BUTTON_STOP | BUTTON_REPEAT:
+                        button_pressed=BUTTON_NONE;
+                        for (i=cursor_pos; i<=len; i++) {
+                            text[i]=text[i+1];
+                        }
+                        break;
+                }
+                break;
             case MENU_LINE_DELETE:
                 switch (button_pressed) {
                     case BUTTON_ON:
@@ -270,12 +286,16 @@ int kbd_input(char* text, int buflen)
             case BUTTON_RIGHT | BUTTON_REPEAT:
                 if (menu_line<MENU_LINE_LAST)
                     menu_line++;
+                else
+                  menu_line=0;
                 break;
           
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
                 if (menu_line>0)
                     menu_line--;
+                else
+                  menu_line=MENU_LINE_LAST;
                 break;
         }
     }

@@ -85,6 +85,7 @@ unsigned char lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned char pat);
 void lcd_allow_bidirectional_scrolling(bool on);
 extern void lcd_bidir_scroll(int threshold);
+void lcd_put_cursor(int x, int y, char cursor_char);
 #endif
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)

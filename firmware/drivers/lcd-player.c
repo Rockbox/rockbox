@@ -72,6 +72,17 @@ struct scrollinfo {
     int direction; /* +1 for right or -1 for left*/
 };
 
+#define MAX_CURSOR_CHARS 8
+struct cursorinfo {
+  int len;
+  char text[MAX_CURSOR_CHARS];
+  int textpos;
+  int y_pos;
+  int x_pos;
+  int divider;
+  int downcount;
+} cursor;
+
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
@@ -265,6 +276,7 @@ void lcd_clear_display(void)
     bool update=false; 
     DEBUGF("lcd_clear_display()\n");
     lcd_stop_scroll();
+    cursor.len=0; /* Stop cursor */
     for (i=0;i<22;i++)
       update|=lcdx_putc(i%11, i/11, ' ');
     if (update)
@@ -299,6 +311,18 @@ void lcd_puts(int x, int y, unsigned char *string)
     DEBUGF("lcd_puts(%d, %d) -> ", x, y);
     scroll[y].mode=SCROLL_MODE_OFF;
     return lcd_puts_cont_scroll(x, y, string);
+}
+
+void lcd_put_cursor(int x, int y, char cursor_char)
+{
+  cursor.text[0]=buffer_xlcd[x][y];
+  cursor.text[1]=cursor_char;
+  cursor.len=2;
+  cursor.textpos=0;
+  cursor.y_pos=y;
+  cursor.x_pos=x;
+  cursor.downcount=0;
+  cursor.divider=4;
 }
 
 void lcd_putc(int x, int y, unsigned short ch)
@@ -573,7 +597,16 @@ static void scroll_thread(void)
                     lcd_puts_cont_scroll(s->startx, s->starty, buffer);
                 }
             }
-
+            if (cursor.len>0) {
+              if (cursor.downcount--<0) {
+                cursor.downcount=cursor.divider;
+                cursor.textpos++;
+                if (cursor.textpos>=cursor.len)
+                  cursor.textpos=0;
+                update|=lcdx_putc(cursor.x_pos, cursor.y_pos,
+                                  cursor.text[cursor.textpos]);
+              }
+            }
             if (update) {
                 lcd_update();
             }
