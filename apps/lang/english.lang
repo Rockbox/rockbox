@@ -236,11 +236,6 @@ desc: in settings_menu
 eng: "Backlight"
 new:
 
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu
-eng: ""
-new:
-
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
