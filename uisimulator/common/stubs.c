@@ -29,6 +29,9 @@
 #include "string.h"
 #include "lcd.h"
 
+extern char having_new_lcd;
+
+
 void backlight_on(void)
 {
   /* we could do something better here! */
@@ -163,7 +166,7 @@ bool oscillograph(void)
 
 bool has_new_lcd(void)
 {
-    return false;
+    return having_new_lcd;
 }
 
 void lcd_set_contrast( int x )

@@ -29,74 +29,114 @@
 #include "system.h"
 
 #include "font-player.h"
+#include "lcd-playersim.h"
 
 /*** definitions ***/
 
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 8
-#define ICON_HEIGHT 10
+#define ICON_HEIGHT 24
+#define CHAR_PIXEL 4
+#define BORDER_MARGIN 1
 
-unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+unsigned char lcd_buffer[2][11];
 
 static int double_height=1;
+extern bool lcd_display_redraw;
+extern unsigned const char *lcd_ascii;
+
 
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 {
   int xpos = x;
   int ypos = icon_line*(ICON_HEIGHT+CHAR_HEIGHT*2);
   int row=0, col;
+
+  int p=0, cp=0;
+  struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
+  struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
   
   while (icon[row]) {
     col=0;
     while (icon[row][col]) {
-      lcd_framebuffer[xpos+col][(ypos+row)/8] &= ~(1<<((row+ypos)&7));
-      if (enable) {
-	if (icon[row][col]=='*') {
-	  lcd_framebuffer[xpos+col][(ypos+row)/8] |= 1<<((row+ypos)&7);
-	}
+      switch(icon[row][col]) {
+      case '*':
+        if (enable) {
+          /* set a dot */
+          points[p].x = xpos + col +BORDER_MARGIN;
+          points[p].y = ypos+row +BORDER_MARGIN;
+          p++; /* increase the point counter */
+        } else {
+          /* clear a dot */
+          clearpoints[cp].x = xpos + col +BORDER_MARGIN;
+          clearpoints[cp].y = ypos+row +BORDER_MARGIN;
+          cp++; /* increase the point counter */
+        }
+        break;
+      case ' ': /* Clear bit */
+        /* clear a dot */
+        clearpoints[cp].x = xpos + col+BORDER_MARGIN;
+        clearpoints[cp].y = ypos+row+BORDER_MARGIN;
+        cp++; /* increase the point counter */
+        break;
       }
       col++;
     }
     row++;
   }
-  lcd_update();
+  drawdots(0, &clearpoints[0], cp);
+  drawdots(1, &points[0], p);
 }
 
-void lcd_print_char(int x, int y, unsigned char ch)
+void lcd_print_char(int x, int y)
 {
-  int xpos = x * CHAR_WIDTH;
-  int ypos = y * CHAR_HEIGHT;
+  int xpos = x * CHAR_WIDTH * CHAR_PIXEL;
+  int ypos = y * CHAR_HEIGHT * CHAR_PIXEL + ICON_HEIGHT;
   int col, row;
-  int y2;
-  //  double_height=2;
+  int p=0, cp=0;
+  struct rectangle points[CHAR_HEIGHT*CHAR_WIDTH];
+  struct rectangle clearpoints[CHAR_HEIGHT*CHAR_WIDTH];
+  unsigned char ch=lcd_buffer[y][x];
+
   if (double_height == 2 && y == 1)
     return; /* Second row can't be printed in double height. ??*/
 
-  xpos*=2;
-
-  /*  printf("(%d,%d)='%d'\n", x, y, ch);*/
+  /* Clear all char
+  clearpoints[cp].x = xpos +BORDER_MARGIN;
+  clearpoints[cp].y = ypos +BORDER_MARGIN;
+  clearpoints[cp].width=CHAR_WIDTH*CHAR_PIXEL;
+  clearpoints[cp].height=7*CHAR_PIXEL*double_height;
+  cp++;
+  */
   for (col=0; col<5; col++) {
     for (row=0; row<7; row++) {
-      for (y2=0; y2<double_height*2; y2++) {
-	int y;
-	unsigned char bitval;
+      char fontbit=(*font_player)[ch][col]&(1<<row);
+      int height=CHAR_PIXEL*double_height;
 
-	if (double_height*row >=7)
-	  y2+=double_height;
-	y=y2+double_height*2*row+2*ypos+ICON_HEIGHT;
+      y=CHAR_PIXEL*(double_height*row)+ypos;
+      if (double_height==2) {
+	if (row == 3) /* Adjust for blank row in the middle */
+	  height=CHAR_PIXEL;
+      }
 
-	bitval=3<<((y&6));
-	if (font_player[ch][col]&(1<<row)) {
-	  lcd_framebuffer[xpos+col*2][y/8] |= bitval;
-	  
-	} else {
-	  lcd_framebuffer[xpos+col*2][y/8] &= ~bitval;
-	}
-	lcd_framebuffer[xpos+col*2+1][y/8] = 
-	  lcd_framebuffer[xpos+col*2][y/8];
+      if (fontbit) {
+        /* set a dot */
+        points[p].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
+        points[p].y = y +BORDER_MARGIN;
+        points[p].width=CHAR_PIXEL;
+        points[p].height=height;
+        p++; /* increase the point counter */
+      } else {
+        clearpoints[cp].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
+        clearpoints[cp].y = y +BORDER_MARGIN;
+        clearpoints[cp].width=CHAR_PIXEL;
+        clearpoints[cp].height=height;
+        cp++;
       }
     }
   }
+  drawrectangles(0, &clearpoints[0], cp);
+  drawrectangles(1, &points[0], p);
 }
 
 
@@ -106,189 +146,35 @@ void lcd_print_char(int x, int y, unsigned char ch)
  */
 void lcd_drawrect (int x, int y, int nx, int ny)
 {
-    int i;
-
-    if (x > LCD_WIDTH)
-        return;
-    if (y > LCD_HEIGHT)
-        return;
-
-    if (x + nx > LCD_WIDTH)
-        nx = LCD_WIDTH - x;
-    if (y + ny > LCD_HEIGHT)
-        ny = LCD_HEIGHT - y;
-
-    /* vertical lines */
-    for (i = 0; i < ny; i++) {
-        DRAW_PIXEL(x, (y + i));
-        DRAW_PIXEL((x + nx - 1), (y + i));
-    }
-
-    /* horizontal lines */
-    for (i = 0; i < nx; i++) {
-        DRAW_PIXEL((x + i),y);
-        DRAW_PIXEL((x + i),(y + ny - 1));
-    }
+    (void)x;
+    (void)y;
+    (void)nx;
+    (void)ny;
 }
 
 /* Invert a rectangular area at (x, y), size (nx, ny) */
 void lcd_invertrect (int x, int y, int nx, int ny)
 {
-    int i, j;
-
-    if (x > LCD_WIDTH)
-        return;
-    if (y > LCD_HEIGHT)
-        return;
-
-    if (x + nx > LCD_WIDTH)
-        nx = LCD_WIDTH - x;
-    if (y + ny > LCD_HEIGHT)
-        ny = LCD_HEIGHT - y;
-
-    for (i = 0; i < nx; i++)
-        for (j = 0; j < ny; j++)
-            INVERT_PIXEL((x + i), (y + j));
+    (void)x;
+    (void)y;
+    (void)nx;
+    (void)ny;
 }
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )
 {
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if(x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if(y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i=0; i<numpixels; i++)
-    {
-        DRAW_PIXEL(x,y);
-
-        if(d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
+    (void)x1;
+    (void)x2;
+    (void)y1;
+    (void)y2;
 }
 
 void lcd_clearline( int x1, int y1, int x2, int y2 )
 {
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if(x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if(y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i=0; i<numpixels; i++)
-    {
-        CLEAR_PIXEL(x,y);
-
-        if(d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
+    (void)x1;
+    (void)x2;
+    (void)y1;
+    (void)y2;
 }
 
 /*
@@ -296,7 +182,8 @@ void lcd_clearline( int x1, int y1, int x2, int y2 )
  */
 void lcd_drawpixel(int x, int y)
 {
-    DRAW_PIXEL(x,y);
+    (void)x;
+    (void)y;
 }
 
 /*
@@ -304,7 +191,8 @@ void lcd_drawpixel(int x, int y)
  */
 void lcd_clearpixel(int x, int y)
 {
-    CLEAR_PIXEL(x,y);
+    (void)x;
+    (void)y;
 }
 
 /*
@@ -312,21 +200,28 @@ void lcd_clearpixel(int x, int y)
  */
 void lcd_invertpixel(int x, int y)
 {
-    INVERT_PIXEL(x,y);
+    (void)x;
+    (void)y;
 }
 
 void lcd_clear_display(void)
 {
-    memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
+    int x, y;
+    for (y=0; y<2; y++) {
+      for (x=0; x<11; x++) {
+        lcd_buffer[y][x++]=lcd_ascii[' '];
+      }
+    }
+    lcd_update();
 }
 
 void lcd_puts(int x, int y, unsigned char *str)
 {
     int i;
     for (i=0; *str && x<11; i++)
-        lcd_print_char(x++, y, *str++);
+        lcd_buffer[y][x++]=lcd_ascii[*str++];
     for (; x<11; x++)
-        lcd_print_char(x, y, ' ');
+        lcd_buffer[y][x]=lcd_ascii[' '];
     lcd_update();
 }
 
@@ -353,14 +248,16 @@ void lcd_define_pattern(int which, char *pattern, int length)
     }
     for (i = 1; i <= 5; i++)
     {
-        font_player[pat][i-1] = icon[i];
+        (*font_player)[pat][i-1] = icon[i];
     }
+    lcd_display_redraw=true;
+    lcd_update();
 }
 
 extern void lcd_puts(int x, int y, unsigned char *str);
 
 void lcd_putc(int x, int y, unsigned char ch)
 {
-    lcd_print_char(x, y, ch);
+    lcd_buffer[y][x]=lcd_ascii[ch];
     lcd_update();
 }
