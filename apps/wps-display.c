@@ -137,7 +137,9 @@ bool wps_load_custom(char* file)
         if ( special ) {
             int i;
             lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
             lcd_setmargins(0,0);
+#endif
             for (i=0; i<MAX_LINES && format_lines[i]; i++)
                 lcd_puts(0,i,format_lines[i]);
             lcd_update();
