@@ -335,19 +335,12 @@ static const unsigned int prescale_table[] =
 bool dma_on;  /* The DMA is active */
 
 #if CONFIG_HWCODEC == MAS3507D
-static void mas_poll_start(int interval_in_ms)
+static void mas_poll_start(void)
 {
     unsigned int count;
 
-    count = (FREQ * interval_in_ms) / 1000 / 8;
+    count = 9 * FREQ / 10000 / 8; /* 0.9 ms */
 
-    if(count > 0xffff)
-    {
-        panicf("Error! The MAS poll interval is too long (%d ms)\n",
-               interval_in_ms);
-        return;
-    }
-    
     /* We are using timer 1 */
     
     TSTR &= ~0x02; /* Stop the timer */
@@ -371,7 +364,7 @@ static void postpone_dma_tick(void)
 {
     unsigned int count;
 
-    count = FREQ / 2000 / 8;
+    count = 8 * FREQ / 10000 / 8; /* 0.8 ms */
 
     /* We are using timer 1 */
     
@@ -1014,7 +1007,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #endif
 
 #if CONFIG_HWCODEC == MAS3507D
-    mas_poll_start(1);
+    mas_poll_start();
 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_enable(true);
