@@ -74,6 +74,10 @@ char* playlist_next(int steps, int* index)
     char dir_buf[MAX_PATH+1];
     char *dir_end;
 
+    if(abs(steps) > playlist.amount)
+        /* prevent madness when all files are empty/bad */
+        return NULL;
+
     playlist.index = (playlist.index+steps) % playlist.amount;
     while ( playlist.index < 0 ) {
         if ( global_settings.loop_playlist )
