@@ -33,8 +33,9 @@
 #define WPS_REFRESH_NON_STATIC (WPS_REFRESH_ALL & ~WPS_REFRESH_STATIC & ~WPS_REFRESH_SCROLL)
 
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode);
-bool wps_display(struct mp3entry* id3);
+bool wps_refresh(struct mp3entry* id3, struct mp3entry* nid3,
+                 int ffwd_offset, unsigned char refresh_mode);
+bool wps_display(struct mp3entry* id3, struct mp3entry* nid3);
 bool wps_load(char* file, bool display);
 void wps_reset(void);
 char* wps_get_genre(struct mp3entry* id3);

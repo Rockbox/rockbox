@@ -54,6 +54,7 @@ bool keys_locked = false;
 static bool ff_rewind = false;
 static bool paused = false;
 static struct mp3entry* id3 = NULL;
+static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
 #if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
@@ -383,11 +384,11 @@ static bool ffwd_rew(int button)
                 }
 
                 if(wps_time_countup == false)
-                    wps_refresh(id3, -ff_rewind_count,
+                    wps_refresh(id3, nid3, -ff_rewind_count,
                                 WPS_REFRESH_PLAYER_PROGRESS |
                                 WPS_REFRESH_DYNAMIC);
                 else
-                    wps_refresh(id3, ff_rewind_count,
+                    wps_refresh(id3, nid3, ff_rewind_count,
                                 WPS_REFRESH_PLAYER_PROGRESS |
                                 WPS_REFRESH_DYNAMIC);
 
@@ -423,7 +424,7 @@ static bool ffwd_rew(int button)
 
     /* let mpeg thread update id3->elapsed before calling wps_refresh */
     yield(); 
-    wps_refresh(id3, 0, WPS_REFRESH_ALL);
+    wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
     return usb;
 }
 
@@ -436,17 +437,18 @@ static bool update(void)
     {
         lcd_stop_scroll();
         id3 = mpeg_current_track();
-        if (wps_display(id3))
+        nid3 = mpeg_next_track();
+        if (wps_display(id3, nid3))
             retcode = true;
         else
-            wps_refresh(id3, 0, WPS_REFRESH_ALL);
+            wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
 
         if (id3)
             memcpy(current_track_path, id3->path, sizeof(current_track_path));
     }
 
     if (id3)
-        wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
+        wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
 
     status_draw(false);
 
@@ -632,7 +634,7 @@ int wps_show(void)
     bool exit = false;
     bool update_track = false;
 
-    id3 = NULL;
+    id3 = nid3 = NULL;
     current_track_path[0] = '\0';
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -650,10 +652,11 @@ int wps_show(void)
     if(mpeg_status() & MPEG_STATUS_PLAY)
     {
         id3 = mpeg_current_track();
+        nid3 = mpeg_next_track();
         if (id3) {
-            if (wps_display(id3))
+            if (wps_display(id3, nid3))
                 return 0;
-            wps_refresh(id3, 0, WPS_REFRESH_ALL);
+            wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
 
             memcpy(current_track_path, id3->path, sizeof(current_track_path));
         }
@@ -703,7 +706,7 @@ int wps_show(void)
                     sleep(1);
 
                     if (TIME_AFTER(current_tick, next_refresh)) {
-                        wps_refresh(id3, 0, WPS_REFRESH_PEAK_METER);
+                        wps_refresh(id3, nid3, 0, WPS_REFRESH_PEAK_METER);
                         next_refresh = current_tick + HZ / peak_meter_fps;
                     }
                 }
@@ -712,12 +715,12 @@ int wps_show(void)
             /* In energy saver mode the cpu may sleep a 
                little bit while waiting for buttons */
             else {
-            for (i = 0; i < 4; i++) {
+                for (i = 0; i < 4; i++) {
                     button = button_get_w_tmo(HZ / peak_meter_fps);
-                if (button != 0) {
-                    break;
-                }
-                    wps_refresh(id3, 0, WPS_REFRESH_PEAK_METER);
+                    if (button != 0) {
+                        break;
+                    }
+                    wps_refresh(id3, nid3, 0, WPS_REFRESH_PEAK_METER);
                 }
             }
         } 
@@ -1008,7 +1011,7 @@ int wps_show(void)
 
         if (restore) {
             restore = false;
-            if (wps_display(id3))
+            if (wps_display(id3, nid3))
             {
                 /* set dir browser to current playing song */
                 if (global_settings.browse_current &&
@@ -1019,7 +1022,7 @@ int wps_show(void)
             }
 
             if (id3)
-                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
+                wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
         }
         if(button != BUTTON_NONE)
             lastbutton = button;

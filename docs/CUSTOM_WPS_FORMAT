@@ -76,6 +76,19 @@ Conditional Tags (If/Else block):
             so the text in the if and else part can contain all % 
             commands, including conditionals.
 
+Next Song Info
+--------------
+You can display information about the next song - the song that is about to
+play after the one currently playing (unless you change the plan).
+
+If you use the uppercase versions of the three tags: F, I and D, they will
+instead refer to the next song instead of the current one. Example: %Ig is
+the genre name used in the next song and %Ff is the mp3 frequency.
+
+Take note that the next song information WILL NOT be available at all times,
+but will most likely be available at the end of a song. We suggest you use the
+conditional display tag a lot when displaying information about the next song!
+
 Alternating Sublines
 --------------------
 It is possible to group items on each line into 2 or more groups or "sublines".

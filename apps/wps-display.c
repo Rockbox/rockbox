@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-/* ID3 formatting based on code from the MAD Winamp plugin (in_mad.dll), 
- * Copyright (C) 2000-2001 Robert Leslie. 
+/* ID3 formatting based on code from the MAD Winamp plugin (in_mad.dll),
+ * Copyright (C) 2000-2001 Robert Leslie.
  * See http://www.mars.org/home/rob/proj/mpeg/ for more information.
  */
 
@@ -61,7 +61,7 @@
 #endif
 #define MAX_SUBLINES 12
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* (10ths of sec) */
-#define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to 
+#define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to
                                 (1/HZ sec, or 100ths of sec) */
 #define SUBLINE_RESET -1
 
@@ -78,7 +78,7 @@ static char format_buffer[FORMAT_BUFFER_SIZE];
 static char* format_lines[MAX_LINES][MAX_SUBLINES];
 static unsigned char line_type[MAX_LINES][MAX_SUBLINES];
 static unsigned char time_mult[MAX_LINES][MAX_SUBLINES];
-static long subline_expire_time[MAX_LINES]; 
+static long subline_expire_time[MAX_LINES];
 static int curr_subline[MAX_LINES];
 
 static int ff_rewind_count;
@@ -115,7 +115,7 @@ char* wps_get_genre(struct mp3entry* id3)
 {
     if( id3->genre_string )
         return id3->genre_string ;
-    
+
     if (id3->genre < sizeof(genres)/sizeof(char*))
         return (char*)genres[id3->genre];
     return NULL;
@@ -128,10 +128,10 @@ static void wps_format(char* fmt)
     char* start_of_line = format_buffer;
     int line = 0;
     int subline;
-    
+
     strncpy(format_buffer, fmt, sizeof(format_buffer));
     format_buffer[sizeof(format_buffer) - 1] = 0;
-    
+
     for (line=0; line<MAX_LINES; line++)
     {
         for (subline=0; subline<MAX_SUBLINES; subline++)
@@ -152,7 +152,7 @@ static void wps_format(char* fmt)
         switch (*buf)
         {
             /* skip % sequences so "%;" doesn't start a new subline */
-            case '%': 
+            case '%':
                 buf++;
                 break;
 
@@ -165,7 +165,7 @@ static void wps_format(char* fmt)
 
                 if (*start_of_line != '#') /* A comment? */
                     line++;
-                
+
                 if (line < MAX_LINES)
                 {
                     /* the next line starts on the next byte */
@@ -184,7 +184,7 @@ static void wps_format(char* fmt)
                 }
                 else /* exceeded max sublines, skip rest of line */
                 {
-                    while (*(++buf)) 
+                    while (*(++buf))
                     {
                         if  ((*buf == '\r') || (*buf == '\n'))
                         {
@@ -213,17 +213,17 @@ bool wps_load(char* file, bool display)
     int fd;
 
     fd = open(file, O_RDONLY);
-    
+
     if (fd >= 0)
     {
         int numread = read(fd, buffer, sizeof(buffer) - 1);
-        
+
         if (numread > 0)
         {
             buffer[numread] = 0;
             wps_format(buffer);
         }
-        
+
         close(fd);
 
         if ( display ) {
@@ -237,7 +237,7 @@ bool wps_load(char* file, bool display)
                 any_defined_line = false;
                 for (i=0; i<MAX_LINES; i++)
                 {
-                    if (format_lines[i][s]) 
+                    if (format_lines[i][s])
                     {
                         if (*format_lines[i][s] == 0)
                             lcd_puts(0,i," ");
@@ -261,7 +261,7 @@ bool wps_load(char* file, bool display)
 
         return numread > 0;
     }
-    
+
     return false;
 }
 
@@ -281,7 +281,7 @@ static void format_time(char* buf, int buf_size, int time)
  * buf      - buffer extract part to.
  * buf_size - size of buffer.
  * path     - path to extract from.
- * level    - what to extract. 0 is file name, 1 is parent of file, 2 is 
+ * level    - what to extract. 0 is file name, 1 is parent of file, 2 is
  *            parent of parent, etc.
  *
  * Returns buf if the desired level was found, NULL otherwise.
@@ -303,7 +303,7 @@ static char* get_dir(char* buf, int buf_size, char* path, int level)
             {
                 break;
             }
-            
+
             level--;
             last_sep = sep - 1;
         }
@@ -323,32 +323,41 @@ static char* get_dir(char* buf, int buf_size, char* path, int level)
 /* Get the tag specified by the two characters at fmt.
  *
  * id3      - ID3 data to get tag values from.
+ * nid3     - next-song ID3 data to get tag values from.
  * tag      - string (of two characters) specifying the tag to get.
- * buf      - buffer to certain tags, such as track number, play time or 
+ * buf      - buffer to certain tags, such as track number, play time or
  *           directory name.
  * buf_size - size of buffer.
  * flags    - returns the type of the line. See constants i wps-display.h
  *
  * Returns the tag. NULL indicates the tag wasn't available.
  */
-static char* get_tag(struct mp3entry* id3, 
-                     char* tag, 
-                     char* buf, 
+static char* get_tag(struct mp3entry* cid3,
+                     struct mp3entry* nid3,
+                     char* tag,
+                     char* buf,
                      int buf_size,
                      unsigned char* tag_len,
                      unsigned char* subline_time_mult,
                      unsigned char* flags)
 {
+    struct mp3entry *id3 = cid3; /* default to current song */
+
     if ((0 == tag[0]) || (0 == tag[1]))
     {
         *tag_len = 0;
         return NULL;
     }
-    
+
     *tag_len = 2;
 
     switch (tag[0])
     {
+        case 'I':  /* ID3 Information */
+            id3 = nid3; /* display next-song data */
+            if(!id3)
+                return NULL; /* no such info (yet) */
+            /* fall-through */
         case 'i':  /* ID3 Information */
             *flags |= WPS_REFRESH_STATIC;
             switch (tag[1])
@@ -358,7 +367,7 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'a':  /* ID3 Artist */
                     return id3->artist;
-            
+
                 case 'n':  /* ID3 Track Number */
                     if (id3->track_string)
                         return id3->track_string;
@@ -368,13 +377,13 @@ static char* get_tag(struct mp3entry* id3,
                         return buf;
                     }
                     return NULL;
-                    
+
                 case 'd':  /* ID3 Album/Disc */
                     return id3->album;
 
                 case 'c':  /* ID3 Composer */
                     return id3->composer;
-                
+
                 case 'y':  /* year */
                     if( id3->year_string )
                         return id3->year_string;
@@ -411,6 +420,11 @@ static char* get_tag(struct mp3entry* id3,
             }
             break;
 
+        case 'F':  /* File Information */
+            id3 = nid3;
+            if(!id3)
+                return NULL; /* no such info (yet) */
+            /* fall-through */
         case 'f':  /* File Information */
             *flags |= WPS_REFRESH_STATIC;
             switch(tag[1])
@@ -511,7 +525,7 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'r': /* Remaining Time in Song */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    format_time(buf, buf_size, 
+                    format_time(buf, buf_size,
                                 id3->length - id3->elapsed - ff_rewind_count);
                     return buf;
 
@@ -565,6 +579,11 @@ static char* get_tag(struct mp3entry* id3,
             }
             break;
 
+        case 'D': /* Directory path information */
+            id3 = nid3; /* next song please! */
+            if(!id3)
+                return NULL; /* no such info (yet) */
+            /* fall-through */
         case 'd': /* Directory path information */
             {
                 int level = tag[1] - '0';
@@ -578,38 +597,38 @@ static char* get_tag(struct mp3entry* id3,
             break;
 
         case 't': /* set sub line time multiplier */
-            { 
+            {
                 int d = 1;
                 int time_mult = 0;
                 bool have_point = false;
                 bool have_tenth = false;
-              
-                while (((tag[d] >= '0') && 
+
+                while (((tag[d] >= '0') &&
                         (tag[d] <= '9')) ||
-                       (tag[d] == '.')) 
+                       (tag[d] == '.'))
                 {
-                    if (tag[d] != '.') 
+                    if (tag[d] != '.')
                     {
                         time_mult = time_mult * 10;
                         time_mult = time_mult + tag[d] - '0';
-                        if (have_point) 
+                        if (have_point)
                         {
                             have_tenth = true;
                             d++;
                             break;
                         }
                     }
-                    else 
+                    else
                     {
                         have_point = true;
                     }
                     d++;
                 }
-                
+
                 if (have_tenth == false)
                     time_mult *= 10;
-                       
-                *subline_time_mult = time_mult; 
+
+                *subline_time_mult = time_mult;
                 *tag_len = d;
 
                 buf[0] = 0;
@@ -617,13 +636,13 @@ static char* get_tag(struct mp3entry* id3,
             }
             break;
     }
-    
+
     return NULL;
 }
 
 /* Skip to the end of the current %? conditional.
  *
- * fmt     - string to skip it. Should point to somewhere after the leading 
+ * fmt     - string to skip it. Should point to somewhere after the leading
  *           "<" char (and before or at the last ">").
  * to_else - if true, skip to the else part (after the "|", if any), else skip
  *           to the end (the ">").
@@ -640,19 +659,19 @@ static char* skip_conditional(char* fmt, bool to_else)
         {
             case '%':
                 break;
-        
+
             case '|':
                 if (to_else && (1 == level))
                     return fmt;
-            
+
                 continue;
-            
+
             case '>':
-                if (0 == --level) 
+                if (0 == --level)
                 {
                     if (to_else)
                         fmt--;
-                
+
                     return fmt;
                 }
                 continue;
@@ -660,7 +679,7 @@ static char* skip_conditional(char* fmt, bool to_else)
             default:
                 continue;
         }
-        
+
         switch (*fmt++)
         {
             case 0:
@@ -669,22 +688,22 @@ static char* skip_conditional(char* fmt, bool to_else)
             case '<':
             case '>':
                 break;
-        
+
             case '?':
                 while (*fmt && ('<' != *fmt))
                     fmt++;
-            
+
                 if ('<' == *fmt)
                     fmt++;
-            
+
                 level++;
                 break;
-        
+
             default:
                 break;
         }
     }
-    
+
     return fmt;
 }
 
@@ -693,14 +712,16 @@ static char* skip_conditional(char* fmt, bool to_else)
  * buf      - char buffer to write the display to.
  * buf_size - the size of buffer.
  * id3      - the ID3 data to format with.
+ * nid3     - the ID3 data of the next song (might by NULL)
  * fmt      - format description.
  * flags    - returns the type of the line. See constants i wps-display.h
  */
-static void format_display(char* buf, 
-                           int buf_size, 
-                           struct mp3entry* id3, 
-                           char* fmt, 
-                           unsigned char* subline_time_mult, 
+static void format_display(char* buf,
+                           int buf_size,
+                           struct mp3entry* id3,
+                           struct mp3entry* nid3, /* next song's id3 */
+                           char* fmt,
+                           unsigned char* subline_time_mult,
                            unsigned char* flags)
 {
     char temp_buf[128];
@@ -719,10 +740,10 @@ static void format_display(char* buf,
             case '%':
                 ++fmt;
                 break;
-        
+
             case '|':
             case '>':
-                if (level > 0) 
+                if (level > 0)
                 {
                     fmt = skip_conditional(fmt, false);
                     level--;
@@ -734,18 +755,18 @@ static void format_display(char* buf,
                 *buf++ = *fmt++;
                 continue;
         }
-        
+
         switch (*fmt)
         {
             case 0:
                 *buf++ = '%';
                 break;
-        
+
             case 's':
                 *flags |= WPS_REFRESH_SCROLL;
                 ++fmt;
                 break;
-        
+
             case '%':
             case '|':
             case '<':
@@ -753,30 +774,30 @@ static void format_display(char* buf,
             case ';':
                 *buf++ = *fmt++;
                 break;
-        
+
             case '?':
                 fmt++;
-                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf),
+                value = get_tag(id3, nid3, fmt, temp_buf, sizeof(temp_buf),
                                 &tag_length, subline_time_mult, flags);
-            
+
                 while (*fmt && ('<' != *fmt))
                     fmt++;
-            
+
                 if ('<' == *fmt)
                     fmt++;
-            
+
                 /* No value, so skip to else part */
                 if ((!value) || (!strlen(value)))
                     fmt = skip_conditional(fmt, true);
 
                 level++;
                 break;
-        
+
             default:
-                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf),
+                value = get_tag(id3, nid3, fmt, temp_buf, sizeof(temp_buf),
                                 &tag_length, subline_time_mult, flags);
                 fmt += tag_length;
-            
+
                 if (value)
                 {
                     while (*value && (buf < buf_end))
@@ -784,7 +805,7 @@ static void format_display(char* buf,
                 }
         }
     }
-    
+
     *buf = 0;
 
     /* if resulting line is an empty line, set the subline time to 0 */
@@ -797,7 +818,9 @@ static void format_display(char* buf,
         *flags = WPS_REFRESH_STATIC;
 }
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, 
+bool wps_refresh(struct mp3entry* id3,
+                 struct mp3entry* nid3,
+                 int ffwd_offset,
                  unsigned char refresh_mode)
 {
     char buf[MAX_PATH];
@@ -814,8 +837,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
        the peak meter. We can't use peak_meter_enabled itself
-       because that would mean to turn off the meter thread 
-       temporarily. (That shouldn't matter unless yield 
+       because that would mean to turn off the meter thread
+       temporarily. (That shouldn't matter unless yield
        or sleep is called but who knows...)
     */
     bool enable_pm = false;
@@ -852,7 +875,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
 
         /* if time to advance to next sub-line  */
         if (TIME_AFTER(current_tick,  subline_expire_time[i] - 1) ||
-           (curr_subline[i] == SUBLINE_RESET)) 
+           (curr_subline[i] == SUBLINE_RESET))
         {
             /* search all sublines until the next subline with time > 0
                is found or we get back to the subline we started with */
@@ -860,7 +883,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
                 search_start = 0;
             else
                 search_start = curr_subline[i];
-            for (search=0; search<MAX_SUBLINES; search++) 
+            for (search=0; search<MAX_SUBLINES; search++)
             {
                 curr_subline[i]++;
 
@@ -884,37 +907,37 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
                 }
                 else
                 {
-                    /* get initial time multiplier and 
+                    /* get initial time multiplier and
                        line type flags for this subline */
-                    format_display(buf, sizeof(buf), id3, 
-                                   format_lines[i][curr_subline[i]], 
+                    format_display(buf, sizeof(buf), id3, nid3,
+                                   format_lines[i][curr_subline[i]],
                                    &time_mult[i][curr_subline[i]],
                                    &line_type[i][curr_subline[i]]);
-                   
+
                     /* only use this subline if subline time > 0 */
                     if (time_mult[i][curr_subline[i]] > 0)
                     {
                         new_subline_refresh = true;
-                        subline_expire_time[i] = current_tick  + 
-                            BASE_SUBLINE_TIME * time_mult[i][curr_subline[i]]; 
+                        subline_expire_time[i] = current_tick  +
+                            BASE_SUBLINE_TIME * time_mult[i][curr_subline[i]];
                         break;
                     }
                 }
             }
 
         }
-        
+
         update_line = false;
 
         if ( !format_lines[i][curr_subline[i]] )
             break;
 
-        if ((line_type[i][curr_subline[i]] & refresh_mode) || 
+        if ((line_type[i][curr_subline[i]] & refresh_mode) ||
             (refresh_mode == WPS_REFRESH_ALL) ||
             new_subline_refresh)
         {
             flags = 0;
-            format_display(buf, sizeof(buf), id3,
+            format_display(buf, sizeof(buf), id3, nid3,
                            format_lines[i][curr_subline[i]],
                            &time_mult[i][curr_subline[i]],
                            &flags);
@@ -926,7 +949,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
                 int percent=
                     id3->length?
                     (id3->elapsed + ff_rewind_count) * 100 / id3->length:0;
-                slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
+                slidebar(0, i*h + offset + 1, LCD_WIDTH, 6,
                          percent, Grow_Right);
                 update_line = true;
             }
@@ -937,8 +960,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
                 update_line = true;
                 peak_meter_y = i * h + offset;
 
-                /* The user might decide to have the peak meter in the last 
-                   line so that it is only displayed if no status bar is 
+                /* The user might decide to have the peak meter in the last
+                   line so that it is only displayed if no status bar is
                    visible. If so we neither want do draw nor enable the
                    peak meter. */
                 if (peak_meter_y + h <= LCD_HEIGHT) {
@@ -987,7 +1010,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
 #endif
     }
 #ifdef HAVE_LCD_BITMAP
-    /* Now we know wether the peak meter is used. 
+    /* Now we know wether the peak meter is used.
        So we can enable / disable the peak meter thread */
     peak_meter_enabled = enable_pm;
 #endif
@@ -996,12 +1019,12 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
     if (global_settings.caption_backlight && id3) {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */
-        int n = 
+        int n =
             backlight_timeout_value[global_settings.backlight_timeout] * 1000;
 
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
- 
+
         if ((id3->elapsed < 1000) ||
             ((id3->length - id3->elapsed) < (unsigned)n))
             backlight_on();
@@ -1010,7 +1033,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset,
     return true;
 }
 
-bool wps_display(struct mp3entry* id3)
+bool wps_display(struct mp3entry* id3,
+                 struct mp3entry* nid3)
 {
     lcd_clear_display();
 
@@ -1049,7 +1073,7 @@ bool wps_display(struct mp3entry* id3)
         }
     }
     yield();
-    wps_refresh(id3, 0, WPS_REFRESH_ALL);
+    wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
     status_draw(true);
     lcd_update();
     return false;
@@ -1115,10 +1139,10 @@ static void draw_player_fullbar(char* buf, int buf_size,
     int digits[6];
     int time;
     char timestr[7];
-    
+
     for (i=0; i < buf_size; i++)
         buf[i] = ' ';
-           
+
     if(id3->elapsed >= id3->length)
         songpos = 55;
     else {
@@ -1129,7 +1153,7 @@ static void draw_player_fullbar(char* buf, int buf_size,
     }
 
     time=(id3->elapsed + ff_rewind_count);
-   
+
     memset(timestr, 0, sizeof(timestr));
     format_time(timestr, sizeof(timestr), time);
     for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
@@ -1166,22 +1190,22 @@ static void draw_player_fullbar(char* buf, int buf_size,
                 }
             }
         }
-         
+
         for (i=0; i<=6; i++) {
             for (j=0;j<5;j++) {
                 player_progressbar[i] <<= 1;
                 player_progressbar[i] += binline[i*5+j];
             }
         }
-       
+
         lcd_define_pattern(wps_progress_pat[lcd_char_pos+1],player_progressbar);
         buf[lcd_char_pos]=wps_progress_pat[lcd_char_pos+1];
-       
+
     }
 
     /* make rest of the progressbar if necessary */
     if (songpos/5>5) {
-   
+
         /* set the characters positions that use the full 5 pixel wide bar */
         for (lcd_char_pos=6; lcd_char_pos < (songpos/5); lcd_char_pos++)
             buf[lcd_char_pos] = 0x86; /* '_' */
@@ -1197,16 +1221,16 @@ static void draw_player_fullbar(char* buf, int buf_size,
                 }
             }
         }
-       
+
         for (i=0; i<7; i++) {
             for (j=0;j<5;j++) {
                 player_progressbar[i] <<= 1;
                 player_progressbar[i] += binline[i*5+j];
             }
         }
-       
+
         lcd_define_pattern(wps_progress_pat[7],player_progressbar);
-           
+
         buf[songpos/5]=wps_progress_pat[7];
     }
 }
