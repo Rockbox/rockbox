@@ -6,6 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
+
 CFLAGS := -O3 -s -ansi
 
 TARGETS := scramble descramble sh2d \
