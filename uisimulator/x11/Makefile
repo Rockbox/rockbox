@@ -61,18 +61,18 @@ LIBS = -lpthread
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
 ifeq ($(UNAME),Linux)
-  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
+  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl -ldl
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
 else
 ifeq ($(UNAME),CYGWIN)
-  LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11
+  LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -ldl
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
 else
-  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
+  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl -ldl
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
 endif
