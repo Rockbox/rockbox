@@ -322,7 +322,7 @@ bool CheckPlatform(int platform_id, UINT16 version)
     {   /* the range of Recorders seen so far */
         return (platform_id == ID_RECORDER);
     }
-    else if (version == 0 || (version >= 300 && version <= 506))
+    else if (version == 0 || (version >= 300 && version <= 508))
     {   /* for very old players, I've seen zero */
         return (platform_id == ID_PLAYER);
     }
