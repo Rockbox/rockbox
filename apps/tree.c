@@ -567,9 +567,9 @@ bool dirbrowse(char *root)
                 break;
 
             case TREE_MENU: {
-                browse_speed = 0;
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
+                browse_speed = 0;
                 lcd_stop_scroll();
                 main_menu();
                 /* do we need to rescan dir? */
