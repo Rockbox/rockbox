@@ -21,9 +21,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     id3 = rb->mpeg_current_track();
-    if (!id3)
-        return PLUGIN_ERROR;
-    
+    if (!id3) {
+        rb->splash(HZ*2, 0, true, "Nothing To Save");
+        return PLUGIN_OK;
+    } 
+
     fd = rb->open(FAVORITES_FILE, O_WRONLY);
 
     // creat the file if it does not return on open.
