@@ -129,6 +129,7 @@ bool recording_screen(void)
     bool have_recorded = false;
 
     cursor = 0;
+    mpeg_stop();
     mpeg_init_recording();
     status_set_playmode(STATUS_STOP);
     
