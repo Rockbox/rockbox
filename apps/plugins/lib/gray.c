@@ -469,7 +469,7 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     graybuf->depth = depth;
     graybuf->cur_plane = 0;
     graybuf->flags = 0;
-    graybuf->bitpattern = (unsigned long *) gbuf + sizeof(tGraybuf);
+    graybuf->bitpattern = (unsigned long *) (gbuf + sizeof(tGraybuf));
     graybuf->data = (unsigned char *) (graybuf->bitpattern + depth + 1);
     graybuf->curfont = FONT_SYSFIXED;
 
