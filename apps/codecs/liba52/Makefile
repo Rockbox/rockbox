@@ -7,11 +7,8 @@
 # $Id$
 #
 
-# ../.. for the plugin.h in the apps dir
-# .. for stuff in the plugins dir
-# . for stuff in the pluginlib dir
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(APPSDIR)/plugins/liba52/
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -35,7 +32,6 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/liba52/%.o: $(APPSDIR)/codecs/liba52/%.c
-	@mkdir -p $(OBJDIR)/liba52
 	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/liba52/ $< -o $@
 
