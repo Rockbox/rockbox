@@ -6,6 +6,10 @@ This is a simple tutorial (or, at least, as simply put as possible) on how
 to convert your video files to RVF (Rockbox Video File), to be played on
 the Archos Recorder / FM Recorder / V2 line.
 
+<p> Other option is to get the GUI Video Conversion Tool from John Wunder, which
+  can be downloaded from <a href="http://home.ripway.com/2004-2/66978/RockVideoRelease.zip">
+  http://home.ripway.com/2004-2/66978/RockVideoRelease.zip</a>
+
 <p> See also Fabian Merki's <a
  href="http://merkisoft.ch/rockbox/">msi-rvf-gallery</a>, a Java program for
  building RVF movies out of individual JPEGs.
@@ -22,7 +26,7 @@ the Archos Recorder / FM Recorder / V2 line.
 
 <li> Download the tools required here:
    <a
-href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip</a>
+href="http://joerg.hohensohn.bei.t-online.de/archos/video/">http://joerg.hohensohn.bei.t-online.de/archos/video/</a>
    Unzip to a PATH, such as C:\RVF, that is easily remembered.
 
 <li> Press START on your taskbar, choose RUN and type in the box (minus
@@ -58,6 +62,49 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joer
  OPTIONAL: You can name the output differently, again. INFO: When this is
  done, a long list will appear on your DOS screen and you will be back at the
  command prompt again.
+
+<li> Next step is adding sound to your video file. Run the tool avi2wav using the format:
+<pre>
+        avi2wav [input.avi] [output.wav]
+</pre>
+   For example, if your original file is called "filename" then you'd put in the following:
+<pre>
+        avi2wav filename.avi filename.wav
+</pre>
+
+ OPTIONAL: You can name the output differently.
+ 
+<li> The extracted audio file must be in mp3 format, so you have to convert the WAV file into MP3.
+     One option is using the LAME codec. You can download the win32 binary from <a
+     href="http://mitiok.cjb.net">http://mitiok.cjb.net</a>
+     One format used with LAME (good quality/size) is:
+<pre>
+         lame --preset standard [input.wav] [output.mp3]
+</pre>
+   For example, if your audio file is called "filename" then you'd put in the following:
+<pre>
+         lame --preset standard filename.wav filename.mp3
+</pre>
+
+ OPTIONL: You can name the output differently. Also, you can use other wav to mp3 tool, or even use
+ other options in the lame command. The --preset standard will give you a VBR file, so if you want a 
+ CBR file, just change the preset to --preset cbr [kbps], where [kbps] is the Constant Bit Rate desired.
+ 
+<li> Now we have to merge the sound with the video, so run the rvf_mux tool found
+     in the packet you've downloaded, using the format:
+<pre>
+        rvf_mux [option] [videoinput.rvf] [audioinput.mp3] [output.rvf]
+</pre>
+   For example, if your video file from step 6 is called "filename.rvf" and the audio file from step 7
+   is called "filename.wav" then you'd put in the following:
+<pre>
+        rvf_mux filename.rvf filename.mp3 filename_av.rvf
+</pre>
+
+ NOTE: You can use any name for the output file, but it's recomended that the name is not the same name
+ used in the input video file.
+ You can change the frames per second of Rockbox playback using the -play_fps [fps] option. The default
+ value is 67.0 fps.
 
 <li> Copy the .rvf output to your jukebox, load up a recent daily build and
    plugins, and kick back and watch the movie!
