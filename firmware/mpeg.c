@@ -821,6 +821,7 @@ static void stop_playing(void)
         close(mpeg_file);
     mpeg_file = -1;
     remove_all_tags();
+    reset_mp3_buffer();
 }
 
 static void update_playlist(void)
@@ -2041,14 +2042,6 @@ static void init_recording(void)
     stop_playing();
     is_playing = false;
     paused = false;
-
-    reset_mp3_buffer();
-
-    remove_all_tags();
-    
-    if(mpeg_file >= 0)
-        close(mpeg_file);
-    mpeg_file = -1;
 
     /* Init the recording variables */
     is_recording = false;
