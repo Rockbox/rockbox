@@ -50,7 +50,7 @@ install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
 
 thread.o: ../../thread.c
-	$(CC) -O $(CFLAGS) -c $<
+	$(CC) -O $(CFLAGS) -fomit-frame-pointer -c $<
 
 ata.o: ../../drivers/ata.c
 	$(CC) -O $(CFLAGS) -c $<

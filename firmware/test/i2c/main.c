@@ -16,13 +16,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "types.h"
+#include <stdbool.h>
 #include "i2c.h"
 #include "mas.h"
 #include "sh7034.h"
 #include "system.h"
 #include "debug.h"
 #include "kernel.h"
+#include "thread.h"
 #include "ata.h"
 #include "disk.h"
 #include "fat.h"
@@ -33,6 +34,15 @@
 #ifndef MIN
 #define MIN(a, b) (((a)<(b))?(a):(b))
 #endif
+
+#define MPEG_PLAY         1
+#define MPEG_STOP         2
+#define MPEG_PAUSE        3
+#define MPEG_RESUME       4
+#define MPEG_NEED_DATA    100
+
+#define MP3_LOW_WATER 0x30000
+#define MP3_CHUNK_SIZE 0x20000
 
 unsigned char fliptable[] =
 {
@@ -81,8 +91,20 @@ int mp3buf_write;
 int mp3buf_read;
 int last_dma_chunk_size;
 
-bool dma_on;
+bool dma_on;  /* The DMA is active */
+bool playing; /* We are playing an MP3 stream */
+bool filling; /* We are filling the buffer with data from disk */
+
+struct event_queue mpeg_queue;
+
 static void mas_poll_start(unsigned int interval_in_ms);
+void mpeg_thread(void);
+
+void reset_mp3_buffer(void)
+{
+    mp3buf_read = 0;
+    mp3buf_write = 0;
+}
 
 void setup_sci0(void)
 {
@@ -124,13 +146,9 @@ void setup_sci0(void)
     IPRC = (IPRC & 0xf0ff) | 0x0800;
     
     /* Enable Tx (only!) */
-//    SCR0 |= 0xa0;
+    SCR0 |= 0x20;
 }
 
-int mas_tx_ready(void)
-{
-    return (SSR0 & SCI_TDRE);
-}
 
 void init_dma(void)
 {
@@ -141,23 +159,25 @@ void init_dma(void)
     last_dma_chunk_size = MIN(65536, mp3buf_write - mp3buf_read);
     DTCR3 = last_dma_chunk_size & 0xffff;
     DMAOR = 0x0001; /* Enable DMA */
+    CHCR3 |= 0x0001; /* Enable DMA IRQ */
 }
 
 void start_dma(void)
 {
     SCR0 |= 0x80;
-    dma_on = TRUE;
+    dma_on = true;
 }
 
 void stop_dma(void)
 {
     SCR0 &= 0x7f;
-    dma_on = FALSE;
+    dma_on = false;
 }
 
 void dma_tick(void)
 {
-    if(!dma_on)
+    /* Start DMA if it isn't running */
+    if(playing && !dma_on)
     {
         if(PBDR & 0x4000)
         {
@@ -176,9 +196,6 @@ void bitswap(unsigned char *data, int length)
     }
 }
 
-struct event_queue disk_queue;
-int filling;
-
 int main(void)
 {
     char buf[40];
@@ -186,12 +203,6 @@ int main(void)
     int i=0;
     DIR *d;
     struct dirent *dent;
-    int f;
-    int free_space_left;
-    int mp3_space_left;
-    int amount_to_read;
-    int play_song;
-    struct event *ev;
     
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
@@ -205,7 +216,7 @@ int main(void)
 
     i2c_init();
 
-    dma_on = TRUE;
+    dma_on = true;
     
     kernel_init();
 
@@ -270,100 +281,20 @@ int main(void)
         closedir(d);
     }
 
-    f = open("/machinae_supremacy_-_arcade.mp3", O_RDONLY);
-    if(f < 0)
-    {
-        debugf("Couldn't open file\n");
-    }
+    queue_init(&mpeg_queue);
 
-    mp3buf_read = mp3buf_write = 0;
-    
-    /* First read in a few seconds worth of MP3 data */
-    i = read(f, mp3buf, 0x20000);
-    debugf("Read %d bytes\n", i);
+    create_thread(mpeg_thread, stack - 0x2000, 0x4000);
 
-    ata_spindown(-1);
-
-    debugf("bit swapping...\n");
-    bitswap(mp3buf + mp3buf_write, i);
-    
-    mp3buf_write = i;
-
-    queue_init(&disk_queue);
-    
-    mas_poll_start(1);
+    mas_poll_start(2);
     
     debugf("let's play...\n");
-    init_dma();
-    
-    dma_on = TRUE;
-    
-    /* Enable Tx & TXIE */
-    SCR0 |= 0xa0;
-    
-    CHCR3 |= 1;
 
-#define MP3_LOW_WATER 0x30000
-#define MP3_CHUNK_SIZE 0x20000
-
-    play_song = 1;
-    filling = 1;
+    queue_post(&mpeg_queue, MPEG_PLAY, 0);
     
-    while(play_song)
+    while(1)
     {
-        if(filling)
-        {
-            free_space_left = mp3buf_read - mp3buf_write;
-            if(free_space_left < 0)
-                free_space_left = MP3BUF_LEN + free_space_left;
-
-            if(free_space_left <= MP3_CHUNK_SIZE)
-            {
-                debugf("0\n");
-                ata_spindown(-1);
-                filling = 0;
-                continue;
-            }
-            
-            amount_to_read = MIN(MP3_CHUNK_SIZE, free_space_left);
-            amount_to_read = MIN(MP3BUF_LEN - mp3buf_write, amount_to_read);
-            
-            /* Read in a few seconds worth of MP3 data. We don't want to
-               read too large chunks because the bitswapping will take
-               too much time. We must keep the DMA happy and also give
-               the other threads a chance to run. */
-            debugf("R\n", i);
-            i = read(f, mp3buf+mp3buf_write, amount_to_read);
-            if(i)
-            {
-                debugf("B\n");
-                bitswap(mp3buf + mp3buf_write, i);
-            
-                mp3buf_write += i;
-                if(mp3buf_write >= MP3BUF_LEN)
-                {
-                    mp3buf_write = 0;
-                    debugf("W\n");
-                }
-            }
-            else
-            {
-                play_song = 0;
-                ata_spindown(-1);
-                filling = 0;
-            }
-        }
-        else
-        {
-            debugf("S\n");
-            ev = queue_wait(&disk_queue);
-            debugf("Q\n");
-            debugf("1\n");
-            filling = 1;
-        }
+        sleep(HZ*1000);
     }
-    debugf("Song is finished\n");
-    while(1);
 }
 
 #pragma interrupt
@@ -377,34 +308,39 @@ void DEI3(void)
 {
     int unplayed_space_left;
     int space_until_end_of_buffer;
-    mp3buf_read += last_dma_chunk_size;
-    if(mp3buf_read >= MP3BUF_LEN)
-        mp3buf_read = 0;
-    
-    unplayed_space_left = mp3buf_write - mp3buf_read;
-    if(unplayed_space_left < 0)
-       unplayed_space_left = MP3BUF_LEN + unplayed_space_left;
 
-    space_until_end_of_buffer = MP3BUF_LEN - mp3buf_read;
-
-    if(!filling && unplayed_space_left < MP3_LOW_WATER)
+    if(playing)
     {
-        queue_post(&disk_queue, 1, 0);
-    }
+        mp3buf_read += last_dma_chunk_size;
+        if(mp3buf_read >= MP3BUF_LEN)
+            mp3buf_read = 0;
     
-    if(unplayed_space_left)
-    {
-        last_dma_chunk_size = MIN(65536, unplayed_space_left);
-        last_dma_chunk_size = MIN(last_dma_chunk_size, space_until_end_of_buffer);
-        DTCR3 = last_dma_chunk_size & 0xffff;
-        SAR3 = (unsigned int)mp3buf + mp3buf_read;
-        CHCR3 &= ~0x0002;
+        unplayed_space_left = mp3buf_write - mp3buf_read;
+        if(unplayed_space_left < 0)
+            unplayed_space_left = MP3BUF_LEN + unplayed_space_left;
+
+        space_until_end_of_buffer = MP3BUF_LEN - mp3buf_read;
+        
+        if(!filling && unplayed_space_left < MP3_LOW_WATER)
+        {
+            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+        }
+        
+        if(unplayed_space_left)
+        {
+            last_dma_chunk_size = MIN(65536, unplayed_space_left);
+            last_dma_chunk_size = MIN(last_dma_chunk_size, space_until_end_of_buffer);
+            DTCR3 = last_dma_chunk_size & 0xffff;
+            SAR3 = (unsigned int)mp3buf + mp3buf_read;
+        }
+        else
+        {
+            debugf("No more MP3 data. Stopping.\n");
+            CHCR3 = 0; /* Stop DMA interrupt */
+        }
     }
-    else
-    {
-        debugf("No more MP3 data. Stopping.\n");
-        CHCR3 = 0;
-    }
+
+    CHCR3 &= ~0x0002; /* Clear DMA interrupt */
 }
 
 static void mas_poll_start(unsigned int interval_in_ms)
@@ -446,3 +382,164 @@ void IMIA1(void)
     TSR1 &= ~0x01;
 }
 
+char *tracks[] =
+{
+    "/machinae_supremacy_-_arcade.mp3"
+};
+
+char *peek_next_track(int index)
+{
+    return tracks[index];
+}
+
+int mpeg_file = -1;
+
+int new_file(void)
+{
+    int len;
+    char *trackname;
+
+    trackname = peek_next_track(0);
+
+    debugf("playing %s\n", trackname);
+    mpeg_file = open(trackname, O_RDONLY);
+    if(mpeg_file < 0)
+    {
+        debugf("Couldn't open file\n");
+        return -1;
+    }
+    
+    /* First read in a few seconds worth of MP3 data */
+    len = read(mpeg_file, mp3buf + mp3buf_write, MP3_CHUNK_SIZE);
+    
+    ata_spindown(-1);
+    
+    bitswap(mp3buf + mp3buf_write, len);
+    
+    mp3buf_write = len;
+
+    return 0;
+}
+
+void mpeg_thread(void)
+{
+    struct event ev;
+    int len;
+    int free_space_left;
+    int amount_to_read;
+
+    playing = false;
+
+    while(1)
+    {
+        debugf("S\n");
+        queue_wait(&mpeg_queue, &ev);
+        switch(ev.id)
+        {
+            case MPEG_PLAY:
+                /* Stop the current stream */
+                playing = false;
+                stop_dma();
+
+                reset_mp3_buffer();
+
+                new_file();
+                
+                /* Make it read more data */
+                filling = true;
+                queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+                playing = true;
+                
+                init_dma();
+                start_dma();
+                break;
+
+            case MPEG_STOP:
+                /* Stop the current stream */
+                playing = false;
+                stop_dma();
+                break;
+
+            case MPEG_PAUSE:
+                /* Stop the current stream */
+                playing = false;
+                stop_dma();
+                break;
+
+            case MPEG_RESUME:
+                /* Stop the current stream */
+                playing = true;
+                start_dma();
+                break;
+
+            case MPEG_NEED_DATA:
+                free_space_left = mp3buf_read - mp3buf_write;
+                if(free_space_left < 0)
+                    free_space_left = MP3BUF_LEN + free_space_left;
+
+                if(free_space_left <= MP3_CHUNK_SIZE)
+                {
+                    debugf("0\n");
+                    ata_spindown(-1);
+                    filling = false;
+                    break;;
+                }
+            
+                amount_to_read = MIN(MP3_CHUNK_SIZE, free_space_left);
+                amount_to_read = MIN(MP3BUF_LEN - mp3buf_write, amount_to_read);
+                
+                /* Read in a few seconds worth of MP3 data. We don't want to
+                   read too large chunks because the bitswapping will take
+                   too much time. We must keep the DMA happy and also give
+                   the other threads a chance to run. */
+                debugf("R\n");
+                len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
+                if(len)
+                {
+                    debugf("B\n");
+                    bitswap(mp3buf + mp3buf_write, len);
+                    
+                    mp3buf_write += len;
+                    if(mp3buf_write >= MP3BUF_LEN)
+                    {
+                        mp3buf_write = 0;
+                        debugf("W\n");
+                    }
+
+                    /* Tell ourselves that we want more data */
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                }
+                else
+                {
+                    close(mpeg_file);
+                    
+                    /* Make sure that the write pointer is at a word
+                       boundary */
+                    mp3buf_write &= 0xfffffffe;
+                        
+                    if(new_file() < 0)
+                    {
+                        /* No more data to play */
+                        debugf("Finished playing\n");
+                        playing = false;
+                        ata_spindown(-1);
+                        filling = false;
+                    }
+                    else
+                    {
+                        /* Tell ourselves that we want more data */
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                    }
+                }
+                break;
+        }
+    }
+}
+
+/* Newlib trap honeypot */
+void __trap34(void)
+{
+    debugf("newlib trap34\n");
+    while(1);
+}
