@@ -321,6 +321,10 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                             case 'd':  /* ID3 Album/Disc */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s", id3->album);
                                 break;
+                            case '\r':
+                            case '\n':
+                                /* As of yet, do nothing with these */
+                                break;
                         }
                         break;
                     case 'f':  /* File Information */
@@ -363,6 +367,10 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d",
                                         id3->filesize / 1024);
                                 break;
+                            case '\r':
+                            case '\n':
+                                /* As of yet, do nothing with these */
+                                break;
                         }
                         break;
                     case 'p':  /* Playlist/Song Information */
@@ -385,6 +393,10 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
                                         id3->elapsed / 60000,
                                         id3->elapsed % 60000 / 1000);
+                                break;
+                            case '\r':
+                            case '\n':
+                                /* As of yet, do nothing with these */
                                 break;
                         }
                         break;
@@ -424,6 +436,10 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                         snprintf(con_else, sizeof(con_else), "%s%s", con_else, tmpbuf);
                         break;
                 }
+                break;
+            case '\r':
+            case '\n':
+                /* As of yet, do nothing with these */
                 break;
             default:
                 switch(con_flag)
