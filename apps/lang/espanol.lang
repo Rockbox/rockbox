@@ -113,7 +113,6 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 new: "Reproducir primero la canción marcada"
-### LANG_MP3FILTER was not found in the english file!
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -1034,7 +1033,6 @@ id: LANG_CHANNEL_STEREO_WIDE
 desc: in sound_settings
 eng: "Stereo Wide"
 new: "Estereo Amplio"
-### LANG_CPU_SLEEP was not found in the english file!
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1675,3 +1673,258 @@ id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
 new: "Ver"
+
+id: LANG_BUTTON_BAR
+desc: in settings menu
+eng: "Button bar"
+new: "Barra de Botones"
+
+id: LANG_DIRBROWSE_F1
+desc: in dir browser, F1 button bar text
+eng: "Menu"
+new: "Menu"
+
+id: LANG_DIRBROWSE_F2
+desc: in dir browser, F2 button bar text
+eng: "Option"
+new: "Opcion"
+
+id: LANG_DIRBROWSE_F3
+desc: in dir browser, F3 button bar text
+eng: "LCD"
+new: "LCD" 
+
+id: VOICE_BILLION
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_DB
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_EIGHT
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_EIGHTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_EIGHTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_ELEVEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FIFE
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FIFTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FIFTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FORTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FOUR
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_FOURTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_GIGABYTE
+desc: spoken only
+eng: ""
+new: ""
+
+id: VOICE_HOUR
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_HOURS
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_HUNDRED
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_KHZ
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_MEGABYTE
+desc: spoken only
+eng: ""
+new: ""
+
+id: VOICE_MILLION
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_MILLISECONDS
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_MINUS
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_MINUTE
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_MINUTES
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_NINE
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_NINETEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_NINETY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_ONE
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_PERCENT
+desc: spoken only
+eng: ""
+new: ""
+
+id: VOICE_PLUS
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_POINT
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SECOND
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_SECONDS
+desc: spoken only, a unit postfix
+eng: ""
+new: ""
+
+id: VOICE_SEVEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SEVENTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SEVENTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SIX
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SIXTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_SIXTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_TEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_THIRTEEN
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_THIRTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_THOUSAND
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_THREE
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_TWELVE
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_TWENTY
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_TWO
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
+
+id: VOICE_ZERO
+desc: spoken only, for composing numbers
+eng: ""
+new: ""
