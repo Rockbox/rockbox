@@ -98,7 +98,7 @@ int rolo_load(char* filename)
         return -1;
     }
 
-    lcd_puts(0, 1, "Descrambling");
+    lcd_puts(0, 1, "Descramble");
     lcd_update();
 
     /* descramble */
@@ -120,7 +120,7 @@ int rolo_load(char* filename)
         return -1;
     }
 
-    lcd_puts(0, 1, "Executing   ");
+    lcd_puts(0, 1, "Executing     ");
     lcd_update();
 
     /* Disable interrupts */
