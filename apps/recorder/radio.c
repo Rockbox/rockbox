@@ -313,6 +313,10 @@ bool radio_screen(void)
 #endif /* #ifdef FM_RECORD */
 
             case FM_EXIT:
+#ifndef SIMULATOR
+                if(mpeg_status() == MPEG_STATUS_RECORD)
+                    mpeg_stop();
+#endif
                 done = true;
                 keep_playing = true;
                 break;
