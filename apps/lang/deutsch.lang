@@ -533,7 +533,7 @@ new: "<unbekannt>"
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[Song Nr.]
+new: "[Song Nr.]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
