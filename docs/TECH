@@ -15,15 +15,21 @@ Booting and (De)Scrambling
   scrambling that the original Archos firmware uses so that it can be loaded
   by the built-in firmware.
 
+  1) The built-in firmware starts
+  2) It looks in the root directory for a file called "archos.mod" (player)
+     or "ajbrec.ajz" (recorder)
+  3) If it finds one, it loads the file, descrambles it and runs it
+
 CPU
 
-  The CPU in use is a SH7034 from Hitachi, running at 11.0592MHz or 12MHz.
-  Most single instructions are excuted in 1 cycle. There is a 4KB internal ram
-  and a 2MB external ram.
+  The CPU in use is a SH7034 from Hitachi, running at 11.0592MHz (recorder)
+  or 12MHz (player).
+  Most single instructions are executed in 1 cycle. There is a 4KB internal RAM
+  and a 2MB external RAM.
 
 Memory Usage
 
-  All Archos Jukebox models have only 2MB ram. The ram is used for everything,
+  All Archos Jukebox models have only 2MB RAM. The RAM is used for everything,
   including code, graphics and config. To be able to play as long as possible
   without having to load more data, the size of the mpeg playing buffer must
   remain as big as possible. Also, since we need to be able to do almost
@@ -36,7 +42,50 @@ Playing MPEG
   The MPEG decoding is performed by an external circuit, MAS3507D (for the
   Player/Studio models) or MAS3587F (for the Recorder models).
 
-  ...
+  The CPU has a serial connection to the MAS for MP3 playback, using serial
+  port 0 at approx. 1mbit/s. The MAS has a handshake signal called DEMAND,
+  that informs the CPU when it wants more MP3 data. Whenever the DEMAND
+  signal goes high, it wants data sent over the serial line, and it wants it
+  quickly, within ~1ms. When the MAS has received enough data, it negates the
+  DEMAND signal and expects the incoming data stream to stop within 1ms.
+
+  The DEMAND signal is connected to a port pin on the CPU which can generate
+  an IRQ, but only on the falling edge. That means that the mpeg driver code
+  must poll the DEMAND signal every ms to keep the MAS happy. The mpeg code
+  does use the IRQ to detect the falling edge when the MAS is "full".
+
+  Unfortunately, the serial port on the CPU sends the LSB first, and the MAS
+  expects the MSB first. Therefore we have to revers the bit order in every
+  byte in the loaded MP3 data. This is referred to as "bit swapping" in the
+  Rockbox code.
+
+  The internal DMA controller is used to feed the serial port with data. The
+  driver works roughly like this:
+
+  1) Load MP3 data into the RAM buffer
+  2) Bitswap the data
+  3) Load the DMA source pointer to the next 64Kbyte block to be transferred
+  4) Wait until DEMAND is high
+  5) Enable the DMA
+  6) Wait until the falling DEMAND pin generates an IRQ
+  7) Disable the DMA
+  8) Go to 4
+
+  The DMA generates an IRQ when the 64Kbyte block is transferred, and the
+  IRQ handler updates the DMA source pointer.
+
+
+                    _____________________________
+                    |                           |
+  DEMAND  __________|                           |_____________
+                        _  _  _  _  _  _  _  _  _
+  SC0     _____________/ \/ \/ \/ \/ \/ \/ \/ \/ \____________
+                       \_/\_/\_/\_/\_/\_/\_/\_/\_/
+                      ^                         ^
+                      |                         |
+              Poll sees the DEMAND       The DEMAND pin generates
+              signal go high and         an IRQ that in turn disables
+              enables the DMA            the DMA again
 
 Spinning The Disk Up/Down
 
@@ -87,10 +136,12 @@ Playing a Directory
 Shuffle
 
   Since the playlist is a an array of indexes to where to read the file name,
-  shuffle modifies the order of these indexes in the array. The randomness is
-  identical for the same random seed. This is the secret to good resume. Even
-  when you've shut down your unit and re-starts it, using the same random seed
-  as the previous time will give exactly the same random order.
+  shuffle modifies the order of these indexes in the array. The algorithm is
+  pretty much like shuffling a deck of cards, and it uses a pseudo random
+  generator called the Mersenne Twister. The randomness is identical for the
+  same random seed. This is the secret to good resume. Even when you've shut
+  down your unit and re-starts it, using the same random seed as the previous
+  time will give exactly the same random order.
 
 Saving Config Data
 
