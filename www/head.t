@@ -29,7 +29,7 @@
 <p align="right">
 <a class="menulink" href="/">home</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/docs/">documentation</a><br>
+<a class="menulink" href="/twiki/bin/view/Main/DocsIndex">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/twiki/">twiki</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
