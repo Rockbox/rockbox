@@ -1316,21 +1316,21 @@ voice: ""
 new: 
 
 id: LANG_VBRFIX_STOP_PLAY
-desc: Tells the user to stop the playback
-eng: "Stop the playback first"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: 
 
 id: LANG_VBRFIX_NOT_VBR
-desc: Tells the user that the selected file is not a VBR file
-eng: "Not a VBR file"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: 
 
 id: LANG_VBRFIX
-desc: The context menu entry
-eng: "Update VBR file"
-voice: "Update VBR file"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: 
 
 id: LANG_INVERT_CURSOR
