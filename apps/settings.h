@@ -281,6 +281,7 @@ struct opt_items {
 
 /* prototypes */
 
+void settings_calc_config_sector(void);
 int settings_save(void);
 void settings_load(int which);
 void settings_reset(void);

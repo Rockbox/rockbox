@@ -82,6 +82,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #endif
 
 long lasttime = 0;
+static int config_sector = 0;  /* mark uninitialized */
 static unsigned char config_block[CONFIG_BLOCK_SIZE];
 
 
@@ -481,8 +482,8 @@ static int save_config_buffer( void )
 
 #endif
 
-    if (fat_startsector() != 0)
-        ata_delayed_write( 61, config_block);
+    if (config_sector != 0)
+        ata_delayed_write( config_sector, config_block);
     else
         return -1;
 
@@ -502,8 +503,8 @@ static int load_config_buffer(int which)
 
     if (which & SETTINGS_HD)
     {
-        if (fat_startsector() != 0) {
-            ata_read_sectors( 61, 1,  config_block);
+        if (config_sector != 0) {
+            ata_read_sectors( config_sector, 1,  config_block);
 
             /* calculate the checksum, check it and the header */
             chksum = calculate_config_checksum(config_block);
@@ -601,6 +602,35 @@ static void save_bit_table(const struct bit_entry* p_table, int count, int bitst
         curr_bit); /* = position after last element */
 }
 
+/*
+ * figure out the config sector from the partition table and the
+ * mounted file system 
+ */
+void settings_calc_config_sector(void)
+{
+#ifdef SIMULATOR
+    config_sector = 61;
+#else
+    int i, partition_start;
+    int sector = 0;
+
+    if (fat_startsector != 0)    /* There is a partition table */
+    {
+        sector = 61;
+        for (i = 0; i < 4; i++)
+        {
+            partition_start = disk_partinfo(i)->start;
+            if (partition_start != 0 && (partition_start - 2) < sector)
+                sector = partition_start - 2;
+        }
+        if (sector < 0)
+            sector = 0;
+    }
+    
+    splash(HZ, true, "CfgSec: %d", sector);
+    config_sector = sector;
+#endif
+}
 
 /*
  * persist all runtime user settings to disk or RTC RAM

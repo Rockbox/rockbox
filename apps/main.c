@@ -79,6 +79,7 @@ void init(void)
     font_init();
     show_logo();
     settings_reset();
+    settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     settings_apply();
     sleep(HZ/2);
@@ -224,11 +225,12 @@ void init(void)
         }
     }
 
+    settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     settings_apply();
-    
+
     status_init();
-    playlist_init();
+    playlist_init(); 
     tree_init();
 
     /* No buffer allocation (see buffer.c) may take place after the call to
