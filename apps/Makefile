@@ -99,12 +99,13 @@ $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
-	@a=`uclpack -h 2>/dev/null`; \
+	@a=`2uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "runs uclpack"; \
 	  uclpack --best --2e $(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.ucl >/dev/null 2>&1; \
 	else \
-	  echo "no uclpack command found, not making any UCL file"; \
+	  echo "no uclpack command found, makes a fake UCL file"; \
+	  echo "fake" > $@; \
 	fi
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
