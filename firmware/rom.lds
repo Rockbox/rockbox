@@ -3,11 +3,23 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
+
+#define PLUGINSIZE 0x8000
+
+#define DRAMORIG 0x09000000
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
+#define IRAMORIG 0x0f000000
+#define IRAMSIZE 0x1000
+#define FLASHORIG 0x02000000 + ROM_START
+#define FLASHSIZE 256K - ROM_START
+
+#define ENDADDR  (DRAMORIG + DRAMSIZE)
+
 MEMORY
 {
-   DRAM : ORIGIN = 0x09000000, LENGTH = (2 * 0x100000) - 0x8000
-   IRAM : ORIGIN = 0x0f000000, LENGTH = 0x1000
-   FLASH : ORIGIN = 0x02000000 + ROM_START, LENGTH = 256K - ROM_START
+   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+   IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+   FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
 }
 SECTIONS
 {
@@ -76,12 +88,12 @@ SECTIONS
         _mp3buffer = .;
     } > DRAM
 
-    .mp3end (0x09000000 + (2 * 0x100000) - 0x8000):
+    .mp3end ENDADDR:
     {
         _mp3end = .;
     } > DRAM
 
-    .plugin (0x09000000 + (2 * 0x100000) - 0x8000):
+    .plugin ENDADDR:
     {
         _pluginbuf = .;
     }
