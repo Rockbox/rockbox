@@ -117,7 +117,7 @@ static void draw_calendar(struct shown *shown)
 {
     int w,h;
     int ws,row,pos,days_per_month,j;
-    char buffer[7];
+    char buffer[9];
     char *Monthname[] = {
                           "Jan",
                           "Feb",
@@ -144,9 +144,9 @@ static void draw_calendar(struct shown *shown)
     for (j = 0; j < days_per_month;)
     {
         if ( (day_has_memo[++j]) || (wday_has_memo[pos]) )
-            rb->snprintf(buffer,3,"%02d.", j);
+            rb->snprintf(buffer,4,"%02d.", j);
         else
-            rb->snprintf(buffer,3,"%02d", j);
+            rb->snprintf(buffer,4,"%02d", j);
         rb->lcd_putsxy(ws, (row * h) + 5 ,buffer);
         if (shown->mday == j)
         {
@@ -164,7 +164,7 @@ static void draw_calendar(struct shown *shown)
     }
     rb->lcd_drawline(60,LCD_HEIGHT-h-3,60,LCD_HEIGHT-1);
     rb->lcd_drawline(60,LCD_HEIGHT-h-3,LCD_WIDTH-1,LCD_HEIGHT-h-3);
-    rb->snprintf(buffer,8,"%s %04d",Monthname[shown->mon-1],shown->year);
+    rb->snprintf(buffer,9,"%s %04d",Monthname[shown->mon-1],shown->year);
     rb->lcd_putsxy(62,(LCD_HEIGHT-h-1),buffer);
     shown->lastday = pos;
     rb->lcd_update();
@@ -185,13 +185,14 @@ struct memo {
 static int pointer_array[MAX_MEMOS_IN_A_MONTH];
 static int memos_in_memory = 0;
 static int memos_in_shown_memory = 0;
+
 static void load_memo(struct shown *shown)
 {
     int i, k, fp;
     bool exit = false;
-    char temp_memo0[0];
-    char temp_memo1[1];
-    char temp_memo3[3];
+    char temp_memo1[2];
+    char temp_memo2[3];
+    char temp_memo4[5];
     for (k = 0; k < memos_in_memory; k++)
     {
         memos[k].day = 0;
@@ -218,16 +219,16 @@ static void load_memo(struct shown *shown)
         {
             memos[memos_in_memory].file_pointer_start = rb->lseek(fp, 0,
                                                                   SEEK_CUR);
-            if (rb->read(fp, temp_memo1, 2) == 2)
-                memos[memos_in_memory].day = rb->atoi(&temp_memo1[0]);
+            if (rb->read(fp, temp_memo2, 2) == 2)
+                memos[memos_in_memory].day = rb->atoi(&temp_memo2[0]);
             else
                 memos[memos_in_memory].day = 0;
-            if (rb->read(fp, temp_memo1, 2) == 2)
-                memos[memos_in_memory].month = rb->atoi(&temp_memo1[0]);
+            if (rb->read(fp, temp_memo2, 2) == 2)
+                memos[memos_in_memory].month = rb->atoi(&temp_memo2[0]);
             else
                 memos[memos_in_memory].month = 0;
-            if (rb->read(fp, temp_memo3, 4) == 4)
-                memos[memos_in_memory].year = rb->atoi(&temp_memo3[0]);
+            if (rb->read(fp, temp_memo4, 4) == 4)
+                memos[memos_in_memory].year = rb->atoi(&temp_memo4[0]);
             else
                 memos[memos_in_memory].year = 0;
             /* as the year returned is sometimes yearmonth, ie if yr should =
@@ -236,17 +237,17 @@ static void load_memo(struct shown *shown)
                 memos[memos_in_memory].year = (memos[memos_in_memory].year -
                                                memos[memos_in_memory].month) /
                     100;
-            if (rb->read(fp, temp_memo0, 1) == 1)
-                memos[memos_in_memory].wday = rb->atoi(&temp_memo0[0]);
+            if (rb->read(fp, temp_memo1, 1) == 1)
+                memos[memos_in_memory].wday = rb->atoi(&temp_memo1[0]);
             else
                 memos[memos_in_memory].wday = 0;
-            if (rb->read(fp, temp_memo0, 1) == 1)
-                memos[memos_in_memory].type = rb->atoi(&temp_memo0[0]);
+            if (rb->read(fp, temp_memo1, 1) == 1)
+                memos[memos_in_memory].type = rb->atoi(&temp_memo1[0]);
             else
                 memos[memos_in_memory].type = 0;
             for (k = 0; k <= count; k++)
             {
-                if (rb->read(fp, temp_memo0, 1) == 1)
+                if (rb->read(fp, temp_memo1, 1) == 1)
                 {
                     if (
                         (memos[memos_in_memory].type < 2)
@@ -266,7 +267,7 @@ static void load_memo(struct shown *shown)
                             )
                         )
                     {
-                        if (temp_memo0[0] == '\n')
+                        if (temp_memo1[0] == '\n')
                         {
                             if (memos[memos_in_memory].type > 0)
                                 day_has_memo[memos[memos_in_memory].day] =
@@ -277,11 +278,11 @@ static void load_memo(struct shown *shown)
                             memos[memos_in_memory++].file_pointer_end =
                                 rb->lseek(fp, 0, SEEK_CUR);
                         }
-                        else if ( (temp_memo0[0] != '\r') &&
-                                  (temp_memo0[0] != '\t') )
-                            memos[memos_in_memory].message[k] = temp_memo0[0];
+                        else if ( (temp_memo1[0] != '\r') &&
+                                  (temp_memo1[0] != '\t') )
+                            memos[memos_in_memory].message[k] = temp_memo1[0];
                     }
-                    if (temp_memo0[0] == '\n')
+                    if (temp_memo1[0] == '\n')
                         break;
                 }
                 else
@@ -320,15 +321,15 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         }
         if (new_mod)
         {
-            rb->snprintf(temp, 2, "%02d", memos[changed].day);
+            rb->snprintf(temp, 3, "%02d", memos[changed].day);
             rb->write(fq,temp,2);
-            rb->snprintf(temp, 2, "%02d", memos[changed].month);
+            rb->snprintf(temp, 3, "%02d", memos[changed].month);
             rb->write(fq,temp,2);
-            rb->snprintf(temp, 4, "%04d", memos[changed].year);
+            rb->snprintf(temp, 5, "%04d", memos[changed].year);
             rb->write(fq,temp,4);
-            rb->snprintf(temp, 1, "%01d", memos[changed].wday);
+            rb->snprintf(temp, 2, "%01d", memos[changed].wday);
             rb->write(fq,temp,1);
-            rb->snprintf(temp, 1, "%01d", memos[changed].type);
+            rb->snprintf(temp, 2, "%01d", memos[changed].type);
             rb->write(fq,temp,1);
             rb->snprintf(temp, rb->strlen(memos[changed].message)+1,
                          "%s\n", memos[changed].message);
