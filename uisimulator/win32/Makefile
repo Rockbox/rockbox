@@ -21,6 +21,7 @@ APPDIR = ../../apps
 RECDIR = $(APPDIR)/recorder
 PLAYDIR = $(APPDIR)/player
 PLUGINDIR = $(APPDIR)/plugins
+SIMCOMMON = ../common
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
      MACHINEDIR = $(RECDIR)
@@ -57,7 +58,7 @@ $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) $(RTC)
 LDFLAGS =  -lgdi32 -luser32
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
+INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(MACHINEDIR) -I$(OBJDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES =  $(INCLUDES)
@@ -96,7 +97,7 @@ else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
 FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c \
-	sprintf.c buffer.c
+	sprintf.c buffer.c lcd-common.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
@@ -277,16 +278,19 @@ $(OBJDIR)/ctype.o: $(COMMON)/ctype.c
 $(OBJDIR)/strtok.o: $(COMMON)/strtok.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/stubs.o: ../common/stubs.c
+$(OBJDIR)/stubs.o: $(SIMCOMMON)/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/font-player.o: ../common/font-player.c
+$(OBJDIR)/lcd-common.o: $(SIMCOMMON)/lcd-common.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/sim_icons.o: ../common/sim_icons.c
+$(OBJDIR)/font-player.o: $(SIMCOMMON)/font-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/lcd-playersim.o: ../common/lcd-playersim.c
+$(OBJDIR)/sim_icons.o: $(SIMCOMMON)/sim_icons.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
