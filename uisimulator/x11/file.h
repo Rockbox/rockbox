@@ -32,7 +32,7 @@ int x11_rename(char *oldpath, char *newpath);
 #define remove(x) x11_remove(x)
 #define rename(x,y) x11_rename(x,y)
 
-#include "../../firmware/common/file.h"
+#include "../../firmware/include/file.h"
 
 extern int open(char* pathname, int flags);
 extern int close(int fd);

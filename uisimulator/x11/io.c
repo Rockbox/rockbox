@@ -30,7 +30,7 @@
 
 #define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
 #define dirent x11_dirent
-#include "../../firmware/common/dir.h"
+#include "../../firmware/include/dir.h"
 #undef dirent
 
 #define SIMULATOR_ARCHOS_ROOT "archos"

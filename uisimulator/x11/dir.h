@@ -22,7 +22,7 @@ typedef void DIR;
 
 #define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
 #define dirent x11_dirent
-#include "../../firmware/common/dir.h"
+#include "../../firmware/include/dir.h"
 #undef dirent
 
 typedef void * MYDIR;
