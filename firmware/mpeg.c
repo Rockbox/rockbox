@@ -544,7 +544,7 @@ void IRQ6(void)
 #pragma interrupt
 void DEI3(void)
 {
-    if(playing)
+    if(playing && !paused)
     {
         int unplayed_space_left;
         int space_until_end_of_buffer;
@@ -665,13 +665,14 @@ static int new_file(int steps)
         }
         else
         {
+            int new_tag_idx = tag_write_idx;
             add_track_to_tag_list(trackname);
             /* skip past id3v2 tag (to an even byte) */
             lseek(mpeg_file, 
-                  id3tags[tag_read_idx]->id3.id3v2len & ~1, 
+                  id3tags[new_tag_idx]->id3.id3v2len & ~1, 
                   SEEK_SET);
-            id3tags[tag_read_idx]->id3.index = index;
-            id3tags[tag_read_idx]->id3.offset = 0;
+            id3tags[new_tag_idx]->id3.index = index;
+            id3tags[new_tag_idx]->id3.offset = 0;
         }
     } while ( mpeg_file < 0 );
 
@@ -784,11 +785,14 @@ static void mpeg_thread(void)
             case MPEG_RESUME:
                 DEBUGF("MPEG_RESUME\n");
                 /* Continue the current stream */
+                paused = false;
+                if (!play_pending)
+                {
                 playing = true;
                 last_dma_tick += current_tick - pause_tick;
                 pause_tick = 0;
-                paused = false;
                 start_dma();
+                }
                 break;
 
             case MPEG_NEXT:
@@ -976,6 +980,7 @@ static void mpeg_thread(void)
                     play_pending = true;
                 }
 
+                id3->offset = newpos;
                 id3->elapsed = newtime;
 
                 break;
@@ -1255,6 +1260,7 @@ void mpeg_pause(void)
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
 #else
     playing = false;
+    paused = true;
 #endif
 }
 
@@ -1264,6 +1270,7 @@ void mpeg_resume(void)
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
 #else
     playing = true;
+    paused = false;
 #endif
 }
 
@@ -1302,7 +1309,7 @@ void mpeg_ff_rewind(int change)
 
 bool mpeg_is_playing(void)
 {
-    return (playing || play_pending) && (!paused) ;
+    return playing || play_pending || paused;
 }
 
 #ifndef SIMULATOR
