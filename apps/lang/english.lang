@@ -1201,3 +1201,18 @@ id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
 new:
+
+id: LANG_TRICKLE_CHARGE
+desc: in settings_menu
+eng: "Trickle Charge"
+new:
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+new:
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+new:
