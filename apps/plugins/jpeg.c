@@ -2012,24 +2012,42 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
                 marker_size |= *p_src++; /* Lowbyte */
 
                 p_temp = p_src;
-                while (p_src < p_temp+marker_size-2) /* another table */
+                while (p_src < p_temp+marker_size-2-17) /* another table */
                 {
+                    int sum = 0;
                     i = *p_src & 0x0F; /* table index */
                     if (i > 1)
                     {
                         return (-5); /* Huffman table index out of range */
                     }
-                    if (*p_src++ & 0xF0) /* AC table */
+                    else if (*p_src++ & 0xF0) /* AC table */
                     {
-                        for (j=0; j<MIN(AC_LEN, marker_size-3); j++)
+                        for (j=0; j<16; j++)
+                        {
+                            sum += *p_src;
+                            p_jpeg->hufftable[i].huffmancodes_ac[j] = *p_src++;
+                        }
+                        if(16 + sum > AC_LEN)
+                            return -10; /* longer than allowed */
+
+                        for (; j < 16 + sum; j++)
                             p_jpeg->hufftable[i].huffmancodes_ac[j] = *p_src++;
                     }
                     else /* DC table */
                     {
-                        for (j=0; j<MIN(DC_LEN, marker_size-3); j++)
+                        for (j=0; j<16; j++)
+                        {
+                            sum += *p_src;
+                            p_jpeg->hufftable[i].huffmancodes_dc[j] = *p_src++;
+                        }
+                        if(16 + sum > DC_LEN)
+                            return -11; /* longer than allowed */
+
+                        for (; j < 16 + sum; j++)
                             p_jpeg->hufftable[i].huffmancodes_dc[j] = *p_src++;
                     }
                 } /* while */
+                p_src = p_temp+marker_size - 2; // skip possible residue
             }
             break;
 
@@ -2103,6 +2121,14 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
         case 0xE5: /* Application Field 5*/
         case 0xE6: /* Application Field 6*/
         case 0xE7: /* Application Field 7*/
+        case 0xE8: /* Application Field 8*/
+        case 0xE9: /* Application Field 9*/
+        case 0xEA: /* Application Field 10*/
+        case 0xEB: /* Application Field 11*/
+        case 0xEC: /* Application Field 12*/
+        case 0xED: /* Application Field 13*/
+        case 0xEE: /* Application Field 14*/
+        case 0xEF: /* Application Field 15*/
         case 0xFE: /* Comment */
             {
                 marker_size = *p_src++ << 8; /* Highbyte */
@@ -2133,7 +2159,7 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
 
 
     /* memory location for later decompress (16-bit aligned) */
-    p_dest = (unsigned char*)((int)p_bytes + 1 & ~1);
+    p_dest = (unsigned char*)(((int)p_bytes + 1) & ~1);
     p_jpeg->p_entropy_data = (unsigned short*)p_dest;
 
     
@@ -2152,6 +2178,8 @@ int process_markers(unsigned char* p_bytes, long size, struct jpeg* p_jpeg)
         }
         else if (*p_src >= 0xD0 && *p_src <= 0xD7) /* restart marker */
         {
+            return (-12); /* can't decode such images for now */
+            /* below won't work, is not seamless to the huffman decoder */
             p_src++; /* continue reading after marker */
             p_dest--; /* roll back, don't copy it */
             continue; /* ignore */
@@ -2899,7 +2927,7 @@ int main(char* filename)
     status = process_markers(buf_jpeg, filesize, &jpg);
 	if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
-        rb->splash(HZ*2, true, "unsupported format %d", status);
+        rb->splash(HZ*2, true, "unsupported %d", status);
         return PLUGIN_ERROR;
     }
 	if (!(status & DHT)) /* if no Huffman table present: */
