@@ -332,8 +332,7 @@ void display_volume_level(int vol_level)
     char buffer[32];
 
     lcd_stop_scroll();
-    lcd_clear_display();
-    snprintf(buffer,sizeof(buffer),"Vol: %d %s", vol_level * 2, "%");
+    snprintf(buffer,sizeof(buffer),"Vol: %d %s       ", vol_level * 2, "%");
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_puts(0, 0, buffer);
