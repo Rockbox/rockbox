@@ -495,7 +495,7 @@ extern unsigned char char_dw_8x8_prop[][9];
 /*
  * Return width and height of a given font.
  */
-void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
+int lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 {
     int width=0;
     int height=0;
@@ -518,6 +518,8 @@ void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
     }
     *w = width;
     *h = height;
+
+    return width;
 }
 
 /*
@@ -527,7 +529,7 @@ void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 void lcd_putspropxy(int x, int y, char *str, int thisfont)
 {
     int ch;
-    int nx = char_dw_8x8_prop[*str][8] >> 4;
+    int nx = char_dw_8x8_prop[(int)*str][8] >> 4;
     int ny=8;
     unsigned char *src;
     int lcd_x = x;
@@ -914,21 +916,30 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
 void lcd_puts_scroll(int x, int y, char* string )
 {
     struct scrollinfo* s = &scroll;
-    char *ch;
 #ifdef HAVE_LCD_CHARCELLS
     s->space = 11 - x;
 #else
+
+#ifdef LCD_PROPFONTS
+    unsigned char ch[2];
+    int w, h;
+#endif
     int width, height;
     lcd_getfontsize(font, &width, &height);
 #ifndef LCD_PROPFONTS
     s->space = (LCD_WIDTH - xmargin - x*width) / width;
 #else
-    ch = string;
+    ch[1] = 0; /* zero terminate */
+    ch[0] = string[0];
     width = 0;
-    for (s->space = 0; width + (char_dw_8x8_prop[*ch][8]>>4) < LCD_WIDTH - x;
-        width += (char_dw_8x8_prop[*ch][8]>>4), ch++, s->space++);
+    for (s->space = 0;
+         width + lcd_getstringsize(ch, 0, &w, &h) < (LCD_WIDTH - x*8); ) {
+        width += lcd_getstringsize(ch, 0, &w, &h);
+        ch[0]=string[(int)++s->space];
+    }
 #endif
 #endif
+
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
     if ( s->textlen > s->space ) {
