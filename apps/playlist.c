@@ -92,7 +92,7 @@ void play_list(char *dir, char *file)
 
     /* if shuffle is wanted, this is where to do that */
 
-    lcd_puts(0,0,"Playing...");
+    lcd_puts(0,0,"Complete. ");
     lcd_update();
     /* also make the first song get playing */
     mpeg_play(playlist_next(0));
@@ -119,6 +119,11 @@ void add_indices_to_playlist( playlist_info_t *playlist )
     int i = 0;
     int store_index = 0;
     int count = 0;
+#ifdef SIMULATOR
+    int next_tick = time(NULL);
+#else
+    int next_tick = current_tick + HZ;
+#endif
 
     unsigned char *p;
     unsigned char buf[512];
@@ -152,8 +157,14 @@ void add_indices_to_playlist( playlist_info_t *playlist )
                 }
 
                 store_index = 0;
-                if ( playlist->amount % 200 == 0 ) {
-                    snprintf(line, sizeof line, "%d", playlist->amount);
+#ifdef SIMULATOR
+                if ( time(NULL) >= next_tick ) {
+                    next_tick = time(NULL) + 1;
+#else
+                if ( current_tick >= next_tick ) {
+                    next_tick = current_tick + HZ;
+#endif
+                    snprintf(line, sizeof line, "%d files", playlist->amount);
                     lcd_puts(0,1,line);
                     lcd_update();
                 }
@@ -162,7 +173,7 @@ void add_indices_to_playlist( playlist_info_t *playlist )
 
         i+= count;
     }
-    snprintf(line, sizeof line, "%d", playlist->amount);
+    snprintf(line, sizeof line, "%d files", playlist->amount);
     lcd_puts(0,1,line);
     lcd_update();
 
