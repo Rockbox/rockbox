@@ -18,10 +18,10 @@
  ****************************************************************************/
  
 /* The following is a first attempt at an assembler optimized version of
-   FLAC__lpc_restore_signal programmed for MFC5249 or any other similar
+   FLAC__lpc_restore_signal programmed for MCF5249 or any other similar
    ColdFire V2 core with the EMAC unit.
-*/
-    .section .icode,"ax",@progbits
+ */
+    .text
     .global FLAC__lpc_restore_signal_mcf5249
     .align 2
 FLAC__lpc_restore_signal_mcf5249:
@@ -43,174 +43,173 @@ FLAC__lpc_restore_signal_mcf5249:
     clr.l %d3
     move.l %d3, %macsr /* we'll need integer mode for this */
     tst.l %d0          
-    jeq .Lexit         /* zero samples to process */
-    movq.l #8, %d3
-    cmp.l %d3, %d2     /* coldfire v2 only has long cmp version */
-    jgt .Ldefault      /* order is over 8, jump to default case */
-    lea.l .Ljumptable, %a4
+    jeq .exit         /* zero samples to process */
+    moveq.l #8, %d3
+    cmp.l %d3, %d2
+    jgt .default      /* order is over 8, jump to default case */
+    lea.l .jumptable, %a4
     move.l (%a4, %d2.l*4), %a4
     jmp (%a4)
     .align 4           /* avoid unaligned fetch */
-.Ljumptable:
-    .long .Lexit
-    .long .Lorder1
-    .long .Lorder2
-    .long .Lorder3
-    .long .Lorder4
-    .long .Lorder5
-    .long .Lorder6
-    .long .Lorder7
-    .long .Lorder8
+.jumptable:
+    .long .exit
+    .long .order1
+    .long .order2
+    .long .order3
+    .long .order4
+    .long .order5
+    .long .order6
+    .long .order7
+    .long .order8
 
-.Lorder8:
+.order8:
     movem.l (%a1), %d3-%d7/%a3-%a5 /* load lpc coefs */
-    movea.l (%a2), %a6             /* load first history sample */
-.Lloop8:
-    mac.l %a6, %a5, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %a4, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %a3, (3*4, %a2), %a6, %acc0
-    mac.l %a6, %d7, (4*4, %a2), %a6, %acc0
-    mac.l %a6, %d6, (5*4, %a2), %a6, %acc0
-    mac.l %a6, %d5, (6*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (7*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0 /* load for the next iteration */
-    addq.l #4, %a2        /* increment history pointer */
-    movclr.l %acc0, %d2   /* get sum */
-    asr.l %d1, %d2        /* shift sum by lp_quantization bits */
-    add.l (%a0)+, %d2     /* add residual and increment residual pointer */
-    move.l %d2, (28, %a2) /* save result to data */
-    subq.l #1, %d0        /* decrement counter */
-    jne .Lloop8           /* are we done? */
-    jra .Lexit
+    move.l (%a2)+, %a6             /* load first history sample */
+.loop8:
+    mac.l %a6, %a5, (%a2)+, %a6, %acc0
+    mac.l %a6, %a4, (%a2)+, %a6, %acc0
+    mac.l %a6, %a3, (%a2)+, %a6, %acc0
+    mac.l %a6, %d7, (%a2)+, %a6, %acc0
+    mac.l %a6, %d6, (%a2)+, %a6, %acc0
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-7*4, %a2), %a6, %acc0 /* load for the next iteration */
+    movclr.l %acc0, %d2    /* get sum */
+    asr.l %d1, %d2         /* shift sum by lp_quantization bits */
+    add.l (%a0)+, %d2      /* add residual and increment residual pointer */
+    move.l %d2, (%a2)      /* save result to data */
+    lea.l (-6*4, %a2), %a2 /* history pointer points at second element */
+    subq.l #1, %d0         /* decrement counter */
+    jne .loop8             /* are we done? */
+    jra .exit
 
-.Lorder7:
+.order7:
     movem.l (%a1), %d3-%d7/%a3-%a4
-    movea.l (%a2), %a6
-.Lloop7:
-    mac.l %a6, %a4, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %a3, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %d7, (3*4, %a2), %a6, %acc0
-    mac.l %a6, %d6, (4*4, %a2), %a6, %acc0
-    mac.l %a6, %d5, (5*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (6*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0
-    addq.l #4, %a2
+    move.l (%a2)+, %a6
+.loop7:
+    mac.l %a6, %a4, (%a2)+, %a6, %acc0
+    mac.l %a6, %a3, (%a2)+, %a6, %acc0
+    mac.l %a6, %d7, (%a2)+, %a6, %acc0
+    mac.l %a6, %d6, (%a2)+, %a6, %acc0
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-6*4, %a2), %a6, %acc0
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (24, %a2)
+    move.l %d2, (%a2)
+    lea.l (-5*4, %a2), %a2
     subq.l #1, %d0
-    jne .Lloop7
-    jra .Lexit
+    jne .loop7
+    jra .exit
 
-.Lorder6:
+.order6:
     movem.l (%a1), %d3-%d7/%a3
-    movea.l (%a2), %a6
-.Lloop6:
-    mac.l %a6, %a3, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %d7, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %d6, (3*4, %a2), %a6, %acc0
-    mac.l %a6, %d5, (4*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (5*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0
-    addq.l #4, %a2
+    move.l (%a2)+, %a6
+.loop6:
+    mac.l %a6, %a3, (%a2)+, %a6, %acc0
+    mac.l %a6, %d7, (%a2)+, %a6, %acc0
+    mac.l %a6, %d6, (%a2)+, %a6, %acc0
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-5*4, %a2), %a6, %acc0
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (20, %a2)
+    move.l %d2, (%a2)
+    lea.l (-4*4, %a2), %a2
     subq.l #1, %d0
-    jne .Lloop6
-    jra .Lexit
+    jne .loop6
+    jra .exit
 
-.Lorder5:
+.order5:
     movem.l (%a1), %d3-%d7
-    movea.l (%a2), %a6
-.Lloop5:
-    mac.l %a6, %d7, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %d6, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %d5, (3*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (4*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0
-    addq.l #4, %a2
+    move.l (%a2)+, %a6
+.loop5:
+    mac.l %a6, %d7, (%a2)+, %a6, %acc0
+    mac.l %a6, %d6, (%a2)+, %a6, %acc0
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-4*4, %a2), %a6, %acc0
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (16, %a2)
+    move.l %d2, (%a2)
+    lea.l (-3*4, %a2), %a2
     subq.l #1, %d0
-    jne .Lloop5
-    jra .Lexit
+    jne .loop5
+    jra .exit
 
-.Lorder4:
+.order4:
     movem.l (%a1), %d3-%d6
-    movea.l (%a2), %a6
-.Lloop4:
-    mac.l %a6, %d6, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %d5, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (3*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0
-    addq.l #4, %a2
+    move.l (%a2)+, %a6
+.loop4:
+    mac.l %a6, %d6, (%a2)+, %a6, %acc0
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-3*4, %a2), %a6, %acc0
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (12, %a2)
+    move.l %d2, (%a2)
+    subq.l #8, %a2
     subq.l #1, %d0
-    jne .Lloop4
-    jra .Lexit
+    jne .loop4
+    jra .exit
 
-.Lorder3:
+.order3:
     movem.l (%a1), %d3-%d5
-    movea.l (%a2), %a6
-.Lloop3:
-    mac.l %a6, %d5, (1*4, %a2), %a6, %acc0
-    mac.l %a6, %d4, (2*4, %a2), %a6, %acc0
-    mac.l %a6, %d3, (1*4, %a2), %a6, %acc0
-    addq.l #4, %a2
+    move.l (%a2)+, %a6
+.loop3:
+    mac.l %a6, %d5, (%a2)+, %a6, %acc0
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
+    mac.l %a6, %d3, (-2*4, %a2), %a6, %acc0
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (8, %a2)
+    move.l %d2, (%a2)
+    subq.l #4, %a2
     subq.l #1, %d0
-    jne .Lloop3
-    jra .Lexit
+    jne .loop3
+    jra .exit
 
-.Lorder2:
+.order2:
     movem.l (%a1), %d3-%d4
-    movea.l (%a2), %a6
-.Lloop2:
-    mac.l %a6, %d4, (1*4, %a2), %a6, %acc0
+    move.l (%a2)+, %a6
+.loop2:
+    mac.l %a6, %d4, (%a2)+, %a6, %acc0
     mac.l %a6, %d3, %acc0 /* data for next iteration is already loaded */
-    addq.l #4, %a2
     movclr.l %acc0, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
-    move.l %d2, (4, %a2)
+    move.l %d2, (%a2)
     subq.l #1, %d0
-    jne .Lloop2
-    jra .Lexit
+    jne .loop2
+    jra .exit
 
-.Lorder1:
+.order1:
     /* no point in using mac here */
     move.l (%a1), %d3
-.Lloop1:
+.loop1:
     move.l %d3, %d2
     muls.l (%a2)+, %d2
     asr.l %d1, %d2
     add.l (%a0)+, %d2
     move.l %d2, (%a2)
     subq.l #1, %d0
-    jne .Lloop1
-    jra .Lexit
+    jne .loop1
+    jra .exit
     
-.Ldefault:
+.default:
     /* we do the filtering in an unrolled by 4 loop as far as we can, and then
-       do the rest in an ordinary on by one sample loop.
+       do the rest in an ordinary one by one sample loop.
      */
     lea.l (%a1, %d2.l*4), %a3 /* need to start in the other end of coefs */
-    movea.l %a2, %a4    /* working copy of history pointer */
+    move.l %a2, %a4     /* working copy of history pointer */
     move.l %d2, %d3
     lsr.l #2, %d3       /* coefs/4, number of iterations needed in next loop */
-    movea.l (%a4)+, %a6 /* preload lpc coef for loop */
-.Ldloop1:
+    move.l (%a4)+, %a6  /* preload lpc coef for loop */
+.dloop1:
     lea.l (-16, %a3), %a3  /* move lpc coef pointer four samples backwards */
     movem.l (%a3), %d4-%d7 /* load four coefs */
     mac.l %a6, %d7, (%a4)+, %a6, %acc0
@@ -218,28 +217,28 @@ FLAC__lpc_restore_signal_mcf5249:
     mac.l %a6, %d5, (%a4)+, %a6, %acc0
     mac.l %a6, %d4, (%a4)+, %a6, %acc0
     subq.l #1, %d3         /* any more unrolled loop operations left? */
-    jne .Ldloop1
+    jne .dloop1
     
     move.l %d2, %d3
-    movq.l #3, %d4        /* mask 0x00000003 */
-    and.l %d4, %d3        /* get the remaining samples to be filtered */
-    jeq .Ldsave           /* no remaining samples */
-.Ldloop2:
-    move.l -(%a3), %d4    /* get lpc coef */
+    moveq.l #3, %d4        /* mask 0x00000003 */
+    and.l %d4, %d3         /* get the remaining samples to be filtered */
+    jeq .dsave             /* no remaining samples */
+.dloop2:
+    move.l -(%a3), %d4     /* get lpc coef */
     mac.l %a6, %d4, (%a4)+, %a6, %acc0
-    subq.l #1, %d3        /* any more iterations left? */
-    jne .Ldloop2
-.Ldsave:
-    movclr.l %acc0, %d3   /* get result */
-    asr.l %d1, %d3        /* shift lp_quantization bits right */
-    add.l (%a0)+, %d3     /* add residual */
-    move.l %d3, (-4, %a4) /* history pointer is one sample past data pointer */
-    addq.l #4, %a2        /* increment history pointer */
-    subq.l #1, %d0        /* decrement data_len */
-    jne .Ldefault         /* are we done? */
-                          /* if so, fall through to exit */
+    subq.l #1, %d3         /* any more iterations left? */
+    jne .dloop2
+.dsave:
+    movclr.l %acc0, %d3    /* get result */
+    asr.l %d1, %d3         /* shift lp_quantization bits right */
+    add.l (%a0)+, %d3      /* add residual */
+    move.l %d3, (-4, %a4)  /* history pointer is one sample past data pointer */
+    addq.l #4, %a2         /* increment history pointer */
+    subq.l #1, %d0         /* decrement data_len */
+    jne .default           /* are we done? */
+                           /* if so, fall through to exit */
 
-.Lexit:
+.exit:
     movem.l (%sp), %d2-%d7/%a2-%a6
     lea.l (44, %sp), %sp
     rts
