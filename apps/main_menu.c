@@ -52,7 +52,7 @@
 #include "misc.h"
 #include "lang.h"
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
 
@@ -274,14 +274,11 @@ static bool plugin_browse(void)
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
 static bool recording_settings(void)
 {
     return recording_menu(false);
 }
-#endif
-
-#if CONFIG_HWCODEC == MAS3587F
 
 bool rec_menu(void)
 {

@@ -246,7 +246,7 @@ static bool avc(void)
 }
 #endif
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
 static bool recsource(void)
 {
     static const struct opt_items names[] = {
@@ -438,7 +438,7 @@ bool sound_menu(void)
     return result;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#ifdef HAVE_RECORDING
 bool recording_menu(bool no_source)
 {
     int m;
