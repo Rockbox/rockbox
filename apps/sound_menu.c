@@ -182,11 +182,6 @@ static Menu bass_boost(void)
     return MENU_OK;
 };
 
-static void set_chanconf(int val)
-{
-    mpeg_sound_set(SOUND_CHANNELS, val);
-}
-
 static void set_avc(int val)
 {
     mpeg_sound_set(SOUND_AVC, val);
@@ -199,6 +194,11 @@ static Menu avc(void)
     return MENU_OK;
 }
 #endif /* ARCHOS_RECORDER */
+
+static void set_chanconf(int val)
+{
+    mpeg_sound_set(SOUND_CHANNELS, val);
+}
 
 static Menu chanconf(void)
 {
