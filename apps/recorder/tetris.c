@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include <stdbool.h>
 #include "lcd.h"

@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+
 #ifdef HAVE_LCD_BITMAP
 
 #include "screensaver.h"
