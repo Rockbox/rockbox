@@ -272,6 +272,35 @@ void ChangeVolume(int delta)
 }
 
 
+// helper function to change the LCD contrast by a certain amount, +/-
+void ChangeContrast(int delta)
+{
+    static int mycontrast = -1; /* the "permanent" value while running */
+    int contrast; /* updated value */
+
+    if (mycontrast == -1)
+        mycontrast = rb->global_settings->contrast;
+
+    contrast = mycontrast + delta;
+    if (contrast > 63) contrast = 63;
+    else if (contrast < 5) contrast = 5;
+    if (contrast != mycontrast)
+    {
+        rb->lcd_set_contrast(contrast);
+        mycontrast = contrast;
+        rb->snprintf(gPrint, sizeof(gPrint), "Contrast: %d", contrast);
+        rb->lcd_puts(0, 7, gPrint);
+        if (gPlay.state == paused) // we have to draw ourselves
+            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+        else // let the display time do it
+        {
+            gPlay.nTimeOSD = 50; // display it for 50 frames
+            gPlay.bDirtyOSD = true; // let the refresh copy it to LCD
+        }
+    }
+}
+
+
 // sync the video to the current audio
 void SyncVideo(void)
 {
@@ -681,6 +710,16 @@ int PlayTick(int fd)
             gPlay.nTimeOSD = 30;
             gPlay.bDirtyOSD = true;
             break;
+        case BUTTON_F2: // contrast down
+        case BUTTON_F2 | BUTTON_REPEAT:
+            if (gPlay.bHasVideo)
+                ChangeContrast(-1);
+            break;
+        case BUTTON_F3: // contrast up
+        case BUTTON_F3 | BUTTON_REPEAT:
+            if (gPlay.bHasVideo)
+                ChangeContrast(1);
+            break;
         }
     } /*  if (button != BUTTON_NONE) */
 
@@ -835,6 +874,9 @@ int main(char* filename)
 
     // restore normal backlight setting
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
+    // restore normal contrast
+    rb->lcd_set_contrast(rb->global_settings->contrast);
 
     if (retval < 0) // aborted?
     {
