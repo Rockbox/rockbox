@@ -225,9 +225,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 (header[5]);
         }
 
-        /* Continue if the frame length seems bad */
-        if(headerlen > size)
-            continue;
+        /* Get only the part of the header that is within our buffer */
+        if(headerlen > (size-readsize))
+            headerlen = (size - readsize);
         
         /* Check for certain frame headers */
         if(!strncmp(header, "TPE1", strlen("TPE1")) || 
