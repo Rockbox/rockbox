@@ -1015,7 +1015,7 @@ bool dirbrowse(char *root)
 
             case TREE_PREV:
             case TREE_PREV | BUTTON_REPEAT:
-            case BUTTON_RC_VOL_UP:
+            case BUTTON_RC_LEFT:
                 if(filesindir) {
                     if(dircursor) {
                         put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
@@ -1053,7 +1053,7 @@ bool dirbrowse(char *root)
 
             case TREE_NEXT:
             case TREE_NEXT | BUTTON_REPEAT:
-            case BUTTON_RC_VOL_DOWN:
+            case BUTTON_RC_RIGHT:
                 if(filesindir)
                 {
                     if (dircursor + dirstart + 1 < numentries ) {

@@ -924,8 +924,9 @@ int wps_show(void)
             case BUTTON_RC_LEFT:
             case BUTTON_LEFT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
-                if ( lastbutton != BUTTON_LEFT )   
-                     break; 
+                if ((button == (BUTTON_LEFT | BUTTON_REL)) &&
+                    (lastbutton != BUTTON_LEFT ))
+                    break; 
 #endif
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     mpeg_prev();
@@ -945,7 +946,8 @@ int wps_show(void)
             case BUTTON_RC_RIGHT:
             case BUTTON_RIGHT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
-                if ( lastbutton != BUTTON_RIGHT )   
+                if ((button == (BUTTON_RIGHT | BUTTON_REL)) &&
+                    (lastbutton != BUTTON_RIGHT))
                      break; 
 #endif
                 mpeg_next();
@@ -984,10 +986,10 @@ int wps_show(void)
 #endif
 
                 /* stop and exit wps */
+            case BUTTON_RC_STOP:
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
 #else
-            case BUTTON_RC_STOP:
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
                     break;
