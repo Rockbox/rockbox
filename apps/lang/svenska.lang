@@ -312,10 +312,10 @@ voice: "Loudness"
 new: "Loudness"
 
 id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-voice: "Bass Boost"
-new: "Basförstärkning"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -2722,3 +2722,33 @@ desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "Tvinga mono"
+
+id: LANG_MDB_CENTER
+desc: in sound settings
+eng: "MDB Center frequency"
+new: "MDB Mittfrekvens"
+
+id: LANG_MDB_ENABLE
+desc: in sound settings
+eng: "MDB Enable"
+new: "Aktivera MDB"
+
+id: LANG_MDB_HARMONICS
+desc: in sound settings
+eng: "MDB Harmonics"
+new: "MDB Övertoner"
+
+id: LANG_MDB_SHAPE
+desc: in sound settings
+eng: "MDB Shape"
+new: "MDB Form"
+
+id: LANG_MDB_STRENGTH
+desc: in sound settings
+eng: "MDB Strength"
+new: "MDB Styrka"
+
+id: LANG_SUPERBASS
+desc: in sound settings
+eng: "Super bass"
+new: "Superbas"
