@@ -43,6 +43,9 @@
 
 /* Always enable debug till we stabilize */
 #define EMULATOR
-#define DEBUG
+
+#define USB_GMINISTYLE
+
+#define HAVE_GMINI_I2C
 
 #endif
