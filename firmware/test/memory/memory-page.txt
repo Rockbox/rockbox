@@ -1,0 +1,74 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id:
+ *
+ * Copyright (C) 2002 by Alan Korr
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+Best-fit via binning represent the main ideas of the algorithm.
+
+The memory-page allocator uses an array which contains the power-of-two
+orders of each free or used pages to retrieve their sizes.
+
+Available pages are maintained in bins, grouped by size. Depending on
+its size, a free page is stored in the bin corresponding to the correct
+size range (bins are detailed further): 512 B, 1 KB, 2 KB, 4 KB, 8 KB,
+16 KB, 32 KB, 64 KB, 128 KB, 256 KB, 512 KB, 1 MB or 2 MB.
+
+Searches for available pages are processed in smallest-first, best-fit
+order.
+
+Two implementations to chain same-sized pages are provided:
+* using doubly linked stack (unordered list) as bin, pages are left
+  unsorted within bins, so that the best-fit strategy should only be
+  approximate.
+* using splay tree (ordered list) as bin, pages are instead sorted
+  by address within bins.
+
+Using splay trees is slower than using doubly linked stacks but affords us
+to allocate contiguous pages when possible : since doubly linked stack is
+not ordered, it cannot warrant a contiguous allocation of pages. However,
+there is no evidence that using splay trees really helps unfragmenting
+much more than using doubly linked stack.
+
+All procedures maintain the invariant that no free page physically
+borders another one (two bordering unused pages are always coalesced
+into one larger page).
+
+* Alignment of pages: power-of-two, the same as their sizes.
+* Minimum overhead per allocated pages: no overhead.
+* Minimum allocated size: minimal page size, i.e, 512 bytes.
+* Maximum allocated size: maximal page size, i.e, 2 megabytes.
+
+-- ALGORITHMS -----------------------------------------------------------------
+
+Unoptimized and recursive algorithm to allocate an N-sized page :
+
+* If there is no pages in the bin of N-sized pages, try to allocate
+  a (2xN)-sized page and split it into two N-sized pages and free
+  both if they are not N-sized pages or just free one and keep
+  the other to mark it used if they are N-sized pages.
+
+Unoptimized and recursive algorithm to release an N-sized page :
+
+* If there is a "contiguous" page, merge it with our N-sized page and
+  try to release it as a (2xN)-sized page. Otherwise mark it free.
+
+Notes:
+* Two pages are "contiguous" if they are also N-aligned and mergeable
+  as a 2xN-aligned page. 
+* The address of a "contiguous" page is quickly given by :
+
+  address("contiguous" page) = (address(page) ^ size(page))
