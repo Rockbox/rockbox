@@ -37,29 +37,6 @@ bool charger_inserted(void)
 #endif
 }
 
-/* Returns battery level in percent */
-int battery_level(void)
-{
-    int level;
-    
-    level = adc_read(ADC_UNREG_POWER);
-    if(level < 0)
-        level = 0;
-    
-    if(level > BATTERY_LEVEL_FULL)
-        level = BATTERY_LEVEL_FULL;
-
-    if(level < BATTERY_LEVEL_EMPTY)
-        level = BATTERY_LEVEL_EMPTY;
-
-    return ((level-BATTERY_LEVEL_EMPTY) * 100) / BATTERY_RANGE;
-}
-
-bool battery_level_safe(void)
-{
-    return adc_read(ADC_UNREG_POWER) > BATTERY_LEVEL_DANGEROUS;
-}
-
 void charger_enable(bool on)
 {
 #ifdef HAVE_CHARGE_CTRL
@@ -103,12 +80,6 @@ void power_off(void)
 bool charger_inserted(void)
 {
     return false;
-}
-
-/* Returns battery level in percent */
-int battery_level(void)
-{
-    return 100;
 }
 
 void charger_enable(bool on)
