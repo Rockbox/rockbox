@@ -203,7 +203,7 @@ struct plugin_api {
     void (*bitswap)(unsigned char *data, int length);
 #endif
     struct user_settings* global_settings;
-    void (*backlight_set_timeout)(unsigned int index);
+    void (*backlight_set_timeout)(int index);
 };
 
 /* defined by the plugin loader (plugin.c) */

@@ -114,9 +114,9 @@ bool simulate_usb(void)
     return false;
 }
 
-void backlight_set_timeout(int seconds)
+void backlight_set_timeout(int index)
 {
-  (void)seconds;
+  (void)index;
 }
 
 void backlight_set_on_when_charging(bool beep)

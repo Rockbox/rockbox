@@ -126,9 +126,9 @@ int backlight_get_timeout(void)
     return backlight_timeout;
 }
 
-void backlight_set_timeout(unsigned int index)
+void backlight_set_timeout(int index)
 {
-    if(index >= sizeof(backlight_timeout_value))
+    if(index >= sizeof(backlight_timeout_value) || index < 0)
         /* if given a weird value, use 0 */
         index=0;
     backlight_timeout = index; /* index in the backlight_timeout_value table */
