@@ -211,6 +211,11 @@ static void power_thread(void)
                     DEBUGF("power: charger inserted and battery not full, enabling\n");
                     charger_enable(true);
                     charged_time = 0;
+                    /* clear the power history so that we don't use values before
+                     * discharge for the long-term delta
+                     */
+                    for (i = 0; i < POWER_HISTORY_LEN-1; i++)
+                        power_history[i] = power_history[POWER_HISTORY_LEN-1];
                     snprintf(power_message, POWER_MESSAGE_LEN, "Chg started at %d%%", battery_level());
                 }
             }
