@@ -107,8 +107,8 @@ void calc_time_to_next_tock(void){
 }
 	
 void callback(unsigned char** start, int* size){
-    *start = sound; /* give it the same frame again */
-    *size = NULL;
+    (void)start; /* unused parameter, avoid warning */
+    *size = NULL; /* end of data */
     sound_active = false;
     led(0);
 }
@@ -182,7 +182,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 
     rb->bitswap(sound, sizeof(sound));
 
-    if (rb->mp3_is_playing)
+    if (rb->mp3_is_playing())
 	rb->mp3_play_stop(); // stop audio ISR
 
      calc_time_to_next_tock();
