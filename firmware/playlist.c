@@ -189,37 +189,6 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
 }
 
 /*
- * check if random number has been used previously
- */
-int is_unused_random_in_list( int number, int *new_list, int count )
-{
-    int i = 0;
-    int *p = new_list;
-
-    /* examine all in list */
-    
-    while( i < count )
-    {
-        /* did we find the number in the list already? */
-        
-        if( p[i] == number )
-        {
-            /* yes - return false */
-
-            return 0;
-        }
-
-        /* move along list */
-        
-        i++;
-    }
-
-    /* if we got here, we didn't find the number. return true */
-    
-    return 1;
-}
-
-/*
  * dump the details of a track to stdout
  */
 void display_playlist_track( track_t *track )
