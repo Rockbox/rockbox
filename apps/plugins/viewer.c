@@ -662,8 +662,9 @@ static int viewer_recorder_on_button(int col)
                 if (++page_mode == PAGE_MODES)
                     page_mode = 0;
 
-                rb->splash(HZ, 0, true, "%s %s",
-                  page_mode_str[page_mode], page_mode_str[PAGE_MODES]);
+                rb->splash(HZ, true, "%s %s",
+                           page_mode_str[page_mode],
+                           page_mode_str[PAGE_MODES]);
 
                 viewer_draw(col);
                 break;
@@ -677,10 +678,11 @@ static int viewer_recorder_on_button(int col)
                     init_need_scrollbar();
                     viewer_draw(col);
 
-                    rb->splash(HZ, 0, true, "%s %s (%s %s)",
-                      scrollbar_mode_str[SCROLLBAR_MODES],
-                      scrollbar_mode_str[scrollbar_mode[view_mode]],
-                      view_mode_str[view_mode], view_mode_str[VIEW_MODES]);
+                    rb->splash(HZ, true, "%s %s (%s %s)",
+                               scrollbar_mode_str[SCROLLBAR_MODES],
+                               scrollbar_mode_str[scrollbar_mode[view_mode]],
+                               view_mode_str[view_mode],
+                               view_mode_str[VIEW_MODES]);
                 }
                 viewer_draw(col);
                 break;
@@ -744,7 +746,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     ok = viewer_init(file);
     if (!ok) {
-        rb->splash(HZ, 0, false, "Error");
+        rb->splash(HZ, false, "Error");
         viewer_exit();
         return PLUGIN_OK;
     }
@@ -776,8 +778,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 #endif
                 viewer_draw(col);
 
-                rb->splash(HZ, 0, true, "%s %s",
-                  word_mode_str[word_mode], word_mode_str[WORD_MODES]);
+                rb->splash(HZ, true, "%s %s",
+                           word_mode_str[word_mode],
+                           word_mode_str[WORD_MODES]);
 
                 viewer_draw(col);
                 break;
@@ -801,8 +804,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 #endif
                 viewer_draw(col);
 
-                rb->splash(HZ, 0, true, "%s %s",
-                  line_mode_str[line_mode], line_mode_str[LINE_MODES]);
+                rb->splash(HZ, true, "%s %s",
+                           line_mode_str[line_mode],
+                           line_mode_str[LINE_MODES]);
 
                 viewer_draw(col);
                 break;
@@ -814,8 +818,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 #endif
                 /* View-width mode: NARROW or WIDE */
                 if (line_mode == JOIN)
-                    rb->splash(HZ, 0, true, "(no %s %s)",
-                      view_mode_str[WIDE], line_mode_str[JOIN]);
+                    rb->splash(HZ, true, "(no %s %s)",
+                               view_mode_str[WIDE],
+                               line_mode_str[JOIN]);
                 else
                     if (++view_mode == VIEW_MODES)
                         view_mode = 0;
@@ -840,8 +845,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 #endif
                 viewer_draw(col);
 
-                rb->splash(HZ, 0, true, "%s %s",
-                  view_mode_str[view_mode], view_mode_str[VIEW_MODES]);
+                rb->splash(HZ, true, "%s %s",
+                           view_mode_str[view_mode],
+                           view_mode_str[VIEW_MODES]);
 
                 viewer_draw(col);
                 break;

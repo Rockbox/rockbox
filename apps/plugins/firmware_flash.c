@@ -611,7 +611,7 @@ void DoUserDialog(char* filename)
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, 0, true, "Wrong plugin");
+        rb->splash(HZ*3, true, "Wrong plugin");
         return; /* exit */
     }
 
@@ -619,7 +619,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, 0, true, "Wrong boot ROM");
+        rb->splash(HZ*3, true, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -640,7 +640,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, 0, true, "Out of memory");
+        rb->splash(HZ*3, true, "Out of memory");
         return; /* exit */
     }
 
@@ -648,7 +648,7 @@ void DoUserDialog(char* filename)
     ShowFlashInfo(&FlashInfo);
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, 0, true, "Sorry!");
+        rb->splash(HZ*3, true, "Sorry!");
         return; /* exit */
     }
     
@@ -832,7 +832,7 @@ void DoUserDialog(char* filename)
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, 0, true, "Wrong version");
+        rb->splash(HZ*3, true, "Wrong version");
         return; /* exit */
     }
 
@@ -840,7 +840,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, 0, true, "Wrong boot ROM");
+        rb->splash(HZ*3, true, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -861,7 +861,7 @@ void DoUserDialog(char* filename)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, 0, true, "Out of memory");
+        rb->splash(HZ*3, true, "Out of memory");
         return; /* exit */
     }
 

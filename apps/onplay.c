@@ -330,7 +330,7 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 
 static void fileerror(int rc)
 {
-    splash(HZ*2, 0, true, "File error: %d", rc);
+    splash(HZ*2, true, "File error: %d", rc);
 }
 
 static const unsigned char empty_id3_header[] =
@@ -352,7 +352,7 @@ static bool vbr_fix(void)
     int unused_space;
 
     if(mpeg_status()) {
-        splash(HZ*2, 0, true, str(LANG_VBRFIX_STOP_PLAY));
+        splash(HZ*2, true, str(LANG_VBRFIX_STOP_PLAY));
         return onplay_result;
     }
     
@@ -473,7 +473,7 @@ static bool vbr_fix(void)
     {
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
-        splash(HZ*2, 0, true, str(LANG_VBRFIX_NOT_VBR));
+        splash(HZ*2, true, str(LANG_VBRFIX_NOT_VBR));
     }
 
     return false;

@@ -861,7 +861,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 
     if (*dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        splash(HZ*2, 0, true, str(LANG_NO_FILES));
+        splash(HZ*2, true, str(LANG_NO_FILES));
         return false;  /* No files found for rockbox_browser() */
     }
 
@@ -1060,7 +1060,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             if(!lang_load(buf)) {
                                 set_file(buf, global_settings.lang_file,
                                          MAX_FILENAME);
-                                splash(HZ, 0, true, str(LANG_LANGUAGE_LOADED));
+                                splash(HZ, true, str(LANG_LANGUAGE_LOADED));
                                 restore = true;
                             }
                             break;

@@ -241,7 +241,7 @@ static int get_level_count(void)
     char buffer[COLS + 3]; /* COLS plus CR/LF and \0 */
 
     if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0) {
-        rb->splash(0, 0, true, "Unable to open %s", LEVELS_FILE);
+        rb->splash(0, true, "Unable to open %s", LEVELS_FILE);
         return -1;
     }
 
@@ -858,7 +858,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     init_boards();
 
     if (get_level_count() != 0) {
-        rb->splash(HZ*2,0,true,"Failed loading levels!");
+        rb->splash(HZ*2, true, "Failed loading levels!");
         return PLUGIN_OK;
     }
 

@@ -31,7 +31,6 @@ bool f3_screen(void);
 #endif
 
 void splash(int ticks,  /* how long */
-            int keymask,/* what keymask aborts the waiting (if any) */
             bool center, /* FALSE means left-justified, TRUE means
                             horizontal and vertical center */
             char *fmt,  /* what to say *printf style */

@@ -22,7 +22,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     id3 = rb->mpeg_current_track();
     if (!id3) {
-        rb->splash(HZ*2, 0, true, "Nothing To Save");
+        rb->splash(HZ*2, true, "Nothing To Save");
         return PLUGIN_OK;
     } 
 
@@ -45,7 +45,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->close(fd);
     }
 
-    rb->splash(HZ*2, 0, true, "Saved Favorite");
+    rb->splash(HZ*2, true, "Saved Favorite");
 
     return PLUGIN_OK;
 }

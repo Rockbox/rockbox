@@ -125,7 +125,7 @@ void display_keylock_text(bool locked)
     else
         s = str(LANG_KEYLOCK_OFF_RECORDER);
 #endif
-    splash(HZ, 0, true, s);
+    splash(HZ, true, s);
 }
 
 void display_mute_text(bool muted)

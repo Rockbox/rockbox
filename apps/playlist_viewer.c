@@ -652,9 +652,9 @@ bool playlist_viewer(void)
         {
             /* Play has stopped */
 #ifdef HAVE_LCD_CHARCELLS
-            splash(HZ, 0, true, str(LANG_END_PLAYLIST_PLAYER));
+            splash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
 #else
-            splash(HZ, 0, true, str(LANG_END_PLAYLIST_RECORDER));
+            splash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
 #endif
             status_set_playmode(STATUS_STOP);
             return false;;
@@ -772,7 +772,7 @@ bool playlist_viewer(void)
                     ret = playlist_move(viewer.move_track,
                         tracks[INDEX(viewer.cursor_pos)].index);
                     if (ret < 0)
-                        splash(HZ, 0, true, str(LANG_MOVE_FAILED));
+                        splash(HZ, true, str(LANG_MOVE_FAILED));
 
                     update_playlist(true);
                     viewer.move_track = -1;

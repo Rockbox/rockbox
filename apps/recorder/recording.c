@@ -504,7 +504,7 @@ bool recording_screen(void)
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
         status_set_playmode(STATUS_STOP);
-        splash(0, 0, true, str(LANG_DISK_FULL));
+        splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
         mpeg_error_clear();

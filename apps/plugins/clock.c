@@ -65,7 +65,7 @@ void save_settings(void)
     }
     else
     {
-	rb->splash(HZ, 0, true, "Setting save failed");
+	rb->splash(HZ, true, "Setting save failed");
     }
 }
 
@@ -83,7 +83,7 @@ void load_settings(void)
     /* Else, loading failed */
     else
     {
-	rb->splash(HZ, 0, true, "Setting load failed, using default settings.");
+	rb->splash(HZ, true, "Setting load failed, using default settings.");
     }
 }
 
@@ -121,7 +121,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     load_settings();
 
     rb->lcd_clear_display();
-    rb->splash(HZ, 0, true, "F1 for INFO");
+    rb->splash(HZ, true, "F1 for INFO");
 
     while (!PLUGIN_OK)
     {
@@ -324,11 +324,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
             	/* Tell the user what's going on */
                 rb->lcd_clear_display();
-            	rb->splash(HZ/2, 0, true, "Saving settings...");
+            	rb->splash(HZ/2, true, "Saving settings...");
             	/* Save to disk */
             	save_settings();
             	rb->lcd_clear_display();
-                rb->splash(HZ, 0, true, "Saved!");
+                rb->splash(HZ, true, "Saved!");
                 /* ...and exit. */
                 return PLUGIN_OK;
                 break;

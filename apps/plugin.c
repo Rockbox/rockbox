@@ -191,7 +191,7 @@ int plugin_load(char* plugin, void* parameter)
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
         snprintf(buf, sizeof buf, "Can't open %s", plugin);
-        splash(HZ*2, 0, true, buf);
+        splash(HZ*2, true, buf);
         DEBUGF("dlopen(%s): %s\n",path,dlerror());
         dlclose(pd);
         return -1;
@@ -201,7 +201,7 @@ int plugin_load(char* plugin, void* parameter)
     if (!plugin_start) {
         plugin_start = dlsym(pd, "_plugin_start");
         if (!plugin_start) {
-            splash(HZ*2, 0, true, "Can't find entry point");
+            splash(HZ*2, true, "Can't find entry point");
             dlclose(pd);
             return -1;
         }
@@ -210,7 +210,7 @@ int plugin_load(char* plugin, void* parameter)
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         snprintf(buf, sizeof buf, str(LANG_PLUGIN_CANT_OPEN), plugin);
-        splash(HZ*2, 0, true, buf);
+        splash(HZ*2, true, buf);
         return fd;
     }
 
@@ -220,12 +220,12 @@ int plugin_load(char* plugin, void* parameter)
     if (plugin_size < 0) {
         /* read error */
         snprintf(buf, sizeof buf, str(LANG_READ_FAILED), plugin);
-        splash(HZ*2, 0, true, buf);
+        splash(HZ*2, true, buf);
         return -1;
     }
     if (plugin_size == 0) {
         /* loaded a 0-byte plugin, implying it's not for this model */
-        splash(HZ*2, 0, true, str(LANG_PLUGIN_WRONG_MODEL));
+        splash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
 #endif
@@ -242,15 +242,15 @@ int plugin_load(char* plugin, void* parameter)
             return PLUGIN_USB_CONNECTED;
 
         case PLUGIN_WRONG_API_VERSION:
-            splash(HZ*2, 0, true, str(LANG_PLUGIN_WRONG_VERSION));
+            splash(HZ*2, true, str(LANG_PLUGIN_WRONG_VERSION));
             break;
 
         case PLUGIN_WRONG_MODEL:
-            splash(HZ*2, 0, true, str(LANG_PLUGIN_WRONG_MODEL));
+            splash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
             break;
 
         default:
-            splash(HZ*2, 0, true, str(LANG_PLUGIN_ERROR));
+            splash(HZ*2, true, str(LANG_PLUGIN_ERROR));
             break;
     }
 

@@ -673,8 +673,7 @@ bool f3_screen(void)
 #define MAXLINES 2
 #endif
 
-void splash(int ticks,   /* how long */
-            int keymask, /* what keymask aborts the waiting (if any) */
+void splash(int ticks,   /* how long the splash is displayed */
             bool center, /* FALSE means left-justified, TRUE means
                             horizontal and vertical center */
             char *fmt,   /* what to say *printf style */
@@ -813,24 +812,13 @@ void splash(int ticks,   /* how long */
     }
     lcd_update();
 
-    if(ticks) {
-        if(keymask) {
-            int start = current_tick;
-            int done = ticks + current_tick + 1;
-            while (TIME_BEFORE( current_tick, done)) {
-                int button = button_get_w_tmo(ticks - (current_tick-start));
-                if((button & keymask) == keymask)
-                    break;
-            }
-        }
-        else
-            /* unbreakable! */
-            sleep(ticks);
-    }
+    if(ticks)
+        /* unbreakable! */
+        sleep(ticks);
 }
 
 void charging_splash(void)
 {
-    splash(2*HZ, 0, true, str(LANG_BATTERY_CHARGE));
+    splash(2*HZ, true, str(LANG_BATTERY_CHARGE));
     while (button_get(false));
 }

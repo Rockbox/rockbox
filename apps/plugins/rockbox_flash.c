@@ -525,7 +525,7 @@ void DoUserDialog(char* filename, bool show_greet)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, 0, true, "Out of memory");
+        rb->splash(HZ*3, true, "Out of memory");
         return; /* exit */
     }
 
@@ -537,12 +537,12 @@ void DoUserDialog(char* filename, bool show_greet)
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, 0, true, "Not flashable");
+        rb->splash(HZ*3, true, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, 0, true, "No image");
+        rb->splash(HZ*3, true, "No image");
         return; /* exit */
     }
     
@@ -701,7 +701,7 @@ void DoUserDialog(char* filename, bool show_greet)
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, 0, true, "Out of memory");
+        rb->splash(HZ*3, true, "Out of memory");
         return; /* exit */
     }
 
@@ -716,12 +716,12 @@ void DoUserDialog(char* filename, bool show_greet)
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, 0, true, "Not flashable");
+        rb->splash(HZ*3, true, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, 0, true, "No image");
+        rb->splash(HZ*3, true, "No image");
         return; /* exit */
     }
     
