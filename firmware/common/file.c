@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <string.h>
+#include <errno.h>
 #include "file.h"
 #include "fat.h"
 #include "types.h"
@@ -26,8 +27,10 @@
 #define MAX_OPEN_FILES 4
 
 struct filedesc {
-    unsigned char sector[SECTOR_SIZE];
-    int offset;
+    unsigned char cache[SECTOR_SIZE];
+    int cacheoffset;
+    int fileoffset;
+    int size;
     struct fat_file fatfile;
     bool busy;
 };
@@ -45,6 +48,7 @@ int open(char* pathname, int flags)
     if ( pathname[0] != '/' ) {
         DEBUGF("'%s' is not an absolute path.\n",pathname);
         DEBUGF("Only absolute pathnames supported at the moment\n");
+        errno = EINVAL;
         return -1;
     }
 
@@ -55,6 +59,7 @@ int open(char* pathname, int flags)
 
     if ( fd == MAX_OPEN_FILES ) {
         DEBUGF("Too many files open\n");
+        errno = EMFILE;
         return -1;
     }
 
@@ -72,6 +77,7 @@ int open(char* pathname, int flags)
     }
     if (!dir) {
         DEBUGF("Failed opening dir\n");
+        errno = EIO;
         return -1;
     }
 
@@ -80,6 +86,7 @@ int open(char* pathname, int flags)
     while ((entry = readdir(dir))) {
         if ( !strncmp(name, entry->d_name, namelen) ) {
             fat_open(entry->startcluster, &(openfiles[fd].fatfile));
+            openfiles[fd].size = entry->size;
             break;
         }
         else {
@@ -89,11 +96,12 @@ int open(char* pathname, int flags)
     closedir(dir);
     if ( !entry ) {
         DEBUGF("Couldn't find %s in %s\n",name,pathname);
-        /* fixme: we need to use proper error codes */
+        errno = ENOENT;
         return -1;
     }
 
-    openfiles[fd].offset = 0;
+    openfiles[fd].cacheoffset = 0;
+    openfiles[fd].fileoffset = 0;
     openfiles[fd].busy = TRUE;
     return fd;
 }
@@ -109,57 +117,81 @@ int read(int fd, void* buf, int count)
     int sectors;
     int nread=0;
 
-    /* are we in the middle of a cached sector? */
-    if ( openfiles[fd].offset ) {
-        if ( count > (SECTOR_SIZE - openfiles[fd].offset) ) {
-            memcpy( buf, openfiles[fd].sector,
-                    SECTOR_SIZE - openfiles[fd].offset );
-            openfiles[fd].offset = 0;
-            nread = SECTOR_SIZE - openfiles[fd].offset;
-            count -= nread;
+    if ( !openfiles[fd].busy ) {
+        errno = EBADF;
+        return -1;
+    }
+
+    /* attempt to read past EOF? */
+    if ( count > openfiles[fd].size - openfiles[fd].fileoffset )
+        count = openfiles[fd].size - openfiles[fd].fileoffset;
+
+    /* any head bytes? */
+    if ( openfiles[fd].cacheoffset ) {
+        int headbytes;
+        int offs = openfiles[fd].cacheoffset;
+        if ( count <= SECTOR_SIZE - openfiles[fd].cacheoffset ) {
+            headbytes = count;
+            openfiles[fd].cacheoffset += count;
+            if ( openfiles[fd].cacheoffset >= SECTOR_SIZE )
+                openfiles[fd].cacheoffset = 0;
         }
         else {
-            memcpy( buf, openfiles[fd].sector, count );
-            openfiles[fd].offset += count;
-            nread = count;
-            count = 0;
+            headbytes = SECTOR_SIZE - openfiles[fd].cacheoffset;
+            openfiles[fd].cacheoffset = 0;
         }
+
+        /* eof? */
+        if ( openfiles[fd].fileoffset + headbytes > openfiles[fd].size )
+            headbytes = openfiles[fd].size - openfiles[fd].fileoffset;
+
+        memcpy( buf, openfiles[fd].cache + offs, headbytes );
+        nread = headbytes;
+        count -= headbytes;
     }
 
     /* read whole sectors right into the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        if ( fat_read(&(openfiles[fd].fatfile), sectors, buf+nread ) < 0 ) {
+        int rc = fat_read(&(openfiles[fd].fatfile), sectors, buf+nread );
+        if ( rc < 0 ) {
             DEBUGF("Failed reading %d sectors\n",sectors);
+            errno = EIO;
             return -1;
         }
-        nread += sectors * SECTOR_SIZE;
-        count -= sectors * SECTOR_SIZE;
-        openfiles[fd].offset = 0;
-    }
-
-    /* trailing odd bytes? */
-    if ( count ) {
-        /* do we already have the sector cached? */
-        if ( count < (SECTOR_SIZE - openfiles[fd].offset) ) {
-            memcpy( buf + nread, openfiles[fd].sector, count );
-            openfiles[fd].offset += count;
-            nread += count;
-            count = 0;
-        }
         else {
-            /* cache one sector and copy the trailing bytes */
-            if ( fat_read(&(openfiles[fd].fatfile), 1,
-                          &(openfiles[fd].sector)) < 0 ) {
-                DEBUGF("Failed reading odd sector\n");
-                return -1;
+            if ( rc > 0 ) {
+                nread += sectors * SECTOR_SIZE;
+                count -= sectors * SECTOR_SIZE;
             }
-            memcpy( buf + nread, openfiles[fd].sector, count );
-            openfiles[fd].offset = nread;
-            nread += count;
+            else {
+                /* eof */
+                count=0;
+            }
+
+            openfiles[fd].cacheoffset = 0;
         }
     }
 
+    /* any tail bytes? */
+    if ( count ) {
+        if ( fat_read(&(openfiles[fd].fatfile), 1,
+                      &(openfiles[fd].cache)) < 0 ) {
+            DEBUGF("Failed caching sector\n");
+            errno = EIO;
+            return -1;
+        }
+
+        /* eof? */
+        if ( openfiles[fd].fileoffset + count > openfiles[fd].size )
+            count = openfiles[fd].size - openfiles[fd].fileoffset;
+
+        memcpy( buf + nread, openfiles[fd].cache, count );
+        nread += count;
+        openfiles[fd].cacheoffset = count;
+    }
+
+    openfiles[fd].fileoffset += nread;
     return nread;
 }
 
