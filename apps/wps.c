@@ -32,6 +32,7 @@
 #include "mpeg.h"
 #include "usb.h"
 #include "power.h"
+#include "main_menu.h"
 
 #define LINE_Y      1 /* initial line */
 
@@ -224,7 +225,15 @@ int wps_show(void)
                 case BUTTON_RIGHT:
                     mpeg_next();
                     break;
-
+#ifdef HAVE_RECORDER_KEYPAD                
+                case BUTTON_F1:
+#else
+                case BUTTON_MENU:
+#endif
+                    lcd_stop_scroll();
+                    main_menu();
+                    draw_screen(id3);
+                    break;
 #ifdef HAVE_RECORDER_KEYPAD                
                 case BUTTON_OFF:
 #else
