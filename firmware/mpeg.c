@@ -1352,7 +1352,7 @@ void mpeg_pause(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
 #else
-    is_playing = false;
+    is_playing = true;
     playing = false;
     paused = true;
 #endif
