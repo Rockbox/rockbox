@@ -606,7 +606,11 @@ int ata_standby(int time)
         return -1;
     }
 
-    ATA_NSECTOR = ((time + 5) / 5) & 0xff; /* Round up to nearest 5 secs */
+    if(time)
+        ATA_NSECTOR = ((time + 5) / 5) & 0xff; /* Round up to nearest 5 secs */
+    else
+        ATA_NSECTOR = 0; /* Disable standby */
+        
     ATA_COMMAND = CMD_STANDBY;
 
     if (!wait_for_rdy())
@@ -873,6 +877,8 @@ static int set_features(void)
     };
     int i;
 
+    return 0;
+    
     ATA_SELECT = ata_device;
 
     if (!wait_for_rdy()) {
@@ -969,6 +975,8 @@ int ata_init(void)
         if (rc)
             return -60 + rc;
 
+        ata_standby(0);
+        
         queue_init(&ata_queue);
 
         last_disk_activity = current_tick;
