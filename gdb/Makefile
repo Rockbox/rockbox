@@ -1,0 +1,32 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+TARGET = stub
+OBJS = start.o sh-stub.o 
+#LIBS = -L/home/linus/sh1/lib/gcc-lib/sh-elf/3.0.4 -lgcc
+LIBS = -lgcc
+
+.s.o:
+	sh-elf-as -o $@ $<
+
+.c.o:
+	sh-elf-gcc -O -m1 -Wall -c -o $@ $<
+
+$(TARGET).out: $(TARGET).elf
+	sh-elf-objcopy -O binary $(TARGET).elf $(TARGET).out
+	scramble $(TARGET).out archos.mod
+
+$(TARGET).elf: $(OBJS)
+	sh-elf-gcc -nostartfiles $(OBJS) -lgcc -Wl,-Map,$(TARGET).map -o $(TARGET).elf -Tlinker.cfg
+
+clean:
+	rm $(OBJS) $(TARGET).map $(TARGET).elf $(TARGET).out archos.mod
+
+start.o: start.s
+stub.o: stub.c
+s-stub.o: sh-stub.c
