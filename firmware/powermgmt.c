@@ -315,17 +315,10 @@ static void handle_auto_poweroff(void)
          !sleeptimer_active)))
     {
         if(TIME_AFTER(current_tick, last_keypress + timeout) &&
-           TIME_AFTER(current_tick, last_disk_activity + timeout))
+           TIME_AFTER(current_tick, last_disk_activity + timeout) &&
+           TIME_AFTER(current_tick, last_charge_time + timeout))
         {
-            if (mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE))
-            {
-                mpeg_stop();
-            }
-
-            if (TIME_AFTER(current_tick, last_charge_time + timeout))
-            {
-                power_off();
-            }
+            power_off();
         }
     }
     else
