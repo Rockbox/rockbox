@@ -39,7 +39,7 @@ const char backlight_timeout_value[19] =
 #define BACKLIGHT_OFF 2
 
 static void backlight_thread(void);
-static char backlight_stack[DEFAULT_STACK_SIZE];
+static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
