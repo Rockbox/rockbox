@@ -19,6 +19,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "system.h"
 #include "kernel.h"
 #include "lcd.h"
 #include "menu.h"
@@ -29,12 +30,18 @@
 #include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "font.h"
+#include "widgets.h"
 #endif
 #include "lang.h"
 #include "sprintf.h"
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
+#if CONFIG_HWCODEC == MAS3587F || CONFIG_HWCODEC == MAS3539F
+#include "peakmeter.h"
+#include "mas.h"
+#endif
 
 static const char* const fmt[] =
 {
@@ -435,11 +442,373 @@ bool sound_menu(void)
 }
 
 #ifdef HAVE_RECORDING
+enum trigger_menu_option
+{
+    TRIGGER_MODE,
+    PRERECORD_TIME,
+    START_THRESHOLD,
+    START_DURATION,
+    STOP_THRESHOLD,
+    STOP_POSTREC,
+    STOP_GAP,
+    TRIG_OPTION_COUNT,
+};
+
+#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
+static char* create_thres_str(int threshold)
+{
+    static char retval[6];
+    if (threshold < 0) {
+        if (threshold < -88) {
+            snprintf (retval, sizeof retval, "%s", str(LANG_DB_INF));
+        } else {
+            snprintf (retval, sizeof retval, "%ddb", threshold + 1);
+        }
+    } else {
+        snprintf (retval, sizeof retval, "%d%%", threshold);
+    }
+    return retval;
+}
+#endif
+
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC == MAS3587F || CONFIG_HWCODEC == MAS3539F)
+#define INF_DB (-89)
+static void change_threshold(int *threshold, int change)
+{
+    if (global_settings.peak_meter_dbfs) {
+        if (*threshold >= 0) {
+            int db = (calc_db(*threshold * MAX_PEAK / 100) - 9000) / 100;
+            *threshold = db;
+        }
+        *threshold += change;
+        if (*threshold > -1) {
+            *threshold = INF_DB;
+        } else if (*threshold < INF_DB) {
+            *threshold = -1;
+        }
+    } else {
+        if (*threshold < 0) {
+            *threshold = peak_meter_db2sample(*threshold * 100) * 100 / MAX_PEAK;
+        }
+        *threshold += change;
+        if (*threshold > 100) {
+            *threshold = 0;
+        } else if (*threshold < 0) {
+            *threshold = 100;
+        }
+    }
+}
+
+/**
+ * Displays a menu for editing the trigger settings.
+ */
+bool rectrigger(void)
+{
+    int exit_request = false;
+    enum trigger_menu_option selected = TRIGGER_MODE;
+    bool retval = false;
+    int old_x_margin, old_y_margin;
+
+#define TRIGGER_MODE_COUNT 3
+    char *trigger_modes[] =
+    {
+        str(LANG_OFF),
+        str(LANG_RECORD_TRIG_NOREARM),
+        str(LANG_RECORD_TRIG_REARM)
+    };
+
+#define PRERECORD_TIMES_COUNT 31
+    char *prerecord_times[] = {
+        str(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+        "10s", "11s", "12s", "13s", "14s", "15s", "16s", "17s", "18s", "19s",
+        "20s", "21s", "22s", "23s", "24s", "25s", "26s", "27s", "28s", "29s",
+        "30s"
+    };
+
+    char *option_name[TRIG_OPTION_COUNT];
+
+    int old_start_thres = global_settings.rec_start_thres;
+    int old_start_duration = global_settings.rec_start_duration;
+    int old_prerecord_time = global_settings.rec_prerecord_time;
+    int old_stop_thres = global_settings.rec_stop_thres;
+    int old_stop_postrec = global_settings.rec_stop_postrec;
+    int old_stop_gap = global_settings.rec_stop_gap;
+    int old_trigger_mode = global_settings.rec_trigger_mode;
+
+    int offset = 0;
+    int option_lines;
+    int w, h;
+
+    option_name[TRIGGER_MODE] =    str(LANG_RECORD_TRIGGER_MODE);
+    option_name[PRERECORD_TIME] =  str(LANG_RECORD_PRERECORD_TIME);
+    option_name[START_THRESHOLD] = str(LANG_RECORD_START_THRESHOLD);
+    option_name[START_DURATION] =  str(LANG_RECORD_MIN_DURATION);
+    option_name[STOP_THRESHOLD] =  str(LANG_RECORD_STOP_THRESHOLD);
+    option_name[STOP_POSTREC] =    str(LANG_RECORD_STOP_POSTREC);
+    option_name[STOP_GAP] =        str(LANG_RECORD_STOP_GAP);
+
+
+    /* restart trigger with new values */
+    settings_apply_trigger();
+    peak_meter_trigger (global_settings.rec_trigger_mode != TRIG_MODE_OFF);
+
+    lcd_clear_display();
+
+    old_x_margin = lcd_getxmargin();
+    old_y_margin = lcd_getymargin();
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+
+    lcd_getstringsize("M", &w, &h);
+
+    // two lines are reserved for peak meter and trigger status
+    option_lines = (LCD_HEIGHT/h) - (global_settings.statusbar ? 1:0) - 2;
+
+    while (!exit_request) {
+        int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+        int button, i;
+        char *str;
+        char option_value[TRIG_OPTION_COUNT][7];
+
+        snprintf(
+            option_value[TRIGGER_MODE],
+            sizeof option_value[TRIGGER_MODE],
+            "%s",
+            trigger_modes[global_settings.rec_trigger_mode]);
+
+        snprintf (
+            option_value[PRERECORD_TIME],
+            sizeof option_value[PRERECORD_TIME],
+            "%s",
+            prerecord_times[global_settings.rec_prerecord_time]);
+
+        /* due to value range shift (peak_meter_define_trigger) -1 is 0db */
+        if (global_settings.rec_start_thres == -1) {
+            str = str(LANG_OFF);
+        } else {
+            str = create_thres_str(global_settings.rec_start_thres);
+        }
+        snprintf(
+            option_value[START_THRESHOLD],
+            sizeof option_value[START_THRESHOLD],
+            "%s",
+            str);
+
+        snprintf(
+            option_value[START_DURATION],
+            sizeof option_value[START_DURATION],
+            "%s",
+            trig_durations[global_settings.rec_start_duration]);
+
+
+        if (global_settings.rec_stop_thres <= INF_DB) {
+            str = str(LANG_OFF);
+        } else {
+            str = create_thres_str(global_settings.rec_stop_thres);
+        }
+        snprintf(
+            option_value[STOP_THRESHOLD],
+            sizeof option_value[STOP_THRESHOLD],
+            "%s",
+            str);
+
+        snprintf(
+            option_value[STOP_POSTREC],
+            sizeof option_value[STOP_POSTREC],
+            "%s",
+            trig_durations[global_settings.rec_stop_postrec]);
+
+        snprintf(
+            option_value[STOP_GAP],
+            sizeof option_value[STOP_GAP],
+            "%s",
+            trig_durations[global_settings.rec_stop_gap]);
+
+        lcd_clearrect(0, stat_height, LCD_WIDTH, LCD_HEIGHT - stat_height);
+        status_draw(true);
+
+        /* reselect FONT_SYSFONT as status_draw has changed the font */
+        /*lcd_setfont(FONT_SYSFIXED);*/
+
+        for (i = 0; i < option_lines; i++) {
+            int x, y;
+
+            str = option_name[i + offset];
+            lcd_putsxy(5, stat_height + i * h, str);
+
+            str = option_value[i + offset];
+            lcd_getstringsize(str, &w, &h);
+            y = stat_height + i * h;
+            x = LCD_WIDTH - w;
+            lcd_putsxy(x, y, str);
+            if ((int)selected == (i + offset))
+                lcd_invertrect(x, y, w, h);
+        }
+
+        scrollbar(0, stat_height,
+            4, LCD_HEIGHT - 16 - stat_height,
+            TRIG_OPTION_COUNT, offset, offset + option_lines,
+            VERTICAL);
+
+        peak_meter_draw_trig(0, LCD_HEIGHT - 8 - TRIG_HEIGHT);
+
+        button = peak_meter_draw_get_btn(0, LCD_HEIGHT - 8, LCD_WIDTH, 8);
+
+        lcd_update();
+
+        switch (button) {
+            case BUTTON_OFF:
+                splash(50, true, str(LANG_RESET_DONE_CANCEL));
+                global_settings.rec_start_thres = old_start_thres;
+                global_settings.rec_start_duration = old_start_duration;
+                global_settings.rec_prerecord_time = old_prerecord_time;
+                global_settings.rec_stop_thres = old_stop_thres;
+                global_settings.rec_stop_postrec = old_stop_postrec;
+                global_settings.rec_stop_gap = old_stop_gap;
+                global_settings.rec_trigger_mode = old_trigger_mode;
+                exit_request = true;
+                break;
+
+            case BUTTON_PLAY:
+                exit_request = true;
+                break;
+
+            case BUTTON_UP:
+                selected += TRIG_OPTION_COUNT - 1;
+                selected %= TRIG_OPTION_COUNT;
+                offset = MIN(offset, (int)selected);
+                offset = MAX(offset, (int)selected - option_lines + 1);
+                break;
+
+            case BUTTON_DOWN:
+                selected ++;
+                selected %= TRIG_OPTION_COUNT;
+                offset = MIN(offset, (int)selected);
+                offset = MAX(offset, (int)selected - option_lines + 1);
+                break;
+
+            case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                switch (selected) {
+                    case TRIGGER_MODE:
+                        global_settings.rec_trigger_mode ++;
+                        global_settings.rec_trigger_mode %= TRIGGER_MODE_COUNT;
+                        break;
+
+                    case PRERECORD_TIME:
+                        global_settings.rec_prerecord_time ++;
+                        global_settings.rec_prerecord_time %= PRERECORD_TIMES_COUNT;
+                        break;
+
+                    case START_THRESHOLD:
+                        change_threshold(&global_settings.rec_start_thres, 1);
+                        break;
+
+                    case START_DURATION:
+                        global_settings.rec_start_duration ++;
+                        global_settings.rec_start_duration %= TRIG_DURATION_COUNT;
+                        break;
+
+                    case STOP_THRESHOLD:
+                        change_threshold(&global_settings.rec_stop_thres, 1);
+                        break;
+
+                    case STOP_POSTREC:
+                        global_settings.rec_stop_postrec ++;
+                        global_settings.rec_stop_postrec %= TRIG_DURATION_COUNT;
+                        break;
+
+                    case STOP_GAP:
+                        global_settings.rec_stop_gap ++;
+                        global_settings.rec_stop_gap %= TRIG_DURATION_COUNT;
+                        break;
+
+                    case TRIG_OPTION_COUNT:
+                        // avoid compiler warnings
+                        break;
+                }
+                peak_meter_trigger(global_settings.rec_trigger_mode!=TRIG_OFF);
+                settings_apply_trigger();
+                break;
+
+            case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                switch (selected) {
+                    case TRIGGER_MODE:
+                        global_settings.rec_trigger_mode+=TRIGGER_MODE_COUNT-1;
+                        global_settings.rec_trigger_mode %= TRIGGER_MODE_COUNT;
+                        break;
+
+                    case PRERECORD_TIME:
+                        global_settings.rec_prerecord_time += PRERECORD_TIMES_COUNT - 1;
+                        global_settings.rec_prerecord_time %= PRERECORD_TIMES_COUNT;
+                        break;
+
+                    case START_THRESHOLD:
+                        change_threshold(&global_settings.rec_start_thres, -1);
+                        break;
+
+                    case START_DURATION:
+                        global_settings.rec_start_duration += TRIG_DURATION_COUNT-1;
+                        global_settings.rec_start_duration %= TRIG_DURATION_COUNT;
+                        break;
+
+                    case STOP_THRESHOLD:
+                        change_threshold(&global_settings.rec_stop_thres, -1);
+                        break;
+
+                    case STOP_POSTREC:
+                        global_settings.rec_stop_postrec +=
+                            TRIG_DURATION_COUNT - 1;
+                        global_settings.rec_stop_postrec %=
+                            TRIG_DURATION_COUNT;
+                        break;
+
+                    case STOP_GAP:
+                        global_settings.rec_stop_gap +=
+                            TRIG_DURATION_COUNT - 1;
+                        global_settings.rec_stop_gap %= TRIG_DURATION_COUNT;
+                        break;
+
+                    case TRIG_OPTION_COUNT:
+                        // avoid compiler warnings
+                        break;
+                }
+                
+                if (global_settings.rec_trigger_mode == TRIG_OFF) {
+                    peak_meter_trigger(true);
+                } else {
+                    /* restart trigger with new values */
+                    settings_apply_trigger();
+                }
+                break;
+
+            case BUTTON_F2:
+                peak_meter_trigger(true);
+                break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                retval = true;
+                exit_request = true;
+                break;
+        }
+    }
+
+    peak_meter_trigger(false);
+    lcd_setfont(FONT_UI);
+    lcd_setmargins(old_x_margin, old_y_margin);
+    return retval;
+}
+#endif
+
 bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_item items[9];
+    struct menu_item items[10];
     bool result;
 
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
@@ -462,6 +831,10 @@ bool recording_menu(bool no_source)
     items[i++].function = recdirectory;
     items[i].desc = ID2P(LANG_RECORD_STARTUP);
     items[i++].function = reconstartup;
+#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
+    items[i].desc = str(LANG_RECORD_TRIGGER);
+    items[i++].function = rectrigger;
+#endif
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL);
     result = menu_run(m);

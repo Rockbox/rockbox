@@ -241,6 +241,8 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 int ata_spinup_time = 0;
+static bool ata_led_enabled = true;
+static bool ata_led_on = false;
 static bool spinup = false;
 static bool sleeping = true;
 static long sleep_timeout = 5*HZ;
@@ -473,6 +475,13 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
 }
 
+static void ata_led(bool on) {
+    ata_led_on = on;
+    if (ata_led_enabled) {
+        led(ata_led_on);
+    }
+}
+
 int ata_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
@@ -492,21 +501,21 @@ int ata_read_sectors(IF_MV2(int drive,)
     last_disk_activity = current_tick;
     spinup_start = current_tick;
 
-    led(true);
+    ata_led(true);
 
     if ( sleeping ) {
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
-                led(false);
+                ata_led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
                 mutex_unlock(&ata_mtx);
-                led(false);
+                ata_led(false);
                 return -1;
             }
         }
@@ -518,7 +527,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
-        led(false);
+        ata_led(false);
         return -2;
     }
 
@@ -614,7 +623,7 @@ int ata_read_sectors(IF_MV2(int drive,)
         }
         break;
     }
-    led(false);
+    ata_led(false);
 
     mutex_unlock(&ata_mtx);
 
@@ -775,21 +784,21 @@ int ata_write_sectors(IF_MV2(int drive,)
     last_disk_activity = current_tick;
     spinup_start = current_tick;
 
-    led(true);
+    ata_led(true);
 
     if ( sleeping ) {
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
                 mutex_unlock(&ata_mtx);
-                led(false);
+                ata_led(false);
                 return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
                 mutex_unlock(&ata_mtx);
-                led(false);
+                ata_led(false);
                 return -1;
             }
         }
@@ -799,7 +808,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
-        led(false);
+        ata_led(false);
         return -2;
     }
 
@@ -843,7 +852,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         ret = -4;
     }
 
-    led(false);
+    ata_led(false);
 
     mutex_unlock(&ata_mtx);
 
@@ -1042,9 +1051,9 @@ static void ata_thread(void)
             case SYS_USB_CONNECTED:
                 if (poweroff) {
                     mutex_lock(&ata_mtx);
-                    led(true);
+                    ata_led(true);
                     ata_power_on();
-                    led(false);
+                    ata_led(false);
                     mutex_unlock(&ata_mtx);
                 }
 
@@ -1384,7 +1393,7 @@ int ata_init(void)
 
     mutex_init(&ata_mtx);
 
-    led(false);
+    ata_led(false);
 
 #if CONFIG_CPU == SH7034
     /* Port A setup */
@@ -1457,4 +1466,13 @@ int ata_init(void)
         return -70 + rc;
 
     return 0;
+}
+
+void ata_set_led_enabled(bool enabled) {
+    ata_led_enabled = enabled;
+    if (ata_led_enabled) {
+        led(ata_led_on);
+    } else {
+        led(false);
+    }
 }

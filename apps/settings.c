@@ -154,6 +154,11 @@ static const char off_on_ask[] = "off,on,ask";
 static const char graphic_numeric[] = "graphic,numeric";
 static const char off_number_spell_hover[] = "off,number,spell,hover";
 
+/* keep synchronous to trig_durations and
+   trigger_times in settings_apply_trigger */
+static const char trig_durations_conf [] =
+                  "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min";
+
 /* the part of the settings which ends up in the RTC RAM, where available 
    (those we either need early, save frequently, or without spinup) */
 static const struct bit_entry rtc_bits[] =
@@ -350,6 +355,14 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_RECORDING
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
+
+    /* values for the trigger */
+    {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},
+    {8 | SIGNED, S_O(rec_stop_thres), -45, "trigger stop threshold", NULL},
+    {4, S_O(rec_start_duration), 0, "trigger start duration", trig_durations_conf},
+    {4, S_O(rec_stop_postrec), 2, "trigger stop postrec", trig_durations_conf},
+    {4, S_O(rec_stop_gap), 1, "trigger min gap", trig_durations_conf},
+    {4, S_O(rec_trigger_mode ), 1, "trigger mode", "off,no rearm,rearm"},
 #endif
 
     /* new stuff to be added at the end */
@@ -1553,5 +1566,35 @@ static const unsigned long rec_timer_seconds[] =
 unsigned int rec_timesplit_seconds(void)
 {
     return rec_timer_seconds[global_settings.rec_timesplit];
+}
+
+/*
+ * Time strings used for the trigger durations.
+ * Keep synchronous to trigger_times in settings_apply_trigger
+ */
+char *trig_durations[TRIG_DURATION_COUNT] =
+{
+    "0s", "1s", "2s", "5s",
+    "10s", "15s", "20s", "25s", "30s",
+    "1min", "2min", "5min", "10min"
+};
+
+void settings_apply_trigger(void)
+{
+    /* Keep synchronous to trig_durations and trig_durations_conf*/
+    static const long trigger_times[TRIG_DURATION_COUNT] = {
+        0, HZ, 2*HZ, 5*HZ,
+        10*HZ, 15*HZ, 20*HZ, 25*HZ, 30*HZ,
+        60*HZ, 2*60*HZ, 5*60*HZ, 10*60*HZ
+    };
+
+    peak_meter_define_trigger(
+        global_settings.rec_start_thres,
+        trigger_times[global_settings.rec_start_duration],
+        MIN(trigger_times[global_settings.rec_start_duration] / 2, 2*HZ),
+        global_settings.rec_stop_thres,
+        trigger_times[global_settings.rec_stop_postrec],
+        trigger_times[global_settings.rec_stop_gap]
+    );
 }
 #endif

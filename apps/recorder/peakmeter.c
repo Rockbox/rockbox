@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "settings.h"
 #include "lcd.h"
+#include "widgets.h"
 #include "wps-display.h"
 #include "sprintf.h"
 #include "button.h"
@@ -66,6 +67,24 @@ static bool peak_meter_use_dbfs = true;
 static unsigned short db_min = 0;
 static unsigned short db_max = 9000;
 static unsigned short db_range = 9000;
+
+static unsigned short trig_strt_threshold;
+static long trig_strt_duration;
+static long trig_strt_dropout;
+static unsigned short trig_stp_threshold;
+static long trig_stp_hold;
+static long trig_rstrt_gap;
+
+/* point in time when the threshold was exceeded */
+static long trig_hightime;
+
+/* point in time when the volume fell below the threshold*/
+static long trig_lowtime;
+
+/* The output value of the trigger. See TRIG_XXX constants vor valid values */
+static int trig_status = TRIG_OFF;
+
+static void (*trigger_listener)(int) = NULL;
 
 #if CONFIG_HWCODEC == MASNONE
 #define MAS_REG_DQPEAK_L 0
@@ -124,7 +143,7 @@ static const long clip_time_out[] = {
 
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
-#define DB_SCALE_SRC_VALUES_SIZE 11
+#define DB_SCALE_SRC_VALUES_SIZE 12
 #if 0
 static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32767, /*   0 db */
@@ -138,6 +157,7 @@ static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     328,   /* -40 db */
     104,   /* -50 db */
     33,    /* -60 db */
+    1,     /* -inf   */
 };
 #else
 static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
@@ -152,8 +172,24 @@ static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     373,   /* -40 db */
     102,   /* -50 db */
     33,    /* -60 db */
+    0,     /* -inf   */
 };
 #endif
+
+const char* peak_meter_dbnames[DB_SCALE_SRC_VALUES_SIZE] = {
+    "0 db",
+    "-3 db",
+    "-6 db",
+    "-9 db",
+    "-12 db",
+    "-18 db",
+    "-24 db",
+    "-30 db",
+    "-40 db",
+    "-50 db",
+    "-60 db",
+    "-inf",
+};
 
 static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
 
@@ -275,8 +311,8 @@ int calc_db (int isample) {
 
 
 /**
- * A helper function for db_to_sample. Don't call it separately but
- * use db_to_sample. If one or both of min and max are outside the 
+ * A helper function for peak_meter_db2sample. Don't call it separately but
+ * use peak_meter_db2sample. If one or both of min and max are outside the
  * range 0 <= min (or max) < 8961 the behaviour of this function is
  * undefined. It may not return.
  * @param int min - The minimum of the value range that is searched.
@@ -312,7 +348,7 @@ static int db_to_sample_bin_search(int min, int max, int db){
  * @return int - The return value is in the range of
  *               0 <= return value < MAX_PEAK
  */
-static int db_to_sample(int db) {
+int peak_meter_db2sample(int db) {
     int retval = 0;
 
     /* what is the maximum pseudo db value */
@@ -351,7 +387,7 @@ static int db_to_sample(int db) {
  */
 void peak_meter_set_min(int newmin) {
     if (peak_meter_use_dbfs) {
-        peak_meter_range_min = db_to_sample(newmin);
+        peak_meter_range_min = peak_meter_db2sample(newmin);
 
     } else {
         if (newmin < peak_meter_range_max) {
@@ -392,7 +428,7 @@ int peak_meter_get_min(void) {
  */
 void peak_meter_set_max(int newmax) {
     if (peak_meter_use_dbfs) {
-        peak_meter_range_max = db_to_sample(newmax);
+        peak_meter_range_max = peak_meter_db2sample(newmax);
     } else {
         if (newmax > peak_meter_range_min) {
             peak_meter_range_max = newmax * MAX_PEAK / 100;
@@ -504,6 +540,15 @@ void peak_meter_playback(bool playback)
 #endif
 }
 
+static void set_trig_status(int new_state) {
+    if (trig_status != new_state) {
+        trig_status = new_state;
+        if (trigger_listener != NULL) {
+            trigger_listener(trig_status);
+        }
+    }
+}
+
 /**
  * Reads peak values from the MAS, and detects clips. The 
  * values are stored in peak_meter_l peak_meter_r for later 
@@ -546,6 +591,121 @@ inline void peak_meter_peek(void)
             current_tick + clip_time_out[peak_meter_clip_hold];
     }
 
+    switch (trig_status) {
+        case TRIG_READY:
+            /* no more changes, if trigger was activated as release trigger */
+            /* threshold exceeded? */
+            if ((left > trig_strt_threshold) || (right > trig_strt_threshold)) {
+                if (trig_strt_duration) {
+                    /* reset trigger duration */
+                    trig_hightime = current_tick;
+
+                    /* reset dropout duration */
+                    trig_lowtime = current_tick;
+
+                    /* if trig_duration is set to 0 the user wants to start
+                     recording immediately */
+                    set_trig_status(TRIG_STEADY);
+                } else {
+                    set_trig_status(TRIG_GO);
+                }
+            }
+            break;
+
+        case TRIG_STEADY:
+        case TRIG_RETRIG:
+            /* trigger duration exceeded */
+            if (current_tick - trig_hightime > trig_strt_duration) {
+                set_trig_status(TRIG_GO);
+            } else {
+                /* threshold exceeded? */
+                if ((left > trig_strt_threshold) ||
+                    (right > trig_strt_threshold)) {
+                    /* reset lowtime */
+                    trig_lowtime = current_tick;
+                }
+                /* volume is below threshold */
+                else {
+                    /* dropout occurred? */
+                    if (current_tick - trig_lowtime > trig_strt_dropout){
+                        if (trig_status == TRIG_STEADY){
+                            set_trig_status(TRIG_READY);
+                        }
+                        /* trig_status == TRIG_RETRIG */
+                        else {
+                            /* the gap has already expired */
+                            trig_lowtime = current_tick - trig_rstrt_gap - 1;
+                            set_trig_status(TRIG_POSTREC);
+                        }
+                    }
+                }
+            }
+            break;
+
+        case TRIG_GO:
+        case TRIG_CONTINUE:
+            /* threshold exceeded? */
+            if ((left > trig_stp_threshold) || (right > trig_stp_threshold)) {
+                /* restart hold time countdown */
+                trig_lowtime = current_tick;
+            } else {
+                set_trig_status(TRIG_POSTREC);
+                trig_hightime = current_tick;
+            }
+            break;
+
+        case TRIG_POSTREC:
+            /* gap time expired? */
+            if (current_tick - trig_lowtime > trig_rstrt_gap){
+                /* start threshold exceeded? */
+                if ((left > trig_strt_threshold) ||
+                    (right > trig_strt_threshold)) {
+
+                    set_trig_status(TRIG_RETRIG);
+                    trig_hightime = current_tick;
+                }
+                else
+
+                /* stop threshold exceeded */
+                if ((left > trig_stp_threshold) ||
+                    (right > trig_stp_threshold)) {
+                    if (current_tick - trig_hightime > trig_stp_hold){
+                        trig_lowtime = current_tick;
+                        set_trig_status(TRIG_CONTINUE);
+                    } else {
+                        trig_lowtime = current_tick - trig_rstrt_gap - 1;
+                    }
+                }
+
+                /* below any threshold */
+                else {
+                    if (current_tick - trig_lowtime > trig_stp_hold){
+                        set_trig_status(TRIG_READY);
+                    } else {
+                        trig_hightime = current_tick;
+                    }
+                }
+            }
+
+            /* still within the gap time */
+            else {
+                /* stop threshold exceeded */
+                if ((left > trig_stp_threshold) ||
+                    (right > trig_stp_threshold)) {
+                    set_trig_status(TRIG_CONTINUE);
+                    trig_lowtime = current_tick;
+                }
+
+                /* hold time expired */
+                else if (current_tick - trig_lowtime > trig_stp_hold){
+                    trig_hightime = current_tick;
+                    trig_lowtime = current_tick;
+                    set_trig_status(TRIG_READY);
+                }
+            }
+            break;
+    }
+
     /* peaks are searched -> we have to find the maximum. When
        many calls of peak_meter_peek the maximum value will be
        stored in peak_meter_x. This maximum is reset by the
@@ -557,37 +717,6 @@ inline void peak_meter_peek(void)
     peek_calls++;
 #endif
 }
-
-
-/**
- * The thread function for the peak meter calls peak_meter_peek 
- * to reas out the mas and find maxima, clips, etc. No display
- * is performed.
- */
-/*
-void peak_meter_thread(void) {
-    sleep(5000);
-    while (1) {
-        if (peak_meter_enabled && peak_meter_use_thread){
-            peak_meter_peek();
-        }
-        yield();
-    }
-}
-*/
-
-/**
- * Creates the peak meter thread 
- */
-/*
-void peak_meter_init(void) {
-    create_thread(
-        peak_meter_thread, 
-        peak_meter_stack, 
-        sizeof peak_meter_stack, 
-        "peakmeter");
-}
-*/
 
 /**
  * Reads out the peak volume of the left channel.
@@ -842,6 +971,22 @@ void peak_meter_draw(int x, int y, int width, int height) {
         lcd_invertpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
     }
 
+    if (trig_status != TRIG_OFF) {
+        int start_trigx, stop_trigx, ycenter;
+
+        ycenter = y + height / 2;
+        /* display threshold value */
+        start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
+        lcd_drawline(start_trigx, ycenter - 2, start_trigx, ycenter);
+        start_trigx ++;
+        if (start_trigx < LCD_WIDTH) lcd_drawpixel(start_trigx, ycenter - 1);
+
+        stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
+        lcd_drawline(stop_trigx, ycenter - 2, stop_trigx, ycenter);
+        if (stop_trigx > 0) lcd_drawpixel(stop_trigx - 1, ycenter - 1);
+
+    }
+
 #ifdef PM_DEBUG
     /* display a bar to show how many calls to peak_meter_peek 
        have ocurred since the last display */
@@ -864,6 +1009,161 @@ void peak_meter_draw(int x, int y, int width, int height) {
 
     last_left = left;
     last_right = right;
+}
+
+/**
+ * Defines the parameters of the trigger. After these parameters are defined
+ * the trigger can be started either by peak_meter_attack_trigger or by
+ * peak_meter_release_trigger. Note that you can pass either linear (%) or
+ * logarithmic (db) values to the thresholds. Positive values are intepreted as
+ * percent (0 is 0% .. 100 is 100%). Negative values are interpreted as db.
+ * To avoid ambiguosity of the value 0 the negative values are shifted by -1.
+ * Thus -75 is -74db .. -1 is 0db.
+ * @param start_threshold - The threshold used for attack trigger. Negative
+ *                          values are interpreted as db -1, positive as %.
+ * @param start_duration - The minimum time span within which start_threshold
+ *                         must be exceeded to fire the attack trigger.
+ * @param start_dropout - The maximum time span the level may fall below
+ *                        start_threshold without releasing the attack trigger.
+ * @param stop_threshold - The threshold the volume must fall below to release
+ *                         the release trigger.Negative values are
+ *                         interpreted as db -1, positive as %.
+ * @param stop_hold - The minimum time the volume must fall below the
+ *                    stop_threshold to release the trigger.
+ * @param
+ */
+void peak_meter_define_trigger(
+    int start_threshold,
+    long start_duration,
+    long start_dropout,
+    int stop_threshold,
+    long stop_hold_time,
+    long restart_gap
+    )
+{
+    if (start_threshold < 0) {
+        /* db */
+        if (start_threshold < -89) {
+            trig_strt_threshold = 0;
+        } else {
+            trig_strt_threshold =peak_meter_db2sample((start_threshold+1)*100);
+        }
+    } else {
+        /* linear percent */
+        trig_strt_threshold = start_threshold * MAX_PEAK / 100;
+    }
+    trig_strt_duration = start_duration;
+    trig_strt_dropout = start_dropout;
+    if (stop_threshold < 0) {
+        /* db */
+        trig_stp_threshold = peak_meter_db2sample((stop_threshold + 1) * 100);
+    } else {
+        /* linear percent */
+        trig_stp_threshold = stop_threshold * MAX_PEAK / 100;
+    }
+    trig_stp_hold = stop_hold_time;
+    trig_rstrt_gap = restart_gap;
+}
+
+/**
+ * Enables or disables the trigger.
+ * @param on - If true the trigger is turned on.
+ */
+void peak_meter_trigger(bool on) {
+    /* don't use set_trigger here as that would fire an undesired event */
+    trig_status = on ? TRIG_READY : TRIG_OFF;
+}
+
+/**
+ * Registers the listener function that listenes on trig_status changes.
+ * @param listener - The function that is called with each change of
+ *                   trig_status. May be set to NULL if no callback is desired.
+ */
+void peak_meter_set_trigger_listener(void (*listener)(int status)) {
+    trigger_listener = listener;
+}
+
+/**
+ * Fetches the status of the trigger.
+ * TRIG_OFF: the trigger is inactive
+ * TRIG_RELEASED:  The volume level is below the threshold
+ * TRIG_ACTIVATED: The volume level has exceeded the threshold, but the trigger
+ *                 hasn't been fired yet.
+ * TRIG_FIRED:     The volume exceeds the threshold
+ *
+ * To activate the trigger call either peak_meter_attack_trigger or
+ * peak_meter_release_trigger. To turn the trigger off call
+ * peak_meter_trigger_off.
+ */
+int peak_meter_trigger_status(void) {
+   return trig_status; /* & TRIG_PIT_MASK;*/
+}
+
+void peak_meter_draw_trig(int xpos, int ypos) {
+    int x = xpos + ICON_PLAY_STATE_WIDTH + 1;
+    switch (trig_status) {
+        long time_left;
+
+        case TRIG_READY:
+            scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
+                      TRIGBAR_WIDTH, 0, 0, HORIZONTAL);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Stop], xpos, ypos,
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+            break;
+
+        case TRIG_STEADY:
+        case TRIG_RETRIG:
+            time_left = trig_strt_duration - (current_tick - trig_hightime);
+            time_left = time_left * TRIGBAR_WIDTH / trig_strt_duration;
+            scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
+                      TRIGBAR_WIDTH, 0, TRIGBAR_WIDTH - time_left, HORIZONTAL);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Stop], xpos, ypos,
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+            break;
+
+        case TRIG_GO:
+        case TRIG_CONTINUE:
+            scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
+                      TRIGBAR_WIDTH, TRIGBAR_WIDTH, TRIGBAR_WIDTH, HORIZONTAL);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Record],
+                       TRIG_WIDTH - ICON_PLAY_STATE_WIDTH, ypos,
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+            break;
+
+        case TRIG_POSTREC:
+            time_left = trig_stp_hold - (current_tick - trig_lowtime);
+            time_left = time_left * TRIGBAR_WIDTH / trig_stp_hold;
+            scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
+                      TRIGBAR_WIDTH, time_left, TRIGBAR_WIDTH, HORIZONTAL);
+            lcd_bitmap(bitmap_icons_7x8[Icon_Record],
+                       TRIG_WIDTH - ICON_PLAY_STATE_WIDTH, ypos,
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+            break;
+    }
+
+}
+
+int peak_meter_draw_get_btn(int x, int y, int width, int height)
+{
+    int button;
+    long next_refresh = current_tick;
+    long next_big_refresh = current_tick + HZ / 10;
+    button = BUTTON_NONE;
+    while (!TIME_AFTER(current_tick, next_big_refresh)) {
+        button = button_get(false);
+        if (button != BUTTON_NONE) {
+            break;
+        }
+        peak_meter_peek();
+        yield();
+
+        if (TIME_AFTER(current_tick, next_refresh)) {
+            peak_meter_draw(x, y, width, height);
+            lcd_update_rect(x, y, width, height);
+            next_refresh = current_tick + HZ / peak_meter_fps;
+        }
+    }
+    return button;
 }
 
 #ifdef PM_DEBUG

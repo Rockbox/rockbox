@@ -102,6 +102,12 @@
 #define FF_REWIND_45000 12
 #define FF_REWIND_60000 13
 
+#define TRIG_MODE_OFF 0
+#define TRIG_MODE_NOREARM 1
+#define TRIG_MODE_REARM 2
+
+#define TRIG_DURATION_COUNT 13
+extern char *trig_durations[TRIG_DURATION_COUNT];
 
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
@@ -171,6 +177,13 @@ struct user_settings
     int rec_directory; /* 0=base dir, 1=current dir */
     bool rec_startup; /* true means start Rockbox in recording screen */
     
+    int rec_start_thres;    /* negative: db, positive: % range -87 .. 100 */
+    int rec_start_duration; /* index of trig_durations */
+    int rec_stop_thres;     /* negative: db, positive: % */
+    int rec_stop_postrec;   /* negative: db, positive: % range -87 .. 100 */
+    int rec_stop_gap;       /* index of trig_durations */
+    int rec_trigger_mode;   /* see TRIG_MODE_XXX constants */
+
     /* device settings */
 
     int contrast;   /* lcd contrast:          0-63 0=low 63=high            */
@@ -325,6 +338,7 @@ int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 
 unsigned int rec_timesplit_seconds(void);
+void settings_apply_trigger(void);
 
 /* global settings */
 extern struct user_settings global_settings;
