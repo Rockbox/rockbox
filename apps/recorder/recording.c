@@ -111,7 +111,7 @@ char *fmt_gain(int snd, int val, char *str, int len)
     unit = mpeg_sound_unit(snd);
     
     i = tmp / (10*numdec);
-    d = tmp % (10*numdec);
+    d = abs(tmp % (10*numdec));
     
     snprintf(str, len, fmtstr[numdec], i, d, unit);
     return str;
