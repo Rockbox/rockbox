@@ -225,6 +225,17 @@ static bool receditable(void)
     return set_bool(str(LANG_RECORDING_EDITABLE),
                     &global_settings.rec_editable);
 }
+
+static bool rectimesplit(void)
+{
+    char *names[] = {str(LANG_OFF), "00:05","00:10","00:15",
+                     "00:30","01:00","02:00","04:00"};
+
+    return set_option(str(LANG_RECORD_TIMESPLIT),
+                      &global_settings.rec_timesplit,
+                      names, 8, NULL );
+}
+
 #endif /* HAVE_MAS3587F */
 
 static void set_chanconf(int val)
@@ -282,6 +293,7 @@ bool recording_menu(void)
         { str(LANG_RECORDING_SOURCE), recsource },
         { str(LANG_RECORDING_CHANNELS), recchannels },
         { str(LANG_RECORDING_EDITABLE), receditable },
+        { str(LANG_RECORD_TIMESPLIT), rectimesplit },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

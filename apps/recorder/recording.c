@@ -89,6 +89,19 @@ static char *fmtstr[] =
     "%d.%02d %s  "      /* 2 decimals */
 };
 
+/* This array holds the record timer interval lengths, in seconds */
+static unsigned long rec_timer_seconds[] =
+{
+    0,    /* off */
+    300,  /* 00:05 */
+    600,  /* 00:10 */
+    900,  /* 00:15 */
+    1800, /* 00:30 */
+    3600, /* 01:00 */
+    7200, /* 02:00 */
+    14400, /* 04:00 */
+};
+
 char *fmt_gain(int snd, int val, char *str, int len)
 {
     int tmp, i, d, numdec;
@@ -349,7 +362,7 @@ bool recording_screen(void)
             timeout = current_tick + HZ/10;
 
             seconds = mpeg_recorded_time() / HZ;
-
+             
             update_countdown--;
             if(update_countdown == 0 || seconds > last_seconds)
             {
@@ -367,8 +380,34 @@ bool recording_screen(void)
                          hours, minutes, seconds%60);
                 lcd_puts(0, 0, buf);
                 
-                snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
-                         num2max5(mpeg_num_recorded_bytes(), buf2));
+                /* if the record timesplit is active */
+                if (global_settings.rec_timesplit)
+                {
+                    unsigned long dseconds, dhours, dminutes;
+                    int rti = global_settings.rec_timesplit;
+                    dseconds = rec_timer_seconds[rti]; 
+
+                    if (mpeg_status() && (seconds >= dseconds))
+                    {
+                        /* stop and restart recording */
+                        mpeg_stop();
+                        have_recorded = true;
+                        mpeg_record(create_filename());
+                        update_countdown = 1;
+                        last_seconds = 0;
+                    }
+
+                    /* Display the record timesplit interval rather than 
+                       the file size if the record timer is active */
+                    dhours = dseconds / 3600;
+                    dminutes = (dseconds - (dhours * 3600)) / 60;
+                    snprintf(buf, 32, "%s %02d:%02d",
+                             str(LANG_RECORD_TIMESPLIT_REC),
+                             dhours, dminutes);
+                }
+                else
+                    snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
+                             num2max5(mpeg_num_recorded_bytes(), buf2));
                 lcd_puts(0, 1, buf);
 
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);

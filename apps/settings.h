@@ -75,6 +75,16 @@ struct user_settings
     int rec_left_gain; /* 0-15 */
     int rec_right_gain; /* 0-15 */
     bool rec_editable; /* true means that the bit reservoir is off */
+
+    /* note: timesplit setting is not saved */
+    int rec_timesplit; /* 0 = off
+                          1 = 00:05
+                          2 = 00:10
+                          3 = 00:15
+                          4 = 00:30
+                          5 = 01:00
+                          6 = 02:00 
+                          7 = 04:00 */
     
     /* device settings */
 

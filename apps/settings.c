@@ -1032,9 +1032,15 @@ bool settings_load_config(char* file)
             set_sound(value, SOUND_RIGHT_GAIN, &global_settings.rec_right_gain);
         else if (!strcasecmp(name, "rec quality"))
             set_cfg_int(&global_settings.rec_quality, value, 0, 7);
+        else if (!strcasecmp(name, "rec timesplit")){
+            static char* options[] = {"off", "00:05","00:10","00:15",
+                                      "00:30","01:00","02:00","04:00"};
+            set_cfg_option(&global_settings.rec_timesplit, value, 
+                           options, 8); 
+        }
         else if (!strcasecmp(name, "rec source")) {
             static char* options[] = {"mic", "line", "spdif"};
-            set_cfg_option(&global_settings.rec_source, value, options, 3);
+            set_cfg_option(&global_settings.rec_source, value, options, 3); 
         }
         else if (!strcasecmp(name, "rec frequency")) {
             static char* options[] = {"44", "48", "32", "22", "24", "16"};

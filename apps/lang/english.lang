@@ -1537,3 +1537,13 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 new:
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new:
+
+id: LANG_RECORD_TIMESPLIT_REC
+decs: Display of record timer interval setting, on the record screen
+eng: "Split time:"
+new:
