@@ -223,12 +223,14 @@ if [ -z "$archos" ]; then
 # Figure out target platform
 #
 
-  echo "Enter target platform: (defaults to Recorder)"
+  echo "Enter target platform: (default is Archos Recorder)"
 
   echo "1 - Archos Player/Studio"
   echo "2 - Archos Recorder"
   echo "3 - Archos FM Recorder"
   echo "4 - Archos Recorder v2"
+  echo "5 - Neo mStation"
+  echo "6 - Neo 35"
 
   getit=`input`;
 
@@ -253,6 +255,20 @@ if [ -z "$archos" ]; then
     target="-DARCHOS_RECORDERV2"
     display="-DHAVE_LCD_BITMAP"
     keypad="-DHAVE_RECORDER_KEYPAD"
+    ;;
+
+   5)
+    archos="neomstation"
+    target="-DNEO_MSTATION"
+    display="-DHAVE_NEOLCD_CHARCELLS"
+    keypad="-DHAVE_NEO_KEYPAD"
+    ;;
+
+   6)
+    archos="neo35"
+    target="-DNEO_35"
+    display="-DHAVE_NEOLCD_CHARCELLS"
+    keypad="-DHAVE_NEO_KEYPAD"
     ;;
 
    *)
