@@ -249,8 +249,8 @@ static int showdir(char *path, int start)
             /* mark mp? and m3u files as such */
             if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
                 if (!strcasecmp(&entry->d_name[len-4], ".mp3") ||
-                   (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
-		    (!strcasecmp(&entry->d_name[len-4], ".mpa")))
+                    (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
+                    (!strcasecmp(&entry->d_name[len-4], ".mpa")))
                     dptr->attr |= TREE_ATTR_MPA;
                 else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
                     dptr->attr |= TREE_ATTR_M3U;

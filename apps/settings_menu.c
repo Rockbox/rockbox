@@ -347,7 +347,7 @@ static bool dir_filter(void)
                       str(LANG_FILTER_PLAYLIST) };
 
     return set_option( str(LANG_FILTER), &global_settings.dirfilter,
-                       names, 3, NULL );
+                       names, 4, NULL );
 }
 
 static bool sort_case(void)
