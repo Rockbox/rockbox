@@ -126,6 +126,7 @@ static int showdir(char *path, int start)
         lastdir[sizeof(lastdir)-1] = 0;
         qsort(dircacheptr,filesindir,sizeof(struct entry*),compare);
     }
+
 #ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(false);
 #endif
@@ -165,18 +166,48 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
+static int numentries=0;
+static int dircursor=0;
+static int start=0;
+static int dirpos[MAX_DIR_LEVELS];
+static int cursorpos[MAX_DIR_LEVELS];
+static int dirlevel=0;
+static bool playing = false;
+static char currdir[255];
+
+/* QUICK HACK! this should be handled by the playlist code later */
+char* peek_next_track(int type)
+{
+    static char buf[256];
+
+    /* next-song only works when not browsing */
+    if (!playing)
+        return NULL;
+
+    /* get next track in dir */
+    while (dircursor + start + 1 < numentries ) {
+        if(dircursor+1 < TREE_MAX_ON_SCREEN)
+            dircursor++;
+        else
+            start++;
+        if ( dircacheptr[dircursor+start]->file &&
+             dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+            snprintf(buf,sizeof buf,"%s/%s",
+                     currdir, dircacheptr[dircursor+start]->name );
+            lcd_clear_display();
+            lcd_puts(0,0,"<Playing>");
+            lcd_puts(0,1,"<all files>");
+            return buf;
+        }
+    }
+
+    return NULL;
+}
+
 bool dirbrowse(char *root)
 {
-    int numentries;
     char buf[255];
-    char currdir[255];
-    int dircursor=0;
     int i;
-    int start=0;
-    int dirpos[MAX_DIR_LEVELS];
-    int cursorpos[MAX_DIR_LEVELS];
-    int dirlevel=0;
-
     lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
@@ -255,7 +286,9 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
+                    playing = true;
                     playtune(currdir, dircacheptr[dircursor+start]->name);
+                    playing = false;
 #ifdef HAVE_LCD_BITMAP
                     lcd_setmargins(0, MARGIN_Y);
                     lcd_setfont(0);
