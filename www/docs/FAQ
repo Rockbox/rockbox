@@ -15,93 +15,92 @@
 Rockbox FAQ 
 -----------
 
-Q. What is a FAQ?
-A. A rare small animal of the species 'Textius Electronicus'. It is known for
-   its' helpful attitude and vicious misspellings.
+Q1. What is a FAQ?
+A1. A rare small animal of the species 'Textius Electronicus'. It is known for
+    its' helpful attitude and vicious misspellings.
 
-Q. What is Rockbox?  What is it's purpose?
-A. The purpose of this project is to write an Open Source replacement 
-   firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
+Q2. What is Rockbox?  What is it's purpose?
+A2. The purpose of this project is to write an Open Source replacement 
+    firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
-Q. I want to write code for my Archos, how do I proceed?
-A. First make sure to read the file CONTRIBUTING in the firmware directory
-   on Sourceforge.  See http://bjorn.haxx.se/rockbox/firmware/CONTRIBUTING
-   if you do not want to have to wade through the CVS directories.
+Q3. I want to write code for my Archos, how do I proceed?
+A3. First make sure to read the file CONTRIBUTING in the firmware directory
+    on Sourceforge.  See http://bjorn.haxx.se/rockbox/firmware/CONTRIBUTING
+    if you do not want to have to wade through the CVS directories.
 
-Q: Whats CVS?
-A: Concurrent Versions System (http://www.cvshome.org).  We have a small
-   help page about how to use this to get, update and commit files on the web
-   at http://bjorn.haxx.se/rockbox/cvs.html
+Q4: Whats CVS?
+A4: Concurrent Versions System (http://www.cvshome.org).  We have a small
+    help page about how to use this to get, update and commit files on the web
+    at http://bjorn.haxx.se/rockbox/cvs.html
 
-Q. What exactly is the CONTRIBUTING file? 
-A. Just like the name implies, it lists conventions that the project follows, 
-   and in turn asks you to follow, for the formating of source code in
-   general.
+Q5. What exactly is the CONTRIBUTING file? 
+A5. Just like the name implies, it lists conventions that the project follows, 
+    and in turn asks you to follow, for the formating of source code in
+    general.
 
-Q. Okay, so I read CONTRIBUTING and although I don't agree with all your 
-   conventions, I am going to be sensible and follow them anyway.  Now what?
-A. Start by reading up on the information about the jukeboxes on our web page.
-   Then go into CVS and look at the code we've written. Then take what you
-   need and start writing.
+Q6. Okay, so I read CONTRIBUTING and although I don't agree with all your 
+    conventions, I am going to be sensible and follow them anyway.  Now what?
+A6. Start by reading up on the information about the jukeboxes on our web page.
+    Then go into CVS and look at the code we've written. Then take what you
+    need and start writing.
 
-Q. Okay, so how do I submit a patch?
-A. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
-   mail the output to any member of the development team and we will take it 
-   under consideration.  (Please remember that all submissions are not
-   automatically accepted.)
+Q7. Okay, so how do I submit a patch?
+A7. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
+    mail the output to any member of the development team and we will take it 
+    under consideration.  (Please remember that all submissions are not
+    automatically accepted.)
 
-Q. I want to join the development team, but don't have a SourceForge account,
-   what should I do?
-A. Head on over to http://sourceforge.net/account/register.php and create an
-   account for yourself.
+Q8. I want to join the development team, but don't have a SourceForge account,
+    what should I do?
+A8. Head on over to http://sourceforge.net/account/register.php and create an
+    account for yourself.
 
-Q. Do you have a mailing list?
-A. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, you need to
-   send a message to majordomo@cool.haxx.se with the words "subscribe rockbox"
-   in the body. 
+Q9. Do you have a mailing list?
+A9. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, you need to
+    send a message to majordomo@cool.haxx.se with the words "subscribe rockbox"
+    in the body. 
 
-Q. Great you have a mailing list!  Is there anyway for me to catch up on
-   past posts?
-A. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
+Q10. Great you have a mailing list!  Is there anyway for me to catch up on
+     past posts?
+A10. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
 
-Q. How can I meet the developers working on the project?
-A. One way is by visiting us on IRC.  Head on over to the server
-   irc.openprojects.net, and then join "#rockbox".  There is usually at least
-   one person there.  If you don't see any activity, feel free to post 
-   questions anyway, serveral of us log the channel and will get you answers
-   when we unidle.
+Q11. How can I meet the developers working on the project?
+A11. One way is by visiting us on IRC.  Head on over to the server
+     irc.openprojects.net, and then join "#rockbox".  There is usually at 
+     least one person there.  If you don't see any activity, feel free to post 
+     questions anyway, serveral of us log the channel and will get you answers
+     when we unidle.
 
-Q: Wow, you guys talk on IRC alot?  I wish I had been around for those 
-   conversations to see what happened.
-A: We are glad you mentioned that!  http://bjorn.haxx.se/rockbox/irc happens
-   to have a list of various logs we have recorded of events in the channel.
-   Feel free to read up, and ask questions on what you find.
+Q12: Wow, you guys talk on IRC alot?  I wish I had been around for those 
+     conversations to see what happened.
+A12: We are glad you mentioned that!  http://bjorn.haxx.se/rockbox/irc happens
+     to have a list of various logs we have recorded of events in the channel.
+     Feel free to read up, and ask questions on what you find.
 
-Q. What is this "SourceForge" you keep mentioning?
-A. http://www.sourceforge.net
+Q13. What is this "SourceForge" you keep mentioning?
+A13. http://www.sourceforge.net
 
-Q. Can the changes or the software that Rockbox suggests or offers 
-   possibly damage my Archos Player?
-A. All firmware mods that are presented are still highly experimental. 
-   Try them at your own risk. We offer no guarantee that this software, or the
-   hardware modifications we show, will not damage your player or void your 
-   warranty.
-   That said, we have not been able to damage any of our units by modifying
-   only the firmware. You can accidentally password protect your harddisk,
-   but there are ways around that. (See below.)
+Q14. Can the changes or the software that Rockbox suggests or offers 
+     possibly damage my Archos Player?
+A14. All firmware mods that are presented are still highly experimental. 
+     Try them at your own risk. We offer no guarantee that this software, or 
+     the hardware modifications we show, will not damage your player or void 
+     your warranty.  That said, we have not been able to damage any of our 
+     units by modifying only the firmware. You can accidentally password 
+     protect your harddisk, but there are ways around that. (See below.)
 
-Q. I want to see what the inside of my player looks like, but I would really
-   like to avoid voiding my warranty.  Is there anything you can suggest?
-A. We have a collection of photos of both the player and recorder. Look at
-   http://bjorn.haxx.se/rockbox/internals/
+Q15. I want to see what the inside of my player looks like, but I would really
+     like to avoid voiding my warranty.  Is there anything you can suggest?
+A15. We have a collection of photos of both the player and recorder. Look at
+     http://bjorn.haxx.se/rockbox/internals/
 
-Q. What exactly are you trying to achieve with this line of development?
-   (A.K.A. whats your purpose for being here?)
-A. Firstly, we wouldn't start something like this if we didn't simply enjoy
-   it profusely. This is great fun!
-   Secondly, we feel the firmware is lacking some features and contain a
-   number of annoying bugs that we want to fix.
-   Some ideas would include (in no particular order):
+Q16. What exactly are you trying to achieve with this line of development?
+     (A.K.A. whats your purpose for being here?)
+A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
+     it profusely. This is great fun!
+     Secondly, we feel the firmware is lacking some features and contain a
+     number of annoying bugs that we want to fix.
+     Some ideas would include (in no particular order):
               - No pause between songs 
               - Mid-song resume 
               - Mid-playlist resume 
@@ -120,47 +119,69 @@ A. Firstly, we wouldn't start something like this if we didn't simply enjoy
               - Support for megabass switch (req hw mod) 
               - Player control via USB
               - Memory expansion?
-   Note: Just because something is on this list, does not mean that it is
-         technically feasible. (But hey we can dream)  And something not
-         being on the list does not mean it isn't a neat idea.  Bring it to 
-         the list.
+     Note: Just because something is on this list, does not mean that it is
+           technically feasible. (But hey we can dream)  And something not
+           being on the list does not mean it isn't a neat idea.  Bring it to 
+           the list.
 
-Q. I don't see you mentioning ogg files on your list of ideas.  What about
-   supporting those?
-A. At the current time this is not considered a possible option.  The 
-   Micronas chip MAS3507 decoder in the archos doesnt support ogg decoding
-   and there is too little program space in the player to implement it 
-   ourselves.  The alternative would be to write a software decoder as part
-   of the RockBox firmware.  However, as much as we love our players, the
-   computing power of the Archos (SH1 microcontroller) is not sufficent for
-   this need. 
+Q17. When do you think there is a version available for my Archos?
+A17. The developers have discussed this.  There has been a variety of
+     dates bantered about.  The truth is we don't really know, but a good
+     guestimate would be 1 to 3 months before we have full working source
+     for the Archos.  Following that, we figure it should only be a week or
+     two before we finish porting Quake II to the platform.  (Please see
+     question 24 regarding this issue).
 
-Q. I tried one of your firmware files and now I can't access my harddisk!
-   When I turn on my jukebox, it says:
+Q18. I don't see you mentioning ogg files on your list of ideas.  What about
+     supporting those?
+A18. At the current time this is not considered a possible option.  The 
+     Micronas chip MAS3507 decoder in the archos doesnt support ogg decoding
+     and there is too little program space in the player to implement it 
+     ourselves.  The alternative would be to write a software decoder as part
+     of the RockBox firmware.  However, as much as we love our players, the
+     computing power of the Archos (SH1 microcontroller) is not sufficent for
+     this need. 
+
+Q19. I tried one of your firmware files and now I can't access my harddisk!
+     When I turn on my jukebox, it says:
                      Part. Error
                      Pls Chck HD
-A. Your harddisk has been password protected. We're not 100% sure why it
-   happens, but you can unlock it yourself. Look at:
-   http://rockbox.sourceforge.net/rockbox/lock.html
+A19. Your harddisk has been password protected. We're not 100% sure why it
+     happens, but you can unlock it yourself. Look at:
+     http://rockbox.sourceforge.net/rockbox/lock.html
 
-Q: This FAQ doesn't answer the question I have.  What should I do?
-A: You have a couple options here.  You could forget the question, find an
-   easier question, or accept '42' as the answer no matter what.  We don't 
-   really recommend any of these (though I do opt for '42' often myself).
-   What we do recommend is stopping by IRC, reading 
-   http://bjorn.haxx.se/rockbox to see if the question was answered else where
-   and just not included here, or ultimatly dropping an email to the mailing
-   list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the project
-   homepage.
+Q20: This FAQ doesn't answer the question I have.  What should I do?
+A20: You have a couple options here.  You could forget the question, find an
+     easier question, or accept '42' as the answer no matter what.  We don't 
+     really recommend any of these (though I do opt for '42' often myself).
+     What we do recommend is stopping by IRC, reading 
+     http://bjorn.haxx.se/rockbox to see if the question was answered else 
+     where and just not included here, or ultimatly dropping an email to the 
+     mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the 
+     project homepage.
 
-Q: Are there other ways to contact the developers?
-A: Yes.
+Q21: Are there other ways to contact the developers?
+A21: Yes.
 
-Q: Are you going to tell us what they are?
-A: No.  Post to the mailing list and we will get back to you.
+Q22: Are you going to tell us what they are?
+A22: No.  Post to the mailing list and we will get back to you.
 
-Q: But I _really_ want to talk with you in person.
-A: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
-   doctors here won't let me have pens or pencils.  They say its some rule
-   about us not having sharp objects.  I'm sorry.  Now please stop calling me
-   here.
+Q23: But I _really_ want to talk with you in person.
+A23: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
+     doctors here won't let me have pens or pencils.  They say its some rule
+     about us not having sharp objects.  I'm sorry.  Now please stop calling me
+     here.
+
+Q24: Will you ever port Quake II to the Archos?
+A24: If you ask that again, I'm sending your address and phone number to the 
+     guy that mailed us with question #23.
+
+Q25: Umm, was that sarcasm?
+A25: That's it, I'm mailing him now.
+
+
+
+
+
+
+
