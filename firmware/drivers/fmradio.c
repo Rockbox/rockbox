@@ -46,7 +46,6 @@
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
 
-static int fmstatus = 0;
 
 int fmradio_read(int addr)
 {
@@ -114,16 +113,6 @@ void fmradio_set(int addr, int data)
     }
 
     CE_LO;
-}
-
-void fmradio_set_status(int status)
-{
-    fmstatus = status;
-}
-
-int fmradio_get_status(void)
-{
-    return fmstatus;
 }
 
 #endif

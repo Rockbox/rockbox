@@ -28,6 +28,32 @@
 bool charger_enabled;
 #endif
 
+
+#ifdef CONFIG_TUNER
+
+static int fmstatus = 0;
+
+void radio_set_status(int status)
+{
+    fmstatus = status;
+#ifdef HAVE_TUNER_PWR_CTRL
+    if (status)
+    {
+        and_b(~0x04, &PADR); /* drive PA2 low for tuner enable */
+        sleep(1); /* let the voltage settle */
+    }
+    else
+        or_b(0x04, &PADR); /* drive PA2 high for tuner disable */
+#endif
+}
+
+int radio_get_status(void)
+{
+    return fmstatus;
+}
+
+#endif /* #ifdef CONFIG_TUNER */
+
 #ifndef SIMULATOR
 
 void power_init(void)
@@ -35,6 +61,11 @@ void power_init(void)
 #ifdef HAVE_CHARGE_CTRL
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
+#endif
+#ifdef HAVE_TUNER_PWR_CTRL
+    and_b(~0x30, &PACR2); /* GPIO for PA2 */
+    or_b(0x04, &PADR); /* drive PA2 high for tuner disable */
+    or_b(0x04, &PAIOR); /* output for PA2 */
 #endif
 }
 

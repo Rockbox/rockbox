@@ -45,14 +45,4 @@ void fmradio_set(int addr, int data)
     fmradio_reg[addr] = data;
 }
 
-void fmradio_set_status(int status)
-{
-    fmstatus = status;
-}
-
-int fmradio_get_status(void)
-{
-    return fmstatus;
-}
-
 #endif

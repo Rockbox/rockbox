@@ -30,4 +30,10 @@ void ide_power_enable(bool on);
 bool ide_powered(void);
 void power_off(void);
 
+#ifdef CONFIG_TUNER
+#define FMRADIO_PLAYING 1
+extern void radio_set_status(int status);
+extern int radio_get_status(void);
+#endif
+
 #endif

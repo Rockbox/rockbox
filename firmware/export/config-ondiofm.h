@@ -43,6 +43,9 @@
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
 
+/* Define this if the tuner is switched on by software */
+#define HAVE_TUNER_PWR_CTRL
+
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
 

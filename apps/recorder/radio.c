@@ -49,6 +49,7 @@
 #include "talk.h"
 #include "tuner.h"
 #include "hwcompat.h"
+#include "power.h"
 
 #ifdef CONFIG_TUNER
 
@@ -168,7 +169,7 @@ bool radio_screen(void)
     lcd_clear_display();
     lcd_setmargins(0, 8);
     status_draw(true);
-    fmradio_set_status(FMRADIO_PLAYING);
+    radio_set_status(FMRADIO_PLAYING);
 
     font_get(FONT_UI);
     lcd_getstringsize("M", &fw, &fh);
@@ -405,7 +406,7 @@ bool radio_screen(void)
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     default_event_handler(SYS_USB_CONNECTED);
-                    fmradio_set_status(0);
+                    radio_set_status(0);
                     screen_freeze = true; /* Cosmetic: makes sure the
                                              radio screen doesn't redraw */
                     done = true;
@@ -529,7 +530,7 @@ bool radio_screen(void)
 
     sound_settings_apply();
 
-    fmradio_set_status(0);
+    radio_set_status(0);
 
     if(keep_playing)
     {

@@ -6,6 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
+ * Driver to control the (Samsung) tuner via port-banging SPI
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
@@ -21,9 +22,5 @@
 
 extern int fmradio_read(int addr);
 extern void fmradio_set(int addr, int data);
-extern void fmradio_set_status(int status);
-extern int fmradio_get_status(void);
-
-#define FMRADIO_PLAYING 1
 
 #endif
