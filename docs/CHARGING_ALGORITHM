@@ -10,9 +10,9 @@ some information here, write to mail@uwe-freese.de.
 
 This doc describes how the charging works for the recorder. The algorithm can be 
 found in firmware/powermgmt.[c|h]. Debug output is done in apps/debug_menu.c. 
-Charging for the player is done by the hardware and therefore isn't implemented 
-in rockbox. Only the functions that calculate the battery level are also used 
-for the player.
+Charging for the player and the FM recorder is done by the hardware and 
+therefore isn't implemented in rockbox. Only the functions that calculate the 
+battery level are also used for these models.
 
 All following information is related to the recorder.
 
@@ -158,7 +158,8 @@ remaining time = remaining battery energy / power consumption of AJB
 With using the battery courves described above and the battery capacity you 
 selected in the settings menu, the remaining capacity is calculated. For the 
 power consumption, a usual constant value is used. If the LED backlight is set 
-to always on, it is also considered.
+to always on, it is also considered. Having a modified Jukebox with 8 MB of RAM 
+leads to about 22 percent longer estimated running time.
 
 
 [BATTERY DISPLAY HOW THE USER EXPECTS IT]
