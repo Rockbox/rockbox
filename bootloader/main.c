@@ -150,17 +150,6 @@ int main(void)
         start_iriver_fw();
     }
 
-    GPIO_FUNCTION |= 0x40000040;
-    GPIO1_FUNCTION |= 0x00000062;
-
-    IDECONFIG1 = 0x00107000;
-    IDECONFIG2 = 0x00040000;
-
-    /* Hard drive power */
-    GPIO_OUT &= ~0x00000040;
-    GPIO_ENABLE |= 0x00040240;
-    GPIO_FUNCTION |= 0x00040200;
-
     rc = ata_init();
     if(rc)
     {
