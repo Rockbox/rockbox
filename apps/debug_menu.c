@@ -232,8 +232,13 @@ bool dbg_hw_info(void)
     lcd_puts(0, 6, buf);
     
     lcd_update();
-    
-    button = button_get(true);
+
+    while(1)
+    {
+        button = button_get(true);
+        if(button == (BUTTON_OFF | BUTTON_REL))
+            return false;
+    }
 
     return false;
 }
@@ -414,7 +419,7 @@ bool dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_OFF:
+            case BUTTON_OFF | BUTTON_REL:
                 return false;
         }
     }
@@ -496,7 +501,7 @@ bool dbg_ports(void)
 
         switch(button)
         {
-        case BUTTON_STOP:
+        case BUTTON_STOP | BUTTON_REL:
             return false;
 
         case BUTTON_LEFT:
@@ -560,8 +565,8 @@ bool dbg_rtc(void)
             for (c = 0; c <= 43; c++)
                 rtc_write(0x14 + c, 0);
             break;
-        case BUTTON_OFF:
-        case BUTTON_LEFT:
+        case BUTTON_OFF | BUTTON_REL:
+        case BUTTON_LEFT | BUTTON_REL:
             return false;
         }
     }
@@ -661,7 +666,8 @@ bool dbg_mas_codec(void)
         case BUTTON_UP:
             if (addr) { addr -= 4; }
             break;
-        case BUTTON_LEFT:
+        case BUTTON_LEFT | BUTTON_REL:
+        case BUTTON_OFF | BUTTON_REL:
             return false;
         }
     }
@@ -798,8 +804,8 @@ bool view_battery(void)
                     view++;
                 break;
                 
-            case BUTTON_LEFT:
-            case BUTTON_OFF:
+            case BUTTON_LEFT | BUTTON_REL:
+            case BUTTON_OFF | BUTTON_REL:
                 return false;
         }
     }
