@@ -141,10 +141,12 @@ static void mmc_tick(void);
 
 void mmc_select_clock(int card_no)
 {
-    if (card_no == 0)             /* internal */
-        or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
-    else                          /* external */
-        and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
+    /* set clock gate for external card / reset for internal card if the
+     * MMC clock polarity bit is 0, vice versa if it is 1 */
+    if ((card_no != 0) ^ (read_hw_mask() & MMC_CLOCK_POLARITY))
+        or_b(0x10, &PADRH);       /* set clock gate PA12 */
+    else
+        and_b(~0x10, &PADRH);     /* clear clock gate PA12 */
 }
 
 static int select_card(int card_no)

@@ -27,6 +27,7 @@
 #define USB_ACTIVE_HIGH 0x0100
 #define PR_ACTIVE_HIGH  0x0100
 #define LCD_CONTRAST_BIAS 0x0200
+#define MMC_CLOCK_POLARITY 0x0400
 #define TUNER_MODEL 0x0800
 
 int read_rom_version(void);

@@ -89,11 +89,15 @@ static void usb_enable(bool on)
 #ifdef HAVE_MMC
         mmc_select_clock(mmc_detect() ? 1 : 0);
 #endif
+        if (!(read_hw_mask() & MMC_CLOCK_POLARITY))
+            and_b(~0x20, &PBDRH); /* old circuit needs SCK1 = low while on USB */
         or_b(0x20, &PADRL); /* enable USB */
         and_b(~0x08, &PADRL); /* assert card detect */
     }
     else
     {
+        if (!(read_hw_mask() & MMC_CLOCK_POLARITY))
+            or_b(0x20, &PBDRH); /* reset SCK1 = high for old circuit */
         and_b(~0x20, &PADRL); /* disable USB */
         or_b(0x08, &PADRL); /* deassert card detect */
     }
