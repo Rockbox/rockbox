@@ -106,6 +106,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #endif /* HAVE_RECORDER_KEYPAD */
 
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
+#define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
 
 static int compare(const void* e1, const void* e2)
 {
@@ -125,51 +126,45 @@ static int showdir(char *path, int start)
         DIR *dir = opendir(path);
         if(!dir)
             return -1; /* not a directory */
+
         memset(dircacheptr,0,sizeof(dircacheptr));
         for ( i=0; i<MAX_FILES_IN_DIR; i++ ) {
             int len;
             struct dirent *entry = readdir(dir);
+            struct entry* dptr = &dircache[i];
             if (!entry)
                 break;
 
             /* skip directories . and .. */
-            if (!strncmp(entry->d_name, ".", 1) ||
-                !strncmp(entry->d_name, "..", 2)) {
+            if ((entry->attribute & ATTR_DIRECTORY) &&
+                (!strncmp(entry->d_name, ".", 1) ||
+                 !strncmp(entry->d_name, "..", 2))) {
                 i--;
                 continue;
             }
-            dircache[i].attr = entry->attribute;
-
+            dptr->attr = entry->attribute;
             len = strlen(entry->d_name);
-            if ( global_settings.mp3filter ) {
 
-                /* filter hidden files and directories */
-                if ( dircache[i].attr & ATTR_HIDDEN ) {
-                    i--;
-                    continue;
-                }
-
-                if ( !(dircache[i].attr & ATTR_DIRECTORY) ) {
-                    /* if not an mp3 or m3u, skip this file */
-                    if ( (len > 4) &&
-                         (strcasecmp(&entry->d_name[len-4], ".m3u") &&
-                          strcasecmp(&entry->d_name[len-4], ".mp3"))) {
-                        i--;
-                        continue;
-                    }
-                    else if ( len > 4 ) {
-                        /* mark m3u files as playlists */
-                        if ( !strcasecmp(&entry->d_name[len-4], ".m3u") )
-                            dircache[i].attr |= TREE_ATTR_M3U;
-                        /* cut off .mp3 and .m3u extensions */
-                        entry->d_name[len-4] = 0;
-                    }
-                }
+            /* mark mp3 and m3u files as such */
+            if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
+                if (!strcasecmp(&entry->d_name[len-4], ".mp3"))
+                    dptr->attr |= TREE_ATTR_MP3;
+                else
+                    if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
+                        dptr->attr |= TREE_ATTR_M3U;
             }
 
-            strncpy(dircache[i].name,entry->d_name,TREE_MAX_FILENAMELEN);
-            dircache[i].name[TREE_MAX_FILENAMELEN-1]=0;
-            dircacheptr[i] = &dircache[i];
+            /* filter hidden files and directories and non-mp3 or m3u files */
+            if ( global_settings.mp3filter &&
+                 ((dptr->attr & ATTR_HIDDEN) ||
+                  !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_MP3|TREE_ATTR_M3U))) ) {
+                i--;
+                continue;
+            }
+
+            strncpy(dptr->name,entry->d_name,TREE_MAX_FILENAMELEN);
+            dptr->name[TREE_MAX_FILENAMELEN-1]=0;
+            dircacheptr[i] = dptr;
         }
         filesindir = i;
         closedir(dir);
@@ -197,19 +192,29 @@ static int showdir(char *path, int start)
         len = strlen(dircacheptr[i]->name);
 
 #ifdef HAVE_LCD_BITMAP
-        if ( !(dircacheptr[i]->attr & ATTR_DIRECTORY) ) {
-            if ( (dircacheptr[i]->attr & TREE_ATTR_M3U) ||
-                 !strcasecmp(&dircacheptr[i]->name[len-4], ".m3u"))
+        if ( dircacheptr[i]->attr & ATTR_DIRECTORY )
+            icon_type = Folder;
+        else {
+            if ( dircacheptr[i]->attr & TREE_ATTR_M3U )
                 icon_type = Playlist;
             else
                 icon_type = File;
-        } else
-            icon_type=Folder;
+        }
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
                    6, MARGIN_Y+(i-start)*LINE_HEIGTH, 6, 8, true);
 #endif
 
-        lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
+        /* if MP3 filter is on, cut off the extension */
+        if (global_settings.mp3filter && 
+            (dircacheptr[i]->attr & (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+        {
+            char temp = dircacheptr[i]->name[len-4];
+            dircacheptr[i]->name[len-4] = 0;
+            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
+            dircacheptr[i]->name[len-4] = temp;
+        }
+        else
+            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
     }
 
     return filesindir;
@@ -240,8 +245,7 @@ char* peek_next_track(int steps)
                         dircursor++;
                     else
                         start++;
-                    if ( !(dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) &&
-                         dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+                    if ( dircacheptr[dircursor+start]->attr & TREE_ATTR_MP3 ) {
                         snprintf(buf,sizeof buf,"%s/%s",
                                  currdir, dircacheptr[dircursor+start]->name );
                         return buf;
@@ -254,8 +258,7 @@ char* peek_next_track(int steps)
                         dircursor--;
                     else
                         start--;
-                    if ( !(dircacheptr[dircursor+start]->attr & ATTR_DIRECTORY) &&
-                         dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+                    if ( dircacheptr[dircursor+start]->attr & TREE_ATTR_MP3 ) {
                         snprintf(buf, sizeof(buf), "%s/%s",
                                  currdir, dircacheptr[dircursor+start]->name);
                         return buf;
@@ -276,7 +279,6 @@ bool dirbrowse(char *root)
 {
     char buf[MAX_PATH];
     int i;
-    int button;
     int rc;
 
     memcpy(currdir,root,sizeof(currdir));
@@ -285,16 +287,32 @@ bool dirbrowse(char *root)
         return -1;  /* root is not a directory */
 
     put_cursorxy(0, CURSOR_Y + dircursor, true);
-    if ( numentries )
-        lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                        dircacheptr[start+dircursor]->name);
-    lcd_update();
 
     while(1) {
         bool restore = false;
-        button = button_get(true);
 
-        switch(button) {
+        if ( numentries ) {
+            i = start+dircursor;
+            
+            /* if MP3 filter is on, cut off the extension */
+            if (global_settings.mp3filter && 
+                (dircacheptr[i]->attr &
+                 (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+            {
+                int len = strlen(dircacheptr[i]->name);
+                char temp = dircacheptr[i]->name[len-4];
+                dircacheptr[i]->name[len-4] = 0;
+                lcd_puts_scroll(LINE_X, LINE_Y+dircursor, 
+                                dircacheptr[i]->name);
+                dircacheptr[i]->name[len-4] = temp;
+            }
+            else
+                lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                                dircacheptr[i]->name);
+        }
+        lcd_update();
+
+        switch ( button_get(true) ) {
             case TREE_EXIT:
                 if ( play_mode == 1 )
                     play_mode = 0;
@@ -349,11 +367,8 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
-                    int len=strlen(dircacheptr[dircursor+start]->name);
                     lcd_stop_scroll();
-                    if((len > 4) &&
-                       !strcasecmp(&dircacheptr[dircursor+start]->name[len-4],
-                               ".m3u")) 
+                    if(dircacheptr[dircursor+start]->attr & TREE_ATTR_M3U )
                     {
                         play_mode = 2;
                         play_list(currdir, dircacheptr[dircursor+start]->name);
@@ -491,10 +506,6 @@ bool dirbrowse(char *root)
         }
 
         lcd_stop_scroll();
-        if ( numentries )
-            lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                            dircacheptr[start+dircursor]->name);
-        lcd_update();
     }
 
     return false;
