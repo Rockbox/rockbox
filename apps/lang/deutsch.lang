@@ -316,7 +316,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -695,7 +695,7 @@ desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
 new: "PLAY = Reset"
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
@@ -988,13 +988,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1252,7 +1252,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1264,19 +1264,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1306,19 +1306,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1653,73 +1653,73 @@ voice: "Kfz-Adapter-Modus"
 new: "Kfz-Adapter-Modus"
 
 id: LANG_LINE_IN
-desc:  in settings_menu
+desc: in settings_menu
 eng: "Line In"
 voice: "Analogeingang"
 new: "Line In"
 
 id: LANG_NO_FILES
-desc:  in settings_menu
+desc: in settings_menu
 eng: "No files"
 voice: "Keine Dateien"
 new: "Keine Dateien"
 
 id: LANG_BUTTONBAR_MENU
-desc:  in button bar
+desc: in button bar
 eng: "Menu"
 voice: "Menü"
 new: "Menü"
 
 id: LANG_FM_BUTTONBAR_PRESETS
-desc:  in button bar
+desc: in button bar
 eng: "Preset"
 voice: ""
 new: "Sender"
 
 id: LANG_FM_SAVE_PRESET
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_DELETE_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Remove preset"
 voice: ""
 new: "Sender entfernen"
 
 id: LANG_FM_STATION
-desc:  in radio screen
+desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
 new: "Sender: %d,%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
-desc:  in radio screen
+desc: in radio screen
 eng: "Preset save failed"
 voice: ""
 new: "Sender speichern fehlgeschlagen"
 
 id: LANG_FM_NO_PRESETS
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_NO_FREE_PRESETS
-desc:  in radio screen
+desc: in radio screen
 eng: "The preset list is full"
 voice: ""
 new: "Die Senderliste ist voll"
 
 id: LANG_FM_RADIO
-desc:  in main menu
+desc: in main menu
 eng: "FM Radio"
 voice: "UKW-Radio"
 new: "UKW-Radio"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc:  in main menu
+desc: in main menu
 eng: "Record"
 voice: ""
 new: "Aufn."
@@ -1761,19 +1761,21 @@ voice: "Vorab-Aufnahme-Länge"
 new: "Vorab-Aufnahme-Länge"
 
 #Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: ""
 eng: "Load Last Bookmark?"
+voice: ""
 new: "Lade letztes Lesezeichen?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: ""
 eng: "Create a Bookmark?"
+voice: ""
 new: "Lesezeichen erstellen?"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1817,6 +1819,7 @@ voice: ""
 new: "ON+Play = Löschen"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1830,6 +1833,7 @@ voice: ""
 new: "Lesezeichen anlegen fehlgeschlagen!"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1837,6 +1841,7 @@ voice: ""
 new: "keine Lesezeichen"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
@@ -1880,6 +1885,7 @@ voice: "nur unterschiedliche"
 new: "nur unterschiedliche"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
@@ -1953,6 +1959,7 @@ voice: "Zeit und Datum"
 new: "Zeit & Datum"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
@@ -2055,307 +2062,307 @@ id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "0"
-new:
+new: 
 
 id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "1"
-new:
+new: 
 
 id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "2"
-new:
+new: 
 
 id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "3"
-new:
+new: 
 
 id: VOICE_FOUR
 desc: spoken only, for composing numbers
 eng: ""
 voice: "4"
-new:
+new: 
 
 id: VOICE_FIFE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "5"
-new:
+new: 
 
 id: VOICE_SIX
 desc: spoken only, for composing numbers
 eng: ""
 voice: "6"
-new:
+new: 
 
 id: VOICE_SEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "7"
-new:
+new: 
 
 id: VOICE_EIGHT
 desc: spoken only, for composing numbers
 eng: ""
 voice: "8"
-new:
+new: 
 
 id: VOICE_NINE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "9"
-new:
+new: 
 
 id: VOICE_TEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "10"
-new:
+new: 
 
 id: VOICE_ELEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "11"
-new:
+new: 
 
 id: VOICE_TWELVE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "12"
-new:
+new: 
 
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "13"
-new:
+new: 
 
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
-new:
+new: 
 
 id: VOICE_FIFTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "15"
-new:
+new: 
 
 id: VOICE_SIXTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "16"
-new:
+new: 
 
 id: VOICE_SEVENTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "17"
-new:
+new: 
 
 id: VOICE_EIGHTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "18"
-new:
+new: 
 
 id: VOICE_NINETEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "19"
-new:
+new: 
 
 id: VOICE_TWENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "20"
-new:
+new: 
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "30"
-new:
+new: 
 
 id: VOICE_FORTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "40"
-new:
+new: 
 
 id: VOICE_FIFTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "50"
-new:
+new: 
 
 id: VOICE_SIXTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "60"
-new:
+new: 
 
 id: VOICE_SEVENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "70"
-new:
+new: 
 
 id: VOICE_EIGHTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "80"
-new:
+new: 
 
 id: VOICE_NINETY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "90"
-new:
+new: 
 
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
 voice: "hundert"
-new:
+new: 
 
 id: VOICE_BILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Milliarde"
-new:
+new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Million"
-new:
+new: 
 
 id: VOICE_THOUSAND
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Tausend"
-new:
+new: 
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Minus"
-new:
+new: 
 
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Plus"
-new:
+new: 
 
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Millisekunden"
-new:
+new: 
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Sekunde"
-new:
+new: 
 
 id: VOICE_SECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Sekunden"
-new:
+new: 
 
 id: VOICE_MINUTE
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Minute"
-new:
+new: 
 
 id: VOICE_MINUTES
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Minuten"
-new:
+new: 
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Stunde"
-new:
+new: 
 
 id: VOICE_HOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Stunden"
-new:
+new: 
 
 id: VOICE_KHZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Kilohertz"
-new:
+new: 
 
 id: VOICE_DB
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Dezibel"
-new:
+new: 
 
 id: VOICE_PERCENT
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Prozent"
-new:
+new: 
 
 id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Milliamperestunden"
-new:
+new: 
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Pixel"
-new:
+new: 
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
 voice: "pro Sekunde"
-new:
+new: 
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "Hertz"
-new:
+new: 
 
 #carry on adding normal LANG_ strings below
 
@@ -2405,13 +2412,13 @@ id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
 voice: "Datei"
-new:
+new: 
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
 voice: "Verzeichnis"
-new:
+new: 
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
@@ -2423,211 +2430,211 @@ id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
 voice: "A"
-new:
+new: 
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
 voice: "B"
-new:
+new: 
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
 voice: "C"
-new:
+new: 
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
 voice: "D"
-new:
+new: 
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
 voice: "E"
-new:
+new: 
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
 voice: "F"
-new:
+new: 
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
 voice: "G"
-new:
+new: 
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
 voice: "H"
-new:
+new: 
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
 voice: "I"
-new:
+new: 
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
 voice: "J"
-new:
+new: 
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
 voice: "K"
-new:
+new: 
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
 voice: "L"
-new:
+new: 
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
 voice: "M"
-new:
+new: 
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
 voice: "N"
-new:
+new: 
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
 voice: "O"
-new:
+new: 
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
 voice: "P"
-new:
+new: 
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
 voice: "Q"
-new:
+new: 
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
 voice: "R"
-new:
+new: 
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
 voice: "S"
-new:
+new: 
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
 voice: "T"
-new:
+new: 
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
 voice: "U"
-new:
+new: 
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
 voice: "V"
-new:
+new: 
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
 voice: "W"
-new:
+new: 
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
 voice: "X"
-new:
+new: 
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
 voice: "Y"
-new:
+new: 
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
 voice: "Z"
-new:
+new: 
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
 voice: "Audio"
-new:
+new: 
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
 voice: "Konfiguration"
-new:
+new: 
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
 voice: "WPS"
-new:
+new: 
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
 voice: "Text"
-new:
+new: 
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
 voice: "Zusatzprogramm"
-new:
+new: 
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
 voice: "Zeichensatz"
-new:
+new: 
 
 id: VOICE_EXT_BMARK
-desc: spoken only, for file extension
+desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "Lesezeichen"
-new:
+new: 
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "Flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "Firmware"
-new:
+new: 
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
@@ -2639,9 +2646,10 @@ id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
 voice: "Uhrzeit:"
-new:
+new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2709,109 +2717,109 @@ voice: "nach Typ"
 new: "nach Typ"
 
 id: LANG_FM_EDIT_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Edit preset"
 voice: ""
 new: "Sender bearbeiten"
 
 id: LANG_FM_MONO_MODE
-desc:  in radio screen
+desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "Mono erzwingen"
 
 id: LANG_FM_BUTTONBAR_EXIT
-desc:  in radio screen
+desc: in radio screen
 eng: "Exit"
 voice: ""
 new: "Ende"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_BUTTONBAR_ADD
-desc:  in radio screen
+desc: in radio screen
 eng: "Add"
 voice: ""
 new: "Hinzu"
 
 id: LANG_FM_BUTTONBAR_ACTION
-desc:  in radio screen
+desc: in radio screen
 eng: "Action"
 voice: ""
 new: "Aktion"
 
 id: LANG_MDB_STRENGTH
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Strength"
 voice: "MDB Stärke"
 new: "MDB Stärke"
 
 id: LANG_MDB_HARMONICS
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Obertöne"
 new: "MDB Obertöne"
 
 id: LANG_MDB_CENTER
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Mittenfrequenz"
 new: "MDB Mittenfrequenz"
 
 id: LANG_MDB_SHAPE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Shape"
 voice: "MDB Form"
 new: "MDB Form"
 
 id: LANG_MDB_ENABLE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB aktivieren"
 new: "MDB aktivieren"
 
 id: LANG_SUPERBASS
-desc:  in sound settings
+desc: in sound settings
 eng: "Super bass"
 voice: "Superbass"
 new: "Superbass"
 
 id: LANG_SHUTDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shut down"
 voice: "Ausschalten"
 new: "Ausschalten"
 
 id: LANG_SHUTTINGDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shutting down..."
 voice: ""
 new: "Schalte aus..."
 
 id: LANG_CONFIRM_SHUTDOWN
-desc:  in shutdown screen
+desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new: "OFF zum Ausschalten"
 
 id: LANG_ID3_ORDER
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "Bevorzugtes ID3 Tag"
 new: "Bevorzugtes ID3 Tag"
 
 id: LANG_ID3_V1_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 vor Version 2"
 new: "V1 vor V2"
 
 id: LANG_ID3_V2_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 vor Version 1"
 new: "V2 vor V1"
@@ -2844,7 +2852,7 @@ id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
-new:
+new: 
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
@@ -2914,7 +2922,7 @@ new: "%d Treffer"
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
-eng: "Battery type"
+eng: "Battery Type"
 voice: "Batterietyp"
 new: "Batterietyp"
 
@@ -2972,3 +2980,8 @@ eng: "Free:"
 voice: "Freier Plattenplatz:"
 new: "Frei:"
 
+id: LANG_ID3DB_ALL_SONGS
+desc: ID3 virtual folder name
+eng: "<Alle Titel>"
+voice: ""
+new:
