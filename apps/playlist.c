@@ -167,15 +167,18 @@ char* playlist_next(int steps, int* index)
     }
 }
 
-void play_list(char *dir,
-               char *file, 
-               int start_index, 
-               int start_offset, 
-               int random_seed )
+/*
+ * This function is called to start playback of a given playlist.  This
+ * playlist may be stored in RAM (when using full-dir playback).
+ */
+void play_list(char *dir,         /* "current directory" */
+               char *file,        /* playlist */
+               int start_index,   /* index in the playlist */
+               int start_offset,  /* offset in the file */
+               int random_seed )  /* used for shuffling */
 {
     char *sep="";
     int dirlen;
-
     empty_playlist();
 
     playlist.index = start_index;
@@ -216,8 +219,31 @@ void play_list(char *dir,
             lcd_puts(0,LINE_Y,"Shuffling...");
             status_draw();
             lcd_update();
+            randomise_playlist( random_seed );
         }
-        randomise_playlist( random_seed );
+        else {
+            int i;
+
+            /* store the seek position before the shuffle */
+            int seek_pos = playlist.indices[start_index];
+
+            /* now shuffle around the indices */
+            randomise_playlist( random_seed );
+
+            /* Because the playlists in RAM is always dir-based playlists,
+               we want the selected file played first so we scan the list
+               for that file to be able to play that one first. */
+
+            for(i=0; i< playlist.amount; i++) {
+                if(seek_pos == playlist.indices[i]) {
+                    /* here's the start song! yiepee! */
+                    playlist.index = i;
+                    break; /* now stop searching */
+                }
+            }
+            /* if we for any reason wouldn't find the index again, it won't
+               set the index again and we should start at index 0 instead */
+        }
     }
 
     if(!playlist.in_ram) {
