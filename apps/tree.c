@@ -586,6 +586,67 @@ void set_current_file(char *path)
     }
 }
 
+#ifdef HAVE_RECORDER_KEYPAD
+bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
+{
+    bool exit = false;
+    bool used = false;
+    
+    int dirstart = *ds;
+    int dircursor = *dc;
+
+    while (!exit) {
+        switch (button_get(true)) {
+            case BUTTON_UP:
+            case BUTTON_ON | BUTTON_UP:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
+                used = true;
+                if ( dirstart ) {
+                    dirstart -= tree_max_on_screen;
+                    if ( dirstart < 0 )
+                        dirstart = 0;
+                }
+                else
+                    dircursor = 0;
+                break;
+                
+            case BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
+                used = true;
+                if ( dirstart < numentries - tree_max_on_screen ) {
+                    dirstart += tree_max_on_screen;
+                    if ( dirstart > 
+                         numentries - tree_max_on_screen )
+                        dirstart = numentries - tree_max_on_screen;
+                }
+                else
+                    dircursor = numentries - dirstart - 1;
+                break;
+                
+#ifdef SIMULATOR
+            case BUTTON_ON:
+#else
+            case BUTTON_ON | BUTTON_REL:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
+#endif
+                exit = true;
+                break;
+        }
+        if ( used ) {
+            showdir(currdir, dirstart);
+            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
+            lcd_update();
+        }
+    }
+    *ds = dirstart;
+    *dc = dircursor;
+
+    return used;
+}
+#endif
+
 bool dirbrowse(char *root)
 {
     int numentries=0;
@@ -894,15 +955,26 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_ON:
-                if (mpeg_status() & MPEG_STATUS_PLAY)
+#ifdef HAVE_RECORDER_KEYPAD
+                if (pageupdown(&dirstart, &dircursor, numentries, 
+                               tree_max_on_screen))
                 {
-                    lcd_stop_scroll();
-                    if (wps_show() == SYS_USB_CONNECTED)
-                        reload_root = true;
-#ifdef HAVE_LCD_BITMAP
-                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#endif
+                    /* start scroll */
                     restore = true;
+                }
+                else
+#endif
+                {
+                    if (mpeg_status() & MPEG_STATUS_PLAY)
+                    {
+                        lcd_stop_scroll();
+                        if (wps_show() == SYS_USB_CONNECTED)
+                            reload_root = true;
+#ifdef HAVE_LCD_BITMAP
+                        tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#endif
+                        restore = true;
+                    }
                 }
                 break;
 
