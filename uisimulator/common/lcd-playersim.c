@@ -27,96 +27,80 @@
 #include "file.h"
 #include "debug.h"
 #include "system.h"
-#include "font.h"
+
+#include "font-player.h"
 
 /*** definitions ***/
 
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 8
-#define ICON_HEIGHT 8
+#define ICON_HEIGHT 10
 
 unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
-/* All zeros and ones bitmaps for area filling */
-static unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-static unsigned char ones[8]  = { 0xff, 0xff, 0xff, 0xff,
-                                  0xff, 0xff, 0xff, 0xff};
-
 static int double_height=1;
+
+void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
+{
+  int xpos = x;
+  int ypos = icon_line*(ICON_HEIGHT+CHAR_HEIGHT*2);
+  int row=0, col;
+  
+  while (icon[row]) {
+    col=0;
+    while (icon[row][col]) {
+      lcd_framebuffer[xpos+col][(ypos+row)/8] &= ~(1<<((row+ypos)&7));
+      if (enable) {
+	if (icon[row][col]=='*') {
+	  lcd_framebuffer[xpos+col][(ypos+row)/8] |= 1<<((row+ypos)&7);
+	}
+      }
+      col++;
+    }
+    row++;
+  }
+  lcd_update();
+}
+
+void lcd_print_char(int x, int y, unsigned char ch)
+{
+  int xpos = x * CHAR_WIDTH;
+  int ypos = y * CHAR_HEIGHT;
+  int col, row;
+  int y2;
+  //  double_height=2;
+  if (double_height == 2 && y == 1)
+    return; /* Second row can't be printed in double height. ??*/
+
+  xpos*=2;
+
+  /*  printf("(%d,%d)='%d'\n", x, y, ch);*/
+  for (col=0; col<5; col++) {
+    for (row=0; row<7; row++) {
+      for (y2=0; y2<double_height*2; y2++) {
+	int y;
+	unsigned char bitval;
+
+	if (double_height*row >=7)
+	  y2+=double_height;
+	y=y2+double_height*2*row+2*ypos+ICON_HEIGHT;
+
+	bitval=3<<((y&6));
+	if (font_player[ch][col]&(1<<row)) {
+	  lcd_framebuffer[xpos+col*2][y/8] |= bitval;
+	  
+	} else {
+	  lcd_framebuffer[xpos+col*2][y/8] &= ~bitval;
+	}
+	lcd_framebuffer[xpos+col*2+1][y/8] = 
+	  lcd_framebuffer[xpos+col*2][y/8];
+      }
+    }
+  }
+}
 
 
 /*
- * Draw a bitmap at (x, y), size (nx, ny)
- * if 'clear' is true, clear destination area first
- */
-void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
-                 bool clear) __attribute__ ((section (".icode")));
-void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
-                 bool clear)
-{
-    unsigned char *dst;
-    unsigned char *dst2;
-    unsigned int data, mask, mask2, mask3, mask4;
-    int shift;
-
-    if (((unsigned)x >= LCD_WIDTH) || ((unsigned)y >= LCD_HEIGHT))
-        return;
-    if (((unsigned)(x + nx)) >= LCD_WIDTH)
-        nx = LCD_WIDTH - x;
-    if (((unsigned)(y + ny)) >= LCD_HEIGHT)
-        ny = LCD_HEIGHT - y;      
-
-    shift = y & 7;
-    dst2 = &lcd_framebuffer[x][y/8];
-    ny += shift;
-
-    /* Calculate bit masks */
-    mask4 = ~(0xfe << ((ny-1) & 7));
-    if (clear)
-    {
-        mask = ~(0xff << shift);
-        mask2 = 0;
-        mask3 = ~mask4;
-        if (ny <= 8)
-            mask3 |= mask;
-    }
-    else
-        mask = mask2 = mask3 = 0xff;
-
-    /* Loop for each column */
-    for (x = 0; x < nx; x++)
-    {
-        dst = dst2;
-        dst2 += LCD_HEIGHT/8;
-        data = 0;
-        y = 0;
-
-        if (ny > 8)
-        {
-            /* First partial row */
-            data = *src++ << shift;
-            *dst = (*dst & mask) | data;
-            data >>= 8;
-            dst++;
-
-            /* Intermediate rows */
-            for (y = 8; y < ny-8; y += 8)
-            {
-                data |= *src++ << shift;
-                *dst = (*dst & mask2) | data;
-                data >>= 8;
-                dst++;
-            }
-        }
-
-        /* Last partial row */
-        if (y + shift < ny)
-            data |= *src++ << shift;
-        *dst = (*dst & mask3) | (data & mask4);
-    }
-}
-
-/* 
  * Draw a rectangle with upper left corner at (x, y)
  * and size (nx, ny)
  */
@@ -145,26 +129,6 @@ void lcd_drawrect (int x, int y, int nx, int ny)
         DRAW_PIXEL((x + i),y);
         DRAW_PIXEL((x + i),(y + ny - 1));
     }
-}
-
-/*
- * Clear a rectangular area at (x, y), size (nx, ny)
- */
-void lcd_clearrect (int x, int y, int nx, int ny)
-{
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_bitmap (zeros, x+i, y, 1, ny, true);
-}
-
-/*
- * Fill a rectangular area at (x, y), size (nx, ny)
- */
-void lcd_fillrect (int x, int y, int nx, int ny)
-{
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_bitmap (ones, x+i, y, 1, ny, true);
 }
 
 /* Invert a rectangular area at (x, y), size (nx, ny) */
@@ -356,79 +320,13 @@ void lcd_clear_display(void)
     memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
 }
 
-/* put a string at a given pixel position, skipping first ofs pixel columns */
-static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
-{
-    int ch;
-    struct font* pf = font_get(2);
-
-    while ((ch = *str++) != '\0' && x < LCD_WIDTH)
-    {
-        int width;
-
-        /* check input range */
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
-        /* no partial-height drawing for now... */
-        if (y + pf->height > LCD_HEIGHT)
-            break;
-
-        /* get proportional width and glyph bits */
-        width = pf->width ? pf->width[ch] : pf->maxwidth;
-        width = MIN (width, LCD_WIDTH - x);
-
-        if (ofs != 0)
-        {
-            if (ofs > width)
-            {
-                ofs -= width;
-                continue;
-            }
-            width -= ofs;
-        }
-
-        if (width > 0)
-        {
-            int rows = (pf->height + 7) / 8;
-            bitmap_t* bits = pf->bits + 
-                (pf->offset ? pf->offset[ch] : (pf->height * ch));
-            lcd_bitmap (((unsigned char*) bits) + ofs*rows, x, y,
-                        width, pf->height, true);
-            x += width;
-        }
-        ofs = 0;
-    }
-}
-
-/* put a string at a given pixel position */
-void lcd_putsxy(int x, int y, unsigned char *str)
-{
-    lcd_putsxyofs(x, y, 0, str);
-}
-
 void lcd_puts(int x, int y, unsigned char *str)
 {
-    int xpos,ypos;
-    
-    /* We make the simulator truncate the string if it reaches the right edge,
-       as otherwise it'll wrap. The real target doesn't wrap. */
-
-    char buffer[12];
-    if(strlen(str)+x > 11 ) {
-        strncpy(buffer, str, sizeof buffer);
-        buffer[11-x]=0;
-        str = buffer;
-    }
-
-    xpos = CHAR_WIDTH * x;
-    ypos = ICON_HEIGHT + CHAR_HEIGHT * y;
-    lcd_clearrect(xpos, ypos, LCD_WIDTH - xpos, CHAR_HEIGHT * double_height);
-    lcd_putsxy(xpos, ypos, str);
-
-    /* this function is being used when simulating a charcell LCD and
-       then we update immediately */
+    int i;
+    for (i=0; *str && x<11; i++)
+        lcd_print_char(x++, y, *str++);
+    for (; x<11; x++)
+        lcd_print_char(x, y, ' ');
     lcd_update();
 }
 
@@ -439,15 +337,13 @@ void lcd_double_height(bool on)
         double_height = 2;
 }
 
-static char patterns[8][7];
-
 void lcd_define_pattern(int which, char *pattern, int length)
 {
     int i, j;
     int pat = which / 8;
     char icon[8];
     memset(icon, 0, sizeof icon);
-    
+
     DEBUGF("Defining pattern %d\n", pat);
     for (j = 0; j <= 5; j++) {
         for (i = 0; i < length; i++) {
@@ -455,42 +351,16 @@ void lcd_define_pattern(int which, char *pattern, int length)
                 icon[5-j] |= (1<<(i));
         }
     }
-    for (i = 0; i <= 5; i++)
+    for (i = 1; i <= 5; i++)
     {
-        patterns[pat][i] = icon[i];
+        font_player[pat][i-1] = icon[i];
     }
-}
-
-char* get_lcd_pattern(int which)
-{
-    DEBUGF("Get pattern %d\n", which);
-    return patterns[which];
 }
 
 extern void lcd_puts(int x, int y, unsigned char *str);
 
 void lcd_putc(int x, int y, unsigned char ch)
 {
-    char str[2];
-    int xpos = x * CHAR_WIDTH;
-    int ypos = ICON_HEIGHT + y * CHAR_HEIGHT;
-    if (ch <= 8)
-    {
-        char* bm = get_lcd_pattern(ch);
-        lcd_bitmap(bm, xpos, ypos, CHAR_WIDTH, CHAR_HEIGHT, true);
-        return;
-    }
-    if (ch == 137) {
-        /* Have no good font yet. Simulate the cursor character. */
-        ch = '>';
-    }
-    str[0] = ch;
-    str[1] = 0;
-
-    lcd_clearrect(xpos, ypos, CHAR_WIDTH, CHAR_HEIGHT * double_height);
-    lcd_putsxy(xpos, ypos, str);
-
-    /* this function is being used when simulating a charcell LCD and
-       then we update immediately */
+    lcd_print_char(x, y, ch);
     lcd_update();
 }
