@@ -48,7 +48,7 @@ $(OBJDIR)/libplugin.a:
 # in number of MB
 $(LINKFILE): $(LDS)
 	@echo "build $@"
-	@$(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(DEFINES) -x c -E -P $< >$@
+	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 clean:
 	@echo "cleaning plugins"
