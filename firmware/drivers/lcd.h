@@ -24,6 +24,11 @@
 #include "types.h"
 #include "config.h"
 
+/* common functions */
+extern void lcd_init(void);
+extern void lcd_clear_display(void);
+extern void lcd_backlight(bool on);
+
 #ifdef HAVE_LCD_CHARCELLS
 #    define LCD_ICON_BATTERY         0
 #      define LCD_BATTERY_FRAME   0x02
@@ -56,19 +61,15 @@
 #      define LCD_PARAM_SYMBOL    0xF0
 
 extern void lcd_puts(int x, int y, char *string);
-extern void lcd_puthex (unsigned int value,int digits);
-extern void lcd_pattern (int which,char *pattern,int count);
+extern void lcd_define_pattern (int which,char *pattern,int length);
 
 #elif HAVE_LCD_BITMAP
 
 #define LCD_WIDTH       112   /* Display width in pixels */
 #define LCD_HEIGHT      64    /* Display height in pixels */
 
-extern void lcd_init (void);
 extern void lcd_update (void);
-extern void lcd_clear_display (void);
-extern void lcd_position (int x, int y, int size);
-extern void lcd_string (char *str);
+extern void lcd_puts(int x, int y, char *str, int font);
 extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_clearrect (int x, int y, int nx, int ny);
