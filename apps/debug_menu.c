@@ -136,34 +136,108 @@ bool dbg_hw_info(void)
     char buf[32];
     int button;
     int usb_polarity;
+    int pr_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
 
     if(PADR & 0x400)
-        usb_polarity = 1;
+        usb_polarity = 0; /* Negative */
     else
-        usb_polarity = 0;
+        usb_polarity = 1; /* Positive */
 
+    if(PADR & 0x800)
+        pr_polarity = 0; /* Negative */
+    else
+        pr_polarity = 1; /* Positive */
+    
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
+    lcd_puts(0, 0, "[Hardware info]");
+
     snprintf(buf, 32, "ROM: %d.%02d", rom_version/100, rom_version%100);
     lcd_puts(0, 1, buf);
     
-    snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
+    snprintf(buf, 32, "Mask: 0x%04x", bitmask);
     lcd_puts(0, 2, buf);
     
-    snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
+    snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
     lcd_puts(0, 3, buf);
     
-    snprintf(buf, 32, "Mask: 0x%04x", bitmask);
+    snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
     lcd_puts(0, 4, buf);
+    
+    snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
+    lcd_puts(0, 5, buf);
     
     lcd_update();
     
     button = button_get(true);
 
+    return false;
+}
+#else
+bool dbg_hw_info(void)
+{
+    char buf[32];
+    int button;
+    int currval = 0;
+    int usb_polarity;
+    int bitmask = *(unsigned short*)0x20000fc;
+    int rom_version = *(unsigned short*)0x20000fe;
+
+    if(PADR & 0x400)
+        usb_polarity = 0; /* Negative */
+    else
+        usb_polarity = 1; /* Positive */
+
+    lcd_clear_display();
+
+    lcd_puts(0, 0, "[HW Info]");
+    while(1)
+    {
+        switch(currval)
+        {
+            case 0:
+                snprintf(buf, 32, "ROM: %d.%02d",
+                         rom_version/100, rom_version%100);
+                break;
+            case 1:
+                snprintf(buf, 32, "USB: %s",
+                         usb_polarity?"pos":"neg");
+                break;
+            case 2:
+                snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
+                break;
+            case 3:
+                snprintf(buf, 32, "Mask: %04x", bitmask);
+                break;
+        }
+            
+        lcd_puts(0, 0, buf);
+        lcd_update();
+        
+        button = button_get(true);
+
+        switch(button)
+        {
+            case BUTTON_STOP:
+                return false;
+
+            case BUTTON_LEFT:
+                currval--;
+                if(currval < 0)
+                    currval = 3;
+                break;
+                
+            case BUTTON_RIGHT:
+                currval++;
+                if(currval > 3)
+                    currval = 0;
+                break;
+        }
+    }
     return false;
 }
 #endif
@@ -815,8 +889,8 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "View battery", view_battery },
-        { "View HW info", dbg_hw_info },
 #endif
+        { "View HW info", dbg_hw_info },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
