@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef _PLUGIN_WIN32_H_
+#define _PLUGIN_WIN32_H_
+
 #define BOOL win32_BOOL /* Avoid conflicts with BOOL/INT defined as */
 #define INT win32_INT   /*  enum values in settings.h */
 
@@ -38,3 +41,8 @@ typedef enum plugin_status (*plugin_fn)(struct plugin_api* api, void* param);
 #define dlsym(_x_, _y_) (plugin_fn)GetProcAddress(_x_, _y_)
 #define dlclose(_x_) FreeLibrary(_x_)
 #define dlerror() "Unknown"
+
+int strcasecmp (const char *a, const char *b);
+int strncasecmp (const char *a, const char *b, size_t n);
+
+#endif

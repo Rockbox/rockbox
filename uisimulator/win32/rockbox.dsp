@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32" /I "../../apps/recorder" /I "../../firmware/export" /I "../../firmware/drivers" /I "../../firmware/common" /I "../common" /I "../../apps" /D "HAVE_LCD_BITMAP" /D "HAVE_RECORDER_KEYPAD" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "GETTIMEOFDAY_TWO_ARGS" /D "SIMULATOR" /D "HAVE_RTC" /D APPSVERSION=\"WIN32SIM\" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32" /I "../../apps/recorder" /I "../../firmware/export" /I "../../firmware/drivers" /I "../../firmware/common" /I "../common" /I "../../apps" /D "ARCHOS_RECORDER" /D "HAVE_LCD_BITMAP" /D "HAVE_RECORDER_KEYPAD" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "GETTIMEOFDAY_TWO_ARGS" /D "SIMULATOR" /D "HAVE_RTC" /D APPSVERSION=\"WIN32SIM\" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32" /I "../../apps/player" /I "../../firmware/export" /I "../../firmware/drivers" /I "../../firmware/common" /I "../common" /I "../../apps" /D "HAVE_LCD_CHARCELLS" /D "HAVE_PLAYER_KEYPAD" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "GETTIMEOFDAY_TWO_ARGS" /D "SIMULATOR" /D APPSVERSION=\"WIN32SIM\" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../win32" /I "../../apps/player" /I "../../firmware/export" /I "../../firmware/drivers" /I "../../firmware/common" /I "../common" /I "../../apps" /D "ARCHOS_PLAYER" /D "HAVE_LCD_CHARCELLS" /D "HAVE_PLAYER_KEYPAD" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "GETTIMEOFDAY_TWO_ARGS" /D "SIMULATOR" /D APPSVERSION=\"WIN32SIM\" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
