@@ -15,7 +15,7 @@
 
  ********************************************************************/
 
-#include "config.h"
+#include "config-tremor.h"
 
 #ifndef _V_RANDOM_H_
 #define _V_RANDOM_H_
