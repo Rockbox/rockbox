@@ -92,6 +92,10 @@ int vsnprintf (char *buf, int size, const char *fmt, va_list ap)
 		    while (val > 0);
 		    break;
 
+		case '%':
+                    *--str = '%';
+                    break;
+
 		default:
 		    *--str = ch;
 		    break;
