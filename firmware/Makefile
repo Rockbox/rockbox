@@ -25,16 +25,17 @@ endif
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
 else
-CFLAGS += -fomit-frame-pointer -fschedule-insns 
+CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
+SRC_S := $(wildcard drivers/*.S common/*.S *.S)
 
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o $(OBJDIR)/bitswap.o $(OBJDIR)/descramble.o
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(SRC_S:%.S=$(OBJDIR)/%.o)
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
-DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
+DIRS = $(subst $(DEPS),".",$(DEPDIRS))
 
 OUTPUT = $(OBJDIR)/librockbox.a
 
