@@ -38,6 +38,7 @@
 #define MPEG_SWAP_CHUNKSIZE  0x8000
 #define MPEG_HIGH_WATER  2
 #define MPEG_LOW_WATER  0x40000
+#define MPEG_LOW_WATER_CHUNKSIZE  0x10000
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -496,6 +497,7 @@ static void mpeg_thread(void)
     struct event ev;
     int len;
     int free_space_left;
+    int unplayed_space_left;
     int amount_to_read;
     int amount_to_swap;
 
@@ -676,6 +678,8 @@ static void mpeg_thread(void)
                 if(free_space_left <= 0)
                     free_space_left = mp3buflen + free_space_left;
 
+		unplayed_space_left = mp3buflen - free_space_left;
+
                 /* Make sure that we don't fill the entire buffer */
                 free_space_left -= 2;
 
@@ -694,7 +698,11 @@ static void mpeg_thread(void)
                 }
                 else
                 {
-                    amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+		    if(unplayed_space_left < MPEG_LOW_WATER)
+			amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
+					     free_space_left);
+		    else
+			amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
                 }
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
                 
