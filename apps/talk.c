@@ -214,21 +214,26 @@ static int shutup(void)
          && (search[1] & 0x30) == (curr_hd[1] & 0x30)) /* sample rate */
         {
             search--; /* back to the sync byte */
-            break; /* From looking at it, this is a header. */
-            /* This is not a sufficient condition to find header, may
-               give "false alert" (end too early), but a good start. */
+            break; /* From looking at it, this is our header. */
         }
     }
-    queue_write = queue_read + 1; /* reset the queue */
-    if (queue_write >= QUEUE_SIZE)
-        queue_write = 0;
-    queue[queue_read].len = 0;
-
-    /* play old data until the frame end, to keep the MAS in sync */
+    
     if (search-pos)
-    {
+    {   /* play old data until the frame end, to keep the MAS in sync */
         DTCR3 = search-pos;
+
+        queue_write = queue_read + 1; /* will be empty after next callback */
+        if (queue_write >= QUEUE_SIZE)
+            queue_write = 0;
+        queue[queue_read].len = 0; /* current one ends now */
+
         CHCR3 |= 0x0001; /* re-enable DMA */
+    }
+    else
+    {   /* by chance we have played to a frame boundary */
+        queue_write = queue_read; /* reset the queue */
+        is_playing = false;
+        mp3_play_stop();
     }
 
     return 0;
