@@ -400,7 +400,17 @@ static bool poweroff_idle_timer(void)
 static bool scroll_speed(void)
 {
     return set_int(str(LANG_SCROLL), "Hz", &global_settings.scroll_speed, 
-                   &lcd_scroll_speed, 1, 1, 10 );
+                   &lcd_scroll_speed, 1, 1, 50 );
+}
+
+
+static bool scroll_delay(void)
+{
+    int dummy = global_settings.scroll_delay * (HZ/10);
+    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", &dummy, 
+                     &lcd_scroll_delay, 100, 0, 5000 );
+    global_settings.scroll_delay = dummy / (HZ/10);
+    return rc;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -410,18 +420,7 @@ static bool scroll_step(void)
                    &global_settings.scroll_step,
                    &lcd_scroll_step, 1, 1, LCD_WIDTH );
 }
-#endif
 
-static bool scroll_delay(void)
-{
-    int dummy = global_settings.scroll_delay * (HZ/10);
-    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", &dummy, 
-                     &lcd_scroll_delay, 100, 0, 2500 );
-    global_settings.scroll_delay = dummy / (HZ/10);
-    return rc;
-}
-
-#ifdef HAVE_LCD_BITMAP
 static bool bidir_limit(void)
 {
     return set_int(str(LANG_BIDIR_SCROLL), "%", &global_settings.bidir_limit, 
