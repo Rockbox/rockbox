@@ -91,6 +91,7 @@ offset  abs
 0x1c    0x30    <peak meter hold timeout (bit 0-4)>
 0x1d    0x31    <peak meter clip hold timeout (bit 0-4)>
 0x1e    0x32    <peak meter release step size>
+0x1f    0x33    <repeat mode>
 
         <all unused space filled with 0xff>
 
@@ -313,6 +314,7 @@ int settings_save( void )
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold;
     config_block[0x1d] = (unsigned char)global_settings.peak_meter_clip_hold;
     config_block[0x1e] = (unsigned char)global_settings.peak_meter_release;
+    config_block[0x1f] = (unsigned char)global_settings.repeat_mode;
 
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
@@ -465,6 +467,9 @@ void settings_load(void)
 
         if (config_block[0x1e] != 0xFF)
             global_settings.peak_meter_release = config_block[0x1e];
+
+        if (config_block[0x1f] != 0xFF)
+            global_settings.repeat_mode = config_block[0x1f];
 
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
@@ -623,7 +628,7 @@ void settings_reset(void) {
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
     global_settings.scrollbar   = true;
-    global_settings.loop_playlist = true;
+    global_settings.repeat_mode = REPEAT_ALL;
     global_settings.playlist_shuffle = false;
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;

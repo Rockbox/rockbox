@@ -543,7 +543,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
     if (!id3)
     {
         lcd_stop_scroll();
-        lcd_clear_display();
         return false;
     }
 

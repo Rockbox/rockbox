@@ -77,7 +77,7 @@ struct user_settings
 
     /* misc options */
 
-    int loop_playlist; /* do we return to top of playlist at end?  */
+    int repeat_mode;   /* 0=off 1=repeat all 2=repeat one  */
     int dirfilter;     /* 0=display all, 1=only supported, 2=only music */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
@@ -150,6 +150,9 @@ extern char rockboxdir[];
 #define DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING   0
 #define DEFAULT_FF_REWIND_MIN_STEP  FF_REWIND_1000
 #define DEFAULT_FF_REWIND_ACCEL_SETTING 3
+
+/* repeat mode options */
+enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 
 /* dir filter options */
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, NUM_FILTER_MODES };

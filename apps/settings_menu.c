@@ -109,12 +109,28 @@ static bool peak_meter_menu(void)
 }
 #endif
 
-#ifndef HAVE_RECORDER_KEYPAD
 static bool shuffle(void)
 {
     return set_bool( str(LANG_SHUFFLE), &global_settings.playlist_shuffle );
 }
-#endif
+
+static bool repeat_mode(void)
+{
+    bool result;
+    char* names[] = { str(LANG_OFF), 
+                      str(LANG_REPEAT_ALL),
+                      str(LANG_REPEAT_ONE) };
+
+    int old_repeat = global_settings.repeat_mode;
+
+    result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
+        names, 3, NULL );
+
+    if (old_repeat != global_settings.repeat_mode)
+        mpeg_flush_and_reload_tracks();
+
+    return result;
+}
 
 static bool play_selected(void)
 {
@@ -299,9 +315,8 @@ static bool playback_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
-#ifndef HAVE_RECORDER_KEYPAD
         { str(LANG_SHUFFLE), shuffle },
-#endif
+        { str(LANG_REPEAT), repeat_mode },
         { str(LANG_PLAY_SELECTED), play_selected },
         { str(LANG_RESUME), resume },
         { str(LANG_FFRW_STEP), ff_rewind_min_step },

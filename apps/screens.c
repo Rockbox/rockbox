@@ -164,6 +164,7 @@ bool f2_screen(void)
     bool used = false;
     int w, h;
     char buf[32];
+    int oldrepeat = global_settings.repeat_mode;
 
     /* Get the font height */
     lcd_getstringsize("A",&w,&h);
@@ -176,6 +177,7 @@ bool f2_screen(void)
 
         lcd_clear_display();
 
+        /* Shuffle mode */
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
         lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
         lcd_putsxy(0, LCD_HEIGHT/2, 
@@ -184,6 +186,7 @@ bool f2_screen(void)
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
+        /* Directory Filter */
         switch ( global_settings.dirfilter ) {
             case SHOW_ALL:
                 ptr = str(LANG_FILTER_ALL);
@@ -205,6 +208,28 @@ bool f2_screen(void)
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+
+        /* Repeat Mode */
+        switch ( global_settings.repeat_mode ) {
+            case REPEAT_OFF:
+                ptr = str(LANG_OFF);
+                break;
+
+            case REPEAT_ALL:
+                ptr = str(LANG_REPEAT_ALL);
+                break;
+
+            case REPEAT_ONE:
+                ptr = str(LANG_REPEAT_ONE);
+                break;
+        }
+
+        lcd_getstringsize(str(LANG_REPEAT),&w,&h);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
 
         lcd_update();
 
@@ -229,6 +254,14 @@ bool f2_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_RIGHT:
+            case BUTTON_F2 | BUTTON_RIGHT:
+                global_settings.repeat_mode++;
+                if ( global_settings.repeat_mode >= NUM_REPEAT_MODES )
+                    global_settings.repeat_mode = 0;
+                used = true;
+                break;
+
             case BUTTON_F2 | BUTTON_REL:
                 if ( used )
                     exit = true;
@@ -247,6 +280,8 @@ bool f2_screen(void)
 
     settings_save();
     lcd_setfont(FONT_UI);
+    if ( oldrepeat != global_settings.repeat_mode )
+        mpeg_flush_and_reload_tracks();
 
     return false;
 }

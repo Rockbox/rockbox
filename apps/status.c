@@ -191,7 +191,7 @@ void status_draw(void)
 #endif
         statusbar_icon_volume(volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
-        if (global_settings.loop_playlist)
+        if (global_settings.repeat_mode != REPEAT_OFF)
             statusbar_icon_play_mode(Icon_Repeat);
         else
             statusbar_icon_play_mode(Icon_Normal);

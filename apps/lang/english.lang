@@ -869,3 +869,18 @@ id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight on when charging"
 new:
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new:
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new:
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new:

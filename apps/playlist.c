@@ -66,15 +66,37 @@ int playlist_add(char *filename)
     return 0;
 }
 
+static int get_next_index(int steps)
+{
+    int next_index = -1;
+
+    switch (global_settings.repeat_mode)
+    {
+        case REPEAT_OFF:
+            next_index = playlist.index+steps;
+            if ((next_index < 0) || (next_index >= playlist.amount))
+                next_index = -1;
+            break;
+
+        case REPEAT_ONE:
+            next_index = playlist.index;
+            break;
+
+        case REPEAT_ALL:
+        default:
+            next_index = (playlist.index+steps) % playlist.amount;
+            while (next_index < 0)
+                next_index += playlist.amount;
+            break;
+    }
+
+    return next_index;
+}
+
 int playlist_next(int steps)
 {
-    playlist.index = (playlist.index+steps) % playlist.amount;
-    while ( playlist.index < 0 ) {
-        if ( global_settings.loop_playlist )
-            playlist.index += playlist.amount;
-        else
-            playlist.index = 0;
-    }
+    playlist.index = get_next_index(steps);
+
     return playlist.index;
 }
 
@@ -93,14 +115,11 @@ char* playlist_peek(int steps)
         /* prevent madness when all files are empty/bad */
         return NULL;
 
-    index = (playlist.index+steps) % playlist.amount;
-    while ( index < 0 ) {
-        if ( global_settings.loop_playlist )
-            index += playlist.amount;
-        else
-            index = 0;
-    }
+    index = get_next_index(steps);
+    if (index >= 0)
     seek = playlist.indices[index];
+    else
+        return NULL;
 
     if(playlist.in_ram)
     {

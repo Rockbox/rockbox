@@ -733,8 +733,11 @@ static void update_playlist(void)
 {
     int index;
 
+    if (num_tracks_in_memory() > 0)
+    {
     index = playlist_next(id3tags[tag_read_idx]->id3.index);
     id3tags[tag_read_idx]->id3.index = index;
+    }
 }
 
 static void track_change(void)
@@ -878,14 +881,14 @@ static void mpeg_thread(void)
 
             case MPEG_NEXT:
                 DEBUGF("MPEG_NEXT\n");
+                /* is next track in ram? */
+                if ( num_tracks_in_memory() > 1 ) {
+                    int unplayed_space_left, unswapped_space_left;
+
                 /* stop the current stream */
                 play_pending = false;
                 playing = false;
                 stop_dma();
-
-                /* is next track in ram? */
-                if ( num_tracks_in_memory() > 1 ) {
-                    int unplayed_space_left, unswapped_space_left;
 
                     track_change();
                     mp3buf_read = id3tags[tag_read_idx]->mempos;
@@ -912,6 +915,14 @@ static void mpeg_thread(void)
                     }
                 }
                 else {
+                    if (!playlist_peek(1))
+                        break;
+
+                    /* stop the current stream */
+                    play_pending = false;
+                    playing = false;
+                    stop_dma();
+
                     reset_mp3_buffer();
                     remove_all_tags();
 
@@ -940,6 +951,8 @@ static void mpeg_thread(void)
             case MPEG_PREV: {
                 int numtracks = num_tracks_in_memory();
                 DEBUGF("MPEG_PREV\n");
+                if (!playlist_peek(-1))
+                    break;
                 /* stop the current stream */
                 play_pending = false;
                 playing = false;
@@ -1162,7 +1175,7 @@ static void mpeg_thread(void)
             case MPEG_SWAP_DATA:
                 free_space_left = get_unswapped_space();
 
-                if(free_space_left == 0)
+                if(free_space_left == 0 && !play_pending)
                     break;
                 
                 amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);

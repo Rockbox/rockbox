@@ -411,7 +411,9 @@ static bool ffwd_rew(int button)
 
 static void update(void)
 {
-    if (mpeg_has_changed_track())
+    bool track_changed = mpeg_has_changed_track();
+
+    if (track_changed)
     {
         lcd_stop_scroll();
         id3 = mpeg_current_track();
@@ -433,6 +435,11 @@ static void update(void)
                id3->offset,id3);
         global_settings.resume_index = id3->index;
         global_settings.resume_offset = id3->offset;
+        settings_save();
+    }
+    else if ( !id3 && track_changed ) {
+        global_settings.resume_index = -1;
+        global_settings.resume_offset = -1;
         settings_save();
     }
 }
