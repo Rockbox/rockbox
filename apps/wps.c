@@ -296,9 +296,8 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
-#else
-            case BUTTON_VOL_UP:
 #endif
+            case BUTTON_VOL_UP:
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
@@ -316,9 +315,8 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-#else
-            case BUTTON_VOL_DOWN:
 #endif
+            case BUTTON_VOL_DOWN:
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
