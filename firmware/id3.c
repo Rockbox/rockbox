@@ -38,21 +38,15 @@
 
 #include "id3.h"
 
-/* Some utility macros used in getsonglength() */
-#define BYTE0(x) ((x >> 24) & 0xFF)
-#define BYTE1(x) ((x >> 16) & 0xFF)
-#define BYTE2(x) ((x >> 8)  & 0xFF)
-#define BYTE3(x) ((x >> 0)  & 0xFF)
+#define UNSYNC(b0,b1,b2,b3) (((b0 & 0x7F) << (3*7)) | \
+                             ((b1 & 0x7F) << (2*7)) | \
+                             ((b2 & 0x7F) << (1*7)) | \
+                             ((b3 & 0x7F) << (0*7)))
 
-#define UNSYNC(b1,b2,b3,b4) (((b1 & 0x7F) << (3*7)) | \
-                             ((b2 & 0x7F) << (2*7)) | \
-                             ((b3 & 0x7F) << (1*7)) | \
-                             ((b4 & 0x7F) << (0*7)))
-
-#define BYTES_TO_INT(b1,b2,b3,b4) (((b1 & 0xFF) << (3*8)) | \
-                                   ((b2 & 0xFF) << (2*8)) | \
-                                   ((b3 & 0xFF) << (1*8)) | \
-                                   ((b4 & 0xFF) << (0*8)))
+#define BYTES2INT(b0,b1,b2,b3) (((b0 & 0xFF) << (3*8)) | \
+                                ((b1 & 0xFF) << (2*8)) | \
+                                ((b2 & 0xFF) << (1*8)) | \
+                                ((b3 & 0xFF) << (0*8)))
 
 /* Table of bitrates for MP3 files, all values in kilo.
  * Indexed by version, layer and value of bit 15-12 in header.
@@ -93,19 +87,63 @@ const int freqtab[][4] =
    string.  If it is, we attempt to convert it to a 8-bit ASCII string
    (for valid 8-bit ASCII characters).  If it's not unicode, we leave
    it alone.  At some point we should fully support unicode strings */
+static int unicode_munge(char** string, int *len) {
+   int tmp;
+   bool le = false;
+   int i;
+   char *str = *string;
+   char *outstr = *string;
 
-static void unicode_munge(char* string) {
-   unsigned short* short_string = (unsigned short*)string;
-   if (short_string[0] == UNICODE_BOM_1 ||
-       short_string[0] == UNICODE_BOM_2) {
-      int x = 0;
-      do {
-         x++;
-         if (!(short_string[x]&0xff00)) {
-             string[x-1]=(short_string[x]&0xff);
-         }
-      } while (short_string[x]!=0x0000);
+   if(str[0] > 0x03) {
+      /* Plain old string */
+      return 0;
    }
+   
+   /* Type 0x00 is ordinary ISO 8859-1 */
+   if(str[0] == 0x00) {
+      *len--;
+      *string++; /* Skip the encoding type byte */
+      return 0;
+   }
+
+   /* Unicode with or without BOM */
+   if(str[0] == 0x01 || str[0] == 0x02) {
+      str++;
+      tmp = BYTES2INT(0, 0, str[1], str[2]);
+
+      if(tmp == UNICODE_BOM_2) { /* Little endian? */
+         le = true;
+         str += 2;
+      }
+
+      if(tmp == UNICODE_BOM_1) /* Big endian? */
+         str += 2;
+
+      i = 0;
+
+      do {
+         if(le) {
+            if(str[1])
+               outstr[i++] = '.';
+            else
+               outstr[i++] = str[0];
+         } else {
+            if(str[0])
+               outstr[i++] = '.';
+            else
+               outstr[i++] = str[1];
+         }
+      } while(str[0] || str[1]);
+
+      *len = i;
+      *string++; /* Skip the encoding type byte */
+      return 0;
+   }
+
+   /* If we come here, the string was of an unsupported type */
+   *len = 1;
+   outstr[0] = 0;
+   return -1;
 }
 
 /*
@@ -248,8 +286,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             } else {
                 /* version .3 files don't use synchsafe ints for
                  * size */
-                headerlen = BYTES_TO_INT(header[4], header[5], 
-                                         header[6], header[7]);
+                headerlen = BYTES2INT(header[4], header[5], 
+                                      header[6], header[7]);
             }
         } else {
             memcpy(header, (buffer + readsize), 6);			
@@ -270,8 +308,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             headerlen--;
             artist = buffer + readsize;
             artistn = headerlen;
-            readsize += headerlen;
-            unicode_munge(artist);
+            unicode_munge(&artist, &artistn);
         }
         else if(!strncmp(header, "TIT2", strlen("TIT2")) || 
                 !strncmp(header, "TT2", strlen("TT2"))) {
@@ -279,27 +316,24 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             headerlen--;
             title = buffer + readsize;
             titlen = headerlen;
-            readsize += headerlen;
-            unicode_munge(title);
+            unicode_munge(&title, &titlen);
         }
         else if(!strncmp(header, "TALB", strlen("TALB"))) {
             readsize++;
             headerlen--;
             album = buffer + readsize;
             albumn = headerlen;
-            readsize += headerlen;
-            unicode_munge(album);
+            unicode_munge(&album, &albumn);
         }
         else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
             readsize++;
             headerlen--;
             tracknum = buffer + readsize;
             tracknumn = headerlen;
-            readsize += headerlen;
-            unicode_munge(tracknum);
-        } else {
-            readsize += headerlen;
+            unicode_munge(&tracknum, &tracknumn);
         }
+        
+        readsize += headerlen;
     }
     
     if(artist) {
@@ -482,12 +516,6 @@ static int getsonglength(int fd, struct mp3entry *entry)
     if((header & 0xF000) == 0xF000)
         goto restart;
 
-#ifdef DEBUG_VERBOSE
-    fprintf(stderr,
-            "We found %x-%x-%x-%x and checksync %i and test %x\n", 
-            BYTE0(header), BYTE1(header), BYTE2(header), BYTE3(header), 
-            CHECKSYNC(header), (header & 0xF000) == 0xF000);
-#endif
     /* MPEG Audio Version */
     switch((header & 0x180000) >> 19) {
         case 0:
