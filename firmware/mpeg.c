@@ -1892,7 +1892,7 @@ static void mpeg_thread(void)
                     /* Create the Xing header */
                     mpeg_file = open(recording_filename, O_RDWR);
                     if(mpeg_file < 0)
-                        panicf("rec upd: %d", mpeg_file);
+                        panicf("rec upd: %d (%s)", mpeg_file, recording_filename);
 
                     /* If the number of recorded frames have reached 0x7ffff,
                        we can no longer trust it */
