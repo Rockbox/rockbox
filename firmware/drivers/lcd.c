@@ -471,6 +471,18 @@ void lcd_setmargins(int x, int y)
  */
 void lcd_puts(int x, int y, char *str)
 {
+#ifdef SIMULATOR
+    /* We make the simulator truncate the string if it reaches the right edge,
+       as otherwise it'll wrap. The real target doesn't wrap. */
+
+    char buffer[12];
+    if((x < 11) && (strlen(str) > (11-x)) ) {
+        memcpy(str, buffer, 11-x);
+        buffer[11-x]=0;
+        str = buffer;
+    }
+#endif
+
     lcd_putsxy( xmargin + x*fonts[font],
                 ymargin + y*fontheight[font],
                 str, font );
