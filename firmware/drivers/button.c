@@ -483,19 +483,19 @@ void button_init(void)
 static int button_read(void)
 {
     int btn = BUTTON_NONE;
-    int data = adc_read(4);
+    int data = adc_read(ADC_BUTTON_ROW1);
 
-    if(adc_read(2) > 0x200) /* active high */
+    if(adc_read(ADC_BUTTON_OPTION) > 0x200) /* active high */
         btn |= BUTTON_MENU;
-    if(adc_read(3) < 0x200) /* active low */
+    if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
         btn |= BUTTON_ON;
 
     /* Check the 4 direction keys, hard-coded analog limits for now */
-    if (data >= 0x2E5)
+    if (data >= 0x2EF)
         btn |= BUTTON_LEFT;
-    else if (data >= 0x23F)
+    else if (data >= 0x246)
         btn |= BUTTON_RIGHT;
-    else if (data >= 0x197)
+    else if (data >= 0x19D)
         btn |= BUTTON_PLAY | BUTTON_UP;
     else if (data >= 0x0A1)
         btn |= BUTTON_STOP | BUTTON_DOWN;
