@@ -60,14 +60,14 @@ static char usb_stack[0x800];
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
+static bool usb_inverted;
 
 static void usb_enable(bool on)
 {
-#ifdef ARCHOS_RECORDER
-    if(!on) /* The pin is inverted on the Recorder */
-#else
+    if(usb_inverted)
+        on = !on;
+    
     if(on)
-#endif
         PADR &= ~0x400; /* enable USB */
     else
         PADR |= 0x400;
@@ -252,7 +252,14 @@ void usb_init(void)
     usb_state = USB_EXTRACTED;
     usb_monitor_enabled = false;
     countdown = -1;
-    
+
+    /* This is lame. Really lame. We determine the polarity of the USB
+       enable pin by checking how it is set by the Archos firmware. */
+    if(PADR & 0x400)
+        usb_inverted = false;
+    else
+        usb_inverted = true;
+        
     usb_enable(false);
 
     /* We assume that the USB cable is extracted */
