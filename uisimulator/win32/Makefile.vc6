@@ -50,22 +50,22 @@ LINK = link
 DEFINES = $(DEFINES) -DWIN32 -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"WIN32SIM\"
 LDFLAGS = /OUT:uisw32.exe /SUBSYSTEM:windows /NOLOGO /MACHINE:IX86 kernel32.lib user32.lib gdi32.lib
 INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON) -I$(APPSCOMMON) -I$(SIMDIR) -I$(APPDIR) -I$(MODEL_SPECIFIC_DIR)
-LIBS = /DEFAULTLIB:gdi32.lib /DEFAULTLIB:user32.lib
+LIBS = /DEFAULTLIB:gdi32.lib /DEFAULTLIB:user32.lib /NODEFAULTLIB:libc.lib
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb" /c
 
 SRCS =	*.c \
 	$(DRIVERS)/power.c \
 	$(APPDIR)*.c \
-	$(PLAYERDIR)*.c \
 	$(APPSCOMMON)/lcd-common.c $(APPSCOMMON)/mpegplay.c $(APPSCOMMON)/sim_icons.c $(APPSCOMMON)/stubs.c \
 	$(FIRMWAREDIR)/mpeg.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/usb.c $(FIRMWAREDIR)/mpeg.c $(FIRMWAREDIR)/font.c $(FIRMWAREDIR)/powermgmt.c \
-        $(COMMON)/sprintf.c $(COMMON)/strtok.c
+        $(COMMON)/sprintf.c $(COMMON)/strtok.c $(COMMON)/errno.c 
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
-SRCS = $(SRCS) $(RECDIR)*.c $(DRIVERS)/lcd-recorder.c
+SRCS = $(SRCS) $(RECDIR)/bmp.c $(RECDIR)/bounce.c  $(RECDIR)/cube.c  $(RECDIR)/icons.c  $(RECDIR)/keyboard.c $(RECDIR)/peakmeter.c \
+       $(RECDIR)/snow.c $(RECDIR)/sokoban.c $(RECDIR)/tetris.c $(RECDIR)/widgets.c $(RECDIR)/wormlet.c $(DRIVERS)/lcd-recorder.c
 !ELSE
-SRCS = $(SRCS) $(APPSCOMMON)/lcd-playersim.c $(DRIVERS)/lcd-player.c
+SRCS = $(SRCS) $(APPSCOMMON)/lcd-playersim.c $(DRIVERS)/lcd-player.c $(PLAYERDIR)*.c
 !ENDIF
 
 OBJS = lang.obj $(SRCS:.c=.obj) uisw32.res
@@ -98,4 +98,4 @@ lang.obj: build.lang
 	$(CC) $(CFLAGS) -c lang.c -o lang.obj
 
 clean:
- $(RM) *.obj lang.c lang.h ..\..\apps\credits.raw lang.build uisw32.res uisw32.exe
+ $(RM) *.obj ..\..\apps\lang.c ..\..\apps\lang.h ..\..\apps\credits.raw lang.build uisw32.res uisw32.exe
