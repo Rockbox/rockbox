@@ -346,8 +346,8 @@ static char* get_tag(struct mp3entry* id3,
     
         case 'd': /* Directory path information */
             {
-                *flags |= WPS_REFRESH_STATIC;
                 int level = tag[1] - '0';
+                *flags |= WPS_REFRESH_STATIC;
                 /* d1 through d9 */
                 if ((0 < level) && (9 > level))
                 {
