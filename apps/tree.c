@@ -1485,6 +1485,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 }
                 lasti=i;
                 lastdircursor=dircursor;
+                thumbnail_time = -1; /* cancel whatever we were about to say */
 
                 showfileline(dircursor, i, true, dirfilter); /* scroll please */
                 need_update = true;
@@ -1493,7 +1494,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 {
                     /* play directory thumbnail */
                     if (global_settings.talk_dir == 3) /* hover */
-                    {   // "schedule" a thumbnail, to have a little dalay */
+                    {   /* "schedule" a thumbnail, to have a little dalay */
                         thumbnail_time = current_tick + HOVER_DELAY;
                     }
                     else if (global_settings.talk_dir == 1) /* dirs as numbers */
