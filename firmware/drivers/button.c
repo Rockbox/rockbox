@@ -35,25 +35,26 @@
 
 struct event_queue button_queue;
 
-static int lastbtn;
+static int lastbtn;   /* Last valid button status */
+static int last_read; /* Last button status, for debouncing/filtering */
 #if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
 
 /* how often we check to see if a button is pressed */
-#define POLL_FREQUENCY    HZ/20
+#define POLL_FREQUENCY    HZ/100
 
 /* how long until repeat kicks in */
-#define REPEAT_START      6
+#define REPEAT_START      30
 
 /* the speed repeat starts at */
-#define REPEAT_INTERVAL_START   4
+#define REPEAT_INTERVAL_START   16
 
 /* speed repeat finishes at */
-#define REPEAT_INTERVAL_FINISH  2
+#define REPEAT_INTERVAL_FINISH  5
 
 /* Number of repeated keys before shutting off */
-#define POWEROFF_COUNT 8
+#define POWEROFF_COUNT 40
 
 static int button_read(void);
 
@@ -275,6 +276,7 @@ void button_set_flip(bool flip)
 static int button_read(void)
 {
     int btn = BUTTON_NONE;
+    int retval;
 
     /* Check port B pins for ON and OFF */
     int data;
@@ -333,9 +335,17 @@ static int button_read(void)
     }
 
     if (btn && flipped)
-        return button_flip(btn); /* swap upside down */
-  
-    return btn;
+        btn = button_flip(btn); /* swap upside down */
+
+    /* Filter the button status. It is only accepted if we get the same
+       status twice in a row. */
+    if(btn != last_read)
+        retval = lastbtn;
+    else
+        retval = btn;
+    last_read = btn;
+    
+    return retval;
 }
 
 #elif defined(HAVE_PLAYER_KEYPAD)
