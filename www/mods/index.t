@@ -26,6 +26,9 @@
 <li><a href="http://mywebpages.comcast.net/jstewart228368/archos-modification.html">James Stewart's Jukebox 6000 Bass and Volume improvement</a>
 <li><a href="http://www2.funmp3players.com/reviews/modify/">Upgrading the Hard Drive in the Archos Jukebox 6000</a>
 <li><a href="http://www.mctubster.com/hd.html">Another page describing hard drive update</a>
+<li>Uwe Freese modified his recorder to be able to
+<a href="http://www.uwe-freese.de/rockbox/rtc_alarm_en.html">
+power-on from the RTC alarm</a>.
 </ul>
 
 <p><img src="esd.jpg">
