@@ -35,3 +35,30 @@ void yield(void)
 {
     switch_thread();
 }
+
+/****************************************************************************
+ * Queue handling stuff
+ ****************************************************************************/
+void queue_init(struct event_queue *q)
+{
+    q->read = 0;
+    q->write = 0;
+}
+
+struct event *queue_wait(struct event_queue *q)
+{
+    while(q->read == q->write)
+    {
+        switch_thread();
+    }
+
+    return &q->events[(q->read++) & QUEUE_LENGTH_MASK];
+}
+
+void queue_post(struct event_queue *q, int id, void *data)
+{
+    int wr = (q->write++) & QUEUE_LENGTH_MASK;
+
+    q->events[wr].id = id;
+    q->events[wr].data = data;
+}

@@ -25,6 +25,22 @@
 
 #define HZ      100 /* number of ticks per second */
 
+#define QUEUE_LENGTH 16 /* MUST be a power of 2 */
+#define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
+
+struct event
+{
+    int id;
+    void *data;
+};
+
+struct event_queue
+{
+    struct event events[QUEUE_LENGTH];
+    unsigned int read;
+    unsigned int write;
+};
+
 /* global tick variable */
 extern long current_tick;
 
@@ -32,5 +48,8 @@ extern long current_tick;
 extern void yield(void);
 extern void sleep(int ticks);
 
+extern void queue_init(struct event_queue *q);
+extern struct event *queue_wait(struct event_queue *q);
+extern void queue_post(struct event_queue *q, int id, void *data);
 
 #endif
