@@ -186,6 +186,24 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     return true;
 }
 
+static int read_frame(int fd, unsigned char *buf, char **destptr, int framelen)
+{
+    int bytesread;
+    
+    bytesread = read(fd, buf, framelen);
+    if(bytesread < 0)
+        return bytesread * 10 - 1;
+
+    if(bytesread < framelen)
+        return -1;
+    
+    *destptr = buf;
+    if(unicode_munge(destptr, &bytesread) < 0)
+        return -2;
+    
+    (*destptr)[bytesread] = '\0';
+    return bytesread + 1;
+}
 
 /*
  * Sets the title of an MP3 entry based on its ID3v2 tag.
@@ -203,7 +221,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     char header[10];
     unsigned char version;
     char *buffer = entry->id3v2buf;
-    char *tracknum = NULL;
+    char *tmp = NULL;
     int bytesread = 0;
     int buffersize = sizeof(entry->id3v2buf);
     int flags;
@@ -339,56 +357,64 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if (!entry->artist &&
             (!strncmp(header, "TPE1", strlen("TPE1")) || 
              !strncmp(header, "TP1", strlen("TP1")))) {
-            bytesread = read(fd, buffer + bufferpos, framelen);
-            entry->artist = buffer + bufferpos;
-            unicode_munge(&entry->artist, &bytesread);
-            entry->artist[bytesread + 1] = '\0';
-            bufferpos += bytesread + 2;
-            size -= bytesread;
+            bytesread = read_frame(fd, buffer + bufferpos,
+                                   &entry->artist, framelen);
+            if(bytesread < 0)
+                return;
+            
+            bufferpos += bytesread;
+            size -= framelen;
         }
         else if (!entry->title &&
                  (!strncmp(header, "TIT2", strlen("TIT2")) || 
                   !strncmp(header, "TT2", strlen("TT2")))) {
-            bytesread = read(fd, buffer + bufferpos, framelen);
-            entry->title = buffer + bufferpos;
-            unicode_munge(&entry->title, &bytesread);
-            entry->title[bytesread + 1] = '\0';
-            bufferpos += bytesread + 2;
-            size -= bytesread;
+            bytesread = read_frame(fd, buffer + bufferpos,
+                                   &entry->title, framelen);
+            if(bytesread < 0)
+                return;
+            
+            bufferpos += bytesread;
+            size -= framelen;
         }
         else if( !entry->album &&
                  !strncmp(header, "TALB", strlen("TALB"))) {
-            bytesread = read(fd, buffer + bufferpos, framelen);
-            entry->album = buffer + bufferpos;
-            unicode_munge(&entry->album, &bytesread);
-            entry->album[bytesread + 1] = '\0';
-            bufferpos += bytesread + 2;
-            size -= bytesread;
+            bytesread = read_frame(fd, buffer + bufferpos,
+                                   &entry->album, framelen);
+            if(bytesread < 0)
+                return;
+            
+            bufferpos += bytesread;
+            size -= framelen;
         }
         else if (!entry->tracknum &&
                  !strncmp(header, "TRCK", strlen("TRCK"))) {
-            bytesread = read(fd, buffer + bufferpos, framelen);
-            tracknum = buffer + bufferpos;
-            unicode_munge(&tracknum, &bytesread);
-            tracknum[bytesread + 1] = '\0';
-            entry->tracknum = atoi(tracknum);
-            bufferpos += bytesread + 1;
-            size -= bytesread;
+            bytesread = read_frame(fd, buffer + bufferpos,
+                                   &tmp, framelen);
+            if(bytesread < 0)
+                return;
+            
+            entry->tracknum = atoi(tmp);
+
+            size -= framelen;
         }
         else if (!entry->year &&
                  (!strncmp(header, "TYER", 4) ||
                   !strncmp(header, "TYR", 3))) {
-            char* ptr = buffer + bufferpos;
-            bytesread = read(fd, ptr, framelen);
-            unicode_munge(&ptr, &bytesread);
-            entry->year = atoi(ptr);
-            bufferpos += bytesread + 1;
+            bytesread = read_frame(fd, buffer + bufferpos,
+                                   &tmp, framelen);
+            if(bytesread < 0)
+                return;
+            
+            entry->year = atoi(tmp);
             size -= bytesread;
         }
         else if (!entry->genre &&
                  !strncmp(header, "TCON", 4)) {
             char* ptr = buffer + bufferpos;
             bytesread = read(fd, ptr, framelen);
+            if(bytesread < 0 || bytesread < framelen)
+                return;
+            
             if (ptr[1] == '(' && ptr[2] != '(')
                 entry->genre = atoi(ptr+2);
             bufferpos += bytesread + 1;
