@@ -936,7 +936,6 @@ void mpeg_init(int volume, int bass, int treble)
 #endif
 
     setup_sci0();
-    i2c_init();
 
 #ifdef ARCHOS_RECORDER
     mas_reset();
