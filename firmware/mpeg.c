@@ -1747,7 +1747,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
-    mas_poll_start(2);
+    mas_poll_start(1);
 
 #ifdef HAVE_MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
