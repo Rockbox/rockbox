@@ -414,40 +414,40 @@ voice: ""
 new: "Tangentlåset är AV"
 
 id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Tyst på"
+new: ""
 
 id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Tyst av"
+new: ""
 
 id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Tyst är PÅ"
+new: ""
 
 id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Tyst är AV"
+new: ""
 
 id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "-ID3 Info- "
+new: ""
 
 id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "--Skärm--"
+new: ""
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -846,16 +846,16 @@ voice: "Battery Display"
 new: "Batterivisning"
 
 id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
-voice: "Free diskspace:"
-new: "Ledigt: %d.%dGB"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Disk: %d.%dGB"
+new: ""
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -1668,10 +1668,10 @@ voice: ""
 new: "Listan med förinställningar är full"
 
 id: LANG_FM_NO_PRESETS
-desc: in radio screen
-eng: "The preset list is empty"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Listan med förinställningar är tom"
+new: ""
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
@@ -1680,10 +1680,10 @@ voice: ""
 new: "Fel vid spara förinställningar"
 
 id: LANG_FM_SAVE_PRESET
-desc: in radio screen
-eng: "Save preset"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Spara förinställningar"
+new: ""
 
 id: LANG_FM_STATION
 desc: in radio screen
@@ -2106,9 +2106,9 @@ voice: "14"
 new: ""
 
 id: VOICE_GIGABYTE
-desc: spoken only, a unit postfix
+desc: DEPRECATED
 eng: ""
-voice: "gigabyte"
+voice: ""
 new: ""
 
 id: VOICE_HOUR
@@ -2136,9 +2136,9 @@ voice: "kilohertz"
 new: ""
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix, currently not used
+desc: DEPRECATED
 eng: ""
-voice: "megabyte"
+voice: ""
 new: ""
 
 id: VOICE_MILLION
@@ -2208,9 +2208,9 @@ voice: "plus"
 new: ""
 
 id: VOICE_POINT
-desc: spoken only, decimal separator for composing numbers
+desc: DEPRECATED
 eng: ""
-voice: "point"
+voice: ""
 new: ""
 
 id: VOICE_SECOND
@@ -2700,10 +2700,10 @@ voice: ""
 new: "Addera"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc: in radio screen
-eng: "Edit"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Redigera"
+new: ""
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
@@ -2846,14 +2846,92 @@ new: "Stereobredd"
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
 eng: "Albums"
+voice: ""
 new: "Album"
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
+voice: ""
 new: "Artister"
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
 eng: "Songs"
+voice: ""
 new: "Sånger"
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery Type"
+new: "Batterityp"
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+new: "Alkalisk"
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+new: "NiMH"
+
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
+new: "B"
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+new: "Ledigt:"
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "Disk:"
+new: "Disk:"
+
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+new: "GB"
+
+id: LANG_ID3DB_MATCHES
+desc: ID3 virtual folder name
+eng: "Found %d matches"
+new: "Fann %d träffar"
+
+id: LANG_ID3DB_SEARCH
+desc: ID3 virtual folder name
+eng: "Search"
+new: "Sök"
+
+id: LANG_ID3DB_SEARCH_ALBUMS
+desc: ID3 virtual folder name
+eng: "Search Albums"
+new: "Sök album"
+
+id: LANG_ID3DB_SEARCH_ARTISTS
+desc: ID3 virtual folder name
+eng: "Search Artists"
+new: "Sök artist"
+
+id: LANG_ID3DB_SEARCH_SONGS
+desc: ID3 virtual folder name
+eng: "Search Songs"
+new: "Sök sång"
+
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+new: "KB"
+
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+new: "MB"
+
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+new: ","
