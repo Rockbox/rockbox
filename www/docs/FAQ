@@ -50,6 +50,9 @@ A7. Run: "diff -u oldfile newfile > patchfile" against the file(s) you have
     we will take it under consideration.  (Please remember that all 
     submissions are not automatically accepted, this is nothing personal.)
 
+    Of if you would like to run the diff against the current cvs code:
+        cvs diff -ub [file(s)]
+
 Q8. I want to join the development team, but don't have a SourceForge account,
     what should I do?
 A8. Head on over to http://sourceforge.net/account/register.php and create an
