@@ -129,7 +129,6 @@ static int save_config_buffer( void )
 
 #ifdef HAVE_RTC
     unsigned int i;
-    int addr=0x14;
 #endif
 
     DEBUGF( "save_config_buffer()\n" );
@@ -148,12 +147,11 @@ static int save_config_buffer( void )
        that it would write a number of bytes at a time since the RTC chip
        supports that, but this will have to do for now 8-) */
     for (i=0; i < CONFIG_BLOCK_SIZE; i++ ) {
-        int r = rtc_write(14, rtc_config_block[i]);
+        int r = rtc_write(0x14+i, rtc_config_block[i]);
         if (r) {
-            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", 14, r );
+            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", 14+i, r );
             return r;
         }
-        addr++;
     }
 
 #else
@@ -176,7 +174,6 @@ static int load_config_buffer( void )
     unsigned short chksum;
 
 #ifdef HAVE_RTC
-    unsigned char addr = 0x14;
     unsigned int i;
 #endif
     
@@ -184,10 +181,8 @@ static int load_config_buffer( void )
 
 #ifdef HAVE_RTC    
     /* FIXME: the same comment applies here as for rtc_write */
-    for (i=0; i < CONFIG_BLOCK_SIZE; i++ ) {
-        rtc_config_block[i] = rtc_read(addr);
-        addr++;
-    }
+    for (i=0; i < CONFIG_BLOCK_SIZE; i++ )
+        rtc_config_block[i] = rtc_read(0x14+i);
 #else
     ata_read_sectors( 61, 1,  rtc_config_block);
 #endif
