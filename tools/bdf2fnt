@@ -14,19 +14,19 @@
 ./bdf2c $1.bdf > /tmp/$1.c
 
 # compile writerbf with linked C source font
-gcc -DFONT=font_$1 -I../firmware -o /tmp/writerbf writerbf.c /tmp/$1.c
+gcc -DARCHOS_RECORDER -DFONT=font_$1 -I../firmware -o /tmp/writerbf writerbf.c /tmp/$1.c
 
 # run writerbf, will write linked incore font to .rbf format
 /tmp/writerbf
 rm /tmp/writerbf
 
 # load .rbf font and display it for test
-gcc -DMAX_FONT_SIZE=500000 -o /tmp/loadrbf loadrbf.c
+gcc -DARCHOS_RECORDER -DMAX_FONT_SIZE=500000 -o /tmp/loadrbf loadrbf.c
 /tmp/loadrbf $1.fnt > /tmp/$1.1
 rm /tmp/loadrbf
 
 # link .c font and diff with .fnt load for test
-gcc -DFONT=font_$1 -I../firmware -o /tmp/loadrbf loadrbf.c /tmp/$1.c
+gcc -DARCHOS_RECORDER -DFONT=font_$1 -I../firmware -o /tmp/loadrbf loadrbf.c /tmp/$1.c
 /tmp/loadrbf > /tmp/$1.2
 rm /tmp/loadrbf
 

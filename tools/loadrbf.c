@@ -10,7 +10,6 @@
 #include <stdio.h>
 
 /* this should go in a library...*/
-#define ARCHOS_RECORDER
 #define DEBUGF printf
 #include "../firmware/loadfont.c"
 
