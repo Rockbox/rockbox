@@ -345,7 +345,10 @@ void display_mute_text(bool muted)
 int wps_show(void)
 {
     struct mp3entry* id3 = NULL;
+
+#ifdef HAVE_PLAYER_KEYPAD
     int retval;
+#endif
     bool dont_go_to_menu = false;
     bool menu_button_is_down = false;
     bool pending_keylock = true; /* Keylock will go ON next time */
