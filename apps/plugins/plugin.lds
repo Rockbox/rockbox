@@ -46,6 +46,7 @@ SECTIONS
 
     .rodata : {
         *(.rodata)
+        *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
     } > PLUGIN_RAM
