@@ -75,6 +75,7 @@ static bool contrast(void)
                     MAX_CONTRAST_SETTING );
 }
 
+#ifdef HAVE_BACKLIGHT
 static bool caption_backlight(void)
 {
     bool rc = set_bool( str(LANG_CAPTION_BACKLIGHT),
@@ -82,6 +83,7 @@ static bool caption_backlight(void)
 
     return rc;
 }
+#endif
 
 /**
  * Menu to set icon visibility
@@ -569,6 +571,8 @@ static bool useMRB(void)
                        &global_settings.usemrb, INT,
                        names, 3, NULL );
 }
+
+#ifdef HAVE_BACKLIGHT
 static bool backlight_on_when_charging(void)
 {
     bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
@@ -603,6 +607,7 @@ static bool backlight_timer(void)
     return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
                       INT, names, 19, backlight_set_timeout );
 }
+#endif /* HAVE_BACKLIGHT */
 
 static bool poweroff_idle_timer(void)
 {
@@ -1141,9 +1146,11 @@ static bool lcd_settings_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
+#ifdef HAVE_BACKLIGHT
         { ID2P(LANG_BACKLIGHT),       backlight_timer },
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
+#endif
         { ID2P(LANG_CONTRAST),        contrast },
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_INVERT),          invert },

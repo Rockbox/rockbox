@@ -987,7 +987,7 @@ bool wps_refresh(struct mp3entry* id3,
     peak_meter_enabled = enable_pm;
 #endif
 
-#ifndef SIMULATOR
+#if defined(HAVE_BACKLIGHT) && !defined(SIMULATOR)
     if (global_settings.caption_backlight && id3) {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */
