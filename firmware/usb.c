@@ -126,7 +126,8 @@ static void usb_slave_mode(bool on)
             panicf("disk: NULL");
     
         for ( i=0; i<4; i++ ) {
-            if (!fat_mount(pinfo[i].start))
+            rc = fat_mount(pinfo[i].start);
+            if (!rc)
                 break;
         }
         if (i==4)
