@@ -134,7 +134,7 @@ static bool dma_on;  /* The DMA is active */
 static bool playing; /* We are playing an MP3 stream */
 static bool filling; /* We are filling the buffer with data from disk */
 
-static int mpeg_file = -1;
+static int mpeg_file;
 
 static void mas_poll_start(int interval_in_ms)
 {
@@ -302,6 +302,7 @@ static void mpeg_thread(void)
 
     play_pending = false;
     playing = false;
+    mpeg_file = -1;
 
     while(1)
     {
@@ -317,6 +318,9 @@ static void mpeg_thread(void)
                 stop_dma();
 
                 reset_mp3_buffer();
+
+		if(mpeg_file >= 0)
+		    close(mpeg_file);
 
                 mpeg_file = open((char*)ev.data, O_RDONLY);
                 if(mpeg_file < 0)
