@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 # this is really a faq2html and should only be used for this purpose
 
