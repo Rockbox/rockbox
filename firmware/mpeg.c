@@ -24,13 +24,13 @@
 #include "mpeg.h"
 #include "ata.h"
 #include "string.h"
+#include "kernel.h"
+#include "thread.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
 #include "dac.h"
 #include "system.h"
-#include "kernel.h"
-#include "thread.h"
 #include "usb.h"
 #include "file.h"
 #include "hwcompat.h"
@@ -2785,10 +2785,30 @@ void mpeg_set_recording_gain(int left, int right, int mic)
 }
 #endif
 
+#ifdef SIMULATOR
+static char mpeg_stack[DEFAULT_STACK_SIZE];
+static char mpeg_thread_name[] = "mpeg";
+static void mpeg_thread(void)
+{
+    struct mp3entry* id3;
+    while ( 1 ) {
+        if (is_playing) {
+            id3 = mpeg_current_track();
+            id3->elapsed+=1000;
+            if (id3->elapsed>=id3->length)
+                mpeg_next();
+        }
+        sleep(1);
+    }
+}
+#endif
+
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
     volume = bass = treble = balance = loudness = bass_boost = avc;
+    create_thread(mpeg_thread, mpeg_stack,
+                  sizeof(mpeg_stack), mpeg_thread_name);
 #else
 #ifdef HAVE_MAS3507D
     unsigned long val;
