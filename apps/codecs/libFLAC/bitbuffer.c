@@ -2143,7 +2143,7 @@ FLAC__bool FLAC__bitbuffer_read_rice_signed(FLAC__BitBuffer *bb, int *val, unsig
 	return true;
 }
 
-FLAC__bool FLAC__bitbuffer_read_rice_signed_block(FLAC__BitBuffer *bb, int vals[], unsigned nvals, unsigned parameter, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data)
+FLAC__bool FLAC__bitbuffer_read_rice_signed_block(FLAC__BitBuffer *bb, FLAC__int32 vals[], unsigned nvals, unsigned parameter, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data)
 #ifdef FLAC__OLD_MSVC_FLAVOR
 {
 	const FLAC__blurb *buffer = bb->buffer;
