@@ -103,10 +103,8 @@ static struct scrollinfo scroll[SCROLLABLE_LINES];
 static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
+static int xoffset = 0; /* needed for flip */
 
-#ifndef SIMULATOR
-static
-#endif
 unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 
 /* All zeros and ones bitmaps for area filling */
@@ -163,6 +161,25 @@ void lcd_init (void)
                   sizeof(scroll_stack), scroll_name);
 }
 
+
+/* Performance function that works with an external buffer
+   note that y and height are in 8-pixel units! */
+void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride) __attribute__ ((section (".icode")));
+void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride)
+{
+    /* Copy display bitmap to hardware */
+    while (height--)
+    {
+        lcd_write (true, LCD_CNTL_PAGE | (y++ & 0xf));
+        lcd_write (true, LCD_CNTL_HIGHCOL | (((x+xoffset)>>4) & 0xf));
+        lcd_write (true, LCD_CNTL_LOWCOL | ((x+xoffset) & 0xf));
+
+        lcd_write_data(p_data, width);
+        p_data += stride;
+    } 
+}
+
+
 /*
  * Update the display.
  * This must be called after all other LCD functions that change the display.
@@ -176,8 +193,8 @@ void lcd_update (void)
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
         lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write (true, LCD_CNTL_HIGHCOL);
-        lcd_write (true, LCD_CNTL_LOWCOL);
+        lcd_write (true, LCD_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
+        lcd_write (true, LCD_CNTL_LOWCOL | (xoffset & 0xf));
 
         for (x = 0; x < LCD_WIDTH; x++)
             lcd_write (false, lcd_framebuffer[x][y]);
@@ -210,8 +227,8 @@ void lcd_update_rect (int x_start, int y,
     for (; y <= ymax; y++)
     {
         lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write (true, LCD_CNTL_HIGHCOL | ((x_start>>4) & 0xf));
-        lcd_write (true, LCD_CNTL_LOWCOL | (x_start & 0xf));
+        lcd_write (true, LCD_CNTL_HIGHCOL | (((x_start+xoffset)>>4) & 0xf));
+        lcd_write (true, LCD_CNTL_LOWCOL | ((x_start+xoffset) & 0xf));
 
         for (x = x_start; x < xmax; x++)
             lcd_write (false, lcd_framebuffer[x][y]);
@@ -230,6 +247,23 @@ void lcd_set_invert_display(bool yesno)
         lcd_write(true, LCD_SET_REVERSE_DISPLAY);
     else 
         lcd_write(true, LCD_SET_NORMAL_DISPLAY);
+}
+
+/* turn the display upside down (call lcd_update() afterwards) */
+void lcd_set_flip(bool yesno)
+{
+    if (yesno) 
+    {
+        lcd_write(true, LCD_SET_SEGMENT_REMAP);
+        lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
+        xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 112 we have */
+    }
+    else 
+    {
+        lcd_write(true, LCD_SET_SEGMENT_REMAP | 0x01);
+        lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
+        xoffset = 0;
+    }
 }
 
 /**

@@ -44,10 +44,13 @@ extern void lcd_scroll_speed( int speed );
 extern void lcd_scroll_delay( int ms );
 extern void lcd_set_contrast(int val);
 extern void lcd_write( bool command, int byte );
+extern void lcd_write_data( unsigned char* p_bytes, int count );
 extern int  lcd_default_contrast(void);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 extern void lcd_update(void);
+/* performance function */
+extern void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride);
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
@@ -134,6 +137,7 @@ extern void lcd_clearpixel(int x, int y);
 extern void lcd_invertpixel(int x, int y);
 extern void lcd_roll(int pixels);
 extern void lcd_set_invert_display(bool yesno);
+extern void lcd_set_flip(bool yesno);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 extern void lcd_setfont(int font);

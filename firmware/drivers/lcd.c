@@ -173,3 +173,116 @@ void lcd_write(bool command, int byte)
          : /* %0 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC),
            /* %1 */ "z"(LCDR));
 }
+
+
+/* A high performance function to write data to the display, 
+   one or multiple bytes.
+   Ultimately, all calls to lcd_write(false, xxx) should be substituted by 
+   this, it will be most efficient if the LCD buffer is tilted to have the
+   X row as consecutive bytes, so we can write a whole row */
+/* FixMe: somehow the red LED is affected by this, although I don't touch
+   any other bit. Therefore not used yet, except for lcd_blit() */
+void lcd_write_data(unsigned char* p_bytes, int count) __attribute__ ((section (".icode")));
+void lcd_write_data(unsigned char* p_bytes, int count)
+{
+    do
+    {
+        unsigned byte;
+        unsigned sda1;     /* precalculated SC=low,SD=1 */
+        unsigned clk0sda0; /* precalculated SC and SD low */
+
+        cli(); /* make port modifications atomic */
+
+        /* precalculate the values for later bit toggling, init data write */
+        asm (
+            "mov.b  @%2,%0\n" /* sda1 = PBDRL */
+            "or     %4,%0\n"  /* sda1 |= LCD_DS | LCD_SD     DS and SD high, */
+            "and    %3,%0\n"  /* sda1 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
+            "mov    %0,%1\n"  /* sda1 -> clk0sda0 */
+            "and    %5,%1\n"  /* clk0sda0 &= ~LCD_SD  both low */
+            "mov.b  %1,@%2\n" /* PBDRL = clk0sda0 */
+            : // outputs
+            /* %0 */ "=r"(sda1),
+            /* %1 */ "=r"(clk0sda0)
+            : // inputs
+            /* %2 */ "r"(LCDR),
+            /* %3 */ "r"(~(LCD_CS | LCD_SC)),
+            /* %4 */ "r"(LCD_DS | LCD_SD),
+            /* %5 */ "r"(~LCD_SD)
+        );
+        
+        byte = *p_bytes++ << 24; /* fetch to MSB position */
+
+        /* unrolled loop to serialize the byte */
+        asm (
+            "mov    %4,r0\n" /* we need &PBDRL in r0 for "or.b x,@(r0,gbr)" */
+            
+            "shll   %0\n" /* shift the MSB into carry */
+            "bf     1f\n"
+            "mov.b  %1,@%4\n" /* if it was a "1": set SD high, SC low still */
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n" /* rise SC (independent of SD level) */
+            "shll   %0\n" /* shift for next round, now for longer hold time */
+            "mov.b  %3,@%4\n" /* SC and SD low again */
+
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+            "shll   %0\n"
+            "mov.b  %3,@%4\n"
+            
+            "bf     1f\n"
+            "mov.b  %1,@%4\n"
+            "1:       \n"
+            "or.b   %2, @(r0,gbr)\n"
+
+            "or.b   %5, @(r0,gbr)\n" /* restore port */
+            :
+            : /* %0 */ "r"(byte),
+            /* %1 */ "r"(sda1),
+            /* %2 */ "I"(LCD_SC),
+            /* %3 */ "r"(clk0sda0),
+            /* %4 */ "r"(LCDR),
+            /* %5 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC)
+        );
+
+        sti();
+
+    } while (--count); /* tail loop is faster */
+}
