@@ -68,7 +68,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c\
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c widgets.c
+   APPS += tetris.c sokoban.c blank.c bounce.c boxes.c icons.c bmp.c widgets.c
 endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \

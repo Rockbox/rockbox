@@ -35,7 +35,7 @@
 
 void blank(void)
 {
-    int w, h, b;
+    int w, h;
     char *off = "[Off] to stop";
     int len = strlen(SS_TITLE);
 
