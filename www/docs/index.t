@@ -32,6 +32,7 @@ yahoo</a>.
 <li> <a href="/sh-win/">Setting up the gnush cross compiler</a> (Windows)
 <li> <a href="how_to_compile.html">How to compile Rockbox</a> (linux/cygwin style)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
+<li> <a href="flash.html">How to flash Rockbox on your Archos</a>
 </ul>
 
 <h3>Specs and Papers</h3>
