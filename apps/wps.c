@@ -32,7 +32,7 @@
 #include "mpeg.h"
 #include "usb.h"
 #include "power.h"
-#include "main_menu.h"
+#include "status.h"
 
 #define LINE_Y      1 /* initial line */
 
@@ -114,6 +114,7 @@ static void draw_screen(struct mp3entry* id3)
             break;
         }
     }
+    status_draw();
     lcd_update();
 }
 
@@ -140,7 +141,6 @@ int wps_show(void)
              ( (id3->album?id3->album[0]:0) != lastalbum ) ||
              ( (id3->title?id3->title[0]:0) != lasttitle ) )
         {
-            lcd_stop_scroll();
             draw_screen(id3);
             lastlength = id3->length;
             lastsize = id3->filesize;
@@ -179,10 +179,12 @@ int wps_show(void)
 #endif
         } 
 
+        status_draw();
+        
 #ifdef HAVE_LCD_BITMAP
         /* draw battery indicator line */
         lcd_clearline(0,LCD_HEIGHT-1,LCD_WIDTH-1, LCD_HEIGHT-1);
-        lcd_drawline(0,LCD_HEIGHT-1,battery_level() * (LCD_WIDTH-1) / 100, LCD_HEIGHT-1);
+        lcd_drawline(0,LCD_HEIGHT-1,battery_level() * LCD_WIDTH / 100, LCD_HEIGHT-1);
 #endif
 
         for ( i=0;i<5;i++ ) {
@@ -196,9 +198,15 @@ int wps_show(void)
                 case BUTTON_UP:
 #endif
                     if ( playing )
+                    {
                         mpeg_pause();
+                        status_set_playmode(STATUS_PAUSE);
+                    }
                     else
+                    {
                         mpeg_resume();
+                        status_set_playmode(STATUS_PLAY);
+                    }
 
                     playing = !playing;
                     break;
@@ -226,21 +234,14 @@ int wps_show(void)
                 case BUTTON_RIGHT:
                     mpeg_next();
                     break;
-#ifdef HAVE_RECORDER_KEYPAD                
-                case BUTTON_F1:
-#else
-                case BUTTON_MENU:
-#endif
-                    lcd_stop_scroll();
-                    main_menu();
-                    draw_screen(id3);
-                    break;
+
 #ifdef HAVE_RECORDER_KEYPAD                
                 case BUTTON_OFF:
 #else
                 case BUTTON_DOWN:
 #endif
                     mpeg_stop();
+                    status_set_playmode(STATUS_STOP);
                     break;
 #ifndef SIMULATOR
                 case SYS_USB_CONNECTED:
