@@ -37,7 +37,7 @@
 #define CHAR_HEIGHT 8
 #define ICON_HEIGHT 24
 #define CHAR_PIXEL 4
-#define BORDER_MARGIN 1
+#define BORDER_MARGIN 5
 
 unsigned char lcd_buffer[2][11];
 
