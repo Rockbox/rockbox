@@ -1,0 +1,783 @@
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+new: "Ton Einstellungen"
+
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+new: "Allgemeine Einstellungen"
+
+id: LANG_GAMES
+desc: in the main menu
+eng: "Games"
+new: "Spiele"
+
+id: LANG_DEMOS
+desc: in the main menu
+eng: "Demos"
+new: "Demos"
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+new: "Info"
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+new: "Version"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+new: "Debug (Haende weg!)"
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (sim)"
+new: "USB (sim)"
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox info:"
+new: "Rockbox info:"
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%02dMb"
+new: "Puf: %d.%02dMb"
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%02dMb"
+new: "Puffer: %d.%02dMb"
+
+id: LANG_BATTERY_LEVEL_PLAYER
+desc: the battery level in percentage
+eng: "Batt: %d%%%s"
+new: "Batt: %d%%%s"
+
+id: LANG_BATTERY_LEVEL_RECORDER
+desc: the battery level in percentage
+eng: "Battery: %d%%%s"
+new: "Batterie: %d%%%s"
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: charging"
+new: "Batterie: Ladevorgang"
+
+id: LANG_BOUNCE
+desc: in the demos menu
+eng: "Bounce"
+new: "Bounce"
+
+id: LANG_SNOW
+desc: in the demos menu
+eng: "Snow"
+new: "Schnee"
+
+id: LANG_TETRIS
+desc: in the games menu
+eng: "Tetris"
+new: "Tetris"
+
+id: LANG_SOKOBAN
+desc: in the games menu
+eng: "Sokoban"
+new: "Sokoban"
+
+id: LANG_WORMLET
+desc: in the games menu
+eng: "Wormlet"
+new: "Wormlet"
+
+id: LANG_SNAKE
+desc: in the games menu
+eng: "Snake"
+new: "Snake"
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
+new: "Lade..."
+
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
+new: "Zufallswiedergabe.."
+
+id: LANG_PLAYLIST_PLAY
+desc: displayed on screen when start playing a playlist
+eng: "Playing..."
+new: "Wiedergabe.."
+
+id: LANG_PLAYINDICES_PLAYLIST
+desc: in playlist.indices() when playlist is full
+eng: "Playlist"
+new: "Playliste"
+
+id: LANG_PLAYINDICES_BUFFER
+desc: in playlist.indices() when playlist is full
+eng: "buffer full"
+new: "Puffer voll"
+
+id: LANG_PLAYINDICES_AMOUNT
+desc: number of files in playlist
+eng: "%d files"
+new: "%d Dateien"
+
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save failed"
+new: "Fehler b. Speichern"
+
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. low?"
+new: "Batt. schwach?
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save failed"
+new: "Fehler b. Speichern"
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is battery low?"
+new: "Batterie schwach?"
+
+id: LANG_TIME_SET
+dec: used in set_time()
+eng: "ON to set"
+new: "ON z. speichern"
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF to revert"
+new: "OFF z. verwerfen"
+
+id: LANG_HIDDEN
+desc: in settings_menu
+eng: "Hidden Files"
+new: "Versteckte Dateien"
+
+id: LANG_HIDDEN_SHOW
+desc: in settings_menu 
+eng: "Show"
+new: "Anzeigen"
+
+id: LANG_HIDDEN_HIDE
+desc: in settings_menu
+eng: "Hide"
+new: "Verstecken"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+new: "Kontrast"
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+new: "Zufall"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play selected first"
+new: "Wahl zuerst wiederg."
+
+id: LANG_MP3FILTER
+desc: in settings_menu
+eng: "Music Filter"
+new: "Musik Filter"
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+new: "Case Sensitive sortieren"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+new: "Resume"
+
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+new: "Aus"
+
+id: LANG_RESUME_SETTING_ASK
+desc: in settings_menu
+eng: "ask"
+new: "fragen"
+
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+new: "An"
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+new: "Beleuchtung"
+
+id: LANG_BACKLIGHT_ON
+desc: in settings_menu, 
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+new: "Scroll Speed Einstell. Beispiel"
+
+id: LANG_DISCHARGE
+desc: in settings_menu
+eng: "Deep discharge"
+new: "Tiefes Entladen"
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+new: "Zeit/Datum einstellen"
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+new: "Disk bremsen"
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+new: "FF/RW Min Schritt"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+new: "FF/RW Beschl."
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+new: "Folge Playliste"
+
+id: LANG_RESET_ASK_PLAYER
+desc: confirm to reset settings
+eng: "Really?"
+new: "Sicher?"
+
+id: LANG_RESET_CONFIRM_PLAYER
+desc: confirm to reset settings
+eng: "Play/Stop"
+new: "Wiedergabe/Stop"
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are you sure?"
+new: "Sind Sie sicher?"
+
+id: LANG_RESET_CONFIRM_RECORDER
+desc: confirm to reset settings
+eng: "Play = Yes"
+new: "Play = Ja"
+
+id: LANG_RESET_CANCEL_RECORDER
+desc: confirm to reset settings
+eng: "Any Other = No"
+new: "Andere = Nein"
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+new: "Einstellungen"
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+new: "Geloescht"
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+new: "Abbruch"
+
+id: LANG_CASE_MENU
+desc: in fileview_settings_menu()
+eng: "Sort Mode"
+new: "Art. d. Sort."
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "Scroll Geschw."
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset settings"
+new: "Einstell. zuruecksetzen"
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+new: "Wiedergabe"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+new: "Datei Ansicht"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+new: "Anzeige"
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+new: "System"
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+new: "Lautstaerke"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+new: "Balance"
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+new: "Bass"
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+new: "Hoehen"
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+new: "Lautstaerke"
+
+id: LANG_BBOOST
+desc: in sound settings
+eng: "Bass Boost"
+new: "Bass Boost"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV decay time"
+new: "AL Zerfallszeit"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+new: "Kanaele"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel configuration"
+new: "Kanal Konfiguration"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+new: "Stereo"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+new: "Mono"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+new: "Mono Links"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+new: "Mono Rechts"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+new: "Autom. Lautstaerke"
+
+id: LANG_SHOWDIR_ERROR_BUFFER
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer"
+new: "Ordner Puffer"
+
+id: LANG_SHOWDIR_ERROR_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "is full!"
+new: "ist voll!"
+
+id: LANG_RESUME_ASK
+desc: question asked at the begining when resume is on
+eng: "Resume?"
+new: "Wiederaufnahme?"
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: posible answers to resume question
+eng: "(PLAY/STOP)"
+new: "(Wiedergabe/Stop)"
+
+id: LANG_RESUME_CONFIRM_RECORDER
+desc: posible answer to resume question
+eng: "Play = Yes"
+new: "Play = Ja"
+
+id: LANG_RESUME_CANCEL_RECORDER
+desc: posible answer to resume question
+eng: "Any Other = No"
+new: "Andere = Nein"
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Keylock ON"
+new: "Tastensperre AN"
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Keylock OFF"
+new: "Tastensperre AUS"
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key lock is ON"
+new: "Tastensperre ist AN"
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key lock is OFF"
+new: "Tastensperre ist AUS"
+
+id: LANG_MUTE_ON_PLAYER
+desc: displayed when mute is on
+eng: "Mute ON"
+new: "Stumm AN"
+
+id: LANG_MUTE_OFF_PLAYER
+desc: displayed when mute is off
+eng: "MUTE OFF"
+new: "Stumm AUS"
+
+id: LANG_MUTE_ON_RECORDER
+desc: displayed when mute is on
+eng: "Mute is ON"
+new: "Stumm ist AN"
+
+id: LANG_MUTE_OFF_RECORDER
+desc: displayed when mute is off
+eng: "Mute is OFF"
+new: "Stumm ist AUS"
+
+id: LANG_ID3_INFO
+desc: in the browse_id3() function
+eng: "-ID3 Info- "
+new: "-ID3 Info-"
+
+id: LANG_ID3_SCREEN
+desc: in the browse_id3() function
+eng: "--Screen-- "
+new: "--Schirm-- "
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+new: "[Titel]
+
+id: LANG_ID3_NO_TITLE
+desc: in wps when no title is avaible
+eng: "<no title>"
+new: "<kein Titel>"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+new: "[Kuenstler]"
+
+id: LANG_ID3_NO_ARTIST
+desc: in wps when no artist is avaible
+eng: "<no artist>"
+new: "<kein Kuenstler>"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+new: "[Album]"
+
+id: LANG_ID3_NO_ALBUM
+desc: in wps when no album is avaible
+eng: "<no album>"
+new: "<kein Album>"
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+new: "[Liednr]"
+
+id: LANG_ID3_NO_TRACKNUM
+desc: in wps if no track number is avaible
+eng: "<no tracknum>"
+new: "<keine Liednr>"
+
+id: LANG_ID3_LENGHT
+desc: in wps
+eng: "[Length]"
+new: "[Laenge]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+new: "[Playliste]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+new: "[Bitrate]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+new: "[Frequenz]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[PATH]"
+new: "[PFAD]"
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch up"
+new: "Takt rauf"
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch down"
+new: "Takt runter"
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+new: "Pause"
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "mode:"
+new: "Modus:"
+
+id: LANG_DIR_FILTER
+desc: in wps F2 pressed
+eng: "Dir filter: %s"
+new: "Ord. Filter: %s"
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+new: "Status"
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+new: "Scroll"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "bar"
+new: "Leiste"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End of list"
+new: "Ende der Liste"
+
+id: LANG_END_CONFIRM_PLAYER
+desc: when playlist has finished
+eng: "<Press ON>"
+new: "<Druecke ON>"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "<End of song list>"
+new: "<Ende der Liederliste>"
+
+id: LANG_END_CONFIRM_RECORDER
+desc: when playlist has finished
+eng: "Press ON"
+new: "Druecke ON"
+
+id: LANG_SNAKE_SCORE
+desc: when you die in snake game
+eng: "Your score :"
+new: "Dein Resultat :"
+
+id: LANG_SNAKE_HISCORE
+desc: high score in snake game
+eng: "High Score: %d"
+new: "High Score: %d"
+
+id: LANG_SNAKE_HISCORE_NEW
+desc: new high score in snake game
+eng: "New High Score!"
+new: "Neuer High Score!"
+
+id: LANG_SNAKE_PAUSE
+desc: displayed when game is paused
+eng: "Game Paused"
+new: "Spiel pausiert"
+
+id: LANG_SNAKE_RESUME
+desc: what to do to resume game
+eng: "[Play] to resume"
+new: "[Play] z. fortfahren"
+
+id: LANG_SNAKE_QUIT
+desc: how to quit game
+eng: "[Off] to quit"
+new: "[Off] z. stoppen"
+
+id: LANG_SNAKE_LEVEL
+desc: level of difficulty
+eng: "Level - %d"
+new: "Level - %d"
+
+id: LANG_SNAKE_RANGE
+desc: range of levels
+eng: "(1 - slow, 9 - fast)"
+new: "(1 - langsam, 9 - schnell)
+
+id: LANG_SNAKE_START
+desc: how to start or pause the game
+eng: "[Play] to start/pause"
+new: "[Play] fuer Start/Pause"
+
+id: LANG_SOKOBAN_LEVEL
+desc: must be smaller than 6 characters
+eng: "Level"
+new: "Level"
+
+id: LANG_SOKOBAN_MOVE
+desc: must be smaller than 6 characters
+eng: "Moves"
+new: "Bewg."
+
+id: LANG_SOKOBAN_WIN
+desc: displayed when you win 
+eng: "YOU WIN!!"
+new: "Gewonnen!!"
+
+id: LANG_SOKOBAN_QUIT
+desc: how to quit game
+eng: "[Off] to stop"
+new: "[Off] z. stoppen"
+
+id: LANG_SOKOBAN_F1
+desc: what does F1 do
+eng: "[F1] - level"
+new: "[F1] - Level"
+
+id: LANG_SOKOBAN_F2
+desc: what does F2 do
+eng: "[F2] same level"
+new: "[F2] gleiches Level"
+
+id: LANG_SOKOBAN_F3
+desc: what does F3 do
+eng: "[F3] + level"
+new: "[F3] + Level"
+
+# Next ids are for Worlmet Game.
+# Lenght restrictions for score board strings (LANG_SB_XXX):
+# LCD_PROPFONTS: max 43 pixel
+# fix font: max 7 characters
+
+id: LANG_WORMLET_LENGTH
+desc: wormlet game
+eng: "Len:%d"
+new: "Lan:%d"
+
+id: LANG_WORMLET_GROWING
+desc: wormlet game 
+eng: "Growing"
+new: "Wachsen"
+
+id: LANG_WORMLET_HUNGRY
+desc: wormlet game
+eng: "Hungry"
+new: "Hungrig"
+
+id: LANG_WORMLET_WORMED
+desc: wormlet game
+eng: "Wormed"
+new: "Gewurmt"
+
+id: LANG_WORMLET_ARGH
+desc: wormlet game
+eng: "Argh"
+new: "Argh"
+
+id: LANG_WORMLET_CRASHED
+desc: wormlet game
+eng: "Crashed"
+new: "Crash!"
+
+id: LANG_WORMLET_HIGHSCORE
+desc: wormlet game
+eng: "Hs: %d"
+new: "Hs: %d"
+
+# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
+# They must fit on the entire screen - preferably with the
+# key names aligned right
+
+id: LANG_WORMLET_PLAYERS
+desc: wormlet game
+eng: "%d Players    up/dn"
+new: "%d Spieler    up/dn"
+
+id: LANG_WORMLET_WORMS
+desc: wormlet game
+eng: "%d Worms        l/r"
+new: "%d Wuermer      l/r"
+
+id: LANG_WORMLET_REMOTE_CTRL
+desc: wormlet game
+eng: "Remote control F1"
+new: "Fernsteuerung  F1"
+
+id: LANG_WORMLET_NO_REM_CTRL
+desc: wormlet game
+eng: "No rem. control F1"
+new: "Keine Fernst.   F1"
+
+id: LANG_WORMLET_2_KEY_CTRL
+desc: wormlet game
+eng: "2 key control   F1"
+new: "2 Key Kontrolle F1"
+
+id: LANG_WORMLET_4_KEY_CTRL
+desc: wormlet game
+eng: "4 key control   F1"
+new: "4 Key Kontrolle F1"
+
+id: LANG_WORMLET_NO_CONTROL
+desc: wormlet game
+eng: "Out of control"
+new: "Ohne Kontrolle"
+
+# Wormlet game ids ended
+
+id: LANG_TETRIS_LOSE
+desc: tetris game
+eng: "You lose!"
+new: "Verloren!"
+
+id: LANG_TETRIS_LEVEL
+desc: tetris game
+eng: "0 Rows - Level 0"
+new: "0 Reih - Level 0"
