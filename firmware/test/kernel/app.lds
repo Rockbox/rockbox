@@ -27,9 +27,10 @@ SECTIONS
 
     .bss :
     {
-        *(.bss)
-       _end = .;
-       _stack = . + 0x1000;
        _edata = .;
+        *(.bss)
+        *(COMMON)
+       _end = .;
+       _stack = . + 0x80000;
     }
 }
