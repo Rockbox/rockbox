@@ -205,8 +205,8 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
 #ifdef DEBUG_VERBOSE
     DEBUGF( "Header: %08x, Ver %d, lay %d, bitr %d, freq %d, "
             "chmode %d, mode_ext %d, emph %d, bytes: %d time: %d\n",
-            header, info->version, info->layer, info->bitrate, info->frequency,
-            info->channel_mode, info->mode_extension,
+            header, info->version, info->layer+1, info->bitrate,
+            info->frequency, info->channel_mode, info->mode_extension,
             info->emphasis, info->frame_size, info->frame_time);
 #endif
     return true;
