@@ -265,7 +265,7 @@ if [ -z "$archos" ]; then
     archos="player"
     target="-DARCHOS_PLAYER"
     shcc
-    tool="scramble"
+    tool="$rootdir/tools/scramble"
     output="archos.mod"
     appextra="player"
     archosrom=""
@@ -276,7 +276,7 @@ if [ -z "$archos" ]; then
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
     shcc
-    tool="scramble -fm"
+    tool="$rootdir/tools/scramble -fm"
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
@@ -287,7 +287,7 @@ if [ -z "$archos" ]; then
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
     shcc
-    tool="scramble -v2"
+    tool="$rootdir/tools/scramble -v2"
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
@@ -298,7 +298,7 @@ if [ -z "$archos" ]; then
     archos="ondiosp"
     target="-DARCHOS_ONDIOSP"
     shcc
-    tool="scramble -osp"
+    tool="$rootdir/tools/scramble -osp"
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
@@ -309,7 +309,7 @@ if [ -z "$archos" ]; then
     archos="ondiofm"
     target="-DARCHOS_ONDIOFM"
     shcc
-    tool="scramble -ofm"
+    tool="$rootdir/tools/scramble -ofm"
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
@@ -321,7 +321,7 @@ if [ -z "$archos" ]; then
     target="-DIRIVER_H100"
     memory=32 # always
     coldfirecc
-    tool="not-written-yet"
+    tool="cp"
     output="rockbox.iriver"
     appextra=""
     archosrom=""
@@ -332,7 +332,7 @@ if [ -z "$archos" ]; then
     archos="recorder"
     target="-DARCHOS_RECORDER"
     shcc
-    tool="scramble"
+    tool="$rootdir/tools/scramble"
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
@@ -449,7 +449,7 @@ export OBJDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell date +%y%m%d-%H%M)
-export MKFIRMWARE=\$(TOOLSDIR)/@TOOL@
+export MKFIRMWARE=@TOOL@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
 export ENABLEDPLUGINS=@PLUGINS@
