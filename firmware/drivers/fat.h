@@ -52,14 +52,16 @@ struct fat_file
     int lastcluster;     /* cluster of last access */
     int lastsector;      /* sector of last access */
     int sectornum;       /* sector number in this cluster */
-    int dirsector;       /* sector where the dir entry is located */
-    int direntry;        /* dir entry index in sector */
+    unsigned int direntry;   /* short dir entry index from start of dir */
+    unsigned int direntries; /* number of dir entries used by this file */
+    unsigned int dircluster; /* first cluster of dir */
     bool eof;
 };
 
 struct fat_dir
 {
     unsigned int entry;
+    unsigned int entrycount;
     int sector;
     struct fat_file file;
 };
