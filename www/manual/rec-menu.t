@@ -6,22 +6,22 @@ The main menu offers:
 <img src="rec-menu.png" width=120 height=70 alt="Main menu">
 
 <p>
-Sound Settings -
+<a href="rec-sound.html">Sound Settings, set Volume, Bass or Treble.</a>
 
 <p>
-General Settings -
+<a href="rec-general.html">General Settings</a>
 
 <p>
-Games -
+Games - pick a game to play!
 
 <p>
-Screensavers -
+Screensavers - pick an enterainer!
 
 <p>
-Info -
+Info - mp3 buffer and battery info.
 
 <p>
-Version -
+Version - sofware version and credits display.
 
 <p>
 (Debug? -)
@@ -32,6 +32,7 @@ Buttons:
 <table>
 <tr><td>UP</td><td>Move upwards in the list</td></tr>
 <tr><td>DOWN</td><td>Move downwards in the list</td></tr>
+<tr><td>RIGHT</td><td>Select item in list</td></tr>
 <tr><td>F1</td><td>Toggle back to the screen you came from when you arrived here, <a href="rec-wps.html">WPS</a> or <a href="rec-dir.html">dir browser</a></td></tr>
 </table>
 
