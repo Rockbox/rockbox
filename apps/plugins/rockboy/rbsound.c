@@ -20,7 +20,8 @@ rcvar_t pcm_exports[] =
 
 void pcm_init(void)
 {
-	pcm.hz = 11025;
+	pcm.hz = 44100;
+	pcm.stereo = 1;
 	pcm.buf = buf;
 	pcm.len = sizeof buf;
 	pcm.pos = 0;
@@ -33,8 +34,15 @@ void pcm_close(void)
 
 int pcm_submit(void)
 {
+#ifdef RBSOUND
+	rb->pcm_play_data(pcm.buf,pcm.pos,NULL);
+	while(rb->pcm_is_playing()); /* spinlock */
+	pcm.pos = 0;
+	return 1;
+#else
 	pcm.pos = 0;
 	return 0;
+#endif
 }
 
 

@@ -75,7 +75,7 @@ int gnuboy_main(char *rom)
 	// FIXME - make interface modules responsible for atexit() 
 	PUTS("Init video");
 	vid_init();
-	PUTS("Init sound (nosound)");
+	PUTS("Init sound");
 	pcm_init();
 	PUTS("Loading rom");
 	loader_init(rom);
