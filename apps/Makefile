@@ -26,6 +26,11 @@ AFLAGS += -small -relax
 # Check if this is a kind of Recorder
 ANYREC = $(findstring RECORDER, $(TARGET))
 
+ifndef MEM
+    # if MEM is not set, assume 2MB
+    MEM=2
+endif
+
 ifdef DEBUG
     DEFINES := -DDEBUG
     CFLAGS += -g
@@ -52,6 +57,8 @@ endif
 
 OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
 
+LINKFILE = $(OBJDIR)/linkage.lds
+
 ifndef OBJDIR
 no_configure:
 	@echo "Don't run make here. Run the tools/configure script from your own build"
@@ -66,17 +73,22 @@ all : $(OBJDIR)/$(OUTNAME)
 $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
 
-$(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
+# MEM should be passed on to this makefile with the chosen memory size given
+# in number of MB
+$(LINKFILE): $(LDS)
+	cat $< | $(CC) -DMEMORYSIZE=$(MEM) -E -P - >$@
 
-$(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
-	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
+	$(CC) -Os -nostdlib -o $(OBJDIR)/rockbox.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
-$(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
-	../tools/sh2d -sh1 $(OBJDIR)/archos.bin > $(OBJDIR)/archos.asm
+$(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
+	$(OC) -O binary $(OBJDIR)/rockbox.elf $(OBJDIR)/rockbox.bin
 
-$(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
-	../tools/scramble $(SCRAMBLE_OPT) $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
+$(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
+	../tools/sh2d -sh1 $(OBJDIR)/rockbox.bin > $(OBJDIR)/rockbox.asm
+
+$(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
+	../tools/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl credits.pl < $< > $@
@@ -96,14 +108,11 @@ $(OBJDIR)/lang.o: $(OBJDIR)/build.lang ../tools/genlang
 	perl -s ../tools/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-dist:
-	tar czvf dist.tar.gz Makefile main.c start.s app.lds
-
 clean:
-	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
-	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map \
+	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.asm \
+	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/rockbox.map \
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch] \
-	$(OBJDIR)/credits.raw
+	$(OBJDIR)/credits.raw $(LINKFILE)
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
