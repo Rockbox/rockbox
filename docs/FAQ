@@ -244,8 +244,10 @@ Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
 A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
      To make use of Rolo, you must have a file with the same extension as 
      your Rockbox firmware (.ajz on Recorder, .mod on Player) but a different
-     name.   You can then browse to it, and you 'run' the other firmware
-     you wish to switch to by pressing play.  
+     name.  You can then browse to it, and you 'run' the other firmware
+     you wish to switch to by pressing play. Remember to set the Show Files
+     option to "Supported" or "All" to be able to see the firmware files in
+     the browser.
 
      *Poof* You will reboot to that firmware.  (Note that in order to return
      to Rockbox you may need to reboot manually if the new firmware you loaded
