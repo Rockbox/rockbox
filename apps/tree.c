@@ -55,6 +55,9 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
+#define BOOTFILE "ajbrec.ajz"
+#else
+#define BOOTFILE "archos.mod"
 #endif
 
 /* Boot value of global_settings.max_files_in_dir */
@@ -80,6 +83,9 @@ static char lastdir[MAX_PATH];
 static char lastfile[MAX_PATH];
 static char currdir[MAX_PATH];
 static bool reload_dir = false;
+static int boot_size = 0;
+static int boot_cluster;
+static bool boot_changed = false;
 
 void browse_root(void)
 {
@@ -322,6 +328,17 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_ROCK;
             }
 
+            /* memorize/compare details about the boot file */
+            if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
+                if (boot_size) {
+                    if ((entry->size != boot_size) ||
+                        (entry->startcluster != boot_cluster))
+                        boot_changed = true;
+                }
+                boot_size = entry->size;
+                boot_cluster = entry->startcluster;
+            }
+            
             /* filter out all non-playlist files */
             if ( global_settings.dirfilter == SHOW_PLAYLIST &&
                  (!(dptr->attr &
@@ -822,6 +839,24 @@ bool dirbrowse(char *root)
         bool restore = false;
 
         button = button_get_w_tmo(HZ/5);
+
+#ifndef SIMULATOR
+        if (boot_changed) {
+            lcd_clear_display();
+            lcd_puts(0,0,str(LANG_BOOT_CHANGED));
+            lcd_puts(0,1,str(LANG_REBOOT_NOW));
+#ifdef HAVE_LCD_BITMAP
+            lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+            lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
+            lcd_update();
+#endif
+            if (button_get(true) == BUTTON_PLAY)
+                rolo_load("/" BOOTFILE);
+            restore = true;
+            boot_changed = false;
+        }
+#endif
+
         switch ( button ) {
             case TREE_EXIT:
             case BUTTON_RC_STOP:

@@ -1599,3 +1599,16 @@ desc: The plugin return an error code
 eng: "Plugin returned error"
 new:
 
+##
+## boot change detection
+##
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new:
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new:
