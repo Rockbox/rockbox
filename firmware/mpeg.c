@@ -794,23 +794,33 @@ static void mpeg_thread(void)
 
                 /* is next track in ram? */
                 if ( num_tracks_in_memory() > 1 ) {
-                    int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
-                    mp3buf_read = id3tags[track_offset]->mempos;
+                    int unplayed_space_left, unswapped_space_left;
+
+                    track_change();
+                    mp3buf_read = id3tags[tag_read_idx]->mempos;
                     init_dma();
                     last_dma_tick = current_tick;
 
+                    unplayed_space_left  = get_unplayed_space();
+                    unswapped_space_left = mp3buf_write - mp3buf_swapwrite;
+                    if (unswapped_space_left < 0)
+                        unswapped_space_left += mp3buflen;
+
                     /* should we start reading more data? */
-                    if(!filling && (get_unplayed_space() < MPEG_LOW_WATER)) {
+                    if(!filling && (unplayed_space_left < MPEG_LOW_WATER)) {
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        play_pending = true;
+                    } else if(unswapped_space_left &&
+                              unswapped_space_left > unplayed_space_left) {
+                        /* Stop swapping the data from the previous file */
+                        mp3buf_swapwrite = mp3buf_read;
                         play_pending = true;
                     } else {
                         playing = true;
                         if (!paused)
                             start_dma();
                     }
-                    
-                    track_change();
                 }
                 else {
                     reset_mp3_buffer();
@@ -903,6 +913,11 @@ static void mpeg_thread(void)
                 else
                     /* Not enough information to FF/Rewind */
                     break;
+
+                /* Don't seek right to the end of the file so that we can
+                   transition properly to the next song */
+                if (newpos >= (int)(id3->filesize - id3->id3v1len))
+                    newpos = id3->filesize - id3->id3v1len - 1;
 
                 newpos = newpos & ~1;
                 curpos = lseek(mpeg_file, 0, SEEK_CUR);
