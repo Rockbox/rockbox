@@ -206,17 +206,6 @@ if [ -z "$target" ]; then
   esac
 fi
 
-<<<<<<< configure
-if [  "-DARCHOS_RECORDER" = "$target" ] ; then
-  
-  echo "Loadable fonts support? (y|n) [n]"
-  getit=`input`;
-  if [ "y" = "$getit" ] ; then
-     loadable_fonts="-DLOADABLE_FONTS"
-  fi
-fi
-
-=======
 if [ "-" = "$extra_defines" ]; then
  extra_defines=""
 
@@ -255,11 +244,7 @@ if [ "-" = "$extra_defines" ]; then
  fi
 fi
 
-<<<<<<< configure
->>>>>>> 1.25
-=======
 
->>>>>>> 1.35
 if [ -z "$debug" ]; then
   ##################################################################
   # Figure out debug on/off
@@ -335,15 +320,7 @@ sed > Makefile \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@TARGET@,${target},g" \
-<<<<<<< configure
-<<<<<<< configure
- -e "s,@LOADABLE_FONTS@,${loadable_fonts},g" \
-=======
- -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
->>>>>>> 1.25
-=======
  -e "s,@EXTRA_DEFINES@,\"${extra_defines}\",g" \
->>>>>>> 1.35
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
@@ -355,29 +332,16 @@ TARGET=@TARGET@
 THISDIR="@PWD@"
 VERSION=\$(shell date +%y%m%d-%H%M)
 
-<<<<<<< configure
-EXTRA_CFLAGS=@LOADABLE_FONTS@
-=======
 EXTRA_DEFINES=@EXTRA_DEFINES@
->>>>>>> 1.25
 .PHONY: firmware apps
 
 all: firmware apps
-	for f in ../tools/*.ajf ; do cp \$\$f . ; done
 
 firmware:
-<<<<<<< configure
-	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_CFLAGS=\$(EXTRA_CFLAGS)
-=======
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES=\$(EXTRA_DEFINES)
->>>>>>> 1.25
 
 apps:
-<<<<<<< configure
-	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_CFLAGS=\$(EXTRA_CFLAGS)
-=======
 	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
->>>>>>> 1.25
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
