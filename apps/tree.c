@@ -661,7 +661,8 @@ static int onplay_screen(char* dir, char* file)
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
     }
 #else
-    lcd_puts(0,0,str(LANG_PLAYER_ONPLAY_1));
+    if (playing)
+        lcd_puts(0,0,str(LANG_PLAYER_ONPLAY_1));
     lcd_puts(0,1,str(LANG_PLAYER_ONPLAY_2));
 #endif
     lcd_update();
