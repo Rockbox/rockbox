@@ -410,6 +410,7 @@ void IMIA4(void)
 {
     if (pfn_timer != NULL)
         pfn_timer(); /* call the user timer function */
+    and_b(~0x01, &TSR4); /* clear the interrupt */
 }
 #endif /* #ifndef SIMULATOR */
 
