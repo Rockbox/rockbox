@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 29
+#define PLUGIN_API_VERSION 30
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -298,6 +298,7 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     
+    char (*strchr)(const char *s, int c);
 };
 
 /* defined by the plugin loader (plugin.c) */
