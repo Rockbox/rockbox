@@ -126,6 +126,8 @@ modified unless the header & checksum test fails.
 
 
 Rest of config block, only saved to disk:
+0xA8  (char)jump scroll mode (only for player)
+0xA9  (char)jump scroll delay (only for player)
 0xAA  Max number of files in playlist (1000-20000)
 0xAC  Max number of files in dir (50-10000)
 0xAE  fade on pause/unpause/stop setting (bit 0)
@@ -143,9 +145,7 @@ Rest of config block, only saved to disk:
 0xE0  (char[20]) Font file
 0xF4  (int) Playlist first index
 0xF8  (int) Playlist shuffle seed
-0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
-0xFD  (char)jump scroll mode (only for player)
-0xFE  (char)jump scroll delay (only for player)
+0xFC-0x1FF  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
 
 *************************************/
 
@@ -383,6 +383,10 @@ int settings_save( void )
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
     
+#ifdef HAVE_LCD_CHARCELLS
+    config_block[0xa8]=(unsigned char)global_settings.jump_scroll;
+    config_block[0xa9]=(unsigned char)global_settings.jump_scroll_delay;
+#endif
     config_block[0xaa] = (unsigned char)
         global_settings.max_files_in_playlist & 0xff;
     config_block[0xab] = (unsigned char)
@@ -413,10 +417,6 @@ int settings_save( void )
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
     strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
-#ifdef HAVE_LCD_CHARCELLS
-    config_block[0xfd]=(unsigned char)global_settings.jump_scroll;
-    config_block[0xfe]=(unsigned char)global_settings.jump_scroll_delay;
-#endif
     DEBUGF( "+Resume file %s\n",global_settings.resume_file );
     DEBUGF( "+Resume index %X offset %X\n",
             global_settings.resume_index,
@@ -535,7 +535,7 @@ void settings_apply(void)
     lcd_scroll_step(global_settings.scroll_step);
 #else
     lcd_jump_scroll(global_settings.jump_scroll);
-    lcd_jump_scroll_delay(global_settings.jump_scroll_delay);
+    lcd_jump_scroll_delay(global_settings.jump_scroll_delay * (HZ/10));
 #endif
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
@@ -735,13 +735,13 @@ void settings_load(void)
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
-#ifdef HAVE_LCD_CHARSCELLS
-        if (config_block[0xfd] != 0xff)
-            global_settings.jump_scroll = config_block[0xfd];
-        if (config_block[0xfe] != 0xff)
-            global_settings.jump_scroll_delay = config_block[0xfe];
-#endif
         global_settings.resume_file[MAX_PATH]=0;
+#ifdef HAVE_LCD_CHARSCELLS
+        if (config_block[0xa8] != 0xff)
+            global_settings.jump_scroll = config_block[0xa8];
+        if (config_block[0xa9] != 0xff)
+            global_settings.jump_scroll_delay = config_block[0xa9];
+#endif
     }
 
     settings_apply();
