@@ -177,12 +177,6 @@ static Bool MapNotify_event_p (Display *dpy, XEvent *event, XPointer window)
             event->xvisibility.window == (Window) window);
 }
 
-
-#ifdef XLOCKMORE
-extern void pre_merge_options (void);
-#endif
-
-
 static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 
 /* Dead-trivial event handling: exits if "q" or "ESC" are typed.
@@ -230,9 +224,11 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
       break;
     case Expose:
       screen_redraw();
+      /*
       fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
               event->xexpose.x, event->xexpose.y,
               event->xexpose.width, event->xexpose.height);
+      */
       break;
     case ButtonPress:
       fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
