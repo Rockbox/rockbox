@@ -42,13 +42,18 @@ extern unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
 extern void screen_resized(int width, int height);
 extern Display *dpy;
 
+unsigned char display_copy[LCD_WIDTH][LCD_HEIGHT/8];
+
 void lcd_update (void)
 {
     int x, y;
     int p=0;
     int bit;
     XPoint points[LCD_WIDTH * LCD_HEIGHT];
+    int cp=0;
+    XPoint clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
+#if 0
     screen_resized(LCD_WIDTH, LCD_HEIGHT);
 
     for(y=0; y<LCD_HEIGHT; y+=8) {
@@ -65,7 +70,40 @@ void lcd_update (void)
             }
         }
     }
-    drawdots(&points[0], p);
-    fprintf(stderr, "lcd_update: Draws %d pixels\n", p);
+#else
+    for(y=0; y<LCD_HEIGHT; y+=8) {
+        for(x=0; x<LCD_WIDTH; x++) {
+            if(display[x][y/8] || display_copy[x][y/8]) {
+                /* one or more bits/pixels are changed */
+                unsigned char diff =
+                  display[x][y/8] ^ display_copy[x][y/8];
+
+                for(bit=0; bit<8; bit++) {
+                    if(display[x][y/8]&(1<<bit)) {
+                        /* set a dot */
+                        points[p].x = x + MARGIN_X;
+                        points[p].y = y+bit + MARGIN_Y;
+                        p++; /* increase the point counter */
+                    }
+                    else if(diff &(1<<bit)) {
+                        /* clear a dot */
+                        clearpoints[cp].x = x + MARGIN_X;
+                        clearpoints[cp].y = y+bit + MARGIN_Y;
+                        cp++; /* increase the point counter */
+                    }
+                }
+            }
+        }
+    }
+
+    /* copy a huge block */
+    memcpy(display_copy, display, sizeof(display));
+
+#endif
+
+
+    drawdots(1, &points[0], p);
+    drawdots(0, &clearpoints[0], cp);
+    fprintf(stderr, "lcd_update: Draws %d pixels, clears %d pixels\n", p, cp);
     XSync(dpy,False);
 }

@@ -177,10 +177,16 @@ void drawdot(int color, int x, int y)
   XDrawPoint(dpy, window, draw_gc, x, y);
 }
 
-void drawdots(XPoint *points, int count)
+void drawdots(int color, XPoint *points, int count)
 {
-  XSetForeground(dpy, draw_gc,
-                 get_pixel_resource("foreground", "Foreground", dpy, cmap));
+  if (color==0) {
+    XSetForeground(dpy, draw_gc,
+                   get_pixel_resource("background", "Background", dpy, cmap));
+  }
+  else
+    XSetForeground(dpy, draw_gc,
+                   get_pixel_resource("foreground", "Foreground", dpy, cmap));
+
   
   XDrawPoints(dpy, window, draw_gc, points, count, CoordModeOrigin);
 }
@@ -223,7 +229,7 @@ screenhack (Display *the_dpy, Window the_window)
 
   Logf("Rockbox will kill ya!");
 
-  tetris();
+  app_main();
 }
 
 void screen_redraw()
