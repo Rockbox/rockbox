@@ -189,7 +189,7 @@ struct plugin_api {
     void (*usb_screen)(void);
     long* current_tick;
     int (*default_event_handler)(int event);
-    int (*create_thread)(void* function, void* stack, int stack_size, char *name);
+    int (*create_thread)(void* function, void* stack, int stack_size, const char *name);
     void (*remove_thread)(int threadnum);
     void (*reset_poweroff_timer)(void);
 

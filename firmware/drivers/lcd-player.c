@@ -87,7 +87,7 @@ struct cursorinfo {
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
-static char scroll_name[] = "scroll";
+static const char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
 static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
@@ -422,7 +422,7 @@ void lcd_double_height(bool on)
         lcd_write_command(on?9:8);
 }
 
-static char icon_pos[] =
+static const char icon_pos[] =
 {
     0, 0, 0, 0, /* Battery */
     2, /* USB */
@@ -441,7 +441,7 @@ static char icon_pos[] =
     10, /* Param */
 };
 
-static char icon_mask[] =
+static const char icon_mask[] =
 {
     0x02, 0x08, 0x04, 0x10, /* Battery */
     0x04, /* USB */

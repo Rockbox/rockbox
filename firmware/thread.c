@@ -36,7 +36,7 @@ int num_threads;
 static volatile int num_sleepers;
 static int current_thread;
 static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")));
-char *thread_name[MAXTHREADS];
+const char *thread_name[MAXTHREADS];
 void *thread_stack[MAXTHREADS];
 int thread_stack_size[MAXTHREADS];
 static char main_thread_name[] = "main";
@@ -142,7 +142,8 @@ void wake_up_thread(void)
  * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread(void* function, void* stack, int stack_size, char *name)
+int create_thread(void* function, void* stack, int stack_size,
+                  const char *name)
 {
    unsigned int i;
    unsigned int stacklen;

@@ -33,7 +33,7 @@
 
 static void backlight_thread(void);
 static char backlight_stack[DEFAULT_STACK_SIZE];
-static char backlight_thread_name[] = "backlight";
+static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
 static bool charger_was_inserted = 0;

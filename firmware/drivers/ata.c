@@ -98,7 +98,7 @@ static bool poweroff = false;
 static int poweroff_timeout = 2*HZ;
 #endif
 static char ata_stack[DEFAULT_STACK_SIZE];
-static char ata_thread_name[] = "ata";
+static const char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
 static bool delayed_write = false;

@@ -45,7 +45,7 @@ extern struct font sysfont;
 static struct font font_ui;
 
 /* system font table, in order of FONT_xxx definition */
-static struct font* sysfonts[MAXFONTS] = { &sysfont, &font_ui };
+static struct font* const sysfonts[MAXFONTS] = { &sysfont, &font_ui };
 
 /* static buffer allocation structures */
 static unsigned char mbuf[MAX_FONT_SIZE];
