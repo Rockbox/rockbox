@@ -16,6 +16,7 @@ plugins/viewers.config
 SOURCES
 plugins/SOURCES
 plugins/lib/SOURCES
+codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
 codecs/libFLAC/*
