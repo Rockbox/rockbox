@@ -69,7 +69,8 @@ bool radio_screen(void)
     lcd_clear_display();
     lcd_setmargins(0, 8);
     status_draw(false);
-
+    fmradio_set_status(FMRADIO_PLAYING);
+    
     /* Enable the Left and right A/D Converter */
     mas_codec_writereg(0x0, 0xccc7);
 
@@ -182,6 +183,8 @@ bool radio_screen(void)
                 break;
         }
     }
+
+    fmradio_set_status(0);
     return false;
 }
 #endif

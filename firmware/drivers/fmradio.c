@@ -50,17 +50,7 @@
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
 
-static struct mutex fmradio_mtx;
-
-void fmradio_begin(void)
-{
-    mutex_lock(&fmradio_mtx);
-}
-
-void fmradio_end(void)
-{
-    mutex_unlock(&fmradio_mtx);
-}
+static int fmstatus = 0;
 
 int fmradio_read(int addr)
 {
@@ -128,6 +118,16 @@ void fmradio_set(int addr, int data)
     }
 
     CE_LO;
+}
+
+void fmradio_set_status(int status)
+{
+    fmstatus = status;
+}
+
+int fmradio_get_status(void)
+{
+    return fmstatus;
 }
 
 #endif

@@ -34,6 +34,9 @@
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
+#ifdef HAVE_FMRADIO
+#include "fmradio.h"
+#endif
 
 #ifdef SIMULATOR
 
@@ -299,6 +302,9 @@ static void handle_auto_poweroff(void)
     charger_was_inserted = charger_is_inserted;
     
     if(timeout &&
+#ifdef HAVE_FMRADIO
+       !fmradio_get_status() &&
+#endif
        !usb_inserted() &&
        (mpeg_stat == 0 ||
         mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)))

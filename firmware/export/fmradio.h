@@ -21,5 +21,9 @@
 
 extern int fmradio_read(int addr);
 extern void fmradio_set(int addr, int data);
+extern void fmradio_set_status(int status);
+extern int fmradio_get_status(void);
+
+#define FMRADIO_PLAYING 1
 
 #endif
