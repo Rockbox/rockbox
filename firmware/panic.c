@@ -31,7 +31,10 @@ char panic_buf[128];
 void panicf( char *fmt, ...)
 {
     va_list ap;
-    
+
+    /* Disable interrupts */
+    asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
+
     va_start( ap, fmt );
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
