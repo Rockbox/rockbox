@@ -189,8 +189,8 @@
     <td>A male</td>
     <td>A male</td>
     <td>A male</td>
-    <td>mini B</td>
-    <td>mini B</td>
+    <td>mini B female</td>
+    <td>mini B female</td>
 </tr>
 <tr><th><b>"Ear" Position</b></th>
     <td>top</td>
