@@ -184,7 +184,7 @@ unsigned short new_lcd_rocklatin1_to_xlcd[] =
    NOCHAR_NEW, /* 0x9c .. ú oe */
    NOCHAR_NEW, /* 0x9d .. ù */
    0x225,      /* 0x9e .. û 'z' with upside down ^ */
-   NOCHAR_NEW, /* 0x9f .. ü Large ˇ (Y with two dots) */
+   0x059,      /* 0x9f .. ü Large ˇ (Y with two dots) */
    NOCHAR_NEW, /* 0xa0 ..   */
    NOCHAR_NEW, /* 0xa1 .. ° */
    NOCHAR_NEW, /* 0xa2 .. ¢ */
@@ -231,8 +231,8 @@ unsigned short new_lcd_rocklatin1_to_xlcd[] =
    0x235, /* 0xcb .. À */
    0x236, /* 0xcc .. Ã */
    0x237, /* 0xcd .. Õ */
-   NOCHAR_NEW, /* 0xce .. Œ */
-   NOCHAR_NEW, /* 0xcf .. œ */
+   0x049, /* 0xce .. Œ */
+   0x049, /* 0xcf .. œ */
    0x238, /* 0xd0 .. – */
    0x239, /* 0xd1 .. — */
    0x23a, /* 0xd2 .. “ */
@@ -244,9 +244,9 @@ unsigned short new_lcd_rocklatin1_to_xlcd[] =
    0x240, /* 0xd8 .. ÿ */
    0x241, /* 0xd9 .. Ÿ */
    0x242, /* 0xda .. ⁄ */
-   NOCHAR_NEW,/* 0xdb .. € */
+   0x055, /* 0xdb .. € */
    0x243, /* 0xdc .. ‹ */
-   NOCHAR_NEW, /* 0xdd .. › */
+   0x059, /* 0xdd .. › */
    NOCHAR_NEW, /* 0xde .. ﬁ */
    0x244, /* 0xdf .. ﬂ */
    0x245, /* 0xe0 .. ‡ */
@@ -261,13 +261,13 @@ unsigned short new_lcd_rocklatin1_to_xlcd[] =
    0x24d, /* 0xe9 .. È */
    0x24e, /* 0xea .. Í */
    0x24f, /* 0xeb .. Î */
-   NOCHAR_NEW, /* 0xec .. Ï */
+   0x069, /* 0xec .. Ï */
    0x250, /* 0xed .. Ì */
    0x251, /* 0xee .. Ó */
    0x252, /* 0xef .. Ô */
    NOCHAR_NEW, /* 0xf0 ..  */
    0x253, /* 0xf1 .. Ò */
-   NOCHAR_NEW, /* 0xf2 .. Ú */
+   0x06f, /* 0xf2 .. Ú */
    0x254, /* 0xf3 .. Û */
    0x255, /* 0xf4 .. Ù */
    0x256, /* 0xf5 .. ı */
@@ -276,11 +276,11 @@ unsigned short new_lcd_rocklatin1_to_xlcd[] =
    0x258, /* 0xf8 .. ¯ */
    0x259, /* 0xf9 .. ˘ */
    0x25a, /* 0xfa .. ˙ */
-   NOCHAR_NEW, /* 0xfb .. ˚ */
+   0x075, /* 0xfb .. ˚ */
    0x25b, /* 0xfc .. ¸ */
    0x25c, /* 0xfd .. ˝ */
    NOCHAR_NEW, /* 0xfe .. ˛ */
-   NOCHAR_NEW, /* 0xff .. ˇ */
+   0x079, /* 0xff .. ˇ */
 };
 
 unsigned short old_lcd_rocklatin1_to_xlcd[] =
@@ -444,16 +444,16 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    NOCHAR_OLD,  /* 0x9b .. õ > */
    NOCHAR_OLD,  /* 0x9c .. ú oe */
    NOCHAR_OLD,  /* 0x9d .. ù */
-   0x0bd,  /* 0x9e .. û 'z' with upside down ^ */
+   0x0bd,       /* 0x9e .. û 'z' with upside down ^ */
    NOCHAR_OLD,  /* 0x9f .. ü Large ˇ (Y with two dots) */
    NOCHAR_OLD,  /* 0xa0 ..   */
    NOCHAR_OLD,  /* 0xa1 .. ° */
    NOCHAR_OLD,  /* 0xa2 .. ¢ */
-   0x005,  /* 0xa3 .. £ */
+   0x005,       /* 0xa3 .. £ */
    NOCHAR_OLD,  /* 0xa4 .. § */
    NOCHAR_OLD,  /* 0xa5 .. • */
    NOCHAR_OLD,  /* 0xa6 .. ¶ */
-   0x063,  /* 0xa7 .. ß */
+   0x063,       /* 0xa7 .. ß */
    NOCHAR_OLD,  /* 0xa8 .. ® */
    NOCHAR_OLD,  /* 0xa9 .. © (copyright) */
    NOCHAR_OLD,  /* 0xaa .. ™ */
@@ -461,7 +461,7 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    NOCHAR_OLD,  /* 0xac .. (unknown) */
    NOCHAR_OLD,  /* 0xad .. (unkown1 */
    NOCHAR_OLD,  /* 0xae .. Æ (register)*/
-   0x0ee,  /* 0xaf .. Ø */
+   0x0ee,       /* 0xaf .. Ø */
    NOCHAR_OLD,  /* 0xb0 .. ∞ */
    NOCHAR_OLD,  /* 0xb1 .. ± */
    NOCHAR_OLD,  /* 0xb2 .. ≤ */
@@ -492,8 +492,8 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    0x092,  /* 0xcb .. À */
    0x093,  /* 0xcc .. Ã */
    0x094,  /* 0xcd .. Õ */
-   NOCHAR_OLD,  /* 0xce .. Œ */
-   NOCHAR_OLD,  /* 0xcf .. œ */
+   0x049,  /* 0xce .. Œ */
+   0x049,  /* 0xcf .. œ */
    0x095,  /* 0xd0 .. – */
    0x061,  /* 0xd1 .. — */
    0x096,  /* 0xd2 .. “ */
@@ -505,9 +505,9 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    0x00f,  /* 0xd8 .. ÿ */
    0x09a,  /* 0xd9 .. Ÿ */
    0x09b,  /* 0xda .. ⁄ */
-   NOCHAR_OLD,  /* 0xdb .. € */
+   0x055,  /* 0xdb .. € */
    0x062,  /* 0xdc .. ‹ */
-   NOCHAR_OLD,  /* 0xdd .. › */
+   0x059,  /* 0xdd .. › */
    NOCHAR_OLD,  /* 0xde .. ﬁ */
    0x022,  /* 0xdf .. ﬂ */
    0x083,  /* 0xe0 .. ‡ */
@@ -522,13 +522,13 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    0x009,  /* 0xe9 .. È */
    0x09f,  /* 0xea .. Í */
    0x0a0,  /* 0xeb .. Î */
-   NOCHAR_OLD,  /* 0xec .. Ï */
+   0x069,  /* 0xec .. Ï */
    0x0a1,  /* 0xed .. Ì */
    0x0a2,  /* 0xee .. Ó */
    0x0a3,  /* 0xef .. Ô */
    NOCHAR_OLD,  /* 0xf0 ..  */
    0x081,  /* 0xf1 .. Ò */
-   NOCHAR_OLD,  /* 0xf2 .. Ú */
+   0x06f,  /* 0xf2 .. Ú */
    0x0a4,  /* 0xf3 .. Û */
    0x0a5,  /* 0xf4 .. Ù */
    0x0a6,  /* 0xf5 .. ı */
@@ -537,11 +537,11 @@ unsigned short old_lcd_rocklatin1_to_xlcd[] =
    0x010,  /* 0xf8 .. ¯ */
    0x00a,  /* 0xf9 .. ˘ */
    0x0a7,  /* 0xfa .. ˙ */
-   NOCHAR_OLD,  /* 0xfb .. ˚ */
+   0x075,  /* 0xfb .. ˚ */
    0x082,  /* 0xfc .. ¸ */
    0x0af,  /* 0xfd .. ˝ */
    NOCHAR_OLD,  /* 0xfe .. ˛ */
-   NOCHAR_OLD,  /* 0xff .. ˇ */
+   0x079,  /* 0xff .. ˇ */
 };
 
 /* second table -- substitute */
