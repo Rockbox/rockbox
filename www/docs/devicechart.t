@@ -196,7 +196,7 @@
     <td>Yes</td>
     <td>Power</td>
     <td>Power</td>
-    <td>Yes</td>
+    <td>No</td>
 </tr>
 <tr><th><b>Hard drive poweroff</b></th>
     <td>No</td>
