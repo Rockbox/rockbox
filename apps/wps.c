@@ -202,6 +202,11 @@ int wps_show(void)
                      id3->length % 60000 / 1000 );
 
             lcd_puts(0, 6, buffer);
+
+            lcd_slidebar(1, LCD_HEIGHT-7, LCD_WIDTH-2, 5,
+                         id3->elapsed*100/id3->length,
+                         BAR_RIGHT);
+
             lcd_update();
 #else
             /* Display time with the filename scroll only because
