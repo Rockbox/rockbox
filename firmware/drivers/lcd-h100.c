@@ -109,10 +109,10 @@ void lcd_init(void)
  */
 void lcd_init (void)
 {
-    /* GPO35 is the LCD A0 pin */
-    GPIO1_FUNCTION |= 0x00000008;
-    GPIO1_ENABLE |= 0x00000008;
-    GPIO1_OUT |= 0x00000008;
+    /* GPO35 is the LCD A0 pin, GPO46 is LCD RESET */
+    GPIO1_OUT |= 0x00004008;
+    GPIO1_FUNCTION |= 0x00004008;
+    GPIO1_ENABLE |= 0x00004008;
     
     lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
     lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);   /* Normal */
