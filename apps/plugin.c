@@ -415,21 +415,15 @@ void* plugin_get_buffer(int* buffer_size)
    Playback gets stopped, to avoid conflicts. */
 void* plugin_get_mp3_buffer(int* buffer_size)
 {
-#ifdef SIMULATOR
-    static unsigned char buf[1700*1024];
-    *buffer_size = sizeof(buf);
-    return buf;
-#else
     mpeg_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     *buffer_size = mp3end - mp3buf;
     return mp3buf;
-#endif 
 }
 
 #ifndef SIMULATOR
 /* Register a periodic time callback, called every "cycles" CPU clocks. 
-   Note that this function will be called in interrupt context! */ 
+   Note that this function will be called in interrupt context! */
 int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
 {
     int phi = 0; /* bits for the prescaler */
