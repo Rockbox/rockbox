@@ -51,11 +51,15 @@ static int  peak_meter_clip_hold;
 /* specifies the value range in peak volume values */
 unsigned short peak_meter_range_min;
 unsigned short peak_meter_range_max;
+unsigned short peak_meter_range;
 
 /* if set to true clip timeout is disabled */
 static bool peak_meter_clip_eternal = false;
 
 static bool peak_meter_use_dbfs = true;
+static unsigned short db_min = 0;
+static unsigned short db_max = 9000;
+static unsigned short db_range = 9000;
 
 
 #ifndef SIMULATOR
@@ -110,8 +114,9 @@ static long clip_time_out[] = {
 
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
+#define DB_SCALE_SRC_VALUES_SIZE 11
 #if 0
-static int db_scale_src_values[] = {
+const static int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32767, /*   0 db */
     23197, /* - 3 db */
     16422, /* - 6 db */
@@ -125,7 +130,7 @@ static int db_scale_src_values[] = {
     33,    /* -60 db */
 };
 #else
-static int db_scale_src_values[] = {
+static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32752, /*   0 db */
     22784, /* - 3 db */
     14256, /* - 6 db */
@@ -140,7 +145,7 @@ static int db_scale_src_values[] = {
 };
 #endif
 
-int db_scale_count = sizeof db_scale_src_values / sizeof (int);
+static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
 
 /* if db_scale_valid is false the content of 
    db_scale_lcd_coord needs recalculation */
@@ -343,6 +348,11 @@ void peak_meter_set_min(int newmin) {
             peak_meter_range_min = newmin * MAX_PEAK / 100;
         }
     }
+
+    peak_meter_range = peak_meter_range_max - peak_meter_range_min;
+
+    db_min = calc_db(peak_meter_range_min);
+    db_range = db_max - db_min;
     db_scale_valid = false;
 }
 
@@ -378,6 +388,11 @@ void peak_meter_set_max(int newmax) {
             peak_meter_range_max = newmax * MAX_PEAK / 100;
         }
     }
+
+    peak_meter_range = peak_meter_range_max - peak_meter_range_min;
+
+    db_max = calc_db(peak_meter_range_max);
+    db_range = db_max - db_min;
     db_scale_valid = false;
 }
 
@@ -482,7 +497,7 @@ void peak_meter_playback(bool playback) {
  * that ocurred. This function could be used by a thread for
  * busy reading the MAS.
  */
-void peak_meter_peek(void) {
+inline void peak_meter_peek(void) {
 #ifdef SIMULATOR
     int left = 8000;
     int right = 9000;
@@ -632,7 +647,6 @@ void peak_meter_set_clip_hold(int time) {
  * @return unsigned short - A value 0 <= return value <= meterwidth
  */
 unsigned short peak_meter_scale_value(unsigned short val, int meterwidth){
-    int range;
     int retval;
 
     if (val <= peak_meter_range_min) {
@@ -648,22 +662,16 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth){
     /* different scaling is used for dBfs and linear percent */
     if (peak_meter_use_dbfs) {
 
-        /* needed the offset in 'zoomed' meters */
-        int dbmin = calc_db(peak_meter_range_min);
-
-        range = calc_db(peak_meter_range_max) - dbmin;
-
         /* scale the samples dBfs */
-        retval  = (calc_db(retval) - dbmin) * meterwidth / range;
+        retval  = (calc_db(retval) - db_min) * meterwidth / db_range;
     }
 
     /* Scale for linear percent display */
     else
     {
-        range =(peak_meter_range_max - peak_meter_range_min);
-
         /* scale the samples */
-        retval  = ((retval - peak_meter_range_min) * meterwidth) / range;
+        retval  = ((retval - peak_meter_range_min) * meterwidth) 
+                  / peak_meter_range;
     }
     return retval;
 }
@@ -697,14 +705,7 @@ void peak_meter_draw(int x, int y, int width, int height) {
         /* read the volume info from MAS */
         left  = peak_meter_read_l(); 
         right = peak_meter_read_r(); 
-        peak_meter_peek();
-
-        /* restrict the range to avoid drawing outside the lcd */
-        left = MAX(peak_meter_range_min, left);
-        left = MIN(peak_meter_range_max, left);
-
-        right = MAX(peak_meter_range_min, right);
-        right = MIN(peak_meter_range_max, right);
+        /*peak_meter_peek();*/
 
         /* scale the samples dBfs */
         left  = peak_meter_scale_value(left, meterwidth);
@@ -715,7 +716,7 @@ void peak_meter_draw(int x, int y, int width, int height) {
         if (!db_scale_valid){
 
             if (peak_meter_use_dbfs) {
-                db_scale_count = sizeof db_scale_src_values / sizeof (int);
+                db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
                 for (i = 0; i < db_scale_count; i++){
                     /* find the real x-coords for predefined interesting
                        dBfs values. These only are recalculated when the
@@ -729,12 +730,11 @@ void peak_meter_draw(int x, int y, int width, int height) {
 
             /* when scaling linear we simly make 10% steps */
             else {
-                int range = peak_meter_range_max - peak_meter_range_min;
                 db_scale_count = 10;
                 for (i = 0; i < db_scale_count; i++) {
                     db_scale_lcd_coord[i] = 
                         (i * (MAX_PEAK / 10) - peak_meter_range_min) *
-                        meterwidth / range;
+                        meterwidth / peak_meter_range;
                 }
             }
 

@@ -687,7 +687,7 @@ int wps_show(void)
                         break;
                     }
                     peak_meter_peek();
-                    yield();
+                    sleep(1);
 
                     if (TIME_AFTER(current_tick, next_refresh)) {
                         wps_refresh(id3, 0, WPS_REFRESH_PEAK_METER);

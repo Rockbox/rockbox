@@ -524,6 +524,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     char buf[MAX_PATH];
     unsigned char flags;
     int i;
+    int h = font_get(FONT_UI)->height;
+    bool update_line;
 #ifdef HAVE_LCD_BITMAP
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
@@ -544,6 +546,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
 
     for (i = 0; i < MAX_LINES; i++)
     {
+        update_line = false;
         if ( !format_lines[i] )
             break;
 
@@ -559,24 +562,21 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
 #ifdef HAVE_LCD_CHARCELLS
                 draw_player_progress(id3, ff_rewind_count);
 #else
-                int w,h;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-                lcd_getstringsize("M",&w,&h);
                 slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
                          (id3->elapsed + ff_rewind_count) * 100 / id3->length,
                          Grow_Right);
-                continue;
 #endif
-            }
+                update_line = true;
+            } else 
 
 #ifdef HAVE_LCD_BITMAP
             /* peak meter */
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
                 int peak_meter_y;
-                struct font *fnt = font_get(FONT_UI);
-                int h = fnt->height;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
 
+                update_line = true;
                 peak_meter_y = i * h + offset;
 
                 /* The user might decide to have the peak meter in the last 
@@ -590,21 +590,28 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
                     peak_meter_draw(0, peak_meter_y, LCD_WIDTH,
                                     MIN(h, LCD_HEIGHT - peak_meter_y));
                 }
-                continue;
-            }
+            } else
 #endif
 
-            /* static line */
+            /* scroll line */
             if (flags & WPS_REFRESH_SCROLL)
             {
-                if (refresh_mode & WPS_REFRESH_SCROLL) {
+                if (refresh_mode & WPS_REFRESH_SCROLL) 
+                {
                 lcd_puts_scroll(0, i, buf);
             }
             }
-            else
+
+            /* dynamic / static line */
+            if ((flags & refresh_mode & WPS_REFRESH_DYNAMIC) ||
+                (flags & refresh_mode & WPS_REFRESH_STATIC))
             {
+                update_line = true;
                 lcd_puts(0, i, buf);
             }
+        }
+        if (update_line) {
+            lcd_update_rect(0, i * h, LCD_WIDTH, h);
         }
     }
 #ifdef HAVE_LCD_BITMAP
@@ -612,7 +619,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
        So we can enable / disable the peak meter thread */
     peak_meter_enabled = enable_pm;
 #endif
-    lcd_update();
 
     return true;
 }

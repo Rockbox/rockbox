@@ -823,7 +823,6 @@ static void scroll_thread(void)
     int index;
     int w, h;
     int xpos, ypos;
-    bool update;
 
     /* initialize scroll struct array */
     for (index = 0; index < SCROLLABLE_LINES; index++) {
@@ -834,15 +833,12 @@ static void scroll_thread(void)
 
     while ( 1 ) {
 
-        update = false;
-
         /* wait 0.5s before starting scroll */
         if ( TIME_AFTER(current_tick, scroll_start_tick) ) {
 
             for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
                 s = &scroll[index];
                 if ( s->mode == SCROLL_MODE_RUN ) {
-                    update = true;
 
                     s->offset += scroll_step;
 
@@ -855,11 +851,8 @@ static void scroll_thread(void)
 
                     lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
                     lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+                    lcd_update_rect(xpos, ypos, LCD_WIDTH - xmargin, h);
                 }
-            }
-
-            if (update) {
-                lcd_update();
             }
         }
 

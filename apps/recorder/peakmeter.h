@@ -21,7 +21,7 @@
 
 /*#define PM_DEBUG */
 #ifdef PM_DEBUG 
-extern bool peak_meter_histogramm(void);
+extern bool peak_meter_histogram(void);
 #endif
 
 
