@@ -33,6 +33,9 @@
 #include "sprintf.h"
 #include "kernel.h"
 #include "power.h"
+#include "system.h"
+#include "powermgmt.h"
+#include "adc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -118,6 +121,78 @@ void usb_screen(void)
 }
 
 
+#ifdef HAVE_LCD_BITMAP
+void charging_display_info(bool animate)
+{
+    unsigned char charging_logo[36];
+    const int pox_x = (LCD_WIDTH - sizeof(charging_logo)) / 2;
+    const int pox_y = 24;
+    static unsigned phase = 3;
+    unsigned i;
+    int battery_voltage;
+    int batt_int, batt_frac;
+    char buf[32];
+
+    battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+    batt_int = battery_voltage / 100;
+    batt_frac = battery_voltage % 100;
+
+    snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
+             battery_level());
+    lcd_puts(0, 6, buf);
+
+#ifdef HAVE_CHARGE_CTRL
+    snprintf(buf, 30, "  Charging: %s", charger_enabled ? "yes" : "no");
+    lcd_puts(0, 2, buf);
+    if (!charger_enabled)
+        animate = false;
+#endif                
+
+    
+    /* middle part */
+    memset(charging_logo+3, 0x00, 32);
+    charging_logo[0] = 0x3C;
+    charging_logo[1] = 0x24;
+    charging_logo[2] = charging_logo[35] = 0xFF;
+    
+    if (!animate)
+    {   /* draw the outline */
+        /* middle part */
+        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8, true);
+        /* upper line */
+        charging_logo[0] = charging_logo[1] = 0x00; 
+        memset(charging_logo+2, 0x80, 34);
+        lcd_bitmap(charging_logo, pox_x, pox_y, sizeof(charging_logo), 8, false);
+        /* lower line */
+        memset(charging_logo+2, 0x01, 34);
+        lcd_bitmap(charging_logo, pox_x, pox_y + 16, sizeof(charging_logo), 8, false);
+    }
+    else
+    {   /* animate the middle part */
+        for (i = 3; i<MIN(sizeof(charging_logo)-1, phase); i++)
+        {
+            if ((i-phase) % 8 == 0)
+            {   /* draw a "bubble" here */
+                unsigned bitpos;
+                bitpos = (phase + i/8) % 15; /* "bounce" effect */
+                if (bitpos > 7) 
+                    bitpos = 14 - bitpos;
+                charging_logo[i] = 0x01 << bitpos;
+            }
+        }
+        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8, true);
+        phase++;
+    }
+    lcd_update();
+}
+#else
+void charging_display_info(bool animate)
+{
+    (void)animate;
+}
+#endif
+
+
 /* blocks while charging, returns on event:
    1 if charger cable was removed
    2 if Off/Stop key was pressed
@@ -140,8 +215,7 @@ int charging_screen(void)
     status_draw(true);
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_puts(0, 3, "[Rockbox charging]"); /* ToDo: show some logo instead */
-    lcd_update();
+    charging_display_info(false);
 #else
     status_set_playmode(STATUS_STOP);
     lcd_puts(0, 1, "[charging]");
@@ -152,8 +226,9 @@ int charging_screen(void)
     do
     {
         status_draw(false);
-        button = button_get_w_tmo(HZ/2);
-        if (button == BUTTON_ON)
+        charging_display_info(true);
+        button = button_get_w_tmo(HZ/3);
+        if (button == (BUTTON_ON | BUTTON_REL))
             rc = 3;
         else if (button == offbutton)
             rc = 2;
