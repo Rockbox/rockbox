@@ -63,10 +63,6 @@ static char debug_rx_char(void)
    char ch;
    char ssr;
 
-   /* Special debug hack. Shut off the IRQ while polling, to prevent the debug
-      stub from catching the IRQ */
-   SCR1 &= ~0x40;
-   
    while (!debug_rx_ready())
    {
       ;
@@ -80,8 +76,6 @@ static char debug_rx_char(void)
    if (ssr)
       debug_handle_error (ssr);
 
-   /* Special debug hack. Enable the IRQ again */
-   SCR1 |= 0x40;
    return ch;
 }
 
@@ -100,8 +94,14 @@ static char lowhex(int  x)
 static void putpacket (char *buffer)
 {
     register  int checksum;
+    char ch;
 
     char *src = buffer;
+
+   /* Special debug hack. Shut off the Rx IRQ during I/O to prevent the debug
+      stub from interrupting the message */
+    SCR1 &= ~0x40;
+   
     debug_tx_char ('$');
     checksum = 0;
 
@@ -144,6 +144,9 @@ static void putpacket (char *buffer)
 
     /* Wait for the '+' */
     debug_rx_char();
+
+    /* Special debug hack. Enable the IRQ again */
+    SCR1 |= 0x40;
 }
 
 /* convert the memory, pointed to by mem into hex, placing result in buf */
