@@ -38,9 +38,20 @@ buildimage() {
 runtests() {
     rm $RESULT
 
+    echo ---Test: create a long name directory in the root
+    try mkdir "/very long subdir name"
+    check
+    try mkdir "/very long subdir name/apa.monkey.me.now"
+    check
+
+    echo ---Test: create a directory called "dir"
+    try mkdir "/dir"
+    check
+
     echo ---Test: create a 10K file
     try mkfile "/really long filenames rock" 10
     check
+
     try mkfile /dir/apa.monkey.me.now 10
     check
     try chkfile "/really long filenames rock" 10
@@ -100,24 +111,34 @@ runtests() {
 
 }
 
+echo "--------------------------------------"
 echo "Building test image (4 sector/cluster)"
+echo "--------------------------------------"
 buildimage 4
 runtests
 
+echo "---------------------------------------"
 echo "Building test image (32 sectors/cluster)"
+echo "---------------------------------------"
 buildimage 32
 runtests
 
+echo "--------------------------------------"
 echo "Building test image (1 sector/cluster)"
+echo "--------------------------------------"
 buildimage 1
 runtests
 
+echo "--------------------------------------"
 echo "Building test image (8 sectors/cluster)"
+echo "--------------------------------------"
 buildimage 8
 runtests
 
+echo "----------------------------------------"
 echo "Building test image (128 sectors/cluster)"
+echo "----------------------------------------"
 buildimage 128
 runtests
 
-echo "== Test completed sucessfully =="
+echo "== Test completed successfully =="

@@ -114,3 +114,55 @@ struct dirent* readdir(DIR* dir)
 
     return theent;
 }
+
+int mkdir(char *name)
+{
+    DIR *dir;
+    char namecopy[MAX_PATH];
+    char* end;
+    char *basename;
+    char *parent;
+    struct dirent *entry;
+    struct fat_dir newdir;
+    int rc;
+    
+    if ( name[0] != '/' ) {
+        DEBUGF("Only absolute paths supported right now\n");
+        return -1;
+    }
+
+    strncpy(namecopy,name,sizeof(namecopy));
+    namecopy[sizeof(namecopy)-1] = 0;
+
+    /* Split the base name and the path */
+    end = strrchr(namecopy, '/');
+    *end = 0;
+    basename = end+1;
+
+    if(namecopy == end) /* Root dir? */
+        parent = "/";
+    else
+        parent = namecopy;
+        
+    DEBUGF("mkdir: parent: %s, name: %s\n", parent, basename);
+
+    dir = opendir(parent);
+    
+    if(!dir) {
+        DEBUGF("mkdir: can't open parent dir\n");
+        return -2;
+    }    
+
+    /* Now check if the name already exists */
+    while ((entry = readdir(dir))) {
+        if ( !strcasecmp(basename, entry->d_name) ) {
+            DEBUGF("mkdir error: file exists\n");
+            errno = EEXIST;
+            return - 3;
+        }
+    }
+    
+    rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
+    
+    return rc;
+}

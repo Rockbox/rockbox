@@ -811,7 +811,8 @@ static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
                            unsigned int numentries,
                            unsigned char* name,
-                           unsigned char* shortname)
+                           unsigned char* shortname,
+                           bool is_directory)
 {
     unsigned char buf[SECTOR_SIZE];
     unsigned char* entry;
@@ -918,7 +919,7 @@ static int write_long_name(struct fat_file* file,
             unsigned short date=0, time=0, tenth=0;
             LDEBUGF("Shortname entry: %.13s\n", shortname);
             strncpy(entry + FATDIR_NAME, shortname, 11);
-            entry[FATDIR_ATTR] = 0;
+            entry[FATDIR_ATTR] = is_directory?FAT_ATTR_DIRECTORY:0;
             entry[FATDIR_NTRES] = 0;
 
             fat_time(&date, &time, &tenth);
@@ -947,7 +948,9 @@ static int write_long_name(struct fat_file* file,
 
 static int add_dir_entry(struct fat_dir* dir,
                          struct fat_file* file,
-                         char* name)
+                         char* name,
+                         bool is_directory,
+                         bool dotdir)
 {
     unsigned char buf[SECTOR_SIZE];
     unsigned char shortname[16];
@@ -963,16 +966,26 @@ static int add_dir_entry(struct fat_dir* dir,
     LDEBUGF( "add_dir_entry(%s,%x)\n",
              name, file->firstcluster);
 
-    /* create dos name */
-    rc = create_dos_name(name, shortname);
-    if (rc < 0)
-        return rc * 10 - 0;
+    /* The "." and ".." directory entries must not be long names */
+    if(dotdir) {
+        int i;
+        strncpy(shortname, name, 16);
+        for(i = strlen(shortname);i < 12;i++)
+            shortname[i] = ' ';
+        
+        entries_needed = 1;
+    } else {
+        /* create dos name */
+        rc = create_dos_name(name, shortname);
+        if (rc < 0)
+            return rc * 10 - 0;
 
-    /* one dir entry needed for every 13 bytes of filename,
-       plus one entry for the short name */
-    entries_needed = namelen / NAME_BYTES_PER_ENTRY + 1;
-    if (namelen % NAME_BYTES_PER_ENTRY)
-        entries_needed++;
+        /* one dir entry needed for every 13 bytes of filename,
+           plus one entry for the short name */
+        entries_needed = namelen / NAME_BYTES_PER_ENTRY + 1;
+        if (namelen % NAME_BYTES_PER_ENTRY)
+            entries_needed++;
+    }
 
  restart:
     firstentry = 0;
@@ -1065,7 +1078,7 @@ static int add_dir_entry(struct fat_dir* dir,
             firstentry, sector);
 
     rc = write_long_name(&dir->file, firstentry, 
-                         entries_needed, name, shortname);
+                         entries_needed, name, shortname, is_directory);
     if (rc < 0)
         return rc * 10 - 5;
 
@@ -1304,7 +1317,7 @@ int fat_create_file(char* name,
     int rc;
 
     LDEBUGF("fat_create_file(\"%s\",%x,%x)\n",name,file,dir);
-    rc = add_dir_entry(dir, file, name);
+    rc = add_dir_entry(dir, file, name, false, false);
     if (!rc) {
         file->firstcluster = 0;
         file->lastcluster = 0;
@@ -1313,6 +1326,51 @@ int fat_create_file(char* name,
         file->sectornum = 0;
         file->eof = false;
     }
+
+    return rc;
+}
+
+int fat_create_dir(char* name,
+                   struct fat_dir* newdir,
+                   struct fat_dir* dir)
+{
+    int rc;
+    struct fat_file dummyfile;
+
+    LDEBUGF("fat_create_dir(\"%s\",%x,%x)\n",name,newdir,dir);
+
+    memset(newdir, sizeof(struct fat_dir), 0);
+
+    /* First, add the entry in the parent directory */
+    rc = add_dir_entry(dir, &newdir->file, name, true, false);
+    if (rc < 0)
+        return rc * 10 - 1;
+
+    /* Then add the "." entry */
+    rc = add_dir_entry(newdir, &dummyfile, ".", true, true);
+    if (rc < 0)
+        return rc * 10 - 2;
+    dummyfile.firstcluster = newdir->file.firstcluster;
+    update_short_entry(&dummyfile, 0, FAT_ATTR_DIRECTORY);
+
+    /* and the ".." entry */
+    rc = add_dir_entry(newdir, &dummyfile, "..", true, true);
+    if (rc < 0)
+        return rc * 10 - 3;
+
+    /* The root cluster is cluster 0 in the ".." entry */
+    if(dir->file.firstcluster == fat_bpb.bpb_rootclus)
+        dummyfile.firstcluster = 0;
+    else
+        dummyfile.firstcluster = dir->file.firstcluster;
+    update_short_entry(&dummyfile, 0, FAT_ATTR_DIRECTORY);
+    
+    /* Set the firstcluster field in the direntry */
+    update_short_entry(&newdir->file, 0, FAT_ATTR_DIRECTORY);
+    
+    rc = flush_fat();
+    if (rc < 0)
+        return rc * 10 - 4;
 
     return rc;
 }
@@ -1487,7 +1545,7 @@ int fat_rename(struct fat_file* file,
         return rc * 10 - 2;
 
     /* create new name */
-    rc = add_dir_entry(&dir, &newfile, newname);
+    rc = add_dir_entry(&dir, &newfile, newname, false, false);
     if (rc < 0)
         return rc * 10 - 3;
 

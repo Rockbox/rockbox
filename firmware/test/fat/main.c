@@ -486,6 +486,21 @@ int dbg_trunc(char* name, int size)
     return close(fd);
 }
 
+int dbg_mkdir(char* name)
+{
+    char text[BUFSIZE+1];
+    int i;
+    int fd;
+    int x=0;
+    bool stop = false;
+
+    fd = mkdir(name);
+    if (fd<0) {
+        DEBUGF("Failed creating directory\n");
+        return -1;
+    }
+}
+
 int dbg_cmd(int argc, char *argv[])
 {
     char* cmd = NULL;
@@ -574,6 +589,13 @@ int dbg_cmd(int argc, char *argv[])
                 return dbg_chkfile(arg1, atoi(arg2));
             else
                 return dbg_chkfile(arg1, 0);
+        }
+    }
+
+    if (!strcasecmp(cmd, "mkdir"))
+    {
+        if (arg1) {
+            return dbg_mkdir(arg1);
         }
     }
 
