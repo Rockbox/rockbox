@@ -24,6 +24,15 @@
 #include "dir.h"
 #include "debug.h"
 
+/*
+  These functions provide a roughly POSIX-compatible file IO API.
+
+  Since the fat32 driver only manages sectors, we maintain a one-sector
+  cache for each open file. This way we can provide byte access without
+  having to re-read the sector each time. 
+  The penalty is the RAM used for the cache and slightly more complex code.
+*/
+
 #define MAX_OPEN_FILES 4
 
 struct filedesc {
