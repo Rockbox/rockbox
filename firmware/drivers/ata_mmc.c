@@ -253,6 +253,11 @@ void ata_enable(bool on)
         PBDR |= 0x2000; /* drive PB13 high */
         PBIOR |= 0x2000; /* output PB13 */
         PBIOR &= ~0x0800; /* high impedance for TxD1 GPIO */
+        PADR |= 0x0680; /* set all the selects+reset high (=inactive) */
+
+        PADR &= ~0x0080; /* assert reset */
+        sleep(1);
+        PADR |= 0x0080; /* de-assert reset */
     }
 }
 
@@ -270,18 +275,18 @@ int ata_init(void)
     led(false);
 
     /* Port setup */
-    PADR |= 0x1600; /* set all the selects high (=inactive) */
-    PAIOR |= 0x1600; /* make outputs for them */
+    PADR |= 0x0680; /* set all the selects + reset high (=inactive) */
+    PAIOR |= 0x1680; /* make outputs for them and the PA12 clock gate */
 
     if(adc_read(ADC_MMC_SWITCH) < 0x200)
     {   /* MMC inserted */
         PADR &= ~0x1000; /* clear PA12 */
-        PADR |= 0x0400; /* chip select internal flash */
+        PADR &= ~0x0400; /* chip select internal flash */
     }
     else
     {   /* no MMC, use internal memory */
         PADR |= 0x1000; /* set PA12 */
-        PADR |= 0x0200; /* chip select external flash */
+        PADR &= ~0x0200; /* chip select external flash */
     }
 
     sleeping = false;
