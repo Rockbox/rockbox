@@ -1632,7 +1632,7 @@ new:
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-voice: "Browse Firm-wares"
+voice: "Browse Firmwares"
 new:
 
 id: LANG_LANGUAGE
@@ -1656,7 +1656,7 @@ new:
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Browse Plug-Ins"
+voice: "Browse Plugins"
 new:
 
 id: LANG_CAR_ADAPTER_MODE
@@ -2616,7 +2616,7 @@ new:
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
-voice: "plug-in"
+voice: "plugin"
 new:
 
 id: VOICE_EXT_FONT
