@@ -268,10 +268,12 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
     {3, S_O(buffer_margin), 0, "antiskip", NULL },
     /* disk */
+#ifndef HAVE_MMC
 #ifdef HAVE_ATA_POWER_OFF
     {1, S_O(disk_poweroff), false, "disk poweroff", off_on },
 #endif
     {8, S_O(disk_spindown), 5, "disk spindown", NULL },
+#endif
     /* browser */
     {2, S_O(dirfilter), SHOW_MUSIC, 
         "show files", "all,supported,music,playlists" },

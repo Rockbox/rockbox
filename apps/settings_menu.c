@@ -773,6 +773,7 @@ static bool timeformat_set(void)
 }
 #endif
 
+#ifndef HAVE_MMC
 static bool spindown(void)
 {
     return set_int(str(LANG_SPINDOWN), "s", UNIT_SEC,
@@ -780,20 +781,21 @@ static bool spindown(void)
                    ata_spindown, 1, 3, 254 );
 }
 
-#if CONFIG_HWCODEC == MAS3507D
-static bool line_in(void)
-{
-    bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
-    dac_line_in(global_settings.line_in);
-    return rc;
-}
-#endif
-
 #ifdef HAVE_ATA_POWER_OFF
 static bool poweroff(void)
 {
     bool rc = set_bool(str(LANG_POWEROFF), &global_settings.disk_poweroff);
     ata_poweroff(global_settings.disk_poweroff);
+    return rc;
+}
+#endif /* HAVE_ATA_POWEROFF */
+#endif /* !HAVE_MMC */
+
+#if CONFIG_HWCODEC == MAS3507D
+static bool line_in(void)
+{
+    bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
+    dac_line_in(global_settings.line_in);
     return rc;
 }
 #endif
@@ -1250,6 +1252,7 @@ static bool battery_settings_menu(void)
     return result;
 }
 
+#ifndef HAVE_MMC
 static bool disk_settings_menu(void)
 {
     int m;
@@ -1268,6 +1271,7 @@ static bool disk_settings_menu(void)
     menu_exit(m);
     return result;
 }
+#endif /* !HAVE_MMC */
 
 #ifdef HAVE_RTC
 static bool time_settings_menu(void)
@@ -1332,7 +1336,9 @@ static bool system_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_BATTERY_MENU),     battery_settings_menu },
+#ifndef HAVE_MMC
         { ID2P(LANG_DISK_MENU),        disk_settings_menu     },
+#endif
 #ifdef HAVE_RTC
         { ID2P(LANG_TIME_MENU),        time_settings_menu     },
 #endif
