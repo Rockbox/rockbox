@@ -1,0 +1,18 @@
+$Id$
+
+In order for the project to run as smoothly as possible, it's best if all
+contributors adhere to a few simple conventions:
+
+- Write all code in C. Sometimes assembly is faster, but C is always more
+  readable and maintainable.
+
+- Write C code. Don't redefine the language. No new types, no C++isms or
+  Javaisms.
+
+- Variables and function names should be all lower case.
+  Preprocessor symbols should be all uppercase.
+
+- Use the brace placement style of your choice, but indent your code with
+  four spaces. Don't use TAB characters, as that will mess up code display in
+  CVS, printing, and a zillion other places.
+
