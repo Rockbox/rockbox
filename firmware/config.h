@@ -42,6 +42,5 @@
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   1
 
-#define CRT_DISPLAY 0 /* see debug.c debug() -> printf() */
 
 #endif
