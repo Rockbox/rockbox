@@ -33,20 +33,6 @@ void button_init()
 {
 }
 
-int button_set_repeat(int newmask)
-{
-    int oldmask = repeat_mask;
-    repeat_mask = newmask;
-    return oldmask;
-}
-
-int button_set_release(int newmask)
-{
-    int oldmask = release_mask;
-    release_mask = newmask;
-    return oldmask;
-}
-
 /*
  * Translate X keys to Recorder keys
  *
@@ -213,4 +199,13 @@ int button_get(bool block)
       sim_sleep(1);
 
     return bits;
+}
+
+int button_status(void)
+{
+    return get_raw_button();
+}
+
+void button_clear_queue(void)
+{
 }

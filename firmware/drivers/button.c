@@ -421,3 +421,13 @@ int button_add(unsigned int button)
     return 1;
 }
 #endif
+
+int button_status(void)
+{
+    return button_read();
+}
+
+void button_clear_queue(void)
+{
+    queue_empty(&button_queue);
+}

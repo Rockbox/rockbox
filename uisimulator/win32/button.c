@@ -36,13 +36,14 @@
 
 struct event_queue button_queue;
 
+static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
+
 void button_event(int key, bool pressed)
 {
     bool post = false;
     int new_btn = 0;
     int diff = 0;
     static int count = 0;
-    static int btn = 0;     /* Hopefully keeps track of currently pressed keys... */
     static int lastbtn;
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
@@ -180,6 +181,11 @@ void button_event(int key, bool pressed)
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
 
+int button_status(void)
+{
+    return btn;
+}
+   
 void button_init(void)
 {
 }
@@ -203,3 +209,8 @@ int button_get_w_tmo(int ticks)
     queue_wait_w_tmo(&button_queue, &ev, ticks);
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 } 
+
+void button_clear_queue(void)
+{
+    queue_empty(&button_queue);
+}

@@ -289,6 +289,8 @@ struct plugin_api {
 #endif
     bool (*settings_parseline)(char* line, char** name, char** value);
     int (*strcmp)(const char *, const char *);
+    int (*button_status)(void);
+    void (*button_clear_queue)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */

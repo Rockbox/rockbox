@@ -253,6 +253,8 @@ static const struct plugin_api rockbox_api = {
 #endif
     settings_parseline,
     strcmp,
+    button_status,
+    button_clear_queue,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -332,7 +334,10 @@ int plugin_load(char* plugin, void* parameter)
 
     plugin_loaded = true;
     rc = plugin_start((struct plugin_api*) &rockbox_api, parameter);
-         /* explicitly casting the pointer here to avoid touching every plugin. */
+    /* explicitly casting the pointer here to avoid touching every plugin. */
+
+    button_clear_queue();
+    
     plugin_loaded = false;
 
     switch (rc) {
