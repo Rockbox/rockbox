@@ -18,23 +18,24 @@ volume                 (0 - 100)
 bass                   (-15 - 15)
 treble                 (-15 - 15)
 balance                (-100 - 100)
+channels               (stereo, mono, mono left, mono right)
 
 shuffle                (on, off)
 repeat                 (off, all, one)
 play selected          (on, off)
-resume                 (off, ask, on)
-scan min step          (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25) [seconds]
+resume                 (off, ask, ask once, on)
+scan min step          (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 45, 60) [seconds]
 scan accel             (0 - 15) [double scan speed every X seconds]
 antiskip               (0 - 7) [seconds]
 volume fade            (on, off)
 
 sort case              (on, off)
-show files             (all, supported, music)
+show files             (all, supported, music, playlists)
 follow playlist        (on, off)
 
 scroll speed           (1 - 10)  [Hz]
 start delay            (0 - 250) [1/10s]
-scroll step            (1 - 112) [pixel]
+scroll step            (1 - 112) [pixels]
 bidir limit            (0 - 200) [% of screen width]
 contrast               (0 - 63)
 backlight timeout      (off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
@@ -42,10 +43,12 @@ backlight timeout      (off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 backlight when plugged (on, off)
 
 disk spindown          (3 - 254) [seconds]
-disk poweroff          (on, off)
 battery capacity       (1500 - 2400) [mAh]
 idle poweroff          (off, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                         10, 15, 30, 45, 60) [minutes]
+
+lang                   (/path/filename.lng)
+wps                    (/path/filename.wps)
 
 Recorder-specific settings (allowed values) [unit]
 ---------------------------------------------------
@@ -66,12 +69,15 @@ peak meter dbfs        (on, off) (on = dbfs, off = linear)
 peak meter min         (0 - 89) [dB] or (0 - 100) [%]
 peak meter max         (0 - 89) [dB] or (0 - 100) [%]
 
+statusbar              (on, off)
+scrollbar              (on, off)
 volume display         (graphic, numeric)
 battery display        (graphic, numeric)
 time format            (12hour, 24hour)
 
 deep discharge         (on, off)
 trickle charge         (on, off)
+disk poweroff          (on, off)
 
 rec quality            (0 - 7) (0=smallest size, 7=highest quality)
 rec frequency          (48, 44, 32, 24, 22, 16) [kHz]

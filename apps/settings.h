@@ -171,6 +171,7 @@ bool set_option(char* string, int* variable, char* options[],
 bool set_int(char* string, char* unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);
+void set_file(char* filename, char* setting, int maxlen);
 
 /* global settings */
 extern struct user_settings global_settings;

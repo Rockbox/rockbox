@@ -762,6 +762,35 @@ static bool settings_parseline(char* line, char** name, char** value)
     return true;
 }
 
+void set_file(char* filename, char* setting, int maxlen)
+{
+    char* fptr = strrchr(filename,'/');
+    int len;
+    int extlen = 0;
+    char* ptr;
+
+    if (!fptr)
+        return;
+
+    *fptr = 0;
+    fptr++;
+
+    len = strlen(fptr);
+    ptr = fptr + len;
+    while (*ptr != '.') {
+        extlen++;
+        ptr--;
+    }
+        
+    if (strcmp(ROCKBOX_DIR, filename) || (len-extlen > maxlen))
+        return;
+        
+    strncpy(setting, fptr, len-extlen);
+    setting[len-extlen]=0;
+
+    settings_save();
+}
+
 static void set_sound(char* value, int type, int* setting)
 {
     int num = atoi(value);
@@ -842,12 +871,20 @@ bool settings_load_config(char* file)
             set_sound(value, SOUND_TREBLE, &global_settings.treble);
         else if (!strcasecmp(name, "balance"))
             set_sound(value, SOUND_BALANCE, &global_settings.balance);
-        else if (!strcasecmp(name, "channels"))
-            set_sound(value, SOUND_CHANNELS, &global_settings.channel_config);
-        else if (!strcasecmp(name, "wps"))
-            strncpy(global_settings.wps_file, value, MAX_FILENAME);
-        else if (!strcasecmp(name, "lang"))
-            strncpy(global_settings.lang_file, value, MAX_FILENAME);
+        else if (!strcasecmp(name, "channels")) {
+            static char* options[] = {
+                "stereo","mono","mono left","mono right"};
+            set_cfg_option(&global_settings.channel_config, value,
+                           options, 4);
+        }
+        else if (!strcasecmp(name, "wps")) {
+            if (wps_load(value,true))
+                set_file(value, global_settings.wps_file, MAX_FILENAME);
+        }
+        else if (!strcasecmp(name, "lang")) {
+            if (!lang_load(value))
+                set_file(value, global_settings.lang_file, MAX_FILENAME);
+        }
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font"))
             strncpy(global_settings.font_file, value, MAX_FILENAME);
@@ -884,25 +921,6 @@ bool settings_load_config(char* file)
             set_cfg_int(&global_settings.peak_meter_max, value, 0, 100);
         else if (!strcasecmp(name, "peak meter busy"))
             set_cfg_bool(&global_settings.peak_meter_performance, value);
-#endif
-        else if (!strcasecmp(name, "shuffle"))
-            set_cfg_bool(&global_settings.playlist_shuffle, value);
-        else if (!strcasecmp(name, "repeat")) {
-            static char* options[] = {"off", "all", "one"};
-            set_cfg_option(&global_settings.repeat_mode, value, options, 3);
-        }
-        else if (!strcasecmp(name, "resume"))
-            set_cfg_int(&global_settings.resume, value, 0, 3);
-        else if (!strcasecmp(name, "sort case"))
-            set_cfg_bool(&global_settings.sort_case, value);
-        else if (!strcasecmp(name, "show files")) {
-            static char* options[] = {"all", "supported","music"};
-            set_cfg_option(&global_settings.dirfilter, value, options, 3);
-        }
-        else if (!strcasecmp(name, "follow playlist"))
-            set_cfg_bool(&global_settings.browse_current, value);
-        else if (!strcasecmp(name, "play selected"))
-            set_cfg_bool(&global_settings.play_selected, value);
         else if (!strcasecmp(name, "volume display")) {
             static char* options[] = {"graphic", "numeric"};
             set_cfg_option(&global_settings.volume_type, value, options, 2);
@@ -915,21 +933,43 @@ bool settings_load_config(char* file)
             static char* options[] = {"24hour", "12hour"};
             set_cfg_option(&global_settings.timeformat, value, options, 2);
         }
+        else if (!strcasecmp(name, "scrollbar"))
+            set_cfg_bool(&global_settings.scrollbar, value);
+#endif
+        else if (!strcasecmp(name, "shuffle"))
+            set_cfg_bool(&global_settings.playlist_shuffle, value);
+        else if (!strcasecmp(name, "repeat")) {
+            static char* options[] = {"off", "all", "one"};
+            set_cfg_option(&global_settings.repeat_mode, value, options, 3);
+        }
+        else if (!strcasecmp(name, "resume")) {
+            static char* options[] = {"off", "ask", "ask once", "on"};
+            set_cfg_option(&global_settings.resume, value, options, 4);
+        }
+        else if (!strcasecmp(name, "sort case"))
+            set_cfg_bool(&global_settings.sort_case, value);
+        else if (!strcasecmp(name, "show files")) {
+            static char* options[] = {"all", "supported","music", "playlists"};
+            set_cfg_option(&global_settings.dirfilter, value, options, 4);
+        }
+        else if (!strcasecmp(name, "follow playlist"))
+            set_cfg_bool(&global_settings.browse_current, value);
+        else if (!strcasecmp(name, "play selected"))
+            set_cfg_bool(&global_settings.play_selected, value);
         else if (!strcasecmp(name, "contrast"))
             set_cfg_int(&global_settings.contrast, value,
                         0, MAX_CONTRAST_SETTING);
-        else if (!strcasecmp(name, "scrollbar"))
-            set_cfg_bool(&global_settings.scrollbar, value);
         else if (!strcasecmp(name, "scroll speed"))
             set_cfg_int(&global_settings.scroll_speed, value, 1, 10);
         else if (!strcasecmp(name, "scan min step")) {
             static char* options[] =
-                {"1","2","3","4","5","6","8","10","15","20","25"};
+                {"1","2","3","4","5","6","8","10",
+                 "15","20","25","30","45","60"};
             set_cfg_option(&global_settings.ff_rewind_min_step, value,
-                           options, 11);
+                           options, 14);
         }
         else if (!strcasecmp(name, "scan accel"))
-            set_cfg_int(&global_settings.ff_rewind_min_step, value, 0, 15);
+            set_cfg_int(&global_settings.ff_rewind_accel, value, 0, 15);
         else if (!strcasecmp(name, "scroll delay"))
             set_cfg_int(&global_settings.scroll_delay, value, 0, 250);
         else if (!strcasecmp(name, "backlight timeout")) {
@@ -977,8 +1017,11 @@ bool settings_load_config(char* file)
             set_cfg_option(&global_settings.rec_channels, value, options, 2);
         }
 #endif
-        else if (!strcasecmp(name, "poweroff"))
-            set_cfg_int(&global_settings.poweroff, value, 0, 15);
+        else if (!strcasecmp(name, "idle poweroff")) {
+            static char* options[] = {"off","1","2","3","4","5","6","7","8",
+                                      "9","10","15","30","45","60"};
+            set_cfg_option(&global_settings.poweroff, value, options, 15);
+        }
         else if (!strcasecmp(name, "battery capacity"))
             set_cfg_int(&global_settings.battery_capacity, value,
                         1500, BATTERY_CAPACITY_MAX);
