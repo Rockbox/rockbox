@@ -117,29 +117,25 @@ static int showdir(char *path, int start)
 #endif
 
     for ( i=start; i < start+TREE_MAX_ON_SCREEN; i++ ) {
-        if ( i < filesindir ) {
-            int len = strlen(buffer[i].name);
+        int len = strlen(buffer[i].name);
 
 #ifdef HAVE_LCD_BITMAP
-            if ( buffer[i].file )
-                icon_type=File;
-            else
-                icon_type=Folder;
-            lcd_bitmap(bitmap_icons_6x8[icon_type], 6, MARGIN_Y+i*LINE_HEIGTH, 6, 
-                       8, true);
+        if ( buffer[i].file )
+            icon_type=File;
+        else
+            icon_type=Folder;
+        lcd_bitmap(bitmap_icons_6x8[icon_type], 6, MARGIN_Y+i*LINE_HEIGTH, 6, 
+                   8, true);
 #endif
 
-            if(len < TREE_MAX_LEN_DISPLAY)
-                lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
-            else {
-                char storage = buffer[i].name[TREE_MAX_LEN_DISPLAY];
-                buffer[i].name[TREE_MAX_LEN_DISPLAY]=0;
-                lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
-                buffer[i].name[TREE_MAX_LEN_DISPLAY]=storage;
-            }
+        if(len < TREE_MAX_LEN_DISPLAY)
+            lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
+        else {
+            char storage = buffer[i].name[TREE_MAX_LEN_DISPLAY];
+            buffer[i].name[TREE_MAX_LEN_DISPLAY]=0;
+            lcd_puts(LINE_X, LINE_Y+i-start, buffer[i].name);
+            buffer[i].name[TREE_MAX_LEN_DISPLAY]=storage;
         }
-        else
-            lcd_puts(LINE_X, LINE_Y+i-start,"                 ");
     }
 
     return filesindir;
@@ -176,13 +172,7 @@ bool dirbrowse(char *root)
 #endif
 
     while(1) {
-        int key = button_get();
-
-        if(!key) {
-            sleep(1);
-            continue;
-        }
-        switch(key) {
+        switch(button_get(true)) {
 #if defined(SIMULATOR) && defined(HAVE_RECODER_KEYPAD)
             case BUTTON_OFF:
                 return false;
