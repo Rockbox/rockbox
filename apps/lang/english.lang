@@ -162,7 +162,7 @@ eng: "Is Battery Low?"
 new:
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: used in set_time()
 eng: "ON To Set"
 new:
 
@@ -1084,6 +1084,7 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 new:
+
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
@@ -1395,7 +1396,7 @@ eng: "Loaded"
 new: 
 
 id: LANG_FADE_ON_STOP
-decs: options menu to set fade on stop or pause
+desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 new:
 

@@ -151,7 +151,7 @@ eng: "Is battery low?"
 new: "Está a bat. baixa?"
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: used in set_time()
 eng: "ON to set"
 new: "ON para mudar"
 

@@ -162,7 +162,7 @@ eng: "Is battery low?"
 new: "Slabe baterie?"
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: used in set_time()
 eng: "ON to set"
 new: "ON - ustaw"
 
@@ -1080,6 +1080,7 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum of range"
 new: "Zakres maksimum"
+
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"

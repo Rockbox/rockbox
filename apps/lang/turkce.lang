@@ -149,7 +149,7 @@ eng: "Is battery low?"
 new: "Pil zayif mi?"
  
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: used in set_time()
 eng: "ON to set"
 new: "Ayar icin ON"
  
