@@ -19,8 +19,10 @@
 
 #ifndef _FILE_H_
 
+#ifndef __MINGW32__
 #include <io.h>
 #include <fcntl.h>
+#endif
 
 int win32_rename(char *oldpath, char *newpath);
 int win32_filesize(int fd);
