@@ -191,8 +191,8 @@ struct plugin_api {
     void (*sleep)(int ticks);
     void (*yield)(void);
     long* current_tick;
-    int (*default_event_handler)(long event);
-    int (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
+    long (*default_event_handler)(long event);
+    long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     int (*create_thread)(void* function, void* stack, int stack_size, const char *name);
     void (*remove_thread)(int threadnum);
     void (*reset_poweroff_timer)(void);
