@@ -573,6 +573,13 @@ int lseek(int fd, int offset, int whence)
                 return rc * 10 - 6;
             }
             file->cacheoffset = sectoroffset;
+
+            /* seek back to current sector */
+            rc = fat_seek(&(file->fatfile), newsector);
+            if ( rc < 0 ) {
+                errno = EIO;
+                return rc * 10 - 7;
+            }
         }
         else
             file->cacheoffset = -1;
