@@ -100,15 +100,18 @@ for(@hfile) {
     print HFILE "    $_,\n";
 }
 
-print HFILE "   /* --- below this follows voice-only strings --- */\n",
-    "    VOICEONLY_DELIMITER = 0x8000,\n";
+print HFILE <<MOO
+    LANG_LAST_INDEX_IN_ARRAY, /* this is not a string, this is a marker */
+    /* --- below this follows voice-only strings --- */
+    VOICEONLY_DELIMITER = 0x8000,
+MOO
+    ;
 
 for(@vfile) {
     print HFILE "    $_,\n";
 }
 
 print HFILE <<MOO
-    LANG_LAST_INDEX_IN_ARRAY /* this is not a string, this is a marker */
 };
 /* end of generated enum list */
 MOO
