@@ -28,6 +28,7 @@
 <a href="http://www.uwe-freese.de/rockbox/rtc_alarm_en.html">
 power-on from the RTC alarm</a>.
 <li><a href="http://www.geocities.com/raichea/">Steve Russell's PIC-based remote control</a>
+<li><a href="http://www.angelfire.com/trek/archos/">Chris Halsall's MMJB20 page</a> with disassembly instructions useful for FM and V2 owners.
 </ul>
 
 <p><img src="esd.jpg">
