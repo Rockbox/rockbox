@@ -71,7 +71,7 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
-#define CONFIG_BLOCK_VERSION 13
+#define CONFIG_BLOCK_VERSION 14
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -165,8 +165,8 @@ static struct bit_entry rtc_bits[] =
     {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
 #ifdef HAVE_MAS3587F
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
-    {7, S_O(bass_boost), 0, "bass boost", NULL }, /* 0...100 */
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
+    {1, S_O(superbass), false, "superbass", off_on },
 #endif
     {3, S_O(channel_config), 6, "channels", 
         "stereo,stereo narrow,mono,mono left,mono right,karaoke,stereo wide" },
@@ -325,7 +325,11 @@ static struct bit_entry hd_bits[] =
     /* If values are just added to the end, no need to bump the version. */
     {2, S_O(sort_file), 0, "sort files", "alpha,oldest,newest,type" },
     {2, S_O(sort_dir), 0, "sort dirs", "alpha,oldest,newest" },
-
+    {7, S_O(mdb_strength), 0, "mdb strength", NULL},
+    {7, S_O(mdb_harmonics), 0, "mdb harmonics", NULL},
+    {9, S_O(mdb_center), 0, "mdb center", NULL},
+    {9, S_O(mdb_shape), 0, "mdb shape", NULL},
+    {1, S_O(mdb_enable), 0, "mdb enable", off_on},
 
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
 };
@@ -667,10 +671,8 @@ void settings_apply_pm_range(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-void settings_apply(void)
+void sound_settings_apply(void)
 {
-    char buf[64];
-
     mpeg_sound_set(SOUND_BASS, global_settings.bass);
     mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
@@ -678,9 +680,21 @@ void settings_apply(void)
     mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
 #ifdef HAVE_MAS3587F
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
-    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
+    mpeg_sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
+    mpeg_sound_set(SOUND_MDB_HARMONICS, global_settings.mdb_harmonics);
+    mpeg_sound_set(SOUND_MDB_CENTER, global_settings.mdb_center);
+    mpeg_sound_set(SOUND_MDB_SHAPE, global_settings.mdb_shape);
+    mpeg_sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
+    mpeg_sound_set(SOUND_SUPERBASS, global_settings.superbass);
 #endif
+}
+
+void settings_apply(void)
+{
+    char buf[64];
+
+    sound_settings_apply();
 
     mpeg_set_buffer_margin(global_settings.buffer_margin);
     
@@ -1207,9 +1221,14 @@ void settings_reset(void) {
     global_settings.bass        = mpeg_sound_default(SOUND_BASS);
     global_settings.treble      = mpeg_sound_default(SOUND_TREBLE);
     global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
-    global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
     global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
+    global_settings.mdb_strength = mpeg_sound_default(SOUND_MDB_STRENGTH);
+    global_settings.mdb_harmonics = mpeg_sound_default(SOUND_MDB_HARMONICS);
+    global_settings.mdb_center = mpeg_sound_default(SOUND_MDB_CENTER);
+    global_settings.mdb_shape = mpeg_sound_default(SOUND_MDB_SHAPE);
+    global_settings.mdb_enable = mpeg_sound_default(SOUND_MDB_ENABLE);
+    global_settings.superbass = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.contrast    = lcd_default_contrast();
     global_settings.wps_file[0] = '\0';
     global_settings.font_file[0] = '\0';

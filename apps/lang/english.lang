@@ -326,9 +326,9 @@ voice: "Loudness"
 new:
 
 id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-voice: "Bass Boost"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_DECAY
@@ -2756,4 +2756,40 @@ id: LANG_FM_BUTTONBAR_ACTION
 desc:  in radio screen
 eng: "Action"
 voice: ""
+new:
+
+id: LANG_MDB_STRENGTH
+desc:  in sound settings
+eng: "MDB Strength"
+voice: "MDB Strength"
+new:
+
+id: LANG_MDB_HARMONICS
+desc:  in sound settings
+eng: "MDB Harmonics"
+voice: "MDB Harmonics"
+new:
+
+id: LANG_MDB_CENTER
+desc:  in sound settings
+eng: "MDB Center frequency"
+voice: "MDB Center frequency"
+new:
+
+id: LANG_MDB_SHAPE
+desc:  in sound settings
+eng: "MDB Shape"
+voice: "MDB Shape"
+new:
+
+id: LANG_MDB_ENABLE
+desc:  in sound settings
+eng: "MDB Enable"
+voice: "MDB Enable"
+new:
+
+id: LANG_SUPERBASS
+desc:  in sound settings
+eng: "Super bass"
+voice: "Super bass"
 new:

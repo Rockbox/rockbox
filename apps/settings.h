@@ -71,9 +71,14 @@ struct user_settings
     int bass;       /* bass eq:              0-100 0=off   100=max           */
     int treble;     /* treble eq:            0-100 0=low   100=high          */
     int loudness;   /* loudness eq:          0-100 0=off   100=max           */
-    int bass_boost; /* bass boost eq:        0-100 0=off   100=max           */
     int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
     int channel_config;  /* Stereo, Mono, Mono left, Mono right */
+    int mdb_strength; /* 0-127dB */
+    int mdb_harmonics; /* 0-100% */
+    int mdb_center; /* 20-300Hz */
+    int mdb_shape; /* 50-300Hz */
+    bool mdb_enable; /* true/false */
+    bool superbass; /* true/false */
 
     int rec_quality;   /* 0-7 */
     int rec_source;    /* 0=mic, 1=line, 2=S/PDIF */
@@ -226,6 +231,7 @@ struct opt_items {
 int settings_save(void);
 void settings_load(int which);
 void settings_reset(void);
+void sound_settings_apply(void);
 void settings_apply(void);
 void settings_apply_pm_range(void);
 void settings_display(void);

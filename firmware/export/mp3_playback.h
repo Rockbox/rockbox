@@ -26,7 +26,10 @@
 
 /* functions formerly in mpeg.c */
 void mp3_init(int volume, int bass, int treble, int balance,
-               int loudness, int bass_boost, int avc, int channel_config);
+              int loudness, int avc, int channel_config,
+              int mdb_strength, int mdb_harmonics,
+              int mdb_center, int mdb_shape, bool mdb_enable,
+              bool superbass);
 void mpeg_sound_set(int setting, int value);
 int mpeg_sound_min(int setting);
 int mpeg_sound_max(int setting);
@@ -35,6 +38,7 @@ void mpeg_sound_channel_config(int configuration);
 int mpeg_val2phys(int setting, int value);
 char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
+int mpeg_sound_steps(int setting);
 #if defined(HAVE_MAS3587F) || defined(SIMULATOR)
 void mpeg_set_pitch(int percent);
 #endif
@@ -63,13 +67,18 @@ unsigned char* mp3_get_pos(void);
 #define SOUND_TREBLE 2
 #define SOUND_BALANCE 3
 #define SOUND_LOUDNESS 4
-#define SOUND_SUPERBASS 5
-#define SOUND_AVC 6
-#define SOUND_CHANNELS 7
-#define SOUND_LEFT_GAIN 8
-#define SOUND_RIGHT_GAIN 9
-#define SOUND_MIC_GAIN 10
-#define SOUND_NUMSETTINGS 11
+#define SOUND_AVC 5
+#define SOUND_CHANNELS 6
+#define SOUND_LEFT_GAIN 7
+#define SOUND_RIGHT_GAIN 8
+#define SOUND_MIC_GAIN 9
+#define SOUND_MDB_STRENGTH 10
+#define SOUND_MDB_HARMONICS 11
+#define SOUND_MDB_CENTER 12
+#define SOUND_MDB_SHAPE 13
+#define SOUND_MDB_ENABLE 14
+#define SOUND_SUPERBASS 15
+#define SOUND_NUMSETTINGS 16
 
 #define MPEG_SOUND_STEREO 0
 #define MPEG_SOUND_STEREO_NARROW 1

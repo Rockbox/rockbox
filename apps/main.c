@@ -89,9 +89,14 @@ void init(void)
               global_settings.treble,
               global_settings.balance,
               global_settings.loudness,
-              global_settings.bass_boost,
               global_settings.avc,
-              global_settings.channel_config );
+              global_settings.channel_config,
+              global_settings.mdb_strength,
+              global_settings.mdb_harmonics,
+              global_settings.mdb_center,
+              global_settings.mdb_shape,
+              global_settings.mdb_enable,
+              global_settings.superbass);
     mpeg_init();
     while (button_get(false) != 0)
       ; /* Empty the keyboard buffer */
@@ -227,9 +232,14 @@ void init(void)
               global_settings.treble,
               global_settings.balance,
               global_settings.loudness,
-              global_settings.bass_boost,
               global_settings.avc,
-              global_settings.channel_config );
+              global_settings.channel_config,
+              global_settings.mdb_strength,
+              global_settings.mdb_harmonics,
+              global_settings.mdb_center,
+              global_settings.mdb_shape,
+              global_settings.mdb_enable,
+              global_settings.superbass);
     mpeg_init();
     talk_init();
 

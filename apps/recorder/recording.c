@@ -606,14 +606,7 @@ bool recording_screen(void)
 
     mpeg_init_playback();
 
-    mpeg_sound_channel_config(global_settings.channel_config);
-    mpeg_sound_set(SOUND_BASS, global_settings.bass);
-    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
-    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
-    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
-    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
-    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+    sound_settings_apply();
 
     lcd_setfont(FONT_UI);
 

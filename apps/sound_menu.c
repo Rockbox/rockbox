@@ -55,9 +55,11 @@ bool set_sound(char* string,
     char* unit;
     char str[32];
     int talkunit = UNIT_INT;
+    int steps;
 
     unit = mpeg_sound_unit(setting);
     numdec = mpeg_sound_numdecimals(setting);
+    steps = mpeg_sound_steps(setting);
     min = mpeg_sound_min(setting);
     max = mpeg_sound_max(setting);
     if (*unit == 'd') /* crude reconstruction */
@@ -103,7 +105,7 @@ bool set_sound(char* string,
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
-                (*variable)++;
+                (*variable)+=steps;
                 if(*variable > max )
                     *variable = max;
                 changed = true;
@@ -116,7 +118,7 @@ bool set_sound(char* string,
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
-                (*variable)--;
+                (*variable)-=steps;
                 if(*variable < min )
                     *variable = min;
                 changed = true;
@@ -176,10 +178,56 @@ static bool loudness(void)
                      SOUND_LOUDNESS);
 }
 
-static bool bass_boost(void)
+static bool mdb_strength(void)
 {
-    return set_sound(str(LANG_BBOOST), &global_settings.bass_boost, 
-                     SOUND_SUPERBASS);
+    return set_sound(str(LANG_MDB_STRENGTH), &global_settings.mdb_strength, 
+                     SOUND_MDB_STRENGTH);
+}
+
+static bool mdb_harmonics(void)
+{
+    return set_sound(str(LANG_MDB_HARMONICS), &global_settings.mdb_harmonics, 
+                     SOUND_MDB_HARMONICS);
+}
+
+static bool mdb_center(void)
+{
+    return set_sound(str(LANG_MDB_CENTER), &global_settings.mdb_center, 
+                     SOUND_MDB_CENTER);
+}
+
+static bool mdb_shape(void)
+{
+    return set_sound(str(LANG_MDB_SHAPE), &global_settings.mdb_shape, 
+                     SOUND_MDB_SHAPE);
+}
+
+static void set_mdb_enable(bool value)
+{
+    mpeg_sound_set(SOUND_MDB_ENABLE, (int)value);
+}
+
+static bool mdb_enable(void)
+{
+    return set_bool_options(str(LANG_MDB_ENABLE),
+                            &global_settings.mdb_enable, 
+                            STR(LANG_SET_BOOL_YES), 
+                            STR(LANG_SET_BOOL_NO), 
+                            set_mdb_enable);
+}
+
+static void set_superbass(bool value)
+{
+    mpeg_sound_set(SOUND_SUPERBASS, (int)value);
+}
+
+static bool superbass(void)
+{
+    return set_bool_options(str(LANG_SUPERBASS),
+                            &global_settings.superbass, 
+                            STR(LANG_SET_BOOL_YES), 
+                            STR(LANG_SET_BOOL_NO), 
+                            set_superbass);
 }
 
 static void set_avc(int val)
@@ -363,8 +411,13 @@ bool sound_menu(void)
         { STR(LANG_CHANNEL_MENU), chanconf },
 #ifdef HAVE_MAS3587F
         { STR(LANG_LOUDNESS), loudness },
-        { STR(LANG_BBOOST), bass_boost },
-        { STR(LANG_AUTOVOL), avc }
+        { STR(LANG_AUTOVOL), avc },
+        { STR(LANG_SUPERBASS), superbass },
+        { STR(LANG_MDB_ENABLE), mdb_enable },
+        { STR(LANG_MDB_STRENGTH), mdb_strength },
+        { STR(LANG_MDB_HARMONICS), mdb_harmonics },
+        { STR(LANG_MDB_CENTER), mdb_center },
+        { STR(LANG_MDB_SHAPE), mdb_shape },
 #endif
     };
     

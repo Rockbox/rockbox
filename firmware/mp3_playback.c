@@ -68,12 +68,17 @@ static char *units[] =
     "dB",   /* Treble */
     "%",    /* Balance */
     "dB",   /* Loudness */
-    "%",    /* Bass boost */
     "",     /* AVC */
     "",     /* Channels */
     "dB",   /* Left gain */
     "dB",   /* Right gain */
     "dB",   /* Mic gain */
+    "dB",   /* MDB Strength */
+    "%",    /* MDB Harmonics */
+    "Hz",   /* MDB Center */
+    "Hz",   /* MDB Shape */
+    "",     /* MDB Enable */
+    "",     /* Super bass */
 };
 
 static int numdecimals[] =
@@ -83,12 +88,37 @@ static int numdecimals[] =
     0,    /* Treble */
     0,    /* Balance */
     0,    /* Loudness */
-    0,    /* Bass boost */
     0,    /* AVC */
     0,    /* Channels */
     1,    /* Left gain */
     1,    /* Right gain */
     1,    /* Mic gain */
+    0,    /* MDB Strength */
+    0,    /* MDB Harmonics */
+    0,    /* MDB Center */
+    0,    /* MDB Shape */
+    0,    /* MDB Enable */
+    0,    /* Super bass */
+};
+
+static int steps[] =
+{
+    1,    /* Volume */
+    1,    /* Bass */
+    1,    /* Treble */
+    2,    /* Balance */
+    1,    /* Loudness */
+    1,    /* AVC */
+    1,    /* Channels */
+    1,    /* Left gain */
+    1,    /* Right gain */
+    1,    /* Mic gain */
+    1,    /* MDB Strength */
+    1,    /* MDB Harmonics */
+    10,   /* MDB Center */
+    10,   /* MDB Shape */
+    1,    /* MDB Enable */
+    1,    /* Super bass */
 };
 
 static int minval[] =
@@ -103,12 +133,17 @@ static int minval[] =
 #endif
     -100,  /* Balance */
     0,    /* Loudness */
-    0,    /* Bass boost */
     -1,   /* AVC */
     0,    /* Channels */
     0,    /* Left gain */
     0,    /* Right gain */
     0,    /* Mic gain */
+    0,    /* MDB Strength */
+    0,    /* MDB Harmonics */
+    20,   /* MDB Center */
+    50,   /* MDB Shape */
+    0,    /* MDB Enable */
+    0,    /* Super bass */
 };
 
 static int maxval[] =
@@ -123,12 +158,17 @@ static int maxval[] =
 #endif
     100,   /* Balance */
     17,   /* Loudness */
-    100,  /* Bass boost */
     4,    /* AVC */
     6,    /* Channels */
     15,   /* Left gain */
     15,   /* Right gain */
     15,   /* Mic gain */
+    127,  /* MDB Strength */
+    100,  /* MDB Harmonics */
+    300,  /* MDB Center */
+    300,  /* MDB Shape */
+    1,    /* MDB Enable */
+    1,    /* Super bass */
 };
 
 static int defaultval[] =
@@ -143,12 +183,17 @@ static int defaultval[] =
 #endif
     0,    /* Balance */
     0,    /* Loudness */
-    0,    /* Bass boost */
     0,    /* AVC */
     0,    /* Channels */
     8,    /* Left gain */
     8,    /* Right gain */
     2,    /* Mic gain */
+    50,   /* MDB Strength */
+    48,   /* MDB Harmonics */
+    60,   /* MDB Center */
+    90,   /* MDB Shape */
+    0,    /* MDB Enable */
+    0,    /* Super bass */
 };
 
 char *mpeg_sound_unit(int setting)
@@ -159,6 +204,11 @@ char *mpeg_sound_unit(int setting)
 int mpeg_sound_numdecimals(int setting)
 {
     return numdecimals[setting];
+}
+
+int mpeg_sound_steps(int setting)
+{
+    return steps[setting];
 }
 
 int mpeg_sound_min(int setting)
@@ -566,6 +616,11 @@ void set_prescaled_volume(void)
 #endif /* HAVE_MAS3507D */
 #endif /* !SIMULATOR */
 
+#ifdef HAVE_MAS3587F
+unsigned long mdb_shape_shadow = 0;
+unsigned long loudness_shadow = 0;
+#endif
+
 void mpeg_sound_set(int setting, int value)
 {
 #ifdef SIMULATOR
@@ -645,30 +700,10 @@ void mpeg_sound_set(int setting, int value)
             break;
             
 #ifdef HAVE_MAS3587F
-        case SOUND_SUPERBASS:
-            if (value) {
-                tmp = MAX(MIN(value * 127 / 100, 0x7f), 0);
-                mas_codec_writereg(MAS_REG_KMDB_STR, (tmp & 0xff) << 8);
-                tmp = 0x30; /* MDB_HAR: Space for experiment here */
-                mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0xff) << 8);
-                tmp = 60 / 10; /* calculate MDB_FC, 60hz - experiment here,
-                                  this would depend on the earphones...
-                                  perhaps make it tunable? */
-                mas_codec_writereg(MAS_REG_KMDB_FC, (tmp & 0xff) << 8);
-                tmp = (3 * tmp) / 2; /* calculate MDB_SHAPE */
-                mas_codec_writereg(MAS_REG_KMDB_SWITCH,
-                    ((tmp & 0xff) << 8) /* MDB_SHAPE */
-                    | 2);  /* MDB_SWITCH enable */
-            } else {
-                mas_codec_writereg(MAS_REG_KMDB_STR, 0);
-                mas_codec_writereg(MAS_REG_KMDB_HAR, 0);
-                mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0); /* MDB_SWITCH disable */
-            }
-            break;
-            
         case SOUND_LOUDNESS:
-            tmp = MAX(MIN(value * 4, 0x44), 0);
-            mas_codec_writereg(MAS_REG_KLOUDNESS, (tmp & 0xff) << 8);
+            loudness_shadow = (loudness_shadow & 0x04) |
+                (MAX(MIN(value * 4, 0x44), 0) << 8);
+            mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
             break;
             
         case SOUND_AVC:
@@ -695,7 +730,36 @@ void mpeg_sound_set(int setting, int value)
             }
             mas_codec_writereg(MAS_REG_KAVC, tmp);
             break;
-#endif
+
+        case SOUND_MDB_STRENGTH:
+            mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8);
+            break;
+          
+        case SOUND_MDB_HARMONICS:
+            tmp = value * 127 / 100;
+            mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0x7f) << 8);
+            break;
+          
+        case SOUND_MDB_CENTER:
+            mas_codec_writereg(MAS_REG_KMDB_FC, (value/10) << 8);
+            break;
+          
+        case SOUND_MDB_SHAPE:
+            mdb_shape_shadow = (mdb_shape_shadow & 0x02) | ((value/10) << 8);
+            mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+            break;
+          
+        case SOUND_MDB_ENABLE:
+            mdb_shape_shadow = (mdb_shape_shadow & ~0x02) | (value?2:0);
+            mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+            break;
+          
+        case SOUND_SUPERBASS:
+            loudness_shadow = (loudness_shadow & ~0x04) |
+                (value?4:0);
+            mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
+            break;
+#endif            
         case SOUND_CHANNELS:
             mpeg_sound_channel_config(value);
             break;
@@ -832,15 +896,36 @@ void mpeg_set_pitch(int pitch)
 #endif
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness, 
-    int bass_boost, int avc, int channel_config)
+              int avc, int channel_config,
+              int mdb_strength, int mdb_harmonics,
+              int mdb_center, int mdb_shape, bool mdb_enable,
+              bool superbass)
 {
 #ifdef SIMULATOR
-    volume = bass = treble = balance = loudness
-        = bass_boost = avc = channel_config;
+    (void)volume;
+    (void)bass;
+    (void)treble;
+    (void)balance;
+    (void)loudness;
+    (void)avc;
+    (void)channel_config;
+    (void)mdb_strength;
+    (void)mdb_harmonics;
+    (void)mdb_center;
+    (void)mdb_shape;
+    (void)mdb_enable;
+    (void)superbass;
 #else
 #ifdef HAVE_MAS3507D
     unsigned long val;
-    loudness = bass_boost = avc;
+    (void)loudness;
+    (void)avc;
+    (void)mdb_strength;
+    (void)mdb_harmonics;
+    (void)mdb_center;
+    (void)mdb_shape;
+    (void)mdb_enable;
+    (void)superbass;
 #endif
 
     setup_sci0();
@@ -929,8 +1014,13 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #ifdef HAVE_MAS3587F
     mpeg_sound_channel_config(channel_config);
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
-    mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
     mpeg_sound_set(SOUND_AVC, avc);
+    mpeg_sound_set(SOUND_MDB_STRENGTH, mdb_strength);
+    mpeg_sound_set(SOUND_MDB_HARMONICS, mdb_harmonics);
+    mpeg_sound_set(SOUND_MDB_CENTER, mdb_center);
+    mpeg_sound_set(SOUND_MDB_SHAPE, mdb_shape);
+    mpeg_sound_set(SOUND_MDB_ENABLE, mdb_enable);
+    mpeg_sound_set(SOUND_SUPERBASS, superbass);
 #endif
 #endif /* !SIMULATOR */
 
