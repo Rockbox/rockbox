@@ -16,8 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 /*
- * Archos Jukebox Recorder button functions
+ * Rockbox button functions
  */
 
 #include <stdlib.h>
@@ -36,9 +37,9 @@
 struct event_queue button_queue;
 
 static int lastbtn;   /* Last valid button status */
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 static int last_read; /* Last button status, for debouncing/filtering */
-static bool flipped; /* bottons can be flipped to match the LCD flip */
+#ifdef HAVE_LCD_BITMAP
+static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
 
 /* how often we check to see if a button is pressed */
@@ -74,9 +75,9 @@ static void button_tick(void)
     if(btn)
     {
         queue_post(&button_queue, btn, NULL);
-    }   
+    }
 #endif
-    
+
     /* only poll every X ticks */
     if ( ++tick >= POLL_FREQUENCY )
     {
@@ -120,8 +121,8 @@ static void button_tick(void)
                                which doesn't shut down easily with the OFF
                                key */
 #ifdef HAVE_SW_POWEROFF
-                            if(btn == BUTTON_OFF && !charger_inserted() &&
-                               repeat_count > POWEROFF_COUNT)
+                            if (btn == BUTTON_OFF && !charger_inserted() &&
+                                repeat_count > POWEROFF_COUNT)
                                 queue_post(&button_queue, SYS_POWEROFF, NULL);
 #endif
                         }
@@ -140,7 +141,7 @@ static void button_tick(void)
                 }
                 if ( post )
                 {
-                    if(repeat)
+                    if (repeat)
                         queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
                     else
                         queue_post(&button_queue, btn, NULL);
@@ -166,7 +167,8 @@ int button_get(bool block)
 {
     struct event ev;
 
-    if ( block || !queue_empty(&button_queue) ) {
+    if ( block || !queue_empty(&button_queue) ) 
+    {
         queue_wait(&button_queue, &ev);
         return ev.id;
     }
@@ -180,23 +182,40 @@ int button_get_w_tmo(int ticks)
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 }
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-void button_init()
+void button_init(void)
 {
-#ifndef SIMULATOR
+    /* hardware inits */
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
     /* Set GPIO37 as general purpose input */
     GPIO1_FUNCTION |= 0x00000020;
     GPIO1_ENABLE &= ~0x00000020;
-#endif
+#elif CONFIG_KEYPAD == RECORDER_PAD
+    /* Set PB4 and PB8 as input pins */
+    PBCR1 &= 0xfffc;  /* PB8MD = 00 */
+    PBCR2 &= 0xfcff;  /* PB4MD = 00 */
+    PBIOR &= ~0x0110; /* Inputs */
+#elif CONFIG_KEYPAD == PLAYER_PAD
+    /* set PA5 and PA11 as input pins */
+    PACR1 &= 0xff3f;  /* PA11MD = 00 */
+    PACR2 &= 0xfbff;  /* PA5MD = 0 */
+    PAIOR &= ~0x0820; /* Inputs */
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    /* nothing to initialize here */
+#endif /* CONFIG_KEYPAD */
+
     queue_init(&button_queue);
     lastbtn = 0;
     tick_add_task(button_tick);
     reset_poweroff_timer();
+
+#ifdef HAVE_LCD_BITMAP
     flipped = false;
+#endif
 }
 
+#ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
 /*
- * helper function to swap UP/DOWN, LEFT/RIGHT
+ * helper function to swap UP/DOWN, LEFT/RIGHT (and F1/F3 for Recorder)
  */
 static int button_flip(int button)
 {
@@ -204,7 +223,11 @@ static int button_flip(int button)
 
     newbutton = button & 
         ~(BUTTON_UP | BUTTON_DOWN
-        | BUTTON_LEFT | BUTTON_RIGHT);
+        | BUTTON_LEFT | BUTTON_RIGHT
+#if CONFIG_KEYPAD == RECORDER_PAD
+        | BUTTON_F1 | BUTTON_F3
+#endif
+        );
 
     if (button & BUTTON_UP)
         newbutton |= BUTTON_DOWN;
@@ -214,6 +237,12 @@ static int button_flip(int button)
         newbutton |= BUTTON_RIGHT;
     if (button & BUTTON_RIGHT)
         newbutton |= BUTTON_LEFT;
+#if CONFIG_KEYPAD == RECORDER_PAD
+    if (button & BUTTON_F1)
+        newbutton |= BUTTON_F3;
+    if (button & BUTTON_F3)
+        newbutton |= BUTTON_F1;
+#endif
 
     return newbutton;
 }
@@ -233,6 +262,75 @@ void button_set_flip(bool flip)
         set_irq_level(oldlevel);
     }
 }
+#endif /* HAVE_LCD_BITMAP */
+
+/* 
+ Archos hardware button hookup
+ =============================
+
+ Recorder / Recorder FM/V2
+ -------------------------
+ F1, F2, F3, UP:           connected to AN4 through a resistor network
+ DOWN, PLAY, LEFT, RIGHT:  likewise connected to AN5
+
+ The voltage on AN4/ AN5 depends on which keys (or key combo) is pressed
+ FM/V2 has PLAY and RIGHT switched compared to plain recorder
+
+ ON:     PB8, low active (plain recorder) / AN3, low active (fm/v2)
+ OFF:    PB4, low active (plain recorder) / AN2, high active (fm/v2)
+
+ Player
+ ------
+ LEFT:   AN0
+ MENU:   AN1
+ RIGHT:  AN2
+ PLAY:   AN3
+
+ STOP:   PA11
+ ON:     PA5
+ 
+ All buttons are low active
+
+ Ondio
+ -----
+ LEFT, RIGHT, UP, DOWN:    connected to AN4 through a resistor network
+
+ The voltage on AN4 depends on which keys (or key combo) is pressed
+
+ OPTION: AN2, high active (assigned as MENU)
+ ON/OFF: AN3, low active (assigned as OFF)
+
+*/
+
+#if CONFIG_KEYPAD == RECORDER_PAD
+
+#ifdef HAVE_FMADC
+/* FM Recorder super-special levels */
+#define LEVEL1        150
+#define LEVEL2        385
+#define LEVEL3        545
+#define LEVEL4        700
+#define ROW2_BUTTON1  BUTTON_PLAY
+#define ROW2_BUTTON3  BUTTON_RIGHT
+
+#else
+/* plain bog standard Recorder levels */
+#define LEVEL1        250
+#define LEVEL2        500
+#define LEVEL3        700
+#define LEVEL4        900
+#define ROW2_BUTTON1  BUTTON_RIGHT
+#define ROW2_BUTTON3  BUTTON_PLAY
+#endif /* HAVE_FMADC */
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+/* Ondio levels */
+#define LEVEL1        165
+#define LEVEL2        415
+#define LEVEL3        585
+#define LEVEL4        755
+
+#endif /* CONFIG_KEYPAD */
 
 /*
  * Get button pressed from hardware
@@ -244,175 +342,57 @@ static int button_read(void)
 
     int data;
 
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+
     data = adc_scan(0);
 
-    if(data < 0x80)
-        if(data < 0x30)
-            if(data < 0x18)
+    if (data < 0x80)
+        if (data < 0x30)
+            if (data < 0x18)
                 btn = BUTTON_SELECT;
             else
                 btn = BUTTON_UP;
         else
-            if(data < 0x50)
+            if (data < 0x50)
                 btn = BUTTON_LEFT;
             else
                 btn = BUTTON_DOWN;
     else
-        if(data < 0xb0)
-            if(data < 0xa0)
+        if (data < 0xb0)
+            if (data < 0xa0)
                 btn = BUTTON_RIGHT;
             else
                 btn = BUTTON_OFF;
         else
-            if(data < 0xd0)
+            if (data < 0xd0)
                 btn = BUTTON_MODE;
             else
-                if(data < 0xf0)
+                if (data < 0xf0)
                     btn = BUTTON_REC;
         
     data = GPIO1_READ;
     if ((data & 0x20) == 0)
         btn |= BUTTON_ON;
 
-
-    if (btn && flipped)
-        btn = button_flip(btn); /* swap upside down */
-
-    /* Filter the button status. It is only accepted if we get the same
-       status twice in a row. */
-    if(btn != last_read)
-        retval = lastbtn;
-    else
-        retval = btn;
-    last_read = btn;
-    
-    return retval;
-}
-
-bool button_hold(void)
-{
-    return (GPIO1_READ & 0x00000002)?true:false;
-}
-
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
-/* AJBR buttons are connected to the CPU as follows:
- *
- * ON and OFF are connected to separate port B input pins.
- *
- * F1, F2, F3, and UP are connected to the AN4 analog input, each through
- * a separate voltage divider.  The voltage on AN4 depends on which button
- * (or none, or a combination) is pressed.
- *
- * DOWN, PLAY, LEFT, and RIGHT are likewise connected to AN5. */
- 
-/* Button analog voltage levels */
 #ifdef HAVE_FMADC
-/* FM Recorder super-special levels */
-#define	LEVEL1		150
-#define	LEVEL2		385
-#define	LEVEL3		545
-#define	LEVEL4		700
-#else
-/* plain bog standard Recorder levels */
-#define	LEVEL1		250
-#define	LEVEL2		500
-#define	LEVEL3		700
-#define	LEVEL4		900
-#endif
-
-/*
- *Initialize buttons
- */
-void button_init()
-{
-#ifndef SIMULATOR
-    /* Set PB4 and PB8 as input pins */
-    PBCR1 &= 0xfffc; /* PB8MD = 00 */
-    PBCR2 &= 0xfcff; /* PB4MD = 00 */
-    PBIOR &= ~(PBDR_BTN_ON|PBDR_BTN_OFF); /* Inputs */
-#endif
-    queue_init(&button_queue);
-    lastbtn = 0;
-    tick_add_task(button_tick);
-    reset_poweroff_timer();
-    flipped = false;
-}
-
-
-/*
- * helper function to swap UP/DOWN, LEFT/RIGHT, F1/F3
- */
-static int button_flip(int button)
-{
-    int newbutton;
-
-    newbutton = button & 
-        ~(BUTTON_UP | BUTTON_DOWN
-        | BUTTON_LEFT | BUTTON_RIGHT 
-        | BUTTON_F1 | BUTTON_F3);
-
-    if (button & BUTTON_UP)
-        newbutton |= BUTTON_DOWN;
-    if (button & BUTTON_DOWN)
-        newbutton |= BUTTON_UP;
-    if (button & BUTTON_LEFT)
-        newbutton |= BUTTON_RIGHT;
-    if (button & BUTTON_RIGHT)
-        newbutton |= BUTTON_LEFT;
-    if (button & BUTTON_F1)
-        newbutton |= BUTTON_F3;
-    if (button & BUTTON_F3)
-        newbutton |= BUTTON_F1;
-
-    return newbutton;
-}
-
-
-/*
- * set the flip attribute
- * better only call this when the queue is empty
- */
-void button_set_flip(bool flip)
-{
-    if (flip != flipped) /* not the current setting */
-    {
-        /* avoid race condition with the button_tick() */
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        lastbtn = button_flip(lastbtn); 
-        flipped = flip;
-        set_irq_level(oldlevel);
-    }
-}
-
-/*
- * Get button pressed from hardware
- */
-static int button_read(void)
-{
-    int btn = BUTTON_NONE;
-    int retval;
-
-    int data;
-
-#ifdef HAVE_FMADC
-    /* TODO: use proper defines here, and not the numerics in the
-       function argument */
-    if ( adc_read(3) < 512 )
+    if ( adc_read(ADC_BUTTON_ON) < 512 )
         btn |= BUTTON_ON;
-    if ( adc_read(2) > 512 )
+    if ( adc_read(ADC_BUTTON_OFF) > 512 )
         btn |= BUTTON_OFF;
 #else
-    /* Check port B pins for ON and OFF */
+    /* check port B pins for ON and OFF */
     data = PBDR;
-    if ((data & PBDR_BTN_ON) == 0)
+    if ((data & 0x0100) == 0)
         btn |= BUTTON_ON;
-    else if ((data & PBDR_BTN_OFF) == 0)
+    if ((data & 0x0010) == 0)
         btn |= BUTTON_OFF;
 #endif
 
-    /* Check F1-3 and UP */
+    /* check F1..F3 and UP */
     data = adc_read(ADC_BUTTON_ROW1);
+
     if (data >= LEVEL4)
         btn |= BUTTON_F3;
     else if (data >= LEVEL3)
@@ -427,181 +407,68 @@ static int button_read(void)
        checks when UP is pressed. */
     if(!(btn & BUTTON_UP))
     {
-        /* Check DOWN, PLAY, LEFT, RIGHT */
+        /* check DOWN, PLAY, LEFT, RIGHT */
         data = adc_read(ADC_BUTTON_ROW2);
+    
         if (data >= LEVEL4)
             btn |= BUTTON_DOWN;
-        else if (data >= LEVEL3) {
-#ifdef HAVE_FMADC
-            btn |= BUTTON_RIGHT;
-#else
-            btn |= BUTTON_PLAY;
-#endif
-        }
+        else if (data >= LEVEL3)
+            btn |= ROW2_BUTTON3;
         else if (data >= LEVEL2)
             btn |= BUTTON_LEFT;
-        else if (data >= LEVEL1) {
-#ifdef HAVE_FMADC
-            btn |= BUTTON_PLAY;
-#else
-            btn |= BUTTON_RIGHT;
-#endif
-        }
+        else if (data >= LEVEL1)
+            btn |= ROW2_BUTTON1;
     }
-
-    if (btn && flipped)
-        btn = button_flip(btn); /* swap upside down */
-
-    /* Filter the button status. It is only accepted if we get the same
-       status twice in a row. */
-    if(btn != last_read)
-        retval = lastbtn;
-    else
-        retval = btn;
-    last_read = btn;
-    
-    return retval;
-}
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
-/* The player has two buttons on port pins:
-
-   STOP:  PA11
-   ON:    PA5
-
-   The rest are on analog inputs:
-   
-   LEFT:  AN0
-   MENU:  AN1
-   RIGHT: AN2
-   PLAY:  AN3
-*/
-
-void button_init(void)
-{
-#ifndef SIMULATOR
-    /* set PA5 and PA11 as input */
-    PACR1 &= 0xff3f;  /* PA11MD = 00 */
-    PACR2 &= 0xfbff;  /* PA5MD = 0 */
-    PAIOR &= ~0x820;
-#endif
-    queue_init(&button_queue);
-    lastbtn = 0;
-    tick_add_task(button_tick);
-
-    reset_poweroff_timer();
-}
-
-static int button_read(void)
-{
-    int porta = PADR;
-    int btn = BUTTON_NONE;
-
     /* buttons are active low */
-    if(adc_read(0) < 0x180)
+    if (adc_read(0) < 0x180)
         btn |= BUTTON_LEFT;
-    if(adc_read(1) < 0x180)
+    if (adc_read(1) < 0x180)
         btn |= BUTTON_MENU;
     if(adc_read(2) < 0x180)
         btn |= BUTTON_RIGHT;
     if(adc_read(3) < 0x180)
         btn |= BUTTON_PLAY;
 
-    if ( !(porta & 0x20) )
+    /* check port A pins for ON and STOP */
+    data = PADR;
+    if ( !(data & 0x0020) )
         btn |= BUTTON_ON;
-    if ( !(porta & 0x800) )
+    if ( !(data & 0x0800) )
         btn |= BUTTON_STOP;
 
-    return btn;
-}
-
 #elif CONFIG_KEYPAD == ONDIO_PAD
-
-/*
- * helper function to swap UP/DOWN, LEFT/RIGHT
- */
-static int button_flip(int button)
-{
-    int newbutton;
-
-    newbutton = button & 
-        ~(BUTTON_UP | BUTTON_DOWN
-        | BUTTON_LEFT | BUTTON_RIGHT);
-
-    if (button & BUTTON_UP)
-        newbutton |= BUTTON_DOWN;
-    if (button & BUTTON_DOWN)
-        newbutton |= BUTTON_UP;
-    if (button & BUTTON_LEFT)
-        newbutton |= BUTTON_RIGHT;
-    if (button & BUTTON_RIGHT)
-        newbutton |= BUTTON_LEFT;
-
-    return newbutton;
-}
-
-
-/*
- * set the flip attribute
- * better only call this when the queue is empty
- */
-void button_set_flip(bool flip)
-{
-    if (flip != flipped) /* not the current setting */
-    {
-        /* avoid race condition with the button_tick() */
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        lastbtn = button_flip(lastbtn); 
-        flipped = flip;
-        set_irq_level(oldlevel);
-    }
-}
-
-
-/* The Ondio its 6 buttons on analog inputs:
-   OPTION: AN2 (used as MENU for now)
-   ON/OFF: AN3
-   LEFT/RIGHT/UP/DOWN: AN4
-   We map them like the player keys for now, although this is far from optimal.
-*/
-void button_init(void)
-{
-    queue_init(&button_queue);
-    lastbtn = 0;
-    tick_add_task(button_tick);
-
-    reset_poweroff_timer();
-}
-
-static int button_read(void)
-{
-    int btn = BUTTON_NONE;
-    int retval;
-
-    int data = adc_read(ADC_BUTTON_ROW1);
 
     if(adc_read(ADC_BUTTON_OPTION) > 0x200) /* active high */
         btn |= BUTTON_MENU;
     if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
         btn |= BUTTON_OFF;
 
-    /* Check the 4 direction keys, hard-coded analog limits for now */
-    if (data >= 0x2EF)
+    /* Check the 4 direction keys */
+    data = adc_read(ADC_BUTTON_ROW1);
+
+    if (data >= LEVEL4)
         btn |= BUTTON_LEFT;
-    else if (data >= 0x246)
+    else if (data >= LEVEL3)
         btn |= BUTTON_RIGHT;
-    else if (data >= 0x19D)
+    else if (data >= LEVEL2)
         btn |= BUTTON_UP;
-    else if (data >= 0x0A1)
+    else if (data >= LEVEL1)
         btn |= BUTTON_DOWN;
 
+#endif /* CONFIG_KEYPAD */
+
+
+#ifdef HAVE_LCD_BITMAP
     if (btn && flipped)
         btn = button_flip(btn); /* swap upside down */
+#endif
 
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
-    if(btn != last_read)
+    if (btn != last_read)
         retval = lastbtn;
     else
         retval = btn;
@@ -610,6 +477,11 @@ static int button_read(void)
     return retval;
 }
 
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+bool button_hold(void)
+{
+    return (GPIO1_READ & 0x00000002)?true:false;
+}
 #endif
 
 int button_status(void)
@@ -621,3 +493,4 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+

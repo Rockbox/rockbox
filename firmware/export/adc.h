@@ -41,8 +41,6 @@
 #define ADC_BUTTON_ROW1         4 /* Used for scanning the keys, different
                                      voltages for different keys */
 #define ADC_UNREG_POWER         7 /* Battery voltage */
-/* FixMe: this doesn't exist, just to make the compiler happy */
-#define ADC_EXT_POWER           5 /* The external power voltage, V=X*0.0148 */
 
 #else
 /* normal JBR channel assignment */
@@ -51,6 +49,8 @@
 #ifdef HAVE_FMADC
 #define ADC_CHARGE_REGULATOR    0 /* Uh, we read the battery voltage? */
 #define ADC_USB_POWER           1 /* USB, reads 0x000 when USB is inserted */
+#define ADC_BUTTON_OFF          2 /* the off button, high value if pressed */
+#define ADC_BUTTON_ON           3 /* the on button, low value if pressed */
 #else
 #define ADC_CHARGE_REGULATOR    1 /* Regulator reference voltage, should read
                                      about 0x1c0 when charging, else 0x3FF */

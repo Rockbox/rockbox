@@ -903,9 +903,12 @@ bool view_battery(void)
                 y = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
                 snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 1, buf);
+#ifdef ADC_EXT_POWER
                 y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000;
                 snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 2, buf);
+#endif
+#ifdef HAVE_CHARGING
                 snprintf(buf, 30, "Charger: %s", 
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
@@ -914,6 +917,7 @@ bool view_battery(void)
                          charger_enabled ? "yes" : "no");
                 lcd_puts(0, 4, buf);
 #endif                
+#endif
                 y = ( power_history[POWER_HISTORY_LEN-1] * 100
                     + power_history[POWER_HISTORY_LEN-2] * 100
                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD+1] * 100

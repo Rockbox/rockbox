@@ -140,7 +140,7 @@
 #define RSTCSR_ADDR     0x05FFFFBB
 
 #define SBYCR_ADDR      0x05FFFFBC
-			
+
 #define PADR_ADDR       0x05FFFFC0
 #define PBDR_ADDR       0x05FFFFC2
 #define PAIOR_ADDR      0x05FFFFC4
@@ -150,7 +150,7 @@
 #define PBCR1_ADDR      0x05FFFFCC
 #define PBCR2_ADDR      0x05FFFFCE
 #define PCDR_ADDR       0x05FFFFD0
-			
+
 #define CASCR_ADDR      0x05FFFFEE
 
 /* byte halves of the ports */
@@ -163,15 +163,6 @@
 #define PBIORH_ADDR     0x05FFFFC6
 #define PBIORL_ADDR     0x05FFFFC7
 
-
-/* Port B data register bits */
-#define PBDR_LCD_SDA    0x0001 /* LCD serial data */
-#define PBDR_LCD_SCK    0x0002 /* LCD serial clock */
-#define PBDR_LCD_DC     0x0004 /* LCD data (1) / command (0) */
-#define PBDR_LCD_CS1    0x0008 /* LCD chip select 1 (active low) */
-#define PBDR_BTN_OFF    0x0010 /* Off button (active low) */
-#define PBDR_LED_RED    0x0040 /* Red LED */
-#define PBDR_BTN_ON     0x0100 /* On button (active low) */
 
 /* A/D control/status register bits */
 #define ADCSR_CH     0x07   /* Channel/group select */
@@ -195,7 +186,7 @@
 #define SMR1       (*((volatile unsigned char*)SMR1_ADDR))   
 #define BRR1       (*((volatile unsigned char*)BRR1_ADDR))   
 #define SCR1       (*((volatile unsigned char*)SCR1_ADDR))   
-#define TDR1       (*((volatile unsigned char*)TDR1_ADDR))   
+#define TDR1       (*((volatile unsigned char*)TDR1_ADDR))
 #define SSR1       (*((volatile unsigned char*)SSR1_ADDR))   
 #define RDR1       (*((volatile unsigned char*)RDR1_ADDR))   
 
