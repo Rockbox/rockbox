@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese
+ * Copyright (C) 2003 Uwe Freese
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,23 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _RTC_H_
-#define _RTC_H_
+#ifndef _ALARM_MENU_H
+#define _ALARM_MENU_H
 
-#include <stdbool.h> 
-
-#ifdef HAVE_RTC
-void rtc_init(void);
-int rtc_read(unsigned char address);
-int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes);
-int rtc_write(unsigned char address, unsigned char value);
-
-#ifdef HAVE_ALARM_MOD  
-void rtc_set_alarm(int h, int m);
-void rtc_get_alarm(int *h, int *m);
-bool rtc_enable_alarm(bool enable);
-#endif /* HAVE_ALARM_MOD */
-
-#endif /* HAVE_RTC */
+bool alarm_screen(void);
 
 #endif

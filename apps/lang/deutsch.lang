@@ -1208,3 +1208,83 @@ id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
 eng: "Total queued: %d"
 new: "Anzahl: %d"
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+new: "Wecker"
+
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm time is too soon!"
+new: "Weckzeit ist zu früh!"
+
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+new: "PLAY=OK OFF=Abbruch"
+
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting down..."
+new: "Schalte aus..."
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm time: %02d:%02d"
+new: "Weckzeit: %02d:%02d"
+
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking up in %d:%02d"
+new: "Einschalten in %d:%02d"
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+new: "Löschen"
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+new: "Gelöscht"
+
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "failed"
+new: "fehlgeschlagen"
+
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
+eng: "Canceled"
+new: "Abgebrochen"
+
+id: LANG_MENU_SETTING_OK
+desc: Visual confirmation of changing a setting
+eng: "OK"
+new: "OK"
+
+id: LANG_PLAYER_ONPLAY_1
+desc: 
+eng: "\x81 Queue"
+new: "\x81 Warteschlange"
+
+id: LANG_PLAYER_ONPLAY_2
+desc: 
+eng: "- Ren + Del"
+new: "- Umb + Ent"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+new: "in Warteschlange stellen"
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+new: "Löschen?"
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+new: "Umbenennen"

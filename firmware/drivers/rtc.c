@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -20,6 +20,7 @@
 #ifdef HAVE_RTC
 #include "i2c.h"
 #include "rtc.h"
+#include <stdbool.h> 
 
 #define RTC_ADR 0xd0
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
@@ -43,7 +44,84 @@ void rtc_init(void)
         data &= ~0x40;
         rtc_write(0x0c,data);
     }
+    
+#ifdef HAVE_ALARM_MOD    
+
+    /* Clear Trec bit, write-protecting the RTC for 200ms when shutting off */
+    /* without this, the alarm won't work! */
+    
+    data = rtc_read(0x04);
+    if (data & 0x80)
+    {
+        data &= ~0x80;
+        rtc_write(0x04, data);
+    }
+
+    rtc_enable_alarm(false);
+#endif
 }
+
+#ifdef HAVE_ALARM_MOD    
+
+/* set alarm time registers to the given time (repeat once per day) */
+void rtc_set_alarm(int h, int m)
+{
+    unsigned char data;
+
+    /* for daily alarm, RPT5=RPT4=on, RPT1=RPT2=RPT3=off */
+    
+    rtc_write(0x0e, 0x00);                       /* seconds 0 and RTP1 */
+    rtc_write(0x0d, ((m / 10) << 4) | (m % 10)); /* minutes and RPT2 */
+    rtc_write(0x0c, ((h / 10) << 4) | (h % 10)); /* hour and RPT3 */
+    rtc_write(0x0b, 0xc1);                       /* set date 01 and RPT4 and RTP5 */
+    
+    /* set month to 1, if it's invalid, the rtc does an alarm every second instead */
+    data = rtc_read(0x0a);
+    data &= 0xe0;
+    data |= 0x01;
+    rtc_write(0x0a, data);
+}
+
+/* read out the current alarm time */
+void rtc_get_alarm(int *h, int *m)
+{
+    unsigned char data;
+
+    data = rtc_read(0x0c);
+    *h = ((data & 0x30) >> 4) * 10 + (data & 0x0f);
+    
+    data = rtc_read(0x0d);
+    *m = ((data & 0x70) >> 4) * 10 + (data & 0x0f);
+}
+
+/* turn alarm on or off by setting the alarm flag enable */
+/* the alarm is automatically disabled when the RTC gets Vcc power at startup */
+/* avoid that an alarm occurs when the device is on because this locks the ON key forever */
+/* returns false if alarm was set and alarm flag (output) is off */
+/* returns true if alarm flag went on, which would lock the device, so the alarm was disabled again */
+bool rtc_enable_alarm(bool enable)
+{
+    unsigned char data = rtc_read(0x0a);
+    if (enable)
+    {
+        data |= 0xa0; /* turn bit d7=AFE and d5=ABE on */
+    }
+    else
+        data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
+    rtc_write(0x0a, data);
+    
+    /* check if alarm flag AF is off (as it sould be) */
+    if ((rtc_read(0x0f) & 0x40) != 0) /* on */
+    {
+       data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
+       rtc_write(0x0a, data);
+       return true;
+    } else {
+        return false; /* all ok */
+    }
+}
+
+#endif /* HAVE_ALARM_MOD */
 
 int rtc_write(unsigned char address, unsigned char value)
 {

@@ -47,6 +47,10 @@
 #include "recording.h"
 #endif
 
+#ifdef HAVE_ALARM_MOD
+#include "alarm_menu.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
@@ -253,10 +257,13 @@ bool main_menu(void)
     struct menu_items items[] = {
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
-        { str(LANG_SLEEP_TIMER),   sleeptimer_screen     },
+        { str(LANG_SLEEP_TIMER),        sleeptimer_screen },
+#ifdef HAVE_ALARM_MOD
+        { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen    },
+#endif
 #ifdef HAVE_MAS3587F
-        { str(LANG_RECORDING_SETTINGS),   recording_menu     },
-        { str(LANG_RECORDING),   recording_screen     },
+        { str(LANG_RECORDING_SETTINGS), recording_menu    },
+        { str(LANG_RECORDING),          recording_screen  },
 #endif
 #ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
