@@ -47,7 +47,7 @@ struct mydir {
 
 typedef struct mydir MYDIR;
 
-MYDIR *x11_opendir(char *name)
+MYDIR *x11_opendir(const char *name)
 {
     char buffer[256]; /* sufficiently big */
     DIR *dir;

@@ -29,7 +29,7 @@ typedef void DIR;
 
 typedef void * MYDIR;
 
-extern MYDIR *x11_opendir(char *name);
+extern MYDIR *x11_opendir(const char *name);
 extern struct x11_dirent* x11_readdir(MYDIR* dir);
 extern int x11_closedir(MYDIR *dir);
 extern int x11_mkdir(char *name, int mode);
