@@ -1999,7 +1999,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 #endif
             break;
 
-        if (temp_buf[0] != '#' || temp_buf[0] != '\0')
+        if (temp_buf[0] != '#' && temp_buf[0] != '\0')
         {
             int insert_pos;
 
