@@ -352,7 +352,7 @@ if [ -z "$archos" ]; then
     target="-DIRIVER_H100"
     memory=32 # always
     coldfirecc
-    tool="$rootdir/tools/scramble -iriver"
+    tool="$rootdir/tools/scramble -add=h120"
     output="rockbox.iriver"
     appextra="recorder"
     archosrom=""
