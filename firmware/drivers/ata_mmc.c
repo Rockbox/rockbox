@@ -524,20 +524,14 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    return true;
+    return false;    /* FIXME: dirty, but makes idle poweroff work */
 }
 
 int ata_standby(int time)
 {
-    int ret = 0;
-
-    mutex_lock(&ata_mtx);
-
-    /* ToDo: is there an equivalent? */
     (void)time;
 
-    mutex_unlock(&ata_mtx);
-    return ret;
+    return 0;
 }
 
 int ata_sleep(void)
