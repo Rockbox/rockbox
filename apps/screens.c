@@ -436,8 +436,7 @@ bool quick_screen(int context, int button)
     context = context;
     lcd_setfont(FONT_SYSFIXED);
 
-    if(button==BUTTON_F2)
-        lcd_getstringsize("A",&w,&h);
+    lcd_getstringsize("A",&w,&h);
 
     while (!exit) {
         char* ptr=NULL;
