@@ -209,7 +209,7 @@ int voltage_to_percent(int voltage, const short* table)
 void battery_level_update(void)
 {
     int level = 0;
-    int c = 0;
+    unsigned short c = 0;
     int i;
 #if BATTERY_TYPES_COUNT == 1 /* single type */
     const int battery_type = 0;
