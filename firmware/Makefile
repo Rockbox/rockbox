@@ -23,19 +23,16 @@ TARGET = -DARCHOS_PLAYER=1
 CFLAGS = -W -Wall -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
 
 ifdef DEBUG
-CFLAGS += -g -DDEBUG
+CFLAGS += -O -g -DDEBUG
 else
-CFLAGS += -O -fomit-frame-pointer -fschedule-insns
+CFLAGS += -O -fomit-frame-pointer -fschedule-insns -save-temps
 endif
 
 AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
-EXCLUDED_SRC := thread.c
 
-SRC := $(filter-out $(EXCLUDED_SRC),$(SRC))
-
-OBJS := $(SRC:%.c=%.o) $(EXCLUDED_SRC:%.c=%.o) crt0.o
+OBJS := $(SRC:%.c=%.o) crt0.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
@@ -46,6 +43,10 @@ clean:
 	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 	-$(RM) -r $(DEPS)
 
+# Special targets
+thread.o: thread.c thread.h
+	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $<
+
 $(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
 	@echo "Updating dependencies for $<"
@@ -54,7 +55,3 @@ $(DEPS)/%.d: %.c
 		[ -s $@ ] || rm -f $@'
 
 -include $(SRC:%.c=$(DEPS)/%.d)
-
-# Special targets
-thread.o: thread.c thread.h
-	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $<
