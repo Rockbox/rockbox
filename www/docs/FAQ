@@ -124,19 +124,24 @@ A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
            being on the list does not mean it isn't a neat idea.  Bring it to 
            the list.
 
-Q17. I don't see you mentioning ogg files on your list of ideas.  What about
-     supporting those?
-A17. At the current time we belive this is not very likely (though
-     we are not completely closing out this possibility). The Micronas 
-     chip (MAS3507) decoder in the archos does not natively support ogg 
-     decoding and there is very little program space in the player to 
+Q17. I don't see you mentioning other file types on your list of ideas.  What 
+     about supporting those?
+A17. Pessimist's Answer: At the current time we belive this is not very likely 
+     The Micronas chip (MAS3507) decoder in the archos does not natively 
+     support decoding and there is very little program space in the player to 
      implement it ourselves.  The alternative would be to write a software 
      decoder as part of the RockBox firmware.  However, as much as we love 
      our players, the computing power of the Archos (SH1 microcontroller) is 
-     not fully sufficent for this need (Once again, this is not a definative
-     no.  The world is full of brilliant people.  We just aren't hunting 
-     down all the ones not already involved with the project right this 
-     instant). 
+     not fully sufficent for this need.
+
+     Optimist's Answer: We can play any format if only we can write code for 
+     the DSP to decode it.  The MAS 3507 (and 3587) are generic DSPs that 
+     simply have MP3 codecs in ROM. We can download new codecs in them and 
+     we will be the first to celebrate if we can get OGG or FLAC or anything 
+     into these DSPs. Unfortunately, we have no docs or tools for writing new 
+     MAS DSP code and Intermetall is very secretive about it.  If anyone can 
+     help, please get in touch!
+
 
 Q18. What about supporting playing of wav files?
 A18. No Bill.  We have no intention of that.  Go buy your own project.
@@ -200,3 +205,52 @@ A26: If you ask that again, I'm sending your address and phone number to the
 
 Q27: Umm, was that sarcasm?
 A27: That's it, I'm mailing him now.
+
+Q28: Is that legal? I mean, I'd just hate to see something like that 
+     challenged under the DMCA in all its ridiculousness. Any thoughts or 
+     ideas?
+A28: We believe we are in the green on this.  We are not violating anyone's
+     copyright and we are not circumventing any copy protection scheme.
+     This has been a big point for the project since its inception.  Some 
+     people wanted us to distribute patched versions of the original firmware,
+     but seeing as that _would_ have violated Archos' copyright, we didn't 
+     follow that course of action.
+
+Q29: On the website [and various information postings] you state 
+        "Every tiny bit was reverse engineered, disassembled and then 
+         re-written from scratch".  
+     If it was rewritten from scratch then why was it first reverse-engineered
+     and disassembled? Instead this sounds more like someone disassembled it
+     then used the understanding that they gained to create a new version,
+     which is not quite the same as "from scratch". 
+A29: Don't confuse the terms.  
+
+     Reverse engineering means examining a product to find out how it works.  
+     Disassembling the firmware is merely one tool used in that examination.  
+     Oscilloscopes and logic analyzers are other tools we have used.
+
+     We have written every single byte of the Rockbox firmware. But we could
+     not have written the software without first researching how the hardware
+     was put together, i.e. reverse engineer it.
+
+     All of this is completely legal.  If you define "from scratch" as writing
+     software without first researching the surrounding interfaces, then no 
+     software has ever been written from scratch.
+
+Q30: Wait a minute here.  You have release version 1.0, but not a single one 
+     of the ideas you have spoken about is actually implimented!  Calling this
+     version 1.0 is really misleading.  Whats the story?!
+A30: It is true that Rockbox 1.0 lacks most of the feature set that every
+     sane user wants.  However, we never said it was more feature-complete or
+     better in any way then the original firmware at this early point.
+     This first release was done as a proof of concept that our ideas are 
+     moving in the right direction.  We also hope that it helps bring the 
+     project some attention, and some additional developers.  Adding the 
+     missing features is just a matter of time (and that time goes
+     faster if you, yes you, help too). 
+     
+     
+
+
+
+
