@@ -13,7 +13,7 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I. -Icommon -Idrivers
+INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
 # Pick a target to build for
 TARGET = -DARCHOS_PLAYER=1
