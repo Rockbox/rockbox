@@ -292,7 +292,9 @@ void generate_c_source(char *id, int width, int height, unsigned char *bitmap)
            id, height, id, width, id );
 
    for(i=0, eline=0; i< height; i+=8, eline++) {
-       for (a=0; a<width; a++) fprintf(f, "0x%02x, ", bitmap[eline*width + a]);
+       for (a=0; a<width; a++)
+           fprintf(f, "0x%02x,%c", bitmap[eline*width + a],
+                   (a+1)%13?' ':'\n');
        fprintf(f, "\n");
    }
    
