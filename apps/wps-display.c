@@ -237,14 +237,15 @@ bool wps_load(const char* file, bool display)
  * buf_size - size of buffer.
  * time     - time to format, in milliseconds.
  */
-static void format_time(char* buf, int buf_size, int time)
+static void format_time(char* buf, int buf_size, long time)
 {
     if ( time < 3600000 ) {
       snprintf(buf, buf_size, "%d:%02d",
-               time % 3600000 / 60000, time % 60000 / 1000);
+               (int) (time % 3600000 / 60000), (int) (time % 60000 / 1000));
     } else {
       snprintf(buf, buf_size, "%d:%02d:%02d",
-               time / 3600000, time % 3600000 / 60000, time % 60000 / 1000);
+               (int) (time / 3600000), (int) (time % 3600000 / 60000),
+               (int) (time % 60000 / 1000));
     }
 }
 
