@@ -629,7 +629,7 @@ bool mp3info(struct mp3entry *entry, char *filename)
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
 
-    if ( entry->id3v2len && entry->id3v2len <= sizeof( entry->id3v2buf ) )
+    if (entry->id3v2len)
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
 
