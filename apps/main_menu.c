@@ -128,6 +128,8 @@ void show_credits(void)
 #ifdef SIMULATOR
 #define mp3buf 0
 #define mp3end 0
+
+extern void simulate_usb(void);
 #else
 /* defined in linker script */
 extern unsigned char mp3buf[];
@@ -197,6 +199,8 @@ void main_menu(void)
         { "Version",            show_credits      },
 #ifndef SIMULATOR
         { "Debug (keep out!)",  debug_menu        },
+#else
+        { "USB (sim)",          simulate_usb      },
 #endif
     };
 
