@@ -36,10 +36,9 @@
  * Specific implementations for X11, using the generic LCD API and data.
  */
 
-#include "lcd.h"
 #include "lcd-x11.h"
 
-extern unsigned char display[LCD_HEIGHT/8][LCD_WIDTH];
+extern unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
 
 void lcd_update (void)
 {
@@ -50,10 +49,10 @@ void lcd_update (void)
 
   for(y=0; y<LCD_HEIGHT; y+=8) {
     for(x=0; x<LCD_WIDTH; x++) {
-      if(display[y/8][x]) {
+      if(display[x][y/8]) {
         /* one or more bits/pixels are set */
         for(bit=0; bit<8; bit++) {
-          if(display[y/8][x]&(1<<bit)) {
+          if(display[x][y/8]&(1<<bit)) {
             points[p].x = x + MARGIN_X;
             points[p].y = y+bit + MARGIN_Y;
             p++; /* increase the point counter */
