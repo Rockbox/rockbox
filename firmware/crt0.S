@@ -78,12 +78,39 @@ start:
            clock (5.6448MHz bus frequency). We haven't yet started the PLL */
         move.l #0x80050000,%d0
         move.l %d0,(0x100,%a0) /* DCR - Synchronous, 80 cycle refresh */
-        move.l #0x3000a520,%d0
-        move.l %d0,(0x108,%a0) /* DACR0 - Base 0x30000000, Banks on 23 and up,
-                                  CAS latency 3, Refresh enable */
-        move.l #0x01fc0001,%d0
+
+        /* Note: we place the SDRAM on an 0x1000000 (16M) offset because
+           the 5249 BGA chip has a fault which disables the use of A24. The
+           suggested workaround by FreeScale is to offset the base address by
+           half the DRAM size and increase the mask to the double.
+           In our case this means that we set the base address 16M ahead and
+           use a 64M mask.
+        */
+        move.l #0x31002520,%d0
+        move.l %d0,(0x108,%a0) /* DACR0 - Base 0x31000000, Banks on 23 and up,
+                                  CAS latency 1, No refresh yet */
+        move.l #0x03fc0001,%d0 /* Size: 64M because of workaround above */
         move.l %d0,(0x10c,%a0) /* DMR0 - 32Mb */
 
+        /* Precharge */
+        move.l #0x31002528,%d0
+        move.l %d0,(0x108,%a0) /* DACR0[IP] = 1, next access will issue a
+                                  Precharge command */
+        move.l #0xabcd1234,%d0
+        move.l %d0,0x31000000  /* Issue precharge command */
+
+        /* Refresh */
+        move.l #0x3100a520,%d0
+        move.l %d0,(0x108,%a0) /* Enable refresh */
+
+        /* Mode Register init */
+        move.l #0x3100a560,%d0 /* DACR0[IMRS] = 1, next access will set the
+                                  Mode Register */
+        move.l %d0,(0x108,%a0)
+
+        move.l #0xabcd1234,%d0
+        move.l %d0,0x31001000  /* A12=1 means CASL=1 */
+        
         lea    _iramcopy,%a2
         lea    _iramstart,%a3
         lea    _iramend,%a4        
