@@ -292,29 +292,30 @@ static int readwrite(int fd, void* buf, int count, bool write)
             openfiles[fd].cacheoffset = -1;
         }
     }
-    openfiles[fd].fileoffset += nread;
-    nread = 0;
 
     /* any tail bytes? */
     if ( count ) {
         if (write) {
-            /* sector is only partially filled. copy-back from disk */
-            int rc;
-            LDEBUGF("Copy-back tail cache\n");
-            rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                               openfiles[fd].cache, false );
-            if ( rc < 0 ) {
-                DEBUGF("Failed reading\n");
-                errno = EIO;
-                return -4;
-            }
-            /* seek back one sector to put file position right */
-            rc = fat_seek(&(openfiles[fd].fatfile), 
-                          openfiles[fd].fileoffset / SECTOR_SIZE);
-            if ( rc < 0 ) {
-                DEBUGF("fat_seek() failed\n");
-                errno = EIO;
-                return -5;
+            if ( openfiles[fd].fileoffset + nread < openfiles[fd].size ) {
+                /* sector is only partially filled. copy-back from disk */
+                int rc;
+                LDEBUGF("Copy-back tail cache\n");
+                rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
+                                   openfiles[fd].cache, false );
+                if ( rc < 0 ) {
+                    DEBUGF("Failed reading\n");
+                    errno = EIO;
+                    return -4;
+                }
+                /* seek back one sector to put file position right */
+                rc = fat_seek(&(openfiles[fd].fatfile), 
+                              (openfiles[fd].fileoffset + nread) / 
+                              SECTOR_SIZE);
+                if ( rc < 0 ) {
+                    DEBUGF("fat_seek() failed\n");
+                    errno = EIO;
+                    return -5;
+                }
             }
             memcpy( openfiles[fd].cache, buf + nread, count );
         }
