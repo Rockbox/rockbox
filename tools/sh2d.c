@@ -2,6 +2,9 @@
  * sh2d
  * Bart Trzynadlowski, July 24, 2000
  * Public domain
+ *
+ * Some changes by Björn Stenberg <bjorn@haxx.se>
+ * $Id$
  */
 
 
@@ -428,7 +431,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                     if ((op & 0xf000) == 0x9000)    /* .W */
                       {
                         int dat =  (unsigned short) (*(imm + p_addr) << 8) | *(imm + p_addr + 1);
-                        m_addr[imm+0] = ND8_F; // this couldn't be an instruction so mark it !
+                        m_addr[imm+0] = ND8_F; /* this couldn't be an instruction so mark it ! */
                         m_addr[imm+1] = imm;
                         printf(tab[i].mnem,
                           imm,
@@ -445,7 +448,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
 			char* str = "";
 			if ( (dat & 0xfffffe00) == 0x05fffe00 )
 			   str = regname[dat & 0x1ff];
-                        m_addr[imm+(b_addr-p_addr)+0] = ND8_F; // this couldn't be an instruction so mark it !
+                        m_addr[imm+(b_addr-p_addr)+0] = ND8_F; /* this couldn't be an instruction so mark it ! */
                         m_addr[imm+(b_addr-p_addr)+1] = imm;
                         m_addr[imm+(b_addr-p_addr)+2] = -1;
                         printf(tab[i].mnem,
