@@ -1,4 +1,4 @@
-#define _PAGE_ Wormlet
+#define _PAGE_ Manual - Wormlet
 #include "head.t"
 #include "manual.t"
 
