@@ -785,7 +785,7 @@ void set_option(char* string, int* variable, char* options[],
     lcd_stop_scroll();
 }
 
-#ifdef HAVE_RTC
+#ifdef HAVE_LCD_BITMAP
 #define INDEX_X 0
 #define INDEX_Y 1
 #define INDEX_WIDTH 2
@@ -857,14 +857,14 @@ void set_time(char* string, int timedate[])
         reffub[2] = '\0';
         lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[0][INDEX_X] = 0;
-        cursor[0][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[0][INDEX_Y] = prev_line_height;
         cursor[0][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 3, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-        cursor[1][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[1][INDEX_Y] = prev_line_height;
         cursor[1][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 6, 2);
@@ -872,7 +872,7 @@ void set_time(char* string, int timedate[])
         lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
                              cursor[1][INDEX_WIDTH] + separator_width;
-        cursor[2][INDEX_Y] = 1 + prev_line_height + 1;
+        cursor[2][INDEX_Y] = prev_line_height;
         cursor[2][INDEX_WIDTH] = width;
 
         lcd_getstringsize(buffer, FONT_UI, &width, &prev_line_height);
@@ -895,7 +895,7 @@ void set_time(char* string, int timedate[])
         reffub[4] = '\0';
         lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[3][INDEX_X] = weekday_width + separator_width;
-        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[3][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 9, 3);
@@ -903,7 +903,7 @@ void set_time(char* string, int timedate[])
         lcd_getstringsize(reffub, FONT_UI, &width, &height);
         cursor[4][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width;
-        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[4][INDEX_WIDTH] = width;
 
         strncpy(reffub, buffer + 13, 2);
@@ -912,7 +912,7 @@ void set_time(char* string, int timedate[])
         cursor[5][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width +
                              cursor[4][INDEX_WIDTH] + separator_width;
-        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height + 1;
+        cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[5][INDEX_WIDTH] = width;
 
         lcd_invertrect(cursor[cursorpos][INDEX_X],

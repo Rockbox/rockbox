@@ -116,12 +116,12 @@ static Menu deep_discharge(void)
 }
 #endif
 
-#ifdef HAVE_RTC
+#ifdef HAVE_LCD_BITMAP
 static Menu timedate_set(void)
 {
     int timedate[7]; /* hour,minute,second,year,month,day,dayofweek */
 
-
+#ifdef HAVE_RTC
     timedate[0] = rtc_read(0x03); /* hour   */
     timedate[1] = rtc_read(0x02); /* minute */
     timedate[2] = rtc_read(0x01); /* second */
@@ -141,10 +141,24 @@ static Menu timedate_set(void)
     timedate[4] = ((timedate[4] & 0x10) >> 4) * 10 + (timedate[4] & 0x0f); 
     /* day    */
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
-
+#else /* SIMULATOR */
+    /* hour   */
+    timedate[0] = 0;
+    /* minute */
+    timedate[1] = 0;
+    /* second */
+    timedate[2] = 0;
+    /* year   */
+    timedate[3] = 0;
+    /* month  */
+    timedate[4] = 1;
+    /* day    */
+    timedate[5] = 1;
+#endif
 
     set_time(str(LANG_TIME),timedate);
 
+#ifdef HAVE_RTC
     if(timedate[0] != -1) {
         /* hour   */
         timedate[0] = ((timedate[0]/10) << 4 | timedate[0]%10) & 0x3f; 
@@ -168,6 +182,7 @@ static Menu timedate_set(void)
         rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0xf8)); /* dayofweek */
         rtc_write(0x00, 0x00); /* 0.1 + 0.01 seconds */
     }
+#endif
     return MENU_OK;
 }
 #endif
@@ -319,7 +334,7 @@ static Menu system_settings_menu(void)
 #ifdef HAVE_CHARGE_CTRL
         { str(LANG_DISCHARGE),   deep_discharge  },
 #endif
-#ifdef HAVE_RTC
+#ifdef HAVE_LCD_BITMAP
         { str(LANG_TIME),        timedate_set    },
 #endif
         { str(LANG_RESET),        reset_settings },
