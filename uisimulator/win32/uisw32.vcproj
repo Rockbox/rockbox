@@ -107,13 +107,13 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\app.c">
+			</File>
+			<File
 				RelativePath="button.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\chartables.c">
-			</File>
-			<File
-				RelativePath="file-win32.c">
 			</File>
 			<File
 				RelativePath="kernel.c">
@@ -125,7 +125,7 @@
 				RelativePath="..\..\firmware\drivers\lcd.c">
 			</File>
 			<File
-				RelativePath="main.c">
+				RelativePath="..\tetris.c">
 			</File>
 			<File
 				RelativePath="uisw32.c">

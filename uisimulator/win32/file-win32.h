@@ -22,16 +22,13 @@
 
 #include <io.h>
 
-typedef unsigned short ino_t;
-typedef long off_t;
 typedef _finddata_t DIR;
 
 struct dirent
 {
-  long __d_reserved[4];
-  ino_t d_ino; /* Just for compatibility, it's junk */
-  char d_name[256];		/* FIXME: use NAME_MAX? */
+    long            __d_reserved[4];
+    unsigned short  d_ino; /* Just for compatibility, it's junk */
+    char            d_name[256];		/* FIXME: use NAME_MAX? */
 };
-
 
 #endif // #ifndef __FILE_WIN32_H__

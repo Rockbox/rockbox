@@ -32,6 +32,9 @@ DIR *opendir (
 {
     DIR *p = (DIR*)malloc(sizeof(DIR));
     if (_findfirst (dirname, &p) == -1)
+    {
+        free (p);
         return NULL;
+    }
     return p;
 }
