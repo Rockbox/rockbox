@@ -17,7 +17,8 @@
  *
  ****************************************************************************/
 
-#include <windows.h>
+#include <io.h>
+#include <malloc.h>
 #include "file-win32.h"
 #include "file.h"
 
@@ -30,11 +31,36 @@ DIR *opendir (
               char *dirname // directory name
               )
 {
-    DIR *p = (DIR*)malloc(sizeof(DIR));
-    if (_findfirst (dirname, &p) == -1)
+    DIR                 *p = (DIR*)malloc(sizeof(DIR));
+    struct _finddata_t  fd;
+    if ((p->handle = _findfirst (dirname, &fd)) == -1)
     {
         free (p);
         return NULL;
     }
     return p;
+}
+
+// closedir
+// close directory
+int closedir (
+              DIR *dir // previously opened dir search
+              )
+{
+    free(dir);
+    return 0;
+}
+
+// read dir
+// read next entry in directory
+dirent *readdir (
+                 DIR *dir
+                 )
+{
+    struct _finddata_t fd;
+    if (_findnext (dir->handle, &fd) == -1)
+        return NULL;
+    memcpy (dir->fd.d_name, fd.name, 256);
+    dir->fd.d_reclen = sizeof (dirent);
+    return &dir->fd;
 }

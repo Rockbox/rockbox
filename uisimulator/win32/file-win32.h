@@ -22,13 +22,21 @@
 
 #include <io.h>
 
-typedef _finddata_t DIR;
-
-struct dirent
+struct direnttag
 {
-    long            __d_reserved[4];
-    unsigned short  d_ino; /* Just for compatibility, it's junk */
-    char            d_name[256];		/* FIXME: use NAME_MAX? */
+    long            d_ino; /* inode number */
+    long            d_off; /* offset to the next dirent */
+    unsigned short  d_reclen;/* length of this record */
+    unsigned char   d_type; /* type of file */
+    char            d_name[256]; /* filename */
 };
+typedef struct direnttag dirent;
+
+struct DIRtag
+{
+    dirent          fd;
+    intptr_t        handle;
+};
+typedef struct DIRtag DIR;
 
 #endif // #ifndef __FILE_WIN32_H__
