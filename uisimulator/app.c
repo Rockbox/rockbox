@@ -34,10 +34,9 @@ extern void tetris(void);
 #define ITEM_TETRIS       0
 #define ITEM_SCREENSAVER  1
 #define ITEM_BROWSE       2
-#define ITEM_ROCKABOX     3
 
 /* the last index with info, starting on 0 */
-#define MAX_LINE          3
+#define MAX_LINE          ITEM_BROWSE
 
 int menu_top = 0;
 int menu_bottom = MAX_LINE;
@@ -54,9 +53,6 @@ void add_menu_item(int location, char *string)
 
 void menu_init(void)
 {
-    /* x, y, string, font */
-    /*   lcd_puts(6, 0,  "Rockabox", 0);*/
-    add_menu_item(ITEM_ROCKABOX, "Rockabox");
     add_menu_item(ITEM_SCREENSAVER, "Screen Saver");
     add_menu_item(ITEM_BROWSE, "Browse");
     add_menu_item(ITEM_TETRIS, "Tetris");
@@ -64,7 +60,12 @@ void menu_init(void)
     lcd_puts(8, 38, "Rockbox!", 2);
 }
 
-/* Move the cursor to a particular id */
+/* 
+ * Move the cursor to a particular id, 
+ *   current: where it is now 
+ *   target: where you want it to be 
+ * Returns: the new current location
+ */
 int put_cursor(int current, int target)
 {
     lcd_puts(0, current*MENU_LINE_HEIGHT, " ", 0);
