@@ -47,6 +47,9 @@ long last_keypress;
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
 
+/* Number of repeated keys before shutting off */
+#define POWEROFF_COUNT 8
+
 static int button_read(void);
 
 static void button_tick(void)
@@ -55,6 +58,7 @@ static void button_tick(void)
     static int count = 0;
     static int lastbtn = 0;
     static int repeat_speed = REPEAT_INTERVAL_START;
+    static int repeat_count = 0;
     static bool repeat = false;
     int diff;
     int btn;
@@ -103,6 +107,27 @@ static void button_tick(void)
                         if (repeat_speed < REPEAT_INTERVAL_FINISH)
                            repeat_speed = REPEAT_INTERVAL_FINISH;
                         count = repeat_speed;
+
+                        repeat_count++;
+                        
+                        /* Shutdown if we have a device which doesn't shut
+                           down easily with the OFF key */
+#ifdef HAVE_POWEROFF_ON_PB5
+                        if(btn == BUTTON_OFF && !charger_inserted() &&
+                            repeat_count > POWEROFF_COUNT)
+                            power_off();
+#endif
+                        
+                        /* Reboot if the OFF button is pressed long enough
+                           and we are connected to a charger. */
+#ifdef HAVE_RECORDER_KEYPAD
+                        if(btn == BUTTON_OFF && charger_inserted() &&
+                            repeat_count > POWEROFF_COUNT)
+#elif HAVE_PLAYER_KEYPAD
+                        if(btn == BUTTON_STOP && charger_inserted() &&
+                            repeat_count > POWEROFF_COUNT)
+#endif
+                            system_reboot();
                     }
                 }
                 else
@@ -111,17 +136,9 @@ static void button_tick(void)
                     {
                         post = true;
                         repeat = true;
+                        repeat_count = 0;
                         /* initial repeat */
                         count = REPEAT_INTERVAL_START; 
-
-                        /* Reboot if the OFF button is pressed long enough
-                           and we are connected to a charger. */
-#ifdef HAVE_RECORDER_KEYPAD
-                        if(btn == BUTTON_OFF && charger_inserted())
-#elif HAVE_PLAYER_KEYPAD
-                        if(btn == BUTTON_STOP && charger_inserted())
-#endif
-                            system_reboot();
                     }
                 }
             }
