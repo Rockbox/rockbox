@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "menu.h"
 #include "sprintf.h"
+#include "rtc.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -176,6 +177,55 @@ struct counter values[]={
   {"ydistt", -6},
 };
 
+static unsigned char yminute[]={
+53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
+};
+static unsigned char yhour[]={
+42,42,42,42,41,41,40,39,39,38,37,36,35,34,33,32,30,29,28,27,26,25,24,24,23,22,22,21,21,21,21,21,21,21,22,22,23,24,24,25,26,27,28,29,30,31,33,34,35,36,37,38,39,39,40,41,41,42,42,42,
+};
+
+static unsigned char xminute[]={
+56,59,63,67,71,74,77,80,83,86,88,90,91,92,93,93,93,92,91,90,88,86,83,80,77,74,71,67,63,59,56,52,48,44,40,37,34,31,28,25,23,21,20,19,18,18,18,19,20,21,23,25,28,31,34,37,40,44,48,52,
+};
+static unsigned char xhour[]={
+56,57,59,61,63,65,66,68,69,71,72,73,73,74,74,74,74,74,73,73,72,71,69,68,66,65,63,61,59,57,56,54,52,50,48,46,45,43,42,40,39,38,38,37,37,37,37,37,38,38,39,40,42,43,45,46,48,50,52,54,
+};
+
+static void addclock(void)
+{
+    int i;
+    int hour;
+    int minute;
+    int pos;
+
+    hour = rtc_read(3);
+    hour = (((hour & 0x30) >> 4) * 10 + (hour & 0x0f))%12;
+    minute = rtc_read(2);
+    minute = ((minute & 0x70) >> 4) * 10 + (minute & 0x0f);
+
+    pos = 90-minute;
+    if(pos >= 60)
+        pos -= 60;
+
+    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xminute[pos], yminute[pos]);
+
+    hour = hour*5 + minute/12;
+    pos = 90-hour;
+    if(pos >= 60)
+        pos -= 60;
+
+    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[pos], yhour[pos]);
+
+    /* draw a circle */
+    for(i=0; i < 60; i+=3) {
+        lcd_drawline( xminute[i],
+                      yminute[i],
+                      xminute[(i+1)%60],
+                      yminute[(i+1)%60]);
+    }
+}
+
+
 static void loopit(void)
 {
     int b;
@@ -205,6 +255,9 @@ static void loopit(void)
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
         lcd_clear_display();
+
+        addclock();
+
         if(timeout) {
             switch(b) {
                 case BUTTON_LEFT:
