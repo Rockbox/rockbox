@@ -72,7 +72,7 @@ voice: ""
 new: "Slumpar..."
 
 id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: "Playlist"
 new: "Spellista"
@@ -1105,9 +1105,9 @@ new: "PLAY=Sätt OFF=Avbryt"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
+eng: "Alarm Set"
 voice: ""
-new: "Stannar..."
+new: "Alarmet aktiverat"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
@@ -1170,28 +1170,28 @@ voice: "Rename"
 new: "Ändra namn"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
-desc: Abort alternative in player keyboard interaction
-eng: "Abort"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Avbryt"
+new: ""
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: Accept alternative in player keyboard interaction
-eng: "Accept"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Utför"
+new: ""
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: Backspace alternative in player keyboard interaction
-eng: "Backspace"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Backsteg"
+new: ""
 
 id: LANG_PLAYER_KEYBOARD_DELETE
-desc: Delete alternative in player keyboard interaction
-eng: "Delete"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Radera"
+new: ""
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -2864,74 +2864,113 @@ new: "Sånger"
 id: LANG_BATTERY_TYPE
 desc: in battery settings
 eng: "Battery Type"
+voice: ""
 new: "Batterityp"
 
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
+voice: ""
 new: "Alkalisk"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
+voice: ""
 new: "NiMH"
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
+voice: ""
 new: "B"
 
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
+voice: ""
 new: "Ledigt:"
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
 eng: "Disk:"
+voice: ""
 new: "Disk:"
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
+voice: ""
 new: "GB"
 
 id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
 eng: "Found %d matches"
+voice: ""
 new: "Fann %d träffar"
 
 id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
+voice: ""
 new: "Sök"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
+voice: ""
 new: "Sök album"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
+voice: ""
 new: "Sök artist"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
 eng: "Search Songs"
+voice: ""
 new: "Sök sång"
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
+voice: ""
 new: "KB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
+voice: ""
 new: "MB"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
+voice: ""
 new: ","
+
+id: LANG_ID3DB_ALL_SONGS
+desc: ID3 virtual folder name
+eng: "<All songs>"
+voice: ""
+new: "<Alla sånger>" 
+
+id: LANG_PLAYLIST
+desc: Used when you need to say playlist, also voiced
+eng: "Playlist"
+voice: "Playlist"
+new: "Spellista"
+
+id: LANG_RECORD_STARTUP
+desc: Start Rockbox in Recording screen
+eng: "Show recording screen on startup"
+voice: "Show recording screen on startup"
+new: "Visa inspelningsskärm vid start"
+
+id: LANG_ALARM_MOD_DISABLE
+desc: Announce that the RTC alarm has been turned off
+eng: "Alarm Disabled"
+voice: "Alarm Disabled"
+new: "Alarmet avaktiverat"
