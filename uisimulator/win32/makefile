@@ -35,8 +35,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 
 #SRCS = $(wildcard *.c)
 
-SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c \
-  chartables.c kernel.c Release/uisw32.res file-win32.c
+SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c tree.c app.c \
+  chartables.c kernel.c Release/uisw32.res dir-win32.c
 
 OBJS = $(SRCS:.c=.obj)
 
@@ -48,6 +48,15 @@ lcd.obj: $(DRIVERS)/lcd.c
  
 chartables.obj: $(FIRMWAREDIR)/chartables.c
  $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/chartables.c -ochartables.obj
+
+tetris.obj: ../tetris.c
+ $(CC) $(CFLAGS) -c ../tetris.c -otetris.obj
+
+tree.obj: ../tree.c
+ $(CC) $(CFLAGS) -c ../tree.c -otree.obj
+
+app.obj: ../app.c
+ $(CC) $(CFLAGS) -c ../app.c -oapp.obj
  
 clean:
  $(RM) *.obj
