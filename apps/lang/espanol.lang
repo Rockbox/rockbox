@@ -1,4 +1,3 @@
-# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -415,38 +414,62 @@ voice: ""
 new: "Teclado Desbloqueado"
 
 id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
+### Description changed! Previous description was:
+### "displayed when mute is on"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Mute ON"
+eng: ""
 voice: ""
 new: "Silencio ON"
 
 id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
+### Description changed! Previous description was:
+### "displayed when mute is off"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Mute OFF"
+eng: ""
 voice: ""
 new: "Silencio OFF"
 
 id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
+### Description changed! Previous description was:
+### "displayed when mute is on"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Mute Is ON"
+eng: ""
 voice: ""
 new: "Silencio ON"
 
 id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
+### Description changed! Previous description was:
+### "displayed when mute is off"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Mute Is OFF"
+eng: ""
 voice: ""
 new: "Silencio OFF"
 
 id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
+### Description changed! Previous description was:
+### "in the browse_id3() function"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "-ID3 Info- "
+eng: ""
 voice: ""
 new: "-Pantalla- "
 
 id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
+### Description changed! Previous description was:
+### "in the browse_id3() function"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "--Screen-- "
+eng: ""
 voice: ""
 new: "-Info ID3- "
 
@@ -805,14 +828,22 @@ voice: ""
 new: "Borrado"
 
 id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
+### Description changed! Previous description was:
+### "disk size info"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Free: %d.%dGB"
+eng: ""
 voice: "Espacio libre en disco"
 new: "Libre: %d.%dGB"
 
 id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
+### Description changed! Previous description was:
+### "disk size info"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Disk: %d.%dGB"
+eng: ""
 voice: ""
 new: "Disco: %d.%dGB"
 
@@ -1621,8 +1652,12 @@ voice: ""
 new: "Lista de Sintonias llena"
 
 id: LANG_FM_NO_PRESETS
-desc: in radio screen
-eng: "The preset list is empty"
+### Description changed! Previous description was:
+### "in radio screen"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "The preset list is empty"
+eng: ""
 voice: ""
 new: "Lista de Sintonias vacia"
 
@@ -1639,8 +1674,12 @@ voice: "Radio FM"
 new: "Radio FM"
 
 id: LANG_FM_SAVE_PRESET
-desc: in radio screen
-eng: "Save preset"
+### Description changed! Previous description was:
+### "in radio screen"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Save preset"
+eng: ""
 voice: ""
 new: "Guardar Sintonia"
 
@@ -2107,7 +2146,9 @@ voice: "14"
 new: ""
 
 id: VOICE_GIGABYTE
-desc: spoken only, a unit postfix
+### Description changed! Previous description was:
+### "spoken only, a unit postfix"
+desc: DEPRECATED
 eng: ""
 voice: "gigabyte"
 new: ""
@@ -2137,7 +2178,9 @@ voice: "kilohercio"
 new: ""
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix, currently not used
+### Description changed! Previous description was:
+### "spoken only, a unit postfix, currently not used"
+desc: DEPRECATED
 eng: ""
 voice: "megabyte"
 new: ""
@@ -2209,7 +2252,9 @@ voice: "más"
 new: ""
 
 id: VOICE_POINT
-desc: spoken only, decimal separator for composing numbers
+### Description changed! Previous description was:
+### "spoken only, decimal separator for composing numbers"
+desc: DEPRECATED
 eng: ""
 voice: "coma"
 new: ""
@@ -2271,14 +2316,12 @@ new: ""
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
-
 voice: "13"
 new: ""
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
-
 voice: "30"
 new: ""
 
@@ -2403,8 +2446,12 @@ voice: ""
 new: "Añadir"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc: in radio screen
-eng: "Edit"
+### Description changed! Previous description was:
+### "in radio screen"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Edit"
+eng: ""
 voice: ""
 new: "Editar"
 
@@ -2845,3 +2892,111 @@ desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
 new: ""
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery Type"
+voice: "Tipo de batería"
+new: "Tipo de batería"
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+voice: "Alcalina"
+new: "Alcalina"
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+voice: "Níquel hidruro de metal"
+new: "NiMH"
+
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
+voice: ""
+new: "B"
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+voice: "Espacio libre"
+new: "Libre:"
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "Disk:"
+voice: ""
+new: "Disco:"
+
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+voice: "gigabyte"
+new: "GB"
+
+id: LANG_ID3DB_ALBUMS
+desc: ID3 virtual folder name
+eng: "Albums"
+voice: ""
+new: "Discos"
+
+id: LANG_ID3DB_ARTISTS
+desc: ID3 virtual folder name
+eng: "Artists"
+voice: ""
+new: "Artistas"
+
+id: LANG_ID3DB_MATCHES
+desc: ID3 virtual folder name
+eng: "Found %d matches"
+voice: ""
+new: "Encontradas %d coincidencias"
+
+id: LANG_ID3DB_SEARCH
+desc: ID3 virtual folder name
+eng: "Search"
+voice: ""
+new: "Búsqueda"
+
+id: LANG_ID3DB_SEARCH_ALBUMS
+desc: ID3 virtual folder name
+eng: "Search Albums"
+voice: ""
+new: "Buscar Discos"
+
+id: LANG_ID3DB_SEARCH_ARTISTS
+desc: ID3 virtual folder name
+eng: "Search Artists"
+voice: ""
+new: "Buscar Artistas"
+
+id: LANG_ID3DB_SEARCH_SONGS
+desc: ID3 virtual folder name
+eng: "Search Songs"
+voice: ""
+new: "Buscar Canciones"
+
+id: LANG_ID3DB_SONGS
+desc: ID3 virtual folder name
+eng: "Songs"
+voice: ""
+new: "Canciones"
+
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+voice: "kilobyte"
+new: "KB"
+
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+voice: "megabyte"
+new: "MB"
+
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+voice: "punto"
+new: "."
