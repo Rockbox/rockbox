@@ -5,6 +5,7 @@
 
 <h2>Submitting new bug reports</h2>
 
+<a name="rules">
 <h3>Rules for bug reporting:</h3>
 
 <ol>
