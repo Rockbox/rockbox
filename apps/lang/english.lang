@@ -1162,3 +1162,7 @@ desc: show only playlist
 eng: "Playlists"
 new:
 
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+new:

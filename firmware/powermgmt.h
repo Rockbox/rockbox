@@ -24,7 +24,7 @@
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.5V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
 #define BATTERY_LEVEL_DANGEROUS  475 /* 4.75V */
-#define BATTERY_LEVEL_FULL       520 /* 5.2V */
+#define BATTERY_LEVEL_FULL       585 /* 5.85V */
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
 
@@ -39,14 +39,26 @@
 
 #ifdef HAVE_CHARGE_CTRL
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
-#define CHARGE_MAX_TIME   6*60   /* minutes: maximum charging time */
+#define CHARGE_MAX_TIME   8*60   /* minutes: maximum charging time */
 #define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
 #define CHARGE_RESTART_HI 95     /* %: when to restart charging in 'charge' mode */
 #define CHARGE_RESTART_LO 10     /* %: when to restart charging in 'discharge' mode */
+#define CHARGE_PAUSE_LEN  60     /* how many minutes to pause between charging cycles */
 
 extern char power_message[POWER_MESSAGE_LEN];
 extern char charge_restart_level;
+
+extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
+extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
+
+extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
+
 #endif /* HAVE_CHARGE_CTRL */
+
+#define BATTERY_CAPACITY 1800    /* battery capacity in mAh for runtime estimation */
+#define CURRENT_NORMAL    145    /* usual current in mA when using the AJB including some disk/backlight/... activity */
+#define CURRENT_BACKLIGHT  30    /* additional current when backlight is always on */
+#define CURRENT_CHARGING  300    /* charging current */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
@@ -57,6 +69,7 @@ void power_init(void);
 
 /* Returns battery level in percent */
 int battery_level(void);
+int battery_time(void); /* minutes */
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);

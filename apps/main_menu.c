@@ -183,21 +183,13 @@ bool show_info(void)
 #endif
             lcd_puts(0, y++, s);
             
-#ifdef HAVE_LCD_CHARCELLS
-            snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_PLAYER), 
-                     battery_level(), battery_level_safe() ? "" : "!");
-#else
 #ifdef HAVE_CHARGE_CTRL
             if (charger_enabled)
                 snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
             else
-                snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
-                         battery_level(), battery_level_safe() ? "" : " !!");
-#else
-            snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
-                     battery_level(), battery_level_safe() ? "" : " !!");
 #endif
-#endif
+            snprintf(s, sizeof(s), str(LANG_BATTERY_TIME), battery_level(),
+                     battery_time() / 60, battery_time() % 60);
             lcd_puts(0, y++, s);
         }
 

@@ -78,9 +78,8 @@ bool dbg_os(void)
         }
 
         lcd_update();
-        sleep(HZ/10);
 
-        button = button_get(false);
+        button = button_get_w_tmo(HZ/10);
 
         switch(button)
         {
@@ -112,9 +111,7 @@ bool dbg_os(void)
         snprintf(buf, 32, "%d: %d%%  ", currval, usage);
         lcd_puts(0, 1, buf);
 	
-        sleep(HZ/10);
-
-        button = button_get(false);
+        button = button_get_w_tmo(HZ/10);
 
         switch(button)
         {
@@ -333,7 +330,7 @@ bool dbg_partitions(void)
     lcd_puts(0, 0, "Partition");
     lcd_puts(0, 1, "list");
     lcd_update();
-    sleep(HZ);
+    sleep(HZ/2);
 
     while(1)
     {
@@ -431,9 +428,7 @@ bool dbg_ports(void)
         lcd_puts(0, 7, buf);
 	
         lcd_update();
-        sleep(HZ/10);
-
-        button = button_get(false);
+        button = button_get(HZ/10);
 
         switch(button)
         {
@@ -513,9 +508,7 @@ bool dbg_ports(void)
         snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
         lcd_puts(0, 1, buf);
         
-        sleep(HZ/5);
-
-        button = button_get(false);
+        button = button_get_w_tmo(HZ/5);
 
         switch(button)
         {
@@ -566,9 +559,8 @@ bool dbg_rtc(void)
         }
         
         lcd_update();
-        sleep(HZ/2);
 
-        button = button_get(false);
+        button = button_get_w_tmo(HZ/2);
 
         switch(button)
         {
@@ -623,9 +615,8 @@ bool dbg_mas(void)
         }
 
         lcd_update();
-        sleep(HZ/16);
 
-        switch(button_get(false))
+        switch(button_get_w_tmo(HZ/16))
         {
 #ifdef HAVE_RECORDER_KEYPAD
         case BUTTON_DOWN:
@@ -674,9 +665,8 @@ bool dbg_mas_codec(void)
         }
         
         lcd_update();
-        sleep(HZ/16);
 
-        switch(button_get(false))
+        switch(button_get_w_tmo(HZ/16))
         {
         case BUTTON_DOWN:
             addr += 4;
@@ -805,12 +795,42 @@ bool view_battery(void)
                     lcd_puts(0, i+1, buf);
                 }
                 break;
+
+            case 3: /* remeining time estimation: */
+                lcd_clear_display();
+                lcd_puts(0, 0, "Remaining time:");
+                
+                snprintf(buf, 30, "Cycle time: %d m", powermgmt_last_cycle_startstop_min);
+                lcd_puts(0, 1, buf);
+
+                snprintf(buf, 30, "Lev.at cycle start: %d%%", powermgmt_last_cycle_level);
+                lcd_puts(0, 2, buf);
+
+                snprintf(buf, 30, "Last PwrHist val: %d.%02d V",
+                    power_history[POWER_HISTORY_LEN-1] / 100,
+                    power_history[POWER_HISTORY_LEN-1] % 100);
+                lcd_puts(0, 3, buf);
+
+                snprintf(buf, 30, "Lazy time amount: %d%%",
+                    (powermgmt_last_cycle_startstop_min < 20)
+                    ? battery_lazyness[powermgmt_last_cycle_startstop_min]
+                    : 0);
+                lcd_puts(0, 4, buf);
+
+                snprintf(buf, 30, "resulting act.lev: %d%%", battery_level());
+                lcd_puts(0, 5, buf);
+
+                snprintf(buf, 30, "Est. remaining: %d m", powermgmt_est_runningtime_min);
+                lcd_puts(0, 6, buf);
+
+#ifdef HAVE_CHARGE_CTRL
+#endif                
+                break;
         }
         
         lcd_update();
-        sleep(HZ/2);
         
-        switch(button_get(false))
+        switch(button_get_w_tmo(HZ/2))
         {
             case BUTTON_UP:
                 if (view)
@@ -818,7 +838,7 @@ bool view_battery(void)
                 break;
                 
             case BUTTON_DOWN:
-                if (view < 2)
+                if (view < 3)
                     view++;
                 break;
                 
