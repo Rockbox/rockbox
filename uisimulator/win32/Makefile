@@ -23,13 +23,11 @@ PLAYDIR = $(APPDIR)/player
 PLUGINDIR = $(APPDIR)/plugins
 SIMCOMMON = ../common
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-     MACHINEDIR = $(RECDIR)
-     # not very nice to set config stuff like this, but...
-     RTC += -DHAVE_RTC
-     RADIO += -DHAVE_FMRADIO
-else
+ISPLAYER := $(findstring PLAYER, $(TARGET))
+ifeq ($(ISPLAYER), PLAYER)
      MACHINEDIR = $(PLAYDIR)
+else
+     MACHINEDIR = $(RECDIR)
 endif
 
 PREVAPPDIR= ..
@@ -58,11 +56,8 @@ endif
 
 LANGUAGE = english
 
-TARGET = $(OBJDIR)/uisw32.exe
-
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
-$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) \
-$(RTC) $(RADIO)
+$(TARGET) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES)
 
 LDFLAGS =  -lgdi32 -luser32
 
@@ -81,11 +76,14 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
+EXEFILE := $(OBJDIR)/rockboxui.exe
+
 ifeq ($(UNAME),CYGWIN)
   CC = gcc
   WINDRES = windres
   DLLTOOL = dlltool
   DLLWRAP = dllwrap
+  RANLIB = ranlib
   DEFINES += -DNOCYGWIN
   LDFLAGS += -mno-cygwin
 else
@@ -93,15 +91,16 @@ else
   WINDRES = i386-mingw32msvc-windres
   DLLTOOL = i386-mingw32msvc-dlltool
   DLLWRAP = i386-mingw32msvc-dllwrap
+  RANLIB = i386-mingw32msvc-ranlib
   CFLAGS += -mwindows
   LDFLAGS += -mwindows
   APPCFLAGS += -mwindows
 endif
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-	LCDSRSC = lcd-recorder.c sysfont.c font.c
-else
+ifeq ($(ISPLAYER),PLAYER)
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
+else
+	LCDSRSC = lcd-recorder.c sysfont.c font.c
 endif
 COMMONSRCS = io.c stubs.c lcd-common.c sim_icons.c fmradio.c
 
@@ -115,7 +114,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c \
 	settings_menu.c sound_menu.c playlist_menu.c
 
-ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+ifneq ($(ISPLAYER),PLAYER)
    APPS += peakmeter.c bmp.c widgets.c radio.c
 endif
 
@@ -128,18 +127,19 @@ OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 ROCKS := $(patsubst $(PLUGINDIR)/%.c,$(OBJDIR)/%.rock,$(wildcard $(PLUGINDIR)/*.c))
 PLUGINLIBOBJS := $(patsubst $(PLUGINDIR)/lib/%.c,$(OBJDIR)/%.o,$(wildcard $(PLUGINDIR)/lib/*.c))
 
-all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
+all: $(TOOLSDIR)/convbdf $(EXEFILE) $(ROCKS)
 
 $(ROCKS): $(OBJDIR)/libplugin.a
 
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
-$(TARGET): $(OBJDIR)/lang.o $(OBJS) $(OBJDIR)/libplugin.a
-	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
+$(EXEFILE): $(OBJDIR)/lang.o $(OBJS)
+	@echo LD $@
+	@$(CC) $(OBJS) -o $(EXEFILE) $(LDFLAGS)
 
 clean:
-	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
+	$(RM) $(OBJS) *~ core $(EXEFILE) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
 	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
 	$(OBJDIR)/credits.raw $(OBJDIR)/libplugin.a
@@ -157,51 +157,67 @@ $(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.r
 $(OBJDIR)/button.o: button.c
 $(OBJDIR)/plugin.o: $(APPDIR)/plugin.c plugin-win32.h
 $(OBJDIR)/build.lang: $(APPDIR)/lang/$(LANGUAGE).lang
-	perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
+	@echo UPLANG
+	@perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
-	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
-	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
+	@echo GENLANG
+	@perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	@$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 $(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
-	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
-	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
+	@echo CC $<
+	@$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	@$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 ################## Plugins ##################
 $(OBJDIR)/libplugin.a:  $(PLUGINLIBOBJS)
-	$(AR) ruv $@ $+
+	@echo AR $@
+	@$(AR) ru $@ $+
+	@$(RANLIB) $@
 
 $(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
-	$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
+	@echo CC $<
+	@$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
 
 $(OBJDIR)/%.po : $(PLUGINDIR)/%.c
-	$(CC) $(APPCFLAGS) -DPLUGIN -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -DPLUGIN -c $< -o $@
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.po
-	$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
+$(OBJDIR)/%.rock : $(OBJDIR)/%.po $(OBJDIR)/libplugin.a
+	@echo DLL $@
+	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a -o $@
+	@chmod -x $@
 
 ################## Patterns for building objects ##################
 $(OBJDIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(SIMCOMMON)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(MACHINEDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(DRIVERS)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(FIRMWAREDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(COMMON)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: $(APPDIR)/%.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	@echo CC $<
+	@$(CC) $(APPCFLAGS) -c $< -o $@
 
 ################## Auto-dependencies ##################
 DEPS:=$(OBJDIR)/.deps
