@@ -320,7 +320,8 @@ Q47: Where's the recording option?  Why can't I record?!!
 A47: I'd like to say we hid it because we don't like you, but you seem to be
      a good person so here's the truth.  It's just not implimented in release 
      versions of Rockbox yet.  But stress not, you can still use Rolo to boot 
-     the default Archos firmware and record from there.  
+     the default Archos firmware and record from there.  (In order to do this
+     you _must_ have a copy of the original firmware still on your player) 
 
      Daily builds and bleeding edge versions have initial support for
      Recording. If you're brave and want to help out, get one, try out and
