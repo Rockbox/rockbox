@@ -64,7 +64,12 @@ extern const unsigned char bitmap_icons_5x8[1][5];
 extern const unsigned char bitmap_icons_6x8[LastIcon][6];
 extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
 
+#if LCD_WIDTH == 112
 extern const unsigned char rockbox112x37[];
+#endif
+#if LCD_WIDTH == 160
+extern const unsigned char rockbox160x53[];
+#endif
 
 #define STATUSBAR_X_POS       0
 #define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */
