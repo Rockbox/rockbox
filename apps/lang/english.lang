@@ -611,17 +611,17 @@ new:
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
-eng: "<Press ON>"
+eng: ""
 new:
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "<End of song list>"
+eng: "End of song list"
 new: 
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
-eng: "Press ON"
+eng: ""
 new:
 
 id: LANG_SNAKE_SCORE

@@ -280,7 +280,6 @@ static int browse_id3(void)
 #endif
             case BUTTON_PLAY:
                 lcd_stop_scroll();
-                wps_display(id3);
                 exit = true;
                 break;
 
@@ -391,7 +390,8 @@ static bool ffwd_rew(int button)
                     status_set_playmode(STATUS_PLAY);
                 }
 #ifdef HAVE_LCD_CHARCELLS
-                wps_display(id3);
+                if (wps_display(id3))
+                    return true;
 #endif
                 exit = true;
                 break;
@@ -409,7 +409,7 @@ static bool ffwd_rew(int button)
     return usb;
 }
 
-static void update(void)
+static bool update(void)
 {
     bool track_changed = mpeg_has_changed_track();
 
@@ -417,13 +417,13 @@ static void update(void)
     {
         lcd_stop_scroll();
         id3 = mpeg_current_track();
-        wps_display(id3);
+        if (wps_display(id3))
+            return true;
         wps_refresh(id3,0,true);
     }
 
-    if (id3) {
+    if (id3)
         wps_refresh(id3,0,false);
-    }
 
     status_draw();
 
@@ -442,6 +442,8 @@ static void update(void)
         global_settings.resume_offset = -1;
         settings_save();
     }
+
+    return false;
 }
 
 
@@ -456,7 +458,8 @@ static bool keylock(void)
     display_keylock_text(true);
     keys_locked = true;
     wps_refresh(id3,0,true);
-    wps_display(id3);
+    if (wps_display(id3))
+        return true;
     status_draw();
     while (button_get(false)); /* clear button queue */
 
@@ -501,7 +504,8 @@ static bool keylock(void)
                 display_keylock_text(true);
                 while (button_get(false)); /* clear button queue */
                 wps_refresh(id3,0,true);
-                wps_display(id3);
+                if(wps_display(id3))
+                    return true;
                 break;
         }
     }
@@ -595,7 +599,6 @@ static bool menu(void)
                 lcd_icon(ICON_PARAM, false);
                 lcd_icon(ICON_AUDIO, true);
 #endif
-                wps_display(id3);
                 exit = true;
                 break;
 
@@ -610,7 +613,8 @@ static bool menu(void)
     lcd_icon(ICON_PARAM, false);
 #endif
 
-    wps_display(id3);
+    if (wps_display(id3))
+        return true;
     wps_refresh(id3,0,true);
     return false;
 }
@@ -644,7 +648,8 @@ int wps_show(void)
     {
         id3 = mpeg_current_track();
         if (id3) {
-            wps_display(id3);
+            if (wps_display(id3))
+                return 0;
             wps_refresh(id3,0,true);
         }
         restore = true;
@@ -851,7 +856,8 @@ int wps_show(void)
                 return SYS_USB_CONNECTED;
 
             case BUTTON_NONE: /* Timeout */
-                update();
+                if (update())
+                    return 0;
                 break;
         }
 
@@ -860,7 +866,8 @@ int wps_show(void)
 
         if (restore) {
             restore = false;
-            wps_display(id3);
+            if (wps_display(id3))
+                return 0;
             if (id3)
                 wps_refresh(id3,0,false);
         }

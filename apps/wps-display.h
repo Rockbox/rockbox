@@ -23,7 +23,7 @@
 #include "id3.h"
 
 bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll);
-void wps_display(struct mp3entry* id3);
+bool wps_display(struct mp3entry* id3);
 bool wps_load(char* file, bool display);
 
 #ifdef HAVE_LCD_CHARCELLS
