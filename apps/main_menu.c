@@ -41,6 +41,9 @@
 #include "fat.h"
 #include "sleeptimer.h"
 #include "wps.h"
+#ifdef HAVE_FMRADIO
+#include "radio.h"
+#endif
 
 #include "lang.h"
 
@@ -258,6 +261,9 @@ bool main_menu(void)
     struct menu_items items[] = {
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
+#ifdef HAVE_FMRADIO
+        { "FM Radio",   radio_screen     },
+#endif
 #ifdef HAVE_MAS3587F
         { str(LANG_RECORDING),          recording_screen  },
         { str(LANG_RECORDING_SETTINGS), recording_menu    },
