@@ -74,7 +74,6 @@ char rec_base_directory[] = REC_BASE_DIR;
 #define CONFIG_BLOCK_VERSION 11
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
-#define MARKER 0x7FFFFFFF /* FIXME: to be removed with val2phys/phys2val */
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES 10
@@ -161,12 +160,12 @@ static struct bit_entry rtc_bits[] =
     /* # of bits, offset+size, default, .cfg name, .cfg values */
     /* sound */
     {7, S_O(volume), 70, "volume", NULL }, /* 0...100 */
-    {7 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -50...50 */
-    {5, S_O(bass), 0, "bass", NULL }, /* 0...30 */
-    {5, S_O(treble), 0, "treble", NULL }, /* 0...30 */
+    {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
+    {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
+    {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
 #ifdef HAVE_MAS3587F
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
-    {4, S_O(bass_boost), 0, "bass boost", NULL }, /* 0...10 */
+    {7, S_O(bass_boost), 0, "bass boost", NULL }, /* 0...100 */
     {2, S_O(avc), 0, "auto volume", "off,2,4,8" },
 #endif
     {3, S_O(channel_config), 6, "channels", 
@@ -595,7 +594,6 @@ static void save_bit_table(const struct bit_entry* p_table, int count, int bitst
  */
 int settings_save( void )
 {
-    int restore[6]; /* recover, FIXME: get rid of this */
     DEBUGF( "settings_save()\n" );
 
     {
@@ -609,24 +607,6 @@ int settings_save( void )
             global_settings.topruntime = global_settings.runtime;
     }
 
-    /* While the mpeg_val2phys business still exists: ( to be removed) */
-    /* temporarily replace the hardware levels with the MMI values */
-    restore[SOUND_VOLUME] = global_settings.volume;
-    global_settings.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-    restore[SOUND_BASS] = global_settings.bass;
-    global_settings.bass = mpeg_val2phys(SOUND_BASS, global_settings.bass);
-    restore[SOUND_TREBLE] = global_settings.treble;
-    global_settings.treble = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
-    restore[SOUND_BALANCE] = global_settings.balance;
-    global_settings.balance = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
-#ifdef HAVE_MAS3587F
-    restore[SOUND_LOUDNESS] = global_settings.loudness;
-    global_settings.loudness = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
-    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
-    global_settings.bass_boost = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
-#endif
-    
-
     /* serialize scalar values into RTC and HD sector, specified via table */
     save_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
     save_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
@@ -634,18 +614,6 @@ int settings_save( void )
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
-
-
-    /* restore the original values; to be removed with mpeg_val2phys */
-    global_settings.volume = restore[SOUND_VOLUME];
-    global_settings.bass = restore[SOUND_BASS];
-    global_settings.treble = restore[SOUND_TREBLE];
-    global_settings.balance = restore[SOUND_BALANCE];
-#ifdef HAVE_MAS3587F
-    global_settings.loudness = restore[SOUND_LOUDNESS];
-    global_settings.bass_boost = restore[SOUND_SUPERBASS];
-#endif
-
 
     if(save_config_buffer())
     {
@@ -839,31 +807,12 @@ static void load_bit_table(const struct bit_entry* p_table, int count, int bitst
  */
 void settings_load(int which)
 {
-    int restore[6]; /* recover, FIXME: get rid of this */
-    
     DEBUGF( "reload_all_settings()\n" );
 
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
     if (!load_config_buffer(which)) 
     {
-        /* While the mpeg_val2phys business still exists: ( FIXME: to be removed) */
-        /* temporarily put markers into the values to detect if they got loaded */
-        restore[SOUND_VOLUME] = global_settings.volume;
-        global_settings.volume = MARKER;
-        restore[SOUND_BASS] = global_settings.bass;
-        global_settings.bass = MARKER;
-        restore[SOUND_TREBLE] = global_settings.treble;
-        global_settings.treble = MARKER;
-        restore[SOUND_BALANCE] = global_settings.balance;
-        global_settings.balance = MARKER;
-#ifdef HAVE_MAS3587F
-        restore[SOUND_LOUDNESS] = global_settings.loudness;
-        global_settings.loudness = MARKER;
-        restore[SOUND_SUPERBASS] = global_settings.bass_boost;
-        global_settings.bass_boost = MARKER;
-#endif
-        
         /* load scalar values from RTC and HD sector, specified via table */
         if (which & SETTINGS_RTC)
         {
@@ -875,23 +824,6 @@ void settings_load(int which)
                 RTC_BLOCK_SIZE*8);
         }
         
-        /* FIXME, to be removed with mpeg_val2phys: */
-        /* if a value got loaded, convert it, else restore it */
-        global_settings.volume = (global_settings.volume == MARKER) ? 
-            restore[SOUND_VOLUME] : mpeg_phys2val(SOUND_VOLUME, global_settings.volume);
-        global_settings.bass = (global_settings.bass == MARKER) ? 
-            restore[SOUND_BASS] : mpeg_phys2val(SOUND_BASS, global_settings.bass);
-        global_settings.treble = (global_settings.treble == MARKER) ? 
-            restore[SOUND_TREBLE] : mpeg_phys2val(SOUND_TREBLE, global_settings.treble);
-        global_settings.balance = (global_settings.balance == MARKER) ? 
-            restore[SOUND_BALANCE] : mpeg_phys2val(SOUND_BALANCE, global_settings.balance);
-#ifdef HAVE_MAS3587F
-        global_settings.loudness = (global_settings.loudness == MARKER) ? 
-            restore[SOUND_LOUDNESS] : mpeg_phys2val(SOUND_LOUDNESS, global_settings.loudness);
-        global_settings.bass_boost = (global_settings.bass_boost == MARKER) ? 
-            restore[SOUND_SUPERBASS] : mpeg_phys2val(SOUND_SUPERBASS, global_settings.bass_boost);
-#endif
-
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
 
@@ -1046,31 +978,11 @@ bool settings_load_config(char* file)
 {
     int fd;
     char line[128];
-    int restore[6]; /* recover, FIXME: get rid of this */
 
     fd = open(file, O_RDONLY);
     if (fd < 0)
         return false;
 
-
-    /* While the mpeg_val2phys business still exists: ( to be removed) */
-    /* temporarily put markers into the values to detect if they got loaded */
-    restore[SOUND_VOLUME] = global_settings.volume;
-    global_settings.volume = MARKER;
-    restore[SOUND_BASS] = global_settings.bass;
-    global_settings.bass = MARKER;
-    restore[SOUND_TREBLE] = global_settings.treble;
-    global_settings.treble = MARKER;
-    restore[SOUND_BALANCE] = global_settings.balance;
-    global_settings.balance = MARKER;
-#ifdef HAVE_MAS3587F
-    restore[SOUND_LOUDNESS] = global_settings.loudness;
-    global_settings.loudness = MARKER;
-    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
-    global_settings.bass_boost = MARKER;
-#endif
-    
-    
     while (read_line(fd, line, sizeof line) > 0)
     {
         char* name;
@@ -1126,23 +1038,6 @@ bool settings_load_config(char* file)
         }
     }
 
-    /* FIXME, to be removed with mpeg_val2phys: */
-    /* if a value got loaded, convert it, else restore it */
-    global_settings.volume = (global_settings.volume == MARKER) ? 
-        restore[SOUND_VOLUME] : mpeg_phys2val(SOUND_VOLUME, global_settings.volume);
-    global_settings.bass = (global_settings.bass == MARKER) ? 
-        restore[SOUND_BASS] : mpeg_phys2val(SOUND_BASS, global_settings.bass);
-    global_settings.treble = (global_settings.treble == MARKER) ? 
-        restore[SOUND_TREBLE] : mpeg_phys2val(SOUND_TREBLE, global_settings.treble);
-    global_settings.balance = (global_settings.balance == MARKER) ? 
-        restore[SOUND_BALANCE] : mpeg_phys2val(SOUND_BALANCE, global_settings.balance);
-#ifdef HAVE_MAS3587F
-    global_settings.loudness = (global_settings.loudness == MARKER) ? 
-        restore[SOUND_LOUDNESS] : mpeg_phys2val(SOUND_LOUDNESS, global_settings.loudness);
-    global_settings.bass_boost = (global_settings.bass_boost == MARKER) ? 
-        restore[SOUND_SUPERBASS] : mpeg_phys2val(SOUND_SUPERBASS, global_settings.bass_boost);
-#endif
-    
     close(fd);
     settings_apply();
     settings_save();
@@ -1221,7 +1116,6 @@ bool settings_save_config(void)
     bool done = false;
     int fd, i;
     char filename[MAX_PATH];
-    int restore[6]; /* recover, FIXME: get rid of this */
 
     /* find unused filename */
     for (i=0; ; i++) {
@@ -1276,36 +1170,9 @@ bool settings_save_config(void)
                 global_settings.font_file);
 #endif
 
-    /* FIXME: While the mpeg_val2phys business still exists: ( to be removed) */
-    /* temporarily replace the hardware levels with the MMI values */
-    restore[SOUND_VOLUME] = global_settings.volume;
-    global_settings.volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
-    restore[SOUND_BASS] = global_settings.bass;
-    global_settings.bass = mpeg_val2phys(SOUND_BASS, global_settings.bass);
-    restore[SOUND_TREBLE] = global_settings.treble;
-    global_settings.treble = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
-    restore[SOUND_BALANCE] = global_settings.balance;
-    global_settings.balance = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
-#ifdef HAVE_MAS3587F
-    restore[SOUND_LOUDNESS] = global_settings.loudness;
-    global_settings.loudness = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
-    restore[SOUND_SUPERBASS] = global_settings.bass_boost;
-    global_settings.bass_boost = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
-#endif
-    
     /* here's the action: write values to file, specified via table */
     save_cfg_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), fd);
     save_cfg_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), fd);
-
-    /* FIXME to be removed with mpeg_val2phys: restore the original values */
-    global_settings.volume = restore[SOUND_VOLUME];
-    global_settings.bass = restore[SOUND_BASS];
-    global_settings.treble = restore[SOUND_TREBLE];
-    global_settings.balance = restore[SOUND_BALANCE];
-#ifdef HAVE_MAS3587F
-    global_settings.loudness = restore[SOUND_LOUDNESS];
-    global_settings.bass_boost = restore[SOUND_SUPERBASS];
-#endif
 
     close(fd);
 

@@ -94,9 +94,14 @@ static int numdecimals[] =
 static int minval[] =
 {
     0,    /* Volume */
-    0,    /* Bass */
-    0,    /* Treble */
-    -50,  /* Balance */
+#ifdef HAVE_MAS3587F
+    -12,  /* Bass */
+    -12,  /* Treble */
+#else
+    -15,  /* Bass */
+    -15,  /* Treble */
+#endif
+    -100,  /* Balance */
     0,    /* Loudness */
     0,    /* Bass boost */
     -1,   /* AVC */
@@ -110,15 +115,15 @@ static int maxval[] =
 {
     100,  /* Volume */
 #ifdef HAVE_MAS3587F
-    24,   /* Bass */
-    24,   /* Treble */
+    12,   /* Bass */
+    12,   /* Treble */
 #else
-    30,   /* Bass */
-    30,   /* Treble */
+    15,   /* Bass */
+    15,   /* Treble */
 #endif
-    50,   /* Balance */
+    100,   /* Balance */
     17,   /* Loudness */
-    10,   /* Bass boost */
+    100,  /* Bass boost */
     3,    /* AVC */
     6,    /* Channels */
     15,   /* Left gain */
@@ -130,11 +135,11 @@ static int defaultval[] =
 {
     70,   /* Volume */
 #ifdef HAVE_MAS3587F
-    12+6, /* Bass */
-    12+6, /* Treble */
+    6,    /* Bass */
+    6,    /* Treble */
 #else
-    15+7, /* Bass */
-    15+7, /* Treble */
+    7,    /* Bass */
+    7,    /* Treble */
 #endif
     0,    /* Balance */
     0,    /* Loudness */
@@ -614,30 +619,27 @@ void mpeg_sound_set(int setting, int value)
 #ifdef HAVE_MAS3587F
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
-#else
-            /* Convert to percent */
-            current_balance = value * 2;
 #endif
             break;
 
         case SOUND_BASS:
 #ifdef HAVE_MAS3587F
-            tmp = (((value-12) * 8) & 0xff) << 8;
+            tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
-            mas_writereg(MAS_REG_KBASS, bass_table[value]);
-            current_bass = (value-15) * 10;
+            mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
+            current_bass = (value) * 10;
             set_prescaled_volume();
 #endif
             break;
 
         case SOUND_TREBLE:
 #ifdef HAVE_MAS3587F
-            tmp = (((value-12) * 8) & 0xff) << 8;
+            tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
-            mas_writereg(MAS_REG_KTREBLE, treble_table[value]);
-            current_treble = (value-15) * 10;
+            mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
+            current_treble = (value) * 10;
             set_prescaled_volume();
 #endif
             break;
@@ -645,7 +647,7 @@ void mpeg_sound_set(int setting, int value)
 #ifdef HAVE_MAS3587F
         case SOUND_SUPERBASS:
             if (value) {
-                tmp = MAX(MIN(value * 12, 0x7f), 0);
+                tmp = MAX(MIN(value * 127 / 100, 0x7f), 0);
                 mas_codec_writereg(MAS_REG_KMDB_STR, (tmp & 0xff) << 8);
                 tmp = 0x30; /* MDB_HAR: Space for experiment here */
                 mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0xff) << 8);
@@ -700,43 +702,11 @@ void mpeg_sound_set(int setting, int value)
 
 int mpeg_val2phys(int setting, int value)
 {
+#ifdef HAVE_MAS3587F
     int result = 0;
     
     switch(setting)
     {
-        case SOUND_VOLUME:
-            result = value;
-            break;
-        
-        case SOUND_BALANCE:
-            result = value * 2;
-            break;
-        
-        case SOUND_BASS:
-#ifdef HAVE_MAS3587F
-            result = value - 12;
-#else
-            result = value - 15;
-#endif
-            break;
-        
-        case SOUND_TREBLE:
-#ifdef HAVE_MAS3587F
-            result = value - 12;
-#else
-            result = value - 15;
-#endif
-            break;
-
-#ifdef HAVE_MAS3587F
-        case SOUND_LOUDNESS:
-            result = value;
-            break;
-            
-        case SOUND_SUPERBASS:
-            result = value * 10;
-            break;
-
         case SOUND_LEFT_GAIN:
         case SOUND_RIGHT_GAIN:
             result = (value - 2) * 15;
@@ -745,59 +715,17 @@ int mpeg_val2phys(int setting, int value)
         case SOUND_MIC_GAIN:
             result = value * 15 + 210;
             break;
-#endif
-    }
-    return result;
-}
 
-int mpeg_phys2val(int setting, int value)
-{
-    int result = 0;
-    
-    switch(setting)
-    {
-        case SOUND_VOLUME:
+       default:
             result = value;
             break;
-        
-        case SOUND_BALANCE:
-            result = value / 2;
-            break;
-        
-        case SOUND_BASS:
-#ifdef HAVE_MAS3587F
-            result = value + 12;
-#else
-            result = value + 15;
-#endif
-            break;
-        
-        case SOUND_TREBLE:
-#ifdef HAVE_MAS3587F
-            result = value + 12;
-#else
-            result = value + 15;
-#endif
-            break;
-
-#ifdef HAVE_MAS3587F
-        case SOUND_SUPERBASS:
-            result = value / 10;
-            break;
-
-        case SOUND_LOUDNESS:
-        case SOUND_AVC:
-        case SOUND_LEFT_GAIN:
-        case SOUND_RIGHT_GAIN:
-        case SOUND_MIC_GAIN:
-            result = value;
-            break;
-#endif
     }
-
     return result;
+#else
+    (void)setting;
+    return value;
+#endif
 }
-
 
 void mpeg_sound_channel_config(int configuration)
 {
