@@ -222,7 +222,7 @@ static int skip_unsynched(int fd, int len)
     }
 
     return len;
-};
+}
 
 /* parse numeric value from string */
 static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
