@@ -1208,3 +1208,113 @@ id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
 eng: "Total queued: %d"
 new: "total mis en Queue: %d"
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+new: "Reveil"
+
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm time is too soon!"
+new: "le reveil est trop tôt!"
+
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+new: "PLAY=Regler OFF=Annuler"
+
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting down..."
+new: "Extinction..."
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm time: %02d:%02d"
+new: "Heure du Reveil : %02d:%02d"
+
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking up in %d:%02d"
+new: "Reveil dans %d:%02d"
+
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+new: "Créer une Liste musicale"
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+new: "en cours de création"
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+new: "Effacer"
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+new: "Effacé"
+
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "failed"
+new: "Echec"
+
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
+eng: "Canceled"
+new: "Annuler"
+
+id: LANG_MENU_SETTING_OK
+desc: Visual confirmation of changing a setting
+eng: "OK"
+new: "OK"
+
+id: LANG_PLAYER_KEYBOARD_ABORT
+desc: Abort alternative in player keyboard interaction
+eng: "Abort"
+new: "Annuler"
+
+id: LANG_PLAYER_KEYBOARD_ACCEPT
+desc: Accept alternative in player keyboard interaction
+eng: "Accept"
+new: "Accepter"
+
+id: LANG_PLAYER_KEYBOARD_BACKSPACE
+desc: Backspace alternative in player keyboard interaction
+eng: "Backspace"
+new: "Del"
+
+id: LANG_PLAYER_KEYBOARD_DELETE
+desc: Delete alternative in player keyboard interaction
+eng: "Delete"
+new: "Effacer"
+
+id: LANG_PLAYER_ONPLAY_1
+desc: 
+eng: "\x81 Queue"
+new: "\x81 Queue"
+
+id: LANG_PLAYER_ONPLAY_2
+desc: 
+eng: "- Ren + Del"
+new: "- Ren + Eff"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+new: "Queue"
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+new: "Effacer?"
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+new: "Renomer"
