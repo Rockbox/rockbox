@@ -150,7 +150,7 @@ int read(int fd, void* buf, int count)
             headbytes = count;
             openfiles[fd].cacheoffset += count;
             if ( openfiles[fd].cacheoffset >= SECTOR_SIZE )
-                openfiles[fd].cacheoffset = 0;
+                openfiles[fd].cacheoffset = -1;
         }
         else {
             headbytes = SECTOR_SIZE - openfiles[fd].cacheoffset;
