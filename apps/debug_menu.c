@@ -39,6 +39,7 @@
 #include "font.h"
 #include "disk.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "settings.h"
 #include "ata.h"
 #include "fat.h"
@@ -1470,6 +1471,102 @@ bool dbg_fm_radio(void)
 }
 #endif
 
+static bool dbg_sound(void)
+{
+    char buf[128];
+    bool done = false;
+    bool set = true;
+    long ll, lr, rr, rl;
+    int d, i;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
+
+    /* Narrow stereo */
+    ll = 0xa0000;
+    lr = 0xe0000;
+    rr = 0xa0000;
+    rl = 0xe0000;
+    
+    while(!done)
+    {
+        int button;
+        lcd_clear_display();
+        d = 200 - ll * 100 / 0x80000;
+        i = d / 100;
+        snprintf(buf, sizeof buf, "LL: -%d.%02d (%05x)", i, d % 100, ll);
+        lcd_puts(0, 0, buf);
+
+        d = 200 - lr * 100 / 0x80000;
+        i = d / 100;
+        snprintf(buf, sizeof buf, "LR: -%d.%02d (%05x)", i, d % 100, lr);
+        lcd_puts(0, 1, buf);
+        
+        lcd_update();
+
+        /* Wait for a key to be pushed */
+        button = button_get(true);
+        switch(button) {
+#if defined(HAVE_PLAYER_KEYPAD) || defined(HAVE_NEO_KEYPAD)
+            case BUTTON_STOP | BUTTON_REL:
+#else
+            case BUTTON_OFF | BUTTON_REL:
+#endif
+                done = true;
+                break;
+
+            case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if(ll < 0x100000)
+                {
+                    ll += 0x80000/128;
+                    rr += 0x80000/128;
+                    lr -= 0x80000/128;
+                    rl -= 0x80000/128;
+                }
+                set = true;
+                break;
+                
+            case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if(ll > 0x80000)
+                {
+                    ll -= 0x80000/128;
+                    rr -= 0x80000/128;
+                    lr += 0x80000/128;
+                    rl += 0x80000/128;
+                }
+                set = true;
+                break;
+
+            case BUTTON_PLAY:
+                if(set) /* This means that the current config is the
+                           custom one */
+                    mpeg_sound_set(SOUND_CHANNELS, MPEG_SOUND_STEREO);
+
+                set = !set;
+                break;
+        }
+        if(set)
+        {
+#ifdef HAVE_MAS3587F
+            mas_writemem(MAS_BANK_D0, 0x7fc, &ll, 1); /* LL */
+            mas_writemem(MAS_BANK_D0, 0x7fd, &lr, 1); /* LR */
+            mas_writemem(MAS_BANK_D0, 0x7fe, &rl, 1); /* RL */
+            mas_writemem(MAS_BANK_D0, 0x7ff, &rr, 1); /* RR */
+#else
+            mas_writemem(MAS_BANK_D1, 0x7f8, &ll, 1); /* LL */
+            mas_writemem(MAS_BANK_D1, 0x7f9, &lr, 1); /* LR */
+            mas_writemem(MAS_BANK_D1, 0x7fa, &rl, 1); /* RL */
+            mas_writemem(MAS_BANK_D1, 0x7fb, &rr, 1); /* RR */
+#endif
+        }
+    }
+
+    return false;
+}
+
 bool debug_menu(void)
 {
     int m;
@@ -1507,6 +1604,7 @@ bool debug_menu(void)
 #ifdef HAVE_FMRADIO
         { "FM Radio", -1, dbg_fm_radio },
 #endif
+        { "Sound test", -1, dbg_sound },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
