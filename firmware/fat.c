@@ -96,12 +96,12 @@ struct disk_info di;
 extern int yyparse(void);
 
 
+#ifdef TEST_FAT
 void prompt(void)
 {
    printf("C:%s>", current_directory);
 }
 
-#ifdef TEST_FAT
 int main(int argc, char *argv[])
 {
     struct bpb bpb;
