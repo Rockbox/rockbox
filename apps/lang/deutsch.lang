@@ -306,8 +306,8 @@ new: "Sortiermodus"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll Speed"
-new: "Scrollgeschwindigkeit"
+eng: "Scroll"
+new: "Scroll-Einstellungen"
 
 id: LANG_RESET
 desc: in system_settings_menu()
@@ -873,7 +873,6 @@ id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 hour clock"
 new: "24 Std. Uhr"
-### LANG_BACKLIGHT_ON was not found in the english file!
 
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
@@ -1149,3 +1148,43 @@ id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 new: "Lautstärkeanzeige"
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+new: "Akku: Übergangsladen"
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+new: "Akku: Erhaltladen"
+
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+new: "Bidirektionales Scroll-Limit"
+
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+new: "Start-Verzögerung"
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "Geschwindigkeit"
+
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+new: "Schrittweite"
+
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
+new: "Beispieltext für die Schrittweite"
+
+id: LANG_TRICKLE_CHARGE
+desc: in settings_menu
+eng: "Trickle Charge"
+new: "Erhaltladen"
