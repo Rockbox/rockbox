@@ -83,24 +83,28 @@ static void wps_format(char* fmt)
     
     while (*buf)
     {
-        switch (*buf++)
+        switch (*buf)
         {
             case '\r':
-                *(buf - 1) = 0;
-                break;                
+                *buf = 0;
+                break;
 
             case '\n': /* LF */
-                *(buf - 1) = 0;
-                line++;
+                *buf = 0;
                 
-                if (line < MAX_LINES)
+                if (++line < MAX_LINES)
                 {
-                    format_lines[line] = buf;
+                    /* the next line starts on the next byte */
+                    format_lines[line] = buf+1;
                 }
-                
                 break;
         }
+        buf++;
     }
+
+    if(buf != format_lines[line])
+        /* the last line didn't terminate with a newline */
+        line++;
 
     for (; line < MAX_LINES; line++)
     {
