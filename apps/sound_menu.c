@@ -42,7 +42,7 @@ void set_sound(char* string,
                int setting)
 {
     bool done = false;
-    bool changed = false;
+    bool changed = true;
     int min, max;
     int val;
     int numdec;
