@@ -643,7 +643,8 @@ static bool ask_resume(bool ask_once)
 #endif
             default:
                 default_event_handler(button);
-                stop = true;
+                if (button & BUTTON_REL)
+                    stop = true;
                 break;
         }
     }
@@ -836,7 +837,8 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
                     default:
                         default_event_handler(button);
-                        stop = true;
+                        if (button & BUTTON_REL)
+                            stop = true;
                         break;
                  }
             }
