@@ -22,6 +22,7 @@
 #include "string.h"
 #include "config.h"
 #include "file.h"
+#include "dir.h"
 #include "lcd.h"
 #include "sprintf.h"
 #include "errno.h"
@@ -37,6 +38,7 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "backlight.h"
+#include "atoi.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -137,8 +139,13 @@ extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 static const unsigned char bmpheader[] =
 {
     0x42, 0x4d, 0x3e, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00,
-    0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0x40, 0x00,
-    0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+    0x00, 0x00, 0x28, 0x00, 0x00, 0x00, LCD_WIDTH, 0x00, 0x00, 0x00, LCD_HEIGHT, 0x00,
+    0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00,
+#if LCD_WIDTH == 160
+ 0x00, 0x00, 0x00, 0x0a,
+#else
+ 0x00, 0x00, 0x00, 0x04,
+#endif
     0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0xee, 0x90, 0x00, 0x00, 0x00,
     0x00, 0x00
@@ -150,12 +157,47 @@ void screen_dump(void)
     int bx, by, ix, iy;
     int src_byte, src_mask, dst_mask;
     char filename[MAX_PATH];
-    static unsigned char line_block[8][16];
+    static unsigned char line_block[8][(LCD_WIDTH/8+3) & ~3];
+#ifdef HAVE_RTC
     struct tm *tm = get_time();
     
     snprintf(filename, MAX_PATH, "/dump %04d-%02d-%02d %02d-%02d-%02d.bmp",
              tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
              tm->tm_hour, tm->tm_min, tm->tm_sec);
+#else
+    {
+        DIR* dir;
+        int max_dump_file = 1; /* default to dump_0001.bmp */
+        dir = opendir("/");
+        if (dir) /* found */
+        {
+            /* Search for the highest screendump filename present,
+               increment behind that. So even with "holes" 
+               (deleted files), the newest will always have the
+               highest number. */
+            while(true)
+            {   
+                struct dirent* entry;
+                int curr_dump_file;
+                /* walk through the directory content */
+                entry = readdir(dir);
+                if (!entry)
+                {
+                    closedir(dir);
+                    break; /* end of dir */
+                }
+                if (strncasecmp(entry->d_name, "dump_", 5))
+                    continue; /* no screendump file */
+                curr_dump_file = atoi(&entry->d_name[5]);
+                if (curr_dump_file >= max_dump_file)
+                    max_dump_file = curr_dump_file + 1;
+            }
+        }
+        snprintf(filename, MAX_PATH, 
+            "/dump_%04d.bmp", max_dump_file);
+    }
+
+#endif
 
     fh = creat(filename, O_WRONLY);
     if (fh < 0)
@@ -166,7 +208,7 @@ void screen_dump(void)
     /* BMP image goes bottom up */
     for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
     {
-        memset(&line_block[0][0], 0, 8*16);
+        memset(&line_block[0][0], 0, sizeof(line_block));
 
         for (bx = 0; bx < LCD_WIDTH/8; bx++)
         {
@@ -185,7 +227,7 @@ void screen_dump(void)
             }
         }
         
-        write(fh, &line_block[0][0], 8*16);
+        write(fh, &line_block[0][0], sizeof(line_block));
     }
     close(fh);
 }
