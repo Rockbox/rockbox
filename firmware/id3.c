@@ -243,7 +243,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             return;
     }
     entry->id3version = version;
-
+    entry->tracknum = entry->year = entry->genre = 0;
+    entry->title = entry->artist = entry->album = NULL;
+    
     /* Skip the extended header if it is present */
     if(version >= ID3_VER_2_4) {
         if(header[5] & 0x40) {
@@ -334,8 +336,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         DEBUGF("id3v2 frame: %.4s\n", header);
 
         /* Check for certain frame headers */
-        if(!strncmp(header, "TPE1", strlen("TPE1")) || 
-           !strncmp(header, "TP1", strlen("TP1"))) {
+        if (!entry->artist &&
+            (!strncmp(header, "TPE1", strlen("TPE1")) || 
+             !strncmp(header, "TP1", strlen("TP1")))) {
             bytesread = read(fd, buffer + bufferpos, framelen);
             entry->artist = buffer + bufferpos;
             unicode_munge(&entry->artist, &bytesread);
@@ -343,8 +346,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 2;
             size -= bytesread;
         }
-        else if(!strncmp(header, "TIT2", strlen("TIT2")) || 
-                !strncmp(header, "TT2", strlen("TT2"))) {
+        else if (!entry->artist &&
+                 (!strncmp(header, "TIT2", strlen("TIT2")) || 
+                  !strncmp(header, "TT2", strlen("TT2")))) {
             bytesread = read(fd, buffer + bufferpos, framelen);
             entry->title = buffer + bufferpos;
             unicode_munge(&entry->title, &bytesread);
@@ -352,7 +356,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 2;
             size -= bytesread;
         }
-        else if(!strncmp(header, "TALB", strlen("TALB"))) {
+        else if( !entry->album &&
+                 !strncmp(header, "TALB", strlen("TALB"))) {
             bytesread = read(fd, buffer + bufferpos, framelen);
             entry->album = buffer + bufferpos;
             unicode_munge(&entry->album, &bytesread);
@@ -360,7 +365,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 2;
             size -= bytesread;
         }
-        else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
+        else if (!entry->tracknum &&
+                 !strncmp(header, "TRCK", strlen("TRCK"))) {
             bytesread = read(fd, buffer + bufferpos, framelen);
             tracknum = buffer + bufferpos;
             unicode_munge(&tracknum, &bytesread);
@@ -369,8 +375,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 1;
             size -= bytesread;
         }
-        else if(!strncmp(header, "TYER", 4) ||
-                !strncmp(header, "TYR", 3)) {
+        else if (!entry->year &&
+                 (!strncmp(header, "TYER", 4) ||
+                  !strncmp(header, "TYR", 3))) {
             char* ptr = buffer + bufferpos;
             bytesread = read(fd, ptr, framelen);
             unicode_munge(&ptr, &bytesread);
@@ -378,7 +385,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 1;
             size -= bytesread;
         }
-        else if(!strncmp(header, "TCON", 4)) {
+        else if (!entry->genre &&
+                 !strncmp(header, "TCON", 4)) {
             char* ptr = buffer + bufferpos;
             bytesread = read(fd, ptr, framelen);
             if (ptr[1] == '(' && ptr[2] != '(')
