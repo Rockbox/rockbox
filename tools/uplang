@@ -106,11 +106,17 @@ while(<NEW>) {
                     $set{'voice'} = $all{$set{'id'}, 'voice'};
                 }
             }
+            if($set{'voice'} =~ /^(\"\")? *$/
+               and $all{$set{'id'}, 'voice'} !~ /^(\"\")? *$/) {
+                print "### Voice not found in previous translation. Set to english.\n";
+                $set{'voice'} = $all{$set{'id'}, 'voice'};
+            }
             print "voice: ".$set{'voice'}."\n";
 
             print "new: ".$set{'new'}."\n";
 
             $ids{$set{'id'}}=0;
+            undef %set;
         }
     }
 }
