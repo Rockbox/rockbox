@@ -38,6 +38,8 @@
      GRAY_DRAW_FG:      Only foreground pixels are drawn
      GRAY_DRAW_BG:      Only background pixels are drawn
      GRAY_DRAW_SOLID:   Foreground and background pixels are drawn
+
+ Default after initialization: GRAY_DRAW_SOLID
  */
 void gray_set_drawmode(int drawmode)
 {

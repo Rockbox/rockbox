@@ -34,6 +34,8 @@
  ----------------------------------------------------------------------------
  If you hand it -1 (or in fact any other out-of-bounds value) for a
  parameter, that particular setting won't be changed
+
+ Default after initialization: GRAY_DRAW_SOLID, 0, 255
  */
 void gray_set_drawinfo(int drawmode, int fg_brightness, int bg_brightness)
 {

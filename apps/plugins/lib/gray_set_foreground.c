@@ -33,6 +33,8 @@
  Set the foreground shade for subsequent drawing operations
  ----------------------------------------------------------------------------
  brightness = 0 (black) .. 255 (white)
+
+ Default after initialization: 0
  */
 void gray_set_foreground(int brightness)
 {

@@ -33,6 +33,8 @@
  Set the background shade for subsequent drawing operations
  ----------------------------------------------------------------------------
  brightness = 0 (black) .. 255 (white)
+
+ Default after initialization: 255
  */
 void gray_set_background(int brightness)
 {

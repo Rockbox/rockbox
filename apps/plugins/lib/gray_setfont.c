@@ -34,6 +34,8 @@
  ----------------------------------------------------------------------------
  newfont can be FONT_SYSFIXED or FONT_UI the same way as with the Rockbox
  core routines
+
+ Default after initialization: FONT_SYSFIXED
  */
 void gray_setfont(int newfont)
 {

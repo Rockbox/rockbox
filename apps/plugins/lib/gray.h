@@ -139,6 +139,8 @@ void gray_position_display(int x, int by);
      GRAY_DRAW_FG:      Only foreground pixels are drawn
      GRAY_DRAW_BG:      Only background pixels are drawn
      GRAY_DRAW_SOLID:   Foreground and background pixels are drawn
+
+ Default after initialization: GRAY_DRAW_SOLID
  */
 void gray_set_drawmode(int drawmode);
 
@@ -155,6 +157,8 @@ void gray_set_drawmode(int drawmode);
  Set the foreground shade for subsequent drawing operations
  ----------------------------------------------------------------------------
  brightness = 0 (black) .. 255 (white)
+
+ Default after initialization: 0
  */
 void gray_set_foreground(int brightness);
 
@@ -162,6 +166,8 @@ void gray_set_foreground(int brightness);
  Set the background shade for subsequent drawing operations
  ----------------------------------------------------------------------------
  brightness = 0 (black) .. 255 (white)
+
+ Default after initialization: 255
  */
 void gray_set_background(int brightness);
 
@@ -170,6 +176,8 @@ void gray_set_background(int brightness);
  ----------------------------------------------------------------------------
  If you hand it -1 (or in fact any other out-of-bounds value) for a
  parameter, that particular setting won't be changed
+
+ Default after initialization: GRAY_DRAW_SOLID, 0, 255
  */
 void gray_set_drawinfo(int drawmode, int fg_brightness, int bg_brightness);
 
@@ -378,6 +386,8 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
  ----------------------------------------------------------------------------
  newfont can be FONT_SYSFIXED or FONT_UI the same way as with the Rockbox
  core routines
+ 
+ Default after initialization: FONT_SYSFIXED
  */
 void gray_setfont(int newfont);
 
