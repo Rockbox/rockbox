@@ -3,7 +3,7 @@ Makefile
 README
 FILES
 *.lds
-common/*.[ch]
+common/*.[chS]
 drivers/*.[ch]
 export/*.h
 include/*.h
