@@ -107,6 +107,7 @@
     <td>Yes</td>
     <td>No</td>
     <td>Yes</td>
+    <td>Yes</td>
 </tr>
 <tr><th><b>LCD Type</b></th>
     <td>Character 11x2 <a href=#footnote2>(2)</a></td>
