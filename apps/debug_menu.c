@@ -506,20 +506,16 @@ void view_battery(void)
                          charger_enabled ? "yes" : "no");
                 lcd_puts(0, 4, buf);
 #endif                
-                y = 0;
-                for (i = 0; i < CHARGE_END_NEGD; i++)
-                    y += power_history[POWER_HISTORY_LEN-1-i]*100 - 
-                        power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                y = y / CHARGE_END_NEGD;
+                y = ( power_history[POWER_HISTORY_LEN-1] * 100
+                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
+                    / CHARGE_END_NEGD;
                 
                 snprintf(buf, 30, "short delta: %d", y);
                 lcd_puts(0, 5, buf);
                 
-                y = 0;
-                for (i = 0; i < CHARGE_END_ZEROD; i++)
-                    y += power_history[POWER_HISTORY_LEN-1-i]*100 - 
-                        power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                y = y / CHARGE_END_ZEROD;
+                y = ( power_history[POWER_HISTORY_LEN-1] * 100
+                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
+                    / CHARGE_END_ZEROD;
                 
                 snprintf(buf, 30, "long delta: %d", y);
                 lcd_puts(0, 6, buf);
@@ -546,7 +542,7 @@ void view_battery(void)
         
         lcd_update();
         sleep(HZ/2);
-                
+        
         switch(button_get(false))
         {
             case BUTTON_UP:
