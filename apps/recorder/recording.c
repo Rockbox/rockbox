@@ -669,6 +669,9 @@ bool recording_screen(void)
             done = true;
         }
     }
+
+    invert_led(false);
+
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
         splash(0, true, str(LANG_DISK_FULL));
@@ -684,8 +687,6 @@ bool recording_screen(void)
         }
     }
     
-    invert_led(false);
-
     mpeg_init_playback();
 
     sound_settings_apply();
