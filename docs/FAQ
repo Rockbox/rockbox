@@ -316,11 +316,13 @@ A38: That is the 'While Playing Screen'.  Basically this is what is shown on
 
 Q39: What good is the WPS?  How usable/flexible is it?
 A39: It is very good if you want information about the current item playing ;)
-     Currently the WPS on the Player is very flexible.  By using the file  
-     'wps.config' you can manage exactly how/what you want data displayed on 
-     your Archos Player.  Currently this feature has not yet been added to the
-     Recorder version of Rockbox.  Please see 
-     http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
+     Currently the WPS on the Player is very flexible.  By using a file with a
+     '.wps' extension you can manage exactly how/what you want data displayed
+     on your Archos Player. If you PLAY such a file, it'll be used. If the
+     file is placed in your /.rockbox directory, the file name will be
+     remembered and used on subsequent restarts.
+     Please see http://rockbox.haxx.se/docs/custom_wps_format.html for more
+     information.
 
 Q40: Can the Player LCD font be modified?
 A40: The simple answer is no.  This is because the Player font is character
