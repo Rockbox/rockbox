@@ -91,7 +91,7 @@ static int curfont = FONT_SYSFIXED;
 static int xoffset = 0; /* needed for flip */
 #endif
 
-unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH] __attribute__ ((section(".idata")));
 
 /* All zeros and ones bitmaps for area filling */  
 static const unsigned char zeros[16] = { 
