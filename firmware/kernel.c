@@ -20,7 +20,7 @@
 #include <string.h>
 #include "kernel.h"
 #include "thread.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "system.h"
 #include "panic.h"
 
@@ -154,6 +154,7 @@ int queue_broadcast(int id, void *data)
 /****************************************************************************
  * Timer tick
  ****************************************************************************/
+#if CONFIG_CPU == SH7034
 static void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;
@@ -205,6 +206,52 @@ void IMIA0(void)
 
     TSR0 &= ~0x01;
 }
+#elif CONFIG_CPU == MCF5249
+static void tick_start(unsigned int interval_in_ms)
+{
+    unsigned int count;
+
+    count = FREQ/2 * interval_in_ms / 1000 / 16;
+
+    if(count > 0xffff)
+    {
+        panicf("Error! The tick interval is too long (%d ms)\n",
+               interval_in_ms);
+        return;
+    }
+    
+    /* We are using timer 0 */
+
+    TRR0 = count; /* The reference count */
+    TCN0 = 0; /* reset the timer */
+    TMR0 = 0x001d; /* no prescaler, restart, CLK/16, enabled */
+
+    TER0 = 0xff; /* Clear all events */
+
+    ICR0 = (ICR0 & 0xff00ffff) | 0x008c0000; /* Interrupt on level 3.0 */
+    IMR &= ~0x200;
+}
+
+void TIMER0(void) __attribute__ ((interrupt_handler));
+void TIMER0(void)
+{
+    int i;
+
+    /* Run through the list of tick tasks */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i])
+        {
+            tick_funcs[i]();
+        }
+    }
+
+    current_tick++;
+    wake_up_thread();
+
+    TER0 = 0xff; /* Clear all events */
+}
+#endif
 
 int tick_add_task(void (*f)(void))
 {
