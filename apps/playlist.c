@@ -210,7 +210,7 @@ void add_indices_to_playlist( playlist_info_t *playlist )
  */
 void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
 {
-    int count = 0;
+    int count;
     int candidate;
     int store;
     
@@ -218,19 +218,15 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
     srand( seed );
 
     /* randomise entire indices list */
-    
-    while( count < playlist->amount )
+    for(count = playlist->amount - 1; count ; count--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
-        candidate = rand() % playlist->amount;
+        candidate = rand() % (count + 1);
 
         /* now swap the values at the 'count' and 'candidate' positions */
         store = playlist->indices[candidate];
         playlist->indices[candidate] = playlist->indices[count];
         playlist->indices[count] = store;
-                
-        /* move along */
-        count++;
     }
 }
 
@@ -239,12 +235,3 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
  * eval: (load-file "../firmware/rockbox-mode.el")
  * end:
  */
-
-
-
-
-
-
-
-
-
