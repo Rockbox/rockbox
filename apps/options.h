@@ -21,10 +21,12 @@
 #define __OPTIONS_H__
 
 #ifndef DISABLE_SCREENSAVERS
+#undef USE_SCREENSAVERS /* since older Makefiles set the define */
 #define USE_SCREENSAVERS
 #endif
 
 #ifndef DISABLE_GAMES
+#undef USE_GAMES /* since older Makefiles set the define */
 #define USE_GAMES
 #endif
 
