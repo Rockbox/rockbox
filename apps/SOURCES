@@ -24,6 +24,8 @@ sound_menu.c
 status.c
 talk.c
 tree.c
+dbtree.c
+filetree.c
 wps-display.c
 wps.c
 #ifdef HAVE_LCD_CHARCELLS

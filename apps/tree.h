@@ -20,6 +20,8 @@
 #define _TREE_H_
 
 #include <stdbool.h>
+#include <applimits.h>
+#include <file.h>
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 #define TREE_NEXT  BUTTON_DOWN
@@ -95,6 +97,12 @@
 
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+#define BOOTFILE "ajbrec.ajz"
+#else
+#define BOOTFILE "archos.mod"
+#endif
+
 struct entry {
     short attr; /* FAT attributes + file type flags */
     unsigned long time_write; /* Last write time */
@@ -108,6 +116,28 @@ struct filetype {
     int voiceclip;
 };
  
+/* browser context for file or db */
+struct tree_context {
+    int dirlevel;
+    int dircursor;
+    int dirstart;
+    int dirpos[MAX_DIR_LEVELS];
+    int cursorpos[MAX_DIR_LEVELS];
+    char currdir[MAX_PATH]; /* file use */
+    int *dirfilter; /* file use */
+    int filesindir;
+    int dirsindir; /* file use */
+    int table_history[MAX_DIR_LEVELS]; /* db use */
+    int extra_history[MAX_DIR_LEVELS]; /* db use */
+    int currtable; /* db use */
+    int currextra; /* db use */
+
+    void* dircache;
+    int dircache_size;
+    char* name_buffer;
+    int name_buffer_size;
+    int dentry_size;
+};
 
 /* using attribute bits not used by FAT (FAT uses lower 7) */
 
@@ -134,8 +164,7 @@ bool create_playlist(void);
 void resume_directory(const char *dir);
 char *getcwd(char *buf, int size);
 void reload_directory(void);
-struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
-                                      int *num_files, bool *buffer_full);
 bool check_rockboxdir(void);
+struct tree_context* tree_get_context(void);
 
 #endif

@@ -84,7 +84,7 @@
 #include "atoi.h"
 #include "misc.h"
 #include "button.h"
-#include "tree.h"
+#include "filetree.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -537,16 +537,18 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     char *count_str;
     int result = 0;
     int num_files = 0;
-    bool buffer_full = false;
     int i;
-    int dirfilter = SHOW_ALL;
+    int dirfilter = global_settings.dirfilter;
     struct entry *files;
 
     /* use the tree browser dircache to load files */
-    files = load_and_sort_directory(dirname, &dirfilter, &num_files,
-        &buffer_full);
+    global_settings.dirfilter = SHOW_ALL;
+    struct tree_context* tc = tree_get_context();
+    strncpy(tc->currdir, dirname, sizeof(tc->currdir));
+    num_files = ft_load(tc, NULL);
+    files = (struct entry*) tc->dircache;
 
-    if(!files)
+    if(!num_files)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
         return 0;
@@ -582,9 +584,10 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
                     break;
 
                 /* we now need to reload our current directory */
-                files = load_and_sort_directory(dirname, &dirfilter, &num_files,
-                    &buffer_full);
-                if (!files)
+                strncpy(tc->currdir, dirname, sizeof(tc->currdir));
+                num_files = ft_load(tc, NULL);
+                files = (struct entry*) tc->dircache;
+                if (!num_files)
                 {
                     result = -1;
                     break;
@@ -626,6 +629,9 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
             yield();
         }
     }
+
+    /* restore dirfilter */
+    global_settings.dirfilter = dirfilter;
 
     return result;
 }
