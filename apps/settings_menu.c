@@ -408,7 +408,7 @@ static bool scroll_delay(void)
 {
     int dummy = global_settings.scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_SCROLL_DELAY), "ms", &dummy, 
-                     &lcd_scroll_delay, 100, 0, 5000 );
+                     &lcd_scroll_delay, 100, 0, 2500 );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
 }
