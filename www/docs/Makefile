@@ -11,11 +11,11 @@ DOCS = ../docs_
 
 all: $(OBJS)
 
-faq.html: faq.t faq.raw $(TXT2PLAIN)
-	$(ACTION) $<
-
 faq.raw: $(DOCS)/FAQ $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
+
+faq.html: faq.t faq.raw $(TXT2PLAIN)
+	$(ACTION) $<
 
 battery-faq.raw: $(DOCS)/BATTERY-FAQ $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
@@ -27,6 +27,12 @@ contributing.raw: $(DOCS)/CONTRIBUTING $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
 
 contributing.html: contributing.t contributing.raw $(TXT2PLAIN)
+	$(ACTION) $<
+
+custom_wps_format.raw: $(DOCS)/CUSTOM_WPS_FORMAT $(TXT2PLAIN)
+	$(TXT2PLAIN) < $< > $@
+
+custom_wps_format.html: custom_wps_format.t custom_wps_format.raw $(TXT2PLAIN)
 	$(ACTION) $<
 
 %.html : %.t
