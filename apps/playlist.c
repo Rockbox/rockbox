@@ -64,7 +64,19 @@ int playlist_add(char *filename)
     return 0;
 }
 
-char* playlist_next(int steps, int* index)
+int playlist_next(int steps)
+{
+    playlist.index = (playlist.index+steps) % playlist.amount;
+    while ( playlist.index < 0 ) {
+        if ( global_settings.loop_playlist )
+            playlist.index += playlist.amount;
+        else
+            playlist.index = 0;
+    }
+    return playlist.index;
+}
+
+char* playlist_peek(int steps)
 {
     int seek;
     int max;
@@ -73,19 +85,20 @@ char* playlist_next(int steps, int* index)
     char *buf;
     char dir_buf[MAX_PATH+1];
     char *dir_end;
+    int index;
 
     if(abs(steps) > playlist.amount)
         /* prevent madness when all files are empty/bad */
         return NULL;
 
-    playlist.index = (playlist.index+steps) % playlist.amount;
-    while ( playlist.index < 0 ) {
+    index = (playlist.index+steps) % playlist.amount;
+    while ( index < 0 ) {
         if ( global_settings.loop_playlist )
-            playlist.index += playlist.amount;
+            index += playlist.amount;
         else
-            playlist.index = 0;
+            index = 0;
     }
-    seek = playlist.indices[playlist.index];
+    seek = playlist.indices[index];
 
     if(playlist.in_ram)
     {
@@ -105,9 +118,6 @@ char* playlist_next(int steps, int* index)
         else
             return NULL;
     }
-
-    if (index)
-        *index = playlist.index;
 
     /* Zero-terminate the file name */
     seek=0;
