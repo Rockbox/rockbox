@@ -56,4 +56,4 @@
 #define HAVE_BATTERIES 1
 
 /* The start address index for ROM builds */
-#define ROM_START 0x12010
+#define ROM_START 0x14010
