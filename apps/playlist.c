@@ -38,7 +38,22 @@
 
 #include "lang.h"
 
-static struct playlist_info playlist;
+static struct playlist_info playlist={
+    "",  /* filename */
+    -1,  /* fd */
+    0,   /* dirlen */
+    {0}, /* indices[] */
+    0,   /* index */
+    0,   /* first_index */
+    0,   /* seed */
+    0,   /* amount */
+    false, /* in_ram */
+    {0}, /* queue_indices[] */
+    0,   /* last_queue_index */
+    0,   /* queue_index */
+    0,   /* num_queued */
+    0    /* start_queue */
+};
 
 #define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
 
