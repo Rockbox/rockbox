@@ -116,7 +116,7 @@ void playlist_name(char *name, int name_size)
     char buf[MAX_PATH+1];
     int i = 0;
 
-    snprintf(buf, "%s", playlist.filename+playlist.dirlen);
+    snprintf(buf, sizeof(buf), "%s", playlist.filename+playlist.dirlen);
     while((buf[i] != '.') && (buf[i] != 0))
         i++;
     buf[i] = 0;
