@@ -47,7 +47,7 @@ sub buildzip {
     mkdir ".rockbox", 0777;
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
-    `find . -name "*.rock" ! -empty | xargs --replace=foo cp foo .rockbox/rocks/`;
+    `find . -name "*.rock" -o -name "*.ovl" ! -empty | xargs --replace=foo cp foo .rockbox/rocks/`;
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
@@ -61,6 +61,11 @@ sub buildzip {
         if (/,(.+),/) {
             if(-e ".rockbox/rocks/$1") {
                 `mv .rockbox/rocks/$1 .rockbox/viewers`;
+                print VIEWERS $_;
+            }
+            elsif(-e ".rockbox/viewers/$1") {
+                # in case the same plugin works for multiple extensions, it
+                # was already moved to the viewers dir
                 print VIEWERS $_;
             }
         }
