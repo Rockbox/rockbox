@@ -18,5 +18,7 @@
 (setq c-basic-offset 4)
 ;;; never ever use tabs to indent!
 (setq indent-tabs-mode nil)
+;;; enable font coloring of type 'bool'
+(setq c-font-lock-extra-types (append '("bool") ))
 ;;; I like this, stolen from Subversion! ;-)
 (setq angry-mob-with-torches-and-pitchforks t)
