@@ -467,7 +467,7 @@ new: "Tastensperre ist AN"
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Tastensperre ist aus"
+new: "Tastensperre ist AUS"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
@@ -497,7 +497,7 @@ new: "-ID3 Info-"
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-new: "-Anzeige--"
+new: "-Anzeige-"
 
 id: LANG_ID3_TITLE
 desc: in wps
