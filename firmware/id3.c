@@ -713,12 +713,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
         filetime = entry->filesize/bpf*tpf;
     }
 
-    DEBUGF("Old ID3V2 length: %x\n", entry->id3v2len);
-    /* Adjust the tag length only if there is a tag present */
-    if(entry->id3v2len || header_found)
-        entry->id3v2len = bytecount;
-    DEBUGF("New ID3V2 length: %x\n", bytecount);
-    
+    /* Update the seek point for the first playable frame */
+    entry->first_frame_offset = bytecount;
+    DEBUGF("First frame is at %x\n", entry->first_frame_offset);
+
     return filetime;
 }
 

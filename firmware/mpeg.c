@@ -775,7 +775,7 @@ static int new_file(int steps)
             {
                 /* skip past id3v2 tag */
                 lseek(mpeg_file, 
-                      id3tags[new_tag_idx]->id3.id3v2len,
+                      id3tags[new_tag_idx]->id3.first_frame_offset,
                       SEEK_SET);
                 id3tags[new_tag_idx]->id3.index = steps;
                 id3tags[new_tag_idx]->id3.offset = 0;
@@ -967,7 +967,7 @@ static void mpeg_thread(void)
                 else {
                     /* skip past id3v2 tag */
                     lseek(mpeg_file, 
-                          id3tags[tag_read_idx]->id3.id3v2len, 
+                          id3tags[tag_read_idx]->id3.first_frame_offset, 
                           SEEK_SET);
 
                 }

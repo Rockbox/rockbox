@@ -33,6 +33,9 @@ struct mp3entry {
     unsigned int frequency;
     unsigned int id3v2len;
     unsigned int id3v1len;
+    unsigned int first_frame_offset; /* Byte offset to first real MP3 frame.
+                                        Used for skipping leading garbage to
+                                        avoid gaps between tracks. */
     unsigned int filesize; /* in bytes */
     unsigned int length;   /* song length */
     unsigned int elapsed;  /* ms played */
