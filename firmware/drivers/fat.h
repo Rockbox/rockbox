@@ -59,11 +59,8 @@ struct fat_file
 
 struct fat_dir
 {
-    int entry;
-    int cached_sec;
-    int num_sec;
-    unsigned char cached_buf[SECTOR_SIZE];
-    int startcluster;
+    unsigned int entry;
+    int sector;
     struct fat_file file;
 };
 
