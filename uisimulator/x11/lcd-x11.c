@@ -48,6 +48,11 @@ unsigned char lcd_framebuffer_copy[LCD_WIDTH][LCD_HEIGHT/8];
 
 static int counter;
 
+void lcd_set_invert_display(bool invert)
+{
+    (void)invert;
+}
+
 void lcd_update (void)
 {
     int x, y;
