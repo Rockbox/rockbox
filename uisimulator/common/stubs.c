@@ -271,4 +271,4 @@ int talk_spell(char* spell, bool enqueue)
     return 0;
 }
 
-const char* dir_thumbnail_name = ".dirname.mp3";
+const char* dir_thumbnail_name = ".dirname.tbx";

@@ -37,7 +37,7 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 /***************** Constants *****************/
 
 #define QUEUE_SIZE 50
-const char* dir_thumbnail_name = ".dirname.mp3";
+const char* dir_thumbnail_name = ".dirname.tbx";
 
 
 /***************** Data types *****************/

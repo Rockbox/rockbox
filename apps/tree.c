@@ -209,8 +209,7 @@ static int build_playlist(int start_index)
 
     for(i = 0;i < filesindir;i++)
     {
-        if((dircache[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA 
-            && (strcmp(dircache[i].name, dir_thumbnail_name) != 0))
+        if((dircache[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
         {
             DEBUGF("Adding %s\n", dircache[i].name);
             if (playlist_add(dircache[i].name) < 0)
