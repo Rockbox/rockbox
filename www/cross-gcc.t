@@ -14,6 +14,20 @@ You will need the following archives:
 <li>gcc-3.0.4.tar.gz (find it at your closest GNU FTP site)
 <li>(optional) gdb-5.1.1.tar.gz (find it at your closest GNU FTP site)
 </ul>
+<p>
+ If you want to stay out of trouble, use the versions stated above. If you
+ want to live on the edge you can try building with the latest versions.
+ However, if you use binutils-2.13 or later you will not be able to build
+ Rockbox older that CVS 2002-09-08 if you don't add the .rodata.str1.4
+ section to the .rodata section in the linker script:
+
+<pre>
+    .rodata :
+    {
+        *(.rodata)
+<b>        *(.rodata.str1.4)</b>
+    } > DRAM
+</pre>
 
 <h2>Unpack the archives</h2>
 <p>
