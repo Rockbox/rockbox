@@ -328,6 +328,9 @@ static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
         update|=lcdx_putc(x, y, ' ');
     if (update)
         xlcd_update();
+#ifdef SIMULATOR
+    lcd_update();
+#endif
 }
 void lcd_puts(int x, int y, unsigned char *string)
 {
