@@ -27,9 +27,13 @@ A2: The charger logic lets the batteries charge until they are full. After
 
 Q3: Does Rockbox charge the batteries more/less/worse/better than the Archos
     firmware?
-A3: The current release of 1.2 is much worse than the Archos charger, it
-    tends to stop charging much too early and leave the batteries half
-    empty.
+A3: Player: Rockbox doesn't affect the charging on Players, it is all done
+    by hardware logic out of software control.
+
+    Recorder: The current release of 1.2 is much worse than the Archos
+    charger, it tends to stop charging much too early and leave the batteries
+    half empty.
+
     The current development code (CVS daily builds as of 20.8.2002) is much
     better than the 1.2 release, but still not perfect. Linus recently
     measured 6 hours continuous playtime after a rockbox charge, and much
@@ -51,11 +55,11 @@ A5: The archos manual and web site describe how to replace the batteries,
     waiting for an answer to arrive!)
 
 Q6: How much do replacement batteries cost? Where can I buy them?
-A6: www.greenbatteries.com sells 1800 mAh NiMH cells at $3.25USD each,
-    and I bought 4 of the same GP batteries for 20 euros in an
-    home electronics & household appliance store in Finland.
-    NiMH batteries are sold in almost all shops that sell consumer
-    electronics, and in many online shops. Browse around.
+A6: http://www.greenbatteries.com sells 1800 mAh NiMH cells at $3.25USD each,
+    and I bought 4 of the same GP batteries for 20 euros in an home
+    electronics & household appliance store in Finland.  NiMH batteries are
+    sold in almost all shops that sell consumer electronics, and in many
+    online shops. Browse around.
 
 Q7: What kind of run-time can I expect on a set of fully-charged batteries
     when running Rockbox?
