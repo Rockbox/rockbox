@@ -1983,9 +1983,20 @@ static void mpeg_thread(void)
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
     }
 #else /* HWCODEC != NONE */
+    struct event ev;
+    
     while(1)
     {
-        yield();
+        queue_wait(&mpeg_queue, &ev);
+        
+        switch(ev.id)
+        {
+        case MPEG_STOP:
+            mpeg_stop_done = true;
+            break;
+        default:
+            break;
+        }
     }
 #endif
 }
