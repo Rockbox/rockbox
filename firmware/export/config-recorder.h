@@ -45,3 +45,6 @@
 
 /* Define this if the platform has batteries */
 #define HAVE_BATTERIES 1
+
+/* The start address index for ROM builds */
+#define ROM_START 0x11010

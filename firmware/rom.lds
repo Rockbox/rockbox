@@ -1,3 +1,5 @@
+#include "config.h"
+
 ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
@@ -5,11 +7,7 @@ MEMORY
 {
    DRAM : ORIGIN = 0x09000000, LENGTH = (2 * 0x100000) - 0x8000
    IRAM : ORIGIN = 0x0f000000, LENGTH = 0x1000
-#ifdef ARCHOS_RECORDER /* recorder v1 */
-   FLASH : ORIGIN = 0x02000000 + 0x11010, LENGTH = 256K - 0x11010
-#else /* recorder v2 */
-   FLASH : ORIGIN = 0x02000000 + 0x12010, LENGTH = 256K - 0x12010
-#endif
+   FLASH : ORIGIN = 0x02000000 + ROM_START, LENGTH = 256K - ROM_START
 }
 SECTIONS
 {
