@@ -15,8 +15,10 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
-# store output files in this directory:
-OBJDIR = .
+ifndef OBJDIR
+	"Don't run make in the firmware dir!"
+endif
+
 TOOLSDIR = ../tools
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)

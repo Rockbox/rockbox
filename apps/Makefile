@@ -19,8 +19,9 @@ FIRMWARE := ../firmware
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I. -I$(OBJDIR)
 
-# store output files in this directory:
-OBJDIR = .
+ifndef OBJDIR
+	"Don't run make in the apps dir!"
+endif
 
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES)
 AFLAGS += -small -relax
