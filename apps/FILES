@@ -19,3 +19,7 @@ plugins/lib/SOURCES
 codecs/Makefile
 codecs/liba52/*
 codecs/libmad/*
+codecs/libFLAC/*
+codecs/libFLAC/include/private/*.h
+codecs/libFLAC/include/protected/*.h
+codecs/libFLAC/include/FLAC/*.h
