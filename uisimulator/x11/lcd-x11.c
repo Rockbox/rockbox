@@ -106,21 +106,3 @@ void lcd_update (void)
 /*    Logf("lcd_update: Draws %d pixels, clears %d pixels", p, cp);*/
     XSync(dpy,False);
 }
-
-#ifdef HAVE_LCD_CHARCELLS
-/* simulation layer for charcells */
-void lcd_clear_display(void)
-{
-    sim_lcd_clear_display();
-}
-
-void lcd_puts(int x, int y, char *string)
-{
-    char buffer[12];
-    strncpy(buffer, string, 11);
-    buffer[11]=0;
-
-    sim_lcd_puts(x, y, buffer, 0);
-    lcd_update();
-}
-#endif
