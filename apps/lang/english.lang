@@ -1429,3 +1429,18 @@ id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
 new:
+
+id: LANG_SAVE_SETTINGS
+desc:  in system_settings_menu()
+eng: "Write .cfg file"
+new: 
+
+id: LANG_SETTINGS_SAVED1
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings"
+new: 
+
+id: LANG_SETTINGS_SAVED2
+desc: Feedback shown when a .cfg file is saved
+eng: "Saved"
+new: 

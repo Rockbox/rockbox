@@ -767,8 +767,8 @@ static bool system_settings_menu(void)
         { str(LANG_TIME),        timedate_set    },
         { str(LANG_TIMEFORMAT),  timeformat_set  },
 #endif
-        { str(LANG_POWEROFF_IDLE),    poweroff_idle_timer },
-        { str(LANG_RESET),       reset_settings },
+        { str(LANG_POWEROFF_IDLE),  poweroff_idle_timer },
+        { str(LANG_RESET),          reset_settings },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -787,6 +787,7 @@ bool settings_menu(void)
         { str(LANG_FILE),            fileview_settings_menu },
         { str(LANG_DISPLAY),         display_settings_menu  },
         { str(LANG_SYSTEM),          system_settings_menu   },
+        { str(LANG_SAVE_SETTINGS),   settings_save_config   },
     };
     
     m = menu_init( items, sizeof items / sizeof(struct menu_items) );

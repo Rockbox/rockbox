@@ -54,6 +54,7 @@
 #include "wps-display.h"
 #include "powermgmt.h"
 #include "sprintf.h"
+#include "keyboard.h"
 
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
@@ -1049,6 +1050,382 @@ bool settings_load_config(char* file)
     close(fd);
     settings_apply();
     settings_save();
+    return true;
+}
+
+
+bool settings_save_config(void)
+{
+    bool done = false;
+    int fd, i, value;
+    char buf[MAX_PATH + 32];
+    char filename[MAX_PATH];
+
+    /* find unused filename */
+    for (i=0; ; i++) {
+        snprintf(filename, sizeof filename, "/.rockbox/config%02d.cfg", i);
+        fd = open(filename, O_RDONLY);
+        if (fd < 0)
+            break;
+        close(fd);
+    }
+
+    /* allow user to modify filename */
+    while (!done) {
+        if (!kbd_input(filename, sizeof filename)) {
+            fd = creat(filename,0);
+            if (fd < 0) {
+                lcd_clear_display();
+                lcd_puts(0,0,str(LANG_FAILED));
+                lcd_update();
+                sleep(HZ);
+            }
+            else
+                done = true;
+        }
+        else
+            break;
+    }
+
+    /* abort if file couldn't be created */
+    if (!done) {
+        lcd_clear_display();
+        lcd_puts(0,0,str(LANG_RESET_DONE_CANCEL));
+        lcd_update();
+        sleep(HZ);
+        return false;
+    }
+
+    strncpy(buf, "# >>> .cfg file created by rockbox <<<\r\n", sizeof(buf));
+    write(fd, buf, strlen(buf));
+    
+    strncpy(buf, "# >>>    http://rockbox.haxx.se    <<<\r\n\r\n", sizeof(buf));
+    write(fd, buf, strlen(buf));
+
+    snprintf(buf, sizeof(buf), "#\r\n# wps / language / font \r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+    if (global_settings.wps_file[0] != 0) {
+        snprintf(buf, sizeof(buf),
+                 "wps: /.rockbox/%s.wps\r\n", global_settings.wps_file);
+        write(fd, buf, strlen(buf));
+    }
+
+    if (global_settings.lang_file[0] != 0) {
+        snprintf(buf, sizeof(buf), "lang: /.rockbox/%s.lng\r\n",
+                 global_settings.lang_file);
+        write(fd, buf, strlen(buf));
+    }
+
+#ifdef HAVE_LCD_BITMAP
+    if (global_settings.font_file[0] != 0) {
+        snprintf(buf, sizeof(buf), "font: /.rockbox/%s.fnt\r\n",
+                 global_settings.font_file);
+        write(fd, buf, strlen(buf));
+    }
+#endif
+
+    snprintf(buf, sizeof(buf), "#\r\n# Sound settings\r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+    value = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+    snprintf(buf, sizeof(buf), "volume: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    value = mpeg_val2phys(SOUND_BASS, global_settings.bass);
+    snprintf(buf, sizeof(buf), "bass: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    value = mpeg_val2phys(SOUND_TREBLE, global_settings.treble);
+    snprintf(buf, sizeof(buf), "treble: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    value = mpeg_val2phys(SOUND_BALANCE, global_settings.balance);
+    snprintf(buf, sizeof(buf), "balance: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] =
+        {"stereo","stereo narrow","mono","mono left",
+         "mono right","karaoke","stereo wide"};
+        snprintf(buf, sizeof(buf), "channels: %s\r\n",
+                 options[global_settings.channel_config]);
+        write(fd, buf, strlen(buf));
+    }
+
+#ifdef HAVE_MAS3587F
+    value = mpeg_val2phys(SOUND_LOUDNESS, global_settings.loudness);
+    snprintf(buf, sizeof(buf), "loudness: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    value = mpeg_val2phys(SOUND_SUPERBASS, global_settings.bass_boost);
+    snprintf(buf, sizeof(buf), "bass boost: %d\r\n", value);
+    write(fd, buf, strlen(buf));
+
+    snprintf(buf, sizeof(buf), "auto volume: %d\r\n", global_settings.avc);
+    write(fd, buf, strlen(buf));
+#endif
+
+    snprintf(buf, sizeof(buf), "#\r\n# Playback\r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "shuffle: %s\r\n",
+                 options[global_settings.playlist_shuffle]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off", "all", "one"};
+        snprintf(buf, sizeof(buf), "repeat: %s\r\n",
+                 options[global_settings.repeat_mode]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "play selected: %s\r\n",
+                 options[global_settings.play_selected]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off", "ask", "ask once", "on"};
+        snprintf(buf, sizeof(buf), "resume: %s\r\n",
+                 options[global_settings.resume]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] =
+        {"1","2","3","4","5","6","8","10",
+         "15","20","25","30","45","60"};
+        snprintf(buf, sizeof(buf), "scan min step: %s\r\n",
+                 options[global_settings.ff_rewind_min_step]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf), "scan accel: %d\r\nantiskip: %d\r\n",
+             global_settings.ff_rewind_accel,
+             global_settings.buffer_margin);
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "volume fade: %s\r\n",
+                 options[global_settings.fade_on_stop]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf), "#\r\n# File View\r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "sort case: %s\r\n",
+                 options[global_settings.sort_case]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] =
+        {"all", "supported","music", "playlists"};
+        snprintf(buf, sizeof(buf), "show files: %s\r\n",
+                 options[global_settings.dirfilter]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "follow playlist: %s\r\n",
+                 options[global_settings.browse_current]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf), "#\r\n# Display\r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+#ifdef HAVE_LCD_BITMAP
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "statusbar: %s\r\nscrollbar: %s\r\n",
+                 options[global_settings.statusbar],
+                 options[global_settings.scrollbar]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"graphic", "numeric"};
+        snprintf(buf, sizeof(buf),
+                 "volume display: %s\r\nbattery display: %s\r\n",
+                 options[global_settings.volume_type],
+                 options[global_settings.battery_type]);
+        write(fd, buf, strlen(buf));
+    }
+#endif
+
+    snprintf(buf, sizeof(buf), "scroll speed: %d\r\nscroll delay: %d\r\n",
+             global_settings.scroll_speed,
+             global_settings.scroll_delay);
+    write(fd, buf, strlen(buf));
+
+#ifdef HAVE_LCD_BITMAP
+    snprintf(buf, sizeof(buf), "scroll step: %d\r\n",
+             global_settings.scroll_step);
+    write(fd, buf, strlen(buf));
+#endif
+
+    snprintf(buf, sizeof(buf), "bidir limit: %d\r\n",
+             global_settings.bidir_limit);
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] =
+        {"off","on","1","2","3","4","5","6","7","8","9",
+         "10","15","20","25","30","45","60","90"};
+        snprintf(buf, sizeof(buf), "backlight timeout: %s\r\n",
+                 options[global_settings.backlight_timeout]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "backlight when plugged: %s\r\n",
+                 options[global_settings.backlight_on_when_charging]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf), "contrast: %d\r\n", global_settings.contrast);
+    write(fd, buf, strlen(buf));
+
+#ifdef HAVE_LCD_BITMAP
+    snprintf(buf, sizeof(buf), "peak meter release: %d\r\n",
+             global_settings.peak_meter_release);
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] =
+        {"off","200ms","300ms","500ms","1","2","3","4","5",
+         "6","7","8","9","10","15","20","30","1min"};
+        snprintf(buf, sizeof(buf), "peak meter hold: %s\r\n",
+                 options[global_settings.peak_meter_hold]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] =
+        {"on","1","2","3","4","5","6","7","8","9","10","15","20","25","30",
+         "45","60","90","2min","3min","5min","10min","20min","45min","90min"};
+        snprintf(buf, sizeof(buf), "peak meter clip hold: %s\r\n",
+                 options[global_settings.peak_meter_clip_hold]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf),
+                 "peak meter busy: %s\r\npeak meter dbfs: %s\r\n",
+                 options[global_settings.peak_meter_performance],
+                 options[global_settings.peak_meter_dbfs]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf), "peak meter min: %d\r\npeak meter max: %d\r\n",
+             global_settings.peak_meter_min,
+             global_settings.peak_meter_max);
+    write(fd, buf, strlen(buf));
+#endif
+
+    snprintf(buf, sizeof(buf), "#\r\n# System\r\n#\r\ndisk spindown: %d\r\n",
+             global_settings.disk_spindown);
+    write(fd, buf, strlen(buf));
+
+#ifdef HAVE_ATA_POWER_OFF
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "disk poweroff: %s\r\n",
+                 options[global_settings.disk_poweroff]);
+        write(fd, buf, strlen(buf));
+    }
+#endif
+
+    snprintf(buf, sizeof(buf), "battery capacity: %d\r\n",
+             global_settings.battery_capacity);
+    write(fd, buf, strlen(buf));
+
+#ifdef HAVE_CHARGE_CTRL
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf),
+                 "deep discharge: %s\r\ntrickle charge: %s\r\n",
+                 options[global_settings.discharge],
+                 options[global_settings.trickle_charge]);
+        write(fd, buf, strlen(buf));
+    }
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+    {
+        static char* options[] = {"24hour", "12hour"};
+        snprintf(buf, sizeof(buf), "time format: %s\r\n",
+                 options[global_settings.timeformat]);
+        write(fd, buf, strlen(buf));
+    }
+#endif
+
+    {
+        static char* options[] =
+        {"off","1","2","3","4","5","6","7","8",
+         "9","10","15","30","45","60"};
+        snprintf(buf, sizeof(buf), "idle poweroff: %s\r\n",
+                 options[global_settings.poweroff]);
+        write(fd, buf, strlen(buf));
+    }
+
+#ifdef HAVE_MAS3587F
+    snprintf(buf, sizeof(buf), "#\r\n# Recording\r\n#\r\n");
+    write(fd, buf, strlen(buf));
+
+    snprintf(buf, sizeof(buf), "rec quality: %d\r\n",
+             global_settings.rec_quality);
+    write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] = {"44", "48", "32", "22", "24", "16"};
+        snprintf(buf, sizeof(buf), "rec frequency: %s\r\n",
+                 options[global_settings.rec_frequency]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"mic", "line", "spdif"};
+        snprintf(buf, sizeof(buf), "rec source: %s\r\n",
+                 options[global_settings.rec_source]);
+        write(fd, buf, strlen(buf));
+    }
+
+    {
+        static char* options[] = {"stereo", "mono"};
+        snprintf(buf, sizeof(buf), "rec channels: %s\r\n",
+                 options[global_settings.rec_channels]);
+        write(fd, buf, strlen(buf));
+    }
+
+    snprintf(buf, sizeof(buf),
+             "rec mic gain: %d\r\nrec left gain: %d\r\nrec right gain: %d\r\n",
+             global_settings.rec_mic_gain,
+             global_settings.rec_left_gain,
+             global_settings.rec_right_gain);
+    write(fd, buf, strlen(buf));
+#endif
+    close(fd);
+
+    lcd_clear_display();
+    lcd_puts(0,0,str(LANG_SETTINGS_SAVED1));
+    lcd_puts(0,1,str(LANG_SETTINGS_SAVED2));
+    lcd_update();
+    sleep(HZ);
     return true;
 }
 
