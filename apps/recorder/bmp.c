@@ -67,13 +67,6 @@ struct RGBQUAD
   unsigned char rgbReserved;
 } STRUCT_PACKED;
 
-static struct Fileheader fh;
-static unsigned char* bmp;
-static struct RGBQUAD palette[2]; /* two colors only */
-
-static unsigned int bitmap_width, bitmap_height;
-static unsigned char *bitmap;
-
 #ifdef STANDALONE
 static id_str[256];
 static bool compress = false;
@@ -110,15 +103,19 @@ int read_bmp_file(char* filename,
                   int *get_height, /* in pixels */
                   char *bitmap)
 {
+   struct Fileheader fh;
+   struct RGBQUAD palette[2]; /* two colors only */
+
+   unsigned int bitmap_width, bitmap_height;
+
    long PaddedWidth;
    int background;
    int fd = open(filename, O_RDONLY);
    long size;
-   unsigned int row, col, byte, bit;
+   unsigned int row, col;
    int l;
    unsigned char *bmp;
    int width;
-   int height;
 
    if(fd == -1)
    {
