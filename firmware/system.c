@@ -450,3 +450,16 @@ asm (
     "_UIE107:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
     "_UIE108:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\t\n"
     "_UIE109:\tbsr\t_UIE\n\tmov.l\t@r15+,r4");
+
+void system_init(void)
+{
+    /* Disable all interrupts */
+    IPRA = 0;
+    IPRB = 0;
+    IPRC = 0;
+    IPRD = 0;
+    IPRE = 0;
+
+    /* NMI level low, falling edge on all interrupts */
+    ICR = 0;
+}

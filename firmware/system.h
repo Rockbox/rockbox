@@ -261,5 +261,6 @@ static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int reques
   }
 
 extern void system_reboot (void);
+extern void system_init(void);
 
 #endif
