@@ -107,7 +107,7 @@ YES
 YES
 EFEAT
 
-NAME Games ENAME
+NAME Games (Recorder) ENAME
 TD Tetris, Sokoban, Snake ETD
 NO
 EFEAT
@@ -137,7 +137,7 @@ YES
 NO
 EFEAT
 
-NAME Deep discharge option ENAME
+NAME Deep discharge option (Recorder) ENAME
 YES
 NO
 EFEAT
@@ -170,6 +170,36 @@ EFEAT
 NAME Max number of files in a dir ENAME
 TD 400 ETD
 UNKNOWN
+EFEAT
+
+NAME Adjustable scroll speed ENAME
+YES
+NO
+EFEAT
+
+NAME Screensaver style demos (Recorder) ENAME
+YES
+NO
+EFEAT
+
+NAME Variable step / accelerating ffwd and rwd ENAME
+YES
+NO
+EFEAT
+
+NAME Visual Progress Bar ENAME
+YES
+NO
+EFEAT
+
+NAME Select/Load configs ENAME
+YES
+NO
+EFEAT
+
+NAME Sleep timer ENAME
+YES
+NO
 EFEAT
 
 </table>
