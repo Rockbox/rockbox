@@ -892,12 +892,12 @@ static void start_playback_if_ready(void)
             play_pending = false;
             playing = true;
 			
+            last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
+            mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+            dma_underrun = false;
+
             if (!paused)
             {
-                last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-                mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
-                dma_underrun = false;
-
                 last_dma_tick = current_tick;
                 mp3_play_pause(true);
             }
