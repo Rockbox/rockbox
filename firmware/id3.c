@@ -437,6 +437,8 @@ getsonglength(int fd, mp3entry *entry)
             "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i\n", 
             version, layer, bitindex, bitrate, freqindex, frequency);
 #endif
+    entry->version = version;
+    entry->layer = layer;
     entry->bitrate = bitrate;
     entry->frequency = frequency;
 	
