@@ -88,8 +88,10 @@ rolo.c
 system.c
 thread.c
 usb.c
+#if CONFIG_CPU == SH7034
 bitswap.S
 crt0.S
 descramble.S
 drivers/lcd.S
+#endif
 #endif
