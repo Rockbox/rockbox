@@ -94,7 +94,7 @@ EFEAT
 
 NAME Text File Reader ENAME
 YES
-NO
+YES
 EFEAT
 
 NAME Games ENAME
@@ -115,6 +115,26 @@ EFEAT
 NAME Recording (Recorder) ENAME
 TD In development ETD
 YES
+EFEAT
+
+NAME Low volume support ENAME
+YES
+NO
+EFEAT
+
+NAME Deep discharge option ENAME
+YES
+NO
+EFEAT
+
+NAME Cutomizable backlight timeout ENAME
+YES
+NO
+EFEAT
+
+NAME Backlight-on when charging option ENAME
+YES
+NO
 EFEAT
 
 </table>
