@@ -2195,14 +2195,14 @@ static void start_recording(void)
         val |= 1;
         mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
         DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
-        
+
         /* Wait until the DSP has accepted the settings */
         do
         {
             mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
         } while(val & 1);
         
-        sleep(20);
+        sleep(HZ/100);
     }
     
     is_recording = true;
