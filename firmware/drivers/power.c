@@ -107,4 +107,9 @@ void power_off(void)
 {
 }
 
+void ide_power_enable(bool on)
+{
+   on = on;
+}
+
 #endif /* SIMULATOR */
