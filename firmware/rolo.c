@@ -68,8 +68,8 @@ int rolo_load(char* filename)
     }
 
     /* Read file length from header and compare to real file length */
-    length=lseek(fd,0,SEEK_END)-6;
-    lseek(fd, 0, SEEK_SET);
+    length=lseek(fd,0,SEEK_END)-FIRMWARE_OFFSET_FILE_DATA;
+    lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);
     if(read(fd, &file_length, 4) != 4) {
         rolo_error("Error Reading File Length");
         return -1;
@@ -80,12 +80,12 @@ int rolo_load(char* filename)
     }
 
     /* Read and save checksum */
-    lseek(fd, 4, SEEK_SET);
+    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 2) != 2) {
         rolo_error("Error Reading checksum");
         return -1;
     }
-    lseek(fd, 6, SEEK_SET);
+    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     /* verify that file can be read and descrambled */
     if ((&mp3buf[0] + (2*length)+4) >= &mp3end) {

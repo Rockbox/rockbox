@@ -22,3 +22,12 @@
 
 /* Define this if you control power on PADR (instead of PBDR) */
 #define HAVE_POWEROFF_ON_PADR
+
+/* Offset ( in the firmware file's header ) to the file length */
+#define FIRMWARE_OFFSET_FILE_LENGTH 0
+
+/* Offset ( in the firmware file's header ) to the file CRC */
+#define FIRMWARE_OFFSET_FILE_CRC 4
+
+/* Offset ( in the firmware file's header ) to the real data */
+#define FIRMWARE_OFFSET_FILE_DATA 6
