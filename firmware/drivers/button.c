@@ -390,7 +390,7 @@ static bool mStation = false;
 void button_init(void)
 {
     /* set port pins as input */
-    PAIOR &= ~0x4000;  //PA14 for stop button
+    PAIOR &= ~0x4000;  /* PA14 for stop button */
 
     queue_init(&button_queue);
     lastbtn = 0;
