@@ -264,7 +264,7 @@ don't have to copy'n'paste that much :). I have also prepared a package with
 the LCDv2 code Björn wrote (ready to compile with Windows).
 
 <P>
-<a href="LCDv2Win.zip">empty.zip</a>
+<a href="empty.zip">empty.zip</a>
 <BR>
 <a href="LCDv2Win.zip">LCDv2Win.zip</a>
 
