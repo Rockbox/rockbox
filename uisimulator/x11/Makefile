@@ -46,7 +46,11 @@ $(KEYPAD) $(DISPLAY)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
+# Use this for simulator-only files
 INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
+
+# The true Rockbox Applications should use this include path:
+APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
 
 LIBS = -lpthread
 
@@ -67,10 +71,12 @@ endif
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
+APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
+
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
 APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c \
-	playlist.c
+	playlist.c showtext.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c
@@ -136,61 +142,67 @@ $(OBJDIR)/mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
 endif
 
 $(OBJDIR)/credits.o: $(APPDIR)/credits.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/menu.o: $(APPDIR)/menu.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/icons.o: $(RECDIR)/icons.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/boxes.o: $(RECDIR)/boxes.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main.o: $(APPDIR)/main.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bmp.o: $(RECDIR)/bmp.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/play.o: $(APPDIR)/play.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/tree.o: $(APPDIR)/tree.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+
+# these ones are simulator-specific
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
