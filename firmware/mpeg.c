@@ -47,6 +47,7 @@ static void stop_recording(void);
 
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
+static int get_playable_space(void);
 static int get_unswapped_space(void);
 #endif
 
@@ -493,7 +494,7 @@ static void recalculate_watermark(int bitrate)
 {
     if(ata_spinup_time)
     {
-        low_watermark = (low_watermark_margin + ata_spinup_time * 3 / HZ) *
+        low_watermark = (low_watermark_margin + ata_spinup_time * 2 / HZ) *
             bitrate*1000 / 8;
     }
     else
@@ -524,6 +525,7 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
     dbgdata->dma_underrun = dma_underrun;
 
     dbgdata->unplayed_space = get_unplayed_space();
+    dbgdata->playable_space = get_playable_space();
     dbgdata->unswapped_space = get_unswapped_space();
 
     dbgdata->low_watermark_level = low_watermark;
@@ -588,6 +590,14 @@ static int dbg_cnt2us(unsigned int cnt)
 static int get_unplayed_space(void)
 {
     int space = mp3buf_write - mp3buf_read;
+    if (space < 0)
+        space += mp3buflen;
+    return space;
+}
+
+static int get_playable_space(void)
+{
+    int space = mp3buf_swapwrite - mp3buf_read;
     if (space < 0)
         space += mp3buflen;
     return space;
@@ -861,6 +871,10 @@ void DEI3(void)
             DTCR3 = last_dma_chunk_size & 0xffff;
             SAR3 = (unsigned int)mp3buf + mp3buf_read;
             id3tags[tag_read_idx]->id3.offset += last_dma_chunk_size;
+
+            /* Update the watermark debug level */
+            if(unplayed_space_left < lowest_watermark_level)
+                lowest_watermark_level = unplayed_space_left;
         }
         else
         {
@@ -870,6 +884,11 @@ void DEI3(void)
                closed. */
             if(mpeg_file >= 0)
             {
+
+                /* Update the watermark debug level */
+                if(unplayed_space_left < lowest_watermark_level)
+                    lowest_watermark_level = unplayed_space_left;
+                
                 DEBUGF("DMA underrun.\n");
                 dma_underrun = true;
             }
@@ -883,10 +902,6 @@ void DEI3(void)
             }
             CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
         }
-
-        /* Update the watermark debug level */
-        if(unplayed_space_left < lowest_watermark_level)
-            lowest_watermark_level = unplayed_space_left;
     }
 
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
@@ -1128,12 +1143,7 @@ static bool swap_one_chunk(void)
 {
     int free_space_left;
     int amount_to_swap;
-    int playable_space;
 
-    playable_space = mp3buf_swapwrite - mp3buf_read;
-    if(playable_space < 0)
-        playable_space += mp3buflen;
-    
     free_space_left = get_unswapped_space();
 
     if(free_space_left == 0 && !play_pending)
@@ -1141,8 +1151,8 @@ static bool swap_one_chunk(void)
 
     /* Swap in larger chunks when the user is waiting for the playback
        to start, or when there is dangerously little playable data left */
-    if(play_pending || playable_space < MPEG_LOW_WATER_CHUNKSIZE)
-        amount_to_swap = MIN(MPEG_LOW_WATER_CHUNKSIZE, free_space_left);
+    if(play_pending || get_playable_space() < MPEG_LOW_WATER_SWAP_CHUNKSIZE)
+        amount_to_swap = MIN(MPEG_LOW_WATER_SWAP_CHUNKSIZE, free_space_left);
     else
         amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
     

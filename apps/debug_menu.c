@@ -166,12 +166,12 @@ bool dbg_mpeg_thread(void)
         lcd_puts(0, 2, buf);
         snprintf(buf, sizeof(buf), "playing: %d", d.playing);
         lcd_puts(0, 3, buf);
-        snprintf(buf, sizeof(buf), "unplayed: %x", d.unplayed_space);
+        snprintf(buf, sizeof(buf), "playable: %x", d.playable_space);
         lcd_puts(0, 4, buf);
         snprintf(buf, sizeof(buf), "unswapped: %x", d.unswapped_space);
         lcd_puts(0, 5, buf);
 
-        percent = d.unplayed_space * 100 / d.mp3buflen;
+        percent = d.playable_space * 100 / d.mp3buflen;
         progressbar(0, 6*8, 112, 4, percent, Grow_Right);
 
         percent = d.low_watermark_level * 100 / d.mp3buflen;
