@@ -409,6 +409,52 @@ static const char hexchars[] = "0123456789abcdef";
 static char remcomInBuffer[BUFMAX];
 static char remcomOutBuffer[BUFMAX];
 
+#define ATA_NSECTOR     (*((volatile unsigned char*)0x06100102))
+#define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
+#define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
+#define ATA_ALT_STATUS  ATA_CONTROL
+
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+
+#define CMD_STANDBY_IMMEDIATE      0xE0
+#define CMD_STANDBY                0xE2
+
+void ata_wait_for_bsy(void)
+{
+    while (ATA_ALT_STATUS & STATUS_BSY);
+}
+
+int ata_wait_for_rdy(void)
+{
+    ata_wait_for_bsy();
+    return ATA_ALT_STATUS & STATUS_RDY;
+}
+
+int ata_spindown(int time)
+{
+    /* activate ATA */
+    PADR &= ~0x80;
+
+    if(!ata_wait_for_rdy())
+        return -1;
+
+    if ( time == -1 ) {
+        ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
+    }
+    else {
+        if (time > 255)
+            return -1;
+        ATA_NSECTOR = time & 0xff;
+        ATA_COMMAND = CMD_STANDBY;
+    }
+
+    if (!ata_wait_for_rdy())
+        return -1;
+
+    return 0;
+}
+
 void blink(void)
 {
     while(1)
@@ -1097,6 +1143,8 @@ void INIT (void)
     dofault = 1;
     stepped = 0;
 
+    ata_spindown(-1);
+    
     stub_sp = stub_stack;
     breakpoint ();
 

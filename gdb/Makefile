@@ -7,7 +7,7 @@
 # $Id$
 #
 TARGET = stub
-OBJS = start.o sh-stub.o 
+OBJS = start.o sh-stub.o
 LIBS = -lgcc
 
 .s.o:
@@ -27,5 +27,4 @@ clean:
 	rm $(OBJS) $(TARGET).map $(TARGET).elf $(TARGET).out archos.mod
 
 start.o: start.s
-stub.o: stub.c
-s-stub.o: sh-stub.c
+sh-stub.o: sh-stub.c
