@@ -71,14 +71,14 @@ void queue_init(struct event_queue *q)
     q->write = 0;
 }
 
-struct event *queue_wait(struct event_queue *q)
+void queue_wait(struct event_queue *q, struct event *ev)
 {
     while(q->read == q->write)
     {
         switch_thread();
     }
 
-    return &q->events[(q->read++) & QUEUE_LENGTH_MASK];
+    *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
 }
 
 void queue_post(struct event_queue *q, int id, void *data)
@@ -189,4 +189,27 @@ int tick_remove_task(void (*f)(void))
     
     set_irq_level(oldlevel);
     return -1;
+}
+
+/****************************************************************************
+ * Simple mutex functions
+ ****************************************************************************/
+void mutex_init(struct mutex *m)
+{
+    m->count = 0;
+}
+
+void mutex_lock(struct mutex *m)
+{
+    /* Wait until the lock is open... */
+    while(m->count)
+        yield();
+
+    /* ...and lock it */
+    m->count++;
+}
+
+void mutex_unlock(struct mutex *m)
+{
+    m->count--;
 }

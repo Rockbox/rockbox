@@ -41,6 +41,11 @@ struct event_queue
     unsigned int write;
 };
 
+struct mutex
+{
+    int count;
+};
+
 /* global tick variable */
 extern long current_tick;
 
@@ -53,7 +58,11 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
 extern void queue_init(struct event_queue *q);
-extern struct event *queue_wait(struct event_queue *q);
+extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_post(struct event_queue *q, int id, void *data);
+
+extern void mutex_init(struct mutex *m);
+extern void mutex_lock(struct mutex *m);
+extern void mutex_unlock(struct mutex *m);
 
 #endif
