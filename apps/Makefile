@@ -227,7 +227,7 @@ clean:
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]	\
 	$(OBJDIR)/credits.raw $(LINKFILE) $(OBJDIR)/rockbox.ucl		\
 	$(LINKROM) $(OBJDIR)/rombox.ucl $(OBJDIR)/rombox.bin		\
-	$(OBJDIR)/rombox.elf
+	$(OBJDIR)/rombox.elf $(MAXOUTFILE)
 	@-$(RM) -r $(OBJDIR)/$(DEPS)
 	@$(MAKE) -C plugins clean
 
