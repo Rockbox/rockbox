@@ -36,8 +36,8 @@
 
 struct event_queue button_queue;
 
-static int lastbtn;   /* Last valid button status */
-static int last_read; /* Last button status, for debouncing/filtering */
+static long lastbtn;   /* Last valid button status */
+static long last_read; /* Last button status, for debouncing/filtering */
 #ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
@@ -509,7 +509,7 @@ bool button_hold(void)
 
 int button_status(void)
 {
-    return button_read();
+    return last_btn;
 }
 
 void button_clear_queue(void)
