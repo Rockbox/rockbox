@@ -552,6 +552,7 @@ void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
             break;
 
         src = char_dw_8x8_prop[ch];
+        lcd_clearrect (lcd_x, lcd_y, nx+1, ny);
         lcd_bitmap (src, lcd_x, lcd_y, nx, ny, true);
 
         lcd_x += nx+1;
