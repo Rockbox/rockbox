@@ -33,28 +33,38 @@
 /* skip whole file for an MMC-based system, FIXME in makefile */
 #ifndef HAVE_MMC 
 
-/* Uncomment the matching #define to use plain C code instead if the tweaked 
- * assembler code for disk reading or writing should cause problems. */
-/* #define PREFER_C_READING */
-/* #define PREFER_C_WRITING */
+#ifdef HAVE_SCF5249
 
-#define SECTOR_SIZE     512
+/* don't use sh7034 assembler routines */
+#define PREFER_C_READING
+#define PREFER_C_WRITING
+
+#define ATA_IOBASE      0x20000000
+#define ATA_DATA        (*((volatile unsigned short*)ATA_IOBASE))
+#define ATA_CONTROL     (*((volatile unsigned short*)ATA_IOBASE + 0xe))
+
+#elif defined HAVE_SH7034
+
+#define ATA_IOBASE      0x06100100
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
-#define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
-#define ATA_FEATURE     ATA_ERROR
-#define ATA_NSECTOR     (*((volatile unsigned char*)0x06100102))
-#define ATA_SECTOR      (*((volatile unsigned char*)0x06100103))
-#define ATA_LCYL        (*((volatile unsigned char*)0x06100104))
-#define ATA_HCYL        (*((volatile unsigned char*)0x06100105))
-#define ATA_SELECT      (*((volatile unsigned char*)0x06100106))
-#define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
-#define ATA_STATUS      (*((volatile unsigned char*)0x06100107))
-
 #define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
 #define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
-
 #define ATA_CONTROL     (*ata_control)
+#endif
+
+/* generic registers */
+#define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))
+#define ATA_NSECTOR     (*((volatile unsigned char*)ATA_IOBASE + 2))
+#define ATA_SECTOR      (*((volatile unsigned char*)ATA_IOBASE + 3))
+#define ATA_LCYL        (*((volatile unsigned char*)ATA_IOBASE + 4))
+#define ATA_HCYL        (*((volatile unsigned char*)ATA_IOBASE + 5))
+#define ATA_SELECT      (*((volatile unsigned char*)ATA_IOBASE + 6))
+#define ATA_COMMAND     (*((volatile unsigned char*)ATA_IOBASE + 7))
+#define ATA_FEATURE     ATA_ERROR
+#define ATA_STATUS      ATA_COMMAND
 #define ATA_ALT_STATUS  ATA_CONTROL
+
+
 
 #define SELECT_DEVICE1  0x10
 #define SELECT_LBA      0x40
@@ -85,6 +95,8 @@
 #define Q_SLEEP 0
 
 #define READ_TIMEOUT 5*HZ
+
+#define SECTOR_SIZE     512
 
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
@@ -699,15 +711,19 @@ static int check_registers(void)
 
 static int freeze_lock(void)
 {
-    ATA_SELECT = ata_device;
+    /* does the disk support Security Mode feature set? */
+    if (identify_info[82] & 2)
+    {
+        ATA_SELECT = ata_device;
 
-    if (!wait_for_rdy())
-        return -1;
+        if (!wait_for_rdy())
+            return -1;
 
-    ATA_COMMAND = CMD_SECURITY_FREEZE_LOCK;
+        ATA_COMMAND = CMD_SECURITY_FREEZE_LOCK;
 
-    if (!wait_for_rdy())
-        return -2;
+        if (!wait_for_rdy())
+            return -2;
+    }
 
     return 0;
 }
@@ -862,7 +878,8 @@ static void ata_thread(void)
 int ata_hard_reset(void)
 {
     int ret;
-    
+
+#ifdef HAVE_SH7034
     /* state HRR0 */
     and_b(~0x02, &PADRH); /* assert _RESET */
     sleep(1); /* > 25us */
@@ -870,6 +887,8 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
+#elif defined HAVE_SCF5249
+#endif
 
     /* state HRR2 */
     ATA_SELECT = ata_device; /* select the right device */
@@ -960,6 +979,7 @@ static int master_slave_detect(void)
     return 0;
 }
 
+#ifdef HAVE_SH7034 /* special archos quirk */
 static int io_address_detect(void)
 {   /* now, use the HW mask instead of probing */
     if (read_hw_mask() & ATA_ADDRESS_200)
@@ -977,15 +997,19 @@ static int io_address_detect(void)
 
     return 0;
 }
+#endif
 
 void ata_enable(bool on)
 {
+#ifdef HAVE_SH7034
     if(on)
         and_b(~0x80, &PADRL); /* enable ATA */
     else
         or_b(0x80, &PADRL); /* disable ATA */
 
     or_b(0x80, &PAIORL);
+#elif defined HAVE_SCF5249
+#endif
 }
 
 static int identify(void)
@@ -1105,10 +1129,13 @@ int ata_init(void)
 
     led(false);
 
+#ifdef HAVE_SH7034
     /* Port A setup */
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH); /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+#elif defined HAVE_SCF5249
+#endif
 
     sleeping = false;
     ata_enable(true);
@@ -1132,9 +1159,11 @@ int ata_init(void)
         if (rc)
             return -10 + rc;
 
+#ifdef HAVE_SH7034
         rc = io_address_detect();
         if (rc)
             return -20 + rc;
+#endif
 
         /* symptom fix: else check_registers() below may fail */
         if (coldstart && !wait_for_bsy())
@@ -1146,16 +1175,16 @@ int ata_init(void)
         if (rc)
             return -30 + rc;
 
-        rc = freeze_lock();
-        if (rc)
-            return -40 + rc;
-
         rc = identify();
         if (rc)
-            return -50 + rc;
+            return -40 + rc;
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
         
+        rc = freeze_lock();
+        if (rc)
+            return -50 + rc;
+
         rc = set_features();
         if (rc)
             return -60 + rc;
