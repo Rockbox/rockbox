@@ -21,7 +21,7 @@ file.o: $(FIRMWARE)/common/file.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 debug.o: $(FIRMWARE)/debug.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -DSIMULATOR -c $< -o $@
 
 ata-sim.o: ata-sim.c $(DRIVERS)/ata.h
 

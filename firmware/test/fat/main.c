@@ -111,15 +111,19 @@ void dbg_type(char* name)
     DEBUGF("Got file descriptor %d\n",fd);
     
     for (i=0;i<5;i++) {
-        rc = read(fd, buf, SECTOR_SIZE/3);
-        if( rc >= 0 )
+        rc = read(fd, buf, SECTOR_SIZE*2/3);
+        if( rc > 0 )
         {
-            buf[SECTOR_SIZE]=0;
-            DEBUGF("%d: %d\n", i, rc);
+            buf[rc]=0;
+            printf("%d: %s\n", i, buf);
+        }
+        else if ( rc == 0 ) {
+            DEBUGF("EOF\n");
+            break;
         }
         else
         {
-            DEBUGF("Failed reading file\n");
+            DEBUGF("Failed reading file: %d\n",rc);
         }
     }
     close(fd);
@@ -218,6 +222,7 @@ int main(int argc, char *argv[])
     }
 
     dbg_console();
+
     return 0;
 }
 
