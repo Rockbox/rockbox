@@ -32,18 +32,23 @@ A7. Start by reading up on the information about the jukeboxes on our web page.
     need and start writing.
 
 Q8. Okay, so how do I submit a patch?
-A8. Run: "diff -u oldfile newfile > patchfile" against the file(s) you have 
-    changed.  Then mail the output to any member of the development team and 
-    we will take it under consideration.  (Please remember that all 
-    submissions are not automatically accepted, this is nothing personal.)
+A8. Run: "diff -ub oldfile newfile > patchfile" against the file(s) you have 
+    changed.  Then mail the output to the rockbox mailing list and 
+    we will take it under consideration. Please remember that all 
+    submissions are not automatically accepted. This is nothing personal.
 
-    Of if you would like to run the diff against the current cvs code:
-        cvs diff -ub [file(s)]
+    Preferrably, run the diff against the current cvs code:
+        cvs diff -ub > patchfile
 
 Q9. I want to join the development team, but don't have a SourceForge account,
     what should I do?
-A9. Head on over to http://sourceforge.net/account/register.php and create an
-    account for yourself.
+A9. You don't need a SourceForge account to help developing Rockbox. Just
+    submit patches to the mailing list as per the instructions above.
+
+    If your patches are consistently well-written and thus accepted, you may
+    ultimately be offered CVS commit access. If that should happen, you will
+    need to get a Sourceforge account:
+    http://sourceforge.net/account/register.php
 
 Q10. Do you have a mailing list?
 A10. Sure do!  As a matter of fact, we have several of them for specific 
