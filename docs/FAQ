@@ -473,3 +473,21 @@ Q56: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
 A56: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
      hardware. The firmware can read the keys, but can't prevent them from
      shutting off the player.
+
+Q57: Could you tell me how to apply a patch?
+A57: There are a ton of ways to apply a patch.  One way is to use the (GNU)
+     'patch' program.  It used like this:
+
+       $ cd rockbox-root
+       $ patch < magic.patch
+
+     Sometimes, the diff has path info you want to strip so that patch can 
+     find your file names.  -p then takes off a number of "path parts" from 
+     left:
+
+       $ patch -p0 < magic.patch
+       - or -
+       $ patch -p1 < magic.patch
+
+     If patch can't apply some changes that are in the diff, you'll get those
+     particular changes in a file named "[source-file].rej".
