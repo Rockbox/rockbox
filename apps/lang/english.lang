@@ -46,43 +46,43 @@ new:
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
-voice: "USB"
+voice: ""
 new:
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
-voice: "Rockbox Info:"
+voice: ""
 new:
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
-voice: "Buffer size:"
+voice: ""
 new:
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
-voice: "Buffer size:"
+voice: ""
 new:
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-voice: "Battery: Charging"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
-voice: "Loading..."
+voice: ""
 new:
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-voice: "Shuffling..."
+voice: ""
 new:
 
 id: LANG_PLAYINDICES_PLAYLIST
@@ -94,43 +94,43 @@ new:
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
-voice: "Buffer Full"
+voice: ""
 new:
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-voice: "Save Failed"
+voice: ""
 new:
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
-voice: "Partition?"
+voice: ""
 new:
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-voice: "Save Failed"
+voice: ""
 new:
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
-voice: "No partition?"
+voice: ""
 new:
 
 id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
-voice: "Press On To Set"
+voice: ""
 new:
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
-voice: "Press Off To Revert"
+voice: ""
 new:
 
 id: LANG_CONTRAST
@@ -154,7 +154,7 @@ new:
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: "Sort Case Sensitive"
+voice: ""
 new:
 
 id: LANG_RESUME
@@ -190,7 +190,7 @@ new:
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-voice: "Scroll Speed Setting Example"
+voice: ""
 new:
 
 id: LANG_DISCHARGE
@@ -232,25 +232,25 @@ new:
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
-voice: "Are You Sure?"
+voice: ""
 new: 
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
-voice: "Settings"
+voice: ""
 new:
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-voice: "Cleared"
+voice: ""
 new:
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
-voice: "Canceled"
+voice: ""
 new:
 
 id: LANG_CASE_MENU
@@ -334,7 +334,7 @@ new:
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-voice: "Auto volume Decay Time"
+voice: ""
 new:
 
 id: LANG_CHANNEL_MENU
@@ -346,7 +346,7 @@ new:
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-voice: "Channel Configuration"
+voice: ""
 new:
 
 id: LANG_CHANNEL_STEREO
@@ -382,217 +382,217 @@ new:
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-voice: "Directory Buffer"
+voice: ""
 new:
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
-voice: "Is Full!"
+voice: ""
 new:
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
 eng: "Resume?"
-voice: "Resume?"
+voice: ""
 new:
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
-voice: "(PLAY/STOP)"
+voice: ""
 new:
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
-voice: "Key Lock ON"
+voice: ""
 new:
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
-voice: "Key Lock OFF"
+voice: ""
 new:
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-voice: "Key Lock Is ON"
+voice: ""
 new:
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
-voice: "Key Lock Is OFF"
+voice: ""
 new:
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-voice: "Mute ON"
+voice: ""
 new:
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "Mute OFF"
-voice: "Mute OFF"
+voice: ""
 new:
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute Is ON"
-voice: "Mute Is ON"
+voice: ""
 new:
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute Is OFF"
-voice: "Mute Is OFF"
+voice: ""
 new:
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
-voice: "ID3 Info"
+voice: ""
 new:
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-voice: "Screen"
+voice: ""
 new:
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-voice: "Title"
+voice: ""
 new:
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<No Title>"
-voice: "No Title"
+voice: ""
 new:
 
 id: LANG_ID3_ARTIST
 desc: in wps 
 eng: "[Artist]"
-voice: "Artist"
+voice: ""
 new:
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<No Artist>"
-voice: "No Artist"
+voice: ""
 new:
 
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
-voice: "Album"
+voice: ""
 new:
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
 eng: "<No Album>"
-voice: "No Album"
+voice: ""
 new:
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-voice: "Track number"
+voice: ""
 new:
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<No Tracknum>"
-voice: "No Track number"
+voice: ""
 new:
 
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-voice: "Length"
+voice: ""
 new:
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-voice: "Playlist"
+voice: ""
 new:
 
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
-voice: "Bitrate"
+voice: ""
 new:
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
-voice: "Frequency"
+voice: ""
 new:
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
-voice: "Path"
+voice: ""
 new: 
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
-voice: "Pitch Up"
+voice: ""
 new:
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
-voice: "Pitch Down"
+voice: ""
 new:
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
-voice: "Pause"
+voice: ""
 new:
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
-voice: "Mode:"
+voice: ""
 new:
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-voice: "Status"
+voice: ""
 new:
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-voice: "Scroll"
+voice: ""
 new:
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
-voice: "Bar"
+voice: ""
 new:
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
-voice: "End Of List"
+voice: ""
 new:
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
-voice: "End Of Song List"
+voice: ""
 new: 
 
 id: LANG_POWEROFF_IDLE
@@ -604,7 +604,7 @@ new:
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
-voice: "New Language"
+voice: ""
 new:
 
 id: LANG_FILTER
@@ -706,13 +706,13 @@ new:
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
-voice: "Press Play to Reset"
+voice: ""
 new:
  
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
-voice: "Press Off to Cancel"
+voice: ""
 new:
 
 id: LANG_TIMEFORMAT
@@ -736,115 +736,115 @@ new:
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
-voice: "Sunday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
-voice: "Monday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
-voice: "Tuesday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
-voice: "Wednesday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
-voice: "Thursday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
-voice: "Friday"
+voice: ""
 new:
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
-voice: "Saturday"
+voice: ""
 new:
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
-voice: "January"
+voice: ""
 new:
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
-voice: "February"
+voice: ""
 new:
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-voice: "March"
+voice: ""
 new:
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
-voice: "April"
+voice: ""
 new:
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
-voice: "May"
+voice: ""
 new:
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
-voice: "June"
+voice: ""
 new:
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
-voice: "July"
+voice: ""
 new:
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
-voice: "August"
+voice: ""
 new:
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
-voice: "September"
+voice: ""
 new:
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-voice: "October"
+voice: ""
 new:
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
-voice: "November"
+voice: ""
 new:
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
-voice: "December"
+voice: ""
 new:
 
 id: LANG_RESUME_SETTING_ASK_ONCE
@@ -934,19 +934,19 @@ new:
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
-voice: "Gain"
+voice: ""
 new:
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
-voice: "Left"
+voice: ""
 new:
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
-voice: "Right"
+voice: ""
 new:
 
 id: LANG_RECORDING_QUALITY
@@ -1000,13 +1000,13 @@ new:
 id: LANG_DISK_STAT
 desc: disk size info
 eng: "Disk: %d.%dGB"
-voice: "Disk:"
+voice: ""
 new:
 
 id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
-voice: "Free:"
+voice: ""
 new:
 
 id: LANG_POWEROFF
@@ -1024,7 +1024,7 @@ new:
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-voice: "day hour minute"
+voice: ""
 new:
 
 id: LANG_SLEEP_TIMER
@@ -1060,7 +1060,7 @@ new:
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-voice: "Scroll Step Size Setting Example Text"
+voice: ""
 new:
 
 id: LANG_SCROLL_SPEED
@@ -1078,13 +1078,13 @@ new:
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-voice: "Battery: Top-Off Charge"
+voice: ""
 new:
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
-voice: "Battery: Trickle Charge"
+voice: ""
 new:
 
 id: LANG_BATTERY_CAPACITY
@@ -1096,7 +1096,7 @@ new:
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
-voice: "Canceled"
+voice: ""
 new:
 
 id: LANG_QUEUE
@@ -1114,13 +1114,13 @@ new:
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
-voice: "Delete?"
+voice: ""
 new:
 
 id: LANG_DELETED
 desc: A file has beed deleted
 eng: "Deleted"
-voice: "Deleted"
+voice: ""
 new:
 
 id: LANG_RENAME
@@ -1132,7 +1132,7 @@ new:
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
-voice: "Failed"
+voice: ""
 new: 
 
 id: LANG_ALARM_MOD_ALARM_MENU
@@ -1144,31 +1144,31 @@ new:
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
-voice: "Alarm Time:"
+voice: ""
 new: 
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
-voice: "Waking Up In"
+voice: ""
 new: 
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Shutting Down..."
-voice: "Shutting Down..."
+voice: ""
 new: 
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
-voice: "Alarm Time Is Too Soon!"
+voice: ""
 new: 
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
-voice: "Press Play to set, Off to cancel"
+voice: ""
 new: 
 
 id: LANG_CREATE_PLAYLIST
@@ -1180,31 +1180,31 @@ new:
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
-voice: "Creating"
+voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: Backspace alternative in player keyboard interaction
 eng: "Backspace"
-voice: "Backspace"
+voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: Delete alternative in player keyboard interaction
 eng: "Delete"
-voice: "Delete"
+voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: Accept alternative in player keyboard interaction
 eng: "Accept"
-voice: "Accept"
+voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: Abort alternative in player keyboard interaction
 eng: "Abort"
-voice: "Abort"
+voice: ""
 new:
 
 id: LANG_MENU_SHOW_ID3_INFO
@@ -1216,43 +1216,43 @@ new:
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
-voice: "[Genre]"
+voice: ""
 new:
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
-voice: "[Year]"
+voice: ""
 new:
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
-voice: "<No Info>"
+voice: ""
 new:
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
-voice: "Time:"
+voice: ""
 new:
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
-voice: "Size:"
+voice: ""
 new:
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
-voice: "Settings"
+voice: ""
 new: 
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
-voice: "Loaded"
+voice: ""
 new: 
 
 id: LANG_FADE_ON_STOP
@@ -1264,7 +1264,7 @@ new:
 id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
-voice: "press On to Undo"
+voice: ""
 new:
 
 id: LANG_INVERT
@@ -1306,25 +1306,25 @@ new:
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
-voice: "Settings"
+voice: ""
 new: 
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
-voice: "Saved"
+voice: ""
 new: 
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: Tells the user to stop the playback
 eng: "Stop the playback first"
-voice: "Stop the playback first"
+voice: ""
 new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: Tells the user that the selected file is not a VBR file
 eng: "Not a VBR file"
-voice: "Not a VBR file"
+voice: ""
 new: 
 
 id: LANG_VBRFIX
@@ -1432,7 +1432,7 @@ new:
 id: LANG_RECORD_TIMESPLIT_REC
 decs: Display of record timer interval setting, on the record screen
 eng: "Split time:"
-voice: "Split time:"
+voice: ""
 new:
 
 id: LANG_SHOW_ICONS
@@ -1444,19 +1444,19 @@ new:
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
-voice: "The disk is full. Press OFF to continue."
+voice: ""
 new:
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
-voice: "press Play for yes"
+voice: ""
 new:
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
-voice: "Any other for no"
+voice: ""
 new:
 
 ##
@@ -1466,31 +1466,31 @@ new:
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
-voice: "Can't open:"
+voice: ""
 new:
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
-voice: "Failed reading:"
+voice: ""
 new:
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
-voice: "Incompatible model"
+voice: ""
 new:
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
-voice: "Incompatible version"
+voice: ""
 new:
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
-voice: "Plugin returned error"
+voice: ""
 new:
 
 ##
@@ -1500,13 +1500,13 @@ new:
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
-voice: "Boot changed"
+voice: ""
 new:
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
-voice: "Reboot now?"
+voice: ""
 new:
 
 id: LANG_QUEUE_LAST
@@ -1554,61 +1554,61 @@ new:
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
-voice: "Inserted tracks:"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
-voice: "Queued tracks:"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
-voice: "Saved tracks:"
+voice: ""
 new:
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
-voice: "press OFF to abort"
+voice: ""
 new:
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
-voice: "press STOP to abort"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
-voice: "Error updating playlist control file"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
-voice: "Error accessing playlist file"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
-voice: "Error accessing playlist control file"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
-voice: "Error accessing directory"
+voice: ""
 new:
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
-voice: "Playlist control file is invalid"
+voice: ""
 new:
 
 id: LANG_RECURSE_DIRECTORY
@@ -1620,7 +1620,7 @@ new:
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
-voice: "Recursively?"
+voice: ""
 new:
 
 id: LANG_CUSTOM_FONT
@@ -1674,19 +1674,19 @@ new:
 id: LANG_NO_FILES
 desc:  in settings_menu
 eng: "No files"
-voice: "No files"
+voice: ""
 new:
 
 id: LANG_BUTTONBAR_MENU
 desc:  in button bar
 eng: "Menu"
-voice: "Menu"
+voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc:  in button bar
 eng: "Preset"
-voice: "Preset"
+voice: ""
 new:
 
 id: LANG_FM_SAVE_PRESET
@@ -1704,25 +1704,25 @@ new:
 id: LANG_FM_STATION
 desc:  in radio screen
 eng: "Station: %d.%dMHz"
-voice: "Station Megahertz:"
+voice: ""
 new:
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc:  in radio screen
 eng: "Preset save failed"
-voice: "Preset save failed"
+voice: ""
 new:
 
 id: LANG_FM_NO_PRESETS
 desc:  in radio screen
 eng: "The preset list is empty"
-voice: "The preset list is empty"
+voice: ""
 new:
 
 id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
 eng: "The preset list is full"
-voice: "The preset list is full"
+voice: ""
 new:
 
 id: LANG_FM_RADIO
@@ -1734,7 +1734,7 @@ new:
 id: LANG_FM_BUTTONBAR_RECORD
 desc:  in main menu
 eng: "Record"
-voice: "Record"
+voice: ""
 new:
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
@@ -1752,7 +1752,7 @@ new:
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
-voice: "Move failed"
+voice: ""
 new:
 
 id: LANG_FLIP_DISPLAY
@@ -1764,25 +1764,25 @@ new:
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
-voice: "Prerecording"
+voice: ""
 new:
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
-voice: "Prerecord time"
+voice: "Pre-Record time"
 new:
 
 #Auto bookmark prompts
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: "Load Last Bookmark?"
+voice: ""
 eng: "Load Last Bookmark?"
 new:
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: "Create a Bookmark?"
+voice: ""
 eng: "Create a Bookmark?"
 new:
 
@@ -1790,63 +1790,63 @@ new:
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
-voice: "press Down to List"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
-voice: "press OFF to Exit"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
-voice: "Bookmark"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
 eng: "Index"
-voice: "Index"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
-voice: "Time"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
-voice: "press PLAY to Select"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
-voice: "press ON+Play to Delete"
+voice: ""
 new:
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
-voice: "Bookmark Created"
+voice: ""
 new:
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
-voice: "Bookmark Failed!"
+voice: ""
 new:
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
-voice: "Bookmark Empty"
+voice: ""
 new:
 
 # Bookmark Settings Text
@@ -1933,7 +1933,7 @@ new:
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "Fast Forward/Rewind"
+voice: ""
 new:
 
 id: LANG_LCD_MENU
@@ -2048,19 +2048,19 @@ new:
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
 eng: "Menu"
-voice: "Menu"
+voice: ""
 new:
 
 id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
 eng: "Option"
-voice: "Option"
+voice: ""
 new:
 
 id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
 eng: "LCD"
-voice: "LCD"
+voice: ""
 new:
 
 #digits and units for voice, the order is important
@@ -2330,43 +2330,43 @@ voice: "decibel"
 new:
 
 id: VOICE_PERCENT
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "percent"
 new:
 
 id: VOICE_MEGABYTE
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "megabyte"
 new:
 
 id: VOICE_GIGABYTE
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "gigabyte"
 new:
 
 id: VOICE_MILLIAMPHOURS
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "milliamp hours"
 new:
 
 id: VOICE_PIXEL
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "pixel"
 new:
 
 id: VOICE_PER_SEC
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "per second"
 new:
 
 id: VOICE_HERTZ
-desc: spoken only
+desc: spoken only, a unit postfix
 eng: ""
 voice: "hertz"
 new:
