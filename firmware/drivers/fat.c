@@ -981,7 +981,8 @@ int fat_truncate(struct fat_file *file)
         next = get_next_cluster(last);
         update_fat_entry(last,0);
     }
-    update_fat_entry(file->lastcluster,FAT_EOF_MARK);
+    if (file->lastcluster)
+        update_fat_entry(file->lastcluster,FAT_EOF_MARK);
 
     return 0;
 }
