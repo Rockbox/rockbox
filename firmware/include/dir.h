@@ -71,10 +71,10 @@ typedef struct DIRtag
 
 #ifndef DIRFUNCTIONS_DEFINED
 
-extern DIR* opendir(char* name);
+extern DIR* opendir(const char* name);
 extern int closedir(DIR* dir);
-extern int mkdir(char* name, int mode);
-extern int rmdir(char* name);
+extern int mkdir(const char* name, int mode);
+extern int rmdir(const char* name);
 
 extern struct dirent* readdir(DIR* dir);
 

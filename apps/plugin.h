@@ -150,7 +150,7 @@ struct plugin_api {
     int (*read_line)(int fd, char* buffer, int buffer_size);
     
     /* dir */
-    DIR* (*opendir)(char* name);
+    DIR* (*opendir)(const char* name);
     int (*closedir)(DIR* dir);
     struct dirent* (*readdir)(DIR* dir);
 

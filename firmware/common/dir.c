@@ -28,7 +28,7 @@
 
 static DIR opendirs[MAX_OPEN_DIRS];
 
-DIR* opendir(char* name)
+DIR* opendir(const char* name)
 {
     char namecopy[MAX_PATH];
     char* part;
@@ -117,7 +117,7 @@ struct dirent* readdir(DIR* dir)
     return theent;
 }
 
-int mkdir(char *name, int mode)
+int mkdir(const char *name, int mode)
 {
     DIR *dir;
     char namecopy[MAX_PATH];
@@ -182,7 +182,7 @@ int mkdir(char *name, int mode)
     return rc;
 }
 
-int rmdir(char* name)
+int rmdir(const char* name)
 {
     int rc;
     DIR* dir;
