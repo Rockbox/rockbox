@@ -878,7 +878,7 @@ bool settings_load_config(char* file)
                            options, 4);
         }
         else if (!strcasecmp(name, "wps")) {
-            if (wps_load(value,true))
+            if (wps_load(value,false))
                 set_file(value, global_settings.wps_file, MAX_FILENAME);
         }
         else if (!strcasecmp(name, "lang")) {
