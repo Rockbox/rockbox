@@ -22,7 +22,7 @@
 	.section .init.text
 	.global	start
 start:
-#if defined(ARCHOS_GMINI120)
+#if CONFIG_CPU == TCC730
 	;; disable all interrupts
  	clrsr fe
 	clrsr ie

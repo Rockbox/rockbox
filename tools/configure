@@ -51,7 +51,7 @@ coldfirecc () {
 
 whichaddr () {
     case $archos in
-    gmini120)
+    gmini120|gminisp)
 	echo ""
 	echo "Where do you want the firmware to be flashed?"
 	echo "WARNING: Do not answer this question lightly,"
@@ -293,6 +293,7 @@ if [ -z "$archos" ]; then
   echo "3 - Archos FM Recorder"
   echo "4 - Archos Recorder v2"
   echo "5 - Archos Gmini 120"
+  echo "6 - Archos Gmini SP"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
   echo "9 - Iriver H100"
@@ -340,6 +341,19 @@ if [ -z "$archos" ]; then
    5)
     archos="gmini120"
     target="-DARCHOS_GMINI120 -DLOADADDRESS=\$(LOADADDRESS)"
+    memory=16 # fixed size (16 is a guess, remove comment when checked)
+    calmrisccc
+    tool="cp" # might work for now!
+    output="rockbox.gmini"
+    appextra="recorder"
+    archosrom=""
+    flash=""
+    plugins="" # disabled for now, enable later on
+    ;;
+
+   6)
+    archos="gminisp"
+    target="-DARCHOS_GMINISP -DLOADADDRESS=\$(LOADADDRESS)"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!

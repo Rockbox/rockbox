@@ -86,6 +86,8 @@
 #include "config-h100.h"
 #elif defined(ARCHOS_GMINI120)
 #include "config-gmini120.h"
+#elif defined(ARCHOS_GMINISP)
+#include "config-gminisp.h"
 #else
 /* no known platform */
 #endif
