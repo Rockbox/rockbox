@@ -66,8 +66,6 @@ static unsigned int gbuf_size = 0;
  * you're doing.
  */
 
-#define IMIA4 (*((volatile unsigned long*)0x09000180)) /* timer 4 */
-
 #define GRAY_RUNNING          0x0001  /* grayscale overlay is running */
 #define GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
 
@@ -91,44 +89,15 @@ static tGraybuf *graybuf = NULL;
 
 /** prototypes **/
 
-void timer_set(unsigned period);
-void timer4_isr(void) __attribute__((interrupt_handler));
+void timer4_isr(void);
 void graypixel(int x, int y, unsigned long pattern);
 void grayinvertmasked(int x, int yb, unsigned char mask);
 
 /** implementation **/
 
-/* setup ISR and timer registers */
-void timer_set(unsigned period)
-{
-    if (period)
-    {
-        and_b(~0x10, &TSTR); /* Stop the timer 4 */
-        and_b(~0x10, &TSNC); /* No synchronization */
-        and_b(~0x10, &TMDR); /* Operate normally */
-
-        IMIA4 = (unsigned long) timer4_isr; /* install ISR */
-
-        and_b(~0x01, &TSR4);
-        TIER4 = 0xF9; /* Enable GRA match interrupt */
-
-        GRA4 = (unsigned short)(period/4 - 1);
-        TCR4 = 0x22; /* clear at GRA match, sysclock/4 */
-        IPRD = (IPRD & 0xFF0F) | 0x0010; /* interrupt priority 1 (lowest) */
-        or_b(0x10, &TSTR); /* start timer 4 */
-    }
-    else
-    {
-        and_b(~0x10, &TSTR);    /* stop the timer 4 */
-        IPRD = (IPRD & 0xFF0F); /* disable interrupt */
-    }
-}
-
 /* timer interrupt handler: display next bitplane */
 void timer4_isr(void) /* IMIA4 */
 {
-    and_b(~0x01, &TSR4); /* clear the interrupt */
-
     rb->lcd_blit(graybuf->data + (graybuf->plane_size * graybuf->cur_plane),
                  graybuf->x, graybuf->by, graybuf->width, graybuf->bheight,
                  graybuf->width);
@@ -505,11 +474,11 @@ void gray_show_display(bool enable)
     if (enable)
     {
         graybuf->flags |= GRAY_RUNNING;
-        timer_set(FREQ / 67);
+        rb->plugin_register_timer(FREQ / 67, 1, timer4_isr);
     }
     else
     {
-        timer_set(0);
+        rb->plugin_unregister_timer();
         graybuf->flags &= ~GRAY_RUNNING;
         rb->lcd_update(); /* restore whatever there was before */
     }
