@@ -65,7 +65,6 @@ ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
-  #MPEG_PLAY = 1
 else
 ifeq ($(UNAME),CYGWIN)
   LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11
@@ -77,10 +76,6 @@ else
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
 endif
-endif
-
-ifdef MPEG_PLAY
-  INCLUDES += -I$(PREVAPPDIR)/common
 endif
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
@@ -108,12 +103,6 @@ endif
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
         button-x11.c io.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS)
 
-ifdef MPEG_PLAY
-  SRCS += mpegplay.c oss_sound.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
-  DEFINES += -DMPEG_PLAY -DFPM_DEFAULT -DHAVE_CONFIG_H
-  INCLUDES += -I$(LIBMADDIR)
-endif
-
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
 all: $(TARGET) $(EXTRA_TARGETS)
@@ -125,45 +114,6 @@ clean:
 
 distclean: clean
 	$(RM) config.cache
-
-ifdef MPEG_PLAY
-$(OBJDIR)/bit.o: $(LIBMADDIR)/bit.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/decoder.o: $(LIBMADDIR)/decoder.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/fixed.o: $(LIBMADDIR)/fixed.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/frame.o: $(LIBMADDIR)/frame.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/huffman.o: $(LIBMADDIR)/huffman.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/layer12.o: $(LIBMADDIR)/layer12.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/layer3.o: $(LIBMADDIR)/layer3.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/stream.o: $(LIBMADDIR)/stream.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/synth.o: $(LIBMADDIR)/synth.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/timer.o: $(LIBMADDIR)/timer.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/version.o: $(LIBMADDIR)/version.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-endif
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl $(APPDIR)/credits.pl < $< > $@
