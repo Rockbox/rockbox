@@ -38,15 +38,16 @@
 
 #define LINE_Y      1 /* initial line */
 
-void playtune(char *dir, char *file)
+void playtune(char *filename)
 {
     static char mfile[256];
-    char buffer[256];
     mp3entry mp3;
     bool good=1;
+#ifdef HAVE_LCD_BITMAP
+    char buffer[256];
+#endif
 
-    snprintf(buffer, sizeof(buffer), "%s/%s", dir, file);
-    if(mp3info(&mp3, buffer)) {
+    if(mp3info(&mp3, filename)) {
         DEBUGF("id3 failure!");
         good=0;
     }
@@ -84,7 +85,7 @@ void playtune(char *dir, char *file)
     lcd_update();
 #endif
 
-    snprintf(mfile, sizeof(mfile), "%s/%s", dir, file);
+    strncpy(mfile, filename, 256);
     mpeg_play(mfile);
 
     while(1) {

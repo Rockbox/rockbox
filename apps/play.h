@@ -17,4 +17,4 @@
  *
  ****************************************************************************/
 
-void playtune(char *dir, char *file);
+void playtune(char *filename);

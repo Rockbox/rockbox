@@ -310,7 +310,7 @@ bool dirbrowse(char *root)
                     else {
 
                         playing = 1;
-                        playtune(currdir, dircacheptr[dircursor+start]->name);
+                        playtune(buf);
                         playing = 0;
 #ifdef HAVE_LCD_BITMAP
                         lcd_setmargins(0, MARGIN_Y);
