@@ -3,12 +3,18 @@
 #define MAIN_PAGE
 #include "head.t"
 
-<h2>What is Rockbox?</h2>
+<p class="ingress"> Rockbox is an Open Source replacement firmware for the
+Archos Jukebox 5000, 6000, Studio, Recorder and FM Recorder MP3 players.
 
-<p>Rockbox is an Open Source replacement firmware for the Archos Jukebox 5000, 6000, Studio and Recorder MP3 players.
+<p> Rockbox is a complete rewrite and uses no fragments of the original
+firmware. It boasts <a href="/docs/features.html">numerous features</a> while
+remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
+
+<p> Installing Rockbox does not harm your Archos, it works the same way you
+upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
-<p><i>2003-05-09</i>: The 400-file dir browser limit is <a href=http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml>gone</a>.
+<p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
 
 <p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
 
@@ -16,11 +22,6 @@
 Rockbox development.
 
 <p><i>2003-04-15</i>: Version 2.0 is <a href="/download/">released</a>
-
-<p><i>2003-04-01</i>: <a href="/doom/">Play Doom on the Archos Recorder</a>!
-
-<p><i>2003-02-17</i>: Rockbox <a href="/daily.shtml">daily builds</a> now work on
-the FM Recorder.
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
