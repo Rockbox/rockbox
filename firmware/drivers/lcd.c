@@ -933,7 +933,9 @@ void lcd_puts_scroll(int x, int y, char* string )
     ch[0] = string[0];
     width = 0;
     for (s->space = 0;
-         width + lcd_getstringsize(ch, 0, &w, &h) < (LCD_WIDTH - x*8); ) {
+         string[(int)s->space] &&
+             (width + lcd_getstringsize(ch, 0, &w, &h) < (LCD_WIDTH - x*8));
+         ) {
         width += lcd_getstringsize(ch, 0, &w, &h);
         ch[0]=string[(int)++s->space];
     }
