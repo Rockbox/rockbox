@@ -13,9 +13,6 @@
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F
 
-/* Define this if you have ATA power-off control */
-#define HAVE_ATA_POWER_OFF
-
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1
 
@@ -28,8 +25,8 @@
 /* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
 #define BATTERY_SCALE_FACTOR 8081
 
-/* Define this if you control power on PBDR (instead of PADR) */
-#define HAVE_POWEROFF_ON_PBDR
+/* Define this if you control power on PB5 (instead of the OFF button) */
+#define HAVE_POWEROFF_ON_PB5
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 20

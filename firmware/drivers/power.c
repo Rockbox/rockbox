@@ -78,6 +78,9 @@ void power_off(void)
 #ifdef HAVE_POWEROFF_ON_PBDR
     PBDR &= ~PBDR_BTN_OFF;
     PBIOR |= PBDR_BTN_OFF;
+#elif defined(HAVE_POWEROFF_ON_PB5)
+    PBDR &= ~0x20;
+    PBIOR |= 0x20;
 #else
     PADR &= ~0x800;
     PAIOR |= 0x800;
