@@ -60,7 +60,8 @@ struct credit credits[] = {
 
 void show_credits(void)
 {
-    int i,j;
+    unsigned int i;
+    int j;
     int line = 0;
 
     lcd_clear_display();
