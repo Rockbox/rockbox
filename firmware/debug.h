@@ -25,7 +25,7 @@ extern void debugf(char* fmt,...);
 #ifdef __GNUC__
 
 /*  */
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SIMULATOR)
 #define DEBUGF(...) debugf(__VA_ARGS__)
 #else
 #define DEBUGF(...)

@@ -215,13 +215,9 @@ void debug_init(void)
 
 void debugf(char *fmt, ...)
 {
-#ifdef DEBUG
     va_list ap;
-    
     va_start( ap, fmt );
-    vsnprintf( debugmembuf, sizeof(debugmembuf), fmt, ap );
+    vfprintf( stderr, fmt, ap );
     va_end( ap );
-    printf( "%s", debugmembuf );
-#endif
 }
 #endif
