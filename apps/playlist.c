@@ -142,7 +142,7 @@ void add_indices_to_playlist( playlist_info_t *playlist )
         for(count=0; count < nread; count++,p++) {
 
             /* Are we on a new line? */
-            if(((*p == '\n') || (*p == '\r')) && (!store_index))
+            if((*p == '\n') || (*p == '\r'))
             {
                 store_index = 1;
             } 
