@@ -94,6 +94,16 @@ start:
         bra    .iramloop
 .iramloopend:
 
+        lea    _edata,%a2
+        lea    _end,%a4
+        clr.l  %d0
+.edataloop:
+        cmp.l  %a2,%a4
+        beq    .edataloopend
+        move.w %d0,(%a2)+
+        bra    .edataloop
+.edataloopend:
+
         lea    _datacopy,%a2
         lea    _datastart,%a3
         lea    _dataend,%a4        
