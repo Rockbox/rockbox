@@ -194,6 +194,11 @@ void remove_thread(int threadnum)
         thread_stack_size[i] = thread_stack_size[i+1];
         thread_contexts[i]   = thread_contexts[i+1];
     }
+
+    if (current_thread == threadnum) /* deleting the current one? */
+        current_thread = num_threads; /* set beyond last, avoid store harm */
+    else if (current_thread > threadnum) /* within the moved positions? */
+        current_thread--; /* adjust it, point to same context again */
 }
 
 void init_threads(void)
