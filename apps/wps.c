@@ -585,6 +585,8 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
+                        mpeg_resume();
+                        status_set_playmode(STATUS_PLAY);
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
@@ -618,6 +620,8 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
+                        mpeg_resume();
+                        status_set_playmode(STATUS_PLAY);
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
