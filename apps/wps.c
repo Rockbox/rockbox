@@ -121,13 +121,9 @@ void display_keylock_text(bool locked)
         lcd_puts(0, 0, str(LANG_KEYLOCK_OFF_PLAYER));
 #else
     if(locked)
-    {
         lcd_puts(2, 3, str(LANG_KEYLOCK_ON_RECORDER));
-    }
     else
-    {
         lcd_puts(2, 3, str(LANG_KEYLOCK_OFF_RECORDER));
-    }
     lcd_update();
 #endif
     
@@ -146,13 +142,9 @@ void display_mute_text(bool muted)
         lcd_puts(0, 0, str(LANG_MUTE_OFF_PLAYER));
 #else
     if (muted)
-    {
         lcd_puts(2, 3, str(LANG_MUTE_ON_RECORDER));
-    }
     else
-    {
         lcd_puts(2, 3, str(LANG_MUTE_OFF_RECORDER));
-    }
     lcd_update();
 #endif
     
@@ -750,6 +742,7 @@ int on_screen(void)
 bool f2_screen(void)
 {
     bool exit = false;
+    bool used = false;
     int w, h;
     char buf[32];
 
@@ -789,19 +782,19 @@ bool f2_screen(void)
                     randomise_playlist(current_tick);
                 else
                     sort_playlist(true);
+                used = true;
                 break;
 
             case BUTTON_DOWN:
             case BUTTON_F2 | BUTTON_DOWN:
                 global_settings.mp3filter = !global_settings.mp3filter;
+                used = true;
                 break;
 
-#ifdef SIMULATOR
-            case BUTTON_F2:
-#else
             case BUTTON_F2 | BUTTON_REL:
-#endif
-                exit = true;
+                if ( used )
+                    exit = true;
+                used = true;
                 break;
 
 #ifndef SIMULATOR
@@ -820,6 +813,7 @@ bool f2_screen(void)
 bool f3_screen(void)
 {
     bool exit = false;
+    bool used = false;
 
     lcd_stop_scroll();
 
@@ -850,19 +844,19 @@ bool f3_screen(void)
             case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
                 global_settings.scrollbar = !global_settings.scrollbar;
+                used = true;
                 break;
 
             case BUTTON_RIGHT:
             case BUTTON_F3 | BUTTON_RIGHT:
                 global_settings.statusbar = !global_settings.statusbar;
+                used = true;
                 break;
 
-#ifdef SIMULATOR
-            case BUTTON_F3:
-#else
             case BUTTON_F3 | BUTTON_REL:
-#endif
-                exit = true;
+                if ( used )
+                    exit = true;
+                used = true;
                 break;
 
 #ifndef SIMULATOR
