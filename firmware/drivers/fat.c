@@ -1178,13 +1178,12 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             ((char*)buf) += count * SECTOR_SIZE;
             first = sector;
         }
-        else {
-            if (i == sectorcount-1) { /* last sector requested */
-                int count = sector - first + 1;
-                if (!transfer( first + fat_bpb.startsector, 
-                               count, buf, write ))
-                    return -2;
-            }
+
+        if (i == sectorcount-1) { /* last sector requested */
+            int count = sector - first + 1;
+            if (!transfer( first + fat_bpb.startsector, 
+                           count, buf, write ))
+                return -2;
         }
 
         last = sector;
