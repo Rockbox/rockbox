@@ -124,6 +124,11 @@ void usb_screen(void)
 /* some simulator dummies */
 #ifdef SIMULATOR
 #define BATTERY_SCALE_FACTOR 7000
+unsigned short adc_read(int channel)
+{
+   (void)channel;
+   return 100;
+}
 #endif
 
 
