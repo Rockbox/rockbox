@@ -38,6 +38,7 @@
 #include "main_menu.h"
 #include "ata.h"
 #include "screens.h"
+#include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
@@ -437,9 +438,14 @@ static bool update(void)
          global_settings.resume_offset != id3->offset ) {
         DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
                id3->offset,id3);
-        global_settings.resume_index = id3->index;
-        global_settings.resume_offset = id3->offset;
-        settings_save();
+ 
+        if (!playlist_get_resume_info(&global_settings.resume_index,
+                &global_settings.queue_resume,
+                &global_settings.queue_resume_index))
+        {
+            global_settings.resume_offset = id3->offset;
+            settings_save();
+        }
     }
     else if ( !id3 && track_changed ) {
         global_settings.resume_index = -1;

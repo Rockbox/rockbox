@@ -94,6 +94,13 @@ struct user_settings
     int resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* random seed for playlist shuffle */
     int resume_first_index; /* first index of playlist */
+
+    bool save_queue_resume; /* save queued songs for resume */
+    int queue_resume; /* resume queue file?: 0 = no
+                                             1 = resume at queue index
+                                             2 = resume at playlist index */
+    int queue_resume_index; /* queue index (seek point in queue file) */
+
     unsigned char resume_file[MAX_PATH+1]; /* playlist name (or dir) */
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */

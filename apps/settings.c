@@ -92,14 +92,10 @@ offset  abs
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
-0x1b    0x2f    <browse current, play selected>
+0x1b    0x2f    <browse current, play selected, queue_resume>
 0x1c    0x30    <peak meter hold timeout (bit 0-4)>, 
                  peak_meter_performance (bit 7)
-0x1d    0x31    <peak meter clip hold timeout (bit 0-4)
-0x1e    0x32    <peak meter release step size, 
-                 peak_meter_dbfs (bit 7)
-0x1f    0x33    <peak meter min either in -db or in percent>
-0x20    0x34    <peak meter max either in -db or in percent>
+0x1d    0x31    <(int) queue resume index>
 0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
                  mic gain (bit 4-7)>
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
@@ -125,7 +121,10 @@ modified unless the header & checksum test fails.
 
 
 Rest of config block, only saved to disk:
-
+0xB0  peak meter clip hold timeout (bit 0-4)
+0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
+0xB2  peak meter min either in -db or in percent
+0xB3  peak meter max either in -db or in percent
 0xB4  battery capacity
 0xB5  scroll step in pixels
 0xB6  scroll start and endpoint delay
@@ -330,15 +329,13 @@ int settings_save( void )
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
     config_block[0x1b] = (unsigned char)
         (((global_settings.browse_current & 1)) |
-         ((global_settings.play_selected & 1) << 1));
+         ((global_settings.play_selected & 1) << 1) |
+         ((global_settings.queue_resume & 3) << 2));
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold;
-    config_block[0x1d] = (unsigned char)global_settings.peak_meter_clip_hold |
-        (global_settings.peak_meter_performance ? 0x80 : 0);
-    config_block[0x1e] = global_settings.peak_meter_release |
-        (global_settings.peak_meter_dbfs ? 0x80 : 0);
-    config_block[0x1f] = (unsigned char)global_settings.peak_meter_min;
-    config_block[0x20] = (unsigned char)global_settings.peak_meter_max;
+
+    memcpy(&config_block[0x1d], &global_settings.queue_resume_index, 4);
+
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
          ((global_settings.rec_channels & 1) << 2) |
@@ -368,6 +365,13 @@ int settings_save( void )
         config_block[0x28]=(unsigned char)(global_settings.topruntime & 0xff);
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
+
+    config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
+        (global_settings.peak_meter_performance ? 0x80 : 0);
+    config_block[0xb1] = global_settings.peak_meter_release |
+        (global_settings.peak_meter_dbfs ? 0x80 : 0);
+    config_block[0xb2] = (unsigned char)global_settings.peak_meter_min;
+    config_block[0xb3] = (unsigned char)global_settings.peak_meter_max;
 
     config_block[0xb4]=(global_settings.battery_capacity - 1000) / 50;
     config_block[0xb5]=(unsigned char)global_settings.scroll_step;
@@ -595,27 +599,15 @@ void settings_load(void)
         if (config_block[0x1b] != 0xFF) {
             global_settings.browse_current = (config_block[0x1b]) & 1;
             global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
+            global_settings.queue_resume = (config_block[0x1b] >> 2) & 3;
         }
 
         if (config_block[0x1c] != 0xFF)
             global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
 
-        if (config_block[0x1d] != 0xFF) {
-            global_settings.peak_meter_clip_hold = (config_block[0x1d]) & 0x1f;
-            global_settings.peak_meter_performance = 
-                (config_block[0x1d] & 0x80) != 0;
-        }
-
-        if (config_block[0x1e] != 0xFF) {
-            global_settings.peak_meter_release = config_block[0x1e] & 0x7f;
-            global_settings.peak_meter_dbfs = (config_block[0x1e] & 0x80) != 0;
-        }
-
-        if (config_block[0x1f] != 0xFF)
-            global_settings.peak_meter_min = config_block[0x1f];
-
-        if (config_block[0x20] != 0xFF)
-            global_settings.peak_meter_max = config_block[0x20];
+        if (config_block[0x1d] != 0xFF)
+            memcpy(&global_settings.queue_resume_index, &config_block[0x1d],
+                4);
 
         if (config_block[0x21] != 0xFF)
         {
@@ -651,6 +643,16 @@ void settings_load(void)
         if (config_block[0x29] != 0xff)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
+
+        global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
+        global_settings.peak_meter_performance = 
+            (config_block[0xb0] & 0x80) != 0;
+
+        global_settings.peak_meter_release = config_block[0xb1] & 0x7f;
+        global_settings.peak_meter_dbfs = (config_block[0xb1] & 0x80) != 0;
+
+        global_settings.peak_meter_min = config_block[0xb2];
+        global_settings.peak_meter_max = config_block[0xb3];
 
         global_settings.battery_capacity = config_block[0xb4]*50 + 1000;
 
@@ -857,6 +859,9 @@ void settings_reset(void) {
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
+    global_settings.save_queue_resume = true;
+    global_settings.queue_resume = 0;
+    global_settings.queue_resume_index = -1;
     global_settings.disk_spindown = 5;
     global_settings.disk_poweroff = false;
     global_settings.buffer_margin = 0;

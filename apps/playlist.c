@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "playlist.h"
-#include <file.h>
+#include "file.h"
 #include "sprintf.h"
 #include "debug.h"
 #include "mpeg.h"
@@ -39,12 +39,214 @@
 
 static struct playlist_info playlist;
 
+#define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
 #define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
 
 static unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
 static int playlist_end_pos = 0;
 
 static char now_playing[MAX_PATH+1];
+
+/*
+ * remove any files and indices associated with the playlist
+ */
+static void empty_playlist(bool queue_resume)
+{
+    int fd;
+
+    playlist.filename[0] = '\0';
+    playlist.index = 0;
+    playlist.queue_index = 0;
+    playlist.last_queue_index = 0;
+    playlist.amount = 0;
+    playlist.num_queued = 0;
+    playlist.start_queue = 0;
+
+    if (!queue_resume)
+    {
+        /* start with fresh queue file when starting new playlist */
+        remove(QUEUE_FILE);
+        fd = creat(QUEUE_FILE, 0);
+        if (fd > 0)
+            close(fd);
+    }
+}
+
+/* update queue list after resume */
+static void add_indices_to_queuelist(int seek)
+{
+    int nread;
+    int fd = -1;
+    int i = seek;
+    int count = 0;
+    bool store_index;
+    char buf[MAX_PATH];
+
+    unsigned char *p = buf;
+
+    fd = open(QUEUE_FILE, O_RDONLY);
+    if(fd < 0)
+        return;
+
+    nread = lseek(fd, seek, SEEK_SET);
+    if (nread < 0)
+        return;
+
+    store_index = true;
+
+    while(1)
+    {
+        nread = read(fd, buf, MAX_PATH);
+        if(nread <= 0)
+            break;
+
+        p = buf;
+        
+        for(count=0; count < nread; count++,p++) {           
+            if(*p == '\n')
+                store_index = true;
+            else if(store_index) 
+            {
+                store_index = false;
+                
+                playlist.queue_indices[playlist.last_queue_index] = i+count;
+                playlist.last_queue_index =
+                    (playlist.last_queue_index + 1) % MAX_QUEUED_FILES;
+                playlist.num_queued++;
+            }
+        }
+        
+        i += count;
+    }
+}
+
+static int get_next_index(int steps, bool *queue)
+{
+    int current_index = playlist.index;
+    int next_index    = -1;
+
+    if (global_settings.repeat_mode == REPEAT_ONE)
+        steps = 0;
+    else if (steps >= 0)
+        steps -= playlist.start_queue;
+
+    if (steps >= 0 && playlist.num_queued > 0 &&
+        playlist.num_queued - steps > 0)
+        *queue = true;
+    else
+    {
+        *queue = false;
+        if (playlist.num_queued)
+        {
+            if (steps >= 0)
+                steps -= (playlist.num_queued - 1);
+            else if (!playlist.start_queue)
+                steps += 1;
+        }
+    }
+
+    switch (global_settings.repeat_mode)
+    {
+        case REPEAT_OFF:
+            if (*queue)
+                next_index = (playlist.queue_index+steps) % MAX_QUEUED_FILES;
+            else
+            {
+                if (current_index < playlist.first_index)
+                    current_index += playlist.amount;
+                current_index -= playlist.first_index;
+                
+                next_index = current_index+steps;
+                if ((next_index < 0) || (next_index >= playlist.amount))
+                    next_index = -1;
+                else
+                    next_index = (next_index+playlist.first_index) %
+                        playlist.amount;
+            }
+            break;
+
+        case REPEAT_ONE:
+            if (*queue && !playlist.start_queue)
+                next_index = playlist.queue_index;
+            else
+            {
+                next_index = current_index;
+                *queue = false;
+            }
+            break;
+
+        case REPEAT_ALL:
+        default:
+            if (*queue)
+                next_index = (playlist.queue_index+steps) % MAX_QUEUED_FILES;
+            else
+            {
+                next_index = (current_index+steps) % playlist.amount;
+                while (next_index < 0)
+                    next_index += playlist.amount;
+            }
+            break;
+    }
+
+    return next_index;
+}
+
+int playlist_amount(void)
+{
+    return playlist.amount + playlist.num_queued;
+}
+
+int playlist_first_index(void)
+{
+    return playlist.first_index;
+}
+
+int playlist_get_resume_info(int *resume_index, int *queue_resume,
+                             int *queue_resume_index)
+{
+    int result = 0;
+
+    *resume_index = playlist.index;
+
+    if (playlist.num_queued > 0)
+    {
+        if (global_settings.save_queue_resume)
+        {
+            *queue_resume_index =
+                playlist.queue_indices[playlist.queue_index];
+            if (playlist.start_queue)
+                *queue_resume = QUEUE_BEGIN_PLAYLIST;
+            else
+                *queue_resume = QUEUE_BEGIN_QUEUE;
+        }
+        else if (!playlist.start_queue)
+        {
+            *queue_resume = QUEUE_OFF;
+            result = -1;
+        }
+    }
+    else
+        *queue_resume = QUEUE_OFF;
+
+    return result;
+}
+
+char *playlist_name(char *buf, int buf_size)
+{
+    char *sep;
+
+    snprintf(buf, buf_size, "%s", playlist.filename+playlist.dirlen);
+
+    if (0 == buf[0])
+        return NULL;
+
+    /* Remove extension */
+    sep = strrchr(buf, '.');
+    if (NULL != sep)
+        *sep = 0;
+    
+    return buf;
+}
 
 void playlist_clear(void)
 {
@@ -66,73 +268,81 @@ int playlist_add(char *filename)
     return 0;
 }
 
-static int get_next_index(int steps)
+/* Add track to queue file */
+int queue_add(char *filename)
 {
-    int current_index = playlist.index;
-    int next_index    = -1;
+    int fd, seek, result;
+    int len = strlen(filename);
 
-    switch (global_settings.repeat_mode)
+    if(playlist.num_queued >= MAX_QUEUED_FILES)
+        return -1;
+
+    fd = open(QUEUE_FILE, O_WRONLY);
+    if (fd < 0)
+        return -1;
+
+    seek = lseek(fd, 0, SEEK_END);
+    if (seek < 0)
     {
-        case REPEAT_OFF:
-            if (current_index < playlist.first_index)
-                current_index += playlist.amount;
-            current_index -= playlist.first_index;
-
-            next_index = current_index+steps;
-            if ((next_index < 0) || (next_index >= playlist.amount))
-                next_index = -1;
-            else
-                next_index = (next_index+playlist.first_index)%playlist.amount;
-            break;
-
-        case REPEAT_ONE:
-            next_index = current_index;
-            break;
-
-        case REPEAT_ALL:
-        default:
-            next_index = (current_index+steps) % playlist.amount;
-            while (next_index < 0)
-                next_index += playlist.amount;
-            break;
+        close(fd);
+        return -1;
     }
 
-    return next_index;
-}
+    filename[len] = '\n';
+    result = write(fd, filename, len+1);
+    if (result < 0)
+    {
+        close(fd);
+        return -1;
+    }
+    filename[len] = '\0';
 
-/* the mpeg thread might ask us */
-int playlist_amount(void)
-{
-    return playlist.amount;
-}
+    close(fd);
 
-int playlist_first_index(void)
-{
-    return playlist.first_index;
-}
+    if (playlist.num_queued <= 0)
+        playlist.start_queue = 1;
 
-char *playlist_name(char *buf, int buf_size)
-{
-    char *sep;
+    playlist.queue_indices[playlist.last_queue_index] = seek;
+    playlist.last_queue_index =
+        (playlist.last_queue_index + 1) % MAX_QUEUED_FILES;
+    playlist.num_queued++;
 
-    snprintf(buf, buf_size, "%s", playlist.filename+playlist.dirlen);
+    mpeg_flush_and_reload_tracks();
 
-    if (0 == buf[0])
-        return NULL;
-
-    /* Remove extension */
-    sep = strrchr(buf, '.');
-    if (NULL != sep)
-        *sep = 0;
-    
-    return buf;
+    return playlist.num_queued;
 }
 
 int playlist_next(int steps)
 {
-    playlist.index = get_next_index(steps);
+    bool queue;
+    int index = get_next_index(steps, &queue);
 
-    return playlist.index;
+    if (queue)
+    {
+        int queue_diff = index - playlist.queue_index;
+        if (queue_diff < 0)
+            queue_diff += MAX_QUEUED_FILES;
+
+        playlist.num_queued -= queue_diff;
+        playlist.queue_index = index;
+        playlist.start_queue = 0;
+    }
+    else
+    {
+        playlist.index = index;
+        if (playlist.num_queued > 0 && !playlist.start_queue)
+        {
+            if (steps >= 0)
+            {
+                playlist.queue_index = playlist.last_queue_index;
+                playlist.num_queued = 0;
+            }
+            else
+                playlist.start_queue = true;
+        }
+    }
+
+    return index;
 }
 
 char* playlist_peek(int steps)
@@ -145,30 +355,48 @@ char* playlist_peek(int steps)
     char dir_buf[MAX_PATH+1];
     char *dir_end;
     int index;
+    bool queue;
 
-    index = get_next_index(steps);
-    if (index >= 0)
-        seek = playlist.indices[index];
-    else
+    index = get_next_index(steps, &queue);
+    if (index < 0)
         return NULL;
 
-    if(playlist.in_ram)
+    if (queue)
     {
-        buf = playlist_buffer + seek;
-        max = playlist_end_pos - seek;
-    }
-    else
-    {
-        fd = open(playlist.filename, O_RDONLY);
+        seek = playlist.queue_indices[index];
+        fd = open(QUEUE_FILE, O_RDONLY);
         if(-1 != fd)
         {
-            buf = playlist_buffer;
+            buf = dir_buf;
             lseek(fd, seek, SEEK_SET);
             max = read(fd, buf, MAX_PATH);
             close(fd);
         }
         else
             return NULL;
+    }
+    else
+    {
+        seek = playlist.indices[index];
+        
+        if(playlist.in_ram)
+        {
+            buf = playlist_buffer + seek;
+            max = playlist_end_pos - seek;
+        }
+        else
+        {
+            fd = open(playlist.filename, O_RDONLY);
+            if(-1 != fd)
+            {
+                buf = playlist_buffer;
+                lseek(fd, seek, SEEK_SET);
+                max = read(fd, buf, MAX_PATH);
+                close(fd);
+            }
+            else
+                return NULL;
+        }
     }
 
     /* Zero-terminate the file name */
@@ -260,11 +488,13 @@ int play_list(char *dir,         /* "current directory" */
                                        playlist AFTER the shuffle */
               int start_offset,  /* offset in the file */
               int random_seed,   /* used for shuffling */
-              int first_index )  /* first index of playlist */
+              int first_index,   /* first index of playlist */
+              int queue_resume, /* resume queue list? */
+              int queue_resume_index ) /* queue list seek pos */
 {
     char *sep="";
     int dirlen;
-    empty_playlist();
+    empty_playlist(queue_resume);
 
     playlist.index = start_index;
     playlist.first_index = first_index;
@@ -343,6 +573,18 @@ int play_list(char *dir,         /* "current directory" */
         }
     }
 
+    /* update the queue indices */
+    if (queue_resume)
+    {
+        add_indices_to_queuelist(queue_resume_index);
+
+        if (queue_resume == QUEUE_BEGIN_PLAYLIST)
+        {
+            playlist.start_queue = 1;
+            playlist.index++; /* so we begin at the correct track */
+        }
+    }
+
     if(!playlist.in_ram) {
         lcd_puts(0,0,str(LANG_PLAYLIST_PLAY));
         status_draw();
@@ -352,16 +594,6 @@ int play_list(char *dir,         /* "current directory" */
     mpeg_play(start_offset);
 
     return playlist.index;
-}
-
-/*
- * remove any filename and indices associated with the playlist
- */
-void empty_playlist(void)
-{
-    playlist.filename[0] = '\0';
-    playlist.index = 0;
-    playlist.amount = 0;
 }
 
 /*

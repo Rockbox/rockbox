@@ -109,6 +109,32 @@ int x11_open(char *name, int opts)
   return open(name, opts);
 }
 
+int x11_creat(char *name, int mode)
+{
+  char buffer[256]; /* sufficiently big */
+
+  if(name[0] == '/') {
+    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+
+    debugf("We open the real file '%s'\n", buffer);
+    return creat(buffer, mode);
+  }
+  return creat(name, mode);
+}
+
+int x11_remove(char *name)
+{
+  char buffer[256]; /* sufficiently big */
+
+  if(name[0] == '/') {
+    sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+
+    debugf("We open the real file '%s'\n", buffer);
+    return remove(buffer);
+  }
+  return remove(name);
+}
+
 void fat_size(unsigned int* size, unsigned int* free)
 {
     struct statfs fs;

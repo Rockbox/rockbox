@@ -452,6 +452,36 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
+static void show_queue_display(int queue_count, char *filename)
+{
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_double_height(false);
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0,0);
+#endif
+
+    lcd_clear_display();
+    if (queue_count > 0)
+    {
+        char s[32];
+
+        snprintf(s, sizeof(s), str(LANG_QUEUE_QUEUED), filename);
+        lcd_puts(0,0,s);
+
+        snprintf(s, sizeof(s), str(LANG_QUEUE_TOTAL), queue_count);
+        lcd_puts(0,1,s);
+    }
+    else
+    {
+        lcd_puts(0,0,str(LANG_QUEUE_FULL));
+    }
+    lcd_update();
+    sleep(HZ);
+    lcd_clear_display();
+}
+
 bool ask_resume(void)
 {
 #ifdef HAVE_LCD_CHARCELLS
@@ -518,7 +548,9 @@ void start_resume(void)
                           true, /* the index is AFTER shuffle */
                           global_settings.resume_offset,
                           global_settings.resume_seed,
-                          global_settings.resume_first_index);
+                          global_settings.resume_first_index,
+                          global_settings.queue_resume,
+                          global_settings.queue_resume_index);
                 *slash='/';
             }
             else {
@@ -537,7 +569,9 @@ void start_resume(void)
                           true,
                           global_settings.resume_offset,
                           global_settings.resume_seed,
-                          global_settings.resume_first_index);
+                          global_settings.resume_first_index,
+                          global_settings.queue_resume,
+                          global_settings.queue_resume_index);
             }
         }
         else {
@@ -556,7 +590,9 @@ void start_resume(void)
                       true,
                       global_settings.resume_offset,
                       global_settings.resume_seed,
-                      global_settings.resume_first_index);
+                      global_settings.resume_first_index,
+                      global_settings.queue_resume,
+                      global_settings.queue_resume_index);
         }
 
         status_set_playmode(STATUS_PLAY);
@@ -774,10 +810,10 @@ bool dirbrowse(char *root)
                 break;
                 
 
-            case TREE_ENTER:
+            case TREE_ENTER | BUTTON_REL:
             case TREE_ENTER | BUTTON_REPEAT:
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REL:
             case BUTTON_PLAY | BUTTON_REPEAT: 
 #endif
                 if ( !numentries )
@@ -798,6 +834,7 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     dirstart=0;
                 } else {
+                    static int repeat_count = 0;
                     int seed = current_tick;
                     bool play = false;
                     int start_index=0;
@@ -810,23 +847,40 @@ bool dirbrowse(char *root)
                                          MAX_PATH, "%s/%s",
                                          currdir, file->name);
                             play_list(currdir, file->name, 0, false, 0,
-                                      seed, 0);
+                                      seed, 0, 0, -1);
                             start_index = 0;
                             play = true;
                             break;
 
                         case TREE_ATTR_MPA:
-                            if ( global_settings.resume )
-                                strncpy(global_settings.resume_file,
-                                        currdir, MAX_PATH);
-                            start_index = build_playlist(dircursor+dirstart);
-
-                            /* it is important that we get back the index in
-                               the (shuffled) list and stor that */
-                            start_index = play_list(currdir, NULL,
-                                                    start_index, false,
-                                                    0, seed, 0);
-                            play = true;
+                            if (button & BUTTON_REPEAT &&
+                                mpeg_status() & MPEG_STATUS_PLAY)
+                            {
+                                int queue_count = queue_add(buf);
+                                show_queue_display(queue_count,
+                                                   file->name);
+                                
+                                while( !(button_get(true) & BUTTON_REL) ) ;
+                                
+                                repeat_count = 0;
+                                restore = true;
+                            }
+                            else
+                            {
+                                repeat_count = 0;
+                                if ( global_settings.resume )
+                                    strncpy(global_settings.resume_file,
+                                            currdir, MAX_PATH);
+                                start_index =
+                                    build_playlist(dircursor+dirstart);
+                                
+                                /* it is important that we get back the index
+                                   in the (shuffled) list and store that */
+                                start_index = play_list(currdir, NULL,
+                                                        start_index, false,
+                                                        0, seed, 0, 0, -1);
+                                play = true;
+                            }
                             break;
 
                             /* wps config file */

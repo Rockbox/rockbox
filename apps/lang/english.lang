@@ -1221,3 +1221,18 @@ id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
 new:
+
+id: LANG_QUEUE_QUEUED
+desc: queued track name %s
+eng: "Queued: %s"
+new:
+
+id: LANG_QUEUE_TOTAL
+desc: number of queued tracks %d
+eng: "Total queued: %d"
+new:
+
+id: LANG_QUEUE_FULL
+desc: queue buffer full
+eng: "Queue buffer full"
+new:

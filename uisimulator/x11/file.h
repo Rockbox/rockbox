@@ -21,13 +21,18 @@
 #include <sys/types.h>
 
 int x11_open(char *name, int opts);
+int x11_creat(char *name, int mode);
+int x11_remove(char *name);
 
 #define open(x,y) x11_open(x,y)
+#define creat(x,y) x11_open(x,y)
+#define remove(x) x11_remove(x)
 
 #include "../../firmware/common/file.h"
 
 extern int open(char* pathname, int flags);
 extern int close(int fd);
 extern int read(int fd, void* buf, int count);
+extern int write(int fd, void* buf, int count);
 extern int lseek(int fd, int offset, int whence);
 extern int printf(const char *format, ...);
