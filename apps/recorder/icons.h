@@ -32,5 +32,7 @@ enum icons_6x8 {
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
+extern unsigned char rockbox112x37[];
+
 #endif /* End HAVE_LCD_BITMAP */
 
