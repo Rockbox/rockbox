@@ -222,11 +222,19 @@ bool show_info(void)
 
         if (state & 2) {
             output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
+#ifdef HAVE_LCD_CHARCELLS
+            snprintf(s, sizeof s, "%s%s", str(LANG_DISK_SIZE_INFO), s2);
+#else
             snprintf(s, sizeof s, "%s %s", str(LANG_DISK_SIZE_INFO), s2);
+#endif
             lcd_puts(0, y++, s);
 
             output_dyn_value(s2, sizeof s2, free, kbyte_units, true);
+#ifdef HAVE_LCD_CHARCELLS
+            snprintf(s, sizeof s, "%s%s", str(LANG_DISK_FREE_INFO), s2);
+#else
             snprintf(s, sizeof s, "%s %s", str(LANG_DISK_FREE_INFO), s2);
+#endif
             lcd_puts(0, y++, s);
         }
         lcd_update();

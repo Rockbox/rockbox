@@ -77,7 +77,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
             snprintf(tbuf, sizeof(tbuf), "%d%s%02d", value, str(LANG_POINT),
                      fraction / 10);
 
-        snprintf(buf, buf_size, "%s %s", tbuf, P2STR(units[unit_no]));
+        snprintf(buf, buf_size, "%s%s", tbuf, P2STR(units[unit_no]));
     }
     else
     {
