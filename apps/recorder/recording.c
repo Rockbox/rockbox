@@ -136,7 +136,7 @@ void adjust_cursor(void)
     }
 }
 
-static char *create_filename(void)
+char *rec_create_filename(void)
 {
     static char fname[32];
     struct tm * tm;
@@ -216,14 +216,14 @@ bool recording_screen(void)
                 if(!mpeg_status())
                 {
                     have_recorded = true;
-                    mpeg_record(create_filename());
+                    mpeg_record(rec_create_filename());
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
                     last_seconds = 0;
                 }
                 else
                 {
-                    mpeg_new_file(create_filename());
+                    mpeg_new_file(rec_create_filename());
                     update_countdown = 1; /* Update immediately */
                 }
                 break;
@@ -394,7 +394,7 @@ bool recording_screen(void)
 
                     if (mpeg_status() && (seconds >= dseconds))
                     {
-                        mpeg_new_file(create_filename());
+                        mpeg_new_file(rec_create_filename());
                         update_countdown = 1;
                         last_seconds = 0;
                     }
