@@ -178,12 +178,11 @@ static void handle_usb(void)
 #endif
 }
 
-#ifdef HAVE_PLAYER_KEYPAD
-int player_id3_show(void)
+static int browse_id3(void)
 {
     int button;
     int menu_pos = 0;
-    int menu_max = 6;
+    int menu_max = 8;
     bool exit = false;
     char scroll_text[MAX_PATH];
 
@@ -191,6 +190,7 @@ int player_id3_show(void)
     lcd_clear_display();
     lcd_puts(0, 0, "-ID3 Info- ");
     lcd_puts(0, 1, "--Screen-- ");
+    lcd_update();
     sleep(HZ);
  
     while (!exit)
@@ -217,6 +217,21 @@ int player_id3_show(void)
                 break;
 
             case 3:
+                lcd_puts(0, 0, "[Tracknum]");
+                
+                if (id3->tracknum)
+                {
+                    snprintf(scroll_text,sizeof(scroll_text), "%d",
+                             id3->tracknum);
+                    lcd_puts_scroll(0, 1, scroll_text);
+                }
+                else
+                {
+                    lcd_puts_scroll(0, 1, "<no tracknum>");
+                }
+                break;
+
+            case 4:
                 lcd_puts(0, 0, "[Length]");
                 snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
                          id3->length / 60000,
@@ -224,21 +239,29 @@ int player_id3_show(void)
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 4:
+            case 5:
+                lcd_puts(0, 0, "[Playlist]");
+                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
+                         id3->index + 1, playlist.amount);
+                lcd_puts_scroll(0, 1, scroll_text);
+                break;
+
+
+            case 6:
                 lcd_puts(0, 0, "[Bitrate]");
                 snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
                          id3->bitrate);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 5:
+            case 7:
                 lcd_puts(0, 0, "[Frequency]");
-                snprintf(scroll_text,sizeof(scroll_text), "%d kHz",
-                        id3->frequency);
+                snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
+                         id3->frequency);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 6:
+            case 8:
                 lcd_puts(0, 0, "[Path]");
                 lcd_puts_scroll(0, 1, id3->path);
                 break;
@@ -250,6 +273,9 @@ int player_id3_show(void)
         switch(button)
         {
             case BUTTON_LEFT:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#endif
                 if (menu_pos > 0)
                     menu_pos--;
                 else
@@ -257,6 +283,9 @@ int player_id3_show(void)
                 break;
 
             case BUTTON_RIGHT:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#endif
                 if (menu_pos < menu_max)
                     menu_pos++;
                 else
@@ -266,7 +295,11 @@ int player_id3_show(void)
             case BUTTON_REPEAT:
                 break;
 
+#ifdef HAVE_PLAYER_KEYPAD
             case BUTTON_STOP:
+#else
+            case BUTTON_OFF:
+#endif
             case BUTTON_PLAY:
                 lcd_stop_scroll();
                 wps_display(id3);
@@ -283,7 +316,6 @@ int player_id3_show(void)
     }
     return 0;
 }
-#endif
 
 static bool ffwd_rew(int button)
 {
@@ -563,17 +595,20 @@ static bool menu(void)
 
                 /* show id3 tags */
             case BUTTON_MENU | BUTTON_ON:
-                lcd_stop_scroll();
                 lcd_icon(ICON_PARAM, true);
                 lcd_icon(ICON_AUDIO, true);
-                if(player_id3_show() == SYS_USB_CONNECTED)
+#else
+            case BUTTON_F1 | BUTTON_ON:
+#endif
+                if(browse_id3() == SYS_USB_CONNECTED)
                     return true;
+#ifdef HAVE_PLAYER_KEYPAD
                 lcd_icon(ICON_PARAM, false);
                 lcd_icon(ICON_AUDIO, true);
+#endif
                 wps_display(id3);
                 exit = true;
                 break;
-#endif
 
             case SYS_USB_CONNECTED:
                 handle_usb();
