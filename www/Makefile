@@ -21,6 +21,7 @@ all: $(OBJS)
 	@(cd sh-win; $(MAKE))
 	@(cd download; $(MAKE))
 	@(cd manual; $(MAKE))
+	@(cd manual-1.2; $(MAKE))
 	@(cd tshirt-contest; $(MAKE))
 
 main.html: main.t activity.html
