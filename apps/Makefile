@@ -42,8 +42,12 @@ MAXOUTFILE = $(OBJDIR)/romstart
 
 ifdef SIMVER
 # this is a sim build
-all: $(OBJDIR)/$(BINARY) $(CODECS) $(ROCKS)
+COMMONLIB = $(ROOTDIR)/uisimulator/common/libcomsim.a
+
+all: $(COMMONLIB) $(OBJDIR)/$(BINARY) $(CODECS) $(ROCKS)
 	@$(MAKE) -C $(SIMDIR)
+
+$(COMMONLIB):
 	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
 else
 # regular target build
