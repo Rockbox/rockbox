@@ -595,8 +595,11 @@ int PlayTick(int fd)
             gPlay.bRefilling = false;
         }
 
-        if (!gPlay.bRefilling)
+        if (!gPlay.bRefilling 
+            && rb->global_settings->disk_spindown < 20) // condition for test only
+        {
             rb->ata_sleep(); // no point in leaving the disk run til timeout
+        }
 
         gBuf.pBufFill += got_now;
         if (gBuf.pBufFill >= gBuf.pBufEnd)
@@ -832,8 +835,6 @@ int main(char* filename)
     if (gFileHdr.audio_format == AUDIOFORMAT_MP3_BITSWAPPED)
     {
         gPlay.bHasAudio = true;
-        rb->mp3_play_init();
-        rb->mpeg_sound_set(SOUND_VOLUME, rb->global_settings->volume);
     }
 
     // start playback by seeking to zero or resume position
