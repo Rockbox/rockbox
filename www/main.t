@@ -61,10 +61,12 @@ from my reverse-engineering the firmware.
 
 <h2>About the software</h2>
 
-<p>The player has one version of the firmware burnt into flash ROM.
+<p>The player has one version of the firmware in ROM.
 The first thing this version does after boot is to look for a file called
-"archos.mod" in the root directory of the harddisk. 
+"archos.mod" on the Player/Studio or "ajbrec.ajz" on the recorder in the
+root directory of the harddisk. 
 If it exists, it is loaded into RAM and started.
-This is how firmware upgrades are loaded.
+This is how firmware upgrades are loaded. Note that you can revert to the ROM
+version by just deleting the firmware file.
 
 #include "foot.t"
