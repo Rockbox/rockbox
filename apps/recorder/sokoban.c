@@ -34,6 +34,8 @@
 #include "screens.h"
 #include "font.h"
 #include "file.h"
+#include "misc.h"
+#include "debug.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -255,40 +257,29 @@ static void init_boards(void)
 
 static int get_level_count(void) 
 {
-    int i = 0;
     int fd = 0;
-    int nread = 0;
-    char buffer[ROWS * COLS * 2];
+    int len, lastlen = 0;
+    char buffer[COLS + 3]; /* COLS plus CR/LF and \0 */
 
     if ((fd = open(LEVELS_FILE, O_RDONLY)) < 0) {
         splash(0, 0, true, "Unable to open %s", LEVELS_FILE);
         return -1;
     }
 
-    do {
-        if ((nread = read(fd, buffer, sizeof(buffer))) < 0) {
-            splash(0, 0, true, "Reading %s failed.", LEVELS_FILE);
-            close(fd);
-            return -1;
-        }
+    while(1) {
+        len = read_line(fd, buffer, sizeof(buffer));
+        if(len <= 0)
+            break;
 
-        for (i = 0; i < (nread - 1); i++) {
-            if (buffer[i] == '\n' && buffer[i+1] == '\n') {
+        /* Two short lines in a row means new level */
+        if(len < 3 && lastlen < 3)
+            current_info.max_level++;
 
-				while (isspace(buffer[i]))
-					i++;
+        lastlen = len;
+    }
 
-                current_info.max_level++;
-			}
-        }
-
-        if (buffer[i] == '\n' && buffer[i-1] != '\n')
-            lseek(fd, -1, SEEK_CUR);
-        
-    } while (nread == sizeof(buffer));
-    
+    DEBUGF("%d levels loaded\n", current_info.max_level);
     close(fd);
-
     return 0;
 }
 
@@ -297,73 +288,42 @@ static int get_level(char *level, int level_size)
     int fd = 0, i = 0;
     int nread = 0;
     int count = 0;
-    int offset = 0;
-    int level_ct = 0;
+    int len, lastlen = 0;
+    int level_ct = 1;
     unsigned char buffer[SOKOBAN_LEVEL_SIZE * 2];
     bool level_found = false;
-    int prevnewl=2; /* previous newlines in a row */
-
-    /* Lets not reparse the full file if we can avoid it */
-    if (current_info.loaded_level > current_info.level.level)
-        offset = 0;
 
     /* open file */
     if ((fd = open(LEVELS_FILE, O_RDONLY)) < 0)
         return -1;
 
-    /* go where we left off */
-    offset = current_info.level_offset;
-    if(offset)
-        if (lseek(fd, offset, SEEK_SET) < 0) {
-            close(fd);
-            return -1;
-        }
-    
-    while (!level_found) {
-        nread = read(fd, buffer, sizeof(buffer));
-        if (nread < SOKOBAN_LEVEL_SIZE) {
-            close(fd);
-            return -1;
-        }
+    /* Lets not reparse the full file if we can avoid it */
+    if (current_info.loaded_level < current_info.level.level) {
+        lseek(fd, current_info.level_offset, SEEK_SET);
+        level_ct = current_info.loaded_level;
+    }
 
-        /* we search for the first character that isn't a newline */
-        for (i = 0; i < nread; i++) {
-            /* skip and count all newlines */
-            while((buffer[i] == '\n' || buffer[i] == '\r') && (i < nread)) {
-                prevnewl++;
-                i++;
-            }
-
-            /* end of buffer? */
-            if(i == nread)
-                break;
-
-            /* start of new level? */
-            if((prevnewl>1) && (buffer[i] != '\n' && buffer[i] != '\r')) {
-                prevnewl=0; /* none now */
-                level_ct++;
-                    
-                if (level_ct == current_info.level.level) {
-                    level_found = true;                    
-                    offset += i;
-                    break;
-                }
+    if(current_info.level.level > 1) {
+        while(!level_found) {
+            len = read_line(fd, buffer, SOKOBAN_LEVEL_SIZE);
+            if(len <= 0) {
+                close(fd);
+                return -1;
             }
             
-            /* skip all non-newlines */
-            while((buffer[i] != '\n' && buffer[i] != '\r') && (i < nread))
-                i++;
+            /* Two short lines in a row means new level */
+            if(len < 3 && lastlen < 3) {
+                level_ct++;
+                if(level_ct == current_info.level.level)
+                    level_found = true;
+            }
+            lastlen = len;
         }
-        if(!level_found)
-            offset += nread;
-    } 
+    }
 
-    if (!level_found) 
-        return -1;
-
-    /* now seek back to the exact start position */
-    lseek(fd, offset, SEEK_SET);
-
+    /* Remember the current offset */
+    current_info.level_offset = lseek(fd, 0, SEEK_CUR);
+    
     /* read a full buffer chunk from here */
     nread = read(fd, buffer, sizeof(buffer)-1);
     if (nread < 0)
@@ -851,14 +811,15 @@ static bool sokoban_loop(void)
 
             lcd_clear_display();
 			
-            if (current_info.level.level == current_info.max_level) {
+            if (current_info.level.level > current_info.max_level) {
                 lcd_putsxy(10, 20, str(LANG_SOKOBAN_WIN));
 
                 for (i = 0; i < 30000 ; i++) {
                     lcd_invertrect(0, 0, 111, 63);
                     lcd_update();
 
-                    if (button_get(false))
+                    button = button_get(false);
+                    if (button && ((button & BUTTON_REL) != BUTTON_REL))
                         break;
                 }
 
