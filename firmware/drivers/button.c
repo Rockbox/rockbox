@@ -68,8 +68,10 @@ static void button_tick(void)
             if ( post )
                 queue_post(&button_queue, btn, NULL);
         }
-        else
+        else {
             repeat = false;
+            count = 0;
+        }
 
         lastbtn = btn;
         tick = 0;
