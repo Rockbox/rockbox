@@ -35,6 +35,7 @@
 #include "mpeg.h"
 #include "main_menu.h"
 #include "thread.h"
+#include "settings.h"
 
 #include "version.h"
 
@@ -71,6 +72,8 @@ void init(void)
 
     system_init();
     kernel_init();
+
+    reset_settings(&global_settings);
     
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
