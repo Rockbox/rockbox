@@ -27,6 +27,7 @@
 #include "playlist.h"
 #include "kernel.h"
 #include "status.h"
+#include "wps-display.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -387,7 +388,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
 #endif
 #ifdef PLAYER_PROGRESS
 #ifdef HAVE_LCD_CHARCELLS
-    draw_player_progress(10,1);
+    draw_player_progress(10,1,id3);
 #endif
 #endif
     return true;
@@ -537,7 +538,7 @@ void wps_display(struct mp3entry* id3)
 }
 
 #ifdef PLAYER_PROGRESS
-static int bin2int(char *input, int size)
+/*static int bin2int(char *input, int size)
 {
     int result=0;
     while(size--) {
@@ -546,25 +547,29 @@ static int bin2int(char *input, int size)
     }
     return result;
 }
-
+*/
 #ifdef HAVE_LCD_CHARCELLS
-static void draw_player_progress(int x, int y)
+void draw_player_progress(int x, int y, struct mp3entry* id3)
 {
-    char player_progressbar[8];
-    char binline[35];
-    char charline[5];
+    char player_progressbar[7];
+    char binline[36];
     int songpos = 0;
-    int i;
+    int i,j;
 
     memset(binline, 0, sizeof binline);
-    memset(charline, 0, sizeof charline);
-    songpos = (id3->elapsed * 35) / id3->length;
+    memset(player_progressbar, 0, sizeof player_progressbar);
+    songpos = (id3->elapsed * 36) / id3->length;
 
-    for (i=0; i <= songpos; i++)
+    for (i=0; i < songpos; i++)
         binline[i] = 1;
 
-    for (i=0; i<=6; i++)
-        player_progressbar[i] = bin2int(binline+(i*5),4);
+    for (i=0; i<=6; i++) {
+        for (j=0;j<5;j++) {
+            player_progressbar[i] <<= 1;
+            player_progressbar[i] += binline[i*5+j];
+        }
+    /*    player_progressbar[i] = bin2int(binline+(i*5),4); */
+    }
 
     lcd_define_pattern(8,player_progressbar,7);
     lcd_puts(x,y,"\x01");

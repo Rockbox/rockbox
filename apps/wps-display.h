@@ -25,4 +25,10 @@
 bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll);
 void wps_display(struct mp3entry* id3);
 
+#ifdef PLAYER_PROGRESS
+#ifdef HAVE_LCD_CHARCELLS
+void draw_player_progress(int x, int y, struct mp3entry* id3);
+#endif
+#endif
+
 #endif

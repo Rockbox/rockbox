@@ -29,8 +29,4 @@ bool load_custom_wps(void);
 bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string);
 bool refresh_wps(bool refresh_scroll);
 
-#ifdef PLAYER_PROGRESS
-void draw_player_progress(int x, int y);
-#endif
-
 #endif
