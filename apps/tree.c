@@ -749,6 +749,11 @@ static bool dirbrowse(void)
 #ifdef TREE_RC_EXIT
             case TREE_RC_EXIT:
 #endif
+                if (*tc.dirfilter > NUM_FILTER_MODES && tc.dirlevel < 1) {
+                    exit_func = true;
+                    break;
+                }
+
                 if (!tc.dirlevel)
                     break;
 
@@ -1363,31 +1368,18 @@ bool create_playlist(void)
 
 bool rockbox_browse(const char *root, int dirfilter)
 {
-    bool rc;
-    int dircursor_save = tc.dircursor;
-    int dirstart_save = tc.dirstart;
-    int dirlevel_save = tc.dirlevel;
-    int dirpos_save = tc.dirpos[0];
-    int cursorpos_save = tc.cursorpos[0];
-    int* dirfilter_save = tc.dirfilter;
-    static char currdir_save[MAX_PATH];
+    static struct tree_context backup;
 
-    memcpy(currdir_save, tc.currdir, sizeof(tc.currdir));
+    backup = tc;
     reload_dir = true;
     memcpy(tc.currdir, root, sizeof(tc.currdir));
     start_wps = false;
     tc.dirfilter = &dirfilter;
     
-    rc = dirbrowse();
+    dirbrowse();
 
-    memcpy(tc.currdir, currdir_save, sizeof(tc.currdir));
+    tc = backup;
     reload_dir = true;
-    tc.dirstart = dirstart_save;
-    tc.cursorpos[0] = cursorpos_save;
-    tc.dirlevel = dirlevel_save;
-    tc.dircursor = dircursor_save;
-    tc.dirpos[0] = dirpos_save;
-    tc.dirfilter = dirfilter_save;
 
     return false;
 }
