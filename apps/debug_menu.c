@@ -238,7 +238,6 @@ unsigned short crc_16(const unsigned char* buf, unsigned len)
 
 
 #if CONFIG_CPU == TCC730
-extern int idatastart __attribute__ ((section(".idata")));
 static unsigned flash_word_temp __attribute__ ((section (".idata")));
 
 static void flash_write_word(unsigned addr, unsigned value) __attribute__ ((section(".icode")));
@@ -246,13 +245,13 @@ static void flash_write_word(unsigned addr, unsigned value) {
     flash_word_temp = value;
 
     long extAddr = (long)addr << 1;
-    ddma_transfer(1, 1, (char*)&flash_word_temp - (char*)&idatastart, extAddr, 2);  
+    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);  
 }
 
 static unsigned flash_read_word(unsigned addr) __attribute__ ((section(".icode")));
 static unsigned flash_read_word(unsigned addr) {
     long extAddr = (long)addr << 1;
-    ddma_transfer(1, 1, (char*)&flash_word_temp - (char*)&idatastart, extAddr, 2);
+    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
     return flash_word_temp;
 }
 
