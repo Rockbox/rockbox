@@ -236,15 +236,9 @@ tImageHeader* GetSecondImage(void)
     UINT32 pos = 0;    /* default: not found */
     UINT32* pFlash = (UINT32*)FB;
 
-    UINT16 version = *(UINT16*)(FB + VERS_ADR);
-    if (version < 200) /* at least 2.00 */
-    {
-        return 0; /* not our flash layout */
-    }
-
     /* determine the first image position */
-    pos = pFlash[2] + pFlash[3]; /* position + size of the bootloader = after
-                                    it */
+    pos = pFlash[2] + pFlash[3]; /* position + size of the bootloader
+                                    = after it */
     pos = (pos + 3) & ~3; /* be sure it's 32 bit aligned */
     pImage1 = (tImageHeader*)pos;
 
