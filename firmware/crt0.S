@@ -18,6 +18,9 @@
  ****************************************************************************/
         #include "config.h"
         #include "cpu.h"
+
+//#define BOOTLOADER
+        
 	.section .init.text
 	.global	start
 start:
@@ -66,14 +69,15 @@ start:
         /* Chip select 2 - ATA controller */
         move.l #0x20000000,%d0 /* CSAR2 - Base = 0x20000000 */
         move.l %d0,(0x098,%a0)
-        move.l #0x00000075,%d0 /* CSMR2 - 64K, Only data access */
+        move.l #0x000f0001,%d0 /* CSMR2 - 64K, Only data access */
         move.l %d0,(0x09c,%a0)
-        move.l #0x00000180,%d0 /* CSCR2 - no wait states, 16 bits, no bursts */
+        move.l #0x00000080,%d0 /* CSCR2 - no wait states, 16 bits, no bursts */
         move.l %d0,(0x0a0,%a0) /* NOTE:  I'm not sure about the wait states.
                                   We have to be careful with the access times,
                                   since IORDY isn't connected to the HDD. */
         
 
+#ifdef BOOTLOADER
         /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
            clock (5.6448MHz bus frequency). We haven't yet started the PLL */
         move.l #0x80050000,%d0
@@ -99,6 +103,12 @@ start:
         move.l #0xabcd1234,%d0
         move.l %d0,0x31000000  /* Issue precharge command */
 
+        /* Let it refresh */
+        move.l #1000,%d0
+.delayloop:
+        subq.l #1,%d0
+        bne    .delayloop
+        
         /* Refresh */
         move.l #0x3100a520,%d0
         move.l %d0,(0x108,%a0) /* Enable refresh */
@@ -109,8 +119,12 @@ start:
         move.l %d0,(0x108,%a0)
 
         move.l #0xabcd1234,%d0
-        move.l %d0,0x31001000  /* A12=1 means CASL=1 */
-        
+        move.l %d0,0x31000800  /* A12=1 means CASL=1 (a0 is not connected) */
+
+        move.l #0x3100a520,%d0 /* Back to normal, the DRAM is now ready */
+        move.l %d0,(0x108,%a0)
+#endif
+#if 1
         lea    _iramcopy,%a2
         lea    _iramstart,%a3
         lea    _iramend,%a4        
@@ -121,6 +135,7 @@ start:
         bra    .iramloop
 .iramloopend:
 
+#endif
         lea    _edata,%a2
         lea    _end,%a4
         clr.l  %d0
