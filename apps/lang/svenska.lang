@@ -1254,22 +1254,22 @@ voice: "Karaoke"
 new: "Karaoke"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
-desc: in sound_settings
-eng: "St. Narrow"
-voice: "Stereo Narrow"
-new: "Smal stereo"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
-desc: in sound_settings
-eng: "Stereo Narrow"
-voice: "Stereo Narrow"
-new: "Smal stereo"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_CHANNEL_STEREO_WIDE
-desc: in sound_settings
-eng: "Stereo Wide"
-voice: "Stereo Wide"
-new: "Bred stereo"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -2810,14 +2810,32 @@ new: "Ingen .rockbox katalog"
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
+voice: "Please remove multimedia card"
 new: "Var vänlig ta bort instucken MMC"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
-new: 
+voice: "dot"
+new: "" 
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
-new: 
+voice: " "
+new: ""
+
+id: LANG_CHANNEL_CUSTOM
+desc: in sound_settings
+eng: "Custom"
+new: "Anpassning"
+
+id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+new: "ID3-databas"
+
+id: LANG_STEREO_WIDTH
+desc: in sound_settings
+eng: "Stereo width"
+new: "Stereobredd"
