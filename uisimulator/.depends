@@ -1,0 +1,11 @@
+alpha.o: alpha.c utils.h alpha.h visual.h hsv.h yarandom.h resources.h
+hsv.o: hsv.c utils.h hsv.h
+screenhack.o: screenhack.c xmu.h screenhack.h config.h yarandom.h \
+  usleep.h resources.h hsv.h colors.h grabscreen.h visual.h version.h \
+  vroot.h
+yarandom.o: yarandom.c yarandom.h
+uibasic.o: uibasic.c screenhack.h config.h yarandom.h usleep.h \
+  resources.h hsv.h colors.h grabscreen.h visual.h alpha.h version.h
+resources.o: resources.c utils.h resources.h
+visual.o: visual.c utils.h resources.h visual.h
+usleep.o: usleep.c
