@@ -69,7 +69,7 @@ int load_firmware(void)
     if(fd < 0)
         return -1;
 
-    len = lseek(fd, 0, SEEK_END) - 8;
+    len = filesize(fd) - 8;
 
     snprintf(str, 80, "Length: %x", len);
     lcd_puts(0, line++, str);
@@ -122,11 +122,10 @@ void start_firmware(void)
     asm(" jmp (%a0)");
 }
 
-int main(void)
+void main(void)
 {
     int i;
     int rc;
-    int button;
     char buf[256];
 
     power_init();
@@ -141,15 +140,30 @@ int main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    sleep(HZ/10); /* Allow the button driver to check the buttons */
+    sleep(HZ/50); /* Allow the button driver to check the buttons */
 
-    if(button_status() & BUTTON_REC) {
+    if(button_status() & BUTTON_REC ||
+        button_status() & BUTTON_RC_ON) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
-        sleep(HZ);
         start_iriver_fw();
     }
 
+    if((button_status() & BUTTON_ON) & button_hold()) {
+        lcd_puts(0, 8, "HOLD switch on, power off...");
+        lcd_update();
+        sleep(HZ/2);
+        power_off();
+    }
+#if 0
+    if((button_status() & BUTTON_RC_ON) & remote_button_hold()) {
+        lcd_puts(0, 8, "HOLD switch on, power off...");
+        lcd_update();
+        sleep(HZ/2);
+        power_off();
+    }
+#endif
+    
     rc = ata_init();
     if(rc)
     {
@@ -186,14 +200,7 @@ int main(void)
     if(i == 0)
         start_firmware();
     
-    while(1) {
-        button = button_get_w_tmo(HZ/2);
-        if(button)
-        {
-            if(button == (BUTTON_OFF | BUTTON_REPEAT))
-                power_off();
-        }
-    }
+    start_iriver_fw();
 }
 
 /* These functions are present in the firmware library, but we reimplement
