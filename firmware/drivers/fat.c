@@ -114,7 +114,7 @@ struct fsinfo {
 #define FSINFO_FREECOUNT 488
 #define FSINFO_NEXTFREE  492
 
-static int first_sector_of_cluster(unsigned int cluster);
+static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
 #ifdef DISK_WRITE
@@ -143,13 +143,7 @@ struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static unsigned char lastsector[SECTOR_SIZE];
 static unsigned char lastsector2[SECTOR_SIZE];
 
-static unsigned int swap_fat_entry(unsigned int entry)
-{
-    SWAB32(entry);
-    return entry;
-}
-
-static int sec2cluster(unsigned int sec)
+static int sec2cluster(int sec)
 {
     if ( sec < fat_bpb.firstdatasector )
     {
@@ -160,7 +154,7 @@ static int sec2cluster(unsigned int sec)
     return ((sec - fat_bpb.firstdatasector) / fat_bpb.bpb_secperclus) + 2;
 }
 
-static int cluster2sec(unsigned int cluster)
+static int cluster2sec(int cluster)
 {
     int max_cluster = fat_bpb.totalsectors -
         fat_bpb.firstdatasector / fat_bpb.bpb_secperclus + 1;
@@ -175,7 +169,7 @@ static int cluster2sec(unsigned int cluster)
     return first_sector_of_cluster(cluster);
 }
 
-static int first_sector_of_cluster(unsigned int cluster)
+static int first_sector_of_cluster(int cluster)
 {
     return (cluster - 2) * fat_bpb.bpb_secperclus + fat_bpb.firstdatasector;
 }

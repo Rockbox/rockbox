@@ -189,21 +189,6 @@ static int check_registers(void)
         return 0;
 }
 
-static int check_harddisk(void)
-{
-    if (!wait_for_rdy())
-        return 0;
-
-    if ((ATA_NSECTOR == 1) &&
-        (ATA_SECTOR == 1) &&
-        (ATA_LCYL == 0) &&
-        (ATA_HCYL == 0) &&
-        (ATA_SELECT == 0))
-        return 1;
-    else
-        return 0;
-}
-
 static int freeze_lock(void)
 {
     if (!wait_for_rdy())
@@ -274,14 +259,8 @@ int ata_init(void)
     if (!check_registers())
         return -2;
 
-//    if (!check_harddisk())
-//        return -3;
-
     if (freeze_lock() < 0)
         return -4;
-
-//    if(ata_spindown(-1) < 0)
-//        return -5;
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;

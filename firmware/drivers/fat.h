@@ -88,8 +88,8 @@ struct fat_direntry
 struct fat_dir
 {
     int entry;
-    unsigned int cached_sec;
-    unsigned int num_sec;
+    int cached_sec;
+    int num_sec;
     unsigned char cached_buf[SECTOR_SIZE];
 };
 
