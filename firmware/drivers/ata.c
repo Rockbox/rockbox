@@ -102,6 +102,7 @@ static unsigned short identify_info[SECTOR_SIZE];
 
 static int ata_power_on(void);
 static int perform_soft_reset(void);
+static int set_multiple_mode(int sectors);
 
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
@@ -524,21 +525,18 @@ int ata_hard_reset(void)
 {
     int ret;
     
-    mutex_lock(&ata_mtx);
-    
     PADR &= ~0x0200;
 
     sleep(2);
 
     PADR |= 0x0200;
 
-    ret = wait_for_rdy();
+    ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
 
     sleeping = false;
-    mutex_unlock(&ata_mtx);
     return ret;
 }
 
@@ -582,26 +580,19 @@ int ata_soft_reset(void)
 
 static int ata_power_on(void)
 {
-    int ret;
-    int retry_count;
-    
     ide_power_enable(true);
-    sleep(HZ/2);
+    if( ata_hard_reset() )
+        return -1;
 
+    ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
 
-    /* This little sucker can take up to 30 seconds */
-    retry_count = 8;
-    do
-    {
-        ret = wait_for_rdy();
-    } while(!ret && retry_count--);
-
-    /* Massage the return code so it is 0 on success and -1 on failure */
-    ret = ret?0:-1;
+    if (set_multiple_mode(multisectors))
+        return -2;
 
     sleeping = false;
-    return ret;
+    poweroff = false;
+    return 0;
 }
 
 static int master_slave_detect(void)
@@ -752,7 +743,7 @@ int ata_init(void)
         initialized = true;
     }
     if (set_multiple_mode(multisectors))
-       return -6;
+        return -6;
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
