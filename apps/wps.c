@@ -293,8 +293,8 @@ int wps_show(void)
                     draw_screen(id3);
                     break;
                 }
-
                 mpeg_prev();
+                status_set_playmode(STATUS_PLAY);
                 break;
 
             case BUTTON_RIGHT:
@@ -305,6 +305,7 @@ int wps_show(void)
                     break;
                 }
                 mpeg_next();
+                status_set_playmode(STATUS_PLAY);
                 break;
 
 #ifdef HAVE_PLAYER_KEYPAD
