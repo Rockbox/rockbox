@@ -49,13 +49,13 @@ bool sleeptimer_screen(void)
     bool done = false;
     char buf[32];
     int oldtime, newtime;
+    int amount = 0;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(w, 8);
 #endif
-    int amount = 0;
     
     while(!done)
     {
