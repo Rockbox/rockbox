@@ -27,6 +27,7 @@
 #include "system.h"
 #include "font.h"
 #include "icons.h"
+#include "lang.h"
 #include "peakmeter.h"
 
 /* buffer the read peak value */

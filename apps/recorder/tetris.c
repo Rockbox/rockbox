@@ -36,6 +36,7 @@
 #include <stdio.h>
 #endif
 #include "sprintf.h"
+#include "lang.h"
 #define TETRIS_TITLE       "Tetris!"
 #define TETRIS_TITLE_FONT  1
 #define TETRIS_TITLE_XLOC  43
