@@ -468,7 +468,7 @@ static int initialize_card(int card_no)
                          * card->tsac / exponent[9 - temp]
                          + (10 * card->nsac));
     card->read_timeout /= 8;      /* clocks -> bytes */
-    card->tsac *= exponent[temp];
+    card->tsac = card->tsac * exponent[temp] / 10;
 
     /* r2w_factor, write timeout */
     temp = mmc_extract_bits(card->csd, 99, 3);
