@@ -56,6 +56,9 @@ clean:
 $(OBJDIR)/thread.o: thread.c thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
+$(OBJDIR)/crt0.o: crt0.S
+	$(AS) $(AFLAGS) -o $@ $<
+
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
 	@echo "Updating dependencies for $<"
