@@ -67,6 +67,11 @@ no_configure:
 	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
 endif
 
+ifndef TOOLSDIR
+no_toolsdir:
+	@echo "Rerun the configure script."
+endif
+
 all : $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/librockbox.a:
@@ -84,10 +89,10 @@ $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
 	$(OC) -O binary $(OBJDIR)/rockbox.elf $(OBJDIR)/rockbox.bin
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
-	../tools/sh2d -sh1 $(OBJDIR)/rockbox.bin > $(OBJDIR)/rockbox.asm
+	$(TOOLSDIR)/sh2d -sh1 $(OBJDIR)/rockbox.bin > $(OBJDIR)/rockbox.asm
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
-	../tools/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
+	$(TOOLSDIR)/scramble $(SCRAMBLE_OPT) $(OBJDIR)/rockbox.bin $(OBJDIR)/$(OUTNAME)
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl credits.pl < $< > $@
@@ -100,11 +105,11 @@ $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang ../tools/uplang
-	perl ../tools/uplang lang/english.lang $< > $@
+$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang $(TOOLSDIR)/uplang
+	perl $(TOOLSDIR)/uplang lang/english.lang $< > $@
 
-$(OBJDIR)/lang.o: $(OBJDIR)/build.lang ../tools/genlang
-	perl -s ../tools/genlang -p=$(OBJDIR)/lang $<
+$(OBJDIR)/lang.o: $(OBJDIR)/build.lang $(TOOLSDIR)/genlang
+	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 clean:
