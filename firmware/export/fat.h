@@ -89,6 +89,7 @@ extern int fat_seek(struct fat_file *ent, unsigned int sector );
 extern int fat_remove(struct fat_file *ent);
 extern int fat_truncate(const struct fat_file *ent);
 extern int fat_rename(struct fat_file* file, 
+                      struct fat_dir* dir, 
                       const unsigned char* newname,
                       int size, int attr);
 

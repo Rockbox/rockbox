@@ -1551,12 +1551,13 @@ int fat_remove(struct fat_file* file)
 }
 
 int fat_rename(struct fat_file* file, 
-               const unsigned char* newname,
-               int size,
-               int attr)
+                struct fat_dir* dir, 
+                const unsigned char* newname,
+                int size,
+                int attr)
 {
     int rc;
-    struct fat_dir dir;
+    struct fat_dir olddir;
     struct fat_file newfile = *file;
 
     if ( !file->dircluster ) {
@@ -1565,12 +1566,12 @@ int fat_rename(struct fat_file* file,
     }
 
     /* create a temporary file handle */
-    rc = fat_opendir(&dir, file->dircluster, NULL);
+    rc = fat_opendir(&olddir, file->dircluster, NULL);
     if (rc < 0)
         return rc * 10 - 2;
 
     /* create new name */
-    rc = add_dir_entry(&dir, &newfile, newname, false, false);
+    rc = add_dir_entry(dir, &newfile, newname, false, false);
     if (rc < 0)
         return rc * 10 - 3;
 

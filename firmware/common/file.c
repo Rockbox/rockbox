@@ -277,12 +277,16 @@ int remove(const char* name)
 int rename(const char* path, const char* newpath)
 {
     int rc, fd;
+    DIR* dir;
     char* nameptr;
+    char* dirptr;
     struct filedesc* file;
+    char newpath2[MAX_PATH];
 
     /* verify new path does not already exist */
+    /* If it is a directory, errno == EISDIR if the name exists */
     fd = open(newpath, O_RDONLY);
-    if ( fd >= 0 ) {
+    if ( fd >= 0 || errno == EISDIR) {
         close(fd);
         errno = EBUSY;
         return -1;
@@ -295,25 +299,51 @@ int rename(const char* path, const char* newpath)
         return fd * 10 - 2;
     }
 
-    /* strip path */
+    /* extract new file name */
     nameptr = strrchr(newpath,'/');
     if (nameptr)
         nameptr++;
     else
-        nameptr = (char*)newpath;
+        return - 3;
 
+    /* Extract new path */
+    strcpy(newpath2, newpath);
+    
+    dirptr = strrchr(newpath2,'/');
+    if(dirptr)
+        *dirptr = 0;
+    else
+        return - 4;
+
+    dirptr = newpath2;
+    
+    if(strlen(dirptr) == 0) {
+        dirptr = "/";
+    }
+    
+    dir = opendir(dirptr);
+    if(!dir)
+        return - 5;
+    
     file = &openfiles[fd];
-    rc = fat_rename(&file->fatfile, nameptr, file->size, file->attr);
+    rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
+                    file->size, file->attr);
     if ( rc < 0 ) {
         DEBUGF("Failed renaming file: %d\n", rc);
         errno = EIO;
-        return rc * 10 - 3;
+        return rc * 10 - 6;
     }
 
     rc = close(fd);
     if (rc<0) {
         errno = EIO;
-        return rc * 10 - 4;
+        return rc * 10 - 7;
+    }
+
+    rc = closedir(dir);
+    if (rc<0) {
+        errno = EIO;
+        return rc * 10 - 8;
     }
 
     return 0;
