@@ -56,7 +56,7 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(OBJDIR)/libplugin.a
 	@echo "LD $@"
 	@$(CC) $(CFLAGS) -shared $< -L$(OBJDIR)  $(CODECLIBS) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
@@ -73,7 +73,7 @@ else # end of x11-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(OBJDIR)/libplugin.a
 	@echo "DLL $@"
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a \
