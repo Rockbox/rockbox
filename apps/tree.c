@@ -276,6 +276,9 @@ bool dirbrowse(char *root)
                 break;
 
             case TREE_ENTER:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_PLAY:
+#endif
                 if ( !numentries )
                     break;
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
