@@ -32,9 +32,14 @@ extern int read(int fd, void* buf, int count);
 extern int write(int fd, void* buf, int count);
 
 extern int lseek(int fd, int offset, int whence);
-#endif
 
 extern int remove(char* pathname);
 extern int rename(char* oldname, char* newname);
+#else
+#ifdef _WIN32
+#include <io.h>
+#include <stdio.h>
+#endif
+#endif
 
 #endif

@@ -20,15 +20,25 @@
 #ifndef _DIR_H_
 #define _DIR_H_
 
-typdef struct {
-    int offset;
-} DIR;
-
 struct dirent {
     unsigned char d_name[256];
     int attribute;
     int size;
 };
+
+#ifndef SIMULATOR
+typedef struct {
+    int offset;
+} DIR;
+#else // SIMULATOR
+#ifdef _WIN32
+typedef struct DIRtag
+{
+    struct dirent   fd;
+    intptr_t        handle;
+} DIR;
+#endif //   _WIN32
+#endif // SIMULATOR
 
 extern DIR* opendir(char* name);
 extern int closedir(DIR* dir);
