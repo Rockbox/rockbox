@@ -77,7 +77,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
+FIRMSRCS = lcd-recorder.c sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c panic.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
@@ -218,8 +218,8 @@ $(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
 	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-$(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/lcd-recorder.o: $(DRIVERS)/lcd-recorder.c
+	$(CC) $(CFLAGS) -DHAVE_LCD_BITMAP -c $< -o $@
 
 $(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
 	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<

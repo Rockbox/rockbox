@@ -119,3 +119,6 @@ void lcd_putc(int x, int y, unsigned char ch)
     (void)ch;
 }
 
+void lcd_set_contrast( int x )
+{
+}

@@ -62,7 +62,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 
-FIRMSRCS = lcd.c power.c sprintf.c id3.c usb.c		\
+FIRMSRCS = lcd-recorder.c power.c sprintf.c id3.c usb.c		\
         mpeg.c powermgmt.c font.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c \
@@ -166,8 +166,8 @@ $(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
 	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-$(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+$(OBJDIR)/lcd.o: $(DRIVERS)/lcd-recorder.c
+	$(CC) $(APPCFLAGS) -DHAVE_LCD_BITMAP -c $< -o $@
 
 $(OBJDIR)/power.o: $(DRIVERS)/power.c
 	$(CC) $(APPCFLAGS) -c $< -o $@

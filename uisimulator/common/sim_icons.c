@@ -172,7 +172,7 @@ void sim_battery_icon(int icon, bool enable)
 };
 
 void
-sim_lcd_icon(int icon, bool enable)
+lcd_icon(int icon, bool enable)
 {
     switch (icon)
     {

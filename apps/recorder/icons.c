@@ -165,10 +165,7 @@ unsigned char rockbox112x37[]={
  */
 void statusbar_wipe(void)
 {
-    int x;
-
-    for (x = 0; x < LCD_WIDTH; x++)
-        lcd_framebuffer[x][STATUSBAR_Y_POS / 8] = 0; 
+    lcd_clearrect(0,0,LCD_WIDTH,8);
 }
 
 /*
@@ -297,9 +294,6 @@ void statusbar_time(int hour, int minute)
 {
     unsigned char buffer[6];
     unsigned int width, height;
-#if defined(LOADABLE_FONTS)
-    unsigned char *font;
-#endif
 
     if ( hour >= 0 && 
          hour <= 23 &&
