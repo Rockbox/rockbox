@@ -48,6 +48,7 @@ static void draw_screen(struct mp3entry* id3)
             char* end;
             char* szTok;
             char* szDelimit;
+            char* szPeriod;
             char szArtist[26];
             char szBuff[257];
             szBuff[sizeof(szBuff)-1] = 0;
@@ -62,6 +63,13 @@ static void draw_screen(struct mp3entry* id3)
             szArtist[sizeof(szArtist)-1] = 0;
             szDelimit = strrchr(id3->path, ch);
             lcd_puts(0,0, szArtist?szArtist:"<nothing>");
+
+            // removes the .mp3 from the end of the display buffer
+            szPeriod = strrchr(szDelimit, '.');
+            if (szPeriod != NULL) {
+                memset(szPeriod, 0, 3);           
+            }
+
             lcd_puts_scroll(0,LINE_Y,(++szDelimit));
             break;
         }
