@@ -66,6 +66,7 @@ extern int fat_mount(int startsector);
 extern int fat_create_file(unsigned int currdir, char *name);
 extern int fat_create_dir(unsigned int currdir, char *name);
 #endif
+extern int fat_startsector(void);
 extern int fat_open(unsigned int cluster, struct fat_file *ent);
 extern int fat_read(struct fat_file *ent, int sectorcount, void* buf );
 extern int fat_seek(struct fat_file *ent, int sector );

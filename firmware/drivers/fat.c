@@ -218,6 +218,11 @@ static int first_sector_of_cluster(int cluster)
     return (cluster - 2) * fat_bpb.bpb_secperclus + fat_bpb.firstdatasector;
 }
 
+int fat_startsector(void)
+{
+    return fat_bpb.startsector;
+}
+
 int fat_mount(int startsector)
 {
     unsigned char buf[SECTOR_SIZE];

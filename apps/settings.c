@@ -198,7 +198,7 @@ static int save_config_buffer( void )
     /* update the checksum in the end of the block before saving */
     calculate_config_checksum(rtc_config_block + sizeof(rtc_config_block) - 2);
 #ifdef SAVE_TO_DISK
-    if(battery_level_safe())
+    if(battery_level_safe() && (fat_firstsector()!=0))
         return !ata_write_sectors( 61, 1, rtc_config_block);
     else
         return -1;
