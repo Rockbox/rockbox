@@ -19,8 +19,6 @@
         #include "config.h"
         #include "cpu.h"
 
-//#define BOOTLOADER
-        
 	.section .init.text
 	.global	start
 start:
@@ -122,6 +120,9 @@ irq_handler:
         /* Platform:     iRiver H1xx */
         move.w #0x2700,%sr
 
+        move.l #vectors,%d0
+        movec.l %d0,%vbr
+        
         move.l #MBAR+1,%d0
         movec.l %d0,%mbar
         
@@ -218,7 +219,8 @@ irq_handler:
         move.l #0x3100a520,%d0 /* Back to normal, the DRAM is now ready */
         move.l %d0,(0x108,%a0)
 #endif
-#if 1
+
+#ifndef BOOTLOADER        
         lea    _iramcopy,%a2
         lea    _iramstart,%a3
         lea    _iramend,%a4        
@@ -228,8 +230,8 @@ irq_handler:
         move.w (%a2)+,(%a3)+
         bra    .iramloop
 .iramloopend:
-
 #endif
+        
         lea    _edata,%a2
         lea    _end,%a4
         clr.l  %d0
