@@ -185,7 +185,10 @@ char *rec_create_filename(char *buffer)
                 /* walk through the directory content */
                 entry = readdir(dir);
                 if (!entry)
+                {
+                    closedir(dir);
                     break; /* end of dir */
+                }
                 if (strncasecmp(entry->d_name, "rec_", 4))
                     continue; /* no recording file */
                 curr_rec_file = atoi(&entry->d_name[4]);
