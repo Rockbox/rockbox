@@ -71,7 +71,7 @@ while(<LANG>) {
         if($var eq "new") {
             # the last one for a single phrase
 
-            if(!$value || ($value eq \"\") ) {
+            if(!$value || ($value eq "\"\"") ) {
                 # if not set, get the english version
                 $value = $set{'eng'};
             }
