@@ -31,11 +31,11 @@
  *  # Reintroduce suspend feature under plugin system
  */
 
+/* Plugin header */
+#include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
 
-/* Plugin header */
-#include "plugin.h"
 static struct plugin_api* rb;
 
 /***************************************************************************/
