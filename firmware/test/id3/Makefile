@@ -1,7 +1,7 @@
 TARGET = id3test
 
 OBJS = id3.o
-CFLAGS = -g -DDEBUG_STANDALONE -c -o
+CFLAGS = -g -W -Wall -DDEBUG_STANDALONE -c -o
 
 $(TARGET) : $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS)
