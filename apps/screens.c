@@ -540,6 +540,9 @@ bool f2_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_OFF | BUTTON_REPEAT:
+                return false;
+                
             case SYS_USB_CONNECTED:
                 usb_screen();
                 return true;
@@ -623,6 +626,9 @@ bool f3_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_OFF | BUTTON_REPEAT:
+                return false;
+                
             case SYS_USB_CONNECTED:
                 usb_screen();
                 return true;
@@ -810,3 +816,8 @@ void splash(int ticks,   /* how long */
     }
 }
 
+void charging_splash(void)
+{
+    splash(2*HZ, 0, true, str(LANG_BATTERY_CHARGE));
+    while (button_get(false));
+}

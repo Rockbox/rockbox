@@ -316,9 +316,11 @@ int menu_show(int m)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
             case BUTTON_F1:
+            case BUTTON_OFF | BUTTON_REPEAT:
 #else
             case BUTTON_STOP:
             case BUTTON_MENU:
+            case BUTTON_STOP | BUTTON_REPEAT:
 #endif
                 lcd_stop_scroll();
                 exit = true;

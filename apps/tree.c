@@ -52,6 +52,7 @@
 #include "onplay.h"
 #include "buffer.h"
 #include "plugin.h"
+#include "power.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -885,7 +886,9 @@ static bool dirbrowse(char *root, int *dirfilter)
         switch ( button ) {
             case TREE_EXIT:
             case BUTTON_RC_STOP:
-            case TREE_EXIT | BUTTON_REPEAT:
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT | BUTTON_REPEAT:
+#endif
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -928,6 +931,16 @@ static bool dirbrowse(char *root, int *dirfilter)
                 settings_save();
                 break;
                 
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF | BUTTON_REPEAT:
+#else
+            case BUTTON_STOP | BUTTON_REPEAT:
+#endif
+                if (charger_inserted()) {
+                    charging_splash();
+                    restore = true;
+                }
+                break;
 
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
