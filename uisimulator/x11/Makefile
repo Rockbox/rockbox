@@ -35,6 +35,7 @@ DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
 LIBMADDIR = $(PREVAPPDIR)/common/libmad
 TOOLSDIR = ../../tools
+DOCSDIR = ../../docs
 
 CC = gcc
 RM = rm -f
@@ -157,7 +158,10 @@ $(OBJDIR)/mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
 
 endif
 
-$(OBJDIR)/credits.o: $(APPDIR)/credits.c
+$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
+	perl $(APPDIR)/credits.pl < $< > $@
+
+$(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.raw
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/menu.o: $(APPDIR)/menu.c
