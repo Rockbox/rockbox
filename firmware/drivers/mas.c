@@ -166,7 +166,7 @@ int mas_writereg(int reg, unsigned int val)
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = MAS_CMD_READ_REG | (reg >> 4);
+    buf[i++] = MAS_CMD_WRITE_REG | (reg >> 4);
     buf[i++] = ((reg & 0x0f) << 4) | (val & 0x0f);
     buf[i++] = (val >> 12) & 0xff;
     buf[i++] = (val >> 4) & 0xff;
