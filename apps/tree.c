@@ -828,6 +828,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
+    lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
