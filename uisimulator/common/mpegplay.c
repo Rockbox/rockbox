@@ -191,7 +191,7 @@ int mpeg_play(char* fname)
      some sound cards don't support mono */
   config_sound(&sound,mp3.frequency,2);
 
-  fd=x11_open(fname,O_RDONLY);
+  fd=open(fname,O_RDONLY);
   if (fd < 0) {
     fprintf(stderr,"could not open %s\n",fname);
     return 0;
