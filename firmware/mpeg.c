@@ -313,10 +313,10 @@ static struct event_queue mpeg_queue;
 static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char mpeg_thread_name[] = "mpeg";
 
-static int mp3buflen;
-static int mp3buf_write;
-static int mp3buf_swapwrite;
-static int mp3buf_read;
+static int audiobuflen;
+static int audiobuf_write;
+static int audiobuf_swapwrite;
+static int audiobuf_read;
 
 static int last_dma_chunk_size;
 
@@ -410,10 +410,10 @@ void audio_set_buffer_margin(int seconds)
 
 void audio_get_debugdata(struct audio_debug *dbgdata)
 {
-    dbgdata->mp3buflen = mp3buflen;
-    dbgdata->mp3buf_write = mp3buf_write;
-    dbgdata->mp3buf_swapwrite = mp3buf_swapwrite;
-    dbgdata->mp3buf_read = mp3buf_read;
+    dbgdata->audiobuflen = audiobuflen;
+    dbgdata->audiobuf_write = audiobuf_write;
+    dbgdata->audiobuf_swapwrite = audiobuf_swapwrite;
+    dbgdata->audiobuf_read = audiobuf_read;
 
     dbgdata->last_dma_chunk_size = last_dma_chunk_size;
 
@@ -457,17 +457,17 @@ static int dbg_cnt2us(unsigned int cnt)
 
 static int get_unplayed_space(void)
 {
-    int space = mp3buf_write - mp3buf_read;
+    int space = audiobuf_write - audiobuf_read;
     if (space < 0)
-        space += mp3buflen;
+        space += audiobuflen;
     return space;
 }
 
 static int get_playable_space(void)
 {
-    int space = mp3buf_swapwrite - mp3buf_read;
+    int space = audiobuf_swapwrite - audiobuf_read;
     if (space < 0)
-        space += mp3buflen;
+        space += audiobuflen;
     return space;
 }
 
@@ -479,33 +479,33 @@ static int get_unplayed_space_current_song(void)
     {
         int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
-        space = id3tags[track_offset].mempos - mp3buf_read;
+        space = id3tags[track_offset].mempos - audiobuf_read;
     }
     else
     {
-        space = mp3buf_write - mp3buf_read;
+        space = audiobuf_write - audiobuf_read;
     }
 
     if (space < 0)
-        space += mp3buflen;
+        space += audiobuflen;
 
     return space;
 }
 
 static int get_unswapped_space(void)
 {
-    int space = mp3buf_write - mp3buf_swapwrite;
+    int space = audiobuf_write - audiobuf_swapwrite;
     if (space < 0)
-        space += mp3buflen;
+        space += audiobuflen;
     return space;
 }
 
 #if CONFIG_HWCODEC == MAS3587F
 static int get_unsaved_space(void)
 {
-    int space = mp3buf_write - mp3buf_read;
+    int space = audiobuf_write - audiobuf_read;
     if (space < 0)
-        space += mp3buflen;
+        space += audiobuflen;
     return space;
 }
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
@@ -570,8 +570,8 @@ void rec_tick(void)
             "mov     #30,r3          \n" /* i_max = 30 */
             "mov     #0x40,r2        \n" /* mask for EOD check */
             "mov     #0,%0           \n" /* i = 0; */
-            "add     %2,%1           \n" /* mp3buf_write -> cur_addr */
-            "add     %2,%3           \n" /* mp3buflen -> end_addr */
+            "add     %2,%1           \n" /* audiobuf_write -> cur_addr */
+            "add     %2,%3           \n" /* audiobuflen -> end_addr */
             "bra     .r_start        \n"
             "mov.b   @%4,r1          \n" /* read PBDR (first time) */
 
@@ -607,13 +607,13 @@ void rec_tick(void)
             "bt      .r_loop         \n" /* yes: next pass */
 
         ".r_end:                     \n"
-            "sub     %2,%1           \n" /* cur_addr -> mp3buf_write */
+            "sub     %2,%1           \n" /* cur_addr -> audiobuf_write */
             : /* outputs */
             /* %0 */ "=&r"(i),
-            /* %1, in & out */ "+r"(mp3buf_write)
+            /* %1, in & out */ "+r"(audiobuf_write)
             : /* inputs */
-            /* %2 */ "r"(mp3buf),
-            /* %3 */ "r"(mp3buflen),
+            /* %2 */ "r"(audiobuf),
+            /* %3 */ "r"(audiobuflen),
             /* %4 */ "r"(PBDR_ADDR),
             /* %5 = r0 */ "z"(&PADRH),
             /* %6 */ "r"(0x4000000)
@@ -634,7 +634,7 @@ void rec_tick(void)
                 prerecord_timeout = current_tick + HZ;
 
                 /* Store the write pointer every second */
-                prerecord_buffer[prerecord_index++] = mp3buf_write;
+                prerecord_buffer[prerecord_index++] = audiobuf_write;
 
                 /* Wrap if necessary */
                 if(prerecord_index == prerecording_max_seconds)
@@ -649,11 +649,11 @@ void rec_tick(void)
         {
             /* Signal to save the data if we are running out of buffer
                space */
-            num_bytes = mp3buf_write - mp3buf_read;
+            num_bytes = audiobuf_write - audiobuf_read;
             if(num_bytes < 0)
-                num_bytes += mp3buflen;
+                num_bytes += audiobuflen;
 
-            if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
+            if(audiobuflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
             {
                 saving = true;
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
@@ -673,10 +673,10 @@ void playback_tick(void)
 
 static void reset_mp3_buffer(void)
 {
-    mp3buf_read = 0;
-    mp3buf_write = 0;
-    mp3buf_swapwrite = 0;
-    lowest_watermark_level = mp3buflen;
+    audiobuf_read = 0;
+    audiobuf_write = 0;
+    audiobuf_swapwrite = 0;
+    lowest_watermark_level = audiobuflen;
 }
 
  /* DMA transfer end interrupt callback */
@@ -688,14 +688,14 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
         int space_until_end_of_buffer;
         int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
-        mp3buf_read += last_dma_chunk_size;
-        if(mp3buf_read >= mp3buflen)
-            mp3buf_read = 0;
+        audiobuf_read += last_dma_chunk_size;
+        if(audiobuf_read >= audiobuflen)
+            audiobuf_read = 0;
     
         /* First, check if we are on a track boundary */
         if (num_tracks_in_memory() > 1)
         {
-            if (mp3buf_read == id3tags[track_offset].mempos)
+            if (audiobuf_read == id3tags[track_offset].mempos)
             {
                 queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
                 track_offset = (track_offset+1) & MAX_ID3_TAGS_MASK;
@@ -704,7 +704,7 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
         
         unplayed_space_left = get_unplayed_space();
         
-        space_until_end_of_buffer = mp3buflen - mp3buf_read;
+        space_until_end_of_buffer = audiobuflen - audiobuf_read;
         
         if(!filling && unplayed_space_left < low_watermark)
         {
@@ -722,18 +722,18 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
             if (num_tracks_in_memory() > 1)
             {
                 /* will we move across the track boundary? */
-                if (( mp3buf_read < id3tags[track_offset].mempos ) &&
-                    ((mp3buf_read+last_dma_chunk_size) >
+                if (( audiobuf_read < id3tags[track_offset].mempos ) &&
+                    ((audiobuf_read+last_dma_chunk_size) >
                      id3tags[track_offset].mempos ))
                 {
                     /* Make sure that we end exactly on the boundary */
                     last_dma_chunk_size = id3tags[track_offset].mempos
-                        - mp3buf_read;
+                        - audiobuf_read;
                 }
             }
 
             *psize = last_dma_chunk_size & 0xffff;
-            *ppbuf = mp3buf + mp3buf_read;
+            *ppbuf = audiobuf + audiobuf_read;
             id3tags[tag_read_idx].id3.offset += last_dma_chunk_size;
 
             /* Update the watermark debug level */
@@ -785,7 +785,7 @@ static int add_track_to_tag_list(const char *filename)
         DEBUGF("Bad mp3\n");
         return -1;
     }
-    id3tags[tag_write_idx].mempos = mp3buf_write;
+    id3tags[tag_write_idx].mempos = audiobuf_write;
     id3tags[tag_write_idx].id3.elapsed = 0;
 
     tag_write_idx = (tag_write_idx+1) & MAX_ID3_TAGS_MASK;
@@ -932,9 +932,9 @@ static void start_playback_if_ready(void)
 {
     int playable_space;
 
-    playable_space = mp3buf_swapwrite - mp3buf_read;
+    playable_space = audiobuf_swapwrite - audiobuf_read;
     if(playable_space < 0)
-        playable_space += mp3buflen;
+        playable_space += audiobuflen;
     
     /* See if we have started playing yet. If not, do it. */
     if(play_pending || dma_underrun)
@@ -950,7 +950,7 @@ static void start_playback_if_ready(void)
             playing = true;
 			
             last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-            mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+            mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
             dma_underrun = false;
 
             if (!paused)
@@ -989,19 +989,19 @@ static bool swap_one_chunk(void)
             amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
     }
     
-    if(mp3buf_write < mp3buf_swapwrite)
-        amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+    if(audiobuf_write < audiobuf_swapwrite)
+        amount_to_swap = MIN(audiobuflen - audiobuf_swapwrite,
                              amount_to_swap);
     else
-        amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
+        amount_to_swap = MIN(audiobuf_write - audiobuf_swapwrite,
                              amount_to_swap);
 
-    bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
+    bitswap(audiobuf + audiobuf_swapwrite, amount_to_swap);
 
-    mp3buf_swapwrite += amount_to_swap;
-    if(mp3buf_swapwrite >= mp3buflen)
+    audiobuf_swapwrite += amount_to_swap;
+    if(audiobuf_swapwrite >= audiobuflen)
     {
-        mp3buf_swapwrite = 0;
+        audiobuf_swapwrite = 0;
     }
 
     return true;
@@ -1058,7 +1058,7 @@ static void mpeg_thread(void)
         else
         {
             DEBUGF("S R:%x W:%x SW:%x\n",
-                   mp3buf_read, mp3buf_write, mp3buf_swapwrite);
+                   audiobuf_read, audiobuf_write, audiobuf_swapwrite);
             queue_wait(&mpeg_queue, &ev);
         }
 
@@ -1169,9 +1169,9 @@ static void mpeg_thread(void)
                     mp3_play_pause(false);
 
                     track_change();
-                    mp3buf_read = id3tags[tag_read_idx].mempos;
+                    audiobuf_read = id3tags[tag_read_idx].mempos;
                     last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-                    mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+                    mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
                     dma_underrun = false;
                     last_dma_tick = current_tick;
 
@@ -1186,7 +1186,7 @@ static void mpeg_thread(void)
                     } else if(unswapped_space_left &&
                               unswapped_space_left > unplayed_space_left) {
                         /* Stop swapping the data from the previous file */
-                        mp3buf_swapwrite = mp3buf_read;
+                        audiobuf_swapwrite = audiobuf_read;
                         play_pending = true;
                     } else {
                         playing = true;
@@ -1304,16 +1304,16 @@ static void mpeg_thread(void)
 
                 diffpos = curpos - newpos;
 
-                if(!filling && diffpos >= 0 && diffpos < mp3buflen)
+                if(!filling && diffpos >= 0 && diffpos < audiobuflen)
                 {
                     int unplayed_space_left, unswapped_space_left;
 
                     /* We are changing to a position that's already in
                        memory, so we just move the DMA read pointer. */
-                    mp3buf_read = mp3buf_write - diffpos;
-                    if (mp3buf_read < 0)
+                    audiobuf_read = audiobuf_write - diffpos;
+                    if (audiobuf_read < 0)
                     {
-                        mp3buf_read += mp3buflen;
+                        audiobuf_read += audiobuflen;
                     }
 
                     unplayed_space_left  = get_unplayed_space();
@@ -1328,7 +1328,7 @@ static void mpeg_thread(void)
                     if (unswapped_space_left > unplayed_space_left)
                     {
                         DEBUGF("Moved swapwrite\n");
-                        mp3buf_swapwrite = mp3buf_read;
+                        audiobuf_swapwrite = audiobuf_read;
                         play_pending = true;
                     }
 
@@ -1344,7 +1344,7 @@ static void mpeg_thread(void)
                         /* resume will start at new position */
                         last_dma_chunk_size = 
                             MIN(0x2000, get_unplayed_space_current_song());
-                        mp3_play_data(mp3buf + mp3buf_read, 
+                        mp3_play_data(audiobuf + audiobuf_read, 
                             last_dma_chunk_size, transfer_end);
                         dma_underrun = false;
                     }
@@ -1402,12 +1402,12 @@ static void mpeg_thread(void)
                     int next = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
                     /* Reset the buffer */
-                    mp3buf_write = id3tags[next].mempos;
+                    audiobuf_write = id3tags[next].mempos;
 
                     /* Reset swapwrite unless we're still swapping current
                        track */
                     if (get_unplayed_space() <= get_playable_space())
-                        mp3buf_swapwrite = mp3buf_write;
+                        audiobuf_swapwrite = audiobuf_write;
 
                     close(mpeg_file);
                     remove_all_non_current_tags();
@@ -1430,13 +1430,13 @@ static void mpeg_thread(void)
             }
 
             case MPEG_NEED_DATA:
-                free_space_left = mp3buf_read - mp3buf_write;
+                free_space_left = audiobuf_read - audiobuf_write;
 
                 /* We interpret 0 as "empty buffer" */
                 if(free_space_left <= 0)
-                    free_space_left = mp3buflen + free_space_left;
+                    free_space_left = audiobuflen + free_space_left;
 
-                unplayed_space_left = mp3buflen - free_space_left;
+                unplayed_space_left = audiobuflen - free_space_left;
 
                 /* Make sure that we don't fill the entire buffer */
                 free_space_left -= MPEG_HIGH_WATER;
@@ -1458,7 +1458,7 @@ static void mpeg_thread(void)
                     amount_to_read = free_space_left;
 
                 /* Don't read more than until the end of the buffer */
-                amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
+                amount_to_read = MIN(audiobuflen - audiobuf_write, amount_to_read);
 #if MEM == 8    
                 amount_to_read = MIN(0x100000, amount_to_read);
 #endif /* #if MEM == 8 */
@@ -1471,7 +1471,7 @@ static void mpeg_thread(void)
                 {
                     DEBUGF("R\n");
                     t1 = current_tick;
-                    len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
+                    len = read(mpeg_file, audiobuf+audiobuf_write, amount_to_read);
                     if(len > 0)
                     {
                         t2 = current_tick;
@@ -1482,17 +1482,17 @@ static void mpeg_thread(void)
                            data */
                         if (len < amount_to_read)
                         {
-                            int tagptr = mp3buf_write + len - 128;
+                            int tagptr = audiobuf_write + len - 128;
                             int i;
                             char *tag = "TAG";
                             int taglen = 128;
                             
                             for(i = 0;i < 3;i++)
                             {
-                                if(tagptr >= mp3buflen)
-                                    tagptr -= mp3buflen;
+                                if(tagptr >= audiobuflen)
+                                    tagptr -= audiobuflen;
 
-                                if(mp3buf[tagptr] != tag[i])
+                                if(audiobuf[tagptr] != tag[i])
                                     taglen = 0;
 
                                 tagptr++;
@@ -1512,11 +1512,11 @@ static void mpeg_thread(void)
                             }
                         }
 
-                        mp3buf_write += len;
+                        audiobuf_write += len;
                         
-                        if(mp3buf_write >= mp3buflen)
+                        if(audiobuf_write >= audiobuflen)
                         {
-                            mp3buf_write = 0;
+                            audiobuf_write = 0;
                             DEBUGF("W\n");
                         }
 
@@ -1597,48 +1597,48 @@ static void mpeg_thread(void)
                         startpos = prerecord_buffer[startpos];
 
                         DEBUGF("Start looking at address %x (%x)\n",
-                               mp3buf+startpos, startpos);
+                               audiobuf+startpos, startpos);
 
                         saved_header = mpeg_get_last_header();
                         
                         mem_find_next_frame(startpos, &offset, 5000,
                                             saved_header);
 
-                        mp3buf_read = startpos + offset;
+                        audiobuf_read = startpos + offset;
                         
-                        DEBUGF("New mp3buf_read address: %x (%x)\n",
-                               mp3buf+mp3buf_read, mp3buf_read);
+                        DEBUGF("New audiobuf_read address: %x (%x)\n",
+                               audiobuf+audiobuf_read, audiobuf_read);
 
                         /* Make room for headers */
-                        mp3buf_read -= MPEG_RESERVED_HEADER_SPACE;
-                        if(mp3buf_read < 0)
+                        audiobuf_read -= MPEG_RESERVED_HEADER_SPACE;
+                        if(audiobuf_read < 0)
                         {
                             /* Clear the bottom half */
-                            memset(mp3buf, 0,
-                                   mp3buf_read + MPEG_RESERVED_HEADER_SPACE);
+                            memset(audiobuf, 0,
+                                   audiobuf_read + MPEG_RESERVED_HEADER_SPACE);
 
                             /* And the top half */
-                            mp3buf_read += mp3buflen;
-                            memset(mp3buf + mp3buf_read, 0,
-                                   mp3buflen - mp3buf_read);
+                            audiobuf_read += audiobuflen;
+                            memset(audiobuf + audiobuf_read, 0,
+                                   audiobuflen - audiobuf_read);
                         }
                         else
                         {
-                            memset(mp3buf + mp3buf_read, 0,
+                            memset(audiobuf + audiobuf_read, 0,
                                    MPEG_RESERVED_HEADER_SPACE);
                         }
 
                         /* Copy the empty ID3 header */
-                        startpos = mp3buf_read;
+                        startpos = audiobuf_read;
                         for(i = 0;i < (int)sizeof(empty_id3_header);i++)
                         {
-                            mp3buf[startpos++] = empty_id3_header[i];
-                            if(startpos == mp3buflen)
+                            audiobuf[startpos++] = empty_id3_header[i];
+                            if(startpos == audiobuflen)
                                 startpos = 0;
                         }
                         
-                        DEBUGF("New mp3buf_read address (reservation): %x\n",
-                               mp3buf+mp3buf_read);
+                        DEBUGF("New audiobuf_read address (reservation): %x\n",
+                               audiobuf+audiobuf_read);
                         
                         DEBUGF("Prerecording...\n");
                     }
@@ -1650,11 +1650,11 @@ static void mpeg_thread(void)
                         
                         /* Advance the write pointer to make
                            room for an ID3 tag plus a VBR header */
-                        mp3buf_write = MPEG_RESERVED_HEADER_SPACE;
-                        memset(mp3buf, 0, MPEG_RESERVED_HEADER_SPACE);
+                        audiobuf_write = MPEG_RESERVED_HEADER_SPACE;
+                        memset(audiobuf, 0, MPEG_RESERVED_HEADER_SPACE);
                         
                         /* Insert the ID3 header */
-                        memcpy(mp3buf, empty_id3_header,
+                        memcpy(audiobuf, empty_id3_header,
                                sizeof(empty_id3_header));
 
                         DEBUGF("Recording...\n");
@@ -1711,14 +1711,14 @@ static void mpeg_thread(void)
                         /* saved_header is saved right before stopping
                            the MAS */
                         framelen = create_xing_header(mpeg_file, 0,
-                                                      num_rec_bytes, mp3buf,
+                                                      num_rec_bytes, audiobuf,
                                                       num_recorded_frames,
                                                       saved_header, NULL,
                                                       false);
                         
                         lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE-framelen,
                               SEEK_SET);
-                        write(mpeg_file, mp3buf, framelen);
+                        write(mpeg_file, audiobuf, framelen);
                         close(mpeg_file);
                     }
                     mpeg_file = -1;
@@ -1760,9 +1760,9 @@ static void mpeg_thread(void)
                     if(amount_to_save >= 1800)
                     {
                         /* Now find a frame boundary to split at */
-                        startpos = mp3buf_write - 1800;
+                        startpos = audiobuf_write - 1800;
                         if(startpos < 0)
-                            startpos += mp3buflen;
+                            startpos += audiobuflen;
 
                         rc = mem_find_next_frame(startpos, &offset, 1800,
                                                  saved_header);
@@ -1771,28 +1771,28 @@ static void mpeg_thread(void)
                             /* offset will now contain the number of bytes to
                                add to startpos to find the frame boundary */
                             startpos += offset;
-                            if(startpos >= mp3buflen)
-                                startpos -= mp3buflen;
+                            if(startpos >= audiobuflen)
+                                startpos -= audiobuflen;
                         }
                         else
                         {
                             /* No header found. Let's save the whole buffer. */
-                            startpos = mp3buf_write;
+                            startpos = audiobuf_write;
                         }
                     }
                     else
                     {
                         /* Too few bytes recorded, timeout */
-                        startpos = mp3buf_write;
+                        startpos = audiobuf_write;
                     }
                     
-                    amount_to_save = startpos - mp3buf_read;
+                    amount_to_save = startpos - audiobuf_read;
                         if(amount_to_save < 0)
-                            amount_to_save += mp3buflen;
+                            amount_to_save += audiobuflen;
 
                     /* First save up to the end of the buffer */
                     writelen = MIN(amount_to_save,
-                                   mp3buflen - mp3buf_read);
+                                   audiobuflen - audiobuf_read);
                     
                     if (mpeg_file < 0) /* delayed file opening */
                     {
@@ -1804,7 +1804,7 @@ static void mpeg_thread(void)
 
                     if(writelen)
                     {
-                        rc = write(mpeg_file, mp3buf + mp3buf_read, writelen);
+                        rc = write(mpeg_file, audiobuf + audiobuf_read, writelen);
                         if(rc < 0)
                         {
                             if(errno == ENOSPC)
@@ -1826,7 +1826,7 @@ static void mpeg_thread(void)
                     writelen =  amount_to_save - writelen;
                     if(writelen)
                     {
-                        rc = write(mpeg_file, mp3buf, writelen);
+                        rc = write(mpeg_file, audiobuf, writelen);
                         if(rc < 0)
                         {
                             if(errno == ENOSPC)
@@ -1845,9 +1845,9 @@ static void mpeg_thread(void)
                     }
 
                     /* Advance the buffer pointers */
-                    mp3buf_read += amount_to_save;
-                    if(mp3buf_read >= mp3buflen)
-                        mp3buf_read -= mp3buflen;
+                    audiobuf_read += amount_to_save;
+                    if(audiobuf_read >= audiobuflen)
+                        audiobuf_read -= audiobuflen;
 
                     /* Close the current file */
                     rc = close(mpeg_file);
@@ -1867,23 +1867,23 @@ static void mpeg_thread(void)
                        wrapped */
                     if(amount_to_save < 0)
                     {
-                        amount_to_save += mp3buflen;
+                        amount_to_save += audiobuflen;
                     }
                     
-                    DEBUGF("r: %x w: %x\n", mp3buf_read, mp3buf_write);
+                    DEBUGF("r: %x w: %x\n", audiobuf_read, audiobuf_write);
                     DEBUGF("ats: %x\n", amount_to_save);
 
                     /* Save data only if the buffer is getting full,
                        or if we should stop recording */
                     if(amount_to_save)
                     {
-                        if(mp3buflen -
+                        if(audiobuflen -
                            amount_to_save < MPEG_RECORDING_LOW_WATER ||
                            stop_pending)
                         {
                             /* Only save up to the end of the buffer */
                             writelen = MIN(amount_to_save,
-                                           mp3buflen - mp3buf_read);
+                                           audiobuflen - audiobuf_read);
                             
                             DEBUGF("wrl: %x\n", writelen);
                             
@@ -1896,7 +1896,7 @@ static void mpeg_thread(void)
                                     panicf("recfile: %d", mpeg_file);
                             }
 
-                            rc = write(mpeg_file, mp3buf + mp3buf_read,
+                            rc = write(mpeg_file, audiobuf + audiobuf_read,
                                        writelen);
                             
                             if(rc < 0)
@@ -1914,9 +1914,9 @@ static void mpeg_thread(void)
                                 }
                             }
                             
-                            mp3buf_read += amount_to_save;
-                            if(mp3buf_read >= mp3buflen)
-                                mp3buf_read = 0;
+                            audiobuf_read += amount_to_save;
+                            if(audiobuf_read >= audiobuflen)
+                                audiobuf_read = 0;
                             
                             rc = fsync(mpeg_file);
                             if(rc < 0)
@@ -2468,9 +2468,9 @@ unsigned long mpeg_num_recorded_bytes(void)
             if(index < 0)
                 index += prerecording_max_seconds;
             
-            num_bytes = mp3buf_write - prerecord_buffer[index];
+            num_bytes = audiobuf_write - prerecord_buffer[index];
             if(num_bytes < 0)
-                num_bytes += mp3buflen;
+                num_bytes += audiobuflen;
             
             return num_bytes;;
         }
@@ -2765,7 +2765,7 @@ void audio_init(void)
     mpeg_errno = 0;
 
 #ifndef SIMULATOR
-    mp3buflen = mp3end - mp3buf;
+    audiobuflen = audiobufend - audiobuf;
     queue_init(&mpeg_queue);
 #endif /* #ifndef SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,

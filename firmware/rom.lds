@@ -104,15 +104,15 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .mp3buf :
+    .audiobuf :
     {
         . = ALIGN(0x4);
-        _mp3buffer = .;
+        _audiobuffer = .;
     } > DRAM
 
-    .mp3end ENDADDR:
+    .audiobufend ENDADDR:
     {
-        _mp3end = .;
+        _audiobufend = .;
     } > DRAM
 
     .plugin ENDADDR:

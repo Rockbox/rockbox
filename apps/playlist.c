@@ -351,8 +351,8 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         audio_stop();
         talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
 
-        buffer = mp3buf;
-        buflen = (mp3end - mp3buf);        
+        buffer = audiobuf;
+        buflen = (audiobufend - audiobuf);        
     }
     
     store_index = true;
@@ -1211,8 +1211,8 @@ int playlist_resume(void)
 
     /* use mp3 buffer for maximum load speed */
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-    buflen = (mp3end - mp3buf);
-    buffer = mp3buf;
+    buflen = (audiobufend - audiobuf);
+    buffer = audiobuf;
 
     empty_playlist(playlist, true);
 
@@ -1294,7 +1294,7 @@ int playlist_resume(void)
                         if (str3[0] != '\0')
                         {
                             /* NOTE: add_indices_to_playlist() overwrites the
-                               mp3buf so we need to reload control file
+                               audiobuf so we need to reload control file
                                data */
                             add_indices_to_playlist(playlist, NULL, 0);
                         }

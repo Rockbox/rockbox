@@ -21,12 +21,12 @@
 
 /* defined in linker script */
 #ifdef SIMULATOR
-extern unsigned char *mp3end;
+extern unsigned char *audiobufend;
 #else
-extern unsigned char mp3end[];
+extern unsigned char audiobufend[];
 #endif
 
-extern unsigned char *mp3buf;
+extern unsigned char *audiobuf;
 
 void buffer_init(void);
 void *buffer_alloc(size_t size);

@@ -273,12 +273,12 @@ static int buf_getbyte(int fd, unsigned char *c)
 {
     if(fnf_read_index < fnf_buf_len)
     {
-        *c = mp3buf[fnf_read_index++];
+        *c = audiobuf[fnf_read_index++];
         return 1;
     }
     else
     {
-        fnf_buf_len = read(fd, mp3buf, mp3end - mp3buf);
+        fnf_buf_len = read(fd, audiobuf, audiobufend - audiobuf);
         if(fnf_buf_len < 0)
             return -1;
 
@@ -286,7 +286,7 @@ static int buf_getbyte(int fd, unsigned char *c)
 
         if(fnf_buf_len > 0)
         {
-            *c = mp3buf[fnf_read_index++];
+            *c = audiobuf[fnf_read_index++];
             return 1;
         }
         else
@@ -302,7 +302,7 @@ static int buf_seek(int fd, int len)
     {
         len = fnf_read_index - fnf_buf_len;
         
-        fnf_buf_len = read(fd, mp3buf, mp3end - mp3buf);
+        fnf_buf_len = read(fd, audiobuf, audiobufend - audiobuf);
         if(fnf_buf_len < 0)
             return -1;
 
@@ -330,7 +330,7 @@ unsigned long buf_find_next_frame(int fd, long *offset, long max_offset,
     return __find_next_frame(fd, offset, max_offset, last_header, buf_getbyte);
 }
 
-static int mp3buflen;
+static int audiobuflen;
 static int mem_pos;
 static int mem_cnt;
 static int mem_maxlen;
@@ -339,8 +339,8 @@ static int mem_getbyte(int dummy, unsigned char *c)
 {
     dummy = dummy;
     
-    *c = mp3buf[mem_pos++];
-    if(mem_pos >= mp3buflen)
+    *c = audiobuf[mem_pos++];
+    if(mem_pos >= audiobuflen)
         mem_pos = 0;
 
     if(mem_cnt++ >= mem_maxlen)
@@ -352,7 +352,7 @@ static int mem_getbyte(int dummy, unsigned char *c)
 unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
                                   unsigned long last_header)
 {
-    mp3buflen = mp3end - mp3buf;
+    audiobuflen = audiobufend - audiobuf;
     mem_pos = startpos;
     mem_cnt = 0;
     mem_maxlen = max_offset;

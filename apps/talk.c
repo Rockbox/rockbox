@@ -131,7 +131,7 @@ static void load_voicefile(void)
         goto load_err;
 
     file_size = filesize(filehandle);
-    if (file_size > mp3end - mp3buf) /* won't fit? */
+    if (file_size > audiobufend - audiobuf) /* won't fit? */
        goto load_err;
 
 #ifdef HAVE_MMC /* load only the header for now */
@@ -140,17 +140,17 @@ static void load_voicefile(void)
     load_size = file_size; 
 #endif
 
-    got_size = read(filehandle, mp3buf, load_size);
+    got_size = read(filehandle, audiobuf, load_size);
     if (got_size == load_size /* success */
-        && ((struct voicefile*)mp3buf)->table /* format check */
+        && ((struct voicefile*)audiobuf)->table /* format check */
            == offsetof(struct voicefile, index))
     {
-        p_voicefile = (struct voicefile*)mp3buf;
+        p_voicefile = (struct voicefile*)audiobuf;
 
         /* thumbnail buffer is the remaining space behind */
-        p_thumbnail = mp3buf + file_size;
+        p_thumbnail = audiobuf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
-        size_for_thumbnail = mp3end - p_thumbnail;
+        size_for_thumbnail = audiobufend - p_thumbnail;
     }
     else
        goto load_err;
@@ -160,7 +160,7 @@ static void load_voicefile(void)
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
                 * sizeof(struct clip_entry);
     got_size = read(filehandle, 
-                    mp3buf + offsetof(struct voicefile, index), load_size);
+                    audiobuf + offsetof(struct voicefile, index), load_size);
     if (got_size != load_size) /* read error */
        goto load_err;
 #else
@@ -356,7 +356,7 @@ static unsigned char* get_clip(long id, long* p_size)
     clipsize = p_voicefile->index[id].size;
     if (clipsize == 0) /* clip not included in voicefile */
         return NULL;
-    clipbuf = mp3buf + p_voicefile->index[id].offset;
+    clipbuf = audiobuf + p_voicefile->index[id].offset;
 
 #ifdef HAVE_MMC /* dynamic loading, on demand */
     if (!(clipsize & LOADED_MASK))
@@ -383,8 +383,8 @@ static void reset_state(void)
 {
     queue_write = queue_read = 0; /* reset the queue */
     p_voicefile = NULL; /* indicate no voicefile (trashed) */
-    p_thumbnail = mp3buf; /*  whole space for thumbnail */
-    size_for_thumbnail = mp3end - mp3buf;
+    p_thumbnail = audiobuf; /*  whole space for thumbnail */
+    size_for_thumbnail = audiobufend - audiobuf;
     p_silence = NULL; /* pause clip not accessible */
 }
 

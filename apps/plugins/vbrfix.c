@@ -20,8 +20,8 @@
 
 static struct plugin_api* rb;
 
-static char *mp3buf;
-static int mp3buflen;
+static char *audiobuf;
+static int audiobuflen;
 
 static void xingupdate(int percent)
 {
@@ -56,14 +56,14 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 
     /* First, copy the initial portion (the ID3 tag) */
     if(fpos) {
-        readlen = rb->read(orig_fd, mp3buf, fpos);
+        readlen = rb->read(orig_fd, audiobuf, fpos);
         if(readlen < 0) {
             rb->close(fd);
             rb->close(orig_fd);
             return 10*readlen - 3;
         }
         
-        rc = rb->write(fd, mp3buf, readlen);
+        rc = rb->write(fd, audiobuf, readlen);
         if(rc < 0) {
             rb->close(fd);
             rb->close(orig_fd);
@@ -81,14 +81,14 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
 
     /* Copy the file */
     do {
-        readlen = rb->read(orig_fd, mp3buf, mp3buflen);
+        readlen = rb->read(orig_fd, audiobuf, audiobuflen);
         if(readlen < 0) {
             rb->close(fd);
             rb->close(orig_fd);
             return 10*readlen - 7;
         }
 
-        rc = rb->write(fd, mp3buf, readlen);
+        rc = rb->write(fd, audiobuf, readlen);
         if(rc < 0) {
             rb->close(fd);
             rb->close(orig_fd);
@@ -193,8 +193,8 @@ static bool vbr_fix(char *selected_file)
                and write it to the file */
             if(unused_space)
             {
-                rb->memset(mp3buf, 0, unused_space);
-                rc = rb->write(fd, mp3buf, unused_space);
+                rb->memset(audiobuf, 0, unused_space);
+                rc = rb->write(fd, audiobuf, unused_space);
                 if(rc < 0) {
                     rb->close(fd);
                     fileerror(rc);
@@ -230,20 +230,20 @@ static bool vbr_fix(char *selected_file)
                 DEBUGF("Inserting 4096+%d bytes\n", framelen);
                 numbytes = 4096 + framelen;
                 
-                rb->memset(mp3buf + 0x100000, 0, numbytes);
+                rb->memset(audiobuf + 0x100000, 0, numbytes);
                 
                 /* Insert the ID3 header */
-                rb->memcpy(mp3buf + 0x100000, empty_id3_header,
+                rb->memcpy(audiobuf + 0x100000, empty_id3_header,
                            sizeof(empty_id3_header));
             }
             
             /* Copy the Xing header */
-            rb->memcpy(mp3buf + 0x100000 + numbytes - framelen,
+            rb->memcpy(audiobuf + 0x100000 + numbytes - framelen,
                        xingbuf, framelen);
             
             rc = insert_data_in_file(selected_file,
                                      entry.first_frame_offset,
-                                     mp3buf + 0x100000, numbytes);
+                                     audiobuf + 0x100000, numbytes);
             
             if(rc < 0) {
                 fileerror(rc);
@@ -272,7 +272,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    mp3buf = rb->plugin_get_mp3_buffer(&mp3buflen);
+    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
     
     vbr_fix(parameter);
 

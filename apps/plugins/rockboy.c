@@ -26,8 +26,8 @@
 #define OVL_DISPLAYNAME "RockBoy"
 
 struct plugin_api* rb;
-unsigned char *mp3buf;
-int mp3buf_size;
+unsigned char *audiobuf;
+int audiobuf_size;
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -60,8 +60,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
     
-    mp3buf = rb->plugin_get_mp3_buffer(&mp3buf_size);
-    if (header.start_addr < mp3buf || header.end_addr > mp3buf + mp3buf_size)
+    audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
+    if (header.start_addr < audiobuf ||
+        header.end_addr > audiobuf + audiobuf_size)
     {
         rb->close(fh);
         rb->splash(2*HZ, true, OVL_DISPLAYNAME 

@@ -59,37 +59,37 @@ void die(char *message, ...)
     errormsg=message;
 }
 
-void *mp3_bufferbase;
-void *mp3_bufferpointer;
-unsigned int mp3_buffer_free;
+void *audio_bufferbase;
+void *audio_bufferpointer;
+unsigned int audio_buffer_free;
 
 void *my_malloc(size_t size)
 {
     void *alloc;
 
-    if (!mp3_bufferbase)
+    if (!audio_bufferbase)
     {
-        mp3_bufferbase = mp3_bufferpointer
-                       = rb->plugin_get_mp3_buffer(&mp3_buffer_free);
+        audio_bufferbase = audio_bufferpointer
+            = rb->plugin_get_audio_buffer(&audio_buffer_free);
 #if MEM <= 8 && !defined(SIMULATOR)
         /* loaded as an overlay, protect from overwriting ourselves */
-        if ((unsigned)(ovl_start_addr - (unsigned char *)mp3_bufferbase) 
-            < mp3_buffer_free)
-            mp3_buffer_free = ovl_start_addr - (unsigned char *)mp3_bufferbase;
+        if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase) 
+            < audio_buffer_free)
+            audio_buffer_free = ovl_start_addr - (unsigned char *)audio_bufferbase;
 #endif
     }
-    if (size + 4 > mp3_buffer_free)
+    if (size + 4 > audio_buffer_free)
         return 0;
-    alloc = mp3_bufferpointer;
-    mp3_bufferpointer += size + 4;
-    mp3_buffer_free -= size + 4;
+    alloc = audio_bufferpointer;
+    audio_bufferpointer += size + 4;
+    audio_buffer_free -= size + 4;
     return alloc;
 }
 
 void setmallocpos(void *pointer) 
 {
-    mp3_bufferpointer = pointer;
-    mp3_buffer_free = mp3_bufferpointer - mp3_bufferbase;
+    audio_bufferpointer = pointer;
+    audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
 
 /* this is the plugin entry point */
@@ -113,8 +113,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
     shut=0;
     cleanshut=0;
-    mp3_bufferbase=mp3_bufferpointer=0;
-    mp3_buffer_free=0;
+    audio_bufferbase=audio_bufferpointer=0;
+    audio_buffer_free=0;
 
     /* now go ahead and have fun! */
     /* rb->splash(HZ*2, true, "Rockboy v0.3"); */

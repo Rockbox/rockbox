@@ -1824,7 +1824,7 @@ int main(char* filename)
 
     rb->memset(&disp, 0, sizeof(disp));
 
-    buf = rb->plugin_get_mp3_buffer(&buf_size); /* start munching memory */
+    buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
 
 
     /* initialize the grayscale buffer:

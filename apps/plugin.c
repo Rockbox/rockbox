@@ -238,7 +238,7 @@ static const struct plugin_api rockbox_api = {
     get_time,
     set_time,
     plugin_get_buffer,
-    plugin_get_mp3_buffer,
+    plugin_get_audio_buffer,
 #ifndef SIMULATOR
     plugin_register_timer,
     plugin_unregister_timer,
@@ -407,12 +407,12 @@ void* plugin_get_buffer(int* buffer_size)
 
 /* Returns a pointer to the mp3 buffer. 
    Playback gets stopped, to avoid conflicts. */
-void* plugin_get_mp3_buffer(int* buffer_size)
+void* plugin_get_audio_buffer(int* buffer_size)
 {
     audio_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-    *buffer_size = mp3end - mp3buf;
-    return mp3buf;
+    *buffer_size = audiobufend - audiobuf;
+    return audiobuf;
 }
 
 #ifndef SIMULATOR

@@ -88,10 +88,10 @@ _stackend = ADDR(.stack) + SIZEOF(.stack);
 
 _idatastart = ADDR(.idata);
 
-/* FIXME: Where to put mp3 buffer? */
+/* FIXME: Where to put audio buffer? */
 
-_mp3buffer = 0;
-_mp3end = 0;
+_audiobuffer = 0;
+_audioend = 0;
 
 /* Plugins are not supported on the Gmini*/
 
@@ -217,16 +217,16 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .mp3buf ALIGN(4) :
+    .audiobuf ALIGN(4) :
     {
-        _mp3buffer = .;
-        mp3buffer = .;
+        _audiobuffer = .;
+        audiobuffer = .;
     } > DRAM
 
-    .mp3end ENDADDR:
+    .audiobufend ENDADDR:
     {
-        mp3end = .;
-        _mp3end = .;
+        audiobufend = .;
+        _audiobufend = .;
     } > DRAM
 
     .plugin ENDADDR:

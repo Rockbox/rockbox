@@ -35,10 +35,10 @@
 
 struct audio_debug
 {
-        int mp3buflen;
-        int mp3buf_write;
-        int mp3buf_swapwrite;
-        int mp3buf_read;
+        int audiobuflen;
+        int audiobuf_write;
+        int audiobuf_swapwrite;
+        int audiobuf_read;
 
         int last_dma_chunk_size;
 

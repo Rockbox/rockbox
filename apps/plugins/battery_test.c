@@ -48,7 +48,7 @@ int buffersize;
 int init(void)
 {
     int f;
-    buffer = rb->plugin_get_mp3_buffer(&buffersize);
+    buffer = rb->plugin_get_audio_buffer(&buffersize);
     
 #ifdef HAVE_MMC
     /* present info what's going on. MMC is slow. */

@@ -864,7 +864,7 @@ int main(char* filename)
     // init buffer
     rb->memset(&gBuf, 0, sizeof(gBuf));
     gBuf.pOSD = rb->lcd_framebuffer + LCD_WIDTH*7; // last screen line
-    gBuf.pBufStart = rb->plugin_get_mp3_buffer(&gBuf.bufsize);
+    gBuf.pBufStart = rb->plugin_get_audio_buffer(&gBuf.bufsize);
     //gBuf.bufsize = 1700*1024; // test, like 2MB version!!!!
     gBuf.pBufFill = gBuf.pBufStart; // all empty
 

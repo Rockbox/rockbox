@@ -126,7 +126,7 @@ int load_wave(char *filename)
     if (audio_size > 8*1024*1024)
         audio_size = 8*1024*1024;
 
-    audio_buffer = mp3buf;
+    audio_buffer = audiobuf;
 
     puts("Reading %d bytes..", audio_size);
 
@@ -356,11 +356,11 @@ bool dbg_audio_thread(void)
         
         lcd_clear_display();
 
-        snprintf(buf, sizeof(buf), "read: %x", d.mp3buf_read);
+        snprintf(buf, sizeof(buf), "read: %x", d.audiobuf_read);
         lcd_puts(0, 0, buf);
-        snprintf(buf, sizeof(buf), "write: %x", d.mp3buf_write);
+        snprintf(buf, sizeof(buf), "write: %x", d.audiobuf_write);
         lcd_puts(0, 1, buf);
-        snprintf(buf, sizeof(buf), "swap: %x", d.mp3buf_swapwrite);
+        snprintf(buf, sizeof(buf), "swap: %x", d.audiobuf_swapwrite);
         lcd_puts(0, 2, buf);
         snprintf(buf, sizeof(buf), "playing: %d", d.playing);
         lcd_puts(0, 3, buf);
@@ -370,11 +370,11 @@ bool dbg_audio_thread(void)
         lcd_puts(0, 5, buf);
 
         /* Playable space left */
-        scrollbar(0, 6*8, 112, 4, d.mp3buflen, 0, 
+        scrollbar(0, 6*8, 112, 4, d.audiobuflen, 0, 
                   d.playable_space, HORIZONTAL);
 
         /* Show the watermark limit */
-        scrollbar(0, 6*8+4, 112, 4, d.mp3buflen, 0, 
+        scrollbar(0, 6*8+4, 112, 4, d.audiobuflen, 0, 
                   d.low_watermark_level, HORIZONTAL);
 
         snprintf(buf, sizeof(buf), "wm: %x - %x",

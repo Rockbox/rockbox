@@ -280,7 +280,7 @@ struct plugin_api {
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
     void* (*plugin_get_buffer)(int* buffer_size);
-    void* (*plugin_get_mp3_buffer)(int* buffer_size);
+    void* (*plugin_get_audio_buffer)(int* buffer_size);
 #ifndef SIMULATOR
     int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
     void (*plugin_unregister_timer)(void);
@@ -334,7 +334,7 @@ struct plugin_api {
 /* defined by the plugin loader (plugin.c) */
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
-void* plugin_get_mp3_buffer(int *buffer_size);
+void* plugin_get_audio_buffer(int *buffer_size);
 int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void));
 void plugin_unregister_timer(void);
 void plugin_tsr(void (*exit_callback)(void));

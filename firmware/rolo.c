@@ -120,7 +120,7 @@ int rolo_load(const char* filename)
     }
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
-    if (read(fd, mp3buf, length) != length) {
+    if (read(fd, audiobuf, length) != length) {
         rolo_error("Error Reading File");
         return -1;
     }
@@ -128,7 +128,7 @@ int rolo_load(const char* filename)
     checksum = 0;
     
     for(i = 0;i < length;i++) {
-        checksum += mp3buf[i];
+        checksum += audiobuf[i];
     }
 
     /* Verify checksum against file header */
@@ -162,12 +162,12 @@ int rolo_load(const char* filename)
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     /* verify that file can be read and descrambled */
-    if ((mp3buf + (2*length)+4) >= mp3end) {
+    if ((audiobuf + (2*length)+4) >= audiobufend) {
         rolo_error("Not enough room to load file");
         return -1;
     }
 
-    if (read(fd, &mp3buf[length], length) != (int)length) {
+    if (read(fd, &audiobuf[length], length) != (int)length) {
         rolo_error("Error Reading File");
         return -1;
     }
@@ -175,7 +175,7 @@ int rolo_load(const char* filename)
     lcd_puts(0, 1, "Descramble");
     lcd_update();
 
-    checksum = descramble(mp3buf + length, mp3buf, length);
+    checksum = descramble(audiobuf + length, audiobuf, length);
     
     /* Verify checksum against file header */
     if (checksum != file_checksum) {
@@ -201,7 +201,7 @@ int rolo_load(const char* filename)
     PAIOR = 0x0FA0;
 #endif
 #endif
-    rolo_restart(mp3buf, ramstart, length);
+    rolo_restart(audiobuf, ramstart, length);
 
     return 0; /* this is never reached */
 }

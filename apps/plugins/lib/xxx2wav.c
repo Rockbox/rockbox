@@ -29,9 +29,9 @@ static struct plugin_api* local_rb;
 
 int mem_ptr;
 int bufsize;
-unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
-unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
-unsigned char* filebuf;    // The rest of the MP3 buffer
+unsigned char* audiobuf;     // The actual audio buffer from Rockbox
+unsigned char* mallocbuf;  // 512K from the start of audio buffer
+unsigned char* filebuf;    // The rest of the audio buffer
 
 void* codec_malloc(size_t size) {
   void* x;
@@ -169,11 +169,11 @@ int local_init(char* infilename, char* outfilename, file_info_struct* file_info,
   local_rb=rb;
 
   mem_ptr=0;
-  mp3buf=local_rb->plugin_get_mp3_buffer(&bufsize);
-  mallocbuf=mp3buf;
-  filebuf=&mp3buf[MALLOC_BUFSIZE];
+  audiobuf=local_rb->plugin_get_audio_buffer(&bufsize);
+  mallocbuf=audiobuf;
+  filebuf=&audiobuf[MALLOC_BUFSIZE];
 
-  local_rb->snprintf(s,32,"mp3 bufsize: %d",bufsize);
+  local_rb->snprintf(s,32,"audio bufsize: %d",bufsize);
   local_rb->lcd_putsxy(0,100,s);
   local_rb->lcd_update();
 
