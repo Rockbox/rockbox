@@ -545,7 +545,6 @@ void radio_load_presets(void)
     char buf[128];
     char *freq;
     char *name;
-    int num_presets = 0;
     bool done = false;
     int i;
 
@@ -557,7 +556,7 @@ void radio_load_presets(void)
         if(fd >= 0)
         {
             i = 0;
-            while(!done && num_presets < MAX_PRESETS)
+            while(!done && i < MAX_PRESETS)
             {
                 rc = read_line(fd, buf, 128);
                 if(rc > 0)
@@ -568,8 +567,6 @@ void radio_load_presets(void)
                         strncpy(presets[i].name, name, 27);
                         presets[i].name[27] = 0;
                         i++;
-                        if(num_presets == MAX_PRESETS)
-                            done = true;
                     }
                 }
                 else
