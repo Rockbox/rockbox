@@ -36,9 +36,12 @@
 #include "sound_menu.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "games_menu.h"
 #include "bmp.h"
 #include "icons.h"
+
+#ifdef USE_GAMES
+#include "games_menu.h"
+#endif /* End USE_GAMES */
 
 #ifdef USE_SCREENSAVERS
 #include "screensavers_menu.h"
@@ -203,7 +206,9 @@ Menu main_menu(void)
         { "Sound Settings",     sound_menu        },
         { "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
+#ifdef USE_GAMES
         { "Games",              games_menu        },
+#endif
 #ifdef USE_SCREENSAVERS
         { "Screensavers",       screensavers_menu },
 #endif /* end USE_SCREENSAVERS */
