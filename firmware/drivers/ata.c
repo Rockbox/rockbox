@@ -32,6 +32,8 @@
 
 /* use plain C code in copy_read_sectors(), instead of tweaked assembler */
 #define PREFER_C /* mystery: assembler caused problems with some disks */
+/* use plain C code in copy_write_sectors(), instead of tweaked assembler */
+#define PREFER_C_WRITING /* we don't know yet about this one */
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -208,11 +210,9 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "tst     #1,r0       \n"  /* 16-bit aligned ? */
         "bt      .aligned    \n"  /* yes, do word copy */
 
-        ".align  2           \n"
         /* not 16-bit aligned */
         "mov     #-1,r3      \n"  /* prepare a bit mask for high byte */
-        "extu.b  r3,r3       \n"
-        "swap.b  r3,r3       \n"  /* r3 = 0x0000FF00 */
+        "shll8   r3          \n"  /* r3 = 0xFFFFFF00 */
 
         "mov.w   @%2,r2      \n"  /* read first word (1st round) */
         "add     #-12,%1     \n"  /* adjust end address for offsets */
@@ -220,6 +220,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "bra     .start4_b   \n"  /* jump into loop after next instr. */
         "add     #-5,%0      \n"  /* adjust for dest. offsets; now even */
 
+        ".align  2           \n"
     ".loop4_b:               \n"  /* main loop: copy 4 words in a row */
         "mov.w   @%2,r2      \n"  /* read first word (2+ round) */
         "and     r3,r1       \n"  /* get high byte of fourth word (2+ round) */
@@ -250,10 +251,8 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         /* avg. 6.5 cycles per word - 100% faster */
 
         "swap.b  r1,r0       \n"  /* get high byte of last word */
-        "mov.b   r0,@(4,%0)  \n"  /* and store it */
-
         "bra     .exit       \n"
-        "nop                 \n"
+        "mov.b   r0,@(4,%0)  \n"  /* and store it */
 
         ".align  2           \n"
         /* 16-bit aligned, loop(read and store word) */
@@ -287,7 +286,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "swap.b  r1,r0       \n"  /* swap fourth word (last round) */
         "mov.w   r0,@(4,%0)  \n"  /* and store it */
 
-        ".exit:              \n"
+    ".exit:                  \n"
         : /* outputs */
         : /* inputs */
         /* %0 */ "r"(buf),
@@ -447,6 +446,124 @@ int ata_read_sectors(unsigned long start,
     return ret;
 }
 
+/* the tight loop of ata_write_sectors(), to avoid the whole in IRAM */
+static void copy_write_sectors(unsigned char* buf,
+                               int wordcount)
+                               __attribute__ ((section (".icode")));
+
+static void copy_write_sectors(unsigned char* buf, int wordcount)
+{
+#ifdef PREFER_C_WRITING
+
+    if ( (unsigned int)buf & 1)
+    {   /* not 16-bit aligned, copy byte by byte */
+        unsigned short tmp = 0;
+        unsigned char* bufend = buf + wordcount*2;
+        do
+        {   /* loop compiles to 8 assembler instructions */
+            /* takes 12 clock cycles because of 2 pipeline stalls */
+            tmp = (unsigned short) *buf++;       
+            tmp |= (unsigned short) *buf++ << 8; /* I assume big endian */
+            ATA_DATA = tmp;           /* and don't use the SWAB16 macro */
+        } while (buf < bufend); /* tail loop is faster */
+    }
+    else
+    {   /* 16-bit aligned, can do faster copy */
+        unsigned short* wbuf = (unsigned short*)buf;
+        unsigned short* wbufend = wbuf + wordcount;
+        do
+        {   /* loop compiles to 5 assembler instructions */
+            /* takes 9 clock cycles because of 2 pipeline stalls */
+            ATA_DATA = SWAB16(*wbuf);
+        } while (++wbuf < wbufend); /* tail loop is faster */
+    }
+#else
+    /* optimized assembler version */
+    /* this assumes wordcount to be a multiple of 2 */
+
+/* writing is not unrolled as much as reading, for several reasons:
+ * - a similar instruction sequence is faster for writing than for reading
+ *   because the auto-incrementing load inctructions can be used
+ * - writing profits from warp mode
+ * Both of these add up to have writing faster than the more unrolled reading.
+ */
+    asm (
+        "add     %1,%1       \n"  /* wordcount -> bytecount */
+        "add     %0,%1       \n"  /* bytecount -> bufend */
+        "mov     %0,r0       \n"
+        "tst     #1,r0       \n"  /* 16-bit aligned ? */
+        "bt      .w_aligned  \n"  /* yes, do word copy */
+
+        /* not 16-bit aligned */
+        "mov     #-1,r6      \n"  /* prepare a bit mask for high byte */
+        "shll8   r6          \n"  /* r6 = 0xFFFFFF00 */
+
+        "mov.b   @%0+,r2     \n"  /* load (initial old second) first byte */
+        "add     #-4,%1      \n"  /* adjust end address for early check */
+        "mov.w   @%0+,r3     \n"  /* load (initial) first word */
+        "bra     .w_start2_b \n"
+        "extu.b  r2,r0       \n"  /* extend unsigned */
+
+        ".align  2           \n"
+    ".w_loop2_b:             \n"  /* main loop: copy 2 words in a row */
+        "mov.w   @%0+,r3     \n"  /* load first word (2+ round) */
+        "extu.b  r2,r0       \n"  /* put away low byte of second word (2+ round) */
+        "and     r6,r2       \n"  /* get high byte of second word (2+ round) */
+        "or      r1,r2       \n"  /* combine with low byte of old first word */
+        "mov.w   r2,@%2      \n"  /* write that */
+    ".w_start2_b:            \n"
+        "cmp/hi  %0,%1       \n"  /* check for end */
+        "mov.w   @%0+,r2     \n"  /* load second word */
+        "extu.b  r3,r1       \n"  /* put away low byte of first word */
+        "and     r6,r3       \n"  /* get high byte of first word */
+        "or      r0,r3       \n"  /* combine with high byte of old second word */
+        "mov.w   r3,@%2      \n"  /* write that */
+        "bt      .w_loop2_b  \n"
+        /* 12 instructions for 2 copies, takes 14 clock cycles */
+        /* avg. 7 cycles per word - 71% faster */
+
+        /* the loop "overreads" 1 byte past the buffer end, however, the last */
+        /* byte is not written to disk */
+        "and     r6,r2       \n"  /* get high byte of last word */
+        "or      r1,r2       \n"  /* combine with low byte of old first word */
+        "bra     .w_exit     \n"
+        "mov.w   r2,@%2      \n"  /* write last word */
+
+        /* 16-bit aligned, loop(load and write word) */
+    ".w_aligned:             \n"
+        "mov.w   @%0+,r2     \n"  /* load first word (1st round) */
+        "bra     .w_start2_w \n"  /* jump into loop after next instr. */
+        "add     #-4,%1      \n"  /* adjust end address for early check */
+
+        ".align  2           \n"
+    ".w_loop2_w:             \n"  /* main loop: copy 2 words in a row */
+        "mov.w   @%0+,r2     \n"  /* load first word (2+ round) */
+        "swap.b  r1,r0       \n"  /* swap second word (2+ round) */
+        "mov.w   r0,@%2      \n"  /* write second word (2+ round) */
+    ".w_start2_w:            \n"
+        "cmp/hi  %0,%1       \n"  /* check for end */
+        "mov.w   @%0+,r1     \n"  /* load second word */
+        "swap.b  r2,r0       \n"  /* swap first word */
+        "mov.w   r0,@%2      \n"  /* write first word */
+        "bt      .w_loop2_w  \n"
+        /* 8 instructions for 2 copies, takes 10 clock cycles */
+        /* avg. 5 cycles per word - 80% faster */
+
+        "swap.b  r1,r0       \n"  /* swap second word (last round) */
+        "mov.w   r0,@%2      \n"  /* and write it */
+
+    ".w_exit:                \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(buf),
+        /* %1 */ "r"(wordcount),
+        /* %2 */ "r"(&ATA_DATA)
+        : /*trashed */
+        "r0","r1","r2","r3","r6"
+    );
+#endif
+}
+
 int ata_write_sectors(unsigned long start,
                       int count,
                       void* buf)
@@ -502,7 +619,7 @@ int ata_write_sectors(unsigned long start,
     ATA_COMMAND = CMD_WRITE_SECTORS;
 
     for (i=0; i<count; i++) {
-        int j;
+
         if (!wait_for_start_of_transfer()) {
             ret = -3;
             break;
@@ -515,11 +632,7 @@ int ata_write_sectors(unsigned long start,
             poweroff = false;
         }
 
-        for (j=0; j<SECTOR_SIZE/2; j++) {
-            ATA_DATA = (unsigned short)
-                (((unsigned char *)buf)[j*2+1] << 8) |
-                ((unsigned char *)buf)[j*2];
-        }
+        copy_write_sectors(buf, SECTOR_SIZE/2);
 
 #ifdef USE_INTERRUPT
         /* reading the status register clears the interrupt */
