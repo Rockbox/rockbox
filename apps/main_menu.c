@@ -137,33 +137,39 @@ void show_info(void)
     char s[32];
     int buflen = ((mp3end - mp3buf) * 100) / 0x100000;
     int integer, decimal;
-    
-    lcd_clear_display();
-    lcd_puts(0, 0, "Rockbox info:");
-    /* TODO: add disk size/usage info, battery charge etc here? */
+    bool done = false;
 
-    integer = buflen / 100;
-    decimal = buflen % 100;
+    while(!done)
+    {
+        lcd_clear_display();
+        lcd_puts(0, 0, "Rockbox info:");
+        
+        integer = buflen / 100;
+        decimal = buflen % 100;
 #ifdef HAVE_LCD_CHARCELLS
-    snprintf(s, sizeof(s), "Buf: %d.%02dMb", integer, decimal);
-    lcd_puts(0, 0, s);
+        snprintf(s, sizeof(s), "Buf: %d.%02dMb", integer, decimal);
+        lcd_puts(0, 0, s);
 #else
-    snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
-    lcd_puts(0, 2, s);
+        snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
+        lcd_puts(0, 2, s);
+#endif
+        
+#ifdef HAVE_LCD_CHARCELLS
+        snprintf(s, sizeof(s), "Batt: %d%%", battery_level());
+        lcd_puts(0, 1, s);
+#else
+        snprintf(s, sizeof(s), "Battery: %d%%", battery_level());
+        lcd_puts(0, 3, s);
 #endif
     
-#ifdef HAVE_LCD_CHARCELLS
-    snprintf(s, sizeof(s), "Batt: %d%%", battery_level());
-    lcd_puts(0, 1, s);
-#else
-    snprintf(s, sizeof(s), "Battery: %d%%", battery_level());
-    lcd_puts(0, 3, s);
-#endif
-    
-    lcd_update();
+        lcd_update();
 
-    /* Wait for a key to be pushed */
-    while(button_get(true) & BUTTON_REL);
+        sleep(HZ/2);
+        
+        /* Wait for a key to be pushed */
+        if(button_get(false) & ~BUTTON_REL)
+            done = true;
+    }
 }
 
 void main_menu(void)
