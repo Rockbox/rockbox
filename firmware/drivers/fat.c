@@ -167,7 +167,7 @@ static unsigned int getcurrdostime(unsigned short *dosdate,
                                    unsigned short *dostime,
                                    unsigned char *dostenth);
 static int create_dos_name(unsigned char *name, unsigned char *newname);
-static int find_free_cluster(int start);
+static unsigned int find_free_cluster(unsigned int start);
 #endif
 
 #define FAT_CACHE_SIZE 0x20
@@ -438,10 +438,10 @@ static void *cache_fat_sector(int fatsector)
     return sectorbuf;
 }
 
-static int find_free_cluster(int startcluster)
+static unsigned int find_free_cluster(unsigned int startcluster)
 {
-    int sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
-    int offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
+    unsigned int sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
+    unsigned int offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
     int i;
 
     /* don't waste time scanning if the disk is already full */
@@ -511,7 +511,7 @@ static int update_fat_entry(unsigned int entry, unsigned int val)
     return 0;
 }
 
-static int read_fat_entry(int entry)
+static int read_fat_entry(unsigned int entry)
 {
     int sector = entry / CLUSTERS_PER_FAT_SECTOR;
     int offset = entry % CLUSTERS_PER_FAT_SECTOR;
@@ -998,24 +998,23 @@ int fat_create_file(char* name,
     return err;
 }
 
-int fat_closewrite(struct fat_file *file, int size)
+int fat_truncate(struct fat_file *file)
 {
-    int next, last = file->lastcluster;
-    int endcluster = last;
-
-    LDEBUGF("fat_closewrite(size=%d, last=%x)\n",size, last);
-
     /* truncate trailing clusters */
-    last = get_next_cluster(last);
+    int next;
+    int last = get_next_cluster(file->lastcluster);
     while ( last && last != FAT_EOF_MARK ) {
         next = get_next_cluster(last);
         update_fat_entry(last,0);
         last = next;
     }
 
-    /* if no cluster was written, size is 0 */
-    if (!endcluster)
-        size = 0;
+    return 0;
+}
+
+int fat_closewrite(struct fat_file *file, int size)
+{
+    LDEBUGF("fat_closewrite(size=%d)\n",size);
 
     if (!size) {
         /* empty file */
@@ -1024,18 +1023,17 @@ int fat_closewrite(struct fat_file *file, int size)
             file->firstcluster = 0;
         }
     }
-    else
-        update_fat_entry(endcluster, FAT_EOF_MARK);
 
     if (file->dirsector)
         update_dir_entry(file, size);
     flush_fat();
 
 #ifdef TEST_FAT
-    {
+    if ( file->firstcluster ) {
         /* debug */
         int count = 0;
         int len;
+        int next;
         for ( next = file->firstcluster; next;
               next = get_next_cluster(next) )
             LDEBUGF("cluster %d: %x\n", count++, next);
@@ -1213,7 +1211,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     return i;
 }
 
-int fat_seek(struct fat_file *file, int seeksector )
+int fat_seek(struct fat_file *file, unsigned int seeksector )
 {
     int clusternum=0, sectornum=0, sector=0;
     int cluster = file->firstcluster;
