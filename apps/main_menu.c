@@ -151,17 +151,19 @@ extern unsigned char mp3end[];
 bool show_info(void)
 {
     char s[32];
-    int buflen = ((mp3end - mp3buf) * 100) / 0x100000;
+    int buflen = ((mp3end - mp3buf) * 1000) / 0x100000;
     int integer, decimal;
     bool done = false;
+    int key;
+    int state=0;
 
     while(!done)
     {
         lcd_clear_display();
         lcd_puts(0, 0, str(LANG_ROCKBOX_INFO));
         
-        integer = buflen / 100;
-        decimal = buflen % 100;
+        integer = buflen / 1000;
+        decimal = buflen % 1000;
 #ifdef HAVE_LCD_CHARCELLS
         snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_PLAYER), integer, decimal);
         lcd_puts(0, 0, s);
@@ -192,11 +194,22 @@ bool show_info(void)
     
         lcd_update();
 
-        sleep(HZ/2);
-        
         /* Wait for a key to be pushed */
-        if(button_get(false) & ~BUTTON_REL)
-            done = true;
+        key = button_get_w_tmo(HZ/2);
+        if(key) {
+            switch(state) {
+            case 0:
+                /* first, a non-release event */
+                if(!(key&BUTTON_REL))
+                    state++;
+                break;
+            case 1:
+                /* then a release-event */
+                if(key&BUTTON_REL)
+                    done = true;
+                break;
+            }
+        }
     }
 
     return false;
@@ -242,3 +255,10 @@ bool main_menu(void)
 
     return result;
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../firmware/rockbox-mode.el")
+ * end:
+ * vim: et sw=4 ts=8 sts=4 tw=78
+ */
