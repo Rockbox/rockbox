@@ -334,10 +334,10 @@ static bool line_in_rect(int startx, int starty, int endx, int endy, int x, int 
     compa = MIN(compa, compb);
     compb = MAX(temp, compb);
 
-    if (simplemin <= simple && simple < simplemax) {
-        if ((compmin <= compa && compa < compmax) ||
-            (compmin <= compb && compb < compmax) ||
-            (compa <= compmin && compb > compmax)) {
+    if (simplemin <= simple && simple <= simplemax) {
+        if ((compmin <= compa && compa <= compmax) ||
+            (compmin <= compb && compb <= compmax) ||
+            (compa <= compmin && compb >= compmax)) {
             retval = true;
         }
     }
@@ -473,7 +473,7 @@ static bool worm_food_collision(struct worm *w, int foodIndex)
     bool retVal = false;
 
     retVal = worm_in_rect(w, foodx[foodIndex], foody[foodIndex], 
-                          FOOD_SIZE, FOOD_SIZE);
+                          FOOD_SIZE - 1, FOOD_SIZE - 1);
 
     return retVal;
 }
@@ -512,7 +512,7 @@ static bool worm_argh_collision(struct worm *w, int arghIndex)
     bool retVal = false;
 
     retVal = worm_in_rect(w, arghx[arghIndex], arghy[arghIndex], 
-                          ARGH_SIZE, ARGH_SIZE);
+                          ARGH_SIZE - 1, ARGH_SIZE - 1);
 
     return retVal;
 }
@@ -1507,6 +1507,20 @@ static void test_worm_food_collision(void) {
 
 }
 
+
+static bool expensive_worm_in_rect(struct worm *w, int rx, int ry, int rw, int rh){
+    int x, y;
+    bool retVal = false;
+    for (x = rx; x < rx + rw; x++){
+        for (y = ry; y < ry + rh; y++) {
+            if (specific_worm_collision(w, x, y) != -1) {
+                retVal = true;
+            }
+        }
+    }
+    return retVal;
+}
+
 static void test_worm_argh_collision(void) {
     int i;
     int dir;
@@ -1738,6 +1752,26 @@ static int testline_in_rect(void) {
         testfailed = 13;
     }
 
+    /* test 14 */
+    rx = 9;
+    ry = 15;
+    rw = 4;
+    rh = 4;
+
+    x1 = 10;
+    y1 = 10;
+    x2 = 10;
+    y2 = 19;
+    if (!(line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
+        line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_invertrect(rx, ry, rw, rh);
+        lcd_putsxy(0, 0, "failed 14", 0);
+        lcd_update();
+        button_get(true);
+        testfailed = 14;
+    }
+
     lcd_clear_display();
 
     return testfailed;
@@ -1789,50 +1823,64 @@ static void test_make_argh(void){
     int seed = 0;
     int hit = 0;
     int failures = 0;
+    int last_failures = 0;
+    int i, worm_idx;
     lcd_clear_display();
-    init_worm(&worms[0], 10, 20);
-    add_growing(&worms[0], 40 - INITIAL_WORM_LENGTH);
+    worm_count = 3;
+
+    for (worm_idx = 0; worm_idx < worm_count; worm_idx++) {
+        init_worm(&worms[worm_idx], 10 + worm_idx * 20, 20);
+        add_growing(&worms[worm_idx], 40 - INITIAL_WORM_LENGTH);
+    }
 
     for (dir = EAST; dir < EAST + 4; dir++) {
-        int i;
-        set_worm_dir(&worms[0], dir % 4);
+        for (worm_idx = 0; worm_idx < worm_count; worm_idx++) {
+            set_worm_dir(&worms[worm_idx], dir % 4);
         for (i = 0; i < 10; i++) {
             if (!(dir % 4 == NORTH && i == 9)) {
-                move_worm(&worms[0]);
-                draw_worm(&worms[0]);
+                    move_worm(&worms[worm_idx]);
+                    draw_worm(&worms[worm_idx]);
+                }
             }
         }
     }
 
     lcd_update();
 
-    srand(seed);
     for (seed = 0; hit < 20; seed += 2) {
-        int x = rand() % (FIELD_RECT_WIDTH  - ARGH_SIZE);
-        int y = rand() % (FIELD_RECT_HEIGHT - ARGH_SIZE);
-        
-        if (worm_in_rect(&worms[0], x, y, ARGH_SIZE, ARGH_SIZE)) {
             char buf[20];
-            srand(seed);
-            make_argh(0);
-            draw_argh(0);
-            lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y, ARGH_SIZE, ARGH_SIZE);
+        int x, y;
+        srand(seed);
+        x = rand() % (FIELD_RECT_WIDTH  - ARGH_SIZE);
+        y = rand() % (FIELD_RECT_HEIGHT - ARGH_SIZE);
 
-            if (x == arghx[0] && y == arghy[0]) {
+        for (worm_idx = 0; worm_idx < worm_count; worm_idx++){
+            if (expensive_worm_in_rect(&worms[worm_idx], x, y, ARGH_SIZE, ARGH_SIZE)) {
+                int tries = 0;
+            srand(seed);
+
+                tries = make_argh(0);
+                if ((x == arghx[0] && y == arghy[0]) || tries < 2) {
                 failures ++;
             }
 
-            snprintf(buf, sizeof buf, "hit at x%d y%d fail%d", x, y, failures);
+                snprintf(buf, sizeof buf, "(%d;%d) fail%d try%d", x, y, failures, tries);
             lcd_putsxy(0, LCD_HEIGHT - 8, buf, 0);
             lcd_update();
+                lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y, ARGH_SIZE, ARGH_SIZE);
+                lcd_update();
+                draw_argh(0);
+                lcd_update();
             lcd_invertrect(x + FIELD_RECT_X, y + FIELD_RECT_Y, ARGH_SIZE, ARGH_SIZE);
             lcd_clearrect(arghx[0] + FIELD_RECT_X, arghy[0] + FIELD_RECT_Y, ARGH_SIZE, ARGH_SIZE);
 
-            if (failures > 0) {
+                if (failures > last_failures) {
                 button_get(true);
             }
+                last_failures = failures;
             hit ++;
         }
+    }
     }
 }
 
@@ -1847,7 +1895,7 @@ static void test_worm_argh_collision_in_moves(void) {
     draw_argh(0);
 
     set_worm_dir(&worms[0], EAST);
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 20; i++) {
         char buf[20];
         move_worm(&worms[0]);
         draw_worm(&worms[0]);
@@ -1857,10 +1905,14 @@ static void test_worm_argh_collision_in_moves(void) {
         snprintf(buf, sizeof buf, "in 5 moves hits: %d", hit_count);
         lcd_putsxy(0, LCD_HEIGHT - 8, buf, 0);
         lcd_update();
+    }    
+    if (hit_count != ARGH_SIZE + 5) {
         button_get(true);
     }    
 }
 #endif /* DEBUG_WORMLET */
+
+extern bool use_old_rect;
 
 /**
  * Main entry point from the menu to start the game control.
@@ -1870,14 +1922,13 @@ Menu wormlet(void)
     bool wormDead = false;
     int button;
 #ifdef DEBUG_WORMLET
+    testline_in_rect();
     test_worm_argh_collision_in_moves();
     test_make_argh();
-    testline_in_rect();
     test_worm_food_collision();
     test_worm_argh_collision();
     test_specific_worm_collision();
 #endif 
-
     lcd_setmargins(0,0);
 
     /* Setup screen */
@@ -1912,7 +1963,6 @@ Menu wormlet(void)
             }
         }
         lcd_puts(0, 2, buf);
-        
         lcd_update();
 
         /* user selection */
