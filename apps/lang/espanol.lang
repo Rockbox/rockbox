@@ -727,7 +727,9 @@ new: "PLAY=Acepta OFF=Cancela"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
+### English phrase was changed! Previous translation was made on:
+### "Shutting Down..."
+eng: "Alarm Set"
 voice: ""
 new: "Apagándose..."
 
@@ -948,26 +950,42 @@ voice: "Buffer Anti-salto"
 new: "Buffer Anti-salto"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
-desc: Abort alternative in player keyboard interaction
-eng: "Abort"
+### Description changed! Previous description was:
+### "Abort alternative in player keyboard interaction"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Abort"
+eng: ""
 voice: ""
 new: "Abortar"
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: Accept alternative in player keyboard interaction
-eng: "Accept"
+### Description changed! Previous description was:
+### "Accept alternative in player keyboard interaction"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Accept"
+eng: ""
 voice: ""
 new: "Aceptar"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: Backspace alternative in player keyboard interaction
-eng: "Backspace"
+### Description changed! Previous description was:
+### "Backspace alternative in player keyboard interaction"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Backspace"
+eng: ""
 voice: ""
 new: "Retroceso"
 
 id: LANG_PLAYER_KEYBOARD_DELETE
-desc: Delete alternative in player keyboard interaction
-eng: "Delete"
+### Description changed! Previous description was:
+### "Delete alternative in player keyboard interaction"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Delete"
+eng: ""
 voice: ""
 new: "Borrar"
 
@@ -2968,3 +2986,9 @@ desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Mostrar pantalla de grabación al encender"
 new: "Mostrar pantalla de grabación al encender"
+
+id: LANG_ALARM_MOD_DISABLE
+desc: Announce that the RTC alarm has been turned off
+eng: "Alarm Disabled"
+voice: "Alarma Desactivada"
+new: "Alarma Desactivada"
