@@ -104,8 +104,7 @@ switch_thread(void)
 }
 
 /*--------------------------------------------------------------------------- 
- * Create thread. Stack is aligned at 32 byte boundary to fit cache line.
- * > 220 bytes allocated on top for exception handlers as per EABI spec.
+ * Create thread.
  * Return 0 if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
