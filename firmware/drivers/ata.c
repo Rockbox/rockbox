@@ -392,7 +392,7 @@ static int ata_perform_sleep(void)
 #ifdef USE_SLEEP
     ATA_COMMAND = CMD_SLEEP;
 #else
-    ATA_COMMAND = CMD_STANDBY;
+    ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
 #endif
 
     if (!wait_for_rdy())
