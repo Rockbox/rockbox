@@ -353,14 +353,12 @@ int settings_save( void )
         ((global_settings.avc & 0x03) | 
          ((global_settings.channel_config & 0x07) << 2));
 
-#if 0
     *((short*)(&config_block[0x12])) = global_settings.resume_index;
     *((short*)(&config_block[0x14])) = global_settings.resume_first_index;
-    *((int*)(&config_block[0x16])) = global_settings.resume_offset;
+    memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
     DEBUGF( "+Resume index %X offset %X\n",
             global_settings.resume_index,
             global_settings.resume_offset );
-#endif
 
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
     config_block[0x1b] = (unsigned char)
@@ -372,9 +370,7 @@ int settings_save( void )
         (global_settings.flip_display ? 0x40 : 0) |
         (global_settings.rec_editable?0x80:0);
 
-#if 0
-    *((int*)(&config_block[0x1d])) = global_settings.resume_seed;
-#endif
+    memcpy(&config_block[0x1d], &global_settings.resume_seed, 4);
 
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
@@ -664,7 +660,7 @@ void settings_load(void)
             global_settings.resume_first_index= *((short*)(&config_block[0x14]));
 
         if (config_block[0x16] != 0xFF)
-            global_settings.resume_offset = *((int*)(&config_block[0x16]));
+            memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
 
         if (config_block[0x1a] != 0xFF)
             global_settings.disk_spindown = config_block[0x1a];
@@ -685,7 +681,7 @@ void settings_load(void)
         }
 
         if (config_block[0x1d] != 0xFF)
-            global_settings.resume_seed = *((int*)(&config_block[0x1d]));
+            memcpy(&global_settings.resume_seed,&config_block[0x1d], 4);
 
         if (config_block[0x21] != 0xFF)
         {
