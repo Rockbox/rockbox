@@ -227,9 +227,9 @@ int button_set_release(int newmask)
  
 /* Button analog voltage levels */
 #define	LEVEL1		250
-#define	LEVEL2		450
-#define	LEVEL3		650
-#define	LEVEL4		850
+#define	LEVEL2		500
+#define	LEVEL3		700
+#define	LEVEL4		900
 
 /*
  *Initialize buttons
