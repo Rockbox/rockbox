@@ -606,7 +606,11 @@ static void add_track_to_tag_list(char *filename)
     {
         /* grab id3 tag of new file and
            remember where in memory it starts */
-        mp3info(&(t->id3), filename);
+        if(mp3info(&(t->id3), filename))
+        {
+            DEBUGF("Bad mp3\n");
+            return;
+        }
         t->mempos = mp3buf_write;
         t->id3.elapsed = 0;
         if(!append_tag(t))
@@ -1220,14 +1224,23 @@ bool mpeg_has_changed_track(void)
 void mpeg_play(int offset)
 {
 #ifdef SIMULATOR
-    char* trackname = playlist_next( 0, NULL );
-    if ( trackname ) {
-        mp3info(&taginfo, trackname);
-        taginfo.offset = offset;
-        set_elapsed(&taginfo);
-        playing = true;
-    }
-    (void)offset;
+    char* trackname;
+    int steps=0;
+
+    do {
+        trackname = playlist_next( steps, NULL );
+        if ( trackname ) {
+            if(mp3info(&taginfo, trackname)) {
+                /* bad mp3, move on */
+                steps++;
+                continue;
+            }
+            taginfo.offset = offset;
+            set_elapsed(&taginfo);
+            playing = true;
+            break;
+        }
+    } while(1);
 #else
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
 #endif
@@ -1267,10 +1280,19 @@ void mpeg_next(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
 #else
-    char* file = playlist_next(1,NULL);
-    mp3info(&taginfo, file);
-    current_track_counter++;
-    playing = true;
+    char* file;
+    int steps = 1;
+
+    do {
+        file = playlist_next(steps, NULL);
+        if(mp3info(&taginfo, file)) {
+            steps++;
+            continue;
+        }
+        current_track_counter++;
+        playing = true;
+        break;
+    } while(1);
 #endif
 }
 
@@ -1279,10 +1301,19 @@ void mpeg_prev(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
 #else
-    char* file = playlist_next(-1,NULL);
-    mp3info(&taginfo, file);
-    current_track_counter++;
-    playing = true;
+    char* file;
+    int steps = -1;
+
+    do {
+        file = playlist_next(steps, NULL);
+        if(mp3info(&taginfo, file)) {
+            steps--;
+            continue;
+        }
+        current_track_counter++;
+        playing = true;
+        break;
+    } while(1);
 #endif
 }
 
@@ -1638,3 +1669,9 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);
 }
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "rockbox-mode.el")
+ * end:
+ */
