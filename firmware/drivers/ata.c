@@ -376,8 +376,11 @@ int ata_write_sectors(unsigned long start,
             poweroff = false;
         }
 
-        for (j=0; j<SECTOR_SIZE/2; j++)
-            ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
+        for (j=0; j<SECTOR_SIZE/2; j++) {
+            ATA_DATA = (unsigned short)
+                (((unsigned char *)buf)[j*2+1] << 8) |
+                ((unsigned char *)buf)[j*2];
+        }
 
 #ifdef USE_INTERRUPT
         /* reading the status register clears the interrupt */
