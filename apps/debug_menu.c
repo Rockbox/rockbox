@@ -349,18 +349,14 @@ bool dbg_hw_info(void)
     snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
     lcd_puts(0, 3, buf);
     
-    snprintf(buf, 32, "ATA: 0x%x,%s", ata_io_address,
-             ata_device ? "slave":"master");
-    lcd_puts(0, 4, buf);
-    
     snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
-    lcd_puts(0, 5, buf);
+    lcd_puts(0, 4, buf);
     
     if (got_id)
         snprintf(buf, 32, "Flash: M=%02x D=%02x", manu, id);
     else
         snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
-    lcd_puts(0, 6, buf);
+    lcd_puts(0, 5, buf);
 
     if (has_bootrom)
     {
@@ -372,8 +368,13 @@ bool dbg_hw_info(void)
     {
         snprintf(buf, 32, "Boot ROM: none");
     }
+    lcd_puts(0, 6, buf);
+
+#ifndef HAVE_MMC /* have ATA */
+    snprintf(buf, 32, "ATA: 0x%x,%s", ata_io_address,
+             ata_device ? "slave":"master");
     lcd_puts(0, 7, buf);
-    
+#endif    
     lcd_update();
 
     while(1)
@@ -580,11 +581,11 @@ bool dbg_ports(void)
         snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
                  battery_level());
         lcd_puts(0, 6, buf);
-
+#ifndef HAVE_MMC /* have ATA */
         snprintf(buf, 32, "ATA: %s, 0x%x",
                  ata_device?"slave":"master", ata_io_address);
         lcd_puts(0, 7, buf);
-
+#endif
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
