@@ -1673,19 +1673,19 @@ new: "Menü"
 id: LANG_FM_BUTTONBAR_PRESETS
 desc:  in button bar
 eng: "Preset"
-voice: "Sender"
+voice: ""
 new: "Sender"
 
 id: LANG_FM_SAVE_PRESET
 desc:  in radio screen
 eng: "Save preset"
-voice: "Sender speichern"
+voice: ""
 new: "Sender speichern"
 
 id: LANG_FM_DELETE_PRESET
 desc:  in radio screen
 eng: "Remove preset"
-voice: "Sender entfernen"
+voice: ""
 new: "Sender entfernen"
 
 id: LANG_FM_STATION
@@ -1722,7 +1722,7 @@ id: LANG_FM_BUTTONBAR_RECORD
 desc:  in main menu
 eng: "Record"
 voice: ""
-new: "Aufnehmen"
+new: "Aufn."
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -2707,3 +2707,39 @@ desc: browser sorting setting
 eng: "by type"
 voice: "nach Typ"
 new: "nach Typ"
+
+id: LANG_FM_EDIT_PRESET
+desc:  in radio screen
+eng: "Edit preset"
+voice: ""
+new: "Sender bearbeiten"
+
+id: LANG_FM_MONO_MODE
+desc:  in radio screen
+eng: "Force mono"
+voice: ""
+new: "Mono erzwingen"
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc:  in radio screen
+eng: "Exit"
+voice: ""
+new: "Ende"
+
+id: LANG_FM_BUTTONBAR_EDIT
+desc:  in radio screen
+eng: "Edit"
+voice: ""
+new: "Bearb."
+
+id: LANG_FM_BUTTONBAR_ADD
+desc:  in radio screen
+eng: "Add"
+voice: ""
+new: "Hinzu"
+
+id: LANG_FM_BUTTONBAR_ACTION
+desc:  in radio screen
+eng: "Action"
+voice: ""
+new: "Aktion"
