@@ -82,13 +82,33 @@ void dbg_dir(struct bpb *bpb, int currdir)
     {
         while(fat_getnext(bpb, &dent, &de) >= 0)
         {
-            printf("%s\n", de.name);
+            printf("%s (%d)\n", de.name,de.firstcluster);
         }
     }
     else
     {
         fprintf(stderr, "Could not read dir on cluster %d\n", currdir);
     }
+}
+
+void dbg_type(struct bpb *bpb, int cluster)
+{
+    unsigned char buf[SECTOR_SIZE*5];
+    struct fat_fileent ent;
+    int i;
+
+    fat_open(bpb,cluster,&ent);
+    
+    for (i=0;i<5;i++)
+        if(fat_read(bpb, &ent, 1, buf) >= 0)
+        {
+            buf[SECTOR_SIZE]=0;
+            printf("%s\n", buf);
+        }
+        else
+        {
+            fprintf(stderr, "Could not read file on cluster %d\n", cluster);
+        }
 }
 
 char current_directory[256] = "\\";
@@ -105,7 +125,6 @@ void dbg_console(struct bpb* bpb)
     char last_cmd[32] = "";
     int quit = 0;
     char *s;
-    int secnum;
 
     while(!quit)
     {
@@ -123,7 +142,7 @@ void dbg_console(struct bpb* bpb)
             {
                 if(!strcasecmp(s, "dir"))
                 {
-                    secnum = 0;
+                    int secnum = 0;
                     if((s = strtok(NULL, " \n")))
                     {
                         secnum = atoi(s);
@@ -147,6 +166,17 @@ void dbg_console(struct bpb* bpb)
                     }
                     printf("secnum: %d\n", last_secnum);
                     dbg_dump_sector(last_secnum);
+                    continue;
+                }
+
+                if(!strcasecmp(s, "type"))
+                {
+                    int cluster = 0;
+                    if((s = strtok(NULL, " \n")))
+                    {
+                        cluster = atoi(s);
+                    }
+                    dbg_type(bpb,cluster);
                     continue;
                 }
             
