@@ -1692,13 +1692,13 @@ new:
 id: LANG_FM_SAVE_PRESET
 desc:  in radio screen
 eng: "Save preset"
-voice: "Save preset"
+voice: ""
 new:
 
 id: LANG_FM_DELETE_PRESET
 desc:  in radio screen
 eng: "Remove preset"
-voice: "Remove preset"
+voice: ""
 new:
 
 id: LANG_FM_STATION
@@ -2725,35 +2725,35 @@ new:
 id: LANG_FM_EDIT_PRESET
 desc:  in radio screen
 eng: "Edit preset"
-voice: "Edit preset"
+voice: ""
 new:
 
 id: LANG_FM_MONO_MODE
 desc:  in radio screen
 eng: "Force mono"
-voice: "Force mono"
+voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc:  in radio screen
 eng: "Exit"
-voice: "Exit"
+voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_EDIT
 desc:  in radio screen
 eng: "Edit"
-voice: "Edit"
+voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_ADD
 desc:  in radio screen
 eng: "Add"
-voice: "Add"
+voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc:  in radio screen
 eng: "Action"
-voice: "Action"
+voice: ""
 new:
