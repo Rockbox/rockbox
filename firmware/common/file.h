@@ -20,6 +20,7 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
+#undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 
 #ifndef SEEK_SET
