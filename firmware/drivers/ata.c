@@ -112,8 +112,7 @@ static int wait_for_bsy(void)
     int timeout = current_tick + HZ*10;
     last_disk_activity = timeout;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
-        sleep_thread();
-    wake_up_thread();
+        yield();
 
     if (TIME_BEFORE(current_tick, timeout))
         return 1;
@@ -132,10 +131,8 @@ static int wait_for_rdy(void)
     timeout = current_tick + HZ*10;
     last_disk_activity = timeout;
 
-    while (TIME_BEFORE(current_tick, timeout) &&
-           !(ATA_ALT_STATUS & STATUS_RDY))
-        sleep_thread();
-    wake_up_thread();
+    while (TIME_BEFORE(current_tick, timeout) && !(ATA_ALT_STATUS & STATUS_RDY))
+        yield();
 
     if (TIME_BEFORE(current_tick, timeout))
         return STATUS_RDY;
