@@ -391,7 +391,7 @@ static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
 
     while ((ch = *str++) != '\0' && x < LCD_WIDTH)
     {
-        int width;
+        int gwidth, width;
 
         /* check input range */
         if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
@@ -403,8 +403,8 @@ static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
             break;
 
         /* get proportional width and glyph bits */
-        width = pf->width ? pf->width[ch] : pf->maxwidth;
-        width = MIN (width, LCD_WIDTH - x);
+        gwidth = pf->width ? pf->width[ch] : pf->maxwidth;
+        width = MIN (gwidth, LCD_WIDTH - x);
 
         if (ofs != 0)
         {
@@ -418,11 +418,22 @@ static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
 
         if (width > 0)
         {
-            int rows = (pf->height + 7) / 8;
-            bitmap_t* bits = pf->bits + 
+        	int i;
+            bitmap_t* bits = pf->bits +
                 (pf->offset ? pf->offset[ch] : (pf->height * ch));
-            lcd_bitmap (((unsigned char*) bits) + ofs*rows, x, y,
-                        width, pf->height, true);
+
+            if (ofs != 0)
+            {
+            	for (i = 0; i < pf->height; i += 8)
+            	{
+            		lcd_bitmap (((unsigned char*) bits) + ofs, x, y + i, width,
+            		            MIN(8, pf->height - i), true);
+            		((unsigned char *)bits) += gwidth;
+            	}
+            }
+            else
+                lcd_bitmap ((unsigned char*) bits, x, y, gwidth,
+                            pf->height, true);
             x += width;
         }
         ofs = 0;
