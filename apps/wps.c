@@ -44,6 +44,9 @@
 #include "ajf.h"
 #endif
 
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
+                                /* 3% of 30min file == 54s step size */
+
 #ifdef HAVE_LCD_BITMAP
     #define PLAY_DISPLAY_2LINEID3        0 
     #define PLAY_DISPLAY_FILENAME_SCROLL 1 
@@ -714,6 +717,9 @@ int wps_show(void)
     int old_release_mask;
     int button;
     int ff_rewind_count = 0;
+    unsigned int ff_rewind_step = 0; /* current rewind step size */
+    unsigned int ff_rewind_max_step = 0; /* max rewind step size */
+    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */
     bool ignore_keyup = true;
     bool restore = false;
 
@@ -853,7 +859,16 @@ int wps_show(void)
                 {
                     if (ff_rewind)
                     {
-                        ff_rewind_count -= global_settings.ff_rewind*1000;
+                        ff_rewind_count -= ff_rewind_step;
+                        if (global_settings.ff_rewind_accel != 0 &&
+                            current_tick >= ff_rewind_accel_tick)
+                        {
+                            ff_rewind_step *= 2;
+                            if (ff_rewind_step > ff_rewind_max_step)
+                                ff_rewind_step = ff_rewind_max_step;
+                            ff_rewind_accel_tick = current_tick +
+                                global_settings.ff_rewind_accel*HZ;
+                        }
                     }
                     else
                     {
@@ -867,7 +882,14 @@ int wps_show(void)
                             status_set_playmode(STATUS_FASTBACKWARD);
                             status_draw();
                             ff_rewind = true;
-                            ff_rewind_count = -global_settings.ff_rewind*1000;
+                            ff_rewind_max_step =
+                                id3->length * FF_REWIND_MAX_PERCENT / 100;
+                            ff_rewind_step = global_settings.ff_rewind*1000;
+                            if (ff_rewind_step > ff_rewind_max_step)
+                                ff_rewind_step = ff_rewind_max_step;
+                            ff_rewind_count = -ff_rewind_step;
+                            ff_rewind_accel_tick = current_tick +
+                                global_settings.ff_rewind_accel*HZ;
                         }
                         else
                             break;
@@ -886,7 +908,16 @@ int wps_show(void)
                 {
                     if (ff_rewind)
                     {
-                        ff_rewind_count += global_settings.ff_rewind*1000;
+                        ff_rewind_count += ff_rewind_step;
+                        if (global_settings.ff_rewind_accel != 0 &&
+                            current_tick >= ff_rewind_accel_tick)
+                        {
+                            ff_rewind_step *= 2;
+                            if (ff_rewind_step > ff_rewind_max_step)
+                                ff_rewind_step = ff_rewind_max_step;
+                            ff_rewind_accel_tick = current_tick +
+                                global_settings.ff_rewind_accel*HZ;
+                        }
                     }
                     else
                     {
@@ -900,7 +931,14 @@ int wps_show(void)
                             status_set_playmode(STATUS_FASTFORWARD);
                             status_draw();
                             ff_rewind = true;
-                            ff_rewind_count = global_settings.ff_rewind*1000;
+                            ff_rewind_max_step =
+                                id3->length * FF_REWIND_MAX_PERCENT / 100;
+                            ff_rewind_step = global_settings.ff_rewind*1000;
+                            if (ff_rewind_step > ff_rewind_max_step)
+                                ff_rewind_step = ff_rewind_max_step;
+                            ff_rewind_count = ff_rewind_step;
+                            ff_rewind_accel_tick = current_tick +
+                                global_settings.ff_rewind_accel*HZ;
                         }
                         else
                             break;

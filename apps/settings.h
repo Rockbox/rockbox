@@ -64,6 +64,7 @@ struct user_settings
     int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
     int ff_rewind;     /* FF/Rewind step size (in seconds) */
+    int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
 
     /* while playing screen settings  */
@@ -78,7 +79,6 @@ struct user_settings
     
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
-
 };
 
 /* prototypes */
@@ -116,5 +116,6 @@ extern struct user_settings global_settings;
 #define DEFAULT_BACKLIGHT_SETTING   5
 #define DEFAULT_WPS_DISPLAY         0 
 #define DEFAULT_FF_REWIND_SETTING   2
+#define DEFAULT_FF_REWIND_ACCEL_SETTING 3
 
 #endif /* __SETTINGS_H__ */

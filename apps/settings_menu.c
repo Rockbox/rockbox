@@ -179,6 +179,16 @@ static Menu spindown(void)
     return MENU_OK;
 }
 
+static Menu ff_rewind_accel(void)
+{
+    char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ",
+                      "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ",
+                      "2x/8s ", "2x/9s ", "2x/10s" };
+    set_option("[FF/Rewind Accel]", &global_settings.ff_rewind_accel,
+               names, 11 );
+    return MENU_OK;
+}
+
 Menu settings_menu(void)
 {
     int m;
@@ -200,6 +210,7 @@ Menu settings_menu(void)
 #endif
         { "Show hidden files", show_hidden_files },
         { "FF/Rewind",       ff_rewind       },
+        { "FF/Rewind Accel", ff_rewind_accel },
         { "Resume",          resume          },
         { "Disk spindown",   spindown        },
     };
