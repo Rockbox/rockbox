@@ -159,6 +159,9 @@ void main_menu(void)
 /*---------------------------------------------------*/
 #ifndef SIMULATOR
 #ifdef ARCHOS_RECORDER
+extern int ata_device;
+extern int ata_io_address;
+
 /* Test code!!! */
 void dbg_ports(void)
 {
@@ -180,8 +183,6 @@ void dbg_ports(void)
 	lcd_puts(0, 0, buf);
 	snprintf(buf, 32, "PBDR: %04x", portb);
 	lcd_puts(0, 1, buf);
-	snprintf(buf, 32, "PCDR: %02x", portc);
-	lcd_puts(0, 2, buf);
 
 	snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
 	lcd_puts(0, 3, buf);
@@ -191,6 +192,10 @@ void dbg_ports(void)
 	lcd_puts(0, 5, buf);
 	snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
 	lcd_puts(0, 6, buf);
+
+	snprintf(buf, 32, "%s : 0x%x",
+             ata_device?"slave":"master", ata_io_address);
+	lcd_puts(0, 7, buf);
 	
 	lcd_update();
 	sleep(HZ/10);
