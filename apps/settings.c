@@ -37,6 +37,7 @@
 #include "backlight.h"
 #include "powermgmt.h"
 #include "status.h"
+#include "atoi.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -395,19 +396,20 @@ void settings_load(void)
 }
 
 #ifdef CUSTOM_EQ
-/ *
-  * Loads a .eq file
-  * /
+/*
+ * Loads a .eq file
+ */
 bool settings_load_eq(char* file)
 {
     char buffer[128];
     char buf_set[16];
+    char buf_disp[16];
     char buf_val[8];
     int fd;
     int i;
-    unsigned int j;
     int d = 0;
     int vtype = 0;
+
 
     fd = open(file, O_RDONLY);
     
@@ -443,12 +445,31 @@ bool settings_load_eq(char* file)
                                 buf_val[d++] = buffer[i];
                                 break;
                             case 3:
-                                if(strcasecmp(buf_set,"volume"))
-                                {
-                                   global_settings.volume = 0;
-                                   for(j=0;j<strlen(buf_val);j++)
-                                       global_settings.volume = global_settings.volume *
-                                           10 + (buf_val[j] - '0');
+                                lcd_clear_display();
+                                snprintf(buf_disp,sizeof(buf_disp),"[%s]", buf_set);
+                                lcd_puts(0,0,buf_disp);
+                                lcd_puts(0,1,buf_val);
+                                sleep(HZ/2);
+                                if (!strcasecmp(buf_set,"volume")) {
+                                    global_settings.volume = (atoi(buf_val)/2);
+                                } else
+                                if (!strcasecmp(buf_set,"bass")) {
+                                    if (buf_val[0] == '-')
+                                        global_settings.bass = mpeg_val2phys(SOUND_BASS,(15-atoi(buf_val+1)));
+                                    else
+                                        global_settings.bass = mpeg_val2phys(SOUND_BASS,(atoi(buf_val)+15));
+                                } else
+                                if (!strcasecmp(buf_set,"treble")) {
+                                    if (buf_val[0] == '-')
+                                        global_settings.treble = (15-atoi(buf_val+1));
+                                    else
+                                        global_settings.treble = (atoi(buf_val)+15);
+                                }
+                                if (!strcasecmp(buf_set,"balance")) {
+                                    if (buf_val[0] == '-')
+                                        global_settings.balance = (25-(atoi(buf_val+1)/2));
+                                    else
+                                        global_settings.balance = ((atoi(buf_val)/2)+25);
                                 }
                                 vtype = 0;
                                 break;
