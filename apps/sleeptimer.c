@@ -31,6 +31,7 @@
 #include "status.h"
 #include "debug.h"
 #include "talk.h"
+#include "icons.h"
 
 #include "lang.h"
 
@@ -41,9 +42,6 @@
 
 bool sleeptimer_screen(void)
 {
-#ifdef HAVE_LCD_BITMAP
-    int w, h;
-#endif
     unsigned long seconds;
     int hours, minutes;
     int button;
@@ -56,9 +54,10 @@ bool sleeptimer_screen(void)
     bool sayit = true;
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("M", &w, &h);
-    lcd_setmargins(w, 8);
+    if (global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
 #endif
     
     lcd_clear_display();
@@ -149,7 +148,7 @@ bool sleeptimer_screen(void)
         else
         {
             lcd_puts(0, 1, str(LANG_OFF));
-            if (sayit)
+            if (sayit && global_settings.talk_menu)
             {
                 talk_id(LANG_OFF, false);
                 sayit = false;
