@@ -20,6 +20,7 @@
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
+APPSCOMMON = ../common
 SIMDIR = ../win32/
 APPDIR = ../../apps/
 RECDIR = $(APPDIR)recorder/
@@ -46,7 +47,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb" /c
 SRCS = *.c \
 	$(DRIVERS)/lcd.c $(DRIVERS)/power.c \
 	$(APPDIR)*.c \
-	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/usb.c \
+	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/usb.c $(FIRMWAREDIR)/mpeg.c \
         $(COMMON)/sprintf.c $(COMMON)/strtok.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")

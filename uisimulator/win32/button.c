@@ -27,10 +27,27 @@
 #define KEY(k)      (HIBYTE(GetKeyState (k)) & 1)
 
 int last_key ;
+static int release_mask;
+static int repeat_mask;
+
 
 void button_init(void) 
 { 
 	last_key = 0 ;
+}
+
+int button_set_repeat(int newmask)
+{
+    int oldmask = repeat_mask;
+    repeat_mask = newmask;
+    return oldmask;
+}
+
+int button_set_release(int newmask)
+{
+    int oldmask = release_mask;
+    release_mask = newmask;
+    return oldmask;
 }
 
 int button_get(bool block)
