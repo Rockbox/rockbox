@@ -40,13 +40,6 @@
 #include "dir-win32.h"
 #endif
 
-#if defined(WIN32) && defined(__MINGW32__)
-/* when building with cross-compiled mingw on Linux for win32, these protos
-   are missing */
-int _commit(int fd);
-int snprintf (char *buf, size_t size, const char *fmt, ...);
-#endif
-
 #define MAX_PATH 260
 
 #include <fcntl.h>
