@@ -111,7 +111,7 @@ typedef enum
 /* result of the CheckBootROM() function */
 typedef enum
 {
-    eBootROM, /* the supported boot ROM */
+    eBootROM, /* the supported boot ROM(s) */
     eUnknown, /* unknown boot ROM */
     eROMless, /* flash mapped to zero */
 } tCheckROM;
@@ -558,7 +558,12 @@ tCheckROM CheckBootROM(void)
     unsigned i;
 
     boot_crc = crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
-    if (boot_crc == 0x56DBA4EE) /* the known boot ROM */
+    if (boot_crc == 0x56DBA4EE  /* the known boot ROM */
+#if PLATFORM_ID == ID_PLAYER
+        /* alternative boot ROM found in one single player so far */
+        || boot_crc == 0x358099E8
+#endif
+       )
         return eBootROM;
 
     /* check if ROM is a flash mirror */
