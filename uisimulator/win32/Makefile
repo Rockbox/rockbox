@@ -55,8 +55,6 @@ no_configure:
 	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
 endif
 
-LANGUAGE = english
-
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
 $(TARGET) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES)
 
@@ -146,14 +144,19 @@ clean:
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
 	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
 	$(OBJDIR)/credits.raw $(OBJDIR)/libplugin.a
+	$(RM) -f $(OBJDIR)/UI256.bmp
 	$(RM) -r $(DEPS)
 
 ################## Specific dependencies ##################
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl $(APPDIR)/credits.pl < $< > $@
 
-$(OBJDIR)/uisw32-res.o: uisw32.rc
-	$(WINDRES) -i $< -o $@
+$(OBJDIR)/UI256.bmp: UI-$(ARCHOS).bmp
+	@echo UI
+	@cp $< $@
+
+$(OBJDIR)/uisw32-res.o: uisw32.rc $(OBJDIR)/UI256.bmp
+	$(WINDRES) -I$(OBJDIR) -i $< -o $@
 
 $(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.raw
 

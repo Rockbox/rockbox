@@ -251,12 +251,12 @@ BOOL GUIStartup ()
     // create window
     hGUIWnd = CreateWindowEx (
         WS_EX_OVERLAPPEDWINDOW,
-        "RockBoxUISimulator", "ARCHOS JukeBox",
+        "RockBoxUISimulator", UI_TITLE,
         WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         UI_WIDTH + GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4,
         UI_HEIGHT + GetSystemMetrics (SM_CYSIZEFRAME) * 2 +
-        GetSystemMetrics (SM_CYSMCAPTION) +4,
+        GetSystemMetrics (SM_CYCAPTION) +4,
         NULL, NULL, GetModuleHandle (NULL), NULL);
 
     if (hGUIWnd == NULL)
