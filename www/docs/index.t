@@ -11,6 +11,13 @@
 <li> <a href="custom_wps_format.html">How to make a custom WPS</a>
 <li> <a href="custom_cfg_format.html">How to make a custom config file</a>
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
+
+<li> Good external user forums devoted to Archos: <a
+href="http://forums.funmp3players.com/forum/forum.asp?forum_id=8&forum_title=General+%2D+Jukebox+Player%2FRecorder">funmp3players.com</a>
+and <a
+href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000 on
+yahoo</a>.
+
 </ul>
 
 <h2>For <a href="http://www.catb.org/~esr/faqs/hacker-howto.html">hackers</a></h2>
