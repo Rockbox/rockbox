@@ -570,12 +570,6 @@ main (int argc, char **argv)
 
   XSync (dpy, False);
 
-  /* This is the one and only place that the random-number generator is
-     seeded in any screenhack.  You do not need to seed the RNG again,
-     it is done for you before your code is invoked. */
-# undef ya_rand_init
-  ya_rand_init ((int) time ((time_t *) 0));
-
   screenhack (dpy, window); /* doesn't return */
   return 0;
 }

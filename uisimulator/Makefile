@@ -28,8 +28,7 @@ LDFLAGS = -lX11 -lm -lXt -lXmu -lsocket -lnsl
 
 DEPEND = .depends
 
-OBJS=   alpha.o screenhack.o yarandom.o uibasic.o resources.o visual.o\
-	lcd.o lcd-x11.o
+OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o
 
 SRCS = $(OBJS:%.o=%.c)
 HDRS = $(OBJS:%.o=%.h)
