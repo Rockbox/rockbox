@@ -78,7 +78,7 @@ void ss_loop(void)
 
         i+=factor;
 
-        sleep(10);
+        sleep(HZ/10);
     }
 }
 
@@ -124,7 +124,7 @@ void screensaver(void)
     lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off,0);
 
     lcd_update();
-    sleep(150);
+    sleep(HZ/2);
     ss_loop();
 }
 
