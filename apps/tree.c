@@ -117,7 +117,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_EXIT  BUTTON_LEFT
 #define TREE_ENTER BUTTON_RIGHT
 #define TREE_MENU  BUTTON_F1
-#define RELEASE_MASK (BUTTON_OFF)
+#define RELEASE_MASK (BUTTON_OFF | BUTTON_F2 | BUTTON_F3)
 #else
 #define TREE_NEXT  BUTTON_RIGHT
 #define TREE_PREV  BUTTON_LEFT
@@ -760,22 +760,31 @@ bool dirbrowse(char *root)
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3: {
-#ifdef HAVE_LCD_BITMAP
-                  unsigned char state;
-                  state = global_settings.statusbar << 1 | global_settings.scrollbar;
-                  state = (state + 1) % 4;
-                  global_settings.statusbar = state >> 1;
-                  global_settings.scrollbar = state & 0x1;
-                  settings_save();
-#ifdef LOADABLE_FONTS
-                  tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
-#else
-                  tree_max_on_screen = TREE_MAX_ON_SCREEN;
-#endif
-                  restore = true;
-#endif
+            case BUTTON_F2:
+                if (f2_screen()) {
+                    /* reread root dir */
+                    strcpy(currdir, "/");
+                    lastdir[0] = 0;
+                    dirlevel = 0;
+                    dircursor = 0;
                 }
+                restore = true;
+                break;
+
+            case BUTTON_F3:
+                if (f3_screen()) {
+                    /* reread root dir */
+                    strcpy(currdir, "/");
+                    lastdir[0] = 0;
+                    dirlevel = 0;
+                    dircursor = 0;
+                }
+#ifdef LOADABLE_FONTS
+                tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#else
+                tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
+                restore = true;
                 break;
 #endif
 

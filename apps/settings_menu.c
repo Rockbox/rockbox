@@ -50,11 +50,13 @@ static Menu contrast(void)
     return MENU_OK;
 }
 
+#ifndef HAVE_RECORDER_KEYPAD
 static Menu shuffle(void)
 {
     set_bool( "[Shuffle]", &global_settings.playlist_shuffle );
     return MENU_OK;
 }
+#endif
 
 static Menu mp3_filter(void)
 {
@@ -169,7 +171,9 @@ Menu settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
+#ifndef HAVE_RECORDER_KEYPAD
         { "Shuffle",         shuffle         }, 
+#endif
         { "MP3/M3U filter",  mp3_filter      },
         { "Sort mode",       sort_case       },
         { "Backlight Timer", backlight_timer },

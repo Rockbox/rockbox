@@ -31,7 +31,31 @@ enum icons_6x8 {
     LastIcon
 };
 
+/* Symbolic names for icons */
+enum icons_5x8 {
+    Icon_Lock
+};
+
+enum icons_7x8 {
+    Icon_Plug,
+    Icon_Speaker,
+    Icon_Mute,
+    Icon_Play,
+    Icon_Stop,
+    Icon_Pause,
+    Icon_FastForward,
+    Icon_FastBackward,
+    Icon_Record,
+    Icon_RecPause,
+    Icon_Normal,
+    Icon_Repeat,
+    Icon_Shuffle,
+    Icon_Last
+};
+
+extern unsigned char bitmap_icons_5x8[1][5];
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
+extern unsigned char bitmap_icons_7x8[Icon_Last][7];
 
 extern unsigned char rockbox112x37[];
 
@@ -56,28 +80,6 @@ extern unsigned char slider_bar[];
 #define LOCK_X_POS            STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+ICON_PLAY_MODE_WIDTH+ICON_SHUFFLE_WIDTH+2+2+2+2+2+2
 #define LOCK_WIDTH            5
 #define TIME_X_END            STATUSBAR_WIDTH-1
-
-/* Symbolic names for icons */
-enum
-{
-    Icon_Lock = 0
-};
-enum
-{
-    Icon_Plug = 0,
-    Icon_Speaker,
-    Icon_Mute,
-    Icon_Play,
-    Icon_Stop,
-    Icon_Pause,
-    Icon_FastForward,
-    Icon_FastBackward,
-    Icon_Record,
-    Icon_RecPause,
-    Icon_Normal,
-    Icon_Repeat,
-    Icon_Shuffle
-};
 
 extern void statusbar_wipe(void);
 extern void statusbar_icon_battery(int percent, bool charging);

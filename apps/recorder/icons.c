@@ -36,7 +36,7 @@ unsigned char slider_bar[] =
     0x7c, 0x28, 0x28, 0x28, 0x28, 0x38
 };
 
-static unsigned char bitmap_icon_5x8[][5] =
+unsigned char bitmap_icons_5x8[][5] =
 {
     /* Lock */
     {0x78,0x7f,0x49,0x7f,0x78}
@@ -70,7 +70,7 @@ unsigned char bitmap_icons_6x8[LastIcon][6] =
     { 0x63, 0x7f, 0x3a, 0x7f, 0x63, 0x00 },
 };
 
-static unsigned char bitmap_icon_7x8[][7] =
+unsigned char bitmap_icons_7x8[][7] =
 {
     /* Power plug */
     {0x08,0x1c,0x3e,0x3e,0x3e,0x14,0x14},
@@ -190,7 +190,7 @@ void statusbar_icon_battery(int percent, bool charging)
 
     /* draw power plug if charging */
     if (charging)
-        lcd_bitmap(bitmap_icon_7x8[Icon_Plug], ICON_PLUG_X_POS,
+        lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
                    STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
 };
 
@@ -217,7 +217,7 @@ void statusbar_icon_volume(int percent)
         volume = 100;
 
     if (volume==0) {
-        lcd_bitmap(bitmap_icon_7x8[Icon_Mute], 
+        lcd_bitmap(bitmap_icons_7x8[Icon_Mute], 
                    ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 - 4,
                    STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
     }
@@ -259,7 +259,7 @@ void statusbar_icon_volume(int percent)
  */
 void statusbar_icon_play_state(int state)
 {
-    lcd_bitmap(bitmap_icon_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS,
+    lcd_bitmap(bitmap_icons_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS,
                ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
@@ -268,7 +268,7 @@ void statusbar_icon_play_state(int state)
  */
 void statusbar_icon_play_mode(int mode)
 {
-    lcd_bitmap(bitmap_icon_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS,
+    lcd_bitmap(bitmap_icons_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS,
                ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
@@ -277,7 +277,7 @@ void statusbar_icon_play_mode(int mode)
  */
 void statusbar_icon_shuffle(void)
 {
-    lcd_bitmap(bitmap_icon_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, 
+    lcd_bitmap(bitmap_icons_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, 
                STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
@@ -286,7 +286,7 @@ void statusbar_icon_shuffle(void)
  */
 void statusbar_icon_lock(void)
 {
-    lcd_bitmap(bitmap_icon_5x8[Icon_Lock], LOCK_X_POS, 
+    lcd_bitmap(bitmap_icons_5x8[Icon_Lock], LOCK_X_POS, 
                STATUSBAR_Y_POS, 5, 8, false);
 }
 

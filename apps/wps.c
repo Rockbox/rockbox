@@ -49,7 +49,7 @@
                                 /* 3% of 30min file == 54s step size */
 
 #ifdef HAVE_RECORDER_KEYPAD
-#define RELEASE_MASK (BUTTON_F1 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP)
+#define RELEASE_MASK (BUTTON_F1 | BUTTON_F2 | BUTTON_F3 | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_UP)
 #else
 #define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP | BUTTON_LEFT | BUTTON_RIGHT | BUTTON_PLAY)
 #endif
@@ -629,6 +629,153 @@ static bool menu(void)
     return false;
 }
 
+#ifdef HAVE_LCD_BITMAP
+bool f2_screen(void)
+{
+    bool exit = false;
+
+    lcd_stop_scroll();
+
+    while (!exit) {
+        int w,h;
+        char* ptr;
+
+        ptr = "Repeat";
+#ifdef LCD_PROPFONTS
+        lcd_getstringsize(ptr,0,&w,&h);
+#else
+        lcd_getfontsize(0,&w,&h);
+        w *= strlen(ptr);
+#endif
+
+        lcd_clear_display();
+
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Shuffle", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, "mode:", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2, 
+                   global_settings.playlist_shuffle ? "on" : "off", 0);
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+
+        /* commented out until we really can disable repeat
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, 0);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "mode:", 0);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, "on", 0 );
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+        */
+        lcd_update();
+
+        switch (button_get(true)) {
+            case BUTTON_LEFT:
+            case BUTTON_F2 | BUTTON_LEFT:
+                global_settings.playlist_shuffle =
+                    !global_settings.playlist_shuffle;
+
+                if (global_settings.playlist_shuffle)
+                    randomise_playlist(current_tick);
+                else
+                    sort_playlist(true);
+                break;
+
+            case BUTTON_RIGHT:
+            case BUTTON_F2 | BUTTON_RIGHT:
+                /* toggle repeat */
+                break;
+
+#ifdef SIMULATOR
+            case BUTTON_F2:
+#else
+            case BUTTON_F2 | BUTTON_REL:
+#endif
+                exit = true;
+                break;
+
+#ifndef SIMULATOR
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                return true;
+#endif
+        }
+    }
+
+    settings_save();
+
+    return false;
+}
+
+bool f3_screen(void)
+{
+    bool exit = false;
+
+    lcd_stop_scroll();
+
+    while (!exit) {
+        int w,h;
+        char* ptr;
+
+        ptr = "Status";
+#ifdef LCD_PROPFONTS
+        lcd_getstringsize(ptr,0,&w,&h);
+#else
+        lcd_getfontsize(0,&w,&h);
+        w *= strlen(ptr);
+#endif
+
+        lcd_clear_display();
+
+        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, "Scroll", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h, "bar:", 0);
+        lcd_putsxy(0, LCD_HEIGHT/2, 
+                   global_settings.scrollbar ? "on" : "off", 0);
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, 0);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "bar:", 0);
+        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
+                   global_settings.statusbar ? "on" : "off", 0 );
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+        lcd_update();
+
+        switch (button_get(true)) {
+            case BUTTON_LEFT:
+            case BUTTON_F3 | BUTTON_LEFT:
+                global_settings.scrollbar = !global_settings.scrollbar;
+                break;
+
+            case BUTTON_RIGHT:
+            case BUTTON_F3 | BUTTON_RIGHT:
+                global_settings.statusbar = !global_settings.statusbar;
+                break;
+
+#ifdef SIMULATOR
+            case BUTTON_F3:
+#else
+            case BUTTON_F3 | BUTTON_REL:
+#endif
+                exit = true;
+                break;
+
+#ifndef SIMULATOR
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                return true;
+#endif
+        }
+    }
+
+    settings_save();
+    if (global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
+
+    return false;
+}
+#endif
+
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
@@ -777,15 +924,18 @@ int wps_show(void)
                 restore = true;
                 break;
 
-                /* toggle status bar */
 #ifdef HAVE_RECORDER_KEYPAD
+                /* play settings */
+            case BUTTON_F2:
+                if (f2_screen())
+                    return SYS_USB_CONNECTED;
+                restore = true;
+                break;
+
+                /* screen settings */
             case BUTTON_F3:
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
+                if (f3_screen())
+                    return SYS_USB_CONNECTED;
                 restore = true;
                 break;
 #endif

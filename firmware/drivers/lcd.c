@@ -797,7 +797,6 @@ extern unsigned char char_dw_8x8_prop[][9];
 int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h)
 {
     int width=0;
-    int height=0;
     unsigned char ch, byte;
     (void)font;
 
@@ -811,12 +810,9 @@ int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h)
 
         byte = char_dw_8x8_prop[ch][8];
         width += (byte>>4) + 1;
-        if((byte & 0x0f) > height)
-            height = byte & 0x0f;
-
     }
     *w = width;
-    *h = height;
+    *h = 8;
 
     return width;
 }
@@ -851,7 +847,7 @@ void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
             break;
 
         src = char_dw_8x8_prop[ch];
-        lcd_clearrect (lcd_x+nx, lcd_y, 1, ny);
+        lcd_clearrect (lcd_x+nx, lcd_y, 1, ny );
         lcd_bitmap (src, lcd_x, lcd_y, nx, ny, true);
 
         lcd_x += nx+1;
@@ -928,7 +924,7 @@ void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
     }
 #endif
 
-    while (((ch = *str++) != '\0') && (lcd_x + nx < LCD_WIDTH))
+    while (((ch = *str++) != '\0') && (lcd_x + nx <= LCD_WIDTH))
     {
         if (lcd_y + ny > LCD_HEIGHT)
             return;
