@@ -153,5 +153,5 @@ int rand(void)
         y ^= (y >> 18);
     }
 
-    return y & 0x7fffffff; /* 31-bit limit by Björn Stenberg*/
+    return (y & 0xfffffffe) >> 1; /* 31-bit limit by Björn Stenberg*/
 }
