@@ -632,8 +632,9 @@ A70: We have no way of knowing the correct contrast setting from start and the
      you like the contrast)
 
 Q71: Where are the FM controls for the FM Recorder?
-A71: There aren't any.  This is not yet implemented under Rockbox.  FM Recorder
-     support in general is new.  Be patient.
+A71: In Rockbox 2.0 and earlier, FM support was not yet developed. FM tuner
+     support is only available using the very latest versions of the Rockbox
+     builds for the FM Recorder.
 
 Q72: I installed/renamed ajbrec.ajz (or archos.mod) but I am still booting
      with another version of firmware.
