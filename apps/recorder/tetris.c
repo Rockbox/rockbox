@@ -136,7 +136,7 @@ void draw_block(int x,int y,int block,int frame,bool clear)
     }
 }
 
-void to_virtual()
+void to_virtual(void)
 {
     int i;
     for(i=0;i < 4;i++)
@@ -145,7 +145,7 @@ void to_virtual()
           (current_x+block_data[current_b][current_f][0][i])) = current_b+1;
 }
 
-bool gameover()
+bool gameover(void)
 {
     int i;
     int frame, block, y, x;
@@ -185,7 +185,7 @@ bool valid_position(int x,int y,int block,int frame)
     return true;
 }
 
-void from_virtual()
+void from_virtual(void)
 {
     int x,y;
     for(y=0;y < max_y;y++)
@@ -219,7 +219,7 @@ void move_block(int x,int y,int f)
         current_f = last_frame;
 }
 
-void new_block()
+void new_block(void)
 {
     current_b = next_b;
     current_f = next_f;
@@ -238,7 +238,7 @@ void new_block()
         draw_block(current_x,current_y,current_b,current_f,false);
 }
 
-int check_lines()
+int check_lines(void)
 {
     int x,y,i;
     bool line;
@@ -262,7 +262,7 @@ int check_lines()
     return lines;
 }
 
-void move_down()
+void move_down(void)
 {
     int l;
     if(!valid_position(current_x,current_y+1,current_b,current_f))
@@ -329,7 +329,7 @@ void game_loop(void)
     }
 }
 
-void init_tetris()
+void init_tetris(void)
 {
     memset(&virtual, 0, sizeof(virtual));
     start_x = 1;
