@@ -444,26 +444,30 @@ bool recording_screen(void)
                 
 #ifdef REC_SETTINGS
             case REC_SETTINGS:
-                if (recording_menu(false))
-                    return SYS_USB_CONNECTED;
-                settings_save();
+                if(mpeg_status() != MPEG_STATUS_RECORD)
+                {
+                    invert_led(false);
+                    if (recording_menu(false))
+                        return SYS_USB_CONNECTED;
+                    settings_save();
 
-                if (global_settings.rec_prerecord_time)
-                    talk_buffer_steal(); /* will use the mp3 buffer */
+                    if (global_settings.rec_prerecord_time)
+                        talk_buffer_steal(); /* will use the mp3 buffer */
 
-                mpeg_set_recording_options(global_settings.rec_frequency,
-                                           global_settings.rec_quality,
-                                           global_settings.rec_source,
-                                           global_settings.rec_channels,
-                                           global_settings.rec_editable,
-                                           global_settings.rec_prerecord_time);
+                    mpeg_set_recording_options(global_settings.rec_frequency,
+                                               global_settings.rec_quality,
+                                               global_settings.rec_source,
+                                               global_settings.rec_channels,
+                                               global_settings.rec_editable,
+                                               global_settings.rec_prerecord_time);
                 
-                set_gain();
+                    set_gain();
 
-                update_countdown = 1; /* Update immediately */
+                    update_countdown = 1; /* Update immediately */
 
-                lcd_setfont(FONT_SYSFIXED);
-                lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
+                    lcd_setfont(FONT_SYSFIXED);
+                    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
+                }
                 break;
 #endif
 
