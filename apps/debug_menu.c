@@ -46,7 +46,7 @@ extern char *thread_name[];
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
-void dbg_os(void)
+Menu dbg_os(void)
 {
     char buf[32];
     int button;
