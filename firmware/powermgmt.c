@@ -57,6 +57,10 @@ void set_poweroff_timeout(int timeout)
     (void)timeout;
 }
 
+void set_battery_capacity(int capacity)
+{
+  (void)capacity;
+}
 #else /* not SIMULATOR */
 
 static int poweroff_idle_timeout_value[15] =
