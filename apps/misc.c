@@ -23,6 +23,7 @@
 #include "sprintf.h"
 #include "errno.h"
 #include "system.h"
+#include "timefuncs.h"
 
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
@@ -102,7 +103,7 @@ int main(int argc, char **argv)
 
 #endif
 
-#ifdef SCREENDUMP
+#ifdef HAVE_LCD_BITMAP
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 static unsigned char bmpheader[] =
 {
@@ -117,7 +118,6 @@ static unsigned char bmpheader[] =
 static unsigned char buf[112*8];
 static unsigned char buf2[112*8];
 static char dummy[2] = {0, 0};
-static int fileindex = 0;
 
 void screen_dump(void)
 {
@@ -125,6 +125,7 @@ void screen_dump(void)
     int i, shift;
     int x, y;
     char filename[MAX_PATH];
+    struct tm *tm = get_time();
 
     i = 0;
     for(y = 0;y < LCD_HEIGHT/8;y++)
@@ -151,7 +152,9 @@ void screen_dump(void)
         }
     }
 
-    snprintf(filename, MAX_PATH, "/dump%03d.bmp", fileindex++);
+    snprintf(filename, MAX_PATH, "/dump %04d-%02d-%02d %02d-%02d-%02d.bmp",
+             tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
+             tm->tm_hour, tm->tm_min, tm->tm_sec);
     f = creat(filename, O_WRONLY);
     if(f >= 0)
     {

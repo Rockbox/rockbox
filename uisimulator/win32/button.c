@@ -23,6 +23,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
+#include "misc.h"
 
 /* how long until repeat kicks in */
 #define REPEAT_START      6
@@ -88,6 +89,15 @@ void button_event(int key, bool pressed)
     case VK_NUMPAD5:
     case VK_SPACE:
         new_btn = BUTTON_PLAY;
+        break;
+
+    case VK_NUMPAD0:
+    case VK_F5:
+        if(pressed)
+        {
+            screen_dump();
+            return;
+        }
         break;
 #else
     case VK_RETURN:

@@ -1612,6 +1612,18 @@ static bool dbg_sound(void)
     return false;
 }
 
+#ifdef HAVE_LCD_BITMAP
+extern bool do_screendump_instead_of_usb;
+
+bool dbg_screendump(void)
+{
+    do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
+    splash(HZ, true, "Screendump %s",
+                 do_screendump_instead_of_usb?"enabled":"disabled");
+    return false;
+}
+#endif
+
 bool debug_menu(void)
 {
     int m;
@@ -1635,6 +1647,7 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "View battery", -1, view_battery },
+        { "Screendump", -1, dbg_screendump },
 #endif
         { "View HW info", -1, dbg_hw_info },
         { "View partitions", -1, dbg_partitions },

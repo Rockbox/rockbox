@@ -19,6 +19,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"
+#include "misc.h"
 
 #include "X11/keysym.h"
 
@@ -131,6 +132,15 @@ static int get_raw_button (void)
 	case XK_3:
 	    k = BUTTON_F3;
             break;
+
+        case XK_5:
+            if(!release)
+            {
+                screen_dump();
+                return 0;
+            }
+            break;
+
 #else
 	case XK_KP_Add:
 	case XK_Q:

@@ -30,3 +30,8 @@ char *num2max5(unsigned int bytes, char *max5);
  * stored in buffer.
  */
 int read_line(int fd, char* buffer, int buffer_size);
+
+#ifdef HAVE_LCD_BITMAP
+/* Save a .BMP file containing the current screen contents. */
+void screen_dump(void);
+#endif

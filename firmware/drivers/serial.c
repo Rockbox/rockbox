@@ -35,12 +35,6 @@
 #define VOLUP 0xD0
 #define VOLDN 0xE0
 
-#ifdef SCREENDUMP
-#define SCRDMP 0xF0
-
-static void screen_dump(void);
-#endif
-
 void serial_setup (void) 
 {
     /* Set PB10 function to serial Rx */
@@ -118,11 +112,6 @@ int remote_control_rx(void)
                     last_valid_button = BUTTON_RC_RIGHT;
                     break;
                     
-#ifdef SCREENDUMP
-                case SCRDMP:
-                    screen_dump();
-                    break;
-#endif
                 default:
                     last_valid_button = BUTTON_NONE;
                     break;
@@ -144,43 +133,3 @@ int remote_control_rx(void)
 
     return ret;
 }
-
-#ifdef SCREENDUMP
-static void serial_enable_tx(void)
-{
-    SCR1 |= 0x20;
-}
-
-static void serial_tx(unsigned char ch)
-{
-    while (!(SSR1 & SCI_TDRE))
-    {
-        ;
-    }
-    
-    /*
-     * Write data into TDR and clear TDRE
-     */
-    TDR1 = ch;
-    SSR1 &= ~SCI_TDRE;
-}
-
-static void screen_dump(void)
-{
-    int x, y;
-    int level;
-
-    serial_enable_tx();
-
-    level = set_irq_level(HIGHEST_IRQ_LEVEL);
-    for(y = 0;y < LCD_HEIGHT/8;y++)
-    {
-        for(x = 0;x < LCD_WIDTH;x++)
-        {
-            serial_tx(lcd_framebuffer[y][x]);
-        }
-    }
-    set_irq_level(level);
-}
-
-#endif

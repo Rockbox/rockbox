@@ -35,6 +35,11 @@
 
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
+#ifdef HAVE_LCD_BITMAP
+bool do_screendump_instead_of_usb = false;
+void screen_dump(void);   /* Nasty again. Defined in apps/ too */
+#endif
+
 #define USB_REALLY_BRAVE
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
@@ -149,13 +154,24 @@ static void usb_thread(void)
         switch(ev.id)
         {
             case USB_INSERTED:
-                /* Tell all threads that they have to back off the ATA.
-                   We subtract one for our own thread. */
-                num_acks_to_expect =
-                    queue_broadcast(SYS_USB_CONNECTED, NULL) - 1;
-                waiting_for_ack = true;
-                DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
-                       num_acks_to_expect);
+#ifdef HAVE_LCD_BITMAP
+                if(do_screendump_instead_of_usb)
+                {
+                    screen_dump();
+                }
+                else
+                {
+#endif
+                    /* Tell all threads that they have to back off the ATA.
+                       We subtract one for our own thread. */
+                    num_acks_to_expect =
+                        queue_broadcast(SYS_USB_CONNECTED, NULL) - 1;
+                    waiting_for_ack = true;
+                    DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
+                           num_acks_to_expect);
+#ifdef HAVE_LCD_BITMAP
+                }
+#endif
                 break;
        
             case SYS_USB_CONNECTED_ACK:
@@ -181,24 +197,31 @@ static void usb_thread(void)
                 break;
 
             case USB_EXTRACTED:
-                if(usb_state == USB_INSERTED)
+#ifdef HAVE_LCD_BITMAP
+                if(!do_screendump_instead_of_usb)
                 {
-                    /* Only disable the USB mode if we really have enabled it
-                       some threads might not have acknowledged the
-                       insertion */
-                    usb_slave_mode(false);
-                }
+#endif
+                    if(usb_state == USB_INSERTED)
+                    {
+                        /* Only disable the USB mode if we really have enabled it
+                           some threads might not have acknowledged the
+                           insertion */
+                        usb_slave_mode(false);
+                    }
 
-                usb_state = USB_EXTRACTED;
-                
-                /* Tell all threads that we are back in business */
-                num_acks_to_expect =
-                    queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
-                waiting_for_ack = true;
-                DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
-                       num_acks_to_expect);
+                    usb_state = USB_EXTRACTED;
+                    
+                    /* Tell all threads that we are back in business */
+                    num_acks_to_expect =
+                        queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
+                    waiting_for_ack = true;
+                    DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
+                           num_acks_to_expect);
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_USB, false);
+                    lcd_icon(ICON_USB, false);
+#endif
+#ifdef HAVE_LCD_BITMAP
+                }
 #endif
                 break;
         
