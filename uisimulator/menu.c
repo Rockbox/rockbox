@@ -117,6 +117,52 @@ void add_menu_item(int location, char *string)
         menu_bottom = location;
 }
 
+void show_logo(void)
+{
+  unsigned char buffer[112 * 8];
+
+  int failure;
+  int width=0;
+  int height=0;
+
+  failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
+
+  debugf("read_bmp_file() returned %d, width %d height %d\n",
+         failure, width, height);
+
+  if(!failure) {
+    int i;
+    int eline;
+    for(i=0, eline=0; i< height; i+=8, eline++) {
+      int x,y;
+      
+      /* the bitmap function doesn't work with full-height bitmaps
+         so we "stripe" the logo output */
+
+      lcd_bitmap(&buffer[eline*width], 0, 24+i, width,
+                 (height-i)>8?8:height-i, false);
+      
+#if 0
+      /* for screen output debugging */
+      for(y=0; y<8 && (i+y < height); y++) {
+        for(x=0; x < width; x++) {
+
+          if(buffer[eline*width + x] & (1<<y)) {
+            printf("*");
+          }
+          else
+            printf(" ");
+        }
+        printf("\n");
+      }
+#endif
+    }
+
+    lcd_update();
+  }
+
+}
+
 void menu_init(void)
 {
     menu_top = Tetris;
@@ -132,7 +178,7 @@ void menu_draw(void)
     for (i = i; i < Last_Id; i++)
         add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
 
-    lcd_putsxy(8, 38, "Rockbox!",2);
+    show_logo();
     redraw_cursor();
 }
 
