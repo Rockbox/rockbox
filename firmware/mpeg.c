@@ -334,8 +334,8 @@ static void mpeg_thread(void)
 
                 reset_mp3_buffer();
 
-		if(mpeg_file >= 0)
-		    close(mpeg_file);
+                if(mpeg_file >= 0)
+                    close(mpeg_file);
 
                 mpeg_file = open((char*)ev.data, O_RDONLY);
                 if(mpeg_file < 0)
