@@ -4,15 +4,12 @@ wps.config File Format Specifications
 
 Description / General Info
 --------------------------
-* The Custom WPS Display is used on the Rockbox Player ONLY, as a means 
-  to customize the WPS to the user's likings.
-* Plans to implement this feature into the recorder are in progress.
-* The first line of the 2 line display is the customized line (scrolling).
-* The second line is always the time display. (Elapsed & Total Time).
-* The second line is not able to be customized.
-* Any CR's, LF's, or CR/LF's (Commonly known as Newline/Return/Enter) in 
-  the wps.config file will be treated as spaces. IE: Don't use them.
+* The Custom WPS Display is used on both the Rockbox Player and Recorder, 
+  as a means to customize the WPS to the user's likings.
 * After editing the wps.config file, you may need to reboot your Rockbox.
+* The file may be 2 lines long for the Player, and 6 lines for the Recorder.
+* The line that has the time displayed on it MUST NOT be the line that
+  is scrolled, or the time will not be updated.
 * All tags except for %%, %?, and %: contain 3 characters (%xx). Remember
   to type the tags correctly, or you will get unexpected output, or even
   possibly no output at all.
@@ -51,6 +48,10 @@ Playlist/Song Info Tags:
   %pt : Total Track Time
 Other Tags:
   %% : Displays a %
+  %s : Define the line to scroll
+       This MUST be the first tag in the line you want to scroll. It can
+       ONLY be used for one line. Currently, this feature only works in
+       the PLAYER.
 Conditional ID3/File Tags (If/Else block):
   The following two tags are completely optional, and meant only for those
     that wish to go crazy with customization. It lets you specify what to
@@ -71,7 +72,8 @@ Conditional ID3/File Tags (If/Else block):
 
 Example wps.config File (Without If/Else)
 -----------------------
-%pp/%pe: %fc * %fsKB
+%s%pp/%pe: %fc * %fsKB
+%pc/%pt
 
 
 Example Output
