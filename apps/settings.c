@@ -875,7 +875,7 @@ void set_file(char* filename, char* setting, int maxlen)
         ptr--;
     }
         
-    if (strncmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
+    if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
         (len-extlen > maxlen))
         return;
         
