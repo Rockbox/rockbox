@@ -42,6 +42,7 @@
 #include "misc.h"
 #include "id3.h" 
 #include "screens.h"
+#include "debug.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define BMPHEIGHT_usb_logo 32
@@ -700,6 +701,9 @@ void splash(int ticks,       /* how long the splash is displayed */
     int maxw=0;
 #endif
 
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_double_height (false);    
+#endif
     va_start( ap, fmt );
     vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
 
