@@ -165,10 +165,11 @@ int ata_read_sectors(unsigned long start,
     int timeout;
     int count;
     void* buf;
-
-    last_disk_activity = current_tick;
+    bool spinup = false;
 
     mutex_lock(&ata_mtx);
+
+    last_disk_activity = current_tick;
 
     led(true);
 
@@ -187,7 +188,7 @@ int ata_read_sectors(unsigned long start,
         }
         sleeping = false;
         poweroff = false;
-        ata_spinup_time = current_tick - last_disk_activity;
+        spinup = true;
     }
 
     ATA_SELECT = ata_device;
@@ -225,6 +226,11 @@ int ata_read_sectors(unsigned long start,
                 goto retry;
             }
 
+            if (spinup) {
+                ata_spinup_time = current_tick - last_disk_activity;
+                spinup = false;
+            }
+
             if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) ) {
                 ret = -5;
                 goto retry;
@@ -258,6 +264,8 @@ int ata_read_sectors(unsigned long start,
 #endif
             buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
             count -= sectors;
+
+            last_disk_activity = current_tick;
         }
 
         if(!wait_for_end_of_transfer()) {
@@ -275,8 +283,6 @@ int ata_read_sectors(unsigned long start,
     if ( delayed_write )
         ata_flush();
 
-    last_disk_activity = current_tick;
-
     return ret;
 }
 
@@ -286,14 +292,15 @@ int ata_write_sectors(unsigned long start,
 {
     int i;
     int ret = 0;
-
-    last_disk_activity = current_tick;
+    bool spinup = false;
 
     if (start == 0)
         panicf("Writing on sector 0\n");
 
     mutex_lock(&ata_mtx);
     
+    last_disk_activity = current_tick;
+
     if ( sleeping ) {
         if (poweroff) {
             if (ata_power_on()) {
@@ -309,7 +316,7 @@ int ata_write_sectors(unsigned long start,
         }
         sleeping = false;
         poweroff = false;
-        ata_spinup_time = current_tick - last_disk_activity;
+        spinup = true;
     }
     
     ATA_SELECT = ata_device;
@@ -339,6 +346,11 @@ int ata_write_sectors(unsigned long start,
             return 0;
         }
 
+        if (spinup) {
+            ata_spinup_time = current_tick - last_disk_activity;
+            spinup = false;
+        }
+
         for (j=0; j<SECTOR_SIZE/2; j++)
             ATA_DATA = SWAB16(((unsigned short*)buf)[j]);
 
@@ -347,6 +359,8 @@ int ata_write_sectors(unsigned long start,
         j = ATA_STATUS;
 #endif
         buf += SECTOR_SIZE;
+
+        last_disk_activity = current_tick;
     }
 
     if(!wait_for_end_of_transfer())
@@ -358,8 +372,6 @@ int ata_write_sectors(unsigned long start,
 
     if ( delayed_write )
         ata_flush();
-
-    last_disk_activity = current_tick;
 
     return ret;
 }
