@@ -16,6 +16,7 @@ OC    = sh-elf-objcopy
 LANGUAGE = english
 
 FIRMWARE := ../firmware
+DOCSDIR := ../docs
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I. -I$(OBJDIR)
 
@@ -73,6 +74,13 @@ $(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
 
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
 	../tools/scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
+
+$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
+	perl credits.pl < $< > $@
+
+$(OBJDIR)/credits.o: credits.c credits.h $(OBJDIR)/credits.raw
+	@mkdir -p `dirname $@`
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
