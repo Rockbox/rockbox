@@ -157,8 +157,6 @@ static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
 
-static unsigned long mas_version_code;
-
 static int tag_read_idx = 0;
 static int tag_write_idx = 0;
 
@@ -234,6 +232,9 @@ static int last_dma_tick = 0;
 static int pause_tick = 0;
 
 #ifdef HAVE_MAS3507D
+
+static unsigned long mas_version_code;
+
 static unsigned int bass_table[] =
 {
     0x9e400, /* -15dB */
