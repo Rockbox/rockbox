@@ -237,7 +237,13 @@ bool wps_load(char* file, bool display)
  */
 static void format_time(char* buf, int buf_size, int time)
 {
-    snprintf(buf, buf_size, "%d:%02d", time / 60000, time % 60000 / 1000);
+    if ( time < 3600000 ) {
+      snprintf(buf, buf_size, "%d:%02d",
+               time % 3600000 / 60000, time % 60000 / 1000);
+    } else {
+      snprintf(buf, buf_size, "%d:%02d:%02d",
+               time / 3600000, time % 3600000 / 60000, time % 60000 / 1000);
+    }
 }
 
 /* Extract a part from a path.

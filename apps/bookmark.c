@@ -849,10 +849,22 @@ static void display_bookmark(char* bookmark,
     lcd_puts_scroll(0, 2, global_temp_buffer);
 
     /* elapsed time*/
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d:%02d",
+    if ( ms < 3600000 )
+    {
+        snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %d:%02d",
+                 str(LANG_BOOKMARK_SELECT_TIME_TEXT),
+                 ms / 60000,
+                 ms % 60000 / 1000);
+    }
+    else
+    {
+        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
+             "%s: %d:%02d:%02d",
              str(LANG_BOOKMARK_SELECT_TIME_TEXT),
-             ms / 60000,
+             ms / 3600000,
+             ms % 3600000 / 60000,
              ms % 60000 / 1000);
+    }
     lcd_puts_scroll(0, 3, global_temp_buffer);
 
     /* commands */
@@ -868,12 +880,26 @@ static void display_bookmark(char* bookmark,
       dot=NULL;
     if (dot)
         *dot='\0';
-    snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-             "%2d, %d:%02d, %s,",
+    if ( ms < 3600000 )
+    {
+        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
+                 "%2d, %d:%02d, %s,",
+                 (bookmark_count+1),
+                 ms / 60000,
+                 ms % 60000 / 1000,
+                 MP3_file_name);
+    }
+    else
+    {
+        snprintf(global_temp_buffer, sizeof(global_temp_buffer),
+             "%2d, %d:%02d:%02d, %s,",
              (bookmark_count+1),
              ms / 60000,
+             ms % 3600000 / 60000,
              ms % 60000 / 1000,
              MP3_file_name);
+    }
+
     status_draw(false);
     lcd_puts_scroll(0,0,global_temp_buffer);
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
