@@ -63,12 +63,12 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 	bcount = read_next_header (wpc.infile, &wps->wphdr);
 
 	if (bcount == (ulong) -1) {
-	    strcpy (error, "not compatible with this version of WavPack file!");
+	    /*strcpy (error, "not compatible with this version of WavPack file!");*/
 	    return NULL;
 	}
 
 	if ((wps->wphdr.flags & UNKNOWN_FLAGS) || wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
-	    strcpy (error, "not compatible with this version of WavPack file!");
+	    /*strcpy (error, "not compatible with this version of WavPack file!");*/
 	    return NULL;
 	}
 
@@ -76,8 +76,8 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 	    wpc.total_samples = wps->wphdr.total_samples;
 
 	if (!unpack_init (&wpc)) {
-	    strcpy (error, wpc.error_message [0] ? wpc.error_message :
-		"not compatible with this version of WavPack file!");
+	    /*strcpy (error, wpc.error_message [0] ? wpc.error_message :
+		"not compatible with this version of WavPack file!");*/
 
 	    return NULL;
 	}

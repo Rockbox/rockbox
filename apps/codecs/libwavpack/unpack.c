@@ -62,7 +62,7 @@ int unpack_init (WavpackContext *wpc)
 
     while (read_metadata_buff (wpc, &wpmd)) {
 	if (!process_metadata (wpc, &wpmd)) {
-	    strcpy (wpc->error_message, "invalid metadata!");
+	    /*strcpy (wpc->error_message, "invalid metadata!");*/
 	    return FALSE;
 	}
 
@@ -71,7 +71,7 @@ int unpack_init (WavpackContext *wpc)
     }
 
     if (wps->wphdr.block_samples && !bs_is_open (&wps->wvbits)) {
-	strcpy (wpc->error_message, "invalid WavPack file!");
+	/*strcpy (wpc->error_message, "invalid WavPack file!");*/
 	return FALSE;
     }
 
