@@ -101,6 +101,14 @@ else
 endif
 COMMONSRCS = io.c
 
+ifeq ($(HAVE_MPEG_PLAY),1)
+ 	SOUNDSRC = mpegplay.c oss_sound.c
+   	LDFLAGS += $(SOUND_LDFLAGS)
+ 	CFLAGS += $(SOUND_CFLAGS) -DHAVE_MPEG_PLAY
+else
+ 	SOUNDSRC = 
+endif
+
 FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c mp3_playback.c power.c\
   powermgmt.c panic.c mp3data.c sprintf.c buffer.c timefuncs.c
 
@@ -117,7 +125,7 @@ endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
        button-x11.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS) \
-       $(COMMONSRCS) lcd-common.c fmradio.c
+       $(COMMONSRCS) $(SOUNDSRC) lcd-common.c fmradio.c
 
 ROCKSRC := $(wildcard $(APPDIR)/plugins/*.c)
 ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
@@ -320,6 +328,9 @@ $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 
 $(OBJDIR)/radio.o: $(RECDIR)/radio.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/mpegplay.o: $(SIMCOMMON)/mpegplay.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
 

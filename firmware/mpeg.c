@@ -38,6 +38,8 @@
 #include "usb.h"
 #include "file.h"
 #include "hwcompat.h"
+#else
+#include "mpegplay.h"
 #endif /* #ifndef SIMULATOR */
 
 extern void bitswap(unsigned char *data, int length);
@@ -2447,6 +2449,9 @@ void mpeg_play(int offset)
                 break;
             continue;
         }
+#ifdef HAVE_MPEG_PLAY
+	real_mpeg_play(trackname);
+#endif
         playlist_next(steps);
         taginfo.offset = offset;
         set_elapsed(&taginfo);

@@ -21,7 +21,8 @@
  *
  ****************************************************************************/
 
-#ifdef MPEG_PLAY
+#ifdef HAVE_MPEG_PLAY
+#ifdef HAVE_LIBMAD
 
 #include <string.h>
 #include <stdlib.h>
@@ -119,7 +120,7 @@ signed int dither(mad_fixed_t sample, struct dither *dither)
 
 #define INPUT_BUFFER_SIZE  (5*8192)
 #define OUTPUT_BUFFER_SIZE  8192 /* Must be an integer multiple of 4. */
-void mpeg_play(char* fname)
+void real_mpeg_play(char* fname)
 {
     unsigned char InputBuffer[INPUT_BUFFER_SIZE],
         OutputBuffer[OUTPUT_BUFFER_SIZE],
@@ -128,9 +129,9 @@ void mpeg_play(char* fname)
     int Status=0, i, fd;
     unsigned long FrameCount=0;
     sound_t sound;
-    mp3entry mp3;
-    register signed int s0, s1;
+    struct mp3entry mp3;
     static struct dither d0, d1;
+    int key=0;
   
     mp3info(&mp3, fname);
 
@@ -152,9 +153,6 @@ void mpeg_play(char* fname)
     mad_timer_reset(&Timer);
 
     do {
-        if (button_get()) 
-            break; 
-
         if (Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN) {
             size_t ReadSize,Remaining;
             unsigned char *ReadStart;
@@ -170,7 +168,7 @@ void mpeg_play(char* fname)
                     Remaining=0;
             }
 
-            if ((ReadSize=read(fd,ReadStart,ReadSize)) < 0) {
+            if ((int)(ReadSize=read(fd,ReadStart,ReadSize)) < 0) {
                 fprintf(stderr,"end of input stream\n");
                 break;
             }
@@ -229,6 +227,12 @@ void mpeg_play(char* fname)
                 OutputPtr=OutputBuffer;
             }
             }
+
+        if ((key=button_get(0))==BUTTON_STOP)
+	{
+            break; 
+	}
+
     }while(1);
     
     /* Mad is no longer used, the structures that were initialized must
@@ -244,7 +248,7 @@ void mpeg_play(char* fname)
         {
             size_t  BufferSize=OutputPtr-OutputBuffer;
 
-            if(write(sound,OutputBuffer,1,BufferSize)!=BufferSize)
+            if (output_sound(&sound, OutputPtr, BufferSize)!=(int)BufferSize)
                 {
                     fprintf(stderr,"PCM write error\n");
                     Status=2;
@@ -267,4 +271,5 @@ void mpeg_play(char* fname)
 }
 
 
-#endif
+#endif /* HAVE_LIBMAD */
+#endif /* HAVE_MPEG_PLAY */

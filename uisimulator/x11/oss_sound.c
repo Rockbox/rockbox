@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#include <linux/soundcard.h>
+#include <sys/soundcard.h>
 #include "../common/sound.h"
 
 /* We want to use the "real" open in this file */
@@ -39,7 +39,7 @@ int init_sound(sound_t* sound) {
 }
 
 int config_sound(sound_t* sound, int sound_freq, int channels) {
-  int format=AFMT_U16_LE;
+  int format=AFMT_S16_NE;
   int setting=0x000C000D;  // 12 fragments size 8kb ? WHAT IS THIS?
 
   sound->freq=sound_freq;

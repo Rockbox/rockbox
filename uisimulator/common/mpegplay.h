@@ -16,8 +16,8 @@
  *
  ****************************************************************************/
 
-#ifdef MPEG_PLAY
+#ifdef HAVE_MPEG_PLAY
 
-void mpeg_play(char* fname);
+void real_mpeg_play(char* fname);
 
-#endif
+#endif /* HAVE_MPEG_PLAY */
