@@ -615,7 +615,7 @@ void IMIA1(void)
     TSR1 &= ~0x01;
 }
 
-static void add_track_to_tag_list(char *filename)
+static int add_track_to_tag_list(char *filename)
 {
     struct id3tag *t = NULL;
     int i;
@@ -631,7 +631,7 @@ static void add_track_to_tag_list(char *filename)
         if(mp3info(&(t->id3), filename))
         {
             DEBUGF("Bad mp3\n");
-            return;
+            return -1;
         }
         t->mempos = mp3buf_write;
         t->id3.elapsed = 0;
@@ -646,6 +646,7 @@ static void add_track_to_tag_list(char *filename)
     {
         DEBUGF("No memory available for id3 tag");
     }
+    return 0;
 }
 
 /* If next_track is true, opens the next track, if false, opens prev track */
@@ -672,13 +673,22 @@ static int new_file(int steps)
 
             index = playlist_next(steps);
             
-            add_track_to_tag_list(trackname);
-            /* skip past id3v2 tag (to an even byte) */
-            lseek(mpeg_file, 
-                  id3tags[new_tag_idx]->id3.id3v2len & ~1, 
-                  SEEK_SET);
-            id3tags[new_tag_idx]->id3.index = index;
-            id3tags[new_tag_idx]->id3.offset = 0;
+            if(add_track_to_tag_list(trackname))
+            {
+                /* Bad mp3 file */
+                steps++;
+                close(mpeg_file);
+                mpeg_file = -1;
+            }
+            else
+            {
+                /* skip past id3v2 tag (to an even byte) */
+                lseek(mpeg_file, 
+                      id3tags[new_tag_idx]->id3.id3v2len & ~1, 
+                      SEEK_SET);
+                id3tags[new_tag_idx]->id3.index = index;
+                id3tags[new_tag_idx]->id3.offset = 0;
+            }
         }
     } while ( mpeg_file < 0 );
 
