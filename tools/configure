@@ -188,10 +188,10 @@ if [ "-" = "$extra_defines" ]; then
 
   echo "Do you want to make use of Screensavers? (Y)"
   getit=`input`;
-  if [ "n" != "$getit" ] ; then
-     if [ "N" != "$getit" ] ; then
+  if [ "n" = "$getit" -o "N" = "$getit" ] ; then
+	extra_defines=""
+  else
         extra_defines="-DUSE_SCREENSAVERS"
-     fi
   fi
  
   echo "Loadable fonts support? (N)"
