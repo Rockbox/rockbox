@@ -29,6 +29,7 @@
 #include "errno.h"
 #include "mp3data.h"
 #include "buffer.h"
+#include "mp3_playback.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -43,7 +44,6 @@ extern void bitswap(unsigned char *data, int length);
 
 #ifdef HAVE_MAS3587F
 static void init_recording(void);
-static void init_playback(void);
 static void start_prerecording(void);
 static void start_recording(void);
 static void stop_recording(void);
@@ -87,116 +87,6 @@ extern int playlist_next(int steps);
 extern int playlist_amount(void);
 extern void update_file_pos( int id, int pos );
 
-static char *units[] =
-{
-    "%",    /* Volume */
-    "dB",   /* Bass */
-    "dB",   /* Treble */
-    "%",    /* Balance */
-    "dB",   /* Loudness */
-    "%",    /* Bass boost */
-    "",     /* AVC */
-    "",     /* Channels */
-    "dB",   /* Left gain */
-    "dB",   /* Right gain */
-    "dB",   /* Mic gain */
-};
-
-static int numdecimals[] =
-{
-    0,    /* Volume */
-    0,    /* Bass */
-    0,    /* Treble */
-    0,    /* Balance */
-    0,    /* Loudness */
-    0,    /* Bass boost */
-    0,    /* AVC */
-    0,    /* Channels */
-    1,    /* Left gain */
-    1,    /* Right gain */
-    1,    /* Mic gain */
-};
-
-static int minval[] =
-{
-    0,    /* Volume */
-    0,    /* Bass */
-    0,    /* Treble */
-    -50,  /* Balance */
-    0,    /* Loudness */
-    0,    /* Bass boost */
-    -1,   /* AVC */
-    0,    /* Channels */
-    0,    /* Left gain */
-    0,    /* Right gain */
-    0,    /* Mic gain */
-};
-
-static int maxval[] =
-{
-    100,  /* Volume */
-#ifdef HAVE_MAS3587F
-    24,   /* Bass */
-    24,   /* Treble */
-#else
-    30,   /* Bass */
-    30,   /* Treble */
-#endif
-    50,   /* Balance */
-    17,   /* Loudness */
-    10,   /* Bass boost */
-    3,    /* AVC */
-    6,    /* Channels */
-    15,   /* Left gain */
-    15,   /* Right gain */
-    15,   /* Mic gain */
-};
-
-static int defaultval[] =
-{
-    70,   /* Volume */
-#ifdef HAVE_MAS3587F
-    12+6, /* Bass */
-    12+6, /* Treble */
-#else
-    15+7, /* Bass */
-    15+7, /* Treble */
-#endif
-    0,    /* Balance */
-    0,    /* Loudness */
-    0,    /* Bass boost */
-    0,    /* AVC */
-    0,    /* Channels */
-    8,    /* Left gain */
-    8,    /* Right gain */
-    2,    /* Mic gain */
-};
-
-char *mpeg_sound_unit(int setting)
-{
-    return units[setting];
-}
-
-int mpeg_sound_numdecimals(int setting)
-{
-    return numdecimals[setting];
-}
-
-int mpeg_sound_min(int setting)
-{
-    return minval[setting];
-}
-
-int mpeg_sound_max(int setting)
-{
-    return maxval[setting];
-}
-
-int mpeg_sound_default(int setting)
-{
-    return defaultval[setting];
-}
-
 /* list of tracks in memory */
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
 #define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
@@ -215,8 +105,6 @@ static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
-
-static bool mpeg_is_initialized = false;
 
 static int tag_read_idx = 0;
 static int tag_write_idx = 0;
@@ -371,100 +259,7 @@ static bool playing = false;
 #else
 static int last_dma_tick = 0;
 
-static unsigned long mas_version_code;
-
-#ifdef HAVE_MAS3507D
-
-static unsigned int bass_table[] =
-{
-    0x9e400, /* -15dB */
-    0xa2800, /* -14dB */
-    0xa7400, /* -13dB */
-    0xac400, /* -12dB */
-    0xb1800, /* -11dB */
-    0xb7400, /* -10dB */
-    0xbd400, /* -9dB */
-    0xc3c00, /* -8dB */
-    0xca400, /* -7dB */
-    0xd1800, /* -6dB */
-    0xd8c00, /* -5dB */
-    0xe0400, /* -4dB */
-    0xe8000, /* -3dB */
-    0xefc00, /* -2dB */
-    0xf7c00, /* -1dB */
-    0,
-    0x800,   /* 1dB */
-    0x10000, /* 2dB */
-    0x17c00, /* 3dB */
-    0x1f800, /* 4dB */
-    0x27000, /* 5dB */
-    0x2e400, /* 6dB */
-    0x35800, /* 7dB */
-    0x3c000, /* 8dB */
-    0x42800, /* 9dB */
-    0x48800, /* 10dB */
-    0x4e400, /* 11dB */
-    0x53800, /* 12dB */
-    0x58800, /* 13dB */
-    0x5d400, /* 14dB */
-    0x61800  /* 15dB */
-};
-
-static unsigned int treble_table[] =
-{
-    0xb2c00, /* -15dB */
-    0xbb400, /* -14dB */
-    0xc1800, /* -13dB */
-    0xc6c00, /* -12dB */
-    0xcbc00, /* -11dB */
-    0xd0400, /* -10dB */
-    0xd5000, /* -9dB */
-    0xd9800, /* -8dB */
-    0xde000, /* -7dB */
-    0xe2800, /* -6dB */
-    0xe7e00, /* -5dB */
-    0xec000, /* -4dB */
-    0xf0c00, /* -3dB */
-    0xf5c00, /* -2dB */
-    0xfac00, /* -1dB */
-    0,
-    0x5400,  /* 1dB */
-    0xac00,  /* 2dB */
-    0x10400, /* 3dB */
-    0x16000, /* 4dB */
-    0x1c000, /* 5dB */
-    0x22400, /* 6dB */
-    0x28400, /* 7dB */
-    0x2ec00, /* 8dB */
-    0x35400, /* 9dB */
-    0x3c000, /* 10dB */
-    0x42c00, /* 11dB */
-    0x49c00, /* 12dB */
-    0x51800, /* 13dB */
-    0x58400, /* 14dB */
-    0x5f800  /* 15dB */
-};
-
-static unsigned int prescale_table[] =
-{
-    0x80000,  /* 0db */
-    0x8e000,  /* 1dB */
-    0x9a400,  /* 2dB */
-    0xa5800, /* 3dB */
-    0xaf400, /* 4dB */
-    0xb8000, /* 5dB */
-    0xbfc00, /* 6dB */
-    0xc6c00, /* 7dB */
-    0xcd000, /* 8dB */
-    0xd25c0, /* 9dB */
-    0xd7800, /* 10dB */
-    0xdc000, /* 11dB */
-    0xdfc00, /* 12dB */
-    0xe3400, /* 13dB */
-    0xe6800, /* 14dB */
-    0xe9400  /* 15dB */
-};
-#endif
+extern unsigned long mas_version_code;
 
 static struct event_queue mpeg_queue;
 static char mpeg_stack[DEFAULT_STACK_SIZE + 0x1000];
@@ -477,7 +272,6 @@ static int mp3buf_read;
 
 static int last_dma_chunk_size;
 
-static bool dma_on;  /* The DMA is active */
 static bool playing; /* We are playing an MP3 stream */
 static bool play_pending; /* We are about to start playing */
 static bool is_playing; /* We are (attempting to) playing MP3 files */
@@ -562,7 +356,7 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
 
     dbgdata->last_dma_chunk_size = last_dma_chunk_size;
 
-    dbgdata->dma_on = dma_on;
+    dbgdata->dma_on = (SCR0 & 0x80) != 0;
     dbgdata->playing = playing;
     dbgdata->play_pending = play_pending;
     dbgdata->is_playing = is_playing;
@@ -577,39 +371,7 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
     dbgdata->lowest_watermark_level = lowest_watermark_level;
 }
 
-#ifdef HAVE_MAS3507D
-static void mas_poll_start(int interval_in_ms)
-{
-    unsigned int count;
-
-    count = (FREQ * interval_in_ms) / 1000 / 8;
-
-    if(count > 0xffff)
-    {
-        panicf("Error! The MAS poll interval is too long (%d ms)\n",
-               interval_in_ms);
-        return;
-    }
-    
-    /* We are using timer 1 */
-    
-    TSTR &= ~0x02; /* Stop the timer */
-    TSNC &= ~0x02; /* No synchronization */
-    TMDR &= ~0x02; /* Operate normally */
-
-    TCNT1 = 0;   /* Start counting at 0 */
-    GRA1 = count;
-    TCR1 = 0x23; /* Clear at GRA match, sysclock/8 */
-
-    /* Enable interrupt on level 5 */
-    IPRC = (IPRC & ~0x000f) | 0x0005;
-    
-    TSR1 &= ~0x02;
-    TIER1 = 0xf9; /* Enable GRA match interrupt */
-
-    TSTR |= 0x02; /* Start timer 1 */
-}
-#else
+#ifndef HAVE_MAS3507D
 static void postpone_dma_tick(void)
 {
     unsigned int count;
@@ -712,31 +474,6 @@ static int get_unsaved_space(void)
 }
 #endif
 
-static void init_dma(void)
-{
-    SAR3 = (unsigned int) mp3buf + mp3buf_read;
-    DAR3 = 0x5FFFEC3;
-    CHCR3 &= ~0x0002; /* Clear interrupt */
-    CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
-    last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-    DTCR3 = last_dma_chunk_size & 0xffff;
-    DMAOR = 0x0001; /* Enable DMA */
-    CHCR3 |= 0x0001; /* Enable DMA IRQ */
-    dma_underrun = false;
-}
-
-static void start_dma(void)
-{
-    SCR0 |= 0x80;
-    dma_on = true;
-}
-
-static void stop_dma(void)
-{
-    SCR0 &= 0x7f;
-    dma_on = false;
-}
-
 #ifdef HAVE_MAS3587F
 #ifdef DEBUG
 static long timing_info_index = 0;
@@ -746,7 +483,7 @@ static bool inverted_pr;
 static unsigned long num_rec_bytes;
 static unsigned long num_recorded_frames;
 
-void drain_dma_buffer(void)
+static void drain_dma_buffer(void)
 {
     if(inverted_pr)
     {
@@ -784,7 +521,8 @@ void drain_dma_buffer(void)
         }
     }
 }
-#endif
+
+#endif /* #ifdef HAVE_MAS3587F */
 
 static void dma_tick (void) __attribute__ ((section (".icode")));
 static void dma_tick(void)
@@ -796,10 +534,9 @@ static void dma_tick(void)
         if(playing && !paused)
         {
             /* Start DMA if it is disabled and the DEMAND pin is high */
-            if(!dma_on && (PBDR & 0x4000))
+            if(!(SCR0 & 0x80) && (PBDR & 0x4000))
             {
-                if(!(SCR0 & 0x80))
-                    start_dma();
+                mp3_play_pause(true);
             }
             id3tags[tag_read_idx]->id3.elapsed +=
                 (current_tick - last_dma_tick) * 1000 / HZ;
@@ -807,7 +544,7 @@ static void dma_tick(void)
         }
 #ifdef HAVE_MAS3587F
     }
-    else
+    else /* MPEG_ENCODER */
     {
         int i;
         int num_bytes;
@@ -845,7 +582,7 @@ static void dma_tick(void)
                     /* No wait for /RTW, cause it's not necessary */
                 }
             }
-            else
+            else /* !inverted_pr */
             {
                 i = 0;
                 while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
@@ -923,8 +660,8 @@ static void reset_mp3_buffer(void)
     lowest_watermark_level = mp3buflen;
 }
 
-#pragma interrupt
-void DEI3(void)
+ /* DMA transfer end interrupt callback */
+static void transfer_end(unsigned char** ppbuf, int* psize)
 {
     if(playing && !paused)
     {
@@ -976,8 +713,8 @@ void DEI3(void)
                 }
             }
 
-            DTCR3 = last_dma_chunk_size & 0xffff;
-            SAR3 = (unsigned int)mp3buf + mp3buf_read;
+            *psize = last_dma_chunk_size & 0xffff;
+            *ppbuf = mp3buf + mp3buf_read;
             id3tags[tag_read_idx]->id3.offset += last_dma_chunk_size;
 
             /* Update the watermark debug level */
@@ -1007,11 +744,10 @@ void DEI3(void)
                 playing = false;
                 is_playing = false;
             }
-            CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
+            *psize = 0; /* no more transfer */
         }
     }
 
-    CHCR3 &= ~0x0002; /* Clear DMA interrupt */
     wake_up_thread();
 }
 
@@ -1033,7 +769,7 @@ static void demand_irq_enable(bool on)
 #endif
 
 #pragma interrupt
-void IMIA1(void)
+void IMIA1(void) /* Timer 1 interrupt */
 {
     dma_tick();
     TSR1 &= ~0x01;
@@ -1043,15 +779,9 @@ void IMIA1(void)
 #endif
 }
 
-#pragma interrupt
-void IRQ6(void)
-{
-    stop_dma();
-}
-
 #ifdef HAVE_MAS3587F
 #pragma interrupt
-void IRQ3(void)
+void IRQ3(void) /* PA15: MAS demand IRQ */
 {
     /* Begin with setting the IRQ to edge sensitive */
     ICR |= 0x0010;
@@ -1170,7 +900,7 @@ static void stop_playing(void)
     if(mpeg_file >= 0)
         close(mpeg_file);
     mpeg_file = -1;
-    stop_dma();
+    mp3_play_pause(false);
     remove_all_tags();
 }
 
@@ -1237,11 +967,14 @@ static void start_playback_if_ready(void)
             play_pending = false;
             playing = true;
 			
-            init_dma();
+            last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
+            mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+            dma_underrun = false;
+
             if (!paused)
             {
                 last_dma_tick = current_tick;
-                start_dma();
+                mp3_play_pause(true);
 #ifdef HAVE_MAS3587F
                 demand_irq_enable(true);
 #endif
@@ -1376,7 +1109,7 @@ static void mpeg_thread(void)
                 play_pending = false;
                 playing = false;
                 paused = false;
-                stop_dma();
+                mp3_play_pause(false);
 
                 reset_mp3_buffer();
                 remove_all_tags();
@@ -1435,7 +1168,7 @@ static void mpeg_thread(void)
                 playing = false;
                 pause_tick = current_tick;
                 pause_track = current_track_counter;
-                stop_dma();
+                mp3_play_pause(false);
                 break;
 
             case MPEG_RESUME:
@@ -1450,7 +1183,7 @@ static void mpeg_thread(void)
                     else
                         last_dma_tick = current_tick;                        
                     pause_tick = 0;
-                    start_dma();
+                    mp3_play_pause(true);
                 }
                 break;
 
@@ -1463,11 +1196,13 @@ static void mpeg_thread(void)
                     /* stop the current stream */
                     play_pending = false;
                     playing = false;
-                    stop_dma();
+                    mp3_play_pause(false);
 
                     track_change();
                     mp3buf_read = id3tags[tag_read_idx]->mempos;
-                    init_dma();
+                    last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
+                    mp3_play_data(mp3buf + mp3buf_read, last_dma_chunk_size, transfer_end);
+                    dma_underrun = false;
                     last_dma_tick = current_tick;
 
                     unplayed_space_left  = get_unplayed_space();
@@ -1486,7 +1221,7 @@ static void mpeg_thread(void)
                     } else {
                         playing = true;
                         if (!paused)
-                            start_dma();
+                            mp3_play_pause(true);
                     }
                 }
                 else {
@@ -1496,7 +1231,7 @@ static void mpeg_thread(void)
                     /* stop the current stream */
                     play_pending = false;
                     playing = false;
-                    stop_dma();
+                    mp3_play_pause(false);
 
                     reset_mp3_buffer();
                     remove_all_tags();
@@ -1532,7 +1267,7 @@ static void mpeg_thread(void)
                 /* stop the current stream */
                 play_pending = false;
                 playing = false;
-                stop_dma();
+                mp3_play_pause(false);
 
                 reset_mp3_buffer();
                 remove_all_tags();
@@ -1685,7 +1420,11 @@ static void mpeg_thread(void)
                     else
                     {
                         /* resume will start at new position */
-                        init_dma();
+                        last_dma_chunk_size = 
+                            MIN(0x2000, get_unplayed_space_current_song());
+                        mp3_play_data(mp3buf + mp3buf_read, 
+                            last_dma_chunk_size, transfer_end);
+                        dma_underrun = false;
                     }
                 }
                 else
@@ -2261,7 +2000,9 @@ static void mpeg_thread(void)
                     break;
                     
                 case MPEG_INIT_PLAYBACK:
-                    init_playback();
+                    mp3_play_init();
+                    mpeg_mode = MPEG_DECODER;
+
                     init_playback_done = true;
                     break;
 
@@ -2287,43 +2028,6 @@ static void mpeg_thread(void)
         }
 #endif
     }
-}
-
-static void setup_sci0(void)
-{
-    /* PB15 is I/O, PB14 is IRQ6, PB12 is SCK0, PB9 is TxD0 */
-    PBCR1 = (PBCR1 & 0x0cff) | 0x1208;
-    
-    /* Set PB12 to output */
-    or_b(0x10, &PBIORH);
-
-    /* Disable serial port */
-    SCR0 = 0x00;
-
-    /* Synchronous, no prescale */
-    SMR0 = 0x80;
-
-    /* Set baudrate 1Mbit/s */
-    BRR0 = 0x03;
-
-    /* use SCK as serial clock output */
-    SCR0 = 0x01;
-
-    /* Clear FER and PER */
-    SSR0 &= 0xe7;
-
-    /* Set interrupt ITU2 and SCI0 priority to 0 */
-    IPRD &= 0x0ff0;
-
-    /* set PB15 and PB14 to inputs */
-     and_b(~0x80, &PBIORH);
-     and_b(~0x40, &PBIORH);
-
-    /* Enable End of DMA interrupt at prio 8 */
-    IPRC = (IPRC & 0xf0ff) | 0x0800;
-    
-    /* Enable Tx (only!) */
-    SCR0 |= 0x20;
 }
 #endif /* SIMULATOR */
 
@@ -2364,66 +2068,6 @@ void mpeg_init_playback(void)
     wake_up_thread();
 }
 
-static void init_playback(void)
-{
-    unsigned long val;
-    int rc;
-
-    if(mpeg_mode == MPEG_ENCODER)
-        stop_recording();
-    
-    stop_dma();
-    
-    mas_reset();
-    
-    /* Enable the audio CODEC and the DSP core, max analog voltage range */
-    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
-    if(rc < 0)
-        panicf("mas_ctrl_w: %d", rc);
-
-    /* Stop the current application */
-    val = 0;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
-    } while(val);
-    
-    /* Enable the D/A Converter */
-    mas_codec_writereg(0x0, 0x0001);
-
-    /* ADC scale 0%, DSP scale 100% */
-    mas_codec_writereg(6, 0x0000);
-    mas_codec_writereg(7, 0x4000);
-
-    /* Disable SDO and SDI */
-    val = 0x0d;
-    mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
-
-    /* Set Demand mode and validate all settings */
-    val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
-
-    /* Start the Layer2/3 decoder applications */
-    val = 0x0c;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
-    } while((val & 0x0c) != 0x0c);
-
-    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
-
-    mpeg_mode = MPEG_DECODER;
-
-    /* set IRQ6 to edge detect */
-    ICR |= 0x02;
-
-    /* set IRQ6 prio 8 */
-    IPRB = ( IPRB & 0xff0f ) | 0x0080;
-
-    DEBUGF("MAS Decoding application started\n");
-}
 
 /****************************************************************************
  **
@@ -2965,383 +2609,6 @@ void mpeg_error_clear(void)
     mpeg_errno = 0;
 }
 
-#ifndef SIMULATOR
-#ifdef HAVE_MAS3507D
-int current_left_volume = 0;  /* all values in tenth of dB */
-int current_right_volume = 0;  /* all values in tenth of dB */
-int current_treble = 0;
-int current_bass = 0;
-int current_balance = 0;
-
-/* convert tenth of dB volume to register value */
-static int tenthdb2reg(int db) {
-    if (db < -540)
-        return (db + 780) / 30;
-    else
-        return (db + 660) / 15;
-}
-
-void set_prescaled_volume(void)
-{
-    int prescale;
-    int l, r;
-
-    prescale = MAX(current_bass, current_treble);
-    if (prescale < 0)
-        prescale = 0;  /* no need to prescale if we don't boost
-                          bass or treble */
-
-    mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-    
-    /* gain up the analog volume to compensate the prescale reduction gain */
-    l = current_left_volume + prescale;
-    r = current_right_volume + prescale;
-
-    dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
-}
-#endif /* HAVE_MAS3507D */
-#endif /* !SIMULATOR */
-
-void mpeg_sound_set(int setting, int value)
-{
-#ifdef SIMULATOR
-    setting = value;
-#else
-#ifdef HAVE_MAS3507D
-    int l, r;
-#else
-    int tmp;
-#endif
-
-    if(!mpeg_is_initialized)
-        return;
-    
-    switch(setting)
-    {
-        case SOUND_VOLUME:
-#ifdef HAVE_MAS3587F
-            tmp = 0x7f00 * value / 100;
-            mas_codec_writereg(0x10, tmp & 0xff00);
-#else
-            l = value;
-            r = value;
-            
-            if(current_balance > 0)
-            {
-                l -= current_balance;
-                if(l < 0)
-                    l = 0;
-            }
-            
-            if(current_balance < 0)
-            {
-                r += current_balance;
-                if(r < 0)
-                    r = 0;
-            }
-            
-            l = 0x38 * l / 100;
-            r = 0x38 * r / 100;
-
-            /* store volume in tenth of dB */
-            current_left_volume = ( l < 0x08 ? l*30 - 780 : l*15 - 660 );
-            current_right_volume = ( r < 0x08 ? r*30 - 780 : r*15 - 660 );
-
-            set_prescaled_volume();
-#endif
-            break;
-
-        case SOUND_BALANCE:
-#ifdef HAVE_MAS3587F
-            tmp = ((value * 127 / 100) & 0xff) << 8;
-            mas_codec_writereg(0x11, tmp & 0xff00);
-#else
-            /* Convert to percent */
-            current_balance = value * 2;
-#endif
-            break;
-
-        case SOUND_BASS:
-#ifdef HAVE_MAS3587F
-            tmp = (((value-12) * 8) & 0xff) << 8;
-            mas_codec_writereg(0x14, tmp & 0xff00);
-#else    
-            mas_writereg(MAS_REG_KBASS, bass_table[value]);
-            current_bass = (value-15) * 10;
-            set_prescaled_volume();
-#endif
-            break;
-
-        case SOUND_TREBLE:
-#ifdef HAVE_MAS3587F
-            tmp = (((value-12) * 8) & 0xff) << 8;
-            mas_codec_writereg(0x15, tmp & 0xff00);
-#else    
-            mas_writereg(MAS_REG_KTREBLE, treble_table[value]);
-            current_treble = (value-15) * 10;
-            set_prescaled_volume();
-#endif
-            break;
-            
-#ifdef HAVE_MAS3587F
-        case SOUND_SUPERBASS:
-            if (value) {
-                tmp = MAX(MIN(value * 12, 0x7f), 0);
-                mas_codec_writereg(MAS_REG_KMDB_STR, (tmp & 0xff) << 8);
-                tmp = 0x30; /* MDB_HAR: Space for experiment here */
-                mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0xff) << 8);
-                tmp = 60 / 10; /* calculate MDB_FC, 60hz - experiment here,
-                                  this would depend on the earphones...
-                                  perhaps make it tunable? */
-                mas_codec_writereg(MAS_REG_KMDB_FC, (tmp & 0xff) << 8);
-                tmp = (3 * tmp) / 2; /* calculate MDB_SHAPE */
-                mas_codec_writereg(MAS_REG_KMDB_SWITCH,
-                    ((tmp & 0xff) << 8) /* MDB_SHAPE */
-                    | 2);  /* MDB_SWITCH enable */
-            } else {
-                mas_codec_writereg(MAS_REG_KMDB_STR, 0);
-                mas_codec_writereg(MAS_REG_KMDB_HAR, 0);
-                mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0); /* MDB_SWITCH disable */
-            }
-            break;
-            
-        case SOUND_LOUDNESS:
-            tmp = MAX(MIN(value * 4, 0x44), 0);
-            mas_codec_writereg(MAS_REG_KLOUDNESS, (tmp & 0xff) << 8);
-            break;
-            
-        case SOUND_AVC:
-            switch (value) {
-                case 1: /* 2s */
-                    tmp = (0x2 << 8) | (0x8 << 12);
-                    break;
-                case 2: /* 4s */
-                    tmp = (0x4 << 8) | (0x8 << 12);
-                    break;
-                case 3: /* 8s */
-                    tmp = (0x8 << 8) | (0x8 << 12);
-                    break;
-                case -1: /* turn off and then turn on again to decay quickly */
-                    tmp = mas_codec_readreg(MAS_REG_KAVC);
-                    mas_codec_writereg(MAS_REG_KAVC, 0);
-                    break;
-                default: /* off */
-                    tmp = 0;
-                    break;  
-            }
-            mas_codec_writereg(MAS_REG_KAVC, tmp);
-            break;
-#endif
-        case SOUND_CHANNELS:
-            mpeg_sound_channel_config(value);
-            break;
-    }
-#endif /* SIMULATOR */
-}
-
-int mpeg_val2phys(int setting, int value)
-{
-    int result = 0;
-    
-    switch(setting)
-    {
-        case SOUND_VOLUME:
-            result = value;
-            break;
-        
-        case SOUND_BALANCE:
-            result = value * 2;
-            break;
-        
-        case SOUND_BASS:
-#ifdef HAVE_MAS3587F
-            result = value - 12;
-#else
-            result = value - 15;
-#endif
-            break;
-        
-        case SOUND_TREBLE:
-#ifdef HAVE_MAS3587F
-            result = value - 12;
-#else
-            result = value - 15;
-#endif
-            break;
-
-#ifdef HAVE_MAS3587F
-        case SOUND_LOUDNESS:
-            result = value;
-            break;
-            
-        case SOUND_SUPERBASS:
-            result = value * 10;
-            break;
-
-        case SOUND_LEFT_GAIN:
-        case SOUND_RIGHT_GAIN:
-            result = (value - 2) * 15;
-            break;
-
-        case SOUND_MIC_GAIN:
-            result = value * 15 + 210;
-            break;
-#endif
-    }
-    return result;
-}
-
-int mpeg_phys2val(int setting, int value)
-{
-    int result = 0;
-    
-    switch(setting)
-    {
-        case SOUND_VOLUME:
-            result = value;
-            break;
-        
-        case SOUND_BALANCE:
-            result = value / 2;
-            break;
-        
-        case SOUND_BASS:
-#ifdef HAVE_MAS3587F
-            result = value + 12;
-#else
-            result = value + 15;
-#endif
-            break;
-        
-        case SOUND_TREBLE:
-#ifdef HAVE_MAS3587F
-            result = value + 12;
-#else
-            result = value + 15;
-#endif
-            break;
-
-#ifdef HAVE_MAS3587F
-        case SOUND_SUPERBASS:
-            result = value / 10;
-            break;
-
-        case SOUND_LOUDNESS:
-        case SOUND_AVC:
-        case SOUND_LEFT_GAIN:
-        case SOUND_RIGHT_GAIN:
-        case SOUND_MIC_GAIN:
-            result = value;
-            break;
-#endif
-    }
-
-    return result;
-}
-
-
-void mpeg_sound_channel_config(int configuration)
-{
-#ifdef SIMULATOR
-    (void)configuration;
-#else
-    unsigned long val_ll = 0x80000;
-    unsigned long val_lr = 0;
-    unsigned long val_rl = 0;
-    unsigned long val_rr = 0x80000;
-    
-    switch(configuration)
-    {
-        case MPEG_SOUND_STEREO:
-            val_ll = 0x80000;
-            val_lr = 0;
-            val_rl = 0;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_MONO:
-            val_ll = 0xc0000;
-            val_lr = 0xc0000;
-            val_rl = 0xc0000;
-            val_rr = 0xc0000;
-            break;
-
-        case MPEG_SOUND_MONO_LEFT:
-            val_ll = 0x80000;
-            val_lr = 0x80000;
-            val_rl = 0;
-            val_rr = 0;
-            break;
-
-        case MPEG_SOUND_MONO_RIGHT:
-            val_ll = 0;
-            val_lr = 0;
-            val_rl = 0x80000;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_STEREO_NARROW:
-            val_ll = 0xa0000;
-            val_lr = 0xe0000;
-            val_rl = 0xe0000;
-            val_rr = 0xa0000;
-            break;
-
-        case MPEG_SOUND_STEREO_WIDE:
-            val_ll = 0x80000;
-            val_lr = 0x40000;
-            val_rl = 0x40000;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_KARAOKE:
-            val_ll = 0x80001;
-            val_lr = 0x7ffff;
-            val_rl = 0x7ffff;
-            val_rr = 0x80001;
-            break;
-    }
-
-#ifdef HAVE_MAS3587F
-    mas_writemem(MAS_BANK_D0, 0x7fc, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D0, 0x7fd, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D0, 0x7fe, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D0, 0x7ff, &val_rr, 1); /* RR */
-#else
-    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
-#endif
-#endif
-}
-
-#ifdef HAVE_MAS3587F
-/* This function works by telling the decoder that we have another
-   crystal frequency than we actually have. It will adjust its internal
-   parameters and the result is that the audio is played at another pitch.
-
-   The pitch value is in tenths of percent.
-*/
-void mpeg_set_pitch(int pitch)
-{
-    unsigned long val;
-
-    /* invert pitch value */
-    pitch = 1000000/pitch;
-
-    /* Calculate the new (bogus) frequency */
-    val = 18432*pitch/1000;
-    
-    mas_writemem(MAS_BANK_D0,0x7f3,&val,1);
-
-    /* We must tell the MAS that the frequency has changed.
-       This will unfortunately cause a short silence. */
-    val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
-}
-#endif
-
 #ifdef SIMULATOR
 static char mpeg_stack[DEFAULT_STACK_SIZE];
 static char mpeg_thread_name[] = "mpeg";
@@ -3364,118 +2631,15 @@ static void mpeg_thread(void)
 }
 #endif
 
-void mpeg_init(int volume, int bass, int treble, int balance, int loudness, 
-    int bass_boost, int avc, int channel_config)
+void mpeg_init(void)
 {
     mpeg_errno = 0;
-    
-#ifdef SIMULATOR
-    volume = bass = treble = balance = loudness
-        = bass_boost = avc = channel_config;
-    create_thread(mpeg_thread, mpeg_stack,
-                  sizeof(mpeg_stack), mpeg_thread_name);
-#else
-#ifdef HAVE_MAS3507D
-    unsigned long val;
-    loudness = bass_boost = avc;
-#endif
-
-    setup_sci0();
-
-#ifdef HAVE_MAS3587F
-    or_b(0x08, &PAIORH); /* output for /PR */
-    init_playback();
-    
-    mas_version_code = mas_readver();
-    DEBUGF("MAS3587 derivate %d, version B%d\n",
-           (mas_version_code & 0xff00) >> 8, mas_version_code & 0xff);
-#endif
-
-#ifdef HAVE_DAC3550A
-    dac_init();
-#endif
-    
-#ifdef HAVE_MAS3507D
-    and_b(~0x20, &PBDRL);
-    sleep(HZ/5);
-    or_b(0x20, &PBDRL);
-    sleep(HZ/5);
-    
-    /* set IRQ6 to edge detect */
-    ICR |= 0x02;
-
-    /* set IRQ6 prio 8 */
-    IPRB = ( IPRB & 0xff0f ) | 0x0080;
-
-    mas_readmem(MAS_BANK_D1, 0xff7, &mas_version_code, 1);
-    
-    mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
-    mas_run(1);
-    sleep(HZ);
-
-    /* Clear the upper 12 bits of the 32-bit samples */
-    mas_writereg(0xc5, 0);
-    mas_writereg(0xc6, 0);
-    
-    /* We need to set the PLL for a 14.1318MHz crystal */
-    if(mas_version_code == 0x0601) /* Version F10? */
-    {
-        val = 0x5d9d0;
-        mas_writemem(MAS_BANK_D0, 0x32d, &val, 1);
-        val = 0xfffceceb;
-        mas_writemem(MAS_BANK_D0, 0x32e, &val, 1);
-        val = 0x0;
-        mas_writemem(MAS_BANK_D0, 0x32f, &val, 1);
-        mas_run(0x475);
-    }
-    else
-    {
-        val = 0x5d9d0;
-        mas_writemem(MAS_BANK_D0, 0x36d, &val, 1);
-        val = 0xfffceceb;
-        mas_writemem(MAS_BANK_D0, 0x36e, &val, 1);
-        val = 0x0;
-        mas_writemem(MAS_BANK_D0, 0x36f, &val, 1);
-        mas_run(0xfcb);
-    }
-    
-#endif
 
     mp3buflen = mp3end - mp3buf;
 
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
-
-#ifdef HAVE_MAS3507D
-    mas_poll_start(1);
-
-    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
-    dac_enable(true);
-
-    mpeg_sound_channel_config(channel_config);
-#endif
-
-#ifdef HAVE_MAS3587F
-    ICR &= ~0x0010; /* IRQ3 level sensitive */
-    PACR1 = (PACR1 & 0x3fff) | 0x4000; /* PA15 is IRQ3 */
-#endif
-
-    /* Must be done before calling mpeg_sound_set() */
-    mpeg_is_initialized = true;
-    
-    mpeg_sound_set(SOUND_BASS, bass);
-    mpeg_sound_set(SOUND_TREBLE, treble);
-    mpeg_sound_set(SOUND_BALANCE, balance);
-    mpeg_sound_set(SOUND_VOLUME, volume);
-    
-#ifdef HAVE_MAS3587F
-    mpeg_sound_channel_config(channel_config);
-    mpeg_sound_set(SOUND_LOUDNESS, loudness);
-    mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
-    mpeg_sound_set(SOUND_AVC, avc);
-#endif
-#endif /* !SIMULATOR */
 
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);

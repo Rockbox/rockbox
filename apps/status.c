@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "settings.h"
 #include "status.h"
-#include "mpeg.h"
+#include "mp3_playback.h"
 #include "wps.h"
 #ifdef HAVE_RTC
 #include "timefuncs.h"

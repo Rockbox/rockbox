@@ -26,6 +26,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "mas.h"
 #include "button.h"
 #include "kernel.h"

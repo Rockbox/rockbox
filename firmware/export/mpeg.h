@@ -61,8 +61,7 @@ struct mpeg_debug
         int lowest_watermark_level;
 };
 
-void mpeg_init(int volume, int bass, int treble, int balance,
-               int loudness, int bass_boost, int avc, int channel_config);
+void mpeg_init(void);
 void mpeg_play(int offset);
 void mpeg_stop(void);
 void mpeg_pause(void);
@@ -71,20 +70,10 @@ void mpeg_next(void);
 void mpeg_prev(void);
 void mpeg_ff_rewind(int newtime);
 void mpeg_flush_and_reload_tracks(void);
-void mpeg_sound_set(int setting, int value);
-int mpeg_sound_min(int setting);
-int mpeg_sound_max(int setting);
-int mpeg_sound_default(int setting);
-void mpeg_sound_channel_config(int configuration);
-int mpeg_val2phys(int setting, int value);
-int mpeg_phys2val(int setting, int value);
-char *mpeg_sound_unit(int setting);
-int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
 bool mpeg_has_changed_track(void);
 int mpeg_status(void);
 #if defined(HAVE_MAS3587F) || defined(SIMULATOR)
-void mpeg_set_pitch(int percent);
 void mpeg_init_recording(void);
 void mpeg_init_playback(void);
 void mpeg_record(char *filename);
@@ -100,27 +89,6 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 void mpeg_set_buffer_margin(int seconds);
 unsigned int mpeg_error(void);
 void mpeg_error_clear(void);
-
-#define SOUND_VOLUME 0
-#define SOUND_BASS 1
-#define SOUND_TREBLE 2
-#define SOUND_BALANCE 3
-#define SOUND_LOUDNESS 4
-#define SOUND_SUPERBASS 5
-#define SOUND_AVC 6
-#define SOUND_CHANNELS 7
-#define SOUND_LEFT_GAIN 8
-#define SOUND_RIGHT_GAIN 9
-#define SOUND_MIC_GAIN 10
-#define SOUND_NUMSETTINGS 11
-
-#define MPEG_SOUND_STEREO 0
-#define MPEG_SOUND_STEREO_NARROW 1
-#define MPEG_SOUND_MONO 2
-#define MPEG_SOUND_MONO_LEFT 3
-#define MPEG_SOUND_MONO_RIGHT 4
-#define MPEG_SOUND_KARAOKE 5
-#define MPEG_SOUND_STEREO_WIDE 6
 
 #define MPEG_STATUS_PLAY 1
 #define MPEG_STATUS_PAUSE 2

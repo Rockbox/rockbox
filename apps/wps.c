@@ -33,6 +33,7 @@
 #include "wps.h"
 #include "wps-display.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
 #include "main_menu.h"

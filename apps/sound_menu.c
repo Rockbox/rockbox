@@ -23,7 +23,7 @@
 #include "lcd.h"
 #include "menu.h"
 #include "button.h"
-#include "mpeg.h"
+#include "mp3_playback.h"
 #include "settings.h"
 #include "status.h"
 #include "screens.h"

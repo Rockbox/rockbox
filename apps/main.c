@@ -37,6 +37,7 @@
 #include "serial.h"
 #endif
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "main_menu.h"
 #include "thread.h"
 #include "settings.h"
@@ -78,14 +79,15 @@ void init(void)
     sleep(HZ/2);
     tree_init();
     playlist_init();
-    mpeg_init( global_settings.volume,
-               global_settings.bass,
-               global_settings.treble,
-               global_settings.balance,
-               global_settings.loudness,
-               global_settings.bass_boost,
-               global_settings.avc,
-               global_settings.channel_config );
+    mp3_init( global_settings.volume,
+              global_settings.bass,
+              global_settings.treble,
+              global_settings.balance,
+              global_settings.loudness,
+              global_settings.bass_boost,
+              global_settings.avc,
+              global_settings.channel_config );
+    mpeg_init();
     while (button_get(false) != 0)
       ; /* Empty the keyboard buffer */
 }
@@ -197,14 +199,15 @@ void init(void)
 
     /* No buffer allocation (see buffer.c) may take place after the call to
        mpeg_init() since the mpeg thread takes the rest of the buffer space */
-    mpeg_init( global_settings.volume,
-               global_settings.bass,
-               global_settings.treble,
-               global_settings.balance,
-               global_settings.loudness,
-               global_settings.bass_boost,
-               global_settings.avc,
-               global_settings.channel_config );
+    mp3_init( global_settings.volume,
+              global_settings.bass,
+              global_settings.treble,
+              global_settings.balance,
+              global_settings.loudness,
+              global_settings.bass_boost,
+              global_settings.avc,
+              global_settings.channel_config );
+    mpeg_init();
 
     /* no auto-rolo on startup any more, but I leave it here for reference */
 #if 0

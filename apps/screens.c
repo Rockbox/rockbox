@@ -26,6 +26,7 @@
 #include "icons.h"
 #include "font.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "usb.h"
 #include "settings.h"
 #include "status.h"

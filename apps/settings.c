@@ -31,6 +31,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "string.h"
 #include "ata.h"
 #include "fat.h"
