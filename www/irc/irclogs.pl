@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#require "/home/dast/perl/date.pm";
+require "/home/dast/perl/date.pm";
 
 opendir(DIR, ".") or
     die "Can't opendir()";
