@@ -1004,12 +1004,8 @@ static bool swap_one_chunk(void)
 
     return true;
 }
-#else
-static bool swap_one_chunk(void)
-{
-    return false;
-}
 #endif
+
 const unsigned char empty_id3_header[] =
 {
     'I', 'D', '3', 0x03, 0x00, 0x00,
