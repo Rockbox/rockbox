@@ -19,7 +19,7 @@
 #ifndef _POWERMGMT_H_
 #define _POWERMGMT_H_
 
-#ifdef HAVE_LIION /* FM Recorder, LiIon */
+#if CONFIG_BATTERY == BATT_LIION2200 /* FM Recorder, LiIon */
 #define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
 #define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
 #define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
@@ -71,7 +71,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 
 #endif /* HAVE_CHARGE_CTRL */
 
-#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_LIION)
+#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
 extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
 #endif
 

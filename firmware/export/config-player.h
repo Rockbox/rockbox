@@ -22,6 +22,9 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ 12000000 /* cycle time ~83.3ns */
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_4AA_NIMH
+
 /* Battery scale factor (?) */
 #define BATTERY_SCALE_FACTOR 6546
 
@@ -44,7 +47,7 @@
 /* How to detect USB */
 #define USB_PLAYERSTYLE 1
 
-/* Define this if the platform has batteries */
+/* Define this if the platform can charge batteries */
 #define HAVE_BATTERIES 1
 
 /* Define this for programmable LED available */

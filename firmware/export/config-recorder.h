@@ -34,6 +34,9 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_4AA_NIMH
+
 /* Battery scale factor (?) */
 #define BATTERY_SCALE_FACTOR 6465
 
@@ -52,7 +55,7 @@
 /* How to detect USB */
 #define USB_RECORDERSTYLE 1
 
-/* Define this if the platform has batteries */
+/* Define this if the platform can charge batteries */
 #define HAVE_BATTERIES 1
 
 /* The start address index for ROM builds */

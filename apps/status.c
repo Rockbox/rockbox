@@ -172,7 +172,7 @@ void status_draw(bool force_redraw)
         if (info.inserted) {
             battery_state = true;
             plug_state = true;
-#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_LIION)
+#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
             /* zero battery run time if charging */
             if (charge_state > 0) {
                 global_settings.runtime = 0;

@@ -25,9 +25,6 @@
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1
 
-/* Define this if you have a LiIon battery */
-#define HAVE_LIION
-
 /* Define this if you need to power on ATA */
 #define NEEDS_ATA_POWER_ON
 
@@ -36,6 +33,9 @@
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11059200
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIION2200
 
 /* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
 #define BATTERY_SCALE_FACTOR 8081
@@ -61,7 +61,7 @@
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1
 
-/* Define this if the platform has batteries */
+/* Define this if the platform can charge batteries */
 #define HAVE_BATTERIES 1
 
 /* The start address index for ROM builds */

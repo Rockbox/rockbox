@@ -92,7 +92,7 @@ static const int poweroff_idle_timeout_value[15] =
 static const int percent_to_volt_decharge[11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
-#ifdef HAVE_LIION
+#if CONFIG_BATTERY == BATT_LIION2200
     /* measured values */
     260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400
 #else /* NiMH */
@@ -112,7 +112,7 @@ void set_battery_capacity(int capacity)
         battery_capacity = 1500;
 }
 
-#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_LIION)
+#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
 int charge_state = 0;                          /* at the beginning, the
                                                   charger does nothing */
 #endif
@@ -443,7 +443,7 @@ static void power_thread(void)
     int i;
     int avg, ok_samples, spin_samples;
     int current = 0;
-#ifdef HAVE_LIION
+#if CONFIG_BATTERY == BATT_LIION2200
     int charging_current;
 #endif
 #ifdef HAVE_CHARGE_CTRL
@@ -535,7 +535,7 @@ static void power_thread(void)
 #endif /* MEM == 8 */
 #endif /* HAVE_CHARGE_CONTROL */
 
-#ifdef HAVE_LIION
+#if CONFIG_BATTERY == BATT_LIION2200
         /* We use the information from the ADC_EXT_POWER ADC channel, which
            tells us the charging current from the LTC1734. When DC is
            connected (either via the external adapter, or via USB), we try
@@ -790,7 +790,7 @@ static void power_thread(void)
         powermgmt_last_cycle_startstop_min++;
         
 #endif /* HAVE_CHARGE_CTRL*/
-#endif /* HAVE_LIION */
+#endif /* # if CONFIG_BATTERY == BATT_LIION2200 */
         
         /* sleep for roughly a minute */
 #ifdef HAVE_CHARGE_CTRL

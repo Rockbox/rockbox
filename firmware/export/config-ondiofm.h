@@ -22,6 +22,9 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000
 
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_3AAA_ALKALINE
+
 /* Battery scale factor (measured from Jörg's FM) */
 #define BATTERY_SCALE_FACTOR 4785 /* 4.890V read as 0x3FE */
 

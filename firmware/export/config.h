@@ -40,6 +40,11 @@
 #define RECORDER_PAD 1
 #define ONDIO_PAD    2
 
+/* CONFIG_BATTERY */
+#define BATT_LIION2200      2200 /* FM/V2 recorder type */
+#define BATT_4AA_NIMH       1500
+#define BATT_3AAA_ALKALINE  1000
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"

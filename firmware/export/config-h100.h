@@ -16,7 +16,10 @@
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
-/* Define this if the platform has batteries */
+/* Type of mobile power, FIXME: probably different, make new type */
+#define CONFIG_BATTERY BATT_LIION2200
+
+/* Define this if the platform can charge batteries */
 #define HAVE_BATTERIES 1
 
 /* The start address index for ROM builds */
