@@ -103,9 +103,9 @@
 
 struct scrollinfo {
     char text[128];
+    char line[32];
     int textlen;
     char offset;
-    char xpos;
     char startx;
     char starty;
     char space;
@@ -113,7 +113,9 @@ struct scrollinfo {
 
 static void scroll_thread(void);
 static char scroll_stack[0x100];
-static char scroll_speed = 5; /* updates per second */
+static char scroll_speed = 8; /* updates per second */
+static char scroll_spacing = 3; /* spaces between end and start of text */
+
 
 static struct scrollinfo scroll; /* only one scroll line at the moment */
 static int scroll_count = 0;
@@ -766,17 +768,18 @@ void lcd_puts_scroll(int x, int y, char* string )
 #else
     int width, height;
     lcd_getfontsize(font, &width, &height);
-    s->space = (LCD_WIDTH - xmargin - x) / width;
+    s->space = (LCD_WIDTH - xmargin - x*width) / width;
 #endif
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
     if ( s->textlen > s->space ) {
-        s->offset=0;
-        s->xpos=x;
+        s->offset=s->space;
         s->startx=x;
         s->starty=y;
         strncpy(s->text,string,sizeof s->text);
         s->text[sizeof s->text - 1] = 0;
+        strncpy(s->line,string,sizeof s->line);
+        s->line[sizeof s->line - 1] = 0;
         scroll_count = 1;
     }
 }
@@ -801,31 +804,34 @@ void lcd_scroll_speed(int speed)
 static void scroll_thread(void)
 {
     struct scrollinfo* s = &scroll;
+
     while ( 1 ) {
         if ( !scroll_count ) {
             yield();
             continue;
         }
-        /* wait 1s before starting scroll */
-        if ( scroll_count < scroll_speed )
+        /* wait 0.5s before starting scroll */
+        if ( scroll_count < scroll_speed/2 )
             scroll_count++;
         else {
-            lcd_puts(s->xpos,s->starty,s->text + s->offset);
-            if ( s->textlen - s->offset < s->space )
-                lcd_puts(s->startx + s->textlen - s->offset, s->starty," ");
-            lcd_update();
-            
-            if ( s->xpos > s->startx )
-                s->xpos--;
-            else
+            int i;
+            for ( i=0; i<s->space-1; i++ )
+                s->line[i] = s->line[i+1];
+
+            if ( s->offset < s->textlen ) {
+                s->line[s->space - 1] = s->text[s->offset];
                 s->offset++;
-            
-            if (s->offset >= s->textlen) {
-                lcd_puts(s->startx + s->textlen - s->offset, s->starty," ");
-                scroll_count = scroll_speed; /* prevent wrap */
-                s->offset=0;
-                s->xpos = s->space-1;
             }
+            else {
+                s->line[s->space - 1] = ' ';
+                if ( s->offset < s->textlen + scroll_spacing - 1 )
+                    s->offset++;
+                else
+                    s->offset = 0;
+            }
+
+            lcd_puts(s->startx,s->starty,s->line);
+            lcd_update();
         }
         sleep(HZ/scroll_speed);
     }
