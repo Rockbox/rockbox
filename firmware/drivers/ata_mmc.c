@@ -198,10 +198,10 @@ static void setup_sci1(int bitrate_register)
 
 static void set_sci1_poll_read(void)
 {
-    while(!(SSR1 & SCI_TEND));    /* wait for end of transfer */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     SCR1 = 0;                     /* disable transmitter (& receiver) */
     SCR1 = (SCI_TE|SCI_RE);       /* re-enable transmitter & receiver */
-    while(!(SSR1 & SCI_TEND));    /* wait for SCI init completion (!) */
+    while (!(SSR1 & SCI_TEND));   /* wait for SCI init completion (!) */
     serial_mode = SER_POLL_READ;
     TDR1 = 0xFF;                  /* send do-nothing while reading */
 }
@@ -213,7 +213,7 @@ static void write_transfer(const unsigned char *buf, int len)
 
     if (serial_mode != SER_POLL_WRITE)
     {
-        while(!(SSR1 & SCI_TEND)); /* wait for end of transfer */
+        while (!(SSR1 & SCI_TEND)); /* wait for end of transfer */
         SCR1 = 0;                  /* disable transmitter & receiver */
         SSR1 = 0;                  /* clear all flags */
         SCR1 = SCI_TE;             /* enable transmitter only */
@@ -415,7 +415,7 @@ static int initialize_card(int card_no)
 
     /* initialize card */
     i = 0;
-    while (send_cmd(CMD_SEND_OP_COND, 0, response) && (++i < 200));
+    while (send_cmd(CMD_SEND_OP_COND, 0, response) && (++i < 500));
     if (response[0] != 0x00)
         return -2;                /* not ready */
         
