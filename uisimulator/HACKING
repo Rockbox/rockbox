@@ -63,6 +63,5 @@ Terminology
 
   Keyboard   Player-only
   --------   --------------
-  [fill in]  MENU
-  [fill in]  PLAY
-  [fill in]  STOP
+  Enter      MENU
+  6          PLAY  (there's no separation between PLAY and RIGHT)
