@@ -848,9 +848,6 @@ bool playlist_viewer_ex(char* filename)
     {
         int track;
 
-        /* Timeout so we can determine if play status has changed */
-        button = button_get_w_tmo(HZ/2);
-
         if (!viewer.playlist && !(mpeg_status() & MPEG_STATUS_PLAY))
         {
             /* Play has stopped */
@@ -899,13 +896,16 @@ bool playlist_viewer_ex(char* filename)
             /* Playlist has changed (new track started?) */
             update_first_index();
             if (!update_playlist(false))
-                exit = true;
+                goto exit;
             else
                 update = true;
 
             /* Abort move on playlist change */
             viewer.move_track = -1;
         }
+
+        /* Timeout so we can determine if play status has changed */
+        button = button_get_w_tmo(HZ/2);
 
         switch (button)
         {
