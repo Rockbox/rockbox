@@ -135,6 +135,14 @@ static int compare(const void* p1, const void* p2)
     if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
     {   /* two directories */
         criteria = global_settings.sort_dir;
+
+        if (e1->attr & ATTR_VOLUME || e2->attr & ATTR_VOLUME)
+        {   /* a volume identifier is involved */
+            if (e1->attr & ATTR_VOLUME && e2->attr & ATTR_VOLUME)
+                criteria = 0; /* two volumes: sort alphabetically */
+            else /* only one is a volume: volume first */
+                return (e2->attr & ATTR_VOLUME) - (e1->attr & ATTR_VOLUME);
+        }
     }
     else if (!(e1->attr & ATTR_DIRECTORY) && !(e2->attr & ATTR_DIRECTORY))
     {   /* two files */
