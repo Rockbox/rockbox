@@ -411,6 +411,7 @@ void settings_load(void)
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_time(global_settings.backlight);
     ata_spindown(global_settings.disk_spindown);
+    set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
 #endif
