@@ -345,6 +345,7 @@ void display_mute_text(bool muted)
 int wps_show(void)
 {
     struct mp3entry* id3 = NULL;
+    int retval;
     bool dont_go_to_menu = false;
     bool menu_button_is_down = false;
     bool pending_keylock = true; /* Keylock will go ON next time */
@@ -491,7 +492,6 @@ int wps_show(void)
                 break;
 
             case BUTTON_MENU | BUTTON_ON:
-                int retval;
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
