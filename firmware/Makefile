@@ -39,6 +39,8 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
+DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
+
 OUTPUT = $(OBJDIR)/librockbox.a
 
 ifdef LOADABLE_FONTS
@@ -58,6 +60,9 @@ $(OBJDIR)/%.o: %.S
 
 $(OBJDIR)/system.ajf: ../tools/bdf2ajf $(SYSTEM_FONT)
 	../tools/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/system.ajf
+
+tags:
+	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
 
 clean:
 	rm -f $(OBJS) $(OUTPUT)
