@@ -96,6 +96,7 @@ static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
 #endif
 static bool initialized = false;
+static bool new_mmc_circuit;
 static bool delayed_write = false;
 static unsigned char delayed_sector[SECTOR_SIZE];
 static int delayed_sector_num;
@@ -122,7 +123,7 @@ static int current_card = 0;
 static bool last_mmc_status = false;
 static int countdown;  /* for mmc switch debouncing */
 static bool usb_activity; /* monitoring the USB bridge */
-static long last_activity;
+static long last_usb_activity;
 
 /* private function declarations */
 
@@ -153,7 +154,7 @@ void mmc_select_clock(int card_no)
 {
     /* set clock gate for external card / reset for internal card if the
      * MMC clock polarity bit is 0, vice versa if it is 1 */
-    if ((card_no != 0) ^ ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0))
+    if ((card_no != 0) ^ new_mmc_circuit)
         or_b(0x10, &PADRH);       /* set clock gate PA12 */
     else
         and_b(~0x10, &PADRH);     /* clear clock gate PA12 */
@@ -848,19 +849,21 @@ bool mmc_usb_active(int delayticks)
 {
     /* reading "inactive" is delayed by user-supplied monoflop value */
     return (usb_activity ||
-            TIME_BEFORE(current_tick, last_activity+delayticks));
+            TIME_BEFORE(current_tick, last_usb_activity + delayticks));
 }
 
 static void mmc_tick(void)
 {
     bool current_status;
 
-    /* USB bridge activity is 0 on idle, ~527 on active */
-    current_status = adc_read(ADC_USB_ACTIVE) > 0x100;
+    if (new_mmc_circuit)
+        /* USB bridge activity is 0 on idle, ~527 on active */
+        current_status = adc_read(ADC_USB_ACTIVE) > 0x100;
+    else
+        current_status = adc_read(ADC_USB_ACTIVE) < 0x190;
+
     if (!current_status && usb_activity)
-    {
-        last_activity = current_tick;
-    }
+        last_usb_activity = current_tick;
     usb_activity = current_status;
 
     current_status = mmc_detect();
@@ -947,6 +950,7 @@ int ata_init(void)
     
     if ( !initialized ) 
     {
+        new_mmc_circuit = ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0);
 #ifdef HAVE_HOTSWAP
         queue_init(&mmc_queue);
         create_thread(mmc_thread, mmc_stack,
