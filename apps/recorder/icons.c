@@ -217,7 +217,7 @@ void statusbar_icon_volume(int percent)
     unsigned char *font;
 #endif
     static long switch_tick;
-    static int last_volume;
+    static int last_volume = -1; /* -1 means "first update ever" */
 
     volume = percent;
     if (volume < 0)
@@ -231,7 +231,7 @@ void statusbar_icon_volume(int percent)
                    STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
     }
     else {
-        if (last_volume != volume) {
+        if (last_volume != volume && last_volume >= 0) {
             switch_tick = current_tick + HZ;
         }
 
