@@ -469,6 +469,19 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 33 -->
+<tr><td>(33)</td>
+    <td colspan=2>Uwe Freese</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="t-shirt_uwefreese.gif"><img border=0 src="design33.gif" width=300 height=251></a></td>
+    <td></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
 <!-- End Entries -->
 
 </table>
