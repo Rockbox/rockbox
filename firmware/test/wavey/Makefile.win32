@@ -18,10 +18,10 @@ AR    = ar
 AS    = as
 OC    = objcopy
 scramble = scramble-win32
-
+DEFINES = -DCRT_DISPLAY
 INCLUDES=-I. -Icommon -Idrivers
 TARGET_OPTIONS =
-CFLAGS = -Os -Wall ${TARGET_OPTIONS} -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET)
+CFLAGS = -Os -Wall ${TARGET_OPTIONS} -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(DEFINES) $(TARGET)
 AFLAGS += -small -relax
 
 SRC := playlist.c settings.c panic.c disk.c debug.c harness.c
