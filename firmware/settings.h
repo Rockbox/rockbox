@@ -64,6 +64,9 @@ void reload_all_settings( user_settings_t *settings );
 void reset_settings( user_settings_t *settings );
 void display_current_settings( user_settings_t *settings );
 
+/* global settings */
+extern user_settings_t global_settings;
+
 /* system defines */
 
 #define DEFAULT_VOLUME_SETTING     70
@@ -78,6 +81,3 @@ void display_current_settings( user_settings_t *settings );
 
 
 #endif /* __SETTINGS_H__ */
-
-
-

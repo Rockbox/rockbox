@@ -24,6 +24,8 @@
 #include "panic.h"
 #include "debug.h"
 
+user_settings_t global_settings;
+
 /*
  * persist all runtime user settings to disk
  */
@@ -97,8 +99,3 @@ void display_current_settings( user_settings_t *settings )
     settings = settings;
 #endif
 }
-
-
-
-
-
