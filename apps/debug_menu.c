@@ -291,6 +291,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #ifdef HAVE_LCD_BITMAP
 bool dbg_hw_info(void)
 {
+#if CONFIG_CPU == SH7034
     char buf[32];
     int button;
     int usb_polarity;
@@ -383,7 +384,7 @@ bool dbg_hw_info(void)
         if(button == SETTINGS_CANCEL)
             return false;
     }
-
+#endif /* CONFIG_CPU == SH7034 */
     return false;
 }
 #else
@@ -541,6 +542,7 @@ bool dbg_partitions(void)
 /* Test code!!! */
 bool dbg_ports(void)
 {
+#if CONFIG_CPU == SH7034
     unsigned short porta;
     unsigned short portb;
     unsigned char portc;
@@ -595,6 +597,7 @@ bool dbg_ports(void)
                 return false;
         }
     }
+#endif /* CONFIG_CPU == SH7034 */
     return false;
 }
 #else
@@ -753,6 +756,8 @@ bool dbg_rtc(void)
 }
 #endif
 
+#if CONFIG_HWCODEC != MASNONE
+
 #ifdef HAVE_LCD_CHARCELLS
 #define NUMROWS 1
 #else
@@ -797,6 +802,7 @@ bool dbg_mas(void)
     }
     return false;
 }
+#endif /* CONFIG_HWCODEC != MASNONE */
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 bool dbg_mas_codec(void)
@@ -1548,6 +1554,7 @@ static bool dbg_disk_info(void)
 }
 #endif
 
+#if CONFIG_CPU == SH7034
 bool dbg_save_roms(void)
 {
     int fd;
@@ -1570,6 +1577,7 @@ bool dbg_save_roms(void)
     system_memory_guard(oldmode);
     return false;
 }
+#endif /*  CONFIG_CPU == SH7034 */
 
 #ifdef CONFIG_TUNER
 extern int debug_fm_detection;
@@ -1619,6 +1627,7 @@ bool dbg_screendump(void)
 }
 #endif
 
+#if CONFIG_CPU == SH7034
 bool dbg_set_memory_guard(void)
 {
     static const struct opt_items names[MAXMEMGUARD] = {
@@ -1633,6 +1642,7 @@ bool dbg_set_memory_guard(void)
 
     return false;
 }
+#endif /* CONFIG_CPU == SH7034 */
 
 bool debug_menu(void)
 {
@@ -1640,6 +1650,7 @@ bool debug_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
+#if CONFIG_CPU == SH7034
         { "Dump ROM contents", dbg_save_roms },
         { "View I/O ports", dbg_ports },
 #ifdef HAVE_LCD_BITMAP
@@ -1647,12 +1658,15 @@ bool debug_menu(void)
         { "View/clr RTC RAM", dbg_rtc },
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
-        { "View OS stacks", dbg_os },
         { "Catch mem accesses", dbg_set_memory_guard },
+#endif /* CONFIG_CPU == SH7034 */
+        { "View OS stacks", dbg_os },
 #if CONFIG_HWCODEC == MAS3507D
         { "View MAS info", dbg_mas_info },
 #endif
+#if CONFIG_HWCODEC != MASNONE
         { "View MAS regs", dbg_mas },
+#endif
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         { "View MAS codec", dbg_mas_codec },
 #endif
