@@ -12,4 +12,4 @@ similar to code that would run on target.
 Simulator-specific code should not be store here, but in the specific
 directories for the simulators.
 
-For further information see ../docs/README
+For further information see ../docs/UISIMULATOR
