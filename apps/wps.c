@@ -109,7 +109,7 @@ static void draw_screen(struct mp3entry* id3)
 #else
 
             lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
-            lcd_puts(0, l++, id3->title?id3->title:"<no title>");
+            lcd_puts_scroll(0, l++, id3->title?id3->title:"<no title>");
 #endif
             break;
         }
