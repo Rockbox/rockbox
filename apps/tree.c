@@ -263,6 +263,7 @@ bool dirbrowse(char *root)
                     }
                     else
                         start = dircursor = 0;
+                    lcd_stop_scroll();
                     numentries = showdir(currdir, start);
                     lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 }
