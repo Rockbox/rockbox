@@ -494,7 +494,7 @@ static int showdir(char *path, int start)
                   LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
 #endif
-    status_draw(false);
+    status_draw(true);
     return filesindir;
 }
 
