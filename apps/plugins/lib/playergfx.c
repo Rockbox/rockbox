@@ -76,9 +76,11 @@ void pgfx_release(void)
 void pgfx_display(int cx, int cy)
 {
     int i, j;
+    int width = MIN(char_width, 11 - cx);
+    int height = MIN(char_height, 2 - cy);
 
-    for (i = 0; i < char_width; i++)
-        for (j = 0; j < char_height; j++)
+    for (i = 0; i < width; i++)
+        for (j = 0; j < height; j++)
             pgfx_rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
 }
 
