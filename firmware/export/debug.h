@@ -20,8 +20,8 @@
 #define DEBUG_H
 
 extern void debug_init(void);
-extern void debugf(char* fmt,...);
-extern void ldebugf(char* file, int line, char *fmt, ...);
+extern void debugf(const char* fmt,...);
+extern void ldebugf(const char* file, int line, const char *fmt, ...);
 
 #ifdef __GNUC__
 

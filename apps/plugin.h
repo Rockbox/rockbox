@@ -261,7 +261,7 @@ struct plugin_api {
 #endif
     void (*plugin_tsr)(void (*exit_callback)(void));
 #if defined(DEBUG) || defined(SIMULATOR)
-    void (*debugf)(char *fmt, ...);
+    void (*debugf)(const char *fmt, ...);
 #endif
     struct user_settings* global_settings;
     void (*backlight_set_timeout)(int index);

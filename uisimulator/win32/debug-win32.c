@@ -47,7 +47,7 @@ void debug( const char *message )
         printf("%s", message);
 }
 
-void debugf(char *fmt, ...)
+void debugf(const char *fmt, ...)
 {
     va_list ap;
 

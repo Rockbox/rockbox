@@ -33,7 +33,7 @@
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
 
-static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
+static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
 {
     switch (page) {
     case 0:
@@ -85,7 +85,7 @@ int kbd_input(char* text, int buflen)
     int len;
     int editpos;
     bool redraw = true;
-    char* line[KEYBOARD_LINES];
+    const char* line[KEYBOARD_LINES];
 
     char outline[256];
     char c = 0;

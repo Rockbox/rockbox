@@ -122,7 +122,7 @@ static const long clip_time_out[] = {
    dBfs values. Used to draw the scale */
 #define DB_SCALE_SRC_VALUES_SIZE 11
 #if 0
-const static int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
+static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32767, /*   0 db */
     23197, /* - 3 db */
     16422, /* - 6 db */
