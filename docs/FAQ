@@ -325,15 +325,14 @@ Q43: I have a question about the id3v1 and id3v2 tags...
 A43: Stop!  Here is all the information about that (if you still have
      questions when done, ask then.)
 
-     1. Rockbox supports both id3v1 and id3v2
-     2. The id3v2 support is limited to the first 300 bytes of the file.  Some
-        ripper programs tend to add very big tags first and then the important
-        ones Rockbox wants to read end up beyond the first 300 bytes and then
-        they remain unknown.
-     3. If you believe that the tags you don't see *are* within 300 bytes, then
-        please make the mp3 file available for one of the developers to try 
-        out.
-     4. The 300-byte limit is subject to be removed in a future version
+     - Rockbox supports both id3v1 and id3v2
+     - The id3v2 support is limited to the first 300 bytes of the file.  Some
+       ripper programs tend to add very big tags first and then the important
+       ones Rockbox wants to read end up beyond the first 300 bytes and then
+       they remain unknown.
+     - If you believe that the tags you don't see *are* within 300 bytes, then
+       please make the mp3 file available for one of the developers to try out.
+     - The 300-byte limit is subject to be removed in a future version
 
 Q44: Would it be possible to record from line in on the player?
 A44: No.
