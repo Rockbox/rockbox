@@ -298,11 +298,18 @@ bool dbg_hw_info(void)
     int usb_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
+    unsigned manu, id; /* flash IDs */
+    bool got_id; /* flag if we managed to get the flash IDs */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
     else
         usb_polarity = 1; /* Positive */
+
+    /* get flash ROM type */
+    got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
+    if (!got_id)
+        got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
 
     lcd_clear_display();
 
@@ -325,6 +332,12 @@ bool dbg_hw_info(void)
             case 3:
                 snprintf(buf, 32, "Mask: %04x", bitmask);
                 break;
+            case 4:
+                if (got_id)
+                    snprintf(buf, 32, "Flash:%02x,%02x", manu, id);
+                else
+                    snprintf(buf, 32, "Flash:??,??"); /* unknown, sorry */
+                break;
         }
             
         lcd_puts(0, 1, buf);
@@ -340,12 +353,12 @@ bool dbg_hw_info(void)
             case BUTTON_LEFT:
                 currval--;
                 if(currval < 0)
-                    currval = 3;
+                    currval = 4;
                 break;
                 
             case BUTTON_RIGHT:
                 currval++;
-                if(currval > 3)
+                if(currval > 4)
                     currval = 0;
                 break;
         }
