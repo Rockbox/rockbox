@@ -159,6 +159,7 @@ unsigned short adc_read(int channel)
 }
 #endif
 
+#ifdef HAVE_CHARGING
 
 #ifdef HAVE_LCD_BITMAP
 void charging_display_info(bool animate)
@@ -204,7 +205,7 @@ void charging_display_info(bool animate)
     lcd_puts(0, 3, buf);
     if (!charger_enabled)
         animate = false;
-#endif
+#endif /* HAVE_CHARGE_CTRL */
 
     
     /* middle part */
@@ -308,9 +309,8 @@ void charging_display_info(bool animate)
     for (i = 0; i < 4; i++)
         lcd_define_pattern(logo_chars[i], buf + 7 * i);
 }
-#endif
+#endif /* (not) HAVE_LCD_BITMAP */
 
-#ifdef HAVE_CHARGING
 /* blocks while charging, returns on event:
    1 if charger cable was removed
    2 if Off/Stop key was pressed
