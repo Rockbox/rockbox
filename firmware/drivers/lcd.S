@@ -359,9 +359,11 @@ lcd_write_data:
         lea MBAR2,%a1
         moveq   #8,%d1
         or.l    %d1,(0xb4,%a1)
+
+        lea     0xf0000000,%a1
 .loop:
         move.b  (%a0)+,%d1
-        move.w  %d1,0xf0000000
+        move.w  %d1,(%a1)
         subq.l  #1,%d0
         bne     .loop
         rts
