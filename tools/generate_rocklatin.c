@@ -119,6 +119,14 @@ int main (int argc, char** argv)
   char *filename;
   FILE *fp;
 
+  printf("This tool will generate gif-pictures that reflect the current "
+         "rocklatin1 charset of the Player.\nThis tool is compiled with "
+         "the source, so don't forget to 'make' it before starting.\n"
+         "This tool will generate pnm-pictures that then automatically is "
+         "converted to gif pictures using the 'convert' tool of "
+         "ImageMagick.\n"
+         "The generated gif-pictures shall then be copied to www/docs.\n");
+  
   for (loop=0; loop<6; loop++) {
     switch (loop) {
     case 0:
