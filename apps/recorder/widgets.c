@@ -28,6 +28,19 @@ void progressbar(int x, int y, int width, int height, int percent, int direction
 {
     int pos;
 
+    /* check position and dimensions */
+    if(x < 0)
+        return;
+
+    if(y < 0)
+        return;
+
+    if(x + width > LCD_WIDTH)
+        return;
+
+    if(y + height > LCD_HEIGHT)
+        return;
+
     /* draw box */
     lcd_drawrect(x, y, width, height);
 
@@ -75,6 +88,19 @@ void progressbar(int x, int y, int width, int height, int percent, int direction
 void slidebar(int x, int y, int width, int height, int percent, int direction)
 {
     int pos;
+
+    /* check position and dimensions */
+    if(x < 0)
+        return;
+
+    if(y < 0)
+        return;
+
+    if(x + width > LCD_WIDTH)
+        return;
+
+    if(y + height > LCD_HEIGHT)
+        return;
 
     /* draw box */
     lcd_drawrect(x, y, width, height);
@@ -127,6 +153,19 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown, in
     int max;
     int start;
     int size;
+
+    /* check position and dimensions */
+    if(x < 0)
+        return;
+
+    if(y < 0)
+        return;
+
+    if(x + width > LCD_WIDTH)
+        return;
+
+    if(y + height > LCD_HEIGHT)
+        return;
 
     /* draw box */
     lcd_drawrect(x, y, width, height);
