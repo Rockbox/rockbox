@@ -22,6 +22,7 @@ TARGET = rockboxui
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
+RM = del
 
 CC = cl
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DARCHOS_RECORDER -D_WIN32 -DWIN32
@@ -35,7 +36,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 #SRCS = $(wildcard *.c)
 
 SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c \
-  chartables.c kernel.c Release/uisw32.res 
+  chartables.c kernel.c Release/uisw32.res file-win32.c
 
 OBJS = $(SRCS:.c=.obj)
 
@@ -47,3 +48,6 @@ lcd.obj: $(DRIVERS)/lcd.c
  
 chartables.obj: $(FIRMWAREDIR)/chartables.c
  $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/chartables.c -ochartables.obj
+ 
+clean:
+ $(RM) *.obj
