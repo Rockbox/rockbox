@@ -24,7 +24,7 @@
 
 typedef enum {
   MENU_OK,
-  MENU_REFRESH_DIR, /* any file/directory contents need to be re-read */
+  MENU_DISK_CHANGED, /* any file/directory contents need to be re-read */
   MENU_LAST /* don't use as return code, only for number of return codes
                available */
 } Menu;

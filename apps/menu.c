@@ -299,7 +299,7 @@ Menu menu_run(int m)
 #else
                 lcd_icon(ICON_PARAM, true);
 #endif
-                result = MENU_REFRESH_DIR;
+                result = MENU_DISK_CHANGED;
                 break;
 #endif
 

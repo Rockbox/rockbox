@@ -645,7 +645,7 @@ bool dirbrowse(char *root)
                 lcd_stop_scroll();
                 result = main_menu();
                 /* do we need to rescan dir? */
-                if (result == MENU_REFRESH_DIR ||
+                if (result == MENU_DISK_CHANGED ||
                     lastfilter != global_settings.mp3filter ||
                     lastsortcase != global_settings.sort_case ||
                     show_hidden_files != global_settings.show_hidden_files)
