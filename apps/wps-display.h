@@ -38,8 +38,4 @@ bool wps_display(struct mp3entry* id3);
 bool wps_load(char* file, bool display);
 void wps_reset(void);
 
-#ifdef HAVE_LCD_CHARCELLS
-bool draw_player_progress(struct mp3entry* id3, int ff_rewind_count);
-#endif
-
 #endif

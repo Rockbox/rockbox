@@ -59,6 +59,7 @@
 
 #ifdef HAVE_LCD_CHARCELLS
 unsigned char wps_progress_pat=0;
+static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count);
 #endif
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
@@ -374,8 +375,6 @@ static char* get_tag(struct mp3entry* id3,
                 case 'b':  /* progress bar */
                     *flags |= WPS_REFRESH_PLAYER_PROGRESS;
 #ifdef HAVE_LCD_CHARCELLS
-                    if (wps_progress_pat==0)
-                      wps_progress_pat=lcd_get_locked_pattern();
                     snprintf(buf, buf_size, "%c", wps_progress_pat);
                     return buf;
 #else
@@ -637,6 +636,11 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     */
     bool enable_pm = false;
 #endif
+#ifdef HAVE_LCD_CHARCELLS
+    if (wps_progress_pat==0)
+        wps_progress_pat=lcd_get_locked_pattern();
+#endif
+
     if (!id3)
     {
         lcd_stop_scroll();
@@ -768,7 +772,7 @@ bool wps_display(struct mp3entry* id3)
 }
 
 #if defined(HAVE_LCD_CHARCELLS)
-bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
+static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
     char player_progressbar[7];
     char binline[36];
@@ -777,9 +781,6 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 
     if (!id3)
         return false;
-
-    if (wps_progress_pat==0)
-        wps_progress_pat=lcd_get_locked_pattern();
 
     memset(binline, 1, sizeof binline);
     memset(player_progressbar, 1, sizeof player_progressbar);
