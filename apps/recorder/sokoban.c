@@ -51,11 +51,11 @@
 #define COLS                20
 #define MAX_UNDOS           5
 
-static void init_undo();
-static void undo();
+static void init_undo(void);
+static void undo(void);
 static void add_undo(int button);
 
-static void init_boards();
+static void init_boards(void);
 static void load_level(short level);
 static void draw_level(short level);
 static void update_screen(void);
@@ -103,13 +103,13 @@ static struct BoardInfo {
 } current_info;
 
 
-static void init_undo()
+static void init_undo(void)
 {
     undo_info.count = 0;
     undo_info.current = 0;
 }
 
-static void undo()
+static void undo(void)
 {
     struct Undo *undo;
     int i = 0;
@@ -230,7 +230,7 @@ static void add_undo(int button)
         undo_info.count++;
 }
 
-static void init_boards()
+static void init_boards(void)
 {
     current_info.level.level = 0;
     current_info.level.moves = 0;
