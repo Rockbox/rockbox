@@ -39,6 +39,8 @@
 #define MPEG_RESUME       4
 #define MPEG_NEED_DATA    100
 
+extern char* peek_next_track(int type);
+
 static unsigned int bass_table[] =
 {
     0,
