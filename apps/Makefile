@@ -48,7 +48,7 @@ SRC := $(wildcard *.c)
 ifeq ($(TARGET), -DARCHOS_FMRECORDER)
    SCRAMBLE_OPT = -fm
 endif
-ifeq ($(TARGET), -DARCHOS_FMRECORDERV2)
+ifeq ($(TARGET), -DARCHOS_RECORDERV2)
    SCRAMBLE_OPT = -v2
 endif
 
