@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "status.h"
 #include "applimits.h"
+#include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -545,10 +546,7 @@ int play_list(char *dir,         /* "current directory" */
 
     /* If file is NULL, the list is in RAM */
     if(file) {
-        lcd_clear_display();
-        lcd_puts(0,0,str(LANG_PLAYLIST_LOAD));
-        status_draw();
-        lcd_update();
+        splash(0, 0, true, str(LANG_PLAYLIST_LOAD));
         playlist.in_ram = false;
     } else {
         /* Assign a dummy filename */
@@ -576,9 +574,7 @@ int play_list(char *dir,         /* "current directory" */
     
     if(global_settings.playlist_shuffle) {
         if(!playlist.in_ram) {
-            lcd_puts(0,0,str(LANG_PLAYLIST_SHUFFLE));
-            status_draw();
-            lcd_update();
+            splash(0, 0, true, str(LANG_PLAYLIST_SHUFFLE));
             randomise_playlist( random_seed );
         }
         else {
@@ -623,11 +619,6 @@ int play_list(char *dir,         /* "current directory" */
         }
     }
 
-    if(!playlist.in_ram) {
-        lcd_puts(0,0,str(LANG_PLAYLIST_PLAY));
-        status_draw();
-        lcd_update();
-    }
     /* also make the first song get playing */
     mpeg_play(start_offset);
 
@@ -643,12 +634,10 @@ void add_indices_to_playlist(void)
     int fd = -1;
     int i = 0;
     int count = 0;
-    int next_tick = current_tick + HZ;
     unsigned char* buffer = playlist_buffer;
     int buflen = PLAYLIST_BUFFER_SIZE;
     bool store_index;
     unsigned char *p;
-    char line[16];
 
     if(!playlist.in_ram) {
         fd = open(playlist.filename, O_RDONLY);
@@ -708,19 +697,6 @@ void add_indices_to_playlist(void)
 
                         return;
                     }
-
-                    /* Update the screen if it takes very long */
-                    if(!playlist.in_ram) {
-                        if ( current_tick >= next_tick ) {
-                            next_tick = current_tick + HZ;
-                            snprintf(line, sizeof line,
-                                     str(LANG_PLAYINDICES_AMOUNT), 
-                                     playlist.amount);
-                            lcd_puts(0,1,line);
-                            status_draw();
-                            lcd_update();
-                        }
-			        }
                 }
             }
         }
@@ -730,14 +706,9 @@ void add_indices_to_playlist(void)
         if(playlist.in_ram)
             break;
     }
-    if(!playlist.in_ram) {
-        snprintf(line, sizeof line, str(LANG_PLAYINDICES_AMOUNT),
-			       	playlist.amount);
-        lcd_puts(0,1,line);
-        status_draw();
-        lcd_update();
+
+    if(!playlist.in_ram)
         close(fd);
-    }
 }
 
 /*
