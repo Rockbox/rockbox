@@ -69,7 +69,7 @@ struct voicefile /* file format of our voice file */
 struct queue_entry /* one entry of the internal queue */
 {
     unsigned char* buf;
-    int len;
+    long len;
 };
 
 
@@ -86,7 +86,7 @@ static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 static int filehandle; /* global, so the MMC variant can keep the file open */
 static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
-static int silence_len; /* length of the VOICE_PAUSE clip */
+static long silence_len; /* length of the VOICE_PAUSE clip */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 
 
@@ -95,9 +95,9 @@ static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 static void load_voicefile(void);
 static void mp3_callback(unsigned char** start, int* size);
 static int shutup(void);
-static int queue_clip(unsigned char* buf, int size, bool enqueue);
+static int queue_clip(unsigned char* buf, long size, bool enqueue);
 static int open_voicefile(void);
-static unsigned char* get_clip(int id, int* p_size);
+static unsigned char* get_clip(long id, long* p_size);
 
 
 /***************** Private implementation *****************/
@@ -149,7 +149,7 @@ static void load_voicefile(void)
 
         /* thumbnail buffer is the remaining space behind */
         p_thumbnail = mp3buf + file_size;
-        p_thumbnail += (int)p_thumbnail % 2; /* 16-bit align */
+        p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
         size_for_thumbnail = mp3end - p_thumbnail;
     }
     else
@@ -292,7 +292,7 @@ static int shutup(void)
 
 
 /* schedule a clip, at the end or discard the existing queue */
-static int queue_clip(unsigned char* buf, int size, bool enqueue)
+static int queue_clip(unsigned char* buf, long size, bool enqueue)
 {
     int queue_level;
 
@@ -335,9 +335,9 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
 }
 
 /* fetch a clip from the voice file */
-static unsigned char* get_clip(int id, int* p_size)
+static unsigned char* get_clip(long id, long* p_size)
 {
-    int clipsize;
+    long clipsize;
     unsigned char* clipbuf;
     
     if (id > VOICEONLY_DELIMITER)
@@ -426,9 +426,9 @@ int talk_buffer_steal(void)
 
 
 /* play a voice ID from voicefile */
-int talk_id(int id, bool enqueue)
+int talk_id(long id, bool enqueue)
 {
-    int clipsize;
+    long clipsize;
     unsigned char* clipbuf;
     int unit;
 
@@ -445,10 +445,10 @@ int talk_id(int id, bool enqueue)
         return -1;
 
     /* check if this is a special ID, with a value */
-    unit = ((unsigned)id) >> UNIT_SHIFT;
+    unit = ((unsigned long)id) >> UNIT_SHIFT;
     if (unit)
     {   /* sign-extend the value */
-        id = (unsigned)id << (32-UNIT_SHIFT);
+        id = (unsigned long)id << (32-UNIT_SHIFT);
         id >>= (32-UNIT_SHIFT);
         talk_value(id, unit, enqueue); /* speak it */
         return 0; /* and stop, end of special case */
@@ -507,10 +507,10 @@ int talk_file(const char* filename, bool enqueue)
 
 /* say a numeric value, this word ordering works for english,
    but not necessarily for other languages (e.g. german) */
-int talk_number(int n, bool enqueue)
+int talk_number(long n, bool enqueue)
 {
     int level = 0; /* mille count */
-    int mil = 1000000000; /* highest possible "-illion" */
+    long mil = 1000000000; /* highest possible "-illion" */
 
     if (mpeg_status()) /* busy, buffer in use */
         return -1; 
@@ -570,7 +570,7 @@ int talk_number(int n, bool enqueue)
 }
 
 /* singular/plural aware saying of a value */
-int talk_value(int n, int unit, bool enqueue)
+int talk_value(long n, int unit, bool enqueue)
 {
     int unit_id;
     static const int unit_voiced[] = 

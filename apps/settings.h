@@ -296,7 +296,7 @@ enum optiontype { INT, BOOL };
 
 struct opt_items {
     unsigned const char* string;
-    int voice_id;
+    long voice_id;
 };
 
 /* prototypes */

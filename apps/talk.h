@@ -49,7 +49,7 @@ enum {
 
 /* make a "talkable" ID from number + unit
    unit is upper 4 bits, number the remaining (in regular 2's complement) */
-#define TALK_ID(n,u) ((u)<<UNIT_SHIFT | ((n) & ~(-1<<UNIT_SHIFT)))
+#define TALK_ID(n,u) (((long)(u))<<UNIT_SHIFT | ((n) & ~(-1L<<UNIT_SHIFT)))
 
 /* convenience macro to have both virtual pointer and ID as arguments */
 #define STR(id) ID2P(id), id
@@ -60,10 +60,10 @@ extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 
 void talk_init(void);
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
-int talk_id(int id, bool enqueue); /* play a voice ID from voicefont */
+int talk_id(long id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
-int talk_number(int n, bool enqueue); /* say a number */
-int talk_value(int n, int unit, bool enqueue); /* say a numeric value */
+int talk_number(long n, bool enqueue); /* say a number */
+int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_spell(const char* spell, bool enqueue); /* spell a string */
 
 #endif /* __TALK_H__ */
