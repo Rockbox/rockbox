@@ -58,6 +58,177 @@
 #include "ata_mmc.h"
 #endif
 
+#ifdef IRIVER_H100
+#include "uda1380.h"
+#include "pcm_playback.h"
+#include "buffer.h"
+
+#define CHUNK_SIZE      44100    /* Transfer CHUNK_SIZE bytes on
+                                    each DMA transfer */
+
+static unsigned char line = 0;
+static unsigned char *audio_buffer;
+static int           audio_pos;
+static int           audio_size;
+
+static void puts(const char *fmt, ...)
+{
+    char buf[80];
+
+    if (line > 15)
+    {
+        lcd_clear_display();
+        line = 0;
+    }
+
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf)-1, fmt, ap);
+    va_end(ap);
+
+    lcd_puts(0, line, buf);
+    lcd_update();
+    
+    line++;
+}
+
+/* Very basic WAVE-file support.. Just for testing purposes.. */
+int load_wave(char *filename)
+{
+    int f, i;
+    unsigned char buf[32];
+    unsigned short *p;
+
+    puts("Loading %s..", filename);
+
+    f = open(filename, O_RDONLY);
+    if (f == -1)
+    {
+        puts("File not found");
+        return -1;
+    }
+
+    memset(buf,0,32);
+    read(f, buf, 32);
+    if (memcmp(buf, "RIFF", 4) != 0 || memcmp(buf+8, "WAVE", 4) != 0)
+    {
+        puts("Not WAVE");
+        return -1;
+    }
+    if (buf[12+8] != 1 || buf[12+9] != 0 ||       /* Check PCM format */
+        buf[12+10] != 2 || buf[12+11] != 0)       /* Check stereo */
+    {
+        puts("Unsupported format");
+        return -1;
+    }
+
+    audio_size = filesize(f) - 0x30;
+    if (audio_size > 8*1024*1024)
+        audio_size = 8*1024*1024;
+
+    audio_buffer = mp3buf;
+
+    puts("Reading %d bytes..", audio_size);
+
+    lseek(f, 0x30, SEEK_SET);    /* Skip wave header */
+
+    read(f, audio_buffer, audio_size);
+    close(f);
+
+    puts("Changing byte order..");
+    p = (unsigned short *)audio_buffer;
+    for (i=0; i<audio_size/2; i++, p++)
+    {
+        *p = SWAB16(*p);
+    }
+
+    return 0;
+}
+
+/* 
+    Test routined of the UDA1380 codec 
+    - Loads a WAVE file and plays it..
+    - Control play/stop, master volume and analog mixer volume
+
+*/
+
+static void test_get_more(unsigned char **ptr, long *size)
+{
+    static long last_chunk_size = 0;
+
+    audio_pos += last_chunk_size;
+    
+    if(audio_pos < audio_size)
+    {
+        last_chunk_size = MIN(CHUNK_SIZE, (audio_size - audio_pos));
+        *ptr = &audio_buffer[audio_pos];
+        *size = last_chunk_size;
+    }
+}
+
+bool uda1380_test(void)
+{
+    long button;
+    int vol = 0x7f;
+    bool done = false;
+
+    lcd_setmargins(0, 0);
+    lcd_clear_display(); 
+    lcd_update();
+
+    if (load_wave("/sample.wav") == -1)
+        goto exit;
+
+    audio_pos = 0;
+
+    puts("uda1380_init");
+    if (uda1380_init() == -1)
+    {
+        puts("Init failed..");
+        goto exit;
+    }
+
+    puts("Playing..");
+    audio_pos = 0;
+    pcm_play_data(audio_buffer, CHUNK_SIZE,
+                  test_get_more);
+
+    while(!done)
+    {
+        button = button_get_w_tmo(HZ/2);
+        switch(button)
+        {
+        case BUTTON_UP:
+            if (vol)
+                vol--;
+
+            uda1380_setvol(vol);
+            break;
+        case BUTTON_DOWN:
+            if (vol < 255)
+                vol++;
+
+            uda1380_setvol(vol);
+            break;
+        case BUTTON_OFF:
+            done = true;
+            break;
+        }
+        
+        if(!pcm_is_playing())
+            done = true;
+    }
+     
+    pcm_play_stop();
+    uda1380_mute(1);
+
+exit:
+    sleep(HZ >> 1);  /* Sleep 1/2 second to fade out sound */
+
+    return false;
+}
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -1793,6 +1964,7 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
+        { "Audio test", uda1380_test },
 #endif
 #if CONFIG_CPU == SH7034
 #ifdef HAVE_LCD_BITMAP
