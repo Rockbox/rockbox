@@ -736,7 +736,7 @@ void settings_load(void)
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
         global_settings.resume_file[MAX_PATH]=0;
-#ifdef HAVE_LCD_CHARSCELLS
+#ifdef HAVE_LCD_CHARCELLS
         if (config_block[0xa8] != 0xff)
             global_settings.jump_scroll = config_block[0xa8];
         if (config_block[0xa9] != 0xff)
@@ -1411,7 +1411,7 @@ void settings_reset(void) {
     global_settings.scroll_speed = 8;
     global_settings.bidir_limit  = 50;
 #ifdef HAVE_LCD_CHARCELLS
-    global_settings.jump_scroll  = 1;
+    global_settings.jump_scroll  = 0;
     global_settings.jump_scroll_delay  = 50;
 #endif    
     global_settings.scroll_delay = 100;
