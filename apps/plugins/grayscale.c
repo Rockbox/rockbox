@@ -334,7 +334,9 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     int possible_depth, plane_size;
     int i, j;
 
-    if (width > LCD_WIDTH || bheight > (LCD_HEIGHT >> 3) || depth < 1)
+    if ((unsigned) width > LCD_WIDTH 
+        || (unsigned) bheight > (LCD_HEIGHT >> 3) 
+        || depth < 1)
         return 0;
 
     while ((unsigned long)gbuf & 3)  /* the buffer has to be long aligned */
@@ -569,7 +571,7 @@ void gray_scroll_left(int count, bool black_border)
     unsigned char *src, *dest;
     unsigned char filler;
 
-    if (graybuf == NULL || count >= graybuf->width)
+    if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
         return;
         
     if (black_border)
@@ -606,7 +608,7 @@ void gray_scroll_right(int count, bool black_border)
     unsigned char *src, *dest;
     unsigned char filler;
 
-    if (graybuf == NULL || count >= graybuf->width)
+    if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
         return;
 
     if (black_border)
@@ -850,8 +852,10 @@ void gray_scroll_down1(bool black_border)
  */
 void gray_drawpixel(int x, int y, int brightness)
 {
-    if (graybuf == NULL || x >= graybuf->width || y >= graybuf->height
-        || brightness > 255)
+    if (graybuf == NULL 
+        || (unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height
+        || (unsigned) brightness > 255)
         return;
 
     graypixel(x, y, graybuf->bitpattern[(brightness
@@ -865,7 +869,9 @@ void gray_drawpixel(int x, int y, int brightness)
  */
 void gray_invertpixel(int x, int y)
 {
-    if (graybuf == NULL || x >= graybuf->width || y >= graybuf->height)
+    if (graybuf == NULL 
+        || (unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
         return;
 
     grayinvertmasked(x, (y >> 3), 1 << (y & 7));
@@ -885,8 +891,12 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
     int y, yinc1, yinc2;
     unsigned long pattern;
 
-    if (graybuf == NULL || x1 >= graybuf->width || y1 >= graybuf->height
-        || x2 >= graybuf->width || y2 >= graybuf->height|| brightness > 255)
+    if (graybuf == NULL 
+        || (unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y2 >= (unsigned) graybuf->height
+        || (unsigned) brightness > 255)
         return;
 
     pattern = graybuf->bitpattern[(brightness * (graybuf->depth + 1)) >> 8];
@@ -966,8 +976,11 @@ void gray_invertline(int x1, int y1, int x2, int y2)
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
 
-    if (graybuf == NULL || x1 >= graybuf->width || y1 >= graybuf->height
-        || x2 >= graybuf->width || y2 >= graybuf->height)
+    if (graybuf == NULL 
+        || (unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y2 >= (unsigned) graybuf->height)
         return;
 
     deltax = abs(x2 - x1);
@@ -1041,8 +1054,12 @@ void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
     int x, y;
     unsigned long pattern;
 
-    if (graybuf == NULL || x1 >= graybuf->width || y1 >= graybuf->height
-        || x2 >= graybuf->width || y2 >= graybuf->height|| brightness > 255)
+    if (graybuf == NULL 
+        || (unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y2 >= (unsigned) graybuf->height
+        || (unsigned) brightness > 255)
         return;
 
     pattern = graybuf->bitpattern[(brightness * (graybuf->depth + 1)) >> 8];
@@ -1082,8 +1099,12 @@ void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
     int x, y;
     unsigned long pattern;
 
-    if (graybuf == NULL || x1 >= graybuf->width || y1 >= graybuf->height
-        || x2 >= graybuf->width || y2 >= graybuf->height || brightness > 255)
+    if (graybuf == NULL 
+        || (unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y2 >= (unsigned) graybuf->height
+        || (unsigned) brightness > 255)
         return;
         
     if (y1 > y2)
@@ -1121,8 +1142,11 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
     int x, yb, yb1, yb2;
     unsigned char mask;
 
-    if (graybuf == NULL || x1 >= graybuf->width || y1 >= graybuf->height
-        || x2 >= graybuf->width || y2 >= graybuf->height)
+    if (graybuf == NULL 
+        || (unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y2 >= (unsigned) graybuf->height)
         return;
 
     if (y1 > y2)
@@ -1174,7 +1198,7 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
  * A grayscale bitmap contains one byte for every pixel that defines the
  * brightness of the pixel (0..255). Bytes are read in row-major order.
  * The <stride> parameter is useful if you want to show only a part of a
- * bitmap. It should always be set to the "line length" of the bitmap, so
+ * bitmap. It should always be set to the "row length" of the bitmap, so
  * for displaying the whole bitmap, nx == stride.
  */
 void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
@@ -1183,7 +1207,9 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
     int xi, yi;
     unsigned char *row;
 
-    if (graybuf == NULL || x >= graybuf->width || y >= graybuf->height)
+    if (graybuf == NULL 
+        || (unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
         return;
     
     if ((y + ny) >= graybuf->height) /* clip bottom */
@@ -1206,14 +1232,19 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
 
 /* Display a bitmap with specific foreground and background gray values
  *
+ * This (now) uses the same bitmap format as the core b&w graphics routines,
+ * so you can use bmp2rb to generate bitmaps for use with this function as
+ * well.
+ *
  * A bitmap contains one bit for every pixel that defines if that pixel is
- * foreground (1) or background (0). Bytes are read in row-major order, MSB
- * first. A row consists of an integer number of bytes, extra bits past the
- * right margin are ignored.
+ * foreground (1) or background (0). Bits within a byte are arranged
+ * vertically, LSB at top.
+ * The bytes are stored in row-major order, with byte 0 being top left,
+ * byte 1 2nd from left etc. The first row of bytes defines pixel rows
+ * 0..7, the second row defines pixel row 8..15 etc.
+ *
  * The <stride> parameter is useful if you want to show only a part of a
- * bitmap. It should always be set to the "line length" of the bitmap.
- * Beware that this is counted in bytes, so nx == 8 * stride for the whole
- * bitmap.
+ * bitmap. It should always be set to the "row length" of the bitmap.
  *
  * If draw_bg is false, only foreground pixels are drawn, so the background
  * is transparent. In this case bg_brightness is ignored.
@@ -1222,15 +1253,18 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
                      int stride, bool draw_bg, int fg_brightness,
                      int bg_brightness)
 {
-    int xi, yi, i;
+    int xi, dy;
+    int bits = 0;  /* Have to initialize to prevent warning */
     unsigned long fg_pattern, bg_pattern;
-    unsigned long bits = 0;  /* Have to initialize to prevent warning */
-    unsigned char *row;
+    unsigned char *col;
 
-    if (graybuf == NULL || x >= graybuf->width || y >= graybuf->height
-        || fg_brightness > 255 || bg_brightness > 255)
+    if (graybuf == NULL 
+        || (unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height
+        || (unsigned) fg_brightness > 255
+        || (unsigned) bg_brightness > 255)
         return;
-    
+
     if ((y + ny) >= graybuf->height) /* clip bottom */
         ny = graybuf->height - y;
 
@@ -1243,25 +1277,24 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
     bg_pattern = graybuf->bitpattern[(bg_brightness
                                       * (graybuf->depth + 1)) >> 8];
 
-    for (yi = y; yi < y + ny; yi++)
+    for (xi = x; xi < x + nx; xi++)
     {
-        i = 0;
-        row = src;
-        src += stride;
-        for (xi = x; xi < x + nx; xi++)
+        col = src++;
+        for (dy = 0; dy < ny; dy++)
         {
-            if (i == 0)   /* get next 8 bits */
-                bits = (unsigned long)(*row++);
+            if (!(dy & 7))   /* get next 8 bits */
+            {
+                bits = (int)(*col);
+                col += stride;
+            }
 
-            if (bits & 0x80)
-                graypixel(xi, yi, fg_pattern);
+            if (bits & 0x01)
+                graypixel(xi, y + dy, fg_pattern);
             else
                 if (draw_bg)
-                    graypixel(xi, yi, bg_pattern);
+                    graypixel(xi, y + dy, bg_pattern);
 
-            bits <<= 1;
-            i++;
-            i &= 7;
+            bits >>= 1;
         }
     }
 }
@@ -1279,41 +1312,36 @@ int main(void)
     bool black_border;
 
     static unsigned char rockbox[] = {
-    /* .... .... .... .... .... .... .... .... .... .... ...
-     * .### #... ###. ..## #..# ...# .### #... ###. .#.. .#.
-     * .#.. .#.# ...# .#.. .#.# ..#. .#.. .#.# ...# ..#. #..
-     * .### #..# ...# .#.. ...# ##.. .### #..# ...# ...# ...
-     * .#.. #..# ...# .#.. .#.# ..#. .#.. .#.# ...# ..#. #..
-     * .#.. .#.. ###. ..## #..# ...# .### #... ###. .#.. .#.
-     * .... .... .... .... .... .... .... .... .... .... ...
+    /* ...........................................
+     * .####...###...###..#...#.####...###..#...#.
+     * .#...#.#...#.#...#.#..#..#...#.#...#..#.#..
+     * .####..#...#.#.....###...####..#...#...#...
+     * .#..#..#...#.#...#.#..#..#...#.#...#..#.#..
+     * .#...#..###...###..#...#.####...###..#...#.
+     * ...........................................
      * 43 x 7 pixel, 1 bpp
      */
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x78, 0xE3, 0x91, 0x78, 0xE4, 0x40,
-       0x45, 0x14, 0x52, 0x45, 0x12, 0x80,
-       0x79, 0x14, 0x1C, 0x79, 0x11, 0x00,
-       0x49, 0x14, 0x52, 0x45, 0x12, 0x80,
-       0x44, 0xE3, 0x91, 0x78, 0xE4, 0x40,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+       0x00, 0x3E, 0x0A, 0x0A, 0x1A, 0x24, 0x00, 0x1C, 0x22, 0x22,
+       0x22, 0x1C, 0x00, 0x1C, 0x22, 0x22, 0x22, 0x14, 0x00, 0x3E,
+       0x08, 0x08, 0x14, 0x22, 0x00, 0x3E, 0x2A, 0x2A, 0x2A, 0x14,
+       0x00, 0x1C, 0x22, 0x22, 0x22, 0x1C, 0x00, 0x22, 0x14, 0x08,
+       0x14, 0x22, 0x00
     };
     
     static unsigned char showing[] = {
-    /* .... .... .... .... .... .... .... .... .... ...
-     * ..## ##.# ...# ..## #..# ...# .#.# ...# ..## ##.
-     * .#.. ...# ...# .#.. .#.# ...# .#.# #..# .#.. ...
-     * ..## #..# #### .#.. .#.# .#.# .#.# .#.# .#.. ##.
-     * .... .#.# ...# .#.. .#.# .#.# .#.# ..## .#.. .#.
-     * .### #..# ...# ..## #... #.#. .#.# ...# ..## ##.
-     * .... .... .... .... .... .... .... .... .... ...
+    /* .......................................
+     * ..####.#...#..###..#...#.#.#...#..####.
+     * .#.....#...#.#...#.#...#.#.##..#.#.....
+     * ..###..#####.#...#.#.#.#.#.#.#.#.#..##.
+     * .....#.#...#.#...#.#.#.#.#.#..##.#...#.
+     * .####..#...#..###...#.#..#.#...#..####.
+     * .......................................
      * 39 x 7 pixel, 1 bpp
      */
-       0x00, 0x00, 0x00, 0x00, 0x00,
-       0x3D, 0x13, 0x91, 0x51, 0x3C,
-       0x41, 0x14, 0x51, 0x59, 0x40,
-       0x39, 0xF4, 0x55, 0x55, 0x4C,
-       0x05, 0x14, 0x55, 0x53, 0x44,
-       0x79, 0x13, 0x8A, 0x51, 0x3C,
-       0x00, 0x00, 0x00, 0x00, 0x00
+       0x00, 0x24, 0x2A, 0x2A, 0x2A, 0x12, 0x00, 0x3E, 0x08, 0x08,
+       0x08, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x22, 0x1C, 0x00, 0x1E,
+       0x20, 0x18, 0x20, 0x1E, 0x00, 0x3E, 0x00, 0x3E, 0x04, 0x08,
+       0x10, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x2A, 0x3A, 0x00
     };
     
     static unsigned char grayscale_gray[] = {
@@ -1405,8 +1433,8 @@ int main(void)
     gray_invertline(13, 27, 98, 27);   /* invert a line */
     
     /* show bitmaps (1 bit and 8 bit) */
-    gray_drawbitmap(rockbox, 14, 13, 43, 7, 6, true, 255, 100);   /* opaque */
-    gray_drawbitmap(showing, 58, 13, 39, 7, 5, false, 0, 0); /* transparent */
+    gray_drawbitmap(rockbox, 14, 13, 43, 7, 43, true, 255, 100);   /* opaque */
+    gray_drawbitmap(showing, 58, 13, 39, 7, 39, false, 0, 0); /* transparent */
     gray_drawgraymap(grayscale_gray, 28, 35, 55, 7, 55);
 
     time = *rb->current_tick - time;  /* end time measurement */
