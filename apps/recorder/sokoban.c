@@ -329,7 +329,7 @@ static int get_level(char *level, int level_size)
         /* we search for the first character that isn't a newline */
         for (i = 0; i < nread; i++) {
             /* skip and count all newlines */
-            while((buffer[i] == '\n') && (i < nread)) {
+            while((buffer[i] == '\n' || buffer[i] == '\r') && (i < nread)) {
                 prevnewl++;
                 i++;
             }
@@ -339,7 +339,7 @@ static int get_level(char *level, int level_size)
                 break;
 
             /* start of new level? */
-            if((prevnewl>1) && (buffer[i] != '\n')) {
+            if((prevnewl>1) && (buffer[i] != '\n' && buffer[i] != '\r')) {
                 prevnewl=0; /* none now */
                 level_ct++;
                     
@@ -351,7 +351,7 @@ static int get_level(char *level, int level_size)
             }
             
             /* skip all non-newlines */
-            while((buffer[i] != '\n') && (i < nread))
+            while((buffer[i] != '\n' && buffer[i] != '\r') && (i < nread))
                 i++;
         }
         if(!level_found)
