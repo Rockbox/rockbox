@@ -254,13 +254,6 @@ int remove(const char* name)
         return fd * 10 - 1;
 
     file = &openfiles[fd];
-    rc = fat_truncate(&(file->fatfile));
-    if ( rc < 0 ) {
-        DEBUGF("Failed truncating file: %d\n", rc);
-        errno = EIO;
-        return rc * 10 - 2;
-    }
-
     rc = fat_remove(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed removing file: %d\n", rc);
