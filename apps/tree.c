@@ -108,10 +108,15 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
 #define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
 
-static int compare(const void* e1, const void* e2)
+static int compare(const void* p1, const void* p2)
 {
-    return strncmp((*(struct entry**)e1)->name, (*(struct entry**)e2)->name,
-                   TREE_MAX_FILENAMELEN);
+    struct entry* e1 = *(struct entry**)p1;
+    struct entry* e2 = *(struct entry**)p2;
+    
+    if (( e1->attr & ATTR_DIRECTORY ) == ( e2->attr & ATTR_DIRECTORY ))
+        return strncasecmp(e1->name, e2->name, TREE_MAX_FILENAMELEN);
+    else 
+        return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }
 
 static int showdir(char *path, int start)
