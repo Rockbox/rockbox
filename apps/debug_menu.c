@@ -800,8 +800,10 @@ bool view_battery(void)
 
             case 3: /* remeining time estimation: */
                 lcd_clear_display();
-                lcd_puts(0, 0, "Remaining time:");
-                
+
+                snprintf(buf, 30, "charge_state: %d", charge_state);
+                lcd_puts(0, 0, buf);
+
                 snprintf(buf, 30, "Cycle time: %d m", powermgmt_last_cycle_startstop_min);
                 lcd_puts(0, 1, buf);
 
