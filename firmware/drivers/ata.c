@@ -757,11 +757,15 @@ static int ata_power_on(void)
     if( ata_hard_reset() )
         return -1;
 
+    rc = set_features();
+    if (rc)
+        return rc * 10 - 2;
+
     if (set_multiple_mode(multisectors))
-        return -2;
+        return -3;
 
     if (freeze_lock())
-        return -3;
+        return -4;
 
     return 0;
 }
