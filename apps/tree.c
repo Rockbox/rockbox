@@ -739,6 +739,7 @@ static bool ask_resume(bool ask_once)
 {
     int button;
     bool stop = false;
+    static bool ignore_power = true;
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
@@ -767,22 +768,35 @@ static bool ask_resume(bool ask_once)
     while (!stop) {
         button = button_get(true);
         switch (button) {
+#ifdef TREE_RUN_PRE
+            case TREE_RUN_PRE:  /* catch the press, not the release */
+#else
             case TREE_RUN:
+#endif
 #ifdef TREE_RC_RUN
             case TREE_RC_RUN:
 #endif
+                ignore_power = false;
+                /* Don't ignore the power button for subsequent calls */
                 return true;
 
-#ifdef BUTTON_ON
-                /* ignore the ON button, since it might
-                   still be pressed since booting */
-            case BUTTON_ON:
-            case BUTTON_ON | BUTTON_REL:
-            case BUTTON_ON | BUTTON_REPEAT:
+#ifdef TREE_POWER_BTN
+                /* Initially ignore the button which powers on the box. It
+                   might still be pressed since booting. */
+            case TREE_POWER_BTN:
+            case TREE_POWER_BTN | BUTTON_REPEAT:
+                if(!ignore_power)
+                    stop = true;
+                break;
+
+                /* No longer ignore the power button after it was released */
+            case TREE_POWER_BTN | BUTTON_REL:
+                ignore_power = false;
                 break;
 #endif
+                /* Handle sys events, ignore button releases */
             default:
-                if(default_event_handler(button) || (button & BUTTON_REL))
+                if(default_event_handler(button) || !(button & BUTTON_REL))
                     stop = true;
                 break;
         }
@@ -793,6 +807,8 @@ static bool ask_resume(bool ask_once)
         settings_save();
     }
 
+    ignore_power = false; 
+    /* Don't ignore the power button for subsequent calls */
     return false;
 }
 
