@@ -63,7 +63,7 @@ int load_firmware(void)
     unsigned char *buf = (unsigned char *)0x30000000;
     char str[80];
     
-    fd = open("/rockbox.bin", O_RDONLY);
+    fd = open("/rockbox.iriver", O_RDONLY);
     if(fd < 0)
         return -1;
 
@@ -73,7 +73,7 @@ int load_firmware(void)
     lcd_puts(0, line++, str);
     lcd_update();
 
-    lseek(fd, 0, SEEK_SET);
+    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     
     rc = read(fd, &chksum, 4);
     if(rc < 4)
@@ -83,7 +83,7 @@ int load_firmware(void)
     lcd_puts(0, line++, str);
     lcd_update();
 
-    lseek(fd, 4, SEEK_CUR);
+    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     rc = read(fd, buf, len);
     if(rc < len)
@@ -139,7 +139,7 @@ int main(void)
     sleep(HZ/10); /* Allow the button driver to check the buttons */
 
     if(button_status() & BUTTON_REC) {
-        lcd_puts(0, 8, "Ninjax");
+        lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         sleep(HZ);
         start_iriver_fw();
@@ -147,8 +147,6 @@ int main(void)
 
     GPIO_FUNCTION |= 0x40000040;
     GPIO1_FUNCTION |= 0x00000062;
-
-    GPIO1_ENABLE |= 0x00000000;
 
     IDECONFIG1 = 0x00107000;
     IDECONFIG2 = 0x00040000;
