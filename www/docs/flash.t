@@ -17,9 +17,10 @@ by Jörg Hohensohn aka [IDC]Dragon
 This package contains tools to update the flash content of Archos Jukebox
 Recorder / FM.
 <p>
-Some terminology I'm gonna use in the following:
-Firmware means the flash ROM content as a whole.
-Image means one operating software started from there.
+Some terminology I'm gonna use in the following:<br>
+<b>Firmware</b> means the flash ROM content as a whole.<br>
+<b>Image</b> means one operating software started from there.
+<p>
 By reprogramming the firmware we can boot much faster. Archos has a pathetic
 boot loader, versus the boot time for rockbox is much faster than the disk
 spinup, in fact it has to wait for the disk. Your boot time will be as quick as
