@@ -97,6 +97,10 @@ if [ "$target" = "update" ]; then
       echo "Existing generated Makefile found. Getting defaults from it."
       target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
+
+      if [ "$debug" = "SIMULATOR=1" ]; then
+        simulator="yes"
+      fi
     fi
   fi
 else
