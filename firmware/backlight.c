@@ -53,27 +53,27 @@ void backlight_thread(void)
 #ifdef HAVE_RTC
                     rtc_write(0x13, 0x10);
 #else
-                    PADR |= 0x40;
+                    PADR &= ~0x4000;
 #endif
                 }
                 break;
-		
+                
             case BACKLIGHT_OFF:
 #ifdef HAVE_RTC
                 rtc_write(0x13, 0x00);
 #else
-                PADR &= ~0x40;
+                PADR |= 0x4000;
 #endif                
                 break;
-		
-	    case SYS_USB_CONNECTED:
-		/* Tell the USB thread that we are safe */
-		DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
-		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                
+            case SYS_USB_CONNECTED:
+                /* Tell the USB thread that we are safe */
+                DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-		/* Wait until the USB cable is extracted again */
-		usb_wait_for_disconnect(&backlight_queue);
-		break;
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&backlight_queue);
+                break;
         }
     }
 }
@@ -113,6 +113,9 @@ void backlight_init(void)
 #endif
     queue_init(&backlight_queue);
     create_thread(backlight_thread, backlight_stack,
-		  sizeof(backlight_stack), backlight_thread_name);
+                  sizeof(backlight_stack), backlight_thread_name);
+
+    PAIOR |= 0x4000;
+    
     backlight_on();
 }
