@@ -69,16 +69,15 @@ int init(void)
     struct partinfo* pinfo;
 
     system_init();
+    kernel_init();
     
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
     lcd_init();
-    show_logo();
 
 #ifdef DEBUG
     debug_init();
 #endif
-    kernel_init();
     set_irq_level(0);
 
     rc = ata_init();
@@ -95,6 +94,8 @@ int init(void)
 
     button_init();
     mpeg_init();
+
+    show_logo();
 
     return 0;
 }
