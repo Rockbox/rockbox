@@ -52,7 +52,7 @@ int button_set_release(int newmask)
 
 static int real_button_get(void)
 {
-    int btn;
+    int btn = 0;
 
     if (bActive)
     {
