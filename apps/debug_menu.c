@@ -38,7 +38,9 @@
 #include "font.h"
 #include "disk.h"
 #include "mpeg.h"
+#ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
+#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
