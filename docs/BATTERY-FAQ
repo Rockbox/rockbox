@@ -90,6 +90,8 @@ A10: People have successfully used different chargers with similar
      The charger should supply at least 7-8 volts, and if it provides
      more than 9V, it probably should be current limited (do not
      directly plug it in your 12V car battery or it's charger!).
+     The universal travel charger sold by Archos is specified at
+     12V, 1.2A so that's probably the maximum rating you should use.
      
      Using lower charging voltage will slow down the charging, and using
      higher voltage will cause a higher charging current, more heat,
@@ -105,7 +107,10 @@ A11: The FAQ on the Archos web site and the top of the charger both read:
 
       Output: 9VDC 600mA
       Center positive (+) polarity
-      
+     
+     The universal travel charger sold separately on the Archos web site
+     is specified for 12VDC, 1200mA output.
+     
      Chargers with similar (or user-adjustable) properties are available
      at shops selling consumer electronics.
 
