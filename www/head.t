@@ -36,7 +36,7 @@
 <a class="menulink" href="/docs/">data sheets</a><br>
 <a class="menulink" href="/schematics/">schematics</a><br>
 <a class="menulink" href="/mods/">hardware mods</a><br>
-<a class="menulink" href="/mail/">mailing list</a><br>
+<a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
 <a class="menulink" href="/tools.html">tools</a><br>
 <a class="menulink" href="/internals/">photos</a><br>
