@@ -29,20 +29,56 @@ start:
 	mov.l	vbr_k,r1	
 	mov.l	orig_vbr_k,r2
 	
-	/* Move the serial Rx interrupt vector */
-	mov	#0x69,r0
-	shll2	r0
-	mov.l	@(r0,r2),r3
-	mov.l	r3,@(r0,r1)
-
-	/* Move the breakpoint trap vector as well (32) */
-	mov	#0x20,r0
+	/* Move the invalid instruction vector (4) */
+	mov	#4,r0
 	shll2	r0
 	mov.l	@(r0,r2),r3
 	mov.l	r3,@(r0,r1)
 	
-	/* Move the single step trap vector as well (127) */
-	mov	#0x7f,r0
+	/* Move the invalid slot vector (6) */
+	mov	#6,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the bus error vector (9) */
+	mov	#9,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the DMA bus error vector (10) */
+	mov	#10,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the NMI vector as well (11) */
+	mov	#11,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the breakpoint trap vector (32) */
+	mov	#32,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the IO trap vector (33) */
+	mov	#33,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+	
+	/* Move the serial Rx interrupt vector (105) */
+	mov	#105,r0
+	shll2	r0
+	mov.l	@(r0,r2),r3
+	mov.l	r3,@(r0,r1)
+
+	/* Move the single step trap vector (127) */
+	mov	#127,r0
 	shll2	r0
 	mov.l	@(r0,r2),r3
 	mov.l	r3,@(r0,r1)
