@@ -16,7 +16,11 @@ struct scan
 {
 	int bg[64];
 	int wnd[64];
-	byte buf[8][256];
+#ifdef GRAYSCALE
+        byte buf[4][256];
+#else
+        byte buf[8][256];
+#endif
 	byte pal1[128];
 	un16 pal2[64];
 	un32 pal4[64];

@@ -754,7 +754,11 @@ void lcd_refreshline(void)
 #if LCD_HEIGHT == 64
     scanline_ind = (L/2) % 8;
 #else
+#ifdef GRAYSCALE
+    scanline_ind = L % 4;
+#else
     scanline_ind = L % 8;
+#endif
 #endif
     X = R_SCX;
     Y = (R_SCY + L) & 0xff;
@@ -797,7 +801,11 @@ void lcd_refreshline(void)
     if (scale == 1) density = 1;
     dest = vdest;
 */
+#ifdef GRAYSCALE
+    if (scanline_ind == 3)
+#else
     if (scanline_ind == 7)
+#endif
         vid_update(L);
   //  vdest += fb.pitch * scale;
 }
