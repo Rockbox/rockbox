@@ -31,9 +31,9 @@
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
-#define BYTES2INT32(array,pos) \
-          (array[pos] | (array[pos+1] << 8 ) | \
-          (array[pos+2] << 16 ) | (array[pos+3] << 24 ))
+#define BYTES2INT32(array,pos)					\
+    ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
+     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
 #define FATTYPE_FAT12       0
 #define FATTYPE_FAT16       1
@@ -180,8 +180,8 @@ static const unsigned char unicode2iso8859_2[] = {
 };
 
 struct fsinfo {
-    unsigned int freecount; /* last known free cluster count */
-    unsigned int nextfree;  /* first cluster to start looking for free
+    unsigned long freecount; /* last known free cluster count */
+    unsigned long nextfree;  /* first cluster to start looking for free
                                clusters, or 0xffffffff for no hint */
 };
 /* fsinfo offsets */
@@ -197,22 +197,22 @@ struct bpb
     int bpb_totsec16;    /* Number of sectors on the volume (old 16-bit) */
     int bpb_media;       /* Media type (typically 0xf0 or 0xf8) */
     int bpb_fatsz16;     /* Number of used sectors per FAT structure */
-    unsigned int bpb_totsec32;    /* Number of sectors on the volume
+    unsigned long bpb_totsec32;    /* Number of sectors on the volume
                                      (new 32-bit) */
     int last_word;       /* 0xAA55 */
 
     /**** FAT32 specific *****/
-    int bpb_fatsz32;
-    int bpb_rootclus;
-    int bpb_fsinfo;
+    long bpb_fatsz32;
+    long bpb_rootclus;
+    long bpb_fsinfo;
 
     /* variables for internal use */
-    unsigned int fatsize;
-    unsigned int totalsectors;
-    unsigned int rootdirsector;
-    unsigned int firstdatasector;
-    unsigned int startsector;
-    unsigned int dataclusters;
+    unsigned long fatsize;
+    unsigned long totalsectors;
+    unsigned long rootdirsector;
+    unsigned long firstdatasector;
+    unsigned long startsector;
+    unsigned long dataclusters;
     struct fsinfo fsinfo;
 #ifdef HAVE_FAT16SUPPORT
     int bpb_rootentcnt;  /* Number of dir entries in the root */
@@ -232,10 +232,10 @@ static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
-static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int secnum, bool dirty);
+static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) long secnum, bool dirty);
 static int create_dos_name(const unsigned char *name, unsigned char *newname);
-static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int start);
-static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned int start, int count, char* buf, bool write );
+static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long start);
+static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start, long count, char* buf, bool write );
 
 #define FAT_CACHE_SIZE 0x20
 #define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
@@ -254,7 +254,7 @@ static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static struct mutex cache_mutex;
 
-static int cluster2sec(IF_MV2(struct bpb* fat_bpb,) int cluster)
+static long cluster2sec(IF_MV2(struct bpb* fat_bpb,) long cluster)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -263,14 +263,15 @@ static int cluster2sec(IF_MV2(struct bpb* fat_bpb,) int cluster)
     /* negative clusters (FAT16 root dir) don't get the 2 offset */
     int zerocluster = cluster < 0 ? 0 : 2;
 #else
-    const int zerocluster = 2;
+    const long zerocluster = 2;
 #endif
-    int max_cluster = fat_bpb->totalsectors -
+    long max_cluster = fat_bpb->totalsectors -
         fat_bpb->firstdatasector / fat_bpb->bpb_secperclus + 1;
+    
     
     if (cluster > max_cluster)
     {
-        DEBUGF( "cluster2sec() - Bad cluster number (%d)\n", cluster);
+      DEBUGF( "cluster2sec() - Bad cluster number (%ld)\n", cluster);
         return -1;
     }
 
@@ -278,7 +279,7 @@ static int cluster2sec(IF_MV2(struct bpb* fat_bpb,) int cluster)
            + fat_bpb->firstdatasector;
 }
 
-int fat_startsector(IF_MV_NONVOID(int volume))
+long fat_startsector(IF_MV_NONVOID(int volume))
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;
@@ -287,16 +288,16 @@ int fat_startsector(IF_MV_NONVOID(int volume))
     return fat_bpb->startsector;
 }
 
-void fat_size(IF_MV2(int volume,) unsigned int* size, unsigned int* free)
+void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
     if (size)
-        *size = fat_bpb->dataclusters * fat_bpb->bpb_secperclus / 2;
+      *size = fat_bpb->dataclusters * fat_bpb->bpb_secperclus / 2;
     if (free)
-        *free = fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus / 2;
+      *free = fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus / 2;
 }
 
 void fat_init(void)
@@ -324,7 +325,7 @@ void fat_init(void)
 #endif
 }
 
-int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
+int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
 {
 #ifndef HAVE_MULTIVOLUME
     const int volume = 0;
@@ -332,7 +333,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
     struct bpb* fat_bpb = &fat_bpbs[volume];
     unsigned char buf[SECTOR_SIZE];
     int rc;
-    int datasec;
+    long datasec;
 #ifdef HAVE_FAT16SUPPORT
     int rootdirsectors;
 #endif
@@ -468,11 +469,11 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
         fat_recalc_free(IF_MV(volume));
     }
 
-    LDEBUGF("Freecount: %d\n",fat_bpb->fsinfo.freecount);
-    LDEBUGF("Nextfree: 0x%x\n",fat_bpb->fsinfo.nextfree);
-    LDEBUGF("Cluster count: 0x%x\n",fat_bpb->dataclusters);
+    LDEBUGF("Freecount: %ld\n",fat_bpb->fsinfo.freecount);
+    LDEBUGF("Nextfree: 0x%lx\n",fat_bpb->fsinfo.nextfree);
+    LDEBUGF("Cluster count: 0x%lx\n",fat_bpb->dataclusters);
     LDEBUGF("Sectors per cluster: %d\n",fat_bpb->bpb_secperclus);
-    LDEBUGF("FAT sectors: 0x%x\n",fat_bpb->fatsize);
+    LDEBUGF("FAT sectors: 0x%lx\n",fat_bpb->fatsize);
 
 #ifdef HAVE_MULTIVOLUME
     fat_bpb->mounted = true;
@@ -518,8 +519,8 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     const int volume = 0;
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
-    int free = 0;
-    unsigned i;
+    long free = 0;
+    unsigned long i;
 #ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
     {
@@ -544,9 +545,9 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     {
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
+            unsigned long* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
-                unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
+                unsigned long c = i * CLUSTERS_PER_FAT_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
                     break;
       
@@ -573,7 +574,7 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
                 fat_bpb->bpb_bytspersec);
         return -1;
     }
-    if(fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec > 128*1024)
+    if((long)fat_bpb->bpb_secperclus * (long)fat_bpb->bpb_bytspersec > 128L*1024L)
     {
         DEBUGF( "bpb_is_sane() - Error: cluster size is larger than 128K "
                 "(%d * %d = %d)\n",
@@ -604,7 +605,7 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
         fat_bpb->bpb_secperclus)
     {
         DEBUGF( "bpb_is_sane() - Error: FSInfo.Freecount > disk size "
-                 "(0x%04x)\n", fat_bpb->fsinfo.freecount);
+                 "(0x%04lx)\n", fat_bpb->fsinfo.freecount);
         return -4;
     }
 
@@ -661,12 +662,12 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
 /* Note: The returned pointer is only safely valid until the next 
          task switch! (Any subsequent ata read/write may yield.) */
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
-                              int fatsector, bool dirty)
+                              long fatsector, bool dirty)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    int secnum = fatsector + fat_bpb->bpb_rsvdseccnt;
+    long secnum = fatsector + fat_bpb->bpb_rsvdseccnt;
     int cache_index = secnum & FAT_CACHE_MASK;
     struct fat_cache_entry *fce = &fat_cache[cache_index];
     unsigned char *sectorbuf = &fat_cache_sectors[cache_index][0];
@@ -697,7 +698,7 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
                               sectorbuf);
         if(rc < 0)
         {
-            DEBUGF( "cache_fat_sector() - Could not read sector %d"
+            DEBUGF( "cache_fat_sector() - Could not read sector %ld"
                     " (error %d)\n", secnum, rc);
             mutex_unlock(&cache_mutex);
             return NULL;
@@ -714,14 +715,14 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
     return sectorbuf;
 }
 
-static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int startcluster)
+static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long startcluster)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned int sector;
-    unsigned int offset;
-    unsigned int i;
+    unsigned long sector;
+    unsigned long offset;
+    unsigned long i;
 
 #ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
@@ -759,19 +760,19 @@ static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int 
     
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned int nr = (i + sector) % fat_bpb->fatsize;
-            unsigned int* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
+            unsigned long nr = (i + sector) % fat_bpb->fatsize;
+            unsigned long* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
             if ( !fat )
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
                 int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
                 if (!(SWAB32(fat[k]) & 0x0fffffff)) {
-                    unsigned int c = nr * CLUSTERS_PER_FAT_SECTOR + k;
+                    unsigned long c = nr * CLUSTERS_PER_FAT_SECTOR + k;
                      /* Ignore the reserved clusters 0 & 1, and also
                         cluster numbers out of bounds */
                     if ( c < 2 || c > fat_bpb->dataclusters+1 )
                         continue;
-                    LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
+                    LDEBUGF("find_free_cluster(%lx) == %lx\n",startcluster,c);
                     fat_bpb->fsinfo.nextfree = c;
                     return c;
                 }
@@ -780,11 +781,13 @@ static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int 
         }
     }
 
-    LDEBUGF("find_free_cluster(%x) == 0\n",startcluster);
+    LDEBUGF("find_free_cluster(%lx) == 0\n",startcluster);
     return 0; /* 0 is an illegal cluster number */
 }
 
-static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, unsigned int val)
+static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) 
+			    unsigned long entry, 
+			    unsigned long val)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -829,11 +832,11 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
     {
-        int sector = entry / CLUSTERS_PER_FAT_SECTOR;
+        long sector = entry / CLUSTERS_PER_FAT_SECTOR;
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-        unsigned int* sec;
+        long unsigned int* sec;
 
-        LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
+        LDEBUGF("update_fat_entry(%lx,%lx)\n",entry,val);
 
         if (entry==val)
             panicf("Creating FAT loop: %x,%x\n",entry,val);
@@ -844,7 +847,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
         {
-            DEBUGF( "update_fat_entry() - Could not cache sector %d\n", sector);
+            DEBUGF( "update_fat_entry() - Could not cache sector %ld\n", sector);
             return -1;
         }
 
@@ -858,7 +861,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
                 fat_bpb->fsinfo.freecount++;
         }
 
-        LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb->fsinfo.freecount);
+        LDEBUGF("update_fat_entry: %ld free clusters\n", fat_bpb->fsinfo.freecount);
 
         /* don't change top 4 bits */
         sec[offset] &= SWAB32(0xf0000000);
@@ -868,7 +871,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
     return 0;
 }
 
-static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
+static long read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry)
 {
 #ifdef HAVE_FAT16SUPPORT
 #ifndef HAVE_MULTIVOLUME
@@ -892,14 +895,14 @@ static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
     {
-        int sector = entry / CLUSTERS_PER_FAT_SECTOR;
+        long sector = entry / CLUSTERS_PER_FAT_SECTOR;
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-        unsigned int* sec;
+        unsigned long* sec;
 
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, false);
         if (!sec)
         {
-            DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
+            DEBUGF( "read_fat_entry() - Could not cache sector %ld\n", sector);
             return -1;
         }
 
@@ -907,10 +910,10 @@ static int read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry)
     }
 }
 
-static int get_next_cluster(IF_MV2(struct bpb* fat_bpb,) int cluster)
+static long get_next_cluster(IF_MV2(struct bpb* fat_bpb,) long cluster)
 {
-    int next_cluster;
-    int eof_mark = FAT_EOF_MARK;
+    long next_cluster;
+    long eof_mark = FAT_EOF_MARK;
     
 #ifdef HAVE_FAT16SUPPORT
 #ifndef HAVE_MULTIVOLUME
@@ -1099,7 +1102,7 @@ static int write_long_name(struct fat_file* file,
     int nameidx=0, namelen = strlen(name);
     int rc;
 
-    LDEBUGF("write_long_name(file:%x, first:%d, num:%d, name:%s)\n",
+    LDEBUGF("write_long_name(file:%lx, first:%d, num:%d, name:%s)\n",
             file->firstcluster, firstentry, numentries, name);
 
     rc = fat_seek(file, sector);
@@ -1188,12 +1191,12 @@ static int write_long_name(struct fat_file* file,
             entry[FATDIR_FSTCLUSLO] = 0;
             entry[FATLONG_TYPE] = 0;
             entry[FATLONG_CHKSUM] = chksum;
-            LDEBUGF("Longname entry %d: %.13s\n", idx, name+nameidx);
+            LDEBUGF("Longname entry %d: %s\n", idx, name+nameidx);
         }
         else {
             /* shortname entry */
             unsigned short date=0, time=0, tenth=0;
-            LDEBUGF("Shortname entry: %.13s\n", shortname);
+            LDEBUGF("Shortname entry: %s\n", shortname);
             strncpy(entry + FATDIR_NAME, shortname, 11);
             entry[FATDIR_ATTR] = is_directory?FAT_ATTR_DIRECTORY:0;
             entry[FATDIR_NTRES] = 0;
@@ -1244,7 +1247,7 @@ static int add_dir_entry(struct fat_dir* dir,
     int namelen = strlen(name);
     int firstentry;
 
-    LDEBUGF( "add_dir_entry(%s,%x)\n",
+    LDEBUGF( "add_dir_entry(%s,%lx)\n",
              name, file->firstcluster);
 
 #ifdef HAVE_MULTIVOLUME
@@ -1482,18 +1485,18 @@ static int create_dos_name(const unsigned char *name, unsigned char *newname)
     return 0;
 }
 
-static int update_short_entry( struct fat_file* file, int size, int attr )
+static int update_short_entry( struct fat_file* file, long size, int attr )
 {
     unsigned char buf[SECTOR_SIZE];
     int sector = file->direntry / DIR_ENTRIES_PER_SECTOR;
     unsigned char* entry =
         buf + DIR_ENTRY_SIZE * (file->direntry % DIR_ENTRIES_PER_SECTOR);
-    unsigned int* sizeptr;
+    unsigned long* sizeptr;
     unsigned short* clusptr;
     struct fat_file dir;
     int rc;
 
-    LDEBUGF("update_file_size(cluster:%x entry:%d size:%d)\n",
+    LDEBUGF("update_file_size(cluster:%lx entry:%d size:%ld)\n",
             file->firstcluster, file->direntry, size);
 
     /* create a temporary file handle for the dir holding this file */
@@ -1520,7 +1523,7 @@ static int update_short_entry( struct fat_file* file, int size, int attr )
     clusptr = (short*)(entry + FATDIR_FSTCLUSLO);
     *clusptr = SWAB16(file->firstcluster & 0xffff);
 
-    sizeptr = (int*)(entry + FATDIR_FILESIZE);
+    sizeptr = (long*)(entry + FATDIR_FILESIZE);
     *sizeptr = SWAB32(size);
 
     {
@@ -1560,8 +1563,8 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
     de->wrtdate = BYTES2INT16(buf,FATDIR_WRTDATE);
     de->wrttime = BYTES2INT16(buf,FATDIR_WRTTIME);
     de->filesize = BYTES2INT32(buf,FATDIR_FILESIZE);
-    de->firstcluster = BYTES2INT16(buf,FATDIR_FSTCLUSLO) |
-                      (BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
+    de->firstcluster = ((long)BYTES2INT16(buf,FATDIR_FSTCLUSLO)) |
+        ((long)BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
 
     /* fix the name */
     for (i=0; (i<8) && (buf[FATDIR_NAME+i] != ' '); i++)
@@ -1575,7 +1578,7 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
 }
 
 int fat_open(IF_MV2(int volume,)
-             int startcluster,
+             long startcluster,
              struct fat_file *file,
              const struct fat_dir* dir)
 {
@@ -1601,7 +1604,7 @@ int fat_open(IF_MV2(int volume,)
         file->direntries = dir->entrycount;
         file->dircluster = dir->file.firstcluster;
     }
-    LDEBUGF("fat_open(%x), entry %d\n",startcluster,file->direntry);
+    LDEBUGF("fat_open(%lx), entry %d\n",startcluster,file->direntry);
     return 0;
 }
 
@@ -1611,7 +1614,7 @@ int fat_create_file(const char* name,
 {
     int rc;
 
-    LDEBUGF("fat_create_file(\"%s\",%x,%x)\n",name,file,dir);
+    LDEBUGF("fat_create_file(\"%s\",%lx,%lx)\n",name,(long)file,(long)dir);
     rc = add_dir_entry(dir, file, name, false, false);
     if (!rc) {
         file->firstcluster = 0;
@@ -1640,7 +1643,7 @@ int fat_create_dir(const char* name,
     int rc;
     struct fat_file dummyfile;
 
-    LDEBUGF("fat_create_dir(\"%s\",%x,%x)\n",name,newdir,dir);
+    LDEBUGF("fat_create_dir(\"%s\",%lx,%lx)\n",name,(long)newdir,(long)dir);
 
     memset(newdir, 0, sizeof(struct fat_dir));
     memset(&dummyfile, 0, sizeof(struct fat_file));
@@ -1698,13 +1701,13 @@ int fat_create_dir(const char* name,
 int fat_truncate(const struct fat_file *file)
 {
     /* truncate trailing clusters */
-    int next;
-    int last = file->lastcluster;
+    long next;
+    long last = file->lastcluster;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
 #endif
 
-    LDEBUGF("fat_truncate(%x, %x)\n", file->firstcluster, last);
+    LDEBUGF("fat_truncate(%lx, %lx)\n", file->firstcluster, last);
 
     for ( last = get_next_cluster(IF_MV2(fat_bpb,) last); last; last = next ) {
         next = get_next_cluster(IF_MV2(fat_bpb,) last);
@@ -1716,13 +1719,13 @@ int fat_truncate(const struct fat_file *file)
     return 0;
 }
 
-int fat_closewrite(struct fat_file *file, int size, int attr)
+int fat_closewrite(struct fat_file *file, long size, int attr)
 {
     int rc;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
 #endif
-    LDEBUGF("fat_closewrite(size=%d)\n",size);
+    LDEBUGF("fat_closewrite(size=%ld)\n",size);
 
     if (!size) {
         /* empty file */
@@ -1748,14 +1751,14 @@ int fat_closewrite(struct fat_file *file, int size, int attr)
 #else
         struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-        int count = 0;
-        int len;
-        int next;
+        long count = 0;
+        long len;
+        long next;
         for ( next = file->firstcluster; next;
               next = get_next_cluster(IF_MV2(fat_bpb,) next) )
-            LDEBUGF("cluster %d: %x\n", count++, next);
+            LDEBUGF("cluster %ld: %lx\n", count++, next);
         len = count * fat_bpb->bpb_secperclus * SECTOR_SIZE;
-        LDEBUGF("File is %d clusters (chainlen=%d, size=%d)\n",
+        LDEBUGF("File is %ld clusters (chainlen=%ld, size=%ld)\n",
                 count, len, size );
         if ( len > size + fat_bpb->bpb_secperclus * SECTOR_SIZE)
             panicf("Cluster chain is too long\n");
@@ -1832,13 +1835,13 @@ static int free_direntries(struct fat_file* file)
 
 int fat_remove(struct fat_file* file)
 {
-    int next, last = file->firstcluster;
+    long next, last = file->firstcluster;
     int rc;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
 #endif
 
-    LDEBUGF("fat_remove(%x)\n",last);
+    LDEBUGF("fat_remove(%lx)\n",last);
 
     while ( last ) {
         next = get_next_cluster(IF_MV2(fat_bpb,) last);
@@ -1865,7 +1868,7 @@ int fat_remove(struct fat_file* file)
 int fat_rename(struct fat_file* file, 
                 struct fat_dir* dir, 
                 const unsigned char* newname,
-                int size,
+                long size,
                 int attr)
 {
     int rc;
@@ -1913,18 +1916,18 @@ int fat_rename(struct fat_file* file,
 }
 
 static int next_write_cluster(struct fat_file* file,
-                              int oldcluster,
-                              int* newsector)
+                              long oldcluster,
+                              long* newsector)
 {
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    int cluster = 0;
-    int sector;
+    long cluster = 0;
+    long sector;
 
-    LDEBUGF("next_write_cluster(%x,%x)\n",file->firstcluster, oldcluster);
+    LDEBUGF("next_write_cluster(%lx,%lx)\n",file->firstcluster, oldcluster);
 
     if (oldcluster)
         cluster = get_next_cluster(IF_MV2(fat_bpb,) oldcluster);
@@ -1965,17 +1968,17 @@ static int next_write_cluster(struct fat_file* file,
 }
 
 static int transfer(IF_MV2(struct bpb* fat_bpb,) 
-                    unsigned int start, int count, char* buf, bool write )
+                    unsigned long start, long count, char* buf, bool write )
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
     int rc;
 
-    LDEBUGF("transfer(s=%x, c=%x, %s)\n",
+    LDEBUGF("transfer(s=%lx, c=%lx, %s)\n",
         start+ fat_bpb->startsector, count, write?"write":"read");
     if (write) {
-        unsigned int firstallowed;
+        unsigned long firstallowed;
 #ifdef HAVE_FAT16SUPPORT
         if (fat_bpb->is_fat16)
             firstallowed = fat_bpb->rootdirsector;
@@ -1995,7 +1998,7 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
         rc = ata_read_sectors(IF_MV2(fat_bpb->drive,)
                               start + fat_bpb->startsector, count, buf);
     if (rc < 0) {
-        DEBUGF( "transfer() - Couldn't %s sector %x"
+        DEBUGF( "transfer() - Couldn't %s sector %lx"
                 " (error code %d)\n", 
                 write ? "write":"read", start, rc);
         return rc;
@@ -2004,7 +2007,7 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
 }
 
 
-int fat_readwrite( struct fat_file *file, int sectorcount,
+int fat_readwrite( struct fat_file *file, long sectorcount,
                    void* buf, bool write )
 {
 #ifdef HAVE_MULTIVOLUME
@@ -2012,18 +2015,18 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    int cluster = file->lastcluster;
-    int sector = file->lastsector;
-    int clusternum = file->clusternum;
-    int numsec = file->sectornum;
+    long cluster = file->lastcluster;
+    long sector = file->lastsector;
+    long clusternum = file->clusternum;
+    long numsec = file->sectornum;
     bool eof = file->eof;
-    int first=0, last=0;
-    int i;
+    long first=0, last=0;
+    long i;
     int rc;
 
-    LDEBUGF( "fat_readwrite(file:%x,count:0x%x,buf:%x,%s)\n",
-             file->firstcluster,sectorcount,buf,write?"write":"read");
-    LDEBUGF( "fat_readwrite: sec=%x numsec=%d eof=%d\n",
+    LDEBUGF( "fat_readwrite(file:%lx,count:0x%lx,buf:%lx,%s)\n",
+             file->firstcluster,sectorcount,(long)buf,write?"write":"read");
+    LDEBUGF( "fat_readwrite: sec=%lx numsec=%ld eof=%d\n",
              sector,numsec, eof?1:0);
 
     if ( eof && !write)
@@ -2032,8 +2035,8 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     /* find sequential sectors and write them all at once */
     for (i=0; (i < sectorcount) && (sector > -1); i++ ) {
         numsec++;
-        if ( numsec > (int)fat_bpb->bpb_secperclus || !cluster ) {
-            int oldcluster = cluster;
+        if ( numsec > (long)fat_bpb->bpb_secperclus || !cluster ) {
+            long oldcluster = cluster;
             if (write)
                 cluster = next_write_cluster(file, cluster, &sector);
             else {
@@ -2080,7 +2083,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
         if ( ((sector != first) && (sector != last+1)) || /* not sequential */
              (last-first+1 == 256) ) { /* max 256 sectors per ata request */
-            int count = last - first + 1;
+            long count = last - first + 1;
             rc = transfer(IF_MV2(fat_bpb,) first, count, buf, write );
             if (rc < 0)
                 return rc * 10 - 1;
@@ -2092,7 +2095,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
         if ((i == sectorcount-1) && /* last sector requested */
             (!eof))
         {
-            int count = sector - first + 1;
+            long count = sector - first + 1;
             rc = transfer(IF_MV2(fat_bpb,) first, count, buf, write );
             if (rc < 0)
                 return rc * 10 - 2;
@@ -2111,20 +2114,20 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     if (eof)
         i--;
 
-    DEBUGF("Sectors written: %d\n", i);
+    DEBUGF("Sectors written: %ld\n", i);
     return i;
 }
 
-int fat_seek(struct fat_file *file, unsigned int seeksector )
+int fat_seek(struct fat_file *file, unsigned long seeksector )
 {
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    int clusternum=0, numclusters=0, sectornum=0, sector=0;
-    int cluster = file->firstcluster;
-    int i;
+    long clusternum=0, numclusters=0, sectornum=0, sector=0;
+    long cluster = file->firstcluster;
+    long i;
 
 #ifdef HAVE_FAT16SUPPORT
     if (cluster < 0) /* FAT16 root dir */
@@ -2149,7 +2152,7 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
             cluster = get_next_cluster(IF_MV2(fat_bpb,) cluster);
             if (!cluster) {
                 DEBUGF("Seeking beyond the end of the file! "
-                       "(sector %d, cluster %d)\n", seeksector, i);
+                       "(sector %ld, cluster %ld)\n", seeksector, i);
                 return -1;
             }
         }
@@ -2160,7 +2163,7 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
         sectornum = -1;
     }
 
-    LDEBUGF("fat_seek(%x, %x) == %x, %x, %x\n",
+    LDEBUGF("fat_seek(%lx, %lx) == %lx, %lx, %lx\n",
             file->firstcluster, seeksector, cluster, sector, sectornum);
 
     file->lastcluster = cluster;
@@ -2171,7 +2174,7 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
 }
 
 int fat_opendir(IF_MV2(int volume,) 
-                struct fat_dir *dir, unsigned int startcluster,
+                struct fat_dir *dir, unsigned long startcluster,
                 const struct fat_dir *parent_dir)
 {
 #ifdef HAVE_MULTIVOLUME

@@ -36,8 +36,8 @@ struct fat_direntry
     unsigned short lstaccdate;      /* Last access date */
     unsigned short wrttime;         /* Last write time */
     unsigned short wrtdate;         /* Last write date */
-    unsigned int filesize;          /* File size in bytes */
-    int firstcluster;               /* fstclusterhi<<16 + fstcluslo */
+    unsigned long filesize;          /* File size in bytes */
+    long firstcluster;               /* fstclusterhi<<16 + fstcluslo */
 };
 
 #define FAT_ATTR_READ_ONLY   0x01
@@ -50,14 +50,14 @@ struct fat_direntry
 
 struct fat_file
 {
-    int firstcluster;    /* first cluster in file */
-    int lastcluster;     /* cluster of last access */
-    int lastsector;      /* sector of last access */
-    int clusternum;      /* current clusternum */
-    int sectornum;       /* sector number in this cluster */
+    long firstcluster;    /* first cluster in file */
+    long lastcluster;     /* cluster of last access */
+    long lastsector;      /* sector of last access */
+    long clusternum;      /* current clusternum */
+    long sectornum;       /* sector number in this cluster */
     unsigned int direntry;   /* short dir entry index from start of dir */
     unsigned int direntries; /* number of dir entries used by this file */
-    int dircluster;      /* first cluster of dir */
+    long dircluster;      /* first cluster of dir */
     bool eof;
 #ifdef HAVE_MULTIVOLUME
     int volume;          /* file resides on which volume */
@@ -75,34 +75,34 @@ struct fat_dir
 
 
 extern void fat_init(void);
-extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector);
+extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector);
 extern int fat_unmount(int volume, bool flush);
-extern void fat_size(IF_MV2(int volume,) unsigned int* size, unsigned int* free); // public for info
+extern void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free); // public for info
 extern void fat_recalc_free(IF_MV_NONVOID(int volume)); // public for debug info screen
 extern int fat_create_dir(const char* name,
                           struct fat_dir* newdir,
                           struct fat_dir* dir);
-extern int fat_startsector(IF_MV_NONVOID(int volume)); // public for config sector
+extern long fat_startsector(IF_MV_NONVOID(int volume)); // public for config sector
 extern int fat_open(IF_MV2(int volume,)
-                    int cluster,
+                    long cluster,
                     struct fat_file* ent,
                     const struct fat_dir* dir);
 extern int fat_create_file(const char* name,
                            struct fat_file* ent,
                            struct fat_dir* dir);
-extern int fat_readwrite(struct fat_file *ent, int sectorcount, 
+extern int fat_readwrite(struct fat_file *ent, long sectorcount, 
                          void* buf, bool write );
-extern int fat_closewrite(struct fat_file *ent, int size, int attr);
-extern int fat_seek(struct fat_file *ent, unsigned int sector );
+extern int fat_closewrite(struct fat_file *ent, long size, int attr);
+extern int fat_seek(struct fat_file *ent, unsigned long sector );
 extern int fat_remove(struct fat_file *ent);
 extern int fat_truncate(const struct fat_file *ent);
 extern int fat_rename(struct fat_file* file, 
                       struct fat_dir* dir,
                       const unsigned char* newname,
-                      int size, int attr);
+                      long size, int attr);
 
 extern int fat_opendir(IF_MV2(int volume,)
-                       struct fat_dir *ent, unsigned int currdir,
+                       struct fat_dir *ent, unsigned long currdir,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 extern int fat_get_cluster_size(IF_MV_NONVOID(int volume));
