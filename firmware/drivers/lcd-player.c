@@ -69,16 +69,15 @@ struct scrollinfo {
     int startx;
     int starty;
     int space;
+    long scroll_start_tick;
 };
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
-static char scroll_delay = HZ/2; /* delay before starting scroll */
+static int scroll_delay = HZ/2; /* delay before starting scroll */
 static char scroll_spacing = 3; /* spaces between end and start of text */
-static long scroll_start_tick;
-
 
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 
@@ -447,7 +446,6 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     struct scrollinfo* s;
 
     DEBUGF("lcd_puts_scroll(%d, %d, %s)\n", x, y, string);
-    scroll_start_tick = current_tick + scroll_delay;
 
     s = &scroll[y];
 
@@ -458,6 +456,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 
     if ( s->textlen > s->space ) {
         s->mode = SCROLL_MODE_RUN;
+        s->scroll_start_tick = current_tick + scroll_delay;
         s->offset=s->space;
         s->startx=x;
         s->starty=y;
@@ -468,7 +467,8 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
                 s->space > (int)sizeof s->line ?
                 (int)sizeof s->line : s->space );
         s->line[sizeof s->line - 1] = 0;
-    }
+    } else
+        s->mode = SCROLL_MODE_OFF;
 }
 
 void lcd_stop_scroll(void)
@@ -532,8 +532,6 @@ void lcd_scroll_resume(void)
     struct scrollinfo* s;
     int index;
 
-    scroll_start_tick = current_tick + scroll_delay;
-
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
         if ( s->mode == SCROLL_MODE_PAUSE ) {
@@ -545,8 +543,6 @@ void lcd_scroll_resume(void)
 void lcd_scroll_resume_line(int line)
 {
     struct scrollinfo* s;
-
-    scroll_start_tick = current_tick + scroll_delay;
 
     s = &scroll[line];
     if (s->mode == SCROLL_MODE_PAUSE ) {
@@ -562,6 +558,7 @@ void lcd_scroll_speed(int speed)
 void lcd_scroll_delay(int ms)
 {
     scroll_delay = ms / (HZ / 10);
+    DEBUGF("scroll_delay=%d (ms=%d, HZ=%d)\n", scroll_delay, ms, HZ);
 }
 static void scroll_thread(void)
 {
@@ -575,18 +572,14 @@ static void scroll_thread(void)
         scroll[index].mode = SCROLL_MODE_OFF;
     }
 
-    scroll_start_tick = current_tick;
-
     while ( 1 ) {
 
         update = false;
 
-        /* wait 0.5s before starting scroll */
-        if ( TIME_AFTER(current_tick, scroll_start_tick) ) {
-
-            for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-                s = &scroll[index];
-                if ( s->mode == SCROLL_MODE_RUN ) {
+        for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
+          s = &scroll[index];
+          if ( s->mode == SCROLL_MODE_RUN ) {
+            if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
                     update = true;
 
                     for ( i = 0; i < s->space - 1; i++ )
