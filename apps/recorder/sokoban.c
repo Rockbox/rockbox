@@ -691,8 +691,8 @@ static bool sokoban_loop(void)
         if (current_info.level.boxes_to_go == 0) {
             current_info.level.level++;
 
-			/* clear undo stats */
-			init_undo();
+            /* clear undo stats */
+            init_undo();
 
             lcd_clear_display();
 			
