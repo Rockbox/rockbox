@@ -22,9 +22,6 @@
 
 #include "lcd-player-charset.h"
 
-#define NOCHAR_OLD 0x24
-#define NOCHAR_NEW 0x20
-
 unsigned short new_lcd_rocklatin1_to_xlcd[] =
 {
    NOCHAR_NEW,    /* 0x00 reserved never to be used */

@@ -90,7 +90,7 @@ static char pattern_size; /* Last pattern, 3 for old LCD, 7 for new LCD */
 
 static bool new_lcd;
 
-unsigned short *lcd_ascii;
+extern unsigned short *lcd_ascii;
 static char lcd_contrast_set;
 static char lcd_cram;
 static char lcd_pram;

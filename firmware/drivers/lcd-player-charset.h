@@ -21,5 +21,7 @@
 #define NO_EXTENDED_LCD_CHARS 0x5e
 #define RESERVED_CHAR 0xff
 #define LAST_RESERVED_CHAR 0x17
+#define NOCHAR_OLD 0x24
+#define NOCHAR_NEW 0x20
 
 #endif
