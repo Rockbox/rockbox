@@ -243,6 +243,7 @@ void DEI3(void)
         
         if(!filling && unplayed_space_left < MPEG_LOW_WATER)
         {
+            filling = true;
             queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
         }
         
@@ -354,7 +355,7 @@ static void mpeg_thread(void)
                    read too large chunks because the bitswapping will take
                    too much time. We must keep the DMA happy and also give
                    the other threads a chance to run. */
-                if(filling)
+                if(mpeg_file >= 0)
                 {
                     DEBUGF("R\n");
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
@@ -387,6 +388,7 @@ static void mpeg_thread(void)
                     else
                     {
                         close(mpeg_file);
+                        mpeg_file = -1;
                     
                         /* Make sure that the write pointer is at a word
                            boundary */
@@ -542,7 +544,7 @@ void mpeg_init(void)
     rc = mas_run(1);
     if (rc < 0)
         panicf("Error - mas_run(1) returned %d\n", rc);
-    
+
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
     mas_poll_start(2);
