@@ -17,13 +17,34 @@
  *
  ****************************************************************************/
 #include "lcd.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
 #include "system.h"
 
 /* cute little functions, atomic read-modify-write */
+#ifdef HAVE_GMINI_I2C
+
+/* This is done like this in the Archos' firmware.
+ * However, the TCC370 has an integrated I2C
+ * controller (bound to the same lines). It should be
+ * possible to use it and thus save some space in flash.
+ */
+#define SDA_LO     (P3 &= ~0x20)
+#define SDA_HI     (P3 |= 0x20)
+#define SDA_INPUT  (P3CONH &= ~0x0C)
+#define SDA_OUTPUT (P3CONH |= 0x04)
+#define SDA        (P3 & 0x20)
+
+#define SCL_LO     (P3 &= ~0x10)
+#define SCL_HI     (P3 |= 0x10)
+#define SCL_INPUT  (P3CONH &= ~0x03)
+#define SCL_OUTPUT (P3CONH |= 0x01)
+#define SCL        (P3 & 0x10)
+
+#else
+
 /* SDA is PB7 */
 #define SDA_LO     and_b(~0x80, &PBDRL)
 #define SDA_HI     or_b(0x80, &PBDRL)
@@ -45,6 +66,7 @@
 #define SCL_LO     and_b(~0x20, &PBDRH)
 #define SCL_HI     or_b(0x20, &PBDRH)
 #define SCL     (PBDR & 0x2000)
+#endif
 #endif
 
 /* arbitrary delay loop */
@@ -84,6 +106,10 @@ void i2c_init(void)
 {
    int i;
 
+#ifdef HAVE_GMINI_I2C
+   SCL_INPUT;
+   SDA_INPUT;   
+#else
 #ifdef HAVE_ONDIO_I2C
    /* make PB5, PB6 & PB7 general I/O */
    PBCR2 &= ~0xfc00; /* includes PB5, see FIXME below */
@@ -92,12 +118,13 @@ void i2c_init(void)
    PBCR1 &= ~0x0c00; /* PB13 */
    PBCR2 &= ~0xcc00; /* PB5 and PB7, see FIXME below */
 #endif
-
+   
    /* PB5 is "MAS enable" (no I2C signal!). make it output and high */
    /* FIXME: this is true only for Players, and should go into mas.c */
    /* for Recorders, it shuts off the charger, for FM/V2 it holds power */
    or_b(0x20, &PBIORL);
    or_b(0x20, &PBDRL);
+#endif
 
    SCL_OUTPUT;
    SDA_OUTPUT;
