@@ -6,7 +6,7 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-I../../
 
-CFLAGS = -g -O -finline-functions -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
+CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
 
 OBJS= crt0.o main.o ../../thread.o ../../debug.o
