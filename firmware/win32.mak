@@ -16,14 +16,27 @@ OC    = sh-elf-objcopy
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
 # Pick a target to build for
-#TARGET = -DARCHOS_PLAYER=1
-#TARGET = -DARCHOS_PLAYER_OLD=1
-TARGET = -DARCHOS_RECORDER=1
+ifdef RECORDER
+    TARGET=-DARCHOS_RECORDER=1
+else
+    ifdef PLAYER
+        TARGET=-DARCHOS_PLAYER=1
+    else
+        ifdef PLAYER_OLD
+            TARGET=-DARCHOS_PLAYER_OLD=1
+        endif
+    endif
+endif
 
 # store output files in this directory:
 OBJDIR = .
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET) -DLCD_PROPFONTS
+# use propfonts?
+ifdef PROPFONTS
+    CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET) -DLCD_PROPFONTS
+else
+    CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
+endif
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
