@@ -23,8 +23,13 @@
 
 #ifdef LINUX
 
-/* The "sound device type" is simply the file descriptor */
-#define sound_t int
+/* The "sound device type" */
+
+typedef struct {
+  int fd;
+  int freq;
+  int channels;
+} sound_t;
 
 #else
  #ifdef WIN32
