@@ -205,6 +205,7 @@ def main():
         del specs[-3:]
     print username
     print 'generating notification message...'
+
     # blast_mail(mailcmd, specs[1:], contextlines)
     print 'Generating notification message... done.'
 
