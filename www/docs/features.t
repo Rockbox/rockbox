@@ -119,7 +119,12 @@ YES
 EFEAT
 
 NAME Games (Recorder) ENAME
-TD 7 ETD
+TD 8 ETD
+NO
+EFEAT
+
+NAME Games (Player) ENAME
+TD 2 ETD
 NO
 EFEAT
 
