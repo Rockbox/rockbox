@@ -26,6 +26,7 @@ of configuration are:
 <li><a href="/fonts/">Loadable fonts</a>
 <li><a href="/lang/">Loadable languages</a>
 <li><a href="/docs/custom_wps_format.html">Loadable WPS template</a>
+<li><a href="/docs/custom_cfg_format.html">Loadable CFG format</a>
 </ul>
 
 <h2>Button notation</h2>
