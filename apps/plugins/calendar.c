@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
- * (based upon 1.1 by calpefrosch) www.HuwSy.ukhackers.net
+ * (based upon 1.1 by calpefrosch) updated by www.HuwSy.ukhackers.net
  *
  * Copyright (C) 2002
  *
@@ -307,12 +307,13 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         int i;
         char temp[MAX_CHAR_MEMO_LEN + 1];
         rb->lseek(fp, 0, SEEK_SET);
-        if ( (memos[changed].file_pointer_start == 0) &&
-             (memos[changed].file_pointer_end == 0) && (new_mod) )
+        for (i = 0; i < memos[changed].file_pointer_start; i++)
         {
-            rb->close(fp);
-            rb->close(fq);
-            fq = rb->open("/.rockbox/.memo",O_RDONLY | O_CREAT | O_APPEND);
+            rb->read(fp, temp, 1);
+            rb->write(fq,temp,1);
+        }
+        if (new_mod)
+        {
             rb->snprintf(temp, 2, "%02d", memos[changed].day);
             rb->write(fq,temp,2);
             rb->snprintf(temp, 2, "%02d", memos[changed].month);
@@ -323,51 +324,27 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
             rb->write(fq,temp,1);
             rb->snprintf(temp, 1, "%01d", memos[changed].type);
             rb->write(fq,temp,1);
-            rb->snprintf(temp, rb->strlen(memos[changed].message)+1, "%s\n",
-                         memos[changed].message);
-            rb->write(fq,temp,rb->strlen(temp));
+            rb->snprintf(temp, rb->strlen(memos[changed].message)+1,
+                         "%s\n", memos[changed].message);
+            rb->write(fq,temp, rb->strlen(temp));
         }
-        else
+        rb->lseek(fp, memos[changed].file_pointer_end, SEEK_SET);
+        for (i = memos[changed].file_pointer_end;
+             i < rb->filesize(fp); i++)
         {
-            for (i = 0; i < memos[changed].file_pointer_start; i++)
-            {
-                rb->read(fp, temp, 1);
-                rb->write(fq,temp,1);
-            }
-            if (new_mod)
-            {
-                rb->snprintf(temp, 2, "%02d", memos[changed].day);
-                rb->write(fq,temp,2);
-                rb->snprintf(temp, 2, "%02d", memos[changed].month);
-                rb->write(fq,temp,2);
-                rb->snprintf(temp, 4, "%04d", memos[changed].year);
-                rb->write(fq,temp,4);
-                rb->snprintf(temp, 1, "%01d", memos[changed].wday);
-                rb->write(fq,temp,1);
-                rb->snprintf(temp, 1, "%01d", memos[changed].type);
-                rb->write(fq,temp,1);
-                rb->snprintf(temp, rb->strlen(memos[changed].message)+1,
-                             "%s\n", memos[changed].message);
-                rb->write(fq,temp, rb->strlen(temp));
-            }
-            rb->lseek(fp, memos[changed].file_pointer_end, SEEK_SET);
-            for (i = memos[changed].file_pointer_end;
-                 i < rb->filesize(fp); i++)
-            {
-                rb->read(fp, temp, 1);
-                rb->write(fq,temp,1);
-            }
-            rb->close(fp);
-            fp = rb->open("/.rockbox/.memo",O_WRONLY | O_CREAT | O_TRUNC);
-            rb->lseek(fp, 0, SEEK_SET);
-            rb->lseek(fq, 0, SEEK_SET);
-            for (i = 0; i < rb->filesize(fq); i++)
-            {
-                rb->read(fq, temp, 1);
-                rb->write(fp,temp,1);
-            }
-            rb->close(fp);
+            rb->read(fp, temp, 1);
+            rb->write(fq,temp,1);
         }
+        rb->close(fp);
+        fp = rb->open("/.rockbox/.memo",O_WRONLY | O_CREAT | O_TRUNC);
+        rb->lseek(fp, 0, SEEK_SET);
+        rb->lseek(fq, 0, SEEK_SET);
+        for (i = 0; i < rb->filesize(fq); i++)
+        {
+            rb->read(fq, temp, 1);
+            rb->write(fp,temp,1);
+        }
+        rb->close(fp);
         rb->close(fq);
         rb->remove("/.rockbox/~temp");
         load_memo(shown);
