@@ -61,6 +61,7 @@ static char power_stack[DEFAULT_STACK_SIZE];
 static char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
+static long last_charge_time = 0;
 
 unsigned short power_history[POWER_HISTORY_LEN];
 #ifdef HAVE_CHARGE_CTRL
@@ -111,14 +112,27 @@ void set_poweroff_timeout(int timeout)
     poweroff_timeout = timeout;
 }
 
+/* We shut off in the following cases:
+   1) The unit is not playing music
+   2) The unit is playing music, but is paused
+
+   We do not shut off if the unit is recording, but paused
+*/
 static void handle_auto_poweroff(void)
 {
     long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
+    int mpeg_stat = mpeg_status();
+
+    if(charger_inserted())
+        last_charge_time = current_tick;
     
-    if(timeout && !mpeg_is_playing() && !charger_inserted())
+    if(timeout &&
+       (mpeg_stat == 0 ||
+        mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)))
     {
         if(TIME_AFTER(current_tick, last_keypress + timeout) &&
-           TIME_AFTER(current_tick, last_disk_activity + timeout))
+           TIME_AFTER(current_tick, last_disk_activity + timeout) &&
+           TIME_AFTER(current_tick, last_charge_time))
             power_off();
     }
 }
