@@ -53,17 +53,17 @@ new:
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
-eng: "Rockbox info:"
+eng: "Rockbox Info:"
 new:
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMb"
+eng: "Buf: %d.%02dMB"
 new:
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMb"
+eng: "Buffer: %d.%02dMB"
 new:
 
 id: LANG_BATTERY_LEVEL_PLAYER
@@ -198,7 +198,7 @@ new:
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
-eng: "Play selected first"
+eng: "Play Selected First"
 new:
 
 id: LANG_MP3FILTER
@@ -246,7 +246,7 @@ new:
 
 id: LANG_DISCHARGE
 desc: in settings_menu
-eng: "Deep discharge"
+eng: "Deep Discharge"
 new:
 
 id: LANG_TIME
@@ -291,7 +291,7 @@ new:
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "Play = Yes"
+eng: "PLAY = Yes"
 new:
 
 id: LANG_RESET_CANCEL_RECORDER
@@ -381,7 +381,7 @@ new:
 
 id: LANG_DECAY
 desc: in sound_settings
-eng: "AV decay time"
+eng: "AV Decay Time"
 new:
 
 id: LANG_CHANNEL_MENU
@@ -391,7 +391,7 @@ new:
 
 id: LANG_CHANNEL
 desc: in sound_settings
-eng: "Channel configuration"
+eng: "Channel Configuration"
 new:
 
 id: LANG_CHANNEL_STEREO
@@ -441,7 +441,7 @@ new:
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
-eng: "Play = Yes"
+eng: "PLAY = Yes"
 new:
 
 id: LANG_RESUME_CANCEL_RECORDER
@@ -476,7 +476,7 @@ new:
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: "MUTE OFF"
+eng: "Mute OFF"
 new:
 
 id: LANG_MUTE_ON_RECORDER
@@ -561,7 +561,7 @@ new:
 
 id: LANG_ID3_PATH
 desc: in wps
-eng: "[PATH]"
+eng: "[Path]"
 new: 
 
 id: LANG_PITCH_UP
@@ -626,7 +626,7 @@ new:
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
-eng: "Your score :"
+eng: "Your score:"
 new:
 
 id: LANG_SNAKE_HISCORE
@@ -646,12 +646,12 @@ new:
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[Play] to resume"
+eng: "[PLAY] to resume"
 new:
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[Off] to quit"
+eng: "[OFF] to quit"
 new:
 
 id: LANG_SNAKE_LEVEL
@@ -666,7 +666,7 @@ new:
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[Play] to start/pause"
+eng: "[PLAY] to start/pause"
 new:
 
 id: LANG_SOKOBAN_LEVEL
@@ -686,7 +686,7 @@ new:
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[Off] to stop"
+eng: "[OFF] to stop"
 new:
 
 id: LANG_SOKOBAN_F1
@@ -750,12 +750,12 @@ new:
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    up/dn"
+eng: "%d Players    UP/DN"
 new:
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        l/r"
+eng: "%d Worms        L/R"
 new:
 
 id: LANG_WORMLET_REMOTE_CTRL
@@ -807,7 +807,7 @@ new:
 
 id: LANG_FILTER
 desc: setting name for dir filter
-eng: "Show files"
+eng: "Show Files"
 new:
 
 id: LANG_FILTER_MUSIC
@@ -837,37 +837,37 @@ new:
 
 id: LANG_PM_MENU
 desc: in the display menu
-eng: "Peak meter"
+eng: "Peak Meter"
 new: 
 
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
-eng: "Peak release"
+eng: "Peak Release"
 new: 
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
-eng: "Peak hold time"
+eng: "Peak Hold Time"
 new: 
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
-eng: "Clip hold time"
+eng: "Clip Hold Time"
 new: 
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
-eng: "eternal"
+eng: "Eternal"
 new: 
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
-eng: "Units per read"
+eng: "Units Per Read"
 new: 
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
-eng: "Backlight on when charging"
+eng: "Backlight On When Plugged"
 new:
 
 id: LANG_REPEAT
