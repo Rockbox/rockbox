@@ -380,6 +380,8 @@ void digital_meter(void) {
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+    int button;
+    
     TEST_PLUGIN_API(api);
     (void) parameter;
     rb = api;
@@ -400,7 +402,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             
         rb->lcd_update();
 
-        switch (rb->button_get_w_tmo(1))
+        button = rb->button_get_w_tmo(1);
+        switch (button)
         {
             case BUTTON_OFF:
                 save_settings();
@@ -430,9 +433,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 change_volume(-1);
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
         }
     }
