@@ -83,8 +83,11 @@ void ev_poll(void)
     oldbuttonstate = newbuttonstate;
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     if (rb->button_hold()&~holdbutton)
-	fb.mode=(fb.mode+1)%4;
+        fb.mode=(fb.mode+1)%4;
     holdbutton=rb->button_hold();
+#elif CONFIG_KEYPAD == RECORDER_PAD
+    if (pressed & BUTTON_ON)
+        fb.mode=(fb.mode+1)%4;
 #endif
     if(released) {
         ev.type = EV_RELEASE;
