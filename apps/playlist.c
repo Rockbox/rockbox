@@ -39,6 +39,7 @@ char* playlist_next(int type)
     int seek = playlist.indices[playlist.index];
     int max;
     int fd;
+    int i;
     (void)type; /* prevent compiler warning until this is gets used */
 
     playlist.index = (playlist.index+1) % playlist.amount;
@@ -57,12 +58,22 @@ char* playlist_next(int type)
         seek++;
 
       now_playing[seek]=0;
+      
+      /* replace backslashes with forward slashes */
+      for ( i=1; i<seek; i++ )
+          if ( now_playing[i] == '\\' )
+              now_playing[i] = '/';
 
       if('/' == now_playing[1])
           return &now_playing[1];
       else {
-          now_playing[0]='/';
-          return now_playing;
+          /* handle dos style drive letter */
+          if ( ':' == now_playing[2] )
+              return &now_playing[3];
+          else {
+              now_playing[0]='/';
+              return now_playing;
+          }
       }
     }
     else
