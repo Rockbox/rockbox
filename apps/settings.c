@@ -1237,13 +1237,6 @@ bool settings_save_config(void)
 
     fprintf(fd, "caption backlight: %s\r\n",
             boolopt[global_settings.caption_backlight]);
-
-    {
-        static char* options[] = {"off","on"};
-        fprintf(fd, "caption backlight: %s\r\n",
-                 options[global_settings.caption_backlight]);
-    }
-
     fprintf(fd, "contrast: %d\r\n", global_settings.contrast);
 
 #ifdef HAVE_LCD_BITMAP
