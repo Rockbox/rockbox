@@ -551,7 +551,7 @@ void free(void *memp)
  *
  **************************************************************************/
 
-void *realloc(char *ptr, size_t size)
+void *realloc(void *ptr, size_t size)
 {
     struct MemInfo *meminfo = (struct MemInfo *)
         ((char *)ptr- sizeof(struct MemInfo));
