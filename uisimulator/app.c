@@ -102,11 +102,9 @@ void app_main(void)
         case BUTTON_DOWN:
             if(cursor == menu_bottom ){
                 /* wrap around to menu top */
-                printf("from (%d) to (%d)\n", cursor, menu_top);
                 cursor = put_cursor(cursor, menu_top);
             } else {
                 /* move down */
-                printf("from (%d) to (%d)\n", cursor, cursor+1);
                 cursor = put_cursor(cursor, cursor+1);
             }
             break;

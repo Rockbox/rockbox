@@ -79,7 +79,7 @@ void ss_loop(void)
             return;
 
         lcd_clear_display();
-        drawrect(x-offset, y-offset, x2+offset, y2+offset);
+        lcd_drawrect(x-offset, y-offset, x2+offset, y2+offset);
         lcd_update();
 
         i+=factor;
