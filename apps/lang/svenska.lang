@@ -192,7 +192,7 @@ new: "Filvy"
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Följ spellistan"
+new: "Följ Låtlistan"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -231,7 +231,7 @@ new: "[Bitrate]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
-eng: "[Frecuency]"
+eng: "[Frequency]"
 new: "[Frekvens]"
 
 id: LANG_ID3_INFO
@@ -242,608 +242,507 @@ new: "-ID3 Info- "
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-### Not previously translated
-new: 
+new: "[Längd]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
+desc: in wps when no album is available
 eng: "<no album>"
-### Not previously translated
-new: 
+new: "<inget album>"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
+desc: in wps when no artist is available
 eng: "<no artist>"
-### Not previously translated
-new: 
+new: "<ingen artist>"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
+desc: in wps when no title is available
 eng: "<no title>"
-### Not previously translated
-new: 
+new: "<ingen titel>"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
+desc: in wps if no track number is available
 eng: "<no tracknum>"
-### Not previously translated
-new: 
+new: "<inget spår>"
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[PATH]"
-### Not previously translated
-new: 
+new: "[VÄG]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-### Not previously translated
-new: 
+new: "[Låtlista]"
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-### Not previously translated
-new: 
+new: "--Skärm--"
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-### Not previously translated
-new: 
+new: "[Titel]"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-### Not previously translated
-new: 
+new: "[Spår]"
 
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
-### Not previously translated
-new: 
+new: "Info"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Keylock OFF"
-### Not previously translated
-new: 
+new: "Tangentlås AV"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-### Not previously translated
-new: 
+new: "Tangentlåset är AV"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Keylock ON"
-### Not previously translated
-new: 
+new: "Tangentlås PÅ"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-### Not previously translated
-new: 
+new: "Tangentlåset är PÅ"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-### Not previously translated
-new: 
+new: "Loudness"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
 eng: "Music Filter"
-### Not previously translated
-new: 
+new: "Musikfilter"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "MUTE OFF"
-### Not previously translated
-new: 
+new: "MUTE AV"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-### Not previously translated
-new: 
+new: "Mute är AV"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-### Not previously translated
-new: 
+new: "Mute PÅ"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-### Not previously translated
-new: 
+new: "Mute är PÅ"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-### Not previously translated
-new: 
+new: "Av"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-### Not previously translated
-new: 
+new: "På"
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
-### Not previously translated
-new: 
+new: "Paus"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch down"
-### Not previously translated
-new: 
+new: "Tonhöjd ner"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch up"
-### Not previously translated
-new: 
+new: "Tonhöjd upp"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
-### Not previously translated
-new: 
+new: "Återgivning"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d files"
-### Not previously translated
-new: 
+new: "%d filer"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "buffer full"
-### Not previously translated
-new: 
+new: "bufferten är full"
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-### Not previously translated
-new: 
+new: "Låtlista"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
-### Not previously translated
-new: 
+new: "Laddar..."
 
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
-### Not previously translated
-new: 
+new: "Spelar..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-### Not previously translated
-new: 
+new: "Slumpar..."
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-### Not previously translated
-new: 
+new: "Spela den valda först"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset settings"
-### Not previously translated
-new: 
+new: "Återställ inställningar"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
 eng: "Really?"
-### Not previously translated
-new: 
+new: "Verkligen?"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are you sure?"
-### Not previously translated
-new: 
+new: "Är du säker?"
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "Any Other = No"
-### Not previously translated
-new: 
+new: "Övriga = Nej"
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
 eng: "Play/Stop"
-### Not previously translated
-new: 
+new: "Spela/Stanna"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
 eng: "Play = Yes"
-### Not previously translated
-new: 
+new: "Spela = Ja"
 
 id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
+desc: Visual confirmation of cancellation
 eng: "Canceled"
-### Not previously translated
-new: 
+new: "Avbruten"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-### Not previously translated
-new: 
+new: "Nollställd"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
-### Not previously translated
-new: 
+new: "Inställningar"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-### Not previously translated
-new: 
+new: "Återuppta"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
+desc: question asked at the beginning when resume is on
 eng: "Resume?"
-### Not previously translated
-new: 
+new: "Återuppta?"
 
 id: LANG_RESUME_CANCEL_RECORDER
-desc: posible answer to resume question
+desc: possible answer to resume question
 eng: "Any Other = No"
-### Not previously translated
-new: 
+new: "Övriga = Nej"
 
 id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
+desc: possible answers to resume question
 eng: "(PLAY/STOP)"
-### Not previously translated
-new: 
+new: "(Ja/Nej)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
-desc: posible answer to resume question
+desc: possible answer to resume question
 eng: "Play = Yes"
-### Not previously translated
-new: 
+new: "Spela = Ja"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "ask"
-### Not previously translated
-new: 
+new: "fråga"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox info:"
-### Not previously translated
-new: 
+new: "Rockbox info:"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-### Not previously translated
-new: 
+new: "Rullningshastighetsexempel"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-### Not previously translated
-new: 
+new: "Rullningshastighet"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-### Not previously translated
-new: 
+new: "Batt. dåligt?"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-### Not previously translated
-new: 
+new: "Är battiet dåligt?"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
-### Not previously translated
-new: 
+new: "Spara misslyckades"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
-### Not previously translated
-new: 
+new: "Spara misslyckade"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-### Not previously translated
-new: 
+new: "Filsystemet bufferten"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-### Not previously translated
-new: 
+new: "är fullt!"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-### Not previously translated
-new: 
+new: "Slumpa"
 
 id: LANG_SNAKE
 desc: in the games menu
 eng: "Snake"
-### Not previously translated
-new: 
+new: "Snake"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
 eng: "High Score: %d"
-### Not previously translated
-new: 
+new: "Poänglista: %d"
 
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-### Not previously translated
-new: 
+new: "Nytt rekord!"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
 eng: "Level - %d"
-### Not previously translated
-new: 
+new: "Nivå - %d"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
 eng: "Game Paused"
-### Not previously translated
-new: 
+new: "Spelet pausat"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[Off] to quit"
-### Not previously translated
-new: 
+new: "[Av] för att avsluta"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - slow, 9 - fast)"
-### Not previously translated
-new: 
+new: "(1- långsamt, 9 - fort)"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[Play] to resume"
-### Not previously translated
-new: 
+new: "[Spela] för att återgå"
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score :"
-### Not previously translated
-new: 
+new: "Din poäng:"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
-### Not previously translated
-new: 
+new: "[Spela] för att starta/pausa"
 
 id: LANG_SNOW
 desc: in the demos menu
 eng: "Snow"
-### Not previously translated
-new: 
+new: "Snö"
 
 id: LANG_SOKOBAN
 desc: in the games menu
 eng: "Sokoban"
-### Not previously translated
-new: 
+new: "Sokoban"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
 eng: "[F1] - level"
-### Not previously translated
-new: 
+new: "[F1] - nivå"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: "[F2] same level"
-### Not previously translated
-new: 
+new: "[F2] samma nivå"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: "[F3] + level"
-### Not previously translated
-new: 
+new: "[F3] + nivå"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-### Not previously translated
-new: 
+new: "Nivå"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
 eng: "Moves"
-### Not previously translated
-new: 
+new: "Drag"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[Off] to stop"
-### Not previously translated
-new: 
+new: "[Av] för att stanna"
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-### Not previously translated
-new: 
+new: "DU VINNER!!"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-### Not previously translated
-new: 
+new: "Sortera olika"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-### Not previously translated
-new: 
+new: "Disk spindown"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
-### Not previously translated
-new: 
+new: "Systemet"
 
 id: LANG_TETRIS
 desc: in the games menu
 eng: "Tetris"
-### Not previously translated
-new: 
+new: "Tetris"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
-### Not previously translated
-new: 
+new: "0 Rader - Nivå 0"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
-### Not previously translated
-new: 
+new: "Du förlorar!"
 
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-### Not previously translated
-new: 
+new: "Ställ Tid/Datum"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-### Not previously translated
-new: 
+new: "AV flr att återgå"
 
 id: LANG_TIME_SET
 desc: 
 eng: "ON to set"
-### Not previously translated
-new: 
+new: "PÅ för att ställa"
 
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-### Not previously translated
-new: 
+new: "Diskant"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (sim)"
-### Not previously translated
-new: 
+new: "USB (sim)"
 
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
-### Not previously translated
-new: 
+new: "Version"
 
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-### Not previously translated
-new: 
+new: "Volym"
 
 id: LANG_WORMLET
 desc: in the games menu
 eng: "Wormlet"
-### Not previously translated
-new: 
+new: "Wormlet"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-### Not previously translated
-new: 
+new: "2 tangentkontroll   F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: "4 key control   F1"
-### Not previously translated
-new: 
+new: "4 tangentkontroll   F1"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
 eng: "Argh"
-### Not previously translated
-new: 
+new: "Argh"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
 eng: "Crashed"
-### Not previously translated
-new: 
+new: "Krasch"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
 eng: "Growing"
-### Not previously translated
-new: 
+new: "Växer"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
 eng: "Hs: %d"
-### Not previously translated
-new: 
+new: "Hs: %d"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
 eng: "Hungry"
-### Not previously translated
-new: 
+new: "Hungrig"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
-### Not previously translated
-new: 
+new: "Längd:%d"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
 eng: "Out of control"
-### Not previously translated
-new: 
+new: "Ingen kontroll"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
@@ -854,23 +753,19 @@ new:
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
-### Not previously translated
-new: 
+new: "%d Spelare  upp/ner"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: "Remote control F1"
-### Not previously translated
-new: 
+new: "Fjärrkontroll F1"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
 eng: "Wormed"
-### Not previously translated
-new: 
+new: "Wormed"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-### Not previously translated
-new: 
+new: "%d Worms        h/v"
