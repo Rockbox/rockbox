@@ -242,7 +242,7 @@ new: "Ställ Tid/Datum"
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "Disk spindown"
+new: "Diskdeaktivering"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
@@ -888,7 +888,6 @@ id: LANF_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Tor"
-### LANG_BACKLIGHT_ON was not found in the english file!
 
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
@@ -1124,3 +1123,24 @@ id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 new: "Volymdisplay"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+new: "Låtlistor"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new: "Diskavstängning"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+new: "%d%% %dh %dmin"
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep timer"
+new: "Insomningstimer"
+
