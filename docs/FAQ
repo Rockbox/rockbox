@@ -162,21 +162,18 @@ A20: Okay, last time.  No.  We have no problems whatsoever reading different
      data directly to the DAC.
 
 Q21. What is the most recent version of Rockbox?
-A21. We recently released version 1.3, so head on over to 
+A21. We recently released version 1.4, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-1.3-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-1.4-notes.txt).  
 
 Q22. What do you plan to add to coming versions?
 A22. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
-     Version 1.4
-          Autobuild playlists, Recording, Loadable fonts, Customizable WPS
-
-     Version 1.5
-          File/directory management
+     Version 2.0
+          Recording, Autobuild playlists, File/directory management
 
 Q23. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
@@ -260,11 +257,11 @@ A32: In simple terms, the first release was called 1.0 because it had a basic
 
 Q33: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
-A33: Rolo is our bootloader.  Currently it is only available in CVS and daily
-     builds, but will be standard in release 1.4.  It works by basically 
-     having a file with the same extension of the firmware (.ajz on Recorder, 
-     .mod on Player) 'run' from within Rockbox.  Just scroll to the firmware
-     you wish to switch to and press play.  
+A33: Rolo is our bootloader.  Rolo became available with our 1.4 release.
+     To make use of Rolo, you must have a file with the same extension as 
+     your Rockbox firmware (.ajz on Recorder, .mod on Player) but a different
+     name.   You can then browse to it, and you 'run' the other firmware
+     you wish to switch to by pressing play.  
 
      *Poof* You will reboot to that firmware.  (Note that in order to return
      to Rockbox you may need to reboot manually if the new firmware you loaded
@@ -302,8 +299,7 @@ A36: They are files using an .fnt extension. Just press PLAY on a font you
      format and then convert that into the Rockbox .fnt format using the
      convbdf tool.
 
-     Loadable fonts are introduced in the 1.4 release, they did not work in
-     the 1.3.
+     Loadable fonts are only available in 1.4 and later releases.
 
 Q37: I have a question about the batteries...
 A37: STOP!  We have put together a completely different FAQ for battery 
@@ -321,8 +317,7 @@ A39: It is very good if you want information about the current item playing ;)
      on your Archos Player. If you PLAY such a file, it'll be used. If the
      file is placed in your /.rockbox directory, the file name will be
      remembered and used on subsequent restarts.
-     Please see http://rockbox.haxx.se/docs/custom_wps_format.html for more
-     information.
+     Please see http://rockbox.haxx.se/manual/wps.html for more information.
 
 Q40: Can the Player LCD font be modified?
 A40: The simple answer is no.  This is because the Player font is character
@@ -401,7 +396,7 @@ A48: Because it's useless.  Dynamic memory is only ever useful if you have
      the same memory, and thus dynamic memory buys us nothing but extra 
      complexity.  If we used dynamic memory for this, we would get all kinds 
      of odd bugs. Playlists that only got half-loaded if placed in certain 
-     directories. Parts of the disk you couldn't go to if playing a certain 
+     directories.  Parts of the disk you couldn't go to if playing a certain 
      playlist etc. 
 
      We have a number of tasks that consume memory. They can all run at the 
@@ -421,7 +416,7 @@ Q50: You don't understand! I _really_ need to have more then 400 files
      in a directory!
 A50: The use of really big directories was a workaround for the poor playlist
      capabilities of the original Archos firmware. With Rockbox, you no longer
-     need this workaround. Organise your files in directories, then build
+     need this workaround. Organize your files in directories, then build
      playlists for all collections you want to shuffle-play.
 
 Q51: How can I make playlists on my PC?
@@ -444,7 +439,7 @@ A51: There are many programs that can create .m3u playlists. WinAmp is one.
 Q52: How can I find out about all the neat features that Rockbox has?
 A52: This information is in our manual (It sometimes gets a bit out of
      date, so please bear with us.)  The information you are most likely 
-     looking for is a bit down the tree, so the heres the url:
+     looking for is a bit down the tree, so the here is the url:
      http://rockbox.haxx.se/manual/rec-general.html
 
 Q53: How does the shuffle work?
