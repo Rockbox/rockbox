@@ -26,22 +26,25 @@
 #define METRONOME_PLAYPAUSE BUTTON_PLAY
 #define METRONOME_VOL_UP BUTTON_UP
 #define METRONOME_VOL_DOWN BUTTON_DOWN
+#define METRONOME_TAP BUTTON_ON
 #define METRONOME_MSG_START "press play"
 #define METRONOME_MSG_STOP "press pause"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define METRONOME_QUIT BUTTON_OFF
-#define METRONOME_PLAYPAUSE BUTTON_MENU
+#define METRONOME_PLAY_TAP BUTTON_MENU
+#define METRONOME_PAUSE (BUTTON_MENU | BUTTON_REPEAT)
 #define METRONOME_VOL_UP BUTTON_UP
 #define METRONOME_VOL_DOWN BUTTON_DOWN
 #define METRONOME_MSG_START "start: menu"
-#define METRONOME_MSG_STOP "pause: menu"
+#define METRONOME_MSG_STOP "pause: hold menu"
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define METRONOME_QUIT BUTTON_STOP
 #define METRONOME_PLAYPAUSE BUTTON_PLAY
 #define METRONOME_VOL_UP (BUTTON_ON | BUTTON_RIGHT)
 #define METRONOME_VOL_DOWN (BUTTON_ON | BUTTON_LEFT)
+#define METRONOME_TAP BUTTON_ON
 
 #endif
 static struct plugin_api* rb;
@@ -54,6 +57,11 @@ static bool sound_active = false;
 static bool sound_paused = true;
 
 static char buffer[30];
+
+static bool reset_tap = false;    
+static int tap_count    = 0;
+static int tap_time     = 0;
+static int tap_timeout  = 0;
 
 /*tick sound from a metronome*/
 static unsigned char sound[]={
@@ -194,12 +202,18 @@ void change_volume(int delta){
 void timer_callback(void){
     if(minitick>=period){
     minitick = 0;
-    if(!sound_active && !sound_paused){
+    if(!sound_active && !sound_paused && !tap_count){
         play_tock();
     }
     } 
     else {
     minitick++;
+    }
+
+    if (tap_count) {
+        tap_time++;
+        if (tap_count > 1 && tap_time > tap_timeout)
+            tap_count = 0;
     }
 }
 
@@ -212,8 +226,32 @@ void cleanup(void *parameter)
     led(0);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
+void tap(void)
+{
+    if (tap_count == 0) {
+        tap_time = 0;
+    } 
+    else {
+        if (tap_time > 0) {
+            bpm = 61440/(tap_time/tap_count);
+            
+            if (bpm > 400)
+                bpm = 400;
+        }
+        
+        calc_period();
+        draw_display();
+        
+        tap_timeout = (tap_count+2)*tap_time/tap_count;
+    }
+    
+    tap_count++;
+    minitick = 0;  /* sync tock to tapping */
+    
+    reset_tap = false;
+}
 
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     int button;
 
     TEST_PLUGIN_API(api);
@@ -223,81 +261,109 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb->bitswap(sound, sizeof(sound));
 
     if (rb->mp3_is_playing())
-    rb->mp3_play_stop(); // stop audio ISR
+        rb->mp3_play_stop(); // stop audio ISR
 
-     calc_period();
-     rb->plugin_register_timer((FREQ/1024), 1, timer_callback);
+    calc_period();
+    rb->plugin_register_timer((FREQ/1024), 1, timer_callback);
 
-     draw_display();
+    draw_display();
 
     /* main loop */
     while (true){
+        reset_tap = true;
                     
-    button = rb->button_get(true);
+        button = rb->button_get(true);
     
-    switch (button) {
+        switch (button) {
 
-    case METRONOME_QUIT:
-        /* get out of here */
-        cleanup(NULL);
-        return PLUGIN_OK;
+            case METRONOME_QUIT:
+                /* get out of here */
+                cleanup(NULL);
+                return PLUGIN_OK;
 
-    case METRONOME_PLAYPAUSE:
-        if(sound_paused)
-        sound_paused = false;
-        else
-        sound_paused = true;
-        calc_period();
-        draw_display();
-        break;
-      
-    case METRONOME_VOL_UP:
-    case METRONOME_VOL_UP | BUTTON_REPEAT:
-        change_volume(1);
-        calc_period();
-        break;
+#if CONFIG_KEYPAD == ONDIO_PAD
+            case METRONOME_PLAY_TAP:
+                if(sound_paused) {
+                    sound_paused = false;
+                    calc_period();
+                    draw_display();
+                }
+                else
+                    tap();
+                break;
+                
+            case METRONOME_PAUSE:
+                if(!sound_paused)
+                    sound_paused = true;
+                break;
+#else
+            case METRONOME_PLAYPAUSE:
+                if(sound_paused)
+                    sound_paused = false;
+                else
+                    sound_paused = true;
+                calc_period();
+                draw_display();
+                break;
+#endif
+                
+            case METRONOME_VOL_UP:
+            case METRONOME_VOL_UP | BUTTON_REPEAT:
+                change_volume(1);
+                calc_period();
+                break;
+          
+            case METRONOME_VOL_DOWN:
+            case METRONOME_VOL_DOWN | BUTTON_REPEAT:
+                change_volume(-1);
+                calc_period();
+                break;
 
-    case METRONOME_VOL_DOWN:
-    case METRONOME_VOL_DOWN | BUTTON_REPEAT:
-        change_volume(-1);
-        calc_period();
-        break;
+            case BUTTON_LEFT:
+                if (bpm > 1)
+                    bpm--;
+                calc_period();
+                draw_display();
+                break;
 
-    case BUTTON_LEFT:
-        if (bpm > 1)
-        bpm--;
-        calc_period();
-        draw_display();
-        break;
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if (bpm > 10)
+                    bpm=bpm-10;
+                calc_period();
+                draw_display();
+                break;
 
-    case BUTTON_LEFT | BUTTON_REPEAT:
-        if (bpm > 10)
-        bpm=bpm-10;
-        calc_period();
-        draw_display();
-        break;
+            case BUTTON_RIGHT:
+                if(bpm < 400)
+                    bpm++;
+                calc_period();
+                draw_display();
+                break;
 
-    case BUTTON_RIGHT:
-        if(bpm < 400)
-        bpm++;
-        calc_period();
-        draw_display();
-        break;
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if (bpm < 400)
+                    bpm=bpm+10;
+                calc_period();
+                draw_display();
+                break;
 
-    case BUTTON_RIGHT | BUTTON_REPEAT:
-        if (bpm < 400)
-        bpm=bpm+10;
-        calc_period();
-        draw_display();
-        break;
-        
-    default:
-        if (rb->default_event_handler_ex(button, cleanup, NULL)
-            == SYS_USB_CONNECTED)
-            return PLUGIN_USB_CONNECTED;
-        break;
+#if CONFIG_KEYPAD != ONDIO_PAD
+            case METRONOME_TAP:
+                tap();
+                break;
+#endif
+                
+            default:
+                if (rb->default_event_handler_ex(button, cleanup, NULL)
+                    == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                reset_tap = false;
+                break;
 
-    }
+        }
+        if (reset_tap) {
+            tap_count = 0;
+        }
     }
 }
 #endif /* #ifndef SIMULATOR */
