@@ -262,6 +262,18 @@ Menu menu_run(int m)
                     /* move up */
                     put_cursor(m, menus[m].cursor-1);
                 }
+                else {
+                    /* move to bottom */
+#ifdef HAVE_RECORDER_KEYPAD
+                    menus[m].top = menus[m].itemcount-9;
+#else
+                    menus[m].top = menus[m].itemcount-3;
+#endif
+                    if (menus[m].top < 0)
+                        menus[m].top = 0;
+                    menus[m].cursor = menus[m].itemcount-1;
+                    put_cursor(m, menus[m].itemcount-1);
+                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -274,6 +286,12 @@ Menu menu_run(int m)
                 if (menus[m].cursor < menus[m].itemcount-1) {
                     /* move down */
                     put_cursor(m, menus[m].cursor+1);
+                }
+                else {
+                    /* move to top */
+                    menus[m].top = 0;
+                    menus[m].cursor = 0;
+                    put_cursor(m, 0);
                 }
                 break;
 
