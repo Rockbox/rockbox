@@ -216,7 +216,6 @@ void lcd_roll(int lines)
 void lcd_clear_display (void)
 {
     memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
-    lcd_stop_scroll();
 }
 
 void lcd_setmargins(int x, int y)
@@ -291,7 +290,7 @@ void lcd_puts(int x, int y, unsigned char *str)
     lcd_putsxy(xpos, ypos, str);
     lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 
-#if defined(SIMULATOR)
+#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     lcd_update();
 #endif
 }
@@ -725,6 +724,7 @@ void lcd_stop_scroll(void)
     struct scrollinfo* s;
     int w,h;
     int index;
+    int update=0;
 
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
@@ -739,10 +739,12 @@ void lcd_stop_scroll(void)
             /* restore scrolled row */
             lcd_puts(s->startx, s->starty, s->line);
             s->mode = SCROLL_MODE_OFF;
+            update++;
         }
     }
 
-    lcd_update();
+    if(update)
+        lcd_update(); /* update only if needed */
 }
 
 void lcd_stop_scroll_line(int line)
@@ -750,6 +752,7 @@ void lcd_stop_scroll_line(int line)
     struct scrollinfo* s;
     int w,h;
     int index;
+    int update=0;
 
     for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
         s = &scroll[index];
@@ -765,10 +768,12 @@ void lcd_stop_scroll_line(int line)
             /* restore scrolled row */
             lcd_puts(s->startx, s->starty, s->line);
             s->mode = SCROLL_MODE_OFF;
+            update++;
         }
     }
-
-    lcd_update();
+    if(update)
+        /* only updated if need be */
+        lcd_update();
 }
 
 void lcd_scroll_pause(void)
