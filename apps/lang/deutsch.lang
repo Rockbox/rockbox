@@ -201,7 +201,7 @@ new: "HD-Ausschaltzeit"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-voice: "Such-lauf kleinster Schritt"
+voice: "Suchlauf kleinster Schritt"
 new: "FF/RW min. Schritt"
 
 id: LANG_FFRW_ACCEL
@@ -1303,22 +1303,22 @@ voice: ""
 new: "gespeichert"
 
 id: LANG_VBRFIX_STOP_PLAY
-desc: Tells the user to stop the playback
-eng: "Stop the playback first"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Vorher Wiedergabe beenden!"
+new:
 
 id: LANG_VBRFIX_NOT_VBR
-desc: Tells the user that the selected file is not a VBR file
-eng: "Not a VBR file"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Keine VBR-Datei"
+new:
 
 id: LANG_VBRFIX
-desc: The context menu entry
-eng: "Update VBR file"
-voice: "VBR Datei aktualisieren"
-new: "VBR Datei aktualisieren"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1919,7 +1919,7 @@ new: "Aufnahme starten"
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "Vor und Rück-lauf"
+voice: "Vor und Rücklauf"
 new: "FF/RW"
 
 id: LANG_LCD_MENU
