@@ -46,7 +46,7 @@
 <form action="http://www.google.com/search">
 <input name=as_q size=12><br>
 <input value="Search" type=submit>
-<input type=hidden name=as_sitesearch value="rockbox.haxx.se">
+<input type=hidden name=as_sitesearch value="www.rockbox.org">
 </form>
 
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
