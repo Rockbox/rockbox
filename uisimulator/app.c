@@ -22,7 +22,9 @@
 #include "button.h"
 #include "kernel.h"
 
+/* Apps to include */
 #include "tree.h"
+#include "screensaver.h"
 
 extern void tetris(void);
 
@@ -30,16 +32,25 @@ extern void tetris(void);
 #define MENU_ITEM_Y_LOC   6
 #define MENU_LINE_HEIGHT  8
 
-/* menu ids */
-#define ITEM_TETRIS       0
-#define ITEM_SCREENSAVER  1
-#define ITEM_BROWSE       2
+enum Menu_Ids {
+    Tetris, Screen_Saver, Browse, Last_Id
+};
 
-/* the last index with info, starting on 0 */
-#define MAX_LINE          ITEM_BROWSE
+struct Menu_Items {
+    int menu_id;
+    const char *menu_desc;
+    void (*function) (void);
+};
 
-int menu_top = 0;
-int menu_bottom = MAX_LINE;
+struct Menu_Items items[] = {
+    { Tetris,       "Tetris",       tetris      },
+    { Screen_Saver, "Screen Saver", screensaver },
+    { Browse,       "Browse",       dirbrowse   },
+};
+
+
+int menu_top = Tetris;
+int menu_bottom = Last_Id-1;
 
 void add_menu_item(int location, char *string)
 {
@@ -53,9 +64,9 @@ void add_menu_item(int location, char *string)
 
 void menu_init(void)
 {
-    add_menu_item(ITEM_SCREENSAVER, "Screen Saver");
-    add_menu_item(ITEM_BROWSE, "Browse");
-    add_menu_item(ITEM_TETRIS, "Tetris");
+    int i = 0;
+    for (i = i; i < Last_Id; i++)
+        add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
 
     lcd_puts(8, 38, "Rockbox!", 2);
 }
@@ -114,13 +125,14 @@ void app_main(void)
             lcd_clear_display();
             
             switch(cursor) {
-            case ITEM_TETRIS:
+            case Tetris:
                 tetris();
                 break;
-            case ITEM_BROWSE:
-                dirbrowse("/");
+            case Browse:
+                printf("at browse\n");
+                browse_root();
                 break;
-            case ITEM_SCREENSAVER:
+            case Screen_Saver:
                 screensaver();
                 break;
             default:
