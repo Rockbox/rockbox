@@ -12,6 +12,8 @@ Build your own archos.mod.
    out things on host before making target tests).  If you haven't already
    done so, we advise you pull down the 'docs' directory as well.
 
+   If you do want to play with the simulator, read UISIMULATOR.
+
 2. Build the tools by running 'make' in the tools/ directory.
 
 3. Create your own build directory, preferably in the same directory as the
