@@ -145,7 +145,6 @@ void sim_closedir(MYDIR *dir)
     free(dir);
 }
 
-
 int sim_open(const char *name, int o)
 {
     char buffer[256]; /* sufficiently big */
@@ -153,7 +152,7 @@ int sim_open(const char *name, int o)
 
     if(name[0] == '/') {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
-        
+
         debugf("We open the real file '%s'\n", buffer);
 #ifdef WIN32
         return (open)(buffer, opts);
@@ -164,11 +163,6 @@ int sim_open(const char *name, int o)
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
-}
-
-int sim_close(int fd)
-{
-    return (close)(fd);
 }
 
 int sim_creat(const char *name, mode_t mode)
@@ -184,7 +178,7 @@ int sim_creat(const char *name, mode_t mode)
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
-}
+}      
 
 int sim_mkdir(const char *name, mode_t mode)
 {
@@ -242,13 +236,19 @@ int sim_rename(const char *oldpath, const char* newpath)
     return -1;
 }
 
-off_t sim_filesize(int fd)
+/* rockbox off_t may be different from system off_t */
+long sim_lseek(int fildes, long offset, int whence)
 {
-    int old = lseek(fd, 0, SEEK_CUR);
-    int size = lseek(fd, 0, SEEK_END);
+    return lseek(fildes, offset, whence);
+}
+
+long sim_filesize(int fd)
+{
+    long old = lseek(fd, 0, SEEK_CUR);
+    long size = lseek(fd, 0, SEEK_END);
     lseek(fd, old, SEEK_SET);
 
-    return(size);
+    return size;
 }
 
 void fat_size(unsigned int* size, unsigned int* free)
