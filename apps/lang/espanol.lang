@@ -31,15 +31,11 @@ new: "Versión"
 
 id: LANG_DEBUG
 desc: in the main menu
-### English phrase was changed! Previous translation was made on:
-### "Debug (keep out!)"
 eng: "Debug (Keep Out!)"
 new: "Depuración (¡no tocar!)"
 
 id: LANG_USB
 desc: in the main menu
-### English phrase was changed! Previous translation was made on:
-### "USB (sim)"
 eng: "USB (Sim)"
 new: "USB (Simulado)"
 
@@ -70,8 +66,6 @@ new: "Batería: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-### English phrase was changed! Previous translation was made on:
-### "Battery: charging"
 eng: "Battery: Charging"
 new: "Batería: Cargando" 
 
@@ -1348,17 +1342,17 @@ new: "Mie"
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
-new: "KAraoke"
+new: "Karaoke"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: in sound_settings
 eng: "St. Narrow"
-new: "Est. fino"
+new: "Est. estrecho"
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: in sound_settings
 eng: "Stereo Narrow"
-new: "Estereo fino"
+new: "Estereo estrecho"
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: in sound_settings
@@ -1419,3 +1413,13 @@ id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
 new: "[ON] para Deshacer"
+
+id: LANG_VBRFIX_NOT_VBR
+desc: Tells the user that the selected file is not a VBR file
+eng: "Not a VBR file"
+new: "No es VBR"
+
+id: LANG_VBRFIX_STOP_PLAY
+desc: Tells the user to stop the playback
+eng: "Stop the playback first"
+new: "Deten la reproduccion antes"
