@@ -1,0 +1,53 @@
+Custom WPS Display
+wps.config File Format Specifications
+
+Description
+-----------
+The Custom WPS Display is used on the Rockbox Player ONLY as a means 
+to customize the WPS to the user's likings. 
+The first line of the 2 line display is the customized line (scrolling).
+The second line is always the time display. (Elapsed & Total Time).
+The second line is not able to be customized.
+All characters not preceded by % are displayed as typed.
+
+File Location
+-------------
+The configuration file must be located in the root folder of the
+device and must be named wps.config (lowercase)
+
+Tags
+----
+%t : ID3 Title
+%a : ID3 Artist
+%n : ID3 Track Number
+%u : ID3 Album
+%c : Conditional Title/Filename
+       Displays "Artist - Title" *or*
+       Displays Filename if no ID3 Artist/Title
+%b : File Bitrate
+%f : File Frequency
+%p : File Path
+%m : File Name
+%s : File Size (In Kilobytes)
+%i : Playlist Position
+%l : Playlist Total Entries
+%e : Elapsed Track Time
+%o : Total Track Time
+
+Example wps.config File
+-----------------------
+%i/%l: %c * %sKB
+
+Example Output
+--------------
+ID3 Title:              None
+ID3 Artist:             None
+Playlist Position:      5
+Playlist Total Entries: 10
+Filename:               My Song.mp3
+File Size:              3500
+Elapsed Track Time:     2:23
+Total Track Time:       3:01
+The output of this on the player would be:
+5/10: My Song.mp3 * 3500KB
+2:23/3:01
