@@ -280,6 +280,7 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             /* %3 */ "r"(clk0sda0),
             /* %4 */ "r"(LCDR),
             /* %5 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC)
+            : "r0"
         );
 
         sti();

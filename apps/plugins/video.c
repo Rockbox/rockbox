@@ -158,7 +158,6 @@ int main(char* filename)
     }
 
     rb->close(fd);
-    and_b(~0x40, &PBDRL); /* hack workaround to get the LED off */
 
     if (shown == SYS_USB_CONNECTED) /* exception */
         return PLUGIN_USB_CONNECTED;
