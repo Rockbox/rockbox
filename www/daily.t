@@ -28,7 +28,9 @@ The batch timestamp is GMT.
 <a name="bleeding_edge"></a>
 <h2>Bleeding edge builds</h2>
 
-<p>These builds are as "bleeding edge" as you can get. They are updated every 20 minutes. (See status on the first line in the above table).
+<p>These builds are as "bleeding edge" as you can get. They are updated every 20 minutes. (See status on the first line in the above table). 
+
+<p><b>Note: These are not complete installation archives.</b> Unless you really know what you are doing, you probably want to download the daily build instead.
 
 <p><table class=dailymod><tr valign=top>
 <td>
