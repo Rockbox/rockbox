@@ -269,21 +269,21 @@ static int mas_devread(unsigned long *dest, int len)
 #ifdef HAVE_MAS3587F
 void mas_reset(void)
 {
-    __set_bit_constant(8-8, &PAIORH);
+    or_b(0x01, &PAIORH);
     
     if(old_recorder)
     {
         /* Older recorder models don't invert the POR signal */
-        __set_bit_constant(8-8, &PADRH);
+        or_b(0x01, &PADRH);
         sleep(HZ/100);
-        __clear_bit_constant(8-8, &PADRH);
+        and_b(~0x01, &PADRH);
         sleep(HZ/5);
     }
     else
     {
-        __clear_bit_constant(8-8, &PADRH);
+        and_b(~0x01, &PADRH);
         sleep(HZ/100);
-        __set_bit_constant(8-8, &PADRH);
+        or_b(0x01, &PADRH);
         sleep(HZ/5);
     }
 }

@@ -33,11 +33,11 @@ bool charger_enabled;
 void power_init(void)
 {
 #ifdef HAVE_CHARGE_CTRL
-    __set_bit_constant(5, &PBIORL); /* Set charging control bit to output */
+    or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
 #endif
 #ifdef HAVE_ATA_POWER_OFF
-    __set_bit_constant(5, &PAIORL);
+    or_b(0x20, &PAIORL);
     PACR2 &= 0xFBFF;
 #endif
 }
@@ -63,12 +63,12 @@ void charger_enable(bool on)
 #ifdef HAVE_CHARGE_CTRL
     if(on) 
     {
-        __clear_bit_constant(5, &PBDRL);
+        and_b(~0x20, &PBDRL);
         charger_enabled = 1;
     } 
     else 
     {
-        __set_bit_constant(5, &PBDRL);
+        or_b(0x20, &PBDRL);
         charger_enabled = 0;
     }
 #else
@@ -80,9 +80,9 @@ void ide_power_enable(bool on)
 {
 #ifdef HAVE_ATA_POWER_OFF
     if(on)
-        __set_bit_constant(5, &PADRL);
+        or_b(0x20, &PADRL);
     else
-        __clear_bit_constant(5, &PADRL);
+        and_b(~0x20, &PADRL);
 #else
     on = on;
 #endif
@@ -92,14 +92,14 @@ void power_off(void)
 {
     set_irq_level(15);
 #ifdef HAVE_POWEROFF_ON_PBDR
-    __clear_mask_constant(PBDR_BTN_OFF, &PBDRL);
-    __set_mask_constant(PBDR_BTN_OFF, &PBIORL);
+    and_b(~0x10, &PBDRL);
+    or_b(0x10, &PBIORL);
 #elif defined(HAVE_POWEROFF_ON_PB5)
-    __clear_bit_constant(5, &PBDRL);
-    __set_bit_constant(5, &PBIORL);
+    and_b(~0x20, &PBDRL);
+    or_b(0x20, &PBIORL);
 #else
-    __clear_bit_constant(11-8, &PADRH);
-    __set_bit_constant(11-8, &PAIORH);
+    and_b(~0x08, &PADRH);
+    or_b(0x08, &PAIORH);
 #endif
     while(1);
 }

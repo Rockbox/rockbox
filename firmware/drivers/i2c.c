@@ -23,22 +23,23 @@
 #include "debug.h"
 #include "system.h"
 
-#define PB13 0x2000
-#define PB7  0x0080
-#define PB5  0x0020
-
+/*
+**  SDA is PB7
+**  SCL is PB13
+*/
+   
 /* cute little functions, atomic read-modify-write */
-#define SDA_LO     __clear_bit_constant(7, &PBDRL)
-#define SDA_HI     __set_bit_constant(7, &PBDRL)
-#define SDA_INPUT  __clear_bit_constant(7, &PBIORL)
-#define SDA_OUTPUT __set_bit_constant(7, &PBIORL)
-#define SDA     (PBDR & PB7)
+#define SDA_LO     and_b(~0x80, &PBDRL)
+#define SDA_HI     or_b(0x80, &PBDRL)
+#define SDA_INPUT  and_b(~0x80, &PBIORL)
+#define SDA_OUTPUT or_b(0x80, &PBIORL)
+#define SDA     (PBDR & 0x80)
 
-#define SCL_INPUT  __clear_bit_constant(13-8, &PBIORH)
-#define SCL_OUTPUT __set_bit_constant(13-8, &PBIORH)
-#define SCL_LO     __clear_bit_constant(13-8, &PBDRH)
-#define SCL_HI     __set_bit_constant(13-8, &PBDRH)
-#define SCL     (PBDR & PB13)
+#define SCL_INPUT  and_b(~0x20, &PBIORH)
+#define SCL_OUTPUT or_b(0x20, &PBIORH)
+#define SCL_LO     and_b(~0x20, &PBDRH)
+#define SCL_HI     or_b(0x20, &PBDRH)
+#define SCL     (PBDR & 0x2000)
 
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
@@ -82,11 +83,11 @@ void i2c_init(void)
    PBCR2 &= ~0xcc00; /* PB5 abd PB7 */
 
    /* PB5 is "MAS enable". make it output and high */
-   __set_bit_constant(5, &PBIORL);
-   __set_bit_constant(5, &PBDRL);
+   or_b(0x20, &PBIORL);
+   or_b(0x20, &PBDRL);
 
    /* Set the clock line PB13 to an output */
-    __set_bit_constant(13-8, &PBIORH);
+    or_b(0x20, &PBIORH);
    
    SDA_OUTPUT;
    SDA_HI;

@@ -24,19 +24,12 @@
 
 void led(bool on)
 {
-#ifdef ASM_IMPLEMENTATION
-    if ( on )
-        asm("or.b"  "\t" "%0,@(r0,gbr)" : : "I"(0x40), "z"(PBDR_ADDR+1));
-    else
-        asm("and.b" "\t" "%0,@(r0,gbr)" : : "I"(~0x40), "z"(PBDR_ADDR+1));
-#else
     if ( on )
     {
-        __set_bit_constant(6, &PBDRL);
+        or_b(0x40, &PBDRL);
     }
     else
     {
-        __clear_bit_constant(6, &PBDRL);
+        and_b(~0x40, &PBDRL);
     }
-#endif
 }

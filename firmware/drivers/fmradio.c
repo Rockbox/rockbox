@@ -32,21 +32,16 @@
    DO (Data Out)    - PB4
 */
 
-#define PB0  0x0001
-#define PB1  0x0002
-#define PB3  0x0008
-#define PB4  0x0010
-
 /* cute little functions */
-#define CE_LO  __clear_bit_constant(3, PBDRL_ADDR)
-#define CE_HI  __set_bit_constant(3, PBDRL_ADDR)
-#define CL_LO  __clear_bit_constant(1, PBDRL_ADDR)
-#define CL_HI  __set_bit_constant(1, PBDRL_ADDR)
-#define DO     (PBDR & PB4)
-#define DI_LO  __clear_bit_constant(0, PBDRL_ADDR)
-#define DI_HI  __set_bit_constant(0, PBDRL_ADDR)
+#define CE_LO  and_b(~0x08, PBDRL_ADDR)
+#define CE_HI  or_b(0x08, PBDRL_ADDR)
+#define CL_LO  and_b(~0x02, PBDRL_ADDR)
+#define CL_HI  or_b(0x02, PBDRL_ADDR)
+#define DO     (PBDR & 0x10)
+#define DI_LO  and_b(~0x01, PBDRL_ADDR)
+#define DI_HI  or_b(0x01, PBDRL_ADDR)
 
-#define START __set_mask_constant((PB3 | PB1), PBDRL_ADDR)
+#define START or_b((0x08 | 0x02), PBDRL_ADDR)
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)

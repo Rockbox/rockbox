@@ -46,134 +46,26 @@
 #define nop \
   asm volatile ("nop")
 
-#define __set_mask_constant(mask,address) \
+#define or_b(mask, address) \
   asm                                     \
     ("or.b\t%0,@(r0,gbr)"                 \
      :                                    \
      : /* %0 */ "I"((char)(mask)),        \
        /* %1 */ "z"(address-GBR))
 
-#define __clear_mask_constant(mask,address) \
+#define and_b(mask, address) \
   asm                                       \
     ("and.b\t%0,@(r0,gbr)"                  \
      :                                      \
-     : /* %0 */ "I"((char)~(mask)),         \
+     : /* %0 */ "I"((char)(mask)),         \
        /* %1 */ "z"(address-GBR))
 
-#define __toggle_mask_constant(mask,address) \
+#define xor_b(mask, address) \
   asm                                        \
     ("xor.b\t%0,@(r0,gbr)"                   \
      :                                       \
      : /* %0 */ "I"((char)(mask)),           \
        /* %1 */ "z"(address-GBR))
-
-#define __test_mask_constant(mask,address)    \
-  ({                                          \
-    int result;                               \
-    asm                                       \
-      ("tst.b\t%1,@(r0,gbr)\n\tmovt\t%0"      \
-       : "=r"(result)                         \
-       : "I"((char)(mask)),"z"(address-GBR)); \
-    result;                                   \
-  })
-
-#define __set_bit_constant(bit,address) \
-  asm                                   \
-    ("or.b\t%0,@(r0,gbr)"               \
-     :                                  \
-     : /* %0 */ "I"((char)(1<<(bit))),  \
-       /* %1 */ "z"(address-GBR))
-
-#define __clear_bit_constant(bit,address) \
-  asm                                     \
-    ("and.b\t%0,@(r0,gbr)"                \
-     :                                    \
-     : /* %0 */ "I"((char)~(1<<(bit))),   \
-       /* %1 */ "z"(address-GBR))
-
-#define __toggle_bit_constant(bit,address) \
-  asm                                      \
-    ("xor.b\t%0,@(r0,gbr)"                 \
-     :                                     \
-     : /* %0 */ "I"((char)(1<<(bit))),     \
-       /* %1 */ "z"(address-GBR))
-
-#define __test_bit_constant(bit,address)      \
-  ({                                          \
-    int result;                               \
-    asm                                       \
-      ("tst.b\t%1,@(r0,gbr)\n\tmovt\t%0"      \
-       : "=r"(result)                         \
-       : "I"((char)(1<<(bit))),"z"(address-GBR)); \
-    result;                                   \
-  })
-
-#define __set_mask(mask,address)      /* FIXME */
-#define __test_mask(mask,address)   0 /* FIXME */
-#define __clear_mask(mask,address)    /* FIXME */
-#define __toggle_mask(mask,address)   /* FIXME */
-
-#define __set_bit(bit,address)      /* FIXME */
-#define __test_bit(bit,address)   0 /* FIXME */
-#define __clear_bit(bit,address)    /* FIXME */
-#define __toggle_bit(bit,address)   /* FIXME */
-
-#define set_mask(mask,address)          \
-  if (__builtin_constant_p (mask))      \
-    __set_mask_constant (mask,address); \
-  else                                  \
-    __set_mask (mask,address)
-
-#define clear_mask(mask,address)          \
-  if (__builtin_constant_p (mask))        \
-    __clear_mask_constant (mask,address); \
-  else                                    \
-    __clear_mask (mask,address)
-
-#define toggle_mask(mask,address)          \
-  if (__builtin_constant_p (mask))         \
-    __toggle_mask_constant (mask,address); \
-  else                                     \
-    __toggle_mask (mask,address)
-
-#define test_mask(mask,address)              \
-  (                                          \
-    (__builtin_constant_p (mask))            \
-  ? (int)__test_mask_constant (mask,address) \
-  : (int)__test_mask (mask,address)          \
-  )
-
-
-#define set_bit(bit,address)          \
-  if (__builtin_constant_p (bit))     \
-    __set_bit_constant (bit,address); \
-  else                                \
-    __set_bit (bit,address)
-
-#define clear_bit(bit,address)          \
-  if (__builtin_constant_p (bit))       \
-    __clear_bit_constant (bit,address); \
-  else                                  \
-    __clear_bit (bit,address)
-
-#define toggle_bit(bit,address)          \
-  if (__builtin_constant_p (bit))        \
-    __toggle_bit_constant (bit,address); \
-  else                                   \
-    __toggle_bit (bit,address)
-
-#define test_bit(bit,address)              \
-  (                                        \
-    (__builtin_constant_p (bit))           \
-  ? (int)__test_bit_constant (bit,address) \
-  : (int)__test_bit (bit,address)          \
-  )
-
-
-extern char __swap_bit[256];
-
-#define swap_bit(byte) \
-  __swap_bit[byte]
 
 #ifndef SIMULATOR
 

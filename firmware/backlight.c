@@ -74,7 +74,7 @@ void backlight_thread(void)
                     /* Disable square wave */
                     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
-                    __set_bit_constant(14-8, &PADRH);
+                    or_b(0x40, &PADRH);
 #endif  
                 }
                 /* else if(backlight_timer) */
@@ -84,7 +84,7 @@ void backlight_thread(void)
                     /* Enable square wave */
                     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 #else
-                    __clear_bit_constant(14-8, &PADRH);
+                    and_b(~0x40, &PADRH);
 #endif
                 }
                 break;
@@ -94,7 +94,7 @@ void backlight_thread(void)
                 /* Disable square wave */
                 rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
-                __set_bit_constant(14-8, &PADRH);
+                or_b(0x40, &PADRH);
 #endif
                 break;
                 
@@ -172,7 +172,10 @@ void backlight_init(void)
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
 
-    __set_bit_constant(14-8, &PAIORH);
+#ifndef HAVE_RTC
+    
+    or_b(0x40, &PAIORH); /* Set data direction of PA14 */
+#endif
     
     backlight_on();
 }
