@@ -43,9 +43,13 @@
 #define NEW_LCD_CRAM         ((char)0x80) /* Characters */
 #define NEW_LCD_PRAM         ((char)0xC0) /*  Patterns  */
 #define NEW_LCD_IRAM         ((char)0x40) /*    Icons   */
+#define NEW_LCD_FUNCTION_SET                    ((char)0x10)
+#define NEW_LCD_POWER_SAVE_MODE_OSC_CONTROL_SET ((char)0x0c)
+#define NEW_LCD_POWER_CONTROL_REGISTER_SET      ((char)0x20)
+#define NEW_LCD_DISPLAY_CONTROL_SET             ((char)0x28)
 
-#define LCD_CURSOR(x,y)    ((char)(lcd_cram+((y)*16+(x))))
-#define LCD_ICON(i)        ((char)(lcd_iram+i))
+#define LCD_CURSOR(x,y)      ((char)(lcd_cram+((y)*16+(x))))
+#define LCD_ICON(i)          ((char)(lcd_iram+i))
 
 #define SCROLLABLE_LINES 2
 
@@ -488,6 +492,8 @@ void lcd_set_contrast(int val)
 
 void lcd_init (void)
 {
+    unsigned char data_vector[64];
+
     new_lcd = has_new_lcd();
     memset(extended_chars_mapped, NO_CHAR, sizeof(extended_chars_mapped));
     memset(extended_pattern_content, NO_CHAR,sizeof(extended_pattern_content));
@@ -500,6 +506,32 @@ void lcd_init (void)
         lcd_pram = NEW_LCD_PRAM;
         lcd_iram = NEW_LCD_IRAM;
         pattern_size=7; /* Last pattern, 7 for new LCD */
+
+        /* LCD init for cold start */
+        PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
+        or_b(0x0f, &PBIORL);             /* ... output */
+        or_b(0x0f, &PBDRL);              /* ... and high */
+
+        lcd_write_command(NEW_LCD_FUNCTION_SET + 1); /* CGRAM selected */
+        lcd_write_command(NEW_LCD_CONTRAST_SET);
+        lcd_data_byte = 0x08;
+        lcd_write_data(&lcd_data_byte, 1);
+        lcd_write_command(NEW_LCD_POWER_SAVE_MODE_OSC_CONTROL_SET + 2);
+                                         /* oscillator on */
+        lcd_write_command(NEW_LCD_POWER_CONTROL_REGISTER_SET + 7);
+                                         /* opamp buffer + voltage booster on*/
+
+        memset(data_vector, 0x20, 64);
+        lcd_write_command(NEW_LCD_CRAM); /* Set DDRAM address */
+        lcd_write_data(data_vector, 64); /* all spaces */
+
+        memset(data_vector, 0, 64);
+        lcd_write_command(NEW_LCD_PRAM); /* Set CGRAM address */
+        lcd_write_data(data_vector, 64); /* zero out */
+        lcd_write_command(NEW_LCD_IRAM); /* Set ICONRAM address */
+        lcd_write_data(data_vector, 16); /* zero out */
+
+        lcd_write_command(NEW_LCD_DISPLAY_CONTROL_SET + 1); /* display on */
     }
     else {
         lcd_ascii = old_lcd_rocklatin1_to_xlcd;
@@ -508,6 +540,81 @@ void lcd_init (void)
         lcd_pram = OLD_LCD_PRAM;
         lcd_iram = OLD_LCD_IRAM;
         pattern_size=3; /* Last pattern, 3 for old LCD */
+        
+#if 1
+        /* LCD init for cold start */
+        PBCR2 &= 0xff00;                 /* Set PB0..PB3 to GPIO */
+        or_b(0x0f, &PBIORL);             /* ... output */
+        or_b(0x0f, &PBDRL);              /* ... and high */
+
+        lcd_write_command(0x61);
+        lcd_write_command(0x42);
+        lcd_write_command(0x57);
+
+        memset(data_vector, 0x24, 13);
+        lcd_write_command(OLD_LCD_CRAM); /* Set DDRAM address */
+        lcd_write_data(data_vector, 13); /* all spaces */
+        lcd_write_command(OLD_LCD_CRAM + 0x10);
+        lcd_write_data(data_vector, 13);
+        lcd_write_command(OLD_LCD_CRAM + 0x20);
+        lcd_write_data(data_vector, 13);
+
+        memset(data_vector, 0, 32);
+        lcd_write_command(OLD_LCD_PRAM); /* Set CGRAM address */
+        lcd_write_data(data_vector, 32); /* zero out */
+        lcd_write_command(OLD_LCD_IRAM); /* Set ICONRAM address */
+        lcd_write_data(data_vector, 13); /* zero out */
+        lcd_write_command(OLD_LCD_IRAM + 0x10);
+        lcd_write_data(data_vector, 13);
+
+        lcd_write_command(0x31);
+#else  
+        /* archos look-alike code, left here for reference. As soon as the
+         * rockbox version is confirmed working, this will go away */
+        {
+        int i;
+
+        PBCR2 &= 0xc000;
+        PBIOR |= 0x000f;
+        PBDR |= 0x0002;
+        PBDR |= 0x0001;
+        PBDR |= 0x0004;
+        PBDR |= 0x0008;
+
+        for (i=0; i<200; i++) asm volatile ("nop"); /* wait 100 us */
+
+        PBDR &= 0xfffd; /* CS low (assert) */
+
+        for (i=0; i<100; i++) asm volatile ("nop"); /* wait 50 us */
+
+        lcd_write_command(0x61);
+        lcd_write_command(0x42);
+        lcd_write_command(0x57);
+
+        memset(data_vector, 0x24, 13);
+        lcd_write_command(0xb0);         /* Set DDRAM address */
+        lcd_write_data(data_vector, 13); /* all spaces */
+        lcd_write_command(0xc0);
+        lcd_write_data(data_vector, 13);
+        lcd_write_command(0xd0);
+        lcd_write_data(data_vector, 13);
+
+        memset(data_vector, 0, 32);
+        lcd_write_command(0x80);         /* Set CGRAM address */
+        lcd_write_data(data_vector, 32); /* zero out */
+        lcd_write_command(0xe0);         /* Set ICONRAM address */
+        lcd_write_data(data_vector, 13); /* zero out */
+        lcd_write_command(0xf0);
+        lcd_write_data(data_vector, 13);
+
+        for (i=0; i<300000; i++) asm volatile ("nop"); /* wait 150 ms */
+
+        lcd_write_command(0x31);
+        lcd_write_command(0xa8);         /* Set contrast control */
+        lcd_data_byte = 0;
+        lcd_write_data(&lcd_data_byte, 1); /* 0 */
+        }
+#endif
     }
     
     lcd_set_contrast(lcd_default_contrast());
