@@ -6,7 +6,8 @@
 
 <p>Please read the <a href="rockbox-2.2-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
-<p>Make sure you download the correct file for your specific archos model:
+<p>Make sure you download the correct file for your specific archos model
+(<a href="/docs/devicechart.html">see chart here</a>):
 <table class=rockbox><tr>
 <th>player</th>
 <th>recorder</th>
