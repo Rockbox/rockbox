@@ -797,6 +797,9 @@ unsigned short* ata_get_identify(void)
 
 int ata_init(void)
 {
+	int rc;
+	bool coldstart = (PACR2 & 0x4000) != 0; 
+
 	mutex_init(&ata_mtx);
 
     led(false);
@@ -809,33 +812,38 @@ int ata_init(void)
     ata_enable(true);
 
     if ( !initialized ) {
-        /* When starting from Flash, the disk is not yet ready when we get here. */
-        /* Crude first fix is to block and poll here for a while, 
-           can we do better? */
-        int time = 0;
-        while ((ATA_STATUS & STATUS_BSY))
+        if (coldstart)
         {
-            if (time >= HZ*10) /* timeout, disk is not coming up */
-                return -6;
+            /* Reset both master and slave, we don't yet know what's in */
+            /* this is safe because non-present devices don't report busy */
+            ata_device = 0;
+            if (ata_hard_reset())
+                return -1;
+            ata_device = SELECT_DEVICE1;
+            if (ata_hard_reset())
+                return -2;
+        }
 
-            sleep(HZ/10);
-            time += HZ/10;
-        };
-        
-        if (master_slave_detect())
-            return -1;
-        
-        if (io_address_detect())
-            return -2;
-        
-        if (check_registers())
-            return -3;
-        
-        if (freeze_lock())
-            return -4;
+        if (rc = master_slave_detect())
+            return -10 + rc;
+    
+        if (rc = io_address_detect())
+            return -20 + rc;
 
-        if (identify())
-            return -5;
+        /* symptom fix: else check_registers() below may fail */
+        if (coldstart && !wait_for_bsy())
+        {   
+            return -29;
+        }
+
+        if (rc = check_registers())
+            return -30 + rc;
+    
+        if (rc = freeze_lock())
+            return -40 + rc;
+
+        if (rc = identify())
+            return -50 + rc;
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
         
@@ -844,8 +852,8 @@ int ata_init(void)
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
     }
-    if (set_multiple_mode(multisectors))
-        return -6;
+    if (rc = set_multiple_mode(multisectors))
+        return -60 + rc;
 
     return 0;
 }
