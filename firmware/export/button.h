@@ -30,8 +30,12 @@ int button_get (bool block);
 int button_get_w_tmo(int ticks);
 int button_status(void);
 void button_clear_queue(void);
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
+#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
 void button_set_flip(bool flip); /* turn 180 degrees */
+#endif
+
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+bool button_hold(void);
 #endif
 
 #define	BUTTON_NONE		0x0000
@@ -51,7 +55,18 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define BUTTON_RC_LEFT          (BUTTON_LEFT | BUTTON_REMOTE)
 #define BUTTON_RC_RIGHT         (BUTTON_RIGHT| BUTTON_REMOTE)
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+
+/* iRiver H100 specific button codes */
+#define BUTTON_SELECT           0x0100
+#define BUTTON_MODE             0x0200
+#define BUTTON_REC              0x0400
+#define	BUTTON_ON		0x0001
+#define	BUTTON_OFF		0x0002
+#define	BUTTON_UP		0x0010
+#define	BUTTON_DOWN		0x0020
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
 
 /* Recorder specific button codes */
 #define	BUTTON_ON		0x0001
