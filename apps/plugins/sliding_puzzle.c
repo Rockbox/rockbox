@@ -19,6 +19,20 @@
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define PUZZLE_QUIT BUTTON_OFF
+#define PUZZLE_SHUFFLE BUTTON_F1
+#define PUZZLE_PICTURE BUTTON_F2
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define PUZZLE_QUIT BUTTON_OFF
+#define PUZZLE_SHUFFLE_PICTURE_PRE BUTTON_MENU
+#define PUZZLE_SHUFFLE (BUTTON_MENU | BUTTON_REPEAT)
+#define PUZZLE_PICTURE (BUTTON_MENU | BUTTON_REL)
+
+#endif
+
 static struct plugin_api* rb;
 static int spots[20];
 static int hole = 19, moves;
@@ -232,20 +246,31 @@ static void puzzle_init(void)
 /* the main game loop */
 static int puzzle_loop(void)
 {
+    int button;
+    int lastbutton = BUTTON_NONE;
     int i;
     puzzle_init();
     while(true) {
-        switch (rb->button_get(true)) {
-            case BUTTON_OFF:
+        button = rb->button_get(true);
+        switch (button) {
+            case PUZZLE_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;
 
-            case BUTTON_F1:
+            case PUZZLE_SHUFFLE:
+#ifdef PUZZLE_SHUFFLE_PICTURE_PRE
+                if (lastbutton != PUZZLE_SHUFFLE_PICTURE_PRE)
+                    break;
+#endif
                 /* mix up the pieces */
                 puzzle_init();
                 break;
     
-            case BUTTON_F2:
+            case PUZZLE_PICTURE:
+#ifdef PUZZLE_SHUFFLE_PICTURE_PRE
+                if (lastbutton != PUZZLE_SHUFFLE_PICTURE_PRE)
+                    break;
+#endif
                 /* change picture */
                 pic = (pic==true?false:true);
                 for (i=0; i<20; i++)
@@ -273,10 +298,13 @@ static int puzzle_loop(void)
                     move_spot(0, 1);
                 break;
     
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
     
@@ -300,9 +328,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* print instructions */
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
+#if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_putsxy(3, 18, "[OFF] to stop");
     rb->lcd_putsxy(3, 28, "[F1] shuffle");
     rb->lcd_putsxy(3, 38, "[F2] change pic");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    rb->lcd_putsxy(0, 18, "[OFF] to stop");
+    rb->lcd_putsxy(0, 28, "[MENU..] shuffle");
+    rb->lcd_putsxy(0, 38, "[MENU] change pic");
+#endif
     rb->lcd_update();
     rb->sleep(HZ*2);
     

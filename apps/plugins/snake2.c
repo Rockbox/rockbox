@@ -33,6 +33,27 @@ Head and Tail are stored
 #define WIDTH  28
 #define HEIGHT 16
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define SNAKE2_QUIT BUTTON_OFF
+#define SNAKE2_LEVEL_UP BUTTON_UP
+#define SNAKE2_LEVEL_UP2 BUTTON_RIGHT
+#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
+#define SNAKE2_LEVEL_DOWN2 BUTTON_LEFT
+#define SNAKE2_SELECT_MAZE BUTTON_F1
+#define SNAKE2_SELECT_TYPE BUTTON_F3
+#define SNAKE2_PLAYPAUSE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define SNAKE2_QUIT BUTTON_OFF
+#define SNAKE2_LEVEL_UP BUTTON_UP
+#define SNAKE2_LEVEL_DOWN BUTTON_DOWN
+#define SNAKE2_SELECT_MAZE BUTTON_LEFT
+#define SNAKE2_SELECT_TYPE BUTTON_RIGHT
+#define SNAKE2_PLAYPAUSE BUTTON_MENU
+
+#endif
+
 static int max_levels = 0;
 static char (*level_cache)[HEIGHT][WIDTH];
 
@@ -770,24 +791,37 @@ void frame (void)
 
 void game_pause (void) 
 {
+    int button;
+
     rb->lcd_clear_display();
     rb->lcd_putsxy(33,12,"Paused");
     
     rb->lcd_update();
     while (1) 
     {
-        switch (rb->button_get(true)) 
+        button = rb->button_get(true);
+        switch (button)
         {
-            case BUTTON_PLAY:
+            case SNAKE2_PLAYPAUSE:
                 redraw();
                 rb->sleep(HZ/2);
                 return;
+
+            default:
+                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                    dead = 1;
+                    quit = 2;
+                    return;
+                }
+                break;
         }
     }
 }
 
 void game (void) 
 {
+    int button;
+
     redraw();
     /*main loop:*/
     while (1) 
@@ -821,7 +855,8 @@ void game (void)
        
         rb->sleep(HZ/speed);
 
-        switch (rb->button_get(false)) 
+        button = rb->button_get(false);
+        switch (button)
         {
              case BUTTON_UP:
              case BUTTON_UP | BUTTON_REPEAT:             
@@ -843,14 +878,21 @@ void game (void)
                  if (dir != EAST) set_direction(WEST);
                  break;
 
-             case BUTTON_OFF:
+             case SNAKE2_QUIT:
                  dead=1;
                  return;
 
-             case BUTTON_PLAY:
+             case SNAKE2_PLAYPAUSE:
                  game_pause();
                  break;
-        }      
+
+             default:
+                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                     quit = 2;
+                     return;
+                 }
+                 break;
+        }
     }
 }
 
@@ -862,37 +904,42 @@ void game_init(void)
     dead=0;
     apple=0;
     score=0;
-    
+    int button;
     
     clear_board();
     load_level( level_from_file );
     
     while (1) 
     {    
-        switch (rb->button_get(true)) 
+        button=rb->button_get(true);
+        switch (button)
         {
-            case BUTTON_RIGHT:
-            case BUTTON_UP:         
+            case SNAKE2_LEVEL_UP:
+#ifdef SNAKE2_LEVEL_UP2
+            case SNAKE2_LEVEL_UP2:
+#endif
                 if (level<10) 
                     level+=1;
                 break;
-            case BUTTON_LEFT:
-            case BUTTON_DOWN:           
+            case SNAKE2_LEVEL_DOWN:
+#ifdef SNAKE2_LEVEL_DOWN2
+            case SNAKE2_LEVEL_DOWN2:
+#endif
                 if (level>1)
                     level-=1;
                 break;
-            case BUTTON_OFF:
+            case SNAKE2_QUIT:
                 quit=1;
                 return;
                 break;
-            case BUTTON_PLAY:
+            case SNAKE2_PLAYPAUSE:
                 speed = level*20;
                 return;
                 break;
-            case BUTTON_F3:
+            case SNAKE2_SELECT_TYPE:
                 if(game_type==0)game_type=1; else game_type=0;
                 break;
-            case BUTTON_F1:
+            case SNAKE2_SELECT_MAZE:
                 
                 level_from_file++;
                 if(level_from_file > num_levels)
@@ -903,6 +950,12 @@ void game_init(void)
                 load_level( level_from_file );
                 
                 break;
+            default:
+                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                    quit = 2;
+                    return;
+                }
+                break;
         }
        
         rb->lcd_clear_display();
@@ -910,13 +963,22 @@ void game_init(void)
         /*TODO: CENTER ALL TEXT!!!!*/
         rb->snprintf(plevel,sizeof(plevel),"Speed - %d",level);
         rb->lcd_putsxy(LCD_WIDTH/2 - 30,5, plevel);
+#if CONFIG_KEYPAD == RECORDER_PAD
         rb->snprintf(plevel,sizeof(plevel),"F1 - Maze %d",level_from_file);
         rb->lcd_putsxy(18, 20, plevel);
         if(game_type==0)
             rb->lcd_putsxy(18, 30, "F3 - Game A");
         else
             rb->lcd_putsxy(18, 30, "F3 - Game B");
-        
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        rb->snprintf(plevel,sizeof(plevel),"Left - Maze %d",level_from_file);
+        rb->lcd_putsxy(18, 20, plevel);
+        if(game_type==0)
+            rb->lcd_putsxy(12, 30, "Right - Game A");
+        else
+            rb->lcd_putsxy(12, 30, "Right - Game B");
+#endif
+
         rb->snprintf(phscore,sizeof(phscore),"Hi Score: %d",hiscore);
         rb->lcd_putsxy(LCD_WIDTH/2 - 37,50, phscore);
         rb->lcd_update();
@@ -953,7 +1015,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
       }
     }
     
-    return false;
+    return (quit==1) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
 
 #endif

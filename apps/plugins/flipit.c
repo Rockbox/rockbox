@@ -19,6 +19,24 @@
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define FLIPIT_QUIT BUTTON_OFF
+#define FLIPIT_SHUFFLE BUTTON_F1
+#define FLIPIT_SOLVE BUTTON_F2
+#define FLIPIT_STEP_BY_STEP BUTTON_F3
+#define FLIPIT_TOGGLE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define FLIPIT_QUIT BUTTON_OFF
+#define FLIPIT_SHUFFLE (BUTTON_MENU | BUTTON_LEFT)
+#define FLIPIT_SOLVE (BUTTON_MENU | BUTTON_UP)
+#define FLIPIT_STEP_BY_STEP (BUTTON_MENU | BUTTON_RIGHT)
+#define FLIPIT_TOGGLE_PRE BUTTON_MENU
+#define FLIPIT_TOGGLE (BUTTON_MENU | BUTTON_REL)
+
+#endif
+
 static struct plugin_api* rb;
 static int spots[20];
 static int toggle[20];
@@ -152,19 +170,23 @@ static void flipit_init(void) {
 /* the main game loop */
 static bool flipit_loop(void) {
     int i;
+    int button;
+    int lastbutton = BUTTON_NONE;
+
     flipit_init();
     while(true) {
-        switch (rb->button_get(true)) {
-            case BUTTON_OFF:
+        button = rb->button_get(true);
+        switch (button) {
+            case FLIPIT_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;
     
-            case BUTTON_F1:
+            case FLIPIT_SHUFFLE:
                 /* mix up the pieces */
                 flipit_init();
                 break;
 
-            case BUTTON_F2:
+            case FLIPIT_SOLVE:
                 /* solve the puzzle */
                 if (!flipit_finished()) {
                     for (i=0; i<20; i++)
@@ -179,7 +201,7 @@ static bool flipit_loop(void) {
                 }
                 break;
 
-            case BUTTON_F3:
+            case FLIPIT_STEP_BY_STEP:
                 if (!flipit_finished()) {
                     for (i=0; i<20; i++)
                         if (!toggle[i]) {
@@ -193,7 +215,11 @@ static bool flipit_loop(void) {
                 }
                 break;
 
-            case BUTTON_PLAY:
+            case FLIPIT_TOGGLE:
+#ifdef FLIPIT_TOGGLE_PRE
+                if (lastbutton != FLIPIT_TOGGLE_PRE)
+                    break;
+#endif
                 /* toggle the pieces */
                 if (!flipit_finished()) {
                     flipit_toggle();
@@ -221,10 +247,13 @@ static bool flipit_loop(void) {
                     move_cursor(0, 1);
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
 
@@ -249,11 +278,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* print instructions */
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
+#if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_putsxy(2, 8, "[OFF] to stop");
     rb->lcd_putsxy(2, 18, "[PLAY] toggle");
     rb->lcd_putsxy(2, 28, "[F1] shuffle");
     rb->lcd_putsxy(2, 38, "[F2] solution");
     rb->lcd_putsxy(2, 48, "[F3] step by step");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    rb->lcd_putsxy(2, 8, "[OFF] to stop");
+    rb->lcd_putsxy(2, 18, "[MENU] toggle");
+    rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
+    rb->lcd_putsxy(2, 38, "[M-UP] solution");
+    rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
+#endif
     rb->lcd_update();
     rb->sleep(HZ*3);
 

@@ -23,6 +23,19 @@
 #define LARGE 55
 #define HAUT  31
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define MOSAIQUE_QUIT BUTTON_OFF
+#define MOSAIQUE_SPEED BUTTON_F1
+#define MOSAIQUE_RESTART BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define MOSAIQUE_QUIT BUTTON_OFF
+#define MOSAIQUE_SPEED BUTTON_LEFT
+#define MOSAIQUE_SPEED2 BUTTON_RIGHT
+#define MOSAIQUE_RESTART BUTTON_MENU
+
+#endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -74,32 +87,36 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->sleep(HZ/timer);
         
         button = rb->button_get(false);
-        if ( button == BUTTON_OFF)
+        switch (button)
         {
-            return false;
-        }
-		 
-        if ( button == BUTTON_F1 )
-        {
-            timer = timer+5;
-            if (timer>20)
-                timer=5;
-        }
-		 
-        if ( button == BUTTON_PLAY )
-        {
-            sx = rb->rand()%20+1;
-            sy = rb->rand()%20+1;
-            x=0;
-            y=0;
-            rb->lcd_clear_display();
-        }
-	
-        if ( button == SYS_USB_CONNECTED) {
-            rb->usb_screen();
-            return 0;
-        }	
+            case MOSAIQUE_QUIT:
+                
+                return PLUGIN_OK;
+                
+            case MOSAIQUE_SPEED:
+#ifdef MOSAIQUE_SPEED2
+            case MOSAIQUE_SPEED2:
+#endif
+                timer = timer+5;
+                if (timer>20)
+                    timer=5;
+                break;
+                
+            case MOSAIQUE_RESTART:
 
+                sx = rb->rand()%20+1;
+                sy = rb->rand()%20+1;
+                x=0;
+                y=0;
+                rb->lcd_clear_display();
+                break;
+
+
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
+        }
     }
 }
 

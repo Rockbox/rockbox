@@ -33,6 +33,23 @@
 
 #define MOVE_STEP 2 /* move pad this many steps up/down each move */
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define PONG_QUIT BUTTON_OFF
+#define PONG_LEFT_UP BUTTON_F1
+#define PONG_LEFT_DOWN BUTTON_LEFT
+#define PONG_RIGHT_UP BUTTON_F3
+#define PONG_RIGHT_DOWN BUTTON_RIGHT
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define PONG_QUIT BUTTON_OFF
+#define PONG_LEFT_UP BUTTON_LEFT
+#define PONG_LEFT_DOWN BUTTON_MENU
+#define PONG_RIGHT_UP BUTTON_UP
+#define PONG_RIGHT_DOWN BUTTON_DOWN
+
+#endif
+
 static struct plugin_api* rb;
 
 struct pong {
@@ -232,7 +249,7 @@ void padmove(int *pos, int dir)
         *pos = 0;
 }
 
-bool keys(struct pong *p)
+int keys(struct pong *p)
 {
     int key;
 
@@ -243,22 +260,25 @@ bool keys(struct pong *p)
     while(end > *rb->current_tick) {
         key = rb->button_get_w_tmo(end - *rb->current_tick);
 
-        if(key & BUTTON_OFF)
-            return false; /* exit game NOW */
+        if(key & PONG_QUIT)
+            return 0; /* exit game NOW */
 
-        if(key & BUTTON_LEFT) /* player left goes down */
+        if(key & PONG_LEFT_DOWN) /* player left goes down */
             padmove(&p->w_pad[0], MOVE_STEP);
 
-        if(key & BUTTON_F1)   /* player left goes up */
-            padmove(&p->w_pad[0], - MOVE_STEP);
+        if(key & PONG_LEFT_UP)   /* player left goes up */
+            padmove(&p->w_pad[0], -MOVE_STEP);
 
-        if(key & BUTTON_RIGHT) /* player right goes down */
+        if(key & PONG_RIGHT_DOWN) /* player right goes down */
             padmove(&p->w_pad[1], MOVE_STEP);
 
-        if(key & BUTTON_F3)   /* player right goes up */
+        if(key & PONG_RIGHT_UP)   /* player right goes up */
             padmove(&p->w_pad[1], -MOVE_STEP);
+        
+        if(rb->default_event_handler(key) == SYS_USB_CONNECTED)
+            return -1; /* exit game because of USB */
     }
-    return true; /* return false to exit game */
+    return 1; /* return 0 to exit game */
 }
 
 void showscore(struct pong *p)
@@ -273,7 +293,7 @@ void showscore(struct pong *p)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     struct pong pong;
-    bool game = true;
+    int game = 1;
 
     /* init the struct with some silly values to start with */
 
@@ -302,7 +322,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_clear_display();
 
     /* go go go */
-    while(game) {
+    while(game > 0) {
         showscore(&pong);
         pad(&pong, 0); /* draw left pad */
         pad(&pong, 1); /* draw right pad */
@@ -313,7 +333,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         game = keys(&pong); /* deal with keys */
     }
 
-    return PLUGIN_OK;
+    return (game == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
 
 #endif /* HAVE_LCD_BITMAP */

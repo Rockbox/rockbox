@@ -16,29 +16,29 @@ bounce.c
 calculator.c
 chip8.c
 cube.c
+flipit.c
 grayscale.c
 jpeg.c
-rockblox.c
-snow.c
-video.c
-
-#ifdef HAVE_RTC /* Recorder models only */
-calendar.c
-clock.c
-#endif
-
-#if CONFIG_KEYPAD != ONDIO_PAD
-/* gradually bring in the ones not working yet */
-flipit.c
 mandelbrot.c
 minesweeper.c
 mosaique.c
 oscillograph.c
 pong.c
+rockblox.c
 sliding_puzzle.c
 snake.c
 snake2.c
+snow.c
 sokoban.c
+video.c
+
+#ifdef HAVE_RTC /* Recorder models only */
+calendar.c
+clock.c
+#endif /* #ifdef HAVE_RTC */
+
+#if CONFIG_KEYPAD != ONDIO_PAD
+/* gradually bring in the ones not working yet */
 solitaire.c
 splitedit.c
 star.c

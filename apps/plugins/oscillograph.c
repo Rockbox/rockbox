@@ -29,6 +29,28 @@
 
 #define MAX_PEAK 0x8000
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define OSCILLOGRAPH_QUIT BUTTON_OFF
+#define OSCILLOGRAPH_SPEED_UP BUTTON_UP
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
+#define OSCILLOGRAPH_ROLL BUTTON_F1
+#define OSCILLOGRAPH_MODE BUTTON_F2
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_F3
+#define OSCILLOGRAPH_PAUSE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define OSCILLOGRAPH_QUIT BUTTON_OFF
+#define OSCILLOGRAPH_SPEED_UP BUTTON_UP
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
+#define OSCILLOGRAPH_ROLL BUTTON_RIGHT
+#define OSCILLOGRAPH_MODE BUTTON_MENU
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
+
+#endif
+
+/* global api struct pointer */
+static struct plugin_api* rb;
 /* number of ticks between two volume samples */
 static int  speed = 1;
 /* roll == true -> lcd rolls */
@@ -37,12 +59,26 @@ static bool roll = true;
 static int  drawMode = DRAW_MODE_FILLED;
 
 /**
+ * cleanup on return / usb
+ */
+void cleanup(void *parameter)
+{
+    (void)parameter;
+    
+    /* restore to default roll position.
+       Looks funny if you forget to do this... */
+    rb->lcd_roll(0);
+    rb->lcd_update();
+}
+
+/**
  * Displays a vertically scrolling oscillosgraph using
  * hardware scrolling of the display. The user can change
  * speed
  */
-enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int button;
     /* stores current volume value left */
     int  left;
     /* stores current volume value right */
@@ -57,8 +93,9 @@ enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
 
     bool exit = false;
 
-    TEST_PLUGIN_API(rb);
+    TEST_PLUGIN_API(api);
     (void)parameter;
+    rb = api;
 
     /* the main loop */
     while (!exit) {
@@ -135,28 +172,31 @@ enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
                it must be ensured that at least 1 is passed. */
 
             /* react to user input */
-            switch (rb->button_get_w_tmo(MAX(speed, 1))) {
-                case BUTTON_UP:
+            button = rb->button_get_w_tmo(MAX(speed, 1));
+            switch (button) {
+                case OSCILLOGRAPH_SPEED_UP:
                     speed++;
                     draw = true;
                     break;
 
-                case BUTTON_DOWN:
+                case OSCILLOGRAPH_SPEED_DOWN:
                     speed--;
                     draw = true;
                     break;
 
-                case BUTTON_PLAY:
+#ifdef OSCILLOGRAPH_PAUSE
+                case OSCILLOGRAPH_PAUSE:
                     /* pause the demo */
                     rb->button_get(true);
                     break;
+#endif
 
-                case BUTTON_F1:
+                case OSCILLOGRAPH_ROLL:
                     /* toggle rolling */
                     roll = !roll;
                     break;
 
-                case BUTTON_F2:
+                case OSCILLOGRAPH_MODE:
                     /* step through the display modes */
                     drawMode ++;
                     drawMode = drawMode % DRAW_MODE_COUNT;
@@ -170,18 +210,20 @@ enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
                     rb->lcd_roll(0);
                     break;
 
-                case BUTTON_F3:
+                case OSCILLOGRAPH_SPEED_RESET:
                     speed = 1;
                     draw = true;
                     break;
 
-                case BUTTON_OFF:
+                case OSCILLOGRAPH_QUIT:
                     exit = true;
                     break;
 
-                case SYS_USB_CONNECTED:
-                    rb->usb_screen();
-                    return PLUGIN_USB_CONNECTED;
+                default:
+                    if (rb->default_event_handler_ex(button, cleanup, NULL)
+                        == SYS_USB_CONNECTED)
+                        return PLUGIN_USB_CONNECTED;
+                    break;
             }
 
             if (draw) {
@@ -191,14 +233,10 @@ enum plugin_status plugin_start(struct plugin_api* rb, void* parameter)
                 rb->lcd_update_rect(0, (y + LCD_HEIGHT - 8) % LCD_HEIGHT, 
                                     LCD_WIDTH, 8);
             }
-        }    
+        }
     }
 
-    /* restore to default roll position. 
-       Looks funny if you forget to do this... */
-    rb->lcd_roll(0);
-    rb->lcd_update();
-
+    cleanup(NULL);
     /* standard return */
     return PLUGIN_OK;
 }

@@ -23,6 +23,27 @@
 #ifdef HAVE_LCD_BITMAP // this is not fun on the player
 # include "gray.h"
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_ZOOM_IN BUTTON_PLAY
+#define MANDELBROT_ZOOM_OUT BUTTON_ON
+#define MANDELBROT_MAXITER_INC BUTTON_F2
+#define MANDELBROT_MAXITER_DEC BUTTON_F1
+#define MANDELBROT_RESET BUTTON_F3
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_ZOOM_IN_PRE BUTTON_MENU
+#define MANDELBROT_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
+#define MANDELBROT_ZOOM_IN2 (BUTTON_MENU | BUTTON_UP)
+#define MANDELBROT_ZOOM_OUT (BUTTON_MENU | BUTTON_DOWN)
+#define MANDELBROT_MAXITER_INC (BUTTON_MENU | BUTTON_RIGHT)
+#define MANDELBROT_MAXITER_DEC (BUTTON_MENU | BUTTON_LEFT)
+#define MANDELBROT_RESET (BUTTON_MENU | BUTTON_OFF)
+
+#endif
+
 static struct plugin_api* rb;
 static char buff[32];
 static int lcd_aspect_ratio;
@@ -101,9 +122,17 @@ void calc_mandelbrot_set(void){
     }
 }
 
+void cleanup(void *parameter)
+{
+    (void)parameter;
+    
+    gray_release_buffer();
+}
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int button;
+    int lastbutton = BUTTON_NONE;
     int grayscales;
     bool redraw = true;
 
@@ -141,12 +170,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         redraw = false;
         
-        switch (rb->button_get(true)) {
-        case BUTTON_OFF:
+        button = rb->button_get(true);
+        switch (button) {
+        case MANDELBROT_QUIT:
             gray_release_buffer();
             return PLUGIN_OK;
 
-        case BUTTON_ON:
+        case MANDELBROT_ZOOM_OUT:
             x_min -= ((delta>>13)*(lcd_aspect_ratio>>13));
             x_max += ((delta>>13)*(lcd_aspect_ratio>>13));
             y_min -= delta;
@@ -156,7 +186,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             break;
 
 
-        case BUTTON_PLAY:
+        case MANDELBROT_ZOOM_IN:
+#ifdef MANDELBROT_ZOOM_IN_PRE
+            if (lastbutton != MANDELBROT_ZOOM_IN_PRE)
+                break;
+#endif
+#ifdef MANDELBROT_ZOOM_IN2
+        case MANDELBROT_ZOOM_IN2:
+#endif
             x_min += ((delta>>13)*(lcd_aspect_ratio>>13));
             x_max -= ((delta>>13)*(lcd_aspect_ratio>>13));
             y_min += delta;
@@ -189,33 +226,36 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             redraw = true;
             break;
 
-        case BUTTON_F1:
+        case MANDELBROT_MAXITER_DEC:
             if (max_iter>5){
                 max_iter -= 5;
                 redraw = true;
             }
             break;
 
-        case BUTTON_F2:
+        case MANDELBROT_MAXITER_INC:
             if (max_iter < 195){
                 max_iter += 5;
                 redraw = true;
             }
             break;
 
-        case BUTTON_F3:
+        case MANDELBROT_RESET:
             init_mandelbrot_set();
             redraw = true;
             break;
 
-        case SYS_USB_CONNECTED:
-            gray_release_buffer();
-            rb->usb_screen();
-            return PLUGIN_USB_CONNECTED;
+        default:
+            if (rb->default_event_handler_ex(button, cleanup, NULL)
+                == SYS_USB_CONNECTED)
+                return PLUGIN_USB_CONNECTED;
+            break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
     gray_release_buffer();
-    return false;
+    return PLUGIN_OK;
 }
 #endif
 #endif

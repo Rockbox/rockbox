@@ -33,6 +33,24 @@
 
 #define SOKOBAN_LEVEL_SIZE (ROWS*COLS)
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define SOKOBAN_QUIT BUTTON_OFF
+#define SOKOBAN_UNDO BUTTON_ON
+#define SOKOBAN_LEVEL_UP BUTTON_F3
+#define SOKOBAN_LEVEL_DOWN BUTTON_F1
+#define SOKOBAN_LEVEL_REPEAT BUTTON_F2
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define SOKOBAN_QUIT BUTTON_OFF
+#define SOKOBAN_UNDO_PRE BUTTON_MENU
+#define SOKOBAN_UNDO (BUTTON_MENU | BUTTON_REL)
+#define SOKOBAN_LEVEL_UP (BUTTON_MENU | BUTTON_RIGHT)
+#define SOKOBAN_LEVEL_DOWN (BUTTON_MENU | BUTTON_LEFT)
+#define SOKOBAN_LEVEL_REPEAT (BUTTON_MENU | BUTTON_UP)
+
+#endif
+
 static void init_undo(void);
 static void undo(void);
 static void add_undo(int button);
@@ -443,7 +461,7 @@ static bool sokoban_loop(void)
 {
     char new_spot;
     bool moved = true;
-    int i = 0, button = 0;
+    int i = 0, button = 0, lastbutton = 0;
     short r = 0, c = 0;
 
     current_info.level.level = 1;
@@ -465,27 +483,32 @@ static bool sokoban_loop(void)
         {
             case BUTTON_OFF:
                 /* get out of here */
-                return PLUGIN_OK; 
+                return PLUGIN_OK;
 
-            case BUTTON_ON:
-            case BUTTON_ON | BUTTON_REPEAT:
+            case SOKOBAN_UNDO:
+#ifdef SOKOBAN_UNDO_PRE
+                if (lastbutton != SOKOBAN_UNDO_PRE)
+                    break;
+#else       /* repeat can't work here for Ondio */
+            case SOKOBAN_UNDO | BUTTON_REPEAT:
+#endif
                 /* this is UNDO */
                 undo();
                 rb->lcd_clear_display();
-                update_screen(); 
+                update_screen();
                 moved = false;
                 break;
 
-            case BUTTON_F3:
-            case BUTTON_F3 | BUTTON_REPEAT:
+            case SOKOBAN_LEVEL_UP:
+            case SOKOBAN_LEVEL_UP | BUTTON_REPEAT:
                 /* increase level */
                 init_undo();
                 current_info.level.boxes_to_go=0;
                 moved = true;
                 break;
 
-            case BUTTON_F1:
-            case BUTTON_F1 | BUTTON_REPEAT:
+            case SOKOBAN_LEVEL_DOWN:
+            case SOKOBAN_LEVEL_DOWN | BUTTON_REPEAT:
                 /* previous level */
                 init_undo();
                 if (current_info.level.level > 1)
@@ -495,8 +518,8 @@ static bool sokoban_loop(void)
                 moved = false;
                 break;
 
-            case BUTTON_F2:
-            case BUTTON_F2 | BUTTON_REPEAT:
+            case SOKOBAN_LEVEL_REPEAT:
+            case SOKOBAN_LEVEL_REPEAT | BUTTON_REPEAT:
                 /* same level */
                 init_undo();
                 draw_level();
@@ -504,7 +527,7 @@ static bool sokoban_loop(void)
                 break;
 
             case BUTTON_LEFT:
-                switch(current_info.board[r][c-1]) 
+                switch(current_info.board[r][c-1])
                 {
                     case ' ': /* if it is a blank spot */
                     case '.': /* if it is a home spot */
@@ -527,7 +550,7 @@ static bool sokoban_loop(void)
                             case '.': /* going from a blank to home */
                                 current_info.board[r][c-2] = '%';
                                 current_info.board[r][c-1] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = ' ';
                                 current_info.level.boxes_to_go--;
                                 break;
@@ -551,7 +574,7 @@ static bool sokoban_loop(void)
                             case '.': /* if we are going from a home to home */
                                 current_info.board[r][c-2] = '%';
                                 current_info.board[r][c-1] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = '.';
                                 break;
 
@@ -580,7 +603,7 @@ static bool sokoban_loop(void)
                         current_info.player.spot = new_spot;
                         break;
 
-                    case '$': 
+                    case '$':
                         switch(current_info.board[r][c+2]) {
                             case ' ': /* going from blank to blank */
                                 current_info.board[r][c+2] = current_info.board[r][c+1];
@@ -592,7 +615,7 @@ static bool sokoban_loop(void)
                             case '.': /* going from a blank to home */
                                 current_info.board[r][c+2] = '%';
                                 current_info.board[r][c+1] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = ' ';
                                 current_info.level.boxes_to_go--;
                                 break;
@@ -616,7 +639,7 @@ static bool sokoban_loop(void)
                             case '.':
                                 current_info.board[r][c+2] = '%';
                                 current_info.board[r][c+1] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = '.';
                                 break;
 
@@ -657,7 +680,7 @@ static bool sokoban_loop(void)
                             case '.': /* going from a blank to home */
                                 current_info.board[r-2][c] = '%';
                                 current_info.board[r-1][c] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = ' ';
                                 current_info.level.boxes_to_go--;
                                 break;
@@ -681,7 +704,7 @@ static bool sokoban_loop(void)
                             case '.': /* if we are going from a home to home */
                                 current_info.board[r-2][c] = '%';
                                 current_info.board[r-1][c] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = '.';
                                 break;
 
@@ -722,7 +745,7 @@ static bool sokoban_loop(void)
                             case '.': /* going from a blank to home */
                                 current_info.board[r+2][c] = '%';
                                 current_info.board[r+1][c] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = ' ';
                                 current_info.level.boxes_to_go--;
                                 break;
@@ -746,7 +769,7 @@ static bool sokoban_loop(void)
                             case '.': /* going from a home to home */
                                 current_info.board[r+2][c] = '%';
                                 current_info.board[r+1][c] = current_info.board[r][c];
-                                current_info.board[r][c] = current_info.player.spot; 
+                                current_info.board[r][c] = current_info.player.spot;
                                 current_info.player.spot = '.';
                                 break;
 
@@ -765,19 +788,21 @@ static bool sokoban_loop(void)
                     current_info.player.row++;
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
-
             default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+
                 moved = false;
                 break;
         }
         
+        if (button != BUTTON_NONE)
+            lastbutton = button;
+
         if (moved) {
             current_info.level.moves++;
             rb->lcd_clear_display();
-            update_screen(); 
+            update_screen();
         }
 
         /* We have completed this level */
@@ -845,11 +870,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_clear_display();
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_putsxy(3,  6, "[OFF] To Stop");
     rb->lcd_putsxy(3, 16, "[ON] To Undo");
     rb->lcd_putsxy(3, 26, "[F1] - Level");
     rb->lcd_putsxy(3, 36, "[F2] Same Level");
     rb->lcd_putsxy(3, 46, "[F3] + Level");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    rb->lcd_putsxy(3,  6, "[OFF] To Stop");
+    rb->lcd_putsxy(3, 16, "[MENU] To Undo");
+    rb->lcd_putsxy(3, 26, "[M-LEFT] - Level");
+    rb->lcd_putsxy(3, 36, "[M-UP] Same Level");
+    rb->lcd_putsxy(3, 46, "[M-RIGHT] + Level");
+#endif
 
     rb->lcd_update();
     rb->sleep(HZ*2);

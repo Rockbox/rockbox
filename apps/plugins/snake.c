@@ -33,6 +33,17 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define SNAKE_QUIT BUTTON_OFF
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define SNAKE_QUIT BUTTON_OFF
+#define SNAKE_PLAYPAUSE BUTTON_MENU
+
+#endif
+
 static int board[28][16],snakelength;
 static unsigned int score,hiscore=0;
 static short dir,frames,apple,level=1,dead=0;
@@ -156,26 +167,39 @@ void redraw (void)
 }
 
 void game_pause (void) {
+    int button;
     rb->lcd_clear_display();
     rb->lcd_putsxy(3,12,"Game Paused");
+#if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_putsxy(3,22,"[Play] to resume");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    rb->lcd_putsxy(3,22,"[Menu] to resume");
+#endif
     rb->lcd_putsxy(3,32,"[Off] to quit");
     rb->lcd_update();
     while (1) {
-        switch (rb->button_get(true)) {
-            case BUTTON_OFF:
+        button=rb->button_get(true);
+        switch (button) {
+            case SNAKE_QUIT:
                 dead=1;
                 return;
-            case BUTTON_PLAY:
+            case SNAKE_PLAYPAUSE:
                 redraw();
                 rb->sleep(HZ/2);
                 return;
+            default:
+                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                    dead=2;
+                    return;
+                }
+                break;
         }
     }
 }
 
 
 void game (void) {
+    int button;
     short x,y;
     while (1) {
         frame();
@@ -198,7 +222,8 @@ void game (void) {
 
         rb->sleep(HZ/level);
 
-        switch (rb->button_get(false)) {
+        button=rb->button_get(false);
+        switch (button) {
              case BUTTON_UP:
                  if (dir!=2) dir=0;
                  break;
@@ -211,17 +236,24 @@ void game (void) {
              case BUTTON_LEFT:
                  if (dir!=1) dir=3;
                  break;
-             case BUTTON_OFF:
+             case SNAKE_QUIT:
                  dead=1;
                  return;
-             case BUTTON_PLAY:
+             case SNAKE_PLAYPAUSE:
                  game_pause();
                  break;
-        }      
+             default:
+                 if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                     dead=2;
+                     return;
+                 }
+                 break;
+        }
     }
 }
 
 void game_init(void) {
+    int button;
     short x,y;
     char plevel[10],phscore[20];
 
@@ -244,12 +276,17 @@ void game_init(void) {
     rb->lcd_puts(0,0, plevel);
     rb->lcd_puts(0,1, "(1-slow, 9-fast)");
     rb->lcd_puts(0,2, "OFF - quit");
+#if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_puts(0,3, "PLAY - start/pause");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    rb->lcd_puts(0,3, "MENU - start/pause");
+#endif
     rb->lcd_puts(0,4, phscore);
     rb->lcd_update();
 
-    while (1) {    
-        switch (rb->button_get(true)) {
+    while (1) {  
+        button=rb->button_get(true);
+        switch (button) {
             case BUTTON_RIGHT:
             case BUTTON_UP:
                 if (level<9) 
@@ -260,12 +297,18 @@ void game_init(void) {
                 if (level>1)
                     level--;
                 break;
-            case BUTTON_OFF:
+            case SNAKE_QUIT:
                 dead=1;
                 return;
                 break;
-            case BUTTON_PLAY:
+            case SNAKE_PLAYPAUSE:
                 return;
+                break;
+            default:
+                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                    dead=2;
+                    return;
+                }
                 break;
         }
         rb->snprintf(plevel,sizeof(plevel),"Level - %d",level);
@@ -283,8 +326,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     game_init(); 
     rb->lcd_clear_display();
-    game();    
-    return false;
+    game();
+    return (dead==1)?PLUGIN_OK:PLUGIN_USB_CONNECTED;
 }
 
 #endif
