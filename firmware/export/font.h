@@ -28,7 +28,7 @@
 
 /* max static loadable fonts buffer*/
 #ifndef MAX_FONT_SIZE
-#define MAX_FONT_SIZE	9000	/* max total fontsize allocation*/
+#define MAX_FONT_SIZE	4000	/* max total fontsize allocation*/
 #endif
 
 /*
