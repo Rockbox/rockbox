@@ -21,8 +21,8 @@
 ****************************************************************************/
 #include "plugin.h"
 
-/* Only build for target */
-#ifndef SIMULATOR
+#ifndef SIMULATOR /* Only build for target */
+#ifndef ARCHOS_RECORDERV2 /* not for those yet */
 
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
@@ -872,4 +872,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return PLUGIN_OK;
 }
 
+
+#endif /* #ifndef ARCHOS_RECORDERV2 */
 #endif /* #ifndef SIMULATOR */
