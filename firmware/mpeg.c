@@ -339,7 +339,8 @@ static void mpeg_thread(void)
                 /* Stop the current stream */
                 playing = false;
                 filling = false;
-                close(mpeg_file);
+                if(mpeg_file >= 0)
+                    close(mpeg_file);
                 mpeg_file = -1;
                 stop_dma();
                 break;
