@@ -50,6 +50,7 @@
 #include "wps-display.h"
 #include "playlist.h"
 #include "buffer.h"
+#include "rolo.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -97,6 +98,7 @@ void init(void)
 {
     int rc, i;
     struct partinfo* pinfo;
+    bool coldstart; /* starting from Flash */
 
     system_init();
     kernel_init();
@@ -130,6 +132,9 @@ void init(void)
     backlight_init();
 
     button_init();
+
+    /* if nobody initialized ATA before, I consider this a cold start */
+    coldstart = (PACR2 & 0x4000) != 0; 
 
     rc = ata_init();
     if(rc)
@@ -168,7 +173,7 @@ void init(void)
                 dbg_partitions();
         }
     }
-    
+
     settings_load();
     
     status_init();
@@ -188,6 +193,22 @@ void init(void)
                global_settings.channel_config );
 
     power_init();
+
+    if (coldstart && !usb_detect())
+    {   /* when starting from flash, this time _we_ have to yield */
+        int fd;
+#ifdef HAVE_LCD_CHARCELLS
+        static const char filename[] = "/archos.mod"; 
+#else
+        static const char filename[] = "/ajbrec.ajz";
+#endif
+        fd = open(filename, O_RDONLY);
+        if(fd >= 0) /* no complaint if it doesn't exit */
+        {
+            close(fd);
+            rolo_load((char*)filename); /* start if it does */
+        }
+    }
 }
 
 int main(void)
