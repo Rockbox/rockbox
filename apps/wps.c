@@ -358,6 +358,11 @@ int wps_show(void)
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_AUDIO, true);
+    lcd_icon(ICON_PARAM, false);
+#endif
+
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
@@ -374,7 +379,7 @@ int wps_show(void)
             id3 = mpeg_current_track();
             draw_screen(id3);
         }
-        
+
         switch(button)
         {
             case BUTTON_ON:
@@ -387,6 +392,7 @@ int wps_show(void)
 
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
+                lcd_icon(ICON_AUDIO, false);
 #endif
                 button_set_release(old_release_mask);
                 return 0;
@@ -511,6 +517,7 @@ int wps_show(void)
 
             case BUTTON_MENU:
                 lcd_icon(ICON_PARAM, true);
+                lcd_icon(ICON_AUDIO, false);
                 menu_button_is_down = true;
                 break;
 
@@ -614,6 +621,9 @@ int wps_show(void)
                 {
                     dont_go_to_menu = false;
                 }
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_icon(ICON_AUDIO, true);
+#endif
                 menu_button_is_down = false;
                 break;
 
@@ -640,6 +650,10 @@ int wps_show(void)
                     break;
                 }
 
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_icon(ICON_RECORD, false);
+                lcd_icon(ICON_AUDIO, false);
+#endif
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
                 button_set_release(old_release_mask);
