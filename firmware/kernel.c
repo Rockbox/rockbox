@@ -258,7 +258,16 @@ void TIMER0(void)
 {
     int i;
 
-    /* Keep alive (?) */
+    /* Mess with smsc chip. No idea what for.
+     */
+    if (smsc_version() < 4) {
+        P6 |= 0x08;
+        P10 |= 0x20;
+    }
+        
+    /* Keep alive (?)
+     * If this is not done, power goes down when DC is unplugged.
+     */
     if (current_tick % 2 == 0)
         P8 |= 1;
     else

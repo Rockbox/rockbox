@@ -106,6 +106,57 @@ void set_pll_freq(int pll_index, long freq_out) {
     } while ((*pllcon & 0x2) == 0); /*  wait for stabilization */
 }
 
+int smsc_version(void) {
+    int v;
+    int* smsc_ver_addr = (int*)0x4C20;
+    __asm__ ("ldc %0, @%1" : "=r"(v) : "a"(smsc_ver_addr));
+    v &= 0xFF;
+    if (v < 4 || v == 0xFF) {
+        return 3;
+    }
+    return v;
+}
+
+
+
+void smsc_delay() {
+    int i;
+    /* FIXME: tune the delay.
+       !!! Delay should depend on CPU speed !!!
+    */
+    for (i = 0; i < 100; i++) {
+        
+    }
+}
+
+static void extra_init(void) {
+    /* Power on 
+       P1 |= 0x01;
+       P1CON |= 0x01;
+    */
+    
+    /* SMSC chip config (?) */
+    P6CON |= 0x08;
+    P10CON |= 0x20;
+    P6 &= 0xF7;
+    P10 &= 0x20;
+    smsc_delay();
+    if (smsc_version() < 4) {
+        P6 |= 0x80;
+        P10 |= 0x20;
+    }
+    
+    /* P5 conf
+     * line 2 & 4 are digital, other analog. : P5CON = 0xec;
+     */
+    
+    /* P7 conf
+       nothing to do: all are inputs
+       (reset value of the register is good)
+    */
+    
+}
+
 /* called by crt0 */
 void system_init(void)
 {
@@ -119,7 +170,14 @@ void system_init(void)
     /* keep alive (?) -- clear the bit to prevent crash at start (??) */
     P8 = 0x00;
     P8CON = 0x01;
-    
+
+    /* smsc chip init (?) */
+    P10 = 0x20;
+    P6 = 0x08;
+
+    P10CON = 0x20;
+    P6CON = 0x08;
+
     /********
      * CPU
      */
@@ -170,6 +228,8 @@ void system_init(void)
 /* IRQ13           IIS0 INT */
 /* IRQ14           IIS1 INT */
 /* IRQ15               ­ */
+
+    extra_init();
 }
 
 #elif CONFIG_CPU == MCF5249

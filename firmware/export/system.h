@@ -190,6 +190,10 @@ static inline void invalidate_icache(void)
 
 #elif CONFIG_CPU == TCC730
 
+extern int smsc_version(void);
+
+extern void smsc_delay(void);
+
 extern void set_pll_freq(int pll_index, long freq_out);
 
 

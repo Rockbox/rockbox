@@ -188,8 +188,11 @@ void switch_thread(void)
 #if CONFIG_CPU == MCF5249
         asm volatile ("stop #0x2000");
 #elif CONFIG_CPU == TCC730
-	/* No sleep instr on the CalmRisc. (?)
-         * TODO: investigate the SYS instruction
+	/* Sleep mode is triggered by the SYS instr on CalmRisc16.
+         * Unfortunately, the manual doesn't specify which arg to use.
+         __asm__ volatile ("sys #0x0f");
+         0x1f seems to trigger a reset;
+         0x0f is the only one other argument used by Archos.
          */
 #else
         SBYCR &= 0x7F;

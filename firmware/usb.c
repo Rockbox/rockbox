@@ -80,19 +80,6 @@ static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
 
-#ifdef USB_GMINISTYLE
-static int getSMSCVer(void) {
-  int v;
-  int* smscVerAddr = (int*)0x4C20;
-  __asm__ ("ldc %0, @%1" : "=r"(v) : "a"(smscVerAddr));
-  v &= 0xFF;
-  if (v < 4 || v == 0xFF) {
-    return 3;
-  }
-  return v;
-}
-
-#endif
 
 static void usb_enable(bool on)
 {
@@ -118,26 +105,23 @@ static void usb_enable(bool on)
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
 #elif defined(USB_GMINISTYLE)
     {
-        int i;
-        int smscVer = getSMSCVer();
+        int smsc_ver = smsc_version();
         if (on) {
-            if (smscVer < 4) {
+            if (smsc_ver < 4) {
                 P6 &= ~0x04;
                 P10 &= ~0x20;
                 
-                for (i=0; i < 20; i++)
-                    ;
+                smsc_delay();
                 
                 P6 |= 0x08;
                 P10 |= 0x20;    
-                
-                for (i=0; i < 20; i++)
-                    ;
+
+                smsc_delay();
             }
             P6 |= 0x10;
         } else {
             P6 &= ~0x10;
-            if (smscVer < 4) {
+            if (smsc_ver < 4) {
                 P6 &= ~0x04;
                 P10 &= ~0x20;
             }
@@ -355,7 +339,7 @@ bool usb_detect(void)
     current_status = (GPIO1_READ & 0x80)?true:false;
 #endif
 #ifdef USB_GMINISTYLE
-    current_status = (P5 & 0x80)?true:false;
+    current_status = (P5 & 0x10)?true:false;
 #endif
     return current_status;
 }
