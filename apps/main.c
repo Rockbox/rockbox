@@ -97,21 +97,34 @@ void init(void)
     
     usb_init();
     
-    rc = ata_init();
-    if(rc)
-        panicf("ata: %d",rc);
-
-    pinfo = disk_init();
-    if (!pinfo)
-        panicf("disk: NULL");
-
-    rc = fat_mount(pinfo[0].start);
-    if(rc)
-        panicf("mount: %d",rc);
-
     backlight_init();
 
     button_init();
+
+    rc = ata_init();
+    if(!rc)
+    {
+#ifdef ARCHOS_RECORDER
+        char str[32];
+        lcd_clear_display();
+        snprintf(str, 31, "ATA error: %d", rc);
+        lcd_puts(0, 1, str);
+        lcd_puts(0, 3, "Press ON to debug");
+        lcd_update();
+        while(button_get(true) != BUTTON_ON) {};
+        dbg_ports();
+#endif
+        panicf("ata: %d", rc);
+    }
+        
+    pinfo = disk_init();
+    if (!pinfo)
+        panicf("disk: NULL");
+    
+    rc = fat_mount(pinfo[0].start);
+    if(rc)
+        panicf("mount: %d",rc);
+    
     mpeg_init( global_settings.volume,
                global_settings.bass,
                global_settings.treble );
