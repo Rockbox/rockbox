@@ -52,5 +52,6 @@ void empty_playlist(void);
 void add_indices_to_playlist(void);
 void playlist_clear(void);
 int playlist_add(char *filename);
+int playlist_amount(void);
 
 #endif /* __PLAYLIST_H__ */

@@ -220,7 +220,7 @@ static int browse_id3(void)
             case 5:
                 lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
                 snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
-                         id3->index + 1, playlist.amount);
+                         id3->index + 1, playlist_amount());
                 lcd_puts_scroll(0, 1, scroll_text);
                 break;
 

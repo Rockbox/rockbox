@@ -37,14 +37,14 @@
 
 #include "lang.h"
 
-struct playlist_info playlist;
+static struct playlist_info playlist;
 
 #define PLAYLIST_BUFFER_SIZE (AVERAGE_FILENAME_LENGTH*MAX_FILES_IN_DIR)
 
-unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
+static unsigned char playlist_buffer[PLAYLIST_BUFFER_SIZE];
 static int playlist_end_pos = 0;
 
-char now_playing[MAX_PATH+1];
+static char now_playing[MAX_PATH+1];
 
 void playlist_clear(void)
 {

@@ -313,7 +313,7 @@ static char* get_tag(struct mp3entry* id3,
                     return buf;
 
                 case 'e':  /* Playlist Total Entries */
-                    snprintf(buf, buf_size, "%d", playlist.amount);
+                    snprintf(buf, buf_size, "%d", playlist_amount());
                     return buf;
 
                 case 'c':  /* Current Time in Song */
