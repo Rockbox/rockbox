@@ -19,92 +19,32 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
-#include "lcd.h"
 #include "menu.h"
-#include "sound_menu.h"
 #include "mpeg.h"
-#include "button.h"
-#include "kernel.h"
-#include "sprintf.h"
 #include "settings.h"
-
-typedef void (*settingfunc)(int);
-enum { Volume, Bass, Treble, numsettings };
-
-static const char* names[] = { "Volume", "Bass", "Treble" };
-static settingfunc funcs[] = { mpeg_volume, mpeg_bass, mpeg_treble };
-
-static void soundsetting(int setting, int *value)
-{
-    char buf[32];
-    bool done = false;
-
-    lcd_clear_display();
-    snprintf(buf,sizeof buf,"[%s]",names[setting]);
-    lcd_puts(0,0,buf);
-
-    while ( !done ) {
-        snprintf(buf,sizeof buf,"%d %% ", *value);
-        lcd_puts(0,1,buf);
-        lcd_update();
-
-        switch ( button_get(true) ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-#else
-            case BUTTON_RIGHT:
-#endif
-                *value += 2;
-                if ( *value >= 100 )
-                    *value = 100;
-                (funcs[setting])(*value);
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-#endif
-                *value -= 2;
-                if ( *value <= 0 )
-                    *value = 0;
-                (funcs[setting])(*value);
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-#endif
-                done = true;
-                break;
-        }
-    }
-}
 
 static void volume(void)
 {
-    soundsetting(Volume, &global_settings.volume);
+    set_int("Volume","%", &global_settings.volume, mpeg_volume, 2, 0, 100);
 }
 
 static void bass(void)
 {
-    soundsetting(Bass, &global_settings.bass);
+    set_int("Bass","%", &global_settings.bass, mpeg_bass, 2, 0, 100);
 };
 
 static void treble(void)
 {
-    soundsetting(Treble, &global_settings.treble);
+    set_int("Treble","%", &global_settings.treble, mpeg_treble, 2, 0, 100);
 }
 
 void sound_menu(void)
 {
     int m;
     struct menu_items items[] = {
-        { Volume, "Volume", volume },
-        { Bass,   "Bass",   bass },
-        { Treble, "Treble", treble }
+        { "Volume", volume },
+        { "Bass",   bass },
+        { "Treble", treble }
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -125,19 +125,16 @@ void show_credits(void)
 void main_menu(void)
 {
     int m;
-    enum {
-        Games, Screensavers, Version, Gen_Settings, Sound_Settings, 
-    };
 
     /* main menu */
     struct menu_items items[] = {
-		{ Sound_Settings,  "Sound Settings",     sound_menu        },
-		{ Gen_Settings,    "General Settings",   settings_menu     },
+        { "Sound Settings",     sound_menu        },
+        { "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
-        { Games,           "Games",              games_menu        },
-        { Screensavers,    "Screensavers",       screensavers_menu },
+        { "Games",              games_menu        },
+        { "Screensavers",       screensavers_menu },
 #endif
-        { Version,         "Version",            show_credits      },
+        { "Version",            show_credits      },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

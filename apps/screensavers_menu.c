@@ -32,15 +32,13 @@
 #include "boxes.h"
 extern void bounce(void);
 
-enum { Boxes, Bounce, numsavers };
-
 void screensavers_menu(void)
 {
     int m;
 
     struct menu_items items[] = {
-        { Boxes, "Boxes", boxes },
-        { Bounce, "Bounce", bounce },
+        { "Boxes", boxes },
+        { "Bounce", bounce },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

@@ -31,15 +31,13 @@
 #include "sokoban.h"
 extern void tetris(void);
 
-enum { Tetris, Sokoban, numgames };
-
 void games_menu(void)
 {
     int m;
 
     struct menu_items items[] = {
-        { Tetris, "Tetris", tetris },
-        { Sokoban, "Sokoban", sokoban },
+        { "Tetris", tetris },
+        { "Sokoban", sokoban },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

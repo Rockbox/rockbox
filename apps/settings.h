@@ -54,6 +54,8 @@ struct user_settings
 
     int loop_playlist; /* do we return to top of playlist at end?            */
     bool mp3filter;
+    int scroll_speed;
+    bool playlist_shuffle;
 
     /* while playing screen settings  */
     int wps_display;
@@ -66,6 +68,16 @@ int persist_all_settings( void );
 void reload_all_settings( struct user_settings *settings );
 void reset_settings( struct user_settings *settings );
 void display_current_settings( struct user_settings *settings );
+
+void set_bool(char* string, bool* variable );
+void set_option(char* string, int* variable, char* options[], int numoptions );
+void set_int(char* string, 
+             char* unit,
+             int* variable,
+             void (*function)(int),
+             int step,
+             int min,
+             int max );
 
 /* global settings */
 extern struct user_settings global_settings;

@@ -23,7 +23,6 @@
 #include <stdbool.h>
 
 struct menu_items {
-    int id;
     char *desc;
     void (*function) (void);
 };

@@ -23,6 +23,8 @@
 #include "disk.h"
 #include "panic.h"
 #include "debug.h"
+#include "button.h"
+#include "lcd.h"
 
 struct user_settings global_settings;
 
@@ -100,4 +102,131 @@ void display_current_settings( struct user_settings *settings )
     /* Get rid of warning */
     settings = settings;
 #endif
+}
+
+void set_bool(char* string, bool* variable )
+{
+    bool done = false;
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,string);
+
+    while ( !done ) {
+        lcd_puts(0, 1, *variable ? "on " : "off");
+        lcd_update();
+
+        switch ( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                break;
+
+            default:
+                *variable = !*variable;
+                break;
+        }
+    }
+    lcd_stop_scroll();
+}
+
+void set_int(char* string, 
+             char* unit,
+             int* variable,
+             void (*function)(int),
+             int step,
+             int min,
+             int max )
+{
+    bool done = false;
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,string);
+
+    while (!done) {
+        char str[32];
+        snprintf(str,sizeof str,"%d %s  ", *variable, unit);
+        lcd_puts(0,1,str);
+        lcd_update();
+
+        switch( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                *variable += step;
+                if(*variable > max )
+                    *variable = max;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                *variable -= step;
+                if(*variable < min )
+                    *variable = min;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                break;
+        }
+        if ( function )
+            function(*variable);
+    }
+    lcd_stop_scroll();
+}
+
+void set_option(char* string, int* variable, char* options[], int numoptions )
+{
+    bool done = false;
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,string);
+
+    while ( !done ) {
+        lcd_puts(0, 1, options[*variable]);
+        lcd_update();
+
+        switch ( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                if ( *variable < (numoptions-1) )
+                    (*variable)++;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                if ( *variable > 0 )
+                    (*variable)--;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                break;
+        }
+    }
+    lcd_stop_scroll();
 }
