@@ -1426,8 +1426,6 @@ static bool add_dir(char* dirname, int fd)
     bool abort = false;
     char buf[MAX_PATH/2]; /* saving a little stack... */
 
-    DEBUGF("add_dir(%s)\n",dirname);
-    
     /* check for user abort */
 #ifdef HAVE_PLAYER_KEYPAD
     if (button_get(false) == BUTTON_STOP)
@@ -1462,7 +1460,6 @@ static bool add_dir(char* dirname, int fd)
                 (!strcasecmp(&entry->d_name[x-4], ".mp2")) ||
                 (!strcasecmp(&entry->d_name[x-4], ".mpa")))
             {
-                DEBUGF("adding %s\n",entry->d_name);
                 write(fd, dirname, strlen(dirname));
                 write(fd, "/", 1);
                 write(fd, entry->d_name, x);
