@@ -256,8 +256,15 @@ off_t sim_filesize(int fd)
 void fat_size(unsigned int* size, unsigned int* free)
 {
 #ifdef WIN32
-    *size = 2049;
-    *free = 1037;
+    long secperclus, bytespersec, free_clusters, num_clusters;
+
+    if (GetDiskFreeSpace(NULL, &secperclus, &bytespersec, &free_clusters,
+                     &num_clusters)) {
+        if (size)
+            *size = num_clusters * secperclus / 2 * (bytespersec / 512);
+        if (free)
+            *free = free_clusters * secperclus / 2 * (bytespersec / 512);
+    }
 #else
     struct statfs fs;
 
@@ -269,13 +276,13 @@ void fat_size(unsigned int* size, unsigned int* free)
         if (free)
             *free = fs.f_bfree * (fs.f_bsize / 1024);
     }
+#endif
     else {
         if (size)
             *size = 0;
         if (free)
             *free = 0;
     }
-#endif
 }
 
 int sim_fsync(int fd)
