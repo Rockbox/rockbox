@@ -66,6 +66,7 @@ void browse_root(void)
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      2 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
+#define CURSOR_CHAR "-"
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
@@ -75,6 +76,12 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_MAX_LEN_DISPLAY 11 /* max length that fits on screen */
 #define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      1 /* X position the entry-list starts at */
+
+#ifdef HAVE_NEW_CHARCELL_LCD
+#define CURSOR_CHAR "\x7e"
+#else
+#define CURSOR_CHAR "\x89"
+#endif
 
 #endif /* HAVE_LCD_BITMAP */
 
@@ -182,7 +189,7 @@ bool dirbrowse(char *root)
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
-    lcd_puts(0, dircursor, "-");
+    lcd_puts(0, dircursor, CURSOR_CHAR);
 #ifdef HAVE_LCD_BITMAP
     lcd_update();
 #endif
@@ -217,7 +224,7 @@ bool dirbrowse(char *root)
                     else
                         start = dircursor = 0;
                     numentries = showdir(currdir, start);
-                    lcd_puts(0, LINE_Y+dircursor, "-");
+                    lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 }
                 else
                     mpeg_stop();
@@ -254,7 +261,7 @@ bool dirbrowse(char *root)
                 }
 
                 numentries = showdir(currdir, start);  
-                lcd_puts(0, LINE_Y+dircursor, "-");
+                lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                 break;
                 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -265,14 +272,14 @@ bool dirbrowse(char *root)
                 if(dircursor) {
                     lcd_puts(0, LINE_Y+dircursor, " ");
                     dircursor--;
-                    lcd_puts(0, LINE_Y+dircursor, "-");
+                    lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                     lcd_update();
                 }
                 else {
                     if (start) {
                         start--;
                         numentries = showdir(currdir, start);
-                        lcd_puts(0, LINE_Y+dircursor, "-");
+                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                     }
                 }
                 break;
@@ -286,12 +293,12 @@ bool dirbrowse(char *root)
                     if(dircursor+1 < TREE_MAX_ON_SCREEN) {
                         lcd_puts(0, LINE_Y+dircursor, " ");
                         dircursor++;
-                        lcd_puts(0, LINE_Y+dircursor, "-");
+                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                     } 
                     else {
                         start++;
                         numentries = showdir(currdir, start);
-                        lcd_puts(0, LINE_Y+dircursor, "-");
+                        lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
                     }
                 }
                 break;
@@ -314,7 +321,7 @@ bool dirbrowse(char *root)
                 lcd_setfont(0);
 #endif
                 numentries = showdir(currdir, start);
-                lcd_puts(0, LINE_Y+dircursor, "-");
+                lcd_puts(0, LINE_Y+dircursor, CURSOR_CHAR);
 
                 break;
         }

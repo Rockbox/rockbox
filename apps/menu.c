@@ -38,6 +38,16 @@ struct menu {
 #define MENU_LINES 2
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+#define CURSOR_CHAR "-"
+#else
+#ifdef HAVE_NEW_CHARCELL_LCD
+#define CURSOR_CHAR "\x7e"
+#else
+#define CURSOR_CHAR "\x89"
+#endif
+#endif
+
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
 
@@ -57,7 +67,7 @@ static void menu_draw(int m)
     }
 
 	/* place the cursor */
-    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
+    lcd_puts(0, menus[m].cursor - menus[m].top, CURSOR_CHAR);
 
     lcd_update();
 }
@@ -85,7 +95,7 @@ static void put_cursor(int m, int target)
     }
 
     if (do_update) {
-        lcd_puts(0, menus[m].cursor - menus[m].top, "-"); 
+        lcd_puts(0, menus[m].cursor - menus[m].top, CURSOR_CHAR); 
         lcd_update();
     }
 
