@@ -109,7 +109,7 @@ struct tag_resolver {
     int (*ppFunc)(struct mp3entry*, char* tag, int bufferpos);
 };
 
-static bool global_ff_found = false;
+static bool global_ff_found;
 
 static int unsynchronize(char* tag, int len, bool *ff_found)
 {
@@ -146,16 +146,13 @@ static int unsynchronize_frame(char* tag, int len)
     return unsynchronize(tag, len, &ff_found);
 }
 
-static int read_unsynched(int fd, void *buf, int len, bool reset)
+static int read_unsynched(int fd, void *buf, int len)
 {
     int i;
     int rc;
     int remaining = len;
     char *wp;
     char *rp;
-
-    if(reset)
-        global_ff_found = false;
 
     wp = buf;
     
@@ -173,16 +170,13 @@ static int read_unsynched(int fd, void *buf, int len, bool reset)
     return len;
 };
 
-static int skip_unsynched(int fd, int len, bool reset)
+static int skip_unsynched(int fd, int len)
 {
     int rc;
     int remaining = len;
     int rlen;
     char buf[32];
 
-    if(reset)
-        global_ff_found = false;
-    
     while(remaining) {
         rlen = MIN(sizeof(buf), (unsigned int)remaining);
         rc = read(fd, buf, rlen);
@@ -425,6 +419,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     int i;
     int rc;
 
+    global_ff_found = false;
+    
     /* Bail out if the tag is shorter than 10 bytes */
     if(entry->id3v2len < 10)
         return;
@@ -493,7 +489,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         /* Read frame header and check length */
         if(version >= ID3_VER_2_3) {
             if(global_unsynch && version <= ID3_VER_2_3)
-                rc = read_unsynched(fd, header, 10, false);
+                rc = read_unsynched(fd, header, 10);
             else
                 rc = read(fd, header, 10);
             if(rc != 10)
@@ -596,7 +592,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 /* found a tag matching one in tagList, and not yet filled */
                 if(global_unsynch && version <= ID3_VER_2_3)
                     bytesread = read_unsynched(fd, buffer + bufferpos,
-                                               framelen, false);
+                                               framelen);
                 else
                     bytesread = read(fd, buffer + bufferpos, framelen);
                 
@@ -624,7 +620,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                skip it using the total size */
 
             if(global_unsynch && version <= ID3_VER_2_3) {
-                skip_unsynched(fd, totframelen, false);
+                skip_unsynched(fd, totframelen);
             } else {
                 if(data_length_ind)
                     totframelen = data_length_ind;
