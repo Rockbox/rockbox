@@ -345,6 +345,7 @@ static bool reset_settings(void)
     button = button_get(true);
     if (button == BUTTON_PLAY) {
         settings_reset();
+        settings_apply();
         lcd_clear_display();
         lcd_puts(0,0,str(LANG_RESET_DONE_SETTING));
         lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));

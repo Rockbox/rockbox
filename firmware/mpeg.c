@@ -170,6 +170,7 @@ static struct id3tag _id3tags[MAX_ID3_TAGS];
 
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
+static bool mpeg_is_initialized = false;
 
 #ifndef SIMULATOR
 
@@ -1601,6 +1602,9 @@ void mpeg_sound_set(int setting, int value)
 #else
     int tmp;
 #endif
+
+    if(!mpeg_is_initialized)
+        return;
     
     switch(setting)
     {
@@ -2013,6 +2017,9 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     mpeg_sound_channel_config(MPEG_SOUND_STEREO);
 
 #endif
+
+    /* Must be done before calling mpeg_sound_set() */
+    mpeg_is_initialized = true;
     
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);

@@ -344,6 +344,32 @@ int settings_save( void )
     return 0;
 }
 
+void settings_apply(void)
+{
+    mpeg_sound_set(SOUND_BASS, global_settings.bass);
+    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
+    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    
+#ifdef HAVE_MAS3587F
+    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
+    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+#endif
+
+    lcd_set_contrast(global_settings.contrast);
+    lcd_scroll_speed(global_settings.scroll_speed);
+    backlight_set_timeout(global_settings.backlight_timeout);
+#ifdef HAVE_CHARGE_CTRL
+    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+#endif
+    ata_spindown(global_settings.disk_spindown);
+    set_poweroff_timeout(global_settings.poweroff);
+#ifdef HAVE_CHARGE_CTRL
+    charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+#endif
+}
+
 /*
  * load settings from disk or RTC RAM
  */
@@ -448,17 +474,8 @@ void settings_load(void)
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
         global_settings.resume_file[MAX_PATH]=0;
     }
-    lcd_set_contrast(global_settings.contrast);
-    lcd_scroll_speed(global_settings.scroll_speed);
-    backlight_set_timeout(global_settings.backlight_timeout);
-#ifdef HAVE_CHARGE_CTRL
-    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-#endif
-    ata_spindown(global_settings.disk_spindown);
-    set_poweroff_timeout(global_settings.poweroff);
-#ifdef HAVE_CHARGE_CTRL
-    charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
-#endif
+
+    settings_apply();
 }
 
 static int read_line(int fd, char* buffer, int buffer_size)

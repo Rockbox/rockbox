@@ -110,6 +110,7 @@ struct user_settings
 int settings_save(void);
 void settings_load(void);
 void settings_reset(void);
+void settings_apply(void);
 void settings_display(void);
 
 bool settings_load_eq(char* file);
