@@ -492,8 +492,14 @@ bool ask_resume(void)
 #endif
     lcd_update();
 
-    if (button_get(true) == BUTTON_PLAY)
-        return true;
+    switch (button_get(true)) {
+        case BUTTON_PLAY:
+            return true;
+
+        case SYS_USB_CONNECTED:
+            usb_screen();
+            break;
+    }
 
     if ( global_settings.resume == RESUME_ASK_ONCE) {
         global_settings.resume_index = -1;
