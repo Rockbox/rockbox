@@ -4,7 +4,7 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
-INCLUDES=-I../../
+INCLUDES=-I../../ -I../../drivers
 
 CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
