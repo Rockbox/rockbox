@@ -35,7 +35,10 @@ extern void lcd_stop_scroll(void);
 extern void lcd_scroll_speed( int speed );
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
-  extern void lcd_update(void);
+extern void lcd_update(void);
+
+/* update a fraction of the screen */
+extern void lcd_update_rect(int x, int y, int width, int height);
 #else
   #define lcd_update()
 #endif

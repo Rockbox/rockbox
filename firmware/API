@@ -30,6 +30,14 @@ LCD
     shown on screen by calling lcd_update().
 
     lcd_update() update the LCD according to the internal buffer.
+
+
+    lcd_update_rect(int x, int y, int height, int width)
+
+      Update the given rectangle to the LCD. Give arguments measured in
+      pixels. Notice that the smallest vertical resolution in updates that the
+      hardware supports is even 8 pixels. This function will adjust to those.
+
     lcd_setfont(int font) set default font
     lcd_setmargins(int x, int y) set top/left margins
     lcd_putsxy(x,y,string,font) put a string at given position, using a

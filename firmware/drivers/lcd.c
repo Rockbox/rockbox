@@ -594,6 +594,40 @@ void lcd_update (void)
     }
 }
 
+/*
+ * Update a fraction of the display.
+ */
+void lcd_update_rect (int, int, int, int) __attribute__ ((section (".icode")));
+void lcd_update_rect (int x_start, int y,
+                      int width, int height)
+{
+    int ymax;
+    int xmax;
+    int x;
+
+    /* The Y coordinates have to work on even 8 pixel rows */
+    ymax = (y + height)/8;
+    y /= 8;
+
+    xmax = x_start + width;
+
+    if(xmax > LCD_WIDTH)
+        xmax = LCD_WIDTH;
+    if(ymax >= LCD_HEIGHT/8)
+        ymax = LCD_HEIGHT/8-1;
+
+    /* Copy specified rectange bitmap to hardware */
+    for (; y <= ymax; y++)
+    {
+        lcd_write (true, LCD_CNTL_PAGE | (y & 0xf));
+        lcd_write (true, LCD_CNTL_HIGHCOL | ((x_start>>4) & 0xf));
+        lcd_write (true, LCD_CNTL_LOWCOL | (x_start & 0xf));
+
+        for (x = x_start; x < xmax; x++)
+            lcd_write (false, lcd_framebuffer[x][y]);
+    }
+}
+
 #endif /* SIMULATOR */
 
 /*
