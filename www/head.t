@@ -14,7 +14,7 @@
 #endif
 <meta name="author" content="Björn Stenberg, in Emacs">
 #ifndef _PAGE_
-<meta name="keywords" content="bjorn,stenberg,computer,programming,mtb,stockholm,software,sms,byta,bostad">
+<meta name="keywords" content="Rockbox,Archos,firmware,open source,computer,programming,software">
 #endif
 </head>
 <body bgcolor=BGCOLOR text="black" link="blue" vlink="purple" alink="red"
