@@ -30,6 +30,9 @@ Read the <a href="rockbox-1.0-notes.txt">release notes</a>.
 </ul>
 
 <h3>User interface simulators</h3>
+<p><img src="player-sim.png" alt="Player simulator">
+<img src="recorder-sim.png" alt="Recorder simulator">
+
 <ul>
 <li><a href="player-sim-1.0">player simulator 1.0 for linux</a> (42880 bytes)
 (if you don't have libgcc_s.so.1, get it <a href="libgcc_s.so.1">here</a>)
