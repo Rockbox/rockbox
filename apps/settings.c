@@ -1099,7 +1099,7 @@ bool settings_save_config(void)
     strncpy(buf, "# >>> .cfg file created by rockbox <<<\r\n", sizeof(buf));
     write(fd, buf, strlen(buf));
     
-    strncpy(buf, "# >>>    http://rockbox.haxx.se    <<<\r\n\r\n", sizeof(buf));
+    strncpy(buf, "# >>>    http://rockbox.haxx.se    <<<\r\n#\r\n", sizeof(buf));
     write(fd, buf, strlen(buf));
 
     snprintf(buf, sizeof(buf), "#\r\n# wps / language / font \r\n#\r\n");
@@ -1162,8 +1162,12 @@ bool settings_save_config(void)
     snprintf(buf, sizeof(buf), "bass boost: %d\r\n", value);
     write(fd, buf, strlen(buf));
 
-    snprintf(buf, sizeof(buf), "auto volume: %d\r\n", global_settings.avc);
-    write(fd, buf, strlen(buf));
+    {
+        static char* options[] = {"off", "2", "4", "8" };
+        snprintf(buf, sizeof(buf), "auto volume: %s\r\n",
+                 options[global_settings.avc]);
+        write(fd, buf, strlen(buf));
+    }
 #endif
 
     snprintf(buf, sizeof(buf), "#\r\n# Playback\r\n#\r\n");
@@ -1300,6 +1304,13 @@ bool settings_save_config(void)
     write(fd, buf, strlen(buf));
 
 #ifdef HAVE_LCD_BITMAP
+    {
+        static char* options[] = {"off","on"};
+        snprintf(buf, sizeof(buf), "invert: %s\r\n",
+                 options[global_settings.invert]);
+        write(fd, buf, strlen(buf));
+    }
+
     snprintf(buf, sizeof(buf), "peak meter release: %d\r\n",
              global_settings.peak_meter_release);
     write(fd, buf, strlen(buf));
