@@ -486,7 +486,7 @@ getsonglength(int fd, struct mp3entry *entry)
      * Now song length is 
      * ((filesize)/(bytes per frame))*(time per frame) 
      */
-    return entry->filesize*tpf/bpf;
+    return entry->filesize/bpf*tpf;
 }
 
 
