@@ -24,7 +24,7 @@
 #include "system.h"
 
 /* cute little functions, atomic read-modify-write */
-#ifdef HAVE_GMINI_I2C
+#if CONFIG_I2C == I2C_GMINI
 
 /* This is done like this in the Archos' firmware.
  * However, the TCC370 has an integrated I2C
@@ -43,7 +43,7 @@
 #define SCL_OUTPUT (P3CONH |= 0x01)
 #define SCL        (P3 & 0x10)
 
-#else
+#else /* non Gmini below */
 
 /* SDA is PB7 */
 #define SDA_LO     and_b(~0x80, &PBDRL)
@@ -52,7 +52,7 @@
 #define SDA_OUTPUT or_b(0x80, &PBIORL)
 #define SDA     (PBDR & 0x80)
 
-#ifdef HAVE_ONDIO_I2C
+#if CONFIG_I2C == I2C_ONDIO
 /* Ondio pinout, SCL moved to PB6 */
 #define SCL_INPUT  and_b(~0x40, &PBIORL)
 #define SCL_OUTPUT or_b(0x40, &PBIORL)
@@ -67,7 +67,7 @@
 #define SCL_HI     or_b(0x20, &PBDRH)
 #define SCL     (PBDR & 0x2000)
 #endif
-#endif
+#endif /* ! I2C_GMINI */
 
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
@@ -106,14 +106,14 @@ void i2c_init(void)
 {
    int i;
 
-#ifdef HAVE_GMINI_I2C
+#if CONFIG_I2C == I2C_GMINI
    SCL_INPUT;
    SDA_INPUT;   
 #else
-#ifdef HAVE_ONDIO_I2C
+#if CONFIG_I2C == I2C_ONDIO
    /* make PB5, PB6 & PB7 general I/O */
    PBCR2 &= ~0xfc00; /* includes PB5, see FIXME below */
-#else
+#else /* not Gmini, not Ondio */
    /* make PB5, PB7 & PB13 general I/O */
    PBCR1 &= ~0x0c00; /* PB13 */
    PBCR2 &= ~0xcc00; /* PB5 and PB7, see FIXME below */
@@ -124,7 +124,7 @@ void i2c_init(void)
    /* for Recorders, it shuts off the charger, for FM/V2 it holds power */
    or_b(0x20, &PBIORL);
    or_b(0x20, &PBDRL);
-#endif
+#endif /* end of non-Gmini */
 
    SCL_OUTPUT;
    SDA_OUTPUT;

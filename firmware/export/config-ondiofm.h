@@ -22,6 +22,9 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000
 
+/* Define this for different I2C pinout */
+#define CONFIG_I2C I2C_ONDIO
+
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_3AAA_ALKALINE
 

@@ -22,6 +22,8 @@
 /* Define this if you have a gmini 100 style LCD */
 #define CONFIG_LCD LCD_GMINI100
 
+#define CONFIG_I2C I2C_GMINI
+
 /* Type of mobile power, FIXME: probably different, make new type */
 #define CONFIG_BATTERY BATT_LIION2200
 #define BATTERY_SCALE_FACTOR 6465

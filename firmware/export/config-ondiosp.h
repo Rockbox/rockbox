@@ -50,7 +50,7 @@
 #define HAVE_DISPLAY_FLIPPED
 
 /* Define this for different I2C pinout */
-#define HAVE_ONDIO_I2C
+#define CONFIG_I2C I2C_ONDIO
 
 /* Define this for different ADC channel assignment */
 #define HAVE_ONDIO_ADC

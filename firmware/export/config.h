@@ -60,6 +60,11 @@
 #define BL_PA14_HI  2 /* Ondio, PA14 high active */
 #define BL_IRIVER   3 /* IRiver GPIO */
 
+/* CONFIG_I2C */
+#define I2C_PLAYREC  0 /* Archos Player/Recorder style */
+#define I2C_ONDIO    1 /* Ondio style */
+#define I2C_GMINI    2 /* Gmini style */
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"
