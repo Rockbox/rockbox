@@ -458,6 +458,16 @@ A64: The old MOD/AJZ was not entirely deleted from the disk. It is still
 
      (Thanks to Olivier Rafidison for this info)
 
+     Another alternative:
+
+     - Copy the firmware file to the jukebox again. Windows will rename it to "Copy of XXXXX"
+
+     - Delete the original firmware file and remove the "Copy of" part from the new file name
+
+     - Reboot
+
+     If it doesn't load the correct firmware, do the whle procedure again until the new file is recognized.
+
 Q65: What kind of mic can I connect to my AJBR?
 A65: There are several types of microphones.
 
