@@ -478,25 +478,35 @@ static bool sort_case(void)
 
 static bool sort_file(void)
 {
+    int oldval = global_settings.sort_file;
+    bool ret;
     struct opt_items names[] = {
         { STR(LANG_SORT_ALPHA) },
         { STR(LANG_SORT_DATE) },
         { STR(LANG_SORT_DATE_REVERSE) },
         { STR(LANG_SORT_TYPE) }
     };
-    return set_option( str(LANG_SORT_FILE), &global_settings.sort_file, INT,
+    ret = set_option( str(LANG_SORT_FILE), &global_settings.sort_file, INT,
                        names, 4, NULL );
+    if (global_settings.sort_file != oldval)
+        reload_directory(); /* force reload if this has changed */
+    return ret;
 }
 
 static bool sort_dir(void)
 {
+    int oldval = global_settings.sort_dir;
+    bool ret;
     struct opt_items names[] = {
         { STR(LANG_SORT_ALPHA) },
         { STR(LANG_SORT_DATE) },
         { STR(LANG_SORT_DATE_REVERSE) }
     };
-    return set_option( str(LANG_SORT_DIR), &global_settings.sort_dir, INT,
+    ret = set_option( str(LANG_SORT_DIR), &global_settings.sort_dir, INT,
                        names, 3, NULL );
+    if (global_settings.sort_dir != oldval)
+        reload_directory(); /* force reload if this has changed */
+    return ret;
 }
 
 static bool resume(void)
