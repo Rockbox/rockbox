@@ -29,7 +29,7 @@
 <p align="right">
 <a class="menulink" href="/">main page</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/manual-1.2/">manual</a><br>
+<a class="menulink" href="/manual/">manual</a><br>
 <a class="menulink" href="/docs/faq.html">FAQ</a><br>
 <a class="menulink" href="/tshirt-contest/">t-shirt contest</a><br>
 <a class="menulink" href="/notes.html">research notes</a><br>
