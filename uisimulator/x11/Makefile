@@ -76,7 +76,7 @@ APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c settings.c
 
 APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c \
-	playlist.c showtext.c
+	playlist.c showtext.c games_menu.c screensavers_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c
@@ -151,6 +151,12 @@ $(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/games_menu.o: $(APPDIR)/games_menu.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/screensavers_menu.o: $(APPDIR)/screensavers_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/icons.o: $(RECDIR)/icons.c
