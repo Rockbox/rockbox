@@ -44,7 +44,9 @@ To do:
 */
 
 /* Name and path of the config file*/
-#define CFGFILE "euroconverter.cfg"
+static const char cfg_filename[] =  "euroconverter.cfg";
+#define CFGFILE_VERSION 0     /* Current config file version */
+#define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
 
 /*Pattern for the converter*/
 static unsigned char pattern_euro[]={0x07, 0x08, 0x1E, 0x10, 0x1E, 0x08, 0x07};    /* € */
@@ -299,14 +301,14 @@ static void show_abbrev(void)
 /* Save the config to disk */
 static void save_config(void)
 {
-    configfile_save(CFGFILE, config, 1);
+    configfile_save(cfg_filename, config, 1, CFGFILE_VERSION);
 }
 
 
 /* Load the config from disk */
 static void load_config(void)
 {
-    configfile_load(CFGFILE, config, 1);
+    configfile_load(cfg_filename, config, 1, CFGFILE_MINVERSION);
 }
 
 
