@@ -26,9 +26,6 @@
 
 #ifdef SIMULATOR
 #include <stdio.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #endif
 
 int start_x = 1;

@@ -26,9 +26,6 @@
 
 #ifdef SIMULATOR
 #include <stdio.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #endif
 
 extern void tetris(void);
