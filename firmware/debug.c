@@ -27,6 +27,18 @@ char debugbuf[200];
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
 
+void debug_init(void)
+{
+    /* Clear it all! */
+    SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
+
+    /* This enables the serial Rx interrupt, to be able to exit into the
+       debugger when you hit CTRL-C */
+    SCR1 |= 0x40;
+    SCR1 &= ~0x80;
+    IPRE |= 0xf000; /* Set to highest priority */
+}
+
 static int debug_tx_ready(void)
 {
     return (SSR1 & SCI_TDRE);
@@ -188,6 +200,10 @@ void debugf(char *fmt, ...)
 }
 
 #else /* SIMULATOR code coming up */
+
+void debug_init(void)
+{
+}
 
 void debugf(char *fmt, ...)
 {

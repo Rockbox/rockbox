@@ -19,6 +19,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+extern void debug_init(void);
 extern void debugf(char* fmt,...);
 
 #ifdef __GNUC__
