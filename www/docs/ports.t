@@ -11,8 +11,8 @@
 </tr>
 <tr><th><b>PA0</b></th>
     <td><b>GP In</b></td><td>DC adapter detect (0=inserted)</td>
-    <td>/CS4</td><td>MAS Parallel Port (for recording)</td>
-    <td>/CS4</td><td>MAS Parallel Port (for recording)</td>
+    <td><b>/CS4</b></td><td>MAS Parallel Port (for recording)</td>
+    <td><b>/CS4</b></td><td>MAS Parallel Port (for recording)</td>
 </tr>
 <tr><th><b>PA1</b></th>
     <td><b>/RAS Out</b></td><td>DRAM control</td>
