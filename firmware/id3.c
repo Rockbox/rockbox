@@ -184,7 +184,7 @@ setid3v2title(FILE *file, mp3entry *entry)
     char header[10];
     unsigned short int version;
     static char buffer[512];
-    int titlen, artistn, albumn;   
+    int titlen=0, artistn=0, albumn=0;   
 	
     /* 10 = headerlength */
     if(entry->id3v2len < 10)
