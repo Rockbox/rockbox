@@ -2,7 +2,7 @@
 #include "head.t"
 
 <pre>
-#include "battery.raw"
+#include "battery-faq.raw"
 </pre>
 
 #include "foot.t"
