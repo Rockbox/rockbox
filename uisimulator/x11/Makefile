@@ -246,7 +246,7 @@ $(OBJDIR)/panic.o: $(FIRMWAREDIR)/panic.c
 $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mp3_playback.c
+$(OBJDIR)/mp3_playback.o: $(FIRMWAREDIR)/mp3_playback.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c

@@ -898,6 +898,8 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 
 /* new functions, to be exported to plugin API */
 
+#ifndef SIMULATOR
+
 void mp3_play_init(void)
 {
 #ifdef HAVE_MAS3587F
@@ -937,3 +939,5 @@ void mp3_play_stop(void)
     mp3_play_pause(false);
     CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
 }
+
+#endif /* #ifndef SIMULATOR */
