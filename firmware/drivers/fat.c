@@ -1989,3 +1989,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     }
     return 0;
 }
+
+int fat_get_cluster_size(void)
+{
+    return fat_bpb.bpb_secperclus * SECTOR_SIZE;
+}

@@ -1253,7 +1253,7 @@ static bool dbg_disk_info(void)
     bool done = false;
     int i;
     int page = 0;
-    const int max_page = 10;
+    const int max_page = 11;
     unsigned short* identify_info = ata_get_identify();
     bool timing_info_present = false;
     char pio3[2], pio4[2];
@@ -1373,6 +1373,12 @@ static bool dbg_disk_info(void)
                 } else {
                     lcd_puts(0, y++, "No timing info");
                 }
+                break;
+
+            case 11:
+                lcd_puts(0, y++, "Cluster size");
+                snprintf(buf, 128, "%d bytes", fat_get_cluster_size());
+                lcd_puts(0, y++, buf);
                 break;
         }
         lcd_update();
