@@ -322,7 +322,7 @@ static void lcd_write(bool command, int byte)
 #endif /* ASM_IMPLEMENTATION */
 #endif /* !SIMULATOR */
 
-unsigned char icon_mirror[11];
+static unsigned char icon_mirror[11];
 
 /*** model specific code */
 
@@ -424,7 +424,7 @@ void lcd_define_pattern (int which,char *pattern,int length)
     int i;
     lcd_write(true,LCD_PRAM|which);
     for (i=0;i<length;i++)
-    lcd_write(false,pattern[i]);
+        lcd_write(false,pattern[i]);
 }
 
 void lcd_double_height(bool on)
@@ -881,12 +881,18 @@ void lcd_puts(int x, int y, unsigned char *str)
 }
 
 
+void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
+{
+#ifdef LOADABLE_FONTS
+    lcd_putsldfxy(x,y,str);
+    (void)thisfont;
+#elif LCD_PROPFONTS
+    lcd_putspropxy(x,y,str,thisfont);
+#else
 /*
  * Put a string at specified bit position
  */
 
-void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
-{
     int nx = fonts[thisfont];
     int ny = fontheight[thisfont];
     int ch;
@@ -919,6 +925,7 @@ void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
         lcd_x += nx;
 
     }
+#endif
 }
 
 /*
