@@ -113,7 +113,12 @@ int main(int argc, char* argv[])
 
 	// generate checksum
 	for (i=0; i<uiSize; i++)
-		usChecksum += aImage[uiStart + i];
+	{
+		UINT8 byte;
+		byte = aImage[uiStart + i];
+		byte = ~((byte >> 1) | ((byte << 7) & 0x80)); /* poor man's ROR */
+		usChecksum += byte;
+	}
 
 	// make header
 	Write32(aHeader + 2, usChecksum); // checksum in 5th and 6th byte
