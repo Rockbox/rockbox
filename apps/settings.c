@@ -19,8 +19,8 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <stddef.h>
+#include <limits.h>
 #include "config.h"
-#include "limits.h"
 #include "kernel.h"
 #include "thread.h"
 #include "settings.h"

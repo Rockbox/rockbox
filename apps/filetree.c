@@ -24,7 +24,7 @@
 #include <lcd.h>
 #include <debug.h>
 #include <font.h>
-#include "limits.h"
+#include <limits.h>
 #include "bookmark.h"
 #include "tree.h"
 #include "settings.h"
