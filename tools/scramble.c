@@ -20,6 +20,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void int2le(unsigned int val, unsigned char* addr)
+{
+    addr[0] = val & 0xFF;
+    addr[1] = (val >> 8) & 0xff;
+    addr[2] = (val >> 16) & 0xff;
+    addr[3] = (val >> 24) & 0xff;
+}
+
+void int2be(unsigned int val, unsigned char* addr)
+{
+    addr[0] = (val >> 24) & 0xff;
+    addr[1] = (val >> 16) & 0xff;
+    addr[2] = (val >> 8) & 0xff;
+    addr[3] = val & 0xFF;
+}
+
 int main (int argc, char** argv)
 {
     unsigned long length,i,slen;
@@ -28,13 +44,20 @@ int main (int argc, char** argv)
     unsigned char header[24];
     unsigned char *iname = argv[1];
     unsigned char *oname = argv[2];
+    unsigned char *xorstring;
     int headerlen = 6;
     FILE* file;
     int version;
-    int scramble=1;
+    enum { none, scramble, xor } method = scramble;
 
     if (argc < 3) {
-       printf("usage: %s [-fm] [-v2] [-neo]<input file> <output file>\n",argv[0]);
+       printf("usage: %s [options] <input file> <output file> [xor string]\n",argv[0]);
+       printf("options:\n");
+       printf("\t-fm    Archos FM recorder format\n");
+       printf("\t-v2    Archos V2 recorder format\n");
+       printf("\t-neo   SSI Neo format\n");
+       printf("\t-mm=X  Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n");
+       printf("\nNo option results in Archos standard player/recorder format.\n");
        return -1;
     }
 
@@ -56,10 +79,22 @@ int main (int argc, char** argv)
         headerlen = 17;
         iname = argv[2];
         oname = argv[3];
-        scramble = 0;
+        method = none;
+    }
+    else if(!strncmp(argv[1], "-mm=", 4)) {
+        headerlen = 16;
+        iname = argv[2];
+        oname = argv[3];
+        method = xor;
+        version = argv[1][4];
+        if (argc > 4)
+            xorstring = argv[4];
+        else {
+            printf("Multimedia needs an xor string\n");
+            return -1;
+        }
     }
 
-    
     /* open file */
     file = fopen(iname,"rb");
     if (!file) {
@@ -70,7 +105,7 @@ int main (int argc, char** argv)
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
     
-    if ((length + headerlen) >= 0x32000) {
+    if ((method == scramble) && ((length + headerlen) >= 0x32000)) {
         printf("error: max firmware size is 200KB!\n");
         fclose(file);
         return -1;
@@ -78,7 +113,10 @@ int main (int argc, char** argv)
     
     fseek(file,0,SEEK_SET); 
     inbuf = malloc(length);
-    outbuf = malloc(length);
+    if (method == xor)
+        outbuf = malloc(length*2);
+    else
+        outbuf = malloc(length);
     if ( !inbuf || !outbuf ) {
        printf("out of memory!\n");
        return -1;
@@ -92,15 +130,27 @@ int main (int argc, char** argv)
     }
     fclose(file);
 
-    if(scramble) {
-        /* scramble */
-        slen = length/4;
-        for (i = 0; i < length; i++) {
-            unsigned long addr = (i >> 2) + ((i % 4) * slen);
-            unsigned char data = inbuf[i];
-            data = ~((data << 1) | ((data >> 7) & 1)); /* poor man's ROL */
-            outbuf[addr] = data;
-        }
+    switch (method)
+    {
+        case scramble:
+            slen = length/4;
+            for (i = 0; i < length; i++) {
+                unsigned long addr = (i >> 2) + ((i % 4) * slen);
+                unsigned char data = inbuf[i];
+                data = ~((data << 1) | ((data >> 7) & 1)); /* poor man's ROL */
+                outbuf[addr] = data;
+            }
+            break;
+
+        case xor:
+            /* "compress" */
+            slen = 0;
+            for (i=0; i<length; i++) {
+                if (!(i&7))
+                    outbuf[slen++] = 0xff; /* all data is uncompressed */
+                outbuf[slen++] = inbuf[i];
+            }
+            break;
     }
     
     /* calculate checksum */
@@ -108,47 +158,62 @@ int main (int argc, char** argv)
        crc += inbuf[i];
 
     memset(header, 0, sizeof header);
-    if(scramble) {
-        if (headerlen == 6) {
-            header[0] = (length >> 24) & 0xff;
-            header[1] = (length >> 16) & 0xff;
-            header[2] = (length >> 8) & 0xff;
-            header[3] = length & 0xff;
-            header[4] = (crc >> 8) & 0xff;
-            header[5] = crc & 0xff;
-        }
-        else {
-            header[0] =
-                header[1] =
-                header[2] =
-                header[3] = 0xff; /* ??? */
+    switch (method)
+    {
+        case scramble:
+            if (headerlen == 6) {
+                int2be(length, header);
+                header[4] = (crc >> 8) & 0xff;
+                header[5] = crc & 0xff;
+            }
+            else {
+                header[0] =
+                    header[1] =
+                    header[2] =
+                    header[3] = 0xff; /* ??? */
+                
+                header[6] = (crc >> 8) & 0xff;
+                header[7] = crc & 0xff;
+                
+                header[11] = version;
+                
+                header[15] = headerlen; /* really? */
+                
+                int2be(length, &header[20]);
+            }
+            break;
+
+        case xor:
+        {
+            int xorlen = strlen(xorstring);
+
+            /* calculate checksum */
+            for (i=0; i<slen; i++)
+                crc += outbuf[i];
+
+            /* xor data */
+            for (i=0; i<slen; i++)
+                outbuf[i] ^= xorstring[i & (xorlen-1)];
             
-            header[6] = (crc >> 8) & 0xff;
-            header[7] = crc & 0xff;
-
-            header[11] = version;
-
-            header[15] = headerlen; /* really? */
-
-            header[20] = (length >> 24) & 0xff;
-            header[21] = (length >> 16) & 0xff;
-            header[22] = (length >> 8) & 0xff;
-            header[23] = length & 0xff;
+            header[0] = header[2] = 'Z';
+            header[1] = header[3] = version;
+            int2le(length, &header[4]);
+            int2le(slen, &header[8]);
+            int2le(crc, &header[12]);
+            length = slen;
+            break;
         }
-    }
-    else {
+
 #define MY_FIRMWARE_TYPE "Rockbox"
 #define MY_HEADER_VERSION 1
-
-        strncpy(header,MY_FIRMWARE_TYPE,9);
-        header[9]='\0'; /*shouldn't have to, but to be SURE */
-        header[10]=MY_HEADER_VERSION&0xFF;
-        header[11]=(crc>>8)&0xFF;
-        header[12]=crc&0xFF;
-        header[13]=(sizeof(header)>>24)&0xFF;
-        header[14]=(sizeof(header)>>16)&0xFF;
-        header[15]=(sizeof(header)>>8)&0xFF;
-        header[16]=sizeof(header)&0xFF;
+        default:
+            strncpy(header,MY_FIRMWARE_TYPE,9);
+            header[9]='\0'; /*shouldn't have to, but to be SURE */
+            header[10]=MY_HEADER_VERSION&0xFF;
+            header[11]=(crc>>8)&0xFF;
+            header[12]=crc&0xFF;
+            int2be(sizeof(header), &header[12]);
+            break;
     }
 
     /* write file */
