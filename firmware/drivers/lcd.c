@@ -504,7 +504,7 @@ void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 
     while((ch = *str++)) {
         /* Limit to char generation table */
-        if ((ch < ASCII_MIN) || (ch > 0x7a))
+        if ((ch < ASCII_MIN) || (ch > 0xda))
             /* replace unsupported letters with question marks */
             ch = ' '-ASCII_MIN;
         else
