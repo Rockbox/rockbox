@@ -55,6 +55,8 @@ int main (int argc, char** argv)
        printf("options:\n");
        printf("\t-fm    Archos FM recorder format\n");
        printf("\t-v2    Archos V2 recorder format\n");
+       printf("\t-ofm   Archos Ondio FM recorder format\n");
+       printf("\t-osp   Archos Ondio SP format\n");
        printf("\t-neo   SSI Neo format\n");
        printf("\t-mm=X  Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n");
        printf("\nNo option results in Archos standard player/recorder format.\n");
@@ -73,6 +75,20 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         version = 2;
+    }
+
+    else if(!strcmp(argv[1], "-ofm")) {
+        headerlen = 24;
+        iname = argv[2];
+        oname = argv[3];
+        version = 8;
+    }
+
+    else if(!strcmp(argv[1], "-osp")) {
+        headerlen = 24;
+        iname = argv[2];
+        oname = argv[3];
+        version = 16;
     }
 
     else if(!strcmp(argv[1], "-neo")) {
