@@ -271,16 +271,22 @@ static int button_read(void)
     else if (data >= LEVEL1)
         btn |= BUTTON_F1;
 
-    /* Check DOWN, PLAY, LEFT, RIGHT */
-    data = adc_read(ADC_BUTTON_ROW2);
-    if (data >= LEVEL4)
-        btn |= BUTTON_DOWN;
-    else if (data >= LEVEL3)
-        btn |= BUTTON_PLAY;
-    else if (data >= LEVEL2)
-        btn |= BUTTON_LEFT;
-    else if (data >= LEVEL1)
-        btn |= BUTTON_RIGHT;
+    /* Some units have mushy keypads, so pressing UP also activates
+       the Left/Right buttons. Let's combat that by skipping the AN5
+       checks when UP is pressed. */
+    if(!(btn & BUTTON_UP))
+    {
+        /* Check DOWN, PLAY, LEFT, RIGHT */
+        data = adc_read(ADC_BUTTON_ROW2);
+        if (data >= LEVEL4)
+            btn |= BUTTON_DOWN;
+        else if (data >= LEVEL3)
+            btn |= BUTTON_PLAY;
+        else if (data >= LEVEL2)
+            btn |= BUTTON_LEFT;
+        else if (data >= LEVEL1)
+            btn |= BUTTON_RIGHT;
+    }
   
     return btn;
 }
