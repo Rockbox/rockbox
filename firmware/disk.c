@@ -23,40 +23,6 @@
 #include "debug.h"
 #include "panic.h"
 
-void read_file_into_buffer( char **buf, const char *filename )
-{
-    int i;
-    FILE *fp;
-    int count = 0;
-   
-    /*DEBUG( "read_file_into_buffer( %s, %s )\n", *buf, filename ); */
-    
-    fp = fopen( filename, "r" );
-
-    if( fp == NULL )
-    {
-        panicf( "failed to open file: %s\n", filename );
-    }
-    
-    while( ( i = getc( fp ) ) != EOF )
-    {
-        /*printf( "%d-'%c'\n", count, i ); */
-        count++;
-        *buf = (char *)realloc( *buf, count * sizeof( char ) );
-        /*printf( "%d='%s'\n", *buf, *buf ); */
-        (*(buf))[count - 1] = (char)i;
-        /*printf( "%d='%s'\n", *buf, *buf );*/
-    }
-
-    /* add null terminator */
-    
-    *buf = (char *)realloc( *buf, count * sizeof( char ) );
-    (*(buf))[ count ] = '\0';
-
-    /* count -2 because of 0 start and \0 terminator 
-       printf( "read %d bytes: '%s'\n", count - 2, *buf ); */
-}
-
 /*
  * stub versions of pre-fat sector storage functions
  */

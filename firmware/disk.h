@@ -20,8 +20,6 @@
 #ifndef __DISK_H__
 #define __DISK_H__
 
-void read_file_into_buffer( char **buf, const char *filename );
-
 int persist_volume_setting( void );
 int persist_balance_setting( void );
 int persist_bass_setting( void );
