@@ -92,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\firmware\buffer.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\firmware\font.c
 
 !IF  "$(CFG)" == "rockbox - Win32 Recorder"
