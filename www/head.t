@@ -2,6 +2,7 @@
 #define MENUBG "#6887bb"
 #define TITLE(_x) <h1>_x</h1>
 
+#ifndef TWIKI
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
@@ -17,8 +18,10 @@
 <meta name="keywords" content="Rockbox,Archos,firmware,open source,computer,programming,software">
 #endif
 </head>
-<body bgcolor=BGCOLOR text="black" link="blue" vlink="purple" alink="red"
-      topmargin=0 leftmargin=0 marginwidth=0 marginheight=0>
+#else
+%TMPL:DEF{"rockboxmenu"}%
+#endif
+<body bgcolor=BGCOLOR text="black" link="blue" vlink="purple" alink="red" topmargin=0 leftmargin=0 marginwidth=0 marginheight=0>
 
 <table border=0 cellpadding=7 cellspacing=0 height="100%">
 <tr valign="top">
@@ -31,8 +34,9 @@
 <a class="menulink" href="/download/">download</a><br>
 <a class="menulink" href="/twiki/bin/view/Main/DocsIndex">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
-<a class="menulink" href="/twiki/">twiki</a><br>
+<a class="menulink" href="/twiki/">wiki</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
+<a class="menulink" href="http://forums.rockbox.org">forums</a><br>
 <a class="menulink" href="/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
 <a class="menulink" href="/bugs.shtml">bug reports</a><br>
@@ -48,7 +52,7 @@
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
 <a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36 alt="Contactor Data AB Logo"></a>
 
-<p><a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+<p><a href="http://sourceforge.net/projects/rockbox/"><img src="/sf_logo.png" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_xclick">
@@ -58,15 +62,17 @@
 <input type="hidden" name="cn" value="Note to the Rockbox team">
 <input type="hidden" name="currency_code" value="USD">
 <input type="hidden" name="tax" value="0">
-<input type="image" src="/paypal-donate.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
+<input type="image" src="/paypal-donate.gif" border="0" name="submit">
 </form>
 </div>
-
 </td>
 <td>
-
+#ifdef TWIKI
+%TMPL:END%
+#else
 #ifdef _LOGO_
 <div align="center">_LOGO_</div>
 #else
 TITLE(_PAGE_)
+#endif
 #endif
