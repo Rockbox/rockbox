@@ -52,7 +52,7 @@ ifeq ($(SIMVER), x11)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o $(APPSDIR)/plugin.h
 	@echo "LD $@"
-	@$(CC) $(APPCFLAGS) -DPLUGIN -shared $< -L$(OBJDIR) -lplugin -o $@
+	@$(CC) $(CFLAGS) -shared $< -L$(OBJDIR)  $(CODECLIBS) -lplugin -o $@
 ifeq ($(UNAME),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
