@@ -154,7 +154,7 @@ static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
 /* parse numeric genre from string, version 2.2 and 2.3 */
 static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    if(entry->id3version >= ID3_VER_2_3) {
+    if(entry->id3version >= ID3_VER_2_4) {
         /* In version 2.4 and up, there are no parentheses, and the genre frame
            is a list of strings, either numbers or text. */
 
