@@ -29,7 +29,7 @@ DEBUG = -g
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP  -DHAVE_RECORDER_KEYPAD
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
-INCLUDES = -I$(DRIVERS) -I$(FIRMWAREDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -44,7 +44,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 #SRCS = $(wildcard *.c)
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd.c lcd-x11.c \
-        button-x11.c chartables.c tetris.c app.c
+        button-x11.c chartables.c tetris.c app.c tree.c io.c
 
 OBJS := $(SRCS:c=o)
 
@@ -61,6 +61,9 @@ tetris.o: $(APPDIR)/tetris.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 app.o: $(APPDIR)/app.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+tree.o: $(APPDIR)/tree.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 lcd.o: $(DRIVERS)/lcd.c
