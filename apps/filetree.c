@@ -184,11 +184,16 @@ static int compare(const void* p1, const void* p2)
 }
 
 /* load and sort directory into dircache.  returns NULL on failure. */
-int ft_load(struct tree_context* c)
+int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
     int name_buffer_used = 0;
-    DIR *dir = opendir(c->currdir);
+    DIR *dir;
+
+    if (tempdir)
+        dir = opendir(tempdir);
+    else
+        dir = opendir(c->currdir);
     if(!dir)
         return -1; /* not a directory */
 

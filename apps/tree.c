@@ -279,7 +279,7 @@ static int showdir(void)
     }
     else {
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
-            if (ft_load(&tc) < 0)
+            if (ft_load(&tc, NULL) < 0)
                 return -1;
             strcpy(lastdir, tc.currdir);
             newdir = true;
@@ -499,7 +499,7 @@ static bool ask_resume(bool ask_once)
 void resume_directory(const char *dir)
 {
     strcpy(tc.currdir, dir);
-    if (!ft_load(&tc))
+    if (ft_load(&tc, NULL) < 0)
         return;
     lastdir[0] = 0;
 
@@ -602,7 +602,7 @@ static bool check_changed_id3mode(bool currmode)
             db_load(&tc);
         }
         else
-            ft_load(&tc);
+            ft_load(&tc, NULL);
     }
     return currmode;
 }
