@@ -10,6 +10,7 @@
 <a href="tools.html">tools</a> &middot;
 <a href="internals/">archos internals</a> &middot;
 <a href="http://sourceforge.net/projects/rockbox/">sourceforge project</a>
+<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">browse cvs</a>
 </small>
 
 <h2>Purpose</h2>
