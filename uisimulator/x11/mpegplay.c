@@ -8,6 +8,11 @@
  *
  * Copyright (C) 2002 Dave Chapman
  *
+ * This file contains significant code from two other projects:
+ *
+ * 1) madldd - a sample application to use libmad
+ * 2) CoolPlayer - a win32 audio player that also uses libmad
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -33,11 +38,136 @@
 /* We want to use the "real" open in some cases */
 #undef open
 
+/* The "dither" code to convert the 24-bit samples produced by libmad was
+   taken from the coolplayer project - coolplayer.sourceforge.net */
+
+struct dither {
+	mad_fixed_t error[3];
+	mad_fixed_t random;
+};
+# define SAMPLE_DEPTH	16
+# define scale(x, y)	dither((x), (y))
+
 struct mad_stream  Stream;
 struct mad_frame  Frame;
 struct mad_synth  Synth;
 mad_timer_t      Timer;
 int sound;
+
+/*
+ * NAME:		prng()
+ * DESCRIPTION:	32-bit pseudo-random number generator
+ */
+static __inline
+unsigned long prng(unsigned long state)
+{
+  return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
+}
+
+/*
+ * NAME:        dither()
+ * DESCRIPTION:	dither and scale sample
+ */
+static __inline
+signed int dither(mad_fixed_t sample, struct dither *dither)
+{
+  unsigned int scalebits;
+  mad_fixed_t output, mask, random;
+
+  enum {
+    MIN = -MAD_F_ONE,
+    MAX =  MAD_F_ONE - 1
+  };
+
+  /* noise shape */
+  sample += dither->error[0] - dither->error[1] + dither->error[2];
+
+  dither->error[2] = dither->error[1];
+  dither->error[1] = dither->error[0] / 2;
+
+  /* bias */
+  output = sample + (1L << (MAD_F_FRACBITS + 1 - SAMPLE_DEPTH - 1));
+
+  scalebits = MAD_F_FRACBITS + 1 - SAMPLE_DEPTH;
+  mask = (1L << scalebits) - 1;
+
+  /* dither */
+  random  = prng(dither->random);
+  output += (random & mask) - (dither->random & mask);
+
+  dither->random = random;
+
+  /* clip */
+  if (output > MAX) {
+    output = MAX;
+
+    if (sample > MAX)
+      sample = MAX;
+  }
+  else if (output < MIN) {
+    output = MIN;
+
+    if (sample < MIN)
+      sample = MIN;
+  }
+
+  /* quantize */
+  output &= ~mask;
+
+  /* error feedback */
+  dither->error[0] = sample - output;
+
+  /* scale */
+  return output >> scalebits;
+}
+
+/*
+ * NAME:    pack_pcm()
+ * DESCRIPTION:  scale and dither MAD output
+ */
+static
+void pack_pcm(unsigned char **pcm, unsigned int nsamples,
+        mad_fixed_t const *ch1, mad_fixed_t const *ch2)
+{
+  register signed int s0, s1;
+  static struct dither d0, d1;
+
+  if (ch2) {  /* stereo */
+    while (nsamples--) {
+      s0 = scale(*ch1++, &d0);
+      s1 = scale(*ch2++, &d1);
+# if SAMPLE_DEPTH == 16
+      (*pcm)[0 + 0] = s0 >> 0;
+      (*pcm)[0 + 1] = s0 >> 8;
+      (*pcm)[2 + 0] = s1 >> 0;
+      (*pcm)[2 + 1] = s1 >> 8;
+
+      *pcm += 2 * 2;
+# elif SAMPLE_DEPTH == 8
+      (*pcm)[0] = s0 ^ 0x80;
+      (*pcm)[1] = s1 ^ 0x80;
+
+      *pcm += 2;
+# else
+#  error "bad SAMPLE_DEPTH"
+# endif
+    }
+  }
+  else {  /* mono */
+    while (nsamples--) {
+      s0 = scale(*ch1++, &d0);
+
+# if SAMPLE_DEPTH == 16
+      (*pcm)[0] = s0 >> 0;
+      (*pcm)[1] = s0 >> 8;
+
+      *pcm += 2;
+# elif SAMPLE_DEPTH == 8
+      *(*pcm)++ = s0 ^ 0x80;
+# endif
+    }
+  }
+}
 
 void init_oss(int sound, int sound_freq, int channels) {
   int format=AFMT_U16_LE;
@@ -56,7 +186,7 @@ void init_oss(int sound, int sound_freq, int channels) {
     perror("SNDCTL_DSP_SETFMT");
   }
 
-  fprintf(stderr,"SETTING /dev/dsp to %dHz\n",sound_freq);
+//  fprintf(stderr,"SETTING /dev/dsp to %dHz\n",sound_freq);
   if (ioctl(sound,SNDCTL_DSP_SPEED,&sound_freq)==-1) {
     perror("SNDCTL_DSP_SPEED");
   }
@@ -81,6 +211,8 @@ int mpeg_play(char* fname)
   unsigned long    FrameCount=0;
   int sound,fd;
   mp3entry mp3;
+  register signed int s0, s1;
+  static struct dither d0, d1;
   
   mp3info(&mp3, fname);
 
@@ -108,7 +240,7 @@ int mpeg_play(char* fname)
 
   do
   {
-    if (button_get()) break; /* Return if a key is pressed */
+    //if (button_get()) break; /* Return if a key is pressed */
 
     if(Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN)
     {
@@ -165,7 +297,7 @@ int mpeg_play(char* fname)
       unsigned short  Sample;
 
       /* Left channel */
-      Sample=MadFixedToUshort(Synth.pcm.samples[0][i]);
+      Sample=scale(Synth.pcm.samples[0][i],&d0);
       *(OutputPtr++)=Sample&0xff;
       *(OutputPtr++)=Sample>>8;
 
@@ -173,7 +305,7 @@ int mpeg_play(char* fname)
        * the right output channel is the same as the left one.
        */
       if(MAD_NCHANNELS(&Frame.header)==2)
-        Sample=MadFixedToUshort(Synth.pcm.samples[1][i]);
+        Sample=scale(Synth.pcm.samples[1][i],&d0);
       *(OutputPtr++)=Sample&0xff;
       *(OutputPtr++)=Sample>>8;
 
@@ -191,7 +323,6 @@ int mpeg_play(char* fname)
     }
   }while(1);
 
-  fprintf(stderr,"END OF MAD LOOP\n");
   /* Mad is no longer used, the structures that were initialized must
      * now be cleared.
    */
