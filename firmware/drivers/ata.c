@@ -287,7 +287,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #ifdef PREFER_C_READING
     unsigned short tmp = 0;
 
-    if ( (unsigned int)buf & 1)
+    if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
         unsigned char* bufend = buf + wordcount*2;
         do
@@ -567,7 +567,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
 #ifdef PREFER_C_WRITING
 
-    if ( (unsigned int)buf & 1)
+    if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
         unsigned short tmp = 0;
         const unsigned char* bufend = buf + wordcount*2;

@@ -199,7 +199,7 @@ struct bpb
     int bpb_fatsz16;     /* Number of used sectors per FAT structure */
     unsigned long bpb_totsec32;    /* Number of sectors on the volume
                                      (new 32-bit) */
-    int last_word;       /* 0xAA55 */
+    unsigned int last_word;       /* 0xAA55 */
 
     /**** FAT32 specific *****/
     long bpb_fatsz32;
