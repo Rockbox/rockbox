@@ -114,7 +114,7 @@ void init(void)
     rc = ata_init();
     if(rc)
     {
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_LCD_BITMAP
         char str[32];
         lcd_clear_display();
         snprintf(str, 31, "ATA error: %d", rc);

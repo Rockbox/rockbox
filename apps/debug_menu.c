@@ -44,7 +44,7 @@ extern int ata_io_address;
 extern int num_threads;
 extern char *thread_name[];
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 void dbg_os(void)
 {
@@ -120,7 +120,7 @@ void dbg_os(void)
 }
 #endif
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 void dbg_ports(void)
 {
@@ -395,7 +395,7 @@ void dbg_mas(void)
     }
 }
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 void dbg_mas_codec(void)
 {
     char buf[32];
@@ -428,7 +428,9 @@ void dbg_mas_codec(void)
         }
     }
 }
+#endif
 
+#ifdef HAVE_LCD_BITMAP
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
  * over time. Usable for estimating battery life / charging rate.
@@ -566,8 +568,10 @@ void debug_menu(void)
 #endif /* HAVE_LCD_BITMAP */
         { "View OS stacks", dbg_os },
         { "View MAS regs", dbg_mas },
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
         { "View MAS codec", dbg_mas_codec },
+#endif
+#ifdef HAVE_LCD_BITMAP
         { "View battery", view_battery },
 #endif
     };

@@ -44,7 +44,7 @@ bool mpeg_has_changed_track(void);
 #define SOUND_TREBLE 2
 #define SOUND_BALANCE 3
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 #define SOUND_LOUDNESS 4
 #define SOUND_SUPERBASS 5
 #define SOUND_AVC 6

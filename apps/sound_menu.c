@@ -122,7 +122,7 @@ static void treble(void)
     set_sound("Treble", &global_settings.treble, SOUND_TREBLE);
 }
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 static void loudness(void)
 {
     set_sound("Loudness", &global_settings.loudness, SOUND_LOUDNESS);
@@ -148,7 +148,7 @@ void sound_menu(void)
         { "Volume", volume },
         { "Bass",   bass },
         { "Treble", treble },
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
         { "Loudness", loudness },
         { "Bass Boost", bass_boost },
         { "Auto Volume", avc }
