@@ -62,6 +62,7 @@
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40
+#define STATUS_DF       0x20
 #define STATUS_DRQ      0x08
 #define STATUS_ERR      0x01
 
@@ -223,6 +224,9 @@ int ata_read_sectors(unsigned long start,
                 continue;
             }
 
+            if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) )
+                continue;
+             
             /* if destination address is odd, use byte copying,
                otherwise use word copying */
 
