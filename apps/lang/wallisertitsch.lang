@@ -1,4 +1,4 @@
-# $Id: wallisertitsch.lang,v 1.77 2003/06/08 12:43:52 vicentinimartin
+# $Id: wallisertitsch.lang,v 1.88 2003/10/24 14:14:08 vicentinimartin
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -385,7 +385,7 @@ new: "Kanäl"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel configuration"
-new: "Kanalkonfiguration"
+new: "Kanalischtellig"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -432,11 +432,13 @@ desc: posible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(PLAY/STOP)"
 
+# depreciated
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
 eng: "Play = Yes"
 new: "Play = Ja"
 
+# depreciated
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
 eng: "Any Other = No"
@@ -1541,3 +1543,211 @@ id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 new: "Icons azeigu"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "Feschtplatta isch voll. Drick OFF."
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "PLAY = Ja"
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Andri = Nei"
+
+##
+## Strings used in the plugin loader:
+##
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Cha %s nit üftüe"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Fähler bim läsu fa %s"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "nit kompatibels Modell"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "nit kompatibli Version"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Plugin mäldut Fähler"
+
+##
+## boot change detection
+##
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new: "Boot gändrut"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "jetz nöü bootu?"
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "zDräjiga"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othelo"
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Schiebepuzzle"
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Schtäru"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "Warteschlanga als letschts"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Ifiegu"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Ifiegu als letschts"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Warteschlanga als negschts"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Ifiegu als negschts"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "dynamischi Abschpillischta schpichru"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Abschpillischta Optione"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "%d Lieder igfiegt (%s)"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "%d Lieder agheicht (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "%d Lieder abgspiichrut (%s)"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "Off fer abzbrächu"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STOP fer abzbrächu"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Fähler: Aktualisierig Abschpillischta-Kontrolldatii"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Fähler: Züegriff Abschpillischta"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Fähler: Züegriff Abschpillischta-Kontrolldatii"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Fähler: Verzeichniszüegriff"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Abschpillischta-Kontrolldatii isch ungültig"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Verzeichnis rekursiv ifiegu"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Rekursiv?"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Schrifte"
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Firmware"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Spraach"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "Azeig währund dum Abschpilu (WPS)"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Ischtellige"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Plugins"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Autoadapter Modus"
