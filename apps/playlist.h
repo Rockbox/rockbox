@@ -21,13 +21,14 @@
 #define __PLAYLIST_H__
 
 #include <stdbool.h>
+#include "file.h"
 
 /* playlist data */
 
 #define MAX_PLAYLIST_SIZE 10000
 typedef struct 
 {
-    char filename[256];  /* path name of m3u playlist on disk       */
+    char filename[MAX_PATH];  /* path name of m3u playlist on disk       */
     int  indices[MAX_PLAYLIST_SIZE]; /* array of indices            */
     int  index;          /* index of *NEXT* track to play           */
     int  seed;           /* random seed                             */
