@@ -43,6 +43,7 @@
 #include "status.h"
 #include "debug.h"
 #include "kernel.h"
+#include "sprintf.h"
 
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
@@ -836,6 +837,7 @@ static void display_bookmark(char* bookmark,
     lcd_puts_scroll(0, 5, str(LANG_BOOKMARK_SELECT_EXIT));
     lcd_puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
 #else
+    (void)bookmark_id;
     len=strlen(MP3_file_name);
     if (len>3)
       dot=strrchr(MP3_file_name+len-4,'.');
