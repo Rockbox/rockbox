@@ -43,7 +43,7 @@ typedef unsigned int mode_t;
 int sim_open(const char *name, int opts);
 int sim_close(int fd);
 int sim_rename(const char *oldpath, const char *newpath);
-int sim_filesize(int fd);
+off_t sim_filesize(int fd);
 int sim_creat(const char *name, mode_t mode);
 int sim_remove(const char *name);
 
