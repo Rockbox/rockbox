@@ -34,18 +34,17 @@ static int max_iter;
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
 
-/**************** Begin grayscale framework ******************/
+/*********************** Begin grayscale framework *************************/
 
-/* This is a generic framework to use grayscale display within
- * rockbox plugins. It obviously does not work for the player.
+/* This is a generic framework to use grayscale display within rockbox
+ * plugins. It obviously does not work for the player.
  *
- * If you want to use grayscale display within a plugin, copy
- * this section (up to "End grayscale framework") into your
- * source and you are able to use it. For detailed documentation
- * look at the head of each public function.
+ * If you want to use grayscale display within a plugin, copy this section
+ * (up to "End grayscale framework") into your source and you are able to use
+ * it. For detailed documentation look at the head of each public function.
  *
- * It requires a global Rockbox api pointer in "rb" and uses 
- * timer 4 so you cannot use timer 4 for other purposes while
+ * It requires a global Rockbox api pointer in "rb" and uses the rockbox
+ * timer api so you cannot use that timer for other  purposes while
  * displaying grayscale.
  *
  * The framework consists of 3 sections:
@@ -54,17 +53,15 @@ static unsigned int gbuf_size = 0;
  * - public core functions
  * - public optional functions
  *
- * Usually you will use functions from the latter two sections
- * in your code. You can cut out functions from the third section
- * that you do not need in order to not waste space. Don't forget
- * to cut the prototype as well.
+ * Usually you will use functions from the latter two sections in your code.
+ * You can cut out functions from the third section that you do not need in
+ * order to not waste space. Don't forget to cut the prototype as well.
  */
 
 /**** internal core functions and definitions ****/
 
-/* You do not want to touch these if you don't know exactly what
- * you're doing.
- */
+/* You do not want to touch these if you don't know exactly what you're
+ * doing. */
 
 #define GRAY_RUNNING          0x0001  /* grayscale overlay is running */
 #define GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
@@ -89,14 +86,14 @@ static tGraybuf *graybuf = NULL;
 
 /** prototypes **/
 
-void timer4_isr(void);
+void timer_isr(void);
 void graypixel(int x, int y, unsigned long pattern);
 void grayinvertmasked(int x, int yb, unsigned char mask);
 
 /** implementation **/
 
 /* timer interrupt handler: display next bitplane */
-void timer4_isr(void) /* IMIA4 */
+void timer_isr(void)
 {
     rb->lcd_blit(graybuf->data + (graybuf->plane_size * graybuf->cur_plane),
                  graybuf->x, graybuf->by, graybuf->width, graybuf->bheight,
@@ -107,24 +104,24 @@ void timer4_isr(void) /* IMIA4 */
 
     if (graybuf->flags & GRAY_DEFERRED_UPDATE)  /* lcd_update() requested? */
     {
-    	int x1 = MAX(graybuf->x, 0);
-    	int x2 = MIN(graybuf->x + graybuf->width, LCD_WIDTH);
-    	int y1 = MAX(graybuf->by << 3, 0);
-    	int y2 = MIN((graybuf->by + graybuf->bheight) << 3, LCD_HEIGHT);
+        int x1 = MAX(graybuf->x, 0);
+        int x2 = MIN(graybuf->x + graybuf->width, LCD_WIDTH);
+        int y1 = MAX(graybuf->by << 3, 0);
+        int y2 = MIN((graybuf->by + graybuf->bheight) << 3, LCD_HEIGHT);
 
-    	if(y1 > 0)  /* refresh part above overlay, full width */
-    	    rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
+        if (y1 > 0)  /* refresh part above overlay, full width */
+            rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
 
-    	if(y2 < LCD_HEIGHT) /* refresh part below overlay, full width */
-    	    rb->lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
+        if (y2 < LCD_HEIGHT) /* refresh part below overlay, full width */
+            rb->lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
 
-    	if(x1 > 0) /* refresh part to the left of overlay */
-    	    rb->lcd_update_rect(0, y1, x1, y2 - y1);
+        if (x1 > 0) /* refresh part to the left of overlay */
+            rb->lcd_update_rect(0, y1, x1, y2 - y1);
 
-    	if(x2 < LCD_WIDTH) /* refresh part to the right of overlay */
-    	    rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
+        if (x2 < LCD_WIDTH) /* refresh part to the right of overlay */
+            rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
 
-    	graybuf->flags &= ~GRAY_DEFERRED_UPDATE; /* clear request */
+        graybuf->flags &= ~GRAY_DEFERRED_UPDATE; /* clear request */
     }
 }
 
@@ -135,14 +132,11 @@ void graypixel(int x, int y, unsigned long pattern)
     static short random_buffer;
     register long address, mask, random;
 
-    /* Some (pseudo-)random function must be used here to shift
-     * the bit pattern randomly, otherwise you would get flicker
-     * and/or moire.
-     * Since rand() is relatively slow, I've implemented a simple,
-     * but very fast pseudo-random generator based on linear
-     * congruency in assembler. It delivers 16 pseudo-random bits
-     * in each iteration.
-     */
+    /* Some (pseudo-)random function must be used here to shift the bit
+     * pattern randomly, otherwise you would get flicker and/or moire.
+     * Since rand() is relatively slow, I've implemented a simple, but very
+     * fast pseudo-random generator based on linear congruency in assembler.
+     * It delivers 16 pseudo-random bits in each iteration. */
 
     /* simple but fast pseudo-random generator */
     asm(
@@ -192,7 +186,7 @@ void graypixel(int x, int y, unsigned long pattern)
 
     ".pp_end:                    \n"
         : /* outputs */
-        /* %0 */ "=&r"(address),
+        /* %0 */ "=&r"(address),    
         /* %1 */ "=&r"(mask)
         : /* inputs */
         /* %2 */ "r"(graybuf->width),
@@ -268,7 +262,7 @@ void graypixel(int x, int y, unsigned long pattern)
 }
 
 /* Invert the bits for 1-8 pixels within the buffer */
-void grayinvertmasked(int x, int yb, unsigned char mask)
+void grayinvertmasked(int x, int by, unsigned char mask)
 {
     asm(
         "mulu    %4,%5           \n"  /* width * by (offset of row) */
@@ -291,7 +285,7 @@ void grayinvertmasked(int x, int yb, unsigned char mask)
         /* %2 */ "r"(mask),
         /* %3 */ "r"(graybuf->plane_size),
         /* %4 */ "r"(graybuf->width),
-        /* %5 */ "r"(yb)
+        /* %5 */ "r"(by)
         : /* clobbers */
         "r1", "r2", "macl"
     );
@@ -316,12 +310,12 @@ void gray_show_display(bool enable);
  *   gbuf_size = max usable size of the buffer
  *   width     = width in pixels  (1..112)
  *   bheight   = height in 8-pixel units  (1..8)
- *   depth     = desired number of grayscales - 1  (1..32)
+ *   depth     = desired number of shades - 1  (1..32)
  *
  * result:
  *   = depth  if there was enough memory
  *   < depth  if there wasn't enough memory. The number of displayable
- *            grayscales is smaller than desired, but it still works
+ *            shades is smaller than desired, but it still works
  *   = 0      if there wasn't even enough memory for 1 bitplane (black & white)
  *
  * You can request any depth from 1 to 32, not just powers of 2. The routine
@@ -335,16 +329,22 @@ void gray_show_display(bool enable);
  *     sizeof(tGraymap)      (= 48 bytes currently)
  *   + sizeof(long)          (=  4 bytes)
  *   + (width * bheight + sizeof(long)) * depth
+ *   + 0..3                  (longword alignment of grayscale display buffer)
  */
 int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
                      int bheight, int depth)
 {
-    int plane_size;
-    int possible_depth;
+    int possible_depth, plane_size;
     int i, j;
 
     if (width > LCD_WIDTH || bheight > (LCD_HEIGHT >> 3) || depth < 1)
         return 0;
+
+    while ((unsigned long)gbuf & 3)  /* the buffer has to be long aligned */
+    { 
+        gbuf++;
+        gbuf_size--;
+    }
 
     plane_size = width * bheight;
     possible_depth = (gbuf_size - sizeof(tGraybuf) - sizeof(unsigned long))
@@ -375,8 +375,8 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     j = 8;
     while (i != 0)
     {
-    	i >>= 1;
-    	j--;
+        i >>= 1;
+        j--;
     }
     graybuf->randmask = 0xFF >> j;
 
@@ -386,11 +386,11 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     /* Precalculate the bit patterns for all possible pixel values */
     for (i = 0; i <= depth; i++)
     {
-    	unsigned long pattern = 0;
-    	int value = 0;
+        unsigned long pattern = 0;
+        int value = 0;
 
-    	for (j = 0; j < depth; j++)
-    	{
+        for (j = 0; j < depth; j++)
+        {
             pattern <<= 1;
             value += i;
 
@@ -398,10 +398,10 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
                 value -= depth;   /* "white" bit */
             else
                 pattern |= 1;     /* "black" bit */
-    	}  
+        }  
         /* now the lower <depth> bits contain the pattern */
 
-    	graybuf->bitpattern[i] = pattern;
+        graybuf->bitpattern[i] = pattern;
     }
     
     return depth;
@@ -474,7 +474,7 @@ void gray_show_display(bool enable)
     if (enable)
     {
         graybuf->flags |= GRAY_RUNNING;
-        rb->plugin_register_timer(FREQ / 67, 1, timer4_isr);
+        rb->plugin_register_timer(FREQ / 67, 1, timer_isr);
     }
     else
     {
@@ -504,7 +504,7 @@ void gray_clear_display(void);
 //void gray_scroll_down8(bool black_border);
 //void gray_scroll_up1(bool black_border);
 //void gray_scroll_down1(bool black_border);
-//
+
 /* pixel functions */
 void gray_drawpixel(int x, int y, int brightness);
 //void gray_invertpixel(int x, int y);
@@ -519,9 +519,11 @@ void gray_drawpixel(int x, int y, int brightness);
 //void gray_invertrect(int x1, int y1, int x2, int y2);
 
 /* bitmap functions */
-//void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny);
+//void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
+//                      int stride);
 //void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
-//                     bool draw_bg, int fg_brightness, int bg_brightness);
+//                     int stride, bool draw_bg, int fg_brightness,
+//                     int bg_brightness);
 
 /** implementation **/
 
@@ -534,31 +536,6 @@ void gray_clear_display(void)
 
     rb->memset(graybuf->data, 0, graybuf->depth * graybuf->plane_size);
 }
-
-/* Set the grayscale display to all black
- */
-void gray_black_display(void)
-{
-    if (graybuf == NULL)
-        return;
-
-    rb->memset(graybuf->data, 0xFF, graybuf->depth * graybuf->plane_size);
-}
-
-/* Do a lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
- * of the screen not covered by the grayscale overlay). If the grayscale 
- * overlay is running, the update will be done in the next call of the
- * interrupt routine, otherwise it will be performed right away. See also
- * comment for the gray_show_display() function.
- */
-void gray_deferred_update(void)
-{
-    if (graybuf != NULL && (graybuf->flags & GRAY_RUNNING))
-        graybuf->flags |= GRAY_DEFERRED_UPDATE;
-    else
-        rb->lcd_update();
-}
-
 
 /* Set a pixel to a specific gray value
  *
@@ -574,24 +551,8 @@ void gray_drawpixel(int x, int y, int brightness)
                     * (graybuf->depth + 1)) >> 8]);
 }
 
-/* Invert a pixel
- *
- * The bit pattern for that pixel in the buffer is inverted, so white
- * becomes black, light gray becomes dark gray etc.
- */
-void gray_invertpixel(int x, int y)
-{
-    if (graybuf == NULL || x >= graybuf->width || y >= graybuf->height)
-        return;
 
-    grayinvertmasked(x, (y >> 3), 1 << (y & 7));
-}
-
-
-
-
-
-/**************** end grayscale framework ********************/
+/*********************** end grayscale framework ***************************/
 
 
 
@@ -630,7 +591,7 @@ void calc_mandelbrot_set(void){
             x = 0;
             y = 0;
             n_iter = 0;
-            
+
             while (++n_iter<=max_iter) {
                 x >>= 13;
                 y >>= 13;
