@@ -26,6 +26,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include <string.h>
 
 #ifdef SIMULATOR
 #include <stdio.h>
