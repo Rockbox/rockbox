@@ -641,10 +641,6 @@ bool dirbrowse(char *root)
                 bool lastsortcase = global_settings.sort_case;
                 bool show_hidden_files = global_settings.show_hidden_files;
 
-#ifdef HAVE_LCD_BITMAP
-                bool laststate=statusbar(false);
-#endif
-
                 lcd_stop_scroll();
                 main_menu();
                 /* do we need to rescan dir? */
@@ -653,9 +649,6 @@ bool dirbrowse(char *root)
                      show_hidden_files != global_settings.show_hidden_files)
                     lastdir[0] = 0;
                 restore = true;
-#ifdef HAVE_LCD_BITMAP
-                statusbar(laststate);
-#endif
                 break;
             }
 
