@@ -9,6 +9,9 @@
 
 <h2>News</h2>
 
+<p><i>2003-02-17</i>: Rockbox <a href="/daily.shtml">daily builds</a> works on
+the FM Recorder now.
+
 <p><i>2003-01-10</i>: Full ISO-8859-1 font support added for Players, using the <a href="/docs/rocklatin.html">Rocklatin1</a> dynamic charset system.
 
 <p><i>2002-12-21</i>: You can now donate to the Rockbox project via PayPal. See the new button in the left menu.
