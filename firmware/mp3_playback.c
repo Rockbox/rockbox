@@ -935,8 +935,9 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     init_playback();
     
     mas_version_code = mas_readver();
-    DEBUGF("MAS3587 derivate %d, version B%d\n",
-           (mas_version_code & 0xff00) >> 8, mas_version_code & 0xff);
+    DEBUGF("MAS3587 derivate %d, version %c%d\n",
+           (mas_version_code & 0xf000) >> 12,
+           'A' + ((mas_version_code & 0x0f00) >> 8), mas_version_code & 0xff);
 #endif
 
 #ifdef HAVE_DAC3550A

@@ -570,7 +570,7 @@ static void drain_dma_buffer(void)
         "mov.b   @%0,r1          \n" /* read PBDR */
         "cmp/pz  r1              \n" /* and wait for /PRTW */
         "bt      .d_wait2        \n"
-            
+
     ".d_start:                   \n"
         "tst     r1,r2           \n" /* EOD low? */
         "bf      .d_loop         \n" /* no: next pass */
@@ -2107,8 +2107,8 @@ static void init_recording(void)
     } while(val);
 
     /* Perform black magic as described by the data sheet */
-    if((mas_version_code & 0xff) == 2)
-    {
+    if((mas_version_code & 0x0fff) == 0x0102)
+    {       
         DEBUGF("Performing MAS black magic for B2 version\n");
         mas_writereg(0xa3, 0x98);
         mas_writereg(0x94, 0xfffff);
