@@ -423,31 +423,31 @@ void gray_init(struct plugin_api* newrb)
  *
  * The total memory needed can be calculated as follows:
  *   total_mem =
- *     sizeof(tGraymap)      (= 48 bytes currently)
+ *     sizeof(tGraybuf)      (= 48 bytes currently)
  *   + sizeof(long)          (=  4 bytes)
  *   + (width * bheight + sizeof(long)) * depth
  *   + 0..3                  (longword alignment of grayscale display buffer)
  */
 int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
-                     int bheight, int depth)
+                     int bheight, int depth, int *buf_taken)
 {
     int possible_depth, plane_size;
-    int i, j;
+    int i, j, align;
 
-    if (rb == NULL || (unsigned) width > LCD_WIDTH
+    if (rb == NULL
+        || (unsigned) width > LCD_WIDTH
         || (unsigned) bheight > (LCD_HEIGHT/8)
         || depth < 1)
         return 0;
 
-    while ((unsigned long)gbuf & 3)  /* the buffer has to be long aligned */
-    { 
-        gbuf++;
-        gbuf_size--;
-    }
+    /* the buffer has to be long aligned */
+    align = 3 - (((unsigned long)gbuf + 3) & 3);
+    gbuf += align;
+    gbuf_size -= align;
 
     plane_size = width * bheight;
-    possible_depth = (gbuf_size - sizeof(tGraybuf) - sizeof(unsigned long))
-                     / (plane_size + sizeof(unsigned long));
+    possible_depth = (gbuf_size - sizeof(tGraybuf) - sizeof(long))
+                     / (plane_size + sizeof(long));
 
     if (possible_depth < 1)
         return 0;
@@ -455,8 +455,8 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     depth = MIN(depth, 32);
     depth = MIN(depth, possible_depth);
 
-    graybuf = (tGraybuf *) gbuf; /* global pointer to buffer structure */
-
+    graybuf = (tGraybuf *) gbuf;  /* global pointer to buffer structure */
+                                  
     graybuf->x = 0;
     graybuf->by = 0;
     graybuf->width = width;
@@ -467,9 +467,9 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     graybuf->cur_plane = 0;
     graybuf->flags = 0;
     graybuf->data = gbuf + sizeof(tGraybuf);
-    graybuf->bitpattern = (unsigned long *) (graybuf->data 
+    graybuf->bitpattern = (unsigned long *) (graybuf->data
                            + depth * plane_size);
-    
+
     i = depth;
     j = 8;
     while (i != 0)
@@ -503,6 +503,12 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
         graybuf->bitpattern[i] = pattern;
     }
     
+    if (buf_taken)  /* caller requested info about space taken */
+    {
+        *buf_taken = sizeof(tGraybuf) + sizeof(long)
+                   + (plane_size + sizeof(long)) * depth + align;
+    }
+
     return depth;
 }
 

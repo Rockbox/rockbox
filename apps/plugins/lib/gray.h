@@ -37,7 +37,7 @@ void gray_init(struct plugin_api* newrb);
 
 /* general functions */
 int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
-                     int bheight, int depth);
+                     int bheight, int depth, int *buf_taken);
 void gray_release_buffer(void);
 void gray_position_display(int x, int by);
 void gray_show_display(bool enable);
