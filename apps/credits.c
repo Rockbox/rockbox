@@ -22,37 +22,33 @@
 #include "kernel.h"
 #include "button.h"
 
-struct credit {
-    char *name;
-    char *desc;
-};
-
-struct credit credits[] = {
-    { "Bjorn Stenberg",          "Originator, Project manager, Code" },
-    { "Linus Nielsen Feltzing",  "Electronics, Code"                 },
-    { "Andy Choi",               "Checksums"                         },
-    { "Andrew Jamieson",         "Schematics, Electronics"           },
-    { "Paul Suade",              "Serial port setup"                 },
-    { "Joachim Schiffer",        "Schematics, Electronics"           },
-    { "Daniel Stenberg",         "Code"                              },
-    { "Alan Korr",               "Code"                              },
-    { "Gary Czvitkovicz",        "Code"                              },
-    { "Stuart Martin",           "Code"                              },
-    { "Felix Arends",            "Code"                              },
-    { "Ulf Ralberg",             "Thread embryo"                     },
-    { "David Hardeman",          "Initial ID3 code"                  },
-    { "Thomas Saeys",            "Logo"                              },
-    { "Grant Wier",              "Code"                              },
-    { "Julien Labruyere",        "Donated Archos Player"             },
-    { "Nicolas Sauzede",         "Display research"                  },
-    { "Robert Hak",              "Code, FAQ, Sarcasm"                },
-    { "Dave Chapman",            "Code"                              },
-    { "Stefan Meyer",            "Code"                              },
-    { "Eric Linenberg",          "Sokoban"                           },
+char* credits[] = {
+    "Bjorn Stenberg",
+    "Linus Nielsen Feltzing",
+    "Andy Choi", 
+    "Andrew Jamieson", 
+    "Paul Suade", 
+    "Joachim Schiffer", 
+    "Daniel Stenberg", 
+    "Alan Korr", 
+    "Gary Czvitkovicz", 
+    "Stuart Martin", 
+    "Felix Arends", 
+    "Ulf Ralberg", 
+    "David Hardeman", 
+    "Thomas Saeys", 
+    "Grant Wier", 
+    "Julien Labruyere", 
+    "Nicolas Sauzede", 
+    "Robert Hak", 
+    "Dave Chapman", 
+    "Stefan Meyer", 
+    "Eric Linenberg",
+    "Tom Cvitan"
 };
 
 #ifdef HAVE_LCD_BITMAP
-#define MAX_LINES 6
+#define MAX_LINES 7
 #define DISPLAY_TIME  HZ*2
 #else
 #define MAX_LINES 2
@@ -68,14 +64,14 @@ void roll_credits(void)
     lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,9);
+    lcd_setmargins(0,8);
 #endif
 
-    for ( i=0; i<sizeof(credits)/sizeof(struct credit); i++ ) {
+    for ( i=0; i<sizeof(credits)/sizeof(char*); i++ ) {
 #ifdef HAVE_LCD_BITMAP
         lcd_putsxy(0, 0, " [Credits]",0);
 #endif
-        lcd_puts(0, line, credits[i].name);
+        lcd_puts(0, line, credits[i]);
         line++;
         if ( line == MAX_LINES ) {
             lcd_update();
