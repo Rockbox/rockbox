@@ -22,18 +22,18 @@ The data is then spread over four memory segments. The two least significant bit
 
 <p>I've written a small utility to descramble the firmware files:
 <ul>
-<li><a href="descramble.c">descramble.c</a> - 1835 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
-<li><a href="descramble">descramble</a> - 4280 bytes - Dynamically linked i386 linux executable
-<li><a href="descramble.static.bz2">descramble.static.bz2</a> - 176015 bytes - bzip2 compressed statically linked i386 linux executable
-<li><a href="descramble.exe">descramble.exe</a> - 45056 bytes - win32 executable
+<li><a href="tools/descramble.c">descramble.c</a> - 1835 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
+<li><a href="tools/descramble">descramble</a> - 4280 bytes - Dynamically linked i386 linux executable
+<li><a href="tools/descramble.static.bz2">descramble.static.bz2</a> - 176015 bytes - bzip2 compressed statically linked i386 linux executable
+<li><a href="tools/descramble.exe">descramble.exe</a> - 45056 bytes - win32 executable
 </ul>
 
 <p>...and one to scramble files:
 <ul>
-<li><a href="scramble.c">scramble.c</a> - 2242 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
-<li><a href="scramble">scramble</a> - 4376 bytes - Dynamically linked i386 linux executable
-<li><a href="scramble.static.bz2">scramble.static.bz2</a> - 176117 bytes - bzip2 compressed statically linked i386 linux executable
-<li><a href="scramble.exe">scramble.exe</a> - 93385 bytes - win32 executable
+<li><a href="tools/scramble.c">scramble.c</a> - 2242 bytes - The source code (pure ANSI C, should work everywhere). GPL licensed.
+<li><a href="tools/scramble">scramble</a> - 4376 bytes - Dynamically linked i386 linux executable
+<li><a href="tools/scramble.static.bz2">scramble.static.bz2</a> - 176117 bytes - bzip2 compressed statically linked i386 linux executable
+<li><a href="tools/scramble.exe">scramble.exe</a> - 93385 bytes - win32 executable
 </ul>
 
 <h2>Disassembler</h2>
@@ -41,10 +41,10 @@ The data is then spread over four memory segments. The two least significant bit
 <p>I found a nice public domain SH-1/SH-2 disassembler written by Bart Trzynadlowski, called <a href="http://saturndev.emuvibes.com/Files/sh2d020.zip">sh2d</a>:
 <p><b>Update:</b> I've added address lookup and register name translation to the disassembler (2001-12-09)
 <ul>
-<li><a href="sh2d.c">sh2d.c</a> - 28 kB - Source code
-<li><a href="sh2d">sh2d</a> - 15 kB - Dynamically linked i386 linux executable
-<li><a href="sh2d.static.bz2">sh2d.static.bz2</a> - 170 kB - bzip2 compressed statically linked i386 linux executable
-<li><a href="sh2d.exe">sh2d.exe</a> - 40 kB - win32 executable (original version; no lookup)
+<li><a href="tools/sh2d.c">sh2d.c</a> - 28 kB - Source code
+<li><a href="tools/sh2d">sh2d</a> - 15 kB - Dynamically linked i386 linux executable
+<li><a href="tools/sh2d.static.bz2">sh2d.static.bz2</a> - 170 kB - bzip2 compressed statically linked i386 linux executable
+<li><a href="tools/sh2d.exe">sh2d.exe</a> - 40 kB - win32 executable (original version; no lookup)
 </ul>
 
 <h2>Compiler</h2>
