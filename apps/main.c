@@ -27,8 +27,10 @@
 #include "tree.h"
 #include "panic.h"
 #include "menu.h"
+#ifndef SIMULATOR
 #include "dmalloc.h"
 #include "bmalloc.h"
+#endif
 #include "mpeg.h"
 #include "main_menu.h"
 
