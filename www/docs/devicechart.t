@@ -227,8 +227,8 @@
     <td>350 g (12.3 oz)</td>
     <td>290 g (10.23 oz)</td>
     <td>290 g (10.23 oz)</td>
-    <td>60 g 2.1 oz)</td>
-    <td>60 g 2.1 oz)</td>
+    <td>60 g (2.1 oz)</td>
+    <td>60 g (2.1 oz)</td>
 </tr>
 <tr><th><b>USB Connector</b></th>
     <td>A male</td>
@@ -249,6 +249,16 @@
     <td>left side</td>
     <td>top left</td>
     <td>top left</td>
+</tr>
+<tr><th><b>Storage</b></th>
+    <td>6 GB 2.5"</td>
+    <td>6 GB 2.5"</td>
+    <td>10-15 GB 2.5"</td>
+    <td>20 GB 2.5"</td>
+    <td>20 GB 2.5"</td>
+    <td>20 GB 2.5"</td>
+    <td>128 MB + MMC</td>
+    <td>128 MB + MMC</td>
 </tr>
 </table>
 <p>
