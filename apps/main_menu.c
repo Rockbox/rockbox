@@ -93,7 +93,7 @@ int show_logo( void )
     lcd_update();
 
 #else
-    char *rockbox = "ROCKbox!";
+    char *rockbox = "  ROCKbox!";
     lcd_clear_display();
 #ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(true);
