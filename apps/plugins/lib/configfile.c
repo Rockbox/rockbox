@@ -26,7 +26,8 @@ void configfile_init(struct plugin_api* newrb)
     cfg_rb = newrb;
 }
 
-int configfile_save(char *filename, struct configdata *cfg, int num_items)
+int configfile_save(const char *filename, struct configdata *cfg,
+                    int num_items, int version)
 {
     int fd;
     int i;
@@ -37,6 +38,8 @@ int configfile_save(char *filename, struct configdata *cfg, int num_items)
     if(fd < 0)
         return fd*10 - 1;
 
+    cfg_rb->fprintf(fd, "file version: %d\n", version);
+    
     for(i = 0;i < num_items;i++) {
         switch(cfg[i].type) {
             case TYPE_INT:
@@ -64,13 +67,16 @@ int configfile_save(char *filename, struct configdata *cfg, int num_items)
     return 0;
 }
 
-int configfile_load(char *filename, struct configdata *cfg, int num_items)
+int configfile_load(const char *filename, struct configdata *cfg,
+                    int num_items, int min_version)
 {
     int fd;
     int i, j;
     char *name;
     char *val;
     char buf[MAX_PATH];
+    int file_version = -1;
+    int tmp;
 
     cfg_rb->snprintf(buf, MAX_PATH, "/.rockbox/rocks/%s", filename);
     fd = cfg_rb->open(buf, O_RDONLY);
@@ -79,12 +85,24 @@ int configfile_load(char *filename, struct configdata *cfg, int num_items)
 
     while(cfg_rb->read_line(fd, buf, MAX_PATH) > 0) {
         cfg_rb->settings_parseline(buf, &name, &val);
+
+        /* Bail out if the file version is too old */
+        if(!cfg_rb->strcmp("file version", name)) {
+            file_version = cfg_rb->atoi(val);
+            if(file_version < min_version) {
+                cfg_rb->close(fd);
+                return -1;
+            }
+        }
         
         for(i = 0;i < num_items;i++) {
             if(!cfg_rb->strcmp(cfg[i].name, name)) {
                 switch(cfg[i].type) {
                     case TYPE_INT:
-                        *cfg[i].val = cfg_rb->atoi(val);
+                        tmp = cfg_rb->atoi(val);
+                        /* Only set it if it's within range */
+                        if(tmp >= cfg[i].min && tmp <= cfg[i].max)
+                            *cfg[i].val = tmp;
                         break;
                         
                     case TYPE_ENUM:

@@ -38,7 +38,9 @@ struct configdata
 };
 
 void configfile_init(struct plugin_api* newrb);
-int configfile_save(char *filename, struct configdata *cfg, int num_items);
-int configfile_load(char *filename, struct configdata *cfg, int num_items);
+int configfile_save(const char *filename, struct configdata *cfg,
+                    int num_items, int version);
+int configfile_load(const char *filename, struct configdata *cfg,
+                    int num_items, int min_version);
 
 #endif
