@@ -546,8 +546,14 @@ static char* get_tag(struct mp3entry* id3,
             *flags |= WPS_REFRESH_DYNAMIC;
             switch (tag[1]) {
                 case 'l': /* battery level */
-                    snprintf(buf, buf_size, "%d%%", battery_level());
+                {
+                    int l = battery_level();
+                    if (l > -1)
+                        snprintf(buf, buf_size, "%d%%");
+                    else
+                        return "?%";
                     return buf;
+                }
 
                 case 't': /* estimated battery time */
                 {
