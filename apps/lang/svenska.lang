@@ -1398,3 +1398,18 @@ id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
 new: "[PÅ] för att ångra"
+
+id: LANG_SAVE_SETTINGS
+desc: in system_settings_menu()
+eng: "Write .cfg file"
+new: "Skriv .cfg-fil"
+
+id: LANG_SETTINGS_SAVED1
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings"
+new: "Inställning"
+
+id: LANG_SETTINGS_SAVED2
+desc: Feedback shown when a .cfg file is saved
+eng: "Saved"
+new: "Sparad"
