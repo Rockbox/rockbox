@@ -14,6 +14,8 @@
 void *dynapointer,*branchp[10];
 int blockclen;
 
+#define DYNA_DEBUG 1
+
 #define DWRITEB(a) *((unsigned char *) dynapointer)=(a); dynapointer+=1
 #define DWRITEW(a) *((unsigned short *) dynapointer)=(a); dynapointer+=2
 #define DWRITEL(a) *((unsigned long *) dynapointer)=(a); dynapointer+=4
@@ -372,7 +374,7 @@ void DYNA_DEC_l_r(un8 dest,int is_areg) {
 
 
 void dynamic_recompile (struct dynarec_block *newblock) {
-    int done=0,writepc=1;
+    int done=0,writepc=1,fd;
     byte op;
     unsigned int oldpc=PC;
     unsigned short temp;
@@ -380,7 +382,14 @@ void dynamic_recompile (struct dynarec_block *newblock) {
     char meow[500];
     dynapointer=malloc(512);
     newblock->block=dynapointer;
-
+#ifdef DYNA_DEBUG
+    snprintf(meow,499,"/dyna_0x%x_asm.rb",PC);
+    fd=open(meow,O_WRONLY|O_CREAT);
+    if(fd<0) {
+	die("couldn't open dyna debug file");
+        return;
+    }
+#endif
     snprintf(meow,499,"Recompiling 0x%x",oldpc);
     rb->splash(HZ*1,1,meow);
     while(!done) {
@@ -399,6 +408,9 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               break;
 
 	  case 0x0B: /* DEC BC*
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"DEC BC\n");
+#endif
 	      DYNA_TST_b_r(3); // test C
 	      DYNA_DUMMYBRANCH(2,0);
 	      DYNA_DEC_l_r(2,0); // dec B
@@ -406,154 +418,284 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	      DYNA_DEC_l_r(3,0); // dec C
 	      break;
           case 0x41: /* LD B,C */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"LD B,C\n");
+#endif
               DYNA_MOVE_b_r_to_r(3,2); 
               break;
           case 0x42: /* LD B,D */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"LD B,D\n");
+#endif
               DYNA_MOVE_b_r_to_r(4,2);
               break;
           case 0x43: /* LD B,E */
-              DYNA_MOVE_b_r_to_r(5,2);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,E\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,2);
               break;
           case 0x44: /* LD B,H */
-              GETUPPER(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,H\n"); 
+#endif
+	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,2);
               break;
           case 0x45: /* LD B,L */
-              DYNA_MOVE_b_r_to_r(6,2);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,L\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(6,2);
               break;
           case 0x47: /* LD B,A */
-              DYNA_MOVE_b_r_to_r(1,2);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(1,2);
               break;
           case 0x48: /* LD C,B */
-              DYNA_MOVE_b_r_to_r(2,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,3);
               break;
           case 0x4A: /* LD C,D */
-              DYNA_MOVE_b_r_to_r(4,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,D\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(4,3);
               break;
           case 0x4B: /* LD C,E */
-              DYNA_MOVE_b_r_to_r(5,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,E\n");
+#endif
+	      DYNA_MOVE_b_r_to_r(5,3);
               break;
           case 0x4C: /* LD C,H */
-              GETUPPER(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,H\n"); 
+#endif
+	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,3);
               break;
           case 0x4D: /* LD C,L */
-              DYNA_MOVE_b_r_to_r(6,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,L\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(6,3);
               break;
           case 0x4F: /* LD C,A */
-              DYNA_MOVE_b_r_to_r(1,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(1,3);
               break;
            
           case 0x50: /* LD D,B */
-              DYNA_MOVE_b_r_to_r(2,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD D,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,4);
               break;
           case 0x51: /* LD D,C */
-              DYNA_MOVE_b_r_to_r(3,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD D,C\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(3,4);
               break;
           case 0x53: /* LD D,E */
-              DYNA_MOVE_b_r_to_r(5,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,4);
               break;
           case 0x54: /* LD D,H */
-              GETUPPER(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,A\n"); 
+#endif
+	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,4);
               break;
           case 0x55: /* LD D,L */
-              DYNA_MOVE_b_r_to_r(6,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(6,4);
               break;
           case 0x57: /* LD D,A */
-              DYNA_MOVE_b_r_to_r(1,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(1,4);
               break;
          
           case 0x58: /* LD E,B */
-              DYNA_MOVE_b_r_to_r(2,5);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,5);
               break;
           case 0x59: /* LD E,C */
-              DYNA_MOVE_b_r_to_r(3,5);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,C\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(3,5);
               break;
           case 0x5A: /* LD E,D */
-              DYNA_MOVE_b_r_to_r(4,5);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,D\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(4,5);
               break;
           case 0x5C: /* LD E,H */
-              GETUPPER(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,H\n"); 
+#endif
+	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,5); 
               break;
           case 0x5D: /* LD E,L */
-              DYNA_MOVE_b_r_to_r(6,5);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,L\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(6,5);
               break;
           case 0x5F: /* LD E,A */
-              DYNA_MOVE_b_r_to_r(1,5); 
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,A\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(1,5); 
               break;
            
           case 0x60: /* LD H,B */
-              DYNA_MOVE_b_r_to_r(2,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,0);
               PUTUPPER(0,6);
               break;
           case 0x61: /* LD H,C */
-              DYNA_MOVE_b_r_to_r(3,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,C\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(3,0);
               PUTUPPER(0,6);
               break;
           case 0x62: /* LD H,D */
-              DYNA_MOVE_b_r_to_r(4,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,D\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(4,0);
               PUTUPPER(0,6);
               break;
           case 0x63: /* LD H,E */
-              DYNA_MOVE_b_r_to_r(5,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,E\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,0);
               PUTUPPER(0,6);
               break;
           case 0x65: /* LD H,L */
-              DYNA_MOVE_b_r_to_r(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,L\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(6,0);
               PUTUPPER(0,6);
               break;
           case 0x67: /* LD H,A */
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,A\n"); 
+#endif	      
               DYNA_MOVE_b_r_to_r(1,0);
               PUTUPPER(0,6);
               break;
           case 0x68: /* LD L,B */
-              DYNA_MOVE_b_r_to_r(2,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,6);
               break;
           case 0x69: /* LD L,C */
-              DYNA_MOVE_b_r_to_r(3,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,C\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(3,6);
               break;
           case 0x6A: /* LD L,D */
-              DYNA_MOVE_b_r_to_r(4,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,D\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(4,6);
               break;
           case 0x6B: /* LD L,E */
-              DYNA_MOVE_b_r_to_r(5,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,E\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,6);
               break;
           case 0x6C: /* LD L,H */
-              GETUPPER(6,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,H\n"); 
+#endif
+	      GETUPPER(6,0);
               DYNA_MOVE_b_r_to_r(0,6);
               break;
            
           case 0x78: /* LD A,B */
-              DYNA_MOVE_b_r_to_r(2,1);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,B\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(2,1);
               break;
           case 0x79: /* LD A,C */
-              DYNA_MOVE_b_r_to_r(3,1);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,C\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(3,1);
               break;
           case 0x7A: /* LD A,D */
-              DYNA_MOVE_b_r_to_r(4,1);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,D\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(4,1);
               break;
           case 0x7B: /* LD A,E */
-              DYNA_MOVE_b_r_to_r(5,1);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,E\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,1);
               break;
           case 0x7C: /* LD A,H */
-              GETUPPER(5,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,H\n"); 
+#endif
+	      GETUPPER(5,0);
               DYNA_MOVE_b_r_to_r(0,1);
               break;
-          case 0x7D: /* LD A,L */
-              DYNA_MOVE_b_r_to_r(5,1);
+	  case 0x7D: /* LD A,L */
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,L\n"); 
+#endif
+	      DYNA_MOVE_b_r_to_r(5,1);
               break;
           case 0x01: /* LD BC,imm */
               {   /* warning (do we have endianness right?) */
-                  temp=readw(xPC);
+#ifdef DYNA_DEBUG 
+		  fdprintf(fd,"LD BC,#0x%x\n",readw(xPC)); 
+#endif		      
+		  temp=readw(xPC);
                   DYNA_MOVEQ_l_i_to_r((temp&0xFF00)>>8,2);
                   DYNA_MOVEQ_l_i_to_r(temp&0xFF,3);
                   PC+=2;
               }
               break;
           case 0x11: /* LD DE,imm */
-              { temp=readw(xPC);
+              { 
+#ifdef DYNA_DEBUG
+		 fdprintf(fd,"LD DE,#0x%x\n",readw(xPC));
+#endif
+		 temp=readw(xPC);
                  DYNA_MOVEQ_l_i_to_r((temp&0xFF00)>>8,4);
                  DYNA_MOVEQ_l_i_to_r(temp&0xFF,5);
                  PC += 2;
@@ -561,11 +703,17 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               break;
           case 0x21: /* LD HL,imm */
               {
+#ifdef DYNA_DEBUG
+                 fdprintf(fd,"LD HL,#0x%x\n",readw(xPC));
+#endif
                  DYNA_MOVE_l_i_to_r(readw(xPC),6);
                  PC += 2;
               }
               break;
 	  case 0x22: /* LDI (HL), A */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"LDI (HL),A\n");
+#endif
               DYNA_PUSH_l_r(1,0);
               DYNA_PUSH_l_r(6,0);
               CALL_NATIVE(&writeb);
@@ -573,44 +721,77 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	      DYNA_INC_l_r(6,0);
 	      break;
           case 0x31: /* LD SP,imm */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"LD SP,#0x%x\n",readw(xPC));
+#endif
               DYNA_MOVEA_l_i_to_r(readw(xPC),0);
               PC += 2; 
               break;
 
           case 0x06: /* LD B,imm */
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD B,#0x%x\n",readb(xPC)); 
+#endif
               DYNA_MOVEQ_l_i_to_r(FETCH,2);
               break;
           case 0x0E: /* LD C,imm */
-              DYNA_MOVEQ_l_i_to_r(FETCH,3);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD C,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_MOVEQ_l_i_to_r(FETCH,3);
               break;
           case 0x16: /* LD D,imm */
-              DYNA_MOVEQ_l_i_to_r(FETCH,4);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD D,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_MOVEQ_l_i_to_r(FETCH,4);
               break;
           case 0x1E: /* LD E,imm */
-              DYNA_MOVEQ_l_i_to_r(FETCH,5);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD E,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_MOVEQ_l_i_to_r(FETCH,5);
               break;
           case 0x26: /* LD H,imm */
-              DYNA_AND_l_i_to_r(0xFF,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD H,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_AND_l_i_to_r(0xFF,6);
               DYNA_OR_l_i_to_r(FETCH<<8,6);
               break;
           case 0x2E: /* LD L,imm */
-              DYNA_AND_l_i_to_r(0xFF00,6);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD L,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_AND_l_i_to_r(0xFF00,6);
               DYNA_OR_l_i_to_r(FETCH,6);
               break;
           case 0x3E: /* LD A,imm */
-              DYNA_MOVEQ_l_i_to_r(FETCH,1);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD A,#0x%x\n",readb(xPC)); 
+#endif
+	      DYNA_MOVEQ_l_i_to_r(FETCH,1);
               break;
 
           case 0xF9: /* LD SP,HL */
-              DYNA_MOVEA_w_r_to_r(6,0,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD SP,HL\n"); 
+#endif
+	      DYNA_MOVEA_w_r_to_r(6,0,0);
               break;     
           case 0xF3: /* DI */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"DI\n");
+#endif
               DYNA_CLR_l_m(&cpu.ime);
               DYNA_CLR_l_m(&cpu.ima);
               DYNA_CLR_l_m(&cpu.halt);
               /* cpu.halt = cpu.ima = cpu.ime = 0; */
               break;
           case 0xFB: /* EI */
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"EI\n"); 
+#endif
               DYNA_MOVEQ_l_i_to_r(1,0);
               DYNA_MOVEA_l_i_to_r(&cpu.ima,3);
               DYNA_MOVE_l_r_to_m(0,3);
@@ -618,7 +799,10 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               break;
            
           case 0xE0: /* LDH (imm),A */
-              DYNA_PUSH_l_r(1,0);
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"LD (0x%x),A\n",readb(xPC)); 
+#endif
+	      DYNA_PUSH_l_r(1,0);
               DYNA_PEA_w_i(FETCH);
               CALL_NATIVE(&writehi);
               DYNA_ADDQ_l_i_to_r(0,7,1);
@@ -626,20 +810,32 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               break;
 
           case 0xC3: /* JP (imm) PC = readw(PC) */
+#ifdef DYNA_DEBUG 
+	      fdprintf(fd,"JP (0x%x)\n",readw(xPC)); 
+#endif
               PC=readw(PC);
               done=1;
               break;
           case 0xCD: /* CALL (imm) PUSH(PC+2) PC=readw(PC); */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"CALL (0x%x)\n",readw(xPC));
+#endif
               PUSH(PC+2);
               PC=readw(PC);
               done=1;
               break;
         
           case 0x97: /* SUB A (halfcarry ?) */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"SUB A\n");
+#endif
               DYNA_CLR_l_r(1);
               DYNA_MOVEQ_l_i_to_r(0xC0,7);
               break;
-          case 0xF0:
+          case 0xF0: /* LDH A,(imm) */
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"LDH A,(0x%x)\n",readb(xPC));
+#endif
               DYNA_PEA_w_i(FETCH);
               CALL_NATIVE(&readhi);
               DYNA_ADDQ_l_i_to_r(4,7,1);
@@ -647,6 +843,9 @@ void dynamic_recompile (struct dynarec_block *newblock) {
               /*A = readhi(FETCH)*/
               break;
           case 0x87:  // ADD A,A
+#ifdef DYNA_DEBUG
+	      fdprintf(fd,"ADD A,A\n");
+#endif
             /*         code taken from gcc -O3 output by compiling;
              *         c=(2*b)&0xFF;
              *         a=(c) ? 0 : 0x80 | // zero flag
@@ -672,6 +871,9 @@ void dynamic_recompile (struct dynarec_block *newblock) {
             DYNA_AND_l_i_to_r(0xB0,7); /* and.l #0xB0,d7  */
             break;
         case 0xD0: /* RET NC */
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"RET NC\n"); 
+#endif
             DYNA_BTST_l_r(5,7); /* btst #5,d7 */
             DYNA_DUMMYBRANCH(2,0);
             POPA(1); /* POP %a1 */
@@ -682,11 +884,17 @@ void dynamic_recompile (struct dynarec_block *newblock) {
             tclen-=3;
             break;
 	case 0xC9: /* RET */
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"RET\n"); 
+#endif
 	    POPA(1);
 	    writepc=0;
 	    done=1;
 	    break;
 	case 0x20: /* JR NZ */
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"JR NZ\n"); 
+#endif
 	    DYNA_BTST_l_r(8,7); /* btst #8,d7 */
 	    DYNA_DUMMYBRANCH(2,0);
 	    DYNA_MOVEA_l_i_to_r(&blockclen,3);
@@ -698,6 +906,9 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	    PC++;
 	    break;
 	case 0xC2: /* JP NZ */
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"JP NZ\n"); 
+#endif
 	    DYNA_BTST_l_r(8,7); /* btst #8,d7 */
 	    DYNA_DUMMYBRANCH(2,0);
 	    DYNA_MOVEA_l_i_to_r(&blockclen,3);
@@ -708,6 +919,9 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	    PC+=2;
 	    break;
 /*	case 0xFA: /* LD A, (imm) 
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"LD A,(0x%x)\n",readw(xPC)); 
+#endif
 	    DYNA_PEA_w_i(readw(xPC));
 	    PC+=2; \
 	    CALL_NATIVE(&readb); \
@@ -716,13 +930,19 @@ void dynamic_recompile (struct dynarec_block *newblock) {
 	    break; */
 		
 	case 0xFE: /* CMP #<imm> TODO: can be (much) more efficient.*/
-            DYNA_MOVEA_l_r_to_r(2,3,0); /* movea.l %d2, %a3 */
+#ifdef DYNA_DEBUG
+	    fdprintf(fd,"CMP #0x%x\n",readb(xPC));
+#endif
+	    DYNA_MOVEA_l_r_to_r(2,3,0); /* movea.l %d2, %a3 */
             DYNA_MOVEQ_l_i_to_r(FETCH,2); /* moveq.l #<FETCH>,%d2 */
             CMP(2);
             DYNA_MOVE_l_r_to_r(3,2,1); /* move.l %a3, %d2 */
             break;
 
 	case 0xB1: /* OR C */
+#ifdef DYNA_DEBUG 
+	    fdprintf(fd,"OR C\n"); 
+#endif
 	    DYNA_OR_l_r_to_r(3,1); // or %d3,%d1
             DYNA_MOVEQ_l_i_to_r(0,7); 
             DYNA_TST_b_r(1,0);
@@ -737,6 +957,10 @@ void dynamic_recompile (struct dynarec_block *newblock) {
            break;
       }  
     }
+#ifdef DYNA_DEBUG 
+    fdprintf(fd,"(End of Block)\n"); 
+    close(fd);
+#endif    
     DYNA_MOVEA_l_i_to_r(&blockclen,3);
     DYNA_MOVE_l_i_to_m(tclen,3);
     if(writepc)
@@ -746,5 +970,11 @@ void dynamic_recompile (struct dynarec_block *newblock) {
     setmallocpos(dynapointer);
     newblock->length=dynapointer-newblock->block;
     invalidate_icache();
+    snprintf(meow,499,"/dyna_0x%x_code.rb",PC);
+    fd=open(meow,O_WRONLY|O_CREAT);
+    if(fd>=0) {
+        write(fd,newblock->block,newblock->length);
+	close(fd);
+    }
 }
 #endif

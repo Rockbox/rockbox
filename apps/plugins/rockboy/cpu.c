@@ -242,7 +242,7 @@ un32 reg_backup[16];
 struct dynarec_block *address_map[1<<HASH_SIGNIFICANT_LOWER_BITS];
 extern void *dynapointer;
 int blockcount;
-#define MAXBLOCK 10
+#define MAXBLOCK 6
 #endif
 
 
@@ -948,11 +948,10 @@ next:
         if(b) { // call block
             int fd;
 	    blockcount++;
-            snprintf(meow,499,"/dyna_0x%x.rb",PC);
+            snprintf(meow,499,"/dyna_0x%x_run.rb",PC);
 	    fd=open(meow,O_WRONLY|O_CREAT);
 	    if(fd>=0) {
-	        fdprintf(fd,"Block 0x%x\n",PC);
-		write(fd,b->block,b->length);
+		fdprintf(fd,"Block 0x%x Blockcount: %d\n",PC,blockcount);
 		fdprintf(fd,"before: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
 		cpu.a,cpu.b,cpu.c,cpu.d,cpu.e,cpu.hl,cpu.f,cpu.sp,cpu.pc,
 		cpu.ime);
