@@ -90,6 +90,7 @@ int mas_readmem(int bank, int addr, unsigned long* dest, int len);
 int mas_writemem(int bank, int addr, unsigned long* src, int len);
 int mas_readreg(int reg);
 int mas_writereg(int reg, unsigned int val);
+void mas_reset(void);
 int mas_direct_config_read(unsigned char reg);
 int mas_direct_config_write(unsigned char reg, unsigned int val);
 int mas_codec_writereg(int reg, unsigned int val);

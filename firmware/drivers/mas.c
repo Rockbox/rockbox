@@ -16,9 +16,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "stdbool.h"
+#include "sh7034.h"
 #include "i2c.h"
 #include "debug.h"
 #include "mas.h"
+#include "kernel.h"
+
+extern bool old_recorder;
 
 static int mas_devread(unsigned long *dest, int len);
 
@@ -260,6 +265,28 @@ static int mas_devread(unsigned long *dest, int len)
 }
 
 #ifdef ARCHOS_RECORDER
+
+void mas_reset(void)
+{
+    PAIOR |= 0x100;
+    
+    if(old_recorder)
+    {
+        /* Older recorder models don't invert the POR signal */
+        PADR |= 0x100;
+        sleep(HZ/100);
+        PADR &= ~0x100;
+        sleep(HZ/5);
+    }
+    else
+    {
+        PADR &= ~0x100;
+        sleep(HZ/100);
+        PADR |= 0x100;
+        sleep(HZ/5);
+    }
+}
+
 int mas_direct_config_read(unsigned char reg)
 {
     int ret = 0;
