@@ -165,7 +165,7 @@ int rtc_write(int address, int value)
      return 0;
 }
 
-bool has_new_lcd(void)
+bool is_new_player(void)
 {
     return having_new_lcd;
 }

@@ -496,7 +496,7 @@ void lcd_init (void)
     
     (void)data_vector;
 
-    new_lcd = has_new_lcd();
+    new_lcd = is_new_player();
     memset(extended_chars_mapped, NO_CHAR, sizeof(extended_chars_mapped));
     memset(extended_pattern_content, NO_CHAR,sizeof(extended_pattern_content));
     memset(extended_pattern_usage, 0, sizeof(extended_pattern_usage));

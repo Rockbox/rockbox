@@ -461,7 +461,7 @@ static char* get_tag(struct mp3entry* cid3,
 #endif
                 case 'f':  /* full-line progress bar */
 #ifdef HAVE_LCD_CHARCELLS
-                    if(has_new_lcd()) {
+                    if(is_new_player()) {
                         *flags |= WPS_REFRESH_PLAYER_PROGRESS;
                         *flags |= WPS_REFRESH_DYNAMIC;
                         full_line_progressbar=1;

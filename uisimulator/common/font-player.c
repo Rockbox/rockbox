@@ -541,7 +541,7 @@ unsigned char (*font_player)[256][5]=&font_new_player;
 
 void font_init()
 {
-  if (has_new_lcd())
+  if (is_new_player())
     font_player = &font_new_player;
   else
     font_player = &font_old_player;
