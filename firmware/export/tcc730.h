@@ -71,6 +71,13 @@
 #define P9CON              MMIO(unsigned char,0x56)
 #define P10CON             MMIO(unsigned char,0x57)
 
+#define IISCON0  MMIO(unsigned char, 0x0a0)
+#define IISMODE0 MMIO(unsigned char, 0x0a1)
+#define IISPTR0  MMIO(unsigned char, 0x0a2)
+#define IISCON1  MMIO(unsigned char, 0x0a3)
+#define IISMODE1 MMIO(unsigned char, 0x0a4)
+#define IISPTR1  MMIO(unsigned char, 0x0a5)
+
 #define ADDATA MMIO(unsigned int, 0x74)
 #define ADCON MMIO(unsigned char, 0x76)
 
@@ -78,6 +85,8 @@
 #define PLL0CON MMIO(unsigned char, 0xAA)
 #define PLL1DATA MMIO(unsigned int, 0xAC)
 #define PLL1CON MMIO(unsigned char, 0xAE)
+
+#define IISBUF ((volatile unsigned int*)(IOBASE+(0x0c0)))
 
 #define MIUSCFG MMIO(unsigned char, 0x110)
 #define MIUDCOM MMIO(unsigned char, 0x111)
