@@ -143,7 +143,7 @@ static char *create_filename(void)
 
     /* Create a filename: RYYMMDDHHMMSS.mp3 */
     snprintf(fname, 32, "/R%02d%02d%02d%02d%02d%02d.mp3",
-             tm->tm_year-2000, tm->tm_mon, tm->tm_mday,
+             tm->tm_year%100, tm->tm_mon, tm->tm_mday,
              tm->tm_hour, tm->tm_min, tm->tm_sec);
 
     DEBUGF("Filename: %s\n", fname);

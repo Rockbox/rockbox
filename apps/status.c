@@ -26,7 +26,7 @@
 #include "mpeg.h"
 #include "wps.h"
 #ifdef HAVE_RTC
-#include "rtc.h"
+#include "timefuncs.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -88,7 +88,7 @@ void status_draw(void)
     int battlevel = battery_level();
     int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
 #if defined(HAVE_LCD_BITMAP) && defined(HAVE_RTC)
-    int hour, minute;
+    struct tm* tm;
 #endif
 
     if ( !global_settings.statusbar )
@@ -247,11 +247,8 @@ void status_draw(void)
         if (keys_locked)
             statusbar_icon_lock();
 #ifdef HAVE_RTC
-        hour = rtc_read(3);
-        hour = ((hour & 0x30) >> 4) * 10 + (hour & 0x0f);
-        minute = rtc_read(2);
-        minute = ((minute & 0x70) >> 4) * 10 + (minute & 0x0f);
-        statusbar_time(hour, minute);
+        tm = get_time();
+        statusbar_time(tm->tm_hour, tm->tm_min);
 #endif
 
         lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
