@@ -51,6 +51,35 @@ static bool wormlet(void)
     return false;
 }
 
+static bool flipit(void) 
+{
+    if (plugin_load("/.rockbox/rocks/flipit.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool othelo(void) 
+{
+    if (plugin_load("/.rockbox/rocks/othelo.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool sliding_puzzle(void) 
+{
+    if (plugin_load("/.rockbox/rocks/sliding_puzzle.rock",
+                    NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
+static bool star(void) 
+{
+    if (plugin_load("/.rockbox/rocks/star.rock",NULL)==PLUGIN_USB_CONNECTED)
+        return true;
+    return false;
+}
+
 bool games_menu(void)
 {
     int m;
@@ -60,6 +89,10 @@ bool games_menu(void)
         { str(LANG_TETRIS),  tetris  },
         { str(LANG_SOKOBAN), sokoban },
         { str(LANG_WORMLET), wormlet },
+        { str(LANG_FLIPIT),  flipit  },
+        { str(LANG_OTHELO), othelo },
+        { str(LANG_SLIDING_PUZZLE), sliding_puzzle },
+        { str(LANG_STAR), star },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );

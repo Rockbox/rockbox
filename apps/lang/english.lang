@@ -1612,3 +1612,23 @@ id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 new:
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new:
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new:
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new:
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new:
