@@ -431,18 +431,6 @@ static int getid3v2len(int fd)
     return offset;
 }
 
-static int getfilesize(int fd)
-{
-    int size;
-    
-    /* seek to the end of it */
-    size = lseek(fd, 0, SEEK_END);
-    if(-1 == size)
-        return 0; /* unknown */
-
-    return size;
-}
-
 /*
  * Calculates the length (in milliseconds) of an MP3 file.
  *
@@ -529,7 +517,7 @@ bool mp3info(struct mp3entry *entry, char *filename)
     strncpy(entry->path, filename, sizeof(entry->path));
  
     entry->title = NULL;
-    entry->filesize = getfilesize(fd);
+    entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
     entry->genre = 0xff;
