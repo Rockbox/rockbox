@@ -67,6 +67,7 @@ simul () {
 sed > Makefile \
  -e "s,@SIMDIR@,${simdir},g" \
  -e "s,@TARGET@,${target},g" \
+ -e "s,@ARCHOS@,${archos},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@DISPLAY@,${display},g" \
  -e "s,@KEYPAD@,${keypad},g" \
@@ -77,6 +78,7 @@ sed > Makefile \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
+ARCHOS=@ARCHOS@
 SIMDIR=@SIMDIR@
 DEBUG=@DEBUG@
 TARGET=@TARGET@
@@ -191,6 +193,7 @@ if [ "$target" = "update" ]; then
   if [ -f Makefile ]; then
     if { grep "^## Auto" Makefile >/dev/null 2>&1 ; } then
       echo "Existing generated Makefile found. Getting defaults from it."
+      archos=`grep "^ARCHOS=" Makefile | cut -d= -f2-`
       target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
@@ -212,7 +215,7 @@ echo ""
 
 fi
 
-if [ -z "$target" ]; then
+if [ -z "$archos" ]; then
 
 ##################################################################
 # Figure out target platform
@@ -222,18 +225,28 @@ if [ -z "$target" ]; then
 
   echo "1 - Archos Player/Studio"
   echo "2 - Archos Recorder"
+  echo "3 - Archos FM Recorder"
 
   getit=`input`;
 
   case $getit in
 
    1)
+    archos="player"
     target="-DARCHOS_PLAYER"
     display="-DHAVE_LCD_CHARCELLS"
     keypad="-DHAVE_PLAYER_KEYPAD"
     ;;
 
-   *|2)
+   3)
+    archos="fmrecorder"
+    target="-DARCHOS_FMRECORDER"
+    display="-DHAVE_LCD_BITMAP"
+    keypad="-DHAVE_RECORDER_KEYPAD"
+    ;;
+
+   *)
+    archos="recorder"
     target="-DARCHOS_RECORDER"
     display="-DHAVE_LCD_BITMAP"
     keypad="-DHAVE_RECORDER_KEYPAD"
@@ -243,7 +256,7 @@ if [ -z "$target" ]; then
 fi
 
 if [ -z "$extra_defines" ]; then
-    if [  "-DARCHOS_RECORDER" = "$target" ] ; then
+    if [  "player" != "$archos" ] ; then
         disable_demos="-DDISABLE_NOTHING"
         disable_games=""
 
@@ -353,6 +366,7 @@ sed > Makefile \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@TARGET@,${target},g" \
+ -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
  -e "s,@PWD@,${pwd},g" \
@@ -362,6 +376,7 @@ sed > Makefile \
 FIRMDIR=@FIRMDIR@
 APPSDIR=@APPSDIR@
 DEBUG=@DEBUG@
+ARCHOS=@ARCHOS@
 TARGET=@TARGET@
 THISDIR="@PWD@"
 LANGUAGE=@LANGUAGE@
@@ -399,17 +414,3 @@ tags:
 EOF
 
 echo "Created Makefile"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
