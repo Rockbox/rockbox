@@ -546,10 +546,17 @@ static void *cache_fat_sector(int fatsector)
 
 static unsigned int find_free_cluster(unsigned int startcluster)
 {
-    unsigned int sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
-    unsigned int offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
+    unsigned int sector;
+    unsigned int offset;
     unsigned int i;
 
+    /* Cluster 0 and 1 are reserved */
+    if(startcluster < 2)
+        startcluster = 2;
+    
+    sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
+    offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
+    
     for (i = 0; i<fat_bpb.fatsize; i++) {
         unsigned int j;
         unsigned int nr = (i + sector) % fat_bpb.fatsize;
