@@ -133,8 +133,6 @@ int main (int argc, char** argv)
             irivernum = 0;
         else if(!strcmp(&argv[1][5], "h140"))
             irivernum = 0; /* the same as the h120 */
-        else if(!strcmp(&argv[1][5], "h140"))
-            irivernum = 0; /* the same as the h120 */
         else if(!strcmp(&argv[1][5], "h100"))
             irivernum = 1;
         else if(!strcmp(&argv[1][5], "h300"))
