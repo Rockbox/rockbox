@@ -27,8 +27,6 @@ AFLAGS += -small -relax
 SRC := $(wildcard *.c)
 OBJS := $(SRC:%.c=%.o)
 
-OBJS := button.o chartables.o lcd.o led.o serial.o system.o ata.o kernel.o
-
 %.o: %.s
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
 
