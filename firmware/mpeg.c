@@ -3131,7 +3131,10 @@ static void mpeg_thread(void)
         if (is_playing) {
             id3 = mpeg_current_track();
             if (!paused)
+            {
                 id3->elapsed+=1000;
+                id3->offset+=1000;
+            }
             if (id3->elapsed>=id3->length)
                 mpeg_next();
         }
