@@ -420,7 +420,7 @@ struct icon_info
     int row;
 };
 
-#define ICON_VOLUME_POS 230
+#define ICON_VOLUME_POS 224
 #define ICON_VOLUME_SIZE 20
 #define ICON_VOLUME_X_SIZE 2
 

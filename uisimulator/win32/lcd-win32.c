@@ -21,6 +21,7 @@
 #include <process.h>
 #include "uisw32.h"
 #include "lcd.h"
+#include "lcd-playersim.h"
 
 unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; /* the display */
 char bitmap[LCD_HEIGHT][LCD_WIDTH]; /* the ui display */
@@ -32,12 +33,20 @@ BITMAPINFO2 bmi =
    BI_RGB, 0, 0, 0, 2, 2,
   },
   {
-    {UI_LCD_BGCOLOR, 0}, /* green background color */
+    //{UI_LCD_BGCOLOR, 0}, /* green background color */
+    {UI_LCD_BGCOLORLIGHT, 0}, /* green background color */
     {UI_LCD_BLACK, 0}    /* black color */
   }
   
 }; /* bitmap information */
 
+#ifdef HAVE_LCD_CHARCELLS
+/* Defined in lcd-playersim.c */
+extern void lcd_print_char(int x, int y);
+extern bool lcd_display_redraw;
+extern unsigned char hardware_buffer_lcd[11][2];
+static unsigned char lcd_buffer_copy[11][2];
+#endif 
 
 void lcd_set_invert_display(bool invert)
 {
@@ -52,6 +61,23 @@ void lcd_update()
     if (hGUIWnd == NULL)
         _endthread ();
 
+#ifdef HAVE_LCD_CHARCELLS
+    for (y = 0; y < 2; y++)
+    {
+        for (x = 0; x < 11; x++)
+        {
+            if (lcd_display_redraw ||
+                lcd_buffer_copy[x][y] != hardware_buffer_lcd[x][y])
+            {
+                lcd_buffer_copy[x][y] = hardware_buffer_lcd[x][y];
+                lcd_print_char(x, y);
+            }
+        }
+    }
+
+    lcd_display_redraw = false;
+#endif
+
     for (x = 0; x < LCD_WIDTH; x++)
         for (y = 0; y < LCD_HEIGHT; y++)
             bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
@@ -59,7 +85,7 @@ void lcd_update()
     InvalidateRect (hGUIWnd, NULL, FALSE);
 
     /* natural sleep :) Bagder: why is this here? */
-    Sleep (50);
+    //Sleep (50);
 }
 
 void lcd_update_rect(int x_start, int y_start,
@@ -105,4 +131,45 @@ void lcd_backlight (bool on)
     }
 
     InvalidateRect (hGUIWnd, NULL, FALSE);
+}
+
+void drawdots(int color, struct coordinate *points, int count)
+{
+    while (count--)
+    {
+        if (color)
+        {
+            DRAW_PIXEL(points[count].x, points[count].y);
+        }
+        else
+        {
+            CLEAR_PIXEL(points[count].x, points[count].y);
+        }
+    }
+}
+
+void drawrectangles(int color, struct rectangle *points, int count)
+{
+    while (count--)
+    {
+        int x;
+        int y;
+        int ix;
+        int iy;
+
+        for (x = points[count].x, ix = 0; ix < points[count].width; x++, ix++)
+        {
+            for (y = points[count].y, iy = 0; iy < points[count].width; y++, iy++)
+            {
+                if (color)
+                {
+                    DRAW_PIXEL(x, y);
+                }
+                else
+                {
+                    CLEAR_PIXEL(x, y);
+                }
+            }
+        }
+    }
 }

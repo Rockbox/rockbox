@@ -20,119 +20,180 @@
 #include <windows.h>
 #include "uisw32.h"
 #include "config.h"
-#include "sh7034.h"
 #include "button.h"
 #include "kernel.h"
+#include "backlight.h"
 
-#define KEY(k)      (HIBYTE(GetKeyState (k)) & 1)
+/* how long until repeat kicks in */
+#define REPEAT_START      6
 
-int last_key ;
-static int release_mask;
-static int repeat_mask;
+/* the speed repeat starts at */
+#define REPEAT_INTERVAL_START   4
 
+/* speed repeat finishes at */
+#define REPEAT_INTERVAL_FINISH  2
 
-void button_init(void) 
-{ 
-	last_key = 0 ;
-}
+long last_keypress;
+struct event_queue button_queue;
 
-int button_set_repeat(int newmask)
+void button_event(int key, bool pressed)
 {
-    int oldmask = repeat_mask;
-    repeat_mask = newmask;
-    return oldmask;
-}
+    bool post = false;
+    int new_btn = 0;
+    int diff = 0;
+    static int count = 0;
+    static int btn = 0;     /* Hopefully keeps track of currently pressed keys... */
+    static int lastbtn;
+    static int repeat_speed = REPEAT_INTERVAL_START;
+    static int repeat_count = 0;
+    static bool repeat = false;
 
-int button_set_release(int newmask)
-{
-    int oldmask = release_mask;
-    release_mask = newmask;
-    return oldmask;
-}
-
-static int real_button_get(void)
-{
-    int btn = 0;
-    Sleep (25);
-
-    if (bActive)
+    switch (key)
     {
-        if (KEY (VK_NUMPAD4) ||
-            KEY (VK_LEFT)) // left button
-            btn |= BUTTON_LEFT;
+    case VK_NUMPAD4:
+    case VK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case VK_NUMPAD6:
+    case VK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case VK_NUMPAD8:
+    case VK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case VK_NUMPAD2:
+    case VK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case VK_ADD:
+        new_btn = BUTTON_ON;
+        break;
 
-        if (KEY (VK_NUMPAD6) ||
-            KEY (VK_RIGHT))
-            btn |= BUTTON_RIGHT; // right button
-
-        if (KEY (VK_NUMPAD8) ||
-            KEY (VK_UP))
-            btn |= BUTTON_UP; // up button
-
-        if (KEY (VK_NUMPAD2) ||
-            KEY (VK_DOWN))
-            btn |= BUTTON_DOWN; // down button
-
-        if (KEY (VK_ADD))
-            btn |= BUTTON_ON; // on button
-      
 #ifdef HAVE_RECORDER_KEYPAD
-        if (KEY (VK_RETURN))
-            btn |= BUTTON_OFF; // off button
-        
-        if (KEY (VK_DIVIDE) || KEY(VK_F1))
-            btn |= BUTTON_F1; // F1 button
-      
-        if (KEY (VK_MULTIPLY) || KEY(VK_F2))
-            btn |= BUTTON_F2; // F2 button
-
-        if (KEY (VK_SUBTRACT) || KEY(VK_F3))
-            btn |= BUTTON_F3; // F3 button
-      
-        if (KEY (VK_NUMPAD5) ||
-            KEY (VK_SPACE))
-            btn |= BUTTON_PLAY; // play button
+    case VK_RETURN:
+        new_btn = BUTTON_OFF;
+        break;
+    case VK_DIVIDE:
+    case VK_F1:
+        new_btn = BUTTON_F1;
+        break;
+    case VK_MULTIPLY:
+    case VK_F2:
+        new_btn = BUTTON_F2;
+        break;
+    case VK_SUBTRACT:
+    case VK_F3:
+        new_btn = BUTTON_F3;
+        break;
+    case VK_NUMPAD5:
+    case VK_SPACE:
+        new_btn = BUTTON_PLAY;
+        break;
 #else
-        if (KEY (VK_RETURN))
-            btn |= BUTTON_MENU; // menu button
+    case VK_RETURN:
+        new_btn = BUTTON_MENU;
+        break;
 #endif
-
-        if (btn != 0) {
-            last_key = 0 ;
-        }
     }
 
-    return btn;	
+    if (pressed)
+        btn |= new_btn;
+    else
+        btn &= !new_btn;
+
+    /* Lots of stuff copied from real button.c. Not good, I think... */
+
+    /* Find out if a key has been released */
+    diff = btn ^ lastbtn;
+
+    if(diff && (btn & diff) == 0)
+    {
+        queue_post(&button_queue, BUTTON_REL | diff, NULL);
+    }
+
+    if ( btn )
+    {
+        /* normal keypress */
+        if ( btn != lastbtn )
+        {
+            post = true;
+            repeat = false;
+            repeat_speed = REPEAT_INTERVAL_START;
+
+        }
+        else /* repeat? */
+        {
+            if ( repeat )
+            {
+                count--;
+                if (count == 0)
+                {
+                    post = true;
+                    /* yes we have repeat */
+                    repeat_speed--;
+                    if (repeat_speed < REPEAT_INTERVAL_FINISH)
+                       repeat_speed = REPEAT_INTERVAL_FINISH;
+                    count = repeat_speed;
+
+                    repeat_count++;
+                }
+            }
+            else
+            {
+                if (count++ > REPEAT_START)
+                {
+                    post = true;
+                    repeat = true;
+                    repeat_count = 0;
+                    /* initial repeat */
+                    count = REPEAT_INTERVAL_START;
+                }
+            }
+        }
+
+        if ( post )
+        {
+            if(repeat)
+                queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+            else
+                queue_post(&button_queue, btn, NULL);
+
+            backlight_on();
+
+            last_keypress = current_tick;
+        }
+        }
+    else
+    {
+        repeat = false;
+        count = 0;
+    }
+
+    lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
+
+void button_init(void)
+{
+	last_keypress = 0;
+}
+
+/* Again copied from real button.c... */
 
 int button_get(bool block)
 {
-    int btn;
-    do {
+    struct event ev;
 
-        btn = real_button_get();
-
-        if (btn)
-            break;
-        
-    } while (block);
-
-    return btn;
+    if ( block || !queue_empty(&button_queue) ) {
+        queue_wait(&button_queue, &ev);
+        return ev.id;
+    }
+    return BUTTON_NONE;
 }
 
 int button_get_w_tmo(int ticks)
 {
-    int btn;
-    do {
-        btn = real_button_get();
-
-        if(!btn)
-            /* prevent busy-looping */
-            sleep(10); /* one tick! */
-        else
-            return btn;
-        
-    } while (--ticks);
-
-    return btn;
-}
+    struct event ev;
+    queue_wait_w_tmo(&button_queue, &ev, ticks);
+    return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
+} 

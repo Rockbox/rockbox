@@ -34,6 +34,8 @@
 extern void                 app_main (void *); // mod entry point
 extern void					new_key(int key);
 
+void button_event(int key, bool pressed);
+
 // variables
 HWND                                hGUIWnd; // the GUI window handle
 unsigned int                        uThreadID; // id of mod thread
@@ -172,7 +174,7 @@ LRESULT GUIWndProc (
             RECT r;
 
             GetClientRect (hWnd, &r);
-            // blit to screen
+            // blit background image to screen
             StretchBlt (hDc, 0, 0, r.right, r.bottom,
                 hMemDc, 0, 0, UI_WIDTH, UI_HEIGHT, SRCCOPY);
             EndPaint (hWnd, &ps);
@@ -187,8 +189,10 @@ LRESULT GUIWndProc (
             GetClientRect (hWnd, &r);
             // draw lcd screen
 			StretchDIBits (hDc,
-                UI_LCD_POSX * r.right / UI_WIDTH, UI_LCD_POSY * r.bottom / UI_HEIGHT,
-                LCD_WIDTH * r.right / UI_WIDTH, LCD_HEIGHT * r.bottom / UI_HEIGHT,
+                UI_LCD_POSX * r.right / UI_WIDTH,
+                UI_LCD_POSY * r.bottom / UI_HEIGHT,
+                UI_LCD_WIDTH * r.right / UI_WIDTH, 
+                UI_LCD_HEIGHT * r.bottom / UI_HEIGHT,
 				0, 0, LCD_WIDTH, LCD_HEIGHT,
 				bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS, SRCCOPY);
 
@@ -205,6 +209,12 @@ LRESULT GUIWndProc (
         // close simulator
         hGUIWnd = NULL;
         PostQuitMessage (0);
+        break;
+    case WM_KEYDOWN:
+        button_event(wParam, true);
+        break;
+    case WM_KEYUP:
+        button_event(wParam, false);
         break;
     }
 

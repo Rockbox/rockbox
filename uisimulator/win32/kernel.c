@@ -56,6 +56,25 @@ void queue_wait(struct event_queue *q, struct event *ev)
     *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
 }
 
+void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
+{
+    unsigned int timeout = current_tick + ticks;
+
+    while(q->read == q->write && TIME_BEFORE( current_tick, timeout ))
+    {
+        sleep(1);
+    }
+
+    if(q->read != q->write)
+    {
+        *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
+    }
+    else
+    {
+        ev->id = SYS_TIMEOUT;
+    }
+}
+
 void queue_post(struct event_queue *q, int id, void *data)
 {
     int wr;
