@@ -60,7 +60,7 @@ while(<ENG>) {
     }
     # get rid of DOS newlines
     $_ =~ s/\r//g;
-    if($_ =~ / *([a-z]+): *(.*)/) {
+    if($_ =~ /^ *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
         $set{$var} = $value;
 
@@ -75,13 +75,13 @@ while(<ENG>) {
 close(ENG);
 
 while(<LANG>) {
-    if($_ =~ / *\#/) {
+    if($_ =~ /^ *\#/) {
         # comment
         next;
     }
     # get rid of DOS newlines
     $_ =~ s/\r//g;
-    if($_ =~ / *([a-z]+): *(.*)/) {
+    if($_ =~ /^ *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
   #      print "$var => $value\n";
 

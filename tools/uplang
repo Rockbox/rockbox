@@ -11,12 +11,12 @@ MOO
 my %ids;
 open(ENG, "<$ARGV[0]");
 while(<ENG>) {
-    if($_ =~ / *\#/) {
+    if($_ =~ /^ *\#/) {
         # comment
         next;
     }
     $_ =~ s/\r//g;
-    if($_ =~ / *([a-z]+): *(.*)/) {
+    if($_ =~ /^ *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
   #      print "$var => $value\n";
 
@@ -37,13 +37,13 @@ close(ENG);
 undef %set;
 open(NEW, "<$ARGV[1]");
 while(<NEW>) {
-    if($_ =~ / *\#/) {
+    if($_ =~ /^ *\#/) {
         # comment
         next;
     }
     $_ =~ s/\r//g;
 
-    if($_ =~ / *([a-z]+): *(.*)/) {
+    if($_ =~ /^ *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
 
         $set{$var} = $value;
