@@ -301,7 +301,9 @@ new: "Mode de tri"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll Speed"
+### English phrase was changed! Previous translation was made on:
+### "Scroll Speed"
+eng: "Scroll"
 new: "Vitesse de défilement"
 
 id: LANG_RESET
@@ -1143,3 +1145,53 @@ id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep timer"
 new: "minuterie d'arrêt auto"
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+new: "Capacité Batterie"
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+new: "niveau max de charge"
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+new: "Batterie: Chrg persistante"
+
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+new: "limite de défilement bidirectionnel"
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-skip buffer"
+new: "Mémoire Anti-choc"
+
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+new: "delai de debut de défilement"
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+new: "Vitesse de défilement"
+
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+new: "taille du pas de défilement"
+
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
+new: "Exemple de defilement pour tester le pas"
+
+id: LANG_TRICKLE_CHARGE
+desc: in settings_menu
+eng: "Trickle Charge"
+new: "Charge Max Persistante"
