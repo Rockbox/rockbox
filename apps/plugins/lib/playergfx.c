@@ -29,9 +29,15 @@ static struct plugin_api *pgfx_rb = NULL; /* global api struct pointer */
 static int char_width;
 static int char_height;
 static int pixel_height;
+static int pixel_width;
 static unsigned char gfx_chars[8];
 static unsigned char gfx_buffer[56];
 
+/* Private function declarations */
+static void linefunc(int x1, int y1, int x2, int y2,
+                     void (*pixelfunc)(int x, int y));
+
+/* Implementation */
 
 bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight)
 {
@@ -44,7 +50,8 @@ bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight)
     char_width = cwidth;
     char_height = cheight;
     pixel_height = 7 * char_height;
-    
+    pixel_width = 5 * char_width;
+
     for (i = 0; i < cwidth * cheight; i++)
     {
         if ((gfx_chars[i] = pgfx_rb->lcd_get_locked_pattern()) == 0)
@@ -69,14 +76,18 @@ void pgfx_release(void)
 void pgfx_display(int cx, int cy)
 {
     int i, j;
-    
-    for (i = 0; i < char_width * char_height; i++)
-        pgfx_rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
-        
 
     for (i = 0; i < char_width; i++)
         for (j = 0; j < char_height; j++)
             pgfx_rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
+}
+
+void pgfx_update(void)
+{
+    int i;
+
+    for (i = 0; i < char_width * char_height; i++)
+        pgfx_rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
 }
 
 void pgfx_clear_display(void)
@@ -89,7 +100,13 @@ void pgfx_drawpixel(int x, int y)
     gfx_buffer[pixel_height * (x/5) + y] |= 0x10 >> (x%5);
 }
 
-void pgfx_drawline(int x1, int y1, int x2, int y2)
+void pgfx_invertpixel(int x, int y)
+{
+    gfx_buffer[pixel_height * (x/5) + y] ^= 0x10 >> (x%5);
+}
+
+static void linefunc(int x1, int y1, int x2, int y2,
+                     void (*pixelfunc)(int x, int y))
 {
     int numpixels;
     int i;
@@ -140,7 +157,7 @@ void pgfx_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        pgfx_drawpixel(x, y);
+        pixelfunc(x, y);
 
         if (d < 0)
         {
@@ -155,6 +172,35 @@ void pgfx_drawline(int x1, int y1, int x2, int y2)
             y += yinc2;
         }
     }
+}
+
+void pgfx_drawline(int x1, int y1, int x2, int y2)
+{
+    linefunc(x1, y1, x2, y2, pgfx_drawpixel);
+}
+
+void pgfx_invertline(int x1, int y1, int x2, int y2)
+{
+    linefunc(x1, y1, x2, y2, pgfx_invertpixel);
+}
+
+void pgfx_invertrect (int x, int y, int nx, int ny)
+{
+    int i, j;
+
+    if (x > pixel_width)
+        return;
+    if (y > pixel_height)
+        return;
+
+    if (x + nx > pixel_width)
+        nx = pixel_width - x;
+    if (y + ny > pixel_height)
+        ny = pixel_height - y;
+
+    for (i = 0; i < nx; i++)
+        for (j = 0; j < ny; j++)
+            pgfx_invertpixel(x + i, y + j);
 }
 
 #endif /* HAVE_LCD_CHARCELLS */
