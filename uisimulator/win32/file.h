@@ -19,9 +19,6 @@
 
 #ifndef _FILE_H_
 
-#include <stdio.h>
-#include <string.h>
-
 int win32_rename(char *oldpath, char *newpath);
 int win32_filesize(int fd);
 

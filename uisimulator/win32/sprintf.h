@@ -29,4 +29,7 @@ int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
 char *strtok_r (char *, const char *, char **);
 #endif
 
+int rockbox_fprintf (int fd, const char *fmt, ...);
+#define fprintf rockbox_fprintf
+
 #endif /* __SPRINTF_H__ */
