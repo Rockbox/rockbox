@@ -37,6 +37,7 @@ bool statusbar_enabled = true;
 long switch_tick;
 bool plug_state;
 bool battery_state;
+int  battery_charge_step = 0;
 #endif
 
 void status_init(void)
@@ -135,18 +136,21 @@ void status_draw(void)
 #ifdef HAVE_CHARGE_CTRL
         if(charger_inserted()) {
             battery_state = true;
-            if(!charger_enabled)
-                plug_state = true;
-            else if(TIME_AFTER(current_tick, switch_tick)) {
-                plug_state = !plug_state;
-                switch_tick = current_tick + HZ;
+            plug_state = true;
+            if(charger_enabled) { /* animate battery if charging */
+                battlevel = battery_charge_step * 34; /* 34 for a better look */
+                battlevel = battlevel > 100 ? 100 : battlevel;
+                if(TIME_AFTER(current_tick, switch_tick)) {
+                    battery_charge_step=(battery_charge_step+1)%4;
+                    switch_tick = current_tick + HZ;
+                }
             }
         }
         else {
             plug_state=false;
             if(battery_level_safe())
                 battery_state = true;
-            else
+            else /* blink battery if level is low */
                 if(TIME_AFTER(current_tick, switch_tick)) {
                     switch_tick = current_tick+HZ;
                     battery_state =! battery_state;
