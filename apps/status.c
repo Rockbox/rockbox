@@ -160,7 +160,7 @@ void status_draw(bool force_redraw)
     info.repeat = global_settings.repeat_mode;
     info.playmode = current_playmode();
 #ifndef HAVE_LED
-	info.led = led_read();
+    info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
 
     /* only redraw if forced to, or info has changed */
@@ -241,8 +241,8 @@ void status_draw(bool force_redraw)
         statusbar_time(info.hour, info.minute);
 #endif
 #ifndef HAVE_LED
-		if (info.led)
-			statusbar_led();
+        if (info.led)
+            statusbar_led();
 #endif
         lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
         lastinfo = info;

@@ -25,7 +25,7 @@
 extern void led( bool on );
 extern void invert_led( bool on );
 #ifndef HAVE_LED
-extern bool led_read(void); /* read for status bar */
+extern bool led_read(int delayticks); /* read for status bar */
 #endif
 
 #endif

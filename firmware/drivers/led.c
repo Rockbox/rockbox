@@ -63,14 +63,14 @@ void invert_led(bool on)
 
 #else /* no LED, just status update */
 
-static long delay; 
+static long last_on; /* timestamp of switching off */
 
 void led(bool on)
 {
-	if (current && !on) /* switching off */
-	{
-		delay = current_tick + HZ/2; /* delay the "off" status a bit */
-	}
+    if (current && !on) /* switching off */
+    {
+        last_on = current_tick; /* remember for off delay */
+    }
     current = on;
 }
 
@@ -79,9 +79,10 @@ void invert_led(bool on)
     (void)on; /* no invert feature */
 }
 
-bool led_read(void) /* read by status bar update */
+bool led_read(int delayticks) /* read by status bar update */
 {
-	return (current || TIME_BEFORE(current_tick, delay));
+    /* reading "off" is delayed by user-supplied monoflop value */
+    return (current || TIME_BEFORE(current_tick, last_on+delayticks));
 }
 
 #endif // #ifdef HAVE_LED
