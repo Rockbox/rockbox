@@ -34,9 +34,11 @@ static DIR opendirs[MAX_OPEN_DIRS];
 /* how to name volumes, first char must be outside of legal file names,
    a number gets appended to enumerate, if applicable */
 #ifdef HAVE_MMC
-static const char* vol_names = ":MMC";
+static const char* vol_names = "<MMC%d>";
+#define VOL_ENUM_POS 4 /* position of %d, to avoid runtime calculation */
 #else
-static const char* vol_names = ":HD";
+static const char* vol_names = "<HD%d>";
+#define VOL_ENUM_POS 3
 #endif
 
 /* returns on which volume this is, and copies the reduced name
@@ -45,10 +47,10 @@ static int strip_volume(const char* name, char* namecopy)
 {
     int volume = 0;
 
-    if (name[1] == vol_names[0] ) /* a colon identifies our volumes */
+    if (name[1] == vol_names[0] ) /* a '<' quickly identifies our volumes */
     {
         const char* temp;
-        temp = name + 1 + strlen(vol_names); /* behind special name */
+        temp = name + 1 + VOL_ENUM_POS; /* behind '/' and special name */
         volume = atoi(temp); /* number is following */
         temp = strchr(temp, '/'); /* search for slash behind */
         if (temp != NULL)
@@ -167,7 +169,7 @@ struct dirent* readdir(DIR* dir)
                 memset(theent, 0, sizeof(*theent));
                 theent->attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
                 snprintf(theent->d_name, sizeof(theent->d_name), 
-                         "%s%d", vol_names, dir->volumecounter);
+                         vol_names, dir->volumecounter);
                 return theent;
             }
         }
