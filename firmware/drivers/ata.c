@@ -311,7 +311,7 @@ static void ata_thread(void)
         switch ( ev.id ) {
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
-                DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+                DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
                 /* Wait until the USB cable is extracted again */
