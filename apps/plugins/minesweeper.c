@@ -234,6 +234,7 @@ void minesweeper_init(void){
 void minesweeper_putmines(int p, int x, int y){
     int i,j;
 
+    mine_num = 0;
     for(i=0;i<height;i++){
         for(j=0;j<width;j++){
             if(rb->rand()%100<p && !(y==i && x==j)){
@@ -470,26 +471,33 @@ int minesweeper(void)
 /* plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    bool exit = false;
     /* plugin init */
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     /* end of plugin init */
 
-    switch(minesweeper()){
-         case MINESWEEPER_WIN:
-             rb->splash(HZ*2, true, "You Win :)");
-             break;
-
-        case MINESWEEPER_LOSE:
-             rb->splash(HZ*2, true, "You Lost :(");
-             break;
-             
-        case MINESWEEPER_USB:
-             return PLUGIN_USB_CONNECTED;
-
-        default:
-            break;
+    while(!exit) {
+        switch(minesweeper()){
+            case MINESWEEPER_WIN:
+                rb->splash(HZ*2, true, "You Win :)");
+                break;
+                
+            case MINESWEEPER_LOSE:
+                rb->splash(HZ*2, true, "You Lost :(");
+                break;
+                
+            case MINESWEEPER_USB:
+                return PLUGIN_USB_CONNECTED;
+                
+            case MINESWEEPER_QUIT:
+                exit = true;
+                break;
+                
+            default:
+                break;
+        }
     }
 
     return PLUGIN_OK;
