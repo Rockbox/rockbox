@@ -70,11 +70,22 @@ A7: For the stock 1500 mAh cells, from 6 hours to 8 hours, depending on
     the batteries. We are looking into implementing more battery-saving
     techniques in rockbox to make it rock longer.
 
-Q8: Can I use different batteries in my Archos?
+Q8: Can I use different batteries in my Archos? How much playtime would
+    I gain by using 1800 mAh batteries instead of the 1500 mAh ones?
 A8: Only use NiMH-type rechargeable batteries. It is considered to be safe
     to use NiMH batteries of different capacities though, a lot of people
     have purchaced 1700 or 1800 mAh batteries to replace the stock 1500 mAh
-    cells and have the device run a bit longer.
+    cells and have the device run a bit longer. 2000 mAh batteries are
+    just appearing in shops are equally good to use.
+    
+    In theory, running time = capacity of batteries / current drawn by device,
+    so running time should increase linearly by the capacity, and 2000 mAh
+    over 1500 mAh should give 33% longer running time. In practice, the
+    mAh ratings are more or less tuned up by the marketing department
+    (think of watts on the back of "hi-fi" speakers and amplifiers) and
+    what you actually get out of the cells is something else than what is
+    printed on them. Check the excellent imaging-resource link above for
+    details!
 
 Q9: Can I use non-chargeable batteries in my Archos?
 A9: This is not recommended. The unit has been designed to operate with
@@ -86,23 +97,32 @@ A9: This is not recommended. The unit has been designed to operate with
     and the unit.
 
 Q10: Can I use a different charger?
-A10: People have successfully used different chargers with similar
-     specifications as the stock charger. The charger must have the
-     same kind of connector with same polarity (center positive/+).
+A10: The short answer is: Using a different charger will void your warranty
+     and can be dangerous to your unit, so we can not recommend it.
+     
+     On the other hand, people have successfully used different chargers
+     with similar specifications as the stock charger. The charger must
+     have the same kind of connector with same polarity (center positive/+).
      The charger should supply at least 7-8 volts, and if it provides
-     more than 9V, it probably should be current limited (do not
+     more than 10V, it probably should be regulated to 9V (do not
      directly plug it in your 12V car battery or it's charger!).
      The universal travel charger sold by Archos is specified at
      12V, 1.2A so that's probably the maximum rating you should use.
+     A good circuit for powering from a car battery or other source
+     with a higher voltage would be a 600 mA fuse and a 9V regulator like
+     a 7809 of your favourite manufacturer in series.
      
      Using lower charging voltage will slow down the charging, and using
      higher voltage will cause a higher charging current, more heat,
      and too much heat and current can damage the batteries or the unit.
-     Using a different charger will void your warranty and can be
-     dangerous to your unit, so we can not recommend it.
+     Inside the Jukebox there is a regulator which limits the charging
+     voltage applied to the batteries (which in turn limits the current
+     - the usual ohm's law applies: current = voltage / resistance) but
+     if a high input voltage is applied, the regulator will heat up a lot!
      
      Many people are happy using an external quick charger which
-     is specified to work with NiMH batteries.
+     is specified to work with NiMH batteries. This is completely safe
+     and will not void your warranty.
 
 Q11: Can I buy a replacement charger exactly as the one Archos shipped?
 A11: The FAQ on the Archos web site and the top of the charger both read:
@@ -152,3 +172,12 @@ A14: When Rockbox is running on the Recorder (the device has been booted
      If the battery is not full, it will start charging. If the 'deep
      discharge' mode is enabled in the settings menu, it will start charging
      only when the battery is almost empty.
+
+Q15: What about the memory effect? Should I be worried about it or not?
+A15: That depends on who you ask. ;-) NiMH sellers say NiMHs are better and
+     do not have a memory effect, but the usual opinion seems to be that
+     they do, although it is very small.
+     
+     However, if you use your AJB connected to the charger all the time,
+     we recommend you to use the deep discharge option.
+
