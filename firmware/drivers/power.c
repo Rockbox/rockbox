@@ -16,9 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "sh7034.h"
-#include <stdbool.h>
 #include "config.h"
+#include "cpu.h"
+#include <stdbool.h>
 #include "adc.h"
 #include "kernel.h"
 #include "system.h"
@@ -36,6 +36,9 @@ static int fmstatus = 0;
 
 void radio_set_status(int status)
 {
+#ifdef IRIVER_H100
+    fmstatus = status;
+#else
     fmstatus = status;
 #ifdef HAVE_TUNER_PWR_CTRL
     if (status)
@@ -45,6 +48,7 @@ void radio_set_status(int status)
     }
     else
         or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
+#endif
 #endif
 }
 
@@ -59,6 +63,15 @@ int radio_get_status(void)
 
 void power_init(void)
 {
+#ifdef IRIVER_H100
+    GPIO1_OUT |= 0x00080000;
+    GPIO1_ENABLE |= 0x00080000;
+    GPIO1_FUNCTION |= 0x00080000;
+
+    GPIO_OUT |= 0x80000000;
+    GPIO_ENABLE |= 0x80000000;
+    GPIO_FUNCTION |= 0x80000000;
+#else
 #ifdef HAVE_CHARGE_CTRL
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
@@ -68,10 +81,14 @@ void power_init(void)
     or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
     or_b(0x04, &PAIORL); /* output for PA2 */
 #endif
+#endif
 }
 
 bool charger_inserted(void)
 {     
+#ifdef IRIVER_H100
+    return (GPIO1_READ & 0x00400000)?true:false;
+#else
 #ifdef HAVE_CHARGING
 #ifdef HAVE_CHARGE_CTRL
     /* Recorder */
@@ -90,6 +107,7 @@ bool charger_inserted(void)
     /* Ondio */
     return false;
 #endif /* HAVE_CHARGING */
+#endif
 }
 
 void charger_enable(bool on)
@@ -113,8 +131,14 @@ void charger_enable(bool on)
 void ide_power_enable(bool on)
 {
     (void)on;
-    bool touched = false;
 
+#ifdef IRIVER_H100
+    if(on)
+        GPIO_OUT &= ~0x80000000;
+    else
+        GPIO_OUT |= 0x80000000;
+#else
+    bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
     if(on)
     {
@@ -150,12 +174,16 @@ void ide_power_enable(bool on)
         PACR2 &= 0xFBFF; /* GPIO for PA5 */
 #endif
     }
+#endif
 }
 #endif /* !HAVE_MMC */
 
 
 bool ide_powered(void)
 {
+#ifdef IRIVER_H100
+    return (GPIO_OUT & 0x80000000)?true:false;
+#else
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
     /* This is not correct for very old players, since these are unable to
@@ -174,12 +202,16 @@ bool ide_powered(void)
 #else
     return true; /* pretend always powered if not controlable */
 #endif
+#endif
 }
 
 
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
+#ifdef IRIVER_H100
+    GPIO1_OUT &= ~0x00080000;
+#else
 #ifdef HAVE_POWEROFF_ON_PBDR
     and_b(~0x10, &PBDRL);
     or_b(0x10, &PBIORL);
@@ -192,6 +224,7 @@ void power_off(void)
 
     and_b(~0x08, &PADRH);
     or_b(0x08, &PAIORH);
+#endif
 #endif
     while(1);
 }
