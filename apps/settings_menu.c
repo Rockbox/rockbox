@@ -167,7 +167,7 @@ static Menu timedate_set(void)
 static Menu ff_rewind(void)
 {
     set_int("[FF/Rewind Step Size]", "s", &global_settings.ff_rewind,
-            NULL, 1, 1, 999 );
+            NULL, 1, 1, 255 );
     return MENU_OK;
 }
 
