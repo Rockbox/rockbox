@@ -271,11 +271,11 @@ void lcd_clear_display(void)
       xlcd_update();
 }
 
-void lcd_puts(int x, int y, unsigned char *string)
+static void lcd_do_puts(int x, int y, unsigned char *string)
 {
     bool update=false; 
-//    lcd_write(true,LCD_CURSOR(x,y));
-    DEBUGF("lcd_puts(%d, %d, \"", x, y);
+    DEBUGF("lcd_do_puts(%d, %d, \"", x, y);
+
     for (; *string && x<11; x++)
         {
 #ifdef DEBUGF
@@ -294,6 +294,12 @@ void lcd_puts(int x, int y, unsigned char *string)
     if (update)
       xlcd_update();
 }
+void lcd_puts(int x, int y, unsigned char *string)
+{
+    DEBUGF("lcd_puts(%d, %d)", x, y);
+    scroll[y].mode=SCROLL_MODE_OFF;
+    return lcd_do_puts(x, y, string);
+}
 
 void lcd_putc(int x, int y, unsigned short ch)
 {
@@ -302,7 +308,6 @@ void lcd_putc(int x, int y, unsigned short ch)
     if (x<0 || y<0) {
       return;
     }
-//    lcd_write(true,LCD_CURSOR(x,y));
     update=lcdx_putc(x, y, ch);
 
     if (update)
@@ -458,7 +463,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
 
     s = &scroll[y];
 
-    lcd_puts(x,y,string);
+    lcd_do_puts(x,y,string);
     s->textlen = strlen(string);
 
     if ( s->textlen > 11-x ) {
@@ -495,7 +500,6 @@ void lcd_stop_scroll(void)
              s->mode == SCROLL_MODE_PAUSE ) {
             /* restore scrolled row */
             lcd_puts(s->startx, s->starty, s->text);
-            s->mode = SCROLL_MODE_OFF;
         }
     }
 
@@ -511,7 +515,6 @@ void lcd_stop_scroll_line(int line)
          s->mode == SCROLL_MODE_PAUSE ) {
         /* restore scrolled row */
         lcd_puts(s->startx, s->starty, s->text);
-        s->mode = SCROLL_MODE_OFF;
     }
 
     lcd_update();
@@ -600,8 +603,6 @@ static void scroll_thread(void)
                 if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
                     char buffer[12];
                     update = true;
-                    DEBUGF("offset=%d, turn_offset=%d, len=%d",
-                           s->offset, s->turn_offset, s->textlen);
                     if ( s->offset < s->textlen-1 ) {
                         s->offset+=s->direction;
                         if (s->offset==0) {
@@ -628,7 +629,7 @@ static void scroll_thread(void)
                         buffer[i++]=s->text[o++];
                     }
                     buffer[11]=0;
-                    lcd_puts(s->startx, s->starty, buffer);
+                    lcd_do_puts(s->startx, s->starty, buffer);
                 }
             }
 
