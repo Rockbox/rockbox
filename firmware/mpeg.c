@@ -119,6 +119,8 @@ static unsigned char fliptable[] =
     0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
 
+static unsigned short big_fliptable[65536];
+
 static struct event_queue mpeg_queue;
 static int mpeg_stack[MPEG_STACK_SIZE/sizeof(int)];
 
@@ -137,6 +139,16 @@ static bool playing; /* We are playing an MP3 stream */
 static bool filling; /* We are filling the buffer with data from disk */
 
 static int mpeg_file;
+
+static void create_fliptable(void)
+{
+    int i;
+
+    for(i = 0;i < 65536;i++)
+    {
+        big_fliptable[i] = fliptable[i & 0xff] | (fliptable[i >> 8] << 8);
+    }
+}
 
 static void mas_poll_start(int interval_in_ms)
 {
@@ -207,12 +219,12 @@ static void dma_tick(void)
     }
 }
 
-static void bitswap(unsigned char *data, int length)
+static void bitswap(unsigned short *data, int length)
 {
     int i = length;
     while(i--)
     {
-        data[i] = fliptable[data[i]];
+        data[i] = big_fliptable[data[i]];
     }
 }
 
@@ -393,7 +405,9 @@ static void mpeg_thread(void)
                     if(len > 0)
                     {
                         DEBUGF("B\n");
-                        bitswap(mp3buf + mp3buf_write, len);
+
+                        bitswap((unsigned short *)(mp3buf + mp3buf_write),
+                                (len+1)/2);
                     
                         mp3buf_write += len;
                         if(mp3buf_write >= mp3buflen)
@@ -609,6 +623,8 @@ void mpeg_init(void)
 
     mp3buflen = mp3end - mp3buf;
 
+    create_fliptable();
+    
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
 
