@@ -591,10 +591,11 @@ bool sokoban(void)
 
     lcd_clear_display();
 
-    lcd_putsxy( 3,12, str(LANG_SOKOBAN_QUIT));
-    lcd_putsxy( 3,22, str(LANG_SOKOBAN_F1));
-    lcd_putsxy( 3,32, str(LANG_SOKOBAN_F2));
-    lcd_putsxy( 3,42, str(LANG_SOKOBAN_F3));
+    lcd_putsxy(3,  6, str(LANG_SOKOBAN_QUIT));
+    lcd_putsxy(3, 16, str(LANG_SOKOBAN_ON));
+    lcd_putsxy(3, 26, str(LANG_SOKOBAN_F1));
+    lcd_putsxy(3, 36, str(LANG_SOKOBAN_F2));
+    lcd_putsxy(3, 46, str(LANG_SOKOBAN_F3));
 
     lcd_update();
     sleep(HZ*2);
