@@ -25,6 +25,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "mpeg.h"
+#include "mas.h"
 #include "button.h"
 #include "kernel.h"
 #include "settings.h"
@@ -116,6 +117,18 @@ void adjust_cursor(void)
     }
 }
 
+#define BLINK_INTERVAL 2
+
+unsigned int frame_times[] =
+{
+    2400, /* 48kHz */
+    2612, /* 44.1kHz */
+    3600, /* 32kHz */
+    2400, /* 24kHz */
+    2612, /* 22.05kHz */
+    3200  /* 16kHz */
+};
+
 bool recording_screen(void)
 {
     int button;
@@ -127,6 +140,10 @@ bool recording_screen(void)
     int w, h;
     int update_countdown = 1;
     bool have_recorded = false;
+    bool blink_toggle = false;
+    unsigned long seconds;
+    unsigned long last_seconds = 0;
+    int hours, minutes;
 
     cursor = 0;
     mpeg_stop();
@@ -176,6 +193,7 @@ bool recording_screen(void)
                     mpeg_record("");
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
+                    last_seconds = 0;
                 }
                 break;
 
@@ -306,13 +324,31 @@ bool recording_screen(void)
         {
             timeout = current_tick + HZ/10;
 
+            seconds = mpeg_num_recorded_frames();
+            seconds *= frame_times[global_settings.rec_frequency];
+            seconds /= 100000;
+
             update_countdown--;
-            if(update_countdown == 0)
+            if(update_countdown == 0 || seconds > last_seconds)
             {
-                update_countdown = 10;
-                
+                update_countdown = 5;
+                last_seconds = seconds;
+
                 lcd_clear_display();
-                peak_meter_draw(0, 8 + h, LCD_WIDTH, h);
+
+                if(mpeg_status() & MPEG_STATUS_RECORD)
+                {
+                    blink_toggle = blink_toggle?false:true;
+                    if(blink_toggle)
+                        lcd_puts(0, 0, "Recording");
+                }
+
+                hours = seconds / 3600;
+                minutes = (seconds - (hours * 3600)) / 60;
+                snprintf(buf, 32, "%02d:%02d:%02d",
+                         hours, minutes, seconds%60);
+                lcd_puts(0, 1, buf);
+                peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
                 /* Show mic gain if input source is Mic */
                 if(global_settings.rec_source == 0)
@@ -363,9 +399,9 @@ bool recording_screen(void)
             }
             else
             {
-                lcd_clearrect(0, 8 + h, LCD_WIDTH, h);
-                peak_meter_draw(0, 8 + h, LCD_WIDTH, h);
-                lcd_update_rect(0, 8 + h, LCD_WIDTH, h);
+                lcd_clearrect(0, 8 + h*2, LCD_WIDTH, h);
+                peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
+                lcd_update_rect(0, 8 + h*2, LCD_WIDTH, h);
             }
             lcd_update();
         }

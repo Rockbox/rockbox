@@ -80,6 +80,7 @@ void mpeg_record(char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode);
 void mpeg_set_recording_gain(int left, int right, int mic);
+unsigned long mpeg_num_recorded_frames(void);
 #endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 

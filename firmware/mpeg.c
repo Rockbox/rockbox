@@ -473,6 +473,7 @@ static int lowest_watermark_level; /* Debug value to observe the buffer
 bool recording; /* We are recording */
 static bool is_recording; /* We are (attempting to) record */
 bool stop_pending;
+unsigned long record_start_frame; /* Frame number where recording started */
 #endif
 
 static int mpeg_file;
@@ -646,7 +647,7 @@ static void dma_tick(void)
     {
         int i;
         int num_bytes = 0;
-        if(recording && (PBDR & 0x4000))
+        if(is_recording && (PBDR & 0x4000))
         {
 #ifdef DEBUG
             timing_info[timing_info_index++] = current_tick;
@@ -1589,8 +1590,6 @@ static void mpeg_thread(void)
         }
         else
         {
-            int i;
-
             yield();
             if(!queue_empty(&mpeg_queue))
             {
@@ -1625,13 +1624,19 @@ static void mpeg_thread(void)
                         if(mpeg_file >= 0)
                             close(mpeg_file);
 
-                        for(i = 0;i < 512;i++)
+#if 0
                         {
-                            DEBUGF("%d - %d us (%d bytes)\n", timing_info[i*2],
-                                   (timing_info[i*2+1] & 0xffff) *
-                                   10000 / 13824,
-                                   timing_info[i*2+1] >> 16);
+                            int i;
+                            for(i = 0;i < 512;i++)
+                            {
+                                DEBUGF("%d - %d us (%d bytes)\n",
+                                       timing_info[i*2],
+                                       (timing_info[i*2+1] & 0xffff) *
+                                       10000 / 13824,
+                                       timing_info[i*2+1] >> 16);
+                            }
                         }
+#endif
                         break;
 
                     case MPEG_SAVE_DATA:
@@ -1862,6 +1867,9 @@ static void init_playback(void)
 
 void mpeg_record(char *filename)
 {
+    /* Read the current frame */
+    mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
+    
     is_recording = true;
     queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
 }
@@ -1872,6 +1880,22 @@ static void start_recording(void)
     stop_pending = false;
 }
 
+unsigned long mpeg_num_recorded_frames(void)
+{
+    unsigned long val;
+
+    if(is_recording)
+    {
+        /* Read the current frame */
+        mas_readmem(MAS_BANK_D0, 0xfd0, &val, 1);
+        
+        return val - record_start_frame;
+    }
+    else
+    {
+        return 0;
+    }
+}
 #endif
 
 void mpeg_play(int offset)
