@@ -2,11 +2,9 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<p><b>Note:</b> The latest "packaged" release, 2.0, is getting a bit old. For the latest features, we recommend you check out the <a href=/daily.shtml>daily builds</a>. (Yes yes, we really should make a new proper release...)
+<h2>Latest version: 2.2 (2004-03-11)</h2>
 
-<h2>Latest version: 2.1 (2003-12-04)</h2>
-
-<p>Please read the <a href="rockbox-2.1-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
+<p>Please read the <a href="rockbox-2.2-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
 <p>
 <table class=rockbox><tr>
@@ -18,35 +16,35 @@
 <td>
 Archos Jukebox 5000, 6000 and Studio models
 
-<p><a href="rockbox-2.1-player.zip">rockbox-2.1-player.zip</a>
-<br>(184 KB)
+<p><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
+<br>(189 KB)
 
 </td><td>
 Archos Jukebox Recorder 6, 10, 15 and 20
 
-<p><a href="rockbox-2.1-recorder.zip">rockbox-2.1-recorder.zip</a>
-<br>(412 KB)
+<p><a href="rockbox-2.2-recorder.zip">rockbox-2.2-recorder.zip</a>
+<br>(439 KB)
 
 </td>
 <td>
 Archos Jukebox FM Recorder
 
-<p><a href="rockbox-2.1-fmrecorder.zip">rockbox-2.1-fmrecorder.zip</a>
-<br>(416 KB)
+<p><a href="rockbox-2.2-fmrecorder.zip">rockbox-2.2-fmrecorder.zip</a>
+<br>(443 KB)
 
 </td>
 <td>
 Archos Jukebox Recorder V2
 
-<p><a href="rockbox-2.1-recorderv2.zip">rockbox-2.1-recorderv2.zip</a>
-<br>(416 KB)
+<p><a href="rockbox-2.2-recorderv2.zip">rockbox-2.2-recorderv2.zip</a>
+<br>(443 KB)
 
 </td>
 </tr></table>
 
 <h3>Source code</h3>
 <ul>
-<li><a href="rockbox-2.1.tar.gz">rockbox-2.1.tar.gz</a>
+<li><a href="rockbox-2.2.tar.gz">rockbox-2.2.tar.gz</a>
 </ul>
 
 <h3>Auxiliary files</h3>
