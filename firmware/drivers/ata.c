@@ -856,6 +856,8 @@ int ata_init(void)
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
         
         queue_init(&ata_queue);
+
+        last_disk_activity = current_tick;
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
