@@ -727,11 +727,9 @@ new: "PLAY=Acepta OFF=Cancela"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-### English phrase was changed! Previous translation was made on:
-### "Shutting Down..."
 eng: "Alarm Set"
 voice: ""
-new: "Apagándose..."
+new: "Alarma Configurada"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
@@ -950,44 +948,28 @@ voice: "Buffer Anti-salto"
 new: "Buffer Anti-salto"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
-### Description changed! Previous description was:
-### "Abort alternative in player keyboard interaction"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Abort"
 eng: ""
 voice: ""
-new: "Abortar"
+new:
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
-### Description changed! Previous description was:
-### "Accept alternative in player keyboard interaction"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Accept"
 eng: ""
 voice: ""
-new: "Aceptar"
+new:
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
-### Description changed! Previous description was:
-### "Backspace alternative in player keyboard interaction"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Backspace"
 eng: ""
 voice: ""
-new: "Retroceso"
+new:
 
 id: LANG_PLAYER_KEYBOARD_DELETE
-### Description changed! Previous description was:
-### "Delete alternative in player keyboard interaction"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Delete"
 eng: ""
 voice: ""
-new: "Borrar"
+new: 
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
