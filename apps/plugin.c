@@ -62,7 +62,7 @@
 #define PREFIX(_x_) _x_
 #endif
 
-#if MEMORYSIZE >= 32
+#if MEM >= 32
 #define PLUGIN_BUFFER_SIZE 0xC0000
 #else
 #define PLUGIN_BUFFER_SIZE 0x8000
