@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "button.h"
 #include "sprintf.h"
+#include "screens.h"
 
 typedef struct
 {long x,y,z;} point3D;
@@ -318,9 +319,14 @@ bool cube(void)
             case BUTTON_OFF|BUTTON_REL:
                 exit=1;
                 break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
+
         }
     }
-    return 1;
+    return false;
 }
 
 #endif /* USE_DEMOS */
