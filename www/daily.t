@@ -5,6 +5,12 @@
 
 <!--#exec cmd="./dailysrc.pl" -->
 
+<p>Useful links for do-it-yourselfers:
+<ul>
+<li><a href="cross-gcc.html">Building the SH1 cross compiler</a>
+<li><a href="sh-win/">Setting up and SH1 cross compiler for Windows</a>
+</ul>
+
 <h2>Target builds</h2>
 
 <p>There are three versions of each build:
