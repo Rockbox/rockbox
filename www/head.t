@@ -6,6 +6,7 @@
 <html>
 <head>
 <link rel="STYLESHEET" type="text/css" href="/style.css">
+<link rel="icon" href="/rockbox-16.png" type="image/png">
 #ifdef _PAGE_
 <title>Rockbox - _PAGE_</title>
 #else
