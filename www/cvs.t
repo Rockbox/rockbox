@@ -99,8 +99,8 @@ On the bottom of the page, there is a link to
 Copy the contents of your local <tt>.ssh/identity.pub</tt> or
 <tt>.ssh/id_rsa.pub</tt> there.
 
-<p>Like many things on SourceForge, they key change doesn't take effect immediately. You'll have to wait a few hours until some magic batch job kicks in and puts your keys where they should be. Then you can use cvs without entering your password.
+<p>Like many things on SourceForge, the key change doesn't take effect immediately. You'll have to wait a few hours until some magic batch job kicks in and puts your keys where they should be. Then you can use cvs without entering your password.
 
-<p>If you work from several different computers, you must add the key for each of your accounts you are using.
+<p>If you work from several different computers/accounts, you must add the key for each account you are using.
 
 #include "foot.t"
