@@ -240,6 +240,9 @@ bool show_info(void)
                     state = 1;
                 break;
 #endif
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
     }
 
