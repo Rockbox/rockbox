@@ -841,18 +841,14 @@ static void mpeg_thread(void)
                     break;
                 }
 
-                if(play_pending)
-                {
-                    amount_to_read = MIN(MPEG_LOW_WATER, free_space_left);
-                }
+                /* Read small chunks while we are below the low water mark */
+                if(unplayed_space_left < MPEG_LOW_WATER)
+                    amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
+                                         free_space_left);
                 else
-                {
-                    if(unplayed_space_left < MPEG_LOW_WATER)
-                        amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
-                                             free_space_left);
-                    else
-                        amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
-                }
+                    amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+
+                /* Don't read more than until the end of the buffer */
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
                 
                 /* Read in a few seconds worth of MP3 data. We don't want to
