@@ -260,6 +260,8 @@ int read_bmp_file(char* filename,
       }
 
 #endif
+      free(bmp);
+
    }
    close(fd);
    return 0; /* success */
