@@ -292,7 +292,7 @@ void game_loop(void)
 	int count = 0;
 	/*  while(count*20 < level_speeds[level]) */
 	{
-	    b = button_get();
+	    b = button_get(false);
 	    if ( b & BUTTON_OFF )
               return; /* get out of here */
 

@@ -68,7 +68,7 @@ void ss_loop(void)
 
         offset=i*factor;
 
-        b = button_get();
+        b = button_get(false);
         if ( b & BUTTON_OFF )
             return;
 
