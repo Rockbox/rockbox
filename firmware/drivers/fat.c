@@ -888,7 +888,7 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
         return 0;
 
     /* find sequential sectors and read them all at once */
-    for (i=0; i<sectorcount && sector>0; i++ ) {
+    for (i=0; i<sectorcount && sector>=0; i++ ) {
         numsec++;
         if ( numsec >= fat_bpb.bpb_secperclus ) {
             cluster = get_next_cluster(cluster);
