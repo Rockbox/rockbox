@@ -27,6 +27,7 @@
 #define ADC_BUTTONS 0
 #define ADC_REMOTE  1
 #define ADC_BATTERY 2
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 
 #else
 #define NUM_ADC_CHANNELS 8
