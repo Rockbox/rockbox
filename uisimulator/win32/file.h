@@ -23,11 +23,14 @@
 #include <string.h>
 
 int win32_rename(char *oldpath, char *newpath);
+int win32_filesize(int fd);
 
 #define rename(x,y) win32_rename(x,y)
+#define filesize(x,y) win32_filesize(x,y)
 
 #include "../../firmware/include/file.h"
 
 #undef rename
+#undef filesize
 
 #endif

@@ -591,3 +591,15 @@ int lseek(int fd, int offset, int whence)
 
     return pos;
 }
+
+int filesize(int fd)
+{
+    struct filedesc* file = &openfiles[fd];
+
+    if ( !file->busy ) {
+        errno = EBADF;
+        return -1;
+    }
+    
+    return file->size;
+}

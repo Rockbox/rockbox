@@ -36,3 +36,12 @@ int win32_rename(char *oldpath, char* newpath)
   }
   return -1;
 }
+
+int win32_filesize(int fd)
+{
+    int old = lseek(fd, 0, SEEK_CUR);
+    int size = lseek(fd, 0, SEEK_END);
+    lseek(fd, old, SEEK_SET);
+
+    return(size);
+}

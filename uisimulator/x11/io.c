@@ -156,6 +156,15 @@ int x11_rename(char *oldpath, char* newpath)
     return -1;
 }
 
+int x11_filesize(int fd)
+{
+    int old = lseek(fd, 0, SEEK_CUR);
+    int size = lseek(fd, 0, SEEK_END);
+    lseek(fd, old, SEEK_SET);
+
+    return(size);
+}
+
 void fat_size(unsigned int* size, unsigned int* free)
 {
     struct statfs fs;

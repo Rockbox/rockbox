@@ -64,6 +64,7 @@ extern int write(int fd, void* buf, int count);
 extern int remove(const char* pathname);
 extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, unsigned int size);
+extern int filesize(int fd);
 #endif /* SIMULATOR */
 #endif /* __MINGW32__ */
 
