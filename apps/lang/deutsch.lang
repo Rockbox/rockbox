@@ -2779,3 +2779,21 @@ desc:  in sound settings
 eng: "Super bass"
 voice: "Superbass"
 new: "Superbass"
+
+id: LANG_SHUTDOWN
+desc:  in main menu
+eng: "Shut down"
+voice: "Ausschalten"
+new: "Ausschalten"
+
+id: LANG_SHUTTINGDOWN
+desc:  in main menu
+eng: "Shutting down..."
+voice: ""
+new: "Schalte aus..."
+
+id: LANG_CONFIRM_SHUTDOWN
+desc:  in shutdown screen
+eng: "Press OFF to shut down"
+voice: ""
+new: "OFF zum Ausschalten"
