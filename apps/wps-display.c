@@ -167,7 +167,7 @@ static bool display_custom_wps( struct mp3entry* id3,
                                      id3->tracknum);
                             break;
                         case 'd':  /* ID3 Album/Disc */
-                            strncpy(buf, id3->album, LINE_LEN);
+                            strncpy(buf, id3->album ? id3->album : "<no album>", LINE_LEN);
                             break;
                     }
                     break;
