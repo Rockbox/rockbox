@@ -471,7 +471,7 @@ void lcd_setmargins(int x, int y)
  */
 void lcd_puts(int x, int y, char *str)
 {
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
        as otherwise it'll wrap. The real target doesn't wrap. */
 
