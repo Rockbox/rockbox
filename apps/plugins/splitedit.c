@@ -230,7 +230,7 @@ static void update_icons(void)
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT, true);
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* The scale icon */
     rb->lcd_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs()],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
@@ -849,7 +849,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             {
                 /* read volume info */
                 unsigned short volume;
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
                 volume = rb->mas_codec_readreg(0x0c);
                 volume += rb->mas_codec_readreg(0x0d);
                 volume = volume / 2;
@@ -1003,7 +1003,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 lastx = time_to_xpos(mp3->elapsed);
                 break;
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             case BUTTON_ON | BUTTON_RIGHT:
                 rb->mpeg_set_pitch(1500);
                 splitedit_invalidate_osci();
@@ -1060,7 +1060,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
             case BUTTON_F3:
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
                 rb->peak_meter_set_use_dbfs(rb->peak_meter_get_use_dbfs() +1);
 #endif
                 splitedit_invalidate_osci();

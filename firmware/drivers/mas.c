@@ -132,7 +132,7 @@ int mas_writemem(int bank, int addr, const unsigned long* src, int len)
 
     j = 0;
     while(len--) {
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         buf[i++] = 0;
         buf[i++] = ptr[j+1];
         buf[i++] = ptr[j+2];
@@ -232,7 +232,7 @@ static int mas_devread(unsigned long *dest, int len)
             if (i2c_getack()) {
                 for (i=0;len;i++) {
                     len--;
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
                     i2c_inb(0); /* Dummy read */
                     ptr[i*4+0] = 0;
                     ptr[i*4+1] = i2c_inb(0) & 0x0f;
@@ -266,7 +266,7 @@ static int mas_devread(unsigned long *dest, int len)
     return ret;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 void mas_reset(void)
 {
     or_b(0x01, &PAIORH);

@@ -326,11 +326,7 @@ unsigned long mpeg_get_last_header(void)
 
     /* Read the frame data from the MAS and reconstruct it with the
        frame sync and all */
-#if CONFIG_HWCODEC == MAS3587F
-    mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
-#else
-    mas_readmem(MAS_BANK_D0, 0x301, tmp, 2);
-#endif
+    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
 #endif
 }
@@ -394,12 +390,14 @@ static int prerecord_count; /* Number of seconds in the prerecord buffer */
 static int prerecord_timeout; /* The tick count of the next prerecord data store */
 
 /* Shadow MAS registers */
-unsigned long shadow_7f0 = 0;
-unsigned long shadow_7f1 = 0;
-unsigned long shadow_7f6 = 0;
-unsigned long shadow_7f9 = 0;
-
+unsigned long shadow_encoder_control = 0;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
+
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+unsigned long shadow_io_control_main = 0;
+unsigned long shadow_app_select = 0;
+unsigned long shadow_soft_mute = 0;
+#endif
 
 static int mpeg_file;
 
@@ -927,10 +925,10 @@ static void track_change(void)
 {
     DEBUGF("Track change\n");
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* Reset the AVC */
     mpeg_sound_set(SOUND_AVC, -1);
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
     remove_current_tag();
 
     update_playlist();
@@ -2100,10 +2098,10 @@ static void init_recording(void)
 
     /* Stop the current application */
     val = 0;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while(val);
 
     /* Perform black magic as described by the data sheet */
@@ -2130,19 +2128,19 @@ static void init_recording(void)
     mas_codec_writereg(7, 0x4000);
 
     /* No mute */
-    shadow_7f9 = 0;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
+    shadow_soft_mute = 0;
+    mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
     
     /* Set Demand mode, monitoring OFF and validate all settings */
-    shadow_7f1 = 0x125;
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
+    shadow_io_control_main = 0x125;
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
 
     /* Start the encoder application */
     val = 0x40;
-    mas_writemem(MAS_BANK_D0, 0x7f6, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while(!(val & 0x40));
 
 #if 1
@@ -2154,13 +2152,13 @@ static void init_recording(void)
     sleep(20);
     
     /* Now set it to Monitoring mode as default, saves power */
-    shadow_7f1 = 0x525;
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
+    shadow_io_control_main = 0x525;
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
 
     /* Wait until the DSP has accepted the settings */
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
     } while(val & 1);
 
     drain_dma_buffer();
@@ -2209,14 +2207,14 @@ static void start_prerecording(void)
     is_prerecording = true;
 
     /* Stop monitoring and start the encoder */
-    shadow_7f1 &= ~(1 << 10);
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
+    shadow_io_control_main &= ~(1 << 10);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+    DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
 
     /* Wait until the DSP has accepted the settings */
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
     } while(val & 1);
     
     is_recording = true;
@@ -2243,14 +2241,14 @@ static void start_recording(void)
     {
         /* If prerecording is off, we need to stop the monitoring
            and start the encoder */
-        shadow_7f1 &= ~(1 << 10);
-        mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
-        DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
+        shadow_io_control_main &= ~(1 << 10);
+        mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+        DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
 
         /* Wait until the DSP has accepted the settings */
         do
         {
-            mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+            mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
         } while(val & 1);
     }
     
@@ -2275,8 +2273,8 @@ static void pause_recording(void)
     pause_start_time = current_tick;
 
     /* Set the pause bit */
-    shadow_7f9 |= 2;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
+    shadow_soft_mute |= 2;
+    mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
 
     paused = true;
 }
@@ -2286,8 +2284,8 @@ static void resume_recording(void)
     paused = false;
     
     /* Clear the pause bit */
-    shadow_7f9 &= ~2;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9, 1);
+    shadow_soft_mute &= ~2;
+    mas_writemem(MAS_BANK_D0,  MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
 
     /* Compensate for the time we have been paused */
     if(pause_start_time)
@@ -2313,17 +2311,17 @@ static void stop_recording(void)
     is_prerecording = false;
         
     /* Read the number of frames recorded */
-    mas_readmem(MAS_BANK_D0, 0xfd0, &num_recorded_frames, 1);
+    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &num_recorded_frames, 1);
 
     /* Start monitoring */
-    shadow_7f1 |= (1 << 10);
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
+    shadow_io_control_main |= (1 << 10);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+    DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
     
     /* Wait until the DSP has accepted the settings */
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
     } while(val & 1);
 
     resume_recording();
@@ -2340,30 +2338,30 @@ void mpeg_set_recording_options(int frequency, int quality,
     rec_version_index = is_mpeg1?3:2;
     rec_frequency_index = frequency % 3;
     
-    shadow_7f0 = (quality << 17) |
+    shadow_encoder_control = (quality << 17) |
         (rec_frequency_index << 10) |
         ((is_mpeg1?1:0) << 9) |
         (((channel_mode * 2 + 1) & 3) << 6) |
         (1 << 5) /* MS-stereo */ |
         (1 << 2) /* Is an original */;
-    mas_writemem(MAS_BANK_D0, 0x7f0, &shadow_7f0,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_ENCODER_CONTROL, &shadow_encoder_control,1);
 
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", shadow_7f0);
+    DEBUGF("mas_writemem(MAS_BANK_D0, ENCODER_CONTROL, %x)\n", shadow_encoder_control);
 
-    shadow_7f9 = editable?4:0;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &shadow_7f9,1);
+    shadow_soft_mute = editable?4:0;
+    mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute,1);
 
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f9, %x)\n", shadow_7f9);
+    DEBUGF("mas_writemem(MAS_BANK_D0, SOFT_MUTE, %x)\n", shadow_soft_mute);
 
-    shadow_7f1 = ((1 << 10) | /* Monitoring ON */
+    shadow_io_control_main = ((1 << 10) | /* Monitoring ON */
         ((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
         (1 << 2) | /* Inverted SIBC clock signal */
         1; /* Validate */
-    mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main,1);
 
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", shadow_7f1);
+    DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
 
     if(source == 0) /* Mic */
     {

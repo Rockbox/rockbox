@@ -41,10 +41,11 @@ enum
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
-
-extern unsigned long shadow_7f1;
-
 #endif /* #ifdef MAS3587F */
+
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+extern unsigned long shadow_io_control_main;
+#endif
 
 /**** globals ****/
 
@@ -124,7 +125,7 @@ static const int steps[] =
 static const int minval[] =
 {
     0,    /* Volume */
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     -12,  /* Bass */
     -12,  /* Treble */
 #else
@@ -149,7 +150,7 @@ static const int minval[] =
 static const int maxval[] =
 {
     100,  /* Volume */
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     12,   /* Bass */
     12,   /* Treble */
 #else
@@ -174,7 +175,7 @@ static const int maxval[] =
 static const int defaultval[] =
 {
     70,   /* Volume */
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     6,    /* Bass */
     6,    /* Treble */
 #else
@@ -393,7 +394,7 @@ static void postpone_dma_tick(void)
 #endif
 
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 void demand_irq_enable(bool on)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -408,7 +409,7 @@ void demand_irq_enable(bool on)
 
     set_irq_level(oldlevel);
 }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
 
 
 void play_tick(void)
@@ -455,10 +456,10 @@ void IMIA1(void) /* Timer 1 interrupt */
     if(playing)
         play_tick();
     TSR1 &= ~0x01;
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* Disable interrupt */
     IPRC &= ~0x000f;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif
 }
 
 #pragma interrupt
@@ -467,19 +468,21 @@ void IRQ6(void) /* PB14: MAS stop demand IRQ */
     SCR0 &= ~0x80;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 #pragma interrupt
 void IRQ3(void) /* PA15: MAS demand IRQ */
 {
     /* Begin with setting the IRQ to edge sensitive */
     ICR |= 0x0010;
-    
+
+#if CONFIG_HWCODEC == MAS3587F
     if(mpeg_mode == MPEG_ENCODER)
         rec_tick();
     else
+#endif
         postpone_dma_tick();
 }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
 
 static void setup_sci0(void)
 {
@@ -519,7 +522,7 @@ static void setup_sci0(void)
 }
 #endif /* SIMULATOR */
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 static void init_playback(void)
 {
     unsigned long val;
@@ -536,10 +539,10 @@ static void init_playback(void)
 
     /* Stop the current application */
     val = 0;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while(val);
     
     /* Enable the D/A Converter */
@@ -551,23 +554,25 @@ static void init_playback(void)
 
     /* Disable SDO and SDI */
     val = 0x0d;
-    mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
 
     /* Set Demand mode and validate all settings */
-    shadow_7f1 = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&shadow_7f1,1);
+    shadow_io_control_main = 0x25;
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
 
     /* Start the Layer2/3 decoder applications */
     val = 0x0c;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while((val & 0x0c) != 0x0c);
 
     mpeg_sound_channel_config(MPEG_SOUND_STEREO);
 
+#if CONFIG_HWCODEC == MAS3587F
     mpeg_mode = MPEG_DECODER;
+#endif
 
     /* set IRQ6 to edge detect */
     ICR |= 0x02;
@@ -577,7 +582,7 @@ static void init_playback(void)
 
     DEBUGF("MAS Decoding application started\n");
 }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
 
 #ifndef SIMULATOR
 #if CONFIG_HWCODEC == MAS3507D
@@ -616,7 +621,7 @@ void set_prescaled_volume(void)
 #endif /* MAS3507D */
 #endif /* !SIMULATOR */
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
 unsigned long loudness_shadow = 0;
 #endif
@@ -638,7 +643,7 @@ void mpeg_sound_set(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
 #else
@@ -671,7 +676,7 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_BALANCE:
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
 #else
@@ -680,7 +685,7 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_BASS:
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
@@ -691,7 +696,7 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_TREBLE:
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
@@ -701,7 +706,7 @@ void mpeg_sound_set(int setting, int value)
 #endif
             break;
             
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         case SOUND_LOUDNESS:
             loudness_shadow = (loudness_shadow & 0x04) |
                 (MAX(MIN(value * 4, 0x44), 0) << 8);
@@ -771,7 +776,7 @@ void mpeg_sound_set(int setting, int value)
 
 int mpeg_val2phys(int setting, int value)
 {
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     int result = 0;
     
     switch(setting)
@@ -858,11 +863,11 @@ void mpeg_sound_channel_config(int configuration)
             break;
     }
 
-#if CONFIG_HWCODEC == MAS3587F
-    mas_writemem(MAS_BANK_D0, 0x7fc, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D0, 0x7fd, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D0, 0x7fe, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D0, 0x7ff, &val_rr, 1); /* RR */
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
 #else
     mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
     mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
@@ -872,7 +877,7 @@ void mpeg_sound_channel_config(int configuration)
 #endif
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.
@@ -889,11 +894,11 @@ void mpeg_set_pitch(int pitch)
     /* Calculate the new (bogus) frequency */
     val = 18432*pitch/1000;
     
-    mas_writemem(MAS_BANK_D0,0x7f3,&val,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
 
     /* We must tell the MAS that the frequency has changed.
        This will unfortunately cause a short silence. */
-    mas_writemem(MAS_BANK_D0,0x7f1,&shadow_7f1,1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
 }
 #endif
 
@@ -938,6 +943,14 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     
     mas_version_code = mas_readver();
     DEBUGF("MAS3587 derivate %d, version %c%d\n",
+           (mas_version_code & 0xf000) >> 12,
+           'A' + ((mas_version_code & 0x0f00) >> 8), mas_version_code & 0xff);
+#elif CONFIG_HW_CODEC == MAS3539F
+    or_b(0x08, &PAIORH); /* output for /PR */
+    init_playback();
+    
+    mas_version_code = mas_readver();
+    DEBUGF("MAS3539 derivate %d, version %c%d\n",
            (mas_version_code & 0xf000) >> 12,
            'A' + ((mas_version_code & 0x0f00) >> 8), mas_version_code & 0xff);
 #endif
@@ -1001,20 +1014,20 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     mpeg_sound_channel_config(channel_config);
 #endif
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     ICR &= ~0x0010; /* IRQ3 level sensitive */
     PACR1 = (PACR1 & 0x3fff) | 0x4000; /* PA15 is IRQ3 */
 #endif
 
     /* Must be done before calling mpeg_sound_set() */
     mpeg_is_initialized = true;
-    
+
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);
     mpeg_sound_set(SOUND_BALANCE, balance);
     mpeg_sound_set(SOUND_VOLUME, volume);
     
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     mpeg_sound_channel_config(channel_config);
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
     mpeg_sound_set(SOUND_AVC, avc);
@@ -1034,9 +1047,9 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 void mp3_shutdown(void)
 {
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     unsigned long val = 1;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1); /* Mute */
+    mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &val, 1); /* Mute */
 #endif
 
 #if CONFIG_HWCODEC == MAS3507D
@@ -1052,7 +1065,7 @@ void mp3_shutdown(void)
 
 void mp3_play_init(void)
 {
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     init_playback();
 #endif
     playing = false;
@@ -1081,7 +1094,7 @@ void mp3_play_data(const unsigned char* start, int size,
 
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     demand_irq_enable(true);
 #endif
 }
@@ -1107,7 +1120,7 @@ void mp3_play_stop(void)
     playing = false;
     mp3_play_pause(false);
     CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     demand_irq_enable(false);
 #endif
 }

@@ -49,6 +49,8 @@
 #include "errno.h"
 #include "talk.h"
 
+#ifdef HAVE_RECORDING
+
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
 
@@ -539,7 +541,7 @@ bool recording_screen(void)
                     {
                         gain = MAX(global_settings.rec_left_gain,
                                    global_settings.rec_right_gain);
-                        
+
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
                                  fmt_gain(SOUND_LEFT_GAIN, gain,
                                           buf2, sizeof(buf2)));
@@ -819,3 +821,4 @@ bool f3_rec_screen(void)
     return false;
 }
 #endif
+#endif /* HAVE_RECORDING */

@@ -239,7 +239,7 @@ struct plugin_api {
     int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
     int (*mas_readreg)(int reg);
     int (*mas_writereg)(int reg, unsigned int val);
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     int (*mas_codec_writereg)(int reg, unsigned int val);
     int (*mas_codec_readreg)(int reg);
 #endif
@@ -277,7 +277,7 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     void (*mpeg_set_pitch)(int pitch);        
 
     unsigned short (*peak_meter_scale_value)(unsigned short val,

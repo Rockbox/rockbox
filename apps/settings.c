@@ -164,7 +164,7 @@ static const struct bit_entry rtc_bits[] =
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
     {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
     {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
     {1, S_O(superbass), false, "superbass", off_on },
@@ -710,7 +710,7 @@ void sound_settings_apply(void)
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
     mpeg_sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);

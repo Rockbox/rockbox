@@ -790,7 +790,7 @@ bool dbg_mas(void)
     return false;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 bool dbg_mas_codec(void)
 {
     char buf[32];
@@ -1050,22 +1050,22 @@ bool dbg_mas_info(void)
                 snprintf(buf, 32, "6f: %05x   ", mas_readreg(0x6f) & 0xfffff);
                 break;
             case 8:
-                mas_readmem(MAS_BANK_D0, 0x300, &val, 1);
+                mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &val, 1);
                 lcd_puts(0, 0, "Frame Count");
                 snprintf(buf, 32, "0/300: %04x", val & 0xffff);
                 break;
             case 9:
-                mas_readmem(MAS_BANK_D0, 0x301, &val, 1);
+                mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, &val, 1);
                 lcd_puts(0, 0, "Status1    ");
                 snprintf(buf, 32, "0/301: %04x", val & 0xffff);
                 break;
             case 10:
-                mas_readmem(MAS_BANK_D0, 0x302, &val, 1);
+                mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_2, &val, 1);
                 lcd_puts(0, 0, "Status2    ");
                 snprintf(buf, 32, "0/302: %04x", val & 0xffff);
                 break;
             case 11:
-                mas_readmem(MAS_BANK_D0, 0x303, &val, 1);
+                mas_readmem(MAS_BANK_D0, MAS_D0_CRC_ERROR_COUNT, &val, 1);
                 lcd_puts(0, 0, "CRC Count  ");
                 snprintf(buf, 32, "0/303: %04x", val & 0xffff);
                 break;
@@ -1539,7 +1539,7 @@ bool debug_menu(void)
         { "View MAS info", dbg_mas_info },
 #endif
         { "View MAS regs", dbg_mas },
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         { "View MAS codec", dbg_mas_codec },
 #endif
 #ifdef HAVE_LCD_BITMAP

@@ -1,5 +1,5 @@
 /* define this if you have recording possibility */
-#define HAVE_RECORDING 1
+/* #define HAVE_RECORDING */
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
@@ -17,7 +17,7 @@
 #define CONFIG_CPU SH7034
 
 /* Define this if you have a MAS3539F */
-#define CONFIG_HWCODEC MAS3587F /* will be MAS3539F once prepared */
+#define CONFIG_HWCODEC MAS3539F
 
 /* Define this if you have a LiIon battery */
 /* #define HAVE_LIION */
