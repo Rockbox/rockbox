@@ -867,7 +867,7 @@ static void display_bookmark(const char* bookmark,
     if ( ms < 3600000 )
     {
         snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-                 "%2d, %d:%02d, %s,",
+                 "%2d, %ld:%02ld, %s,",
                  (bookmark_count+1),
                  ms / 60000,
                  ms % 60000 / 1000,
@@ -876,7 +876,7 @@ static void display_bookmark(const char* bookmark,
     else
     {
         snprintf(global_temp_buffer, sizeof(global_temp_buffer),
-             "%2d, %d:%02d:%02d, %s,",
+             "%2d, %ld:%02ld:%02ld, %s,",
              (bookmark_count+1),
              ms / 60000,
              ms % 3600000 / 60000,
