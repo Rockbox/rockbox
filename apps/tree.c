@@ -642,9 +642,7 @@ static bool ask_resume(bool ask_once)
                 break;
 
             default:
-                /* React only on release events */
-                if(button & BUTTON_REL)
-                    stop = true;
+                stop = true;
                 break;
         }
     }
@@ -1016,7 +1014,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_OFF | BUTTON_REL:
+            case BUTTON_OFF:
                 /* Stop the music if it is playing, else show the shutdown
                    screen */
                 if(mpeg_status())
@@ -1025,6 +1023,8 @@ static bool dirbrowse(char *root, int *dirfilter)
                     if (!charger_inserted()) {
                         shutdown_screen();
                         restore = true;
+                    } else {
+                       charging_splash();
                     }
                 }
                 break;
