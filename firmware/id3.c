@@ -141,9 +141,11 @@ static struct tag_resolver taglist[] = {
     { "TIT2", 4, offsetof(struct mp3entry, title), NULL },
     { "TT2",  3, offsetof(struct mp3entry, title), NULL },
     { "TALB", 4, offsetof(struct mp3entry, album), NULL },
+    { "TAL",  3, offsetof(struct mp3entry, album), NULL },
+    { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum },
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
-    { "TYR",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
+    { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL }
 };
