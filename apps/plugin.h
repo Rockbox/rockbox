@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 20
+#define PLUGIN_API_VERSION 21
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -287,6 +287,8 @@ struct plugin_api {
     void (*lcd_put_cursor)(int x, int y, char cursor_char);
     void (*lcd_remove_cursor)(void);
 #endif
+    bool (*settings_parseline)(char* line, char** name, char** value);
+    int (*strcmp)(const char *, const char *);
 };
 
 /* defined by the plugin loader (plugin.c) */

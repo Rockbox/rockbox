@@ -251,6 +251,8 @@ static struct plugin_api rockbox_api = {
     lcd_put_cursor,
     lcd_remove_cursor,
 #endif
+    settings_parseline,
+    strcmp,
 };
 
 int plugin_load(char* plugin, void* parameter)
