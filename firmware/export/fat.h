@@ -57,10 +57,10 @@ struct fat_file
     int sectornum;       /* sector number in this cluster */
     unsigned int direntry;   /* short dir entry index from start of dir */
     unsigned int direntries; /* number of dir entries used by this file */
-    unsigned int dircluster; /* first cluster of dir */
+    int dircluster;      /* first cluster of dir */
     bool eof;
 #ifdef HAVE_MULTIVOLUME
-    int volume;           /* file resides on which volume */
+    int volume;          /* file resides on which volume */
 #endif
 };
 
@@ -83,7 +83,7 @@ extern int fat_create_dir(const char* name,
                           struct fat_dir* dir);
 extern int fat_startsector(IF_MV_NONVOID(int volume)); // public for config sector
 extern int fat_open(IF_MV2(int volume,)
-                    unsigned int cluster,
+                    int cluster,
                     struct fat_file* ent,
                     const struct fat_dir* dir);
 extern int fat_create_file(const char* name,
@@ -96,7 +96,7 @@ extern int fat_seek(struct fat_file *ent, unsigned int sector );
 extern int fat_remove(struct fat_file *ent);
 extern int fat_truncate(const struct fat_file *ent);
 extern int fat_rename(struct fat_file* file, 
-                      struct fat_dir* dir, 
+                      struct fat_dir* dir,
                       const unsigned char* newname,
                       int size, int attr);
 

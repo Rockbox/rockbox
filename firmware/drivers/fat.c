@@ -217,7 +217,8 @@ struct bpb
     int bpb_rootentcnt;  /* Number of dir entries in the root */
     /* internals for FAT16 support */
     bool is_fat16; /* true if we mounted a FAT16 partition, false if FAT32 */
-    unsigned int rootdirsectors; /* fixed # of sectors occupied by root dir */
+    unsigned int rootdiroffset; /* sector offset of root dir relative to start
+                                 * of first pseudo cluster */
 #endif /* #ifdef HAVE_FAT16SUPPORT */
 #ifdef HAVE_MULTIVOLUME
     int drive; /* on which physical device is this located */
@@ -229,7 +230,6 @@ static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
-static int first_sector_of_cluster(IF_MV2(struct bpb* fat_bpb,) int cluster);
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int secnum);
 static int create_dos_name(const unsigned char *name, unsigned char *newname);
 static unsigned int find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int start);
@@ -251,39 +251,7 @@ struct fat_cache_entry
 static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 
-static int sec2cluster(IF_MV2(struct bpb* fat_bpb,) unsigned int sec)
-{
-#ifndef HAVE_MULTIVOLUME
-    struct bpb* fat_bpb = &fat_bpbs[0];
-#endif
-    if ( sec < fat_bpb->firstdatasector )
-    {
-        DEBUGF( "sec2cluster() - Bad sector number (%d)\n", sec);
-        return -1;
-    }
-
-    return ((sec - fat_bpb->firstdatasector) / fat_bpb->bpb_secperclus) + 2;
-}
-
 static int cluster2sec(IF_MV2(struct bpb* fat_bpb,) int cluster)
-{
-#ifndef HAVE_MULTIVOLUME
-    struct bpb* fat_bpb = &fat_bpbs[0];
-#endif
-    int max_cluster = fat_bpb->totalsectors -
-        fat_bpb->firstdatasector / fat_bpb->bpb_secperclus + 1;
-    
-    if(cluster > max_cluster)
-    {
-        DEBUGF( "cluster2sec() - Bad cluster number (%d)\n",
-                cluster);
-        return -1;
-    }
-
-    return first_sector_of_cluster(IF_MV2(fat_bpb,) cluster);
-}
-
-static int first_sector_of_cluster(IF_MV2(struct bpb* fat_bpb,) int cluster)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -294,7 +262,17 @@ static int first_sector_of_cluster(IF_MV2(struct bpb* fat_bpb,) int cluster)
 #else
     const int zerocluster = 2;
 #endif
-    return (cluster - zerocluster) * fat_bpb->bpb_secperclus + fat_bpb->firstdatasector;
+    int max_cluster = fat_bpb->totalsectors -
+        fat_bpb->firstdatasector / fat_bpb->bpb_secperclus + 1;
+    
+    if (cluster > max_cluster)
+    {
+        DEBUGF( "cluster2sec() - Bad cluster number (%d)\n", cluster);
+        return -1;
+    }
+
+    return (cluster - zerocluster) * fat_bpb->bpb_secperclus 
+           + fat_bpb->firstdatasector;
 }
 
 int fat_startsector(IF_MV_NONVOID(int volume))
@@ -349,6 +327,9 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
     unsigned char buf[SECTOR_SIZE];
     int rc;
     int datasec;
+#ifdef HAVE_FAT16SUPPORT
+    int rootdirsectors;
+#endif
 
     /* Read the sector */
     rc = ata_read_sectors(IF_MV2(drive,) startsector,1,buf);
@@ -359,7 +340,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
     }
 
     memset(fat_bpb, 0, sizeof(struct bpb));
-    fat_bpb->startsector = startsector;
+    fat_bpb->startsector    = startsector;
 #ifdef HAVE_MULTIVOLUME
     fat_bpb->drive          = drive;
 #endif
@@ -388,13 +369,13 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
 
 #ifdef HAVE_FAT16SUPPORT
     fat_bpb->bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT);
-    fat_bpb->rootdirsectors = ((fat_bpb->bpb_rootentcnt * 32) 
+    rootdirsectors = ((fat_bpb->bpb_rootentcnt * 32)
         + (fat_bpb->bpb_bytspersec - 1)) / fat_bpb->bpb_bytspersec;
 #endif /* #ifdef HAVE_FAT16SUPPORT */
     
     fat_bpb->firstdatasector = fat_bpb->bpb_rsvdseccnt
 #ifdef HAVE_FAT16SUPPORT
-        + fat_bpb->rootdirsectors
+        + rootdirsectors
 #endif
         + fat_bpb->bpb_numfats * fat_bpb->fatsize;
 
@@ -431,11 +412,13 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
         int dirclusters;  
         fat_bpb->rootdirsector = fat_bpb->bpb_rsvdseccnt
             + fat_bpb->bpb_numfats * fat_bpb->bpb_fatsz16;
-        dirclusters = ((fat_bpb->rootdirsectors + fat_bpb->bpb_secperclus - 1) 
-          / fat_bpb->bpb_secperclus); /* rounded up, to full clusters */
+        dirclusters = ((rootdirsectors + fat_bpb->bpb_secperclus - 1)
+            / fat_bpb->bpb_secperclus); /* rounded up, to full clusters */
         /* I assign negative pseudo cluster numbers for the root directory,
            their range is counted upward until -1. */
         fat_bpb->bpb_rootclus = 0 - dirclusters; /* backwards, before the data */
+        fat_bpb->rootdiroffset = dirclusters * fat_bpb->bpb_secperclus
+            - rootdirsectors;
     }
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
@@ -610,7 +593,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
                            sectorbuf);
     if(rc < 0)
     {
-        panicf("cache_fat_sector() - Could not write sector %d"
+        panicf("flush_fat_sector() - Could not write sector %d"
                " (error %d)\n",
                secnum, rc);
     }
@@ -630,7 +613,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
                                secnum, 1, sectorbuf);
         if(rc < 0)
         {
-            panicf("cache_fat_sector() - Could not write sector %d"
+            panicf("flush_fat_sector() - Could not write sector %d"
                    " (error %d)\n",
                    secnum, rc);
         }
@@ -667,7 +650,7 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int fatsector)
     /* Load the sector if it is not cached */
     if(!fce->inuse)
     {
-        rc = ata_read_sectors(IF_MV2(fat_bpb->drive,) 
+        rc = ata_read_sectors(IF_MV2(fat_bpb->drive,)
                               secnum + fat_bpb->startsector,1,
                               sectorbuf);
         if(rc < 0)
@@ -780,7 +763,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
         if (!sec)
         {
-            DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
+            DEBUGF( "update_fat_entry() - Could not cache sector %d\n", sector);
             return -1;
         }
         fat_cache[(sector + fat_bpb->bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
@@ -816,7 +799,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned int entry, uns
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector);
         if (!sec)
         {
-            DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
+            DEBUGF( "update_fat_entry() - Could not cache sector %d\n", sector);
             return -1;
         }
         fat_cache[(sector + fat_bpb->bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
@@ -1541,8 +1524,8 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
     return 1;
 }
 
-int fat_open(IF_MV2(int volume,) 
-             unsigned int startcluster,
+int fat_open(IF_MV2(int volume,)
+             int startcluster,
              struct fat_file *file,
              const struct fat_dir* dir)
 {
@@ -1571,33 +1554,6 @@ int fat_open(IF_MV2(int volume,)
     LDEBUGF("fat_open(%x), entry %d\n",startcluster,file->direntry);
     return 0;
 }
-
-#ifdef HAVE_FAT16SUPPORT
-/* special function to open the FAT16 root dir, 
-   which may not be on cluster boundary */
-static int fat_open_root(IF_MV2(int volume,) 
-                         struct fat_file *file)
-{
-    int dirclusters;
-#ifdef HAVE_MULTIVOLUME
-    struct bpb* fat_bpb = &fat_bpbs[volume];
-    file->volume = volume;
-#else
-    struct bpb* fat_bpb = &fat_bpbs[0];
-#endif
-    file->firstcluster = fat_bpb->bpb_rootclus;
-    file->lastcluster = fat_bpb->bpb_rootclus;
-    file->lastsector = 0;
-    file->clusternum = 0;
-    dirclusters = 0 - fat_bpb->bpb_rootclus; /* bpb_rootclus is the negative */
-    file->sectornum = (dirclusters * fat_bpb->bpb_secperclus)
-      - fat_bpb->rootdirsectors; /* cluster sectors minus real sectors */
-    file->eof = false;
-
-    LDEBUGF("fat_open_root(), sector %d\n", cluster2sec(fat_bpb->bpb_rootclus));
-    return 0;
-}
-#endif /* #ifdef HAVE_FAT16SUPPORT */
 
 int fat_create_file(const char* name,
                     struct fat_file* file,
@@ -2054,6 +2010,13 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
                 /* look up first sector of file */
                 sector = cluster2sec(IF_MV2(fat_bpb,) file->firstcluster);
                 numsec=1;
+#ifdef HAVE_FAT16SUPPORT
+                if (file->firstcluster < 0)
+                {   /* FAT16 root dir */
+                    sector += fat_bpb->rootdiroffset;
+                    numsec += fat_bpb->rootdiroffset;
+                }
+#endif
             }
         }
 
@@ -2107,6 +2070,11 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
     int clusternum=0, numclusters=0, sectornum=0, sector=0;
     int cluster = file->firstcluster;
     int i;
+
+#ifdef HAVE_FAT16SUPPORT
+    if (cluster < 0) /* FAT16 root dir */
+        seeksector += fat_bpb->rootdiroffset;
+#endif
 
     file->eof = false;
     if (seeksector) {
@@ -2168,15 +2136,7 @@ int fat_opendir(IF_MV2(int volume,)
     dir->sector = 0;
 
     if (startcluster == 0)
-    {
-#ifdef HAVE_FAT16SUPPORT
-        if (fat_bpb->is_fat16)
-        {   /* FAT16 has the root dir outside of the data area */
-            return fat_open_root(IF_MV2(volume,) &dir->file);
-        }
-#endif
-        startcluster = sec2cluster(IF_MV2(fat_bpb,) fat_bpb->rootdirsector);
-    }
+        startcluster = fat_bpb->bpb_rootclus;
 
     rc = fat_open(IF_MV2(volume,) startcluster, &dir->file, parent_dir);
     if(rc)
