@@ -165,23 +165,14 @@ void statusbar_wipe(void)
  */
 void statusbar_icon_battery(int percent, bool charging)
 {
-    int i,j;
+    int i;
     int fill;
 
     /* draw battery */
-    for (i=0; i < 17; i++) {
-        DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS);
-        DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS + 6);
-    }
-
-    for (i=1; i < 6; i++) {
-        DRAW_PIXEL(ICON_BATTERY_X_POS, STATUSBAR_Y_POS + i);
-        DRAW_PIXEL(ICON_BATTERY_X_POS + 16, STATUSBAR_Y_POS + i);
-    }
-
+    lcd_drawrect(ICON_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
     for (i=2; i < 5; i++)
-        DRAW_PIXEL(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
-
+        lcd_drawpixel(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
+    
     /* fill battery */
     fill=percent;
     if (fill < 0)
@@ -191,10 +182,9 @@ void statusbar_icon_battery(int percent, bool charging)
 
     fill = fill * 15 / 100;
 
-    for (i=1; i <= fill; i++)
-        for (j=1; j < 6; j++)
-            DRAW_PIXEL(ICON_BATTERY_X_POS + i, STATUSBAR_Y_POS + j);
+    lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
 
+    /* draw power plug if charging */
     if (charging)
         lcd_bitmap(bitmap_icon_7x8[Icon_Plug], ICON_PLUG_X_POS,
                    STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
@@ -254,7 +244,7 @@ void statusbar_icon_volume(int percent)
                 if(i%2 == 0)
                     step++;
                 for(j=1; j <= step; j++)
-                    DRAW_PIXEL(ICON_VOLUME_X_POS + i, STATUSBAR_Y_POS + 7 - j);
+                    lcd_drawpixel(ICON_VOLUME_X_POS + i, STATUSBAR_Y_POS + 7 - j);
             }
         }
     }
