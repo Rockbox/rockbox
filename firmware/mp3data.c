@@ -246,7 +246,7 @@ static unsigned long __find_next_frame(int fd, int *offset, int max_offset, unsi
 
     *offset = pos - 4;
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SIMULATOR)
     if(*offset)
         DEBUGF("Warning: skipping %d bytes of garbage\n", *offset);
 #endif
@@ -547,6 +547,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     int progress_cnt = 0;
     bool is_vbr = false;
     int last_bitrate = 0;
+    int header_template = 0;
 
     if(lseek(fd, startpos, SEEK_SET) < 0)
         return -1;
@@ -557,9 +558,12 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     num_frames = 0;
     cnt = 0;
     
-    while((header = buf_find_next_frame(fd, &bytes, -1, header))) {
+    while((header = buf_find_next_frame(fd, &bytes, -1, header_template))) {
         mp3headerinfo(&info, header);
 
+        if(!header_template)
+            header_template = header;
+        
         /* See if this really is a VBR file */
         if(last_bitrate && info.bitrate != last_bitrate)
         {
@@ -607,8 +611,12 @@ int create_xing_header(int fd, int startpos, int filesize,
     int x;
     int index;
     unsigned char toc[100];
+    unsigned long xing_header_template = 0;
 
     DEBUGF("create_xing_header()\n");
+
+    if(header_template)
+        xing_header_template = header_template;
     
     if(generate_toc)
     {
@@ -627,19 +635,22 @@ int create_xing_header(int fd, int startpos, int filesize,
             /* Advance from the last seek point to this one */
             for(j = 0;j < pos - last_pos;j++)
             {
-                DEBUGF("fpos: %x frame no: %x\n", filepos, x++);
-                header = buf_find_next_frame(fd, &bytes, -1, header);
+                header = buf_find_next_frame(fd, &bytes, -1, header_template);
+                filepos += bytes;
                 mp3headerinfo(&info, header);
                 buf_seek(fd, info.frame_size-4);
                 filepos += info.frame_size;
+
+                if(!header_template)
+                    header_template = header;
             }
 
             /* Save a header for later use if header_template is empty.
                We only save one header, and we want to save one in the
                middle of the stream, just in case the first and the last
                headers are corrupt. */
-            if(!header_template && i == 1)
-                header_template = header;
+            if(!xing_header_template && i == 1)
+                xing_header_template = header;
             
             if(progressfunc)
             {
@@ -676,7 +687,7 @@ int create_xing_header(int fd, int startpos, int filesize,
     memset(buf, 0, 1500);
 
     /* Use the template header and create a new one */
-    mp3headerinfo(&info, header_template);
+    mp3headerinfo(&info, xing_header_template);
 
     /* calculate position of VBR header */
     if ( info.version == MPEG_VERSION1 ) {
@@ -694,7 +705,7 @@ int create_xing_header(int fd, int startpos, int filesize,
 
     /* We ignore the Protection bit even if the rest of the stream is
        protected. (fixme?) */
-    header = header_template & ~(BITRATE_MASK | PROTECTION_MASK);
+    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
     header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
 
     /* Write the header to the buffer */
