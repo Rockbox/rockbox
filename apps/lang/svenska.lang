@@ -2726,29 +2726,35 @@ new: "Tvinga mono"
 id: LANG_MDB_CENTER
 desc: in sound settings
 eng: "MDB Center frequency"
+voice: "MDB Center frequency"
 new: "MDB Mittfrekvens"
 
 id: LANG_MDB_ENABLE
 desc: in sound settings
 eng: "MDB Enable"
+voice: "MDB Enable"
 new: "Aktivera MDB"
 
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
+voice: "MDB Harmonics"
 new: "MDB Övertoner"
 
 id: LANG_MDB_SHAPE
 desc: in sound settings
 eng: "MDB Shape"
+voice: "MDB Shape"
 new: "MDB Form"
 
 id: LANG_MDB_STRENGTH
 desc: in sound settings
 eng: "MDB Strength"
+voice: "MDB Strength"
 new: "MDB Styrka"
 
 id: LANG_SUPERBASS
 desc: in sound settings
 eng: "Super bass"
+voice: "Super bass"
 new: "Superbas"
