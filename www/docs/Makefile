@@ -37,6 +37,12 @@ custom_wps_format.raw: $(DOCS)/CUSTOM_WPS_FORMAT $(TXT2HTML)
 custom_wps_format.html: custom_wps_format.t custom_wps_format.raw $(TXT2HTML)
 	$(ACTION) $<
 
+custom_cfg_format.raw: $(DOCS)/CUSTOM_CFG_FORMAT $(TXT2HTML)
+	$(TXT2HTML) < $< > $@
+
+custom_cfg_format.html: custom_cfg_format.t custom_cfg_format.raw $(TXT2HTML)
+	$(ACTION) $<
+
 how_to_compile.raw: $(DOCS)/README $(TXT2HTML)
 	$(TXT2HTML) < $< > $@
 

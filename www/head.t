@@ -27,14 +27,14 @@
 &nbsp;<a href="/"><img src="/rockbox100.png" width=99 height=30 border=0></a>&nbsp;<br>
 
 <p align="right">
-<a class="menulink" href="/">main page</a><br>
+<a class="menulink" href="/">home</a><br>
 <a class="menulink" href="/download/">download</a><br>
 <a class="menulink" href="/screenshots.html">screen&nbsp;shots</a><br>
-<a class="menulink" href="/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/docs/">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
 <a class="menulink" href="/internals/">photos</a><br>
+<a class="menulink" href="/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/mods/">hardware mods</a><br>
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
 <a class="menulink" href="/bugs.shtml">bug reports</a><br>
@@ -45,11 +45,11 @@
 <form action="http://www.google.com/search">
 <input name=as_q size=12><br>
 <input value="Search" type=submit>
-<input type=hidden name=as_oq value=rockbox>
-<input type=hidden name=as_sitesearch value="bjorn.haxx.se">
-</form></div>
+<input type=hidden name=as_sitesearch value="rockbox.haxx.se">
+</form>
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+</div>
 
-<a href="http://sourceforge.net"><img src="http://sourceforge.net/ sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 </td>
 <td>
 

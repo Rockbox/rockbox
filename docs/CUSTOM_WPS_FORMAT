@@ -89,7 +89,7 @@ If you haven't selected a .wps file in the .rockbox directory, you get the
 hardcoded wps layout. The default WPS screen is for player:
 
 %s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>
-%pc/%pt
+%pc%pb%pt
 
 and for recorder:
 
@@ -100,3 +100,4 @@ and for recorder:
 %fb kbit %fv
 Time: %pc / %pt
 %pb
+%pm

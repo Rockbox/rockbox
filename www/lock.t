@@ -7,11 +7,13 @@ Part. Error
 Pls Chck HD
 </pre>
 
-<p>We are still not 100% sure why it happens. Theories range from
+<p>We are still not 100% sure why it happened. Theories range from
 low-power conditions to accidental chip select failure.
 It has also happened for normal users,
-using the standard Archos-supplied firmware, although it's more frequent for
+using the standard Archos-supplied firmware, although it was more frequent for
 us developers.
+
+<p>Note: None of us developers have experienced this problem since march 2002.
 
 <p>We do however know how to unlock the disk:
 
@@ -34,6 +36,10 @@ us developers.
 </ol>
 
 <p>Big thanks to Magnus Andersson for discovering the Fujitsu (lack of) user password!
+
+<p>There is also a program for win32,
+<a href="http://www.ws64.com/archos/ArchosUnlock.exe">ArchosUnlock.exe</a>,
+that creates a linux boot disk with the below mentioned patched isd200 driver.
 
 <h2>Linux unlock</h2>
 
