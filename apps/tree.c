@@ -310,8 +310,13 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
             else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
                 dptr->attr |= TREE_ATTR_ROCK;
             else if (!strcasecmp(&entry->d_name[len-4], ".ucl"))
-                dptr->attr |= TREE_ATTR_UCL; }
-        
+                dptr->attr |= TREE_ATTR_UCL;
+#ifdef HAVE_LCD_BITMAP
+            else if (!strcasecmp(&entry->d_name[len-4], ".ch8"))
+                dptr->attr |= TREE_ATTR_CH8;
+#endif
+        }
+
         /* memorize/compare details about the boot file */
         if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
             if (boot_size) {
@@ -1025,6 +1030,11 @@ static bool dirbrowse(char *root, int *dirfilter)
                             break;
 
 #ifdef HAVE_LCD_BITMAP
+                            /* chip-8 game */
+                        case TREE_ATTR_CH8:
+                            plugin_load("/.rockbox/rocks/chip8.rock",buf);
+                            break; 
+
                         case TREE_ATTR_FONT:
                             font_load(buf);
                             set_file(buf, global_settings.font_file,
