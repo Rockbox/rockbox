@@ -40,15 +40,15 @@ void lang_load(char *filename)
             filesize-=2;
 
             while(filesize>3) {
-                id = (ptr[0]<<8) | ptr[1];
-                ptr+=2;
-                language_strings[id] = ptr;
-                while(*ptr) {
+                id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
+                ptr+=2;                     /* pass the id */
+                language_strings[id] = ptr; /* point to this string */
+                while(*ptr) {               /* pass the string */
                     filesize--;
                     ptr++;
                 }
-                filesize-=3;
-                ptr++; /* pass the terminating newline */
+                filesize-=3; /* the id and the terminating zero */
+                ptr++;       /* pass the terminating zero-byte */
             }
         }
         else {
