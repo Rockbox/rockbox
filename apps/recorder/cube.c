@@ -315,7 +315,7 @@ bool cube(void)
                 highspeed=!highspeed;
                 t_disp=DISP_TIME;
                 break;
-            case BUTTON_OFF:
+            case BUTTON_OFF|BUTTON_REL:
                 exit=1;
                 break;
         }
