@@ -41,6 +41,8 @@
 #include "screens.h"
 #include "ctype.h"
 #include "file.h"
+#include "errno.h"
+#include "system.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -581,9 +583,18 @@ void settings_load(void)
     settings_apply();
 }
 
+/* Read (up to) a line of text from fd into buffer and return number of bytes
+ * read (which may be larger than the number of bytes stored in buffer). If 
+ * an error occurs, -1 is returned (and buffer contains whatever could be 
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are 
+ * stored in buffer.
+ */
 static int read_line(int fd, char* buffer, int buffer_size)
 {
     int count = 0;
+    int num_read = 0;
+    
+    errno = 0;
 
     while (count < buffer_size)
     {
@@ -592,6 +603,8 @@ static int read_line(int fd, char* buffer, int buffer_size)
         if (1 != read(fd, &c, 1))
             break;
         
+        num_read++;
+            
         if ( c == '\n' )
             break;
 
@@ -601,12 +614,9 @@ static int read_line(int fd, char* buffer, int buffer_size)
         buffer[count++] = c;
     }
 
-    if ( count < buffer_size )
-        buffer[count] = 0;
-    else
-        buffer[buffer_size-1] = 0;
+    buffer[MIN(count, buffer_size - 1)] = 0;
 
-    return count;
+    return errno ? -1 : num_read;
 }
 
 /* parse a line from a configuration file. the line format is: 
@@ -656,6 +666,12 @@ static void set_sound(char* value, int type, int* setting)
 
     *setting = num;
     mpeg_sound_set(type, num);
+
+#ifdef HAVE_MAS3507D
+    /* This is required to actually apply balance */
+    if (SOUND_BALANCE == type)
+        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+#endif
 }
 
 bool settings_load_config(char* file)
@@ -667,7 +683,7 @@ bool settings_load_config(char* file)
     if (-1 == fd)
         return false;
 
-    while (read_line(fd, line, sizeof line))
+    while (read_line(fd, line, sizeof line) > 0)
     {
         char* name;
         char* value;
@@ -786,12 +802,12 @@ bool set_bool(char* string, bool* variable )
 bool set_bool_options(char* string, bool* variable,
                       char* yes_str, char* no_str )
 {
-    char* names[] = { yes_str, no_str };
-    int value = !*variable;
+    char* names[] = { no_str, yes_str };
+    int value = *variable;
     bool result;
 
     result = set_option(string, &value, names, 2, NULL);
-    *variable = !value;
+    *variable = value;
     return result;
 }
 
