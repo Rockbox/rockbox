@@ -279,6 +279,7 @@ static bool plugin_browse(void)
 bool recording_screen(void)
 {
     /* a dummy */
+    return false;
 }
 #endif
 
