@@ -819,7 +819,7 @@ static void scroll_thread(void)
                 s->line[i] = s->line[i+1];
 
             if ( s->offset < s->textlen ) {
-                s->line[s->space - 1] = s->text[s->offset];
+                s->line[(int)s->space - 1] = s->text[(int)s->offset];
                 s->offset++;
             }
             else {
