@@ -234,6 +234,7 @@ static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
 {
     char* name = dircache[direntry].name;
     int xpos = LINE_X;
+    char* dotpos = NULL;
 
 #ifdef HAVE_LCD_CHARCELLS
     if (!global_settings.show_icons)
@@ -244,35 +245,26 @@ static void showfileline(int line, int direntry, bool scroll, int *dirfilter)
     if (*dirfilter != SHOW_ALL &&
         !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
-        char* dotpos = strrchr(name, '.');
-        char temp=0;
+        dotpos = strrchr(name, '.');
         if (dotpos) {
-            temp = *dotpos;
             *dotpos = 0;
         }
-        if(scroll)
-#ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor)
-                lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
-            else
-#endif
-                lcd_puts_scroll(xpos, line, name);
-        else
-            lcd_puts(xpos, line, name);
-        if (temp)
-            *dotpos = temp;
     }
-    else {
-        if(scroll)
+    
+    if(scroll) {
 #ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor)
-                lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
-            else
-#endif
-                lcd_puts_scroll(xpos, line, name);
+        lcd_setfont(FONT_UI);
+        if (global_settings.invert_cursor)
+            lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
         else
-            lcd_puts(xpos, line, name);
-    }
+#endif
+            lcd_puts_scroll(xpos, line, name);
+    } else
+        lcd_puts(xpos, line, name);
+
+    /* Restore the dot before the extension if it was removed */
+    if (dotpos)
+        *dotpos = '.';
 }
 
 /* load sorted directory into dircache.  returns NULL on failure. */
