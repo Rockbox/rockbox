@@ -176,7 +176,7 @@ bool recording_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("M", &w, &h);
-    lcd_setmargins(w, 8);
+    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
 
     while(!done)
     {
@@ -353,6 +353,8 @@ bool recording_screen(void)
             update_countdown--;
             if(update_countdown == 0 || seconds > last_seconds)
             {
+                int pos = 0;
+
                 update_countdown = 5;
                 last_seconds = seconds;
 
@@ -378,7 +380,10 @@ bool recording_screen(void)
                              fmt_gain(SOUND_MIC_GAIN,
                                       global_settings.rec_mic_gain,
                                       buf2, sizeof(buf2)));
-                    lcd_puts(0, 3, buf);
+                    if (global_settings.invert_cursor && (pos++ == cursor))
+                        lcd_puts_style(0, 3, buf, STYLE_INVERT);
+                    else
+                        lcd_puts(0, 3, buf);
                 }
                 else
                 {
@@ -390,19 +395,28 @@ bool recording_screen(void)
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
                                  fmt_gain(SOUND_LEFT_GAIN, gain,
                                           buf2, sizeof(buf2)));
-                        lcd_puts(0, 3, buf);
+                        if (global_settings.invert_cursor && (pos++ == cursor))
+                            lcd_puts_style(0, 3, buf, STYLE_INVERT);
+                        else
+                            lcd_puts(0, 3, buf);
                         
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_LEFT),
                                  fmt_gain(SOUND_LEFT_GAIN,
                                           global_settings.rec_left_gain,
                                           buf2, sizeof(buf2)));
-                        lcd_puts(0, 4, buf);
+                        if (global_settings.invert_cursor && (pos++ == cursor))
+                            lcd_puts_style(0, 4, buf, STYLE_INVERT);
+                        else
+                            lcd_puts(0, 4, buf);
                         
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_RIGHT),
                                  fmt_gain(SOUND_RIGHT_GAIN,
                                           global_settings.rec_right_gain,
                                           buf2, sizeof(buf2)));
-                        lcd_puts(0, 5, buf);
+                        if (global_settings.invert_cursor && (pos++ == cursor))
+                            lcd_puts_style(0, 5, buf, STYLE_INVERT);
+                        else
+                            lcd_puts(0, 5, buf);
                     }
                 }
 
