@@ -170,10 +170,10 @@ static struct id3tag _id3tags[MAX_ID3_TAGS];
 
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
-static bool mpeg_is_initialized = false;
 
 #ifndef SIMULATOR
 
+static bool mpeg_is_initialized = false;
 static int tag_read_idx = 0;
 static int tag_write_idx = 0;
 
