@@ -24,7 +24,7 @@ all: $(TOOLSDIR)/convbdf $(OUTPUT) $(EXTRA_TARGETS)
 dep: $(DEPFILE)
 
 $(TOOLSDIR)/convbdf:
-	$(MAKE) -C $(TOOLSDIR)
+	$(MAKE) CC=gcc LD=ld -C $(TOOLSDIR)
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
 	@echo "AR $@"
