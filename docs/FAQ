@@ -380,7 +380,12 @@ A60: We currently support four different hardware platforms: Players, Recorder
      The Release version (currently 2.3) is a frozen known-good state. This
      means that we are confident that few, if any, significant bugs reside
      within the code for that version. This is the version for the common
-     user.
+     user, *except for Ondio*. Use a current daily build for Ondio.
+     There are 2 bugs in the 2.3 release that render it not recommended for
+     Ondio: (1) Saving configuration files or radio presets takes ages, and
+     wears the flash chip much more than necessary. (2) Rockbox 2.3 does not
+     yet support all Ondio hardware variants. This may lead to non-working
+     storage access both from rockbox and via USB.
 
      The Daily Builds (http://www.rockbox.org/daily.shtml) are automated
      daily builds of the CVS (development) code.  As such they contain all the
