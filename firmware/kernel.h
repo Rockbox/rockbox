@@ -45,8 +45,10 @@ struct event_queue
 extern long current_tick;
 
 /* kernel functions */
+extern void kernel_init(void);
 extern void yield(void);
 extern void sleep(int ticks);
+int set_irq_level(int level);
 
 extern void queue_init(struct event_queue *q);
 extern struct event *queue_wait(struct event_queue *q);
