@@ -19,7 +19,7 @@ descramble: descramble.c
 sh2d: sh2d.c
 
 bdf2ajf: bdf2ajf.c
-	gcc -O -ansi $+ -o $@
+	gcc -g -ansi $+ -o $@
 
 bmp2rb:	bmp2rb.c
 	gcc -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
