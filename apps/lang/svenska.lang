@@ -41,18 +41,18 @@ new: "USB (sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
-eng: "Rockbox info:"
-new: "Rockbox info:"
+eng: "Rockbox Info:"
+new: "Rockbox Info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMb"
-new: "Buf: %d.%02dMb"
+eng: "Buf: %d.%02dMB"
+new: "Buf: %d.%02dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMb"
-new: "Buffert: %d.%02dMb"
+eng: "Buffer: %d.%02dMB"
+new: "Buffert: %d.%02dMB"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -186,7 +186,7 @@ new: "Slumpa"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
-eng: "Play selected first"
+eng: "Play Selected First"
 new: "Spela den valda först"
 
 id: LANG_MP3FILTER
@@ -231,7 +231,7 @@ new: "Rullningshastighetsexempel"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
-eng: "Deep discharge"
+eng: "Deep Discharge"
 new: "Djup urladdning"
 
 id: LANG_TIME
@@ -261,13 +261,13 @@ new: "Följ Låtlistan"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
-eng: "Really?"
-new: "Verkligen?"
+eng: ""
+new: ""
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Spela/Stanna"
+eng: ""
+new: ""
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -276,13 +276,13 @@ new: "Är du säker?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "Play = Yes"
-new: "Spela = Ja"
+eng: ""
+new: ""
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
-eng: "Any Other = No"
-new: "Övriga = Nej"
+eng: "OFF=Cancel"
+new: "AV=Avbryt"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -366,7 +366,7 @@ new: "Basförstärkning"
 
 id: LANG_DECAY
 desc: in sound_settings
-eng: "AV decay time"
+eng: "AV Decay Time"
 new: "AV falltid"
 
 id: LANG_CHANNEL_MENU
@@ -376,7 +376,7 @@ new: "Kanaler"
 
 id: LANG_CHANNEL
 desc: in sound_settings
-eng: "Channel configuration"
+eng: "Channel Configuration"
 new: "Kanalkonfigurering"
 
 id: LANG_CHANNEL_STEREO
@@ -426,7 +426,7 @@ new: "(Ja/Nej)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "Play = Yes"
+eng: "PLAY = Yes"
 new: "Spela = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
@@ -461,7 +461,7 @@ new: "Tyst PÅ"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: "MUTE OFF"
+eng: "Mute OFF"
 new: "TYST AV"
 
 id: LANG_MUTE_ON_RECORDER
@@ -546,7 +546,7 @@ new: "[Frekvens]"
 
 id: LANG_ID3_PATH
 desc: in wps
-eng: "[PATH]"
+eng: "[Path]"
 new: "[VÄG]"
 
 id: LANG_PITCH_UP
@@ -596,23 +596,23 @@ new: "Listan slut"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
-eng: "<Press ON>"
-new: "<Tryck ON>"
+eng: ""
+new: ""
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "<End of song list>"
-new: "<Slut på listan>"
+eng: "End of song list"
+new: "Slut på låtlistan"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
-eng: "Press ON"
-new: "Tryck ON"
+eng: ""
+new: ""
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
-eng: "Your score :"
-new: "Din poäng:"
+eng: "Your score:"
+new: "Dina poäng:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
@@ -631,12 +631,12 @@ new: "Spelet pausat"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[Play] to resume"
+eng: "[PLAY] to resume"
 new: "[Spela] för att återgå"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[Off] to quit"
+eng: "[OFF] to quit"
 new: "[Av] för att avsluta"
 
 id: LANG_SNAKE_LEVEL
@@ -651,7 +651,7 @@ new: "(1- långsamt, 9 - fort)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[Play] to start/pause"
+eng: "[PLAY] to start/pause"
 new: "[Spela] för att starta/pausa"
 
 id: LANG_SOKOBAN_LEVEL
@@ -671,7 +671,7 @@ new: "DU VINNER!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[Off] to stop"
+eng: "[OFF] to stop"
 new: "[Av] för att stanna"
 
 id: LANG_SOKOBAN_F1
@@ -726,12 +726,12 @@ new: "Hs: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    up/dn"
+eng: "%d Players    UP/DN"
 new: "%d Spelare  upp/ner"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        l/r"
+eng: "%d Worms        L/R"
 new: "%d Worms        h/v"
 
 id: LANG_WORMLET_REMOTE_CTRL
@@ -766,8 +766,8 @@ new: "Du förlorar!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "0 Rows - Level 0"
-new: "0 Rader - Nivå 0"
+eng: "Rows - Level"
+new: "Rader - Nivå"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -781,7 +781,7 @@ new: "Nytt språk"
 
 id: LANG_FILTER
 desc: setting name for dir filter
-eng: "Show files"
+eng: "Show Files"
 new: "Visa filer"
 
 id: LANG_FILTER_MUSIC
@@ -811,37 +811,37 @@ new: "Nej"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
-eng: "Backlight on when charging"
-new: "Belysning vid laddning"
+eng: "Backlight On When Plugged"
+new: "Belysning på vid laddning"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
-eng: "Clip hold time"
+eng: "Clip Hold Time"
 new: "Klipphålltid"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
-eng: "eternal"
-new: "oändlig"
+eng: "Eternal"
+new: "Oändlig"
 
 id: LANG_PM_MENU
 desc: in the display menu
-eng: "Peak meter"
+eng: "Peak Meter"
 new: "Toppmätare"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
-eng: "Peak hold time"
+eng: "Peak Hold Time"
 new: "Topphålltid"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
-eng: "Peak release"
+eng: "Peak Release"
 new: "Toppsläppning"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
-eng: "Units per read"
+eng: "Units Per Read"
 new: "Enheter per läsning"
 
 id: LANG_REPEAT
@@ -858,3 +858,29 @@ id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
 new: "En"
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 hour clock"
+new: "12-timmarsvisning"
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 hour clock"
+new: "24-timmarsvisning"
+
+id: LANG_RESET_CANCEL
+desc: confirm to reset settings
+eng: "OFF=Cancel"
+new: "AV=Avbryt"
+
+id: LANG_RESET_CONFIRM
+desc: confirm to reset settings
+eng: "PLAY=Reset"
+new: "SPELA=Återställ"
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+new: "Tidsformat"
+
