@@ -2,6 +2,12 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2004-06-17</i>: We now have a <a href="/twiki">Wiki</a> for the documentation. Feel free to join the documentation frenzy!
+
+<p><i>2004-05-07</i>: The CVS repository has <a href="/cvs.html">moved</a>
+
+<p><i>2004-03-14</i>: Rockbox can <a href="/lang/">talk</a> to you
+
 <p><i>2004-03-11</i>: Version 2.2 is <a href="/download/">released</a>
 
 <p><i>2004-02-05</i>: Rockbox can play <a href="/docs/rvf.html">video</a>, with sound 

@@ -15,6 +15,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-10-05</i>: Call for help: We need information from Ondio owners for our <a href="/twiki/bin/view/Main/ArchosOndio">Archos Ondio port</a>.
+
 <p><i>2004-10-01</i>: Touchdown! The Coldfire BDM wiggler is working on the iHP-120 target! Time for some sweet GDB debugging...
 
 <p><i>2004-09-24</i>: We finally have rockbox.org, thanks to Jeff at Misticriver.
@@ -22,12 +24,6 @@ upgrade your ordinary Archos firmware.
 <p><i>2004-09-13</i>: Call for help! Please donate your broken iRiver iHP-1xx to the project!
 
 <p><i>2004-07-08</i>: Good news for Windows users! You can now install the <a href=/daily.shtml>daily builds</a> with an installer executable. Thanks to Christi Scarborough for that.
-
-<p><i>2004-06-17</i>: We now have a <a href="/twiki">Wiki</a> for the documentation. Feel free to join the documentation frenzy!
-
-<p><i>2004-05-07</i>: The CVS repository has <a href="/cvs.html">moved</a>
-
-<p><i>2004-03-14</i>: Rockbox can <a href="/lang/">talk</a> to you
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
