@@ -147,7 +147,7 @@ static const unsigned char old_lcd_ascii[] = {
 
 static bool new_lcd;
 
-static unsigned const char *lcd_ascii;
+unsigned const char *lcd_ascii;
 static char lcd_contrast_set;
 static char lcd_cram;
 static char lcd_pram;
