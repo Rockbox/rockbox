@@ -825,6 +825,8 @@ bool dbg_ports(void)
     char buf[128];
     int button;
     int line;
+    int battery_voltage;
+    int batt_int, batt_frac;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
@@ -873,6 +875,14 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
 
+        battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
+        batt_int = battery_voltage / 100;
+        batt_frac = battery_voltage % 100;
+    
+        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
+                 battery_level());
+        lcd_puts(0, line++, buf);
+        
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 

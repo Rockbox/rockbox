@@ -35,6 +35,14 @@
 #define BATTERY_CAPACITY_MIN 500
 #define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable in settings */
 #define BATTERY_TYPES_COUNT      2   /* Alkalines or NiMH */
+#elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
+#define BATTERY_LEVEL_SHUTDOWN   306 /* 3.06V */
+#define BATTERY_LEVEL_EMPTY      330 /* 3.30V */
+#define BATTERY_LEVEL_DANGEROUS  339 /* 3.39V */
+#define BATTERY_LEVEL_FULL       400 /* 4.00V */
+#define BATTERY_CAPACITY_MIN 1300
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
+#define BATTERY_TYPES_COUNT      1
 #else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */

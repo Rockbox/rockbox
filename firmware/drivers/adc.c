@@ -202,6 +202,8 @@ void adc_init(void)
     GPIO_OUT |= 0x80;         /* CS high */
     GPIO_OUT &= ~0x00400000;  /* CLK low */
 
+    adc_scan(ADC_BATTERY);
+    
     tick_add_task(adc_tick);
 }
 

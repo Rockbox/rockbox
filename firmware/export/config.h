@@ -48,7 +48,7 @@
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
 #define BATT_4AA_NIMH   1500
 #define BATT_3AAA       1000 /* Ondio */
-#define BATT_IRIVER     2    /* the type used in iRiver h1x0 models */
+#define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
 
 /* CONFIG_LCD */
 #define LCD_GMINI100 0
