@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;HAVE_LCD_BITMAP"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -107,6 +107,9 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\app.c">
+			</File>
+			<File
 				RelativePath="button.c">
 			</File>
 			<File
@@ -122,7 +125,7 @@
 				RelativePath="..\..\firmware\disk.c">
 			</File>
 			<File
-				RelativePath="..\..\firmware\test\wavey\harness.c">
+				RelativePath="..\..\firmware\id3.c">
 			</File>
 			<File
 				RelativePath="kernel.c">
@@ -134,13 +137,31 @@
 				RelativePath="..\..\firmware\drivers\lcd.c">
 			</File>
 			<File
+				RelativePath="..\menu.c">
+			</File>
+			<File
 				RelativePath="panic-win32.c">
+			</File>
+			<File
+				RelativePath="..\play.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\playlist.c">
 			</File>
 			<File
+				RelativePath="..\screensaver.c">
+			</File>
+			<File
 				RelativePath="..\..\firmware\settings.c">
+			</File>
+			<File
+				RelativePath="..\..\firmware\common\sprintf.c">
+			</File>
+			<File
+				RelativePath="..\tetris.c">
+			</File>
+			<File
+				RelativePath="..\tree.c">
 			</File>
 			<File
 				RelativePath="..\tree.c">
@@ -153,13 +174,19 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="harness.h">
-			</File>
-			<File
 				RelativePath="lcd-win32.h">
 			</File>
 			<File
+				RelativePath="..\play.h">
+			</File>
+			<File
 				RelativePath="resource.h">
+			</File>
+			<File
+				RelativePath="..\screensaver.h">
+			</File>
+			<File
+				RelativePath="..\tree.h">
 			</File>
 			<File
 				RelativePath="uisw32.h">
