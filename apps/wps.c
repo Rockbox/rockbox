@@ -1157,7 +1157,6 @@ static bool menu(void)
                 /* change volume */
             case BUTTON_MENU | BUTTON_LEFT:
             case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-                dont_go_to_menu = true;
                 global_settings.volume--;
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
@@ -1171,7 +1170,6 @@ static bool menu(void)
                 /* change volume */
             case BUTTON_MENU | BUTTON_RIGHT:
             case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                dont_go_to_menu = true;
                 global_settings.volume++;
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -1184,12 +1182,6 @@ static bool menu(void)
 
                 /* show id3 tags */
             case BUTTON_MENU | BUTTON_ON:
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
                 lcd_stop_scroll();
                 lcd_icon(ICON_PARAM, true);
                 lcd_icon(ICON_AUDIO, true);
@@ -1220,10 +1212,6 @@ static bool menu(void)
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
-
-#ifdef HAVE_PLAYER_KEYPAD
-    int retval;
-#endif
     int button;
     bool ignore_keyup = true;
     bool restore = false;
