@@ -180,7 +180,7 @@ struct counter values[]={
   {"xadd", 1},
   {"yadd", 1},
   {"xdist", -4},
-  {"ydistt", -6},
+  {"ydist", -6},
 };
 
 #ifdef HAVE_RTC
