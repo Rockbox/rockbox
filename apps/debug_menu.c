@@ -274,7 +274,8 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
-    unsigned rom_crc; /* CRC16 of the boot ROM */
+    unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
+    bool has_bootrom; /* flag for boot ROM present */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -291,8 +292,13 @@ bool dbg_hw_info(void)
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
     
-    /* calculate CRC16 checksum of boot ROM */
-    rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+    /* check if the boot ROM area is a flash mirror */
+    has_bootrom = (memcmp((char*)0, (char*)0x02000000, 64*1024) != 0);
+    if (has_bootrom)  /* if ROM and Flash different */
+    {
+        /* calculate CRC16 checksum of boot ROM */
+        rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+    }
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -322,11 +328,16 @@ bool dbg_hw_info(void)
         snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
     lcd_puts(0, 6, buf);
 
-    snprintf(buf, 32-3, "ROM CRC: 0x%04x", rom_crc);
-    if (rom_crc == 0x222F) /* Version 1 */
-        strcat(buf, " V1");
-    else if (rom_crc == 0x8C1E) /* Version 2 */
-        strcat(buf, " V2");
+    if (has_bootrom)
+    {
+        snprintf(buf, 32-3, "ROM CRC: 0x%04x", rom_crc);
+        if (rom_crc == 0x222F) /* known Version 1 */
+            strcat(buf, " V1");
+    }
+    else
+    {
+        snprintf(buf, 32, "Boot ROM: none");
+    }
     lcd_puts(0, 7, buf);
     
     lcd_update();
@@ -351,7 +362,8 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
-    unsigned rom_crc; /* CRC16 of the boot ROM */
+    unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
+    bool has_bootrom; /* flag for boot ROM present */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -363,8 +375,13 @@ bool dbg_hw_info(void)
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
 
-    /* calculate CRC16 checksum of boot ROM */
-    rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+    /* check if the boot ROM area is a flash mirror */
+    has_bootrom = (memcmp((char*)0, (char*)0x02000000, 64*1024) != 0);
+    if (has_bootrom)  /* if ROM and Flash different */
+    {
+        /* calculate CRC16 checksum of boot ROM */
+        rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+    }
 
     lcd_clear_display();
 
@@ -395,7 +412,10 @@ bool dbg_hw_info(void)
                     snprintf(buf, 32, "Flash:??,??"); /* unknown, sorry */
                 break;
             case 5:
-                snprintf(buf, 32, "ROM CRC:%04x", rom_crc);
+                if (has_bootrom)
+                    snprintf(buf, 32, "RomCRC:%04x", rom_crc);
+                else
+                    snprintf(buf, 32, "BootROM: no");
         }
             
         lcd_puts(0, 1, buf);
