@@ -30,12 +30,12 @@
 #include "string.h"
 
 /* Define one of USE_STANDBY, USE_SLEEP or USE_POWEROFF */
-#define USE_STANDBY
+#define USE_SLEEP
 
 /* We can only use power off on the recorder */
 #if !defined(ARCHOS_RECORDER) && defined(USE_POWEROFF)
 #undef USE_POWEROFF
-#define USE_STANDBY
+#define USE_SLEEP
 #endif
 
 
