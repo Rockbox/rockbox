@@ -261,12 +261,13 @@ bool rec_menu(void)
     bool result;
 
     /* recording menu */
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_RECORDING_MENU),     recording_screen  },
         { STR(LANG_RECORDING_SETTINGS), recording_settings},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -280,7 +281,7 @@ bool info_menu(void)
     bool result;
 
     /* info menu */
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
         { STR(LANG_INFO_MENU),          show_info         },
         { STR(LANG_VERSION),            show_credits      },
@@ -291,7 +292,8 @@ bool info_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -305,7 +307,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_items items[8];
+    struct menu_item items[8];
 
     items[i].desc = str(LANG_BOOKMARK_MENU);
     items[i].voice_id = LANG_BOOKMARK_MENU;
@@ -345,7 +347,7 @@ bool main_menu(void)
     items[i].voice_id = LANG_INFO;
     items[i++].function = info_menu;
 
-    m=menu_init( items, i, NULL );
+    m=menu_init( items, i, NULL, NULL, NULL, NULL );
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
 #endif

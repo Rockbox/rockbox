@@ -1475,7 +1475,7 @@ bool debug_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { "Dump ROM contents", -1, dbg_save_roms },
         { "View I/O ports", -1, dbg_ports },
 #ifdef HAVE_LCD_BITMAP
@@ -1509,7 +1509,8 @@ bool debug_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     

@@ -66,14 +66,15 @@ bool playlist_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_CREATE_PLAYLIST),       create_playlist   },
         { STR(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
         { STR(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
         { STR(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
-    
-    m = menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+
+    m = menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
+                   NULL, NULL, NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;

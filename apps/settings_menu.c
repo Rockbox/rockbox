@@ -402,7 +402,7 @@ static bool peak_meter_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_PM_RELEASE)  , peak_meter_release   },  
         { STR(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
         { STR(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
@@ -414,8 +414,9 @@ static bool peak_meter_menu(void)
         { STR(LANG_PM_MIN)      , peak_meter_min       },
         { STR(LANG_PM_MAX)      , peak_meter_max       },
     };
-    
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL );
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -882,6 +883,11 @@ static bool status_bar(void)
 {
     return set_bool( str(LANG_STATUS_BAR), &global_settings.statusbar );
 }
+
+static bool button_bar(void)
+{
+    return set_bool( str(LANG_BUTTON_BAR), &global_settings.buttonbar );
+}
 #endif
 
 static bool ff_rewind_settings_menu(void)
@@ -889,12 +895,13 @@ static bool ff_rewind_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_FFRW_STEP), ff_rewind_min_step },
         { STR(LANG_FFRW_ACCEL), ff_rewind_accel },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -906,7 +913,7 @@ static bool playback_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_SHUFFLE), shuffle },
         { STR(LANG_REPEAT), repeat_mode },
         { STR(LANG_PLAY_SELECTED), play_selected },
@@ -918,7 +925,8 @@ static bool playback_settings_menu(void)
 
     bool old_shuffle = global_settings.playlist_shuffle;
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -941,13 +949,14 @@ static bool bookmark_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_BOOKMARK_SETTINGS_AUTOCREATE), autocreatebookmark},
         { STR(LANG_BOOKMARK_SETTINGS_AUTOLOAD), autoloadbookmark},
         { STR(LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS), useMRB},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -1008,14 +1017,15 @@ static bool fileview_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_CASE_MENU),    sort_case           },
         { STR(LANG_FILTER),       dir_filter          },
         { STR(LANG_FOLLOW),       browse_current      },
         { STR(LANG_SHOW_ICONS),   show_icons          },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1027,7 +1037,7 @@ static bool scroll_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_SCROLL_SPEED),     scroll_speed    },
         { STR(LANG_SCROLL_DELAY),    scroll_delay    },  
 #ifdef HAVE_LCD_BITMAP
@@ -1040,7 +1050,8 @@ static bool scroll_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1051,7 +1062,7 @@ static bool lcd_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_BACKLIGHT),       backlight_timer },
         { STR(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { STR(LANG_CAPTION_BACKLIGHT), caption_backlight },
@@ -1063,7 +1074,8 @@ static bool lcd_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1075,14 +1087,16 @@ static bool bars_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_SCROLL_BAR),      scroll_bar },
         { STR(LANG_STATUS_BAR),      status_bar },
+        { STR(LANG_BUTTON_BAR),      button_bar },
         { STR(LANG_VOLUME_DISPLAY),  volume_type },
         { STR(LANG_BATTERY_DISPLAY), battery_type },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1095,7 +1109,7 @@ static bool display_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
 #ifdef HAVE_LCD_BITMAP
         { STR(LANG_CUSTOM_FONT),     font_browse },
 #endif
@@ -1108,7 +1122,8 @@ static bool display_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1125,7 +1140,7 @@ static bool battery_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
 #ifdef HAVE_CHARGE_CTRL
         { STR(LANG_DISCHARGE),        deep_discharge   },
         { STR(LANG_TRICKLE_CHARGE),   trickle_charge   },
@@ -1135,7 +1150,8 @@ static bool battery_settings_menu(void)
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1146,14 +1162,15 @@ static bool disk_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_SPINDOWN),    spindown        },
 #ifdef HAVE_ATA_POWER_OFF
         { STR(LANG_POWEROFF),    poweroff        },
 #endif
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1165,12 +1182,13 @@ static bool time_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_TIME),        timedate_set    },
         { STR(LANG_TIMEFORMAT),  timeformat_set  },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1182,14 +1200,15 @@ static bool manage_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_CUSTOM_CFG),      custom_cfg_browse },
         { STR(LANG_FIRMWARE),        firmware_browse },
         { STR(LANG_RESET),           reset_settings },
         { STR(LANG_SAVE_SETTINGS),   settings_save_config },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1200,12 +1219,13 @@ static bool limits_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_MAX_FILES_IN_DIR),    max_files_in_dir        },
         { STR(LANG_MAX_FILES_IN_PLAYLIST),    max_files_in_playlist        },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1217,7 +1237,7 @@ static bool system_settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_BATTERY_MENU),     battery_settings_menu },
         { STR(LANG_DISK_MENU),        disk_settings_menu     },
 #ifdef HAVE_RTC
@@ -1236,7 +1256,8 @@ static bool system_settings_menu(void)
         { STR(LANG_MANAGE_MENU),      manage_settings_menu   },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
@@ -1247,7 +1268,7 @@ bool settings_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_PLAYBACK),         playback_settings_menu },
         { STR(LANG_FILE),             fileview_settings_menu },
         { STR(LANG_DISPLAY),          display_settings_menu  },
@@ -1256,7 +1277,8 @@ bool settings_menu(void)
         { STR(LANG_LANGUAGE),         language_browse        },
     };
     
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;

@@ -42,9 +42,13 @@
 struct menu {
     int top;
     int cursor;
-    struct menu_items* items;
+    struct menu_item* items;
     int itemcount;
     int (*callback)(int, int);
+#ifdef HAVE_LCD_BITMAP
+    bool use_buttonbar; /* true if a buttonbar is defined */
+    char *buttonbar[3];
+#endif
 };
 
 #define MAX_MENUS 5
@@ -132,12 +136,22 @@ void menu_draw(int m)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
+    int height = LCD_HEIGHT;
+    
     lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
     if (global_settings.statusbar)
-        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
-    else
-        menu_lines = LCD_HEIGHT/fh;
+        height -= STATUSBAR_HEIGHT;
+
+    if(global_settings.buttonbar && menus[m].use_buttonbar) {
+        buttonbar_set(menus[m].buttonbar[0],
+                      menus[m].buttonbar[1],
+                      menus[m].buttonbar[2]);
+        height -= BUTTONBAR_HEIGHT;
+    }
+
+    menu_lines = height / fh;
+    
 #else
     int menu_lines = MENU_LINES;
 #endif
@@ -170,10 +184,14 @@ void menu_draw(int m)
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.scrollbar && menus[m].itemcount > menu_lines) 
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
-                  LCD_HEIGHT - SCROLLBAR_Y, menus[m].itemcount, menus[m].top,
+                  height, menus[m].itemcount, menus[m].top,
                   menus[m].top + menu_lines, VERTICAL);
+
+    if(global_settings.buttonbar && menus[m].use_buttonbar)
+        buttonbar_draw();
 #endif
     status_draw(true);
+
     lcd_update();
 }
 
@@ -187,12 +205,17 @@ static void put_cursor(int m, int target)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
+    int height = LCD_HEIGHT;
+    
     lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
-    if (global_settings.statusbar)
-        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
-    else
-        menu_lines = LCD_HEIGHT/fh;
+    if(global_settings.statusbar)
+        height -= STATUSBAR_HEIGHT;
+
+    if(global_settings.buttonbar && menus[m].use_buttonbar)
+        height -= BUTTONBAR_HEIGHT;
+
+    menu_lines = height / fh;
 #else
     int menu_lines = MENU_LINES;
 #endif
@@ -226,7 +249,8 @@ static void put_cursor(int m, int target)
 
 }
 
-int menu_init(struct menu_items* mitems, int count, int (*callback)(int, int))
+int menu_init(struct menu_item* mitems, int count, int (*callback)(int, int),
+              char *button1, char *button2, char *button3)
 {
     int i;
 
@@ -245,7 +269,20 @@ int menu_init(struct menu_items* mitems, int count, int (*callback)(int, int))
     menus[i].top = 0;
     menus[i].cursor = 0;
     menus[i].callback = callback;
+#ifdef HAVE_LCD_BITMAP
+    menus[i].buttonbar[0] = button1;
+    menus[i].buttonbar[1] = button2;
+    menus[i].buttonbar[2] = button3;
 
+    if(button1 || button2 || button3)
+        menus[i].use_buttonbar = true;
+    else
+        menus[i].use_buttonbar = false;
+#else
+    (void)button1;
+    (void)button2;
+    (void)button3;
+#endif
     return i;
 }
 
@@ -262,12 +299,21 @@ int menu_show(int m)
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
+    int height = LCD_HEIGHT;
+    
     lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
     if (global_settings.statusbar)
-        menu_lines = (LCD_HEIGHT - STATUSBAR_HEIGHT) / fh;
-    else
-        menu_lines = LCD_HEIGHT/fh;
+        height -= STATUSBAR_HEIGHT;
+
+    if(global_settings.buttonbar && menus[m].use_buttonbar) {
+        buttonbar_set(menus[m].buttonbar[0],
+                      menus[m].buttonbar[1],
+                      menus[m].buttonbar[2]);
+        height -= BUTTONBAR_HEIGHT;
+    }
+
+    menu_lines = height / fh;
 #endif
 
     menu_draw(m);
@@ -439,7 +485,7 @@ int menu_count(int menu)
 
 bool menu_moveup(int menu)
 {
-    struct menu_items swap;
+    struct menu_item swap;
     
     /* can't be the first item ! */
     if( menus[menu].cursor == 0)
@@ -460,7 +506,7 @@ bool menu_moveup(int menu)
 
 bool menu_movedown(int menu)
 {
-    struct menu_items swap;
+    struct menu_item swap;
     
     /* can't be the last item ! */
     if( menus[menu].cursor == menus[menu].itemcount - 1)

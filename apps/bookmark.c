@@ -92,13 +92,14 @@ bool bookmark_menu(void)
     int m;
     bool result;
 
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
         { STR(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
         { STR(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
+                 NULL, NULL, NULL);
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);

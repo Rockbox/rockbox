@@ -346,7 +346,7 @@ bool sound_menu(void)
 {
     int m;
     bool result;
-    struct menu_items items[] = {
+    struct menu_item items[] = {
         { STR(LANG_VOLUME), volume },
         { STR(LANG_BASS), bass },
         { STR(LANG_TREBLE), treble },
@@ -359,7 +359,8 @@ bool sound_menu(void)
 #endif
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items), NULL );
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
@@ -371,37 +372,37 @@ bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_items menu[8];
+    struct menu_item items[8];
     bool result;
 
-    menu[i].desc = str(LANG_RECORDING_QUALITY);
-    menu[i].voice_id = LANG_RECORDING_QUALITY;
-    menu[i++].function = recquality;
-    menu[i].desc = str(LANG_RECORDING_FREQUENCY);
-    menu[i].voice_id = LANG_RECORDING_FREQUENCY;
-    menu[i++].function = recfrequency;
+    items[i].desc = str(LANG_RECORDING_QUALITY);
+    items[i].voice_id = LANG_RECORDING_QUALITY;
+    items[i++].function = recquality;
+    items[i].desc = str(LANG_RECORDING_FREQUENCY);
+    items[i].voice_id = LANG_RECORDING_FREQUENCY;
+    items[i++].function = recfrequency;
     if(!no_source) {
-        menu[i].desc = str(LANG_RECORDING_SOURCE);
-        menu[i].voice_id = LANG_RECORDING_SOURCE;
-        menu[i++].function = recsource;
+        items[i].desc = str(LANG_RECORDING_SOURCE);
+        items[i].voice_id = LANG_RECORDING_SOURCE;
+        items[i++].function = recsource;
     }
-    menu[i].desc = str(LANG_RECORDING_CHANNELS);
-    menu[i].voice_id = LANG_RECORDING_CHANNELS;
-    menu[i++].function = recchannels;
-    menu[i].desc = str(LANG_RECORDING_EDITABLE);
-    menu[i].voice_id = LANG_RECORDING_EDITABLE;
-    menu[i++].function = receditable;
-    menu[i].desc = str(LANG_RECORD_TIMESPLIT);
-    menu[i].voice_id = LANG_RECORD_TIMESPLIT;
-    menu[i++].function = rectimesplit;
-    menu[i].desc = str(LANG_RECORD_PRERECORD_TIME);
-    menu[i].voice_id = LANG_RECORD_PRERECORD_TIME;
-    menu[i++].function = recprerecord;
-    menu[i].desc = str(LANG_RECORD_DIRECTORY);
-    menu[i].voice_id = LANG_RECORD_DIRECTORY;
-    menu[i++].function = recdirectory;
-        
-    m=menu_init( menu, i, NULL );
+    items[i].desc = str(LANG_RECORDING_CHANNELS);
+    items[i].voice_id = LANG_RECORDING_CHANNELS;
+    items[i++].function = recchannels;
+    items[i].desc = str(LANG_RECORDING_EDITABLE);
+    items[i].voice_id = LANG_RECORDING_EDITABLE;
+    items[i++].function = receditable;
+    items[i].desc = str(LANG_RECORD_TIMESPLIT);
+    items[i].voice_id = LANG_RECORD_TIMESPLIT;
+    items[i++].function = rectimesplit;
+    items[i].desc = str(LANG_RECORD_PRERECORD_TIME);
+    items[i].voice_id = LANG_RECORD_PRERECORD_TIME;
+    items[i++].function = recprerecord;
+    items[i].desc = str(LANG_RECORD_DIRECTORY);
+    items[i].voice_id = LANG_RECORD_DIRECTORY;
+    items[i++].function = recdirectory;
+
+    m=menu_init( items, i, NULL, NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 

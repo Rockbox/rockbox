@@ -140,54 +140,54 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_items menu[7]; 
+    struct menu_item items[7]; 
     struct playlist_args args[7]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
 
     if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
     {
-        menu[i].desc = str(LANG_VIEW);
-        menu[i].voice_id = LANG_VIEW;
-        menu[i].function = view_playlist;
+        items[i].desc = str(LANG_VIEW);
+        items[i].voice_id = LANG_VIEW;
+        items[i].function = view_playlist;
         i++;
         pstart++;
     }
 
     if (mpeg_status() & MPEG_STATUS_PLAY)
     {
-        menu[i].desc = str(LANG_INSERT);
-        menu[i].voice_id = LANG_INSERT;
+        items[i].desc = str(LANG_INSERT);
+        items[i].voice_id = LANG_INSERT;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
         
-        menu[i].desc = str(LANG_INSERT_FIRST);
-        menu[i].voice_id = LANG_INSERT_FIRST;
+        items[i].desc = str(LANG_INSERT_FIRST);
+        items[i].voice_id = LANG_INSERT_FIRST;
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = false;
         i++;
         
-        menu[i].desc = str(LANG_INSERT_LAST);
-        menu[i].voice_id = LANG_INSERT_LAST;
+        items[i].desc = str(LANG_INSERT_LAST);
+        items[i].voice_id = LANG_INSERT_LAST;
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = false;
         i++;
         
-        menu[i].desc = str(LANG_QUEUE);
-        menu[i].voice_id = LANG_QUEUE;
+        items[i].desc = str(LANG_QUEUE);
+        items[i].voice_id = LANG_QUEUE;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = true;
         i++;
         
-        menu[i].desc = str(LANG_QUEUE_FIRST);
-        menu[i].voice_id = LANG_QUEUE_FIRST;
+        items[i].desc = str(LANG_QUEUE_FIRST);
+        items[i].voice_id = LANG_QUEUE_FIRST;
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = true;
         i++;
         
-        menu[i].desc = str(LANG_QUEUE_LAST);
-        menu[i].voice_id = LANG_QUEUE_LAST;
+        items[i].desc = str(LANG_QUEUE_LAST);
+        items[i].voice_id = LANG_QUEUE_LAST;
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = true;
         i++;
@@ -195,17 +195,17 @@ static bool playlist_options(void)
     else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
              (selected_file_attr & ATTR_DIRECTORY))
     {
-        menu[i].desc = str(LANG_INSERT);
-        menu[i].voice_id = LANG_INSERT;
+        items[i].desc = str(LANG_INSERT);
+        items[i].voice_id = LANG_INSERT;
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
     }
 
-    m = menu_init( menu, i, NULL );
+    m = menu_init( items, i, NULL, NULL, NULL, NULL );
     result = menu_show(m);
     if (result >= 0 && result < pstart)
-        ret = menu[result].function();
+        ret = items[result].function();
     else if (result >= pstart)
         ret = add_to_playlist(args[result].position, args[result].queue);
     menu_exit(m);
@@ -550,7 +550,7 @@ bool create_dir(void)
 
 int onplay(char* file, int attr)
 {
-    struct menu_items menu[5]; /* increase this if you add entries! */
+    struct menu_item items[5]; /* increase this if you add entries! */
     int m, i=0, result;
 
     onplay_result = ONPLAY_OK;
@@ -564,44 +564,44 @@ int onplay(char* file, int attr)
             (attr & ATTR_DIRECTORY) ||
             ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
         {
-            menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
-            menu[i].voice_id = LANG_PLAYINDICES_PLAYLIST;
-            menu[i].function = playlist_options;
+            items[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
+            items[i].voice_id = LANG_PLAYINDICES_PLAYLIST;
+            items[i].function = playlist_options;
             i++;
         }
         
-        menu[i].desc = str(LANG_RENAME);
-        menu[i].voice_id = LANG_RENAME;
-        menu[i].function = rename_file;
+        items[i].desc = str(LANG_RENAME);
+        items[i].voice_id = LANG_RENAME;
+        items[i].function = rename_file;
         i++;
         
         if (!(attr & ATTR_DIRECTORY))
         {
-            menu[i].desc = str(LANG_DELETE);
-            menu[i].voice_id = LANG_DELETE;
-            menu[i].function = delete_file;
+            items[i].desc = str(LANG_DELETE);
+            items[i].voice_id = LANG_DELETE;
+            items[i].function = delete_file;
             i++;
         }
         
         if ((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
         {
-            menu[i].desc = str(LANG_VBRFIX);
-            menu[i].voice_id = LANG_VBRFIX;
-            menu[i].function = vbr_fix;
+            items[i].desc = str(LANG_VBRFIX);
+            items[i].voice_id = LANG_VBRFIX;
+            items[i].function = vbr_fix;
             i++;
         }
     }
 
-    menu[i].desc = str(LANG_CREATE_DIR);
-    menu[i].voice_id = LANG_CREATE_DIR;
-    menu[i].function = create_dir;
+    items[i].desc = str(LANG_CREATE_DIR);
+    items[i].voice_id = LANG_CREATE_DIR;
+    items[i].function = create_dir;
     i++;
 
     /* DIY menu handling, since we want to exit after selection */
-    m = menu_init( menu, i, NULL );
+    m = menu_init( items, i, NULL, NULL, NULL, NULL );
     result = menu_show(m);
     if (result >= 0)
-        menu[result].function();
+        items[result].function();
     menu_exit(m);
 
     return onplay_result;

@@ -22,13 +22,14 @@
 
 #include <stdbool.h>
 
-struct menu_items {
+struct menu_item {
     unsigned char *desc; /* string */
     int voice_id; /* the associated voice clip, -1 if none */
     bool (*function) (void); /* return true if USB was connected */
 };
 
-int menu_init(struct menu_items* items, int count, int (*callback) (int keycode, int menu));
+int menu_init(struct menu_item* mitems, int count, int (*callback)(int, int),
+              char *button1, char *button2, char *button3);
 void menu_exit(int menu);
 
 void put_cursorxy(int x, int y, bool on);
@@ -48,6 +49,3 @@ bool menu_movedown(int menu);
 void menu_draw(int menu);
 
 #endif /* End __MENU_H__ */
-
-
-

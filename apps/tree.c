@@ -387,6 +387,24 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
     return dircache;
 }
 
+#ifdef HAVE_LCD_BITMAP
+static int recalc_screen_height(void)
+{
+    int fw, fh;
+    int height = LCD_HEIGHT;
+
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("A", &fw, &fh);
+    if(global_settings.statusbar)
+        height -= STATUSBAR_HEIGHT;
+    
+    if(global_settings.buttonbar)
+        height -= BUTTONBAR_HEIGHT;
+
+    return height / fh;
+}
+#endif
+
 static int showdir(char *path, int start, int *dirfilter)
 {
     int icon_type = 0;
@@ -399,7 +417,7 @@ static int showdir(char *path, int start, int *dirfilter)
     int fw, fh;
     lcd_setfont(FONT_UI);
     lcd_getstringsize("A", &fw, &fh);
-    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+    tree_max_on_screen = recalc_screen_height();
     line_height = fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
@@ -536,10 +554,18 @@ static int showdir(char *path, int start, int *dirfilter)
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.scrollbar && (filesindir > tree_max_on_screen))
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
-                  LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
+                  tree_max_on_screen * line_height, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
+
+    if(global_settings.buttonbar) {
+        buttonbar_set(str(LANG_DIRBROWSE_F1),
+                      str(LANG_DIRBROWSE_F2),
+                      str(LANG_DIRBROWSE_F3));
+        buttonbar_draw();
+    }
 #endif
     status_draw(true);
+
     return filesindir;
 }
 
@@ -852,10 +878,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                                 has been refreshed on screen */
 
 #ifdef HAVE_LCD_BITMAP
-    int fw, fh;
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+    tree_max_on_screen = recalc_screen_height();
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
@@ -1065,8 +1088,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             lcd_update();
 
                             /* maybe we have a new font */
-                            lcd_getstringsize("A", &fw, &fh);
-                            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                            tree_max_on_screen = recalc_screen_height();
                             /* make sure cursor is on screen */
                             while ( dircursor > tree_max_on_screen )
                             {
@@ -1114,8 +1136,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             set_file(buf, global_settings.font_file,
                                      MAX_FILENAME);
 
-                            lcd_getstringsize("A", &fw, &fh);
-                            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                            tree_max_on_screen = recalc_screen_height();
                             /* make sure cursor is on screen */
                             while ( dircursor > tree_max_on_screen ) {
                                 dircursor--;
@@ -1291,7 +1312,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                         reload_root = true;
 
 #ifdef HAVE_LCD_BITMAP
-                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                    tree_max_on_screen = recalc_screen_height();
 #endif
                     restore = true;
                 }
@@ -1318,7 +1339,7 @@ static bool dirbrowse(char *root, int *dirfilter)
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_root = true;
 #ifdef HAVE_LCD_BITMAP
-            tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+            tree_max_on_screen = recalc_screen_height();
 #endif
             restore = true;
             start_wps=false;

@@ -1701,3 +1701,23 @@ id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
 new:
+
+id: LANG_BUTTON_BAR
+desc: in settings menu
+eng: "Button bar"
+new:
+
+id: LANG_DIRBROWSE_F1
+desc: in dir browser, F1 button bar text
+eng: "Menu"
+new:
+
+id: LANG_DIRBROWSE_F2
+desc: in dir browser, F2 button bar text
+eng: "Option"
+new:
+
+id: LANG_DIRBROWSE_F3
+desc: in dir browser, F3 button bar text
+eng: "LCD"
+new:

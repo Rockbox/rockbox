@@ -117,7 +117,7 @@ offset  abs
 0x23    0x37    <rec. left gain (bit 0-3)>
 0x24    0x38    <rec. right gain (bit 0-3)>
 0x25    0x39    <disk poweroff flag (bit 0), MP3 buffer margin (bit 1-3),
-                 Trickle charge flag (bit 4)>
+                 Trickle charge flag (bit 4), buttonbar (bit 5)>
 0x26    0x40    <runtime low byte>
 0x27    0x41    <runtime high byte>
 0x28    0x42    <topruntime low byte>
@@ -396,7 +396,8 @@ int settings_save( void )
     config_block[0x25] = (unsigned char)
         ((global_settings.disk_poweroff & 1) |
          ((global_settings.buffer_margin & 7) << 1) |
-         ((global_settings.trickle_charge & 1) << 4));
+         ((global_settings.trickle_charge & 1) << 4) |
+         ((global_settings.buttonbar & 1) << 5));
 
     {
         int elapsed_secs;
@@ -723,6 +724,7 @@ void settings_load(void)
             global_settings.disk_poweroff = config_block[0x25] & 1;
             global_settings.buffer_margin = (config_block[0x25] >> 1) & 7;
             global_settings.trickle_charge = (config_block[0x25] >> 4) & 1;
+            global_settings.buttonbar = (config_block[0x25] >> 5) & 1;
         }
 
         if (config_block[0x27] != 0xff)
@@ -977,6 +979,8 @@ bool settings_load_config(char* file)
             set_cfg_int(&global_settings.scroll_step, value, 1, LCD_WIDTH);
         else if (!strcasecmp(name, "statusbar"))
             set_cfg_bool(&global_settings.statusbar, value);
+        else if (!strcasecmp(name, "buttonbar"))
+            set_cfg_bool(&global_settings.buttonbar, value);
         else if (!strcasecmp(name, "peak meter release"))
             set_cfg_int(&global_settings.peak_meter_release, value, 1, 0x7e);
         else if (!strcasecmp(name, "peak meter hold")) {
@@ -1336,8 +1340,9 @@ bool settings_save_config(void)
     fprintf(fd, "#\r\n# Display\r\n#\r\n");
     
 #ifdef HAVE_LCD_BITMAP
-    fprintf(fd, "statusbar: %s\r\nscrollbar: %s\r\n",
+    fprintf(fd, "statusbar: %s\r\nbuttonbar: %s\r\nscrollbar: %s\r\n",
             boolopt[global_settings.statusbar],
+            boolopt[global_settings.buttonbar],
             boolopt[global_settings.scrollbar]);
 
     {
@@ -1588,6 +1593,7 @@ void settings_reset(void) {
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;
+    global_settings.buttonbar   = true;
     global_settings.scrollbar   = true;
     global_settings.repeat_mode = REPEAT_ALL;
     global_settings.playlist_shuffle = false;

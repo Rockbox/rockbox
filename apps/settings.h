@@ -159,6 +159,9 @@ struct user_settings
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
 
+    /* show button bar */
+    bool buttonbar;    /* 0=hide, 1=show */
+
     /* show scroll bar */
     bool scrollbar;    /* 0=hide, 1=show */
 

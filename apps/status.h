@@ -35,7 +35,11 @@ void status_set_playmode(enum playmode mode);
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
 void buttonbar_set(char* caption1, char* caption2, char* caption3);
+void buttonbar_unset(void);
+bool buttonbar_isset(void);
 void buttonbar_draw(void);
+
+#define BUTTONBAR_HEIGHT 8
 #endif
 void status_draw(bool force_redraw);
 

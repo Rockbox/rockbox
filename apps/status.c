@@ -260,12 +260,29 @@ static char stored_caption3[8];
 
 void buttonbar_set(char* caption1, char *caption2, char *caption3)
 {
-    strncpy(stored_caption1, caption1, 7);
-    stored_caption1[7] = 0;
-    strncpy(stored_caption2, caption2, 7);
-    stored_caption2[7] = 0;
-    strncpy(stored_caption3, caption3, 7);
-    stored_caption3[7] = 0;
+    buttonbar_unset();
+    if(caption1)
+    {
+        strncpy(stored_caption1, caption1, 7);
+        stored_caption1[7] = 0;
+    }
+    if(caption2)
+    {
+        strncpy(stored_caption2, caption2, 7);
+        stored_caption2[7] = 0;
+    }
+    if(caption3)
+    {
+        strncpy(stored_caption3, caption3, 7);
+        stored_caption3[7] = 0;
+    }
+}
+
+void buttonbar_unset(void)
+{
+    stored_caption1[0] = 0;
+    stored_caption2[0] = 0;
+    stored_caption3[0] = 0;
 }
 
 void buttonbar_draw(void)
@@ -275,4 +292,14 @@ void buttonbar_draw(void)
     draw_buttonbar_btn(1, stored_caption2);
     draw_buttonbar_btn(2, stored_caption3);
 }
+
+bool buttonbar_isset(void)
+{
+    /* If all buttons are unset, the button bar is considered disabled */
+    return (global_settings.buttonbar &&
+            ((stored_caption1[0] != 0) ||
+             (stored_caption2[0] != 0) ||
+             (stored_caption3[0] != 0)));
+}
+
 #endif
