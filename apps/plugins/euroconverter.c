@@ -144,7 +144,7 @@ static char *currency_str[12] = {
    "Belgium",
    "Spain",
    "Finland",
-   "Irland",
+   "Ireland",
    "Italy",
    "Luxemburg",
    "Netherlands",
