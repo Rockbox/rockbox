@@ -63,7 +63,7 @@ option=`input`;
 
 case $option in
   [Yy])
-    debug="-DDEBUG"
+    debug="DEBUG=1"
     ;;
   *)
     debug=""
@@ -126,11 +126,9 @@ DEBUG=@DEBUG@
 TARGET=@TARGET@
 THISDIR="@PWD@"
 
-CFLAGS="\$(DEBUG) \$(TARGET)"
-
 all:
-	make -C \$(FIRMDIR) CFLAGS=\$(CFLAGS) OBJDIR=\$(THISDIR)
-	make -C \$(APPSDIR) CFLAGS=\$(CFLAGS) OBJDIR=\$(THISDIR)
+	make -C \$(FIRMDIR) TARGET=\$(TARGET) $(DEBUG) OBJDIR=\$(THISDIR)
+	make -C \$(APPSDIR) TARGET=\$(TARGET) $(DEBUG) OBJDIR=\$(THISDIR)
 
 EOF
 
