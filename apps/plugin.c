@@ -167,7 +167,6 @@ static struct plugin_api rockbox_api = {
     atoi,
     get_time,
     plugin_get_buffer,
-    battery_level,
 
     /* new stuff at the end, sort into place next time the API gets incompatible */
 
@@ -232,6 +231,7 @@ static struct plugin_api rockbox_api = {
     mas_codec_writereg,
 #endif
 #endif
+    battery_level,
 };
 
 int plugin_load(char* plugin, void* parameter)

@@ -195,7 +195,6 @@ struct plugin_api {
     int (*atoi)(const char *str);
     struct tm* (*get_time)(void);
     void* (*plugin_get_buffer)(int* buffer_size);
-    int  (*battery_level)(void);
 
     /* new stuff, sort in next time the API gets broken! */
 #ifndef HAVE_LCD_CHARCELLS
@@ -266,6 +265,7 @@ struct plugin_api {
    int (*mas_codec_writereg)(int reg, unsigned int val);
 #endif
 #endif
+    int  (*battery_level)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
