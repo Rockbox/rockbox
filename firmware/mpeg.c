@@ -350,9 +350,9 @@ static bool playing = false;
 #else
 static int last_dma_tick = 0;
 
-#ifdef HAVE_MAS3507D
-
 static unsigned long mas_version_code;
+
+#ifdef HAVE_MAS3507D
 
 static unsigned int bass_table[] =
 {
@@ -621,6 +621,7 @@ static void stop_dma(void)
 long timing_info_index = 0;
 long timing_info[1024];
 bool inverted_pr;
+unsigned long num_rec_bytes;
 #endif
 
 static void dma_tick(void)
@@ -661,7 +662,6 @@ static void dma_tick(void)
                     PADR &= ~0x800;
 
                 /* It must take at least 5 cycles before the data is read */
-                
                 mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
                 
                 if(inverted_pr)
@@ -670,6 +670,7 @@ static void dma_tick(void)
                     PADR |= 0x800;
                 
                 /* It must take at least 4 cycles before the next loop */
+                num_rec_bytes++;
                 
                 mp3buf_write++;
                 if(mp3buf_write >= mp3buflen)
@@ -1623,6 +1624,7 @@ static void mpeg_thread(void)
                         demand_irq_enable(false);
                         if(mpeg_file >= 0)
                             close(mpeg_file);
+                        mpeg_file = -1;
 
 #if 0
                         {
@@ -1784,6 +1786,7 @@ static void init_recording(void)
     /* Stop the current stream */
     play_pending = false;
     playing = false;
+    is_playing = false;
     stop_dma();
     
     reset_mp3_buffer();
@@ -1791,6 +1794,7 @@ static void init_recording(void)
     
     if(mpeg_file >= 0)
         close(mpeg_file);
+    mpeg_file = -1;
 
     /* Init the recording variables */
     recording = false;
@@ -1801,8 +1805,19 @@ static void init_recording(void)
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while(val);
+
+    /* Perform black magic as described by the data sheet */
+    if((mas_version_code & 0xff) == 2)
+    {
+        DEBUGF("Performing MAS black magic for B2 version\n");
+        mas_writereg(0xa3, 0x98);
+        mas_writereg(0x94, 0xfffff);
+        val = 0;
+        mas_writemem(MAS_BANK_D1, 0, &val, 1);
+        mas_writereg(0xa3, 0x90);
+    }
     
     /* Enable the Left A/D Converter */
     mas_codec_writereg(0x0, 0xcccd);
@@ -1816,18 +1831,18 @@ static void init_recording(void)
 
     /* No mute */
     val = 0;
-    mas_writemem(MAS_BANK_D0,0x7f9,&val,1);    
+    mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1);    
     
     /* Set Demand mode and validate all settings */
     val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
 
     /* Start the encoder application */
     val = 0x40;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
+    mas_writemem(MAS_BANK_D0, 0x7f6, &val, 1);
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while(!(val & 0x40));
 
     mpeg_mode = MPEG_ENCODER;
@@ -1839,14 +1854,12 @@ static void init_playback(void)
 {
     unsigned long val;
     
-    mpeg_mode = MPEG_DECODER;
-
     /* Stop the current application */
     val = 0;
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
     do
     {
-        mas_readmem(MAS_BANK_D0, 0x7f6, &val, 1);
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while(val);
     
     /* Enable the D/A Converter */
@@ -1867,6 +1880,12 @@ static void init_playback(void)
     /* Start the Layer2/3 decoder applications */
     val = 0x0c;
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+    } while((val & 0x0c) != 0x0c);
+
+    mpeg_mode = MPEG_DECODER;
 
     DEBUGF("MAS Decoding application started\n");
 }
@@ -1875,7 +1894,8 @@ void mpeg_record(char *filename)
 {
     /* Read the current frame */
     mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
-    
+
+    num_rec_bytes = 0;
     is_recording = true;
     queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
 }
@@ -1901,6 +1921,14 @@ unsigned long mpeg_num_recorded_frames(void)
     {
         return 0;
     }
+}
+
+unsigned long mpeg_num_recorded_bytes(void)
+{
+    if(is_recording)
+        return num_rec_bytes;
+    else
+        return 0;
 }
 #endif
 
@@ -2502,6 +2530,10 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     if(rc < 0)
         panicf("mas_ctrl_r: %d", rc);
 
+    mas_version_code = mas_readver();
+    DEBUGF("MAS3587 derivate %d, version B%d\n",
+           (mas_version_code & 0xff00) >> 8, mas_version_code & 0xff);
+    
     init_playback();
     
     mpeg_sound_channel_config(MPEG_SOUND_STEREO);
