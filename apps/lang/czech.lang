@@ -1,7 +1,3 @@
-# Czech language file 
-# Based on english.lang version 1.91
-# Translated by Jiri Jurecek
-
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -12,16 +8,6 @@ id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 new: "Obecné nastavení"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Hry"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Dema"
 
 id: LANG_INFO
 desc: in the main menu
@@ -58,50 +44,10 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 new: "Buffer : %d.%03dMB"
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Bat.: %d%%%s"
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Baterie: %d%%%s"
-
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 new: "Baterie: Nabíjení"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Skákací text"
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Snì¾ení"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Skladník"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Èervy"
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Had"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -113,11 +59,6 @@ desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Promíchávání..."
 
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Pøehrávání..."
-
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
@@ -127,11 +68,6 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new: "Zaplnìný buffer"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
-new: "%d soubor(ù)"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -163,21 +99,6 @@ desc: used in set_time()
 eng: "OFF To Revert"
 new: "OFF - Storno"
 
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: "Neviditelné soubory"
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: "Zobraz"
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: "Skryj"
-
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
@@ -192,11 +113,6 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 new: "Pøehrát nejprve vybrané"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: "Filtr hudby"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -263,30 +179,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "Následování seznamu skladeb"
 
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Opravdu?"
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Play/Stop"
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 new: "Jste si jistý?"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new: "Play=Vynulovat"
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF  =Zachovat"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -310,7 +206,7 @@ new: "Zpùsob øazení"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new: "Rolování"
 
 id: LANG_RESET
@@ -427,16 +323,6 @@ id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(PLAY/STOP)"
-
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "Play = Ano"
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "Ostatní = Ne"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -573,11 +459,6 @@ desc: in wps F2 pressed
 eng: "Mode:"
 new: "mód:"
 
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: "Filtr souborù:%s"
-
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
@@ -598,180 +479,10 @@ desc: when playlist has finished
 eng: "End Of List"
 new: "Konec seznamu"
 
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: "Stiskni On"
-
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 new: "Konec playlistu"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: "Stiskni ON"
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Va¹e score:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Rekord: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Nový rekord!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Hra pozastavena"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new: "[PLAY] - pokraèovat"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new: "[OFF] - Konec"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Level  - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new: "(1 - pomalu, 9 - rychle)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new: "[PLAY] - Start/Pauza"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: ""
-new: "Level"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: ""
-new: "Tahù"
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: ""
-new: "VYHRÁLS!!"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: ""
-new: "[OFF] - konec"
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: ""
-new: "[F1]  - Level"
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: ""
-new: "[F2]  - Stejný Level"
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: ""
-new: "[F3]  + Level"
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: ""
-new: "Vel:%d"
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: ""
-new: "Roste"
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: ""
-new: "Hladný"
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: ""
-new: "Se¾rán"
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: ""
-new: "Ups"
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: ""
-new: "Narazil"
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: ""
-new: "Rek:%d"
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: ""
-new: "%d hráè(ù)    UP/DN"
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: ""
-new: "%d èerv(ù)      L/P"
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: ""
-new: "Dálk. ovládání F1"
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: ""
-new: "Bez dálk. ovl.  F1"
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: "2 ovl.klávesy   F1"
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: "4 ovl.klávesy   F1"
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: ""
-new: "Bez ovládání"
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: ""
-new: "Dohráls!"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: ""
-new: "Øadkù - Level"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -983,16 +694,6 @@ desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 new: "Pro"
 
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Krychle"
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oscilograf"
-
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
@@ -1198,40 +899,10 @@ desc: in settings_menu
 eng: "Battery Capacity"
 new: "Kapacita baterie"
 
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "Ve frontì: %s"
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new: "Celkem ve frontì: %d"
-
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new: "Zaplnìný bafr fronty"
-
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 new: "Stornováno"
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: "OK"
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Fronta"
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Pøe + Sma"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1352,11 +1023,6 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 new: "Velikost:"
-
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: ""
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1528,11 +1194,6 @@ desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 new: "Disk je plný. Pro pokraèování stisknìte OFF."
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "FlipIt"
-
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
@@ -1552,11 +1213,6 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 new: "OFF zru¹it"
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othelo"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1591,7 +1247,7 @@ new: "Vlo¾eno %d skladeb (%s)"
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
-new: "Nastavení playlistu"
+new: "Playlisty"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
@@ -1660,23 +1316,13 @@ new: "Vkládat adresáøe rekurzivnì"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
-new: "Ulo¾it dynamický playlist"
+eng: "Save Current Playlist"
+new: "Ulo¾it aktuální playlist"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 new: "Zobrazit ikony"
-
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Hra 15"
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Star"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
@@ -1693,11 +1339,6 @@ desc: in button bar
 eng: "Menu"
 new: "Menu" 
 
-id: LANG_BUTTONBAR_OPTIONS
-desc: in button bar
-eng: "Option"
-new: "Volby"
-
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
@@ -1705,18 +1346,18 @@ new: "Mód auto adaptéru"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
-new: "Konfigurace"
+eng: "Browse .cfg files"
+new: "Procházet .cfg soubory"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
-new: "Fonty"
+eng: "Browse Fonts"
+new: "Procházet fonty"
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
-new: "Firmware"
+eng: "Browse Firmwares"
+new: "Procházet firmware soubory"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
@@ -1770,10 +1411,265 @@ new: "®ádné soubory"
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
-new: "Pluginy"
+eng: "Browse Plugins"
+new: "Procházet pluginy"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
-new: "Pøehrávací obrazovka"
+eng: "Browse .wps files"
+new: "Procházet .wps soubory"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Vytvoøit zálo¾ku?"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new: "Infopanel/Posuvník"
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new: "Baterie"
+
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "Nahrát poslední zálo¾ku?"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Chyba pøi vytváøení zálo¾ky!"
+
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Zálo¾ka vytvoøena"
+
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "Zálo¾ka je prázdná"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Zálo¾ky"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Vytvoøit zálo¾ku"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Procházet zálo¾ky"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "Poslední zálo¾ky"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Zálo¾ka"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+new: "ON+Play = Vyma¾"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+new: "OFF = Zpìt"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: "Index"
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "Dolù = Procházet"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+new: "PLAY = Vybrat"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Èas"
+
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Vytváøení zálo¾ek"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Vytvoøit pøi zastavení"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "Nahrát poslední zálo¾ku"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Uchovávat seznam pou¾ívaných zálo¾ek?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+new: "Zeptat se - Jen u naposledy pou¾itých"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+new: "Ano - U naposledy pou¾itých"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "Jen unikátní"
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new: "Vytvoøit adresáø"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new: "Disk"
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+new: "Plná cesta"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+new: "Jen název skladby"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+new: "Vlastnosti souborù"
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+new: "Vzhùru nohama"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc: in main menu
+eng: "Record"
+new: "Nahrávání"
+
+id: LANG_FM_RADIO
+desc: in main menu
+eng: "FM Radio"
+new: "FM Rádio"
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new: "Rockbox info"
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new: "Nastavení displeje"
+
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new: "Limity"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+new: "Zmìnit nastavení"
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new: "Pøesunout"
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+new: "Chyba pøi pøesouvání"
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new: "Zaèít nahrávat"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new: "V aktuálním adresáøi"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new: "Adresáø"
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+new: "Pøednahrávání"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+new: "Délka pøednáhrátí"
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+new: "Smazat"
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+new: "Ukazovat indexy"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new: "Datum a èas"
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+new: "Info o skladbì"
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+new: "Zobrazit"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new: "Zobrazit aktuální playlist"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new: "Pøetáèení dopøedu/dozadu"
