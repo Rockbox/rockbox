@@ -81,12 +81,12 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-	LCDSRSC = lcd-recorder.c
+	LCDSRSC = lcd-recorder.c sysfont.c font.c
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c
 endif
 FIRMSRCS = $(LCDSRSC) sprintf.c id3.c debug.c usb.c mpeg.c power.c\
-  powermgmt.c font.c panic.c sysfont.c ctype.c
+  powermgmt.c panic.c ctype.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
