@@ -41,7 +41,7 @@ static long matrice[3][3];
 static int nb_points = 8;
 
 static int x_off = 56;
-static int y_off = 95;
+static int y_off = 31;
 static int z_off = 600;
 
 /* Precalculated sine and cosine * 10000 (four digit fixed point math) */
@@ -249,7 +249,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     while(!exit)
     {
-        if (!highspeed) 
+        if (highspeed) 
+            rb->yield();
+        else
             rb->sleep(4);
         
         rb->lcd_clear_display();

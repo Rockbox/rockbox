@@ -405,7 +405,7 @@ static void star_transition_update(void)
     int y = 0;
     int var_y = 0;
 
-    for (x = 0 ; x < lcd_demi_width ; x++)
+    for (x = 1 ; x < lcd_demi_width ; x++)
     {
         var_y += LCD_HEIGHT;
         if (var_y > LCD_WIDTH)

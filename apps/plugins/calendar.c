@@ -108,7 +108,7 @@ static void draw_headers(void)
         rb->lcd_putsxy(ws, 0 , Dayname[i++]);
         ws += space;
     }
-    rb->lcd_drawline(0 ,h ,LCD_WIDTH ,h);
+    rb->lcd_drawline(0 ,h ,LCD_WIDTH-1 ,h);
 }
 
 static bool day_has_memo[31];
