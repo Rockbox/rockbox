@@ -210,6 +210,7 @@ int ata_read_sectors(unsigned long start,
     while (count) {
         int j;
         int sectors;
+        int wordcount;
 
         if (!wait_for_start_of_transfer())
         {
@@ -226,15 +227,17 @@ int ata_read_sectors(unsigned long start,
         else
             sectors = count;
 
+        wordcount = sectors * SECTOR_SIZE / 2;
+
         if ( (unsigned int)buf & 1 ) {
-            for (j=0; j < sectors * SECTOR_SIZE / 2; j++) {
+            for (j=0; j < wordcount; j++) {
                 unsigned short tmp = SWAB16(ATA_DATA);
                 ((unsigned char*)buf)[j*2] = tmp >> 8;
                 ((unsigned char*)buf)[j*2+1] = tmp & 0xff;
             }
         }
         else {
-            for (j=0; j < sectors * SECTOR_SIZE / 2; j++)
+            for (j=0; j < wordcount; j++)
                 ((unsigned short*)buf)[j] = SWAB16(ATA_DATA);
         }
 
@@ -242,7 +245,7 @@ int ata_read_sectors(unsigned long start,
         /* reading the status register clears the interrupt */
         j = ATA_STATUS;
 #endif
-        buf += sectors * SECTOR_SIZE; /* Advance one sector */
+        buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
         count -= sectors;
     }
 
