@@ -238,7 +238,7 @@ static bool display_custom_wps( struct mp3entry* id3,
 
                     switch(cchr3)
                     {
-#ifdef HAVE_LCD_CHARCELLS
+#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
                         case 'b':  /* Progress Bar (PLAYER ONLY)*/
                             draw_player_progress(id3, ff_rewind_count);
                             snprintf(buf, LINE_LEN, "\x01");
@@ -551,10 +551,9 @@ void wps_display(struct mp3entry* id3)
     lcd_update();
 }
 
-#ifdef HAVE_LCD_CHARCELLS
+#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
 bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
-#ifndef SIMULATOR
     if(!id3)
         return(false);
     char player_progressbar[7];
@@ -579,6 +578,5 @@ bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
     }
     lcd_define_pattern(8,player_progressbar,7);
     return(true);
-#endif
 }
 #endif
