@@ -26,9 +26,6 @@ struct regs
 {
     unsigned int  r[7]; /* Registers r8 thru r14 */
     void          *sp;  /* Stack pointer (r15) */
-    unsigned int  mach;
-    unsigned int  macl;
-    unsigned int  sr;   /* Status register */
     void*         pr;   /* Procedure register */
 };
 
@@ -52,11 +49,8 @@ void switch_thread(void) __attribute__ ((section(".icode")));
  */
 static inline void store_context(void* addr)
 {
-    asm volatile ("add #48, %0\n\t"
+    asm volatile ("add #36, %0\n\t"
                   "sts.l pr,  @-%0\n\t"
-                  "stc.l sr,  @-%0\n\t"
-                  "sts.l macl,@-%0\n\t"
-                  "sts.l mach,@-%0\n\t"
                   "mov.l r15, @-%0\n\t"
                   "mov.l r14, @-%0\n\t"
                   "mov.l r13, @-%0\n\t"
@@ -81,9 +75,6 @@ static inline void load_context(const void* addr)
                   "mov.l @%0+,r13\n\t"
                   "mov.l @%0+,r14\n\t"
                   "mov.l @%0+,r15\n\t"
-                  "lds.l @%0+,mach\n\t"
-                  "lds.l @%0+,macl\n\t"
-                  "ldc.l @%0+,sr\n\t"
                   "mov.l @%0,%0\n\t"
                   "lds %0,pr\n\t"
                   "mov.l %0, @(0, r15)" : "+r" (addr));
@@ -170,7 +161,6 @@ int create_thread(void* function, void* stack, int stack_size,
    /* Subtract 4 to leave room for the PR push in load_context()
       Align it on an even 32 bit boundary */
    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
-   regs->sr = 0;
    regs->pr = function;
 
    wake_up_thread();
