@@ -44,7 +44,7 @@ track_t next_playlist_track( playlist_info_t *playlist );
 void display_playlist_track( track_t *track );
 void add_indices_to_playlist( char *buf, playlist_info_t *playlist );
 void extend_indices( playlist_info_t *playlist, int new_index );
-void randomise_playlist( playlist_info_t *playlist );
+void randomise_playlist( playlist_info_t *playlist, unsigned int seed );
 int is_unused_random_in_list( int number, int *original_list, int count );
 
 /**********/
