@@ -488,6 +488,50 @@ void lcd_setmargins(int x, int y)
     ymargin = y;
 }
 
+#ifdef LCD_PROPFONTS
+
+extern unsigned char char_dw_8x8_prop[][9];
+
+/*
+ * Put a string at specified bit position
+ */
+
+void lcd_putspropxy(int x, int y, char *str, int thisfont)
+{
+    int ch;
+    int nx;
+    int ny=8;
+    unsigned char *src;
+    int lcd_x = x;
+    int lcd_y = y;
+
+    (void)thisfont;
+
+    while (((ch = *str++) != '\0') && (lcd_x + nx < LCD_WIDTH))
+    {
+        if (lcd_y + ny > LCD_HEIGHT)
+            return;
+
+        /* Limit to char generation table */
+        if ((ch < ASCII_MIN) || (ch > 0x7a))
+            /* replace unsupported letters with question marks */
+            ch = ' '-ASCII_MIN;
+        else
+            ch -= ASCII_MIN;
+        
+        src = char_dw_8x8_prop[ch];
+
+        nx = char_dw_8x8_prop[ch][8] >> 4;
+        
+        lcd_bitmap (src, lcd_x, lcd_y, nx, ny, true);
+
+        lcd_x += nx+1;
+
+    }
+}
+
+#endif
+
 /*
  * Put a string at specified character position
  */
@@ -507,15 +551,22 @@ void lcd_puts(int x, int y, char *str)
     ymargin = 8;
 #endif
 
+#ifdef LCD_PROPFONTS
+    lcd_putspropxy( xmargin + x*fonts[font],
+                ymargin + y*fontheight[font],
+                str, font );
+#else
     lcd_putsxy( xmargin + x*fonts[font],
                 ymargin + y*fontheight[font],
                 str, font );
+#endif
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* this function is being used when simulating a charcell LCD and
        then we update immediately */
     lcd_update();
 #endif
 }
+
 
 /*
  * Put a string at specified bit position
