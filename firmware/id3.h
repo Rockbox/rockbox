@@ -19,8 +19,10 @@
 #ifndef ID3_H
 #define ID3_H
 
+#include "file.h"
+
 struct mp3entry {
-    char path[256];
+    char path[MAX_PATH];
     char *title;
     char *artist;
     char *album;
