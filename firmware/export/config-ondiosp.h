@@ -22,8 +22,8 @@
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_3AAA_ALKALINE
 
-/* Battery scale factor (measured from Jörg's FM) */
-#define BATTERY_SCALE_FACTOR 4785 /* 4.890V read as 0x3FE */
+/* Battery scale factor (average from 3 Ondios) */
+#define BATTERY_SCALE_FACTOR 4735
 
 /* Define this if you control power on PB5 (instead of the OFF button) */
 #define HAVE_POWEROFF_ON_PB5
