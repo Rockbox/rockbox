@@ -302,7 +302,7 @@ void lcd_clear_display(void)
         xlcd_update();
 }
 
-static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
+static void lcd_puts_cont_scroll(int x, int y, const unsigned char *string)
 {
     bool update=false; 
     DEBUGF("lcd_puts_cont_scroll(%d, %d, \"", x, y);
@@ -332,7 +332,7 @@ static void lcd_puts_cont_scroll(int x, int y, unsigned char *string)
     lcd_update();
 #endif
 }
-void lcd_puts(int x, int y, unsigned char *string)
+void lcd_puts(int x, int y, const unsigned char *string)
 {
     DEBUGF("lcd_puts(%d, %d) -> ", x, y);
     scroll[y].mode=SCROLL_MODE_OFF;
