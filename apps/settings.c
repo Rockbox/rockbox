@@ -542,19 +542,6 @@ void settings_apply(void)
     }
 }
 
-static int default_contrast(void)
-{
-#ifdef SIMULATOR
-    return 30;
-#else
-#ifdef HAVE_LCD_CHARCELLS
-    return 30;
-#else
-    return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
-#endif
-#endif
-}
-
 /*
  * load settings from disk or RTC RAM
  */
@@ -587,7 +574,7 @@ void settings_load(void)
             global_settings.invert =
                 config_block[0xa] & 0x40 ? true : false;
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
-                global_settings.contrast = default_contrast();
+                global_settings.contrast = lcd_default_contrast();
             global_settings.show_icons =
                 config_block[0xa] & 0x80 ? true : false;
         }
@@ -1414,7 +1401,7 @@ void settings_reset(void) {
     global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.rec_editable = false;
     global_settings.resume      = RESUME_ASK;
-    global_settings.contrast    = default_contrast();
+    global_settings.contrast    = lcd_default_contrast();
     global_settings.invert      = DEFAULT_INVERT_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;

@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "system.h"
 #include "font.h"
+#include "hwcompat.h"
 
 /*** definitions ***/
 
@@ -113,6 +114,15 @@ static unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 static unsigned char ones[8]  = { 0xff, 0xff, 0xff, 0xff,
                                   0xff, 0xff, 0xff, 0xff};
 
+int lcd_default_contrast(void)
+{
+#ifdef SIMULATOR
+    return 30;
+#else
+    return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
+#endif
+}
+
 #ifdef SIMULATOR
 
 void lcd_init(void)
@@ -132,23 +142,20 @@ void lcd_init (void)
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
 
-	/* inits like the original firmware */
-	lcd_write(true, LCD_SOFTWARE_RESET);
-	lcd_write(true, LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
-	lcd_write(true, LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
-	lcd_write(true, LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
-	lcd_write(true, LCD_SET_DISPLAY_ON);
-	lcd_write(true, LCD_SET_NORMAL_DISPLAY);
-	lcd_write(true, LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
-	lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
-	lcd_write(true, LCD_SET_DISPLAY_START_LINE + 0);
-#if 0 /* done later, depending on h/w mask bit and settings */
-	lcd_write(true, LCD_SET_CONTRAST_CONTROL_REGISTER);
-	lcd_write(true, 0xF1); /* contrast set to 49/64 */
-#endif
-	lcd_write(true, LCD_SET_PAGE_ADDRESS);
-	lcd_write(true, LCD_SET_LOWER_COLUMN_ADDRESS + 0);
-	lcd_write(true, LCD_SET_HIGHER_COLUMN_ADDRESS + 0);
+    /* inits like the original firmware */
+    lcd_write(true, LCD_SOFTWARE_RESET);
+    lcd_write(true, LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
+    lcd_write(true, LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
+    lcd_write(true, LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
+    lcd_write(true, LCD_SET_DISPLAY_ON);
+    lcd_write(true, LCD_SET_NORMAL_DISPLAY);
+    lcd_write(true, LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
+    lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
+    lcd_write(true, LCD_SET_DISPLAY_START_LINE + 0);
+    lcd_set_contrast(lcd_default_contrast());
+    lcd_write(true, LCD_SET_PAGE_ADDRESS);
+    lcd_write(true, LCD_SET_LOWER_COLUMN_ADDRESS + 0);
+    lcd_write(true, LCD_SET_HIGHER_COLUMN_ADDRESS + 0);
 
     lcd_clear_display();
     lcd_update();

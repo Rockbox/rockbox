@@ -44,6 +44,7 @@ extern void lcd_scroll_speed( int speed );
 extern void lcd_scroll_delay( int ms );
 extern void lcd_set_contrast(int val);
 extern void lcd_write( bool command, int byte );
+extern int  lcd_default_contrast(void);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 extern void lcd_update(void);

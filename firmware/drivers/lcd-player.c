@@ -278,6 +278,11 @@ bool lcdx_putc(int x, int y, unsigned short ch)
     return false;
 }
 
+int lcd_default_contrast(void)
+{
+    return 30;
+}
+
 void lcd_clear_display(void)
 {
     int i;
@@ -497,6 +502,8 @@ void lcd_init (void)
         pattern_size=3; /* Last pattern, 3 for old LCD, 7 for new LCD */
     }
     
+    lcd_set_contrast(lcd_default_contrast());
+
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
 }
