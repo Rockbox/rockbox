@@ -16,9 +16,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "i2c.h"
 #include "mas.h"
+#include "dac.h"
 #include "sh7034.h"
 #include "system.h"
 #include "debug.h"
@@ -43,6 +47,46 @@
 
 #define MP3_LOW_WATER 0x30000
 #define MP3_CHUNK_SIZE 0x20000
+
+unsigned int bass_table[] =
+{
+    0,
+    0x800,   /* 1dB */
+    0x10000, /* 2dB */
+    0x17c00, /* 3dB */
+    0x1f800, /* 4dB */
+    0x27000, /* 5dB */
+    0x2e400, /* 6dB */
+    0x35800, /* 7dB */
+    0x3c000, /* 8dB */
+    0x42800, /* 9dB */
+    0x48800, /* 10dB */
+    0x4e400, /* 11dB */
+    0x53800, /* 12dB */
+    0x58800, /* 13dB */
+    0x5d400, /* 14dB */
+    0x61800  /* 15dB */
+};
+
+unsigned int treble_table[] =
+{
+    0,
+    0x5400,  /* 1dB */
+    0xac00,  /* 2dB */
+    0x10400, /* 3dB */
+    0x16000, /* 4dB */
+    0x1c000, /* 5dB */
+    0x22400, /* 6dB */
+    0x28400, /* 7dB */
+    0x2ec00, /* 8dB */
+    0x35400, /* 9dB */
+    0x3c000, /* 10dB */
+    0x42c00, /* 11dB */
+    0x49c00, /* 12dB */
+    0x51800, /* 13dB */
+    0x58400, /* 14dB */
+    0x5f800  /* 15dB */
+};
 
 unsigned char fliptable[] =
 {
@@ -86,6 +130,9 @@ extern unsigned int stack[];
 #define MP3BUF_LEN 0x100000 /* 1 Mbyte */
 
 unsigned char *mp3buf = (unsigned char *)stack;
+
+char *tracks[100];
+int num_tracks;
 
 int mp3buf_write;
 int mp3buf_read;
@@ -189,7 +236,7 @@ void dma_tick(void)
 
 void bitswap(unsigned char *data, int length)
 {
-    unsigned int i;
+    int i;
     for(i = 0;i < length;i++)
     {
         data[i] = fliptable[data[i]];
@@ -203,6 +250,9 @@ int main(void)
     int i=0;
     DIR *d;
     struct dirent *dent;
+    char *tmp;
+    int volume, bass, treble;
+    unsigned short frame_count;
     
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
@@ -271,15 +321,35 @@ int main(void)
     
     i = fat_mount(part[0].start);
     debugf("fat_mount() returned %d\n", i);
-    
+
+    num_tracks = 0;
     if((d = opendir("/")))
     {
         while((dent = readdir(d)))
         {
             debugf("%s\n", dent->d_name);
+            i = strlen(dent->d_name);
+            tmp = dent->d_name + i - 4;
+            debugf("%s\n", tmp);
+            if(!stricmp(tmp, ".mp3"))
+            {
+                tmp = malloc(i+1);
+                if(tmp)
+                {
+                    debugf("Adding track %s\n", dent->d_name);
+                    snprintf(tmp, i+1, "/%s", dent->d_name);
+                    tracks[num_tracks++] = tmp;
+                }
+                else
+                {
+                    panicf("Out of memory\n");
+                }
+            }
         }
         closedir(d);
     }
+
+    debugf("Number of tracks: %d\n");
 
     queue_init(&mpeg_queue);
 
@@ -290,10 +360,25 @@ int main(void)
     debugf("let's play...\n");
 
     queue_post(&mpeg_queue, MPEG_PLAY, 0);
+
+    volume = 0x2c;
+
+    if(dac_config(0x04) < 0)
+        debugf("DAC write failed\n");
+
+    if(dac_volume(volume) < 0)
+        debugf("DAC write failed\n");
+
+    bass = 12;
+    treble = 8;
+    
+    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
+    mas_writereg(MAS_REG_KBASS, bass_table[bass]);
+    mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
     
     while(1)
     {
-        sleep(HZ*1000);
+        sleep(HZ*4);
     }
 }
 
@@ -382,21 +467,24 @@ void IMIA1(void)
     TSR1 &= ~0x01;
 }
 
-char *tracks[] =
-{
-    "/machinae_supremacy_-_arcade.mp3"
-};
-
+int track_index = 0;
 char *peek_next_track(int index)
 {
-    return tracks[index];
+    if(track_index < num_tracks)
+        return tracks[track_index+index];
+    else
+        return NULL;
+}
+
+void next_track(void)
+{
+    track_index++;
 }
 
 int mpeg_file = -1;
 
 int new_file(void)
 {
-    int len;
     char *trackname;
 
     trackname = peek_next_track(0);
@@ -408,16 +496,6 @@ int new_file(void)
         debugf("Couldn't open file\n");
         return -1;
     }
-    
-    /* First read in a few seconds worth of MP3 data */
-    len = read(mpeg_file, mp3buf + mp3buf_write, MP3_CHUNK_SIZE);
-    
-    ata_spindown(-1);
-    
-    bitswap(mp3buf + mp3buf_write, len);
-    
-    mp3buf_write = len;
-
     return 0;
 }
 
@@ -427,7 +505,9 @@ void mpeg_thread(void)
     int len;
     int free_space_left;
     int amount_to_read;
+    bool play_pending;
 
+    play_pending = false;
     playing = false;
 
     while(1)
@@ -438,6 +518,7 @@ void mpeg_thread(void)
         {
             case MPEG_PLAY:
                 /* Stop the current stream */
+                play_pending = false;
                 playing = false;
                 stop_dma();
 
@@ -449,10 +530,9 @@ void mpeg_thread(void)
                 filling = true;
                 queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-                playing = true;
-                
-                init_dma();
-                start_dma();
+                /* Tell the file loading code that we want to start playing
+                   as soon as we have some data */
+                play_pending = true;
                 break;
 
             case MPEG_STOP:
@@ -475,7 +555,9 @@ void mpeg_thread(void)
 
             case MPEG_NEED_DATA:
                 free_space_left = mp3buf_read - mp3buf_write;
-                if(free_space_left < 0)
+
+                /* We interpret 0 as "empty buffer" */
+                if(free_space_left <= 0)
                     free_space_left = MP3BUF_LEN + free_space_left;
 
                 if(free_space_left <= MP3_CHUNK_SIZE)
@@ -509,6 +591,17 @@ void mpeg_thread(void)
 
                     /* Tell ourselves that we want more data */
                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+                    /* And while we're at it, see if we have startet playing
+                       yet. If not, do it. */
+                    if(play_pending)
+                    {
+                        play_pending = false;
+                        playing = true;
+                
+                        init_dma();
+                        start_dma();
+                    }
                 }
                 else
                 {
@@ -517,7 +610,8 @@ void mpeg_thread(void)
                     /* Make sure that the write pointer is at a word
                        boundary */
                     mp3buf_write &= 0xfffffffe;
-                        
+
+                    next_track();
                     if(new_file() < 0)
                     {
                         /* No more data to play */
