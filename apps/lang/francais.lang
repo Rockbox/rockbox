@@ -31,7 +31,7 @@ new: "Version"
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (keep out!)"
-new: Debug (Danger !)
+new: "Debug (Danger !)"
 
 id: LANG_USB
 desc: in the main menu
