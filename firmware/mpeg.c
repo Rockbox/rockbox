@@ -740,6 +740,12 @@ static void mpeg_thread(void)
                     init_dma();
                     start_dma();
                     track_change();
+
+                    /* should we start reading more data? */
+                    if(!filling && (get_unplayed_space() < MPEG_LOW_WATER)) {
+                        filling = true;
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                    }
                 }
                 else {
                     reset_mp3_buffer();
