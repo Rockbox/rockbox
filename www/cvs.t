@@ -7,11 +7,19 @@
 
 <h2>Downloading (checking out) the source</h2>
 
-<p>You need to have
-<a href="http://www.cvshome.org">CVS</a> and
-<a href="http://www.openssh.com">SSH</a> installed.
+<p>You, obviously, need to have <a href="http://www.cvshome.org">CVS</a> installed to do this.
 
-<h3>Anonymously</h3>
+<p>The examples below use the 'firmware' module, since that's what most people are interested in. Here is a complete list of the available modules:
+
+<ul>
+<li>firmware - the source code to the actual firmware
+<li>gdb - the gdb stub to use for remote debugging
+<li>tools - tools for building the firmware
+<li>uisimulator - a user interface simulator for X11
+<li>www - the web page
+</ul>
+
+<h3>Anonymous read-only checkout</h3>
 
 <p>If you are not a registered developer, use this method.
 When asked for a password, just press enter:
@@ -21,11 +29,12 @@ When asked for a password, just press enter:
 
 <p>A "firmware" directory will be created in your current directory, and all the source files go there.
 
-<h3>For developers</h3>
+<h3>Checkout for developers</h3>
 
 <p>For this, you need to:
 
 <ol>
+<li> Have <a href="http://www.openssh.com">SSH</a> installed
 <li> Have a <a href="http://sourceforge.net/account/register.php">SourceForge account</a>
 <li> Be a 
 <a href="http://sourceforge.net/project/memberlist.php?group_id=44306">registered developer</a>
@@ -40,7 +49,7 @@ of the Rockbox project
 
 <h2>Checking in modifications</h2>
 
-<p>CVS is a "no-reserve" version control system. This means that you work on your local files without first reserving them. Any conflicts with other developers are resolved when you check-in, or "commit" as it's called in CVS:
+<p>CVS is a "no-reserve" version control system. This means that you work on your local files without first reserving them. Any conflicts with other developers are detected when you check-in, or "commit" as it's called in CVS:
 
 <p><tt>cvs commit <b>filename</b></tt>
 
