@@ -141,16 +141,9 @@ default_interrupt (TEI1,   107);
 reserve_interrupt (        108);
 default_interrupt (ADITI,  109);
 
-void (*vbr[]) (void) __attribute__ ((section (".sram.vbr"))) = 
+/* reset vectors are handled in crt0.S */
+void (*vbr[]) (void) __attribute__ ((section (".vectors"))) = 
 {
-    /*** 0-1 Power-on Reset ***/
-		
-    reset_pc,reset_sp,
-
-    /*** 2-3 Manual Reset ***/
-		
-    reset_pc,reset_sp,
-
     /*** 4 General Illegal Instruction ***/
 
     GII,
@@ -305,9 +298,14 @@ void system_reboot (void)
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
-    unsigned int i,n;
+    unsigned int i;
+
+#if 0
+    unsigned int n;
+
     lcd_stop ();
     asm volatile ("sts\tpr,%0" : "=r"(n));
+
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
     lcd_start ();
     lcd_goto (0,0); lcd_puts ("** UIE00 **");
@@ -315,6 +313,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_goto (6,0); lcd_puthex (n,2);
     lcd_goto (3,1); lcd_puthex (pc,8); /* or pc - 4 !? */
     lcd_stop ();
+#endif
 
     while (1)
     {
