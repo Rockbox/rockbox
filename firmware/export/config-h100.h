@@ -39,9 +39,9 @@
 #define CONFIG_LCD LCD_S1D15E06
 
 /* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 4
+#define FIRMWARE_OFFSET_FILE_CRC 0
 
 /* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 6
+#define FIRMWARE_OFFSET_FILE_DATA 8
 
 #endif
