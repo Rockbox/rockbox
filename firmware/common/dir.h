@@ -20,11 +20,15 @@
 #ifndef _DIR_H_
 #define _DIR_H_
 
+#ifndef DIRENT_DEFINED
+
 struct dirent {
     unsigned char d_name[256];
     int attribute;
     int size;
 };
+#endif
+
 
 #ifndef SIMULATOR
 typedef struct {
