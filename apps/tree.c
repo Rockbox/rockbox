@@ -347,12 +347,14 @@ bool dirbrowse(char *root)
                         start = dircursor = 0;
                     restore = true;
                 }
-                else {
-                    mpeg_stop();
-                    play_mode = 0;
-                    status_set_playmode(STATUS_STOP);
-                }
                 break;
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_OFF:
+                mpeg_stop();
+                play_mode = 0;
+                status_set_playmode(STATUS_STOP);
+                break;
+#endif
 
             case TREE_ENTER:
 #ifdef HAVE_RECORDER_KEYPAD
