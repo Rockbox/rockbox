@@ -322,8 +322,6 @@ static void lcd_write(bool command, int byte)
 #endif /* ASM_IMPLEMENTATION */
 #endif /* !SIMULATOR */
 
-static unsigned char icon_mirror[11];
-
 /*** model specific code */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -472,6 +470,7 @@ static char icon_mask[] =
 
 void lcd_icon(int icon, bool enable)
 {
+    static unsigned char icon_mirror[11] = {0};
     int pos, mask;
 
     pos = icon_pos[icon];
@@ -506,7 +505,6 @@ void lcd_init (void)
 #if  defined(LOADABLE_FONTS) && defined(SIMULATOR)
     lcd_init_fonts();
 #endif
-    memset(icon_mirror, sizeof(icon_mirror), 0);
 }
 #endif
 
