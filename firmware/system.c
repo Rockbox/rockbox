@@ -483,16 +483,16 @@ void set_cpu_frequency(long frequency)
         DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR &= ~1;  /* Bypass mode */
-        PLLCR = 0x11c8600d;
-        CSCR0 = 0x00000580; /* Flash: 1 wait state */
-        CSCR1 = 0x00001180; /* LCD: 4 wait states */
+        PLLCR = 0x11853005;
+        CSCR0 = 0x00000980; /* Flash: 2 wait state */
+        CSCR1 = 0x00002580; /* LCD: 9 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
-        DCR = (DCR & ~0x000001ff) | 33;   /* Refresh timer */
+        DCR = (DCR & ~0x000001ff) | 28;   /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
         tick_start(1000/HZ);
         IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (5 << 10); /* CS2Pre,Post */
-        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (1 << 8); /* CS2wait */
         break;
         
     case CPUFREQ_NORMAL:

@@ -200,7 +200,7 @@ static inline void invalidate_icache(void)
 
 #define CPUFREQ_DEFAULT CPU_FREQ
 #define CPUFREQ_NORMAL 47980800
-#define CPUFREQ_MAX 95961600
+#define CPUFREQ_MAX 119952000
 
 #elif CONFIG_CPU == TCC730
 
