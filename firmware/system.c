@@ -485,8 +485,8 @@ void system_init(void)
     /* NMI level low, falling edge on all interrupts */
     ICR = 0;
 
-    /* Enable burst mode on DRAM */
-    DCR |= 0x1000;
+    /* Enable burst and RAS down mode on DRAM */
+    DCR |= 0x5000;
 
     /* Activate Warp mode (simultaneous internal and external mem access) */
     BCR |= 0x2000;
