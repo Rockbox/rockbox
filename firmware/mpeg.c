@@ -1047,7 +1047,11 @@ static void mpeg_thread(void)
                 }
 
                 newpos = newpos & ~1;
-                curpos = lseek(mpeg_file, 0, SEEK_CUR);
+
+                if (mpeg_file >= 0)
+                    curpos = lseek(mpeg_file, 0, SEEK_CUR);
+                else
+                    curpos = id3->filesize;
 
                 if (num_tracks_in_memory() > 1)
                 {
@@ -1083,7 +1087,7 @@ static void mpeg_thread(void)
                     unplayed_space_left  = get_unplayed_space();
                     unswapped_space_left = get_unswapped_space();
 
-                    if (unplayed_space_left < MPEG_LOW_WATER)
+                    if (mpeg_file>=0 && unplayed_space_left < MPEG_LOW_WATER)
                     {
                         /* We need to load more data before starting */
                         filling = true;
@@ -1112,7 +1116,11 @@ static void mpeg_thread(void)
                         /* We have to reload the current track */
                         close(mpeg_file);
                         remove_all_non_current_tags();
+                        mpeg_file = -1;
+                    }
 
+                    if (mpeg_file < 0)
+                    {
                         mpeg_file = open(id3->path, O_RDONLY);
                         if (mpeg_file < 0)
                         {
