@@ -243,7 +243,7 @@ static void put_cursor(int m, int target)
     if (do_update)
     {   /* "say" the entry under the cursor */
         int voice_id = menus[m].items[menus[m].cursor].voice_id;
-        if (voice_id >= 0) /* valid ID given? */
+        if (voice_id >= 0 && global_settings.talk_menu) /* valid ID given? */
             talk_id(voice_id, false); /* say it */
     }
 
@@ -320,7 +320,7 @@ int menu_show(int m)
 
     /* say current entry */
     voice_id = menus[m].items[menus[m].cursor].voice_id;
-    if (voice_id >= 0) /* valid ID given? */
+    if (voice_id >= 0 && global_settings.talk_menu) /* valid ID given? */
         talk_id(voice_id, false); /* say it */
 
     while (!exit) {

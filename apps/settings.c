@@ -456,6 +456,9 @@ int settings_save( void )
 
     config_block[0xf4]=((unsigned char)global_settings.rec_prerecord_time |
                         ((unsigned char)global_settings.rec_directory << 5));
+    config_block[0xf5] = (global_settings.talk_dir & 7) |
+                         ((global_settings.talk_file & 3) << 3) | 
+                         ((global_settings.talk_menu & 1) << 5);
 
     if(save_config_buffer())
     {
@@ -792,6 +795,11 @@ void settings_load(void)
         if (config_block[0xf4] != 0xff) {
             global_settings.rec_prerecord_time = config_block[0xf4] & 0x1f;
             global_settings.rec_directory = (config_block[0xf4] >> 5) & 3;
+        }
+        if (config_block[0xf5] != 0xff) {
+            global_settings.talk_dir = config_block[0xf5] & 7;
+            global_settings.talk_file = (config_block[0xf5] >> 3) & 3;
+            global_settings.talk_menu = (config_block[0xf5] >> 5) & 1;
         }
         
 #ifdef HAVE_LCD_CHARCELLS
@@ -1193,6 +1201,20 @@ bool settings_load_config(char* file)
             set_cfg_option(&global_settings.playlist_viewer_track_display,
                 value, options, 2);
         }
+        else if (!strcasecmp(name, "talk dir"))
+        {
+            static char* options[] = {"off", "number", "enter", "hover"};
+            set_cfg_option(&global_settings.talk_dir, value, options, 4);
+        }
+        else if (!strcasecmp(name, "talk file"))
+        {
+            static char* options[] = {"off", "number"};
+            set_cfg_option(&global_settings.talk_dir, value, options, 2);
+        }
+        else if (!strcasecmp(name, "talk menu"))
+        {
+            set_cfg_bool(&global_settings.talk_menu, value);
+        }
     }
 
     close(fd);
@@ -1539,6 +1561,16 @@ bool settings_save_config(void)
                 options[global_settings.playlist_viewer_track_display]);
         }
     }
+    fprintf(fd, "#\r\n# Voice\r\n#\r\n");
+    {
+        static char* options[] = {"off", "number", "enter", "hover"};
+        fprintf(fd, "talk dir: %s\r\n",
+            options[global_settings.talk_dir]);
+        fprintf(fd, "talk file: %s\r\n", /* recycle the options, */
+            options[global_settings.talk_file]); /* first 2 are alike */
+        fprintf(fd, "talk menu: %s\r\n",
+            boolopt[global_settings.talk_menu]);
+    }
 
     close(fd);
 
@@ -1646,6 +1678,10 @@ void settings_reset(void) {
     global_settings.playlist_viewer_icons = true;
     global_settings.playlist_viewer_indices = true;
     global_settings.playlist_viewer_track_display = 0;
+    /* talking menu on by default, to help the blind (if voice file present) */
+    global_settings.talk_menu = 1; 
+    global_settings.talk_dir = 0;
+    global_settings.talk_file = 0;
 }
 
 bool set_bool(char* string, bool* variable )
@@ -1713,7 +1749,7 @@ bool set_int(char* string,
 #endif
         lcd_update();
 
-        if (*variable != last_value)
+        if (global_settings.talk_menu && *variable != last_value)
         {
             if (voice_unit < UNIT_LAST)
             {   /* use the available unit definition */
@@ -1829,7 +1865,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
     while ( !done ) {
         index = type==INT ? *intvar : (int)*boolvar;
         lcd_puts(0, 1, options[index].string);
-        if (index != oldindex)
+        if (global_settings.talk_menu && index != oldindex)
         {
             talk_id(options[index].voice_id, false);
             oldindex = index;

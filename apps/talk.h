@@ -54,6 +54,9 @@ enum {
 /* convenience macro to have both string and ID as arguments */
 #define STR(id) str(id), id
 
+/* publish this string, so it's stored only once (better than #define) */
+extern const char* dir_thumbnail_name;
+
 
 void talk_init(void);
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */

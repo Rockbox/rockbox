@@ -87,7 +87,8 @@ bool set_sound(char* string,
             {
                 snprintf(str,sizeof str,"%d %s  ", val, unit);
             }
-            talk_value(val, talkunit, false); /* speak it */
+            if (global_settings.talk_menu)
+                talk_value(val, talkunit, false); /* speak it */
         }
         lcd_puts(0,1,str);
         status_draw(true);

@@ -2373,3 +2373,57 @@ new:
 
 #carry on adding normal LANG_ strings below
 
+id: LANG_VOICE
+desc: root of voice menu
+eng: "Voice"
+voice: "Voice"
+new:
+
+id: LANG_VOICE_MENU
+desc: item of voice menu, enable/disable the voice UI
+eng: "Voice Menus"
+voice: "Voice Menus"
+new:
+
+id: LANG_VOICE_DIR
+desc: item of voice menu, set the "talkbox" mode for directories
+eng: "Voice Directories"
+voice: "Voice Directories"
+new:
+
+id: LANG_VOICE_FILE
+desc: item of voice menu, set the voive mode for files
+eng: "Voice Filenames"
+voice: "Voice Filenames"
+new:
+
+id: LANG_VOICE_NUMBER
+desc: "talkbox" mode for files+directories
+eng: "Numbers"
+voice: "Numbers"
+new:
+
+id: LANG_VOICE_DIR_ENTER
+desc: "talkbox" mode for directories
+eng: "on enter"
+voice: "on enter"
+new:
+
+id: LANG_VOICE_DIR_HOVER
+desc: "talkbox" mode for directories
+eng: "while hovering"
+voice: "while hovering"
+new:
+
+id: VOICE_FILE
+desc: spoken only, prefix for file number
+eng: ""
+voice: "file"
+new:
+
+id: VOICE_DIR
+desc: spoken only, prefix for directory number
+eng: ""
+voice: "folder"
+new:
+

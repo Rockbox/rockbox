@@ -144,7 +144,7 @@ bool sleeptimer_screen(void)
                      hours, minutes);
             lcd_puts(0, 1, buf);
 
-            if (sayit)
+            if (sayit && global_settings.talk_menu)
             {
                 bool enqueue = false; /* first one should not ne queued */
 

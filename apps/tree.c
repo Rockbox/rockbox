@@ -55,6 +55,7 @@
 #include "plugin.h"
 #include "power.h"
 #include "action.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -112,6 +113,7 @@ static int dircursor;
 static int dirstart;
 static int dirlevel;
 static int filesindir;
+static int dirsindir; /* how many of the dircache entries are directories */
 static int dirpos[MAX_DIR_LEVELS];
 static int cursorpos[MAX_DIR_LEVELS];
 static char lastdir[MAX_PATH];
@@ -122,6 +124,7 @@ static bool reload_dir = false;
 static int boot_size = 0;
 static int boot_cluster;
 static bool boot_changed = false;
+static bool enqueue_next = false;
 
 static bool start_wps = false;
 static bool dirbrowse(char *root, int *dirfilter);
@@ -199,7 +202,8 @@ static int build_playlist(int start_index)
 
     for(i = 0;i < filesindir;i++)
     {
-        if((dircache[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        if((dircache[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA 
+            && (strcmp(dircache[i].name, dir_thumbnail_name) != 0))
         {
             DEBUGF("Adding %s\n", dircache[i].name);
             if (playlist_add(dircache[i].name) < 0)
@@ -215,6 +219,36 @@ static int build_playlist(int start_index)
 
     return start_index;
 }
+
+
+static int play_dirname(int start_index, bool enqueue)
+{
+    int fd;
+    char dirname_mp3_filename[MAX_PATH+1];
+
+    if (mpeg_status() & MPEG_STATUS_PLAY)
+        return 0;
+
+    snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
+		 currdir, dircache[start_index].name, dir_thumbnail_name);
+
+    DEBUGF("Checking for %s\n", dirname_mp3_filename);
+
+    fd = open(dirname_mp3_filename, O_RDONLY);
+    if (fd < 0)
+    {
+	    DEBUGF("Failed to find: %s\n", dirname_mp3_filename);
+	    return -1;
+    }
+
+    close(fd);
+  
+    DEBUGF("Found: %s\n", dirname_mp3_filename);
+
+    talk_file(dirname_mp3_filename, enqueue);
+    return 1;
+}
+
 
 static int compare(const void* p1, const void* p2)
 {
@@ -278,6 +312,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
         return NULL; /* not a directory */
 
     name_buffer_length = 0;
+    dirsindir = 0;
     *buffer_full = false;
 
     for ( i=0; i < max_files_in_dir; i++ ) {
@@ -369,6 +404,9 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
         dptr->name = &name_buffer[name_buffer_length];
         strcpy(dptr->name,entry->d_name);
         name_buffer_length += len + 1;
+
+        if (dptr->attr & ATTR_DIRECTORY) /* count the remaining dirs */
+            dirsindir++; 
     }
     *num_files = i;
     closedir(dir);
@@ -1019,6 +1057,14 @@ static bool dirbrowse(char *root, int *dirfilter)
                     snprintf(buf,sizeof(buf),"/%s",file->name);
 
                 if (file->attr & ATTR_DIRECTORY) {
+                    if (global_settings.talk_dir == 2) /* enter */
+                    {
+                        /* play_dirname */
+                        DEBUGF("Playing directory thumbnail: %s", currdir);
+                        play_dirname(dircursor+dirstart, false);
+                        /* avoid reading getting cut by next filename */
+                        enqueue_next = true;
+                    }
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirpos[dirlevel] = dirstart;
@@ -1425,6 +1471,32 @@ static bool dirbrowse(char *root, int *dirfilter)
 
                 showfileline(dircursor, i, true, dirfilter); /* scroll please */
                 need_update = true;
+
+                if (dircache[i].attr & ATTR_DIRECTORY) /* directory? */
+                {
+                    int ret = 0;
+                    /* play directory thumbnail */
+                    if (global_settings.talk_dir == 3) /* hover */
+                    {
+                        DEBUGF("Playing directory thumbnail: %s", currdir);
+                        ret = play_dirname(dircursor+dirstart, false);
+                    }
+
+                    if (global_settings.talk_dir == 1 /* dirs as numbers */
+                        || ret == -1) /* or no thumbnail found above */
+                    {
+                        talk_id(VOICE_DIR, false);
+                        talk_number(i+1, true);
+                    }
+                }
+                else if (global_settings.talk_file == 1) /* files as numbers */
+                {
+                    /* enqueue_next is true if still talking the dir name */
+                    talk_id(VOICE_FILE, enqueue_next);
+                    talk_number(i-dirsindir+1, true);
+                    enqueue_next = false;
+                }
+
             }
         }
 

@@ -30,14 +30,14 @@
 #include "mpeg.h"
 #include "lang.h"
 #include "talk.h"
-#include "screens.h" /* test hack */
-#include "kernel.h"
+#include "id3.h"
 extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 /***************** Constants *****************/
 
 #define QUEUE_SIZE 20
 const char* voicefont_file = "/.rockbox/langs/english.voice";
+const char* dir_thumbnail_name = ".dirname.mp3";
 
 
 /***************** Data types *****************/
@@ -317,6 +317,7 @@ int talk_file(char* filename, bool enqueue)
 {
     int fd;
     int size;
+    struct mp3entry info;
 
     if (mpeg_status()) /* busy, buffer in use */
         return -1; 
@@ -324,11 +325,18 @@ int talk_file(char* filename, bool enqueue)
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
         return -1;
 
+    if(mp3info(&info, filename)) /* use this to find real start */
+    {   
+        return 0; /* failed to open, or invalid */
+    }
+
     fd = open(filename, O_RDONLY);
     if (fd < 0) /* failed to open */
     {
         return 0;
     }
+
+    lseek(fd, info.first_frame_offset, SEEK_SET); /* behind ID data */
 
     size = read(fd, p_thumbnail, size_for_thumbnail);
     close(fd);

@@ -202,6 +202,11 @@ struct user_settings
     bool playlist_viewer_icons; /* display icons on viewer */
     bool playlist_viewer_indices; /* display playlist indices on viewer */
     int playlist_viewer_track_display; /* how to display tracks in viewer */
+
+    /* voice UI settings */
+    bool talk_menu; /* enable voice UI */
+    int talk_dir; /* talkbox mode: 0=off 1=number 2=clip@enter 3=clip@hover */
+    int talk_file; /* voice filename mode: 0=off, 1=number, other t.b.d. */ 
 };
 
 enum optiontype { INT, BOOL };

@@ -876,6 +876,56 @@ static bool language_browse(void)
     return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
 }
 
+static bool voice_menus(void)
+{
+    bool ret;
+    bool temp = global_settings.talk_menu;
+    /* work on a temp variable first, avoid "life" disabling */
+    ret = set_bool( str(LANG_VOICE_MENU), &temp );
+    global_settings.talk_menu = temp;
+    return ret;
+}
+
+static bool voice_dirs(void)
+{
+    struct opt_items names[] = {
+        { STR(LANG_OFF) }, 
+        { STR(LANG_VOICE_NUMBER) },
+        { STR(LANG_VOICE_DIR_ENTER) },
+        { STR(LANG_VOICE_DIR_HOVER) }
+    };
+    return set_option( str(LANG_VOICE_DIR), 
+                       &global_settings.talk_dir, INT, names, 4, NULL);
+}
+
+static bool voice_files(void)
+{
+    struct opt_items names[] = {
+        { STR(LANG_OFF) }, 
+        { STR(LANG_VOICE_NUMBER) }
+    };
+    return set_option( str(LANG_VOICE_DIR), 
+                       &global_settings.talk_file, INT, names, 2, NULL);
+}
+
+static bool voice_menu(void)
+{
+    int m;
+    bool result;
+
+    struct menu_item items[] = {
+        { STR(LANG_VOICE_MENU), voice_menus },
+        { STR(LANG_VOICE_DIR),  voice_dirs  },
+        { STR(LANG_VOICE_FILE),  voice_files }
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
 #ifdef HAVE_LCD_BITMAP
 static bool font_browse(void)
 {
@@ -1283,6 +1333,7 @@ bool settings_menu(void)
         { STR(LANG_SYSTEM),           system_settings_menu   },
         { STR(LANG_BOOKMARK_SETTINGS),bookmark_settings_menu },
         { STR(LANG_LANGUAGE),         language_browse        },
+        { STR(LANG_VOICE),            voice_menu             },
     };
     
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
