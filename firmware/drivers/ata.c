@@ -165,11 +165,13 @@ int ata_read_sectors(unsigned long start,
                      int count,
                      void* buf) __attribute__ ((section (".icode")));
 int ata_read_sectors(unsigned long start,
-                     int count,
-                     void* buf)
+                     int incount,
+                     void* inbuf)
 {
     int ret = 0;
     int timeout;
+    int count;
+    void* buf;
 
     last_disk_activity = current_tick;
 
@@ -201,6 +203,10 @@ int ata_read_sectors(unsigned long start,
     led(true);
 
     timeout = current_tick + READ_TIMEOUT;
+
+ retry:
+    buf = inbuf;
+    count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
 
         if ( count == 256 )
@@ -221,11 +227,11 @@ int ata_read_sectors(unsigned long start,
 
             if (!wait_for_start_of_transfer()) {
                 ret = -4;
-                continue;
+                goto retry;
             }
 
             if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) )
-                continue;
+                goto retry;
              
             /* if destination address is odd, use byte copying,
                otherwise use word copying */
@@ -259,9 +265,10 @@ int ata_read_sectors(unsigned long start,
 
         if(!wait_for_end_of_transfer()) {
             ret = -3;
-            continue;
+            goto retry;
         }
 
+        ret = 0;
         break;
     }
     led(false);
