@@ -67,14 +67,15 @@ DEFINES += -DWIN32
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mno-cygwin
-DLLFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin \
-	--def plugin.def
+DLLTOOLFLAGS = --export-all
+DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
 ifeq ($(UNAME),CYGWIN)
   CC = gcc
   WINDRES = windres
-  DLL = dllwrap
+  DLLTOOL = dlltool
+  DLLWRAP = dllwrap
   DEFINES += -DNOCYGWIN
   CFLAGS += -mno-cygwin
   LDFLAGS += -mno-cygwin
@@ -82,7 +83,8 @@ ifeq ($(UNAME),CYGWIN)
 else
   CC = i386-mingw32msvc-gcc
   WINDRES = i386-mingw32msvc-windres
-  DLL = i386-mingw32msvc-dllwrap
+  DLLTOOL = i386-mingw32msvc-dlltool
+  DLLWRAP = i386-mingw32msvc-dllwrap
   CFLAGS += -mwindows
   LDFLAGS += -mwindows
   APPCFLAGS += -mwindows
@@ -128,7 +130,8 @@ $(OBJDIR)/uisw32-res.o: uisw32.rc
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
-	$(OBJDIR)/*.rock $(OBJDIR)/sysfont.c $(OBJDIR)/credits.raw
+	$(OBJDIR)/*.rock $(OBJDIR)/*.def $(OBJDIR)/sysfont.c \
+	$(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
 
 distclean: clean
@@ -295,10 +298,11 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.po : $(PLUGINDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.po
-	-$(DLL) $(DLLFLAGS) $< -o $@
+	$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< -o $@
 
 DEPS:=$(OBJDIR)/.deps
 
