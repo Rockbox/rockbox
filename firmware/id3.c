@@ -304,8 +304,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             if(flags & 0x0040) /* Grouping identity */
                 skip++;
 
-            if(flags & 0x000e) /* Compression, encryption or
-                                  unsynchronization */
+            if(flags & 0x000c) /* Compression or encryption */
             {
                 /* Skip it using the total size in case
                    it was truncated */
@@ -314,6 +313,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 continue;
             }
 
+            /* The Unsynchronization flag can't be trusted, so we
+               don't check it for now... */
+            
             if(flags & 0x0001) /* Data length indicator */
                 skip += 4;
 
