@@ -10,9 +10,11 @@
 
 use MP3::Info;
 
-my $db;
-my $dir;
+my $db = "rockbox.id3db";
+my $dir = ".";
 my $strip;
+my $verbose;
+my $help;
 
 while($ARGV[0]) {
     if($ARGV[0] eq "--db") {
@@ -30,6 +32,14 @@ while($ARGV[0]) {
         shift @ARGV;
         shift @ARGV;
     }
+    elsif($ARGV[0] eq "--verbose") {
+        $verbose = 1;
+        shift @ARGV;
+    }
+    elsif($ARGV[0] eq "--help" or ($ARGV[0] eq "-h")) {
+        $help = 1;
+        shift @ARGV;
+    }
     else {
         shift @ARGV;
     }
@@ -42,9 +52,9 @@ my %filename;
 
 my $dbver = 1;
 
-if(! -d $dir) {
-    print "songdb [--db <file>] --path <dir> [--strip <path>]\n";
-    print "given argument is not a directory!\n";
+if(! -d $dir or $help) {
+    print "'$dir' is not a directory\n" if (! -d $dir);
+    print "songdb [--db <file>] [--path <dir>] [--strip <path>] [--verbose] [--help]\n";
     exit;
 }
 
@@ -100,6 +110,8 @@ my $maxsongperalbum;
 sub dodir {
     my ($dir)=@_;
 
+    print "$dir\n";
+
     # getdir() returns all entries in the given dir
     my @a = getdir($dir);
 
@@ -120,15 +132,26 @@ sub dodir {
         # TRACKNUM
         # YEAR
 
+        # don't index songs without tags
+        if (not defined $$id3{'ARTIST'} and
+            not defined $$id3{'ALBUM'} and
+            not defined $$id3{'TITLE'})
+        {
+            next;
+        }
+
         #printf "Artist: %s\n", $id3->{'ARTIST'};
-        $entries{"$dir/$f"}= $id3;
-        $filename{$id3}="$dir/$f";
+        my $path = "$dir/$f";
+        if ($strip ne "" and $path =~ /^$strip(.*)/) {
+            $path = $1;
+        }
+
+        $entries{$path}= $id3;
         $artists{$id3->{'ARTIST'}}++ if($id3->{'ARTIST'});
         $genres{$id3->{'GENRE'}}++ if($id3->{'GENRE'});
         $years{$id3->{'YEAR'}}++ if($id3->{'YEAR'});
 
-        $id3->{'FILE'}="$dir/$f"; # store file name
-
+        # fallback names
         $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
         $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
         $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
@@ -136,10 +159,11 @@ sub dodir {
         # prepend Artist name to handle duplicate album names from other
         # artists
         my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
-        if($id3->{'ALBUM'}) {
+        if($albumid ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
                 $maxsongperalbum = $num;
+                $longestalbum = $albumid;
             }
             $album2songs{$albumid}{$$id3{TITLE}} = $id3;
             $artist2albums{$$id3{ARTIST}}{$$id3{ALBUM}} = $id3;
@@ -157,23 +181,25 @@ sub dodir {
 
 
 dodir($dir);
+print "\n";
 
-print "File name table\n";
+print "File name table\n" if ($verbose);
 my $fc;
 for(sort keys %entries) {
-    printf("  %s\n", $_);
+    printf("  %s\n", $_) if ($verbose);
     $fc += length($_)+1;
 }
 
-my $maxsonglen;
+my $maxsonglen = 0;
 my $sc;
-print "\nSong title table\n";
-#for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} %entries) {
+print "\nSong title table\n" if ($verbose);
+
 for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
-    printf("  %s\n", $entries{$_}->{'TITLE'} );
+    printf("  %s\n", $entries{$_}->{'TITLE'} ) if ($verbose);
     my $l = length($entries{$_}->{'TITLE'});
     if($l > $maxsonglen) {
         $maxsonglen = $l;
+        $longestsong = $entries{$_}->{'TITLE'};
     }
 }
 $maxsonglen++; # include zero termination byte
@@ -181,16 +207,17 @@ while($maxsonglen&3) {
     $maxsonglen++;
 }
 
-my $maxartistlen;
-print "\nArtist table\n";
+my $maxartistlen = 0;
+print "\nArtist table\n" if ($verbose);
 my $i=0;
 my %artistcount;
 for(sort keys %artists) {
-    printf("  %s\n", $_);
+    printf("  %s\n", $_) if ($verbose);
     $artistcount{$_}=$i++;
     my $l = length($_);
     if($l > $maxartistlen) {
         $maxartistlen = $l;
+        $longestartist = $_;
     }
 
     $l = scalar keys %{$artist2albums{$_}};
@@ -203,27 +230,30 @@ while($maxartistlen&3) {
     $maxartistlen++;
 }
 
-print "\nGenre table\n";
-for(sort keys %genres) {
-    printf("  %s\n", $_);
+if ($verbose) {
+    print "\nGenre table\n";
+    for(sort keys %genres) {
+        printf("  %s\n", $_);
+    }
+
+    print "\nYear table\n";
+    for(sort keys %years) {
+        printf("  %s\n", $_);
+    }
 }
 
-print "\nYear table\n";
-for(sort keys %years) {
-    printf("  %s\n", $_);
-}
-
-print "\nAlbum table\n";
-my $maxalbumlen;
+print "\nAlbum table\n" if ($verbose);
+my $maxalbumlen = 0;
 my %albumcount;
 $i=0;
 for(sort keys %albums) {
     my @moo=split(/___/, $_);
-    printf("  %s\n", $moo[0]);
+    printf("  %s\n", $moo[0]) if ($verbose);
     $albumcount{$_} = $i++;
     my $l = length($moo[0]);
     if($l > $maxalbumlen) {
         $maxalbumlen = $l;
+        $longestalbumname = $moo[0];
     }
 }
 $maxalbumlen++; # include zero termination byte
@@ -245,17 +275,25 @@ sub dumpint {
                ($num&0xff));
 }
 
-if($db) {
-    print STDERR "\nCreating db $db\n";
+if (!scalar keys %entries) {
+    print "No songs found. Did you specify the right --path ?\n";
+    print "Use the --help parameter to see all options.\n";
+    exit;
+}
 
+if ($db) {
     my $songentrysize = $maxsonglen + 12;
     my $albumentrysize = $maxalbumlen + 4 + $maxsongperalbum*4;
     my $artistentrysize = $maxartistlen + $maxalbumsperartist*4;
 
-    print STDERR "Max song length: $maxsonglen\n";
-    print STDERR "Max album length: $maxalbumlen\n";
-    print STDERR "Max artist length: $maxartistlen\n";
-    print STDERR "Database version: $dbver\n";
+    printf STDERR "Number of artists  : %d\n", scalar keys %artists;
+    printf STDERR "Number of albums   : %d\n", scalar keys %albums;
+    printf STDERR "Number of songs    : %d\n", scalar keys %entries;
+    print STDERR "Max artist length  : $maxartistlen ($longestartist)\n";
+    print STDERR "Max album length   : $maxalbumlen ($longestalbumname)\n";
+    print STDERR "Max song length    : $maxsonglen ($longestsong)\n";
+    print STDERR "Max songs per album: $maxsongperalbum ($longestalbum)\n";
+    print STDERR "Database version: $dbver\n" if ($verbose);
 
     open(DB, ">$db") || die "couldn't make $db";
     printf DB "RDB%c", $dbver;
