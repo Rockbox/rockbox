@@ -49,7 +49,7 @@ extern unsigned const char *lcd_ascii;
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 {
   int xpos = x;
-  int ypos = icon_line*(ICON_HEIGHT+CHAR_HEIGHT*2);
+  int ypos = icon_line*(ICON_HEIGHT+CHAR_HEIGHT*2*4);
   int row=0, col;
 
   int p=0, cp=0;
