@@ -12,6 +12,18 @@ by Jörg Hohensohn aka [IDC]Dragon
 7. Known issues, limitations<br>
 8. Movies and images<br>
 
+<h2>What is Flashing</h2>
+
+<p> Flashing in the sense used here and elsewhere in regard to Rockbox, means
+reprogramming the flash memory of the Archos unit.  Flash memory (sometimes
+called "flash RAM") is a type of constantly-powered nonvolatile memory that
+can be erased and reprogrammed. It is a variation of electrically erasable
+programmable read-only memory (EEPROM).
+
+<p>
+ When you bought Your Archos, it came with the Archos firmware flashed. Now,
+you can replace the built-in software with Rockbox.
+
 <h2>1. What is this about?</h2>
 <p>
 This package contains tools to update the flash content of Archos Jukebox
