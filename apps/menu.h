@@ -20,6 +20,8 @@
 #ifndef __MENU_H__
 #define __MENU_H__
 
+#include <stdbool.h>
+
 struct menu_items {
     int id;
     char *desc;
@@ -29,5 +31,7 @@ struct menu_items {
 int menu_init(struct menu_items* items, int count);
 void menu_exit(int menu);
 void menu_run(int menu);
+
+void put_cursorxy(int x, int y, bool on);
 
 #endif /* End __MENU_H__ */

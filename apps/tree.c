@@ -33,6 +33,7 @@
 #include "sprintf.h"
 #include "mpeg.h"
 #include "playlist.h"
+#include "menu.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
