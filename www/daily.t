@@ -5,13 +5,7 @@
 
 <!--#exec cmd="./dailysrc.pl" -->
 
-<p>Useful links for do-it-yourselfers:
-<ul>
-<li><a href="cross-gcc.html">Building the SH1 cross compiler</a> (unix/linux/cygwin)
-<li><a href="sh-win/">Setting up an SH1 cross compiler for Windows</a>
-<li><a href="docs/how_to_compile.html">How to compile Rockbox from source</a>
-<lI><a href="manual/">The Rockbox User's Manual</a>
-</ul>
+<p>Please also look at our a useful <a href="docs/">documentaion</a> for do-it-yourselfers.
 
 <a name="target_builds"></a>
 <h2>Target builds</h2>
