@@ -23,7 +23,7 @@
 #include "thread.h"
 #include "settings.h"
 #include "status.h"
-
+#include "mpeg.h"
 static enum playmode current_mode;
 
 void status_init(void)
@@ -40,60 +40,62 @@ void status_draw(void)
 {
 #if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
     int battlevel = battery_level();
+    int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
     
     lcd_icon(ICON_BATTERY, true);
     if(battlevel > 25)
-	lcd_icon(ICON_BATTERY_1, true);
+        lcd_icon(ICON_BATTERY_1, true);
     else
-	lcd_icon(ICON_BATTERY_1, false);
+        lcd_icon(ICON_BATTERY_1, false);
     if(battlevel > 50)
-	lcd_icon(ICON_BATTERY_2, true);
+        lcd_icon(ICON_BATTERY_2, true);
     else
-	lcd_icon(ICON_BATTERY_2, false);
+        lcd_icon(ICON_BATTERY_2, false);
     if(battlevel > 75)
-	lcd_icon(ICON_BATTERY_3, true);
+        lcd_icon(ICON_BATTERY_3, true);
     else
-	lcd_icon(ICON_BATTERY_3, false);
+        lcd_icon(ICON_BATTERY_3, false);
 
 
+    DEBUGF("vol: %d\n", volume);
     lcd_icon(ICON_VOLUME, true);
-    if(global_settings.volume > 10)
-	lcd_icon(ICON_VOLUME_1, true);
+    if(volume > 10)
+        lcd_icon(ICON_VOLUME_1, true);
     else
-	lcd_icon(ICON_VOLUME_1, false);
-    if(global_settings.volume > 30)
-	lcd_icon(ICON_VOLUME_2, true);
+        lcd_icon(ICON_VOLUME_1, false);
+    if(volume > 30)
+        lcd_icon(ICON_VOLUME_2, true);
     else
-	lcd_icon(ICON_VOLUME_2, false);
-    if(global_settings.volume > 50)
-	lcd_icon(ICON_VOLUME_3, true);
+        lcd_icon(ICON_VOLUME_2, false);
+    if(volume > 50)
+        lcd_icon(ICON_VOLUME_3, true);
     else
-	lcd_icon(ICON_VOLUME_3, false);
-    if(global_settings.volume > 70)
-	lcd_icon(ICON_VOLUME_4, true);
+        lcd_icon(ICON_VOLUME_3, false);
+    if(volume > 70)
+        lcd_icon(ICON_VOLUME_4, true);
     else
-	lcd_icon(ICON_VOLUME_4, false);
-    if(global_settings.volume > 90)
-	lcd_icon(ICON_VOLUME_5, true);
+        lcd_icon(ICON_VOLUME_4, false);
+    if(volume > 90)
+        lcd_icon(ICON_VOLUME_5, true);
     else
-	lcd_icon(ICON_VOLUME_5, false);
+        lcd_icon(ICON_VOLUME_5, false);
 
     switch(current_mode)
     {
-    case STATUS_PLAY:
-	lcd_icon(ICON_PLAY, true);
-	lcd_icon(ICON_PAUSE, false);
-	break;
-	
-    case STATUS_STOP:
-	lcd_icon(ICON_PLAY, false);
-	lcd_icon(ICON_PAUSE, false);
-	break;
-	
-    case STATUS_PAUSE:
-	lcd_icon(ICON_PLAY, false);
-	lcd_icon(ICON_PAUSE, true);
-	break;
+        case STATUS_PLAY:
+            lcd_icon(ICON_PLAY, true);
+            lcd_icon(ICON_PAUSE, false);
+            break;
+    
+        case STATUS_STOP:
+            lcd_icon(ICON_PLAY, false);
+            lcd_icon(ICON_PAUSE, false);
+            break;
+    
+        case STATUS_PAUSE:
+            lcd_icon(ICON_PLAY, false);
+            lcd_icon(ICON_PAUSE, true);
+            break;
     }
 #endif
 }
