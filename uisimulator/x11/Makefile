@@ -73,7 +73,7 @@ APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c \
 	playlist.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c bounce.c screensaver.c icons.c bmp.c
+   APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c mpeg.c \
@@ -153,10 +153,13 @@ $(OBJDIR)/icons.o: $(RECDIR)/icons.c
 $(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/screensaver.o: $(RECDIR)/screensaver.c
+$(OBJDIR)/boxes.o: $(RECDIR)/boxes.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/main.o: $(APPDIR)/main.c
