@@ -46,7 +46,7 @@
 
 #define USB_GMINISTYLE
 
-#define HAVE_GMINI_I2C
+#define CONFIG_I2C I2C_GMINI
 
 #define GMINI_ARCH
 
