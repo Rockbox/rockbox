@@ -9,15 +9,15 @@
 #define LCD_HEIGHT 64
 
 /* define this if you have an Ondio style 6-key keyboard */
-#define HAVE_ONDIO_KEYPAD
+#define CONFIG_KEYPAD ONDIO_PAD
 
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
-#define HAVE_SH7034
+#define CONFIG_CPU SH7034
 
-/* Define this if you have a MAS3587F */
-#define HAVE_MAS3587F
+/* Define this if you have a MAS3539F */
+#define CONFIG_HWCODEC MAS3587F /* will be MAS3539F once prepared */
 
 /* Define this if you have a LiIon battery */
 /* #define HAVE_LIION */

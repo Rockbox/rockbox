@@ -51,7 +51,7 @@
 #include "widgets.h"
 #include "peakmeter.h"
 #endif
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
 
@@ -790,7 +790,7 @@ bool dbg_mas(void)
     return false;
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 bool dbg_mas_codec(void)
 {
     char buf[32];
@@ -999,7 +999,7 @@ bool view_battery(void)
 
 #endif
 
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
 bool dbg_mas_info(void)
 {
     int button;
@@ -1457,7 +1457,7 @@ bool dbg_save_roms(void)
     return false;
 }
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 extern int debug_fm_detection;
 
 bool dbg_fm_radio(void)
@@ -1535,11 +1535,11 @@ bool debug_menu(void)
 #endif /* HAVE_LCD_BITMAP */
         { "View OS stacks", dbg_os },
         { "Catch mem accesses", dbg_set_memory_guard },
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
         { "View MAS info", dbg_mas_info },
 #endif
         { "View MAS regs", dbg_mas },
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
         { "View MAS codec", dbg_mas_codec },
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -1560,7 +1560,7 @@ bool debug_menu(void)
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
         { "View runtime", view_runtime },
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
 #endif
     };

@@ -19,7 +19,7 @@
 #ifndef RADIO_H
 #define RADIO_H
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 bool radio_screen(void);
 void radio_stop(void);
 bool radio_hardware_present(void);

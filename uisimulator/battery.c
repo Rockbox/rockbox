@@ -22,7 +22,7 @@
 #include "types.h"
 #include "lcd.h"
 #include "debug.h"
-#define HAVE_RECORDER_KEYPAD
+#define CONFIG_KEYPAD RECORDER_PAD
 #include "button.h"
 
 #ifdef SIMULATOR

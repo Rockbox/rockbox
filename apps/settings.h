@@ -34,7 +34,7 @@
 #define MAX_FILENAME 20
 
 /* button definitions */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 #define SETTINGS_INC     BUTTON_UP
 #define SETTINGS_DEC     BUTTON_DOWN
 #define SETTINGS_OK      (BUTTON_PLAY|BUTTON_REL)
@@ -42,14 +42,14 @@
 #define SETTINGS_CANCEL  (BUTTON_OFF|BUTTON_REL)
 #define SETTINGS_CANCEL2 (BUTTON_F1|BUTTON_REL)
 
-#elif defined HAVE_PLAYER_KEYPAD
+#elif CONFIG_KEYPAD == PLAYER_PAD
 #define SETTINGS_INC     BUTTON_RIGHT
 #define SETTINGS_DEC     BUTTON_LEFT
 #define SETTINGS_OK      (BUTTON_PLAY|BUTTON_REL)
 #define SETTINGS_CANCEL  (BUTTON_STOP|BUTTON_REL)
 #define SETTINGS_CANCEL2 (BUTTON_MENU|BUTTON_REL)
 
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
 #define SETTINGS_INC    BUTTON_UP
 #define SETTINGS_DEC    BUTTON_DOWN
 #define SETTINGS_OK     (BUTTON_RIGHT|BUTTON_REL)
@@ -239,7 +239,7 @@ struct user_settings
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool caption_backlight; /* turn on backlight at end and start of track */
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
     int fm_freq_step;    /* Frequency step for manual tuning, in kHz */
     bool fm_force_mono;  /* Forces Mono mode if true */
     bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
@@ -306,7 +306,7 @@ bool set_time_screen(const char* string, struct tm *tm);
 int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 unsigned int rec_timesplit_seconds(void);
 #endif
 

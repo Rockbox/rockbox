@@ -33,7 +33,7 @@
 /* skip whole file for an MMC-based system, FIXME in makefile */
 #ifndef HAVE_MMC 
 
-#ifdef HAVE_SCF5249
+#if CONFIG_CPU == SCF5249
 
 /* don't use sh7034 assembler routines */
 #define PREFER_C_READING
@@ -43,7 +43,7 @@
 #define ATA_DATA        (*((volatile unsigned short*)ATA_IOBASE))
 #define ATA_CONTROL     (*((volatile unsigned short*)ATA_IOBASE + 0xe))
 
-#elif defined HAVE_SH7034
+#elif CONFIG_CPU == SH7034
 
 #define ATA_IOBASE      0x06100100
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -879,7 +879,7 @@ int ata_hard_reset(void)
 {
     int ret;
 
-#ifdef HAVE_SH7034
+#if CONFIG_CPU == SH7034
     /* state HRR0 */
     and_b(~0x02, &PADRH); /* assert _RESET */
     sleep(1); /* > 25us */
@@ -979,7 +979,7 @@ static int master_slave_detect(void)
     return 0;
 }
 
-#ifdef HAVE_SH7034 /* special archos quirk */
+#if CONFIG_CPU == SH7034 /* special archos quirk */
 static int io_address_detect(void)
 {   /* now, use the HW mask instead of probing */
     if (read_hw_mask() & ATA_ADDRESS_200)
@@ -1001,7 +1001,7 @@ static int io_address_detect(void)
 
 void ata_enable(bool on)
 {
-#ifdef HAVE_SH7034
+#if CONFIG_CPU == SH7034
     if(on)
         and_b(~0x80, &PADRL); /* enable ATA */
     else
@@ -1129,7 +1129,7 @@ int ata_init(void)
 
     led(false);
 
-#ifdef HAVE_SH7034
+#if CONFIG_CPU == SH7034
     /* Port A setup */
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH); /* release ATA reset */
@@ -1159,7 +1159,7 @@ int ata_init(void)
         if (rc)
             return -10 + rc;
 
-#ifdef HAVE_SH7034
+#if CONFIG_CPU == SH7034
         rc = io_address_detect();
         if (rc)
             return -20 + rc;

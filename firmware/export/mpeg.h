@@ -74,7 +74,7 @@ struct mp3entry* mpeg_current_track(void);
 struct mp3entry* mpeg_next_track(void);
 bool mpeg_has_changed_track(void);
 int mpeg_status(void);
-#if defined(HAVE_MAS3587F) || defined(SIMULATOR)
+#if (CONFIG_HWCODEC == MAS3587F) || defined(SIMULATOR)
 void mpeg_init_recording(void);
 void mpeg_init_playback(void);
 void mpeg_record(const char *filename);

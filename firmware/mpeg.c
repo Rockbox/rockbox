@@ -44,7 +44,7 @@
 
 #include "bitswap.h"
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static void init_recording(void);
 static void start_prerecording(void);
 static void start_recording(void);
@@ -52,7 +52,7 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
@@ -79,13 +79,13 @@ static int get_unswapped_space(void);
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 extern enum /* from mp3_playback.c */
 {
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 extern char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
@@ -326,7 +326,7 @@ unsigned long mpeg_get_last_header(void)
 
     /* Read the frame data from the MAS and reconstruct it with the
        frame sync and all */
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
 #else
     mas_readmem(MAS_BANK_D0, 0x301, tmp, 2);
@@ -368,7 +368,7 @@ static int low_watermark; /* Dynamic low watermark level */
 static int low_watermark_margin; /* Extra time in seconds for watermark */
 static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static bool is_recording; /* We are recording */
 static bool stop_pending;
 unsigned long record_start_time; /* Value of current_tick when recording
@@ -399,15 +399,15 @@ unsigned long shadow_7f1 = 0;
 unsigned long shadow_7f6 = 0;
 unsigned long shadow_7f9 = 0;
 
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 static int mpeg_file;
 
 /* Synchronization variables */
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static bool init_recording_done;
 static bool init_playback_done;
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 static bool mpeg_stop_done;
 
 static void recalculate_watermark(int bitrate)
@@ -533,7 +533,7 @@ static int get_unswapped_space(void)
     return space;
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static int get_unsaved_space(void)
 {
     int space = mp3buf_write - mp3buf_read;
@@ -541,9 +541,9 @@ static int get_unsaved_space(void)
         space += mp3buflen;
     return space;
 }
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 #ifdef DEBUG
 static long timing_info_index = 0;
 static long timing_info[1024];
@@ -584,12 +584,12 @@ static void drain_dma_buffer(void)
     );
 }
 
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 void rec_tick (void) __attribute__ ((section (".icode")));
 void rec_tick(void)
 {
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     int i;
     int num_bytes;
     if(is_recording && (PBDR & 0x4000))
@@ -694,7 +694,7 @@ void rec_tick(void)
             }
         }
     }
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 }
 
 void playback_tick(void)
@@ -927,10 +927,10 @@ static void track_change(void)
 {
     DEBUGF("Track change\n");
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     /* Reset the AVC */
     mpeg_sound_set(SOUND_AVC, -1);
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
     remove_current_tag();
 
     update_playlist();
@@ -1049,7 +1049,7 @@ static void mpeg_thread(void)
     int amount_to_read;
     int t1, t2;
     int start_offset;
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     int amount_to_save;
     int writelen;
     int framelen;
@@ -1058,7 +1058,7 @@ static void mpeg_thread(void)
     int rc;
     int offset;
     int countdown;
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
     
     is_playing = false;
     play_pending = false;
@@ -1067,10 +1067,10 @@ static void mpeg_thread(void)
 
     while(1)
     {
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
         if(mpeg_mode == MPEG_DECODER)
         {
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -1092,11 +1092,11 @@ static void mpeg_thread(void)
             case MPEG_PLAY:
                 DEBUGF("MPEG_PLAY\n");
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
                 /* Silence the A/D input, it may be on because the radio
                    may be playing */
                 mas_codec_writereg(6, 0x0000);
-#endif /* #ifdef HAVE_FMRADIO */
+#endif /* #ifdef CONFIG_TUNER */
 
                 /* Stop the current stream */
                 play_pending = false;
@@ -1589,14 +1589,14 @@ static void mpeg_thread(void)
                 break;
 #endif /* #ifndef USB_NONE */
                 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
                 init_recording_done = true;
                 break;
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
             }
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
         }
         else
         {
@@ -1996,7 +1996,7 @@ static void mpeg_thread(void)
                     break;
             }
         }
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
     }
 }
 #endif /* SIMULATOR */
@@ -2044,7 +2044,7 @@ bool mpeg_has_changed_track(void)
     return false;
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 void mpeg_init_playback(void)
 {
     init_playback_done = false;
@@ -2617,13 +2617,13 @@ int mpeg_status(void)
     if(paused)
         ret |= MPEG_STATUS_PAUSE;
     
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     if(is_recording && !is_prerecording)
         ret |= MPEG_STATUS_RECORD;
 
     if(is_prerecording)
         ret |= MPEG_STATUS_PRERECORD;
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
     if(mpeg_errno)
         ret |= MPEG_STATUS_ERROR;
@@ -2677,12 +2677,12 @@ void mpeg_init(void)
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     if(read_hw_mask() & PR_ACTIVE_HIGH)
         and_b(~0x08, &PADRH);
     else
         or_b(0x08, &PADRH);
-#endif /* #ifdef HAVE_MAS3587F */
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 #ifdef DEBUG
     dbg_timer_start();

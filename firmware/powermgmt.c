@@ -34,7 +34,7 @@
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 #include "fmradio.h"
 #endif
 
@@ -315,7 +315,7 @@ static void handle_auto_poweroff(void)
     charger_was_inserted = charger_is_inserted;
     
     if(timeout &&
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
        !fmradio_get_status() &&
 #endif
        !usb_inserted() &&

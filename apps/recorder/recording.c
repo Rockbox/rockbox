@@ -166,7 +166,7 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
-#ifndef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD != RECORDER_PAD
     splash(HZ*2, true, "Recording not supported yet");
     return false;
 #else
@@ -625,7 +625,7 @@ bool recording_screen(void)
 #endif    
 }
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_rec_screen(void)
 {
     bool exit = false;

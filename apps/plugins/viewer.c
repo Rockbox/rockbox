@@ -746,7 +746,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     while (!exit) {
         switch (rb->button_get(true)) {
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_OFF:
 #else
             case BUTTON_STOP:
@@ -755,7 +755,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 exit = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_F1:
 #else
             case BUTTON_ON | BUTTON_LEFT:
@@ -776,7 +776,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_F2:
 #else
             case BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT:
@@ -802,7 +802,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_F3:
 #else
             case BUTTON_ON | BUTTON_RIGHT:
@@ -843,7 +843,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #else
@@ -861,7 +861,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #else
@@ -875,7 +875,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
 #else
@@ -895,7 +895,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
 #else
@@ -915,7 +915,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_ON:
                 /*Go to On-btn combinations */
                 col = viewer_recorder_on_button(col);

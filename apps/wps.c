@@ -62,7 +62,7 @@ static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
 /* button definitions */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 #define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
 #define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
@@ -84,7 +84,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_RC_DECVOL BUTTON_RC_VOL_DOWN
 #define WPS_RC_EXIT   BUTTON_RC_STOP
 
-#elif defined HAVE_PLAYER_KEYPAD
+#elif CONFIG_KEYPAD == PLAYER_PAD
 #define WPS_NEXT     BUTTON_RIGHT
 #define WPS_PREV     BUTTON_LEFT
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
@@ -106,7 +106,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_RC_DECVOL BUTTON_RC_VOL_DOWN
 #define WPS_RC_EXIT   BUTTON_RC_STOP
 
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
 #define WPS_NEXT    (BUTTON_RIGHT | BUTTON_REL)
 #define WPS_PREV    (BUTTON_LEFT | BUTTON_REL)
 #define WPS_FFWD    (BUTTON_RIGHT | BUTTON_REPEAT)
@@ -218,7 +218,7 @@ static bool ffwd_rew(int button)
                     {
                         if (!paused)
                             mpeg_pause();
-#ifdef HAVE_PLAYER_KEYPAD
+#if CONFIG_KEYPAD == PLAYER_PAD
                         lcd_stop_scroll();
 #endif
                         if (direction > 0) 
@@ -629,7 +629,7 @@ int wps_show(void)
             case WPS_RC_NEXT:
 #endif
             case WPS_NEXT:
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
                 if (lastbutton & BUTTON_REPEAT)
                     break; 
 #endif
@@ -664,7 +664,7 @@ int wps_show(void)
                 waitfor_nokey();
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
                 /* play settings */
             case BUTTON_F2:
                 if (quick_screen(CONTEXT_WPS, BUTTON_F2))

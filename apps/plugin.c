@@ -211,7 +211,7 @@ static const struct plugin_api rockbox_api = {
     mas_writemem,
     mas_readreg,
     mas_writereg,
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     mas_codec_writereg,
     mas_codec_readreg,
 #endif
@@ -244,7 +244,7 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     mpeg_set_pitch,
 
     peak_meter_scale_value,

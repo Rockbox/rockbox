@@ -200,7 +200,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     while (true){
     
     switch (rb->button_get(true)) {
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
     case BUTTON_OFF:
 #else
     case BUTTON_STOP:
@@ -220,7 +220,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         draw_display();
         break;
       
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
     case BUTTON_UP:
     case BUTTON_UP | BUTTON_REPEAT:
 #else
@@ -231,7 +231,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         calc_period();
         break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
     case BUTTON_DOWN:
     case BUTTON_DOWN | BUTTON_REPEAT:
 #else

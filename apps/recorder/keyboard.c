@@ -33,7 +33,7 @@
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
 {
     switch (page) {
@@ -77,7 +77,7 @@ void kbd_spellchar(char c)
 
 int kbd_input(char* text, int buflen)
 {
-#ifndef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD != RECORDER_PAD
     (void)text;
     (void)buflen;
     splash(HZ*2, true, "Keyboard not implemented yet");

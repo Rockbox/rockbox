@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "system.h"
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 
 /* Signals:
    DI (Data In)     - PB0 (doubles as data pin for the LCD)

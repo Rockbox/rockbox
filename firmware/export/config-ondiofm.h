@@ -9,15 +9,15 @@
 #define LCD_HEIGHT 64
 
 /* define this if you have an Ondio style 6-key keyboard */
-#define HAVE_ONDIO_KEYPAD
+#define CONFIG_KEYPAD ONDIO_PAD
 
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
-#define HAVE_SH7034
+#define CONFIG_CPU SH7034
 
 /* Define this if you have a MAS3587F */
-#define HAVE_MAS3587F
+#define CONFIG_HWCODEC MAS3587F
 
 /* Define this if you have a LiIon battery */
 /* #define HAVE_LIION */
@@ -50,7 +50,7 @@
 /* #define HAVE_ALARM_MOD 1 */
 
 /* Define this if you have an FM Radio */
-#define HAVE_FMRADIO 1
+#define CONFIG_TUNER TEA5767
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */

@@ -48,7 +48,7 @@
 #include "recording.h"
 #include "talk.h"
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 
 #define MAX_FREQ (108000000)
 #define MIN_FREQ (87500000)
@@ -167,7 +167,7 @@ static void remember_frequency(void)
 
 bool radio_screen(void)
 {
-#ifndef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD != RECORDER_PAD
     splash(HZ*2, true, "Radio not supported yet");
     return false;
 #else
@@ -668,7 +668,7 @@ static bool radio_add_preset(void)
 static int handle_radio_presets_menu_cb(int key, int m)
 {
     (void)m;
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
     switch(key)
     {
         case BUTTON_F3:
@@ -732,7 +732,7 @@ bool handle_radio_presets_menu(void)
 
 int handle_radio_presets_cb(int key, int m)
 {
-#ifdef HAVE_ONDIO_KEYPAD
+#if CONFIG_KEYPAD == ONDIO_PAD
     (void)key;
     (void)m;
     return BUTTON_NONE;

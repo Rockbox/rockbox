@@ -46,13 +46,13 @@
 #include "screens.h"
 #include "playlist_menu.h"
 #include "talk.h"
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
 #include "misc.h"
 #include "lang.h"
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 #include "recording.h"
 #endif
 
@@ -263,14 +263,14 @@ static bool plugin_browse(void)
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static bool recording_settings(void)
 {
     return recording_menu(false);
 }
 #endif
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 
 bool rec_menu(void)
 {
@@ -335,14 +335,14 @@ bool main_menu(void)
     items[i].desc = ID2P(LANG_GENERAL_SETTINGS);
     items[i++].function = settings_menu;
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
     if(radio_hardware_present()) {
         items[i].desc = ID2P(LANG_FM_RADIO);
         items[i++].function = radio_screen;
     }
 #endif
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORDING);
     items[i++].function = rec_menu;
 #endif

@@ -130,7 +130,7 @@ bool alarm_screen(void)
                  h = 23;
              break;
             
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
          /* inc(h) */            
          case BUTTON_UP:
          case BUTTON_UP | BUTTON_REPEAT:
@@ -144,7 +144,7 @@ bool alarm_screen(void)
              break;
 #endif
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
         case BUTTON_OFF:
 #else
         case BUTTON_STOP:

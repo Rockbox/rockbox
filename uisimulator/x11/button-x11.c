@@ -145,10 +145,10 @@ static int get_raw_button (void)
 #endif
 
 #ifdef BUTTON_MENU
-#ifdef HAVE_PLAYER_KEYPAD
+#if CONFIG_KEYPAD == PLAYER_PAD
 	case XK_KP_Enter:
 	case XK_Return:
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
 	case XK_KP_Insert:
 	case XK_Control_R:
 #endif

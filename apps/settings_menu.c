@@ -48,7 +48,7 @@
 #include "peakmeter.h"
 #endif
 #include "lang.h"
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
 #ifdef HAVE_ALARM_MOD
@@ -775,7 +775,7 @@ static bool spindown(void)
                    ata_spindown, 1, 3, 254 );
 }
 
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
 static bool line_in(void)
 {
     bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
@@ -1335,7 +1335,7 @@ static bool system_settings_menu(void)
         { ID2P(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
 #endif
         { ID2P(LANG_LIMITS_MENU),      limits_settings_menu   },
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
         { ID2P(LANG_LINE_IN),          line_in                },
 #endif
         { ID2P(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },

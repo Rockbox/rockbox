@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "debug.h"
 
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
 
 static int fmstatus = 0;
 

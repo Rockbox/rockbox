@@ -1050,7 +1050,7 @@ static void display_playlist_count(int count, const char *fmt)
 #endif
 
     splash(0, true, fmt, count,
-#ifdef HAVE_PLAYER_KEYPAD
+#if CONFIG_KEYPAD == PLAYER_PAD
            str(LANG_STOP_ABORT)
 #else
            str(LANG_OFF_ABORT)

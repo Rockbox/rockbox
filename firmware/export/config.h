@@ -20,6 +20,27 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
+/* symbolic names for multiple choice configurations: */
+
+/* CONFIG_TUNER */
+#define S1A0903X01 0 /* Samsung */
+#define TEA5767    1 /* Philips */
+
+/* CONFIG_HWCODEC */
+#define MAS3587F 3587
+#define MAS3507D 3507
+#define MAS3539F 3539
+
+/* CONFIG_CPU */
+#define SH7034  7034
+#define SCF5249 5249
+
+/* CONFIG_KEYPAD */
+#define PLAYER_PAD   0
+#define RECORDER_PAD 1
+#define ONDIO_PAD    2
+
+/* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"
 #elif defined(ARCHOS_RECORDER)

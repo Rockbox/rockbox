@@ -124,9 +124,9 @@ void button_event(int key, bool pressed)
 #endif
 
 #ifdef BUTTON_MENU
-#ifdef HAVE_PLAYER_KEYPAD
+#if CONFIG_KEYPAD == PLAYER_PAD
     case VK_RETURN:
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
     case VK_INSERT:
 #endif
         new_btn = BUTTON_MENU;

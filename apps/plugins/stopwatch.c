@@ -103,7 +103,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
 
             /* OFF/MENU key to exit */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_OFF:
 #else
             case BUTTON_MENU:
@@ -127,7 +127,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  break;
 
             /* LEFT = Reset timer */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_LEFT:
 #else
             case BUTTON_STOP:
@@ -148,7 +148,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  break;
 
             /* UP (RIGHT/+) = Scroll Lap timer up */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_UP:
 #else
             case BUTTON_RIGHT:
@@ -161,7 +161,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  break;
 
             /* DOWN (LEFT/-) = Scroll Lap timer down */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_DOWN:
 #else
             case BUTTON_LEFT:

@@ -30,7 +30,7 @@ int button_get (bool block);
 int button_get_w_tmo(int ticks);
 int button_status(void);
 void button_clear_queue(void);
-#if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
+#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 
@@ -51,7 +51,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define BUTTON_RC_LEFT          (BUTTON_LEFT | BUTTON_REMOTE)
 #define BUTTON_RC_RIGHT         (BUTTON_RIGHT| BUTTON_REMOTE)
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 
 /* Recorder specific button codes */
 #define	BUTTON_ON		0x0001
@@ -66,7 +66,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
 #define BUTTON_RC_STOP          (BUTTON_OFF | BUTTON_REMOTE)
 
-#elif defined(HAVE_PLAYER_KEYPAD)
+#elif CONFIG_KEYPAD == PLAYER_PAD
 
 /* Jukebox 6000 and Studio specific button codes */
 #define	BUTTON_ON		0x0001
@@ -77,7 +77,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define BUTTON_RC_PLAY          (BUTTON_PLAY | BUTTON_REMOTE)
 #define BUTTON_RC_STOP          (BUTTON_STOP | BUTTON_REMOTE)
 
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
 
 /* Ondio specific button codes */
 #define	BUTTON_OFF		0x0002
@@ -85,7 +85,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #define	BUTTON_DOWN		0x0020
 #define	BUTTON_MENU		0x0100
 
-#endif /* HAVE_RECORDER/PLAYER/ONDIO_KEYPAD */
+#endif /* RECORDER/PLAYER/ONDIO KEYPAD */
 
 #endif /* _BUTTON_H_ */
 

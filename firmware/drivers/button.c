@@ -36,7 +36,7 @@
 struct event_queue button_queue;
 
 static int lastbtn;   /* Last valid button status */
-#if defined(HAVE_RECORDER_KEYPAD) || defined(HAVE_ONDIO_KEYPAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
 static int last_read; /* Last button status, for debouncing/filtering */
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
@@ -179,7 +179,7 @@ int button_get_w_tmo(int ticks)
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 }
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 
 /* AJBR buttons are connected to the CPU as follows:
  *
@@ -348,7 +348,7 @@ static int button_read(void)
     return retval;
 }
 
-#elif defined(HAVE_PLAYER_KEYPAD)
+#elif CONFIG_KEYPAD == PLAYER_PAD
 
 /* The player has two buttons on port pins:
 
@@ -397,7 +397,7 @@ static int button_read(void)
     return btn;
 }
 
-#elif defined HAVE_ONDIO_KEYPAD
+#elif CONFIG_KEYPAD == ONDIO_PAD
 
 /*
  * helper function to swap UP/DOWN, LEFT/RIGHT

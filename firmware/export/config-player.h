@@ -6,15 +6,15 @@
 #define LCD_HEIGHT      (4*16+2*24) /* 4*char + 2*icons */
 
 /* define this if you have the Player's keyboard */
-#define HAVE_PLAYER_KEYPAD 1
+#define CONFIG_KEYPAD PLAYER_PAD
 
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
-#define HAVE_SH7034
+#define CONFIG_CPU SH7034
 
 /* Define this if you have a MAS3507D */
-#define HAVE_MAS3507D
+#define CONFIG_HWCODEC MAS3507D
 
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A

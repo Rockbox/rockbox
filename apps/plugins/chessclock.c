@@ -227,7 +227,7 @@ static int run_timer(int nr)
         button = rb->button_get_w_tmo(10);
         switch (button) {
             /* OFF/MENU key to exit */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_OFF:
 #else
             case BUTTON_ON:
@@ -299,7 +299,7 @@ static int run_timer(int nr)
             break;
 
             /* UP (RIGHT/+) = Scroll Lap timer up */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_UP:
 #else
             case BUTTON_RIGHT:
@@ -309,7 +309,7 @@ static int run_timer(int nr)
                 break;
 
             /* DOWN (LEFT/-) = Scroll Lap timer down */
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_DOWN:
 #else
             case BUTTON_LEFT:
@@ -364,7 +364,7 @@ static int chessclock_set_int(char* string,
 #endif
         button = rb->button_get_w_tmo(HZ/2);
         switch(button) {
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #else
@@ -374,7 +374,7 @@ static int chessclock_set_int(char* string,
                 *variable += step;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #else
@@ -384,7 +384,7 @@ static int chessclock_set_int(char* string,
                 *variable -= step;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_LEFT:
             case BUTTON_PLAY:
 #else
@@ -393,7 +393,7 @@ static int chessclock_set_int(char* string,
                 done = true;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_OFF:
 #else
             case BUTTON_STOP:
@@ -442,7 +442,7 @@ static int simple_menu(int nr, char **strarr)
         rb->lcd_puts_scroll(0, 0, strarr[show]);
         button = rb->button_get(false);
         switch(button) {
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #else
@@ -452,7 +452,7 @@ static int simple_menu(int nr, char **strarr)
                 show++;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #else
@@ -462,7 +462,7 @@ static int simple_menu(int nr, char **strarr)
                 show--;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_LEFT:
             case BUTTON_PLAY:
 #else
@@ -471,7 +471,7 @@ static int simple_menu(int nr, char **strarr)
                 return show;
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_OFF:
 #else
             case BUTTON_STOP:

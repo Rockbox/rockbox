@@ -26,7 +26,7 @@ void usb_screen(void);
 int charging_screen(void);
 void charging_splash(void);
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 int pitch_screen(void);
 bool quick_screen(const int, const int);
 #endif

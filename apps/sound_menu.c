@@ -137,7 +137,7 @@ bool set_sound(const char* string,
         }
         if (changed) {
             mpeg_sound_set(setting, *variable);
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
             if(setting == SOUND_BALANCE)
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
 #endif
@@ -168,7 +168,7 @@ static bool treble(void)
     return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 static bool loudness(void)
 {
     return set_sound(str(LANG_LOUDNESS), &global_settings.loudness, 
@@ -370,7 +370,7 @@ static bool recdirectory(void)
                       names, 2, NULL );
 }
 
-#endif /* HAVE_MAS3587F */
+#endif /* MAS3587F */
 
 static void set_chanconf(int val)
 {
@@ -406,7 +406,7 @@ bool sound_menu(void)
         { ID2P(LANG_TREBLE), treble },
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
         { ID2P(LANG_LOUDNESS), loudness },
         { ID2P(LANG_AUTOVOL), avc },
         { ID2P(LANG_SUPERBASS), superbass },
@@ -426,7 +426,7 @@ bool sound_menu(void)
     return result;
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 bool recording_menu(bool no_source)
 {
     int m;

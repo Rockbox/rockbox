@@ -97,7 +97,7 @@ enum plugin_status loop(void)
 
             /* Check if we shall exit the plugin */
             if (button==BUTTON_ON ||
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
                 button==BUTTON_OFF
 #else
                 button==BUTTON_STOP

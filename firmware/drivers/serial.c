@@ -87,7 +87,7 @@ int remote_control_rx(void)
         }
         else
         {
-#ifndef HAVE_ONDIO_KEYPAD
+#if CONFIG_KEYPAD != ONDIO_PAD
             switch (btn)
             {
                 case STOP:

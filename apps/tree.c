@@ -1351,7 +1351,7 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                 break;
 #endif
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_F2:
                 if (*dirfilter < NUM_FILTER_MODES)
                 {

@@ -28,7 +28,7 @@ int wps_show(void);
 bool refresh_wps(bool refresh_scroll);
 void handle_usb(void);
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_screen(void);
 bool f3_screen(void);
 #endif

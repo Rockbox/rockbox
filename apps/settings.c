@@ -63,7 +63,7 @@
 #include "keyboard.h"
 #include "version.h"
 #include "rtc.h"
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
@@ -164,7 +164,7 @@ static const struct bit_entry rtc_bits[] =
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
     {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
     {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
     {1, S_O(superbass), false, "superbass", off_on },
@@ -221,7 +221,7 @@ static const struct bit_entry rtc_bits[] =
 
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
-#ifdef HAVE_FMRADIO
+#ifdef CONFIG_TUNER
     {1, S_O(fm_force_mono), false, "force fm mono", off_on },
     {8, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
 #endif
@@ -295,7 +295,7 @@ static const struct bit_entry hd_bits[] =
     {7, S_O(peak_meter_min), 60, "peak meter min", NULL }, /* 0...100 */
     {7, S_O(peak_meter_max), 0, "peak meter max", NULL }, /* 0...100 */
 #endif
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     /* recording */
     {1, S_O(rec_editable), false, "editable recordings", off_on },
     {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...13 */
@@ -315,7 +315,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
 #endif
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
     {1, S_O(line_in), false, "line in", off_on },
 #endif
     /* voice */
@@ -710,7 +710,7 @@ void sound_settings_apply(void)
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
     mpeg_sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
@@ -735,7 +735,7 @@ void settings_apply(void)
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
-#ifdef HAVE_MAS3507D
+#if CONFIG_HWCODEC == MAS3507D
     dac_line_in(global_settings.line_in);
 #endif
 #ifdef HAVE_ATA_POWER_OFF
@@ -1513,7 +1513,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     return false;
 }
 
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 /* This array holds the record timer interval lengths, in seconds */
 static const unsigned long rec_timer_seconds[] =
 {

@@ -39,13 +39,13 @@ int mpeg_val2phys(int setting, int value);
 const char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
 int mpeg_sound_steps(int setting);
-#if defined(HAVE_MAS3587F) || defined(SIMULATOR)
+#if CONFIG_HWCODEC == MAS3587F || defined(SIMULATOR)
 void mpeg_set_pitch(int percent);
 #endif
 
 
 /* exported just for mpeg.c, to keep the recording there */
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
 void demand_irq_enable(bool on);
 #endif
 

@@ -84,7 +84,7 @@ int current_playmode(void)
         else
             return STATUS_PLAY;
     }
-#ifdef HAVE_MAS3587F
+#if CONFIG_HWCODEC == MAS3587F
     else
     {
         if(mpeg_stat & MPEG_STATUS_RECORD)

@@ -286,7 +286,7 @@ int charging_screen(void)
 #endif /* HAVE_BATTERIES */
 
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 /* returns:
    0 if no key was pressed
    1 if a key was pressed (or if ON was held down long enough to repeat)
@@ -1112,7 +1112,7 @@ bool set_time_screen(const char* string, struct tm *tm)
 }
 #endif
 
-#ifdef HAVE_RECORDER_KEYPAD
+#if CONFIG_KEYPAD == RECORDER_PAD
 bool shutdown_screen(void)
 {
     int button;

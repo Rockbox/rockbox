@@ -9,7 +9,7 @@
 #define LCD_HEIGHT 64
 
 /* define this if you have a Recorder style 10-key keyboard */
-#define HAVE_RECORDER_KEYPAD 1
+#define CONFIG_KEYPAD RECORDER_PAD
 
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
@@ -17,10 +17,10 @@
 #ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */
-#define HAVE_MAS3587F
+#define CONFIG_HWCODEC MAS3587F
 
 /* Define this if you have a SH7034 */
-#define HAVE_SH7034
+#define CONFIG_CPU SH7034
 
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1
@@ -56,7 +56,7 @@
 #define HAVE_ALARM_MOD 1
 
 /* Define this if you have an FM Radio */
-#define HAVE_FMRADIO 1
+#define CONFIG_TUNER S1A0903X01
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1
