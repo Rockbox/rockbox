@@ -56,6 +56,10 @@ void app_main(void)
   while(1) {
     key = button_get();
 
+    if(!key) {
+      sleep(1);
+      continue;
+    }
     switch(key) {
     case BUTTON_UP:
       if(cursor) {
