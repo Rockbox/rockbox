@@ -23,6 +23,7 @@
 #include "font.h"
 #include "led.h"
 #include "system.h"
+#include "rolo.h"
 
 #define default_interrupt(name,number) \
   extern __attribute__((weak,alias("UIE" #number))) void name (void); void UIE##number (void)
@@ -323,7 +324,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     char str[32];
 
     asm volatile ("sts\tpr,%0" : "=r"(n));
-
+    
     /* clear screen */
     lcd_clear_display ();
 #ifdef HAVE_LCD_BITMAP
@@ -347,6 +348,15 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
         state = state?false:true;
         
         for (i = 0; i < 240000; ++i);
+
+        /* try to restart firmware if ON is pressed */
+#ifdef HAVE_LCD_CHARCELLS
+        if (!(PADR & 0x20))
+            rolo_load("/archos.mod");
+#else
+        if (!(PBDR & PBDR_BTN_ON))
+            rolo_load("/ajbrec.ajz");
+#endif
     }
 }
 
