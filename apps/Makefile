@@ -71,7 +71,7 @@ dist:
 
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/archos.mod $(OBJDIR)/archos.asm \
-	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf
+	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
