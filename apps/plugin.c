@@ -322,6 +322,9 @@ int plugin_load(const char* plugin, void* parameter)
         splash(HZ*2, true, buf);
         return fd;
     }
+    
+    /* zero out plugin buffer to ensure a properly zeroed bss area */
+    memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
 
     plugin_start = (void*)&pluginbuf;
     plugin_size = read(fd, plugin_start, PLUGIN_BUFFER_SIZE);
