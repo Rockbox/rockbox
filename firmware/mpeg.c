@@ -433,6 +433,7 @@ static void mpeg_thread(void)
                 /* Open the next file */
                 if (mpeg_file >= 0)
                     close(mpeg_file);
+                last_tag=0;
                 if (new_file(true) < 0) {
                      DEBUGF("Finished Playing!\n");
                      filling = false;
@@ -458,6 +459,7 @@ static void mpeg_thread(void)
                 /* Open the next file */
                 if (mpeg_file >= 0)
                     close(mpeg_file);
+                last_tag=0;
                 if (new_file(false) < 0) {
                      DEBUGF("Finished Playing!\n");
                      filling = false;
