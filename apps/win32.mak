@@ -15,7 +15,7 @@ OC    = sh-elf-objcopy
 
 FIRMWARE := ../firmware
 
-INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I./recorder
+INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I./recorder -I.
 
 # Pick a target to build for
 #TARGET = -DARCHOS_PLAYER=1
