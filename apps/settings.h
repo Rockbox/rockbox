@@ -24,7 +24,7 @@
 #include "file.h"
 
 /* Custom WPS Parsing - Uncomment to enable - PLAYER ONLY */
-/* #define CUSTOM_WPS */
+#define CUSTOM_WPS
 
 /* data structures */
 
