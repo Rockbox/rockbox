@@ -1,4 +1,4 @@
-#define _PAGE_ Internals of the Recorder
+#define _PAGE_ Internals of the FM Recorder
 #include "head.t"
 
 <p>Linus' photos of his FM Recorder.
