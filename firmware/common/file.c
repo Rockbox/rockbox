@@ -423,7 +423,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 rc = fat_readwrite(&(file->fatfile), 1,
                                    file->cache, false );
                 if ( rc < 0 ) {
-                    DEBUGF("Failed reading\n");
+                    DEBUGF("Failed writing\n");
                     errno = EIO;
                     return -6;
                 }
