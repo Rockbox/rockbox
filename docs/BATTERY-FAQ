@@ -220,6 +220,9 @@ A13: There is a switch in the DC IN jack of the Jukebox - when a charger (or
      Rockbox) from the disk, but goes into charging mode instead. You can use
      this feature to get to the Archos charger if you want to.
 
+     However, if you put Rockbox in flash, it will always charge with the
+     Rockbox charging algorithm.
+
 Q14: When I plug the charger in my Recorder, it doesn't immediately start
      charging the batteries!
 A14: When Rockbox is running on the Recorder (the device has been booted
