@@ -7,7 +7,7 @@ sub list {
 
     opendir(DIR, "$basedir/$dir") or
         die "Can't opendir($basedir/$dir)";
-    @tarballs = grep { /^archos/ } readdir(DIR);
+    @tarballs = sort grep { /^archos/ } readdir(DIR);
     closedir DIR;
     
     print "<ul>\n";

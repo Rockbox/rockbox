@@ -28,7 +28,8 @@ They are <i>not</i> official releases, they are in fact almost guaranteed to not
 
 <h2>Build status</h2>
 
-<p>This table shows which targets are currently buildable with the CVS code:
+<p>This table shows which targets are currently buildable with the CVS code.
+The timestamp is GMT.
 
 <p>
 <!--#include virtual="buildstatus.link" -->
