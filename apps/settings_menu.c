@@ -36,7 +36,7 @@
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
-#include "usb.h"
+#include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
