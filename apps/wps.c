@@ -95,7 +95,7 @@ static void draw_screen(struct mp3entry* id3)
             lcd_puts(0, l++, id3->album?id3->album:"");
             lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-            snprintf(buffer,sizeof(buffer), "Time: %d:%d",
+            snprintf(buffer,sizeof(buffer), "Time: %d:%02d",
                      id3->length / 60000,
                      id3->length % 60000 / 1000 );
             lcd_puts(0, l++, buffer);
@@ -123,17 +123,25 @@ void wps_show(void)
     static bool playing = true;
     struct mp3entry* id3 = mpeg_current_track();
     int lastlength=0, lastsize=0, lastrate=0;
+    int lastartist=0, lastalbum=0, lasttitle=0;
 
     while ( 1 ) {
         int i;
 
         if ( ( id3->length != lastlength ) ||
              ( id3->filesize != lastsize ) ||
-             ( id3->bitrate != lastrate ) ) {
+             ( id3->bitrate != lastrate ) ||
+             ( id3->artist[0] != lastartist ) ||
+             ( id3->album[0] != lastalbum ) ||
+             ( id3->title[0] != lasttitle ) )
+        {
             draw_screen(id3);
             lastlength = id3->length;
             lastsize = id3->filesize;
             lastrate = id3->bitrate;
+            lastartist = id3->artist[0];
+            lastalbum = id3->album[0];
+            lasttitle = id3->title[0];
         }
 
         for ( i=0;i<20;i++ ) {
