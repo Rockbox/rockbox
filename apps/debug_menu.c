@@ -626,6 +626,77 @@ bool dbg_ports(void)
                 return false;
         }
     }
+#elif CONFIG_CPU == MCF5249
+    unsigned int gpio_out;
+    unsigned int gpio1_out;
+    unsigned int gpio_read;
+    unsigned int gpio1_read;
+    unsigned int gpio_function;
+    unsigned int gpio1_function;
+    unsigned int gpio_enable;
+    unsigned int gpio1_enable;
+    int adc_buttons, adc_remote, adc_battery;
+    char buf[32];
+    int button;
+    int line;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        line = 0;
+        gpio_read = GPIO_READ;
+        gpio1_read = GPIO1_READ;
+        gpio_out = GPIO_OUT;
+        gpio1_out = GPIO1_OUT;
+        gpio_function = GPIO_FUNCTION;
+        gpio1_function = GPIO1_FUNCTION;
+        gpio_enable = GPIO_ENABLE;
+        gpio1_enable = GPIO1_ENABLE;
+        
+        snprintf(buf, 32, "GPIO_READ:     %08x", gpio_read);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO_OUT:      %08x", gpio_out);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO_FUNCTION: %08x", gpio_function);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO_ENABLE:   %08x", gpio_enable);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, 32, "GPIO1_READ:     %08x", gpio1_read);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO1_OUT:      %08x", gpio1_out);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO1_FUNCTION: %08x", gpio1_function);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "GPIO1_ENABLE:   %08x", gpio1_enable);
+        lcd_puts(0, line++, buf);
+
+        adc_buttons = adc_read(ADC_BUTTONS);
+        adc_remote = adc_read(ADC_REMOTE);
+        adc_battery = adc_read(ADC_BATTERY);
+
+        snprintf(buf, 32, "ADC_BUTTONS: %02x", adc_buttons);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "ADC_REMOTE:  %02x", adc_remote);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, 32, "ADC_BATTERY: %02x", adc_battery);
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+        button = button_get_w_tmo(HZ/10);
+
+        switch(button)
+        {
+            case SETTINGS_CANCEL:
+                return false;
+        }
+    }
+
 #endif /* CONFIG_CPU == SH7034 */
     return false;
 }
@@ -1678,7 +1749,11 @@ bool debug_menu(void)
     static const struct menu_item items[] = {
 #if CONFIG_CPU == SH7034
         { "Dump ROM contents", dbg_save_roms },
+#endif
+#if CONFIG_CPU == SH7034 || CONFIG_CPU == MCF5249
         { "View I/O ports", dbg_ports },
+#endif
+#if CONFIG_CPU == SH7034
 #ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC
         { "View/clr RTC RAM", dbg_rtc },
