@@ -1418,3 +1418,33 @@ id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
 new: "karaoke"
+
+id: LANG_SAVE_SETTINGS
+desc:  in system_settings_menu()
+eng: "Write .cfg file"
+new: "Zapisz do pliku .cfg"
+
+id: LANG_SETTINGS_SAVED1
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings"
+new: "Ustawienia"
+
+id: LANG_SETTINGS_SAVED2
+desc: Feedback shown when a .cfg file is saved
+eng: "Saved"
+new: "zapisane"
+
+id: LANG_VBRFIX_STOP_PLAY
+desc: Tells the user to stop the playback
+eng: "Stop the playback first"
+new: "Najpierw zatrzymaj odgrywanie"
+
+id: LANG_VBRFIX_NOT_VBR
+desc: Tells the user that the selected file is not a VBR file
+eng: "Not a VBR file"
+new: "Plik nie VBR"
+
+id: LANG_VBRFIX
+desc: The context menu entry
+eng: "Update VBR file"
+new: "Aktualizuj plik VBR"
