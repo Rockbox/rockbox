@@ -31,7 +31,6 @@ enum icons_6x8 {
 };
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
-extern icons_6x8;
 
 #endif /* End HAVE_LCD_BITMAP */
 
