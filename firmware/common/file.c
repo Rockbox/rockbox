@@ -65,6 +65,7 @@ int open(const char* pathname, int flags)
     int fd;
     char* name;
     struct filedesc* file = NULL;
+    int rc;
 
     LDEBUGF("open(\"%s\",%d)\n",pathname,flags);
 
@@ -131,14 +132,15 @@ int open(const char* pathname, int flags)
     if ( !entry ) {
         LDEBUGF("Didn't find file %s\n",name);
         if ( file->write && (flags & O_CREAT) ) {
-            if (fat_create_file(name,
-                                &(file->fatfile),
-                                &(dir->fatdir)) < 0) {
+            rc = fat_create_file(name,
+                                 &(file->fatfile),
+                                 &(dir->fatdir));
+            if (rc < 0) {
                 DEBUGF("Couldn't create %s in %s\n",name,pathname);
                 errno = EIO;
                 file->busy = false;
                 closedir(dir);
-                return -5;
+                return rc * 10 - 5;
             }
             file->size = 0;
             file->attr = 0;
@@ -157,8 +159,9 @@ int open(const char* pathname, int flags)
     file->fileoffset = 0;
 
     if (file->write && (flags & O_APPEND)) {
-        if (lseek(fd,0,SEEK_END) < 0 )
-            return -7;
+        rc = lseek(fd,0,SEEK_END);
+        if (rc < 0 )
+            return rc * 10 - 7;
     }
 
     return fd;
@@ -169,7 +172,7 @@ int close(int fd)
     struct filedesc* file = &openfiles[fd];
     int rc = 0;
 
-    LDEBUGF("close(%d)\n",fd);
+    LDEBUGF("close(%d)\n", fd);
 
     if (fd < 0 || fd > MAX_OPEN_FILES-1) {
         errno = EINVAL;
@@ -182,22 +185,25 @@ int close(int fd)
     if (file->write) {
         /* flush sector cache */
         if ( file->dirty ) {
-            if (flush_cache(fd) < 0)
-                return -2;
+            rc = flush_cache(fd);
+            if (rc < 0)
+                return rc * 10 - 3;
         }
 
         /* truncate? */
         if (file->trunc) {
-            if (ftruncate(fd, file->fileoffset) < 0)
-                return -1;
+            rc = ftruncate(fd, file->fileoffset);
+            if (rc < 0)
+                return rc * 10 - 4;
         }
 
         /* tie up all loose ends */
-        if (fat_closewrite(&(file->fatfile), file->size, file->attr) < 0)
-            return -3;
+        rc = fat_closewrite(&(file->fatfile), file->size, file->attr);
+        if (rc < 0)
+            return rc * 10 - 5;
     }
     file->busy = false;
-    return rc;
+    return 0;
 }
 
 int remove(const char* name)
@@ -206,28 +212,28 @@ int remove(const char* name)
     struct filedesc* file;
     int fd = open(name, O_WRONLY);
     if ( fd < 0 )
-        return fd;
+        return fd * 10 - 1;
 
     file = &openfiles[fd];
     rc = fat_truncate(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed truncating file: %d\n", rc);
         errno = EIO;
-        return -1;
+        return rc * 10 - 2;
     }
 
     rc = fat_remove(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed removing file: %d\n", rc);
         errno = EIO;
-        return -2;
+        return rc * 10 - 3;
     }
 
     file->size = 0;
 
     rc = close(fd);
     if (rc<0)
-        return -3;
+        return rc * 10 - 4;
 
     return 0;
 }
@@ -241,15 +247,16 @@ int rename(const char* path, const char* newpath)
     /* verify new path does not already exist */
     fd = open(newpath, O_RDONLY);
     if ( fd >= 0 ) {
+        close(fd);
         errno = EBUSY;
-        return fd;
+        return -1;
     }
     close(fd);
 
     fd = open(path, O_RDONLY);
     if ( fd < 0 ) {
         errno = EIO;
-        return fd;
+        return fd * 10 - 2;
     }
 
     /* strip path */
@@ -264,13 +271,13 @@ int rename(const char* path, const char* newpath)
     if ( rc < 0 ) {
         DEBUGF("Failed renaming file: %d\n", rc);
         errno = EIO;
-        return -1;
+        return rc * 10 - 3;
     }
 
     rc = close(fd);
     if (rc<0) {
         errno = EIO;
-        return -2;
+        return rc * 10 - 4;
     }
 
     return 0;
@@ -288,13 +295,13 @@ int ftruncate(int fd, unsigned int size)
     rc = fat_seek(&(file->fatfile), sector);
     if (rc < 0) {
         errno = EIO;
-        return -1;
+        return rc * 10 - 1;
     }
 
     rc = fat_truncate(&(file->fatfile));
     if (rc < 0) {
         errno = EIO;
-        return -2;
+        return rc * 10 - 2;
     }
 
     file->size = size;
@@ -313,12 +320,12 @@ static int flush_cache(int fd)
     /* seek back one sector to get file position right */
     rc = fat_seek(&(file->fatfile), sector);
     if ( rc < 0 )
-        return -1;
+        return rc * 10 - 1;
     
     rc = fat_readwrite(&(file->fatfile), 1,
                        file->cache, true );
     if ( rc < 0 )
-        return -2;
+        return rc * 10 - 2;
 
     file->dirty = false;
 
@@ -330,6 +337,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
     int sectors;
     int nread=0;
     struct filedesc* file = &openfiles[fd];
+    int rc;
 
     if ( !file->busy ) {
         errno = EBADF;
@@ -364,7 +372,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 int rc = flush_cache(fd);
                 if ( rc < 0 ) {
                     errno = EIO;
-                    return -2;
+                    return rc * 10 - 2;
                 }
                 file->cacheoffset = -1;
             }
@@ -381,8 +389,9 @@ static int readwrite(int fd, void* buf, int count, bool write)
 
     /* if buffer has been modified, write it back to disk */
     if (count && file->dirty) {
-        if (flush_cache(fd) < 0)
-            return -3;
+        rc = flush_cache(fd);
+        if (rc < 0)
+            return rc * 10 - 3;
     }
 
     /* read whole sectors right into the supplied buffer */
@@ -393,7 +402,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
-            return -5;
+            return rc * 10 - 4;
         }
         else {
             if ( rc > 0 ) {
@@ -425,7 +434,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("Failed writing\n");
                     errno = EIO;
-                    return -6;
+                    return rc * 10 - 5;
                 }
                 /* seek back one sector to put file position right */
                 rc = fat_seek(&(file->fatfile), 
@@ -434,18 +443,18 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
                     errno = EIO;
-                    return -7;
+                    return rc * 10 - 6;
                 }
             }
             memcpy( file->cache, buf + nread, count );
             file->dirty = true;
         }
         else {
-            if ( fat_readwrite(&(file->fatfile), 1,
-                               &(file->cache),false) < 1 ) {
+            rc = fat_readwrite(&(file->fatfile), 1, &(file->cache),false);
+            if (rc < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
-                return -8;
+                return rc * 10 - 7;
             }
             memcpy( buf + nread, file->cache, count );
         }
@@ -527,14 +536,15 @@ int lseek(int fd, int offset, int whence)
 
         if ( newsector != oldsector ) {
             if (file->dirty) {
-                if (flush_cache(fd) < 0)
-                    return -5;
+                rc = flush_cache(fd);
+                if (rc < 0)
+                    return rc * 10 - 5;
             }
             
             rc = fat_seek(&(file->fatfile), newsector);
             if ( rc < 0 ) {
                 errno = EIO;
-                return -4;
+                return rc * 10 - 4;
             }
         }
         if ( sectoroffset ) {
@@ -542,7 +552,7 @@ int lseek(int fd, int offset, int whence)
                                &(file->cache),false);
             if ( rc < 0 ) {
                 errno = EIO;
-                return -6;
+                return rc * 10 - 6;
             }
             file->cacheoffset = sectoroffset;
         }
