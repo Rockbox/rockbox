@@ -159,7 +159,7 @@ def blast_mail(mailcmd, filestodiff, contextlines):
 def main():
     contextlines = 2
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hC:cu',
+        opts, args = getopt.getopt(sys.argv[1:], 'hC:cuU:',
                                    ['context=', 'cvsroot=', 'help'])
     except getopt.error, msg:
         usage(1, msg)
