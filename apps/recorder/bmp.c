@@ -185,7 +185,7 @@ int read_bmp_file(char* filename,
       width = readlong(fh.Width);
 
       /* PaddedWidth = ((width+31)&(~0x1f))/8; */
-      PaddedWidth = ((width+7)&(~0x7));
+      PaddedWidth = ((width+3)&(~0x3));
       size = PaddedWidth*readlong(fh.Height);
 
       bmp = (unsigned char *)malloc(size);
