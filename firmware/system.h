@@ -34,7 +34,7 @@
 #endif
 
 #ifndef MAX
-#define MAX(a, b) MIN(b,a)
+#define MAX(a, b) (((a)>(b))?(a):(b))
 #endif
 
 #ifdef LITTLE_ENDIAN
