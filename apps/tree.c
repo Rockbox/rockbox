@@ -394,7 +394,7 @@ bool dirbrowse(char *root)
                 browse_speed++;  /* increase the browse speed every time we get here */
                 if(filesindir) {
                     if(dircursor) {
-                        if (browse_speed < 7) {
+                        if (browse_speed < TREE_MAX_ON_SCREEN - 1) {
                             /* moving the cursor up through a full screen */
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
                                         false);
@@ -412,8 +412,8 @@ bool dirbrowse(char *root)
                     else {
                         if (start) {
                             /* leaving the cursor at top line and moving screen down */
-                            if (browse_speed >=7)
-                                start = start - 7;
+                            if (browse_speed >=TREE_MAX_ON_SCREEN-1)
+                                start = start - TREE_MAX_ON_SCREEN - 1;
                             else
                                 start--;
                             if (start<0)
