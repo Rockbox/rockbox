@@ -75,7 +75,7 @@
 
 #define SCROLL_SPACING 3
 
-#define SCROLLABLE_LINES 10
+#define SCROLLABLE_LINES 13
 
 struct scrollinfo {
     char line[MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2];
@@ -83,7 +83,6 @@ struct scrollinfo {
     int width;  /* length of line in pixels */
     int offset;
     int startx;
-    int starty;
     bool backward; /* scroll presently forward or backward? */
     bool bidir;
     bool invert; /* invert the scrolled text */
@@ -337,8 +336,6 @@ void lcd_puts(int x, int y, unsigned char *str)
 void lcd_puts_style(int x, int y, unsigned char *str, int style)
 {
     int xpos,ypos,w,h;
-    struct scrollinfo* s;
-    int index;
 
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
@@ -355,17 +352,7 @@ void lcd_puts_style(int x, int y, unsigned char *str, int style)
 #endif
 
     /* make sure scrolling is turned off on the line we are updating */
-    if (scrolling_lines) {
-        for (index = 0; index < SCROLLABLE_LINES; index++) {
-            if (scrolling_lines&(1<<index)) {
-                s = &scroll[index];
-                if (s->starty == y) {
-                    scrolling_lines &= ~(1<<index);
-                    break;
-                }
-            }
-        }
-    }
+    scrolling_lines &= ~(1 << y);
 
     if(!str || !str[0])
         return;
@@ -625,22 +612,11 @@ void lcd_invertrect (int x, int y, int nx, int ny)
 void lcd_invertscroll(int x, int y)
 {
     struct scrollinfo* s;
-    int index;
 
-    for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-        /* is this a scrolling line? */
-        if ( !(scrolling_lines&(1<<index)) )
-            continue;
-        
-        s = &scroll[index];
+    (void)x;
 
-        if (s->startx == x && s->starty == y)
-        {
-            /* Found the line */
-            s->invert = !s->invert;
-            break;
-        }
-    }
+    s = &scroll[y];
+    s->invert = !s->invert;
 }
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )
@@ -816,29 +792,9 @@ void lcd_puts_scroll_style(int x, int y, unsigned char *string, int style)
 {
     struct scrollinfo* s;
     int w, h;
-    int index;
-    int free_index=0;
 
-    DEBUGF("puts_scroll_style: %s\n", string);
-    
-    for (index = 0; index < SCROLLABLE_LINES; index++) {
-        s = &scroll[index];
+    s = &scroll[y];
 
-        if (scrolling_lines&(1<<index)) {
-            if (s->starty == y) {
-                /* we prefer to re-use an existing index with the
-                   same y-position */
-                free_index=index;
-                break;
-            }
-        }
-        else {
-            /* remember the last unused one */
-            free_index=index;
-        }
-    }
-    index=free_index;
-    s = &scroll[index]; /* get the proper 's' */
     s->start_tick = current_tick + scroll_delay;
     s->invert = false;
     if (style & STYLE_INVERT) {
@@ -881,13 +837,12 @@ void lcd_puts_scroll_style(int x, int y, unsigned char *string, int style)
         s->len = strlen(string);
         s->offset = 0;
         s->startx = x;
-        s->starty = y;
         s->backward = false;
-        scrolling_lines |= (1<<index);
+        scrolling_lines |= (1<<y);
     }
     else
         /* force a bit switch-off since it doesn't scroll */
-        scrolling_lines &= ~(1<<index);
+        scrolling_lines &= ~(1<<y);
 }
 
 void lcd_stop_scroll(void)
@@ -943,7 +898,7 @@ static void scroll_thread(void)
 
             pf = font_get(curfont);
             xpos = xmargin + s->startx * s->width / s->len;
-            ypos = ymargin + s->starty * pf->height;
+            ypos = ymargin + index * pf->height;
 
             if (s->bidir) { /* scroll bidirectional */
                 if (s->offset <= 0) {
