@@ -91,7 +91,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c blank.c bounce.c boxes.c icons.c bmp.c widgets.c
 endif
 
-SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c thread.c $(APPS) $(MENUS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
@@ -250,9 +250,6 @@ $(OBJDIR)/unicode.o: $(FIRMWAREDIR)/unicode.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/ajf.o: $(FIRMWAREDIR)/ajf.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/stubs.o: ../common/stubs.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/power.o: $(DRIVERS)/power.c
