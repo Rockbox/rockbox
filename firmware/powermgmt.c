@@ -447,7 +447,9 @@ static void car_adapter_mode_processing(void)
 static void power_thread_rtc_process(void) 
 {
 
-    rtc_check_alarm_flag();
+    if (rtc_check_alarm_flag()) {
+	rtc_enable_alarm(false);
+    }
 }
 #endif
 

@@ -436,8 +436,10 @@ static bool ask_resume(bool ask_once)
     }
 
 #ifdef HAVE_ALARM_MOD
-    if ( rtc_check_alarm_started(true) ) 
+    if ( rtc_check_alarm_started(true) ) {
+       rtc_enable_alarm(false);
        return true;
+    }
 #endif
 
     /* always resume? */
