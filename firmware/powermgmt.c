@@ -179,8 +179,10 @@ static void power_thread(void)
                          * 0.0005 V).
                          */
                         delta = ( power_history[POWER_HISTORY_LEN-1] * 100
+                        	+ power_history[POWER_HISTORY_LEN-2] * 100
+                        	- power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD+1] * 100
                                 - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
-                                / CHARGE_END_NEGD;
+                                / CHARGE_END_NEGD / 2;
                         
                         if (delta < -100) { /* delta < -10 mV */
                             DEBUGF("power: short-term negative delta, enough!\n");
@@ -189,8 +191,10 @@ static void power_thread(void)
                         } else {
                             /* if we didn't disable the charger in the previous test, check for low positive delta */
                             delta = ( power_history[POWER_HISTORY_LEN-1] * 100
+                                    + power_history[POWER_HISTORY_LEN-2] * 100
+                                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD+1] * 100
                                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
-                                    / CHARGE_END_ZEROD;
+                                    / CHARGE_END_ZEROD / 2;
                             
                             if (delta < 1) { /* delta < 0.1 mV */
                                 DEBUGF("power: long-term small positive delta, enough!\n");
