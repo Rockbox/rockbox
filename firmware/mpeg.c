@@ -342,7 +342,7 @@ static void set_elapsed(struct mp3entry* id3)
         }
         else {
             /* no TOC exists. set a rough estimate using average bitrate */
-            int tpk = (id3->filesize / 1024) / id3->length;
+            int tpk = id3->length / (id3->filesize / 1024);
             id3->elapsed = id3->offset * tpk / 1024;
         }
     }
