@@ -20,6 +20,7 @@
 APPDIR = ../../apps
 RECDIR = $(APPDIR)/recorder
 PLAYDIR = $(APPDIR)/player
+PLUGINDIR = $(APPDIR)/plugins
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
      MACHINEDIR = $(RECDIR)
@@ -66,11 +67,13 @@ DEFINES += -DWIN32
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mno-cygwin
+DLLFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 --def plugin.def
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
 ifeq ($(UNAME),CYGWIN)
   CC = gcc
   WINDRES = windres
+  DLL = dllwrap
   DEFINES += -DNOCYGWIN
   CFLAGS += -mno-cygwin
   LDFLAGS += -mno-cygwin
@@ -78,6 +81,7 @@ ifeq ($(UNAME),CYGWIN)
 else
   CC = i386-mingw32msvc-gcc
   WINDRES = i386-mingw32msvc-windres
+  DLL = i386-mingw32msvc-dllwrap
   CFLAGS += -mwindows
   LDFLAGS += -mwindows
   APPCFLAGS += -mwindows
@@ -108,7 +112,12 @@ SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
-all: $(TARGET)
+ROCKSRCS = bounce.c cube.c flipit.c helloworld.c sliding_puzzle.c snow.c \
+            sokoban.c star.c tetris.c viewer.c wormlet.c
+
+ROCKS := $(ROCKSRCS:%.c=$(OBJDIR)/%.rock)
+
+all: $(TARGET) $(ROCKS)
 
 $(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)
@@ -119,7 +128,7 @@ $(OBJDIR)/uisw32-res.o: uisw32.rc
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/uisw32-res.o \
 	$(OBJDIR)/lang.[cho] $(OBJDIR)/build.lang $(OBJDIR)/*.o \
-	$(OBJDIR)/sysfont.c $(OBJDIR)/credits.raw
+	$(OBJDIR)/*.rock $(OBJDIR)/sysfont.c $(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
 
 distclean: clean
@@ -161,24 +170,6 @@ $(OBJDIR)/widgets.o: $(RECDIR)/widgets.c
 $(OBJDIR)/keyboard.o: $(MACHINEDIR)/keyboard.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/wormlet.o: $(RECDIR)/wormlet.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/sokoban.o: $(RECDIR)/sokoban.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/bounce.o: $(RECDIR)/bounce.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/cube.o: $(RECDIR)/cube.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/snow.o: $(RECDIR)/snow.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
 $(OBJDIR)/main.o: $(APPDIR)/main.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
@@ -189,9 +180,6 @@ $(OBJDIR)/wps.o: $(APPDIR)/wps.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/sleeptimer.o: $(APPDIR)/sleeptimer.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
-$(OBJDIR)/viewer.o: $(APPDIR)/viewer.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/wps-display.o: $(APPDIR)/wps-display.c
@@ -299,6 +287,12 @@ $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.po : $(PLUGINDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.rock : $(OBJDIR)/%.po
+	$(DLL) $(DLLFLAGS) $< -o $@
 
 DEPS:=$(OBJDIR)/.deps
 
