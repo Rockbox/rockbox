@@ -131,7 +131,7 @@ struct plugin_api {
     void (*lcd_putc)(int x, int y, unsigned short ch);
     void (*lcd_put_cursor)(int x, int y, char cursor_char);
     void (*lcd_remove_cursor)(void);
-    void (*lcd_icon)(int icon, bool enable);
+    void (*PREFIX(lcd_icon))(int icon, bool enable);
 #else
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);

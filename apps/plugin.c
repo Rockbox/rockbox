@@ -93,7 +93,7 @@ static const struct plugin_api rockbox_api = {
     lcd_putc,
     lcd_put_cursor,
     lcd_remove_cursor,
-    lcd_icon,
+    PREFIX(lcd_icon),
 #else
     lcd_putsxy,
     lcd_puts_style,
