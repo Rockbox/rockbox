@@ -139,11 +139,13 @@ int mpeg_sound_default(int setting)
 }
 
 /* list of tracks in memory */
-#define MAX_ID3_TAGS 4
+#define MAX_ID3_TAGS 12
 static struct {
     struct mp3entry id3;
     int mempos;
 } id3tags[MAX_ID3_TAGS];
+static unsigned int current_track_counter = 0;
+static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
 static int last_tag = 0;
@@ -582,6 +584,8 @@ static void mpeg_thread(void)
                 /* Tell the file loading code that we want to start playing
                    as soon as we have some data */
                 play_pending = true;
+
+                current_track_counter++;
                 break;
 
             case MPEG_STOP:
@@ -629,6 +633,8 @@ static void mpeg_thread(void)
                     /* Tell the file loading code that we want to start playing
                        as soon as we have some data */
                     play_pending = true;
+
+                    current_track_counter++;
                 }
                 break;
 
@@ -655,6 +661,8 @@ static void mpeg_thread(void)
                     /* Tell the file loading code that we want to start playing
                        as soon as we have some data */
                     play_pending = true;
+
+                    current_track_counter++;
                 }
                 break; 
 
@@ -820,6 +828,8 @@ static void mpeg_thread(void)
                     DEBUGF("tc: %d, %x\n", i, id3tags[i].mempos);
                 }
                 last_tag--;
+
+                current_track_counter++;
                 break;
                 
             case SYS_USB_CONNECTED:
@@ -883,6 +893,16 @@ static void setup_sci0(void)
 struct mp3entry* mpeg_current_track(void)
 {
     return &(id3tags[0].id3);
+}
+
+bool mpeg_has_changed_track(void)
+{
+    if(last_track_counter != current_track_counter)
+    {
+        last_track_counter = current_track_counter;
+        return true;
+    }
+    return false;
 }
 
 void mpeg_play(char* trackname)
@@ -1196,5 +1216,5 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
     mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
     mpeg_sound_set(SOUND_AVC, avc);
 #endif
-#endif /* SIMULATOR */
+#endif /* !SIMULATOR */
 }

@@ -37,6 +37,7 @@ int mpeg_val2phys(int setting, int value);
 char *mpeg_sound_unit(int setting);
 int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
+bool mpeg_has_changed_track(void);
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1
