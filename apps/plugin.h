@@ -69,7 +69,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 36
+#define PLUGIN_API_VERSION 37
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -317,6 +317,10 @@ struct plugin_api {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     bool (*button_hold)(void);
 #endif
+    void (*pcm_play_data)(const unsigned char *start, int size,
+		    void (*get_more)(unsigned char** start, long*size));
+    void (*pcm_play_stop)(void);
+    bool (*pcm_is_playing)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
