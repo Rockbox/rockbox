@@ -67,7 +67,8 @@ DEFINES += -DWIN32
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mno-cygwin
-DLLFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 --def plugin.def
+DLLFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin \
+	--def plugin.def
 
 UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
 ifeq ($(UNAME),CYGWIN)
