@@ -1,0 +1,178 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2002 by wavey@wavey.org
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <stdio.h>
+#include "config.h"
+#include "settings.h"
+#include "disk.h"
+#include "panic.h"
+#include "debug.h"
+
+/*
+ * persist all runtime user settings to disk
+ */
+int persist_all_settings( void )
+{
+    if( ! persist_volume_setting() )
+    {
+        panic( "failed to persist volume setting" );
+    }
+    
+    if( ! persist_balance_setting() )
+    {
+        panic( "failed to persist balance setting" );
+    }
+    
+    if( ! persist_bass_setting() )
+    {
+        panic( "failed to persist bass setting" );
+    }
+    
+    if( ! persist_treble_setting() )
+    {
+        panic( "failed to persist treble setting" );
+    }
+    
+    if( ! persist_loudness_setting() )
+    {
+        panic( "failed to persist loudness setting" );
+    }
+    
+    if( ! persist_bass_boost_setting() )
+    {
+        panic( "failed to persist bass boost setting" );
+    }
+    
+    if( ! persist_contrast_setting() )
+    {
+        panic( "failed to persist contrast setting" );
+    }
+    
+    if( ! persist_poweroff_setting() )
+    {
+        panic( "failed to persist poweroff setting" );
+    }
+    
+    if( ! persist_backlight_setting() )
+    {
+        panic( "failed to persist backlight setting" );
+    }
+    
+    if( ! persist_poweroff_setting() )
+    {
+        panic( "failed to persist poweroff setting" );
+    }
+    
+    if( ! persist_resume_setting() )
+    {
+        panic( "failed to persist resume setting" );
+    }
+    
+    /* by getting here, we had no problems */
+    
+    return 1;
+}
+
+/*
+ * persist all the playlist information to disk
+ */
+int persist_all_playlist_info( void )
+{
+    if( ! persist_playlist_filename() )
+    {
+        panic( "failed to persist playlist filename" );
+    }
+    
+    if( ! persist_playlist_indices() )
+    {
+        panic( "failed to persist playlist indices" );
+    }
+    
+    if( ! persist_playlist_index() )
+    {
+        panic( "failed to persist playlist index" );
+    }
+    
+    if( ! persist_resume_track_time() )
+    {
+        panic( "failed to persist resume track time" );
+    }
+
+    /* by getting here, we had no problems */
+    
+    return 1;
+}
+
+/*
+ * load settings from disk
+ */
+void reload_all_settings( user_settings_t *settings )
+{
+    debug( "reload_all_settings()\n" );
+
+    /* this is a TEMP stub version */
+    
+    /* populate settings with default values */
+    
+    reset_settings( settings );
+}
+
+/*
+ * reset all settings to their default value 
+ */
+void reset_settings( user_settings_t *settings ) {
+        
+    debug( "reset_settings()\n" );
+
+    settings->volume     = DEFAULT_VOLUME_SETTING;
+    settings->balance    = DEFAULT_BALANCE_SETTING;
+    settings->bass       = DEFAULT_BASS_SETTING;
+    settings->treble     = DEFAULT_TREBLE_SETTING;
+    settings->loudness   = DEFAULT_LOUDNESS_SETTING;
+    settings->bass_boost = DEFAULT_BASS_BOOST_SETTING;
+    settings->contrast   = DEFAULT_CONTRAST_SETTING;
+    settings->poweroff   = DEFAULT_POWEROFF_SETTING;
+    settings->backlight  = DEFAULT_BACKLIGHT_SETTING;
+}
+
+/*
+ * dump the list of current settings
+ */
+void display_current_settings( user_settings_t *settings )
+{
+    debug( "\ndisplay_current_settings()\n" );
+
+    debugf( "\nvolume:\t\t%d\nbalance:\t%d\nbass:\t\t%d\ntreble:\t\t%d\nloudness:\t%d\nbass boost:\t%d\n",
+            settings->volume,
+            settings->balance,
+            settings->bass,
+            settings->treble,
+            settings->loudness,
+            settings->bass_boost );
+
+    debugf( "contrast:\t%d\npoweroff:\t%d\nbacklight:\t%d\n",
+            settings->contrast,
+            settings->poweroff,
+            settings->backlight );
+}
+
+
+
+
+
