@@ -64,6 +64,7 @@
 # define _tolower(c)  ((c) - 'A' + 'a')
 #endif
 
+char having_new_lcd=True;
 
 char *progname;
 XrmDatabase db;
@@ -87,7 +88,7 @@ static char *default_defaults[] = {
 #ifdef HAVE_LCD_BITMAP
   "120x68"
 #else
-  "264x128"
+  "280x132" /* A bit larger that necessary */
 #endif
   , /* this should be .geometry, but nooooo... */
   "*mono:		false",
@@ -212,12 +213,14 @@ int screenhack_handle_event(Display *dpy, XEvent *event, bool *release)
       break;
     case Expose:
       {
+	/*
 	int x=event->xexpose.width+event->xexpose.x;
 	int y=event->xexpose.height+event->xexpose.y;
 	screen_resized(x, y);
-	screen_redraw();
 	fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
 		x, y);
+	*/
+	screen_redraw();
       }
       break;
     default:
@@ -344,10 +347,18 @@ int main (int argc, char **argv)
 
     if (argc > 1)
     {
-        fprintf (stderr, 
-                 "This is the RockBox simulator.  The firmware will not take\n"
-                 "arguements, so the simulator will not either.\n");
-		exit(0);
+      int x;
+      for (x=1; x<argc; x++) {
+	if (!strcmp("--old_lcd", argv[x])) {
+	  having_new_lcd=FALSE;
+	  printf("Using old LCD layout.\n");
+	} else {
+	  printf("rockboxui\n");
+	  printf("Arguments:\n");
+	  printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
+	  exit(0);
+	}
+      }
     }
 
     if (CellsOfScreen (DefaultScreenOfDisplay (dpy)) <= 2)
