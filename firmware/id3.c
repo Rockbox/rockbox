@@ -40,6 +40,7 @@
 
 #include "id3.h"
 #include "mp3data.h"
+#include "system.h"
 
 #define UNSYNC(b0,b1,b2,b3) (((b0 & 0x7F) << (3*7)) | \
                              ((b1 & 0x7F) << (2*7)) | \
@@ -108,12 +109,13 @@ struct tag_resolver {
     int (*ppFunc)(struct mp3entry*, char* tag, int bufferpos);
 };
 
-static int unsynchronize(char* tag, int len)
+static bool global_ff_found = false;
+
+static int unsynchronize(char* tag, int len, bool *ff_found)
 {
     int i;
     unsigned char c;
     unsigned char *rp, *wp;
-    bool ff_found = false;
 
     wp = rp = tag;
     
@@ -123,19 +125,75 @@ static int unsynchronize(char* tag, int len)
            write pointer */
         c = *rp++;
         *wp = c;
-        if(ff_found) {
+        if(*ff_found) {
             /* Increment the write pointer if it isn't an unsynch pattern */
             if(c != 0)
                 wp++;
-            ff_found = false;
+            *ff_found = false;
         } else {
             if(c == 0xff)
-                ff_found = true;
+                *ff_found = true;
             wp++;
         }
     }
     return (int)wp - (int)tag;
 }
+
+static int unsynchronize_frame(char* tag, int len)
+{
+    bool ff_found = false;
+
+    return unsynchronize(tag, len, &ff_found);
+}
+
+static int read_unsynched(int fd, void *buf, int len, bool reset)
+{
+    int i;
+    int rc;
+    int remaining = len;
+    char *wp;
+    char *rp;
+
+    if(reset)
+        global_ff_found = false;
+
+    wp = buf;
+    
+    while(remaining) {
+        rp = wp;
+        rc = read(fd, rp, remaining);
+        if(rc < 0)
+            return rc;
+
+        i = unsynchronize(wp, remaining, &global_ff_found);
+        remaining -= i;
+        wp += i;
+    }
+
+    return len;
+};
+
+static int skip_unsynched(int fd, int len, bool reset)
+{
+    int rc;
+    int remaining = len;
+    int rlen;
+    char buf[32];
+
+    if(reset)
+        global_ff_found = false;
+    
+    while(remaining) {
+        rlen = MIN(sizeof(buf), (unsigned int)remaining);
+        rc = read(fd, buf, rlen);
+        if(rc < 0)
+            return rc;
+
+        remaining -= unsynchronize(buf, rlen, &global_ff_found);
+    }
+
+    return len;
+};
 
 /* parse numeric value from string */
 static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
@@ -365,6 +423,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     bool unsynch = false;
     int data_length_ind;
     int i;
+    int rc;
 
     /* Bail out if the tag is shorter than 10 bytes */
     if(entry->id3v2len < 10)
@@ -433,7 +492,11 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         
         /* Read frame header and check length */
         if(version >= ID3_VER_2_3) {
-            if(10 != read(fd, header, 10))
+            if(global_unsynch && version <= ID3_VER_2_3)
+                rc = read_unsynched(fd, header, 10, false);
+            else
+                rc = read(fd, header, 10);
+            if(rc != 10)
                 return;
             /* Adjust for the 10 bytes we read */
             size -= 10;
@@ -531,15 +594,20 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             if( !*ptag && !memcmp( header, tr->tag, tr->tag_length ) ) { 
 
                 /* found a tag matching one in tagList, and not yet filled */
-                bytesread = read(fd, buffer + bufferpos, framelen);
+                if(global_unsynch && version <= ID3_VER_2_3)
+                    bytesread = read_unsynched(fd, buffer + bufferpos,
+                                               framelen, false);
+                else
+                    bytesread = read(fd, buffer + bufferpos, framelen);
+                
                 if( bytesread != framelen )
                     return;
                 
                 size -= bytesread;
                 *ptag = buffer + bufferpos;
 
-                if(global_unsynch || unsynch)
-                    bytesread = unsynchronize(*ptag, bytesread);
+                if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
+                    bytesread = unsynchronize_frame(*ptag, bytesread);
                 
                 unicode_munge( ptag, &bytesread );
                 tag = *ptag; 
@@ -555,23 +623,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             /* no tag in tagList was found, or it was a repeat. 
                skip it using the total size */
 
-            /* We may need to compensate for the unsynchronization scheme */
-            if(global_unsynch && !data_length_ind) {
-                bool ff_found = false;
-                
-                for(i = 0;i < totframelen;i++) {
-                    unsigned char c;
-                    bytesread = read(fd, &c, 1);
-                    if(ff_found) {
-                        if(c == 0)
-                            /* Found an unsynch pattern, counting it */
-                            totframelen++;
-                        ff_found = false;
-                    } else {
-                        if(c == 0xff)
-                            ff_found = true;
-                    }
-                }
+            if(global_unsynch && version <= ID3_VER_2_3) {
+                skip_unsynched(fd, totframelen, false);
             } else {
                 if(data_length_ind)
                     totframelen = data_length_ind;
