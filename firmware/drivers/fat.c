@@ -28,6 +28,7 @@
 #include "fat.h"
 #include "ata.h"
 #include "debug.h"
+#include "system.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
@@ -141,6 +142,12 @@ struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 /* sectors cache for longname use */
 static unsigned char lastsector[SECTOR_SIZE];
 static unsigned char lastsector2[SECTOR_SIZE];
+
+static unsigned int swap_fat_entry(unsigned int entry)
+{
+    SWAB32(entry);
+    return entry;
+}
 
 static int sec2cluster(unsigned int sec)
 {
@@ -339,20 +346,20 @@ static void *cache_fat_sector(int secnum)
         /* Write back if it is dirty */
         if(fat_cache[cache_index].dirty)
         {
-            if(ata_write_sectors(secnum + fat_bpb.bpb_rsvdseccnt +
-                                 fat_bpb.startsector, 1, sec))
+            if(ata_write_sectors(secnum + fat_bpb.startsector, 1, sec))
             {
                 panic("cache_fat_sector() - Could"
                       " not write sector %d\n",
                       secnum);
             }
         }
+#endif
         free(sec);
         
         fat_cache[cache_index].ptr = NULL;
         fat_cache[cache_index].secnum = 8; /* Normally an unused sector */
         fat_cache[cache_index].dirty = 0;
-#endif
+        sec = NULL;
     }
     
     /* Load the sector if it is not cached */
@@ -364,7 +371,7 @@ static void *cache_fat_sector(int secnum)
             DEBUGF( "cache_fat_sector() - Out of memory\n");
             return NULL;
         }
-        if(ata_read_sectors(secnum+fat_bpb.startsector,1,sec))
+        if(ata_read_sectors(secnum + fat_bpb.startsector,1,sec))
         {
             DEBUGF( "cache_fat_sector() - Could"
                     " not read sector %d\n",
@@ -424,22 +431,31 @@ static int read_entry(int entry)
     thisfatentoffset = fatoffset % fat_bpb.bpb_bytspersec;
 
     /* Load the sector if it is not cached */
+    debugf("Loading FAT sector %d\n", thisfatsecnum);
     sec = cache_fat_sector(thisfatsecnum);
     if(!sec)
     {
-        DEBUGF( "update_entry() - Could not cache sector %d\n",
+        DEBUGF( "read_entry() - Could not cache sector %d\n",
                 thisfatsecnum);
         return -1;
     }
 
     val = sec[thisfatentoffset/sizeof(int)];
+
+    val = SWAB32(val);
+    
     return val;
 }
 
 static int get_next_cluster(unsigned int cluster)
 {
-    int next_cluster = read_entry(cluster);
+    int next_cluster;
 
+    debugf("get_next_cluster(%d)\n", cluster);
+    next_cluster = read_entry(cluster);
+
+    debugf("next cluster is %d\n", next_cluster);
+    
     /* is this last cluster in chain? */
     if ( next_cluster >= 0x0ffffff8 )
         return 0;
