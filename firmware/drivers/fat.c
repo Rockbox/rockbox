@@ -243,7 +243,7 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start, long count
 
 struct fat_cache_entry
 {
-    int secnum;
+    long secnum;
     bool inuse;
     bool dirty;
 #ifdef HAVE_MULTIVOLUME
@@ -614,7 +614,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
                              unsigned char *sectorbuf)
 {
     int rc;
-    int secnum;
+    long secnum;
 
     /* With multivolume, use only the FAT info from the cached sector! */
 #ifdef HAVE_MULTIVOLUME
@@ -939,7 +939,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
     unsigned char fsinfo[SECTOR_SIZE];
-    unsigned int* intptr;
+    unsigned long* intptr;
     int rc;
     
 #ifdef HAVE_FAT16SUPPORT
@@ -955,10 +955,10 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
         DEBUGF( "flush_fat() - Couldn't read FSInfo (error code %d)\n", rc);
         return rc * 10 - 1;
     }
-    intptr = (int*)&(fsinfo[FSINFO_FREECOUNT]);
+    intptr = (long*)&(fsinfo[FSINFO_FREECOUNT]);
     *intptr = SWAB32(fat_bpb->fsinfo.freecount);
 
-    intptr = (int*)&(fsinfo[FSINFO_NEXTFREE]);
+    intptr = (long*)&(fsinfo[FSINFO_NEXTFREE]);
     *intptr = SWAB32(fat_bpb->fsinfo.nextfree);
 
     rc = ata_write_sectors(IF_MV2(fat_bpb->drive,)
@@ -1664,7 +1664,7 @@ int fat_create_dir(const char* name,
 #endif
     unsigned char buf[SECTOR_SIZE];
     int i;
-    int sector;
+    long sector;
     int rc;
     struct fat_file dummyfile;
 
