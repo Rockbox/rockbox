@@ -234,8 +234,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
            !strncmp(header, "TP1", strlen("TP1"))) {
             readsize++;
             headerlen--;
-            if(headerlen > (size - readsize))
-                headerlen = (size - readsize);
             artist = buffer + readsize;
             artistn = headerlen;
             readsize += headerlen;
@@ -244,8 +242,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 !strncmp(header, "TT2", strlen("TT2"))) {
             readsize++;
             headerlen--;
-            if(headerlen > (size - readsize))
-                headerlen = (size - readsize);
             title = buffer + readsize;
             titlen = headerlen;
             readsize += headerlen;
@@ -253,8 +249,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         else if(!strncmp(header, "TALB", strlen("TALB"))) {
             readsize++;
             headerlen--;
-            if(headerlen > (size - readsize))
-                headerlen = (size - readsize);
             album = buffer + readsize;
             albumn = headerlen;
             readsize += headerlen;
@@ -262,8 +256,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
             readsize++;
             headerlen--;
-            if(headerlen > (size - readsize))
-                headerlen = (size - readsize);
             tracknum = buffer + readsize;
             tracknumn = headerlen;
             readsize += headerlen;
