@@ -70,7 +70,7 @@ static int compare(const void* p1, const void* p2)
     char *s1 = *(char **)p1;
     char *s2 = *(char **)p2;
 
-    return rb->strcmp(s2, s1);
+    return rb->strcasecmp(s2, s1);
 }
 
 static void sort_buffer(void)
