@@ -33,7 +33,7 @@ INCLUDES = -I$(DRIVERS) -I$(FIRMWAREDIR)
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-  INCLUDES = -I/usr/X11R6/include $(INCLUDES)
+  INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
 else
   LIBDIRS = 
