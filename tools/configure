@@ -196,6 +196,8 @@ if [ "-" = "$extra_defines" ]; then
         extra_defines=""
      fi
   fi
+ else
+    extra_defines=""
  fi
 fi
 
