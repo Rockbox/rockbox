@@ -31,6 +31,9 @@ AFLAGS += -small -relax
 # Check if this is a kind of Recorder
 ANYREC = $(findstring RECORDER, $(TARGET))
 
+# scramble tool
+TOOL = scramble
+
 ifndef MEM
     # if MEM is not set, assume 2MB
     MEM=2
@@ -56,19 +59,17 @@ ifeq ($(ANYREC), RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
-   TOOL = scramble
 else
 ifeq ($(TARGET), -DARCHOS_PLAYER)
    SRC += $(wildcard player/*.c)
    CFLAGS += -Iplayer
    OUTNAME = archos.mod
-   TOOL = scramble
 else
 # some kind of Neo 
    SRC += $(wildcard neo/*.c)
    CFLAGS += -Ineo
    OUTNAME = Rockbox.bin
-   TOOL = mkneofile
+   TOOL_OPT = -neo
 endif
 endif
 
