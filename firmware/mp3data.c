@@ -628,9 +628,9 @@ int create_xing_header(int fd, int startpos, int filesize,
     buf[36+1] = 'i';
     buf[36+2] = 'n';
     buf[36+3] = 'g';
-    int2bytes(&buf[36+4], (num_frames?VBR_FRAMES_FLAG:0 |
-                           filesize?VBR_BYTES_FLAG:0 |
-                           generate_toc?VBR_TOC_FLAG:0));
+    int2bytes(&buf[36+4], ((num_frames?VBR_FRAMES_FLAG:0) |
+                           (filesize?VBR_BYTES_FLAG:0) |
+                           (generate_toc?VBR_TOC_FLAG:0)));
     index = 36+8;
     if(num_frames)
     {
