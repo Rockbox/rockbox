@@ -373,9 +373,11 @@ int settings_save( void )
 
     {
         static long lasttime = 0;
+        int elapsed_secs;
 
-        global_settings.runtime += (current_tick - lasttime) / HZ;
-        lasttime = current_tick;
+        elapsed_secs = (current_tick - lasttime) / HZ;
+        global_settings.runtime += elapsed_secs;
+        lasttime += (elapsed_secs * HZ);
 
         if ( global_settings.runtime > global_settings.topruntime )
             global_settings.topruntime = global_settings.runtime;
