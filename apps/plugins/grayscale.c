@@ -314,10 +314,9 @@ void grayblock(int x, int by, unsigned char* src, int stride)
 
         "mov     %2,r5           \n"
         "sub     r1,r5           \n"  /* r5 = depth - r1 */
+        "mov.l   .lshrsi3,r1     \n"
+        "jsr     @r1             \n"  /* shift r4 right by r5 */
         "mov     r0,r1           \n"  /* last result stored in r1 */
-        "mov.l   .lshrsi3,r0     \n"
-        "jsr     @r0             \n"  /* shift r4 right by r5 */
-        "nop                     \n"
 
         "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
         "mov.l   r0,@-r15        \n"  /* push pattern */
@@ -640,8 +639,8 @@ void gray_scroll_left(int count, bool black_border);
 void gray_scroll_right(int count, bool black_border);
 void gray_scroll_up8(bool black_border);
 void gray_scroll_down8(bool black_border);
-void gray_scroll_up1(bool black_border);
-void gray_scroll_down1(bool black_border);
+void gray_scroll_up(int count, bool black_border);
+void gray_scroll_down(int count, bool black_border);
 
 /* pixel functions */
 void gray_drawpixel(int x, int y, int brightness);
@@ -685,7 +684,7 @@ void gray_black_display(void)
     rb->memset(graybuf->data, 0xFF, MULU16(graybuf->depth, graybuf->plane_size));
 }
 
-/* Do a lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
+/* Do an lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
  * of the screen not covered by the grayscale overlay). If the grayscale 
  * overlay is running, the update will be done in the next call of the
  * interrupt routine, otherwise it will be performed right away. See also
@@ -703,6 +702,9 @@ void gray_deferred_update(void)
  *
  * black_border determines if the pixels scrolled in at the right are black
  * or white 
+ *
+ * Scrolling left/right by an even pixel count is almost twice as fast as
+ * scrolling by an odd pixel count.
  */
 void gray_scroll_left(int count, bool black_border)
 {
@@ -765,6 +767,9 @@ void gray_scroll_left(int count, bool black_border)
  *
  * black_border determines if the pixels scrolled in at the left are black
  * or white
+ *
+ * Scrolling left/right by an even pixel count is almost twice as fast as
+ * scrolling by an odd pixel count.
  */
 void gray_scroll_right(int count, bool black_border)
 {
@@ -791,7 +796,7 @@ void gray_scroll_right(int count, bool black_border)
                 ".sr_loop1:                   \n"
                     "mov.b   @(%2,%0),r1      \n"
                     "mov.b   r1,@-%0          \n"
-                    "cmp/hs  %1,%0            \n"
+                    "cmp/hi  %1,%0            \n"
                     "bt      .sr_loop1        \n"
                     : /* outputs */
                     : /* inputs */
@@ -806,7 +811,7 @@ void gray_scroll_right(int count, bool black_border)
                 ".sr_loop2:                   \n"
                     "mov.w   @(%2,%0),r1      \n"
                     "mov.w   r1,@-%0          \n"
-                    "cmp/hs  %1,%0            \n"
+                    "cmp/hi  %1,%0            \n"
                     "bt      .sr_loop2        \n"
                     : /* outputs */
                     : /* inputs */
@@ -827,6 +832,8 @@ void gray_scroll_right(int count, bool black_border)
  *
  * black_border determines if the pixels scrolled in at the bottom are black
  * or white
+ *
+ * Scrolling up/down by 8 pixels is very fast.
  */
 void gray_scroll_up8(bool black_border)
 {
@@ -865,6 +872,8 @@ void gray_scroll_up8(bool black_border)
  *
  * black_border determines if the pixels scrolled in at the top are black
  * or white
+ *
+ * Scrolling up/down by 8 pixels is very fast.
  */
 void gray_scroll_down8(bool black_border)
 {
@@ -899,7 +908,7 @@ void gray_scroll_down8(bool black_border)
     }
 }
 
-/* Scroll the whole grayscale buffer up by 1 pixel
+/* Scroll the whole grayscale buffer up by <count> pixels (<= 7)
  *
  * black_border determines if the pixels scrolled in at the bottom are black
  * or white
@@ -908,51 +917,84 @@ void gray_scroll_down8(bool black_border)
  * left/right or scrolling up/down byte-wise because it involves bit
  * shifting. That's why it is asm optimized.
  */
-void gray_scroll_up1(bool black_border)
+void gray_scroll_up(int count, bool black_border)
 {
-    int filler;
+    unsigned long filler;
 
-    if (graybuf == NULL)
+    if (graybuf == NULL || (unsigned) count > 7)
         return;
 
     if (black_border)
-        filler = 1;
+        filler = 0xFF;
     else
         filler = 0;
-
+    
     /* scroll column by column to minimize flicker */
     asm(
-        "mov     #0,r6           \n"  /* x = 0; */
+        "mov     #0,r6           \n"  /* x = 0 */
+        "mova    .su_shifttbl,r0 \n"  /* calculate jump destination for */
+        "mov.b   @(r0,%6),%6     \n"  /*   shift amount from table */
+        "bra     .su_cloop       \n"  /* skip table */
+        "add     r0,%6           \n"
+
+        ".align  2               \n"
+    ".su_shifttbl:               \n"  /* shift jump offset table */
+        ".byte   .su_shift0 - .su_shifttbl \n"
+        ".byte   .su_shift1 - .su_shifttbl \n"
+        ".byte   .su_shift2 - .su_shifttbl \n"
+        ".byte   .su_shift3 - .su_shifttbl \n"
+        ".byte   .su_shift4 - .su_shifttbl \n"
+        ".byte   .su_shift5 - .su_shifttbl \n"
+        ".byte   .su_shift6 - .su_shifttbl \n"
+        ".byte   .su_shift7 - .su_shifttbl \n"
 
     ".su_cloop:                  \n"  /* repeat for every column */
-        "mov     %1,r7           \n"  /* get start address */
-        "mov     #0,r1           \n"  /* current_plane = 0 */
-            
+        "mov     %1,r2           \n"  /* get start address */
+        "mov     #0,r3           \n"  /* current_plane = 0 */
+        
     ".su_oloop:                  \n"  /* repeat for every bitplane */
-        "mov     r7,r2           \n"  /* get start address */
-        "mov     #0,r3           \n"  /* current_row = 0 */
-        "mov     %5,r5           \n"  /* get filler bit (bit 0) */
-
+        "mov     r2,r4           \n"  /* get start address */
+        "mov     #0,r5           \n"  /* current_row = 0 */
+        "mov     %5,r1           \n"  /* get filler bits */
+        
     ".su_iloop:                  \n"  /* repeat for all rows */
-        "sub     %2,r2           \n"  /* address -= width; */
-        "mov.b   @r2,r4          \n"  /* get new byte */
-        "shll8   r5              \n"  /* shift old lsb to bit 8 */
-        "extu.b  r4,r4           \n"  /* extend byte unsigned */
-        "or      r5,r4           \n"  /* merge old lsb */
-        "shlr    r4              \n"  /* shift right */
-        "movt    r5              \n"  /* save new lsb */
-        "mov.b   r4,@r2          \n"  /* store byte */
-        "add     #1,r3           \n"  /* current_row++; */
-        "cmp/hi  r3,%3           \n"  /* cuurent_row < bheight ? */
+        "sub     %2,r4           \n"  /* address -= width */
+        "mov.b   @r4,r0          \n"  /* get data byte */
+        "shll8   r1              \n"  /* old data to 2nd byte */
+        "extu.b  r0,r0           \n"  /* extend unsigned */
+        "or      r1,r0           \n"  /* combine old data */
+        "jmp     @%6             \n"  /* jump into shift "path" */
+        "extu.b  r0,r1           \n"  /* store data for next round */
+        
+    ".su_shift6:                 \n"  /* shift right by 0..7 bits */
+        "shlr2   r0              \n"
+    ".su_shift4:                 \n"
+        "shlr2   r0              \n"
+    ".su_shift2:                 \n"
+        "bra     .su_shift0      \n"
+        "shlr2   r0              \n"
+    ".su_shift7:                 \n"
+        "shlr2   r0              \n"
+    ".su_shift5:                 \n"
+        "shlr2   r0              \n"
+    ".su_shift3:                 \n"
+        "shlr2   r0              \n"
+    ".su_shift1:                 \n"
+        "shlr    r0              \n"
+    ".su_shift0:                 \n"
+
+        "mov.b   r0,@r4          \n"  /* store data */
+        "add     #1,r5           \n"  /* current_row++ */
+        "cmp/hi  r5,%3           \n"  /* current_row < bheight ? */
         "bt      .su_iloop       \n"
-            
-        "add     %4,r7           \n"  /* start_address += plane_size; */
-        "add     #1,r1           \n"  /* current_plane++; */
-        "cmp/hi  r1,%0           \n"  /* current_plane < depth ? */
+
+        "add     %4,r2           \n"  /* start_address += plane_size */
+        "add     #1,r3           \n"  /* current_plane++ */
+        "cmp/hi  r3,%0           \n"  /* current_plane < depth ? */
         "bt      .su_oloop       \n"
 
-        "add     #1,%1           \n"  /* start_address++; */
-        "add     #1,r6           \n"  /* x++; */
+        "add     #1,%1           \n"  /* start_address++ */
+        "add     #1,r6           \n"  /* x++ */
         "cmp/hi  r6,%2           \n"  /* x < width ? */
         "bt      .su_cloop       \n"
         : /* outputs */
@@ -962,67 +1004,100 @@ void gray_scroll_up1(bool black_border)
         /* %2 */ "r"(graybuf->width),
         /* %3 */ "r"(graybuf->bheight),
         /* %4 */ "r"(graybuf->plane_size),
-        /* %5 */ "r"(filler)
+        /* %5 */ "r"(filler),
+        /* %6 */ "r"(count)
         : /* clobbers */
-        "r1", "r2", "r3", "r4", "r5", "r6", "r7"
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6"
     );
 }
 
-/* Scroll the whole grayscale buffer down by 1 pixel
+/* Scroll the whole grayscale buffer down by <count> pixels (<= 7)
  *
  * black_border determines if the pixels scrolled in at the top are black
  * or white
  *
  * Scrolling up/down pixel-wise is significantly slower than scrolling
  * left/right or scrolling up/down byte-wise because it involves bit
- * shifting. That's why it is asm optimized. Scrolling down is a bit
- * faster than scrolling up, though.
+ * shifting. That's why it is asm optimized.
  */
-void gray_scroll_down1(bool black_border)
+void gray_scroll_down(int count, bool black_border)
 {
-    int filler;
+    unsigned long filler;
 
-    if (graybuf == NULL)
+    if (graybuf == NULL || (unsigned) count > 7)
         return;
 
     if (black_border)
-        filler = -1; /* sets bit 31 */
+        filler = 0xFF << count; /* calculate filler bits */
     else
         filler = 0;
-
+    
     /* scroll column by column to minimize flicker */
     asm(
-        "mov     #0,r5           \n"  /* x = 0; */
+        "mov     #0,r6           \n"  /* x = 0 */
+        "mova    .sd_shifttbl,r0 \n"  /* calculate jump destination for */
+        "mov.b   @(r0,%6),%6     \n"  /*   shift amount from table */
+        "bra     .sd_cloop       \n"  /* skip table */
+        "add     r0,%6           \n"
+        
+        ".align  2               \n"
+    ".sd_shifttbl:               \n"  /* shift jump offset table */
+        ".byte   .sd_shift0 - .sd_shifttbl \n"
+        ".byte   .sd_shift1 - .sd_shifttbl \n"
+        ".byte   .sd_shift2 - .sd_shifttbl \n"
+        ".byte   .sd_shift3 - .sd_shifttbl \n"
+        ".byte   .sd_shift4 - .sd_shifttbl \n"
+        ".byte   .sd_shift5 - .sd_shifttbl \n"
+        ".byte   .sd_shift6 - .sd_shifttbl \n"
+        ".byte   .sd_shift7 - .sd_shifttbl \n"
 
     ".sd_cloop:                  \n"  /* repeat for every column */
-        "mov     %1,r6           \n"  /* get start address */
-        "mov     #0,r1           \n"  /* current_plane = 0 */
-            
+        "mov     %1,r2           \n"  /* get start address */
+        "mov     #0,r3           \n"  /* current_plane = 0 */
+        
     ".sd_oloop:                  \n"  /* repeat for every bitplane */
-        "mov     r6,r2           \n"  /* get start address */
-        "mov     #0,r3           \n"  /* current_row = 0 */
-        "mov     %5,r4           \n"  /* get filler bit (bit 31) */
-
+        "mov     r2,r4           \n"  /* get start address */
+        "mov     #0,r5           \n"  /* current_row = 0 */
+        "mov     %5,r1           \n"  /* get filler bits */
+        
     ".sd_iloop:                  \n"  /* repeat for all rows */
-        "shll    r4              \n"  /* get old msb (again) */
-        /* This is possible because the sh1 loads byte data sign-extended,
-         * so the upper 25 bits of the register are all identical */
-        "mov.b   @r2,r4          \n"  /* get new byte */
-        "add     #1,r3           \n"  /* current_row++; */
-        "rotcl   r4              \n"  /* rotate left, merges previous msb */
-        "mov.b   r4,@r2          \n"  /* store byte */
-        "add     %2,r2           \n"  /* address += width; */
-        "cmp/hi  r3,%3           \n"  /* cuurent_row < bheight ? */
+        "shlr8   r1              \n"  /* shift right to get residue */
+        "mov.b   @r4,r0          \n"  /* get data byte */
+        "jmp     @%6             \n"  /* jump into shift "path" */
+        "extu.b  r0,r0           \n"  /* extend unsigned */
+        
+    ".sd_shift6:                 \n"  /* shift left by 0..7 bits */
+        "shll2   r0              \n"
+    ".sd_shift4:                 \n"
+        "shll2   r0              \n"
+    ".sd_shift2:                 \n"
+        "bra     .sd_shift0      \n"
+        "shll2   r0              \n"
+    ".sd_shift7:                 \n"
+        "shll2   r0              \n"
+    ".sd_shift5:                 \n"
+        "shll2   r0              \n"
+    ".sd_shift3:                 \n"
+        "shll2   r0              \n"
+    ".sd_shift1:                 \n"
+        "shll    r0              \n"
+    ".sd_shift0:                 \n"
+
+        "or      r0,r1           \n"  /* combine with last residue */
+        "mov.b   r1,@r4          \n"  /* store data */
+        "add     %2,r4           \n"  /* address += width */
+        "add     #1,r5           \n"  /* current_row++ */
+        "cmp/hi  r5,%3           \n"  /* current_row < bheight ? */
         "bt      .sd_iloop       \n"
-            
-        "add     %4,r6           \n"  /* start_address += plane_size; */
-        "add     #1,r1           \n"  /* current_plane++; */
-        "cmp/hi  r1,%0           \n"  /* current_plane < depth ? */
+
+        "add     %4,r2           \n"  /* start_address += plane_size */
+        "add     #1,r3           \n"  /* current_plane++ */
+        "cmp/hi  r3,%0           \n"  /* current_plane < depth ? */
         "bt      .sd_oloop       \n"
 
-        "add     #1,%1           \n"  /* start_address++; */
-        "add     #1,r5           \n"  /* x++ */
-        "cmp/hi  r5,%2           \n"  /* x < width ? */
+        "add     #1,%1           \n"  /* start_address++ */
+        "add     #1,r6           \n"  /* x++ */
+        "cmp/hi  r6,%2           \n"  /* x < width ? */
         "bt      .sd_cloop       \n"
         : /* outputs */
         : /* inputs */
@@ -1031,9 +1106,10 @@ void gray_scroll_down1(bool black_border)
         /* %2 */ "r"(graybuf->width),
         /* %3 */ "r"(graybuf->bheight),
         /* %4 */ "r"(graybuf->plane_size),
-        /* %5 */ "r"(filler)
+        /* %5 */ "r"(filler),
+        /* %6 */ "r"(count)
         : /* clobbers */
-        "r1", "r2", "r3", "r4", "r5", "r6"
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6"
     );
 }
 
@@ -1437,7 +1513,7 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
 
     for (yi = y; yi < y + ny; )
     {
-    	row = src;
+        row = src;
 
         if (!(yi & 7) && (y + ny - yi > 7))
         /* current row byte aligned in fb & at least 8 rows left */
@@ -1448,7 +1524,7 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
                 grayblock(xi, yi >> 3, row++, stride);
             }
             yi += 8;
-    	    src += stride << 3;
+            src += stride << 3;
         }
         else
         {
@@ -1458,7 +1534,7 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
                                   graybuf->depth + 1) >> 8]);
             }
             yi++;
-    	    src += stride;
+            src += stride;
         }
     }
 }
@@ -1646,11 +1722,11 @@ int main(void)
     /* draw a dark gray line star background */
     for (y = 0; y < 56; y += 8)        /* horizontal part */
     {
-    	gray_drawline(0, y, 111, 55 - y, 80); /* gray lines */
+        gray_drawline(0, y, 111, 55 - y, 80); /* gray lines */
     }
     for (x = 10; x < 112; x += 10)     /* vertical part */
     {
-    	gray_drawline(x, 0, 111 - x, 55, 80); /* gray lines */
+        gray_drawline(x, 0, 111 - x, 55, 80); /* gray lines */
     }
 
     gray_drawrect(0, 0, 111, 55, 0);   /* black border */
@@ -1658,8 +1734,8 @@ int main(void)
     /* draw gray tones */
     for (i = 0; i < 86; i++)           
     {
-    	x = 13 + i;
-    	gray_fillrect(x, 6, x, 49, 3 * i); /* gray rectangles */
+        x = 13 + i;
+        gray_fillrect(x, 6, x, 49, 3 * i); /* gray rectangles */
     }
 
     gray_invertrect(13, 29, 98, 49);   /* invert rectangle (lower half) */
@@ -1715,12 +1791,12 @@ int main(void)
 
             case BUTTON_UP:
 
-                gray_scroll_up1(black_border); /* scroll up by 1 pixel */
+                gray_scroll_up(scroll_amount, black_border); /* scroll up */
                 break;
 
             case BUTTON_DOWN:
 
-                gray_scroll_down1(black_border); /* scroll down by 1 pixel */
+                gray_scroll_down(scroll_amount, black_border); /* scroll down */
                 break;
 
             case BUTTON_OFF:
