@@ -64,7 +64,7 @@
 
 <h2>Uninstallation</h2>
 
-<p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) from the root of your Archos disk.
+<p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) and the .rockbox directory from the root of your Archos disk.
 
 <h2>Source code</h2>
 <p><a href="rockbox-2.3.tar.gz">rockbox-2.3.tar.gz</a>
