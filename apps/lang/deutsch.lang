@@ -2882,3 +2882,32 @@ eng: "Songs"
 voice: ""
 new: "Titel"
 
+id: LANG_ID3DB_SEARCH
+desc: ID3 virtual folder name
+eng: "Search"
+voice: ""
+new: "Suche"
+
+id: LANG_ID3DB_SEARCH_ARTISTS
+desc: ID3 virtual folder name
+eng: "Search Artists"
+voice: ""
+new: "Suche Künstler"
+
+id: LANG_ID3DB_SEARCH_ALBUMS
+desc: ID3 virtual folder name
+eng: "Search Albums"
+voice: ""
+new: "Suche Alben"
+
+id: LANG_ID3DB_SEARCH_SONGS
+desc: ID3 virtual folder name
+eng: "Search Songs"
+voice: ""
+new: "Suche Titel"
+
+id: LANG_ID3DB_MATCHES
+desc: ID3 virtual folder name
+eng: "Found %d matches"
+voice: ""
+new: "%d Treffer"
