@@ -65,7 +65,7 @@ typedef unsigned int mode_t;
 
 #ifndef _SIZE_T
 #define _SIZE_T
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 #endif
 
 typedef int (*open_func)(const char* pathname, int flags);

@@ -239,7 +239,7 @@ bool clean_shutdown(void)
     return false;
 }
 
-int default_event_handler_ex(int event, void (*callback)(void *), void *parameter)
+int default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
 {
     switch(event)
     {
@@ -261,7 +261,7 @@ int default_event_handler_ex(int event, void (*callback)(void *), void *paramete
     return 0;
 }
 
-int default_event_handler(int event)
+int default_event_handler(long event)
 {
     return default_event_handler_ex(event, NULL, NULL);
 }
