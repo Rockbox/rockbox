@@ -627,7 +627,10 @@ static char* select_bookmark(const char* bookmark_file_name)
     while(true)
     {
         if(bookmark_id < 0)
-            bookmark_id = bookmark_count -1;
+        {
+            bookmark_id = 0;
+            bookmark_id_prev = -1;
+        }
         if(bookmark_id == bookmark_count)
             bookmark_id = 0;
 
