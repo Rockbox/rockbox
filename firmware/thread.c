@@ -31,7 +31,7 @@ struct regs
 
 int num_threads;
 static int current_thread;
-static struct regs thread_contexts[MAXTHREADS];
+static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")));
 char *thread_name[MAXTHREADS];
 void *thread_stack[MAXTHREADS];
 int thread_stack_size[MAXTHREADS];
@@ -39,6 +39,8 @@ static char main_thread_name[] = "main";
 
 extern int stackbegin[];
 extern int stackend[];
+
+void switch_thread(void) __attribute__ ((section(".icode")));
 
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
