@@ -15,6 +15,7 @@ check() {
 }
 
 try() {
+    echo COMMAND: fat $1 $2 $3 >> $RESULT
     ./fat $1 $2 $3 2>> $RESULT
     RETVAL=$?
     [ $RETVAL -ne 0 ] && fail
@@ -25,6 +26,7 @@ buildimage() {
     mount -o loop $IMAGE $MOUNT
     echo "Filling it with /etc files"
     find /etc -type f -maxdepth 1 -exec cp {} $MOUNT \;
+    mkdir $MOUNT/dir
     umount $MOUNT
 }
 
@@ -33,8 +35,10 @@ runtests() {
 
     echo ---Test: create a 10K file
     try mkfile /apa.txt 10
+    try mkfile /dir/apa.txt 10
     check
     try chkfile /apa.txt 10
+    try chkfile /dir/apa.txt 8
 
     echo ---Test: create a 1K file
     try mkfile /bpa.txt 1
@@ -64,7 +68,7 @@ runtests() {
     try chkfile /bpa.txt
 
     LOOP=50
-    SIZE=50
+    SIZE=70
 
     echo ---Test: create $LOOP $SIZE k files
     for i in `seq 1 $LOOP`;
@@ -73,9 +77,18 @@ runtests() {
         try mkfile /rockbox.$i $SIZE
         check
         try chkfile /rockbox.$i $SIZE
+        check
+        try del /rockbox.$i
+        check
+        try mkfile /rockbox.$i $SIZE
+        check
     done
 
 }
+
+echo "Building test image (4 sector/cluster)"
+buildimage 4
+runtests
 
 echo "Building test image (128 sectors/cluster)"
 buildimage 128
@@ -87,10 +100,6 @@ runtests
 
 echo "Building test image (8 sectors/cluster)"
 buildimage 8
-runtests
-
-echo "Building test image (4 sector/cluster)"
-buildimage 4
 runtests
 
 echo "Building test image (1 sector/cluster)"

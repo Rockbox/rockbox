@@ -14,7 +14,7 @@ int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
         DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
                count, start, start+count-1); 
     else
-        DEBUGF("[Reading block 0x%lx, %d]\n", start, count); 
+        DEBUGF("[Reading block 0x%lx]\n", start); 
 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");

@@ -466,13 +466,11 @@ static int update_fat_entry(unsigned int entry, unsigned int val)
 
     LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
 
-#ifdef TEST_FAT
     if (entry==val)
         panicf("Creating FAT loop: %x,%x\n",entry,val);
 
     if ( entry < 2 )
         panicf("Updating reserved FAT entry %d.\n",entry);
-#endif
 
     sec = cache_fat_sector(sector);
     if (!sec)
@@ -490,6 +488,8 @@ static int update_fat_entry(unsigned int entry, unsigned int val)
         if (SWAB32(sec[offset]) & 0x0fffffff)
             fat_bpb.fsinfo.freecount++;
     }
+
+    LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb.fsinfo.freecount);
 
     /* don't change top 4 bits */
     sec[offset] &= SWAB32(0xf0000000);
@@ -873,13 +873,14 @@ static void update_dir_entry( struct fat_file* file, int size )
     unsigned short* clusptr;
     int err;
 
-    LDEBUGF("update_dir_entry(cluster:%x entry:%d size:%d)\n",
-            file->firstcluster,file->direntry,size);
+    LDEBUGF("update_dir_entry(cluster:%x entry:%d sector:%x size:%d)\n",
+            file->firstcluster,file->direntry,sector,size);
 
-    if ( file->direntry >= (SECTOR_SIZE / DIR_ENTRY_SIZE) ) {
-        DEBUGF("update_dir_entry(): Illegal entry %d!\n",file->direntry);
-        return;
-    }
+    if ( file->direntry >= (SECTOR_SIZE / DIR_ENTRY_SIZE) )
+        panicf("update_dir_entry(): Illegal entry %d!\n",file->direntry);
+
+    if ( file->direntry < 0 )
+        panicf("update_dir_entry(): Illegal entry %d!\n",file->direntry);
 
     err = ata_read_sectors(sector, 1, buf);
     if (err)
@@ -949,7 +950,7 @@ int fat_open(unsigned int startcluster,
 
     /* remember where the file's dir entry is located */
     file->dirsector = dir->cached_sec;
-    file->direntry = (dir->entry % DIR_ENTRIES_PER_SECTOR) - 1;
+    file->direntry = dir->entry - 1;
     LDEBUGF("fat_open(%x), entry %d\n",startcluster,file->direntry);
     return 0;
 }
@@ -1013,7 +1014,8 @@ int fat_closewrite(struct fat_file *file, int size)
     else
         update_fat_entry(endcluster, FAT_EOF_MARK);
 
-    update_dir_entry(file, size);
+    if (file->dirsector)
+        update_dir_entry(file, size);
     flush_fat();
 
 #ifdef TEST_FAT
@@ -1043,13 +1045,14 @@ int fat_remove(struct fat_file* file)
 
     LDEBUGF("fat_remove(%x)\n",last);
 
-    while ( last != FAT_EOF_MARK ) {
-        LDEBUGF("Freeing cluster %x\n",last);
+    while ( last ) {
         next = get_next_cluster(last);
         update_fat_entry(last,0);
         last = next;
     }
     update_dir_entry(file, -1);
+    file->dirsector = 0;
+    file->firstcluster = 0;
 
     return 0;
 }

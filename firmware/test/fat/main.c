@@ -267,6 +267,11 @@ void dbg_head(char* name)
     close(fd);
 }
 
+int dbg_del(char* name)
+{
+    return remove(name);
+}
+
 char current_directory[256] = "\\";
 int last_secnum = 0;
 
@@ -300,6 +305,7 @@ int dbg_cmd(int argc, char *argv[])
                " tail <file>\n"
                " mkfile <file> <size (KB)>\n"
                " chkfile <file>\n"
+               " del <file>\n"
             );
         return -1;
     }
@@ -356,6 +362,12 @@ int dbg_cmd(int argc, char *argv[])
             else
                 return dbg_chkfile(arg1, 0);
         }
+    }
+
+    if (!strcasecmp(cmd, "del"))
+    {
+        if (arg1)
+            return dbg_del(arg1);
     }
 
     return 0;

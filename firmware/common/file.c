@@ -184,6 +184,20 @@ int close(int fd)
     return rc;
 }
 
+int remove(const char* name)
+{
+    int rc;
+    int fd = open(name, O_WRONLY);
+    if ( fd < 0 )
+        return fd;
+
+    rc = fat_remove(&(openfiles[fd].fatfile));
+
+    close(fd);
+
+    return rc;
+}
+
 static int readwrite(int fd, void* buf, int count, bool write)
 {
     int sectors;
