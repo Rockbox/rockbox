@@ -470,26 +470,90 @@ bool f3_screen(void)
 
 #ifdef HAVE_LCD_BITMAP
 #define SPACE 4 /* pixels between words */
+#define MAXLETTERS 128 /* 16*8 */
+#define MAXLINES 10
 #else
 #define SPACE 1 /* one letter space */
 #undef LCD_WIDTH
 #define LCD_WIDTH 11
 #undef LCD_HEIGHT
 #define LCD_HEIGHT 2
+#define MAXLETTERS 22 /* 11 * 2 */
+#define MAXLINES 2
 #endif
 
-void splash(char *text, /* what to say */
-            int ticks,  /* fow how long */
-            int keymask) /* what keymask aborts the waiting (if any) */
+void splash(int ticks,   /* how long */
+            int keymask, /* what keymask aborts the waiting (if any) */
+            bool center, /* FALSE means left-justified, TRUE means
+                            horizontal and vertical center */
+            char *fmt,   /* what to say *printf style */
+            ...)
 {
     char *next;
     char *store=NULL;
     int x=0;
     int y=0;
     int w, h;
+    unsigned char splash_buf[MAXLETTERS];
+    va_list ap;
+    unsigned char widths[MAXLINES];
+    int line=0;
+    bool first=true;
+
+    va_start( ap, fmt );
+    vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
+
     lcd_clear_display();
-    
-    next = strtok_r(text, " ", &store);
+
+    if(center) {
+        /* first a pass to measure sizes */
+        next = strtok_r(splash_buf, " ", &store);
+        while (next) {
+#ifdef HAVE_LCD_BITMAP
+            lcd_getstringsize(next, &w, &h);
+#else
+            w = strlen(next);
+            h = 1;
+#endif
+            if(!first) {
+                if(x+w> LCD_WIDTH) {
+                    /* too wide */
+                    y+=h;
+                    line++;
+                    if((y > (LCD_HEIGHT-h)) || (line > MAXLINES))
+                        /* STOP */
+                        break;
+                    x=0;
+                    first=true;
+                }
+            }
+            else
+                first = false;
+
+            /* think of it as if the text was written here at position x,y
+               being w pixels/chars wide and h high */
+
+            x += w+SPACE;
+            widths[line]=x-SPACE; /* don't count the trailing space */
+            next = strtok_r(NULL, " ", &store);
+        }
+#ifdef HAVE_LCD_BITMAP
+        /* Start displaying the message at position y. The reason for the
+           added h here is that it isn't added until the end of lines in the
+           loop above and we always break the loop in the middle of a line. */
+        y = (LCD_HEIGHT - (y+h) )/2;
+#else
+        y = 0; /* vertical center on 2 lines would be silly */
+#endif
+        line=0;
+        first=true;
+        vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
+    }
+    va_end( ap );
+
+    if(center)
+        x = (LCD_WIDTH-widths[0])/2;
+    next = strtok_r(splash_buf, " ", &store);
     while (next) {
 #ifdef HAVE_LCD_BITMAP
         lcd_getstringsize(next, &w, &h);
@@ -497,16 +561,23 @@ void splash(char *text, /* what to say */
         w = strlen(next);
         h = 1;
 #endif
-        if(x) {
+        if(!first) {
             if(x+w> LCD_WIDTH) {
                 /* too wide */
                 y+=h;
+                line++; /* goto next line */
+                first=true;
                 if(y > (LCD_HEIGHT-h))
                     /* STOP */
                     break;
-                x=0;
+                if(center)
+                    x = (LCD_WIDTH-widths[line])/2;
+                else
+                    x=0;
             }
         }
+        else
+            first=false;
 #ifdef HAVE_LCD_BITMAP
         lcd_putsxy(x, y, next);
         lcd_update(); /* DURING DEBUG ONLY */
@@ -519,12 +590,17 @@ void splash(char *text, /* what to say */
     lcd_update();
 
     if(ticks) {
-        int start = current_tick;
-        int done = ticks + current_tick + 1;
-        while (TIME_BEFORE( current_tick, done)) {
-            int button = button_get_w_tmo(ticks - (current_tick-start));
-            if((button & keymask) == keymask)
-                break;
+        if(keymask) {
+            int start = current_tick;
+            int done = ticks + current_tick + 1;
+            while (TIME_BEFORE( current_tick, done)) {
+                int button = button_get_w_tmo(ticks - (current_tick-start));
+                if((button & keymask) == keymask)
+                    break;
+            }
         }
+        else
+            /* unbreakable! */
+            sleep(ticks);
     }
 }
