@@ -352,6 +352,9 @@ int talk_number(int n, bool enqueue)
     int level = 0; /* mille count */
     int mil = 1000000000; /* highest possible "-illion" */
 
+    if (mpeg_status()) /* busy, buffer in use */
+        return -1; 
+
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
     
@@ -426,6 +429,9 @@ int talk_value(int n, int unit, bool enqueue)
         VOICE_PER_SEC,
         VOICE_HERTZ,
     };
+
+    if (mpeg_status()) /* busy, buffer in use */
+        return -1; 
 
     if (unit < 0 || unit >= UNIT_LAST)
         unit_id = -1;
