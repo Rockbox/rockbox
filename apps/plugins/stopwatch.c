@@ -73,6 +73,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int button;
     int lap;
     int done = false;
+    bool update_lap = true;
 
     TEST_PLUGIN_API(api);
     (void)parameter;
@@ -131,6 +132,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                  {
                      prev_total = 0;
                      curr_lap = 0;
+                     update_lap = true;
                  }
                  break;
 
@@ -138,6 +140,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case BUTTON_ON:
                  lap_times[curr_lap%MAX_LAPS] = stopwatch;
                  curr_lap++;
+                 update_lap = true;
                  break;
 
             /* UP (RIGHT/+) = Scroll Lap timer up */
@@ -147,7 +150,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case BUTTON_RIGHT:
 #endif
                  if (lap_scroll > 0)
+                 {
                      lap_scroll --;
+                     update_lap = true;
+                 }
                  break;
 
             /* DOWN (LEFT/-) = Scroll Lap timer down */
@@ -160,8 +166,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                      (lap_scroll < MAX_SCROLL) )
                  {
                      lap_scroll ++;
+                     update_lap = true;
                  }
                  break;
+
+            case SYS_USB_CONNECTED:
+                rb->usb_screen();
+                return PLUGIN_USB_CONNECTED;
         }
 
         if (counting)
@@ -176,19 +187,23 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         ticks_to_string(stopwatch,0,32,buf);
         rb->lcd_puts(0, TIMER_Y, buf);
 
-        lap_start = MIN(curr_lap, lap_scroll);
-        lap_start = curr_lap - lap_scroll;
-        for (lap = lap_start; lap > lap_start - LAP_LINES; lap--)
+        if(update_lap)
         {
-            if (lap > 0)
+            lap_start = curr_lap - lap_scroll;
+            for (lap = lap_start; lap > lap_start - LAP_LINES; lap--)
             {
-                ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
-                rb->lcd_puts(0, LAP_Y + lap_start - lap, buf);
+                if (lap > 0)
+                {
+                    ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
+                    rb->lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
+                }
+                else
+                {
+                    rb->lcd_puts(0, LAP_Y + lap_start - lap,
+                                 "                  ");
+                }
             }
-            else
-            {
-                rb->lcd_puts(0, LAP_Y + lap_start - lap, "                  ");
-            }
+            update_lap = false;
         }
 
 #ifdef HAVE_LCD_BITMAP
