@@ -34,7 +34,7 @@ When asked for a password, just press enter:
 <p>For this, you need to:
 
 <ol>
-<li> Have <a href="http://www.openssh.com">SSH</a> installed
+<li> Have <a href="http://www.openssh.com">SSH</a> installed.
 <li> Have a <a href="http://sourceforge.net/account/register.php">SourceForge account</a>
 <li> Be a 
 <a href="http://sourceforge.net/project/memberlist.php?group_id=44306">registered developer</a>
@@ -46,6 +46,9 @@ of the Rockbox project
 
 <p><tt>export CVS_RSH=ssh
 <br>cvs -z3 -d:ext:<b>username</b>@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co firmware</tt>
+
+<p>If you are using WinCVS, the procedure is
+<a href="http://www.wincvs.org/ssh.html">somewhat different</a>.
 
 <h2>Checking in modifications</h2>
 
