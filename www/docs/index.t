@@ -42,6 +42,7 @@ Archos. (Jean Boullier)
 <li> <a href="uisimulator.html">How to compile the uisimulators</a> (linux/cygwin style)
 <li> <a href="http://www.mcintoshfamily.pwp.blueyonder.co.uk/rockbox/buildingInEclipse.htm">How to build and debug Rockbox in the Eclipse IDE</a> 
 <li> <a href="flash.html">How to flash Rockbox on your Archos</a>
+<li> <a href="repairlcd.html">How to repair your broken LCD</a>
 </ul>
 
 <h3>Specs and Papers</h3>
