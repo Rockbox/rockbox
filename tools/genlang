@@ -52,6 +52,8 @@ while(<LANG>) {
         # comment
         next;
     }
+    # get rid of DOS newlines
+    $_ =~ s/\r//g;
     if($_ =~ / *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
   #      print "$var => $value\n";
