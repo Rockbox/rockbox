@@ -20,6 +20,8 @@
 #ifndef _FILE_H_
 #define _FILE_H_
 
+#define MAX_PATH 260
+
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
