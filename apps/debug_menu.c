@@ -32,12 +32,91 @@
 #include "power.h"
 #include "rtc.h"
 #include "debug.h"
+#include "thread.h"
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
 extern int ata_device;
 extern int ata_io_address;
+extern int num_threads;
+extern char *thread_name[];
+
+#ifdef ARCHOS_RECORDER
+/* Test code!!! */
+void dbg_os(void)
+{
+    char buf[32];
+    int button;
+    int i;
+    int usage;
+
+    lcd_clear_display();
+
+    while(1)
+    {
+	lcd_puts(0, 0, "Stack usage:");
+        for(i = 0; i < num_threads;i++)
+        {
+            usage = thread_stack_usage(i);
+	    snprintf(buf, 32, "%s: %d%%", thread_name[i], usage);
+	    lcd_puts(0, 1+i, buf);
+        }
+
+        lcd_update();
+        sleep(HZ/10);
+
+        button = button_get(false);
+
+        switch(button)
+        {
+            case BUTTON_OFF:
+                return;
+        }
+    }
+}
+#else
+void dbg_os(void)
+{
+    char buf[32];
+    int button;
+    int usage;
+    int currval = 0;
+
+    lcd_clear_display();
+
+    while(1)
+    {
+	lcd_puts(0, 0, "Stack usage");
+
+	usage = thread_stack_usage(currval);
+	snprintf(buf, 32, "%d: %d%%  ", currval, usage);
+	lcd_puts(0, 1, buf);
+	
+        sleep(HZ/10);
+
+        button = button_get(false);
+
+        switch(button)
+        {
+            case BUTTON_STOP:
+                return;
+
+	    case BUTTON_LEFT:
+                currval--;
+                if(currval < 0)
+                    currval = num_threads-1;
+                break;
+
+            case BUTTON_RIGHT:
+                currval++;
+                if(currval > num_threads-1)
+                    currval = 0;
+                break;
+        }
+    }
+}
+#endif
 
 #ifdef ARCHOS_RECORDER
 /* Test code!!! */
@@ -267,12 +346,13 @@ void debug_menu(void)
     int m;
 
     struct menu_items items[] = {
-#ifdef HAVE_LCD_BITMAP
         { "Debug ports", dbg_ports },
+#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_RTC
         { "Debug RTC", dbg_rtc },
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
+        { "Debug OS", dbg_os },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
