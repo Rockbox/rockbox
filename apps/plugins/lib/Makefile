@@ -7,42 +7,18 @@
 # $Id$
 #
 
-CC    = sh-elf-gcc
-LD    = sh-elf-ld
-AR    = sh-elf-ar
-AS    = sh-elf-as
-OC    = sh-elf-objcopy
-
-FIRMWARE = ../../../firmware
-
-# Check if this is a kind of Recorder
-ANYREC = $(findstring RECORDER, $(TARGET))
-
-# Check if this is an Ondio model
-ANYONDIO = $(findstring ONDIO, $(TARGET))
-
 # ../.. for the plugin.h in the apps dir
 # .. for stuff in the plugins dir
 # . for stuff in the pluginlib dir
-INCLUDES=-I../.. -I.. -I. -I$(FIRMWARE)/include -I$(FIRMWARE)/export	\
- -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
+INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
 
-ifeq ($(ANYREC), RECORDER)
-INCLUDES += -I../../recorder
+ifdef APPEXTRA
+INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
-ifeq ($(ANYONDIO), ONDIO)
-# use the recorder tree for now
-INCLUDES += -I../../recorder
-endif
-
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
-
-ifndef MEM
-    # if MEM is not set, assume 2MB
-    MEM=2
-endif
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
@@ -51,51 +27,25 @@ CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
 SRC := $(wildcard *.c)
-
+SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
-DEPS:=.deps
-DEPDIRS:=$(DEPS)
-
-DIRS = $(subst $(DEPS),".",$(DEPDIRS))
+DEPFILE = $(OBJDIR)/dep-pluginlib
+DIRS = .
 
 OUTPUT = $(OBJDIR)/libplugin.a
 
-ifndef OBJDIR
-no_configure:
-	@echo "Don't run make here. Run the tools/configure script from your own build"
-	@echo "directory, then run make there."
-	@echo
-	@echo "More help on how to build rockbox can be found here:"
-	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
-endif
-
 all: $(OUTPUT)
-	@echo "lib done"
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
-	@$(AR) ruv $@ $+ >/dev/null
+	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
-$(OBJDIR)/%.o: %.c
-	@mkdir -p `dirname $@`
-	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-tags:
-	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
+include $(TOOLSDIR)/make.inc
 
 clean:
 	@echo "cleaning lib"
-	@rm -f $(OBJS) $(OUTPUT)
-	@rm -rf $(OBJDIR)/$(DEPS)
+	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
-$(OBJDIR)/$(DEPS)/%.d: %.c
-	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
-	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< 2>/dev/null \
-		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
-		[ -s $@ ] || rm -f $@'
+-include $(DEPFILE)
 
-ifdef OBJDIR
- -include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
-endif
 

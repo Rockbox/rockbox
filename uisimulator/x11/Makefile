@@ -17,10 +17,9 @@
 #
 ############################################################################
 
-APPDIR = ../../apps
-RECDIR = $(APPDIR)/recorder
-PLAYDIR = $(APPDIR)/player
-PLUGINDIR = $(APPDIR)/plugins
+RECDIR = $(APPSDIR)/recorder
+PLAYDIR = $(APPSDIR)/player
+PLUGINDIR = $(APPSDIR)/plugins
 SIMCOMMON = ../common
 
 ISONDIO := $(findstring ONDIO, $(TARGET))
@@ -31,17 +30,14 @@ else
      MACHINEDIR = $(RECDIR)
 endif
 
-PREVAPPDIR= ..
-FIRMWAREDIR = ../../firmware
+PREVAPPSDIR= ..
 
 # build some sources from these dirs
-DRIVERS = $(FIRMWAREDIR)/drivers
-COMMON = $(FIRMWAREDIR)/common
+DRIVERS = $(FIRMDIR)/drivers
+COMMON = $(FIRMDIR)/common
 
 # include here:
-EXPORT = $(FIRMWAREDIR)/export
-TOOLSDIR = ../../tools
-DOCSDIR = ../../docs
+EXPORT = $(FIRMDIR)/export
 
 RM = rm -f
 DEBUG = -g
@@ -55,20 +51,16 @@ no_configure:
 	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
 endif
 
-LANGUAGE = english
-
-TARGET = $(OBJDIR)/rockboxui
-
 DEFINES := -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
 $(TARGET) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) 
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(OBJDIR) -I$(PLUGINDIR)/lib
+INCLUDES = -I. -I$(EXPORT) -I$(APPSDIR) -I$(MACHINEDIR) -I$(SIMCOMMON) -I$(OBJDIR) -I$(PLUGINDIR)/lib
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES =  $(INCLUDES)
 
-SRCDIRS = . $(DRIVERS) $(FIRMWAREDIR)/export $(APPDIR) $(MACHINEDIR)
+SRCDIRS = . $(DRIVERS) $(FIRMDIR)/export $(APPSDIR) $(MACHINEDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = $(INCLUDES)
@@ -164,26 +156,26 @@ clean:
 
 ################## Specific dependencies ##################
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
-	perl $(APPDIR)/credits.pl < $< > $@
+	perl $(APPSDIR)/credits.pl < $< > $@
 
 $(OBJDIR)/uisw32-res.o: uisw32.rc
 	$(WINDRES) -i $< -o $@
 
-$(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.raw
+$(OBJDIR)/credits.o: $(APPSDIR)/credits.c $(APPSDIR)/credits.h $(OBJDIR)/credits.raw
 
 $(OBJDIR)/thread.o: ./thread.c
-$(OBJDIR)/plugin.o: $(APPDIR)/plugin.c
-$(OBJDIR)/build.lang: $(APPDIR)/lang/$(LANGUAGE).lang
+$(OBJDIR)/plugin.o: $(APPSDIR)/plugin.c
+$(OBJDIR)/build.lang: $(APPSDIR)/lang/$(LANGUAGE).lang
 	@echo "UPLANG"
-	@perl $(TOOLSDIR)/uplang $(APPDIR)/lang/english.lang $< > $@
+	@perl $(TOOLSDIR)/uplang $(APPSDIR)/lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
 	@echo GENLANG
 	@perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	@echo "CC lang.c"
-	@$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
+	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-$(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
+$(OBJDIR)/sysfont.o: $(FIRMDIR)/fonts/clR6x8.bdf
 	@echo CC $<
 	@$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
 	@$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
@@ -197,7 +189,7 @@ $(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
 	@echo CC $<
 	@$(CC) $(CFLAGS) -DPLUGIN -c $< -o $@
 
-$(OBJDIR)/%.rock: $(APPDIR)/plugins/%.c $(APPDIR)/plugin.h
+$(OBJDIR)/%.rock: $(APPSDIR)/plugins/%.c $(APPSDIR)/plugin.h
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
 	@chmod -x $@
@@ -219,7 +211,7 @@ $(OBJDIR)/%.o: $(DRIVERS)/%.c
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(FIRMWAREDIR)/%.c
+$(OBJDIR)/%.o: $(FIRMDIR)/%.c
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -c $< -o $@
 
@@ -227,7 +219,7 @@ $(OBJDIR)/%.o: $(COMMON)/%.c
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(APPDIR)/%.c
+$(OBJDIR)/%.o: $(APPSDIR)/%.c
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -c $< -o $@
 
@@ -239,7 +231,6 @@ $(DEPS)/%.d: %.c
 		@$(SHELL) -c 'if [ ! -d $(DEPS) ]; then \
 			echo Creating the dependency directory: $(DEPS); \
 			mkdir -p $(DEPS); fi'
-		@echo "Updating Dependencies for $<"
 		@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
 	|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'

@@ -17,6 +17,22 @@ input() {
     echo $response
 }
 
+shcc () {
+ CC=sh-elf-gcc
+ LD=sh-elf-ld
+ AR=sh-elf-ar
+ AS=sh-elf-as
+ OC=sh-elf-objcopy
+}
+
+coldfirecc () {
+ CC=m68k-elf-gcc
+ LD=m68k-elf-ld
+ AR=m68k-elf-ar
+ AS=m68k-elf-as
+ OC=m68k-elf-objcopy
+}
+
 whichsim () {
 
 if [ -z "$simver" ]; then
@@ -56,32 +72,36 @@ sed > Makefile \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
-ARCHOS=@ARCHOS@
-ROOTDIR=@ROOTDIR@
-SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
-TOOLSDIR=\$(ROOTDIR)/tools
-DEBUG=@DEBUG@
-KEYPAD=@KEYPAD@
-THISDIR="@PWD@"
-SIMVER=@SIMVER@
-TARGET=@TARGET@
-LANGUAGE=@LANGUAGE@
-VERSION=\$(shell date +%y%m%d-%H%M)
+export ARCHOS=@ARCHOS@
+export ROOTDIR=@ROOTDIR@
+export FIRMDIR=\$(ROOTDIR)/firmware
+export APPSDIR=\$(ROOTDIR)/apps
+export TOOLSDIR=\$(ROOTDIR)/tools
+export DOCSDIR=\$(ROOTDIR)/docs
+export APPSDIR=@ROOTDIR@/apps
+export SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
+export DEBUG=@DEBUG@
+export KEYPAD=@KEYPAD@
+export OBJDIR=@PWD@
+export SIMVER=@SIMVER@
+export TARGET=@TARGET@
+export LANGUAGE=@LANGUAGE@
+export VERSION=\$(shell date +%y%m%d-%H%M)
 
 .PHONY: 
 
 all: sim
 
 sim:
-	\$(MAKE) -C \$(SIMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE)
+	\$(MAKE) -C \$(SIMDIR)
 
 clean:
-	\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(THISDIR) clean
+	\$(MAKE) -C \$(SIMDIR) clean
 	rm -rf rockbox.zip
 
 tags:
 	@rm -f TAGS
-	make -C \$(SIMDIR) OBJDIR=\$(THISDIR) tags
+	make -C \$(SIMDIR) tags
 
 zip:
 	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" sim\$(TARGET)
@@ -169,139 +189,14 @@ fi
 pwd=`pwd`;
 
 if [ "$target" = "update" ]; then
-  update="1"
-  target=""
-  if [ -f Makefile ]; then
-    if { grep "^## Auto" Makefile >/dev/null 2>&1 ; } then
-      echo "Existing generated Makefile found. Getting defaults from it."
-      archos=`grep "^ARCHOS=" Makefile | cut -d= -f2-`
-      debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
-      language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
-      memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
-      rootdir=`grep "^ROOTDIR=" Makefile | cut -d= -f2-`
-      target=`grep "^TARGET=" Makefile | cut -d= -f2-`
-
-      if [ "$debug" = "SIMULATOR=1" ]; then
-        simulator="yes"
-        keypad=`grep "^KEYPAD=" Makefile | cut -d= -f2-`
-        simver=`grep "^SIMVER=" Makefile | cut -d= -f2-`
-      fi
-    fi
-  fi
+  echo "configure update is unfortunately no longer supported"
+  exit
 else
 
 echo "This script will setup your Rockbox build environment."
 echo "Further docs here: http://rockbox.haxx.se/docs/"
 echo ""
 
-fi
-
-if [ -z "$archos" ]; then
-
-##################################################################
-# Figure out target platform
-#
-
-  echo "Enter target platform: (default is Archos Recorder)"
-
-  echo "1 - Archos Player/Studio"
-  echo "2 - Archos Recorder"
-  echo "3 - Archos FM Recorder"
-  echo "4 - Archos Recorder v2"
-  echo "7 - Archos Ondio SP"
-  echo "8 - Archos Ondio FM"
-  echo "9 - Iriver H100"
-
-  getit=`input`;
-
-  case $getit in
-
-   1)
-    archos="player"
-    target="-DARCHOS_PLAYER"
-    ;;
-
-   3)
-    archos="fmrecorder"
-    target="-DARCHOS_FMRECORDER"
-    ;;
-
-   4)
-    archos="recorderv2"
-    target="-DARCHOS_RECORDERV2"
-    ;;
-
-   7)
-    archos="ondiosp"
-    target="-DARCHOS_ONDIOSP"
-    ;;
-
-   8)
-    archos="ondiofm"
-    target="-DARCHOS_ONDIOFM"
-    ;;
-
-   9)
-    archos="h100"
-    target="-DIRIVER_H100"
-    memory=32 # always
-    ;;
-
-   *)
-    archos="recorder"
-    target="-DARCHOS_RECORDER"
-    ;;
-
-  esac
-
-  echo "Platform set to $archos"
-
-fi
-
-if [ -z "$memory" ]; then
-  size="2"
-  if [ -z "$update" ]; then
-    echo "Enter size of your RAM (in MB): (defaults to 2)"
-    size=`input`;
-  fi
-
-  case $size in
-   8)
-    memory="8"
-    ;;
-   *)
-    memory="2"
-    ;;
-
-  esac
-  echo "Memory size selected: $memory MB"
-fi
-
-if [ -z "$debug" ]; then
-  ##################################################################
-  # Figure out debug on/off
-  #
-  echo "Build (N)ormal, (D)ebug or (S)imulated version? (N)"
-
-  option=`input`;
-
-  case $option in
-    [Ss])
-      debug="SIMULATOR=1"
-      simulator="yes"
-      echo "Simulator build selected"
-      whichsim
-      ;;
-    [Dd])
-      debug="DEBUG=1"
-      echo "Debug build selected"
-      ;;
-    *)
-      debug="NODEBUG=1"
-      echo "Normal build selected"
-      ;;
-
-  esac
 fi
 
 if [ -z "$rootdir" ]; then
@@ -340,6 +235,149 @@ if [ -z "$rootdir" ]; then
   cd $now
 fi
 
+if [ -z "$archos" ]; then
+
+##################################################################
+# Figure out target platform
+#
+
+  echo "Enter target platform: (default is Archos Recorder)"
+
+  echo "1 - Archos Player/Studio"
+  echo "2 - Archos Recorder"
+  echo "3 - Archos FM Recorder"
+  echo "4 - Archos Recorder v2"
+  echo "7 - Archos Ondio SP"
+  echo "8 - Archos Ondio FM"
+  echo "9 - Iriver H100"
+
+  getit=`input`;
+
+  case $getit in
+
+   1)
+    archos="player"
+    target="-DARCHOS_PLAYER"
+    shcc
+    tool="scramble"
+    output="archos.mod"
+    appextra="player"
+    archosrom=""
+    ;;
+
+   *)
+    archos="recorder"
+    target="-DARCHOS_RECORDER"
+    shcc
+    tool="scramble"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom="$pwd/rombox.ucl"
+    ;;
+
+   3)
+    archos="fmrecorder"
+    target="-DARCHOS_FMRECORDER"
+    shcc
+    tool="scramble -fm"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom="$pwd/rombox.ucl"
+    ;;
+
+   4)
+    archos="recorderv2"
+    target="-DARCHOS_RECORDERV2"
+    shcc
+    tool="scramble -v2"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom="$pwd/rombox.ucl"
+    ;;
+
+   7)
+    archos="ondiosp"
+    target="-DARCHOS_ONDIOSP"
+    shcc
+    tool="scramble -osp"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom=""
+    ;;
+
+   8)
+    archos="ondiofm"
+    target="-DARCHOS_ONDIOFM"
+    shcc
+    tool="scramble -ofm"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom=""
+    ;;
+
+   9)
+    archos="h100"
+    target="-DIRIVER_H100"
+    memory=32 # always
+    coldfirecc
+    tool="not-written-yet"
+    output="rockbox.iriver"
+    appextra=""
+    archosrom=""
+    ;;
+
+  esac
+
+  echo "Platform set to $archos"
+
+fi
+
+if [ -z "$memory" ]; then
+  size="2"
+  if [ -z "$update" ]; then
+    echo "Enter size of your RAM (in MB): (defaults to 2)"
+    size=`input`;
+  fi
+
+  case $size in
+   8)
+    memory="8"
+    ;;
+   *)
+    memory="2"
+    ;;
+
+  esac
+  echo "Memory size selected: $memory MB"
+fi
+
+if [ -z "$debug" ]; then
+  ##################################################################
+  # Figure out debug on/off
+  #
+  echo "Build (N)ormal, (D)ebug or (S)imulated version? (N)"
+
+  option=`input`;
+
+  case $option in
+    [Ss])
+      debug="1"
+      simulator="yes"
+      echo "Simulator build selected"
+      whichsim
+      ;;
+    [Dd])
+      debug="1"
+      echo "Debug build selected"
+      ;;
+    *)
+      debug=""
+      echo "Normal build selected"
+      ;;
+
+  esac
+fi
+
 
 if [ -z "$language" ]; then
 
@@ -369,50 +407,57 @@ sed > Makefile \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@PWD@,${pwd},g" \
+ -e "s,@CC@,${CC},g" \
+ -e "s,@LD@,${LD},g" \
+ -e "s,@AR@,${AR},g" \
+ -e "s,@AS@,${AS},g" \
+ -e "s,@OC@,${OC},g" \
+ -e "s,@TOOL@,${tool},g" \
+ -e "s,@OUTPUT@,${output},g" \
+ -e "s,@APPEXTRA@,${appextra},g" \
+ -e "s,@ARCHOSROM@,${archosrom},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
-ROOTDIR=@ROOTDIR@
-FIRMDIR=\$(ROOTDIR)/firmware
-APPSDIR=\$(ROOTDIR)/apps
-TOOLSDIR=\$(ROOTDIR)/tools
-DEBUG=@DEBUG@
-ARCHOS=@ARCHOS@
-TARGET=@TARGET@
-THISDIR="@PWD@"
-LANGUAGE=@LANGUAGE@
-MEMORYSIZE=@MEMORY@
-VERSION=\$(shell date +%y%m%d-%H%M)
+export ROOTDIR=@ROOTDIR@
+export FIRMDIR=\$(ROOTDIR)/firmware
+export APPSDIR=\$(ROOTDIR)/apps
+export TOOLSDIR=\$(ROOTDIR)/tools
+export DOCSDIR=\$(ROOTDIR)/docs
+export DEBUG=@DEBUG@
+export ARCHOS=@ARCHOS@
+export ARCHOSROM=@ARCHOSROM@
+export TARGET=@TARGET@
+export OBJDIR=@PWD@
+export LANGUAGE=@LANGUAGE@
+export MEMORYSIZE=@MEMORY@
+export VERSION=\$(shell date +%y%m%d-%H%M)
+export MKFIRMWARE=\$(TOOLSDIR)/@TOOL@
+export BINARY=@OUTPUT@
+export APPEXTRA=@APPEXTRA@
+export CC=@CC@
+export LD=@LD@
+export AR=@AR@
+export AS=@AS@
+export OC=@OC@
 
-.PHONY: firmware apps
+.PHONY: all clean tags zip
 
-all: firmware apps
-
-firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
-
-apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
-
-clean-firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
-
-clean-apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
+all:
+	@\$(MAKE) -C \$(FIRMDIR)
+	@\$(MAKE) -C \$(APPSDIR)
 
 clean:
-	\$(MAKE) clean-firmware clean-apps
-	rm -f rockbox.zip
-
-tags-firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) tags
-
-tags-apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) tags
+	@\$(MAKE) -C \$(FIRMDIR) clean
+	@\$(MAKE) -C \$(APPSDIR) clean
+	@rm -f rockbox.zip TAGS
 
 tags:
 	@rm -f TAGS
-	\$(MAKE) tags-firmware tags-apps
+	\$(MAKE) -C \$(FIRMDIR) tags
+	\$(MAKE) -C \$(APPSDIR) tags
+	\$(MAKE) -C \$(APPSDIR)/plugins tags
+	\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
 zip:
 	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET)

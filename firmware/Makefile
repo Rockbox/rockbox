@@ -7,20 +7,10 @@
 # $Id$
 #
 
-CC    = sh-elf-gcc
-LD    = sh-elf-ld
-AR    = sh-elf-ar
-AS    = sh-elf-as
-OC    = sh-elf-objcopy
+INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers
 
-INCLUDES=-Iinclude -I. -Iexport -Icommon -Idrivers
-
-CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
-
-ifndef MEM
-    # if MEM is not set, assume 2MB
-    MEM=2
-endif
+CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
@@ -30,61 +20,29 @@ endif
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
 SRC_S := $(wildcard drivers/*.S common/*.S *.S)
-
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(SRC_S:%.S=$(OBJDIR)/%.o)
-DEPS:=.deps
-DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
-
-DIRS = $(subst $(DEPS),".",$(DEPDIRS))
-
+SOURCES = $(SRC) $(SRC_S)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(SRC_S:%.S=$(OBJDIR)/%.o) $(OBJDIR)/sysfont.o
+DIRS:=. drivers common
 OUTPUT = $(OBJDIR)/librockbox.a
-
-ifeq (RECORDER,$(findstring RECORDER, $(CFLAGS)))
-	OBJS +=	$(OBJDIR)/sysfont.o
-endif
-ifeq (ONDIO,$(findstring ONDIO, $(CFLAGS)))
-	OBJS +=	$(OBJDIR)/sysfont.o
-endif
-
-ifndef OBJDIR
-no_configure:
-	@echo "Don't run make here. Run the tools/configure script from your own build"
-	@echo "directory, then run make there."
-	@echo
-	@echo "More help on how to build rockbox can be found here:"
-	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
-endif
-
-ifndef TOOLSDIR
-	TOOLSDIR=../tools
-endif
+DEPFILE = $(OBJDIR)/dep-firmware
 
 all: $(TOOLSDIR)/convbdf $(OUTPUT) $(EXTRA_TARGETS)
+
+dep: $(DEPFILE)
 
 $(TOOLSDIR)/convbdf:
 	$(MAKE) -C $(TOOLSDIR)
 
-$(OUTPUT): $(OBJS)
+$(OUTPUT): $(OBJS) $(DEPFILE)
 	@echo "AR $@"
-	@$(AR) ruv $@ $+ >/dev/null
+	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
-$(OBJDIR)/%.o: %.c
-	@mkdir -p `dirname $@`
-	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/%.o: %.S
-	@mkdir -p `dirname $@`
-	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-tags:
-	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
+include $(TOOLSDIR)/make.inc
 
 clean:
 	@echo "cleaning firmware"
-	@rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c
-	@rm -rf $(OBJDIR)/$(DEPS)
+	@rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c $(DEPFILE)
+	@rm -rf $(OBJDIR)/drivers $(OBJDIR)/common
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c export/thread.h
@@ -97,13 +55,4 @@ $(OBJDIR)/sysfont.o: fonts/clR6x8.bdf
 	@echo "CC sysfont.c"
 	@$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
-$(OBJDIR)/$(DEPS)/%.d: %.c
-	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
-	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< 2>/dev/null \
-		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
-		[ -s $@ ] || rm -f $@'
-
-ifdef OBJDIR
- -include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
-endif
-
+-include $(DEPFILE)

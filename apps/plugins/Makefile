@@ -7,46 +7,27 @@
 # $Id$
 #
 
-CC    = sh-elf-gcc
-OC    = sh-elf-objcopy
-
-FIRMWARE = ../../firmware
-
-# Check if this is a kind of Recorder
-ANYREC = $(findstring RECORDER, $(TARGET))
-
-# Check if this is an Ondio model
-ANYONDIO = $(findstring ONDIO, $(TARGET))
-
-INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common \
--I$(FIRMWARE)/drivers -I.. -Ilib
+INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
+-I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM} -DPLUGIN
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DPLUGIN
 
-ifeq ($(ANYREC), RECORDER)
-INCLUDES += -I../recorder
-endif
-ifeq ($(ANYONDIO), ONDIO)
-# use the recorder tree for now
-INCLUDES += -I../recorder
+ifdef APPEXTRA
+   INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
+DEPFILE = $(OBJDIR)/dep-plugins
 
 SRC := $(wildcard *.c)
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
+SOURCES = $(SRC)
+ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+DIRS = .
 
-ifndef OBJDIR
-no_configure:
-	@echo "Don't run make here. Run the tools/configure script from your own build"
-	@echo "directory, then run make there."
-	@echo
-	@echo "More help on how to build rockbox can be found here:"
-	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
-endif
-
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a $(DEPFILE)
 	@echo "LD $@"
 	@$(CC) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
@@ -54,9 +35,7 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY $<"
 	@$(OC) -O binary $< $@
 
-$(OBJDIR)/%.o: %.c  ../plugin.h Makefile
-	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
+include $(TOOLSDIR)/make.inc
 
 ifeq ($(ANYONDIO), ONDIO)
 all:
@@ -68,15 +47,15 @@ endif
 
 $(OBJDIR)/libplugin.a:
 	@echo "MAKE in lib"
-	@$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
+	@$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
 
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
 	@echo "build $@"
-	@$(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -x c -E -P $< >$@
+	@$(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(DEFINES) -x c -E -P $< >$@
 
 clean:
 	@echo "cleaning plugins"
-	@-rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock
+	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) $(OBJS)
 	@$(MAKE) -C lib clean
