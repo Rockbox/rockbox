@@ -20,6 +20,32 @@
 #include "config.h"
 #include "lcd.h"
 
+#define LCDR (PBDR+1)
+
+/* PA14 : /LCD-BL --- backlight */
+#define LCD_BL 6
+
+#ifdef HAVE_LCD_CHARCELLS
+
+#define LCD_DS  1 // PB0 = 1 --- 0001 ---  LCD-DS
+#define LCD_CS  2 // PB1 = 1 --- 0010 --- /LCD-CS
+#define LCD_SD  4 // PB2 = 1 --- 0100 ---  LCD-SD
+#define LCD_SC  8 // PB3 = 1 --- 1000 ---  LCD-SC
+#ifndef JBP_OLD
+#  define LCD_CONTRAST_SET ((char)0x50)
+#  define LCD_CRAM         ((char)0x80) /* Characters */
+#  define LCD_PRAM         ((char)0xC0) /*  Patterns  */
+#  define LCD_IRAM         ((char)0x40) /*    Icons   */
+#else
+#  define LCD_CONTRAST_SET ((char)0xA8)
+#  define LCD_CRAM         ((char)0xB0) /* Characters */
+#  define LCD_PRAM         ((char)0x80) /*  Patterns  */
+#  define LCD_IRAM         ((char)0xE0) /*    Icons   */
+#endif
+#define LCD_ASCII(c)       (lcd_ascii[(c)&255])
+#define LCD_CURSOR(x,y)    ((char)(LCD_CRAM+((y)*16+(x))))
+#define LCD_ICON(i)        ((char)(LCD_IRAM+i))          
+
 #ifndef SIMULATOR
 /*
  * About /CS,DS,SC,SD
@@ -71,12 +97,11 @@
  /*
   * Enter a LCD session :
   *
-  * QI(LCDR) &= ~(LCD_CS|LCD_DS|LCD_SD|LCD_SC);
+  * LCDR &= ~(LCD_CS|LCD_DS|LCD_SD|LCD_SC);
   */
 static void lcd_start (void)
 {
-    asm
-        ("and.b\t%0,@(r0,gbr)"
+    asm("and.b %0, @(r0,gbr)"
          :
          : /* %0 */ "I"(~(LCD_CS|LCD_DS|LCD_SD|LCD_SC)),
            /* %1 */ "z"(LCDR));
@@ -85,7 +110,7 @@ static void lcd_start (void)
  /*
   * Leave a LCD session :
   *
-  * QI(LCDR) |= LCD_CS|LCD_RS|LCD_SD|LCD_SC;
+  * LCDR |= LCD_CS|LCD_RS|LCD_SD|LCD_SC;
   */
 static void lcd_stop (void)
 {
@@ -96,42 +121,42 @@ static void lcd_stop (void)
            /* %1 */ "z"(LCDR));
 }
 
-static void lcd_byte (int byte,int rs)
+static void lcd_byte (int byte,bool data)
+
  /*
   * char j = 0x80;
   * if (rs)
   *   do
   *     {
-  *       QI(LCDR) &= ~(LCD_SC|LCD_SD);
+  *       LCDR &= ~(LCD_SC|LCD_SD);
   *       if (j & byte)
-  *         QI(LCDR) |= LCD_SD;
-  *       QI(LCDR) |= LCD_SC|LCD_DS;
+  *         LCDR |= LCD_SD;
+  *       LCDR |= LCD_SC|LCD_DS;
   *     }
   *   while ((unsigned char)j >>= 1);
   * else
   *   do
   *     {
-  *       QI(LCDR) &= ~(LCD_SC|LCD_SD|LCD_DS);
+  *       LCDR &= ~(LCD_SC|LCD_SD|LCD_DS);
   *       if (j & byte)
-  *         QI(LCDR) |= LCD_SD;
-  *       QI(LCDR) |= LCD_SC;
+  *         LCDR |= LCD_SD;
+  *       LCDR |= LCD_SC;
   *     }
   *   while ((unsigned char)j >>= 1);
   */
 {
-    if (rs > 0)
-        asm
-            ("shll8\t%0\n"
-             "0:\n\t"
-             "and.b\t%2,@(r0,gbr)\n\t"
-             "shll\t%0\n\t"  
-             "bf\t1f\n\t"
-             "or.b\t%3,@(r0,gbr)\n"
-             "1:\n\t"
-             "or.b\t%4,@(r0,gbr)\n"
-             "add\t#-1,%1\n\t"
-             "cmp/pl\t%1\n\t"
-             "bt\t0b"
+    if (data)
+        asm ("shll8 %0\n"
+             "0:      \n\t"
+             "and.b %2,@(r0,gbr)\n\t"
+             "shll  %0\n\t"  
+             "bf    1f\n\t"
+             "or.b  %3,@(r0,gbr)\n"
+             "1:      \n\t"
+             "or.b  %4,@(r0,gbr)\n"
+             "add   #-1,%1\n\t"
+             "cmp/pl %1\n\t"
+             "bt    0b"
              :
              : /* %0 */ "r"(((unsigned)byte)<<16),
              /* %1 */ "r"(8),
@@ -161,7 +186,7 @@ static void lcd_byte (int byte,int rs)
              /* %5 */ "z"(LCDR));
 }
 
-void lcd_data (int data)
+static void lcd_data (int data)
 {
     lcd_byte (data,1);
 }
@@ -200,30 +225,29 @@ static void lcd_goto (int x,int y)
 
 static void lcd_toggle_backlight (void)
 {
-   PAIOR ^= LCD_BL;
+    PAIOR ^= LCD_BL;
 }
 
 static void lcd_turn_on_backlight (void)
 {
-   PAIOR |= LCD_BL;
+    PAIOR |= LCD_BL;
 }
 
 static void lcd_turn_off_backlight (void)
 {
-   PAIOR &= ~LCD_BL;
+    PAIOR &= ~LCD_BL;
 }
 
 /*** ICONS ***/
-#endif
+#endif /* SIMULATOR */
 
-#ifdef HAVE_LCD_CHARCELLS
-#  ifndef JBP_OLD
+#ifdef HAVE_NEW_CHARCELL_LCD
 
-static char const lcd_ascii[] =
+static char lcd_ascii[] =
 {
-/*****************************************************************************************/
+/*****************************************************************************/
 /*         x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
-/*    ************************************************************************************/
+/*    ************************************************************************/
 /* 0x */ 0x00,0x01,0x02,0x03,0x00,0x00,0x00,0x00,0x04,0x05,0x00,0x00,0x00,0x00,0x00,0x00,
 /* 1x */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 /* 2x */ 0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,
@@ -240,16 +264,15 @@ static char const lcd_ascii[] =
 /* Dx */ 0x44,0x4E,0x4F,0x4F,0x4F,0x4F,0x4F,0x20,0x20,0x55,0x55,0x55,0x55,0x59,0x20,0x20,
 /* Ex */ 0x61,0x61,0x61,0x61,0x61,0x61,0x20,0x63,0x65,0x65,0x65,0x65,0x69,0x69,0x69,0x69,
 /* Fx */ 0x64,0x6E,0x6F,0x6F,0x6F,0x6F,0x6F,0x20,0x20,0x75,0x75,0x75,0x75,0x79,0x79,0x79
-/******/
-  };
+};
 
-#  else
+#else
 
-static char const lcd_ascii[] =
-  {
-/*****************************************************************************************/
+static char lcd_ascii[] =
+{
+/*****************************************************************************/
 /*         x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
-/*    ************************************************************************************/
+/*    ************************************************************************/
 /* 0x */ 0x00,0x01,0x02,0x03,0x00,0x00,0x00,0x00,0x85,0x89,0x00,0x00,0x00,0x00,0x00,0x00,
 /* 1x */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 /* 2x */ 0x24,0x25,0x26,0x37,0x06,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,0x31,0x32,0x33,
@@ -266,18 +289,17 @@ static char const lcd_ascii[] =
 /* Dx */ 0x48,0x52,0x53,0x53,0x53,0x53,0x53,0x24,0x24,0x59,0x59,0x59,0x59,0x5D,0x24,0x24,
 /* Ex */ 0x65,0x65,0x65,0x65,0x65,0x65,0x24,0x67,0x69,0x69,0x69,0x69,0x6D,0x6D,0x6D,0x6D,
 /* Fx */ 0x73,0x72,0x73,0x73,0x73,0x73,0x73,0x24,0x24,0x79,0x79,0x79,0x79,0x7D,0x24,0x7D
-/******/
-  };
+};
 
-#  endif
+#endif
 
-void lcd_puts (char const *string)
+void lcd_puts(int x, int y, char *string)
 {
     while (*string)
         lcd_data (LCD_ASCII(*string++));
 }
 
-void lcd_putns (char const *string,int n)
+void lcd_putns (char *string,int n)
 {
     while (n--)
         lcd_data (LCD_ASCII(*string++));
@@ -288,7 +310,7 @@ void lcd_putc (int character)
     lcd_data (LCD_ASCII(character));
 }
 
-void lcd_pattern (int which,char const *pattern,int count)
+void lcd_pattern (int which,char *pattern,int count)
 {
     lcd_instruction (LCD_PRAM|which);
     lcd_copy ((void *)pattern,count);
@@ -310,8 +332,37 @@ void lcd_puthex (unsigned int value,int digits)
 }
 
 
-/* HAVE_LCD_CHARCELLS */
-#elif defined(HAVE_LCD_BITMAP)
+#elif HAVE_LCD_BITMAP /* not CHARCELLS */
+
+#define LCD_SD  1 // PB0 = 1 --- 0001
+#define LCD_SC  2 // PB1 = 1 --- 0010
+#define LCD_RS  4 // PB2 = 1 --- 0100
+#define LCD_CS  8 // PB3 = 1 --- 1000
+#define LCD_DS LCD_RS
+
+#define LCD_SET_LOWER_COLUMN_ADDRESS              ((char)0x00)
+#define LCD_SET_HIGHER_COLUMN_ADDRESS             ((char)0x10)
+#define LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO ((char)0x20)
+#define LCD_SET_POWER_CONTROL_REGISTER            ((char)0x28)
+#define LCD_SET_DISPLAY_START_LINE                ((char)0x40)
+#define LCD_SET_CONTRAST_CONTROL_REGISTER         ((char)0x81)
+#define LCD_SET_SEGMENT_REMAP                     ((char)0xA0)
+#define LCD_SET_LCD_BIAS                          ((char)0xA2)
+#define LCD_SET_ENTIRE_DISPLAY_OFF                ((char)0xA4)
+#define LCD_SET_ENTIRE_DISPLAY_ON                 ((char)0xA5)
+#define LCD_SET_NORMAL_DISPLAY                    ((char)0xA6)
+#define LCD_SET_REVERSE_DISPLAY                   ((char)0xA7)
+#define LCD_SET_INDICATOR_OFF                     ((char)0xAC)
+#define LCD_SET_INDICATOR_ON                      ((char)0xAD)
+#define LCD_SET_DISPLAY_OFF                       ((char)0xAE)
+#define LCD_SET_DISPLAY_ON                        ((char)0xAF)
+#define LCD_SET_PAGE_ADDRESS                      ((char)0xB0)
+#define LCD_SET_COM_OUTPUT_SCAN_DIRECTION         ((char)0xC0)
+#define LCD_SET_DISPLAY_OFFSET                    ((char)0xD3)
+#define LCD_SET_READ_MODIFY_WRITE_MODE            ((char)0xE0)
+#define LCD_SOFTWARE_RESET                        ((char)0xE2)
+#define LCD_NOP                                   ((char)0xE3)
+#define LCD_SET_END_OF_READ_MODIFY_WRITE_MODE     ((char)0xEE)
 
 /*
  * All bitmaps have this format:
@@ -667,7 +718,6 @@ void lcd_clearpixel(int x, int y)
 {
     CLEAR_PIXEL(x,y);
 }
-
 
 #else
 /* no LCD defined, no code to use */
