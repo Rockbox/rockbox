@@ -1249,10 +1249,10 @@ voice: "Ausblenden bei Stop und Pause"
 new: "Blenden bei Stop/Pause"
 
 id: LANG_SOKOBAN_ON
-desc: how to undo move 
-eng: "[ON] To Undo"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "[ON] = Rückgängig"
+new:
 
 id: LANG_INVERT
 desc: in settings_menu
