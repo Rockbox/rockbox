@@ -28,8 +28,8 @@
 
 #ifdef SIMULATOR
 #include <stdio.h>
-#include <string.h>
 #endif
+#include <string.h>
 
 #define SS_TITLE       "Boxes"
 #define SS_TITLE_FONT  2
