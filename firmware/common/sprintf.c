@@ -43,7 +43,9 @@ static int format(
     char *str;
     char tmpbuf[12], pad;
     int ch, width, val, sign;
+    long lval;
     unsigned int uval;
+    unsigned long ulval;
     bool ok = true;
 
     tmpbuf[sizeof tmpbuf - 1] = '\0';
@@ -99,7 +101,41 @@ static int format(
 		    }
 		    while (uval);
 		    break;
-
+		    
+                case 'l':
+                    ch = *fmt++;
+                    switch(ch) {
+                        case 'x':
+                        case 'X':
+                            ulval = va_arg (ap, long);
+                            do
+                            {
+                                *--str = hexdigit[ulval & 0xf];
+                                ulval >>= 4;
+                            }
+                            while (ulval);
+                            break;
+                        case 'd':
+                            lval = sign = va_arg (ap, long);
+                            if (lval < 0)
+                                lval = -lval;
+                            do
+                            {
+                                *--str = (lval % 10) + '0';
+                                lval /= 10;
+                            }
+                            while (lval > 0);
+                            if (sign < 0)
+                                *--str = '-';
+                            break;
+                            
+                        default:
+                            *--str = 'l';
+                            *--str = ch;
+                    }
+                    
+                    break;
+                    
 		default:
 		    *--str = ch;
 		    break;

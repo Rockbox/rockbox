@@ -23,8 +23,17 @@
 #include <stddef.h>
 #include <stdarg.h>
 
-int snprintf (char *buf, size_t size, const char *fmt, ...);
+#ifdef __GNUC__
+#define ATTRIBUTE_PRINTF(fmt, arg1) __attribute__ ( ( format( printf, fmt, arg1 ) ) )
+#else
+#define ATTRIBUTE_PRINTF(fmt, arg1)
+#endif
+
+int snprintf (char *buf, size_t size, const char *fmt, ...)
+    ATTRIBUTE_PRINTF(3, 4);
+
 int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-int fprintf (int fd, const char *fmt, ...);
+int fprintf (int fd, const char *fmt, ...)
+    ATTRIBUTE_PRINTF(2, 3);
 
 #endif /* __SPRINTF_H__ */
