@@ -391,19 +391,6 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
-<!-- Entry 26 -->
-<tr><td>(26)</td>
-    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
-</tr>
-<tr>
-    <td></td>
-    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
-    <td><a href="jeansebastien.tauth-2.jpg"><img border=0 src="design26b.jpg" width=212 height=300></a></td>
-</tr>
-<tr>
-    <td colspan=3>&nbsp</td>
-</tr>
-
 <!-- Entry 27 -->
 <tr><td>(27)</td>
     <td colspan=2>Jean-S&eacute;bastien Tauth</td>
