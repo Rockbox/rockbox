@@ -65,18 +65,11 @@ int show_logo( void )
 {
 #ifdef HAVE_LCD_BITMAP
     char version[32];
-    unsigned char *ptr=rockbox112x37;
-    int height, i, font_h, font_w;
+    int font_h, font_w;
 
     lcd_clear_display();
 
-    for(i=0; i < 37; i+=8) {
-        /* the bitmap function doesn't work with full-height bitmaps
-           so we "stripe" the logo output */
-        lcd_bitmap(ptr, 0, 10+i, 112, (37-i)>8?8:37-i, false);
-        ptr += 112;
-    }
-    height = 37;
+    lcd_bitmap(rockbox112x37, 0, 10, 112, 37, false);
 
 #if 0
     /*
@@ -85,23 +78,15 @@ int show_logo( void )
      * providing logo.
      */
     unsigned char buffer[112 * 8];
-    int width;
-
-    int i;
-    int eline;
+    int width, height;
 
     int failure;
     failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
 
     debugf("read_bmp_file() returned %d, width %d height %d\n",
            failure, width, height);
-    
-    for(i=0, eline=0; i < height; i+=8, eline++) {
-        /* the bitmap function doesn't work with full-height bitmaps
-           so we "stripe" the logo output */
-        lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
-                   (height-i)>8?8:height-i, false);
-    }
+           
+    lcd_bitmap(&buffer, 0, 10, width, height, false);
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);

@@ -436,15 +436,16 @@ void lcd_putsxy(int x, int y, unsigned char *str)
 }
 
 /*
- * All bitmaps have this format:
- * Bits within a byte are arranged veritcally, LSB at top.
- * Bytes are stored in column-major format, with byte 0 at top left,
- * byte 1 is 2nd from top, etc.  Bytes following left-most column
- * starts 2nd left column, etc.
+ * About Rockbox' internal bitmap format:
  *
- * Note: The HW takes bitmap bytes in row-major order.
+ * A bitmap contains one bit for every pixel that defines if that pixel is
+ * black (1) or white (0). Bits within a byte are arranged vertically, LSB
+ * at top.
+ * The bytes are stored in row-major order, with byte 0 being top left,
+ * byte 1 2nd from left etc. The first row of bytes defines pixel rows
+ * 0..7, the second row defines pixel row 8..15 etc.
  *
- * Memory copy of display bitmap
+ * This is the same as the internal lcd hw format.
  */
 
 /*
@@ -456,77 +457,88 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
-    unsigned char *dst;
-    unsigned char *dst2;
-    unsigned int data, mask, mask2, mask3, mask4;
-    int shift;
+    unsigned char *src_col, *dst, *dst_col;
+    unsigned int data, mask1, mask2, mask3, mask4;
+    int stride, shift;
 
-    if (((unsigned)x >= LCD_WIDTH) || ((unsigned)y >= LCD_HEIGHT))
+    if (((unsigned) x >= LCD_WIDTH) || ((unsigned) y >= LCD_HEIGHT))
         return;
-    if (((unsigned)(x + nx)) >= LCD_WIDTH)
+
+    stride = nx;    /* otherwise right-clipping will destroy the image */
+
+    if (((unsigned) (x + nx)) >= LCD_WIDTH)
         nx = LCD_WIDTH - x;
-    if (((unsigned)(y + ny)) >= LCD_HEIGHT)
-        ny = LCD_HEIGHT - y;      
-
+    if (((unsigned) (y + ny)) >= LCD_HEIGHT)
+        ny = LCD_HEIGHT - y;
+        
+    dst = &lcd_framebuffer[y >> 3][x];
     shift = y & 7;
-    dst2 = &lcd_framebuffer[y/8][x];
-
-    /* short cut for byte aligned match (e.g. standard text) */
-    if (!shift && clear && ny==8)
+    
+    if (!shift && clear)  /* shortcut for byte aligned match with clear */
     {
-        memcpy(dst2, src, nx);
-        return;
+    	while (ny >= 8)   /* all full rows */
+    	{
+    		memcpy(dst, src, nx);
+    		src += stride;
+    		dst += LCD_WIDTH;
+            ny -= 8;
+    	}
+        if (ny == 0)     /* nothing left to do? */
+            return;
+        /* last partial row to do by default routine */
     }
 
     ny += shift;
 
     /* Calculate bit masks */
-    mask4 = ~(0xfe << ((ny-1) & 7));
+    mask4 = ~(0xfe << ((ny-1) & 7));  /* data mask for last partial row */
     if (clear)
     {
-        mask = ~(0xff << shift);
-        mask2 = 0;
-        mask3 = ~mask4;
+        mask1 = ~(0xff << shift); /* clearing of first partial row */
+        mask2 = 0;                /* clearing of intermediate (full) rows */
+        mask3 = ~mask4;           /* clearing of last partial row */
         if (ny <= 8)
-            mask3 |= mask;
+            mask3 |= mask1;
     }
     else
-        mask = mask2 = mask3 = 0xff;
+        mask1 = mask2 = mask3 = 0xff;
 
     /* Loop for each column */
     for (x = 0; x < nx; x++)
     {
-        dst = dst2;
-        dst2++;
+    	src_col = src++;
+    	dst_col = dst++;
         data = 0;
         y = 0;
 
         if (ny > 8)
         {
             /* First partial row */
-            data = *src++ << shift;
-            *dst = (*dst & mask) | data;
+            data = *src_col << shift;
+            *dst_col = (*dst_col & mask1) | data;
+            src_col += stride;
+            dst_col += LCD_WIDTH;
             data >>= 8;
-            dst += LCD_WIDTH;
 
             /* Intermediate rows */
             for (y = 8; y < ny-8; y += 8)
             {
-                data |= *src++ << shift;
-                *dst = (*dst & mask2) | data;
+                data |= *src_col << shift;
+                *dst_col = (*dst_col & mask2) | data;
+                src_col += stride;
+                dst_col += LCD_WIDTH;
                 data >>= 8;
-                dst += LCD_WIDTH;
             }
         }
 
         /* Last partial row */
         if (y + shift < ny)
-            data |= *src++ << shift;
-        *dst = (*dst & mask3) | (data & mask4);
+            data |= *src_col << shift;
+        *dst_col = (*dst_col & mask3) | (data & mask4);
     }
 }
 
-/* 
+/*
  * Draw a rectangle with upper left corner at (x, y)
  * and size (nx, ny)
  */

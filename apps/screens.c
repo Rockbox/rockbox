@@ -84,15 +84,7 @@ void usb_display_info(void)
     lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    /* lcd_bitmap() only supports 16 pixels height! */
-    lcd_bitmap(usb_logo, 6, 16,
-               BMPWIDTH_usb_logo, 8, false);
-    lcd_bitmap(usb_logo+BMPWIDTH_usb_logo, 6, 24,
-               BMPWIDTH_usb_logo, 8, false);
-    lcd_bitmap(usb_logo+BMPWIDTH_usb_logo*2, 6, 32,
-               BMPWIDTH_usb_logo, 8, false);
-    lcd_bitmap(usb_logo+BMPWIDTH_usb_logo*3, 6, 40,
-               BMPWIDTH_usb_logo, 8, false);
+    lcd_bitmap(usb_logo, 6, 16, BMPWIDTH_usb_logo, BMPHEIGHT_usb_logo, false);
     status_draw(true);
     lcd_update();
 #else
@@ -534,7 +526,7 @@ bool quick_screen(int context, int button)
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward],
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
 
         lcd_update();

@@ -300,6 +300,7 @@ static void rotate_font_bits(struct font* pf)
  * Take an bitmap_t bitmap and convert to Rockbox format.
  * Used for converting font glyphs for the time being.
  * Can use for standard X11 and Win32 images as well.
+ * See format description in lcd-recorder.c
  *
  * Doing it this way keeps fonts in standard formats,
  * as well as keeping Rockbox hw bitmap format.
@@ -308,52 +309,44 @@ static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
                     unsigned int height)
 {
     unsigned int i,j;
-    unsigned int dst_col = 0;		/* destination column*/
-    unsigned int dst_shift = 0;		/* destination shift amount*/
-    unsigned int dst_linelen;		/* # bytes per output row*/
     unsigned int src_words;		/* # words of input image*/
-    
-    /* calc bytes per output row*/
-    dst_linelen = (height-1)/8+1;
+    unsigned int dst_mask;      /* bit mask for destination */
+    bitmap_t src_mask;          /* bit mask for source */
 
     /* calc words of input image*/
     src_words = BITMAP_WORDS(width) * height;
 
     /* clear background*/
-    memset(dst, 0, dst_linelen*width);
+    memset(dst, 0, ((height + 7) / 8) * width);
+
+    dst_mask = 1;
 
     for (i=0; i < src_words; i++) {
-        bitmap_t srcmap;	/* current src input bit*/
-        bitmap_t dstmap;	/* current dst output bit*/
-        
+
         /* calc src input bit*/
-        srcmap = 1 << (sizeof(bitmap_t)*8-1);
-
-        /* calc dst output bit*/
-        if (i>0 && (i%8==0)) {
-            ++dst_col;
-            dst_shift = 0;
-        }
-        dstmap = 1 << dst_shift++;
-
+        src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+        
         /* for each input column...*/
         for(j=0; j < width; j++) {
 
-            /* calc input bitmask*/
-            bitmap_t bit = srcmap >> j;
-            if (bit==0) {
-                srcmap = 1 << (sizeof(bitmap_t)*8-1);
-                bit = srcmap >> (j % 16);
-            }
+            /* if set in input, set in rotated output */
+            if (src[i] & src_mask)
+            	dst[j] |= dst_mask;
 
-            /* if set in input, set in rotated output*/
-            if (bit & src[i]) {
-                /* input column j becomes output row*/
-                dst[j*dst_linelen + dst_col] |= dstmap;
+            src_mask >>= 1;    /* next input bit */
+            if (src_mask == 0) /* input word done? */
+            {
+            	src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+            	i++;           /* next input word */
             }
-            /*debugf((bit & src[i])? "*": ".");*/
         }
-        /*debugf("\n");*/
+
+        dst_mask <<= 1;          /* next output bit (row) */
+        if (dst_mask > (1 << 7)) /* output bit > 7? */
+        {
+        	dst_mask = 1;
+        	dst += width;        /* next output byte row */
+        }
     }
 }
 #endif /* HAVE_LCD_BITMAP */

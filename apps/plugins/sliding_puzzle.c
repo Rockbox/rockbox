@@ -24,7 +24,6 @@ static int spots[20];
 static int hole = 19, moves;
 static char s[5];
 static bool pic = true;
-static unsigned char *ptr;
 static unsigned char picture[20][32] = {
     { 0x00, 0x00, 0x00, 0x00, 0x18, 0x38, 0xf8, 0xd9,
       0x10, 0xb0, 0x60, 0xc0, 0x80, 0x00, 0x30, 0x78,
@@ -131,10 +130,7 @@ static unsigned char picture[20][32] = {
 static void draw_spot(int p, int x, int y)
 {
     if (pic || p==20) {
-        ptr = picture[p-1];
-        rb->lcd_bitmap (ptr, x, y, 16, 8, true);
-        ptr += 16;
-        rb->lcd_bitmap (ptr, x, y+8, 16, 8, true);
+        rb->lcd_bitmap (picture[p-1], x, y, 16, 16, true);
     } else {
         rb->lcd_drawrect(x, y, 16, 16);
         rb->lcd_clearrect(x+1, y+1, 14, 14);
