@@ -89,7 +89,7 @@ void mpeg_record(char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable);
-void mpeg_set_recording_gain(int left, int right, int mic);
+void mpeg_set_recording_gain(int left, int right, bool use_mic);
 unsigned long mpeg_recorded_time(void);
 unsigned long mpeg_num_recorded_bytes(void);
 #endif

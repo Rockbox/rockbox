@@ -2142,7 +2142,7 @@ static void init_recording(void)
         mas_writereg(0xa3, 0x90);
     }
 
-    /* Enable the Left A/D Converter */
+    /* Enable A/D Converters */
     mas_codec_writereg(0x0, 0xcccd);
 
     /* Copy left channel to right (mono mode) */
@@ -2925,14 +2925,15 @@ void mpeg_set_recording_options(int frequency, int quality,
     }
 }
 
-void mpeg_set_recording_gain(int left, int right, int mic)
+/* If use_mic is true, the left gain is used */
+void mpeg_set_recording_gain(int left, int right, bool use_mic)
 {
     /* Enable both left and right A/D */
     mas_codec_writereg(0x0,
                        (left << 12) |
                        (right << 8) |
-                       (mic << 4) |
-                       (mic?0x0008:0) | /* Connect left A/D to mic */
+                       (left << 4) |
+                       (use_mic?0x0008:0) | /* Connect left A/D to mic */
                        0x0007);
 }
 
