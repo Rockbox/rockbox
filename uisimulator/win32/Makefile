@@ -59,8 +59,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c backlight.c usb.c \
-        mpeg.c powermgmt.c
+FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c usb.c \
+        mpeg.c powermgmt.c stubs.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c status.c
@@ -72,7 +72,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 endif
 
 SRCS = button.c dir-win32.c lcd-win32.c panic-win32.c thread-win32.c \
-	debug-win32.c kernel.c string-win32.c uisw32.c \
+	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
 	$(APPS) $(MENUS) $(FIRMSRCS) strtok.c
 
 OBJS := $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
@@ -188,9 +188,8 @@ $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 $(OBJDIR)/strtok.o: $(COMMON)/strtok.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/backlight.o: $(FIRMWAREDIR)/backlight.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
-
+$(OBJDIR)/stubs.o: ../common/stubs.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
 
