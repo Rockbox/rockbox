@@ -58,11 +58,13 @@
 #include "sprintf.h"
 #include "keyboard.h"
 #include "version.h"
-
+#ifdef HAVE_MAS3507D
+#include "dac.h"
+#endif
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
-#define CONFIG_BLOCK_VERSION 7
+#define CONFIG_BLOCK_VERSION 8
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -134,6 +136,7 @@ Rest of config block, only saved to disk:
 0xAE  fade on pause/unpause/stop setting (bit 0)
       caption backlight (bit 1)
       car adapter mode (bit 2)
+      line_in (Player only)  (bit 3)
 0xAF  [available/unused]
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
@@ -405,7 +408,8 @@ int settings_save( void )
     config_block[0xae] = (unsigned char)
         ((global_settings.fade_on_stop & 1) |
          ((global_settings.caption_backlight & 1) << 1) |
-         ((global_settings.car_adapter_mode  & 1) << 2));
+         ((global_settings.car_adapter_mode  & 1) << 2) |
+         ((global_settings.line_in & 1) << 3));
     config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
         (global_settings.peak_meter_performance ? 0x80 : 0);
     config_block[0xb1] = global_settings.peak_meter_release |
@@ -490,7 +494,9 @@ void settings_apply(void)
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
-
+#ifdef HAVE_MAS3507D
+    dac_line_in(global_settings.line_in);
+#endif
 #ifdef HAVE_ATA_POWER_OFF
     ata_poweroff(global_settings.disk_poweroff);
 #endif
@@ -690,6 +696,7 @@ void settings_load(void)
             global_settings.fade_on_stop = config_block[0xae] & 1;
             global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
             global_settings.car_adapter_mode  = (config_block[0xae] >> 2) & 1;
+            global_settings.line_in = (config_block[0xae] >> 3) & 1;
         }
 
         if(config_block[0xb0] != 0xff) {
@@ -1059,6 +1066,12 @@ bool settings_load_config(char* file)
                                       "9","10","15","30","45","60"};
             set_cfg_option(&global_settings.poweroff, value, options, 15);
         }
+#ifdef HAVE_MAS3507D
+        else if (!strcasecmp(name, "line in")){
+            set_cfg_bool(&global_settings.line_in, value);
+	    dac_line_in(global_settings.line_in);
+	}
+#endif
         else if (!strcasecmp(name, "battery capacity"))
             set_cfg_int(&global_settings.battery_capacity, value,
                         1500, BATTERY_CAPACITY_MAX);
@@ -1341,6 +1354,10 @@ bool settings_save_config(void)
     fprintf(fd, "car adapter mode: %s\r\n",
             boolopt[global_settings.car_adapter_mode]);
 
+#ifdef HAVE_MAS3507D
+    fprintf(fd, "line in: %s\r\n", boolopt[global_settings.line_in]);
+#endif
+
 #ifdef HAVE_MAS3587F
     fprintf(fd, "#\r\n# Recording\r\n#\r\n");
     fprintf(fd, "rec quality: %d\r\n", global_settings.rec_quality);
@@ -1472,6 +1489,7 @@ void settings_reset(void) {
     global_settings.max_files_in_playlist = 10000;
     global_settings.show_icons = true;
     global_settings.recursive_dir_insert = RECURSE_OFF;
+    global_settings.line_in = false;
 }
 
 bool set_bool(char* string, bool* variable )

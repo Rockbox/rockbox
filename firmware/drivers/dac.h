@@ -36,8 +36,9 @@
 #define DAC_AVOL        2
 #define DAC_GCFG        3
 
-extern int dac_volume(unsigned int left, unsigned int right, bool deemph);
-extern int dac_config(int value);
+extern int  dac_volume(unsigned int left, unsigned int right, bool deemph);
+extern void dac_enable(bool enable);
+extern void dac_line_in(bool enable);
 extern void dac_init(void);
 
 #endif

@@ -43,6 +43,9 @@
 #include "peakmeter.h"
 #endif
 #include "lang.h"
+#ifdef HAVE_MAS3507D
+#include "dac.h"
+#endif
 
 static bool car_adapter_mode(void)
 {
@@ -630,6 +633,15 @@ static bool spindown(void)
                    ata_spindown, 1, 3, 254 );
 }
 
+#ifdef HAVE_MAS3507D
+static bool line_in(void)
+{
+    bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
+    dac_line_in(global_settings.line_in);
+    return rc;
+}
+#endif
+
 #ifdef HAVE_ATA_POWER_OFF
 static bool poweroff(void)
 {
@@ -893,6 +905,9 @@ static bool system_settings_menu(void)
 
     struct menu_items items[] = {
         { str(LANG_SPINDOWN),    spindown        },
+#ifdef HAVE_MAS3507D
+        { str(LANG_LINE_IN),     line_in         },
+#endif
 #ifdef HAVE_ATA_POWER_OFF
         { str(LANG_POWEROFF),    poweroff        },
 #endif

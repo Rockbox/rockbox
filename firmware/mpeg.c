@@ -3212,7 +3212,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     mas_poll_start(1);
 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
-    dac_config(0x04); /* DAC on, all else off */
+    dac_enable(true);
 
     mpeg_sound_channel_config(channel_config);
 #endif

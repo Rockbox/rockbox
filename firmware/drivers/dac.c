@@ -24,6 +24,10 @@
 
 #ifdef HAVE_DAC3550A
 
+static bool line_in_enabled = false;
+static bool dac_enabled = false;
+
+
 int dac_volume(unsigned int left, unsigned int right, bool deemph)
 {
     int ret = 0;
@@ -54,12 +58,16 @@ int dac_volume(unsigned int left, unsigned int right, bool deemph)
 ** Bit6:  0 = 3V        1 = 5V
 ** Bit5:  0 = normal    1 = low power
 ** Bit4:  0 = AUX2 off  1 = AUX2 on
-** Bit3:  0 = AUX1 off  1 = AUX2 on
+** Bit3:  0 = AUX1 off  1 = AUX1 on
 ** Bit2:  0 = DAC off   1 = DAC on
 ** Bit1:  0 = stereo    1 = mono
 ** Bit0:  0 = normal right amp   1 = inverted right amp
 ******************************************************************/
-int dac_config(int value)
+/* dac_config is called once to initialize it. we will apply
+   our static settings because of the init flow.
+   dac_init -> dac_line_in -> mpeg_init -> dac_config
+*/
+static int dac_config(void)
 {
     int ret = 0;
     unsigned char buf[2];
@@ -67,7 +75,8 @@ int dac_config(int value)
     i2c_begin();
 
     buf[0] = DAC_REG_WRITE | DAC_GCFG;
-    buf[1] = value;
+    buf[1] = (dac_enabled ? 0x04 : 0) |
+        (line_in_enabled ? 0x08 : 0);
 
     /* send write command */
     if (i2c_write(DAC_DEV_WRITE,buf,2))
@@ -77,6 +86,18 @@ int dac_config(int value)
 
     i2c_end();
     return ret;
+}
+
+void dac_enable(bool enable)
+{
+    dac_enabled = enable;
+    dac_config();
+}
+
+void dac_line_in(bool enable)
+{
+    line_in_enabled = enable;
+    dac_config();
 }
 
 void dac_init(void)

@@ -171,6 +171,8 @@ struct user_settings
     int max_files_in_playlist; /* Max entries in playlist */
     bool show_icons;   /* 0=hide 1=show */
     int recursive_dir_insert; /* should directories be inserted recursively */
+
+    bool   line_in;       /* false=off, true=active */
 };
 
 enum optiontype { INT, BOOL };

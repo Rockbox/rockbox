@@ -1762,3 +1762,8 @@ id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 new: 
+
+id: LANG_LINE_IN
+desc:  in settings_menu
+eng: "Line In"
+new:
