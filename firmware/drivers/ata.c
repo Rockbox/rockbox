@@ -1000,8 +1000,6 @@ int ata_init(void)
         if (rc)
             return -60 + rc;
 
-        ata_standby(0);
-        
         queue_init(&ata_queue);
 
         last_disk_activity = current_tick;
