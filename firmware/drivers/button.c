@@ -34,6 +34,7 @@
 struct event_queue button_queue;
 
 long last_keypress;
+static int lastbtn;
 #ifdef HAVE_RECORDER_KEYPAD
 static bool flipped; /* bottons can be flipped to match the LCD flip */
 #endif
@@ -59,7 +60,6 @@ static void button_tick(void)
 {
     static int tick = 0;
     static int count = 0;
-    static int lastbtn = 0;
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
     static bool repeat = false;
@@ -214,19 +214,10 @@ void button_init()
     PBIOR &= ~(PBDR_BTN_ON|PBDR_BTN_OFF); /* Inputs */
 #endif
     queue_init(&button_queue);
+    lastbtn = 0;
     tick_add_task(button_tick);
     last_keypress = current_tick;
     flipped = false;
-}
-
-
-/*
- * set the flip attribute
- * better only call this when the queue is empty
- */
-void button_set_flip(bool flip)
-{
-    flipped = flip;
 }
 
 
@@ -257,6 +248,23 @@ static int button_flip(int button)
 
     return newbutton;
 }
+
+
+/*
+ * set the flip attribute
+ * better only call this when the queue is empty
+ */
+void button_set_flip(bool flip)
+{
+    if (flip != flipped) /* not the curent setting */
+    {
+        cli(); /* avoid race condition with the button_tick() */
+        lastbtn = button_flip(lastbtn); 
+        flipped = flip;
+        sti();
+    }
+}
+
 
 /*
  * Get button pressed from hardware
@@ -347,6 +355,7 @@ void button_init(void)
     /* set port pins as input */
     PAIOR &= ~0x820;
     queue_init(&button_queue);
+    lastbtn = 0;
     tick_add_task(button_tick);
 
     last_keypress = current_tick;
@@ -383,6 +392,7 @@ void button_init(void)
     PAIOR &= ~0x4000;  //PA14 for stop button
 
     queue_init(&button_queue);
+    lastbtn = 0;
     tick_add_task(button_tick);
 
     last_keypress = current_tick;
