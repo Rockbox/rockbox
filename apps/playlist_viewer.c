@@ -730,6 +730,7 @@ bool playlist_viewer(void)
                 update = true;
                 break;
 
+#ifdef BUTTON_ON
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
@@ -753,6 +754,7 @@ bool playlist_viewer(void)
                 scroll_display(viewer.num_display_lines);
                 update = true;
                 break;
+#endif /* BUTTON_ON */
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_RIGHT:
@@ -784,6 +786,7 @@ bool playlist_viewer(void)
                 update = true;
                 break;
 
+#ifdef BUTTON_ON
             case BUTTON_ON | BUTTON_PLAY:
             {
                 /* ON+PLAY menu */
@@ -808,6 +811,7 @@ bool playlist_viewer(void)
                 update = true;
                 break;
             }
+#endif /* BUTTON_ON */
             case SYS_USB_CONNECTED:
                 usb_screen();
                 return true;
