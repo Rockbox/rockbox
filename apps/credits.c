@@ -48,6 +48,7 @@ struct credit credits[] = {
     { "Robert Hak",              "Code, FAQ, Sarcasm"                },
     { "Dave Chapman",            "Code"                              },
     { "Stefan Meyer",            "Code"                              },
+	{ "Eric Linenberg",          "Sokoban"                           },
 };
 
 #ifdef HAVE_LCD_BITMAP
