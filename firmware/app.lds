@@ -3,6 +3,8 @@
 ENTRY(start)
 #if CONFIG_CPU == MCF5249
 OUTPUT_FORMAT(elf32-m68k)
+#elif CONFIG_CPU == TCC730
+OUTPUT_FORMAT(elf32-calmrisc16)
 #else
 OUTPUT_FORMAT(elf32-sh)
 #endif
