@@ -82,7 +82,7 @@ offset  abs
 0x07    0x1b    <treble byte>
 0x08    0x1c    <loudness byte>
 0x09    0x1d    <bass boost byte>
-0x0a    0x1e    <contrast byte>
+0x0a    0x1e    <contrast (bit 0-5), invert bit (bit 6)>
 0x0b    0x1f    <backlight_on_when_charging, backlight_timeout>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
@@ -297,7 +297,9 @@ int settings_save( void )
     config_block[0x8] = (unsigned char)global_settings.loudness;
     config_block[0x9] = (unsigned char)global_settings.bass_boost;
     
-    config_block[0xa] = (unsigned char)global_settings.contrast;
+    config_block[0xa] = (unsigned char)
+      ((global_settings.contrast & 0x3f) |
+       (global_settings.invert ? 0x40 : 0));
 
     config_block[0xb] = (unsigned char)
         ((global_settings.backlight_on_when_charging?0x40:0) |
@@ -482,6 +484,7 @@ void settings_apply(void)
     set_battery_capacity(global_settings.battery_capacity);
 
 #ifdef HAVE_LCD_BITMAP
+    lcd_set_invert_display(global_settings.invert);
     settings_apply_pm_range();
     peak_meter_init_times(
         global_settings.peak_meter_release, global_settings.peak_meter_hold, 
@@ -550,7 +553,9 @@ void settings_load(void)
             global_settings.bass_boost = config_block[0x9];
     
         if (config_block[0xa] != 0xFF) {
-            global_settings.contrast = config_block[0xa];
+            global_settings.contrast = config_block[0xa] & 0x3f;
+            global_settings.invert =
+                config_block[0xa] & 0x40 ? true : false;
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
                 global_settings.contrast = DEFAULT_CONTRAST_SETTING;
         }
@@ -1066,6 +1071,7 @@ void settings_reset(void) {
     global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
+    global_settings.invert      = DEFAULT_INVERT_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
     global_settings.backlight_on_when_charging   = 
@@ -1132,8 +1138,9 @@ void settings_display(void)
             global_settings.loudness,
             global_settings.bass_boost );
 
-    DEBUGF( "contrast:\t%d\npoweroff:\t%d\nbacklight_timeout:\t%d\n",
+    DEBUGF( "contrast:\t%d\ninvert:\t%d\npoweroff:\t%d\nbacklight_timeout:\t%d\n",
             global_settings.contrast,
+            global_settings.invert,
             global_settings.poweroff,
             global_settings.backlight_timeout );
 #endif

@@ -77,7 +77,8 @@ struct user_settings
     
     /* device settings */
 
-    int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
+    int contrast;   /* lcd contrast:          0-63 0=low 63=high            */
+    bool invert;    /* invert display */
     int poweroff;   /* power off timer */
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
@@ -189,6 +190,7 @@ extern char rockboxdir[];
 #define DEFAULT_CONTRAST_SETTING    38
 #endif
 #define MIN_CONTRAST_SETTING        5
+#define DEFAULT_INVERT_SETTING    false
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_TIMEOUT_SETTING   5
 #define DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING   0

@@ -51,6 +51,15 @@ static bool contrast(void)
 
 #ifdef HAVE_LCD_BITMAP
 
+static bool invert(void)
+{
+    char* names[] = { str(LANG_SET_BOOL_NO), 
+                      str(LANG_SET_BOOL_YES) };
+
+    return set_option( str(LANG_INVERT), &global_settings.invert,
+                       names, 2, lcd_set_invert_display );
+}
+
 /**
  * Menu to configure the battery display on status bar
  */
@@ -724,6 +733,7 @@ static bool display_settings_menu(void)
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
+        { str(LANG_INVERT),          invert },
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },

@@ -194,6 +194,14 @@ void lcd_set_contrast(int val)
     lcd_write(true, val);
 }
 
+void lcd_set_invert_display(bool yesno)
+{
+    if (yesno) 
+        lcd_write(true, LCD_SET_REVERSE_DISPLAY);
+    else 
+        lcd_write(true, LCD_SET_NORMAL_DISPLAY);
+}
+
 /**
  * Rolls up the lcd display by the specified amount of lines.
  * Lines that are rolled out over the top of the screen are

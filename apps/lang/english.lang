@@ -1404,3 +1404,8 @@ id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
 new:
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "Invert"
+new:

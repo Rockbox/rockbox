@@ -122,7 +122,7 @@ extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 extern void lcd_invertpixel(int x, int y);
 extern void lcd_roll(int pixels);
-
+extern void lcd_set_invert_display(bool yesno);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 extern void lcd_setfont(int font);
