@@ -549,3 +549,120 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
     }
     lcd_stop_scroll();
 }
+
+#ifdef HAVE_RTC
+#define INDEX_X 0
+#define INDEX_Y 1
+char *dayname[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+char cursor[][2]={{9, 1}, {12, 1}, {15, 1}, {9, 2}, {12, 2}, {15, 2}};
+char daysinmonth[]={31,28,31,30,31,30,31,31,30,31,30,31};
+
+void set_time(char* string, int timedate[])
+{
+    bool done = false;
+    int button;
+    int min=0,steps=0;
+    int cursorpos=0;
+    int lastcursorpos=!cursorpos;
+    unsigned char buffer[19];
+    int realyear;
+    int julianday;
+    int i;
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,string);
+
+    while ( !done ) {
+        /* calculate the number of days in febuary */
+        realyear=timedate[5]+2000;
+        if((realyear%4==0 && !(realyear%100 == 0)) || realyear%400 == 0) /* for february depends on year */
+            daysinmonth[1]=29;
+        else
+            daysinmonth[1]=28;
+
+        /* fix day if month or year changed */
+        timedate[3]=timedate[3]<daysinmonth[timedate[4]-1]?timedate[3]:daysinmonth[timedate[4]-1];
+
+        /* calculate day of week */
+        julianday=0;
+        for(i=0;i<timedate[4]-1;i++) {
+           julianday+=daysinmonth[i];
+        }
+        julianday+=timedate[3];
+        timedate[6]=(realyear+julianday+(realyear-1)/4-(realyear-1)/100+(realyear-1)/400+7-1)%7;
+
+        snprintf(buffer, sizeof(buffer), "Time     %02d:%02d:%02d",
+                 timedate[0],
+                 timedate[1],
+                 timedate[2]);
+        lcd_puts(0,1,buffer);
+
+        snprintf(buffer, sizeof(buffer), "Date %s %02d.%02d.%02d",
+                 dayname[timedate[6]],
+                 timedate[3],
+                 timedate[4],
+                 timedate[5]);
+        lcd_puts(0,2,buffer);
+        lcd_invertrect(cursor[cursorpos][INDEX_X]*6,cursor[cursorpos][INDEX_Y]*8,12,8);
+        lcd_puts(0,4,"ON  to set");
+        lcd_puts(0,5,"OFF to revert");
+        lcd_update();
+
+        /* calculate the minimum and maximum for the number under cursor */
+        if(cursorpos!=lastcursorpos) {
+            lastcursorpos=cursorpos;
+            switch(cursorpos) {
+                case 0: /* hour */
+                    min=0;
+                    steps=24;
+                    break;
+                case 1: /* minute */
+                case 2: /* second */
+                    min=0;
+                    steps=60;
+                    break;
+                case 3: /* day */
+                    min=1;
+                    steps=daysinmonth[timedate[4]-1];
+                    break;
+                case 4: /* month */
+                    min=1;
+                    steps=12;
+                    break;
+                case 5: /* year */
+                    min=0;
+                    steps=100;
+                    break;
+            }
+        }
+
+        button = button_get(true);
+        switch ( button ) {
+            case BUTTON_LEFT:
+                cursorpos=(cursorpos+6-1)%6;
+                break;
+            case BUTTON_RIGHT:
+                cursorpos=(cursorpos+6+1)%6;
+                break;
+            case BUTTON_UP:
+                timedate[cursorpos]=(timedate[cursorpos]+steps-min+1)%steps+min;
+                if(timedate[cursorpos] == 0) timedate[cursorpos]+=min;
+                break;
+            case BUTTON_DOWN:
+                timedate[cursorpos]=(timedate[cursorpos]+steps-min-1)%steps+min;
+                if(timedate[cursorpos] == 0) timedate[cursorpos]+=min;
+                break;
+            case BUTTON_ON:
+                done=true;
+                if (timedate[6] == 0) timedate[6]=7; /* rtc needs 1 .. 7 */
+                break;
+            case BUTTON_OFF:
+                done=true;
+                timedate[0]=-1;
+                break;
+            default:
+                break;
+        }
+    }
+}
+#endif

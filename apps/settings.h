@@ -86,6 +86,7 @@ void set_int(char* string,
              int step,
              int min,
              int max );
+void set_time(char* string, int timedate[]);
 
 /* global settings */
 extern struct user_settings global_settings;

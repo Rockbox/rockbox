@@ -33,6 +33,7 @@
 #include "backlight.h"
 #include "playlist.h"  /* for playlist_shuffle */
 #include "powermgmt.h"
+#include "rtc.h"
 
 static void shuffle(void)
 {
@@ -83,6 +84,47 @@ static void statusbar(void)
 }
 #endif
 
+#ifdef HAVE_RTC
+static void timedate_set(void)
+{
+    int timedate[7]; /* hour,minute,second,day,month,year,dayofweek */
+
+
+    timedate[0] = rtc_read(0x03); /* hour   */
+    timedate[1] = rtc_read(0x02); /* minute */
+    timedate[2] = rtc_read(0x01); /* second */
+    timedate[3] = rtc_read(0x05); /* day    */
+    timedate[4] = rtc_read(0x06); /* month  */
+    timedate[5] = rtc_read(0x07); /* year   */
+    /* day of week not read, calculated */
+    timedate[0] = ((timedate[0] & 0x70) >> 4) * 10 + (timedate[0] & 0x0f); /* hour   */
+    timedate[1] = ((timedate[1] & 0xf0) >> 4) * 10 + (timedate[1] & 0x0f); /* minute */
+    timedate[2] = ((timedate[2] & 0x30) >> 4) * 10 + (timedate[2] & 0x0f); /* second */
+    timedate[3] = ((timedate[3] & 0x30) >> 4) * 10 + (timedate[3] & 0x0f); /* day    */
+    timedate[4] = ((timedate[4] & 0x30) >> 4) * 10 + (timedate[4] & 0x0f); /* month  */
+    timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f); /* year   */
+
+    set_time("[Set time/date]",timedate);
+
+    if(timedate[0] != -1) {
+        timedate[0] = ((timedate[0]/10) << 4 | timedate[0]%10) & 0x3f; /* hour   */
+        timedate[1] = ((timedate[1]/10) << 4 | timedate[1]%10) & 0x7f; /* minute */
+        timedate[2] = ((timedate[2]/10) << 4 | timedate[2]%10) & 0x7f; /* second */
+        timedate[3] = ((timedate[3]/10) << 4 | timedate[3]%10) & 0x3f; /* day    */
+        timedate[4] = ((timedate[4]/10) << 4 | timedate[4]%10) & 0x1f; /* month  */
+        timedate[5] = ((timedate[5]/10) << 4 | timedate[5]%10) & 0xff; /* year   */
+        rtc_write(0x03, timedate[0] | (rtc_read(0x03) & 0xc0));  /* hour               */
+        rtc_write(0x02, timedate[1] | (rtc_read(0x02) & 0x80));  /* minute             */
+        rtc_write(0x01, timedate[2] | (rtc_read(0x01) & 0x80));  /* second             */
+        rtc_write(0x05, timedate[3] | (rtc_read(0x05) & 0xc0));  /* day                */
+        rtc_write(0x06, timedate[4] | (rtc_read(0x06) & 0xe0));  /* month              */
+        rtc_write(0x07, timedate[5]);                            /* year               */
+        rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0x07));  /* dayofweek          */
+        rtc_write(0x00, 0x00);                                   /* 0.1 + 0.01 seconds */
+    }
+}
+#endif
+
 void settings_menu(void)
 {
     int m;
@@ -98,6 +140,9 @@ void settings_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "Status bar",      statusbar       },
+#endif
+#ifdef HAVE_RTC
+        { "Time/Date",       timedate_set    },
 #endif
     };
     bool old_shuffle = global_settings.playlist_shuffle;
