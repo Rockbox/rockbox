@@ -43,9 +43,11 @@
 #include "lang.h"
 #include "keyboard.h"
 
-#ifdef LITTLE_ENDIAN
-#include <netinet/in.h>
-#define BE32(_x_) htonl(_x_)
+#if defined(LITTLE_ENDIAN) || defined(_X86_)
+#define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
+                   ((_x_ & 0x00ff0000) >> 8) | \
+                   ((_x_ & 0x0000ff00) << 8) | \
+                   ((_x_ & 0x000000ff) << 24))
 #else
 #define BE32(_x_) _x_
 #endif
