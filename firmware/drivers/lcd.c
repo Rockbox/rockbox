@@ -504,7 +504,7 @@ int lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 
     while((ch = *str++)) {
         /* Limit to char generation table */
-        if ((ch < ASCII_MIN) || (ch > 0xda))
+        if (ch < ASCII_MIN)
             /* replace unsupported letters with question marks */
             ch = ' '-ASCII_MIN;
         else
@@ -526,10 +526,10 @@ int lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
  * Put a string at specified bit position
  */
 
-void lcd_putspropxy(int x, int y, char *str, int thisfont)
+void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
 {
-    int ch;
-    int nx = char_dw_8x8_prop[(int)*str][8] >> 4;
+    unsigned int ch;
+    int nx;
     int ny=8;
     unsigned char *src;
     int lcd_x = x;
@@ -537,26 +537,24 @@ void lcd_putspropxy(int x, int y, char *str, int thisfont)
 
     (void)thisfont;
 
-    while (((ch = *str++) != '\0') && (lcd_x + nx < LCD_WIDTH))
+    while (((ch = *str++) != '\0'))
     {
-        if (lcd_y + ny > LCD_HEIGHT)
-            return;
-
         /* Limit to char generation table */
-        if ((ch < ASCII_MIN) || (ch > 0xda))
+        if (ch < ASCII_MIN)
             /* replace unsupported letters with question marks */
             ch = ' '-ASCII_MIN;
         else
             ch -= ASCII_MIN;
         
-        src = char_dw_8x8_prop[ch];
-
         nx = char_dw_8x8_prop[ch][8] >> 4;
-        
+
+        if(lcd_x + nx > LCD_WIDTH)
+            break;
+
+        src = char_dw_8x8_prop[ch];
         lcd_bitmap (src, lcd_x, lcd_y, nx, ny, true);
 
         lcd_x += nx+1;
-
     }
 }
 
@@ -933,10 +931,10 @@ void lcd_puts_scroll(int x, int y, char* string )
     ch[0] = string[0];
     width = 0;
     for (s->space = 0;
-         string[(int)s->space] &&
+         ch[0] &&
              (width + lcd_getstringsize(ch, 0, &w, &h) < (LCD_WIDTH - x*8));
          ) {
-        width += lcd_getstringsize(ch, 0, &w, &h);
+        width += w;
         ch[0]=string[(int)++s->space];
     }
 #endif
