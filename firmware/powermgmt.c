@@ -25,6 +25,7 @@
 #include "panic.h"
 #include "adc.h"
 #include "string.h"
+#include "sprintf.h"
 #include "power.h"
 #include "powermgmt.h"
 
