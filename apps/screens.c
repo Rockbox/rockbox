@@ -572,10 +572,9 @@ bool f3_screen(void)
         int w,h;
         char* ptr;
 
-        ptr = str(LANG_F3_STATUS);
-        lcd_getstringsize(ptr,&w,&h);
         lcd_clear_display();
 
+        /* Scrollbar */
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
         lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
         lcd_putsxy(0, LCD_HEIGHT/2, 
@@ -583,6 +582,9 @@ bool f3_screen(void)
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
+        /* Status bar */
+        ptr = str(LANG_F3_STATUS);
+        lcd_getstringsize(ptr,&w,&h);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
@@ -590,11 +592,14 @@ bool f3_screen(void)
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        /* Invert */
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_INVERT));
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, 
-                   global_settings.invert ?
-                   str(LANG_INVERT_LCD_INVERSE) : str(LANG_INVERT_LCD_NORMAL));
+        /* Flip */
+        ptr = str(LANG_FLIP_DISPLAY);
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_FLIP_DISPLAY));
+        ptr = global_settings.flip_display ?
+                   str(LANG_SET_BOOL_YES) : str(LANG_SET_BOOL_NO);
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
@@ -615,8 +620,12 @@ bool f3_screen(void)
 
             case BUTTON_DOWN:
             case BUTTON_F3 | BUTTON_DOWN:
-                global_settings.invert = !global_settings.invert;
-                lcd_set_invert_display(global_settings.invert);
+            case BUTTON_UP: /* allow "up" as well, more tolerant if tilted */
+            case BUTTON_F3 | BUTTON_UP:
+                global_settings.flip_display = !global_settings.flip_display;
+                button_set_flip(global_settings.flip_display);
+                lcd_set_flip(global_settings.flip_display);
+                //lcd_update(); /* need to refresh */
                 used = true;
                 break;
 
