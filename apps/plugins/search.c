@@ -40,6 +40,16 @@ static int line_end;   /* Index of the end of line */
 char resultfile[MAX_PATH];
 char path[MAX_PATH];
 
+static int strpcasecmp(const char *s1, const char *s2) 	 
+{ 	 
+    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) { 	 
+        s1++; 	 
+        s2++; 	 
+    } 	 
+    
+    return (*s1 == '\0') ; 	 
+}
+
 static void fill_buffer(int pos)
 {
     int numread;
@@ -84,11 +94,12 @@ static void fill_buffer(int pos)
             default:
 	    	if (!found && tolower(buffer[i]) == tolower(search_string[0]))
 		{
-                    found = rb->strcasecmp(&search_string[0],&buffer[i]) ;
+                    found = strpcasecmp(&search_string[0],&buffer[i]) ;
 		}
 		break;
 	}
     }
+    DEBUGF("\n-------------------\n");
 }
 
 static void search_buffer(void)
@@ -103,6 +114,8 @@ static void search_buffer(void)
 
 static bool search_init(char* file)
 {
+    rb->memset(search_string, 0, sizeof(search_string));
+    
     if (!rb->kbd_input(search_string,sizeof search_string))
     {
         rb->lcd_clear_display();
@@ -141,8 +154,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api;
 
+    DEBUGF("%s - %s\n", parameter, &filename[rb->strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */
-    if(!rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u")) {
+    if(rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u")) {
         rb->splash(HZ, true, "Not a .m3u file");
         return PLUGIN_ERROR;
     }
