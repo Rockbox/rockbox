@@ -1184,26 +1184,26 @@ voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: Backspace alternative in player keyboard interaction
+desc: DEPRECATED
 eng: "Backspace"
 voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_DELETE
-desc: Delete alternative in player keyboard interaction
-eng: "Delete"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: Accept alternative in player keyboard interaction
-eng: "Accept"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_PLAYER_KEYBOARD_ABORT
-desc: Abort alternative in player keyboard interaction
-eng: "Abort"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
