@@ -56,6 +56,18 @@ extern void system_init(void);
 #define I_CONSTRAINT "I"
 #endif
 
+/* Utilize the user break controller to catch invalid memory accesses. */
+int system_memory_guard(int newmode);
+
+enum {
+    MEMGUARD_KEEP = -1,    /* don't change the mode; for reading */
+    MEMGUARD_NONE = 0,     /* catch nothing */
+    MEMGUARD_FLASH_WRITES, /* catch writes to area 02 (flash ROM) */
+    MEMGUARD_ZERO_AREA,    /* catch all accesses to areas 00 and 01 */
+    MAXMEMGUARD
+};
+
+
 #if CONFIG_CPU == SH7034
 #define or_b(mask, address) \
   asm                                     \
@@ -131,17 +143,6 @@ static inline unsigned long SWAB32(unsigned long value)
                   "swap.b\t%0,%0\n" : "+r"(value));
     return value;
 }
-
-/* Utilize the user break controller to catch invalid memory accesses. */
-int system_memory_guard(int newmode);
-
-enum {
-    MEMGUARD_KEEP = -1,    /* don't change the mode; for reading */
-    MEMGUARD_NONE = 0,     /* catch nothing */
-    MEMGUARD_FLASH_WRITES, /* catch writes to area 02 (flash ROM) */
-    MEMGUARD_ZERO_AREA,    /* catch all accesses to areas 00 and 01 */
-    MAXMEMGUARD
-};
 
 #elif CONFIG_CPU == MCF5249
 #define HIGHEST_IRQ_LEVEL (7<<8)
