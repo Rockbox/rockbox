@@ -104,8 +104,11 @@ struct user_settings
     /* resume settings */
 
     int resume;        /* resume option: 0=off, 1=ask, 2=on */
-    int resume_index;  /* index in playlist (-1 for no active resume) */
+    short resume_index;  /* index in playlist (-1 for no active resume) */
+    short resume_first_index;  /* index of first track in playlist */
     int resume_offset; /* byte offset in mp3 file */
+    int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
+                                        >0=shuffled) */
 
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */

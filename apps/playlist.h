@@ -39,10 +39,11 @@ struct playlist_info
     char *buffer;        /* buffer for in-ram playlists             */
     int  buffer_size;    /* size of buffer                          */
     int  buffer_end_pos; /* last position where buffer was written  */
-    int  index;          /* index of current playing track          */
-    int  first_index;    /* index of first song in playlist         */
+    short index;         /* index of current playing track          */
+    short first_index;   /* index of first song in playlist         */
     int  amount;         /* number of tracks in the index           */
     int  last_insert_pos; /* last position we inserted a track      */
+    bool shuffle_flush;  /* Does shuffle value need to be flushed?  */
     struct mutex control_mutex; /* mutex for control file access    */
 };
 
@@ -62,7 +63,7 @@ int playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
 char *playlist_peek(int steps);
 int playlist_next(int steps);
-int playlist_get_resume_info(int *resume_index);
+int playlist_get_resume_info(short *resume_index);
 int playlist_get_display_index(void);
 int playlist_amount(void);
 char *playlist_name(char *buf, int buf_size);

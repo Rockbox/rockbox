@@ -93,14 +93,14 @@
 static struct playlist_info playlist;
 
 #define PLAYLIST_CONTROL_FILE ROCKBOX_DIR "/.playlist_control"
-#define PLAYLIST_CONTROL_FILE_VERSION 1
+#define PLAYLIST_CONTROL_FILE_VERSION 2
 
 /*
     Each playlist index has a flag associated with it which identifies what
     type of track it is.  These flags are stored in the 3 high order bits of
     the index.
     
-    NOTE: This limits the playlist file size to a max of 512K.
+    NOTE: This limits the playlist file size to a max of 512M.
 
     Bits 31-30:
         00 = Playlist track
@@ -145,6 +145,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
                              char *dir);
 static void display_playlist_count(int count, char *fmt);
 static void display_buffer_full(void);
+static int flush_pending_control(void);
 
 /*
  * remove any files and indices associated with the playlist
@@ -170,6 +171,7 @@ static void empty_playlist(bool resume)
     playlist.first_index = 0;
     playlist.amount = 0;
     playlist.last_insert_pos = -1;
+    playlist.shuffle_flush = false;
 
     if (!resume)
     {
@@ -180,6 +182,10 @@ static void empty_playlist(bool resume)
         fd = creat(PLAYLIST_CONTROL_FILE, 0000200);
         if (fd >= 0)
             close(fd);
+
+        /* Reset resume settings */
+        global_settings.resume_first_index = 0;
+        global_settings.resume_seed = -1;
     }
 }
 
@@ -357,7 +363,15 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
 
     if (playlist.amount > 0 && insert_position <= playlist.first_index &&
         position != PLAYLIST_PREPEND)
+    {
         playlist.first_index++;
+
+        if (seek_pos < 0)
+        {
+            global_settings.resume_first_index = playlist.first_index;
+            settings_save();
+        }
+    }
 
     if (insert_position < playlist.last_insert_pos ||
         (insert_position == playlist.last_insert_pos && position < 0))
@@ -366,6 +380,9 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
     if (seek_pos < 0 && playlist.control_fd >= 0)
     {
         int result = -1;
+
+        if (flush_pending_control() < 0)
+            return -1;
 
         mutex_lock(&playlist.control_mutex);
 
@@ -525,7 +542,15 @@ static int remove_track_from_playlist(int position, bool write)
         playlist.index--;
 
     if (position < playlist.first_index)
+    {
         playlist.first_index--;
+
+        if (write)
+        {
+            global_settings.resume_first_index = playlist.first_index;
+            settings_save();
+        }
+    }
 
     if (position <= playlist.last_insert_pos)
         playlist.last_insert_pos--;
@@ -533,6 +558,9 @@ static int remove_track_from_playlist(int position, bool write)
     if (write && playlist.control_fd >= 0)
     {
         int result = -1;
+
+        if (flush_pending_control() < 0)
+            return -1;
 
         mutex_lock(&playlist.control_mutex);
 
@@ -568,6 +596,10 @@ static int randomise_playlist(unsigned int seed, bool start_current, bool write)
     int store;
     unsigned int current = playlist.indices[playlist.index];
     
+    /* seed 0 is used to identify sorted playlist for resume purposes */
+    if (seed == 0)
+        seed = 1;
+
     /* seed with the given seed */
     srand(seed);
 
@@ -589,29 +621,13 @@ static int randomise_playlist(unsigned int seed, bool start_current, bool write)
     /* indices have been moved so last insert position is no longer valid */
     playlist.last_insert_pos = -1;
 
-    if (write && playlist.control_fd >= 0)
+    if (write)
     {
-        int result = -1;
-
-        mutex_lock(&playlist.control_mutex);
-
-        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
-        {
-            if (fprintf(playlist.control_fd, "S:%d:%d\n", seed,
-                    playlist.first_index) > 0)
-            {
-                fsync(playlist.control_fd);
-                result = 0;
-            }
-        }
-
-        mutex_unlock(&playlist.control_mutex);
-
-        if (result < 0)
-        {
-            splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-            return result;
-        }
+        /* Don't write to disk immediately.  Instead, save in settings and
+           only flush if playlist is modified (insertion/deletion) */
+        playlist.shuffle_flush = true;
+        global_settings.resume_seed = seed;
+        settings_save();
     }
 
     return 0;
@@ -637,27 +653,11 @@ static int sort_playlist(bool start_current, bool write)
 
     if (write && playlist.control_fd >= 0)
     {
-        int result = -1;
-
-        mutex_lock(&playlist.control_mutex);
-
-        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
-        {
-            if (fprintf(playlist.control_fd, "U:%d\n", playlist.first_index) >
-                    0)
-            {
-                fsync(playlist.control_fd);
-                result = 0;
-            }
-        }
-
-        mutex_unlock(&playlist.control_mutex);
-
-        if (result < 0)
-        {
-            splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-            return result;
-        }
+        /* Don't write to disk immediately.  Instead, save in settings and
+           only flush if playlist is modified (insertion/deletion) */
+        playlist.shuffle_flush = true;
+        global_settings.resume_seed = 0;
+        settings_save();
     }
 
     return 0;
@@ -745,7 +745,9 @@ static void find_and_set_playlist_index(unsigned int seek)
     {
         if (playlist.indices[i] == seek)
         {
-            playlist.index = playlist.first_index = i;
+            playlist.index = global_settings.resume_first_index =
+                playlist.first_index = i;
+            settings_save();
             break;
         }
     }
@@ -941,6 +943,56 @@ static void display_buffer_full(void)
 }
 
 /*
+ * Flush any pending control commands to disk.  Called when playlist is being
+ * modified.  Returns 0 on success and -1 on failure.
+ */
+static int flush_pending_control(void)
+{
+    int result = 0;
+        
+    if (playlist.shuffle_flush && global_settings.resume_seed >= 0)
+    {
+        /* pending shuffle */
+        mutex_lock(&playlist.control_mutex);
+        
+        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
+        {
+            if (global_settings.resume_seed == 0)
+                result = fprintf(playlist.control_fd, "U:%d\n",
+                    playlist.first_index);
+            else
+                result = fprintf(playlist.control_fd, "S:%d:%d\n",
+                    global_settings.resume_seed, playlist.first_index);
+
+            if (result > 0)
+            {
+                fsync(playlist.control_fd);
+
+                playlist.shuffle_flush = false;
+                global_settings.resume_seed = -1;
+                settings_save();
+
+                result = 0;
+            }
+            else
+                result = -1;
+        }
+        else
+            result = -1;
+        
+        mutex_unlock(&playlist.control_mutex);
+        
+        if (result < 0)
+        {
+            splash(HZ*2, 0, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+            return result;
+        }
+    }
+
+    return result;
+}
+
+/*
  * Initialize playlist entries at startup
  */
 void playlist_init(void)
@@ -1008,6 +1060,7 @@ int playlist_resume(void)
     int nread;
     int total_read = 0;
     bool first = true;
+    bool sorted = true;
 
     enum {
         resume_playlist,
@@ -1089,11 +1142,7 @@ int playlist_resume(void)
                         version = atoi(str1);
                         
                         if (version != PLAYLIST_CONTROL_FILE_VERSION)
-                        {
-                            result = -1;
-                            exit_loop = true;
-                            break;
-                        }
+                            return -1;
                         
                         update_playlist_filename(str2, str3);
                         
@@ -1177,12 +1226,19 @@ int playlist_resume(void)
                             break;
                         }
                         
+                        if (!sorted)
+                        {
+                            /* Always sort list before shuffling */
+                            sort_playlist(false, false);
+                        }
+
                         seed = atoi(str1);
                         playlist.first_index = atoi(str2);
                         
                         if (randomise_playlist(seed, false, false) < 0)
                             return -1;
 
+                        sorted = false;
                         break;
                     }
                     case resume_unshuffle:
@@ -1200,6 +1256,7 @@ int playlist_resume(void)
                         if (sort_playlist(false, false) < 0)
                             return -1;
 
+                        sorted = true;
                         break;
                     }
                     case resume_reset:
@@ -1334,7 +1391,26 @@ int playlist_resume(void)
 
         /* Terminate on EOF */
         if(nread <= 0)
+        {
+            if (global_settings.resume_seed >= 0)
+            {
+                /* Apply shuffle command saved in settings */
+                if (global_settings.resume_seed == 0)
+                    sort_playlist(false, true);
+                else
+                {
+                    if (!sorted)
+                        sort_playlist(false, false);
+
+                    randomise_playlist(global_settings.resume_seed, false,
+                        true);
+                }
+
+                playlist.first_index = global_settings.resume_first_index;
+            }
+
             break;
+        }
     }
 
     return 0;
@@ -1557,13 +1633,17 @@ int playlist_shuffle(int random_seed, int start_index)
     {
         /* store the seek position before the shuffle */
         seek_pos = playlist.indices[start_index];        
-        playlist.index = playlist.first_index = start_index;
+        playlist.index = global_settings.resume_first_index =
+            playlist.first_index = start_index;
         start_current = true;
     }
 
     splash(0, 0, true, str(LANG_PLAYLIST_SHUFFLE));
     
     randomise_playlist(random_seed, start_current, true);
+
+    /* Flush shuffle command to disk */
+    flush_pending_control();
 
     return playlist.index;
 }
@@ -1734,7 +1814,7 @@ int playlist_next(int steps)
 
 /* Get resume info for current playing song.  If return value is -1 then
    settings shouldn't be saved. */
-int playlist_get_resume_info(int *resume_index)
+int playlist_get_resume_info(short *resume_index)
 {
     *resume_index = playlist.index;
 

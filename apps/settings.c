@@ -97,13 +97,14 @@ offset  abs
 0x0f    0x23    <volume type, battery type, timeformat, scroll speed>
 0x10    0x24    <ff/rewind min step, acceleration rate>
 0x11    0x25    <AVC, channel config>
-0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
+0x12    0x26    <(short) Resume playlist index, or -1 if no playlist resume>
+0x14    0x28    <(short) Resume playlist first index>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
 0x1b    0x2f    <browse current, play selected, recursive dir insert>
 0x1c    0x30    <peak meter hold timeout (bit 0-4),
                  rec_editable (bit 7)>
-0x1d    0x31    <unused>
+0x1d    0x31    <(int) Resume shuffle seed, or -1 if no shuffle>
 0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
                  mic gain (bit 4-7)>
 0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
@@ -347,7 +348,8 @@ int settings_save( void )
         ((global_settings.avc & 0x03) | 
          ((global_settings.channel_config & 0x07) << 2));
 
-    memcpy(&config_block[0x12], &global_settings.resume_index, 4);
+    memcpy(&config_block[0x12], &global_settings.resume_index, 2);
+    memcpy(&config_block[0x14], &global_settings.resume_first_index, 2);
     memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
     DEBUGF( "+Resume index %X offset %X\n",
             global_settings.resume_index,
@@ -361,6 +363,8 @@ int settings_save( void )
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
         (global_settings.rec_editable?0x80:0);
+
+    memcpy(&config_block[0x1d], &global_settings.resume_seed, 4);
 
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
@@ -636,7 +640,10 @@ void settings_load(void)
         }
 
         if (config_block[0x12] != 0xFF)
-            memcpy(&global_settings.resume_index, &config_block[0x12], 4);
+            memcpy(&global_settings.resume_index, &config_block[0x12], 2);
+
+        if (config_block[0x14] != 0xFF)
+            memcpy(&global_settings.resume_first_index, &config_block[0x14], 2);
 
         if (config_block[0x16] != 0xFF)
             memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
@@ -656,6 +663,9 @@ void settings_load(void)
             global_settings.rec_editable =
                 (config_block[0x1c] & 0x80)?true:false;
         }
+
+        if (config_block[0x1d] != 0xFF)
+            memcpy(&global_settings.resume_seed, &config_block[0x1d], 4);
 
         if (config_block[0x21] != 0xFF)
         {
@@ -1468,7 +1478,9 @@ void settings_reset(void) {
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;
+    global_settings.resume_first_index = 0;
     global_settings.resume_offset = -1;
+    global_settings.resume_seed = -1;
     global_settings.disk_spindown = 5;
     global_settings.disk_poweroff = false;
     global_settings.buffer_margin = 0;
