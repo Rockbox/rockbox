@@ -105,7 +105,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         /* We must yield once in a while to make sure that the MPEG thread
            isn't starved, but we use the shortest possible timeout for best
            performance */
-        switch (rb->button_get_w_tmo(HZ/HZ))
+        switch (rb->button_get_w_tmo(1))
         {
             case BUTTON_OFF:
                 return PLUGIN_OK;
