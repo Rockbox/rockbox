@@ -35,7 +35,7 @@ The batch timestamp is GMT.
 <p>
 <!--#include virtual="buildstatus.link" -->
 
-<h2>CVS builds</h2>
+<h2>Bleeding edge builds</h2>
 
 <p>These builds are as "bleeding edge" as you can get. Up-to-date builds of the latest CVS code (the top line from the above table):
 
