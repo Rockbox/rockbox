@@ -8,12 +8,14 @@ MOO
     exit;
 }
 
+my %ids;
 open(ENG, "<$ARGV[0]");
 while(<ENG>) {
     if($_ =~ / *\#/) {
         # comment
         next;
     }
+    $_ =~ s/\r//g;
     if($_ =~ / *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
   #      print "$var => $value\n";
@@ -39,6 +41,8 @@ while(<NEW>) {
         # comment
         next;
     }
+    $_ =~ s/\r//g;
+
     if($_ =~ / *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
 
@@ -47,11 +51,16 @@ while(<NEW>) {
         if($var eq "new") {
             # the last one for a single phrase
 
+            if(!$ids{$set{'id'}}) {
+                print "### ".$set{'id'}." was not found in the english file!\n";
+                next;
+            }
+
             print "\nid: ".$set{'id'}."\n";
             print "desc: ".$set{'desc'}."\n";
             if($set{'eng'} ne $all{$set{'id'}, 'eng'}) {
                 print "### English phrase was changed! Previous translation was made on:\n",
-                "### ".$set{'eng'}."\n";
+                "### ".$all{$set{'id'}, 'eng'}."\n";
                 $set{'eng'} = $all{$set{'id'}, 'eng'};
             }
             print "eng: ".$set{'eng'}."\n";
