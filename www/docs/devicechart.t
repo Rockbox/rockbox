@@ -34,8 +34,8 @@
 <tr><th><b>S/PDIF</b></th>
     <td>No</td>
     <td>No</td>
-    <td>In/Out</td>
-    <td>In/Out</td>
+    <td>In+Out</td>
+    <td>In+Out</td>
     <td>In</td>
     <td>In</td>
 </tr>
@@ -136,12 +136,12 @@
     <td>No</td>
 </tr>
 <tr><th><b>Battery type</b></th>
-    <td>NiMH</td>
-    <td>NiMH</td>
-    <td>NiMH</td>
-    <td>NiMH</td>
-    <td>LiIon</td>
-    <td>LiIon</td>
+    <td>NiMH (Type AA)</td>
+    <td>NiMH (Type AA)</td>
+    <td>NiMH (Type AA)</td>
+    <td>NiMH (Type AA)</td>
+    <td>LiIon (Custom)</td>
+    <td>LiIon (Custom)</td>
 </tr>
 <tr><th><b>Charger spec</b></th>
     <td>9-12V 600mA</td>
