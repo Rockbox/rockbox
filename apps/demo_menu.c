@@ -46,9 +46,7 @@ bool demo_menu(void)
     struct menu_items items[] = {
         { str(LANG_BOUNCE), bounce },
         { str(LANG_SNOW), snow },
-#ifndef SIMULATOR
-        { "Oscillograph", oscillograph },
-#endif
+        { str(LANG_OSCILLOGRAPH), oscillograph },
         { str(LANG_CUBE), cube },
     };
 
