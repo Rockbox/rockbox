@@ -6,6 +6,7 @@ favorites.c
 firmware_flash.c
 helloworld.c
 metronome.c
+mosaique.c
 rockbox_flash.c
 search.c
 sort.c
@@ -22,7 +23,6 @@ grayscale.c
 jpeg.c
 mandelbrot.c
 minesweeper.c
-mosaique.c
 oscillograph.c
 oscilloscope.c
 pong.c
@@ -57,7 +57,7 @@ wormlet.c
 #ifdef HAVE_LCD_CHARCELLS /* Player model only */
 euroconverter.c
 jackpot.c
-nim.c    
+nim.c
 #endif /* #ifdef HAVE_LCD_CHARCELLS */
 
 #ifndef HAVE_MMC
