@@ -122,11 +122,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int x = (LCD_WIDTH / 2) - (WIDTH / 2);
     int y = (LCD_HEIGHT / 2) - (HEIGHT / 2);
     struct plugin_api* rb = api;
+    int dx;
+    int dy;
+
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb->srand(*rb->current_tick);
-    int dx = rb->rand()%11 - 5;
-    int dy = rb->rand()%11 - 5;
+
+    dx = rb->rand()%11 - 5;
+    dy = rb->rand()%11 - 5;
 
     while (1) {
         rb->lcd_clear_display();
