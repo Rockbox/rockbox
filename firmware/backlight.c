@@ -35,10 +35,8 @@ static char backlight_stack[DEFAULT_STACK_SIZE];
 static char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
-#ifdef HAVE_CHARGE_CTRL
 static bool charger_was_inserted = 0;
 static bool backlight_on_when_charging = 0;
-#endif
 
 static int backlight_timer;
 static int backlight_timeout = 5;
@@ -58,7 +56,6 @@ void backlight_thread(void)
         switch(ev.id)
         {
             case BACKLIGHT_ON:
-#ifdef HAVE_CHARGE_CTRL
                 if( backlight_on_when_charging && charger_inserted() )
                 {
                     /* Forcing to zero keeps the lights on */
@@ -66,11 +63,11 @@ void backlight_thread(void)
                 }
                 else
                 {
-                backlight_timer = HZ*timeout_value[backlight_timeout];
+                    backlight_timer = HZ*timeout_value[backlight_timeout];
                 }
-#else
+
                 backlight_timer = HZ*timeout_value[backlight_timeout];
-#endif
+
                 if(backlight_timer < 0)
                 {
                     backlight_timer = 0;    /* timer value 0 will not get ticked */
@@ -139,14 +136,14 @@ void backlight_set_on_when_charging(bool yesno)
 
 void backlight_tick(void)
 {
-#ifdef HAVE_CHARGE_CTRL
-    bool charger_is_inserted = charger_inserted();
-    if( backlight_on_when_charging && (charger_was_inserted != charger_is_inserted) )
+  bool charger_is_inserted = charger_inserted();
+    if( backlight_on_when_charging &&
+        (charger_was_inserted != charger_is_inserted) )
     {
         backlight_on();
     }
     charger_was_inserted = charger_is_inserted;
-#endif
+
     if(backlight_timer)
     {
         backlight_timer--;
