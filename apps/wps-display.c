@@ -285,34 +285,38 @@ static char* get_tag(struct mp3entry* id3,
                     return id3->artist;
             
                 case 'n':  /* ID3 Track Number */
-                    if (id3->tracknum)
-                    {
+                    if (id3->track_string)
+                        return id3->track_string;
+
+                    if (id3->tracknum) {
                         snprintf(buf, buf_size, "%d", id3->tracknum);
                         return buf;
                     }
-                    else
-                    {
-                        return NULL;
-                    }
-
+                    return NULL;
+                    
                 case 'd':  /* ID3 Album/Disc */
                     return id3->album;
 
+                case 'c':  /* ID3 Composer */
+                    return id3->composer;
+                
                 case 'y':  /* year */
+                    if( id3->year_string )
+                        return id3->year_string;
+
                     if (id3->year) {
                         snprintf(buf, buf_size, "%d", id3->year);
                         return buf;
                     }
-                    else
-                        return NULL;
-                    break;
+                    return NULL;
 
                 case 'g':  /* genre */
+                    if( id3->genre_string )
+                        return id3->genre_string ;
+
                     if (id3->genre < sizeof(genres)/sizeof(char*))
                         return (char*)genres[id3->genre];
-                    else
-                        return NULL;
-                    break;
+                    return NULL;
 
                 case 'v': /* id3 version */
                     switch (id3->id3version) {

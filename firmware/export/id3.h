@@ -26,6 +26,10 @@ struct mp3entry {
     char *title;
     char *artist;
     char *album;
+    char* genre_string ;
+    char* track_string ;
+    char* year_string ;
+    char* composer ;
     int tracknum;
     int version;
     int layer;
