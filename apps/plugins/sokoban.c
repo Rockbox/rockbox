@@ -388,14 +388,15 @@ static int load_level(void)
 
 static void update_screen(void) 
 {
-    short b = 0, c = 0;
-    short rows = 0, cols = 0;
+    int b = 0, c = 0;
+    int rows = 0, cols = 0;
+    int i, j;
     char s[25];
     
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-    short magnify = 6;
+#if LCD_HEIGHT >= 128
+    int magnify = 6;
 #else
-    short magnify = 4;
+    int magnify = 4;
 #endif
     
     /* load the board to the screen */
@@ -407,13 +408,17 @@ static void update_screen(void)
             switch(current_info.board[rows][cols]) {
             case 'X': /* black space */
                 break;
-                
-            case '#': /* this is a wall */ 
-		rb->lcd_fillrect(c, b, magnify, magnify);
+
+            case '#': /* this is a wall */
+                for (i = c; i < c + magnify; i++)
+                    for (j = b; j < b + magnify; j++)
+                        if ((i ^ j) & 1)
+                            rb->lcd_drawpixel(i, j);
                 break;
 
             case '.': /* this is a home location */
-                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, magnify/2);
+                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, 
+                                 magnify/2);
                 break;
 
             case '$': /* this is a box */
@@ -430,8 +435,9 @@ static void update_screen(void)
                 break;
 
             case '%': /* this is a box on a home spot */ 
-		rb->lcd_drawrect(c, b, magnify, magnify);
-		rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, magnify/2);	
+                rb->lcd_drawrect(c, b, magnify, magnify);
+                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
+                                 magnify/2);
                 break;
             }
         }
@@ -815,7 +821,7 @@ static bool sokoban_loop(void)
             init_undo();
 
             rb->lcd_clear_display();
-			
+
             if (current_info.level.level > current_info.max_level) {
                 rb->lcd_putsxy(10, 20, "You WIN!!");
 
