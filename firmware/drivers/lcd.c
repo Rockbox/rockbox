@@ -452,6 +452,11 @@ void lcd_update (void)
 void lcd_clear_display (void)
 {
     memset (display, 0, sizeof display);
+#if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
+    /* this function is being used when simulating a charcell LCD and
+       then we update immediately */
+    lcd_update();
+#endif
 }
 
 void lcd_setfont(int newfont)
