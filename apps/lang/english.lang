@@ -1262,8 +1262,8 @@ voice: "Fade On Stop and Pause"
 new:
 
 id: LANG_SOKOBAN_ON
-desc: how to undo move 
-eng: "[ON] To Undo"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
