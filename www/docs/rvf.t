@@ -27,9 +27,10 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joer
 
 <li> Press START on your taskbar, choose RUN and type in the box (minus
    quotes): "command" You should now be looking at a command prompt. If you
-   don't know basic DOS commands, here is what you need to know: Use 'cd'
-   change dir (format: cd <dir>) IE: "cd .." to go UP one, "cd ROCKBOX" to
-   enter a path "ROCKBOX"
+   don't know basic DOS commands, here is what you need to know:
+<br>
+   Use 'cd' to change dir (format: cd [dir]) IE: "cd .." to go UP one, "cd
+   ROCKBOX" to enter a path "ROCKBOX"
 
 <li> Navigate to your PATH in DOS prompt, using "cd" as illustrated above.
 
