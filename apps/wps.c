@@ -126,17 +126,17 @@ void wps_show(void)
         if ( ( id3->length != lastlength ) ||
              ( id3->filesize != lastsize ) ||
              ( id3->bitrate != lastrate ) ||
-             ( id3->artist[0] != lastartist ) ||
-             ( id3->album[0] != lastalbum ) ||
-             ( id3->title[0] != lasttitle ) )
+             ( (id3->artist?id3->artist[0]:0) != lastartist ) ||
+             ( (id3->album?id3->album[0]:0) != lastalbum ) ||
+             ( (id3->title?id3->title[0]:0) != lasttitle ) )
         {
             draw_screen(id3);
             lastlength = id3->length;
             lastsize = id3->filesize;
             lastrate = id3->bitrate;
-            lastartist = id3->artist[0];
-            lastalbum = id3->album[0];
-            lasttitle = id3->title[0];
+            lastartist = id3->artist?id3->artist[0]:0;
+            lastalbum = id3->album?id3->album[0]:0;
+            lasttitle = id3->title?id3->title[0]:0;
         }
         
         if (playing)
