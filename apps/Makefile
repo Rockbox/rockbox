@@ -17,11 +17,6 @@ FIRMWARE := ../firmware
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
 
-# Pick a target to build for
-#TARGET = -DARCHOS_PLAYER=1
-TARGET = -DARCHOS_PLAYER_OLD=1
-#TARGET = -DARCHOS_RECORDER=1
-
 # store output files in this directory:
 OBJDIR = .
 

@@ -36,12 +36,6 @@ OBJDIR = .
 
 TARGET = $(OBJDIR)/rockboxui
 
-#DISPLAY = -DHAVE_LCD_CHARCELLS
-DISPLAY = -DHAVE_LCD_BITMAP
-
-#KEYPAD = -DHAVE_PLAYER_KEYPAD
-KEYPAD = -DHAVE_RECORDER_KEYPAD
-
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
 
@@ -81,6 +75,10 @@ ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(DEFINES)))
 	FIRMSRCS += unicode.c ajf.c panic.c
 	EXTRA_TARGETS = $(OBJDIR)/archos/system.ajf
 	SYSTEM_FONT = $(FIRMWAREDIR)/fonts/alt6x10.bdf
+else
+ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+   DEFINES += -DLCD_PROPFONTS
+endif
 endif
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\

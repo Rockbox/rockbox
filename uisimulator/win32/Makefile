@@ -36,12 +36,6 @@ OBJDIR = .
 
 TARGET = $(OBJDIR)/uisw32.exe
 
-#DISPLAY = -DHAVE_LCD_CHARCELLS
-DISPLAY = -DHAVE_LCD_BITMAP
-
-#KEYPAD = -DHAVE_PLAYER_KEYPAD
-KEYPAD = -DHAVE_RECORDER_KEYPAD
-
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\"
 
@@ -68,6 +62,7 @@ APPS = main.c tree.c menu.c credits.c main_menu.c\
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+   DEFINES += -DLCD_PROPFONTS
    APPS += tetris.c sokoban.c blank.c bounce.c boxes.c icons.c bmp.c \
 	widgets.c wormlet.c
 endif

@@ -17,11 +17,6 @@ INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
 SYSTEM_FONT = fonts/alt6x10.bdf
 
-# Pick a target to build for
-TARGET = -DARCHOS_PLAYER=1
-#TARGET = -DARCHOS_PLAYER_OLD=1
-#TARGET = -DARCHOS_RECORDER=1
-
 # store output files in this directory:
 OBJDIR = .
 
@@ -43,8 +38,13 @@ DIRS = $(subst $(DEPS),".",$(DEPDIRS))
 
 OUTPUT = $(OBJDIR)/librockbox.a
 
+
 ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(CFLAGS)))
 	EXTRA_TARGETS = $(OBJDIR)/system.ajf
+else
+ifeq ($(TARGET),-DARCHOS_RECORDER)
+	CFLAGS += -DLCD_PROPFONTS
+endif
 endif
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
