@@ -737,9 +737,12 @@ bool mp3info(struct mp3entry *entry, char *filename)
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
 
-    entry->id3v1len = getid3v1len(fd);
-    if(entry->id3v1len && !entry->title)
-        setid3v1title(fd, entry);
+    /* only seek to end of file if no id3v2 tags were found */
+    if (!entry->id3v2len) {
+        entry->id3v1len = getid3v1len(fd);
+        if(entry->id3v1len && !entry->title)
+            setid3v1title(fd, entry);
+    }
 
     close(fd);
 
