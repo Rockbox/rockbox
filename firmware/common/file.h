@@ -45,7 +45,7 @@ extern int rename(char* oldname, char* newname);
 #endif
 
 #else
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #include <io.h>
 #include <stdio.h>
 #endif // WIN32

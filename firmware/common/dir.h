@@ -53,14 +53,14 @@ typedef struct {
 
 #else // SIMULATOR
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #include <io.h>
+#endif //   WIN32
 typedef struct DIRtag
 {
     struct dirent   fd;
     int             handle;
 } DIR;
-#endif //   WIN32
 #endif // SIMULATOR
 
 #ifndef DIRFUNCTIONS_DEFINED
