@@ -1,4 +1,4 @@
-#define _LOGO_ <img src="rockbox400.png" align=center width=400 height=123>
+#define _LOGO_ <img src="rockbox400.png" align=center width=400 height=123 alt="Rockbox Logo">
 #define _PAGE_ Open Source Jukebox Firmware
 #define MAIN_PAGE
 #include "head.t"
