@@ -112,20 +112,6 @@ copy_l:
 	bf	copy_l
 	nop
 
-	/* copy the .topram section */
-	mov.l	topramcopy_k,r0
-	mov.l	topram_k,r1
-	mov.l	topramend_k,r2
-copy_l2:
-	mov.l	@r0,r3
-	mov.l	r3,@r1
-	add	#4,r0
-	add	#4,r1
-	cmp/ge	r2,r1
-	bf	copy_l2
-	nop
-
-        
 	/* Munge the main thread stack */
 	mov.l	stack_k,r2
 	mov.l	deadbeef_k,r0
@@ -164,12 +150,6 @@ iram_k:
 	.long	_iramstart
 iramend_k:
 	.long	_iramend
-topramcopy_k:
-	.long	_topramcopy
-topram_k:
-	.long	_topramstart
-topramend_k:
-	.long	_topramend
 main_k:
 	.long	_main
 vbr_k:

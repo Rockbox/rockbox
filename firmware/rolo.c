@@ -89,20 +89,24 @@ static void rolo_error(char *text)
     button_get(true);
     lcd_stop_scroll();
 }
+
+/* these are in assembler file "descramble.S" */
+extern unsigned short descramble(unsigned char* source, unsigned char* dest, int length);
+extern void rolo_restart(unsigned char* source, unsigned char* dest, int length);
+
 /***************************************************************************
  *
  * Name: rolo_load_app(char *filename,int scrambled)
  * Filename must be a fully defined filename including the path and extension
  *
  ***************************************************************************/
-int rolo_load(char* filename) __attribute__ ((section (".topcode")));
 int rolo_load(char* filename)
 {
-    int fd,slen;
-    unsigned long length,file_length,i;
+    int fd;
+    unsigned long length;
+    unsigned long file_length;
     unsigned short checksum,file_checksum;
     unsigned char* ramstart = (void*)0x09000000;
-    void (*start_func)(void) = (void*)ramstart + 0x200;
     bool restore_io; /* debug value */
 
     lcd_clear_display();
@@ -152,19 +156,9 @@ int rolo_load(char* filename)
     lcd_puts(0, 1, "Descramble");
     lcd_update();
 
-    /* descramble */
-    slen = length/4;
-    for (i = 0; i < length; i++) {
-        unsigned long addr = ((i % slen) << 2) + i/slen;
-        unsigned char data = mp3buf[i+length];
-        data = ~((data >> 1) | ((data << 7) & 0x80)); /* poor man's ROR */
-        mp3buf[addr] = data;
-    }
+    checksum = descramble(mp3buf + length, mp3buf, length);
 
-    /* Compute checksum and verify against checksum from file header */
-    checksum=0;
-    for (i=0; i<length; i++)
-        checksum += mp3buf[i];
+    /* Verify checksum against file header */
 
     if (checksum != file_checksum) {
         rolo_error("Checksum Error");
@@ -185,16 +179,14 @@ int rolo_load(char* filename)
     system_init();           /* Initialize system for restart */
     i2c_init();              /* Init i2c bus - it seems like a good idea */
     ICR = IRQ0_EDGE_TRIGGER; /* Make IRQ0 edge triggered */
+#ifndef ARCHOS_PLAYER        /* player is to be checked later */
 	PAIOR = 0x0FA0;          /* needed when flashed, probably model-specific */
+#endif
 
     if (restore_io) /* test code */
         rolo_io_restore(); /* restore the I/Os from the file content */
 
-    /* move firmware to start of ram */
-    for ( i=0; i < length/4+1; i++ )
-        ((unsigned int*)ramstart)[i] = ((unsigned int*)mp3buf)[i];
-
-    start_func(); /* start new firmware */
+    rolo_restart(mp3buf, ramstart, length);
 
     return 0; /* this is never reached */
 }

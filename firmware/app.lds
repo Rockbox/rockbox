@@ -55,8 +55,6 @@ SECTIONS
        /* We put the copy of the .iram section here to save space */
        _iramcopy = .;
        . += 0x2000;
-       _topramcopy = .;
-       . += 0x300;
        _stackend = .;
     } > DRAM
 
@@ -82,15 +80,9 @@ SECTIONS
         _mp3buffer = .;
     } > DRAM
 
-    .mp3end ENDADDR - 0x300:
+    .mp3end ENDADDR:
     {
         _mp3end = .;
-    } > DRAM
-
-    .topram : AT ( _topramcopy ) {
-        _topramstart = .;
-        *(.topcode)
-        _topramend = .;
     } > DRAM
 
     .plugin ENDADDR:
