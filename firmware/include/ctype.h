@@ -36,7 +36,7 @@ int _EXFUN(_toupper, (int __c));
 #define _X	0100
 #define	_B	0200
 
-extern	__IMPORT _CONST char	_ctype_[];
+extern	char	_ctype_[];
 
 #ifndef __cplusplus
 #define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))
