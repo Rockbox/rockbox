@@ -447,8 +447,8 @@ static bool keylock(void)
     bool exit = false;
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_RECORD, true);
-    lcd_icon(ICON_PARAM, false);
+    status_set_record(true);
+    status_set_param(false);
 #endif
     display_keylock_text(true);
     keys_locked = true;
@@ -468,7 +468,7 @@ static bool keylock(void)
             case BUTTON_MENU | BUTTON_REPEAT | BUTTON_STOP:
 #endif
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_RECORD, false);
+                status_set_record(false);
 #endif
                 display_keylock_text(false);
                 keys_locked = false;
@@ -515,7 +515,8 @@ static bool menu(void)
     int last_button = 0;
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_PARAM, true);
+    status_set_param(true);
+    status_draw();
 #endif
 
     while (!exit) {
@@ -555,7 +556,7 @@ static bool menu(void)
                     mpeg_sound_set(SOUND_VOLUME, 0);
                 muted = !muted;
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_PARAM, false);
+                status_set_param(false);
 #endif
                 display_mute_text(muted);
                 break;
@@ -583,16 +584,16 @@ static bool menu(void)
 
                 /* show id3 tags */
             case BUTTON_MENU | BUTTON_ON:
-                lcd_icon(ICON_PARAM, true);
-                lcd_icon(ICON_AUDIO, true);
+                status_set_param(true);
+                status_set_audio(true);
 #else
             case BUTTON_F1 | BUTTON_ON:
 #endif
                 if(browse_id3() == SYS_USB_CONNECTED)
                     return true;
 #ifdef HAVE_PLAYER_KEYPAD
-                lcd_icon(ICON_PARAM, false);
-                lcd_icon(ICON_AUDIO, true);
+                status_set_param(false);
+                status_set_audio(true);
 #endif
                 exit = true;
                 break;
@@ -606,7 +607,7 @@ static bool menu(void)
     }
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_PARAM, false);
+    status_set_param(false);
 #endif
 
     if (wps_display(id3))
@@ -625,8 +626,8 @@ int wps_show(void)
     id3 = NULL;
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_AUDIO, true);
-    lcd_icon(ICON_PARAM, false);
+    status_set_audio(true);
+    status_set_param(false);
 #else
     if(global_settings.statusbar)
         lcd_setmargins(0, STATUSBAR_HEIGHT);
@@ -696,8 +697,8 @@ int wps_show(void)
                     case 0:
                         /* otherwise, exit to browser */
 #else
-                        lcd_icon(ICON_RECORD, false);
-                        lcd_icon(ICON_AUDIO, false);
+                        status_set_record(false);
+                        status_set_audio(false);
 #endif
                         /* set dir browser to current playing song */
                         if (global_settings.browse_current && id3)
@@ -829,8 +830,8 @@ int wps_show(void)
                     break;
 #endif
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_RECORD, false);
-                lcd_icon(ICON_AUDIO, false);
+                status_set_record(false);
+                status_set_audio(false);
 #endif
                 /* set dir browser to current playing song */
                 if (global_settings.browse_current && id3)

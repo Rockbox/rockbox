@@ -333,7 +333,7 @@ bool menu_run(int m)
             case SYS_USB_CONNECTED:
                 usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_PARAM, false);
+                status_set_param(false);
 #endif
                 return true;
         }

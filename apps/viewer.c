@@ -30,6 +30,8 @@
 #include "settings.h"
 #include "icons.h"
 #include "screens.h"
+#include "status.h"
+
 
 #define BUFFER_SIZE 1024
 
@@ -423,7 +425,7 @@ bool viewer_run(char* file)
             case SYS_USB_CONNECTED:
                 usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_PARAM, false);
+                status_set_param(false);
 #endif
                 viewer_exit();
                 return true;

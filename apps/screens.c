@@ -89,9 +89,9 @@ void usb_display_info(void)
     lcd_update();
 #else
     lcd_puts(0, 0, "[USB Mode]");
-    lcd_icon(ICON_PARAM, false);
-    lcd_icon(ICON_AUDIO, false);
-    lcd_icon(ICON_USB, true);
+    status_set_param(false);
+    status_set_audio(false);
+    status_set_usb(true);
 #endif
 }
 

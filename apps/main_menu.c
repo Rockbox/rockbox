@@ -37,6 +37,7 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "sound_menu.h"
+#include "status.h"
 
 #include "lang.h"
 
@@ -241,11 +242,11 @@ bool main_menu(void)
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_PARAM, true);
+    status_set_param(true);
 #endif
     result = menu_run(m);
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_icon(ICON_PARAM, false);
+    status_set_param(false);
 #endif
     menu_exit(m);
 
