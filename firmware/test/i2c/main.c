@@ -247,13 +247,14 @@ int main(void)
         debugf("Couldn't open file\n");
     }
 
-    i = read(f, mp3buf, 200000);
+    i = read(f, mp3buf, 1000000);
     debugf("Read %d bytes\n", i);
 
     mp3datalen = i;
     
     ata_spindown(-1);
-    
+
+    debugf("bit swapping...\n");
     for(i = 0;i < mp3datalen;i++)
     {
         mp3buf[i] = fliptable[mp3buf[i]];
