@@ -67,6 +67,7 @@ simul () {
 
 sed > Makefile \
  -e "s,@SIMDIR@,${simdir},g" \
+ -e "s,@TOOLSDIR@,${toolsdir},g" \
  -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -81,6 +82,7 @@ sed > Makefile \
 
 ARCHOS=@ARCHOS@
 SIMDIR=@SIMDIR@
+TOOLSDIR=@TOOLSDIR@
 DEBUG=@DEBUG@
 TARGET=@TARGET@
 DISPLAY=@DISPLAY@
