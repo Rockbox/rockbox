@@ -216,7 +216,7 @@ int screenhack_handle_event (Display *dpy, XEvent *event)
                 event->xexpose.width, event->xexpose.height);
 	    break;
 	case ButtonPress:
-	    fprintf(stderr, "BUTTON PRESSED\n");
+	    fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
 	    break;
 	case ClientMessage:
 	{
