@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <lcd.h>
+#include <limits.h>
 
 #include "widgets.h"
 
@@ -42,6 +43,7 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
 {
     int min;
     int max;
+    int inner_len;
     int start;
     int size;
 
@@ -82,42 +84,37 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
     if(max > items)
         max = items;
 
-    /* calc start and end of the knob */
-    if(items > 0 && items > (max - min)) {
-        if(orientation == VERTICAL) {
-            size = (height - 2) * (max - min) / items;
-            start = (height - 2 - size) * min / (items - (max - min));
-        }
-        else {
-            size = (width - 2) * (max - min) / items;
-            start = (width - 2 - size) * min / (items - (max - min));
-        }
-    }
-    else { /* if null draw a full bar */
-        start = 0;
-        if(orientation == VERTICAL) 
-            size = (height - 2);
-        else
-            size = (width - 2);
+    if (orientation == VERTICAL)
+        inner_len = height - 2;
+    else
+        inner_len = width - 2;
+        
+    /* avoid overflows */
+    while (items > (INT_MAX / inner_len)) {
+        items >>= 1;
+        min >>= 1;
+        max >>= 1;
     }
 
-    /* knob has a width */
-    if(size != 0) {
-        if(orientation == VERTICAL)
-            lcd_fillrect(x + 1, y + start + 1, width - 2, size);
-        else
-            lcd_fillrect(x + start + 1, y + 1, size, height - 2);
+    /* calc start and end of the knob */
+    if(items > 0 && items > (max - min)) {
+        size = inner_len * (max - min) / items;
+        start = (inner_len - size) * min / (items - (max - min));
     }
-    else { /* width of knob is null */
-        if(orientation == VERTICAL) {
-            start = (height - 2 - 1) * min / items;
-            lcd_fillrect(x + 1, y + start + 1, width - 2, 1);
-        }
-        else {
-            start = (width - 2 - 1) * min / items;
-            lcd_fillrect(x + start + 1, y + 1, 1, height - 2);
-        }
+    else { /* if null draw a full bar */
+        size = inner_len;
+        start = 0;
     }
+    /* width of knob is null */
+    if(size == 0) {
+        start = (inner_len - 1) * min / items;
+        size = 1;
+    }
+
+    if(orientation == VERTICAL)
+        lcd_fillrect(x + 1, y + start + 1, width - 2, size);
+    else
+        lcd_fillrect(x + start + 1, y + 1, size, height - 2);
 }
 
 /*
