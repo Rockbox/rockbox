@@ -1,29 +1,53 @@
 
+#include <sys/stat.h>
 #include "dir.h"
 
-#define SIMULATOR_ARCHOS_ROOT "archos"
+#undef DIR
 
-DIR *x11_opendir(char *name)
+MYDIR *x11_opendir(char *name)
 {
   char buffer[256]; /* sufficiently big */
+  MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
 
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
-    return opendir(buffer);
+    my->dir=(DIR *)opendir(buffer);
   }
-  return opendir(name);
+  else
+    my->dir=(DIR *)opendir(name);
+  
+  my->name = (char *)strdup(name);
+
+  return my;
 }
 
-struct dirent *x11_readdir(DIR *dir)
+struct dirent *x11_readdir(MYDIR *dir)
 {
+  char buffer[512]; /* sufficiently big */
   static struct dirent secret;
+  struct stat s;
 
-  struct x11_dirent *x11 = (readdir)(dir);
+  struct x11_dirent *x11 = (readdir)(dir->dir);
 
   strcpy(secret.d_name, x11->d_name);
-  secret.attribute = (x11->d_type == DT_DIR)?ATTR_DIRECTORY:0;
+
+  /* build file name */
+  sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
+          dir->name, x11->d_name);
+  stat(buffer, &s); /* get info */
+
+  secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
+  secret.size = s.st_size;
 
   return &secret;
+}
+
+void x11_closedir(MYDIR *dir)
+{
+  free(dir->name);
+  (closedir)(dir->dir);
+
+  free(dir);
 }
 
 
