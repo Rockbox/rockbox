@@ -30,6 +30,7 @@
 #include "tree.h"
 #include "play.h"
 #include "main_menu.h"
+#include "mpeg.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -222,6 +223,10 @@ bool dirbrowse(char *root)
                         dircursor=0;
                     lcd_puts(0, LINE_Y+dircursor, "-");
                     lcd_update();
+                }
+                else {
+                    /* if in root, stop stops playback */
+                    mpeg_stop();
                 }
 
                 break;
