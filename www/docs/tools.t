@@ -1,7 +1,7 @@
 #define _PAGE_ Useful mp3 and jukebox related tools
 #include "head.t"
 
-<h2>Jukebox synchronization</h2>
+<h3>Jukebox synchronization</h3>
 <ul>
 <li><a href="http://www.cflashsoft.com/progs/jbsynch.html">Jukebox Synchronizer</a> (Windows, Freeware)<br>
 <li><a href="http://users.skynet.be/bk260007/">Jukebox Manager</a> (Windows, Freeware)</li>
@@ -11,7 +11,7 @@
 <li><a href="http://www.cis.upenn.edu/~bcpierce/unison/">Unison</a> (Linux, Windows, Open Source)</li>
 </ul>
 
-<h2>MP3 Ripping &amp; Encoding</h2>
+<h3>MP3 Ripping &amp; Encoding</h3>
 <ul>
 <li><a href="http://www.exactaudiocopy.de/">Exact Audio Copy</a> (Windows, Cardware)<br>
     Tutorials:<ul>
@@ -24,7 +24,7 @@
 <li><a href="http://lame.sourceforge.net/">Lame</a> (Linux, Windows, Open Source)</li>
 </ul>
 
-<h2>MP3 Cutting, Splitting, Merging</h2>
+<h3>MP3 Cutting, Splitting, Merging</h3>
 <ul>
 <li><a href="http://www.rz.uni-frankfurt.de/~pesch/">mp3DirectCut</a> (Windows, Freeware)</li>
 <li><a href="http://www.logiccell.com/~mp3trim/">mp3Trim</a> (Windows, Freeware)</li>
@@ -35,7 +35,7 @@
 <li><a href="http://mp3splt.sourceforge.net/">MP3 Splt</a> (Linux, Windows, Open Source)</li>
 </ul>
 
-<h2>MP3 Tagging &amp; Organization</h2>
+<h3>MP3 Tagging &amp; Organization</h3>
 <ul>
 <li><a href="http://users.otenet.gr/~jtcliper/tgf/">The GodFather</a> (Windows, Freeware)</li>
 <li><a href="http://www.magnusbrading.com/mp3ts/">Mp3TagStudio</a> (Windows, Shareware)</li>
@@ -46,9 +46,11 @@
 <li><a href="http://www.id3-tagit.de/english/index.htm">ID3-TagIT</a> (Windows, Freeware)</li>
 <li><a href="http://mp3renamer.de/start_frame.html">MP3 ID3Tag Renamer</a> (Windows, email-ware)</li>
 <li><a href="http://shanebrinkmandavis.com/homepage/ID3Browse/index.html">ID3Browse</a> (Windows, Freeware)</li>
+<li><a href="http://www.mediamonkey.com/">MediaMonkey Standard</a> (Windows, Freeware)</li>
+<li><a href="http://easytag.sourceforge.net/">EasyTAG</a> (Linux, Open Source)</li>
 </ul>
 
-<h2>MP3 Repairing &amp; Analyzing</h2>
+<h3>MP3 Repairing &amp; Analyzing</h3>
 <ul>
 <li><a href="http://www.willwap.co.uk/Programs/vbrfix.html">VBRFix</a> (Linux, Windows, Freeware)</li>
 <li><a href="http://www.geocities.com/mp3utility/">MP3Utility</a> (Windows, Freeware)</li>
