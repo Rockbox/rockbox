@@ -19,8 +19,8 @@
 
 #include <io.h>
 #include <malloc.h>
-#include "file-win32.h"
-#include "file.h"
+#include "dir-win32.h"
+#include "dir.h"
 
 // Directory operations
 //
@@ -36,7 +36,7 @@ DIR *opendir (
     if ((p->handle = _findfirst (dirname, &fd)) == -1)
     {
         free (p);
-        return NULL;
+        return 0;
     }
     return p;
 }
@@ -53,14 +53,13 @@ int closedir (
 
 // read dir
 // read next entry in directory
-dirent *readdir (
-                 DIR *dir
-                 )
+struct dirent *readdir (
+                        DIR *dir
+                        )
 {
     struct _finddata_t fd;
     if (_findnext (dir->handle, &fd) == -1)
-        return NULL;
+        return 0;
     memcpy (dir->fd.d_name, fd.name, 256);
-    dir->fd.d_reclen = sizeof (dirent);
     return &dir->fd;
 }

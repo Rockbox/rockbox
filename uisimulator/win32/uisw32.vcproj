@@ -116,6 +116,9 @@
 				RelativePath="..\..\firmware\chartables.c">
 			</File>
 			<File
+				RelativePath="dir-win32.c">
+			</File>
+			<File
 				RelativePath="kernel.c">
 			</File>
 			<File
@@ -134,9 +137,6 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
-			<File
-				RelativePath="file-win32.h">
-			</File>
 			<File
 				RelativePath="lcd-win32.h">
 			</File>
