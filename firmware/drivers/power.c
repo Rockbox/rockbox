@@ -32,14 +32,17 @@ bool charger_enabled = 0;
 bool charger_inserted(void)
 {
 #ifdef HAVE_CHARGE_CTRL
+    /* Recorder */
+    return adc_read(ADC_EXT_POWER) > 0x100;
+#else
 #ifdef HAVE_FMADC
+    /* FM */
     return adc_read(ADC_CHARGE_REGULATOR) < 0x1FF;
 #else
-    return adc_read(ADC_EXT_POWER) > 0x100;
-#endif
-#else
+    /* Player */
     return (PADR & 1) == 0;
-#endif
+#endif /* HAVE_FMADC */
+#endif /* HAVE_CHARGE_CTRL */
 }
 
 void charger_enable(bool on)

@@ -200,7 +200,7 @@ void status_draw(void)
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.statusbar) {
         statusbar_wipe();
-#ifdef HAVE_CHARGE_CTRL
+#ifdef HAVE_CHARGE_CTRL /* Recorder */
         if(charger_inserted()) {
             battery_state = true;
             plug_state = true;
@@ -229,8 +229,12 @@ void status_draw(void)
         if (battery_state)
             statusbar_icon_battery(battlevel, plug_state);
 #else
+#ifdef HAVE_FMADC /* FM */
+        statusbar_icon_battery(battlevel, charger_inserted());
+#else /* Player */
         statusbar_icon_battery(battlevel, false);
-#endif
+#endif /* HAVE_FMADC */
+#endif /* HAVE_CHARGE_CTRL */
         statusbar_icon_volume(volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
         switch (global_settings.repeat_mode) {
