@@ -49,25 +49,32 @@ extern void system_init(void);
 #define nop \
   asm volatile ("nop")
 
+/* gcc 3.4 changed the format of the constraints */
+#if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3)
+#define I_CONSTRAINT "I08"
+#else
+#define I_CONSTRAINT "I"
+#endif
+
 #define or_b(mask, address) \
   asm                                     \
     ("or.b\t%0,@(r0,gbr)"                 \
      :                                    \
-     : /* %0 */ "I"((char)(mask)),        \
+     : /* %0 */ I_CONSTRAINT((char)(mask)), \
        /* %1 */ "z"(address-GBR))
 
 #define and_b(mask, address) \
   asm                                       \
     ("and.b\t%0,@(r0,gbr)"                  \
      :                                      \
-     : /* %0 */ "I"((char)(mask)),         \
+     : /* %0 */ I_CONSTRAINT((char)(mask)),         \
        /* %1 */ "z"(address-GBR))
 
 #define xor_b(mask, address) \
   asm                                        \
     ("xor.b\t%0,@(r0,gbr)"                   \
      :                                       \
-     : /* %0 */ "I"((char)(mask)),           \
+     : /* %0 */ I_CONSTRAINT((char)(mask)), \
        /* %1 */ "z"(address-GBR))
 
 #ifndef SIMULATOR
