@@ -676,7 +676,7 @@ static void init_dma(void)
     DAR3 = 0x5FFFEC3;
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
-    last_dma_chunk_size = MIN(65536, get_unplayed_space_current_song());
+    last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
     DTCR3 = last_dma_chunk_size & 0xffff;
     DMAOR = 0x0001; /* Enable DMA */
     CHCR3 |= 0x0001; /* Enable DMA IRQ */
@@ -893,7 +893,7 @@ void DEI3(void)
         
         if(unplayed_space_left)
         {
-            last_dma_chunk_size = MIN(65536, unplayed_space_left);
+            last_dma_chunk_size = MIN(0x2000, unplayed_space_left);
             last_dma_chunk_size = MIN(last_dma_chunk_size,
                                       space_until_end_of_buffer);
 
