@@ -255,7 +255,7 @@ static char stored_caption1[8];
 static char stored_caption2[8];
 static char stored_caption3[8];
 
-void set_buttonbar(char* caption1, char *caption2, char *caption3)
+void buttonbar_set(char* caption1, char *caption2, char *caption3)
 {
     strncpy(stored_caption1, caption1, 7);
     stored_caption1[7] = 0;
@@ -265,7 +265,7 @@ void set_buttonbar(char* caption1, char *caption2, char *caption3)
     stored_caption3[7] = 0;
 }
 
-void draw_buttonbar(void)
+void buttonbar_draw(void)
 {
     draw_buttonbar_btn(0, stored_caption1);
     draw_buttonbar_btn(1, stored_caption2);

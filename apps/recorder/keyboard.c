@@ -168,8 +168,8 @@ int kbd_input(char* text, int buflen)
         lcd_drawline(curpos, main_y, curpos, main_y + font_h);
 
         /* draw the status bar */
-        set_buttonbar("Shift", "OK", "Del");
-        draw_buttonbar();
+        buttonbar_set("Shift", "OK", "Del");
+        buttonbar_draw();
         
         /* highlight the key that has focus */
         lcd_invertrect(font_w * x, font_h * y, font_w, font_h);
