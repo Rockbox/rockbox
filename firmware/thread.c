@@ -268,7 +268,7 @@ int create_thread(void* function, void* stack, int stack_size,
    regs->pr = function;
 #elif CONFIG_CPU == TCC730
    /* Align stack on word boundary */
-   regs->sp = (void*)(((unsigned int)stack + stack_size - 2) & ~1);
+   regs->sp = (void*)(((unsigned long)stack + stack_size - 2) & ~1);
    regs->start = (void*)function;
    regs->started = 0;
 #endif
