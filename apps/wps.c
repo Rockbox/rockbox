@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "system.h"
 #include "file.h"
 #include "lcd.h"
 #include "font.h"
@@ -49,6 +50,7 @@
 #include "bookmark.h"
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
+#define MIN_FF_REWIND_STEP 500
 
 bool keys_locked = false;
 static bool ff_rewind = false;
@@ -327,15 +329,31 @@ static bool ffwd_rew(int button)
             case BUTTON_RIGHT | BUTTON_REPEAT:
                 if (ff_rewind)
                 {
+                    if (direction == 1)
+                    {
+                        /* fast forwarding, calc max step relative to end */
+                        max_step =
+                            (id3->length - (id3->elapsed + ff_rewind_count)) *
+                            FF_REWIND_MAX_PERCENT / 100;
+                    }
+                    else
+                    {
+                        /* rewinding, calc max step relative to start */
+                        max_step = (id3->elapsed + ff_rewind_count) *
+                            FF_REWIND_MAX_PERCENT / 100;
+                    }
+
+                    max_step = MAX(max_step, MIN_FF_REWIND_STEP);
+
+                    if (step > max_step)
+                        step = max_step;
+
                     ff_rewind_count += step * direction;
 
                     if (global_settings.ff_rewind_accel != 0 && 
                         current_tick >= accel_tick)
                     { 
                         step *= 2;
-                        if (step > max_step)
-                            step = max_step;
-
                         accel_tick = current_tick +
                             global_settings.ff_rewind_accel*HZ; 
                     } 
@@ -361,12 +379,6 @@ static bool ffwd_rew(int button)
 
                         step = ff_rew_steps[global_settings.ff_rewind_min_step];
 
-                        max_step = id3->length * FF_REWIND_MAX_PERCENT / 100;
-
-                        if (step > max_step)
-                            step = max_step;
-
-                        ff_rewind_count = step * direction;
                         accel_tick = current_tick +
                             global_settings.ff_rewind_accel*HZ; 
                     }
