@@ -25,14 +25,30 @@
 /*
 	MAS I2C	defs
 */
+#ifdef ARCHOS_RECORDER
+#define MAS_ADR         0x3c
+#define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
+#define	MAS_DEV_READ    (MAS_ADR | 0x01)
+#else
 #define MAS_ADR         0x3a
 #define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
 #define	MAS_DEV_READ    (MAS_ADR | 0x01)
+#endif
 
 /* registers..*/
+#ifdef ARCHOS_RECORDER
+#define	MAS_DATA_WRITE  0x68
+#define MAS_DATA_READ   0x69
+#define	MAS_CODEC_WRITE  0x6c
+#define MAS_CODEC_READ   0x6d
+#define	MAS_CONTROL     0x6a
+#define	MAS_DCCF        0x76
+#define	MAS_DCFR        0x77
+#else
 #define	MAS_DATA_WRITE  0x68
 #define MAS_DATA_READ   0x69
 #define	MAS_CONTROL     0x6a
+#endif
 
 /*
  *	MAS register
@@ -45,6 +61,29 @@
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
 
+/*
+ * MAS commands
+ */
+#ifdef ARCHOS_RECORDER
+#define MAS_CMD_READ_ANCILLARY  0x50
+#define MAS_CMD_FAST_PRG_DL     0x60
+#define MAS_CMD_READ_IC_VER     0x70
+#define MAS_CMD_READ_REG        0xa0
+#define MAS_CMD_WRITE_REG       0xb0
+#define MAS_CMD_READ_D0_MEM     0xc0
+#define MAS_CMD_READ_D1_MEM     0xd0
+#define MAS_CMD_WRITE_D0_MEM    0xe0
+#define MAS_CMD_WRITE_D1_MEM    0xf0
+#else
+#define MAS_CMD_READ_ANCILLARY  0x30
+#define MAS_CMD_WRITE_REG       0x90
+#define MAS_CMD_WRITE_D0_MEM    0xa0
+#define MAS_CMD_WRITE_D1_MEM    0xb0
+#define MAS_CMD_READ_REG        0xd0
+#define MAS_CMD_READ_D0_MEM     0xe0
+#define MAS_CMD_READ_D1_MEM     0xf0
+#endif
+
 int mas_default_read(unsigned short *buf);
 int mas_run(unsigned short address);
 int mas_readmem(int bank, int addr, unsigned long* dest, int len);
@@ -53,5 +92,9 @@ int mas_devread(unsigned long *buf, int len);
 int mas_readreg(int reg);
 int mas_writereg(int reg, unsigned int val);
 int dac_volume(unsigned int volume);
+int mas_direct_config_read(unsigned char reg);
+int mas_direct_config_write(unsigned char reg, unsigned int val);
+int mas_codec_writereg(int reg, unsigned int val);
+int mas_codec_readreg(int reg);
 
 #endif

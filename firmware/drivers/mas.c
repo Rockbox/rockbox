@@ -77,7 +77,7 @@ int mas_readmem(int bank, int addr, unsigned long* dest, int len)
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = bank?0xf0:0xe0;
+    buf[i++] = bank?MAS_CMD_READ_D1_MEM:MAS_CMD_READ_D0_MEM;
     buf[i++] = 0x00;
     buf[i++] = (len & 0xff00) >> 8;
     buf[i++] = len & 0xff;
@@ -102,7 +102,7 @@ int mas_writemem(int bank, int addr, unsigned long* src, int len)
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = bank;
+    buf[i++] = bank?MAS_CMD_WRITE_D1_MEM:MAS_CMD_WRITE_D0_MEM;
     buf[i++] = 0x00;
     buf[i++] = (len & 0xff00) >> 8;
     buf[i++] = len & 0xff;
@@ -111,10 +111,17 @@ int mas_writemem(int bank, int addr, unsigned long* src, int len)
 
     j = 0;
     while(len--) {
-        buf[i++] = ptr[j*4+1];
-        buf[i++] = ptr[j*4+0];
+#ifdef ARCHOS_RECORDER
         buf[i++] = 0;
-        buf[i++] = ptr[j*4+2];
+        buf[i++] = ptr[j+1];
+        buf[i++] = ptr[j+2];
+        buf[i++] = ptr[j+3];
+#else
+        buf[i++] = ptr[j+2];
+        buf[i++] = ptr[j+3];
+        buf[i++] = 0;
+        buf[i++] = ptr[j+1];
+#endif
         j += 4;
     }
     
@@ -131,10 +138,11 @@ int mas_readreg(int reg)
 {
     int i;
     unsigned char buf[16];
+    unsigned long value;
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = 0xd0 | reg >> 4;
+    buf[i++] = MAS_CMD_READ_REG | (reg >> 4);
     buf[i++] = (reg & 0x0f) << 4;
 
     /* send read command */
@@ -143,12 +151,12 @@ int mas_readreg(int reg)
         return -1;
     }
 
-    if(mas_devread((unsigned long *)buf, 1))
+    if(mas_devread(&value, 1))
     {
         return -2;
     }
 
-    return buf[0] | buf[1] << 8 | buf[3] << 16;
+    return value;
 }
 
 int mas_writereg(int reg, unsigned int val)
@@ -158,7 +166,7 @@ int mas_writereg(int reg, unsigned int val)
 
     i=0;
     buf[i++] = MAS_DATA_WRITE;
-    buf[i++] = 0x90 | reg >> 4;
+    buf[i++] = MAS_CMD_READ_REG | (reg >> 4);
     buf[i++] = ((reg & 0x0f) << 4) | (val & 0x0f);
     buf[i++] = (val >> 12) & 0xff;
     buf[i++] = (val >> 4) & 0xff;
@@ -179,6 +187,8 @@ int mas_devread(unsigned long *dest, int len)
     int i;
     
     /* handle read-back */
+    /* Remember, the MAS values are only 20 bits, so we set
+       the upper 12 bits to 0 */
     i2c_start();
     i2c_outb(MAS_DEV_WRITE);
     if (i2c_getack()) {
@@ -189,13 +199,24 @@ int mas_devread(unsigned long *dest, int len)
             if (i2c_getack()) {
                 for (i=0;len;i++) {
                     len--;
-                    ptr[i*4+1] = i2c_inb(0);
-                    ptr[i*4+0] = i2c_inb(0);
-                    ptr[i*4+3] = i2c_inb(0);
+#ifdef ARCHOS_RECORDER
+                    i2c_inb(0); /* Dummy read */
+                    ptr[i*4+0] = 0;
+                    ptr[i*4+1] = i2c_inb(0) & 0x0f;
+                    ptr[i*4+2] = i2c_inb(0);
                     if(len)
-                        ptr[i*4+2] = i2c_inb(0);
+                        ptr[i*4+3] = i2c_inb(0);
                     else
-                        ptr[i*4+2] = i2c_inb(1); /* NAK the last byte */
+                        ptr[i*4+3] = i2c_inb(1); /* NAK the last byte */
+#else
+                    ptr[i*4+2] = i2c_inb(0);
+                    ptr[i*4+3] = i2c_inb(0);
+                    ptr[i*4+0] = i2c_inb(0);
+                    if(len)
+                        ptr[i*4+1] = i2c_inb(0);
+                    else
+                        ptr[i*4+1] = i2c_inb(1); /* NAK the last byte */
+#endif
                 }
             }
             else
@@ -211,3 +232,116 @@ int mas_devread(unsigned long *dest, int len)
 
     return ret;
 }
+
+#ifdef ARCHOS_RECORDER
+int mas_direct_config_read(unsigned char reg)
+{
+    unsigned char tmp[2];
+    int ret = 0;
+    
+    i2c_start();
+    i2c_outb(MAS_DEV_WRITE);
+    if (i2c_getack()) {
+        i2c_outb(reg);
+        if (i2c_getack()) {
+            i2c_start();
+            i2c_outb(MAS_DEV_READ);
+            if (i2c_getack()) {
+                tmp[0] = i2c_inb(0);
+                tmp[1] = i2c_inb(1); /* NAK the last byte */
+                ret = (tmp[0] << 8) | tmp[1];
+            }
+            else
+                ret = -3;
+        }
+        else
+            ret = -2;
+    }
+    else
+        ret = -1;
+    
+    i2c_stop();
+
+    return ret;
+}
+
+int mas_direct_config_write(unsigned char reg, unsigned int val)
+{
+    unsigned char buf[3];
+
+    buf[0] = reg;
+    buf[1] = (val >> 8) & 0xff;
+    buf[2] = val & 0xff;
+
+    /* send write command */
+    if (i2c_write(MAS_DEV_WRITE,buf,3))
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int mas_codec_writereg(int reg, unsigned int val)
+{
+    int i;
+    unsigned char buf[16];
+
+    i=0;
+    buf[i++] = MAS_CODEC_WRITE;
+    buf[i++] = (reg >> 8) & 0xff;
+    buf[i++] = reg & 0xff;
+    buf[i++] = (val >> 8) & 0xff;
+    buf[i++] = val & 0xff;
+
+    /* send write command */
+    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int mas_codec_readreg(int reg)
+{
+    int i;
+    int ret = 0;
+    unsigned char buf[16];
+    unsigned char tmp[2];
+
+    i=0;
+    buf[i++] = MAS_CODEC_WRITE;
+    buf[i++] = (reg >> 8) & 0xff;
+    buf[i++] = reg & 0xff;
+
+    /* send read command */
+    if (i2c_write(MAS_DEV_WRITE,buf,i))
+    {
+        return -1;
+    }
+
+    i2c_start();
+    i2c_outb(MAS_DEV_WRITE);
+    if (i2c_getack()) {
+        i2c_outb(MAS_CODEC_READ);
+        if (i2c_getack()) {
+            i2c_start();
+            i2c_outb(MAS_DEV_READ);
+            if (i2c_getack()) {
+                tmp[0] = i2c_inb(0);
+                tmp[1] = i2c_inb(1); /* NAK the last byte */
+                ret = (tmp[0] << 8) | tmp[1];
+            }
+            else
+                ret = -3;
+        }
+        else
+            ret = -2;
+    }
+    else
+        ret = -1;
+    
+    i2c_stop();
+
+    return ret;
+}
+#endif
