@@ -123,7 +123,10 @@ static void button_tick(void)
                                which doesn't shut down easily with the OFF
                                key */
 #ifdef HAVE_SW_POWEROFF
-                            if (btn == BUTTON_OFF && !charger_inserted() &&
+                            if (btn == BUTTON_OFF &&
+#ifndef IRIVER_H100
+                                !charger_inserted() &&
+#endif
                                 repeat_count > POWEROFF_COUNT)
                                 queue_post(&button_queue, SYS_POWEROFF, NULL);
 #endif
@@ -378,6 +381,9 @@ static int button_read(void)
     if ((data & 0x20) == 0)
         btn |= BUTTON_ON;
 
+    if ((data & 0x40) == 0)
+        btn |= BUTTON_RC_ON;
+    
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
 #ifdef HAVE_FMADC
@@ -507,6 +513,11 @@ static int button_read(void)
 bool button_hold(void)
 {
     return (GPIO1_READ & 0x00000002)?true:false;
+}
+
+bool remote_button_hold(void)
+{
+    return (GPIO1_READ & 0x00100000)?true:false;
 }
 #endif
 
