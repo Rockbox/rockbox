@@ -98,9 +98,6 @@ int open(char* pathname, int flags)
             openfiles[fd].size = entry->size;
             break;
         }
-        else {
-            DEBUGF("entry: %s\n",entry->d_name);
-        }
     }
     closedir(dir);
     if ( !entry ) {
