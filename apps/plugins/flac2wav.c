@@ -204,6 +204,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   file_info.frames_decoded=0;
   file_info.start_tick=*(rb->current_tick);
+  rb->button_clear_queue();
+
   while (FLAC__seekable_stream_decoder_get_state(flacDecoder)!=2) {
     FLAC__seekable_stream_decoder_process_single(flacDecoder);
     file_info.frames_decoded++;
