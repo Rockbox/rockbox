@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include "config.h"
 
+extern struct event_queue button_queue;
+
 void button_init (void);
 int button_get (bool block);
 

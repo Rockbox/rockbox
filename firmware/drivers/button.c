@@ -28,7 +28,7 @@
 #include "kernel.h"
 #include "backlight.h"
 
-static struct event_queue button_queue;
+struct event_queue button_queue;
 
 #define POLL_FREQUENCY    HZ/20
 #define REPEAT_START      6
