@@ -610,7 +610,7 @@ int create_xing_header(int fd, int startpos, int filesize,
                        void (*progressfunc)(int), bool generate_toc)
 {
     unsigned long header = 0;
-    unsigned long saved_header;
+    unsigned long saved_header = 0;
     struct mp3info info;
     int pos, last_pos;
     int i, j;
