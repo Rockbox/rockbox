@@ -38,8 +38,6 @@ extern void					new_key(int key);
 
 void button_event(int key, bool pressed);
 
-extern int _fmode;
-
 // variables
 HWND                                hGUIWnd; // the GUI window handle
 unsigned int                        uThreadID; // id of mod thread
