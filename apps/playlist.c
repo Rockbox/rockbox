@@ -78,7 +78,7 @@ char* playlist_next(int steps)
     char *dir_end;
 
     playlist.index = (playlist.index+steps) % playlist.amount;
-    if ( playlist.index < 0 ) {
+    while ( playlist.index < 0 ) {
         if ( global_settings.loop_playlist )
             playlist.index += playlist.amount;
         else
