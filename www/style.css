@@ -55,7 +55,11 @@ A {
  width: 3em;
 }
 
-.buildfailed {
- background-color: #ff0000;
+.buildfail {
+ background-color: #ff8080;
  width: 3em;
+}
+
+.gccwarn {
+ color: #ff0000;
 }
