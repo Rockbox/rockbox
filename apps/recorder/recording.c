@@ -37,6 +37,8 @@
 #include "status.h"
 #include "menu.h"
 #include "sound_menu.h"
+#include "timefuncs.h"
+#include "debug.h"
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -129,6 +131,22 @@ unsigned int frame_times[] =
     3200  /* 16kHz */
 };
 
+static char *create_filename(void)
+{
+    static char fname[32];
+    struct tm * tm;
+
+    tm = get_time();
+
+    /* Create a filename: RYYMMDDHHMMSS.mp3 */
+    snprintf(fname, 32, "/R%02d%02d%02d%02d%02d%02d.mp3",
+             tm->tm_year-2000, tm->tm_mon, tm->tm_mday,
+             tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+    DEBUGF("Filename: %s\n", fname);
+    return fname;
+}
+
 bool recording_screen(void)
 {
     int button;
@@ -164,7 +182,7 @@ bool recording_screen(void)
     lcd_setfont(FONT_UI);
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(w, 8);
-    
+
     while(!done)
     {
         button = button_get(false);
@@ -190,7 +208,7 @@ bool recording_screen(void)
                 if(!mpeg_status())
                 {
                     have_recorded = true;
-                    mpeg_record("");
+                    mpeg_record(create_filename());
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
                     last_seconds = 0;

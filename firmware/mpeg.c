@@ -1598,7 +1598,7 @@ static void mpeg_thread(void)
                 {
                     case MPEG_RECORD:
                         DEBUGF("Recording...\n");
-                        mpeg_file = open("/RECORD.MP3",
+                        mpeg_file = open((char *)ev.data,
                                          O_WRONLY | O_TRUNC | O_CREAT);
                         if(mpeg_file < 0)
                             panicf("recfile: %d", mpeg_file);
