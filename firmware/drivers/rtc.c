@@ -28,9 +28,21 @@
 void rtc_init(void)
 {
     unsigned char data;
-    data = (unsigned int)rtc_read(0x0c);
-    data &= 0xbf;
-    rtc_write(0x0c,data);
+    rtc_write(0x13, 0x10); /* 32 kHz square wave */
+
+    /* Clear the Stop bit if it is set */
+    data = rtc_read(0x01);
+    if(data & 0x80)
+        rtc_write(0x01, 0x00);
+
+    /* Clear the HT bit if it is set */
+    data = rtc_read(0x0c);
+
+    if(data & 0x40)
+    {
+        data &= ~0x40;
+        rtc_write(0x0c,data);
+    }
 }
 
 int rtc_write(unsigned char address, unsigned char value)
