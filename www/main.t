@@ -9,6 +9,8 @@
 
 <h2>News</h2>
 
+<p><i>2003-04-01</i>: <a href="/doom/">Play Doom on the Archos Recorder</a>!
+
 <p><i>2003-02-17</i>: Rockbox <a href="/daily.shtml">daily builds</a> works on
 the FM Recorder now.
 
