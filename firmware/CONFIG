@@ -1,0 +1,16 @@
+/*
+ * Config template file. Contains and describes all possibile config
+ * items. Don't actually use this file, this is plain documentation.
+ */
+
+/* define this if you have recording possibility */
+#define HAVE_RECORDING 1
+
+/* define this if you have a bitmap LCD display */
+#define HAVE_LCD_BITMAP 1
+
+/* define this if you have a charcell LCD display */
+#define HAVE_LCD_CHARCELLS 1
+
+/* define this if you compile a simulator (no actual HW) */
+#define SIMULATOR 1
