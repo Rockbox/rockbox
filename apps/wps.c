@@ -170,7 +170,7 @@ static bool ffwd_rew(int button)
     unsigned int step = 0;     /* current ff/rewind step */ 
     unsigned int max_step = 0; /* maximum ff/rewind step */ 
     int ff_rewind_count = 0;   /* current ff/rewind count (in ticks) */
-    int direction = 1;         /* forward=1 or backward=-1 */
+    int direction = -1;         /* forward=1 or backward=-1 */
     long accel_tick = 0;       /* next time at which to bump the step size */
     bool exit = false;
     bool usb = false;
@@ -178,6 +178,7 @@ static bool ffwd_rew(int button)
     while (!exit) {
         switch ( button ) {
             case WPS_FFWD:
+                 direction = 1;
             case WPS_REW:
                 if (ff_rewind)
                 {
@@ -220,8 +221,6 @@ static bool ffwd_rew(int button)
 #ifdef HAVE_PLAYER_KEYPAD
                         lcd_stop_scroll();
 #endif
-                        direction = (button & WPS_FFWD) ? 1 : -1;
-
                         if (direction > 0) 
                             status_set_ffmode(STATUS_FASTFORWARD);
                         else
