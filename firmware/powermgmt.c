@@ -306,25 +306,35 @@ static void handle_auto_poweroff(void)
 #endif
        !usb_inserted() &&
        (mpeg_stat == 0 ||
-        mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)))
+        (mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)) &&
+        !sleeptimer_active))
     {
         if(TIME_AFTER(current_tick, last_keypress + timeout) &&
-           TIME_AFTER(current_tick, last_disk_activity + timeout) &&
-           TIME_AFTER(current_tick, last_charge_time + timeout))
-            power_off();
+           TIME_AFTER(current_tick, last_disk_activity + timeout))
+        {
+            if (mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE))
+            {
+                mpeg_stop();
+            }
+
+            if (TIME_AFTER(current_tick, last_charge_time + timeout))
+            {
+                power_off();
+            }
+        }
     }
     else
     {
         /* Handle sleeptimer */
-        if(sleeptimer_endtick &&
-           !usb_inserted())
+        if(sleeptimer_active && !usb_inserted())
         {
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
+                mpeg_stop();
                 if(charger_is_inserted)
                 {
                     DEBUGF("Sleep timer timeout. Stopping...\n");
-                    mpeg_stop();
+                    set_sleep_timer(0);
                 }
                 else
                 {

@@ -738,6 +738,12 @@ int wps_show(void)
             continue;
         }
 
+        /* Exit if mpeg has stopped playing. This can happen if using the
+           sleep timer with the charger plugged or if starting a recording
+           from F1 */
+        if (!mpeg_status())
+            exit = true;
+
         switch(button)
         {
             case BUTTON_ON:
@@ -882,10 +888,6 @@ int wps_show(void)
                 if (menu())
                     return SYS_USB_CONNECTED;
 
-                /* if user recorded, playback is stopped and we should exit */
-                if (!mpeg_status())
-                    exit = true;
-
                 restore = true;
                 break;
 
@@ -946,6 +948,10 @@ int wps_show(void)
             lcd_stop_scroll();
             mpeg_stop();
             status_set_playmode(STATUS_STOP);
+
+            /* Keys can be locked when exiting, so either unlock here
+               or implement key locking in tree.c too */
+            keys_locked=false;
 
             /* set dir browser to current playing song */
             if (global_settings.browse_current &&
