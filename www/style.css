@@ -84,6 +84,7 @@ A {
 
 .faqq {
  font-weight: bold;
+ font-size: 110%;
 }
 
 .faqa {
@@ -95,7 +96,7 @@ PRE {
 }
 
 
-.rockbox, .changetable, .bugs, .requests, .dailymod, .buildstatus, .archive, .buttontable, .changesummary
+.rockbox, .changetable, .bugs, .requests, .patches, .dailymod, .buildstatus, .archive, .buttontable, .changesummary
 {
  border: outset 2px #ffffff;
 }
@@ -110,7 +111,7 @@ PRE {
  padding: 4px;
 }
 
-.rockbox td, .changetable td, .bugs td, .requests td, .archive td, .buttontable td
+.rockbox td, .changetable td, .bugs td, .requests td, .patches td, .archive td, .buttontable td
 {
  background-color: #c6d6f5;
  padding: 4px;
