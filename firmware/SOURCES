@@ -1,3 +1,6 @@
+#ifdef ARCHOS_GMINI120
+common/string.c
+#endif
 #ifdef IRIVER_H100
 crt0.S
 backlight.c
