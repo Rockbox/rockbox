@@ -19,10 +19,11 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-#ifdef HAVE_LCD_BITMAP
-
 #include "plugin.h"
 #include "system.h"
+
+#ifndef SIMULATOR /* not for simulator by now */
+#ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
 #define DEFAULT_FILENAME "/default.rvf"
 #define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
@@ -195,4 +196,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return main((char*) parameter);
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
+#endif /* #ifdef HAVE_LCD_BITMAP */
+#endif /* #ifndef SIMULATOR */
