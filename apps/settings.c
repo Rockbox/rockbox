@@ -1464,18 +1464,28 @@ void settings_reset(void) {
 bool set_bool(char* string, bool* variable )
 {
     return set_bool_options(string, variable, str(LANG_SET_BOOL_YES), 
-                            str(LANG_SET_BOOL_NO));
+                            str(LANG_SET_BOOL_NO), NULL);
+}
+
+/* wrapper to convert from int param to bool param in set_option */
+static void (*boolfunction)(bool);
+void bool_funcwrapper(int value)
+{
+    if (value)
+        boolfunction(true);
+    else
+        boolfunction(false);
 }
 
 bool set_bool_options(char* string, bool* variable,
-                      char* yes_str, char* no_str )
+                      char* yes_str, char* no_str, void (*function)(bool))
 {
     char* names[] = { no_str, yes_str };
-    int value = *variable;
     bool result;
 
-    result = set_option(string, &value, names, 2, NULL);
-    *variable = value;
+    boolfunction = function;
+    result = set_option(string, variable, BOOL, names, 2, 
+                        function ? bool_funcwrapper : NULL);
     return result;
 }
 
@@ -1576,12 +1586,23 @@ bool set_int(char* string,
     return false;
 }
 
-bool set_option(char* string, int* variable, char* options[],
-                int numoptions, void (*function)(int))
+/* NOTE: the 'type' parameter specifies the actual type of the variable
+   that 'variable' points to. not the value within. Only variables with
+   type 'bool' should use parameter BOOL.
+
+   The type separation is nececssary since int and bool are fundamentally
+   different and bit-incompatible types and can not share the same access
+   code. */
+
+bool set_option(char* string, void* variable, enum optiontype type,
+                char* options[], int numoptions, void (*function)(int))
 {
     bool done = false;
     int button;
-    int org_value=*variable;
+    int* intvar = (int*)variable;
+    bool* boolvar = (bool*)variable;
+    int orgint=*intvar;
+    bool orgbool=*boolvar;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -1594,7 +1615,7 @@ bool set_option(char* string, int* variable, char* options[],
     lcd_puts_scroll(0, 0, string);
 
     while ( !done ) {
-        lcd_puts(0, 1, options[*variable]);
+        lcd_puts(0, 1, options[type==INT ? *intvar : (int)*boolvar]);
 #ifdef HAVE_LCD_BITMAP
         status_draw(true);
 #endif
@@ -1609,10 +1630,14 @@ bool set_option(char* string, int* variable, char* options[],
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
-                if ( *variable < (numoptions-1) )
-                    (*variable)++;
+                if (type == INT) {
+                    if ( *intvar < (numoptions-1) )
+                        (*intvar)++;
+                    else
+                        (*intvar) -= (numoptions-1);
+                }
                 else
-                    (*variable) -= (numoptions-1);
+                    *boolvar = !*boolvar;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -1622,10 +1647,14 @@ bool set_option(char* string, int* variable, char* options[],
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
-                if ( *variable > 0 )
-                    (*variable)--;
+                if (type == INT) {
+                    if ( *intvar > 0 )
+                        (*intvar)--;
+                    else
+                        (*intvar) += (numoptions-1);
+                }
                 else
-                    (*variable) += (numoptions-1);
+                    *boolvar = !*boolvar;
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -1643,8 +1672,12 @@ bool set_option(char* string, int* variable, char* options[],
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
-                if (*variable != org_value) {
-                    *variable=org_value;
+                if (((type==INT) && (*intvar != orgint)) ||
+                    ((type==BOOL) && (*boolvar != orgbool))) {
+                    if (type==INT)
+                        *intvar=orgint;
+                    else
+                        *boolvar=orgbool;
                     lcd_stop_scroll();
                     lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
                     lcd_update();
@@ -1658,8 +1691,12 @@ bool set_option(char* string, int* variable, char* options[],
                 return true;
         }
 
-        if ( function && button != BUTTON_NONE)
-            function(*variable);
+        if ( function && button != BUTTON_NONE) {
+            if (type == INT)
+                function(*intvar);
+            else
+                function(*boolvar);
+        }
     }
     lcd_stop_scroll();
     return false;

@@ -181,7 +181,7 @@ static void set_avc(int val)
 static bool avc(void)
 {
     char* names[] = { str(LANG_OFF), "2s", "4s", "8s" };
-    return set_option(str(LANG_DECAY), &global_settings.avc, 
+    return set_option(str(LANG_DECAY), &global_settings.avc, INT,
                       names, 4, set_avc);
 }
 
@@ -190,7 +190,7 @@ static bool recsource(void)
     char *names[] = {str(LANG_RECORDING_SRC_MIC), str(LANG_RECORDING_SRC_LINE),
                      str(LANG_RECORDING_SRC_DIGITAL) };
     return set_option(str(LANG_RECORDING_SOURCE),
-                      &global_settings.rec_source,
+                      &global_settings.rec_source, INT,
                       names, 3, NULL );
 }
 
@@ -200,7 +200,7 @@ static bool recfrequency(void)
                      "22.05kHz", "24kHz", "16kHz"};
 
     return set_option(str(LANG_RECORDING_FREQUENCY),
-                      &global_settings.rec_frequency,
+                      &global_settings.rec_frequency, INT,
                       names, 6, NULL );
 }
 
@@ -209,7 +209,7 @@ static bool recchannels(void)
     char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO)};
 
     return set_option(str(LANG_RECORDING_CHANNELS),
-                      &global_settings.rec_channels,
+                      &global_settings.rec_channels, INT,
                       names, 2, NULL );
 }
 
@@ -232,7 +232,7 @@ static bool rectimesplit(void)
                      "00:30","01:00","02:00","04:00"};
 
     return set_option(str(LANG_RECORD_TIMESPLIT),
-                      &global_settings.rec_timesplit,
+                      &global_settings.rec_timesplit, INT,
                       names, 8, NULL );
 }
 
@@ -245,16 +245,18 @@ static void set_chanconf(int val)
 
 static bool chanconf(void)
 {
-    char *names[] = {str(LANG_CHANNEL_STEREO),
+    char *names[] = {
+        str(LANG_CHANNEL_STEREO),
 #ifdef HAVE_LCD_CHARCELLS
-                     str(LANG_CHANNEL_STEREO_NARROW_PLAYER),
+        str(LANG_CHANNEL_STEREO_NARROW_PLAYER),
 #else
-                     str(LANG_CHANNEL_STEREO_NARROW_RECORDER),
+        str(LANG_CHANNEL_STEREO_NARROW_RECORDER),
 #endif
-                     str(LANG_CHANNEL_MONO),
-                     str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT),
-                     str(LANG_CHANNEL_KARAOKE), str(LANG_CHANNEL_STEREO_WIDE) };
-    return set_option(str(LANG_CHANNEL), &global_settings.channel_config,
+        str(LANG_CHANNEL_MONO),
+        str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT),
+        str(LANG_CHANNEL_KARAOKE), str(LANG_CHANNEL_STEREO_WIDE)
+    };
+    return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
                       names, 7, set_chanconf );
 }
 

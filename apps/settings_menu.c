@@ -75,9 +75,8 @@ static bool invert(void)
      bool rc = set_bool_options(str(LANG_INVERT),
                                 &global_settings.invert,
                                 str(LANG_INVERT_LCD_INVERSE),
-                                str(LANG_INVERT_LCD_NORMAL));
-
-     lcd_set_invert_display(global_settings.invert);
+                                str(LANG_INVERT_LCD_NORMAL),
+                                lcd_set_invert_display);
      return rc;
 }
 
@@ -89,7 +88,8 @@ static bool invert_cursor(void)
         return set_bool_options(str(LANG_INVERT_CURSOR),
                             &global_settings.invert_cursor,
                             str(LANG_INVERT_CURSOR_BAR),
-                            str(LANG_INVERT_CURSOR_POINTER));
+                            str(LANG_INVERT_CURSOR_POINTER),
+                            NULL);
 }
 
 /**
@@ -101,7 +101,7 @@ static bool battery_type(void)
                       str(LANG_DISPLAY_NUMERIC)  };
 
     return set_option( str(LANG_BATTERY_DISPLAY), 
-                       &global_settings.battery_type, names, 2, NULL);
+                       &global_settings.battery_type, INT, names, 2, NULL);
 }
 
 /**
@@ -113,7 +113,7 @@ static bool volume_type(void)
                       str(LANG_DISPLAY_NUMERIC) };
 
     return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
-                       names, 2, NULL);
+                       INT, names, 2, NULL);
 }
 
 #ifdef PM_DEBUG
@@ -137,9 +137,9 @@ static bool peak_meter_hold(void) {
                       "8 s", "9 s", "10 s", "15 s", "20 s",
                       "30 s", "1 min"
     };
-    retval = set_option( str(LANG_PM_PEAK_HOLD), 
-                       &global_settings.peak_meter_hold, names,
-                       18, NULL);
+    retval = set_option( str(LANG_PM_PEAK_HOLD),
+                         &global_settings.peak_meter_hold, INT, names,
+                         18, NULL);
 
     peak_meter_init_times(global_settings.peak_meter_release,
         global_settings.peak_meter_hold, 
@@ -163,8 +163,8 @@ static bool peak_meter_clip_hold(void) {
     };
 
     retval = set_option( str(LANG_PM_CLIP_HOLD), 
-                       &global_settings.peak_meter_clip_hold, names,
-                       25, peak_meter_set_clip_hold);
+                         &global_settings.peak_meter_clip_hold, INT, names,
+                         25, peak_meter_set_clip_hold);
 
     peak_meter_init_times(global_settings.peak_meter_release,
         global_settings.peak_meter_hold, 
@@ -203,7 +203,8 @@ static bool peak_meter_scale(void) {
     bool use_dbfs = global_settings.peak_meter_dbfs;
     retval = set_bool_options(str(LANG_PM_SCALE), 
         &use_dbfs, 
-        str(LANG_PM_DBFS), str(LANG_PM_LINEAR));
+        str(LANG_PM_DBFS), str(LANG_PM_LINEAR),
+        NULL);
 
     /* has the user really changed the scale? */
     if (use_dbfs != global_settings.peak_meter_dbfs) {
@@ -315,7 +316,8 @@ static bool peak_meter_performance(void) {
     bool retval = false;
     retval = set_bool_options(str(LANG_PM_PERFORMANCE), 
         &global_settings.peak_meter_performance, 
-        str(LANG_PM_HIGH_PERFORMANCE), str(LANG_PM_ENERGY_SAVER));
+        str(LANG_PM_HIGH_PERFORMANCE), str(LANG_PM_ENERGY_SAVER),
+        NULL);
 
     if (global_settings.peak_meter_performance) {
         peak_meter_fps = 25;
@@ -368,7 +370,7 @@ static bool repeat_mode(void)
     int old_repeat = global_settings.repeat_mode;
 
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
-                         names, 3, NULL );
+                         INT, names, 3, NULL );
 
     if (old_repeat != global_settings.repeat_mode)
         mpeg_flush_and_reload_tracks();
@@ -388,7 +390,7 @@ static bool dir_filter(void)
                       str(LANG_FILTER_MUSIC),
                       str(LANG_FILTER_PLAYLIST) };
 
-    return set_option( str(LANG_FILTER), &global_settings.dirfilter,
+    return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
                        names, 4, NULL );
 }
 
@@ -404,7 +406,7 @@ static bool resume(void)
                       str(LANG_RESUME_SETTING_ASK_ONCE),
                       str(LANG_SET_BOOL_YES) };
 
-    return set_option( str(LANG_RESUME), &global_settings.resume,
+    return set_option( str(LANG_RESUME), &global_settings.resume, INT,
                        names, 4, NULL );
 }
 
@@ -425,7 +427,7 @@ static bool backlight_timer(void)
                       "60s", "90s"};
 
     return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
-                      names, 19, backlight_set_timeout );
+                      INT, names, 19, backlight_set_timeout );
 }
 
 static bool poweroff_idle_timer(void)
@@ -436,7 +438,7 @@ static bool poweroff_idle_timer(void)
                       "15m", "30m", "45m", "60m"};
 
     return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
-                      names, 15, set_poweroff_timeout);
+                      INT, names, 15, set_poweroff_timeout);
 }
 
 static bool scroll_speed(void)
@@ -477,7 +479,7 @@ static bool jump_scroll(void)
                       "3", "4", str(LANG_ALWAYS)};
     bool ret;
     ret=set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
-                   names, 6, lcd_jump_scroll);
+                   INT, names, 6, lcd_jump_scroll);
     if (!ret && global_settings.jump_scroll>=JUMP_SCROLL_ALWAYS) {
         global_settings.jump_scroll=254; /* Nice future "safe" value */
     }
@@ -609,7 +611,8 @@ static bool timeformat_set(void)
     char* names[] = { str(LANG_24_HOUR_CLOCK),
                       str(LANG_12_HOUR_CLOCK) };
 
-    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat, names, 2, NULL);
+    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat, 
+                      INT, names, 2, NULL);
 }
 #endif
 
@@ -657,7 +660,7 @@ static bool ff_rewind_min_step(void)
                       "45s", "60s" };
 
     return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
-                      names, 14, NULL ); 
+                      INT, names, 14, NULL ); 
 } 
 
 static bool set_fade_on_stop(void)
@@ -674,7 +677,7 @@ static bool ff_rewind_accel(void)
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
 
     return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
-                      names, 16, NULL ); 
+                      INT, names, 16, NULL ); 
 } 
 
 static bool browse_current(void)

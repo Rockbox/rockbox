@@ -180,6 +180,8 @@ struct user_settings
     bool show_icons;   /* 0=hide 1=show */
 };
 
+enum optiontype { INT, BOOL };
+
 /* prototypes */
 
 int settings_save(void);
@@ -192,11 +194,11 @@ void settings_display(void);
 bool settings_load_config(char* file);
 bool settings_save_config(void);
 bool set_bool_options(char* string, bool* variable, 
-                      char* yes_str, char* no_str );
+                      char* yes_str, char* no_str, void (*function)(bool));
 
 bool set_bool(char* string, bool* variable );
-bool set_option(char* string, int* variable, char* options[],
-                int numoptions, void (*function)(int));
+bool set_option(char* string, void* variable, enum optiontype type,
+                char* options[], int numoptions, void (*function)(int));
 bool set_int(char* string, char* unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);
