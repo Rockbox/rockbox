@@ -183,6 +183,31 @@ int close(int fd)
         return -2;
     }
     if (file->write) {
+        rc = flush(fd);
+        if (rc < 0)
+            return rc * 10 - 3;
+    }
+
+    file->busy = false;
+    return 0;
+}
+
+int flush(int fd)
+{
+    struct filedesc* file = &openfiles[fd];
+    int rc = 0;
+
+    LDEBUGF("flush(%d)\n", fd);
+
+    if (fd < 0 || fd > MAX_OPEN_FILES-1) {
+        errno = EINVAL;
+        return -1;
+    }
+    if (!file->busy) {
+        errno = EBADF;
+        return -2;
+    }
+    if (file->write) {
         /* flush sector cache */
         if ( file->dirty ) {
             rc = flush_cache(fd);
@@ -202,7 +227,6 @@ int close(int fd)
         if (rc < 0)
             return rc * 10 - 5;
     }
-    file->busy = false;
     return 0;
 }
 
@@ -318,9 +342,11 @@ static int flush_cache(int fd)
     DEBUGF("Flushing dirty sector cache %x\n", sector);
     
     /* seek back one sector to get file position right */
+#if 0
     rc = fat_seek(&(file->fatfile), sector);
     if ( rc < 0 )
         return rc * 10 - 1;
+#endif
     
     rc = fat_readwrite(&(file->fatfile), 1,
                        file->cache, true );
