@@ -75,7 +75,7 @@ DIR* opendir(char* name)
                 return NULL;
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
-                 (!strncmp(part, entry.name, partlen)) ) {
+                 (!strncasecmp(part, entry.name, partlen)) ) {
                 if ( fat_opendir(&(opendirs[dd].fatdir),
                                  entry.firstcluster) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",

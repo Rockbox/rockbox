@@ -103,7 +103,7 @@ int open(char* pathname, int flags)
     /* scan dir for name */
     namelen = strlen(name);
     while ((entry = readdir(dir))) {
-        if ( !strncmp(name, entry->d_name, namelen) ) {
+        if ( !strncasecmp(name, entry->d_name, namelen) ) {
             fat_open(entry->startcluster, &(openfiles[fd].fatfile));
             openfiles[fd].size = entry->size;
             break;
