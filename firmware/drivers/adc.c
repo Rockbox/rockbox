@@ -77,7 +77,6 @@ static void adc_batch_convert(bool lower)
 
 void adc_init(void)
 {
-    int i;
     ADCR  = 0x7f; /* No external trigger; other bits should be 1 according to the manual... */
 
     current_channel = 0;
