@@ -796,6 +796,10 @@ int wps_show(void)
                 lcd_icon(ICON_RECORD, false);
                 lcd_icon(ICON_AUDIO, false);
 #endif
+                /* set dir browser to current playing song */
+                if (global_settings.browse_current && id3)
+                    set_current_file(id3->path);
+
                 button_set_release(old_release_mask);
                 return 0;
                 
@@ -922,6 +926,10 @@ int wps_show(void)
                 lcd_icon(ICON_RECORD, false);
                 lcd_icon(ICON_AUDIO, false);
 #endif
+                /* set dir browser to current playing song */
+                if (global_settings.browse_current && id3)
+                    set_current_file(id3->path);
+
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
                 button_set_release(old_release_mask);

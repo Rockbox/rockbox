@@ -67,7 +67,8 @@ offset  abs
 0x0b    0x1f    <backlight byte>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
-0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden>
+0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden,
+                 browse_current>
 0x0f    0x23    <scroll speed>
 0x10    0x24    <ff/rewind min step, acceleration rate>
 0x11    0x25    <AVC byte>
@@ -266,7 +267,8 @@ int settings_save( void )
          ((global_settings.discharge & 1) << 3) |
          ((global_settings.statusbar & 1) << 4) |
          ((global_settings.show_hidden_files & 1) << 5) |
-         ((global_settings.scrollbar & 1) << 6));
+         ((global_settings.scrollbar & 1) << 6) |
+         ((global_settings.browse_current & 1) << 7));
 
     config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
     
@@ -355,6 +357,7 @@ void settings_load(void)
             global_settings.statusbar = (config_block[0xe] >> 4) & 1;
             global_settings.show_hidden_files = (config_block[0xe] >> 5) & 1;
             global_settings.scrollbar = (config_block[0xe] >> 6) & 1;
+            global_settings.browse_current = (config_block[0xe] >> 7) & 1;
         }
         
         c = config_block[0xf] >> 3;
@@ -543,6 +546,7 @@ void settings_reset(void) {
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;
     global_settings.disk_spindown = 5;
+    global_settings.browse_current = false;
 }
 
 

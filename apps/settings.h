@@ -94,6 +94,10 @@ struct user_settings
     bool show_hidden_files; /* 1=show dotfiles/hidden,
                                0=hide dotfiles/hidden */
     
+    /* goto current song when exiting WPS */
+    bool browse_current; /* 1=goto current song,
+                            0=goto previous location */
+
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
 };

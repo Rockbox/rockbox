@@ -63,8 +63,15 @@ struct entry {
 };
 
 static struct entry dircache[MAX_FILES_IN_DIR];
+static int dircursor;
+static int dirstart;
+static int dirlevel;
 static int filesindir;
-static char lastdir[MAX_PATH] = {0};
+static int dirpos[MAX_DIR_LEVELS];
+static int cursorpos[MAX_DIR_LEVELS];
+static char lastdir[MAX_PATH];
+static char lastfile[MAX_PATH];
+static char currdir[MAX_PATH];
 
 void browse_root(void)
 {
@@ -294,6 +301,20 @@ static int showdir(char *path, int start)
         }
     }
 
+    if (start == -1)
+    {
+        /* use lastfile to determine start (default=0) */
+        start = dirstart = 0;
+        for (i=0; i<filesindir; i++)
+        {
+            if (!strcasecmp(dircache[i].name, lastfile))
+            {
+                start = dirstart = i;
+                break;
+            }
+        }
+    }
+
     lcd_stop_scroll();
 #ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(false);
@@ -476,15 +497,53 @@ void start_resume(void)
     }
 }
 
+void set_current_file(char *path)
+{
+    char *name;
+    unsigned int i;
+
+    /* separate directory from filename */
+    name = strrchr(path,'/');
+    if (name)
+    {
+        *name = 0;
+        strcpy(currdir, path);
+        *name = '/';
+        name++;
+    }
+    else
+    {
+        strcpy(currdir, "/");
+        name = path+1;
+    }
+
+    strcpy(lastfile, name);
+
+    dircursor    =  0;
+    dirstart     = -1;
+
+    if (strncmp(currdir,lastdir,sizeof(lastdir)))
+    {
+        dirlevel            =  0;
+        dirpos[dirlevel]    = -1;
+        cursorpos[dirlevel] =  0;
+        
+        /* use '/' to calculate dirlevel */
+        for (i=1; i<strlen(path)+1; i++)
+        {
+            if (path[i] == '/')
+            {
+                dirlevel++;
+                dirpos[dirlevel]    = -1;
+                cursorpos[dirlevel] =  0;
+            }
+        }
+    }
+}
+
 bool dirbrowse(char *root)
 {
     int numentries=0;
-    int dircursor=0;
-    int start=0;
-    int dirpos[MAX_DIR_LEVELS];
-    int cursorpos[MAX_DIR_LEVELS];
-    int dirlevel=0;
-    char currdir[MAX_PATH];
     char buf[MAX_PATH];
     int i;
     int lasti=-1;
@@ -506,15 +565,19 @@ bool dirbrowse(char *root)
     start_resume();
     button_set_release(RELEASE_MASK);
 
+    dircursor=0;
+    dirstart=0;
+    dirlevel=0;
+
     memcpy(currdir,root,sizeof(currdir));
-    numentries = showdir(root, start);
+    numentries = showdir(root, dirstart);
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
 
     while(1) {
-        struct entry* file = &dircache[dircursor+start];
+        struct entry* file = &dircache[dircursor+dirstart];
 
         bool restore = false;
 
@@ -534,11 +597,15 @@ bool dirbrowse(char *root)
 
                     dirlevel--;
                     if ( dirlevel < MAX_DIR_LEVELS ) {
-                        start = dirpos[dirlevel];
+                        dirstart = dirpos[dirlevel];
                         dircursor = cursorpos[dirlevel];
                     }
                     else
-                        start = dircursor = 0;
+                        dirstart = dircursor = 0;
+
+                    if (dirstart == -1)
+                        strcpy(lastfile, buf);
+
                     restore = true;
                 }
                 break;
@@ -577,12 +644,12 @@ bool dirbrowse(char *root)
                 if (file->attr & ATTR_DIRECTORY) {
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
-                        dirpos[dirlevel] = start;
+                        dirpos[dirlevel] = dirstart;
                         cursorpos[dirlevel] = dircursor;
                     }
                     dirlevel++;
                     dircursor=0;
-                    start=0;
+                    dirstart=0;
                 } else {
                     int seed = current_tick;
                     bool play = false;
@@ -603,7 +670,7 @@ bool dirbrowse(char *root)
                             if ( global_settings.resume )
                                 strncpy(global_settings.resume_file,
                                         currdir, MAX_PATH);
-                            start_index = build_playlist(dircursor+start);
+                            start_index = build_playlist(dircursor+dirstart);
 
                             /* it is important that we get back the index in
                                the (shuffled) list and stor that */
@@ -675,9 +742,9 @@ bool dirbrowse(char *root)
                         put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                     }
                     else {
-                        if (start) {
-                            start--;
-                            numentries = showdir(currdir, start);
+                        if (dirstart) {
+                            dirstart--;
+                            numentries = showdir(currdir, dirstart);
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                         else {
@@ -689,9 +756,9 @@ bool dirbrowse(char *root)
                                              true);
                             }
                             else {
-                                start = numentries - tree_max_on_screen;
+                                dirstart = numentries - tree_max_on_screen;
                                 dircursor = tree_max_on_screen - 1;
-                                numentries = showdir(currdir, start);
+                                numentries = showdir(currdir, dirstart);
                                 put_cursorxy(CURSOR_X, CURSOR_Y +
                                              tree_max_on_screen - 1, true);
                             }
@@ -706,7 +773,7 @@ bool dirbrowse(char *root)
             case BUTTON_VOL_DOWN:
                 if(filesindir)
                 {
-                    if (dircursor + start + 1 < numentries ) {
+                    if (dircursor + dirstart + 1 < numentries ) {
                         if(dircursor+1 < tree_max_on_screen) {
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                          false);
@@ -714,8 +781,8 @@ bool dirbrowse(char *root)
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 
                         else {
-                            start++;
-                            numentries = showdir(currdir, start);
+                            dirstart++;
+                            numentries = showdir(currdir, dirstart);
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
@@ -723,12 +790,12 @@ bool dirbrowse(char *root)
                         if(numentries < tree_max_on_screen) {
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                          false);
-                            start = dircursor = 0;
+                            dirstart = dircursor = 0;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 
                         else {
-                            start = dircursor = 0;
-                            numentries = showdir(currdir, start);
+                            dirstart = dircursor = 0;
+                            numentries = showdir(currdir, dirstart);
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
@@ -811,7 +878,7 @@ bool dirbrowse(char *root)
                 reload_root = false;
             }
             dircursor = 0;
-            start = 0;
+            dirstart = 0;
             lastdir[0] = 0;
             lastfilter = global_settings.mp3filter;
             lastsortcase = global_settings.sort_case;
@@ -824,15 +891,15 @@ bool dirbrowse(char *root)
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
             if(CURSOR_Y+LINE_Y+dircursor>tree_max_on_screen) {
-                start++;
+                dirstart++;
                 dircursor--;
             }
-            numentries = showdir(currdir, start);
+            numentries = showdir(currdir, dirstart);
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
         }
 
         if ( numentries ) {
-            i = start+dircursor;
+            i = dirstart+dircursor;
 
             /* if MP3 filter is on, cut off the extension */
             if(lasti!=i || restore) {
