@@ -45,6 +45,9 @@
 #include "settings.h"
 #include "thread.h"
 #include "playlist.h"
+#ifdef HAVE_LCD_BITMAP
+#include "widgets.h"
+#endif
 
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -132,10 +135,6 @@ struct plugin_api {
     int  (*lcd_getstringsize)(unsigned char *str, int *w, int *h);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
-    void (*progressbar)(int x, int y, int width, int height,
-                        int percent, int direction);
-    void (*slidebar)(int x, int y, int width, int height,
-                     int percent, int direction);
     void (*scrollbar)(int x, int y, int width, int height, int items,
                       int min_shown, int max_shown, int orientation);
 #ifndef SIMULATOR

@@ -1607,8 +1607,8 @@ int wait_for_button(void)
 void cb_progess(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
-    rb->progressbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8,
-        current*100/total, 0 /*Grow_Right*/);
+    rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, 0, total,
+                  current, HORIZONTAL);
     rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
 }
 

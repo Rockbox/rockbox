@@ -151,7 +151,6 @@ bool dbg_mpeg_thread(void)
 {
     char buf[32];
     int button;
-    int percent;
     struct mpeg_debug d;
 
     lcd_setmargins(0, 0);
@@ -182,11 +181,13 @@ bool dbg_mpeg_thread(void)
         snprintf(buf, sizeof(buf), "unswapped: %x", d.unswapped_space);
         lcd_puts(0, 5, buf);
 
-        percent = d.playable_space * 100 / d.mp3buflen;
-        progressbar(0, 6*8, 112, 4, percent, Grow_Right);
+        /* Playable space left */
+        scrollbar(0, 6*8, 112, 4, d.mp3buflen, 0, 
+                  d.playable_space, HORIZONTAL);
 
-        percent = d.low_watermark_level * 100 / d.mp3buflen;
-        progressbar(0, 6*8+4, 112, 4, percent, Grow_Right);
+        /* Show the watermark limit */
+        scrollbar(0, 6*8+4, 112, 4, d.mp3buflen, 0, 
+                  d.low_watermark_level, HORIZONTAL);
 
         snprintf(buf, sizeof(buf), "wm: %x - %x",
                  d.low_watermark_level, d.lowest_watermark_level);

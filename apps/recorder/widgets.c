@@ -23,7 +23,7 @@
 #ifdef HAVE_LCD_BITMAP
 
 /* Valid dimensions return true, invalid false */
-bool valid_dimensions(int x, int y, int width, int height) 
+static bool valid_dimensions(int x, int y, int width, int height) 
 {
     if((x < 0) || (x + width > LCD_WIDTH) || 
        (y < 0) || (y + height > LCD_HEIGHT))
@@ -33,107 +33,6 @@ bool valid_dimensions(int x, int y, int width, int height)
 
     return true;
 }
-
-void init_bar(int x, int y, int width, int height)
-{
-    /* draw box */
-    lcd_drawrect(x, y, width, height);
-
-    /* clear edge pixels */
-    lcd_clearpixel(x, y);
-    lcd_clearpixel((x + width - 1), y);
-    lcd_clearpixel(x, (y + height - 1));
-    lcd_clearpixel((x + width - 1), (y + height - 1));
-
-    /* clear pixels in progress bar */
-    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
-}
-
-/*
- * Print a progress bar
- */
-void progressbar(int x, int y, int width, int height, int percent, 
-                 int direction)
-{
-    int pos;
-
-    /* check position and dimensions */
-    if (!valid_dimensions(x, y, width, height))
-        return;
-
-    init_bar(x, y, width, height);
-
-    /* draw bar */
-    pos = percent;
-    if(pos < 0)
-        pos = 0;
-    if(pos > 100)
-        pos = 100;
-
-    switch (direction)
-    {
-        case Grow_Right:
-            pos=(width - 2) * pos / 100;
-            lcd_fillrect(x + 1, y + 1, pos, height - 2);
-            break;
-        case Grow_Left:
-            pos=(width - 2) * (100 - pos) / 100;
-            lcd_fillrect(x + pos, y + 1, width - 1 - pos, height - 2);
-            break;
-        case Grow_Down:
-            pos=(height - 2) * pos / 100;
-            lcd_fillrect(x + 1, y + 1, width - 2, pos);
-            break;
-        case Grow_Up:
-            pos=(height - 2) * (100 - pos) / 100;
-            lcd_fillrect(x + 1, y + pos, width - 2, height - 1 - pos);
-            break;
-    }
-}
-
-
-/*
- * Print a slidebar bar
- */
-void slidebar(int x, int y, int width, int height, int percent, int direction)
-{
-    int pos;
-
-    /* check position and dimensions */
-    if (!valid_dimensions(x, y, width, height))
-        return;
-
-    init_bar(x, y, width, height);
-
-    /* draw knob */
-    pos = percent;
-    if(pos < 0)
-        pos = 0;
-    if(pos > 100)
-        pos = 100;
-
-    switch (direction)
-    {
-        case Grow_Right:
-            pos = (width - height) * pos / 100;
-            break;
-        case Grow_Left:
-            pos=(width - height) * (100 - pos) / 100;
-            break;
-        case Grow_Down:
-            pos=(height - width) * pos / 100;
-            break;
-        case Grow_Up:
-            pos=(height - width) * (100 - pos) / 100;
-            break;
-    }
-
-    if(direction == Grow_Left || direction == Grow_Right)
-        lcd_fillrect(x + pos + 1, y + 1, height - 2, height - 2);
-    else
-        lcd_fillrect(x + 1, y + pos + 1, width - 2, width - 2);
-}
-
 
 /*
  * Print a scroll bar
@@ -150,7 +49,17 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
     if (!valid_dimensions(x, y, width, height))
         return;
 
-    init_bar(x, y, width, height);
+    /* draw box */
+    lcd_drawrect(x, y, width, height);
+
+    /* clear edge pixels */
+    lcd_clearpixel(x, y);
+    lcd_clearpixel((x + width - 1), y);
+    lcd_clearpixel(x, (y + height - 1));
+    lcd_clearpixel((x + width - 1), (y + height - 1));
+
+    /* clear pixels in progress bar */
+    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
 
     /* min should be min */
     if(min_shown < max_shown) {

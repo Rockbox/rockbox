@@ -107,8 +107,6 @@ static struct plugin_api rockbox_api = {
     lcd_getstringsize,
     lcd_update,
     lcd_update_rect,
-    progressbar,
-    slidebar,
     scrollbar,
 #ifndef SIMULATOR
     lcd_roll,
