@@ -469,7 +469,7 @@ bool f3_screen(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#define SPACE 4 /* pixels between words */
+#define SPACE 3 /* pixels between words */
 #define MAXLETTERS 128 /* 16*8 */
 #define MAXLINES 10
 #else
@@ -499,13 +499,15 @@ void splash(int ticks,   /* how long */
     unsigned char widths[MAXLINES];
     int line=0;
     bool first=true;
+#ifdef HAVE_LCD_BITMAP
+    int maxw=0;
+#endif
 
     va_start( ap, fmt );
     vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
 
-    lcd_clear_display();
-
     if(center) {
+        
         /* first a pass to measure sizes */
         next = strtok_r(splash_buf, " ", &store);
         while (next) {
@@ -513,11 +515,11 @@ void splash(int ticks,   /* how long */
             lcd_getstringsize(next, &w, &h);
 #else
             w = strlen(next);
-            h = 1;
+            h = 1; /* store height in characters */
 #endif
             if(!first) {
                 if(x+w> LCD_WIDTH) {
-                    /* too wide */
+                    /* Too wide, wrap */
                     y+=h;
                     line++;
                     if((y > (LCD_HEIGHT-h)) || (line > MAXLINES))
@@ -535,6 +537,11 @@ void splash(int ticks,   /* how long */
 
             x += w+SPACE;
             widths[line]=x-SPACE; /* don't count the trailing space */
+#ifdef HAVE_LCD_BITMAP
+            /* store the widest line */
+            if(widths[line]>maxw)
+                maxw = widths[line];
+#endif
             next = strtok_r(NULL, " ", &store);
         }
 #ifdef HAVE_LCD_BITMAP
@@ -545,14 +552,37 @@ void splash(int ticks,   /* how long */
 #else
         y = 0; /* vertical center on 2 lines would be silly */
 #endif
-        line=0;
         first=true;
+
+        /* Now recreate the string again since the strtok_r() above has ruined
+           the one we already have! Here's room for improvements! */
         vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
     }
     va_end( ap );
 
     if(center)
         x = (LCD_WIDTH-widths[0])/2;
+
+#ifdef HAVE_LCD_BITMAP
+    /* If we center the display and it wouldn't cover the full screen,
+       then just clear the box we need and put a nice little frame and
+       put the text in there! */
+    if(center && (y > 2)) {
+        if(maxw < (LCD_WIDTH -4)) {
+            int xx = (LCD_WIDTH-maxw)/2 - 2;
+            lcd_clearrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
+            lcd_drawrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
+        }
+        else {
+            lcd_clearrect(0, y-2, LCD_WIDTH, LCD_HEIGHT-y*2+4);
+            lcd_drawline(0, y-2, LCD_WIDTH, y-2);
+            lcd_drawline(0, LCD_HEIGHT-y+2, LCD_WIDTH, LCD_HEIGHT-y+2);
+        }
+    }
+    else
+#endif
+        lcd_clear_display();
+    line=0;
     next = strtok_r(splash_buf, " ", &store);
     while (next) {
 #ifdef HAVE_LCD_BITMAP
