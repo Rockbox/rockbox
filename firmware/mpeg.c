@@ -204,8 +204,8 @@ static void dma_tick(void)
 
 static void bitswap(unsigned char *data, int length)
 {
-    int i;
-    for(i = 0;i < length;i++)
+    int i = length;
+    while(i--)
     {
         data[i] = fliptable[data[i]];
     }
