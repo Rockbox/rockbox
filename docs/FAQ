@@ -3,7 +3,7 @@ A1. A rare small animal of the species 'Textius Electronicus'. It is known for
     its helpful attitude and vicious misspellings.
 
 Q2. Okay, fine, what is _this_ FAQ?
-A2. This FAQ is for questions (that we have answers too) that have been asked
+A2. This FAQ is for questions (that we have answers to) that have been asked
     repeatedly either in emails or on IRC.
 
 Q3. What is Rockbox?  What is it's purpose?
@@ -127,13 +127,13 @@ A17. Firstly, we wouldn't start something like this if we didn't simply enjoy
 
 Q18. You mention supporting Ogg Vorbis and other file types on your list of
      ideas. What is the status on that?
-A18. Pessimist's Answer: At the current time we belive this is not very likely 
-     The Micronas chip (MAS3507) decoder in the archos does not natively 
-     support decoding and there is very little program space in the player to 
-     implement it ourselves.  The alternative would be to write a software 
-     decoder as part of the RockBox firmware.  However, as much as we love 
-     our players, the computing power of the Archos (SH1 microcontroller) is 
-     not fully sufficent for this need.
+A18. Pessimist's Answer: At the current time we believe this is not very
+     likely. The Micronas chip (MAS3507) decoder in the archos does not
+     natively support decoding and there is very little program space in the
+     player to implement it ourselves.  The alternative would be to write a
+     software decoder as part of the RockBox firmware.  However, as much as we
+     love our players, the computing power of the Archos (SH1 microcontroller)
+     is not fully sufficent for this need.
 
      Optimist's Answer: We can play any format if only we can write code for 
      the DSP to decode it.  The MAS 3507 (and 3587) are generic DSPs that 
@@ -308,7 +308,7 @@ A41: In the sense of brevity (wouldn't that be a first), check out:
      http://rockbox.haxx.se/lang
 
 Q42: Why can't I use other languages on the Player?
-A42: See the answer to question 45.  
+A42: See the answer to question 45.
 
 Q43: Does Rockbox support other fonts/character sets?
 A43: Yuppers.  See the next question.
@@ -370,6 +370,7 @@ A52: Stop!  Here is all the information about that (if you still have
      please make the mp3 file available for one of the developers to try out.
 
      - The 300-byte limit is subject to be removed in a future version
+       (Actually, it is already removed in post-1.4 versions)
 
 Q53: Where exactly did the name 'Rockbox' come from?
 A53: Well you can follow the full line of emails at 
@@ -381,7 +382,7 @@ A53: Well you can follow the full line of emails at
      leader vetoed the winning name and chose Rockbox instead.
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
      
-     There you have it.  Recommeded by users, decision by dictator.
+     There you have it.  Recommended by users, decision by dictator.
 
 Q54: Why is there a limit of 400 files in a directory?
 A54: We have answered this question numerous times.  It is mentioned in the
@@ -542,5 +543,34 @@ A66: Truth is, we don't need to fix anything.  If you are using OSX then you
      the Finder, then name the folder.  
          
 Q67: Will Rockbox work on an of Archos' other units? (FM player, Multimedia)
-A67: Unfortunately, RockBox will not likely support any units other then
+A67: Unfortunately, RockBox will not likely support any units other than
      those that we do currently support.
+
+Q68: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
+     safely and rebooted. But Rockbox still didn't load. What is wrong?
+     I am running Windows.
+A68: The old MOD/AJZ was not entirely deleted from the disk. It is still
+     there, and the boot loader finds that one instead of the new file. Here's
+     what you can do:
+
+     o Download and install Directory Snoop (version 4.03 in november 2002)
+       from http://www.briggsoft.com/dsnoop.htm
+       It's shareware, the trial version can be used 25 times.
+
+       Directory Snoop can display true drive contents by bypassing the
+       operating system and reading the raw drive sectors directly.
+
+     o Plug the Jukebox in the PC as usual and power on
+     o Launch Directory snoop
+     o Click on the Jukebox drive letter in the [select drive] field in the
+       toolbar. The content of the jukebox harddrive appears in the main
+       window. Files which appear in red color don't seem to be present on the
+       harddrive, but they still here.
+
+     o Simply select the appropriate files (red color) and purge them
+       (Purge button). Of course, don't erase the new archos.mod file and the
+       .rockbox directory :)
+     o Safely remove (Windows unmount device function) the Jukebox.
+       Power it up and ...voila... Rockbox is there!
+
+     (Thanks to Olivier Rafidison for this info)
