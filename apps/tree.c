@@ -710,7 +710,7 @@ static int onplay_screen(char* dir, char* file)
                 int pathlen = (ptr - buf);
                 strncpy(newname, buf, sizeof newname);
                 if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
-                    if (rename(buf, newname) < 0) {
+                    if (!strlen(buf+pathlen) || (rename(buf, newname) < 0)) {
                         lcd_clear_display();
                         lcd_puts(0,0,str(LANG_RENAME));
                         lcd_puts(0,1,str(LANG_FAILED));
