@@ -16,7 +16,7 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-OUTPUT = $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a $(OBJDIR)/libFLAC.a $(OBJDIR)/libTremor.a
+OUTPUT = $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a $(OBJDIR)/libFLAC.a $(OBJDIR)/libTremor.a $(OBJDIR)/libwavpack.a
 
 all: $(OUTPUT)
 
@@ -42,10 +42,16 @@ $(OBJDIR)/libTremor.a:
 	@mkdir -p $(OBJDIR)/Tremor
 	@$(MAKE) -C Tremor TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
 
+$(OBJDIR)/libwavpack.a:
+	@echo "MAKE in libwavpack"
+	@mkdir -p $(OBJDIR)/libwavpack
+	@$(MAKE) -C libwavpack TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+		
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack.a
 	@$(MAKE) -C libmad clean
 	@$(MAKE) -C liba52 clean
 	@$(MAKE) -C libFLAC clean
 	@$(MAKE) -C Tremor clean
+	@$(MAKE) -C libwavpack clean
