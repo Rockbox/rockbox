@@ -31,6 +31,7 @@ SECTIONS
     .text :
     {
         *(.text)
+        . = ALIGN(0x4);
     } > DRAM
 
     .data :
@@ -42,6 +43,7 @@ SECTIONS
     {
         *(.rodata)
         *(.rodata.str1.4)
+        . = ALIGN(0x4);
     } > DRAM
 
     .stack :
