@@ -52,7 +52,7 @@ static unsigned int backlight_timeout = 5;
 static void __backlight_off(void)
 {
 #ifdef IRIVER_H100
-    GPIO1_OUT  &= ~0x00020000;
+    GPIO1_OUT  |= 0x00020000;
 #else
 #ifdef HAVE_RTC
     /* Disable square wave */
@@ -66,7 +66,7 @@ static void __backlight_off(void)
 static void __backlight_on(void)
 {
 #ifdef IRIVER_H100
-    GPIO1_OUT  |= 0x00020000;
+    GPIO1_OUT  &= ~0x00020000;
 #else
 #ifdef HAVE_RTC
     /* Enable square wave */
