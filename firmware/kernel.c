@@ -139,7 +139,7 @@ void queue_clear(struct event_queue* q)
     set_irq_level(oldlevel);
 }
 
-int queue_broadcast(int id, void *data)
+int queue_broadcast(long id, void *data)
 {
    int i;
 
