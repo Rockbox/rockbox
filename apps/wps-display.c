@@ -120,7 +120,7 @@ static void wps_format(char* fmt)
     format_buffer[sizeof(format_buffer) - 1] = 0;
     format_lines[line] = buf;
     
-    while (*buf)
+    while ((*buf) && (line < MAX_LINES))
     {
         switch (*buf)
         {
@@ -134,7 +134,7 @@ static void wps_format(char* fmt)
                 if(*start_of_line != '#') /* A comment? */
                     line++;
                 
-                if (line <= MAX_LINES)
+                if (line < MAX_LINES)
                 {
                     /* the next line starts on the next byte */
                     format_lines[line] = buf+1;
@@ -145,13 +145,19 @@ static void wps_format(char* fmt)
         buf++;
     }
 
-    if(buf != format_lines[line])
-        /* the last line didn't terminate with a newline */
-        line++;
-
-    for (; line < MAX_LINES; line++)
+    /* if supplied input didn't define a format line   
+       for each line on the wps, set the rest to null */
+    if (line < MAX_LINES)
     {
-        format_lines[line] = NULL;
+        /* if the final line didn't terminate with a newline,  
+           the line index wasn't incremented */
+        if (buf != format_lines[line])
+            line++;
+
+        for (; line < MAX_LINES; line++)
+        {
+            format_lines[line] = NULL;
+        }
     }
 }
 
