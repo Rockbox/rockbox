@@ -1,3 +1,4 @@
+# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -150,8 +151,6 @@ eng: "Is battery low?"
 new: "Is de batterij leeg ?"
 
 id: LANG_TIME_SET
-### Description changed! Previous description was:
-### "if save settings has failed"
 desc: 
 eng: "ON to set"
 new: "ON om in te stellen"
@@ -308,10 +307,8 @@ new: "Sorteer mode"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-### English phrase was changed! Previous translation was made on:
-### "Scroll Speed"
 eng: "Scroll"
-new: "Scroll snelheid"
+new: 
 
 id: LANG_RESET
 desc: in system_settings_menu()
@@ -424,22 +421,16 @@ eng: "Resume?"
 new: "Hervatten?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
-### Description changed! Previous description was:
-### "posible answers to resume question"
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: 
 
 id: LANG_RESUME_CONFIRM_RECORDER
-### Description changed! Previous description was:
-### "posible answer to resume question"
 desc: possible answer to resume question
 eng: "PLAY = Yes"
 new: "PLAY = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
-### Description changed! Previous description was:
-### "posible answer to resume question"
 desc: possible answer to resume question
 eng: "Any Other = No"
 new: "Elke andere = Nee"
@@ -870,8 +861,6 @@ eng: "One"
 new: "Een"
 
 id: LANF_WEEKDAY_THURSDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Do" 
@@ -887,85 +876,61 @@ eng: "24 hour clock"
 new: "24 uurs klok" 
 
 id: LANG_MONTH_APRIL
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
 new: 
 
 id: LANG_MONTH_AUGUST
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
 new: 
 
 id: LANG_MONTH_DECEMBER
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 new: 
 
 id: LANG_MONTH_FEBRUARY
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
 new: 
 
 id: LANG_MONTH_JANUARY
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
 new: 
 
 id: LANG_MONTH_JULY
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
 new: 
 
 id: LANG_MONTH_JUNE
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
 new: 
 
 id: LANG_MONTH_MARCH
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
 new: "Maa" 
 
 id: LANG_MONTH_MAY
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
 new: "Mei" 
 
 id: LANG_MONTH_NOVEMBER
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
 new: 
 
 id: LANG_MONTH_OCTOBER
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
 new: "Okt" 
 
 id: LANG_MONTH_SEPTEMBER
-### Description changed! Previous description was:
-### "abbreviation for monthname"
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 new: 
@@ -986,43 +951,31 @@ eng: "Time Format"
 new: "Tijds Aanduiding" 
 
 id: LANG_WEEKDAY_FRIDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
 new: "Vr" 
 
 id: LANG_WEEKDAY_MONDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
 new: "Ma"
 
 id: LANG_WEEKDAY_SATURDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 new: "Za"
 
 id: LANG_WEEKDAY_SUNDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 new: "Zo" 
 
 id: LANG_WEEKDAY_TUESDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
 new: "Di"
 
 id: LANG_WEEKDAY_WEDNESDAY
-### Description changed! Previous description was:
-### "abbreviation for weekday"
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new: "Wo" 
@@ -1192,62 +1145,157 @@ desc: sleep timer setting
 eng: "Sleep timer"
 new: 
 
-id: LANG_BATTERY_CAPACITY
-desc: in settings_menu
-eng: "Battery Capacity"
-### Not previously translated
-new: 
-
-id: LANG_BATTERY_TOPOFF_CHARGE
-desc: in info display, shows that top off charge is running
-eng: "Battery: Top-Off Chg"
-### Not previously translated
-new: 
-
-id: LANG_BATTERY_TRICKLE_CHARGE
-desc: in info display, shows that trickle charge is running
-eng: "Battery: Trickle Chg"
-### Not previously translated
-new: 
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-skip buffer"
+new: "Overslaan buffer" 
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-### Not previously translated
-new: 
-
-id: LANG_MP3BUFFER_MARGIN
-desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
-### Not previously translated
-new: 
+new: "Tweerichting Scroll Limiet" 
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-### Not previously translated
-new: 
+new: "Scroll Start Vertraging"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-### Not previously translated
-new: 
+new: "Scroll Snelheid"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-### Not previously translated
-new: 
+new: "Scroll Stapgrote" 
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-### Not previously translated
-new: 
+new: "Scroll Stapgrote Instelling Voorbeeld Text" 
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+new: "Batterij Capaciteit"
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+new: "Batterij: Vol Laden" 
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+new: "Batterij: Druppel Laden"
 
 id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
-### Not previously translated
+new: "Druppel Laden" 
+
+id: LANG_QUEUE_FULL
+desc: queue buffer full
+eng: "Queue buffer full"
+new: "Wachtrij buffer vol"
+
+id: LANG_QUEUE_QUEUED
+desc: queued track name %s
+eng: "Queued: %s"
+new: "In Wachtrij: %s" 
+
+id: LANG_QUEUE_TOTAL
+desc: number of queued tracks %d
+eng: "Total queued: %d"
+new: "Totaal In Wachtrij: %d" 
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+new: "Verwijder"
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+new: "Verwijderd" 
+
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "failed"
+new: "Mislukt" 
+
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
+eng: "Canceled"
+new: "Afgebroken" 
+
+id: LANG_MENU_SETTING_OK
+desc: Visual confirmation of changing a setting
+eng: "OK"
 new: 
+
+id: LANG_PLAYER_ONPLAY_1
+desc: 
+eng: "\x81 Queue"
+new: "\x81 Wachtrij" 
+
+id: LANG_PLAYER_ONPLAY_2
+desc: 
+eng: "- Ren + Del"
+new: "- Hern + Verw"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+new: "Wachtrij" 
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+new: "Verwijderen?" 
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+new: "Hernoem" 
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+new: "Inschakeltijd" 
+
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm time is too soon!"
+new: "Inschakel tijd is te snel" 
+
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+new: "PLAY=Set OFF=Afbreken"
+
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting down..."
+new: "Uitschakelen..." 
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm time: %02d:%02d"
+new: "Inschakel tijd: %02d:%02d" 
+
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking up in %d:%02d"
+new: "Inschakelen om:  
+
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+new: "Afspeellijst maken" 
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+new: "Creeëren..."
