@@ -16,9 +16,9 @@ LIBS = -lgcc
 .c.o:
 	sh-elf-gcc -O -I../firmware/drivers -m1 -Wall -Wstrict-prototypes -c -o $@ $<
 
-$(TARGET).out: $(TARGET).elf
+archos.mod: $(TARGET).elf
 	sh-elf-objcopy -O binary $(TARGET).elf $(TARGET).out
-	scramble $(TARGET).out archos.mod
+	../tools/scramble $(TARGET).out archos.mod
 
 $(TARGET).elf: $(OBJS)
 	sh-elf-gcc -nostartfiles $(OBJS) -lgcc -Wl,-Map,$(TARGET).map -o $(TARGET).elf -Tlinker.cfg
