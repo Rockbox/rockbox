@@ -137,6 +137,12 @@ static int initialize_card(int card_no);
 
 static int select_card(int card_no)
 {
+    if (!card_info[card_no].initialized)
+    {
+        write_transfer(dummy, 10); /* allow the card to synchronize */
+        while (!(SSR1 & SCI_TEND));
+    }
+
     if (card_no == 0)
     {   /* internal */
         or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
@@ -161,7 +167,7 @@ static int select_card(int card_no)
 
 static void deselect_card(void)
 {
-    while (!(SSR1 & SCI_TEND));   /* wait until end of transfer */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     or_b(0x06, &PADRH);           /* deassert CS (both cards) */
 }
 
@@ -169,7 +175,7 @@ static void setup_sci1(int bitrate_register)
 {
     int i;
 
-    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
 
     SCR1 = 0;                     /* disable serial port */
     SMR1 = SYNC_MODE;             /* no prescale */
@@ -187,12 +193,10 @@ static void write_transfer(const unsigned char *buf, int len)
     const unsigned char *buf_end = buf + len;
 
     /* TODO: DMA */
-
-    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
-
+    
     while (buf < buf_end)
     {
-        while (!(SSR1 & SCI_TDRE));              /* wait for Tx reg. free */
+        while (!(SSR1 & SCI_TEND));              /* wait for end of transfer */
         TDR1 = fliptable[(signed char)(*buf++)]; /* write byte */
         SSR1 = 0;                                /* start transmitting */
     }
@@ -204,7 +208,7 @@ static void read_transfer(unsigned char *buf, int len)
 
     /* TODO: DMA */
 
-    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     TDR1 = 0xFF;                  /* send do-nothing data in parallel */
     
     while (buf < buf_end)
@@ -221,7 +225,7 @@ static unsigned char poll_byte(int timeout)
     int i;
     unsigned char data = 0;       /* stop the compiler complaining */
 
-    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     TDR1 = 0xFF;                  /* send do-nothing data in parallel */
 
     i = 0;
@@ -230,6 +234,24 @@ static unsigned char poll_byte(int timeout)
         while (!(SSR1 & SCI_RDRF)); /* wait for data */
         data = RDR1;                /* read byte */
     } while ((data == 0xFF) && (++i < timeout));
+
+    return fliptable[(signed char)data];
+}
+
+static unsigned char poll_busy(int timeout)
+{
+    int i;
+    unsigned char data;
+    
+    while (!(SSR1 &SCI_TEND));    /* wait for end of transfer */
+    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
+    
+    i = 0;
+    do {
+        SSR1 = 0;                   /* start receiving */
+        while (!(SSR1 & SCI_RDRF)); /* wait for data */
+        data = RDR1;                /* read byte */
+    } while ((data == 0x00) && (++i < timeout));
 
     return fliptable[(signed char)data];
 }
@@ -250,7 +272,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
     
     write_transfer(command, 6);
 
-    response[0] = poll_byte(50);
+    response[0] = poll_byte(20);
     
     if (response[0] != 0x00)
     {
@@ -301,6 +323,23 @@ static int receive_data(unsigned char *buf, int len, int timeout)
     return 0;
 }
 
+static int send_data(const unsigned char *buf, int len, int timeout)
+{
+    static const unsigned char start_data = 0xFE;
+    int ret = 0;
+
+    write_transfer(&start_data, 1);
+    write_transfer(buf, len);
+    write_transfer(dummy, 2);     /* crc - dontcare */
+
+    if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
+        ret = -1;
+
+    write_transfer(dummy, 1);
+    
+    return ret;
+}
+
 static int initialize_card(int card_no)
 {
     int i, temp;
@@ -322,8 +361,7 @@ static int initialize_card(int card_no)
 
     card->initialized = false;
     setup_sci1(7); /* Initial rate: 375 kBit/s (need <= 400 per mmc specs) */
-    write_transfer(dummy, 10);    /* synchronize: 74+ clocks */
-    
+
     /* switch to SPI mode */
     send_cmd(CMD_GO_IDLE_STATE, 0, &response);
     if (response != 0x01)
@@ -331,7 +369,7 @@ static int initialize_card(int card_no)
 
     /* initialize card */
     i = 0;
-    while (send_cmd(CMD_SEND_OP_COND, 0, &response) && (++i < 100));
+    while (send_cmd(CMD_SEND_OP_COND, 0, &response) && (++i < 200));
     if (response != 0x00)
         return -2;                /* not ready */
     
@@ -409,7 +447,7 @@ int ata_read_sectors(unsigned long start,
     unsigned long addr;
     unsigned char response;
     tCardInfo *card = &card_info[current_card];
-
+    
     addr = start * SECTOR_SIZE;
     
     mutex_lock(&ata_mtx);
@@ -424,7 +462,7 @@ int ata_read_sectors(unsigned long start,
         addr += SECTOR_SIZE;
         inbuf += SECTOR_SIZE;
     }
-
+    
     deselect_card();
     mutex_unlock(&ata_mtx);
 
@@ -437,17 +475,30 @@ int ata_write_sectors(unsigned long start,
                       const void* buf)
 {
     int ret = 0;
+    int i;
+    unsigned long addr;
+    unsigned char response;
+    tCardInfo *card = &card_info[current_card];
 
     if (start == 0)
         panicf("Writing on sector 0\n");
 
+    addr = start * SECTOR_SIZE;
+
     mutex_lock(&ata_mtx);
+    ret = select_card(current_card);
 
-    /* ToDo: action */
-    (void)start;
-    (void)count;
-    (void)buf;
+    for (i = 0; (i < count) && (ret == 0); i++)
+    {
+        if ((ret = send_cmd(CMD_WRITE_BLOCK, addr, &response)))
+            break;
+        ret = send_data(buf, SECTOR_SIZE, card->write_timeout);
 
+        addr += SECTOR_SIZE;
+        buf += SECTOR_SIZE;
+    }
+
+    deselect_card();
     mutex_unlock(&ata_mtx);
 
     return ret;
@@ -532,16 +583,15 @@ void ata_enable(bool on)
     PBCR1 &= ~0x0CF0; /* PB13, PB11 and PB10 become GPIOs, if not modified below */
     if (on)
     {
-        /* serial setup */
         PBCR1 |= 0x08A0;    /* as SCK1, TxD1, RxD1 */
+        IPRE &= 0x0FFF;     /* disable SCI1 interrupts for the CPU */
     }
-    else
-    {
-        and_b(~0x80, &PADRL); /* assert reset */
-        sleep(5);
-        or_b(0x80, &PADRL);   /* de-assert reset */
-        sleep(5);
-    }
+    and_b(~0x80, &PADRL); /* assert reset */
+    sleep(HZ/20);
+    or_b(0x80, &PADRL);   /* de-assert reset */
+    sleep(HZ/20);
+    card_info[0].initialized = false;
+    card_info[1].initialized = false;
 }
 
 int ata_init(void)
