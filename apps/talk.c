@@ -11,7 +11,7 @@
  *
  * This module collects the Talkbox and voice UI functions.
  * (Talkbox reads directory names from mp3 clips called thumbnails,
- *  the voice UI lets menus and screens "talk" from a voicefont in memory.
+ *  the voice UI lets menus and screens "talk" from a voicefile in memory.
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -36,28 +36,32 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 /***************** Constants *****************/
 
-#define QUEUE_SIZE 50
+#define QUEUE_SIZE 64 /* must be a power of two */
+#define QUEUE_MASK (QUEUE_SIZE-1)
 const char* dir_thumbnail_name = ".dirname.tbx";
+
+/***************** Functional Macros *****************/
+
+#define QUEUE_LEVEL ((queue_write - queue_read) & QUEUE_MASK)
 
 
 /***************** Data types *****************/
 
 struct clip_entry /* one entry of the index table */
 {
-    int offset; /* offset from start of voicefont file */
+    int offset; /* offset from start of voicefile file */
     int size; /* size of the clip */
 };
 
-struct voicefont /* file format of our "voicefont" */
+struct voicefile /* file format of our voice file */
 {
-    int version; /* version of the voicefont */
+    int version; /* version of the voicefile */
     int table;   /* offset to index table, (=header size) */
     int id1_max; /* number of "normal" clips contained in above index */
     int id2_max; /* number of "voice only" clips contained in above index */
     struct clip_entry index[]; /* followed by the index tables */
     /* and finally the bitswapped mp3 clips, not visible here */
 };
-
 
 struct queue_entry /* one entry of the internal queue */
 {
@@ -66,23 +70,22 @@ struct queue_entry /* one entry of the internal queue */
 };
 
 
-
 /***************** Globals *****************/
 
 static unsigned char* p_thumbnail; /* buffer for thumbnail */
 static long size_for_thumbnail; /* leftover buffer size for it */
-static struct voicefont* p_voicefont; /* loaded voicefont */
-static bool has_voicefont; /* a voicefont file is present */
-static bool is_playing; /* we're currently playing */
+static struct voicefile* p_voicefile; /* loaded voicefile */
+static bool has_voicefile; /* a voicefile file is present */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
+static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 
 
 /***************** Private prototypes *****************/
 
-static int load_voicefont(void);
+static int load_voicefile(void);
 static void mp3_callback(unsigned char** start, int* size);
 static int shutup(void);
 static int queue_clip(unsigned char* buf, int size, bool enqueue);
@@ -108,28 +111,29 @@ static int open_voicefile(void)
 }
 
 
-
-static int load_voicefont(void)
+/* load the voice file into the mp3 buffer */
+static int load_voicefile(void)
 {
     int fd;
     int size;
 
-    p_voicefont = NULL; /* indicate no voicefont if we fail below */
+    p_voicefile = NULL; /* indicate no voicefile if we fail below */
 
     fd = open_voicefile();
     if (fd < 0) /* failed to open */
     {
-        p_voicefont = NULL; /* indicate no voicefont */
-        has_voicefont = false; /* don't try again */
+        p_voicefile = NULL; /* indicate no voicefile */
+        has_voicefile = false; /* don't try again */
         return 0;
     }
 
     size = read(fd, mp3buf, mp3end - mp3buf);
-    if (size > 1000
-        && ((struct voicefont*)mp3buf)->table
-           == offsetof(struct voicefont, index))
+    if (size > 10000 /* too small is probably invalid */
+        && size == filesize(fd) /* has to fit completely */
+        && ((struct voicefile*)mp3buf)->table /* format check */
+           == offsetof(struct voicefile, index))
     {
-        p_voicefont = (struct voicefont*)mp3buf;
+        p_voicefile = (struct voicefile*)mp3buf;
 
         /* thumbnail buffer is the remaining space behind */
         p_thumbnail = mp3buf + size;
@@ -138,7 +142,7 @@ static int load_voicefont(void)
     }
     else
     {
-        has_voicefont = false; /* don't try again */
+        has_voicefile = false; /* don't try again */
     }
     close(fd);
 
@@ -149,15 +153,14 @@ static int load_voicefont(void)
 /* called in ISR context if mp3 data got consumed */
 static void mp3_callback(unsigned char** start, int* size)
 {
-    int play_now;
+    queue[queue_read].len -= sent; /* we completed this */
+    queue[queue_read].buf += sent;
 
     if (queue[queue_read].len > 0) /* current clip not finished? */
     {   /* feed the next 64K-1 chunk */
-        play_now = MIN(queue[queue_read].len, 0xFFFF);
+        sent = MIN(queue[queue_read].len, 0xFFFF);
         *start = queue[queue_read].buf;
-        *size = play_now;
-        queue[queue_read].buf += play_now;
-        queue[queue_read].len -= play_now;
+        *size = sent;
         return;
     }
     else /* go to next entry */
@@ -167,21 +170,18 @@ static void mp3_callback(unsigned char** start, int* size)
             queue_read = 0;
     }
 
-    if (queue_read != queue_write) /* queue is not empty? */
+    if (QUEUE_LEVEL) /* queue is not empty? */
     {   /* start next clip */
-        play_now = MIN(queue[queue_read].len, 0xFFFF);
+        sent = MIN(queue[queue_read].len, 0xFFFF);
         *start = queue[queue_read].buf;
-        *size = play_now;
+        *size = sent;
         curr_hd[0] = *start[1];
         curr_hd[1] = *start[2];
         curr_hd[2] = *start[3];
-        queue[queue_read].buf += play_now;
-        queue[queue_read].len -= play_now;
     }
     else
     {
         *size = 0; /* end of data */
-        is_playing = false;
         mp3_play_stop(); /* fixme: should be done by caller */
     }
 }
@@ -193,48 +193,54 @@ static int shutup(void)
     unsigned char* search;
     unsigned char* end;
 
-    if (!is_playing) /* has ended anyway */
+    if (QUEUE_LEVEL == 0) /* has ended anyway */
+    {
         return 0;
+    }
 
-    CHCR3 &= ~0x0001; /* disable the DMA */
+    CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
 
     /* search next frame boundary and continue up to there */
     pos = search = mp3_get_pos();
     end = queue[queue_read].buf + queue[queue_read].len;
 
-    /* Find the next frame boundary */
-    while (search < end) /* search the remaining data */
-    {
-        if (*search++ != 0xFF) /* quick search for frame sync byte */
-            continue; /* (this does the majority of the job) */
-            
-        /* look at the (bitswapped) rest of header candidate */
-        if (search[0] == curr_hd[0] /* do the quicker checks first */
-         && search[2] == curr_hd[2]
-         && (search[1] & 0x30) == (curr_hd[1] & 0x30)) /* sample rate */
+    if (pos >= queue[queue_read].buf
+        && pos <= end) /* really our clip? */
+    { /* (for strange reasons this isn't nesessarily the case) */
+        /* find the next frame boundary */
+        while (search < end) /* search the remaining data */
         {
-            search--; /* back to the sync byte */
-            break; /* From looking at it, this is our header. */
+            if (*search++ != 0xFF) /* quick search for frame sync byte */
+                continue; /* (this does the majority of the job) */
+            
+            /* look at the (bitswapped) rest of header candidate */
+            if (search[0] == curr_hd[0] /* do the quicker checks first */
+             && search[2] == curr_hd[2]
+             && (search[1] & 0x30) == (curr_hd[1] & 0x30)) /* sample rate */
+            {
+                search--; /* back to the sync byte */
+                break; /* From looking at it, this is our header. */
+            }
+        }
+    
+        if (search-pos)
+        {   /* play old data until the frame end, to keep the MAS in sync */
+            sent = search-pos;
+
+            queue_write = queue_read + 1; /* will be empty after next callback */
+            if (queue_write >= QUEUE_SIZE)
+                queue_write = 0;
+            queue[queue_read].len = sent; /* current one ends after this */
+
+            DTCR3 = sent; /* let the DMA finish this frame */
+            CHCR3 |= 0x0001; /* re-enable DMA */
+            return 0;
         }
     }
-    
-    if (search-pos)
-    {   /* play old data until the frame end, to keep the MAS in sync */
-        DTCR3 = search-pos;
 
-        queue_write = queue_read + 1; /* will be empty after next callback */
-        if (queue_write >= QUEUE_SIZE)
-            queue_write = 0;
-        queue[queue_read].len = 0; /* current one ends now */
-
-        CHCR3 |= 0x0001; /* re-enable DMA */
-    }
-    else
-    {   /* by chance we have played to a frame boundary */
-        queue_write = queue_read; /* reset the queue */
-        is_playing = false;
-        mp3_play_stop();
-    }
+    /* nothing to do, was frame boundary or not our clip */
+    mp3_play_stop();
+    queue_write = queue_read = 0; /* reset the queue */
 
     return 0;
 }
@@ -243,30 +249,42 @@ static int shutup(void)
 /* schedule a clip, at the end or discard the existing queue */
 static int queue_clip(unsigned char* buf, int size, bool enqueue)
 {
+    int queue_level;
+
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
     
-    queue[queue_write].buf = buf;
-    queue[queue_write].len = size;
+    if (!size)
+        return 0; /* safety check */
+
+    /* disable the DMA temporarily, to be safe of race condition */
+    CHCR3 &= ~0x0001;
+
+    queue_level = QUEUE_LEVEL; /* check old level */
+
+    if (queue_level < QUEUE_SIZE - 1) /* space left? */
+    {
+        queue[queue_write].buf = buf; /* populate an entry */
+        queue[queue_write].len = size;
     
-    /* FixMe: make this IRQ-safe */
+        queue_write++; /* increase queue */
+        if (queue_write >= QUEUE_SIZE)
+            queue_write = 0;
+    }
         
-    if (!is_playing)
-    {   /* queue empty, we have to do the initial start */
-        int size_now = MIN(size, 0xFFFF); /* DMA can do no more */
-        is_playing = true;
-        mp3_play_data(buf, size_now, mp3_callback);
+    if (queue_level == 0)
+    {   /* queue was empty, we have to do the initial start */
+        sent = MIN(size, 0xFFFF); /* DMA can do no more */
+        mp3_play_data(buf, sent, mp3_callback);
         curr_hd[0] = buf[1];
         curr_hd[1] = buf[2];
         curr_hd[2] = buf[3];
         mp3_play_pause(true); /* kickoff audio */
-        queue[queue_write].buf += size_now;
-        queue[queue_write].len -= size_now;
     }
-
-    queue_write++;
-    if (queue_write >= QUEUE_SIZE)
-        queue_write = 0;
+    else
+    {
+        CHCR3 |= 0x0001; /* re-enable DMA */
+    }
 
     return 0;
 }
@@ -282,29 +300,30 @@ void talk_init(void)
     if (fd >= 0) /* success */
     {
         close(fd);
-        has_voicefont = true;
+        has_voicefile = true;
     }
     else
     {
-        has_voicefont = false; /* no voice file available */
+        has_voicefile = false; /* no voice file available */
     }
     
     talk_buffer_steal(); /* abuse this for most of our inits */
-    queue_write = queue_read = 0; 
 }
 
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 int talk_buffer_steal(void)
 {
-    p_voicefont = NULL; /* indicate no voicefont (trashed) */
+    mp3_play_stop();
+    queue_write = queue_read = 0; /* reset the queue */
+    p_voicefile = NULL; /* indicate no voicefile (trashed) */
     p_thumbnail = mp3buf; /*  whole space for thumbnail */
     size_for_thumbnail = mp3end - mp3buf;
     return 0;
 }
 
 
-/* play a voice ID from voicefont */
+/* play a voice ID from voicefile */
 int talk_id(int id, bool enqueue)
 {
     int clipsize;
@@ -314,10 +333,10 @@ int talk_id(int id, bool enqueue)
     if (mpeg_status()) /* busy, buffer in use */
         return -1; 
 
-    if (p_voicefont == NULL && has_voicefont)
-        load_voicefont(); /* reload needed */
+    if (p_voicefile == NULL && has_voicefile)
+        load_voicefile(); /* reload needed */
 
-    if (p_voicefont == NULL) /* still no voices? */
+    if (p_voicefile == NULL) /* still no voices? */
         return -1;
 
     if (id == -1) /* -1 is an indication for silence */
@@ -327,7 +346,6 @@ int talk_id(int id, bool enqueue)
     unit = ((unsigned)id) >> UNIT_SHIFT;
     if (unit)
     {   /* sign-extend the value */
-        //splash(200, true,"unit=%d", unit);
         id = (unsigned)id << (32-UNIT_SHIFT);
         id >>= (32-UNIT_SHIFT);
         talk_value(id, unit, enqueue); /* speak it */
@@ -337,21 +355,21 @@ int talk_id(int id, bool enqueue)
     if (id > VOICEONLY_DELIMITER)
     {   /* voice-only entries use the second part of the table */
         id -= VOICEONLY_DELIMITER + 1;
-        if (id >= p_voicefont->id2_max)
+        if (id >= p_voicefile->id2_max)
             return -1; /* must be newer than we have */
-        id += p_voicefont->id1_max; /* table 2 is behind table 1 */
+        id += p_voicefile->id1_max; /* table 2 is behind table 1 */
     }
     else
     {   /* normal use of the first table */
-        if (id >= p_voicefont->id1_max)
+        if (id >= p_voicefile->id1_max)
             return -1; /* must be newer than we have */
     }
     
-    clipsize = p_voicefont->index[id].size;
-    if (clipsize == 0) /* clip not included in voicefont */
+    clipsize = p_voicefile->index[id].size;
+    if (clipsize == 0) /* clip not included in voicefile */
         return -1;
 
-    clipbuf = mp3buf + p_voicefont->index[id].offset;
+    clipbuf = mp3buf + p_voicefile->index[id].offset;
 
     queue_clip(clipbuf, clipsize, enqueue);
 
