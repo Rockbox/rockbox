@@ -78,7 +78,7 @@ static void draw_screen(struct mp3entry* id3)
 #endif
 
     lcd_clear_display();
-    if(!id3)
+    if(!id3 && !mpeg_is_playing())
     {
 #ifdef HAVE_LCD_CHARCELLS
         lcd_puts(0, 0, "End of list");
