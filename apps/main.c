@@ -61,7 +61,7 @@
 
 
 #if (CONFIG_HWCODEC == MASNONE)
-#include "uda1380.h"
+#include "pcm_playback.h"
 #endif
 
 #ifdef CONFIG_TUNER
@@ -269,7 +269,7 @@ void init(void)
 #endif /* #ifdef AUTOROCK */
 
 #if (CONFIG_HWCODEC == MASNONE)
-    uda1380_init();
+    pcm_init();
 #endif
 }
 
