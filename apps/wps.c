@@ -1124,6 +1124,7 @@ int wps_show(void)
         }
 
         if(restore) {
+            restore = false;
             draw_screen(id3);
             if (mpeg_is_playing() && id3)
                 display_file_time(id3->elapsed, id3->length);
