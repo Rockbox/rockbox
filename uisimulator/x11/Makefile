@@ -191,7 +191,7 @@ $(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
 
 $(OBJDIR)/%.rock: $(APPSDIR)/plugins/%.c $(APPSDIR)/plugin.h
 	@echo CC $<
-	@$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
+	@$(CC) $(APPCFLAGS) -DPLUGIN -shared $< -L$(OBJDIR) -lplugin -o $@
 	@chmod -x $@
 
 ################## Patterns for building objects ##################
