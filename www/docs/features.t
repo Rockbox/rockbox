@@ -240,7 +240,7 @@ EFEAT
 
 NAME Number of available languages ENAME
 TD 19 ETD
-TD 3? ETD
+TD 3 ETD
 EFEAT
 
 NAME Accurate VBR bitrate display ENAME
@@ -250,6 +250,11 @@ EFEAT
 
 NAME FM Tuner support (FM Recorder) ENAME
 YES
+YES
+EFEAT
+
+NAME FF/FR with sound ENAME
+NO
 YES
 EFEAT
 
