@@ -20,6 +20,7 @@
 #define _RTC_H_
 
 #ifdef HAVE_RTC
+void rtc_init(void);
 int rtc_read(unsigned char address);
 int rtc_write(unsigned char address, unsigned char value);
 #endif
