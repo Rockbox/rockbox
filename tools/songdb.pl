@@ -563,7 +563,6 @@ sub AUTOLOAD {
 				return $_[0]->{$name}
 			};
 
-		no strict 'refs';
 		*{$AUTOLOAD} = $sub;
 		goto &$AUTOLOAD;
 
