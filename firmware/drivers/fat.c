@@ -891,7 +891,7 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
 int fat_seek(struct fat_file *file, int seeksector )
 {
     int cluster = file->firstcluster;
-    int sector = seeksector;
+    int sector = cluster2sec(cluster);
     int numsec = 0;
     int i;
 
@@ -912,11 +912,6 @@ int fat_seek(struct fat_file *file, int seeksector )
             else
                 sector++;
         }
-    }
-    else {
-        sector = cluster2sec(cluster);
-        if (sector<0)
-            return -2;
     }
         
     file->nextcluster = cluster;
