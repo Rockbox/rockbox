@@ -89,7 +89,7 @@ while(<LANG>) {
                 $value = $set{'eng'};
             }
 
-            if($value =~ s/^\"(.*)\"/$1/g) {
+            if($value =~ s/^\"(.*)\" *$/$1/g) {
 
                 $idnum = $idnum{$set{'id'}};
                 $idnum{$set{'id'}} = '_done_';
