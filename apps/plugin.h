@@ -44,6 +44,7 @@
 #include "mp3_playback.h"
 #include "settings.h"
 #include "thread.h"
+#include "playlist.h"
 
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -239,7 +240,7 @@ struct plugin_api {
     void (*mpeg_prev)(void);
     void (*mpeg_ff_rewind)(int newtime);
     struct mp3entry* (*mpeg_next_track)(void);
-    bool (*mpeg_has_changed_track)(void);
+    int (*playlist_amount)(void);
     int (*mpeg_status)(void);
     
 #ifdef HAVE_LCD_BITMAP

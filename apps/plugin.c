@@ -210,7 +210,7 @@ static struct plugin_api rockbox_api = {
     mpeg_prev,
     mpeg_ff_rewind,
     mpeg_next_track,
-    mpeg_has_changed_track,
+    playlist_amount,
     mpeg_status,
 #ifdef HAVE_LCD_BITMAP
     font_get,
