@@ -1,4 +1,4 @@
-#define _LOGO_ <img src="rockbox400.png" width=400 height=123>
+#define _LOGO_ <img src="rockbox400.png" align=center width=400 height=123>
 #define _PAGE_ Open Source Jukebox Firmware
 #include "head.t"
 
@@ -15,6 +15,12 @@
 <a href="cvs.html">CVS</a> &middot;
 <a href="/isd200/">linux driver</a>
 </small>
+
+<form action="http://www.google.com/search">
+<input name=as_q> <input value="Search" type=submit>
+<input type=hidden name=as_oq value=rockbox>
+<input type=hidden name=as_sitesearch value="bjorn.haxx.se">
+</form>
 
 <h2>Purpose</h2>
 
