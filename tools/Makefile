@@ -8,7 +8,7 @@
 #
 CFLAGS := -O -s -ansi
 
-TARGETS := scramble descramble sh2d bdf2ajf bmp2rb
+TARGETS := scramble descramble sh2d bmp2rb
 
 all: $(TARGETS)
 
@@ -17,9 +17,6 @@ scramble: scramble.c
 descramble: descramble.c
 
 sh2d: sh2d.c
-
-bdf2ajf: bdf2ajf.c
-	gcc -g -ansi $+ -o $@
 
 bmp2rb:	bmp2rb.c
 	gcc -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
