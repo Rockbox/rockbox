@@ -17,10 +17,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
-
-#include <serial.h>
-#include <lcd.h>
+#include "serial.h"
 
 #define TDRE 7 /* transmit data register empty */
 #define RDRF 6 /* receive data register full   */
@@ -75,8 +72,4 @@ void RXI1 (void)
     serial_byte = RDR1;
     serial_flag = 1;
     clear_bit(RDRF,SSR1_ADDR);
-    if (serial_byte == '0')
-	lcd_turn_off_backlight ();
-    if (serial_byte == '1')
-	lcd_turn_on_backlight ();
 }
