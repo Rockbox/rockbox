@@ -43,11 +43,11 @@
 #include "mpeg.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 8
+#define PLUGIN_API_VERSION 9
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility */
-#define PLUGIN_MIN_API_VERSION 6
+#define PLUGIN_MIN_API_VERSION 9
 
 /* plugin return codes */
 enum plugin_status {
