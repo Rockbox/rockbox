@@ -80,7 +80,7 @@ extern int charge_state;         /* tells what the charger is doing (for info di
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
 /* Start up power management thread */
-void power_init(void);
+void powermgmt_init(void);
 
 #endif /* SIMULATOR */
 

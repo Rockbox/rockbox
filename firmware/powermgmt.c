@@ -685,8 +685,10 @@ static void power_thread(void)
     }
 }
 
-void power_init(void)
+void powermgmt_init(void)
 {
+    power_init();
+    
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
     /* initialize the history with a single sample to prevent level

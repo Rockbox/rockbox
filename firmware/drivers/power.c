@@ -24,10 +24,18 @@
 #include "power.h"
 
 #ifdef HAVE_CHARGE_CTRL
-bool charger_enabled = 0;
+bool charger_enabled;
 #endif
 
 #ifndef SIMULATOR
+
+void power_init(void)
+{
+#ifdef HAVE_CHARGE_CTRL
+    PBIOR |= 0x20;          /* Set charging control bit to output */
+    charger_enable(false);  /* Default to charger OFF */
+#endif
+}
 
 bool charger_inserted(void)
 {

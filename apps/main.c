@@ -146,7 +146,7 @@ void init(void)
 
     button_init();
 
-    power_init(); /* moved up from below mpeg_init, hope that's not harmful */
+    powermgmt_init();
 
     if (coldstart && charger_inserted())
     {
