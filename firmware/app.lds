@@ -5,9 +5,11 @@ INPUT(crt0.o)
 #ifdef DEBUG
 #define DRAMSIZE 0x1f0000
 #define ORIGADDR 0x09010000
+#define ENDADDR  0x09200000
 #else
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 #define ORIGADDR 0x09000000
+#define ENDADDR  (ORIGADDR + DRAMSIZE)
 #endif
 
 MEMORY
@@ -76,7 +78,7 @@ SECTIONS
         _mp3buf = .;
     } > DRAM
 
-    .mp3end 0x09200000 - 0x300:
+    .mp3end ENDADDR - 0x300:
     {
         _mp3end = .;
     } > DRAM
