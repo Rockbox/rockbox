@@ -42,18 +42,18 @@ new: "USB (sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
-eng: "Rockbox info:"
-new: "Rockbox info:"
+eng: "Rockbox Info:"
+new: "Rockbox Info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMb"
-new: "Buf: %d.%02dMb"
+eng: "Buf: %d.%02dMB"
+new: "Buf: %d.%02dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMb"
-new: "Buffer: %d.%02dMb"
+eng: "Buffer: %d.%02dMB"
+new: "Buffer: %d.%02dMB"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -187,8 +187,8 @@ new: "Shuffle"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
-eng: "Play selected first"
-new: "Speel geselecteerde eerst"
+eng: "Play Selected First"
+new: "Speel Geselecteerde Eerst"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -232,8 +232,8 @@ new: "Scrollsnelheid voorbeeld"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
-eng: "Deep discharge"
-new: "Diepe ontlading"
+eng: "Deep Discharge"
+new: "Diepe Ontlading"
 
 id: LANG_TIME
 desc: in settings_menu
@@ -277,8 +277,8 @@ new: "Weet je het zeker?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "Play = Yes"
-new: "Play = Ja"
+eng: "PLAY = Yes"
+new: "PLAY = Ja"
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
@@ -367,8 +367,8 @@ new: "Bas Boost"
 
 id: LANG_DECAY
 desc: in sound_settings
-eng: "AV decay time"
-new: "AV terugloop"
+eng: "AV Decay Time"
+new: "AV Terugloop"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -377,8 +377,8 @@ new: "Kanalen"
 
 id: LANG_CHANNEL
 desc: in sound_settings
-eng: "Channel configuration"
-new: "Kanaal configuratie"
+eng: "Channel Configuration"
+new: "Kanaal Configuratie"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -427,8 +427,8 @@ new: "(PLAY/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
-eng: "Play = Yes"
-new: "Play = Ja"
+eng: "PLAY = Yes"
+new: "PLAY = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
@@ -462,7 +462,7 @@ new: "Stil AAN"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: "MUTE OFF"
+eng: "Mute OFF"
 new: "Stil UIT"
 
 id: LANG_MUTE_ON_RECORDER
@@ -547,8 +547,8 @@ new: "[Frequentie]"
 
 id: LANG_ID3_PATH
 desc: in wps
-eng: "[PATH]"
-new: "[PAD]"
+eng: "[Path]"
+new: "[Pad]"
 
 id: LANG_PITCH_UP
 desc: in wps
@@ -612,8 +612,8 @@ new: ""
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
-eng: "Your score :"
-new: "Jouw score :"
+eng: "Your score:"
+new: "Jouw score:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
@@ -632,13 +632,13 @@ new: "Spel gepauseerd"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[Play] to resume"
-new: "[Play] om door te gaan"
+eng: "[PLAY] to resume"
+new: "[PLAY] om door te gaan"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[Off] to quit"
-new: "[Off] om te stoppen"
+eng: "[OFF] to quit"
+new: "[OFF] om te stoppen"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -652,8 +652,8 @@ new: "(1 - langzaam, 9 - snel)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[Play] to start/pause"
-new: "[Play] om te starten/pauseren"
+eng: "[PLAY] to start/pause"
+new: "[PLAY] om te starten/pauseren"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
@@ -672,8 +672,8 @@ new: "JE HEBT GEWONNEN !!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[Off] to stop"
-new: "[Off] om te stoppen"
+eng: "[OFF] to stop"
+new: "[OFF] om te stoppen"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -727,13 +727,13 @@ new: "Hs: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    up/dn"
-new: "%d Spelers    up/dn"
+eng: "%d Players    UP/DN"
+new: "%d Spelers    UP/DN"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        l/r"
-new: "%d Worms        l/r"
+eng: "%d Worms        L/R"
+new: "%d Worms        L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -778,12 +778,12 @@ new: "Uitschakeltijd"
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "new language"
-new: "Nieuwe taal"
+new: "Nieuwe Taal"
 
 id: LANG_FILTER
 desc: setting name for dir filter
-eng: "Show files"
-new: "Welke bestanden tonen"
+eng: "Show Files"
+new: "Welke Bestanden Tonen"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -812,38 +812,38 @@ new: "Nee"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
-eng: "Clip hold time"
-new: "Clip vasthouden" 
+eng: "Clip Hold Time"
+new: "Clip Vasthouden" 
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
-eng: "eternal"
-new: "altijd" 
+eng: "Eternal"
+new: "Altijd" 
 
 id: LANG_PM_MENU
 desc: in the display menu
-eng: "Peak meter"
-new: "Piek meter" 
+eng: "Peak Meter"
+new: "Piek Meter" 
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
-eng: "Peak hold time"
-new: "Pieken vasthouden" 
+eng: "Peak Hold Time"
+new: "Pieken Vasthouden" 
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
-eng: "Peak release"
-new: "Piek terugloop"
+eng: "Peak Release"
+new: "Piek Terugloop"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
-eng: "Units per read"
-new: "Eenheden per keer"  
+eng: "Units Per Read"
+new: "Eenheden Per Keer"  
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
-eng: "Backlight on when charging"
-new: "Verlichting tijdens opladen"
+eng: "Backlight On When Plugged"
+new: "Verlichting Tijdens Opladen"
 
 id: LANG_REPEAT
 desc: in settings_menu
