@@ -36,13 +36,18 @@ unsigned char* filebuf;    // The rest of the MP3 buffer
 void* codec_malloc(size_t size) {
   void* x;
   char s[32];
+  static long last_tick = 0;
 
   x=&mallocbuf[mem_ptr];
-  mem_ptr+=size+(size%4); // Keep memory 32-bit aligned (if it was already?)
+  mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
 
-  local_rb->snprintf(s,30,"Memory used: %d",mem_ptr);
-  local_rb->lcd_putsxy(0,80,s);
-  local_rb->lcd_update();
+  if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
+      local_rb->snprintf(s,30,"Memory used: %d",mem_ptr);
+      local_rb->lcd_putsxy(0,80,s);
+
+      last_tick = *(local_rb->current_tick);
+      local_rb->lcd_update();
+  }
   return(x);
 }
 
@@ -111,32 +116,32 @@ void display_status(file_info_struct* file_info) {
   unsigned long xspeed;
   static long last_tick = 0;
 
-  local_rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
-  local_rb->lcd_putsxy(0,0,s);
-  local_rb->snprintf(s,32,"Samples Decoded: %d",file_info->current_sample);
-  local_rb->lcd_putsxy(0,20,s);
-  local_rb->snprintf(s,32,"Frames Decoded: %d",file_info->frames_decoded);
-  local_rb->lcd_putsxy(0,40,s);
-
-  ticks_taken=*(local_rb->current_tick)-file_info->start_tick;
-
-  /* e.g.:
-   ticks_taken=500
-   sam_fmt.rate=44,100
-   samples_decoded=172,400
-   (samples_decoded/sam_fmt.rate)*100=400 (time it should have taken)
-   % Speed=(400/500)*100=80%
-  */
-
-  if (ticks_taken==0) { ticks_taken=1; } // Avoid fp exception.
-
   if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
-      last_tick = *(local_rb->current_tick);
+      local_rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
+      local_rb->lcd_putsxy(0,0,s);
+      local_rb->snprintf(s,32,"Samples Decoded: %d",file_info->current_sample);
+      local_rb->lcd_putsxy(0,20,s);
+      local_rb->snprintf(s,32,"Frames Decoded: %d",file_info->frames_decoded);
+      local_rb->lcd_putsxy(0,40,s);
+
+      ticks_taken=*(local_rb->current_tick)-file_info->start_tick;
+
+      /* e.g.:
+       ticks_taken=500
+       sam_fmt.rate=44,100
+       samples_decoded=172,400
+       (samples_decoded/sam_fmt.rate)*100=400 (time it should have taken)
+       % Speed=(400/500)*100=80%
+      */
+
+      if (ticks_taken==0) { ticks_taken=1; } // Avoid fp exception.
+
       speed=(100*file_info->current_sample)/file_info->samplerate;
       xspeed=(speed*10000)/ticks_taken;
-      local_rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100); 
+      local_rb->snprintf(s,32,"Speed %ld.%02ld %% Secs: %d",(xspeed/100),(xspeed%100),ticks_taken/100);
       local_rb->lcd_putsxy(0,60,s);
 
+      last_tick = *(local_rb->current_tick);
       local_rb->lcd_update();
   }
 }
@@ -204,6 +209,7 @@ int local_init(char* infilename, char* outfilename, file_info_struct* file_info,
     i+=n; bytesleft-=n;
   }
   local_rb->close(file_info->infile);
+  local_rb->lcd_clear_display();
   return(0);
 }
 
