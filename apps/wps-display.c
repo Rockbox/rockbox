@@ -318,6 +318,10 @@ static char* get_tag(struct mp3entry* id3,
                     snprintf(buf, buf_size, "%d", id3->index + 1);
                     return buf;
 
+                case 'n':  /* Playlist Name (without path) */
+                    playlist_name(buf, buf_size);
+                    return buf;
+
                 case 'e':  /* Playlist Total Entries */
                     snprintf(buf, buf_size, "%d", playlist_amount());
                     return buf;

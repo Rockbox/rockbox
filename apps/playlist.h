@@ -51,8 +51,10 @@ void sort_playlist(bool start_current);
 void empty_playlist(void);
 void add_indices_to_playlist(void);
 void playlist_clear(void);
+void playlist_name(char *name, int name_size);
 int playlist_add(char *filename);
 int playlist_amount(void);
 int playlist_first_index(void);
 
 #endif /* __PLAYLIST_H__ */
+
