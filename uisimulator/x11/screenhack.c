@@ -87,7 +87,7 @@ static char *default_defaults[] = {
 #ifdef HAVE_LCD_BITMAP
   "120x68"
 #else
-  "138x54"
+  "264x128"
 #endif
   , /* this should be .geometry, but nooooo... */
   "*mono:		false",
