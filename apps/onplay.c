@@ -409,13 +409,6 @@ int onplay(char* file, int attr)
         selected_file = file;
         selected_file_attr = attr;
         
-        if (!(attr & ATTR_DIRECTORY))
-        {
-            items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
-            items[i].function = list_viewers;
-            i++;
-        }
-        
         if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
             (attr & ATTR_DIRECTORY) ||
             ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
@@ -439,6 +432,13 @@ int onplay(char* file, int attr)
         {
             items[i].desc = ID2P(LANG_DELETE_DIR);
             items[i].function = delete_dir;
+            i++;
+        }
+
+        if (!(attr & ATTR_DIRECTORY))
+        {
+            items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
+            items[i].function = list_viewers;
             i++;
         }
     }
