@@ -24,8 +24,7 @@
 #include "debug.h"
 
 struct menu {
-    int menu_top;
-    int menu_bottom;
+    int top;
     int cursor;
     struct menu_items* items;
     int itemcount;
@@ -33,8 +32,33 @@ struct menu {
 
 #define MAX_MENUS 4
 
+#ifdef HAVE_LCD_BITMAP
+#define MENU_LINES 6
+#else
+#define MENU_LINES 2
+#endif
+
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
+
+static void menu_draw(int m)
+{
+    int i = 0;
+
+    lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0,0);
+    lcd_setfont(0);
+#endif
+    for (i = menus[m].top; 
+         (i < menus[m].itemcount) && (i<menus[m].top+MENU_LINES);
+         i++) {
+        lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
+    }
+
+    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
+    lcd_update();
+}
 
 /* 
  * Move the cursor to a particular id, 
@@ -42,9 +66,18 @@ static bool inuse[MAX_MENUS] = { false };
  */
 static void put_cursor(int m, int target)
 {
-    lcd_puts(0, menus[m].cursor, " ");
+    lcd_puts(0, menus[m].cursor - menus[m].top, " ");
+
+    if ( target < menus[m].top ) {
+        menus[m].top--;
+        menu_draw(m);
+    }
+    else if ( target > MENU_LINES-1 ) {
+        menus[m].top++;
+        menu_draw(m);
+    }
     menus[m].cursor = target;
-    lcd_puts(0, menus[m].cursor, "-");
+    lcd_puts(0, menus[m].cursor - menus[m].top, "-");
 }
 
 int menu_init(struct menu_items* mitems, int count)
@@ -63,8 +96,7 @@ int menu_init(struct menu_items* mitems, int count)
     }
     menus[i].items = mitems;
     menus[i].itemcount = count;
-    menus[i].menu_top = 0;
-    menus[i].menu_bottom = count-1;
+    menus[i].top = 0;
     menus[i].cursor = 0;
 
     return i;
@@ -75,31 +107,8 @@ void menu_exit(int m)
     inuse[m] = false;
 }
 
-static void menu_draw(int m)
-{
-    int i = 0;
-
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,0);
-    lcd_setfont(0);
-#endif
-    for (i = 0; i < menus[m].itemcount; i++) {
-        lcd_puts(1, i, menus[m].items[i].desc);
-        if (i < menus[m].menu_top)
-            menus[m].menu_top = i;
-        if (i > menus[m].menu_bottom)
-            menus[m].menu_bottom = i;
-    }
-
-    lcd_puts(0, menus[m].cursor, "-");
-    lcd_update();
-}
-
 void menu_run(int m)
 {
-    int key;
-
     menu_draw(m);
     
     while(1) {
@@ -109,9 +118,9 @@ void menu_run(int m)
 #else
             case BUTTON_LEFT:
 #endif
-                if (menus[m].cursor == menus[m].menu_top) {
+                if (menus[m].cursor == 0) {
                     /* wrap around to menu bottom */
-                    put_cursor(m, menus[m].menu_bottom);
+                    put_cursor(m, menus[m].itemcount-1);
                 } else {
                     /* move up */
                     put_cursor(m, menus[m].cursor-1);
@@ -123,9 +132,9 @@ void menu_run(int m)
 #else
             case BUTTON_RIGHT:
 #endif
-                if (menus[m].cursor == menus[m].menu_bottom) {
+                if (menus[m].cursor == menus[m].itemcount-1) {
                     /* wrap around to menu top */
-                    put_cursor(m, menus[m].menu_top);
+                    put_cursor(m, 0);
                 } else {
                     /* move down */
                     put_cursor(m, menus[m].cursor+1);
