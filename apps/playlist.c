@@ -42,8 +42,8 @@ static struct playlist_info playlist;
 #define QUEUE_FILE ROCKBOX_DIR "/.queue_file"
 #define PLAYLIST_BUFFER_SIZE (&mp3end - &mp3buf[0])
 
-static unsigned char* playlist_buffer = mp3buf;
 extern unsigned char mp3buf[],mp3end;
+static unsigned char* playlist_buffer = mp3buf;
 static int playlist_end_pos = 0;
 
 static char now_playing[MAX_PATH+1];
