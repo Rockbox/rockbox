@@ -391,6 +391,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
             break;
         }
         dptr->name = &name_buffer[name_buffer_length];
+        dptr->time_write = entry->wrtdate<<16 | entry->wrttime; /* in one # */
         strcpy(dptr->name,entry->d_name);
         name_buffer_length += len + 1;
 

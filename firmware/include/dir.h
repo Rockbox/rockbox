@@ -36,6 +36,8 @@ struct dirent {
     int attribute;
     int size;
     int startcluster;
+    unsigned short wrtdate; /*  Last write date */ 
+    unsigned short wrttime; /*  Last write time */
 };
 #endif
 

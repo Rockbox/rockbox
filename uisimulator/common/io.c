@@ -114,6 +114,8 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 
     secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
     secret.size = s.st_size;
+    secret.wrtdate = (unsigned short)(s.st_mtime >> 16); 
+    secret.wrttime = (unsigned short)(s.st_mtime & 0xFFFF); 
 
     return &secret;
 }

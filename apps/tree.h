@@ -23,6 +23,7 @@
 
 struct entry {
     short attr; /* FAT attributes + file type flags */
+    unsigned long time_write; /* Last write time */
     char *name;
 };
 

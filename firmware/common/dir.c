@@ -113,6 +113,8 @@ struct dirent* readdir(DIR* dir)
     theent->attribute = entry.attr;
     theent->size = entry.filesize;
     theent->startcluster = entry.firstcluster;
+    theent->wrtdate = entry.wrtdate;
+    theent->wrttime = entry.wrttime;
 
     return theent;
 }
