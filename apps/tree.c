@@ -247,17 +247,6 @@ bool dirbrowse(char *root)
 
     while(1) {
         button = button_get(true);
-        if(!numentries) {
-          switch(button) {
-          case TREE_MENU:
-          case TREE_PREV:
-            /* let it go */
-            break; 
-          default:
-            continue;
-          }
-        }
-
 
         switch(button) {
             case TREE_EXIT:
@@ -287,6 +276,8 @@ bool dirbrowse(char *root)
                 break;
 
             case TREE_ENTER:
+                if ( !numentries )
+                    break;
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
                     snprintf(buf,sizeof(buf),"%s%s",currdir,
                              dircacheptr[dircursor+start]->name);
