@@ -270,7 +270,8 @@ int talk_spell(char* spell, bool enqueue)
     return 0;
 }
 
-const char* dir_thumbnail_name = ".dirname.tbx";
+const char* const dir_thumbnail_name = ".dirname.tbx";
+const char* const file_thumbnail_ext = ".talk";
 
 /* FIXME: this shoudn't be a stub, rather the real thing.
    I'm afraid on Win32/X11 it'll be hard to kill a thread from outside. */
