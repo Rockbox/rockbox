@@ -27,6 +27,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
      MACHINEDIR = $(RECDIR)
      # not very nice to set RTC like this, but...
      RTC += -DHAVE_RTC
+     # not very nice to set RADIO like this, but...
+     RADIO += -DHAVE_FMRADIO
 else
      MACHINEDIR = $(PLAYDIR)
 endif
@@ -53,7 +55,8 @@ LANGUAGE = english
 TARGET = $(OBJDIR)/uisw32.exe
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
-$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) $(RTC)
+$(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) \
+$(RTC) $(RADIO)
 
 LDFLAGS =  -lgdi32 -luser32
 
@@ -110,12 +113,12 @@ APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 MENUS = settings_menu.c sound_menu.c playlist_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += bmp.c widgets.c
+   APPS += bmp.c widgets.c radio.c
 endif
 
 SRCS = button.c lcd-win32.c panic-win32.c thread-win32.c \
 	debug-win32.c kernel.c string-win32.c uisw32.c stubs.c \
-	$(APPS) $(MENUS) $(FIRMSRCS) $(COMMONSRCS) sim_icons.c
+	$(APPS) $(MENUS) $(FIRMSRCS) $(COMMONSRCS) sim_icons.c fmradio.c
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o) $(OBJDIR)/uisw32-res.o
 
@@ -315,8 +318,14 @@ $(OBJDIR)/io.o: $(SIMCOMMON)/io.c
 $(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/fmradio.o: $(SIMCOMMON)/fmradio.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/radio.o: $(RECDIR)/radio.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
 

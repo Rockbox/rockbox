@@ -26,6 +26,8 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 	MACHINEDIR = $(RECDIR)
         # not very nice to set RTC like this, but...
         RTC += -DHAVE_RTC
+        # not very nice to set RADIO like this, but...
+        RADIO += -DHAVE_FMRADIO
 else
 	MACHINEDIR = $(PLAYDIR)
 endif
@@ -110,12 +112,12 @@ APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 MENUS = settings_menu.c sound_menu.c playlist_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += bmp.c widgets.c
+   APPS += bmp.c widgets.c radio.c
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c stubs.c \
        button-x11.c thread.c sim_icons.c $(APPS) $(MENUS) $(FIRMSRCS) \
-       $(COMMONSRCS) lcd-common.c
+       $(COMMONSRCS) lcd-common.c fmradio.c
 
 ROCKSRC := $(wildcard $(APPDIR)/plugins/*.c)
 ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
@@ -307,11 +309,17 @@ $(OBJDIR)/lcd-player-charset.o: $(DRIVERS)/lcd-player-charset.c
 $(OBJDIR)/lcd-playersim.o: $(SIMCOMMON)/lcd-playersim.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/fmradio.o: $(SIMCOMMON)/fmradio.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/font-player.o: $(SIMCOMMON)/font-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/radio.o: $(RECDIR)/radio.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
 

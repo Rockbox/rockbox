@@ -130,7 +130,7 @@ bool radio_screen(void)
     bool stereo = false;
     int search_dir = 0;
     int fw, fh;
-    int last_stereo_status = false;
+    bool last_stereo_status = false;
     int top_of_screen = 0;
     bool update_screen = true;
     int timeout = current_tick + HZ/10;
@@ -155,6 +155,7 @@ bool radio_screen(void)
     
     radio_load_presets();
 
+#ifndef SIMULATOR
     if(rec_create_directory() > 0)
         have_recorded = true;
     
@@ -189,6 +190,7 @@ bool radio_screen(void)
     
     mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
                             mpeg_sound_default(SOUND_RIGHT_GAIN), false);
+#endif
     
     fmradio_set(2, 0x140884); /* 5kHz, 7.2MHz crystal */
     radio_set_frequency(curr_freq);
@@ -236,11 +238,13 @@ bool radio_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
+#ifndef SIMULATOR
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
                 }
                 else
+#endif
                 {
                     radio_stop();
                     done = true;
@@ -249,6 +253,7 @@ bool radio_screen(void)
                 break;
 
             case BUTTON_F3:
+#ifndef SIMULATOR
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
                     mpeg_new_file(rec_create_filename(buf));
@@ -261,6 +266,7 @@ bool radio_screen(void)
                     mpeg_record(rec_create_filename(buf));
                     update_screen = true;
                 }
+#endif
                 last_seconds = 0;
                 break;
 
@@ -395,7 +401,9 @@ bool radio_screen(void)
                 }
             }
             
+#ifndef SIMULATOR
             seconds = mpeg_recorded_time() / HZ;
+#endif
             
             if(update_screen || seconds > last_seconds)
             {
@@ -455,7 +463,7 @@ bool radio_screen(void)
         }
     }
 
-    
+#ifndef SIMULATOR
     if(mpeg_status() & MPEG_STATUS_ERROR)
     {
         splash(0, true, str(LANG_DISK_FULL));
@@ -491,6 +499,7 @@ bool radio_screen(void)
                                 mpeg_sound_default(SOUND_RIGHT_GAIN), false);
         mas_codec_writereg(6, 0x4000);
     }
+#endif
     return have_recorded;
 }
 
@@ -696,6 +705,7 @@ bool radio_delete_preset(void)
     return reload_dir;
 }
 
+#ifndef SIMULATOR
 static bool fm_recording_settings(void)
 {
     bool ret;
@@ -715,14 +725,16 @@ static bool fm_recording_settings(void)
     }
     return ret;
 }
-
+#endif
 bool radio_menu(void)
 {
     struct menu_item radio_menu_items[] = {
         { STR(LANG_FM_SAVE_PRESET), radio_add_preset },
         { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
         { STR(LANG_SOUND_SETTINGS), sound_menu },
+#ifndef SIMULATOR
         { STR(LANG_RECORDING_SETTINGS), fm_recording_settings }
+#endif
     };
     int m;
     bool result;
