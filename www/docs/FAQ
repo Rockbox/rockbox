@@ -124,23 +124,27 @@ A16. Firstly, we wouldn't start something like this if we didn't simply enjoy
            being on the list does not mean it isn't a neat idea.  Bring it to 
            the list.
 
-Q17. When do you think there is a version available for my Archos?
-A17. The developers have discussed this.  There has been a variety of
+Q17. I don't see you mentioning ogg files on your list of ideas.  What about
+     supporting those?
+A17. At the current time we belive this is not very likely (though
+     we are not completely closing out this possibility). The Micronas 
+     chip (MAS3507) decoder in the archos does not natively support ogg 
+     decoding and there is very little program space in the player to 
+     implement it ourselves.  The alternative would be to write a software 
+     decoder as part of the RockBox firmware.  However, as much as we love 
+     our players, the computing power of the Archos (SH1 microcontroller) is 
+     not fully sufficent for this need (Once again, this is not a definative
+     no.  The world is full of brilliant people.  We just aren't hunting 
+     down all the ones not already involved with the project right this 
+     instant). 
+
+Q18. When do you think there is a version available for my Archos?
+A18. The developers have discussed this.  There has been a variety of
      dates bantered about.  The truth is we don't really know, but a good
      guestimate would be 1 to 3 months before we have full working source
-     for the Archos.  Following that, we figure it should only be a week or
-     two before we finish porting Quake II to the platform.  (Please see
-     question 24 regarding this issue).
-
-Q18. I don't see you mentioning ogg files on your list of ideas.  What about
-     supporting those?
-A18. At the current time this is not considered a possible option.  The 
-     Micronas chip MAS3507 decoder in the archos doesnt support ogg decoding
-     and there is too little program space in the player to implement it 
-     ourselves.  The alternative would be to write a software decoder as part
-     of the RockBox firmware.  However, as much as we love our players, the
-     computing power of the Archos (SH1 microcontroller) is not sufficent for
-     this need. 
+     for the Archos (as of late April 2002).  Following that, we figure it 
+     should only be a week or two before we finish porting Quake II to the 
+     platform.  (Please see question 24 regarding this issue).
 
 Q19. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
