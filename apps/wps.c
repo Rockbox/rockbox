@@ -171,9 +171,127 @@ static void draw_screen(struct mp3entry* id3)
     lcd_update();
 }
 
+int player_id3_show(void)
+{
+    int button;
+    int menu_pos = 0;
+    int menu_max = 6;
+    bool menu_changed = true;
+    char scroll_text[MAX_PATH];
+    struct mp3entry* id3 = NULL;
+
+    lcd_stop_scroll();
+    lcd_clear_display();
+    lcd_puts(0, 0, "-ID3 Info- ");
+    lcd_puts(0, 1, "--Screen-- ");
+    sleep(HZ*1.5);
+ 
+    while(1)
+    {
+        id3 = mpeg_current_track();
+        button = button_get(false);
+
+        switch(button)
+        {
+            case BUTTON_LEFT:
+                menu_changed = true;
+                if(menu_pos > 0)
+                    menu_pos--;
+                else
+                    menu_pos = menu_max;
+                break;
+
+            case BUTTON_RIGHT:
+                menu_changed = true;
+                if(menu_pos < menu_max)
+                    menu_pos++;
+                else
+                    menu_pos = 0;
+                break;
+            
+            case BUTTON_REPEAT:
+                break;
+
+            case BUTTON_STOP:
+            case BUTTON_PLAY:
+                lcd_stop_scroll();
+                return(0);
+                break;
+
+#ifndef SIMULATOR
+            case SYS_USB_CONNECTED: 
+                /* Tell the USB thread that we are safe */
+                DEBUGF("wps got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                    
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&button_queue);
+
+                /* Signal to our caller that we have been in USB mode */
+                return SYS_USB_CONNECTED;
+                break;
+#endif
+
+        }
+
+        switch(menu_pos)
+        {
+            case 0:
+                lcd_puts(0, 0, "Title");
+                snprintf(scroll_text,sizeof(scroll_text), "%s",
+                        id3->title);
+                break;
+            case 1:
+                lcd_puts(0, 0, "Artist");
+                snprintf(scroll_text,sizeof(scroll_text), "%s",
+                        id3->artist);
+                break;
+            case 2:
+                lcd_puts(0, 0, "Album");
+                snprintf(scroll_text,sizeof(scroll_text), "%s",
+                        id3->album);
+                break;
+            case 3:
+                lcd_puts(0, 0, "Length");
+                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
+                   id3->length / 60000,
+                   id3->length % 60000 / 1000 );
+                break;
+            case 4:
+                lcd_puts(0, 0, "Bitrate");
+                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
+                        id3->bitrate);
+                break;
+            case 5:
+                lcd_puts(0, 0, "Frequency");
+                snprintf(scroll_text,sizeof(scroll_text), "%d kHz",
+                        id3->frequency);
+                break;
+            case 6:
+                lcd_puts(0, 0, "Path");
+                snprintf(scroll_text,sizeof(scroll_text), "%s",
+                        id3->path);
+                break;
+        }
+
+        if(menu_changed == true)
+        {
+            menu_changed = false;
+            lcd_stop_scroll();
+            lcd_clear_display();
+            lcd_puts_scroll(0, 1, scroll_text);
+        }
+
+        status_draw();
+        lcd_update();
+        yield();
+    }
+
+}
+
 void display_keylock_text(bool locked)
 {
-    lcd_scroll_pause();
+    lcd_stop_scroll();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -194,12 +312,11 @@ void display_keylock_text(bool locked)
 #endif
     
     sleep(HZ);
-    lcd_scroll_resume();
 }
 
 void display_mute_text(bool muted)
 {
-    lcd_scroll_pause();
+    lcd_stop_scroll();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -220,7 +337,6 @@ void display_mute_text(bool muted)
 #endif
     
     sleep(HZ);
-    lcd_scroll_resume();
 }
 
 /* demonstrates showing different formats from playtune */
@@ -372,35 +488,22 @@ int wps_show(void)
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 break;
 
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_UP:
-#else
-            case BUTTON_MENU | BUTTON_UP:
-#endif
+            case BUTTON_MENU | BUTTON_ON:
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
                     draw_screen(id3);
                     break;
                 }
+                int retval;
                 dont_go_to_menu = true;
-
-                if(global_settings.muted == false)
-                {
-                    global_settings.muted = true;
-                    mpeg_sound_set(SOUND_VOLUME, 0);
-                    display_mute_text(global_settings.muted);
-                    draw_screen(id3);
-                }
-                else
-                {
-                    global_settings.muted = false;
-                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                    display_mute_text(global_settings.muted);
-                    draw_screen(id3);
-                }
+                lcd_stop_scroll();
+                retval = player_id3_show();
+                if(retval == SYS_USB_CONNECTED)
+                    return SYS_USB_CONNECTED;
+                draw_screen(id3);
                 break;
-                    
+
             case BUTTON_MENU:
                 lcd_icon(ICON_PARAM, true);
                 menu_button_is_down = true;
@@ -427,6 +530,35 @@ int wps_show(void)
                 }
                 break;
 #endif
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1: | BUTTON_UP:
+#else
+            case BUTTON_MENU | BUTTON_UP:
+#endif
+                if(keys_locked)
+                {
+                    display_keylock_text(keys_locked);
+                    draw_screen(id3);
+                    break;
+                }
+                dont_go_to_menu = true;
+
+                if(global_settings.muted == false)
+                {
+                    global_settings.muted = true;
+                    mpeg_sound_set(SOUND_VOLUME, 0);
+                    display_mute_text(global_settings.muted);
+                    draw_screen(id3);
+                }
+                else
+                {
+                    global_settings.muted = false;
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                    display_mute_text(global_settings.muted);
+                    draw_screen(id3);
+                }
+                break;
                     
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F1 | BUTTON_DOWN:
