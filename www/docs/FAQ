@@ -6,7 +6,7 @@ Q. What is a FAQ?
 A. A rare small animal of the species 'Textius Electronicus'. It is known for
    its' helpful attitude and vicious misspellings.
 
-Q. What is Rockbox, what is it's purpose?
+Q. What is Rockbox?  What is it's purpose?
 A. The purpose of this project is to write an Open Source replacement 
    firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
@@ -14,6 +14,11 @@ Q. I want to write code for my Archos, how do I proceed?
 A. First make sure to read the file CONTRIBUTING in the firmware directory
    on Sourceforge.  See http://bjorn.haxx.se/rockbox/firmware/CONTRIBUTING
    if you do not want to have to wade through the CVS directories.
+
+Q: Whats CVS?
+A: Concurrent Versions System (http://www.cvshome.org).  We have a small
+   help page about how to use this to get, update and commit files on the web
+   at http://bjorn.haxx.se/rockbox/cvs.html
 
 Q. What exactly is the CONTRIBUTING file? 
 A. Just like the name implies, it lists conventions that the project follows, 
@@ -52,6 +57,12 @@ A. One way is by visiting us on IRC.  Head on over to the server
    one person there.  If you don't see any activity, feel free to post 
    questions anyway, serveral of us log the channel and will get you answers
    when we unidle.
+
+Q: Wow, you guys talk on IRC alot?  I wish I had been around for those 
+   conversations to see what happened.
+A: We are glad you mentioned that!  http://bjorn.haxx.se/rockbox/irc happens
+   to have a list of various logs we have recorded of events in the channel.
+   Feel free to read up, and ask questions on what you find.
 
 Q. What is this "SourceForge" you keep mentioning?
 A. http://www.sourceforge.net
@@ -103,10 +114,29 @@ A. Firstly, we wouldn't start something like this if we didn't simply enjoy
 
 Q. I tried one of your firmware files and now I can't access my harddisk!
    When I turn on my jukebox, it says:
-
-   Part. Error
-   Pls Chck HD
-
+                     Part. Error
+                     Pls Chck HD
 A. Your harddisk has been password protected. We're not 100% sure why it
    happens, but you can unlock it yourself. Look at:
    http://rockbox.sourceforge.net/rockbox/lock.html
+
+Q: This FAQ doesn't answer the question I have.  What should I do?
+A: You have a couple options here.  You could forget the question, find an
+   easier question, or accept '42' as the answer no matter what.  We don't 
+   really recommend any of these (though I do opt for '42' often myself).
+   What we do recommend is stopping by IRC, reading 
+   http://bjorn.haxx.se/rockbox to see if the question was answered else where
+   and just not included here, or ultimatly dropping an email to the mailing
+   list (rockbox@cool.haxx.se).
+
+Q: Are there other ways to contact the developers?
+A: Yes.
+
+Q: Are you going to tell us what they are?
+A: No.  Post to the mailing list and we will get back to you.
+
+Q: But I _really_ want to talk with you in person,
+A: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
+   doctors here won't let me have pens or pencils.  They say its some rule
+   about us not having sharp objects.  I'm sorry.  Now please stop calling me
+   here.
