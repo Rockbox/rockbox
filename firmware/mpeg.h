@@ -21,6 +21,26 @@
 
 #include <stdbool.h>
 
+struct mpeg_debug
+{
+        int mp3buflen;
+        int mp3buf_write;
+        int mp3buf_swapwrite;
+        int mp3buf_read;
+
+        int last_dma_chunk_size;
+
+        bool dma_on;
+        bool playing;
+        bool play_pending;
+        bool is_playing;
+        bool filling;
+        bool dma_underrun;
+
+        int unplayed_space;
+        int unswapped_space;
+};
+
 void mpeg_init(int volume, int bass, int treble, int balance,
                int loudness, int bass_boost, int avc);
 void mpeg_play(int offset);
@@ -46,6 +66,7 @@ int mpeg_status(void);
 #ifdef HAVE_MAS3587F
 void mpeg_set_pitch(int percent);
 #endif
+void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1

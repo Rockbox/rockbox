@@ -37,11 +37,15 @@
 
 extern void bitswap(unsigned char *data, int length);
 
-#define MPEG_CHUNKSIZE  0x180000
-#define MPEG_SWAP_CHUNKSIZE  0x8000
-#define MPEG_HIGH_WATER  2
+static int get_unplayed_space(void);
+static int get_unswapped_space(void);
+
+#define MPEG_SWAP_CHUNKSIZE  0x2000
+#define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we
+                              wouldn't be able to see the difference between
+                              an empty buffer and a full one. */
 #define MPEG_LOW_WATER  0x40000
-#define MPEG_LOW_WATER_CHUNKSIZE  0x10000
+#define MPEG_LOW_WATER_CHUNKSIZE  0x40000
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -52,8 +56,7 @@ extern void bitswap(unsigned char *data, int length);
 #define MPEG_FF_REWIND    7
 #define MPEG_FLUSH_RELOAD 8
 #define MPEG_NEED_DATA    100
-#define MPEG_SWAP_DATA    101
-#define MPEG_TRACK_CHANGE 102
+#define MPEG_TRACK_CHANGE 101
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
@@ -439,6 +442,26 @@ static bool dma_underrun; /* True when the DMA has stopped because of
 
 static int mpeg_file;
 
+void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
+{
+    dbgdata->mp3buflen = mp3buflen;
+    dbgdata->mp3buf_write = mp3buf_write;
+    dbgdata->mp3buf_swapwrite = mp3buf_swapwrite;
+    dbgdata->mp3buf_read = mp3buf_read;
+
+    dbgdata->last_dma_chunk_size = last_dma_chunk_size;
+
+    dbgdata->dma_on = dma_on;
+    dbgdata->playing = playing;
+    dbgdata->play_pending = play_pending;
+    dbgdata->is_playing = is_playing;
+    dbgdata->filling = filling;
+    dbgdata->dma_underrun = dma_underrun;
+
+    dbgdata->unplayed_space = get_unplayed_space();
+    dbgdata->unswapped_space = get_unswapped_space();
+}
+
 static void mas_poll_start(int interval_in_ms)
 {
     unsigned int count;
@@ -480,8 +503,8 @@ static void dbg_timer_start(void)
     TSNC &= ~0x04; /* No synchronization */
     TMDR &= ~0x44; /* Operate normally */
 
-    TCNT1 = 0;   /* Start counting at 0 */
-    TCR1 = 0x03; /* Sysclock/8 */
+    TCNT2 = 0;   /* Start counting at 0 */
+    TCR2 = 0x03; /* Sysclock/8 */
 
     TSTR |= 0x04; /* Start timer 2 */
 }
@@ -492,7 +515,7 @@ static int dbg_cnt2us(unsigned int cnt)
 }
 #endif
 
-int get_unplayed_space(void)
+static int get_unplayed_space(void)
 {
     int space = mp3buf_write - mp3buf_read;
     if (space < 0)
@@ -815,6 +838,65 @@ void hexdump(unsigned char *buf, int len)
 }
 #endif
 
+static void swap_one_chunk(void)
+{
+    int free_space_left;
+    int amount_to_swap;
+    int t1, t2;
+
+    free_space_left = get_unswapped_space();
+
+    if(free_space_left == 0 && !play_pending)
+        return;
+                
+    amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+    if(mp3buf_write < mp3buf_swapwrite)
+        amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+                             amount_to_swap);
+    else
+        amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
+                             amount_to_swap);
+                
+    DEBUGF("B %x\n", amount_to_swap);
+    t1 = current_tick;
+    bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
+    t2 = current_tick;
+    DEBUGF("time: %d\n", t2 - t1);
+
+    mp3buf_swapwrite += amount_to_swap;
+    if(mp3buf_swapwrite >= mp3buflen)
+    {
+        mp3buf_swapwrite = 0;
+        DEBUGF("BW\n");
+    }
+
+    /* And while we're at it, see if we have started
+       playing yet. If not, do it. */
+    if(play_pending || dma_underrun)
+    {
+        /* If the filling has stopped, and we still haven't reached
+           the watermark, the file must be smaller than the
+           watermark. We must still play it. */
+        if(((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER) ||
+           !filling)
+        {
+            DEBUGF("P\n");
+            play_pending = false;
+            playing = true;
+			
+            init_dma();
+            if (!paused)
+            {
+                last_dma_tick = current_tick;
+                start_dma();
+            }
+
+            /* Tell ourselves that we need more data */
+            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+        }
+    }
+}
+
 static void mpeg_thread(void)
 {
     static int pause_tick = 0;
@@ -824,7 +906,6 @@ static void mpeg_thread(void)
     int free_space_left;
     int unplayed_space_left;
     int amount_to_read;
-    int amount_to_swap;
     int t1, t2;
     int start_offset;
 
@@ -838,7 +919,18 @@ static void mpeg_thread(void)
         DEBUGF("S R:%x W:%x SW:%x\n",
                mp3buf_read, mp3buf_write, mp3buf_swapwrite);
         yield();
-        queue_wait(&mpeg_queue, &ev);
+
+        /* Swap if necessary, and don't block on the queue_wait() */
+        if(get_unswapped_space())
+        {
+            swap_one_chunk();
+            queue_wait_w_tmo(&mpeg_queue, &ev, 0);
+        }
+        else
+        {
+            queue_wait(&mpeg_queue, &ev);
+        }
+        
         switch(ev.id)
         {
             case MPEG_PLAY:
@@ -1221,64 +1313,6 @@ static void mpeg_thread(void)
                 break;
             }
 
-            case MPEG_SWAP_DATA:
-                free_space_left = get_unswapped_space();
-
-                if(free_space_left == 0 && !play_pending)
-                    break;
-                
-                amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
-                if(mp3buf_write < mp3buf_swapwrite)
-                    amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
-                                         amount_to_swap);
-                else
-                    amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
-                                         amount_to_swap);
-                
-                DEBUGF("B %x\n", amount_to_swap);
-                t1 = current_tick;
-                bitswap(mp3buf + mp3buf_swapwrite, amount_to_swap);
-                t2 = current_tick;
-                DEBUGF("time: %d\n", t2 - t1);
-
-                mp3buf_swapwrite += amount_to_swap;
-                if(mp3buf_swapwrite >= mp3buflen)
-                {
-                    mp3buf_swapwrite = 0;
-                    DEBUGF("BW\n");
-                }
-
-                /* Tell ourselves that we must swap more data */
-                queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
-
-                /* And while we're at it, see if we have started
-                   playing yet. If not, do it. */
-                if(play_pending || dma_underrun)
-                {
-                    /* If the filling has stopped, and we still haven't reached
-                       the watermark, the file must be smaller than the
-                       watermark. We must still play it. */
-                    if(((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER) ||
-                       !filling)
-                    {
-                        DEBUGF("P\n");
-                        play_pending = false;
-                        playing = true;
-			
-                        init_dma();
-                        if (!paused)
-                        {
-                            last_dma_tick = current_tick;
-                            start_dma();
-                        }
-
-                        /* Tell ourselves that we need more data */
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-
-                    }
-                }
-                break;
-
             case MPEG_NEED_DATA:
                 free_space_left = mp3buf_read - mp3buf_write;
 
@@ -1289,7 +1323,7 @@ static void mpeg_thread(void)
                 unplayed_space_left = mp3buflen - free_space_left;
 
                 /* Make sure that we don't fill the entire buffer */
-                free_space_left -= 2;
+                free_space_left -= MPEG_HIGH_WATER;
 
                 /* do we have any more buffer space to fill? */
                 if(free_space_left <= MPEG_HIGH_WATER)
@@ -1305,15 +1339,12 @@ static void mpeg_thread(void)
                     amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
                                          free_space_left);
                 else
-                    amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+                    amount_to_read = free_space_left;
 
                 /* Don't read more than until the end of the buffer */
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
-                
-                /* Read in a few seconds worth of MP3 data. We don't want to
-                   read too large chunks because the bitswapping will take
-                   too much time. We must keep the DMA happy and also give
-                   the other threads a chance to run. */
+
+                /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
                 {
                     DEBUGF("R\n");
@@ -1325,8 +1356,6 @@ static void mpeg_thread(void)
                         t2 = current_tick;
                         DEBUGF("time: %d\n", t2 - t1);
                         DEBUGF("R: %x\n", len);
-                        /* Tell ourselves that we need to swap some data */
-                        queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
 
                         /* Make sure that the write pointer is at a word
                            boundary when we reach the end of the file */
