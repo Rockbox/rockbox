@@ -305,7 +305,7 @@ void game_loop(void)
 		move_down();
 	    }
 	    count++;
-	    sleep(1);
+	    sleep(10);
 	}
     if(gameover()) {
         char w, h;
