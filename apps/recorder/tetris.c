@@ -328,29 +328,34 @@ void game_loop(void)
 {
     while(1)
     {
-	    int b=0;
-	    int count = 0;
-	    while(count * 300 < level_speeds[level])
-	    {
-	        b = button_get(false);
-	        if ( b & BUTTON_OFF )
-                return; /* get out of here */
-
-	        if ( b & BUTTON_UP )
-		        move_block(0,-3,0);
-
-            if ( b & BUTTON_DOWN )
-		        move_block(0,3,0);
-
-            if ( b & BUTTON_RIGHT )
-		        move_block(0,0,1);
-
-            if ( b & BUTTON_LEFT )
-		        move_down();
-
+        int count = 0;
+        while(count * 300 < level_speeds[level])
+        {
+            switch(button_get(false))
+            {
+            case BUTTON_OFF:
+                return;
+                
+            case BUTTON_UP:
+                move_block(0,-3,0);
+                break;
+                
+            case BUTTON_DOWN:
+                move_block(0,3,0);
+                break;
+                
+            case BUTTON_RIGHT:
+                move_block(0,0,1);
+                break;
+                
+            case BUTTON_LEFT:
+                move_down();
+                break;
+            }
+            
             count++;
-	        sleep(HZ/10);
-	    }
+            sleep(HZ/10);
+        }
         
         if(gameover())
         {
@@ -361,7 +366,7 @@ void game_loop(void)
             return;
         }
 
-	    move_down();
+        move_down();
     }
 }
 
