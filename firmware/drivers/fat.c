@@ -400,7 +400,8 @@ static void *cache_fat_sector(int fatsector)
         /* Write back if it is dirty */
         if(fat_cache[cache_index].dirty)
         {
-            if(ata_write_sectors(secnum + fat_bpb.startsector, 1,
+            if(ata_write_sectors(fat_cache[cache_index].secnum +
+                                 fat_bpb.startsector, 1,
                                  fat_cache_sectors[cache_index]))
             {
                 panicf("cache_fat_sector() - Could not write sector %d\n",
