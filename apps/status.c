@@ -31,6 +31,7 @@
 #endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "font.h"
 #endif
 #include "powermgmt.h"
 
@@ -227,3 +228,47 @@ void status_draw(bool force_redraw)
 
 }
 
+#ifdef HAVE_LCD_BITMAP
+static void draw_buttonbar_btn(int num, char* caption)
+{
+    int xpos, ypos, button_width, text_width;
+    int fw, fh;
+
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize("M", &fw, &fh);
+
+    button_width = LCD_WIDTH/3;
+    xpos = num * button_width;
+    ypos = LCD_HEIGHT - fh;
+    
+    if(caption)
+    {
+        /* center the text */
+        text_width = fw * strlen(caption);
+        lcd_putsxy(xpos + (button_width - text_width)/2, ypos, caption);
+    }
+    
+    lcd_invertrect(xpos, ypos, button_width - 1, fh);
+}
+
+static char stored_caption1[8];
+static char stored_caption2[8];
+static char stored_caption3[8];
+
+void set_buttonbar(char* caption1, char *caption2, char *caption3)
+{
+    strncpy(stored_caption1, caption1, 7);
+    stored_caption1[7] = 0;
+    strncpy(stored_caption2, caption2, 7);
+    stored_caption2[7] = 0;
+    strncpy(stored_caption3, caption3, 7);
+    stored_caption3[7] = 0;
+}
+
+void draw_buttonbar(void)
+{
+    draw_buttonbar_btn(0, stored_caption1);
+    draw_buttonbar_btn(1, stored_caption2);
+    draw_buttonbar_btn(2, stored_caption3);
+}
+#endif

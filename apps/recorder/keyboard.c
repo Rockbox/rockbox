@@ -55,7 +55,7 @@ static void kbd_setupkeys(char* line[KEYBOARD_LINES], int page)
         break;
     }
 }
-
+#if 0
 static void kbd_draw_statusbar_button(int num, char* caption, int y, int fw)
 {
     int x, x2, tw, cx;
@@ -67,7 +67,7 @@ static void kbd_draw_statusbar_button(int num, char* caption, int y, int fw)
     lcd_putsxy((x + (cx/2)) - (tw/2), y, caption);
     lcd_invertrect(x, y - 1, (x2-x)-1, LCD_HEIGHT-y+1);
 }
-
+#endif
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
@@ -168,10 +168,9 @@ int kbd_input(char* text, int buflen)
         lcd_drawline(curpos, main_y, curpos, main_y + font_h);
 
         /* draw the status bar */
-        kbd_draw_statusbar_button(0, "Shift", status_y1, font_w);
-        kbd_draw_statusbar_button(1, "OK", status_y1, font_w);
-        kbd_draw_statusbar_button(2, "Del", status_y1, font_w);
-
+        set_buttonbar("Shift", "OK", "Del");
+        draw_buttonbar();
+        
         /* highlight the key that has focus */
         lcd_invertrect(font_w * x, font_h * y, font_w, font_h);
         lcd_update();
