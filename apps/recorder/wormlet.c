@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#ifdef HAVE_LCD_BITMAP
+
 #include <sprintf.h>
 #include <stdlib.h>
 #include <string.h>
@@ -736,3 +738,6 @@ Menu wormlet(void)
 
     return MENU_OK;
 }
+
+
+#endif
