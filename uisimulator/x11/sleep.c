@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "kernel.h"
+#include <poll.h>
 
 /* ticks is HZ per second */
 void x11_sleep(int ticks)

@@ -71,7 +71,6 @@ void init_window ()
 {
   XGCValues gcv;
   XWindowAttributes xgwa;
-  char *test_p;
 
   XGetWindowAttributes (dpy, window, &xgwa);
 
@@ -176,15 +175,12 @@ void drawtext(int color, int x, int y, char *text)
   XDrawString(dpy, window, draw_gc, x, y, text, strlen(text));
 }
 
+/* this is where the applicaton starts */
+extern void app_main(void);
 
 void
 screenhack (Display *the_dpy, Window the_window)
 {
-  unsigned short porttouse=0;
-  char *proxy = NULL;
-  char *url = NULL;
-  int i;
-  char *guiname="Rock-the-box";
   Bool helpme;
 
   /* This doesn't work, but I don't know why (Daniel 1999-12-01) */
@@ -206,8 +202,6 @@ screenhack (Display *the_dpy, Window the_window)
 
 void screen_redraw()
 {
-  int y, x;
-
   /* draw a border around the "Recorder" screen */
 
 #define X1 0

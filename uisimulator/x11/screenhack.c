@@ -166,6 +166,7 @@ static int screenhack_ehandler (Display *dpy, XErrorEvent *error)
 
 static Bool MapNotify_event_p (Display *dpy, XEvent *event, XPointer window)
 {
+    (void)dpy;
     return (event->xany.type == MapNotify &&
             event->xvisibility.window == (Window) window);
 }
@@ -184,64 +185,60 @@ static Atom XA_WM_PROTOCOLS, XA_WM_DELETE_WINDOW;
 int screenhack_handle_event (Display *dpy, XEvent *event)
 {
     int key=0;
-    switch (event->xany.type)
-    {
-	case KeyPress:
-	{
-	    KeySym keysym;
-	    unsigned char c = 0;
-	    XLookupString (&event->xkey, &c, 1, &keysym, 0);
-	    if (! (keysym >= XK_Shift_L && keysym <= XK_Hyper_R))
-            XBell (dpy, 0);  /* beep for non-chord keys */
-	    key = keysym;
-/*	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c); */
-	}
-	break;
-	case ResizeRequest:
-	    screen_resized(event->xresizerequest.width, 
-                       event->xresizerequest.height);
-	    screen_redraw();
-	    fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
-                event->xresizerequest.width, event->xresizerequest.height);
-	    break;
-	default:
+    switch (event->xany.type) {
+    case KeyPress:
+      {
+          KeySym keysym;
+          unsigned char c = 0;
+          XLookupString (&event->xkey, &c, 1, &keysym, 0);
+          if (! (keysym >= XK_Shift_L && keysym <= XK_Hyper_R))
+              XBell (dpy, 0);  /* beep for non-chord keys */
+          key = keysym;
+          /*	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c); */
+      }
+      break;
+    case ResizeRequest:
+      screen_resized(event->xresizerequest.width, 
+                     event->xresizerequest.height);
+      screen_redraw();
+      fprintf(stderr, "WINDOW RESIZED to width %d height %d\n",
+              event->xresizerequest.width, event->xresizerequest.height);
+      break;
+    default:
 /*	    fprintf(stderr, "EVENT: %d (see /usr/include/X11/X.h)\n",  
-                event->xany.type);
+            event->xany.type);
 */
-	    break;
-	case Expose:
-	    screen_redraw();
-	    fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
-                event->xexpose.x, event->xexpose.y,
-                event->xexpose.width, event->xexpose.height);
-	    break;
-	case ButtonPress:
-	    fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
-	    break;
-	case ClientMessage:
-	{
-	    if (event->xclient.message_type != XA_WM_PROTOCOLS)
-	    {
-            char *s = XGetAtomName(dpy, event->xclient.message_type);
-            if (!s) s = "(null)";
-            fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
-                     progname, s);
-	    }
-	    else if (event->xclient.data.l[0] != XA_WM_DELETE_WINDOW)
-	    {
-            char *s1 = XGetAtomName(dpy, event->xclient.message_type);
-            char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
-            if (!s1) s1 = "(null)";
-            if (!s2) s2 = "(null)";
-            fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
-                     progname, s1, s2);
-	    }
-	    else
-	    {
-            exit (0);
-	    }
-	}
-	break;
+      break;
+    case Expose:
+      screen_redraw();
+      fprintf(stderr, "EXPOSE: x: %d y: %d width: %d height: %d\n",
+              event->xexpose.x, event->xexpose.y,
+              event->xexpose.width, event->xexpose.height);
+      break;
+    case ButtonPress:
+      fprintf(stderr, "BUTTON PRESSED: x: %d y:%d\n",event->xbutton.x,event->xbutton.y);
+      break;
+    case ClientMessage:
+      {
+          if (event->xclient.message_type != XA_WM_PROTOCOLS) {
+              char *s = XGetAtomName(dpy, event->xclient.message_type);
+              if (!s) s = "(null)";
+              fprintf (stderr, "%s: unknown ClientMessage %s received!\n",
+                       progname, s);
+          }
+          else if (event->xclient.data.l[0] != (int)XA_WM_DELETE_WINDOW) {
+              char *s1 = XGetAtomName(dpy, event->xclient.message_type);
+              char *s2 = XGetAtomName(dpy, event->xclient.data.l[0]);
+              if (!s1) s1 = "(null)";
+              if (!s2) s2 = "(null)";
+              fprintf (stderr, "%s: unknown ClientMessage %s[%s] received!\n",
+                       progname, s1, s2);
+          }
+          else {
+              exit (0);
+          }
+      }
+      break;
     }
     return key;
 }
@@ -311,10 +308,10 @@ static void visual_warning (Screen *screen, Window window, Visual *visual,
     if (window == RootWindowOfScreen (screen))
         strcpy (win, "root window");
     else
-        sprintf (win, "window 0x%x", (unsigned long) window);
+        sprintf (win, "window 0x%lx", (long) window);
 
     if (window_p)
-        sprintf (why, "-window-id 0x%x", (unsigned long) window);
+        sprintf (why, "-window-id 0x%lx", (long)window);
     else
         strcpy (why, "-root");
 
@@ -333,8 +330,8 @@ static void visual_warning (Screen *screen, Window window, Visual *visual,
         {
             fprintf (stderr, "%s: ignoring `-visual %s' because of `%s'.\n",
                      progname, visual_string, why);
-            fprintf (stderr, "%s: using %s's visual 0x%x.\n",
-                     progname, win, XVisualIDFromVisual (visual));
+            fprintf (stderr, "%s: using %s's visual 0x%lx.\n",
+                     progname, win, (long)XVisualIDFromVisual (visual));
         }
         free (visual_string);
     }
@@ -345,8 +342,8 @@ static void visual_warning (Screen *screen, Window window, Visual *visual,
     {
         fprintf (stderr, "%s: ignoring `-install' because of `%s'.\n",
                  progname, why);
-        fprintf (stderr, "%s: using %s's colormap 0x%x.\n",
-                 progname, win, (unsigned long) cmap);
+        fprintf (stderr, "%s: using %s's colormap 0x%lx.\n",
+                 progname, win, (long) cmap);
     }
 }
 

@@ -17,8 +17,14 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
+
+#include <fcntl.h>
+#include "debug.h"
 
 #define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
 #define dirent x11_dirent

@@ -39,6 +39,10 @@ void button_init()
  * +,Enter = On, Off
  *
  */
+
+/* from uibasic.c */
+extern int screenhack_handle_events (void);
+
 static int get_raw_button (void)
 {
     int k = screenhack_handle_events();

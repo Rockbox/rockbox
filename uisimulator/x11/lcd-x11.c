@@ -44,6 +44,9 @@ extern Display *dpy;
 
 unsigned char display_copy[LCD_WIDTH][LCD_HEIGHT/8];
 
+/* this is in uibasic.c */
+extern void drawdots(int color, XPoint *points, int count);
+
 void lcd_update (void)
 {
     int x, y;
