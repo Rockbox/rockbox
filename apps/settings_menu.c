@@ -161,10 +161,11 @@ static bool resume(void)
 {
     char* names[] = { str(LANG_SET_BOOL_NO), 
                       str(LANG_RESUME_SETTING_ASK),
+                      str(LANG_RESUME_SETTING_ASK_ONCE),
                       str(LANG_SET_BOOL_YES) };
 
     return set_option( str(LANG_RESUME), &global_settings.resume,
-                       names, 3, NULL );
+                       names, 4, NULL );
 }
 
 static bool backlight_on_when_charging(void)

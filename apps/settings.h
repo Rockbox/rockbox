@@ -31,7 +31,8 @@
 
 #define RESUME_OFF 0
 #define RESUME_ASK 1
-#define RESUME_ON  2
+#define RESUME_ASK_ONCE 2
+#define RESUME_ON  3
 
 #define FF_REWIND_1000   0
 #define FF_REWIND_2000   1

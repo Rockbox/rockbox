@@ -237,7 +237,9 @@ eng: "Backlight"
 new:
 
 id: LANG_BACKLIGHT_ON
-desc: in settings_menu, 
+desc: in settings_menu
+eng: ""
+new:
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -1020,3 +1022,10 @@ id: LANG_OSCILLOGRAPH
 desc: the name of the oscillograph demo in the demo menu
 eng: "Oscillograph"
 new:
+
+id: LANG_RESUME_SETTING_ASK_ONCE
+desc: in settings_menu
+eng: "Ask Once"
+new:
+
+

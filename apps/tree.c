@@ -454,6 +454,11 @@ bool ask_resume(void)
     if ( global_settings.resume == RESUME_ON )
         return true;
 
+    if ( global_settings.resume == RESUME_ASK_ONCE) {
+        global_settings.resume_index = -1;
+        settings_save();
+    }
+
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_RESUME_ASK));
 #ifdef HAVE_LCD_CHARCELLS
@@ -463,6 +468,7 @@ bool ask_resume(void)
     lcd_puts(0,2,str(LANG_RESUME_CANCEL_RECORDER));
 #endif
     lcd_update();
+
     if (button_get(true) == BUTTON_PLAY)
         return true;
     return false;
