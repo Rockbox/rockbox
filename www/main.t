@@ -12,6 +12,8 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
 
+<p><i>2002-08-02</i>: <a href="tshirt-contest">Rockbox T-Shirt Design Contest</a>
+
 <p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk
 is not yet enabled on the players by default.
 
