@@ -313,6 +313,9 @@ bool recording_screen(void)
                 
                 set_gain();
                 update_countdown = 1; /* Update immediately */
+
+                lcd_setfont(FONT_SYSFIXED);
+                lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
                 break;
 
             case BUTTON_F2:
@@ -349,6 +352,8 @@ bool recording_screen(void)
                     have_recorded = true; /* Refreshes the browser later on */
                     done = true;
                 }
+                lcd_setfont(FONT_SYSFIXED);
+                lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
                 break;
         }
 
