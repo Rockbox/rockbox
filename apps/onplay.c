@@ -32,6 +32,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "keyboard.h"
+#include "tree.h"
 
 static char* selected_file = NULL;
 static bool reload_dir = false;
@@ -49,17 +50,17 @@ static bool delete_file(void)
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_REALLY_DELETE));
     lcd_puts_scroll(0,1,selected_file);
+    lcd_update();
 
     while (!exit) {
         int btn = button_get(true);
         switch (btn) {
         case BUTTON_PLAY:
-        case BUTTON_PLAY | BUTTON_REL:
             if (!remove(selected_file)) {
                 reload_dir = true;
                 lcd_clear_display();
-                lcd_puts_scroll(0,0,selected_file);
-                lcd_puts(0,1,str(LANG_DELETED));
+                lcd_puts(0,0,str(LANG_DELETED));
+                lcd_puts_scroll(0,1,selected_file);
                 lcd_update();
                 sleep(HZ);
                 exit = true;
@@ -151,7 +152,9 @@ int onplay(char* file, int attr)
         menu[i++] = (struct menu_items) { str(LANG_DELETE), delete_file };
 
     menu[i++] = (struct menu_items) { str(LANG_RENAME), rename_file };
-    menu[i++] = (struct menu_items) { "VBRfix", vbr_fix };
+
+    if (attr & TREE_ATTR_MPA)
+        menu[i++] = (struct menu_items) { "VBRfix", vbr_fix };
 
     /* DIY menu handling, since we want to exit after selection */
     m = menu_init( menu, i );
