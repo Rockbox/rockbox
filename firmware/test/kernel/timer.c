@@ -19,6 +19,7 @@
 #include "sh7034.h"
 #include "system.h"
 #include "debug.h"
+#include "kernel.h"
 
 void tick_start(unsigned int interval_in_ms)
 {
@@ -26,6 +27,7 @@ void tick_start(unsigned int interval_in_ms)
 
     count = FREQ / 1000 / 8 * interval_in_ms;
 
+    debugf("count = %d\n", count);
     if(count > 0xffff)
     {
 	debugf("Error! The tick interval is too long (%d ms)\n",
@@ -40,24 +42,22 @@ void tick_start(unsigned int interval_in_ms)
     TMDR &= ~0x01; /* Operate normally */
 
     TCNT0 = 0;   /* Start counting at 0 */
-    GRA0 = 0xfff0;
+    GRA0 = count;
     TCR0 = 0x23; /* Clear at GRA match, sysclock/8 */
-
-    TSTR |= 0x01; /* Start timer 1 */
 
     /* Enable interrupt on level 1 */
     IPRC = (IPRC & ~0x00f0) | 0x0010;
-
-    TIER0 |= 0x01; /* Enable GRA match interrupt */
     
-    while(1)
-    {
-    }
+    TSR0 &= ~0x01;
+    TIER0 |= 0x01; /* Enable GRA match interrupt */
+
+    TSTR |= 0x01; /* Start timer 1 */
 }
 
 #pragma interrupt
 void IMIA0(void)
 {
+    current_tick++;
+
     TSR0 &= ~0x01;
-    debugf("Yes\n");
 }

@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "thread.h"
+#include "kernel.h"
 #include "sh7034.h"
 #include "debug.h"
 
@@ -30,11 +31,11 @@ void t2(void);
 
 int main(void)
 {
-   char buf[40];
-   char str[32];
-   int i=0;
+    char buf[40];
+    char str[32];
+    int i=0;
 
-   /* Clear it all! */
+    /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
 
     /* This enables the serial Rx interrupt, to be able to exit into the
@@ -46,31 +47,31 @@ int main(void)
     debugf("OK. Let's go\n");
 
     tick_start(40);
-    
+
     create_thread(t1, s1, 1024);
     create_thread(t2, s2, 1024);
 
     while(1)
     {
-       debugf("t0\n");
-       switch_thread();
+	debugf("t0\n");
+	sleep(100);
     }
 }
 
 void t1(void)
 {
-   while(1)
-   {
-      debugf("t1\n");
-      switch_thread();
-   }
+    while(1)
+    {
+	debugf("t1\n");
+	sleep(200);
+    }
 }
 
 void t2(void)
 {
-   while(1)
-   {
-      debugf("t2\n");
-      switch_thread();
-   }
+    while(1)
+    {
+	debugf("t2\n");
+	sleep(300);
+    }
 }

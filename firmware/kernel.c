@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "kernel.h"
+#include "thread.h"
 
 long current_tick = 0;
 
@@ -32,4 +33,5 @@ void sleep(int ticks)
 
 void yield(void)
 {
+    switch_thread();
 }
