@@ -103,7 +103,7 @@ static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
 #ifndef SIMULATOR
-static int xoffset = 0; /* needed for flip */
+static int xoffset; /* needed for flip */
 #endif
 
 unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
@@ -148,8 +148,7 @@ void lcd_init (void)
     lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
     lcd_write_command(LCD_SET_DISPLAY_ON);
     lcd_write_command(LCD_SET_NORMAL_DISPLAY);
-    lcd_write_command(LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
-    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
+    lcd_set_flip(false);
     lcd_write_command(LCD_SET_DISPLAY_START_LINE + 0);
     lcd_set_contrast(lcd_default_contrast());
     lcd_write_command(LCD_SET_PAGE_ADDRESS);
@@ -249,7 +248,11 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
+#ifdef HAVE_DISPLAY_FLIPPED
+    if (!yesno) 
+#else
     if (yesno) 
+#endif
     {
         lcd_write_command(LCD_SET_SEGMENT_REMAP);
         lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
