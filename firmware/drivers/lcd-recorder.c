@@ -408,7 +408,8 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         {
             unsigned int i;
             const unsigned char* bits = pf->bits +
-                (pf->offset ? pf->offset[ch] : (pf->height * ch));
+                (pf->offset ? pf->offset[ch] 
+                            : ((pf->height + 7) / 8 * pf->maxwidth * ch));
 
             if (ofs != 0)
             {

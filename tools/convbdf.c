@@ -393,7 +393,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
                 fprintf(stderr, "Error: bad 'ENCODING'\n");
                 return 0;
             }
-            if (encoding >= 0 && 
+            if (encoding >= 0 &&
                 encoding <= limit_char && 
                 encoding >= start_char) {
 
@@ -595,6 +595,16 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     }
 
     /* determine whether font doesn't require encode table*/
+#ifdef ROTATE
+    l = 0;
+    for (i=0; i<pf->size; ++i) {
+        if (pf->offrot[i] != l) {
+            encodetable = 1;
+            break;
+        }
+        l += pf->maxwidth * (pf->height + 7) / 8;
+    }
+#else
     l = 0;
     for (i=0; i<pf->size; ++i) {
         if (pf->offset[i] != l) {
@@ -603,6 +613,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         }
         l += BITMAP_WORDS(pf->width[i]) * pf->height;
     }
+#endif
     if (!encodetable) {
         free(pf->offset);
         pf->offset = NULL;

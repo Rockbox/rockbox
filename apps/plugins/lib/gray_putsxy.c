@@ -53,8 +53,8 @@ void gray_putsxy(int x, int y, const unsigned char *str)
 
         /* get proportional width and glyph bits */
         width = pf->width ? pf->width[ch] : pf->maxwidth;
-        bits = pf->bits + (pf->offset ? pf->offset[ch] 
-                                      : MULU16(pf->height, ch));
+        bits = pf->bits + (pf->offset ? pf->offset[ch] :
+               MULU16((pf->height + 7) / 8, MULU16(pf->maxwidth, ch)));
 
         gray_drawbitmap((const unsigned char*) bits, x, y, width, pf->height,
                         width);
