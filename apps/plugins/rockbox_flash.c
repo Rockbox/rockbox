@@ -243,7 +243,7 @@ tImageHeader* GetSecondImage(void)
 
     if (pImage1->destination != ROCKBOX_DEST ||
         pImage1->execute != ROCKBOX_EXEC)
-        return 0; /* seems to be no Rockbox stuff in here */
+        return 0; /* seems to be no Archos/Rockbox image in here */
 
     if (pImage1->size != 0)
     {
@@ -262,7 +262,8 @@ tImageHeader* GetSecondImage(void)
 /*********** Image File Functions ************/
 
 /* so far, only compressed images in UCL NRV algorithm 2e supported */
-tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
+tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader,
+                            UINT8* pos)
 {
     int i;
     int fd;
@@ -311,13 +312,6 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
         }
     }
 
-    /* check for supported algorithm */
-    if (ucl_header[12] != 0x2E)
-    {
-        rb->close(fd);
-        return eWrongAlgorithm;
-    }
-
     pHeader->size = Read32(ucl_header + 22); /* compressed size */
     if (pHeader->size != filesize - sizeof(ucl_header) - 8)
     {
@@ -325,15 +319,39 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
         return eMultiBlocks;
     }
 
+    /* fill in the hardcoded defaults of the header */
+    pHeader->destination = ROCKBOX_DEST;
+    pHeader->execute = ROCKBOX_EXEC;
+
     if (Read32(ucl_header + 18) > pHeader->size) /* compare with uncompressed
                                                     size */
-    {   /* normal case */
+    {   /* compressed, normal case */
         pHeader->flags = 0x00000001; /* flags for UCL compressed */
+
+        /* check for supported algorithm */
+        if (ucl_header[12] != 0x2E)
+        {
+            rb->close(fd);
+            return eWrongAlgorithm;
+        }
     }
     else
-    {
-        pHeader->flags = 0x00000000; /* very unlikely, content was not
-                                        compressible */
+    {   /* uncompressed, either to be copied or run directly in flash */
+        UINT32 reset_vector; /* image has to start with reset vector */
+
+        pHeader->flags = 0x00000000; /* uncompressed */
+
+        read = rb->read(fd, &reset_vector, sizeof(reset_vector));
+        fileread += read;
+        if (read != sizeof(reset_vector))
+        {
+            rb->close(fd);
+            return eReadErr;
+        }
+        pHeader->execute = reset_vector;
+        if (reset_vector != ROCKBOX_EXEC) /* nonstandard address? */
+            /* assume in-place, executing directly in flash */
+            pHeader->destination = (UINT32)(pos + sizeof(tImageHeader));
     }
     
     /* check if we can read the whole file */
@@ -347,10 +365,6 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader)
 
     if (fileread != filesize)
         return eReadErr;
-    
-    /* fill in the hardcoded rest of the header */
-    pHeader->destination = ROCKBOX_DEST;
-    pHeader->execute = ROCKBOX_EXEC;
     
     return eOK;
 }
@@ -567,7 +581,7 @@ void DoUserDialog(char* filename, bool show_greet)
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
     
-    rc = CheckImageFile(filename, space, &ImageHeader);
+    rc = CheckImageFile(filename, space, &ImageHeader, pos);
     if (rc != eOK)
     {
         rb->lcd_clear_display(); /* make room for error message */
@@ -743,7 +757,7 @@ void DoUserDialog(char* filename, bool show_greet)
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
     
-    rc = CheckImageFile(filename, space, &ImageHeader);
+    rc = CheckImageFile(filename, space, &ImageHeader, pos);
     rb->lcd_puts(0, 0, "Checked:");
     switch (rc) {
         case eOK:
