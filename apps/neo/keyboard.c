@@ -28,6 +28,12 @@
 #include "lang.h"
 #include "debug.h"
 
+/* Two functions that are part of the firmware for the Neo-builds only.
+   TODO: make them proper "official" firmware functions or replace them
+   with apps code */
+extern void lcd_cursor(int x, int y);
+extern int button_add(unsigned int button);
+
 #define KEYBOARD_MAX_LENGTH 255
 
 static unsigned char* kbd_screens[3] = {
@@ -51,10 +57,15 @@ static void kbd_show_legend( int nb )
   lcd_puts( 0, 3, &kbd_screens[nb][20] );
 }
 
-/* returns text len 
-   Max = KEYBOARD_MAX_LENGTH characters
+/*
+  Returns text len Max = KEYBOARD_MAX_LENGTH characters.
+
+  This function MUST NOT fill in more than 'buflen' bytes into the given
+  buffer!
 */
-int kbd_input( char* text, int buflen )
+static char kbdbuffer[KEYBOARD_MAX_LENGTH+1]; /* no use to alloc this huge one
+                                                 on the stack */
+int kbd_input(char* text, int buflen)
 {
   char* pstart;
   char* pcursor;
@@ -62,7 +73,6 @@ int kbd_input( char* text, int buflen )
   int bufferlen;
   char cursorpos = 0;
   int ret = 0;
-  char buffer[KEYBOARD_MAX_LENGTH+1];
   bool done = false;
   int key;
   int screen = 0;
@@ -72,21 +82,21 @@ int kbd_input( char* text, int buflen )
 
   bufferlen = strlen(text);
   
-  if( bufferlen > KEYBOARD_MAX_LENGTH )
+  if(bufferlen > KEYBOARD_MAX_LENGTH)
     bufferlen = KEYBOARD_MAX_LENGTH;
   
-  strncpy( buffer, text, bufferlen );
-  buffer[bufferlen] = 0;
+  strncpy(kbdbuffer, text, bufferlen);
+  kbdbuffer[bufferlen] = 0;
 
   lcd_clear_display();
 
   /* Initial setup */
-  lcd_puts( 0, 0, buffer );
-  kbd_show_legend( screen );
-  lcd_cursor( cursorpos, 0 );
-  lcd_write(true,LCD_BLINKCUR);
+  lcd_puts(0, 0, kbdbuffer);
+  kbd_show_legend(screen);
+  lcd_cursor(cursorpos, 0);
+  lcd_write(true, LCD_BLINKCUR);
   
-  pstart = pcursor = buffer;
+  pstart = pcursor = kbdbuffer;
 
   while(!done) {
       /* We want all the keys except the releases and the repeats */
@@ -119,9 +129,8 @@ int kbd_input( char* text, int buflen )
                   
               case BUTTON_PLAY:
               case BUTTON_IR|NEO_IR_BUTTON_PLAY:
-                  
                   if( bufferlen ) {
-                      strncpy(text, buffer, bufferlen);
+                      strncpy(text, kbdbuffer, bufferlen);
                       text[bufferlen] = 0;
                       ret = bufferlen;
                   }
@@ -171,7 +180,7 @@ int kbd_input( char* text, int buflen )
                   
                   /* Insert left */
 
-                  if(bufferlen >=  KEYBOARD_MAX_LENGTH )
+                  if(bufferlen >= buflen)
                       break;
                   
                   pold = pcursor;
@@ -197,17 +206,17 @@ int kbd_input( char* text, int buflen )
 	
                   /* Insert Right */
 	
-                  if(bufferlen >=  KEYBOARD_MAX_LENGTH )
+                  if(bufferlen >= buflen)
                       break;
 	
                   pold = pcursor;
 	
                   /* Goto end */
-                  while( *pcursor )
+                  while(*pcursor)
                       pcursor++;
 	
                   /* Move string content to the right */
-                  while( pcursor > pold ){
+                  while(pcursor > pold){
                       *(pcursor+1) = *pcursor;
                       pcursor--;
                   }
@@ -229,7 +238,7 @@ int kbd_input( char* text, int buflen )
                      left */
                   
                   /* Check for start of string */
-                  if( pcursor > buffer ) {
+                  if(pcursor > kbdbuffer) {
                       
                       screenidx = -1;
                       cursorpos--;
