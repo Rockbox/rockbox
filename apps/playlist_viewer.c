@@ -898,7 +898,10 @@ bool playlist_viewer_ex(char* filename)
 
         switch (button)
         {
-            case TREE_EXIT | BUTTON_REL:
+            case TREE_EXIT:
+#ifdef TREE_OFF
+           case TREE_OFF:
+#endif
                 exit = true;
                 break;
 
@@ -983,9 +986,6 @@ bool playlist_viewer_ex(char* filename)
                 /* ON+PLAY menu */
                 int ret;
 
-                /* Wait for the user to release the TREE_RUN key */
-                while((button_get(true)) != (TREE_RUN | BUTTON_REL)) {};
-                
                 ret = onplay_menu(INDEX(viewer.cursor_pos));
 
                 if (ret < 0)
