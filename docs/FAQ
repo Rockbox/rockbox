@@ -42,7 +42,8 @@ A8. You don't need a SourceForge account to help developing Rockbox. Just
 
 Q9. Do you have a mailing list?
 A9. Sure do!  As a matter of fact, we have several of them for specific things.
-    Please check out: http://rockbox.haxx.se/mail/
+    Please check out: http://rockbox.haxx.se/mail/, and please see FAQ entry
+    75.
 
 Q10. Great you have a mailing list!  Is there anyway for me to catch up on
      past posts?
@@ -727,3 +728,27 @@ A74: The Recorder models have a connector for digital audio output using the
      small converter box which converts your signal from electrical to optical
      (for digital output from the Archos) or optical to electrical (for
      digital recording in to the Archos).
+
+Q75: How do I unsubscribe from the rockbox mailing list?
+A75: The same way you subscribed, but you send an 'unsubscribe' request to the
+     mailing list server instead of the 'subscribe' one you sent before.
+
+     This is all mentioned on the same web page: http://rockbox.haxx.se/mail/
+
+     Please please please pretty please with sugar on top, DO NOT attempt to
+     mail unsubscribe requests to the mailing list itself. That will only
+     annoy more than 400 readers and will have no effect on your subscription.
+
+     In fact, you NEVER unsuscribe to ANY mailing lists by mailing unsubscribe
+     to the list's address. You might as well take the opportunity to learn
+     this right away.
+
+     When you first subscribed to the mailing list, you were sent a welcome
+     mail from the server. It contained information about the mailing list and
+     instructions on how to unsubscribe. It is considered a good habit to keep
+     such welcome messages from mailing lists.
+
+     In addition to all this, every mail that is sent out to the rockbox
+     mailing list has a set of standard headers that offer info about the
+     mailing list: how to post, how to unsubscribe, where to find the mailing
+     list archives etc. Sensible mail clients can display these headers.
