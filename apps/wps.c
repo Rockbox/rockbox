@@ -95,11 +95,6 @@ static void draw_screen(struct mp3entry* id3)
             lcd_puts(0, l++, id3->album?id3->album:"");
             lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-            snprintf(buffer,sizeof(buffer), "Time: %d:%02d",
-                     id3->length / 60000,
-                     id3->length % 60000 / 1000 );
-            lcd_puts(0, l++, buffer);
-
             snprintf(buffer,sizeof(buffer), "%d kbits", id3->bitrate);
 
             lcd_puts(0, l++, buffer);
@@ -124,6 +119,7 @@ void wps_show(void)
     struct mp3entry* id3 = mpeg_current_track();
     int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
+    char buffer[32];
 
     while ( 1 ) {
         int i;
@@ -144,7 +140,17 @@ void wps_show(void)
             lasttitle = id3->title[0];
         }
 
-        for ( i=0;i<20;i++ ) {
+#ifdef HAVE_LCD_BITMAP
+        snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
+                 id3->elapsed / 60000,
+                 id3->elapsed % 60000 / 1000,
+                 id3->length / 60000,
+                 id3->length % 60000 / 1000 );
+        lcd_puts(0, 6, buffer);
+        lcd_update();
+#endif
+
+        for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
                     return;
@@ -194,7 +200,7 @@ void wps_show(void)
                     mpeg_stop();
                     break;
             }
-            sleep(HZ/20);
+            sleep(HZ/10);
         }
     }
 }

@@ -150,6 +150,7 @@ static struct {
     int mempos;
 } id3tags[MAX_ID3_TAGS];
 static int last_tag = 0;
+static int last_dma_tick = 0;
 
 static void create_fliptable(void)
 {
@@ -228,6 +229,8 @@ static void dma_tick(void)
                 start_dma();
         }
     }
+    id3tags[0].id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
+    last_dma_tick = current_tick;
 }
 
 static void bitswap(unsigned short *data, int length)
@@ -387,6 +390,7 @@ static void mpeg_thread(void)
                 mp3info(&(id3tags[0].id3), ev.data);
                 id3tags[0].mempos = mp3buf_write;
                 last_tag=1;
+                id3tags[0].id3.elapsed = 0;
 
                 /* Make it read more data */
                 filling = true;

@@ -33,6 +33,7 @@ struct mp3entry {
     int id3v1len;
     int filesize; /* in bytes */
     int length;   /* song length */
+    int elapsed;  /* ms played */
 
     /* these following two fields are used for local buffering */
     char id3v2buf[300];
