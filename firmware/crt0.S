@@ -282,8 +282,8 @@ irq_handler:
 .dataloopend:
 
         /* Munge the main stack */
-        lea    _stackbegin,%a2
-        lea    _stackend,%a4
+        lea    stackbegin,%a2
+        lea    stackend,%a4
         move.l #0xdeadbeef,%d0
 .mungeloop:
         cmp.l  %a2,%a4
@@ -299,7 +299,7 @@ irq_handler:
 
 	.section .resetvectors
 vectors:
-	.long _stackend
+	.long stackend
 	.long start
 #else
         /* Platform:     Archos Jukebox
