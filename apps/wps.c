@@ -45,12 +45,6 @@
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
-#else /* HAVE_LCD_BITMAP */
-#define LINE_Y      0 /* Y position the entry-list starts at */
-#endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_BITMAP
     #define PLAY_DISPLAY_2LINEID3        0 
     #define PLAY_DISPLAY_FILENAME_SCROLL 1 
     #define PLAY_DISPLAY_TRACK_TITLE     2 
@@ -81,7 +75,6 @@ static void draw_screen(struct mp3entry* id3)
 #else
     font_height = 8;
 #endif
-
 
     lcd_clear_display();
     if(!id3)
@@ -117,14 +110,14 @@ static void draw_screen(struct mp3entry* id3)
                 strncpy(szArtist,szTok,sizeof(szArtist));
                 szArtist[sizeof(szArtist)-1] = 0;
                 szDelimit = strrchr(id3->path, ch);
-                lcd_puts(0,LINE_Y, szArtist?szArtist:"<nothing>");
+                lcd_puts(0, 0, szArtist?szArtist:"<nothing>");
 
                 // removes the .mp3 from the end of the display buffer
                 szPeriod = strrchr(szDelimit, '.');
                 if (szPeriod != NULL)
                     *szPeriod = 0;
 
-                lcd_puts_scroll(0,LINE_Y+1,(++szDelimit));
+                lcd_puts_scroll(0, 1, (++szDelimit));
                 break;
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
@@ -147,12 +140,12 @@ static void draw_screen(struct mp3entry* id3)
                             playlist.amount,
                             id3->path);
                 }
-                lcd_puts_scroll(0,LINE_Y, buffer);
+                lcd_puts_scroll(0, 0, buffer);
                 break;
             }
             case PLAY_DISPLAY_2LINEID3:
             {
-                int l = LINE_Y;
+                int l = 0;
 #ifdef HAVE_LCD_BITMAP
                 char buffer[64];
 
@@ -161,7 +154,7 @@ static void draw_screen(struct mp3entry* id3)
                 lcd_puts(0, l++, id3->album?id3->album:"");
                 lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-                if(LINE_Y==0&&font_height<=8) {
+                if(!global_settings.statusbar && font_height <= 8) {
                     if(id3->vbr)
                         snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
                                  id3->bitrate);
@@ -345,6 +338,11 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
     char buffer[32];
 
 #ifdef HAVE_LCD_BITMAP
+    int line;
+    if(global_settings.statusbar)
+        line = 5;
+    else
+        line = 6;
     snprintf(buffer,sizeof(buffer),
              "Time:%3d:%02d/%d:%02d",
              elapsed / 60000,
@@ -352,7 +350,7 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
              length / 60000,
              length % 60000 / 1000 );
 
-    lcd_puts(0, 6, buffer);
+    lcd_puts(0, line, buffer);
     slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, elapsed*100/length, Grow_Right);
     lcd_update();
 #else
@@ -410,6 +408,7 @@ void display_keylock_text(bool locked)
     {
         lcd_puts(2, 3, "Key lock is OFF");
     }
+    status_draw();
     lcd_update();
 #endif
     
@@ -435,6 +434,7 @@ void display_mute_text(bool muted)
     {
         lcd_puts(2, 3, "Mute is OFF");
     }
+    status_draw();
     lcd_update();
 #endif
     
@@ -464,7 +464,10 @@ int wps_show(void)
     lcd_icon(ICON_AUDIO, true);
     lcd_icon(ICON_PARAM, false);
 #else
-    lcd_setmargins(0,0);
+    if(global_settings.statusbar)
+        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    else
+        lcd_setmargins(0, 0);
 #endif
 
     ff_rewind = false;
@@ -876,15 +879,9 @@ int wps_show(void)
 #endif
                 if(!keys_locked && !dont_go_to_menu && menu_button_is_down)
                 {
-#ifdef HAVE_LCD_BITMAP
-                    bool laststate=statusbar(false);
-#endif
                     lcd_stop_scroll();
                     button_set_release(old_release_mask);
                     main_menu();
-#ifdef HAVE_LCD_BITMAP
-                    statusbar(laststate);
-#endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                     ignore_keyup = true;
                     id3 = mpeg_current_track();
@@ -905,6 +902,10 @@ int wps_show(void)
 #ifdef HAVE_LCD_BITMAP
                 global_settings.statusbar = !global_settings.statusbar;
                 settings_save();
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
                 draw_screen(id3);
 #endif
                 break;

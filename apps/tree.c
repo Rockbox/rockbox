@@ -69,10 +69,10 @@ void browse_root(void)
 
 #ifdef HAVE_LCD_BITMAP
 
-#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH-LINE_Y)
+#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH)
 #define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
-#define MARGIN_Y      0  /* Y pixel margin */
+#define MARGIN_Y      (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)  /* Y pixel margin */
 #define MARGIN_X      10 /* X pixel margin */
 #define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
 #define LINE_X      0 /* X position the entry-list starts at */
@@ -167,7 +167,7 @@ static int showdir(char *path, int start)
     int fh;
     unsigned char *font = lcd_getcurrentldfont();
     fh  = ajf_get_fontheight(font);
-    tree_max_on_screen =  ((LCD_HEIGHT-MARGIN_Y)/fh)-LINE_Y;
+    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
     line_height = fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
@@ -273,7 +273,7 @@ static int showdir(char *path, int start)
                 icon_type = File;
         }
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                   4, MARGIN_Y+(LINE_Y+i-start)*line_height, 6, 8, true);
+                   4, MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #endif
 
 
@@ -283,11 +283,11 @@ static int showdir(char *path, int start)
         {
             char temp = dircache[i].name[len-4];
             dircache[i].name[len-4] = 0;
-            lcd_puts(LINE_X, LINE_Y+i-start, dircache[i].name);
+            lcd_puts(LINE_X, i-start, dircache[i].name);
             dircache[i].name[len-4] = temp;
         }
         else
-            lcd_puts(LINE_X, LINE_Y+i-start, dircache[i].name);
+            lcd_puts(LINE_X, i-start, dircache[i].name);
     }
 
     status_draw();
@@ -411,7 +411,7 @@ bool dirbrowse(char *root)
     int fh;
     unsigned char *font = lcd_getcurrentldfont();
     fh  = ajf_get_fontheight(font);
-    tree_max_on_screen =  ((LCD_HEIGHT-MARGIN_Y)/fh)-LINE_Y;
+    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
@@ -424,7 +424,7 @@ bool dirbrowse(char *root)
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
-    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+    put_cursorxy(0, CURSOR_Y + dircursor, true);
 
     while(1) {
         bool restore = false;
@@ -545,29 +545,29 @@ bool dirbrowse(char *root)
             case BUTTON_VOL_UP:
                 if(filesindir) {
                     if(dircursor) {
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, false);
+                        put_cursorxy(0, CURSOR_Y + dircursor, false);
                         dircursor--;
-                        put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                        put_cursorxy(0, CURSOR_Y + dircursor, true);
                     }
                     else {
                         if (start) {
                             start--;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            put_cursorxy(0, CURSOR_Y + dircursor, true);
                         }
                         else {
                             if (numentries < tree_max_on_screen) {
-                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                put_cursorxy(0, CURSOR_Y + dircursor,
                                              false);
                                 dircursor = numentries - 1;
-                                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                                put_cursorxy(0, CURSOR_Y + dircursor,
                                              true);
                             }
                             else {
                                 start = numentries - tree_max_on_screen;
                                 dircursor = tree_max_on_screen - 1;
                                 numentries = showdir(currdir, start);
-                                put_cursorxy(0, CURSOR_Y + LINE_Y +
+                                put_cursorxy(0, CURSOR_Y +
                                              tree_max_on_screen - 1, true);
                             }
                         }
@@ -583,28 +583,28 @@ bool dirbrowse(char *root)
                 {
                     if (dircursor + start + 1 < numentries ) {
                         if(dircursor+1 < tree_max_on_screen) {
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                            put_cursorxy(0, CURSOR_Y + dircursor,
                                          false);
                             dircursor++;
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            put_cursorxy(0, CURSOR_Y + dircursor, true);
                         } 
                         else {
                             start++;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            put_cursorxy(0, CURSOR_Y + dircursor, true);
                         }
                     }
                     else {
                         if(numentries < tree_max_on_screen) {
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
+                            put_cursorxy(0, CURSOR_Y + dircursor,
                                          false);
                             start = dircursor = 0;
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            put_cursorxy(0, CURSOR_Y + dircursor, true);
                         } 
                         else {
                             start = dircursor = 0;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                            put_cursorxy(0, CURSOR_Y + dircursor, true);
                         }
                     }
                     lcd_update();
@@ -614,14 +614,8 @@ bool dirbrowse(char *root)
             case TREE_MENU: {
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
-#ifdef HAVE_LCD_BITMAP
-                bool laststate=statusbar(false);
-#endif
                 lcd_stop_scroll();
                 main_menu();
-#ifdef HAVE_LCD_BITMAP
-                statusbar(laststate);
-#endif
                 /* do we need to rescan dir? */
                 if ( lastfilter != global_settings.mp3filter ||
                      lastsortcase != global_settings.sort_case)
@@ -650,13 +644,18 @@ bool dirbrowse(char *root)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
-#endif
 #ifdef HAVE_LCD_BITMAP
                 global_settings.statusbar = !global_settings.statusbar;
                 settings_save();
+#ifdef LOADABLE_FONTS
+                tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#else
+                tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
                 restore = true;
 #endif
                 break;
+#endif
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED: {
@@ -694,7 +693,7 @@ bool dirbrowse(char *root)
                 dircursor--;
             }
             numentries = showdir(currdir, start);
-            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+            put_cursorxy(0, CURSOR_Y + dircursor, true);
         }
 
         if ( numentries ) {
@@ -711,12 +710,12 @@ bool dirbrowse(char *root)
                     int len = strlen(dircache[i].name);
                     char temp = dircache[i].name[len-4];
                     dircache[i].name[len-4] = 0;
-                    lcd_puts_scroll(LINE_X, LINE_Y+dircursor, 
+                    lcd_puts_scroll(LINE_X, dircursor, 
                                     dircache[i].name);
                     dircache[i].name[len-4] = temp;
                 }
                 else
-                    lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                    lcd_puts_scroll(LINE_X, dircursor,
                                     dircache[i].name);
             }
         }
