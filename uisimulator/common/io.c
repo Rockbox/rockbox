@@ -227,7 +227,7 @@ int sim_rename(const char *oldpath, const char* newpath)
     return -1;
 }
 
-int sim_filesize(int fd)
+off_t sim_filesize(int fd)
 {
     int old = lseek(fd, 0, SEEK_CUR);
     int size = lseek(fd, 0, SEEK_END);
