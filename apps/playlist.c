@@ -586,8 +586,14 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
                     break;
 
                 /* we now need to reload our current directory */
-                num_files = ft_load(tc, dirname);
+                if(ft_load(tc, dirname) < 0)
+                {
+                    result = -1;
+                    break;
+                }
+                    
                 files = (struct entry*) tc->dircache;
+                num_files = tc->filesindir;
                 if (!num_files)
                 {
                     result = -1;
