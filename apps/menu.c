@@ -84,7 +84,8 @@ static void menu_draw(int m)
 {
     int i = 0;
 
-    lcd_clear_display();
+    lcd_clear_display(); 
+    lcd_stop_scroll();
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0,0);
     lcd_setfont(0);
@@ -92,12 +93,14 @@ static void menu_draw(int m)
     for (i = menus[m].top; 
          (i < menus[m].itemcount) && (i<menus[m].top+MENU_LINES);
          i++) {
-        lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
+        if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
+            lcd_puts_scroll(1, i-menus[m].top, menus[m].items[i].desc);
+        else
+            lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
     }
 
     /* place the cursor */
     put_cursorxy(0, menus[m].cursor - menus[m].top, true);
-
     lcd_update();
 }
 
@@ -111,6 +114,7 @@ static void put_cursor(int m, int target)
 
     put_cursorxy(0, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
+    menu_draw(m);
 
     if ( target < menus[m].top ) {
         menus[m].top--;
@@ -167,6 +171,7 @@ void menu_run(int m)
             case BUTTON_UP:
 #else
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
                 if (menus[m].cursor) {
                     /* move up */
@@ -178,6 +183,7 @@ void menu_run(int m)
             case BUTTON_DOWN:
 #else
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
                 if (menus[m].cursor < menus[m].itemcount-1) {
                     /* move down */
@@ -190,6 +196,7 @@ void menu_run(int m)
 #endif
             case BUTTON_PLAY:
                 /* Erase current display state */
+                lcd_stop_scroll();
                 lcd_clear_display();
             
                 menus[m].items[menus[m].cursor].function();
@@ -205,6 +212,7 @@ void menu_run(int m)
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
+                lcd_stop_scroll();
                 return;
 
             default:
