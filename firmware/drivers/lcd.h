@@ -30,7 +30,7 @@ extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, char *string);
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
   extern void lcd_update(void);
 #else
   #define lcd_update()
