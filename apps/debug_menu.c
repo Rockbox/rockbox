@@ -136,6 +136,7 @@ bool dbg_hw_info(void)
     char buf[32];
     int button;
     int usb_polarity;
+    int bitmask = *(unsigned short*)0x20000fc;
     int rom_version = *(unsigned short*)0x20000fe;
 
     if(PADR & 0x400)
@@ -155,6 +156,9 @@ bool dbg_hw_info(void)
     
     snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
     lcd_puts(0, 3, buf);
+    
+    snprintf(buf, 32, "Mask: 0x%04x", bitmask);
+    lcd_puts(0, 4, buf);
     
     lcd_update();
     
