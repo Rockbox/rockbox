@@ -30,6 +30,7 @@ snake.c
 snake2.c
 snow.c
 sokoban.c
+solitaire.c
 video.c
 
 #ifdef HAVE_RTC /* Recorder models only */
@@ -39,7 +40,6 @@ clock.c
 
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */
-solitaire.c
 splitedit.c
 star.c
 vu_meter.c

@@ -44,19 +44,71 @@ static struct plugin_api* rb;
 
 #define min(a,b) (a<b?a:b)
 
-#define HELP_CASE( key )    case BUTTON_ ## key: \
-                                rb->splash(HZ*1, true, # key " : " HELP_BUTTON_ ## key); \
-                                break;
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define SOL_QUIT BUTTON_OFF
+#define SOL_UP BUTTON_UP
+#define SOL_DOWN BUTTON_DOWN
+#define SOL_LEFT BUTTON_LEFT
+#define SOL_RIGHT BUTTON_RIGHT
+#define SOL_MOVE BUTTON_ON
+#define SOL_DRAW BUTTON_F2
+#define SOL_REM2CUR BUTTON_PLAY
+#define SOL_CUR2STACK BUTTON_F1
+#define SOL_REM2STACK BUTTON_F3
+#define SOL_MENU_RUN BUTTON_RIGHT
+#define SOL_MENU_RUN2 BUTTON_PLAY
+#define SOL_MENU_INFO BUTTON_F1
+#define SOL_MENU_INFO2 BUTTON_F2
+#define SOL_MENU_INFO3 BUTTON_F3
 
-#define HELP_BUTTON_UP "Move the cursor up in the column."
-#define HELP_BUTTON_DOWN "Move the cursor down in the column."
-#define HELP_BUTTON_LEFT "Move the cursor to the previous column."
-#define HELP_BUTTON_RIGHT "Move the cursor to the next column."
-#define HELP_BUTTON_F1 "Put the card under the cursor on one of the 4 final color stacks."
-#define HELP_BUTTON_F2 "Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
-#define HELP_BUTTON_F3 "Put the card on top of the remains' stack on one of the 4 final color stacks."
-#define HELP_BUTTON_PLAY "Put the card on top of the remains' stack on top of the cursor."
-#define HELP_BUTTON_ON "Select cards, Move cards, reveal hidden cards ..."
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define SOL_QUIT BUTTON_OFF
+#define SOL_UP_PRE BUTTON_UP
+#define SOL_UP (BUTTON_UP | BUTTON_REL)
+#define SOL_DOWN_PRE BUTTON_DOWN
+#define SOL_DOWN (BUTTON_DOWN | BUTTON_REL)
+#define SOL_LEFT_PRE BUTTON_LEFT
+#define SOL_LEFT (BUTTON_LEFT | BUTTON_REL)
+#define SOL_RIGHT_PRE BUTTON_RIGHT
+#define SOL_RIGHT (BUTTON_RIGHT | BUTTON_REL)
+#define SOL_MOVE_PRE BUTTON_MENU
+#define SOL_MOVE (BUTTON_MENU | BUTTON_REL)
+#define SOL_DRAW_PRE BUTTON_MENU
+#define SOL_DRAW (BUTTON_MENU | BUTTON_REPEAT)
+#define SOL_REM2CUR_PRE BUTTON_LEFT
+#define SOL_REM2CUR (BUTTON_LEFT | BUTTON_REPEAT)
+#define SOL_CUR2STACK_PRE BUTTON_RIGHT
+#define SOL_CUR2STACK (BUTTON_RIGHT | BUTTON_REPEAT)
+#define SOL_REM2STACK_PRE BUTTON_UP
+#define SOL_REM2STACK (BUTTON_UP | BUTTON_REPEAT)
+#define SOL_MENU_RUN BUTTON_RIGHT
+#define SOL_MENU_INFO BUTTON_MENU
+
+#endif
+
+/* common help definitions */
+#define HELP_SOL_UP "UP: Move the cursor up in the column."
+#define HELP_SOL_DOWN "DOWN: Move the cursor down in the column."
+#define HELP_SOL_LEFT "LEFT: Move the cursor to the previous column."
+#define HELP_SOL_RIGHT "RIGHT: Move the cursor to the next column."
+
+/* variable help definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define HELP_SOL_MOVE "ON: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "F2: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "PLAY: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "F1: Put the card under the cursor on one of the 4 final color stacks."
+#define HELP_SOL_REM2STACK "F3: Put the card on top of the remains' stack on one of the 4 final color stacks."
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define HELP_SOL_MOVE "MENU: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "MENU..: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "LEFT..: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final color stacks."
+#define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final color stacks."
+
+#endif
 
 static unsigned char colors[4][8] = {
 /* Spades */
@@ -267,37 +319,123 @@ unsigned char next_random_card(card *deck){
     return i;
 }
 
+#define HELP_QUIT 0
+#define HELP_USB 1
+
 /* help for the not so intuitive interface */
-void solitaire_help(void){
+int solitaire_help(void){
 
-    rb->lcd_clear_display();
+    int button;
+    int lastbutton = BUTTON_NONE;
 
-    rb->lcd_putsxy(0, 0, "Press a key to see");
-    rb->lcd_putsxy(0, 7, "it's role.");
-    rb->lcd_putsxy(0, 21, "Press OFF to");
-    rb->lcd_putsxy(0, 28, "return to menu.");
-    rb->lcd_putsxy(0, 42, "All actions can");
-    rb->lcd_putsxy(0, 49, "be done using");
-    rb->lcd_putsxy(0, 56, "arrows, ON and F2.");
-
-    rb->lcd_update();
-    
     while(1){
     
-        switch(rb->button_get(true)){
-            HELP_CASE( UP );
-            HELP_CASE( DOWN );
-            HELP_CASE( LEFT );
-            HELP_CASE( RIGHT );
-            HELP_CASE( F1 );
-            HELP_CASE( F2 );
-            HELP_CASE( F3 );
-            HELP_CASE( PLAY );
-            HELP_CASE( ON );
+        rb->lcd_clear_display();
 
-            case BUTTON_OFF:
-                return;
+#if CONFIG_KEYPAD == RECORDER_PAD
+        rb->lcd_putsxy(0, 0, "Press a key to see");
+        rb->lcd_putsxy(0, 7, "it's role.");
+        rb->lcd_putsxy(0, 21, "Press OFF to");
+        rb->lcd_putsxy(0, 28, "return to menu.");
+        rb->lcd_putsxy(0, 42, "All actions can");
+        rb->lcd_putsxy(0, 49, "be done using");
+        rb->lcd_putsxy(0, 56, "arrows, ON and F2.");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        rb->lcd_putsxy(0, 0, "Press a key short or");
+        rb->lcd_putsxy(0, 7, "long to see it's role.");
+        rb->lcd_putsxy(0, 21, "Press OFF to");
+        rb->lcd_putsxy(0, 28, "return to menu.");
+        rb->lcd_putsxy(0, 42, "All actions can be");
+        rb->lcd_putsxy(0, 49, "done using arows,");
+        rb->lcd_putsxy(0, 56, "short & long MENU.");
+#endif
+
+        rb->lcd_update();
+    
+        button = rb->button_get(true);
+        switch(button){
+            case SOL_UP:
+#ifdef SOL_UP_PRE
+                if(lastbutton != SOL_UP_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_UP);
+                break;
+
+            case SOL_DOWN:
+#ifdef SOL_DOWN_PRE
+                if(lastbutton != SOL_DOWN_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_DOWN);
+                break;
+
+            case SOL_LEFT:
+#ifdef SOL_LEFT_PRE
+                if(lastbutton != SOL_LEFT_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_LEFT);
+                break;
+
+            case SOL_RIGHT:
+#ifdef SOL_RIGHT_PRE
+                if(lastbutton != SOL_RIGHT_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_RIGHT);
+                break;
+
+            case SOL_MOVE:
+#ifdef SOL_MOVE_PRE
+                if(lastbutton != SOL_MOVE_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_MOVE);
+                break;
+
+            case SOL_DRAW:
+#ifdef SOL_DRAW_PRE
+                if(lastbutton != SOL_DRAW_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_DRAW);
+                break;
+
+            case SOL_CUR2STACK:
+#ifdef SOL_CUR2STACK_PRE
+                if(lastbutton != SOL_CUR2STACK_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_CUR2STACK);
+                break;
+
+            case SOL_REM2STACK:
+#ifdef SOL_REM2STACK_PRE
+                if(lastbutton != SOL_REM2STACK_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_REM2STACK);
+                break;
+
+            case SOL_REM2CUR:
+#ifdef SOL_REM2CUR_PRE
+                if(lastbutton != SOL_REM2CUR_PRE)
+                    break;
+#endif
+                rb->splash(HZ*2, true, HELP_SOL_REM2CUR);
+                break;
+
+            case SOL_QUIT:
+                return HELP_QUIT;
+                
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return HELP_USB;
+                break;
         }
+        if(button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
 
@@ -306,6 +444,7 @@ void solitaire_help(void){
 #define MENU_RESTART 1
 #define MENU_HELP 2
 #define MENU_QUIT 3
+#define MENU_USB 4
 
 /* menu item number */
 #define MENU_LENGTH 4
@@ -331,6 +470,7 @@ int solitaire_menu(unsigned char when) {
     
     int i;
     int cursor=0;
+    int button;
     
     if(when!=MENU_BEFOREGAME && when!=MENU_DURINGGAME)
         when = MENU_DURINGGAME;
@@ -349,7 +489,8 @@ int solitaire_menu(unsigned char when) {
 
         rb->lcd_update();
 
-        switch(rb->button_get(true)){
+        button = rb->button_get(true);
+        switch(button){
             case BUTTON_UP:
                 cursor = (cursor + MENU_LENGTH - 1)%MENU_LENGTH;
                 break;
@@ -361,8 +502,10 @@ int solitaire_menu(unsigned char when) {
             case BUTTON_LEFT:
                 return MENU_RESUME;
 
-            case BUTTON_PLAY:
-            case BUTTON_RIGHT:
+            case SOL_MENU_RUN:
+#ifdef SOL_MENU_RUN2
+            case SOL_MENU_RUN2:
+#endif
                 switch(cursor){
                     case MENU_RESUME:
                     case MENU_RESTART:
@@ -370,14 +513,17 @@ int solitaire_menu(unsigned char when) {
                         return cursor;
 
                     case MENU_HELP:
-                        solitaire_help();
+                        if(solitaire_help() == HELP_USB)
+                            return MENU_USB;
                         break;
                 }
                 break;
             
-            case BUTTON_F1:
-            case BUTTON_F2:
-            case BUTTON_F3:
+            case SOL_MENU_INFO:
+#if defined(SOL_MENU_INFO2) && defined(SOL_MENU_INFO3)
+            case SOL_MENU_INFO2:
+            case SOL_MENU_INFO3:
+#endif
                 rb->splash(HZ, true, "Solitaire for Rockbox by dionoea");
                 break;
 
@@ -385,6 +531,8 @@ int solitaire_menu(unsigned char when) {
                 return MENU_QUIT;
 
             default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return MENU_USB;
                 break;
         }
     }
@@ -455,7 +603,7 @@ void solitaire_init(void){
     /* we now finished dealing the cards. The game can start ! (at last) */
     
     /* init the stack */
-    for(i = 0; i<COL_NUM;i++){
+    for(i = 0; i<COLORS;i++){
         stacks[i] = NOT_A_CARD;
     }
     
@@ -642,15 +790,24 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
 
 #define SOLITAIRE_WIN 0
 #define SOLITAIRE_QUIT 1
+#define SOLITAIRE_USB 2
 
 /* the game */
 int solitaire(void){
     
     int i,j;
+    int button, lastbutton = 0;
     unsigned char c;
     int biggest_col_length;
     
-    if(solitaire_menu(MENU_BEFOREGAME) == MENU_QUIT) return SOLITAIRE_QUIT;
+    switch(solitaire_menu(MENU_BEFOREGAME)) {
+        case MENU_QUIT:
+            return SOLITAIRE_QUIT;
+
+        case MENU_USB:
+            return SOLITAIRE_USB;
+    }
+
     solitaire_init();
    
     while(true){
@@ -776,12 +933,17 @@ int solitaire(void){
         rb->lcd_update();
         
         /* what to do when a key is pressed ... */
-        switch(rb->button_get(true)){
+        button = rb->button_get(true);
+        switch(button){
             
             /* move cursor to the last card of the previous column */
             /* or to the previous color stack */
             /* or to the remains stack */
-            case BUTTON_RIGHT:
+            case SOL_RIGHT:
+#ifdef SOL_RIGHT_PRE
+                if(lastbutton != SOL_RIGHT_PRE)
+                    break;
+#endif
                 if(cur_col >= COL_NUM){
                     cur_col = 0;
                 } else if(cur_col == COL_NUM - 1){
@@ -799,7 +961,11 @@ int solitaire(void){
             /* move cursor to the last card of the next column */
             /* or to the next color stack */
             /* or to the remains stack */
-            case BUTTON_LEFT:
+            case SOL_LEFT:
+#ifdef SOL_LEFT_PRE
+                if(lastbutton != SOL_LEFT_PRE)
+                    break;
+#endif
                 if(cur_col == 0){
                     cur_col = REM_COL;
                 } else if(cur_col >= COL_NUM) {
@@ -815,7 +981,11 @@ int solitaire(void){
                 break;
             
             /* move cursor to card that's bellow */
-            case BUTTON_DOWN:
+            case SOL_DOWN:
+#ifdef SOL_DOWN_PRE
+                if(lastbutton != SOL_DOWN_PRE)
+                    break;
+#endif
                 if(cur_col >= COL_NUM) {
                     cur_col = (cur_col - COL_NUM + 1)%(COLORS + 1) + COL_NUM;
                     if(cur_col == REM_COL){
@@ -838,7 +1008,11 @@ int solitaire(void){
                 break;
             
             /* move cursor to card that's above */
-            case BUTTON_UP:
+            case SOL_UP:
+#ifdef SOL_UP_PRE
+                if(lastbutton != SOL_UP_PRE)
+                    break;
+#endif
                 if(cur_col >= COL_NUM) {
                     cur_col = (cur_col - COL_NUM + COLORS)%(COLORS + 1) + COL_NUM;
                     if(cur_col == REM_COL){
@@ -857,16 +1031,24 @@ int solitaire(void){
                 } while (deck[cur_card].next != NOT_A_CARD
                          && deck[cur_card].known == 0);
                 break;
-            
+
             /* Try to put card under cursor on one of the stacks */
-            case BUTTON_F1:
+            case SOL_CUR2STACK:
+#ifdef SOL_CUR2STACK_PRE
+                if(lastbutton != SOL_CUR2STACK_PRE)
+                    break;
+#endif
                 if(cur_card != NOT_A_CARD){
                     move_card(deck[cur_card].color + STACKS_COL, cur_card);
                 }
                 break;
-            
+
             /* Move cards arround, Uncover cards, ... */
-            case BUTTON_ON:
+            case SOL_MOVE:
+#ifdef SOL_MOVE_PRE
+                if(lastbutton != SOL_MOVE_PRE)
+                    break;
+#endif
                 if(sel_card == NOT_A_CARD) {
                     if(cur_card != NOT_A_CARD){
                         /* reveal a hidden card */
@@ -891,21 +1073,33 @@ int solitaire(void){
             
             /* If the card on the top of the remains can be put where */
             /* the cursor is, go ahead */
-            case BUTTON_PLAY:
+            case SOL_REM2CUR:
+#ifdef SOL_REM2CUR_PRE
+                if(lastbutton != SOL_REM2CUR_PRE)
+                    break;
+#endif
                 move_card(cur_col, cur_rem);
                 break;
-            
+
             /* If the card on top of the remains can be put on one */
             /* of the stacks, do so */
-            case BUTTON_F3:
+            case SOL_REM2STACK:
+#ifdef SOL_REM2STACK_PRE
+                if(lastbutton != SOL_REM2STACK_PRE)
+                    break;
+#endif
                 if(cur_rem != NOT_A_CARD){
                     move_card(deck[cur_rem].color + COL_NUM, cur_rem);
                 }
                 break;
-            
+
             /* unselect selected card or ... */
             /* draw new cards from the remains of the deck */
-            case BUTTON_F2:
+            case SOL_DRAW:
+#ifdef SOL_DRAW_PRE
+                if(lastbutton != SOL_DRAW_PRE)
+                    break;
+#endif
                 if(sel_card != NOT_A_CARD){
                     /* unselect selected card */
                     sel_card = NOT_A_CARD;
@@ -932,16 +1126,26 @@ int solitaire(void){
                 break;
             
             /* Show the menu */
-            case BUTTON_OFF:
+            case SOL_QUIT:
                 switch(solitaire_menu(MENU_DURINGGAME)){
                     case MENU_QUIT:
                         return SOLITAIRE_QUIT;
+                        
+                    case MENU_USB:
+                        return SOLITAIRE_USB;
 
                     case MENU_RESTART:
                         solitaire_init();
                         break;
                 }
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return SOLITAIRE_USB;
+                break;
         }
+        
+        if(button != BUTTON_NONE)
+            lastbutton = button;
 
         /* fix incoherences concerning cur_col and cur_card */
         c = find_card_col(cur_card);
@@ -952,6 +1156,8 @@ int solitaire(void){
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int result;
+
     /* plugin init */
     TEST_PLUGIN_API(api);
     (void)parameter;
@@ -964,10 +1170,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* play the game :) */
     /* Keep playing if a game was won (that means display the menu after */
     /* winning instead of quiting) */
-    while(solitaire() == SOLITAIRE_WIN);
+    while((result = solitaire()) == SOLITAIRE_WIN);
 
     /* Exit the plugin */
-    return PLUGIN_OK;
+    return (result == SOLITAIRE_USB) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
 #endif
