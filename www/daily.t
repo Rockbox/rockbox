@@ -22,14 +22,14 @@ They are <i>not</i> official releases, they are in fact almost guaranteed to not
 
 <!--#exec cmd="./dailymod.pl" -->
 
-<p><b>Note 1:</b> You must rename the file to "archos.mod" (archos.ajz for the recorder) before copying it to the root of your archos.
+<p><b>Note 1:</b> You must rename the file to "archos.mod" ("ajbrec.ajz" for the recorder) before copying it to the root of your archos.
 
 <p><b>Note 2:</b> The Recorder version does not work yet, due to unfinished drivers. It builds, but does not run.
 
-<h2>Build status</h2>
+<h2>CVS compile status</h2>
 
-<p>This table shows which targets are currently buildable with the CVS code.
-The timestamp is GMT.
+<p>This table shows which targets are currently compilable from the CVS code, and how many compiler warnings the build generates. "OK" means no warnings.
+The batch timestamp is GMT.
 
 <p>
 <!--#include virtual="buildstatus.link" -->
