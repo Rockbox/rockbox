@@ -34,50 +34,15 @@ static int itemcount;
  * Move the cursor to a particular id, 
  *   target: where you want it to be 
  */
-void put_cursor(int target)
+static void put_cursor(int target)
 {
     lcd_puts(0, cursor, " ");
     cursor = target;
     lcd_puts(0, cursor, "-");
 }
 
-int is_cursor_menu_top(void)
-{
-    return ((cursor == menu_top) ? 1 : 0);
-}
-
-int is_cursor_menu_bottom(void)
-{
-    return ((cursor == menu_bottom) ? 1 : 0);
-}
-
-void put_cursor_menu_top(void)
-{
-    put_cursor(menu_top);
-}
-
-void put_cursor_menu_bottom(void)
-{
-    put_cursor(menu_bottom);
-}
-
-void move_cursor_up(void)
-{
-    put_cursor(cursor-1);
-}
-
-void move_cursor_down(void)
-{
-    put_cursor(cursor+1);
-}
-
-void redraw_cursor(void)
-{
-    lcd_puts(0, cursor, "-");
-}
-
 /* We call the function pointer related to the current cursor position */
-void execute_menu_item(void)
+static void execute_menu_item(void)
 {
     /* call the proper function for this line */
     items[cursor].function();
@@ -92,7 +57,7 @@ void menu_init(struct menu_items* mitems, int count)
     cursor = menu_top;
 }
 
-void menu_draw(void)
+static void menu_draw(void)
 {
     int i = 0;
 
@@ -109,7 +74,7 @@ void menu_draw(void)
             menu_bottom = i;
     }
 
-    redraw_cursor();
+    lcd_puts(0, cursor, "-");
     lcd_update();
 }
 
@@ -132,12 +97,12 @@ void menu_run(void)
 #else
             case BUTTON_LEFT:
 #endif
-                if(is_cursor_menu_top()){
+                if (cursor == menu_top) {
                     /* wrap around to menu bottom */
-                    put_cursor_menu_bottom();
+                    put_cursor(menu_bottom);
                 } else {
                     /* move up */
-                    move_cursor_up();
+                    put_cursor(cursor-1);
                 }
                 break;
 
@@ -146,12 +111,12 @@ void menu_run(void)
 #else
             case BUTTON_RIGHT:
 #endif
-                if(is_cursor_menu_bottom() ){
+                if (cursor == menu_bottom) {
                     /* wrap around to menu top */
-                    put_cursor_menu_top();
+                    put_cursor(menu_top);
                 } else {
                     /* move down */
-                    move_cursor_down();
+                    put_cursor(cursor+1);
                 }
                 break;
 
