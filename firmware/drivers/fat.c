@@ -30,6 +30,12 @@
 #include "fat.h"
 #include "ata.h"
 
+#define BYTES2INT16(array,pos) \
+          (array[pos] | (array[pos+1] << 8 ))
+#define BYTES2INT32(array,pos) \
+          (array[pos] | (array[pos+1] << 8 ) | \
+          (array[pos+2] << 16 ) | (array[pos+3] << 24 ))
+
 #define NUM_ROOT_DIR_ENTRIES 512
 #define NUM_FATS 2
 #define NUM_RESERVED_SECTORS 1
@@ -39,33 +45,6 @@ struct dsksz2secperclus
 {
         unsigned int disk_size;
         unsigned int sec_per_cluster;
-};
-
-/*
-** This is the table for FAT16 drives. NOTE that this table includes
-** entries for disk sizes larger than 512 MB even though typically
-** only the entries for disks < 512 MB in size are used.
-** The way this table is accessed is to look for the first entry
-** in the table for which the disk size is less than or equal
-** to the DiskSize field in that table entry. For this table to
-** work properly BPB_RsvdSecCnt must be 1, BPB_NumFATs
-** must be 2, and BPB_RootEntCnt must be 512. Any of these values
-** being different may require the first table entries DiskSize value
-** to be changed otherwise the cluster count may be to low for FAT16.
-*/
-struct dsksz2secperclus dsk_table_fat16 [] =
-{
-    { 8400, 0}, /* disks up to 4.1 MB, the 0 value for SecPerClusVal
-                   trips an error */
-    { 32680, 2}, /* disks up to 16 MB, 1k cluster */
-    { 262144, 4}, /* disks up to 128 MB, 2k cluster */
-    { 524288, 8}, /* disks up to 256 MB, 4k cluster */
-    { 1048576, 16}, /* disks up to 512 MB, 8k cluster */
-/* The entries after this point are not used unless FAT16 is forced */
-    { 2097152, 32}, /* disks up to 1 GB, 16k cluster */
-    { 4194304, 64}, /* disks up to 2 GB, 32k cluster */
-    { 0xFFFFFFFF, 0} /* any disk greater than 2GB,
-                        0 value for SecPerClusVal trips an error */
 };
 
 int fat_num_rootdir_sectors(struct bpb *bpb);
@@ -84,7 +63,6 @@ int fat_update_entry(struct bpb *bpb, int entry, unsigned int val);
 unsigned int fat_getcurrdostime(unsigned short *dosdate,
                                 unsigned short *dostime,
                                 unsigned char *dostenth);
-int fat_create_root_dir(struct bpb *bpb);
 int fat_create_dos_name(unsigned char *name, unsigned char *newname);
 int fat_create_file(struct bpb *bpb, unsigned int currdir, char *name);
 
@@ -94,14 +72,10 @@ char current_directory[256] = "\\";
 struct bpb *global_bpb;
 struct disk_info di;
 
-extern int yyparse(void);
-
 
 #ifdef TEST_FAT
-void prompt(void)
-{
-   printf("C:%s>", current_directory);
-}
+
+#include "debug.h"
 
 int main(int argc, char *argv[])
 {
@@ -110,27 +84,18 @@ int main(int argc, char *argv[])
     memset(fat_cache, 0, sizeof(fat_cache));
     memset(fat_cache_dirty, 0, sizeof(fat_cache_dirty));
     
-    disk_init(NUM_BLOCKS);
-
     di.num_sectors = NUM_BLOCKS;
     di.sec_per_track = 40;
     di.num_heads = 250;
     di.hidden_sectors = 0;
 
-    if(read_disk("diskdump.dmp") < 0)
-    {
+    if(ata_init())
         printf("*** Warning! The disk is uninitialized\n");
-    }
     else
-    {
         fat_get_bpb(&bpb);
-    }
 
     global_bpb = &bpb;
-    prompt();
-    yyparse();
-
-    dump_disk("diskdump.dmp");
+    dbg_console(&bpb);
     return 0;
 }
 #endif
@@ -146,28 +111,6 @@ int fat_sec2cluster(struct bpb *bpb, unsigned int sec)
     }
 
     return ((sec - first_sec) / bpb->bpb_secperclus) + 2;
-}
-
-int fat_last_cluster_in_chain(struct bpb *bpb, unsigned int cluster)
-{
-    int iseof = 0;
-
-    switch(bpb->fat_type)
-    {
-        case FATTYPE_FAT12:
-            if(cluster >= 0x0ff8)
-                iseof = 1;
-            break;
-        case FATTYPE_FAT16:
-            if(cluster >= 0xfff8)
-                iseof = 1;
-            break;
-        case FATTYPE_FAT32:
-            if(cluster >= 0x0ffffff8)
-                iseof = 1;
-            break;
-    }
-    return iseof;
 }
 
 int fat_cluster2sec(struct bpb *bpb, unsigned int cluster)
@@ -214,7 +157,7 @@ int fat_get_totsec(struct bpb* bpb)
 
 int fat_get_rootdir_sector(struct bpb *bpb)
 {
-    return bpb->bpb_rsvdseccnt + bpb->bpb_numfats * fat_get_fatsize(bpb);
+    return bpb->bpb_rootclus;
 }
 
 int fat_first_data_sector(struct bpb* bpb)
@@ -227,118 +170,6 @@ int fat_first_data_sector(struct bpb* bpb)
     rootdirsectors = fat_num_rootdir_sectors(bpb);
     
     return bpb->bpb_rsvdseccnt + bpb->bpb_numfats * fatsz + rootdirsectors;
-}
-
-int fat_format(struct disk_info *di, char *vol_name)
-{
-    unsigned char buf[BLOCK_SIZE];
-    struct bpb bpb;
-    unsigned int root_dir_sectors;
-    unsigned int tmp1, tmp2;
-    int sec_per_clus = 0;
-    int fat_size;
-    int i = 0;
-    int err;
-
-    while(di->num_sectors > dsk_table_fat16[i].disk_size)
-    {
-        i++;
-    }
-
-    sec_per_clus = dsk_table_fat16[i].sec_per_cluster;
-    
-    if(sec_per_clus == 0)
-    {
-        fprintf(stderr, "fat_format() - Bad disk size (%u)\n",
-                di->num_sectors);
-        return -1;
-    }
-
-    /* First calculate how many sectors we need for
-       the root directory */
-    root_dir_sectors = ((NUM_ROOT_DIR_ENTRIES * 32) +
-                        (BLOCK_SIZE - 1)) / BLOCK_SIZE;
-
-    /* Now calculate the FAT size */
-    tmp1 = di->num_sectors - (NUM_RESERVED_SECTORS + root_dir_sectors);
-    tmp2 = (256 * sec_per_clus) + NUM_FATS;
-
-    fat_size = (tmp1 + (tmp2 - 1)) / tmp2;
-
-    /* Now create the BPB. We must be careful, so we really make
-       it little endian. */
-    memset(buf, 0xff, BLOCK_SIZE);
-
-    strncpy(&buf[BS_OEMNAME], "MSWIN4.1", 8);
-    buf[BPB_BYTSPERSEC] = BLOCK_SIZE & 0xff;
-    buf[BPB_BYTSPERSEC+1] = BLOCK_SIZE >> 8;
-    buf[BPB_SECPERCLUS] = sec_per_clus;
-    buf[BPB_RSVDSECCNT] = 1;
-    buf[BPB_RSVDSECCNT+1] = 0;
-    buf[BPB_NUMFATS] = 2;
-    buf[BPB_ROOTENTCNT] = NUM_ROOT_DIR_ENTRIES & 0xff;
-    buf[BPB_ROOTENTCNT+1] = NUM_ROOT_DIR_ENTRIES >> 8;
-    buf[BPB_TOTSEC16] = di->num_sectors & 0xff;
-    buf[BPB_TOTSEC16+1] = di->num_sectors >> 8;
-    buf[BPB_MEDIA] = 0xf0;
-    buf[BPB_FATSZ16] = fat_size & 0xff;
-    buf[BPB_FATSZ16+1] = fat_size >> 8;
-    buf[BPB_SECPERTRK] = di->sec_per_track & 0xff;
-    buf[BPB_SECPERTRK+1] = di->sec_per_track >> 8;
-    buf[BPB_NUMHEADS] = di->num_heads & 0xff;
-    buf[BPB_NUMHEADS+1] = di->num_heads >> 8;
-    buf[BPB_HIDDSEC] = di->hidden_sectors & 0xff;
-    buf[BPB_HIDDSEC+1] = (di->hidden_sectors >> 8) & 0xff;
-    buf[BPB_HIDDSEC+2] = (di->hidden_sectors >> 16) & 0xff;
-    buf[BPB_HIDDSEC+3] = (di->hidden_sectors >> 24) & 0xff;
-    buf[BPB_TOTSEC32] = 0;
-    buf[BPB_TOTSEC32+1] = 0;
-    buf[BPB_TOTSEC32+2] = 0;
-    buf[BPB_TOTSEC32+3] = 0;
-
-    buf[BS_DRVNUM] = 0;
-    buf[BS_RESERVED1] = 0;
-    buf[BS_BOOTSIG] = 0x29;
-    buf[BS_VOLID] = 0x78;
-    buf[BS_VOLID+1] = 0x56;
-    buf[BS_VOLID+2] = 0x34;
-    buf[BS_VOLID+3] = 0x12;
-    memset(&buf[BS_VOLLAB], ' ', 11);
-    strncpy(&buf[BS_VOLLAB], vol_name, MIN(11, strlen(vol_name));
-    strncpy(&buf[BS_FILSYSTYPE], "FAT16   ", 8);
-
-    /* The final signature */
-    buf[BPB_LAST_WORD] = 0x55;
-    buf[BPB_LAST_WORD+1] = 0xaa;
-
-    /* Now write the sector to disk */
-    err = ata_write_sectors(0,1,buf);
-    if(err)
-    {
-        fprintf(stderr, "fat_format() - Couldn't write BSB (error code %i)\n",
-                err);
-        return -1;
-    }
-
-    if(fat_get_bpb(&bpb) < 0)
-    {
-        fprintf(stderr, "fat_format() - Couldn't read BPB\n");
-        return -1;
-    }
-
-    if(fat_create_fat(&bpb) < 0)
-    {
-        fprintf(stderr, "fat_format() - Couldn't create FAT\n");
-        return -1;
-    }
-    
-    if(fat_create_root_dir(&bpb) < 0)
-    {
-        fprintf(stderr, "fat_format() - Couldn't write root dir sector\n");
-        return -1;
-    }
-    
-    return 0;
 }
 
 int fat_get_bpb(struct bpb *bpb)
@@ -365,40 +196,34 @@ int fat_get_bpb(struct bpb *bpb)
     strncpy(bpb->bs_oemname, &buf[BS_OEMNAME], 8);
     bpb->bs_oemname[8] = 0;
 
-    bpb->bpb_bytspersec = buf[BPB_BYTSPERSEC] | (buf[BPB_BYTSPERSEC+1] << 8);
+    bpb->bpb_bytspersec = BYTES2INT16(buf,BPB_BYTSPERSEC);
     bpb->bpb_secperclus = buf[BPB_SECPERCLUS];
-    bpb->bpb_rsvdseccnt = buf[BPB_RSVDSECCNT] | (buf[BPB_RSVDSECCNT+1] << 8);
-    bpb->bpb_numfats = buf[BPB_NUMFATS];
-    bpb->bpb_rootentcnt = buf[BPB_ROOTENTCNT] | (buf[BPB_ROOTENTCNT+1] << 8);
-    bpb->bpb_totsec16 = buf[BPB_TOTSEC16] | (buf[BPB_TOTSEC16+1] << 8);
-    bpb->bpb_media = buf[BPB_MEDIA];
-    bpb->bpb_fatsz16 = buf[BPB_FATSZ16] | (buf[BPB_FATSZ16+1] << 8);
-    bpb->bpb_secpertrk = buf[BPB_SECPERTRK] | (buf[BPB_SECPERTRK+1] << 8);
-    bpb->bpb_numheads = buf[BPB_NUMHEADS] | (buf[BPB_NUMHEADS+1] << 8);
-    bpb->bpb_hiddsec = buf[BPB_HIDDSEC] | (buf[BPB_HIDDSEC+1] << 8) |
-        (buf[BPB_HIDDSEC+2] << 16) | (buf[BPB_HIDDSEC+3] << 24);
-    bpb->bpb_totsec32 = buf[BPB_TOTSEC32] | (buf[BPB_TOTSEC32+1] << 8) |
-        (buf[BPB_TOTSEC32+2] << 16) | (buf[BPB_TOTSEC32+3] << 24);
+    bpb->bpb_rsvdseccnt = BYTES2INT16(buf,BPB_RSVDSECCNT);
+    bpb->bpb_numfats    = buf[BPB_NUMFATS];
+    bpb->bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT);
+    bpb->bpb_totsec16   = BYTES2INT16(buf,BPB_TOTSEC16);
+    bpb->bpb_media      = buf[BPB_MEDIA];
+    bpb->bpb_fatsz16    = BYTES2INT16(buf,BPB_FATSZ16);
+    bpb->bpb_secpertrk  = BYTES2INT16(buf,BPB_SECPERTRK);
+    bpb->bpb_numheads   = BYTES2INT16(buf,BPB_NUMHEADS);
+    bpb->bpb_hiddsec    = BYTES2INT32(buf,BPB_HIDDSEC);
+    bpb->bpb_totsec32   = BYTES2INT32(buf,BPB_TOTSEC32);
+    bpb->bs_drvnum      = buf[BS_DRVNUM];
+    bpb->bs_bootsig     = buf[BS_BOOTSIG];
+    bpb->bpb_fatsz32    = BYTES2INT32(buf,BPB_FATSZ32);
+    bpb->last_word      = BYTES2INT16(buf,BPB_LAST_WORD);
 
-    bpb->bs_drvnum = buf[BS_DRVNUM];
-    bpb->bs_bootsig = buf[BS_BOOTSIG];
     if(bpb->bs_bootsig == 0x29)
     {
-        bpb->bs_volid = buf[BS_VOLID] | (buf[BS_VOLID+1] << 8) |
-            (buf[BS_VOLID+2] << 16) | (buf[BS_VOLID+3] << 24);
+        bpb->bs_volid = BYTES2INT32(buf,BS_VOLID);
         strncpy(bpb->bs_vollab, &buf[BS_VOLLAB], 11);
         strncpy(bpb->bs_filsystype, &buf[BS_FILSYSTYPE], 8);
     }
 
-    bpb->bpb_fatsz32 = (buf[BPB_FATSZ32] + (buf[BPB_FATSZ32+1] << 8)) |
-        (buf[BPB_FATSZ32+2] << 16) | (buf[BPB_FATSZ32+3] << 24);
-    
-    bpb->last_word = buf[BPB_LAST_WORD] | (buf[BPB_LAST_WORD+1] << 8);
-
     /* Determine FAT type */
     fatsz = fat_get_fatsize(bpb);
 
-    if(bpb->bpb_totsec16 != 0)
+    if (bpb->bpb_totsec16 != 0)
         totsec = bpb->bpb_totsec16;
     else
         totsec = bpb->bpb_totsec32;
@@ -408,23 +233,30 @@ int fat_get_bpb(struct bpb *bpb)
                         rootdirsectors);
     countofclusters = datasec / bpb->bpb_secperclus;
 
-    if(countofclusters < 4085)
-    {
-        bpb->fat_type = FATTYPE_FAT12;
-    }
-    else
-    {
-        if(countofclusters < 65525)
-        {
-            bpb->fat_type = FATTYPE_FAT16;
-        }
-        else
-        {
-            bpb->fat_type = FATTYPE_FAT32;
-        }
+
+    /* Determining FAT type:
+
+       This is the "proper way" to do it:
+
+       if (countofclusters < 4085)
+           fat12
+       else
+           if (countofclusters < 65525)
+               fat16
+           else
+               fat32
+    */
+
+    /*
+       This is the "real world way" to do it
+       (since not all FAT32 partitions have >65524 clusters)
+    */
+    if ( bpb->bpb_fatsz16 ) {
+        printf("This is not FAT32. Go away!\n");
+        return -1;
     }
 
-    if(fat_bpb_is_sane(bpb) < 0)
+    if (fat_bpb_is_sane(bpb) < 0)
     {
         fprintf(stderr, "fat_get_bpb() - BPB is not sane\n");
         return -1;
@@ -435,12 +267,6 @@ int fat_get_bpb(struct bpb *bpb)
 
 int fat_bpb_is_sane(struct bpb *bpb)
 {
-    if(bpb->fat_type == FATTYPE_FAT32)
-    {
-        fprintf(stderr, "fat_bpb_is_sane() - Error: FAT32 not supported\n");
-        return -1;
-    }
-    
     if(bpb->bpb_bytspersec != 512)
     {
         fprintf(stderr,
@@ -504,75 +330,6 @@ int fat_bpb_is_sane(struct bpb *bpb)
     return 0;
 }
 
-int fat_create_fat(struct bpb* bpb)
-{
-    unsigned char *sec;
-    int i;
-    int secnum = 0;
-    int fatsz;
-
-    if(fat_bpb_is_sane(bpb) < 0)
-    {
-        fprintf(stderr, "fat_create_fat() - BPB is not sane\n");
-        return -1;
-    }
-
-    if(bpb->bpb_fatsz16 != 0)
-        fatsz = bpb->bpb_fatsz16;
-    else
-        fatsz = bpb->bpb_fatsz32;
-
-    sec = fat_cache_fat_sector(bpb, secnum);
-    if(!sec)
-    {
-        fprintf(stderr, "fat_create_fat() - Couldn't cache fat sector"
-                " (%d)\n", secnum);
-        return -1;
-    }
-
-    fat_cache_dirty[secnum] = 1;
-    
-    /* First entry should have the media type in the
-       low byte and the rest of the bits set to 1.
-       The second should be the EOC mark. */
-    memset(sec, 0, BLOCK_SIZE);
-    sec[0] = bpb->bpb_media;
-    if(bpb->fat_type == FATTYPE_FAT12)
-    {
-        sec[1] = 0xff;
-        sec[2] = 0xff;
-    }
-    if(bpb->fat_type == FATTYPE_FAT16)
-    {
-        sec[0] = bpb->bpb_media;
-        sec[1] = 0xff;
-        sec[2] = 0xff;
-        sec[3] = 0xff;
-    }
-    secnum++;
-        
-    for(i = 0; i < fatsz - 1;i++)
-    {
-        sec = fat_cache_fat_sector(bpb, secnum);
-        if(!sec)
-        {
-            fprintf(stderr, "fat_create_fat() - Couldn't cache fat sector"
-                    " (%d)\n", i);
-            return -1;
-        }
-        fat_cache_dirty[secnum] = 1;
-        secnum++;
-        memset(sec, 0, BLOCK_SIZE);
-    }
-
-    if(fat_flush_fat(bpb) < 0)
-    {
-        fprintf(stderr, "fat_create_fat() - Couldn't flush fat\n");
-        return -1;
-    }
-    return 0;
-}
-
 int fat_dbg_read_block(char *name, unsigned char *buf)
 {
     FILE *f;
@@ -628,7 +385,6 @@ unsigned char *fat_cache_fat_sector(struct bpb *bpb, int secnum)
 int fat_update_entry(struct bpb *bpb, int entry, unsigned int val)
 {
     unsigned char *sec;
-    unsigned char *sec2;
     int fatsz;
     int fatoffset;
     int thisfatsecnum;
@@ -636,18 +392,7 @@ int fat_update_entry(struct bpb *bpb, int entry, unsigned int val)
     unsigned int tmp;
 
     fatsz = fat_get_fatsize(bpb);
-    
-    if(bpb->fat_type == FATTYPE_FAT12)
-    {
-        fatoffset = entry + (entry / 2);
-    }
-    else 
-    {
-        if(bpb->fat_type == FATTYPE_FAT16)
-            fatoffset = entry * 2;
-        else
-            fatoffset = entry * 4;
-    }
+    fatoffset = entry * 4;
     thisfatsecnum = fatoffset / bpb->bpb_bytspersec;
     thisfatentoffset = fatoffset % bpb->bpb_bytspersec;
 
@@ -662,55 +407,16 @@ int fat_update_entry(struct bpb *bpb, int entry, unsigned int val)
 
     fat_cache_dirty[thisfatsecnum] = 1;
     
-    switch(bpb->fat_type)
-    {
-        case FATTYPE_FAT12:
-            if(thisfatentoffset == bpb->bpb_bytspersec - 1)
-            {
-                /* This entry spans a sector boundary. Take care */
-                sec2 = fat_cache_fat_sector(bpb, thisfatsecnum + 1);
-                /* Load the sector if it is not cached */
-                if(!sec2)
-                {
-                    fprintf(stderr, "fat_update_entry() - Could not "
-                            "cache sector %d\n",
-                            thisfatsecnum + 1);
-                    return -1;
-                }
-                fat_cache_dirty[thisfatsecnum + 1] = 1;
-            }
-            else
-            {
-                if(entry & 1) /* Odd entry number? */
-                {
-                    tmp = sec[thisfatentoffset] & 0xf0;
-                    sec[thisfatentoffset] = tmp | (val & 0x0f);
-                    sec[thisfatentoffset+1] = (val >> 4) & 0xff;
-                }
-                else
-                {
-                    sec[thisfatentoffset] = val & 0xff;
-                    tmp = sec[thisfatentoffset+1] & 0x0f;
-                    sec[thisfatentoffset+1] = tmp | ((val >> 4) & 0xf0);
-                }
-            }
-            break;
-        case FATTYPE_FAT16:
-            *(unsigned short *)(&sec[thisfatentoffset]) = val;
-            break;
-        case FATTYPE_FAT32:
-            tmp = *(unsigned short *)(&sec[thisfatentoffset]) & 0xf000000;
-            val = tmp | (val & 0x0fffffff);
-            *(unsigned short *)(&sec[thisfatentoffset]) = val;
-            break;
-    }
+    tmp = *(unsigned short *)(&sec[thisfatentoffset]) & 0xf000000;
+    val = tmp | (val & 0x0fffffff);
+    *(unsigned short *)(&sec[thisfatentoffset]) = val;
+
     return 0;
 }
 
 int fat_read_entry(struct bpb *bpb, int entry)
 {
     unsigned char *sec;
-    unsigned char *sec2;
     int fatsz;
     int fatoffset;
     int thisfatsecnum;
@@ -718,18 +424,7 @@ int fat_read_entry(struct bpb *bpb, int entry)
     int val = -1;
 
     fatsz = fat_get_fatsize(bpb);
-    
-    if(bpb->fat_type == FATTYPE_FAT12)
-    {
-        fatoffset = entry + (entry / 2);
-    }
-    else 
-    {
-        if(bpb->fat_type == FATTYPE_FAT16)
-            fatoffset = entry * 2;
-        else
-            fatoffset = entry * 4;
-    }
+    fatoffset = entry * 4;
     thisfatsecnum = fatoffset / bpb->bpb_bytspersec;
     thisfatentoffset = fatoffset % bpb->bpb_bytspersec;
 
@@ -742,43 +437,7 @@ int fat_read_entry(struct bpb *bpb, int entry)
         return -1;
     }
 
-    switch(bpb->fat_type)
-    {
-        case FATTYPE_FAT12:
-            if(thisfatentoffset == bpb->bpb_bytspersec - 1)
-            {
-                /* This entry spans a sector boundary. Take care */
-                sec2 = fat_cache_fat_sector(bpb, thisfatsecnum + 1);
-                /* Load the sector if it is not cached */
-                if(!sec2)
-                {
-                    fprintf(stderr, "fat_update_entry() - Could not "
-                            "cache sector %d\n",
-                            thisfatsecnum + 1);
-                    return -1;
-                }
-            }
-            else
-            {
-                if(entry & 1) /* Odd entry number? */
-                {
-                    val = (sec[thisfatentoffset] & 0x0f) |
-                        (sec[thisfatentoffset+1] << 4);
-                }
-                else
-                {
-                    val = (sec[thisfatentoffset] & 0xff) |
-                        ((sec[thisfatentoffset+1] & 0x0f) << 8);
-                }
-            }
-            break;
-        case FATTYPE_FAT16:
-            val = *(unsigned short *)(&sec[thisfatentoffset]);
-            break;
-        case FATTYPE_FAT32:
-            val = *(unsigned int *)(&sec[thisfatentoffset]);
-            break;
-    }
+    val = *(unsigned int *)(&sec[thisfatentoffset]);
     return val;
 }
 
@@ -843,67 +502,12 @@ unsigned int fat_getcurrdostime(unsigned short *dosdate,
     return 0;
 }
 
-int fat_create_root_dir(struct bpb *bpb)
-{
-    unsigned char buf[BLOCK_SIZE];
-    int fatsz;
-    int sec;
-    int res;
-    int i;
-    unsigned short dosdate;
-    unsigned short dostime;
-    unsigned char dostenth;
-    int num_root_sectors;
-
-    fatsz = fat_get_fatsize(bpb);
-
-    sec = bpb->bpb_rsvdseccnt + bpb->bpb_numfats * fatsz;
-
-    memset(buf, 0, sizeof(buf));
-    
-    strncpy(&buf[FATDIR_NAME], bpb->bs_vollab, 11);
-    buf[FATDIR_ATTR] = FAT_ATTR_VOLUME_ID;
-    buf[FATDIR_NTRES] = 0;
-
-    fat_getcurrdostime(&dosdate, &dostime, &dostenth);
-    buf[FATDIR_WRTDATE] = dosdate & 0xff;
-    buf[FATDIR_WRTDATE+1] = dosdate >> 8;
-    buf[FATDIR_WRTTIME] = dostime & 0xff;
-    buf[FATDIR_WRTTIME+1] = dostime >> 8;
-
-    printf("Writing rootdir to sector %d...\n", sec);
-
-    res = ata_write_sectors(sec,1,buf);
-    if(res)
-    {
-        fprintf(stderr, "fat_create_root_dir() - Couldn't write sector (%d)\n",
-                sec);
-        return -1;
-    }
-
-    printf("Clearing the rest of the root dir.\n");
-    sec++;
-    num_root_sectors = bpb->bpb_rootentcnt * 32 / bpb->bpb_bytspersec;
-    memset(buf, 0, BLOCK_SIZE);
-    
-    for(i = 1;i < num_root_sectors;i++)
-    {
-        if(ata_write_sectors(sec++,1,buf))
-        {
-            fprintf(stderr, "fat_create_root_dir() - "
-                            " Couldn't write sector (%d)\n", sec);
-            return -1;
-        }
-    }
-    
-    return 0;
-}
-
 int fat_get_next_cluster(struct bpb *bpb, unsigned int cluster)
 {
     int next_cluster = fat_read_entry(bpb, cluster);
 
-    if(fat_last_cluster_in_chain(bpb, next_cluster))
+    /* is this last cluster in chain? */
+    if ( next_cluster >= 0x0ffffff8 )
         return 0;
     else
         return next_cluster;
@@ -1198,22 +802,26 @@ int fat_create_file(struct bpb *bpb, unsigned int currdir, char *name)
     return err;
 }
 
-void fat_fill_direntry(struct fat_direntry *de, char *buf)
+int fat_parse_direntry(struct fat_direntry *de, char *buf)
 {
-    memset(de, 0, sizeof(struct fat_direntry));
+    /* is this a long filename entry? */
+    if ( ( buf[FATDIR_ATTR] & FAT_ATTR_LONG_NAME_MASK ) == 
+         FAT_ATTR_LONG_NAME )
+    {
+        return 0;
+    }
     
-    strncpy(de->name, &buf[FATDIR_NAME], 11);
+    memset(de, 0, sizeof(struct fat_direntry));
     de->attr = buf[FATDIR_ATTR];
     de->crttimetenth = buf[FATDIR_CRTTIMETENTH];
-    de->crtdate = buf[FATDIR_CRTDATE] | (buf[FATDIR_CRTDATE+1] << 8);
-    de->crttime = buf[FATDIR_CRTTIME] | (buf[FATDIR_CRTTIME+1] << 8);
-    de->wrtdate = buf[FATDIR_WRTDATE] | (buf[FATDIR_WRTDATE+1] << 8);
-    de->wrttime = buf[FATDIR_WRTTIME] | (buf[FATDIR_WRTTIME+1] << 8);
-    
-    de->filesize = buf[FATDIR_FILESIZE] |
-        (buf[FATDIR_FILESIZE+1] << 8) |
-        (buf[FATDIR_FILESIZE+2] << 16) |
-        (buf[FATDIR_FILESIZE+3] << 24);
+    de->crtdate = BYTES2INT16(buf,FATDIR_CRTDATE);
+    de->crttime = BYTES2INT16(buf,FATDIR_CRTTIME);
+    de->wrtdate = BYTES2INT16(buf,FATDIR_WRTDATE);
+    de->wrttime = BYTES2INT16(buf,FATDIR_WRTTIME);
+    de->filesize = BYTES2INT32(buf,FATDIR_FILESIZE);
+    strncpy(de->name, &buf[FATDIR_NAME], 11);
+
+    return 1;
 }
 
 int fat_opendir(struct bpb *bpb, struct fat_dirent *ent, unsigned int currdir)
@@ -1246,8 +854,9 @@ int fat_opendir(struct bpb *bpb, struct fat_dirent *ent, unsigned int currdir)
     return 0;
 }
 
-int fat_getnext(struct bpb *bpb, struct fat_dirent *ent,
-                 struct fat_direntry *entry)
+int fat_getnext(struct bpb *bpb, 
+                struct fat_dirent *ent,
+                struct fat_direntry *entry)
 {
     int done = 0;
     int i;
@@ -1261,18 +870,17 @@ int fat_getnext(struct bpb *bpb, struct fat_dirent *ent,
         {
             firstbyte = ent->cached_buf[i*32];
             if(firstbyte == 0xe5)
-            {
                 continue;
-            }
 
-            if(firstbyte == 0)
-            {
+            if(firstbyte == 0) {
+                printf("Firstbyte == 0\n");
                 return -1;
             }
 
-            fat_fill_direntry(entry, &ent->cached_buf[i*32]);
-            done = 1;
-            break;
+            if ( fat_parse_direntry(entry, &ent->cached_buf[i*32]) ) {
+                done = 1;
+                break;
+            }
         }
 
         /* Next sector? */
@@ -1284,9 +892,13 @@ int fat_getnext(struct bpb *bpb, struct fat_dirent *ent,
             /* Do we need to advance one cluster? */
             if(ent->num_sec >= bpb->bpb_secperclus)
             {
+                int cluster = fat_sec2cluster(bpb, ent->cached_sec);
+                if ( cluster < 0 ) {
+                    printf("sec2cluster failed\n");
+                    return -1;
+                }
                 ent->num_sec = 0;
-                ent->cached_sec = fat_get_next_cluster(
-                    bpb, fat_sec2cluster(bpb, ent->cached_sec));
+                ent->cached_sec = fat_get_next_cluster( bpb, cluster );
                 if(!ent->cached_sec)
                 {
                     printf("End of cluster chain.\n");

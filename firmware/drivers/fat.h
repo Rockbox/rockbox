@@ -20,6 +20,8 @@
 #ifndef FAT_H
 #define FAT_H
 
+#define BLOCK_SIZE 512
+
 #define FATTYPE_FAT12       0
 #define FATTYPE_FAT16       1
 #define FATTYPE_FAT32       2
@@ -50,37 +52,42 @@
 
 #define BPB_LAST_WORD       510
 
-#define MIN(a,b) (((a) < (b))?(a):(b)))
+#define MIN(a,b) (((a) < (b))?(a):(b))
 
 struct bpb
 {
-        char bs_oemname[9];  /* OEM string, ending with \0 */
-        int bpb_bytspersec;  /* Bytes per sectory, typically 512 */
-        int bpb_secperclus;  /* Sectors per cluster */
-        int bpb_rsvdseccnt;  /* Number of reserved sectors */
-        int bpb_numfats;     /* Number of FAT structures, typically 2 */
-        int bpb_rootentcnt;  /* Number of dir entries in the root */
-        int bpb_totsec16;    /* Number of sectors on the volume (old 16-bit) */
-        int bpb_media;       /* Media type (typically 0xf0 or 0xf8) */
-        int bpb_fatsz16;     /* Number of used sectors per FAT structure */
-        int bpb_secpertrk;   /* Number of sectors per track */
-        int bpb_numheads;    /* Number of heads */
-        int bpb_hiddsec;     /* Hidden sectors before the volume */
-        unsigned int bpb_totsec32;    /* Number of sectors on the volume
-                                         (new 32-bit) */
-        /**** FAT12/16 specific *****/
-        int bs_drvnum;       /* Drive number */
-        int bs_bootsig;      /* Is 0x29 if the following 3 fields are valid */
-        unsigned int bs_volid; /* Volume ID */
-        char bs_vollab[12];  /* Volume label, 11 chars plus \0 */
-        char bs_filsystype[9]; /* File system type, 8 chars plus \0 */
+    char bs_oemname[9];  /* OEM string, ending with \0 */
+    int bpb_bytspersec;  /* Bytes per sectory, typically 512 */
+    int bpb_secperclus;  /* Sectors per cluster */
+    int bpb_rsvdseccnt;  /* Number of reserved sectors */
+    int bpb_numfats;     /* Number of FAT structures, typically 2 */
+    int bpb_rootentcnt;  /* Number of dir entries in the root */
+    int bpb_totsec16;    /* Number of sectors on the volume (old 16-bit) */
+    int bpb_media;       /* Media type (typically 0xf0 or 0xf8) */
+    int bpb_fatsz16;     /* Number of used sectors per FAT structure */
+    int bpb_secpertrk;   /* Number of sectors per track */
+    int bpb_numheads;    /* Number of heads */
+    int bpb_hiddsec;     /* Hidden sectors before the volume */
+    unsigned int bpb_totsec32;    /* Number of sectors on the volume
+                                     (new 32-bit) */
+    /**** FAT12/16 specific *****/
+    int bs_drvnum;       /* Drive number */
+    int bs_bootsig;      /* Is 0x29 if the following 3 fields are valid */
+    unsigned int bs_volid; /* Volume ID */
+    char bs_vollab[12];    /* Volume label, 11 chars plus \0 */
+    char bs_filsystype[9]; /* File system type, 8 chars plus \0 */
 
-        /**** FAT32 specific *****/
-        int bpb_fatsz32;
-        
-        int last_word;       /* Must be 0xaa55 */
+    /**** FAT32 specific *****/
+    int bpb_fatsz32;
+    int bpb_extflags;
+    int bpb_fsver;
+    int bpb_rootclus;
+    int bpb_fsinfo;
+    int bpb_bkbootsec;
 
-        int fat_type;        /* What type of FAT is this? */
+    /* variables for internal use */
+    int fat_type;       /* FAT12, FAT16 or FAT32 */
+    int last_word;      /* must be 0xAA55 */
 };
 
 #define FAT_ATTR_READ_ONLY   0x01
@@ -91,6 +98,9 @@ struct bpb
 #define FAT_ATTR_ARCHIVE     0x20
 #define FAT_ATTR_LONG_NAME   (FAT_ATTR_READ_ONLY | FAT_ATTR_HIDDEN | \
                               FAT_ATTR_SYSTEM | FAT_ATTR_VOLUME_ID)
+#define FAT_ATTR_LONG_NAME_MASK (FAT_ATTR_READ_ONLY | FAT_ATTR_HIDDEN | \
+                                 FAT_ATTR_SYSTEM | FAT_ATTR_VOLUME_ID | \
+                                 FAT_ATTR_DIRECTORY | FAT_ATTR_ARCHIVE )
 
 
 #define FATDIR_NAME          0
@@ -145,10 +155,14 @@ struct fat_dirent
         char cached_buf[BLOCK_SIZE];
 };
 
-int fat_format(struct disk_info *di, char *vol_name);
-int fat_create_file(struct bpb *bpb, unsigned int currdir, char *name);
-int fat_opendir(struct bpb *bpb, struct fat_dirent *ent, unsigned int currdir);
-int fat_getnext(struct bpb *bpb, struct fat_dirent *ent,
-                struct fat_direntry *entry);
+extern int fat_create_file(struct bpb *bpb, 
+                           unsigned int currdir, 
+                           char *name);
+extern int fat_opendir(struct bpb *bpb, 
+                       struct fat_dirent *ent, 
+                       unsigned int currdir);
+extern int fat_getnext(struct bpb *bpb, 
+                       struct fat_dirent *ent,
+                       struct fat_direntry *entry);
 
 #endif
