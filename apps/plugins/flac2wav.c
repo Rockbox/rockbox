@@ -64,9 +64,7 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
 
     if (samples*frame->header.channels > (FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS)) {
       // ERROR!!!
-#ifdef SIMULATOR
-      printf("ERROR: samples*frame->header.channels=%d\n",samples*frame->header.channels);
-#endif
+      DEBUGF("ERROR: samples*frame->header.channels=%d\n",samples*frame->header.channels);
       return(FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE);
     }
 

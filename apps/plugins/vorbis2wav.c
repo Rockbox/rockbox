@@ -141,7 +141,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     if (n==0) {
       eof=1;
     } else if (n < 0) {
-      dprintf("Error decoding frame\n");
+      DEBUGF("Error decoding frame\n");
     } else {
       file_info.frames_decoded++;
 #if BYTE_ORDER == BIG_ENDIAN

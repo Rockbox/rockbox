@@ -19,15 +19,6 @@
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
-
-/* A macro to enable printf for the simulator only */
-
-#ifdef SIMULATOR
-#define dprintf(...) printf(__VA_ARGS__)
-#else
-#define dprintf(...)
-#endif
-
 /* the main data structure of the program */
 typedef struct {
     int infile;

@@ -66,9 +66,7 @@ void ao_play(file_info_struct* file_info,sample_t* samples,int flags) {
         int16_samples[2*i+1] = LE_S16(convert (samples[i+256]));
     }
   } else {
-#ifdef SIMULATOR
-    printf("ERROR: unsupported format: %d\n",flags);
-#endif
+    DEBUGF("ERROR: unsupported format: %d\n",flags);
   }
 
   /* FIX: Buffer the disk write to write larger amounts at one */
@@ -108,9 +106,7 @@ void a52_decode_data (file_info_struct* file_info, uint8_t * start, uint8_t * en
 
 		length = a52_syncinfo (buf, &flags, &sample_rate, &bit_rate);
 		if (!length) {
-#ifdef SIMULATOR
-		    printf("skip\n");
-#endif
+		    DEBUGF("skip\n");
 		    for (bufptr = buf; bufptr < buf + 6; bufptr++)
 			bufptr[0] = bufptr[1];
 		    continue;
@@ -149,9 +145,7 @@ void a52_decode_data (file_info_struct* file_info, uint8_t * start, uint8_t * en
 		bufpos = buf + 7;
 		continue;
 	    error:
-#ifdef SIMULATOR
-		printf ("error\n");
-#endif
+		DEBUGF("error\n");
 		bufptr = buf;
 		bufpos = buf + 7;
 	    }
