@@ -33,6 +33,7 @@
 #include "thread.h"
 #include "usb.h"
 #include "file.h"
+#include "hwcompat.h"
 #endif
 
 extern void bitswap(unsigned char *data, int length);
@@ -649,10 +650,18 @@ static void dma_tick(void)
             TCNT2 = 0;
             for(i = 0;i < 30;i++)
             {
-                PADR |= 0x800;
+                if(read_hw_mask() & PR_ACTIVE_HIGH)
+                    PADR |= 0x800;
+                else
+                    PADR &= ~0x800;
+                    
                 while(PBDR & 0x8000) {};
                 mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
-                PADR &= ~0x800;
+                
+                if(read_hw_mask() & PR_ACTIVE_HIGH)
+                    PADR &= ~0x800;
+                else
+                    PADR |= 0x800;
                 
                 mp3buf_write++;
                 if(mp3buf_write >= mp3buflen)
