@@ -375,6 +375,42 @@ if [ -z "$appsdir" ]; then
     appsdir=`input`
 fi
 
+##################################################################
+# Figure out where the tools directory is!
+#
+
+toolsfile="descramble.c" # a file to check for in the tools root dir
+
+for dir in tools . .. ../tools ../../tools $firmdir/tools $firmdir/../tools; do
+    if [ -f $dir/$toolsfile ]; then
+        toolsdir="$dir"
+        break
+    fi
+done
+
+if [ -z "$toolsdir" ]; then
+  # no file found, check if (some of) the necessary tools are in the PATH
+  # already
+
+  toolsexe="scramble"
+
+  for dir in `echo $PATH | tr ':' ' '`; do
+    if [ -x "$dir/$toolsexe" ]; then
+       echo "found $toolsexe in $dir"
+       toolsdir="$dir"
+       break
+    fi
+  done
+
+fi
+
+if [ -z "$toolsdir" ]; then
+    echo "This script couldn't find your tools directory. Please enter the"
+    echo "full path to the tools directory here:"
+
+    toolsdir=`input`
+fi
+
 if [ -z "$language" ]; then
 
     echo "Select a number for the language to use (default is english)"
@@ -398,6 +434,7 @@ fi
 sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
+ -e "s,@TOOLSDIR@,${toolsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@MEMORY@,${memory},g" \
  -e "s,@TARGET@,${target},g" \
@@ -410,6 +447,7 @@ sed > Makefile \
 
 FIRMDIR=@FIRMDIR@
 APPSDIR=@APPSDIR@
+TOOLSDIR=@TOOLSDIR@
 DEBUG=@DEBUG@
 ARCHOS=@ARCHOS@
 TARGET=@TARGET@
@@ -424,10 +462,10 @@ EXTRA_DEFINES=@EXTRA_DEFINES@
 all: firmware apps
 
 firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE)
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
 
 apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE)
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) LANGUAGE=\$(LANGUAGE) EXTRA_DEFINES="\$(EXTRA_DEFINES)" MEM=\$(MEMORYSIZE) TOOLSDIR=\$(TOOLSDIR)
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
