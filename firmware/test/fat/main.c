@@ -61,7 +61,8 @@ void dbg_dir(char* currdir)
     if (dir)
     {
         while ( (entry = readdir(dir)) ) {
-            DEBUGF("%15s (%d bytes)\n", entry->d_name, entry->size);
+            DEBUGF("%15s (%d bytes) %x\n", 
+                   entry->d_name, entry->size, entry->startcluster);
         }
         closedir(dir);
     }
@@ -69,6 +70,20 @@ void dbg_dir(char* currdir)
     {
         DEBUGF( "Could not open dir %s\n", currdir);
     }
+}
+
+void dbg_mkfile(char* name)
+{
+    char* text = "Detta är en dummy-text\n";
+    int fd = open(name,O_WRONLY);
+    if (fd<0) {
+        DEBUGF("Failed creating file\n");
+        return;
+    }
+    if (write(fd, text, strlen(text)) < 0)
+        DEBUGF("Failed writing data\n");
+
+    close(fd);
 }
 
 void dbg_type(char* name)
@@ -270,6 +285,8 @@ int main(int argc, char *argv[])
 
     //dbg_console();
     //dbg_tail("/fat.h");
+    //dbg_dir("/");
+    dbg_mkfile("/apa.txt");
     dbg_dir("/");
 
     return 0;
