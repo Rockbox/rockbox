@@ -66,20 +66,23 @@ void write_short(unsigned short s, unsigned char* buf)
 
 void usage()
 {
-    printf("bdf2ajf - compile BDF font for use with Rockbox\n");
-    printf("Usage: bdf2ajf -f <font> -o <outfile>\n");
-    printf("Options:\n");
-    printf("    -f   - input BDF file\n");
-    printf("    -o   - output AJF file\n");
-    printf("    -h   - print help\n");
-    printf("    -t <string>  - print string as bitmap\n");
-    printf("    -t2 <string>  - print string as Archos bitmap (must be the same result as -t)\n");
+    printf("bdf2ajf - compile BDF font for use with Rockbox\n"
+           "Usage: bdf2ajf -f <font> -o <outfile>\n"
+           "Options:\n"
+           "    -f   - input BDF file\n"
+           "    -o   - output AJF file\n"
+           "    -v   - verbose debug output\n"
+           "    -h   - print help\n"
+           "    -t <string>  - print string as bitmap\n"
+           "    -t2 <string>  - print string as Archos bitmap (must be the same result as -t)\n");
     exit(0);
 
 }
 
 int do_test1 = 0;
 int do_test2 = 0;
+
+int verbose;
 
 int main(int argc, char** argv)
 {
@@ -112,6 +115,11 @@ int main(int argc, char** argv)
             i++;
             if (i==argc) usage();
             strcpy(out_file, argv[i]);
+        }
+        else if (!strcmp(argv[i], "-v"))
+        {
+            i++;
+            verbose = 1;
         }
         else if (!strcmp(argv[i], "-t"))
         {
@@ -229,6 +237,13 @@ void writeAJF(BDF* bdf, const char* out_file)
         {
             bmp_bytes = rows*glyph->dwidth_x;
             getBitmap(glyph, &outbuf[idx]);
+            if(verbose) {
+                int i;
+                printf("char %c (%02x) width %d\n", c, c, glyph->dwidth_x);
+                for(i=0; i< bmp_bytes;i++)
+                    printf("%02x, ", outbuf[idx+i]);
+                printf("\n");
+            }
         }
         else
         {
