@@ -19,10 +19,6 @@ FIRMWARE := ../firmware
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I. -I$(OBJDIR)
 
-ifndef OBJDIR
-	"Don't run make in the apps dir!"
-endif
-
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES)
 AFLAGS += -small -relax
 
@@ -51,6 +47,15 @@ else
 endif
 
 OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
+
+ifndef OBJDIR
+no_configure:
+	@echo "Don't run make here. Run the tools/configure script from your own build"
+	@echo "directory, then run make there."
+	@echo
+	@echo "More help on how to build rockbox can be found here:"
+	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
+endif
 
 all : $(OBJDIR)/$(OUTNAME)
 
@@ -109,4 +114,6 @@ $(OBJDIR)/$(DEPS)/%.d: %.c
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
--include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
+ifdef OBJDIR
+ -include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
+endif

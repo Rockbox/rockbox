@@ -15,10 +15,6 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
-ifndef OBJDIR
-	"Don't run make in the firmware dir!"
-endif
-
 TOOLSDIR = ../tools
 
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
@@ -41,6 +37,15 @@ OUTPUT = $(OBJDIR)/librockbox.a
 
 ifeq (RECORDER,$(findstring RECORDER, $(CFLAGS)))
 	OBJS +=	$(OBJDIR)/sysfont.o
+endif
+
+ifndef OBJDIR
+no_configure:
+	@echo "Don't run make here. Run the tools/configure script from your own build"
+	@echo "directory, then run make there."
+	@echo
+	@echo "More help on how to build rockbox can be found here:"
+	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
 endif
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
@@ -78,4 +83,7 @@ $(OBJDIR)/$(DEPS)/%.d: %.c
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
--include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
+ifdef OBJDIR
+ -include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
+endif
+
