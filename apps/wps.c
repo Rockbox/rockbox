@@ -124,9 +124,6 @@ int wps_show(void)
 {
     static bool playing = true;
     struct mp3entry* id3 = mpeg_current_track();
-    unsigned int lastlength=0, lastsize=0, lastrate=0;
-    int lastartist=0, lastalbum=0, lasttitle=0;
-    bool lastvbr = false;
     bool keys_locked = false;
     bool dont_go_to_menu = false;
 
@@ -136,23 +133,10 @@ int wps_show(void)
         int i;
         char buffer[32];
 
-        if ( ( id3->length != lastlength ) ||
-             ( id3->filesize != lastsize ) ||
-             ( id3->bitrate != lastrate ) ||
-             ( id3->vbr != lastvbr ) ||
-             ( (id3->artist?id3->artist[0]:0) != lastartist ) ||
-             ( (id3->album?id3->album[0]:0) != lastalbum ) ||
-             ( (id3->title?id3->title[0]:0) != lasttitle ) )
+        if(mpeg_has_changed_track())
         {
 	    lcd_stop_scroll();
             draw_screen(id3);
-            lastlength = id3->length;
-            lastsize = id3->filesize;
-            lastrate = id3->bitrate;
-            lastvbr = id3->vbr;
-            lastartist = id3->artist?id3->artist[0]:0;
-            lastalbum = id3->album?id3->album[0]:0;
-            lasttitle = id3->title?id3->title[0]:0;
         }
         
         if (playing)
