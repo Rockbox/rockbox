@@ -1296,12 +1296,12 @@ bool mpeg_has_changed_track(void)
 
 void mpeg_play(int offset)
 {
-    is_playing = true;
-    
 #ifdef SIMULATOR
     char* trackname;
     int steps=0;
 
+    is_playing = true;
+    
     do {
         trackname = playlist_peek( steps );
         if (!trackname)
@@ -1319,6 +1319,8 @@ void mpeg_play(int offset)
         break;
     } while(1);
 #else
+    is_playing = true;
+    
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
 #endif
 }
