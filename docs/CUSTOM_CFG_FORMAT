@@ -1,15 +1,17 @@
-Custom EQ
+Custom CFG
 File Format Specifications
 
 Description / General Info
 --------------------------
-* The Custom EQ is used on both the Rockbox Player and Recorder, in order to
-  load, well, custom eq settings.
+* The .cfg file is used on both the Rockbox Player and Recorder, in order to
+  load custom settings.
+* Currently, only sound settings are supported but this will change in the
+  future.
 
 File Location
 -------------
 The files may reside anywhere on the hard disk. The only restriction is that
-the filename must end in .eq
+the filename must end in .cfg
 
 Format Rules
 ------------
