@@ -10,7 +10,11 @@ static FILE* file;
 
 int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    DEBUGF("[Reading block 0x%lx, %d]\n", start, count); 
+    if ( count > 1 )
+        DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
+               count, start, start+count-1); 
+    else
+        DEBUGF("[Reading block 0x%lx, %d]\n", start, count); 
 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
@@ -26,7 +30,11 @@ int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 
 int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    DEBUGF("[Writing block 0x%lx, %d]\n", start, count); 
+    if ( count > 1 )
+        DEBUGF("[Writing %d blocks: 0x%lx to 0x%lx]\n",
+               count, start, start+count-1); 
+    else
+        DEBUGF("[Writing block 0x%lx]\n", start); 
 
     if (start == 0)
         panicf("Writing on sector 0!\n");

@@ -125,9 +125,9 @@ int dbg_mkfile(char* name, int num)
     return 0;
 }
 
-int dbg_chkfile(char* name)
+int dbg_chkfile(char* name, int size)
 {
-    char text[8192];
+    char text[81920];
     int i;
     int x=0;
     int block=0;
@@ -136,6 +136,13 @@ int dbg_chkfile(char* name)
         DEBUGF("Failed opening file\n");
         return -1;
     }
+
+    if (size) {
+        lseek(fd, size*512, SEEK_SET);
+        x = size * 1024 / 16;
+        LDEBUGF("Check base is %x\n",x);
+    }
+
     while (1) {
         int rc = read(fd, text, sizeof text);
         DEBUGF("read %d bytes\n",rc);
@@ -343,8 +350,12 @@ int dbg_cmd(int argc, char *argv[])
 
     if (!strcasecmp(cmd, "chkfile"))
     {
-        if (arg1)
-            return dbg_chkfile(arg1);
+        if (arg1) {
+            if (arg2)
+                return dbg_chkfile(arg1, atoi(arg2));
+            else
+                return dbg_chkfile(arg1, 0);
+        }
     }
 
     return 0;

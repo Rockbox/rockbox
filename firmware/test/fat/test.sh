@@ -34,22 +34,27 @@ runtests() {
     echo ---Test: create a 10K file
     try mkfile /apa.txt 10
     check
-    try chkfile /apa.txt
+    try chkfile /apa.txt 10
 
     echo ---Test: create a 1K file
     try mkfile /bpa.txt 1
     check
-    try chkfile /bpa.txt
+    try chkfile /bpa.txt 1
 
     echo ---Test: create a 40K file
     try mkfile /cpa.txt 40
     check
-    try chkfile /cpa.txt
+    try chkfile /cpa.txt 40
+
+    echo ---Test: create a 400K file
+    try mkfile /dpa.txt 400
+    check
+    try chkfile /dpa.txt 400
 
     echo ---Test: truncate previous 40K file to 20K
     try mkfile /cpa.txt 20
     check
-    try chkfile /cpa.txt
+    try chkfile /cpa.txt 20
 
     echo ---Test: truncate previous 20K file to 0K
     try mkfile /cpa.txt 0
@@ -59,14 +64,15 @@ runtests() {
     try chkfile /bpa.txt
 
     LOOP=50
+    SIZE=50
 
-    echo ---Test: create $LOOP 40k files
+    echo ---Test: create $LOOP $SIZE k files
     for i in `seq 1 $LOOP`;
     do
         echo ---Test: $i/$LOOP ---
-        try mkfile /rockbox.$i 40
+        try mkfile /rockbox.$i $SIZE
         check
-        try chkfile /rockbox.$i
+        try chkfile /rockbox.$i $SIZE
     done
 
 }
