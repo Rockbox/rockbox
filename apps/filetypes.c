@@ -224,7 +224,6 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
 {
     int i;
     int cnt=0;
-    char* dash;
 
     for (i=0; i < cnt_filetypes; i++)
     {

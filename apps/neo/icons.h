@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ICONS_H_
+#define _ICONS_H_
+
 #include <lcd.h>
 
 /* 
@@ -29,5 +32,7 @@ enum {
     Plugin = 0x17,
     Folder, Mod_Ajz, Language, File, Wps, Playlist, Text, Config,
 };
+
+#endif
 
 #endif
