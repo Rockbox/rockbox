@@ -174,6 +174,8 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
     return pr.bytes;
 }
 
+#ifndef SIMULATOR
+
 struct for_fprintf {
     int fd;    /* where to store it */
     int bytes; /* amount stored */
@@ -192,8 +194,6 @@ static int fprfunc(void *pr, unsigned char letter)
     return false; /* failure */
 }
 
-
-#ifndef SIMULATOR
 
 int fprintf(int fd, const char *fmt, ...)
 {
