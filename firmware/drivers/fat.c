@@ -1200,7 +1200,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
 int fat_seek(struct fat_file *file, int seeksector )
 {
-    int clusternum, sectornum, sector;
+    int clusternum, sectornum, sector=0;
     int cluster = file->firstcluster;
     int i;
 
