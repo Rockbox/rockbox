@@ -281,7 +281,11 @@ static int ata_perform_sleep(void)
     }
 
     ATA_SELECT = ata_device;
+#ifdef DEBUG
+    ATA_COMMAND = CMD_STANDBY;
+#else
     ATA_COMMAND = CMD_SLEEP;
+#endif
 
     if (!wait_for_rdy())
         ret = -1;
