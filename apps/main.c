@@ -75,6 +75,8 @@ int init(void)
     bmalloc_add_pool(poolstart, poolend-poolstart);
     lcd_init();
 
+    show_logo();
+
 #ifdef DEBUG
     debug_init();
 #endif
@@ -94,8 +96,6 @@ int init(void)
 
     button_init();
     mpeg_init();
-
-    show_logo();
 
     return 0;
 }
