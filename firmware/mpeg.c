@@ -861,10 +861,6 @@ void DEI3(void)
             DTCR3 = last_dma_chunk_size & 0xffff;
             SAR3 = (unsigned int)mp3buf + mp3buf_read;
             id3tags[tag_read_idx]->id3.offset += last_dma_chunk_size;
-
-            /* Update the watermark debug level */
-            if(unplayed_space_left < lowest_watermark_level)
-                lowest_watermark_level = unplayed_space_left;
         }
         else
         {
@@ -887,6 +883,10 @@ void DEI3(void)
             }
             CHCR3 &= ~0x0001; /* Disable the DMA interrupt */
         }
+
+        /* Update the watermark debug level */
+        if(unplayed_space_left < lowest_watermark_level)
+            lowest_watermark_level = unplayed_space_left;
     }
 
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
