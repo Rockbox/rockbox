@@ -190,7 +190,7 @@ static int playing = 0;
 static char currdir[255];
 
 /* QUICK HACK! this should be handled by the playlist code later */
-char* peek_next_track(int type)
+char* peek_next_track(int steps)
 {
     static char buf[256];
 
@@ -204,26 +204,39 @@ char* peek_next_track(int type)
             /* play-full-dir mode */
       
             /* get next track in dir */
-            while (dircursor + start + 1 < numentries ) {
-                if(dircursor+1 < TREE_MAX_ON_SCREEN)
-                    dircursor++;
-                else
-                    start++;
-                if ( dircacheptr[dircursor+start]->file &&
-                     dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
-                    snprintf(buf,sizeof buf,"%s/%s",
-                             currdir, dircacheptr[dircursor+start]->name );
-                    lcd_clear_display();
-                    lcd_puts(0,0,"<Playing>");
-                    lcd_puts(0,1,"<all files>");
-                    return buf;
+            if ( steps == 1 ) {
+                while (dircursor + start + 1 < numentries ) {
+                    if(dircursor+1 < TREE_MAX_ON_SCREEN)
+                        dircursor++;
+                    else
+                        start++;
+                    if ( dircacheptr[dircursor+start]->file &&
+                         dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+                        snprintf(buf,sizeof buf,"%s/%s",
+                                 currdir, dircacheptr[dircursor+start]->name );
+                        return buf;
+                    }
+                }
+            }
+            else {
+                while (dircursor + start > 0) {
+                    if (dircursor > 0)
+                        dircursor--;
+                    else
+                        start--;
+                    if ( dircacheptr[dircursor+start]->file &&
+                         dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+                        snprintf(buf, sizeof(buf), "%s/%s",
+                                 currdir, dircacheptr[dircursor+start]->name);
+                        return buf;
+                    }
                 }
             }
             break;
       
         case 2:
             /* playlist mode */
-            return playlist_next(type);
+            return playlist_next(steps);
     }
 
     return NULL;
@@ -313,8 +326,9 @@ bool dirbrowse(char *root)
                     else {
 
                         playing = 1;
-                        playtune(buf);
-                        playing = 0;
+                        mpeg_play(buf);
+                        lcd_stop_scroll();
+                        wps_show();
                     }
                 }
                 restore = true;
@@ -367,7 +381,6 @@ bool dirbrowse(char *root)
 
         if ( restore ) {
             /* restore display */
-            /* TODO: this is just a copy from BUTTON_STOP, fix it */
             numentries = showdir(currdir, start);
             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
         }

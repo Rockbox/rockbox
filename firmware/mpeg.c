@@ -319,11 +319,7 @@ static int new_file(bool next_track)
 {
     char *trackname;
 
-    if (next_track)
-        trackname = peek_next_track(0);
-    else
-        trackname = peek_prev_track(0);
-
+    trackname = peek_next_track( next_track ? 1 : -1 );
     if ( !trackname )
         return -1;
 

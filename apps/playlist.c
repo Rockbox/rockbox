@@ -35,15 +35,15 @@ bool playlist_shuffle = false;
 
 char now_playing[256];
 
-char* playlist_next(int type)
+char* playlist_next(int steps)
 {
-    int seek = playlist.indices[playlist.index];
+    int seek;
     int max;
     int fd;
     int i;
-    (void)type; /* prevent compiler warning until this is gets used */
 
-    playlist.index = (playlist.index+1) % playlist.amount;
+    playlist.index = (playlist.index+steps) % playlist.amount;
+    seek = playlist.indices[playlist.index];
 
     fd = open(playlist.filename, O_RDONLY);
     if(-1 != fd) {

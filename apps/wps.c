@@ -146,24 +146,34 @@ void wps_show(void)
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_UP:
-#else
-                case BUTTON_RIGHT:
-#endif
                     global_settings.volume += 2;
                     if(global_settings.volume > 100)
                         global_settings.volume = 100;
                     mpeg_volume(global_settings.volume);
                     break;
 
-#ifdef HAVE_RECORDER_KEYPAD                
                 case BUTTON_DOWN:
-#else
-                case BUTTON_LEFT:
-#endif
                     global_settings.volume -= 2;
                     if(global_settings.volume < 0)
                         global_settings.volume = 0;
                     mpeg_volume(global_settings.volume);
+                    break;
+#endif
+
+                case BUTTON_LEFT:
+                    mpeg_prev();
+                    break;
+
+                case BUTTON_RIGHT:
+                    mpeg_next();
+                    break;
+
+#ifdef HAVE_RECORDER_KEYPAD                
+                case BUTTON_OFF:
+#else
+                case BUTTON_DOWN:
+#endif
+                    mpeg_stop();
                     break;
             }
             sleep(HZ/20);
