@@ -691,24 +691,6 @@ bool dbg_ports(void)
 
         switch(button)
         {
-        case BUTTON_UP:
-            cpu_boost(true);
-            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
-            splash(HZ, false, buf);
-            break;
-            
-        case BUTTON_DOWN:
-            cpu_boost(false);
-            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
-            splash(HZ, false, buf);
-            break;
-            
-        case BUTTON_SELECT:
-            set_cpu_frequency(CPUFREQ_DEFAULT);
-            snprintf(buf, sizeof(buf), "freq: %ld, IDECONFIG1: %08lx, IDECONFIG2: %08lx", FREQ, IDECONFIG1, IDECONFIG2);
-            splash(HZ, false, buf);
-            break;
-            
             case SETTINGS_CANCEL:
                 return false;
         }
@@ -807,6 +789,57 @@ bool dbg_ports(void)
             break;
         }
     }
+    return false;
+}
+#endif
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+extern int boost_counter;
+bool dbg_cpufreq(void)
+{
+    char buf[128];
+    int line;
+    int button;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+#endif
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        line = 0;
+        
+        snprintf(buf, sizeof(buf), "Frequency: %ld", FREQ);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "boost_counter: %d", boost_counter);
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+        button = button_get_w_tmo(HZ/10);
+
+        switch(button)
+        {
+        case BUTTON_UP:
+            cpu_boost(true);
+            break;
+            
+        case BUTTON_DOWN:
+            cpu_boost(false);
+            break;
+            
+        case BUTTON_SELECT:
+            set_cpu_frequency(CPUFREQ_DEFAULT);
+            boost_counter = 0;
+            break;
+            
+        case SETTINGS_CANCEL:
+            return false;
+        }
+    }
+
     return false;
 }
 #endif
@@ -1753,6 +1786,9 @@ bool debug_menu(void)
 #endif
 #if CONFIG_CPU == SH7034 || CONFIG_CPU == MCF5249
         { "View I/O ports", dbg_ports },
+#endif
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        { "CPU frequency", dbg_cpufreq },
 #endif
 #if CONFIG_CPU == SH7034
 #ifdef HAVE_LCD_BITMAP

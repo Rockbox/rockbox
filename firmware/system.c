@@ -29,13 +29,13 @@ long cpu_frequency = CPU_FREQ;
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+int boost_counter = 0;
 void cpu_boost(bool on_off)
 {
-    static int counter = 0;
     if(on_off)
     {
         /* Boost the frequency if not already boosted */
-        if(counter++ == 0)
+        if(boost_counter++ == 0)
         {
             set_cpu_frequency(CPUFREQ_MAX);
         }
@@ -43,14 +43,14 @@ void cpu_boost(bool on_off)
     else
     {
         /* Lower the frequency if the counter reaches 0 */
-        if(--counter == 0)
+        if(--boost_counter == 0)
         {
             set_cpu_frequency(CPUFREQ_NORMAL);
         }
 
         /* Safety measure */
-        if(counter < 0)
-            counter = 0;
+        if(boost_counter < 0)
+            boost_counter = 0;
     }
 }
 #endif
