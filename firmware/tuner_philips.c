@@ -20,6 +20,8 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio_i2c.h" /* physical interface driver */
 
@@ -31,8 +33,17 @@ void philips_set(int setting, int value)
 {
     switch(setting)
     {
-        case RADIO_INIT:
-            memset(write_bytes, 0, sizeof(write_bytes));
+        case RADIO_SLEEP:
+            /* init values */
+            write_bytes[0] = 0x80; /* mute */
+            write_bytes[1] = 0x00;
+            write_bytes[2] = 0x00;
+            write_bytes[3] = 0x0A; /* soft mute, stereo noise cancelling */
+            write_bytes[4] = 0x00;
+            if (value) /* sleep */
+            {
+                write_bytes[3] |= 0x40; /* standby mode */
+            }
             break;
 
         case RADIO_FREQUENCY:
@@ -53,8 +64,6 @@ void philips_set(int setting, int value)
             fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
 
-        case RADIO_IF_MEASUREMENT:
-        case RADIO_SENSITIVITY:
         default:
             return;
     }
@@ -75,13 +84,24 @@ int philips_get(int setting)
             val = 1; /* true */
             break;
 
-        case RADIO_DEVIATION:
-            val = read_bytes[2] & 0x7F;
-            val = 222 - val*4; /* convert to kHz */
+        case RADIO_TUNED:
+            val = 0;
+            if (read_bytes[0] & 0x80) /* ready */
+            {
+                val = read_bytes[2] & 0x7F; /* IF counter */
+                val = (abs(val - 0x36) < 2); /* close match */
+            }
             break;
 
         case RADIO_STEREO:
             val = read_bytes[2] >> 7;
+            break;
+
+        case RADIO_ALL: /* debug query */
+            val = read_bytes[0] << 24 
+                | read_bytes[1] << 16 
+                | read_bytes[2] << 8 
+                | read_bytes[3];
             break;
     }
     return val;

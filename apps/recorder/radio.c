@@ -20,7 +20,6 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include "sprintf.h"
 #include "lcd.h"
 #include "mas.h"
@@ -116,11 +115,14 @@ void radio_init(void)
         radio_get = samsung_get;
     }
 #endif
+    radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
 }
 
 void radio_stop(void)
 {
     radio_set(RADIO_MUTE, 1);
+    radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
+    radio_set_status(FMRADIO_OFF); /* status update, power off if avail. */
 }
 
 bool radio_hardware_present(void)
@@ -128,7 +130,7 @@ bool radio_hardware_present(void)
 #ifdef HAVE_TUNER_PWR_CTRL
     bool ret;
     int fmstatus = radio_get_status(); /* get current state */
-    radio_set_status(FMRADIO_PLAYING); /* power it up */
+    radio_set_status(FMRADIO_POWERED); /* power it up */
     ret = radio_get(RADIO_PRESENT);
     radio_set_status(fmstatus); /* restore previous state */
     return ret;
@@ -161,7 +163,7 @@ bool radio_screen(void)
     bool done = false;
     int button;
     int freq;
-    int freq_diff;
+    bool tuned;
     bool stereo = false;
     int search_dir = 0;
     int fw, fh;
@@ -222,7 +224,7 @@ bool radio_screen(void)
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
     
-    radio_set(RADIO_INIT, 0);
+    radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
     radio_set(RADIO_FREQUENCY, curr_freq);
     radio_set(RADIO_IF_MEASUREMENT, 0);
     radio_set(RADIO_SENSITIVITY, 0);
@@ -255,10 +257,10 @@ bool radio_screen(void)
             sleep(1);
 
             /* Now check how close to the IF frequency we are */
-            freq_diff = radio_get(RADIO_DEVIATION);
+            tuned = radio_get(RADIO_TUNED);
 
             /* Stop searching if the tuning is close */
-            if(abs(freq_diff) < 50)
+            if(tuned)
             {
                 search_dir = 0;
                 curr_preset = find_preset(curr_freq);
@@ -283,7 +285,6 @@ bool radio_screen(void)
                 else
 #endif
                 {
-                    radio_stop();
                     done = true;
                 }
                 update_screen = true;
@@ -416,7 +417,6 @@ bool radio_screen(void)
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     default_event_handler(SYS_USB_CONNECTED);
-                    radio_set_status(0);
                     screen_freeze = true; /* Cosmetic: makes sure the
                                              radio screen doesn't redraw */
                     done = true;
@@ -540,15 +540,19 @@ bool radio_screen(void)
 
     sound_settings_apply();
 
-    radio_set_status(0);
-
     if(keep_playing)
     {
         /* Enable the Left and right A/D Converter */
         mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
                                 mpeg_sound_default(SOUND_RIGHT_GAIN), false);
         mas_codec_writereg(6, 0x4000);
+        radio_set_status(FMRADIO_POWERED); /* leave it powered */
     }
+    else
+    {
+        radio_stop();
+    }
+
 #endif
     return have_recorded;
 }
@@ -848,12 +852,16 @@ static bool toggle_mono_mode(void)
 
 bool radio_menu(void)
 {
-    struct menu_item items[3];
+    struct menu_item items[4];
     int m;
     bool result;
 
     m = menu_init(items, 0, NULL, NULL, NULL, NULL);
 
+#if CONFIG_KEYPAD == ONDIO_PAD /* Ondio has no key for presets, put it in menu */
+    /* fixme: make a real string table entry */
+    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets_menu);
+#endif
     create_monomode_menu();
     menu_insert(m, -1, monomode_menu_string, toggle_mono_mode);
     menu_insert(m, -1, ID2P(LANG_SOUND_SETTINGS), sound_menu);

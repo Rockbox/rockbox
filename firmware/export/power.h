@@ -31,7 +31,10 @@ bool ide_powered(void);
 void power_off(void);
 
 #ifdef CONFIG_TUNER
-#define FMRADIO_PLAYING 1
+/* status values */
+#define FMRADIO_OFF     0 /* switched off */
+#define FMRADIO_POWERED 1 /* left powered, but idle */
+#define FMRADIO_PLAYING 2 /* actively in use */
 extern void radio_set_status(int status);
 extern int radio_get_status(void);
 #endif

@@ -196,6 +196,10 @@ void init(void)
 
     powermgmt_init();
 
+#ifdef CONFIG_TUNER
+    radio_init();
+#endif
+
 #ifdef HAVE_CHARGING
     if (coldstart && charger_inserted() && !global_settings.car_adapter_mode)
     {
@@ -288,9 +292,6 @@ void init(void)
               global_settings.superbass);
     mpeg_init();
     talk_init();
-#ifdef CONFIG_TUNER
-    radio_init();
-#endif
 
 #ifdef AUTOROCK
     if (!usb_detect())

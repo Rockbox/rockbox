@@ -322,7 +322,7 @@ static void handle_auto_poweroff(void)
     
     if(timeout &&
 #ifdef CONFIG_TUNER
-       !radio_get_status() &&
+       (radio_get_status() != FMRADIO_PLAYING) &&
 #endif
        !usb_inserted() &&
        (mpeg_stat == 0 ||

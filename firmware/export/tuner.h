@@ -21,7 +21,7 @@
 #define __TUNER_SAMSUNG_H__
 
 /* settings to the tuner layer */
-#define RADIO_INIT 0
+#define RADIO_SLEEP 0
 #define RADIO_FREQUENCY 1
 #define RADIO_MUTE 2
 #define RADIO_IF_MEASUREMENT 3
@@ -29,8 +29,9 @@
 #define RADIO_FORCE_MONO 5
 /* readback from the tuner layer */
 #define RADIO_PRESENT 0
-#define RADIO_DEVIATION 1
+#define RADIO_TUNED 1
 #define RADIO_STEREO 2
+#define RADIO_ALL 3 /* debug */
 
 #ifdef CONFIG_TUNER
 

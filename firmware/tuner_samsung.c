@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
 
@@ -35,11 +36,15 @@ void samsung_set(int setting, int value)
 {
     switch(setting)
     {
-        case RADIO_INIT:
-            fm_in1 = DEFAULT_IN1;
-            fm_in2 = DEFAULT_IN2;
-            fmradio_set(1, fm_in1);
-            fmradio_set(2, fm_in2);
+        case RADIO_SLEEP:
+            if (!value)
+            {   /* wakeup: just unit */
+                fm_in1 = DEFAULT_IN1;
+                fm_in2 = DEFAULT_IN2;
+                fmradio_set(1, fm_in1);
+                fmradio_set(2, fm_in2);
+            }
+            /* else we have no sleep mode? */
             break;
 
         case RADIO_FREQUENCY:
@@ -96,9 +101,9 @@ int samsung_get(int setting)
             val = (val == 0x140885);
             break;
 
-        case RADIO_DEVIATION:
+        case RADIO_TUNED:
             val = fmradio_read(3);
-            val = 10700 - ((val & 0x7ffff) / 8); /* convert to kHz */
+            val = abs(10700 - ((val & 0x7ffff) / 8)) < 50; /* convert to kHz */
             break;
 
         case RADIO_STEREO:
