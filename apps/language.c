@@ -43,8 +43,13 @@ int lang_load(char *filename)
             while(filesize>3) {
                 id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
                 ptr+=2;                     /* pass the id */
-                if(id < LANG_LAST_INDEX_IN_ARRAY)
+                if(id < LANG_LAST_INDEX_IN_ARRAY) {
+#ifdef SIMULATOR
+                    printf("%2x New: %30s ", id, ptr);
+                    printf("Replaces: %s\n", language_strings[id]);
+#endif
                     language_strings[id] = ptr; /* point to this string */
+                }
                 while(*ptr) {               /* pass the string */
                     filesize--;
                     ptr++;
