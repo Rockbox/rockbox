@@ -1498,11 +1498,13 @@ static bool dbg_sound(void)
     rr = 0x80000;
     rl = 0x00000;
 
+#ifdef HAVE_MAS3587F
     /* Set the MDB to the Archos "flat" setting, but not activated */
     mas_codec_writereg(MAS_REG_KMDB_STR, 0);
     mas_codec_writereg(MAS_REG_KMDB_HAR, 0x3000);
     mas_codec_writereg(MAS_REG_KMDB_FC, 0x0600);
     mas_codec_writereg(MAS_REG_KMDB_SWITCH, 0);
+#endif
     
     while(!done)
     {
