@@ -45,7 +45,7 @@ all: $(ROCKS)
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
-	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
+	$(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -x c -E -P $< >$@
 
 clean:
 	-rm -f $(ROCKS) $(LINKFILE)
