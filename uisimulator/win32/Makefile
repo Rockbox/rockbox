@@ -61,7 +61,7 @@ LDFLAGS =  -lgdi32 -luser32  -mwindows
 INCLUDES = -I. -I$(EXPORT) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR) -I$(OBJDIR)
 
 # The true Rockbox Applications should use this include path:
-APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
+APPINCLUDES =  $(INCLUDES)
 
 DEFINES += -DWIN32
 
@@ -75,7 +75,7 @@ else
 	LCDSRSC = lcd-playersim.c lcd-player.c
 endif
 FIRMSRCS = $(LCDSRSC) power.c sprintf.c id3.c usb.c \
-        mpeg.c powermgmt.c font.c sysfont.c ctype.c
+        mpeg.c powermgmt.c font.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
