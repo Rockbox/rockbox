@@ -318,12 +318,12 @@ void charging_display_info(bool animate)
    4 if USB was connected */
 int charging_screen(void)
 {
-    int button;
+    unsigned int button;
     int rc = 0;
 #ifdef BUTTON_OFF
-    const int offbutton = BUTTON_OFF;
+    const unsigned int offbutton = BUTTON_OFF;
 #else
-    const int offbutton = BUTTON_STOP;
+    const unsigned int offbutton = BUTTON_STOP;
 #endif
 
     ide_power_enable(false); /* power down the disk, else would be spinning */
@@ -1311,8 +1311,8 @@ bool browse_id3(void)
             case 6:
                 lcd_puts(0, 0, str(LANG_ID3_LENGHT));
                 snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
-                         id3->length / 60000,
-                         id3->length % 60000 / 1000 );
+                         (int) (id3->length / 60000),
+                         (int) (id3->length % 60000 / 1000) );
                 lcd_puts(0, 1, scroll_text);
                 break;
 
