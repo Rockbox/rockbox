@@ -575,8 +575,8 @@ void splash(int ticks,   /* how long */
         }
         else {
             lcd_clearrect(0, y-2, LCD_WIDTH, LCD_HEIGHT-y*2+4);
-            lcd_drawline(0, y-2, LCD_WIDTH, y-2);
-            lcd_drawline(0, LCD_HEIGHT-y+2, LCD_WIDTH, LCD_HEIGHT-y+2);
+            lcd_drawline(0, y-2, LCD_WIDTH-1, y-2);
+            lcd_drawline(0, LCD_HEIGHT-y+2, LCD_WIDTH-1, LCD_HEIGHT-y+2);
         }
     }
     else
