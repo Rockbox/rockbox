@@ -217,9 +217,8 @@ static const struct plugin_api rockbox_api = {
     mpeg_set_pitch,
 #endif
 
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
     /* MAS communication */
-#ifndef SIMULATOR
-#if CONFIG_HWCODEC != MASNONE
     mas_readmem,
     mas_writemem,
     mas_readreg,
@@ -228,8 +227,7 @@ static const struct plugin_api rockbox_api = {
     mas_codec_writereg,
     mas_codec_readreg,
 #endif
-#endif /* HWCODEC != MASNONE */
-#endif
+#endif /* !simulator and HWCODEC != MASNONE */
 
     /* misc */
     srand,
@@ -454,6 +452,8 @@ int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
     TCR4 = 0x20 | phi; /* clear at GRA match, set prescaler */
     IPRD = (IPRD & 0xFF0F) | prio << 4; /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
+#else
+    pfn_timer = timer_callback;
 #endif
     return cycles * prescale; /* return the actual period, in CPU clocks */
 }

@@ -247,7 +247,7 @@ struct plugin_api {
 #endif
 
     /* MAS communication */
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
     int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
     int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
     int (*mas_readreg)(int reg);
