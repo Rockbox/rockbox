@@ -99,6 +99,7 @@ static void usb_slave_mode(bool on)
     }
     else
     {
+        int i;
         DEBUGF("Leaving USB slave mode\n");
         
         /* Let the ISDx00 settle */
@@ -124,8 +125,11 @@ static void usb_slave_mode(bool on)
         if (!pinfo)
             panicf("disk: NULL");
     
-        rc = fat_mount(pinfo[0].start);
-        if(rc)
+        for ( i=0; i<4; i++ ) {
+            if (!fat_mount(pinfo[i].start))
+                break;
+        }
+        if (i==4)
             panicf("mount: %d",rc);
     }
 }
