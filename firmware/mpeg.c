@@ -647,42 +647,52 @@ static void dma_tick(void)
     else
     {
         int i;
-        int num_bytes = 0;
+        int num_bytes;
         if(is_recording && (PBDR & 0x4000))
         {
 #ifdef DEBUG
             timing_info[timing_info_index++] = current_tick;
             TCNT2 = 0;
 #endif
-            for(i = 0;i < 30 && (PBDR & 0x4000);i++)
+            if(inverted_pr)
             {
-                if(inverted_pr)
+                for(i = 0;PBDR & 0x4000;i++)
+                {
                     PADR |= 0x800;
-                else
+                    
+                    /* It must take at least 5 cycles before
+                       the data is read */
+                    mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
+                    
                     PADR &= ~0x800;
-
-                /* It must take at least 5 cycles before the data is read */
-                mp3buf[mp3buf_write] = *(unsigned char *)0x4000000;
-                
-                if(inverted_pr)
+                    
+                    if(mp3buf_write >= mp3buflen)
+                        mp3buf_write = 0;
+                }
+            }
+            else
+            {
+                for(i = 0;PBDR & 0x4000;i++)
+                {
                     PADR &= ~0x800;
-                else
+                    
+                    /* It must take at least 5 cycles before
+                       the data is read */
+                    mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
+                    
                     PADR |= 0x800;
-                
-                /* It must take at least 4 cycles before the next loop */
-                num_rec_bytes++;
-                
-                mp3buf_write++;
-                if(mp3buf_write >= mp3buflen)
-                    mp3buf_write = 0;
-                
-                num_bytes++;
+                    
+                    if(mp3buf_write >= mp3buflen)
+                        mp3buf_write = 0;
+                }
             }
 #ifdef DEBUG
-            timing_info[timing_info_index++] = TCNT2 + (num_bytes << 16);
+            timing_info[timing_info_index++] = TCNT2 + (i << 16);
             timing_info_index &= 0x3ff;
 #endif
 
+            num_rec_bytes += i;
+            
             /* Signal to save the data if we are running out of buffer
                space */
             num_bytes = mp3buf_write - mp3buf_read;
@@ -1626,7 +1636,7 @@ static void mpeg_thread(void)
                             close(mpeg_file);
                         mpeg_file = -1;
 
-#if 0
+#ifdef DEBUG
                         {
                             int i;
                             for(i = 0;i < 512;i++)
