@@ -14,7 +14,7 @@ Description / General Info
 File Location
 -------------
 The configuration file must be located in the /.rockbox folder of the
-device and must be named wps.config (lowercase)
+device and must be named default.wps (lowercase)
 
 Tags
 ----
