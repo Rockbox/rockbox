@@ -1070,6 +1070,15 @@ int ata_hard_reset(void)
 
     GPIO_OUT |= 0x00080000;
     sleep(1); /* > 25us */
+#elif CONFIG_CPU == TCC730
+    P1 |= 0x04;
+    P10CON &= ~0x56;
+    sleep(1); /* > ???ms */
+
+    P10CON |= 0x56;
+    P10 &= ~0x56;
+    P1 &= ~0x04;
+    sleep(1); /* > ???ms */
 #endif
 
     /* state HRR2 */
@@ -1196,6 +1205,11 @@ void ata_enable(bool on)
     
     GPIO_ENABLE |= 0x00040000;
     GPIO_FUNCTION |= 0x00040000;
+#elif CONFIG_CPU == TCC730
+    if(on)
+        P1 |= 0x08;
+    else
+        P1 &= ~0x08;
 #endif
 }
 

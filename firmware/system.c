@@ -142,7 +142,7 @@ static void extra_init(void) {
     P10 &= 0x20;
     smsc_delay();
     if (smsc_version() < 4) {
-        P6 |= 0x80;
+        P6 |= 0x08;
         P10 |= 0x20;
     }
     

@@ -349,6 +349,18 @@ static void usb_tick(void)
 {
     bool current_status;
 
+#ifdef USB_GMINISTYLE
+    /* Keep usb chip in usb state (?) */
+    if (P5 & 0x10) {
+        if ((P10 & 0x20) == 0 || (P6 & 0x08) == 0) {
+            if (smsc_version() < 4) {
+                P6 |= 0x08;
+                P10 |= 0x20;
+            }
+        }
+    }
+#endif
+    
     if(usb_monitor_enabled)
     {
         current_status = usb_detect();
