@@ -62,7 +62,7 @@ uisimulator.html: uisimulator.t uisimulator.raw $(TXT2HTML)
 	$(ACTION) $<
 
 credits.raw: $(DOCS)/CREDITS $(TXT2HTML)
-	$(TXT2HTML) < $< > $@
+	egrep -v '^( |People that have|$$)' $< | awk '{ print $$0 " <br>" }' > $@
 
 credits.html: credits.t credits.raw $(TXT2HTML)
 	$(ACTION) $<
