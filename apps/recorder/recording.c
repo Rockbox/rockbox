@@ -39,6 +39,9 @@
 #include "sound_menu.h"
 #include "timefuncs.h"
 #include "debug.h"
+#include "string.h"
+
+extern char *num2max5(unsigned int bytes, char *max5);
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -366,8 +369,9 @@ bool recording_screen(void)
 
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;
-                snprintf(buf, 32, "%02d:%02d:%02d",
-                         hours, minutes, seconds%60);
+                snprintf(buf, 32, "%02d:%02d:%02d   %s",
+                         hours, minutes, seconds%60,
+                         num2max5(mpeg_num_recorded_bytes(), buf2));
                 lcd_puts(0, 1, buf);
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
