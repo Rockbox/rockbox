@@ -484,7 +484,7 @@ static void ata_thread(void)
                 last_sleep = current_tick;
             }
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_ATA_POWER_OFF
             if ( sleeping && poweroff_timeout && !poweroff &&
                  TIME_AFTER( current_tick, last_sleep + poweroff_timeout ))
             {
