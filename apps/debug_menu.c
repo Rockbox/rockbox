@@ -188,6 +188,42 @@ bool dbg_mpeg_thread(void)
 }
 #endif
 
+/* Tool function to read the flash manufacturer and type, if available.
+   Only chips which could be reprogrammed in system will return values.
+   (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
+bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device, unsigned addr1, unsigned addr2)
+{
+    unsigned not_manu, not_id; /* read values before switching to ID mode */
+    unsigned manu, id; /* read values when in ID mode */
+    volatile unsigned char* flash = (unsigned char*)0x2000000; /* flash mapping */
+
+    not_manu = flash[0]; /* read the normal content */
+    not_id   = flash[1]; /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
+
+    flash[addr1] = 0xAA; /* enter command mode */
+    flash[addr2] = 0x55;
+    flash[addr1] = 0x90; /* ID command */
+    sleep(HZ/50); /* Atmel wants 20ms pause here */
+
+    manu = flash[0]; /* read the IDs */
+    id   = flash[1];
+
+    flash[0] = 0xF0; /* reset flash (back to normal read mode) */
+    sleep(HZ/50); /* Atmel wants 20ms pause here */
+
+    /* I assume success if the obtained values are different from
+        the normal flash content. This is not perfectly bulletproof, they 
+        could theoretically be the same by chance, causing us to fail. */
+    if (not_manu != manu || not_id != id) /* a value has changed */
+    {
+        *p_manufacturer = manu; /* return the results */
+        *p_device = id;
+        return true; /* success */
+    }
+    return false; /* fail */
+}
+
+
 #ifdef HAVE_LCD_BITMAP
 bool dbg_hw_info(void)
 {
@@ -200,6 +236,8 @@ bool dbg_hw_info(void)
     unsigned char sec, sec2;
     unsigned long tick;
     bool is_12mhz;
+    unsigned manu, id; /* flash IDs */
+    bool got_id; /* flag if we managed to get the flash IDs */
 
     if(PADR & 0x400)
         usb_polarity = 0; /* Negative */
@@ -224,6 +262,11 @@ bool dbg_hw_info(void)
 
     is_12mhz = (current_tick - tick > HZ);
     
+    /* get flash ROM type */
+    got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
+    if (!got_id)
+        got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
+    
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
@@ -247,6 +290,12 @@ bool dbg_hw_info(void)
     
     snprintf(buf, 32, "Freq: %s", is_12mhz?"12MHz":"11.0592MHz");
     lcd_puts(0, 6, buf);
+    
+    if (got_id)
+        snprintf(buf, 32, "Flash: M=%02x D=%02x", manu, id);
+    else
+        snprintf(buf, 32, "Flash: M=?? D=??"); /* unknown, sorry */
+    lcd_puts(0, 7, buf);
     
     lcd_update();
 
