@@ -69,7 +69,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 33
+#define PLUGIN_API_VERSION 34
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -309,6 +309,9 @@ struct plugin_api {
        the API gets incompatible */
 #ifndef SIMULATOR
     long *cpu_frequency;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    void (*cpu_boost)(bool on_off);
+#endif
 #endif
 };
 

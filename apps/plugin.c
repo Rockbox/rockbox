@@ -260,6 +260,9 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
 #ifndef SIMULATOR
     &cpu_frequency,
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost,
+#endif
 #endif
 };
 
