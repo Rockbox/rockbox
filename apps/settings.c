@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "button.h"
 #include "lcd.h"
+#include "mpeg.h"
 
 struct user_settings global_settings;
 
@@ -65,10 +66,10 @@ void reset_settings( struct user_settings *settings ) {
         
     DEBUGF( "reset_settings()\n" );
 
-    settings->volume      = DEFAULT_VOLUME_SETTING;
+    settings->volume      = mpeg_sound_default(SOUND_VOLUME);
     settings->balance     = DEFAULT_BALANCE_SETTING;
-    settings->bass        = DEFAULT_BASS_SETTING;
-    settings->treble      = DEFAULT_TREBLE_SETTING;
+    settings->bass        = mpeg_sound_default(SOUND_BASS);
+    settings->treble      = mpeg_sound_default(SOUND_TREBLE);
     settings->loudness    = DEFAULT_LOUDNESS_SETTING;
     settings->bass_boost  = DEFAULT_BASS_BOOST_SETTING;
     settings->contrast    = DEFAULT_CONTRAST_SETTING;

@@ -66,6 +66,13 @@ static int maxval[] =
     50     /* Treble */
 };
 
+static int defaultval[] =
+{
+    70/2,    /* Volume */
+    50/2,    /* Bass */
+    50/2     /* Treble */
+};
+
 char *mpeg_sound_unit(int setting)
 {
     return units[setting];
@@ -79,6 +86,11 @@ int mpeg_sound_min(int setting)
 int mpeg_sound_max(int setting)
 {
     return maxval[setting];
+}
+
+int mpeg_sound_default(int setting)
+{
+    return defaultval[setting];
 }
 
 #ifndef ARCHOS_RECORDER
