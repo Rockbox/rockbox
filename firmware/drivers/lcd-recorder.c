@@ -68,21 +68,22 @@
 #define LCD_CNTL_HIGHCOL        0x10    // Upper column address
 #define LCD_CNTL_LOWCOL         0x00    // Lower column address
 
+#define SCROLL_SPACING 3
+
 struct scrollinfo {
-    char text[MAX_PATH];
-    char line[32];
-    int textlen;
+    char line[MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2];
+    int len;    /* length of line in chars */
+    int width;  /* length of line in pixels */
     int offset;
     int startx;
     int starty;
-    int space;
 };
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
-static char scroll_spacing = 3; /* spaces between end and start of text */
+static char scroll_step = 6;  /* pixels per scroll step */
 static struct scrollinfo scroll; /* only one scroll line at the moment */
 static int scroll_count = 0;
 static int xmargin = 0;
@@ -284,34 +285,56 @@ void lcd_puts(int x, int y, unsigned char *str)
 #endif
 }
 
-/* put a string at a given pixel position */
-void lcd_putsxy(int x, int y, unsigned char *str)
+/* put a string at a given pixel position, skipping first ofs pixel columns */
+static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
 {
     int ch;
     struct font* pf = font_get(curfont);
 
-    while (((ch = *str++) != '\0')) {
-        bitmap_t *bits;
+    while ((ch = *str++) != '\0' && x < LCD_WIDTH)
+    {
         int width;
 
-        /* check input range*/
+        /* check input range */
         if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
             ch = pf->defaultchar;
         ch -= pf->firstchar;
 
-        /* get proportional width and glyph bits*/
-        width = pf->width ? pf->width[ch] : pf->maxwidth;
-        if (x + width > LCD_WIDTH)
-            break;
-
-        /* no partial-height drawing for now...*/
+        /* no partial-height drawing for now... */
         if (y + pf->height > LCD_HEIGHT)
             break;
-        bits = pf->bits + (pf->offset ? pf->offset[ch] : (pf->height * ch));
 
-        lcd_bitmap((unsigned char *)bits, x, y, width, pf->height, true);
-        x += width;
+        /* get proportional width and glyph bits */
+        width = pf->width ? pf->width[ch] : pf->maxwidth;
+        width = MIN (width, LCD_WIDTH - x);
+
+        if (ofs != 0)
+        {
+            if (ofs > width)
+            {
+                ofs -= width;
+                continue;
+            }
+            width -= ofs;
+        }
+
+        if (width > 0)
+        {
+            int rows = (pf->height + 7) / 8;
+            bitmap_t* bits = pf->bits + 
+                (pf->offset ? pf->offset[ch] : (pf->height * ch));
+            lcd_bitmap (((unsigned char*) bits) + ofs*rows, x, y,
+                        width, pf->height, true);
+            x += width;
+        }
+        ofs = 0;
     }
+}
+
+/* put a string at a given pixel position */
+void lcd_putsxy(int x, int y, unsigned char *str)
+{
+    lcd_putsxyofs(x, y, 0, str);
 }
 
 /*
@@ -635,38 +658,29 @@ void lcd_invertpixel(int x, int y)
 void lcd_puts_scroll(int x, int y, unsigned char* string )
 {
     struct scrollinfo* s = &scroll;
-    unsigned char ch[2];
     int w, h;
-    int width;
-
-    ch[1] = 0; /* zero terminate */
-    ch[0] = string[0];
-    width = 0;
-    s->space = 0;
-    while ( ch[0] &&
-            (width + lcd_getstringsize(ch, &w, &h) <
-             (LCD_WIDTH - x*8))) {
-        width += w;
-        s->space++;
-        ch[0]=string[s->space];
-    }
 
     lcd_puts(x,y,string);
-    s->textlen = strlen(string);
+    lcd_getstringsize(string, &w, &h);
 
-    s->space += 2;
-    lcd_getstringsize(string,&w,&h);
-    if ( w > LCD_WIDTH - xmargin ) {
-        s->offset=s->space;
-        s->startx=x;
-        s->starty=y;
-        strncpy(s->text,string,sizeof s->text);
-        s->text[sizeof s->text - 1] = 0;
+    if (LCD_WIDTH - x*8 - xmargin < w)
+    {
+        /* prepare scroll line */
+        char *end;
+
         memset(s->line, 0, sizeof s->line);
-        strncpy(s->line,string,
-                s->space > (int)sizeof s->line ?
-                (int)sizeof s->line : s->space );
-        s->line[sizeof s->line - 1] = 0;
+        strcpy(s->line, string);
+        strcat(s->line, "   ");
+        /* get new width incl. spaces */
+        s->width = lcd_getstringsize(s->line, &w, &h);
+
+        for (end = s->line; *end; end++);
+        strncpy(end, string, LCD_WIDTH/2);
+
+        s->len = strlen(string);
+        s->offset = 0;
+        s->startx = x;
+        s->starty = y;
         scroll_count = 1;
     }
 }
@@ -679,14 +693,14 @@ void lcd_stop_scroll(void)
         struct scrollinfo* s = &scroll;
         scroll_count = 0;
 
-        lcd_getstringsize( s->text, &w, &h);
-        lcd_clearrect(xmargin + s->startx*w/s->textlen,
+        lcd_getstringsize(s->line, &w, &h);
+        lcd_clearrect(xmargin + s->startx*w/s->len,
                       ymargin + s->starty*h,
                       LCD_WIDTH - xmargin,
                       h);
 
         /* restore scrolled row */
-        lcd_puts(s->startx,s->starty,s->text);
+        lcd_puts(s->startx,s->starty,s->line);
         lcd_update();
     }
 }
@@ -703,7 +717,7 @@ void lcd_scroll_resume(void)
 
 void lcd_scroll_speed(int speed)
 {
-    scroll_speed = speed;
+    scroll_step = speed;
 }
 
 static void scroll_thread(void)
@@ -719,30 +733,20 @@ static void scroll_thread(void)
         if ( scroll_count < scroll_speed/2 )
             scroll_count++;
         else {
-            int i;
             int w, h;
-            for ( i=0; i<s->space-1; i++ )
-                s->line[i] = s->line[i+1];
+            int xpos, ypos;
 
-            if ( s->offset < s->textlen ) {
-                s->line[(int)s->space - 1] = s->text[(int)s->offset];
-                s->offset++;
-            }
-            else {
-                s->line[s->space - 1] = ' ';
-                if ( s->offset < s->textlen + scroll_spacing - 1 )
-                    s->offset++;
-                else
-                    s->offset = 0;
-            }
+            s->offset += scroll_step;
 
-            lcd_getstringsize( s->text, &w, &h);
-            lcd_clearrect(xmargin + s->startx*w/s->textlen,
-                          ymargin + s->starty*h,
-                          LCD_WIDTH - xmargin,
-                          h);
+            if (s->offset >= s->width)
+                s->offset %= s->width;
 
-            lcd_puts(s->startx,s->starty,s->line);
+            lcd_getstringsize(s->line, &w, &h);
+            xpos = xmargin + s->startx * w / s->len;
+            ypos = ymargin + s->starty * h;
+
+            lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
+            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
             lcd_update();
         }
         sleep(HZ/scroll_speed);
