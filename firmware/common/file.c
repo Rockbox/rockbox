@@ -72,6 +72,8 @@ int open(char* pathname, int flags)
         return -1;
     }
 
+    openfiles[fd].busy = true;
+
     /* locate filename */
     name=strrchr(pathname+1,'/');
     if ( name ) {
@@ -87,6 +89,7 @@ int open(char* pathname, int flags)
     if (!dir) {
         DEBUGF("Failed opening dir\n");
         errno = EIO;
+        openfiles[fd].busy = false;
         return -1;
     }
 
@@ -103,12 +106,12 @@ int open(char* pathname, int flags)
     if ( !entry ) {
         DEBUGF("Couldn't find %s in %s\n",name,pathname);
         errno = ENOENT;
+        openfiles[fd].busy = false;
         return -1;
     }
 
     openfiles[fd].cacheoffset = -1;
     openfiles[fd].fileoffset = 0;
-    openfiles[fd].busy = true;
     return fd;
 }
 
