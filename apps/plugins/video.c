@@ -25,11 +25,119 @@
 #ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
-#define DEFAULT_FILENAME "/default.rvf"
+#define INT_MAX ((int)(~(unsigned)0 >> 1))
+#define INT_MIN (-INT_MAX-1)
+
 #define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
 #define FILEBUFSIZE SCREENSIZE*4 /* must result in a multiple of 512 */
 
+#define WIND_STEP 5
+
+
+/* globals */
 static struct plugin_api* rb; /* here is a global api struct pointer */
+
+static enum 
+{
+    playing,
+    paused,
+    stop,
+    exit
+} state = playing;
+
+static int playstep = 1; /* forcurrent speed and direction */
+static long time; /* to calculate the playing time */
+
+
+/* test for button, returns relative frame and may change state */
+int check_button(void)
+{
+    int button;
+    int frame;
+    bool loop;
+    
+    frame = playstep; /* default */
+
+    do
+    {
+        loop = false;
+        if (state == playing)
+            button = rb->button_get(false);
+        else
+        {
+            long current = *rb->current_tick;
+            button = rb->button_get(true); /* block */
+            time += *rb->current_tick - current; /* don't time while waiting */
+        }
+
+        switch(button)
+        {
+        case BUTTON_NONE:
+            break; /* quick exit */
+
+        case BUTTON_LEFT | BUTTON_REPEAT:
+            if (state == paused)
+                frame = -1; /* single step back */
+            else if (state == playing)
+                playstep = -WIND_STEP; /* FR */
+            break;
+
+        case BUTTON_RIGHT | BUTTON_REPEAT:
+            if (state == paused)
+                frame = 1; /* single step */
+            else if (state == playing)
+                playstep = WIND_STEP; /* FF */
+            break;
+
+        case BUTTON_PLAY:
+            if (state == playing && playstep == 1)
+                state = paused;
+            else if (state == paused)
+                state = playing;
+            playstep = 1;
+            break;
+
+        case BUTTON_LEFT:
+            if (state == paused)
+                frame = -1; /* single step back */
+            else if (state == playing)
+                playstep = -1; /* rewind */
+            break;
+        
+        case BUTTON_RIGHT:
+            if (state == paused)
+                frame = 1; /* single step */
+            else if (state == playing)
+                playstep = 1; /* forward */
+            break;
+
+        case BUTTON_UP:
+            if (state == paused)
+                frame = INT_MAX; /* end of clip */
+            break;
+
+        case BUTTON_DOWN:
+            frame = INT_MIN; /* start of clip */
+            break;
+
+        case BUTTON_OFF:
+            state = stop;
+            break;
+
+        case SYS_USB_CONNECTED:
+            state = exit;
+            break;
+
+        default:
+            if (state != playing)
+                loop = true;
+        }
+    }
+    while (loop);
+
+    return frame;
+}
+
 
 int WaitForButton(void)
 {
@@ -50,36 +158,44 @@ int show_buffer(unsigned char* p_start, int frames)
     unsigned char* p_current = p_start;
     unsigned char* p_end = p_start + SCREENSIZE * frames;
     int shown = 0;
-    int button;
+    int delta; /* next frame */
 
     do
     {
         rb->lcd_blit(p_current, 0, 0, LCD_WIDTH, LCD_HEIGHT/8, LCD_WIDTH);
-        p_current += SCREENSIZE;
-        if (p_current >= p_end)
-            p_current = p_start; /* wrap */
 
         rb->yield(); /* yield to the other treads */
         shown++;
 
-        button = rb->button_get(false);
-    } while(button != BUTTON_OFF && button != SYS_USB_CONNECTED);
+        delta = check_button();
+        if (delta == INT_MIN)
+            p_current = p_start;
+        else if (delta == INT_MAX)
+            p_current = p_end - SCREENSIZE;
+        else
+        {
+            p_current += delta * SCREENSIZE;
+            if (p_current >= p_end || p_current < p_start)
+                p_current = p_start; /* wrap */
+        }
 
-    return (button != SYS_USB_CONNECTED) ? shown : SYS_USB_CONNECTED;
+    } while(state != stop && state != exit);
+
+    return (state != exit) ? shown : -1;
 }
 
 
 /* play from file, exit if OFF is pressed */
 int show_file(unsigned char* p_buffer, int fd)
 {
-    int got_now; /* how many gotten for this frame */
     int shown = 0;
-    int button = BUTTON_NONE;
+    int delta; /* next frame */
     /* tricky buffer handling to read only whole sectors, then no copying needed */
     unsigned char* p_file = p_buffer; /* file read */
     unsigned char* p_screen = p_buffer; /* display */
     unsigned char* p_end = p_buffer + FILEBUFSIZE; /* for wraparound test */
     int needed; /* read how much data to complete a frame */
+    int got_now; /* how many gotten for this frame */
     int read_now; /* size to read for this frame, 512 or 1024 */
 
     do
@@ -98,19 +214,54 @@ int show_file(unsigned char* p_buffer, int fd)
         if (p_file >= p_end)
             p_file = p_buffer; /* wrap */
 
+        delta = check_button();
+
         if (read_now < SCREENSIZE) /* below average? time to do something else */
-        {
             rb->yield(); /* yield to the other treads */
-            button = rb->button_get(false);
+
+        if (delta != 1)
+        {   /* need to seek */
+            long newpos;
+            
+            rb->yield(); /* yield in case we didn't do it above */
+
+            if (delta == INT_MIN)
+                newpos = 0;
+            else if (delta == INT_MAX)
+                newpos = rb->filesize(fd) - SCREENSIZE;
+            else
+            {
+                bool pause = false;
+                newpos = rb->lseek(fd, 0, SEEK_CUR) - (p_file - p_screen) + (delta-1) * SCREENSIZE;
+            
+                if (newpos < 0)
+                {
+                    newpos = 0;
+                    pause = true; /* go in paused mode */
+                }
+
+                if (newpos > rb->filesize(fd) - SCREENSIZE)
+                {
+                    newpos = rb->filesize(fd) - SCREENSIZE;
+                    pause = true; /* go in paused mode */
+                }
+
+                if (pause && state == playing)
+                    state = paused;
+            }
+
+            newpos -= newpos % SCREENSIZE; /* should be "even", just to make shure */
+
+            rb->lseek(fd, newpos & ~(SECTOR_SIZE-1), SEEK_SET); /* round down to sector */
+            newpos %= FILEBUFSIZE; /* make it an offset within buffer */ 
+            p_screen = p_buffer + newpos;
+            p_file = p_buffer + (newpos & ~(SECTOR_SIZE-1));
         }
 
         shown++;
+    } while (got_now >= needed && state != stop && state != exit);
 
-    } while (got_now >= needed 
-          && button != BUTTON_OFF 
-          && button != SYS_USB_CONNECTED);
-
-    return (button != SYS_USB_CONNECTED) ? shown : SYS_USB_CONNECTED;
+    return (state != exit) ? shown : -1;
 }
 
 
@@ -122,19 +273,13 @@ int main(char* filename)
     int fd; /* file descriptor handle */
     int got_now; /* how many bytes read from file */
     int frames, shown;
-    long time;
     int button;
+    int fps;
 
     p_buffer = rb->plugin_get_buffer(&buffer_size);
     if (buffer_size < FILEBUFSIZE)
         return PLUGIN_ERROR; /* not enough memory */
     
-    /* compose filename if none given */
-    if (filename == NULL)
-    {
-        filename = DEFAULT_FILENAME;
-    }
-
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return PLUGIN_ERROR;
@@ -157,17 +302,17 @@ int main(char* filename)
         rb->close(fd);
     }
 
-    rb->close(fd);
-
-    if (shown == SYS_USB_CONNECTED) /* exception */
+    if (shown == -1) /* exception */
         return PLUGIN_USB_CONNECTED;
 
+    fps = (shown * HZ *100) / time; /* 100 times fps */
+
     rb->lcd_clear_display();
-    rb->snprintf(buf, sizeof(buf), "%d frames", shown);
+    rb->snprintf(buf, sizeof(buf), "%d frames shown", shown);
     rb->lcd_puts(0, 0, buf);
     rb->snprintf(buf, sizeof(buf), "%d.%02d seconds", time/HZ, time%HZ);
     rb->lcd_puts(0, 1, buf);
-    rb->snprintf(buf, sizeof(buf), "%d fps", (shown * HZ + time/2) / time);
+    rb->snprintf(buf, sizeof(buf), "%d.%02d fps", fps/100, fps%100);
     rb->lcd_puts(0, 2, buf);
     rb->snprintf(buf, sizeof(buf), "file: %d bytes", file_size);
     rb->lcd_puts(0, 6, buf);
@@ -176,6 +321,7 @@ int main(char* filename)
     rb->lcd_update();
     button = WaitForButton();
     return (button == SYS_USB_CONNECTED) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
+
 
 }
 
@@ -191,6 +337,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     rb = api; /* copy to global api pointer */
     
+    if (parameter == NULL)
+    {
+        rb->splash(HZ*2, 0, true, "play .rfv file");
+        return PLUGIN_ERROR;
+    }
+
     /* now go ahead and have fun! */
     return main((char*) parameter);
 }
