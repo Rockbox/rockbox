@@ -17,10 +17,10 @@
  *
  ****************************************************************************/
 #ifndef __LIBRARY_MEMORY_H__
-#error "This header file must be included ONLY from memory.h."
+# error "This header file must be included ONLY from memory.h."
 #endif
 #ifndef __LIBRARY_MEMORY_TYPES_H__
-#define __LIBRARY_MEMORY_TYPES_H__
+# define __LIBRARY_MEMORY_TYPES_H__
 
 struct memory_free_page
   {

@@ -18,10 +18,10 @@
  ****************************************************************************/
 #ifndef __LIBRARY_MEMORY_H__
 #  define __LIBRARY_MEMORY_H__
-#  include <config.h>
-#  include <defines.h>
-#  include <types.h>
-#  include <return_values.h>
-#  include <inlines.h>
-#  include <functions.h>
+#  include <memory/config.h>
+#  include <memory/defines.h>
+#  include <memory/types.h>
+#  include <memory/return_values.h>
+#  include <memory/inlines.h>
+#  include <memory/functions.h>
 #endif
