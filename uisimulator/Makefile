@@ -22,7 +22,7 @@ TARGET = rockboxui
 CC = gcc
 RM = rm
 
-CFLAGS = -g -O2 
+CFLAGS = -g
 CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS
 LDFLAGS = -lX11 -lm -lXt -lXmu -lsocket -lnsl
 
@@ -42,7 +42,7 @@ distclean: clean
 	$(RM) config.cache
 
 .c.o:
-	$(CC) $(CPPFLAGS) $(CCFLAGS) -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
 $(DEPEND):
 	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPEND)

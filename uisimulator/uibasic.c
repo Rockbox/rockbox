@@ -224,16 +224,13 @@ screenhack (Display *the_dpy, Window the_window)
 
   Logf("Rockbox will kill ya!");
 
-  lcd_position(1, 1);
-  lcd_string( "R", 0);
+  lcd_position(0, 6);
+  lcd_string( "Rock the box", 0);
 
-  lcd_position(0, 16);
-  lcd_string( "R", 0);
-
-#if 0
   lcd_position(8, 24);
-  lcd_string( "2", 0);
-#endif
+  lcd_string( "Roolz", 0);
+
+  lcd_update();
 
   while (1) {
     /* deal with input here */

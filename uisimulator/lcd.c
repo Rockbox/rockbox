@@ -24,7 +24,12 @@
 #include "lcd.h"
 #ifdef LCD_DEBUG
 #include <stdio.h>
+
+#define PRINT(x) printf x
+#else
+#define PRINT(x)
 #endif
+
 
 #define	DISP_X LCD_WIDTH	/* Display width in pixels */
 #define	DISP_Y LCD_HEIGHT       /* Display height in pixels */
@@ -168,14 +173,11 @@ void lcd_position(int x, int y)
   if (x >= 0 && x < DISP_X && y >= 0 && y < DISP_Y) {
     lcd_x = x;
     lcd_y = y;
-#ifdef LCD_DEBUG
-    fprintf(stderr, "lcd_position: set to %d, %d\n", x, y);
-#endif
+    PRINT(("lcd_position: set to %d, %d\n", x, y));
   }
-#ifdef LCD_DEBUG
   else
-    fprintf(stderr, "lcd_position: not set\n");
-#endif
+    PRINT(("lcd_position: not set\n"));
+
 
 }
 
@@ -198,8 +200,12 @@ void lcd_clear(void)
  */
 void lcd_char (int ch, char invert)
 {
-  unsigned char (*dp)[DISP_X] = (void *) &display[lcd_y/8][lcd_x];
-  unsigned long shift, mask, col;
+  unsigned char yrow = lcd_y/8;
+  unsigned char (*dp)[LCD_WIDTH] = &display[yrow][lcd_x];
+  unsigned char shift, mask, col;
+
+  PRINT(("lcd_char: output %c (%02x) at %d, %d (yrow %d)\n",
+         ch, ch, lcd_x, lcd_y, yrow));
 
   /* Limit to char generation table */
   if (ch < ASCII_MIN || ch > ASCII_MAX)
@@ -214,9 +220,14 @@ void lcd_char (int ch, char invert)
   /* Write each char column */
   for (col = 0; col < CHAR_X-1; col++) {
     unsigned long data = (lcd_font_data[ch-ASCII_MIN][col] << shift) ^ invert;
+
+    PRINT(("OR[0]: %02x on x %d y %d \n", data&0xff, col+lcd_x, yrow));
+
     dp[0][col] = (dp[0][col] & mask) | data;
-    if (lcd_y < DISP_Y-8)
+    if (lcd_y < DISP_Y-8) {
+      PRINT(("OR[1]: %02x on x %d y %d\n", (data>>8), col+lcd_x, yrow+1));
       dp[1][col] = (dp[1][col] & (mask >> 8)) | (data >> 8);
+    }
   }
 
   /* Column after char */
@@ -232,10 +243,8 @@ void lcd_string(const char *text, char invert)
 {
   int ch;
 
-#ifdef LCD_DEBUG
-  fprintf(stderr, "lcd_string: output %s at %d, %d\n",
-          text, lcd_x, lcd_y);
-#endif
+  PRINT(("lcd_string: output %s at %d, %d\n", text, lcd_x, lcd_y));
+
   while ((ch = *text++) != '\0') {
     if (lcd_y > DISP_Y-CHAR_Y) {
       /* Scroll (8 pixels) */
@@ -248,16 +257,13 @@ void lcd_string(const char *text, char invert)
     else {
       lcd_char (ch, invert);
       lcd_x += CHAR_X;
-    }
 
-    if (lcd_x > DISP_X-CHAR_X) {
-      /* Wrap to next line */
-      lcd_x = 0;
-      lcd_y += CHAR_Y;
+      if (lcd_x > DISP_X-CHAR_X) {
+        /* Wrap to next line */
+        lcd_x = 0;
+        lcd_y += CHAR_Y;
+      }
     }
   }
-#ifdef LCD_DEBUG
-  fprintf(stderr, "lcd_string: position after write: %d, %d\n",
-          lcd_x, lcd_y);
-#endif
+  PRINT(("lcd_string: position after write: %d, %d\n", lcd_x, lcd_y));
 }
