@@ -46,13 +46,13 @@ new: "Rockbox Info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMB"
-new: "Buf: %d.%02dMB"
+eng: "Buf: %d.%03dMB"
+new: "Buf: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMB"
-new: "Buffert: %d.%02dMB"
+eng: "Buffer: %d.%03dMB"
+new: "Buffert: %d.%03dMB"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -295,7 +295,7 @@ eng: "Cleared"
 new: "Nollställd"
 
 id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancellation
+desc: Visual confirmation of cancelation
 eng: "Canceled"
 new: "Avbruten"
 
@@ -415,7 +415,7 @@ eng: "is full!"
 new: "är full!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the beginning when resume is on
+desc: question asked at the begining when resume is on
 eng: "Resume?"
 new: "Återuppta?"
 
@@ -490,7 +490,7 @@ eng: "[Title]"
 new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is available
+desc: in wps when no title is avaible
 eng: "<no title>"
 new: "<ingen titel>"
 
@@ -500,7 +500,7 @@ eng: "[Artist]"
 new: "[Artist]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is available
+desc: in wps when no artist is avaible
 eng: "<no artist>"
 new: "<ingen artist>"
 
@@ -510,7 +510,7 @@ eng: "[Album]"
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is available
+desc: in wps when no album is avaible
 eng: "<no album>"
 new: "<inget album>"
 
@@ -520,7 +520,7 @@ eng: "[Tracknum]"
 new: "[Spår]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is available
+desc: in wps if no track number is avaible
 eng: "<no tracknum>"
 new: "<inget spår>"
 
@@ -884,3 +884,117 @@ desc: select the time format of time in status bar
 eng: "Time Format"
 new: "Tidsformat"
 
+id: LANF_WEEKDAY_THURSDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Thu"
+new: "Tor"
+
+id: LANG_BACKLIGHT_ON
+desc: in settings_menu
+eng: ""
+new: ""
+
+id: LANG_CUBE
+desc: the name of the cube demo in the demo menu
+eng: "Cube"
+new: "Kub"
+
+id: LANG_MONTH_APRIL
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Apr"
+new: "Apr"
+
+id: LANG_MONTH_AUGUST
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Aug"
+new: "Aug"
+
+id: LANG_MONTH_DECEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Dec"
+new: "Dec"
+
+id: LANG_MONTH_FEBRUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Feb"
+new: "Feb"
+
+id: LANG_MONTH_JANUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jan"
+new: "Jan"
+
+id: LANG_MONTH_JULY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jul"
+new: "Jul"
+
+id: LANG_MONTH_JUNE
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jun"
+new: "Jun"
+
+id: LANG_MONTH_MARCH
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Mar"
+new: "Mar"
+
+id: LANG_MONTH_MAY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "May"
+new: "Maj"
+
+id: LANG_MONTH_NOVEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Nov"
+new: "Nov"
+
+id: LANG_MONTH_OCTOBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Oct"
+new: "Okt"
+
+id: LANG_MONTH_SEPTEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Sep"
+new: "Sep"
+
+id: LANG_OSCILLOGRAPH
+desc: the name of the oscillograph demo in the demo menu
+eng: "Oscillograph"
+new: "Oscilloskop"
+
+id: LANG_RESUME_SETTING_ASK_ONCE
+desc: in settings_menu
+eng: "Ask Once"
+new: "Fråga en gång" 
+
+id: LANG_WEEKDAY_FRIDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Fri"
+new: "Fre"
+
+id: LANG_WEEKDAY_MONDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Mon"
+new: "Mån"
+
+id: LANG_WEEKDAY_SATURDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Sat"
+new: "Lör"
+
+id: LANG_WEEKDAY_SUNDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Sun"
+new: "Sön"
+
+id: LANG_WEEKDAY_TUESDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Tue"
+new: "Tis"
+
+id: LANG_WEEKDAY_WEDNESDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Wed"
+new: "Ons"
