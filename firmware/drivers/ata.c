@@ -174,7 +174,6 @@ int ata_read_sectors(unsigned long start,
     return ret;
 }
 
-//#ifdef DISK_WRITE
 int ata_write_sectors(unsigned long start,
                       unsigned char count,
                       void* buf)
@@ -230,7 +229,6 @@ int ata_write_sectors(unsigned long start,
     mutex_unlock(&ata_mtx);
     return i;
 }
-//#endif
 
 static int check_registers(void)
 {
