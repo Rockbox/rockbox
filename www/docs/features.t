@@ -52,9 +52,9 @@ TD Longer ETD
 TD  Long ETD
 EFEAT
 
-NAME Charges batteries 100% full ENAME
-NO
+NAME Battery time indicator ENAME
 YES
+NO
 EFEAT
 
 NAME Customizable font (Recorder) ENAME
@@ -223,7 +223,7 @@ YES
 EFEAT
 
 NAME ISO8859-1 font support (Player) ENAME
-NO
+YES
 NO
 EFEAT
 
