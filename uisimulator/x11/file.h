@@ -26,7 +26,7 @@
 int x11_open(const char *name, int opts);
 int x11_close(int fd);
 int x11_filesize(int fd);
-int x11_creat(char *name, int mode);
+int x11_creat(const char *name, mode_t mode);
 int x11_remove(char *name);
 int x11_rename(char *oldpath, char *newpath);
 

@@ -52,7 +52,7 @@ static struct filedesc openfiles[MAX_OPEN_FILES];
 
 static int flush_cache(int fd);
 
-int creat(const char *pathname, int mode)
+int creat(const char *pathname, mode_t mode)
 {
     (void)mode;
     return open(pathname, O_WRONLY|O_CREAT|O_TRUNC);
@@ -307,7 +307,7 @@ int rename(const char* path, const char* newpath)
     return 0;
 }
 
-int ftruncate(int fd, unsigned int size)
+int ftruncate(int fd, off_t size)
 {
     int rc, sector;
     struct filedesc* file = &openfiles[fd];
@@ -513,22 +513,22 @@ static int readwrite(int fd, void* buf, int count, bool write)
     return nread;
 }
 
-int write(int fd, void* buf, int count)
+ssize_t write(int fd, const void* buf, size_t count)
 {
     if (!openfiles[fd].write) {
         errno = EACCES;
         return -1;
     }
-    return readwrite(fd, buf, count, true);
+    return readwrite(fd, (void *)buf, count, true);
 }
 
-int read(int fd, void* buf, int count)
+ssize_t read(int fd, void* buf, size_t count)
 {
     return readwrite(fd, buf, count, false);
 }
 
 
-int lseek(int fd, int offset, int whence)
+off_t lseek(int fd, off_t offset, int whence)
 {
     int pos;
     int newsector;

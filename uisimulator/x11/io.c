@@ -120,7 +120,7 @@ int x11_close(int fd)
     return (close)(fd);
 }
 
-int x11_creat(char *name, int mode)
+int x11_creat(const char *name, mode_t mode)
 {
     char buffer[256]; /* sufficiently big */
     (void)mode;

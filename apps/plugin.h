@@ -135,13 +135,13 @@ struct plugin_api {
     /* file */
     int (*open)(const char* pathname, int flags);
     int (*close)(int fd);
-    int (*read)(int fd, void* buf, int count);
-    int (*lseek)(int fd, int offset, int whence);
-    int (*creat)(const char *pathname, int mode);
-    int (*write)(int fd, void* buf, int count);
+    ssize_t (*read)(int fd, void* buf, size_t count);
+    off_t (*lseek)(int fd, off_t offset, int whence);
+    int (*creat)(const char *pathname, mode_t mode);
+    ssize_t (*write)(int fd, const void* buf, size_t count);
     int (*remove)(const char* pathname);
     int (*rename)(const char* path, const char* newname);
-    int (*ftruncate)(int fd, unsigned int size);
+    int (*ftruncate)(int fd, off_t length);
     int (*filesize)(int fd);
     int (*fprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
