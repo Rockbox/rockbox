@@ -83,6 +83,8 @@ getfont(int font)
 {
     PMWCFONT pf;
 
+    if (font >= MAXFONTS)
+        font = 0;
     while (1) {
         pf = sysfonts[font].pf;
         if (pf && pf->height)
@@ -115,13 +117,13 @@ lcd_getstringsize(unsigned char *str, int font, int *w, int *h)
     int width = 0;
 
     while((ch = *str++)) {
-	/* check input range*/
-	if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-		ch = pf->defaultchar;
-	ch -= pf->firstchar;
+        /* check input range*/
+        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
+            ch = pf->defaultchar;
+        ch -= pf->firstchar;
 
-	/* get proportional width and glyph bits*/
-	width += pf->width? pf->width[ch]: pf->maxwidth;
+        /* get proportional width and glyph bits*/
+        width += pf->width? pf->width[ch]: pf->maxwidth;
     }
     *w = width;
     *h = pf->height;
@@ -150,7 +152,11 @@ lcd_putsxy(int x, int y, unsigned char *str, int font)
 
         /* get proportional width and glyph bits*/
         width = pf->width? pf->width[ch]: pf->maxwidth;
-        if(x + width > LCD_WIDTH)
+        if (x + width > LCD_WIDTH)
+            break;
+
+        /* no partial-height drawing for now...*/
+        if (y + pf->height > LCD_HEIGHT)
             break;
         bits = pf->bits + (pf->offset? pf->offset[ch]: (pf->height * ch));
 
@@ -224,29 +230,29 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
         MWIMAGEBITS srcmap;	/* current src input bit*/
         MWIMAGEBITS dstmap;	/* current dst output bit*/
         
-	/* calc src input bit*/
-	srcmap = 1 << (sizeof(MWIMAGEBITS)*8-1);
+        /* calc src input bit*/
+        srcmap = 1 << (sizeof(MWIMAGEBITS)*8-1);
 
-	/* calc dst output bit*/
+        /* calc dst output bit*/
         if (i>0 && (i%8==0)) {
             ++dst_col;
             dst_shift = 0;
         }
         dstmap = 1 << dst_shift++;
 
-	/* for each input column...*/
+        /* for each input column...*/
         for(j=0; j < width; j++) {
 
-	    /* calc input bitmask*/
+            /* calc input bitmask*/
             MWIMAGEBITS bit = srcmap >> j;
             if (bit==0) {
                 srcmap = 1 << (sizeof(MWIMAGEBITS)*8-1);
                 bit = srcmap >> (j % 16);
             }
 
-	    /* if set in input, set in rotated output*/
-	    if (bit & src[i]) {
-		/* input column j becomes output row*/
+            /* if set in input, set in rotated output*/
+            if (bit & src[i]) {
+                /* input column j becomes output row*/
                 dst[j*dst_linelen + dst_col] |= dstmap;
             }
             /*debugf((bit & src[i])? "*": ".");*/
@@ -259,6 +265,6 @@ rotleft(unsigned char *dst, MWIMAGEBITS *src, unsigned int width,
 /* -----------------------------------------------------------------
  * local variables:
  * eval: (load-file "rockbox-mode.el")
- * vim: et sw=4 ts=4 sts=4 tw=78
+ * vim: et sw=4 ts=8 sts=4 tw=78
  * end:
  */

@@ -39,9 +39,8 @@
 /* static buffer allocation structures*/
 static unsigned char mbuf[MAX_FONT_SIZE];
 static unsigned char *freeptr = mbuf;
-typedef unsigned char CFILE;
-static CFILE *fileptr;
-static CFILE *eofptr;
+static unsigned char *fileptr;
+static unsigned char *eofptr;
 
 static int
 READSHORT(unsigned short *sp)
@@ -101,9 +100,9 @@ PMWCFONT
 rbf_load_font(char *path, PMWCFONT pf)
 {
     int fd, filesize;
-    unsigned short maxwidth, height, ascent;
+    unsigned short maxwidth, height, ascent, pad;
     unsigned long firstchar, defaultchar, size;
-    unsigned long nbits, noffset, nwidth;
+    unsigned long i, nbits, noffset, nwidth;
     char version[4+1];
     char copyright[256+1];
 
@@ -115,10 +114,12 @@ rbf_load_font(char *path, PMWCFONT pf)
         DEBUGF("Can't open font: %s\n", path);
         return NULL;
     }
+freeptr = (unsigned char *)(((int)mbuf + 3) & ~3);
     fileptr = freeptr;
     filesize = read(fd, fileptr, MAX_FONT_SIZE);
-    freeptr += filesize;
     eofptr = fileptr + filesize;
+    //freeptr += filesize;
+    //freeptr = (unsigned char *)(freeptr + 3) & ~3;  /* pad freeptr*/
     close(fd);
     if (filesize == MAX_FONT_SIZE) {
         DEBUGF("Font %s too large: %d\n", path, filesize);
@@ -151,6 +152,8 @@ rbf_load_font(char *path, PMWCFONT pf)
     if (!READSHORT(&ascent))
         return NULL;
     pf->ascent = ascent;
+    if (!READSHORT(&pad))
+        return NULL;
     if (!READLONG(&firstchar))
         return NULL;
     pf->firstchar = firstchar;
@@ -177,16 +180,22 @@ rbf_load_font(char *path, PMWCFONT pf)
 
     /* variable font data*/
     pf->bits = (MWIMAGEBITS *)fileptr;
-    fileptr += nbits*sizeof(MWIMAGEBITS);
+    for (i=0; i<nbits; ++i)
+        if (!READSHORT(&pf->bits[i]))
+            return NULL;
+    /* pad to longword boundary*/
+    fileptr = (unsigned char *)(((int)fileptr + 3) & ~3);
 
     if (noffset) {
         pf->offset = (unsigned long *)fileptr;
-        fileptr += noffset*sizeof(unsigned long);
+        for (i=0; i<noffset; ++i)
+            if (!READLONG(&pf->offset[i]))
+                return NULL;
     } else pf->offset = NULL;
 
     if (nwidth) {
         pf->width = (unsigned char *)fileptr;
-        fileptr += noffset*sizeof(unsigned char);
+        fileptr += nwidth*sizeof(unsigned char);
     } else pf->width = NULL;
 
     if (fileptr > eofptr)
@@ -198,5 +207,6 @@ rbf_load_font(char *path, PMWCFONT pf)
 /* -----------------------------------------------------------------
  * local variables:
  * eval: (load-file "rockbox-mode.el")
+ * vim: et sw=4 ts=8 sts=4 tw=78
  * end:
  */

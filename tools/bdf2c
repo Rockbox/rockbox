@@ -5,6 +5,7 @@
 #
 # from The Microwindows Project (http://microwindows.org)
 #
+# modified 09/13/02 correct output when no DEFAULT_CHAR, allow numeric font name
 # modified 09/12/02 added -limit <max_encode_hex_value> option
 # modified on 09/10/02 by G Haerr
 #	- fixed DWIDTH 0 parsing
@@ -79,7 +80,7 @@ print "   descent: $font_descent\n";
 print "*/\n\n";
 
 print "/* Font character bitmap data. */\n";
-print "static MWIMAGEBITS ${font}_bits[] = {\n";
+print "static MWIMAGEBITS _${font}_bits[] = {\n";
 
 $ch_height = $font_ascent + $font_descent;
 $ofs = 0;
@@ -162,8 +163,10 @@ print "};\n\n";
 
 ##print STDERR "Maximum character width=$maxwidth\n";
 
+$default_char = $firstchar if !defined $default_char;
+
 print "/* Character->glyph mapping. */\n";
-print "static unsigned long ${font}_offset[] = {\n";
+print "static unsigned long _${font}_offset[] = {\n";
 for (my $i = $firstchar; $i <= $lastchar; $i++) {
     my $char = $i;
     my $ofs = $encoding_tab[$i];
@@ -177,13 +180,13 @@ $gen_width_table = 0;
 for (my $i = $firstchar; $i <= $lastchar; $i++) {
     my $char = $i;
     my $width = $width[$i];
-    $width = $width[$default_char], $char = $default_char if !defined $encoding_tab[$i];
+    $width = $width[$default_char] if !defined $encoding_tab[$i];
     $gen_width_table = 1 if $width != $maxwidth
 }
 
 if ($gen_width_table) {
 	print "/* Character width data. */\n";
-	print "static unsigned char ${font}_width[] = {\n";
+	print "static unsigned char _${font}_width[] = {\n";
 	for (my $i = $firstchar; $i <= $lastchar; $i++) {
 	    my $char = $i;
 	    my $width = $width[$i];
@@ -204,11 +207,11 @@ print "  $ch_height,\n";
 print "  $font_ascent,\n";
 print "  $firstchar,\n";
 print "  $size,\n";
-print "  ${font}_bits,\n";
-print "  ${font}_offset,\n";
+print "  _${font}_bits,\n";
+print "  _${font}_offset,\n";
 if ($gen_width_table) {
-	print "  ${font}_width,\n";
+	print "  _${font}_width,\n";
 } else { print "  0,  /* fixed width*/\n"; }
 print "  $default_char,\n";
-print "  sizeof(${font}_bits)/sizeof(MWIMAGEBITS),\n";
+print "  sizeof(_${font}_bits)/sizeof(MWIMAGEBITS),\n";
 print "};\n";

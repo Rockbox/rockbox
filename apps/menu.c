@@ -125,7 +125,7 @@ void put_cursorxy(int x, int y, bool on)
 static void menu_draw(int m)
 {
     int i = 0;
-#if LCD_PROPFONTS
+#ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
     lcd_getfontsize(FONT_UI, &fw, &fh);
@@ -175,7 +175,7 @@ static void menu_draw(int m)
 static void put_cursor(int m, int target)
 {
     bool do_update = true;
-#if LCD_PROPFONTS
+#ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
     lcd_getfontsize(FONT_UI, &fw, &fh);

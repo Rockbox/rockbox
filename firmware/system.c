@@ -19,7 +19,8 @@
 #include <stdio.h>
 #include "config.h"
 
-#include <lcd.h>
+#include "lcd.h"
+#include "font.h"
 #include "led.h"
 #include "system.h"
 
@@ -325,6 +326,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     /* clear screen */
     lcd_clear_display ();
+    lcd_setfont(FONT_SYSFIXED);
     /* output exception */
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
     snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);

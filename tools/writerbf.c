@@ -80,6 +80,7 @@ rbf_write_font(PMWCFONT pf)
 	WRITESHORT(ofp, pf->maxwidth);
 	WRITESHORT(ofp, pf->height);
 	WRITESHORT(ofp, pf->ascent);
+	WRITESHORT(ofp, 0);
 	WRITELONG(ofp, pf->firstchar);
 	WRITELONG(ofp, pf->defaultchar);
 	WRITELONG(ofp, pf->size);
@@ -92,9 +93,13 @@ rbf_write_font(PMWCFONT pf)
 	/* variable font data*/
 	for (i=0; i<pf->bits_size; ++i)
 		WRITESHORT(ofp, pf->bits[i]);
+        if (ftell(ofp) & 2)
+		WRITESHORT(ofp, 0);		/* pad to 32-bit boundary*/
+
 	if (pf->offset)
 		for (i=0; i<pf->size; ++i)
 			WRITELONG(ofp, pf->offset[i]);
+
 	if (pf->width)
 		for (i=0; i<pf->size; ++i)
 			WRITEBYTE(ofp, pf->width[i]);

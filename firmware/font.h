@@ -46,7 +46,7 @@
 /*
  * .fnt (.rbf) loadable font file format definition
  *
- * format		      len	description
+ * format                     len	description
  * -------------------------  ----	------------------------------
  * UCHAR version[4]		4	magic number and version bytes
  * UCHAR name[64]	       64	font name, space padded
@@ -54,6 +54,7 @@
  * USHORT maxwidth		2	font max width in pixels
  * USHORT height		2	font height in pixels
  * USHORT ascent		2	font ascent (baseline) in pixels
+ * USHORT pad                   2       unused, pad to 32-bit boundary
  * ULONG firstchar		4	first character code in font
  * ULONG defaultchar		4	default character code in font
  * ULONG size			4	# characters in font
@@ -61,12 +62,13 @@
  * ULONG noffset		4	# longs offset data in file
  * ULONG nwidth			4	# bytes width data in file
  * MWIMAGEBITS bits	  nbits*2	image bits variable data
+ * [MWIMAGEBITS padded to 32-bit boundary]
  * ULONG offset         noffset*4	offset variable data
  * UCHAR width		 nwidth*1	width variable data
  */
 
 /* loadable font magic and version #*/
-#define VERSION		"RB10"
+#define VERSION		"RB11"
 
 /* MWIMAGEBITS helper macros*/
 #define MWIMAGE_WORDS(x)	(((x)+15)/16)	/* image size in words*/
@@ -122,5 +124,6 @@ void font_init(void);
 /* -----------------------------------------------------------------
  * local variables:
  * eval: (load-file "rockbox-mode.el")
+ * vim: et sw=4 ts=8 sts=4 tw=78
  * end:
  */
