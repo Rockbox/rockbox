@@ -318,7 +318,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
         }
 
         /* memorize/compare details about the boot file */
-        if ((currdir[1] == 0) && !strcmp(entry->d_name, BOOTFILE)) {
+        if ((currdir[1] == 0) && !stricmp(entry->d_name, BOOTFILE)) {
             if (boot_size) {
                 if ((entry->size != boot_size) ||
                     (entry->startcluster != boot_cluster))
