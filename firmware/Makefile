@@ -20,6 +20,9 @@ TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
+# store output files in this directory:
+OBJDIR = .
+
 CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
 
 ifdef DEBUG
@@ -32,26 +35,28 @@ AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
 
-OBJS := $(SRC:%.c=%.o) crt0.o
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
-librockbox.a: $(OBJS)
+OUTPUT = $(OBJDIR)/librockbox.a
+
+$(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+
 
 clean:
-	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-$(RM) -f $(OBJDIR)/$(OBJS) *~ $(OUTPUT)
 	-$(RM) -r $(DEPS)
 
 # Special targets
-thread.o: thread.c thread.h
-	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $<
+$(OBJDIR)/thread.o: thread.c thread.h
+	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
 	@echo "Updating dependencies for $<"
 	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
-		|sed '\''s|\($*\)\.o[ :]*|\1.o $(<:%.c=%.d) : |g'\'' > $@; \
+		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
 -include $(SRC:%.c=$(DEPS)/%.d)
