@@ -141,6 +141,7 @@ int wps_show(void)
             lastlength = id3->length;
             lastsize = id3->filesize;
             lastrate = id3->bitrate;
+            lastvbr = id3->vbr;
             lastartist = id3->artist?id3->artist[0]:0;
             lastalbum = id3->album?id3->album[0]:0;
             lasttitle = id3->title?id3->title[0]:0;
