@@ -7,19 +7,11 @@
 # $Id$
 #
 
-ifdef SIMULATOR
-CC    = gcc
-LD    = ld
-AR    = ar
-AS    = as
-OC    = objcopy
-else
 CC    = sh-elf-gcc
 LD    = sh-elf-ld
 AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
-endif
 
 FIRMWARE = ../../../firmware
 
@@ -36,13 +28,8 @@ ifeq ($(ANYREC), RECORDER)
 INCLUDES += -I../../recorder
 endif
 
-ifdef SIMULATOR
-CFLAGS = -W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes	\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DSIMULATOR
-else
 CFLAGS = -W -Wall -O -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
-endif
 
 ifndef MEM
     # if MEM is not set, assume 2MB
