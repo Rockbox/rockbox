@@ -29,10 +29,10 @@
 #elif CONFIG_BATTERY == BATT_3AAA_ALKALINE /* Ondio, Alkalines */
 #define BATTERY_LEVEL_SHUTDOWN   250 /* 2.50V */
 #define BATTERY_LEVEL_EMPTY      260 /* 2.60V */
-#define BATTERY_LEVEL_DANGEROUS  270 /* 2.80V */
+#define BATTERY_LEVEL_DANGEROUS  270 /* 2.70V */
 #define BATTERY_LEVEL_FULL       450 /* 4.50V */
-#define BATTERY_CAPACITY_MIN 1000
-#define BATTERY_CAPACITY_MAX 2000 /* max. capacity selectable in settings */
+#define BATTERY_CAPACITY_MIN 500
+#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable in settings */
 #else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
