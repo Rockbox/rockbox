@@ -16,3 +16,5 @@ malloc/README
 malloc/THOUGHTS
 malloc/Makefile
 drivers/*.[ch]
+include/*.h
+include/sys/*.h
