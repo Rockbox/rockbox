@@ -51,7 +51,7 @@ $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
+	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
 
 $(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
 	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
