@@ -10,3 +10,4 @@ rockbox-style.el
 sample.emacs
 buildzip.pl
 romsizetest.pl
+make.inc
