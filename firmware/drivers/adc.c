@@ -45,11 +45,6 @@
 
 static int current_channel;
 static unsigned short adcdata[NUM_ADC_CHANNELS];
-static const unsigned int adcreg[NUM_ADC_CHANNELS] =
-{
-    ADDRAH_ADDR, ADDRBH_ADDR, ADDRCH_ADDR, ADDRDH_ADDR,
-    ADDRAH_ADDR, ADDRBH_ADDR, ADDRCH_ADDR, ADDRDH_ADDR
-};
 
 static void adc_tick(void)
 {
