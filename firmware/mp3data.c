@@ -398,10 +398,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
             vbrheader = frame + 17;
     }
 
-    if (vbrheader[0] == 'X' &&
-        vbrheader[1] == 'i' &&
-        vbrheader[2] == 'n' &&
-        vbrheader[3] == 'g')
+    if (!memcmp(vbrheader, "Xing", 4))
     {
         int i = 8; /* Where to start parsing info */
 
@@ -452,10 +449,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         }
     }
 
-    if (vbrheader[0] == 'V' &&
-        vbrheader[1] == 'B' &&
-        vbrheader[2] == 'R' &&
-        vbrheader[3] == 'I')
+    if (!memcmp(vbrheader, "VBRI", 4))
     {
         DEBUGF("VBRI header\n");
 
@@ -517,10 +511,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     }
 
     /* Is it a LAME Info frame? */
-    if (vbrheader[0] == 'I' &&
-        vbrheader[1] == 'n' &&
-        vbrheader[2] == 'f' &&
-        vbrheader[3] == 'o')
+    if (!memcmp(vbrheader, "Info", 4))
     {
         /* Make sure we skip this frame in playback */
         bytecount += info->frame_size;
