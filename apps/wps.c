@@ -552,10 +552,10 @@ static bool menu(void)
                     button_set_release(old_release_mask);
                     main_menu();
 #ifdef HAVE_LCD_BITMAP
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
+                    if(global_settings.statusbar)
+                        lcd_setmargins(0, STATUSBAR_HEIGHT);
+                    else
+                        lcd_setmargins(0, 0);
 #endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                 }
@@ -632,7 +632,7 @@ static bool menu(void)
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
-    int button;
+    int button, lastbutton = 0;
     bool ignore_keyup = true;
     bool restore = false;
 
@@ -743,6 +743,9 @@ int wps_show(void)
 
                 /* prev / restart */
             case BUTTON_LEFT | BUTTON_REL:
+                if ( lastbutton != BUTTON_LEFT )
+                    break;
+
                 if (!id3 || (id3->elapsed < 3*1000))
                     mpeg_prev();
                 else {
@@ -758,6 +761,8 @@ int wps_show(void)
 
                 /* next */
             case BUTTON_RIGHT | BUTTON_REL:
+                if ( lastbutton != BUTTON_RIGHT )
+                    break;
                 mpeg_next();
                 break;
 
@@ -820,5 +825,6 @@ int wps_show(void)
             if (id3)
                 wps_refresh(id3,0,false);
         }
+        lastbutton = button;
     }
 }
