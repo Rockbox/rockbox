@@ -123,10 +123,10 @@ A19: Okay, last time.  No.  We have no problems whatsoever reading different
      data directly to the DAC.
 
 Q20. What is the most recent version of Rockbox?
-A20. We recently released version 2.1, so head on over to 
+A20. We recently released version 2.2, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-2.1-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-2.2-notes.txt).  
 
 Q21. What do you plan to add to coming versions?
 A21. We don't plan versions in detail. We just write code, and when it feels
@@ -377,7 +377,7 @@ A60: We currently support four different hardware platforms: Players, Recorder
      For each platform, Rockbox is released in three versions: Release, Daily
      Build and Bleeding Edge. These only differ in release frequency.
 
-     The Release version (currently 2.1) is a frozen known-good state. This
+     The Release version (currently 2.2) is a frozen known-good state. This
      means that we are confident that few, if any, significant bugs reside
      within the code for that version. This is the version for the common
      user.
@@ -677,3 +677,14 @@ A76: It means you have more files in a single directory than you have
      configured Rockbox to support. See Q53.
 
      Solution: Increase the "max files in dir browser" setting.
+
+     The current official release (2.2) contains a bug that sets
+     the default buffer setting to 0, giving the dir buffer full error.
+     Solution:
+
+     1) Change the limit in the settings
+     2) Exit the menu back to the browser
+     3) Force a disk spinup. There are several ways: either select
+        another setting for the file filter, or insert the USB and extract
+        it again
+     4) Turn it off and on again
