@@ -30,3 +30,6 @@ gray_set_foreground.c
 gray_setfont.c
 gray_verline.c
 #endif
+#ifdef HAVE_LCD_CHARCELLS
+playergfx.c
+#endif
