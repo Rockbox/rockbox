@@ -40,8 +40,6 @@ A value have 5 digits after the . (123.45 = 12345000)
 
 To do:
 - The Irish currency needs 6 digits after the . to have sufficient precision on big number
-- Improve the config save format to be like rockbox setting 
-  (use of settings_parseline(...) of setting.c ? must be extern and export in the config.h)  
 */
 
 /* Name and path of the config file*/
@@ -272,7 +270,6 @@ static void display(long long euro, long long home, bool pos)
 /* Show country Abbreviation */
 static void show_abbrev(void)
 {
-//    rb->lcd_remove_cursor();
     rb->lcd_puts(2,1,abbrev_str[country]);
     rb->sleep(HZ*3/4);
 }
@@ -287,13 +284,12 @@ static void save_config(void)
     if (fd < 0)
     {
         rb->lcd_clear_display();
-        rb->lcd_puts(0,0,"Impossible");
-        rb->lcd_puts(0,1,"to save cfg");
+        rb->splash(HZ, false, "Failed to save config");
         rb->sleep(HZ);
     }
     else
     {
-        rb->fprintf(fd, "%c", country+0x30);
+        rb->fprintf(fd, "last currency: %d\n", country);
         rb->close(fd);
     }
     return;
@@ -305,13 +301,17 @@ static void load_config(void)
 {
     int fd;
     char line[128];
+    char *name, *value;
 
     fd = rb->open(CFGFILE, O_RDONLY);
     if (fd < 0)
         return;
 
-    rb->read(fd, line,1);
-    country=line[0]-0x30;
+    rb->read_line(fd, line, 128);
+    rb->settings_parseline(line, &name, &value);
+
+    if(!rb->strcmp("last currency", name))
+       country = rb->atoi(value);
 
     if ((country>11)|| (country<0))
         country=0;
