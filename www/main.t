@@ -10,6 +10,8 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-09-02</i>: <a href="http://rockbox.haxx.se/tshirt-contest/vote.html">Vote for your favourite tshirt designs!</a>
+
 <p><i>2002-08-28</i>: Version 1.3 is released. <a href="download/">Go fetch</a>.
 
 <p><i>2002-08-09</i>: Version 1.2 is released. <a href="download/">Download it here</a>.
