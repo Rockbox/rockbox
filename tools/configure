@@ -70,6 +70,14 @@ clean:
 EOF
 
 echo "Created Makefile"
+
+if [ -d "archos" ]; then
+ echo "sub directory archos already present"
+else
+ mkdir archos
+ echo "created an archos subdirectory for simulating the hard disk"
+fi
+
 }
 
 if [ "$target" = "--help" -o \
@@ -224,7 +232,7 @@ THISDIR="@PWD@"
 
 .PHONE: firmware apps
 
-all: apps
+all: firmware apps
 
 firmware:
 	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
