@@ -28,6 +28,11 @@ MOO
     exit;
 }
 
+if($ARGV[0] eq "-v") {
+    shift @ARGV;
+    $debug=1;
+}
+
 my $english = $ARGV[0];
 my $input = $ARGV[1];
 my $output = $ARGV[2];
@@ -47,6 +52,7 @@ printf OFILE ("\x1a%c", $langversion); # magic lang file header
 #
 # We scan the english file to get the correct order of the id numbers
 #
+my $idnum=0; # start with a true number
 while(<ENG>) {
     if($_ =~ / *\#/) {
         # comment
@@ -92,11 +98,20 @@ while(<LANG>) {
             if($value =~ s/^\"(.*)\" *$/$1/g) {
 
                 $idnum = $idnum{$set{'id'}};
-                $idnum{$set{'id'}} = '_done_';
 
-                printf OFILE ("%c%c%s\x00",
-                              ($idnum>>8), ($idnum&0xff),
-                              $value);
+                if($idnum eq "") {
+                    warn "Found no ".$set{'id'}." in english file!\n";
+                }
+                else {
+                    $idnum{$set{'id'}} = '_done_';
+
+                    printf OFILE ("%c%c%s\x00",
+                                  ($idnum>>8), ($idnum&0xff),
+                                  $value);
+                    if($debug) {
+                        printf("%02x => %s\n", $idnum, $value);
+                    }
+                }
             }
             else {
                 warn "String for ".$set{'id'}." misses quotes\n";
