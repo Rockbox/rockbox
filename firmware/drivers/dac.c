@@ -16,10 +16,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "stdbool.h"
 #include "i2c.h"
 #include "debug.h"
 #include "dac.h"
+
+#ifdef HAVE_DAC3550A
 
 int dac_volume(unsigned int left, unsigned int right, bool deemph)
 {
@@ -89,3 +92,5 @@ void dac_init(void)
     i2c_write(DAC_DEV_WRITE,buf,2);
     i2c_end();
 }
+
+#endif

@@ -1512,8 +1512,6 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 
     setup_sci0();
 
-    dac_init();
-
 #ifdef HAVE_MAS3587F
     mas_reset();
     
@@ -1548,6 +1546,10 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     /* Start the Layer2/3 decoder applications */
     val = 0x0c;
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+#endif
+
+#ifdef HAVE_DAC3550A
+    dac_init();
 #endif
     
 #ifdef HAVE_MAS3507D

@@ -19,6 +19,10 @@
 #ifndef _DAC_H_
 #define _DAC_H_
 
+#include "config.h"
+
+#ifdef HAVE_DAC3550A
+
 /*
 	DAC I2C	defs
 */
@@ -35,5 +39,7 @@
 extern int dac_volume(unsigned int left, unsigned int right, bool deemph);
 extern int dac_config(int value);
 extern void dac_init(void);
+
+#endif
 
 #endif
