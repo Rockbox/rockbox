@@ -35,7 +35,7 @@ endif
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
 
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o $(OBJDIR)/bitswap.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
