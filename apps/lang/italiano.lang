@@ -66,7 +66,7 @@ new: "Batteria: %d%%%s"
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: charging"
-new: "Batteria: in carica"
+new: "Batteria: In Carica"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -121,12 +121,12 @@ new: "Playlist"
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "buffer full"
-new: "buffer pieno"
+new: "Buffer Pieno"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d files"
-new: "%d canzoni"
+new: "%d Canzoni"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -136,7 +136,7 @@ new: "Salvataggio Fallito"
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-new: "Batt. scarica?"
+new: "Batt. Scarica?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -146,17 +146,17 @@ new: "Salvataggio Fallito"
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new: "La batteria è scarica?"
+new: "La Batteria è Scarica?"
 
 id: LANG_TIME_SET
 dec: used in set_time()
 eng: "ON to set"
-new: "ON per salvare"
+new: "ON per Salvare"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "OFF per ritornare"
+new: "OFF per Ritornare"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -186,7 +186,7 @@ new: "Mescola"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Suona prima i selezionati"
+new: "Suona Prima i Selezionati"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -234,7 +234,7 @@ new: "Esempio Impostazione Velocità Scorrimento"
 id: LANG_DISCHARGE
 desc: in settings_menu
 eng: "Deep discharge"
-new: "Scarica completa"
+new: "Scarica Completa"
 
 id: LANG_TIME
 desc: in settings_menu
@@ -414,7 +414,7 @@ new: "Dir Buffer"
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "E' pieno!"
+new: "E' Pieno!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
@@ -449,7 +449,7 @@ new: "Tastiera Sbloccata"
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-new: "  Tastiera Bloccata"
+new: " Tastiera Bloccata"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
@@ -554,12 +554,12 @@ new: "[Percorso]"
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch up"
-new: "Tono su"
+new: "Tono Su"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch down"
-new: "Tono giù"
+new: "Tono Giù"
 
 id: LANG_PAUSE
 desc: in wps
@@ -594,7 +594,7 @@ new: "Barra"
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End of list"
-new: "Fine lista"
+new: "Fine Lista"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
@@ -604,7 +604,7 @@ new: "<Premi ON>"
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "<End of song list>"
-new: "<Fine lista canzoni>"
+new: "<Fine Lista Canzoni>"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -634,12 +634,12 @@ new: "Pausa"
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[Play] to resume"
-new: "[Play] per riprendere"
+new: "[Play] per Riprendere"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[Off] to quit"
-new: "[Off] per uscire"
+new: "[Off] per Uscire"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -654,7 +654,7 @@ new: "(1 - Lento, 9 - Veloce)"
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
-new: "[Play] per inizio/pausa"
+new: "[Play] per Inizio/Pausa"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
@@ -674,7 +674,7 @@ new: "HAI VINTO!!"
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[Off] to stop"
-new: "[Off] per interrompere"
+new: "[Off] per Interrompere"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -738,44 +738,44 @@ new: "Rec: %d"
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
-new: "%d Giocatori      su/giù"
+new: "%d Giocatori    Su/Giù"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-new: "%d Vermi          d/s"
+new: "%d Vermi        D/S"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: "Remote control F1"
-new: "Telecomando       F1"
+new: "Telecomando      F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-new: "No Telecomando    F1"
+new: "No Telecomando  F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-new: "Controllo 2 tasti F1"
+new: "Controllo 2 Tasti F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: "4 key control   F1"
-new: "Controllo 4 tasti F1"
+new: "Controllo 4 Tasti F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
 eng: "Out of control"
-new: "Fuori controllo"
+new: "Fuori Controllo"
 
 # Wormlet game ids ended
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
-new: "Hai perso!"
+new: "Hai Perso!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
@@ -821,6 +821,56 @@ id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
 new: "No"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Misuratore di Picco"
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Rilascio Picco"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Tempo Blocco Picco"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Tempo Blocco Sequenza"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "Eterno"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "Unità per Lettura"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Retroilluminazione Accesa Durante La Carica"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Ripetere"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Tutte"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Una"
 
 
 
