@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fat.h"
-#include "ata.h"
 #include "debug.h"
 #include "disk.h"
 #include "dir.h"
 #include "file.h"
 
+extern int ata_init(char*);
+extern void ata_read_sectors(int, int, char*);
+
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf);
-void dbg_print_bpb(struct bpb *bpb);
 void dbg_console(void);
 
 void dbg_dump_sector(int sec)
@@ -30,6 +31,7 @@ void dbg_dump_buffer(unsigned char *buf)
 
     for(i = 0;i < 512/16;i++)
     {
+        DEBUGF("%03x: ", i*16);
         for(j = 0;j < 16;j++)
         {
             c = buf[i*16+j];
@@ -50,37 +52,6 @@ void dbg_dump_buffer(unsigned char *buf)
     }
 }
 
-void dbg_print_bpb(struct bpb *bpb)
-{
-    DEBUGF("bpb_oemname = \"%s\"\n", bpb->bs_oemname);
-    DEBUGF("bpb_bytspersec = %d\n", bpb->bpb_bytspersec);
-    DEBUGF("bpb_secperclus = %d\n", bpb->bpb_secperclus);
-    DEBUGF("bpb_rsvdseccnt = %d\n", bpb->bpb_rsvdseccnt);
-    DEBUGF("bpb_numfats = %d\n", bpb->bpb_numfats);
-    DEBUGF("bpb_rootentcnt = %d\n", bpb->bpb_rootentcnt);
-    DEBUGF("bpb_totsec16 = %d\n", bpb->bpb_totsec16);
-    DEBUGF("bpb_media = %02x\n", bpb->bpb_media);
-    DEBUGF("bpb_fatsz16 = %d\n", bpb->bpb_fatsz16);
-    DEBUGF("bpb_secpertrk = %d\n", bpb->bpb_secpertrk);
-    DEBUGF("bpb_numheads = %d\n", bpb->bpb_numheads);
-    DEBUGF("bpb_hiddsec = %u\n", bpb->bpb_hiddsec);
-    DEBUGF("bpb_totsec32 = %u\n", bpb->bpb_totsec32);
-
-    DEBUGF("bs_drvnum = %d\n", bpb->bs_drvnum);
-    DEBUGF("bs_bootsig = %02x\n", bpb->bs_bootsig);
-    if(bpb->bs_bootsig == 0x29)
-    {
-       DEBUGF("bs_volid = %xl\n", bpb->bs_volid);
-       DEBUGF("bs_vollab = \"%s\"\n", bpb->bs_vollab);
-       DEBUGF("bs_filsystype = \"%s\"\n", bpb->bs_filsystype);
-    }
-
-    DEBUGF("bpb_fatsz32 = %u\n", bpb->bpb_fatsz32);
-    DEBUGF("last_word = %04x\n", bpb->last_word);
-
-    DEBUGF("fat_type = FAT32\n");
-}
-
 void dbg_dir(char* currdir)
 {
     DIR* dir;
@@ -92,12 +63,12 @@ void dbg_dir(char* currdir)
         while ( (entry = readdir(dir)) ) {
             DEBUGF("%15s (%d bytes)\n", entry->d_name, entry->size);
         }
+        closedir(dir);
     }
     else
     {
         DEBUGF( "Could not open dir %s\n", currdir);
     }
-    closedir(dir);
 }
 
 void dbg_type(char* name)
@@ -261,21 +232,45 @@ void dbg_console(void)
 
 int main(int argc, char *argv[])
 {
-    if(ata_init()) {
+    int rc,i;
+    struct partinfo* pinfo;
+
+    if(ata_init(argv[1])) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
         return -1;
     }
-    if (disk_init()) {
+    pinfo = disk_init();
+    if (!pinfo) {
         DEBUGF("*** Failed reading partitions\n");
         return -1;
     }
 
-    if(fat_mount(part[0].start)) {
-        DEBUGF("*** Failed mounting fat\n");
+    if ( argc > 2 ) {
+        dbg_dump_sector(atoi(argv[2]));
+        return 0;
+    }
+
+    for ( i=0; i<4; i++ ) {
+        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ) {
+            DEBUGF("*** Mounting at block %ld\n",pinfo[i].start);
+            rc = fat_mount(pinfo[i].start);
+            if(rc) {
+                DEBUGF("mount: %d",rc);
+                return 0;
+            }
+            break;
+        }
+    }
+    if ( i==4 ) {
+        if(fat_mount(0)) {
+            DEBUGF("No FAT32 partition!");
+            return 0;
+        }
     }
 
     //dbg_console();
-    dbg_tail("/fat.h");
+    //dbg_tail("/fat.h");
+    dbg_dir("/");
 
     return 0;
 }

@@ -2,20 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ata.h"
-
 #define BLOCK_SIZE 512
 
 static FILE* file;
 
 int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 {
+    printf("Reading block 0x%lx\n",start); 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
     }
     if(!fread(buf,BLOCK_SIZE,count,file)) {
-        printf("Failed reading %d blocks starting at block %ld\n",count,start); 
+        printf("Failed reading %d blocks starting at block 0x%lx\n",count,start); 
         perror("fread");
         return -1;
     }
@@ -35,10 +34,10 @@ int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
     return 0;
 }
 
-int ata_init(void)
+int ata_init(char* filename)
 {
     /* check disk size */
-    file=fopen("disk.img","r+");
+    file=fopen(filename,"r+");
     if(!file) {
         fprintf(stderr, "read_disk() - Could not find \"disk.img\"\n");
         return -1;

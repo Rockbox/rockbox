@@ -1,7 +1,7 @@
 FIRMWARE = ../..
 DRIVERS = ../../drivers
 
-CFLAGS = -g -Wall -DTEST_FAT -I$(DRIVERS) -I$(FIRMWARE)/common -I$(FIRMWARE) -I. -DDEBUG -DCRT_DISPLAY
+CFLAGS = -g -Wall -DTEST_FAT -I. -I$(DRIVERS) -I$(FIRMWARE)/common -I$(FIRMWARE) -DDEBUG -DCRT_DISPLAY
 
 TARGET = fat
 
