@@ -111,29 +111,27 @@ if [ -z "$appsdir" ]; then
   appsdir=`input`
 fi
 
-echo "Firmware directory: $firmdir"
-echo "Apps directory: $appsdir"
-echo "CFLAGS=\"$debug $target\""
-
 pwd=`pwd`;
 
-sed \
- -e "s,@FIRMDIR@,$firmdir,g" \
- -e "s,@APPSDIR@,$appsdir,g" \
- -e "s,@DEBUG@,$debug,g" \
- -e "s,@TARGET@,$target,g" \
- -e "s,@PWD@,$pwd,g" \
-<<EOF > Makefile
+sed > Makefile \
+ -e "s,@FIRMDIR@,${firmdir},g" \
+ -e "s,@APPSDIR@,${appsdir},g" \
+ -e "s,@DEBUG@,${debug},g" \
+ -e "s,@TARGET@,${target},g" \
+ -e "s,@PWD@,${pwd},g" \
+<<EOF 
 FIRMDIR=@FIRMDIR@
 APPSDIR=@APPSDIR@
 DEBUG=@DEBUG@
 TARGET=@TARGET@
-THISDIR=@PWD@
+THISDIR="@PWD@"
 
-CFLAGS=$(DEBUG) $(TARGET)
+CFLAGS="\$(DEBUG) \$(TARGET)"
 
 all:
-	make -C $(FIRMDIR) CFLAGS=$(CFLAGS) OBJDIR=$(THISDIR)
-	make -C $(APPSDIR) CFLAGS=$(CFLAGS) OBJDIR=$(THISDIR)
+	make -C \$(FIRMDIR) CFLAGS=\$(CFLAGS) OBJDIR=\$(THISDIR)
+	make -C \$(APPSDIR) CFLAGS=\$(CFLAGS) OBJDIR=\$(THISDIR)
 
 EOF
+
+echo "Created Makefile"
