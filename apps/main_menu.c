@@ -144,7 +144,7 @@ bool show_info(void)
     bool done = false;
     int key;
     int state = 1;
-    unsigned int size, free;
+    unsigned long size, free;
 
     fat_size( IF_MV2(0,) &size, &free );
     size /= 1024;

@@ -502,9 +502,9 @@ bool dbg_partitions(void)
         struct partinfo* p = disk_partinfo(partition);
 
         lcd_clear_display();
-        snprintf(buf, sizeof buf, "P%d: S:%x", partition, p->start);
+        snprintf(buf, sizeof buf, "P%d: S:%lx", partition, p->start);
         lcd_puts(0, 0, buf);
-        snprintf(buf, sizeof buf, "T:%x %d MB", p->type, p->size / 2048);
+        snprintf(buf, sizeof buf, "T:%x %ld MB", p->type, p->size / 2048);
         lcd_puts(0, 1, buf);
         lcd_update();
         
@@ -1031,7 +1031,7 @@ bool dbg_mas_info(void)
             case 0:
                 mas_readmem(MAS_BANK_D1, 0xff7, &val, 1);
                 lcd_puts(0, 0, "Design Code");
-                snprintf(buf, 32, "%05x      ", val);
+                snprintf(buf, 32, "%05lx      ", val);
                 break;
             case 1:
                 lcd_puts(0, 0, "DC/DC mode ");
@@ -1064,72 +1064,72 @@ bool dbg_mas_info(void)
             case 8:
                 mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &val, 1);
                 lcd_puts(0, 0, "Frame Count");
-                snprintf(buf, 32, "0/300: %04x", val & 0xffff);
+                snprintf(buf, 32, "0/300: %04x", (unsigned int)(val & 0xffff));
                 break;
             case 9:
                 mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, &val, 1);
                 lcd_puts(0, 0, "Status1    ");
-                snprintf(buf, 32, "0/301: %04x", val & 0xffff);
+                snprintf(buf, 32, "0/301: %04x", (unsigned int)(val & 0xffff));
                 break;
             case 10:
                 mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_2, &val, 1);
                 lcd_puts(0, 0, "Status2    ");
-                snprintf(buf, 32, "0/302: %04x", val & 0xffff);
+                snprintf(buf, 32, "0/302: %04x", (unsigned int)(val & 0xffff));
                 break;
             case 11:
                 mas_readmem(MAS_BANK_D0, MAS_D0_CRC_ERROR_COUNT, &val, 1);
                 lcd_puts(0, 0, "CRC Count  ");
-                snprintf(buf, 32, "0/303: %04x", val & 0xffff);
+                snprintf(buf, 32, "0/303: %04x", (unsigned int)(val & 0xffff));
                 break;
             case 12:
                 mas_readmem(MAS_BANK_D0, 0x36d, &val, 1);
                 lcd_puts(0, 0, "PLLOffset48");
-                snprintf(buf, 32, "0/36d %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/36d %05lx", val & 0xfffff);
                 break;
             case 13:
                 mas_readmem(MAS_BANK_D0, 0x32d, &val, 1);
                 lcd_puts(0, 0, "PLLOffset48");
-                snprintf(buf, 32, "0/32d %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/32d %05lx", val & 0xfffff);
                 break;
             case 14:
                 mas_readmem(MAS_BANK_D0, 0x36e, &val, 1);
                 lcd_puts(0, 0, "PLLOffset44");
-                snprintf(buf, 32, "0/36e %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/36e %05lx", val & 0xfffff);
                 break;
             case 15:
                 mas_readmem(MAS_BANK_D0, 0x32e, &val, 1);
                 lcd_puts(0, 0, "PLLOffset44");
-                snprintf(buf, 32, "0/32e %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/32e %05lx", val & 0xfffff);
                 break;
             case 16:
                 mas_readmem(MAS_BANK_D0, 0x36f, &val, 1);
                 lcd_puts(0, 0, "OutputConf ");
-                snprintf(buf, 32, "0/36f %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/36f %05lx", val & 0xfffff);
                 break;
             case 17:
                 mas_readmem(MAS_BANK_D0, 0x32f, &val, 1);
                 lcd_puts(0, 0, "OutputConf ");
-                snprintf(buf, 32, "0/32f %05x", val & 0xfffff);
+                snprintf(buf, 32, "0/32f %05lx", val & 0xfffff);
                 break;
             case 18:
                 mas_readmem(MAS_BANK_D1, 0x7f8, &val, 1);
                 lcd_puts(0, 0, "LL Gain    ");
-                snprintf(buf, 32, "1/7f8 %05x", val & 0xfffff);
+                snprintf(buf, 32, "1/7f8 %05lx", val & 0xfffff);
                 break;
             case 19:
                 mas_readmem(MAS_BANK_D1, 0x7f9, &val, 1);
                 lcd_puts(0, 0, "LR Gain    ");
-                snprintf(buf, 32, "1/7f9 %05x", val & 0xfffff);
+                snprintf(buf, 32, "1/7f9 %05lx", val & 0xfffff);
                 break;
             case 20:
                 mas_readmem(MAS_BANK_D1, 0x7fa, &val, 1);
                 lcd_puts(0, 0, "RL Gain    ");
-                snprintf(buf, 32, "1/7fa %05x", val & 0xfffff);
+                snprintf(buf, 32, "1/7fa %05lx", val & 0xfffff);
                 break;
             case 21:
                 mas_readmem(MAS_BANK_D1, 0x7fb, &val, 1);
                 lcd_puts(0, 0, "RR Gain    ");
-                snprintf(buf, 32, "1/7fb %05x", val & 0xfffff);
+                snprintf(buf, 32, "1/7fb %05lx", val & 0xfffff);
                 break;
             case 22:
                 lcd_puts(0, 0, "L Trailbits");
@@ -1269,7 +1269,7 @@ static bool view_runtime(void)
 
 #ifdef HAVE_MMC
 /* value is 10 * real value */
-static unsigned char prep_value_unit(unsigned int *value,
+static unsigned char prep_value_unit(unsigned long *value,
                                      const unsigned char *units)
 {
     int unit_no = 0;
@@ -1286,7 +1286,7 @@ bool dbg_mmc_info(void)
 {
     bool done = false;
     int currval = 0;
-    unsigned int value;
+    unsigned long value;
     tCardInfo *card;
     unsigned char pbuf[32];
     unsigned char card_name[7];
@@ -1315,23 +1315,23 @@ bool dbg_mmc_info(void)
             {
                 strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
                 snprintf(pbuf, sizeof(pbuf), "%s Rev %d.%d", card_name,
-                         mmc_extract_bits(card->cid, 72, 4),
-                         mmc_extract_bits(card->cid, 76, 4));
+                         (int) mmc_extract_bits(card->cid, 72, 4),
+                         (int) mmc_extract_bits(card->cid, 76, 4));
                 lcd_puts(0, 1, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Prod: %d/%d",
-                         mmc_extract_bits(card->cid, 112, 4),
-                         mmc_extract_bits(card->cid, 116, 4) + 1997);
+                         (int) mmc_extract_bits(card->cid, 112, 4),
+                         (int) mmc_extract_bits(card->cid, 116, 4) + 1997);
                 lcd_puts(0, 2, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Ser#: 0x%08x",
+                snprintf(pbuf, sizeof(pbuf), "Ser#: 0x%08lx",
                          mmc_extract_bits(card->cid, 80, 32));
                 lcd_puts(0, 3, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "M=%02x, O=%04x",
-                         mmc_extract_bits(card->cid, 0, 8),
-                         mmc_extract_bits(card->cid, 8, 16));
+                         (int) mmc_extract_bits(card->cid, 0, 8),
+                         (int) mmc_extract_bits(card->cid, 8, 16));
                 lcd_puts(0, 4, pbuf);
                 value = mmc_extract_bits(card->csd, 54, 12)
                       * (SECTOR_SIZE << (mmc_extract_bits(card->csd, 78, 3)+2));
-                snprintf(pbuf, sizeof(pbuf), "Size: %d MB",
+                snprintf(pbuf, sizeof(pbuf), "Size: %ld MB",
                          value / (1024*1024));
                 lcd_puts(0, 5, pbuf);
             }
@@ -1341,20 +1341,20 @@ bool dbg_mmc_info(void)
                 unit = prep_value_unit(&value, "kMG");
                 if (value < 100)
                     snprintf(pbuf, sizeof(pbuf), "Speed: %d.%01d %cBit/s",
-                             value / 10, value % 10, unit);
+                             (int)(value / 10), (int)(value % 10), unit);
                 else
                     snprintf(pbuf, sizeof(pbuf), "Speed: %d %cBit/s",
-                             value / 10, unit);
+                             (int)(value / 10), unit);
                 lcd_puts(0, 1, pbuf);
 
                 value = card->tsac;
                 unit = prep_value_unit(&value, "nµm");
                 if (value < 100)
                     snprintf(pbuf, sizeof(pbuf), "Tsac: %d.%01d %cs",
-                             value / 10, value % 10, unit);
+                             (int)(value / 10), (int)(value % 10), unit);
                 else
                     snprintf(pbuf, sizeof(pbuf), "Tsac: %d %cs",
-                             value / 10, unit);
+                             (int)(value / 10), unit);
                 lcd_puts(0, 2, pbuf);
 
                 snprintf(pbuf, sizeof(pbuf), "Nsac: %d clk", card->nsac);
@@ -1454,9 +1454,9 @@ static bool dbg_disk_info(void)
                 break;
 
             case 3: {
-                unsigned int free;
+                unsigned long free;
                 fat_size( IF_MV2(0,) NULL, &free );
-                snprintf(buf, sizeof buf, "%d MB",  free / 1024 );
+                snprintf(buf, sizeof buf, "%ld MB",  free / 1024 );
                 lcd_puts(0, y++, "Free");
                 lcd_puts(0, y++, buf);
                 break;

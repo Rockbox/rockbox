@@ -174,7 +174,7 @@ struct plugin_api {
     int (*remove)(const char* pathname);
     int (*rename)(const char* path, const char* newname);
     int (*ftruncate)(int fd, off_t length);
-    int (*filesize)(int fd);
+    long (*filesize)(int fd);
     int (*fprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);

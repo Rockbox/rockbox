@@ -1114,7 +1114,7 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
         
         if (p_run->cfg_val == NULL) /* write as number */
         {
-            fprintf(fd, "%s: %d\r\n", p_run->cfg_name, value);
+            fprintf(fd, "%s: %ld\r\n", p_run->cfg_name, value);
         }
         else /* write as item */
         {
