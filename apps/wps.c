@@ -103,7 +103,7 @@ void player_change_volume(int button)
         if (!exit)
             button = button_get(true);
     }
-    status_draw();
+    status_draw(false);
     wps_refresh(id3,0, WPS_REFRESH_ALL);
 }
 #endif
@@ -443,7 +443,7 @@ static bool update(void)
     if (id3)
         wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
 
-    status_draw();
+    status_draw(false);
 
     /* save resume data */
     if ( id3 &&
@@ -488,7 +488,7 @@ static bool keylock(void)
 #endif
         return false;
     }
-    status_draw();
+    status_draw(false);
     while (button_get(false)); /* clear button queue */
 
     while (!exit) {
@@ -560,7 +560,7 @@ static bool menu(void)
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_param(true);
-    status_draw();
+    status_draw(false);
 #endif
 
     while (!exit) {
@@ -896,7 +896,7 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw();
+                status_draw(false);
                 settings_save();
                 break;
 
@@ -910,7 +910,7 @@ int wps_show(void)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                status_draw();
+                status_draw(false);
                 settings_save();
                 break;
 

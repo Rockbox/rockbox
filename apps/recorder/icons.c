@@ -139,14 +139,6 @@ unsigned char rockbox112x37[]={
 };
 
 /*
- * Wipe statusbar
- */
-void statusbar_wipe(void)
-{
-    lcd_clearrect(0,0,LCD_WIDTH,8);
-}
-
-/*
  * Print battery icon to status bar
  */
 void statusbar_icon_battery(int percent, bool charging)

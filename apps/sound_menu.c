@@ -83,7 +83,7 @@ bool set_sound(char* string,
             }
         }
         lcd_puts(0,1,str);
-        status_draw();
+        status_draw(true);
         lcd_update();
 
         changed = false;

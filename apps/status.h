@@ -35,7 +35,7 @@ void status_set_playmode(enum playmode mode);
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
 #endif
-void status_draw(void);
+void status_draw(bool force_redraw);
 
 #if defined(HAVE_LCD_CHARCELLS)
 void status_set_record(bool b);

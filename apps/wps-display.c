@@ -801,7 +801,7 @@ bool wps_display(struct mp3entry* id3)
 #endif
         global_settings.resume_index = -1;
         status_set_playmode(STATUS_STOP);
-        status_draw();
+        status_draw(true);
         sleep(HZ);
         return true;
     }
@@ -827,7 +827,7 @@ bool wps_display(struct mp3entry* id3)
     }
     yield();
     wps_refresh(id3, 0, WPS_REFRESH_ALL);
-    status_draw();
+    status_draw(true);
     lcd_update();
     return false;
 }

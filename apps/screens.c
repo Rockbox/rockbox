@@ -85,14 +85,14 @@ void usb_display_info(void)
                BMPWIDTH_usb_logo, 8, false);
     lcd_bitmap(usb_logo+BMPWIDTH_usb_logo*3, 6, 40,
                BMPWIDTH_usb_logo, 8, false);
-    status_draw();
+    status_draw(true);
     lcd_update();
 #else
     lcd_puts(0, 0, "[USB Mode]");
     status_set_param(false);
     status_set_audio(false);
     status_set_usb(true);
-    status_draw();
+    status_draw(false);
 #endif
 }
 
@@ -101,9 +101,10 @@ void usb_screen(void)
 #ifndef SIMULATOR
     backlight_on();
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_display_info();
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
         if(usb_inserted()) {
-            usb_display_info();
+            status_draw(false);
         }
     }
 #ifdef HAVE_LCD_CHARCELLS

@@ -147,7 +147,7 @@ bool sleeptimer_screen(void)
             lcd_puts(0, 1, str(LANG_OFF));
         }
 
-        status_draw();
+        status_draw(true);
 
         lcd_update();
     }

@@ -167,7 +167,7 @@ static void menu_draw(int m)
                   LCD_HEIGHT - SCROLLBAR_Y, menus[m].itemcount, menus[m].top,
                   menus[m].top + menu_lines, VERTICAL);
 #endif
-    status_draw();
+    status_draw(true);
     lcd_update();
 }
 
@@ -332,7 +332,7 @@ int menu_show(int m)
                 return MENU_ATTACHED_USB;
         }
         
-        status_draw();
+        status_draw(false);
     }
     return MENU_SELECTED_EXIT;
 }

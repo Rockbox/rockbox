@@ -416,7 +416,7 @@ bool recording_screen(void)
                          global_settings.rec_quality);
                 lcd_puts(0, 6, buf);
 
-                status_draw();
+                status_draw(false);
 
                 lcd_update();
             }

@@ -1609,7 +1609,7 @@ bool set_int(char* string,
         snprintf(str,sizeof str,"%d %s  ", *variable, unit);
         lcd_puts(0, 1, str);
 #ifdef HAVE_LCD_BITMAP
-        status_draw();
+        status_draw(true);
 #endif
         lcd_update();
 
@@ -1699,7 +1699,7 @@ bool set_option(char* string, int* variable, char* options[],
     while ( !done ) {
         lcd_puts(0, 1, options[*variable]);
 #ifdef HAVE_LCD_BITMAP
-        status_draw();
+        status_draw(true);
 #endif
         lcd_update();
 
@@ -1932,7 +1932,7 @@ bool set_time(char* string, int timedate[])
         lcd_puts(0, 4, str(LANG_TIME_SET));
         lcd_puts(0, 5, str(LANG_TIME_REVERT));
 #ifdef HAVE_LCD_BITMAP
-        status_draw();
+        status_draw(true);
 #endif
         lcd_update();
 

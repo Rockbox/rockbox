@@ -494,7 +494,7 @@ static int showdir(char *path, int start)
                   LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);
 #endif
-    status_draw();
+    status_draw(false);
     return filesindir;
 }
 
@@ -511,7 +511,7 @@ bool ask_resume(void)
     lcd_clear_display();
     lcd_puts(0,0,str(LANG_RESUME_ASK));
 #ifdef HAVE_LCD_CHARCELLS
-    status_draw();
+    status_draw(false);
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #else
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_RECORDER));
@@ -621,7 +621,7 @@ void start_resume(void)
         }
 
         status_set_playmode(STATUS_PLAY);
-        status_draw();
+        status_draw(true);
         wps_show();
     }
 }
@@ -839,7 +839,7 @@ bool dirbrowse(char *root)
             case BUTTON_OFF:
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
-                status_draw();
+                status_draw(false);
                 restore = true;
                 break;
 
@@ -996,7 +996,7 @@ bool dirbrowse(char *root)
                         }
 
                         status_set_playmode(STATUS_PLAY);
-                        status_draw();
+                        status_draw(false);
                         lcd_stop_scroll();
                         if ( wps_show() == SYS_USB_CONNECTED ) {
                             reload_root = true;
@@ -1136,7 +1136,7 @@ bool dirbrowse(char *root)
                 break;
 
             case BUTTON_NONE:
-                status_draw();
+                status_draw(false);
                 break;
         }
 
