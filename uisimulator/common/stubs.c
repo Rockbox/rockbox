@@ -231,16 +231,24 @@ int talk_buffer_steal(void)
     return 0;
 }
 
-int talk_id(int id, bool block)
+int talk_id(int id, bool enqueue)
 {
     (void)id;
-    (void)block;
+    (void)enqueue;
     return 0;
 }
 
-int talk_file(char* filename, bool block)
+int talk_file(char* filename, bool enqueue)
 {
     (void)filename;
-    (void)block;
+    (void)enqueue;
+    return 0;
+}
+
+int talk_value(int n, int unit, bool enqueue)
+{
+    (void)n;
+    (void)unit;
+    (void)enqueue;
     return 0;
 }
