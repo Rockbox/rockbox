@@ -110,7 +110,9 @@ static unsigned char sector_buffer[2][(SECTOR_SIZE+4)];
 static int current_buffer = 0;
 
 static tCardInfo card_info[2];
+#ifndef HAVE_MULTIVOLUME
 static int current_card = 0;
+#endif
 static bool last_mmc_status = false;
 static int countdown;  /* for mmc switch debouncing */
 
@@ -620,15 +622,17 @@ int ata_read_sectors(
     unsigned char response;
     void *inbuf_prev = NULL;
     tCardInfo *card;
-#ifdef HAVE_MULTIVOLUME
-    current_card = drive;
-#endif
-    card = &card_info[current_card];
+
     addr = start * SECTOR_SIZE;
 
     mutex_lock(&mmc_mutex);
+#ifdef HAVE_MULTIVOLUME
+    card = &card_info[drive];
+    ret = select_card(drive);
+#else
+    card = &card_info[current_card];
     ret = select_card(current_card);
-
+#endif
     if (ret == 0)
     {
         if (incount == 1)
@@ -678,10 +682,6 @@ int ata_write_sectors(IF_MV2(int drive,)
     unsigned long addr;
     unsigned char response;
     tCardInfo *card;
-#ifdef HAVE_MULTIVOLUME
-    current_card = drive;
-#endif
-    card = &card_info[current_card];
 
     if (start == 0)
         panicf("Writing on sector 0\n");
@@ -689,7 +689,13 @@ int ata_write_sectors(IF_MV2(int drive,)
     addr = start * SECTOR_SIZE;
     
     mutex_lock(&mmc_mutex);
+#ifdef HAVE_MULTIVOLUME
+    card = &card_info[drive];
+    ret = select_card(drive);
+#else
+    card = &card_info[current_card];
     ret = select_card(current_card);
+#endif
 
     if (ret == 0)
     {
@@ -859,6 +865,7 @@ int ata_init(void)
     PBIOR &= ~0x0C00; /* TxD1, RxD1 input */
 
     last_mmc_status = mmc_detect();
+#ifndef HAVE_MULTIVOLUME
     if (last_mmc_status)
     {   /* MMC inserted */
         current_card = 1;
@@ -867,6 +874,7 @@ int ata_init(void)
     {   /* no MMC, use internal memory */
         current_card = 0;
     }
+#endif
 
     ata_enable(true);
     
