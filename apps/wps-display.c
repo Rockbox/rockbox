@@ -478,10 +478,14 @@ static char* get_tag(struct mp3entry* id3,
                     return buf;
 
                 case 't': /* estimated battery time */
-                    snprintf(buf, buf_size, "%dh %dm",
-                             battery_time() / 60,
-                             battery_time() % 60);
+                {
+                    int t = battery_time();
+                    if (t >= 0)
+                        snprintf(buf, buf_size, "%dh %dm", t / 60, t % 60);
+                    else
+                        strncpy(buf, "?h ?m", buf_size);
                     return buf;
+                }
             }
             break;
 

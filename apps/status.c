@@ -175,8 +175,9 @@ void status_draw(bool force_redraw)
         }
 
 #ifdef HAVE_LCD_BITMAP
-        if (battery_state)
+        if (battery_state && (info.battlevel > -1))
             statusbar_icon_battery(info.battlevel, plug_state);
+            
         statusbar_icon_volume(info.volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
         switch (info.repeat) {
@@ -202,6 +203,7 @@ void status_draw(bool force_redraw)
 
 
 #if defined(HAVE_LCD_CHARCELLS)
+    if (info.battlevel > -1)
     lcd_icon(ICON_BATTERY, battery_state);
     lcd_icon(ICON_BATTERY_1, info.battlevel > 25);
     lcd_icon(ICON_BATTERY_2, info.battlevel > 50);

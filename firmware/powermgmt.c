@@ -184,15 +184,13 @@ void battery_level_update(void)
     int c = 0;
     int i;
     
-    /* calculate average over last 3 minutes (skip empty samples) */
+    /* calculate maximum over last 3 minutes (skip empty samples) */
     for (i = 0; i < 3; i++)
-        if (power_history[POWER_HISTORY_LEN-1-i]) {
-            level += power_history[POWER_HISTORY_LEN-1-i];
-            c++;
-        }
+        if (power_history[POWER_HISTORY_LEN-1-i] > c)
+            c = power_history[POWER_HISTORY_LEN-1-i];
         
     if (c)
-        level = level / c;  /* avg */
+        level = c;
     else /* history was empty, get a fresh sample */
         level = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
 
@@ -448,6 +446,12 @@ static void power_thread(void)
     
     while (1)
     {
+        /* never read power while disk is spinning, unless in USB mode */
+        if (ata_disk_is_active() && !usb_inserted()) {
+            sleep(HZ * 2);
+            continue;
+        }
+        
         /* Make POWER_AVG measurements and calculate an average of that to
          * reduce the effect of backlights/disk spinning/other variation.
          */
@@ -777,6 +781,8 @@ void powermgmt_init(void)
     
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
+
+#if 0
     /* initialize the history with a single sample to prevent level
        flickering during the first minute of execution */
     power_history[POWER_HISTORY_LEN-1] =
@@ -797,6 +803,7 @@ void powermgmt_init(void)
     /* if the battery is nearly empty, start charging immediately */
     if (power_history[POWER_HISTORY_LEN-1] < BATTERY_LEVEL_DANGEROUS)
         charger_enable(true);
+#endif
 #endif
 
     create_thread(power_thread, power_stack, sizeof(power_stack),
