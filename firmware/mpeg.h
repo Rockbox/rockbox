@@ -22,7 +22,7 @@
 #include <stdbool.h>
 
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int bass_boost, int avc);
-void mpeg_play(char* trackname);
+void mpeg_play(int offset);
 void mpeg_stop(void);
 void mpeg_pause(void);
 void mpeg_resume(void);

@@ -34,6 +34,7 @@
 #include "powermgmt.h"
 #include "status.h"
 #include "main_menu.h"
+#include "ata.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -462,6 +463,13 @@ int wps_show(void)
                 {
                     mpeg_pause();
                     status_set_playmode(STATUS_PAUSE);
+                    if (global_settings.resume) {
+                        status_draw();
+                        settings_save();
+#ifndef HAVE_RTC
+                        ata_flush();
+#endif
+                    }
                 }
                 else
                 {
@@ -577,7 +585,6 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
-                        status_set_playmode(STATUS_PLAY);
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
@@ -589,7 +596,6 @@ int wps_show(void)
 #endif
                     {
                         mpeg_prev();
-                        status_set_playmode(STATUS_PLAY);
                     }
                 }
 #ifdef HAVE_PLAYER_KEYPAD
@@ -612,7 +618,6 @@ int wps_show(void)
                         mpeg_ff_rewind(ff_rewind_count);
                         ff_rewind_count = 0;
                         ff_rewind = false;
-                        status_set_playmode(STATUS_PLAY);
 #ifdef HAVE_LCD_CHARCELLS
                         draw_screen(id3);
 #endif
@@ -624,7 +629,6 @@ int wps_show(void)
 #endif
                     {
                         mpeg_next();
-                        status_set_playmode(STATUS_PLAY);
                     }
                 }
 #ifdef HAVE_PLAYER_KEYPAD
@@ -862,6 +866,16 @@ int wps_show(void)
                 if (mpeg_is_playing() && id3)
                     display_file_time(id3->elapsed, id3->length);
                 
+                /* save resume data */
+                if ( id3 && 
+                     global_settings.resume &&
+                     global_settings.resume_offset != id3->offset ) {
+                    DEBUGF("R%X,%X (%X)\n",global_settings.resume_offset,id3->offset,id3);
+                    global_settings.resume_index = id3->index;
+                    global_settings.resume_offset = id3->offset;
+                    settings_save();
+                }
+
                 status_draw();
                 break;
         }

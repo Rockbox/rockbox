@@ -57,6 +57,11 @@ static void sort_case(void)
     set_bool( "[Sort case sensitive]", &global_settings.sort_case );
 }
 
+static void resume(void)
+{
+    set_bool( "[Resume]", &global_settings.resume );
+}
+
 static void backlight_timer(void)
 {
     char* names[] = { "off", "on ",
@@ -153,13 +158,13 @@ void settings_menu(void)
         { "Time/Date",       timedate_set    },
 #endif
         { "FF/Rewind",       ff_rewind       },
+        { "Resume",          resume          },
     };
     bool old_shuffle = global_settings.playlist_shuffle;
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
     menu_run(m);
     menu_exit(m);
-    settings_save();
 
     if (old_shuffle != global_settings.playlist_shuffle)
     {

@@ -66,7 +66,7 @@ int playlist_add(char *filename)
     return 0;
 }
 
-char* playlist_next(int steps)
+char* playlist_next(int steps, int* index)
 {
     int seek;
     int max;
@@ -103,7 +103,9 @@ char* playlist_next(int steps)
         else
             return NULL;
     }
-    
+
+    if (index)
+        *index = playlist.index;
 
     /* Zero-terminate the file name */
     seek=0;
@@ -165,7 +167,11 @@ char* playlist_next(int steps)
     }
 }
 
-void play_list(char *dir, char *file, int start_index)
+void play_list(char *dir,
+               char *file, 
+               int start_index, 
+               int start_offset, 
+               int random_seed )
 {
     char *sep="";
     int dirlen;
@@ -211,7 +217,7 @@ void play_list(char *dir, char *file, int start_index)
             status_draw();
             lcd_update();
         }
-        randomise_playlist( current_tick );
+        randomise_playlist( random_seed );
     }
 
     if(!playlist.in_ram) {
@@ -220,7 +226,7 @@ void play_list(char *dir, char *file, int start_index)
         lcd_update();
     }
     /* also make the first song get playing */
-    mpeg_play(playlist_next(0));
+    mpeg_play(start_offset);
 }
 
 /*

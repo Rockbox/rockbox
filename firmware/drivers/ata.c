@@ -304,6 +304,7 @@ extern void ata_delayed_write(unsigned long sector, void* buf)
 extern void ata_flush(void)
 {
     if ( delayed_write ) {
+        DEBUGF("ata_flush()\n");
         delayed_write = false;
         ata_write_sectors(delayed_sector_num, 1, delayed_sector);
     }

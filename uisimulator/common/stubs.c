@@ -80,3 +80,7 @@ void ata_delayed_write(unsigned long sector, void* buf)
 {
     ata_write_sectors(sector,1,buf);
 }
+
+void ata_flush(void)
+{
+}

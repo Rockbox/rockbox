@@ -102,12 +102,14 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_EXIT  BUTTON_LEFT
 #define TREE_ENTER BUTTON_RIGHT
 #define TREE_MENU  BUTTON_F1
+#define RELEASE_MASK (BUTTON_OFF)
 #else
 #define TREE_NEXT  BUTTON_RIGHT
 #define TREE_PREV  BUTTON_LEFT
 #define TREE_EXIT  BUTTON_STOP
 #define TREE_ENTER BUTTON_PLAY
 #define TREE_MENU  BUTTON_MENU
+#define RELEASE_MASK (BUTTON_STOP)
 #endif /* HAVE_RECORDER_KEYPAD */
 
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
@@ -292,6 +294,98 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
+bool ask_resume(void)
+{
+    lcd_clear_display();
+    lcd_puts(0,0,"Resume?");
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_puts(0,1,"(Play/Stop)");
+#else
+    lcd_puts(0,1,"Play = Yes");
+    lcd_puts(0,2,"Any other = No");
+#endif
+    lcd_update();
+    if (button_get(true) == BUTTON_PLAY)
+        return true;
+    return false;
+}
+
+void start_resume(void)
+{
+    if ( global_settings.resume &&
+         global_settings.resume_index != -1 ) {
+        int len = strlen(global_settings.resume_file);
+
+        DEBUGF("Resume file %s\n",global_settings.resume_file);
+        DEBUGF("Resume index %X offset %X\n",
+               global_settings.resume_index,
+               global_settings.resume_offset);
+        DEBUGF("Resume shuffle %s seed %X\n",
+               global_settings.playlist_shuffle?"on":"off",
+               global_settings.resume_seed);
+
+        /* playlist? */
+        if (!strcasecmp(&global_settings.resume_file[len-4], ".m3u")) {
+            char* slash;
+
+            /* check that the file exists */
+            int fd = open(global_settings.resume_file, O_RDONLY);
+            if(fd<0)
+                return;
+            close(fd);
+
+            if (!ask_resume())
+                return;
+            
+            slash = strrchr(global_settings.resume_file,'/');
+            if (slash) {
+                *slash=0;
+                play_list(global_settings.resume_file,
+                          slash+1,
+                          global_settings.resume_index,
+                          global_settings.resume_offset,
+                          global_settings.resume_seed );
+                *slash='/';
+            }
+            else {
+                /* check that the dir exists */
+                DIR* dir = opendir(global_settings.resume_file);
+                if(!dir)
+                    return;
+                closedir(dir);
+
+                if (!ask_resume())
+                    return;
+
+                play_list("/",
+                          global_settings.resume_file,
+                          global_settings.resume_index,
+                          global_settings.resume_offset,
+                          global_settings.resume_seed );
+            }
+        }
+        else {
+            int start_index;
+
+            if (!ask_resume())
+                return;
+
+            if (showdir(global_settings.resume_file, 0) < 0 )
+                return;
+            start_index = build_playlist(global_settings.resume_index);
+            play_list(global_settings.resume_file,
+                      NULL, 
+                      start_index, 
+                      global_settings.resume_offset,
+                      global_settings.resume_seed);
+        }
+
+        status_set_playmode(STATUS_PLAY);
+        status_draw();
+        wps_show();
+    }
+}
+
 bool dirbrowse(char *root)
 {
     int numentries=0;
@@ -316,6 +410,9 @@ bool dirbrowse(char *root)
 #else
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
+
+    start_resume();
+    button_set_release(RELEASE_MASK);
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -350,6 +447,7 @@ bool dirbrowse(char *root)
                     restore = true;
                 }
                 break;
+
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
                 mpeg_stop();
@@ -357,7 +455,15 @@ bool dirbrowse(char *root)
                 status_draw();
                 restore = true;
                 break;
+
+            case BUTTON_OFF | BUTTON_REL:
+#else
+            case BUTTON_STOP | BUTTON_REL:
 #endif
+                global_settings.resume_index = -1;
+                settings_save();
+                break;
+                
 
             case TREE_ENTER:
 #ifdef HAVE_RECORDER_KEYPAD
@@ -383,16 +489,34 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
+                    int seed = current_tick;
                     lcd_stop_scroll();
                     if(dircache[dircursor+start].attr & TREE_ATTR_M3U )
                     {
+                        if ( global_settings.resume )
+                            snprintf(global_settings.resume_file,
+                                     MAX_PATH, "%s/%s",
+                                     currdir,
+                                     dircache[dircursor+start].name);
                         play_list(currdir,
-                                  dircache[dircursor+start].name, 0);
+                                  dircache[dircursor+start].name, 
+                                  0, 0, seed );
                     }
                     else {
+                        if ( global_settings.resume )
+                            strncpy(global_settings.resume_file,
+                                    currdir, MAX_PATH);
                         start_index = build_playlist(dircursor+start);
-                        play_list(currdir, NULL, start_index);
+                        play_list(currdir, NULL, start_index, 0, seed);
                     }
+
+                    if ( global_settings.resume ) {
+                        global_settings.resume_index = 0;
+                        global_settings.resume_offset = 0;
+                        global_settings.resume_seed = seed;
+                        settings_save();
+                    }
+
                     status_set_playmode(STATUS_PLAY);
                     status_draw();
                     lcd_stop_scroll();
@@ -405,6 +529,7 @@ bool dirbrowse(char *root)
                         dirlevel = 0;
                         dircursor = 0;
                         start = 0;
+                        global_settings.resume_index = -1;
                     }
                 }
                 restore = true;

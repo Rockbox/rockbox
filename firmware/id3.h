@@ -47,6 +47,10 @@ struct mp3entry {
     /* these following two fields are used for local buffering */
     char id3v2buf[300];
     char id3v1buf[3][32];
+
+    /* resume related */
+    int offset;            /* bytes played */
+    int index;             /* playlist index */
 };
 
 #define VBR_FRAMES_FLAG 0x01

@@ -37,10 +37,9 @@
 
 struct user_settings global_settings;
 
-static unsigned short last_checksum = 0;
-
 #define CONFIG_BLOCK_VERSION 1
-#define CONFIG_BLOCK_SIZE 44
+#define CONFIG_BLOCK_SIZE 512
+#define RTC_BLOCK_SIZE 44
 
 /********************************************
 
@@ -64,6 +63,8 @@ offset  abs
 0x0f    0x23    <scroll speed & WPS display byte>
 0x10    0x24    <playlist options byte>
 0x11    0x25    <AVC byte>
+0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
+0x16    0x2b    <(int) Byte offset into resume file>
 
         <all unused space filled with 0xff>
 
@@ -81,24 +82,30 @@ location used, and reset the setting in question with a factory default if
 needed. Memory locations not used by a given version should not be
 modified unless the header & checksum test fails.
 
+
+Rest of config block, only saved to disk:
+
+0xF8  (int) Playlist shuffle seed
+0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
+
 *************************************/
 
 #include "rtc.h"
-static unsigned char rtc_config_block[CONFIG_BLOCK_SIZE];
+static unsigned char config_block[CONFIG_BLOCK_SIZE];
 
 /*
- * Calculates the checksum for the config block and places it in the given 2-byte buffer
+ * Calculates the checksum for the config block and returns it
  */
 
-static unsigned short calculate_config_checksum(void)
+static unsigned short calculate_config_checksum(unsigned char* buf)
 {
     unsigned int i;
     unsigned char cksum[2];
     cksum[0] = cksum[1] = 0;
     
-    for (i=0; i < CONFIG_BLOCK_SIZE - 2; i+=2 ) {
-        cksum[0] ^= rtc_config_block[i];
-        cksum[1] ^= rtc_config_block[i+1];
+    for (i=0; i < RTC_BLOCK_SIZE - 2; i+=2 ) {
+        cksum[0] ^= buf[i];
+        cksum[1] ^= buf[i+1];
     }
 
     return (cksum[0] << 8) | cksum[1];
@@ -112,12 +119,12 @@ static void init_config_buffer( void )
     DEBUGF( "init_config_buffer()\n" );
     
     /* reset to 0xff - all unused */
-    memset(rtc_config_block, 0xff, CONFIG_BLOCK_SIZE);
+    memset(config_block, 0xff, CONFIG_BLOCK_SIZE);
     /* insert header */
-    rtc_config_block[0] = 'R';
-    rtc_config_block[1] = 'o';
-    rtc_config_block[2] = 'c';
-    rtc_config_block[3] = CONFIG_BLOCK_VERSION;
+    config_block[0] = 'R';
+    config_block[1] = 'o';
+    config_block[2] = 'c';
+    config_block[3] = CONFIG_BLOCK_VERSION;
 }
 
 /*
@@ -126,7 +133,6 @@ static void init_config_buffer( void )
 static int save_config_buffer( void )
 {
     unsigned short chksum;
-
 #ifdef HAVE_RTC
     unsigned int i;
 #endif
@@ -134,35 +140,28 @@ static int save_config_buffer( void )
     DEBUGF( "save_config_buffer()\n" );
     
     /* update the checksum in the end of the block before saving */
-    chksum = calculate_config_checksum();
-    rtc_config_block[ CONFIG_BLOCK_SIZE - 2 ] = chksum >> 8;
-    rtc_config_block[ CONFIG_BLOCK_SIZE - 1 ] = chksum & 0xff;
-
-    /* don't save if no changes were made */
-    if ( chksum == last_checksum )
-        return 0;
-    last_checksum = chksum;
+    chksum = calculate_config_checksum(config_block);
+    config_block[ RTC_BLOCK_SIZE - 2 ] = chksum >> 8;
+    config_block[ RTC_BLOCK_SIZE - 1 ] = chksum & 0xff;
 
 #ifdef HAVE_RTC    
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
        that it would write a number of bytes at a time since the RTC chip
        supports that, but this will have to do for now 8-) */
-    for (i=0; i < CONFIG_BLOCK_SIZE; i++ ) {
-        int r = rtc_write(0x14+i, rtc_config_block[i]);
+    for (i=0; i < RTC_BLOCK_SIZE; i++ ) {
+        int r = rtc_write(0x14+i, config_block[i]);
         if (r) {
             DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n", 14+i, r );
             return r;
         }
     }
 
-#else
+#endif
 
-    if(battery_level_safe() && (fat_startsector()!=0))
-        ata_delayed_write( 61, rtc_config_block);
+    if (fat_startsector() != 0)
+        ata_delayed_write( 61, config_block);
     else
         return -1;
-
-#endif
 
     return 0;
 }
@@ -173,40 +172,61 @@ static int save_config_buffer( void )
 static int load_config_buffer( void )
 {
     unsigned short chksum;
+    bool correct = false;
 
 #ifdef HAVE_RTC
     unsigned int i;
+    unsigned char rtc_block[RTC_BLOCK_SIZE];
 #endif
     
     DEBUGF( "load_config_buffer()\n" );
 
+    if (fat_startsector() != 0) {
+        ata_read_sectors( 61, 1,  config_block);
+
+        /* calculate the checksum, check it and the header */
+        chksum = calculate_config_checksum(config_block);
+        
+        if (config_block[0] == 'R' &&
+            config_block[1] == 'o' &&
+            config_block[2] == 'c' &&
+            config_block[3] == CONFIG_BLOCK_VERSION &&
+            (chksum >> 8) == config_block[RTC_BLOCK_SIZE - 2] &&
+            (chksum & 0xff) == config_block[RTC_BLOCK_SIZE - 1])
+        {
+            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
+            correct = true;
+        }
+    }
+
 #ifdef HAVE_RTC    
-    /* FIXME: the same comment applies here as for rtc_write */
-    for (i=0; i < CONFIG_BLOCK_SIZE; i++ )
-        rtc_config_block[i] = rtc_read(0x14+i);
-#else
-    ata_read_sectors( 61, 1,  rtc_config_block);
+    /* read rtc block */
+    for (i=0; i < RTC_BLOCK_SIZE; i++ )
+        rtc_block[i] = rtc_read(0x14+i);
+
+    chksum = calculate_config_checksum(rtc_block);
+    
+    /* if rtc block is ok, use that */
+    if (rtc_block[0] == 'R' &&
+        rtc_block[1] == 'o' &&
+        rtc_block[2] == 'c' &&
+        rtc_block[3] == CONFIG_BLOCK_VERSION &&
+        (chksum >> 8) == rtc_block[RTC_BLOCK_SIZE - 2] &&
+        (chksum & 0xff) == rtc_block[RTC_BLOCK_SIZE - 1])
+    {
+        memcpy(config_block, rtc_block, RTC_BLOCK_SIZE);
+        correct = true;
+    }
 #endif
     
-    /* calculate the checksum, check it and the header */
-    chksum = calculate_config_checksum();
-    
-    if (rtc_config_block[0] == 'R' &&
-        rtc_config_block[1] == 'o' &&
-        rtc_config_block[2] == 'c' &&
-        rtc_config_block[3] == CONFIG_BLOCK_VERSION &&
-        (chksum >> 8) == rtc_config_block[CONFIG_BLOCK_SIZE - 2] &&
-        (chksum & 0xff) == rtc_config_block[CONFIG_BLOCK_SIZE - 1])
-    {
-        DEBUGF( "load_config_buffer: header & checksum test ok\n" );
-        last_checksum = chksum;
-        return 0; /* header and checksum is valid */
+    if ( !correct ) {
+        /* if checksum is not valid, clear the config buffer */
+        DEBUGF( "load_config_buffer: header & checksum test failed\n" );
+        init_config_buffer();
+        return -1;
     }
-    
-    /* if checksum is not valid, initialize the config buffer to all-unused */
-    DEBUGF( "load_config_buffer: header & checksum test failed\n" );
-    init_config_buffer();
-    return 1;
+
+    return 0;
 }
 
 /*
@@ -218,33 +238,47 @@ int settings_save( void )
     
     /* update the config block buffer with current
        settings and save the block in the RTC */
-    rtc_config_block[0x4] = (unsigned char)global_settings.volume;
-    rtc_config_block[0x5] = (unsigned char)global_settings.balance;
-    rtc_config_block[0x6] = (unsigned char)global_settings.bass;
-    rtc_config_block[0x7] = (unsigned char)global_settings.treble;
-    rtc_config_block[0x8] = (unsigned char)global_settings.loudness;
-    rtc_config_block[0x9] = (unsigned char)global_settings.bass_boost;
+    config_block[0x4] = (unsigned char)global_settings.volume;
+    config_block[0x5] = (unsigned char)global_settings.balance;
+    config_block[0x6] = (unsigned char)global_settings.bass;
+    config_block[0x7] = (unsigned char)global_settings.treble;
+    config_block[0x8] = (unsigned char)global_settings.loudness;
+    config_block[0x9] = (unsigned char)global_settings.bass_boost;
     
-    rtc_config_block[0xa] = (unsigned char)global_settings.contrast;
-    rtc_config_block[0xb] = (unsigned char)global_settings.backlight;
-    rtc_config_block[0xc] = (unsigned char)global_settings.poweroff;
-    rtc_config_block[0xd] = (unsigned char)global_settings.resume;
+    config_block[0xa] = (unsigned char)global_settings.contrast;
+    config_block[0xb] = (unsigned char)global_settings.backlight;
+    config_block[0xc] = (unsigned char)global_settings.poweroff;
+    config_block[0xd] = (unsigned char)global_settings.resume;
     
-    rtc_config_block[0xe] = (unsigned char)
+    config_block[0xe] = (unsigned char)
         ((global_settings.playlist_shuffle & 1) |
          ((global_settings.mp3filter & 1) << 1) |
          ((global_settings.sort_case & 1) << 2) |
          ((global_settings.discharge & 1) << 3) |
          ((global_settings.statusbar & 1) << 4));
 
-    rtc_config_block[0xf] = (unsigned char)
+    config_block[0xf] = (unsigned char)
         ((global_settings.scroll_speed << 3) |
          (global_settings.wps_display & 7));
     
-    rtc_config_block[0x11] = (unsigned char)global_settings.avc;
+    config_block[0x10] = (unsigned char)global_settings.ff_rewind;
+    config_block[0x11] = (unsigned char)global_settings.avc;
     
-    memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
+    memcpy(&config_block[0x12], &global_settings.resume_index, 4);
+    memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
+    memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
+
+    memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
+    strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
     
+    DEBUGF("+Resume file %s\n",global_settings.resume_file);
+    DEBUGF("+Resume index %X offset %X\n",
+           global_settings.resume_index,
+           global_settings.resume_offset);
+    DEBUGF("+Resume shuffle %s seed %X\n",
+           global_settings.playlist_shuffle?"on":"off",
+           global_settings.resume_seed);
+
     if(save_config_buffer())
     {
         lcd_clear_display();
@@ -277,51 +311,65 @@ void settings_load(void)
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
     if (!load_config_buffer()) {
-        if (rtc_config_block[0x4] != 0xFF)
-            global_settings.volume = rtc_config_block[0x4];
-        if (rtc_config_block[0x5] != 0xFF)
-            global_settings.balance = rtc_config_block[0x5];
-        if (rtc_config_block[0x6] != 0xFF)
-            global_settings.bass = rtc_config_block[0x6];
-        if (rtc_config_block[0x7] != 0xFF)
-            global_settings.treble = rtc_config_block[0x7];
-        if (rtc_config_block[0x8] != 0xFF)
-            global_settings.loudness = rtc_config_block[0x8];
-        if (rtc_config_block[0x9] != 0xFF)
-            global_settings.bass_boost = rtc_config_block[0x9];
+        if (config_block[0x4] != 0xFF)
+            global_settings.volume = config_block[0x4];
+        if (config_block[0x5] != 0xFF)
+            global_settings.balance = config_block[0x5];
+        if (config_block[0x6] != 0xFF)
+            global_settings.bass = config_block[0x6];
+        if (config_block[0x7] != 0xFF)
+            global_settings.treble = config_block[0x7];
+        if (config_block[0x8] != 0xFF)
+            global_settings.loudness = config_block[0x8];
+        if (config_block[0x9] != 0xFF)
+            global_settings.bass_boost = config_block[0x9];
     
-        if (rtc_config_block[0xa] != 0xFF) {
-            global_settings.contrast = rtc_config_block[0xa];
+        if (config_block[0xa] != 0xFF) {
+            global_settings.contrast = config_block[0xa];
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
                 global_settings.contrast = DEFAULT_CONTRAST_SETTING;
         }
-        if (rtc_config_block[0xb] != 0xFF)
-            global_settings.backlight = rtc_config_block[0xb];
-        if (rtc_config_block[0xc] != 0xFF)
-            global_settings.poweroff = rtc_config_block[0xc];
-        if (rtc_config_block[0xd] != 0xFF)
-            global_settings.resume = rtc_config_block[0xd];
-        if (rtc_config_block[0xe] != 0xFF) {
-            global_settings.playlist_shuffle = rtc_config_block[0xe] & 1;
-            global_settings.mp3filter = (rtc_config_block[0xe] >> 1) & 1;
-            global_settings.sort_case = (rtc_config_block[0xe] >> 2) & 1;
-            global_settings.discharge = (rtc_config_block[0xe] >> 3) & 1;
-            global_settings.statusbar = (rtc_config_block[0xe] >> 4) & 1;
+        if (config_block[0xb] != 0xFF)
+            global_settings.backlight = config_block[0xb];
+        if (config_block[0xc] != 0xFF)
+            global_settings.poweroff = config_block[0xc];
+        if (config_block[0xd] != 0xFF)
+            global_settings.resume = config_block[0xd];
+        if (config_block[0xe] != 0xFF) {
+            global_settings.playlist_shuffle = config_block[0xe] & 1;
+            global_settings.mp3filter = (config_block[0xe] >> 1) & 1;
+            global_settings.sort_case = (config_block[0xe] >> 2) & 1;
+            global_settings.discharge = (config_block[0xe] >> 3) & 1;
+            global_settings.statusbar = (config_block[0xe] >> 4) & 1;
         }
         
-        c = rtc_config_block[0xf] >> 3;
+        c = config_block[0xf] >> 3;
         if (c != 31)
             global_settings.scroll_speed = c;
 
-        c = rtc_config_block[0xf] & 7;
+        c = config_block[0xf] & 7;
         if (c != 7)
             global_settings.wps_display = c;
         
-        if (rtc_config_block[0x11] != 0xFF)
-            global_settings.avc = rtc_config_block[0x11];
+        if (config_block[0x10] != 0xFF)
+            global_settings.ff_rewind = config_block[0x10];
 
-        if (rtc_config_block[0x24] != 0xFF)
-            memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
+        if (config_block[0x11] != 0xFF)
+            global_settings.avc = config_block[0x11];
+
+        if (config_block[0x12] != 0xFF)
+            memcpy(&global_settings.resume_index, &config_block[0x12], 4);
+
+        if (config_block[0x16] != 0xFF)
+            memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
+
+        memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
+
+        if (config_block[0x24] != 0xFF)
+            memcpy(&global_settings.total_uptime, &config_block[0x24], 4);
+
+        strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
+        global_settings.resume_file[MAX_PATH]=0;
     }
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
@@ -345,6 +393,7 @@ void settings_reset(void) {
     global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
     global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
+    global_settings.resume      = true;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
@@ -358,6 +407,8 @@ void settings_reset(void) {
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
     global_settings.ff_rewind    = DEFAULT_FF_REWIND_SETTING;
+    global_settings.resume_index = -1;
+    global_settings.resume_offset = -1;
 }
 
 

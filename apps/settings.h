@@ -21,6 +21,7 @@
 #define __SETTINGS_H__
 
 #include <stdbool.h>
+#include "file.h"
 
 /* data structures */
 
@@ -49,8 +50,11 @@ struct user_settings
 
     /* resume settings */
 
-    int resume;     /* power-on song resume: 0=no. 1=yes song. 2=yes pl   */
-    int track_time; /* number of seconds into the track to resume         */
+    bool resume;       /* resume option on/off */
+    int resume_index;  /* index in playlist (-1 for no active resume) */
+    int resume_offset; /* byte offset in mp3 file */
+    int resume_seed;   /* random seed for playlist shuffle */
+    unsigned char resume_file[MAX_PATH+1]; /* playlist name (or dir) */
 
     /* misc options */
 
