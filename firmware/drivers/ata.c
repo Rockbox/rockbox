@@ -243,7 +243,7 @@ bool old_recorder = false;
 int ata_spinup_time = 0;
 static bool spinup = false;
 static bool sleeping = true;
-static int sleep_timeout = 5*HZ;
+static long sleep_timeout = 5*HZ;
 static bool poweroff = false;
 #ifdef HAVE_ATA_POWER_OFF
 static int poweroff_timeout = 2*HZ;
@@ -270,7 +270,7 @@ static int set_features(void);
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
-    int timeout = current_tick + HZ*30;
+    long timeout = current_tick + HZ*30;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
         last_disk_activity = current_tick;
         yield();
@@ -285,7 +285,7 @@ static int wait_for_bsy(void)
 static int wait_for_rdy(void) __attribute__ ((section (".icode")));
 static int wait_for_rdy(void)
 {
-    int timeout;
+    long timeout;
 
     if (!wait_for_bsy())
         return 0;
@@ -479,7 +479,7 @@ int ata_read_sectors(IF_MV2(int drive,)
                      void* inbuf)
 {
     int ret = 0;
-    int timeout;
+    long timeout;
     int count;
     void* buf;
     long spinup_start;
@@ -762,7 +762,7 @@ int ata_write_sectors(IF_MV2(int drive,)
 {
     int i;
     int ret = 0;
-    int spinup_start;
+    long spinup_start;
 
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */

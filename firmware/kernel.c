@@ -289,7 +289,7 @@ static void tick_start(unsigned int interval_in_ms)
 
     if(count > 0xffffL)
     {
-        panicf("Error! The tick interval is too long (%dms->%x)\n",
+        panicf("Error! The tick interval is too long (%dms->%lx)\n",
                interval_in_ms, count);
         return;
     }

@@ -43,7 +43,7 @@ static int format(
     char *str;
     char tmpbuf[12], pad;
     int ch, width, val, sign;
-    long lval;
+    long lval, lsign;
     unsigned int uval;
     unsigned long ulval;
     bool ok = true;
@@ -116,7 +116,7 @@ static int format(
                     while (ulval);
                     break;
                 case 'd':
-                    lval = sign = va_arg (ap, long);
+                    lval = lsign = va_arg (ap, long);
                     if (lval < 0)
                         lval = -lval;
                     do
@@ -125,7 +125,7 @@ static int format(
                         lval /= 10;
                     }
                     while (lval > 0);
-                    if (sign < 0)
+                    if (lsign < 0)
                         *--str = '-';
                     break;
 

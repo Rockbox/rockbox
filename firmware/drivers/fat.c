@@ -629,7 +629,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
                            sectorbuf);
     if(rc < 0)
     {
-        panicf("flush_fat_sector() - Could not write sector %d"
+        panicf("flush_fat_sector() - Could not write sector %ld"
                " (error %d)\n",
                secnum, rc);
     }
@@ -649,7 +649,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
                                secnum, 1, sectorbuf);
         if(rc < 0)
         {
-            panicf("flush_fat_sector() - Could not write sector %d"
+            panicf("flush_fat_sector() - Could not write sector %ld"
                    " (error %d)\n",
                    secnum, rc);
         }
@@ -832,15 +832,15 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
     {
         long sector = entry / CLUSTERS_PER_FAT_SECTOR;
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-        long unsigned int* sec;
+        unsigned long* sec;
 
         LDEBUGF("update_fat_entry(%lx,%lx)\n",entry,val);
 
         if (entry==val)
-            panicf("Creating FAT loop: %x,%x\n",entry,val);
+            panicf("Creating FAT loop: %lx,%lx\n",entry,val);
 
         if ( entry < 2 )
-            panicf("Updating reserved FAT entry %d.\n",entry);
+            panicf("Updating reserved FAT entry %ld.\n",entry);
 
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
@@ -2012,9 +2012,9 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
             firstallowed = fat_bpb->firstdatasector;
             
         if (start < firstallowed)
-            panicf("Write %d before data\n", firstallowed - start);
+            panicf("Write %ld before data\n", firstallowed - start);
         if (start + count > fat_bpb->totalsectors)
-            panicf("Write %d after data\n",
+            panicf("Write %ld after data\n",
                 start + count - fat_bpb->totalsectors);
         rc = ata_write_sectors(IF_MV2(fat_bpb->drive,)
                                start + fat_bpb->startsector, count, buf);

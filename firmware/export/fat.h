@@ -68,7 +68,7 @@ struct fat_dir
 {
     unsigned int entry;
     unsigned int entrycount;
-    int sector;
+    long sector;
     struct fat_file file;
     unsigned char sectorcache[3][SECTOR_SIZE];
 };
