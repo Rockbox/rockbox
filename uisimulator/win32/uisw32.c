@@ -60,10 +60,13 @@ LRESULT CALLBACK GUIWndProc (
     static HBITMAP hBkgnd;
     static HDC hMemDc;
 
+    static LARGE_INTEGER    persec, tick1, ticknow;
+
     switch (uMsg)
     {
     case WM_TIMER:
-        current_tick++;
+        QueryPerformanceCounter(&ticknow);
+        current_tick = ((ticknow.QuadPart-tick1.QuadPart)*HZ)/persec.QuadPart;
         return TRUE;
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE)
@@ -72,7 +75,10 @@ LRESULT CALLBACK GUIWndProc (
             bActive = false;
         return TRUE;
     case WM_CREATE:
-        SetTimer (hWnd, TIMER_EVENT, 50, NULL);
+        QueryPerformanceFrequency(&persec);
+        QueryPerformanceCounter(&tick1);
+        SetTimer (hWnd, TIMER_EVENT, 1, NULL);
+        
         // load background image
         hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL), MAKEINTRESOURCE(IDB_UI),
             IMAGE_BITMAP, 0, 0, LR_VGACOLOR);
@@ -190,14 +196,15 @@ LRESULT CALLBACK GUIWndProc (
 
             GetClientRect (hWnd, &r);
             // draw lcd screen
-			StretchDIBits (hDc,
-                UI_LCD_POSX * r.right / UI_WIDTH,
-                UI_LCD_POSY * r.bottom / UI_HEIGHT,
-                UI_LCD_WIDTH * r.right / UI_WIDTH, 
-                UI_LCD_HEIGHT * r.bottom / UI_HEIGHT,
-				0, 0, LCD_WIDTH, LCD_HEIGHT,
-				bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS, SRCCOPY);
-
+            StretchDIBits (hDc,
+                           UI_LCD_POSX * r.right / UI_WIDTH,
+                           UI_LCD_POSY * r.bottom / UI_HEIGHT,
+                           UI_LCD_WIDTH * r.right / UI_WIDTH, 
+                           UI_LCD_HEIGHT * r.bottom / UI_HEIGHT,
+                           0, 0, LCD_WIDTH, LCD_HEIGHT,
+                           bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS,
+                           SRCCOPY);
+            
             EndPaint (hWnd, &ps);
             return TRUE;
         }
@@ -243,12 +250,13 @@ BOOL GUIStartup ()
 
     // create window
     hGUIWnd = CreateWindowEx (
-        WS_EX_TOOLWINDOW | WS_EX_OVERLAPPEDWINDOW,
+        WS_EX_OVERLAPPEDWINDOW,
         "RockBoxUISimulator", "ARCHOS JukeBox",
         WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         UI_WIDTH + GetSystemMetrics (SM_CXSIZEFRAME) * 2 +4,
-        UI_HEIGHT + GetSystemMetrics (SM_CYSIZEFRAME) * 2 + GetSystemMetrics (SM_CYSMCAPTION) +4,
+        UI_HEIGHT + GetSystemMetrics (SM_CYSIZEFRAME) * 2 +
+        GetSystemMetrics (SM_CYSMCAPTION) +4,
         NULL, NULL, GetModuleHandle (NULL), NULL);
 
     if (hGUIWnd == NULL)
