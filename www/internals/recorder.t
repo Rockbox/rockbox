@@ -24,5 +24,8 @@ Outside view of the MP3REAR board
 <p><a href="rec_rear_bottom.jpg"><img src="rec_rear_bottom_t.jpg"></a><br>
 Inside view of the MP3REAR board
 
+<p><a href="rec_lcd.jpg"><img src="rec_lcd_t.jpg"></a><br>
+The LCD
+
 
 #include "foot.t"

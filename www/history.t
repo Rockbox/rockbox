@@ -2,6 +2,15 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
+
+<p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
+
+<p><i>2003-04-23</i>: <a href="/digest/">The Rockbox Digest</a> - track
+Rockbox development.
+
+<p><i>2003-04-15</i>: Version 2.0 is <a href="/download/">released</a>
+
 <p><i>2003-02-14</i>: Matthew P. O'Reilly gave Linus an FM Recorder  for his birthday!
 Linus had it for 2 hours before he took it apart and started drawing schematics...
 

@@ -27,6 +27,7 @@
 <li>Uwe Freese modified his recorder to be able to
 <a href="http://www.uwe-freese.de/rockbox/rtc_alarm_en.html">
 power-on from the RTC alarm</a>.
+<li><a href="http://www.geocities.com/raichea/">Steve Russell's PIC-based remote control</a>
 </ul>
 
 <p><img src="esd.jpg">

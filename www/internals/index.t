@@ -32,4 +32,8 @@
  Roland's "undressed" archos:<br>
 <a href="micromusic_archos_jb20rec.jpg"><img src="small-micromusic_archos_jb20rec.jpg" border="0"></a>
 
+<p>
+ Sa'ad Saeed's tribute to Rockbox:<br>
+<a href="archos_radiosity20.jpg"><img src="archos_radiosity20.thumb.jpg" border="0"></a>
+
 #include "foot.t"

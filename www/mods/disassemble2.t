@@ -6,6 +6,8 @@
 <p><img src="a2.jpg">
 <br>
 Locate the three solder points where the top board is soldered to the frame.
+
+<p>On some units the there are also two additional solder points (green circles) where the top board is soldered to the "MP3REAR" board.
 <hr>
 
 <p><img src="a3.jpg">

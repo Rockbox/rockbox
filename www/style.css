@@ -20,7 +20,7 @@ H2 {
  font-size:        14pt;
 }
 
-H3, div.h5 {
+H3, div.h5, .newsdate {
  text-decoration:  none;
  font-family:      Verdana,Arial,Helvetica,sans-serif;
  font-style:       normal;

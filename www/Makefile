@@ -28,6 +28,7 @@ all: $(OBJS)
 	@(cd lang; $(MAKE))
 	@(cd tshirt-contest; $(MAKE))
 	@(cd screenshots; $(MAKE))
+	@(cd digest; $(MAKE))
 
 main.html: main.t activity.html
 

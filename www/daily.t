@@ -8,13 +8,14 @@ The top line is the latest.
 
 <p>
 <!--#exec cmd="./dailymod.pl" -->
+#if 0
 <p>
 <b>mod</b> - The file you should name "archos.mod" before copying it to the root of your archos.<br>
 <b>ajz</b> - The file you should name "ajbrec.ajz" before copying it to the root of your archos.<br>
 <b>rocks</b> - All plugins for this particular release of Rockbox.<br>
 <b>full</b> - Full zip archive, with rockbox, plugins, languages, docs, fonts, ucl etc.<br>
 <b>ucl</b> - File to use when <a href="/docs/flash.html">flashing Rockbox</a>
-
+#endif
 <h2>Source tarballs</h2>
 
 <!--#exec cmd="./dailysrc.pl" -->
@@ -65,6 +66,8 @@ The batch timestamp is GMT.
 <td>
 <a href="auto/build-fmrecorder/ajbrec.ajz">FM Recorder</a>
 (<a href="auto/build-fmrecorder/rocks.zip">rocks</a>)<br>
+<a href="auto/build-recorderv2/ajbrec.ajz">V2 Recorder</a>
+(<a href="auto/build-recorderv2/rocks.zip">rocks</a>)<br>
 <a href="auto/build-recorder8mb/ajbrec.ajz">8MB Recorder</a>
 (<a href="auto/build-recorder8mb/rocks.zip">rocks</a>)<br>
 </td>

@@ -9,7 +9,7 @@ closedir DIR;
 
 print "<ul>\n";
 
-for ( @tarballs ) {
+for ( sort {$b <=> $a} @tarballs ) {
     $size = (stat("$basedir/$_"))[7];
     $log = "";
     if (/-(\d+)/) {

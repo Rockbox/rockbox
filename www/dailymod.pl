@@ -2,7 +2,7 @@
 
 my $basedir = "/home/dast/rockbox-build/daily-build";
 
-my @list=("player", "recorder", "fmrecorder", "recorder8mb");
+my @list=("player", "recorder", "fmrecorder", "recorderv2", "recorder8mb");
 
 for(@list) {
     my $dir = $_;
@@ -17,10 +17,14 @@ for(@list) {
     }
 }
 
-print "<table class=rockbox><tr><th>date</th>";
+print "<table class=rockbox>\n";
 
-for(@list) {
-    print "<th>$_</th>";
+if (0) {
+    print "<tr><th>date</th>";
+
+    for(@list) {
+        print "<th>$_</th>";
+    }
 }
 
 for(reverse sort keys %date) {
@@ -35,47 +39,9 @@ for(reverse sort keys %date) {
         my $n=0;
         my $m = $_;
         print "<td> ";
-        # old mod
-        if( -f "daily/$_/rockbox${d}.mod") {
-            print "<a href=\"daily/$_/rockbox${d}.mod\">mod</a>";
-            $n++;
-        }
-        # new mod
-        if( -f "daily/$_/rockbox-$m-${d}.mod") {
-            print "<a href=\"daily/$m/rockbox-$m-${d}.mod\">mod</a>";
-            $n++;
-        }
-        # old ajz
-        if( -f "daily/$_/rockbox${d}.ajz") {
-            printf "%s<a href=\"daily/$_/rockbox${d}.ajz\">ajz</a>",
-            $n?", ":"";
-            $n++;
-        }
-        # new ajz
-        if( -f "daily/$m/rockbox-$m-${d}.ajz") {
-            printf "%s<a href=\"daily/$m/rockbox-$m-${d}.ajz\">ajz</a>",
-            $n?", ":"";
-            $n++;
-        }
-        if( -f "daily/$_/rocks${d}.zip") {
-            printf "%s<a href=\"daily/$_/rocks${d}.zip\">rocks</a>",
-            $n?", ":"";
-            $n++;
-        }
-        # old-style full zip
-        if( -f "daily/$_/rockbox-${d}.zip") {
-            printf "%s<a href=\"daily/$_/rockbox-${d}.zip\">full</a>",
-            $n?", ":"";
-            $n++;
-        }
         # new-style full zip:
         if( -f "daily/$m/rockbox-${m}-${d}.zip") {
-            printf "%s<a href=\"daily/$_/rockbox-${m}-${d}.zip\">full</a>",
-            $n?", ":"";
-            $n++;
-        }
-        if( -f "daily/$_/rockbox${d}.ucl") {
-            printf "%s<a href=\"daily/$_/rockbox${d}.ucl\">ucl</a>",
+            printf "%s<a href=\"daily/$_/rockbox-${m}-${d}.zip\">${m}</a>",
             $n?", ":"";
             $n++;
         }

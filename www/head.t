@@ -40,6 +40,7 @@
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
 <a class="menulink" href="/bugs.shtml">bug reports</a><br>
 <a class="menulink" href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patches</a><br>
+<a class="menulink" href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">CVS</a><br>
 <a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
@@ -48,12 +49,11 @@
 <input value="Search" type=submit>
 <input type=hidden name=as_sitesearch value="rockbox.haxx.se">
 </form>
-<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/"><img src="/viewcvs.png" width="128" height="48" border="0" alt="View CVS"></a>
-
-<br><a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
 <a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36></a>
+
+<p><a href="http://sourceforge.net/projects/rockbox/"><img src="http://sourceforge.net/sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_xclick">

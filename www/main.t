@@ -4,7 +4,7 @@
 #include "head.t"
 
 <p class="ingress"> Rockbox is an Open Source replacement firmware for the
-Archos Jukebox 5000, 6000, Studio, Recorder and FM Recorder MP3 players.
+Archos Jukebox 5000, 6000, Studio, Recorder, FM Recorder and Recorder V2 MP3 players.
 
 <p> Rockbox is a complete rewrite and uses no fragments of the original
 firmware. It boasts <a href="/docs/features.html">numerous features</a> while
@@ -14,36 +14,14 @@ remaining <a href="http://rockbox.haxx.se/manual/manual.pdf">easy to use</a>.
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
-<p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works!
+<p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
 
-<p><i>2003-06-30</i>: The plugin loader is now <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-06/0707.shtml">alive</a>!
+<p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works
 
-<p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
-
-<p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
-
-<p><i>2003-04-23</i>: <a href="/digest/">The Rockbox Digest</a> - track
-Rockbox development.
-
-<p><i>2003-04-15</i>: Version 2.0 is <a href="/download/">released</a>
+<p><i>2003-06-30</i>: The plugin loader is now <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-06/0707.shtml">alive</a>
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
-
-<h2>Roadmap</h2>
-<p>This is a rough indication of which features we plan/expect/hope to be
-included in which versions. Naturally, this is all subject to change without
-notice.
-
-<dl>
-<dt><b>Version 2.1</b>
-<dd> Lots of features and fixes that were held off for 2.0
-<br> Plugin loader, opening the door for a bucketful of new applications
-
-<dt><b>Version 2.2</b>
-<dd> User interface overhaul
-
-</dl>
 
 <h2>Recent CVS activity</h2>
 <p>
