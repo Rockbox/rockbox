@@ -670,6 +670,8 @@ static char* select_bookmark(const char* bookmark_file_name)
 
 #if CONFIG_KEYPAD == ONDIO_PAD
             case BUTTON_MENU | BUTTON_RIGHT:
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+            case BUTTON_ON | BUTTON_SELECT:
 #else
             case BUTTON_ON | BUTTON_PLAY:
 #endif
