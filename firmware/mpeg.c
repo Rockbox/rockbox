@@ -27,7 +27,6 @@
 #include "thread.h"
 #include "panic.h"
 #include "file.h"
-#include "settings.h"
 #include "id3.h"
 
 #define MPEG_STACK_SIZE 0x2000
@@ -672,7 +671,7 @@ void mpeg_treble(int percent)
 #endif
 }
 
-void mpeg_init(void)
+void mpeg_init(int volume, int bass, int treble)
 {
 #ifdef ARCHOS_RECORDER
     int rc;
@@ -737,8 +736,7 @@ void mpeg_init(void)
     dac_config(0x04); /* DAC on, all else off */
 #endif
     
-    mpeg_bass(DEFAULT_BASS_SETTING);
-    mpeg_treble(DEFAULT_TREBLE_SETTING);
-    mpeg_volume(DEFAULT_VOLUME_SETTING);
-
+    mpeg_bass(bass);
+    mpeg_treble(treble);
+    mpeg_volume(volume);
 }

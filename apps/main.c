@@ -103,7 +103,9 @@ void init(void)
     backlight_init();
 
     button_init();
-    mpeg_init();
+    mpeg_init( DEFAULT_VOLUME_SETTING,
+               DEFAULT_BASS_SETTING,
+               DEFAULT_TREBLE_SETTING );
 }
 
 int main(void)

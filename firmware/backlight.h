@@ -23,5 +23,6 @@ void backlight_init(void);
 void backlight_on(void);
 void backlight_off(void);
 void backlight_tick(void);
+void backlight_time(int seconds);
 
 #endif

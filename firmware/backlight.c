@@ -24,7 +24,6 @@
 #include "i2c.h"
 #include "debug.h"
 #include "rtc.h"
-#include "settings.h"
 
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
@@ -34,6 +33,7 @@ static char backlight_stack[0x100];
 static struct event_queue backlight_queue;
 
 static int backlight_timer;
+static int backlight_timeout = 5;
 
 void backlight_thread(void)
 {
@@ -45,7 +45,7 @@ void backlight_thread(void)
         switch(ev.id)
         {
             case BACKLIGHT_ON:
-                backlight_timer = HZ*global_settings.backlight;
+                backlight_timer = HZ*backlight_timeout;
                 if(backlight_timer)
                 {
 #ifdef HAVE_RTC
@@ -74,6 +74,12 @@ void backlight_on(void)
 void backlight_off(void)
 {
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
+}
+
+void backlight_time(int seconds)
+{
+    backlight_timeout = seconds;
+    backlight_on();
 }
 
 void backlight_tick(void)
