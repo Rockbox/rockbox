@@ -148,6 +148,8 @@ int lcd_default_contrast(void)
 {
 #ifdef SIMULATOR
     return 30;
+#elif defined(LCD_GMINI100)
+    return 31;
 #else
     return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
 #endif
