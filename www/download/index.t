@@ -6,8 +6,7 @@
 
 <p>Please read the <a href="rockbox-2.2-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
-<p>Make sure you download the correct file for your specific archos model
-(<a href="/docs/devicechart.html">see chart here</a>):
+<p>Make sure you download the correct file for your specific archos model:
 <table class=rockbox><tr>
 <th>player</th>
 <th>recorder</th>
@@ -15,33 +14,33 @@
 <th>recorder v2</th>
 </tr><tr  valign=top>
 <td>
-<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg></a><br>
+<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg align=left></a><br>
 Archos Jukebox 5000, 6000 and Studio models
 
-<p><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
+<br clear=all><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
 <br>(189 KB)
 
 </td><td>
-<a href=/docs/recorder.jpg><img src=/docs/recorder_t.jpg></a><br>
+<a href=/docs/recorder.jpg><img src=/docs/recorder_t.jpg align=left></a><br>
 Archos Jukebox Recorder 6, 10, 15 and 20
 
-<p><a href="rockbox-2.2-recorder.zip">rockbox-2.2-recorder.zip</a>
+<br clear=all><a href="rockbox-2.2-recorder.zip">rockbox-2.2-recorder.zip</a>
 <br>(439 KB)
 
 </td>
 <td>
-<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg></a><br>
+<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg align=left></a><br>
 Archos Jukebox FM Recorder
 
-<p><a href="rockbox-2.2-fmrecorder.zip">rockbox-2.2-fmrecorder.zip</a>
+<br clear=all><a href="rockbox-2.2-fmrecorder.zip">rockbox-2.2-fmrecorder.zip</a>
 <br>(443 KB)
 
 </td>
 <td>
-<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg></a><br>
+<a href=/docs/fmrecorder.jpg><img src=/docs/fmrecorder_t.jpg align=left></a><br>
 Archos Jukebox Recorder V2
 
-<p><a href="rockbox-2.2-recorderv2.zip">rockbox-2.2-recorderv2.zip</a>
+<br clear=all><a href="rockbox-2.2-recorderv2.zip">rockbox-2.2-recorderv2.zip</a>
 <br>(443 KB)
 
 </td>
