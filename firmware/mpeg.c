@@ -1779,7 +1779,7 @@ int mpeg_phys2val(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            result = value / 2;
+            result = value;
             break;
         
         case SOUND_BALANCE:
