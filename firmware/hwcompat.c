@@ -41,6 +41,8 @@ int read_hw_mask(void)
 #ifdef ARCHOS_PLAYER
 bool is_new_player(void)
 {
-    return read_rom_version() > 451;
+    int ver = read_rom_version();
+
+    return (ver > 449) || (ver == 116);
 }           
 #endif
