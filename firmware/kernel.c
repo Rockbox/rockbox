@@ -131,10 +131,12 @@ bool queue_empty(const struct event_queue* q)
     return ( q->read == q->write );
 }
 
-void queue_clear(const struct event_queue* q)
+void queue_clear(struct event_queue* q)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     q->read = 0;
     q->write = 0;
+    set_irq_level(oldlevel);
 }
 
 int queue_broadcast(int id, void *data)
