@@ -28,4 +28,7 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Define this to the CPU frequency */
+#define CPU_FREQ      11289600
+
 #endif
