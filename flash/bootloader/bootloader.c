@@ -122,9 +122,10 @@ void PlatformInit(void)
 
 #if defined PLATFORM_PLAYER
 	BRR1  =  0x0019; // 14400 Baud for monitor
-	if (FW_VERSION > 451) // "new" Player?
-	{
-		PBDR &= ~0x10; // set PB4 to 0 to power-up the harddisk early
+	PACR2 &= 0xFFFC; // GPIO for PA0 (charger detection, input by default)
+	if (FW_VERSION > 451 && (PADRL & 0x01)) 
+	{   // "new" Player and charger not plugged?
+		PBDR |= 0x10; // set PB4 to 1 to power-up the harddisk early
 		PBIOR |= 0x10; // make PB4 an output
 	}
 #elif defined PLATFORM_RECORDER
@@ -255,7 +256,7 @@ void DecompressStart(tImage* pImage)
 	pImage->pExecute();
 }
 
-
+#ifdef USE_ADC
 int ReadADC(int channel)
 {
 	// after channel 3, the ports wrap and get re-used
@@ -267,12 +268,14 @@ int ReadADC(int channel)
 
 	return (timeout == 0) ? -1 : *pResult>>6;
 }
+#endif
 
 
 // This function is platform-dependent, 
 //	until I figure out how to distinguish at runtime.
 int ButtonPressed(void) // return 1,2,3 for F1,F2,F3, 0 if none pressed
 {
+#ifdef USE_ADC
 	int value = ReadADC(CHANNEL);
 
 	if (value >= F1_LOWER && value <= F1_UPPER) // in range
@@ -281,6 +284,16 @@ int ButtonPressed(void) // return 1,2,3 for F1,F2,F3, 0 if none pressed
 		return 2;
 	else if (value >= F3_LOWER && value <= F3_UPPER) // in range
 		return 3;
+#else
+    int value = PCDR;
+    
+    if (!(value & F1_MASK))
+        return 1;
+    else if (!(value & F2_MASK))
+        return 2;
+    else if (!(value & F3_MASK))
+        return 3;
+#endif
 	
 	return 0;
 }

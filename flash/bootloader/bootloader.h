@@ -34,14 +34,12 @@ typedef struct
 
 // resolve platform dependency of F1 button check
 #if defined PLATFORM_PLAYER
-#define CHANNEL 1
-#define F1_LOWER 0  // this is the "Menu" key
-#define F1_UPPER 384
-#define F2_LOWER 1024 // not present
-#define F2_UPPER 1024
-#define F3_LOWER 1024
-#define F3_UPPER 1024
+#define F1_MASK 0x0001 // Player has no F1 button, so we use "-"
+#define F2_MASK 0x0008 // Player has no F2 button, so we use "Play"
+#define F3_MASK 0x0004 // Player has no F3 button, so we use "+"
+
 #elif defined PLATFORM_RECORDER
+#define USE_ADC
 #define CHANNEL 4
 #define F1_LOWER 250
 #define F1_UPPER 499
@@ -49,7 +47,9 @@ typedef struct
 #define F2_UPPER 699
 #define F3_LOWER 900
 #define F3_UPPER 1023
+
 #elif defined PLATFORM_FM
+#define USE_ADC
 #define CHANNEL 4
 #define F1_LOWER 150
 #define F1_UPPER 384
@@ -57,17 +57,21 @@ typedef struct
 #define F2_UPPER 544
 #define F3_LOWER 700
 #define F3_UPPER 1023
+
 #elif defined PLATFORM_ONDIO
+#define USE_ADC
 #define CHANNEL 4
 #define F1_LOWER 0x2EF // Ondio has no F1 button,
-#define F1_UPPER 0x3FF //  so we use "Right".
+#define F1_UPPER 0x3FF //  so we use "Left".
 #define F2_LOWER 0x19D // Ondio has no F2 button,
 #define F2_UPPER 0x245 //  so we use "Up".
 #define F3_LOWER 0x246 // Ondio has no F3 button,
-#define F3_UPPER 0x2EE //  so we use "Left".
+#define F3_UPPER 0x2EE //  so we use "Right".
+
 #else
 #error ("No platform given!")
 #endif
+
 
 #define FLASH_BASE 0x02000000 // start of the flash memory
 #define FW_VERSION *(unsigned short*)(FLASH_BASE + 0xFE) // firmware version
@@ -80,7 +84,9 @@ void PlatformInit(void);
 void DramInit(void);
 int ucl_nrv2e_decompress_8(const UINT8 *src, UINT8 *dst, UINT32* dst_len);
 void DecompressStart(tImage* pImage);
+#ifdef USE_ADC
 int ReadADC(int channel);
+#endif
 int ButtonPressed(void);
 tImage* GetStartImage(int nPreferred);
 // test functions
