@@ -20,7 +20,7 @@ H2 {
  font-size:        14pt;
 }
 
-H3 {
+H3, div.h5 {
  text-decoration:  none;
  font-family:      Verdana,Arial,Helvetica,sans-serif;
  font-style:       normal;
@@ -34,6 +34,10 @@ BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT, A
  font-family:      Verdana,Arial,Helvetica,sans-serif;
  font-style:       normal;
  font-size:        10pt;
+}
+
+P.ind {
+ margin-left: 3em;
 }
 
 A {
@@ -52,7 +56,7 @@ A {
 
 .menutext {
  color: #f0f0f0;
- font-size: 8pt;
+ font-size: 7pt;
 }
 
 .buildok {
