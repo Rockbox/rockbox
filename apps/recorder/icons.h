@@ -27,7 +27,7 @@
 enum icons_6x8 {
     Box_Filled, Box_Empty, Slider_Horizontal, File, 
     Folder,     Directory, Playlist,          Repeat,
-    Selected,   Cursor,    LastIcon
+    Selected,   Cursor,    Wps, LastIcon
 };
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];

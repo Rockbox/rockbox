@@ -37,6 +37,7 @@
 #include "playlist.h"
 #include "menu.h"
 #include "wps.h"
+#include "wps-display.h"
 #include "settings.h"
 #include "status.h"
 #include "debug.h"
@@ -297,14 +298,16 @@ static int showdir(char *path, int start)
             icon_type = Playlist;
         else if ( dircache[i].attr & TREE_ATTR_MPA )
             icon_type = File;
+        else if (!strcasecmp(&dircache[i].name[len-4], ".wps"))
+            icon_type = Wps;
         else
             icon_type = 0;
 
         if (icon_type)
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                       CURSOR_X * 6 + CURSOR_WIDTH, MARGIN_Y+(i-start)*line_height, 6, 8, true);
+                       CURSOR_X * 6 + CURSOR_WIDTH, 
+                       MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #endif
-
 
         /* if MP3 filter is on, cut off the extension */
         if (global_settings.mp3filter && 
@@ -466,6 +469,8 @@ bool dirbrowse(char *root)
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
 
     while(1) {
+        struct entry* file = &dircache[dircursor+start];
+
         bool restore = false;
 
         button = button_get_w_tmo(HZ/5);
@@ -514,19 +519,17 @@ bool dirbrowse(char *root)
             case TREE_ENTER | BUTTON_REPEAT:
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
-            case BUTTON_PLAY | BUTTON_REPEAT:
+            case BUTTON_PLAY | BUTTON_REPEAT: 
 #endif
                 if ( !numentries )
                     break;
                 if ((currdir[0]=='/') && (currdir[1]==0)) {
-                    snprintf(buf,sizeof(buf),"%s%s",currdir,
-                             dircache[dircursor+start].name);
+                    snprintf(buf,sizeof(buf),"%s%s",currdir, file->name);
                 } else {
-                    snprintf(buf,sizeof(buf),"%s/%s",currdir,
-                             dircache[dircursor+start].name);
+                    snprintf(buf,sizeof(buf),"%s/%s",currdir, file->name);
                 }
 
-                if (dircache[dircursor+start].attr & ATTR_DIRECTORY) {
+                if (file->attr & ATTR_DIRECTORY) {
                     memcpy(currdir,buf,sizeof(currdir));
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirpos[dirlevel] = start;
@@ -538,21 +541,16 @@ bool dirbrowse(char *root)
                 } else {
                     int seed = current_tick;
                     lcd_stop_scroll();
-                    if(dircache[dircursor+start].attr & TREE_ATTR_M3U )
+                    if (file->attr & TREE_ATTR_M3U )
                     {
                         if ( global_settings.resume )
                             snprintf(global_settings.resume_file,
                                      MAX_PATH, "%s/%s",
-                                     currdir,
-                                     dircache[dircursor+start].name);
-                        play_list(currdir,
-                                  dircache[dircursor+start].name,
-                                  0,
-                                  false,
-                                  0, seed );
+                                     currdir, file->name);
+                        play_list(currdir, file->name, 0, false, 0, seed );
                         start_index = 0;
                     }
-                    else if (dircache[dircursor+start].attr & TREE_ATTR_MPA ) {
+                    else if (file->attr & TREE_ATTR_MPA ) {
                         if ( global_settings.resume )
                             strncpy(global_settings.resume_file,
                                     currdir, MAX_PATH);
@@ -563,9 +561,19 @@ bool dirbrowse(char *root)
                         start_index = play_list(currdir, NULL,
                                                 start_index, false, 0, seed);
                     }
-                    else
-                        break;
-
+                    else {
+                        /* wps config file? */
+                        int len = strlen(file->name);
+                        if (!strcasecmp(&file->name[len-4], ".wps")) {
+                            snprintf(buf, sizeof buf, "%s/%s", 
+                                     currdir, file->name);
+                            wps_load_custom(buf);
+                            restore = true;
+                            break;
+                        }
+                        else
+                            break;
+                    }
                     if ( global_settings.resume ) {
                         /* the resume_index must always be the index in the
                            shuffled list in case shuffle is enabled */

@@ -46,9 +46,14 @@
 #include "ajf.h"
 #endif
 
-#define WPS_CONFIG ROCKBOX_DIR "/wps.config"
+#define WPS_CONFIG ROCKBOX_DIR "/default.wps"
 
+#ifdef HAVE_LCD_BITMAP
 #define MAX_LINES 10
+#else
+#define MAX_LINES 2
+#endif
+
 #define FORMAT_BUFFER_SIZE 300
 
 struct format_flags
@@ -103,12 +108,19 @@ static void wps_format(char* fmt)
     }
 }
 
-static bool load_custom_wps(void)
+bool wps_load_custom(char* file)
 {
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
+    bool special = true;
 
-    fd = open(WPS_CONFIG, O_RDONLY);
+    /* default wps file? */
+    if (!file) {
+        file = WPS_CONFIG;
+        special = false;
+    }
+
+    fd = open(file, O_RDONLY);
     
     if (-1 != fd)
     {
@@ -121,6 +133,17 @@ static bool load_custom_wps(void)
         }
         
         close(fd);
+
+        if ( special ) {
+            int i;
+            lcd_clear_display();
+            lcd_setmargins(0,0);
+            for (i=0; i<MAX_LINES && format_lines[i]; i++)
+                lcd_puts(0,i,format_lines[i]);
+            lcd_update();
+            sleep(HZ);
+        }
+
         return numread > 0;
     }
     
@@ -195,8 +218,11 @@ static char* get_dir(char* buf, int buf_size, char* path, int level)
  *
  * Returns the tag. NULL indicates the tag wasn't available.
  */
-static char* get_tag(struct mp3entry* id3, char* tag, char* buf, int buf_size,
-    struct format_flags* flags)
+static char* get_tag(struct mp3entry* id3, 
+                     char* tag, 
+                     char* buf, 
+                     int buf_size,
+                     struct format_flags* flags)
 {
     if ((0 == tag[0]) || (0 == tag[1]))
     {
@@ -205,122 +231,122 @@ static char* get_tag(struct mp3entry* id3, char* tag, char* buf, int buf_size,
     
     switch (tag[0])
     {
-    case 'i':  /* ID3 Information */
-        switch (tag[1])
-        {
-        case 't':  /* ID3 Title */
-            return id3->title;
+        case 'i':  /* ID3 Information */
+            switch (tag[1])
+            {
+                case 't':  /* ID3 Title */
+                    return id3->title;
 
-        case 'a':  /* ID3 Artist */
-            return id3->artist;
+                case 'a':  /* ID3 Artist */
+                    return id3->artist;
             
-        case 'n':  /* ID3 Track Number */
-            if (id3->tracknum)
-            {
-                snprintf(buf, buf_size, "%d", id3->tracknum);
-                return buf;
+                case 'n':  /* ID3 Track Number */
+                    if (id3->tracknum)
+                    {
+                        snprintf(buf, buf_size, "%d", id3->tracknum);
+                        return buf;
+                    }
+                    else
+                    {
+                        return NULL;
+                    }
+
+                case 'd':  /* ID3 Album/Disc */
+                    return id3->album;
             }
-            else
+            break;
+
+        case 'f':  /* File Information */
+            switch(tag[1])
             {
-                return NULL;
+                case 'v':  /* VBR file? */
+                    return id3->vbr ? "(avg)" : NULL;
+
+                case 'b':  /* File Bitrate */
+                    snprintf(buf, buf_size, "%d", id3->bitrate);
+                    return buf;
+
+                case 'f':  /* File Frequency */
+                    snprintf(buf, buf_size, "%d", id3->frequency);
+                    return buf;
+
+                case 'p':  /* File Path */
+                    return id3->path;
+
+                case 'm':  /* File Name - With Extension */
+                    return get_dir(buf, buf_size, id3->path, 0);
+
+                case 'n':  /* File Name */
+                    if (get_dir(buf, buf_size, id3->path, 0))
+                    {
+                        /* Remove extension */
+                        char* sep = strrchr(buf, '.');
+
+                        if (NULL != sep)
+                        {
+                            *sep = 0;
+                        }
+
+                        return buf;
+                    }
+                    else
+                    {
+                        return NULL;
+                    }
+
+                case 's':  /* File Size (in kilobytes) */
+                    snprintf(buf, buf_size, "%d", id3->filesize / 1024);
+                    return buf;
             }
+            break;
 
-        case 'd':  /* ID3 Album/Disc */
-            return id3->album;
-        }
-        break;
-
-    case 'f':  /* File Information */
-        switch(tag[1])
-        {
-        case 'v':  /* VBR file? */
-            return id3->vbr ? "(avg)" : NULL;
-
-        case 'b':  /* File Bitrate */
-            snprintf(buf, buf_size, "%d", id3->bitrate);
-            return buf;
-
-        case 'f':  /* File Frequency */
-            snprintf(buf, buf_size, "%d", id3->frequency);
-            return buf;
-
-        case 'p':  /* File Path */
-            return id3->path;
-
-        case 'm':  /* File Name - With Extension */
-            return get_dir(buf, buf_size, id3->path, 0);
-
-        case 'n':  /* File Name */
-            if (get_dir(buf, buf_size, id3->path, 0))
+        case 'p':  /* Playlist/Song Information */
+            switch(tag[1])
             {
-                /* Remove extension */
-                char* sep = strrchr(buf, '.');
-
-                if (NULL != sep)
-                {
-                    *sep = 0;
-                }
-
-                return buf;
-            }
-            else
-            {
-                return NULL;
-            }
-
-        case 's':  /* File Size (in kilobytes) */
-            snprintf(buf, buf_size, "%d", id3->filesize / 1024);
-            return buf;
-        }
-        break;
-
-    case 'p':  /* Playlist/Song Information */
-        switch(tag[1])
-        {
 #if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
-        case 'b':  /* Player progress bar */
-            flags->player_progress = true;
-            flags->dynamic = true;
-            return "\x01";
+                case 'b':  /* Player progress bar */
+                    flags->player_progress = true;
+                    flags->dynamic = true;
+                    return "\x01";
 #endif
 
-        case 'p':  /* Playlist Position */
-            snprintf(buf, buf_size, "%d", id3->index + 1);
-            return buf;
+                case 'p':  /* Playlist Position */
+                    snprintf(buf, buf_size, "%d", id3->index + 1);
+                    return buf;
 
-        case 'e':  /* Playlist Total Entries */
-            snprintf(buf, buf_size, "%d", playlist.amount);
-            return buf;
+                case 'e':  /* Playlist Total Entries */
+                    snprintf(buf, buf_size, "%d", playlist.amount);
+                    return buf;
 
-        case 'c':  /* Current Time in Song */
-            flags->dynamic = true;
-            format_time(buf, buf_size, id3->elapsed + ff_rewind_count);
-            return buf;
+                case 'c':  /* Current Time in Song */
+                    flags->dynamic = true;
+                    format_time(buf, buf_size, id3->elapsed + ff_rewind_count);
+                    return buf;
 
-        case 'r': /* Remaining Time in Song */
-            flags->dynamic = true;
-            format_time(buf, buf_size, id3->length - id3->elapsed + ff_rewind_count);
-            return buf;
+                case 'r': /* Remaining Time in Song */
+                    flags->dynamic = true;
+                    format_time(buf, buf_size, id3->length - id3->elapsed + ff_rewind_count);
+                    return buf;
 
-        case 't':  /* Total Time */
-            format_time(buf, buf_size, id3->length);
-            return buf;
-        }
-        break;
+                case 't':  /* Total Time */
+                    format_time(buf, buf_size, id3->length);
+                    return buf;
+            }
+            break;
     
-    case 'd': /* Directory path information */
-        switch(tag[1])
-        {
-        case '1':  /* Parent folder */
-            return get_dir(buf, buf_size, id3->path, 1);
+        case 'd': /* Directory path information */
+            switch(tag[1])
+            {
+                case '1':  /* Parent folder */
+                    return get_dir(buf, buf_size, id3->path, 1);
 
-        case '2':  /* Parent of parent */
-            return get_dir(buf, buf_size, id3->path, 2);
+                case '2':  /* Parent of parent */
+                    return get_dir(buf, buf_size, id3->path, 2);
 
-        case '3':  /* Parent of parent of parent */
-            return get_dir(buf, buf_size, id3->path, 3);
-        }
-        break;
+                case '3':  /* Parent of parent of parent */
+                    return get_dir(buf, buf_size, id3->path, 3);
+            }
+            break;
     }
     
     return NULL;
@@ -507,11 +533,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
 
     ff_rewind_count = ffwd_offset;
 
-#ifdef HAVE_LCD_CHARCELL
-    for (i = 0; i < 2; i++)
-#else
     for (i = 0; i < MAX_LINES; i++)
-#endif
     {
         if ( !format_lines[i] )
             break;
@@ -586,7 +608,7 @@ void wps_display(struct mp3entry* id3)
         static bool wps_loaded = false;
 
         if (!wps_loaded) {
-            load_custom_wps();
+            wps_load_custom(NULL);
             wps_loaded = true;
 
             if ( !format_buffer[0] ) {
