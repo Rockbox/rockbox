@@ -198,9 +198,12 @@ void dbg_ports(void)
 	    /* Toggle the charger */
 	    PBDR ^= 0x20;
 	    break;
-	    
+
+#ifdef HAVE_RECORDER_KEYPAD	    
 	case BUTTON_OFF:
-	    /* Disable the charger */
+#else
+        case BUTTON_STOP:
+#endif	    /* Disable the charger */
 	    PBDR |= 0x20;
 	    return;
 	}
