@@ -111,6 +111,12 @@ static void wps_format(char* fmt)
     }
 }
 
+void wps_reset(void)
+{
+    wps_loaded = false;
+    memset(&format_buffer, 0, sizeof format_buffer);
+}
+
 bool wps_load(char* file, bool display)
 {
     char buffer[FORMAT_BUFFER_SIZE];

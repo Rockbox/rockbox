@@ -102,6 +102,7 @@ struct font {
 void font_init(void);
 struct font* font_load(char *path);
 struct font* font_get(int font);
+void font_reset(void);
 
 #else /* HAVE_LCD_BITMAP */
 

@@ -383,6 +383,9 @@ void settings_apply(void)
                  global_settings.wps_file);
         wps_load(buf, false);
     }
+    else
+        wps_reset();
+
 #ifdef HAVE_LCD_BITMAP
     if ( global_settings.font_file[0] &&
          global_settings.font_file[0] != 0xff ) {
@@ -390,7 +393,10 @@ void settings_apply(void)
                  global_settings.font_file);
         font_load(buf);
     }
+    else
+        font_reset();
 #endif
+
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.lng",
@@ -673,6 +679,9 @@ void settings_reset(void) {
     global_settings.peak_meter_release = 8;
     global_settings.peak_meter_hold = 1;
     global_settings.peak_meter_clip_hold = 16;
+    global_settings.wps_file[0] = 0;
+    global_settings.font_file[0] = 0;
+    global_settings.lang_file[0] = 0;
 }
 
 

@@ -114,6 +114,11 @@ static int readstrpad(char *buf, int totlen)
     return totlen;
 }
 
+void font_reset(void)
+{
+    memset(&font_ui, 0, sizeof(struct font));
+}
+
 /* read and load font into incore font structure*/
 struct font* font_load(char *path)
 {
@@ -132,7 +137,7 @@ struct font* font_load(char *path)
         return NULL;
     }
 
-    memset(pf, 0, sizeof(struct font));
+    font_reset();
 
     /* currently, font loading replaces earlier font allocation*/
     freeptr = (unsigned char *)(((int)mbuf + 3) & ~3);
