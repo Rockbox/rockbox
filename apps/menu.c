@@ -214,7 +214,9 @@ void menu_exit(int m)
 
 void menu_run(int m)
 {
+#ifdef HAVE_LCD_BITMAP
     bool laststate;
+#endif
 
     menu_draw(m);
 
