@@ -54,6 +54,13 @@ int open(char* pathname, int flags)
     char* name;
     int namelen;
 
+    /* For now, we don't support writing */
+    if(flags & (O_WRONLY | O_RDWR))
+    {
+        errno = EROFS;
+        return -1;
+    }
+
     if ( pathname[0] != '/' ) {
         DEBUGF("'%s' is not an absolute path.\n",pathname);
         DEBUGF("Only absolute pathnames supported at the moment\n");
