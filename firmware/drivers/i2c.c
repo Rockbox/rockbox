@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "lcd.h"
 #include "sh7034.h"
+#include "kernel.h"
 #include "debug.h"
 
 #define PB13 0x2000
@@ -94,7 +95,8 @@ void i2c_ack(int bit)
         SDA_LO;
     
     SCL_INPUT;   /* Set the clock to input */
-    while(!SCL); /* and wait for the MAS to release it */
+    while(!SCL)  /* and wait for the MAS to release it */
+        yield();
 
     DELAY;
     SCL_OUTPUT;
@@ -114,8 +116,9 @@ int i2c_getack(void)
     SDA_INPUT;   /* And set to input */
     SCL_LO;      /* Set the clock low */
     SCL_INPUT;   /* Set the clock to input */
-    while(!SCL); /* and wait for the MAS to release it */
-
+    while(!SCL)  /* and wait for the MAS to release it */
+        yield();
+    
     x = SDA;
     if (x)
         /* ack failed */
