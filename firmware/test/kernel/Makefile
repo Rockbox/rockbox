@@ -11,11 +11,12 @@ INCLUDES=-I../../ -I../../drivers
 TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET)
+CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
-OBJS= ../../crt0.o ../../system.o main.o timer.o \
-	../../thread.o ../../kernel.o ../../drivers/led.o ../../debug.o
+OBJS= 	../../crt0.o ../../system.o main.o timer.o \
+	../../thread.o ../../kernel.o ../../drivers/led.o \
+	../../debug.o ../../common/sprintf.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
