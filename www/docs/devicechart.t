@@ -34,7 +34,7 @@
 <tr><th><b>Bumper Colors</b></th>
     <td>Blue</td>
     <td>Blue</td>
-    <td>Blue</td>
+    <td>Blue or Black</td>
     <td>Blue or Black</td>
     <td>Blue</td>
     <td>Blue</td>
