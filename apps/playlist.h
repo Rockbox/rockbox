@@ -22,7 +22,7 @@
 
 /* playlist data */
 
-#define MAX_PLAYLIST_SIZE 1000
+#define MAX_PLAYLIST_SIZE 10000
 typedef struct 
 {
     char filename[256];  /* path name of m3u playlist on disk       */
@@ -31,6 +31,8 @@ typedef struct
     int  seed;           /* random seed                             */
     int  amount;         /* number of tracks in the index           */
 } playlist_info_t;
+
+extern playlist_info_t playlist;
 
 void play_list(char *dir, char *file);
 char* playlist_next(int type);

@@ -30,8 +30,6 @@
 
 playlist_info_t playlist;
 
-int index_array[1000];
-
 char now_playing[256];
 
 char* playlist_next(int type)
@@ -138,9 +136,12 @@ void add_indices_to_playlist( playlist_info_t *playlist )
             else if(store_index) 
             {
                 /* Store a new entry */
-                DEBUGF("tune %d at position %d\n", playlist->amount, i+count);
                 playlist->indices[ playlist->amount ] = i+count;
                 playlist->amount++;
+                if ( playlist->amount >= MAX_PLAYLIST_SIZE ) {
+                    close(fd);
+                    return;
+                }
 
                 store_index = 0;
             }

@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "sprintf.h"
 #include <string.h>
+#include "playlist.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -164,15 +165,31 @@ void scroll_speed(void)
     }
 }
 
+void shuffle(void)
+{
+    lcd_clear_display();
+    lcd_puts(0,0,"Shuffling...");
+    lcd_update();
+#ifdef SIMULATOR
+    randomise_playlist( &playlist, time() );
+#else
+    randomise_playlist( &playlist, current_tick );
+#endif
+    lcd_puts(0,1,"Done.");
+    lcd_update();
+    sleep(HZ);
+}
+
 void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Version, Sound, Scroll
+        Tetris, Screen_Saver, Version, Sound, Scroll, Shuffle
     };
 
     /* main menu */
     struct menu_items items[] = {
+        { Shuffle,      "Shuffle",      shuffle  },
         { Sound,        "Sound",        sound_menu  },
 #ifdef HAVE_LCD_BITMAP
         { Tetris,       "Tetris",       tetris      },
