@@ -22,6 +22,5 @@
 #include "playlist.h" 
 
 void wps_show(void);
-//void wps_show_playlist(char* current, playlist_info_t *list);
 
 #endif

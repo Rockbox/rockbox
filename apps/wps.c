@@ -38,12 +38,8 @@
 #define PLAY_DISPLAY_FILENAME_SCROLL 1 
 #define PLAY_DISPLAY_TRACK_TITLE     2 
 
-/* demonstrates showing different formats from playtune */
-void wps_show(void)
+static void draw_screen(struct mp3entry* id3)
 {
-    struct mp3entry* id3 = mpeg_current_track();
-    static bool playing = true;
-
     lcd_clear_display();
     switch ( global_settings.wps_display ) {
         case PLAY_DISPLAY_TRACK_TITLE:
@@ -84,76 +80,93 @@ void wps_show(void)
         case PLAY_DISPLAY_DEFAULT:
         {
 #ifdef HAVE_LCD_BITMAP
-            char buffer[256];
+            char buffer[64];
+            int l = 0;
 
-            lcd_puts(0, 0, "[id3 info]");
-            lcd_puts(0, LINE_Y, id3->title?id3->title:"");
-            lcd_puts(0, LINE_Y+1, id3->album?id3->album:"");
-            lcd_puts(0, LINE_Y+2, id3->artist?id3->artist:"");
+            lcd_puts(0, l++, id3->title?id3->title:"");
+            lcd_puts(0, l++, id3->album?id3->album:"");
+            lcd_puts(0, l++, id3->artist?id3->artist:"");
 
             snprintf(buffer,sizeof(buffer), "%d ms", id3->length);
-            lcd_puts(0, LINE_Y+3, buffer);
+            lcd_puts(0, l++, buffer);
 
             snprintf(buffer,sizeof(buffer), "%d kbits", id3->bitrate);
 
-            lcd_puts(0, LINE_Y+4, buffer);
+            lcd_puts(0, l++, buffer);
 
             snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
-            lcd_puts(0, LINE_Y+5, buffer);
+            lcd_puts(0, l++, buffer);
 #else
 
-            lcd_puts(0, 0, id3->artist?id3->artist:"<no artist>");
-            lcd_puts(0, 1, id3->title?id3->title:"<no title>");
+            lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
+            lcd_puts(0, l++, id3->title?id3->title:"<no title>");
 #endif
             break;
         }
     }
     lcd_update();
+}
+
+/* demonstrates showing different formats from playtune */
+void wps_show(void)
+{
+    static bool playing = true;
+    struct mp3entry* id3 = mpeg_current_track();
+    int lastlength=0, lastsize=0, lastrate=0;
+
     while ( 1 ) {
-        switch ( button_get(true) ) {
-            case BUTTON_ON:
-                return;
+        int i;
+
+        if ( ( id3->length != lastlength ) ||
+             ( id3->filesize != lastsize ) ||
+             ( id3->bitrate != lastrate ) ) {
+            draw_screen(id3);
+            lastlength = id3->length;
+            lastsize = id3->filesize;
+            lastrate = id3->bitrate;
+        }
+
+        for ( i=0;i<20;i++ ) {
+            switch ( button_get(false) ) {
+                case BUTTON_ON:
+                    return;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_PLAY:
+                case BUTTON_PLAY:
 #else
-            case BUTTON_UP:
+                case BUTTON_UP:
 #endif
-                if ( playing )
-                    mpeg_pause();
-                else
-                    mpeg_resume();
+                    if ( playing )
+                        mpeg_pause();
+                    else
+                        mpeg_resume();
 
-                playing = !playing;
-                break;
+                    playing = !playing;
+                    break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+                case BUTTON_UP:
+#else
+                case BUTTON_RIGHT:
+#endif
+                    global_settings.volume += 2;
+                    if(global_settings.volume > 100)
+                        global_settings.volume = 100;
+                    mpeg_volume(global_settings.volume);
+                    break;
+
+#ifdef HAVE_RECORDER_KEYPAD                
+                case BUTTON_DOWN:
+#else
+                case BUTTON_LEFT:
+#endif
+                    global_settings.volume -= 2;
+                    if(global_settings.volume < 0)
+                        global_settings.volume = 0;
+                    mpeg_volume(global_settings.volume);
+                    break;
+            }
+            sleep(HZ/20);
         }
     }
 }
-
-/* experimental idea still being sorted out, but want it in the the code tree still so that important playlist info is not forgotten. */
-#if 0
-void wps_show_playlist(char* current, playlist_info_t *list)
-{
-    char ch       = '/';
-    char* szLast = strrchr(current, ch);
-    char buf[16];
-    
-    buf[15] = 0;
-
-    snprintf(buf, sizeof(buf), "[%d/%d]", list->index, list->amount);
-    
-    lcd_clear_display();
-
-#ifdef HAVE_LCD_BITMAP
-    lcd_puts(0, 0, "[Playlist Mode]");
-    lcd_puts_scroll(0,LINE_Y, (++szLast));
-    lcd_puts(0, LINE_Y+1, buf);
-#else
-    lcd_puts_scroll(0,0, (++szLast));
-    lcd_puts(0,1,buf);
-#endif
-
-
-    lcd_update();
-}
-#endif
