@@ -12,3 +12,39 @@ id: LANG_GAMES
 desc: in the main menu
 eng: "Games"
 new:
+
+id: LANG_DEMOS
+desc: in the main menu
+eng: "Demos"
+new:
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+new:
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+new:
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+new:
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox info:"
+new:
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%02dMb"
+new:
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%02dMb"
+new:
+

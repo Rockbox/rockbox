@@ -158,15 +158,16 @@ Menu show_info(void)
     while(!done)
     {
         lcd_clear_display();
-        lcd_puts(0, 0, "Rockbox info:");
+        lcd_puts(0, 0, str(LANG_ROCKBOX_INFO));
         
         integer = buflen / 100;
         decimal = buflen % 100;
 #ifdef HAVE_LCD_CHARCELLS
-        snprintf(s, sizeof(s), "Buf: %d.%02dMb", integer, decimal);
+        snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_PLAYER), integer, decimal);
         lcd_puts(0, 0, s);
 #else
-        snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
+        snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_RECORDER), integer,
+                 decimal);
         lcd_puts(0, 2, s);
 #endif
 
@@ -215,13 +216,13 @@ Menu main_menu(void)
         { str(LANG_GAMES),              games_menu        },
 #endif
 #ifdef USE_DEMOS
-        { "Demos",              demo_menu },
+        { str(LANG_DEMOS),              demo_menu },
 #endif /* end USE_DEMOS */
 #endif
-        { "Info",               show_info         },
-        { "Version",            show_credits      },
+        { str(LANG_INFO),               show_info         },
+        { str(LANG_VERSION),            show_credits      },
 #ifndef SIMULATOR
-        { "Debug (keep out!)",  debug_menu        },
+        { str(LANG_DEBUG),              debug_menu        },
 #else
         { "USB (sim)",          simulate_usb      },
 #endif
