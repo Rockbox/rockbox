@@ -1,9 +1,9 @@
-                   How To Connect your Archos to Your Linux
-                   ========================================
+               How To Connect your Archos to Your Linux
+               ========================================
 
 Author:  Daniel Stenberg <daniel@haxx.se>
-Version: 0.2
-Date:    April 23, 2002
+Version: $Revision$
+Date:    $Date$
 
  Archos Recorder
 
