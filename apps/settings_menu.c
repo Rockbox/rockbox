@@ -488,6 +488,7 @@ static bool resume(void)
 
 static bool autocreatebookmark(void)
 {
+    bool retval = false;
     struct opt_items names[] = {
         { STR(LANG_SET_BOOL_NO) },
         { STR(LANG_SET_BOOL_YES) },
@@ -495,9 +496,18 @@ static bool autocreatebookmark(void)
         { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES) },
         { STR(LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK) }
     };
-    return set_option( str(LANG_BOOKMARK_SETTINGS_AUTOCREATE),
+
+    retval = set_option( str(LANG_BOOKMARK_SETTINGS_AUTOCREATE),
                        &global_settings.autocreatebookmark, INT,
                        names, 5, NULL );
+    if(global_settings.autocreatebookmark ==  BOOKMARK_RECENT_ONLY_YES ||
+       global_settings.autocreatebookmark ==  BOOKMARK_RECENT_ONLY_ASK)
+    {
+        if(global_settings.usemrb == BOOKMARK_NO)
+            global_settings.usemrb = BOOKMARK_YES;
+
+    }
+    return retval;
 }
 
 static bool autoloadbookmark(void)
