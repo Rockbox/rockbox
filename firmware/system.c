@@ -824,3 +824,16 @@ int system_memory_guard(int newmode)
     return oldmode;
 }
 #endif
+
+#if CONFIG_CPU != SH7034
+/* this does nothing on non-SH systems */
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
+void system_reboot (void)
+{
+    /* dummy */
+}
+#endif
