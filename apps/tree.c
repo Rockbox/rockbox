@@ -395,7 +395,8 @@ bool dirbrowse(char *root)
                     restore = true;
                 }
                 break;
-		
+
+#ifndef SIMULATOR
 	    case SYS_USB_CONNECTED:
 		/* Tell the USB thread that we are safe */
 		DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
@@ -411,6 +412,7 @@ bool dirbrowse(char *root)
 		strcpy(currdir, "/");
 		lastdir[0] = 0;
 		break;
+#endif
         }
 
         if ( restore ) {
