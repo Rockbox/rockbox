@@ -37,7 +37,6 @@
 #include "lang.h"
 
 extern bool tetris(void);
-extern bool snake(void);
 
 bool games_menu(void)
 {
@@ -48,7 +47,6 @@ bool games_menu(void)
         { str(LANG_TETRIS),  tetris  },
         { str(LANG_SOKOBAN), sokoban },
         { str(LANG_WORMLET), wormlet },
-        { str(LANG_SNAKE),   snake   } 
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
