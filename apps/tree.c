@@ -124,7 +124,6 @@ static bool reload_dir = false;
 static int boot_size = 0;
 static int boot_cluster;
 static bool boot_changed = false;
-static bool enqueue_next = false;
 
 static bool start_wps = false;
 static bool dirbrowse(char *root, int *dirfilter);
@@ -195,6 +194,9 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_MENU  BUTTON_MENU
 #endif /* HAVE_RECORDER_KEYPAD */
 
+/* talkbox hovering delay, to avoid immediate disk activity */
+#define HOVER_DELAY (HZ)
+
 static int build_playlist(int start_index)
 {
     int i;
@@ -221,7 +223,7 @@ static int build_playlist(int start_index)
 }
 
 
-static int play_dirname(int start_index, bool enqueue)
+static int play_dirname(int start_index)
 {
     int fd;
     char dirname_mp3_filename[MAX_PATH+1];
@@ -245,7 +247,7 @@ static int play_dirname(int start_index, bool enqueue)
   
     DEBUGF("Found: %s\n", dirname_mp3_filename);
 
-    talk_file(dirname_mp3_filename, enqueue);
+    talk_file(dirname_mp3_filename, false);
     return 1;
 }
 
@@ -904,6 +906,8 @@ static bool dirbrowse(char *root, int *dirfilter)
     int lastdircursor=-1;
     bool need_update = true;
     bool exit_func = false;
+    bool enqueue_next = false;
+    long thumbnail_time = -1; /* for delaying a thumbnail */
     bool update_all = false; /* set this to true when the whole file list
                                 has been refreshed on screen */
 
@@ -1061,7 +1065,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                     {
                         /* play_dirname */
                         DEBUGF("Playing directory thumbnail: %s", currdir);
-                        play_dirname(dircursor+dirstart, false);
+                        play_dirname(dircursor+dirstart);
                         /* avoid reading getting cut by next filename */
                         enqueue_next = true;
                     }
@@ -1382,6 +1386,19 @@ static bool dirbrowse(char *root, int *dirfilter)
                 break;
 
             case BUTTON_NONE:
+                if (thumbnail_time != -1 &&
+                    TIME_AFTER(current_tick, thumbnail_time))
+                {   /* a delayed hovering thumbnail is due now */
+                    int res;
+                    DEBUGF("Playing directory thumbnail: %s", currdir);
+                    res = play_dirname(lasti);
+                    if (res < 0) /* failed, not existing */
+                    {   /* say the number instead, as a fallback */
+                        talk_id(VOICE_DIR, false);
+                        talk_number(lasti+1, true);
+                    }
+                    thumbnail_time = -1; /* job done */
+                }
                 status_draw(false);
                 break;
         }
@@ -1477,13 +1494,10 @@ static bool dirbrowse(char *root, int *dirfilter)
                     int ret = 0;
                     /* play directory thumbnail */
                     if (global_settings.talk_dir == 3) /* hover */
-                    {
-                        DEBUGF("Playing directory thumbnail: %s", currdir);
-                        ret = play_dirname(dircursor+dirstart, false);
+                    {   // "schedule" a thumbnail, to have a little dalay */
+                        thumbnail_time = current_tick + HOVER_DELAY;
                     }
-
-                    if (global_settings.talk_dir == 1 /* dirs as numbers */
-                        || ret == -1) /* or no thumbnail found above */
+                    else if (global_settings.talk_dir == 1) /* dirs as numbers */
                     {
                         talk_id(VOICE_DIR, false);
                         talk_number(i+1, true);
