@@ -281,15 +281,18 @@ void DEI3(void)
             DTCR3 = last_dma_chunk_size & 0xffff;
             SAR3 = (unsigned int)mp3buf + mp3buf_read;
 
-            /* will we move across the track boundary? */
-            if (( mp3buf_read <= id3tags[0].mempos ) &&
-                ( (mp3buf_read + last_dma_chunk_size) > id3tags[0].mempos )) {
-                /* shift array so index 0 is current track */
-                int i;
-                for (i=0; i<last_tag-1; i++)
-                    id3tags[i] = id3tags[i+1];
-                if ( last_tag )
+            /* several tracks loaded? */
+            if ( last_tag>1 ) {
+                /* will we move across the track boundary? */
+                if (( mp3buf_read <= id3tags[1].mempos ) &&
+                    ((mp3buf_read+last_dma_chunk_size) > id3tags[1].mempos )) {
+                    /* shift array so index 0 is current track */
+                    int i;
+                    for (i=0; i<last_tag-1; i++)
+                        id3tags[i] = id3tags[i+1];
                     last_tag--;
+                    DEBUGF("Track change\n");
+                }
             }
         }
         else
@@ -379,11 +382,9 @@ static void mpeg_thread(void)
                 
                 /* grab id3 tag of new file and
                    remember where in memory it starts */
-                if ( last_tag < MAX_ID3_TAGS ) {
-                    mp3info(&(id3tags[last_tag].id3), ev.data);
-                    id3tags[last_tag].mempos = mp3buf_write;
-                    last_tag++;
-                }
+                mp3info(&(id3tags[0].id3), ev.data);
+                id3tags[0].mempos = mp3buf_write;
+                last_tag=1;
 
                 /* Make it read more data */
                 filling = true;
