@@ -34,6 +34,7 @@ static int delta;
 static int max_iter;
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
+static unsigned char graybuffer[LCD_HEIGHT];
 
 
 void init_mandelbrot_set(void){
@@ -56,18 +57,15 @@ void calc_mandelbrot_set(void){
     
     start_tick = *rb->current_tick;  
     
-//    rb->lcd_clear_display();
-//    rb->lcd_update();
-
     gray_clear_display();
 
     x_fact = (x_max - x_min) / LCD_WIDTH;
     y_fact = (y_max - y_min) / LCD_HEIGHT;
     
+    for (x_pixel = 0; x_pixel<LCD_WIDTH; x_pixel++){
+    a = (x_pixel * x_fact) + x_min;
     for(y_pixel = LCD_HEIGHT-1; y_pixel>=0; y_pixel--){    
         b = (y_pixel * y_fact) + y_min;
-        for (x_pixel = LCD_WIDTH-1; x_pixel>=0; x_pixel--){
-            a = (x_pixel * x_fact) + x_min;
             x = 0;
             y = 0;
             n_iter = 0;
@@ -91,9 +89,9 @@ void calc_mandelbrot_set(void){
             } else {
                 brightness = 255 - (31 * (n_iter & 7));
             }
-
-            gray_drawpixel( x_pixel, y_pixel, brightness);
+        graybuffer[y_pixel]=brightness;
         }
+    gray_drawgraymap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT, 1);
     }
 }
 
