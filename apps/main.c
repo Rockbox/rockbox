@@ -74,6 +74,7 @@ void init(void)
     settings_load();
     sleep(HZ/2);
     tree_init();
+    playlist_init();
     mpeg_init( global_settings.volume,
                global_settings.bass,
                global_settings.treble,
