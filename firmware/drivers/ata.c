@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdbool.h>
 #include "ata.h"
 #include "kernel.h"
 #include "led.h"
@@ -99,7 +100,7 @@ int ata_read_sectors(unsigned long start,
     if (!wait_for_rdy())
         return -1;
 
-    led(TRUE);
+    led(true);
 
     ATA_NSECTOR = count;
     ATA_SECTOR  = start & 0xff;
@@ -122,7 +123,7 @@ int ata_read_sectors(unsigned long start,
 #endif
     }
 
-    led(FALSE);
+    led(false);
 
     if(!wait_for_end_of_transfer())
         return -1;
@@ -140,7 +141,7 @@ int ata_write_sectors(unsigned long start,
     if (!wait_for_rdy())
         return 0;
 
-    led(TRUE);
+    led(true);
 
     ATA_NSECTOR = count;
     ATA_SECTOR  = start & 0xff;
@@ -163,7 +164,7 @@ int ata_write_sectors(unsigned long start,
 #endif
     }
 
-    led(FALSE);
+    led(false);
 
     return wait_for_end_of_transfer();
 }
@@ -262,7 +263,7 @@ int ata_soft_reset(void)
 
 int ata_init(void)
 {
-    led(FALSE);
+    led(false);
 
     /* activate ATA */
     PADR &= ~0x80;
