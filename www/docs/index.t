@@ -18,8 +18,9 @@ and <a
 href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000 on
 yahoo</a>.
 
-<li> Small <a href="Help-JBR.txt">help text</a> for your Recorder, meant to
-get stored and read on your Archos. (Jean Boullier)
+<li> Small help texts for your <a href="Help-JBR.txt">Recorder</A> or <a
+href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
+Archos. (Jean Boullier)
 
 </ul>
 
