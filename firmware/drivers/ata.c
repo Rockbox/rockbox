@@ -222,8 +222,10 @@ int ata_read_sectors(unsigned long start,
                 goto retry;
             }
 
-            if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) )
+            if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) ) {
+                ret = -5;
                 goto retry;
+            }
              
             /* if destination address is odd, use byte copying,
                otherwise use word copying */
