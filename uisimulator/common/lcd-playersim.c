@@ -18,8 +18,6 @@
  ****************************************************************************/
 #include "config.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
@@ -674,8 +672,6 @@ static void scroll_thread(void)
         sleep(HZ/scroll_speed);
     }
 }
-
-#endif
 
 /* -----------------------------------------------------------------
  * local variables:
