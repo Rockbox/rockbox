@@ -61,7 +61,7 @@ void lcd_update (void)
             if(lcd_framebuffer[x][y/8] || lcd_framebuffer_copy[x][y/8]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
-                  lcd_framebuffer[x][y/8] ^ lcd_framebuffer_copy[x][y/8];
+                    lcd_framebuffer[x][y/8] ^ lcd_framebuffer_copy[x][y/8];
 
                 for(bit=0; bit<8; bit++) {
                     if(lcd_framebuffer[x][y/8]&(1<<bit)) {
@@ -86,7 +86,8 @@ void lcd_update (void)
 
     drawdots(0, &clearpoints[0], cp);
     drawdots(1, &points[0], p);
-/*    Logf("lcd_update: Draws %d pixels, clears %d pixels", p, cp);*/
+    /* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n", 
+       p, cp, p+cp, LCD_HEIGHT*LCD_WIDTH); */
     XSync(dpy,False);
 }
 
@@ -146,7 +147,7 @@ void lcd_update_rect(int x_start, int y_start,
 
     drawdots(0, &clearpoints[0], cp);
     drawdots(1, &points[0], p);
-/*    Logf("lcd_update: Draws %d pixels, clears %d pixels", p, cp);*/
+   /* printf("lcd_update_rect: Draws %d pixels, clears %d pixels\n", p, cp);*/
     XSync(dpy,False);
 }
 
