@@ -330,7 +330,7 @@ void lcd_clear_display(void)
 {
     int i;
     lcd_write(true,LCD_CURSOR(0,0));
-    for (i=0;i<24;i++)
+    for (i=0;i<32;i++)
         lcd_write(false,0);
 }
 
