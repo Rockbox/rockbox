@@ -897,7 +897,6 @@ static void mpeg_thread(void)
 
                 diffpos = curpos - newpos;
 
-#warning "Borde inte mp3buflen vara mp3buf_write?"
                 if(diffpos >= 0 && diffpos < mp3buflen)
                 {
                     /* We are changing to a position that's already in
