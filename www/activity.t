@@ -33,7 +33,7 @@ STATUS(GREEN,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/vie
 STATUS(GREEN,Directory browser UI,apps/tree.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/apps/tree.c", Daniel,Works)
 STATUS(GREEN,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Works)
 STATUS(YELLOW,Playlist handling,firmware/playlist.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/playlist.c", Wavey, Progressing)
-STATUS(YELLOW,Mpeg thread,&nbsp;,&nbsp;,Linus, Progressing)
+STATUS(YELLOW,Mpeg thread,firmware/mpeg.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/mpeg.c",Linus, Progressing)
 #if 0
 STATUS(RED,Boot loader (rolo),&nbsp;,"",&nbsp;,Planned)
 STATUS(RED,New DSP algorithms,&nbsp;,"",&nbsp;,We need help!)
