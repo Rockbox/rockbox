@@ -16,7 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "string.h"
+#include "config.h"
+#include "file.h"
+#include "lcd.h"
 #include "sprintf.h"
 #define ONE_KILOBYTE 1024
 #define ONE_MEGABYTE (1024*1024)
@@ -58,4 +61,70 @@ int main(int argc, char **argv)
     return 0;
 }
 
+#endif
+
+#ifdef SCREENDUMP
+extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+static unsigned char bmpheader[] =
+{
+    0x42, 0x4d, 0x3e, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00,
+    0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0x40, 0x00,
+    0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+    0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xd0, 0x80, 0x00, 0x00, 0x00,
+    0x00, 0x00
+};
+
+static unsigned char buf[112*8];
+static unsigned char buf2[112*8];
+static char dummy[2] = {0, 0};
+static int fileindex = 0;
+
+void screen_dump(void)
+{
+    int f;
+    int i, shift;
+    int x, y;
+    char filename[MAX_PATH];
+
+    i = 0;
+    for(y = 0;y < LCD_HEIGHT/8;y++)
+    {
+        for(x = 0;x < LCD_WIDTH;x++)
+        {
+            buf[i++] = lcd_framebuffer[x][y];
+        }
+    }
+
+    memset(buf2, 0, sizeof(buf2));
+    
+    for(y = 0;y < 64;y++)
+    {
+        shift = y & 7;
+        
+        for(x = 0;x < 112/8;x++)
+        {
+            for(i = 0;i < 8;i++)
+            {
+                buf2[y*112/8+x] |= ((buf[y/8*112+x*8+i] >> shift)
+                                    & 0x01) << (7-i);
+            }
+        }
+    }
+
+    snprintf(filename, MAX_PATH, "/dump%03d.bmp", fileindex++);
+    f = creat(filename, O_WRONLY);
+    if(f >= 0)
+    {
+        write(f, bmpheader, sizeof(bmpheader));
+        
+        for(i = 63;i >= 0;i--)
+        {
+            write(f, &buf2[i*14], 14);
+            write(f, dummy, 2);
+        }
+        
+        close(f);
+    }
+}
 #endif
