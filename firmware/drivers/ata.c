@@ -136,10 +136,10 @@ static int wait_for_end_of_transfer(void)
 }    
 
 int ata_read_sectors(unsigned long start,
-                     unsigned char count,
+                     int count,
                      void* buf) __attribute__ ((section (".icode")));
 int ata_read_sectors(unsigned long start,
-                     unsigned char count,
+                     int count,
                      void* buf)
 {
     int i;
@@ -169,7 +169,11 @@ int ata_read_sectors(unsigned long start,
 
     led(true);
 
-    ATA_NSECTOR = count;
+    if ( count == 256 )
+        ATA_NSECTOR = 0; /* 0 means 256 sectors */
+    else
+        ATA_NSECTOR = (unsigned char)count;
+    
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
@@ -215,7 +219,7 @@ int ata_read_sectors(unsigned long start,
 }
 
 int ata_write_sectors(unsigned long start,
-                      unsigned char count,
+                      int count,
                       void* buf)
 {
     int i;
@@ -242,7 +246,10 @@ int ata_write_sectors(unsigned long start,
 
     led(true);
 
-    ATA_NSECTOR = count;
+    if ( count == 256 )
+        ATA_NSECTOR = 0; /* 0 means 256 sectors */
+    else
+        ATA_NSECTOR = (unsigned char)count;
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;

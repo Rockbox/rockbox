@@ -40,10 +40,10 @@ extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
 extern int ata_init(void);
 extern int ata_read_sectors(unsigned long start,
-                            unsigned char count,
+                            int  count,
                             void* buf);
 extern int ata_write_sectors(unsigned long start,
-                             unsigned char count,
+                             int count,
                              void* buf);
 
 #endif
