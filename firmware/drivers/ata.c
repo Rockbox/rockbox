@@ -512,7 +512,6 @@ static int perform_soft_reset(void)
     ret = ret?0:-1;
 
     sleeping = false;
-    mutex_unlock(&ata_mtx);
     return ret;
 }
 
