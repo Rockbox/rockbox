@@ -406,10 +406,10 @@ static int readwrite(int fd, void* buf, int count, bool write)
     }
 
     /* if buffer has been modified, write it back to disk */
-    if (count && file->dirty) {
+    if (nread && file->dirty) {
         rc = flush_cache(fd);
         if (rc < 0)
-            return nread ? nread : rc * 10 - 3;
+            return rc * 10 - 3;
     }
 
     /* read whole sectors right into the supplied buffer */
