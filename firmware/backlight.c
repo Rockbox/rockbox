@@ -86,7 +86,7 @@ void backlight_thread(void)
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
+                break;
 
             case SYS_USB_DISCONNECTED:
                 usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
