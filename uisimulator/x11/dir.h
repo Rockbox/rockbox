@@ -17,10 +17,26 @@
  *
  ****************************************************************************/
 
+#define dirent x11_dirent
+#define readdir(x) x11_readdir(x)
+#define opendir(x) x11_opendir(x)
+
+/*
+ * The defines above should let us use the readdir() and opendir() in target
+ * code just as they're defined to work in target. They will then call our
+ * x11_* versions of the functions that'll work as wrappers for the actual
+ * host functions.
+ */
+
 #include <sys/types.h>
 #include <dirent.h>
 
-#define opendir(x) x11_opendir(x)
+#undef dirent
 
-#define DIRENT_DEFINED /* prevent it from getting defined again */
+
+#define DIRFUNCTIONS_DEFINED /* prevent those prototypes */
+
 #include "../../firmware/common/dir.h"
+
+extern DIR *x11_opendir(char *name);
+

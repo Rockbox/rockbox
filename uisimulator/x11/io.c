@@ -1,5 +1,5 @@
 
-#include <dirent.h>
+#include "dir.h"
 
 #define SIMULATOR_ARCHOS_ROOT "archos"
 
@@ -13,6 +13,19 @@ DIR *x11_opendir(char *name)
   }
   return opendir(name);
 }
+
+struct dirent *x11_readdir(DIR *dir)
+{
+  static struct dirent secret;
+
+  struct x11_dirent *x11 = (readdir)(dir);
+
+  strcpy(secret.d_name, x11->d_name);
+  secret.attribute = (x11->d_type == DT_DIR)?ATTR_DIRECTORY:0;
+
+  return &secret;
+}
+
 
 int x11_open(char *name, int opts)
 {
