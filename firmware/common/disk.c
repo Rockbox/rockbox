@@ -19,6 +19,10 @@
 #include <stdio.h>
 #include "ata.h"
 #include "debug.h"
+#include "fat.h"
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
+#endif
 #include "disk.h"
 
 /* Partition table entry layout:
@@ -39,7 +43,7 @@
           (array[pos] | (array[pos+1] << 8 ) | \
           (array[pos+2] << 16 ) | (array[pos+3] << 24 ))
 
-static struct partinfo part[8];
+static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
 
 struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 {
@@ -87,5 +91,50 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 struct partinfo* disk_partinfo(int partition)
 {
     return &part[partition];
+}
+
+int disk_mount_all(void)
+{
+    struct partinfo* pinfo;
+    int i,j;
+    int mounted = 0;
+    bool found;
+    int drives = 1;
+#ifdef HAVE_MMC
+    if (mmc_detect()) /* for Ondio, only if card detected */
+    {
+        drives = 2; /* in such case we have two drives to try */
+    }
+#endif
+
+    fat_init(); /* reset all mounted partitions */
+    for (j=0; j<drives; j++)
+    {
+        found = false; /* reset partition-on-drive flag */
+        pinfo = disk_init(IF_MV(j));
+        if (pinfo == NULL)
+        {
+            continue;
+        }
+        for (i=0; mounted<NUM_VOLUMES && i<4; i++)
+        {
+            if (!fat_mount(IF_MV2(mounted,) IF_MV2(j,) pinfo[i].start))
+            {
+                mounted++;
+                found = true; /* at least one valid entry */
+            }
+        }
+
+        if (!found && mounted<NUM_VOLUMES) /* none of the 4 entries worked? */
+        {   /* try "superfloppy" mode */
+            DEBUGF("No partition found, trying to mount sector 0.\n");
+            if (!fat_mount(IF_MV2(mounted,) IF_MV2(j,) 0))
+            {
+                mounted++;
+            }
+        }
+    }
+
+    return mounted;
 }
 

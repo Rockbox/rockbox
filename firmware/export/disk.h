@@ -34,5 +34,6 @@ struct partinfo {
 /* returns a pointer to an array of 8 partinfo structs */
 struct partinfo* disk_init(IF_MV_NONVOID(int volume));
 struct partinfo* disk_partinfo(int partition);
+int disk_mount_all(void); /* returns the # of successful mounts */
 
 #endif

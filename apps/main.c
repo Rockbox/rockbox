@@ -156,7 +156,6 @@ void init(void)
 void init(void)
 {
     int rc, i;
-    struct partinfo* pinfo;
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
 
@@ -240,12 +239,12 @@ void init(void)
     usb_start_monitoring();
 
     /* FixMe: the same kind of mounting happens in usb.c, share the code. */
-    pinfo = disk_init(IF_MV(0));
-    if (!pinfo)
+    rc = disk_mount_all();
+    if (rc<=0)
     {
         lcd_clear_display();
         lcd_puts(0, 0, "No partition");
-        lcd_puts(0, 1, "table.");
+        lcd_puts(0, 1, "found.");
 #ifdef HAVE_LCD_BITMAP
         lcd_puts(0, 2, "Insert USB cable");
         lcd_puts(0, 3, "and fix it.");
@@ -256,47 +255,6 @@ void init(void)
         system_reboot();
     }
 
-    fat_init();
-    for ( i=0; i<4; i++ ) {
-        if (!fat_mount(IF_MV2(0,) IF_MV2(0,) pinfo[i].start))
-            break; /* only one partition gets mounted as of now */
-    }
-
-    if ( i==4 ) {
-        DEBUGF("No partition found, trying to mount sector 0.\n");
-        rc = fat_mount(IF_MV2(0,) IF_MV2(0,) 0);
-        if(rc) {
-            lcd_clear_display();
-            lcd_puts(0,0,"No FAT32");
-            lcd_puts(0,1,"partition!");
-            lcd_update();
-            sleep(HZ);
-            /* Don't leave until we have been in USB mode */
-            while(!dbg_partitions());
-
-            /* The USB thread will panic if the drive still can't be mounted */
-        }
-    }
-#ifdef HAVE_MULTIVOLUME
-    /* mount partition on the optional volume */
-#ifdef HAVE_MMC
-    if (mmc_detect()) /* for Ondio, only if card detected */
-#endif
-    {
-        pinfo = disk_init(1);
-        if (pinfo)
-        {
-            for ( i=0; i<4; i++ ) {
-                if (!fat_mount(1, 1, pinfo[i].start))
-                    break; /* only one partition gets mounted as of now */
-            }
-
-            if ( i==4 ) {
-                rc = fat_mount(1, 1, 0);
-            }
-        }
-    }
-#endif /* #ifdef HAVE_MULTIVOLUME */
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     settings_apply();
