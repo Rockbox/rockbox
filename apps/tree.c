@@ -1384,6 +1384,10 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 #endif
 
             case TREE_MENU:
+#ifdef TREE_MENU_PRE
+                if (lastbutton != TREE_MENU_PRE)
+                    break;
+#endif
                 if (*dirfilter < NUM_FILTER_MODES)
                 {
                     lcd_stop_scroll();
