@@ -180,7 +180,7 @@ FLAC_API const char * const FLAC__StreamDecoderErrorStatusString[] = {
  * Class constructor/destructor
  *
  ***********************************************************************/
-FLAC_API FLAC__StreamDecoder *FLAC__stream_decoder_new()
+FLAC_API FLAC__StreamDecoder *FLAC__stream_decoder_new(void)
 {
 	FLAC__StreamDecoder *decoder;
 	unsigned i;
@@ -1828,7 +1828,7 @@ FLAC__bool read_subframe_(FLAC__StreamDecoder *decoder, unsigned channel, unsign
 	x &= 0xfe;
 
 	if(wasted_bits) {
-		unsigned u;
+		FLAC__uint32 u;
 		if(!FLAC__bitbuffer_read_unary_unsigned(decoder->private_->input, &u, read_callback_, decoder))
 			return false; /* the read_callback_ sets the state for us */
 		decoder->private_->frame.subframes[channel].wasted_bits = u+1;

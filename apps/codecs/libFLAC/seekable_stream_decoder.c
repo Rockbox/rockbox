@@ -135,7 +135,7 @@ FLAC_API const char * const FLAC__SeekableStreamDecoderLengthStatusString[] = {
  *
  ***********************************************************************/
 
-FLAC_API FLAC__SeekableStreamDecoder *FLAC__seekable_stream_decoder_new()
+FLAC_API FLAC__SeekableStreamDecoder *FLAC__seekable_stream_decoder_new(void)
 {
 	FLAC__SeekableStreamDecoder *decoder;
 

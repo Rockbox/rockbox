@@ -317,7 +317,7 @@ static FLAC__bool bitbuffer_read_from_client_(FLAC__BitBuffer *bb, FLAC__bool (*
  *
  ***********************************************************************/
 
-FLAC__BitBuffer *FLAC__bitbuffer_new()
+FLAC__BitBuffer *FLAC__bitbuffer_new(void)
 {
 	FLAC__BitBuffer *bb = (FLAC__BitBuffer*)calloc(1, sizeof(FLAC__BitBuffer));
 
@@ -1983,7 +1983,7 @@ FLAC__bool FLAC__bitbuffer_read_byte_block_aligned_no_crc(FLAC__BitBuffer *bb, F
 	return true;
 }
 
-FLaC__INLINE FLAC__bool FLAC__bitbuffer_read_unary_unsigned(FLAC__BitBuffer *bb, unsigned *val, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data)
+FLaC__INLINE FLAC__bool FLAC__bitbuffer_read_unary_unsigned(FLAC__BitBuffer *bb, FLAC__uint32 *val, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data)
 #ifdef FLAC__NO_MANUAL_INLINING
 {
 	unsigned bit, val_ = 0;

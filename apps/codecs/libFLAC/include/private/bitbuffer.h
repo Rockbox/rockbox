@@ -56,7 +56,7 @@ typedef struct FLAC__BitBuffer FLAC__BitBuffer;
 /*
  * construction, deletion, initialization, cloning functions
  */
-FLAC__BitBuffer *FLAC__bitbuffer_new();
+FLAC__BitBuffer *FLAC__bitbuffer_new(void);
 void FLAC__bitbuffer_delete(FLAC__BitBuffer *bb);
 FLAC__bool FLAC__bitbuffer_init(FLAC__BitBuffer *bb);
 FLAC__bool FLAC__bitbuffer_init_from(FLAC__BitBuffer *bb, const FLAC__byte buffer[], unsigned bytes);
@@ -142,7 +142,7 @@ FLAC__bool FLAC__bitbuffer_read_raw_int64(FLAC__BitBuffer *bb, FLAC__int64 *val,
 FLAC__bool FLAC__bitbuffer_read_raw_uint32_little_endian(FLAC__BitBuffer *bb, FLAC__uint32 *val, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data); /*only for bits=32*/
 FLAC__bool FLAC__bitbuffer_skip_bits_no_crc(FLAC__BitBuffer *bb, unsigned bits, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data); /* WATCHOUT: does not CRC the skipped data! */ /*@@@@ add to unit tests */
 FLAC__bool FLAC__bitbuffer_read_byte_block_aligned_no_crc(FLAC__BitBuffer *bb, FLAC__byte *val, unsigned nvals, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data); /* val may be 0 to skip bytes instead of reading them */ /* WATCHOUT: does not CRC the read data! */
-FLAC__bool FLAC__bitbuffer_read_unary_unsigned(FLAC__BitBuffer *bb, unsigned *val, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data);
+FLAC__bool FLAC__bitbuffer_read_unary_unsigned(FLAC__BitBuffer *bb, FLAC__uint32 *val, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data);
 #ifdef FLAC__SYMMETRIC_RICE
 FLAC__bool FLAC__bitbuffer_read_symmetric_rice_signed(FLAC__BitBuffer *bb, int *val, unsigned parameter, FLAC__bool (*read_callback)(FLAC__byte buffer[], unsigned *bytes, void *client_data), void *client_data);
 #endif
