@@ -89,8 +89,10 @@ SECTIONS
     {
        *(.stack)
        _stackbegin = . - SIZEOF(.iram);
+       stackbegin = . - SIZEOF(.iram);
        . += 0x2000 - SIZEOF(.iram);
        _stackend = .;
+       stackend = .;
     } > DRAM
 
     .bss :
