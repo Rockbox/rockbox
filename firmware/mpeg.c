@@ -251,21 +251,40 @@ static void set_elapsed(struct mp3entry* id3)
     if ( id3->vbr ) {
         if ( id3->vbrflags & VBR_TOC_FLAG ) {
             /* calculate elapsed time using TOC */
-            int i, remainder, plen, relpos;
-
-            relpos = id3->offset * 256 / id3->filesize;
-            remainder = id3->offset - (relpos * id3->filesize / 256);
+            int i;
+            unsigned int remainder, plen, relpos, nextpos;
 
             /* find wich percent we're at */
             for (i=0; i<100; i++ )
-                if ( relpos < id3->toc[i] )
+            {
+                if ( id3->offset < (int)(id3->toc[i] * (id3->filesize / 256)) )
+                {
                     break;
-                        
+                }
+            }
+            
+            i--;
+            if (i < 0)
+                i = 0;
+
+            relpos = id3->toc[i];
+
+            if (i < 99)
+            {
+                nextpos = id3->toc[i+1];
+            }
+            else
+            {
+                nextpos = 256; 
+            }
+
+            remainder = id3->offset - (relpos * (id3->filesize / 256));
+
             /* set time for this percent */
-            id3->elapsed = (i-1) * id3->length / 100;
+            id3->elapsed = i * id3->length / 100;
 
             /* calculate remainder time */
-            plen = (id3->toc[i] - id3->toc[i-1]) * id3->filesize / 256;
+            plen = (nextpos - relpos) * (id3->filesize / 256);
             id3->elapsed += remainder * 1000 / plen ;
         }
         else {
@@ -881,9 +900,12 @@ static void mpeg_thread(void)
 
             case MPEG_FF_REWIND: {
                 struct mp3entry *id3 = mpeg_current_track();
-                int newtime  = id3->elapsed + (int)ev.data;
+                int oldtime  = id3->elapsed;
+                int newtime  = oldtime + (int)ev.data;
                 int curpos, newpos, diffpos;
                 DEBUGF("MPEG_FF_REWIND\n");
+
+                id3->elapsed = newtime;
 
                 if (id3->vbr && (id3->vbrflags & VBR_TOC_FLAG))
                 {
@@ -913,13 +935,23 @@ static void mpeg_thread(void)
                 else if (id3->bpf && id3->tpf)
                     newpos = (newtime*id3->bpf)/id3->tpf;
                 else
+                {
                     /* Not enough information to FF/Rewind */
+                    id3->elapsed = oldtime;
                     break;
+                }
 
-                /* Don't seek right to the end of the file so that we can
-                   transition properly to the next song */
                 if (newpos >= (int)(id3->filesize - id3->id3v1len))
+                {
+                    /* Don't seek right to the end of the file so that we can
+                       transition properly to the next song */
                     newpos = id3->filesize - id3->id3v1len - 1;
+                }
+                else if (newpos < (int)id3->id3v2len)
+                {
+                    /* skip past id3v2 tag */
+                    newpos = id3->id3v2len;
+                }
 
                 newpos = newpos & ~1;
                 curpos = lseek(mpeg_file, 0, SEEK_CUR);
@@ -980,11 +1012,17 @@ static void mpeg_thread(void)
 
                         mpeg_file = open(id3->path, O_RDONLY);
                         if (mpeg_file < 0)
+                        {
+                            id3->elapsed = oldtime;
                             break;
+                        }
                     }
 
                     if(-1 == lseek(mpeg_file, newpos, SEEK_SET))
+                    {
+                        id3->elapsed = oldtime;
                         break;
+                    }
 
                     filling = true;
                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
@@ -995,7 +1033,6 @@ static void mpeg_thread(void)
                 }
 
                 id3->offset = newpos;
-                id3->elapsed = newtime;
 
                 break;
             }
