@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Heikki Hannikainen
+ * Copyright (C) 2002 by Heikki Hannikainen, Uwe Freese
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -99,6 +99,7 @@ char charge_restart_level = CHARGE_RESTART_HI;
 int powermgmt_last_cycle_startstop_min = 20; /* how many minutes ago was the charging started or stopped? */
 int powermgmt_last_cycle_level = 0;          /* which level had the batteries at this time? */
 int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
+int charge_state = 0;                        /* at the beginning, the charger does nothing */
 #endif
 
 
@@ -292,7 +293,6 @@ static void power_thread(void)
     int charged_time = 0;
     int charge_max_time_now = 0;
     int charge_pause = 0;         /* no charging pause at the beginning */
-    bool trickle_enabled = false; /* enable trickle charging only after a complete charging cycle */
     int trickle_time = 0;         /* how many minutes trickle charging already? */
 #endif
     
@@ -372,6 +372,7 @@ static void power_thread(void)
                     /* disable charging for several hours from this point, just to be sure */
                     charge_pause = CHARGE_PAUSE_LEN;
                     /* no trickle charge here, because the charging cycle didn't end the right way */
+                    charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                 } else {
                     if (charged_time > CHARGE_MIN_TIME) {
                         /* have charged continuously over the minimum charging time,
@@ -396,9 +397,11 @@ static void power_thread(void)
                             /* disable charging for several hours from this point, just to be sure */
                             charge_pause = CHARGE_PAUSE_LEN;
                             /* enable trickle charging */
-                            trickle_enabled = true;
-                            trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
-                            trickle_time = 0;
+                            if (global_settings.trickle_charge) {
+                                trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
+                                trickle_time = 0;
+                                charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                            }
                         } else {
                             /* if we didn't disable the charger in the previous test, check for low positive delta */
                             delta = ( power_history[POWER_HISTORY_LEN-1] * 100
@@ -416,9 +419,11 @@ static void power_thread(void)
                                 /* disable charging for several hours from this point, just to be sure */
                                 charge_pause = CHARGE_PAUSE_LEN;
                                 /* enable trickle charging */
-                                trickle_enabled = true;
-                                trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
-                                trickle_time = 0;
+                                if (global_settings.trickle_charge) {
+                                    trickle_sec = CURRENT_NORMAL * 60 / CURRENT_CHARGING; /* first guess, maybe consider if LED backlight is on, disk is active,... */
+                                    trickle_time = 0;
+                                    charge_state = 2; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                                }
                             }
                         }
                     }
@@ -426,12 +431,10 @@ static void power_thread(void)
             } else { /* charged inserted but not enabled */
 
                 /* trickle charging */
-                if (trickle_enabled) {
+                if (charge_state > 1) { /* top off or trickle? */
                     /* adjust trickle charge time */
-                    if (  ((trickle_time <= TOPOFF_MAX_TIME)
-                          && (power_history[POWER_HISTORY_LEN-1] > TOPOFF_VOLTAGE))
-                       || ((trickle_time > TOPOFF_MAX_TIME)
-                          && (power_history[POWER_HISTORY_LEN-1] > TRICKLE_VOLTAGE)) ) { /* charging too much */
+                    if (  ((charge_state == 2) && (power_history[POWER_HISTORY_LEN-1] > TOPOFF_VOLTAGE))
+                       || ((charge_state == 3) && (power_history[POWER_HISTORY_LEN-1] > TRICKLE_VOLTAGE)) ) { /* charging too much */
                         trickle_sec--;
                     } else { /* charging too less */
                         trickle_sec++;
@@ -448,9 +451,12 @@ static void power_thread(void)
                     /* trickle charging long enough? */
                     
                     if (trickle_time++ > TRICKLE_MAX_TIME + TOPOFF_MAX_TIME) {
-                        trickle_enabled = false;
                         trickle_sec = 0; /* show in debug menu that trickle is off */
+                        charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                     }
+
+                    if ((charge_state == 2) && (trickle_time > TOPOFF_MAX_TIME)) /* change state? */
+                        charge_state = 3; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                 }               
 
                 /* if battery is not full, enable charging */
@@ -475,12 +481,12 @@ static void power_thread(void)
                         charged_time = 0;
 
                         charger_enable(true);
-
-                    /* clear the power history so that we don't use values before
-                     * discharge for the long-term delta
-                     */
-                    for (i = 0; i < POWER_HISTORY_LEN-1; i++)
-                        power_history[i] = power_history[POWER_HISTORY_LEN-1];
+                        charge_state = 1; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                        /* clear the power history so that we don't use values before
+                         * discharge for the long-term delta
+                         */
+                        for (i = 0; i < POWER_HISTORY_LEN-1; i++)
+                            power_history[i] = power_history[POWER_HISTORY_LEN-1];
                     }
                 }
             }
@@ -491,9 +497,9 @@ static void power_thread(void)
                 DEBUGF("power: charger disconnected, disabling\n");
                 powermgmt_last_cycle_level = battery_level();
                 powermgmt_last_cycle_startstop_min = 0;
-                trickle_enabled = false;
                 trickle_sec = 0; /* show in debug menu that trickle is off */
                 charger_enable(false);
+                charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                 snprintf(power_message, POWER_MESSAGE_LEN, "Charger disc");
             }
             /* charger not inserted and disabled, so we're discharging */
