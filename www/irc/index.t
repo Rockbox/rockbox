@@ -16,6 +16,10 @@ for later reference.
 <li><a href="rockbox-20020325.log">March 25, 2002</a>
 <li><a href="rockbox-20020326.log">March 26, 2002</a>
 <li><a href="rockbox-20020327.log">March 27, 2002</a>
+<li><a href="rockbox-20020416.log">April 16, 2002</a>
+<li><a href="rockbox-20020417.log">April 17, 2002</a>
+<li><a href="rockbox-20020418.log">April 18, 2002</a>
+<li><a href="rockbox-20020419.log">April 19, 2002</a>
 </ul>
 
 #include "foot.t"
