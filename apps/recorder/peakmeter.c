@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "mas.h"
 #include "thread.h"
 #include "kernel.h"
