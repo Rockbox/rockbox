@@ -1679,7 +1679,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
             case BUTTON_MENU:
 #endif
                 if (((type==INT) && (*intvar != oldval)) ||
-                    ((type==BOOL) && (*boolvar != oldval))) {
+                    ((type==BOOL) && ((int)*boolvar != oldval))) {
                     if (type==INT)
                         *intvar=oldval;
                     else
