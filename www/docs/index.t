@@ -6,6 +6,7 @@
 <ul>
 <li><a href="/docs/faq.html">Frequently Asked Questions</a>
 <li><a href="/manual/">User manual</a>
+<li><a href="/docs/features.html">Feature Comparison Chart</a>
 </ul>
 
 <h2>For developers</h2>
