@@ -12,6 +12,9 @@
 /* define this if you have a charcell LCD display */
 #define HAVE_LCD_CHARCELLS 1
 
+/* define this if you have a post-4.50 charcell LCD display */
+#define HAVE_NEW_CHARCELL_LCD 1
+
 /* define this if you have the Recorder's 10-key keyboard */
 #define HAVE_RECORDER_KEYPAD 1
 
