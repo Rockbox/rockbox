@@ -2,6 +2,13 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2002-06-01</i>: Version 1.0 is released! <a href="download/">Download it here</a>.
+
+<p><i>2002-06-01</i>: Web site has been down three days due to a major power loss.
+
+<p><i>2002-05-27</i>: All v1.0 code is written, we are now entering debug phase.
+If you like living on the edge, <a href="daily.shtml">here are daily builds</a>.
+
 <p><i>2002-05-26</i>: New web design. First player release drawing closer.
 
 <p><i>2002-05-03</i>: <b>SOUND!</b> Linus' experimental MAS code has 

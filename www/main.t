@@ -10,18 +10,13 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-06-19</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
+
 <p><i>2002-06-19</i>: Recorder sound support checked into CVS. Good news: No background noise!
 
 <p><i>2002-06-10</i>: Playlist and scroll support added. Testing for release v1.1.
 
 <p><i>2002-06-07</i>: The ATA driver now works for the Recorder models too.
-
-<p><i>2002-06-01</i>: Version 1.0 is released! <a href="download.html">Download it here</a>.
-
-<p><i>2002-06-01</i>: Web site has been down three days due to a major power loss.
-
-<p><i>2002-05-27</i>: All v1.0 code is written, we are now entering debug phase.
-If you like living on the edge, <a href="daily.shtml">here are daily builds</a>.
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
