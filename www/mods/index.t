@@ -17,6 +17,11 @@
 
 </ul>
 
+<h2>External pages</h2>
+<ul>
+<li><a href="http://www.geocities.com/notching/Sony-archos-remote.html">Nick Robinson's Sony Remote Joystick RM-X4S interface</a>
+</ul>
+
 <p><img src="esd.jpg">
 <br><i>Practice safe modding!</i>
 
