@@ -17,6 +17,14 @@ Try one of these:
 <li> <a href="http://gnuwin32.sourceforge.net/packages/diffutils.htm">http://gnuwin32.sourceforge.net/packages/diffutils.htm</a> - diff for Windows
 </ul>
 
+<h2>Newlines</h2>
+<p>
+ These tools will assume and operate on "unix-style" newlines. That means all
+files that you're diffing and patching etc must have LF newlines only, and
+<b>not</b> the Windows/DOS standard CRLF newlines,
+<p>
+ Not complying to this simple fact will cause you grief. Mark my words.
+
 <h2>Creating A Patch</h2>
 <p>
  We generate diffs (often called patches) using 'diff' in a manner similar to
@@ -80,6 +88,7 @@ manually.
  You can use the --dry-run option to patch to make sure that the patch applies
 clean. It doesn't actually apply the patch, only prints what would happen if
 you run it.
+<h2>Removing A Patch</h2>
 <p>
  You can remove a patch again from the sources by doing the reverse action of
 a specific patch. You do this with the -R (or --reverse) options, such as:
