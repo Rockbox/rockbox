@@ -662,6 +662,7 @@ static bool radio_add_preset(void)
     return true;
 }
 
+/* button preprocessor for preset option submenu */
 static int handle_radio_presets_menu_cb(int key, int m)
 {
     (void)m;
@@ -715,6 +716,7 @@ bool radio_delete_preset(void)
     return true; /* Make the menu return immediately */
 }
 
+/* little menu on what to do with a preset entry */
 bool handle_radio_presets_menu(void)
 {
     static const struct menu_item preset_menu_items[] = {
@@ -732,6 +734,7 @@ bool handle_radio_presets_menu(void)
     return false;
 }
 
+/* button preprocessor for list of preset stations menu */
 int handle_radio_presets_cb(int key, int m)
 {
     (void)m;
@@ -752,6 +755,11 @@ int handle_radio_presets_cb(int key, int m)
 #endif
 #ifdef FM_PRESET_ACTION
         case FM_PRESET_ACTION:
+#endif
+#ifdef MENU_ENTER2
+        case MENU_ENTER2 | BUTTON_REPEAT:
+#endif
+        case MENU_ENTER | BUTTON_REPEAT: /* long gives options */
         {
             bool ret;
             ret = handle_radio_presets_menu();
@@ -762,19 +770,31 @@ int handle_radio_presets_cb(int key, int m)
                 key = BUTTON_NONE;
             break;
         }
+#ifdef MENU_ENTER2
+        case MENU_ENTER2 | BUTTON_REL:
 #endif
+        case MENU_ENTER | BUTTON_REL:
+            key = MENU_ENTER; /* fake enter for short press */
+            break;
 
+#ifdef MENU_ENTER2
+        case MENU_ENTER2:
+#endif
+        case MENU_ENTER: /* ignore down event */
             /* Ignore the release events */
-#if defined (FM_PRESET_ADD) || defined (FM_PRESET_ACTION)
+#ifdef FM_PRESET_ADD
         case FM_PRESET_ADD | BUTTON_REL:
+#endif
+#ifdef FM_PRESET_ACTION
         case FM_PRESET_ACTION | BUTTON_REL:
+#endif
             key = BUTTON_NONE;
             break;
-#endif
     }
     return key;
 }
 
+/* present a list of preset stations */
 bool handle_radio_presets(void)
 {
     int result;
@@ -850,13 +870,39 @@ static bool toggle_mono_mode(void)
     return false;
 }
 
+
+/* button preprocessor for the main menu */
+int radio_menu_cb(int key, int m)
+{
+    (void)m;
+    switch(key)
+    {
+#ifdef MENU_ENTER2
+    case MENU_ENTER2:
+#endif
+    case MENU_ENTER:
+        key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
+        break;
+
+#ifdef MENU_ENTER2
+    case MENU_ENTER2 | BUTTON_REL:
+#endif
+    case MENU_ENTER | BUTTON_REL:
+        key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
+        break;
+    }
+
+    return key;
+}
+
+/* main menu of the radio screen */
 bool radio_menu(void)
 {
     struct menu_item items[5];
     int m;
     bool result;
 
-    m = menu_init(items, 0, NULL, NULL, NULL, NULL);
+    m = menu_init(items, 0, radio_menu_cb, NULL, NULL, NULL);
 
 #if CONFIG_KEYPAD == ONDIO_PAD /* Ondio has no key for presets, put it in menu */
     /* fixme: make real string table entries */
