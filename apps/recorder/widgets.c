@@ -21,26 +21,21 @@
 #include "widgets.h"
 
 #ifdef HAVE_LCD_BITMAP
-/*
- * Print a progress bar
- */
-void progressbar(int x, int y, int width, int height, int percent, int direction)
+
+/* Valid dimensions return true, invalid false */
+bool valid_dimensions(int x, int y, int width, int height) 
 {
-    int pos;
+    if((x < 0) || (x + width > LCD_WIDTH) || 
+       (y < 0) || (y + height > LCD_HEIGHT))
+    {
+        return false;
+    }
 
-    /* check position and dimensions */
-    if(x < 0)
-        return;
+    return true;
+}
 
-    if(y < 0)
-        return;
-
-    if(x + width > LCD_WIDTH)
-        return;
-
-    if(y + height > LCD_HEIGHT)
-        return;
-
+void init_bar(int x, int y, int width, int height)
+{
     /* draw box */
     lcd_drawrect(x, y, width, height);
 
@@ -52,6 +47,21 @@ void progressbar(int x, int y, int width, int height, int percent, int direction
 
     /* clear pixels in progress bar */
     lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+}
+
+/*
+ * Print a progress bar
+ */
+void progressbar(int x, int y, int width, int height, int percent, 
+                 int direction)
+{
+    int pos;
+
+    /* check position and dimensions */
+    if (!valid_dimensions(x, y, width, height))
+        return;
+
+    init_bar(x, y, width, height);
 
     /* draw bar */
     pos = percent;
@@ -90,29 +100,10 @@ void slidebar(int x, int y, int width, int height, int percent, int direction)
     int pos;
 
     /* check position and dimensions */
-    if(x < 0)
+    if (!valid_dimensions(x, y, width, height))
         return;
 
-    if(y < 0)
-        return;
-
-    if(x + width > LCD_WIDTH)
-        return;
-
-    if(y + height > LCD_HEIGHT)
-        return;
-
-    /* draw box */
-    lcd_drawrect(x, y, width, height);
-
-    /* clear edge pixels */
-    lcd_clearpixel(x, y);
-    lcd_clearpixel((x + width - 1), y);
-    lcd_clearpixel(x, (y + height - 1));
-    lcd_clearpixel((x + width - 1), (y + height - 1));
-
-    /* clear pixels in progress bar */
-    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+    init_bar(x, y, width, height);
 
     /* draw knob */
     pos = percent;
@@ -147,7 +138,8 @@ void slidebar(int x, int y, int width, int height, int percent, int direction)
 /*
  * Print a scroll bar
  */
-void scrollbar(int x, int y, int width, int height, int items, int min_shown, int max_shown, int orientation)
+void scrollbar(int x, int y, int width, int height, int items, int min_shown, 
+               int max_shown, int orientation)
 {
     int min;
     int max;
@@ -155,29 +147,10 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown, in
     int size;
 
     /* check position and dimensions */
-    if(x < 0)
+    if (!valid_dimensions(x, y, width, height))
         return;
 
-    if(y < 0)
-        return;
-
-    if(x + width > LCD_WIDTH)
-        return;
-
-    if(y + height > LCD_HEIGHT)
-        return;
-
-    /* draw box */
-    lcd_drawrect(x, y, width, height);
-
-    /* clear edge pixels */
-    lcd_clearpixel(x, y);
-    lcd_clearpixel((x + width - 1), y);
-    lcd_clearpixel(x, (y + height - 1));
-    lcd_clearpixel((x + width - 1), (y + height - 1));
-
-    /* clear pixels in progress bar */
-    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+    init_bar(x, y, width, height);
 
     /* min should be min */
     if(min_shown < max_shown) {
