@@ -27,69 +27,45 @@
 void progressbar(int x, int y, int width, int height, int percent, int direction)
 {
     int pos;
-    int i,j;
 
-    /* draw horizontal lines */
-    for(i=x+1;i<=x+width-2;i++) {
-        DRAW_PIXEL(i,y);
-        DRAW_PIXEL(i,(y+height-1));
-    }
-
-    /* draw vertical lines */
-    for(i=1;i<height;i++) {
-        DRAW_PIXEL(x,(y+i));
-        DRAW_PIXEL((x+width-1),(y+i));
-    }
+    /* draw box */
+    lcd_drawrect(x, y, width, height);
 
     /* clear edge pixels */
-    CLEAR_PIXEL(x,y);
-    CLEAR_PIXEL((x+width-1),y);
-    CLEAR_PIXEL(x,(y+height-1));
-    CLEAR_PIXEL((x+width-1),(y+height-1));
+    lcd_clearpixel(x, y);
+    lcd_clearpixel((x + width - 1), y);
+    lcd_clearpixel(x, (y + height - 1));
+    lcd_clearpixel((x + width - 1), (y + height - 1));
 
     /* clear pixels in progress bar */
-    for(i=1;i<=width-2;i++) {
-        for(j=1;j<=height-2;j++) {
-            CLEAR_PIXEL((x+i),(y+j));
-            CLEAR_PIXEL((x+i),(y+j));
-        }
-    }
+    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
 
     /* draw bar */
-    pos=percent;
-    if(pos<0)
-        pos=0;
-    if(pos>100)
-        pos=100;
+    pos = percent;
+    if(pos < 0)
+        pos = 0;
+    if(pos > 100)
+        pos = 100;
 
     switch (direction)
     {
         case Grow_Right:
-            pos=(width-2)*pos/100;
-            for(i=1;i<=pos;i++)
-                for(j=1;j<height-1;j++)
-                    DRAW_PIXEL((x+i),(y+j));
+            pos=(width - 2) * pos / 100;
+            lcd_fillrect(x + 1, y + 1, pos, height - 2);
             break;
         case Grow_Left:
-            pos=(width-2)*(100-pos)/100;
-            for(i=pos+1;i<=width-2;i++)
-                for(j=1;j<height-1;j++)
-                    DRAW_PIXEL((x+i),(y+j));
+            pos=(width - 2) * (100 - pos) / 100;
+            lcd_fillrect(x + pos, y + 1, width - 1 - pos, height - 2);
             break;
         case Grow_Down:
-            pos=(height-2)*pos/100;
-            for(i=1;i<=pos;i++)
-                for(j=1;j<width-1;j++)
-                    DRAW_PIXEL((x+j),(y+i));
+            pos=(height - 2) * pos / 100;
+            lcd_fillrect(x + 1, y + 1, width - 2, pos);
             break;
         case Grow_Up:
-            pos=(height-2)*(100-pos)/100;
-            for(i=pos+1;i<=height-2;i++)
-                for(j=1;j<width-1;j++)
-                    DRAW_PIXEL((x+j),(y+i));
+            pos=(height - 2) * (100 - pos) / 100;
+            lcd_fillrect(x + 1, y + pos, width - 2, height - 1 - pos);
             break;
     }
-
 }
 
 
@@ -99,63 +75,127 @@ void progressbar(int x, int y, int width, int height, int percent, int direction
 void slidebar(int x, int y, int width, int height, int percent, int direction)
 {
     int pos;
-    int i,j;
 
-    /* draw horizontal lines */
-    for(i=x+1;i<=x+width-2;i++) {
-        DRAW_PIXEL(i,y);
-        DRAW_PIXEL(i,(y+height-1));
-    }
-
-    /* draw vertical lines */
-    for(i=1;i<height;i++) {
-        DRAW_PIXEL(x,(y+i));
-        DRAW_PIXEL((x+width-1),(y+i));
-    }
+    /* draw box */
+    lcd_drawrect(x, y, width, height);
 
     /* clear edge pixels */
-    CLEAR_PIXEL(x,y);
-    CLEAR_PIXEL((x+width-1),y);
-    CLEAR_PIXEL(x,(y+height-1));
-    CLEAR_PIXEL((x+width-1),(y+height-1));
+    lcd_clearpixel(x, y);
+    lcd_clearpixel((x + width - 1), y);
+    lcd_clearpixel(x, (y + height - 1));
+    lcd_clearpixel((x + width - 1), (y + height - 1));
 
     /* clear pixels in progress bar */
-    for(i=1;i<=width-2;i++)
-        for(j=1;j<=height-2;j++) {
-            CLEAR_PIXEL((x+i),(y+j));
-            CLEAR_PIXEL((x+i),(y+j));
-        }
+    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
 
-    /* draw point */
-    pos=percent;
-    if(pos<0)
-        pos=0;
-    if(pos>100)
-        pos=100;
+    /* draw knob */
+    pos = percent;
+    if(pos < 0)
+        pos = 0;
+    if(pos > 100)
+        pos = 100;
 
     switch (direction)
     {
         case Grow_Right:
-            pos=(width-height-1)*pos/100;
+            pos = (width - height) * pos / 100;
             break;
         case Grow_Left:
-            pos=(width-height-1)*(100-pos)/100;
+            pos=(width - height) * (100 - pos) / 100;
             break;
         case Grow_Down:
-            pos=(height-width-1)*pos/100;
+            pos=(height - width) * pos / 100;
             break;
         case Grow_Up:
-            pos=(height-width-1)*(100-pos)/100;
+            pos=(height - width) * (100 - pos) / 100;
             break;
     }
 
     if(direction == Grow_Left || direction == Grow_Right)
-        for(i=1;i<height;i++)
-            for(j=1;j<height;j++)
-                DRAW_PIXEL((x+pos+i),(y+j));
+        lcd_fillrect(x + pos + 1, y + 1, height - 2, height - 2);
     else
-        for(i=1;i<width;i++)
-            for(j=1;j<width;j++)
-                DRAW_PIXEL((x+i),(y+pos+j));
+        lcd_fillrect(x + 1, y + pos + 1, width - 2, width - 2);
+}
+
+
+/*
+ * Print a scroll bar
+ */
+void scrollbar(int x, int y, int width, int height, int items, int min_shown, int max_shown, int orientation)
+{
+    int min;
+    int max;
+    int start;
+    int size;
+
+    /* draw box */
+    lcd_drawrect(x, y, width, height);
+
+    /* clear edge pixels */
+    lcd_clearpixel(x, y);
+    lcd_clearpixel((x + width - 1), y);
+    lcd_clearpixel(x, (y + height - 1));
+    lcd_clearpixel((x + width - 1), (y + height - 1));
+
+    /* clear pixels in progress bar */
+    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+
+    /* min should be min */
+    if(min_shown < max_shown) {
+        min = min_shown;
+        max = max_shown;
+    }
+    else {
+        min = max_shown;
+        max = min_shown;
+    }
+
+    /* limit min and max */
+    if(min < 0)
+        min = 0;
+    if(min > items)
+        min = items;
+
+    if(max < 0)
+        max = 0;
+    if(max > items)
+        max = items;
+
+    /* calc start and end of the knob */
+    if(items > 0 && items > (max - min)) {
+        if(orientation == VERTICAL) {
+            size = (height - 2) * (max - min) / items;
+            start = (height - 2 - size) * min / (items - (max - min));
+        }
+        else {
+            size = (width - 2) * (max - min) / items;
+            start = (width - 2 - size) * min / (items - (max - min));
+        }
+    }
+    else { /* if null draw a full bar */
+        start = 0;
+        if(orientation == VERTICAL) 
+            size = (height - 2);
+        else
+            size = (width - 2);
+    }
+
+    /* knob has a width */
+    if(size != 0) {
+        if(orientation == VERTICAL)
+            lcd_fillrect(x + 1, y + start + 1, width - 2, size);
+        else
+            lcd_fillrect(x + start + 1, y + 1, size, height - 2);
+    }
+    else { /* width of knob is null */
+        if(orientation == VERTICAL) {
+            start = (height - 2 - 1) * min / items;
+            lcd_fillrect(x + 1, y + start + 1, width - 2, 1);
+        }
+        else {
+            start = (width - 2 - 1) * min / items;
+            lcd_fillrect(x + start + 1, y + 1, 1, height - 2);
+        }
+    }
 }
 #endif
