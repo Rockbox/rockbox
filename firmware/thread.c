@@ -23,6 +23,8 @@ typedef union
     struct regs_t
     {
         unsigned int  r[7]; /* Registers r8 thru r14 */
+        unsigned int  mach,
+                      macl;
         void          *sp;  /* Stack pointer (r15) */
         unsigned int  sr;   /* Status register */
 #if 0
@@ -111,6 +113,8 @@ static inline void stctx(void* addr)
     /* here a far better code */
     asm volatile ("sts.l pr,  @-%0\n\t"
                   "stc.l sr,  @-%0\n\t"
+                  "sts.l macl,@-%0\n\t"
+                  "sts.l mach,@-%0\n\t"
                   "mov.l r15, @-%0\n\t"
                   "mov.l r14, @-%0\n\t"
                   "mov.l r13, @-%0\n\t"
@@ -159,6 +163,8 @@ static inline void ldctx(void* addr)
                   "mov.l @%0+,r13\n\t"
                   "mov.l @%0+,r14\n\t"
                   "mov.l @%0+,r15\n\t"
+                  "lds.l @%0+,mach\n\t"
+                  "lds.l @%0+,macl\n\t"
                   "ldc.l @%0+,sr\n\t"
                   "lds.l @%0+,pr" : : "r" (addr));
 
