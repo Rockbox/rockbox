@@ -172,7 +172,7 @@ static int start=0;
 static int dirpos[MAX_DIR_LEVELS];
 static int cursorpos[MAX_DIR_LEVELS];
 static int dirlevel=0;
-static bool playing = false;
+static int playing = 0;
 static char currdir[255];
 
 /* QUICK HACK! this should be handled by the playlist code later */
@@ -180,25 +180,36 @@ char* peek_next_track(int type)
 {
     static char buf[256];
 
-    /* next-song only works when not browsing */
+    /* next-song only works when playing */
     if (!playing)
         return NULL;
 
-    /* get next track in dir */
-    while (dircursor + start + 1 < numentries ) {
-        if(dircursor+1 < TREE_MAX_ON_SCREEN)
+    switch(playing) {
+    default:
+    case 1:
+      /* play-full-dir mode */
+      
+      /* get next track in dir */
+      while (dircursor + start + 1 < numentries ) {
+          if(dircursor+1 < TREE_MAX_ON_SCREEN)
             dircursor++;
-        else
+          else
             start++;
-        if ( dircacheptr[dircursor+start]->file &&
-             dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
-            snprintf(buf,sizeof buf,"%s/%s",
-                     currdir, dircacheptr[dircursor+start]->name );
-            lcd_clear_display();
-            lcd_puts(0,0,"<Playing>");
-            lcd_puts(0,1,"<all files>");
-            return buf;
-        }
+          if ( dircacheptr[dircursor+start]->file &&
+               dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+              snprintf(buf,sizeof buf,"%s/%s",
+                       currdir, dircacheptr[dircursor+start]->name );
+              lcd_clear_display();
+              lcd_puts(0,0,"<Playing>");
+              lcd_puts(0,1,"<all files>");
+              return buf;
+          }
+      }
+      break;
+      
+    case 2:
+      /* playlist mode */
+      return playlist_next(type);
     }
 
     return NULL;
@@ -286,13 +297,25 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
-                    playing = true;
-                    playtune(currdir, dircacheptr[dircursor+start]->name);
-                    playing = false;
+                    int len=
+                      strlen(dircacheptr[dircursor+start]->name);
+                    if((len > 4) &&
+                       !strcmp(&dircacheptr[dircursor+start]->name[len-4],
+                               ".m3u")) {
+                        playing = 2;
+                        play_list(currdir, dircacheptr[dircursor+start]->name);
+                    }
+                    
+                    else {
+
+                        playing = 1;
+                        playtune(currdir, dircacheptr[dircursor+start]->name);
+                        playing = 0;
 #ifdef HAVE_LCD_BITMAP
-                    lcd_setmargins(0, MARGIN_Y);
-                    lcd_setfont(0);
+                        lcd_setmargins(0, MARGIN_Y);
+                        lcd_setfont(0);
 #endif
+                    }
                 }
 
                 numentries = showdir(currdir, start);  
