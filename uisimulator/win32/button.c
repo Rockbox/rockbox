@@ -103,14 +103,20 @@ void button_event(int key, bool pressed)
     case VK_F3:
         new_btn = BUTTON_F3;
         break;
-#endif
-
-#ifdef BUTTON_PLAY
-    case VK_NUMPAD5:
-    case VK_SPACE:
-        new_btn = BUTTON_PLAY;
+#elif defined(BUTTON_REC)
+    case VK_DIVIDE:
+        new_btn = BUTTON_REC;
         break;
 #endif
+
+    case VK_NUMPAD5:
+    case VK_SPACE:
+#ifdef BUTTON_PLAY
+        new_btn = BUTTON_PLAY;
+#elif defined(BUTTON_SELECT)
+        new_btn = BUTTON_SELECT;
+#endif
+        break;
 
 #ifdef HAVE_LCD_BITMAP
     case VK_NUMPAD0:
@@ -123,15 +129,13 @@ void button_event(int key, bool pressed)
         break;
 #endif
 
+    case VK_DECIMAL:
 #ifdef BUTTON_MENU
-#if CONFIG_KEYPAD == PLAYER_PAD
-    case VK_RETURN:
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    case VK_INSERT:
-#endif
         new_btn = BUTTON_MENU;
-        break;
+#elif defined(BUTTON_MODE)
+        new_btn = BUTTON_MODE;
 #endif
+        break;
     }
 
     if (pressed)
@@ -208,15 +212,6 @@ void button_event(int key, bool pressed)
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
 
-int button_status(void)
-{
-    return btn;
-}
-   
-void button_init(void)
-{
-}
-
 /* Again copied from real button.c... */
 
 int button_get(bool block)
@@ -237,7 +232,17 @@ int button_get_w_tmo(int ticks)
     return (ev.id != SYS_TIMEOUT)? ev.id: BUTTON_NONE;
 } 
 
+void button_init(void)
+{
+}
+
+int button_status(void)
+{
+    return btn;
+}
+
 void button_clear_queue(void)
 {
     queue_empty(&button_queue);
 }
+
