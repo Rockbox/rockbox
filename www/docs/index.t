@@ -25,6 +25,7 @@ Archos. (Jean Boullier)
 
 <li><a href="license.html">The GNU General Public License</a> under which terms Rockbox may be distributed
 <li><a href="tools.html">Useful mp3 and jukebox related tools</a>
+<li><a href="rvf.html">How to Create RVF Movies</a>
 
 </ul>
 
