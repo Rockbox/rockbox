@@ -11,7 +11,7 @@
 <li><a href="credits.html">The Noble People Behind Rockbox</a>
 </ul>
 
-<h2>For hackers</h2>
+<h2>For <a href="http://www.tuxedo.org/~esr/faqs/hacker-howto.html">hackers</a></h2>
 
 <h3>Howtos</h3>
 <ul>
