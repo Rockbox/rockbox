@@ -317,7 +317,7 @@ struct plugin_api {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     bool (*button_hold)(void);
 #endif
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_HWCODEC == MASNONE)  && !defined(SIMULATOR)
     void (*pcm_play_data)(const unsigned char *start, int size,
 		    void (*get_more)(unsigned char** start, long*size));
     void (*pcm_play_stop)(void);
