@@ -21,6 +21,7 @@
 #ifndef SIMULATOR
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include "lcd.h"
 #include "menu.h"
 #include "debug_menu.h"
