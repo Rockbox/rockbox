@@ -42,7 +42,7 @@ enum
     MPEG_ENCODER
 } mpeg_mode;
 
-unsigned long shadow_7f1;
+extern unsigned long shadow_7f1;
 
 #endif /* #ifdef HAVE_MAS3587F */
 
@@ -554,8 +554,8 @@ static void init_playback(void)
     mas_writemem(MAS_BANK_D0,0x7f2,&val,1);
 
     /* Set Demand mode and validate all settings */
-    val = 0x25;
-    mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
+    shadow_7f1 = 0x25;
+    mas_writemem(MAS_BANK_D0,0x7f1,&shadow_7f1,1);
 
     /* Start the Layer2/3 decoder applications */
     val = 0x0c;
