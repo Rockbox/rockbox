@@ -246,6 +246,39 @@ static void remove_all_tags(void)
 }
 #endif
 
+static void set_elapsed(struct mp3entry* id3)
+{
+    if ( id3->vbr ) {
+        if ( id3->vbrflags & VBR_TOC_FLAG ) {
+            /* calculate elapsed time using TOC */
+            int i, remainder, plen, relpos;
+
+            relpos = id3->offset * 256 / id3->filesize;
+            remainder = id3->offset - (relpos * id3->filesize / 256);
+
+            /* find wich percent we're at */
+            for (i=0; i<100; i++ )
+                if ( relpos < id3->toc[i] )
+                    break;
+                        
+            /* set time for this percent */
+            id3->elapsed = (i-1) * id3->length / 100;
+
+            /* calculate remainder time */
+            plen = (id3->toc[i] - id3->toc[i-1]) * id3->filesize / 256;
+            id3->elapsed += remainder * 1000 / plen ;
+        }
+        else {
+            /* no TOC exists. set a rough estimate using average bitrate */
+            int tpk = (id3->filesize / 1024) / id3->length;
+            id3->elapsed = id3->offset * tpk / 1024;
+        }
+    }
+    else
+        /* constant bitrate == simple frame calculation */
+        id3->elapsed = id3->offset / id3->bpf * id3->tpf;
+}
+
 static bool paused; /* playback is paused */
 #ifdef SIMULATOR
 static bool playing = false;
@@ -688,9 +721,13 @@ static void mpeg_thread(void)
                     return;
 
                 start_offset = (int)ev.data;
+
+                /* mid-song resume? */
                 if (start_offset) {
+                    struct mp3entry* id3 = &id3tags[tag_read_idx]->id3;
                     lseek(mpeg_file, start_offset, SEEK_SET);
-                    id3tags[tag_read_idx]->id3.offset = start_offset;
+                    id3->offset = start_offset;
+                    set_elapsed(id3);
                 }
                 else {
                     /* skip past id3v2 tag (to an even byte) */
