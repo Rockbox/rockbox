@@ -37,7 +37,6 @@ struct event_queue button_queue;
 
 static int repeat_mask = DEFAULT_REPEAT_MASK;
 static int release_mask = DEFAULT_RELEASE_MASK;
-static int locked_mask = DEFAULT_LOCKED_MASK;
 
 static int button_read(void);
 
@@ -50,73 +49,92 @@ static void button_tick(void)
     int diff;
 
     /* only poll every X ticks */
-    if ( ++tick >= POLL_FREQUENCY ) {
+    if ( ++tick >= POLL_FREQUENCY )
+    {
         bool post = false;
         int btn = button_read();
-
+        
+        /* Find out if a key has been released */
+        diff = btn ^ lastbtn;
+        if((btn & diff) == 0)
+        {
+            if(diff & release_mask)
+                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+        }
+        
         if ( btn )
         {
-            /* Find out if a key has been released */
-            diff = btn ^ lastbtn;
-            if((btn & diff) == 0)
-            {
-                if(diff & release_mask)
-                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
-            }
-            
             /* normal keypress */
-            if ( btn != lastbtn ) {
+            if ( btn != lastbtn )
+            {
                 post = true;
+                repeat = false;
             }
-            /* repeat? */
-            else {
-                if ( repeat ) {
+            else /* repeat? */
+            {
+                if ( repeat )
+                {
                     if ( ! --count ) {
                         post = true;
                         count = REPEAT_INTERVAL;
                     }
                 }
-                else if (count++ > REPEAT_START) {
-                    /* Only repeat if a repeatable key is pressed */
-                    if(btn & repeat_mask)
-                    {
-                        post = true;
-                        repeat = true;
-                        count = REPEAT_INTERVAL;
-                    }
-                    /* If the OFF button is pressed long enough, and we are
-                       still alive, then the unit must be connected to a
-                       charger. Therefore we will reboot and let the original
-                       firmware handle the charging. */
+                else
+                {
+                    if(btn & repeat_mask ||
 #ifdef HAVE_RECORDER_KEYPAD
-                    if(btn == BUTTON_OFF)
-#elif HAVE_PLAYER_KEYPAD
-                    if(btn == BUTTON_STOP)
+                     btn == BUTTON_OFF)
+#else
+                     btn == BUTTON_STOP)
 #endif
-                        system_reboot();
+                    {
+                        if (count++ > REPEAT_START)
+                        {
+                            /* Only repeat if a repeatable key is pressed */
+                            if(btn & repeat_mask)
+                            {
+                                post = true;
+                                repeat = true;
+                                count = REPEAT_INTERVAL;
+                            }
+                            /* If the OFF button is pressed long enough,
+                               and we are still alive, then the unit must be
+                               connected to a charger. Therefore we will
+                               reboot and let the original firmware handle
+                               the charging. */
+#ifdef HAVE_RECORDER_KEYPAD
+                            if(btn == BUTTON_OFF)
+#elif HAVE_PLAYER_KEYPAD
+                            if(btn == BUTTON_STOP)
+#endif
+                                system_reboot();
+                        }
+                    }
+                    else
+                    {
+                        count = 0;
+                    }
                 }
             }
             if ( post )
             {
-                queue_post(&button_queue, btn, NULL);
+                if(repeat)
+                    queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                else
+                    queue_post(&button_queue, btn, NULL);
                 backlight_on();
             }
         }
-        else {
+        else
+        {
             repeat = false;
             count = 0;
-            /* Report that the key has been released */
-            if(lastbtn != btn)
-            {
-                if(lastbtn & release_mask)
-                    queue_post(&button_queue, BUTTON_REL | lastbtn, NULL);
-            }
         }
-
-        lastbtn = btn;
+            
+        lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
         tick = 0;
     }
-
+        
     backlight_tick();
 }
 
@@ -142,13 +160,6 @@ int button_set_release(int newmask)
 {
     int oldmask = release_mask;
     release_mask = newmask;
-    return oldmask;
-}
-
-int button_set_locked(int newmask)
-{
-    int oldmask = locked_mask;
-    locked_mask = newmask;
     return oldmask;
 }
 

@@ -28,7 +28,6 @@ void button_init (void);
 int button_get (bool block);
 int button_set_repeat(int newmask);
 int button_set_release(int newmask);
-int button_set_locked(int newmask);
 
 /* Shared button codes */
 #define	BUTTON_NONE		0x0000
@@ -39,7 +38,7 @@ int button_set_locked(int newmask);
 #define	BUTTON_RIGHT		0x0080
 
 /* Button modifiers */
-#define	BUTTON_HELD		0x4000
+#define	BUTTON_REPEAT		0x4000
 #define	BUTTON_REL		0x8000
 
 /* Special message */
@@ -56,7 +55,11 @@ int button_set_locked(int newmask);
 
 #define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT | \
                              BUTTON_UP | BUTTON_DOWN)
-    
+
+#define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
+                     BUTTON_RIGHT | BUTTON_OFF | BUTTON_PLAY | BUTTON_F1 | \
+                     BUTTON_F2 | BUTTON_F3)
+
 #elif HAVE_PLAYER_KEYPAD
 
 /* Jukebox 6000 and Studio specific button codes */
@@ -66,9 +69,11 @@ int button_set_locked(int newmask);
 
 #define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT)
 
+#define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
+                     BUTTON_RIGHT | BUTTON_OFF | BUTTON_MENU)
+
 #endif /* HAVE_PLAYER_KEYPAD */
 
 #define DEFAULT_RELEASE_MASK 0
-#define DEFAULT_LOCKED_MASK 0
 
 #endif
