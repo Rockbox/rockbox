@@ -33,7 +33,7 @@
 #define TREE_MAX_FILENAMELEN 64
 #define TREE_MAX_ON_SCREEN   7
 #define TREE_MAX_LEN_DISPLAY 17 /* max length that fits on screen */
-
+ 
 void browse_root(void) {
 	dirbrowse("/");
 }
@@ -61,9 +61,10 @@ bool is_dir(char* path)
 }
 
 int static
-showdir(char *path, struct entry *buffer, int start)
+showdir(char *path, struct entry *buffer, int start, int scrollpos, int* at_end)
 {
   int i;
+  int j=0;
   DIR *dir = opendir(path);
   struct dirent *entry;
 
@@ -71,12 +72,16 @@ showdir(char *path, struct entry *buffer, int start)
     return -1; /* not a directory */
 
   i=start;
+  *at_end=0; /* Have we displayed the last directory entry? */
   while((entry = readdir(dir))) {
     int len;
 
     if(entry->d_name[0] == '.')
       /* skip names starting with a dot */
       continue;
+
+    if(j++ < scrollpos) 
+      continue ;
 
     len = strlen(entry->d_name);
     if(len < TREE_MAX_FILENAMELEN)
@@ -101,6 +106,15 @@ showdir(char *path, struct entry *buffer, int start)
       break;
   }
 
+  if (entry==0) {
+    *at_end=1;
+  } else {
+    *at_end=(readdir(dir)==0); 
+  }
+  j = i ;
+  while (j++ < TREE_MAX_ON_SCREEN) {
+      lcd_puts(LINE_X, LINE_Y+j*LINE_HEIGTH,"                 ", 0);  
+  }
   closedir(dir);
 
   return i;
@@ -116,6 +130,8 @@ bool dirbrowse(char *root)
   char currdir[255];
   int dircursor=0;
   int i;
+  int start=0;
+  int at_end=0;
 
 #ifdef HAVE_LCD_BITMAP
   lcd_clear_display();
@@ -123,7 +139,7 @@ bool dirbrowse(char *root)
   lcd_puts(0,0, "[Browse]", 0);
   memcpy(currdir,root,sizeof(currdir));
 
-  numentries = showdir(root, buffer, 0);
+  numentries = showdir(root, buffer, 0, start, &at_end);
 
   if (numentries == -1) return -1;  /* root is not a directory */
 
@@ -155,10 +171,12 @@ bool dirbrowse(char *root)
 
         lcd_clear_display();
         lcd_puts(0,0, "[Browse]", 0);
-        numentries = showdir(currdir, buffer, 0);  
+        numentries = showdir(currdir, buffer, 0, 0, &at_end);  
         dircursor=0;
+        start=0;
         while ( (dircursor < TREE_MAX_ON_SCREEN) && 
                 (strcmp(buffer[dircursor].name,buf)!=0)) dircursor++;
+        if (dircursor==TREE_MAX_ON_SCREEN) dircursor=0;
         lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
         lcd_update();
       }
@@ -176,13 +194,14 @@ bool dirbrowse(char *root)
       if (is_dir(buf)) {
         memcpy(currdir,buf,sizeof(currdir));
         dircursor=0;
+        start=0;
       } else {
         playtune(currdir, buffer[dircursor].name);
       }
 
       lcd_clear_display();
       lcd_puts(0,0, "[Browse]", 0);
-      numentries = showdir(currdir, buffer, 0);  
+      numentries = showdir(currdir, buffer, 0, 0, &at_end);  
       lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
       lcd_update();
       break;
@@ -193,6 +212,15 @@ bool dirbrowse(char *root)
         dircursor--;
         lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
         lcd_update();
+      } else
+      {
+        if (start) {   
+            lcd_clear_display();
+            lcd_puts(0,0, "[Browse]", 0);
+            numentries = showdir(currdir, buffer, 0, --start, &at_end);
+            lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
+            lcd_update();
+        }
       }
       break;
     case BUTTON_DOWN:
@@ -201,6 +229,16 @@ bool dirbrowse(char *root)
         dircursor++;
         lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
         lcd_update();
+      } else
+      {
+        if (!at_end) {
+          lcd_clear_display();
+          lcd_puts(0,0, "[Browse]", 0);
+          numentries = showdir(currdir, buffer, 0, ++start, &at_end);
+       
+          lcd_puts(0, LINE_Y+dircursor*LINE_HEIGTH, "-", 0);
+          lcd_update();
+        }
       }
       break;
     }
