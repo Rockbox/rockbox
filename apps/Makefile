@@ -76,7 +76,7 @@ $(OBJDIR)/build.lang: lang/$(LANGUAGE).lang
 	perl ../tools/uplang lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang
-	perl ../tools/genlang -p=$(OBJDIR)/lang $<
+	perl -s ../tools/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 dist:
@@ -84,7 +84,8 @@ dist:
 
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
-	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map
+	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map \
+	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
