@@ -83,7 +83,7 @@ APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 	LCDSRSC = lcd-recorder.c
 else
-	LCDSRSC = lcd-playersim.c
+	LCDSRSC = lcd-playersim.c lcd-player.c
 endif
 FIRMSRCS = $(LCDSRSC) sprintf.c id3.c debug.c usb.c mpeg.c power.c\
   powermgmt.c font.c panic.c sysfont.c ctype.c
@@ -299,6 +299,9 @@ $(OBJDIR)/power.o: $(DRIVERS)/power.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd-playersim.o: ../common/lcd-playersim.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # these ones are simulator-specific
