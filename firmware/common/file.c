@@ -38,11 +38,12 @@
 struct filedesc {
     unsigned char cache[SECTOR_SIZE];
     int cacheoffset;
-    unsigned int fileoffset;
+    int fileoffset;
     int size;
     struct fat_file fatfile;
     bool busy;
     bool write;
+    bool dirty;
 };
 
 static struct filedesc openfiles[MAX_OPEN_FILES];
@@ -85,6 +86,7 @@ int open(const char* pathname, int flags)
             openfiles[fd].write = false;
             break;
 
+        case O_RDWR:
         case O_WRONLY:
             openfiles[fd].write = true;
             break;
@@ -168,7 +170,7 @@ int close(int fd)
     }
     if (openfiles[fd].write) {
         /* flush sector cache */
-        if ( openfiles[fd].cacheoffset != -1 ) {
+        if ( openfiles[fd].dirty ) {
             if ( fat_readwrite(&(openfiles[fd].fatfile), 1,
                                &(openfiles[fd].cache),true) < 0 ) {
                 DEBUGF("Failed flushing cache\n");
@@ -250,12 +252,14 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 int rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
                                        openfiles[fd].cache, true );
                 if ( rc < 0 ) {
-                    DEBUGF("Failed read/writing\n");
                     errno = EIO;
                     return -2;
                 }
+                openfiles[fd].dirty = false;
                 openfiles[fd].cacheoffset = -1;
             }
+            else
+                openfiles[fd].dirty = true;
         }
         else {
             memcpy( buf, openfiles[fd].cache + offs, headbytes );
@@ -263,6 +267,28 @@ static int readwrite(int fd, void* buf, int count, bool write)
 
         nread = headbytes;
         count -= headbytes;
+    }
+
+    /* if buffer has been modified, write it back to disk */
+    if (count && openfiles[fd].dirty) {
+        int rc;
+        DEBUGF("Flushing dirty sector cache\n");
+
+        /* seek back one sector to get file position right */
+        rc = fat_seek(&(openfiles[fd].fatfile), 
+                      openfiles[fd].fileoffset / SECTOR_SIZE);
+        if ( rc < 0 ) {
+            errno = EIO;
+            return -3;
+        }
+
+        rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
+                           openfiles[fd].cache, true );
+        if ( rc < 0 ) {
+            errno = EIO;
+            return -4;
+        }
+        openfiles[fd].dirty = false;
     }
 
     /* read whole sectors right into the supplied buffer */
@@ -273,7 +299,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
-            return -3;
+            return -5;
         }
         else {
             if ( rc > 0 ) {
@@ -305,7 +331,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("Failed reading\n");
                     errno = EIO;
-                    return -4;
+                    return -6;
                 }
                 /* seek back one sector to put file position right */
                 rc = fat_seek(&(openfiles[fd].fatfile), 
@@ -314,17 +340,18 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
                     errno = EIO;
-                    return -5;
+                    return -7;
                 }
             }
             memcpy( openfiles[fd].cache, buf + nread, count );
+            openfiles[fd].dirty = true;
         }
         else {
             if ( fat_readwrite(&(openfiles[fd].fatfile), 1,
                                &(openfiles[fd].cache),false) < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
-                return -6;
+                return -8;
             }
             memcpy( buf + nread, openfiles[fd].cache, count );
         }
@@ -345,6 +372,10 @@ static int readwrite(int fd, void* buf, int count, bool write)
 
 int write(int fd, void* buf, int count)
 {
+    if (!openfiles[fd].write) {
+        errno = EACCES;
+        return -1;
+    }
     return readwrite(fd, buf, count, true);
 }
 
@@ -368,13 +399,6 @@ int lseek(int fd, int offset, int whence)
         errno = EBADF;
         return -1;
     }
-
-    if ( openfiles[fd].write ) {
-        DEBUGF("lseek() is not supported when writing\n");
-        errno = EROFS;
-        return -2;
-    }
-
 
     switch ( whence ) {
         case SEEK_SET:
