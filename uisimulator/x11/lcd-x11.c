@@ -158,7 +158,8 @@ extern unsigned char lcd_buffer[2][11];
 extern void drawrect(int color, int x1, int y1, int x2, int y2);
 extern bool lcd_display_redraw;
 
-static unsigned char lcd_buffer_copy[2][11];
+extern unsigned char hardware_buffer_lcd[11][2];
+static unsigned char lcd_buffer_copy[11][2];
 
 void lcd_update (void)
 {
@@ -167,8 +168,8 @@ void lcd_update (void)
   for (y=0; y<2; y++) {
     for (x=0; x<11; x++) {
       if (lcd_display_redraw ||
-          lcd_buffer_copy[y][x] != lcd_buffer[y][x]) {
-        lcd_buffer_copy[y][x] = lcd_buffer[y][x];
+          lcd_buffer_copy[x][y] != hardware_buffer_lcd[x][y]) {
+        lcd_buffer_copy[x][y] = hardware_buffer_lcd[x][y];
         lcd_print_char(x, y);
         changed=true;
       }
