@@ -85,9 +85,7 @@ void playtune(char *dir, char *file)
 #endif
 
     snprintf(mfile, sizeof(mfile), "%s/%s", dir, file);
-#if !defined(SIMULATOR) || defined(MPEGPLAY)
     mpeg_play(mfile);
-#endif
 
     while(1) {
         switch ( button_get(true) ) {
