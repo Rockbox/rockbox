@@ -140,20 +140,25 @@ Q19. What about supporting playing of WMA files?
 A19. Dear Mr. Gates, you have two options.  Re-read question #18, or go buy 
      your own project.
 
-Q20. What is the most recent version of Rockbox?
-A20. We recently released version 1.2, so head on over to 
+Q20: But you don't understand, I'm not talking about decoding here, 
+     since the data we want may already be in the decoded format (PCM). 
+A20: Okay, last time.  No.  We have no problems whatsoever reading different 
+     file formats, call it PCM, WAV, GRI, PQR or whatever.  The problem is 
+     that the CODEC only accepts MP3 data and nothing else. We could write a 
+     new CODEC if we knew how to do it, but there is no documentation on the 
+     DSP. Please note that we have no access to the DAC, so we can't send the 
+     data directly to the DAC.
+
+Q21. What is the most recent version of Rockbox?
+A21. We recently released version 1.3, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-1.2-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-1.3-notes.txt).  
 
-Q21. What do you plan to add to coming versions?
-A21. We have a rough idea of which features we plan/expect/hope to be included
+Q22. What do you plan to add to coming versions?
+A22. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
-
-     Version 1.3
-          Resume, persistent settings, proportional fonts, UI improvements,
-          Improved charging
 
      Version 1.4
           Autobuild playlists, Recording, Loadable fonts, Customizable WPS
@@ -161,16 +166,16 @@ A21. We have a rough idea of which features we plan/expect/hope to be included
      Version 1.5
           File/directory management
 
-Q22. I tried one of your firmware files and now I can't access my harddisk!
+Q23. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
                      Part. Error
                      Pls Chck HD
-A22. Your harddisk has been password protected. We're not 100% sure why it
+A23. Your harddisk has been password protected. We're not 100% sure why it
      happens, but you can unlock it yourself. Look at:
      http://rockbox.haxx.se/lock.html
 
-Q23: This FAQ doesn't answer the question I have.  What should I do?
-A23: You have a couple options here.  You could forget the question, find an
+Q24: This FAQ doesn't answer the question I have.  What should I do?
+A24: You have a couple options here.  You could forget the question, find an
      easier question, or accept '42' as the answer no matter what.  We don't 
      really recommend any of these (though I do opt for '42' often myself).
      What we do recommend is stopping by IRC, reading 
@@ -179,43 +184,43 @@ A23: You have a couple options here.  You could forget the question, find an
      mailing list (rockbox@cool.haxx.se) or the FAQ maintainer listed on the 
      project homepage.
 
-Q24: Are there other ways to contact the developers?
-A24: Yes.
+Q25: Are there other ways to contact the developers?
+A25: Yes.
 
-Q25: Are you going to tell us what they are?
-A25: No.  Post to the mailing list and we will get back to you.
+Q26: Are you going to tell us what they are?
+A26: No.  Post to the mailing list and we will get back to you.
 
-Q26: But I _really_ want to talk with you in person.
-A26: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
+Q27: But I _really_ want to talk with you in person.
+A27: I'm sorry.  My girlfriend/boyfriend/pet says I'm not allowed to, and the
      doctors here won't let me have pens or pencils.  They say its some rule
      about us not having sharp objects.  I'm sorry.  Now please stop calling me
      here.
 
-Q27: Will you ever port Quake II to the Archos?
-A27: If you ask that again, I'm sending your address and phone number to the 
+Q28: Will you ever port Quake II to the Archos?
+A28: If you ask that again, I'm sending your address and phone number to the 
      guy that mailed us with question #24.
 
-Q28: Umm, was that sarcasm?
-A28: That's it, I'm mailing him now.
+Q29: Umm, was that sarcasm?
+A29: That's it, I'm mailing him now.
 
-Q29: Is this legal? I mean, I'd just hate to see something like that 
+Q30: Is this legal? I mean, I'd just hate to see something like that 
      challenged under the DMCA in all its ridiculousness. Any thoughts or 
      ideas?
-A29: We believe we are in the green on this.  We are not violating anyone's
+A30: We believe we are in the green on this.  We are not violating anyone's
      copyright and we are not circumventing any copy protection scheme.
      This has been a big point for the project since its inception.  Some 
      people wanted us to distribute patched versions of the original firmware,
      but seeing as that _would_ have violated Archos' copyright, we didn't 
      follow that course of action.
 
-Q30: On the website [and various information postings] you state 
+Q31: On the website [and various information postings] you state 
         "Every tiny bit was reverse engineered, disassembled and then 
          re-written from scratch".  
      If it was rewritten from scratch then why was it first reverse-engineered
      and disassembled? Instead this sounds more like someone disassembled it
      then used the understanding that they gained to create a new version,
      which is not quite the same as "from scratch". 
-A30: Don't confuse the terms.  Reverse engineering means examining a product 
+A31: Don't confuse the terms.  Reverse engineering means examining a product 
      to find out how it works.  Disassembling the firmware is merely one tool 
      used in that examination.  Oscilloscopes and logic analyzers are other 
      tools we have used.  We have written every single byte of the Rockbox 
@@ -225,11 +230,11 @@ A30: Don't confuse the terms.  Reverse engineering means examining a product
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
 
-Q31: Wait a minute here.  When you released version 1.0 you did not have a 
+Q32: Wait a minute here.  When you released version 1.0 you did not have a 
      single one of the ideas you have mentioned on your website actually 
      implimented!  Calling this version 1.0 is really misleading.  Whats the 
      story?!
-A31: In simple terms, the first release was called 1.0 because it had a basic 
+A32: In simple terms, the first release was called 1.0 because it had a basic 
      working feature set that worked and had no known bugs. That is what 1.0 
      meant.  It is true that Rockbox 1.0 lacked most of the feature set that 
      every sane user wanted.  However, we never said it was more 
@@ -241,9 +246,9 @@ A31: In simple terms, the first release was called 1.0 because it had a basic
      more recent releases we have completed many of our desired goals, and 
      several new ones that were implimented to fullfill user requests.
 
-Q32: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
+Q33: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
-A32: The developers have discussed the possibility of a boot loader.  (Mainly
+A33: The developers have discussed the possibility of a boot loader.  (Mainly
      because having one sounds cool, and isn't Rolo just a great name?)
      The idea would be that a user could use the load to choose between
      different verions of Rockbox or the Archo firmware itself.  We have a 
@@ -254,11 +259,11 @@ A32: The developers have discussed the possibility of a boot loader.  (Mainly
      the main release.  Please check the mailing list logs and irc logs for 
      more information.  
 
-Q33: I was thinking about making the USB a bit more usable.  What are the
+Q34: I was thinking about making the USB a bit more usable.  What are the
      chances of using the USB port to [play games / share files / list
      the device as something other then a hard drive / sell my soul to you
      for a nickel].  What do you think?
-A33: You really don't want to know what I think, it involves road flares, 
+A34: You really don't want to know what I think, it involves road flares, 
      microwave ovens and shaved cats.  Enough said.  But regarding the USB 
      portion of your question, this is not feasible.  First, any ideas 
      regarding special communications over the USB port will not work because
@@ -270,59 +275,59 @@ A33: You really don't want to know what I think, it involves road flares,
      master involved there can be no communication.  Sorry.  Now about your
      soul.  Would you settle for 3 cents and a small wad of belly button lint?
 
-Q34: When I use RockBox my jukebox's red "error" light turns on a lot, but this
+Q35: When I use RockBox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
-A34: Rockbox uses the red LED as harddisk activity light, not as an error 
+A35: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
 
-Q35: How do I use the loadable fonts?
-A35: Loadable fonts are a work in progress.  We do not have full documentation
+Q36: How do I use the loadable fonts?
+A36: Loadable fonts are a work in progress.  We do not have full documentation
      for it.  The best we can do now is tell you that you need a valid .bdf
      font, and to use the tool "bdf2ajf" from CVS to conver to the .ajf format.
      The final .ajf font must be stored in the archos root as 'system.ajf'
      We do expect more documentation on this process shortly.
 
-Q36: I have a question about the batteries...
-A36: STOP!  We have put together a completely different FAQ for battery 
+Q37: I have a question about the batteries...
+A37: STOP!  We have put together a completely different FAQ for battery 
      related questions.  
      Check out: http://rockbox.haxx.se/docs/battery-faq.html
 
-Q37: What is the WPS?
-A37: That is the 'While Playing Screen'.  Basically this is what is shown on
+Q38: What is the WPS?
+A38: That is the 'While Playing Screen'.  Basically this is what is shown on
      your player's display while we are playing your song.
 
-Q38: What good is the WPS?  How usable/flexible is it?
-A38: It is very good if you want information about the current item playing ;)
+Q39: What good is the WPS?  How usable/flexible is it?
+A39: It is very good if you want information about the current item playing ;)
      Currently the WPS on the Player is very flexible.  By using the file  
      'wps.config' you can manage exactly how/what you want data displayed on 
      your Archos Player.  Currently this feature has not yet been added to the
      Recorder version of Rockbox.  Please see 
      http://rockbox.haxx.se/docs/custom_wps_format.html for more information.
 
-Q39: Can the Player LCD font be modified?
-A39: The simple answer is no.  This is because the Player font is character
+Q40: Can the Player LCD font be modified?
+A40: The simple answer is no.  This is because the Player font is character
      cell based (as opposed to the Recorder's bitmap based display).  This
      means that we are able to choose what characters to display, but not how
      to display them.  We do have the ability to change/create up to 4 chars 
      on one model and 8 on another, however we are currently using several of 
      these 'letters' to store icons for the player.
 
-Q40: Why don't you have any games available for the Players?
-A40: The display on the Players is character cell and not bitmap based.  
+Q41: Why don't you have any games available for the Players?
+A41: The display on the Players is character cell and not bitmap based.  
      This means we can only control what characters get displayed, not
      what pixels are shown.  This makes the prospect of game play very 
      slim (at least for anything involving graphics).
 
-Q41: When recording is finally implimented in Rockbox, will it be possible to
+Q42: When recording is finally implimented in Rockbox, will it be possible to
      use custom codecs (like LAME) or is there a built in codec in the Archos?
-A41: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
+A42: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
 
-Q42: What are the max/min bitrates for recording on the Recorder's encoder?
-A42: The builtin encoder is variable bit rate only with a max of 192kbit/s,
+Q43: What are the max/min bitrates for recording on the Recorder's encoder?
+A43: The builtin encoder is variable bit rate only with a max of 192kbit/s,
      and a min of 32kbit/s.
 
-Q43: I have a question about the id3v1 and id3v2 tags...
-A43: Stop!  Here is all the information about that (if you still have
+Q44: I have a question about the id3v1 and id3v2 tags...
+A44: Stop!  Here is all the information about that (if you still have
      questions when done, ask then.)
 
      - Rockbox supports both id3v1 and id3v2
@@ -337,11 +342,11 @@ A43: Stop!  Here is all the information about that (if you still have
 
      - The 300-byte limit is subject to be removed in a future version
 
-Q44: Would it be possible to record from line in on the player?
-A44: No.
+Q45: Would it be possible to record from line in on the player?
+A45: No.
 
-Q45: Where exactly did the name 'Rockbox' come from?
-A45: Well you can follow the full line of emails at 
+Q46: Where exactly did the name 'Rockbox' come from?
+A46: Well you can follow the full line of emails at 
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0062.shtml
      However, the brief rundown is that it was recommended first by 
      Tome Cvitan, and put to a vote (which it lost). 
@@ -351,3 +356,4 @@ A45: Well you can follow the full line of emails at
      http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-01/0134.shtml
      
      There you have it.  Recommeded by users, decision by dictator.
+
