@@ -1128,15 +1128,20 @@ static bool swap_one_chunk(void)
 {
     int free_space_left;
     int amount_to_swap;
+    int playable_space;
 
+    playable_space = mp3buf_swapwrite - mp3buf_read;
+    if(playable_space < 0)
+        playable_space += mp3buflen;
+    
     free_space_left = get_unswapped_space();
 
     if(free_space_left == 0 && !play_pending)
         return false;
 
     /* Swap in larger chunks when the user is waiting for the playback
-       to start */
-    if(play_pending)
+       to start, or when there is dangerously little playable data left */
+    if(play_pending || playable_space < MPEG_LOW_WATER_CHUNKSIZE)
         amount_to_swap = MIN(MPEG_LOW_WATER_CHUNKSIZE, free_space_left);
     else
         amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
