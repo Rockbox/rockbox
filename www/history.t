@@ -2,6 +2,8 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2004-03-11</i>: Version 2.2 is <a href="/download/">released</a>
+
 <p><i>2004-02-05</i>: Rockbox can play <a href="/docs/rvf.html">video</a>, with sound 
 
 <p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
