@@ -99,6 +99,7 @@ static struct
 #ifdef HAVE_LCD_BITMAP
     { ".ucl", TREE_ATTR_UCL, Flashfile, VOICE_EXT_UCL },
     { ".ajz", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
+    { ".jpg", TREE_ATTR_JPEG, Jpeg, -1 },
 #else
     { ".mod", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #endif
@@ -1196,6 +1197,11 @@ static bool dirbrowse(char *root, int *dirfilter)
                             /* "movie" animation */
                         case TREE_ATTR_RVF:
                             plugin_load("/.rockbox/rocks/video.rock",buf);
+                            break; 
+
+                            /* JPEG image */
+                        case TREE_ATTR_JPEG:
+                            plugin_load("/.rockbox/rocks/jpeg.rock",buf);
                             break; 
 
                         case TREE_ATTR_FONT:
