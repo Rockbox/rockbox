@@ -636,9 +636,9 @@ static bool poweroff_idle_timer(void)
 
 static bool scroll_speed(void)
 {
-    return set_int(str(LANG_SCROLL), "Hz", UNIT_HERTZ,
-                   &global_settings.scroll_speed, 
-                   &lcd_scroll_speed, 1, 1, 25 );
+    return set_int(str(LANG_SCROLL), "", UNIT_INT,
+                   &global_settings.scroll_speed,
+                   &lcd_scroll_speed, 1, 0, 15 );
 }
 
 

@@ -71,7 +71,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 
 
-#define CONFIG_BLOCK_VERSION 17
+#define CONFIG_BLOCK_VERSION 18
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -250,7 +250,7 @@ static const struct bit_entry hd_bits[] =
 #ifdef HAVE_BACKLIGHT
     {1, S_O(caption_backlight), false, "caption backlight", off_on },
 #endif
-    {5, S_O(scroll_speed), 8, "scroll speed", NULL }, /* 1...25 */
+    {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
     {7, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...112 */
     {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
     {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */

@@ -88,7 +88,7 @@ struct cursorinfo {
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static const char scroll_name[] = "scroll";
-static char scroll_speed = 8; /* updates per second */
+static char scroll_ticks = 12; /* # of ticks between updates */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
 static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
 static char scroll_spacing = 3; /* spaces between end and start of text */
@@ -547,7 +547,7 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string )
         s->direction=+1;
         s->jump_scroll=0;
         s->jump_scroll_steps=0;
-        if (jump_scroll && jump_scroll_delay<(HZ/scroll_speed)*(s->textlen-11+x)) {
+        if (jump_scroll && jump_scroll_delay<scroll_ticks*(s->textlen-11+x)) {
             s->jump_scroll_steps=11-x;
             s->jump_scroll=jump_scroll;
         }
@@ -593,9 +593,15 @@ void lcd_allow_bidirectional_scrolling(bool on)
     allow_bidirectional_scrolling=on;
 }
 
+static const char scroll_tick_table[16] = {
+ /* Hz values:
+    1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
+    100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
+};
+
 void lcd_scroll_speed(int speed)
 {
-    scroll_speed = speed;
+    scroll_ticks = scroll_tick_table[speed];
 }
 
 void lcd_scroll_delay(int ms)
@@ -723,7 +729,7 @@ static void scroll_thread(void)
             }
         }
 
-        sleep(HZ/scroll_speed);
+        sleep(scroll_ticks);
     }
 }
 
