@@ -191,13 +191,24 @@ static void draw_screen(struct mp3entry* id3)
             case PLAY_DISPLAY_1LINEID3:
             {
                 char buffer[64];
+                char ch = '/';
+                char* szLast = strrchr(id3->path, ch);
 
-                snprintf(buffer, sizeof(buffer), "%d/%d: %s - %s",
-                        id3->index + 1,
-                        playlist.amount,
-                        id3->artist?id3->artist:"<no artist>",
-                        id3->title?id3->title:"<no title>");
-
+                if(id3->artist && id3->title)
+                {
+                    snprintf(buffer, sizeof(buffer), "%d/%d: %s - %s",
+                            id3->index + 1,
+                            playlist.amount,
+                            id3->artist?id3->artist:"<no artist>",
+                            id3->title?id3->title:"<no title>");
+                }
+                else
+                {
+                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
+                            id3->index + 1,
+                            playlist.amount,
+                            szLast?++szLast:id3->path);
+                }
                 lcd_puts_scroll(0, 0, buffer);
                 break;
             }
