@@ -30,7 +30,7 @@ ID3 Info Tags:
   %in : ID3 Track Number
   %it : ID3 Track Title
   %iy : ID3 Year
-  %iv : ID3 Version (1.1, 2.2, 2.3, 2.4 or empty if no id3 tag) (*)
+  %iv : ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag) (*)
 
 
 Battery Info:
