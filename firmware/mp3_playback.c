@@ -338,7 +338,7 @@ static void postpone_dma_tick(void)
 #ifdef HAVE_MAS3587F
 void demand_irq_enable(bool on)
 {
-    int oldlevel = set_irq_level(15);
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     
     if(on)
     {

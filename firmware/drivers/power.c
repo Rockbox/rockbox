@@ -118,7 +118,7 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    set_irq_level(15);
+    set_irq_level(HIGHEST_IRQ_LEVEL);
 #ifdef HAVE_POWEROFF_ON_PBDR
     and_b(~0x10, &PBDRL);
     or_b(0x10, &PBIORL);

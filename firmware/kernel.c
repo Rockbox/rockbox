@@ -118,7 +118,7 @@ void queue_post(struct event_queue *q, int id, void *data)
     int wr;
     int oldlevel;
 
-    oldlevel = set_irq_level(15);
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     wr = (q->write++) & QUEUE_LENGTH_MASK;
 
     q->events[wr].id = id;
@@ -201,7 +201,7 @@ void IMIA0(void)
 int tick_add_task(void (*f)(void))
 {
     int i;
-    int oldlevel = set_irq_level(15);
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     /* Add a task if there is room */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
@@ -221,7 +221,7 @@ int tick_add_task(void (*f)(void))
 int tick_remove_task(void (*f)(void))
 {
     int i;
-    int oldlevel = set_irq_level(15);
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     /* Remove a task if it is there */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)

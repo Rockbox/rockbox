@@ -227,7 +227,8 @@ Various
   int set_irq_level(int level)
 
      Sets the interrupt level (0 = lowest, 15 = highest) and returns the
-     previous level.
+     previous level. Note that you must shift the argument 4 bits to the left:
+     set_irq_level(level << 4);
 
   void queue_init(struct event_queue *q)
 

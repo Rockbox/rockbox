@@ -172,7 +172,7 @@ static void screen_dump(void)
 
     serial_enable_tx();
 
-    level = set_irq_level(15);
+    level = set_irq_level(HIGHEST_IRQ_LEVEL);
     for(y = 0;y < LCD_HEIGHT/8;y++)
     {
         for(x = 0;x < LCD_WIDTH;x++)

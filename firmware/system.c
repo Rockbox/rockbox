@@ -318,18 +318,6 @@ void system_reboot (void)
 		  "r"(*(int*)0),"r"(4));
 }
 
-/****************************************************************************
- * Interrupt level setting
- ****************************************************************************/
-int set_irq_level(int level)
-{
-    int i;
-    /* Read the old level and set the new one */
-    asm volatile ("stc sr, %0" : "=r" (i));
-    asm volatile ("ldc %0, sr" : : "r" (level << 4));
-    return (i >> 4) & 0x0f;
-}
-
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
     bool state = true;

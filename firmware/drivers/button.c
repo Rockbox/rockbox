@@ -30,6 +30,7 @@
 #include "adc.h"
 #include "serial.h"
 #include "power.h"
+#include "system.h"
 
 struct event_queue button_queue;
 
@@ -256,10 +257,10 @@ static int button_flip(int button)
  */
 void button_set_flip(bool flip)
 {
-    if (flip != flipped) /* not the curent setting */
+    if (flip != flipped) /* not the current setting */
     {
         /* avoid race condition with the button_tick() */
-        int oldlevel = set_irq_level(15);
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
         lastbtn = button_flip(lastbtn); 
         flipped = flip;
         set_irq_level(oldlevel);

@@ -25,7 +25,6 @@
 
 extern void system_reboot (void);
 extern void system_init(void);
-extern int set_irq_level(int level);
 
 #define FREQ CPU_FREQ
 #define BAUDRATE 9600
@@ -72,6 +71,20 @@ extern int set_irq_level(int level);
        /* %1 */ "z"(address-GBR))
 
 #ifndef SIMULATOR
+
+/****************************************************************************
+ * Interrupt level setting
+ * The level is left shifted 4 bits
+ ****************************************************************************/
+#define HIGHEST_IRQ_LEVEL (15<<4)
+static inline int set_irq_level(int level)
+{
+    int i;
+    /* Read the old level and set the new one */
+    asm volatile ("stc sr, %0" : "=r" (i));
+    asm volatile ("ldc %0, sr" : : "r" (level));
+    return i;
+}
 
 static inline short SWAB16(short value)
   /*
