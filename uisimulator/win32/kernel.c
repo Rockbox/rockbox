@@ -23,6 +23,11 @@
 #include "thread-win32.h"
 #include "thread.h"
 
+/* (Daniel 2002-10-31) Mingw32 requires this errno variable to be present.
+   I'm not quite sure why and I don't know if this breaks the MSVC compile.
+   If it does, we should put this within #ifdef __MINGW32__ */
+int errno;
+
 void sleep(int ticks)
 {
     Sleep (1000 / HZ * ticks);
