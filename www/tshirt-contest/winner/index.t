@@ -27,4 +27,6 @@
 <p> Thanks and gratulations of course go to Robert Hak for his design. He will
  be given two free shirts.
 
+<p> <a href="votes">The raw complete table of voting results</a>
+
 #include "foot.t"
