@@ -839,7 +839,18 @@ static int add_track_to_tag_list(const char *filename)
 static int new_file(int steps)
 {
     int max_steps = playlist_amount();
-    int start = num_tracks_in_memory() - 1;
+    int start = 0;
+    int i;
+
+    /* Find out how many steps to advance. Each loaded tag has a "steps" member
+       that tells us how many playlist entries it had to skip to get to
+       a valid one. We add those together to find out where to start. */
+    i = tag_read_idx;
+    while(i != tag_write_idx)
+    {
+        start += id3tags[i]->id3.index;
+        i = (i+1) & MAX_ID3_TAGS_MASK;
+    }
 
     if (start < 0)
         start = 0;
