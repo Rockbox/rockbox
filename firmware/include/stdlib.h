@@ -30,6 +30,9 @@ void *calloc (size_t nmemb, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
 
+void srand(unsigned int seed);
+int rand(void);
+
 #define abs(x) ((x)>0?(x):-(x))
 
 #ifdef __cplusplus

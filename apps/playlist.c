@@ -205,20 +205,6 @@ void add_indices_to_playlist( playlist_info_t *playlist )
     close(fd);
 }
 
-static unsigned int playlist_seed = 0xdeadcafe;
-static void seedit(unsigned int seed)
-{
-    playlist_seed = seed;   
-}
-
-static int getrand(void)
-{
-    playlist_seed += 0x12345;
-
-    /* the rand is from 0 to RAND_MAX */
-    return playlist_seed;
-}
-
 /*
  * randomly rearrange the array of indices for the playlist
  */
@@ -229,14 +215,14 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
     int store;
     
     /* seed with the given seed */
-    seedit( seed );
+    srand( seed );
 
     /* randomise entire indices list */
     
     while( count < playlist->amount )
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
-        candidate = getrand() % ( playlist->amount );
+        candidate = rand() % playlist->amount;
 
         /* now swap the values at the 'count' and 'candidate' positions */
         store = playlist->indices[candidate];
