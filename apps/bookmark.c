@@ -627,11 +627,8 @@ static char* select_bookmark(const char* bookmark_file_name)
     while(true)
     {
         if(bookmark_id < 0)
-        {
-            bookmark_id = 0;
-            bookmark_id_prev = -1;
-        }
-        if(bookmark_id == bookmark_count)
+            bookmark_id = bookmark_count -1;
+        if(bookmark_id >= bookmark_count)
             bookmark_id = 0;
 
         if (bookmark_id != bookmark_id_prev)
@@ -643,7 +640,7 @@ static char* select_bookmark(const char* bookmark_file_name)
         if (!bookmark)
         {
             /* if there were no bookmarks in the file, delete the file and exit. */
-            if(bookmark_id == 0)
+            if(bookmark_id <= 0)
             {
                 splash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
@@ -684,9 +681,10 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
-                bookmark_id_prev=-1;
-                bookmark_id--;
+                bookmark_id_prev=-2;
                 bookmark_count--;
+                if(bookmark_id >= bookmark_count)
+                    bookmark_id = bookmark_count -1;
                 while (button_get(false)); /* clear button queue */
                 break;
 
@@ -951,6 +949,9 @@ static char* get_bookmark(const char* bookmark_file, int bookmark_count)
     if (file < 0)
         return NULL;
 
+    if (bookmark_count < 0)
+        return NULL;
+     
     /* Get the requested bookmark */
     while (read_count < bookmark_count)
     {
