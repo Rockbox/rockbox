@@ -47,8 +47,8 @@
     <td>Blue or Black</td>
     <td>Blue</td>
     <td>Blue</td>
-    <td>Blue</td>
-    <td>Violet</td>
+    <td>Blue-violet</td>
+    <td>Blue-violet</td>
 </tr>
 <tr><th><b>S/PDIF</b></th>
     <td>No</td>
