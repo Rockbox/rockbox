@@ -24,7 +24,7 @@
 			(substatement-open    . 0)
 			(statement-case-intro . +)
 			(statement-case-open  . 0)
-			(case-label           . 0)
+			(case-label           . +)
 			))
     )
   "Rockbox C Programming Style")
