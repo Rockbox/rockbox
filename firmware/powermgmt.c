@@ -114,18 +114,28 @@ void set_poweroff_timeout(int timeout)
 }
 
 /* We shut off in the following cases:
-   1) The unit is not playing music
+   1) The unit is idle, not playing music
    2) The unit is playing music, but is paused
 
-   We do not shut off if the unit is recording, but paused
+   We do not shut off in the following cases:
+   1) The USB is connected
+   2) The charger is connected
+   3) We are recording, or recording with pause
 */
 static void handle_auto_poweroff(void)
 {
     long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
     int mpeg_stat = mpeg_status();
+    bool charger_is_inserted = charger_inserted();
+    static bool charger_was_inserted = false;
 
-    if(charger_inserted())
+    /* The was_inserted thing prevents the unit to shut down immediately
+       when the charger is extracted */
+    if(charger_is_inserted || charger_was_inserted)
+    {
         last_charge_time = current_tick;
+    }
+    charger_was_inserted = charger_is_inserted;
     
     if(timeout &&
        !usb_inserted() &&
@@ -134,7 +144,7 @@ static void handle_auto_poweroff(void)
     {
         if(TIME_AFTER(current_tick, last_keypress + timeout) &&
            TIME_AFTER(current_tick, last_disk_activity + timeout) &&
-           TIME_AFTER(current_tick, last_charge_time))
+           TIME_AFTER(current_tick, last_charge_time + timeout))
             power_off();
     }
 }
