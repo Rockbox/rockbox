@@ -48,14 +48,14 @@ void init_mandelbrot_set(void){
 
 void calc_mandelbrot_set(void){
     
-    unsigned int start_tick;
+    unsigned int start_tick, last_yield;
     int n_iter;
     int x_pixel, y_pixel;
     int x, x2, y, y2, a, b;
     int x_fact, y_fact;
     int brightness;
     
-    start_tick = *rb->current_tick;  
+    start_tick = last_yield = *rb->current_tick;
     
     gray_clear_display();
 
@@ -63,9 +63,9 @@ void calc_mandelbrot_set(void){
     y_fact = (y_max - y_min) / LCD_HEIGHT;
     
     for (x_pixel = 0; x_pixel<LCD_WIDTH; x_pixel++){
-    a = (x_pixel * x_fact) + x_min;
-    for(y_pixel = LCD_HEIGHT-1; y_pixel>=0; y_pixel--){    
-        b = (y_pixel * y_fact) + y_min;
+        a = (x_pixel * x_fact) + x_min;
+        for(y_pixel = LCD_HEIGHT-1; y_pixel>=0; y_pixel--){
+            b = (y_pixel * y_fact) + y_min;
             x = 0;
             y = 0;
             n_iter = 0;
@@ -89,9 +89,15 @@ void calc_mandelbrot_set(void){
             } else {
                 brightness = 255 - (31 * (n_iter & 7));
             }
-        graybuffer[y_pixel]=brightness;
+            graybuffer[y_pixel]=brightness;
+            /* be nice to other threads:
+             * if at least one tick has passed, yield */
+            if  (*rb->current_tick > last_yield){
+                rb->yield();
+                last_yield = *rb->current_tick;
+            }
         }
-    gray_drawgraymap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT, 1);
+        gray_drawgraymap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT, 1);
     }
 }
 
