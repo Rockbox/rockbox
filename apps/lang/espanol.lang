@@ -14,7 +14,7 @@ new: "Opciones Generales"
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
-voice: "Info"
+voice: "Información"
 new: "Información"
 
 id: LANG_VERSION
@@ -182,8 +182,8 @@ new: "Ejemplo de la velocidad de desplazamiento"
 id: LANG_DISCHARGE
 desc: in settings_menu
 eng: "Deep Discharge"
-voice: "Descarga profunda"
-new: "Descarga profunda"
+voice: "Descarga Completa"
+new: "Descarga Completa"
 
 id: LANG_TIME
 desc: in settings_menu
@@ -243,7 +243,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -315,7 +315,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:  
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -417,31 +417,31 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
@@ -807,7 +807,7 @@ id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_STAT
 desc: DEPRECATED
@@ -1172,8 +1172,8 @@ new: "Formato del reloj"
 id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
-voice: "Carga intermitente"
-new: "Carga intermitente"
+voice: "Carga de mantenimiento"
+new: "Carga de mantenimiento"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
@@ -1227,13 +1227,13 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
@@ -1299,19 +1299,19 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX
 desc: DEPRECATED
@@ -1623,7 +1623,7 @@ id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
@@ -1814,7 +1814,7 @@ new: "Guardadas %d Pistas (%s)"
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Mostrar Plug-ins"
+voice: "Mostrar Plugins"
 new: "Mostrar Plugins"
 
 id: LANG_PLUGIN_CANT_OPEN
@@ -1964,8 +1964,8 @@ new: "Ruta Completa"
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-voice: "Seguir Solo el Nombre"
-new: "Seguir Solo el Nombre"
+voice: "Sólo nombre de pista"
+new: "Sólo nombre de pista"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
@@ -2546,8 +2546,8 @@ new: "por tipo"
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
-voice: "Separación del estéreo"
-new: "Separación Estéreo"
+voice: "Amplitud estéreo"
+new: "Amplitud Estéreo"
 
 id: LANG_SUPERBASS
 desc: in sound settings
@@ -2571,7 +2571,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:  
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2950,3 +2950,9 @@ desc: decimal separator for composing numbers
 eng: "."
 voice: "punto"
 new: "."
+
+id: LANG_ID3DB_ALL_SONGS
+desc: ID3 virtual folder name
+eng: "<All songs>"
+voice: ""
+new: "<Todas las Canciones>"
