@@ -24,7 +24,7 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
-CVSROOT $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} zagor@users.sourceforge.net
+CVSROOT $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} bjorn@haxx.se
 ^apps $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^flash $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^firmware $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
