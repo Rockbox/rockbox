@@ -37,12 +37,12 @@ void kernel_init(void)
 
 void sleep(int ticks)
 {
-    int timeout = current_tick + ticks;
+    /* Always sleep at least 1 tick */
+    int timeout = current_tick + ticks + 1;
 
-    /* always yield at least once */
-    do {
+    while (TIME_BEFORE( current_tick, timeout )) {
         yield();
-    } while (TIME_BEFORE( current_tick, timeout ));
+    }
 }
 
 void yield(void)
