@@ -243,7 +243,7 @@ BOOL GUIStartup ()
 
     // create window
     hGUIWnd = CreateWindowEx (
-        WS_EX_TOOLWINDOW | WS_EX_PALETTEWINDOW,
+        WS_EX_TOOLWINDOW | WS_EX_OVERLAPPEDWINDOW,
         "RockBoxUISimulator", "ARCHOS JukeBox",
         WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
