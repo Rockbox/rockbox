@@ -30,6 +30,9 @@
 #include "string.h"
 #include "hwcompat.h"
 
+/* skip whole file for an MMC-based system, FIXME in makefile */
+#ifndef HAVE_MMC 
+
 /* Uncomment the matching #define to use plain C code instead if the tweaked 
  * assembler code for disk reading or writing should cause problems. */
 /* #define PREFER_C_READING */
@@ -1170,3 +1173,5 @@ int ata_init(void)
 
     return 0;
 }
+
+#endif /* #ifndef HAVE_MMC */

@@ -61,3 +61,6 @@
 /* Define this for different ADC channel assignment */
 #define HAVE_ONDIO_ADC
 
+/* Define this for MMC support instead of ATA harddisk */
+#define HAVE_MMC
+
