@@ -71,7 +71,7 @@ char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 char rec_base_directory[] = REC_BASE_DIR;
 
 
-#define CONFIG_BLOCK_VERSION 12
+#define CONFIG_BLOCK_VERSION 13
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -166,7 +166,7 @@ static struct bit_entry rtc_bits[] =
 #ifdef HAVE_MAS3587F
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
     {7, S_O(bass_boost), 0, "bass boost", NULL }, /* 0...100 */
-    {2, S_O(avc), 0, "auto volume", "off,2,4,8" },
+    {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
 #endif
     {3, S_O(channel_config), 6, "channels", 
         "stereo,stereo narrow,mono,mono left,mono right,karaoke,stereo wide" },

@@ -72,7 +72,7 @@ struct user_settings
     int treble;     /* treble eq:            0-100 0=low   100=high          */
     int loudness;   /* loudness eq:          0-100 0=off   100=max           */
     int bass_boost; /* bass boost eq:        0-100 0=off   100=max           */
-    int avc;        /* auto volume correct:  0=disable, 1=2s 2=4s 3=8s       */
+    int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
     int channel_config;  /* Stereo, Mono, Mono left, Mono right */
 
     int rec_quality;   /* 0-7 */

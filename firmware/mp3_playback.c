@@ -124,7 +124,7 @@ static int maxval[] =
     100,   /* Balance */
     17,   /* Loudness */
     100,  /* Bass boost */
-    3,    /* AVC */
+    4,    /* AVC */
     6,    /* Channels */
     15,   /* Left gain */
     15,   /* Right gain */
@@ -673,13 +673,16 @@ void mpeg_sound_set(int setting, int value)
             
         case SOUND_AVC:
             switch (value) {
-                case 1: /* 2s */
+                case 1: /* 20ms */
+                    tmp = (0x1 << 8) | (0x8 << 12);
+                    break;
+                case 2: /* 2s */
                     tmp = (0x2 << 8) | (0x8 << 12);
                     break;
-                case 2: /* 4s */
+                case 3: /* 4s */
                     tmp = (0x4 << 8) | (0x8 << 12);
                     break;
-                case 3: /* 8s */
+                case 4: /* 8s */
                     tmp = (0x8 << 8) | (0x8 << 12);
                     break;
                 case -1: /* turn off and then turn on again to decay quickly */

@@ -191,12 +191,13 @@ static bool avc(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) },
+        { "20ms", TALK_ID(20, UNIT_MS) },
         { "2s", TALK_ID(2, UNIT_SEC) },
         { "4s", TALK_ID(4, UNIT_SEC) },
         { "8s", TALK_ID(8, UNIT_SEC) }
     };
     return set_option(str(LANG_DECAY), &global_settings.avc, INT,
-                      names, 4, set_avc);
+                      names, 5, set_avc);
 }
 
 static bool recsource(void)
