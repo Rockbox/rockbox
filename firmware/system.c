@@ -306,6 +306,7 @@ void system_reboot (void)
 
     asm volatile ("ldc\t%0,vbr" : : "r"(0));
 
+    PACR2 |= 0x4000; /* for coldstart detection */
     IPRA = 0;
     IPRB = 0;
     IPRC = 0;
