@@ -45,6 +45,7 @@
 #include "powermgmt.h"
 
 #ifdef HAVE_LCD_BITMAP
+#include "peakmeter.h"
 #include "widgets.h"
 #endif
 
@@ -243,6 +244,21 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+#ifdef HAVE_MAS3587F
+    mpeg_set_pitch,
+
+    peak_meter_scale_value,
+    peak_meter_set_use_dbfs, 
+    peak_meter_get_use_dbfs,
+#endif
+#ifdef HAVE_LCD_BITMAP
+    lcd_puts_scroll_style,
+#endif
+    mpeg_flush_and_reload_tracks,
+    strncasecmp,
+    mpeg_get_file_pos,
+    find_next_frame,
+    mpeg_get_last_header,
 };
 
 int plugin_load(char* plugin, void* parameter)

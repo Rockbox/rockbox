@@ -60,7 +60,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 25
+#define PLUGIN_API_VERSION 26
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -276,7 +276,23 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     
+#ifdef HAVE_MAS3587F
+    void (*mpeg_set_pitch)(int pitch);        
 
+    unsigned short (*peak_meter_scale_value)(unsigned short val,
+                                             int meterwidth);
+    void (*peak_meter_set_use_dbfs)(int use);
+    int  (*peak_meter_get_use_dbfs)(void);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    void (*lcd_puts_scroll_style)(int x, int y, unsigned char* string, int style);
+#endif
+   void (*mpeg_flush_and_reload_tracks)(void);
+   int (*strncasecmp)(const char *s1, const char *s2, size_t n);
+   int (*mpeg_get_file_pos)(void);
+   unsigned long (*find_next_frame)(int fd, int *offset,
+                                    int max_offset, unsigned long last_header);
+   unsigned long (*mpeg_get_last_header)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
