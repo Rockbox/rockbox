@@ -90,7 +90,7 @@ one hundred thousand), so you don't need to worry about that wearing out.
 
 <h2>4. Will it work for me?</h2>
 <p>
-You need two things:
+You need three things:
 <ul>
 <li> The first is a Recorder or FM model. Be sure you're using the correct
 package, Recorder and FM are different! In principle, the technology works for
@@ -103,6 +103,15 @@ trick.  You can find out via Rockbox debug menu, entry Hardware Info. If the
 flash info gives you question marks, you're out of luck. The only chance then
 is to solder in the right chip (SST39VF020), at best with the firmware already
 in. If the chip is blank, you'll need the UART boot mod as well.
+
+<li> Third, your boot ROM (within the CPU) has to contain the right stuff.
+The vast majority of the Player/Recorder/FM all have the same boot ROM content, 
+differenciation comes later by flash content. So far very few people had a 
+different, presumable later boot ROM. It uses a different flash layout.
+For these the tools will refuse to work, the only
+way to find out is to try if the sanity check fails. 
+Flashing these is not impossible, but the firmware authoring has to be 
+different. It takes a developer with the UART boot mod to go ahead with it.
 </ul>
 
 <h2>5. How do I flash the firmware?</h2>
@@ -127,8 +136,8 @@ flow. If the flash info shows question marks, you can stop here, sorry.
 <li> Backup the current firmware, using the first option of the debug menu
 (Dump ROM contents). This creates 2 files in the root directory, which you may
 not immediately see in the Rockbox browser. The 256kB-sized
-"internal_rom_2000000-203FFFF.bin" one is your present firmware. Back it up to
-your PC.
+"internal_rom_2000000-203FFFF.bin" one is your present firmware. Back both up 
+to your PC.
 
 <li> (optional) While you're in this Rockbox version, I recommend to give it a
 test and play around with it, this version is identical to the one about to be
@@ -145,6 +154,8 @@ and the file it's gonna program. After F1 it checks the file. Your hardware
 mask value will be kept, it won't overwrite it. Hitting F2 gives you a big
 warning.  If I still didn't manage to scare you off, you can hit F3 to
 actually program and verify. The programming takes just a few seconds.
+If the sanity check fails, you have the wrong kind of boot ROM and are
+out of luck by now, sorry.
 
 <li> In the unlikely event that the programming should give you any error,
 don't switch off the box! Otherwise you'll have seen it working for the last
@@ -245,17 +256,17 @@ from flash. This is some initialization problem which I hope to fix, rolo-ing
 Rockbox versions works OK. If you feel homesick, hold F1 during powerup.
 
 <p>
-The behavior with plugged charger differs from original: the box starts when
-you plug it in (no charging screen). You can't power it off while the charger
-is plugged in, instead it kindof restarts in an odd way, can give ATA init
-errors in this case. This is not harmful, sortof reminds to unplug before
-powering off.
+Latest Rockbox now has a charging screen, but it is in an early stage. You'll 
+get it When the unit is off and you plug in the charger. The Rockbox charging
+algorithm is first measuring the battery voltage for about 40 seconds, after
+that it only starts charging when the capacity is below 85%. 
+You can use the Archos charging (which always tops off) by holding F1 
+while plugging in.
 
 <p>
-Rockbox currently insists on starting the HD before doing anything useful.
-This can be a problem if the batteries are deeply discharged and too weak to
-power up the HD, preventing rockbox to start up and charge them. Current
-workaround is to hold F1 while plugging in, this gives the Archos charging
-screen.
+The plugin API is currently changed often, new builds may render the plugins 
+incompatible. When updating, make shure you grab those too, but don't
+overwrite the rockbox_flash.rock yet, since you still need it matching the 
+currently running Rockbox to flash.
 
 #include "foot.t"
