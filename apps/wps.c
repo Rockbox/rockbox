@@ -671,6 +671,7 @@ int wps_show(void)
     int button = 0, lastbutton = 0;
     bool ignore_keyup = true;
     bool restore = false;
+    bool exit = false;
 
     id3 = NULL;
     current_track_path[0] = '\0';
@@ -888,6 +889,11 @@ int wps_show(void)
 #endif
                 if (menu())
                     return SYS_USB_CONNECTED;
+
+                /* if user recorded, playback is stopped and we should exit */
+                if (!mpeg_status())
+                    exit = true;
+
                 restore = true;
                 break;
 
@@ -915,21 +921,9 @@ int wps_show(void)
                 if ( lastbutton != BUTTON_STOP )
                     break;
 #endif
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_record(false);
-                status_set_audio(false);
-#endif
-                lcd_stop_scroll();
+                exit = true;
+                break;
 
-                /* set dir browser to current playing song */
-                if (global_settings.browse_current &&
-                    current_track_path[0] != '\0')
-                    set_current_file(current_track_path);
-
-                mpeg_stop();
-                status_set_playmode(STATUS_STOP);
-                return 0;
-                    
             case SYS_USB_CONNECTED:
                 status_set_playmode(STATUS_STOP);
                 usb_screen();
@@ -947,6 +941,24 @@ int wps_show(void)
                 }
                 break;
         }
+
+        if (exit) {
+#ifdef HAVE_LCD_CHARCELLS
+            status_set_record(false);
+            status_set_audio(false);
+#endif
+            lcd_stop_scroll();
+            mpeg_stop();
+            status_set_playmode(STATUS_STOP);
+
+            /* set dir browser to current playing song */
+            if (global_settings.browse_current &&
+                current_track_path[0] != '\0')
+                set_current_file(current_track_path);
+            
+            return 0;
+        }
+                    
 
         if ( button )
             ata_spin();
