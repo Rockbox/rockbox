@@ -627,7 +627,9 @@ static int onplay_screen(char* dir, char* file)
     bool used = false;
     bool playing = mpeg_status() & MPEG_STATUS_PLAY;
     char buf[MAX_PATH];
-
+    struct entry* f = &dircache[dirstart + dircursor];
+    bool isdir = f->attr & ATTR_DIRECTORY;
+        
     if ((dir[0]=='/') && (dir[1]==0))
         snprintf(buf, sizeof buf, "%s%s", dir, file);
     else
@@ -650,11 +652,14 @@ static int onplay_screen(char* dir, char* file)
                        LCD_WIDTH/2 - 3, LCD_HEIGHT/2 - 4, 7, 8, true);
         }
 
-        ptr = str(LANG_DELETE);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h/2, ptr);
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
-                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+        /* don't delete directories */
+        if (!isdir) {
+            ptr = str(LANG_DELETE);
+            lcd_getstringsize(ptr,&w,&h);
+            lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h/2, ptr);
+            lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                       LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+        }
 
         lcd_putsxy(0, LCD_HEIGHT/2 - h/2, str(LANG_RENAME));
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
@@ -693,6 +698,9 @@ static int onplay_screen(char* dir, char* file)
 
             case BUTTON_RIGHT:
             case BUTTON_ON | BUTTON_RIGHT:
+                /* don't delete directories */
+                if (isdir)
+                    break;
                 lcd_clear_display();
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_puts(0,0,file);
@@ -746,9 +754,11 @@ static int onplay_screen(char* dir, char* file)
                     exit = true;
                 break;
 
+#ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
                 exit = true;
                 break;
+#endif
         }
     }
 
