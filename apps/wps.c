@@ -148,7 +148,7 @@ void display_mute_text(bool muted)
     sleep(HZ);
 }
 
-static int browse_id3(void)
+bool browse_id3(void)
 {
     int button;
     int menu_pos = 0;
@@ -156,12 +156,9 @@ static int browse_id3(void)
     bool exit = false;
     char scroll_text[MAX_PATH];
 
-    lcd_clear_display();
-    lcd_puts(0, 0, str(LANG_ID3_INFO));
-    lcd_puts(0, 1, str(LANG_ID3_SCREEN));
-    lcd_update();
-    sleep(HZ);
- 
+    if (!(mpeg_status() & MPEG_STATUS_PLAY))
+        return false;
+    
     while (!exit)
     {
         lcd_clear_display();
@@ -190,19 +187,35 @@ static int browse_id3(void)
             case 3:
                 lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
                 
-                if (id3->tracknum)
-                {
+                if (id3->tracknum) {
                     snprintf(scroll_text,sizeof(scroll_text), "%d",
                              id3->tracknum);
                     lcd_puts_scroll(0, 1, scroll_text);
                 }
                 else
-                {
                     lcd_puts_scroll(0, 1, str(LANG_ID3_NO_TRACKNUM));
-                }
                 break;
 
             case 4:
+                lcd_puts(0, 0, str(LANG_ID3_GENRE));
+                lcd_puts_scroll(0, 1,
+                                wps_get_genre(id3->genre) ?
+                                wps_get_genre(id3->genre) :
+                                (char*)str(LANG_ID3_NO_INFO));
+                break;
+
+            case 5:
+                lcd_puts(0, 0, str(LANG_ID3_YEAR));
+                if (id3->year) {
+                    snprintf(scroll_text,sizeof(scroll_text), "%d",
+                             id3->year);
+                    lcd_puts_scroll(0, 1, scroll_text);
+                }
+                else
+                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_INFO));
+                break;
+
+            case 6:
                 lcd_puts(0, 0, str(LANG_ID3_LENGHT));
                 snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
                          id3->length / 60000,
@@ -210,7 +223,7 @@ static int browse_id3(void)
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 5:
+            case 7:
                 lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
                 snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
                          id3->index + 1, playlist_amount());
@@ -218,21 +231,21 @@ static int browse_id3(void)
                 break;
 
 
-            case 6:
+            case 8:
                 lcd_puts(0, 0, str(LANG_ID3_BITRATE));
                 snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
                          id3->bitrate);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 7:
+            case 9:
                 lcd_puts(0, 0, str(LANG_ID3_FRECUENCY));
                 snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
                          id3->frequency);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
-            case 8:
+            case 10:
                 lcd_puts(0, 0, str(LANG_ID3_PATH));
                 lcd_puts_scroll(0, 1, id3->path);
                 break;
@@ -279,11 +292,11 @@ static int browse_id3(void)
             case SYS_USB_CONNECTED: 
                 status_set_playmode(STATUS_STOP);
                 usb_screen();
-                return SYS_USB_CONNECTED;
+                return true;
                 break;
         }
     }
-    return 0;
+    return false;
 }
 
 static bool ffwd_rew(int button)
@@ -618,7 +631,13 @@ static bool menu(void)
 #else
             case BUTTON_F1 | BUTTON_ON:
 #endif
-                if(browse_id3() == SYS_USB_CONNECTED)
+                lcd_clear_display();
+                lcd_puts(0, 0, str(LANG_ID3_INFO));
+                lcd_puts(0, 1, str(LANG_ID3_SCREEN));
+                lcd_update();
+                sleep(HZ);
+ 
+                if(browse_id3())
                     return true;
 #ifdef HAVE_PLAYER_KEYPAD
                 status_set_param(false);

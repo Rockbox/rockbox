@@ -40,6 +40,7 @@
 #include "status.h"
 #include "fat.h"
 #include "sleeptimer.h"
+#include "wps.h"
 
 #include "lang.h"
 
@@ -261,7 +262,8 @@ bool main_menu(void)
         { str(LANG_RECORDING),          recording_screen  },
         { str(LANG_RECORDING_SETTINGS), recording_menu    },
 #endif
-        { str(LANG_CREATE_PLAYLIST),    create_playlist },
+        { str(LANG_CREATE_PLAYLIST),    create_playlist   },
+        { str(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
         { str(LANG_SLEEP_TIMER),        sleeptimer_screen },
 #ifdef HAVE_ALARM_MOD
         { str(LANG_ALARM_MOD_ALARM_MENU), alarm_screen    },

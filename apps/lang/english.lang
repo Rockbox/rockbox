@@ -1346,3 +1346,23 @@ id: LANG_PLAYER_KEYBOARD_ABORT
 desc: Abort alternative in player keyboard interaction
 eng: "Abort"
 new:
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+new:
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+new:
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+new:
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<no info>"
+new:

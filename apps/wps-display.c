@@ -95,6 +95,12 @@ static const char* const genres[] = {
     "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall"
 };
 
+char* wps_get_genre(unsigned int genre)
+{
+    if (genre < sizeof(genres)/sizeof(char*))
+        return (char*)genres[genre];
+    return NULL;
+}
 
 /* Set format string to use for WPS, splitting it into lines */
 static void wps_format(char* fmt)
