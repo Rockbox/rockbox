@@ -503,6 +503,33 @@ static int ata_perform_sleep(void)
     return ret;
 }
 
+int ata_standby(int time)
+{
+    int ret = 0;
+
+    mutex_lock(&ata_mtx);
+
+    ATA_SELECT = ata_device;
+
+    if(!wait_for_rdy()) {
+        DEBUGF("ata_standby() - not RDY\n");
+        mutex_unlock(&ata_mtx);
+        return -1;
+    }
+
+    ATA_NSECTOR = ((time + 5) / 5) & 0xff; /* Round up to nearest 5 secs */
+    ATA_COMMAND = CMD_STANDBY;
+
+    if (!wait_for_rdy())
+    {
+        DEBUGF("ata_standby() - CMD failed\n");
+        ret = -2;
+    }
+
+    mutex_unlock(&ata_mtx);
+    return ret;
+}
+
 int ata_sleep(void)
 {
     queue_post(&ata_queue, Q_SLEEP, NULL);

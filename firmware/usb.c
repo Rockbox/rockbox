@@ -86,6 +86,7 @@ static void usb_slave_mode(bool on)
         DEBUGF("Entering USB slave mode\n");
         ata_soft_reset();
         ata_init();
+        ata_standby(15);
         ata_enable(false);
         usb_enable(true);
     }
