@@ -458,6 +458,8 @@ void button_init(void)
 static int button_read(void)
 {
     int btn = BUTTON_NONE;
+    int retval;
+
     int data = adc_read(ADC_BUTTON_ROW1);
 
     if(adc_read(ADC_BUTTON_OPTION) > 0x200) /* active high */
@@ -475,7 +477,15 @@ static int button_read(void)
     else if (data >= 0x0A1)
         btn |= BUTTON_DOWN;
 
-    return btn;
+    /* Filter the button status. It is only accepted if we get the same
+       status twice in a row. */
+    if(btn != last_read)
+        retval = lastbtn;
+    else
+        retval = btn;
+    last_read = btn;
+
+    return retval;
 }
 
 #endif
