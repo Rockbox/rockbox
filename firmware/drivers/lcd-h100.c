@@ -362,10 +362,6 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
             ch = pf->defaultchar;
         ch -= pf->firstchar;
 
-        /* no partial-height drawing for now... */
-        if (y + pf->height > LCD_HEIGHT)
-            break;
-
         /* get proportional width and glyph bits */
         gwidth = pf->width ? pf->width[ch] : pf->maxwidth;
         width = MIN (gwidth, LCD_WIDTH - x);
