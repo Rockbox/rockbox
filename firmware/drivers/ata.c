@@ -186,8 +186,6 @@ int ata_read_sectors(unsigned long start,
                 return -1;
             }
         }
-        sleeping = false;
-        poweroff = false;
         spinup = true;
     }
 
@@ -226,16 +224,18 @@ int ata_read_sectors(unsigned long start,
                 goto retry;
             }
 
-            if (spinup) {
-                ata_spinup_time = current_tick - last_disk_activity;
-                spinup = false;
-            }
-
             if ( ATA_ALT_STATUS & (STATUS_ERR | STATUS_DF) ) {
                 ret = -5;
                 goto retry;
             }
              
+            if (spinup) {
+                ata_spinup_time = current_tick - last_disk_activity;
+                spinup = false;
+                sleeping = false;
+                poweroff = false;
+            }
+
             /* if destination address is odd, use byte copying,
                otherwise use word copying */
 
@@ -314,8 +314,6 @@ int ata_write_sectors(unsigned long start,
                 return -1;
             }
         }
-        sleeping = false;
-        poweroff = false;
         spinup = true;
     }
     
@@ -349,6 +347,8 @@ int ata_write_sectors(unsigned long start,
         if (spinup) {
             ata_spinup_time = current_tick - last_disk_activity;
             spinup = false;
+            sleeping = false;
+            poweroff = false;
         }
 
         for (j=0; j<SECTOR_SIZE/2; j++)
@@ -563,7 +563,6 @@ int ata_hard_reset(void)
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
 
-    sleeping = false;
     return ret;
 }
 
@@ -589,7 +588,6 @@ static int perform_soft_reset(void)
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
 
-    sleeping = false;
     return ret;
 }
 
@@ -617,8 +615,6 @@ static int ata_power_on(void)
     if (freeze_lock())
         return -3;
 
-    sleeping = false;
-    poweroff = false;
     return 0;
 }
 
