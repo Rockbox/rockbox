@@ -916,8 +916,12 @@ bool wps_refresh(struct mp3entry* id3,
                 int percent=
                     id3->length?
                     (id3->elapsed + ff_rewind_count) * 100 / id3->length:0;
-                slidebar(0, i*h + offset + 1, LCD_WIDTH, 6,
-                         percent, Grow_Right);
+                if(global_settings.progressbar_solid)
+                    scrollbar(0, i*h + offset + 1, LCD_WIDTH, 6, 100, 0,
+                              percent, HORIZONTAL);
+                else
+                    slidebar(0, i*h + offset + 1, LCD_WIDTH, 6,
+                             percent, Grow_Right);
                 update_line = true;
             }
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {

@@ -959,6 +959,12 @@ static bool button_bar(void)
 {
     return set_bool( str(LANG_BUTTON_BAR), &global_settings.buttonbar );
 }
+
+static bool progressbar_solid(void)
+{
+    return set_bool( str(LANG_PROGRESSBAR_SOLID), 
+                     &global_settings.progressbar_solid );
+}
 #endif
 
 static bool ff_rewind_settings_menu(void)
@@ -1192,6 +1198,7 @@ static bool display_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { STR(LANG_BARS_MENU),       bars_settings_menu },
         { STR(LANG_PM_MENU),         peak_meter_menu },
+        { STR(LANG_PROGRESSBAR_SOLID),	progressbar_solid },
 #endif
     };
 

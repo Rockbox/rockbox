@@ -168,6 +168,9 @@ struct user_settings
     /* show scroll bar */
     bool scrollbar;    /* 0=hide, 1=show */
 
+    /* Scrollbar mode */
+    bool progressbar_solid;	/* 0=slider, 1=solid */
+
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
