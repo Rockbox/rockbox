@@ -329,7 +329,7 @@ static bool delete_handler(bool is_dir)
 
             default:
                 /* ignore button releases */
-                if (!(btn & BUTTON_REL))
+                if ((btn & BUTTON_REL))
                     exit = true;
                 break;
         }
