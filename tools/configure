@@ -211,10 +211,10 @@ if [ "-" = "$extra_defines" ]; then
 
  if [  "-DARCHOS_RECORDER" = "$target" ] ; then
 
-  echo "Do you want to use Screensavers? (Y)"
+  echo "Do you want to use Demos? (Y)"
   getit=`input`;
   if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines="$extra_defines -DDISABLE_SCREENSAVERS"
+	extra_defines="$extra_defines -DDISABLE_DEMOS"
   else
         extra_defines="$extra_defines"
   fi
