@@ -324,7 +324,7 @@ bool dirbrowse(char *root)
         lcd_update();
 
         button = button_get(true);
-        switch ( button & ~BUTTON_REPEAT) {
+        switch ( button ) {
             case TREE_EXIT:
                 if ( play_mode == 1 )
                     play_mode = 0;
@@ -410,6 +410,7 @@ bool dirbrowse(char *root)
                 break;
                 
             case TREE_PREV:
+            case TREE_PREV | BUTTON_REPEAT:
                 if(filesindir)
                 {
                     if(dircursor) {
@@ -445,6 +446,7 @@ bool dirbrowse(char *root)
                 break;
 
             case TREE_NEXT:
+            case TREE_NEXT | BUTTON_REPEAT:
                 if(filesindir)
                 {
                     if (dircursor + start + 1 < numentries ) {
