@@ -253,6 +253,9 @@ if [ -z "$rootdir" ]; then
   cd $now
 fi
 
+
+appsdir='\$(ROOTDIR)/apps'
+
 if [ -z "$archos" ]; then
 
 ##################################################################
@@ -401,11 +404,21 @@ if [ -z "$debug" ]; then
   ##################################################################
   # Figure out debug on/off
   #
-  echo "Build (N)ormal, (D)ebug or (S)imulated version? (N)"
+  echo "Build (N)ormal, (D)ebug, (S)imulator, (B)ootloader? (N)"
 
   option=`input`;
 
   case $option in
+    [Bb])
+      if [ "$archos" != "h100" ]; then
+          echo "only the iRiver_h100 platform can build a boot loader";
+          exit
+      fi
+      extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
+      appsdir='\$(ROOTDIR)/bootloader'
+      bootloader="1"
+      echo "Bootloader build selected"
+      ;;
     [Ss])
       debug="1"
       simulator="yes"
@@ -467,12 +480,14 @@ sed > Makefile \
  -e "s,@FLASHFILE@,${flash},g" \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
+ -e "s,@EXTRADEF@,${extradefines},g" \
+ -e "s,@APPSDIR@,${appsdir},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
 export ROOTDIR=@ROOTDIR@
 export FIRMDIR=\$(ROOTDIR)/firmware
-export APPSDIR=\$(ROOTDIR)/apps
+export APPSDIR=@APPSDIR@
 export TOOLSDIR=\$(ROOTDIR)/tools
 export DOCSDIR=\$(ROOTDIR)/docs
 export DEBUG=@DEBUG@
@@ -488,6 +503,7 @@ export MKFIRMWARE=@TOOL@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
 export ENABLEDPLUGINS=@PLUGINS@
+export EXTRA_DEFINES=@EXTRADEF@
 export CC=@CC@
 export LD=@LD@
 export AR=@AR@
