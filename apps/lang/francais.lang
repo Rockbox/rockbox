@@ -41,18 +41,18 @@ new: "USB (sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
-eng: "Rockbox info:"
+eng: "Rockbox Info:"
 new: "Infos Rockbox:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMb"
-new: "Tmp: %d.%02dMo"
+eng: "Buf: %d.%03dMB"
+new: "Tmp: %d.%03dMo"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMb"
-new: "Tampon: %d.%02dMo"
+eng: "Buffer: %d.%03dMB"
+new: "Tampon: %d.%03dMo"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -181,7 +181,7 @@ new: "Aléatoire"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
-eng: "Play selected first"
+eng: "Play Selected First"
 new: "Lire fichier selectionné en 1er"
 
 id: LANG_MP3FILTER
@@ -226,7 +226,7 @@ new: "Exemple de vitesse de défilement"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
-eng: "Deep discharge"
+eng: "Deep Discharge"
 new: "Décharge complète"
 
 id: LANG_TIME
@@ -256,13 +256,13 @@ new: "Suivre liste musicale"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
-eng: "Really?"
-new: "Vraiment ?"
+eng: ""
+new: ""
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Lecture/Stop"
+eng: ""
+new: ""
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -271,13 +271,13 @@ new: "Etes-vous sûr ?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "Play = Yes"
-new: "Lecture=Oui"
+eng: ""
+new: ""
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
-eng: "Any Other = No"
-new: "Autres touches = Non"
+eng: "OFF=Cancel"
+new: "OFF=Annuler"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -361,7 +361,7 @@ new: "Maximisation des graves"
 
 id: LANG_DECAY
 desc: in sound_settings
-eng: "AV decay time"
+eng: "AV Decay Time"
 new: "AV délai de réference"
 
 id: LANG_CHANNEL_MENU
@@ -371,7 +371,7 @@ new: "Canaux"
 
 id: LANG_CHANNEL
 desc: in sound_settings
-eng: "Channel configuration"
+eng: "Channel Configuration"
 new: "Configuration des canaux"
 
 id: LANG_CHANNEL_STEREO
@@ -421,13 +421,13 @@ new: "(LECT/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
-eng: "Play = Yes"
+eng: "PLAY = Yes"
 new: "Lecture = Oui"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
 eng: "Any Other = No"
-new: "Toutes les autres = Non"
+new: "les autres = Non"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -456,7 +456,7 @@ new: "Silence"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: "MUTE OFF"
+eng: "Mute OFF"
 new: "Son activé"
 
 id: LANG_MUTE_ON_RECORDER
@@ -541,7 +541,7 @@ new: "[Fréquence]"
 
 id: LANG_ID3_PATH
 desc: in wps
-eng: "[PATH]"
+eng: "[Path]"
 new: "[Chemin]"
 
 id: LANG_PITCH_UP
@@ -591,22 +591,22 @@ new: "Fin de liste"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
-eng: "<Press ON>"
-new: "<Presser ON>"
+eng: ""
+new: ""
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "<End of song list>"
+eng: "End of song list"
 new: "<Fin de la liste>"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
-eng: "Press ON"
-new: "Appuyer sur ON"
+eng: ""
+new: ""
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
-eng: "Your score :"
+eng: "Your score:"
 new: "Votre score :"
 
 id: LANG_SNAKE_HISCORE
@@ -626,13 +626,13 @@ new: "En pause"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[Play] to resume"
+eng: "[PLAY] to resume"
 new: "[Lecture] pour reprendre"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[Off] to quit"
-new: "[Off] pour quitter"
+eng: "[OFF] to quit"
+new: "[OFF] pour quitter"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -646,7 +646,7 @@ new: "(1 - lent, 9 - rapide)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[Play] to start/pause"
+eng: "[PLAY] to start/pause"
 new: "[Lecture] pour commencer/pause"
 
 id: LANG_SOKOBAN_LEVEL
@@ -666,8 +666,8 @@ new: "GAGNÉ !"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[Off] to stop"
-new: "[Off] : arrêter"
+eng: "[OFF] to stop"
+new: "[OFF] : arrêter"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -721,12 +721,12 @@ new: "Rec: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    up/dn"
+eng: "%d Players    UP/DN"
 new: "%d Joueurs haut/bas"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        l/r"
+eng: "%d Worms        L/R"
 new: "%d Vers   gauche/droite"
 
 id: LANG_WORMLET_REMOTE_CTRL
@@ -761,12 +761,12 @@ new: "PERDU !"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "0 Rows - Level 0"
+eng: "Rows - Level"
 new: "0 Lignes - Niveau 0"
 
 id: LANG_FILTER
 desc: setting name for dir filter
-eng: "Show files"
+eng: "Show Files"
 new: "Montrer fichiers" 
 
 id: LANG_FILTER_ALL
@@ -811,37 +811,37 @@ new: "Oui"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
-eng: "Backlight on when charging"
+eng: "Backlight On When Plugged"
 new: "Rétro-Eclairage pendant chargement"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
-eng: "Clip hold time"
+eng: "Clip Hold Time"
 new: "Persistance marqueur seuil max"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
-eng: "eternal"
+eng: "Eternal"
 new: "Eternel" 
 
 id: LANG_PM_MENU
 desc: in the display menu
-eng: "Peak meter"
+eng: "Peak Meter"
 new: "Vu-mètre" 
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
-eng: "Peak hold time"
+eng: "Peak Hold Time"
 new: "Persistance marqueur de crête"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
-eng: "Peak release"
+eng: "Peak Release"
 new: "Taux de baisse de l'indicateur"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
-eng: "Units per read"
+eng: "Units Per Read"
 new: "Unités par mesure"
 
 id: LANG_REPEAT
@@ -858,3 +858,128 @@ id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
 new: "Une"
+
+id: LANF_WEEKDAY_THURSDAY
+desc: abbreviation for weekday
+eng: "Thu"
+new: "Mar"
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 hour clock"
+new: "Horloge AM/PM"
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 hour clock"
+new: "Horloge sur 24H"
+
+id: LANG_CUBE
+desc: the name of the cube demo in the demo menu
+eng: "Cube"
+new: "Cube"
+
+id: LANG_MONTH_APRIL
+desc: abbreviation for monthname
+eng: "Apr"
+new: "avr"
+
+id: LANG_MONTH_AUGUST
+desc: abbreviation for monthname
+eng: "Aug"
+new: "aou"
+
+id: LANG_MONTH_DECEMBER
+desc: abbreviation for monthname
+eng: "Dec"
+new: "déc"
+
+id: LANG_MONTH_FEBRUARY
+desc: abbreviation for monthname
+eng: "Feb"
+new: "fév"
+
+id: LANG_MONTH_JANUARY
+desc: abbreviation for monthname
+eng: "Jan"
+new: "jan" 
+
+id: LANG_MONTH_JULY
+desc: abbreviation for monthname
+eng: "Jul"
+new: "jul"
+
+id: LANG_MONTH_JUNE
+desc: abbreviation for monthname
+eng: "Jun"
+new: "jui" 
+
+id: LANG_MONTH_MARCH
+desc: abbreviation for monthname
+eng: "Mar"
+new: "mar"
+
+id: LANG_MONTH_MAY
+desc: abbreviation for monthname
+eng: "May"
+new: "mai"
+
+id: LANG_MONTH_NOVEMBER
+desc: abbreviation for monthname
+eng: "Nov"
+new: "nov"
+
+id: LANG_MONTH_OCTOBER
+desc: abbreviation for monthname
+eng: "Oct"
+new: "oct"
+
+id: LANG_MONTH_SEPTEMBER
+desc: abbreviation for monthname
+eng: "Sep"
+new: "sep"
+
+id: LANG_RESET_CANCEL
+desc: confirm to reset settings
+eng: "OFF=Cancel"
+new: "OFF=Annuler"
+
+id: LANG_RESET_CONFIRM
+desc: confirm to reset settings
+eng: "PLAY=Reset"
+new: "Lecture=Reinitialisation"
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+new: "Format Horloge"
+
+id: LANG_WEEKDAY_FRIDAY
+desc: abbreviation for weekday
+eng: "Fri"
+new: "ven"
+
+id: LANG_WEEKDAY_MONDAY
+desc: abbreviation for weekday
+eng: "Mon"
+new: "lun"
+
+id: LANG_WEEKDAY_SATURDAY
+desc: abbreviation for weekday
+eng: "Sat"
+new: "sam"
+
+id: LANG_WEEKDAY_SUNDAY
+desc: abbreviation for weekday
+eng: "Sun"
+new: "dim"
+
+id: LANG_WEEKDAY_TUESDAY
+desc: abbreviation for weekday
+eng: "Tue"
+new: "mar"
+
+id: LANG_WEEKDAY_WEDNESDAY
+desc: abbreviation for weekday
+eng: "Wed"
+new: "mer"
