@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "panic.h"
 #include "usb.h"
+#include "power.h"
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -290,16 +291,15 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-    ATA_SELECT = ata_device;
-#ifdef DEBUG
-    ATA_COMMAND = CMD_STANDBY;
+#ifdef ATA_POWER_OFF
+    ide_power_enable(false);
 #else
-    ATA_COMMAND = CMD_SLEEP;
-#endif
+    ATA_SELECT = ata_device;
+    ATA_COMMAND = CMD_STANDBY;
 
     if (!wait_for_rdy())
         ret = -1;
-
+#endif
     sleeping = true;
     sleep_timer = 0;
     mutex_unlock(&ata_mtx);
@@ -372,14 +372,18 @@ int ata_soft_reset(void)
     int retry_count;
     
     mutex_lock(&ata_mtx);
-    
+
+#ifdef ATA_POWER_OFF
+    ide_power_enable(true);
+    sleep(HZ);
+#else
     ATA_SELECT = SELECT_LBA | ata_device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
 
     ATA_CONTROL = CONTROL_nIEN;
     sleep(HZ/400); /* >2ms */
-
+#endif
     /* This little sucker can take up to 30 seconds */
     retry_count = 8;
     do
