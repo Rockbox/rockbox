@@ -44,8 +44,9 @@ OUTPUT = $(OBJDIR)/librockbox.a
 $(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+
 
-.c.o:
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$@
+$(OBJDIR)/%.o: %.c
+	@mkdir -p `dirname $@`
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	-$(RM) -f $(OBJDIR)/$(OBJS) *~ $(OUTPUT)
