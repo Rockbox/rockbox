@@ -638,15 +638,7 @@ bool f2_screen(void)
 
     while (!exit) {
         int w,h;
-        char* ptr;
-
-        ptr = "Repeat";
-#ifdef LCD_PROPFONTS
-        lcd_getstringsize(ptr,0,&w,&h);
-#else
-        lcd_getfontsize(0,&w,&h);
-        w *= strlen(ptr);
-#endif
+        char buf[32];
 
         lcd_clear_display();
 
@@ -657,13 +649,18 @@ bool f2_screen(void)
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
 
-        /* commented out until we really can disable repeat
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr, 0);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, "mode:", 0);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, "on", 0 );
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
-                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
-        */
+        snprintf(buf, sizeof buf, "Dir filter: %s",
+                 global_settings.mp3filter ? "on" : "off");
+#ifdef LCD_PROPFONTS
+        lcd_getstringsize(buf,0,&w,&h);
+#else
+        lcd_getfontsize(0,&w,&h);
+        w *= strlen(buf);
+#endif
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, buf, 0);
+        lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+
         lcd_update();
 
         switch (button_get(true)) {
@@ -678,9 +675,9 @@ bool f2_screen(void)
                     sort_playlist(true);
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_F2 | BUTTON_RIGHT:
-                /* toggle repeat */
+            case BUTTON_DOWN:
+            case BUTTON_F2 | BUTTON_DOWN:
+                global_settings.mp3filter = !global_settings.mp3filter;
                 break;
 
 #ifdef SIMULATOR

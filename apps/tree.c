@@ -327,18 +327,17 @@ static int showdir(char *path, int start)
             default:
                 icon_type = 0;
         }
+
+        if (icon_type) {
 #ifdef HAVE_LCD_BITMAP
-        if (icon_type)
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
                        CURSOR_X * 6 + CURSOR_WIDTH, 
                        MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #else
-        if(icon_type!=0)
-        {
             lcd_define_pattern((i-start)*8,tree_icons_5x7[icon_type],8);
             lcd_putc(LINE_X-1, i-start, i-start);
-        }
 #endif
+        }
 
         /* if MP3 filter is on, cut off the extension */
         if (global_settings.mp3filter && 
@@ -476,9 +475,12 @@ bool dirbrowse(char *root)
     char buf[MAX_PATH];
     int i;
     int lasti=-1;
-    int rc;
     int button;
     int tree_max_on_screen;
+    bool reload_root = false;
+    bool lastfilter = global_settings.mp3filter;
+    bool lastsortcase = global_settings.sort_case;
+    bool lastshowhidden = global_settings.show_hidden_files;
 #ifdef LOADABLE_FONTS
     int fh;
     unsigned char *font = lcd_getcurrentldfont();
@@ -629,15 +631,8 @@ bool dirbrowse(char *root)
                         status_set_playmode(STATUS_PLAY);
                         status_draw();
                         lcd_stop_scroll();
-                        rc = wps_show();
-                        if(rc == SYS_USB_CONNECTED)
-                        {
-                            /* Force a re-read of the root directory */
-                            strcpy(currdir, "/");
-                            lastdir[0] = 0;
-                            dirlevel = 0;
-                            dircursor = 0;
-                            start = 0;
+                        if ( wps_show() == SYS_USB_CONNECTED ) {
+                            reload_root = true;
                             global_settings.resume_index = -1;
                         }
 #ifdef LOADABLE_FONTS
@@ -721,38 +716,18 @@ bool dirbrowse(char *root)
                 }
                 break;
 
-            case TREE_MENU: {
-                bool lastfilter = global_settings.mp3filter;
-                bool lastsortcase = global_settings.sort_case;
-                bool show_hidden_files = global_settings.show_hidden_files;
-                Menu result;
-
+            case TREE_MENU:
                 lcd_stop_scroll();
-                result = main_menu();
-                /* do we need to rescan dir? */
-                if (result == MENU_DISK_CHANGED ||
-                    lastfilter != global_settings.mp3filter ||
-                    lastsortcase != global_settings.sort_case ||
-                    show_hidden_files != global_settings.show_hidden_files)
-                    lastdir[0] = 0;
+                main_menu();
                 restore = true;
                 break;
-            }
 
             case BUTTON_ON:
                 if (mpeg_is_playing())
                 {
                     lcd_stop_scroll();
-                    rc = wps_show();
-                    if(rc == SYS_USB_CONNECTED)
-                    {
-                        /* Force a re-read of the root directory */
-                        strcpy(currdir, "/");
-                        lastdir[0] = 0;
-                        dirlevel = 0;
-                        dircursor = 0;
-                        start = 0;
-                    }
+                    if (wps_show() == SYS_USB_CONNECTED)
+                        reload_root = true;
 #ifdef LOADABLE_FONTS
                     tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
@@ -764,24 +739,14 @@ bool dirbrowse(char *root)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F2:
-                if (f2_screen()) {
-                    /* reread root dir */
-                    strcpy(currdir, "/");
-                    lastdir[0] = 0;
-                    dirlevel = 0;
-                    dircursor = 0;
-                }
+                if (f2_screen())
+                    reload_root = true;
                 restore = true;
                 break;
 
             case BUTTON_F3:
-                if (f3_screen()) {
-                    /* reread root dir */
-                    strcpy(currdir, "/");
-                    lastdir[0] = 0;
-                    dirlevel = 0;
-                    dircursor = 0;
-                }
+                if (f3_screen())
+                    reload_root = true;
 #ifdef LOADABLE_FONTS
                 tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
@@ -805,12 +770,7 @@ bool dirbrowse(char *root)
                 backlight_time(global_settings.backlight);
                 
                 /* Force a re-read of the root directory */
-                restore = true;
-                strcpy(currdir, "/");
-                lastdir[0] = 0;
-                dirlevel = 0;
-                dircursor = 0;
-                start = 0;
+                reload_root = true;
             }
             break;
 #endif
@@ -819,6 +779,26 @@ bool dirbrowse(char *root)
         if ( button )
             ata_spin();
         
+        /* do we need to rescan dir? */
+        if (reload_root ||
+            lastfilter != global_settings.mp3filter ||
+            lastsortcase != global_settings.sort_case ||
+            lastshowhidden != global_settings.show_hidden_files)
+        {
+            if ( reload_root ) {
+                strcpy(currdir, "/");
+                dirlevel = 0;
+                reload_root = false;
+            }
+            dircursor = 0;
+            start = 0;
+            lastdir[0] = 0;
+            lastfilter = global_settings.mp3filter;
+            lastsortcase = global_settings.sort_case;
+            lastshowhidden = global_settings.show_hidden_files;
+            restore = true;
+        }
+
         if ( restore ) {
             /* restore display */
             /* We need to adjust if the number of lines on screen have
