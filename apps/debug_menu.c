@@ -309,7 +309,8 @@ bool dbg_hw_info(void)
     snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
     lcd_puts(0, 3, buf);
     
-    snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
+    snprintf(buf, 32, "ATA: 0x%x,%s", ata_io_address,
+             ata_device ? "slave":"master");
     lcd_puts(0, 4, buf);
     
     snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
@@ -381,7 +382,8 @@ bool dbg_hw_info(void)
                          usb_polarity?"pos":"neg");
                 break;
             case 2:
-                snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
+                snprintf(buf, 32, "ATA: 0x%x%s",
+                         ata_io_address, ata_device ? "s","m");
                 break;
             case 3:
                 snprintf(buf, 32, "Mask: %04x", bitmask);
@@ -1222,47 +1224,47 @@ static bool dbg_disk_info(void)
 #endif
 
         switch (page) {
-        case 0:
-            for (i=0; i < 20; i++)
-                ((unsigned short*)buf)[i]=identify_info[i+27];
-            buf[40]=0;
-            /* kill trailing space */
-            for (i=39; i && buf[i]==' '; i--)
-                buf[i] = 0;
-            lcd_puts(0, y++, "Model");
-            lcd_puts_scroll(0, y++, buf);
-            break;
+            case 0:
+                for (i=0; i < 20; i++)
+                    ((unsigned short*)buf)[i]=identify_info[i+27];
+                buf[40]=0;
+                /* kill trailing space */
+                for (i=39; i && buf[i]==' '; i--)
+                    buf[i] = 0;
+                lcd_puts(0, y++, "Model");
+                lcd_puts_scroll(0, y++, buf);
+                break;
 
-        case 1:
-            for (i=0; i < 4; i++)
-                ((unsigned short*)buf)[i]=identify_info[i+23];
-            buf[8]=0;
-            lcd_puts(0, y++, "Firmware");
-            lcd_puts(0, y++, buf);
-            break;
+            case 1:
+                for (i=0; i < 4; i++)
+                    ((unsigned short*)buf)[i]=identify_info[i+23];
+                buf[8]=0;
+                lcd_puts(0, y++, "Firmware");
+                lcd_puts(0, y++, buf);
+                break;
 
-        case 2:
-            snprintf(buf, sizeof buf, "%d MB",
-                     ((unsigned)identify_info[61] << 16 | 
-                      (unsigned)identify_info[60]) / 2048 );
-            lcd_puts(0, y++, "Size");
-            lcd_puts(0, y++, buf);
-            break;
+            case 2:
+                snprintf(buf, sizeof buf, "%d MB",
+                         ((unsigned)identify_info[61] << 16 | 
+                          (unsigned)identify_info[60]) / 2048 );
+                lcd_puts(0, y++, "Size");
+                lcd_puts(0, y++, buf);
+                break;
 
-        case 3: {
-            unsigned int free;
-            fat_size( NULL, &free );
-            snprintf(buf, sizeof buf, "%d MB",  free / 1024 );
-            lcd_puts(0, y++, "Free");
-            lcd_puts(0, y++, buf);
-            break;
-        }
+            case 3: {
+                unsigned int free;
+                fat_size( NULL, &free );
+                snprintf(buf, sizeof buf, "%d MB",  free / 1024 );
+                lcd_puts(0, y++, "Free");
+                lcd_puts(0, y++, buf);
+                break;
+            }
 
-        case 4:
-            snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
-            lcd_puts(0, y++, "Spinup time");
-            lcd_puts(0, y++, buf);
-            break;
+            case 4:
+                snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
+                lcd_puts(0, y++, "Spinup time");
+                lcd_puts(0, y++, buf);
+                break;
         }
         lcd_update();
 
