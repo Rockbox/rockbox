@@ -9,6 +9,9 @@
 
 <h2>News</h2>
 
+<p><i>2003-04-23</i>: <a href="/digest/">The Rockbox Digest</a> - track
+Rockbox development.
+
 <p><i>2003-04-15</i>: Version 2.0 is <a href="/download/">released</a>
 
 <p><i>2003-04-01</i>: <a href="/doom/">Play Doom on the Archos Recorder</a>!
