@@ -382,6 +382,7 @@ static unsigned char zeros[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 static unsigned char ones[]  = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 				 0xff, 0xff };
 static char fonts[] = { 6,8,12 };
+static char fontheight[] = { 8,12,16 };
 
 #ifndef SIMULATOR
 
@@ -663,6 +664,17 @@ void lcd_drawpixel(int x, int y)
 void lcd_clearpixel(int x, int y)
 {
     CLEAR_PIXEL(x,y);
+}
+
+/*
+ * Return width and height of a given font.
+ */
+void lcd_fontsize(char font, char *width, char *height)
+{
+    if(font < sizeof(fonts)) {
+        *width =  fonts[font];
+        *height = fontheight[font];
+    }
 }
 
 #else

@@ -79,6 +79,8 @@ extern void lcd_drawline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 
+void lcd_fontsize(char font, char *width, char *height);
+
 #endif /* CHARCELLS / BITMAP */
 
 #endif /* __LCD_H__ */
