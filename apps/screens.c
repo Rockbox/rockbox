@@ -610,7 +610,6 @@ void splash(int ticks,   /* how long */
             first=false;
 #ifdef HAVE_LCD_BITMAP
         lcd_putsxy(x, y, next);
-        lcd_update(); /* DURING DEBUG ONLY */
 #else
         lcd_puts(x, y, next);
 #endif
