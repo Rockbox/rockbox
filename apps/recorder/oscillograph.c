@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+#ifndef SIMULATOR /* don't want this code in the simulator */
+
 #include <stdlib.h>
 #include <sprintf.h>
 #include "menu.h"
@@ -199,3 +201,5 @@ bool oscillograph(void)
     /* standard return */
     return false;
 }
+
+#endif /* #ifndef SIMULATOR */
