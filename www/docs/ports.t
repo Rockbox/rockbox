@@ -179,5 +179,52 @@
 </tr>
 </table>
 
+<h2>Port C/Analog In</h2>
+<table border=1>
+<tr><th>Port pin</th>
+    <th colspan=2>Player</th>
+    <th colspan=2>Recorder</th>
+    <th colspan=2>FM/V2 Recorder</th>
+</tr>
+<tr><th><b>PC0/AN0</b></th>
+    <td>LEFT key</td>
+    <td>Battery voltage 1 (unusable)</td>
+    <td>&nbsp;</td>
+</tr>
+<tr><th><b>PC1/AN1</b></th>
+    <td>MENU key</td>
+    <td>Charger regulator voltage</td>
+    <td>USB detect</td>
+</tr>
+<tr><th><b>PC2/AN2</b></th>
+    <td>RIGHT key</td>
+    <td>USB voltage</td>
+    <td>OFF key</td>
+</tr>
+<tr><th><b>PC3/AN3</b></th>
+    <td>PLAY key</td>
+    <td>&nbsp;</td>
+    <td>ON key</td>
+</tr>
+<tr><th><b>PC4/AN4</b></th>
+    <td>&nbsp;</td>
+    <td>F1, F2, F3, UP keys</td>
+    <td>F1, F2, F3, UP keys</td>
+</tr>
+<tr><th><b>PC5/AN5</b></th>
+    <td>&nbsp;</td>
+    <td>DOWN, PLAY, LEFT, RIGHT keys</td>
+    <td>DOWN, PLAY, LEFT, RIGHT keys</td>
+</tr>
+<tr><th><b>PC6/AN6</b></th>
+    <td>Battery voltage</td>
+    <td>Battery voltage</td>
+    <td>Battery voltage</td>
+</tr>
+<tr><th><b>PC7/AN7</b></th>
+    <td>DC input voltage</td>
+    <td>DC input voltage</td>
+    <td>DC input voltage</td>
+</tr>
+</table>
 #include "foot.t"
-
