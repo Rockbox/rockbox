@@ -22,8 +22,10 @@
 #include <stdarg.h>
 #include "config.h"
 
+#ifdef DEBUG
 static char debugmembuf[100];
 static char debugbuf[200];
+#endif
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
 
@@ -39,6 +41,7 @@ void debug_init(void)
     IPRE |= 0xf000; /* Set to highest priority */
 }
 
+#ifdef DEBUG
 static int debug_tx_ready(void)
 {
     return (SSR1 & SCI_TDRE);
@@ -60,7 +63,8 @@ static void debug_tx_char(char ch)
 
 static void debug_handle_error(char ssr)
 {
-   SSR1 &= ~(SCI_ORER | SCI_PER | SCI_FER);
+    (void)ssr;
+    SSR1 &= ~(SCI_ORER | SCI_PER | SCI_FER);
 }
 
 static int debug_rx_ready(void)
@@ -163,6 +167,7 @@ static void putpacket (char *buffer)
     SCR1 |= 0x40;
 }
 
+
 /* convert the memory, pointed to by mem into hex, placing result in buf */
 /* return a pointer to the last char put in buf (null) */
 static char *mem2hex (char *mem, char *buf, int count)
@@ -186,6 +191,7 @@ static void debug(char *msg)
     mem2hex(msg, &debugbuf[1], strlen(msg));
     putpacket(debugbuf);
 }
+#endif /* end of DEBUG section */
 
 void debugf(char *fmt, ...)
 {
@@ -196,6 +202,8 @@ void debugf(char *fmt, ...)
     vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
     debug(debugmembuf);
+#else
+    (void)fmt;
 #endif
 }
 
