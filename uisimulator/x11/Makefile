@@ -93,6 +93,7 @@ ifeq ($(UNAME),CYGWIN)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DHAVE_OSS -D_SSIZE_T_
+  TARGET = $(OBJDIR)/rockboxui.exe
 else
 ifeq ($(UNAME),FreeBSD)
   LIBS = -pthread
