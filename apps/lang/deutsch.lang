@@ -46,13 +46,13 @@ id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
 voice: ""
-new: "Puf: %d.%02dMB"
+new: "Puf: %d,%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 voice: ""
-new: "Puffer: %d.%02dMB"
+new: "Puffer: %d,%03dMB"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
@@ -313,10 +313,10 @@ voice: "Loudness"
 new: "Loudness"
 
 id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-voice: "Bass Anhebung"
-new: "Bass Boost"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -988,13 +988,13 @@ id: LANG_DISK_STAT
 desc: disk size info
 eng: "Disk: %d.%dGB"
 voice: ""
-new: "HDD: %d.%dGB"
+new: "HDD: %d,%dGB"
 
 id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
 voice: "Freier Plattenplatz:"
-new: "Frei: %d.%dGB"
+new: "Frei: %d,%dGB"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1692,7 +1692,7 @@ id: LANG_FM_STATION
 desc:  in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
-new: "Sender: %d.%dMHz"
+new: "Sender: %d,%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc:  in radio screen
@@ -1715,8 +1715,8 @@ new: "Die Senderliste ist voll"
 id: LANG_FM_RADIO
 desc:  in main menu
 eng: "FM Radio"
-voice: "UKW Radio"
-new: "UKW Radio"
+voice: "UKW-Radio"
+new: "UKW-Radio"
 
 id: LANG_FM_BUTTONBAR_RECORD
 desc:  in main menu
@@ -2743,3 +2743,39 @@ desc:  in radio screen
 eng: "Action"
 voice: ""
 new: "Aktion"
+
+id: LANG_MDB_STRENGTH
+desc:  in sound settings
+eng: "MDB Strength"
+voice: "MDB Stärke"
+new: "MDB Stärke"
+
+id: LANG_MDB_HARMONICS
+desc:  in sound settings
+eng: "MDB Harmonics"
+voice: "MDB Obertöne"
+new: "MDB Obertöne"
+
+id: LANG_MDB_CENTER
+desc:  in sound settings
+eng: "MDB Center frequency"
+voice: "MDB Mittenfrequenz"
+new: "MDB Mittenfrequenz"
+
+id: LANG_MDB_SHAPE
+desc:  in sound settings
+eng: "MDB Shape"
+voice: "MDB Form"
+new: "MDB Form"
+
+id: LANG_MDB_ENABLE
+desc:  in sound settings
+eng: "MDB Enable"
+voice: "MDB aktivieren"
+new: "MDB aktivieren"
+
+id: LANG_SUPERBASS
+desc:  in sound settings
+eng: "Super bass"
+voice: "Superbass"
+new: "Superbass"
