@@ -254,16 +254,15 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
-static int numentries=0;
-static int dircursor=0;
-static int start=0;
-static int dirpos[MAX_DIR_LEVELS];
-static int cursorpos[MAX_DIR_LEVELS];
-static int dirlevel=0;
-static char currdir[MAX_PATH];
-
 bool dirbrowse(char *root)
 {
+    int numentries=0;
+    int dircursor=0;
+    int start=0;
+    int dirpos[MAX_DIR_LEVELS];
+    int cursorpos[MAX_DIR_LEVELS];
+    int dirlevel=0;
+    char currdir[MAX_PATH];
     char buf[MAX_PATH];
     int i;
     int lasti=-1;
