@@ -203,7 +203,7 @@ static int read_unsynched(int fd, void *buf, int len)
     }
 
     return len;
-};
+}
 
 static int skip_unsynched(int fd, int len)
 {
