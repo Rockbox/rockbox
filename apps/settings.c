@@ -222,7 +222,7 @@ static struct bit_entry rtc_bits[] =
     /* If values are just added to the end, no need to bump the version. */
 #ifdef HAVE_FMRADIO
     {1, S_O(fm_force_mono), false, "force fm mono", off_on },
-    {8, S_O(last_frequency), 994, NULL, NULL },
+    {8, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
 #endif
 
     /* Current sum of bits: 286 (worst case) */
