@@ -190,6 +190,9 @@ static inline void invalidate_icache(void)
 
 #elif CONFIG_CPU == TCC730
 
+extern void set_pll_freq(int pll_index, long freq_out);
+
+
 extern void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
 
 extern void ddma_transfer(int dir, int mem, long intAddr, long extAddr,

@@ -85,25 +85,51 @@ extern int icodecopy;
 extern int icodesize;
 extern int icodestart;
 
+/* change the CPU frequency */
+void set_pll_freq(int pll_index, long freq_out) {
+    volatile unsigned int* plldata;
+    volatile unsigned char* pllcon;
+    if (pll_index == 0) {
+        plldata = &PLL0DATA;
+        pllcon = &PLL0CON;
+    } else {
+        plldata = &PLL1DATA;
+        pllcon = &PLL1CON;
+    }
+    /* VC0 is 32768 Hz */
+#define VC0FREQ (32768L)
+    unsigned m = (freq_out / VC0FREQ) - 2;
+    /* TODO: if m is too small here, use the divider bits [0,1] */
+    *plldata = m << 2;
+    *pllcon |= 0x1; /* activate */
+    do {
+    } while ((*pllcon & 0x2) == 0); /*  wait for stabilization */
+}
+
 /* called by crt0 */
 void system_init(void)
 {
     /* Disable watchdog */
     WDTEN = 0xA5;
+
+    /****************
+     * GPIO ports
+     */
+
+    /* keep alive (?) -- clear the bit to prevent crash at start (??) */
+    P8 = 0x00;
+    P8CON = 0x01;
     
-    /* Setup the CPU */
+    /********
+     * CPU
+     */
     
     
     /* PLL0 (cpu osc. frequency) */
     
 #if 0
-    PLL0DATA = 0xf98;
-    PLL0CON = 0x1; /* activate */
-    do {
-        asm "nop";
-    } while ((PLL0CON & 0x2) == 0); /*  wait for stabilization */
-
-    PLL0CON = 0x5; /* use as CPU clock */
+    set_pll_freq(0, CPU_FREQ);
+    PLL0CON |= 0x4; /* use as CPU clock */
 
 #endif
 
@@ -118,11 +144,12 @@ void system_init(void)
    
 
     /***************************
-     * Interrupt mask
+     * Interrupts
      */
 
-    /* interrupt priorities ? */
+    /* priorities ? */
 
+    /* mask */
     IMR0 = 0;
     IMR1 = 0;
 
