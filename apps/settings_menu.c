@@ -686,10 +686,10 @@ static bool display_settings_menu(void)
     bool result;
 
     struct menu_items items[] = {
+        { str(LANG_SCROLL_MENU),     scroll_settings_menu },  
         { str(LANG_BACKLIGHT),       backlight_timer },
         { str(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
         { str(LANG_CONTRAST),        contrast        },  
-        { str(LANG_SCROLL_MENU),     scroll_settings_menu },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
