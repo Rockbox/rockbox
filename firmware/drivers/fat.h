@@ -100,12 +100,16 @@ struct fat_fileent
     int sectornum;       /* sector number in this cluster */
 };
 
+extern int fat_mount(struct bpb *bpb);
+
+#ifdef DISK_WRITE
 extern int fat_create_file(struct bpb *bpb, 
                            unsigned int currdir, 
                            char *name);
 extern int fat_create_dir(struct bpb *bpb, 
                           unsigned int currdir,
                           char *name);
+#endif
 extern int fat_open(struct bpb *bpb, 
                     unsigned int cluster,
                     struct fat_fileent *ent);

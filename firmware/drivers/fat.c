@@ -113,7 +113,6 @@ struct fsinfo {
 #define FSINFO_NEXTFREE  492
 
 static int first_sector_of_cluster(struct bpb *bpb, unsigned int cluster);
-static int get_bpb(struct bpb *bpb);
 static int bpb_is_sane(struct bpb *bpb);
 static void *cache_fat_sector(struct bpb *bpb, int secnum);
 #ifdef DISK_WRITE
@@ -125,7 +124,9 @@ static int create_dos_name(unsigned char *name, unsigned char *newname);
 
 /* fat cache */
 static unsigned char *fat_cache[256];
+#ifdef DISK_WRITE
 static int fat_cache_dirty[256];
+#endif
 
 /* sectors cache for longname use */
 static unsigned char lastsector[SECTOR_SIZE];
@@ -149,7 +150,7 @@ int main(int argc, char *argv[])
     if(ata_init())
         DEBUG("*** Warning! The disk is uninitialized\n");
     else
-        get_bpb(&bpb);
+        fat_mount(&bpb);
 
     dbg_console(&bpb);
     return 0;
@@ -192,7 +193,7 @@ static int first_sector_of_cluster(struct bpb *bpb, unsigned int cluster)
     return (cluster - 2) * bpb->bpb_secperclus + bpb->firstdatasector;
 }
 
-static int get_bpb(struct bpb *bpb)
+int fat_mount(struct bpb *bpb)
 {
     unsigned char buf[SECTOR_SIZE];
     int err;
@@ -203,7 +204,7 @@ static int get_bpb(struct bpb *bpb)
     err = ata_read_sectors(0,1,buf);
     if(err)
     {
-        DEBUG1( "get_bpb() - Couldn't read BPB (error code %i)\n",
+        DEBUG1( "fat_mount() - Couldn't read BPB (error code %i)\n",
                 err);
         return -1;
     }
@@ -276,7 +277,7 @@ static int get_bpb(struct bpb *bpb)
 
     if (bpb_is_sane(bpb) < 0)
     {
-        DEBUG( "get_bpb() - BPB is not sane\n");
+        DEBUG( "fat_mount() - BPB is not sane\n");
         return -1;
     }
 
@@ -863,7 +864,7 @@ int fat_seek(struct bpb *bpb,
              int seeksector )
 {
     int cluster = ent->firstcluster;
-    int sector;
+    int sector = seeksector;
     int numsec = 0;
     int i;
 
@@ -880,6 +881,8 @@ int fat_seek(struct bpb *bpb,
                 return -2;
             numsec=0;
         }
+        else
+          sector++;
     }
     ent->nextcluster = cluster;
     ent->nextsector = sector;
@@ -980,7 +983,10 @@ int fat_getnext(struct bpb *bpb,
                                 index &= SECTOR_SIZE-1;
                             }
 
-                            /* piece together the name subcomponents */
+                            /* piece together the name subcomponents.
+                               names are stored in unicode, but we
+                               only grab the low byte (iso8859-1).
+			     */
                             for (k=0; k<5; k++)
                                 entry->name[l++] = ptr[index + k*2 + 1];
                             for (k=0; k<6; k++)
