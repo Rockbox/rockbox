@@ -69,7 +69,8 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
-APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c
+APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c \
+	playlist.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c screensaver.c icons.c bmp.c
@@ -165,6 +166,9 @@ $(OBJDIR)/play.o: $(APPDIR)/play.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/tree.o: $(APPDIR)/tree.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/playlist.o: $(APPDIR)/playlist.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
