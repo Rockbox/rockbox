@@ -36,6 +36,7 @@ use F3 to put card on top of the remains' stack on one of the 4 final color
 #include "lcd.h"
 
 #ifdef HAVE_LCD_BITMAP
+#if CONFIG_KEYPAD != IRIVER_H100_PAD /* FIX! */
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
@@ -1192,4 +1193,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return (result == SOLITAIRE_USB) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
+#endif /* iRiver h100 keypad */
 #endif
