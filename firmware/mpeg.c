@@ -835,7 +835,6 @@ static int add_track_to_tag_list(const char *filename)
     return 0;
 }
 
-/* If next_track is true, opens the next track, if false, opens prev track */
 static int new_file(int steps)
 {
     int max_steps = playlist_amount();
