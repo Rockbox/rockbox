@@ -1135,7 +1135,9 @@ void exit_tsr(void)
 int main(void* parameter)
 {
     (void)parameter;
-    /*int button; */
+#ifdef DEBUG
+    int button;
+#endif
     int stacksize;
     void* stack;
 
@@ -1167,7 +1169,7 @@ int main(void* parameter)
     do
     {
         button = rb->button_get(true);
-    } while (button & BUTTON_REL));
+    } while (button & BUTTON_REL);
 #endif
 
     gTread.foreground = false; /* we're in the background now */
