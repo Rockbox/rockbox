@@ -116,11 +116,13 @@ desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new:
 
+# NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new:
 
+# NO LONGER USED
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
@@ -136,6 +138,7 @@ desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new:
 
+# NO LONGER USED
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d Files"
