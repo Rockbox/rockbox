@@ -361,6 +361,8 @@ int wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
     lcd_icon(ICON_AUDIO, true);
     lcd_icon(ICON_PARAM, false);
+#else
+    lcd_setmargins(0,0);
 #endif
 
     if(mpeg_is_playing())

@@ -73,9 +73,9 @@ void browse_root(void)
 #define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
 #define MARGIN_Y      0  /* Y pixel margin */
-#define MARGIN_X      12 /* X pixel margin */
+#define MARGIN_X      10 /* X pixel margin */
 #define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
-#define LINE_X      2 /* X position the entry-list starts at */
+#define LINE_X      0 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
 #define CURSOR_Y    0 /* the cursor is not positioned in regard to
@@ -241,7 +241,7 @@ static int showdir(char *path, int start)
 #endif
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,MARGIN_Y);
+    lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
     lcd_setfont(0);
 #endif
 
@@ -263,7 +263,7 @@ static int showdir(char *path, int start)
                 icon_type = File;
         }
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                   6, MARGIN_Y+(LINE_Y+i-start)*line_height, 6, 8, true);
+                   4, MARGIN_Y+(LINE_Y+i-start)*line_height, 6, 8, true);
 #endif
 
 
