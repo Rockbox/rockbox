@@ -48,7 +48,7 @@ LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
 
-LIBS = 
+LIBS = -lpthread
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -77,7 +77,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c mpeg.c \
-        button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
+        button-x11.c io.c sleep.c thread.c $(APPS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
   SRCS += mpegplay.c oss_sound.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
