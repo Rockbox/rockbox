@@ -72,7 +72,7 @@ _DEFUN (memcpy, (dst0, src0, len0),
   _CONST char *src = src0;
   long *aligned_dst;
   _CONST long *aligned_src;
-  int   len =  len0;
+  unsigned int   len =  len0;
 
   /* If the size is small, or either SRC or DST is unaligned,
      then punt into the byte copy loop.  This should be rare.  */

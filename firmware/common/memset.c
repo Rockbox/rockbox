@@ -56,7 +56,7 @@ _DEFUN (memset, (m, c, n),
   return m;
 #else
   char *s = (char *) m;
-  int i;
+  unsigned int i;
   unsigned long buffer;
   unsigned long *aligned_addr;
 
