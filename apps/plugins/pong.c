@@ -20,18 +20,18 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#define PAD_HEIGHT 10
-#define PAD_WIDTH 2
+#define PAD_HEIGHT LCD_HEIGHT / 6    /* Recorder: 10   iRiver: 21 */
+#define PAD_WIDTH LCD_WIDTH / 50     /* Recorder: 2    iRiver: 2  */
 
-#define BALL_HEIGTH 2
-#define BALL_WIDTH 2
+#define BALL_HEIGTH LCD_HEIGHT / 32  /* Recorder: 2    iRiver: 4  */
+#define BALL_WIDTH LCD_HEIGHT / 32   /* We want a square ball */
 
-#define SPEEDX 150
-#define SPEEDY 120
+#define SPEEDX ( LCD_WIDTH * 3 ) / 2 /* Recorder: 168  iRiver: 240 */
+#define SPEEDY LCD_HEIGHT * 2        /* Recorder: 128  iRiver: 256 */
 
 #define RES 100
 
-#define MOVE_STEP 2 /* move pad this many steps up/down each move */
+#define MOVE_STEP LCD_HEIGHT / 32 /* move pad this many steps up/down each move */
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -291,9 +291,11 @@ int keys(struct pong *p)
 void showscore(struct pong *p)
 {
     static char buffer[20];
+    int w;
 
     rb->snprintf(buffer, sizeof(buffer), "%d - %d", p->score[0], p->score[1]);
-    rb->lcd_puts(4, 0, buffer);
+    w = rb->lcd_getstringsize(buffer, NULL, NULL);
+    rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, buffer);
 }
 
 /* this is the plugin entry point */
