@@ -41,12 +41,22 @@
 
 static struct partinfo part[8];
 
-struct partinfo* disk_init(void)
+struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 {
     int i;
     unsigned char sector[512];
+#ifdef HAVE_MULTIVOLUME
+    /* For each drive, start at a different position, in order not to destroy 
+       the first entry of drive 0. 
+       That one is needed to calculate config sector position. */
+    struct partinfo* pinfo = &part[drive*4];
+    if ((size_t)drive >= sizeof(part)/sizeof(*part)/4)
+        return NULL; /* out of space in table */
+#else
+    struct partinfo* pinfo = part;
+#endif
 
-    ata_read_sectors(0,1,&sector);
+    ata_read_sectors(IF_MV2(drive,) 0,1,&sector);
 
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
@@ -58,20 +68,20 @@ struct partinfo* disk_init(void)
     /* parse partitions */
     for ( i=0; i<4; i++ ) {
         unsigned char* ptr = sector + 0x1be + 16*i;
-        part[i].type  = ptr[4];
-        part[i].start = BYTES2INT32(ptr, 8);
-        part[i].size  = BYTES2INT32(ptr, 12);
+        pinfo[i].type  = ptr[4];
+        pinfo[i].start = BYTES2INT32(ptr, 8);
+        pinfo[i].size  = BYTES2INT32(ptr, 12);
 
         DEBUGF("Part%d: Type %02x, start: %08x size: %08x\n",
-               i,part[i].type,part[i].start,part[i].size);
+               i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
 
         /* extended? */
-        if ( part[i].type == 5 ) {
+        if ( pinfo[i].type == 5 ) {
             /* not handled yet */
         }
     }
 
-    return part;
+    return pinfo;
 }
 
 struct partinfo* disk_partinfo(int partition)

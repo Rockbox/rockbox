@@ -157,17 +157,38 @@ static void usb_slave_mode(bool on)
             panicf("ata: %d",rc);
         }
     
-        pinfo = disk_init();
+        pinfo = disk_init(IF_MV(0));
         if (!pinfo)
             panicf("disk: NULL");
     
+        fat_init();
         for ( i=0; i<4; i++ ) {
-            rc = fat_mount(pinfo[i].start);
+            rc = fat_mount(IF_MV2(0,) IF_MV2(0,) pinfo[i].start);
             if (!rc)
-                break;
+                break; /* only one partition gets mounted as of now */
         }
         if (i==4)
             panicf("mount: %d",rc);
+#ifdef HAVE_MULTIVOLUME
+        /* mount partition on the optional volume */
+#ifdef HAVE_MMC
+        if (mmc_detect()) /* for Ondio, only if card detected */
+#endif
+        {
+            pinfo = disk_init(1);
+            if (pinfo)
+            {
+                for ( i=0; i<4; i++ ) {
+                    if (!fat_mount(1, 1, pinfo[i].start))
+                        break; /* only one partition gets mounted as of now */
+                }
+
+                if ( i==4 ) {
+                    rc = fat_mount(1, 1, 0);
+                }
+            }
+        }
+#endif /* #ifdef HAVE_MULTIVOLUME */
     }
 }
 

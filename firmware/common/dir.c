@@ -23,10 +23,47 @@
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
+#include "atoi.h"
 
 #define MAX_OPEN_DIRS 8
 
 static DIR opendirs[MAX_OPEN_DIRS];
+
+#ifdef HAVE_MULTIVOLUME
+
+/* how to name volumes, first char must be outside of legal file names,
+   a number gets appended to enumerate, if applicable */
+#ifdef HAVE_MMC
+static const char* vol_names = ":MMC";
+#else
+static const char* vol_names = ":HD";
+#endif
+
+/* returns on which volume this is, and copies the reduced name
+   (sortof a preprocessor for volume-decorated pathnames) */
+static int strip_volume(const char* name, char* namecopy)
+{
+    int volume = 0;
+
+    if (name[1] == vol_names[0] ) /* a colon identifies our volumes */
+    {
+        const char* temp;
+        temp = name + 1 + strlen(vol_names); /* behind special name */
+        volume = atoi(temp); /* number is following */
+        temp = strchr(temp, '/'); /* search for slash behind */
+        if (temp != NULL)
+            name = temp; /* use the part behind the volume */
+        else
+            name = "/"; /* else this must be the root dir */
+    }
+
+    strncpy(namecopy, name, MAX_PATH);
+    namecopy[MAX_PATH-1] = '\0';
+
+    return volume;
+}
+#endif /* #ifdef HAVE_MULTIVOLUME */
+
 
 DIR* opendir(const char* name)
 {
@@ -35,6 +72,9 @@ DIR* opendir(const char* name)
     char* end;
     struct fat_direntry entry;
     int dd;
+#ifdef HAVE_MULTIVOLUME
+    int volume;
+#endif
 
     /* find a free dir descriptor */
     for ( dd=0; dd<MAX_OPEN_DIRS; dd++ )
@@ -55,14 +95,20 @@ DIR* opendir(const char* name)
         return NULL;
     }
 
-    if ( fat_opendir(&(opendirs[dd].fatdir), 0, NULL) < 0 ) {
+#ifdef HAVE_MULTIVOLUME
+    /* try to extract a heading volume name, if present */
+    volume = strip_volume(name, namecopy);
+    opendirs[dd].volumecounter = 0;
+#else
+    strncpy(namecopy,name,sizeof(namecopy)); /* just copy */
+    namecopy[sizeof(namecopy)-1] = '\0';
+#endif
+
+    if ( fat_opendir(IF_MV2(volume,) &(opendirs[dd].fatdir), 0, NULL) < 0 ) {
         DEBUGF("Failed opening root dir\n");
         opendirs[dd].busy = false;
         return NULL;
     }
-
-    strncpy(namecopy,name,sizeof(namecopy));
-    namecopy[sizeof(namecopy)-1] = 0;
 
     for ( part = strtok_r(namecopy, "/", &end); part;
           part = strtok_r(NULL, "/", &end)) {
@@ -76,7 +122,8 @@ DIR* opendir(const char* name)
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
                 opendirs[dd].parent_dir = opendirs[dd].fatdir;
-                if ( fat_opendir(&(opendirs[dd].fatdir),
+                if ( fat_opendir(IF_MV2(volume,)
+                                 &(opendirs[dd].fatdir),
                                  entry.firstcluster,
                                  &(opendirs[dd].parent_dir)) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",
@@ -84,6 +131,9 @@ DIR* opendir(const char* name)
                     opendirs[dd].busy = false;
                     return NULL;
                 }
+#ifdef HAVE_MULTIVOLUME
+                opendirs[dd].volumecounter = -1; /* n.a. to subdirs */
+#endif
                 break;
             }
         }
@@ -102,7 +152,28 @@ struct dirent* readdir(DIR* dir)
 {
     struct fat_direntry entry;
     struct dirent* theent = &(dir->theent);
-
+#ifdef HAVE_MULTIVOLUME
+    /* Volumes (secondary file systems) get inserted into the root directory
+        of the first volume, since we have no separate top level. */
+    if (dir->volumecounter >= 0 /* on a root dir */
+     && dir->volumecounter < NUM_VOLUMES /* in range */
+     && dir->fatdir.file.volume == 0) /* at volume 0 */
+    {   /* fake special directories, which don't really exist, but
+           will get redirected upon opendir() */
+        while (++dir->volumecounter < NUM_VOLUMES)
+        {
+            if (fat_ismounted(dir->volumecounter))
+            {
+                memset(theent, 0, sizeof(*theent));
+                theent->attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
+                snprintf(theent->d_name, sizeof(theent->d_name), 
+                         "%s%d", vol_names, dir->volumecounter);
+                return theent;
+            }
+        }
+    }
+#endif
+    /* normal directory entry fetching follows here */
     if (fat_getnext(&(dir->fatdir),&entry) < 0)
         return NULL;
 

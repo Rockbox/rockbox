@@ -21,6 +21,7 @@
 #define FAT_H
 
 #include <stdbool.h>
+#include "ata.h" /* for volume definitions */
 
 #define SECTOR_SIZE 512
 
@@ -45,6 +46,7 @@ struct fat_direntry
 #define FAT_ATTR_VOLUME_ID   0x08
 #define FAT_ATTR_DIRECTORY   0x10
 #define FAT_ATTR_ARCHIVE     0x20
+#define FAT_ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
 
 struct fat_file
 {
@@ -57,6 +59,9 @@ struct fat_file
     unsigned int direntries; /* number of dir entries used by this file */
     unsigned int dircluster; /* first cluster of dir */
     bool eof;
+#ifdef HAVE_MULTIVOLUME
+    int volume;           /* file resides on which volume */
+#endif
 };
 
 struct fat_dir
@@ -69,14 +74,16 @@ struct fat_dir
 };
 
 
-extern int fat_mount(int startsector);
-extern void fat_size(unsigned int* size, unsigned int* free);
-extern void fat_recalc_free(void);
+extern void fat_init(void);
+extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector);
+extern void fat_size(IF_MV2(int volume,) unsigned int* size, unsigned int* free); // public for info
+extern void fat_recalc_free(IF_MV_NONVOID(int volume)); // public for debug info screen
 extern int fat_create_dir(const char* name,
                           struct fat_dir* newdir,
                           struct fat_dir* dir);
-extern int fat_startsector(void);
-extern int fat_open(unsigned int cluster,
+extern int fat_startsector(IF_MV_NONVOID(int volume)); // public for config sector
+extern int fat_open(IF_MV2(int volume,)
+                    unsigned int cluster,
                     struct fat_file* ent,
                     const struct fat_dir* dir);
 extern int fat_create_file(const char* name,
@@ -93,9 +100,11 @@ extern int fat_rename(struct fat_file* file,
                       const unsigned char* newname,
                       int size, int attr);
 
-extern int fat_opendir(struct fat_dir *ent, unsigned int currdir,
+extern int fat_opendir(IF_MV2(int volume,)
+                       struct fat_dir *ent, unsigned int currdir,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
-extern int fat_get_cluster_size(void);
+extern int fat_get_cluster_size(IF_MV_NONVOID(int volume));
+extern bool fat_ismounted(int volume);
 
 #endif

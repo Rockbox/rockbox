@@ -20,6 +20,21 @@
 #define __ATA_H__
 
 #include <stdbool.h>
+#include "config.h" /* for HAVE_MULTIVOLUME or not */
+
+/* FixMe: These macros are a bit nasty and perhaps misplaced here.
+   We'll get rid of them once decided on how to proceed with multivolume. */
+#ifdef HAVE_MULTIVOLUME
+#define IF_MV(x) x /* optional volume/drive parameter */
+#define IF_MV2(x,y) x,y /* same, for a list of arguments */
+#define IF_MV_NONVOID(x) x /* for prototype with sole volume parameter */
+#define NUM_VOLUMES 2
+#else /* empty definitions if no multi-volume */
+#define IF_MV(x)
+#define IF_MV2(x,y)
+#define IF_MV_NONVOID(x) void
+#define NUM_VOLUMES 1
+#endif
 
 /*
   ata_spindown() time values:
@@ -41,8 +56,8 @@ extern bool ata_disk_is_active(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
 extern int ata_init(void);
-extern int ata_read_sectors(unsigned long start, int count, void* buf);
-extern int ata_write_sectors(unsigned long start, int count, const void* buf);
+extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
+extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 extern void ata_delayed_write(unsigned long sector, const void* buf);
 extern void ata_flush(void);
 extern void ata_spin(void);

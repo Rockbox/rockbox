@@ -608,17 +608,24 @@ static int send_single_sector(const unsigned char *buf, int timeout)
     return ret;
 }
 
-int ata_read_sectors(unsigned long start,
-                     int incount,
-                     void* inbuf)
+int ata_read_sectors(
+#ifdef HAVE_MULTIVOLUME
+    int drive,
+#endif
+    unsigned long start,
+    int incount,
+    void* inbuf)
 {
     int ret = 0;
     int i;
     unsigned long addr;
     unsigned char response;
     void *inbuf_prev = NULL;
-    tCardInfo *card = &card_info[current_card];
-
+    tCardInfo *card;
+#ifdef HAVE_MULTIVOLUME
+    current_card = drive;
+#endif
+    card = &card_info[current_card];
     addr = start * SECTOR_SIZE;
 
     mutex_lock(&mmc_mutex);
@@ -663,7 +670,11 @@ int ata_read_sectors(unsigned long start,
     return ret;
 }
 
-int ata_write_sectors(unsigned long start,
+int ata_write_sectors(
+#ifdef HAVE_MULTIVOLUME
+                      int drive,
+#endif
+                      unsigned long start,
                       int count,
                       const void* buf)
 {
@@ -671,7 +682,11 @@ int ata_write_sectors(unsigned long start,
     int i;
     unsigned long addr;
     unsigned char response;
-    tCardInfo *card = &card_info[current_card];
+    tCardInfo *card;
+#ifdef HAVE_MULTIVOLUME
+    current_card = drive;
+#endif
+    card = &card_info[current_card];
 
     if (start == 0)
         panicf("Writing on sector 0\n");
@@ -733,12 +748,13 @@ extern void ata_delayed_write(unsigned long sector, const void* buf)
     delayed_write = true;
 }
 
+/* write the delayed sector to volume 0 */
 extern void ata_flush(void)
 {
     if ( delayed_write ) {
         DEBUGF("ata_flush()\n");
         delayed_write = false;
-        ata_write_sectors(delayed_sector_num, 1, delayed_sector);
+        ata_write_sectors(IF_MV2(0,) delayed_sector_num, 1, delayed_sector);
     }
 }
 

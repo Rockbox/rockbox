@@ -310,7 +310,8 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
 }
 
-int ata_read_sectors(unsigned long start,
+int ata_read_sectors(IF_MV((int drive,))
+                     unsigned long start,
                      int incount,
                      void* inbuf)
 {
@@ -576,7 +577,8 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 #endif
 }
 
-int ata_write_sectors(unsigned long start,
+int ata_write_sectors(IF_MV((int drive,))
+                      unsigned long start,
                       int count,
                       const void* buf)
 {
@@ -669,6 +671,8 @@ int ata_write_sectors(unsigned long start,
     return ret;
 }
 
+/* schedule a single sector write, executed with the the next spinup 
+   (volume 0 only, used for config sector) */
 extern void ata_delayed_write(unsigned long sector, const void* buf)
 {
     memcpy(delayed_sector, buf, SECTOR_SIZE);
@@ -676,12 +680,13 @@ extern void ata_delayed_write(unsigned long sector, const void* buf)
     delayed_write = true;
 }
 
+/* write the delayed sector to volume 0 */
 extern void ata_flush(void)
 {
     if ( delayed_write ) {
         DEBUGF("ata_flush()\n");
         delayed_write = false;
-        ata_write_sectors(delayed_sector_num, 1, delayed_sector);
+        ata_write_sectors(IF_MV2(0,) delayed_sector_num, 1, delayed_sector);
     }
 }
 

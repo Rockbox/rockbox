@@ -132,7 +132,8 @@ int open(const char* pathname, int flags)
     /* scan dir for name */
     while ((entry = readdir(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
-            fat_open(entry->startcluster,
+            fat_open(IF_MV2(dir->fatdir.file.volume,)
+                     entry->startcluster,
                      &(file->fatfile),
                      &(dir->fatdir));
             file->size = file->trunc ? 0 : entry->size;

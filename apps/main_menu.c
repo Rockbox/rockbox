@@ -146,7 +146,7 @@ bool show_info(void)
     int state = 1;
     unsigned int size, free;
 
-    fat_size( &size, &free );
+    fat_size( IF_MV2(0,) &size, &free );
     size /= 1024;
     free /= 1024;
 

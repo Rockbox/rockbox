@@ -513,8 +513,7 @@ static int load_config_buffer(int which)
     if (which & SETTINGS_HD)
     {
         if (config_sector != 0) {
-            ata_read_sectors( config_sector, 1,  config_block);
-
+            ata_read_sectors(IF_MV2(0,) config_sector, 1,  config_block);
             /* calculate the checksum, check it and the header */
             chksum = calculate_config_checksum(config_block);
         
@@ -623,7 +622,7 @@ void settings_calc_config_sector(void)
     int i, partition_start;
     int sector = 0;
 
-    if (fat_startsector() != 0)    /* There is a partition table */
+    if (fat_startsector(IF_MV(0)) != 0)    /* There is a partition table */
     {
         sector = 61;
         for (i = 0; i < 4; i++)

@@ -30,6 +30,7 @@
 #define ATTR_VOLUME_ID   0x08
 #define ATTR_DIRECTORY   0x10
 #define ATTR_ARCHIVE     0x20
+#define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
 
 struct dirent {
     unsigned char d_name[MAX_PATH];
@@ -52,6 +53,9 @@ typedef struct {
     struct fat_dir fatdir;
     struct fat_dir parent_dir;
     struct dirent theent;
+#ifdef HAVE_MULTIVOLUME
+    int volumecounter; /* running counter for faked volume entries */
+#endif
 } DIR;
 
 #else /* SIMULATOR */

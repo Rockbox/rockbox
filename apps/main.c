@@ -101,6 +101,9 @@ int main(void)
 #ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
+#endif
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
@@ -236,7 +239,8 @@ void init(void)
 
     usb_start_monitoring();
 
-    pinfo = disk_init();
+    /* FixMe: the same kind of mounting happens in usb.c, share the code. */
+    pinfo = disk_init(IF_MV(0));
     if (!pinfo)
     {
         lcd_clear_display();
@@ -252,14 +256,15 @@ void init(void)
         system_reboot();
     }
 
+    fat_init();
     for ( i=0; i<4; i++ ) {
-        if (!fat_mount(pinfo[i].start))
-            break;
+        if (!fat_mount(IF_MV2(0,) IF_MV2(0,) pinfo[i].start))
+            break; /* only one partition gets mounted as of now */
     }
 
     if ( i==4 ) {
         DEBUGF("No partition found, trying to mount sector 0.\n");
-        rc = fat_mount(0);
+        rc = fat_mount(IF_MV2(0,) IF_MV2(0,) 0);
         if(rc) {
             lcd_clear_display();
             lcd_puts(0,0,"No FAT32");
@@ -272,7 +277,26 @@ void init(void)
             /* The USB thread will panic if the drive still can't be mounted */
         }
     }
+#ifdef HAVE_MULTIVOLUME
+    /* mount partition on the optional volume */
+#ifdef HAVE_MMC
+    if (mmc_detect()) /* for Ondio, only if card detected */
+#endif
+    {
+        pinfo = disk_init(1);
+        if (pinfo)
+        {
+            for ( i=0; i<4; i++ ) {
+                if (!fat_mount(1, 1, pinfo[i].start))
+                    break; /* only one partition gets mounted as of now */
+            }
 
+            if ( i==4 ) {
+                rc = fat_mount(1, 1, 0);
+            }
+        }
+    }
+#endif /* #ifdef HAVE_MULTIVOLUME */
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     settings_apply();

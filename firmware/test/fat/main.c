@@ -677,7 +677,7 @@ int main(int argc, char *argv[])
 #endif
         ) {
             DEBUGF("*** Mounting at block %ld\n",pinfo[i].start);
-            rc = fat_mount(pinfo[i].start);
+            rc = fat_mount(IF_MV2(0,) IF_MV2(0,) pinfo[i].start);
             if(rc) {
                 DEBUGF("mount: %d",rc);
                 return -1;
@@ -686,7 +686,7 @@ int main(int argc, char *argv[])
         }
     }
     if ( i==4 ) {
-        if(fat_mount(0)) {
+        if(fat_mount(IF_MV2(0,) IF_MV2(0,) 0)) {
             DEBUGF("No FAT32 partition!");
             return -1;
         }

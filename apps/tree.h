@@ -108,7 +108,7 @@ struct filetype {
 };
  
 
-/* using attribute bits not used by FAT (FAT uses lower 6) */
+/* using attribute bits not used by FAT (FAT uses lower 7) */
 
 #define TREE_ATTR_THUMBNAIL 0x0080 /* corresponding .talk file exists */
 

@@ -19,6 +19,8 @@
 #ifndef _DISK_H_
 #define _DISK_H_
 
+#include "ata.h" /* for volume definitions */
+
 struct partinfo {
     unsigned long start; /* first sector (LBA) */
     unsigned long size;  /* number of sectors */
@@ -30,7 +32,7 @@ struct partinfo {
 #define PARTITION_TYPE_FAT16     0x06
 
 /* returns a pointer to an array of 8 partinfo structs */
-struct partinfo* disk_init(void);
+struct partinfo* disk_init(IF_MV_NONVOID(int volume));
 struct partinfo* disk_partinfo(int partition);
 
 #endif
