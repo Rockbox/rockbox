@@ -35,7 +35,7 @@ struct playlist_info
     int  control_fd;     /* descriptor of the open control file     */
     bool control_created; /* has control file been created?         */
     int  dirlen;         /* Length of the path to the playlist file */
-    unsigned int *indices; /* array of indices                      */
+    unsigned long *indices; /* array of indices                      */
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     bool in_ram;         /* playlist stored in ram (dirplay)        */

@@ -412,7 +412,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
                                  bool queue, int seek_pos)
 {
     int insert_position = position;
-    unsigned int flags = PLAYLIST_INSERT_TYPE_INSERT;
+    unsigned long flags = PLAYLIST_INSERT_TYPE_INSERT;
     int i;
 
     if (playlist->amount >= playlist->max_playlist_size)
@@ -897,10 +897,10 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
  */
 static int compare(const void* p1, const void* p2)
 {
-    unsigned int* e1 = (unsigned int*) p1;
-    unsigned int* e2 = (unsigned int*) p2;
-    unsigned int flags1 = *e1 & PLAYLIST_INSERT_TYPE_MASK;
-    unsigned int flags2 = *e2 & PLAYLIST_INSERT_TYPE_MASK;
+    unsigned long* e1 = (unsigned long*) p1;
+    unsigned long* e2 = (unsigned long*) p2;
+    unsigned long flags1 = *e1 & PLAYLIST_INSERT_TYPE_MASK;
+    unsigned long flags2 = *e2 & PLAYLIST_INSERT_TYPE_MASK;
 
     if (flags1 == flags2)
         return (*e1 & PLAYLIST_SEEK_MASK) - (*e2 & PLAYLIST_SEEK_MASK);
