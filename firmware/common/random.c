@@ -140,7 +140,7 @@ static int rand_reload(void)
 
 int rand(void)
 {
-    int y;
+    unsigned int y;
   
     if(--left < 0) {
         y = rand_reload();
