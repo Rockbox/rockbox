@@ -26,7 +26,7 @@ char panic_buf[128];
 // whatever it says ;)
 void panic( char *message )
 {
-    debug( message );
+    debugf ( message );
     PostQuitMessage (-1);
 }
 

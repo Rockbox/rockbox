@@ -31,7 +31,7 @@ void button_init(void)
 	last_key = 0 ;
 }
 
-int button_get(void)
+int button_get(bool block)
 {
     int btn = 0;
     if (KEY (VK_NUMPAD4) ||

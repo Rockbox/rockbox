@@ -52,7 +52,7 @@ END
 // Bitmap
 //
 
-IDB_UI                  BITMAP                  "UI.bmp"
+IDB_UI                  BITMAP                  "UI256.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

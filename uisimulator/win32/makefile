@@ -22,12 +22,15 @@ TARGET = rockboxui
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
+SIMDIR = ../win32/
+APPDIR = ../../apps/
+RECDIR = $(APPDIR)recorder/
 RM = del
 
 CC = cl
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DARCHOS_RECORDER -D_WIN32 -DWIN32
 LDFLAGS = /ouisw32.exe /link -subsystem:windows
-INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON)
+INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON) -I$(SIMDIR) -I$(APPDIR) -I$(RECDIR)
 LIBS = gdi32.lib user32.lib
 
 
@@ -35,8 +38,10 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 
 #SRCS = $(wildcard *.c)
 
-SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c tree.c app.c \
-  chartables.c kernel.c Release/uisw32.res dir-win32.c
+SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c tree.c main.c \
+  chartables.c kernel.c uisw32.res dir-win32.c main_menu.c \
+  play.c bmp.c debug-win32.c screensaver.c menu.c credits.c \
+  icons.c sound_menu.c mpeg.c id3.c settings.c sprintf.c
 
 OBJS = $(SRCS:.c=.obj)
 
@@ -49,14 +54,47 @@ lcd.obj: $(DRIVERS)/lcd.c
 chartables.obj: $(FIRMWAREDIR)/chartables.c
  $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/chartables.c -ochartables.obj
 
-tetris.obj: ../tetris.c
- $(CC) $(CFLAGS) -c ../tetris.c -otetris.obj
+tetris.obj: ../../apps/recorder/tetris.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/tetris.c -otetris.obj
 
-tree.obj: ../tree.c
- $(CC) $(CFLAGS) -c ../tree.c -otree.obj
+tree.obj: ../../apps/tree.c
+ $(CC) $(CFLAGS) -c ../../apps/tree.c -otree.obj
 
-app.obj: ../app.c
- $(CC) $(CFLAGS) -c ../app.c -oapp.obj
+main.obj: ../../apps/main.c
+ $(CC) $(CFLAGS) -c ../../apps/main.c -omain.obj
  
+main_menu.obj: ../../apps/main_menu.c
+ $(CC) $(CFLAGS) -c ../../apps/main_menu.c -omain_menu.obj
+
+play.obj: ../../apps/play.c
+ $(CC) $(CFLAGS) -c ../../apps/play.c -oplay.obj
+
+bmp.obj: ../../apps/recorder/bmp.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/bmp.c -obmp.obj
+
+screensaver.obj: ../../apps/recorder/screensaver.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/screensaver.c -oscreensaver.obj
+
+menu.obj: ../../apps/menu.c
+ $(CC) $(CFLAGS) -c ../../apps/menu.c -omenu.obj
+
+credits.obj: ../../apps/credits.c
+ $(CC) $(CFLAGS) -c ../../apps/credits.c -ocredits.obj
+
+icons.obj: ../../apps/recorder/icons.c
+ $(CC) $(CFLAGS) -c ../../apps/recorder/icons.c -oicons.obj
+
+sound_menu.obj: ../../apps/sound_menu.c
+ $(CC) $(CFLAGS) -c ../../apps/sound_menu.c -osound_menu.obj
+
+id3.obj: $(FIRMWAREDIR)/id3.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/id3.c -oid3.obj
+
+settings.obj: $(FIRMWAREDIR)/settings.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/settings.c -osettings.obj
+
+sprintf.obj: $(FIRMWAREDIR)/common/sprintf.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/common/sprintf.c -osprintf.obj
+
 clean:
  $(RM) *.obj

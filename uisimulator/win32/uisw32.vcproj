@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;HAVE_LCD_BITMAP"
+				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\apps\recorder&quot;;&quot;C:\Programming\CVS Checkout\RockBox\apps&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\uisimulator\win32&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;HAVE_LCD_BITMAP;SIMULATOR;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -107,7 +107,7 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\app.c">
+				RelativePath="..\..\apps\recorder\bmp.c">
 			</File>
 			<File
 				RelativePath="button.c">
@@ -116,16 +116,16 @@
 				RelativePath="..\..\firmware\chartables.c">
 			</File>
 			<File
+				RelativePath="..\..\apps\credits.c">
+			</File>
+			<File
 				RelativePath="debug-win32.c">
 			</File>
 			<File
 				RelativePath="dir-win32.c">
 			</File>
 			<File
-				RelativePath="..\..\firmware\disk.c">
-			</File>
-			<File
-				RelativePath="..\icons.c">
+				RelativePath="..\..\apps\recorder\icons.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\id3.c">
@@ -140,31 +140,67 @@
 				RelativePath="..\..\firmware\drivers\lcd.c">
 			</File>
 			<File
-				RelativePath="..\menu.c">
+				RelativePath="..\..\apps\main.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\main_menu.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\menu.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="mpeg.c">
 			</File>
 			<File
 				RelativePath="panic-win32.c">
 			</File>
 			<File
-				RelativePath="..\play.c">
+				RelativePath="..\..\apps\play.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\firmware\playlist.c">
 			</File>
 			<File
-				RelativePath="..\screensaver.c">
+				RelativePath="..\..\apps\recorder\screensaver.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\settings.c">
 			</File>
 			<File
+				RelativePath="..\..\apps\sound_menu.c">
+			</File>
+			<File
 				RelativePath="..\..\firmware\common\sprintf.c">
 			</File>
 			<File
-				RelativePath="..\tetris.c">
+				RelativePath="..\..\apps\recorder\tetris.c">
 			</File>
 			<File
-				RelativePath="..\tree.c">
+				RelativePath="..\..\apps\tree.c">
 			</File>
 			<File
 				RelativePath="uisw32.c">
@@ -202,7 +238,7 @@
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="UI.bmp">
+				RelativePath="UI256.bmp">
 			</File>
 			<File
 				RelativePath="uisw32.rc">

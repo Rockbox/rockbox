@@ -50,7 +50,7 @@ LRESULT GUIWndProc (
     case WM_CREATE:
         // load background image
         hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL), MAKEINTRESOURCE(IDB_UI),
-            IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+            IMAGE_BITMAP, 0, 0, LR_VGACOLOR);
         hMemDc = CreateCompatibleDC (GetDC (hWnd));
         SelectObject (hMemDc, hBkgnd);
         return TRUE;
