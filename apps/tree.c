@@ -109,6 +109,21 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
 #define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
 
+static void build_playlist(int start_index)
+{
+    int i;
+
+    playlist_clear();
+    for(i = start_index;i < filesindir;i++)
+    {
+        if(dircacheptr[i]->attr & TREE_ATTR_MP3)
+        {
+            DEBUGF("Adding %s\n", dircacheptr[i]->name);
+            playlist_add(dircacheptr[i]->name);
+        }
+    }
+}
+
 static int compare(const void* p1, const void* p2)
 {
     struct entry* e1 = *(struct entry**)p1;
@@ -242,47 +257,7 @@ static char currdir[MAX_PATH];
 /* QUICK HACK! this should be handled by the playlist code later */
 char* peek_next_track(int steps)
 {
-    static char buf[MAX_PATH];
-
-    switch(play_mode) {
-        case 1:
-            /* play-full-dir mode */
-      
-            /* get next track in dir */
-            if ( steps == 1 ) {
-                while (dircursor + start + 1 < numentries ) {
-                    if(dircursor+1 < TREE_MAX_ON_SCREEN)
-                        dircursor++;
-                    else
-                        start++;
-                    if ( dircacheptr[dircursor+start]->attr & TREE_ATTR_MP3 ) {
-                        snprintf(buf,sizeof buf,"%s/%s",
-                                 currdir, dircacheptr[dircursor+start]->name );
-                        return buf;
-                    }
-                }
-            }
-            else {
-                while (dircursor + start > 0) {
-                    if (dircursor > 0)
-                        dircursor--;
-                    else
-                        start--;
-                    if ( dircacheptr[dircursor+start]->attr & TREE_ATTR_MP3 ) {
-                        snprintf(buf, sizeof(buf), "%s/%s",
-                                 currdir, dircacheptr[dircursor+start]->name);
-                        return buf;
-                    }
-                }
-            }
-            break;
-      
-        case 2:
-            /* playlist mode */
-            return playlist_next(steps, currdir);
-    }
-
-    return NULL;
+    return playlist_next(steps);
 }
 
 bool dirbrowse(char *root)
@@ -390,8 +365,9 @@ bool dirbrowse(char *root)
                         status_set_playmode(STATUS_PLAY);
                     }
                     else {
-                        play_mode = 1;
-                        mpeg_play(buf);
+                        build_playlist(dircursor+start);
+                        play_mode = 2;
+                        play_list(currdir, NULL);
                         status_set_playmode(STATUS_PLAY);
                     }
                     status_draw();
