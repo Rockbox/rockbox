@@ -18,46 +18,6 @@
  ****************************************************************************/
 #include "config.h"
 
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
-#include "thread.h"
-#include "cpu.h"
-
-unsigned long test_thread_stack[0x1000];
-
-void yield(void)
-{
-    switch_thread();
-    wake_up_thread();
-}
-
-void test_thread(void)
-{
-    while(1)
-    {
-        GPIO1_OUT ^= 0x00020000;
-        yield();
-    }
-}
-
-int main(void)
-{
-    int i;
-
-    init_threads();
-
-    create_thread(test_thread, test_thread_stack,
-                  sizeof(test_thread_stack), "Test thread");
-    
-    GPIO1_FUNCTION |= 0x00020000;
-    GPIO1_ENABLE |= 0x00020000;
-    
-    while(1) {
-        for(i = 0;i < 10000;i++) {}
-        yield();
-    }
-}
-
-#else
 #include "ata.h"
 #include "disk.h"
 #include "fat.h"
@@ -157,9 +117,10 @@ void init(void)
 void init(void)
 {
     int rc;
+#if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
-
+#endif
     system_init();
     kernel_init();
 
@@ -204,7 +165,7 @@ void init(void)
     radio_init();
 #endif
 
-#ifdef HAVE_CHARGING
+#if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
     if (coldstart && charger_inserted()
         && !global_settings.car_adapter_mode
 #ifdef ATA_POWER_PLAYERSTYLE
@@ -218,8 +179,6 @@ void init(void)
         /* "On" pressed or USB connected: proceed */
         show_logo();  /* again, to provide better visual feedback */
     }
-#else
-    (void)coldstart;
 #endif
 
     rc = ata_init();
@@ -311,4 +270,4 @@ int main(void)
     return 0;
 }
 #endif
-#endif
+

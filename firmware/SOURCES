@@ -1,40 +1,3 @@
-#ifdef IRIVER_H100
-crt0.S
-backlight.c
-thread.c
-system.c
-kernel.c
-common/memcpy_a.S
-common/memset_a.S
-common/atoi.c
-common/ctype.c
-common/dir.c
-common/disk.c
-common/errno.c
-common/file.c
-common/random.c
-common/sprintf.c
-common/strcasecmp.c
-common/strcat.c
-common/strchr.c
-common/strcmp.c
-common/strcpy.c
-common/strlen.c
-common/strncmp.c
-common/strncpy.c
-common/strrchr.c
-common/strtok.c
-panic.c
-font.c
-drivers/lcd.S
-drivers/lcd-h100.c
-drivers/ata.c
-drivers/led.c
-drivers/adc.c
-drivers/button.c
-drivers/fat.c
-drivers/power.c
-#else
 backlight.c
 buffer.c
 common/atoi.c
@@ -96,7 +59,11 @@ drivers/lcd-player-charset.c
 drivers/lcd-player.c
 #endif
 #ifdef HAVE_LCD_BITMAP
+#if CONFIG_LCD == LCD_S1D15E06
+drivers/lcd-h100.c
+#else
 drivers/lcd-recorder.c
+#endif
 #endif
 drivers/led.c
 #if CONFIG_HWCODEC != MASNONE
@@ -126,6 +93,5 @@ crt0.S
 #if CONFIG_CPU == SH7034
 bitswap.S
 descramble.S
+#endif
 drivers/lcd.S
-#endif
-#endif
