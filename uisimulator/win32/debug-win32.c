@@ -22,6 +22,7 @@
 char debugmembuf[100];
 char debugbuf[200];
 
+
 void debug( const char *message )
 {
     OutputDebugString (message);
@@ -30,9 +31,19 @@ void debug( const char *message )
 void debugf(char *fmt, ...)
 {
     va_list ap;
-    
+
     va_start( ap, fmt );
-    wsprintf( debugmembuf, fmt, ap );
+    wvsprintf( debugmembuf, fmt, ap );
+    va_end( ap );
+    debug ( debugmembuf );
+}
+
+void Logf(char *fmt, ...)
+{
+    va_list ap;
+
+    va_start( ap, fmt );
+    wvsprintf( debugmembuf, fmt, ap );
     va_end( ap );
     debug ( debugmembuf );
 }
