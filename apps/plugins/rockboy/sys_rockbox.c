@@ -81,7 +81,9 @@ void ev_poll(void)
     released = ~newbuttonstate & oldbuttonstate;
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
     fb.mode=rb->button_hold();
+#endif
     if(released) {
         ev.type = EV_RELEASE;
         if(released & BUTTON_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
