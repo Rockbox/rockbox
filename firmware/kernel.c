@@ -131,6 +131,12 @@ bool queue_empty(const struct event_queue* q)
     return ( q->read == q->write );
 }
 
+void queue_clear(const struct event_queue* q)
+{
+    q->read = 0;
+    q->write = 0;
+}
+
 int queue_broadcast(int id, void *data)
 {
    int i;
