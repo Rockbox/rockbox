@@ -101,6 +101,7 @@ static const struct plugin_api rockbox_api = {
 #else
     lcd_putsxy,
     lcd_puts_style,
+    lcd_puts_scroll_style,
     lcd_bitmap,
     lcd_drawline,
     lcd_clearline,
@@ -125,6 +126,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     backlight_on,
     backlight_off,
+    backlight_set_timeout,
     splash,
 
     /* button */
@@ -156,15 +158,18 @@ static const struct plugin_api rockbox_api = {
     PREFIX(closedir),
     PREFIX(readdir),
 
-    /* kernel */
+    /* kernel/ system */
     PREFIX(sleep),
     yield,
-    usb_screen,
     &current_tick,
     default_event_handler,
+    default_event_handler_ex,
     create_thread,
     remove_thread,
     reset_poweroff_timer,
+#ifndef SIMULATOR
+    system_memory_guard,
+#endif
 
     /* strings and memory */
     snprintf,
@@ -174,6 +179,7 @@ static const struct plugin_api rockbox_api = {
     strrchr,
     strcmp,
     strcasecmp,
+    strncasecmp,
     memset,
     memcpy,
 #ifndef SIMULATOR
@@ -204,6 +210,12 @@ static const struct plugin_api rockbox_api = {
     mpeg_status,
     mpeg_has_changed_track,
     mpeg_current_track,
+    mpeg_flush_and_reload_tracks,
+    mpeg_get_file_pos,
+    mpeg_get_last_header,
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    mpeg_set_pitch,
+#endif
 
     /* MAS communication */
 #ifndef SIMULATOR
@@ -235,34 +247,21 @@ static const struct plugin_api rockbox_api = {
     debugf,
 #endif
     &global_settings,
-    backlight_set_timeout,
     mp3info,
     count_mp3_frames,
     create_xing_header,
+    find_next_frame,
     battery_level,
+    battery_level_safe,
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    peak_meter_scale_value,
+    peak_meter_set_use_dbfs,
+    peak_meter_get_use_dbfs,
+#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    mpeg_set_pitch,
-
-    peak_meter_scale_value,
-    peak_meter_set_use_dbfs, 
-    peak_meter_get_use_dbfs,
-#endif
-#ifdef HAVE_LCD_BITMAP
-    lcd_puts_scroll_style,
-#endif
-    mpeg_flush_and_reload_tracks,
-    strncasecmp,
-    mpeg_get_file_pos,
-    find_next_frame,
-    mpeg_get_last_header,
-#ifndef SIMULATOR
-    system_memory_guard,
-#endif
-    default_event_handler_ex,
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -60,12 +60,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 28
+#define PLUGIN_API_VERSION 29
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 25
+#define PLUGIN_MIN_API_VERSION 29
 
 /* plugin return codes */
 enum plugin_status {
@@ -126,6 +126,8 @@ struct plugin_api {
 #else
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
+    void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
+                                  int style);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y,
                        int nx, int ny, bool clear);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
@@ -153,6 +155,7 @@ struct plugin_api {
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
+    void (*backlight_set_timeout)(int index);
     void (*splash)(int ticks, bool center, const char *fmt, ...);
 
     /* button */
@@ -184,26 +187,30 @@ struct plugin_api {
     int (*closedir)(DIR* dir);
     struct dirent* (*readdir)(DIR* dir);
 
-    /* kernel */
+    /* kernel/ system */
     void (*sleep)(int ticks);
     void (*yield)(void);
-    void (*usb_screen)(void);
     long* current_tick;
     int (*default_event_handler)(int event);
+    int (*default_event_handler_ex)(int event, void (*callback)(void *), void *parameter);
     int (*create_thread)(void* function, void* stack, int stack_size, const char *name);
     void (*remove_thread)(int threadnum);
     void (*reset_poweroff_timer)(void);
+#ifndef SIMULATOR
+    int (*system_memory_guard)(int newmode);
+#endif
 
     /* strings and memory */
-    int    (*snprintf)(char *buf, size_t size, const char *fmt, ...);
-    char*  (*strcpy)(char *dst, const char *src);
-    char *(*strncpy)(char *dst, const char *src, size_t length);
+    int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
+    char* (*strcpy)(char *dst, const char *src);
+    char* (*strncpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
     char * (*strrchr)(const char *s, int c);
     int (*strcmp)(const char *, const char *);
     int (*strcasecmp)(const char *, const char *);
-    void*  (*memset)(void *dst, int c, size_t length);
-    void*  (*memcpy)(void *out, const void *in, size_t n);
+    int (*strncasecmp)(const char *s1, const char *s2, size_t n);
+    void* (*memset)(void *dst, int c, size_t length);
+    void* (*memcpy)(void *out, const void *in, size_t n);
 #ifndef SIMULATOR
     const char *_ctype_;
 #endif
@@ -232,6 +239,12 @@ struct plugin_api {
     int (*mpeg_status)(void);
     bool (*mpeg_has_changed_track)(void);
     struct mp3entry* (*mpeg_current_track)(void);
+    void (*mpeg_flush_and_reload_tracks)(void);
+    int (*mpeg_get_file_pos)(void);
+    unsigned long (*mpeg_get_last_header)(void);
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    void (*mpeg_set_pitch)(int pitch);        
+#endif
 
     /* MAS communication */
 #ifndef SIMULATOR
@@ -244,7 +257,7 @@ struct plugin_api {
     int (*mas_codec_readreg)(int reg);
 #endif
 #endif
-    
+
     /* misc */
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
@@ -264,7 +277,6 @@ struct plugin_api {
     void (*debugf)(const char *fmt, ...);
 #endif
     struct user_settings* global_settings;
-    void (*backlight_set_timeout)(int index);
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
@@ -272,33 +284,20 @@ struct plugin_api {
                               unsigned char *buf, int num_frames,
                               unsigned long header_template,
                               void (*progressfunc)(int), bool generate_toc);
-    int  (*battery_level)(void);
+    unsigned long (*find_next_frame)(int fd, int *offset,
+                                     int max_offset, unsigned long last_header);
+    int (*battery_level)(void);
+    bool (*battery_level_safe)(void);
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    unsigned short (*peak_meter_scale_value)(unsigned short val,
+                                             int meterwidth);
+    void (*peak_meter_set_use_dbfs)(int use);
+    int (*peak_meter_get_use_dbfs)(void);
+#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    void (*mpeg_set_pitch)(int pitch);        
-
-    unsigned short (*peak_meter_scale_value)(unsigned short val,
-                                             int meterwidth);
-    void (*peak_meter_set_use_dbfs)(int use);
-    int  (*peak_meter_get_use_dbfs)(void);
-#endif
-#ifdef HAVE_LCD_BITMAP
-    void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                  int style);
-#endif
-    void (*mpeg_flush_and_reload_tracks)(void);
-    int (*strncasecmp)(const char *s1, const char *s2, size_t n);
-    int (*mpeg_get_file_pos)(void);
-    unsigned long (*find_next_frame)(int fd, int *offset,
-                                    int max_offset, unsigned long last_header);
-    unsigned long (*mpeg_get_last_header)(void);
-#ifndef SIMULATOR
-    int (*system_memory_guard)(int newmode);
-#endif
-    int (*default_event_handler_ex)(int event, void (*callback)(void *), void *parameter);
 };
 
 /* defined by the plugin loader (plugin.c) */
