@@ -28,9 +28,9 @@
 
 static struct event_queue button_queue;
 
-#define POLL_FREQUENCY    HZ/10
-#define REPEAT_START      3
-#define REPEAT_INTERVAL   2
+#define POLL_FREQUENCY    HZ/20
+#define REPEAT_START      6
+#define REPEAT_INTERVAL   4
 
 static int button_read(void);
 
@@ -42,7 +42,7 @@ static void button_tick(void)
     static bool repeat=false;
 
     /* only poll every X ticks */
-    if ( tick++ > POLL_FREQUENCY ) {
+    if ( ++tick >= POLL_FREQUENCY ) {
         bool post = false;
         int btn = button_read();
 
