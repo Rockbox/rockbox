@@ -21,6 +21,7 @@ STATUS(GREEN,List,firmware/common/list.c,"http://cvs.sourceforge.net/cgi-bin/vie
 STATUS(GREEN,ID3 parser,firmware/i3d.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/id3.c", Daniel,Works)
 STATUS(GREEN,FAQ,www/docs/FAQ,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/www/docs/FAQ",Rob,Existing)
 STATUS(GREEN,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn,Written)
+STATUS(GREEN,Tetris,uisimulator/tetris.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/tetris.c", &nbsp;, Written)
 STATUS(YELLOW,ATA driver,firmware/drivers/ata.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/ata.c", Björn,Written; untested)
 STATUS(YELLOW,MAS driver,firmware/drivers/mas.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/mas.c", Linus,Embryo written)
 STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/button.c", -,Written; untested)
@@ -34,5 +35,6 @@ STATUS(RED,Boot loader,-,"", -,-)
 STATUS(RED,Newlib port,-,"", -,-)
 STATUS(RED,Directory browser UI,uisimulator/tree.c,"", Daniel,Progressing)
 STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",-,Embryo)
+STATUS(RED,API docs,-,"",-, Header files exist)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
