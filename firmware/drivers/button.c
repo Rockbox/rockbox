@@ -36,6 +36,8 @@ struct event_queue button_queue;
 #define REPEAT_INTERVAL   4
 
 static int repeat_mask = DEFAULT_REPEAT_MASK;
+static int release_mask = DEFAULT_RELEASE_MASK;
+static int locked_mask = DEFAULT_LOCKED_MASK;
 
 static int button_read(void);
 
@@ -45,13 +47,23 @@ static void button_tick(void)
     static int count=0;
     static int lastbtn=0;
     static bool repeat=false;
+    int diff;
 
     /* only poll every X ticks */
     if ( ++tick >= POLL_FREQUENCY ) {
         bool post = false;
         int btn = button_read();
 
-        if ( btn ) {
+        if ( btn )
+        {
+            /* Find out if a key has been released */
+            diff = btn ^ lastbtn;
+            if((btn & diff) == 0)
+            {
+                if(diff & release_mask)
+                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
+            }
+            
             /* normal keypress */
             if ( btn != lastbtn ) {
                 post = true;
@@ -96,7 +108,8 @@ static void button_tick(void)
             /* Report that the key has been released */
             if(lastbtn != btn)
             {
-                queue_post(&button_queue, BUTTON_REL | lastbtn, NULL);
+                if(lastbtn & release_mask)
+                    queue_post(&button_queue, BUTTON_REL | lastbtn, NULL);
             }
         }
 
@@ -116,6 +129,27 @@ int button_get(bool block)
         return ev.id;
     }
     return BUTTON_NONE;
+}
+
+int button_set_repeat(int newmask)
+{
+    int oldmask = repeat_mask;
+    repeat_mask = newmask;
+    return oldmask;
+}
+
+int button_set_release(int newmask)
+{
+    int oldmask = release_mask;
+    release_mask = newmask;
+    return oldmask;
+}
+
+int button_set_locked(int newmask)
+{
+    int oldmask = locked_mask;
+    locked_mask = newmask;
+    return oldmask;
 }
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -149,13 +183,6 @@ void button_init()
 #endif
     queue_init(&button_queue);
     tick_add_task(button_tick);
-}
-
-int button_set_repeat(int newmask)
-{
-    int oldmask = repeat_mask;
-    repeat_mask = newmask;
-    return oldmask;
 }
 
 /*

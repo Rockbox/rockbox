@@ -27,6 +27,8 @@ extern struct event_queue button_queue;
 void button_init (void);
 int button_get (bool block);
 int button_set_repeat(int newmask);
+int button_set_release(int newmask);
+int button_set_locked(int newmask);
 
 /* Shared button codes */
 #define	BUTTON_NONE		0x0000
@@ -39,6 +41,9 @@ int button_set_repeat(int newmask);
 /* Button modifiers */
 #define	BUTTON_HELD		0x4000
 #define	BUTTON_REL		0x8000
+
+/* Special message */
+#define	BUTTON_LOCKED		0x2000
 
 #ifdef HAVE_RECORDER_KEYPAD
 
@@ -61,6 +66,9 @@ int button_set_repeat(int newmask);
 
 #define DEFAULT_REPEAT_MASK (BUTTON_LEFT | BUTTON_RIGHT)
 
-#endif
+#endif /* HAVE_PLAYER_KEYPAD */
+
+#define DEFAULT_RELEASE_MASK 0
+#define DEFAULT_LOCKED_MASK 0
 
 #endif
