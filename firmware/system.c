@@ -27,12 +27,15 @@
 
 void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
 
+void ddma_wait_idle(void)  __attribute__ ((section (".icode")));
 void ddma_wait_idle(void)
 {
     do {
     } while ((DDMACOM & 3) != 0);
 }
 
+void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num)
+    __attribute__ ((section (".icode")));
 void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num) {
     int irq = set_irq_level(1);
     ddma_wait_idle();
@@ -49,6 +52,31 @@ void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num) {
     DDMACOM |= 0x4; /* start */
     
     ddma_wait_idle(); /* wait for completion */
+    set_irq_level(irq);
+}
+
+static void ddma_wait_idle_noicode(void)
+{
+    do {
+    } while ((DDMACOM & 3) != 0);
+}
+
+static void ddma_transfer_noicode(int dir, int mem, long intAddr, long extAddr, int num) {
+    int irq = set_irq_level(1);
+    ddma_wait_idle_noicode();
+    long externalAddress = (long) extAddr;
+    long internalAddress = (long) intAddr;
+    /* HW wants those two in word units. */
+    num /= 2;
+    externalAddress /= 2;
+    
+    DDMACFG = (dir << 1) | (mem << 2);
+    DDMAIADR = internalAddress;
+    DDMAEADR = externalAddress;
+    DDMANUM = num;
+    DDMACOM |= 0x4; /* start */
+    
+    ddma_wait_idle_noicode(); /* wait for completion */
     set_irq_level(irq);
 }
 
@@ -86,7 +114,7 @@ void system_init(void)
     /************************
      * Copy .icode section to icram
      */
-    ddma_transfer(0, 0, 0x40, (long)&icodecopy, (int)&icodesize);
+    ddma_transfer_noicode(0, 0, 0x40, (long)&icodecopy, (int)&icodesize);
    
 
     /***************************
