@@ -574,7 +574,7 @@ int play_list(char *dir,         /* "current directory" */
     
     if(global_settings.playlist_shuffle) {
         if(!playlist.in_ram) {
-            lcd_puts(0,0,"Shuffling...");
+            lcd_puts(0,0,str(LANG_PLAYLIST_SHUFFLE));
             status_draw();
             lcd_update();
             randomise_playlist( random_seed );
