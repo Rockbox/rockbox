@@ -1,4 +1,3 @@
-
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -107,7 +106,7 @@ new: "Загружается..."
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-new: "Выбор случайного..."
+new: "Случайный выбор..."
 
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
@@ -137,7 +136,7 @@ new: "Настройки утеряны"
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-new: "Сели батареки?"
+new: "Сели аккумуляторы?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -147,12 +146,9 @@ new: "Настройки утеряны"
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new: "Сели батареки?"
+new: "Сели аккумуляторы?"
 
-id: LANG_TIME_SET
-### Description changed! Previous description was:
-### "if save settings has failed"
-desc: 
+id: LANG_TIME_SET 
 eng: "ON to set"
 new: "ON для установ."
 
@@ -199,7 +195,7 @@ new: ""
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Сортировать с учетом заглавных"
+new: "Сортировать с учетом заглавных букв"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -254,7 +250,7 @@ new: "шаг прокрутки/перемотки"
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "ускорение прокрутки/перемотки"
+new: "Ускорение прокрутки/перемотки"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -308,10 +304,8 @@ new: "Режим сортировки"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-### English phrase was changed! Previous translation was made on:
-### "Scroll Speed"
 eng: "Scroll"
-new: "Скорость прокрутки"
+new: "Прокрутка"
 
 id: LANG_RESET
 desc: in system_settings_menu()
@@ -371,7 +365,7 @@ new: "Экстра басы"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-new: "Время спада автогромкости"
+new: "Время реагирования автогромкости"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -495,8 +489,8 @@ new: "[Название]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
-new: "<без названия>"
+eng: ""
+new: ""
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -505,8 +499,8 @@ new: "[Исполнитель]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
-new: "<без названия>"
+eng: ""
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -515,8 +509,8 @@ new: "[Альбом]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
-new: "<без названия>"
+eng: ""
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -525,8 +519,8 @@ new: "[Номер песни]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
-new: "<без номера>"
+eng: ""
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -636,12 +630,12 @@ new: "Игра на паузе"
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[PLAY] to resume"
-new: "[Игра] для продолжения"
+new: "[PLAY] для продолжения"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[OFF] to quit"
-new: "[Выкл.] для выхода"
+new: "[OFF] для выхода"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -651,7 +645,7 @@ new: "Уровень - %d"
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - slow, 9 - fast)"
-new: "(1- медл., 9- быстро)"
+new: "(1- медленно, 9- быстро)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
@@ -661,7 +655,7 @@ new: "[Игра] для старта/паузы"
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new: "Уровень"
+new: "Уровен"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
@@ -676,7 +670,7 @@ new: "Вы выиграли!!"
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[OFF] to stop"
-new: "[Выкл.] остановить"
+new: "[OFF] остановить"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -706,7 +700,7 @@ new: "Рост"
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
 eng: "Hungry"
-new: "Голодный"
+new: "Хочется кушать"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
@@ -716,7 +710,7 @@ new: "Червяк"
 id: LANG_WORMLET_ARGH
 desc: wormlet game
 eng: "Argh"
-new: "Блин!"
+new: "Черррт!"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
@@ -736,22 +730,22 @@ new: "%d Игроки      ^/V"
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        L/R"
-new: "%d Черви        </> "
+new: "%d Черви   Прав./Лев."
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: "Remote control F1"
-new: "Дист. упр. F1"
+new: "Дист. управление F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-new: "Без дитст. упр. F1"
+new: "Без дитст. управ. F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-new: "2 кноп. управ.  F1"
+new: "2-кнопочное управ.  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
@@ -761,12 +755,12 @@ new: "4 кноп. управ.  F1"
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
 eng: "Out of control"
-new: "Без управления"
+new: "Неуправляем"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
-new: "Вы проиграли"
+new: "Вы проиграли!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
@@ -776,7 +770,7 @@ new: "Ряды - Уровень"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new: "Отключение после"
+new: "Отключение при бездействии"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -831,7 +825,7 @@ new: "Держать пик"
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
-new: "Дердать клип"
+new: "Держать столбик индикатора"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
@@ -846,7 +840,7 @@ new: "Единиц за считывание"
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "Подсветка при внеш. питании"
+new: "Подсветка при внешнем питании"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -876,7 +870,7 @@ new: "OFF=Отменить"
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
-new: "Отображение времени"
+new: "Формат времени"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
@@ -1001,12 +995,12 @@ new: "Спросить 1 раз"
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-new: "Дисплей питания"
+new: "Индикатор питания"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
-new: "Дисплей громкости"
+new: "Индикатор громкости"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -1016,7 +1010,7 @@ new: "Графический"
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
-new: "Цифровой"
+new: "Численный"
 
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
@@ -1026,17 +1020,17 @@ new: "Производительность"
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
 eng: "High performance"
-new: "Высок. произв."
+new: "Высокая производительность"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save energy"
-new: "Сохр. питание"
+new: "Экономия питание"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
-new: "dBfs <-> линейный"
+eng: "dBfs  linear"
+new: "dBfs  линейный"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -1101,7 +1095,7 @@ new: "Каналы"
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
-new: "Микр."
+new: "Микрофон"
 
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
@@ -1156,63 +1150,54 @@ new: "БУфер анти-скип"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-### Not previously translated
-new: 
+new: "Емкость аккумуляторов"
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-### Not previously translated
-new: 
+new: "Питание: Зарядка через край"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
-### Not previously translated
-new: 
+new: "Питание: Имп. заряд"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-### Not previously translated
-new: 
+new: "Ограничение прокрутке в обе стороны"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-### Not previously translated
-new: 
+new: "Задержка перед началом прокрутки"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-### Not previously translated
-new: 
+new: "Скорость прокрутки"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-### Not previously translated
-new: 
+new: "Шаг прокрутки"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-### Not previously translated
-new: 
+new:  "Образец шага прокрутки"
 
 id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
-### Not previously translated
-new: 
+new: "Перезарядка импульсами"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-new:
+new: "Панель состояния"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new:
+new:  "Панель прокрутки"
