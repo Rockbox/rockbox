@@ -44,6 +44,10 @@ SECTIONS
         *(.data)
     } > PLUGIN_RAM
 
+    /DISCARD/ : {
+        *(.eh_frame)
+    }
+
     .bss : {
         *(.bss)
     } > PLUGIN_RAM
