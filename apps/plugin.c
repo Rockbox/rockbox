@@ -265,6 +265,10 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif
     PREFIX(mkdir),
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    button_hold,
+#endif
+    
 };
 
 int plugin_load(const char* plugin, void* parameter)

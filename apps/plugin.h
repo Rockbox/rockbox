@@ -69,7 +69,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 35
+#define PLUGIN_API_VERSION 36
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -314,6 +314,9 @@ struct plugin_api {
 #endif
 #endif
     int (*PREFIX(mkdir))(const char *name, int mode);
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    bool (*button_hold)(void);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */
