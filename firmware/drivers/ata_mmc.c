@@ -647,7 +647,11 @@ int ata_read_sectors(IF_MV2(int drive,)
     ret = select_card(current_card);
 #endif
     if (start + incount > card->numsectors)
-        panicf("Reading past end of card\n");
+    {
+        ret = -1;
+        /* panicf("Reading %d@%d, past end of card %d\n", 
+            incount, start, card->numsectors); */
+    }
 
     /* some cards don't like reading the very last sector with
      * CMD_READ_MULTIPLE_BLOCK, so make sure this sector is always
