@@ -1856,7 +1856,7 @@ static void mpeg_thread(void)
                     start_recording();
                     demand_irq_enable(true);
                     
-                    mpeg_file = creat(recording_filename, O_WRONLY);
+                    mpeg_file = open(recording_filename, O_WRONLY|O_CREAT);
                     
                     if(mpeg_file < 0)
                         panicf("recfile: %d", mpeg_file);
