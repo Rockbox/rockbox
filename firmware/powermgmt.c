@@ -216,11 +216,8 @@ void battery_level_update(void)
         battery_level_cached = (level > 95) ? 100 : level + 5;
     }
     else {
-        /* the level is allowed to be +1/-1 of the last value when usb not
-           connected and to be +1/-3 of the last value when usb is
-           connected */
-        if (level > battery_level_cached + 1)
-            level = battery_level_cached + 1;
+        /* the level is allowed to be -1 of the last value when usb not
+           connected and to be -3 of the last value when usb is connected */
         if (usb_inserted()) {
             if (level < battery_level_cached - 3)
                 level = battery_level_cached - 3;
