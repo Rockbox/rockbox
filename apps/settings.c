@@ -67,7 +67,7 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
-char rec_base_directory[] = REC_BASE_DIR;
+const char rec_base_directory[] = REC_BASE_DIR;
 
 
 #define CONFIG_BLOCK_VERSION 16
@@ -1513,7 +1513,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
 
 #ifdef HAVE_MAS3587F
 /* This array holds the record timer interval lengths, in seconds */
-static unsigned long rec_timer_seconds[] =
+static const unsigned long rec_timer_seconds[] =
 {
     24*60*60, /* OFF really means 24 hours, to avoid >2Gbyte files */
     5*60,     /* 00:05 */

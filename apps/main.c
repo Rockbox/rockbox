@@ -59,7 +59,7 @@
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
-char appsversion[]=APPSVERSION;
+const char appsversion[]=APPSVERSION;
 
 void init(void);
 

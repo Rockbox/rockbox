@@ -111,7 +111,7 @@ struct plugin_api {
 
     /* lcd */
     void (*lcd_clear_display)(void);
-    void (*lcd_puts)(int x, int y, unsigned char *string);
+    void (*lcd_puts)(int x, int y, const unsigned char *string);
     void (*lcd_puts_scroll)(int x, int y, unsigned char* string);
     void (*lcd_stop_scroll)(void);
     void (*lcd_set_contrast)(int x);
@@ -125,7 +125,7 @@ struct plugin_api {
     void (*lcd_icon)(int icon, bool enable);
 #else
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
-    void (*lcd_puts_style)(int x, int y, unsigned char *str, int style);
+    void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y,
                        int nx, int ny, bool clear);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
@@ -138,7 +138,7 @@ struct plugin_api {
     void (*lcd_fillrect)(int x, int y, int nx, int ny);
     void (*lcd_drawrect)(int x, int y, int nx, int ny);
     void (*lcd_invertrect)(int x, int y, int nx, int ny);
-    int  (*lcd_getstringsize)(unsigned char *str, int *w, int *h);
+    int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*scrollbar)(int x, int y, int width, int height, int items,

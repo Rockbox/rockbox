@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
 #ifdef HAVE_LCD_BITMAP
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
-static unsigned char bmpheader[] =
+static const unsigned char bmpheader[] =
 {
     0x42, 0x4d, 0x3e, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00,
     0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x70, 0x00, 0x00, 0x00, 0x40, 0x00,
@@ -126,7 +126,7 @@ static unsigned char bmpheader[] =
 
 static unsigned char buf[112*8];
 static unsigned char buf2[112*8];
-static char dummy[2] = {0, 0};
+static const char dummy[2] = {0, 0};
 
 void screen_dump(void)
 {

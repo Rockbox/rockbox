@@ -69,7 +69,7 @@
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 #ifdef SIMULATOR
 /* a space which is defined in stubs.c */
-extern unsigned char vp_dummy[VIRT_SIZE]; 
+extern unsigned char vp_dummy[VIRT_SIZE];
 #define VIRT_PTR vp_dummy
 #else
 /* a location where we won't store strings, 0 is the fastest */
@@ -250,7 +250,7 @@ struct user_settings
 enum optiontype { INT, BOOL };
 
 struct opt_items {
-    unsigned char* string;
+    unsigned const char* string;
     int voice_id;
 };
 
@@ -291,7 +291,7 @@ extern struct user_settings global_settings;
 extern long lasttime;
 
 /* Recording base directory */
-extern char rec_base_directory[];
+extern const char rec_base_directory[];
 
 /* system defines */
 

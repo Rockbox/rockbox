@@ -305,7 +305,7 @@ void lcd_setfont(int newfont)
     curfont = newfont;
 }
 
-int lcd_getstringsize(unsigned char *str, int *w, int *h)
+int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
     struct font* pf = font_get(curfont);
     int ch;
@@ -328,12 +328,12 @@ int lcd_getstringsize(unsigned char *str, int *w, int *h)
 }
 
 /* put a string at a given char position */
-void lcd_puts(int x, int y, unsigned char *str)
+void lcd_puts(int x, int y, const unsigned char *str)
 {
     lcd_puts_style(x, y, str, STYLE_DEFAULT);
 }
 
-void lcd_puts_style(int x, int y, unsigned char *str, int style)
+void lcd_puts_style(int x, int y, const unsigned char *str, int style)
 {
     int xpos,ypos,w,h;
 
