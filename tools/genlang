@@ -63,7 +63,8 @@ while(<LANG>) {
 
         if( (($var eq "new") && $value && ($value !~ /^\"(.*)\" *$/)) ||
             (($var eq "eng") && ($value !~ /^\"(.*)\" *$/)) ) {
-            print "missing quotes on line $line for ".$set{'id'}."\n";
+            print "$input:$line:missing quotes for ".$set{'id'}."\n";
+            $errors++;
             next;
         }
 
@@ -101,3 +102,5 @@ MOO
 
 close(CFILE);
 close(HFILE);
+
+exit $errors;
