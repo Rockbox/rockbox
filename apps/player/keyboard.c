@@ -92,6 +92,8 @@ int kbd_input(char* text, int buflen)
     int button_pressed;
     unsigned char temptext[12];
     bool cursor_on=true;                /* Blinking cursor control */
+    int old_cursor_pos=0;               /* Windowed cursor movement */
+    int left_pos=0;
 
     lcd_clear_display();
 
@@ -99,13 +101,14 @@ int kbd_input(char* text, int buflen)
         int i, p;
         int len = strlen(text);
 
-        /* draw filename */
+        /* draw input */
+        if (old_cursor_pos<cursor_pos && 7<(cursor_pos-left_pos) && cursor_pos<(len-1))
+            left_pos++;
+        else
+            if (cursor_pos<old_cursor_pos && (cursor_pos-left_pos)<2 && 0<left_pos)
+                left_pos--;
         p=0;
-        i=0;
-        if (cursor_pos>7) {
-            i=cursor_pos-7;
-        }
-        
+        i = left_pos;
         while (p<10 && line[i]) {
             if (i == cursor_pos && cursor_on)
             {
@@ -118,6 +121,7 @@ int kbd_input(char* text, int buflen)
         temptext[p]=0;
         lcd_puts(1, 0, temptext);
         cursor_on = !cursor_on;
+        old_cursor_pos=cursor_pos;
 
         switch (menu_line) {
             case MENU_LINE_INPUT:
