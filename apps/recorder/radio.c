@@ -121,7 +121,7 @@ bool radio_screen(void)
     mpeg_stop();
     
     /* Enable the Left and right A/D Converter */
-    mas_codec_writereg(0x0, 0xccc7);
+    mas_codec_writereg(0x0, 0x2227);
 
     mas_codec_writereg(6, 0x4000);
 
