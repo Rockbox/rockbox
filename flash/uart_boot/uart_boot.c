@@ -21,6 +21,7 @@ struct
 	char* szDumpfile; // file to dump into
 	char* szExecfile; // file with the executable
 	bool bTest; // debug action
+	bool bHold; // hold power (for FMs & V2s)
 	bool bBlink; // blink red LED
 	bool bNoDownload;
 } gCmd;
@@ -43,6 +44,7 @@ int ProcessCmdLine(int argc, char* argv[])
 		printf("-recorder  (this is a recorder/FM, default is player if not specified)\n");
 		printf("-archos  (use Archos bootloader, this one needs powerup while program waits)\n");
 		printf("-nodownload  (no MiniMon download, it's already active)\n");
+		printf("-hold  (hold the power, useful for FMs and V2s, so you can release ON)\n");
 		printf("-spindown  (spindown the harddisk, else it stays on by default)\n");
 		printf("-id  (read manufacturer and device ID of flash, no checks)\n");
 		printf("-flash <filename of binary to program into flash>\n");
@@ -122,6 +124,10 @@ int ProcessCmdLine(int argc, char* argv[])
 		{
 			gCmd.bTest = true;
 		}
+		else if (!strncmp("-hold", *argv, 2))
+		{
+			gCmd.bHold = true;
+		}
 		else if (!strncmp("-blink", *argv, 2))
 		{
 			gCmd.bBlink = true;
@@ -194,21 +200,37 @@ int main(int argc, char* argv[])
 		}
 	}
 
+
 	// do the action
+	if (gCmd.bHold)
+	{
+		// hold power for FM
+		reg = ReadHalfword(serial_handle, 0x05FFFFC2); // PBDR
+		reg |= 0x0020; // set PB5 to keep power
+		WriteHalfword(serial_handle, 0x05FFFFC2, reg);
+
+		reg = ReadHalfword(serial_handle, 0x05FFFFC6); // PBIOR
+		reg |= 0x0020; // make PB5 an output
+		WriteHalfword(serial_handle, 0x05FFFFC6, reg);
+		printf("Power hold, you can release ON button now.\n");
+	}
+
 
 	if (gCmd.bSpindown)
 	{
-		// spindown the disk (works only for master)
-		UINT32 ata; // address of ATA_ALT_STATUS
-		printf("Harddisk spindown...");
-		ata = (gCmd.bRecorder && (ReadHalfword(serial_handle, 0x020000FC) & 0x0100)) ? 0x06200206 : 0x06200306;
-		WriteHalfword(serial_handle, 0x05FFFFCA, 0xBF99); // PACR2 (was 0xFF99)
-		WriteHalfword(serial_handle, 0x05FFFFC4, 0x0280); // PAIOR (was 0x0000)
-		WriteHalfword(serial_handle, 0x05FFFFC0, 0xA27F); // PADR  (was 0xA0FF)
-		while (ReadByte(serial_handle, ata) & 0x80); // ATA_ALT_STATUS & STATUS_BSY
-		WriteByte(serial_handle, 0x06100107, 0xE0); // ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
-		//while (ReadByte(serial_handle, ata) & 0x80); // ATA_ALT_STATUS & STATUS_BSY
-		printf("\b\b\b done.\n");
+		// power down the disk
+		reg = ReadHalfword(serial_handle, 0x05FFFFCA); // PACR2
+		reg &= ~0x0400; // clear bit 10: GPIO
+		WriteHalfword(serial_handle, 0x05FFFFCA, reg);
+
+		reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PAIOR
+		reg |= 0x0020; // set bit 5: output
+		WriteHalfword(serial_handle, 0x05FFFFC4, reg);
+
+		reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PADR
+		reg &= ~0x0020; // clear PA5 to power down
+		WriteHalfword(serial_handle, 0x05FFFFC0, reg);
+		printf("Harddisk powered down.\n");
 	}
 
 
@@ -307,13 +329,22 @@ int main(int argc, char* argv[])
 
 	if (gCmd.bTest)
 	{
-		// test code: query keypad
+		// test code: toggle PA5 to test FM IDE power
+		reg = ReadHalfword(serial_handle, 0x05FFFFCA); // PACR2
+		reg &= ~0x0400; // clear bit 10: GPIO
+		WriteHalfword(serial_handle, 0x05FFFFCA, reg);
+
+		reg = ReadHalfword(serial_handle, 0x05FFFFC4); // PAIOR
+		reg |= 0x0020; // set bit 5: output
+		WriteHalfword(serial_handle, 0x05FFFFC4, reg);
+
+		printf("Toggling PA5 forever... (stop with Ctrl-C)\n");
+		reg = ReadHalfword(serial_handle, 0x05FFFFC0); // PADR
 		while (1)
 		{
-			WriteByte(serial_handle, 0x05FFFEE8, 0x24); // ADCSR
-			while (!(ReadByte(serial_handle, 0x05FFFEE8) & 0x80));
-			reg = ReadHalfword(serial_handle, 0x05FFFEE0); // ADDRA
-			printf("ADC(4): %d\n", reg>>6);
+			reg ^= 0x0020;
+			WriteHalfword(serial_handle, 0x05FFFFC0, reg); // PADR
+			Sleep(1000);
 		}
 	}
 
