@@ -1244,7 +1244,7 @@ static bool view_runtime(void)
                 lcd_puts(0,1,"PLAY = Yes");
                 lcd_update();
                 while (1) {
-                    key = button_get_w_tmo(HZ*10);
+                    key = button_get(true);
                     if ( key == SETTINGS_OK ) {
                         if ( state == 1 )
                             global_settings.runtime = 0;
@@ -1252,7 +1252,7 @@ static bool view_runtime(void)
                             global_settings.topruntime = 0;
                         break;
                     }
-                    if ( key & BUTTON_REL )
+                    if (!(key & BUTTON_REL))  /* ignore button releases */
                         break;
                 }
                 break;
