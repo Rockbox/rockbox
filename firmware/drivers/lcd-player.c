@@ -78,7 +78,7 @@ static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
 static char scroll_spacing = 3; /* spaces between end and start of text */
-static bool allow_bidirectictional_scrolling = true;
+static bool allow_bidirectional_scrolling = true;
 
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 
@@ -463,7 +463,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
         s->direction=+1;
         strncpy(s->text,string,sizeof s->text);
         s->turn_offset=-1;
-        if (allow_bidirectictional_scrolling) {
+        if (allow_bidirectional_scrolling) {
             if ( s->textlen + x > 11+4)
                 s->turn_offset=s->textlen-x-11+4;
         }
@@ -557,9 +557,9 @@ void lcd_scroll_resume_line(int line)
     }
 }
 
-void lcd_allow_bidirectictional_scrolling(bool on)
+void lcd_allow_bidirectional_scrolling(bool on)
 {
-    allow_bidirectictional_scrolling=on;
+    allow_bidirectional_scrolling=on;
 }
 
 void lcd_scroll_speed(int speed)

@@ -87,7 +87,7 @@ extern void lcd_define_pattern (int which,char *pattern);
 extern void lcd_double_height (bool on);
 unsigned char lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned char pat);
-void lcd_allow_bidirectictional_scrolling(bool on);
+void lcd_allow_bidirectional_scrolling(bool on);
 
 #endif
 
