@@ -369,8 +369,8 @@ static int run_timer(int nr)
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                    retval = 3; /* been in usb mode */
                     done = true;
-                    return 3; /* been in usb mode */
                 }
                 break;
         }
