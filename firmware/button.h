@@ -42,6 +42,6 @@
 #define	BUTTON_REL		0x8000
 
 void button_init (void);
-int get_button (void);
+int button_get (void);
 
 #endif
