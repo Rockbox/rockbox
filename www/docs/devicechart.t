@@ -119,14 +119,6 @@
     <td>Hardware</td>
     <td>Hardware</td>
 </tr>
-<tr><th><b>Charging ctrl</b></th>
-    <td>Hardware</td>
-    <td>Hardware</td>
-    <td>Software</td>
-    <td>Software</td>
-    <td>Hardware</td>
-    <td>Hardware</td>
-</tr>
 <tr><th><b>Charge via USB</b></th>
     <td>No</td>
     <td>No</td>
@@ -134,6 +126,14 @@
     <td>No</td>
     <td>Yes</td>
     <td>Yes</td>
+</tr>
+<tr><th><b>Hard drive poweroff</b></th>
+    <td>No</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>No</td>
+    <td>No</td>
 </tr>
 <tr><th><b>Battery type</b></th>
     <td>NiMH</td>
