@@ -158,7 +158,7 @@ static int save_config_buffer( void )
 #else
 
     if(battery_level_safe() && (fat_startsector()!=0))
-        return !ata_write_sectors( 61, 1, rtc_config_block);
+        ata_delayed_write( 61, rtc_config_block);
     else
         return -1;
 

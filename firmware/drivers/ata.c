@@ -89,6 +89,9 @@ static char ata_stack[DEFAULT_STACK_SIZE];
 static char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
+static bool delayed_write = false;
+static unsigned char delayed_sector[SECTOR_SIZE];
+static int delayed_sector_num;
 
 #ifdef USE_POWEROFF
 static int ata_power_on(void);
@@ -215,6 +218,10 @@ int ata_read_sectors(unsigned long start,
         ret = -1;
 
     mutex_unlock(&ata_mtx);
+
+    if ( delayed_write )
+        ata_flush();
+
     return ret;
 }
 
@@ -279,8 +286,29 @@ int ata_write_sectors(unsigned long start,
     i = wait_for_end_of_transfer();
 
     mutex_unlock(&ata_mtx);
+
+    if ( delayed_write )
+        ata_flush();
+
     return i;
 }
+
+extern void ata_delayed_write(unsigned long sector, void* buf)
+{
+    memcpy(delayed_sector, buf, SECTOR_SIZE);
+    delayed_sector_num = sector;
+    delayed_write = true;
+}
+
+extern void ata_flush(void)
+{
+    if ( delayed_write ) {
+        delayed_write = false;
+        ata_write_sectors(delayed_sector_num, 1, delayed_sector);
+    }
+}
+
+
 
 static int check_registers(void)
 {

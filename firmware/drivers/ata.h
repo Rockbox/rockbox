@@ -39,11 +39,9 @@ extern bool ata_disk_is_active(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
 extern int ata_init(void);
-extern int ata_read_sectors(unsigned long start,
-                            int  count,
-                            void* buf);
-extern int ata_write_sectors(unsigned long start,
-                             int count,
-                             void* buf);
+extern int ata_read_sectors(unsigned long start, int count, void* buf);
+extern int ata_write_sectors(unsigned long start, int count, void* buf);
+extern void ata_delayed_write(unsigned long sector, void* buf);
+extern void ata_flush(void);
 
 #endif

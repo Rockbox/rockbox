@@ -75,3 +75,8 @@ int ata_read_sectors(unsigned long start,
     }
     return 1;
 }
+
+void ata_delayed_write(unsigned long sector, void* buf)
+{
+    ata_write_sectors(sector,1,buf);
+}
