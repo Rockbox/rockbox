@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <stdlib.h>
+#include <string.h>
 #include "kernel.h"
 #include "thread.h"
 #include "sh7034.h"
@@ -198,6 +199,7 @@ int tick_add_task(void (*f)(void))
         }
     }
     set_irq_level(oldlevel);
+    panicf("Error! tick_add_task(): out of tasks");
     return -1;
 }
 
