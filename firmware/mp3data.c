@@ -600,7 +600,7 @@ int create_xing_header(int fd, int startpos, int filesize,
     int pos, last_pos;
     int i, j;
     int bytes;
-    int filepos;
+    unsigned int filepos;
     int x;
     int index;
     unsigned char toc[100];
