@@ -41,6 +41,7 @@
 #include "thread.h"
 #include "settings.h"
 #include "backlight.h"
+#include "status.h"
 #include "debug_menu.h"
 
 #include "version.h"
@@ -151,6 +152,7 @@ void init(void)
                global_settings.loudness,
                global_settings.bass_boost );
 
+    status_init();
     usb_start_monitoring();
 }
 
