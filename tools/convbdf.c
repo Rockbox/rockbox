@@ -703,8 +703,14 @@ int gen_c_source(struct font* pf, char *path)
         "   %s\n"
         "*/\n"
         "\n"
+        "#ifdef SIMULATOR\n"
+        "#define FONT_CONST\n"
+        "#else\n"
+        "#define FONT_CONST const\n"
+        "#endif\n"
+        "\n"
         "/* Font character bitmap data. */\n"
-        "static const bitmap_t _font_bits[] = {\n"
+        "static FONT_CONST bitmap_t _font_bits[] = {\n"
     };
 
     ofp = fopen(path, "w");
@@ -799,7 +805,7 @@ int gen_c_source(struct font* pf, char *path)
     if (pf->offset) {
         /* output offset table*/
         fprintf(ofp, "/* Character->glyph mapping. */\n"
-                "static const unsigned long _sysfont_offset[] = {\n");
+                "static FONT_CONST unsigned long _sysfont_offset[] = {\n");
 
         for (i=0; i<pf->size; ++i)
             fprintf(ofp, "  %ld,\t/* (0x%02x) */\n", 
@@ -810,7 +816,7 @@ int gen_c_source(struct font* pf, char *path)
     /* output width table for proportional fonts*/
     if (pf->width) {
         fprintf(ofp, "/* Character width data. */\n"
-                "static const unsigned char _sysfont_width[] = {\n");
+                "static FONT_CONST unsigned char _sysfont_width[] = {\n");
 
         for (i=0; i<pf->size; ++i)
             fprintf(ofp, "  %d,\t/* (0x%02x) */\n", 
@@ -830,7 +836,7 @@ int gen_c_source(struct font* pf, char *path)
         sprintf(buf, "0,  /* fixed width*/");
 
     fprintf(ofp, 	"/* Exported structure definition. */\n"
-            "const struct font sysfont = {\n"
+            "FONT_CONST struct font sysfont = {\n"
             "  \"%s\",\n"
             "  %d,\n"
             "  %d,\n"
