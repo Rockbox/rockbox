@@ -40,6 +40,9 @@ int button_get_w_tmo(int ticks);
 #define	BUTTON_RIGHT		0x0002
 
 #define BUTTON_SELECT           0x0040
+
+#define BUTTON_ON BUTTON_SELECT
+
 #define BUTTON_PROGRAM          0x0020
 #define	BUTTON_MENU		0x0004
 #define	BUTTON_PLAY		0x0008
