@@ -162,6 +162,7 @@ static void draw_screen(struct mp3entry* id3)
 
 void display_keylock_text(bool locked)
 {
+    lcd_scroll_pause();
     lcd_clear_display();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -182,6 +183,33 @@ void display_keylock_text(bool locked)
 #endif
     
     sleep(HZ);
+    lcd_scroll_resume();
+}
+
+void display_mute_text(bool muted)
+{
+    lcd_scroll_pause();
+    lcd_clear_display();
+
+#ifdef HAVE_LCD_CHARCELLS
+    if(muted)
+        lcd_puts(0, 0, "Mute ON");
+    else
+        lcd_puts(0, 0, "Mute OFF");
+#else
+    if(muted)
+    {
+        lcd_puts(2, 3, "Mute is ON");
+    }
+    else
+    {
+        lcd_puts(2, 3, "Mute is OFF");
+    }
+    lcd_update();
+#endif
+    
+    sleep(HZ);
+    lcd_scroll_resume();
 }
 
 /* demonstrates showing different formats from playtune */
@@ -325,6 +353,35 @@ int wps_show(void)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1 | BUTTON_UP:
+#else
+            case BUTTON_MENU | BUTTON_UP:
+#endif
+                if (keys_locked)
+                {
+                    display_keylock_text(keys_locked);
+                    draw_screen(id3);
+                    break;
+                }
+                dont_go_to_menu = true;
+
+                if(global_settings.muted == false)
+                {
+                    global_settings.muted = true;
+                    mpeg_sound_set(SOUND_VOLUME, 0);
+                    display_mute_text(global_settings.muted);
+                    draw_screen(id3);
+                }
+                else
+                {
+                    global_settings.muted = false;
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                    display_mute_text(global_settings.muted);
+                    draw_screen(id3);
+                }
                 break;
                     
             case BUTTON_MENU:
