@@ -270,8 +270,6 @@ void showscore(struct pong *p)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
-
     struct pong pong;
     bool game = true;
 
@@ -294,6 +292,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        this to avoid the compiler warning about it */
     (void)parameter;
 
+    TEST_PLUGIN_API(api);
+    
     rb = api; /* use the "standard" rb pointer */
 
     /* Clear screen */
