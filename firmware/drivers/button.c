@@ -65,14 +65,16 @@ static void button_tick(void)
                     post = true;
                     repeat = true;
                     count = REPEAT_INTERVAL;
-#ifdef HAVE_RECORDER_KEYPAD
                     /* If the OFF button is pressed long enough, and we are
                        still alive, then the unit must be connected to a
                        charger. Therefore we will reboot and let the original
                        firmware handle the charging. */
+#ifdef HAVE_RECORDER_KEYPAD
                     if(btn == BUTTON_OFF)
-                        system_reboot();
+#elif HAVE_PLAYER_KEYPAD
+                    if(btn == BUTTON_STOP)
 #endif
+                        system_reboot();
                 }
             }
             if ( post )
