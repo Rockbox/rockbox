@@ -334,16 +334,6 @@ void timer4_isr(void)
     tAudioFrameHeader* pAudioBuf;
     int height; // height to display
 
-    TSR4 &= ~0x01; // clear the interrupt
-
-    // xor_b(0x40, &PBDRL); // test: toggle LED (PB6)
-    // debug code
-/*
-    gPlay.nTimeOSD = 1;
-    DrawBuf();
-    gPlay.bDirtyOSD = true;
-*/
-
     // reduce height if we have OSD on
     height = gFileHdr.video_height/8;        
     if (gPlay.nTimeOSD > 0)
