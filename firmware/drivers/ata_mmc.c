@@ -448,39 +448,6 @@ static int initialize_card(int card_no)
     return 0;
 }
 
-#if 0 /* old implementation */
-int ata_read_sectors(unsigned long start,
-                     int incount,
-                     void* inbuf)
-{
-    int ret = 0;
-    int i;
-    unsigned long addr;
-    unsigned char response;
-    tCardInfo *card = &card_info[current_card];
-    
-    addr = start * SECTOR_SIZE;
-    
-    mutex_lock(&mmc_mutex);
-    ret = select_card(current_card);
-
-    for (i = 0; (i < incount) && (ret == 0); i++)
-    {
-        if ((ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response)))
-            break;
-        ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
-
-        addr += SECTOR_SIZE;
-        inbuf += SECTOR_SIZE;
-    }
-    
-    deselect_card();
-    mutex_unlock(&mmc_mutex);
-
-    return ret;
-}
-#endif
-
 int ata_read_sectors(unsigned long start,
                      int incount,
                      void* inbuf)
