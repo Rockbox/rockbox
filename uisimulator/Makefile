@@ -26,18 +26,42 @@ CC = gcc
 RM = rm
 
 CFLAGS = -g
-CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP -I$(FIRMWAREDIR)
-LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
-UNAME := $(shell uname)
-ifeq ($(UNAME),Linux)
-  INCLUDES = -I/usr/X11R6/include -I$(DRIVERS)
+
+CPPFLAGS = \
+	-DHAVE_CONFIG_H \
+	-DGETTIMEOFDAY_TWO_ARGS \
+	-DSIMULATOR \
+	-DHAVE_LCD_BITMAP \
+
+LDFLAGS = \
+	-lX11 \
+	-lm \
+	-lXt \
+	-lXmu \
+	-lnsl \
+
+ifeq ($(shell uname),Linux)
+  INCLUDES = \
+  	-I/usr/X11R6/include \
+	-I$(DRIVERS) \
+	-I$(FIRMWAREDIR) \
+
   LIBDIRS = -L/usr/X11R6/lib
 else
   INCLUDES = 
   LIBDIRS = 
 endif
 
-OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o button-x11.o chartables.o tetris.o
+OBJS= \
+	screenhack.o \
+	uibasic.o \
+	resources.o \
+	visual.o \
+	lcd.o \
+	lcd-x11.o \
+	button-x11.o \
+	chartables.o \
+	tetris.o \
 
 SRCS = $(OBJS:%.o=%.c)
 HDRS = $(OBJS:%.o=%.h)
@@ -63,9 +87,39 @@ $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS)
 
 
-lcd-x11.o: lcd-x11.c screenhack.h config.h resources.h visual.h lcd-x11.h
-resources.o: resources.c utils.h resources.h
-screenhack.o: screenhack.c xmu.h screenhack.h config.h resources.h \
-  visual.h version.h vroot.h
-uibasic.o: uibasic.c screenhack.h config.h resources.h visual.h version.h
-visual.o: visual.c utils.h resources.h visual.h
+lcd-x11.o: \
+	lcd-x11.c \
+	screenhack.h \
+	config.h \
+	resources.h \
+	visual.h \
+	lcd-x11.h \
+
+resources.o: \
+	resources.c \
+	utils.h \
+	resources.h \
+
+screenhack.o: \
+	screenhack.c \
+	xmu.h \
+	screenhack.h \
+	config.h \
+	resources.h \
+	visual.h \
+	version.h \
+	vroot.h \
+
+uibasic.o: \
+	uibasic.c \
+	screenhack.h \
+	config.h \
+	resources.h \
+	visual.h \
+	version.h \
+
+visual.o: \
+	visual.c \
+	utils.h \
+	resources.h \
+	visual.h
