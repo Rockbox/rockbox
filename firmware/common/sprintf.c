@@ -29,6 +29,7 @@
 #include <stdbool.h>
 
 #include "file.h" /* for write(), used in fprintf() */
+#include "sprintf.h" /* to allow the simulator magic */
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
