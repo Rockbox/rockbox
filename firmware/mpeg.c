@@ -1998,6 +1998,9 @@ static void mpeg_thread(void)
             /* Tell the USB thread that we are safe */
             DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+            /* Wait until the USB cable is extracted again */
+            usb_wait_for_disconnect(&mpeg_queue);
             break;
         }
     }
