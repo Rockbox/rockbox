@@ -20,11 +20,11 @@ void dbg_dump_buffer(unsigned char *buf)
     unsigned char c;
     unsigned char ascii[33];
 
-    for(i = 0;i < 512/32;i++)
+    for(i = 0;i < 512/16;i++)
     {
-        for(j = 0;j < 32;j++)
+        for(j = 0;j < 16;j++)
         {
-            c = buf[i*32+j];
+            c = buf[i*16+j];
 
             printf("%02x ", c);
             if(c < 32 || c > 127)
@@ -70,21 +70,7 @@ void dbg_print_bpb(struct bpb *bpb)
     printf("bpb_fatsz32 = %u\n", bpb->bpb_fatsz32);
     printf("last_word = %04x\n", bpb->last_word);
 
-    switch(bpb->fat_type)
-    {
-    case FATTYPE_FAT12:
-       printf("fat_type = FAT12\n");
-       break;
-    case FATTYPE_FAT16:
-       printf("fat_type = FAT16\n");
-       break;
-    case FATTYPE_FAT32:
-       printf("fat_type = FAT32\n");
-       break;
-    default:
-       printf("fat_type = UNKNOWN (%d)\n", bpb->fat_type);
-       break;
-    }
+    printf("fat_type = FAT32\n");
 }
 
 void dbg_dir(struct bpb *bpb, int currdir)
@@ -105,7 +91,7 @@ void dbg_dir(struct bpb *bpb, int currdir)
     }
 }
 
-extern char current_directory[];
+char current_directory[256] = "\\";
 int last_secnum = 0;
 
 void dbg_prompt(void)
