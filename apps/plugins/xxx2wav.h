@@ -55,7 +55,7 @@ void* malloc(size_t size) {
   x=&mallocbuf[mem_ptr];
   mem_ptr+=size+(size%4); // Keep memory 32-bit aligned (if it was already?)
 
-  rb->snprintf(s,30,"Memory used: %d\r",mem_ptr);
+  rb->snprintf(s,30,"Memory used: %d",mem_ptr);
   rb->lcd_putsxy(0,80,s);
   rb->lcd_update();
   return(x);
@@ -111,11 +111,11 @@ void display_status(file_info_struct* file_info) {
   unsigned long long speed;
   unsigned long xspeed;
 
-  rb->snprintf(s,32,"Bytes read: %d\r",file_info->curpos);
+  rb->snprintf(s,32,"Bytes read: %d",file_info->curpos);
   rb->lcd_putsxy(0,0,s);
-  rb->snprintf(s,32,"Samples Decoded: %d\r",file_info->current_sample);
+  rb->snprintf(s,32,"Samples Decoded: %d",file_info->current_sample);
   rb->lcd_putsxy(0,20,s);
-  rb->snprintf(s,32,"Frames Decoded: %d\r",file_info->frames_decoded);
+  rb->snprintf(s,32,"Frames Decoded: %d",file_info->frames_decoded);
   rb->lcd_putsxy(0,40,s);
 
   ticks_taken=*(rb->current_tick)-file_info->start_tick;
@@ -154,7 +154,7 @@ static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                              };
 
 
-int local_init(char* file, file_info_struct* file_info) {
+int local_init(char* infilename, char* outfilename, file_info_struct* file_info) {
   char s[32];
   int i,n,bytesleft;
 
@@ -163,14 +163,15 @@ int local_init(char* file, file_info_struct* file_info) {
   mallocbuf=mp3buf;
   filebuf=&mp3buf[MALLOC_BUFSIZE];
 
-  rb->snprintf(s,32,"mp3 bufsize: %d\r",bufsize);
+  rb->snprintf(s,32,"mp3 bufsize: %d",bufsize);
   rb->lcd_putsxy(0,100,s);
   rb->lcd_update();
 
-  file_info->infile=rb->open(file,O_RDONLY);
-  file_info->outfile=rb->creat("/ac3test.wav",O_WRONLY);
+  file_info->infile=rb->open(infilename,O_RDONLY);
+  file_info->outfile=rb->creat(outfilename,O_WRONLY);
   rb->write(file_info->outfile,wav_header,sizeof(wav_header));
   file_info->curpos=0;
+  file_info->current_sample=0;
   file_info->frames_decoded=0;
   file_info->filesize=rb->filesize(file_info->infile);
 

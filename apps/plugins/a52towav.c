@@ -175,7 +175,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   /* This function sets up the buffers and reads the file into RAM */
 
-  if (local_init(file,&file_info)) {
+  if (local_init(file,"/ac3test.wav",&file_info)) {
     return PLUGIN_ERROR;
   }
 
@@ -190,6 +190,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   /* The main decoding loop */
 
   file_info.start_tick=*(rb->current_tick);
+  rb->button_clear_queue();
+
   while (file_info.curpos < file_info.filesize) {
 
     if ((file_info.curpos+BUFFER_SIZE) < file_info.filesize) {   
