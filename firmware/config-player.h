@@ -12,3 +12,13 @@
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ 12000000 /* cycle time ~83.3ns */
+
+/* Battery scale factor (?) */
+#define BATTERY_SCALE_FACTOR 6546
+
+/* Define this if you must discharge the data line by driving it low
+   and then set it to input to see if it stays low or goes high */
+#define HAVE_I2C_LOW_FIRST
+
+/* Define this if you control power on PADR (instead of PBDR) */
+#define HAVE_POWEROFF_ON_PADR

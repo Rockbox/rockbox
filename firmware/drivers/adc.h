@@ -38,12 +38,6 @@
 #define ADC_UNREG_POWER         6 /* Battery voltage with a better scaling */
 #define ADC_EXT_POWER           7 /* The external power voltage, V=X*0.0148 */
 
-#ifdef ARCHOS_RECORDER
-#define BATTERY_SCALE_FACTOR 6465
-#else
-#define BATTERY_SCALE_FACTOR 6546
-#endif
-
 #define EXT_SCALE_FACTOR 14800
 
 unsigned short adc_read(int channel);

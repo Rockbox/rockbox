@@ -59,7 +59,7 @@ void charger_enable(bool on)
 
 void ide_power_enable(bool on)
 {
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_ATA_POWER_OFF
     if(on)
         PADR |= 0x20;
     else
@@ -72,7 +72,7 @@ void ide_power_enable(bool on)
 void power_off(void)
 {
     set_irq_level(15);
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_POWEROFF_ON_PBDR
     PBDR &= ~PBDR_BTN_OFF;
     PBIOR |= PBDR_BTN_OFF;
 #else

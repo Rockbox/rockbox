@@ -124,7 +124,7 @@ int i2c_getack(void)
        low until it is ready. We need to poll the clock line until it goes
        high before we read the ack. */
 
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_I2C_LOW_FIRST
     SDA_LO;      /* First, discharge the data line */
 #endif
     SDA_INPUT;   /* And set to input */
@@ -167,7 +167,7 @@ unsigned char i2c_inb(int ack)
 
    /* clock in each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_I2C_LOW_FIRST
        /* Tricky business. Here we discharge the data line by driving it low
           and then set it to input to see if it stays low or goes high */
        SDA_LO;      /* First, discharge the data line */

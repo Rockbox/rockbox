@@ -27,7 +27,7 @@
 /*
 	MAS I2C	defs
 */
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
 #define MAS_ADR         0x3c
 #define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
 #define	MAS_DEV_READ    (MAS_ADR | 0x01)
