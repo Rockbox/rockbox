@@ -17,16 +17,16 @@ side of each entry that shows what kind of entry it is.
 <table>
 
 <tr>
- <td> <img src="rec-mp3.png" width=32 height=40 alt="mp3 icon"></td>
- <td>mp3 file </td>
+ <td> <img src="rec-folder.png" width=33 height=42 alt="folder icon"></td>
+ <td>folder</td>
 </tr>
 <tr>
  <td> <img src="rec-m3u.png" width=35 height=45 alt="m3u icon"></td>
- <td>m3u file</td>
+ <td>playlist</td>
 </tr>
 <tr>
- <td> <img src="rec-folder.png" width=33 height=42 alt="folder icon"></td>
- <td>folder</td>
+ <td> <img src="rec-mp3.png" width=32 height=40 alt="mp3 icon"></td>
+ <td>mp3 file </td>
 </tr>
 </table>
 
