@@ -39,15 +39,12 @@
 
 void playtune(char *dir, char *file)
 {
+    static char mfile[256];
     char buffer[256];
     mp3entry mp3;
     bool good=1;
 
     snprintf(buffer, sizeof(buffer), "%s/%s", dir, file);
-#if !defined(SIMULATOR) || defined(MPEGPLAY)
-    mpeg_play(buffer);
-#endif
-
     if(mp3info(&mp3, buffer)) {
         DEBUGF("id3 failure!");
         good=0;
@@ -84,6 +81,11 @@ void playtune(char *dir, char *file)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_update();
+#endif
+
+    snprintf(mfile, sizeof(mfile), "%s/%s", dir, file);
+#if !defined(SIMULATOR) || defined(MPEGPLAY)
+    mpeg_play(mfile);
 #endif
 
     while(1) {
