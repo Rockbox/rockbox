@@ -35,7 +35,7 @@ $(OUTPUT): $(OBJS)
 
 $(OBJDIR)/%.o: $(APPSDIR)/codecs/libmad/%.c
 	@echo "CC $<"
-	$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
+	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
