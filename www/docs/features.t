@@ -239,7 +239,7 @@ NO
 EFEAT
 
 NAME Number of available languages ENAME
-TD 19 ETD
+TD 20 ETD
 TD 3 ETD
 EFEAT
 
