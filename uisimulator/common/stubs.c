@@ -124,6 +124,13 @@ void backlight_set_on_when_charging(bool beep)
   (void)beep;
 }
 
+/* original is in firmware/common/timefuncs.c */
+struct tm *get_time(void)
+{
+    time_t now = time(NULL);
+    return localtime(&now);
+}
+
 int rtc_read(int address)
 {
   time_t now = time(NULL);
