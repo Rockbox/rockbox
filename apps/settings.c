@@ -627,7 +627,6 @@ void settings_calc_config_sector(void)
             sector = 0;
     }
     
-    splash(HZ, true, "CfgSec: %d", sector);
     config_sector = sector;
 #endif
 }
