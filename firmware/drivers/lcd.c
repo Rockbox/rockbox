@@ -497,10 +497,10 @@ extern unsigned char char_dw_8x8_prop[][9];
  */
 void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
 {
-    (void)font;
     int width=0;
     int height=0;
     unsigned char ch, byte;
+    (void)font;
 
     while((ch = *str++)) {
         /* Limit to char generation table */
@@ -581,8 +581,8 @@ void lcd_puts(int x, int y, char *str)
 
 #ifdef LCD_PROPFONTS
     lcd_putspropxy( xmargin + x*fonts[font],
-                ymargin + y*fontheight[font],
-                str, font );
+                    ymargin + y*fontheight[font],
+                    str, font );
 #else
     lcd_putsxy( xmargin + x*fonts[font],
                 ymargin + y*fontheight[font],
@@ -981,6 +981,12 @@ static void scroll_thread(void)
                     s->offset = 0;
             }
 
+#ifdef LCD_PROPFONTS
+            lcd_clearrect(xmargin + s->startx*fonts[font],
+                          ymargin + s->starty*fontheight[font],
+                          LCD_WIDTH - xmargin,
+                          fontheight[font]);
+#endif
             lcd_puts(s->startx,s->starty,s->line);
             lcd_update();
         }
