@@ -543,7 +543,7 @@ new:
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
-eng: "[Frecuency]"
+eng: "[Frequency]"
 new:
 
 id: LANG_ID3_PATH
