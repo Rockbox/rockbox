@@ -20,6 +20,7 @@
 <li><a href="/sh-win/">Setting up the cross compiler for Windows</a>
 <li><a href="how_to_compile.html">How to compile Rockbox</a> (README from cvs)
 <li><a href="mpeghdr.html">MPEG frame header info</a>
+<li><a href="rocklatin.htm">Rocklatin charset in Player</a>
 </ul>
 
 #include "foot.t"
