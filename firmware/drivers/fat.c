@@ -1588,8 +1588,10 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
     de->wrtdate = BYTES2INT16(buf,FATDIR_WRTDATE);
     de->wrttime = BYTES2INT16(buf,FATDIR_WRTTIME);
     de->filesize = BYTES2INT32(buf,FATDIR_FILESIZE);
-    de->firstcluster = ((long)BYTES2INT16(buf,FATDIR_FSTCLUSLO)) |
-        ((long)BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
+    de->firstcluster = ((long)(unsigned)BYTES2INT16(buf,FATDIR_FSTCLUSLO)) |
+        ((long)(unsigned)BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
+    /* The double cast is to prevent a sign-extension to be done on CalmRISC16.
+       (the result of the shift is always considered signed) */
 
     /* fix the name */
     for (i=0; (i<8) && (buf[FATDIR_NAME+i] != ' '); i++)

@@ -42,7 +42,7 @@
 */
 
 #define BYTES2INT32(array,pos)					\
-    ((long)array[pos] | (long)(array[pos+1] << 8 ) |		\
+    ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
      ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
 static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
