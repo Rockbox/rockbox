@@ -62,8 +62,6 @@ void lcd_update (void)
     int cp=0;
     struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
-    fprintf(stderr, "%04d: lcd_update()\n", counter++);
-
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
             if(lcd_framebuffer[y/8][x] || lcd_framebuffer_copy[y/8][x]) {

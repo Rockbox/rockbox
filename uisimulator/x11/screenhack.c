@@ -213,7 +213,6 @@ static Bool checkrepeat(time_t prev,
                        time_t now)
 {
     if(now-prev < 50) {
-        DEBUGF("Consider this a button repeat\n");
         return true;
     }
     return false;
