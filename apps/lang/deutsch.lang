@@ -1461,10 +1461,20 @@ new: "normal"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
-eng: "Editable files"
-new: "Editierbare Dateien"
+eng: "Independent frames"
+new: "unabhängige mp3-Frames"
 
 id: LANG_VBRFIX
 desc: The context menu entry
 eng: "Update VBR file"
 new: "VBR Datei aktualisieren"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Icons anzeigen"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Beleuchtung an bei Titelwechsel"

@@ -177,6 +177,7 @@ struct user_settings
 
     int max_files_in_dir; /* Max entries in directory (file browser) */
     int max_files_in_playlist; /* Max entries in playlist */
+    bool show_icons;   /* 0=hide 1=show */
 };
 
 /* prototypes */

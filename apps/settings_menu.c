@@ -57,8 +57,19 @@ static bool caption_backlight(void)
     return rc;
 }
 
+/**
+ * Menu to set icon visibility
+ */
+static bool show_icons(void)
+{
+    return set_bool( str(LANG_SHOW_ICONS), &global_settings.show_icons );
+}
+
 #ifdef HAVE_LCD_BITMAP
 
+ /**
+ * Menu to set LCD Mode (normal/inverse)
+ */
 static bool invert(void)
 {
      bool rc = set_bool_options(str(LANG_INVERT),
@@ -70,6 +81,9 @@ static bool invert(void)
      return rc;
 }
 
+/**
+ * Menu to set Line Selector Type (Pointer/Bar)
+ */
 static bool invert_cursor(void)
 {
         return set_bool_options(str(LANG_INVERT_CURSOR),
@@ -829,6 +843,7 @@ static bool display_settings_menu(void)
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },
 #endif
+        { str(LANG_SHOW_ICONS),      show_icons },
         { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
     };
     

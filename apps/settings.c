@@ -85,7 +85,7 @@ offset  abs
 0x07    0x1b    <treble byte>
 0x08    0x1c    <loudness byte>
 0x09    0x1d    <bass boost byte>
-0x0a    0x1e    <contrast (bit 0-5), invert bit (bit 6)>
+0x0a    0x1e    <contrast (bit 0-5), invert bit (bit 6), show_icons (bit 7)>
 0x0b    0x1f    <backlight_on_when_charging, invert_cursor, backlight_timeout>
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
@@ -307,7 +307,8 @@ int settings_save( void )
     
     config_block[0xa] = (unsigned char)
       ((global_settings.contrast & 0x3f) |
-       (global_settings.invert ? 0x40 : 0));
+       (global_settings.invert ? 0x40 : 0) |
+       (global_settings.show_icons ? 0x80 : 0) );
 
     config_block[0xb] = (unsigned char)
         ((global_settings.backlight_on_when_charging?0x40:0) |
@@ -581,6 +582,8 @@ void settings_load(void)
                 config_block[0xa] & 0x40 ? true : false;
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
                 global_settings.contrast = DEFAULT_CONTRAST_SETTING;
+            global_settings.show_icons =
+                config_block[0xa] & 0x80 ? true : false;
         }
 
         if (config_block[0xb] != 0xFF) {
@@ -959,6 +962,8 @@ bool settings_load_config(char* file)
             set_cfg_bool(&global_settings.invert, value);
         else if (!strcasecmp(name, "invert cursor"))
             set_cfg_bool(&global_settings.invert_cursor, value);
+        else if (!strcasecmp(name, "show icons"))
+            set_cfg_bool(&global_settings.show_icons, value);
 #endif
         else if (!strcasecmp(name, "caption backlight"))
             set_cfg_bool(&global_settings.caption_backlight, value);
@@ -1265,6 +1270,9 @@ bool settings_save_config(void)
     fprintf(fd, "invert cursor: %s\r\n",
             boolopt[global_settings.invert_cursor]);
 
+    fprintf(fd, "show icons: %s\r\n",
+            boolopt[global_settings.show_icons]);
+
     fprintf(fd, "peak meter release: %d\r\n",
             global_settings.peak_meter_release);
 
@@ -1450,6 +1458,7 @@ void settings_reset(void) {
     global_settings.caption_backlight = false;
     global_settings.max_files_in_dir = 400;
     global_settings.max_files_in_playlist = 10000;
+    global_settings.show_icons = true;
 }
 
 bool set_bool(char* string, bool* variable )

@@ -92,8 +92,11 @@ void put_cursorxy(int x, int y, bool on)
 #ifdef HAVE_LCD_BITMAP
     int fh, fw;
     int xpos, ypos;
+
+    /* check here instead of at every call (ugly, but cheap) */
     if (global_settings.invert_cursor)
         return;
+
     lcd_getstringsize("A", &fw, &fh);
     xpos = x*6;
     ypos = y*fh + lcd_getymargin();

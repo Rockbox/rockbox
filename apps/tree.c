@@ -57,8 +57,8 @@
 #include "widgets.h"
 #endif
 
-/* Mirror of global_settings.max_files_in_dir */
-int max_files_in_dir;
+/* Boot value of global_settings.max_files_in_dir */
+static int max_files_in_dir;
 
 static char *name_buffer;
 static int name_buffer_size;    /* Size of allocated buffer */
@@ -98,7 +98,7 @@ void browse_root(void)
 /* pixel margins */
 #define MARGIN_X (global_settings.scrollbar && \
                   filesindir > tree_max_on_screen ? SCROLLBAR_WIDTH : 0) + \
-                  CURSOR_WIDTH + ICON_WIDTH
+                  CURSOR_WIDTH + (global_settings.show_icons && ICON_WIDTH > 0 ? ICON_WIDTH :0)
 #define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 /* position the entry-list starts at */
@@ -188,11 +188,19 @@ static int compare(const void* p1, const void* p2)
 
 static void showfileline(int line, int direntry, bool scroll)
 {
+    char* name = dircache[direntry].name;
+    int xpos = LINE_X;
+
+#ifdef HAVE_LCD_CHARCELLS
+    if (!global_settings.show_icons)
+        xpos--;
+#endif
+
     /* if any file filter is on, strip the extension */
     if (global_settings.dirfilter != SHOW_ALL && 
         !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
-        char* dotpos = strrchr(dircache[direntry].name, '.');
+        char* dotpos = strrchr(name, '.');
         char temp=0;
         if (dotpos) {
             temp = *dotpos;
@@ -201,13 +209,12 @@ static void showfileline(int line, int direntry, bool scroll)
         if(scroll)
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)
-                lcd_puts_scroll_style(LINE_X, line, dircache[direntry].name,
-                                      STYLE_INVERT);
+                lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
             else
 #endif
-                lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+                lcd_puts_scroll(xpos, line, name);
         else
-            lcd_puts(LINE_X, line, dircache[direntry].name);
+            lcd_puts(xpos, line, name);
         if (temp)
             *dotpos = temp;
     }
@@ -215,13 +222,12 @@ static void showfileline(int line, int direntry, bool scroll)
         if(scroll)
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)
-                lcd_puts_scroll_style(LINE_X, line, dircache[direntry].name,
-                                      STYLE_INVERT);
+                lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
             else
 #endif
-                lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+                lcd_puts_scroll(xpos, line, name);
         else
-            lcd_puts(LINE_X, line, dircache[direntry].name);
+            lcd_puts(xpos, line, name);
     }
 }
 
@@ -475,7 +481,7 @@ static int showdir(char *path, int start)
 #endif
         }
 
-        if (icon_type) {
+        if (icon_type && global_settings.show_icons) {
 #ifdef HAVE_LCD_BITMAP
             int offset=0;
             if ( line_height > 8 )
@@ -493,7 +499,7 @@ static int showdir(char *path, int start)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar && filesindir > tree_max_on_screen) 
+    if (global_settings.scrollbar && (filesindir > tree_max_on_screen)) 
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
                   LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
                   start + tree_max_on_screen, VERTICAL);

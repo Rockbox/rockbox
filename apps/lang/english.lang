@@ -1547,3 +1547,8 @@ id: LANG_RECORD_TIMESPLIT_REC
 decs: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 new:
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new:
