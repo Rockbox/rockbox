@@ -19,6 +19,9 @@
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F
 
+/* Define this if you have a SH7034 */
+#define HAVE_SH7034
+
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1
 

@@ -9,6 +9,10 @@
 #define HAVE_PLAYER_KEYPAD 1
 
 #ifndef SIMULATOR
+
+/* Define this if you have a SH7034 */
+#define HAVE_SH7034
+
 /* Define this if you have a MAS3507D */
 #define HAVE_MAS3507D
 

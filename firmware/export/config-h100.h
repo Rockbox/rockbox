@@ -13,6 +13,9 @@
 
 #ifndef SIMULATOR
 
+/* Define this if you have a Motorola SCF5249 */
+#define HAVE_SCF5249
+
 /* Define this if the platform has batteries */
 #define HAVE_BATTERIES 1
 
