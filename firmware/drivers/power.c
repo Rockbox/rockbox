@@ -35,6 +35,10 @@ void power_init(void)
     PBIOR |= 0x20;          /* Set charging control bit to output */
     charger_enable(false);  /* Default to charger OFF */
 #endif
+#ifdef HAVE_ATA_POWER_OFF
+    PAIOR |= 0x20;
+    PACR2 &= 0xFBFF;
+#endif
 }
 
 bool charger_inserted(void)
@@ -71,9 +75,6 @@ void charger_enable(bool on)
 void ide_power_enable(bool on)
 {
 #ifdef HAVE_ATA_POWER_OFF
-    PAIOR |= 0x20; /* there's no power driver init, so I have to do that here */
-    PACR2 &= 0xFBFF;
-    
     if(on)
         PADR |= 0x20;
     else
