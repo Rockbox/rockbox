@@ -5,7 +5,7 @@
 
 <!--#exec cmd="./dailysrc.pl" -->
 
-<p>Please also look at our a useful <a href="docs/">documentaion</a> for do-it-yourselfers.
+<p>Please also look at our a useful <a href="docs/">documentation</a> for do-it-yourselfers.
 
 <a name="target_builds"></a>
 <h2>Target builds</h2>
