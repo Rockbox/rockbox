@@ -177,7 +177,7 @@ struct font* font_load(const char *path)
     fileptr += nbits*sizeof(unsigned char);
 
     /* pad to 16 bit boundary*/
-    fileptr = (unsigned char *)(((int)fileptr + 1) & ~1);
+    fileptr = (unsigned char *)(((long)fileptr + 1) & ~1);
 
     if (noffset) {
         pf->offset = (unsigned short *)fileptr;
