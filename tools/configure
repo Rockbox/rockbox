@@ -77,9 +77,10 @@ esac
 
 firmfile="start.s" # a file to check for in the firmware root dir
 
-for dir in . .. ../firmware ../../firmware; do
+for dir in firmware . .. ../firmware ../../firmware; do
   if [ -f $dir/$firmfile ]; then
     firmdir=$dir
+    break
   fi
 done
 
@@ -96,9 +97,10 @@ fi
 
 appsfile="credits.c" # a file to check for in the apps root dir
 
-for dir in $firmdir/apps $firmdir/../apps . .. ../apps ../../apps; do
+for dir in apps $firmdir/apps $firmdir/../apps . .. ../apps ../../apps; do
   if [ -f $dir/$appsfile ]; then
     appsdir=$dir
+    break
   fi
 done
 
