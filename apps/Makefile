@@ -31,11 +31,7 @@ ifdef DEBUG
     CFLAGS += -g
     LDS := $(FIRMWARE)/gdb.lds
 else
-ifeq ($(ANYREC), RECORDER)
     LDS := $(FIRMWARE)/app.lds
-else
-    LDS := $(FIRMWARE)/player.lds
-endif
 endif
 
 SRC := $(wildcard *.c)
