@@ -409,4 +409,38 @@ int mas_codec_readreg(int reg)
     i2c_end();
     return ret;
 }
+
+unsigned long mas_readver(void)
+{
+    int ret = 0;
+    unsigned char buf[16];
+    unsigned long value;
+
+    i2c_begin();
+
+    buf[0] = MAS_DATA_WRITE;
+    buf[1] = MAS_CMD_READ_IC_VER;
+    buf[2] = 0;
+
+    /* send read command */
+    if (i2c_write(MAS_DEV_WRITE,buf,3))
+    {
+        ret = -1;
+    }
+    else
+    {
+        if(mas_devread(&value, 1))
+        {
+            ret = -2;
+        }
+        else
+        {
+            ret = value;
+        }
+    }
+
+    i2c_end();
+    return ret;
+}
+
 #endif

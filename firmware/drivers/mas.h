@@ -109,5 +109,6 @@ int mas_direct_config_read(unsigned char reg);
 int mas_direct_config_write(unsigned char reg, unsigned int val);
 int mas_codec_writereg(int reg, unsigned int val);
 int mas_codec_readreg(int reg);
+unsigned long mas_readver(void);
 
 #endif
