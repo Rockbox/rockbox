@@ -43,7 +43,11 @@
 #include "mpeg.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 6
+#define PLUGIN_API_VERSION 7
+
+/* update this to latest version if a change to the api struct breaks
+   backwards compatibility */
+#define PLUGIN_MIN_API_VERSION 6
 
 /* plugin return codes */
 enum plugin_status {
@@ -75,6 +79,12 @@ do { \
      return _rc_; \
 } while(0)
 
+/* NOTE: To support backwards compatibility, only add new functions at
+         the end of the structure.  Every time you add a new function,
+         remember to increase PLUGIN_API_VERSION.  If you make changes to the
+         existing APIs then also update PLUGIN_MIN_API_VERSION to current
+         version
+ */
 struct plugin_api {
     /* these two fields must always be first, to ensure
        TEST_PLUGIN_API will always work */
@@ -170,10 +180,12 @@ struct plugin_api {
     struct mp3entry* (*mpeg_current_track)(void);
     int (*atoi)(const char *str);
     struct tm* (*get_time)(void);
+    void* (*plugin_get_buffer)(int* buffer_size);
 };
 
 /* defined by the plugin loader (plugin.c) */
 int plugin_load(char* plugin, void* parameter);
+void* plugin_get_buffer(int *buffer_size);
 
 /* defined by the plugin */
 enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)

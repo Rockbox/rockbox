@@ -52,6 +52,17 @@
 #define PREFIX(_x_) _x_
 #endif
 
+#define PLUGIN_BUFFER_SIZE 0x8000
+
+#ifdef SIMULATOR
+static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
+#else
+extern unsigned char pluginbuf[];
+#endif
+
+static bool plugin_loaded = false;
+static int  plugin_size = 0;
+
 static int plugin_test(int api_version, int model, int memsize);
 
 static struct plugin_api rockbox_api = {
@@ -142,7 +153,8 @@ static struct plugin_api rockbox_api = {
     kbd_input,
     mpeg_current_track,
     atoi,
-    get_time
+    get_time,
+    plugin_get_buffer,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -154,7 +166,6 @@ int plugin_load(char* plugin, void* parameter)
     void* pd;
     char path[256];
 #else
-    extern unsigned char pluginbuf[];
     int fd;
 #endif
 
@@ -196,22 +207,25 @@ int plugin_load(char* plugin, void* parameter)
     }
 
     plugin_start = (void*)&pluginbuf;
-    rc = read(fd, plugin_start, 0x8000);
+    plugin_size = read(fd, plugin_start, PLUGIN_BUFFER_SIZE);
     close(fd);
-    if (rc < 0) {
+    if (plugin_size < 0) {
         /* read error */
         snprintf(buf, sizeof buf, str(LANG_READ_FAILED), plugin);
         splash(HZ*2, 0, true, buf);
         return -1;
     }
-    if (rc == 0) {
+    if (plugin_size == 0) {
         /* loaded a 0-byte plugin, implying it's not for this model */
         splash(HZ*2, 0, true, str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
 #endif
 
+    plugin_loaded = true;
     rc = plugin_start(&rockbox_api, parameter);
+    plugin_loaded = false;
+
     switch (rc) {
         case PLUGIN_OK:
             break;
@@ -239,9 +253,33 @@ int plugin_load(char* plugin, void* parameter)
     return PLUGIN_OK;
 }
 
-int plugin_test(int api_version, int model, int memsize)
+/* Returns a pointer to the portion of the plugin buffer that is not already
+   being used.  If no plugin is loaded, returns the entire plugin buffer */
+void* plugin_get_buffer(int* buffer_size)
 {
-    if (api_version != PLUGIN_API_VERSION)
+    int buffer_pos;
+
+    if (plugin_loaded)
+    {
+        if (plugin_size >= PLUGIN_BUFFER_SIZE)
+            return NULL;
+        
+        *buffer_size = PLUGIN_BUFFER_SIZE-plugin_size;
+        buffer_pos = plugin_size;
+    }
+    else
+    {
+        *buffer_size = PLUGIN_BUFFER_SIZE;
+        buffer_pos = 0;
+    }
+
+    return &pluginbuf[buffer_pos];
+}
+
+static int plugin_test(int api_version, int model, int memsize)
+{
+    if (api_version < PLUGIN_MIN_API_VERSION ||
+        api_version > PLUGIN_API_VERSION)
         return PLUGIN_WRONG_API_VERSION;
 
     if (model != MODEL)
