@@ -389,6 +389,8 @@ A53: We have answered this question numerous times.  It is mentioned in the
      file limits in order to provide a greater amount of memory for buffering 
      of files being played.
 
+     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+
 Q54: Okay, I understand your 400 file limit.  But why hardcode?  Why not 
      have this be dynamically allocated?
 A54: Because it's useless.  Dynamic memory is only ever useful if you have 
@@ -409,6 +411,8 @@ A54: Because it's useless.  Dynamic memory is only ever useful if you have
      else is able to use it. This is standard practice in memory-limited 
      systems. 
 
+     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+
 Q55: Why is there a 10,000 song limit on playlists?
 A55: This is another hardcoded limit.  We feel that as bigger disks arrive 
      that this limit will increase.  Because of the way that playlists are
@@ -416,12 +420,16 @@ A55: This is another hardcoded limit.  We feel that as bigger disks arrive
      For further detail, look at questions 53 and 54 and replace any instances
      of '400' with '10,000'.
 
+     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
+
 Q56: You don't understand! I _really_ need to have more then 400 files
      in a directory!
 A56: The use of really big directories was a workaround for the poor playlist
      capabilities of the original Archos firmware. With Rockbox, you no longer
      need this workaround. Organize your files in directories, then build
      playlists for all collections you want to shuffle-play.
+
+     Newsflash! This limit is now configurable in the daily (post-2.0) builds.
 
 Q57: How can I make playlists on my PC?
 A57: There are many programs that can create .m3u playlists. WinAmp is one.
