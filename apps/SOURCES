@@ -1,3 +1,5 @@
+#ifdef IRIVER_H100
+#else
 alarm_menu.c
 bookmark.c
 credits.c
@@ -39,4 +41,5 @@ recorder/radio.c
 #endif
 #ifdef HAVE_RECORDING
 recorder/recording.c
+#endif
 #endif
