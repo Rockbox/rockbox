@@ -27,13 +27,19 @@
 #include "lcd.h"
 #include "serial.h"
 
-/* Recieved byte identifiers */
+/* Received byte identifiers */
 #define PLAY  0xC1
 #define STOP  0xC2
 #define PREV  0xC4
 #define NEXT  0xC8
 #define VOLUP 0xD0
 #define VOLDN 0xE0
+
+#ifdef SCREENDUMP
+#define SCRDMP 0xF0
+
+static void screen_dump(void);
+#endif
 
 void serial_setup (void) 
 { 
@@ -86,6 +92,12 @@ static void process_byte(int byte)
         case NEXT:
             btn = BUTTON_RIGHT;
             break;
+            
+#ifdef SCREENDUMP
+        case SCRDMP:
+            screen_dump();
+            break;
+#endif
     }
 
     if ( btn ) {
@@ -110,3 +122,43 @@ void RXI1 (void)
     SSR1 = SSR1 & ~0x40; /* Clear RDRF */
     process_byte(serial_byte);
 }
+
+#ifdef SCREENDUMP
+static void serial_enable_tx(void)
+{
+    SCR1 |= 0x20;
+}
+
+static void serial_tx(unsigned char ch)
+{
+    while (!(SSR1 & SCI_TDRE))
+    {
+        ;
+    }
+    
+    /*
+     * Write data into TDR and clear TDRE
+     */
+    TDR1 = ch;
+    SSR1 &= ~SCI_TDRE;
+}
+
+static void screen_dump(void)
+{
+    int x, y;
+    int level;
+
+    serial_enable_tx();
+
+    level = set_irq_level(15);
+    for(y = 0;y < LCD_HEIGHT/8;y++)
+    {
+        for(x = 0;x < LCD_WIDTH;x++)
+        {
+            serial_tx(lcd_framebuffer[x][y]);
+        }
+    }
+    set_irq_level(level);
+}
+
+#endif
