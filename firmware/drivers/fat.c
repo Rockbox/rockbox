@@ -1128,8 +1128,11 @@ static bool transfer( int start, int count, char* buf, bool write )
     int err;
 
     LDEBUGF("transfer(s=%x, c=%x, %s)\n",start, count, write?"write":"read");
-    if (write)
+    if (write) {
+        if (start < fat_bpb.firstdatasector)
+            panicf("Writing before data\n");
         err = ata_write_sectors(start, count, buf);
+    }
     else
         err = ata_read_sectors(start, count, buf);
     if (err) {

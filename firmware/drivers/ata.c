@@ -292,6 +292,9 @@ int ata_write_sectors(unsigned long start,
 
     last_disk_activity = current_tick;
 
+    if (start == 0)
+        panicf("Writing on sector 0\n");
+
     mutex_lock(&ata_mtx);
     
     if ( sleeping ) {
