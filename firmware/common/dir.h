@@ -25,7 +25,9 @@ typdef struct {
 } DIR;
 
 struct dirent {
-    int d_name[256];
+    unsigned char d_name[256];
+    int attribute;
+    int size;
 };
 
 extern DIR* opendir(char* name);
