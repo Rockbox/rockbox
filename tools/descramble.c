@@ -97,8 +97,11 @@ int main (int argc, char** argv)
         int unpackedsize;
         unsigned char xorstring[32];
 
-        unpackedsize = ((unsigned int*)header)[1];
-        length = ((unsigned int*)header)[2];
+        unpackedsize = header[4] | header[5] << 8;
+        unpackedsize |= header[6] << 16 | header[7] << 24;
+
+        length = header[8] | header[9] << 8;
+        length |= header[10] << 16 | header[11] << 24;
 
         /* calculate the xor string used */
         for (i=0; i<stringlen; i++) {
