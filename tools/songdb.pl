@@ -885,226 +885,226 @@ data (if TAGVERSION argument is C<0>, may contain two versions).
 =cut
 
 sub get_mp3tag {
-	my($file, $ver, $raw_v2) = @_;
-	my($tag, $v1, $v2, $v2h, %info, @array, $fh);
-	$raw_v2 ||= 0;
-	$ver = !$ver ? 0 : ($ver == 2 || $ver == 1) ? $ver : 0;
+    my($file, $ver, $raw_v2) = @_;
+    my($tag, $v1, $v2, $v2h, %info, @array, $fh);
+    $raw_v2 ||= 0;
+    $ver = !$ver ? 0 : ($ver == 2 || $ver == 1) ? $ver : 0;
 
-	if (not (defined $file && $file ne '')) {
-		$@ = "No file specified";
-		return undef;
-	}
+    if (not (defined $file && $file ne '')) {
+        $@ = "No file specified";
+        return undef;
+    }
 
-	if (not -s $file) {
-		$@ = "File is empty";
-		return undef;
-	}
+    if (not -s $file) {
+        $@ = "File is empty";
+        return undef;
+    }
 
-	if (ref $file) { # filehandle passed
-		$fh = $file;
-	} else {
-		$fh = gensym;
-		if (not open $fh, "< $file\0") {
-			$@ = "Can't open $file: $!";
-			return undef;
-		}
-	}
+    if (ref $file) { # filehandle passed
+        $fh = $file;
+    } else {
+        $fh = gensym;
+        if (not open $fh, "< $file\0") {
+            $@ = "Can't open $file: $!";
+            return undef;
+        }
+    }
 
-	binmode $fh;
+    binmode $fh;
 
-	if ($ver < 2) {
-		seek $fh, -128, 2;
-		while(defined(my $line = <$fh>)) { $tag .= $line }
+    if ($ver < 2) {
+        seek $fh, -128, 2;
+        while(defined(my $line = <$fh>)) { $tag .= $line }
 
-		if ($tag =~ /^TAG/) {
-			$v1 = 1;
-			if (substr($tag, -3, 2) =~ /\000[^\000]/) {
-				(undef, @info{@v1_tag_names}) =
-					(unpack('a3a30a30a30a4a28', $tag),
-					ord(substr($tag, -2, 1)),
-					$mp3_genres[ord(substr $tag, -1)]);
-				$info{TAGVERSION} = 'ID3v1.1';
-			} else {
-				(undef, @info{@v1_tag_names[0..4, 6]}) =
-					(unpack('a3a30a30a30a4a30', $tag),
-					$mp3_genres[ord(substr $tag, -1)]);
-				$info{TAGVERSION} = 'ID3v1';
-			}
-			if ($UNICODE) {
-				for my $key (keys %info) {
-					next unless $info{$key};
-					my $u = Unicode::String::latin1($info{$key});
-					$info{$key} = $u->utf8;
-				}
-			}
-		} elsif ($ver == 1) {
-			_close($file, $fh);
-			$@ = "No ID3v1 tag found";
-			return undef;
-		}
-	}
+        if ($tag =~ /^TAG/) {
+            $v1 = 1;
+            if (substr($tag, -3, 2) =~ /\000[^\000]/) {
+                (undef, @info{@v1_tag_names}) =
+                    (unpack('a3a30a30a30a4a28', $tag),
+                     ord(substr($tag, -2, 1)),
+                     $mp3_genres[ord(substr $tag, -1)]);
+                $info{TAGVERSION} = 'ID3v1.1';
+            } else {
+                (undef, @info{@v1_tag_names[0..4, 6]}) =
+                    (unpack('a3a30a30a30a4a30', $tag),
+                     $mp3_genres[ord(substr $tag, -1)]);
+                $info{TAGVERSION} = 'ID3v1';
+            }
+            if ($UNICODE) {
+                for my $key (keys %info) {
+                    next unless $info{$key};
+                    my $u = Unicode::String::latin1($info{$key});
+                    $info{$key} = $u->utf8;
+                }
+            }
+        } elsif ($ver == 1) {
+            _close($file, $fh);
+            $@ = "No ID3v1 tag found";
+            return undef;
+        }
+    }
 
-	($v2, $v2h) = _get_v2tag($fh);
+    ($v2, $v2h) = _get_v2tag($fh);
 
-	unless ($v1 || $v2) {
-		_close($file, $fh);
-		$@ = "No ID3 tag found";
-		return undef;
-	}
+    unless ($v1 || $v2) {
+        _close($file, $fh);
+        $@ = "No ID3 tag found";
+        return undef;
+    }
 
-	if (($ver == 0 || $ver == 2) && $v2) {
-		if ($raw_v2 == 1 && $ver == 2) {
-			%info = %$v2;
-			$info{TAGVERSION} = $v2h->{version};
-		} else {
-			my $hash = $raw_v2 == 2 ? { map { ($_, $_) } keys %v2_tag_names } : \%v2_to_v1_names;
-			for my $id (keys %$hash) {
-				if (exists $v2->{$id}) {
-					if ($id =~ /^TCON?$/ && $v2->{$id} =~ /^.?\((\d+)\)/) {
-						$info{$hash->{$id}} = $mp3_genres[$1];
-					} else {
-						my $data1 = $v2->{$id};
+    if (($ver == 0 || $ver == 2) && $v2) {
+        if ($raw_v2 == 1 && $ver == 2) {
+            %info = %$v2;
+            $info{TAGVERSION} = $v2h->{version};
+        } else {
+            my $hash = $raw_v2 == 2 ? { map { ($_, $_) } keys %v2_tag_names } : \%v2_to_v1_names;
+            for my $id (keys %$hash) {
+                if (exists $v2->{$id}) {
+                    if ($id =~ /^TCON?$/ && $v2->{$id} =~ /^.?\((\d+)\)/) {
+                        $info{$hash->{$id}} = $mp3_genres[$1];
+                    } else {
+                        my $data1 = $v2->{$id};
 
-						# this is tricky ... if this is an arrayref,
-						# we want to only return one, so we pick the
-						# first one.  but if it is a comment, we pick
-						# the first one where the first charcter after
-						# the language is NULL and not an additional
-						# sub-comment, because that is most likely to be
-						# the user-supplied comment
-						if (ref $data1 && !$raw_v2) {
-							if ($id =~ /^COMM?$/) {
-								my($newdata) = grep /^(....\000)/, @{$data1};
-								$data1 = $newdata || $data1->[0];
-							} else {
-								$data1 = $data1->[0];
-							}
-						}
+                        # this is tricky ... if this is an arrayref, we want
+                        # to only return one, so we pick the first one.  but
+                        # if it is a comment, we pick the first one where the
+                        # first charcter after the language is NULL and not an
+                        # additional sub-comment, because that is most likely
+                        # to be the user-supplied comment
 
-						$data1 = [ $data1 ] if ! ref $data1;
+                        if (ref $data1 && !$raw_v2) {
+                            if ($id =~ /^COMM?$/) {
+                                my($newdata) = grep /^(....\000)/, @{$data1};
+                                $data1 = $newdata || $data1->[0];
+                            } else {
+                                $data1 = $data1->[0];
+                            }
+                        }
 
-						for my $data (@$data1) {
-							$data =~ s/^(.)//; # strip first char (text encoding)
-							my $encoding = $1;
-							my $desc;
-							if ($id =~ /^COM[M ]?$/) {
-								$data =~ s/^(?:...)//;		# strip language
-								$data =~ s/^(.*?)\000+//;	# strip up to first NULL(s),
-												# for sub-comment
-								$desc = $1;
-							}
+                        $data1 = [ $data1 ] if ! ref $data1;
 
-							if ($UNICODE) {
-								if ($encoding eq "\001" || $encoding eq "\002") {  # UTF-16, UTF-16BE
-									my $u = Unicode::String::utf16($data);
-									$data = $u->utf8;
-									$data =~ s/^\xEF\xBB\xBF//;	# strip BOM
-								} elsif ($encoding eq "\000") {
-									my $u = Unicode::String::latin1($data);
-									$data = $u->utf8;
-								}
-							}
+                        for my $data (@$data1) {
+                            $data =~ s/^(.)//; # strip first char (text encoding)
+                            my $encoding = $1;
+                            my $desc;
+                            if ($id =~ /^COM[M ]?$/) {
+                                $data =~ s/^(?:...)//;		# strip language
+                                $data =~ s/^(.*?)\000+//;	# strip up to first NULL(s),
+                                # for sub-comment
+                                $desc = $1;
+                            }
+                            
+                            if ($UNICODE) {
+                                if ($encoding eq "\001" || $encoding eq "\002") {  # UTF-16, UTF-16BE
+                                    my $u = Unicode::String::utf16($data);
+                                    $data = $u->utf8;
+                                    $data =~ s/^\xEF\xBB\xBF//;	# strip BOM
+                                } elsif ($encoding eq "\000") {
+                                    my $u = Unicode::String::latin1($data);
+                                    $data = $u->utf8;
+                                }
+                            }
+                            
+                            if ($raw_v2 == 2 && $desc) {
+                                $data = { $desc => $data };
+                            }
+                            
+                            if ($raw_v2 == 2 && exists $info{$hash->{$id}}) {
+                                if (ref $info{$hash->{$id}} eq 'ARRAY') {
+                                    push @{$info{$hash->{$id}}}, $data;
+                                } else {
+                                    $info{$hash->{$id}} = [ $info{$hash->{$id}}, $data ];
+                                }
+                            } else {
+                                $info{$hash->{$id}} = $data;
+                            }
+                        }
+                    }
+                }
+            }
+            if ($ver == 0 && $info{TAGVERSION}) {
+                $info{TAGVERSION} .= ' / ' . $v2h->{version};
+            } else {
+                $info{TAGVERSION} = $v2h->{version};
+            }
+        }
+    }
 
-							if ($raw_v2 == 2 && $desc) {
-								$data = { $desc => $data };
-							}
+    unless ($raw_v2 && $ver == 2) {
+        foreach my $key (keys %info) {
+            if (defined $info{$key}) {
+                $info{$key} =~ s/\000+.*//g;
+                $info{$key} =~ s/\s+$//;
+            }
+        }
+        
+        for (@v1_tag_names) {
+            $info{$_} = '' unless defined $info{$_};
+        }
+    }
 
-							if ($raw_v2 == 2 && exists $info{$hash->{$id}}) {
-								if (ref $info{$hash->{$id}} eq 'ARRAY') {
-									push @{$info{$hash->{$id}}}, $data;
-								} else {
-									$info{$hash->{$id}} = [ $info{$hash->{$id}}, $data ];
-								}
-							} else {
-								$info{$hash->{$id}} = $data;
-							}
-						}
-					}
-				}
-			}
-			if ($ver == 0 && $info{TAGVERSION}) {
-				$info{TAGVERSION} .= ' / ' . $v2h->{version};
-			} else {
-				$info{TAGVERSION} = $v2h->{version};
-			}
-		}
-	}
+    if (keys %info && exists $info{GENRE} && ! defined $info{GENRE}) {
+        $info{GENRE} = '';
+    }
 
-	unless ($raw_v2 && $ver == 2) {
-		foreach my $key (keys %info) {
-			if (defined $info{$key}) {
-				$info{$key} =~ s/\000+.*//g;
-				$info{$key} =~ s/\s+$//;
-			}
-		}
+    _close($file, $fh);
 
-		for (@v1_tag_names) {
-			$info{$_} = '' unless defined $info{$_};
-		}
-	}
-
-	if (keys %info && exists $info{GENRE} && ! defined $info{GENRE}) {
-		$info{GENRE} = '';
-	}
-
-	_close($file, $fh);
-
-	return keys %info ? {%info} : undef;
+    return keys %info ? {%info} : undef;
 }
 
 sub _get_v2tag {
-	my($fh) = @_;
-	my($off, $myseek, $myseek_22, $myseek_23, $v2, $h, $hlen, $num);
-	$h = {};
+    my($fh) = @_;
+    my($off, $myseek, $myseek_22, $myseek_23, $v2, $h, $hlen, $num);
+    $h = {};
 
-	$v2 = _get_v2head($fh) or return;
-	if ($v2->{major_version} < 2) {
-		warn "This is $v2->{version}; " .
-		     "ID3v2 versions older than ID3v2.2.0 not supported\n"
-		     if $^W;
-		return;
-	}
+    $v2 = _get_v2head($fh) or return;
+    if ($v2->{major_version} < 2) {
+        warn "This is $v2->{version}; " .
+            "ID3v2 versions older than ID3v2.2.0 not supported\n"
+            if $^W;
+        return;
+    }
 
-	if ($v2->{major_version} == 2) {
-		$hlen = 6;
-		$num = 3;
-	} else {
-		$hlen = 10;
-		$num = 4;
-	}
+    if ($v2->{major_version} == 2) {
+        $hlen = 6;
+        $num = 3;
+    } else {
+        $hlen = 10;
+        $num = 4;
+    }
 
-	$myseek = sub {
-		seek $fh, $off, 0;
-		read $fh, my($bytes), $hlen;
-		return unless $bytes =~ /^([A-Z0-9]{$num})/
-			|| ($num == 4 && $bytes =~ /^(COM )/);  # stupid iTunes
-		my($id, $size) = ($1, $hlen);
-		my @bytes = reverse unpack "C$num", substr($bytes, $num, $num);
-		for my $i (0 .. ($num - 1)) {
-			$size += $bytes[$i] * 256 ** $i;
-		}
-		return($id, $size);
-	};
+    $myseek = sub {
+        seek $fh, $off, 0;
+        read $fh, my($bytes), $hlen;
+        return unless $bytes =~ /^([A-Z0-9]{$num})/
+            || ($num == 4 && $bytes =~ /^(COM )/);  # stupid iTunes
+        my($id, $size) = ($1, $hlen);
+        my @bytes = reverse unpack "C$num", substr($bytes, $num, $num);
+        for my $i (0 .. ($num - 1)) {
+            $size += $bytes[$i] * 256 ** $i;
+        }
+        return($id, $size);
+    };
 
-	$off = $v2->{ext_header_size} + 10;
+    $off = $v2->{ext_header_size} + 10;
 
-	while ($off < $v2->{tag_size}) {
-		my($id, $size) = &$myseek or last;
-		seek $fh, $off + $hlen, 0;
-		read $fh, my($bytes), $size - $hlen;
-		if (exists $h->{$id}) {
-			if (ref $h->{$id} eq 'ARRAY') {
-				push @{$h->{$id}}, $bytes;
-			} else {
-				$h->{$id} = [$h->{$id}, $bytes];
-			}
-		} else {
-			$h->{$id} = $bytes;
-		}
-		$off += $size;
-	}
+    while ($off < $v2->{tag_size}) {
+        my($id, $size) = &$myseek or last;
+        seek $fh, $off + $hlen, 0;
+        read $fh, my($bytes), $size - $hlen;
+        if (exists $h->{$id}) {
+            if (ref $h->{$id} eq 'ARRAY') {
+                push @{$h->{$id}}, $bytes;
+            } else {
+                $h->{$id} = [$h->{$id}, $bytes];
+            }
+        } else {
+            $h->{$id} = $bytes;
+        }
+        $off += $size;
+    }
 
-	return($h, $v2);
+    return($h, $v2);
 }
 
 
@@ -1143,292 +1143,292 @@ On error, returns nothing and sets C<$@>.
 =cut
 
 sub get_mp3info {
-	my($file) = @_;
-	my($off, $myseek, $byte, $eof, $h, $tot, $fh);
+    my($file) = @_;
+    my($off, $myseek, $byte, $eof, $h, $tot, $fh);
 
-	if (not (defined $file && $file ne '')) {
-		$@ = "No file specified";
-		return undef;
-	}
+    if (not (defined $file && $file ne '')) {
+        $@ = "No file specified";
+        return undef;
+    }
 
-	if (not -s $file) {
-		$@ = "File is empty";
-		return undef;
-	}
+    if (not -s $file) {
+        $@ = "File is empty";
+        return undef;
+    }
 
-	if (ref $file) { # filehandle passed
-		$fh = $file;
-	} else {
-		$fh = gensym;
-		if (not open $fh, "< $file\0") {
-			$@ = "Can't open $file: $!";
-			return undef;
-		}
-	}
+    if (ref $file) { # filehandle passed
+        $fh = $file;
+    } else {
+        $fh = gensym;
+        if (not open $fh, "< $file\0") {
+            $@ = "Can't open $file: $!";
+            return undef;
+        }
+    }
 
-	$off = 0;
-	$tot = 4096;
+    $off = 0;
+    $tot = 4096;
 
-	$myseek = sub {
-		seek $fh, $off, 0;
-		read $fh, $byte, 4;
-	};
+    $myseek = sub {
+        seek $fh, $off, 0;
+        read $fh, $byte, 4;
+    };
 
-	binmode $fh;
-	&$myseek;
+    binmode $fh;
+    &$myseek;
 
-	if ($off == 0) {
-		if (my $id3v2 = _get_v2head($fh)) {
-			$tot += $off += $id3v2->{tag_size};
-			&$myseek;
-		}
-	}
+    if ($off == 0) {
+        if (my $id3v2 = _get_v2head($fh)) {
+            $tot += $off += $id3v2->{tag_size};
+            &$myseek;
+        }
+    }
 
-	$h = _get_head($byte);
-	until (_is_mp3($h)) {
-		$off++;
-		&$myseek;
-		$h = _get_head($byte);
-		if ($off > $tot && !$try_harder) {
-			_close($file, $fh);
-			$@ = "Couldn't find MP3 header (perhaps set " .
-			     '$MP3::Info::try_harder and retry)';
-			return undef;
-		}
-	}
+    $h = _get_head($byte);
+    until (_is_mp3($h)) {
+        $off++;
+        &$myseek;
+        $h = _get_head($byte);
+        if ($off > $tot && !$try_harder) {
+            _close($file, $fh);
+            $@ = "Couldn't find MP3 header (perhaps set " .
+                '$MP3::Info::try_harder and retry)';
+            return undef;
+        }
+    }
 
-	my $vbr = _get_vbr($fh, $h, \$off);
+    my $vbr = _get_vbr($fh, $h, \$off);
 
-	seek $fh, 0, 2;
-	$eof = tell $fh;
-	seek $fh, -128, 2;
-	$off += 128 if <$fh> =~ /^TAG/ ? 1 : 0;
+    seek $fh, 0, 2;
+    $eof = tell $fh;
+    seek $fh, -128, 2;
+    $off += 128 if <$fh> =~ /^TAG/ ? 1 : 0;
 
-	_close($file, $fh);
+    _close($file, $fh);
 
-	$h->{size} = $eof - $off;
+    $h->{size} = $eof - $off;
 
-	return _get_info($h, $vbr);
+    return _get_info($h, $vbr);
 }
 
 sub _get_info {
-	my($h, $vbr) = @_;
-	my $i;
+    my($h, $vbr) = @_;
+    my $i;
 
-	$i->{VERSION}	= $h->{IDR} == 2 ? 2 : $h->{IDR} == 3 ? 1 :
-				$h->{IDR} == 0 ? 2.5 : 0;
-	$i->{LAYER}	= 4 - $h->{layer};
-	$i->{VBR}	= defined $vbr ? 1 : 0;
+    $i->{VERSION}	= $h->{IDR} == 2 ? 2 : $h->{IDR} == 3 ? 1 :
+        $h->{IDR} == 0 ? 2.5 : 0;
+    $i->{LAYER}	= 4 - $h->{layer};
+    $i->{VBR}	= defined $vbr ? 1 : 0;
 
-	$i->{COPYRIGHT}	= $h->{copyright} ? 1 : 0;
-	$i->{PADDING}	= $h->{padding_bit} ? 1 : 0;
-	$i->{STEREO}	= $h->{mode} == 3 ? 0 : 1;
-	$i->{MODE}	= $h->{mode};
+    $i->{COPYRIGHT}	= $h->{copyright} ? 1 : 0;
+    $i->{PADDING}	= $h->{padding_bit} ? 1 : 0;
+    $i->{STEREO}	= $h->{mode} == 3 ? 0 : 1;
+    $i->{MODE}	= $h->{mode};
 
-	$i->{SIZE}	= $vbr && $vbr->{bytes} ? $vbr->{bytes} : $h->{size};
+    $i->{SIZE}	= $vbr && $vbr->{bytes} ? $vbr->{bytes} : $h->{size};
 
-	my $mfs		= $h->{fs} / ($h->{ID} ? 144000 : 72000);
-	$i->{FRAMES}	= int($vbr && $vbr->{frames}
-				? $vbr->{frames}
-				: $i->{SIZE} / $h->{bitrate} / $mfs
-			  );
+    my $mfs		= $h->{fs} / ($h->{ID} ? 144000 : 72000);
+    $i->{FRAMES}	= int($vbr && $vbr->{frames}
+                              ? $vbr->{frames}
+                              : $i->{SIZE} / $h->{bitrate} / $mfs
+                              );
 
-	if ($vbr) {
-		$i->{VBR_SCALE}	= $vbr->{scale} if $vbr->{scale};
-		$h->{bitrate}	= $i->{SIZE} / $i->{FRAMES} * $mfs;
-		if (not $h->{bitrate}) {
-			$@ = "Couldn't determine VBR bitrate";
-			return undef;
-		}
-	}
+    if ($vbr) {
+        $i->{VBR_SCALE}	= $vbr->{scale} if $vbr->{scale};
+        $h->{bitrate}	= $i->{SIZE} / $i->{FRAMES} * $mfs;
+        if (not $h->{bitrate}) {
+            $@ = "Couldn't determine VBR bitrate";
+            return undef;
+        }
+    }
 
-	$h->{'length'}	= ($i->{SIZE} * 8) / $h->{bitrate} / 10;
-	$i->{SECS}	= $h->{'length'} / 100;
-	$i->{MM}	= int $i->{SECS} / 60;
-	$i->{SS}	= int $i->{SECS} % 60;
-	$i->{MS}	= (($i->{SECS} - ($i->{MM} * 60) - $i->{SS}) * 1000);
+    $h->{'length'}	= ($i->{SIZE} * 8) / $h->{bitrate} / 10;
+    $i->{SECS}	= $h->{'length'} / 100;
+    $i->{MM}	= int $i->{SECS} / 60;
+    $i->{SS}	= int $i->{SECS} % 60;
+    $i->{MS}	= (($i->{SECS} - ($i->{MM} * 60) - $i->{SS}) * 1000);
 #	$i->{LF}	= ($i->{MS} / 1000) * ($i->{FRAMES} / $i->{SECS});
 #	int($i->{MS} / 100 * 75);  # is this right?
-	$i->{TIME}	= sprintf "%.2d:%.2d", @{$i}{'MM', 'SS'};
+    $i->{TIME}	= sprintf "%.2d:%.2d", @{$i}{'MM', 'SS'};
 
-	$i->{BITRATE}		= int $h->{bitrate};
+    $i->{BITRATE}		= int $h->{bitrate};
 	# should we just return if ! FRAMES?
-	$i->{FRAME_LENGTH}	= int($h->{size} / $i->{FRAMES}) if $i->{FRAMES};
-	$i->{FREQUENCY}		= $frequency_tbl[3 * $h->{IDR} + $h->{sampling_freq}];
+    $i->{FRAME_LENGTH}	= int($h->{size} / $i->{FRAMES}) if $i->{FRAMES};
+    $i->{FREQUENCY}		= $frequency_tbl[3 * $h->{IDR} + $h->{sampling_freq}];
 
-	return $i;
+    return $i;
 }
 
 sub _get_head {
-	my($byte) = @_;
-	my($bytes, $h);
+    my($byte) = @_;
+    my($bytes, $h);
 
-	$bytes = _unpack_head($byte);
-	@$h{qw(IDR ID layer protection_bit
-		bitrate_index sampling_freq padding_bit private_bit
-		mode mode_extension copyright original
-		emphasis version_index bytes)} = (
+    $bytes = _unpack_head($byte);
+    @$h{qw(IDR ID layer protection_bit
+           bitrate_index sampling_freq padding_bit private_bit
+           mode mode_extension copyright original
+           emphasis version_index bytes)} = (
 		($bytes>>19)&3, ($bytes>>19)&1, ($bytes>>17)&3, ($bytes>>16)&1,
 		($bytes>>12)&15, ($bytes>>10)&3, ($bytes>>9)&1, ($bytes>>8)&1,
 		($bytes>>6)&3, ($bytes>>4)&3, ($bytes>>3)&1, ($bytes>>2)&1,
 		$bytes&3, ($bytes>>19)&3, $bytes
 	);
 
-	$h->{bitrate} = $t_bitrate[$h->{ID}][3 - $h->{layer}][$h->{bitrate_index}];
-	$h->{fs} = $t_sampling_freq[$h->{IDR}][$h->{sampling_freq}];
+    $h->{bitrate} = $t_bitrate[$h->{ID}][3 - $h->{layer}][$h->{bitrate_index}];
+    $h->{fs} = $t_sampling_freq[$h->{IDR}][$h->{sampling_freq}];
 
-	return $h;
+    return $h;
 }
 
 sub _is_mp3 {
-	my $h = $_[0] or return undef;
-	return ! (	# all below must be false
-		 $h->{bitrate_index} == 0
-			||
-		 $h->{version_index} == 1
-			||
+    my $h = $_[0] or return undef;
+    return ! (	# all below must be false
+                $h->{bitrate_index} == 0
+                ||
+                $h->{version_index} == 1
+                ||
 		($h->{bytes} & 0xFFE00000) != 0xFFE00000
-			||
+                ||
 		!$h->{fs}
-			||
+                ||
 		!$h->{bitrate}
-			||
-		 $h->{bitrate_index} == 15
-			||
+                ||
+                $h->{bitrate_index} == 15
+                ||
 		!$h->{layer}
-			||
-		 $h->{sampling_freq} == 3
-			||
-		 $h->{emphasis} == 2
-			||
+                ||
+                $h->{sampling_freq} == 3
+                ||
+                $h->{emphasis} == 2
+                ||
 		!$h->{bitrate_index}
-			||
+                ||
 		($h->{bytes} & 0xFFFF0000) == 0xFFFE0000
-			||
+                ||
 		($h->{ID} == 1 && $h->{layer} == 3 && $h->{protection_bit} == 1)
-			||
+                ||
 		($h->{mode_extension} != 0 && $h->{mode} != 1)
-	);
+                );
 }
 
 sub _get_vbr {
-	my($fh, $h, $roff) = @_;
-	my($off, $bytes, @bytes, $myseek, %vbr);
+    my($fh, $h, $roff) = @_;
+    my($off, $bytes, @bytes, $myseek, %vbr);
 
-	$off = $$roff;
-	@_ = ();	# closure confused if we don't do this
+    $off = $$roff;
+    @_ = ();	# closure confused if we don't do this
 
-	$myseek = sub {
-		my $n = $_[0] || 4;
-		seek $fh, $off, 0;
-		read $fh, $bytes, $n;
-		$off += $n;
-	};
+    $myseek = sub {
+        my $n = $_[0] || 4;
+        seek $fh, $off, 0;
+        read $fh, $bytes, $n;
+        $off += $n;
+    };
 
-	$off += 4;
+    $off += 4;
 
-	if ($h->{ID}) {	# MPEG1
-		$off += $h->{mode} == 3 ? 17 : 32;
-	} else {	# MPEG2
-		$off += $h->{mode} == 3 ? 9 : 17;
-	}
+    if ($h->{ID}) {	# MPEG1
+        $off += $h->{mode} == 3 ? 17 : 32;
+    } else {	# MPEG2
+        $off += $h->{mode} == 3 ? 9 : 17;
+    }
 
-	&$myseek;
-	return unless $bytes eq 'Xing';
+    &$myseek;
+    return unless $bytes eq 'Xing';
 
-	&$myseek;
-	$vbr{flags} = _unpack_head($bytes);
+    &$myseek;
+    $vbr{flags} = _unpack_head($bytes);
 
-	if ($vbr{flags} & 1) {
-		&$myseek;
-		$vbr{frames} = _unpack_head($bytes);
-	}
+    if ($vbr{flags} & 1) {
+        &$myseek;
+        $vbr{frames} = _unpack_head($bytes);
+    }
 
-	if ($vbr{flags} & 2) {
-		&$myseek;
-		$vbr{bytes} = _unpack_head($bytes);
-	}
+    if ($vbr{flags} & 2) {
+        &$myseek;
+        $vbr{bytes} = _unpack_head($bytes);
+    }
 
-	if ($vbr{flags} & 4) {
-		$myseek->(100);
+    if ($vbr{flags} & 4) {
+        $myseek->(100);
 # Not used right now ...
 #		$vbr{toc} = _unpack_head($bytes);
-	}
+    }
 
-	if ($vbr{flags} & 8) { # (quality ind., 0=best 100=worst)
-		&$myseek;
-		$vbr{scale} = _unpack_head($bytes);
-	} else {
-		$vbr{scale} = -1;
-	}
+    if ($vbr{flags} & 8) { # (quality ind., 0=best 100=worst)
+        &$myseek;
+        $vbr{scale} = _unpack_head($bytes);
+    } else {
+        $vbr{scale} = -1;
+    }
 
-	$$roff = $off;
-	return \%vbr;
+    $$roff = $off;
+    return \%vbr;
 }
 
 sub _get_v2head {
-	my $fh = $_[0] or return;
-	my($h, $bytes, @bytes);
+    my $fh = $_[0] or return;
+    my($h, $bytes, @bytes);
 
-	# check first three bytes for 'ID3'
-	seek $fh, 0, 0;
-	read $fh, $bytes, 3;
-	return unless $bytes eq 'ID3';
+    # check first three bytes for 'ID3'
+    seek $fh, 0, 0;
+    read $fh, $bytes, 3;
+    return unless $bytes eq 'ID3';
 
-	# get version
-	read $fh, $bytes, 2;
-	$h->{version} = sprintf "ID3v2.%d.%d",
-		@$h{qw[major_version minor_version]} =
-			unpack 'c2', $bytes;
+    # get version
+    read $fh, $bytes, 2;
+    $h->{version} = sprintf "ID3v2.%d.%d",
+    @$h{qw[major_version minor_version]} =
+        unpack 'c2', $bytes;
 
-	# get flags
-	read $fh, $bytes, 1;
-	if ($h->{major_version} == 2) {
-		@$h{qw[unsync compression]} =
-			(unpack 'b8', $bytes)[7, 6];
-		$h->{ext_header} = 0;
-		$h->{experimental} = 0;
-	} else {
-		@$h{qw[unsync ext_header experimental]} =
-			(unpack 'b8', $bytes)[7, 6, 5];
-	}
+    # get flags
+    read $fh, $bytes, 1;
+    if ($h->{major_version} == 2) {
+        @$h{qw[unsync compression]} =
+            (unpack 'b8', $bytes)[7, 6];
+        $h->{ext_header} = 0;
+        $h->{experimental} = 0;
+    } else {
+        @$h{qw[unsync ext_header experimental]} =
+            (unpack 'b8', $bytes)[7, 6, 5];
+    }
 
-	# get ID3v2 tag length from bytes 7-10
-	$h->{tag_size} = 10;	# include ID3v2 header size
-	read $fh, $bytes, 4;
-	@bytes = reverse unpack 'C4', $bytes;
-	foreach my $i (0 .. 3) {
-		# whoaaaaaa nellllllyyyyyy!
-		$h->{tag_size} += $bytes[$i] * 128 ** $i;
-	}
+    # get ID3v2 tag length from bytes 7-10
+    $h->{tag_size} = 10;	# include ID3v2 header size
+    read $fh, $bytes, 4;
+    @bytes = reverse unpack 'C4', $bytes;
+    foreach my $i (0 .. 3) {
+        # whoaaaaaa nellllllyyyyyy!
+        $h->{tag_size} += $bytes[$i] * 128 ** $i;
+    }
 
-	# get extended header size
-	$h->{ext_header_size} = 0;
-	if ($h->{ext_header}) {
-		$h->{ext_header_size} += 10;
-		read $fh, $bytes, 4;
-		@bytes = reverse unpack 'C4', $bytes;
-		for my $i (0..3) {
-			$h->{ext_header_size} += $bytes[$i] * 256 ** $i;
-		}
-	}
+    # get extended header size
+    $h->{ext_header_size} = 0;
+    if ($h->{ext_header}) {
+        $h->{ext_header_size} += 10;
+        read $fh, $bytes, 4;
+        @bytes = reverse unpack 'C4', $bytes;
+        for my $i (0..3) {
+            $h->{ext_header_size} += $bytes[$i] * 256 ** $i;
+        }
+    }
 
-	return $h;
+    return $h;
 }
 
 sub _unpack_head {
-	unpack('l', pack('L', unpack('N', $_[0])));
+    unpack('l', pack('L', unpack('N', $_[0])));
 }
 
 sub _close {
-	my($file, $fh) = @_;
-	unless (ref $file) { # filehandle not passed
-		close $fh or warn "Problem closing '$file': $!";
-	}
+    my($file, $fh) = @_;
+    unless (ref $file) { # filehandle not passed
+        close $fh or warn "Problem closing '$file': $!";
+    }
 }
 
 BEGIN {
-	@mp3_genres = (
+    @mp3_genres = (
 		'Blues',
 		'Classic Rock',
 		'Country',
@@ -1583,7 +1583,7 @@ BEGIN {
 		'Synthpop',
 	);
 
-	@t_bitrate = ([
+    @t_bitrate = ([
 		[0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256],
 		[0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160],
 		[0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160]
@@ -1593,17 +1593,17 @@ BEGIN {
 		[0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320]
 	]);
 
-	@t_sampling_freq = (
-		[11025, 12000,  8000],
-		[undef, undef, undef],	# reserved
-		[22050, 24000, 16000],
-		[44100, 48000, 32000]
-	);
+    @t_sampling_freq = (
+                        [11025, 12000,  8000],
+                        [undef, undef, undef],	# reserved
+                        [22050, 24000, 16000],
+                        [44100, 48000, 32000]
+                        );
 
-	@frequency_tbl = map { $_ ? eval "${_}e-3" : 0 }
+    @frequency_tbl = map { $_ ? eval "${_}e-3" : 0 }
 		map { @$_ } @t_sampling_freq;
 
-	@mp3_info_fields = qw(
+    @mp3_info_fields = qw(
 		VERSION
 		LAYER
 		STEREO
@@ -1624,12 +1624,12 @@ BEGIN {
 		VBR_SCALE
 	);
 
-	%v1_tag_fields =
-		(TITLE => 30, ARTIST => 30, ALBUM => 30, COMMENT => 30, YEAR => 4);
+    %v1_tag_fields =
+        (TITLE => 30, ARTIST => 30, ALBUM => 30, COMMENT => 30, YEAR => 4);
 
-	@v1_tag_names = qw(TITLE ARTIST ALBUM YEAR COMMENT TRACKNUM GENRE);
+    @v1_tag_names = qw(TITLE ARTIST ALBUM YEAR COMMENT TRACKNUM GENRE);
 
-	%v2_to_v1_names = (
+    %v2_to_v1_names = (
 		# v2.2 tags
 		'TT2' => 'TITLE',
 		'TP1' => 'ARTIST',
@@ -1648,7 +1648,7 @@ BEGIN {
 		'TCON' => 'GENRE',
 	);
 
-	%v2_tag_names = (
+    %v2_tag_names = (
 		# v2.2 tags
 		'BUF' => 'Recommended buffer size',
 		'CNT' => 'Play counter',
