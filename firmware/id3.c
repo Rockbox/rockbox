@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include "file.h"
+#include "debug.h"
 
 #include "id3.h"
 
@@ -489,20 +490,18 @@ mp3info(struct mp3entry *entry, char *filename)
 
     memset(entry, 0, sizeof(struct mp3entry));
 
-    entry->path = filename;
-
-    entry->filesize = getfilesize(fd);
-    entry->id3v2len = getid3v2len(fd);
-    entry->id3v1len = getid3v1len(fd);
-    entry->length = getsonglength(fd, entry);
     entry->title = NULL;
 
-    
+    entry->id3v2len = getid3v2len(fd);
     if(HASID3V2(entry))
         setid3v2title(fd, entry);
+    entry->length = getsonglength(fd, entry);
 
+    entry->id3v1len = getid3v1len(fd);
     if(HASID3V1(entry) && !entry->title)
         setid3v1title(fd, entry);
+
+    entry->filesize = getfilesize(fd);
 
     close(fd);
 
