@@ -52,7 +52,7 @@ static int onplay_result = ONPLAY_OK;
 
 static bool list_viewers(void)
 {
-    struct menu_item menu[8];
+    struct menu_item menu[16];
     int m, i, result;
     int ret = 0;
 
