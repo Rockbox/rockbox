@@ -326,7 +326,9 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     /* clear screen */
     lcd_clear_display ();
+#ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
+#endif
     /* output exception */
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
     snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
