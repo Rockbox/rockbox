@@ -28,6 +28,16 @@
 #include "usb.h"
 #include "power.h"
 
+/* Define one of USE_STANDBY, USE_SLEEP or USE_POWEROFF */
+#define USE_STANDBY
+
+/* We can only use power off on the recorder */
+#if !defined(ARCHOS_RECORDER) && defined(USE_POWEROFF)
+#undef USE_POWEROFF
+#define USE_STANDBY
+#endif
+
+
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
@@ -80,6 +90,10 @@ static char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
 
+#ifdef USE_POWEROFF
+static int ata_power_on(void);
+#endif
+
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
@@ -131,12 +145,19 @@ int ata_read_sectors(unsigned long start,
     int i;
     int ret = 0;
 
+#ifndef USE_STANDBY
     if ( sleeping ) {
+#ifdef USE_POWEROFF
+        if (ata_power_on()) {
+            return -1;
+        }
+#else
         if (ata_soft_reset()) {
             return -1;
         }
+#endif
     }
-
+#endif
     mutex_lock(&ata_mtx);
     sleep_timer = sleep_timeout;
 
@@ -188,12 +209,17 @@ int ata_write_sectors(unsigned long start,
 {
     int i;
 
-    if ( sleeping ) {
+#ifndef USE_STANDBY
+#ifdef USE_POWEROFF
+        if (ata_power_on()) {
+            return -1;
+        }
+#else
         if (ata_soft_reset()) {
             return -1;
         }
-    }
-
+#endif
+#endif
     mutex_lock(&ata_mtx);
     sleep_timer = sleep_timeout;
     
@@ -291,11 +317,15 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-#ifdef ATA_POWER_OFF
+#ifdef USE_POWEROFF
     ide_power_enable(false);
 #else
     ATA_SELECT = ata_device;
+#ifdef USE_SLEEP
+    ATA_COMMAND = CMD_SLEEP;
+#else
     ATA_COMMAND = CMD_STANDBY;
+#endif
 
     if (!wait_for_rdy())
         ret = -1;
@@ -373,17 +403,13 @@ int ata_soft_reset(void)
     
     mutex_lock(&ata_mtx);
 
-#ifdef ATA_POWER_OFF
-    ide_power_enable(true);
-    sleep(HZ);
-#else
     ATA_SELECT = SELECT_LBA | ata_device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
 
     ATA_CONTROL = CONTROL_nIEN;
     sleep(HZ/400); /* >2ms */
-#endif
+
     /* This little sucker can take up to 30 seconds */
     retry_count = 8;
     do
@@ -398,6 +424,35 @@ int ata_soft_reset(void)
     mutex_unlock(&ata_mtx);
     return ret;
 }
+
+#ifdef USE_POWEROFF
+static int ata_power_on(void)
+{
+    int ret;
+    int retry_count;
+    
+    mutex_lock(&ata_mtx);
+
+    ide_power_enable(true);
+    sleep(HZ/2);
+
+    ATA_CONTROL = CONTROL_nIEN;
+
+    /* This little sucker can take up to 30 seconds */
+    retry_count = 8;
+    do
+    {
+        ret = wait_for_rdy();
+    } while(!ret && retry_count--);
+
+    /* Massage the return code so it is 0 on success and -1 on failure */
+    ret = ret?0:-1;
+
+    sleeping = false;
+    mutex_unlock(&ata_mtx);
+    return ret;
+}
+#endif
 
 static int master_slave_detect(void)
 {
