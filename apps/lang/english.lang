@@ -2881,17 +2881,17 @@ new:
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
-voice: "Artists"
+voice: ""
 new:
 
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
 eng: "Albums"
-voice: "Albums"
+voice: ""
 new:
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
 eng: "Songs"
-voice: "Songs"
+voice: ""
 new:

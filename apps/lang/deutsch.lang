@@ -2867,18 +2867,18 @@ new: "ID3-Datenbank"
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
-voice: "Künstler"
+voice: ""
 new: "Künstler"
 
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
 eng: "Albums"
-voice: "Alben"
+voice: ""
 new: "Alben"
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
 eng: "Songs"
-voice: "Titel"
+voice: ""
 new: "Titel"
 
