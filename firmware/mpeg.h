@@ -24,6 +24,8 @@ void mpeg_play(char* trackname);
 void mpeg_stop(void);
 void mpeg_pause(void);
 void mpeg_resume(void);
+void mpeg_next(void);
+void mpeg_prev(void);
 void mpeg_volume(int percent);
 void mpeg_bass(int percent);
 void mpeg_treble(int percent);

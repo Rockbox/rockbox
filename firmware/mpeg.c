@@ -38,9 +38,12 @@
 #define MPEG_STOP         2
 #define MPEG_PAUSE        3
 #define MPEG_RESUME       4
+#define MPEG_NEXT         5
+#define MPEG_PREV         6
 #define MPEG_NEED_DATA    100
 
 extern char* peek_next_track(int type);
+extern char* peek_prev_track(int type);
 
 #ifndef ARCHOS_RECORDER
 static unsigned int bass_table[] =
@@ -311,11 +314,16 @@ void IMIA1(void)
     TSR1 &= ~0x01;
 }
 
-static int new_file(void)
+/* If next_track is true, opens the next track, if false, opens prev track */
+static int new_file(bool next_track)
 {
     char *trackname;
 
-    trackname = peek_next_track(0);
+    if (next_track)
+        trackname = peek_next_track(0);
+    else
+        trackname = peek_prev_track(0);
+
     if ( !trackname )
         return -1;
 
@@ -419,6 +427,56 @@ static void mpeg_thread(void)
                 start_dma();
                 break;
 
+            case MPEG_NEXT:
+                DEBUGF("MPEG_NEXT\n");
+                /* stop the current stream */
+                play_pending = false;
+                playing = false;
+                stop_dma();
+
+                reset_mp3_buffer();
+                /* Open the next file */
+                if (mpeg_file >= 0)
+                    close(mpeg_file);
+                if (new_file(true) < 0) {
+                     DEBUGF("Finished Playing!\n");
+                     filling = false;
+                } else {
+                     /* Make it read more data */
+                     filling = true;
+                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+                     /* Tell the file loading code that we want to start playing
+                        as soon as we have some data */
+                     play_pending = true;
+                }
+                break;
+
+            case MPEG_PREV:
+                DEBUGF("MPEG_PREV\n");
+                /* stop the current stream */
+                play_pending = false;
+                playing = false;
+                stop_dma();
+
+                reset_mp3_buffer();
+                /* Open the next file */
+                if (mpeg_file >= 0)
+                    close(mpeg_file);
+                if (new_file(false) < 0) {
+                     DEBUGF("Finished Playing!\n");
+                     filling = false;
+                } else {
+                     /* Make it read more data */
+                     filling = true;
+                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+                     /* Tell the file loading code that we want to start playing
+                        as soon as we have some data */
+                     play_pending = true;
+                }
+                break; 
+
             case MPEG_NEED_DATA:
                 free_space_left = mp3buf_read - mp3buf_write;
 
@@ -486,7 +544,7 @@ static void mpeg_thread(void)
                            boundary */
                         mp3buf_write = (mp3buf_write + 1) & 0xfffffffe;
 
-                        if(new_file() < 0)
+                        if(new_file(1) < 0)
                         {
                             /* No more data to play */
                             DEBUGF("Finished playing\n");
@@ -567,6 +625,16 @@ void mpeg_pause(void)
 void mpeg_resume(void)
 {
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
+}
+
+void mpeg_next(void)
+{
+    queue_post(&mpeg_queue, MPEG_NEXT, NULL);
+}
+
+void mpeg_prev(void)
+{
+    queue_post(&mpeg_queue, MPEG_PREV, NULL);
 }
 
 void mpeg_volume(int percent)
