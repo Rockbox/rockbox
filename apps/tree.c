@@ -42,9 +42,9 @@
 #include "status.h"
 #include "debug.h"
 #include "ata.h"
+#include "icons.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "icons.h"
 #include "widgets.h"
 #endif
 
@@ -102,7 +102,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
 #define TREE_MAX_ON_SCREEN   2
 #define TREE_MAX_LEN_DISPLAY 11 /* max length that fits on screen */
-#define LINE_X      1 /* X position the entry-list starts at */
+#define LINE_X      2 /* X position the entry-list starts at */
 #define LINE_Y      0 /* Y position the entry-list starts at */
 
 #define CURSOR_X    0
@@ -170,9 +170,11 @@ static int compare(const void* p1, const void* p2)
 
 static int showdir(char *path, int start)
 {
-#ifdef HAVE_LCD_BITMAP
     int icon_type = 0;
+#ifdef HAVE_LCD_BITMAP
     int line_height = LINE_HEIGTH;
+#else
+    char tmpstring[2];
 #endif
     int i;
     int tree_max_on_screen;
@@ -291,7 +293,6 @@ static int showdir(char *path, int start)
 
         len = strlen(dircache[i].name);
 
-#ifdef HAVE_LCD_BITMAP
         if ( dircache[i].attr & ATTR_DIRECTORY )
             icon_type = Folder;
         else if ( dircache[i].attr & TREE_ATTR_M3U )
@@ -303,10 +304,16 @@ static int showdir(char *path, int start)
         else
             icon_type = 0;
 
+#ifdef HAVE_LCD_BITMAP
         if (icon_type)
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
                        CURSOR_X * 6 + CURSOR_WIDTH, 
                        MARGIN_Y+(i-start)*line_height, 6, 8, true);
+#else
+        lcd_define_pattern(0,tree_icons_5x7[0],LastTreeIcon*8);
+        tmpstring[0] = icon_type;
+        tmpstring[1] = 0;
+        lcd_puts(LINE_X-1, i-start, tmpstring);
 #endif
 
         /* if MP3 filter is on, cut off the extension */
