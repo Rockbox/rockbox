@@ -52,8 +52,8 @@ int lang_load(const char *filename)
         if((language_buffer[0] == LANGUAGE_COOKIE) &&
            (language_buffer[1] == LANGUAGE_VERSION)) {
             unsigned char *ptr=&language_buffer[2];
-            lang_init();                    /* initialize with builtin */
             int id;
+            lang_init();                    /* initialize with builtin */
             filesize-=2;
 
             while(filesize>3) {
