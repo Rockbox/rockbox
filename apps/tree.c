@@ -907,6 +907,8 @@ static bool dirbrowse(char *root, int *dirfilter)
 
 #ifndef SIMULATOR
         if (boot_changed) {
+            bool stop = false;
+
             lcd_clear_display();
             lcd_puts(0,0,str(LANG_BOOT_CHANGED));
             lcd_puts(0,1,str(LANG_REBOOT_NOW));
@@ -915,8 +917,24 @@ static bool dirbrowse(char *root, int *dirfilter)
             lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
             lcd_update();
 #endif
-            if (button_get(true) == BUTTON_PLAY)
-                rolo_load("/" BOOTFILE);
+            while (!stop) {
+                switch (button_get(true)) {
+                    case BUTTON_PLAY:
+                        rolo_load("/" BOOTFILE);
+                        stop = true;
+                        break;
+
+                    case SYS_USB_CONNECTED:
+                        usb_screen();
+                        stop = true;
+                        break;
+
+                    default:
+                        stop = true;
+                        break;
+                 }
+            }
+
             restore = true;
             boot_changed = false;
         }
