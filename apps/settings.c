@@ -54,6 +54,7 @@ offset  abs
 0x0e    0x22    <shuffle mode & directory filter byte>
 0x0f    0x23    <scroll speed & WPS display byte>
 0x10    0x24    <playlist options byte>
+0x11    0x25    <AVC byte>
   
         <all unused space filled with 0xff>
 
@@ -216,6 +217,8 @@ int settings_save( void )
         ((global_settings.scroll_speed << 3) |
          (global_settings.wps_display & 7));
     
+    rtc_config_block[0x11] = (unsigned char)global_settings.avc;
+    
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
     memcpy(&rtc_config_block[0x28], &global_settings.total_boots, 2);
     
@@ -277,6 +280,9 @@ void settings_load(void)
         c = rtc_config_block[0xf] & 7;
         if (c != 7)
             global_settings.wps_display = c;
+        
+        if (rtc_config_block[0x11] != 0xFF)
+            global_settings.avc = rtc_config_block[0x11];
     
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
@@ -300,6 +306,7 @@ void settings_reset(void) {
     global_settings.treble      = mpeg_sound_default(SOUND_TREBLE);
     global_settings.loudness    = DEFAULT_LOUDNESS_SETTING;
     global_settings.bass_boost  = DEFAULT_BASS_BOOST_SETTING;
+    global_settings.avc         = DEFAULT_AVC_SETTING;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;

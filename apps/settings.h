@@ -38,7 +38,8 @@ struct user_settings
     int treble;     /* treble eq:            0-100 0=low   100=high          */
     int loudness;   /* loudness eq:          0-100 0=off   100=max           */
     int bass_boost; /* bass boost eq:        0-100 0=off   100=max           */
-
+    int avc;        /* auto volume correct:  0=disable, 1=2s 2=4s 3=8s       */
+    
     /* device settings */
 
     int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
@@ -94,6 +95,7 @@ extern struct user_settings global_settings;
 #define DEFAULT_TREBLE_SETTING     50/2
 #define DEFAULT_LOUDNESS_SETTING    0
 #define DEFAULT_BASS_BOOST_SETTING  0
+#define DEFAULT_AVC_SETTING         0
 #define DEFAULT_CONTRAST_SETTING    0
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5

@@ -128,6 +128,13 @@ static void bass_boost(void)
 {
     set_sound("Bass boost", &global_settings.bass_boost, SOUND_SUPERBASS);
 };
+
+static void avc(void)
+{
+    char* names[] = { "off", "2s ", "4s ", "8s " };
+    set_option("[AVC decay time]", &global_settings.avc, names, 4 );
+    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+}
 #endif /* ARCHOS_RECORDER */
 
 void sound_menu(void)
@@ -139,7 +146,8 @@ void sound_menu(void)
         { "Treble", treble },
 #ifdef ARCHOS_RECORDER
         { "Loudness", loudness },
-        { "Bass Boost", bass_boost }
+        { "Bass Boost", bass_boost },
+        { "AVC", avc }
 #endif
     };
     

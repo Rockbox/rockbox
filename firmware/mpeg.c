@@ -484,6 +484,7 @@ void IMIA1(void)
 static int new_file(bool next_track)
 {
     char *trackname;
+    int i;
 
     do {
         trackname = peek_next_track( next_track ? 1 : -1 );
@@ -503,6 +504,10 @@ static int new_file(bool next_track)
                 mp3info(&(id3tags[last_tag].id3), trackname);
                 id3tags[last_tag].mempos = mp3buf_write;
                 last_tag++;
+                for(i = 0;i < last_tag;i++)
+                {
+                    DEBUGF("nf: %d, %x\n", i, id3tags[i].mempos);
+                }
             }
         }
     } while ( mpeg_file < 0 );
@@ -800,10 +805,15 @@ static void mpeg_thread(void)
             case MPEG_TRACK_CHANGE:
                 DEBUGF("Track change\n");
 
+#ifdef ARCHOS_RECORDER
+                /* Reset the AVC */
+                mpeg_sound_set(SOUND_AVC, -1);
+#endif
                 /* shift array so index 0 is current track */
                 for (i=0; i<last_tag-1; i++)
                 {
                     id3tags[i] = id3tags[i+1];
+                    DEBUGF("tc: %d, %x\n", i, id3tags[i].mempos);
                 }
                 last_tag--;
                 break;
@@ -1038,6 +1048,28 @@ void mpeg_sound_set(int setting, int value)
             tmp = MAX(MIN(value * 4, 0x44), 0);
             mas_codec_writereg(MAS_REG_KLOUDNESS, (tmp & 0xff) << 8);
             break;
+            
+        case SOUND_AVC:
+            switch (value) {
+                case 1: /* 2s */
+                    tmp = (0x2 << 8) | (0x8 << 12);
+                    break;
+                case 2: /* 4s */
+                    tmp = (0x4 << 8) | (0x8 << 12);
+                    break;
+                case 3: /* 8s */
+                    tmp = (0x8 << 8) | (0x8 << 12);
+                    break;
+                case -1: /* turn off and then turn on again to decay quickly */
+                    tmp = mas_codec_readreg(MAS_REG_KAVC);
+                    mas_codec_writereg(MAS_REG_KAVC, 0);
+                    break;
+                default: /* off */
+                    tmp = 0;
+                    break;  
+            }
+            mas_codec_writereg(MAS_REG_KAVC, tmp);
+            break;
 #endif
     }
 #endif /* SIMULATOR */
@@ -1082,16 +1114,16 @@ int mpeg_val2phys(int setting, int value)
     return result;
 }
 
-void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost)
+void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc)
 {
 #ifdef SIMULATOR
-    volume = bass = treble = loudness = bass_boost;
+    volume = bass = treble = loudness = bass_boost = avc;
 #else
 #ifdef ARCHOS_RECORDER
     int rc;
     unsigned long val;
 #else
-    loudness = bass_boost;
+    loudness = bass_boost = avc;
 #endif
 
     setup_sci0();
@@ -1158,6 +1190,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost)
 #ifdef ARCHOS_RECORDER
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
     mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
+    mpeg_sound_set(SOUND_AVC, avc);
 #endif
 #endif /* SIMULATOR */
 }

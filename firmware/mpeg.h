@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost);
+void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, int avc);
 void mpeg_play(char* trackname);
 void mpeg_stop(void);
 void mpeg_pause(void);
@@ -46,7 +46,8 @@ struct mp3entry* mpeg_current_track(void);
 #ifdef ARCHOS_RECORDER
 #define SOUND_LOUDNESS 4
 #define SOUND_SUPERBASS 5
-#define SOUND_NUMSETTINGS 6
+#define SOUND_AVC 6
+#define SOUND_NUMSETTINGS 7
 #else
 #define SOUND_DEEMPH 4
 #define SOUND_NUMSETTINGS 5

@@ -60,11 +60,18 @@
 #define	MAS_REG_KPRESCALE       0xe7
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
+#ifdef ARCHOS_RECORDER
 #define MAS_REG_KMDB_SWITCH     0x21
 #define MAS_REG_KMDB_STR        0x22
 #define MAS_REG_KMDB_HAR        0x23
 #define MAS_REG_KMDB_FC         0x24
 #define MAS_REG_KLOUDNESS       0x1e
+#define MAS_REG_QPEAK_L         0x0a
+#define MAS_REG_QPEAK_R   	 0x0b
+#define MAS_REG_DQPEAK_L	 0x0c
+#define MAS_REG_DQPEAK_R        0x0d
+#define MAS_REG_KAVC            0x12
+#endif
 
 /*
  * MAS commands
