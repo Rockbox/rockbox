@@ -79,7 +79,7 @@ void set_car_adapter_mode(bool setting)
 
 #else /* not SIMULATOR */
 
-int battery_capacity = 1500;   /* only a default value */
+int battery_capacity = BATTERY_CAPACITY_MIN; /* only a default value */
 int battery_level_cached = -1; /* battery level of this minute, updated once
                                   per minute */
 static bool car_adapter_mode_enabled = false;
@@ -368,6 +368,7 @@ void set_car_adapter_mode(bool setting)
 
 static bool charger_power_is_on;
 
+#ifdef HAVE_CHARGING
 static void car_adapter_mode_processing(void)
 {
     static bool waiting_to_resume_play = false;
@@ -415,6 +416,7 @@ static void car_adapter_mode_processing(void)
         }
     }
 }
+#endif
 
 /*
  * This function is called to do the relativly long sleep waits from within the
@@ -424,6 +426,7 @@ static void car_adapter_mode_processing(void)
  */
 static void power_thread_sleep(int ticks)
 {
+#ifdef HAVE_CHARGING
     while (ticks > 0) {
         int small_ticks = MIN(HZ/2, ticks);
         sleep(small_ticks);
@@ -431,6 +434,9 @@ static void power_thread_sleep(int ticks)
 
         car_adapter_mode_processing();
     }
+#else
+    sleep(ticks);  /* no fast-processing functions, sleep the whole time */
+#endif
 }
 
 

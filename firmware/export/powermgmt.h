@@ -84,10 +84,16 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
 #endif
 
-#define CURRENT_NORMAL    145    /* usual current in mA when using the AJB including some disk/backlight/... activity */
-#define CURRENT_USB       500    /* usual current in mA in USB mode */
-#define CURRENT_BACKLIGHT  30    /* additional current when backlight is always on */
-#define CURRENT_CHARGING  300    /* charging current */
+#ifdef HAVE_MMC  /* Values for Ondio */
+#define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
+#define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
+#define CURRENT_BACKLIGHT   0  /* no backlight */
+#else            /* Values for HD based jukeboxes */
+#define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
+#define CURRENT_USB       500  /* usual current in mA in USB mode */
+#define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
+#define CURRENT_CHARGING  300  /* charging current */
+#endif
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
