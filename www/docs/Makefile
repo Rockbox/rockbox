@@ -23,5 +23,11 @@ battery-faq.raw: $(DOCS)/BATTERY-FAQ $(TXT2PLAIN)
 battery-faq.html: battery-faq.t battery-faq.raw $(TXT2PLAIN)
 	$(ACTION) $<
 
+contributing.raw: $(DOCS)/CONTRIBUTING $(TXT2PLAIN)
+	$(TXT2PLAIN) < $< > $@
+
+contributing.html: contributing.t contributing.raw $(TXT2PLAIN)
+	$(ACTION) $<
+
 %.html : %.t
 	$(ACTION) $<
