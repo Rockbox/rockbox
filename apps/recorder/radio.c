@@ -29,6 +29,7 @@
 #include "status.h"
 #include "kernel.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "ctype.h"
 #include "file.h"
@@ -199,7 +200,7 @@ bool radio_screen(void)
     if(rec_create_directory() > 0)
         have_recorded = true;
     
-    mpeg_stop();
+    audio_stop();
     
     mpeg_init_recording();
 
@@ -281,9 +282,9 @@ bool radio_screen(void)
         {
             case FM_STOP:
 #ifndef SIMULATOR
-                if(mpeg_status() == MPEG_STATUS_RECORD)
+                if(audio_status() == AUDIO_STATUS_RECORD)
                 {
-                    mpeg_stop();
+                    audio_stop();
                 }
                 else
 #endif
@@ -296,7 +297,7 @@ bool radio_screen(void)
 #ifdef FM_RECORD
             case FM_RECORD:
 #ifndef SIMULATOR
-                if(mpeg_status() == MPEG_STATUS_RECORD)
+                if(audio_status() == AUDIO_STATUS_RECORD)
                 {
                     mpeg_new_file(rec_create_filename(buf));
                     update_screen = true;
@@ -315,8 +316,8 @@ bool radio_screen(void)
 
             case FM_EXIT:
 #ifndef SIMULATOR
-                if(mpeg_status() == MPEG_STATUS_RECORD)
-                    mpeg_stop();
+                if(audio_status() == AUDIO_STATUS_RECORD)
+                    audio_stop();
 #endif
                 done = true;
                 keep_playing = true;
@@ -421,7 +422,7 @@ bool radio_screen(void)
 #endif                
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
-                if(mpeg_status() != MPEG_STATUS_RECORD)
+                if(audio_status() != AUDIO_STATUS_RECORD)
                 {
                     default_event_handler(SYS_USB_CONNECTED);
                     screen_freeze = true; /* Cosmetic: makes sure the
@@ -442,7 +443,7 @@ bool radio_screen(void)
             lcd_setmargins(0, 8);
             
             /* Only display the peak meter when not recording */
-            if(!mpeg_status())
+            if(!audio_status())
             {
                 lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
                 peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
@@ -490,7 +491,7 @@ bool radio_screen(void)
                          str(LANG_CHANNEL_MONO));
                 lcd_puts(0, top_of_screen + 2, buf);
 
-                if(mpeg_status() == MPEG_STATUS_RECORD)
+                if(audio_status() == AUDIO_STATUS_RECORD)
                 {
                     hours = seconds / 3600;
                     minutes = (seconds - (hours * 3600)) / 60;
@@ -520,19 +521,19 @@ bool radio_screen(void)
             status_draw(update_screen);
         }
 
-        if(mpeg_status() & MPEG_STATUS_ERROR)
+        if(audio_status() & AUDIO_STATUS_ERROR)
         {
             done = true;
         }
     }
 
 #ifndef SIMULATOR
-    if(mpeg_status() & MPEG_STATUS_ERROR)
+    if(audio_status() & AUDIO_STATUS_ERROR)
     {
         splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
-        mpeg_error_clear();
+        audio_error_clear();
 
         while(1)
         {
@@ -542,7 +543,7 @@ bool radio_screen(void)
         }
     }
     
-    mpeg_init_playback();
+    audio_init_playback();
 
     sound_settings_apply();
 
