@@ -1,7 +1,7 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Ton Einstellungen"
+new: "Klang Einstellungen"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
@@ -31,7 +31,7 @@ new: "Version"
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (keep out!)"
-new: "Debug (Haende weg!)"
+new: "Debug (Hände weg!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -41,7 +41,7 @@ new: "USB (sim)"
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox info:"
-new: "Rockbox info:"
+new: "Rockbox Info:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
@@ -151,12 +151,12 @@ new: "Batterie schwach?"
 id: LANG_TIME_SET
 dec: used in set_time()
 eng: "ON to set"
-new: "ON z. speichern"
+new: "ON = speichern"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "OFF z. verwerfen"
+new: "OFF = verwerfen"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -186,17 +186,17 @@ new: "Zufall"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Wahl zuerst wiederg."
+new: "Gewählte zuerst wiederg."
 
 id: LANG_MP3FILTER
 desc: in settings_menu
 eng: "Music Filter"
-new: "Musik Filter"
+new: "Musik-Filter"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Case Sensitive sortieren"
+new: "Sortieren Groß-/Kleinschreibung"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -216,7 +216,7 @@ new: "fragen"
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-new: "An"
+new: "Ein"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -229,7 +229,7 @@ desc: in settings_menu,
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Scroll Speed Einstell. Beispiel"
+new: "Scrollgeschwindigkeit Beispiel"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
@@ -244,12 +244,12 @@ new: "Zeit/Datum einstellen"
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "Disk bremsen"
+new: "HDD Ausschaltzeit"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "FF/RW Min Schritt"
+new: "FF/RW min. Schritt"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
@@ -294,7 +294,7 @@ new: "Einstellungen"
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-new: "Geloescht"
+new: "Gelöscht"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
@@ -304,12 +304,12 @@ new: "Abbruch"
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Art. d. Sort."
+new: "Art der Sort."
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-new: "Scroll Geschw."
+new: "Scrollgeschw."
 
 id: LANG_RESET
 desc: in system_settings_menu()
@@ -339,7 +339,7 @@ new: "System"
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-new: "Lautstaerke"
+new: "Lautstärke"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -354,12 +354,12 @@ new: "Bass"
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-new: "Hoehen"
+new: "Höhen"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Lautstaerke"
+new: "Loudness"
 
 id: LANG_BBOOST
 desc: in sound settings
@@ -369,17 +369,17 @@ new: "Bass Boost"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV decay time"
-new: "AL Zerfallszeit"
+new: "AL Trägheit"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-new: "Kanaele"
+new: "Kanäle"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel configuration"
-new: "Kanal Konfiguration"
+new: "Kanal-Konfiguration"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -404,7 +404,7 @@ new: "Mono Rechts"
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-new: "Autom. Lautstaerke"
+new: "Autom. Lautstärke"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -499,12 +499,12 @@ new: "<kein Titel>"
 id: LANG_ID3_ARTIST
 desc: in wps 
 eng: "[Artist]"
-new: "[Kuenstler]"
+new: "[Künstler]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<no artist>"
-new: "<kein Kuenstler>"
+new: "<kein Künstler>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -529,7 +529,7 @@ new: "<keine Liednr>"
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-new: "[Laenge]"
+new: "[Länge]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -554,12 +554,12 @@ new: "[PFAD]"
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch up"
-new: "Takt rauf"
+new: "schneller"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch down"
-new: "Takt runter"
+new: "langsamer"
 
 id: LANG_PAUSE
 desc: in wps
@@ -574,7 +574,7 @@ new: "Modus:"
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
 eng: "Dir filter: %s"
-new: "Ord. Filter: %s"
+new: "Ordner Filter: %s"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -599,7 +599,7 @@ new: "Ende der Liste"
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
 eng: "<Press ON>"
-new: "<Druecke ON>"
+new: "<Drücke ON>"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
@@ -609,7 +609,7 @@ new: "<Ende der Liederliste>"
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
 eng: "Press ON"
-new: "Druecke ON"
+new: "Drücke ON"
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
@@ -634,12 +634,12 @@ new: "Spiel pausiert"
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[Play] to resume"
-new: "[Play] z. fortfahren"
+new: "[Play] = fortfahren"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[Off] to quit"
-new: "[Off] z. stoppen"
+new: "[Off] = beenden"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -654,7 +654,7 @@ new: "(1 - langsam, 9 - schnell)
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[Play] to start/pause"
-new: "[Play] fuer Start/Pause"
+new: "[Play] für Start/Pause"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
@@ -674,7 +674,7 @@ new: "Gewonnen!!"
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[Off] to stop"
-new: "[Off] z. stoppen"
+new: "[Off] = stoppen"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
@@ -699,7 +699,7 @@ new: "[F3] + Level"
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
-new: "Lan:%d"
+new: "Län:%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
@@ -743,7 +743,7 @@ new: "%d Spieler    up/dn"
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-new: "%d Wuermer      l/r"
+new: "%d Würmer       l/r"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -781,3 +781,4 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new: "0 Reih - Level 0"
+
