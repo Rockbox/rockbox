@@ -31,18 +31,18 @@ new: "Version"
 
 id: LANG_DEBUG
 desc: in the main menu
-eng: "Debug (keep out!)"
-new: "Debug (rör ej!)"
+eng: "Debug (Keep Out!)"
+new: "Debug (Rör ej!)"
 
 id: LANG_USB
 desc: in the main menu
-eng: "USB (sim)"
-new: "USB (sim)"
+eng: "USB (Sim)"
+new: "USB (Sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
-new: "Rockbox Info:"
+new: "Rockboxinfo:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
@@ -66,8 +66,8 @@ new: "Batteri: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
-new: "Batteri: laddar"
+eng: "Battery: Charging"
+new: "Batteriladdning"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -121,42 +121,42 @@ new: "Spellista"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
-eng: "buffer full"
-new: "full buffert"
+eng: "Buffer Full"
+new: "Full buffert"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
-eng: "%d files"
+eng: "%d Files"
 new: "%d filer"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Spara misslyckades"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. low?"
+eng: "Batt. Low?"
 new: "Batt. tomt?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
-eng: "Save failed"
+eng: "Save Failed"
 new: "Spara misslyckades"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is battery low?"
+eng: "Is Battery Low?"
 new: "Är batteriet urladdat?"
 
 id: LANG_TIME_SET
-desc: 
-eng: "ON to set"
+desc: used in set_time()
+eng: "ON To Set"
 new: "PÅ för att ställa"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
-eng: "OFF to revert"
+eng: "OFF To Revert"
 new: "AV för att återgå"
 
 id: LANG_HIDDEN
@@ -252,7 +252,7 @@ new: "FF/RW min. steg"
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "FF/RW Acceleration"
+new: "FF/RW acceleration"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -271,7 +271,7 @@ new: ""
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
-eng: "Are you sure?"
+eng: "Are You Sure?"
 new: "Är du säker?"
 
 id: LANG_RESET_CONFIRM_RECORDER
@@ -311,7 +311,7 @@ new: "Rullning"
 
 id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Reset settings"
+eng: "Reset Settings"
 new: "Återställ inställningar"
 
 id: LANG_PLAYBACK
@@ -411,8 +411,8 @@ new: "Filsystembufferten"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
-new: "är full!"
+eng: "Is Full!"
+new: "Är full!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
@@ -436,22 +436,22 @@ new: "Övriga = Nej"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
-eng: "Keylock ON"
+eng: "Key Lock ON"
 new: "Lås PÅ"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
-eng: "Keylock OFF"
+eng: "Key Lock OFF"
 new: "Lås AV"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key lock is ON"
+eng: "Key Lock Is ON"
 new: "Tangentlåset är PÅ"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
+eng: "Key Lock Is OFF"
 new: "Tangentlåset är AV"
 
 id: LANG_MUTE_ON_PLAYER
@@ -466,12 +466,12 @@ new: "Tyst AV"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
-eng: "Mute is ON"
+eng: "Mute Is ON"
 new: "Tyst är PÅ"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
-eng: "Mute is OFF"
+eng: "Mute Is OFF"
 new: "Tyst är AV"
 
 id: LANG_ID3_INFO
@@ -491,8 +491,8 @@ new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
-eng: "<no title>"
-new: "<ingen titel>"
+eng: "<No Title>"
+new: "<Ingen titel>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -501,8 +501,8 @@ new: "[Artist]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
-eng: "<no artist>"
-new: "<ingen artist>"
+eng: "<No Artist>"
+new: "<Ingen artist>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -511,8 +511,8 @@ new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
-eng: "<no album>"
-new: "<inget album>"
+eng: "<No Album>"
+new: "<Inget album>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -521,8 +521,8 @@ new: "[Spår]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
-eng: "<no tracknum>"
-new: "<inget spår>"
+eng: "<No Tracknum>"
+new: "<Inget spår>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -551,12 +551,12 @@ new: "[Sökväg]"
 
 id: LANG_PITCH_UP
 desc: in wps
-eng: "Pitch up"
+eng: "Pitch Up"
 new: "Höj tonläget"
 
 id: LANG_PITCH_DOWN
 desc: in wps
-eng: "Pitch down"
+eng: "Pitch Down"
 new: "Sänk tonläget"
 
 id: LANG_PAUSE
@@ -566,8 +566,8 @@ new: "Paus"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
-eng: "mode:"
-new: "läge:"
+eng: "Mode:"
+new: "Läge:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
@@ -586,12 +586,12 @@ new: "Rull-"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
-eng: "bar"
-new: "list"
+eng: "Bar"
+new: "List"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End of list"
+eng: "End Of List"
 new: "Listan slut"
 
 id: LANG_END_CONFIRM_PLAYER
@@ -601,7 +601,7 @@ new: ""
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "End of song list"
+eng: "End Of Song List"
 new: "Slut på spellistan"
 
 id: LANG_END_CONFIRM_RECORDER
@@ -631,12 +631,12 @@ new: "Spelet pausat"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
-eng: "[PLAY] to resume"
+eng: "[PLAY] To Resume"
 new: "[Spela] för att återgå"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
-eng: "[OFF] to quit"
+eng: "[OFF] To Quit"
 new: "[Av] för att avsluta"
 
 id: LANG_SNAKE_LEVEL
@@ -646,12 +646,12 @@ new: "Nivå - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
-eng: "(1 - slow, 9 - fast)"
-new: "(1- långsamt, 9 - fort)"
+eng: "(1 - Slow, 9 - Fast)"
+new: "(1 - Långsamt, 9 - Fort)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
-eng: "[PLAY] to start/pause"
+eng: "[PLAY] To Start/Pause"
 new: "[Spela] för att starta/pausa"
 
 id: LANG_SOKOBAN_LEVEL
@@ -671,23 +671,23 @@ new: "DU VINNER!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] to stop"
+eng: "[OFF] To Stop"
 new: "[Av] för att stanna"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - level"
-new: "[F1] - nivå"
+eng: "[F1] - Level"
+new: "[F1] - Nivå"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] same level"
-new: "[F2] samma nivå"
+eng: "[F2] Same Level"
+new: "[F2] Samma nivå"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + level"
-new: "[F3] + nivå"
+eng: "[F3] + Level"
+new: "[F3] + Nivå"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
@@ -736,32 +736,32 @@ new: "%d Worms        h/v"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote control F1"
+eng: "Remote Control F1"
 new: "Fjärrkontroll F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No rem. control F1"
-new: 
+eng: "No Rem. Control F1"
+new: "Ingen fjärrkontroll F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 key control   F1"
-new: "2 tangentkontroll   F1"
+eng: "2 Key Control   F1"
+new: "2-tangentskontroll   F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 key control   F1"
-new: "4 tangentkontroll   F1"
+eng: "4 Key Control   F1"
+new: "4-tangentskontroll   F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out of control"
+eng: "Out Of Control"
 new: "Ingen kontroll"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You lose!"
+eng: "You Lose!"
 new: "Du förlorar!"
 
 id: LANG_TETRIS_LEVEL
@@ -776,7 +776,7 @@ new: "Autoavstängning"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
-eng: "new language"
+eng: "New Language"
 new: "Nytt språk"
 
 id: LANG_FILTER
@@ -861,12 +861,12 @@ new: "En"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
-eng: "12 hour clock"
+eng: "12 Hour Clock"
 new: "12-timmarsvisning"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
-eng: "24 hour clock"
+eng: "24 Hour Clock"
 new: "24-timmarsvisning"
 
 id: LANG_RESET_CANCEL
@@ -1026,7 +1026,7 @@ new: "dBfs"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
-eng: "Save energy"
+eng: "Save Energy"
 new: "Energispar"
 
 id: LANG_PM_HIGH_PERFORMANCE
@@ -1036,17 +1036,17 @@ new: "Bästa prestanda"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "linear"
-new: "linjär"
+eng: "Linear"
+new: "Linjär"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
-eng: "Maximum of range"
+eng: "Maximum Of Range"
 new: "Maximalt värde"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
-eng: "Minimum of range"
+eng: "Minimum Of Range"
 new: "Minimalt värde"
 
 id: LANG_PM_PERFORMANCE
@@ -1056,8 +1056,8 @@ new: "Prestanda"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
-new: "dBfs <-> linjär"
+eng: "dBfs <-> Linear"
+new: "dBfs <-> Linjär"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -1096,7 +1096,7 @@ new: "Höger"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
-eng: "Recording settings"
+eng: "Recording Settings"
 new: "Inspelningsinställningar"
 
 id: LANG_RECORDING_SOURCE
@@ -1141,7 +1141,7 @@ new: "%d%% %dh %dmin"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
-eng: "Sleep timer"
+eng: "Sleep Timer"
 new: "Insomningstid"
 
 id: LANG_BATTERY_CAPACITY
@@ -1166,7 +1166,7 @@ new: "Gräns för dubbelriktad rullning"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
-eng: "Anti-skip buffer"
+eng: "Anti-Skip Buffer"
 new: "Antiskak-buffert"
 
 id: LANG_SCROLL_DELAY
@@ -1196,7 +1196,7 @@ new: "Underhållsladdning"
 
 id: LANG_QUEUE_FULL
 desc: queue buffer full
-eng: "Queue buffer full"
+eng: "Queue Buffer Full"
 new: "Kön är full" 
 
 id: LANG_QUEUE_QUEUED
@@ -1206,7 +1206,7 @@ new: "Köad: %s"
 
 id: LANG_QUEUE_TOTAL
 desc: number of queued tracks %d
-eng: "Total queued: %d"
+eng: "Total Queued: %d"
 new: "Kö: %d st"
 
 id: LANG_MENU_SETTING_CANCEL
@@ -1226,7 +1226,7 @@ new: "Väckarklocka"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm time is too soon!"
+eng: "Alarm Time Is Too Soon!"
 new: "Väckning om för kort tid!"
 
 id: LANG_ALARM_MOD_KEYS
@@ -1236,23 +1236,23 @@ new: "PLAY=Sätt OFF=Avbryt"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting down..."
+eng: "Shutting Down..."
 new: "Stannar..."
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm time: %02d:%02d"
+eng: "Alarm Time: %02d:%02d"
 new: "Alarm: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking up in %d:%02d"
+eng: "Waking Up In %d:%02d"
 new: "Vaknar om %d:%02d"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-new: "Skapa Spellista"
+new: "Skapa spellista"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -1271,7 +1271,7 @@ new: "Raderad"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
-eng: "failed"
+eng: "Failed"
 new: "misslyckades"
 
 id: LANG_PLAYER_ONPLAY_1
@@ -1326,8 +1326,8 @@ new: "[Genre]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
-eng: "<no info>"
-new: "<ingen info>"
+eng: "<No Info>"
+new: "<Ingen info>"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
@@ -1337,7 +1337,7 @@ new: "[År]"
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
-new: "Visa ID3 Info"
+new: "Visa ID3 info"
 
 id: LANG_CPU_SLEEP
 desc: in system_settings_menu()
@@ -1345,9 +1345,9 @@ eng: "Power Saving"
 new: "Strömspar"
 
 id: LANG_FADE_ON_STOP
-desc: 
+desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
-new: "Tona bort vid Stop/Paus"
+new: "Tona bort vid stop/paus"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
@@ -1366,5 +1366,35 @@ new: "Inställningar"
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
-eng: "loaded"
-new: "inlästa"
+eng: "Loaded"
+new: "Inläst"
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new: "Karaoke"
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new: "Smal stereo"
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new: "Smal stereo"
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new: "Bred stereo"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "Invert"
+new: "Invertera"
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] To Undo"
+new: "[PÅ] för att ångra"
