@@ -28,9 +28,9 @@
 
 static struct plugin_api* rb;
 
-struct mad_stream  Stream __attribute__ ((section(".idata")));
-struct mad_frame  Frame __attribute__ ((section(".idata")));
-struct mad_synth  Synth __attribute__ ((section(".idata")));
+struct mad_stream  Stream IDATA_ATTR;
+struct mad_frame  Frame IDATA_ATTR;
+struct mad_synth  Synth IDATA_ATTR;
 mad_timer_t      Timer;
 struct dither d0, d1;
 
@@ -130,7 +130,7 @@ unsigned char *OutputPtr=OutputBuffer;
 unsigned char *GuardPtr=NULL;
 const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
@@ -151,7 +151,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   TEST_PLUGIN_API(api);
   rb = api;
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
 
