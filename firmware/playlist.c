@@ -37,7 +37,7 @@ int reload_playlist_info( playlist_info_t *playlist )
 
     /* return a dummy playlist entry */
 
-    strncpy( playlist->filename, "\\playlists\\1.m3u", sizeof(playlist->filename) );
+    strncpy( playlist->filename, "test.m3u", sizeof(playlist->filename) );
 
     playlist->indices_count = 4;
 
@@ -160,80 +160,32 @@ track_t next_playlist_track( playlist_info_t *playlist )
 /*
  * randomly rearrange the array of indices for the playlist
  */
-void randomise_playlist( playlist_info_t *playlist )
+void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
 {
-    unsigned seed;
     int count = 0;
     int candidate;
-    int adjusted_candidate;
-    int found_next_number;
-    int *index_list = (int*) malloc(sizeof(int) * playlist->indices_count);
-    int *randomised_list;
-    int i;
+    int store;
     
     DEBUGF( "randomise_playlist()\n" );
 
-    /* create dynamic storage for randomised list so it can be freed later */
-
-    randomised_list = (int *)malloc( playlist->indices_count * sizeof( int ) );
-    
-    /* use date as random seed */
-
-    seed = time(0);
+    /* seed with the given seed */
     srand( seed );
 
     /* randomise entire indices list */
     
     while( count < playlist->indices_count )
     {
-        found_next_number = 0;
-        
-        /* loop until we successfully get the next number */
-        
-        while( ! found_next_number )
-        {
-            /* get the next random number */
-            
-            candidate = rand();
-            
-            /* the rand is from 0 to RAND_MAX, so adjust to our value range */
-            
-            adjusted_candidate = candidate % ( playlist->indices_count + 1 );
-            
-            /* has this number already been used? */
-            
-            if( is_unused_random_in_list( adjusted_candidate, index_list, playlist->indices_count ) )
-            {
-                /* store value found at random location in original list */
+        /* the rand is from 0 to RAND_MAX, so adjust to our value range */
+        candidate = rand() % ( playlist->indices_count );
+
+        /* now swap the values at the 'count' and 'candidate' positions */
+        store = playlist->indices[candidate];
+        playlist->indices[candidate] = playlist->indices[count];
+        playlist->indices[count] = store;
                 
-                index_list[ count ] = adjusted_candidate;
-                
-                /* leave loop */
-                
-                found_next_number = 1;
-            }
-        }
-        
         /* move along */
-        
         count++;
     }
-
-    /* populate actual replacement list with values
-     * found at indexes specified in index_list */
-    
-    for( i = 0; i < playlist->indices_count; i++ )
-    {
-        randomised_list[i] = playlist->indices[ index_list[ i ] ];
-    }
-
-    /* release memory from old array */
-    
-    free( (void *)playlist->indices );
-
-    /* use newly randomise list */
-    
-    playlist->indices = randomised_list;
 }
 
 /*
@@ -340,4 +292,8 @@ void get_indices_as_string( char *string, playlist_info_t *playlist )
   <alan> i don't see how you can do it with a list
 */
 
-
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "rockbox-mode.el")
+ * end:
+ */
