@@ -25,8 +25,8 @@
 #include <stdbool.h>
 
 /* functions formerly in mpeg.c */
-void mp3_init(int volume, int bass, int treble, int balance,
-              int loudness, int avc, int channel_config,
+void mp3_init(int volume, int bass, int treble, int balance, int loudness,
+              int avc, int channel_config, int stereo_width,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass);
@@ -70,23 +70,23 @@ void mp3_shutdown(void);
 #define SOUND_LOUDNESS 4
 #define SOUND_AVC 5
 #define SOUND_CHANNELS 6
-#define SOUND_LEFT_GAIN 7
-#define SOUND_RIGHT_GAIN 8
-#define SOUND_MIC_GAIN 9
-#define SOUND_MDB_STRENGTH 10
-#define SOUND_MDB_HARMONICS 11
-#define SOUND_MDB_CENTER 12
-#define SOUND_MDB_SHAPE 13
-#define SOUND_MDB_ENABLE 14
-#define SOUND_SUPERBASS 15
-#define SOUND_NUMSETTINGS 16
+#define SOUND_STEREO_WIDTH 7
+#define SOUND_LEFT_GAIN 8
+#define SOUND_RIGHT_GAIN 9
+#define SOUND_MIC_GAIN 10
+#define SOUND_MDB_STRENGTH 11
+#define SOUND_MDB_HARMONICS 12
+#define SOUND_MDB_CENTER 13
+#define SOUND_MDB_SHAPE 14
+#define SOUND_MDB_ENABLE 15
+#define SOUND_SUPERBASS 16
+#define SOUND_NUMSETTINGS 17
 
 #define MPEG_SOUND_STEREO 0
-#define MPEG_SOUND_STEREO_NARROW 1
-#define MPEG_SOUND_MONO 2
+#define MPEG_SOUND_MONO 1
+#define MPEG_SOUND_CUSTOM 2
 #define MPEG_SOUND_MONO_LEFT 3
 #define MPEG_SOUND_MONO_RIGHT 4
 #define MPEG_SOUND_KARAOKE 5
-#define MPEG_SOUND_STEREO_WIDE 6
 
 #endif /* #ifndef _MP3_PLAYBACK_H_ */

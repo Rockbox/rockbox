@@ -1261,22 +1261,22 @@ voice: "LCD-Modus"
 new: "LCD-Modus"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
-desc: in sound_settings
-eng: "St. Narrow"
-voice: "Stereo schmal"
-new: "St. schmal"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
-desc: in sound_settings
-eng: "Stereo Narrow"
-voice: "Stereo schmal"
-new: "Stereo schmal"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_STEREO_WIDE
-desc: in sound_settings
-eng: "Stereo Wide"
-voice: "Stereo breit"
-new: "Stereo breit"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -2845,4 +2845,17 @@ desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
 new:
+
+id: LANG_STEREO_WIDTH
+desc: in sound_settings
+eng: "Stereo width"
+voice: "Stereobasisbreite"
+new: "Stereobasisbreite"
+
+id: LANG_CHANNEL_CUSTOM
+desc: in sound_settings
+eng: "Custom"
+voice: "Angepasst"
+new: "Angepasst"
+
 

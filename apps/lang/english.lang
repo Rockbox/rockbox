@@ -1274,21 +1274,21 @@ voice: "LCD Mode"
 new:
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
-desc: in sound_settings
-eng: "St. Narrow"
-voice: "Stereo Narrow"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
-desc: in sound_settings
-eng: "Stereo Narrow"
-voice: "Stereo Narrow"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_CHANNEL_STEREO_WIDE
-desc: in sound_settings
-eng: "Stereo Wide"
-voice: "Stereo Wide"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_CHANNEL_KARAOKE
@@ -2859,4 +2859,17 @@ desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
 new:
+
+id: LANG_STEREO_WIDTH
+desc: in sound_settings
+eng: "Stereo width"
+voice: "Stereo width"
+new:
+
+id: LANG_CHANNEL_CUSTOM
+desc: in sound_settings
+eng: "Custom"
+voice: "Custom"
+new:
+
 

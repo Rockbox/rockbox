@@ -129,7 +129,8 @@ struct user_settings
     int treble;     /* treble eq:            0-100 0=low   100=high          */
     int loudness;   /* loudness eq:          0-100 0=off   100=max           */
     int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
-    int channel_config;  /* Stereo, Mono, Mono left, Mono right */
+    int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
+    int stereo_width; /* 0-255% */
     int mdb_strength; /* 0-127dB */
     int mdb_harmonics; /* 0-100% */
     int mdb_center; /* 20-300Hz */

@@ -385,19 +385,20 @@ static bool chanconf(void)
 {
     static const struct opt_items names[] = {
         { STR(LANG_CHANNEL_STEREO) },
-#ifdef HAVE_LCD_CHARCELLS
-        { STR(LANG_CHANNEL_STEREO_NARROW_PLAYER) },
-#else
-        { STR(LANG_CHANNEL_STEREO_NARROW_RECORDER) },
-#endif
         { STR(LANG_CHANNEL_MONO) },
+        { STR(LANG_CHANNEL_CUSTOM) },
         { STR(LANG_CHANNEL_LEFT) },
         { STR(LANG_CHANNEL_RIGHT) },
-        { STR(LANG_CHANNEL_KARAOKE) }, 
-        { STR(LANG_CHANNEL_STEREO_WIDE) }
+        { STR(LANG_CHANNEL_KARAOKE) }
     };
     return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
-                      names, 7, set_chanconf );
+                      names, 6, set_chanconf );
+}
+
+static bool stereo_width(void)
+{
+    return set_sound(str(LANG_STEREO_WIDTH), &global_settings.stereo_width,
+                     SOUND_STEREO_WIDTH);
 }
 
 bool sound_menu(void)
@@ -410,6 +411,7 @@ bool sound_menu(void)
         { ID2P(LANG_TREBLE), treble },
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
+        { ID2P(LANG_STEREO_WIDTH), stereo_width },
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },
         { ID2P(LANG_AUTOVOL), avc },

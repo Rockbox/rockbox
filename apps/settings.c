@@ -71,7 +71,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 
 
-#define CONFIG_BLOCK_VERSION 18
+#define CONFIG_BLOCK_VERSION 19
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -170,8 +170,9 @@ static const struct bit_entry rtc_bits[] =
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
     {1, S_O(superbass), false, "superbass", off_on },
 #endif
-    {3, S_O(channel_config), 6, "channels", 
-        "stereo,stereo narrow,mono,mono left,mono right,karaoke,stereo wide" },
+    {3, S_O(channel_config), 0, "channels",
+        "stereo,mono,custom,mono left,mono right,karaoke" },
+    {8, S_O(stereo_width), 100, "stereo width", NULL},
     /* playback */
     {2, S_O(resume), RESUME_ASK, "resume", "off,ask,ask once,on" },
     {1, S_O(playlist_shuffle), false, "shuffle", off_on },
@@ -206,7 +207,7 @@ static const struct bit_entry rtc_bits[] =
 #endif
     {1, S_O(show_icons), true, "show icons", off_on },
     /* system */
-    {4, S_O(poweroff), 10, 
+    {4, S_O(poweroff), 10,
         "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
     {18, S_O(runtime), 0, NULL, NULL },
     {18, S_O(topruntime), 0, NULL, NULL },
@@ -221,19 +222,20 @@ static const struct bit_entry rtc_bits[] =
 #endif
     {12, S_O(battery_capacity), BATTERY_CAPACITY_MIN, "battery capacity",
          NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,
-                    1000...2000 for Alkaline */
+                     500...1500 for Alkaline */
 #ifdef HAVE_CHARGING
     {1, S_O(car_adapter_mode), false, "car adapter mode", off_on },
 #endif
-
-    /* new stuff to be added here */
-    /* If values are just added to the end, no need to bump the version. */
+    /* tuner */
 #ifdef CONFIG_TUNER
     {1, S_O(fm_force_mono), false, "force fm mono", off_on },
     {8, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
 #endif
 
-    /* Current sum of bits: 286 (worst case) */
+    /* new stuff to be added here */
+    /* If values are just added to the end, no need to bump the version. */
+
+    /* Current sum of bits: 259 (worst case) */
     /* Sum of all bit sizes must not grow beyond 288! */
 };
 
@@ -716,6 +718,7 @@ void sound_settings_apply(void)
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
     mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
+    mpeg_sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
@@ -1261,6 +1264,7 @@ void settings_reset(void) {
     global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
     global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
+    global_settings.stereo_width = mpeg_sound_default(SOUND_STEREO_WIDTH);
     global_settings.mdb_strength = mpeg_sound_default(SOUND_MDB_STRENGTH);
     global_settings.mdb_harmonics = mpeg_sound_default(SOUND_MDB_HARMONICS);
     global_settings.mdb_center = mpeg_sound_default(SOUND_MDB_CENTER);

@@ -72,6 +72,7 @@ static const char* const units[] =
     "dB",   /* Loudness */
     "",     /* AVC */
     "",     /* Channels */
+    "%",    /* Stereo width */
     "dB",   /* Left gain */
     "dB",   /* Right gain */
     "dB",   /* Mic gain */
@@ -92,6 +93,7 @@ static const int numdecimals[] =
     0,    /* Loudness */
     0,    /* AVC */
     0,    /* Channels */
+    0,    /* Stereo width */
     1,    /* Left gain */
     1,    /* Right gain */
     1,    /* Mic gain */
@@ -112,6 +114,7 @@ static const int steps[] =
     1,    /* Loudness */
     1,    /* AVC */
     1,    /* Channels */
+    1,    /* Stereo width */
     1,    /* Left gain */
     1,    /* Right gain */
     1,    /* Mic gain */
@@ -137,6 +140,7 @@ static const int minval[] =
     0,    /* Loudness */
     -1,   /* AVC */
     0,    /* Channels */
+    0,    /* Stereo width */
     0,    /* Left gain */
     0,    /* Right gain */
     0,    /* Mic gain */
@@ -161,7 +165,8 @@ static const int maxval[] =
     100,   /* Balance */
     17,   /* Loudness */
     4,    /* AVC */
-    6,    /* Channels */
+    5,    /* Channels */
+    255,  /* Stereo width */
     15,   /* Left gain */
     15,   /* Right gain */
     15,   /* Mic gain */
@@ -187,6 +192,7 @@ static const int defaultval[] =
     0,    /* Loudness */
     0,    /* AVC */
     0,    /* Channels */
+    100,  /* Stereo width */
     8,    /* Left gain */
     8,    /* Right gain */
     2,    /* Mic gain */
@@ -566,8 +572,6 @@ static void init_playback(void)
         mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while((val & 0x0c) != 0x0c);
 
-    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
-
 #if CONFIG_HWCODEC == MAS3587F
     mpeg_mode = MPEG_DECODER;
 #endif
@@ -617,6 +621,89 @@ void set_prescaled_volume(void)
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 }
 #endif /* MAS3507D */
+#endif /* !SIMULATOR */
+
+int channel_configuration = MPEG_SOUND_STEREO;
+int stereo_width = 100;
+
+#ifndef SIMULATOR
+static void set_channel_config(void)
+{
+    /* default values: stereo */
+    unsigned long val_ll = 0x80000;
+    unsigned long val_lr = 0;
+    unsigned long val_rl = 0;
+    unsigned long val_rr = 0x80000;
+    
+    switch(channel_configuration)
+    {
+        /* case MPEG_SOUND_STEREO unnecessary */
+
+        case MPEG_SOUND_MONO:
+            val_ll = 0xc0000;
+            val_lr = 0xc0000;
+            val_rl = 0xc0000;
+            val_rr = 0xc0000;
+            break;
+
+        case MPEG_SOUND_CUSTOM:
+            {
+                /* fixed point variables (matching MAS internal format)
+                   integer part: upper 13 bits (inlcuding sign)
+                   fractional part: lower 19 bits */
+                long fp_width, fp_straight, fp_cross;
+                
+                fp_width = (stereo_width << 19) / 100;
+                if (stereo_width <= 100)
+                {
+                    fp_straight = - ((1<<19) + fp_width) / 2;
+                    fp_cross = fp_straight + fp_width;
+                }
+                else
+                {
+                    fp_straight = - (1<<19);
+                    fp_cross = ((2 * fp_width / (((1<<19) + fp_width) >> 10))
+                                << 9) - (1<<19);
+                }
+                val_ll = val_rr = fp_straight & 0xFFFFF;
+                val_lr = val_rl = fp_cross & 0xFFFFF;
+            }
+            break;
+
+        case MPEG_SOUND_MONO_LEFT:
+            val_ll = 0x80000;
+            val_lr = 0x80000;
+            val_rl = 0;
+            val_rr = 0;
+            break;
+
+        case MPEG_SOUND_MONO_RIGHT:
+            val_ll = 0;
+            val_lr = 0;
+            val_rl = 0x80000;
+            val_rr = 0x80000;
+            break;
+
+        case MPEG_SOUND_KARAOKE:
+            val_ll = 0x80001;
+            val_lr = 0x7ffff;
+            val_rl = 0x7ffff;
+            val_rr = 0x80001;
+            break;
+    }
+
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
+#elif CONFIG_HWCODEC == MAS3507D
+    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
+#endif
+}
 #endif /* !SIMULATOR */
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
@@ -766,7 +853,14 @@ void mpeg_sound_set(int setting, int value)
             break;
 #endif            
         case SOUND_CHANNELS:
-            mpeg_sound_channel_config(value);
+            channel_configuration = value;
+            set_channel_config();
+            break;
+        
+        case SOUND_STEREO_WIDTH:
+            stereo_width = value;
+            if (channel_configuration == MPEG_SOUND_CUSTOM)
+                set_channel_config();
             break;
     }
 #endif /* SIMULATOR */
@@ -799,82 +893,6 @@ int mpeg_val2phys(int setting, int value)
 #endif
 }
 
-void mpeg_sound_channel_config(int configuration)
-{
-#ifdef SIMULATOR
-    (void)configuration;
-#else
-    unsigned long val_ll = 0x80000;
-    unsigned long val_lr = 0;
-    unsigned long val_rl = 0;
-    unsigned long val_rr = 0x80000;
-    
-    switch(configuration)
-    {
-        case MPEG_SOUND_STEREO:
-            val_ll = 0x80000;
-            val_lr = 0;
-            val_rl = 0;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_MONO:
-            val_ll = 0xc0000;
-            val_lr = 0xc0000;
-            val_rl = 0xc0000;
-            val_rr = 0xc0000;
-            break;
-
-        case MPEG_SOUND_MONO_LEFT:
-            val_ll = 0x80000;
-            val_lr = 0x80000;
-            val_rl = 0;
-            val_rr = 0;
-            break;
-
-        case MPEG_SOUND_MONO_RIGHT:
-            val_ll = 0;
-            val_lr = 0;
-            val_rl = 0x80000;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_STEREO_NARROW:
-            val_ll = 0xa0000;
-            val_lr = 0xe0000;
-            val_rl = 0xe0000;
-            val_rr = 0xa0000;
-            break;
-
-        case MPEG_SOUND_STEREO_WIDE:
-            val_ll = 0x80000;
-            val_lr = 0x40000;
-            val_rl = 0x40000;
-            val_rr = 0x80000;
-            break;
-
-        case MPEG_SOUND_KARAOKE:
-            val_ll = 0x80001;
-            val_lr = 0x7ffff;
-            val_rl = 0x7ffff;
-            val_rr = 0x80001;
-            break;
-    }
-
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
-#else
-    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
-#endif
-#endif
-}
-
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
@@ -901,7 +919,7 @@ void mpeg_set_pitch(int pitch)
 #endif
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config,
+              int avc, int channel_config, int stereo_width,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass)
@@ -914,6 +932,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     (void)loudness;
     (void)avc;
     (void)channel_config;
+    (void)stereo_width;
     (void)mdb_strength;
     (void)mdb_harmonics;
     (void)mdb_center;
@@ -1015,8 +1034,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_enable(true);
-
-    mpeg_sound_channel_config(channel_config);
 #endif
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
@@ -1031,9 +1048,10 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     mpeg_sound_set(SOUND_TREBLE, treble);
     mpeg_sound_set(SOUND_BALANCE, balance);
     mpeg_sound_set(SOUND_VOLUME, volume);
+    mpeg_sound_set(SOUND_CHANNELS, channel_config);
+    mpeg_sound_set(SOUND_STEREO_WIDTH, stereo_width);
     
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-    mpeg_sound_channel_config(channel_config);
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
     mpeg_sound_set(SOUND_AVC, avc);
     mpeg_sound_set(SOUND_MDB_STRENGTH, mdb_strength);
