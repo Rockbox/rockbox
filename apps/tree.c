@@ -699,6 +699,7 @@ void set_current_file(char *path)
     }
 }
 
+#ifdef BUTTON_ON
 static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, int *dirfilter)
 {
     bool exit = false;
@@ -817,6 +818,7 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
 
     return used;
 }
+#endif
 
 static bool dirbrowse(char *root, int *dirfilter)
 {
