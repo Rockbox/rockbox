@@ -16,7 +16,7 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-all: $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a
+all: $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a $(OBJDIR)/libFLAC.a
 
 include $(TOOLSDIR)/make.inc
 
@@ -30,8 +30,14 @@ $(OBJDIR)/liba52.a:
 	@mkdir -p $(OBJDIR)/liba52
 	@$(MAKE) -C liba52 TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
 
+$(OBJDIR)/libFLAC.a:
+	@echo "MAKE in libFLAC"
+	@mkdir -p $(OBJDIR)/libFLAC
+	@$(MAKE) -C libFLAC TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC
 	@$(MAKE) -C libmad clean
 	@$(MAKE) -C liba52 clean
+	@$(MAKE) -C libFLAC clean
