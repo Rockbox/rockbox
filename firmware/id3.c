@@ -86,6 +86,28 @@ const int freqtab[][4] =
     {22050, 24000, 16000, 0}, /* MPEG version 2 */
 };
 
+#define UNICODE_BOM_1 0xfffe
+#define UNICODE_BOM_2 0xfeff
+
+/* Checks to see if the passed in string is a 16-bit wide Unicode v2
+   string.  If it is, we attempt to convert it to a 8-bit ASCII string
+   (for valid 8-bit ASCII characters).  If it's not unicode, we leave
+   it alone.  At some point we should fully support unicode strings */
+
+static void unicode_munge(char* string) {
+   unsigned short* short_string = (unsigned short*)string;
+   if (short_string[0] == UNICODE_BOM_1 ||
+       short_string[0] == UNICODE_BOM_2) {
+      int x = 0;
+      do {
+         x++;
+         if (!(short_string[x]&0xff00)) {
+             string[x-1]=(short_string[x]&0xff);
+         }
+      } while (short_string[x]!=0x0000);
+   }
+}
+
 /*
  * Removes trailing spaces from a string.
  *
@@ -249,6 +271,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             artist = buffer + readsize;
             artistn = headerlen;
             readsize += headerlen;
+            unicode_munge(artist);
         }
         else if(!strncmp(header, "TIT2", strlen("TIT2")) || 
                 !strncmp(header, "TT2", strlen("TT2"))) {
@@ -257,6 +280,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             title = buffer + readsize;
             titlen = headerlen;
             readsize += headerlen;
+            unicode_munge(title);
         }
         else if(!strncmp(header, "TALB", strlen("TALB"))) {
             readsize++;
@@ -264,6 +288,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             album = buffer + readsize;
             albumn = headerlen;
             readsize += headerlen;
+            unicode_munge(album);
         }
         else if(!strncmp(header, "TRCK", strlen("TRCK"))) {
             readsize++;
@@ -271,6 +296,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             tracknum = buffer + readsize;
             tracknumn = headerlen;
             readsize += headerlen;
+            unicode_munge(tracknum);
         } else {
             readsize += headerlen;
         }
