@@ -287,7 +287,7 @@ static int do_menu(char *title, char **items, size_t num_items, int sel) {
         done = true;
         break;
       case BUTTON_LEFT:
-      case BUTTON_SELECT:
+      case BUTTON_OFF:
         /* cancel out of menu */
         ret = MENU_CANCEL;
         done = true;
