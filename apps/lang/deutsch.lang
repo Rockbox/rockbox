@@ -161,22 +161,16 @@ new: "OFF = abbrechen"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
 new: "Versteckte Dateien"
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
 new: "Anzeigen"
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
 new: "Verstecken"
 
@@ -197,8 +191,6 @@ new: "Gewählte zuerst wiedergeben"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
 new: "Musik-Filter"
 
@@ -219,8 +211,6 @@ new: "Aus"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-### English phrase was changed! Previous translation was made on:
-### "Ask"
 eng: "Ask"
 new: "nachfragen"
 
@@ -581,8 +571,6 @@ new: "modus:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-### English phrase was changed! Previous translation was made on:
-### ""
 eng: ""
 new: "Verzeichnisf.: %s"
 
@@ -855,3 +843,18 @@ id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
 new: "Ja"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Wiederholung"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Alle Titel"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Einen Titel"
