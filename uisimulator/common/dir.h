@@ -31,7 +31,7 @@ typedef void * MYDIR;
 extern MYDIR *sim_opendir(const char *name);
 extern struct sim_dirent* sim_readdir(MYDIR* dir);
 extern int sim_closedir(MYDIR *dir);
-extern int sim_mkdir(char *name, int mode);
+extern int sim_mkdir(const char *name, int mode);
 extern int sim_rmdir(char *name);
 
 #define DIR MYDIR
