@@ -1670,25 +1670,25 @@ bool set_time(char* string, int timedate[])
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
-    char *dayname[] = {str(LANG_WEEKDAY_SUNDAY),
-                       str(LANG_WEEKDAY_MONDAY),
-                       str(LANG_WEEKDAY_TUESDAY),
-                       str(LANG_WEEKDAY_WEDNESDAY),
-                       str(LANG_WEEKDAY_THURSDAY),
-                       str(LANG_WEEKDAY_FRIDAY),
-                       str(LANG_WEEKDAY_SATURDAY)};
-    char *monthname[] = {str(LANG_MONTH_JANUARY),
-                         str(LANG_MONTH_FEBRUARY),
-                         str(LANG_MONTH_MARCH),
-                         str(LANG_MONTH_APRIL),
-                         str(LANG_MONTH_MAY),
-                         str(LANG_MONTH_JUNE),
-                         str(LANG_MONTH_JULY),
-                         str(LANG_MONTH_AUGUST),
-                         str(LANG_MONTH_SEPTEMBER),
-                         str(LANG_MONTH_OCTOBER),
-                         str(LANG_MONTH_NOVEMBER),
-                         str(LANG_MONTH_DECEMBER)};
+    int dayname[] = {LANG_WEEKDAY_SUNDAY,
+                     LANG_WEEKDAY_MONDAY,
+                     LANG_WEEKDAY_TUESDAY,
+                     LANG_WEEKDAY_WEDNESDAY,
+                     LANG_WEEKDAY_THURSDAY,
+                     LANG_WEEKDAY_FRIDAY,
+                     LANG_WEEKDAY_SATURDAY};
+    int monthname[] = {LANG_MONTH_JANUARY,
+                       LANG_MONTH_FEBRUARY,
+                       LANG_MONTH_MARCH,
+                       LANG_MONTH_APRIL,
+                       LANG_MONTH_MAY,
+                       LANG_MONTH_JUNE,
+                       LANG_MONTH_JULY,
+                       LANG_MONTH_AUGUST,
+                       LANG_MONTH_SEPTEMBER,
+                       LANG_MONTH_OCTOBER,
+                       LANG_MONTH_NOVEMBER,
+                       LANG_MONTH_DECEMBER};
     char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
                         {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
     char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -1763,16 +1763,16 @@ bool set_time(char* string, int timedate[])
         lcd_getstringsize(buffer, &width, &prev_line_height);
 
         snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
-                 dayname[timedate[6]], timedate[3], monthname[timedate[4] - 1],
-                 timedate[5]);
+                 str(dayname[timedate[6]]), timedate[3],
+                 str(monthname[timedate[4] - 1]), timedate[5]);
         lcd_puts(0, 2, buffer);
 
         /* recalculate the positions and offsets */
         lcd_getstringsize(buffer, &width, &line_height);
 
         /* store these 2 to prevent _repeated_ strlen calls */
-        monthname_len = strlen(monthname[timedate[4] - 1]);
-        dayname_len = strlen(dayname[timedate[6]]);
+        monthname_len = strlen(str(monthname[timedate[4] - 1]));
+        dayname_len = strlen(str(dayname[timedate[6]]));
 
         /* weekday */
         strncpy(reffub, buffer, dayname_len);
