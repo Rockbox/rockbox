@@ -20,7 +20,7 @@
 #include "buffer.h"
 
 #ifdef SIMULATOR
-unsigned char mp3buffer[0x200000];
+unsigned char mp3buffer[(MEM*1024-256)*1024];
 unsigned char *mp3end = mp3buffer + sizeof(mp3buffer);
 #else
 /* defined in linker script */
