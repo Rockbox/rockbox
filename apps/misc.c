@@ -218,12 +218,13 @@ bool clean_shutdown(void)
     {
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
-        sleep(HZ);
         mpeg_stop();
-        ata_flush();
-        ata_spindown(1);
-        while(ata_disk_is_active())
-            sleep(HZ/10);
+        if (ata_disk_is_active()) {
+            ata_flush();
+            ata_spindown(1);
+            while(ata_disk_is_active())
+                sleep(HZ/10);
+        }
         mp3_shutdown();
 #if CONFIG_KEYPAD == ONDIO_PAD
         backlight_off();
