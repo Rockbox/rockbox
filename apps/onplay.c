@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "debug.h"
 #include "sprintf.h"
 #include "lcd.h"
 #include "dir.h"
@@ -32,6 +33,9 @@
 #include "button.h"
 #include "kernel.h"
 #include "keyboard.h"
+#include "mp3data.h"
+#include "id3.h"
+#include "screens.h"
 #include "tree.h"
 
 static char* selected_file = NULL;
@@ -99,41 +103,89 @@ static bool rename_file(void)
     return false;
 }
 
-extern int d_1;
-extern int d_2;
-
 static void xingupdate(int percent)
 {
     char buf[32];
 
     snprintf(buf, 32, "%d%%", percent);
-    lcd_puts(0, 3, buf);
-    snprintf(buf, 32, "%x", d_1);
-    lcd_puts(0, 4, buf);
-    snprintf(buf, 32, "%x", d_2);
-    lcd_puts(0, 5, buf);
+    lcd_puts(0, 1, buf);
     lcd_update();
 }
 
 static bool vbr_fix(void)
 {
-    char buf[32];
-    unsigned long start_tick;
-    unsigned long end_tick;
+    unsigned char xingbuf[417];
+    struct mp3entry entry;
+    int fd;
+    int rc;
+    int flen;
+    int num_frames;
+    int fpos;
+
 
     lcd_clear_display();
-    lcd_puts(0, 0, selected_file);
+    lcd_puts_scroll(0, 0, selected_file);
     lcd_update();
 
-    start_tick = current_tick;
-    mpeg_create_xing_header(selected_file, xingupdate);
-    end_tick = current_tick;
+    xingupdate(0);
 
-    snprintf(buf, 32, "%d ticks", (int)(end_tick - start_tick));
-    lcd_puts(0, 1, buf);
-    snprintf(buf, 32, "%d seconds", (int)(end_tick - start_tick)/HZ);
-    lcd_puts(0, 2, buf);
-    lcd_update();
+    rc = mp3info(&entry, selected_file);
+    if(rc < 0)
+        return rc * 10 - 1;
+    
+    fd = open(selected_file, O_RDWR);
+    if(fd < 0)
+        return fd * 10 - 2;
+
+    flen = lseek(fd, 0, SEEK_END);
+
+    xingupdate(0);
+
+    num_frames = count_mp3_frames(fd, entry.first_frame_offset,
+                                  flen, xingupdate);
+
+    if(num_frames)
+    {
+        create_xing_header(fd, entry.first_frame_offset,
+                           flen, xingbuf, num_frames, xingupdate, true);
+        
+        /* Try to fit the Xing header first in the stream. Replace the existing
+           Xing header if there is one, else see if there is room between the
+           ID3 tag and the first MP3 frame. */
+        if(entry.vbr_header_pos)
+        {
+            /* Reuse existing Xing header */
+            fpos = entry.vbr_header_pos;
+            
+            DEBUGF("Reusing Xing header at %d\n", fpos);
+        }
+        else
+        {
+            /* Any room between ID3 tag and first MP3 frame? */
+            if(entry.first_frame_offset - entry.id3v2len > 417)
+            {
+                fpos = entry.first_frame_offset - 417;
+            }
+            else
+            {
+                close(fd);
+                splash(HZ*2, 0, true, "No room for header");
+                return -3;
+            }
+        }
+        
+        lseek(fd, fpos, SEEK_SET);
+        write(fd, xingbuf, 417);
+        close(fd);
+        
+        xingupdate(100);
+    }
+    else
+    {
+        /* Not a VBR file */
+        DEBUGF("Not a VBR file\n");
+        splash(HZ*2, 0, true, "Not a VBR file");
+    }
 
     return false;
 }

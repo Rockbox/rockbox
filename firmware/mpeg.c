@@ -715,6 +715,7 @@ static long timing_info[1024];
 #endif
 static bool inverted_pr;
 static unsigned long num_rec_bytes;
+static unsigned long num_recorded_frames;
 
 void drain_dma_buffer(void)
 {
@@ -1851,7 +1852,7 @@ static void mpeg_thread(void)
                         panicf("recfile: %d", mpeg_file);
 
                     break;
-                    
+
                 case MPEG_STOP:
                     DEBUGF("MPEG_STOP\n");
                     demand_irq_enable(false);
@@ -1872,8 +1873,9 @@ static void mpeg_thread(void)
                     if(mpeg_file < 0)
                         panicf("rec upd: %d", mpeg_file);
 
-                    create_xing_header(mpeg_file, 0, mpeg_num_recorded_bytes(),
-                                       xingbuf, 0, NULL, false);
+                    create_xing_header(mpeg_file, 0, num_rec_bytes,
+                                       xingbuf, num_recorded_frames, NULL,
+                                       false);
                     
                     lseek(mpeg_file, 4096, SEEK_SET);
                     write(mpeg_file, xingbuf, 417);
@@ -2209,6 +2211,8 @@ static void start_recording(void)
 {
     unsigned long val;
 
+    num_recorded_frames = 0;
+    
     /* Stop monitoring and record for real */
     mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
     val &= ~(1 << 10);
@@ -2236,6 +2240,9 @@ static void stop_recording(void)
     unsigned long val;
 
     is_recording = false;
+
+    /* Read the number of frames recorded */
+    mas_readmem(MAS_BANK_D0, 0xfd0, &num_recorded_frames, 1);
     
     /* Start monitoring */
     mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
@@ -2266,6 +2273,7 @@ unsigned long mpeg_num_recorded_bytes(void)
     else
         return 0;
 }
+
 #endif
 
 void mpeg_play(int offset)
@@ -2853,6 +2861,7 @@ void mpeg_set_recording_gain(int left, int right, int mic)
                        (mic?0x0008:0) | /* Connect left A/D to mic */
                        0x0007);
 }
+
 #endif
 
 #ifdef SIMULATOR
@@ -2998,83 +3007,4 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     dbg_timer_start();
     dbg_cnt2us(0);
 #endif
-}
-
-int d_1;
-int d_2;
-
-int mpeg_create_xing_header(char *filename, void (*progressfunc)(int))
-{
-    struct mp3entry entry;
-    int fd;
-    int rc;
-    int flen;
-    int num_frames;
-    int fpos;
-
-    if(progressfunc)
-        progressfunc(0);
-
-    rc = mp3info(&entry, filename);
-    if(rc < 0)
-        return rc * 10 - 1;
-    
-    fd = open(filename, O_RDWR);
-    if(fd < 0)
-        return fd * 10 - 2;
-
-    flen = lseek(fd, 0, SEEK_END);
-
-    d_1 = entry.first_frame_offset;
-    d_2 = entry.filesize;
-    
-    if(progressfunc)
-        progressfunc(0);
-
-    num_frames = count_mp3_frames(fd, entry.first_frame_offset,
-                                  flen, progressfunc);
-
-    if(num_frames)
-    {
-        create_xing_header(fd, entry.first_frame_offset,
-                           flen, xingbuf, num_frames, progressfunc, true);
-        
-        /* Try to fit the Xing header first in the stream. Replace the existing
-           Xing header if there is one, else see if there is room between the
-           ID3 tag and the first MP3 frame. */
-        if(entry.vbr_header_pos)
-        {
-            /* Reuse existing Xing header */
-            fpos = entry.vbr_header_pos;
-            
-            DEBUGF("Reusing Xing header at %d\n", fpos);
-        }
-        else
-        {
-            /* Any room between ID3 tag and first MP3 frame? */
-            if(entry.first_frame_offset - entry.id3v2len > 417)
-            {
-                fpos = entry.first_frame_offset - 417;
-            }
-            else
-            {
-                close(fd);
-                return -3;
-            }
-        }
-        
-        lseek(fd, fpos, SEEK_SET);
-        write(fd, xingbuf, 417);
-        close(fd);
-        
-        if(progressfunc)
-            progressfunc(100);
-        return 0;
-    }
-    else
-    {
-        /* Not a VBR file */
-        DEBUGF("Not a VBR file\n");
-        return -9;
-    }
 }
