@@ -299,7 +299,5 @@ bool main_menu(void)
 
 /* -----------------------------------------------------------------
  * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
  * vim: et sw=4 ts=8 sts=4 tw=78
  */

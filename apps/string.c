@@ -59,9 +59,3 @@ int main(int argc, char **argv)
 }
 
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

@@ -335,11 +335,3 @@ static int button_read(void)
 }
 
 #endif
-
-
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

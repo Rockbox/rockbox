@@ -809,9 +809,3 @@ int main(int argc, char **argv)
 }
 
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
- * end:
- */

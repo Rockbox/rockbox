@@ -808,8 +808,5 @@ static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 #endif
 
 /* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
  * vim: et sw=4 ts=8 sts=4 tw=78
  */

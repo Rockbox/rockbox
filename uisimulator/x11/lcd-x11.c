@@ -181,8 +181,3 @@ void lcd_update (void)
 }
 
 #endif
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../../firmware/rockbox-mode.el")
- * end:
- */

@@ -1361,9 +1361,3 @@ bool set_time(char* string, int timedate[])
     return false;
 }
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

@@ -584,9 +584,3 @@ static void scroll_thread(void)
 }
 
 #endif /* HAVE_LCD_CHARCELLS */
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

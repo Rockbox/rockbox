@@ -1804,9 +1804,3 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     }
     return 0;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

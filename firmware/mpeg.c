@@ -2925,9 +2925,3 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     dbg_cnt2us(0);
 #endif
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
- * end:
- */

@@ -1307,9 +1307,3 @@ bool dirbrowse(char *root)
 
     return false;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

@@ -632,9 +632,3 @@ calloc (size_t nmemb, size_t size)
   
     return result;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

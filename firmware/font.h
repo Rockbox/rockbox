@@ -112,8 +112,5 @@ void font_reset(void);
 #endif
 
 /* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
  * vim: et sw=4 ts=8 sts=4 tw=78
- * end:
  */

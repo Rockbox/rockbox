@@ -101,9 +101,3 @@ void lcd_backlight (bool on)
 
     InvalidateRect (hGUIWnd, NULL, FALSE);
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../../firmware/rockbox-mode.el")
- * end:
- */

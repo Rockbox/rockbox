@@ -793,9 +793,3 @@ void sort_playlist(bool start_current)
 
     mpeg_flush_and_reload_tracks();
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

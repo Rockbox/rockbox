@@ -833,9 +833,3 @@ static void scroll_thread(void)
 }
 
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

@@ -554,9 +554,3 @@ int lseek(int fd, int offset, int whence)
 
     return pos;
 }
-
-/*
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

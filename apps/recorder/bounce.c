@@ -415,9 +415,3 @@ bool bounce(void)
 }
 
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../../firmware/rockbox-mode.el")
- * end:
- */

@@ -74,9 +74,3 @@ int button_get_w_tmo(int ticks);
 #endif /* HAVE_PLAYER_KEYPAD */
 
 #endif
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */

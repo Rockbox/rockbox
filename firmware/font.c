@@ -359,8 +359,5 @@ static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
 #endif /* HAVE_LCD_BITMAP */
 
 /* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
  * vim: et sw=4 ts=8 sts=4 tw=78
- * end:
  */

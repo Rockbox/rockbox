@@ -946,9 +946,3 @@ int gen_fnt_file(struct font* pf, char *path)
     fclose(ofp);
     return 0;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

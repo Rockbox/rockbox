@@ -769,9 +769,3 @@ bool settings_menu(void)
     menu_exit(m);
     return result;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "../firmware/rockbox-mode.el")
- * end:
- */

@@ -172,9 +172,3 @@ void backlight_init(void)
     
     backlight_on();
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
- * end:
- */

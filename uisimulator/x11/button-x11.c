@@ -198,9 +198,3 @@ int button_get(bool block)
 
     return bits;
 }
-
-/* -----------------------------------------------------------------
- * local variables:
- * eval: (load-file "rockbox-mode.el")
- * end:
- */

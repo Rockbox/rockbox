@@ -59,9 +59,3 @@ strtok_r(char *ptr, const char *sep, char **end)
 }
 
 #endif /* this was only compiled if strtok_r wasn't present */
-
-/*
- * local variables:
- * eval: (load-file "../rockbox-mode.el")
- * end:
- */
