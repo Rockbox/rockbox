@@ -53,21 +53,13 @@ void yield(void)
 /****************************************************************************
  * Interrupt level setting
  ****************************************************************************/
-static int current_irq_level = 15;
-
 int set_irq_level(int level)
 {
-    int old;
-
-    /* First raise to highest level and update the shadow */
-    asm volatile ("ldc %0, sr" : : "r" (15<<4));
-    old = current_irq_level;
-    current_irq_level = level;
-
-    /* Then set the wanted level */
-    asm volatile ("ldc %0, sr" : : "r" ((unsigned int)level<<4));
-
-    return ((unsigned int)old >> 4) & 0x0f;
+    int i;
+    /* Read the old level and set the new one */
+    asm volatile ("stc sr, %0" : "=r" (i));
+    asm volatile ("ldc %0, sr" : : "r" (level << 4));
+    return (i >> 4) & 0x0f;
 }
 
 /****************************************************************************
