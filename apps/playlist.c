@@ -336,11 +336,12 @@ void add_indices_to_playlist(void)
             {
                 store_index = 1;
             } 
-            else if((*p == '#') && store_index)
+            else if(!playlist.in_ram && (*p == '#') && store_index)
             {
                 /* If the first character on a new line is a hash
                    sign, we treat it as a comment. So called winamp
-                   style playlist. */
+                   style playlist.
+                   This applies only to playlist files, of course */
                 store_index = 0;
             }
             else if(store_index) 
