@@ -52,7 +52,6 @@ int open(char* pathname, int flags)
     struct dirent* entry;
     int fd;
     char* name;
-    int namelen;
 
     /* For now, we don't support writing */
     if(flags & (O_WRONLY | O_RDWR))
@@ -101,9 +100,8 @@ int open(char* pathname, int flags)
     }
 
     /* scan dir for name */
-    namelen = strlen(name);
     while ((entry = readdir(dir))) {
-        if ( !strncasecmp(name, entry->d_name, namelen) ) {
+        if ( !strcasecmp(name, entry->d_name) ) {
             fat_open(entry->startcluster, &(openfiles[fd].fatfile));
             openfiles[fd].size = entry->size;
             break;
