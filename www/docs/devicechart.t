@@ -27,7 +27,7 @@
      <a href=ondiofm.jpg><img src=ondiofm_t.jpg></a><br>Ondio FM
     </th>
     <th valign=top>
-     <a href=ondiofm.jpg><img src=ondiofm_t.jpg></a><br>Ondio SP
+     <a href=ondiosp.jpg><img src=ondiosp_t.jpg></a><br>Ondio SP
      <a href=#footnote5>(5)</a>
     </th>
 </tr>
