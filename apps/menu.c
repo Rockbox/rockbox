@@ -19,40 +19,26 @@
 
 #include "lcd.h"
 #include "menu.h"
-
-#include "tree.h"
-#include "credits.h"
-
-#ifdef HAVE_LCD_BITMAP
-
-#include "screensaver.h"
-extern void tetris(void);
-
-#define MENU_ITEM_FONT    0
-#define MENU_ITEM_Y_LOC   6
-#define MENU_LINE_HEIGHT  8
-
-enum Main_Menu_Ids {
-    Tetris, Screen_Saver, Browse, Splash, Credits, Last_Id
-};
-
-struct main_menu_items items[] = {
-    { Tetris,       "Tetris",       tetris      },
-    { Screen_Saver, "Screen Saver", screensaver },
-    { Browse,       "Browse",       browse_root },
-	{ Splash,       "Splash",       show_splash },
-	{ Credits,      "Credits",      show_credits },
-};
+#include "button.h"
+#include "kernel.h"
+#include "debug.h"
 
 /* Global values for menuing */
-int menu_top;
-int menu_bottom;
-int menu_line_height;
-int cursor;
+static int menu_top;
+static int menu_bottom;
+static int cursor;
+static struct menu_items* items;
+static int itemcount;
 
-int get_line_height(void)
+/* 
+ * Move the cursor to a particular id, 
+ *   target: where you want it to be 
+ */
+void put_cursor(int target)
 {
-    return menu_line_height;
+    lcd_puts(0, cursor, " ");
+    cursor = target;
+    lcd_puts(0, cursor, "-");
 }
 
 int is_cursor_menu_top(void)
@@ -87,18 +73,7 @@ void move_cursor_down(void)
 
 void redraw_cursor(void)
 {
-    lcd_putsxy(0, cursor*menu_line_height, "-", 0);
-}
-
-/* 
- * Move the cursor to a particular id, 
- *   target: where you want it to be 
- */
-void put_cursor(int target)
-{
-    lcd_putsxy(0, cursor*menu_line_height, " ",0);
-    cursor = target;
-    lcd_putsxy(0, cursor*menu_line_height, "-",0);
+    lcd_puts(0, cursor, "-");
 }
 
 /* We call the function pointer related to the current cursor position */
@@ -108,104 +83,105 @@ void execute_menu_item(void)
     items[cursor].function();
 }
 
-void add_menu_item(int location, char *string)
+void menu_init(struct menu_items* mitems, int count)
 {
-    lcd_putsxy(MENU_ITEM_Y_LOC, MENU_LINE_HEIGHT*location, string,
-               MENU_ITEM_FONT);
-    if (location < menu_top)
-        menu_top = location;
-    if (location > menu_bottom)
-        menu_bottom = location;
-}
-
-int show_logo(void)
-{
-  unsigned char buffer[112 * 8];
-
-  int failure;
-  int width=0;
-  int height=0;
-
-  failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
-
-  debugf("read_bmp_file() returned %d, width %d height %d\n",
-         failure, width, height);
-
-  if (failure) {
-	  debugf("Unable to find \"/rockbox112.bmp\"\n");
-	  return -1;
-  } else {
-
-    int i;
-    int eline;
-
-    for(i=0, eline=0; i< height; i+=8, eline++) {
-      int x,y;
-      
-      /* the bitmap function doesn't work with full-height bitmaps
-         so we "stripe" the logo output */
-
-      lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
-                 (height-i)>8?8:height-i, false);
-      
-#if 0
-      /* for screen output debugging */
-      for(y=0; y<8 && (i+y < height); y++) {
-        for(x=0; x < width; x++) {
-
-          if(buffer[eline*width + x] & (1<<y)) {
-            printf("*");
-          }
-          else
-            printf(" ");
-        }
-        printf("\n");
-      }
-#endif
-    }
-  }
-
-  return 0;
-}
-
-void menu_init(void)
-{
-    menu_top = Tetris;
-    menu_bottom = Last_Id-1;
-    menu_line_height = MENU_LINE_HEIGHT;
+    items = mitems;
+    itemcount = count;
+    menu_top = items[0].id;
+    menu_bottom = count-1;
     cursor = menu_top;
-	lcd_clear_display();
-	lcd_update();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0,0);
+    lcd_setfont(0);
+#endif
+    lcd_clear_display();
+    lcd_update();
 }
 
 void menu_draw(void)
 {
     int i = 0;
 
-    for (i = i; i < Last_Id; i++)
-        add_menu_item(items[i].menu_id, (char *) items[i].menu_desc);
+    for (i = 0; i < itemcount; i++) {
+        lcd_puts(1, i, items[i].desc);
+        if (i < menu_top)
+            menu_top = i;
+        if (i > menu_bottom)
+            menu_bottom = i;
+    }
 
     redraw_cursor();
-	lcd_update();
+    lcd_update();
 }
 
-#endif /* end HAVE_LCD_BITMAP */
-
-
-
-void show_splash(void)
+void menu_run(void)
 {
+    int key;
 
-    char *rockbox = "ROCKbox!";
-    lcd_clear_display();
-
-#ifdef HAVE_LCD_BITMAP
-    if (show_logo() != 0) 
-        return;
+    menu_draw();
+    put_cursor_menu_top();
+    
+    while(1) {
+        key = button_get();
+        if(!key) {
+            sleep(1);
+            continue;
+        }
+        
+        switch(key) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
 #else
-    lcd_puts(0, 0, rockbox);
+            case BUTTON_LEFT:
 #endif
+                if(is_cursor_menu_top()){
+                    /* wrap around to menu bottom */
+                    put_cursor_menu_bottom();
+                } else {
+                    /* move up */
+                    move_cursor_up();
+                }
+                break;
 
-    lcd_update();
-    busy_wait();
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_RIGHT:
+#endif
+                if(is_cursor_menu_bottom() ){
+                    /* wrap around to menu top */
+                    put_cursor_menu_top();
+                } else {
+                    /* move down */
+                    move_cursor_down();
+                }
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_RIGHT:
+#endif
+            case BUTTON_PLAY:
+                /* Erase current display state */
+                lcd_clear_display();
+            
+                execute_menu_item();
+            
+                /* Return to previous display state */
+                lcd_clear_display();
+                menu_draw();
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+#endif
+                return;
+
+            default:
+                break;
+        }
+        
+        lcd_update();
+    }
 }

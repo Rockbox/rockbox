@@ -20,37 +20,13 @@
 #ifndef __MENU_H__
 #define __MENU_H__
 
-struct main_menu_items {
-    int menu_id;
-    const char *menu_desc;
+struct menu_items {
+    int id;
+    char *desc;
     void (*function) (void);
 };
 
-int get_line_height(void);
-
-/* Reads in bmp file for logo */
-int show_logo(void);
-
-/* Shows the actual splash screen.  
- * Wrapper around show_logo making use of lcd functions */
-void show_splash(void);
-
-/* Cursor calls */
-void put_cursor(int target);
-void put_cursor_menu_top(void);
-void put_cursor_menu_bottom(void);
-void move_cursor_up(void);
-void move_cursor_down(void);
-int is_cursor_menu_top(void);
-int is_cursor_menu_bottom(void);
-
-/* Menu calls */
-void add_menu_item(int location, char *string);
-void menu_init(void);
+void menu_init(struct menu_items* items, int count);
 void menu_draw(void);
-void execute_menu_item(void);
 
 #endif /* End __MENU_H__ */
-
-
-
