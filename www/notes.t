@@ -75,8 +75,8 @@ This is backed by the HW manual p102, which says that DRAM can only be at put on
 <tr><td>PB11</td><td>TxD1</td><td>Output</td><td></td><td>Remote?</td></tr>
 <tr><td>PB12</td><td>SCK0</td><td>Output</td><td></td><td>MPEG</td></tr>
 <tr><td>PB13</td><td>i/o</td><td>Output</td><td></td><td>I²C clock</td></tr>
-<tr><td>PB14</td><td>/IRQ6</td><td>Input</td></tr>
-<tr><td>PB15</td><td>i/o</td><td>Input</td></tr>
+<tr><td>PB14</td><td>/IRQ6</td><td>Input</td><td></td><td>MAS demand</td></tr>
+<tr><td>PB15</td><td>i/o</td><td>Input</td><td></td><td>MAS MP3 frame sync</td></tr>
 </table>
 
 
