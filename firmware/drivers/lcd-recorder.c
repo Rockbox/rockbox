@@ -165,7 +165,8 @@ void lcd_init (void)
 
 /* Performance function that works with an external buffer
    note that y and height are in 8-pixel units! */
-void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride)
+void lcd_blit (const unsigned char* p_data, int x, int y, int width,
+               int height, int stride)
 {
     /* Copy display bitmap to hardware */
     while (height--)

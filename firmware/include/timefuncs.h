@@ -25,7 +25,7 @@
 #include "time.h"
 
 struct tm *get_time(void);
-int set_time(struct tm *tm);
-bool valid_time(struct tm *tm);
+int set_time(const struct tm *tm);
+bool valid_time(const struct tm *tm);
 
 #endif /* _TIMEFUNCS_H_ */

@@ -236,7 +236,7 @@ static int update_fsinfo(void);
 static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
-static int create_dos_name(unsigned char *name, unsigned char *newname);
+static int create_dos_name(const unsigned char *name, unsigned char *newname);
 static unsigned int find_free_cluster(unsigned int start);
 static int transfer( unsigned int start, int count, char* buf, bool write );
 
@@ -811,8 +811,8 @@ static void fat_time(unsigned short* date,
 static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
                            unsigned int numentries,
-                           unsigned char* name,
-                           unsigned char* shortname,
+                           const unsigned char* name,
+                           const unsigned char* shortname,
                            bool is_directory)
 {
     unsigned char buf[SECTOR_SIZE];
@@ -949,7 +949,7 @@ static int write_long_name(struct fat_file* file,
 
 static int add_dir_entry(struct fat_dir* dir,
                          struct fat_file* file,
-                         char* name,
+                         const char* name,
                          bool is_directory,
                          bool dotdir)
 {
@@ -1178,7 +1178,7 @@ unsigned char char2dos(unsigned char c)
     return c;
 }
 
-static int create_dos_name(unsigned char *name, unsigned char *newname)
+static int create_dos_name(const unsigned char *name, unsigned char *newname)
 {
     int i,j;
 
@@ -1265,7 +1265,7 @@ static int update_short_entry( struct fat_file* file, int size, int attr )
     return 0;
 }
 
-static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
+static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
 {
     int i=0,j=0;
     memset(de, 0, sizeof(struct fat_direntry));
@@ -1292,7 +1292,7 @@ static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
 
 int fat_open(unsigned int startcluster,
              struct fat_file *file,
-             struct fat_dir* dir)
+             const struct fat_dir* dir)
 {
     file->firstcluster = startcluster;
     file->lastcluster = startcluster;
@@ -1311,7 +1311,7 @@ int fat_open(unsigned int startcluster,
     return 0;
 }
 
-int fat_create_file(char* name,
+int fat_create_file(const char* name,
                     struct fat_file* file,
                     struct fat_dir* dir)
 {
@@ -1331,7 +1331,7 @@ int fat_create_file(char* name,
     return rc;
 }
 
-int fat_create_dir(char* name,
+int fat_create_dir(const char* name,
                    struct fat_dir* newdir,
                    struct fat_dir* dir)
 {
@@ -1396,7 +1396,7 @@ int fat_create_dir(char* name,
     return rc;
 }
 
-int fat_truncate(struct fat_file *file)
+int fat_truncate(const struct fat_file *file)
 {
     /* truncate trailing clusters */
     int next;
@@ -1551,7 +1551,7 @@ int fat_remove(struct fat_file* file)
 }
 
 int fat_rename(struct fat_file* file, 
-               unsigned char* newname,
+               const unsigned char* newname,
                int size,
                int attr)
 {
@@ -1656,7 +1656,7 @@ static int transfer( unsigned int start, int count, char* buf, bool write )
 }
 
 
-int fat_readwrite( struct fat_file *file, int sectorcount, 
+int fat_readwrite( struct fat_file *file, int sectorcount,
                    void* buf, bool write )
 {
     int cluster = file->lastcluster;
@@ -1801,7 +1801,7 @@ int fat_seek(struct fat_file *file, unsigned int seeksector )
 }
 
 int fat_opendir(struct fat_dir *dir, unsigned int startcluster,
-                struct fat_dir *parent_dir)
+                const struct fat_dir *parent_dir)
 {
     int rc;
 
@@ -1823,7 +1823,8 @@ int fat_opendir(struct fat_dir *dir, unsigned int startcluster,
 }
 
 /* convert from unicode to a single-byte charset */
-static void unicode2iso(unsigned char* unicode, unsigned char* iso, int count )
+static void unicode2iso(const unsigned char* unicode, unsigned char* iso,
+                        int count)
 {
     int i;
 

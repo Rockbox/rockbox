@@ -116,7 +116,7 @@ struct plugin_api {
     void (*lcd_stop_scroll)(void);
     void (*lcd_set_contrast)(int x);
 #ifdef HAVE_LCD_CHARCELLS
-    void (*lcd_define_pattern)(int which,char *pattern);
+    void (*lcd_define_pattern)(int which,const char *pattern);
     unsigned char (*lcd_get_locked_pattern)(void);
     void (*lcd_unlock_pattern)(unsigned char pat);
     void (*lcd_putc)(int x, int y, unsigned short ch);
@@ -145,7 +145,8 @@ struct plugin_api {
                       int min_shown, int max_shown, int orientation);
     void (*checkbox)(int x, int y, int width, int height, bool checked);
     unsigned char* lcd_framebuffer;
-    void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
+    void (*lcd_blit) (const unsigned char* p_data, int x, int y, int width,
+                      int height, int stride);
 #ifndef SIMULATOR
     void (*lcd_roll)(int pixels);
 #endif
@@ -235,7 +236,7 @@ struct plugin_api {
     /* MAS communication */
 #ifndef SIMULATOR
     int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
-    int (*mas_writemem)(int bank, int addr, unsigned long* src, int len);
+    int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
     int (*mas_readreg)(int reg);
     int (*mas_writereg)(int reg, unsigned int val);
 #ifdef HAVE_MAS3587F
@@ -251,7 +252,7 @@ struct plugin_api {
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
-    int  (*set_time)(struct tm *tm);
+    int  (*set_time)(const struct tm *tm);
     void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_mp3_buffer)(int* buffer_size);
 #ifndef SIMULATOR

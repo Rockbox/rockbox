@@ -447,11 +447,11 @@ int ata_read_sectors(unsigned long start,
 }
 
 /* the tight loop of ata_write_sectors(), to avoid the whole in IRAM */
-static void copy_write_sectors(unsigned char* buf,
+static void copy_write_sectors(const unsigned char* buf,
                                int wordcount)
                                __attribute__ ((section (".icode")));
 
-static void copy_write_sectors(unsigned char* buf, int wordcount)
+static void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
 #ifdef PREFER_C_WRITING
 
@@ -566,7 +566,7 @@ static void copy_write_sectors(unsigned char* buf, int wordcount)
 
 int ata_write_sectors(unsigned long start,
                       int count,
-                      void* buf)
+                      const void* buf)
 {
     int i;
     int ret = 0;
@@ -657,7 +657,7 @@ int ata_write_sectors(unsigned long start,
     return ret;
 }
 
-extern void ata_delayed_write(unsigned long sector, void* buf)
+extern void ata_delayed_write(unsigned long sector, const void* buf)
 {
     memcpy(delayed_sector, buf, SECTOR_SIZE);
     delayed_sector_num = sector;

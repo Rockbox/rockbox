@@ -398,7 +398,7 @@ void lcd_unlock_pattern(unsigned char pat)
     lcd_free_pat(pat);
 }
 
-void lcd_define_pattern(int pat, char *pattern)
+void lcd_define_pattern(int pat, const char *pattern)
 {
     int i;
     for (i=0; i<7; i++) {
@@ -410,7 +410,7 @@ void lcd_define_pattern(int pat, char *pattern)
 }
 
 #ifndef SIMULATOR
-void lcd_define_hw_pattern (int which,char *pattern,int length)
+void lcd_define_hw_pattern (int which,const char *pattern,int length)
 {
     lcd_write_command(lcd_pram | which);
     lcd_write_data(pattern, length);

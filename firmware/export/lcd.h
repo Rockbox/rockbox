@@ -44,13 +44,14 @@ extern void lcd_scroll_speed( int speed );
 extern void lcd_scroll_delay( int ms );
 extern void lcd_set_contrast(int val);
 extern void lcd_write_command( int byte );
-extern void lcd_write_data( unsigned char* p_bytes, int count );
+extern void lcd_write_data( const unsigned char* p_bytes, int count );
 extern int  lcd_default_contrast(void);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 extern void lcd_update(void);
 /* performance function */
-extern void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride);
+extern void lcd_blit (const unsigned char* p_data, int x, int y, int width,
+                      int height, int stride);
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
@@ -88,8 +89,8 @@ enum
     ICON_PARAM
 };
 
-extern void lcd_define_hw_pattern (int which,char *pattern,int length);
-extern void lcd_define_pattern (int which,char *pattern);
+extern void lcd_define_hw_pattern (int which,const char *pattern,int length);
+extern void lcd_define_pattern (int which,const char *pattern);
 extern void lcd_double_height (bool on);
 #define JUMP_SCROLL_ALWAYS 5
 extern void lcd_jump_scroll (int mode); /* 0=off, 1=once, ..., ALWAYS */

@@ -222,7 +222,7 @@ void lcd_double_height(bool on)
     lcd_update();
 }
 
-void lcd_define_hw_pattern(int which, char *pattern, int length)
+void lcd_define_hw_pattern(int which, const char *pattern, int length)
 {
     int i, j;
     int pat = which / 8;

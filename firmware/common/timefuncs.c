@@ -27,7 +27,7 @@
 static struct tm tm;
 #endif
 
-bool valid_time(struct tm *tm)
+bool valid_time(const struct tm *tm)
 {
     if (tm->tm_hour < 0 || tm->tm_hour > 23 ||
         tm->tm_sec < 0 || tm->tm_sec > 59 || 
@@ -81,7 +81,7 @@ struct tm *get_time(void)
 #endif
 }
 
-int set_time(struct tm *tm)
+int set_time(const struct tm *tm)
 {
 #ifdef HAVE_RTC
     int rc;

@@ -101,7 +101,7 @@
 int mas_default_read(unsigned short *buf);
 int mas_run(unsigned short address);
 int mas_readmem(int bank, int addr, unsigned long* dest, int len);
-int mas_writemem(int bank, int addr, unsigned long* src, int len);
+int mas_writemem(int bank, int addr, const unsigned long* src, int len);
 int mas_readreg(int reg);
 int mas_writereg(int reg, unsigned int val);
 void mas_reset(void);

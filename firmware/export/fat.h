@@ -72,14 +72,14 @@ struct fat_dir
 extern int fat_mount(int startsector);
 extern void fat_size(unsigned int* size, unsigned int* free);
 extern void fat_recalc_free(void);
-extern int fat_create_dir(char* name,
+extern int fat_create_dir(const char* name,
                           struct fat_dir* newdir,
                           struct fat_dir* dir);
 extern int fat_startsector(void);
 extern int fat_open(unsigned int cluster,
                     struct fat_file* ent,
-                    struct fat_dir* dir);
-extern int fat_create_file(char* name, 
+                    const struct fat_dir* dir);
+extern int fat_create_file(const char* name,
                            struct fat_file* ent,
                            struct fat_dir* dir);
 extern int fat_readwrite(struct fat_file *ent, int sectorcount, 
@@ -87,13 +87,13 @@ extern int fat_readwrite(struct fat_file *ent, int sectorcount,
 extern int fat_closewrite(struct fat_file *ent, int size, int attr);
 extern int fat_seek(struct fat_file *ent, unsigned int sector );
 extern int fat_remove(struct fat_file *ent);
-extern int fat_truncate(struct fat_file *ent);
+extern int fat_truncate(const struct fat_file *ent);
 extern int fat_rename(struct fat_file* file, 
-                      unsigned char* newname,
+                      const unsigned char* newname,
                       int size, int attr);
 
 extern int fat_opendir(struct fat_dir *ent, unsigned int currdir,
-                       struct fat_dir *parent_dir);
+                       const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 extern int fat_get_cluster_size(void);
 

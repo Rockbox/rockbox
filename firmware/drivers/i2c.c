@@ -198,7 +198,7 @@ unsigned char i2c_inb(int ack)
    return byte;
 }
 
-int i2c_write(int address, unsigned char* buf, int count )
+int i2c_write(int address, const unsigned char* buf, int count )
 {
     int i,x=0;
 

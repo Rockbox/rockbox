@@ -112,12 +112,12 @@ int mas_readmem(int bank, int addr, unsigned long* dest, int len)
 }
 
 /* note: 'len' is number of 32-bit words, not number of bytes! */
-int mas_writemem(int bank, int addr, unsigned long* src, int len)
+int mas_writemem(int bank, int addr, const unsigned long* src, int len)
 {
     int ret = 0;
     int i, j;
     unsigned char buf[60];
-    unsigned char* ptr = (unsigned char*)src;
+    const unsigned char* ptr = (const unsigned char*)src;
 
     i2c_begin();
 

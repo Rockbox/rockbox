@@ -3,5 +3,5 @@
 
 /* struct tm defined */
 struct tm *get_time(void);
-int set_time(struct tm *tm);
-bool valid_time(struct tm *tm);
+int set_time(const struct tm *tm);
+bool valid_time(const struct tm *tm);
