@@ -55,16 +55,16 @@ int main(void)
     SCR1 &= ~0x80;
     IPRE |= 0xf000; /* Set to highest priority */
 
-    set_irq_level(0);
-
     debugf("OK. Let's go\n");
 
     kernel_init();
 
+    set_irq_level(0);
+
     tick_add_task(testfunc);
     
     debugf("sleeping 10s...\n");
-    sleep(10000);
+    sleep(HZ*10);
     debugf("woke up\n");
     
     queue_init(&main_q);
@@ -84,7 +84,7 @@ void t1(void)
     debugf("Thread 1 started\n");
     while(1)
     {
-        sleep(100);
+        sleep(HZ);
         debugf("Thread 1 posting an event\n");
         queue_post(&main_q, 1234, 0);
         queue_post(&main_q, 5678, 0);
@@ -96,7 +96,7 @@ void t2(void)
     debugf("Thread 2 started\n");
     while(1)
     {
-        sleep(300);
+        sleep(HZ*3);
         debugf("Thread 2 awakened\n");
     }
 }

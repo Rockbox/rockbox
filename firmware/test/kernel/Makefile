@@ -11,11 +11,11 @@ INCLUDES=-I../../ -I../../drivers
 TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
+CFLAGS = -g -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
 OBJS= 	../../crt0.o ../../system.o main.o ../../panic.o ../../drivers/lcd.o \
-	../../thread.o ../../kernel.o ../../drivers/led.o \
+	thread.o ../../kernel.o ../../drivers/led.o \
 	../../debug.o ../../common/sprintf.o
 
 %.o: %.S
@@ -47,3 +47,6 @@ clean:
 
 install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
+
+thread.o: ../../thread.c
+	$(CC) -O -fomit-frame-pointer -c $(CFLAGS) $<
