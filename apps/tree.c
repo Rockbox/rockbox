@@ -268,15 +268,17 @@ bool dirbrowse(char *root)
 #else
             case BUTTON_RIGHT:
 #endif
-                if(dircursor+1 < TREE_MAX_ON_SCREEN) {
-                    lcd_puts(0, LINE_Y+dircursor, " ");
-                    dircursor++;
-                    lcd_puts(0, LINE_Y+dircursor, "-");
-                } 
-                else {
-                    start++;
-                    numentries = showdir(currdir, start);
-                    lcd_puts(0, LINE_Y+dircursor, "-");
+                if (dircursor + start + 1 < numentries ) {
+                    if(dircursor+1 < TREE_MAX_ON_SCREEN) {
+                        lcd_puts(0, LINE_Y+dircursor, " ");
+                        dircursor++;
+                        lcd_puts(0, LINE_Y+dircursor, "-");
+                    } 
+                    else {
+                        start++;
+                        numentries = showdir(currdir, start);
+                        lcd_puts(0, LINE_Y+dircursor, "-");
+                    }
                 }
                 break;
 
