@@ -20,7 +20,7 @@
 #include "config.h"
 
 #include "rtc.h"
-#include "time.h"
+#include "timefuncs.h"
 #include "debug.h"
 
 static struct tm tm;
