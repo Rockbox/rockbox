@@ -53,7 +53,7 @@ void playlist_init(void)
 {
     playlist.fd = -1;
     playlist.max_playlist_size = global_settings.max_files_in_playlist;
-    playlist.indices = buffer_alloc(playlist.max_playlist_size);
+    playlist.indices = buffer_alloc(playlist.max_playlist_size * sizeof(int));
     playlist.buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
     playlist_buffer = buffer_alloc(playlist.buffer_size);
