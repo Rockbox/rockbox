@@ -9,6 +9,7 @@
 *
 * Plugin for video playback
 * Reads raw image data + audio data from a file
+* !!!!!!!!!! Code Police free zone !!!!!!!!!!
 *
 * Copyright (C) 2003-2004 Jörg Hohensohn aka [IDC]Dragon
 *
@@ -19,132 +20,439 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
+
+
+/****************** imports ******************/
+
 #include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
-#include "../apps/recorder/widgets.h" /* not in search path, booh */
+#include "../apps/recorder/widgets.h" // not in search path, booh
 
-#ifndef SIMULATOR /* not for simulator by now */
-#ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
+#ifndef SIMULATOR // not for simulator by now
+#ifdef HAVE_LCD_BITMAP // and definitely not for the Player, haha
 
-#define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
-#define FILEBUFSIZE (SCREENSIZE*4) /* must result in a multiple of 512 */
-#define FPS 71 /* desired framerate */
-#define WIND_MAX 9 /* max FF/FR speed */
+/****************** constants ******************/
 
-#define FRAMETIME (FREQ/8/FPS) /* internal timer4 value */
+#define IMIA4 (*((volatile unsigned long*)0x09000180)) // timer 4
 
-/* globals */
+#define INT_MAX ((int)(~(unsigned)0 >> 1))
+#define INT_MIN (-INT_MAX-1)
+
+#define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) // in bytes
+#define FPS 68 // default fps for headerless (old video-only) file
+#define MAX_ACC 20 // maximum FF/FR speedup
+#define FF_TICKS 3000; // experimentally found nice
+
+// trigger levels, we need about 80 kB/sec
+#define PRECHARGE (1024 * 64) // the initial filling before starting to play
+#define SPINUP 2500 // 2200 // from what level on to refill, in milliseconds
+#define CHUNK (1024*32) // read size
+
+
+/****************** prototypes ******************/
+void timer_set(unsigned period); // setup ISR and timer registers
+void timer4_isr(void) __attribute__((interrupt_handler)); // IMIA4 ISR
+int check_button(void); // determine next relative frame
+
+
+/****************** data types ******************/
+
+// plugins don't introduce headers, so structs are repeated from rvf_format.h
+
+#define HEADER_MAGIC 0x52564668 // "RVFh" at file start 
+#define AUDIO_MAGIC  0x41756446 // "AudF" for each audio block
+#define FILEVERSION  100 // 1.00
+#define CLOCK 11059200 // SH CPU clock
+
+// format type definitions
+#define VIDEOFORMAT_NO_VIDEO       0
+#define VIDEOFORMAT_RAW            1
+#define AUDIOFORMAT_NO_AUDIO       0
+#define AUDIOFORMAT_MP3            1
+#define AUDIOFORMAT_MP3_BITSWAPPED 2
+
+// bit flags
+#define FLAG_LOOP 0x00000001 // loop the playback, e.g. for stills
+
+typedef struct // contains whatever might be useful to the player
+{
+    // general info (16 entries = 64 byte)
+    unsigned long magic; // HEADER_MAGIC
+    unsigned long version; // file version
+    unsigned long flags; // combination of FLAG_xx
+    unsigned long blocksize; // how many bytes per block (=video frame)
+    unsigned long bps_average; // bits per second of the whole stream
+    unsigned long bps_peak; // max. of above (audio may be VBR)
+    unsigned long reserved[10]; // reserved, should be zero
+
+    // video info (16 entries = 64 byte)
+    unsigned long video_format; // one of VIDEOFORMAT_xxx
+    unsigned long video_1st_frame; // byte position of first video frame
+    unsigned long video_duration; // total length of video part, in ms
+    unsigned long video_payload_size; // total amount of video data, in bytes
+    unsigned long video_bitrate; // derived from resolution and frame time, in bps
+    unsigned long video_frametime; // frame interval in 11.0592 MHz clocks
+    long video_preroll; // video is how much ahead, in 11.0592 MHz clocks
+    unsigned long video_width; // in pixels
+    unsigned long video_height; // in pixels
+    unsigned long video_reserved[7]; // reserved, should be zero
+
+    // audio info (16 entries = 64 byte)
+    unsigned long audio_format; // one of AUDIOFORMAT_xxx
+    unsigned long audio_1st_frame; // byte position of first video frame
+    unsigned long audio_duration; // total length of audio part, in ms
+    unsigned long audio_payload_size; // total amount of audio data, in bytes
+    unsigned long audio_avg_bitrate; // average audio bitrate, in bits per second
+    unsigned long audio_peak_bitrate; // maximum bitrate
+    unsigned long audio_headersize; // offset to payload in audio frames
+    long audio_min_associated; // minimum offset to video frame, in bytes
+    long audio_max_associated; // maximum offset to video frame, in bytes
+    unsigned long audio_reserved[7]; // reserved, should be zero
+
+   // more to come... ?
+
+    // Note: padding up to 'blocksize' with zero following this header
+} tFileHeader;
+
+typedef struct // the little header for all audio blocks
+{
+    unsigned long magic; // AUDIO_MAGIC indicates an audio block
+	unsigned char previous_block; // previous how many blocks backwards
+    unsigned char next_block; // next how many blocks forward
+	short associated_video; // offset to block with corresponding video
+    unsigned short frame_start; // offset to first frame starting in this block
+    unsigned short frame_end; // offset to behind last frame ending in this block
+} tAudioFrameHeader;
+
+
+
+/****************** globals ******************/
+
 static struct plugin_api* rb; /* here is a global api struct pointer */
+static char gPrint[32]; /* a global printf buffer, saves stack */
 
-static enum 
+
+// playstate
+static struct 
 {
-    playing,
-    paused,
-    stop,
-    exit
-} state = playing;
-
-static int playstep = 1; /* for current speed and direction */
-static int acceleration = 0;
-static long time; /* to calculate the playing time */
-
-
-/* test for button, returns relative frame and may change state */
-int check_button(void)
-{
-    int button;
-    int frame; /* result: relative frame */
-    bool loop;
-    
-    frame = playstep; /* default */
-
-    do
+    enum 
     {
-        loop = false;
-        if (state == playing)
-            button = rb->button_get(false);
-        else
+        playing,
+        paused,
+    } state;
+    bool bAudioUnderrun;
+    bool bVideoUnderrun;
+    bool bHasAudio;
+    bool bHasVideo;
+    int nTimeOSD; // OSD should stay for this many frames
+    bool bDirtyOSD; // OSD needs redraw
+    bool bRefilling; // set if refilling buffer
+    bool bSeeking;
+    int nSeekAcc; // accelleration value for seek
+    int nSeekPos; // current file position for seek
+} gPlay;
+
+// buffer information
+static struct
+{
+    int bufsize;
+    int granularity; // common multiple of block and sector size
+    unsigned char* pBufStart; // start of ring buffer
+    unsigned char* pBufEnd; // end of ring buffer
+    unsigned char* pOSD; // OSD memory (112 bytes for 112*8 pixels)
+
+    int vidcount; // how many video blocks are known in a row
+    unsigned char* pBufFill; // write pointer for disk, owned by main task
+    unsigned char* pReadVideo; // video readout, maintained by timer ISR
+    unsigned char* pReadAudio; // audio readout, maintained by demand ISR
+    bool bEOF; // flag for end of file
+    int low_water; // reload threshold 
+    int high_water; // end of reload threshold
+    int nReadChunk; // how much data for normal buffer fill
+    int nSeekChunk; // how much data while seeking
+} gBuf;
+
+// statistics
+static struct
+{
+    int minAudioAvail;
+    int minVideoAvail;
+    int nAudioUnderruns;
+    int nVideoUnderruns;
+} gStats;
+
+tFileHeader gFileHdr; // file header
+
+/****************** implementation ******************/
+
+// tool function: return how much playable audio/video is left
+int Available(unsigned char* pSnapshot)
+{
+    if (pSnapshot <= gBuf.pBufFill)
+        return gBuf.pBufFill - pSnapshot;
+    else
+        return gBuf.bufsize - (pSnapshot - gBuf.pBufFill);
+}
+
+// debug function to draw buffer indicators
+void DrawBuf(void)
+{
+    static int old_fill = -1; // indicate not initialized
+    static int old_video;
+    static int old_audio;
+    int fill, video, audio;
+
+    // first call?
+    if (old_fill == -1)
+    {
+        rb->memset(gBuf.pOSD, 0x10, LCD_WIDTH); // draw line
+        gBuf.pOSD[0] = gBuf.pOSD[LCD_WIDTH-1] = 0xFE; // ends
+        old_fill = 1; // do no harm below
+    }
+
+    // calculate new tick positions
+    fill = 1 + ((gBuf.pBufFill - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
+    video = 1 + ((gBuf.pReadVideo - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
+    audio = 1 + ((gBuf.pReadAudio - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
+
+    if (fill != old_fill || video != old_video || audio != old_audio)
+    {
+        // erase old ticks
+        gBuf.pOSD[old_fill] = 0x10;
+        gBuf.pOSD[old_video] = 0x10;
+        gBuf.pOSD[old_audio] = 0x10;
+
+        gBuf.pOSD[fill] |= 0x20; // below the line, two pixels
+        gBuf.pOSD[video] |= 0x08; // one above
+        gBuf.pOSD[audio] |= 0x04; // two above
+
+        old_fill =  fill;
+        old_video = video;
+        old_audio = audio;
+
+        gPlay.bDirtyOSD = true; // redraw it with next timer IRQ
+    }
+}
+
+
+// helper function to draw a position indicator
+void DrawPosition(int pos, int total)
+{
+    int w,h;
+    int sec; // estimated seconds
+    int percent;
+
+
+    /* print the estimated position */   
+    sec = pos / (gFileHdr.bps_average/8);
+    if (sec < 100*60) /* fits into mm:ss format */
+        rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dm", sec/60, sec%60);
+    else /* a very long clip, hh:mm format */
+        rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dh", sec/3600, (sec/60)%60);
+    rb->lcd_puts(0, 7, gPrint);
+
+    /* draw a slider over the rest of the line */
+    rb->lcd_getstringsize(gPrint, &w, &h);
+    w++;
+    percent = pos/(total/100);
+    rb->slidebar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, percent, Grow_Right);
+
+    if (gPlay.state == paused) // we have to draw ourselves
+        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    else // let the display time do it
+    {
+        gPlay.nTimeOSD = 70;
+        gPlay.bDirtyOSD = true; // redraw it with next timer IRQ
+    }
+}
+
+
+// helper function to change the volume by a certain amount, +/-
+void ChangeVolume(int delta)
+{
+    int vol = rb->global_settings->volume + delta;
+
+    if (vol > 100) vol = 100;
+    else if (vol < 0) vol = 0;
+    if (vol != rb->global_settings->volume)
+    {
+        rb->mpeg_sound_set(SOUND_VOLUME, vol);
+        rb->global_settings->volume = vol;
+        rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d", vol);
+        rb->lcd_puts(0, 7, gPrint);
+        if (gPlay.state == paused) // we have to draw ourselves
+            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+        else // let the display time do it
         {
-            long current = *rb->current_tick;
-            button = rb->button_get(true); /* block */
-            time += *rb->current_tick - current; /* don't time while waiting */
-        }
-
-        switch(button)
-        {
-        case BUTTON_NONE:
-            break; /* quick exit */
-
-        case BUTTON_LEFT | BUTTON_REPEAT:
-            if (state == paused)
-                frame = -1; /* single step back */
-            else if (state == playing)
-            {
-                acceleration--;
-                playstep = acceleration/4; /* FR */
-                if (playstep > -2)
-                    playstep = -2;
-                if (playstep < -WIND_MAX)
-                    playstep = -WIND_MAX;
-            }
-            break;
-
-        case BUTTON_RIGHT | BUTTON_REPEAT:
-            if (state == paused)
-                frame = 1; /* single step */
-            else if (state == playing)
-            {
-                acceleration++;
-                playstep = acceleration/4; /* FF */
-                if (playstep < 2)
-                    playstep = 2;
-                if (playstep > WIND_MAX)
-                    playstep = WIND_MAX;
-            }
-            break;
-
-        case BUTTON_PLAY:
-            if (state == playing && (playstep == 1 || playstep == -1))
-                state = paused;
-            else if (state == paused)
-                state = playing;
-            playstep = 1;
-            acceleration = 0;
-            break;
-
-        case BUTTON_LEFT:
-            if (state == paused)
-                frame = -1; /* single step back */
-            else if (state == playing)
-                playstep = -1; /* rewind */
-            acceleration = 0;
-            break;
-        
-        case BUTTON_RIGHT:
-            if (state == paused)
-                frame = 1; /* single step */
-            else if (state == playing)
-                playstep = 1; /* forward */
-            acceleration = 0;
-            break;
-
-        case BUTTON_OFF:
-            state = stop;
-            break;
-
-        case SYS_USB_CONNECTED:
-            state = exit;
-            break;
-
-        default:
-            if (state != playing)
-                loop = true;
+            gPlay.nTimeOSD = 50; // display it for 50 frames
+            gPlay.bDirtyOSD = true; // let the refresh copy it to LCD
         }
     }
-    while (loop);
+}
 
-    return frame;
+
+// sync the video to the current audio
+void SyncVideo(void)
+{
+    tAudioFrameHeader* pAudioBuf;
+
+    pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadAudio);
+    if (pAudioBuf->magic == AUDIO_MAGIC)
+    {
+        gBuf.vidcount = 0; // nothing known
+        // sync the video position
+        gBuf.pReadVideo = gBuf.pReadAudio + 
+            (long)pAudioBuf->associated_video * (long)gFileHdr.blocksize;
+    
+        // handle possible wrap
+        if (gBuf.pReadVideo >= gBuf.pBufEnd)
+            gBuf.pReadVideo -= gBuf.bufsize;
+        else if (gBuf.pReadVideo < gBuf.pBufStart)
+            gBuf.pReadVideo += gBuf.bufsize;
+    }
+}
+
+
+// setup ISR and timer registers
+void timer_set(unsigned period)
+{
+    if (period)
+    {
+        and_b(~0x10, &TSTR); // Stop the timer 4
+        and_b(~0x10, &TSNC); // No synchronization
+        and_b(~0x10, &TMDR); // Operate normally
+
+        IMIA4 = (unsigned long)timer4_isr; // install ISR
+
+        TSR4 &= ~0x01;
+        TIER4 = 0xF9; // Enable GRA match interrupt
+
+        GRA4 = (unsigned short)(period/4 - 1);
+        TCR4 = 0x22; // clear at GRA match, sysclock/4
+        IPRD = (IPRD & 0xFF0F) | 0x0010; // interrupt priority 1 (lowest)
+        or_b(0x10, &TSTR); // start timer 4
+    }
+    else
+    {
+        and_b(~0x10, &TSTR); // stop the timer 4
+        IPRD = (IPRD & 0xFF0F); // disable interrupt
+    }
+}
+
+
+// timer interrupt handler to display a frame
+void timer4_isr(void) // IMIA4
+{
+    int available;
+    tAudioFrameHeader* pAudioBuf;
+    int height; // height to display
+
+    TSR4 &= ~0x01; // clear the interrupt
+
+    // xor_b(0x40, &PBDRL); // test: toggle LED (PB6)
+    // debug code
+/*
+    gPlay.nTimeOSD = 1;
+    DrawBuf();
+    gPlay.bDirtyOSD = true;
+*/
+
+    // reduce height if we have OSD on
+    height = gFileHdr.video_height/8;        
+    if (gPlay.nTimeOSD > 0)
+    {
+        gPlay.nTimeOSD--;
+        height = MIN(LCD_HEIGHT/8-1, height); // reserve bottom line
+        if (gPlay.bDirtyOSD)
+        {   // OSD to bottom line
+            rb->lcd_blit(gBuf.pOSD, 0, LCD_HEIGHT/8-1, 
+                LCD_WIDTH, 1, LCD_WIDTH);
+            gPlay.bDirtyOSD = false;
+        }
+    }
+
+    rb->lcd_blit(gBuf.pReadVideo, 0, 0, 
+        gFileHdr.video_width, height, gFileHdr.video_width);
+
+    available = Available(gBuf.pReadVideo);
+
+    // loop to skip audio frame(s)
+    while(1)
+    {
+        // just for the statistics
+        if (!gBuf.bEOF && available < gStats.minVideoAvail)
+            gStats.minVideoAvail = available;
+
+        if (available < (int)gFileHdr.blocksize)
+        {   // no data for next frame
+
+            if (gBuf.bEOF && (gFileHdr.flags & FLAG_LOOP))
+            {   // loop now, assuming the looped clip fits in memory
+                gBuf.pReadVideo = gBuf.pBufStart + gFileHdr.video_1st_frame;
+            }
+            else
+            {
+                gPlay.bVideoUnderrun = true;
+                timer_set(0); // disable ourselves
+                return; // no data available
+            }
+        }
+
+        gBuf.pReadVideo += gFileHdr.blocksize;
+        if (gBuf.pReadVideo >= gBuf.pBufEnd)
+            gBuf.pReadVideo -= gBuf.bufsize; // wraparound
+        available -= gFileHdr.blocksize;
+
+        if (!gPlay.bHasAudio)
+            break; // no need to skip any audio
+        
+        if (gBuf.vidcount)
+        {   
+            // we know the next is a video frame
+            gBuf.vidcount--;
+            break; // exit the loop
+        }
+        
+        pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadVideo);
+        if (pAudioBuf->magic == AUDIO_MAGIC)
+        {   // we ran into audio, can happen after seek
+            gBuf.vidcount = pAudioBuf->next_block;
+            if (gBuf.vidcount)
+                gBuf.vidcount--; // minus the audio block
+        }
+    } // while
+}
+
+
+// ISR function to get more mp3 data
+void GetMoreMp3(unsigned char** start, int* size)
+{
+    int available;
+    int advance;
+
+    tAudioFrameHeader* pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadAudio);
+
+    advance = pAudioBuf->next_block * gFileHdr.blocksize;
+
+    available = Available(gBuf.pReadAudio);
+
+    // just for the statistics
+    if (!gBuf.bEOF && available < gStats.minAudioAvail)
+        gStats.minAudioAvail = available;
+    
+    if (available < advance || advance == 0)
+    {
+        gPlay.bAudioUnderrun = true;
+        return; // no data available
+    }
+
+    gBuf.pReadAudio += advance;
+    if (gBuf.pReadAudio >= gBuf.pBufEnd)
+        gBuf.pReadAudio -= gBuf.bufsize; // wraparound
+
+    *start = gBuf.pReadAudio + gFileHdr.audio_headersize;
+    *size = gFileHdr.blocksize - gFileHdr.audio_headersize;
 }
 
 
@@ -161,225 +469,388 @@ int WaitForButton(void)
 }
 
 
-/* play from memory, loop until OFF is pressed */
-int show_buffer(unsigned char* p_start, int frames)
+int SeekTo(int fd, int nPos)
 {
-    unsigned char* p_current = p_start;
-    unsigned char* p_end = p_start + SCREENSIZE * frames;
-    int shown = 0;
-    int delta; /* next frame */
+    int read_now, got_now;
 
-    do
+    if (gPlay.bHasAudio)
+        rb->mp3_play_stop(); // stop audio ISR
+    if (gPlay.bHasVideo)
+        timer_set(0); // stop the timer 4
+
+    rb->lseek(fd, nPos, SEEK_SET);
+
+    gBuf.pBufFill = gBuf.pBufStart; // all empty
+    gBuf.pReadVideo = gBuf.pReadAudio = gBuf.pBufStart;
+
+    read_now = (PRECHARGE + gBuf.granularity - 1); // round up
+    read_now -= read_now % gBuf.granularity; // to granularity
+    got_now = rb->read(fd, gBuf.pBufFill, read_now);
+    gBuf.bEOF = (read_now != got_now);
+    gBuf.pBufFill += got_now;
+
+    if (nPos == 0)
+    {   // we seeked to the start
+        if (gPlay.bHasVideo)
+            gBuf.pReadVideo += gFileHdr.video_1st_frame;
+
+        if (gPlay.bHasAudio)
+            gBuf.pReadAudio += gFileHdr.audio_1st_frame;
+    }
+    else
+    {   // we have to search for the positions
+        if (gPlay.bHasAudio) // prepare audio playback, if contained
+        {
+            // search for audio frame
+            while (((tAudioFrameHeader*)(gBuf.pReadAudio))->magic != AUDIO_MAGIC)
+                gBuf.pReadAudio += gFileHdr.blocksize;
+            
+            rb->mp3_play_data(gBuf.pReadAudio + gFileHdr.audio_headersize,
+                gFileHdr.blocksize - gFileHdr.audio_headersize, GetMoreMp3);
+
+            if (gPlay.bHasVideo)
+                SyncVideo(); // pick the right video for that
+        }
+    }
+
+    // synchronous start
+    if (gPlay.bHasAudio)
     {
-        /* wait for frame to be due */
-        while (TCNT4 < FRAMETIME) /* use our timer 4 */
-            rb->yield(); /* yield to the other treads */
-        TCNT4 -= FRAMETIME;
-        
-        rb->lcd_blit(p_current, 0, 0, LCD_WIDTH, LCD_HEIGHT/8, LCD_WIDTH);
+        gPlay.bAudioUnderrun = false;
+        rb->mp3_play_pause(true); // kickoff audio
+    }
+    if (gPlay.bHasVideo)
+    {
+        gPlay.bVideoUnderrun = false;
+        timer_set(gFileHdr.video_frametime); // start display interrupt
+    }
 
-        shown++;
-
-        delta = check_button();
-        p_current += delta * SCREENSIZE;
-        if (p_current >= p_end || p_current < p_start)
-            p_current = p_start; /* wrap */
-    } while(state != stop && state != exit);
-
-    return (state != exit) ? shown : -1;
+    return 0;
 }
 
 
-/* play from file, exit if OFF is pressed */
-int show_file(unsigned char* p_buffer, int fd)
+// returns >0 if continue, =0 to stop, <0 to abort (USB)
+int PlayTick(int fd)
 {
-	long tag[FILEBUFSIZE/512]; /* I treat the buffer as direct-mapped cache */
-	long framepos = 0; /* position of frame in file */
-	long filesize = rb->filesize(fd);
-    long filepos = 0; /* my own counting */
-    int shown = 0;
+    int button;
+    int avail_audio = -1, avail_video = -1;
+    int retval = 1;
+    int filepos;
 
-	long readfrom;
-    long readto;
-    int read; /* amount read from disk */
-	long frame_offset; /* pos of frame in buffer */
-    long writefrom; /* round down to sector */
-	long sector; /* sector in frame buffer */
-	long pos_aligned, orig_aligned; /* round down to sector */
-    char buf[10];
-    
-    rb->memset(&tag, 0xFF, sizeof(tag)); /* invalidate cache */
+    if (gPlay.bHasAudio)
+        avail_audio = Available(gBuf.pReadAudio);
+    if (gPlay.bHasVideo)
+        avail_video = Available(gBuf.pReadVideo);
 
-	do
-	{
-		/* load the frame into memory */
-		readfrom = readto = -1; /* invalidate */
-		frame_offset = framepos % FILEBUFSIZE; /* pos of frame in buffer */
-        writefrom = frame_offset & ~511; /* round down to sector */
-		sector = frame_offset / 512; /* sector in frame buffer */
-		orig_aligned = pos_aligned = framepos & ~511; /* down to sector */
+    if ((gPlay.bHasAudio && avail_audio < gBuf.low_water)
+     || (gPlay.bHasVideo && avail_video < gBuf.low_water))
+    {
+        gPlay.bRefilling = true; /* go to refill mode */
+    }
 
-		do
+    if ((!gPlay.bHasAudio || gPlay.bAudioUnderrun)
+     && (!gPlay.bHasVideo || gPlay.bVideoUnderrun))
+        return 0; // all expired
+
+    if (!gPlay.bRefilling || gBuf.bEOF)
+    {   // nothing to do
+        button = rb->button_get_w_tmo(HZ/10);
+    }
+    else
+    {   // refill buffer
+        int read_now, got_now;
+        int buf_free;
+        
+        // how much can we reload, don't fill completely, would appear empty
+        buf_free = gBuf.bufsize - MAX(avail_audio, avail_video) - gBuf.high_water;
+        if (buf_free < 0)
+            buf_free = 0; // just for safety
+        buf_free -= buf_free % gBuf.granularity; // round down to granularity
+
+        // in one piece max. up to buffer end (wrap after that)
+        read_now = MIN(buf_free, gBuf.pBufEnd - gBuf.pBufFill);
+
+        // load piecewise, to stay responsive
+        read_now = MIN(read_now, gBuf.nReadChunk);
+
+        if (read_now == buf_free)
+            gPlay.bRefilling = false; // last piece requested
+
+        got_now = rb->read(fd, gBuf.pBufFill, read_now);
+        if (got_now != read_now || read_now == 0)
         {
-			if (tag[sector] != pos_aligned) /* in cache? */
-			{   /* not cached */
-                tag[sector] = pos_aligned;
-				if (readfrom == -1) /* not used yet? */
-                {
-					readfrom = pos_aligned; /* set start */
-                    writefrom += pos_aligned - orig_aligned;
-                }
-                readto = pos_aligned; /* set stop */
-			}
-            pos_aligned += 512;
-            sector++;
-        } while (pos_aligned < framepos + SCREENSIZE);
-
-        if (readfrom != -1)
-        {   /* need to read from disk */
-            if (filepos != readfrom)
-            {   /* need to seek */
-                filepos = rb->lseek(fd, readfrom, SEEK_SET);
-            }
-            read = readto - readfrom + 512;
-            /* read the sector(s) */
-            filepos += rb->read(fd, p_buffer + writefrom, read); 
+            gBuf.bEOF = true;
+            gPlay.bRefilling = false;
         }
+
+        if (!gPlay.bRefilling)
+            rb->ata_sleep(); // no point in leaving the disk run til timeout
+
+        gBuf.pBufFill += got_now;
+        if (gBuf.pBufFill >= gBuf.pBufEnd)
+            gBuf.pBufFill = gBuf.pBufStart; // wrap
+
+        rb->yield(); // have mercy with the other threads
+        button = rb->button_get(false);
+    }
+
+    if (button != BUTTON_NONE)
+    {
+        filepos = rb->lseek(fd, 0, SEEK_CUR);
+
+        if (gPlay.bHasVideo) // video position is more accurate
+            filepos -= Available(gBuf.pReadVideo); // take video position
         else
-            read = 0;
+            filepos -= Available(gBuf.pReadAudio); // else audio
 
-        /* wait for frame to be due */
-        while (TCNT4 < FRAMETIME) /* use our timer 4 */
-            rb->yield(); /* yield to the other treads */
-        TCNT4 -= FRAMETIME;
-
-        /* display OSD if FF/FR */
-        if (playstep != 1 && playstep != -1)
-        {
-            int w,h;
-
-            if (playstep > 0)
-                rb->snprintf(buf, sizeof(buf), "%d>>", playstep);
-            else
-                rb->snprintf(buf, sizeof(buf), "%d<<", -playstep);
-
-            rb->lcd_getstringsize(buf, &w, &h);
-            rb->lcd_putsxy(0, LCD_HEIGHT-h, buf);
-            
-            w++;
-            rb->slidebar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, 
-                (100 * filepos)/filesize, Grow_Right);
-            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-            rb->lcd_blit(p_buffer + frame_offset, 0, 0, 
-                LCD_WIDTH, LCD_HEIGHT/8 - 1, LCD_WIDTH);
-        }
-        else
-        {   /* display the frame normally */
-            rb->lcd_blit(p_buffer + frame_offset, 0, 0, LCD_WIDTH, 
-                LCD_HEIGHT/8, LCD_WIDTH);
-        }
-
-		/* query keys to determine next frame */
-		framepos += check_button() * SCREENSIZE;
-        if (framepos <= 0)
-        {
-            state = paused;
-            framepos = 0;
-        }
-        else if (framepos >= filesize)
-        {
-            if (state == playing)
+        switch (button)
+        {   // set exit conditions
+        case BUTTON_OFF:
+            retval = 0; // signal "stop" to caller
+            break;
+        case SYS_USB_CONNECTED:
+            retval = -1; // signal "abort" to caller
+            break;
+        case BUTTON_PLAY:
+            if (gPlay.bSeeking)
             {
-                if (playstep == 1)
-                    state = stop; /* reached the end while playing normally */
-                else
-                {
-                    state = paused; /* it may have been FF */
-                    playstep = 1;
-                }
+                gPlay.bSeeking = false;
+                gPlay.state = playing;
+                SeekTo(fd, gPlay.nSeekPos);
             }
-
-            framepos = filesize - SCREENSIZE;
-            /* in case the file size is no integer multiple */
-            framepos -= framepos % SCREENSIZE;
+            else if (gPlay.state == playing)
+            {
+                gPlay.state = paused;
+                if (gPlay.bHasAudio)
+                    rb->mp3_play_pause(false); // pause audio
+                if (gPlay.bHasVideo)
+                    and_b(~0x10, &TSTR); // stop the timer 4
+            }
+            else if (gPlay.state == paused)
+            {
+                gPlay.state = playing;
+                if (gPlay.bHasAudio)
+                {
+                    if (gPlay.bHasVideo)
+                        SyncVideo();
+                    rb->mp3_play_pause(true); // play audio
+                }
+                if (gPlay.bHasVideo)
+                    or_b(0x10, &TSTR); // start the video
+            }
+            break;
+        case BUTTON_UP:
+        case BUTTON_UP | BUTTON_REPEAT:
+            if (gPlay.bHasAudio)
+                ChangeVolume(1);
+            break;
+        case BUTTON_DOWN:
+        case BUTTON_DOWN | BUTTON_REPEAT:
+            if (gPlay.bHasAudio)
+                ChangeVolume(-1);
+            break;
+        case BUTTON_LEFT:
+        case BUTTON_LEFT | BUTTON_REPEAT:
+            if (!gPlay.bSeeking) // prepare seek
+            {
+                gPlay.nSeekPos = filepos;
+                gPlay.bSeeking = true;
+                gPlay.nSeekAcc = 0;
+            }
+            else if (gPlay.nSeekAcc > 0) // other direction, stop sliding
+                gPlay.nSeekAcc = 0;
+            else
+                gPlay.nSeekAcc--;
+            break;
+        case BUTTON_RIGHT:
+        case BUTTON_RIGHT | BUTTON_REPEAT:
+            if (!gPlay.bSeeking) // prepare seek
+            {
+                gPlay.nSeekPos = filepos;
+                gPlay.bSeeking = true;
+                gPlay.nSeekAcc = 0;
+            }
+            else if (gPlay.nSeekAcc < 0) // other direction, stop sliding
+                gPlay.nSeekAcc = 0;
+            else
+                gPlay.nSeekAcc++;
+            break;
         }
+    } /*  if (button != BUTTON_NONE) */
 
-        shown++;
+    if (gPlay.bSeeking) // seeking?
+    {
+        if (gPlay.nSeekAcc < -MAX_ACC)
+            gPlay.nSeekAcc = -MAX_ACC;
+        else if (gPlay.nSeekAcc > MAX_ACC)
+            gPlay.nSeekAcc = MAX_ACC;
+        
+        gPlay.nSeekPos += gPlay.nSeekAcc * gBuf.nSeekChunk;
+        if (gPlay.nSeekPos < 0)
+            gPlay.nSeekPos = 0;
+        if (gPlay.nSeekPos > rb->filesize(fd) - gBuf.granularity)
+        {
+            gPlay.nSeekPos = rb->filesize(fd);
+            gPlay.nSeekPos -= gPlay.nSeekPos % gBuf.granularity;
+        }
+        DrawPosition(gPlay.nSeekPos, rb->filesize(fd));
+    }
 
-	} while (state != stop && state != exit);
-
-    return (state != exit) ? shown : -1;
+    return retval;
 }
 
 
 int main(char* filename)
 {
-    char buf[32];
-    int buffer_size, file_size;
-    unsigned char* p_buffer;
+    int file_size;
     int fd; /* file descriptor handle */
-    int got_now; /* how many bytes read from file */
-    int frames, shown;
+    int read_now, got_now;
     int button;
-    int fps;
+    int retval;
 
-    p_buffer = rb->plugin_get_buffer(&buffer_size);
-    if (buffer_size < FILEBUFSIZE)
-        return PLUGIN_ERROR; /* not enough memory */
-    
+    // try to open the file
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return PLUGIN_ERROR;
-
-    /* init timer 4, crude code */
-    IPRD = (IPRD & 0xFF0F); // disable interrupt
-    and_b(~0x10, &TSTR); // Stop the timer 4
-    and_b(~0x10, &TSNC); // No synchronization
-    and_b(~0x10, &TMDR); // Operate normally
-    TCR4 = 0x03; // no clear at GRA match, sysclock/8
-    TCNT4 = 0; // start counting at 0
-
     file_size =  rb->filesize(fd);
-    if (file_size <= buffer_size)
-    {   /* we can read the whole file in advance */
-        got_now = rb->read(fd, p_buffer, file_size);
+
+    // init statistics
+    rb->memset(&gStats, 0, sizeof(gStats));
+    gStats.minAudioAvail = gStats.minVideoAvail = INT_MAX;
+
+    // init playback state
+    rb->memset(&gPlay, 0, sizeof(gPlay));
+    gPlay.state = playing;
+
+    // init buffer
+    rb->memset(&gBuf, 0, sizeof(gBuf));
+    gBuf.pOSD = rb->lcd_framebuffer + LCD_WIDTH*7; // last screen line
+    gBuf.pBufStart = rb->plugin_get_mp3_buffer(&gBuf.bufsize);
+    //gBuf.bufsize = 1700*1024; // test!!!!
+    gBuf.pBufFill = gBuf.pBufStart; // all empty
+    gBuf.pReadVideo = gBuf.pReadAudio = gBuf.pBufStart;
+
+    // load file header
+    read_now = sizeof(gFileHdr);
+    got_now = rb->read(fd, &gFileHdr, read_now);
+    rb->lseek(fd, 0, SEEK_SET); // rewind to restart sector-aligned
+    if (got_now != read_now)
+    {
         rb->close(fd);
-        frames = got_now / (LCD_WIDTH*LCD_HEIGHT/8);
-        or_b(0x10, &TSTR); // start timer 4
-        time = *rb->current_tick;
-        shown = show_buffer(p_buffer, frames);
-        time = *rb->current_tick - time;
+        return (PLUGIN_ERROR);
     }
+
+    // check header
+    if (gFileHdr.magic != HEADER_MAGIC)
+    {   // old file, use default info
+        rb->memset(&gFileHdr, 0, sizeof(gFileHdr));
+        gFileHdr.blocksize = SCREENSIZE;
+        if (file_size < SCREENSIZE * FPS) // less than a second
+            gFileHdr.flags |= FLAG_LOOP;
+        gFileHdr.video_format = VIDEOFORMAT_RAW;
+        gFileHdr.video_width = LCD_WIDTH;
+        gFileHdr.video_height = LCD_HEIGHT;
+        gFileHdr.video_frametime = CLOCK / FPS;
+        gFileHdr.bps_peak = gFileHdr.bps_average = LCD_WIDTH * LCD_HEIGHT * FPS;
+    }
+    
+    // continue buffer init: align the end, calc low water, read sizes
+    gBuf.granularity = gFileHdr.blocksize;
+    while (gBuf.granularity % 512) // common multiple of sector size
+        gBuf.granularity *= 2;
+    gBuf.bufsize -= gBuf.bufsize % gBuf.granularity; // round down
+    gBuf.pBufEnd = gBuf.pBufStart + gBuf.bufsize;
+    gBuf.low_water = SPINUP * gFileHdr.bps_peak / 8000;
+    if (gFileHdr.audio_min_associated < 0)
+        gBuf.high_water = 0 - gFileHdr.audio_min_associated;
     else
-    {   /* we need to stream */
-        or_b(0x10, &TSTR); // start timer 4
-        time = *rb->current_tick;
-        shown = show_file(p_buffer, fd);
-        time = *rb->current_tick - time;
-        rb->close(fd);
+        gBuf.high_water = 1; // never fill buffer completely, would appear empty
+    gBuf.nReadChunk = (CHUNK + gBuf.granularity - 1); // round up
+    gBuf.nReadChunk -= gBuf.nReadChunk % gBuf.granularity;// and align
+    gBuf.nSeekChunk = rb->filesize(fd) / FF_TICKS;
+    gBuf.nSeekChunk += gBuf.granularity - 1; // round up
+    gBuf.nSeekChunk -= gBuf.nSeekChunk % gBuf.granularity; // and align
+
+    // precharge buffer with more data
+    read_now = MAX(gFileHdr.audio_1st_frame, gFileHdr.video_1st_frame);
+    read_now = (read_now + PRECHARGE + gBuf.granularity - 1);
+    read_now -= read_now % gBuf.granularity; // round up to granularity
+    got_now = rb->read(fd, gBuf.pBufFill, read_now);
+    gBuf.pBufFill += got_now;
+
+    // prepare video playback, if contained
+    if (gFileHdr.video_format == VIDEOFORMAT_RAW)
+    {
+        gBuf.pReadVideo += gFileHdr.video_1st_frame;
+        gPlay.bHasVideo = true;
+        
+        if (rb->global_settings->backlight_timeout > 0)
+            rb->backlight_set_timeout(1); // keep the light on
     }
 
-    if (shown == -1) /* exception */
+    // prepare audio playback, if contained
+    if (gFileHdr.audio_format == AUDIOFORMAT_MP3_BITSWAPPED)
+    {
+        gBuf.pReadAudio += gFileHdr.audio_1st_frame;
+        gPlay.bHasAudio = true;
+
+        rb->mp3_play_init();
+        rb->mp3_play_data(gBuf.pReadAudio + gFileHdr.audio_headersize,
+            gFileHdr.blocksize - gFileHdr.audio_headersize, GetMoreMp3);
+        rb->mpeg_sound_set(SOUND_VOLUME, rb->global_settings->volume);
+    }
+
+    // synchronous start
+    gPlay.state = playing;
+    if (gPlay.bHasAudio)
+        rb->mp3_play_pause(true); // kickoff audio
+    if (gPlay.bHasVideo)
+        timer_set(gFileHdr.video_frametime); // start display interrupt
+
+    // all that's left to do is keep the buffer full
+    do // the main loop
+    {
+        retval = PlayTick(fd);
+    } while (retval > 0);
+
+    rb->close(fd); // close the file
+
+    if (gPlay.bHasVideo)
+        timer_set(0); // stop video ISR, now I can use the display again
+
+    if (gPlay.bHasAudio)
+        rb->mp3_play_stop(); // stop audio ISR
+
+    // restore normal backlight setting
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
+    if (retval < 0) // aborted?
+    {
         return PLUGIN_USB_CONNECTED;
+    }
 
-    fps = (shown * HZ *100) / time; /* 100 times fps */
-
+    // display statistics
     rb->lcd_clear_display();
-    rb->snprintf(buf, sizeof(buf), "%d frames shown", shown);
-    rb->lcd_puts(0, 0, buf);
-    rb->snprintf(buf, sizeof(buf), "%d.%02d seconds", time/HZ, time%HZ);
-    rb->lcd_puts(0, 1, buf);
-    rb->snprintf(buf, sizeof(buf), "%d.%02d fps", fps/100, fps%100);
-    rb->lcd_puts(0, 2, buf);
-    rb->snprintf(buf, sizeof(buf), "file: %d bytes", file_size);
-    rb->lcd_puts(0, 6, buf);
-    rb->snprintf(buf, sizeof(buf), "buffer: %d bytes", buffer_size);
-    rb->lcd_puts(0, 7, buf);
+    rb->snprintf(gPrint, sizeof(gPrint), "AudioUnderrun: %d", gPlay.bAudioUnderrun);
+    rb->lcd_puts(0, 0, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "VideoUnderrun: %d", gPlay.bVideoUnderrun);
+    rb->lcd_puts(0, 1, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "MinAudio: %d bytes", gStats.minAudioAvail);
+    rb->lcd_puts(0, 2, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "MinVideo: %d bytes", gStats.minVideoAvail);
+    rb->lcd_puts(0, 3, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "ReadChunk: %d", gBuf.nReadChunk);
+    rb->lcd_puts(0, 4, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "SeekChunk: %d", gBuf.nSeekChunk);
+    rb->lcd_puts(0, 5, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "1st Video: %d", gFileHdr.video_1st_frame);
+    rb->lcd_puts(0, 6, gPrint);
+    rb->snprintf(gPrint, sizeof(gPrint), "pBufStart: %x", gBuf.pBufStart);
+    rb->lcd_puts(0, 7, gPrint);
+ 
     rb->lcd_update();
     button = WaitForButton();
     return (button == SYS_USB_CONNECTED) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
-
-
 }
 
 
@@ -393,7 +864,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     matches the machine it is running on */
     TEST_PLUGIN_API(api);
     
-    rb = api; /* copy to global api pointer */
+    rb = api; // copy to global api pointer
     
     if (parameter == NULL)
     {
@@ -401,13 +872,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
-    /* now go ahead and have fun! */
+    // now go ahead and have fun!
     ret = main((char*) parameter);
     if (ret==PLUGIN_USB_CONNECTED)
         rb->usb_screen();
     return ret;
 }
 
-#endif /* #ifdef HAVE_LCD_BITMAP */
-#endif /* #ifndef SIMULATOR */
+#endif // #ifdef HAVE_LCD_BITMAP
+#endif // #ifndef SIMULATOR
 
