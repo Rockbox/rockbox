@@ -45,7 +45,7 @@ coldfirecc () {
  AR=m68k-elf-ar
  AS=m68k-elf-as
  OC=m68k-elf-objcopy
- GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249"
+ GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
