@@ -100,7 +100,7 @@ int open(char* pathname, int flags)
         return -1;
     }
 
-    openfiles[fd].cacheoffset = 0;
+    openfiles[fd].cacheoffset = -1;
     openfiles[fd].fileoffset = 0;
     openfiles[fd].busy = TRUE;
     return fd;
@@ -127,7 +127,7 @@ int read(int fd, void* buf, int count)
         count = openfiles[fd].size - openfiles[fd].fileoffset;
 
     /* any head bytes? */
-    if ( openfiles[fd].cacheoffset ) {
+    if ( openfiles[fd].cacheoffset != -1 ) {
         int headbytes;
         int offs = openfiles[fd].cacheoffset;
         if ( count <= SECTOR_SIZE - openfiles[fd].cacheoffset ) {
@@ -138,7 +138,7 @@ int read(int fd, void* buf, int count)
         }
         else {
             headbytes = SECTOR_SIZE - openfiles[fd].cacheoffset;
-            openfiles[fd].cacheoffset = 0;
+            openfiles[fd].cacheoffset = -1;
         }
 
         /* eof? */
@@ -169,7 +169,7 @@ int read(int fd, void* buf, int count)
                 count=0;
             }
 
-            openfiles[fd].cacheoffset = 0;
+            openfiles[fd].cacheoffset = -1;
         }
     }
 
@@ -193,6 +193,70 @@ int read(int fd, void* buf, int count)
 
     openfiles[fd].fileoffset += nread;
     return nread;
+}
+
+int lseek(int fd, int offset, int whence)
+{
+    int pos;
+    int newsector;
+    int oldsector;
+    int sectoroffset;
+    int rc;
+
+    if ( !openfiles[fd].busy ) {
+        errno = EBADF;
+        return -1;
+    }
+
+    switch ( whence ) {
+        case SEEK_SET:
+            pos = offset;
+            break;
+
+        case SEEK_CUR:
+            pos = openfiles[fd].fileoffset + offset;
+            break;
+
+        case SEEK_END:
+            pos = openfiles[fd].size - offset;
+            break;
+
+        default:
+            errno = EINVAL;
+            return -1;
+    }
+    if ( (pos < 0) ||
+         (pos > openfiles[fd].size) ) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    /* new sector? */
+    newsector = pos / SECTOR_SIZE;
+    oldsector = openfiles[fd].fileoffset / SECTOR_SIZE;
+    sectoroffset = pos % SECTOR_SIZE;
+
+    if ( (newsector != oldsector) ||
+         ((openfiles[fd].cacheoffset==-1) && sectoroffset) ) {
+        if ( newsector != oldsector ) {
+            rc = fat_seek(&(openfiles[fd].fatfile), newsector);
+            if ( rc < 0 ) {
+                errno = EIO;
+                return -1;
+            }
+        }
+        rc = fat_read(&(openfiles[fd].fatfile), 1,
+                      &(openfiles[fd].cache));
+        if ( rc < 0 ) {
+            errno = EIO;
+            return -1;
+        }
+    }
+
+    openfiles[fd].cacheoffset = sectoroffset;
+    openfiles[fd].fileoffset = pos;
+
+    return pos;
 }
 
 /*

@@ -129,6 +129,59 @@ void dbg_type(char* name)
     close(fd);
 }
 
+void dbg_tail(char* name)
+{
+    unsigned char buf[SECTOR_SIZE*5];
+    int fd,rc;
+
+    fd = open(name,O_RDONLY);
+    if (fd<0)
+        return;
+    DEBUGF("Got file descriptor %d\n",fd);
+    
+    rc = lseek(fd,512,SEEK_SET);
+    if ( rc >= 0 ) {
+        rc = read(fd, buf, SECTOR_SIZE);
+        if( rc > 0 )
+        {
+            buf[rc]=0;
+            printf("%d: %s\n", strlen(buf), buf);
+        }
+        else if ( rc == 0 ) {
+            DEBUGF("EOF\n");
+        }
+        else
+        {
+            DEBUGF("Failed reading file: %d\n",rc);
+        }
+    }
+    else {
+        perror("lseek");
+    }
+
+    rc = lseek(fd,-100,SEEK_CUR);
+    if ( rc >= 0 ) {
+        rc = read(fd, buf, SECTOR_SIZE);
+        if( rc > 0 )
+        {
+            buf[rc]=0;
+            printf("%d: %s\n", strlen(buf), buf);
+        }
+        else if ( rc == 0 ) {
+            DEBUGF("EOF\n");
+        }
+        else
+        {
+            DEBUGF("Failed reading file: %d\n",rc);
+        }
+    }
+    else {
+        perror("lseek");
+    }
+
+    close(fd);
+}
+
 char current_directory[256] = "\\";
 int last_secnum = 0;
 
@@ -221,7 +274,8 @@ int main(int argc, char *argv[])
         DEBUGF("*** Failed mounting fat\n");
     }
 
-    dbg_console();
+    //dbg_console();
+    dbg_tail("/fat.h");
 
     return 0;
 }

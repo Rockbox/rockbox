@@ -838,22 +838,30 @@ int fat_seek(struct fat_file *file, int seeksector )
     int numsec = 0;
     int i;
 
-    for (i=0; i<seeksector; i++) {
-        numsec++;
-        if ( numsec >= fat_bpb.bpb_secperclus ) {
-            cluster = get_next_cluster(cluster);
-            if (!cluster)
-                /* end of file */
-                return -1; 
-            
-            sector = cluster2sec(cluster);
-            if (sector<0)
-                return -2;
-            numsec=0;
+    if ( seeksector ) {
+        for (i=0; i<seeksector; i++) {
+            numsec++;
+            if ( numsec >= fat_bpb.bpb_secperclus ) {
+                cluster = get_next_cluster(cluster);
+                if (!cluster)
+                    /* end of file */
+                    return -1; 
+                
+                sector = cluster2sec(cluster);
+                if (sector<0)
+                    return -2;
+                numsec=0;
+            }
+            else
+                sector++;
         }
-        else
-          sector++;
     }
+    else {
+        sector = cluster2sec(cluster);
+        if (sector<0)
+            return -2;
+    }
+        
     file->nextcluster = cluster;
     file->nextsector = sector;
     file->sectornum = numsec;
