@@ -31,7 +31,7 @@
 #include "wps.h"
 #include "mpeg.h"
 #include "usb.h"
-#include "power.h"
+#include "powermgmt.h"
 #include "status.h"
 #include "main_menu.h"
 #ifdef HAVE_LCD_BITMAP
