@@ -437,6 +437,12 @@ static bool deep_discharge(void)
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
     return result;
 }
+static bool trickle_charge(void)
+{
+    bool result;
+    result = set_bool( str(LANG_TRICKLE_CHARGE), &global_settings.trickle_charge );
+    return result;
+}
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -715,6 +721,7 @@ static bool system_settings_menu(void)
 #endif
 #ifdef HAVE_CHARGE_CTRL
         { str(LANG_DISCHARGE),   deep_discharge  },
+        { str(LANG_TRICKLE_CHARGE),   trickle_charge  },
 #endif
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_TIME),        timedate_set    },
