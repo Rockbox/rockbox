@@ -164,7 +164,7 @@ static int showdir(char *path, int start)
 
 #ifdef HAVE_LCD_BITMAP
         if ( dircacheptr[i]->file ) {
-            if(!strcmp(&dircacheptr[i]->name[len-4], ".m3u")) 
+            if(!strcasecmp(&dircacheptr[i]->name[len-4], ".m3u")) 
                 icon_type = Playlist;
             else
                 icon_type=File;
@@ -295,7 +295,7 @@ bool dirbrowse(char *root)
                     int len=strlen(dircacheptr[dircursor+start]->name);
                     lcd_stop_scroll();
                     if((len > 4) &&
-                       !strcmp(&dircacheptr[dircursor+start]->name[len-4],
+                       !strcasecmp(&dircacheptr[dircursor+start]->name[len-4],
                                ".m3u")) 
                     {
                         playing = 2;
