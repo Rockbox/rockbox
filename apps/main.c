@@ -98,6 +98,7 @@ int main(void)
 #include "power.h"
 #include "talk.h"
 #include "plugin.h"
+#include "radio.h"
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
@@ -285,6 +286,9 @@ void init(void)
               global_settings.superbass);
     mpeg_init();
     talk_init();
+#ifdef CONFIG_TUNER
+    radio_init();
+#endif
 
 #ifdef AUTOROCK
     if (!usb_detect())

@@ -22,9 +22,9 @@
 
 /* symbolic names for multiple choice configurations: */
 
-/* CONFIG_TUNER */
-#define S1A0903X01 0 /* Samsung */
-#define TEA5767    1 /* Philips */
+/* CONFIG_TUNER (note these are combineable bit-flags) */
+#define S1A0903X01 0x01 /* Samsung */
+#define TEA5767    0x02 /* Philips */
 
 /* CONFIG_HWCODEC */
 #define MAS3587F 3587

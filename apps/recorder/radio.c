@@ -47,6 +47,8 @@
 #include "sound_menu.h"
 #include "recording.h"
 #include "talk.h"
+#include "tuner.h"
+#include "hwcompat.h"
 
 #ifdef CONFIG_TUNER
 
@@ -66,24 +68,10 @@
 
 #define MAX_FREQ (108000000)
 #define MIN_FREQ (87500000)
-#define PLL_FREQ_STEP 10000
 #define FREQ_STEP 100000
-
-#define RADIO_FREQUENCY 0
-#define RADIO_MUTE 1
-#define RADIO_IF_MEASUREMENT 2
-#define RADIO_SENSITIVITY 3
-#define RADIO_FORCE_MONO 4
-
-#define DEFAULT_IN1 0x100003 /* Mute */
-#define DEFAULT_IN2 0x140884 /* 5kHz, 7.2MHz crystal */
-
-static int fm_in1 = DEFAULT_IN1;
-static int fm_in2 = DEFAULT_IN2;
 
 static int curr_preset = -1;
 static int curr_freq;
-static int pll_cnt;
 
 #define MAX_PRESETS 32
 static bool presets_loaded = false;
@@ -101,46 +89,31 @@ void radio_load_presets(void);
 bool handle_radio_presets(void);
 bool radio_menu(void);
 
-void radio_set(int setting, int value)
+#if CONFIG_TUNER == S1A0903X01
+#define radio_set samsung_set
+#define radio_get samsung_get
+#elif CONFIG_TUNER == TEA5767
+#define radio_set philips_set
+#define radio_get philips_get
+#elif CONFIG_TUNER == (S1A0903X01 | TEA5767)
+void (*radio_set)(int setting, int value);
+int (*radio_get)(int setting);
+#endif
+
+void radio_init(void)
 {
-    switch(setting)
+#if CONFIG_TUNER == (S1A0903X01 | TEA5767)
+    if (read_hw_mask() & TUNER_MODEL)
     {
-        case RADIO_FREQUENCY:
-            /* We add the standard Intermediate Frequency 10.7MHz
-            ** before calculating the divisor
-            ** The reference frequency is set to 50kHz, and the VCO
-            ** output is prescaled by 2.
-            */
-    
-            pll_cnt = (value + 10700000) / (PLL_FREQ_STEP/2) / 2;
-
-            /* 0x100000 == FM mode
-            ** 0x000002 == Microprocessor controlled Mute
-            */
-            fm_in1 = (fm_in1 & 0xfff00007) | (pll_cnt << 3);
-            fmradio_set(1, fm_in1);
-            break;
-
-        case RADIO_MUTE:
-            fm_in1 = (fm_in1 & 0xfffffffe) | (value?1:0);
-            fmradio_set(1, fm_in1);
-            break;
-
-        case RADIO_IF_MEASUREMENT:
-            fm_in1 = (fm_in1 & 0xfffffffb) | (value?4:0);
-            fmradio_set(1, fm_in1);
-            break;
-
-        case RADIO_SENSITIVITY:
-            fm_in2 = (fm_in2 & 0xffff9fff) | ((value & 3) << 13);
-            fmradio_set(2, fm_in2);
-            break;
-
-        case RADIO_FORCE_MONO:
-            fm_in2 = (fm_in2 & 0xfffffffb) | (value?0:4);
-            fmradio_set(2, fm_in2);
-            break;
+        radio_set = philips_set;
+        radio_get = philips_get;
     }
+    else
+    {
+        radio_set = samsung_set;
+        radio_get = samsung_get;
+    }
+#endif
 }
 
 void radio_stop(void)
@@ -150,15 +123,7 @@ void radio_stop(void)
 
 bool radio_hardware_present(void)
 {
-    int val;
-    
-    fmradio_set(2, 0x140885); /* 5kHz, 7.2MHz crystal, test mode 1 */
-    val = fmradio_read(0);
-    debug_fm_detection = val;
-    if(val == 0x140885)
-        return true;
-    else
-        return false;
+    return radio_get(RADIO_PRESENT);
 }
 
 static int find_preset(int freq)
@@ -184,7 +149,6 @@ bool radio_screen(void)
     char buf[MAX_PATH];
     bool done = false;
     int button;
-    int val;
     int freq;
     int i_freq;
     bool stereo = false;
@@ -247,9 +211,7 @@ bool radio_screen(void)
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
     
-    fmradio_set(1, DEFAULT_IN1);
-    fmradio_set(2, DEFAULT_IN2);
-
+    radio_set(RADIO_INIT, 0);
     radio_set(RADIO_FREQUENCY, curr_freq);
     radio_set(RADIO_IF_MEASUREMENT, 0);
     radio_set(RADIO_SENSITIVITY, 0);
@@ -282,8 +244,7 @@ bool radio_screen(void)
             sleep(1);
 
             /* Now check how close to the IF frequency we are */
-            val = fmradio_read(3);
-            i_freq = (val & 0x7ffff) / 80;
+            i_freq = radio_get(RADIO_IF_MEASURED);
 
             /* Stop searching if the IF frequency is close to 10.7MHz */
             if(i_freq > 1065 && i_freq < 1075)
@@ -474,8 +435,7 @@ bool radio_screen(void)
             {
                 timeout = current_tick + HZ;
                 
-                val = fmradio_read(3);
-                stereo = ((val & 0x100000)?true:false) &
+                stereo = radio_get(RADIO_STEREO) &&
                     !global_settings.fm_force_mono;
                 if(stereo != last_stereo_status)
                 {

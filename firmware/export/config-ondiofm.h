@@ -41,7 +41,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
 /* Define this if you have an FM Radio */
-#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */

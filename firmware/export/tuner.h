@@ -6,8 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
+ * Tuner abstraction layer
  *
- * Copyright (C) 2003 Linus Nielsen Feltzing
+ * Copyright (C) 2004 Jörg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,21 +17,33 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef RADIO_H
-#define RADIO_H
+#ifndef __TUNER_SAMSUNG_H__
+#define __TUNER_SAMSUNG_H__
+
+/* settings to the tuner layer */
+#define RADIO_INIT 0
+#define RADIO_FREQUENCY 1
+#define RADIO_MUTE 2
+#define RADIO_IF_MEASUREMENT 3
+#define RADIO_SENSITIVITY 4
+#define RADIO_FORCE_MONO 5
+/* readback from the tuner layer */
+#define RADIO_PRESENT 0
+#define RADIO_IF_MEASURED 1
+#define RADIO_STEREO 2
 
 #ifdef CONFIG_TUNER
-void radio_init(void);
-bool radio_screen(void);
-void radio_stop(void);
-bool radio_hardware_present(void);
 
-struct fmstation
-{
-    int frequency; /* In Hz */
-    char name[28];
-};
-
+#if (CONFIG_TUNER & S1A0903X01)
+void samsung_set(int setting, int value);
+int samsung_get(int setting);
 #endif
+
+#if (CONFIG_TUNER & TEA5767)
+void philips_set(int setting, int value);
+int philips_get(int setting);
+#endif
+
+#endif /* #ifdef CONFIG_TUNER */
 
 #endif

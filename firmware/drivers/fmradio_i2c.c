@@ -6,8 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
+ * Physical interface of the Philips TEA5767 in Archos Ondio
  *
- * Copyright (C) 2003 Linus Nielsen Feltzing
+ * Copyright (C) 2004 by Jörg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,21 +17,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef RADIO_H
-#define RADIO_H
+#include "lcd.h"
+#include "sh7034.h"
+#include "kernel.h"
+#include "thread.h"
+#include "debug.h"
+#include "system.h"
 
 #ifdef CONFIG_TUNER
-void radio_init(void);
-bool radio_screen(void);
-void radio_stop(void);
-bool radio_hardware_present(void);
 
-struct fmstation
+/* reads 5 byte */
+void fmradio_i2c_read(unsigned char* p_data)
 {
-    int frequency; /* In Hz */
-    char name[28];
-};
+    (void)p_data;
+}
 
-#endif
+/* writes 5 bytes */
+void fmradio_i2c_set(const unsigned char* p_data)
+{
+    (void)p_data;
+}
 
 #endif

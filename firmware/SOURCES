@@ -38,7 +38,14 @@ drivers/button.c
 drivers/dac.c
 drivers/fat.c
 #ifdef CONFIG_TUNER
+#if (CONFIG_TUNER & S1A0903X01)
 drivers/fmradio.c
+tuner_samsung.c
+#endif
+#if (CONFIG_TUNER & TEA5767)
+drivers/fmradio_i2c.c
+tuner_philips.c
+#endif
 #endif
 drivers/i2c.c
 #ifdef HAVE_LCD_CHARCELLS
