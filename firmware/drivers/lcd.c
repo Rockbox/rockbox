@@ -82,7 +82,7 @@
  *
  */ 
 
-void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
+//void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
 void lcd_write(bool command, int byte)
 {
     asm("and.b %0, @(r0,gbr)"
@@ -191,6 +191,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
         unsigned sda1;     /* precalculated SC=low,SD=1 */
         unsigned clk0sda0; /* precalculated SC and SD low */
 
+        byte = *p_bytes++ << 24; /* fetch to MSB position */
+
         cli(); /* make port modifications atomic */
 
         /* precalculate the values for later bit toggling, init data write */
@@ -211,8 +213,6 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             /* %5 */ "r"(~LCD_SD)
         );
         
-        byte = *p_bytes++ << 24; /* fetch to MSB position */
-
         /* unrolled loop to serialize the byte */
         asm (
             "mov    %4,r0\n" /* we need &PBDRL in r0 for "or.b x,@(r0,gbr)" */
