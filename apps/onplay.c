@@ -145,7 +145,7 @@ int onplay(char* file, int attr)
 
     selected_file = file;
     
-    if (mpeg_status() & MPEG_STATUS_PLAY)
+    if ((mpeg_status() & MPEG_STATUS_PLAY) && (attr & TREE_ATTR_MPA))
         menu[i++] = (struct menu_items) { str(LANG_QUEUE), queue_file };
 
     if (!(attr & ATTR_DIRECTORY))
