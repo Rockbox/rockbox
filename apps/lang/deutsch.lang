@@ -51,10 +51,8 @@ new: "Puf: %d.%02dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-### English phrase was changed! Previous translation was made on:
-### "Buffer: %d.%02dMb"
 eng: "Buffer: %d.%03dMB"
-new: "Puffer: %d.%02dMb"
+new: "Puffer: %d.%02dMB"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -152,8 +150,6 @@ eng: "Is battery low?"
 new: "Akku leer?"
 
 id: LANG_TIME_SET
-### Description changed! Previous description was:
-### "if save settings has failed"
 desc: 
 eng: "ON to set"
 new: "ON = speichern"
@@ -246,7 +242,7 @@ new: "Zeit/Datum setzen"
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "HDD Ausschaltzeit"
+new: "HDD Motor-Ausschaltzeit"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
@@ -426,7 +422,7 @@ new: "Fortsetzen"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(Wiederg./Stop)"
+new: "(PLAY/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
@@ -877,11 +873,7 @@ id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 hour clock"
 new: "24 Std. Uhr"
-
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu
-eng: ""
-new: ""
+### LANG_BACKLIGHT_ON was not found in the english file!
 
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
@@ -966,7 +958,7 @@ new: "PLAY = Reset"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
-new: "Einmalig fragen"
+new: "einmalig fragen"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -1002,3 +994,158 @@ id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new: "Mi"
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+new: "Akku-Anzeige"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+new: "%d%% %d Std %d Min"
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new: "Frei: %d.%dGB"
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+new: "HDD: %d.%dGB"
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+new: "grafisch"
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+new: "numerisch"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+new: "Playlisten"
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-skip buffer"
+new: "Puffer vorzeitig füllen"
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "dBfs"
+new: "dBfs"
+
+id: LANG_PM_ENERGY_SAVER
+desc: in the peak meter menu
+eng: "Save energy"
+new: "Energie sparen"
+
+id: LANG_PM_HIGH_PERFORMANCE
+desc: in the peak meter menu
+eng: "High performance"
+new: "genauere Anzeige"
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "linear"
+new: "linear"
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum of range"
+new: "größter Wert"
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum of range"
+new: "kleinster Wert"
+
+id: LANG_PM_PERFORMANCE
+desc: in the peak meter menu
+eng: "Performance"
+new: "Genauigkeit"
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "dBfs <-> linear"
+new: "dBfs <-> linear"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new: "HDD Ausschalt-Befehl verwenden"
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new: "Aufnahme"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+new: "Kanäle"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new: "Abtastrate"
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+new: "Verst"
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new: "Links"
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new: "Qualität"
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new: "Rechts"
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
+new: "Aufnahmeeinstellungen"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new: "Quelle"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new: "Digital"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new: "Analog"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new: "Mikrofon"
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep timer"
+new: "Einschlaftimer"
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+new: "Lautstärkeanzeige"
