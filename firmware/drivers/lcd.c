@@ -566,17 +566,6 @@ void lcd_init (void)
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
 
-    /* We are using timer 2 */
-    
-    TSTR &= ~0x04; /* Stop the timer */
-    TSNC &= ~0x04; /* No synchronization */
-    TMDR &= ~0x04; /* Operate normally */
-
-    TCNT2 = 0;   /* Start counting at 0 */
-    TCR2 = 0x03; /* sysclock/8 */
-
-    TSTR |= 0x04; /* Start timer 2 */
-
     lcd_clear_display();
     lcd_update();
     create_thread(scroll_thread, scroll_stack,
@@ -590,15 +579,6 @@ void lcd_init (void)
 void lcd_update (void)
 {
     int x, y;
-#ifdef DEBUG
-    int t1;
-    int t;
-    int i, d;
-    int tk1, tk2;
-
-    TCNT2 = 0;
-    tk1 = current_tick;
-#endif
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
@@ -609,14 +589,6 @@ void lcd_update (void)
         for (x = 0; x < LCD_WIDTH; x++)
             lcd_write (false, display[x][y]);
     }
-#ifdef DEBUG
-    tk2 = current_tick;
-    t1 = TCNT2;
-    t = (t1 * 10) / (FREQ/8000);
-    i = t / 10;
-    d = t % 10;
-    DEBUGF("TCNT2: %d, (%d.%d ms), %d\n", t1, i, d, tk2-tk1);
-#endif
 }
 
 #endif /* SIMULATOR */
