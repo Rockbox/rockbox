@@ -11,6 +11,13 @@ struct pcm pcm;
 #define DMA_PORTION (1024)
 
 static short buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; // to make sure 4 byte aligned
+
+rcvar_t pcm_exports[] =
+{
+	    RCV_END
+};
+
+#if CONFIG_HWCODEC == MASNONE
 static short* buf1;
 
 static short front_buf[512];
@@ -19,11 +26,6 @@ static short* last_back_pos;
 
 static bool newly_started;
 static int turns;
-
-rcvar_t pcm_exports[] =
-{
-    RCV_END
-};
 
 void pcm_init(void)
 {
@@ -85,7 +87,6 @@ void get_more(unsigned char** start, long* size)
             
 int pcm_submit(void)
 {
-#ifdef RBSOUND      
     while( (turns < 0) && ((((unsigned int)last_back_pos) + pcm.pos * sizeof(short)) > ((unsigned int)SAR0)) && !newly_started) rb->yield(); /* wait until data is passed through DAC or until exit*/
     int shorts_left = ((((unsigned int)buf1) + BUF_SIZE) - ((unsigned int)last_back_pos)) / sizeof(short);
     if( shorts_left >= pcm.pos )
@@ -112,13 +113,25 @@ int pcm_submit(void)
     
     pcm.pos = 0;
     return 1;
+}
 #else
+void pcm_init(void)
+{
+    pcm.hz = 11025;
+    pcm.stereo = 1;
+    pcm.buf = buf1_unal;
+    pcm.len = (BUF_SIZE / sizeof(short));
     pcm.pos = 0;
-    return 0;
-#endif
 }
 
-
-
-
+void pcm_close(void)
+{
+    memset(&pcm, 0, sizeof pcm);
+}
+int pcm_submit(void)
+{
+    pcm.pos =0;
+    return 0;
+}
+#endif
 
