@@ -654,3 +654,8 @@ A74: The Recorder V2 is essentially an FM Recorder without the radio. It looks
      NOTE! The first V2 Recorders were in fact real FM Recorders with the
      radio parts still mounted. If you are lucky, the FM radio might work in
      your V2, try it!
+
+Q75: Why is there a Radio option in my Rockbox for V2?
+A75: Some of the first V2 units had an FM radio in there, so if you're one of
+     the few lucky ones, you can use the radio fine. If you aren't lucky, you
+     just won't get any sound when trying the radio screen.
