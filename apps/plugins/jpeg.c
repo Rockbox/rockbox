@@ -27,7 +27,7 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
-#include "grayscale.h"
+#include "gray.h"
 
 /******************************* Globals ***********************************/
 
@@ -1754,9 +1754,7 @@ int main(char* filename)
     /* initialize the grayscale buffer:
      * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
      * 32 bitplanes for 33 shades of gray. (uses 28856 bytes)*/
-    align(&buf, &buf_size, 4); // 32 bit align
-    graysize = sizeof(tGraybuf) + sizeof(long) + (112 * 8 + sizeof(long)) * 32;
-    grayscales = gray_init_buffer(buf, graysize, 112, 8, 32) + 1;
+    grayscales = gray_init_buffer(buf, buf_size, 112, 8, 32, &graysize) + 1;
     buf += graysize;
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)
@@ -1906,6 +1904,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; /* copy to global api pointer */
 
+    /* This plugin uses the grayscale framework, so initialize */
+    gray_init(api);
     ret = main((char*)parameter);
 
     if (ret == PLUGIN_USB_CONNECTED)
