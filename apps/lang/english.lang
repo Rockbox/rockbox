@@ -799,3 +799,8 @@ id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 new:
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new:

@@ -733,8 +733,27 @@ bool dirbrowse(char *root)
                         case TREE_ATTR_LNG:
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
-                            lang_load(buf);
-                            restore = true;
+                            if(!lang_load(buf)) {
+                                lcd_clear_display();
+#ifdef HAVE_LCD_CHARCELLS
+                                lcd_puts(0, 0, str(LANG_LANGUAGE_LOADED));
+#else
+                                lcd_getstringsize(str(LANG_LANGUAGE_LOADED),
+                                                  FONT_UI, &fw, &fh);
+                                if(fw>LCD_WIDTH)
+                                    fw=0;
+                                else
+                                    fw=LCD_WIDTH/2 - fw/2;
+                                
+                                lcd_putsxy(fw,
+                                           LCD_HEIGHT/2 - fh/2,
+                                           str(LANG_LANGUAGE_LOADED),
+                                           FONT_UI);
+#endif
+                                lcd_update();
+                                sleep(HZ);            
+                                restore = true;
+                            }
                             break;
 
 #ifdef HAVE_LCD_BITMAP
