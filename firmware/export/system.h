@@ -23,6 +23,10 @@
 #include "sh7034.h"
 #include "config.h"
 
+extern void system_reboot (void);
+extern void system_init(void);
+extern int set_irq_level(int level);
+
 #define FREQ CPU_FREQ
 #define BAUDRATE 9600
 
@@ -113,47 +117,34 @@ static inline int tas (volatile int *pointer)
     return result;
   }
 
-static inline void sti (void)
-  {
-    asm volatile ("ldc\t%0,sr" : : "r"(0<<4));
-  }
-
-static inline void cli (void)
-  {
-    asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
-  }
-
 /* Compare And Swap */
 static inline int cas (volatile int *pointer,int requested_value,int new_value)
   {
-    cli();
+    unsigned int oldlevel = set_irq_level(15);
     if (*pointer == requested_value)
       {
         *pointer = new_value;
-        sti ();
+        set_irq_level(oldlevel);
         return 1;
       }
-    sti ();
+    set_irq_level(oldlevel);
     return 0;
   }
 
 static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int requested_value1,int requested_value2,int new_value1,int new_value2)
   {
-    cli();
+    unsigned int oldlevel = set_irq_level(15);
     if (*pointer1 == requested_value1 && *pointer2 == requested_value2)
       {
         *pointer1 = new_value1;
         *pointer2 = new_value2;
-        sti ();
+        set_irq_level(oldlevel);
         return 1;
       }
-    sti ();
+    set_irq_level(oldlevel);
     return 0;
   }
 
 #endif
-
-extern void system_reboot (void);
-extern void system_init(void);
 
 #endif

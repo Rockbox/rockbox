@@ -258,10 +258,11 @@ void button_set_flip(bool flip)
 {
     if (flip != flipped) /* not the curent setting */
     {
-        cli(); /* avoid race condition with the button_tick() */
+        /* avoid race condition with the button_tick() */
+        int oldlevel = set_irq_level(15);
         lastbtn = button_flip(lastbtn); 
         flipped = flip;
-        sti();
+        set_irq_level(oldlevel);
     }
 }
 

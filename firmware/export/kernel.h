@@ -64,7 +64,6 @@ extern long current_tick;
 extern void kernel_init(void);
 extern void yield(void);
 extern void sleep(int ticks);
-int set_irq_level(int level);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 

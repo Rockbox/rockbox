@@ -188,14 +188,16 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 {
     do
     {
-        unsigned byte;
-        unsigned sda1;     /* precalculated SC=low,SD=1 */
-        unsigned clk0sda0; /* precalculated SC and SD low */
+        unsigned int byte;
+        unsigned int sda1;     /* precalculated SC=low,SD=1 */
+        unsigned int clk0sda0; /* precalculated SC and SD low */
+        unsigned int oldlevel;
 
         byte = *p_bytes++ << 24; /* fetch to MSB position */
 
-        cli();  /* make port modifications atomic, in case an IRQ uses PBDRL */
-                /* (currently not the case, so this could be optimized away) */
+        /* make port modifications atomic, in case an IRQ uses PBDRL */
+        /* (currently not the case, so this could be optimized away) */
+        oldlevel = set_irq_level(15);
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
@@ -285,7 +287,7 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             : "r0"
         );
 
-        sti();
+        set_irq_level(oldlevel);
 
     } while (--count); /* tail loop is faster */
 }
@@ -298,13 +300,15 @@ void lcd_write_data(unsigned char* p_bytes, int count)
     {
         unsigned byte;
         unsigned sda1;     /* precalculated SC=low,SD=1 */
+        unsigned int oldlevel;
 
         /* take inverse data, so I can use the NEGC instruction below, it is
            the only carry add/sub which does not destroy a source register */
         byte = ~(*p_bytes++ << 24); /* fetch to MSB position */
 
-        cli(); /* make port modifications atomic, in case an IRQ uses PBDRL */
-                /* (currently not the case, so this could be optimized away) */
+        /* make port modifications atomic, in case an IRQ uses PBDRL */
+        /* (currently not the case, so this could be optimized away) */
+        oldlevel = set_irq_level(15);
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
@@ -386,7 +390,7 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             "r0"
         );
 
-        sti(); /* end of atomic port modifications */
+        set_irq_level(oldlevel);
 
     } while (--count); /* tail loop is faster */
 }

@@ -302,7 +302,7 @@ void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
 void system_reboot (void)
 {
-    cli ();
+    set_irq_level(15);
 
     asm volatile ("ldc\t%0,vbr" : : "r"(0));
 
@@ -316,6 +316,18 @@ void system_reboot (void)
 
     asm volatile ("jmp @%0; mov.l @%1,r15" : :
 		  "r"(*(int*)0),"r"(4));
+}
+
+/****************************************************************************
+ * Interrupt level setting
+ ****************************************************************************/
+int set_irq_level(int level)
+{
+    int i;
+    /* Read the old level and set the new one */
+    asm volatile ("stc sr, %0" : "=r" (i));
+    asm volatile ("ldc %0, sr" : : "r" (level << 4));
+    return (i >> 4) & 0x0f;
 }
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
