@@ -58,6 +58,11 @@ char* playlist_next(int steps)
             (seek < max))
         seek++;
 
+      /* Now work back killing white space */
+      while((now_playing[seek-1] == ' ') || 
+            (now_playing[seek-1] == '\t'))
+          seek--;
+
       now_playing[seek]=0;
       
       /* replace backslashes with forward slashes */
@@ -243,3 +248,12 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
  * eval: (load-file "../firmware/rockbox-mode.el")
  * end:
  */
+
+
+
+
+
+
+
+
+
