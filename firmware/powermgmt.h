@@ -59,7 +59,6 @@ extern int powermgmt_last_cycle_level;         /* which level had the batteries 
 
 extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
 void enable_trickle_charge(bool on);
-void set_battery_capacity(int capacity); /* set local battery capacity value */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
 
@@ -70,6 +69,7 @@ extern int charge_state;         /* tells what the charger is doing (for info di
 #define CURRENT_CHARGING  300    /* charging current */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
+void set_battery_capacity(int capacity); /* set local battery capacity value */
 
 /* Start up power management thread */
 void power_init(void);

@@ -69,6 +69,15 @@ static int percent_to_volt_nocharge[11] = /* voltages (centivolt) of 0%, 10%, ..
     450, 481, 491, 497, 503, 507, 512, 514, 517, 528, 560
 };
 
+int battery_capacity = 1500;                 /* only a default value */
+
+void set_battery_capacity(int capacity)
+{
+    int values[8] = {1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200};
+    
+    battery_capacity = values[capacity];
+}
+
 #ifdef HAVE_CHARGE_CTRL
 
 char power_message[POWER_MESSAGE_LEN] = "";
@@ -79,17 +88,11 @@ int powermgmt_last_cycle_level = 0;          /* which level had the batteries at
 bool trickle_charge_enabled = true;
 int trickle_sec = 0;                         /* how many seconds should the charger be enabled per minute for trickle charging? */
 int charge_state = 0;                        /* at the beginning, the charger does nothing */
-int battery_capacity = 1800;                 /* only a default value */
 
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
 };
-
-void set_battery_capacity(int capacity)
-{
-    battery_capacity = capacity;
-}
 
 void enable_trickle_charge(bool on)
 {
@@ -375,7 +378,7 @@ static void power_thread(void)
             charge_pause--;
         
         if (charger_inserted()) {
-            if (charger_enabled) {
+            if (charge_state == 1) {
                 /* charger inserted and enabled */
                 charged_time++;
                 snprintf(power_message, POWER_MESSAGE_LEN, "Chg %dm max %dm", charged_time, charge_max_time_now);
@@ -446,36 +449,39 @@ static void power_thread(void)
                         }
                     }
                 }
-            } else { /* charged inserted but not enabled */
-
-                /* trickle charging */
-                if (charge_state > 1) { /* top off or trickle? */
-                    /* adjust trickle charge time */
-                    if (  ((charge_state == 2) && (power_history[POWER_HISTORY_LEN-1] > TOPOFF_VOLTAGE))
-                       || ((charge_state == 3) && (power_history[POWER_HISTORY_LEN-1] > TRICKLE_VOLTAGE)) ) { /* charging too much */
-                        trickle_sec--;
-                    } else { /* charging too less */
-                        trickle_sec++;
-                    }
-                        
-                    if (trickle_sec > 24) trickle_sec = 24;
-                    if (trickle_sec < 1)  trickle_sec = 1;
-
-                    /* charge the calculated amount of seconds */                
-                    charger_enable(true);
-                    sleep(HZ * trickle_sec);
-                    charger_enable(false);             
-
-                    /* trickle charging long enough? */
+            } else if (charge_state > 1) { /* top off or trickle? */
+                /* adjust trickle charge time */
+                if (  ((charge_state == 2) && (power_history[POWER_HISTORY_LEN-1] > TOPOFF_VOLTAGE))
+                   || ((charge_state == 3) && (power_history[POWER_HISTORY_LEN-1] > TRICKLE_VOLTAGE)) ) { /* charging too much */
+                    trickle_sec--;
+                } else { /* charging too less */
+                    trickle_sec++;
+                }
                     
-                    if (trickle_time++ > TRICKLE_MAX_TIME + TOPOFF_MAX_TIME) {
-                        trickle_sec = 0; /* show in debug menu that trickle is off */
-                        charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
-                    }
+                if (trickle_sec > 24) trickle_sec = 24;
+                if (trickle_sec < 1)  trickle_sec = 1;
 
-                    if ((charge_state == 2) && (trickle_time > TOPOFF_MAX_TIME)) /* change state? */
-                        charge_state = 3; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
-                }               
+                /* charge the calculated amount of seconds */                
+                charger_enable(true);
+                sleep(HZ * trickle_sec);
+                charger_enable(false);             
+
+                /* trickle charging long enough? */
+                
+                if (trickle_time++ > TRICKLE_MAX_TIME + TOPOFF_MAX_TIME) {
+                    trickle_sec = 0; /* show in debug menu that trickle is off */
+                    charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+                }
+
+                if ((charge_state == 2) && (trickle_time > TOPOFF_MAX_TIME)) /* change state? */
+                    charge_state = 3; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
+            
+            } else { /* charge_state == 0 */
+
+                /* the charger is enabled here only in one case: if it was turned on at boot time (power_init) */
+                /* turn it off now */
+                if (charger_enabled)
+                    charger_enable(false);
 
                 /* if battery is not full, enable charging */
                 if (battery_level() < charge_restart_level) {
@@ -511,12 +517,16 @@ static void power_thread(void)
             }
         } else {
             /* charger not inserted */
-            if (charger_enabled) {
+            if (charge_state > 0) {
                 /* charger not inserted but was enabled */
                 DEBUGF("power: charger disconnected, disabling\n");
                 powermgmt_last_cycle_level = battery_level();
-                powermgmt_last_cycle_startstop_min = 0;
-                trickle_sec = 0; /* show in debug menu that trickle is off */
+                /* if the user only charged some minutes, we don't really have */
+                /* a battery level that's usual for charging */
+                /* the next line prevents the battery level being too low when the charger is connected for only some minutes */
+                powermgmt_last_cycle_startstop_min = (powermgmt_last_cycle_startstop_min > 10) ? 0 : 20;
+                /* show in debug menu that trickle is off */
+                trickle_sec = 0;
                 charger_enable(false);
                 charge_state = 0; /* 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
                 snprintf(power_message, POWER_MESSAGE_LEN, "Charger disc");
@@ -552,6 +562,10 @@ void power_init(void)
 
 #ifdef HAVE_CHARGE_CTRL
     snprintf(power_message, POWER_MESSAGE_LEN, "Powermgmt started");
+    
+    /* if the battery is nearly empty, start charging immediately */
+    if (power_history[POWER_HISTORY_LEN-1] < BATTERY_LEVEL_DANGEROUS)
+        charger_enable(true);
 #endif
     create_thread(power_thread, power_stack, sizeof(power_stack), power_thread_name);
 }
