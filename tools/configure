@@ -265,16 +265,6 @@ if [ -z "$archos" ]; then
     archosrom=""
     ;;
 
-   *)
-    archos="recorder"
-    target="-DARCHOS_RECORDER"
-    shcc
-    tool="scramble"
-    output="ajbrec.ajz"
-    appextra="recorder"
-    archosrom="$pwd/rombox.ucl"
-    ;;
-
    3)
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
@@ -324,6 +314,16 @@ if [ -z "$archos" ]; then
     output="rockbox.iriver"
     appextra=""
     archosrom=""
+    ;;
+
+   *)
+    archos="recorder"
+    target="-DARCHOS_RECORDER"
+    shcc
+    tool="scramble"
+    output="ajbrec.ajz"
+    appextra="recorder"
+    archosrom="$pwd/rombox.ucl"
     ;;
 
   esac
