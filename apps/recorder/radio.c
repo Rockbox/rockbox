@@ -58,7 +58,7 @@ static struct fmstation presets[MAX_PRESETS];
 
 void fm_load_presets(void);
 bool fm_preset_select(void);
-bool fm_f3_menu(void);
+bool fm_menu(void);
 
 void fm_set_frequency(int freq)
 {
@@ -228,16 +228,16 @@ bool radio_screen(void)
                 settings_save();
                 break;
 
-            case BUTTON_F2:
-                fm_preset_select();
+            case BUTTON_F1:
+                fm_menu();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
                 status_draw(false);
                 break;
                 
-            case BUTTON_F3:
-                fm_f3_menu();
+            case BUTTON_F2:
+                fm_preset_select();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
@@ -462,17 +462,18 @@ bool fm_delete_preset(void)
     return reload_dir;
 }
 
-static struct menu_items f3_items[] = {
+static struct menu_items fm_menu_items[] = {
     { "Add preset...", fm_add_preset },
     { "Delete preset...", fm_delete_preset }
 };
     
-bool fm_f3_menu(void)
+bool fm_menu(void)
 {
     int m;
     bool result;
 
-    m = menu_init( f3_items, sizeof f3_items / sizeof(struct menu_items) );
+    m = menu_init( fm_menu_items,
+                   sizeof fm_menu_items / sizeof(struct menu_items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
