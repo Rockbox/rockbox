@@ -1,26 +1,19 @@
 Introduction to Othelo
 ======================
 
-Othelo is based on a popular board game.  This is by no means the first
-computer port of this game - the most famous port I can name was "Reversi".
+Othelo is based on a popular board game.  This is by no means the first computer port of this game - the most famous port I can name was "Reversi".
 
 The objective is to 'capture' more squares of the board than your opponent.
 
-Each turn you claim a single, previously unclaimed, square of the board.  But
-EVERY move MUST result in the taking of at least one of your opponents
-squares.
+Each turn you claim a single, previously unclaimed, square of the board.  But EVERY move MUST result in the taking of at least one of your opponents squares.
 
-An opponents square may be captured by placing your pieces either side of it.
-Either vertically, horizontally or diagonally.
+An opponents square is captured by placing your pieces either side of it.  Either vertically, horizontally or diagonally.
 
-The rules are mind-numbingly simple ...but, like Chess, the strategy for
-regular success is far from obvious.
+The rules are mind-numbingly simple ...but, like Chess, the strategy for regular success is far from obvious.
 
 Further guidance on playing can be found at:
 http://home.nc.rr.com/othello/strategy/midgame/
-...although I would like to add that all of the AI Bots (Computer opponents)
-(currently three thereof) were written by yours truly without reference to
-these type of guides.
+...although I would like to add that all of the AI Bots (Computer opponents) (currently three thereof) were written by yours truly without reference to these type of guides :-)
 
 
 Controls
@@ -37,16 +30,15 @@ OFF will switch off the Othelo game.  When Othelo is restarted from the menu,
 ON  will suspend the current Othelo game.  When Othelo is restarted from the
          menu, play will continue from where it left off.
 
-Either player may be a Human or Computer, and this may be changed at any time
-during play with F1 and F2.  The current choice is indicated by an H or C
-above the respective F1 and F2 buttons on the Jukebox.
+Either player may be a Human or Computer, and this may be changed at any time during play with F1 and F2.  The current choice is indicated by an H or C above the respective F1 and F2 buttons on the Jukebox.
+
+NOTE: The "suspend" function relied on an 'undocumented' feature which is no longer prevelant under the new "plugin" system.  Therefore it needs to be re-implemented as "save progress to file."  There are a number of reasons why this has not been implemented - if there is any demand for it, it will be added.
 
 
 Computer Advice
 ===============
 
-When a Human is playing, he may select any of the AI Bots to offer advice (it
-is described as the Computer "dreaming" for you).
+When a Human is playing, he may select any of the AI Bots to offer advice (it is described as the Computer "dreaming" for you).
 
 The default advice/help level is 0 (zero) ...no advice
 Bot 1 help will simply highlight all possible valid moves
@@ -54,37 +46,25 @@ Bot 2 will advise you which moves would steal the most pieces per turn
 Bot 3 will offer even deeper insights about strategic positioning
 Bot 4 hasn't been written yet ...watch this space
 
-In each case a 'valid' move is displayed as a dot in the centre of the square
-and a 'choice' move is highlighted with a cross.
+In each case a 'valid' move is displayed as a dot in the centre of the square and a 'choice' move is highlighted with a cross.
 
 
 AI Opponents
-===========
+============
 
-There are currently three AI opponents C-1, C-2 and C-3 respectively.  Each
-has it's own style of play.  Losing against one of the opponents does not
-necessarily mean that you will lose against another.
+There are currently three AI opponents C-1, C-2 and C-3 respectively.  Each has it's own style of play.  Losing against one of the opponents does not necessarily mean that you will lose against another.
 
-It can be interesting to set both opponents to Computer mode and watch them
-play against each other.
+It can be interesting to set both opponents to Computer mode and watch them play against each other.
 
 
 Navigation
 ==========
 
-During the turn of a Human, the up, down, left and right cursor keys navigate
-the board highlight in a suspiciously expected manner the chosen square.  When
-the cursor is highlighting the square you wish to play in, press PLAY.  If you
-have chosen an invalid move, the board will flash and you will be expected to
-try again.
+During the turn of a Human, the up, down, left and right cursor keys navigate the board highlight in a suspiciously expected manner to the chosen square.  When the cursor is highlighting the square you wish to play in, press PLAY.  If you have chosen an invalid move, the board will flash and you will be expected to try again.
 
 Button repeat _is_ enabled for navigation.
 
-The AI opponents will pause slightly before making their move, to allow you to
-see the result of your move.  If you wish to force the Computer opponent to
-wait longer before playing, you may keep PLAY depressed ("keep your finger on
-the piece you just played") and the Computer will make his move immediately
-you remove your finger from the keypad.
+The AI opponents will pause slightly before making their move, to allow you to see the result of your move.  If you wish to force the Computer opponent to wait longer before playing, you may keep PLAY depressed ("keep your finger on the piece you just played") and the Computer will make his move immediately you remove your finger from the keypad.
 
 
 Display
@@ -92,67 +72,44 @@ Display
 
 The main board is that great big grid thing taking up most of the screen.
 
-Above F1 and F2, on the bottom line of the screen, is the identity of each
-player.  Such as:
+Above F1 and F2, on the bottom line of the screen, is the identity of each player.  Such as:
 "O:C-1" ...this means that, the player represented by the "O" graphic is a
                             [C]omputer and is controlled by AI Bot #1
 "O:H-2" ...this means that, the player represented by the "O" graphic is a
-                            [H]uman player, and has AI Bot #0 dreaming for him
+                            [H]uman player, and has AI Bot #2 dreaming for him
 etc.
 
-The scores are shown toward the bottom right of the screen and the current
-player has a small arrow (->) next to his name, indicating that he should
-hurry up and actually make a move, today preferably ...although if the music
-does run out, you can always use the ON button to suspend the game while you
-go and queue up some more :)
+The scores are shown toward the bottom right of the screen and the current player has a small arrow (->) next to his name, indicating that he should hurry up and actually make a move, today preferably ...although if the music does run out, you can always use the ON button to suspend the game while you go and queue up some more :)  ...or not if you are using the current plugin version :(
 
-During play the rest of the screen (the big lump on the right at the top) will
-show a pointless graphic to make the screen look pretty.  When the game is
-quit or finished naturally, this area will display the identity of the winner,
-and a secret "end of play" message.
+During play the rest of the screen (the big lump on the right at the top) will show a pointless graphic to make the screen look pretty.  When the game is quit or finished naturally, this area will display the identity of the winner, and a secret "end of play" message.
 
 
 Source Code
 ===========
 
-The source code is scruffy, but well documented.
+The source code is scruffy, but well documented.  For the plugin system all headers files were included into the main source code and erased to conform to the new coding standard.
 
 
 Future Development
 ==================
 
-Better AI Bots.  A perfect AI Bot is easy and you can add tolerances to it
-from there (to dumb it down a bit) ...the dilemma is the vast quantity of RAM
-required to run it.  So the Bots really need to be strategy and not logic
-based.
+Better AI Bots.  A perfect AI Bot is easy and you can add tolerances to it from there (to dumb it down a bit) ...the dilemma is the vast quantity of RAM required to run it.  So the Bots really need to be strategy and not logic based.
 
-Remote control support.  Save wear and tear on your Jukebox keys - that really
-weren't designed with games players in mind.
-
-Tidy code to conform to whatever complaints I get about it.
+Remote control support.  Save wear and tear on your Jukebox keys - that really weren't designed with games players in mind.
 
 
 Coding standards, bugs'n'stuff
 ==============================
 
-Remember, if you don't like the code ...throw it away and never look at it
-again! ...Please do not tell me, I don't care.  Any complaint requiring a
-response should be written on the back of notes valued at five thousand shiny
-new pennies of the British realm.
+Remember, if you don't like the code ...throw it away and never look at it again! ...Please do not tell me, I don't care.  Any complaint requiring a response should be written on the back of notes valued at five thousand shiny new pennies of the British realm. ;)
 
-On the other hand, I love getting compliments, I am pleased to hear about bugs
-I can fix - although they don't tend to happen too often in my code ...go on
-then find one!  If you can think of any clever short cuts I have missed or
-fancy your hand at writing the next AI Bot - gimme a shout and I will explain
-all there is to know about possibility lists, and perhaps even answer such
-questions as "why is there only one equals sign in this IF statement" and "why
-are there lines of code with question marks in them"
+On the other hand, I love getting compliments, I am pleased to hear about bugs I can fix - although they don't tend to happen too often in my code ...go on then, find one!  If you can think of any clever short cuts I have missed or fancy your hand at writing the next AI Bot - gimme a shout and I will explain all there is to know about possibility lists, and perhaps even answer such questions as "why is there only one equals sign in this IF statement" and "why are there lines of code with question marks in them"
 
 
 Greetz
 ======
 
-mk, pajaco, Hardeep, DevZer0, jzoss, LinusN
+mk, pajaco, DevZer0, jzoss, LinusN, Zagor, Cyborg, Lord Grumble
 
 
 Author
@@ -161,3 +118,5 @@ Author
 BlueChip
 Yep, the lot - and right chuffed with miself too :)
 
+
+-- othelo.txt - EOF

@@ -1,183 +1,47 @@
-/***************************************************************************
- *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
- *                     \/            \/     \/    \/            \/
- * $Id$
- *
- * Copyright (C) 2003 Blue Chip
- *
- * All files in this archive are subject to the GNU General Public License.
- * See the file COPYING in the source tree root for full license agreement.
- *
- * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
- * KIND, either express or implied.
- *
- ****************************************************************************/
 /*
    Designed, Written, AI Bots, the lot ...BlueChip =8ªD#
 
    Thanks espcially to
-      Hardeep, DevZer0, LinusN
+      DevZer0, LinusN, Zagor
          for their help with understanding Rockbox & the SDK
+
+   Please note that the code formatting is not that which was
+   produced originally, but has been updated by whoever
+   ported it to the plugin system.
+   I am sure it was done with good reason, so I have not
+   redone it!
 */
 
-#include "plugin.h"
+/*
+ *  Version   Date      Who   Comment
+ *  --------  --------  ----  ------------------------------------------------
+ *  1.3       20030729  BC    Fixed display bug introduced by port to plugin
+ *                            Updated documentation
+ *  1.2       2003            Ported to new plugin system
+ *  1.1       20030625  BC    Flash board when invalid move to used aquare
+ *                            Fixed "pause computer" for real harware!
+ *                            Added USB_CONNECTED support
+ *                            Ensure correct fonts on the way in and out
+ *  1.0       20030622  BC    Release
+ *
+ *
+ *  Todo:
+ *  # More AI :)
+ *  # Reintroduce suspend feature under plugin system
+ */
+
+
 #ifdef HAVE_LCD_BITMAP
 
-/* the following #define had to be taken from Button.c
-   'cos it is not defined in the header!! */
-/* how long until repeat kicks in */
-#define REPEAT_START      6
-
-/* player types */
-#define HUMAN     false
-#define AIBOT     true
-
-/* for domove() */
-#define CHECK     false
-#define MAKE      true
-
-/* screen coords - top left x&y */
-  /* game over */
-#define go_tlx    71
-#define go_tly    17
-  /* WiNS */
-#define win_tlx   63
-#define win_tly   1
-  /* DRaW */
-#define draw_tlx  59
-#define draw_tly  1
-  /* scores */
-#define sc_tlx    65
-#define sc_tly    39
-  /* logo */
-#define logo_tlx  65
-#define logo_tly  2
-
-/* board sqaures -
- * there are a number of routines that expect these values asis
- * do not try to play with these, you will likely kill the program
- */
-#define PLAYERX   0
-#define PLAYERO   1
-#define POSS      2
-#define CHOICE    3
-#define EMPTY     4
-#define BORDER    5
-
-/* Who gets first turn */
-#define FIRST     PLAYERX
-#define DF_PLX    HUMAN
-#define DF_AIX    NONE
-#define DF_PLO    AIBOT
-#define DF_AIO    WEAK
-
-/* Oponent  skill level                   / help level
- * -------- ---------------------------------------------------
- * NONE     no ai                         / no help
- * WEAK     random valid move             / show all possible
- * AVERAGE  most pieces (random)          / all + most pieces
- * SMART    most pieces (weighted/random) / all + weighted
- * EXPERT
- * GURU
- */
-#define NONE    0
-#define WEAK    1
-#define AVERAGE 2
-#define SMART   3
-#define EXPERT  4
-#define GURU    5
-#define BEST    3 /* the best ai alogrithm currently available */
-
-/* these are for code clarity, do not change them! */
-#define LEFT    0x08
-#define RIGHT   0x04
-#define UP      0x02
-#define DOWN    0x01
-
-/* This represents the maximum number of possible moves
- * I have no idea what the real maximum is, buts tests
- * suggest about 10
- */
-#define MAXPOSS 20
-
-struct move
-{
-    int   x;
-    int   y;
-    int   taken;
-    int   rank;
-    bool  player;
-};
-
-
-/*===================================================================
- * Procedure prototypes
- *==================================================================*/
-static void changeplayer(bool pl);
-
-static int  othstrlen(char* s);
-static void othprint(unsigned char x, unsigned char y, char ch, bool upd);
-static void othprints(unsigned char x, unsigned char y, char* s, bool upd);
-
-static void initscreen(void);
-static void show_board(void);
-static void flashboard(void);
-static void show_grid(void);
-static void show_score(bool turn);
-static void show_players(void);
-static void show_f3(bool playing);
-static void hilite(struct move* move, bool on);
-static void show_endgame(unsigned char scx, unsigned char sco);
-
-static void initboard(void);
-static int  getmove(struct move* move, struct move* plist,
-                    unsigned char* pcnt, bool turn);
-static int  checkmove(unsigned char x, unsigned char y, bool pl,
-                      unsigned char dir, bool type);
-static void domove(struct move* move, bool type);
-
-static bool calcposs(struct move* plist, unsigned char* pcnt, bool turn);
-static int  getplist(struct move* plist, unsigned char pl);
-static unsigned char reduceplist(struct move* plist, unsigned char pcnt,
-                                 unsigned char ai_help);
-static void smartranking(struct move* plist, unsigned char pcnt);
-static int  plist_bytaken(const void* m1, const void* m2);
-static int  plist_byrank(const void* m1, const void* m2);
-static void clearposs(void);
-
-
-/*===================================================================
- * *static* local global variables
- *==================================================================*/
-
+/* Plugin header */
+#include "plugin.h"
 static struct plugin_api* rb;
 
-/* score */
-static  struct
-        {
-          int x;
-          int o;
-        }       score;
-
-/* 8x8 with borders */
-static  unsigned char     board[10][10];
-
-/* player=HUMAN|AIBOT */
-static  bool    player[2] = {DF_PLX, DF_PLO};
-
-/* AI  =     WEAK|AVERAGE|SMART|EXPERT|GURU
-   Help=NONE|WEAK|AVERAGE|SMART|EXPERT|GURU */
-static  unsigned char     ai_help[2] = {DF_AIX, DF_AIO};
-
-/* is a game under way */
-static  bool    playing = false;
-
-/* who's turn is it? */
-static  bool    turn = FIRST;
+/***************************************************************************/
+/***************************************************************************/
+/*                        OTHFONT.H                                        */
+/***************************************************************************/
+/***************************************************************************/
 
 /* Don't reorder this array - you have been warned! */
 enum othfontc {
@@ -443,6 +307,13 @@ static unsigned char othfont[of_eos][6] = {
 
 };
 
+
+/***************************************************************************/
+/***************************************************************************/
+/*                        OTHLOGO.H                                        */
+/***************************************************************************/
+/***************************************************************************/
+
 /*
 
 ######### #   # ###   ##   ##   ###
@@ -575,12 +446,135 @@ static void showlogo(int x, int y, bool on)
 }
 
 
+/***************************************************************************/
+/***************************************************************************/
+/*                        OTHELO.H                                         */
+/***************************************************************************/
+/***************************************************************************/
+
+
+/* the following #define had to be taken from Button.c
+   'cos it is not defined in the header!! */
+/* how long until repeat kicks in */
+#define REPEAT_START      6
+
+/* player types */
+#define HUMAN     false
+#define AIBOT     true
+
+/* for domove() */
+#define CHECK     false
+#define MAKE      true
+
+/* screen coords - top left x&y */
+  /* game over */
+#define go_tlx    71
+#define go_tly    17
+  /* WiNS */
+#define win_tlx   63
+#define win_tly   1
+  /* DRaW */
+#define draw_tlx  59
+#define draw_tly  1
+  /* scores */
+#define sc_tlx    65
+#define sc_tly    39
+  /* logo */
+#define logo_tlx  65
+#define logo_tly  2
+
+/* board sqaures -
+ * there are a number of routines that expect these values asis
+ * do not try to play with these, you will likely kill the program
+ */
+#define PLAYERX   0
+#define PLAYERO   1
+#define POSS      2
+#define CHOICE    3
+#define EMPTY     4
+#define BORDER    5
+
+/* Who gets first turn */
+#define FIRST     PLAYERX
+#define DF_PLX    HUMAN
+#define DF_AIX    NONE
+#define DF_PLO    AIBOT
+#define DF_AIO    WEAK
+
+/* Oponent  skill level                   / help level
+ * -------- ---------------------------------------------------
+ * NONE     no ai                         / no help
+ * WEAK     random valid move             / show all possible
+ * AVERAGE  most pieces (random)          / all + most pieces
+ * SMART    most pieces (weighted/random) / all + weighted
+ * EXPERT
+ * GURU
+ */
+#define NONE    0
+#define WEAK    1
+#define AVERAGE 2
+#define SMART   3
+#define EXPERT  4
+#define GURU    5
+#define BEST    3 /* the best ai alogrithm currently available */
+
+/* these are for code clarity, do not change them! */
+#define LEFT    0x08
+#define RIGHT   0x04
+#define UP      0x02
+#define DOWN    0x01
+
+/* This represents the maximum number of possible moves
+ * I have no idea what the real maximum is, buts tests
+ * suggest about 10
+ */
+#define MAXPOSS 20
+
+struct move
+{
+    int   x;
+    int   y;
+    int   taken;
+    int   rank;
+    bool  player;
+};
+
+
+/*===================================================================
+ * local global variables
+ * THIS IS THE DATA THAT NEEDS TO BE SAVED TO ALLOW THE GAME
+ * TO CONTINUE  ...THE CONTINUE FEATURE DOES NOT WORK UNDER THE
+ * NEW PLUGIN SYSTEM!
+ *==================================================================*/
+
+/* score */
+static  struct
+        {
+          int x;
+          int o;
+        }       score;
+
+/* 8x8 with borders */
+static  unsigned char     board[10][10];
+
+/* player=HUMAN|AIBOT */
+static  bool    player[2] = {DF_PLX, DF_PLO};
+
+/* AI  =     WEAK|AVERAGE|SMART|EXPERT|GURU
+   Help=NONE|WEAK|AVERAGE|SMART|EXPERT|GURU */
+static  unsigned char     ai_help[2] = {DF_AIX, DF_AIO};
+
+/* is a game under way */
+static  bool    playing = false;
+
+/* who's turn is it? */
+static  bool    turn = FIRST;
+
 /********************************************************************
  * strlen ofr use with othello print system
  ********************************************************************/
 static int othstrlen(char* s)
 {
-
     int i;
 
     for(i=0; s[i]!=of_eos; i++);
@@ -730,10 +724,14 @@ static void show_players(void)
 
     if (player[PLAYERX]==AIBOT)
         scs[2] = of_c;
+    else
+        scs[2] = of_h;
     scs[4] = ai_help[PLAYERX] +of_0;
 
     if (player[PLAYERO]==AIBOT)
         scs[8] = of_c;
+    else
+        scs[8] = of_h;
     scs[10] = ai_help[PLAYERO] +of_0;
 
     othprints( 2,58, &scs[0], true);
@@ -1151,11 +1149,11 @@ static unsigned char reduceplist(struct move* plist, unsigned char pcnt, unsigne
         /* ------------------------------------------------- */
         case GURU:
             break;
-            /* ------------------------------------------------- */
+        /* ------------------------------------------------- */
         case EXPERT:
             break;
-            /* ------------------------------------------------- */
-            /* this player will favour certain known moves */
+        /* ------------------------------------------------- */
+        /* this player will favour certain known moves */
         case SMART:
             if (pcnt>1)
             {
@@ -1167,8 +1165,8 @@ static unsigned char reduceplist(struct move* plist, unsigned char pcnt, unsigne
                 pcnt = i;
             }
             /* FALL THROUGH */
-            /* ------------------------------------------------- */
-            /* reduce possibilites to "most pieces taken" */
+        /* ------------------------------------------------- */
+        /* reduce possibilites to "most pieces taken" */
         case AVERAGE:
             if (pcnt>1)
             {
@@ -1179,7 +1177,7 @@ static unsigned char reduceplist(struct move* plist, unsigned char pcnt, unsigne
                 pcnt = i;
             }
             break;
-            /* ------------------------------------------------- */
+        /* ------------------------------------------------- */
         default:
             // you should never get here!
             break;
@@ -1353,7 +1351,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
-    
+
     quit = false;
 
     do /* while !quit */
