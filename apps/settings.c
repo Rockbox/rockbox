@@ -657,6 +657,7 @@ void set_int(char* string,
              int max )
 {
     bool done = false;
+    int button;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -677,7 +678,8 @@ void set_int(char* string,
 #endif
         lcd_update();
 
-        switch( button_get_w_tmo(HZ/2) ) {
+        button = button_get_w_tmo(HZ/2);
+        switch(button) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -710,23 +712,8 @@ void set_int(char* string,
 #endif
                 done = true;
                 break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-                lcd_clear_display();
-                lcd_puts_scroll(0, 0, string);
-#endif
-                break;
-#endif
         }
-        if ( function )
+        if ( function && button != BUTTON_NONE)
             function(*variable);
     }
     lcd_stop_scroll();
@@ -736,6 +723,7 @@ void set_option(char* string, int* variable, char* options[],
                 int numoptions, void (*function)(int))
 {
     bool done = false;
+    int button;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -753,7 +741,8 @@ void set_option(char* string, int* variable, char* options[],
 #endif
         lcd_update();
 
-        switch ( button_get_w_tmo(HZ/2) ) {
+        button = button_get_w_tmo(HZ/2);
+        switch (button) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -788,24 +777,9 @@ void set_option(char* string, int* variable, char* options[],
 #endif
                 done = true;
                 break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-                lcd_clear_display();
-                lcd_puts_scroll(0, 0, string);
-#endif
-                break;
-#endif
         }
 
-        if ( function )
+        if ( function && button != BUTTON_NONE)
             function(*variable);
     }
     lcd_stop_scroll();
