@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "lcd.h"
 #include "kernel.h"
 #include "sprintf.h"
@@ -27,6 +28,8 @@
 #include "i2c.h"
 #include "string.h"
 #include "buffer.h"
+
+#if CONFIG_CPU != MCF5249 /* FIX: this doesn't work on iRiver yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -130,14 +133,22 @@ int rolo_load(const char* filename)
     system_init();           /* Initialize system for restart */
     i2c_init();              /* Init i2c bus - it seems like a good idea */
     ICR = IRQ0_EDGE_TRIGGER; /* Make IRQ0 edge triggered */
-	TSTR = 0xE0;             /* disable all timers */
+    TSTR = 0xE0;             /* disable all timers */
     /* model-specific de-init, needed when flashed */
     /* Especially the Archos software is picky about this */
-#if defined(ARCHOS_RECORDER) || defined(ARCHOS_RECORDERV2) || defined(ARCHOS_FMRECORDER)
-	PAIOR = 0x0FA0;
+#if defined(ARCHOS_RECORDER) || defined(ARCHOS_RECORDERV2) || \
+    defined(ARCHOS_FMRECORDER)
+    PAIOR = 0x0FA0;
 #endif
 
     rolo_restart(mp3buf, ramstart, length);
 
     return 0; /* this is never reached */
 }
+#else  /* CONFIG_CPU != MCF5249 */
+int rolo_load(const char* filename)
+{
+    /* dummy */
+}
+
+#endif /* CONFIG_CPU == MCF5249 */
