@@ -15,7 +15,7 @@ Read the <a href="rockbox-1.0-notes.txt">release notes</a>.
 </ul>
 
 <h3>player</h3>
-<p>This version is for Archos Jukebox 6000 with ROM firmware 4.50 or later, and all Studio models.
+<p>This version is for Archos Jukebox 5000, 6000 with ROM firmware 4.50 or later, and all Studio models.
 
 <ul>
 <li><a href="rockbox-1.0-player.zip">rockbox-1.0-player.zip</a>
