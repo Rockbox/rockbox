@@ -130,7 +130,7 @@ id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
 voice: "Shuffle"
-new: "Stokk om"
+new: "Stokk om rekkefølge"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -142,13 +142,13 @@ id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "Sorter etter liten/stor bokstav"
+new: "Sortere små/store bokstaver"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
 voice: "Resume"
-new: "Fortsett"
+new: "Husk låtposisjon"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -178,7 +178,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Eksempel på rullehastighet"
+new: "Eksempel for rullehastighetsinnstilling"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
@@ -364,7 +364,7 @@ id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "Automatisk volum"
+new: "Automatisk volumjustering"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -406,13 +406,13 @@ id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Tastelåsen er PÅ"
+new: "Tastelås er PÅ"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Tastelåsen er AV"
+new: "Tastelås er AV"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -1048,7 +1048,7 @@ id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "Anti-hopp-buffer"
+new: "Antihopp-buffer"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
@@ -1324,7 +1324,7 @@ id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
 voice: "Line Selector"
-new: "Linjevelger" 
+new: "Menyvalgindikator" 
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
@@ -1918,7 +1918,7 @@ id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
 voice: "Status- and Scrollbar"
-new: "Status-/rulle-felt"
+new: "Status-/rullefelt"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
@@ -1936,7 +1936,7 @@ id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: "Klokke & dato"
+new: "Klokke og dato"
 
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
@@ -1954,7 +1954,7 @@ id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
 voice: "Directory"
-new: "Mappe"
+new: "Katalog"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
@@ -2026,7 +2026,7 @@ id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
 eng: "Option"
 voice: ""
-new: "Innstilling"
+new: "Valg"
 
 id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
@@ -2692,7 +2692,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Editere innstilling"
+new: "Editer innstilling"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
