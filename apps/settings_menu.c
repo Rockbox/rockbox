@@ -262,9 +262,10 @@ static bool peak_meter_release(void)  {
        fits into a 7 bit number. The 8th bit is used for storing
        something else in the rtc ram.
        Also, the max value is 0x7e, since the RTC value 0xff is reserved */
-    retval = set_int( str(LANG_PM_RELEASE), STR(LANG_PM_UNITS_PER_READ), 
-                    &global_settings.peak_meter_release,
-             NULL, 1, 1, 0x7e);
+    retval = set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ),
+                      LANG_PM_UNITS_PER_READ,
+                      &global_settings.peak_meter_release,
+                      NULL, 1, 1, 0x7e);
 
     peak_meter_init_times(global_settings.peak_meter_release,
         global_settings.peak_meter_hold, 
