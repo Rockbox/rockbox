@@ -120,10 +120,10 @@ int button_get(bool block)
  * DOWN, PLAY, LEFT, and RIGHT are likewise connected to AN5. */
  
 /* Button analog voltage levels */
-#define	LEVEL1		50
-#define	LEVEL2		125
-#define	LEVEL3		175
-#define	LEVEL4		225
+#define	LEVEL1		300
+#define	LEVEL2		500
+#define	LEVEL3		700
+#define	LEVEL4		900
 
 /*
  *Initialize buttons
