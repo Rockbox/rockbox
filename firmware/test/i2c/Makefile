@@ -8,12 +8,12 @@ INCLUDES=-I../../common -I../.. -I../../drivers
 
 TARGET = -DARCHOS_PLAYER_OLD=1
 
-CFLAGS = -g -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
+CFLAGS = -g -W -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
 OBJS= ../../crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o \
 	../../debug.o ../../kernel.o thread.o ../../common/sprintf.o \
-	../../panic.o ../../system.o ../../drivers/led.o \
+	../../drivers/dac.o ../../panic.o ../../system.o ../../drivers/led.o \
 	../../drivers/lcd.o ata.o ../../drivers/fat.o \
 	../../common/disk.o ../../common/file.o ../../common/dir.o
 
@@ -44,7 +44,7 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-rm -f $(OBJS) *.x *.i *.o *.s *.elf *.bin *.map *.mod *.bak *~
 
 install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
