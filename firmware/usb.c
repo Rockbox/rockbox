@@ -72,10 +72,14 @@ static void usb_enable(bool on)
 #endif
     
     if(on)
-        PADR &= ~0x400; /* enable USB */
+    {
+        and_b(~0x04, &PADRH); /* enable USB */
+    }
     else
-        PADR |= 0x400;
-    PAIOR |= 0x400;
+    {
+        or_b(0x04, &PADRH);
+    }
+    or_b(0x04, &PAIORH);
 }
 
 static void usb_slave_mode(bool on)
