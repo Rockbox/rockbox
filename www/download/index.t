@@ -40,27 +40,6 @@
 <li><a href="rockbox-1.3.tar.gz">rockbox-1.3.tar.gz</a>
 </ul>
 
-
-<h3>Screen shots (from 1.2 simulator)</h3>
-
-<p>
-<table><tr valign=top>
-<td><img src="pboot-1.2.png" alt="Player simulator">
-<br>Player boot screen</td>
-
-<td><img src="boot-1.2.png" alt="Recorder simulator">
-<br>Recorder boot screen</td>
-
-<td><img src="dir-1.2.png" alt="Dir browser"><br>Recorder dir browser</td>
-
-<td><img src="wps-1.2.png" alt="WPS"><br>Recorder "While Playing Screen"</td>
-</tr><tr valign=top>
-<td><img src="tetris-1.2.png" alt="Tetris"><br>Tetris (recorder only)</td>
-<td><img src="sokoban.png" alt="Sokoban"><br>Sokoban (recorder only)</td>
-<td><img src="bounce.png" alt="Bounce"><br>Bouncing text (recorder only)</td>
-</tr></table>
-
-
 <h3>User interface simulators</h3>
 
 <p>
@@ -89,10 +68,8 @@
 
 <h2>Bug reports</h2>
 
-<p>Please use our
-<a href="http://sourceforge.net/tracker/?group_id=44306&atid=439118">Sourceforge page</a>
-for all bug reports and feature requests. If you have a sourceforge account,
-please log in first so we have a name to connect to the report.
+<p>Please use our <a href="/bugs.html">bug page</a>
+for all bug reports and feature requests.
 
 <p>If you are interested in helping with the development of Rockbox, please join the mailing list.
 

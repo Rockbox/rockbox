@@ -98,3 +98,8 @@ PRE {
  background-color: #c6d6f5;
  padding: 4px;
 }
+
+.fixed td {
+ background-color: #aae8aa;
+ padding: 4px;
+}

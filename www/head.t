@@ -29,22 +29,15 @@
 <p align="right">
 <a class="menulink" href="/">main page</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/manual/">manual</a><br>
-<a class="menulink" href="/docs/faq.html">FAQ</a><br>
-<a class="menulink" href="/tshirt-contest/">t-shirt contest</a><br>
-<a class="menulink" href="/notes.html">research notes</a><br>
-<a class="menulink" href="/docs/">data sheets</a><br>
-<a class="menulink" href="/schematics/">schematics</a><br>
-<a class="menulink" href="/mods/">hardware mods</a><br>
+<a class="menulink" href="/screenshots.html">screen&nbsp;shots</a><br>
+<a class="menulink" href="/daily.shtml">daily builds</a><br>
+<a class="menulink" href="/docs/">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
-<a class="menulink" href="/tools.html">tools</a><br>
 <a class="menulink" href="/internals/">photos</a><br>
-<a class="menulink" href="/daily.shtml">daily builds</a><br>
-<a class="menulink" href="/cvs.html">CVS</a><br>
-<a class="menulink" href="http://sourceforge.net/projects/rockbox/">sourceforge</a><br>
-<a class="menulink" href="bugs.shtml">bug reports</a><br>
-<a class="menulink" href="requests.shtml">feature&nbsp;requests</a><br>
+<a class="menulink" href="/mods/">hardware mods</a><br>
+<a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
+<a class="menulink" href="/bugs.shtml">bug reports</a><br>
 <a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
 <div align="right">
