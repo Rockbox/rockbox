@@ -234,6 +234,7 @@ static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) long secnum, bool dirty);
 static int create_dos_name(const unsigned char *name, unsigned char *newname);
+static void randomize_dos_name(unsigned char *name);
 static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long start);
 static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start, long count, char* buf, bool write );
 
@@ -1335,7 +1336,7 @@ static int add_dir_entry(struct fat_dir* dir,
                 /* check that our intended shortname doesn't already exist */
                 if (!strncmp(shortname, buf + i * DIR_ENTRY_SIZE, 12)) {
                     /* filename exists already. make a new one */
-                    snprintf(shortname+8, 4, "%03X", (unsigned)rand() & 0xfff);
+                    randomize_dos_name(shortname);
                     LDEBUGF("Duplicate shortname, changing to %s\n",
                             shortname);
 
@@ -1464,22 +1465,49 @@ unsigned char char2dos(unsigned char c)
 
 static int create_dos_name(const unsigned char *name, unsigned char *newname)
 {
-    int i,j;
+    int i;
+    unsigned char *ext;      
+
+    /* Find extension part */
+    ext = strrchr(name, '.');
+    if (ext == name)         /* handle .dotnames */
+        ext = NULL;
 
     /* Name part */
-    for (i=0, j=0; name[i] && (j < 8); i++)
+    for (i = 0; *name && (!ext || name < ext) && (i < 8); name++)
     {
-        unsigned char c = char2dos(name[i]);
+        unsigned char c = char2dos(*name);
         if (c)
-            newname[j++] = toupper(c);
+            newname[i++] = toupper(c);
     }
-    while (j < 8)
-        newname[j++] = ' ';
 
-    /* Extension part */
-    snprintf(newname+8, 4, "%03X", (unsigned)rand() & 0xfff);
+    /* Pad both name and extension */
+    while (i < 11)
+        newname[i++] = ' ';
 
+    if (ext)
+    {   /* Extension part */
+        ext++;
+        for (i = 8; *ext && (i < 11); ext++)
+        {
+            unsigned char c = char2dos(*ext);
+            if (c)
+                newname[i++] = toupper(c);
+        }
+    }
     return 0;
+}
+
+static void randomize_dos_name(unsigned char *name)
+{
+    int i;
+    unsigned char buf[5];
+
+    snprintf(buf, sizeof buf, "%04x", (unsigned)rand() & 0xffff);
+
+    for (i = 0; (i < 4) && (name[i] != ' '); i++);
+    /* account for possible shortname length < 4 */
+    memcpy(&name[i], buf, 4);
 }
 
 static int update_short_entry( struct fat_file* file, long size, int attr )
