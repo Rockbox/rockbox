@@ -27,8 +27,11 @@ AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
 
+LANGUAGE = english
+
 FIRMWARE := ../firmware
 TOOLS := ../tools
+DOCSDIR := ../docs
 
 INCLUDES= -I$(FIRMWARE)/include -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I$(FIRMWARE)/malloc -I.
 
@@ -100,6 +103,12 @@ $(OBJDIR)/archos.asm: $(OBJDIR)/archos.bin
 $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/archos.bin
 	$(TOOLS)/scramble $(OBJDIR)/archos.bin $(OBJDIR)/$(OUTNAME)
 
+$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
+	perl credits.pl < $< > $(OBJDIR)/$@
+
+$(OBJDIR)/credits.o: $(OBJDIR)/credits.c $(OBJDIR)/credits.h $(OBJDIR)/credits.raw
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(TARGET) -c $< -o $@
 
@@ -116,7 +125,8 @@ dist:
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/archos.asm \
 	$(OBJDIR)/archos.bin $(OBJDIR)/archos.elf $(OBJDIR)/archos.map \
-	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]
+	$(OBJDIR)/build.lang $(OBJDIR)/lang.c $(OBJDIR)/lang.h \
+	$(OBJDIR)/credits.raw
 	make -C $(FIRMWARE) -f win32.mak TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) clean
 
 DEPS:=.deps
