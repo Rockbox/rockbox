@@ -60,12 +60,6 @@ typedef struct
     BDF_GLYPH* enc_table[256];
 } BDF;
 
-typedef union
-{
-    unsigned char db[2];
-    unsigned short sval;
-} DOUBLE_BYTE;
-
 BDF* readFont(const char *name);
 BDF_GLYPH* getGlyph(unsigned char c, BDF* bdf, short* enc_map);
 void getBitmap(BDF_GLYPH* g, unsigned char* src);

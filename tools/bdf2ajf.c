@@ -799,9 +799,7 @@ void test_print(unsigned char c, BDF* font, short* enc_map)
     {
         unsigned short bmp = 0;
         unsigned short sh;
-        DOUBLE_BYTE db;
-        db.db[0] = g->bitmap[i*2];
-        db.db[1] = g->bitmap[i*2+1];
+        int db= (g->bitmap[i*2] | (g->bitmap[i*2+1] <<8));
         
         sh = 1 << 7; /*g->dwidth_x;*/
 
@@ -814,7 +812,7 @@ void test_print(unsigned char c, BDF* font, short* enc_map)
                 sh = 1 << (sizeof(unsigned short)*8-1);
                 bit = sh>>(j - 8);
             }
-            b = bit & db.sval;
+            b = bit & db;
             printf( b ? "*" : " " );
         }
         
@@ -884,9 +882,7 @@ void getBitmap(BDF_GLYPH* g, unsigned char* src)
     {
         unsigned short bmp = 0;
         unsigned short sh, srcmap;
-        DOUBLE_BYTE db;
-        db.db[0] = g->bitmap[i*2];
-        db.db[1] = g->bitmap[i*2+1];
+        int db= (g->bitmap[i*2] | (g->bitmap[i*2+1] <<8));
         
         sh = 1 << 7; /*g->dwidth_x;*/
 
@@ -906,7 +902,7 @@ void getBitmap(BDF_GLYPH* g, unsigned char* src)
                 sh = 1 << (sizeof(unsigned short)*8-1);
                 bit = sh>>(j - 8);
             }
-            b = bit&db.sval;
+            b = bit&db;
 
             if (b)
                 src[j*rows+d] |= srcmap;
