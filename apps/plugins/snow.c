@@ -20,7 +20,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#define NUM_PARTICLES 100
+#define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
 
 static short particles[NUM_PARTICLES][2];
 static struct plugin_api* rb;
@@ -28,7 +28,7 @@ static struct plugin_api* rb;
 static bool particle_exists(int particle)
 {
     if (particles[particle][0]>=0 && particles[particle][1]>=0 && 
-        particles[particle][0]<112 && particles[particle][1]<64) 
+        particles[particle][0]<LCD_WIDTH && particles[particle][1]<LCD_HEIGHT)
         return true;
     else
         return false;
@@ -40,7 +40,7 @@ static int create_particle(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (!particle_exists(i)) {
-            particles[i][0]=(rb->rand()%112);
+            particles[i][0]=(rb->rand()%LCD_WIDTH);
             particles[i][1]=0;
             return i;
         }
