@@ -8,10 +8,11 @@ some information here, write to mail@uwe-freese.de.
 
 [INTRODUCTION]
 
-This doc describes how the charging works for the recorder. The algorithm can be
-found in firmware/powermgmt.[c|h]. Debug output is done in apps/debug_menu.c.
-Charging for the player is done by the hardware and therefore isn't implemented
-in rockbox.
+This doc describes how the charging works for the recorder. The algorithm can be 
+found in firmware/powermgmt.[c|h]. Debug output is done in apps/debug_menu.c. 
+Charging for the player is done by the hardware and therefore isn't implemented 
+in rockbox. Only the functions that calculate the battery level are also used 
+for the player.
 
 All following information is related to the recorder.
 
@@ -154,25 +155,21 @@ power consumption, a usual constant value is used. If the LED backlight is set
 to always on, it is also considered.
 
 
-[BATTERY LAZYNESS]
+[BATTERY DISPLAY HOW THE USER EXPECTS IT]
 
-The battery voltage gives no realistic hint to the actual charging status when 
-the charger was just turned on or off.
+To not confuse the user with the shown battery level, some tricks are used in 
+the battery level calculation (this does not affect the charging algorithm, 
+because it uses the raw voltages):
 
-Assume a 50% full battery and then turn on the charger. The voltage goes up. But 
-the voltage is smaller than the voltage of a 50% full battery when the charging 
-started at 0%.
-
-To consider this (and make a better remaining time estimation possible), I 
-implemented the battery lazyness array. It means (in simple words, let's assume 
-the charger is turned on):
-
-- if the charger is just turned on, calculate the battery status (percentage)
-  out of the voltage for decharging (even if we actually charge)
-- after 20 minutes of charging, calculate the battery status out of the voltage 
-  courve for charging
-- inside these 20 minutes, mix the voltage courves (another array in
-  powermgmt.c tells how)
+- if charging is completed, top-off charge or trickle charge is running, always 
+  set the battery level to 100%
+- the battery level is only allowed to change 1% per minute (exception: when usb 
+  is connected, is is allowed to go 3% down/min)
+- if charging just started (or stopped), ignore the battery voltage for the 
+  first 25 minutes
+- after turning on the device, add another 5% to the battery level, because the 
+  drive is used heavily when booting and the voltage usually gets a little higher 
+  after that
 
 
 [WHICH CHARGING MODE TO USE]
