@@ -9,7 +9,7 @@ INCLUDES=-I../../
 CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES)
 AFLAGS += -small -relax
 
-OBJS= crt0.o main.o ../../lcd.o ../../i2c.o ../../mas.o ../../debug.o
+OBJS= crt0.o main.o ../../i2c.o ../../mas.o ../../debug.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
