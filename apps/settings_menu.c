@@ -596,6 +596,7 @@ static bool browse_current(void)
     return set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
 }
 
+#ifdef HAVE_LCD_BITMAP
 static bool scroll_bar(void)
 {
     return set_bool( str(LANG_SCROLL_BAR), &global_settings.scrollbar );
@@ -605,6 +606,7 @@ static bool status_bar(void)
 {
     return set_bool( str(LANG_STATUS_BAR), &global_settings.statusbar );
 }
+#endif
 
 static bool playback_settings_menu(void)
 {
