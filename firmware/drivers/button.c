@@ -485,12 +485,10 @@ static int button_read(void)
     int btn = BUTTON_NONE;
     int data = adc_read(4);
 
-    if(adc_read(2) > 0x180) /* active high */
+    if(adc_read(2) > 0x200) /* active high */
         btn |= BUTTON_MENU;
-    if(adc_read(3) < 0x180) /* active low */
+    if(adc_read(3) < 0x200) /* active low */
         btn |= BUTTON_ON;
-    if(adc_read(3) < 0x180)
-        btn |= BUTTON_PLAY | BUTTON_UP;
 
     /* Check the 4 direction keys, hard-coded analog limits for now */
     if (data >= 0x2E5)
