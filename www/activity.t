@@ -21,7 +21,7 @@ STATUS(GREEN,List,firmware/common/list.c,"http://cvs.sourceforge.net/cgi-bin/vie
 STATUS(GREEN,ID3 parser,firmware/i3d.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/id3.c", Daniel,Works)
 STATUS(GREEN,FAQ,www/docs/FAQ,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/www/docs/FAQ",Rob,Existing)
 STATUS(GREEN,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn,Works)
-STATUS(GREEN,Tetris,uisimulator/tetris.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/tetris.c", &nbsp;, Written)
+STATUS(GREEN,Tetris,apps/tetris.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/apps/tetris.c", &nbsp;, Written)
 STATUS(GREEN,MAS driver,firmware/drivers/mas.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/mas.c", Linus,Works)
 STATUS(GREEN,ATA driver,firmware/drivers/ata.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/ata.c", Björn,Works)
 STATUS(GREEN,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Works)
@@ -32,9 +32,9 @@ STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net
 STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Written; untested)
 STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/system.c", Linus,In progress)
 STATUS(YELLOW,Playlist handling,firmware/playlist.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/playlist.c", Wavey, Progressing)
-STATUS(YELLOW,Directory browser UI,uisimulator/tree.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/tree.c", Daniel,Works in simulator)
+STATUS(YELLOW,Directory browser UI,apps/tree.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/apps/tree.c", Daniel,Works in simulator)
 STATUS(RED,Boot loader (rolo),&nbsp;,"",&nbsp;,Planned)
-STATUS(RED,Application...,uisimulator/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/app.c",&nbsp;,Embryo)
+STATUS(RED,Application...,apps/app.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/apps/app.c",&nbsp;,Embryo)
 STATUS(RED,New DSP algorithms,&nbsp;,"",&nbsp;,We need help!)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
