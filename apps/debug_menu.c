@@ -186,7 +186,6 @@ Menu dbg_ports(void)
         switch(button)
         {
             case BUTTON_OFF:
-            case BUTTON_LEFT:
                 return MENU_OK;
         }
     }
