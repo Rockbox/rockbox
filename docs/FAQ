@@ -11,9 +11,8 @@ A3. The purpose of this project is to write an Open Source replacement
     firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
 Q4. I want to write code for my Archos, how do I proceed?
-A4. First make sure to read the file CONTRIBUTING in the docs directory
-    on Sourceforge.  See http://rockbox.haxx.se/docs/contributing.html
-    if you do not want to have to wade through the CVS directories.
+A4. Our guide on first time (http://rockbox.haxx.se/docs/firsttime.html) 
+    Rockbox development should answer most of your questions.
 
 Q5: What is CVS?
 A5: Concurrent Versions System (http://www.cvshome.org).  We have a small
@@ -253,10 +252,7 @@ A32: Rolo is our bootloader.  Rolo became available with our 1.4 release.
 
 Q33: Can I use the Archos as an USB harddisk to store data from my PDA/
      digital camera/phone etc.
-A33: No. USB is a master/slave protocol, and both the Archos and your device
-     are slaves. Two slaves cannot communicate without a master (usually a PC).
-     (An upcoming extension called USB On-The-Go will let slaves communicate
-     without a master, but current Archoses will not be able to support that.)
+A33: No.  See: http://rockbox.haxx.se/docs/nodo.html#4
 
 Q34: When I use RockBox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
@@ -322,11 +318,11 @@ A46: No. Unfortunately, the ON/OFF mechanisms are handled entirely in
 
 Q47: Where's the recording option?  Why can't I record?!!
 A47: I'd like to say we hid it because we don't like you, but you seem to be
-     a good person so here's the truth.  It's just not implimented in Rockbox
-     yet.  But stress not, you can still use Rolo to boot the default Archos
-     firmware and record from there.  (Check out question #33).
+     a good person so here's the truth.  It's just not implimented in release 
+     versions of Rockbox yet.  But stress not, you can still use Rolo to boot 
+     the default Archos firmware and record from there.  
 
-     Recent development versions (daily builds) have initial support for
+     Daily builds and bleeding edge versions have initial support for
      Recording. If you're brave and want to help out, get one, try out and
      report your findings!
 
@@ -469,26 +465,8 @@ A61: If we were better programmers we would take that as an insult.  But we
      submitted through SourceForge's bug tracker.  (A link to the bug tracker
      can be found under our bug submission rules.)
 
-Q62: Could you tell me how to apply a patch?
-A62: There are a ton of ways to apply a patch.  One way is to use the (GNU)
-     'patch' program.  It used like this:
-
-       $ cd rockbox-root
-       $ patch < magic.patch
-
-     Sometimes, the diff has path info you want to strip so that patch can 
-     find your file names.  -p then takes off a number of "path parts" from 
-     left:
-
-       $ patch -p0 < magic.patch
-       - or -
-       $ patch -p1 < magic.patch
-
-     If patch can't apply some changes that are in the diff, you'll get those
-     particular changes in a file named "[source-file].rej".
-
-Q63: Whats with all the different versions of Rockbox?
-A63: There are really only two versions of Rockbox.  One for Players and one
+Q62: Whats with all the different versions of Rockbox?
+A62: There are really only two versions of Rockbox.  One for Players and one
      for Recorders.  However, we do have 3 other 'versions' of Rockbox 
      available for download.  These would be Releases, Daily Builds, and 
      Bleeding Edge.
@@ -513,32 +491,34 @@ A63: There are really only two versions of Rockbox.  One for Players and one
      but would love to hear any reports you may have about Release or Daily
      build versions. (see question #62).
             
-Q64: I am in Windows and can't create a .rockbox directory to store my
+Q63: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
-A64: We won't.  The limitations of your operating system is not reason 
+A63: We won't.  The limitations of your operating system is not reason 
      enough for us to change how we handle things.  And you _can_ create
      this directory.  Open a command line and type:
           mkdir j:\.rockbox
      You will need to correct the location for the drive letter that Windows
      assigns to your drive.
 
-Q65: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
+Q64: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
      fix this?
-A65: Truth is, we don't need to fix anything.  If you are using OSX then you
+A64: Truth is, we don't need to fix anything.  If you are using OSX then you
      can just open a console, change directories to the device and just:
           mkdir .rockbox
 
      If you are in another version then you should be able to do command-N in 
      the Finder, then name the folder.  
          
-Q66: Will Rockbox work on an of Archos' other units? (FM player, Multimedia)
-A66: Unfortunately, RockBox will not likely support any units other than
-     those that we do currently support.
+Q65: Will Rockbox work on an of Archos' other units?
+A65: Some development has recently occured on the Archos FM units, and is 
+     in the daily builds.  However the FM developement is not being done by 
+     the core team, and so is progressing at a slower rate.  As yet, 
+     no development is planned for any of Archos' other units.
 
-Q67: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
+Q66: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
      safely and rebooted. But Rockbox still didn't load. What is wrong?
      I am running Windows.
-A67: The old MOD/AJZ was not entirely deleted from the disk. It is still
+A66: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
 
@@ -567,8 +547,8 @@ A67: The old MOD/AJZ was not entirely deleted from the disk. It is still
 
      (Thanks to Olivier Rafidison for this info)
 
-Q68: What kind of mic can I connect to my AJBR?
-A68: There are several types of microphones.
+Q67: What kind of mic can I connect to my AJBR?
+A67: There are several types of microphones.
 
      Dynamic: The one that's available from archos is a dynamic one.
      Their output level is high enough so that they don't need an
@@ -626,20 +606,18 @@ A68: There are several types of microphones.
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
      (As described, you also need amplification.)
 
-Q69: I can't start rockbox when the charger is connected. What am I doing
+Q68: I can't start rockbox when the charger is connected. What am I doing
      wrong?
-A69: If your device is off and you connect the charger, the Archos charger code
+A68: If your device is off and you connect the charger, the Archos charger code
      is started immediately. You can then start Rockbox with holding down the
      ON key for several seconds. Hold the key down a really long time, until
      you see the Rockbox logo!
 
-Q70: Why can't you implement a crossfader? That would be so cool!
-A70: To crossfade you need to decode two MP3 streams simultaneously. The MP3
-     decoding is done in hardware and we only have one decoder chip, so it
-     can't be done. Sorry.
+Q69: Why can't you implement a crossfader? That would be so cool!
+A69: Please read our NODO faq. http://rockbox.haxx.se/docs/nodo.html#3
 
-Q71: My screen is all black/white when I run Rockbox on my Recorder!
-A71: We have no way of knowing the correct contrast setting from start and the
+Q70: My screen is all black/white when I run Rockbox on my Recorder!
+A70: We have no way of knowing the correct contrast setting from start and the
      displays differ a lot. Change your contrast setting by doing this:
 
      F1, down, right, down, down, right, down, down, down, right, down (until

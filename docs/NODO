@@ -11,7 +11,7 @@ A3. Crossfading would require two mp3 decoders, and we only have one. This
 
 Q4. Interfacing with other USB devices (like cameras) or 2 player games over
     USB
-A4. The USB system demands that there is a master that talkes to a slave.
+A4. The USB system demands that there is a master that talks to a slave.
     The Archos can only serve as a slave, as most other USB devices such
     as cameras can. Thus, without a master no communication between the slaves
     can take place.
