@@ -1481,7 +1481,7 @@ static int next_write_cluster(struct fat_file* file,
     return cluster;
 }
 
-static bool transfer( unsigned int start, int count, char* buf, bool write )
+static int transfer( unsigned int start, int count, char* buf, bool write )
 {
     int rc;
 
@@ -1497,9 +1497,9 @@ static bool transfer( unsigned int start, int count, char* buf, bool write )
         DEBUGF( "transfer() - Couldn't %s sector %x"
                 " (error code %d)\n", 
                 write ? "write":"read", start, rc);
-        return false;
+        return rc;
     }
-    return true;
+    return 0;
 }
 
 
@@ -1512,6 +1512,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     bool eof = file->eof;
     int first=0, last=0;
     int i;
+    int rc;
 
     LDEBUGF( "fat_readwrite(file:%x,count:0x%x,buf:%x,%s)\n",
              file->firstcluster,sectorcount,buf,write?"write":"read");
@@ -1560,8 +1561,9 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
         if ( ((sector != first) && (sector != last+1)) || /* not sequential */
              (last-first+1 == 256) ) { /* max 256 sectors per ata request */
             int count = last - first + 1;
-            if (!transfer( first + fat_bpb.startsector, count, buf, write ))
-                return -1;
+            rc = transfer( first + fat_bpb.startsector, count, buf, write );
+            if (rc < 0)
+                return rc * 10 - 1;
 
             ((char*)buf) += count * SECTOR_SIZE;
             first = sector;
@@ -1571,9 +1573,9 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             (!eof))
         {
             int count = sector - first + 1;
-            if (!transfer( first + fat_bpb.startsector, 
-                           count, buf, write ))
-                    return -2;
+            rc = transfer( first + fat_bpb.startsector, count, buf, write );
+            if (rc < 0)
+                return rc * 10 - 2;
         }
 
         last = sector;
