@@ -26,12 +26,12 @@ CFLAGS = -Os -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fs
 AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
-OBJS := $(SRC:%.c=%.o) crt0.o
+OBJS := $(SRC:%.c=%.o) $(FIRMWARE)/crt0.o
 
 all : archos.mod # archos.asm 
 
 archos.elf : $(OBJS) $(FIRMWARE)/app.lds
-	$(CC) -nostdlib -o archos.elf $(OBJS) -lgcc -lc -T$(FIRMWARE)/app.lds -Wl,-Map,archos.map
+	$(CC) -nostdlib -o archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(FIRMWARE)/app.lds -Wl,-Map,archos.map
 
 archos.bin : archos.elf
 	$(OC) -O binary archos.elf archos.bin
