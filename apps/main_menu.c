@@ -72,12 +72,15 @@ int show_logo( void )
                height+10+font_h, version, 0);
 #else
     char *rockbox = "ROCKbox!";
+    lcd_clear_display();
+#ifdef HAVE_NEW_CHARCELL_LCD
+    lcd_double_height(true);
+#endif
     lcd_puts(0, 0, rockbox);
     lcd_puts(0, 1, appsversion);
 #endif
 
     lcd_update();
-
 
     return 0;
 }
@@ -87,6 +90,9 @@ void show_credits(void)
     int j = 0;
 
     show_logo();
+#ifdef HAVE_NEW_CHARCELL_LCD
+    lcd_double_height(false);
+#endif
     
     for (j = 0; j < 10; j++) {
         sleep((HZ*2)/10);
@@ -94,7 +100,6 @@ void show_credits(void)
         if (button_get(false))
             return;	
     }
-
     roll_credits();
 }
 
