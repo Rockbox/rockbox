@@ -96,31 +96,4 @@ void roll_credits(void)
         }
     }
     return;
-    for ( i=0; i<sizeof(credits)/sizeof(char*); i++ ) {
-#ifdef HAVE_LCD_BITMAP
-        lcd_putsxy(0, 0, " [Credits]",0);
-#endif
-        lcd_puts(0, line, credits[i]);
-        line++;
-        if ( line == MAX_LINES ) {
-            lcd_update();
-            /* abort on keypress */
-            for ( j=0;j<10;j++ ) {
-                sleep(DISPLAY_TIME/10);
-                if (button_get(false))
-                    return;
-            }
-            lcd_clear_display();
-            line=0;
-        }
-    }
-    if ( line != MAX_LINES ) {
-        lcd_update();
-        /* abort on keypress */
-        for ( j=0;j<10;j++ ) {
-            sleep(DISPLAY_TIME/10);
-            if (button_get(false))
-                return;
-        }
-    }
 }
