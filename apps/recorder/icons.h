@@ -25,7 +25,7 @@
 #ifdef HAVE_LCD_BITMAP
 
 enum icons_6x8 {
-    Test, Box_Filled, Box_Empty, Slider_Horizontal, File, 
+    Box_Filled, Box_Empty, Slider_Horizontal, File, 
     Folder,     Directory, Playlist,          Repeat,
     Selected,   Cursor,    LastIcon
 };
