@@ -26,9 +26,12 @@
 #include "panic.h"
 #include "settings.h"
 #include "status.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "widgets.h"
 #endif
+
 #ifdef LOADABLE_FONTS
 #include "ajf.h"
 #endif
@@ -43,12 +46,37 @@ struct menu {
 #define MAX_MENUS 4
 
 #ifdef HAVE_LCD_BITMAP
+
+#define MARGIN_X    (global_settings.scrollbar ? SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH /* X pixel margin */
+#define MARGIN_Y    (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)  /* Y pixel margin */
+
+#define LINE_X      0 /* X position the entry-list starts at */
 #define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
+
 #define MENU_LINES  (LCD_HEIGHT / LINE_HEIGTH - LINE_Y)
-#else
+
+#define CURSOR_X    (global_settings.scrollbar ? 1 : 0)
+#define CURSOR_Y    0 /* the cursor is not positioned in regard to
+                         the margins, so this is the amount of lines
+                         we add to the cursor Y position to position
+                         it on a line */
+#define CURSOR_WIDTH  4
+
+#define SCROLLBAR_X      0
+#define SCROLLBAR_Y      lcd_getymargin()
+#define SCROLLBAR_WIDTH  6
+
+#else /* HAVE_LCD_BITMAP */
+
+#define LINE_X      0 /* X position the entry-list starts at */
+
 #define MENU_LINES 2
-#endif
+
+#define CURSOR_X    0
+#define CURSOR_Y    0 /* not really used for players */
+
+#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_NEW_CHARCELL_LCD
 #define CURSOR_CHAR "\x7e"
@@ -117,10 +145,7 @@ static void menu_draw(int m)
     lcd_scroll_pause();  /* halt scroll first... */
     lcd_clear_display(); /* ...then clean the screen */
 #ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
+    lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
     lcd_setfont(0);
 #endif
     /* correct cursor pos if out of screen */
@@ -131,16 +156,20 @@ static void menu_draw(int m)
          (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
          i++) {
         if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
-            lcd_puts_scroll(1, i-menus[m].top, menus[m].items[i].desc);
+            lcd_puts_scroll(LINE_X, i-menus[m].top, menus[m].items[i].desc);
         else
-            lcd_puts(1, i-menus[m].top, menus[m].items[i].desc);
+            lcd_puts(LINE_X, i-menus[m].top, menus[m].items[i].desc);
     }
 
     /* place the cursor */
-    put_cursorxy(0, menus[m].cursor - menus[m].top, true);
+    put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
 #ifdef HAVE_LCD_BITMAP
-    status_draw();
+    if (global_settings.scrollbar) 
+        scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
+                  LCD_HEIGHT - SCROLLBAR_Y, menus[m].itemcount, menus[m].top,
+                  menus[m].top + menu_lines, VERTICAL);
 #endif
+    status_draw();
     lcd_update();
 }
 
@@ -163,7 +192,7 @@ static void put_cursor(int m, int target)
 #else
     int menu_lines = MENU_LINES;
 #endif
-    put_cursorxy(0, menus[m].cursor - menus[m].top, false);
+    put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
     menu_draw(m);
 
@@ -179,7 +208,7 @@ static void put_cursor(int m, int target)
     }
 
     if (do_update) {
-        put_cursorxy(0, menus[m].cursor - menus[m].top, true); 
+        put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true); 
         lcd_update();
     }
 
@@ -282,12 +311,18 @@ Menu menu_run(int m)
                 return result;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
+            case BUTTON_F3: {
 #ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                menu_draw(m);
+                  unsigned char state;
+                  state = global_settings.statusbar << 1 | global_settings.scrollbar;
+                  state = (state + 1) % 4;
+                  global_settings.statusbar = state >> 1;
+                  global_settings.scrollbar = state & 0x1;
+                  settings_save();
+
+                  menu_draw(m);
 #endif
+                }
                 break;
 #endif
 

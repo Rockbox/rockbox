@@ -43,6 +43,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
+#include "widgets.h"
 #endif
 
 #ifdef LOADABLE_FONTS
@@ -73,16 +74,25 @@ void browse_root(void)
 #define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH)
 #define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
+#define MARGIN_X      (global_settings.scrollbar ? SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH + ICON_WIDTH /* X pixel margin */
 #define MARGIN_Y      (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)  /* Y pixel margin */
-#define MARGIN_X      10 /* X pixel margin */
-#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
+
 #define LINE_X      0 /* X position the entry-list starts at */
+#define LINE_Y      (global_settings.statusbar ? 1 : 0) /* Y position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
+#define CURSOR_X    (global_settings.scrollbar ? 1 : 0)
 #define CURSOR_Y    0 /* the cursor is not positioned in regard to
                          the margins, so this is the amount of lines
                          we add to the cursor Y position to position
                          it on a line */
+#define CURSOR_WIDTH  4
+
+#define ICON_WIDTH    6
+
+#define SCROLLBAR_X      0
+#define SCROLLBAR_Y      lcd_getymargin()
+#define SCROLLBAR_WIDTH  6
 
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
@@ -90,9 +100,10 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 
 #define TREE_MAX_ON_SCREEN   2
 #define TREE_MAX_LEN_DISPLAY 11 /* max length that fits on screen */
-#define LINE_Y      0 /* Y position the entry-list starts at */
 #define LINE_X      1 /* X position the entry-list starts at */
+#define LINE_Y      0 /* Y position the entry-list starts at */
 
+#define CURSOR_X    0
 #define CURSOR_Y    0 /* not really used for players */
 
 #endif /* HAVE_LCD_BITMAP */
@@ -290,7 +301,7 @@ static int showdir(char *path, int start)
 
         if (icon_type)
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                       4, MARGIN_Y+(i-start)*line_height, 6, 8, true);
+                       CURSOR_X * 6 + CURSOR_WIDTH, MARGIN_Y+(i-start)*line_height, 6, 8, true);
 #endif
 
 
@@ -307,6 +318,12 @@ static int showdir(char *path, int start)
             lcd_puts(LINE_X, i-start, dircache[i].name);
     }
 
+#ifdef HAVE_LCD_BITMAP
+    if (global_settings.scrollbar) 
+        scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
+                  LCD_HEIGHT - SCROLLBAR_Y, filesindir, start,
+                  start + tree_max_on_screen, VERTICAL);
+#endif
     status_draw();
     return filesindir;
 }
@@ -445,7 +462,7 @@ bool dirbrowse(char *root)
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
-    put_cursorxy(0, CURSOR_Y + dircursor, true);
+    put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
 
     while(1) {
         bool restore = false;
@@ -568,6 +585,11 @@ bool dirbrowse(char *root)
                         start = 0;
                         global_settings.resume_index = -1;
                     }
+#ifdef LOADABLE_FONTS
+                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#else
+                    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
                 }
                 restore = true;
                 break;
@@ -577,29 +599,29 @@ bool dirbrowse(char *root)
             case BUTTON_VOL_UP:
                 if(filesindir) {
                     if(dircursor) {
-                        put_cursorxy(0, CURSOR_Y + dircursor, false);
+                        put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
                         dircursor--;
-                        put_cursorxy(0, CURSOR_Y + dircursor, true);
+                        put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                     }
                     else {
                         if (start) {
                             start--;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + dircursor, true);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                         else {
                             if (numentries < tree_max_on_screen) {
-                                put_cursorxy(0, CURSOR_Y + dircursor,
+                                put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                              false);
                                 dircursor = numentries - 1;
-                                put_cursorxy(0, CURSOR_Y + dircursor,
+                                put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                              true);
                             }
                             else {
                                 start = numentries - tree_max_on_screen;
                                 dircursor = tree_max_on_screen - 1;
                                 numentries = showdir(currdir, start);
-                                put_cursorxy(0, CURSOR_Y +
+                                put_cursorxy(CURSOR_X, CURSOR_Y +
                                              tree_max_on_screen - 1, true);
                             }
                         }
@@ -615,28 +637,28 @@ bool dirbrowse(char *root)
                 {
                     if (dircursor + start + 1 < numentries ) {
                         if(dircursor+1 < tree_max_on_screen) {
-                            put_cursorxy(0, CURSOR_Y + dircursor,
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                          false);
                             dircursor++;
-                            put_cursorxy(0, CURSOR_Y + dircursor, true);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 
                         else {
                             start++;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + dircursor, true);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
                     else {
                         if(numentries < tree_max_on_screen) {
-                            put_cursorxy(0, CURSOR_Y + dircursor,
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor,
                                          false);
                             start = dircursor = 0;
-                            put_cursorxy(0, CURSOR_Y + dircursor, true);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         } 
                         else {
                             start = dircursor = 0;
                             numentries = showdir(currdir, start);
-                            put_cursorxy(0, CURSOR_Y + dircursor, true);
+                            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
                     lcd_update();
@@ -675,22 +697,32 @@ bool dirbrowse(char *root)
                         dircursor = 0;
                         start = 0;
                     }
+#ifdef LOADABLE_FONTS
+                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+#else
+                    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
                     restore = true;
                 }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
+            case BUTTON_F3: {
 #ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
+                  unsigned char state;
+                  state = global_settings.statusbar << 1 | global_settings.scrollbar;
+                  state = (state + 1) % 4;
+                  global_settings.statusbar = state >> 1;
+                  global_settings.scrollbar = state & 0x1;
+                  settings_save();
 #ifdef LOADABLE_FONTS
-                tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                  tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
-                tree_max_on_screen = TREE_MAX_ON_SCREEN;
+                  tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
-                restore = true;
+                  restore = true;
 #endif
+                }
                 break;
 #endif
 
@@ -733,7 +765,7 @@ bool dirbrowse(char *root)
                 dircursor--;
             }
             numentries = showdir(currdir, start);
-            put_cursorxy(0, CURSOR_Y + dircursor, true);
+            put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
         }
 
         if ( numentries ) {

@@ -752,6 +752,13 @@ int wps_show(void)
 #endif
                 if (menu())
                     return SYS_USB_CONNECTED;
+#ifdef HAVE_LCD_BITMAP
+                if(global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+#endif
+                restore = true;
                 break;
 
                 /* toggle status bar */
