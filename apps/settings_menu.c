@@ -94,19 +94,6 @@ static Menu scroll_speed(void)
     return MENU_OK;
 }
 
-static Menu wps_set(void)
-{
-#ifdef HAVE_LCD_BITMAP
-    char* names[] = { "ID3 Tags   ", "Filename  ", "Dir Parse  ", "Custom WPS  " };
-    set_option("[WPS display]", &global_settings.wps_display, names, 4 );
-#else
-    char* names[] = { "1 Line ID3 ", "1 Line ID3+", "2 Line ID3 ", "Filename   ",
-        "Dir Parse  ", "Custom WPS " };
-    set_option("[WPS display]", &global_settings.wps_display, names, 6 );
-#endif
-    return MENU_OK;
-}
-
 #ifdef HAVE_CHARGE_CTRL
 static Menu deep_discharge(void)
 {
@@ -188,7 +175,6 @@ Menu settings_menu(void)
         { "Backlight Timer", backlight_timer },
         { "Contrast",        contrast    },  
         { "Scroll speed",    scroll_speed    },  
-        { "While Playing",   wps_set         },
 #ifdef HAVE_CHARGE_CTRL
         { "Deep discharge",  deep_discharge  },
 #endif

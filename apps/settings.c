@@ -42,7 +42,7 @@
 #endif
 
 struct user_settings global_settings;
-char rockboxdir[] = "/.rockbox/";       /* config/font/data file directory */
+char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
 #define CONFIG_BLOCK_VERSION 1
 #define CONFIG_BLOCK_SIZE 512
@@ -67,7 +67,7 @@ offset  abs
 0x0c    0x20    <poweroff timer byte>
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden>
-0x0f    0x23    <scroll speed & WPS display byte>
+0x0f    0x23    <scroll speed>
 0x10    0x24    <ff/rewind accleration rate>
 0x11    0x25    <AVC byte>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
@@ -267,9 +267,7 @@ int settings_save( void )
          ((global_settings.show_hidden_files & 1) << 5) |
          ((global_settings.scrollbar & 1) << 6));
 
-    config_block[0xf] = (unsigned char)
-        ((global_settings.scroll_speed << 3) |
-         (global_settings.wps_display & 7));
+    config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
     
     config_block[0x10] = (unsigned char)global_settings.ff_rewind_accel;
     config_block[0x11] = (unsigned char)global_settings.avc;
@@ -360,10 +358,6 @@ void settings_load(void)
         if (c != 31)
             global_settings.scroll_speed = c;
 
-        c = config_block[0xf] & 7;
-        if (c != 7)
-            global_settings.wps_display = c;
-        
         if (config_block[0x10] != 0xFF)
             global_settings.ff_rewind_accel = config_block[0x10];
 
@@ -414,7 +408,6 @@ void settings_reset(void) {
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
-    global_settings.wps_display = DEFAULT_WPS_DISPLAY;
     global_settings.mp3filter   = true;
     global_settings.sort_case   = false;
     global_settings.statusbar   = true;

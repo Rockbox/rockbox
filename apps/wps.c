@@ -783,7 +783,6 @@ int wps_show(void)
                 /* toggle status bar */
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
                 global_settings.statusbar = !global_settings.statusbar;
                 settings_save();
                 if(global_settings.statusbar)
@@ -791,7 +790,6 @@ int wps_show(void)
                 else
                     lcd_setmargins(0, 0);
                 restore = true;
-#endif
                 break;
 #endif
 

@@ -16,6 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+/* ID3 formatting based on code from the MAD Winamp plugin (in_mad.dll), 
+ * Copyright (C) 2000-2001 Robert Leslie. 
+ * See http://www.mars.org/home/rob/proj/mpeg/ for more information.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,8 +32,10 @@
 #include "settings.h"
 #include "playlist.h"
 #include "kernel.h"
+#include "system.h"
 #include "status.h"
 #include "wps-display.h"
+#include "debug.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -38,321 +46,454 @@
 #include "ajf.h"
 #endif
 
-#define WPS_CONFIG "/wps.config"
+#define WPS_CONFIG ROCKBOX_DIR "/wps.config"
 
-#ifdef HAVE_LCD_BITMAP
-    #define PLAY_DISPLAY_2LINEID3        0 
-    #define PLAY_DISPLAY_FILENAME_SCROLL 1 
-    #define PLAY_DISPLAY_TRACK_TITLE     2 
-    #define PLAY_DISPLAY_CUSTOM_WPS      3 
-#else
-    #define PLAY_DISPLAY_1LINEID3        0 
-    #define PLAY_DISPLAY_1LINEID3_PLUS   1
-    #define PLAY_DISPLAY_2LINEID3        2 
-    #define PLAY_DISPLAY_FILENAME_SCROLL 3 
-    #define PLAY_DISPLAY_TRACK_TITLE     4 
-    #define PLAY_DISPLAY_CUSTOM_WPS      5 
+#define MAX_LINES 10
+#define FORMAT_BUFFER_SIZE 300
+
+struct format_flags
+{
+    bool dynamic;
+    bool scroll;
+#ifdef HAVE_LCD_CHARCELLS
+    bool player_progress;
 #endif
+};
 
-#define LINE_LEN 64
-
+static char format_buffer[FORMAT_BUFFER_SIZE];
+static char* format_lines[MAX_LINES];
+static bool dynamic_lines[MAX_LINES];
 static int ff_rewind_count;
-static char custom_wps[5][LINE_LEN];
-static char display[5][LINE_LEN];
-static int scroll_line;
-static int scroll_line_custom;
 bool wps_time_countup = true;
+
+/* Set format string to use for WPS, splitting it into lines */
+static void wps_format(char* fmt)
+{
+    char* buf = format_buffer;
+    int line = 0;
+    
+    strncpy(format_buffer, fmt, sizeof(format_buffer));
+    format_buffer[sizeof(format_buffer) - 1] = 0;
+    format_lines[line] = buf;
+    
+    while (*buf)
+    {
+        switch (*buf++)
+        {
+            case '\r':
+                *(buf - 1) = 0;
+                break;                
+
+            case '\n': /* LF */
+                *(buf - 1) = 0;
+                line++;
+                
+                if (line < MAX_LINES)
+                {
+                    format_lines[line] = buf;
+                }
+                
+                break;
+        }
+    }
+
+    for (; line < MAX_LINES; line++)
+    {
+        format_lines[line] = NULL;
+    }
+}
 
 static bool load_custom_wps(void)
 {
+    char buffer[FORMAT_BUFFER_SIZE];
     int fd;
-    int l = 0;
-    int numread = 1;
-    char cchr[0];
-
-    for (l=0;l<=5;l++)
-         custom_wps[l][0] = 0;
-
-    l = 0;
 
     fd = open(WPS_CONFIG, O_RDONLY);
-    if (-1 == fd)
+    
+    if (-1 != fd)
     {
-        close(fd);
-        return false;
-    }
-
-    while(l<=5)
-    {
-        numread = read(fd, cchr, 1);
-        if (numread==0)
-            break;
-
-        switch (cchr[0])
+        int numread = read(fd, buffer, sizeof(buffer) - 1);
+        
+        if (numread > 0)
         {
-            case '\n': /* LF */
-                l++;
-                break;
-
-            case '\r': /* CR ... Ignore it */
-                break;                
-
-            default:
-                snprintf(custom_wps[l], LINE_LEN,
-                         "%s%c", custom_wps[l], cchr[0]);
-                break;
+            buffer[numread] = 0;
+            wps_format(buffer);
         }
+        
+        close(fd);
+        return numread > 0;
     }
-    close(fd);
-
-    scroll_line_custom = 0;
-    for (l=0;l<=5;l++)
-    {
-        if (custom_wps[l][0] == '%' && custom_wps[l][1] == 's')
-            scroll_line_custom = l;
-    }
-    return true;
+    
+    return false;
 }
 
-static bool display_custom_wps( struct mp3entry* id3, 
-                                int x_val, 
-                                int y_val, 
-                                bool do_scroll, 
-                                char *wps_string)
+/* Format time into buf.
+ *
+ * buf      - buffer to format to.
+ * buf_size - size of buffer.
+ * time     - time to format, in milliseconds.
+ */
+static void format_time(char* buf, int buf_size, int time)
 {
-    char bigbuf[LINE_LEN*2];
-    char buf[LINE_LEN];
-    int i;
-    int con_flag = 0;  /* (0)Not inside of if/else
-                          (1)Inside of If
-                          (2)Inside of Else */
-    char con_if[LINE_LEN];
-    char con_else[LINE_LEN];
-    char cchr1;
-    char cchr2;
-    char cchr3;
-    unsigned int seek;
+    snprintf(buf, buf_size, "%d:%02d", time / 60000, time % 60000 / 1000);
+}
 
-    char* szLast;
+/* Extract a part from a path.
+ *
+ * buf      - buffer extract part to.
+ * buf_size - size of buffer.
+ * path     - path to extract from.
+ * level    - what to extract. 0 is file name, 1 is parent of file, 2 is 
+ *            parent of parent, etc.
+ *
+ * Returns buf if the desired level was found, NULL otherwise.
+ */
+static char* get_dir(char* buf, int buf_size, char* path, int level)
+{
+    char* sep;
+    char* last_sep;
+    int len;
 
-    szLast = strrchr(id3->path, '/');
-    if (szLast)
-        /* point to the first letter in the file name */
-        szLast++;
+    sep = path + strlen(path);
+    last_sep = sep;
 
-    bigbuf[0] = 0;
-
-    seek = -1;
-    while(1)
+    while (sep > path)
     {
-        seek++;
-        cchr1 = wps_string[seek];
-        buf[0] = 0;
-        if (cchr1 == '%')
+        if ('/' == *(--sep))
         {
-            seek++;
-            cchr2 = wps_string[seek];
-            switch(cchr2)
+            if (!level)
             {
-                case 'i':  /* ID3 Information */
-                    seek++;
-                    cchr3 = wps_string[seek];
-                    switch(cchr3)
-                    {
-                        case 't':  /* ID3 Title */
-                            strncpy(buf, 
-                                    id3->title ? id3->title : "<no title>",
-                                    LINE_LEN);
-                            break;
-                        case 'a':  /* ID3 Artist */
-                            strncpy(buf, 
-                                    id3->artist ? id3->artist : "<no artist>",
-                                    LINE_LEN);
-                            break;
-                        case 'n':  /* ID3 Track Number */
-                            snprintf(buf, LINE_LEN, "%d", 
-                                     id3->tracknum);
-                            break;
-                        case 'd':  /* ID3 Album/Disc */
-                            strncpy(buf, id3->album ? id3->album : "<no album>", LINE_LEN);
-                            break;
-                    }
-                    break;
-                case 'f':  /* File Information */
-                    seek++;
-                    cchr3 = wps_string[seek];
-                    switch(cchr3)
-                    {
-                        case 'c': /* Conditional Filename \ ID3 Artist-Title */
-                            if (id3->artist && id3->title)
-                                snprintf(buf, LINE_LEN, "%s - %s",
-                                         id3->artist?id3->artist:"<no artist>",
-                                         id3->title?id3->title:"<no title>");
-                            else
-                                strncpy(buf, 
-                                        szLast ? szLast : id3->path,
-                                        LINE_LEN );
-                            break;
-
-                        case 'd': /* Conditional Filename \ ID3 Title-Artist */
-                            if (id3->artist && id3->title)
-                                snprintf(buf, LINE_LEN, "%s - %s",
-                                         id3->title?id3->title:"<no title>",
-                                         id3->artist?id3->artist:"<no artist>");
-                            else
-                                strncpy(buf, szLast ? szLast : id3->path,
-                                        LINE_LEN);
-                            break;
-
-                        case 'b':  /* File Bitrate */
-                            snprintf(buf, LINE_LEN, "%d", id3->bitrate);
-                            break;
-
-                        case 'f':  /* File Frequency */
-                            snprintf(buf, LINE_LEN, "%d", id3->frequency);
-                            break;
-
-                        case 'p':  /* File Path */
-                            strncpy(buf, id3->path, LINE_LEN );
-                            break;
-
-                        case 'n':  /* File Name */
-                            strncpy(buf, szLast ? szLast : id3->path,
-                                    LINE_LEN );
-                            break;
-
-                        case 's':  /* File Size (In Kilobytes) */
-                            snprintf(buf, LINE_LEN, "%d",
-                                     id3->filesize / 1024);
-                            break;
-                    }
-                    break;
-
-                case 'p':  /* Playlist/Song Information */
-                    seek++;
-                    cchr3 = wps_string[seek];
-
-                    switch(cchr3)
-                    {
-#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
-                        case 'b':  /* Progress Bar (PLAYER ONLY)*/
-                            draw_player_progress(id3, ff_rewind_count);
-                            snprintf(buf, LINE_LEN, "\x01");
-                            break;
-#endif
-                        case 'p':  /* Playlist Position */
-                            snprintf(buf, LINE_LEN, "%d", id3->index + 1);
-                            break;
-
-                        case 'e':  /* Playlist Total Entries */
-                            snprintf(buf, LINE_LEN, "%d", playlist.amount);
-                            break;
-
-                        case 'c':  /* Current Time in Song */
-                            i = id3->elapsed + ff_rewind_count;
-                            snprintf(buf, LINE_LEN, "%d:%02d",
-                                     i / 60000,
-                                     i % 60000 / 1000);
-                            wps_time_countup = true;
-                            break;
-
-                        case 'r': /* Remaining Time in Song */
-                            i = id3->length - id3->elapsed + ff_rewind_count;
-                            snprintf(buf, LINE_LEN, "%d:%02d",
-                                     i / 60000,
-                                     i % 60000 / 1000 );
-                            wps_time_countup = false;
-                            break;
-
-                        case 't':  /* Total Time */
-                            snprintf(buf, LINE_LEN, "%d:%02d",
-                                     id3->length / 60000,
-                                     id3->length % 60000 / 1000);
-                            break;
-                    }
-                    break;
-
-                case '%':  /* Displays % */
-                    buf[0] = '%';
-                    buf[1] = 0;
-                    break;
-
-                case '?':  /* Conditional Display of ID3/File */
-                    switch(con_flag)
-                    {
-                        case 0:
-                            con_if[0] = 0;
-                            con_else[0] = 0;
-                            con_flag = 1;
-                            break;
-                        default:
-                            if (id3->artist && id3->title)
-                                strncpy(buf, con_if, LINE_LEN);
-                            else
-                                strncpy(buf, con_else, LINE_LEN);
-                            con_flag = 0;
-                            break;
-                    }
-                    break;
-
-                case ':': /* Seperator for Conditional ID3/File Display */
-                    con_flag = 2;
-                    break;
+                break;
             }
-
-            switch(con_flag)
-            {
-                case 0:
-                    snprintf(bigbuf, sizeof bigbuf, "%s%s", bigbuf, buf);
-                    break;
-
-                case 1:
-                    snprintf(con_if, sizeof con_if, "%s%s", con_if, buf);
-                    break;
-
-                case 2:
-                    snprintf(con_else, sizeof con_else, "%s%s", con_else, buf);
-                    break;
-            }
+            
+            level--;
+            last_sep = sep - 1;
         }
-        else
+    }
+
+    if (level || (last_sep <= sep))
+    {
+        return NULL;
+    }
+
+    len = MIN(last_sep - sep, buf_size - 1);
+    strncpy(buf, sep + 1, len);
+    buf[len] = 0;
+    return buf;
+}
+
+/* Get the tag specified by the two characters at fmt.
+ *
+ * id3      - ID3 data to get tag values from.
+ * tag      - string (of two characters) specifying the tag to get.
+ * buf      - buffer to certain tags, such as track number, play time or 
+ *           directory name.
+ * buf_size - size of buffer.
+ * flags    - flags in this struct will be set depending on the tag:
+ *            dynamic - if the tag data changes over time (like play time);
+ *            player_progress - set if the tag is %pb.
+ *
+ * Returns the tag. NULL indicates the tag wasn't available.
+ */
+static char* get_tag(struct mp3entry* id3, char* tag, char* buf, int buf_size,
+    struct format_flags* flags)
+{
+    if ((0 == tag[0]) || (0 == tag[1]))
+    {
+        return NULL;
+    }
+    
+    switch (tag[0])
+    {
+    case 'i':  /* ID3 Information */
+        switch (tag[1])
         {
-            switch(con_flag)
+        case 't':  /* ID3 Title */
+            return id3->title;
+
+        case 'a':  /* ID3 Artist */
+            return id3->artist;
+            
+        case 'n':  /* ID3 Track Number */
+            if (id3->tracknum)
             {
-                case 0:
-                    snprintf(bigbuf, sizeof bigbuf, "%s%c", bigbuf, cchr1);
-                    break;
-
-                case 1:
-                    snprintf(con_if, sizeof con_if, "%s%c", con_if, cchr1);
-                    break;
-
-                case 2:
-                    snprintf(con_else, sizeof con_else, "%s%c", 
-                             con_else, cchr1);
-                    break;
-            }
-        }
-
-        if (seek >= strlen(wps_string))
-        {
-            if (do_scroll)
-            {
-                lcd_stop_scroll();
-                lcd_puts_scroll(x_val, y_val, bigbuf);
+                snprintf(buf, buf_size, "%d", id3->tracknum);
+                return buf;
             }
             else
-                lcd_puts(x_val, y_val, bigbuf);
+            {
+                return NULL;
+            }
 
-            return true;
+        case 'd':  /* ID3 Album/Disc */
+            return id3->album;
         }
+        break;
+
+    case 'f':  /* File Information */
+        switch(tag[1])
+        {
+        case 'v':  /* VBR file? */
+            return id3->vbr ? "(avg)" : NULL;
+
+        case 'b':  /* File Bitrate */
+            snprintf(buf, buf_size, "%d", id3->bitrate);
+            return buf;
+
+        case 'f':  /* File Frequency */
+            snprintf(buf, buf_size, "%d", id3->frequency);
+            return buf;
+
+        case 'p':  /* File Path */
+            return id3->path;
+
+        case 'm':  /* File Name - With Extension */
+            return get_dir(buf, buf_size, id3->path, 0);
+
+        case 'n':  /* File Name */
+            if (get_dir(buf, buf_size, id3->path, 0))
+            {
+                /* Remove extension */
+                char* sep = strrchr(buf, '.');
+
+                if (NULL != sep)
+                {
+                    *sep = 0;
+                }
+
+                return buf;
+            }
+            else
+            {
+                return NULL;
+            }
+
+        case 's':  /* File Size (in kilobytes) */
+            snprintf(buf, buf_size, "%d", id3->filesize / 1024);
+            return buf;
+        }
+        break;
+
+    case 'p':  /* Playlist/Song Information */
+        switch(tag[1])
+        {
+#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
+        case 'b':  /* Player progress bar */
+            flags->player_progress = true;
+            flags->dynamic = true;
+            return "\x01";
+#endif
+
+        case 'p':  /* Playlist Position */
+            snprintf(buf, buf_size, "%d", id3->index + 1);
+            return buf;
+
+        case 'e':  /* Playlist Total Entries */
+            snprintf(buf, buf_size, "%d", playlist.amount);
+            return buf;
+
+        case 'c':  /* Current Time in Song */
+            flags->dynamic = true;
+            format_time(buf, buf_size, id3->elapsed + ff_rewind_count);
+            return buf;
+
+        case 'r': /* Remaining Time in Song */
+            flags->dynamic = true;
+            format_time(buf, buf_size, id3->length - id3->elapsed + ff_rewind_count);
+            return buf;
+
+        case 't':  /* Total Time */
+            format_time(buf, buf_size, id3->length);
+            return buf;
+        }
+        break;
+    
+    case 'd': /* Directory path information */
+        switch(tag[1])
+        {
+        case '1':  /* Parent folder */
+            return get_dir(buf, buf_size, id3->path, 1);
+
+        case '2':  /* Parent of parent */
+            return get_dir(buf, buf_size, id3->path, 2);
+
+        case '3':  /* Parent of parent of parent */
+            return get_dir(buf, buf_size, id3->path, 3);
+        }
+        break;
     }
-    return true;
+    
+    return NULL;
 }
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
+/* Skip to the end of the current %? conditional.
+ *
+ * fmt     - string to skip it. Should point to somewhere after the leading 
+ *           "<" char (and before or at the last ">").
+ * to_else - if true, skip to the else part (after the "|", if any), else skip
+ *           to the end (the ">").
+ *
+ * Returns the new position in fmt.
+ */
+static char* skip_conditional(char* fmt, bool to_else)
 {
-    int l;
+    int level = 1;
+
+    while (*fmt)
+    {
+        switch (*fmt++)
+        {
+            case '%':
+                break;
+        
+            case '|':
+                if (to_else && (1 == level))
+                    return fmt;
+            
+                continue;
+            
+            case '>':
+                if (0 == --level) 
+                {
+                    if (to_else)
+                        fmt--;
+                
+                    return fmt;
+                }
+                continue;
+
+            default:
+                continue;
+        }
+        
+        switch (*fmt++)
+        {
+            case 0:
+            case '%':
+            case '|':
+            case '<':
+            case '>':
+                break;
+        
+            case '?':
+                while (*fmt && ('<' != *fmt))
+                    fmt++;
+            
+                if ('<' == *fmt)
+                    fmt++;
+            
+                level++;
+                break;
+        
+            default:
+                break;
+        }
+    }
+    
+    return fmt;
+}
+
+/* Generate the display based on id3 information and format string.
+ *
+ * buf      - char buffer to write the display to.
+ * buf_size - the size of buffer.
+ * id3      - the ID3 data to format with.
+ * fmt      - format description.
+ * flags    - flags in this struct will be set depending on the tag:
+ *            dynamic - if the tag data changes over time (like play time);
+ *            player_progress - set if the tag is %pb.
+ *            scroll - if line scrolling is requested.
+ */
+static void format_display(char* buf, 
+                           int buf_size, 
+                           struct mp3entry* id3, 
+                           char* fmt, 
+                           struct format_flags* flags)
+{
+    char temp_buf[128];
+    char* buf_end = buf + buf_size - 1;   /* Leave room for end null */
+    char* value = NULL;
+    int level = 0;
+    
+    while (fmt && *fmt && buf < buf_end)
+    {
+        switch (*fmt)
+        {
+            case '%':
+                ++fmt;
+                break;
+        
+            case '|':
+            case '>':
+                if (level > 0) 
+                {
+                    fmt = skip_conditional(fmt, false);
+                    level--;
+                    continue;
+                }
+                /* Else fall through */
+
+            default:
+                *buf++ = *fmt++;
+                continue;
+        }
+        
+        switch (*fmt)
+        {
+            case 0:
+                *buf++ = '%';
+                break;
+        
+            case 's':
+                flags->scroll = true;
+                ++fmt;
+                break;
+        
+            case '%':
+            case '|':
+            case '<':
+            case '>':
+                *buf++ = *fmt++;
+                break;
+        
+            case '?':
+                fmt++;
+                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf), flags);
+            
+                while (*fmt && ('<' != *fmt))
+                    fmt++;
+            
+                if ('<' == *fmt)
+                    fmt++;
+            
+                /* No value, so skip to else part */
+                if (NULL == value)
+                    fmt = skip_conditional(fmt, true);
+
+                level++;
+                break;
+        
+            default:
+                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf), flags);
+                fmt += 2;
+            
+                if (value)
+                {
+                    while (*value && (buf < buf_end))
+                        *buf++ = *value++;
+                }
+        }
+    }
+    
+    *buf = 0;
+}
+
+bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
+{
+    char buf[MAX_PATH];
+    struct format_flags flags;
+    bool scroll_active = false;
+    int i;
 #ifdef HAVE_LCD_BITMAP
     int bmp_time_line;
 #endif
@@ -367,25 +508,38 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
     ff_rewind_count = ffwd_offset;
 
 #ifdef HAVE_LCD_CHARCELL
-    for (l = 0; l <= 1; l++)
+    for (i = 0; i < 2; i++)
 #else
-    for (l = 0; l <= 5; l++)
+    for (i = 0; i < MAX_LINES; i++)
 #endif
     {
-        if (global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS)
+        if ( !format_lines[i] )
+            break;
+
+        if (dynamic_lines[i] || refresh_all)
         {
-            scroll_line = scroll_line_custom;
-            if (scroll_line != l)
-                    display_custom_wps(id3, 0, l, false, custom_wps[l]);
-            if (scroll_line == l && refresh_scroll)
-                    display_custom_wps(id3, 0, l, true, custom_wps[l]);
-        }
-        else
-        {
-            if (scroll_line != l)
-                    display_custom_wps(id3, 0, l, false, display[l]);
-            if (scroll_line == l && refresh_scroll)
-                    display_custom_wps(id3, 0, l, true, display[l]);                
+            flags.dynamic = false;
+            flags.scroll = false;
+#ifdef HAVE_LCD_CHARCELLS
+            flags.player_progress = false;
+#endif
+            format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
+            dynamic_lines[i] = flags.dynamic;
+            
+#ifdef HAVE_LCD_CHARCELLS
+            if (flags.player_progress)
+                draw_player_progress(id3, ff_rewind_count);
+#endif
+
+            if (!scroll_active && flags.scroll && !flags.dynamic)
+            {
+                scroll_active = true;
+                lcd_puts_scroll(0, i, buf);
+            }
+            else
+            {
+                lcd_puts(0, i, buf);
+            }
         }
     }
 #ifdef HAVE_LCD_BITMAP
@@ -393,10 +547,12 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll)
         bmp_time_line = 5;
     else
         bmp_time_line = 6;
-    snprintf(display[bmp_time_line], sizeof display[bmp_time_line],
-             "%s","Time: %pc/%pt");
 
-    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, id3->elapsed*100/id3->length, Grow_Right);
+    format_display(buf, sizeof(buf), id3, "Time: %pc/%pt", &flags);
+    lcd_puts(0, bmp_time_line, buf);
+
+    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, 
+             id3->elapsed * 100 / id3->length, Grow_Right);
     lcd_update();
 #endif
     return true;
@@ -414,6 +570,7 @@ void wps_display(struct mp3entry* id3)
 #endif
 
     lcd_clear_display();
+
     if (!id3 && !mpeg_is_playing())
     {
 #ifdef HAVE_LCD_CHARCELLS
@@ -426,123 +583,28 @@ void wps_display(struct mp3entry* id3)
     }
     else
     {
-        static int last_wps = -1;
-        if ((last_wps != global_settings.wps_display
-            && global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS))
-        {
+        static bool wps_loaded = false;
+
+        if (!wps_loaded) {
             load_custom_wps();
-            last_wps = global_settings.wps_display;
-        }
+            wps_loaded = true;
 
-        switch ( global_settings.wps_display ) {
-            case PLAY_DISPLAY_TRACK_TITLE:
-            {
-                char ch = '/';
-                char* end;
-                char* szTok;
-                char* szDelimit;
-                char* szPeriod;
-                char szArtist[26];
-                char szBuff[257];
-                int tmpcnt = 0;
-
-                szBuff[sizeof(szBuff)-1] = 0;
-                strncpy(szBuff, id3->path, sizeof szBuff);
-
-                szTok = strtok_r(szBuff, "/", &end);
-                szTok = strtok_r(NULL, "/", &end);
-
-                /* Assume path format of: Genre/Artist/Album/Mp3_file */
-                strncpy(szArtist, szTok, sizeof szArtist);
-                szArtist[sizeof(szArtist)-1] = 0;
-                szDelimit = strrchr(id3->path, ch);
-                lcd_puts(0, 0, szArtist ? szArtist : "<nothing>");
-
-                /* removes the .mp3 from the end of the display buffer */
-                szPeriod = strrchr(szDelimit, '.');
-                if (szPeriod != NULL)
-                    *szPeriod = 0;
-
-                strncpy(display[0], ++szDelimit, sizeof display[0]);
-#ifdef HAVE_LCD_CHARCELLS
-                snprintf(display[1], sizeof display[1], "%s", "%pc/%pt");
-#endif
-                for (tmpcnt=2;tmpcnt<=5;tmpcnt++)
-                    display[tmpcnt][0] = 0;
-                scroll_line = 0;
-                break;
-            }
-            case PLAY_DISPLAY_FILENAME_SCROLL:
-            {
-                snprintf(display[0], sizeof display[0], "%s", "%pp/%pe: %fn");
-#ifdef HAVE_LCD_CHARCELLS
-                snprintf(display[1], sizeof display[1], "%s", "%pc/%pt");
-#endif
-                scroll_line = 0;
-                break;
-            }
-            case PLAY_DISPLAY_2LINEID3:
-            {
+            if ( !format_buffer[0] ) {
 #ifdef HAVE_LCD_BITMAP
-                int l = 0;
-
-                strncpy( display[l++], "%fn", LINE_LEN );
-                strncpy( display[l++], "%it", LINE_LEN );
-                strncpy( display[l++], "%id", LINE_LEN );
-                strncpy( display[l++], "%ia", LINE_LEN );
-
-                if (!global_settings.statusbar && font_height <= 8)
-                {
-                    if (id3->vbr)
-                        strncpy(display[l++], "%fb kbit (avg)", LINE_LEN);
-                    else
-                        strncpy(display[l++], "%fb kbit", LINE_LEN);
-
-                    strncpy(display[l++], "%ff Hz", LINE_LEN);
-                }
-                else
-                {
-                    if (id3->vbr)
-                        strncpy(display[l++], "%fb kbit(a) %ffHz", LINE_LEN);
-                    else
-                        strncpy(display[l++], "%fb kbit    %ffHz", LINE_LEN);
-                }
-                scroll_line = 0;
+                wps_format("%s%fp\n"
+                           "%it\n"
+                           "%id\n"
+                           "%ia\n"
+                           "%fb kbit %fv\n"
+                           "%ff Hz\n");
 #else
-                strncpy(display[0], "%ia", LINE_LEN);
-                strncpy(display[1], "%it", LINE_LEN);
-                scroll_line = 1;
+                wps_format("%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>\n"
+                           "%pc/%pt\n");
 #endif
-                break;
-            }
-#ifdef HAVE_LCD_CHARCELLS
-            case PLAY_DISPLAY_1LINEID3:
-            {
-                strncpy(display[0], "%pp/%pe: %fc", LINE_LEN);
-                strncpy(display[1], "%pc/%pt", LINE_LEN);
-                scroll_line = 0;
-                break;
-            }
-            case PLAY_DISPLAY_1LINEID3_PLUS:
-            {
-                strncpy(display[0], "%pp/%pe: %fc", LINE_LEN);
-                strncpy(display[1], "%pr%pb%fbkps", LINE_LEN);
-                scroll_line = 0;
-                break;
-            }
-#endif
-            case PLAY_DISPLAY_CUSTOM_WPS:
-            {
-                if (custom_wps[0] == 0)
-                {
-                    strncpy(display[0], "Couldn't Load Custom WPS", LINE_LEN);
-                    strncpy(display[1], "%pc/%pt", LINE_LEN);
-                }
-                break;
             }
         }
     }
-    wps_refresh(id3,0,false);
+    wps_refresh(id3, 0, true);
     status_draw();
     lcd_update();
 }

@@ -23,6 +23,8 @@
 #include <stdbool.h>
 #include "file.h"
 
+#define ROCKBOX_DIR "/.rockbox"
+
 /* data structures */
 
 #define RESUME_OFF 0
@@ -65,9 +67,6 @@ struct user_settings
     bool playlist_shuffle;
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
-
-    /* while playing screen settings  */
-    int wps_display;   /* 0=id3, 1=file, 2=parse */
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
@@ -119,7 +118,6 @@ extern char rockboxdir[];
 #define MIN_CONTRAST_SETTING        5
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5
-#define DEFAULT_WPS_DISPLAY         0 
 #define DEFAULT_FF_REWIND_ACCEL_SETTING 3
 
 #endif /* __SETTINGS_H__ */
