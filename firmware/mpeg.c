@@ -46,13 +46,13 @@ static void init_recording(void);
 static void init_playback(void);
 static void start_recording(void);
 static void stop_recording(void);
+static int get_unsaved_space(void);
 #endif
 
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
 static int get_playable_space(void);
 static int get_unswapped_space(void);
-static int get_unsaved_space(void);
 #endif
 
 #define MPEG_PLAY         1
