@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "kernel.h"
 #include "thread.h"
+#include "usb.h"
 #include "panic.h"
 #include "file.h"
 #include "mpeg.h"
@@ -471,6 +472,17 @@ struct mp3entry* mpeg_current_track(void)
     return &(id3tags[0].id3);
 }
 
+static void stop_playing(void)
+{
+    /* Stop the current stream */
+    playing = false;
+    filling = false;
+    if(mpeg_file >= 0)
+	close(mpeg_file);
+    mpeg_file = -1;
+    stop_dma();
+}
+
 static void mpeg_thread(void)
 {
     struct event ev;
@@ -526,13 +538,7 @@ static void mpeg_thread(void)
 
             case MPEG_STOP:
                 DEBUGF("MPEG_STOP\n");
-                /* Stop the current stream */
-                playing = false;
-                filling = false;
-                if(mpeg_file >= 0)
-                    close(mpeg_file);
-                mpeg_file = -1;
-                stop_dma();
+		stop_playing();
                 break;
 
             case MPEG_PAUSE:
@@ -683,6 +689,18 @@ static void mpeg_thread(void)
                     yield(); /* To be safe */
                 }
                 break;
+		
+	    case SYS_USB_CONNECTED:
+		stop_playing();
+		
+		/* Tell the USB thread that we are safe */
+		DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
+		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+		/* Wait until the system reboots */
+		while(1)
+		    yield();
+		break;
         }
     }
 }

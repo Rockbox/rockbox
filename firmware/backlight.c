@@ -24,6 +24,7 @@
 #include "i2c.h"
 #include "debug.h"
 #include "rtc.h"
+#include "usb.h"
 
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
@@ -55,6 +56,7 @@ void backlight_thread(void)
 #endif
                 }
                 break;
+		
             case BACKLIGHT_OFF:
 #ifdef HAVE_RTC
                 rtc_write(0x13, 0x00);
@@ -62,6 +64,16 @@ void backlight_thread(void)
                 PADR &= ~0x40;
 #endif                
                 break;
+		
+	    case SYS_USB_CONNECTED:
+		/* Tell the USB thread that we are safe */
+		DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+		/* Wait until the system reboots */
+		while(1)
+		    yield();
+		break;
         }
     }
 }
