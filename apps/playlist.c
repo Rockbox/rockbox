@@ -106,6 +106,11 @@ int playlist_amount(void)
     return playlist.amount;
 }
 
+int playlist_first_index(void)
+{
+    return playlist.first_index;
+}
+
 int playlist_next(int steps)
 {
     playlist.index = get_next_index(steps);

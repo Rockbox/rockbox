@@ -906,7 +906,8 @@ bool dirbrowse(char *root)
                                shuffled list in case shuffle is enabled */
                             global_settings.resume_index = start_index;
                             global_settings.resume_offset = 0;
-                            global_settings.resume_first_index = start_index;
+                            global_settings.resume_first_index =
+                                playlist_first_index();
                             global_settings.resume_seed = seed;
                             settings_save();
                         }
