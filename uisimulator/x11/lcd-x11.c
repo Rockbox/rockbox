@@ -101,9 +101,8 @@ void lcd_update (void)
 
 #endif
 
-
-    drawdots(1, &points[0], p);
     drawdots(0, &clearpoints[0], cp);
+    drawdots(1, &points[0], p);
     Logf("lcd_update: Draws %d pixels, clears %d pixels", p, cp);
     XSync(dpy,False);
 }
