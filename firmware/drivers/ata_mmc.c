@@ -246,7 +246,8 @@ static void read_transfer(unsigned char *buf, int len)
     *buf = fliptable[(signed char)(RDR1)]; /* read & bitswap */
 }
 
-static unsigned char poll_byte(int timeout) /* timeout is in bytes */
+/* returns 0xFF on timeout, timeout is in bytes */
+static unsigned char poll_byte(int timeout) 
 {
     int i;
     unsigned char data = 0;       /* stop the compiler complaining */
@@ -264,7 +265,8 @@ static unsigned char poll_byte(int timeout) /* timeout is in bytes */
     return fliptable[(signed char)data];
 }
 
-static unsigned char poll_busy(int timeout) /* timeout is in bytes */
+/* returns 0 on timeout, timeout is in bytes */
+static unsigned char poll_busy(int timeout) 
 {
     int i;
     unsigned char data, dummy;
@@ -285,7 +287,7 @@ static unsigned char poll_busy(int timeout) /* timeout is in bytes */
         dummy = RDR1;               /* read byte */
     } while ((dummy != 0xFF) && (++i < timeout));
     
-    return data;
+    return (dummy == 0xFF) ? data : 0;
 }
 
 /* Send MMC command and get response */
@@ -734,7 +736,7 @@ void ata_spindown(int seconds)
 }
 
 bool ata_disk_is_active(void)
-{   
+{
     /* this is correct unless early return from write gets implemented */
     return mmc_mutex.locked;
 }
