@@ -83,8 +83,11 @@ void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
     }
     row++;
   }
-  drawdots(0, &clearpoints[0], cp);
-  drawdots(1, &points[0], p);
+/*  DEBUGF("icon draw %d/%d\n", p, cp);*/
+  if (cp)
+      drawdots(0, &clearpoints[0], cp);
+  if (p)
+      drawdots(1, &points[0], p);
 }
 
 void lcd_print_char(int x, int y)
@@ -96,46 +99,51 @@ void lcd_print_char(int x, int y)
   struct rectangle points[CHAR_HEIGHT*CHAR_WIDTH];
   struct rectangle clearpoints[CHAR_HEIGHT*CHAR_WIDTH];
   unsigned char ch=hardware_buffer_lcd[x][y];
+  static char bitmap_content[11*8][2*8];
 
   if (double_height == 2 && y == 1)
     return; /* Second row can't be printed in double height. ??*/
 
-  /* Clear all char
-  clearpoints[cp].x = xpos +BORDER_MARGIN;
-  clearpoints[cp].y = ypos +BORDER_MARGIN;
-  clearpoints[cp].width=CHAR_WIDTH*CHAR_PIXEL;
-  clearpoints[cp].height=7*CHAR_PIXEL*double_height;
-  cp++;
-  */
   for (col=0; col<5; col++) {
+    unsigned char fontbitmap=(*font_player)[ch][col];
     for (row=0; row<7; row++) {
-      char fontbit=(*font_player)[ch][col]&(1<<row);
+      char fontbit=fontbitmap&(1<<row);
       int height=CHAR_PIXEL*double_height;
+      int ypixel;
+      if (bitmap_content[x*8+col][y*8+row*double_height]!=fontbit ||
+          bitmap_content[x*8+col][y*8+row*double_height+double_height-1]!=
+          fontbit) {
+        bitmap_content[x*8+col][y*8+row*double_height]=fontbit;
+        bitmap_content[x*8+col][y*8+row*double_height+double_height-1]=fontbit;
 
-      y=CHAR_PIXEL*(double_height*row)+ypos;
-      if (double_height==2) {
-	if (row == 3) /* Adjust for blank row in the middle */
-	  height=CHAR_PIXEL;
-      }
+        ypixel=CHAR_PIXEL*(double_height*row)+ypos;
+        if (double_height==2) {
+            if (row == 3) /* Adjust for blank row in the middle */
+                height=CHAR_PIXEL;
+        }
 
-      if (fontbit) {
-        /* set a dot */
-        points[p].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
-        points[p].y = y +BORDER_MARGIN;
-        points[p].width=CHAR_PIXEL;
-        points[p].height=height;
-        p++; /* increase the point counter */
-      } else {
-        clearpoints[cp].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
-        clearpoints[cp].y = y +BORDER_MARGIN;
-        clearpoints[cp].width=CHAR_PIXEL;
-        clearpoints[cp].height=height;
-        cp++;
+        if (fontbit) {
+            /* set a dot */
+            points[p].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
+            points[p].y = ypixel +BORDER_MARGIN;
+            points[p].width=CHAR_PIXEL;
+            points[p].height=height;
+            p++; /* increase the point counter */
+        } else {
+            clearpoints[cp].x = xpos + col*CHAR_PIXEL +BORDER_MARGIN;
+            clearpoints[cp].y = ypixel +BORDER_MARGIN;
+            clearpoints[cp].width=CHAR_PIXEL;
+            clearpoints[cp].height=height;
+            cp++;
+        }
       }
     }
   }
-  drawrectangles(0, &clearpoints[0], cp);
-  drawrectangles(1, &points[0], p);
+/*  DEBUGF("print_char %d/%d\n", p, cp);*/
+  if (cp)
+      drawrectangles(0, &clearpoints[0], cp);
+  if (p)
+      drawrectangles(1, &points[0], p);
 }
 
 

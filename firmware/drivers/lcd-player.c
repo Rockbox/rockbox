@@ -271,7 +271,6 @@ bool lcdx_putc(int x, int y, unsigned short ch)
     buffer_lcd_mirror[x][y]=lcd_char;
 #ifdef SIMULATOR
     hardware_buffer_lcd[x][y]=lcd_char;
-    lcd_update();
 #else
     lcd_write(true, LCD_CURSOR(x, y));
     lcd_write(false, lcd_char);
