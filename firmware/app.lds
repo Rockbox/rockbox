@@ -42,7 +42,8 @@ SECTIONS
     .heap :
     {
         _poolstart = .;
-        _poolend = . + 0x20000;
+        . = . + 0x20000;
+        _poolend = .;
     }
 
     .mp3buf :
