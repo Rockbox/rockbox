@@ -667,7 +667,7 @@ void settings_load(void)
                 config_block[0x28] | (config_block[0x29] << 8);
 
         global_settings.fade_on_stop = config_block[0xae] & 1;
-        global_settings.caption_backlight = config_block[0xae] & 2;
+        global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
 
         global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
         global_settings.peak_meter_performance = 
