@@ -21,7 +21,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "led.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "system.h"
 #include "debug.h"
 #include "panic.h"
@@ -30,7 +30,7 @@
 #include "string.h"
 #include "hwcompat.h"
 
-#if CONFIG_CPU == SCF5249
+#if CONFIG_CPU == MCF5249
 
 /* don't use sh7034 assembler routines */
 #define PREFER_C_READING
