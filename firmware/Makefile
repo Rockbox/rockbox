@@ -20,12 +20,12 @@ TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -W -Wall -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
+CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
 
 ifdef DEBUG
-CFLAGS += -O -g -DDEBUG
+CFLAGS += -g -DDEBUG
 else
-CFLAGS += -O -fomit-frame-pointer -fschedule-insns -save-temps
+CFLAGS += -fomit-frame-pointer -fschedule-insns
 endif
 
 AFLAGS += -small -relax
