@@ -100,7 +100,7 @@ static inline unsigned short SWAB16(unsigned short value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
-  */    
+  */
 {
     short result;
     asm volatile ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
@@ -111,7 +111,7 @@ static inline unsigned long SWAW32(unsigned long value)
   /*
     result[31..16] = value[15.. 0];
     result[15.. 0] = value[31..16];
-  */    
+  */
 {
     long result;
     asm volatile ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
@@ -124,7 +124,7 @@ static inline unsigned long SWAB32(unsigned long value)
     result[23..16] = value[15.. 8];
     result[15.. 8] = value[23..16];
     result[ 7.. 0] = value[31..24];
-  */    
+  */
 {
     asm volatile ("swap.b\t%0,%0\n"
                   "swap.w\t%0,%0\n"
@@ -159,7 +159,7 @@ static inline unsigned short SWAB16(unsigned short value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
-  */    
+  */
 {
     return (value >> 8) | (value << 8);
 }
@@ -170,10 +170,51 @@ static inline unsigned long SWAB32(unsigned long value)
     result[23..16] = value[15.. 8];
     result[15.. 8] = value[23..16];
     result[ 7.. 0] = value[31..24];
-  */    
+  */
 {
     unsigned short hi = SWAB16(value >> 16);
     unsigned short lo = SWAB16(value & 0xffff);
+    return (lo << 16) | hi;
+}
+
+#elif CONFIG_CPU == TCC730
+
+extern void* interrupt_vector[16]  __attribute__ ((section(".idata")));
+
+extern void ddma_transfer(int dir, int mem, long intAddr, void* extAddr,
+                          int num);
+
+static inline void clear_watchdog(void)
+{
+    WDTCON = 0x0A;
+}
+
+
+#define HIGHEST_IRQ_LEVEL (1<<15)
+static inline int set_irq_level(int level)
+{
+    return 0;
+}
+
+static inline unsigned short SWAB16(unsigned short value)
+    /*
+      result[15..8] = value[ 7..0];
+      result[ 7..0] = value[15..8];
+    */
+{
+    return (value >> 8) | (value << 8);
+}
+
+static inline unsigned long SWAB32(unsigned long value)
+    /*
+      result[31..24] = value[ 7.. 0];
+      result[23..16] = value[15.. 8];
+      result[15.. 8] = value[23..16];
+      result[ 7.. 0] = value[31..24];
+    */
+{
+    unsigned short hi = SWAB16(value >> 16);
+    unsigned long lo = SWAB16(value & 0xffff);
     return (lo << 16) | hi;
 }
 
