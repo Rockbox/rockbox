@@ -33,6 +33,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/libmad/%.o: $(APPSDIR)/codecs/libmad/%.c
+	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

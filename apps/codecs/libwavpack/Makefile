@@ -32,6 +32,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/libwavpack/%.o: $(APPSDIR)/codecs/libwavpack/%.c
+	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libwavpack/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

@@ -36,6 +36,7 @@ $(OUTPUT): $(OBJS)
 
 $(OBJDIR)/liba52/%.o: $(APPSDIR)/codecs/liba52/%.c
 	@mkdir -p $(OBJDIR)/liba52
+	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/liba52/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

@@ -32,6 +32,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/Tremor/%.o: $(APPSDIR)/codecs/Tremor/%.c
+	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/Tremor/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
