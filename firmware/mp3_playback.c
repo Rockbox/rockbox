@@ -591,11 +591,11 @@ static void init_playback(void)
 
 #ifndef SIMULATOR
 #if CONFIG_HWCODEC == MAS3507D
-int current_left_volume = 0;  /* all values in tenth of dB */
-int current_right_volume = 0;  /* all values in tenth of dB */
-int current_treble = 0;
-int current_bass = 0;
-int current_balance = 0;
+/* all values in tenth of dB */
+int current_volume = 0;   /* -780..+180 */
+int current_balance = 0;  /* -960..+960 */
+int current_treble = 0;   /* -150..+150 */
+int current_bass = 0;     /* -150..+150 */
 
 /* convert tenth of dB volume to register value */
 static int tenthdb2reg(int db) {
@@ -616,10 +616,25 @@ void set_prescaled_volume(void)
                           bass or treble */
 
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-    
-    /* gain up the analog volume to compensate the prescale reduction gain */
-    l = current_left_volume + prescale;
-    r = current_right_volume + prescale;
+
+    /* gain up the analog volume to compensate the prescale reduction gain,
+     * but limit to +18 dB (the maximum the DAC can do */
+    if (current_volume + prescale > 180)
+        prescale = 180 - current_volume;
+    l = r = current_volume + prescale;
+
+    if (current_balance > 0)
+    {
+        l -= current_balance;
+        if (l < -780)
+            l = -780;
+    }
+    if (current_balance < 0)
+    {
+        r += current_balance;
+        if (r < -780)
+            r = -780;
+    }
 
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 }
@@ -719,9 +734,7 @@ void mpeg_sound_set(int setting, int value)
 #ifdef SIMULATOR
     setting = value;
 #else
-#if CONFIG_HWCODEC == MAS3507D
-    int l, r;
-#else
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     int tmp;
 #endif
 
@@ -735,30 +748,7 @@ void mpeg_sound_set(int setting, int value)
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
 #else
-            l = value;
-            r = value;
-            
-            if(current_balance > 0)
-            {
-                l -= current_balance;
-                if(l < 0)
-                    l = 0;
-            }
-            
-            if(current_balance < 0)
-            {
-                r += current_balance;
-                if(r < 0)
-                    r = 0;
-            }
-            
-            l = 0x38 * l / 100;
-            r = 0x38 * r / 100;
-
-            /* store volume in tenth of dB */
-            current_left_volume = ( l < 0x08 ? l*30 - 780 : l*15 - 660 );
-            current_right_volume = ( r < 0x08 ? r*30 - 780 : r*15 - 660 );
-
+            current_volume = -780 + (value * 960 / 100); /* tenth of dB */
             set_prescaled_volume();
 #endif
             break;
@@ -768,7 +758,8 @@ void mpeg_sound_set(int setting, int value)
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
 #else
-            current_balance = value;
+            current_balance = value * 960 / 100; /* tenth of dB */
+            set_prescaled_volume();
 #endif
             break;
 
@@ -778,7 +769,7 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
             mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
-            current_bass = (value) * 10;
+            current_bass = value * 10;
             set_prescaled_volume();
 #endif
             break;
@@ -789,7 +780,7 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
             mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
-            current_treble = (value) * 10;
+            current_treble = value * 10;
             set_prescaled_volume();
 #endif
             break;

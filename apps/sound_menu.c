@@ -135,13 +135,8 @@ bool set_sound(const char* string,
                     return true;
                 break;
         }
-        if (changed) {
+        if (changed)
             mpeg_sound_set(setting, *variable);
-#if CONFIG_HWCODEC == MAS3507D
-            if(setting == SOUND_BALANCE)
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-#endif
-        }
     }
     lcd_stop_scroll();
     return false;
