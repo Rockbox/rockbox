@@ -263,7 +263,7 @@ while($maxalbumlen&3) {
 sub dumpint {
     my ($num)=@_;
 
-#    print STDERR "int: $num\n";
+#    print "int: $num\n";
 
     printf DB ("%c%c%c%c",
                $num>>24,
@@ -283,14 +283,14 @@ if ($db) {
     my $albumentrysize = $maxalbumlen + 4 + $maxsongperalbum*4;
     my $artistentrysize = $maxartistlen + $maxalbumsperartist*4;
 
-    printf STDERR "Number of artists  : %d\n", scalar keys %artists;
-    printf STDERR "Number of albums   : %d\n", scalar keys %albums;
-    printf STDERR "Number of songs    : %d\n", scalar keys %entries;
-    print STDERR "Max artist length  : $maxartistlen ($longestartist)\n";
-    print STDERR "Max album length   : $maxalbumlen ($longestalbumname)\n";
-    print STDERR "Max song length    : $maxsonglen ($longestsong)\n";
-    print STDERR "Max songs per album: $maxsongperalbum ($longestalbum)\n";
-    print STDERR "Database version: $dbver\n" if ($verbose);
+    printf "Number of artists  : %d\n", scalar keys %artists;
+    printf "Number of albums   : %d\n", scalar keys %albums;
+    printf "Number of songs    : %d\n", scalar keys %entries;
+    print "Max artist length  : $maxartistlen ($longestartist)\n";
+    print "Max album length   : $maxalbumlen ($longestalbumname)\n";
+    print "Max song length    : $maxsonglen ($longestsong)\n";
+    print "Max songs per album: $maxsongperalbum ($longestalbum)\n";
+    print "Database version: $dbver\n" if ($verbose);
 
     open(DB, ">$db") || die "couldn't make $db";
     printf DB "RDB%c", $dbver;
