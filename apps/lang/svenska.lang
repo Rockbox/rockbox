@@ -888,11 +888,7 @@ id: LANF_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Tor"
-
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu
-eng: ""
-new: ""
+### LANG_BACKLIGHT_ON was not found in the english file!
 
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
@@ -998,3 +994,133 @@ id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new: "Ons"
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+new: "Batteridisplay"
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new: "Ledigt: %d.%dGB"
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+new: "Disk: %d.%dGB"
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+new: "Grafik"
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+new: "Numerisk"
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "dBfs"
+new: "dBfs"
+
+id: LANG_PM_ENERGY_SAVER
+desc: in the peak meter menu
+eng: "Save energy"
+new: "Energispar"
+
+id: LANG_PM_HIGH_PERFORMANCE
+desc: in the peak meter menu
+eng: "High performance"
+new: "Bästa prestanda"
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "linear"
+new: "linjär"
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum of range"
+new: "Maximalt värde"
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum of range"
+new: "Minimalt värde"
+
+id: LANG_PM_PERFORMANCE
+desc: in the peak meter menu
+eng: "Performance"
+new: "Prestanda"
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "dBfs <-> linear"
+new: "dBfs <-> linjär"
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new: "Inspelning"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+new: "Kanaler"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new: "Frekvens"
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+new: "Förstärkning"
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new: "Vänster"
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new: "Kvalitet"
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new: "Höger"
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
+new: "Inspelningsinställningar"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new: "Källa"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new: "Digital"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new: "Linjeingång"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new: "Mikrofon"
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+new: "Volymdisplay"
