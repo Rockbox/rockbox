@@ -185,10 +185,9 @@ setid3v2title(int fd, mp3entry *entry)
     if(size >= (int)sizeof(entry->id3v2buf))
         size = sizeof(entry->id3v2buf)-1;
 
-    if(size != read(fd, buffer, size)) {
-        free(buffer);
+    if(size != read(fd, buffer, size))
         return;
-    }
+
     *(buffer + size) = '\0';
 
     /* Set minimun frame size according to ID3v2 version */
