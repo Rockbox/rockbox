@@ -17,8 +17,6 @@
 #
 ############################################################################
 
-TARGET = rockboxui
-
 APPDIR = ../../apps
 RECDIR = $(APPDIR)/recorder
 
@@ -31,6 +29,11 @@ LIBMADDIR = $(PREVAPPDIR)/common/libmad
 CC = gcc
 RM = rm -f
 DEBUG = -g
+
+# where to put all output files
+OBJDIR = .
+
+TARGET = $(OBJDIR)/rockboxui
 
 #DISPLAY = -DHAVE_LCD_CHARCELLS
 DISPLAY = -DHAVE_LCD_BITMAP
@@ -64,8 +67,6 @@ endif
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
-#SRCS = $(wildcard *.c)
-
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
 APPS = main.c tree.c play.c menu.c credits.c main_menu.c sound_menu.c
@@ -83,7 +84,7 @@ ifdef MPEG_PLAY
   INCLUDES += -I$(LIBMADDIR)
 endif
 
-OBJS := $(SRCS:c=o)
+OBJS := $(SRCS:%.c=$(OBJDIR)/%.o)
 
 all: $(TARGET)
 
@@ -95,107 +96,107 @@ distclean: clean
 	$(RM) config.cache
 
 ifdef MPEG_PLAY
-bit.o: $(LIBMADDIR)/bit.c
+$(OBJDIR)/bit.o: $(LIBMADDIR)/bit.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-decoder.o: $(LIBMADDIR)/decoder.c
+$(OBJDIR)/decoder.o: $(LIBMADDIR)/decoder.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-fixed.o: $(LIBMADDIR)/fixed.c
+$(OBJDIR)/fixed.o: $(LIBMADDIR)/fixed.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-frame.o: $(LIBMADDIR)/frame.c
+$(OBJDIR)/frame.o: $(LIBMADDIR)/frame.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-huffman.o: $(LIBMADDIR)/huffman.c
+$(OBJDIR)/huffman.o: $(LIBMADDIR)/huffman.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-layer12.o: $(LIBMADDIR)/layer12.c
+$(OBJDIR)/layer12.o: $(LIBMADDIR)/layer12.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-layer3.o: $(LIBMADDIR)/layer3.c
+$(OBJDIR)/layer3.o: $(LIBMADDIR)/layer3.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-stream.o: $(LIBMADDIR)/stream.c
+$(OBJDIR)/stream.o: $(LIBMADDIR)/stream.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-synth.o: $(LIBMADDIR)/synth.c
+$(OBJDIR)/synth.o: $(LIBMADDIR)/synth.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-timer.o: $(LIBMADDIR)/timer.c
+$(OBJDIR)/timer.o: $(LIBMADDIR)/timer.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-version.o: $(LIBMADDIR)/version.c
+$(OBJDIR)/version.o: $(LIBMADDIR)/version.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
+$(OBJDIR)/mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 endif
 
-credits.o: $(APPDIR)/credits.c
+$(OBJDIR)/credits.o: $(APPDIR)/credits.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-menu.o: $(APPDIR)/menu.c
+$(OBJDIR)/menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-main_menu.o: $(APPDIR)/main_menu.c
+$(OBJDIR)/main_menu.o: $(APPDIR)/main_menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-sound_menu.o: $(APPDIR)/sound_menu.c
+$(OBJDIR)/sound_menu.o: $(APPDIR)/sound_menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-icons.o: $(RECDIR)/icons.c
+$(OBJDIR)/icons.o: $(RECDIR)/icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-tetris.o: $(RECDIR)/tetris.c
+$(OBJDIR)/tetris.o: $(RECDIR)/tetris.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-screensaver.o: $(RECDIR)/screensaver.c
+$(OBJDIR)/screensaver.o: $(RECDIR)/screensaver.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-main.o: $(APPDIR)/main.c
+$(OBJDIR)/main.o: $(APPDIR)/main.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-bmp.o: $(RECDIR)/bmp.c
+$(OBJDIR)/bmp.o: $(RECDIR)/bmp.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-play.o: $(APPDIR)/play.c
+$(OBJDIR)/play.o: $(APPDIR)/play.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-tree.o: $(APPDIR)/tree.c
+$(OBJDIR)/tree.o: $(APPDIR)/tree.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-lcd.o: $(DRIVERS)/lcd.c
+$(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-chartables.o: $(FIRMWAREDIR)/chartables.c
+$(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-id3.o: $(FIRMWAREDIR)/id3.c
+$(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-debug.o: $(FIRMWAREDIR)/debug.c
+$(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-sprintf.o: $(COMMON)/sprintf.c
+$(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.c.o:
-	$(CC) $(CFLAGS) -c $<
+$(OBJDIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS)
 	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
 
-DEPS:=.deps
+DEPS:=$(OBJDIR)/.deps
 
 $(DEPS)/%.d: %.c
 		@$(SHELL) -c 'if [ ! -d $(DEPS) ]; then \
 			echo Creating the dependency directory: $(DEPS); \
-			mkdir $(DEPS); fi'
+			mkdir -p $(DEPS); fi'
 		@echo "Updating Dependencies for $<"
 		@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
-	|sed '\''s/\($*\)\.o[ :]*/\1.o $(<:%.c=%.d) : /g'\'' > $@; \
+	|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'
 
 -include $(SRCS:%.c=$(DEPS)/%.d)
