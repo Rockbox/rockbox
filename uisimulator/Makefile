@@ -20,6 +20,7 @@
 TARGET = rockboxui
 
 FIRMWAREDIR=../firmware
+DRIVERS=$(FIRMWAREDIR)/drivers
 
 CC = gcc
 RM = rm
@@ -29,14 +30,14 @@ CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMA
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-  INCLUDES = -I/usr/X11R6/include
+  INCLUDES = -I/usr/X11R6/include -I$(DRIVERS)
   LIBDIRS = -L/usr/X11R6/lib
 else
   INCLUDES = 
   LIBDIRS = 
 endif
 
-OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o button-x11.o chartables.o tetris.o 
+OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o button-x11.o chartables.o tetris.o
 
 SRCS = $(OBJS:%.o=%.c)
 HDRS = $(OBJS:%.o=%.h)
@@ -49,7 +50,7 @@ clean:
 distclean: clean
 	$(RM) config.cache
 
-lcd.o: $(FIRMWAREDIR)/lcd.c
+lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $< -o $@
 
 chartables.o: $(FIRMWAREDIR)/chartables.c
