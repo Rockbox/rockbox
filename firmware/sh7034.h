@@ -37,18 +37,14 @@
 #define SSR1_ADDR       0x05FFFECC
 #define RDR1_ADDR       0x05FFFECD
 
-#define ADDRA_ADDR      0x05FFFEE0
 #define ADDRAH_ADDR     0x05FFFEE0
 #define ADDRAL_ADDR     0x05FFFEE1
-#define ADDRB_ADDR      0x05FFFEE2
 #define ADDRBH_ADDR     0x05FFFEE2
 #define ADDRBL_ADDR     0x05FFFEE3
-#define ADDRC_ADDR      0x05FFFEE4
 #define ADDRCH_ADDR     0x05FFFEE4
 #define ADDRCL_ADDR     0x05FFFEE5
-#define ADDRD_ADDR      0x05FFFEE6
 #define ADDRDH_ADDR     0x05FFFEE6
-#define ADDRDL_ADDR     0x05FFFEE6
+#define ADDRDL_ADDR     0x05FFFEE7
 #define ADCSR_ADDR      0x05FFFEE8
 #define ADCR_ADDR       0x05FFFEE9
 
@@ -173,16 +169,16 @@
 #define SSR1       (*((volatile unsigned char*)SSR1_ADDR))   
 #define RDR1       (*((volatile unsigned char*)RDR1_ADDR))   
 
-#define ADDRA      (*((volatile unsigned short*)ADDRA_ADDR)) 
+#define ADDRA      (*((volatile unsigned short*)ADDRAH_ADDR)) /* combined */
 #define ADDRAH     (*((volatile unsigned char*)ADDRAH_ADDR)) 
 #define ADDRAL     (*((volatile unsigned char*)ADDRAL_ADDR)) 
-#define ADDRB      (*((volatile unsigned short*)ADDRB_ADDR)) 
+#define ADDRB      (*((volatile unsigned short*)ADDRBH_ADDR)) /* combined */
 #define ADDRBH     (*((volatile unsigned char*)ADDRBH_ADDR)) 
 #define ADDRBL     (*((volatile unsigned char*)ADDRBL_ADDR)) 
-#define ADDRC      (*((volatile unsigned short*)ADDRC_ADDR)) 
+#define ADDRC      (*((volatile unsigned short*)ADDRCJ_ADDR)) /* combined */
 #define ADDRCH     (*((volatile unsigned char*)ADDRCH_ADDR)) 
 #define ADDRCL     (*((volatile unsigned char*)ADDRCL_ADDR)) 
-#define ADDRD      (*((volatile unsigned short*)ADDRD_ADDR)) 
+#define ADDRD      (*((volatile unsigned short*)ADDRDH_ADDR)) /* combined */
 #define ADDRDH     (*((volatile unsigned char*)ADDRDH_ADDR)) 
 #define ADDRDL     (*((volatile unsigned char*)ADDRDL_ADDR)) 
 #define ADCSR      (*((volatile unsigned char*)ADCSR_ADDR))  
@@ -258,8 +254,10 @@
 #define IPRE       (*((volatile unsigned short*)IPRE_ADDR))  
 #define ICR        (*((volatile unsigned short*)ICR_ADDR))   
 
+#define BAR        (*((volatile unsigned long*)BARH_ADDR))  /* combined */
 #define BARH       (*((volatile unsigned short*)BARH_ADDR))  
 #define BARL       (*((volatile unsigned short*)BARL_ADDR))  
+#define BAMR       (*((volatile unsigned long*)BAMRH_ADDR)) /* combined */
 #define BAMRH      (*((volatile unsigned short*)BAMRH_ADDR)) 
 #define BAMRL      (*((volatile unsigned short*)BAMRL_ADDR)) 
 #define BBR        (*((volatile unsigned short*)BBR_ADDR))   
