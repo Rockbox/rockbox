@@ -79,6 +79,7 @@ static char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
 
+static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*4;
@@ -95,6 +96,7 @@ static int wait_for_bsy(void)
     }
 }
 
+static int wait_for_rdy(void) __attribute__ ((section (".icode")));
 static int wait_for_rdy(void)
 {
     if (!wait_for_bsy())
@@ -102,6 +104,7 @@ static int wait_for_rdy(void)
     return ATA_ALT_STATUS & STATUS_RDY;
 }
 
+static int wait_for_start_of_transfer(void) __attribute__ ((section (".icode")));
 static int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
@@ -109,6 +112,7 @@ static int wait_for_start_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
+static int wait_for_end_of_transfer(void) __attribute__ ((section (".icode")));
 static int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
@@ -116,6 +120,9 @@ static int wait_for_end_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_RDY|STATUS_DRQ)) == STATUS_RDY;
 }    
 
+int ata_read_sectors(unsigned long start,
+                     unsigned char count,
+                     void* buf) __attribute__ ((section (".icode")));
 int ata_read_sectors(unsigned long start,
                      unsigned char count,
                      void* buf)
