@@ -389,7 +389,7 @@ int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
 
     pfn_timer = timer_callback; /* install 2nd level ISR */
 
-    TSR4 &= ~0x01;
+    and_b(~0x01, &TSR4);
     TIER4 = 0xF9; /* Enable GRA match interrupt */
 
     GRA4 = (unsigned short)(cycles - 1);
