@@ -680,6 +680,12 @@ static char* select_bookmark(char* bookmark_file_name)
         {
             case BUTTON_PLAY:
                 /* User wants to use this bookmark */
+#ifdef HAVE_LCD_BITMAP
+                if (global_settings.statusbar)
+                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                else
+                    lcd_setmargins(0, 0);
+#endif
                 return bookmark;
 
             case BUTTON_ON | BUTTON_PLAY:
