@@ -1193,3 +1193,18 @@ id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
 new: "Underhållsladdning"
+
+id: LANG_QUEUE_FULL
+desc: queue buffer full
+eng: "Queue buffer full"
+new: "Kön är full" 
+
+id: LANG_QUEUE_QUEUED
+desc: queued track name %s
+eng: "Queued: %s"
+new: "Köad: %s"
+
+id: LANG_QUEUE_TOTAL
+desc: number of queued tracks %d
+eng: "Total queued: %d"
+new: "Kö: %d st"
