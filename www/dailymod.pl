@@ -24,7 +24,7 @@ print "<tr><td>\n";
 print "</td><td>\n";
 &list("recorder");
 
-print "</td><td><p><b>Note:</b> The FM Recorder version is still very early and buggy. It is available here for testing purposes only.\n";
+print "</td><td><p><b>Note:</b> The FM Recorder version is still experimental and very buggy. It is available here for testing purposes only.\n";
 &list("fmrecorder");
 
 print "</td></tr></table>\n";
