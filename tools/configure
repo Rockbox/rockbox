@@ -89,11 +89,12 @@ all: sim
 sim:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
 
-clean-sim:
+clean:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
 
-clean:
-	\$(MAKE) clean-sim
+tags:
+	@rm -f TAGS
+	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) tags
 
 EOF
 
