@@ -177,6 +177,13 @@ void init(void)
     
     usb_start_monitoring();
 
+/* temporary hack for Ondio, which can't browse without disk I/O */
+#ifdef HAVE_MMC
+    while(button_get(true) & BUTTON_REL) {}; /* wait to see the logo */
+    while(1) main_menu(); /* just show the main menu, all we can do */
+#endif
+/* end of Ondio hack */
+
     pinfo = disk_init();
     if (!pinfo)
     {
