@@ -252,3 +252,10 @@ int talk_value(int n, int unit, bool enqueue)
     (void)enqueue;
     return 0;
 }
+
+int talk_number(int n, bool enqueue)
+{
+    (void)n;
+    (void)enqueue;
+    return 0;
+}
