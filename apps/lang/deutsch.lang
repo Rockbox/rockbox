@@ -1,4 +1,4 @@
-# $Id$
+# German language file. Format is V2.
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -9,16 +9,6 @@ id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 new: "Grundeinstellungen"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Spiele"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demos"
 
 id: LANG_INFO
 desc: in the main menu
@@ -55,50 +45,10 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 new: "Puffer: %d.%02dMB"
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Akku: %d%%%s"
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Akku: %d%%%s"
-
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 new: "Akku: lädt"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Bounce"
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Snow"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Sokoban"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Wormlet"
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Snake"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -110,11 +60,6 @@ desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Mische..."
 
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Wiedergeben.."
-
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
@@ -124,11 +69,6 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new: "Puffer voll"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
-new: "%d Dateien"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -160,21 +100,6 @@ desc: used in set_time()
 eng: "OFF To Revert"
 new: "OFF = abbrechen"
 
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: "Versteckte Dateien"
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: "Anzeigen"
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: "Verstecken"
-
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
@@ -189,11 +114,6 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 new: "Gewählte zuerst wiedergeben"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: "Musik-Filter"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -260,30 +180,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "aktuellem Titel folgen"
 
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Sicher?"
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Wiedergabe/Stop"
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 new: "Sind Sie sicher?"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new: "Play = Ja"
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF=Abbruch"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -307,7 +207,7 @@ new: "Sortiermodus"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new: "Scroll-Einstellungen"
 
 id: LANG_RESET
@@ -424,16 +324,6 @@ id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(PLAY/STOP)"
-
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "PLAY = Ja"
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "Sonstige = Nein"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -570,11 +460,6 @@ desc: in wps F2 pressed
 eng: "Mode:"
 new: "modus:"
 
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: "Verzeichnisf.: %s"
-
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
@@ -595,180 +480,10 @@ desc: when playlist has finished
 eng: "End Of List"
 new: "Listenende"
 
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: "<Drücke ON>"
-
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 new: "Playlist zu Ende"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: "Drücke ON"
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Ihre Punktzahl:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "High Score: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Neuer Highscore!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Spiel pausiert"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new: "[PLAY] um fortzusetzen"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new: "[OFF] zum Beenden"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Level - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new: "(1 - langsam, 9 - schnell)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new: "[PLAY] Start/Pause"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: ""
-new: "Level"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: ""
-new: "Bewg."
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: ""
-new: "GEWONNEN!"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: ""
-new: "[OFF] beenden"
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: ""
-new: "[F1] - Level"
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: ""
-new: "[F2] gl. Level"
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: ""
-new: "[F3] + Level"
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: ""
-new: "Län:%d"
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: ""
-new: "Wachse"
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: ""
-new: "Hungrig"
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: ""
-new: "Gewurmt"
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: ""
-new: "Argh"
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: ""
-new: "Unfall!"
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: ""
-new: "Hs: %d"
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: ""
-new: "%d Spieler    UP/DN"
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: ""
-new: "%d Würmer       L/R"
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: ""
-new: "Fernsteuerung  F1"
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: ""
-new: "Keine Fernst.   F1"
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: "2 Tastenkontr.  F1"
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: "4 Tastenkontr.  F1"
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: ""
-new: "Ohne Kontrolle"
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: ""
-new: "Verloren!"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: ""
-new: "Reihen - Level"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -875,11 +590,6 @@ desc: option for 24 hour clock
 eng: "24 Hour Clock"
 new: "24 Std. Uhr"
 
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Cube"
-
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
@@ -939,11 +649,6 @@ id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 new: "Sep"
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oszillograph"
 
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
@@ -1195,21 +900,6 @@ desc: in settings_menu
 eng: "Battery Capacity"
 new: "Akkukapazität"
 
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new: "Warteschlange voll"
-
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "Vorgemerkt: %s"
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new: "Anzahl: %d"
-
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
@@ -1259,21 +949,6 @@ id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 new: "Abgebrochen"
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: "OK"
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Warteschlange"
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Umb + Ent"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1359,11 +1034,6 @@ id: LANG_CHANNEL_STEREO_WIDE
 desc: in sound_settings
 eng: "Stereo Wide"
 new: "Stereo breit"
-
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: ""
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1505,11 +1175,6 @@ desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 new: "Festplatte voll. Drücke OFF zum fortfahren."
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "Flipit"
-
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
@@ -1554,11 +1219,6 @@ id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
 new: "Einmalig"
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othelo"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1667,18 +1327,8 @@ new: "Rekursiv?"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
-eng: "Save Dynamic Playlist"
-new: "Speichere dynamische Playlist"
-
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Verschiebe-Puzzle"
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Stern"
+eng: "Save Current Playlist"
+new: "Speichere aktuelle Playlist"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
@@ -1690,11 +1340,6 @@ desc: in button bar
 eng: "Menu"
 new: "Menü"
 
-id: LANG_BUTTONBAR_OPTIONS
-desc: in button bar
-eng: "Option"
-new: "Option"
-
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
@@ -1702,18 +1347,18 @@ new: "Kfz-Adapter Modus"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
-new: "Einstellungen"
+eng: "Browse .cfg files"
+new: "Zeige .cfg-Dateien"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
-new: "Zeichensätze"
+eng: "Browse Fonts"
+new: "Zeige Zeichensätze"
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
-new: "Firmware"
+eng: "Browse Firmwares"
+new: "Zeige Firmwares"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
@@ -1767,13 +1412,13 @@ new: "Keine Dateien"
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
-new: "Plugins"
+eng: "Browse Plugins"
+new: "Zeige Plugins"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
-new: "While Playing Screen"
+eng: "Browse .wps files"
+new: "Zeige .wps-Dateien"
 
 id: LANG_FM_BUTTONBAR_RECORD
 desc: in main menu
@@ -1784,3 +1429,213 @@ id: LANG_FM_RADIO
 desc: in main menu
 eng: "FM Radio"
 new: "FM Radio"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Lesezeichen erstellen?"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new: "Status-/Verlaufsbalken"
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new: "Akku"
+
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "Lade letztes Lesezeichen?"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Lesezeichen anlegen fehlgeschlagen!"
+
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Lesezeichen angelegt"
+
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "keine Lesezeichen"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Lesezeichen anlegen"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Lesezeichen auflisten"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "Neueste Lesezeichen"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+new: "ON+Play = Löschen"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+new: "OFF = Beenden"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: "Index"
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "Unten = Liste"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+new: "PLAY = Auswählen"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Zeit"
+
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Lesezeichen"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Beim Stoppen Lesezeichen anlegen"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "Letztes Lesezeichen laden"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Liste zuletzt verwendeter Lesezeichen verwalten?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+new: "Fragen - nur neuestes"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+new: "Ja - nur neuestes"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "nur unterschiedliche"
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new: "Verzeichnis anlegen"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new: "Festplatte"
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+new: "Umgedreht"
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new: "Rockbox Info"
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new: "LCD Einstellungen"
+
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new: "Grenzwerte"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+new: "Konfigurationen verwalten"
+
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+new: "verschieben"
+
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+new: "Verschieben fehlgeschlagen"
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new: "Aufnahme starten"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new: "Aktuelles Verzeichnis"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new: "Verzeichnis"
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+new: "Vorab-Aufnahme"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+new: "Vorab-Aufnahme-Länge"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new: "Zeit & Datum"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+new: "Zeige aktuelle Playliste"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new: "FF/RW"
