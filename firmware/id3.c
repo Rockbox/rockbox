@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <ctype.h>
 #include "file.h"
 #include "debug.h"
 #include "atoi.h"
@@ -121,15 +122,32 @@ static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
     return bufferpos;
 }
 
-/* parse numeric genre from string */
-static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
+/* parse numeric genre from string, version 2.2 and 2.3 */
+static int parseoldgenre( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    if( tag[ 1 ] == '(' && tag[ 2 ] != '(' ) {
-        entry->genre = atoi( tag + 2 );
+    if( tag[0] == '(' && tag[1] != '(' ) {
+        entry->genre = atoi( tag + 1 );
         entry->genre_string = 0;
         return tag - entry->id3v2buf;
     }
     else {
+        entry->genre = 0xFF;
+        return bufferpos;
+    }
+}
+
+/* parse numeric genre from string, version 2.4 and up */
+static int parsenewgenre( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    /* In version 2.4 and up, there are no parentheses, and the genre frame
+       is a list of strings, either numbers or text. */
+
+    /* Is it a number? */
+    if(isdigit(tag[0])) {
+        entry->genre = atoi( tag );
+        entry->genre_string = 0;
+        return tag - entry->id3v2buf;
+    } else {
         entry->genre = 0xFF;
         return bufferpos;
     }
@@ -146,7 +164,8 @@ static struct tag_resolver taglist[] = {
     { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum },
     { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
     { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
-    { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
+    { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsenewgenre },
+    { "TCO",  3, offsetof(struct mp3entry, genre_string), &parseoldgenre },
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL }
 };
 
