@@ -1,7 +1,9 @@
+# $Id$
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Geluid Instellingen"
+new: "Geluids Instellingen"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
@@ -61,7 +63,7 @@ new: "Batt: %d%%%s"
 id: LANG_BATTERY_LEVEL_RECORDER
 desc: the battery level in percentage
 eng: "Battery: %d%%%s"
-new: "Battery: %d%%%s"
+new: "Batterij: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
@@ -71,7 +73,7 @@ new: "Batterij: opladen"
 id: LANG_BOUNCE
 desc: in the demos menu
 eng: "Bounce"
-new: "Bounce
+new: "Bounce"
 
 id: LANG_SNOW
 desc: in the demos menu
@@ -143,14 +145,13 @@ desc: displayed if save settings has failed
 eng: "Save failed"
 new: "Opslaan mislukt"
 
-
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
 new: "Is de batterij leeg ?"
 
 id: LANG_TIME_SET
-dec: used in set_time()
+desc: if save settings has failed
 eng: "ON to set"
 new: "ON om in te stellen"
 
@@ -161,23 +162,23 @@ new: "OFF om terug te zetten"
 
 id: LANG_HIDDEN
 desc: in settings_menu
-eng: "Hidden Files"
-new: "Verborgen bestanden"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
-eng: "Show"
-new: "Toon"
+eng: ""
+new: ""
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
-eng: "Hide"
-new: "Verberg"
+eng: ""
+new: ""
 
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
-new: "Kontrast"
+new: "Contrast"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
@@ -191,13 +192,13 @@ new: "Speel geselecteerde eerst"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
-eng: "Music Filter"
-new: "Muziek filter"
+eng: ""
+new: ""
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Sorteer op hoofd/kleine letters"
+new: "Sorteer hoofd en kleine letters apart"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -224,9 +225,6 @@ desc: in settings_menu
 eng: "Backlight"
 new: "LCD verlichting"
 
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu, 
-
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
@@ -240,7 +238,7 @@ new: "Diepe ontlading"
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-new: "Stel Tijd/datum in"
+new: "Stel Tijd/Datum in"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
@@ -265,7 +263,7 @@ new: "Volg Speellijst"
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
 eng: "Really?"
-new: "Zeker?"
+new: "Zeker weten?"
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
@@ -285,7 +283,7 @@ new: "Play = Ja"
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "Any Other = No"
-new: "Elke ander = Nee"
+new: "Elke andere = Nee"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -325,7 +323,7 @@ new: "Afspelen"
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "bestanden bekijken"
+new: "Bestanden"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -335,7 +333,7 @@ new: "LCD scherm"
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
-new: "Systeem
+new: "Systeem"
 
 id: LANG_VOLUME
 desc: in sound_settings
@@ -544,8 +542,8 @@ new: "[Bitrate]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
-eng: "[Frecuency]"
-new: "[Frekwentie]"
+eng: "[Frequency]"
+new: "[Frequentie]"
 
 id: LANG_ID3_PATH
 desc: in wps
@@ -574,8 +572,8 @@ new: "mode:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
-eng: "Dir filter: %s"
-new: "Map filter: %s"
+eng: ""
+new: ""
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -692,11 +690,6 @@ desc: what does F3 do
 eng: "[F3] + level"
 new: "[F3] volgend niveau"
 
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
-
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
@@ -732,10 +725,6 @@ desc: wormlet game
 eng: "Hs: %d"
 new: "Hs: %d"
 
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
-
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
@@ -744,7 +733,7 @@ new: "%d Spelers    up/dn"
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-new: "%d Worms        l\r"
+new: "%d Worms        l/r"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -771,8 +760,6 @@ desc: wormlet game
 eng: "Out of control"
 new: "Geen controle"
 
-# Wormlet game ids ended
-
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
@@ -782,3 +769,43 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new: "0 Rijen - Niveau 0"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new: "Uitschakeltijd"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+new: "Nieuwe taal"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show files"
+new: "Welke bestanden tonen"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+new: "Muziek"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+new: "Ondersteunde"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+new: "Alle"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Ja"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Nee"
