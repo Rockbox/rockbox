@@ -192,9 +192,9 @@ struct plugin_api {
 #endif
     
     /* dir */
-    DIR* (*opendir)(const char* name);
-    int (*closedir)(DIR* dir);
-    struct dirent* (*readdir)(DIR* dir);
+    DIR* (*PREFIX(opendir))(const char* name);
+    int (*PREFIX(closedir))(DIR* dir);
+    struct dirent* (*PREFIX(readdir))(DIR* dir);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
