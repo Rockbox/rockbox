@@ -242,6 +242,7 @@ static struct plugin_api rockbox_api = {
 #endif
 
     reset_poweroff_timer,
+    mpeg_has_changed_track,
 };
 
 int plugin_load(char* plugin, void* parameter)

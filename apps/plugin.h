@@ -278,6 +278,7 @@ struct plugin_api {
 #endif
 
     void (*reset_poweroff_timer)(void);
+    bool (*mpeg_has_changed_track)(void);
 };
 
 /* defined by the plugin loader (plugin.c) */
