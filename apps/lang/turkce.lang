@@ -737,12 +737,12 @@ new: "Es: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    up/dn"
+eng: "%d Players  up/dn"
 new: "%d Oyuncu  y/a"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        l/r"
+eng: "%d Worms    l/r"
 new: "%d Kurtcuk sa/so"
 
 id: LANG_WORMLET_REMOTE_CTRL
@@ -821,3 +821,53 @@ id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
 new: "Hayir"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak meter"
+new: "Ses Duzeyi Gosterimi"
+
+id:   LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak release"
+new: "Tepe noktasi birakma"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak hold time"
+new: "Tepe noktasi kalis suresi"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip hold time"
+new: "Parca kalis suresi"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "eternal"
+new: "sonsuz"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units per read"
+new: "birim/okuma"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "LCD isigi sarj sirasinda acik"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Tekrarla"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Hepsini"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Calani"
