@@ -854,7 +854,7 @@ bool settings_load_config(char* file)
     char line[128];
 
     fd = open(file, O_RDONLY);
-    if (-1 == fd)
+    if (fd < 0)
         return false;
 
     while (read_line(fd, line, sizeof line) > 0)
