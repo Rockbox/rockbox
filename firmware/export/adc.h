@@ -19,6 +19,16 @@
 #ifndef _ADC_H_
 #define _ADC_H_
 
+#include "config.h"
+
+#ifdef IRIVER_H100
+#define NUM_ADC_CHANNELS 4
+
+#define ADC_BUTTONS 0
+#define ADC_REMOTE  1
+#define ADC_BATTERY 2
+
+#else
 #define NUM_ADC_CHANNELS 8
 
 #ifdef HAVE_ONDIO_ADC
@@ -56,6 +66,7 @@
 #endif
 
 #define EXT_SCALE_FACTOR 14800
+#endif
 
 unsigned short adc_read(int channel);
 void adc_init(void);
