@@ -49,7 +49,6 @@ extern const unsigned char char_gen_12x16[][22];
 
 static void loopit(void)
 {
-    int center = 0;
     int b;
     int y=0;
     int x=16;
