@@ -231,6 +231,7 @@ if [ -z "$archos" ]; then
   echo "1 - Archos Player/Studio"
   echo "2 - Archos Recorder"
   echo "3 - Archos FM Recorder"
+  echo "4 - Archos Recorder v2"
 
   getit=`input`;
 
@@ -246,6 +247,13 @@ if [ -z "$archos" ]; then
    3)
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
+    display="-DHAVE_LCD_BITMAP"
+    keypad="-DHAVE_RECORDER_KEYPAD"
+    ;;
+
+   4)
+    archos="recorderv2"
+    target="-DARCHOS_RECORDERV2"
     display="-DHAVE_LCD_BITMAP"
     keypad="-DHAVE_RECORDER_KEYPAD"
     ;;
