@@ -43,11 +43,13 @@ DIRS = $(subst $(DEPS),".",$(DEPDIRS))
 
 OUTPUT = $(OBJDIR)/librockbox.a
 
-ifdef LOADABLE_FONTS
+ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(CFLAGS)))
 	EXTRA_TARGETS = $(OBJDIR)/system.ajf
 endif
 
-$(OUTPUT): $(OBJS) $(EXTRA_TARGETS)
+all: $(OUTPUT) $(EXTRA_TARGETS)
+
+$(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+
 
 $(OBJDIR)/%.o: %.c
@@ -58,7 +60,7 @@ $(OBJDIR)/%.o: %.S
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/system.ajf: ../tools/bdf2ajf $(SYSTEM_FONT)
+$(OBJDIR)/system.ajf: $(SYSTEM_FONT)
 	../tools/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/system.ajf
 
 tags:
