@@ -53,13 +53,14 @@ TARGET=@TARGET@
 DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
+VERSION=\$(shell date +%y%m%d-%H%M)
 
 .PHONE: 
 
 all: sim
 
 sim:
-	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR)
+	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
 
 clean-sim:
 	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
@@ -150,7 +151,6 @@ if [ -z "$target" ]; then
   esac
 fi
 
-
 if [ -z "$debug" ]; then
   ##################################################################
   # Figure out debug on/off
@@ -235,6 +235,7 @@ APPSDIR=@APPSDIR@
 DEBUG=@DEBUG@
 TARGET=@TARGET@
 THISDIR="@PWD@"
+VERSION=\$(shell date +%y%m%d-%H%M)
 
 .PHONE: firmware apps
 
@@ -244,7 +245,7 @@ firmware:
 	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
 
 apps:
-	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
 
 clean-firmware:
 	make -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean

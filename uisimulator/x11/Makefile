@@ -42,7 +42,7 @@ DISPLAY = -DHAVE_LCD_BITMAP
 KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
-$(KEYPAD) $(DISPLAY)
+$(KEYPAD) $(DISPLAY) 
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
@@ -71,7 +71,7 @@ endif
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
-APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
+APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c
 
@@ -198,7 +198,7 @@ $(OBJDIR)/showtext.o: $(APPDIR)/showtext.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/lcd.o: $(DRIVERS)/lcd.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
@@ -216,10 +216,10 @@ $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
-	$(CC) $(APPCFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 
 # these ones are simulator-specific
