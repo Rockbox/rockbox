@@ -740,7 +740,7 @@ void drain_dma_buffer(void)
     {
         while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
         {
-            PADR |= 0x800;
+            __set_bit_constant(11-8, &PADRH);
             
             while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                     
@@ -748,7 +748,7 @@ void drain_dma_buffer(void)
                the data is read */
             asm(" nop\n nop\n nop\n");
             asm(" nop\n nop\n nop\n");
-            PADR &= ~0x800;
+            __clear_bit_constant(11-8, &PADRH);
 
             while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
         }
@@ -757,7 +757,7 @@ void drain_dma_buffer(void)
     {
         while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
         {
-            PADR &= ~0x800;
+            __clear_bit_constant(11-8, &PADRH);
             
             while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
             
@@ -766,7 +766,7 @@ void drain_dma_buffer(void)
             asm(" nop\n nop\n nop\n");
             asm(" nop\n nop\n nop\n");
                     
-            PADR |= 0x800;
+            __set_bit_constant(11-8, &PADRH);
 
             while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
         }
@@ -814,7 +814,7 @@ static void dma_tick(void)
                 while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
                       && i < 30)
                 {
-                    PADR |= 0x800;
+                    __set_bit_constant(11-8, &PADRH);
 
                     while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                     
@@ -828,7 +828,7 @@ static void dma_tick(void)
 
                     i++;
                     
-                    PADR &= ~0x800;
+                    __clear_bit_constant(11-8, &PADRH);
 
                     /* No wait for /RTW, cause it's not necessary */
                 }
@@ -839,7 +839,7 @@ static void dma_tick(void)
                 while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
                       && i < 30)
                 {
-                    PADR &= ~0x800;
+                    __clear_bit_constant(11-8, &PADRH);
                     
                     while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                     
@@ -853,7 +853,7 @@ static void dma_tick(void)
 
                     i++;
                     
-                    PADR |= 0x800;
+                    __set_bit_constant(11-8, &PADRH);
 
                     /* No wait for /RTW, cause it's not necessary */
                 }
@@ -2169,7 +2169,7 @@ static void setup_sci0(void)
     PBCR1 = (PBCR1 & 0x0cff) | 0x1208;
     
     /* Set PB12 to output */
-    PBIOR |= 0x1000;
+    __set_bit_constant(12-8, &PBIORH);
 
     /* Disable serial port */
     SCR0 = 0x00;
@@ -2190,8 +2190,8 @@ static void setup_sci0(void)
     IPRD &= 0x0ff0;
 
     /* set PB15 and PB14 to inputs */
-    PBIOR &= 0x7fff;
-    PBIOR &= 0xbfff;
+     __clear_bit_constant(15-8, &PBIORH);
+     __clear_bit_constant(14-8, &PBIORH);
 
     /* Enable End of DMA interrupt at prio 8 */
     IPRC = (IPRC & 0xf0ff) | 0x0800;
@@ -3144,7 +3144,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     setup_sci0();
 
 #ifdef HAVE_MAS3587F
-    PAIOR |= 0x0800; /* output for /PR */
+    __set_bit_constant(11-8, &PAIORH); /* output for /PR */
     init_playback();
     
     mas_version_code = mas_readver();
@@ -3157,9 +3157,9 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
 #endif
     
 #ifdef HAVE_MAS3507D
-    PBDR &= ~0x20;
+    __clear_bit_constant(5, &PBDRL);
     sleep(HZ/5);
-    PBDR |= 0x20;
+    __set_bit_constant(5, &PBDRL);
     sleep(HZ/5);
     
     /* set IRQ6 to edge detect */

@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "mas.h"
 #include "kernel.h"
+#include "system.h"
 
 extern bool old_recorder;
 
@@ -268,21 +269,21 @@ static int mas_devread(unsigned long *dest, int len)
 #ifdef HAVE_MAS3587F
 void mas_reset(void)
 {
-    PAIOR |= 0x100;
+    __set_bit_constant(8-8, &PAIORH);
     
     if(old_recorder)
     {
         /* Older recorder models don't invert the POR signal */
-        PADR |= 0x100;
+        __set_bit_constant(8-8, &PADRH);
         sleep(HZ/100);
-        PADR &= ~0x100;
+        __clear_bit_constant(8-8, &PADRH);
         sleep(HZ/5);
     }
     else
     {
-        PADR &= ~0x100;
+        __clear_bit_constant(8-8, &PADRH);
         sleep(HZ/100);
-        PADR |= 0x100;
+        __set_bit_constant(8-8, &PADRH);
         sleep(HZ/5);
     }
 }

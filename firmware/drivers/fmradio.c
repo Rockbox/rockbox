@@ -21,6 +21,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
+#include "system.h"
 
 #ifdef HAVE_FMRADIO
 
@@ -37,15 +38,15 @@
 #define PB4  0x0010
 
 /* cute little functions */
-#define CE_LO  (PBDR &= ~PB3)
-#define CE_HI  (PBDR |= PB3)
-#define CL_LO  (PBDR &= ~PB1)
-#define CL_HI  (PBDR |= PB1)
+#define CE_LO  __clear_bit_constant(3, PBDRL_ADDR)
+#define CE_HI  __set_bit_constant(3, PBDRL_ADDR)
+#define CL_LO  __clear_bit_constant(1, PBDRL_ADDR)
+#define CL_HI  __set_bit_constant(1, PBDRL_ADDR)
 #define DO     (PBDR & PB4)
-#define DI_LO  (PBDR &= ~PB0)
-#define DI_HI  (PBDR |= PB0)
+#define DI_LO  __clear_bit_constant(0, PBDRL_ADDR)
+#define DI_HI  __set_bit_constant(0, PBDRL_ADDR)
 
-#define START (PBDR |= (PB3 | PB1))
+#define START __set_mask_constant((PB3 | PB1), PBDRL_ADDR)
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)

@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include "sh7034.h"
 #include "led.h"
+#include "system.h"
 
 void led(bool on)
 {
@@ -30,8 +31,12 @@ void led(bool on)
         asm("and.b" "\t" "%0,@(r0,gbr)" : : "I"(~0x40), "z"(PBDR_ADDR+1));
 #else
     if ( on )
-        PBDR |= 0x40;
+    {
+        __set_bit_constant(6, &PBDRL);
+    }
     else
-        PBDR &= ~0x40;
+    {
+        __clear_bit_constant(6, &PBDRL);
+    }
 #endif
 }

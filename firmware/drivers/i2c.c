@@ -21,22 +21,23 @@
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
+#include "system.h"
 
 #define PB13 0x2000
 #define PB7  0x0080
 #define PB5  0x0020
 
-/* cute little functions */
-#define SDA_LO  (PBDR &= ~PB7)
-#define SDA_HI  (PBDR |= PB7)
-#define SDA_INPUT (PBIOR &= ~PB7)
-#define SDA_OUTPUT (PBIOR |= PB7)
+/* cute little functions, atomic read-modify-write */
+#define SDA_LO     __clear_bit_constant(7, &PBDRL)
+#define SDA_HI     __set_bit_constant(7, &PBDRL)
+#define SDA_INPUT  __clear_bit_constant(7, &PBIORL)
+#define SDA_OUTPUT __set_bit_constant(7, &PBIORL)
 #define SDA     (PBDR & PB7)
 
-#define SCL_INPUT (PBIOR &= ~PB13)
-#define SCL_OUTPUT (PBIOR |= PB13)
-#define SCL_LO  (PBDR &= ~PB13)
-#define SCL_HI  (PBDR |= PB13)
+#define SCL_INPUT  __clear_bit_constant(13-8, &PBIORH)
+#define SCL_OUTPUT __set_bit_constant(13-8, &PBIORH)
+#define SCL_LO     __clear_bit_constant(13-8, &PBDRH)
+#define SCL_HI     __set_bit_constant(13-8, &PBDRH)
 #define SCL     (PBDR & PB13)
 
 /* arbitrary delay loop */
@@ -81,11 +82,11 @@ void i2c_init(void)
    PBCR2 &= ~0xcc00; /* PB5 abd PB7 */
 
    /* PB5 is "MAS enable". make it output and high */
-   PBIOR |= PB5;
-   PBDR |= PB5;
+   __set_bit_constant(5, &PBIORL);
+   __set_bit_constant(5, &PBDRL);
 
-   /* Set the clock line to an output */
-   PBIOR |= PB13;
+   /* Set the clock line PB13 to an output */
+    __set_bit_constant(13-8, &PBIORH);
    
    SDA_OUTPUT;
    SDA_HI;
@@ -103,9 +104,13 @@ void i2c_ack(int bit)
     
     SCL_LO;      /* Set the clock low */
     if ( bit )
+    {
         SDA_HI;
+    }
     else
+    {
         SDA_LO;
+    }
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
@@ -153,9 +158,13 @@ void i2c_outb(unsigned char byte)
    /* clock out each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
       if ( i & byte )
+      {
          SDA_HI;
+      }
       else
+      {
          SDA_LO;
+      }
       SCL_HI;
       SCL_LO;
    }

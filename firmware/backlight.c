@@ -26,6 +26,7 @@
 #include "rtc.h"
 #include "usb.h"
 #include "power.h"
+#include "system.h"
 
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
@@ -73,7 +74,7 @@ void backlight_thread(void)
                     /* Disable square wave */
                     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
-                    PADR |= 0x4000;
+                    __set_bit_constant(14-8, &PADRH);
 #endif  
                 }
                 /* else if(backlight_timer) */
@@ -83,7 +84,7 @@ void backlight_thread(void)
                     /* Enable square wave */
                     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 #else
-                    PADR &= ~0x4000;
+                    __clear_bit_constant(14-8, &PADRH);
 #endif
                 }
                 break;
@@ -93,7 +94,7 @@ void backlight_thread(void)
                 /* Disable square wave */
                 rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #else
-                PADR |= 0x4000;
+                __set_bit_constant(14-8, &PADRH);
 #endif
                 break;
                 
@@ -171,7 +172,7 @@ void backlight_init(void)
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
 
-    PAIOR |= 0x4000;
+    __set_bit_constant(14-8, &PAIORH);
     
     backlight_on();
 }

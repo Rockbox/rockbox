@@ -607,11 +607,11 @@ int ata_hard_reset(void)
     int ret;
     
     /* state HRR0 */
-    PADR &= ~0x0200; /* assert _RESET */
+    __clear_bit_constant(9-8, &PADRH); /* assert _RESET */
     sleep(1); /* > 25us */
 
     /* state HRR1 */
-    PADR |= 0x0200; /* negate _RESET */
+    __set_bit_constant(9-8, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
 
     /* state HRR2 */
@@ -718,11 +718,11 @@ static int io_address_detect(void)
 void ata_enable(bool on)
 {
     if(on)
-        PADR &= ~0x80; /* enable ATA */
+        __clear_bit_constant(7, &PADRL); /* enable ATA */
     else
-        PADR |= 0x80;   /* disable ATA */
+        __set_bit_constant(7, &PADRL); /* disable ATA */
 
-    PAIOR |= 0x80;
+    __set_bit_constant(7, &PAIORL);
 }
 
 static int identify(void)
@@ -787,8 +787,8 @@ int ata_init(void)
     led(false);
 
     /* Port A setup */
-    PAIOR |= 0x0200; /* output for ATA reset */
-    PADR |= 0x0200; /* release ATA reset */
+    __set_bit_constant(9-8, &PAIORH); /* output for ATA reset */
+    __set_bit_constant(9-8, &PADRH); /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 
     sleeping = false;

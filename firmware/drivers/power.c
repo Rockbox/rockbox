@@ -21,6 +21,7 @@
 #include "config.h"
 #include "adc.h"
 #include "kernel.h"
+#include "system.h"
 #include "power.h"
 
 #ifdef HAVE_CHARGE_CTRL
@@ -32,11 +33,11 @@ bool charger_enabled;
 void power_init(void)
 {
 #ifdef HAVE_CHARGE_CTRL
-    PBIOR |= 0x20;          /* Set charging control bit to output */
-    charger_enable(false);  /* Default to charger OFF */
+    __set_bit_constant(5, &PBIORL); /* Set charging control bit to output */
+    charger_enable(false); /* Default to charger OFF */
 #endif
 #ifdef HAVE_ATA_POWER_OFF
-    PAIOR |= 0x20;
+    __set_bit_constant(5, &PAIORL);
     PACR2 &= 0xFBFF;
 #endif
 }
@@ -60,11 +61,14 @@ bool charger_inserted(void)
 void charger_enable(bool on)
 {
 #ifdef HAVE_CHARGE_CTRL
-    if(on) {
-        PBDR &= ~0x20;
+    if(on) 
+    {
+        __clear_bit_constant(5, &PBDRL);
         charger_enabled = 1;
-    } else {
-        PBDR |= 0x20;
+    } 
+    else 
+    {
+        __set_bit_constant(5, &PBDRL);
         charger_enabled = 0;
     }
 #else
@@ -76,9 +80,9 @@ void ide_power_enable(bool on)
 {
 #ifdef HAVE_ATA_POWER_OFF
     if(on)
-        PADR |= 0x20;
+        __set_bit_constant(5, &PADRL);
     else
-        PADR &= ~0x20;
+        __clear_bit_constant(5, &PADRL);
 #else
     on = on;
 #endif
@@ -88,14 +92,14 @@ void power_off(void)
 {
     set_irq_level(15);
 #ifdef HAVE_POWEROFF_ON_PBDR
-    PBDR &= ~PBDR_BTN_OFF;
-    PBIOR |= PBDR_BTN_OFF;
+    __clear_mask_constant(PBDR_BTN_OFF, &PBDRL);
+    __set_mask_constant(PBDR_BTN_OFF, &PBIORL);
 #elif defined(HAVE_POWEROFF_ON_PB5)
-    PBDR &= ~0x20;
-    PBIOR |= 0x20;
+    __clear_bit_constant(5, &PBDRL);
+    __set_bit_constant(5, &PBIORL);
 #else
-    PADR &= ~0x800;
-    PAIOR |= 0x800;
+    __clear_bit_constant(11-8, &PADRH);
+    __set_bit_constant(11-8, &PAIORH);
 #endif
     while(1);
 }
