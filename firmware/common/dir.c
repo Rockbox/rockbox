@@ -48,7 +48,8 @@ DIR* opendir(char* name)
         return NULL;
     }
 
-    while ( (part = strtok(name, "/")) ) {
+    for ( part = strtok(name, "/"); part;
+          part = strtok(NULL, "/") ) {
         int partlen = strlen(part);
         /* scan dir for name */
         while (1) {
