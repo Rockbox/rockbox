@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "usb.h"
 #include "tree.h"
 #include "main_menu.h"
 #include "sprintf.h"
@@ -35,6 +36,7 @@
 #include "menu.h"
 #include "wps.h"
 #include "settings.h"
+#include "debug.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -393,7 +395,15 @@ bool dirbrowse(char *root)
                     restore = true;
                 }
                 break;
+		
+	    case SYS_USB_CONNECTED:
+		/* Tell the USB thread that we are safe */
+		DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
+		usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
+		/* Wait until the USB cable is extracted again */
+		usb_wait_for_disconnect(&button_queue);
+		break;
         }
 
         if ( restore ) {
