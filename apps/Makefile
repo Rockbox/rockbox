@@ -101,7 +101,7 @@ $(OBJDIR)/librockbox.a:
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
-	 $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - < $< >$@
+	 cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
 	$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
