@@ -50,6 +50,20 @@
 
 #ifdef CONFIG_TUNER
 
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define FM_MENU (BUTTON_F1 | BUTTON_REL)
+#define FM_PRESET (BUTTON_F2 | BUTTON_REL)
+#define FM_RECORD BUTTON_F3
+#define FM_FREEZE BUTTON_PLAY
+#define FM_STOP BUTTON_OFF
+#define FM_EXIT (BUTTON_ON | BUTTON_REL)
+#elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
+#define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
+#define FM_RECORD (BUTTON_MENU | BUTTON_REL)
+#define FM_STOP (BUTTON_OFF | BUTTON_REL)
+#define FM_EXIT (BUTTON_OFF | BUTTON_REPEAT)
+#endif
+
 #define MAX_FREQ (108000000)
 #define MIN_FREQ (87500000)
 #define PLL_FREQ_STEP 10000
@@ -167,10 +181,6 @@ static void remember_frequency(void)
 
 bool radio_screen(void)
 {
-#if CONFIG_KEYPAD != RECORDER_PAD
-    splash(HZ*2, true, "Radio not supported yet");
-    return false;
-#else
     char buf[MAX_PATH];
     bool done = false;
     int button;
@@ -248,8 +258,10 @@ bool radio_screen(void)
     
     curr_preset = find_preset(curr_freq);
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
                   str(LANG_FM_BUTTONBAR_RECORD));
+#endif
 
     while(!done)
     {
@@ -290,7 +302,7 @@ bool radio_screen(void)
             button = button_get_w_tmo(HZ / peak_meter_fps);
         switch(button)
         {
-            case BUTTON_OFF:
+            case FM_STOP:
 #ifndef SIMULATOR
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
@@ -305,7 +317,8 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
 
-            case BUTTON_F3:
+#ifdef FM_RECORD
+            case FM_RECORD:
 #ifndef SIMULATOR
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
@@ -322,8 +335,9 @@ bool radio_screen(void)
 #endif
                 last_seconds = 0;
                 break;
+#endif /* #ifdef FM_RECORD */
 
-            case BUTTON_ON | BUTTON_REL:
+            case FM_EXIT:
                 done = true;
                 keep_playing = true;
                 break;
@@ -380,30 +394,38 @@ bool radio_screen(void)
                 settings_save();
                 break;
 
-            case BUTTON_F1 | BUTTON_REL:
+#ifdef FM_MENU
+            case FM_MENU:
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
+#if CONFIG_KEYPAD == RECORDER_PAD
                 buttonbar_set(str(LANG_BUTTONBAR_MENU),
                               str(LANG_FM_BUTTONBAR_PRESETS),
                               str(LANG_FM_BUTTONBAR_RECORD));
+#endif
                 update_screen = true;
                 break;
+#endif
                 
-            case BUTTON_F2 | BUTTON_REL:
+#ifdef FM_PRESET
+            case FM_PRESET:
                 handle_radio_presets();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
                 lcd_setmargins(0, 8);
+#if CONFIG_KEYPAD == RECORDER_PAD
                 buttonbar_set(str(LANG_BUTTONBAR_MENU),
                               str(LANG_FM_BUTTONBAR_PRESETS),
                               str(LANG_FM_BUTTONBAR_RECORD));
+#endif
                 update_screen = true;
                 break;
+#endif
                 
-#if (BUTTON_UP != BUTTON_PLAY) /* FixMe, this is just to make the Ondio compile */
-            case BUTTON_PLAY:
+#ifdef FM_FREEZE
+            case FM_FREEZE:
                 if(!screen_freeze)
                 {
                     splash(0, true, "Screen frozen");
@@ -512,9 +534,9 @@ bool radio_screen(void)
                 
                 /* Only force the redraw if update_screen is true */
                 status_draw(update_screen);
-                
+#if CONFIG_KEYPAD == RECORDER_PAD
                 buttonbar_draw();
-                
+#endif                
                 lcd_update();
                 
                 update_screen = false;
@@ -558,7 +580,6 @@ bool radio_screen(void)
     }
 #endif
     return have_recorded;
-#endif /* ONDIO */
 }
 
 void radio_save_presets(void)
@@ -636,6 +657,7 @@ static void rebuild_preset_menu(void)
     }
 }
 
+#ifdef FM_PRESET /* FIXME: that was just to kill a warning */
 static bool radio_add_preset(void)
 {
     char buf[27];
@@ -664,6 +686,7 @@ static bool radio_add_preset(void)
     }
     return true;
 }
+#endif /* #ifdef FM_PRESET */
 
 static int handle_radio_presets_menu_cb(int key, int m)
 {
