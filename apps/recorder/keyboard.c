@@ -25,6 +25,7 @@
 #include <string.h>
 #include "font.h"
 #include "screens.h"
+#include "status.h"
 
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
@@ -175,7 +176,7 @@ int kbd_input(char* text, int buflen)
         lcd_invertrect(font_w * x, font_h * y, font_w, font_h);
         lcd_update();
 
-        switch ( button_get(true) ) {
+        switch ( button_get_w_tmo(HZ/2) ) {
 
             case BUTTON_OFF:
                 /* abort */
@@ -282,6 +283,10 @@ int kbd_input(char* text, int buflen)
             case SYS_USB_CONNECTED:
                 usb_screen();
                 lcd_setfont(FONT_SYSFIXED);
+                break;
+
+            case BUTTON_NONE:
+                status_draw(false);
                 break;
         }
     }
