@@ -350,7 +350,7 @@ void game_loop(void)
 		move_down();
 	    }
 	    count++;
-	    sleep(10);
+	    sleep(HZ/10);
 	}
     if(gameover()) {
         int w, h;
@@ -362,7 +362,7 @@ void game_loop(void)
         lcd_putsxy(TETRIS_TITLE_XLOC, TETRIS_TITLE_YLOC, "You lose!",
                    TETRIS_TITLE_FONT);
         lcd_update();
-        sleep(2);
+        sleep(HZ);
         return;
     }
 	move_down();
