@@ -57,11 +57,9 @@
 
 <p>Windows users can also use the the installer: Simply select your model and destination drive.
 
-<h2>Download voice files, fonts and languages</h2>
+<h2>Download voice files</h2>
 <ul>
 <li><a href="/twiki/bin/view/Main/VoiceFiles">Voice files</a>
-<li><a href="/fonts/">Fonts</a>
-<li><a href="/lang/">Language files</a>
 </ul>
 
 <h2>Uninstallation</h2>
