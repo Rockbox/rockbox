@@ -1994,7 +1994,8 @@ static void mpeg_thread(void)
         case MPEG_STOP:
             mpeg_stop_done = true;
             break;
-        default:
+            
+        case SYS_USB_CONNECTED:
             /* Tell the USB thread that we are safe */
             DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
