@@ -706,10 +706,17 @@ int on_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_ON | BUTTON_PLAY | BUTTON_REL:
+                mpeg_resume();
+                exit = true;
+                break;
+
 #ifdef SIMULATOR
             case BUTTON_ON:
 #else
             case BUTTON_ON | BUTTON_REL:
+            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
+            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
 #endif
                 exit = true;
                 break;
