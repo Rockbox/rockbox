@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include "debug.h"
 
+#include "usb.h"
+#include "button.h"
+
 void backlight_on(void)
 {
   /* we could do something better here! */
@@ -83,4 +86,10 @@ void ata_delayed_write(unsigned long sector, void* buf)
 
 void ata_flush(void)
 {
+}
+
+void simulate_usb(void)
+{
+    usb_display_info();
+    button_get(true);
 }
