@@ -211,10 +211,11 @@ SECTIONS
        _edata = .;
         *(.bss)
         *(COMMON)
+        . = ALIGN(0x4);
        _end = .;
     } > DRAM
 
-    .mp3buf :
+    .mp3buf ALIGN(4) :
     {
         _mp3buffer = .;
         mp3buffer = .;
