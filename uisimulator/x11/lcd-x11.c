@@ -37,24 +37,23 @@
  */
 
 #include "lcd-x11.h"
+#include "lcd-playersim.h"
 
 extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 extern void screen_resized(int width, int height);
 extern Display *dpy;
 
+#ifdef HAVE_LCD_BITMAP
 unsigned char lcd_framebuffer_copy[LCD_WIDTH][LCD_HEIGHT/8];
-
-/* this is in uibasic.c */
-extern void drawdots(int color, XPoint *points, int count);
 
 void lcd_update (void)
 {
     int x, y;
     int p=0;
     int bit;
-    XPoint points[LCD_WIDTH * LCD_HEIGHT];
+    struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
     int cp=0;
-    XPoint clearpoints[LCD_WIDTH * LCD_HEIGHT];
+    struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
@@ -86,7 +85,7 @@ void lcd_update (void)
 
     drawdots(0, &clearpoints[0], cp);
     drawdots(1, &points[0], p);
-    /* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n", 
+/* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n", 
        p, cp, p+cp, LCD_HEIGHT*LCD_WIDTH); */
     XSync(dpy,False);
 }
@@ -102,8 +101,8 @@ void lcd_update_rect(int x_start, int y_start,
     int cp=0;
     int xmax;
     int ymax;
-    XPoint points[LCD_WIDTH * LCD_HEIGHT];
-    XPoint clearpoints[LCD_WIDTH * LCD_HEIGHT];
+    struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
+    struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (yline + height)/8;
@@ -150,7 +149,37 @@ void lcd_update_rect(int x_start, int y_start,
    /* printf("lcd_update_rect: Draws %d pixels, clears %d pixels\n", p, cp);*/
     XSync(dpy,False);
 }
+#endif
+#ifdef HAVE_LCD_CHARCELLS
 
+/* Defined in lcd-playersim.c */
+extern void lcd_print_char(int x, int y);
+extern unsigned char lcd_buffer[2][11];
+extern void drawrect(int color, int x1, int y1, int x2, int y2);
+extern bool lcd_display_redraw;
+
+static unsigned char lcd_buffer_copy[2][11];
+
+void lcd_update (void)
+{
+  bool changed=false;
+  int x, y;
+  for (y=0; y<2; y++) {
+    for (x=0; x<11; x++) {
+      if (lcd_display_redraw ||
+          lcd_buffer_copy[y][x] != lcd_buffer[y][x]) {
+        lcd_buffer_copy[y][x] = lcd_buffer[y][x];
+        lcd_print_char(x, y);
+        changed=true;
+      }
+    }
+  }
+  if (changed)
+    XSync(dpy,False);
+  lcd_display_redraw=false;
+}
+
+#endif
 /* -----------------------------------------------------------------
  * local variables:
  * eval: (load-file "../../firmware/rockbox-mode.el")
