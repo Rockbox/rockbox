@@ -278,6 +278,11 @@ static int load_config_buffer( void )
     }
 
 #ifdef HAVE_RTC    
+    if(!correct)
+    {
+        /* If the disk sector was incorrect, reinit the buffer */
+        memset(config_block, 0xff, CONFIG_BLOCK_SIZE);
+    }
     /* read rtc block */
     for (i=0; i < RTC_BLOCK_SIZE; i++ )
         rtc_block[i] = rtc_read(0x14+i);
