@@ -612,10 +612,6 @@ int wps_show(void)
         id3 = mpeg_current_track();
         draw_screen(id3);
     }
-    else if(!id3)
-    {
-      restore  = true;
-    }
 
     while ( 1 )
     {
