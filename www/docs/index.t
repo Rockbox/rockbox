@@ -6,6 +6,7 @@
 <li> <a href="/manual/manual.pdf">User manual</a> (pdf, ~300 KB)
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
+<li> <a href="/screenshots/">Screenshots</a> of Rockbox.
 <p>
 <li> <a href="nodo.html">Features We Will Not Implement</a>
 <li> <a href="features.html">Feature Comparison Chart</a>
