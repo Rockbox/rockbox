@@ -23,4 +23,3 @@
 
 void x11_sleep(int);
 
-#define yield() x11_sleep(5)
