@@ -1430,12 +1430,22 @@ desc: The context menu entry
 eng: "Update VBR file"
 new: "Update VBR bestand"
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Status balk"
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Invert cursor"
+new: "Geïnverteerde cursor"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+new: "Onafhankelijke frames" 
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new: "Scroll balk"
+new: 
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new: 
