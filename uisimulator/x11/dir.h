@@ -33,6 +33,7 @@ extern MYDIR *x11_opendir(char *name);
 extern struct x11_dirent* x11_readdir(MYDIR* dir);
 extern int x11_closedir(MYDIR *dir);
 extern int x11_mkdir(char *name, int mode);
+extern int x11_rmdir(char *name);
 
 #ifndef NO_REDEFINES_PLEASE
 
