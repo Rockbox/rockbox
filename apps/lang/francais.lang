@@ -36,7 +36,7 @@ new: Debug (Danger !)
 id: LANG_USB
 desc: in the main menu
 eng: "USB (sim)"
-new: "USB (sim)
+new: "USB (sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
@@ -394,12 +394,12 @@ new: "Mono"
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-new: "Mono gauche"
+new: "Mono Gauche"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-new: "Mono droit"
+new: "Mono Droit"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -539,7 +539,7 @@ new: "[Liste musicale]"
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
-new: "[Taux de données]"
+new: "[Taux de d'encodage]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
@@ -609,7 +609,7 @@ new:  "<Fin de la liste>"
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
 eng: "Press ON"
-new: "<Appuyer sur ON>"
+new: "Appuyer sur ON"
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
