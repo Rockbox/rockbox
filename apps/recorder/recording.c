@@ -165,9 +165,13 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_PLAY:
-                mpeg_record("");
-                status_set_playmode(STATUS_RECORD);
-                update_countdown = 1; /* Update immediately */
+                /* Only act if the mpeg is stopped */
+                if(!mpeg_status())
+                {
+                    mpeg_record("");
+                    status_set_playmode(STATUS_RECORD);
+                    update_countdown = 1; /* Update immediately */
+                }
                 break;
 
             case BUTTON_UP:
@@ -268,6 +272,12 @@ bool recording_screen(void)
                 if (recording_menu())
                     return SYS_USB_CONNECTED;
                 settings_save();
+                mpeg_set_recording_options(global_settings.rec_frequency,
+                                           global_settings.rec_quality,
+                                           global_settings.rec_source,
+                                           global_settings.rec_channels);
+                
+                set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
 
