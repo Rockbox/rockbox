@@ -47,6 +47,9 @@ extern int open(const char*, int, ...);
 extern int close(int fd);
 extern int read(int, void*, unsigned int);
 extern long lseek(int, long, int);
+extern int creat(const char *, int);
+extern int write(int, const void*, unsigned int);
+extern int remove(const char*);
 
 #else
 
