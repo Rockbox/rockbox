@@ -8,7 +8,7 @@ sub fixline {
 
     $_ =~ s/(http:\/\/([a-zA-Z0-9_.\/-]*)[^\) .\n])/\<a href=\"$1\"\>$1\<\/a\>/g;
 
-    $_ =~ s/^$/\&nbsp;/g;   # empty lines are nbsp
+    $_ =~ s/^\s*$/\&nbsp;\n/g;   # empty lines are nbsp
     $_ =~ s/(\\|\/)$/$1&nbsp;/g; # clobber backslash on end of line
 }
 
@@ -18,7 +18,7 @@ while(<STDIN>) {
 
     # detect and mark Q-sections
     if( $_ =~ /^Q(\d*)/) {
-        print "</pre>\n<a name=\"$1\"></a><p class=\"faqq\">$_";
+        print "</pre>\n<a name=\"$1\"></a><div class=\"faqq\">$_";
         my $line;
         while(<STDIN>) {
 
@@ -32,7 +32,7 @@ while(<STDIN>) {
                 last;
             }
         }
-        print "</p>\n<pre class=\"faqa\">\n$line";
+        print "</div>\n<pre class=\"faqa\">$line";
         next;
     }
 
