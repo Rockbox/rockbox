@@ -653,14 +653,22 @@ int wps_show(void)
         restore = true;
     }
 
-    if (mpeg_status() & MPEG_STATUS_PAUSE) {
-        paused = true;
-    } else {
-        paused = false;
-    }
-
     while ( 1 )
     {
+        /* did someone else (i.e power thread) change mpeg pause mode? */
+        if (paused != (mpeg_status() & MPEG_STATUS_PAUSE)) {
+            paused = mpeg_status() & MPEG_STATUS_PAUSE;
+            status_set_playmode(paused ? STATUS_PAUSE : STATUS_PLAY);
+
+            /* if another thread paused mpeg, we are probably in car mode,
+               about to shut down. lets save the settings. */
+            if (paused && global_settings.resume) {
+                settings_save();
+#ifndef HAVE_RTC
+                ata_flush();
+#endif
+            }
+        }
 
 #ifdef HAVE_LCD_BITMAP
         /* when the peak meter is enabled we want to have a

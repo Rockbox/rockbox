@@ -119,6 +119,7 @@ void status_draw(bool force_redraw)
     info.shuffle = global_settings.playlist_shuffle;
     info.keylock = keys_locked;
     info.repeat = global_settings.repeat_mode;
+    info.playmode = current_mode;
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||

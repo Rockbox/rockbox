@@ -64,11 +64,18 @@ void set_battery_capacity(int capacity)
 {
   (void)capacity;
 }
+
+void set_car_adapter_mode(bool setting)
+{
+    (void)setting;
+}
+
 #else /* not SIMULATOR */
 
 int battery_capacity = 1500;   /* only a default value */
 int battery_level_cached = -1; /* battery level of this minute, updated once
                                   per minute */
+static bool car_adapter_mode_enabled = false;
 
 static int poweroff_idle_timeout_value[15] =
 {
@@ -306,8 +313,8 @@ static void handle_auto_poweroff(void)
 #endif
        !usb_inserted() &&
        (mpeg_stat == 0 ||
-        (mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)) &&
-        !sleeptimer_active))
+        ((mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)) &&
+         !sleeptimer_active)))
     {
         if(TIME_AFTER(current_tick, last_keypress + timeout) &&
            TIME_AFTER(current_tick, last_disk_activity + timeout))
@@ -345,6 +352,78 @@ static void handle_auto_poweroff(void)
         }
     }
 }
+
+void set_car_adapter_mode(bool setting)
+{
+    car_adapter_mode_enabled = setting;
+}
+
+static void car_adapter_mode_processing(void)
+{
+    static bool charger_power_is_on = false;
+    static bool waiting_to_resume_play = false;
+    static long play_resume_time;
+    
+    if (car_adapter_mode_enabled) {
+
+        if (waiting_to_resume_play) {
+            if (TIME_AFTER(current_tick, play_resume_time)) {
+                if (mpeg_status() & MPEG_STATUS_PAUSE) {
+                    mpeg_resume(); 
+                }
+                waiting_to_resume_play = false;
+            }
+        }
+        else {
+            if (charger_power_is_on) {
+
+                /* if external power was turned off */
+                if (!charger_inserted()) { 
+
+                    charger_power_is_on = false;
+
+                    /* if playing */
+                    if ((mpeg_status() & MPEG_STATUS_PLAY) &&
+                        !(mpeg_status() & MPEG_STATUS_PAUSE)) {
+                        mpeg_pause(); 
+                    }
+                }
+            }
+            else { 
+                /* if external power was turned on */
+                if (charger_inserted()) { 
+
+                    charger_power_is_on = true;
+
+                    /* if paused */
+                    if (mpeg_status() & MPEG_STATUS_PAUSE) {
+                        /* delay resume a bit while the engine is cranking */
+                        play_resume_time = current_tick + HZ*5;
+                        waiting_to_resume_play = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+ * This function is called to do the relativly long sleep waits from within the
+ * main power_thread loop while at the same time servicing any other periodic
+ * functions in the power thread which need to be called at a faster periodic
+ * rate than the slow periodic rate of the main power_thread loop
+ */
+static void power_thread_sleep(int ticks)
+{
+    while (ticks > 0) {
+        int small_ticks = MIN(HZ/2, ticks);
+        sleep(small_ticks);
+        ticks -= small_ticks;
+
+        car_adapter_mode_processing();
+    }
+}
+
 
 /*
  * This power thread maintains a history of battery voltage
@@ -389,7 +468,7 @@ static void power_thread(void)
                 avg += adc_read(ADC_UNREG_POWER);
                 ok_samples++;
             }
-            sleep(HZ*POWER_AVG_SLEEP);
+            power_thread_sleep(HZ*POWER_AVG_SLEEP);
         }
         avg = avg / ((ok_samples) ? ok_samples : spin_samples);
 
@@ -580,7 +659,7 @@ static void power_thread(void)
 
                 /* charge the calculated amount of seconds */                
                 charger_enable(true);
-                sleep(HZ * trickle_sec);
+                power_thread_sleep(HZ * trickle_sec);
                 charger_enable(false);             
 
                 /* trickle charging long enough? */
@@ -686,7 +765,7 @@ static void power_thread(void)
         i = 60 - POWER_AVG_N * POWER_AVG_SLEEP;
 #endif
         if (i > 0)
-          sleep(HZ*(i));
+            power_thread_sleep(HZ*(i));
 
         handle_auto_poweroff();
     }

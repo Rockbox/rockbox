@@ -133,6 +133,8 @@ Rest of config block, only saved to disk:
 0xAC  Max number of files in dir (50-10000)
 0xAE  fade on pause/unpause/stop setting (bit 0)
       caption backlight (bit 1)
+      car adapter mode (bit 2)
+0xAF  [available/unused]
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
 0xB2  peak meter min either in -db or in percent
@@ -402,7 +404,8 @@ int settings_save( void )
         (global_settings.max_files_in_dir >> 8) & 0xff;
     config_block[0xae] = (unsigned char)
         ((global_settings.fade_on_stop & 1) |
-         ((global_settings.caption_backlight & 1) << 1));
+         ((global_settings.caption_backlight & 1) << 1) |
+         ((global_settings.car_adapter_mode  & 1) << 2));
     config_block[0xb0] = (unsigned char)global_settings.peak_meter_clip_hold |
         (global_settings.peak_meter_performance ? 0x80 : 0);
     config_block[0xb1] = global_settings.peak_meter_release |
@@ -542,6 +545,8 @@ void settings_apply(void)
                  global_settings.lang_file);
         lang_load(buf);
     }
+
+    set_car_adapter_mode(global_settings.car_adapter_mode);
 }
 
 /*
@@ -684,6 +689,7 @@ void settings_load(void)
         if (config_block[0xae] != 0xff) {
             global_settings.fade_on_stop = config_block[0xae] & 1;
             global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
+            global_settings.car_adapter_mode  = (config_block[0xae] >> 2) & 1;
         }
 
         if(config_block[0xb0] != 0xff) {
@@ -1070,6 +1076,8 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "max files in playlist"))
             set_cfg_int(&global_settings.max_files_in_playlist, value,
                         1000, 20000);
+        else if (!strcasecmp(name, "car adapter mode"))
+            set_cfg_bool(&global_settings.car_adapter_mode, value);
         else if (!strcasecmp(name, "recursive directory insert")) {
             static char* options[] = {"off", "on", "ask"};
             set_cfg_option(&global_settings.recursive_dir_insert, value,
@@ -1330,6 +1338,9 @@ bool settings_save_config(void)
                 options[global_settings.poweroff]);
     }
 
+    fprintf(fd, "car adapter mode: %s\r\n",
+            boolopt[global_settings.car_adapter_mode]);
+
 #ifdef HAVE_MAS3587F
     fprintf(fd, "#\r\n# Recording\r\n#\r\n");
     fprintf(fd, "rec quality: %d\r\n", global_settings.rec_quality);
@@ -1456,6 +1467,7 @@ void settings_reset(void) {
     global_settings.topruntime = 0;
     global_settings.fade_on_stop = true;
     global_settings.caption_backlight = false;
+    global_settings.car_adapter_mode = false;
     global_settings.max_files_in_dir = 400;
     global_settings.max_files_in_playlist = 10000;
     global_settings.show_icons = true;

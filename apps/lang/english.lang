@@ -1757,3 +1757,8 @@ id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Plugins"
 new:
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: 

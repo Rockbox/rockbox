@@ -44,6 +44,15 @@
 #endif
 #include "lang.h"
 
+static bool car_adapter_mode(void)
+{
+    return set_bool_options( str(LANG_CAR_ADAPTER_MODE),
+                             &global_settings.car_adapter_mode,
+                             str(LANG_SET_BOOL_YES),
+                             str(LANG_SET_BOOL_NO),
+                             set_car_adapter_mode);
+}
+
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
@@ -901,6 +910,7 @@ static bool system_settings_menu(void)
         { str(LANG_TIMEFORMAT),  timeformat_set  },
 #endif
         { str(LANG_POWEROFF_IDLE),  poweroff_idle_timer },
+        { str(LANG_CAR_ADAPTER_MODE), car_adapter_mode },
         { str(LANG_RESET),          reset_settings },
     };
     

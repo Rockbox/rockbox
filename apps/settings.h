@@ -135,6 +135,7 @@ struct user_settings
     bool peak_meter_performance;  /* true: high performance, else save energy*/
     int peak_meter_min; /* range minimum */
     int peak_meter_max; /* range maximum */
+    bool car_adapter_mode; /* 0=off 1=on */
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
