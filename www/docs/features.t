@@ -138,7 +138,7 @@ YES
 EFEAT
 
 NAME Generates XING VBR header when recording ENAME
-TD Soon ETD
+YES
 NO
 EFEAT
 
