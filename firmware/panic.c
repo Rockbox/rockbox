@@ -19,10 +19,12 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include "panic.h"
 #include "lcd.h"
 #include "font.h"
 #include "debug.h"
+#include "led.h"
 
 static char panic_buf[128];
 
@@ -34,6 +36,8 @@ void panicf( char *fmt, ...)
     va_list ap;
 
 #ifndef SIMULATOR
+    bool state = false;
+
     /* Disable interrupts */
     asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
 #endif
@@ -44,17 +48,36 @@ void panicf( char *fmt, ...)
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
-    lcd_puts(0,0,panic_buf);
+    lcd_puts(0,0,"*PANIC*");
+    lcd_puts(0,1,panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
-    
     lcd_setfont(FONT_SYSFIXED);
-    lcd_putsxy(0,0,panic_buf);
+    lcd_puts(0,0,"*PANIC*");
+    {
+        /* wrap panic line */
+        int i, y=1, len = strlen(panic_buf);
+        for (i=0; i<len; i+=18) {
+            unsigned char c = panic_buf[i+18];
+            panic_buf[i+18] = 0;
+            lcd_puts(0,y++,panic_buf+i);
+            panic_buf[i+18] = c;
+        }
+    }
     lcd_update();
 
 #else
     /* no LCD */
 #endif
     DEBUGF(panic_buf);
-    while(1);
+    while (1)
+    {
+#ifndef SIMULATOR
+        volatile int i;
+        led (state);
+        state = state?false:true;
+        
+        for (i = 0; i < 400000; ++i);
+#endif
+    }
 }
