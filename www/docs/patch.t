@@ -40,8 +40,14 @@ changes done to multiple:
  diff programs don't have that, and then -c (for 'context diff') is OK.
 
 <h2>Submitting A Patch</h2>
-<p>All patches that are meant for inclusion in the sources should follow the 
-format listed on the <a href="contributing.html">Contributing to Rockbox</a> page, and be posted to the <a href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch tracker</a>.  Patches sent to the mailing list are quickly lost in the traffic of the list itself.
+
+<p>All patches that are meant for inclusion in the sources should follow the
+format listed on the <a href="contributing.html">Contributing to Rockbox</a>
+page, and be posted to the <a
+href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch
+tracker</a>.  Patches sent to the mailing list are quickly lost in the traffic
+of the list itself.
+
 <p>
  Please keep in mind that not all submitted patches will be accepted.
 
@@ -69,5 +75,15 @@ manually.
   patch -p2 < patchfile
 </pre>
  ... each example line removes one extra level of dir info from the left.
+<p>
+ You can use the --dry-run option to patch to make sure that the patch applies
+clean. It doesn't actually apply the patch, only prints what would happen if
+you run it.
+<p>
+ You can remove a patch again from the sources by doing the reverse action of
+a specific patch. You do this with the -R (or --reverse) options, such as:
+<pre>
+  patch -p1 -R < patchfile
+</pre>
 
 #include "foot.t"
