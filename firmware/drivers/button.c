@@ -72,7 +72,6 @@ static void button_tick(void)
     if(btn)
     {
         queue_post(&button_queue, btn, NULL);
-        backlight_on();
     }   
     
     /* only poll every X ticks */
