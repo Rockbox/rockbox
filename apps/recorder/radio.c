@@ -674,6 +674,11 @@ static int handle_radio_presets_menu_cb(int key, int m)
         case BUTTON_F3 | BUTTON_REL:
             key = MENU_EXIT; /* Fake an exit */
             break;
+            
+       case BUTTON_F3:
+          /* Ignore the DOWN events */
+          key = BUTTON_NONE;
+          break;
     }
 #endif
     return key;
@@ -760,6 +765,13 @@ int handle_radio_presets_cb(int key, int m)
             else
                 key = BUTTON_NONE;
             break;
+            
+       case BUTTON_F1:
+       case BUTTON_F2:
+       case BUTTON_F3:
+          /* Ignore the DOWN events */
+          key = BUTTON_NONE;
+          break;
     }
     return key;
 #endif
