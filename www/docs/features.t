@@ -278,6 +278,11 @@ TD 4 ETD
 TD 12 ETD
 EFEAT
 
+NAME Speaking Menus Support ENAME
+YES
+NO
+EFEAT
+
 </table>
 
 <p>
