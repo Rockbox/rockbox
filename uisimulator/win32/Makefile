@@ -19,6 +19,13 @@
 
 APPDIR = ../../apps
 RECDIR = $(APPDIR)/recorder
+PLAYDIR = $(APPDIR)/player
+
+ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+     MACHINEDIR = $(RECDIR)
+else
+     MACHINEDIR = $(PLAYDIR)
+endif
 
 PREVAPPDIR= ..
 FIRMWAREDIR = ../../firmware
@@ -42,7 +49,7 @@ $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\"
 LDFLAGS =  -lgdi32 -luser32  -mwindows
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR) -I../common
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(MACHINEDIR) -I../common -I$(MACHINEDIR)
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
@@ -56,13 +63,13 @@ APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c usb.c \
         mpeg.c powermgmt.c
 
-APPS = main.c tree.c menu.c credits.c main_menu.c\
+APPS = main.c tree.c menu.c credits.c main_menu.c icons.c \
 	playlist.c showtext.c wps.c wps-display.c settings.c status.c
 
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
 ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
-   APPS += tetris.c sokoban.c blank.c bounce.c boxes.c icons.c bmp.c \
+   APPS += tetris.c sokoban.c blank.c bounce.c boxes.c bmp.c \
 	widgets.c wormlet.c
 endif
 
@@ -108,7 +115,7 @@ $(OBJDIR)/screensavers_menu.o: $(APPDIR)/screensavers_menu.c
 $(OBJDIR)/settings_menu.o: $(APPDIR)/settings_menu.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
-$(OBJDIR)/icons.o: $(RECDIR)/icons.c
+$(OBJDIR)/icons.o: $(MACHINEDIR)/icons.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/widgets.o: $(RECDIR)/widgets.c
