@@ -1,5 +1,13 @@
 #!/usr/bin/perl
 
+sub filesize {
+    my ($filename)=@_;
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks)
+        = stat($filename);
+    return $size;
+}
+
 sub buildlangs {
     my ($outputlang)=@_;
     my $dir = "../apps/lang";
@@ -54,6 +62,16 @@ sub buildzip {
         my @fonts = grep { /\.bdf$/ && -f "../fonts/$_" } readdir(DIR);
         closedir DIR;
 
+        my $maxfont;
+        open(HEADER, "<../firmware/export/font.h");
+        while(<HEADER>) {
+            if(/^\#define MAX_FONT_SIZE[ \t]*(\d+)/) {
+                $maxfont = $1;
+            }
+        }
+        close(HEADER);
+        die "no decent max font size" if ($maxfont < 2000);
+        
         for(@fonts) {
             my $f = $_;
 
@@ -63,6 +81,14 @@ sub buildzip {
             my $cmd ="../tools/convbdf -s 32 -l 255 -f -o \".rockbox/fonts/$o\" \"../fonts/$f\" >/dev/null 2>&1";
             print "CMD: $cmd\n" if($verbose);
             `$cmd`;
+            
+            # no need to add fonts we cannot load anyway
+            my $fontsize = filesize(".rockbox/fonts/$o");
+            print STDERR "$maxfont $fontsize $o\n";
+            if($fontsize > $maxfont) {
+                print STDERR "unlink\n";
+                unlink(".rockbox/fonts/$o");
+            }
         }
 
         if($image) {
