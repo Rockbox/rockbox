@@ -46,7 +46,7 @@
 #include "version.h"
 #include "sprintf.h"
 #include "font.h"
-
+#include "language.h"
 
 char appsversion[]=APPSVERSION;
 
@@ -69,6 +69,7 @@ void init(void)
     settings_reset();
     settings_load();
     font_load(ROCKBOX_DIR "/default.fnt");
+    lang_load(ROCKBOX_DIR "/default.lng");
     sleep(HZ/2);
 }
 
@@ -147,6 +148,7 @@ void init(void)
     
     settings_load();
     font_load(ROCKBOX_DIR "/default.fnt");
+    lang_load(ROCKBOX_DIR "/default.lng");
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
