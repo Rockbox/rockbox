@@ -58,12 +58,12 @@
 /* global variables */
 
 struct plugin_api* rb; /* global api struct pointer */
-int x;
-int draw_mode;
-bool scroll;
+int x = 0;
+int draw_mode = DRAW_MODE_FILLED;
+bool scroll = true;
 int left_val;
 int right_val;
-bool new_val;
+bool new_val = false;
 
 /* prototypes */
 
@@ -202,11 +202,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
 
-    x = 0;
-    draw_mode = DRAW_MODE_FILLED;
-    scroll = true;
-    new_val = false;
-
     rb->plugin_register_timer(FREQ / 67, 1, timer_isr);
 
     while (!exit)
@@ -220,7 +215,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         rb->yield();
 
-        button = rb->button_get(false);
+        button = rb->button_get(paused);
         switch (button)
         {
             case OSCILLOSCOPE_QUIT:
