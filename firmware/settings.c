@@ -63,16 +63,18 @@ void reset_settings( user_settings_t *settings ) {
         
     DEBUGF( "reset_settings()\n" );
 
-    settings->volume     = DEFAULT_VOLUME_SETTING;
-    settings->balance    = DEFAULT_BALANCE_SETTING;
-    settings->bass       = DEFAULT_BASS_SETTING;
-    settings->treble     = DEFAULT_TREBLE_SETTING;
-    settings->loudness   = DEFAULT_LOUDNESS_SETTING;
-    settings->bass_boost = DEFAULT_BASS_BOOST_SETTING;
-    settings->contrast   = DEFAULT_CONTRAST_SETTING;
-    settings->poweroff   = DEFAULT_POWEROFF_SETTING;
-    settings->backlight  = DEFAULT_BACKLIGHT_SETTING;
+    settings->volume      = DEFAULT_VOLUME_SETTING;
+    settings->balance     = DEFAULT_BALANCE_SETTING;
+    settings->bass        = DEFAULT_BASS_SETTING;
+    settings->treble      = DEFAULT_TREBLE_SETTING;
+    settings->loudness    = DEFAULT_LOUDNESS_SETTING;
+    settings->bass_boost  = DEFAULT_BASS_BOOST_SETTING;
+    settings->contrast    = DEFAULT_CONTRAST_SETTING;
+    settings->poweroff    = DEFAULT_POWEROFF_SETTING;
+    settings->backlight   = DEFAULT_BACKLIGHT_SETTING;
+    settings->wps_display = DEFAULT_WPS_DISPLAY;
 }
+
 
 /*
  * dump the list of current settings

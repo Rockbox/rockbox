@@ -55,6 +55,10 @@ typedef struct
 
     int loop_playlist; /* do we return to top of playlist at end?            */
 
+
+    /* while playing screen settings  */
+    int wps_display;
+
 } user_settings_t;
 
 /* prototypes */
@@ -78,6 +82,6 @@ extern user_settings_t global_settings;
 #define DEFAULT_CONTRAST_SETTING    0
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5
-
+#define DEFAULT_WPS_DISPLAY         0 
 
 #endif /* __SETTINGS_H__ */
