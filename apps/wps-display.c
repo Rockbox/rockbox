@@ -374,6 +374,8 @@ static char* get_tag(struct mp3entry* id3,
                 case 'b':  /* progress bar */
                     *flags |= WPS_REFRESH_PLAYER_PROGRESS;
 #ifdef HAVE_LCD_CHARCELLS
+                    if (wps_progress_pat==0)
+                      wps_progress_pat=lcd_get_locked_pattern();
                     snprintf(buf, buf_size, "%c", wps_progress_pat);
                     return buf;
 #else
