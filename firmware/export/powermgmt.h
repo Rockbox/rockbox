@@ -24,20 +24,25 @@
 #define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
 #define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
 #define BATTERY_LEVEL_FULL       400 /* 4.00V */
+#define BATTERY_CAPACITY_MIN 2200
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
 #elif CONFIG_BATTERY == BATT_3AAA_ALKALINE /* Ondio, Alkalines */
 #define BATTERY_LEVEL_SHUTDOWN   250 /* 2.50V */
 #define BATTERY_LEVEL_EMPTY      260 /* 2.60V */
 #define BATTERY_LEVEL_DANGEROUS  270 /* 2.80V */
 #define BATTERY_LEVEL_FULL       450 /* 4.50V */
+#define BATTERY_CAPACITY_MIN 1000
+#define BATTERY_CAPACITY_MAX 2000 /* max. capacity selectable in settings */
 #else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
 #define BATTERY_LEVEL_DANGEROUS  475 /* 4.75V */
 #define BATTERY_LEVEL_FULL       585 /* 5.85V */
+#define BATTERY_CAPACITY_MIN 1500
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
 #endif
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity that can be selected in settings menu, min. is always 1500 */
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 #define POWER_AVG_N       4      /* how many samples to take for each measurement */

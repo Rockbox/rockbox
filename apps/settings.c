@@ -217,13 +217,9 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(discharge), 0, "deep discharge", off_on },
     {1, S_O(trickle_charge), true, "trickle charge", off_on },
 #endif
-#if CONFIG_BATTERY == BATT_LIION2200
-    {12, S_O(battery_capacity), 2200, "battery capacity", NULL }, /* 1500...3200 */
-#elif CONFIG_BATTERY == BATT_4AA_NIMH
-    {12, S_O(battery_capacity), 1500, "battery capacity", NULL }, /* 1500...3200 */
-#elif CONFIG_BATTERY == BATT_3AAA_ALKALINE
-    {12, S_O(battery_capacity), 1000, "battery capacity", NULL },
-#endif
+    {12, S_O(battery_capacity), BATTERY_CAPACITY_MIN, "battery capacity",
+         NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,
+                    1000...2000 for Alkaline */
 #ifdef HAVE_CHARGING
     {1, S_O(car_adapter_mode), false, "car adapter mode", off_on },
 #endif
