@@ -242,6 +242,9 @@ int mpeg_sound_default(int setting)
 static bool mpeg_is_initialized = false;
 #endif
 
+#if CONFIG_HWCODEC != MASNONE
+/* FIX: this code pretty much assumes a MAS */
+
 #ifndef SIMULATOR
 
 unsigned long mas_version_code;
@@ -366,7 +369,7 @@ static void mas_poll_start(void)
 
     TSTR |= 0x02; /* Start timer 1 */
 }
-#else
+#elif CONFIG_HWCODEC != MASNONE
 static void postpone_dma_tick(void)
 {
     unsigned int count;
@@ -1177,3 +1180,52 @@ unsigned char* mp3_get_pos(void)
 
 
 #endif /* #ifndef SIMULATOR */
+
+#else /* CONFIG_HWCODEC != MASNONE */
+void mp3_init(int volume, int bass, int treble, int balance, int loudness,
+              int avc, int channel_config, int stereo_width,
+              int mdb_strength, int mdb_harmonics,
+              int mdb_center, int mdb_shape, bool mdb_enable,
+              bool superbass)
+{
+    /* a dummy */
+}
+void mp3_shutdown(void)
+{
+    /* a dummy */
+}
+void mp3_play_data(const unsigned char* start, int size,
+                   void (*get_more)(unsigned char** start, int* size))
+{
+    /* a dummy */
+}
+
+void mp3_play_stop(void)
+{
+    /* a dummy */
+}
+
+void mp3_play_pause(bool play)
+{
+    /* a dummy */
+}
+
+void mpeg_sound_set(int setting, int value)
+{
+    /* a dummy */
+}
+bool mp3_is_playing(void)
+{
+    /* a dummy */
+}
+
+int mpeg_val2phys(int setting, int value)
+{
+    return value; /* FIX dummy */
+}
+unsigned char* mp3_get_pos(void)
+{
+    /* a dummy */
+    return 0x1234;
+}
+#endif /* CONFIG_HWCODEC == MASNONE */
