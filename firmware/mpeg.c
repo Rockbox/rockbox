@@ -1717,18 +1717,40 @@ static void mpeg_thread(void)
                         t2 = current_tick;
                         DEBUGF("time: %d\n", t2 - t1);
                         DEBUGF("R: %x\n", len);
-
-                        /* Make sure that the write pointer is at a word
-                           boundary when we reach the end of the file */
-                        if (len < amount_to_read) {
-                            /* Skip id3v1 tag */
-                            DEBUGF("Skipping ID3v1 tag\n");
-                            len -= id3tags[tag_read_idx]->id3.id3v1len;
-                            /* The very rare case when the buffer wrapped
-                               inside the tag must be taken care of */
-                            if(len < 0)
-                                len = 0;
-                       }
+                        
+                        /* Now make sure that we don't feed the MAS with ID3V1
+                           data */
+                        if (len < amount_to_read)
+                        {
+                            int tagptr = mp3buf_write + len - 128;
+                            int i;
+                            char *tag = "TAG";
+                            int taglen = 128;
+                            
+                            for(i = 0;i < 3;i++)
+                            {
+                                if(tagptr >= mp3buflen)
+                                    tagptr -= mp3buflen;
+                                
+                                if(mp3buf[tagptr] != tag[i])
+                                    taglen = 0;
+                                
+                                tagptr++;
+                            }
+                            
+                            if(taglen)
+                            {
+                                /* Skip id3v1 tag */
+                                DEBUGF("Skipping ID3v1 tag\n");
+                                len -= taglen;
+                                
+                                /* The very rare case when the entire tag
+                                   wasn't read in this read() call must be
+                                   taken care of */
+                                if(len < 0)
+                                    len = 0;
+                            }
+                        }
 
                         mp3buf_write += len;
                         
