@@ -32,9 +32,14 @@
 #include "lang.h"
 
 #ifdef SIMULATOR
-#include <dlfcn.h>
-#include <debug.h>
-#define PREFIX(_x_) x11_ ## _x_
+  #include <debug.h>
+  #ifdef WIN32
+    #include "plugin-win32.h"
+    #define PREFIX(_x_) _x_
+  #else
+    #include <dlfcn.h>
+    #define PREFIX(_x_) x11_ ## _x_
+  #endif
 #else
 #define PREFIX(_x_) _x_
 #endif
@@ -141,7 +146,11 @@ int plugin_load(char* plugin, void* parameter)
     lcd_update();
 #endif
 #ifdef SIMULATOR
+#ifdef WIN32
+    snprintf(path, sizeof path, "%s", plugin);
+#else
     snprintf(path, sizeof path, "archos%s", plugin);
+#endif
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
         snprintf(buf, sizeof buf, "Can't open %s", plugin);
