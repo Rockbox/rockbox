@@ -57,12 +57,12 @@ void dbg_os(void)
 
     while(1)
     {
-	lcd_puts(0, 0, "Stack usage:");
+        lcd_puts(0, 0, "Stack usage:");
         for(i = 0; i < num_threads;i++)
         {
             usage = thread_stack_usage(i);
-	    snprintf(buf, 32, "%s: %d%%", thread_name[i], usage);
-	    lcd_puts(0, 1+i, buf);
+            snprintf(buf, 32, "%s: %d%%", thread_name[i], usage);
+            lcd_puts(0, 1+i, buf);
         }
 
         lcd_update();
@@ -72,8 +72,9 @@ void dbg_os(void)
 
         switch(button)
         {
-            case BUTTON_OFF:
-                return;
+        case BUTTON_OFF:
+        case BUTTON_LEFT:
+            return;
         }
     }
 }
@@ -89,11 +90,11 @@ void dbg_os(void)
 
     while(1)
     {
-	lcd_puts(0, 0, "Stack usage");
+        lcd_puts(0, 0, "Stack usage");
 
-	usage = thread_stack_usage(currval);
-	snprintf(buf, 32, "%d: %d%%  ", currval, usage);
-	lcd_puts(0, 1, buf);
+        usage = thread_stack_usage(currval);
+        snprintf(buf, 32, "%d: %d%%  ", currval, usage);
+        lcd_puts(0, 1, buf);
 	
         sleep(HZ/10);
 
@@ -101,20 +102,20 @@ void dbg_os(void)
 
         switch(button)
         {
-            case BUTTON_STOP:
-                return;
+        case BUTTON_STOP:
+            return;
 
 	    case BUTTON_LEFT:
-                currval--;
-                if(currval < 0)
-                    currval = num_threads-1;
-                break;
+            currval--;
+            if(currval < 0)
+                currval = num_threads-1;
+            break;
 
-            case BUTTON_RIGHT:
-                currval++;
-                if(currval > num_threads-1)
-                    currval = 0;
-                break;
+        case BUTTON_RIGHT:
+            currval++;
+            if(currval > num_threads-1)
+                currval = 0;
+            break;
         }
     }
 }
@@ -175,20 +176,20 @@ void dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_ON:
-                charge_status = charge_status?false:true;
-                charger_enable(charge_status);
-                break;
+        case BUTTON_ON:
+            charge_status = charge_status?false:true;
+            charger_enable(charge_status);
+            break;
                 
-            case BUTTON_UP:
-                ide_status = ide_status?false:true;
-                ide_power_enable(ide_status);
-                break;
+        case BUTTON_UP:
+            ide_status = ide_status?false:true;
+            ide_power_enable(ide_status);
+            break;
 
-            case BUTTON_OFF:
-                charger_enable(false);
-                ide_power_enable(true);
-                return;
+        case BUTTON_OFF:
+            charger_enable(false);
+            ide_power_enable(true);
+            return;
         }
     }
 }
@@ -215,45 +216,45 @@ void dbg_ports(void)
 
         switch(currval)
         {
-            case 0:
-                snprintf(buf, 32, "PADR: %04x  ", porta);
-                break;
-            case 1:
-                snprintf(buf, 32, "PBDR: %04x  ", portb);
-                break;
-            case 2:
-                snprintf(buf, 32, "AN0: %03x  ", adc_read(0));
-                break;
-            case 3:
-                snprintf(buf, 32, "AN1: %03x  ", adc_read(1));
-                break;
-            case 4:
-                snprintf(buf, 32, "AN2: %03x  ", adc_read(2));
-                break;
-            case 5:
-                snprintf(buf, 32, "AN3: %03x  ", adc_read(3));
-                break;
-            case 6:
-                snprintf(buf, 32, "AN4: %03x  ", adc_read(4));
-                break;
-            case 7:
-                snprintf(buf, 32, "AN5: %03x  ", adc_read(5));
-                break;
-            case 8:
-                snprintf(buf, 32, "AN6: %03x  ", adc_read(6));
-                break;
-            case 9:
-                snprintf(buf, 32, "AN7: %03x  ", adc_read(7));
-                break;
-            case 10:
-                snprintf(buf, 32, "%s, 0x%x ",
-                         ata_device?"slv":"mst", ata_io_address);
-                break;
-            case 11:
-                mas_readmem(MAS_BANK_D0, 0x303, &crc_count, 1);
+        case 0:
+            snprintf(buf, 32, "PADR: %04x  ", porta);
+            break;
+        case 1:
+            snprintf(buf, 32, "PBDR: %04x  ", portb);
+            break;
+        case 2:
+            snprintf(buf, 32, "AN0: %03x  ", adc_read(0));
+            break;
+        case 3:
+            snprintf(buf, 32, "AN1: %03x  ", adc_read(1));
+            break;
+        case 4:
+            snprintf(buf, 32, "AN2: %03x  ", adc_read(2));
+            break;
+        case 5:
+            snprintf(buf, 32, "AN3: %03x  ", adc_read(3));
+            break;
+        case 6:
+            snprintf(buf, 32, "AN4: %03x  ", adc_read(4));
+            break;
+        case 7:
+            snprintf(buf, 32, "AN5: %03x  ", adc_read(5));
+            break;
+        case 8:
+            snprintf(buf, 32, "AN6: %03x  ", adc_read(6));
+            break;
+        case 9:
+            snprintf(buf, 32, "AN7: %03x  ", adc_read(7));
+            break;
+        case 10:
+            snprintf(buf, 32, "%s, 0x%x ",
+                     ata_device?"slv":"mst", ata_io_address);
+            break;
+        case 11:
+            mas_readmem(MAS_BANK_D0, 0x303, &crc_count, 1);
                 
-                snprintf(buf, 32, "CRC: %d    ", crc_count);
-                break;
+            snprintf(buf, 32, "CRC: %d    ", crc_count);
+            break;
         }
         lcd_puts(0, 0, buf);
         
@@ -270,20 +271,20 @@ void dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_STOP:
-                return;
+        case BUTTON_STOP:
+            return;
 
-            case BUTTON_LEFT:
-                currval--;
-                if(currval < 0)
-                    currval = 11;
-                break;
+        case BUTTON_LEFT:
+            currval--;
+            if(currval < 0)
+                currval = 11;
+            break;
 
-            case BUTTON_RIGHT:
-                currval++;
-                if(currval > 11)
-                    currval = 0;
-                break;
+        case BUTTON_RIGHT:
+            currval++;
+            if(currval > 11)
+                currval = 0;
+            break;
         }
     }
 }
@@ -319,20 +320,20 @@ void dbg_rtc(void)
 
         switch(button)
         {
-            case BUTTON_DOWN:
-                if (addr < 63-16) { addr += 16; }
-                break;
-            case BUTTON_UP:
-                if (addr) { addr -= 16; }
-                break;
-            case BUTTON_F2:
-                /* clear the user RAM space */
-                for (c = 0; c <= 43; c++)
-                    rtc_write(0x18 + c, 0);
-                break;
-            case BUTTON_OFF:
-            case BUTTON_LEFT:
-                return;
+        case BUTTON_DOWN:
+            if (addr < 63-16) { addr += 16; }
+            break;
+        case BUTTON_UP:
+            if (addr) { addr -= 16; }
+            break;
+        case BUTTON_F2:
+            /* clear the user RAM space */
+            for (c = 0; c <= 43; c++)
+                rtc_write(0x18 + c, 0);
+            break;
+        case BUTTON_OFF:
+        case BUTTON_LEFT:
+            return;
         }
     }
 }
@@ -371,26 +372,26 @@ void dbg_mas(void)
         switch(button_get(false))
         {
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_DOWN:
+        case BUTTON_DOWN:
 #else
-            case BUTTON_RIGHT:
+        case BUTTON_RIGHT:
 #endif
-                addr += NUMROWS;
-                break;
+            addr += NUMROWS;
+            break;
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
+        case BUTTON_UP:
 #else
-            case BUTTON_LEFT:
+        case BUTTON_LEFT:
 #endif
-                if(addr)
-                    addr -= NUMROWS;
-                break;
+            if(addr)
+                addr -= NUMROWS;
+            break;
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
+        case BUTTON_LEFT:
 #else
-            case BUTTON_DOWN:
+        case BUTTON_DOWN:
 #endif
-                return;
+            return;
         }
     }
 }
@@ -417,14 +418,14 @@ void dbg_mas_codec(void)
 
         switch(button_get(false))
         {
-            case BUTTON_DOWN:
-                addr += 4;
-                break;
-            case BUTTON_UP:
-                if (addr) { addr -= 4; }
-                break;
-            case BUTTON_LEFT:
-                return;
+        case BUTTON_DOWN:
+            addr += 4;
+            break;
+        case BUTTON_UP:
+            if (addr) { addr -= 4; }
+            break;
+        case BUTTON_LEFT:
+            return;
         }
     }
 }
@@ -450,85 +451,94 @@ void view_battery(void)
     while(1)
     {
         switch (view) {
-            case 0: /* voltage history graph */
-                /* Find maximum and minimum voltage for scaling */
-                maxv = minv = 0;
-                for (i = BAT_FIRST_VAL; i < POWER_HISTORY_LEN; i++) {
-                    if (power_history[i] > maxv)
-                        maxv = power_history[i];
-                    if ((minv == 0) || ((power_history[i]) && (power_history[i] < minv)) )
-                        minv = power_history[i];
+        case 0: /* voltage history graph */
+            /* Find maximum and minimum voltage for scaling */
+            maxv = minv = 0;
+            for (i = BAT_FIRST_VAL; i < POWER_HISTORY_LEN; i++) {
+                if (power_history[i] > maxv)
+                    maxv = power_history[i];
+                if ((minv == 0) || ((power_history[i]) && 
+                                    (power_history[i] < minv)) )
+                {
+                    minv = power_history[i];
                 }
+            }
                 
-                if (minv < 1)
-                    minv = 1;
-                if (maxv < 2)
-                    maxv = 2;
+            if (minv < 1)
+                minv = 1;
+            if (maxv < 2)
+                maxv = 2;
                     
-                lcd_clear_display();
-                lcd_puts(0, 0, "Battery voltage:");
-                snprintf(buf, 30, "scale %d.%02d-%d.%02d V", minv / 100, minv % 100, maxv / 100, maxv % 100);
-                lcd_puts(0, 1, buf);
+            lcd_clear_display();
+            lcd_puts(0, 0, "Battery voltage:");
+            snprintf(buf, 30, "scale %d.%02d-%d.%02d V", 
+                     minv / 100, minv % 100, maxv / 100, maxv % 100);
+            lcd_puts(0, 1, buf);
                 
-                x = 0;
-                for (i = BAT_FIRST_VAL+1; i < POWER_HISTORY_LEN; i++) {
-                    y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
-                    lcd_clearline(x, LCD_HEIGHT-1, x, 20);
-                    lcd_drawline(x, LCD_HEIGHT-1, x, MIN(MAX(LCD_HEIGHT-1 - y, 20), LCD_HEIGHT-1));
-                    x++;
-                }
+            x = 0;
+            for (i = BAT_FIRST_VAL+1; i < POWER_HISTORY_LEN; i++) {
+                y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
+                lcd_clearline(x, LCD_HEIGHT-1, x, 20);
+                lcd_drawline(x, LCD_HEIGHT-1, x, 
+                             MIN(MAX(LCD_HEIGHT-1 - y, 20), LCD_HEIGHT-1));
+                x++;
+            }
                 
-                break;
+            break;
                 
-            case 1: /* status: */
-                lcd_clear_display();
-                lcd_puts(0, 0, "Power status:");
+        case 1: /* status: */
+            lcd_clear_display();
+            lcd_puts(0, 0, "Power status:");
                 
-                y = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
-                snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
-                lcd_puts(0, 1, buf);
-                y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000;
-                snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
-                lcd_puts(0, 2, buf);
-                snprintf(buf, 30, "Charger: %s", charger_inserted() ? "present" : "absent");
-                lcd_puts(0, 3, buf);
+            y = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+            snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
+            lcd_puts(0, 1, buf);
+            y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000;
+            snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
+            lcd_puts(0, 2, buf);
+            snprintf(buf, 30, "Charger: %s", 
+                     charger_inserted() ? "present" : "absent");
+            lcd_puts(0, 3, buf);
 #ifdef HAVE_CHARGE_CTRL
-                snprintf(buf, 30, "Charging: %s", charger_enabled ? "yes" : "no");
-                lcd_puts(0, 4, buf);
+            snprintf(buf, 30, "Charging: %s", charger_enabled ? "yes" : "no");
+            lcd_puts(0, 4, buf);
 #endif                
-                y = 0;
-                for (i = 0; i < CHARGE_END_NEGD; i++)
-                    y += power_history[POWER_HISTORY_LEN-1-i]*100 - power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                y = y / CHARGE_END_NEGD;
+            y = 0;
+            for (i = 0; i < CHARGE_END_NEGD; i++)
+                y += power_history[POWER_HISTORY_LEN-1-i]*100 - 
+                    power_history[POWER_HISTORY_LEN-1-i-1]*100;
+            y = y / CHARGE_END_NEGD;
                 
-                snprintf(buf, 30, "short delta: %d", y);
-                lcd_puts(0, 5, buf);
+            snprintf(buf, 30, "short delta: %d", y);
+            lcd_puts(0, 5, buf);
                 
-                y = 0;
-                for (i = 0; i < CHARGE_END_ZEROD; i++)
-                    y += power_history[POWER_HISTORY_LEN-1-i]*100 - power_history[POWER_HISTORY_LEN-1-i-1]*100;
-                y = y / CHARGE_END_ZEROD;
+            y = 0;
+            for (i = 0; i < CHARGE_END_ZEROD; i++)
+                y += power_history[POWER_HISTORY_LEN-1-i]*100 - 
+                    power_history[POWER_HISTORY_LEN-1-i-1]*100;
+            y = y / CHARGE_END_ZEROD;
                 
-                snprintf(buf, 30, "long delta: %d", y);
-                lcd_puts(0, 6, buf);
+            snprintf(buf, 30, "long delta: %d", y);
+            lcd_puts(0, 6, buf);
 
 #ifdef HAVE_CHARGE_CTRL
-                lcd_puts(0, 7, power_message);
+            lcd_puts(0, 7, power_message);
 #endif
-                break;
+            break;
                 
-            case 2: /* voltage deltas: */
-                lcd_clear_display();
-                lcd_puts(0, 0, "Voltage deltas:");
+        case 2: /* voltage deltas: */
+            lcd_clear_display();
+            lcd_puts(0, 0, "Voltage deltas:");
                 
-                for (i = 0; i <= 6; i++) {
-                    y = power_history[POWER_HISTORY_LEN-1-i] - power_history[POWER_HISTORY_LEN-1-i-1];
-                    snprintf(buf, 30, "-%d min: %s%d.%02d V", i,
-                        (y < 0) ? "-" : "",
-                        ((y < 0) ? y * -1 : y) / 100, ((y < 0) ? y * -1 : y ) % 100);
-                    lcd_puts(0, i+1, buf);
-                }
-                break;
+            for (i = 0; i <= 6; i++) {
+                y = power_history[POWER_HISTORY_LEN-1-i] - 
+                    power_history[POWER_HISTORY_LEN-1-i-1];
+                snprintf(buf, 30, "-%d min: %s%d.%02d V", i,
+                         (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 100, 
+                         ((y < 0) ? y * -1 : y ) % 100);
+                lcd_puts(0, i+1, buf);
+            }
+            break;
         }
         
         lcd_update();
@@ -536,19 +546,19 @@ void view_battery(void)
                 
         switch(button_get(false))
         {
-            case BUTTON_UP:
-                if (view)
-                    view--;
-                break;
+        case BUTTON_UP:
+            if (view)
+                view--;
+            break;
                 
-            case BUTTON_DOWN:
-                if (view < 2)
-                    view++;
-                break;
+        case BUTTON_DOWN:
+            if (view < 2)
+                view++;
+            break;
                 
-            case BUTTON_LEFT:
-            case BUTTON_OFF:
-                return;
+        case BUTTON_LEFT:
+        case BUTTON_OFF:
+            return;
         }
     }
 }
