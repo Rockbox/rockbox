@@ -75,6 +75,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_MENU    (BUTTON_F1 | BUTTON_REL)
 #define WPS_MENU_PRE BUTTON_F1
 #define WPS_BROWSE  (BUTTON_ON | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_ON
 #define WPS_EXIT     BUTTON_OFF
 #define WPS_KEYLOCK (BUTTON_F1 | BUTTON_DOWN)
 #define WPS_ID3     (BUTTON_F1 | BUTTON_ON)
@@ -99,6 +100,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_MENU    (BUTTON_MENU | BUTTON_REL)
 #define WPS_MENU_PRE BUTTON_MENU
 #define WPS_BROWSE  (BUTTON_ON | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_ON
 #define WPS_EXIT     BUTTON_STOP
 #define WPS_KEYLOCK (BUTTON_MENU | BUTTON_STOP)
 #define WPS_ID3     (BUTTON_MENU | BUTTON_ON)
@@ -122,6 +124,7 @@ static char current_track_path[MAX_PATH+1];
 #define WPS_PAUSE    BUTTON_OFF
 #define WPS_MENU    (BUTTON_MENU | BUTTON_REPEAT)
 #define WPS_BROWSE  (BUTTON_MENU | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_MENU
 #define WPS_KEYLOCK (BUTTON_MENU | BUTTON_DOWN)
 
 #endif
@@ -530,6 +533,10 @@ int wps_show(void)
         switch(button)
         {
             case WPS_BROWSE:
+#ifdef WPS_BROWSE_PRE
+                if (lastbutton != WPS_BROWSE_PRE)
+                    break;
+#endif
 #ifdef HAVE_LCD_CHARCELLS
                 status_set_record(false);
                 status_set_audio(false);
