@@ -45,10 +45,10 @@ A6. Start by reading up on the information about the jukeboxes on our web page.
     need and start writing.
 
 Q7. Okay, so how do I submit a patch?
-A7. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
-    mail the output to any member of the development team and we will take it 
-    under consideration.  (Please remember that all submissions are not
-    automatically accepted.)
+A7. Run: "diff -u oldfile newfile > patchfile" against the file(s) you have 
+    changed.  Then mail the output to any member of the development team and 
+    we will take it under consideration.  (Please remember that all 
+    submissions are not automatically accepted, this is nothing personal.)
 
 Q8. I want to join the development team, but don't have a SourceForge account,
     what should I do?
@@ -144,7 +144,8 @@ A17. Pessimist's Answer: At the current time we belive this is not very likely
 
 
 Q18. What about supporting playing of wav files?
-A18. No Bill.  We have no intention of that.  Go buy your own project.
+A18. Dear Mr. Gates, you have two options.  Re-read question #17, or go buy 
+     your own project.
 
 Q19. When do you think there will be a version available for my Archos?
 A19. We recently released version 1.0, so head on over to 
@@ -152,10 +153,6 @@ A19. We recently released version 1.0, so head on over to
      version is more a proof-of-concept than a serious replacement for the 
      stock firmware, so make sure you read the release notes 
      (http://bjorn.haxx.se/rockbox/rockbox-1.0-notes.txt).  
-
-     * NOTE *
-     This first version will _note_ work on Archos Recorders yet.  We plan/hope
-     to get Rockbox working on Recorders around version 1.2.
 
 Q20. What do you plan to add to coming versions?
 A20. We have a rough idea of which features we plan/expect/hope to be included
@@ -249,7 +246,8 @@ A30: It is true that Rockbox 1.0 lacks most of the feature set that every
      missing features is just a matter of time (and that time goes
      faster if you, yes you, help too). 
      
-     
+
+
 
 
 
