@@ -22,6 +22,7 @@ chip8.c
 flipit.c
 grayscale.c
 jpeg.c
+logo.c
 mandelbrot.c
 minesweeper.c
 oscillograph.c
