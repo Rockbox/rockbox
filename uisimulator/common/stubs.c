@@ -265,3 +265,10 @@ int talk_spell(char* spell, bool enqueue)
 }
 
 const char* dir_thumbnail_name = ".dirname.tbx";
+
+/* FIXME: this shoudn't be a stub, rather the real thing.
+   I'm afraid on Win32/X11 it'll be hard to kill a thread from outside. */
+void remove_thread(int threadnum)
+{
+    (void)threadnum;
+}
