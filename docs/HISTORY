@@ -39,7 +39,7 @@ Rockbox History
 
 * Feb 2002
 
-  Linus Feltzing Nielsen did some major progress on his gdb-stub and
+  Linus Nielsen Feltzing did some major progress on his gdb-stub and
   associated hardware modification to do really low-level debugging.
 
   Lots of feature-requests were posted.
