@@ -495,7 +495,7 @@ extern unsigned char char_dw_8x8_prop[][9];
 /*
  * Return width and height of a given font.
  */
-int lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
+int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h)
 {
     int width=0;
     int height=0;
@@ -563,7 +563,7 @@ void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
 /*
  * Put a string at specified character position
  */
-void lcd_puts(int x, int y, char *str)
+void lcd_puts(int x, int y, unsigned char *str)
 {
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
@@ -600,7 +600,7 @@ void lcd_puts(int x, int y, char *str)
  * Put a string at specified bit position
  */
 
-void lcd_putsxy(int x, int y, char *str, int thisfont)
+void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
 {
     int nx = fonts[thisfont];
     int ny = fontheight[thisfont];
@@ -911,7 +911,7 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
 /* no LCD defined, no code to use */
 #endif
 
-void lcd_puts_scroll(int x, int y, char* string )
+void lcd_puts_scroll(int x, int y, unsigned char* string )
 {
     struct scrollinfo* s = &scroll;
 #ifdef HAVE_LCD_CHARCELLS

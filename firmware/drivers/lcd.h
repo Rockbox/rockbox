@@ -28,8 +28,8 @@
 extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
-extern void lcd_puts(int x, int y, char *string);
-extern void lcd_puts_scroll(int x, int y, char* string );
+extern void lcd_puts(int x, int y, unsigned char *string);
+extern void lcd_puts_scroll(int x, int y, unsigned char* string );
 extern void lcd_stop_scroll(void);
 extern void lcd_scroll_speed( int speed );
 
@@ -79,7 +79,7 @@ extern void lcd_double_height (bool on);
 #define LCD_WIDTH       112   /* Display width in pixels */
 #define LCD_HEIGHT      64    /* Display height in pixels */
 
-extern void lcd_putsxy(int x, int y, char *string, int font);
+extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
 extern void lcd_setfont(int font);
 extern void lcd_getfontsize(unsigned int font, int *width, int *height);
 extern void lcd_setmargins(int xmargin, int ymargin);
