@@ -14,7 +14,7 @@ TARGET = -DARCHOS_PLAYER_OLD=1
 CFLAGS = -g -O -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET)
 AFLAGS += -small -relax
 
-OBJS= ../../crt0.o ../../drivers/lcd.o ../../system.o main.o ../../thread.o ../../debug.o
+OBJS= ../../crt0.o ../../system.o main.o timer.o ../../thread.o ../../debug.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<
@@ -41,7 +41,7 @@ dist:
 	tar czvf dist.tar.gz Makefile main.c start.s app.lds
 
 clean:
-	-rm -f $(OBJS) *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
+	-rm -f $(OBJS) *.s *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 
 install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos

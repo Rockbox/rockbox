@@ -16,61 +16,48 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "thread.h"
 #include "sh7034.h"
+#include "system.h"
 #include "debug.h"
 
-void tick_start(unsigned int interval);
-
-unsigned int s1[256];
-unsigned int s2[256];
-
-void t1(void);
-void t2(void);
-
-int main(void)
+void tick_start(unsigned int interval_in_ms)
 {
-   char buf[40];
-   char str[32];
-   int i=0;
+    unsigned int count;
 
-   /* Clear it all! */
-    SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
+    count = FREQ / 1000 / 8 * interval_in_ms;
 
-    /* This enables the serial Rx interrupt, to be able to exit into the
-       debugger when you hit CTRL-C */
-    SCR1 |= 0x40;
-    SCR1 &= ~0x80;
-    asm ("ldc\t%0,sr" : : "r"(0<<4));
-
-    debugf("OK. Let's go\n");
-
-    tick_start(40);
+    if(count > 0xffff)
+    {
+	debugf("Error! The tick interval is too long (%d ms)\n",
+	       interval_in_ms);
+	return;
+    }
     
-    create_thread(t1, s1, 1024);
-    create_thread(t2, s2, 1024);
+    /* We are using timer 0 */
+    
+    TSTR &= ~0x01; /* Stop the timer */
+    TSNC &= ~0x01; /* No synchronization */
+    TMDR &= ~0x01; /* Operate normally */
 
+    TCNT0 = 0;   /* Start counting at 0 */
+    GRA0 = 0xfff0;
+    TCR0 = 0x23; /* Clear at GRA match, sysclock/8 */
+
+    TSTR |= 0x01; /* Start timer 1 */
+
+    /* Enable interrupt on level 1 */
+    IPRC = (IPRC & ~0x00f0) | 0x0010;
+
+    TIER0 |= 0x01; /* Enable GRA match interrupt */
+    
     while(1)
     {
-       debugf("t0\n");
-       switch_thread();
     }
 }
 
-void t1(void)
+#pragma interrupt
+void IMIA0(void)
 {
-   while(1)
-   {
-      debugf("t1\n");
-      switch_thread();
-   }
-}
-
-void t2(void)
-{
-   while(1)
-   {
-      debugf("t2\n");
-      switch_thread();
-   }
+    TSR0 &= ~0x01;
+    debugf("Yes\n");
 }
