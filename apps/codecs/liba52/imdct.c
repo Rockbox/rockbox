@@ -58,18 +58,19 @@ static uint8_t fftorder[] = {
 };
 
 /* Root values for IFFT */
-static sample_t roots16[3];
-static sample_t roots32[7];
-static sample_t roots64[15];
-static sample_t roots128[31];
+//static sample_t roots16[3];
+//static sample_t roots32[7];
+//static sample_t roots64[15];
+//static sample_t roots128[31];
 
 /* Twiddle factors for IMDCT */
-static complex_t pre1[128];
-static complex_t post1[64];
-static complex_t pre2[64];
-static complex_t post2[32];
+//static complex_t pre1[128];
+//static complex_t post1[64];
+//static complex_t pre2[64];
+//static complex_t post2[32];
 
-static sample_t a52_imdct_window[256];
+//static sample_t a52_imdct_window[256];
+#include "imdct_lookups.h"
 
 static void (* ifft128) (complex_t * buf);
 static void (* ifft64) (complex_t * buf);
@@ -358,31 +359,55 @@ static double besselI0 (double x)
 void a52_imdct_init (uint32_t mm_accel)
 {
     int i, k;
-    double sum;
-    double local_imdct_window[256];
+/*    double sum;
+    double local_imdct_window[256];*/
 
     /* compute imdct window - kaiser-bessel derived window, alpha = 5.0 */
-    sum = 0;
+    /*    sum = 0;
     for (i = 0; i < 256; i++) {
 	sum += besselI0 (i * (256 - i) * (5 * M_PI / 256) * (5 * M_PI / 256));
 	local_imdct_window[i] = sum;
     }
     sum++;
-    for (i = 0; i < 256; i++)
+    */
+    /*    for (i = 0; i < 256; i++)
 	a52_imdct_window[i] = SAMPLE (sqrt (local_imdct_window[i] / sum));
 
-    for (i = 0; i < 3; i++)
+    printf("static sample_t a52_imdct_window[256]={");
+    for (i=0;i<256;i++) {
+      if ((i % 16)==0) { printf("\n"); }
+      printf("%d,",a52_imdct_window[i]);
+    }
+    printf("\n}\n");
+    */
+
+    /*    for (i = 0; i < 3; i++)
 	roots16[i] = SAMPLE (cos ((M_PI / 8) * (i + 1)));
+
+    printf("static sample_t roots16[3]={%d,%d,%d};\n\n",roots16[0],roots16[1],roots16[2]);
 
     for (i = 0; i < 7; i++)
 	roots32[i] = SAMPLE (cos ((M_PI / 16) * (i + 1)));
 
+    printf("static sample_t roots32[7]={");
+    for (i=0;i<7;i++) { printf("%d%s",roots32[i],(i < 6 ? "," : "")); }
+    printf("};\n");
+
     for (i = 0; i < 15; i++)
 	roots64[i] = SAMPLE (cos ((M_PI / 32) * (i + 1)));
+
+    printf("static sample_t roots64[15]={");
+    for (i=0;i<15;i++) { printf("%d%s",roots64[i],(i < 14 ? "," : "")); }
+    printf("};\n");
 
     for (i = 0; i < 31; i++)
 	roots128[i] = SAMPLE (cos ((M_PI / 64) * (i + 1)));
 
+    printf("static sample_t roots128[31]={");
+    for (i=0;i<31;i++) { printf("%d%s",roots128[i],(i < 30 ? "," : "")); }
+    printf("};\n");
+    */
+    /*
     for (i = 0; i < 64; i++) {
 	k = fftorder[i] / 2 + 64;
 	pre1[i].real = SAMPLE (cos ((M_PI / 256) * (k - 0.25)));
@@ -395,21 +420,41 @@ void a52_imdct_init (uint32_t mm_accel)
 	pre1[i].imag = SAMPLE (-sin ((M_PI / 256) * (k - 0.25)));
     }
 
+    printf("static complex_t pre1[128]={");
+    for (i=0;i<128;i++) { printf("{%d,%d}%s",pre1[i].real,pre1[i].imag,(i < 127 ? "," : "")); }
+    printf("};\n");
+    */
+    /*
     for (i = 0; i < 64; i++) {
 	post1[i].real = SAMPLE (cos ((M_PI / 256) * (i + 0.5)));
 	post1[i].imag = SAMPLE (sin ((M_PI / 256) * (i + 0.5)));
     }
 
+    printf("static complex_t post1[64]={");
+    for (i=0;i<64;i++) { printf("{%d,%d}%s",post1[i].real,post1[i].imag,(i < 63 ? "," : "")); }
+    printf("};\n");
+    */
+
+    /*
     for (i = 0; i < 64; i++) {
 	k = fftorder[i] / 4;
 	pre2[i].real = SAMPLE (cos ((M_PI / 128) * (k - 0.25)));
 	pre2[i].imag = SAMPLE (sin ((M_PI / 128) * (k - 0.25)));
     }
 
+    printf("static complex_t pre2[64]={");
+    for (i=0;i<64;i++) { printf("{%d,%d}%s",pre2[i].real,pre2[i].imag,(i < 63 ? "," : "")); }
+    printf("};\n");
+
     for (i = 0; i < 32; i++) {
 	post2[i].real = SAMPLE (cos ((M_PI / 128) * (i + 0.5)));
 	post2[i].imag = SAMPLE (sin ((M_PI / 128) * (i + 0.5)));
     }
+
+    printf("static complex_t post2[32]={");
+    for (i=0;i<32;i++) { printf("{%d,%d}%s",post2[i].real,post2[i].imag,(i < 31 ? "," : "")); }
+    printf("};\n");
+    */
 
 #ifdef LIBA52_DJBFFT
     if (mm_accel & MM_ACCEL_DJBFFT) {
