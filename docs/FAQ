@@ -683,10 +683,13 @@ A76: It means you have more files in a single directory than you have
      Solution:
 
      1) Change the limit in the settings
+
      2) Exit the menu back to the browser
+
      3) Force a disk spinup. There are several ways: either select
-        another setting for the file filter, or insert the USB and extract
-        it again
+     another setting for the file filter, or insert the USB and extract
+     it again
+     
      4) Turn it off and on again
 
 Q77: Why are you developing X when you should be doing Y?
