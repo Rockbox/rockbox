@@ -22,8 +22,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef DISK_WRITE
 #include <time.h>
 #include <sys/timeb.h>
+#endif
 #include <stdbool.h>
 #include "fat.h"
 #include "ata.h"
