@@ -415,40 +415,40 @@ voice: ""
 new: "Tastensperre ist AUS"
 
 id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Stumm AN"
+new: ""
 
 id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Stumm AUS"
+new: ""
 
 id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Stummschaltung ist AN"
+new: ""
 
 id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Stummschaltung ist AUS"
+new: ""
 
 id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "-ID3 Info-"
+new: ""
 
 id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "-Anzeige-"
+new: ""
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -1677,10 +1677,10 @@ voice: ""
 new: "Sender"
 
 id: LANG_FM_SAVE_PRESET
-desc:  in radio screen
-eng: "Save preset"
+desc:  DEPRECATED
+eng: ""
 voice: ""
-new: "Sender speichern"
+new: ""
 
 id: LANG_FM_DELETE_PRESET
 desc:  in radio screen
@@ -1701,10 +1701,10 @@ voice: ""
 new: "Sender speichern fehlgeschlagen"
 
 id: LANG_FM_NO_PRESETS
-desc:  in radio screen
-eng: "The preset list is empty"
+desc:  DEPRECATED
+eng: ""
 voice: ""
-new: "Die Senderliste ist leer"
+new: ""
 
 id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
@@ -2727,10 +2727,10 @@ voice: ""
 new: "Ende"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  in radio screen
-eng: "Edit"
+desc:  DEPRECATED
+eng: ""
 voice: ""
-new: "Bearb."
+new: ""
 
 id: LANG_FM_BUTTONBAR_ADD
 desc:  in radio screen

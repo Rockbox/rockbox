@@ -428,38 +428,38 @@ voice: ""
 new:
 
 id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -1247,7 +1247,7 @@ id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
 voice: ""
-new: 
+new:
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
@@ -1690,8 +1690,8 @@ voice: ""
 new:
 
 id: LANG_FM_SAVE_PRESET
-desc:  in radio screen
-eng: "Save preset"
+desc:  DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -1714,8 +1714,8 @@ voice: ""
 new:
 
 id: LANG_FM_NO_PRESETS
-desc:  in radio screen
-eng: "The preset list is empty"
+desc:  DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -2741,8 +2741,8 @@ voice: ""
 new:
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  in radio screen
-eng: "Edit"
+desc:  DEPRECATED
+eng: ""
 voice: ""
 new:
 
