@@ -100,7 +100,7 @@ int load_all_levels(void)
 
     while(rb->read_line(fd, buf, 64))
     {
-        if(buf[0] == '-') /* Separator? */
+        if(rb->strlen(buf) == 0) /* Separator? */
         {
             num_levels++;
             if(num_levels > max_levels)
@@ -149,19 +149,18 @@ int load_level( int level_number )
         {
             switch(level_cache[level_number][y][x])
             {
-                case '1':
+                case '|':
                     board[x][y] = NORTH;
                     break;
 
-                case '2':
+                case '-':
                     board[x][y] = EAST;
                     break;
 
-                case 'H':
+                case '+':
                     board[x][y] = HEAD;
                     break;
             }
-            
         }
     }
     return 1;
@@ -238,7 +237,8 @@ void new_level(int level)
 void init_snake(void)
 {
     num_apples_to_get=1;
-    level_from_file = 1;
+    if(game_type == 1)
+       level_from_file = 1;
     game_b_level=1;
     new_level(level_from_file);
 }
@@ -863,6 +863,10 @@ void game_init(void)
     apple=0;
     score=0;
     
+    
+    clear_board();
+    load_level( level_from_file );
+    
     while (1) 
     {    
         switch (rb->button_get(true)) 
@@ -904,9 +908,9 @@ void game_init(void)
         rb->lcd_clear_display();
         redraw();
         /*TODO: CENTER ALL TEXT!!!!*/
-        rb->snprintf(plevel,sizeof(plevel),"Speed - %d  ",level);
+        rb->snprintf(plevel,sizeof(plevel),"Speed - %d",level);
         rb->lcd_putsxy(LCD_WIDTH/2 - 30,5, plevel);
-        rb->snprintf(plevel,sizeof(plevel),"F1 - Maze %d  ",level_from_file);
+        rb->snprintf(plevel,sizeof(plevel),"F1 - Maze %d",level_from_file);
         rb->lcd_putsxy(18, 20, plevel);
         if(game_type==0)
             rb->lcd_putsxy(18, 30, "F3 - Game A");
@@ -934,9 +938,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
 
-    /*load the 1st level in*/
-    load_level( level_from_file );
-
     while(quit==0)
     {
       game_init(); 
@@ -949,8 +950,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
           
           /*Start Game:*/
           game();
-
-          clear_board();
       }
     }
     
