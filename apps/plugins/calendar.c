@@ -46,6 +46,9 @@ struct shown {
     int     firstday;    /* first (w)day of month */
     int     lastday;     /* last (w)day of month */
 };
+
+static bool use_system_font = false;
+
 /* leap year -- account for gregorian reformation in 1752 */
 static int is_leap_year(int yr)
 {
@@ -69,7 +72,10 @@ static void calendar_init(struct today *today, struct shown *shown)
 #endif
     rb->lcd_getstringsize("A",&w,&h);
     if ( ((w * 14) > LCD_WIDTH) || ((h * 7) > LCD_HEIGHT) )
+    {
         rb->lcd_setfont(FONT_SYSFIXED);
+        use_system_font = true;
+    }
     rb->lcd_clear_display();
 #ifdef HAVE_RTC
     tm = rb->get_time();
@@ -390,6 +396,8 @@ static void add_memo(struct shown *shown, int type)
         }
     }
     rb->lcd_clear_display();
+    if(use_system_font)
+        rb->lcd_setfont(FONT_SYSFIXED);
     if (saved)
         rb->lcd_puts(0,0,"Event added");
     else
@@ -407,18 +415,18 @@ static bool edit_memo(int change, struct shown *shown)
         rb->lcd_puts(0,0,"Remove : Up");
         rb->lcd_puts(0,1,"Edit : Down");
         rb->lcd_puts(0,2,"New :");
-        rb->lcd_puts(6,3,"weekly : Left");
-        rb->lcd_puts(6,4,"monthly : Play");
-        rb->lcd_puts(6,5,"annually : Right");
-        rb->lcd_puts(6,6,"one off : On");
+        rb->lcd_puts(2,3,"weekly : Left");
+        rb->lcd_puts(2,4,"monthly : Play");
+        rb->lcd_puts(2,5,"annually : Right");
+        rb->lcd_puts(2,6,"one off : On");
     }
     else
     {
         rb->lcd_puts(0,0,"New :");
-        rb->lcd_puts(6,1,"weekly : Left");
-        rb->lcd_puts(6,2,"monthly : Play");
-        rb->lcd_puts(6,3,"anualy : Right");
-        rb->lcd_puts(6,4,"one off : On");
+        rb->lcd_puts(2,1,"weekly : Left");
+        rb->lcd_puts(2,2,"monthly : Play");
+        rb->lcd_puts(2,3,"anualy : Right");
+        rb->lcd_puts(2,4,"one off : On");
     }
     rb->lcd_update();
     while (!exit)
@@ -430,19 +438,19 @@ static bool edit_memo(int change, struct shown *shown)
 
             case BUTTON_LEFT:
                 add_memo(shown,0);
-				return false;
+                return false;
 
             case BUTTON_PLAY:
                 add_memo(shown,1);
-				return false;
+                return false;
 
             case BUTTON_RIGHT:
                 add_memo(shown,2);
-				return false;
+                return false;
 
             case BUTTON_ON:
                 add_memo(shown,3);
-				return false;
+                return false;
 
             case BUTTON_DOWN:
                 if (memos_in_shown_memory > 0)
@@ -450,6 +458,8 @@ static bool edit_memo(int change, struct shown *shown)
                     if(rb->kbd_input(memos[pointer_array[change]].message,
                                      sizeof memos[pointer_array[change]].message) != -1)
                         save_memo(pointer_array[change],true,shown);
+                    if(use_system_font)
+                        rb->lcd_setfont(FONT_SYSFIXED);
                     exit = true;
                 }
                 break;
