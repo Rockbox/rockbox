@@ -15,7 +15,7 @@
 <th>recorder v2</th>
 </tr><tr  valign=top>
 <td>
-<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg></a>
+<a href=/docs/newplayer.jpg><img src=/docs/newplayer_t.jpg></a><br>
 Archos Jukebox 5000, 6000 and Studio models
 
 <p><a href="rockbox-2.2-player.zip">rockbox-2.2-player.zip</a>
