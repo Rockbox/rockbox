@@ -63,8 +63,11 @@ SECTIONS
 
 .idata 0x200000: {
 	*(.idata)
-}> DRAM
+}> IMEM1
 
+.idata2 0x210000: {
+	*(.idata2)
+}> IMEM2
 
 _codesize = SIZEOF(.text);
 
