@@ -578,7 +578,7 @@ static bool max_files_in_playlist(void)
 {
     return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "",
                    &global_settings.max_files_in_playlist,
-                   NULL, 1000, 1000, 10000 );
+                   NULL, 1000, 1000, 20000 );
 }
 
 static bool buffer_margin(void)
