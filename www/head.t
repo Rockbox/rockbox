@@ -39,7 +39,7 @@
 <a class="menulink" href="/mods/">hardware mods</a><br>
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
 <a class="menulink" href="/bugs.shtml">bug reports</a><br>
-<a class="menulink" href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patches</a><br>
+<a class="menulink" href="/patches.shtml">patches</a><br>
 <a class="menulink" href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">CVS</a><br>
 <a class="menulink" href="http://bjorn.haxx.se/isd200/">linux driver</a>
 
