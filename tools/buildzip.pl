@@ -169,7 +169,7 @@ my $exe = "";
 
 if($target !~ /sim/i) {
     # not a simulator
-    if($target =~ /recorder/i) {
+    if($target =~ /(recorder|ondio)/i) {
         $exe = "ajbrec.ajz";
     }
     else {
