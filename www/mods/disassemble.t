@@ -1,0 +1,30 @@
+#define _PAGE_ Disassembling the Archos
+#include "head.t"
+
+<p>There are several ways to disassemble the Archos Jukeboxes.
+Here is an approach where you don't need to bend any metal parts.
+
+
+<p><img src="b10.jpg">
+<br>
+First, remove the battery covers and unscrew all 8 visible screws: 2 torx screws on the left and right sides, and 2 small philips head screws on the top and bottom. Then you simply lift off the plastic top cover.
+<hr>
+
+<p><img src="b5.jpg"> <img src="b6.jpg">
+<br>
+Use your thumb nails to compress the thin edge of the rubber while gently pulling the metal plate over it.
+<hr>
+
+<p><img src="b7.jpg"> <img src="b8.jpg">
+<br>
+Do the same on the side.
+<hr>
+
+<p><img src="b9.jpg">
+<br>
+You have liberated one end of the Archos from the metal back plate!
+Now lightly lift the blue rubber bumbers up from the circuit board on the other end, then slide the Archos out of the back plate.
+
+<p><i>Björn</i>
+
+#include "foot.t"
