@@ -34,6 +34,7 @@ KEYPAD = -DHAVE_PLAYER_KEYPAD
 #KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 CC = cl
+RC = rc
 LINK = link
 DEFINES = -DWIN32 -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR $(KEYPAD) $(DISPLAY)
 LDFLAGS = /OUT:uisw32.exe /SUBSYSTEM:windows
@@ -46,7 +47,7 @@ SRCS = *.c \
 	$(DRIVERS)/lcd.c \
 	$(APPDIR)*.c \
 	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/settings.c $(FIRMWAREDIR)/backlight.c \
-	$(COMMON)/sprintf.c $(COMMON)/strtok.c
+        $(COMMON)/sprintf.c $(COMMON)/strtok.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
 SRCS = $(SRCS) $(RECDIR)*.c
@@ -56,7 +57,9 @@ OBJS = *.obj uisw32.res
 
 uisw32.exe: $(SRCS:.c=.obj)
  $(CC) $(CFLAGS) $(SRCS)
+ $(RC) /r uisw32.rc
  $(LINK) $(LIBS) $(LDFLAGS) $(OBJS)
 
 clean:
  $(RM) *.obj
+ $(RM) uisw32.res
