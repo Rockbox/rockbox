@@ -18,14 +18,14 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
-#include "types.h"
 
 static DIR thedir;
 static struct dirent theent;
-static bool busy=FALSE;
+static bool busy=false;
 
 DIR* opendir(char* name)
 {
@@ -70,14 +70,14 @@ DIR* opendir(char* name)
         }
     }
 
-    busy = TRUE;
+    busy = true;
 
     return &thedir;
 }
 
 int closedir(DIR* dir)
 {
-    busy=FALSE;
+    busy=false;
     return 0;
 }
 

@@ -18,9 +18,9 @@
  ****************************************************************************/
 #include <string.h>
 #include <errno.h>
+#include <stdbool.h>
 #include "file.h"
 #include "fat.h"
-#include "types.h"
 #include "dir.h"
 #include "debug.h"
 
@@ -111,13 +111,13 @@ int open(char* pathname, int flags)
 
     openfiles[fd].cacheoffset = -1;
     openfiles[fd].fileoffset = 0;
-    openfiles[fd].busy = TRUE;
+    openfiles[fd].busy = true;
     return fd;
 }
 
 int close(int fd)
 {
-    openfiles[fd].busy = FALSE;
+    openfiles[fd].busy = false;
     return 0;
 }
 

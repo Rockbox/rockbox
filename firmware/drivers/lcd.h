@@ -20,8 +20,8 @@
 #ifndef __LCD_H__
 #define __LCD_H__
 
+#include <stdbool.h>
 #include "sh7034.h"
-#include "types.h"
 #include "config.h"
 
 /* common functions */

@@ -318,10 +318,10 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     while (1)
     {
-        bool state = TRUE;
+        bool state = true;
         
         led (state);
-        state = state?FALSE:TRUE;
+        state = state?false:true;
         
         for (i = 0; i < 240000; ++i);
     }

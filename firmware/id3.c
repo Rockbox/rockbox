@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdbool.h>
 #include "file.h"
-#include "types.h"
 
 #include "id3.h"
 
@@ -107,7 +107,7 @@ stripspaces(char *buffer)
  * Arguments: file - the MP3 file to scen for a ID3v1 tag
  *            entry - the entry to set the title in
  *
- * Returns: TRUE if a title was found and created, else FALSE
+ * Returns: true if a title was found and created, else false
  */
 static bool 
 setid3v1title(int fd, mp3entry *entry) 
@@ -119,7 +119,7 @@ setid3v1title(int fd, mp3entry *entry)
 
     for(i=0;i<3;i++) {
         if(-1 == lseek(fd, offsets[i], SEEK_END))
-            return FALSE;
+            return false;
 
         buffer[30]=0;
         read(fd, buffer, 30);
@@ -143,7 +143,7 @@ setid3v1title(int fd, mp3entry *entry)
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -153,7 +153,7 @@ setid3v1title(int fd, mp3entry *entry)
  * Arguments: file - the MP3 file to scen for a ID3v2 tag
  *            entry - the entry to set the title in
  *
- * Returns: TRUE if a title was found and created, else FALSE
+ * Returns: true if a title was found and created, else false
  */
 static void
 setid3v2title(int fd, mp3entry *entry) 
@@ -484,7 +484,7 @@ mp3info(mp3entry *entry, char *filename)
     int fd;
     fd = open(filename, O_RDONLY);
     if(-1 == fd)
-        return TRUE;
+        return true;
 
     memset(entry, 0, sizeof(mp3entry));
 
@@ -504,7 +504,7 @@ mp3info(mp3entry *entry, char *filename)
 
     close(fd);
 
-    return FALSE;
+    return false;
 }
 
 #ifdef DEBUG_STANDALONE
