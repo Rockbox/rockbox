@@ -902,10 +902,9 @@ bool settings_load_config(char* file)
             static char* options[] = {
                 "off","200ms","300ms","500ms",
                 "1","2","3","4","5","6","7","8","9","10",
-                "15","20","25","30","45","60","90",
-                "2min","3min","5min","10min","20min","45min","90min"};
+                "15","20","30","1min"};
             set_cfg_option(&global_settings.peak_meter_hold, value,
-                           options, 28);
+                           options, 18);
         }
         else if (!strcasecmp(name, "peak meter clip hold")) {
             static char* options[] = {
@@ -977,9 +976,9 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "backlight timeout")) {
             static char* options[] = {
                 "off","on","1","2","3","4","5","6","7","8","9",
-                "10","15","20","30","45","60","90"};
+                "10","15","20","25","30","45","60","90"};
             set_cfg_option(&global_settings.backlight_timeout, value,
-                           options, 18);
+                           options, 19);
         }
         else if (!strcasecmp(name, "backlight when plugged"))
             set_cfg_bool(&global_settings.backlight_on_when_charging, value);

@@ -34,12 +34,12 @@ show files             (all, supported, music, playlists)
 follow playlist        (on, off)
 
 scroll speed           (1 - 10)  [Hz]
-start delay            (0 - 250) [1/10s]
+scroll delay           (0 - 250) [1/10s]
 scroll step            (1 - 112) [pixels]
 bidir limit            (0 - 200) [% of screen width]
 contrast               (0 - 63)
 backlight timeout      (off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                        15, 20, 30, 45, 60, 90) [seconds]
+                        15, 20, 25, 30, 45, 60, 90) [seconds]
 backlight when plugged (on, off)
 
 disk spindown          (3 - 254) [seconds]
@@ -59,8 +59,7 @@ auto volume            (0=off, 1=2s, 2=4s, 3=8s)
 peak meter release     (1 - 126)
 peak meter hold        (off, 200ms, 300ms, 500ms,
                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                        15, 20, 25, 30, 45, 90,
-                        2min, 3min, 5min, 10min, 20min, 45min, 90min)
+                        15, 20, 30, 1min)
 peak meter clip hold   (on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                         15, 20, 25, 30, 45, 60, 90,
                         2min, 3min, 5min, 10min, 20min, 45min, 90min)
