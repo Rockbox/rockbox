@@ -188,7 +188,7 @@ void status_draw(bool force_redraw)
             
             /* animate battery if charging */
             if ((charge_state == 1) ||
-€                (charge_state == 2)) {
+                (charge_state == 2)) {
 #else
             global_settings.runtime = 0;
             lasttime = current_tick;
