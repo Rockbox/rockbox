@@ -14,10 +14,6 @@
 <li><a href="serialport.html">Make LINE IN a two-way serial port</a>, for some sweet remote gdb love
 
 <li>Build yourself an <a href="rs232.html">rs232 converter</a>, so your PC can talk to your Archos
-
-<li>Matthias Wächter modified his player to get 
-<a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-09/0769.shtml">8MB RAM</a>!
-
 </ul>
 
 <h2>External pages</h2>
