@@ -59,7 +59,7 @@ static bool add_to_playlist(int position, bool queue)
     if (new_playlist)
         playlist_create(NULL, NULL);
 
-    if (selected_file_attr & TREE_ATTR_MPA)
+    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
         playlist_insert_track(selected_file, position, queue);
     else if (selected_file_attr & ATTR_DIRECTORY)
     {
@@ -101,7 +101,7 @@ static bool add_to_playlist(int position, bool queue)
 
         playlist_insert_directory(selected_file, position, queue, recurse);
     }
-    else if (selected_file_attr & TREE_ATTR_M3U)
+    else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
         playlist_insert_playlist(selected_file, position, queue);
 
     if (new_playlist && (playlist_amount() > 0))
@@ -158,7 +158,7 @@ static bool playlist_options(void)
         args[i].queue = true;
         i++;
     }
-    else if ((selected_file_attr & TREE_ATTR_MPA) ||
+    else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
              (selected_file_attr & ATTR_DIRECTORY))
     {
         menu[i].desc = str(LANG_INSERT);
@@ -489,8 +489,8 @@ int onplay(char* file, int attr)
     selected_file = file;
     selected_file_attr = attr;
 
-    if ((attr & TREE_ATTR_MPA) || (attr & ATTR_DIRECTORY) ||
-        ((attr & TREE_ATTR_M3U) && (mpeg_status() & MPEG_STATUS_PLAY)))
+    if (((attr  & TREE_ATTR_MASK) == TREE_ATTR_MPA) || (attr & ATTR_DIRECTORY) ||
+        (((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U) && (mpeg_status() & MPEG_STATUS_PLAY)))
     {
         menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
         menu[i].function = playlist_options;
@@ -508,7 +508,7 @@ int onplay(char* file, int attr)
         i++;
     }
 
-    if (attr & TREE_ATTR_MPA)
+    if ((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
     {
         menu[i].desc = str(LANG_VBRFIX);
         menu[i].function = vbr_fix;

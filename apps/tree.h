@@ -27,18 +27,18 @@ struct entry {
 };
 
 /* using attribute not used by FAT */
-#define TREE_ATTR_MPA 0x40 /* mpeg audio file */
-#define TREE_ATTR_M3U 0x80 /* playlist */
-#define TREE_ATTR_WPS 0x100 /* wps config file */
-#define TREE_ATTR_MOD 0x200 /* firmware file */
-#define TREE_ATTR_CFG 0x400 /* config file */
-#define TREE_ATTR_TXT 0x500 /* text file */
-#define TREE_ATTR_FONT 0x800 /* font file */
-#define TREE_ATTR_LNG  0x1000 /* binary lang file */
-#define TREE_ATTR_ROCK 0x2000 /* binary rockbox plugin */
-#define TREE_ATTR_UCL 0x4000 /* rockbox flash image */ 
-#define TREE_ATTR_CH8 0x8000 /* chip-8 game */ 
-#define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
+#define TREE_ATTR_MPA  0x0100 /* mpeg audio file */
+#define TREE_ATTR_M3U  0x0200 /* playlist */
+#define TREE_ATTR_WPS  0x0300 /* wps config file */
+#define TREE_ATTR_MOD  0x0400 /* firmware file */
+#define TREE_ATTR_CFG  0x0500 /* config file */
+#define TREE_ATTR_TXT  0x0600 /* text file */
+#define TREE_ATTR_FONT 0x0700 /* font file */
+#define TREE_ATTR_LNG  0x0800 /* binary lang file */
+#define TREE_ATTR_ROCK 0x0900 /* binary rockbox plugin */
+#define TREE_ATTR_UCL  0x0A00 /* rockbox flash image */ 
+#define TREE_ATTR_CH8  0x0B00 /* chip-8 game */ 
+#define TREE_ATTR_MASK 0xFFC0 /* which bits tree.c uses (above) */
 
 void tree_init(void);
 void browse_root(void);

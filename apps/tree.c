@@ -61,6 +61,38 @@
 #define BOOTFILE "archos.mod"
 #endif
 
+/* a table for the know file types */
+static struct
+{
+    char* extension; /* extension for which the file type is recognized */
+    int tree_attr; /* which identifier */
+    int icon; /* the icon which shall be used for it, -1 if unknown */
+    /* To have it extendable, there could be more useful stuff in here, 
+       like handler functions, plugin name, etc. */
+} filetypes[] = {
+    { ".mp3", TREE_ATTR_MPA, File     },
+    { ".mp2", TREE_ATTR_MPA, File     },
+    { ".mpa", TREE_ATTR_MPA, File     },
+    { ".m3u", TREE_ATTR_M3U, Playlist },
+    { ".cfg", TREE_ATTR_CFG, Config   },
+    { ".wps", TREE_ATTR_WPS, Wps,     },
+    { ".txt", TREE_ATTR_TXT, Text     },
+    { ".lng", TREE_ATTR_LNG, Language },
+    { ".rock",TREE_ATTR_ROCK,Plugin   },
+#ifdef HAVE_LCD_BITMAP
+    { ".fnt", TREE_ATTR_FONT,Font     },
+    { ".ch8", TREE_ATTR_CH8, -1       },
+#endif
+#ifndef SIMULATOR
+#ifdef ARCHOS_RECORDER
+    { ".ucl", TREE_ATTR_UCL, Flashfile},
+    { ".ajz", TREE_ATTR_MOD, Mod_Ajz  },
+#else
+    { ".mod", TREE_ATTR_MOD, Mod_Ajz  },
+#endif
+#endif /* #ifndef SIMULATOR */
+};
+
 /* Boot value of global_settings.max_files_in_dir */
 static int max_files_in_dir;
 
@@ -284,38 +316,20 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
         
         dptr->attr = entry->attribute;
         
-        /* mark mp? and m3u files as such */
-        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
-            if (!strcasecmp(&entry->d_name[len-4], ".mp3") ||
-                (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
-                (!strcasecmp(&entry->d_name[len-4], ".mpa")))
-                dptr->attr |= TREE_ATTR_MPA;
-            else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
-                dptr->attr |= TREE_ATTR_M3U;
-            else if (!strcasecmp(&entry->d_name[len-4], ".cfg"))
-                dptr->attr |= TREE_ATTR_CFG;
-            else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
-                dptr->attr |= TREE_ATTR_WPS;
-            else if (!strcasecmp(&entry->d_name[len-4], ".txt"))
-                dptr->attr |= TREE_ATTR_TXT;
-            else if (!strcasecmp(&entry->d_name[len-4], ".lng"))
-                dptr->attr |= TREE_ATTR_LNG;
-#ifdef HAVE_RECORDER_KEYPAD
-            else if (!strcasecmp(&entry->d_name[len-4], ".fnt"))
-                dptr->attr |= TREE_ATTR_FONT;
-            else if (!strcasecmp(&entry->d_name[len-4], ".ajz"))
-#else
-            else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
-#endif
-                dptr->attr |= TREE_ATTR_MOD;
-            else if (!strcasecmp(&entry->d_name[len-5], ".rock"))
-                dptr->attr |= TREE_ATTR_ROCK;
-            else if (!strcasecmp(&entry->d_name[len-4], ".ucl"))
-                dptr->attr |= TREE_ATTR_UCL;
-#ifdef HAVE_LCD_BITMAP
-            else if (!strcasecmp(&entry->d_name[len-4], ".ch8"))
-                dptr->attr |= TREE_ATTR_CH8;
-#endif
+        /* check for known file types */
+        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) 
+        {
+            unsigned j;
+            for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
+            {
+                if (!strcasecmp(
+                    &entry->d_name[len-strlen(filetypes[j].extension)],
+                    filetypes[j].extension))
+                {
+                    dptr->attr |= filetypes[j].tree_attr;
+                    break;
+                }
+            }
         }
 
         /* memorize/compare details about the boot file */
@@ -330,17 +344,19 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
         }
 
         /* filter out non-visible files */
-        if ((*dirfilter == SHOW_PLAYLIST &&
-             !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_M3U))) ||
-            (*dirfilter == SHOW_MUSIC &&
-             !(dptr->attr & (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ||
+        if (!(dptr->attr & ATTR_DIRECTORY) && (
+            (*dirfilter == SHOW_PLAYLIST &&
+             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
+            ((*dirfilter == SHOW_MUSIC &&
+             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MPA) &&
+             (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
             (*dirfilter == SHOW_SUPPORTED && !(dptr->attr & TREE_ATTR_MASK)) ||
-            (*dirfilter == SHOW_WPS && !(dptr->attr & TREE_ATTR_WPS)) ||
-            (*dirfilter == SHOW_CFG && !(dptr->attr & TREE_ATTR_CFG)) ||
-            (*dirfilter == SHOW_LNG && !(dptr->attr & TREE_ATTR_LNG)) ||
-            (*dirfilter == SHOW_MOD && !(dptr->attr & TREE_ATTR_MOD)) ||
-            (*dirfilter == SHOW_FONT && !(dptr->attr & TREE_ATTR_FONT)) ||
-            (*dirfilter == SHOW_PLUGINS && !(dptr->attr & TREE_ATTR_ROCK)))
+            (*dirfilter == SHOW_WPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_WPS) ||
+            (*dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
+            (*dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
+            (*dirfilter == SHOW_MOD && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MOD) ||
+            (*dirfilter == SHOW_FONT && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FONT) ||
+            (*dirfilter == SHOW_PLUGINS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_ROCK)))
         {
             i--;
             continue;
@@ -459,66 +475,38 @@ static int showdir(char *path, int start, int *dirfilter)
 
     for ( i=start; i < start+tree_max_on_screen; i++ ) {
         int len;
+        unsigned j;
 
         if ( i >= filesindir )
             break;
 
         len = strlen(dircache[i].name);
 
-        switch ( dircache[i].attr & TREE_ATTR_MASK ) {
-            case ATTR_DIRECTORY:
-                icon_type = Folder;
-                break;
+        if (dircache[i].attr & ATTR_DIRECTORY)
+        {
+            icon_type = Folder;
+        }
+        else
+        {
+            /* search which icon to use */
+            icon_type = -1; /* default to none */
+            for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
+            {
+                if ((dircache[i].attr & TREE_ATTR_MASK) == filetypes[j].tree_attr)
+                {
+                    icon_type = filetypes[j].icon;
+                    break;
+                }
+            }
 
-            case TREE_ATTR_M3U:
-                icon_type = Playlist;
-                break;
-
-            case TREE_ATTR_MPA:
-                icon_type = File;
-                break;
-
-            case TREE_ATTR_WPS:
-                icon_type = Wps;
-                break;
-
-            case TREE_ATTR_CFG:
-                icon_type = Config;
-                break;
-
-            case TREE_ATTR_TXT:
-                icon_type = Text;
-                break;
-
-            case TREE_ATTR_LNG:
-                icon_type = Language;
-                break;
-
-            case TREE_ATTR_MOD:
-                icon_type = Mod_Ajz;
-                break;
-
-#ifdef HAVE_LCD_BITMAP
-            case TREE_ATTR_UCL:
-                icon_type = Flashfile;
-                break;
-#endif
- 
-            case TREE_ATTR_ROCK:
-                icon_type = Plugin;
-                break;
-
-#ifdef HAVE_LCD_BITMAP
-            case TREE_ATTR_FONT:
-                icon_type = Font;
-                break;
-#endif
-            default:
+            if (icon_type == -1)
+            {
 #ifdef HAVE_LCD_BITMAP
                 icon_type = 0;
 #else
                 icon_type = Unknown;
 #endif
+            }
         }
 
         if (icon_type && global_settings.show_icons) {

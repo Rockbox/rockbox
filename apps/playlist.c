@@ -468,7 +468,7 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
             else
                 continue;
         }
-        else if (files[i].attr & TREE_ATTR_MPA)
+        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
         {
             int insert_pos;
 
