@@ -163,19 +163,13 @@ void wps_set()
 
     bool done = false;
     int itemp = 0;
-    char buf[6];
-
-
-    buf[5] = 0;
-    //static int savedsettings[3] = { 0, 1, 2 };
-    static const char* names[] = { "Id3  ", "File ", "Parse" };
+    char* names[] = { "Id3  ", "File ", "Parse" };
 
     lcd_clear_display();
     lcd_puts(0,0,"[Display]");
 
     while (!done) {
-        snprintf(buf,sizeof(buf),"%s", names[itemp]);
-        lcd_puts(0,1,buf);
+        lcd_puts(0,1,names[itemp]);
         lcd_update();
 
         switch ( button_get(true) ) {
