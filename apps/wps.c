@@ -406,14 +406,16 @@ static bool ffwd_rew(int button)
 static bool update(void)
 {
     bool track_changed = mpeg_has_changed_track();
+    bool retcode = false;
 
     if (track_changed)
     {
         lcd_stop_scroll();
         id3 = mpeg_current_track();
         if (wps_display(id3))
-            return true;
-        wps_refresh(id3,0,true);
+            retcode = true;
+        else
+            wps_refresh(id3,0,true);
     }
 
     if (id3)
@@ -437,7 +439,7 @@ static bool update(void)
         settings_save();
     }
 
-    return false;
+    return retcode;
 }
 
 
