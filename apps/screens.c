@@ -200,16 +200,9 @@ void charging_display_info(bool animate)
         snprintf(buf, 32, "not charging");
 
     lcd_puts(0, 3, buf);
-    if (charger_enabled)
-    {
-        backlight_on(); /* using the light gives good indication */
-    }
-    else
-    {
-        backlight_off();
+    if (!charger_enabled)
         animate = false;
-    }
-#endif                
+#endif
 
     
     /* middle part */
@@ -275,7 +268,8 @@ int charging_screen(void)
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
     lcd_clear_display();
-    backlight_on();
+    if(global_settings.backlight_on_when_charging)
+       backlight_on();
     status_draw(true);
 
 #ifdef HAVE_LCD_BITMAP
