@@ -776,6 +776,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     /* get the size of char */
+    rb->lcd_setfont(FONT_SYSFIXED);
     if (char_width == -1)
         rb->lcd_getstringsize("a", &char_width, &char_height);
 
