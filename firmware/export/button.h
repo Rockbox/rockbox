@@ -66,7 +66,7 @@ bool button_hold(void);
 #define  BUTTON_UP            0x0010
 #define  BUTTON_DOWN          0x0020
 
-#define BUTTON_RC_ON          0x0200
+#define BUTTON_RC_ON          (BUTTON_REMOTE | BUTTON_ON)
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
