@@ -1,0 +1,81 @@
+############################################################################
+#             __________               __   ___.                  
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/ 
+# $Id$
+#
+# Copyright (C) 2002 by Felix Arends
+#
+# All files in this archive are subject to the GNU General Public License.
+# See the file COPYING in the source tree root for full license agreement.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+############################################################################
+
+TARGET = rockboxui
+
+FIRMWAREDIR = ../../firmware
+DRIVERS = $(FIRMWAREDIR)/drivers
+COMMON = $(FIRMWAREDIR)/common
+RM = del
+
+CC = cl
+DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DARCHOS_RECORDER -D_WIN32 -DWIN32 -DHAVE_LCD_BITMAP
+LDFLAGS = /Feuisw32.exe /link -subsystem:windows
+INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON)
+LIBS = gdi32.lib user32.lib
+
+
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
+
+#SRCS = $(wildcard *.c)
+
+SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c tree.c app.c\
+	menu.c play.c icons.c screensaver.c\
+	debug.c\
+  chartables.c kernel.c Release/uisw32.res dir-win32.c
+
+OBJS = $(SRCS:.c=.obj)
+
+
+uisw32.exe: $(OBJS)
+ $(CC) $(CFLAGS) $(LIBS) $(LDFLAGS) $(OBJS)
+ 
+lcd.obj: $(DRIVERS)/lcd.c
+ $(CC) $(CFLAGS) -c $(DRIVERS)/lcd.c -olcd.obj
+
+debug.obj: $(FIRMWAREDIR)/debug.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/debug.c -odebug.obj
+
+ 
+chartables.obj: $(FIRMWAREDIR)/chartables.c
+ $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/chartables.c -ochartables.obj
+
+tetris.obj: ../tetris.c
+ $(CC) $(CFLAGS) -c ../tetris.c -otetris.obj
+
+tree.obj: ../tree.c
+ $(CC) $(CFLAGS) -c ../tree.c -otree.obj
+
+play.obj: ../play.c
+ $(CC) $(CFLAGS) -c ../play.c -oplay.obj
+
+menu.obj: ../menu.c
+ $(CC) $(CFLAGS) -c ../menu.c -omenu.obj
+
+screensaver.obj: ../screensaver.c
+ $(CC) $(CFLAGS) -c ../screensaver.c -oscreensaver.obj
+
+app.obj: ../app.c
+ $(CC) $(CFLAGS) -c ../app.c -oapp.obj
+
+icons.obj: ../icons.c
+ $(CC) $(CFLAGS) -c ../icons.c -oicons.obj
+
+clean:
+ $(RM) *.obj
