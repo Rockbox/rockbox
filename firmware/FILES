@@ -4,7 +4,7 @@ README
 FILES
 *.lds
 common/*.[chS]
-drivers/*.[ch]
+drivers/*.[chS]
 export/*.h
 include/*.h
 include/sys/*.h
