@@ -25,12 +25,12 @@
 #include <stdio.h>
 
 int snprintf (char *buf, size_t size, const char *fmt, ...);
-#ifndef NOCYGWIN
-int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
 char *strtok_r (char *, const char *, char **);
-#endif
 
 int rockbox_fprintf (int fd, const char *fmt, ...);
 #define fprintf rockbox_fprintf
+
+int rockbox_vsnprintf (char *buf, int size, const char *fmt, va_list ap);
+#define vsnprintf rockbox_vsnprintf
 
 #endif /* __SPRINTF_H__ */
