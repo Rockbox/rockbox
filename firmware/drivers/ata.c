@@ -205,6 +205,7 @@ int ata_read_sectors(unsigned long start,
     count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
         ret = 0;
+        last_disk_activity = current_tick;
 
         if ( count == 256 )
             ATA_NSECTOR = 0; /* 0 means 256 sectors */
