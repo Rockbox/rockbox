@@ -53,8 +53,8 @@ static volatile UINT8* FB = (UINT8*)0x02000000; /* Flash base address */
 #if CONFIG_KEYPAD == ONDIO_PAD /* limited keypad */
 #define KEY1 BUTTON_LEFT
 #define KEY2 BUTTON_UP
-#define KEYNAME1 "[Left]"
-#define KEYNAME2 "[Up]"
+#define KEYNAME1 "Left"
+#define KEYNAME2 "Up"
 #else /* recorder keypad */
 #define KEY1 BUTTON_F1
 #define KEY2 BUTTON_F2
