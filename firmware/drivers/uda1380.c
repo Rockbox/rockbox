@@ -49,7 +49,7 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
         REG_I2S,      I2S_IFMT_IIS,
         REG_PWR,      PON_PLL | PON_HP | PON_DAC | EN_AVC | PON_AVC | PON_BIAS,
         REG_AMIX,     AMIX_RIGHT(0x10) | AMIX_LEFT(0x10), /* 00=max, 3f=mute */
-        REG_MASTER_VOL, MASTER_VOL_LEFT(0x7f) | MASTER_VOL_RIGHT(0x7f), /* 00=max, ff=mute */
+        REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
         REG_MIX_VOL,    MIX_VOL_CHANNEL_1(0) | MIX_VOL_CHANNEL_2(0xff), /* 00=max, ff=mute */
         REG_EQ,         0,
         REG_MUTE,       MUTE_CH2, /* Mute channel 2 (digital decimation filter) */
@@ -131,6 +131,8 @@ int uda1380_set_regs(void)
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
+    PLLCR &= ~(1 << 22);     /* Set AudioClk = FXTAL/2*/
+
     if (uda1380_set_regs() == -1)
         return -1;
     

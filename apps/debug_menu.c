@@ -169,27 +169,29 @@ static void test_get_more(unsigned char **ptr, long *size)
 bool uda1380_test(void)
 {
     long button;
-    int vol = 0x7f;
+    int vol = 0x50;
     bool done = false;
 
     lcd_setmargins(0, 0);
     lcd_clear_display(); 
     lcd_update();
+    cpu_boost(true);
 
     if (load_wave("/sample.wav") == -1)
         goto exit;
 
     audio_pos = 0;
 
+    puts("Playing..");
     puts("uda1380_init");
     if (uda1380_init() == -1)
     {
-        puts("Init failed..");
-        goto exit;
+        puts("UDA1380 init failed");
     }
 
-    puts("Playing..");
     audio_pos = 0;
+    pcm_set_frequency(44100);
+    pcm_set_volume(0xff - vol);
     pcm_play_data(audio_buffer, CHUNK_SIZE,
                   test_get_more);
 
@@ -224,6 +226,7 @@ bool uda1380_test(void)
 
 exit:
     sleep(HZ >> 1);  /* Sleep 1/2 second to fade out sound */
+    cpu_boost(false);
 
     return false;
 }
@@ -1247,10 +1250,9 @@ bool view_battery(void)
                 lcd_puts(0, 3, buf);
 #endif
 #ifdef HAVE_CHARGE_CTRL
-                snprintf(buf, 30, "Chgr: %s %s", 
-                         charger_inserted() ? "present" : "absent",
-                         charger_enabled ? "on" : "off");
-                lcd_puts(0, 3, buf);
+                snprintf(buf, 30, "Charging: %s", 
+                         charger_enabled ? "yes" : "no");
+                lcd_puts(0, 4, buf);
                 snprintf(buf, 30, "short delta: %d", short_delta);
                 lcd_puts(0, 5, buf);
                 snprintf(buf, 30, "long delta: %d", long_delta);
@@ -1272,7 +1274,7 @@ bool view_battery(void)
                 }
                 break;
 
-            case 3: /* remaining time estimation: */
+            case 3: /* remeining time estimation: */
                 lcd_clear_display();
 
 #ifdef HAVE_CHARGE_CTRL
@@ -1284,24 +1286,23 @@ bool view_battery(void)
 
                 snprintf(buf, 30, "Lvl@cyc st: %d%%", powermgmt_last_cycle_level);
                 lcd_puts(0, 2, buf);
-
-                snprintf(buf, 30, "P=%2d I=%2d", pid_p, pid_i);
-                lcd_puts(0, 3, buf);
-
-                snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
-                lcd_puts(0, 4, buf);
 #endif
 
                 snprintf(buf, 30, "Last PwrHist: %d.%02d V",
                     power_history[0] / 100,
                     power_history[0] % 100);
-                lcd_puts(0, 5, buf);
+                lcd_puts(0, 3, buf);
 
                 snprintf(buf, 30, "battery level: %d%%", battery_level());
-                lcd_puts(0, 6, buf);
+                lcd_puts(0, 5, buf);
 
                 snprintf(buf, 30, "Est. remain: %d m", battery_time());
+                lcd_puts(0, 6, buf);
+
+#ifdef HAVE_CHARGE_CTRL
+                snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
                 lcd_puts(0, 7, buf);
+#endif                
                 break;
         }
         

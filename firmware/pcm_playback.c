@@ -37,20 +37,32 @@
 #include "file.h"
 #include "buffer.h"
 
-bool pcm_playing;
+#include "sprintf.h"
+#include "button.h"
+#include <string.h>
+
+static bool pcm_playing;
+static int pcm_freq = 0x6; // 44.1 in default
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-static void dma_start(const void *addr, long size)
-{
+static void dma_start(const void *addr_r, long size)
+{   
     pcm_playing = 1;
+    int i;
+    
+    int align;
+    align = 4;
+
+    void* addr = (void*)((((unsigned int)addr_r) >> 2) << 2); // always align data, never pass unaligned data
+    size = (size >> 2) << 2; // size shoudl also be always multiple of 4
 
     BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
 
     /* Set up DMA transfer  */
     DIVR0 = 54;          /* DMA0 is mapped into vector 54 in system.c */
-    SAR0 = (unsigned long)addr;         /* Source address */
+    SAR0 = ((unsigned long)addr) + align*4;         /* Source address */
     DAR0 = (unsigned long)&PDOR3;       /* Destination address */
-    BCR0 = size;                        /* Bytes to transfer */
+    BCR0 = size-(align*4);                        /* Bytes to transfer */
     DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
     DMACONFIG = 1;   /* Enable DMA0Req => set DMAROUTE |= DMA0_REQ_AUDIO_1 */
 
@@ -61,14 +73,10 @@ static void dma_start(const void *addr, long size)
     ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
     IMR &= ~(1<<14);      /* bit 14 is DMA0 */
 
-    IIS2CONFIG = 0x4300;   /* CLOCKSEL = AudioClk/8 (44.1kHz),
-                              data source = PDOR3 */
+    IIS2CONFIG = (pcm_freq << 12) | 0x300;   /* CLOCKSEL for right frequency +  data source = PDOR3 */
 
-    PDOR3 = 0; /* These are needed to generate FIFO empty request to DMA.. */
-    PDOR3 = 0;
-    PDOR3 = 0;
-    PDOR3 = 0;
-    PDOR3 = 0;
+    for(i = 0; i < align; i++)
+        PDOR3 = ((unsigned int*)(addr))[i]; /* These are needed to generate FIFO empty request to DMA.. */
 }
 
 /* Stops the DMA transfer and interrupt */
@@ -76,10 +84,49 @@ static void dma_stop(void)
 {
     pcm_playing = 0;
     DCR0 = 0;
+                       
+/*    DMAROUTE &= 0xffffff00;
+    DMACONFIG = 0;*/
+
+    IIS2CONFIG = 0x800;
     
     /* Disable DMA0 interrupt */
     IMR |= (1<<14);
     ICR4 &= 0xffff00ff;
+}
+
+
+/* set volume of the main channel */
+void pcm_set_volume(int volume)
+{
+   if(volume > 0)
+   {
+       uda1380_mute(0);
+       uda1380_setvol(0xff - volume); 
+   }
+   else
+   {
+       uda1380_mute(1);
+   } 
+}
+
+/* sets frequency of input to DAC */
+void pcm_set_frequency(unsigned int frequency)
+{
+   switch(frequency)
+   {
+    case 11025:
+        pcm_freq = 0x2;
+        break;
+    case 22050:
+        pcm_freq = 0x4;
+        break;
+    case 44100:
+        pcm_freq = 0x6;
+        break;
+    default:
+        pcm_freq = 0x6;
+   }
 }
 
 /* the registered callback function to ask for more mp3 data */
@@ -110,7 +157,14 @@ void DMA0(void)
     unsigned char* start;
     long size = 0;
 
+    int res = DSR0;
+
     DSR0 = 1;    /* Clear interrupt */
+
+    if(res == 0x41)
+    {
+       dma_stop();
+    }
 
     if (callback_for_more)
     {

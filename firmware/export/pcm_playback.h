@@ -19,9 +19,11 @@
 #ifndef PCM_PLAYBACK_H
 #define PCM_PLAYBACK_H
 
+void pcm_set_frequency(unsigned int frequency);
 void pcm_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, long* size));
 void pcm_play_stop(void);
 bool pcm_is_playing(void);
+void pcm_set_volume(int volume);
 
 #endif

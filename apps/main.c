@@ -58,6 +58,10 @@
 #include "power.h"
 #include "talk.h"
 #include "plugin.h"
+
+
+#include "uda1380.h"
+
 #ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -261,6 +265,9 @@ void init(void)
         }
     }
 #endif /* #ifdef AUTOROCK */
+
+    uda1380_init();
+
 }
 
 int main(void)

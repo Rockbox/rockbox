@@ -43,6 +43,7 @@
 #include "id3.h"
 #include "mpeg.h"
 #include "mp3_playback.h"
+#include "pcm_playback.h"
 #include "settings.h"
 #include "thread.h"
 #include "playlist.h"
@@ -317,11 +318,13 @@ struct plugin_api {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     bool (*button_hold)(void);
 #endif
-#if (CONFIG_HWCODEC == MASNONE)  && !defined(SIMULATOR)
+#if (CONFIG_HWCODEC == MASNONE)
     void (*pcm_play_data)(const unsigned char *start, int size,
 		    void (*get_more)(unsigned char** start, long*size));
-    void (*pcm_play_stop)(void);
+    void (*pcm_play_stop)(void);    
+    void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
+    void (*pcm_set_volume)(int volume);
 #endif
 };
 

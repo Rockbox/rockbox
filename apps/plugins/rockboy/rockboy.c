@@ -51,6 +51,7 @@ struct plugin_api* rb;
 int shut,cleanshut;
 char *errormsg;
 int gnuboy_main(char *rom);
+void pcm_close(void);
 
 void die(char *message, ...)
 {
@@ -124,10 +125,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ*2, true, errormsg);
         return PLUGIN_ERROR;
     }
-
+    pcm_close();
     rb->splash(HZ*2, true, "Shutting down.. byebye ^^");
 
     cleanup();
+
 
     return PLUGIN_OK;
 }

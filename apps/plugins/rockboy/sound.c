@@ -60,9 +60,9 @@ int pcm_submit(void);
 #define S4 (snd.ch[3])
 
 rcvar_t sound_exports[] =
-    {
-        RCV_END
-    };
+{
+    RCV_END
+};
 
 
 static void s1_freq_d(int d)
@@ -275,10 +275,10 @@ void sound_mix(void)
                 pcm_submit();
             if (pcm.stereo)
             {
-                pcm.buf[pcm.pos++] = l+128;
-                pcm.buf[pcm.pos++] = r+128;
+                pcm.buf[pcm.pos++] = (signed short)(l * 256);
+                pcm.buf[pcm.pos++] = (signed short)(r * 256);
             }
-            else pcm.buf[pcm.pos++] = ((l+r)>>1)+128;
+            else pcm.buf[pcm.pos++] = (signed short)((r+l) * 128);
         }
     }
     R_NR52 = (R_NR52&0xf0) | S1.on | (S2.on<<1) | (S3.on<<2) | (S4.on<<3);
