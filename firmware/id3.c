@@ -49,6 +49,11 @@
                              ((b3 & 0x7F) << (1*7)) | \
                              ((b4 & 0x7F) << (0*7)))
 
+#define BYTES_TO_INT(b1,b2,b3,b4) (((b1 & 0xFF) << (3*8)) | \
+                                   ((b2 & 0xFF) << (2*8)) | \
+                                   ((b3 & 0xFF) << (1*8)) | \
+                                   ((b4 & 0xFF) << (0*8)))
+
 /* Table of bitrates for MP3 files, all values in kilo.
  * Indexed by version, layer and value of bit 15-12 in header.
  */
@@ -215,8 +220,15 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(version > 2) {
             memcpy(header, (buffer + readsize), 10);
             readsize += 10;
-            headerlen = UNSYNC(header[4], header[5], 
-                               header[6], header[7]);
+            if (version > 3) {
+                headerlen = UNSYNC(header[4], header[5], 
+                                   header[6], header[7]);
+            } else {
+                /* version .3 files don't use synchsafe ints for
+                 * size */
+                headerlen = BYTES_TO_INT(header[4], header[5], 
+                                         header[6], header[7]);
+            }
         } else {
             memcpy(header, (buffer + readsize), 6);			
             readsize += 6;
