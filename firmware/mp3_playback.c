@@ -61,7 +61,7 @@ static long cumulative_ticks;
 static void (*callback_for_more)(unsigned char**, int*);
 #endif /* #ifndef SIMULATOR */
 
-static char *units[] =
+static const char* const units[] =
 {
     "%",    /* Volume */
     "dB",   /* Bass */
@@ -81,7 +81,7 @@ static char *units[] =
     "",     /* Super bass */
 };
 
-static int numdecimals[] =
+static const int numdecimals[] =
 {
     0,    /* Volume */
     0,    /* Bass */
@@ -101,7 +101,7 @@ static int numdecimals[] =
     0,    /* Super bass */
 };
 
-static int steps[] =
+static const int steps[] =
 {
     1,    /* Volume */
     1,    /* Bass */
@@ -121,7 +121,7 @@ static int steps[] =
     1,    /* Super bass */
 };
 
-static int minval[] =
+static const int minval[] =
 {
     0,    /* Volume */
 #ifdef HAVE_MAS3587F
@@ -146,7 +146,7 @@ static int minval[] =
     0,    /* Super bass */
 };
 
-static int maxval[] =
+static const int maxval[] =
 {
     100,  /* Volume */
 #ifdef HAVE_MAS3587F
@@ -171,7 +171,7 @@ static int maxval[] =
     1,    /* Super bass */
 };
 
-static int defaultval[] =
+static const int defaultval[] =
 {
     70,   /* Volume */
 #ifdef HAVE_MAS3587F
@@ -196,7 +196,7 @@ static int defaultval[] =
     0,    /* Super bass */
 };
 
-char *mpeg_sound_unit(int setting)
+const char *mpeg_sound_unit(int setting)
 {
     return units[setting];
 }

@@ -52,7 +52,7 @@ bool set_sound(char* string,
     int numdec;
     int integer;
     int dec;
-    char* unit;
+    const char* unit;
     char str[32];
     int talkunit = UNIT_INT;
     int steps;

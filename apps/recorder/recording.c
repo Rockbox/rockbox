@@ -89,7 +89,7 @@ static char *fmtstr[] =
 char *fmt_gain(int snd, int val, char *str, int len)
 {
     int tmp, i, d, numdec;
-    char *unit;
+    const char *unit;
     
     tmp = mpeg_val2phys(snd, val);
     numdec = mpeg_sound_numdecimals(snd);
