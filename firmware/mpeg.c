@@ -2014,8 +2014,8 @@ static void mpeg_thread(void)
 
 static void setup_sci0(void)
 {
-    /* PB15 is I/O, PB14 is IRQ6, PB12 is SCK0 */
-    PBCR1 = (PBCR1 & 0x0cff) | 0x1200;
+    /* PB15 is I/O, PB14 is IRQ6, PB12 is SCK0, PB9 is TxD0 */
+    PBCR1 = (PBCR1 & 0x0cff) | 0x1208;
     
     /* Set PB12 to output */
     PBIOR |= 0x1000;
@@ -2973,7 +2973,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     loudness = bass_boost = avc;
 #endif
 
-	PAIOR |= 0x0800; /* output for /PR */
+    PAIOR |= 0x0800; /* output for /PR */
     setup_sci0();
 
 #ifdef HAVE_MAS3587F
