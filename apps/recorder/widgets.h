@@ -21,16 +21,22 @@
 #include <lcd.h>
 
 #ifdef HAVE_LCD_BITMAP
-/* Directions for progressbar and scrollbar */
-enum
-{
+/* Directions for progressbar and slidebar */
+enum {
     Grow_Right = 0,
     Grow_Left,
     Grow_Down,
     Grow_Up
 };
 
+/* Orientation for scrollbar */
+enum {
+    VERTICAL = 0,
+    HORIZONTAL
+};
+
 extern void progressbar(int x, int y, int width, int height, int percent, int direction);
 extern void slidebar(int x, int y, int width, int height, int percent, int direction);
+extern void scrollbar(int x, int y, int width, int height, int items, int min_shown, int max_shown, int orientation);
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __WIDGETS_H__ */
