@@ -1,0 +1,175 @@
+Rockbox History
+
+* Dec 2001
+
+  Björn Stenberg set up and announced the mailing list for Archos Open Source
+  Jukebox software hacking dicsussions. People started to join up. The
+  scrambling algorithm was "broken" and the first ever LED-flashing program
+  was downloaded and run.
+
+  Lots of efforts were put on researching the hardware, how it works, what
+  circuits that are used, where to find the spec sheets for those circuits
+  etc.
+
+  By the end of the month, the first working LCD-code for the Recorder was
+  written.
+
+  148 mails was posted to the list.
+
+* Jan 2002
+
+  Initial source packages were offered that did basic things like scrolling
+  or blinking on the screen.
+
+  A vote page was setup for people to vote on a project name, and even while
+  Rockbox was not the winning one, Björn showed his dictator-side and set the
+  project name. Rockbox it shall be.
+
+  Discussions about development environments.
+
+  The issue of locked hard disks were discussed a lot, since Björn got this
+  problem on a whole range of his disks!
+
+  More hardware pins and functionality was detected and researched.
+
+  At the end of the month, Rockbox was setup as a project on sourceforge.net
+  and people immediately started posting feature-requests.
+
+  187 mails was posted to the list.
+
+* Feb 2002
+
+  Linus Feltzing Nielsen did some major progress on his gdb-stub and
+  associated hardware modification to do really low-level debugging.
+
+  Lots of feature-requests were posted.
+
+  47 mails was posted to the list.
+
+* Mar 2002
+
+  Robert Hak suggested we start maintaining a FAQ, and took an initiative
+  to start the #rockbox IRC channel.
+
+  Daniel started the work on the simulator.
+
+  Initial code was added to the CVS.
+
+  72 mails was posted to the list.
+
+* Apr 2002
+
+  UI-wise functionality is getting written, as by the help of the simulator we
+  write code even though the lower levels aren't quite there yet.
+
+  April 19th. Björn, Linus, Daniel and Kjell gathered at the "Rockbox
+  Developer Conference 2002" at Linus' place and drew up a basic design of the
+  Rockbox software.
+
+  Julien Labruyére donated a slightly broken Archos Jukebox 6000 to the
+  project.
+
+  70 mails was posted to the list.
+
+* May 2002
+
+  Introducing our cool playlist concept.
+
+  May 3rd. We have sound. Rockbox was able to produce sound for the first time
+  ever. The 4 seconds of music was the beginning of "Arcade" by Machinae
+  Supremacy.
+
+  The FAT32 driver is working! We can access the file system.
+
+  The dir browser could run on a Player. The ATA code still didn't work on the
+  Recorder.
+
+  May 28th. We start offering "daily builds" on the Rockbox web site.
+
+  103 mails was posted to the list.
+
+* Jun 2002
+
+  June 2nd. Rockbox 1.0 (for players only) is released.
+
+  The WPS concept was introduced.
+
+  June 19th. Working Archos Recorder mp3 playback was announced to the list.
+
+  June 19th. Rockbox 1.1 was released.
+
+  355 mails was posted to the list.
+
+* Jul 2002
+
+  430 mails was posted to the list.
+
+* Aug 2002
+
+  August 9th. Rockbox 1.2 was released.
+
+  August 28th. Rockbox 1.3 was released.
+
+  1199 mails was posted to the list.
+
+* Sep 2002
+
+  ROLO was introduced.
+
+  Multiple-language support was added.
+
+  1375 mails was posted to the list.
+
+* Oct 2002
+
+  October 11th. Rockbox 1.4 was release.
+
+  831 mails was posted to the list.
+
+* Nov 2002
+
+  On Nov 10th, Linus announced the first recording code committed to CVS and
+  made available to users.
+
+* Dec 2002
+
+  On Dec 19th, Björn posted the first ever test version for the FM Recorder.
+  Didn't work much...
+
+* Jan 2003.
+
+  The FM version starts to work properly in the end of January.
+
+* Feb 2003
+
+  Matthew P. O'Reilly donated an FM Recorder to Linus. Linus had it for 2
+  hours before he took it apart and started drawing schematics...
+
+  The FM version of Rockbox hits the daily builds on February 17th.
+
+* Apr 2003
+
+  The April 1st joke, Doom on Archos, heated up the community.
+
+  On April 15th, the long awaited Rockbox 2.0 was released. Works fine on
+  Players, Recorders as well as FM Recorders (but without FM tuner support).
+
+  Daniel started editing and publishing the Rockbox Digest.
+
+  368 subscribers of the development mailing list.
+  1349 mails was posted to the list by 181 authors.
+
+* May 2003
+
+  On May 3rd, Linus committed the first code ever that made use of the FM
+  tuner on the FM model.
+
+* June 2003
+
+  On June 29th, Björn committed the first plugin interface and things, and
+  now Rockbox runs plugins.
+
+* July 2003
+
+  On July 9th, Jörg Hohensohn announced the first official release of Rockbox
+  in flash! It only works on the Recorders and the FM Recorders.
