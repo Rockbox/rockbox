@@ -25,28 +25,56 @@
 /* Registers used:
  *
  * r0   Temporary (required by some instructions)
- * r1   Flip table
- * r4   Argument:  Data pointer
- * r5   Argument:  Length (in bytes)
+ * r1   Low byte
+ * r2   High byte
+ * r3   Result after flip
+ * r4   Data
+ * r5   Length
+ * r6   1
+ * r7   Flip table
  */
 
-/* TODO: Optimize for DRAM burst operation by reading and writing in chunks
-   We do not want to optimize by reading/writing words, because the data
-   pointer may be odd */
- 
 _bitswap:
-    mov.l   .fliptable,r1
-    add r4,r5             /* Calculate end of buffer */
+    mov.l   .fliptable,r7
+    mov #1,r6
+    mov r4,r0
+    and #1,r0               /* odd address? */
+    cmp/eq  #0,r0
+    bt  .init               /* no, address is even */
+
+    mov.b   @r4,r0          /* swap first byte */
+    extu.b  r0,r0
+    mov.b   @(r0,r7),r0
+    mov.b   r0,@r4
+    add #1,r4
+    add #-1,r5
     bra .init
 .loop:
-    mov.b   @r4,r0        /* Data to flip */
-    extu.b  r0,r0         /* Zero extend */
-    mov.b   @(r0,r1),r0   /* Look up in the flip table */
-    mov.b   r0,@r4        /* Store result */
-    add #1,r4
+    mov.w   @r4,r1          /* data to flip */
+    swap.b  r1,r2
+    extu.b  r2,r0           /* high byte */
+    mov.b   @(r0,r7),r2
+    extu.b  r2,r0           /* Zero extend */
+    swap.b  r0,r3           /* put high byte in result */
+    extu.b  r1,r0           /* low byte */
+    mov.b   @(r0,r7),r1
+    extu.b  r1,r0           /* Zero extend */
+    or  r0,r3               /* put low byte in result */
+    mov.w   r3,@r4          /* store result */
+    add #2,r4
+    add #-2,r5
 .init:
-    cmp/gt  r4,r5         /* while (dataptr < start+length) */
-    bt  .loop
+    cmp/gt  r6,r5           /* while [bytes remaining] > 1 */
+    bt  .loop               /* (at least 2 bytes left) */
+
+    cmp/eq  r6,r5
+    bf  .exit               /* if not 1 byte left, exit */
+
+    mov.b   @r4,r0              /* swap last byte */
+    extu.b  r0,r0
+    mov.b   @(r0,r7),r0
+    mov.b   r0,@r4
+.exit:
     rts
 
     .align  4
