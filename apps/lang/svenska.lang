@@ -1021,8 +1021,8 @@ new: "Numerisk"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
-new: "dBfs"
+eng: "Logarithmic(dB)"
+new: "Logaritmisk(dB)"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
@@ -1036,8 +1036,8 @@ new: "Bästa prestanda"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear"
-new: "Linjär"
+eng: "Linear(%)"
+new: "Linjär(%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
@@ -1056,8 +1056,8 @@ new: "Prestanda"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> Linear"
-new: "dBfs <-> Linjär"
+eng: "Scale"
+new: "Skala"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -1275,12 +1275,12 @@ eng: "Failed"
 new: "misslyckades"
 
 id: LANG_PLAYER_ONPLAY_1
-desc: 
+desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
 new: "\x81 Köa"
 
 id: LANG_PLAYER_ONPLAY_2
-desc: 
+desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
 new: "- Ren + Del"
 
@@ -1391,8 +1391,8 @@ new: "Bred stereo"
 
 id: LANG_INVERT
 desc: in settings_menu
-eng: "Invert"
-new: "Invertera"
+eng: "LCD Mode"
+new: "LCD-Läge"
 
 id: LANG_SOKOBAN_ON
 desc: how to undo move 
@@ -1441,10 +1441,45 @@ new: "Rullningslist"
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
-eng: "Invert cursor"
-new: "Invertera markören"
+eng: "Line Selector"
+new: "Radväljare"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
-eng: "Editable files"
-new: "Redigerbara filer"
+eng: "Independent frames"
+new: "Oberoende ramar"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Rubrikbelysning"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Streck(Inverterad)"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Pekare"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "Inverterad"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "Normal"
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+new: "Max filer i filväljaren"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+new: "Max storlek på spellistan"
