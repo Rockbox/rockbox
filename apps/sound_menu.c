@@ -183,7 +183,42 @@ static bool avc(void)
     return set_option(str(LANG_DECAY), &global_settings.avc, 
                       names, 4, set_avc);
 }
-#endif /* ARCHOS_RECORDER */
+
+static bool recsource(void)
+{
+    char *names[] = {str(LANG_RECORDING_SRC_MIC), str(LANG_RECORDING_SRC_LINE),
+                     str(LANG_RECORDING_SRC_DIGITAL) };
+    return set_option(str(LANG_RECORDING_SOURCE),
+                      &global_settings.rec_source,
+                      names, 3, NULL );
+}
+
+static bool recfrequency(void)
+{
+    char *names[] = {"44.1kHz", "48kHz", "32kHz",
+                     "22.05kHz", "24kHz", "16kHz"};
+
+    return set_option(str(LANG_RECORDING_FREQUENCY),
+                      &global_settings.rec_frequency,
+                      names, 6, NULL );
+}
+
+static bool recchannels(void)
+{
+    char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO)};
+
+    return set_option(str(LANG_RECORDING_CHANNELS),
+                      &global_settings.rec_channels,
+                      names, 2, NULL );
+}
+
+static bool recquality(void)
+{
+    return set_int(str(LANG_RECORDING_QUALITY), "",
+                   &global_settings.rec_quality, 
+                   NULL, 1, 0, 7 );
+}
+#endif /* HAVE_MAS3587F */
 
 static void set_chanconf(int val)
 {
@@ -221,3 +256,23 @@ bool sound_menu(void)
 
     return result;
 }
+
+#ifdef HAVE_MAS3587F
+bool recording_menu(void)
+{
+    int m;
+    bool result;
+    struct menu_items items[] = {
+        { str(LANG_RECORDING_QUALITY), recquality },
+        { str(LANG_RECORDING_FREQUENCY), recfrequency },
+        { str(LANG_RECORDING_SOURCE), recsource },
+        { str(LANG_RECORDING_CHANNELS), recchannels },
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+#endif

@@ -35,6 +35,7 @@
 #include "peakmeter.h"
 #include "status.h"
 #include "menu.h"
+#include "sound_menu.h"
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -45,14 +46,6 @@ extern int recording_peak_right;
 extern int mp3buf_write;
 extern int mp3buf_read;
 extern bool recording;
-
-int mic_gain = 8;
-int left_gain = 2;
-int right_gain = 2;
-unsigned int recording_quality = 5;
-unsigned int recording_frequency = 0;
-unsigned int recording_channel_mode = 0;
-unsigned int recording_source = 0;
 
 #define SOURCE_MIC 0
 #define SOURCE_LINE 1
@@ -70,13 +63,15 @@ char *freq_str[6] =
 
 static void set_gain(void)
 {
-    if(recording_source == SOURCE_MIC)
+    if(global_settings.rec_source == SOURCE_MIC)
     {
-        mpeg_set_recording_gain(left_gain, 0, mic_gain);
+        mpeg_set_recording_gain(global_settings.rec_left_gain, 0,
+                                global_settings.rec_mic_gain);
     }
     else
     {
-        mpeg_set_recording_gain(left_gain, right_gain, 0);
+        mpeg_set_recording_gain(global_settings.rec_left_gain,
+                                global_settings.rec_right_gain, 0);
     }
 }
 
@@ -107,7 +102,7 @@ int cursor;
 
 void adjust_cursor(void)
 {
-    if(recording_source == SOURCE_LINE)
+    if(global_settings.rec_source == SOURCE_LINE)
     {
         if(cursor < 0)
             cursor = 0;
@@ -140,8 +135,10 @@ bool recording_screen(void)
     
     peak_meter_enabled = true;
 
-    mpeg_set_recording_options(recording_frequency, recording_quality,
-                               recording_source, recording_channel_mode);
+    mpeg_set_recording_options(global_settings.rec_frequency,
+                               global_settings.rec_quality,
+                               global_settings.rec_source,
+                               global_settings.rec_channels);
 
     lcd_setfont(FONT_UI);
     lcd_getstringsize("M", &w, &h);
@@ -189,30 +186,37 @@ bool recording_screen(void)
                 switch(cursor)
                 {
                     case 0:
-                        if(recording_source == SOURCE_MIC)
+                        if(global_settings.rec_source == SOURCE_MIC)
                         {
-                            mic_gain++;
-                            if(mic_gain > mpeg_sound_max(SOUND_MIC_GAIN))
-                                mic_gain = mpeg_sound_max(SOUND_MIC_GAIN);
+                            global_settings.rec_mic_gain++;
+                            if(global_settings.rec_mic_gain >
+                               mpeg_sound_max(SOUND_MIC_GAIN))
+                                global_settings.rec_mic_gain =
+                                    mpeg_sound_max(SOUND_MIC_GAIN);
                         }
                         else
                         {
-                            gain = MAX(left_gain, right_gain) + 1;
+                            gain = MAX(global_settings.rec_left_gain,
+                                       global_settings.rec_right_gain) + 1;
                             if(gain > mpeg_sound_max(SOUND_MIC_GAIN))
                                 gain = mpeg_sound_max(SOUND_MIC_GAIN);
-                            left_gain = gain;
-                            right_gain = gain;
+                            global_settings.rec_left_gain = gain;
+                            global_settings.rec_right_gain = gain;
                         }
                         break;
                     case 1:
-                        left_gain++;
-                        if(left_gain > mpeg_sound_max(SOUND_LEFT_GAIN))
-                            left_gain = mpeg_sound_max(SOUND_LEFT_GAIN);
+                        global_settings.rec_left_gain++;
+                        if(global_settings.rec_left_gain >
+                           mpeg_sound_max(SOUND_LEFT_GAIN))
+                            global_settings.rec_left_gain =
+                                mpeg_sound_max(SOUND_LEFT_GAIN);
                         break;
                     case 2:
-                        right_gain++;
-                        if(right_gain > mpeg_sound_max(SOUND_RIGHT_GAIN))
-                            right_gain = mpeg_sound_max(SOUND_RIGHT_GAIN);
+                        global_settings.rec_right_gain++;
+                        if(global_settings.rec_right_gain >
+                           mpeg_sound_max(SOUND_RIGHT_GAIN))
+                            global_settings.rec_right_gain =
+                                mpeg_sound_max(SOUND_RIGHT_GAIN);
                         break;
                 }
                 set_gain();
@@ -223,36 +227,50 @@ bool recording_screen(void)
                 switch(cursor)
                 {
                     case 0:
-                        if(recording_source == SOURCE_MIC)
+                        if(global_settings.rec_source == SOURCE_MIC)
                         {
-                            mic_gain--;
-                            if(mic_gain < mpeg_sound_min(SOUND_MIC_GAIN))
-                                mic_gain = mpeg_sound_min(SOUND_MIC_GAIN);
+                            global_settings.rec_mic_gain--;
+                            if(global_settings.rec_mic_gain <
+                               mpeg_sound_min(SOUND_MIC_GAIN))
+                                global_settings.rec_mic_gain =
+                                    mpeg_sound_min(SOUND_MIC_GAIN);
                         }
                         else
                         {
-                            gain = MAX(left_gain, right_gain) - 1;
+                            gain = MAX(global_settings.rec_left_gain,
+                                       global_settings.rec_right_gain) - 1;
                             if(gain < mpeg_sound_min(SOUND_LEFT_GAIN))
                                 gain = mpeg_sound_min(SOUND_LEFT_GAIN);
-                            left_gain = gain;
-                            right_gain = gain;
+                            global_settings.rec_left_gain = gain;
+                            global_settings.rec_right_gain = gain;
                         }
                         break;
                     case 1:
-                        left_gain--;
-                        if(left_gain < mpeg_sound_min(SOUND_LEFT_GAIN))
-                            left_gain = mpeg_sound_min(SOUND_LEFT_GAIN);
+                        global_settings.rec_left_gain--;
+                        if(global_settings.rec_left_gain <
+                           mpeg_sound_min(SOUND_LEFT_GAIN))
+                            global_settings.rec_left_gain =
+                                mpeg_sound_min(SOUND_LEFT_GAIN);
                         break;
                     case 2:
-                        right_gain--;
-                        if(right_gain < mpeg_sound_min(SOUND_MIC_GAIN))
-                            right_gain = mpeg_sound_min(SOUND_MIC_GAIN);
+                        global_settings.rec_right_gain--;
+                        if(global_settings.rec_right_gain <
+                           mpeg_sound_min(SOUND_MIC_GAIN))
+                            global_settings.rec_right_gain =
+                                mpeg_sound_min(SOUND_MIC_GAIN);
                         break;
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
                 
+            case BUTTON_F1:
+                if (recording_menu())
+                    return SYS_USB_CONNECTED;
+                settings_save();
+                update_countdown = 1; /* Update immediately */
+                break;
+
             case BUTTON_F2:
                 if (f2_rec_screen())
                     return SYS_USB_CONNECTED;
@@ -282,18 +300,20 @@ bool recording_screen(void)
                 peak_meter_draw(0, 8 + h, LCD_WIDTH, h);
 
                 /* Show mic gain if input source is Mic */
-                if(recording_source == 0)
+                if(global_settings.rec_source == 0)
                 {
                     snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
-                             fmt_gain(SOUND_MIC_GAIN, mic_gain,
+                             fmt_gain(SOUND_MIC_GAIN,
+                                      global_settings.rec_mic_gain,
                                       buf2, sizeof(buf2)));
                     lcd_puts(0, 3, buf);
                 }
                 else
                 {
-                    if(recording_source == SOURCE_LINE)
+                    if(global_settings.rec_source == SOURCE_LINE)
                     {
-                        gain = MAX(left_gain, right_gain);
+                        gain = MAX(global_settings.rec_left_gain,
+                                   global_settings.rec_right_gain);
                         
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
                                  fmt_gain(SOUND_LEFT_GAIN, gain,
@@ -301,12 +321,14 @@ bool recording_screen(void)
                         lcd_puts(0, 3, buf);
                         
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_LEFT),
-                                 fmt_gain(SOUND_LEFT_GAIN, left_gain,
+                                 fmt_gain(SOUND_LEFT_GAIN,
+                                          global_settings.rec_left_gain,
                                           buf2, sizeof(buf2)));
                         lcd_puts(0, 4, buf);
                         
                         snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_RIGHT),
-                                 fmt_gain(SOUND_RIGHT_GAIN, right_gain,
+                                 fmt_gain(SOUND_RIGHT_GAIN,
+                                          global_settings.rec_right_gain,
                                           buf2, sizeof(buf2)));
                         lcd_puts(0, 5, buf);
                     }
@@ -314,14 +336,14 @@ bool recording_screen(void)
 
                 status_draw();
 
-                if(recording_source != SOURCE_SPDIF)
+                if(global_settings.rec_source != SOURCE_SPDIF)
                     put_cursorxy(0, 3 + cursor, true);
 
                 snprintf(buf, 32, "%s %s [%d]",
-                         freq_str[recording_frequency],
-                         recording_channel_mode?
+                         freq_str[global_settings.rec_frequency],
+                         global_settings.rec_channels?
                          str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
-                         recording_quality);
+                         global_settings.rec_quality);
                 lcd_puts(0, 6, buf);
             }
             else
@@ -357,7 +379,7 @@ bool f2_rec_screen(void)
 
         /* Recording quality */
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_QUALITY));
-        snprintf(buf, 32, "%d", recording_quality);
+        snprintf(buf, 32, "%d", global_settings.rec_quality);
         lcd_putsxy(0, LCD_HEIGHT/2-h, buf);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
@@ -366,14 +388,14 @@ bool f2_rec_screen(void)
         snprintf(buf, sizeof buf, "%s:", str(LANG_RECORDING_FREQUENCY));
         lcd_getstringsize(buf,&w,&h);
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
-        ptr = freq_str[recording_frequency];
+        ptr = freq_str[global_settings.rec_frequency];
         lcd_getstringsize(ptr, &w, &h);
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
 
         /* Channel mode */
-        switch ( recording_channel_mode ) {
+        switch ( global_settings.rec_channels ) {
             case 0:
                 ptr = str(LANG_CHANNEL_STEREO);
                 break;
@@ -383,9 +405,9 @@ bool f2_rec_screen(void)
                 break;
         }
 
-        lcd_getstringsize(str(LANG_RECORDING_CHANNEL), &w, &h);
+        lcd_getstringsize(str(LANG_RECORDING_CHANNELS), &w, &h);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
-                   str(LANG_RECORDING_CHANNEL));
+                   str(LANG_RECORDING_CHANNELS));
         lcd_getstringsize(str(LANG_F2_MODE), &w, &h);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
         lcd_getstringsize(ptr, &w, &h);
@@ -398,25 +420,25 @@ bool f2_rec_screen(void)
         switch (button_get(true)) {
             case BUTTON_LEFT:
             case BUTTON_F2 | BUTTON_LEFT:
-                recording_quality++;
-                if(recording_quality > 7)
-                    recording_quality = 0;
+                global_settings.rec_quality++;
+                if(global_settings.rec_quality > 7)
+                    global_settings.rec_quality = 0;
                 used = true;
                 break;
 
             case BUTTON_DOWN:
             case BUTTON_F2 | BUTTON_DOWN:
-                recording_frequency++;
-                if(recording_frequency > 5)
-                    recording_frequency = 0;
+                global_settings.rec_frequency++;
+                if(global_settings.rec_frequency > 5)
+                    global_settings.rec_frequency = 0;
                 used = true;
                 break;
 
             case BUTTON_RIGHT:
             case BUTTON_F2 | BUTTON_RIGHT:
-                recording_channel_mode++;
-                if(recording_channel_mode > 1)
-                    recording_channel_mode = 0;
+                global_settings.rec_channels++;
+                if(global_settings.rec_channels > 1)
+                    global_settings.rec_channels = 0;
                 used = true;
                 break;
 
@@ -436,27 +458,30 @@ bool f2_rec_screen(void)
         }
     }
 
-    mpeg_set_recording_options(recording_frequency, recording_quality,
-                               recording_source, recording_channel_mode);
+    mpeg_set_recording_options(global_settings.rec_frequency,
+                               global_settings.rec_quality,
+                               global_settings.rec_source,
+                               global_settings.rec_channels);
 
-//    settings_save();
+    set_gain();
+    
+    settings_save();
     lcd_setfont(FONT_UI);
 
     return false;
 }
-
-char *src_str[] =
-{
-    "Mic",
-    "Line In",
-    "Digital"
-};
 
 bool f3_rec_screen(void)
 {
     bool exit = false;
     bool used = false;
     int w, h;
+    char *src_str[] =
+    {
+        str(LANG_RECORDING_SRC_MIC),
+        str(LANG_RECORDING_SRC_LINE),
+        str(LANG_RECORDING_SRC_DIGITAL)
+    };
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("A",&w,&h);
@@ -469,7 +494,7 @@ bool f3_rec_screen(void)
 
         /* Recording source */
         lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_SOURCE));
-        ptr = src_str[recording_source];
+        ptr = src_str[global_settings.rec_source];
         lcd_getstringsize(ptr, &w, &h);
         lcd_putsxy(0, LCD_HEIGHT/2-h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
@@ -480,25 +505,25 @@ bool f3_rec_screen(void)
         switch (button_get(true)) {
             case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
-                recording_source++;
-                if(recording_source > 2)
-                    recording_source = 0;
+                global_settings.rec_source++;
+                if(global_settings.rec_source > 2)
+                    global_settings.rec_source = 0;
                 used = true;
                 break;
 
             case BUTTON_DOWN:
             case BUTTON_F3 | BUTTON_DOWN:
-                recording_frequency++;
-                if(recording_frequency > 5)
-                    recording_frequency = 0;
+                global_settings.rec_frequency++;
+                if(global_settings.rec_frequency > 5)
+                    global_settings.rec_frequency = 0;
                 used = true;
                 break;
 
             case BUTTON_RIGHT:
             case BUTTON_F3 | BUTTON_RIGHT:
-                recording_channel_mode++;
-                if(recording_channel_mode > 1)
-                    recording_channel_mode = 0;
+                global_settings.rec_channels++;
+                if(global_settings.rec_channels > 1)
+                    global_settings.rec_channels = 0;
                 used = true;
                 break;
 
@@ -518,10 +543,14 @@ bool f3_rec_screen(void)
         }
     }
 
-    mpeg_set_recording_options(recording_frequency, recording_quality,
-                               recording_source, recording_channel_mode);
+    mpeg_set_recording_options(global_settings.rec_frequency,
+                               global_settings.rec_quality,
+                               global_settings.rec_source,
+                               global_settings.rec_channels);
 
-//    settings_save();
+    set_gain();
+    
+    settings_save();
     lcd_setfont(FONT_UI);
 
     return false;

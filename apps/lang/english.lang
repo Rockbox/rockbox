@@ -1118,7 +1118,27 @@ desc: in the recording settings
 eng: "Source"
 new:
 
-id: LANG_RECORDING_CHANNEL
+id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
-eng: "Channel"
+eng: "Channels"
+new:
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new:
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new:
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new:
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
 new:

@@ -61,12 +61,27 @@ struct user_settings
     int bass_boost; /* bass boost eq:        0-100 0=off   100=max           */
     int avc;        /* auto volume correct:  0=disable, 1=2s 2=4s 3=8s       */
     int channel_config;  /* Stereo, Mono, Mono left, Mono right */
+
+    int rec_quality;   /* 0-7 */
+    int rec_source;    /* 0=mic, 1=line, 2=S/PDIF */
+    int rec_frequency; /* 0 = 44.1kHz
+                          1 = 48kHz
+                          2 = 32kHz
+                          3 = 22.05kHz
+                          4 = 24kHz
+                          5 = 16kHz */
+    int rec_channels;  /* 0=Stereo, 1=Mono */
+    int rec_mic_gain; /* 0-15 */
+    int rec_left_gain; /* 0-15 */
+    int rec_right_gain; /* 0-15 */
     
     /* device settings */
 
     int contrast;   /* lcd contrast:         0-100 0=low 100=high            */
     int poweroff;   /* power off timer */
-    int backlight_timeout;  /* backlight off timeout:  0-18 0=never,1=always,then according to timeout_values[] */
+    int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
+                               1=always,
+                               then according to timeout_values[] */
     bool backlight_on_when_charging;
     bool discharge; /* maintain charge of at least: false = 90%, true = 10%  */
 
@@ -115,8 +130,6 @@ struct user_settings
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
 
-    /* geeky persistent statistics */
-    unsigned int total_uptime; /* total uptime since rockbox was first booted */
 };
 
 /* prototypes */

@@ -99,12 +99,14 @@ offset  abs
                  peak_meter_dbfs (bit 7)
 0x1f    0x33    <peak meter min either in -db or in percent>
 0x20    0x34    <peak meter max either in -db or in percent>
-0x21    0x35    <repeat mode>
+0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
+                 mic gain (bit 4-7)>
+0x22    0x36    <rec. quality (bit 0-2), source (bit 3-4), frequency (bit 5-7)>
+0x23    0x37    <rec. left gain (bit 0-3)>
+0x24    0x38    <rec. right gain (bit 0-3)>
+
 
         <all unused space filled with 0xff>
-
-  the geeky but useless statistics part:
-0x24    <total uptime in seconds: 32 bits uint, actually unused for now>
 
 0x2a    <checksum 2 bytes: xor of 0x0-0x29>
 
@@ -329,9 +331,16 @@ int settings_save( void )
         (global_settings.peak_meter_dbfs ? 0x80 : 0);
     config_block[0x1f] = (unsigned char)global_settings.peak_meter_min;
     config_block[0x20] = (unsigned char)global_settings.peak_meter_max;
-    config_block[0x21] = (unsigned char)global_settings.repeat_mode;
-
-    memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
+    config_block[0x21] = (unsigned char)
+        ((global_settings.repeat_mode & 3) |
+         ((global_settings.rec_channels & 1) << 2) |
+         ((global_settings.rec_mic_gain & 0x0f) << 3));
+    config_block[0x22] = (unsigned char)
+        ((global_settings.rec_quality & 7) |
+         ((global_settings.rec_source & 1) << 3) |
+         ((global_settings.rec_frequency & 7) << 5));
+    config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
+    config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
 
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
@@ -565,10 +574,24 @@ void settings_load(void)
             global_settings.peak_meter_max = config_block[0x20];
 
         if (config_block[0x21] != 0xFF)
-            global_settings.repeat_mode = config_block[0x21];
+        {
+            global_settings.repeat_mode = config_block[0x21] & 3;
+            global_settings.rec_channels = (config_block[0x21] >> 2) & 1;
+            global_settings.rec_mic_gain = (config_block[0x21] >> 4) & 0x0f;
+        }
+
+        if (config_block[0x22] != 0xFF)
+        {
+            global_settings.rec_quality = config_block[0x22] & 7;
+            global_settings.rec_source = (config_block[0x22] >> 3) & 3;
+            global_settings.rec_frequency = (config_block[0x22] >> 5) & 7;
+        }
+
+        if (config_block[0x23] != 0xFF)
+            global_settings.rec_left_gain = config_block[0x23] & 0x0f;
 
         if (config_block[0x24] != 0xFF)
-            memcpy(&global_settings.total_uptime, &config_block[0x24], 4);
+            global_settings.rec_right_gain = config_block[0x24] & 0x0f;
 
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
@@ -731,6 +754,13 @@ void settings_reset(void) {
     global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
     global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
+    global_settings.rec_quality = 5;
+    global_settings.rec_source = 0;    /* 0=mic */
+    global_settings.rec_frequency = 0; /* 0=44.1kHz */
+    global_settings.rec_channels = 0;  /* 0=Stereo */
+    global_settings.rec_mic_gain = 8;
+    global_settings.rec_left_gain = 2; /* 0dB */
+    global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
@@ -744,7 +774,6 @@ void settings_reset(void) {
     global_settings.repeat_mode = REPEAT_ALL;
     global_settings.playlist_shuffle = false;
     global_settings.discharge    = 0;
-    global_settings.total_uptime = 0;
     global_settings.timeformat   = 0;
     global_settings.volume_type  = 0;
     global_settings.battery_type = 0;

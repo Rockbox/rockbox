@@ -228,6 +228,7 @@ bool main_menu(void)
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
 #ifdef HAVE_MAS3587F
+        { str(LANG_RECORDING_SETTINGS),   recording_menu     },
         { str(LANG_RECORDING),   recording_screen     },
 #endif
 #ifdef HAVE_LCD_BITMAP
