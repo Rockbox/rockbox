@@ -43,6 +43,7 @@ static int format(
     char *str;
     char tmpbuf[12], pad;
     int ch, width, val, sign;
+    unsigned int uval;
     bool ok = true;
 
     tmpbuf[sizeof tmpbuf - 1] = '\0';
@@ -90,13 +91,13 @@ static int format(
 
 		case 'x':
 		case 'X':
-		    val = va_arg (ap, int);
+		    uval = va_arg (ap, int);
 		    do
 		    {
-			*--str = hexdigit[val & 0xf];
-			val >>= 4;
+			*--str = hexdigit[uval & 0xf];
+			uval >>= 4;
 		    }
-		    while (val > 0);
+		    while (uval);
 		    break;
 
 		default:
