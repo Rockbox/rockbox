@@ -433,8 +433,6 @@ static char fontheight[] = { 8,12,16 };
  */
 void lcd_init (void)
 {
-    int i;
-
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
