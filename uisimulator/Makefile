@@ -19,53 +19,64 @@
 
 TARGET = rockboxui
 
-FIRMWAREDIR=../firmware
-DRIVERS=$(FIRMWAREDIR)/drivers
+FIRMWAREDIR = ../firmware
+DRIVERS = $(FIRMWAREDIR)/drivers
 
 CC = gcc
-RM = rm
-
-CFLAGS = -g
-CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP -I$(FIRMWAREDIR)
+RM = rm -f
+DEBUG = -g
+DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
+
+
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-  INCLUDES = -I/usr/X11R6/include -I$(DRIVERS)
+  INCLUDES = -I/usr/X11R6/include -I$(DRIVERS) -I$(FIRMWAREDIR)
   LIBDIRS = -L/usr/X11R6/lib
 else
-  INCLUDES = 
+  INCLUDES = -I$(FIRMWAREDIR) 
   LIBDIRS = 
 endif
 
-OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o button-x11.o chartables.o tetris.o
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
-SRCS = $(OBJS:%.o=%.c)
-HDRS = $(OBJS:%.o=%.h)
+#SRCS = $(wildcard *.c)
+
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd.c lcd-x11.c \
+        button-x11.c chartables.c tetris.c  
+
+OBJS := $(SRCS:c=o)
 
 all: $(TARGET)
 
 clean:
-	$(RM) -f $(OBJS) *~ core $(TARGET) $(CLIENTS)
+	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS)
+	$(RM) -r $(DEPS)
 
 distclean: clean
 	$(RM) config.cache
 
 lcd.o: $(DRIVERS)/lcd.c
-	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 chartables.o: $(FIRMWAREDIR)/chartables.c
-	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .c.o:
-	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS)
 
+DEPS:=.deps
 
-lcd-x11.o: lcd-x11.c screenhack.h config.h resources.h visual.h lcd-x11.h
-resources.o: resources.c utils.h resources.h
-screenhack.o: screenhack.c xmu.h screenhack.h config.h resources.h \
-  visual.h version.h vroot.h
-uibasic.o: uibasic.c screenhack.h config.h resources.h visual.h version.h
-visual.o: visual.c utils.h resources.h visual.h
+$(DEPS)/%.d: %.c
+		@$(SHELL) -c 'if [ ! -d $(DEPS) ]; then \
+			echo Creating the dependency directory: $(DEPS); \
+			mkdir $(DEPS); fi'
+		@echo "Updating Dependencies for $<"
+		@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+	|sed '\''s/\($*\)\.o[ :]*/\1.o $(<:%.c=%.d) : /g'\'' > $@; \
+	[ -s $@ ] || rm -f $@'
+
+-include $(SRCS:%.c=$(DEPS)/%.d)
