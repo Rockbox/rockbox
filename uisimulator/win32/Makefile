@@ -119,7 +119,10 @@ ROCKSRCS := $(patsubst $(PLUGINDIR)/%.c,%.c,$(wildcard $(PLUGINDIR)/*.c))
 
 ROCKS := $(ROCKSRCS:%.c=$(OBJDIR)/%.rock)
 
-all: $(TARGET) $(ROCKS)
+all: $(TOOLSDIR)/convbdf $(TARGET) $(ROCKS)
+
+$(TOOLSDIR)/convbdf:
+	$(MAKE) -C $(TOOLSDIR)
 
 $(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS)

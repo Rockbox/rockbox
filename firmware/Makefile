@@ -55,7 +55,10 @@ ifndef TOOLSDIR
 	TOOLSDIR=../tools
 endif
 
-all: $(OUTPUT) $(EXTRA_TARGETS)
+all: $(TOOLSDIR)/convbdf $(OUTPUT) $(EXTRA_TARGETS)
+
+$(TOOLSDIR)/convbdf:
+	$(MAKE) -C $(TOOLSDIR)
 
 $(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+

@@ -117,7 +117,10 @@ ROCKS := $(ROCKSRC:$(APPDIR)/plugins/%.c=$(OBJDIR)/%.rock)
 
 OBJS := $(OBJDIR)/lang.o $(SRCS:%.c=$(OBJDIR)/%.o)
 
-all: $(TARGET) $(EXTRA_TARGETS) $(ROCKS)
+all: $(TOOLSDIR)/convbdf $(TARGET) $(EXTRA_TARGETS) $(ROCKS)
+
+$(TOOLSDIR)/convbdf:
+	$(MAKE) -C $(TOOLSDIR)
 
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS) $(OBJDIR)/lang.[cho] \

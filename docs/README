@@ -7,18 +7,25 @@
 
 Build Your Own Rockbox
 
-1. Check out 'rockbox' from CVS (or possibly from a downloaded archive). You
-   may possibly want to check out 'rockbox-devel' instead, since that includes
-   the simulator code (for trying out things on host before making target
-   tests).
+1. Check out 'rockbox' from CVS (or extract a downloaded archive). You
+   want to check out 'rockbox-devel' instead if you want the simulator
+   code too (for trying out things on host before making target tests).
 
-   If you do want to play with the simulator, read UISIMULATOR.
+   (For more information about the simulator, read UISIMULATOR.)
 
-2. Build the tools by running 'make' in the tools/ directory.
+   $ cvs -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox login 
+   $ cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox
 
-3. Create your own build directory, preferably in the same directory as the
-   firmware/ and apps/ directories. This is where all generated files will be
-   put.
+     or
+
+   $ tar xzf rockbox.tar.gz
+
+2. Create a build directory, preferably in the same directory as the firmware/
+   and apps/ directories. This is where all generated files will be written.
+
+   $ cd rockbox
+   $ mkdir build
+   $ cd build
 
 4. In your build directory, run the 'tools/configure' script and enter what
    target you want to build for and if you want a debug version or not (and a
@@ -26,23 +33,41 @@ Build Your Own Rockbox
    gdb version out of it. It is only useful if you run gdb towards your target
    Archos.
 
+   $ ../tools/configure
+
 5. *ploink*. Now you have got a Makefile generated for you.
 
 6. Make sure you have sh-elf-gcc and siblings in the PATH. Make sure that you
    have 'perl' in your PATH too.
 
+   $ which sh-elf-gcc
+   $ which perl
+
 7. Run 'make' and soon the necessary pieces from the firmware and the apps
    directories have been compiled, linked and scrambled for you.
+
+   $ make
 
 8. Copy the archos.mod or ajbrec.ajz file to your archos, reboot it and
    *smile*.  Recent Rockbox versions need no reboots, just PLAY a new rockbox
    version and that'll be loaded and replace the currently running version.
 
+   $ mount /dev/sda1 /mnt/archos
+   $ cp ajbrec.ajz /mnt/archos
+   $ umount /mnt/archos
+
 Whenever the tools/configure script gets updated, you can make your makefile
-updated too by running 'tools/configure update'
+updated too by running 'tools/configure update'.
 
-If you want to build for more than one target, just create a new build
-directory and create a setup for another target combination in there.
+If you want to build for more than one target, just create several build
+directories and create a setup for each target:
 
-Questions anyone? Take them to the mailing list. We'll be happy to help you
-out!
+   $ mkdir build-fmrecorder
+   $ cd build-fmrecorder
+   $ ../tools/configure
+
+   $ mkdir build-player
+   $ cd build-player
+   $ ../tools/configure
+
+Questions anyone? Ask on the mailing list. We'll be happy to help you!
