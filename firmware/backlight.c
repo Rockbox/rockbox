@@ -51,7 +51,7 @@ void backlight_thread(void)
 #ifdef HAVE_RTC
                     rtc_write(0x13, 0x10);
 #else
-                    PAIOR |= 0x40;
+                    PADR |= 0x40;
 #endif
                 }
                 break;
@@ -59,7 +59,7 @@ void backlight_thread(void)
 #ifdef HAVE_RTC
                 rtc_write(0x13, 0x00);
 #else
-                PAIOR &= 0xbf;
+                PADR &= ~0x40;
 #endif                
                 break;
         }
