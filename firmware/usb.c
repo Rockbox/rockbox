@@ -29,6 +29,8 @@
 #include "lcd.h"
 #include "adc.h"
 #include "usb.h"
+#include "button.h"
+#include "sprintf.h"
 
 
 #define USB_REALLY_BRAVE
