@@ -82,9 +82,9 @@ drivers/serial.c
 #ifdef HAVE_LCD_BITMAP
 font.c
 #endif
-hwcompat.c
 id3.c
 #ifndef SIMULATOR
+hwcompat.c
 kernel.c
 rolo.c
 thread.c
