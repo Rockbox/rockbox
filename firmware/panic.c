@@ -77,7 +77,7 @@ void panicf( const char *fmt, ...)
     while (1)
     {
 #ifndef SIMULATOR
-        volatile int i;
+        volatile long i;
         led (state);
         state = state?false:true;
         
