@@ -104,23 +104,14 @@ SECTIONS
     {
         *(.resetvectors);
         *(.vectors);
-        . = ALIGN(0x200);
-        *(.init.text)
     } > DRAM
 
     .text :
     {
+        . = ALIGN(0x200);
+        *(.init.text)
         *(.text)
         . = ALIGN(0x4);
-    } > DRAM
-
-    .data :
-    {
-        *(.data)
-        . = ALIGN(0x4);
-        _datacopy = .; /* dummy here, only for ROM based */
-        _datastart = .;
-        _dataend  = .;
     } > DRAM
 
     .rodata :
@@ -128,15 +119,38 @@ SECTIONS
         *(.rodata)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
+
+        /* Pseudo-allocate the copies of the data sections */
+        _datacopy = .;
     } > DRAM
 
-    .stack :
+    /* TRICK ALERT! For RAM execution, we put the .data section at the
+       same load address as the copy. Thus, we don't waste extra RAM
+       when we don't actually need the copy.  */
+    .data : AT ( _datacopy )
+    {
+        _datastart = .;
+        *(.data)
+        . = ALIGN(0x4);
+        _dataend  = .;
+        _iramcopy = .;
+    } > DRAM
+
+    .iram 0xf000000 : AT ( _iramcopy)
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.idata)
+        _iramend = .;
+    } > IRAM
+
+    /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section
+       size smaller, and allow the stack to grow into the .iram copy */
+    .stack ADDR(.data)+SIZEOF(.data) + SIZEOF(.iram):
     {
        *(.stack)
        _stackbegin = .;
-       /* We put the copy of the .iram section here to save space */
-       _iramcopy = .;
-       . += 0x2000;
+       . += 0x2000-SIZEOF(.iram);
        _stackend = .;
     } > DRAM
 
@@ -147,15 +161,6 @@ SECTIONS
         *(COMMON)
        _end = .;
     } > DRAM
-
-#ifdef DEBUG
-    .heap :
-    {
-        _poolstart = .;
-        . = 0x20000;
-        _poolend = .;
-    } > DRAM
-#endif
 
     .mp3buf :
     {
@@ -172,12 +177,5 @@ SECTIONS
         _pluginbuf = .;
     }
 
-    .iram 0xf000000 : AT ( _iramcopy )
-    {
-        _iramstart = .;
-        *(.icode)
-        *(.idata)
-        _iramend = .;
-    } > IRAM
 #endif
 }
