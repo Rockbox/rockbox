@@ -153,8 +153,6 @@ void init(void)
     (void)coldstart;
 #endif
 
-    usb_start_monitoring();
-
     rc = ata_init();
     if(rc)
     {
@@ -171,6 +169,8 @@ void init(void)
         panicf("ata: %d", rc);
     }
     
+    usb_start_monitoring();
+
     pinfo = disk_init();
     if (!pinfo)
         panicf("disk: NULL");
