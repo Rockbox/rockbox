@@ -281,12 +281,12 @@ int ata_init(void)
     if(adc_read(ADC_MMC_SWITCH) < 0x200)
     {   /* MMC inserted */
         PADR &= ~0x1000; /* clear PA12 */
-        PADR &= ~0x0400; /* chip select internal flash */
+        PADR &= ~0x0200; /* chip select external flash */
     }
     else
     {   /* no MMC, use internal memory */
         PADR |= 0x1000; /* set PA12 */
-        PADR &= ~0x0200; /* chip select external flash */
+        PADR &= ~0x0400; /* chip select internal flash */
     }
 
     sleeping = false;
