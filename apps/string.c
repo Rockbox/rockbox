@@ -37,7 +37,7 @@ char *num2max5(unsigned int bytes, char *max5)
     }
     if(bytes < (100*ONE_MEGABYTE)) {
         /* 'XX.XM' is good as long as we're less than 100 megs */
-        snprintf(max5, 6, "%4d.%0dM",
+        snprintf(max5, 6, "%2d.%0dM",
                  bytes/ONE_MEGABYTE,
                  (bytes%ONE_MEGABYTE)/(ONE_MEGABYTE/10) );
         return max5;
