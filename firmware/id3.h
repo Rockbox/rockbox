@@ -27,13 +27,13 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
-    int bitrate;
-    int frequency;
-    int id3v2len;
-    int id3v1len;
-    int filesize; /* in bytes */
-    int length;   /* song length */
-    int elapsed;  /* ms played */
+    unsigned int bitrate;
+    unsigned int frequency;
+    unsigned int id3v2len;
+    unsigned int id3v1len;
+    unsigned int filesize; /* in bytes */
+    unsigned int length;   /* song length */
+    unsigned int elapsed;  /* ms played */
 
     /* these following two fields are used for local buffering */
     char id3v2buf[300];

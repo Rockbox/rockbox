@@ -116,7 +116,7 @@ void wps_show(void)
 {
     static bool playing = true;
     struct mp3entry* id3 = mpeg_current_track();
-    int lastlength=0, lastsize=0, lastrate=0;
+    unsigned int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
 
     while ( 1 ) {
