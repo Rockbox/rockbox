@@ -111,6 +111,11 @@ PRE {
  padding: 4px;
 }
 
+.buildstatus th
+{
+ vertical-align: top;
+}
+
 .rockbox td, .changetable td, .bugs td, .requests td, .patches td, .archive td, .buttontable td
 {
  background-color: #c6d6f5;
