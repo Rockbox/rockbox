@@ -483,7 +483,7 @@ void set_cpu_frequency(long frequency)
         DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR &= ~1;  /* Bypass mode */
-        PLLCR = 0x11853005;
+        PLLCR = 0x11c53005;
         CSCR0 = 0x00000980; /* Flash: 2 wait state */
         CSCR1 = 0x00002580; /* LCD: 9 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -491,15 +491,18 @@ void set_cpu_frequency(long frequency)
         DCR = (DCR & ~0x000001ff) | 28;   /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
         tick_start(1000/HZ);
-        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (5 << 10); /* CS2Pre,Post */
-        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (1 << 8); /* CS2wait */
+        IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
+        IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
+        /* I2C Clock divisor = 1280 => 119.952 MHz / 1280 = 93,7 kHz */
+        MFDR = 0x19;  
+        MFDR2 = 0x19;
         break;
         
     case CPUFREQ_NORMAL:
         DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR &= ~1;  /* Bypass mode */
-        PLLCR = 0x10c86801;
+        PLLCR = 0x10c86001;
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
@@ -507,19 +510,25 @@ void set_cpu_frequency(long frequency)
         DCR = (DCR & ~0x000001ff) | 10;   /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
         tick_start(1000/HZ);
-        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (5 << 10); /* CS2Pre,Post */
-        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
+        IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+        /* I2C Clock divisor = 480 => 47.9808 MHz / 480 = 99,9 kHz */
+        MFDR = 0x13;  
+        MFDR2 = 0x13;
         break;
     default:
         DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
                                             frequency */
-        PLLCR &= ~1;  /* Bypass mode */
+        PLLCR = 0x00400000;  /* Bypass mode */
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
         cpu_frequency = CPU_FREQ;
         tick_start(1000/HZ);
-        IDECONFIG1 = (IDECONFIG1 & ~(7 << 10)) | (1 << 10); /* CS2Pre,Post */
-        IDECONFIG2 = (IDECONFIG2 & ~0x0000ff00) | (0 << 8); /* CS2wait */
+        IDECONFIG1 = 0x106000 | (1 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
+        IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+        /* I2C Clock divisor = 480 => 47.9808 MHz / 480 = 99,9 kHz */
+        MFDR = 0x13;
+        MFDR2 = 0x13;
         break;
     }
 }
