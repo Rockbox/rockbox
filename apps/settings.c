@@ -31,6 +31,7 @@
 #include "string.h"
 #include "ata.h"
 #include "power.h"
+#include "backlight.h"
 
 struct user_settings global_settings;
 
@@ -347,6 +348,8 @@ void settings_load(void)
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
     }
+    lcd_scroll_speed(global_settings.scroll_speed);
+    backlight_time(global_settings.backlight);
 }
 
 /*
