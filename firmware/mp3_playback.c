@@ -938,7 +938,9 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     or_b(0x01, &PBIORH); /* output for PB8 */
 #endif
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_HWCODEC == MAS3507D
+    mas_reset();
+#elif CONFIG_HWCODEC == MAS3587F
     or_b(0x08, &PAIORH); /* output for /PR */
     init_playback();
     

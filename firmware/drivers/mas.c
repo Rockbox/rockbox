@@ -266,11 +266,18 @@ static int mas_devread(unsigned long *dest, int len)
     return ret;
 }
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 void mas_reset(void)
 {
     or_b(0x01, &PAIORH);
-    
+
+#if CONFIG_HWCODEC == MAS3507D
+    or_b(0x01, &PAIORH);
+    and_b(~0x01, &PADRH);
+    sleep(HZ/100);
+    or_b(0x01, &PADRH);
+    sleep(HZ/5);
+
+#elif (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     if(old_recorder)
     {
         /* Older recorder models don't invert the POR signal */
@@ -285,9 +292,11 @@ void mas_reset(void)
         sleep(HZ/100);
         or_b(0x01, &PADRH);
         sleep(HZ/5);
-    }
+    }  
+#endif
 }
 
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 int mas_direct_config_read(unsigned char reg)
 {
     int ret = 0;
