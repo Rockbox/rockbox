@@ -20,8 +20,6 @@
 #ifndef TCC730_H
 #define TCC730_H
 
-#include "types.h"
-
 /* int is 16 bit 
    long is 32 bit */
 
