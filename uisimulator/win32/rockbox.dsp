@@ -349,6 +349,10 @@ SOURCE=..\..\apps\debug_menu.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\apps\filetypes.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\apps\language.c
 # End Source File
 # Begin Source File
