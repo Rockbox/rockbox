@@ -28,6 +28,9 @@
 #include "sprintf.h"
 #include "ata.h"
 #include "power.h"
+#include "button.h"
+#include "ata.h"
+#include "mpeg.h"
 #include "powermgmt.h"
 
 #ifdef SIMULATOR
@@ -44,8 +47,15 @@ bool battery_level_safe(void)
 
 #else /* not SIMULATOR */
 
+static int poweroff_idle_timeout_value[15] =
+{
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
+};
+
 static char power_stack[DEFAULT_STACK_SIZE];
 static char power_thread_name[] = "power";
+
+static int poweroff_timeout = 0;
 
 unsigned short power_history[POWER_HISTORY_LEN];
 #ifdef HAVE_CHARGE_CTRL
@@ -89,6 +99,23 @@ bool battery_level_safe(void)
         return power_history[POWER_HISTORY_LEN-1] > BATTERY_LEVEL_DANGEROUS;
     else
         return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000) / BATTERY_SCALE_FACTOR;
+}
+
+void set_poweroff_timeout(int timeout)
+{
+    poweroff_timeout = timeout;
+}
+
+static void handle_auto_poweroff(void)
+{
+    long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
+    
+    if(timeout && !mpeg_is_playing() && !charger_inserted())
+    {
+        if(TIME_AFTER(current_tick, last_keypress + timeout) &&
+           TIME_AFTER(current_tick, last_disk_activity + timeout))
+            power_off();
+    }
 }
 
 /*
@@ -233,6 +260,8 @@ static void power_thread(void)
         
         /* sleep for roughly a minute */
         sleep(HZ*(60 - POWER_AVG_N * POWER_AVG_SLEEP));
+
+        handle_auto_poweroff();
     }
 }
 

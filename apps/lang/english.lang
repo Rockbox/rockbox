@@ -781,3 +781,8 @@ id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "0 Rows - Level 0"
 new:
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+new:

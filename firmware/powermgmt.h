@@ -61,4 +61,6 @@ int battery_level(void);
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
 
+void set_poweroff_timeout(int timeout);
+
 #endif

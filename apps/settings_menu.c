@@ -99,6 +99,17 @@ static Menu backlight_timer(void)
     return MENU_OK;
 }
 
+static Menu poweroff_idle_timer(void)
+{
+    char* names[] = { str(LANG_OFF),
+                      "1m ", "2m ", "3m ", "4m ", "5m ",
+                      "6m ", "7m ", "8m ", "9m ", "10m",
+                      "15m", "30m", "45m", "60m"};
+    set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff, names,
+               15, set_poweroff_timeout);
+    return MENU_OK;
+}
+
 static Menu scroll_speed(void)
 {
     set_int(str(LANG_SCROLL), "", &global_settings.scroll_speed, 
@@ -337,7 +348,8 @@ static Menu system_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_TIME),        timedate_set    },
 #endif
-        { str(LANG_RESET),        reset_settings },
+        { str(LANG_POWEROFF_IDLE),    poweroff_idle_timer },
+        { str(LANG_RESET),       reset_settings },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
