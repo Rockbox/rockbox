@@ -41,6 +41,18 @@
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
 
+static struct mutex i2c_mtx;
+
+void i2c_begin(void)
+{
+    mutex_lock(&i2c_mtx);
+}
+
+void i2c_end(void)
+{
+    mutex_unlock(&i2c_mtx);
+}
+
 void i2c_start(void)
 {
     SDA_OUTPUT;

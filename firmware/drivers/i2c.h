@@ -20,6 +20,8 @@
 #define I2C_H
 
 extern void i2c_init(void);
+extern void i2c_begin(void);
+extern void i2c_end(void);
 extern int i2c_write(int device, unsigned char* buf, int count );
 extern int i2c_read(int device, unsigned char* buf, int count );
 extern int i2c_readmem(int device, int address, unsigned char* buf, int count );
