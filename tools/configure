@@ -182,12 +182,22 @@ if [ -z "$target" ]; then
 fi
 
 if [ "-" = "$extra_defines" ]; then
+ extra_defines=""
+
  if [  "-DARCHOS_RECORDER" = "$target" ] ; then
-  
+
+  echo "Do you want to make use of Screensavers? (Y)"
+  getit=`input`;
+  if [ "n" != "$getit" ] ; then
+     if [ "N" != "$getit" ] ; then
+        extra_defines="-DUSE_SCREENSAVERS"
+     fi
+  fi
+ 
   echo "Loadable fonts support? (N)"
   getit=`input`;
   if [ "y" = "$getit" -o "Y" = "$getit" ] ; then
-     extra_defines="-DLOADABLE_FONTS"
+     extra_defines="$extra_defines -DLOADABLE_FONTS"
      echo "*** Remember to copy the 'system.ajf' file to the root of your Archos!"
   else
    echo "Proportional font support? (N)"
@@ -195,13 +205,9 @@ if [ "-" = "$extra_defines" ]; then
    getit=`input`;
  
    if [ "y" = "$getit" -o "Y" = "$getit"  ] ; then
-     extra_defines="-DLCD_PROPFONTS"
-   else
-     extra_defines=""
+     extra_defines="$extra_defines -DLCD_PROPFONTS"
    fi
   fi
- else
-    extra_defines=""
  fi
 fi
 
