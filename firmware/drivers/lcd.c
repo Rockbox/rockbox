@@ -675,6 +675,6 @@ void lcd_clearpixel(int x, int y)
 
 /* -----------------------------------------------------------------
  * local variables:
- * eval: (load-file "rockbox-mode.el")
+ * eval: (load-file "../rockbox-mode.el")
  * end:
  */
