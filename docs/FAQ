@@ -560,81 +560,92 @@ A68: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
 
-     o Download and install Directory Snoop (version 4.03 in november 2002)
-       from http://www.briggsoft.com/dsnoop.htm
-       It's shareware, the trial version can be used 25 times.
+     - Download and install Directory Snoop (version 4.03 in november 2002)
+     from http://www.briggsoft.com/dsnoop.htm
+     It's shareware, the trial version can be used 25 times.
 
-       Directory Snoop can display true drive contents by bypassing the
-       operating system and reading the raw drive sectors directly.
+     Directory Snoop can display true drive contents by bypassing the
+     operating system and reading the raw drive sectors directly.
 
-     o Plug the Jukebox in the PC as usual and power on
-     o Launch Directory snoop
-     o Click on the Jukebox drive letter in the [select drive] field in the
-       toolbar. The content of the jukebox harddrive appears in the main
-       window. Files which appear in red color don't seem to be present on the
-       harddrive, but they still here.
+     - Plug the Jukebox in the PC as usual and power on
 
-     o Simply select the appropriate files (red color) and purge them
-       (Purge button). Of course, don't erase the new archos.mod file and the
-       .rockbox directory :)
-     o Safely remove (Windows unmount device function) the Jukebox.
-       Power it up and ...voila... Rockbox is there!
+     - Launch Directory snoop
+
+     - Click on the Jukebox drive letter in the [select drive] field in the
+     toolbar. The content of the jukebox harddrive appears in the main
+     window. Files which appear in red color don't seem to be present on the
+     harddrive, but they still here.
+
+     - Simply select the appropriate files (red color) and purge them
+     (Purge button). Of course, don't erase the new archos.mod file and the
+     .rockbox directory :)
+
+     - Safely remove (Windows unmount device function) the Jukebox.
+     Power it up and ...voila... Rockbox is there!
 
      (Thanks to Olivier Rafidison for this info)
 
 Q69: What kind of mic can I connect to my AJBR?
 A69: There are several types of microphones.
+
      Dynamic: The one that's available from archos is a dynamic one.
-              Their output level is high enough so that they don't need an
-              amplifier (that's the reason why the archos mic is of
-              this type - it's cheap).
+     Their output level is high enough so that they don't need an
+     amplifier (that's the reason why the archos mic is of this type -
+     it's cheap).
               - cheap
               - no good sound quality of cheap dynamic mics (good enough for
                 speech)
               - no amplifier needed
+
      Backplate Condenser: These are the professional mics. They need phantom
-              power (48V) for charging the condenser.
-              They also need an amplifier, because their output level is low.
+     power (48V) for charging the condenser.
+     They also need an amplifier, because their output level is low.
               - good sound quality
               - need phantom power (48V)
               - need amplifier
               - expensive              
-     Electret Condenser: These capsules are cheap and result in a good recording
-              quality. They don't need phantom power voltage. They need power
-              for the FET (field effect transistor) that's inside. If you have
-              such a mic with a battery in it, it is mostly because of the FET
-              power, not because of an amplification circuit inside the mic.
-              These mics are in all the consumer products like mobile phones,
-              PC headsets and so on.
+ 
+     Electret Condenser: These capsules are cheap and result in a good
+     recording quality. They don't need phantom power voltage. They need power
+     for the FET (field effect transistor) that's inside. If you have
+     such a mic with a battery in it, it is mostly because of the FET
+     power, not because of an amplification circuit inside the mic.
+     These mics are in all the consumer products like mobile phones,
+     PC headsets and so on.
               - cheap (2 EUR for a capsule)
               - good sound quality
               - need amplifier
               - need power for the FET (1,5 - 15V)
-     recommendation for do-it-yourselfers: Use electret condenser mic capsules,
-              solder an amplifier for them which both amplifies the output level
-              and feeds the power needed for the FET to the capsule.
-              The one on http://www.geocities.com/ferocious_1999/md/micpreamp2.html
-              was soldered and tested by Uwe Freese, and it works.
-              There are some others available from www.elv.de and other sellers.
-     recommendation for others: Buy some mic + preamp combination which can be
-              plugged into a line in of any amplifier. Maybe such a commercially
-              available combination needs a power supply and doesn't work with
-              batteries. Some are very expensive. (If you know a cheap solution
-              with an electret condenser mic + preamp, please tell us!)
-     what does not work: Don't use an amplifier thing that can be simply connected
-              between some mic cable. Maybe it sounds as if it could work, but
-              I doesn't. If the piece of (expensive) electronic doesn't have a
-              power source and your mic doen't either, it does not work!
-              A PC sound card or md player has usually a power output (same pin
-              where the sound goes through, dc value) for feeding the FET of
-              an electret condenser capsule (see above) (and this power could
-              also used to feed a mic amplifier), but the archos hasn't
-              (it's a line in and no mic in!).
+
+     Recommendation for do-it-yourselfers: Use electret condenser mic capsules,
+     solder an amplifier for them which both amplifies the output level
+     and feeds the power needed for the FET to the capsule.
+     The one on http://www.geocities.com/ferocious_1999/md/micpreamp2.html
+     was soldered and tested by Uwe Freese, and it works.
+     There are some others available from www.elv.de and other sellers.
+
+     Recommendation for others: Buy some mic + preamp combination which can be
+     plugged into a line in of any amplifier. Maybe such a commercially
+     available combination needs a power supply and doesn't work with
+     batteries. Some are very expensive. (If you know a cheap solution
+     with an electret condenser mic + preamp, please tell us!)
+
+     What does not work: Don't use an amplifier thing that is simply
+     connected between some mic cable. Maybe it sounds as if it could work, but
+     I doesn't. If the piece of (expensive) electronic doesn't have a
+     power source and your mic doen't either, it does not work!
+     A PC sound card or md player usually has a power output (same pin
+     where the sound goes through, dc value) for feeding the FET of
+     an electret condenser capsule (see above) (and this power could
+     also used to feed a mic amplifier), but the archos hasn't
+     (it's a line in and no mic in!).
+
      If you want to know more on microphone powering, read this:
      http://www.hut.fi/Misc/Electronics/circuits/microphone_powering.html.
-     (As described, you need also amplification.)
+     (As described, you also need amplification.)
 
-Q70: I can't start rockbox when the charger is connected. What am I doing wrong?
+Q70: I can't start rockbox when the charger is connected. What am I doing
+     wrong?
 A70: If your device is off and you connect the charger, the Archos charger code
      is started immediately. You can then start Rockbox with holding down the
      ON key for several seconds. Hold the key down a really long time, until
