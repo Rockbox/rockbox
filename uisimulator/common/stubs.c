@@ -179,6 +179,11 @@ void mpeg_set_pitch(int pitch)
     (void)pitch;
 }
 
+void mpeg_set_buffer_margin(int seconds)
+{
+    (void)seconds;
+}
+
 static int sleeptime;
 void set_sleep_timer(int seconds)
 {

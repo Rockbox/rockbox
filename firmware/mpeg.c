@@ -2830,8 +2830,6 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     dbg_timer_start();
     dbg_cnt2us(0);
 #endif
-
-    recalculate_watermark(320); /* Maximum bitrate for safety's sake */
 }
 
 /* -----------------------------------------------------------------
