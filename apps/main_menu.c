@@ -118,11 +118,57 @@ void show_credits(void)
     roll_credits();
 }
 
+void scroll_speed(void)
+{
+    bool done=false;
+    int speed=10;
+    char str[16];
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,"Scroll speed indicator");
+
+    while (!done) {
+        snprintf(str,sizeof str,"Speed: %d ",speed);
+        lcd_puts(0,1,str);
+        lcd_update();
+        lcd_scroll_speed(speed);
+        switch( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                speed++;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                speed--;
+                if ( speed < 1 )
+                    speed = 1;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                lcd_stop_scroll();
+                break;
+        }
+    }
+}
+
 void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Version, Sound
+        Tetris, Screen_Saver, Version, Sound, Scroll
     };
 
     /* main menu */
@@ -133,6 +179,7 @@ void main_menu(void)
         { Screen_Saver, "Screen Saver", screensaver },
 #endif
         { Version,      "Version",      show_credits },
+        { Scroll,       "Scroll speed", scroll_speed },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
