@@ -229,7 +229,7 @@ unsigned short crc_16(const unsigned char* buf, unsigned len)
         crc16 <<= 4; /* shift the CRC Register left 4 bits */     
         crc16 ^= crc16_lookup[t]; /* do the table lookup and XOR the result */
     }
-    
+
     return crc16;
 }
 
@@ -1255,6 +1255,14 @@ static bool view_runtime(void)
     return false;
 }
 
+#ifdef HAVE_MMC
+static bool dbg_mmc_info(void)
+{
+    splash(HZ, true, "To be implemented.");
+
+    return false;
+}
+#else /* Disk-based jukebox */
 static bool dbg_disk_info(void)
 {
     char buf[128];
@@ -1424,6 +1432,7 @@ static bool dbg_disk_info(void)
 
     return false;
 }
+#endif
 
 bool dbg_save_roms(void)
 {
@@ -1539,7 +1548,11 @@ bool debug_menu(void)
 #endif
         { "View HW info", dbg_hw_info },
         { "View partitions", dbg_partitions },
+#ifdef HAVE_MMC
+        { "View MMC info", dbg_mmc_info },
+#else
         { "View disk info", dbg_disk_info },
+#endif
 #ifdef HAVE_LCD_BITMAP
         { "View mpeg thread", dbg_mpeg_thread },
 #ifdef PM_DEBUG

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Alan Korr
+ * Copyright (C) 2004 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -31,65 +31,405 @@
 #include "hwcompat.h"
 #include "adc.h"
 
+#include "bitswap.h"
+
 /* use file for an MMC-based system, FIXME in makefile */
-#ifdef HAVE_MMC 
+#ifdef HAVE_MMC
 
 #define SECTOR_SIZE     512
-#define Q_SLEEP 0
+
+/* Command definitions */
+#define CMD_GO_IDLE_STATE        0x40  /* R1 */
+#define CMD_SEND_OP_COND         0x41  /* R1 */
+#define CMD_SEND_CSD             0x49  /* R1 */
+#define CMD_SEND_CID             0x4A  /* R1 */
+#define CMD_STOP_TRANSMISSION    0x4C  /* R1 */
+#define CMD_SEND_STATUS          0x4D  /* R2 */
+#define CMD_SET_BLOCKLEN         0x50  /* R1 */
+#define CMD_READ_SINGLE_BLOCK    0x51  /* R1 */
+#define CMD_READ_MULTIPLE_BLOCK  0x52  /* R1 */
+#define CMD_SET_BLOCK_COUNT      0x57  /* R1 */
+#define CMD_WRITE_BLOCK          0x58  /* R1b */
+#define CMD_WRITE_MULTIPLE_BLOCK 0x59  /* R1b */
+#define CMD_READ_OCR             0x7A  /* R3 */
+
+/* Response formats:
+   R1  = single byte, msb=0, various error flags
+   R1b = R1 + busy token(s)
+   R2  = 2 bytes (1st byte identical to R1), additional flags
+   R3  = 5 bytes (R1 + OCR register)
+*/
+
+#define R1_PARAMETER_ERR 0x40
+#define R1_ADDRESS_ERR   0x20
+#define R1_ERASE_SEQ_ERR 0x10
+#define R1_COM_CRC_ERR   0x08
+#define R1_ILLEGAL_CMD   0x04
+#define R1_ERASE_RESET   0x02
+#define R1_IN_IDLE_STATE 0x01
+
+#define R2_OUT_OF_RANGE  0x80
+#define R2_ERASE_PARAM   0x40
+#define R2_WP_VIOLATION  0x20
+#define R2_CARD_ECC_FAIL 0x10
+#define R2_CC_ERROR      0x08
+#define R2_ERROR         0x04
+#define R2_ERASE_SKIP    0x02
+#define R2_CARD_LOCKED   0x01
+
+// DEBUG
+#include "../../apps/screens.h"
 
 /* for compatibility */
 bool old_recorder = false; /* FIXME: get rid of this cross-dependency */
 int ata_spinup_time = 0;
-static int sleep_timeout = 5*HZ;
 char ata_device = 0; /* device 0 (master) or 1 (slave) */
 int ata_io_address = 0; /* 0x300 or 0x200, only valid on recorder */
-static unsigned short identify_info[SECTOR_SIZE];
+long last_disk_activity = -1;
+
+/* private variables */
 
 static struct mutex ata_mtx;
 
-static bool sleeping = true;
-
-static char ata_stack[DEFAULT_STACK_SIZE];
-static const char ata_thread_name[] = "ata";
-static struct event_queue ata_queue;
+static char mmc_stack[DEFAULT_STACK_SIZE];
+static const char mmc_thread_name[] = "mmc";
+static struct event_queue mmc_queue;
 static bool initialized = false;
-static bool delayed_write = false;
-static unsigned char delayed_sector[SECTOR_SIZE];
-static int delayed_sector_num;
+static int current_card = 0;
 
-static long last_user_activity = -1;
-long last_disk_activity = -1;
+static const unsigned char dummy[] = {
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
 
+typedef struct
+{  
+    bool initialized;
+    unsigned char bitrate_register;
+    unsigned char rev;
+    unsigned char rev_fract;
+    unsigned int speed;           /* bps */
+    unsigned int read_timeout;    /* n * 8 clock cycles */
+    unsigned int write_timeout;   /* n * 8 clock cycles */
+    unsigned int size;            /* in bytes */
+    unsigned int manuf_month;
+    unsigned int manuf_year;
+    unsigned long serial_number;
+    unsigned char name[7];
+} tCardInfo;
+
+static tCardInfo card_info[2];
+
+/* private function declarations */
+
+static int select_card(int card_no);
+static void deselect_card(void);
+static void setup_sci1(int bitrate_register);
+static void write_transfer(const unsigned char *buf, int len)
+            __attribute__ ((section(".icode")));
+static void read_transfer(unsigned char *buf, int len)
+            __attribute__ ((section(".icode")));
+static unsigned char poll_byte(int timeout);
+static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
+static int receive_data(unsigned char *buf, int len, int timeout);
+static int initialize_card(int card_no);
+
+/* implementation */
+
+static int select_card(int card_no)
+{
+    if (card_no == 0)
+    {   /* internal */
+        or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
+        and_b(~0x04, &PADRH);     /* assert CS */
+    }
+    else
+    {   /* external */
+        and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
+        and_b(~0x02, &PADRH);     /* assert CS */
+    }
+
+    if (card_info[card_no].initialized)
+    {
+        setup_sci1(card_info[card_no].bitrate_register);
+        return 0;
+    }
+    else
+    {
+        return initialize_card(card_no);
+    }
+}
+
+static void deselect_card(void)
+{
+    while (!(SSR1 & SCI_TEND));   /* wait until end of transfer */
+    or_b(0x06, &PADRH);           /* deassert CS (both cards) */
+}
+
+static void setup_sci1(int bitrate_register)
+{
+    int i;
+
+    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+
+    SCR1 = 0;                     /* disable serial port */
+    SMR1 = SYNC_MODE;             /* no prescale */
+    BRR1 = bitrate_register;
+    SCR1 = SCI_CKE0;
+    SSR1 = 0;
+
+    for (i = 0; i <= bitrate_register; i++); /* wait at least one bit time */
+    
+    or_b((SCI_TE|SCI_RE), &SCR1); /* enable transmitter & receiver */
+}
+
+static void write_transfer(const unsigned char *buf, int len)
+{
+    const unsigned char *buf_end = buf + len;
+
+    /* TODO: DMA */
+
+    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+
+    while (buf < buf_end)
+    {
+        while (!(SSR1 & SCI_TDRE));              /* wait for Tx reg. free */
+        TDR1 = fliptable[(signed char)(*buf++)]; /* write byte */
+        SSR1 = 0;                                /* start transmitting */
+    }
+}
+
+static void read_transfer(unsigned char *buf, int len)
+{
+    unsigned char *buf_end = buf + len;
+
+    /* TODO: DMA */
+
+    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
+    
+    while (buf < buf_end)
+    {
+        SSR1 = 0;                                /* start receiving */
+        while (!(SSR1 & SCI_RDRF));              /* wait for data */
+        *buf++ = fliptable[(signed char)(RDR1)]; /* read byte */
+    }
+}
+
+/* timeout is in bytes */
+static unsigned char poll_byte(int timeout)
+{
+    int i;
+    unsigned char data = 0;       /* stop the compiler complaining */
+
+    while (!(SSR1 & SCI_TEND));   /* wait until previous transfer ended */
+    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
+
+    i = 0;
+    do {
+        SSR1 = 0;                   /* start receiving */
+        while (!(SSR1 & SCI_RDRF)); /* wait for data */
+        data = RDR1;                /* read byte */
+    } while ((data == 0xFF) && (++i < timeout));
+
+    return fliptable[(signed char)data];
+}
+
+static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
+{
+    unsigned char command[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95 };
+
+    command[0] = cmd;
+    
+    if (parameter != 0)
+    {
+        command[1] = (parameter >> 24) & 0xFF;
+        command[2] = (parameter >> 16) & 0xFF;
+        command[3] = (parameter >> 8) & 0xFF;
+        command[4] = parameter & 0xFF;
+    }
+    
+    write_transfer(command, 6);
+
+    response[0] = poll_byte(50);
+    
+    if (response[0] != 0x00)
+    {
+        write_transfer(dummy, 1);
+        return -1;
+    }
+
+    switch (cmd)
+    {
+        case CMD_SEND_CSD:        /* R1 response, leave open */
+        case CMD_SEND_CID:
+        case CMD_READ_SINGLE_BLOCK:
+     // case READ_MULTIPLE_BLOCK:
+            break;
+            
+        case CMD_SEND_STATUS:     /* R2 response, close with dummy */
+            read_transfer(response + 1, 1);
+            write_transfer(dummy, 1);
+            break;
+            
+        case CMD_READ_OCR:        /* R3 response, close with dummy */
+            read_transfer(response + 1, 4);
+            write_transfer(dummy, 1);
+            break;
+
+        default:                  /* R1 response, close with dummy */
+            write_transfer(dummy, 1);
+            break;                /* also catches block writes */
+    }
+
+    return 0;
+}
+
+static int receive_data(unsigned char *buf, int len, int timeout)
+{
+    unsigned char crc[2];         /* unused */
+
+    if (poll_byte(timeout) != 0xFE)
+    {
+        write_transfer(dummy, 1);
+        return -1;                /* not start of data */
+    }
+        
+    read_transfer(buf, len);
+    read_transfer(crc, 2);        /* throw away */
+    write_transfer(dummy, 1);
+
+    return 0;
+}
+
+static int initialize_card(int card_no)
+{
+    int i, temp;
+    unsigned char response;
+    unsigned char cxd[16];
+    tCardInfo *card = &card_info[card_no];
+
+    static const char mantissa[] = {  /* *10 */
+        0,  10, 12, 13, 15, 20, 25, 30,
+        35, 40, 45, 50, 55, 60, 70, 80
+    };
+    static const int speed_exponent[] = {  /* /10 */
+        10000, 100000, 1000000, 10000000, 0, 0, 0, 0
+    };
+    
+    static const int time_exponent[] = { /* reciprocal */
+        1000000000, 100000000, 10000000, 1000000, 100000, 10000, 1000, 100
+    };
+
+    card->initialized = false;
+    setup_sci1(7); /* Initial rate: 375 kBit/s (need <= 400 per mmc specs) */
+    write_transfer(dummy, 10);    /* synchronize: 74+ clocks */
+    
+    /* switch to SPI mode */
+    send_cmd(CMD_GO_IDLE_STATE, 0, &response);
+    if (response != 0x01)
+        return -1;                /* error response */
+
+    /* initialize card */
+    i = 0;
+    while (send_cmd(CMD_SEND_OP_COND, 0, &response) && (++i < 100));
+    if (response != 0x00)
+        return -2;                /* not ready */
+    
+    /* get CSD register */
+    if (send_cmd(CMD_SEND_CSD, 0, &response))
+        return -3;
+    if (receive_data(cxd, 16, 50))
+        return -4;
+        
+    /* check block size */
+    if (1 << (cxd[5] & 0x0F) != SECTOR_SIZE)
+        return -5;
+
+    /* max transmission speed the card is capable of */
+    card->speed = mantissa[(cxd[3] & 0x78) >> 3]
+                * speed_exponent[(cxd[3] & 0x07)];
+    
+    /* calculate the clock divider */
+    card->bitrate_register = (FREQ/4-1) / card->speed;
+
+    /* calculate read timeout in clock cycles from TSAC, NSAC and the actual
+     * clock frequency */
+    temp = (FREQ/4) / (card->bitrate_register + 1); /* actual frequency */
+    card->read_timeout =
+        (temp * mantissa[(cxd[1] & 0x78) >> 3] + (1000 * cxd[2]))
+         / (time_exponent[cxd[1] & 0x07] * 8);
+     
+    /* calculate write timeout */
+    temp = (cxd[12] & 0x1C) >> 2;
+    if (temp > 5)
+        temp = 5;
+    card->write_timeout = card->read_timeout * (1 << temp);
+
+    /* calculate size */
+    card->size = ((unsigned int)(cxd[6] & 0x03) << 10)
+               + ((unsigned int)cxd[7] << 2)
+               + ((unsigned int)(cxd[8] & 0xC0) >> 6);
+    temp = ((cxd[9] & 0x03) << 1) + ((cxd[10] & 0x80) >> 7) + 2;
+    card->size *= (SECTOR_SIZE << temp);
+
+    /* switch to full speed */
+    setup_sci1(card->bitrate_register);
+    
+    /* get CID register */
+    if (send_cmd(CMD_SEND_CID, 0, &response))
+        return -6;
+    if (receive_data(cxd, 16, 50))
+        return -7;
+    
+    /* get data from CID */
+    strncpy(card->name, &cxd[3], 6);
+    card->name[6] = '\0';
+    
+    card->rev = (cxd[9] & 0xF0) >> 4;
+    card->rev_fract = cxd[9] & 0x0F;
+    
+    card->manuf_month = (cxd[14] & 0xF0) >> 4;
+    card->manuf_year = (cxd[14] & 0x0F) + 1997;
+    
+    card->serial_number = ((unsigned long)cxd[10] << 24)
+                        + ((unsigned long)cxd[11] << 16)
+                        + ((unsigned long)cxd[12] << 8)
+                        + (unsigned long)cxd[13];
+
+    card->initialized = true;
+    return 0;
+}
 
 int ata_read_sectors(unsigned long start,
                      int incount,
                      void* inbuf)
 {
     int ret = 0;
+    int i;
+    unsigned long addr;
+    unsigned char response;
+    tCardInfo *card = &card_info[current_card];
 
+    addr = start * SECTOR_SIZE;
+    
     mutex_lock(&ata_mtx);
+    ret = select_card(current_card);
 
-    last_disk_activity = current_tick;
+    for (i = 0; (i < incount) && (ret == 0); i++)
+    {
+        if ((ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response)))
+            break;
+        ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
 
-    led(true);
-    sleeping = false;
+        addr += SECTOR_SIZE;
+        inbuf += SECTOR_SIZE;
+    }
 
-    /* ToDo: action */
-    (void)start;
-    (void)incount;
-    (void)inbuf;
-
-    led(false);
-
+    deselect_card();
     mutex_unlock(&ata_mtx);
-
-    /* only flush if reading went ok */
-    if ( (ret == 0) && delayed_write )
-        ata_flush();
 
     return ret;
 }
-
 
 
 int ata_write_sectors(unsigned long start,
@@ -102,65 +442,35 @@ int ata_write_sectors(unsigned long start,
         panicf("Writing on sector 0\n");
 
     mutex_lock(&ata_mtx);
-    sleeping = false;
-    
-    last_disk_activity = current_tick;
-
-    led(true);
 
     /* ToDo: action */
     (void)start;
     (void)count;
     (void)buf;
 
-    led(false);
-
     mutex_unlock(&ata_mtx);
-
-    /* only flush if writing went ok */
-    if ( (ret == 0) && delayed_write )
-        ata_flush();
 
     return ret;
 }
 
+/* no need to delay with flash memory. There is no spinup :) */
 extern void ata_delayed_write(unsigned long sector, const void* buf)
 {
-    memcpy(delayed_sector, buf, SECTOR_SIZE);
-    delayed_sector_num = sector;
-    delayed_write = true;
+    ata_write_sectors(sector, 1, buf);
 }
 
 extern void ata_flush(void)
 {
-    if ( delayed_write ) {
-        DEBUGF("ata_flush()\n");
-        delayed_write = false;
-        ata_write_sectors(delayed_sector_num, 1, delayed_sector);
-    }
 }
 
 void ata_spindown(int seconds)
 {
-    sleep_timeout = seconds * HZ;
+    (void)seconds;
 }
 
 bool ata_disk_is_active(void)
 {
-    return !sleeping;
-}
-
-static int ata_perform_sleep(void)
-{
-    int ret = 0;
-
-    mutex_lock(&ata_mtx);
-
-    /* ToDo: is there an equivalent? */
-
-    sleeping = true;
-    mutex_unlock(&ata_mtx);
-    return ret;
+    return true;
 }
 
 int ata_standby(int time)
@@ -178,59 +488,36 @@ int ata_standby(int time)
 
 int ata_sleep(void)
 {
-    queue_post(&ata_queue, Q_SLEEP, NULL);
     return 0;
 }
 
 void ata_spin(void)
 {
-    last_user_activity = current_tick;
 }
 
-static void ata_thread(void)
+static void mmc_thread(void)
 {
-    static long last_sleep = 0;
     struct event ev;
-    
+
     while (1) {
-        while ( queue_empty( &ata_queue ) ) {
-            if ( sleep_timeout && !sleeping &&
-                 TIME_AFTER( current_tick, 
-                             last_user_activity + sleep_timeout ) &&
-                 TIME_AFTER( current_tick, 
-                             last_disk_activity + sleep_timeout ) )
-            {
-                ata_perform_sleep();
-                last_sleep = current_tick;
-            }
+        while ( queue_empty( &mmc_queue ) ) {
 
             sleep(HZ/4);
         }
-        queue_wait(&ata_queue, &ev);
+        queue_wait(&mmc_queue, &ev);
         switch ( ev.id ) {
 #ifndef USB_NONE
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
-                DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
+                DEBUGF("mmc_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
                 /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&ata_queue);
+                usb_wait_for_disconnect(&mmc_queue);
                 break;
 #endif
-            case Q_SLEEP:
-                last_disk_activity = current_tick - sleep_timeout + (HZ/2);
-                break;
         }
     }
-}
-
-/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
-{
-    int ret = 0;
-    
-    return ret;
 }
 
 int ata_soft_reset(void)
@@ -242,28 +529,19 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    PBCR1 &= ~0x0CC0; /* PB13 and TxD1 become GPIOs, if not modified below */
+    PBCR1 &= ~0x0CF0; /* PB13, PB11 and PB10 become GPIOs, if not modified below */
     if (on)
     {
         /* serial setup */
-        PBCR1 |= 0x0880; /* as SCK1, TxD1 */
+        PBCR1 |= 0x08A0;    /* as SCK1, TxD1, RxD1 */
     }
     else
     {
-        PBDR |= 0x2000; /* drive PB13 high */
-        PBIOR |= 0x2000; /* output PB13 */
-        PBIOR &= ~0x0800; /* high impedance for TxD1 GPIO */
-        PADR |= 0x0680; /* set all the selects+reset high (=inactive) */
-
-        PADR &= ~0x0080; /* assert reset */
-        sleep(1);
-        PADR |= 0x0080; /* de-assert reset */
+        and_b(~0x80, &PADRL); /* assert reset */
+        sleep(5);
+        or_b(0x80, &PADRL);   /* de-assert reset */
+        sleep(5);
     }
-}
-
-unsigned short* ata_get_identify(void)
-{
-    return identify_info;
 }
 
 int ata_init(void)
@@ -275,30 +553,30 @@ int ata_init(void)
     led(false);
 
     /* Port setup */
-    PADR |= 0x0680; /* set all the selects + reset high (=inactive) */
-    PAIOR |= 0x1680; /* make outputs for them and the PA12 clock gate */
+    PADR |= 0x0680;   /* set all the selects + reset high (=inactive) */
+    PAIOR |= 0x1680;  /* make outputs for them and the PA12 clock gate */
+
+    PBDR |= 0x2C00;   /* SCK1, TxD1 and RxD1 high when GPIO  CHECKME: mask */
+    PBIOR |= 0x2000;  /* SCK1 output */
+    PBIOR &= ~0x0C00; /* TxD1, RxD1 input */
 
     if(adc_read(ADC_MMC_SWITCH) < 0x200)
     {   /* MMC inserted */
-        PADR &= ~0x1000; /* clear PA12 */
-        PADR &= ~0x0200; /* chip select external flash */
+        current_card = 1;
     }
     else
     {   /* no MMC, use internal memory */
-        PADR |= 0x1000; /* set PA12 */
-        PADR &= ~0x0400; /* chip select internal flash */
+        current_card = 0;
     }
 
-    sleeping = false;
     ata_enable(true);
 
     if ( !initialized ) {
 
-        queue_init(&ata_queue);
+        queue_init(&mmc_queue);
 
-        last_disk_activity = current_tick;
-        create_thread(ata_thread, ata_stack,
-                      sizeof(ata_stack), ata_thread_name);
+        create_thread(mmc_thread, mmc_stack,
+                      sizeof(mmc_stack), mmc_thread_name);
         initialized = true;
     }
 
