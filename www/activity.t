@@ -2,8 +2,8 @@
 #define GREEN  "#80db72"
 #define RED    "#ffadad"
 
-#define STATUS(_col_,_a_,_b_,_c_,_d_) \
-<tr bgcolor=_col_><td>_a_</td><td>_b_</td><td>_c_</td><td>_d_</td></tr>
+#define STATUS(_col_,_mod_,_file_,_href_,_person_,_status_) \
+<tr bgcolor=_col_><td>_mod_</td><td><a href=_href_>_file_</a></td><td>_person_</td><td>_status_</td></tr>
 
 <table align="right">
 <tr><th colspan=2>Color codes:</th></tr>
@@ -12,27 +12,27 @@
 <tr><td bgcolor=RED>&nbsp; &nbsp;</td><td> Undermanned. Help needed.</td></tr>
 </table>
 
-<table>
+<table cellspacing=0 cellpadding=2 border=1>
 <tr bgcolor="#cccccc"><th>Module</th><th>File(s) in CVS</h><th>Current person</th><th>Status</th></tr><tr>
-STATUS(YELLOW,ATA driver,firmware/drivers/ata.c,Björn,Written; untested)
-STATUS(GREEN,I<sup>2</sup>C driver,firmware/drivers/i2c.c,Linus,Works)
-STATUS(YELLOW,MAS driver,firmware/drivers/mas.c,Linus,Embryo written)
-STATUS(RED,Fat32 filesystem,firmware/drivers/fat.c,Björn & Linus,Fat16 code exists)
-STATUS(YELLOW,Key handling,firmware/drivers/button.c,-,Written; untested)
-STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,Björn,Written; untested)
-STATUS(GREEN,LED driver,firmware/drivers/led.c,-,Written)
-STATUS(YELLOW,CPU setup,firmware/system.c,Linus,In progress)
-STATUS(GREEN,GDB stub,gdb/,Linus,Works)
-STATUS(YELLOW,Scheduler,firmware/thread.c,Linus,Final touches)
-STATUS(GREEN,List,firmware/common/list.c,Linus,Works)
-STATUS(YELLOW,Playlist handling,-,Stuart,Planning)
-STATUS(RED,Newlib port,-,-,-)
-STATUS(GREEN,ID3 parser,firmware/i3d.c,Daniel,Works)
-STATUS(YELLOW,X11 simulator,uisimulator/,Daniel,Progressing)
-STATUS(YELLOW,Win32 simulator,uisimulator/win32,Felix,Progressing)
-STATUS(GREEN,FAQ,www/docs/FAQ,Rob,Existing)
-STATUS(RED,Directory browser UI,-,-,-)
-STATUS(RED,Application...,-,-,-)
+STATUS(YELLOW,ATA driver,firmware/drivers/ata.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/ata.c", Björn,Written; untested)
+STATUS(GREEN,I<sup>2</sup>C driver,firmware/drivers/i2c.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/i2c.c", Linus,Works)
+STATUS(YELLOW,MAS driver,firmware/drivers/mas.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/mas.c", Linus,Embryo written)
+STATUS(RED,Fat32 filesystem,firmware/drivers/fat.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/fat.c", Björn & Linus,Fat16 code exists)
+STATUS(YELLOW,Key handling,firmware/drivers/button.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/button.c", -,Written; untested)
+STATUS(YELLOW,LCD driver,firmware/drivers/lcd.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/lcd.c", Björn,Written; untested)
+STATUS(GREEN,LED driver,firmware/drivers/led.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/drivers/led.c",-,Written)
+STATUS(YELLOW,CPU setup,firmware/system.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/system.c", Linus,In progress)
+STATUS(GREEN,GDB stub,gdb/,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/gdb/", Linus,Works)
+STATUS(YELLOW,Scheduler,firmware/thread.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/thread.c", Linus,Final touches)
+STATUS(GREEN,List,firmware/common/list.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/common/lists.c", Linus,Works)
+STATUS(YELLOW,Playlist handling,-,"", Stuart,Planning)
+STATUS(RED,Newlib port,-,"", -,-)
+STATUS(GREEN,ID3 parser,firmware/i3d.c,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/firmware/id3.c", Daniel,Works)
+STATUS(YELLOW,X11 simulator,uisimulator/, "http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/", Daniel,Progressing)
+STATUS(YELLOW,Win32 simulator,uisimulator/win32,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/uisimulator/win32/", Felix,Progressing)
+STATUS(GREEN,FAQ,www/docs/FAQ,"http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/www/docs/FAQ",Rob,Existing)
+STATUS(RED,Directory browser UI,-,"", -,-)
+STATUS(RED,Application...,-,"",-,-)
 </tr></table>
 <i><small>Updated __DATE__</small></i>
 
