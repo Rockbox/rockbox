@@ -523,6 +523,12 @@ static bool menu(void)
                     lcd_stop_scroll();
                     button_set_release(old_release_mask);
                     main_menu();
+#ifdef HAVE_LCD_BITMAP
+                    if(global_settings.statusbar)
+                        lcd_setmargins(0, STATUSBAR_HEIGHT);
+                    else
+                        lcd_setmargins(0, 0);
+#endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                 }
                 break;
@@ -752,12 +758,6 @@ int wps_show(void)
 #endif
                 if (menu())
                     return SYS_USB_CONNECTED;
-#ifdef HAVE_LCD_BITMAP
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-#endif
                 restore = true;
                 break;
 
