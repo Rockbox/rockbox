@@ -368,8 +368,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bytesread = read(fd, ptr, framelen);
             if (ptr[1] == '(' && ptr[2] != '(')
                 entry->genre = atoi(ptr+2);
-            else
-                entry->genre = 0xff;
             bufferpos += bytesread + 1;
             size -= bytesread;
         }
@@ -746,6 +744,7 @@ bool mp3info(struct mp3entry *entry, char *filename)
     entry->filesize = getfilesize(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
+    entry->genre = 0xff;
 
     if (entry->id3v2len)
         setid3v2title(fd, entry);
