@@ -26,23 +26,27 @@ struct entry {
     char *name;
 };
 
-/* using attribute not used by FAT */
-#define TREE_ATTR_MPA  0x0100 /* mpeg audio file */
-#define TREE_ATTR_M3U  0x0200 /* playlist */
-#define TREE_ATTR_WPS  0x0300 /* wps config file */
-#define TREE_ATTR_MOD  0x0400 /* firmware file */
-#define TREE_ATTR_CFG  0x0500 /* config file */
-#define TREE_ATTR_TXT  0x0600 /* text file */
-#define TREE_ATTR_FONT 0x0700 /* font file */
-#define TREE_ATTR_LNG  0x0800 /* binary lang file */
-#define TREE_ATTR_ROCK 0x0900 /* binary rockbox plugin */
-#define TREE_ATTR_UCL  0x0A00 /* rockbox flash image */ 
-#define TREE_ATTR_CH8  0x0B00 /* chip-8 game */ 
-#define TREE_ATTR_RVF  0x0C00 /* rockbox video file */ 
-#define TREE_ATTR_BMARK 0x0D00 /* book mark file */
-#define TREE_ATTR_JPEG 0x0E00 /* JPEG image */
-#define TREE_ATTR_MASK 0xFFC0 /* which bits tree.c uses (above) */
+struct filetype {
+    char* extension;
+    int tree_attr;
+    int icon;
+    int voiceclip;
+};
+ 
 
+/* using attribute not used by FAT */
+#define TREE_ATTR_MPA   0x0100 /* mpeg audio file */
+#define TREE_ATTR_M3U   0x0200 /* playlist */
+#define TREE_ATTR_WPS   0x0300 /* wps config file */
+#define TREE_ATTR_MOD   0x0400 /* firmware file */
+#define TREE_ATTR_CFG   0x0500 /* config file */
+#define TREE_ATTR_FONT  0x0600 /* font file */
+#define TREE_ATTR_LNG   0x0700 /* binary lang file */
+#define TREE_ATTR_ROCK  0x0800 /* binary rockbox plugin */
+#define TREE_ATTR_BMARK 0x0900 /* book mark file */
+#define TREE_ATTR_MASK  0xFFC0 /* which bits tree.c uses (above) */
+
+void tree_get_filetypes(struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
 void set_current_file(char *path);

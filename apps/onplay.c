@@ -43,10 +43,34 @@
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "onplay.h"
+#include "filetypes.h"
 
 static char* selected_file = NULL;
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+
+static bool list_viewers(void)
+{
+    struct menu_item menu[8];
+    int m, i, result;
+
+    i=filetype_load_menu(menu,sizeof(menu)/sizeof(*menu));
+    if (i)
+    {
+        m = menu_init( menu, i, NULL, NULL, NULL, NULL );
+        result = menu_show(m);
+        if (result >= 0)
+        {
+            menu_exit(m);
+            filetype_load_plugin(menu[result].desc,selected_file);
+        }
+    }
+    else
+    {
+        splash(HZ*2, true, "No viewers found");
+    }
+    return false;
+}
 
 /* For playlist options */
 struct playlist_args {
@@ -625,7 +649,7 @@ bool create_dir(void)
 
 int onplay(char* file, int attr)
 {
-    struct menu_item items[5]; /* increase this if you add entries! */
+    struct menu_item items[6]; /* increase this if you add entries! */
     int m, i=0, result;
 
     onplay_result = ONPLAY_OK;
@@ -634,6 +658,14 @@ int onplay(char* file, int attr)
     {
         selected_file = file;
         selected_file_attr = attr;
+        
+        if (!(attr & ATTR_DIRECTORY))
+        {
+            items[i].desc = str(LANG_ONPLAY_OPEN_WITH);
+            items[i].voice_id = LANG_ONPLAY_OPEN_WITH;
+            items[i].function = list_viewers;
+            i++;
+        }
         
         if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
             (attr & ATTR_DIRECTORY) ||

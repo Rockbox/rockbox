@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ICONS_H_
+#define _ICONS_H_
+
 #include <lcd.h>
 
 /* 
@@ -28,9 +31,8 @@ enum icons_6x8 {
     Box_Filled, Box_Empty, Slider_Horizontal, File, 
     Folder,     Directory, Playlist,          Repeat,
     Selected,   Cursor,    Wps,               Mod_Ajz, 
-    Font,       Language,  Text,              Config,
-    Plugin,     Flashfile, Chip8,             Video,
-    Bookmark,   Jpeg,
+    Font,       Language,  Config,            Plugin,
+    Bookmark,
     LastIcon
 };
 
@@ -97,3 +99,5 @@ extern void statusbar_icon_lock(void);
 extern void statusbar_time(int hour, int minute);
 #endif
 #endif /* End HAVE_LCD_BITMAP */
+
+#endif /*  _ICONS_H_ */

@@ -53,5 +53,5 @@ $(LINKFILE): $(LDS)
 	$(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -x c -E -P $< >$@
 
 clean:
-	-rm -f $(ROCKS) $(LINKFILE)
+	-rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock
 	$(MAKE) -C lib clean

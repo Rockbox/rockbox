@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ICONS_H_
+#define _ICONS_H_
+
 #include <lcd.h>
 
 /* 
@@ -25,9 +28,11 @@
 #ifdef HAVE_LCD_CHARCELLS
 
 enum {
-    Unknown=0x90, 
+    Unknown = 0x90,
     Plugin = 0x17,
     Folder, Mod_Ajz, Language, File, Wps, Playlist, Text, Config,
 };
 
 #endif
+
+#endif /* _ICONS_H_ */

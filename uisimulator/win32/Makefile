@@ -103,7 +103,7 @@ FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c mp3_playback.c \
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
 	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
-	misc.c plugin.c playlist_viewer.c bookmark.c
+	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c
 
 MENUS = settings_menu.c sound_menu.c playlist_menu.c
 
@@ -197,6 +197,9 @@ $(OBJDIR)/tree.o: $(APPDIR)/tree.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/onplay.o: $(APPDIR)/onplay.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/filetypes.o: $(APPDIR)/filetypes.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/playlist.o: $(APPDIR)/playlist.c

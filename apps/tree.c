@@ -56,6 +56,7 @@
 #include "power.h"
 #include "action.h"
 #include "talk.h"
+#include "filetypes.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -69,37 +70,24 @@
 extern bool language_changed;
 
 /* a table for the know file types */
-static struct
-{
-    char* extension; /* extension for which the file type is recognized */
-    int tree_attr; /* which identifier */
-    int icon; /* the icon which shall be used for it, -1 if unknown */
-    int voiceclip; /* spoken extension */
-    /* To have it extendable, there could be more useful stuff in here,
-       like handler functions, plugin name, etc. */
-} filetypes[] = {
+struct filetype filetypes[] = {
     { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYINDICES_PLAYLIST },
     { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },
     { ".wps", TREE_ATTR_WPS, Wps, VOICE_EXT_WPS },
-    { ".txt", TREE_ATTR_TXT, Text, VOICE_EXT_TXT },
     { ".lng", TREE_ATTR_LNG, Language, LANG_LANGUAGE },
     { ".rock",TREE_ATTR_ROCK,Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
     { ".fnt", TREE_ATTR_FONT,Font, VOICE_EXT_FONT },
-    { ".ch8", TREE_ATTR_CH8, Chip8, -1 },
-    { ".rvf", TREE_ATTR_RVF, Video, -1 },
     { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
 #else
-    {  ".bmark", TREE_ATTR_BMARK, -1, VOICE_EXT_BMARK },
+    { ".bmark", TREE_ATTR_BMARK, -1, VOICE_EXT_BMARK },
 #endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
-    { ".ucl", TREE_ATTR_UCL, Flashfile, VOICE_EXT_UCL },
     { ".ajz", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
-    { ".jpg", TREE_ATTR_JPEG, Jpeg, -1 },
 #else
     { ".mod", TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
 #endif
@@ -136,6 +124,7 @@ static bool dirbrowse(char *root, int *dirfilter);
 
 void browse_root(void)
 {
+    filetype_init();
 #ifndef SIMULATOR
     dirbrowse("/", &global_settings.dirfilter);
 #else
@@ -145,6 +134,11 @@ void browse_root(void)
 #endif
 }
 
+void tree_get_filetypes(struct filetype** types, int* count)
+{
+    *types = filetypes;
+    *count = sizeof(filetypes) / sizeof(*filetypes);
+}
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -359,19 +353,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
 
         /* check for known file types */
         if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) )
-        {
-            unsigned j;
-            for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
-            {
-                if (!strcasecmp(
-                    &entry->d_name[len-strlen(filetypes[j].extension)],
-                    filetypes[j].extension))
-                {
-                    dptr->attr |= filetypes[j].tree_attr;
-                    break;
-                }
-            }
-        }
+           dptr->attr |= filetype_get_attr(entry->d_name);
 
         /* memorize/compare details about the boot file */
         if ((currdir[1] == 0) && !strcasecmp(entry->d_name, BOOTFILE)) {
@@ -391,7 +373,7 @@ struct entry* load_and_sort_directory(char *dirname, int *dirfilter,
             ((*dirfilter == SHOW_MUSIC &&
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MPA) &&
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
-            (*dirfilter == SHOW_SUPPORTED && !(dptr->attr & TREE_ATTR_MASK)) ||
+            (*dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)) ||
             (*dirfilter == SHOW_WPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_WPS) ||
             (*dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
             (*dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
@@ -444,12 +426,12 @@ static int recalc_screen_height(void)
 
 static int showdir(char *path, int start, int *dirfilter)
 {
-    int icon_type = 0;
     int i;
     int tree_max_on_screen;
     bool dir_buffer_full;
 
 #ifdef HAVE_LCD_BITMAP
+    char* icon;
     int line_height;
     int fw, fh;
     lcd_setfont(FONT_UI);
@@ -457,6 +439,7 @@ static int showdir(char *path, int start, int *dirfilter)
     tree_max_on_screen = recalc_screen_height();
     line_height = fh;
 #else
+    int icon;
     tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
 
@@ -536,52 +519,24 @@ static int showdir(char *path, int start, int *dirfilter)
 #endif
 
     for ( i=start; i < start+tree_max_on_screen; i++ ) {
-        int len;
-        unsigned j;
-
         if ( i >= filesindir )
             break;
 
-        len = strlen(dircache[i].name);
+        icon = filetype_get_icon(dircache[i].attr);
 
-        if (dircache[i].attr & ATTR_DIRECTORY)
-        {
-            icon_type = Folder;
-        }
-        else
-        {
-            /* search which icon to use */
-            icon_type = -1; /* default to none */
-            for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
-            {
-                if ((dircache[i].attr & TREE_ATTR_MASK) == filetypes[j].tree_attr)
-                {
-                    icon_type = filetypes[j].icon;
-                    break;
-                }
-            }
-
-            if (icon_type == -1)
-            {
-#ifdef HAVE_LCD_BITMAP
-                icon_type = 0;
-#else
-                icon_type = Unknown;
-#endif
-            }
-        }
-
-        if (icon_type && global_settings.show_icons) {
+        if (icon && global_settings.show_icons) {
 #ifdef HAVE_LCD_BITMAP
             int offset=0;
             if ( line_height > 8 )
                 offset = (line_height - 8) / 2;
-            lcd_bitmap(bitmap_icons_6x8[icon_type],
+            lcd_bitmap(icon,
                        CURSOR_X * 6 + CURSOR_WIDTH,
                        MARGIN_Y+(i-start)*line_height + offset,
                        6, 8, true);
 #else
-            lcd_putc(LINE_X-1, i-start, icon_type);
+            if (icon < 0 )
+                icon = Unknown;
+            lcd_putc(LINE_X-1, i-start, icon);
 #endif
         }
 
@@ -1005,6 +960,9 @@ static bool dirbrowse(char *root, int *dirfilter)
                     else
                         currdir[i-1]=0;
 
+                    if (*dirfilter > NUM_FILTER_MODES && dirlevel < 1)
+                        exit_func = true;
+
                     dirlevel--;
                     if ( dirlevel < MAX_DIR_LEVELS ) {
                         dirstart = dirpos[dirlevel];
@@ -1018,8 +976,11 @@ static bool dirbrowse(char *root, int *dirfilter)
 
                     restore = true;
                 }
-                if (*dirfilter > NUM_FILTER_MODES)
-                    exit_func = true;
+                else
+                {
+                    if (*dirfilter > NUM_FILTER_MODES && dirlevel < 1)
+                        exit_func = true;
+                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -1171,11 +1132,6 @@ static bool dirbrowse(char *root, int *dirfilter)
                             reload_dir = true;
                             break;
 
-                        case TREE_ATTR_TXT:
-                            plugin_load("/.rockbox/rocks/viewer.rock",buf);
-                            restore = true;
-                            break;
-
                         case TREE_ATTR_LNG:
                             if(!lang_load(buf)) {
                                 set_file(buf, global_settings.lang_file,
@@ -1189,21 +1145,6 @@ static bool dirbrowse(char *root, int *dirfilter)
                             break;
 
 #ifdef HAVE_LCD_BITMAP
-                            /* chip-8 game */
-                        case TREE_ATTR_CH8:
-                            plugin_load("/.rockbox/rocks/chip8.rock",buf);
-                            break;
-
-                            /* "movie" animation */
-                        case TREE_ATTR_RVF:
-                            plugin_load("/.rockbox/rocks/video.rock",buf);
-                            break; 
-
-                            /* JPEG image */
-                        case TREE_ATTR_JPEG:
-                            plugin_load("/.rockbox/rocks/jpeg.rock",buf);
-                            break; 
-
                         case TREE_ATTR_FONT:
                             font_load(buf);
                             set_file(buf, global_settings.font_file,
@@ -1224,11 +1165,6 @@ static bool dirbrowse(char *root, int *dirfilter)
                         case TREE_ATTR_MOD:
                             rolo_load(buf);
                             break;
-
-                            /* ucl flash file */
-                        case TREE_ATTR_UCL:
-                            plugin_load("/.rockbox/rocks/rockbox_flash.rock",buf);
-                            break;
 #endif
 
                             /* plugin file */
@@ -1238,6 +1174,19 @@ static bool dirbrowse(char *root, int *dirfilter)
                             else
                                 restore = true;
                             break;
+
+                        default:
+                        {
+                            char* plugin = filetype_get_plugin(file);
+                            if (plugin)
+                            {
+                                if (plugin_load(plugin,buf) == PLUGIN_USB_CONNECTED)
+                                    reload_root = true;
+                                else
+                                    restore = true;
+                            }
+                            break;
+                        }
                     }
 
                     if ( play ) {
@@ -1389,8 +1338,8 @@ static bool dirbrowse(char *root, int *dirfilter)
 #endif
                     restore = true;
                 }
-                break;
 #endif
+                break;
 
             case SYS_USB_CONNECTED:
                 status_set_playmode(STATUS_STOP);

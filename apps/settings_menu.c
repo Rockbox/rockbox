@@ -43,6 +43,7 @@
 #include "screens.h"
 #include "talk.h"
 #include "timefuncs.h"
+#include "filetypes.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -1243,6 +1244,7 @@ static bool manage_settings_menu(void)
         { STR(LANG_FIRMWARE),        firmware_browse },
         { STR(LANG_RESET),           reset_settings },
         { STR(LANG_SAVE_SETTINGS),   settings_save_config },
+        { STR(LANG_FILETYPES_RESET), filetype_reset},
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

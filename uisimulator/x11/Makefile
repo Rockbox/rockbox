@@ -102,7 +102,7 @@ FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c mp3_playback.c power.c\
 APPS = main.c tree.c menu.c credits.c main_menu.c language.c\
 	playlist.c wps.c wps-display.c settings.c status.c icons.c\
 	screens.c peakmeter.c sleeptimer.c keyboard.c onplay.c\
-	misc.c plugin.c playlist_viewer.c bookmark.c
+	misc.c plugin.c playlist_viewer.c bookmark.c filetypes.c
 
 MENUS = settings_menu.c sound_menu.c playlist_menu.c
 
@@ -140,6 +140,9 @@ $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	perl $(APPDIR)/credits.pl < $< > $@
 
 $(OBJDIR)/credits.o: $(APPDIR)/credits.c $(APPDIR)/credits.h $(OBJDIR)/credits.raw
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/filetypes.o: $(APPDIR)/filetypes.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/menu.o: $(APPDIR)/menu.c
