@@ -503,7 +503,7 @@ void DEI3(void)
 {
     if(playing)
     {
-        int unplayed_space_left = get_unplayed_space();
+        int unplayed_space_left;
         int space_until_end_of_buffer;
         int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
@@ -520,6 +520,8 @@ void DEI3(void)
                 track_offset = (track_offset+1) & MAX_ID3_TAGS_MASK;
             }
         }
+        
+        unplayed_space_left = get_unplayed_space();
         
         space_until_end_of_buffer = mp3buflen - mp3buf_read;
         
