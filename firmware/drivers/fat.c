@@ -1202,24 +1202,28 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
 int fat_seek(struct fat_file *file, int seeksector )
 {
-    int clusternum, sectornum, sector=0;
+    int clusternum=0, sectornum=0, sector=0;
     int cluster = file->firstcluster;
     int i;
 
-    seeksector--;
-    clusternum = seeksector / fat_bpb.bpb_secperclus;
-    sectornum = seeksector % fat_bpb.bpb_secperclus;
-
-    for (i=0; i<clusternum; i++) {
-        cluster = get_next_cluster(cluster);
-        if (!cluster) {
-            sector = -1;
-            break;
+    if (seeksector) {
+        /* we need to find the sector BEFORE the requested, since
+           the file struct stores the last accessed sector */
+        seeksector--;
+        clusternum = seeksector / fat_bpb.bpb_secperclus;
+        sectornum = seeksector % fat_bpb.bpb_secperclus;
+        
+        for (i=0; i<clusternum; i++) {
+            cluster = get_next_cluster(cluster);
+            if (!cluster) {
+                sector = -1;
+                break;
+            }
         }
+        
+        if ( sector > -1 )
+            sector = cluster2sec(cluster) + sectornum;
     }
-
-    if ( sector > -1 )
-        sector = cluster2sec(cluster) + sectornum;
 
     LDEBUGF("fat_seek(%x) == %x, %x, %x\n",
             seeksector, cluster, sector, sectornum);

@@ -386,6 +386,8 @@ int lseek(int fd, int offset, int whence)
             }
             openfiles[fd].cacheoffset = sectoroffset;
         }
+        else
+            openfiles[fd].cacheoffset = -1;
     }
     else
         if ( openfiles[fd].cacheoffset != -1 )
