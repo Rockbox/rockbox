@@ -28,25 +28,10 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <file.h>
+#include <types.h>
 
-struct mp3entry {
-    char *path;
-    char *title;
-    char *artist;
-    char *album;
-    int bitrate;
-    int frequency;
-    int id3v2len;
-    int id3v1len;
-    int filesize; /* in bytes */
-    int length;   /* song length */
-};
-
-typedef struct mp3entry mp3entry;
-
-typedef unsigned char bool;
-#define TRUE 1
-#define FALSE 0
+#include "id3.h"
 
 /* Some utility macros used in getsonglength() */
 #define CHECKSYNC(x) (((x >> 21) & 0x07FF) == 0x7FF)
