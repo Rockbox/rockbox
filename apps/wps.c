@@ -663,11 +663,11 @@ int wps_show(void)
     while ( 1 )
     {
         bool mpeg_paused = (mpeg_status() & MPEG_STATUS_PAUSE)?true:false;
+        status_set_playmode(paused ? STATUS_PAUSE : STATUS_PLAY);
         
         /* did someone else (i.e power thread) change mpeg pause mode? */
         if (paused != mpeg_paused) {
             paused = mpeg_paused;
-            status_set_playmode(paused ? STATUS_PAUSE : STATUS_PLAY);
 
             /* if another thread paused mpeg, we are probably in car mode,
                about to shut down. lets save the settings. */
