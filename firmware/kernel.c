@@ -139,7 +139,7 @@ static void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;
 
-    count = FREQ / 1000 / 8 * interval_in_ms;
+    count = FREQ * interval_in_ms / 1000 / 8;
 
     if(count > 0xffff)
     {
