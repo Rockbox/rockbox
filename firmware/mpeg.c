@@ -1963,6 +1963,7 @@ static void mpeg_thread(void)
                         else
                         {
                             saving = false;
+                            ata_sleep();
                         }
                     }
                     else
@@ -1972,6 +1973,7 @@ static void mpeg_thread(void)
                         if(stop_pending)
                             queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                         saving = false;
+                        ata_sleep();
                     }
                     break;
                     
