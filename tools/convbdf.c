@@ -12,9 +12,15 @@
 #include <string.h>
 #include <time.h>
 
+#define ROTATE /* define this for the new, rotated format */
+
 /* BEGIN font.h*/
 /* loadable font magic and version #*/
+#ifdef ROTATE
+#define VERSION		"RB12" /* newer version */
+#else
 #define VERSION		"RB11"
+#endif
 
 /* bitmap_t helper macros*/
 #define BITMAP_WORDS(x)         (((x)+15)/16)	/* image size in words*/
@@ -30,7 +36,6 @@ typedef unsigned short bitmap_t; /* bitmap image unit size*/
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
 struct font {
-    char *	name;		/* font name*/
     int		maxwidth;	/* max width in pixels*/
     int 	height;		/* height in pixels*/
     int		ascent;		/* ascent (baseline) height*/
@@ -43,6 +48,8 @@ struct font {
     long	bits_size;	/* # words of bitmap_t bits*/
     
     /* unused by runtime system, read in by convbdf*/
+    unsigned long* offrot;	/* offsets into rotated bitmap data*/
+    char *	name;		/* font name*/
     char *	facename;	/* facename of font*/
     char *	copyright;	/* copyright info for loadable fonts*/
     int		pixel_size;
@@ -259,6 +266,8 @@ void free_font(struct font* pf)
         free(pf->bits);
     if (pf->offset)
         free(pf->offset);
+    if (pf->offrot)
+        free(pf->offrot);
     if (pf->width)
         free(pf->width);
     free(pf);
@@ -426,9 +435,10 @@ int bdf_read_header(FILE *fp, struct font* pf)
     /* allocate bits, offset, and width arrays*/
     pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t) + EXTRA);
     pf->offset = (unsigned long *)malloc(pf->size * sizeof(unsigned long));
+    pf->offrot = (unsigned long *)malloc(pf->size * sizeof(unsigned long));
     pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
 	
-    if (!pf->bits || !pf->offset || !pf->width) {
+    if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
         fprintf(stderr, "Error: no memory for font load\n");
         return 0;
     }
@@ -440,6 +450,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
 int bdf_read_bitmaps(FILE *fp, struct font* pf)
 {
     long ofs = 0;
+    long ofr = 0;
     int maxwidth = 0;
     int i, k, encoding, width;
     int bbw, bbh, bbx, bby;
@@ -504,6 +515,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 continue;
             }
             pf->offset[encoding-pf->firstchar] = ofs;
+            pf->offrot[encoding-pf->firstchar] = ofr;
 
             /* calc char width*/
             if (bbx < 0) {
@@ -560,6 +572,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             }
 
             ofs += BITMAP_WORDS(width) * pf->height;
+            ofr += pf->width[encoding-pf->firstchar] * ((pf->height+7)/8);
 
             continue;
         }
@@ -576,6 +589,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
         if (pf->offset[i] == (unsigned long)-1) {
             pf->offset[i] = pf->offset[defchar];
+            pf->offrot[i] = pf->offrot[defchar];
             pf->width[i] = pf->width[defchar];
         }
     }
@@ -621,6 +635,10 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             pf->bits_size = ofs;
         }
     }
+
+#ifdef ROTATE
+    pf->bits_size = ofr; /* always update, rotated is smaller */
+#endif
 
     return 1;
 }
@@ -674,6 +692,62 @@ bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
     return val;
 }
 
+/*
+ * Take an bitmap_t bitmap and convert to Rockbox format.
+ * Used for converting font glyphs for the time being.
+ * Can use for standard X11 and Win32 images as well.
+ * See format description in lcd-recorder.c
+ *
+ * Doing it this way keeps fonts in standard formats,
+ * as well as keeping Rockbox hw bitmap format.
+ */
+int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
+                    unsigned int height)
+{
+    unsigned int i,j;
+    unsigned int src_words;        /* # words of input image*/
+    unsigned int dst_mask;      /* bit mask for destination */
+    bitmap_t src_mask;          /* bit mask for source */
+
+    /* calc words of input image*/
+    src_words = BITMAP_WORDS(width) * height;
+
+    /* clear background*/
+    memset(dst, 0, ((height + 7) / 8) * width);
+
+    dst_mask = 1;
+
+    for (i=0; i < src_words; i++) {
+
+        /* calc src input bit*/
+        src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+        
+        /* for each input column...*/
+        for(j=0; j < width; j++) {
+
+            /* if set in input, set in rotated output */
+            if (src[i] & src_mask)
+                dst[j] |= dst_mask;
+
+            src_mask >>= 1;    /* next input bit */
+            if (src_mask == 0) /* input word done? */
+            {
+                src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+                i++;           /* next input word */
+            }
+        }
+
+        dst_mask <<= 1;          /* next output bit (row) */
+        if (dst_mask > (1 << 7)) /* output bit > 7? */
+        {
+            dst_mask = 1;
+            dst += width;        /* next output byte row */
+        }
+    }
+    return ((height + 7) / 8) * width; /* return result size in bytes */
+}
+
+
 /* generate C source from in-core font*/
 int gen_c_source(struct font* pf, char *path)
 {
@@ -704,7 +778,7 @@ int gen_c_source(struct font* pf, char *path)
         "*/\n"
         "\n"
         "/* Font character bitmap data. */\n"
-        "static bitmap_t _font_bits[] = {\n"
+        "static const unsigned char _font_bits[] = {\n"
     };
 
     ofp = fopen(path, "w");
@@ -786,6 +860,27 @@ int gen_c_source(struct font* pf, char *path)
             fprintf(ofp, " */\n");
 
         bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
+#ifdef ROTATE /* pre-rotated into Rockbox bitmap format */
+        {
+          unsigned char bytemap[256];
+          int y8, ix=0;
+          
+          rotleft(bytemap, bits, width, pf->height);
+          ofs = (bitmap_t*)bytemap;
+          for (y8=0; y8<pf->height; y8+=8) /* column rows */
+          {
+            for (x=0; x<width; x++) {
+                fprintf(ofp, "0x%02x, ", bytemap[ix]);
+                if (!did_syncmsg && bytemap[ix] != *ofs++) {
+                    fprintf(stderr, "Warning: found encoding values in non-sorted order (not an error).\n");
+                    did_syncmsg = 1;
+                }
+                ix++;
+            }	
+            fprintf(ofp, "\n");
+          }
+        }
+#else
         for (x=BITMAP_WORDS(width)*pf->height; x>0; --x) {
             fprintf(ofp, "0x%04x,\n", *bits);
             if (!did_syncmsg && *bits++ != *ofs++) {
@@ -793,24 +888,29 @@ int gen_c_source(struct font* pf, char *path)
                 did_syncmsg = 1;
             }
         }	
+#endif
     }
     fprintf(ofp, "};\n\n");
 
     if (pf->offset) {
         /* output offset table*/
         fprintf(ofp, "/* Character->glyph mapping. */\n"
-                "static unsigned long _sysfont_offset[] = {\n");
+                "static const unsigned short _sysfont_offset[] = {\n");
 
         for (i=0; i<pf->size; ++i)
             fprintf(ofp, "  %ld,\t/* (0x%02x) */\n", 
+#ifdef ROTATE
+                    pf->offrot[i], i+pf->firstchar);
+#else
                     pf->offset[i], i+pf->firstchar);
+#endif
         fprintf(ofp, "};\n\n");
     }
 
     /* output width table for proportional fonts*/
     if (pf->width) {
         fprintf(ofp, "/* Character width data. */\n"
-                "static unsigned char _sysfont_width[] = {\n");
+                "static const unsigned char _sysfont_width[] = {\n");
 
         for (i=0; i<pf->size; ++i)
             fprintf(ofp, "  %d,\t/* (0x%02x) */\n", 
@@ -822,28 +922,25 @@ int gen_c_source(struct font* pf, char *path)
     if (pf->offset)
         sprintf(obuf, "_sysfont_offset,");
     else
-        sprintf(obuf, "0,  /* no encode table*/");
+        sprintf(obuf, "0,  /* no encode table */");
 
     if (pf->width)
-        sprintf(buf, "_sysfont_width,");
+        sprintf(buf, "_sysfont_width,  /* width */");
     else
-        sprintf(buf, "0,  /* fixed width*/");
+        sprintf(buf, "0,  /* fixed width */");
 
     fprintf(ofp, 	"/* Exported structure definition. */\n"
-            "struct font sysfont = {\n"
-            "  \"%s\",\n"
-            "  %d,\n"
-            "  %d,\n"
-            "  %d,\n"
-            "  %d,\n"
-            "  %d,\n"
-            "  _font_bits,\n"
+            "const struct font sysfont = {\n"
+            "  %d,  /* maxwidth */\n"
+            "  %d,  /* height */\n"
+            "  %d,  /* ascent */\n"
+            "  %d,  /* firstchar */\n"
+            "  %d,  /* size */\n"
+            "  _font_bits, /* bits */\n"
+            "  %s  /* offset */\n"
             "  %s\n"
-            "  %s\n"
-            "  %d,\n"
-            "  sizeof(_font_bits)/sizeof(bitmap_t),\n"
+            "  %d,  /* defaultchar */\n"
             "};\n",
-            pf->name,
             pf->maxwidth, pf->height,
             pf->ascent,
             pf->firstchar,
@@ -899,6 +996,7 @@ int gen_fnt_file(struct font* pf, char *path)
 {
     FILE *ofp;
     int i;
+    int did_defaultchar = 0;
 
     ofp = fopen(path, "wb");
     if (!ofp) {
@@ -908,13 +1006,13 @@ int gen_fnt_file(struct font* pf, char *path)
 
     /* write magic and version #*/
     writestr(ofp, VERSION, 4);
-
+#ifndef ROTATE
     /* internal font name*/
     writestrpad(ofp, pf->name, 64);
 
     /* copyright*/
     writestrpad(ofp, pf->copyright, 256);
-
+#endif
     /* font info*/
     writeshort(ofp, pf->maxwidth);
     writeshort(ofp, pf->height);
@@ -928,8 +1026,37 @@ int gen_fnt_file(struct font* pf, char *path)
     writelong(ofp, pf->bits_size);		  /* # words of bitmap_t*/
     writelong(ofp, pf->offset? pf->size: 0);  /* # longs of offset*/
     writelong(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
-
     /* variable font data*/
+#ifdef ROTATE
+    for (i=0; i<pf->size; ++i)
+    {
+        bitmap_t* bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
+        int width = pf->width ? pf->width[i] : pf->maxwidth;
+        int size;  
+        unsigned char bytemap[256];
+  
+        if (pf->offset && 
+            (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
+            if (did_defaultchar)
+                continue;
+            did_defaultchar = 1;
+        }
+
+        size = rotleft(bytemap, bits, width, pf->height);
+        writestr(ofp, bytemap, size);
+    }
+
+    if (ftell(ofp) & 1)
+        writebyte(ofp, 0);		/* pad to 16-bit boundary*/
+
+    if (pf->offset)
+        for (i=0; i<pf->size; ++i)
+            writeshort(ofp, pf->offrot[i]);
+
+    if (pf->width)
+        for (i=0; i<pf->size; ++i)
+            writebyte(ofp, pf->width[i]);
+#else
     for (i=0; i<pf->bits_size; ++i)
         writeshort(ofp, pf->bits[i]);
     if (ftell(ofp) & 2)
@@ -942,7 +1069,7 @@ int gen_fnt_file(struct font* pf, char *path)
     if (pf->width)
         for (i=0; i<pf->size; ++i)
             writebyte(ofp, pf->width[i]);
-
+#endif
     fclose(ofp);
     return 0;
 }

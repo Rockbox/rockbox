@@ -72,7 +72,7 @@ enum {
  */
 
 /* loadable font magic and version #*/
-#define VERSION		"RB11"
+#define VERSION		"RB12"
 
 typedef unsigned short bitmap_t; /* bitmap image unit size*/
 
@@ -88,15 +88,14 @@ typedef unsigned short bitmap_t; /* bitmap image unit size*/
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
 struct font {
-    char *	name;		/* font name*/
     int		maxwidth;	/* max width in pixels*/
     unsigned int height;	/* height in pixels*/
     int		ascent;		/* ascent (baseline) height*/
     int		firstchar;	/* first character in bitmap*/
     int		size;		/* font size in glyphs*/
-    bitmap_t *bits;		/* 16-bit right-padded bitmap data*/
-    unsigned long *offset;	/* offsets into bitmap data*/
-    unsigned char *width;	/* character widths or NULL if fixed*/
+    const unsigned char *bits;		/* 8-bit column bitmap data*/
+    const unsigned short *offset;	/* offsets into bitmap data*/
+    const unsigned char *width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
     long	bits_size;	/* # words of bitmap_t bits*/
 };

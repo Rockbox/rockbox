@@ -53,15 +53,8 @@ static unsigned char *freeptr = mbuf;
 static unsigned char *fileptr;
 static unsigned char *eofptr;
 
-static void rotate_font_bits(const struct font* pf);
-static void rotleft(unsigned char *dst, 
-                    const bitmap_t *src,
-                    unsigned int width,
-                    unsigned int height);
-
 void font_init(void)
 {
-    rotate_font_bits(&sysfont);
     memset(&font_ui, 0, sizeof(struct font));
 }
 
@@ -95,25 +88,6 @@ static int readstr(char *buf, int count)
     return (fileptr <= eofptr)? count: 0;
 }
 
-/* read totlen bytes, return NUL terminated string*/
-/* may write 1 past buf[totlen]; removes blank pad*/
-static int readstrpad(char *buf, int totlen)
-{
-    char *p = buf;
-    int n = totlen;
-
-    while (--n >= 0)
-        *p++ = *fileptr++;
-    if (fileptr > eofptr)
-        return 0;
-
-    p = &buf[totlen];
-    *p-- = 0;
-    while (*p == ' ' && p >= buf)
-        *p-- = '\0';
-    return totlen;
-}
-
 void font_reset(void)
 {
     memset(&font_ui, 0, sizeof(struct font));
@@ -127,7 +101,6 @@ struct font* font_load(const char *path)
     unsigned long firstchar, defaultchar, size;
     unsigned long i, nbits, noffset, nwidth;
     char version[4+1];
-    char copyright[256+1];
     struct font* pf = &font_ui;
 
     /* open and read entire font file*/
@@ -163,15 +136,6 @@ struct font* font_load(const char *path)
     if (strcmp(version, VERSION) != 0)
         return NULL;
 
-    /* internal font name*/
-    pf->name = fileptr;
-    if (readstrpad(pf->name, 64) != 64)
-        return NULL;
-
-    /* copyright, not currently stored*/
-    if (readstrpad(copyright, 256) != 256)
-        return NULL;
-
     /* font info*/
     if (!readshort(&maxwidth))
         return NULL;
@@ -198,7 +162,6 @@ struct font* font_load(const char *path)
     /* # words of bitmap_t*/
     if (!readlong(&nbits))
         return NULL;
-    pf->bits_size = nbits;
 
     /* # longs of offset*/
     if (!readlong(&noffset))
@@ -209,18 +172,21 @@ struct font* font_load(const char *path)
         return NULL;
 
     /* variable font data*/
-    pf->bits = (bitmap_t *)fileptr;
-    for (i=0; i<nbits; ++i)
-        if (!readshort(&pf->bits[i]))
-            return NULL;
-    /* pad to longword boundary*/
-    fileptr = (unsigned char *)(((int)fileptr + 3) & ~3);
+    pf->bits = (unsigned char *)fileptr;
+    fileptr += nbits*sizeof(unsigned char);
+
+    /* pad to 16 bit boundary*/
+    fileptr = (unsigned char *)(((int)fileptr + 1) & ~1);
 
     if (noffset) {
-        pf->offset = (unsigned long *)fileptr;
+        pf->offset = (unsigned short *)fileptr;
         for (i=0; i<noffset; ++i)
-            if (!readlong(&pf->offset[i]))
+        {
+            unsigned short offset;
+            if (!readshort(&offset))
                 return NULL;
+            ((unsigned short*)(pf->offset))[i] = (unsigned short)offset;
+        }
     }
     else
         pf->offset = NULL;
@@ -234,9 +200,6 @@ struct font* font_load(const char *path)
 
     if (fileptr > eofptr)
         return NULL;
-
-    /* one-time rotate font bits to rockbox format*/
-    rotate_font_bits(pf);
 
     return pf;    /* success!*/
 }
@@ -262,93 +225,6 @@ struct font* font_get(int font)
     }
 }
 
-/* convert font bitmap data inplace to rockbox format*/
-static void rotate_font_bits(const struct font* pf)
-{
-    int i;
-    unsigned long defaultchar = pf->defaultchar - pf->firstchar;
-    bool did_defaultchar = false;
-    unsigned char buf[256];
-
-    for (i=0; i<pf->size; ++i) {
-        bitmap_t *bits = pf->bits +
-            (pf->offset ? pf->offset[i] : (pf->height * i));
-        int width = pf->width? pf->width[i]: pf->maxwidth;
-        int src_bytes = BITMAP_BYTES(width) * pf->height;
-
-        /*
-         * Due to the way the offset map works,
-         * non-mapped characters are mapped to the default
-         * character, and shouldn't be rotated twice.
-         */
-
-        if (pf->offset && pf->offset[i] == defaultchar) {
-            if (did_defaultchar)
-                continue;
-            did_defaultchar = true;
-        }
-
-        /* rotate left for lcd_bitmap function input*/
-        rotleft(buf, bits, width, pf->height);
-
-        /* copy back into original location*/
-        memcpy(bits, buf, src_bytes);
-    }
-}
-
-/*
- * Take an bitmap_t bitmap and convert to Rockbox format.
- * Used for converting font glyphs for the time being.
- * Can use for standard X11 and Win32 images as well.
- * See format description in lcd-recorder.c
- *
- * Doing it this way keeps fonts in standard formats,
- * as well as keeping Rockbox hw bitmap format.
- */
-static void rotleft(unsigned char *dst, const bitmap_t *src,
-                    unsigned int width, unsigned int height)
-{
-    unsigned int i,j;
-    unsigned int src_words;        /* # words of input image*/
-    unsigned int dst_mask;      /* bit mask for destination */
-    bitmap_t src_mask;          /* bit mask for source */
-
-    /* calc words of input image*/
-    src_words = BITMAP_WORDS(width) * height;
-
-    /* clear background*/
-    memset(dst, 0, ((height + 7) / 8) * width);
-
-    dst_mask = 1;
-
-    for (i=0; i < src_words; i++) {
-
-        /* calc src input bit*/
-        src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
-        
-        /* for each input column...*/
-        for(j=0; j < width; j++) {
-
-            /* if set in input, set in rotated output */
-            if (src[i] & src_mask)
-                dst[j] |= dst_mask;
-
-            src_mask >>= 1;    /* next input bit */
-            if (src_mask == 0) /* input word done? */
-            {
-                src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
-                i++;           /* next input word */
-            }
-        }
-
-        dst_mask <<= 1;          /* next output bit (row) */
-        if (dst_mask > (1 << 7)) /* output bit > 7? */
-        {
-            dst_mask = 1;
-            dst += width;        /* next output byte row */
-        }
-    }
-}
 #endif /* HAVE_LCD_BITMAP */
 
 /* -----------------------------------------------------------------
