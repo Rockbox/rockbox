@@ -795,6 +795,9 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
     int numsec = file->sectornum;
     int err, i;
 
+    if ( sector == -1 )
+        return 0;
+
     for ( i=0; i<sectorcount; i++ ) {
         err = ata_read_sectors(sector + fat_bpb.startsector, 1,
                                (char*)buf+(i*SECTOR_SIZE));
@@ -807,8 +810,11 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
         numsec++;
         if ( numsec >= fat_bpb.bpb_secperclus ) {
             cluster = get_next_cluster(cluster);
-            if (!cluster)
-                break; /* end of file */
+            if (!cluster) {
+                /* end of file */
+                sector = -1;
+                break;
+            }
             
             sector = cluster2sec(cluster);
             if (sector<0)
