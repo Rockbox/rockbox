@@ -497,9 +497,11 @@ static int showdir(char *path, int start)
                 icon_type = Mod_Ajz;
                 break;
 
+#ifdef HAVE_LCD_BITMAP
             case TREE_ATTR_UCL:
                 icon_type = Flashfile;
                 break;
+#endif
  
             case TREE_ATTR_ROCK:
                 icon_type = Plugin;
