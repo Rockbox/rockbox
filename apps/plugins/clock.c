@@ -22,6 +22,13 @@ RELEASE NOTES *******************
 *********************************
 
 *********************************
+VERSION 2.22 * STABLE ***********
+*********************************
+Fixed two bugs:
+-Digital settings are now independent of LCD settings
+-12/24h "Analog" settings are now displayed correctly.
+
+*********************************
 VERSION 2.21 * STABLE ***********
 *********************************
 Changed the behaviour of F2
@@ -80,12 +87,13 @@ Release Version.
 Features analog / digital modes,
 and a few options.
 ********************************/
+
 #include "plugin.h"
 #include "time.h"
 
 #ifdef HAVE_LCD_BITMAP
 
-#define CLOCK_VERSION "2.21"
+#define CLOCK_VERSION "2.22"
 
 /* prototypes */
 void show_logo(bool animate, bool show_clock_text);
@@ -758,18 +766,40 @@ bool colon, bool lcd)
     int xpos = x;
 
     /* Draw PM indicator */
-    if(settings.digital_12h)
+	if(settings.clock == 2)
+	{
+		if(settings.digital_12h)
+		{
+			if(hour > 12)
+				rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+			else
+				rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+		}
+	}
+    else
     {
-        if(hour > 12)
-            rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
-        else
-            rb->lcd_bitmap(am, 1, 55, 15, 8, true);
-    }
+		if(settings.lcd_12h)
+		{
+			if(hour > 12)
+				rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+			else
+				rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+		}
+	}
 
     /* Now change to 12H mode if requested */
-    if(settings.digital_12h)
-        if(hour > 12)
-            hour -= 12;
+    if(settings.clock == 2)
+    {
+		if(settings.digital_12h)
+			if(hour > 12)
+				hour -= 12;
+	}
+	else
+	{
+		if(settings.lcd_12h)
+			if(hour > 12)
+				hour -= 12;
+	}
 
     draw_7seg_digit(hour / 10, xpos, y, width, height, lcd);
     xpos += width + 6;
@@ -2105,8 +2135,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         hour = current_time->tm_hour;
         minute = current_time->tm_min;
         second = current_time->tm_sec;
-
-        temphour = hour;
+        temphour = current_time->tm_hour;
 
         /*********************
          * Date info
@@ -2300,8 +2329,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
         }
 
-        if(settings.analog_time == 1 && temphour > 12)
-            temphour += 12;
+        if(settings.analog_time == 2 && temphour > 12)
+            temphour -= 12;
 
         draw_extras(year, day, month, temphour, minute, second);
 
