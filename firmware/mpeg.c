@@ -1688,7 +1688,7 @@ static void mpeg_thread(void)
                     if(mpeg_file >= 0)
                         close(mpeg_file);
 
-                    if(!disable_xing_header)
+                    if(!disable_xing_header && num_rec_bytes > 0)
                     {
                         /* Create the Xing header */
                         mpeg_file = open(recording_filename, O_RDWR);
