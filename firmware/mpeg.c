@@ -860,10 +860,6 @@ static int new_file(int steps)
                steps--;
             else
                steps++;
-
-            /* Bail out if no file could be opened */
-            if(abs(steps) > max_steps)
-                return -1;
         }
         else
         {
@@ -895,6 +891,10 @@ static int new_file(int steps)
                     
             }
         }
+
+        /* Bail out if no file could be opened */
+        if(abs(steps) > max_steps)
+           return -1;
     } while ( mpeg_file < 0 );
 
     return 0;
