@@ -597,6 +597,7 @@ int PlayTick(int fd)
             rb->lseek(fd, 0, SEEK_SET); // save resume position
             rb->write(fd, &gFileHdr, sizeof(gFileHdr));
         }
+        Cleanup(&fd);
         return 0; // all expired
     }
 
