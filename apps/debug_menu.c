@@ -1345,9 +1345,10 @@ static bool dbg_disk_info(void)
             case 9:
                 timing_info_present = identify_info[53] & (1<<1);
                 if(timing_info_present) {
-                    snprintf(buf, 128, "Min time: %dns", identify_info[67]);
-                    lcd_puts(0, y++, buf);
-                    snprintf(buf, 128, "Min IORDY: %dns", identify_info[68]);
+                    lcd_puts(0, y++, "Cycle times");
+                    snprintf(buf, 128, "%dns/%dns",
+                             identify_info[67],
+                             identify_info[68]);
                     lcd_puts(0, y++, buf);
                 } else {
                     lcd_puts(0, y++, "No timing info");
