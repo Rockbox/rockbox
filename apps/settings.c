@@ -519,8 +519,6 @@ void settings_apply(void)
     cpu_sleep(global_settings.cpu_sleep);
 }
 
-static void set_cfg_bool(bool* variable, char* value);
-
 /*
  * load settings from disk or RTC RAM
  */
@@ -529,8 +527,6 @@ void settings_load(void)
     
     DEBUGF( "reload_all_settings()\n" );
 
-    //    set_cfg_bool(&global_settings.playlist_shuffle, "off");
-    
     /* populate settings with default values */
     settings_reset();
     
