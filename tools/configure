@@ -46,7 +46,6 @@ simul () {
 
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
- -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@DISPLAY@,${display},g" \
@@ -60,9 +59,7 @@ sed > Makefile \
 ARCHOS=@ARCHOS@
 ROOTDIR=@ROOTDIR@
 SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
-TOOLSDIR=\$(ROOTDIR)/tools
 DEBUG=@DEBUG@
-TARGET=@TARGET@
 DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
@@ -125,11 +122,6 @@ whichlang() {
     done
 }
 
-
-#
-# Beging Build Script
-#
-
 target=$1
 debug=$2
 
@@ -175,7 +167,6 @@ if [ "$target" = "update" ]; then
     if { grep "^## Auto" Makefile >/dev/null 2>&1 ; } then
       echo "Existing generated Makefile found. Getting defaults from it."
       archos=`grep "^ARCHOS=" Makefile | cut -d= -f2-`
-      target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
       language=`grep "^LANGUAGE=" Makefile | cut -d= -f2-`
       memory=`grep "^MEMORYSIZE=" Makefile | cut -d= -f2-`
@@ -186,6 +177,8 @@ if [ "$target" = "update" ]; then
         display=`grep "^DISPLAY=" Makefile | cut -d= -f2-`
         keypad=`grep "^KEYPAD=" Makefile | cut -d= -f2-`
         simver=`grep "^SIMVER=" Makefile | cut -d= -f2-`
+      else
+        target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       fi
     fi
   fi
@@ -317,7 +310,7 @@ if [ -z "$rootdir" ]; then
 
   firmfile="crt0.S" # a file to check for in the firmware root dir
 
-  for dir in  . .. ../..; do
+  for dir in  . .. ../.. ../rockbox*; do
     if [ -f $dir/firmware/$firmfile ]; then
      rootdir=$dir
      break
@@ -337,6 +330,10 @@ if [ -z "$rootdir" ]; then
   now=`pwd`
   cd $rootdir
   rootdir=`pwd`
+
+  echo "Using this source code root directory:"
+  echo $rootdir
+  echo ""
 
   # cd back to the build dir
   cd $now
