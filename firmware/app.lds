@@ -36,14 +36,14 @@ SECTIONS
     .stack :
     {
        *(.stack)
-       . = . + 0x8000;
+       . = 0x8000;
        _stack = .;
     }
 
     .heap :
     {
         _poolstart = .;
-        . = . + 0x20000;
+        . = 0x20000;
         _poolend = .;
     }
 
