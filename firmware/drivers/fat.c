@@ -27,7 +27,6 @@
 #include <sys/timeb.h>
 #endif
 #include <stdbool.h>
-#include <unicode.h>
 #include "fat.h"
 #include "ata.h"
 #include "debug.h"
