@@ -41,6 +41,8 @@ crosswincc () {
  LDOPTS="-lgdi32 -luser32 -mwindows"
  # add cross-compiler option(s)
  GCCOPTS="$GCCOPTS -mno-cygwin"
+
+ output="rockboxui.exe" # use this as output binary name
 }
 
 simcc () {
@@ -614,6 +616,9 @@ export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
 export UNAME=@UNAME@
+
+# Do not print "Entering directory ..."
+MAKEFLAGS += --no-print-directory
 
 .PHONY: all clean tags zip
 
