@@ -1441,7 +1441,11 @@ void settings_reset(void) {
     global_settings.invert_cursor = DEFAULT_INVERT_CURSOR_SETTING;
     global_settings.backlight_on_when_charging   = 
         DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
+#ifdef HAVE_LIION
+    global_settings.battery_capacity = 2200; /* mAh */
+#else
     global_settings.battery_capacity = 1500; /* mAh */
+#endif
     global_settings.trickle_charge = true;
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
