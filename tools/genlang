@@ -85,7 +85,7 @@ while(<LANG>) {
 #            print "VOICE: ".$set{'voice'}." VALUE: $value\n";
             # Note: if both entries are "", the string is deprecated,
             # but must be included to maintain compatibility
-            if(($value eq "\"\"") && $set{'voice'} ne "\"\"") {
+            if($set{'id'} =~ /^VOICE_/) {
                 # voice-only
                 push @vfile, $set{'id'};
             }

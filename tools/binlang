@@ -70,7 +70,7 @@ while(<ENG>) {
             
             if($value =~ s/^\"(.*)\"\s*$/$1/g) {
                 # Skip voice-only entries
-                if(!$value && $set{'voice'} ne "\"\"") {
+                if($set{'id'} =~ /^VOICE_/) {
                     $idnum{$set{'id'}} = '_done_';
                     next;
                 }
