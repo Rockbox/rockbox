@@ -42,6 +42,7 @@
 #include "sleeptimer.h"
 #include "wps.h"
 #include "buffer.h"
+#include "screens.h"
 #ifdef HAVE_FMRADIO
 #include "radio.h"
 #endif
