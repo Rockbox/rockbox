@@ -1899,12 +1899,18 @@ static void mpeg_thread(void)
                                 mpeg_file = open(recording_filename,
                                                  O_WRONLY| O_APPEND);
                                 if(mpeg_file < 0)
-                                    panicf("recfile: %d", mpeg_file);
+                                    panicf("rec open: %d", mpeg_file);
                                     
                                 rc = write(mpeg_file, mp3buf + mp3buf_read,
                                            writelen);
 
-                                close(mpeg_file);
+                                if(rc < 0)
+                                    panicf("rec wrt: %d", rc);
+
+                                rc = close(mpeg_file);
+                                if(rc < 0)
+                                    panicf("rec cls: %d", rc);
+
                                 mpeg_file = -1;
                                 DEBUGF("rc: %x\n", rc);
                                 
