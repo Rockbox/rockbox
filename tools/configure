@@ -143,9 +143,19 @@ DEBUG=@DEBUG@
 TARGET=@TARGET@
 THISDIR="@PWD@"
 
-all:
+.PHONE: firmware apps
+
+all: firmware apps
+
+firmware:
 	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+
+apps:
 	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+
+clean:
+	make -C \$(APPSDIR) clean
+	make -C \$(FIRMDIR) clean
 
 EOF
 
