@@ -549,6 +549,8 @@ static int showdir(char *path, int start)
 
 static bool ask_resume(bool ask_once)
 {
+    bool stop = false;
+    
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
 #endif
@@ -568,14 +570,27 @@ static bool ask_resume(bool ask_once)
 #endif
     lcd_update();
 
-    switch (button_get(true)) {
-        case BUTTON_PLAY:
-        case BUTTON_RC_PLAY:
-            return true;
+    while (!stop) {
+        switch (button_get(true)) {
+            case BUTTON_PLAY:
+            case BUTTON_RC_PLAY:
+                return true;
 
-        case SYS_USB_CONNECTED:
-            usb_screen();
-            break;
+                /* ignore the ON button, since it might
+                   still be pressed since booting */
+            case BUTTON_ON:
+            case BUTTON_ON | BUTTON_REL:
+                break;
+                
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                stop = true;
+                break;
+
+            default:
+                stop = true;
+                break;
+        }
     }
 
     if ( global_settings.resume == RESUME_ASK_ONCE && ask_once) {
