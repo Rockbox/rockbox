@@ -19,19 +19,13 @@
 
 #include "serial.h"
 
-#define TDRE 7 /* transmit data register empty */
-#define RDRF 6 /* receive data register full   */
-#define ORER 5 /* overrun error                */
-#define FER  4 /* frame   error                */
-#define PER  3 /* parity  error                */
-
 static int serial_byte,serial_flag;
 
 void serial_putc (char byte) 
 {
-    while (!(SSR1 & (1<<TDRE)));
+    while (!(SSR1 & 0x80)); /* Wait for TDRE */
     TDR1 = byte;
-    clear_bit(TDRE,SSR1_ADDR);
+    SSR1 &= 0x80; /* Clear TDRE */
 }
 
 void serial_puts (char const *string) 
@@ -63,7 +57,7 @@ void serial_setup (int baudrate)
 #pragma interrupt
 void REI1 (void)
 {
-    clear_bit (FER,SSR1_ADDR);
+    SSR1 &= 0x10; /* Clear FER */
 }
 
 #pragma interrupt
@@ -71,5 +65,5 @@ void RXI1 (void)
 {
     serial_byte = RDR1;
     serial_flag = 1;
-    clear_bit(RDRF,SSR1_ADDR);
+    SSR1 &= 0x40; /* Clear RDRF */
 }
