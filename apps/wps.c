@@ -74,12 +74,10 @@ static int ff_rewind_count = 0;
 static struct mp3entry* id3 = NULL;
 static int old_release_mask;
 
-#ifdef CUSTOM_WPS
 static char custom_wps[5][64];
 static char wps_display[5][64];
 static int scroll_line;
 static int scroll_line_custom;
-#endif
 
 static void draw_screen(void)
 {
@@ -105,7 +103,6 @@ static void draw_screen(void)
     }
     else
     {
-#ifdef CUSTOM_WPS
         static int last_wps = -1;
         if ((last_wps != global_settings.wps_display
             && global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS))
@@ -113,7 +110,7 @@ static void draw_screen(void)
             load_custom_wps();
             last_wps = global_settings.wps_display;
         }
-#endif
+
         switch ( global_settings.wps_display ) {
             case PLAY_DISPLAY_TRACK_TITLE:
             {
@@ -124,9 +121,7 @@ static void draw_screen(void)
                 char* szPeriod;
                 char szArtist[26];
                 char szBuff[257];
-#ifdef CUSTOM_WPS
                 int tmpcnt = 0;
-#endif
 
                 szBuff[sizeof(szBuff)-1] = 0;
                 strncpy(szBuff, id3->path, sizeof(szBuff));
@@ -144,7 +139,7 @@ static void draw_screen(void)
                 szPeriod = strrchr(szDelimit, '.');
                 if (szPeriod != NULL)
                     *szPeriod = 0;
-#ifdef CUSTOM_WPS
+
                 snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
                         (++szDelimit));
 #ifdef HAVE_LCD_CHARCELLS
@@ -155,14 +150,10 @@ static void draw_screen(void)
                     wps_display[tmpcnt][0] = 0;
                 scroll_line = 0;
                 refresh_wps(false);
-#else
-                lcd_puts_scroll(0, 1, (++szDelimit));
-#endif
                 break;
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
             {
-#ifdef CUSTOM_WPS
                 snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
                         "%pp/%pe: %fn");
 #ifdef HAVE_LCD_CHARCELLS
@@ -171,27 +162,6 @@ static void draw_screen(void)
 #endif
                 scroll_line = 0;
                 refresh_wps(false);
-#else
-                char buffer[64];
-                char ch = '/';
-                char* szLast = strrchr(id3->path, ch);
-
-                if (szLast)
-                {
-                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
-                            id3->index + 1,
-                            playlist.amount,
-                            ++szLast);
-                }
-                else
-                {
-                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
-                            id3->index + 1,
-                            playlist.amount,
-                            id3->path);
-                }
-                lcd_puts_scroll(0, 0, buffer);
-#endif
                 break;
             }
             case PLAY_DISPLAY_2LINEID3:
@@ -199,7 +169,6 @@ static void draw_screen(void)
 #ifdef HAVE_LCD_BITMAP
                 int l = 0;
 
-#ifdef CUSTOM_WPS
                 snprintf(wps_display[l],sizeof(wps_display[l]),"%s","%fn");
                 snprintf(wps_display[l++],sizeof(wps_display[l]),"%s","%it");
                 snprintf(wps_display[l++],sizeof(wps_display[l]),"%s","%id");
@@ -227,79 +196,25 @@ static void draw_screen(void)
                 scroll_line = 0;
                 refresh_wps(false);
 #else
-                char buffer[64];
-
-                lcd_puts_scroll(0, l++, id3->path);
-                lcd_puts(0, l++, id3->title?id3->title:"");
-                lcd_puts(0, l++, id3->album?id3->album:"");
-                lcd_puts(0, l++, id3->artist?id3->artist:"");
-
-                if(!global_settings.statusbar && font_height <= 8) {
-                    if(id3->vbr)
-                        snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
-                                 id3->bitrate);
-                    else
-                        snprintf(buffer, sizeof(buffer), "%d kbit", 
-                                 id3->bitrate);
-
-                    lcd_puts(0, l++, buffer);
-                    snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
-                    lcd_puts(0, l++, buffer);
-                }
-                else {
-                    if(id3->vbr)
-                        snprintf(buffer, sizeof(buffer), "%dkbit(a) %dHz",
-                                 id3->bitrate, id3->frequency);
-                    else
-                        snprintf(buffer, sizeof(buffer), "%dkbit    %dHz",
-                                 id3->bitrate, id3->frequency);
-
-                    lcd_puts(0, l++, buffer);
-                }
-#endif
-#else
-#ifdef CUSTOM_WPS
                 snprintf(wps_display[0],sizeof(wps_display[0]),"%s","%ia");
                 snprintf(wps_display[1],sizeof(wps_display[1]),"%s","%it");
                 scroll_line = 1;
                 refresh_wps(false);
-#else
-                lcd_puts(0, 0, id3->artist?id3->artist:"<no artist>");
-                lcd_puts_scroll(0, 1, id3->title?id3->title:"<no title>");
-#endif
 #endif
                 break;
             }
 #ifdef HAVE_LCD_CHARCELLS
             case PLAY_DISPLAY_1LINEID3:
             {
-#ifdef CUSTOM_WPS
                 snprintf(wps_display[0],sizeof(wps_display[0]),"%s",
                         "%pp/%pe: %fc");
                 snprintf(wps_display[1],sizeof(wps_display[1]),"%s",
                         "%pc/%pt");
                 scroll_line = 0;
                 refresh_wps(false);
-#else
-                char buffer[64];
-                char ch = '/';
-                char* szLast = strrchr(id3->path, ch);
-
-                if(id3->artist && id3->title)
-                    snprintf(buffer, sizeof(buffer), "%d/%d: %s - %s",
-                            id3->index + 1, playlist.amount,
-                            id3->artist?id3->artist:"<no artist>",
-                            id3->title?id3->title:"<no title>");
-                else
-                    snprintf(buffer, sizeof(buffer), "%d/%d: %s",
-                            id3->index + 1, playlist.amount,
-                            szLast?++szLast:id3->path);
-                lcd_puts_scroll(0, 0, buffer);
-#endif
                 break;
             }
 #endif
-#ifdef CUSTOM_WPS
             case PLAY_DISPLAY_CUSTOM_WPS:
             {
                 if(custom_wps[0] == 0)
@@ -312,21 +227,29 @@ static void draw_screen(void)
                 refresh_wps(false);
                 break;
             }
-#endif
         }
     }
     status_draw();
     lcd_update();
 }
 
-#ifdef CUSTOM_WPS
+#ifdef PLAYER_PROGRESS
+int bin2int(char *input, int size)
+{
+    int result=0;
+    while(size--) {
+        result <<= 1;
+        result += (*input++ - '0');
+    }
+    return result;
+}
+#endif
+
 bool refresh_wps(bool refresh_scroll)
 {
     int l;
-#ifdef CUSTOM_WPS
 #ifdef HAVE_LCD_BITMAP
     int bmp_time_line;
-#endif
 #endif
 
     if(!id3)
@@ -370,8 +293,36 @@ bool refresh_wps(bool refresh_scroll)
     slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, id3->elapsed*100/id3->length, Grow_Right);
     lcd_update();
 #endif
+#ifdef PLAYER_PROGRESS
+#ifdef HAVE_LCD_CHARCELLS
+    draw_player_progress(10,1);
+#endif
+#endif
     return(true);
 }
+
+#ifdef PLAYER_PROGRESS
+#ifdef HAVE_LCD_CHARCELLS
+void draw_player_progress(int x, int y)
+{
+    char player_progressbar[8];
+    char binline[35];
+    char charline[5];
+    int songpos = 0;
+    int tmpcnt;
+
+    memset(binline, 0, sizeof(binline));
+    memset(charline, 0, sizeof(charline));
+    songpos = (id3->elapsed * 35) / id3->length;
+    for(tmpcnt=0;tmpcnt<=songpos;tmpcnt++)
+        binline[tmpcnt] = 1;
+    for(tmpcnt=0;tmpcnt<=6;tmpcnt++)
+        player_progressbar[tmpcnt] = bin2int(binline+(tmpcnt*5),4);
+    lcd_define_pattern(8,player_progressbar,7);
+    lcd_puts(x,y,"\01");
+}
+#endif
+#endif
 
 bool load_custom_wps(void)
 {
@@ -625,7 +576,6 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
     }
     return(true);
 }
-#endif
 
 int player_id3_show(void)
 {
@@ -744,50 +694,6 @@ int player_id3_show(void)
 #endif
     return(0);
 }
-
-#ifndef CUSTOM_WPS
-static void display_file_time(void)
-{
-    char buffer[32];
-    int elapsed = id3->elapsed + ff_rewind_count;
-
-#ifdef HAVE_LCD_BITMAP
-    int line;
-    if(global_settings.statusbar)
-        line = 5;
-    else
-        line = 6;
-    snprintf(buffer,sizeof(buffer),
-             "Time:%3d:%02d/%d:%02d",
-             elapsed / 60000,
-             elapsed % 60000 / 1000,
-             id3->length / 60000,
-             id3->length % 60000 / 1000 );
-
-    lcd_puts(0, line, buffer);
-    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, 
-             elapsed*100/id3->length, Grow_Right);
-    lcd_update();
-#else
-    /* Display time with the filename scroll only because
-       the screen has room. */
-    if ((global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL) ||
-        global_settings.wps_display == PLAY_DISPLAY_1LINEID3 ||
-        global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS ||
-        ff_rewind)
-    {
-        snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
-                 elapsed / 60000,
-                 elapsed % 60000 / 1000,
-                 id3->length / 60000,
-                 id3->length % 60000 / 1000 );
-
-        lcd_puts(0, 1, buffer);
-        lcd_update();
-    }
-#endif
-}
-#endif
 
 void display_volume_level(int vol_level)
 {
@@ -926,11 +832,7 @@ static bool ffwd_rew(int button)
                 if ((int)(id3->elapsed + ff_rewind_count) < 0)
                     ff_rewind_count = -id3->elapsed;
 
-#ifdef CUSTOM_WPS
                 refresh_wps(false);
-#else
-                display_file_time();
-#endif
                 break;
 
             case BUTTON_RIGHT | BUTTON_REPEAT:
@@ -974,11 +876,7 @@ static bool ffwd_rew(int button)
                 if ((id3->elapsed + ff_rewind_count) > id3->length)
                     ff_rewind_count = id3->length - id3->elapsed;
 
-#ifdef CUSTOM_WPS
                 refresh_wps(false);
-#else
-                display_file_time();
-#endif
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
@@ -1024,9 +922,7 @@ static bool ffwd_rew(int button)
         if (!exit)
             button = button_get(true);
     }
-#ifdef CUSTOM_WPS
     refresh_wps(true);
-#endif
     return usb;
 }
 
@@ -1037,17 +933,11 @@ static void update(void)
         lcd_stop_scroll();
         id3 = mpeg_current_track();
         draw_screen();
-#ifdef CUSTOM_WPS
         refresh_wps(true);
-#endif
     }
 
     if (id3) {
-#ifdef CUSTOM_WPS
         refresh_wps(false);
-#else
-        display_file_time();
-#endif
     }
 
     status_draw();
@@ -1075,9 +965,7 @@ static bool keylock(void)
 #endif
     display_keylock_text(true);
     keys_locked = true;
-#ifdef CUSTOM_WPS
     refresh_wps(true);
-#endif
     draw_screen();
     status_draw();
     while (button_get(false)); /* clear button queue */
@@ -1118,9 +1006,7 @@ static bool keylock(void)
             default:
                 display_keylock_text(true);
                 while (button_get(false)); /* clear button queue */
-#ifdef CUSTOM_WPS
                 refresh_wps(true);
-#endif
                 draw_screen();
                 break;
         }
@@ -1238,9 +1124,7 @@ static bool menu(void)
 #endif
 
     draw_screen();
-#ifdef CUSTOM_WPS
     refresh_wps(true);
-#endif
     return false;
 }
 
@@ -1268,20 +1152,14 @@ int wps_show(void)
     ff_rewind = false;
     ff_rewind_count = 0;
 
-#ifdef CUSTOM_WPS
     load_custom_wps();  /* Load the Custom WPS file, if there is one */
-#endif
 
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
         if (id3) {
             draw_screen();
-#ifdef CUSTOM_WPS
             refresh_wps(true);
-#else
-            display_file_time();
-#endif
         }
         restore = true;
     }
@@ -1443,11 +1321,7 @@ int wps_show(void)
             restore = false;
             draw_screen();
             if (id3)
-#ifdef CUSTOM_WPS
                 refresh_wps(false);
-#else
-                display_file_time();
-#endif
         }
     }
 }
