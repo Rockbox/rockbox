@@ -159,9 +159,6 @@ static int get_raw_button (void)
 
     if(repeat)
         k |= BUTTON_REPEAT;
-
-    if(k)
-        DEBUGF("key: %08x\n", k);
     return k;
 }
 
