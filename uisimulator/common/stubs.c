@@ -259,3 +259,5 @@ int talk_number(int n, bool enqueue)
     (void)enqueue;
     return 0;
 }
+
+const char* dir_thumbnail_name = ".dirname.mp3";
