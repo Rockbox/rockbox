@@ -471,6 +471,7 @@ bool dirbrowse(char *root)
         button = button_get_w_tmo(HZ/5);
         switch ( button ) {
             case TREE_EXIT:
+            case TREE_EXIT | BUTTON_REPEAT:
                 i=strlen(currdir);
                 if (i>1) {
                     while (currdir[i-1]!='/')
@@ -510,8 +511,10 @@ bool dirbrowse(char *root)
                 
 
             case TREE_ENTER:
+            case TREE_ENTER | BUTTON_REPEAT:
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REPEAT:
 #endif
                 if ( !numentries )
                     break;
