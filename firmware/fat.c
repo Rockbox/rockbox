@@ -25,9 +25,9 @@
 #include <time.h>
 #include <sys/timeb.h>
 
-#include "fakestorage.h"
+#define BLOCK_SIZE 512
+
 #include "fat.h"
-#include "debug.h"
 
 #define NUM_ROOT_DIR_ENTRIES 512
 #define NUM_FATS 2
