@@ -57,6 +57,8 @@ bool alarm_screen(void)
     char buf[32]; 
 
     lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_setmargins(0, 0);
     lcd_puts(0,1, str(LANG_ALARM_MOD_KEYS));
     
     while(!done) {
