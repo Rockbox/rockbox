@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "button.h"
+#include "kernel.h"
 
 #include "X11/keysym.h"
 
@@ -102,9 +103,18 @@ static int get_raw_button (void)
  * BUTTON_HELD bit is while the button is being held.
  * BUTTON_REL bit is set when button has been released.
  */
-int button_get(void)
+int button_get(bool block)
 {
-    return get_raw_button();
+    int bits;
+    do {
+        bits = get_raw_button();
+        if(block && !bits)
+            x11_sleep(HZ/4);
+        else
+            break;
+    } while(1);
+
+    return bits;
 }
 
 /* -----------------------------------------------------------------
