@@ -35,11 +35,11 @@
 
 static enum playmode current_mode = STATUS_STOP;
 
-#ifdef HAVE_LCD_BITMAP
 long switch_tick;
+int  battery_charge_step = 0;
+#ifdef HAVE_LCD_BITMAP
 bool plug_state;
 bool battery_state;
-int  battery_charge_step = 0;
 #endif
 
 void status_init(void)
@@ -62,21 +62,6 @@ void status_draw(void)
 #endif
     
 #if defined(HAVE_LCD_CHARCELLS)
-    lcd_icon(ICON_BATTERY, true);
-    if(battlevel > 25)
-        lcd_icon(ICON_BATTERY_1, true);
-    else
-        lcd_icon(ICON_BATTERY_1, false);
-    if(battlevel > 50)
-        lcd_icon(ICON_BATTERY_2, true);
-    else
-        lcd_icon(ICON_BATTERY_2, false);
-    if(battlevel > 75)
-        lcd_icon(ICON_BATTERY_3, true);
-    else
-        lcd_icon(ICON_BATTERY_3, false);
-
-
     lcd_icon(ICON_VOLUME, true);
     if(volume > 10)
         lcd_icon(ICON_VOLUME_1, true);
@@ -118,6 +103,55 @@ void status_draw(void)
 
         default:
             break;
+    }
+    if(charger_inserted())
+    {
+        if(TIME_AFTER(current_tick, switch_tick))
+        {
+            lcd_icon(ICON_BATTERY, true);
+            lcd_icon(ICON_BATTERY_1, false);
+            lcd_icon(ICON_BATTERY_2, false);
+            lcd_icon(ICON_BATTERY_3, false);
+            switch(battery_charge_step)
+            {
+                case 0:
+                    battery_charge_step++;
+                    break;
+                case 1:
+                    lcd_icon(ICON_BATTERY_1, true);
+                    battery_charge_step++;
+                    break;
+                case 2:
+                    lcd_icon(ICON_BATTERY_1, true);
+                    lcd_icon(ICON_BATTERY_2, true);
+                    battery_charge_step++;
+                    break;
+                case 3:
+                    lcd_icon(ICON_BATTERY_1, true);
+                    lcd_icon(ICON_BATTERY_2, true);
+                    lcd_icon(ICON_BATTERY_3, true);
+                    battery_charge_step = 0;
+                    break;
+                default:
+                    battery_charge_step = 0;
+                    break;
+            }
+           switch_tick = current_tick + HZ/2;
+       }
+    } else {
+        lcd_icon(ICON_BATTERY, true);
+        if(battlevel > 25)
+            lcd_icon(ICON_BATTERY_1, true);
+        else
+            lcd_icon(ICON_BATTERY_1, false);
+        if(battlevel > 50)
+            lcd_icon(ICON_BATTERY_2, true);
+        else
+            lcd_icon(ICON_BATTERY_2, false);
+        if(battlevel > 75)
+            lcd_icon(ICON_BATTERY_3, true);
+        else
+            lcd_icon(ICON_BATTERY_3, false);
     }
 #endif
 #ifdef HAVE_LCD_BITMAP
