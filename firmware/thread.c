@@ -16,18 +16,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include <stdbool.h>
 #include "thread.h"
 #include "panic.h"
 #include "kernel.h"
-#include "sh7034.h"
+#include "cpu.h"
 
+#if CONFIG_CPU == MCF5249
+struct regs
+{
+    unsigned int d[6]; /* d2-d7 */
+    unsigned int a[5]; /* a2-a6 */
+    void         *sp;  /* Stack pointer (a7) */
+};
+#elif CONFIG_CPU == SH7034
 struct regs
 {
     unsigned int  r[7]; /* Registers r8 thru r14 */
     void          *sp;  /* Stack pointer (r15) */
     void*         pr;   /* Procedure register */
 };
+#endif
 
 int num_threads;
 static volatile int num_sleepers;
@@ -43,6 +53,26 @@ extern int stackend[];
 
 void switch_thread(void) __attribute__ ((section(".icode")));
 
+#if CONFIG_CPU == MCF5249
+/*--------------------------------------------------------------------------- 
+ * Store non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+static inline void store_context(void* addr)
+{
+    asm volatile ("movem.l %%d2-%%d7/%%a2-%%a7,(%0)\n\t" : : "a" (addr));
+}
+
+/*--------------------------------------------------------------------------- 
+ * Load non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+static inline void load_context(const void* addr)
+{
+    asm volatile ("movem.l (%0),%%d2-%%d7/%%a2-%%a7\n\t" : : "a" (addr));
+}
+
+#elif CONFIG_CPU == SH7034
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
  *---------------------------------------------------------------------------
@@ -79,6 +109,7 @@ static inline void load_context(const void* addr)
                   "lds %0,pr\n\t"
                   "mov.l %0, @(0, r15)" : "+r" (addr));
 }
+#endif
 
 /*--------------------------------------------------------------------------- 
  * Switch thread in round robin fashion.
@@ -97,8 +128,12 @@ void switch_thread(void)
     while (num_sleepers == num_threads)
     {
         /* Enter sleep mode, woken up on interrupt */
+#if CONFIG_CPU == MCF5249
+        asm volatile ("stop #0x2000");
+#else
         SBYCR &= 0x7F;
         asm volatile ("sleep");
+#endif
     }
     
 #endif
@@ -111,8 +146,10 @@ void switch_thread(void)
     
     /* Check if the current thread stack is overflown */
     stackptr = thread_stack[current];
+#ifndef IRIVER_H100
     if(stackptr[0] != 0xdeadbeef)
        panicf("Stkov %s", thread_name[current]);
+#endif
        
     load_context(&thread_contexts[next]);
 }
@@ -158,10 +195,16 @@ int create_thread(void* function, void* stack, int stack_size,
    thread_stack_size[num_threads] = stack_size;
    regs = &thread_contexts[num_threads];
    store_context(regs);
+#if CONFIG_CPU == MCF5249
+   regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
+   /* Put the return address on the stack */
+   *(unsigned long *)(regs->sp) = (int)function;
+#elif CONFIG_CPU == SH7034
    /* Subtract 4 to leave room for the PR push in load_context()
       Align it on an even 32 bit boundary */
    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
    regs->pr = function;
+#endif
 
    wake_up_thread();
    return num_threads++; /* return the current ID, e.g for remove_thread() */

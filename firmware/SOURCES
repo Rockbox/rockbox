@@ -1,6 +1,7 @@
 #ifdef IRIVER_H100
 crt0.S
 backlight.c
+thread.c
 #else
 backlight.c
 buffer.c
