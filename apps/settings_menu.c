@@ -434,7 +434,7 @@ static bool bidir_limit(void)
  */
 static bool battery_capacity(void)
 {
-    return set_int(str(LANG_BATTERY_CAPACITY), " mAh", &global_settings.battery_capacity, 
+    return set_int(str(LANG_BATTERY_CAPACITY), "mAh", &global_settings.battery_capacity, 
                    &set_battery_capacity, 50, 1500, BATTERY_CAPACITY_MAX );
 }
 #endif
