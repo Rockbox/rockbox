@@ -22,6 +22,7 @@
 #include "config.h"
 #include "sh7034.h"
 #include "button.h"
+#include "kernel.h"
 
 #define KEY(k)      HIBYTE(GetKeyState (k))
 
@@ -34,6 +35,7 @@ void button_init(void)
 
 int button_get(bool block)
 {
+    int func_call = current_tick;
     
     int btn = 0;
     do
@@ -86,6 +88,8 @@ int button_get(bool block)
         }
     }
     while (btn == 0 && block);
+
+    Sleep (50);
 
     return btn;	
 }

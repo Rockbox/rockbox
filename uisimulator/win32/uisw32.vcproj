@@ -107,7 +107,7 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\firmware\backlight.c">
+				RelativePath="backlight-win32.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\recorder\bmp.c">
