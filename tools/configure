@@ -331,7 +331,7 @@ if [ -z "$archos" ]; then
     appextra=""
     archosrom=""
     flash=""
-    plugins="yes"
+    plugins=""
     ;;
 
    *)
