@@ -184,7 +184,7 @@ bool dirbrowse(char *root)
             continue;
         }
         switch(key) {
-#ifdef HAVE_RECODER_KEYPAD
+#if defined(SIMULATOR) && defined(HAVE_RECODER_KEYPAD)
             case BUTTON_OFF:
                 return false;
 #endif
