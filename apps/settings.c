@@ -480,6 +480,8 @@ void settings_apply(void)
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
 #endif
 
+    mpeg_set_buffer_margin(global_settings.buffer_margin);
+    
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
     backlight_set_timeout(global_settings.backlight_timeout);
