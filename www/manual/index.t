@@ -12,3 +12,5 @@ Directory browser: <a href="rec-dir.html">Recorder</a> <a href="play-dir.html">P
 While Playing Screen: <a href="rec-wps.html">Recorder</a> <a href="play-wps.html">Player</a>
 <p>
 Main menu: <a href="rec-menu.html">Recorder</a> <a href="play-menu.html">Player</a>
+
+#include "foot.t"
