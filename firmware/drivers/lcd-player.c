@@ -506,65 +506,6 @@ void lcd_stop_scroll(void)
     lcd_update();
 }
 
-void lcd_stop_scroll_line(int line)
-{
-    struct scrollinfo* s;
-    
-    s = &scroll[line];
-    if ( s->mode == SCROLL_MODE_RUN ||
-         s->mode == SCROLL_MODE_PAUSE ) {
-        /* restore scrolled row */
-        lcd_puts(s->startx, s->starty, s->text);
-    }
-
-    lcd_update();
-}
-
-void lcd_scroll_pause(void)
-{
-    struct scrollinfo* s;
-    int index;
-
-    for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-        s = &scroll[index];
-        if ( s->mode == SCROLL_MODE_RUN ) {
-            s->mode = SCROLL_MODE_PAUSE;
-        }
-    }
-}
-
-void lcd_scroll_pause_line(int line)
-{
-    struct scrollinfo* s;
-
-    s = &scroll[line];
-    if ( s->mode == SCROLL_MODE_RUN ) {
-        s->mode = SCROLL_MODE_PAUSE;
-    }
-}
-
-void lcd_scroll_resume(void)
-{
-    struct scrollinfo* s;
-    int index;
-
-    for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
-        s = &scroll[index];
-        if ( s->mode == SCROLL_MODE_PAUSE ) {
-            s->mode = SCROLL_MODE_RUN;
-        }
-    }
-}
-
-void lcd_scroll_resume_line(int line)
-{
-    struct scrollinfo* s;
-
-    s = &scroll[line];
-    if (s->mode == SCROLL_MODE_PAUSE ) {
-        s->mode = SCROLL_MODE_RUN;
-    }
-}
 
 void lcd_allow_bidirectional_scrolling(bool on)
 {
