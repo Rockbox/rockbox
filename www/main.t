@@ -2,7 +2,8 @@
 #define _PAGE_ Open Source Jukebox Firmware
 #include "head.t"
 
-<p><small><a href="notes.html">research notes</a> &middot;
+<p><small><a href="docs/FAQ">faq</a> &middot;
+<a href="notes.html">research notes</a> &middot;
 <a href="docs/">data sheets</a> &middot;
 <a href="schematics/">schematics</a> &middot;
 <a href="mods/">hardware mods</a> &middot;
@@ -32,6 +33,12 @@ Try them on your own risk. If you are not 100% sure of what you are doing, keep 
 #include "activity.html"
 
 <h2>News</h2>
+
+<p><i>2002-03-28</i>: Lots of new stuff on the web page:
+<a href="docs/FAQ">faq</a>,
+<a href="irc/">irc logs</a>,
+<a href="tools.html">tools</a> and
+<a href="internals/">archos internals</a>.
 
 <p><i>2002-03-25</i>: New section for
 <a href="mods/">hardware modifications</a>.
