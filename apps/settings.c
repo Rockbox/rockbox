@@ -500,9 +500,9 @@ void settings_apply(void)
     else
         font_reset();
 
-    lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_step(global_settings.scroll_step);
 #endif
+    lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
 
     if ( global_settings.lang_file[0] &&
