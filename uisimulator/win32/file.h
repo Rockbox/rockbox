@@ -31,9 +31,9 @@ extern int _commit( int handle );
 int win32_rename(char *oldpath, char *newpath);
 int win32_filesize(int fd);
 
-#define rename(x,y) win32_rename(x,y)
-#define filesize(x) win32_filesize(x)
-#define fsync(x) _commit(x)
+#define rename win32_rename
+#define filesize win32_filesize
+#define fsync _commit
 
 #include "../../firmware/include/file.h"
 
