@@ -338,6 +338,9 @@ static void mpeg_thread(void)
                 DEBUGF("MPEG_STOP\n");
                 /* Stop the current stream */
                 playing = false;
+                filling = false;
+                close(mpeg_file);
+                mpeg_file = -1;
                 stop_dma();
                 break;
 
@@ -485,6 +488,7 @@ static void setup_sci0(void)
 void mpeg_play(char* trackname)
 {
 #ifdef ARCHOS_RECORDER
+    DEBUGF("mpeg_play(%s)\n", trackname);
     return;
 #endif
     
@@ -494,6 +498,7 @@ void mpeg_play(char* trackname)
 void mpeg_stop(void)
 {
 #ifdef ARCHOS_RECORDER
+    DEBUGF("mpeg_stop()\n");
     return;
 #endif
     
