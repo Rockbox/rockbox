@@ -1300,6 +1300,13 @@ static void mpeg_thread(void)
         {
             case MPEG_PLAY:
                 DEBUGF("MPEG_PLAY\n");
+
+#ifdef HAVE_FMRADIO
+                /* Silence the A/D input, it may be on because the radio
+                   may be playing */
+                mas_codec_writereg(6, 0x0000);
+#endif
+
                 /* Stop the current stream */
                 play_pending = false;
                 playing = false;
