@@ -84,6 +84,8 @@ extern int rmdir(const char* name);
 
 extern struct dirent* readdir(DIR* dir);
 
+extern int release_dirs(int volume);
+
 #endif /* DIRFUNCTIONS_DEFINED */
 
 #endif

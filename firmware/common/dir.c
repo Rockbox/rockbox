@@ -67,6 +67,26 @@ static int strip_volume(const char* name, char* namecopy)
 #endif /* #ifdef HAVE_MULTIVOLUME */
 
 
+#ifdef HAVE_HOTSWAP
+// release all dir handles on a given volume "by force", to avoid leaks
+int release_dirs(int volume)
+{
+    DIR* pdir = opendirs;
+    int dd;
+    int closed = 0;
+    for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
+    {
+        if (pdir->fatdir.file.volume == volume)
+        {
+            pdir->busy = false; /* mark as available, no further action */
+            closed++;
+        }
+    }
+    return closed; /* return how many we did */
+}
+#endif /* #ifdef HAVE_HOTSWAP */
+
+
 DIR* opendir(const char* name)
 {
     char namecopy[MAX_PATH];
@@ -154,6 +174,10 @@ struct dirent* readdir(DIR* dir)
 {
     struct fat_direntry entry;
     struct dirent* theent = &(dir->theent);
+
+    if (!dir->busy)
+        return NULL;
+
 #ifdef HAVE_MULTIVOLUME
     /* Volumes (secondary file systems) get inserted into the root directory
         of the first volume, since we have no separate top level. */

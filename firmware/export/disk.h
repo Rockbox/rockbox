@@ -35,5 +35,7 @@ struct partinfo {
 struct partinfo* disk_init(IF_MV_NONVOID(int volume));
 struct partinfo* disk_partinfo(int partition);
 int disk_mount_all(void); /* returns the # of successful mounts */
+int disk_mount(int drive);
+int disk_unmount(int drive);
 
 #endif

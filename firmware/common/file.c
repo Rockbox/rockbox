@@ -660,3 +660,23 @@ off_t filesize(int fd)
     
     return file->size;
 }
+
+
+#ifdef HAVE_HOTSWAP
+// release all file handles on a given volume "by force", to avoid leaks
+int release_files(int volume)
+{
+    struct filedesc* pfile = openfiles;
+    int fd;
+    int closed = 0;
+    for ( fd=0; fd<MAX_OPEN_FILES; fd++, pfile++)
+    {
+        if (pfile->fatfile.volume == volume)
+        {
+            pfile->busy = false; /* mark as available, no further action */
+            closed++;
+        }
+    }
+    return closed; /* return how many we did */
+}
+#endif /* #ifdef HAVE_HOTSWAP */

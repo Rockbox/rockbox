@@ -87,6 +87,7 @@ extern int remove(const char* pathname);
 extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
+extern int release_files(int volume);
 #endif /* SIMULATOR */
 
 #endif

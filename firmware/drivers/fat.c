@@ -482,7 +482,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     return 0;
 }
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_HOTSWAP
 int fat_unmount(int volume, bool flush)
 {
     int rc;
@@ -511,7 +511,7 @@ int fat_unmount(int volume, bool flush)
     fat_bpb->mounted = false;
     return rc;
 }
-#endif
+#endif /* #ifdef HAVE_HOTSWAP */
 
 void fat_recalc_free(IF_MV_NONVOID(int volume))
 {
