@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <sys/vfs.h>
 #include <dirent.h>
+#include <unistd.h>
 
 #include <fcntl.h>
 #include "debug.h"
@@ -107,6 +108,11 @@ int x11_open(char *name, int opts)
     return open(buffer, opts);
   }
   return open(name, opts);
+}
+
+int x11_close(int fd)
+{
+  return close(fd);
 }
 
 int x11_creat(char *name, int mode)

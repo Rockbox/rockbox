@@ -21,12 +21,14 @@
 #include <sys/types.h>
 
 int x11_open(char *name, int opts);
+int x11_close(int fd);
 int x11_creat(char *name, int mode);
 int x11_remove(char *name);
 int x11_rename(char *oldpath, char *newpath);
 
 #define open(x,y) x11_open(x,y)
-#define creat(x,y) x11_open(x,y)
+#define close(x) x11_close(x)
+#define creat(x,y) x11_creat(x,y)
 #define remove(x) x11_remove(x)
 #define rename(x,y) x11_rename(x,y)
 
