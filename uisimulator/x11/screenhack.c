@@ -69,27 +69,55 @@
 
 #define KEYBOARD_GENERIC \
   "Keyboard   Rockbox\n" \
-  "--------   --------------\n" \
-  "+          ON\n" \
-  "8          UP\n" \
-  "2          DOWN\n" \
-  "4          LEFT\n" \
+  "--------   ------------\n" \
+  "2, Left    LEFT\n" \
+  "6, Right   RIGHT\n"
 
-#ifdef HAVE_LCD_BITMAP
-#define KEYBOARD_SPECIFIC  \
-  "6          RIGHT\n" \
-  "Enter      OFF\n" \
-  "5          PLAY\n" \
-  "/          F1\n" \
-  "*          F2\n" \
-  "-          F3\n"
-#else 
-#define KEYBOARD_SPECIFIC  \
-  "6          RIGHT/PLAY  (there's no separation between PLAY and RIGHT)\n" \
-  "Enter      MENU\n"
-#endif    
+#if CONFIG_KEYPAD == PLAYER_PAD
+#define KEYBOARD_SPECIFIC \
+  "8, Up      PLAY\n" \
+  "2, Down    STOP\n" \
+  "+, Q       ON\n" \
+  "., INS     MENU\n"
 
+#elif CONFIG_KEYPAD == RECORDER_PAD
+#define KEYBOARD_SPECIFIC \
+  "8, Up      UP\n" \
+  "2, Down    DOWN\n" \
+  "5, Space   PLAY\n" \
+  "+, Q       ON\n" \
+  "Enter, A   OFF\n" \
+  "/, (1)     F1\n" \
+  "*, (2)     F2\n" \
+  "-, (3)     F3\n" 
 
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define KEYBOARD_SPECIFIC \
+  "8, Up      UP\n" \
+  "2, Down    DOWN\n" \
+  "., INS     MENU\n" \
+  "Enter, A   OFF\n"
+
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define KEYBOARD_SPECIFIC \
+  "8, Up      UP\n" \
+  "2, Down    DOWN\n" \
+  "5, Space   SELECT\n" \
+  "+, Q       ON\n" \
+  "Enter, A   OFF\n" \
+  "., INS     MODE\n" \
+  "/, (1)     RECORD\n"
+
+#elif CONFIG_KEYPAD == GMINI_PAD
+#define KEYBOARD_SPECIFIC \
+  "8, Up      UP\n" \
+  "2, Down    DOWN\n" \
+  "5, Space   PLAY\n" \
+  "+, Q       ON\n" \
+  "Enter, A   OFF\n" \
+  "., INS     MENU\n"
+
+#endif
 
 
 char having_new_lcd=True;
