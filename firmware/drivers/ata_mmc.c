@@ -137,6 +137,11 @@ static int initialize_card(int card_no);
 
 static int select_card(int card_no)
 {
+    if (card_no == 0)             /* internal */
+        or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
+    else                          /* external */
+        and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
+
     if (!card_info[card_no].initialized)
     {
         setup_sci1(7); /* Initial rate: 375 kbps (need <= 400 per mmc specs) */
@@ -144,16 +149,10 @@ static int select_card(int card_no)
         while (!(SSR1 & SCI_TEND));
     }
 
-    if (card_no == 0)
-    {   /* internal */
-        or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
+    if (card_no == 0)             /* internal */
         and_b(~0x04, &PADRH);     /* assert CS */
-    }
-    else
-    {   /* external */
-        and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
+    else                          /* external */
         and_b(~0x02, &PADRH);     /* assert CS */
-    }
 
     if (card_info[card_no].initialized)
     {
@@ -504,7 +503,7 @@ int ata_write_sectors(unsigned long start,
 
     deselect_card();
     mutex_unlock(&ata_mtx);
-
+    
     return ret;
 }
 
