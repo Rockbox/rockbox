@@ -1,5 +1,6 @@
 %{
 #include "memory.h"
+#include "memory-page.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -63,7 +64,7 @@ spy
 
 check
   : CHECK expression
-    { memory_check (yylval); }
+    { __memory_check (yylval); }
   ;
 
 expression
@@ -112,21 +113,19 @@ void prompt (void)
 
 void allocate (int order)
   {
-    extern char free_page[0];
     void *address;
     printf("\nallocating a page of %d bytes...",512<<order);
     if ((unsigned)order > 21)
       printf (" bad order !");
     else if ((address = memory_allocate_page (order)))
-      printf (" page #%d allocated !",((char *)address - free_page) >> 9);
+      printf (" page #%d allocated !",((char *)address - (char *)__memory_free_page) >> 9);
     else
       printf (" cannot allocate a page !");
   }
 
 void release (int page)
   {
-    extern char free_page[0];
-    void *address = (void *)(free_page + (page << 9));
+    void *address = (void *)((char *)__memory_free_page + (page << 9));
     printf("\nreleasing page #%d...",page);
     if ((unsigned)page >= (2*1024*1024/512))
       printf (" bad page number !");
@@ -138,13 +137,12 @@ void release (int page)
 
 void spy (int page)
   {
-    extern char free_page[0];
-    void *address = (void *)(free_page + (page << 9));
+    void *address = (void *)((char *)__memory_free_page + (page << 9));
     printf("\nspying page #%d...",page);
     if ((unsigned)page >= (2*1024*1024/512))
       printf (" bad page number !");
     else
-      memory_spy_page (address);
+      __memory_spy_page (address);
   }
 
 void dump (void)
@@ -152,7 +150,7 @@ void dump (void)
     int order;
     printf("\ndumping free pages list...");
     for (order = 0; order < 13; ++order)
-      memory_dump (order);
+      __memory_dump (order);
   }
 
 int main ()

@@ -6,7 +6,6 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
- *
  * Copyright (C) 2002 by Alan Korr
  *
  * All files in this archive are subject to the GNU General Public License.
