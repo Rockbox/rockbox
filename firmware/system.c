@@ -134,8 +134,19 @@ static void extra_init(void) {
     P1 |= 0x07;
     P1CON |= 0x1f;
     
+    /* P5 conf
+     * lines 0, 1 & 4 are digital, other analog. : 
+     */
+    P5CON = 0xec;
+
+    P6CON = 0x19;
+
+    /* P7 conf
+       nothing to do: all are inputs
+       (reset value of the register is good)
+    */
+
     /* SMSC chip config (?) */
-    P6CON |= 0x08;
     P10CON |= 0x20;
     P6 &= 0xF7;
     P10 &= 0x20;
@@ -144,16 +155,6 @@ static void extra_init(void) {
         P6 |= 0x08;
         P10 |= 0x20;
     }
-    
-    /* P5 conf
-     * lines 0, 1 & 4 are digital, other analog. : P5CON = 0xec;
-     */
-    
-    /* P7 conf
-       nothing to do: all are inputs
-       (reset value of the register is good)
-    */
-    
 }
 
 /* called by crt0 */
