@@ -2,18 +2,13 @@
 #include "head.t"
 
 <p>
- <a href="vote.html">Vote for your favourites!</a>
-
-<p>
  <a href="designs.html">Designs Submitted So Far</a>
 
 <p>
- <big>Submissions are not accepted any more, the submission period is
-over!</big>
+ <big>Neither submissions nor votes are accepted any more, the submission
+and voting period is over!</big>
 
-<p> <b>Winner:</b> After the initial submission period, we will have a voting
-period. Users will then be allowed to vote for which single design they think
-is the best. The one T-shirt design with the most votes wins.
+<p> <b>Winner:</b> The winner will be announce really soon.
 
 <p> <b>Prize:</b> The winning designer will be given two T-shirts, and will
 get the honor of having his/hers design used on T-shirts donated to <a
