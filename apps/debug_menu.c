@@ -139,8 +139,6 @@ Menu dbg_ports(void)
     int button;
     int battery_voltage;
     int batt_int, batt_frac;
-    bool charge_status = false;
-    bool ide_status = true;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
@@ -186,20 +184,8 @@ Menu dbg_ports(void)
 
         switch(button)
         {
-            case BUTTON_ON:
-                charge_status = charge_status?false:true;
-                charger_enable(charge_status);
-                break;
-                
-            case BUTTON_UP:
-                ide_status = ide_status?false:true;
-                ide_power_enable(ide_status);
-                break;
-
             case BUTTON_OFF:
             case BUTTON_LEFT:
-                charger_enable(false);
-                ide_power_enable(true);
                 return MENU_OK;
         }
     }
