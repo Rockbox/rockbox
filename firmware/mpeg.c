@@ -1246,17 +1246,17 @@ void mpeg_play(int offset)
 
     do {
         trackname = playlist_next( steps, NULL );
-        if ( trackname ) {
-            if(mp3info(&taginfo, trackname)) {
-                /* bad mp3, move on */
-                steps++;
-                continue;
-            }
-            taginfo.offset = offset;
-            set_elapsed(&taginfo);
-            playing = true;
+        if (!trackname)
             break;
+        if(mp3info(&taginfo, trackname)) {
+            /* bad mp3, move on */
+            steps++;
+            continue;
         }
+        taginfo.offset = offset;
+        set_elapsed(&taginfo);
+        playing = true;
+        break;
     } while(1);
 #else
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
@@ -1302,6 +1302,8 @@ void mpeg_next(void)
 
     do {
         file = playlist_next(steps, NULL);
+        if(!file)
+            break;
         if(mp3info(&taginfo, file)) {
             steps++;
             continue;
@@ -1323,6 +1325,8 @@ void mpeg_prev(void)
 
     do {
         file = playlist_next(steps, NULL);
+        if(!file)
+            break;
         if(mp3info(&taginfo, file)) {
             steps--;
             continue;
