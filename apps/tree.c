@@ -1075,6 +1075,17 @@ static bool dirbrowse(void)
                 status_draw(false);
                 break;
 
+#ifdef HAVE_HOTSWAP
+            case SYS_FS_CHANGED:
+                if (!id3db) /* file browsing */
+                {
+                    /* FixMe: skip this if not in root 
+                       and our path is still valid */
+                    reload_root = true; /* the dumb way */
+                }
+                break;
+#endif
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {

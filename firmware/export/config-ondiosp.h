@@ -70,6 +70,9 @@
 /* define this if more than one device/partition can be used */
 #define HAVE_MULTIVOLUME
 
+/* define this if media can be exchanged on the fly */
+#define HAVE_HOTSWAP
+
 #define CONFIG_LCD LCD_SSD1815
 
 #endif /* SIMULATOR */
