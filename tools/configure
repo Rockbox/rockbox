@@ -68,7 +68,7 @@ sed > Makefile \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@SIMVER@,${simver},g" \
- -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
+ -e "s,@EXTRA_DEFINES@,\"${extra_defines}\",g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
@@ -339,3 +339,8 @@ tags:
 EOF
 
 echo "Created Makefile"
+
+
+
+
+
