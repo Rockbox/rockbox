@@ -230,6 +230,7 @@ struct bpb
 static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
+static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) int secnum, bool dirty);
 static int create_dos_name(const unsigned char *name, unsigned char *newname);
@@ -483,10 +484,12 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
 #ifdef HAVE_MULTIVOLUME
 int fat_unmount(int volume, bool flush)
 {
+    int rc;
     struct bpb* fat_bpb = &fat_bpbs[volume];
+
     if(flush)
     {
-        flush_fat(fat_bpb); /* the clean way, while still alive */
+        rc = flush_fat(fat_bpb); /* the clean way, while still alive */
     }
     else
     {   /* volume is not accessible any more, e.g. MMC removed */
@@ -502,8 +505,10 @@ int fat_unmount(int volume, bool flush)
             }
         }
         mutex_unlock(&cache_mutex);
+        rc = 0;
     }
     fat_bpb->mounted = false;
+    return rc;
 }
 #endif
 
