@@ -25,6 +25,8 @@
 
 #define ROCKBOX_DIR "/.rockbox"
 
+#define MAX_FILENAME 20
+
 /* data structures */
 
 #define RESUME_OFF 0
@@ -75,6 +77,9 @@ struct user_settings
     int resume_seed;   /* random seed for playlist shuffle */
     int resume_first_index; /* first index of playlist */
     unsigned char resume_file[MAX_PATH+1]; /* playlist name (or dir) */
+    unsigned char font_file[MAX_FILENAME+1]; /* last font */
+    unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
+    unsigned char lang_file[MAX_FILENAME+1]; /* last language */
 
     /* misc options */
 

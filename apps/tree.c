@@ -658,6 +658,26 @@ bool pageupdown(int* ds, int* dc, int numentries, int tree_max_on_screen )
 }
 #endif
 
+static void storefile(char* filename, char* setting, int maxlen)
+{
+    int len = strlen(filename);
+    int extlen = 0;
+    char* ptr = filename + len;
+
+    while (*ptr != '.') {
+        extlen++;
+        ptr--;
+    }
+
+    if (strcmp(ROCKBOX_DIR, currdir) || (len > maxlen-extlen))
+        return;
+
+    strncpy(setting, filename, len-extlen);
+    setting[len-extlen]=0;
+
+    settings_save();
+}
+
 bool dirbrowse(char *root)
 {
     int numentries=0;
@@ -771,6 +791,7 @@ bool dirbrowse(char *root)
                     int seed = current_tick;
                     bool play = false;
                     int start_index=0;
+
                     lcd_stop_scroll();
                     switch ( file->attr & TREE_ATTR_MASK ) {
                         case TREE_ATTR_M3U:
@@ -802,7 +823,9 @@ bool dirbrowse(char *root)
                         case TREE_ATTR_WPS:
                             snprintf(buf, sizeof buf, "%s/%s", 
                                      currdir, file->name);
-                            wps_load_custom(buf);
+                            wps_load(buf,true);
+                            storefile(file->name, global_settings.wps_file,
+                                      MAX_FILENAME);
                             restore = true;
                             break;
 
@@ -824,6 +847,10 @@ bool dirbrowse(char *root)
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
                             if(!lang_load(buf)) {
+                                storefile(file->name,
+                                          global_settings.lang_file,
+                                          MAX_FILENAME);
+                                          
                                 lcd_clear_display();
 #ifdef HAVE_LCD_CHARCELLS
                                 lcd_puts(0, 0, str(LANG_LANGUAGE_LOADED));
@@ -849,6 +876,9 @@ bool dirbrowse(char *root)
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
                             font_load(buf);
+                            storefile(file->name, global_settings.font_file,
+                                      MAX_FILENAME);
+
                             lcd_getstringsize("A", &fw, &fh);
                             tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
                             /* make sure cursor is on screen */

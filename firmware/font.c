@@ -125,14 +125,14 @@ struct font* font_load(char *path)
     char copyright[256+1];
     struct font* pf = &font_ui;
 
-    memset(pf, 0, sizeof(struct font));
-
     /* open and read entire font file*/
     fd = open(path, O_RDONLY|O_BINARY);
     if (fd < 0) {
         DEBUGF("Can't open font: %s\n", path);
         return NULL;
     }
+
+    memset(pf, 0, sizeof(struct font));
 
     /* currently, font loading replaces earlier font allocation*/
     freeptr = (unsigned char *)(((int)mbuf + 3) & ~3);

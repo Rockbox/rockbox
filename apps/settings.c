@@ -45,8 +45,9 @@
 #include "icons.h"
 #include "font.h"
 #endif
-
 #include "lang.h"
+#include "language.h"
+#include "wps-display.h"
 
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
@@ -112,6 +113,9 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 
+0xB8  (char[20]) WPS file
+0xCC  (char[20]) Lang file
+0xE0  (char[20]) Font file
 0xF4  (int) Playlist first index
 0xF8  (int) Playlist shuffle seed
 0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
@@ -313,6 +317,9 @@ int settings_save( void )
 
     memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
 
+    strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
+    strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
+    strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
     memcpy(&config_block[0xF4], &global_settings.resume_first_index, 4);
     memcpy(&config_block[0xF8], &global_settings.resume_seed, 4);
 
@@ -345,6 +352,8 @@ int settings_save( void )
 
 void settings_apply(void)
 {
+    char buf[64];
+
     mpeg_sound_set(SOUND_BASS, global_settings.bass);
     mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
     mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
@@ -367,6 +376,24 @@ void settings_apply(void)
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
 #endif
+
+    if ( global_settings.wps_file[0] ) {
+        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.wps",
+                 global_settings.wps_file);
+        wps_load(buf, false);
+    }
+#ifdef HAVE_LCD_BITMAP
+    if ( global_settings.font_file[0] ) {
+        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.fnt",
+                 global_settings.font_file);
+        font_load(buf);
+    }
+#endif
+    if ( global_settings.lang_file[0] ) {
+        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.lng",
+                 global_settings.lang_file);
+        lang_load(buf);
+    }
 }
 
 /*
@@ -473,6 +500,9 @@ void settings_load(void)
         memcpy(&global_settings.resume_first_index, &config_block[0xF4], 4);
         memcpy(&global_settings.resume_seed, &config_block[0xF8], 4);
 
+        strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
+        strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
+        strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
         strncpy(global_settings.resume_file, &config_block[0xFC], MAX_PATH);
         global_settings.resume_file[MAX_PATH]=0;
     }

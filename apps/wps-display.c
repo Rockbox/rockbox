@@ -111,19 +111,12 @@ static void wps_format(char* fmt)
     }
 }
 
-bool wps_load_custom(char* file)
+bool wps_load(char* file, bool display)
 {
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
-    bool special = true;
 
     wps_loaded = true;
-
-    /* default wps file? */
-    if (!file) {
-        file = WPS_CONFIG;
-        special = false;
-    }
 
     fd = open(file, O_RDONLY);
     
@@ -139,7 +132,7 @@ bool wps_load_custom(char* file)
         
         close(fd);
 
-        if ( special ) {
+        if ( display ) {
             int i;
             lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
@@ -640,8 +633,6 @@ void wps_display(struct mp3entry* id3)
     else
     {
         if (!wps_loaded) {
-            wps_load_custom(NULL);
-
             if ( !format_buffer[0] ) {
 #ifdef HAVE_LCD_BITMAP
                 wps_format("%s%fp\n"
