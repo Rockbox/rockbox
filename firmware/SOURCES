@@ -67,7 +67,9 @@ drivers/lcd-player.c
 drivers/lcd-recorder.c
 #endif
 drivers/led.c
+#if CONFIG_HWCODEC != MASNONE
 drivers/mas.c
+#endif
 drivers/power.c
 #ifdef HAVE_RTC
 drivers/rtc.c
@@ -88,9 +90,9 @@ rolo.c
 system.c
 thread.c
 usb.c
+crt0.S
 #if CONFIG_CPU == SH7034
 bitswap.S
-crt0.S
 descramble.S
 drivers/lcd.S
 #endif
