@@ -126,11 +126,17 @@ static int create_dos_name(unsigned char *name, unsigned char *newname);
 /* global FAT info struct */
 struct bpb fat_bpb;
 
-/* fat cache */
-static unsigned char *fat_cache[256];
-#ifdef DISK_WRITE
-static int fat_cache_dirty[256];
-#endif
+#define FAT_CACHE_SIZE 0x20
+#define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
+
+struct fat_cache_entry
+{
+    unsigned char *ptr;
+    int secnum;
+    int dirty;
+};
+
+struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 
 /* sectors cache for longname use */
 static unsigned char lastsector[SECTOR_SIZE];
@@ -173,6 +179,19 @@ int fat_mount(int startsector)
     int err;
     int datasec;
     int countofclusters;
+    int i;
+
+    /* Clear the cache. Be aware! The bss section MUST have been cleared
+       at boot. Otherwise we will free() garbage pointers here */
+    for(i = 0;i < FAT_CACHE_SIZE;i++)
+    {
+        if(fat_cache[i].ptr)
+        {
+            free(fat_cache[i].ptr);
+        }
+        fat_cache[i].secnum = 8; /* We use a "safe" sector just in case */
+        fat_cache[i].dirty = 0;
+    }
 
     /* Read the sector */
     err = ata_read_sectors(startsector,1,buf);
@@ -308,9 +327,34 @@ static int bpb_is_sane(void)
 
 static void *cache_fat_sector(int secnum)
 {
+    int cache_index = secnum & FAT_CACHE_MASK;
     unsigned char *sec;
 
-    sec = fat_cache[secnum];
+    sec = fat_cache[cache_index].ptr;
+
+    /* Delete the cache entry if it isn't the sector we want */
+    if(sec && fat_cache[cache_index].secnum != secnum)
+    {
+#ifdef WRITE
+        /* Write back if it is dirty */
+        if(fat_cache[cache_index].dirty)
+        {
+            if(ata_write_sectors(secnum + fat_bpb.bpb_rsvdseccnt +
+                                 fat_bpb.startsector, 1, sec))
+            {
+                panic("cache_fat_sector() - Could"
+                      " not write sector %d\n",
+                      secnum);
+            }
+        }
+        free(sec);
+        
+        fat_cache[cache_index].ptr = NULL;
+        fat_cache[cache_index].secnum = 8; /* Normally an unused sector */
+        fat_cache[cache_index].dirty = 0;
+#endif
+    }
+    
     /* Load the sector if it is not cached */
     if(!sec)
     {
@@ -328,7 +372,8 @@ static void *cache_fat_sector(int secnum)
             free(sec);
             return NULL;
         }
-        fat_cache[secnum] = sec;
+        fat_cache[cache_index].ptr = sec;
+        fat_cache[cache_index].secnum = secnum;
     }
     return sec;
 }
@@ -354,7 +399,9 @@ static int update_entry(int entry, unsigned int val)
         return -1;
     }
 
-    fat_cache_dirty[thisfatsecnum] = 1;
+    /* We can safely assume that the correct sector is in the cache,
+       so we mark it dirty without checking the sector number */
+    fat_cache[thisfatsecnum & FAT_CACHE_MASK].dirty = 1;
 
     /* don't change top 4 bits */
     sec[thisfatentoffset/sizeof(int)] &= 0xf000000;
@@ -406,36 +453,40 @@ static int flush_fat(struct bpb *bpb)
     int i;
     int err;
     unsigned char *sec;
+    int secnum;
     int fatsz;
     unsigned short d, t;
     char m;
 
     fatsz = fat_bpb.fatsize;
 
-    for(i = 0;i < 256;i++)
+    for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
-        if(fat_cache[i] && fat_cache_dirty[i])
+        if(fat_cache[i].ptr && fat_cache[i].dirty)
         {
-            DEBUGF("Flushing FAT sector %d\n", i);
-            sec = fat_cache[i];
-            err = ata_write_sectors(i + fat_bpb.bpb_rsvdseccnt + fat_bpb.startsector,
-                                    1,sec);
+            secnum = fat_cache[i].secnum + fat_bpb.bpb_rsvdseccnt +
+                fat_bpb.startsector;
+            DEBUGF("Flushing FAT sector %d\n", secnum);
+            sec = fat_cache[i].ptr;
+
+            /* Write to the first FAT */
+            err = ata_write_sectors(secnum, 1, sec);
             if(err)
             {
                 DEBUGF( "flush_fat() - Couldn't write"
-                        " sector (%d)\n", i + fat_bpb.bpb_rsvdseccnt);
+                        " sector (%d)\n", secnum);
                 return -1;
             }
-            err = ata_write_sectors(i + fat_bpb.bpb_rsvdseccnt + fatsz +
-                                    fat_bpb.startsector,
-                                    1,sec);
+
+            /* Write to the second FAT */
+            err = ata_write_sectors(secnum + fatsz, 1, sec);
             if(err)
             {
                 DEBUGF( "flush_fat() - Couldn't write"
-                        " sector (%d)\n", i + fat_bpb.bpb_rsvdseccnt + fatsz);
+                        " sector (%d)\n", secnum + fatsz);
                 return -1;
             }
-            fat_cache_dirty[i] = 0;
+            fat_cache[i].dirty = 0;
         }
     }
 
