@@ -477,8 +477,8 @@ static int initialize_card(int card_no)
     card->write_timeout = card->read_timeout * card->r2w_factor;
 
     /* card size */
-    card->numsectors = mmc_extract_bits(card->csd, 54, 12)
-                      * (1 << (mmc_extract_bits(card->csd, 78, 3)+2));
+    card->numsectors = (mmc_extract_bits(card->csd, 54, 12) + 1)
+                       * (1 << (mmc_extract_bits(card->csd, 78, 3)+2));
 
     /* switch to full speed */
     setup_sci1(card->bitrate_register);

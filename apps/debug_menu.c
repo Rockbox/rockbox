@@ -1421,8 +1421,7 @@ bool dbg_mmc_info(void)
                          (int) mmc_extract_bits(card->cid, 0, 8),
                          (int) mmc_extract_bits(card->cid, 8, 16));
                 lcd_puts(0, 4, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Size: %d MB",
-                         card->numsectors * SECTOR_SIZE / (1024*1024));
+                snprintf(pbuf, sizeof(pbuf), "Sectors: %08x", card->numsectors);
                 lcd_puts(0, 5, pbuf);
             }
             else                  /* Technical details */
