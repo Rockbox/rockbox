@@ -179,7 +179,13 @@
 				RelativePath="panic-win32.c">
 			</File>
 			<File
-				RelativePath="..\..\apps\play.c">
+				RelativePath="..\..\apps\playlist.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\screensavers_menu.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\settings.c">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -192,15 +198,6 @@
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\apps\playlist.c">
-			</File>
-			<File
-				RelativePath="..\..\apps\screensavers_menu.c">
-			</File>
-			<File
-				RelativePath="..\..\firmware\settings.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\settings_menu.c">
