@@ -83,7 +83,7 @@ static XrmOptionDescRec default_options [] = {
 
 static char *default_defaults[] = {
   ".root:		false",
-  "*geometry:		200x100", /* this should be .geometry, but nooooo... */
+  "*geometry:		120x70", /* this should be .geometry, but nooooo... */
   "*mono:		false",
   "*installColormap:	false",
   "*visualID:		default",
