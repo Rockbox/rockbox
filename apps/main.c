@@ -102,7 +102,7 @@ void init(void)
     button_init();
 
     rc = ata_init();
-    if(!rc)
+    if(rc)
     {
 #ifdef ARCHOS_RECORDER
         char str[32];
