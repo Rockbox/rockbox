@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <lcd.h>
+#include "kernel.h"
 
 #include "icons.h"
 #ifndef SIMULATOR
@@ -208,6 +209,9 @@ void statusbar_icon_volume(int percent)
     int i,j;
     int volume;
     int step=0;
+    char buffer[4];
+    static long switch_tick;
+    static int last_volume;
 
     volume=percent;
     if(volume<0)
@@ -218,12 +222,22 @@ void statusbar_icon_volume(int percent)
     if(volume==0)
         lcd_bitmap(bitmap_icon_7x8[Icon_Mute], ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-4, STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
     else {
-        volume=volume*14/100;
-        for(i=0;i<volume;i++) {
-            if(i%2 == 0)
-                step++;
-            for(j=1;j<=step;j++)
-                DRAW_PIXEL((ICON_VOLUME_X_POS+i),(STATUSBAR_Y_POS+7-j));
+        if(last_volume!=volume) {
+            switch_tick=current_tick+HZ;
+            last_volume=volume;
+        }
+        if(TIME_BEFORE(current_tick,switch_tick)) { /* display volume lever numerical */
+            snprintf(buffer, sizeof(buffer), "%2d", percent);
+            lcd_putsxy(ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-6, STATUSBAR_Y_POS, buffer, 0);
+        }
+        else { /* display volume bar */
+            volume=volume*14/100;
+            for(i=0;i<volume;i++) {
+                if(i%2 == 0)
+                    step++;
+                for(j=1;j<=step;j++)
+                    DRAW_PIXEL((ICON_VOLUME_X_POS+i),(STATUSBAR_Y_POS+7-j));
+            }
         }
     }
 }
