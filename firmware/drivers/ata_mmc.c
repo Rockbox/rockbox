@@ -79,9 +79,6 @@
 #define DT_START_WRITE_MULTIPLE 0xfc
 #define DT_STOP_TRAN            0xfd
 
-// DEBUG
-#include "../../apps/screens.h"
-
 /* for compatibility */
 bool old_recorder = false; /* FIXME: get rid of this cross-dependency */
 int ata_spinup_time = 0;
@@ -101,19 +98,30 @@ static bool delayed_write = false;
 static unsigned char delayed_sector[SECTOR_SIZE];
 static int delayed_sector_num;
 
-static int current_card = 0;
+static enum {
+    SER_POLL_WRITE,
+    SER_POLL_READ,
+    SER_DISABLED
+} serial_mode;
 
 static const unsigned char dummy[] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
+/* 2 buffers for writing, include start token and dummy crc and an extra
+ * byte to keep word alignment */
+static unsigned char sector_buffer[2][(SECTOR_SIZE+4)];
+static int current_buffer = 0;
+
 static tCardInfo card_info[2];
+static int current_card = 0;
 
 /* private function declarations */
 
 static int select_card(int card_no);
 static void deselect_card(void);
 static void setup_sci1(int bitrate_register);
+static void set_sci1_poll_read(void);
 static void write_transfer(const unsigned char *buf, int len)
             __attribute__ ((section(".icode")));
 static void read_transfer(unsigned char *buf, int len)
@@ -121,10 +129,13 @@ static void read_transfer(unsigned char *buf, int len)
 static unsigned char poll_byte(int timeout);
 static unsigned char poll_busy(int timeout);
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
-static int receive_data(unsigned char *buf, int len, int timeout);
-static int send_data(char start_token, const unsigned char *buf, int len,
-                     int timeout);
+static int receive_cxd(unsigned char *buf);
 static int initialize_card(int card_no);
+static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
+                          int timeout);
+static void swapcopy_sector(const unsigned char *buf);
+static int send_sector(const unsigned char *nextbuf, int timeout);
+static int send_single_sector(const unsigned char *buf, int timeout);
 
 /* implementation */
 
@@ -170,19 +181,25 @@ static void deselect_card(void)
 
 static void setup_sci1(int bitrate_register)
 {
-    int i;
-
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
 
     SCR1 = 0;                     /* disable serial port */
     SMR1 = SYNC_MODE;             /* no prescale */
     BRR1 = bitrate_register;
-    SCR1 = SCI_CKE0;
     SSR1 = 0;
 
-    for (i = 0; i <= bitrate_register; i++); /* wait at least one bit time */
-    
-    or_b((SCI_TE|SCI_RE), &SCR1); /* enable transmitter & receiver */
+    SCR1 = SCI_TE;                /* enable transmitter */
+    serial_mode = SER_POLL_WRITE;
+}
+
+static void set_sci1_poll_read(void)
+{
+    while(!(SSR1 & SCI_TEND));    /* wait for end of transfer */
+    SCR1 = 0;                     /* disable transmitter (& receiver) */
+    SCR1 = (SCI_TE|SCI_RE);       /* re-enable transmitter & receiver */
+    while(!(SSR1 & SCI_TEND));    /* wait for SCI init completion (!) */
+    serial_mode = SER_POLL_READ;
+    TDR1 = 0xFF;                  /* send do-nothing while reading */
 }
 
 static void write_transfer(const unsigned char *buf, int len)
@@ -190,12 +207,19 @@ static void write_transfer(const unsigned char *buf, int len)
     const unsigned char *buf_end = buf + len;
     register unsigned char data;
 
-    /* TODO: DMA */
-    
+    if (serial_mode != SER_POLL_WRITE)
+    {
+        while(!(SSR1 & SCI_TEND)); /* wait for end of transfer */
+        SCR1 = 0;                  /* disable transmitter & receiver */
+        SSR1 = 0;                  /* clear all flags */
+        SCR1 = SCI_TE;             /* enable transmitter only */
+        serial_mode = SER_POLL_WRITE;
+    }
+
     while (buf < buf_end)
     {
         data = fliptable[(signed char)(*buf++)]; /* bitswap */
-        while (!(SSR1 & SCI_TEND));              /* wait for end of transfer */
+        while (!(SSR1 & SCI_TDRE));              /* wait for end of transfer */
         TDR1 = data;                             /* write byte */
         SSR1 = 0;                                /* start transmitting */
     }
@@ -207,11 +231,9 @@ static void read_transfer(unsigned char *buf, int len)
     unsigned char *buf_end = buf + len - 1;
     register signed char data;
 
-    /* TODO: DMA */
+    if (serial_mode != SER_POLL_READ)
+        set_sci1_poll_read();
 
-    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
-    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
-    
     SSR1 = 0;                     /* start receiving first byte */
     while (buf < buf_end)
     {
@@ -229,8 +251,8 @@ static unsigned char poll_byte(int timeout) /* timeout is in bytes */
     int i;
     unsigned char data = 0;       /* stop the compiler complaining */
 
-    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
-    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
+    if (serial_mode != SER_POLL_READ)
+        set_sci1_poll_read();
 
     i = 0;
     do {
@@ -247,8 +269,8 @@ static unsigned char poll_busy(int timeout) /* timeout is in bytes */
     int i;
     unsigned char data, dummy;
     
-    while (!(SSR1 &SCI_TEND));    /* wait for end of transfer */
-    TDR1 = 0xFF;                  /* send do-nothing data in parallel */
+    if (serial_mode != SER_POLL_READ)
+        set_sci1_poll_read();
 
     /* get data response */
     SSR1 = 0;                     /* start receiving */
@@ -266,6 +288,7 @@ static unsigned char poll_busy(int timeout) /* timeout is in bytes */
     return data;
 }
 
+/* Send MMC command and get response */
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
 {
     unsigned char command[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95, 0xFF};
@@ -283,7 +306,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
     write_transfer(command, 7);
 
     response[0] = poll_byte(20);
-    
+
     if (response[0] != 0x00)
     {
         write_transfer(dummy, 1);
@@ -316,38 +339,18 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
     return 0;
 }
 
-static int receive_data(unsigned char *buf, int len, int timeout)
+/* Receive CID/ CSD data (16 bytes) */
+static int receive_cxd(unsigned char *buf)
 {
-    unsigned char crc[2];         /* unused */
-
-    if (poll_byte(timeout) != DT_START_BLOCK)
+    if (poll_byte(20) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
         return -1;                /* not start of data */
     }
-        
-    read_transfer(buf, len);
-    read_transfer(crc, 2);        /* throw away */
-    write_transfer(dummy, 1);
-
-    return 0;
-}
-
-static int send_data(char start_token, const unsigned char *buf, int len,
-                     int timeout)
-{
-    int ret = 0;
-
-    write_transfer(&start_token, 1);
-    write_transfer(buf, len);
-    write_transfer(dummy, 2);     /* crc - dontcare */
-
-    if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
-        ret = -1;
-
-    write_transfer(dummy, 1);
     
-    return ret;
+    read_transfer(buf, 16);
+    write_transfer(dummy, 3);     /* 2 bytes dontcare crc + 1 byte trailer */
+    return 0;
 }
 
 /* helper function to extract n (<=32) bits from an arbitrary position.
@@ -423,7 +426,7 @@ static int initialize_card(int card_no)
     /* get CSD register */
     if (send_cmd(CMD_SEND_CSD, 0, response))
         return -5;
-    if (receive_data((unsigned char*)card->csd, 16, 20))
+    if (receive_cxd((unsigned char*)card->csd))
         return -6;
 
     /* check block size */
@@ -459,7 +462,7 @@ static int initialize_card(int card_no)
     /* get CID register */
     if (send_cmd(CMD_SEND_CID, 0, response))
         return -8;
-    if (receive_data((unsigned char*)card->cid, 16, 20))
+    if (receive_cxd((unsigned char*)card->cid))
         return -9;
 
     card->initialized = true;
@@ -478,6 +481,119 @@ tCardInfo *mmc_card_info(int card_no)
     return card;
 }
 
+/* Receive one sector with dma, possibly swapping the previously received
+ * sector in the background */
+static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf, 
+                          int timeout)
+{
+    if (poll_byte(timeout) != DT_START_BLOCK)
+    {
+        write_transfer(dummy, 1);
+        return -1;                /* not start of data */
+    }
+    
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
+
+    SCR1 = 0;                     /* disable serial */
+    SSR1 = 0;                     /* clear all flags */
+    
+    /* setup DMA channel 2 */
+    CHCR2 = 0;                    /* disable */
+    SAR2 = RDR1_ADDR;
+    DAR2 = (unsigned long) inbuf;
+    DTCR2 = SECTOR_SIZE;
+    CHCR2 = 0x4601;               /* fixed source address, RXI1, enable */
+    DMAOR = 0x0001;
+    SCR1 = (SCI_RE|SCI_RIE);      /* kick off DMA */
+    
+    /* dma receives 2 bytes more than DTCR2, but the last 2 bytes are not
+     * stored. The first extra byte is available from RDR1 after the DMA ends,
+     * the second one is lost because of the SCI overrun. However, this 
+     * behaviour conveniently discards the crc. */
+
+    if (swapbuf != NULL)          /* bitswap previous sector */
+        bitswap(swapbuf, SECTOR_SIZE);
+    yield();                      /* be nice */
+
+    while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
+    while (!(SSR1 & SCI_ORER));   /* wait for the trailing bytes */
+    SCR1 = 0;
+    serial_mode = SER_DISABLED;
+
+    write_transfer(dummy, 1);     /* send trailer */
+    return 0;
+}
+
+/* copies one sector into the next-current write buffer, then bitswaps */
+static void swapcopy_sector(const unsigned char *buf)
+{
+    unsigned char *curbuf;
+
+    current_buffer ^= 1;          /* toggles between 0 and 1 */
+
+    curbuf = sector_buffer[current_buffer];
+    curbuf[1] = DT_START_WRITE_MULTIPLE;
+    curbuf[(SECTOR_SIZE+2)] = curbuf[(SECTOR_SIZE+3)] = 0xFF; /* dummy crc */
+    memcpy(curbuf + 2, buf, SECTOR_SIZE);
+    bitswap(curbuf + 1, (SECTOR_SIZE+1));
+}
+
+/* Send one sector with dma from the current sector buffer, possibly preparing
+ * the next sector within the other sector buffer in the background. Use
+ * for multisector transfer only */
+static int send_sector(const unsigned char *nextbuf, int timeout)
+{
+    int ret = 0;
+
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
+
+    SCR1 = 0;                     /* disable serial */
+    SSR1 = 0;                     /* clear all flags */
+
+    /* setup DMA channel 2 */
+    CHCR2 = 0;                    /* disable */
+    SAR2 = (unsigned long)(sector_buffer[current_buffer] + 1);
+    DAR2 = TDR1_ADDR;
+    DTCR2 = (SECTOR_SIZE+3);
+    CHCR2 = 0x1701;               /* fixed dest. address, TXI1, enable */
+    DMAOR = 0x0001;
+    SCR1 = (SCI_TE|SCI_TIE);      /* kick off DMA */
+
+    if (nextbuf != NULL)          /* prepare next sector */
+        swapcopy_sector(nextbuf);
+    yield();                      /* be nice */
+
+    while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
+    while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
+    SCR1 = 0;
+    serial_mode = SER_DISABLED;
+
+    if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
+        ret = -1;
+
+    write_transfer(dummy, 1);
+
+    return ret;
+}
+
+/* Send one sector with polled i/o. Use for single sector transfers only. */
+static int send_single_sector(const unsigned char *buf, int timeout)
+{
+    int ret = 0;
+    unsigned char start_token = DT_START_BLOCK;
+
+    write_transfer(&start_token, 1);
+    write_transfer(buf, SECTOR_SIZE);
+    write_transfer(dummy, 2);     /* crc - dontcare */
+
+    if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
+        ret = -1;
+
+    write_transfer(dummy, 1);
+
+    return ret;
+}
+
 int ata_read_sectors(unsigned long start,
                      int incount,
                      void* inbuf)
@@ -486,8 +602,9 @@ int ata_read_sectors(unsigned long start,
     int i;
     unsigned long addr;
     unsigned char response;
+    void *inbuf_prev = NULL;
     tCardInfo *card = &card_info[current_card];
-    
+
     addr = start * SECTOR_SIZE;
 
     mutex_lock(&mmc_mutex);
@@ -499,21 +616,27 @@ int ata_read_sectors(unsigned long start,
         {   
             ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
             if (ret == 0)
-                ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
+            {
+                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
+                inbuf_prev = inbuf;
                 last_disk_activity = current_tick;
+            }
         }
         else
         {
             ret = send_cmd(CMD_READ_MULTIPLE_BLOCK, addr, &response);
             for (i = 0; (i < incount) && (ret == 0); i++)
             {
-                ret = receive_data(inbuf, SECTOR_SIZE, card->read_timeout);
+                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
+                inbuf_prev = inbuf;
                 inbuf += SECTOR_SIZE;
                 last_disk_activity = current_tick;
             }
             if (ret == 0)
                 ret = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
         }
+        if (ret == 0)
+            bitswap(inbuf_prev, SECTOR_SIZE);
     }
 
     deselect_card();
@@ -550,25 +673,28 @@ int ata_write_sectors(unsigned long start,
         {
             ret = send_cmd(CMD_WRITE_BLOCK, addr, &response);
             if (ret == 0)
-                ret = send_data(DT_START_BLOCK, buf, SECTOR_SIZE,
-                                card->write_timeout);
+                ret = send_single_sector(buf, card->write_timeout);
             last_disk_activity = current_tick;
         }
         else
         {
+            swapcopy_sector(buf); /* prepare first sector */
             ret = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, addr, &response);
-            for (i = 0; (i < count) && (ret == 0); i++)
+            for (i = 1; (i < count) && (ret == 0); i++)
             {
-                ret = send_data(DT_START_WRITE_MULTIPLE, buf, SECTOR_SIZE,
-                                card->write_timeout);
                 buf += SECTOR_SIZE;
+                ret = send_sector(buf, card->write_timeout);
                 last_disk_activity = current_tick;
             }
             if (ret == 0)
             {
-                response = DT_STOP_TRAN;
-                write_transfer(&response, 1);
-                poll_busy(card->write_timeout);
+                ret = send_sector(NULL, card->write_timeout);
+                if (ret == 0)
+                {
+                    response = DT_STOP_TRAN;
+                    write_transfer(&response, 1);
+                    poll_busy(card->write_timeout);
+                }
                 last_disk_activity = current_tick;
             }
         }
@@ -656,9 +782,7 @@ static void mmc_thread(void)
 
 int ata_soft_reset(void)
 {
-    int ret = 0;
-
-    return ret;
+    return 0;
 }
 
 void ata_enable(bool on)
@@ -706,7 +830,7 @@ int ata_init(void)
     }
 
     ata_enable(true);
-
+    
     if ( !initialized ) {
 
         queue_init(&mmc_queue);
