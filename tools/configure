@@ -263,6 +263,7 @@ if [ -z "$archos" ]; then
     output="archos.mod"
     appextra="player"
     archosrom=""
+    plugins="yes"
     ;;
 
    3)
@@ -273,6 +274,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    plugins="yes"
     ;;
 
    4)
@@ -283,6 +285,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    plugins="yes"
     ;;
 
    7)
@@ -293,6 +296,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom=""
+    plugins=""
     ;;
 
    8)
@@ -303,6 +307,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom=""
+    plugins=""
     ;;
 
    9)
@@ -314,6 +319,7 @@ if [ -z "$archos" ]; then
     output="rockbox.iriver"
     appextra=""
     archosrom=""
+    plugins="yes"
     ;;
 
    *)
@@ -324,6 +330,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    plugins="yes"
     ;;
 
   esac
@@ -416,6 +423,7 @@ sed > Makefile \
  -e "s,@OUTPUT@,${output},g" \
  -e "s,@APPEXTRA@,${appextra},g" \
  -e "s,@ARCHOSROM@,${archosrom},g" \
+ -e "s,@PLUGINS@,${plugins},g" \
 <<EOF 
 ## Automaticly generated. http://rockbox.haxx.se
 
@@ -435,6 +443,7 @@ export VERSION=\$(shell date +%y%m%d-%H%M)
 export MKFIRMWARE=\$(TOOLSDIR)/@TOOL@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
+export ENABLEDPLUGINS=@PLUGINS@
 export CC=@CC@
 export LD=@LD@
 export AR=@AR@

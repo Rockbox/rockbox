@@ -70,11 +70,11 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rombox.elf"
 	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rockbox.elf"
 	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
@@ -89,7 +89,7 @@ $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
-$(OBJDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin $(DEPFILE)
+$(OBJDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
 	@echo "Build firmware file"
 	@$(MKFIRMWARE) $< $@
 

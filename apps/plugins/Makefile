@@ -27,6 +27,13 @@ ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DIRS = .
 
+ifdef ENABLEDPLUGINS
+all: $(OBJDIR)/libplugin.a $(ROCKS) $(DEPFILE)
+else
+all:
+	@echo "no plugin support yet"
+endif
+
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a $(DEPFILE)
 	@echo "LD $@"
 	@$(CC) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
@@ -36,14 +43,6 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@$(OC) -O binary $< $@
 
 include $(TOOLSDIR)/make.inc
-
-ifeq ($(ANYONDIO), ONDIO)
-all:
-	@echo "no plugin support yet"
-else
-all: $(OBJDIR)/libplugin.a $(ROCKS)
-	@echo "plugins done"
-endif
 
 $(OBJDIR)/libplugin.a:
 	@echo "MAKE in lib"
@@ -59,3 +58,5 @@ clean:
 	@echo "cleaning plugins"
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) $(OBJS)
 	@$(MAKE) -C lib clean
+
+-include $(DEPFILE)

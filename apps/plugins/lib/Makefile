@@ -47,5 +47,3 @@ clean:
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
 -include $(DEPFILE)
-
-

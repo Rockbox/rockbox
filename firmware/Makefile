@@ -35,7 +35,7 @@ $(TOOLSDIR)/convbdf:
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
 	@echo "AR $@"
-	@$(AR) ruv $@ $+ >/dev/null 2>&1
+	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 
 include $(TOOLSDIR)/make.inc
 
