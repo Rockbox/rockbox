@@ -1270,31 +1270,26 @@ int fat_rename(struct fat_file* file,
     struct fat_file newfile = *file;
 
     if ( !file->dircluster ) {
-        LDEBUGF("File has no dir cluster!\n");
+        DEBUGF("File has no dir cluster!\n");
         return -1;
     }
 
     /* create a temporary file handle */
-    LDEBUGF("create a temporary file handle: fat_opendir(%x,%x)\n",
-            &dir, file->dircluster);
     err = fat_opendir(&dir, file->dircluster);
     if (err<0)
         return -2;
 
     /* create new name */
-    LDEBUGF("create new name\n");
     err = add_dir_entry(&dir, &newfile, newname);
     if (err<0)
         return -3;
 
     /* write size and cluster link */
-    LDEBUGF("write size and cluster link\n");
     err = update_file_size(&newfile, size);
     if (err<0)
         return -4;
 
     /* remove old name */
-    LDEBUGF("remove old name\n");
     err = free_direntries(file->dircluster, file->direntry, file->direntries);
     if (err<0)
         return -5;
