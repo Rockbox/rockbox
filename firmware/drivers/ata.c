@@ -661,6 +661,26 @@ static int identify(void)
     return 0;
 }
 
+static int set_multiple_mode(int sectors)
+{
+    if(!wait_for_rdy()) {
+        DEBUGF("set_multiple_mode() - not RDY\n");
+        return -1;
+    }
+
+    ATA_SELECT = ata_device;
+    ATA_NSECTOR = sectors;
+    ATA_COMMAND = CMD_SET_MULTIPLE_MODE;
+
+    if (!wait_for_rdy())
+    {
+        DEBUGF("set_multiple_mode() - CMD failed\n");
+        return -2;
+    }
+
+    return 0;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
@@ -692,6 +712,8 @@ int ata_init(void)
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
     }
+    if (set_multiple_mode(multisectors))
+       return -6;
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
