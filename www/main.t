@@ -41,6 +41,8 @@ Try them on your own risk. If you are not 100% sure of what you are doing, keep 
 
 <h2>News</h2>
 
+<p><i>2002-04-27</i>: Julien Labruyére has generously donated an Archos Jukebox 6000 to the project. Thank you!
+
 <p><i>2002-04-25</i>: Grant Wier has tested the Player LCD's double-height capability:
 <a href="archos-text-DH1.jpg"><img align=center src="archos-text-DH2_sm.jpg"></a>
 
