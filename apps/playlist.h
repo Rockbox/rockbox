@@ -33,29 +33,9 @@ typedef struct
 } playlist_info_t;
 
 void play_list(char *dir, char *file);
-
-void read_entire_file( char *buf, const char *filename );
-void load_playlist( playlist_info_t *playlist, const char *filename );
-void extract_playlist_indices( char *buf, playlist_info_t *playlist );
-void display_current_playlist( playlist_info_t *playlist );
-void get_indices_as_string( char *string, playlist_info_t *playlist );
+char* playlist_next(int type);
+void randomise_playlist( playlist_info_t *playlist, unsigned int seed );
 void empty_playlist( playlist_info_t *playlist );
 void add_indices_to_playlist( playlist_info_t *playlist );
-void extend_indices( playlist_info_t *playlist, int new_index );
-void randomise_playlist( playlist_info_t *playlist, unsigned int seed );
-int is_unused_random_in_list( int number, int *original_list, int count );
-
-/**********/
-
-
-
-
-
-
-int create_playlist( void );
-/*int add_to_playlist( track_t *track );*/
-int remove_from_playlist( int index );
-int set_playlist_position( void );
-/*track_t * get_previous_entry_in_playlist( void );*/
 
 #endif /* __PLAYLIST_H__ */
