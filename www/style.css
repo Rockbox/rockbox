@@ -66,17 +66,14 @@ A {
 
 .buildok {
  background-color: #00ff00;
- width: 3em;
 }
 
 .buildwarn {
  background-color: #ffff00;
- width: 3em;
 }
 
 .buildfail {
  background-color: #ff8080;
- width: 3em;
 }
 
 .gccwarn {
