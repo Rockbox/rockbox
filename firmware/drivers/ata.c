@@ -30,10 +30,10 @@
 #include "string.h"
 #include "hwcompat.h"
 
-/* use plain C code in copy_read_sectors(), instead of tweaked assembler */
-#define PREFER_C
-/* use plain C code in copy_write_sectors(), instead of tweaked assembler */
-#define PREFER_C_WRITING
+/* Uncomment the matching #define to use plain C code instead if the tweaked 
+ * assembler code for disk reading or writing should cause problems. */
+/* #define PREFER_C_READING */
+/* #define PREFER_C_WRITING */
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -176,7 +176,7 @@ static void copy_read_sectors(unsigned char* buf,
                          __attribute__ ((section (".icode")));
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
-#ifdef PREFER_C
+#ifdef PREFER_C_READING
     unsigned short tmp = 0;
 
     if ( (unsigned int)buf & 1)
