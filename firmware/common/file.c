@@ -54,7 +54,7 @@ static int flush_cache(int fd);
 int creat(const char *pathname, int mode)
 {
     (void)mode;
-    return open(pathname, O_WRONLY|O_CREAT);
+    return open(pathname, O_WRONLY|O_CREAT|O_TRUNC);
 }
 
 int open(const char* pathname, int flags)
