@@ -42,6 +42,7 @@ extern void bitswap(unsigned char *data, int length);
 static void init_recording(void);
 static void init_playback(void);
 static void start_recording(void);
+static void stop_recording(void);
 #endif
 
 #ifndef SIMULATOR
@@ -629,6 +630,45 @@ long timing_info_index = 0;
 long timing_info[1024];
 bool inverted_pr;
 unsigned long num_rec_bytes;
+
+void drain_dma_buffer(void)
+{
+    if(inverted_pr)
+    {
+        while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
+        {
+            PADR |= 0x800;
+            
+            while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
+                    
+            /* It must take at least 5 cycles before
+               the data is read */
+            asm(" nop\n nop\n nop\n");
+            asm(" nop\n nop\n nop\n");
+            PADR &= ~0x800;
+
+            while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
+        }
+    }
+    else
+    {
+        while((*((volatile unsigned char *)PBDR_ADDR) & 0x40))
+        {
+            PADR &= ~0x800;
+            
+            while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
+            
+            /* It must take at least 5 cycles before
+               the data is read */
+            asm(" nop\n nop\n nop\n");
+            asm(" nop\n nop\n nop\n");
+                    
+            PADR |= 0x800;
+
+            while(!(*((volatile unsigned char *)PBDR_ADDR) & 0x80));
+        }
+    }
+}
 #endif
 
 static void dma_tick (void) __attribute__ ((section (".icode")));
@@ -702,6 +742,7 @@ static void dma_tick(void)
                     
                     /* It must take at least 5 cycles before
                        the data is read */
+                    asm(" nop\n nop\n nop\n");
                     mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
                     
                     if(mp3buf_write >= mp3buflen)
@@ -1656,7 +1697,7 @@ static void mpeg_thread(void)
                     case MPEG_STOP:
                         DEBUGF("MPEG_STOP\n");
                         demand_irq_enable(false);
-                        is_recording = false;
+                        stop_recording();
 
                         /* Save the remaining data in the buffer */
                         stop_pending = true;
@@ -1970,9 +2011,6 @@ static void init_playback(void)
 
 void mpeg_record(char *filename)
 {
-    /* Read the current frame */
-    mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
-
     num_rec_bytes = 0;
     is_recording = true;
     queue_post(&mpeg_queue, MPEG_RECORD, (void*)filename);
@@ -1980,8 +2018,33 @@ void mpeg_record(char *filename)
 
 static void start_recording(void)
 {
+    unsigned long val;
+
+    /* Stop monitoring and record for real */
+    mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
+    val &= ~(1 << 10);
+    val |= 1;
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+
+    /* Read the current frame */
+    mas_readmem(MAS_BANK_D0, 0xfd0, &record_start_frame, 1);
+
     stop_pending = false;
     saving = false;
+}
+
+static void stop_recording(void)
+{
+    unsigned long val;
+
+    is_recording = false;
+    
+    /* Start monitoring */
+    mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
+    val |= (1 << 10) | 1;
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+
+    drain_dma_buffer();
 }
 
 unsigned long mpeg_num_recorded_frames(void)
@@ -2554,7 +2617,8 @@ void mpeg_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
 
-    val = (((source < 2)?1:2) << 8) | /* Input select */
+    val = ((1 << 10) | /* Monitoring on */
+        ((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
         (1 << 2) | /* Inverted SIBC clock signal */
@@ -2562,6 +2626,8 @@ void mpeg_set_recording_options(int frequency, int quality,
     mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
 
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+    
+    drain_dma_buffer();
     
     if(source == 0) /* Mic */
     {
