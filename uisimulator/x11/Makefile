@@ -102,11 +102,11 @@ endif
 COMMONSRCS = io.c
 
 ifeq ($(HAVE_MPEG_PLAY),1)
- 	SOUNDSRC = mpegplay.c oss_sound.c
-   	LDFLAGS += $(SOUND_LDFLAGS)
- 	CFLAGS += $(SOUND_CFLAGS) -DHAVE_MPEG_PLAY
+	SOUNDSRC = mpegplay.c oss_sound.c
+	LDFLAGS += $(SOUND_LDFLAGS)
+	CFLAGS += $(SOUND_CFLAGS) -DHAVE_MPEG_PLAY
 else
- 	SOUNDSRC = 
+	SOUNDSRC = 
 endif
 
 FIRMSRCS = $(LCDSRSC) id3.c debug.c usb.c mpeg.c mp3_playback.c power.c\
