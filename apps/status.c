@@ -120,6 +120,9 @@ void status_draw(void)
             lcd_icon(ICON_PLAY, false);
             lcd_icon(ICON_PAUSE, true);
             break;
+
+        default:
+            break;
     }
 #endif
 #ifdef HAVE_LCD_BITMAP
