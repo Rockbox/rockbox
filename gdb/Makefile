@@ -8,14 +8,13 @@
 #
 TARGET = stub
 OBJS = start.o sh-stub.o 
-#LIBS = -L/home/linus/sh1/lib/gcc-lib/sh-elf/3.0.4 -lgcc
 LIBS = -lgcc
 
 .s.o:
 	sh-elf-as -o $@ $<
 
 .c.o:
-	sh-elf-gcc -O -m1 -Wall -c -o $@ $<
+	sh-elf-gcc -O -I../firmware/drivers -m1 -Wall -c -o $@ $<
 
 $(TARGET).out: $(TARGET).elf
 	sh-elf-objcopy -O binary $(TARGET).elf $(TARGET).out

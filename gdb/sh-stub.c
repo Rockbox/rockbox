@@ -164,10 +164,13 @@
 	So 
 	"0* " means the same as "0000".  */
 
-#include "archos.h"
-#include "sh.h"
+#include "sh7034.h"
 #include <string.h>
 #include <setjmp.h>
+#include <signal.h>
+
+/* We need to undefine this from the sh7034.h file */
+#undef GBR
 
 /* Hitachi SH architecture instruction encoding masks */
 
@@ -196,9 +199,6 @@
 /* Hitachi SH processor register masks */
 
 #define T_BIT_MASK     0x0001
-
-#define PBDR  (*(volatile unsigned short *)(0x5ffffc2)) /* Port B Data */
-void lcd_printxy( char x, char y, unsigned char* string, int len );
 
 /*
  * BUFMAX defines the maximum number of characters in inbound/outbound
@@ -377,8 +377,6 @@ void start ();
 #define IO_VEC            33
 #define USER_VEC         127
 
-
-
 char in_nmi;   /* Set when handling an NMI, so we don't reenter */
 int dofault;  /* Non zero, bus errors will raise exception */
 
@@ -391,18 +389,18 @@ int remote_debug;
 jmp_buf remcomEnv;
 
 enum regnames
-  {
+{
     R0, R1, R2, R3, R4, R5, R6, R7,
     R8, R9, R10, R11, R12, R13, R14,
     R15, PC, PR, GBR, VBR, MACH, MACL, SR,
     TICKS, STALLS, CYCLES, INSTS, PLR
-  };
+};
 
 typedef struct
-  {
+{
     short *memAddr;
     short oldInstr;
-  }
+}
 stepData;
 
 int registers[NUMREGBYTES / 4];
@@ -657,28 +655,28 @@ static int computeSignal (int exceptionVector)
     switch (exceptionVector)
     {
         case INVALID_INSN_VEC:
-            sigval = 4;
+            sigval = SIGILL;
             break;			
         case INVALID_SLOT_VEC:
-            sigval = 4;
+            sigval = SIGILL;
             break;			
         case CPU_BUS_ERROR_VEC:
-            sigval = 10;
+            sigval = SIGBUS;
             break;			
         case DMA_BUS_ERROR_VEC:
-            sigval = 10;
+            sigval = SIGBUS;
             break;	
         case NMI_VEC:
-            sigval = 2;
+            sigval = SIGINT;
             break;	
 
         case TRAP_VEC:
         case USER_VEC:
-            sigval = 5;
+            sigval = SIGTRAP;
             break;
 
         default:
-            sigval = 7;		/* "software generated"*/
+            sigval = SIGEMT;		/* "software generated"*/
             break;
     }
     return (sigval);
@@ -763,7 +761,6 @@ void doSStep (void)
 
 /* Undo the effect of a previous doSStep.  If we single stepped,
    restore the old instruction. */
-
 void undoSStep (void)
 {
     if (stepped)
@@ -776,18 +773,13 @@ void undoSStep (void)
 }
 
 /*
-This function does all exception handling.  It only does two things -
-it figures out why it was called and tells gdb, and then it reacts
-to gdb's requests.
-
-When in the monitor mode we talk a human on the serial line rather than gdb.
-
+ * This function does all exception handling.  It only does two things -
+ * it figures out why it was called and tells gdb, and then it reacts
+ * to gdb's requests.
+ *
 */
-
 void gdb_handle_exception (int exceptionVector)
 {
-    char buf[32];
-    unsigned int r;
     int sigval, stepping;
     int addr, length;
     char *ptr;
@@ -812,28 +804,13 @@ void gdb_handle_exception (int exceptionVector)
         registers[PC] -= 2;
 
     /*
-     * Do the thangs needed to undo
+     * Do the things needed to undo
      * any stepping we may have done!
      */
     undoSStep ();
 
     stepping = 0;
 
-    buf[0] = highhex(exceptionVector);
-    buf[1] = lowhex(exceptionVector);
-    buf[2] = ':';
-    r = registers[PC];
-    buf[3] = highhex((r >> 24) & 0xff);
-    buf[4] = lowhex((r >> 24) & 0xff);
-    buf[5] = highhex((r >> 16) & 0xff);
-    buf[6] = lowhex((r >> 16) & 0xff);
-    buf[7] = highhex((r >> 8) & 0xff);
-    buf[8] = lowhex((r >> 8) & 0xff);
-    buf[9] = highhex(r & 0xff);
-    buf[10] = lowhex(r & 0xff);
-   
-    lcd_printxy(0, 0, buf, 11);
-    
     while (1)
     {
         remcomOutBuffer[0] = 0;
@@ -841,96 +818,96 @@ void gdb_handle_exception (int exceptionVector)
 
         switch (*ptr++)
         {
-            case '?':
-                remcomOutBuffer[0] = 'S';
-                remcomOutBuffer[1] = highhex (sigval);
-                remcomOutBuffer[2] = lowhex (sigval);
-                remcomOutBuffer[3] = 0;
-                break;
-            case 'd':
-                remote_debug = !(remote_debug);	/* toggle debug flag */
-                break;
-            case 'g':		/* return the value of the CPU registers */
-                mem2hex ((char *) registers, remcomOutBuffer, NUMREGBYTES);
-                break;
-            case 'G':		/* set the value of the CPU registers - return OK */
-                hex2mem (ptr, (char *) registers, NUMREGBYTES);
-                strcpy (remcomOutBuffer, "OK");
-                break;
-
-                /* mAA..AA,LLLL  Read LLLL bytes at address AA..AA */
-            case 'm':
-                if (setjmp (remcomEnv) == 0)
-                {
-                    dofault = 0;
-                    /* TRY, TO READ %x,%x.  IF SUCCEED, SET PTR = 0 */
-                    if (hex2int (&ptr, &addr))
-                        if (*(ptr++) == ',')
-                            if (hex2int (&ptr, &length))
-                            {
-                                ptr = 0;
-                                mem2hex ((char *) addr, remcomOutBuffer, length);
-                            }
-                    if (ptr)
-                        strcpy (remcomOutBuffer, "E01");
-                }
-                else
-                    strcpy (remcomOutBuffer, "E03");
-
-                /* restore handler for bus error */
-                dofault = 1;
-                break;
-
-                /* MAA..AA,LLLL: Write LLLL bytes at address AA.AA return OK */
-            case 'M':
-                if (setjmp (remcomEnv) == 0)
-                {
-                    dofault = 0;
-
-                    /* TRY, TO READ '%x,%x:'.  IF SUCCEED, SET PTR = 0 */
-                    if (hex2int (&ptr, &addr))
-                        if (*(ptr++) == ',')
-                            if (hex2int (&ptr, &length))
-                                if (*(ptr++) == ':')
-                                {
-                                    hex2mem (ptr, (char *) addr, length);
-                                    ptr = 0;
-                                    strcpy (remcomOutBuffer, "OK");
-                                }
-                    if (ptr)
-                        strcpy (remcomOutBuffer, "E02");
-                }
-                else
-                    strcpy (remcomOutBuffer, "E03");
-
-                /* restore handler for bus error */
-                dofault = 1;
-                break;
-
-                /* cAA..AA    Continue at address AA..AA(optional) */
-                /* sAA..AA   Step one instruction from AA..AA(optional) */
-            case 's':
-                stepping = 1;
-            case 'c':
-            {
-                /* tRY, to read optional parameter, pc unchanged if no parm */
-                if (hex2int (&ptr, &addr))
-                    registers[PC] = addr;
-
-                if (stepping)
-                    doSStep ();
-            }
-
-            return;
+        case '?':
+            remcomOutBuffer[0] = 'S';
+            remcomOutBuffer[1] = highhex (sigval);
+            remcomOutBuffer[2] = lowhex (sigval);
+            remcomOutBuffer[3] = 0;
+            break;
+        case 'd':
+            remote_debug = !(remote_debug);     /* toggle debug flag */
+            break;
+        case 'g':   /* return the value of the CPU registers */
+            mem2hex ((char *) registers, remcomOutBuffer, NUMREGBYTES);
+            break;
+        case 'G':   /* set the value of the CPU registers - return OK */
+            hex2mem (ptr, (char *) registers, NUMREGBYTES);
+            strcpy (remcomOutBuffer, "OK");
             break;
 
-            /* kill the program */
-            case 'k':		/* do nothing */
-                break;
+            /* mAA..AA,LLLL  Read LLLL bytes at address AA..AA */
+        case 'm':
+            if (setjmp (remcomEnv) == 0)
+            {
+                dofault = 0;
+                /* TRY, TO READ %x,%x.  IF SUCCEED, SET PTR = 0 */
+                if (hex2int (&ptr, &addr))
+                    if (*(ptr++) == ',')
+                        if (hex2int (&ptr, &length))
+                        {
+                            ptr = 0;
+                            mem2hex ((char *) addr, remcomOutBuffer, length);
+                        }
+                if (ptr)
+                    strcpy (remcomOutBuffer, "E01");
+            }
+            else
+                strcpy (remcomOutBuffer, "E03");
 
-            default:
-                break;
-        }			/* switch */
+            /* restore handler for bus error */
+            dofault = 1;
+            break;
+
+            /* MAA..AA,LLLL: Write LLLL bytes at address AA.AA return OK */
+        case 'M':
+            if (setjmp (remcomEnv) == 0)
+            {
+                dofault = 0;
+
+                /* TRY, TO READ '%x,%x:'.  IF SUCCEED, SET PTR = 0 */
+                if (hex2int (&ptr, &addr))
+                    if (*(ptr++) == ',')
+                        if (hex2int (&ptr, &length))
+                            if (*(ptr++) == ':')
+                            {
+                                hex2mem (ptr, (char *) addr, length);
+                                ptr = 0;
+                                strcpy (remcomOutBuffer, "OK");
+                            }
+                if (ptr)
+                    strcpy (remcomOutBuffer, "E02");
+            }
+            else
+                strcpy (remcomOutBuffer, "E03");
+
+            /* restore handler for bus error */
+            dofault = 1;
+            break;
+
+            /* cAA..AA    Continue at address AA..AA(optional) */
+            /* sAA..AA   Step one instruction from AA..AA(optional) */
+        case 's':
+            stepping = 1;
+        case 'c':
+        {
+            /* tRY, to read optional parameter, pc unchanged if no parm */
+            if (hex2int (&ptr, &addr))
+                registers[PC] = addr;
+
+            if (stepping)
+                doSStep ();
+        }
+
+        return;
+        break;
+
+        /* kill the program */
+        case 'k':               /* do nothing */
+            break;
+
+        default:
+            break;
+        }                       /* switch */
 
         /* reply to the request */
         putpacket (remcomOutBuffer);
@@ -1127,7 +1104,6 @@ void INIT (void)
     blink();
 }
 
-
 void sr()
 {
     /* Calling Reset does the same as pressing the button */
@@ -1237,7 +1213,7 @@ void rr()
         "	mov.l	@r1, r1			! restore R1");
 }
 
-static __inline__ void code_for_catch_exception(unsigned int n)
+static inline void code_for_catch_exception(unsigned int n)
 {
     asm("		.globl	_catch_exception_%O0" : : "X" (n) ); 
     asm("	_catch_exception_%O0:" :: "X" (n) );
@@ -1550,79 +1526,4 @@ void handleError (char theSSR)
 {
     /* Clear all error bits, otherwise the receiver will stop */
     SSR1 &= ~(SCI_ORER | SCI_PER | SCI_FER);
-}
-
-#define DC  1
-#define CS1 2
-#define SDA 4
-#define SCK 8
-
-static const unsigned char ascii2lcd[] = {
-   0x00,0x01,0x02,0x03,0x00,0x84,0x85,0x89,
-   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-   0xec,0xe3,0xe2,0xe1,0xe0,0xdf,0x15,0x00,
-   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-   0x24,0x25,0x26,0x37,0x06,0x29,0x2a,0x2b,
-   0x2c,0x2d,0x2e,0x2f,0x30,0x31,0x32,0x33,
-   0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,
-   0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,
-   0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,
-   0x4c,0x4d,0x4e,0x4f,0x50,0x51,0x52,0x53,
-   0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,
-   0x5c,0x5d,0x5e,0xa9,0x33,0xce,0x00,0x15,
-   0x00,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,
-   0x6c,0x6d,0x6e,0x6f,0x70,0x71,0x72,0x73,
-   0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b,
-   0x7c,0x7d,0x7e,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24,
-   0x45,0x45,0x45,0x45,0x45,0x45,0x24,0x47,
-   0x49,0x49,0x49,0x49,0x4d,0x4d,0x4d,0x4d,
-   0x48,0x52,0x53,0x53,0x53,0x53,0x53,0x24,
-   0x24,0x59,0x59,0x59,0x59,0x5d,0x24,0x24,
-   0x65,0x65,0x65,0x65,0x65,0x65,0x24,0x67,
-   0x69,0x69,0x69,0x69,0x6d,0x6d,0x6d,0x6d,
-   0x73,0x72,0x73,0x73,0x73,0x73,0x73,0x24,
-   0x24,0x79,0x79,0x79,0x79,0x7d,0x24,0x7d
-};
-
-void lcd_write(int byte, int data)
-{
-    int i;
-    char on,off;
-
-    PBDR &= ~CS1; /* enable lcd chip select */
-
-    if ( data ) {
-        on=~(SDA|SCK);
-        off=SCK|DC;
-    }
-    else {
-        on=~(SDA|SCK|DC);
-        off=SCK;
-    }
-    /* clock out each bit, MSB first */
-    for (i=0x80;i;i>>=1)
-    {
-        PBDR &= on;
-        if (i & byte)
-            PBDR |= SDA;
-        PBDR |= off;
-    }
-
-    PBDR |= CS1; /* disable lcd chip select */
-}
-
-void lcd_printxy( char x, char y, unsigned char* string, int len )
-{
-    int i;
-    lcd_write(0xb0+y*16+x,0);
-    for (i=0; string[i] && i<len; i++)
-        lcd_write(ascii2lcd[string[i]],1);
 }
