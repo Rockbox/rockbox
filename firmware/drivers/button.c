@@ -163,36 +163,38 @@ int button_set_repeat(int newmask)
  */
 static int button_read(void)
 {
+    int btn = BUTTON_NONE;
+
     /* Check port B pins for ON and OFF */
     int data = PBDR;
     if ((data & PBDR_BTN_ON) == 0)
-        return BUTTON_ON;
+        btn |= BUTTON_ON;
     else if ((data & PBDR_BTN_OFF) == 0)
-        return BUTTON_OFF;
+        btn |= BUTTON_OFF;
 
     /* Check F1-3 and UP */
     data = adc_read(ADC_BUTTON_ROW1);
     if (data >= LEVEL4)
-        return BUTTON_F3;
+        btn |= BUTTON_F3;
     else if (data >= LEVEL3)
-        return BUTTON_UP;
+        btn |= BUTTON_UP;
     else if (data >= LEVEL2)
-        return BUTTON_F2;
+        btn |= BUTTON_F2;
     else if (data >= LEVEL1)
-        return BUTTON_F1;
+        btn |= BUTTON_F1;
 
     /* Check DOWN, PLAY, LEFT, RIGHT */
     data = adc_read(ADC_BUTTON_ROW2);
     if (data >= LEVEL4)
-        return BUTTON_DOWN;
+        btn |= BUTTON_DOWN;
     else if (data >= LEVEL3)
-        return BUTTON_PLAY;
+        btn |= BUTTON_PLAY;
     else if (data >= LEVEL2)
-        return BUTTON_LEFT;
+        btn |= BUTTON_LEFT;
     else if (data >= LEVEL1)
-        return BUTTON_RIGHT;
+        btn |= BUTTON_RIGHT;
   
-    return BUTTON_NONE;
+    return btn;
 }
 
 #elif HAVE_PLAYER_KEYPAD
@@ -221,7 +223,7 @@ void button_init(void)
 static int button_read(void)
 {
     int porta = PADR;
-    int btn = 0;
+    int btn = BUTTON_NONE;
 
     /* buttons are active low */
     if(adc_read(0) < 0x180)
