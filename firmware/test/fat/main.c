@@ -19,6 +19,7 @@ void panicf( char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
+    printf("***PANIC*** ");
     vprintf( fmt, ap );
     va_end( ap );
     exit(0);
@@ -82,17 +83,20 @@ void dbg_dir(char* currdir)
     }
 }
 
-void dbg_mkfile(char* name)
+void dbg_mkfile(char* name, int num)
 {
-    char* text = "Detta är en dummy-text\n";
+    char text[800];
     int i;
     int fd = open(name,O_WRONLY);
     if (fd<0) {
         DEBUGF("Failed creating file\n");
         return;
     }
-    for (i=0;i<200;i++)
-        if (write(fd, text, strlen(text)) < 0)
+    for (i=0; i<sizeof(text)/4; i++ )
+        sprintf(text+i*4,"%03x,",i);
+
+    for (i=0;i<num;i++)
+        if (write(fd, text, sizeof(text)) < 0)
             DEBUGF("Failed writing data\n");
     
     close(fd);
@@ -137,27 +141,7 @@ void dbg_tail(char* name)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
     
-    rc = lseek(fd,512,SEEK_SET);
-    if ( rc >= 0 ) {
-        rc = read(fd, buf, SECTOR_SIZE);
-        if( rc > 0 )
-        {
-            buf[rc]=0;
-            printf("%d: %s\n", strlen(buf), buf);
-        }
-        else if ( rc == 0 ) {
-            DEBUGF("EOF\n");
-        }
-        else
-        {
-            DEBUGF("Failed reading file: %d\n",rc);
-        }
-    }
-    else {
-        perror("lseek");
-    }
-
-    rc = lseek(fd,-100,SEEK_CUR);
+    rc = lseek(fd,-512,SEEK_END);
     if ( rc >= 0 ) {
         rc = read(fd, buf, SECTOR_SIZE);
         if( rc > 0 )
@@ -284,6 +268,8 @@ void dbg_console(void)
     }
 }
 
+extern void ata_exit(void);
+
 int main(int argc, char *argv[])
 {
     int rc,i;
@@ -325,11 +311,13 @@ int main(int argc, char *argv[])
     //dbg_console();
     //dbg_dir("/");
 #if 1
-    dbg_head("/bepa.txt");
+    dbg_tail("/depa.txt");
 #else
-    dbg_mkfile("/bepa.txt");
+    dbg_mkfile("/depa.txt", 10);
 #endif
     dbg_dir("/");
+
+    ata_exit();
 
     return 0;
 }

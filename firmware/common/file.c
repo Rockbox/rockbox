@@ -178,7 +178,7 @@ int close(int fd)
         }
         
         /* tie up all loose ends */
-        fat_closewrite(&(openfiles[fd].fatfile), openfiles[fd].size);
+        fat_closewrite(&(openfiles[fd].fatfile), openfiles[fd].fileoffset);
     }
     openfiles[fd].busy = false;
     return rc;
@@ -239,8 +239,6 @@ static int readwrite(int fd, void* buf, int count, bool write)
 
         nread = headbytes;
         count -= headbytes;
-
-        LDEBUGF("readwrite incache: offs=%d\n",openfiles[fd].cacheoffset);
     }
 
     /* read whole sectors right into the supplied buffer */
@@ -315,6 +313,13 @@ int lseek(int fd, int offset, int whence)
         errno = EBADF;
         return -1;
     }
+
+    if ( openfiles[fd].write ) {
+        DEBUGF("lseek() is not supported when writing\n");
+        errno = EROFS;
+        return -2;
+    }
+
 
     switch ( whence ) {
         case SEEK_SET:

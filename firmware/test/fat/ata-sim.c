@@ -9,7 +9,7 @@ static FILE* file;
 
 int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    DEBUGF("Reading block 0x%lx\n",start); 
+    DEBUGF("[Reading block 0x%lx]\n",start); 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
@@ -17,14 +17,14 @@ int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
     if(!fread(buf,BLOCK_SIZE,count,file)) {
         printf("Failed reading %d blocks starting at block 0x%lx\n",count,start); 
         perror("fread");
-        return -1;
+        return -2;
     }
     return 0;
 }
 
 int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    DEBUGF("Writing block 0x%lx\n",start); 
+    DEBUGF("[Writing block 0x%lx]\n",start); 
 
     if (start == 0) {
         DEBUGF("Holy crap! You're writing on sector 0!\n");
@@ -37,7 +37,7 @@ int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
     }
     if(!fwrite(buf,BLOCK_SIZE,count,file)) {
         perror("fwrite");
-        return -1;
+        return -2;
     }
     return 0;
 }

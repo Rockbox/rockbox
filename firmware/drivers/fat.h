@@ -58,8 +58,8 @@ struct fat_dir
 struct fat_file
 {
     int firstcluster;    /* first cluster in file */
-    int nextcluster;     /* cluster of last access */
-    int nextsector;      /* sector of last access */
+    int lastcluster;     /* cluster of last access */
+    int lastsector;      /* sector of last access */
     int sectornum;       /* sector number in this cluster */
     int dirsector;       /* sector where the dir entry is located */
     int direntry;        /* dir entry index in sector */
@@ -79,6 +79,7 @@ extern int fat_readwrite(struct fat_file *ent, int sectorcount,
                          void* buf, bool write );
 extern int fat_closewrite(struct fat_file *ent, int size);
 extern int fat_seek(struct fat_file *ent, int sector );
+extern int fat_remove(struct fat_file *ent);
 
 extern int fat_opendir(struct fat_dir *ent, unsigned int currdir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
