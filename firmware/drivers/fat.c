@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/timeb.h>
-
+#include <stdbool.h>
 #include "fat.h"
 #include "ata.h"
 #include "debug.h"
@@ -132,12 +132,13 @@ struct bpb fat_bpb;
 
 struct fat_cache_entry
 {
-    unsigned char *ptr;
     int secnum;
-    int dirty;
+    bool inuse;
+    bool dirty;
 };
 
-struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
+static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
+static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 
 /* sectors cache for longname use */
 static unsigned char lastsector[SECTOR_SIZE];
@@ -182,16 +183,11 @@ int fat_mount(int startsector)
     int countofclusters;
     int i;
 
-    /* Clear the cache. Be aware! The bss section MUST have been cleared
-       at boot. Otherwise we will free() garbage pointers here */
     for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
-        if(fat_cache[i].ptr)
-        {
-            free(fat_cache[i].ptr);
-        }
         fat_cache[i].secnum = 8; /* We use a "safe" sector just in case */
-        fat_cache[i].dirty = 0;
+        fat_cache[i].inuse = false;
+        fat_cache[i].dirty = false;
     }
 
     /* Read the sector */
@@ -329,12 +325,10 @@ static int bpb_is_sane(void)
 static void *cache_fat_sector(int secnum)
 {
     int cache_index = secnum & FAT_CACHE_MASK;
-    unsigned char *sec;
-
-    sec = fat_cache[cache_index].ptr;
 
     /* Delete the cache entry if it isn't the sector we want */
-    if(sec && fat_cache[cache_index].secnum != secnum)
+    if(fat_cache[cache_index].inuse &&
+       fat_cache[cache_index].secnum != secnum)
     {
 #ifdef WRITE
         /* Write back if it is dirty */
@@ -347,36 +341,25 @@ static void *cache_fat_sector(int secnum)
                       secnum);
             }
         }
-#endif
-        free(sec);
-        
-        fat_cache[cache_index].ptr = NULL;
         fat_cache[cache_index].secnum = 8; /* Normally an unused sector */
-        fat_cache[cache_index].dirty = 0;
-        sec = NULL;
+        fat_cache[cache_index].dirty = false;
+#endif
+        fat_cache[cache_index].inuse = false;
     }
     
     /* Load the sector if it is not cached */
-    if(!sec)
+    if(!fat_cache[cache_index].inuse)
     {
-        sec = malloc(fat_bpb.bpb_bytspersec);
-        if(!sec)
+        if(ata_read_sectors(secnum + fat_bpb.startsector,1,
+                            fat_cache_sectors[cache_index]))
         {
-            DEBUGF( "cache_fat_sector() - Out of memory\n");
+            DEBUGF( "cache_fat_sector() - Could not read sector %d\n", secnum);
             return NULL;
         }
-        if(ata_read_sectors(secnum + fat_bpb.startsector,1,sec))
-        {
-            DEBUGF( "cache_fat_sector() - Could"
-                    " not read sector %d\n",
-                    secnum);
-            free(sec);
-            return NULL;
-        }
-        fat_cache[cache_index].ptr = sec;
+        fat_cache[cache_index].inuse = true;
         fat_cache[cache_index].secnum = secnum;
     }
-    return sec;
+    return fat_cache_sectors[cache_index];
 }
 
 #ifdef DISK_WRITE
