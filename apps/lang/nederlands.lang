@@ -262,13 +262,13 @@ new: "Volg Speellijst"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
-eng: "Really?"
-new: "Zeker weten?"
+eng: ""
+new: ""
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Play/Stop"
+eng: ""
+new: ""
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -277,13 +277,13 @@ new: "Weet je het zeker?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
-eng: "PLAY = Yes"
-new: "PLAY = Ja"
+eng: ""
+new: ""
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
-eng: "Any Other = No"
-new: "Elke andere = Nee"
+eng: "OFF=Cancel"
+new: "OFF=Afbreken"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -767,8 +767,8 @@ new: "Je hebt verloren!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "0 Rows - Level 0"
-new: "0 Rijen - Niveau 0"
+eng: "Rows - Level"
+new: "Rijen - Niveau"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -859,3 +859,123 @@ id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
 new: "Een"
+
+id: LANF_WEEKDAY_THURSDAY
+desc: abbreviation for weekday
+eng: "Thu"
+new: "Do" 
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 hour clock"
+new: "12 uurs klok" 
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 hour clock"
+new: "24 uurs klok" 
+
+id: LANG_MONTH_APRIL
+desc: abbreviation for monthname
+eng: "Apr"
+new: "Apr" 
+
+id: LANG_MONTH_AUGUST
+desc: abbreviation for monthname
+eng: "Aug"
+new: "Aug" 
+
+id: LANG_MONTH_DECEMBER
+desc: abbreviation for monthname
+eng: "Dec"
+new: "Dec" 
+
+id: LANG_MONTH_FEBRUARY
+desc: abbreviation for monthname
+eng: "Feb"
+new: "Feb" 
+
+id: LANG_MONTH_JANUARY
+desc: abbreviation for monthname
+eng: "Jan"
+new: "Jan" 
+
+id: LANG_MONTH_JULY
+desc: abbreviation for monthname
+eng: "Jul"
+new: "Jul" 
+
+id: LANG_MONTH_JUNE
+desc: abbreviation for monthname
+eng: "Jun"
+new: "Jun" 
+
+id: LANG_MONTH_MARCH
+desc: abbreviation for monthname
+eng: "Mar"
+new: "Maa" 
+
+id: LANG_MONTH_MAY
+desc: abbreviation for monthname
+eng: "May"
+new: "Mei" 
+
+id: LANG_MONTH_NOVEMBER
+desc: abbreviation for monthname
+eng: "Nov"
+new: "Nov"
+
+id: LANG_MONTH_OCTOBER
+desc: abbreviation for monthname
+eng: "Oct"
+new: "Okt" 
+
+id: LANG_MONTH_SEPTEMBER
+desc: abbreviation for monthname
+eng: "Sep"
+new: "Sep"
+
+id: LANG_RESET_CANCEL
+desc: confirm to reset settings
+eng: "OFF=Cancel"
+new: "OFF=Afbreken" 
+
+id: LANG_RESET_CONFIRM
+desc: confirm to reset settings
+eng: "PLAY=Reset"
+new: "PLAY=Reset" 
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+new: "Tijds Aanduiding" 
+
+id: LANG_WEEKDAY_FRIDAY
+desc: abbreviation for weekday
+eng: "Fri"
+new: "Vr" 
+
+id: LANG_WEEKDAY_MONDAY
+desc: abbreviation for weekday
+eng: "Mon"
+new: "Ma"
+
+id: LANG_WEEKDAY_SATURDAY
+desc: abbreviation for weekday
+eng: "Sat"
+new: "Za"
+
+id: LANG_WEEKDAY_SUNDAY
+desc: abbreviation for weekday
+eng: "Sun"
+new: "Zo" 
+
+id: LANG_WEEKDAY_TUESDAY
+desc: abbreviation for weekday
+eng: "Tue"
+new: "Di"
+
+id: LANG_WEEKDAY_WEDNESDAY
+desc: abbreviation for weekday
+eng: "Wed"
+new: "Wo" 
