@@ -1,4 +1,4 @@
-# $Id: wallisertitsch.lang,v 1.45 2003/01/18 23:50:55 vicentinimartin
+# $Id: wallisertitsch.lang,v 1.77 2003/06/08 12:43:52 vicentinimartin
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -48,12 +48,12 @@ new: "Rockbox info:"
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMb"
-new: "Puf: %d.%02dMb"
+new: "Puf: %d.%03dMb"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMb"
-new: "Puffer: %d.%02dMb"
+new: "Puffer: %d.%03dMb"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
@@ -105,11 +105,13 @@ desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new: "Ladu..."
 
+# NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Mischlu..."
 
+# NO LONGER USED
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
@@ -125,6 +127,7 @@ desc: in playlist.indices() when playlist is full
 eng: "buffer full"
 new: "Puffer voll"
 
+# NO LONGER USED
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d files"
@@ -183,12 +186,12 @@ new: "Kontrascht"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Züefallswiedergaab"
+new: "Züefall"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play selected first"
-new: "Gwählti zersch abschpilu"
+new: "Gwählts zersch abschpilu"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -213,7 +216,7 @@ new: "Üs"
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "ask"
-new: "Nafrägu"
+new: "Naafrägu"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -248,7 +251,7 @@ new: "HDD Motor-Üsschaltzit"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "FF/RR min. Schritt"
+new: "FF/RW min. Schritt"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
@@ -472,22 +475,22 @@ new: "Schtumm Üs"
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Schtummschaltig isch A"
+new: "Schtumm isch A"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Schtummschaltig isch Üs"
+new: "Schtumm isch Üs"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
-new: "-ID3 Info- "
+new: "|¯ ID3 Info"
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-new: "--Azeig--"
+new: "|_  Azeig"
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -572,7 +575,7 @@ new: "Pause"
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "mode:"
-new: "Modus:"
+new: "modus:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
@@ -582,7 +585,7 @@ new: "Verzeichnisf.: %s"
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-new: "Schtatus-"
+new: "Status-"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
@@ -592,7 +595,7 @@ new: "Scroll-"
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "bar"
-new: "Liischta"
+new: "Azeig:"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
@@ -853,7 +856,7 @@ new: "ewig"
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units per read"
-new: "Einheite pro gläsnum Wärt"
+new: "Einheite pro Mässig"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -863,17 +866,17 @@ new: "Bilüüchtig a bim ladu"
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
-new: "Widerholig"
+new: "W'lig"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
-new: "Alli Lieder"
+new: "Alli"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
-new: "Eis Lied"
+new: "Eis"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
@@ -884,6 +887,10 @@ id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 new: "OFF=Abbrächu"
+
+# NOTE: ignore this label.  It is no longer used/was an error.
+# We are aware of this and it will this instance will be removed in the future
+id: LANG_TETRIS_LEVEL
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -1047,18 +1054,18 @@ new: "Energie schparu"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> linear"
-new: "dBfs <-> linear"
+eng: "Scale"
+new: "Skalierig"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
-new: "dBfs"
+eng: "Logarithmic(dB)"
+new: "logarithmisch (dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "linear"
-new: "linear"
+eng: "Linear(%)"
+new: "linear (%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -1108,7 +1115,7 @@ new: "Quella"
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
-new: "Kanäl"
+new: "Kanal"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1238,12 +1245,12 @@ new: "OK"
 id: LANG_PLAYER_ONPLAY_1
 desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
-new:
+new: "\x81 Warteschlanga"
 
 id: LANG_PLAYER_ONPLAY_2
 desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
-new:
+new: "- Umb + Ent"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1275,72 +1282,262 @@ desc: Something failed. To be appended after above actions
 eng: "failed"
 new: "gschitrut"
 
-id: LANG_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Schiebepuzzle"
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+new: "Wecker"
 
-id: LANG_PUZZLE_QUIT
-desc: how to quit game
-eng: "[OFF] to stop"
-new: "[OFF] üfheru"
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm Time: %02d:%02d"
+new: "Weckzit: %02d:%02d"
 
-id: LANG_PUZZLE_F1
-desc: what does F1 do
-eng: "[F1]  shuffle"
-new: "[F1]  mischlu"
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking Up In %d:%02d"
+new: "Üfwachu in %d:%02d"
 
-id: LANG_PUZZLE_F2
-desc: what does F2 do
-eng: "[F2]  change pic"
-new: "[F2]  bild wägslu"
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting Down..."
+new: "Schaltu üs..."
 
-id: LANG_PUZZLE_MOVE
-desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Zig"
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm Time Is Too Soon!"
+new: "Weckzit isch zfrüeh"
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "FlipIt!"
-new: "zDräjiga"
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+new: "PLAY=Ok OFF=Abbrächu"
 
-id: LANG_FLIPIT_FLIPS
-desc: in the games menu
-eng: "Flips"
-new:
-    
-id: LANG_FLIPIT_OFF
-desc: in the games menu
-eng: "[OFF]  to stop"
-new: "[OFF]  üfheru"
-  
-id: LANG_FLIPIT_PLAY
-desc: in the games menu
-eng: "[PLAY] toggle"
-new: "[PLAY] dräiju"
-    
-id: LANG_FLIPIT_F1
-desc: in the games menu
-eng: "[F1]   shuffle"
-new: "[F1]   mischlu"
-    
-id: LANG_FLIPIT_F2
-desc: in the games menu
-eng: "[F2]   solution"
-new: "[F2]   leesig"
-    
-id: LANG_FLIPIT_F3
-desc: in the games menu
-eng: "[F3]   step by step"
-new: "[F3]   teilleesig"
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+new: "Abschpillischta Erschtellu"
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+new: "Am Zämuschtellu"
+
+id: LANG_PLAYER_KEYBOARD_BACKSPACE
+desc: Backspace alternative in player keyboard interaction
+eng: "Backspace"
+new: "Zrugg"
+
+id: LANG_PLAYER_KEYBOARD_DELETE
+desc: Delete alternative in player keyboard interaction
+eng: "Delete"
+new: "Leschu"
+
+id: LANG_PLAYER_KEYBOARD_ACCEPT
+desc: Accept alternative in player keyboard interaction
+eng: "Accept"
+new: "Anäh"
+
+id: LANG_PLAYER_KEYBOARD_ABORT
+desc: Abort alternative in player keyboard interaction
+eng: "Abort"
+new: "Abbruch"
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+new: "Zeig ID3 Info"
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+new: "[Stil]"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+new: "[Jahr]"
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<No Info>"
+new: "<kei Info>"
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+new: "Zit:"
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+new: "Greessi:"
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu() (removed)
+eng: ""
+new: ""
+
+id: LANG_SETTINGS_LOADED1
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings"
+new: "Ischtellige"
+
+id: LANG_SETTINGS_LOADED2
+desc: Feedback shown when a .cfg file is loaded
+eng: "Loaded"
+new: "gladu"
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+new: "Uberblendu bi Stop/Pause"
+
+id: LANG_SOKOBAN_ON
+desc: how to undo move 
+eng: "[ON] To Undo"
+new: "[ON] Zug zrugg"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "LCD Mode"
+new: "LCD Modus"
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new: "St. schmal"
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new: "Stereo schmal"
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new: "Stereo breit"
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new: "Karaoke"
+
+id: LANG_SAVE_SETTINGS
+desc: in system_settings_menu()
+eng: "Write .cfg file"
+new: "Sichre .cfg datii"
+
+id: LANG_SETTINGS_SAVED1
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings"
+new: "Ischtellige"
+
+id: LANG_SETTINGS_SAVED2
+desc: Feedback shown when a .cfg file is saved
+eng: "Saved"
+new: "gschpiichrut"
+
+id: LANG_VBRFIX_STOP_PLAY
+desc: Tells the user to stop the playback
+eng: "Stop the playback first"
+new: "zersch Wiedergaab biendu"
+
+id: LANG_VBRFIX_NOT_VBR
+desc: Tells the user that the selected file is not a VBR file
+eng: "Not a VBR file"
+new: "kei VBR-Datii"
+
+id: LANG_VBRFIX
+desc: The context menu entry
+eng: "Update VBR file"
+new: "VBR-Datii aktualisieru"
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Line Selector"
+new: "Ziiluüswahl"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+new: "unabhängigi Frames"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-new: "Schtatusliischta"
+new: "Statusliischta"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new: "Scrollliischta"
+new: "Scrolliischta"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Bilüüchtig a bim Titelwägsel"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Zeiger"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Balku (invertieru)"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "normal"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "invertiert"
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+new: "max. Azahl Datije im Browser"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+new: "max. gressi Abschpillischta"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+new: "Gump-Scroll"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time"
+eng: "One time"
+new: "eis Mal"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always"
+eng: "Always"
+new: "immer"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new: "Gumpverzögrig"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Üfnahm teilu"
+
+id: LANG_RECORD_TIMESPLIT_REC
+decs: Display of record timer interval setting, on the record screen
+eng: "Split time:"
+new: "Üfnahm teilu:"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Icons azeigu"
