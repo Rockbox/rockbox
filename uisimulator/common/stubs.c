@@ -175,3 +175,15 @@ void mpeg_set_pitch(int pitch)
 {
     (void)pitch;
 }
+
+#ifdef HAVE_LCD_CHARCELLS
+void lcd_clearrect (int x, int y, int nx, int ny)
+{
+  /* Reprint char if you want to change anything */
+}
+
+void lcd_fillrect (int x, int y, int nx, int ny)
+{
+  /* Reprint char if you want to change display anything */
+}
+#endif
