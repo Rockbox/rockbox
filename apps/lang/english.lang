@@ -1666,3 +1666,38 @@ id: LANG_CREATE_DIR
 desc: in main menu
 eng: "Create directory"
 new:
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+new:
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+new:
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+new:
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+new:
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+new:
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+new:
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+new:

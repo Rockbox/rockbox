@@ -40,6 +40,7 @@
 #include "buffer.h"
 #include "settings.h"
 #include "status.h"
+#include "playlist_viewer.h"
 #include "onplay.h"
 
 static char* selected_file = NULL;
@@ -60,7 +61,7 @@ static bool add_to_playlist(int position, bool queue)
         playlist_create(NULL, NULL);
 
     if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
-        playlist_insert_track(selected_file, position, queue);
+        playlist_insert_track(NULL, selected_file, position, queue);
     else if (selected_file_attr & ATTR_DIRECTORY)
     {
         bool recurse = false;
@@ -99,10 +100,11 @@ static bool add_to_playlist(int position, bool queue)
             }
         }
 
-        playlist_insert_directory(selected_file, position, queue, recurse);
+        playlist_insert_directory(NULL, selected_file, position, queue,
+            recurse);
     }
     else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
-        playlist_insert_playlist(selected_file, position, queue);
+        playlist_insert_playlist(NULL, selected_file, position, queue);
 
     if (new_playlist && (playlist_amount() > 0))
     {
@@ -119,12 +121,36 @@ static bool add_to_playlist(int position, bool queue)
     return false;
 }
 
+static bool view_playlist(void)
+{
+    bool was_playing = mpeg_status() & MPEG_STATUS_PLAY;
+    bool result;
+
+    result = playlist_viewer_ex(selected_file);
+
+    if (!was_playing && (mpeg_status() & MPEG_STATUS_PLAY) &&
+        onplay_result == ONPLAY_OK)
+        /* playlist was started from viewer */
+        onplay_result = ONPLAY_START_PLAY;
+
+    return result;
+}
+
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_items menu[6]; 
-    struct playlist_args args[6]; /* increase these 2 if you add entries! */
-    int m, i=0, result;
+    struct menu_items menu[7]; 
+    struct playlist_args args[7]; /* increase these 2 if you add entries! */
+    int m, i=0, pstart=0, result;
+    bool ret = false;
+
+    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
+    {
+        menu[i].desc = str(LANG_VIEW);
+        menu[i].function = view_playlist;
+        i++;
+        pstart++;
+    }
 
     if (mpeg_status() & MPEG_STATUS_PLAY)
     {
@@ -169,11 +195,13 @@ static bool playlist_options(void)
 
     m = menu_init( menu, i );
     result = menu_show(m);
-    if (result >= 0)
-        add_to_playlist(args[result].position, args[result].queue);
+    if (result >= 0 && result < pstart)
+        ret = menu[result].function();
+    else if (result >= pstart)
+        ret = add_to_playlist(args[result].position, args[result].queue);
     menu_exit(m);
 
-    return false;
+    return ret;
 }
 
 static bool delete_file(void)
@@ -489,8 +517,9 @@ int onplay(char* file, int attr)
     selected_file = file;
     selected_file_attr = attr;
 
-    if (((attr  & TREE_ATTR_MASK) == TREE_ATTR_MPA) || (attr & ATTR_DIRECTORY) ||
-        (((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U) && (mpeg_status() & MPEG_STATUS_PLAY)))
+    if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
+         (attr & ATTR_DIRECTORY) ||
+        ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
     {
         menu[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
         menu[i].function = playlist_options;

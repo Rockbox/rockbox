@@ -28,9 +28,12 @@
 
 struct playlist_info
 {
+    bool current;        /* current playing playlist                */
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
+    char control_filename[MAX_PATH]; /* full path of control file   */
     int  fd;             /* descriptor of the open playlist file    */
     int  control_fd;     /* descriptor of the open control file     */
+    bool control_created; /* has control file been created?         */
     int  dirlen;         /* Length of the path to the playlist file */
     unsigned int *indices; /* array of indices                      */
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
@@ -63,33 +66,48 @@ struct playlist_track_info
     int  display_index;      /* index of track for display          */
 };
 
+/* Exported functions only for current playlist. */
 void playlist_init(void);
 int playlist_create(char *dir, char *file);
 int playlist_resume(void);
 int playlist_add(char *filename);
-int playlist_insert_track(char *filename, int position, bool queue);
-int playlist_insert_directory(char *dirname, int position, bool queue,
-                              bool recurse);
-int playlist_insert_playlist(char *filename, int position, bool queue);
-int playlist_delete(int index);
-int playlist_move(int index, int new_index);
 int playlist_shuffle(int random_seed, int start_index);
-int playlist_randomise(unsigned int seed, bool start_current);
-int playlist_sort(bool start_current);
 int playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
 char *playlist_peek(int steps);
 int playlist_next(int steps);
 int playlist_get_resume_info(int *resume_index);
 int playlist_get_display_index(void);
-int playlist_get_first_index(void);
 int playlist_amount(void);
-char *playlist_name(char *buf, int buf_size);
-int playlist_get_track_info(int index, struct playlist_track_info* info);
-int playlist_save(char *filename);
-int playlist_get_seed(void);
-char *playlist_get_name(char *buf, int buf_size);
-bool playlist_modified(void);
+
+/* Exported functions for all playlists.  Pass NULL for playlist_info
+   structure to work with current playlist. */
+int playlist_create_ex(struct playlist_info* playlist, char* dir, char* file,
+                       void* index_buffer, int index_buffer_size,
+                       void* temp_buffer, int temp_buffer_size);
+int playlist_set_current(struct playlist_info* playlist);
+void playlist_close(struct playlist_info* playlist);
+int playlist_insert_track(struct playlist_info* playlist, char *filename,
+                          int position, bool queue);
+int playlist_insert_directory(struct playlist_info* playlist, char *dirname,
+                              int position, bool queue, bool recurse);
+int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
+                             int position, bool queue);
+int playlist_delete(struct playlist_info* playlist, int index);
+int playlist_move(struct playlist_info* playlist, int index, int new_index);
+int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
+                       bool start_current);
+int playlist_sort(struct playlist_info* playlist, bool start_current);
+bool playlist_modified(struct playlist_info* playlist);
+int playlist_get_first_index(struct playlist_info* playlist);
+int playlist_get_seed(struct playlist_info* playlist);
+int playlist_amount_ex(struct playlist_info* playlist);
+char *playlist_name(struct playlist_info* playlist, char *buf, int buf_size);
+char *playlist_get_name(struct playlist_info* playlist, char *buf,
+                        int buf_size);
+int playlist_get_track_info(struct playlist_info* playlist, int index,
+                            struct playlist_track_info* info);
+int playlist_save(struct playlist_info* playlist, char *filename);
 
 enum {
     PLAYLIST_PREPEND = -1,

@@ -60,7 +60,9 @@
       The only resume info that needs to be saved is the current index in the
       playlist and the position in the track.  When resuming, all the commands
       in the control file will be reapplied so that the playlist indices are
-      exactly the same as before shutdown.
+      exactly the same as before shutdown.  To avoid unnecessary disk
+      accesses, the shuffle mode settings are also saved in settings and only
+      flushed to disk when required.
  */
 
 #include <stdio.h>
@@ -89,8 +91,6 @@
 #endif
 
 #include "lang.h"
-
-static struct playlist_info playlist;
 
 #define PLAYLIST_CONTROL_FILE ROCKBOX_DIR "/.playlist_control"
 #define PLAYLIST_CONTROL_FILE_VERSION 2
@@ -123,70 +123,83 @@ static struct playlist_info playlist;
 
 #define PLAYLIST_DISPLAY_COUNT          10
 
+static struct playlist_info current_playlist;
 static char now_playing[MAX_PATH+1];
 
-static void empty_playlist(bool resume);
-static void update_playlist_filename(char *dir, char *file);
-static int add_indices_to_playlist(void);
-static int add_track_to_playlist(char *filename, int position, bool queue,
+static void empty_playlist(struct playlist_info* playlist, bool resume);
+static void new_playlist(struct playlist_info* playlist, char *dir,
+                         char *file);
+static void create_control(struct playlist_info* playlist);
+static int  check_control(struct playlist_info* playlist);
+static void update_playlist_filename(struct playlist_info* playlist,
+                                     char *dir, char *file);
+static int add_indices_to_playlist(struct playlist_info* playlist,
+                                   char* buffer, int buflen);
+static int add_track_to_playlist(struct playlist_info* playlist,
+                                 char *filename, int position, bool queue,
                                  int seek_pos);
-static int add_directory_to_playlist(char *dirname, int *position, bool queue,
+static int add_directory_to_playlist(struct playlist_info* playlist,
+                                     char *dirname, int *position, bool queue,
                                      int *count, bool recurse);
-static int remove_track_from_playlist(int position, bool write);
-static int randomise_playlist(unsigned int seed, bool start_current,
+static int remove_track_from_playlist(struct playlist_info* playlist,
+                                      int position, bool write);
+static int randomise_playlist(struct playlist_info* playlist,
+                              unsigned int seed, bool start_current,
                               bool write);
-static int sort_playlist(bool start_current, bool write);
-static int get_next_index(int steps);
-static void find_and_set_playlist_index(unsigned int seek);
+static int sort_playlist(struct playlist_info* playlist, bool start_current,
+                         bool write);
+static int get_next_index(struct playlist_info* playlist, int steps);
+static void find_and_set_playlist_index(struct playlist_info* playlist,
+                                        unsigned int seek);
 static int compare(const void* p1, const void* p2);
-static int get_filename(int seek, bool control_file, char *buf,
-                        int buf_length);
+static int get_filename(struct playlist_info* playlist, int seek,
+                        bool control_file, char *buf, int buf_length);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              char *dir);
 static void display_playlist_count(int count, char *fmt);
 static void display_buffer_full(void);
-static int flush_pending_control(void);
-static int rotate_index(int index);
+static int flush_pending_control(struct playlist_info* playlist);
+static int rotate_index(struct playlist_info* playlist, int index);
 
 /*
  * remove any files and indices associated with the playlist
  */
-static void empty_playlist(bool resume)
+static void empty_playlist(struct playlist_info* playlist, bool resume)
 {
-    playlist.filename[0] = '\0';
+    playlist->filename[0] = '\0';
 
-    if(playlist.fd >= 0)
+    if(playlist->fd >= 0)
         /* If there is an already open playlist, close it. */
-        close(playlist.fd);
-    playlist.fd = -1;
+        close(playlist->fd);
+    playlist->fd = -1;
 
-    if(playlist.control_fd >= 0)
-        close(playlist.control_fd);
-    playlist.control_fd = -1;
+    if(playlist->control_fd >= 0)
+        close(playlist->control_fd);
+    playlist->control_fd = -1;
+    playlist->control_created = false;
 
-    playlist.in_ram = false;
-    playlist.buffer[0] = 0;
-    playlist.buffer_end_pos = 0;
+    playlist->in_ram = false;
 
-    playlist.index = 0;
-    playlist.first_index = 0;
-    playlist.amount = 0;
-    playlist.last_insert_pos = -1;
-    playlist.seed = 0;
-    playlist.shuffle_modified = false;
-    playlist.deleted = false;
-    playlist.num_inserted_tracks = 0;
-    playlist.shuffle_flush = false;
+    if (playlist->buffer)
+        playlist->buffer[0] = 0;
 
-    if (!resume)
+    playlist->buffer_end_pos = 0;
+
+    playlist->index = 0;
+    playlist->first_index = 0;
+    playlist->amount = 0;
+    playlist->last_insert_pos = -1;
+    playlist->seed = 0;
+    playlist->shuffle_modified = false;
+    playlist->deleted = false;
+    playlist->num_inserted_tracks = 0;
+    playlist->shuffle_flush = false;
+
+    if (!resume && playlist->current)
     {
-        int fd;
-
         /* start with fresh playlist control file when starting new
            playlist */
-        fd = creat(PLAYLIST_CONTROL_FILE, 0000200);
-        if (fd >= 0)
-            close(fd);
+        create_control(playlist);
 
         /* Reset resume settings */
         global_settings.resume_first_index = 0;
@@ -195,9 +208,86 @@ static void empty_playlist(bool resume)
 }
 
 /*
+ * Initialize a new playlist for viewing/editing/playing.  dir is the
+ * directory where the playlist is located and file is the filename.
+ */
+static void new_playlist(struct playlist_info* playlist, char *dir,
+                         char *file)
+{
+    empty_playlist(playlist, false);
+
+    if (!file)
+    {
+        file = "";
+
+        if (dir && playlist->current) /* !current cannot be in_ram */
+            playlist->in_ram = true;
+        else
+            dir = ""; /* empty playlist */
+    }
+    
+    update_playlist_filename(playlist, dir, file);
+
+    if (playlist->control_fd >= 0)
+    {
+        if (fprintf(playlist->control_fd, "P:%d:%s:%s\n",
+            PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
+            fsync(playlist->control_fd);
+        else
+            splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+    }
+}
+
+/*
+ * create control file for playlist
+ */
+static void create_control(struct playlist_info* playlist)
+{
+    playlist->control_fd = creat(playlist->control_filename, 0000200);
+    if (playlist->control_fd < 0)
+        splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+    playlist->control_created = true;
+}
+
+/*
+ * validate the control file.  This may include creating/initializing it if
+ * necessary;
+ */
+static int check_control(struct playlist_info* playlist)
+{
+    if (!playlist->control_created)
+    {
+        create_control(playlist);
+
+        if (playlist->control_fd >= 0)
+        {
+            char* dir = playlist->filename;
+            char* file = playlist->filename+playlist->dirlen;
+            char c = playlist->filename[playlist->dirlen-1];
+
+            playlist->filename[playlist->dirlen-1] = '\0';
+
+            if (fprintf(playlist->control_fd, "P:%d:%s:%s\n",
+                PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
+                fsync(playlist->control_fd);
+            else
+                splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+
+            playlist->filename[playlist->dirlen-1] = c;
+        }
+    }
+
+    if (playlist->control_fd < 0)
+        return -1;
+
+    return 0;
+}
+
+/*
  * store directory and name of playlist file
  */
-static void update_playlist_filename(char *dir, char *file)
+static void update_playlist_filename(struct playlist_info* playlist,
+                                     char *dir, char *file)
 {
     char *sep="";
     int dirlen = strlen(dir);
@@ -210,9 +300,9 @@ static void update_playlist_filename(char *dir, char *file)
         dirlen++;
     }
     
-    playlist.dirlen = dirlen;
+    playlist->dirlen = dirlen;
     
-    snprintf(playlist.filename, sizeof(playlist.filename),
+    snprintf(playlist->filename, sizeof(playlist->filename),
         "%s%s%s", 
         dir, sep, file);
 }
@@ -220,19 +310,18 @@ static void update_playlist_filename(char *dir, char *file)
 /*
  * calculate track offsets within a playlist file
  */
-static int add_indices_to_playlist(void)
+static int add_indices_to_playlist(struct playlist_info* playlist,
+                                   char* buffer, int buflen)
 {
     unsigned int nread;
     unsigned int i = 0;
     unsigned int count = 0;
-    int buflen;
     bool store_index;
-    char *buffer;
     unsigned char *p;
 
-    if(-1 == playlist.fd)
-        playlist.fd = open(playlist.filename, O_RDONLY);
-    if(playlist.fd < 0)
+    if(-1 == playlist->fd)
+        playlist->fd = open(playlist->filename, O_RDONLY);
+    if(playlist->fd < 0)
         return -1; /* failure */
     
 #ifdef HAVE_LCD_BITMAP
@@ -244,17 +333,20 @@ static int add_indices_to_playlist(void)
 
     splash(0, true, str(LANG_PLAYLIST_LOAD));
 
-    /* use mp3 buffer for maximum load speed */
-    buflen = (mp3end - mp3buf);
-    buffer = mp3buf;
+    if (!buffer)
+    {
+        /* use mp3 buffer for maximum load speed */
+        mpeg_stop();
 
+        buffer = mp3buf;
+        buflen = (mp3end - mp3buf);        
+    }
+    
     store_index = true;
 
-    mpeg_stop();
-    
     while(1)
     {
-        nread = read(playlist.fd, buffer, buflen);
+        nread = read(playlist->fd, buffer, buflen);
         /* Terminate on EOF */
         if(nread <= 0)
             break;
@@ -275,9 +367,9 @@ static int add_indices_to_playlist(void)
                 if(*p != '#')
                 {
                     /* Store a new entry */
-                    playlist.indices[ playlist.amount ] = i+count;
-                    playlist.amount++;
-                    if ( playlist.amount >= playlist.max_playlist_size ) {
+                    playlist->indices[ playlist->amount ] = i+count;
+                    playlist->amount++;
+                    if ( playlist->amount >= playlist->max_playlist_size ) {
                         display_buffer_full();
                         return -1;
                     }
@@ -302,14 +394,15 @@ static int add_indices_to_playlist(void)
  *                             matter what other tracks have been inserted.
  *     PLAYLIST_INSERT_LAST  - Add track to end of playlist
  */
-static int add_track_to_playlist(char *filename, int position, bool queue,
+static int add_track_to_playlist(struct playlist_info* playlist,
+                                 char *filename, int position, bool queue,
                                  int seek_pos)
 {
     int insert_position = position;
     unsigned int flags = PLAYLIST_INSERT_TYPE_INSERT;
     int i;
 
-    if (playlist.amount >= playlist.max_playlist_size)
+    if (playlist->amount >= playlist->max_playlist_size)
     {
         display_buffer_full();
         return -1;
@@ -318,38 +411,38 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
     switch (position)
     {
         case PLAYLIST_PREPEND:
-            insert_position = playlist.first_index;
+            insert_position = playlist->first_index;
             flags = PLAYLIST_INSERT_TYPE_PREPEND;
             break;
         case PLAYLIST_INSERT:
             /* if there are already inserted tracks then add track to end of
                insertion list else add after current playing track */
-            if (playlist.last_insert_pos >= 0 &&
-                playlist.last_insert_pos < playlist.amount &&
-                (playlist.indices[playlist.last_insert_pos]&
+            if (playlist->last_insert_pos >= 0 &&
+                playlist->last_insert_pos < playlist->amount &&
+                (playlist->indices[playlist->last_insert_pos]&
                     PLAYLIST_INSERT_TYPE_MASK) == PLAYLIST_INSERT_TYPE_INSERT)
-                position = insert_position = playlist.last_insert_pos+1;
-            else if (playlist.amount > 0)
-                position = insert_position = playlist.index + 1;
+                position = insert_position = playlist->last_insert_pos+1;
+            else if (playlist->amount > 0)
+                position = insert_position = playlist->index + 1;
             else
                 position = insert_position = 0;
 
-            playlist.last_insert_pos = position;
+            playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_FIRST:
-            if (playlist.amount > 0)
-                position = insert_position = playlist.index + 1;
+            if (playlist->amount > 0)
+                position = insert_position = playlist->index + 1;
             else
                 position = insert_position = 0;
 
-            if (playlist.last_insert_pos < 0)
-                playlist.last_insert_pos = position;
+            if (playlist->last_insert_pos < 0)
+                playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_LAST:
-            if (playlist.first_index > 0)
-                insert_position = playlist.first_index;
+            if (playlist->first_index > 0)
+                insert_position = playlist->first_index;
             else
-                insert_position = playlist.amount;
+                insert_position = playlist->amount;
 
             flags = PLAYLIST_INSERT_TYPE_APPEND;
             break;
@@ -359,52 +452,52 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
         flags |= PLAYLIST_QUEUED;
 
     /* shift indices so that track can be added */
-    for (i=playlist.amount; i>insert_position; i--)
-        playlist.indices[i] = playlist.indices[i-1];
+    for (i=playlist->amount; i>insert_position; i--)
+        playlist->indices[i] = playlist->indices[i-1];
 
     /* update stored indices if needed */
-    if (playlist.amount > 0 && insert_position <= playlist.index)
-        playlist.index++;
+    if (playlist->amount > 0 && insert_position <= playlist->index)
+        playlist->index++;
 
-    if (playlist.amount > 0 && insert_position <= playlist.first_index &&
+    if (playlist->amount > 0 && insert_position <= playlist->first_index &&
         position != PLAYLIST_PREPEND)
     {
-        playlist.first_index++;
+        playlist->first_index++;
 
-        if (seek_pos < 0)
+        if (seek_pos < 0 && playlist->current)
         {
-            global_settings.resume_first_index = playlist.first_index;
+            global_settings.resume_first_index = playlist->first_index;
             settings_save();
         }
     }
 
-    if (insert_position < playlist.last_insert_pos ||
-        (insert_position == playlist.last_insert_pos && position < 0))
-        playlist.last_insert_pos++;
+    if (insert_position < playlist->last_insert_pos ||
+        (insert_position == playlist->last_insert_pos && position < 0))
+        playlist->last_insert_pos++;
 
-    if (seek_pos < 0 && playlist.control_fd >= 0)
+    if (seek_pos < 0 && playlist->control_fd >= 0)
     {
         int result = -1;
 
-        if (flush_pending_control() < 0)
+        if (flush_pending_control(playlist) < 0)
             return -1;
 
-        mutex_lock(&playlist.control_mutex);
+        mutex_lock(&playlist->control_mutex);
 
-        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
+        if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
-            if (fprintf(playlist.control_fd, "%c:%d:%d:", (queue?'Q':'A'),
-                    position, playlist.last_insert_pos) > 0)
+            if (fprintf(playlist->control_fd, "%c:%d:%d:", (queue?'Q':'A'),
+                    position, playlist->last_insert_pos) > 0)
             {
                 /* save the position in file where track name is written */
-                seek_pos = lseek(playlist.control_fd, 0, SEEK_CUR);
+                seek_pos = lseek(playlist->control_fd, 0, SEEK_CUR);
 
-                if (fprintf(playlist.control_fd, "%s\n", filename) > 0)
+                if (fprintf(playlist->control_fd, "%s\n", filename) > 0)
                     result = 0;
             }
         }
 
-        mutex_unlock(&playlist.control_mutex);
+        mutex_unlock(&playlist->control_mutex);
 
         if (result < 0)
         {
@@ -413,10 +506,10 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
         }
     }
 
-    playlist.indices[insert_position] = flags | seek_pos;
+    playlist->indices[insert_position] = flags | seek_pos;
 
-    playlist.amount++;
-    playlist.num_inserted_tracks++;
+    playlist->amount++;
+    playlist->num_inserted_tracks++;
 
     return insert_position;
 }
@@ -424,7 +517,8 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
 /*
  * Insert directory into playlist.  May be called recursively.
  */
-static int add_directory_to_playlist(char *dirname, int *position, bool queue,
+static int add_directory_to_playlist(struct playlist_info* playlist,
+                                     char *dirname, int *position, bool queue,
                                      int *count, bool recurse)
 {
     char buf[MAX_PATH+1];
@@ -474,8 +568,8 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
             {
                 /* recursively add directories */
                 snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
-                result = add_directory_to_playlist(buf, position, queue,
-                    count, recurse);
+                result = add_directory_to_playlist(playlist, buf, position,
+                    queue, count, recurse);
                 if (result < 0)
                     break;
 
@@ -497,7 +591,8 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
 
             snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
             
-            insert_pos = add_track_to_playlist(buf, *position, queue, -1);
+            insert_pos = add_track_to_playlist(playlist, buf, *position,
+                queue, -1);
             if (insert_pos < 0)
             {
                 result = -1;
@@ -530,64 +625,65 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
 /*
  * remove track at specified position
  */
-static int remove_track_from_playlist(int position, bool write)
+static int remove_track_from_playlist(struct playlist_info* playlist,
+                                      int position, bool write)
 {
     int i;
     bool inserted;
 
-    if (playlist.amount <= 0)
+    if (playlist->amount <= 0)
         return -1;
 
-    inserted = playlist.indices[position] & PLAYLIST_INSERT_TYPE_MASK;
+    inserted = playlist->indices[position] & PLAYLIST_INSERT_TYPE_MASK;
 
     /* shift indices now that track has been removed */
-    for (i=position; i<playlist.amount; i++)
-        playlist.indices[i] = playlist.indices[i+1];
+    for (i=position; i<playlist->amount; i++)
+        playlist->indices[i] = playlist->indices[i+1];
 
-    playlist.amount--;
+    playlist->amount--;
 
     if (inserted)
-        playlist.num_inserted_tracks--;
+        playlist->num_inserted_tracks--;
     else
-        playlist.deleted = true;
+        playlist->deleted = true;
 
     /* update stored indices if needed */
-    if (position < playlist.index)
-        playlist.index--;
+    if (position < playlist->index)
+        playlist->index--;
 
-    if (position < playlist.first_index)
+    if (position < playlist->first_index)
     {
-        playlist.first_index--;
+        playlist->first_index--;
 
         if (write)
         {
-            global_settings.resume_first_index = playlist.first_index;
+            global_settings.resume_first_index = playlist->first_index;
             settings_save();
         }
     }
 
-    if (position <= playlist.last_insert_pos)
-        playlist.last_insert_pos--;
+    if (position <= playlist->last_insert_pos)
+        playlist->last_insert_pos--;
 
-    if (write && playlist.control_fd >= 0)
+    if (write && playlist->control_fd >= 0)
     {
         int result = -1;
 
-        if (flush_pending_control() < 0)
+        if (flush_pending_control(playlist) < 0)
             return -1;
 
-        mutex_lock(&playlist.control_mutex);
+        mutex_lock(&playlist->control_mutex);
 
-        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
+        if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
-            if (fprintf(playlist.control_fd, "D:%d\n", position) > 0)
+            if (fprintf(playlist->control_fd, "D:%d\n", position) > 0)
             {
-                fsync(playlist.control_fd);
+                fsync(playlist->control_fd);
                 result = 0;
             }
         }
 
-        mutex_unlock(&playlist.control_mutex);
+        mutex_unlock(&playlist->control_mutex);
 
         if (result < 0)
         {
@@ -603,12 +699,14 @@ static int remove_track_from_playlist(int position, bool write)
  * randomly rearrange the array of indices for the playlist.  If start_current
  * is true then update the index to the new index of the current playing track
  */
-static int randomise_playlist(unsigned int seed, bool start_current, bool write)
+static int randomise_playlist(struct playlist_info* playlist,
+                              unsigned int seed, bool start_current,
+                              bool write)
 {
     int count;
     int candidate;
     int store;
-    unsigned int current = playlist.indices[playlist.index];
+    unsigned int current = playlist->indices[playlist->index];
     
     /* seed 0 is used to identify sorted playlist for resume purposes */
     if (seed == 0)
@@ -618,32 +716,32 @@ static int randomise_playlist(unsigned int seed, bool start_current, bool write)
     srand(seed);
 
     /* randomise entire indices list */
-    for(count = playlist.amount - 1; count >= 0; count--)
+    for(count = playlist->amount - 1; count >= 0; count--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
         candidate = rand() % (count + 1);
 
         /* now swap the values at the 'count' and 'candidate' positions */
-        store = playlist.indices[candidate];
-        playlist.indices[candidate] = playlist.indices[count];
-        playlist.indices[count] = store;
+        store = playlist->indices[candidate];
+        playlist->indices[candidate] = playlist->indices[count];
+        playlist->indices[count] = store;
     }
 
     if (start_current)
-        find_and_set_playlist_index(current);
+        find_and_set_playlist_index(playlist, current);
 
     /* indices have been moved so last insert position is no longer valid */
-    playlist.last_insert_pos = -1;
+    playlist->last_insert_pos = -1;
 
-    playlist.seed = seed;
-    if (playlist.num_inserted_tracks > 0 || playlist.deleted)
-        playlist.shuffle_modified = true;
+    playlist->seed = seed;
+    if (playlist->num_inserted_tracks > 0 || playlist->deleted)
+        playlist->shuffle_modified = true;
 
     if (write)
     {
         /* Don't write to disk immediately.  Instead, save in settings and
            only flush if playlist is modified (insertion/deletion) */
-        playlist.shuffle_flush = true;
+        playlist->shuffle_flush = true;
         global_settings.resume_seed = seed;
         settings_save();
     }
@@ -655,27 +753,28 @@ static int randomise_playlist(unsigned int seed, bool start_current, bool write)
  * Sort the array of indices for the playlist. If start_current is true then
  * set the index to the new index of the current song.
  */
-static int sort_playlist(bool start_current, bool write)
+static int sort_playlist(struct playlist_info* playlist, bool start_current,
+                         bool write)
 {
-    unsigned int current = playlist.indices[playlist.index];
+    unsigned int current = playlist->indices[playlist->index];
 
-    if (playlist.amount > 0)
-        qsort(playlist.indices, playlist.amount, sizeof(playlist.indices[0]),
+    if (playlist->amount > 0)
+        qsort(playlist->indices, playlist->amount, sizeof(playlist->indices[0]),
             compare);
 
     if (start_current)
-        find_and_set_playlist_index(current);
+        find_and_set_playlist_index(playlist, current);
 
     /* indices have been moved so last insert position is no longer valid */
-    playlist.last_insert_pos = -1;
+    playlist->last_insert_pos = -1;
 
-    if (!playlist.num_inserted_tracks && !playlist.deleted)
-        playlist.shuffle_modified = false;
-    if (write && playlist.control_fd >= 0)
+    if (!playlist->num_inserted_tracks && !playlist->deleted)
+        playlist->shuffle_modified = false;
+    if (write && playlist->control_fd >= 0)
     {
         /* Don't write to disk immediately.  Instead, save in settings and
            only flush if playlist is modified (insertion/deletion) */
-        playlist.shuffle_flush = true;
+        playlist->shuffle_flush = true;
         global_settings.resume_seed = 0;
         settings_save();
     }
@@ -687,26 +786,26 @@ static int sort_playlist(bool start_current, bool write)
  * returns the index of the track that is "steps" away from current playing
  * track.
  */
-static int get_next_index(int steps)
+static int get_next_index(struct playlist_info* playlist, int steps)
 {
-    int current_index = playlist.index;
+    int current_index = playlist->index;
     int next_index    = -1;
 
-    if (playlist.amount <= 0)
+    if (playlist->amount <= 0)
         return -1;
 
     switch (global_settings.repeat_mode)
     {
         case REPEAT_OFF:
         {
-            current_index = rotate_index(current_index);
+            current_index = rotate_index(playlist, current_index);
             
             next_index = current_index+steps;
-            if ((next_index < 0) || (next_index >= playlist.amount))
+            if ((next_index < 0) || (next_index >= playlist->amount))
                 next_index = -1;
             else
-                next_index = (next_index+playlist.first_index) %
-                    playlist.amount;
+                next_index = (next_index+playlist->first_index) %
+                    playlist->amount;
 
             break;
         }
@@ -718,11 +817,11 @@ static int get_next_index(int steps)
         case REPEAT_ALL:
         default:
         {
-            next_index = (current_index+steps) % playlist.amount;
+            next_index = (current_index+steps) % playlist->amount;
             while (next_index < 0)
-                next_index += playlist.amount;
+                next_index += playlist->amount;
 
-            if (steps >= playlist.amount)
+            if (steps >= playlist->amount)
             {
                 int i, index;
 
@@ -730,10 +829,10 @@ static int get_next_index(int steps)
                 next_index = -1;
 
                 /* second time around so skip the queued files */
-                for (i=0; i<playlist.amount; i++)
+                for (i=0; i<playlist->amount; i++)
                 {
-                    if (playlist.indices[index] & PLAYLIST_QUEUE_MASK)
-                        index = (index+1) % playlist.amount;
+                    if (playlist->indices[index] & PLAYLIST_QUEUE_MASK)
+                        index = (index+1) % playlist->amount;
                     else
                     {
                         next_index = index;
@@ -752,18 +851,24 @@ static int get_next_index(int steps)
  * Search for the seek track and set appropriate indices.  Used after shuffle
  * to make sure the current index is still pointing to correct track.
  */
-static void find_and_set_playlist_index(unsigned int seek)
+static void find_and_set_playlist_index(struct playlist_info* playlist,
+                                        unsigned int seek)
 {
     int i;
     
     /* Set the index to the current song */
-    for (i=0; i<playlist.amount; i++)
+    for (i=0; i<playlist->amount; i++)
     {
-        if (playlist.indices[i] == seek)
+        if (playlist->indices[i] == seek)
         {
-            playlist.index = global_settings.resume_first_index =
-                playlist.first_index = i;
-            settings_save();
+            playlist->index = playlist->first_index = i;
+
+            if (playlist->current)
+            {
+                global_settings.resume_first_index = i;
+                settings_save();
+            }
+
             break;
         }
     }
@@ -799,8 +904,8 @@ static int compare(const void* p1, const void* p2)
 /*
  * gets pathname for track at seek index
  */
-static int get_filename(int seek, bool control_file, char *buf,
-                        int buf_length)
+static int get_filename(struct playlist_info* playlist, int seek,
+                        bool control_file, char *buf, int buf_length)
 {
     int fd;
     int max = -1;
@@ -810,34 +915,34 @@ static int get_filename(int seek, bool control_file, char *buf,
     if (buf_length > MAX_PATH+1)
         buf_length = MAX_PATH+1;
 
-    if (playlist.in_ram && !control_file)
+    if (playlist->in_ram && !control_file)
     {
-        strncpy(tmp_buf, &playlist.buffer[seek], sizeof(tmp_buf));
+        strncpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
         tmp_buf[MAX_PATH] = '\0';
         max = strlen(tmp_buf) + 1;
     }
     else
     {
         if (control_file)
-            fd = playlist.control_fd;
+            fd = playlist->control_fd;
         else
         {
-            if(-1 == playlist.fd)
-                playlist.fd = open(playlist.filename, O_RDONLY);
+            if(-1 == playlist->fd)
+                playlist->fd = open(playlist->filename, O_RDONLY);
             
-            fd = playlist.fd;
+            fd = playlist->fd;
         }
         
         if(-1 != fd)
         {
             if (control_file)
-                mutex_lock(&playlist.control_mutex);
+                mutex_lock(&playlist->control_mutex);
             
             lseek(fd, seek, SEEK_SET);
             max = read(fd, tmp_buf, buf_length);
             
             if (control_file)
-                mutex_unlock(&playlist.control_mutex);            
+                mutex_unlock(&playlist->control_mutex);            
         }
 
         if (max < 0)
@@ -852,8 +957,8 @@ static int get_filename(int seek, bool control_file, char *buf,
         }
     }
 
-    strncpy(dir_buf, playlist.filename, playlist.dirlen-1);
-    dir_buf[playlist.dirlen-1] = 0;
+    strncpy(dir_buf, playlist->filename, playlist->dirlen-1);
+    dir_buf[playlist->dirlen-1] = 0;
 
     return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
 }
@@ -964,29 +1069,29 @@ static void display_buffer_full(void)
  * Flush any pending control commands to disk.  Called when playlist is being
  * modified.  Returns 0 on success and -1 on failure.
  */
-static int flush_pending_control(void)
+static int flush_pending_control(struct playlist_info* playlist)
 {
     int result = 0;
         
-    if (playlist.shuffle_flush && global_settings.resume_seed >= 0)
+    if (playlist->shuffle_flush && global_settings.resume_seed >= 0)
     {
         /* pending shuffle */
-        mutex_lock(&playlist.control_mutex);
+        mutex_lock(&playlist->control_mutex);
         
-        if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
+        if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
         {
             if (global_settings.resume_seed == 0)
-                result = fprintf(playlist.control_fd, "U:%d\n",
-                    playlist.first_index);
+                result = fprintf(playlist->control_fd, "U:%d\n",
+                    playlist->first_index);
             else
-                result = fprintf(playlist.control_fd, "S:%d:%d\n",
-                    global_settings.resume_seed, playlist.first_index);
+                result = fprintf(playlist->control_fd, "S:%d:%d\n",
+                    global_settings.resume_seed, playlist->first_index);
 
             if (result > 0)
             {
-                fsync(playlist.control_fd);
+                fsync(playlist->control_fd);
 
-                playlist.shuffle_flush = false;
+                playlist->shuffle_flush = false;
                 global_settings.resume_seed = -1;
                 settings_save();
 
@@ -998,7 +1103,7 @@ static int flush_pending_control(void)
         else
             result = -1;
         
-        mutex_unlock(&playlist.control_mutex);
+        mutex_unlock(&playlist->control_mutex);
         
         if (result < 0)
         {
@@ -1013,11 +1118,11 @@ static int flush_pending_control(void)
 /*
  * Rotate indices such that first_index is index 0
  */
-static int rotate_index(int index)
+static int rotate_index(struct playlist_info* playlist, int index)
 {
-    index -= playlist.first_index;
+    index -= playlist->first_index;
     if (index < 0)
-        index += playlist.amount;
+        index += playlist->amount;
 
     return index;
 }
@@ -1027,15 +1132,20 @@ static int rotate_index(int index)
  */
 void playlist_init(void)
 {
-    playlist.fd = -1;
-    playlist.control_fd = -1;
-    playlist.max_playlist_size = global_settings.max_files_in_playlist;
-    playlist.indices = buffer_alloc(playlist.max_playlist_size * sizeof(int));
-    playlist.buffer_size =
+    struct playlist_info* playlist = &current_playlist;
+
+    playlist->current = true;
+    snprintf(playlist->control_filename, sizeof(playlist->control_filename),
+        "%s", PLAYLIST_CONTROL_FILE);
+    playlist->fd = -1;
+    playlist->control_fd = -1;
+    playlist->max_playlist_size = global_settings.max_files_in_playlist;
+    playlist->indices = buffer_alloc(playlist->max_playlist_size * sizeof(int));
+    playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
-    playlist.buffer = buffer_alloc(playlist.buffer_size);
-    mutex_init(&playlist.control_mutex);
-    empty_playlist(true);
+    playlist->buffer = buffer_alloc(playlist->buffer_size);
+    mutex_init(&playlist->control_mutex);
+    empty_playlist(playlist, true);
 }
 
 /*
@@ -1043,36 +1153,13 @@ void playlist_init(void)
  */
 int playlist_create(char *dir, char *file)
 {
-    empty_playlist(false);
+    struct playlist_info* playlist = &current_playlist;
 
-    playlist.control_fd = open(PLAYLIST_CONTROL_FILE, O_RDWR);
-    if (playlist.control_fd < 0)
-        splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+    new_playlist(playlist, dir, file);
 
-    if (!file)
-    {
-        file = "";
-
-        if (dir)
-            playlist.in_ram = true;
-        else
-            dir = ""; /* empty playlist */
-    }
-    
-    update_playlist_filename(dir, file);
-
-    if (playlist.control_fd >= 0)
-    {
-        if (fprintf(playlist.control_fd, "P:%d:%s:%s\n",
-            PLAYLIST_CONTROL_FILE_VERSION, dir, file) > 0)
-            fsync(playlist.control_fd);
-        else
-            splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-    }
-
-    /* load the playlist file */
-    if (file[0] != '\0')
-        add_indices_to_playlist();
+    if (file)
+        /* load the playlist file */
+        add_indices_to_playlist(playlist, NULL, 0);
 
     return 0;
 }
@@ -1085,6 +1172,7 @@ int playlist_create(char *dir, char *file)
  */
 int playlist_resume(void)
 {
+    struct playlist_info* playlist = &current_playlist;
     char *buffer;
     int buflen;
     int nread;
@@ -1107,17 +1195,18 @@ int playlist_resume(void)
     buflen = (mp3end - mp3buf);
     buffer = mp3buf;
 
-    empty_playlist(true);
+    empty_playlist(playlist, true);
 
-    playlist.control_fd = open(PLAYLIST_CONTROL_FILE, O_RDWR);
-    if (playlist.control_fd < 0)
+    playlist->control_fd = open(playlist->control_filename, O_RDWR);
+    if (playlist->control_fd < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
+    playlist->control_created = true;
 
     /* read a small amount first to get the header */
-    nread = read(playlist.control_fd, buffer,
+    nread = read(playlist->control_fd, buffer,
         PLAYLIST_COMMAND_SIZE<buflen?PLAYLIST_COMMAND_SIZE:buflen);
     if(nread <= 0)
     {
@@ -1174,18 +1263,18 @@ int playlist_resume(void)
                         if (version != PLAYLIST_CONTROL_FILE_VERSION)
                             return -1;
                         
-                        update_playlist_filename(str2, str3);
+                        update_playlist_filename(playlist, str2, str3);
                         
                         if (str3[0] != '\0')
                         {
                             /* NOTE: add_indices_to_playlist() overwrites the
                                mp3buf so we need to reload control file
                                data */
-                            add_indices_to_playlist();
+                            add_indices_to_playlist(playlist, NULL, 0);
                         }
                         else if (str2[0] != '\0')
                         {
-                            playlist.in_ram = true;
+                            playlist->in_ram = true;
                             resume_directory(str2);
                         }
                         
@@ -1216,11 +1305,11 @@ int playlist_resume(void)
                         
                         /* seek position is based on str3's position in
                            buffer */
-                        if (add_track_to_playlist(str3, position, queue,
-                            total_read+(str3-buffer)) < 0)
+                        if (add_track_to_playlist(playlist, str3, position,
+                                queue, total_read+(str3-buffer)) < 0)
                             return -1;
                         
-                        playlist.last_insert_pos = last_position;
+                        playlist->last_insert_pos = last_position;
 
                         break;
                     }
@@ -1238,8 +1327,8 @@ int playlist_resume(void)
                         
                         position = atoi(str1);
                         
-                        if (remove_track_from_playlist(position,
-                            false) < 0)
+                        if (remove_track_from_playlist(playlist, position,
+                                false) < 0)
                             return -1;
 
                         break;
@@ -1259,13 +1348,14 @@ int playlist_resume(void)
                         if (!sorted)
                         {
                             /* Always sort list before shuffling */
-                            sort_playlist(false, false);
+                            sort_playlist(playlist, false, false);
                         }
 
                         seed = atoi(str1);
-                        playlist.first_index = atoi(str2);
+                        playlist->first_index = atoi(str2);
                         
-                        if (randomise_playlist(seed, false, false) < 0)
+                        if (randomise_playlist(playlist, seed, false,
+                                false) < 0)
                             return -1;
 
                         sorted = false;
@@ -1281,9 +1371,9 @@ int playlist_resume(void)
                             break;
                         }
                         
-                        playlist.first_index = atoi(str1);
+                        playlist->first_index = atoi(str1);
                         
-                        if (sort_playlist(false, false) < 0)
+                        if (sort_playlist(playlist, false, false) < 0)
                             return -1;
 
                         sorted = true;
@@ -1291,7 +1381,7 @@ int playlist_resume(void)
                     }
                     case resume_reset:
                     {
-                        playlist.last_insert_pos = -1;
+                        playlist->last_insert_pos = -1;
                         break;
                     }
                     case resume_comment:
@@ -1407,17 +1497,17 @@ int playlist_resume(void)
                NOTE: because of this, control file must always end with a
                      newline */
             count = last_newline;
-            lseek(playlist.control_fd, total_read+count, SEEK_SET);
+            lseek(playlist->control_fd, total_read+count, SEEK_SET);
         }
 
         total_read += count;
 
         if (first)
             /* still looking for header */
-            nread = read(playlist.control_fd, buffer,
+            nread = read(playlist->control_fd, buffer,
                 PLAYLIST_COMMAND_SIZE<buflen?PLAYLIST_COMMAND_SIZE:buflen);
         else
-            nread = read(playlist.control_fd, buffer, buflen);
+            nread = read(playlist->control_fd, buffer, buflen);
 
         /* Terminate on EOF */
         if(nread <= 0)
@@ -1426,17 +1516,17 @@ int playlist_resume(void)
             {
                 /* Apply shuffle command saved in settings */
                 if (global_settings.resume_seed == 0)
-                    sort_playlist(false, true);
+                    sort_playlist(playlist, false, true);
                 else
                 {
                     if (!sorted)
-                        sort_playlist(false, false);
+                        sort_playlist(playlist, false, false);
 
-                    randomise_playlist(global_settings.resume_seed, false,
-                        true);
+                    randomise_playlist(playlist, global_settings.resume_seed,
+                        false, true);
                 }
 
-                playlist.first_index = global_settings.resume_first_index;
+                playlist->first_index = global_settings.resume_first_index;
             }
 
             break;
@@ -1451,43 +1541,364 @@ int playlist_resume(void)
  */
 int playlist_add(char *filename)
 {
+    struct playlist_info* playlist = &current_playlist;
     int len = strlen(filename);
     
-    if((len+1 > playlist.buffer_size - playlist.buffer_end_pos) || 
-       (playlist.amount >= playlist.max_playlist_size))
+    if((len+1 > playlist->buffer_size - playlist->buffer_end_pos) || 
+       (playlist->amount >= playlist->max_playlist_size))
     {
         display_buffer_full();
         return -1;
     }
 
-    playlist.indices[playlist.amount++] = playlist.buffer_end_pos;
+    playlist->indices[playlist->amount++] = playlist->buffer_end_pos;
 
-    strcpy(&playlist.buffer[playlist.buffer_end_pos], filename);
-    playlist.buffer_end_pos += len;
-    playlist.buffer[playlist.buffer_end_pos++] = '\0';
+    strcpy(&playlist->buffer[playlist->buffer_end_pos], filename);
+    playlist->buffer_end_pos += len;
+    playlist->buffer[playlist->buffer_end_pos++] = '\0';
 
     return 0;
+}
+
+/* shuffle newly created playlist using random seed. */
+int playlist_shuffle(int random_seed, int start_index)
+{
+    struct playlist_info* playlist = &current_playlist;
+
+    unsigned int seek_pos = 0;
+    bool start_current = false;
+
+    if (start_index >= 0 && global_settings.play_selected)
+    {
+        /* store the seek position before the shuffle */
+        seek_pos = playlist->indices[start_index];        
+        playlist->index = global_settings.resume_first_index =
+            playlist->first_index = start_index;
+        start_current = true;
+    }
+
+    splash(0, true, str(LANG_PLAYLIST_SHUFFLE));
+    
+    randomise_playlist(playlist, random_seed, start_current, true);
+
+    /* Flush shuffle command to disk */
+    flush_pending_control(playlist);
+
+    return playlist->index;
+}
+
+/* start playing current playlist at specified index/offset */
+int playlist_start(int start_index, int offset)
+{
+    struct playlist_info* playlist = &current_playlist;
+
+    playlist->index = start_index;
+    mpeg_play(offset);
+
+    return 0;
+}
+
+/* Returns false if 'steps' is out of bounds, else true */
+bool playlist_check(int steps)
+{
+    struct playlist_info* playlist = &current_playlist;
+    int index = get_next_index(playlist, steps);
+    return (index >= 0);
+}
+
+/* get trackname of track that is "steps" away from current playing track.
+   NULL is used to identify end of playlist */
+char* playlist_peek(int steps)
+{
+    struct playlist_info* playlist = &current_playlist;
+    int seek;
+    int fd;
+    char *temp_ptr;
+    int index;
+    bool control_file;
+
+    index = get_next_index(playlist, steps);
+    if (index < 0)
+        return NULL;
+
+    control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+    seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
+
+    if (get_filename(playlist, seek, control_file, now_playing,
+            MAX_PATH+1) < 0)
+        return NULL;
+
+    temp_ptr = now_playing;
+
+    if (!playlist->in_ram || control_file)
+    {
+        /* remove bogus dirs from beginning of path
+           (workaround for buggy playlist creation tools) */
+        while (temp_ptr)
+        {
+            fd = open(temp_ptr, O_RDONLY);
+            if (fd >= 0)
+            {
+                close(fd);
+                break;
+            }
+            
+            temp_ptr = strchr(temp_ptr+1, '/');
+        }
+        
+        if (!temp_ptr)
+        {
+            /* Even though this is an invalid file, we still need to pass a
+               file name to the caller because NULL is used to indicate end
+               of playlist */
+            return now_playing;
+        }
+    }
+
+    return temp_ptr;
+}
+
+/*
+ * Update indices as track has changed
+ */
+int playlist_next(int steps)
+{
+    struct playlist_info* playlist = &current_playlist;
+    int index;
+
+    if (steps > 0 && global_settings.repeat_mode != REPEAT_ONE)
+    {
+        int i, j;
+
+        /* We need to delete all the queued songs */
+        for (i=0, j=steps; i<j; i++)
+        {
+            index = get_next_index(playlist, i);
+            
+            if (playlist->indices[index] & PLAYLIST_QUEUE_MASK)
+            {
+                remove_track_from_playlist(playlist, index, true);
+                steps--; /* one less track */
+            }
+        }
+    }
+
+    index = get_next_index(playlist, steps);
+    playlist->index = index;
+
+    if (playlist->last_insert_pos >= 0 && steps > 0)
+    {
+        /* check to see if we've gone beyond the last inserted track */
+        int cur = rotate_index(playlist, index);
+        int last_pos = rotate_index(playlist, playlist->last_insert_pos);
+
+        if (cur > last_pos)
+        {
+            /* reset last inserted track */
+            playlist->last_insert_pos = -1;
+
+            if (playlist->control_fd >= 0)
+            {
+                int result = -1;
+
+                mutex_lock(&playlist->control_mutex);
+            
+                if (lseek(playlist->control_fd, 0, SEEK_END) >= 0)
+                {
+                    if (fprintf(playlist->control_fd, "R\n") > 0)
+                    {
+                        fsync(playlist->control_fd);
+                        result = 0;
+                    }
+                }
+
+                mutex_unlock(&playlist->control_mutex);
+
+                if (result < 0)
+                {
+                    splash(HZ*2, true,
+                        str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+                    return result;
+                }
+            }
+        }
+    }
+
+    return index;
+}
+
+/* Get resume info for current playing song.  If return value is -1 then
+   settings shouldn't be saved. */
+int playlist_get_resume_info(int *resume_index)
+{
+    struct playlist_info* playlist = &current_playlist;
+
+    *resume_index = playlist->index;
+
+    return 0;
+}
+
+/* Returns index of current playing track for display purposes.  This value
+   should not be used for resume purposes as it doesn't represent the actual
+   index into the playlist */
+int playlist_get_display_index(void)
+{
+    struct playlist_info* playlist = &current_playlist;
+
+    /* first_index should always be index 0 for display purposes */
+    int index = rotate_index(playlist, playlist->index);
+
+    return (index+1);
+}
+
+/* returns number of tracks in current playlist */
+int playlist_amount(void)
+{
+    return playlist_amount_ex(NULL);
+}
+
+/*
+ * Create a new playlist  If playlist is not NULL then we're loading a
+ * playlist off disk for viewing/editing.  The index_buffer is used to store
+ * playlist indices (required for and only used if !current playlist).  The
+ * temp_buffer (if not NULL) is used as a scratchpad when loading indices.
+ */
+int playlist_create_ex(struct playlist_info* playlist, char* dir, char* file,
+                       void* index_buffer, int index_buffer_size,
+                       void* temp_buffer, int temp_buffer_size)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+    else
+    {
+        /* Initialize playlist structure */
+        int r = rand() % 10;
+        playlist->current = false;
+
+        /* Use random name for control file */
+        snprintf(playlist->control_filename, sizeof(playlist->control_filename),
+            "%s.%d", PLAYLIST_CONTROL_FILE, r);
+        playlist->fd = -1;
+        playlist->control_fd = -1;
+
+        if (index_buffer)
+        {
+            int num_indices = index_buffer_size / sizeof(int);
+
+            if (num_indices > global_settings.max_files_in_playlist)
+                num_indices = global_settings.max_files_in_playlist;
+
+            playlist->max_playlist_size = num_indices;
+            playlist->indices = index_buffer;
+        }
+        else
+        {
+            playlist->max_playlist_size = current_playlist.max_playlist_size;
+            playlist->indices = current_playlist.indices;
+        }
+
+        playlist->buffer_size = 0;
+        playlist->buffer = NULL;
+        mutex_init(&playlist->control_mutex);
+    }
+
+    new_playlist(playlist, dir, file);
+
+    if (file)
+        /* load the playlist file */
+        add_indices_to_playlist(playlist, temp_buffer, temp_buffer_size);
+
+    return 0;
+}
+
+/*
+ * Set the specified playlist as the current.
+ * NOTE: You will get undefined behaviour if something is already playing so
+ *       remember to stop before calling this.  Also, this call will
+ *       effectively close your playlist, making it unusable.
+ */
+int playlist_set_current(struct playlist_info* playlist)
+{
+    if (!playlist || (check_control(playlist) < 0))
+        return -1;
+
+    empty_playlist(&current_playlist, false);
+
+    strncpy(current_playlist.filename, playlist->filename,
+        sizeof(current_playlist.filename));
+
+    current_playlist.fd = playlist->fd;
+
+    close(playlist->control_fd);
+    remove(current_playlist.control_filename);
+    if (rename(playlist->control_filename,
+            current_playlist.control_filename) < 0)
+        return -1;
+    current_playlist.control_fd = open(current_playlist.control_filename,
+        O_RDWR);
+    if (current_playlist.control_fd < 0)
+        return -1;
+    current_playlist.control_created = true;
+
+    current_playlist.dirlen = playlist->dirlen;
+
+    if (playlist->indices && playlist->indices != current_playlist.indices)
+        memcpy(current_playlist.indices, playlist->indices,
+            playlist->max_playlist_size*sizeof(int));
+
+    current_playlist.first_index = playlist->first_index;
+    current_playlist.amount = playlist->amount;
+    current_playlist.last_insert_pos = playlist->last_insert_pos;
+    current_playlist.seed = playlist->seed;
+    current_playlist.shuffle_modified = playlist->shuffle_modified;
+    current_playlist.deleted = playlist->deleted;
+    current_playlist.num_inserted_tracks = playlist->num_inserted_tracks;
+    current_playlist.shuffle_flush = playlist->shuffle_flush;
+    
+    return 0;
+}
+
+/*
+ * Close files and delete control file for non-current playlist.
+ */
+void playlist_close(struct playlist_info* playlist)
+{
+    if (!playlist)
+        return;
+
+    if (playlist->fd >= 0)
+        close(playlist->fd);
+
+    if (playlist->control_fd >= 0)
+        close(playlist->control_fd);
+
+    if (playlist->control_created)
+        remove(playlist->control_filename);
 }
 
 /*
  * Insert track into playlist at specified position (or one of the special
  * positions).  Returns position where track was inserted or -1 if error.
  */
-int playlist_insert_track(char *filename, int position, bool queue)
+int playlist_insert_track(struct playlist_info* playlist, char *filename,
+                          int position, bool queue)
 {
     int result;
     
-    if (playlist.control_fd < 0)
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (check_control(playlist) < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
-    result = add_track_to_playlist(filename, position, queue, -1);
+    result = add_track_to_playlist(playlist, filename, position, queue, -1);
 
     if (result != -1)
     {
-        fsync(playlist.control_fd);
+        fsync(playlist->control_fd);
         mpeg_flush_and_reload_tracks();
     }
 
@@ -1497,14 +1908,17 @@ int playlist_insert_track(char *filename, int position, bool queue)
 /*
  * Insert all tracks from specified directory into playlist.
  */
-int playlist_insert_directory(char *dirname, int position, bool queue,
-                              bool recurse)
+int playlist_insert_directory(struct playlist_info* playlist, char *dirname,
+                              int position, bool queue, bool recurse)
 {
     int count = 0;
     int result;
     char *count_str;
 
-    if (playlist.control_fd < 0)
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (check_control(playlist) < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
@@ -1517,9 +1931,9 @@ int playlist_insert_directory(char *dirname, int position, bool queue,
 
     display_playlist_count(count, count_str);
 
-    result = add_directory_to_playlist(dirname, &position, queue, &count,
-        recurse);
-    fsync(playlist.control_fd);
+    result = add_directory_to_playlist(playlist, dirname, &position, queue,
+        &count, recurse);
+    fsync(playlist->control_fd);
 
     display_playlist_count(count, count_str);
     mpeg_flush_and_reload_tracks();
@@ -1528,9 +1942,10 @@ int playlist_insert_directory(char *dirname, int position, bool queue,
 }
 
 /*
- * Insert all tracks from specified playlist into dynamic playlist
+ * Insert all tracks from specified playlist into dynamic playlist.
  */
-int playlist_insert_playlist(char *filename, int position, bool queue)
+int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
+                             int position, bool queue)
 {
     int fd;
     int max;
@@ -1542,7 +1957,10 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
     int count = 0;
     int result = 0;
 
-    if (playlist.control_fd < 0)
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (check_control(playlist) < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
@@ -1594,8 +2012,8 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
                 break;
             }
             
-            insert_pos = add_track_to_playlist(trackname, position, queue,
-                                               -1);
+            insert_pos = add_track_to_playlist(playlist, trackname, position,
+                queue, -1);
 
             if (insert_pos < 0)
             {
@@ -1624,9 +2042,10 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
     }
 
     close(fd);
-    fsync(playlist.control_fd);
+    fsync(playlist->control_fd);
 
-    *temp_ptr = '/';
+    if (temp_ptr)
+        *temp_ptr = '/';
 
     display_playlist_count(count, count_str);
     mpeg_flush_and_reload_tracks();
@@ -1638,20 +2057,23 @@ int playlist_insert_playlist(char *filename, int position, bool queue)
  * Delete track at specified index.  If index is PLAYLIST_DELETE_CURRENT then
  * we want to delete the current playing track.
  */
-int playlist_delete(int index)
+int playlist_delete(struct playlist_info* playlist, int index)
 {
     int result = 0;
 
-    if (playlist.control_fd < 0)
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (check_control(playlist) < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
     if (index == PLAYLIST_DELETE_CURRENT)
-        index = playlist.index;
+        index = playlist->index;
 
-    result = remove_track_from_playlist(index, true);
+    result = remove_track_from_playlist(playlist, index, true);
     
     if (result != -1)
         mpeg_flush_and_reload_tracks();
@@ -1663,49 +2085,62 @@ int playlist_delete(int index)
  * Move track at index to new_index.  Tracks between the two are shifted
  * appropriately.  Returns 0 on success and -1 on failure.
  */
-int playlist_move(int index, int new_index)
+int playlist_move(struct playlist_info* playlist, int index, int new_index)
 {
     int result;
     int seek;
     bool control_file;
     bool queue;
     bool current = false;
-    int r = rotate_index(new_index);
+    int r;
     char filename[MAX_PATH];
+
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (check_control(playlist) < 0)
+    {
+        splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        return -1;
+    }
 
     if (index == new_index)
         return -1;
 
-    if (index == playlist.index)
+    if (index == playlist->index)
         /* Moving the current track */
         current = true;
 
-    control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
-    queue = playlist.indices[index] & PLAYLIST_QUEUE_MASK;
-    seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
+    control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+    queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
+    seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
 
-    if (get_filename(seek, control_file, filename, sizeof(filename)) < 0)
+    if (get_filename(playlist, seek, control_file, filename,
+            sizeof(filename)) < 0)
         return -1;
 
     /* Delete track from original position */
-    result = remove_track_from_playlist(index, true);
+    result = remove_track_from_playlist(playlist, index, true);
 
     if (result != -1)
     {
         /* We want to insert the track at the position that was specified by
            new_index.  This may be different then new_index because of the
            shifting that occurred after the delete */
+        r = rotate_index(playlist, new_index);
+
         if (r == 0)
             /* First index */
             new_index = PLAYLIST_PREPEND;
-        else if (r == playlist.amount)
+        else if (r == playlist->amount)
             /* Append */
             new_index = PLAYLIST_INSERT_LAST;
         else
             /* Calculate index of desired position */
-            new_index = (r+playlist.first_index)%playlist.amount;
+            new_index = (r+playlist->first_index)%playlist->amount;
 
-        result = add_track_to_playlist(filename, new_index, queue, -1);
+        result = add_track_to_playlist(playlist, filename, new_index, queue,
+            -1);
         
         if (result != -1)
         {
@@ -1715,20 +2150,20 @@ int playlist_move(int index, int new_index)
                 switch (new_index)
                 {
                     case PLAYLIST_PREPEND:
-                        playlist.index = playlist.first_index;
+                        playlist->index = playlist->first_index;
                         break;
                     case PLAYLIST_INSERT_LAST:
-                        playlist.index = playlist.first_index - 1;
-                        if (playlist.index < 0)
-                            playlist.index += playlist.amount;
+                        playlist->index = playlist->first_index - 1;
+                        if (playlist->index < 0)
+                            playlist->index += playlist->amount;
                         break;
                     default:
-                        playlist.index = new_index;
+                        playlist->index = new_index;
                         break;
                 }
             }
 
-            fsync(playlist.control_fd);
+            fsync(playlist->control_fd);
             mpeg_flush_and_reload_tracks();
         }
     }
@@ -1736,35 +2171,18 @@ int playlist_move(int index, int new_index)
     return result;
 }
 
-/* shuffle newly created playlist using random seed. */
-int playlist_shuffle(int random_seed, int start_index)
-{
-    unsigned int seek_pos = 0;
-    bool start_current = false;
-
-    if (start_index >= 0 && global_settings.play_selected)
-    {
-        /* store the seek position before the shuffle */
-        seek_pos = playlist.indices[start_index];        
-        playlist.index = global_settings.resume_first_index =
-            playlist.first_index = start_index;
-        start_current = true;
-    }
-
-    splash(0, true, str(LANG_PLAYLIST_SHUFFLE));
-    
-    randomise_playlist(random_seed, start_current, true);
-
-    /* Flush shuffle command to disk */
-    flush_pending_control();
-
-    return playlist.index;
-}
-
 /* shuffle currently playing playlist */
-int playlist_randomise(unsigned int seed, bool start_current)
+int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
+                       bool start_current)
 {
-    int result = randomise_playlist(seed, start_current, true);
+    int result;
+
+    if (!playlist)
+        playlist = &current_playlist;
+
+    check_control(playlist);
+
+    result = randomise_playlist(playlist, seed, start_current, true);
 
     if (result != -1)
         mpeg_flush_and_reload_tracks();
@@ -1773,9 +2191,16 @@ int playlist_randomise(unsigned int seed, bool start_current)
 }
 
 /* sort currently playing playlist */
-int playlist_sort(bool start_current)
+int playlist_sort(struct playlist_info* playlist, bool start_current)
 {
-    int result = sort_playlist(start_current, true);
+    int result;
+
+    if (!playlist)
+        playlist = &current_playlist;
+
+    check_control(playlist);
+
+    result = sort_playlist(playlist, start_current, true);
 
     if (result != -1)
         mpeg_flush_and_reload_tracks();
@@ -1783,206 +2208,57 @@ int playlist_sort(bool start_current)
     return result;
 }
 
-/* start playing current playlist at specified index/offset */
-int playlist_start(int start_index, int offset)
+/* returns true if playlist has been modified */
+bool playlist_modified(struct playlist_info* playlist)
 {
-    playlist.index = start_index;
-    mpeg_play(offset);
+    if (!playlist)
+        playlist = &current_playlist;
 
-    return 0;
-}
+    if (playlist->shuffle_modified ||
+        playlist->deleted ||
+        playlist->num_inserted_tracks > 0)
+        return true;
 
-/* Returns false if 'steps' is out of bounds, else true */
-bool playlist_check(int steps)
-{
-    int index = get_next_index(steps);
-    return (index >= 0);
-}
-
-/* get trackname of track that is "steps" away from current playing track.
-   NULL is used to identify end of playlist */
-char* playlist_peek(int steps)
-{
-    int seek;
-    int fd;
-    char *temp_ptr;
-    int index;
-    bool control_file;
-
-    index = get_next_index(steps);
-    if (index < 0)
-        return NULL;
-
-    control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
-    seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
-
-    if (get_filename(seek, control_file, now_playing, MAX_PATH+1) < 0)
-        return NULL;
-
-    temp_ptr = now_playing;
-
-    if (!playlist.in_ram || control_file)
-    {
-        /* remove bogus dirs from beginning of path
-           (workaround for buggy playlist creation tools) */
-        while (temp_ptr)
-        {
-            fd = open(temp_ptr, O_RDONLY);
-            if (fd >= 0)
-            {
-                close(fd);
-                break;
-            }
-            
-            temp_ptr = strchr(temp_ptr+1, '/');
-        }
-        
-        if (!temp_ptr)
-        {
-            /* Even though this is an invalid file, we still need to pass a
-               file name to the caller because NULL is used to indicate end
-               of playlist */
-            return now_playing;
-        }
-    }
-
-    return temp_ptr;
-}
-
-/*
- * Update indices as track has changed
- */
-int playlist_next(int steps)
-{
-    int index;
-
-    if (steps > 0 && global_settings.repeat_mode != REPEAT_ONE)
-    {
-        int i, j;
-
-        /* We need to delete all the queued songs */
-        for (i=0, j=steps; i<j; i++)
-        {
-            index = get_next_index(i);
-            
-            if (playlist.indices[index] & PLAYLIST_QUEUE_MASK)
-            {
-                remove_track_from_playlist(index, true);
-                steps--; /* one less track */
-            }
-        }
-    }
-
-    index = get_next_index(steps);
-    playlist.index = index;
-
-    if (playlist.last_insert_pos >= 0 && steps > 0)
-    {
-        /* check to see if we've gone beyond the last inserted track */
-        int cur = rotate_index(index);
-        int last_pos = rotate_index(playlist.last_insert_pos);
-
-        if (cur > last_pos)
-        {
-            /* reset last inserted track */
-            playlist.last_insert_pos = -1;
-
-            if (playlist.control_fd >= 0)
-            {
-                int result = -1;
-
-                mutex_lock(&playlist.control_mutex);
-            
-                if (lseek(playlist.control_fd, 0, SEEK_END) >= 0)
-                {
-                    if (fprintf(playlist.control_fd, "R\n") > 0)
-                    {
-                        fsync(playlist.control_fd);
-                        result = 0;
-                    }
-                }
-
-                mutex_unlock(&playlist.control_mutex);
-
-                if (result < 0)
-                {
-                    splash(HZ*2, true,
-                        str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-                    return result;
-                }
-            }
-        }
-    }
-
-    return index;
-}
-
-bool playlist_modified(void)
-{
-    if ((mpeg_status() & MPEG_STATUS_PLAY))
-    {
-        if (playlist.shuffle_modified ||
-            playlist.deleted ||
-            playlist.num_inserted_tracks > 0)
-            return true;
-    }
     return false;
 }
 
-int playlist_get_seed(void)
-{
-    return playlist.seed;
-}
-
-/* Get resume info for current playing song.  If return value is -1 then
-   settings shouldn't be saved. */
-int playlist_get_resume_info(int *resume_index)
-{
-    *resume_index = playlist.index;
-
-    return 0;
-}
-
-/* Returns index of current playing track for display purposes.  This value
-   should not be used for resume purposes as it doesn't represent the actual
-   index into the playlist */
-int playlist_get_display_index(void)
-{
-    /* first_index should always be index 0 for display purposes */
-    int index = rotate_index(playlist.index);
-
-    return (index+1);
-}
-
 /* returns index of first track in playlist */
-int playlist_get_first_index(void)
+int playlist_get_first_index(struct playlist_info* playlist)
 {
-    return playlist.first_index;
+    if (!playlist)
+        playlist = &current_playlist;
+
+    return playlist->first_index;
 }
 
-char *playlist_get_name(char *buf, int buf_size)
+/* returns shuffle seed of playlist */
+int playlist_get_seed(struct playlist_info* playlist)
 {
-    snprintf(buf, buf_size, "%s", playlist.filename);
+    if (!playlist)
+        playlist = &current_playlist;
 
-    if (!buf[0])
-        return NULL;
-
-    return buf;
+    return playlist->seed;
 }
 
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
-int playlist_amount(void)
+int playlist_amount_ex(struct playlist_info* playlist)
 {
-    return playlist.amount;
+    if (!playlist)
+        playlist = &current_playlist;
+
+    return playlist->amount;
 }
 
-/* returns playlist name */
-char *playlist_name(char *buf, int buf_size)
+/* returns full path of playlist (minus extension) */
+char *playlist_name(struct playlist_info* playlist, char *buf, int buf_size)
 {
     char *sep;
 
-    snprintf(buf, buf_size, "%s", playlist.filename+playlist.dirlen);
+    if (!playlist)
+        playlist = &current_playlist;
 
+    snprintf(buf, buf_size, "%s", playlist->filename+playlist->dirlen);
+  
     if (!buf[0])
         return NULL;
 
@@ -1994,20 +2270,39 @@ char *playlist_name(char *buf, int buf_size)
     return buf;
 }
 
+/* returns the playlist filename */
+char *playlist_get_name(struct playlist_info* playlist, char *buf,
+                        int buf_size)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+
+    snprintf(buf, buf_size, "%s", playlist->filename);
+
+    if (!buf[0])
+        return NULL;
+
+    return buf;
+}
+
 /* Fills info structure with information about track at specified index. 
    Returns 0 on success and -1 on failure */
-int playlist_get_track_info(int index, struct playlist_track_info* info)
+int playlist_get_track_info(struct playlist_info* playlist, int index,
+                            struct playlist_track_info* info)
 {
     int seek;
     bool control_file;
 
-    if (index < 0 || index >= playlist.amount)
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (index < 0 || index >= playlist->amount)
         return -1;
 
-    control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
-    seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
+    control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+    seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
 
-    if (get_filename(seek, control_file, info->filename,
+    if (get_filename(playlist, seek, control_file, info->filename,
             sizeof(info->filename)) < 0)
         return -1;
 
@@ -2015,20 +2310,20 @@ int playlist_get_track_info(int index, struct playlist_track_info* info)
 
     if (control_file)
     {
-        if (playlist.indices[index] & PLAYLIST_QUEUE_MASK)
+        if (playlist->indices[index] & PLAYLIST_QUEUE_MASK)
             info->attr |= PLAYLIST_ATTR_QUEUED;
         else
             info->attr |= PLAYLIST_ATTR_INSERTED;
     }
 
     info->index = index;
-    info->display_index = rotate_index(index) + 1;
+    info->display_index = rotate_index(playlist, index) + 1;
 
     return 0;
 }
 
 /* save the current dynamic playlist to specified file */
-int playlist_save(char *filename)
+int playlist_save(struct playlist_info* playlist, char *filename)
 {
     int fd;
     int i, index;
@@ -2036,13 +2331,10 @@ int playlist_save(char *filename)
     char tmp_buf[MAX_PATH+1];
     int result = 0;
 
-    if (playlist.control_fd < 0)
-    {
-        splash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-        return -1;
-    }
+    if (!playlist)
+        playlist = &current_playlist;
 
-    if (playlist.amount <= 0)
+    if (playlist->amount <= 0)
         return -1;
 
     /* use current working directory as base for pathname */
@@ -2059,8 +2351,8 @@ int playlist_save(char *filename)
 
     display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));
 
-    index = playlist.first_index;
-    for (i=0; i<playlist.amount; i++)
+    index = playlist->first_index;
+    for (i=0; i<playlist->amount; i++)
     {
         bool control_file;
         bool queue;
@@ -2074,14 +2366,15 @@ int playlist_save(char *filename)
 #endif
             break;
 
-        control_file = playlist.indices[index] & PLAYLIST_INSERT_TYPE_MASK;
-        queue = playlist.indices[index] & PLAYLIST_QUEUE_MASK;
-        seek = playlist.indices[index] & PLAYLIST_SEEK_MASK;
+        control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
+        queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
+        seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
 
         /* Don't save queued files */
         if (!queue)
         {
-            if (get_filename(seek, control_file, tmp_buf, MAX_PATH+1) < 0)
+            if (get_filename(playlist, seek, control_file, tmp_buf,
+                    MAX_PATH+1) < 0)
             {
                 result = -1;
                 break;
@@ -2102,7 +2395,7 @@ int playlist_save(char *filename)
             yield();
         }
 
-        index = (index+1)%playlist.amount;
+        index = (index+1)%playlist->amount;
     }
 
     display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));

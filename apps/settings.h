@@ -194,6 +194,11 @@ struct user_settings
     int recursive_dir_insert; /* should directories be inserted recursively */
 
     bool   line_in;       /* false=off, true=active */
+
+    /* playlist viewer settings */
+    bool playlist_viewer_icons; /* display icons on viewer */
+    bool playlist_viewer_indices; /* display playlist indices on viewer */
+    int playlist_viewer_track_display; /* how to display tracks in viewer */
 };
 
 enum optiontype { INT, BOOL };

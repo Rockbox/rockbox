@@ -140,7 +140,7 @@ static bool bookmark_load_menu(void)
         return false;
     else
     {
-        char* name = playlist_get_name(global_temp_buffer,
+        char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
         if (generate_bookmark_file_name(name,
                                         global_bookmark_file_name,
@@ -306,7 +306,7 @@ static bool write_bookmark(bool create_bookmark_file)
     /* writing the bookmark */
     if (create_bookmark_file)
     {
-        char* name = playlist_get_name(global_temp_buffer,
+        char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
         if (generate_bookmark_file_name(name,
                                         global_bookmark_file_name,
@@ -428,12 +428,13 @@ static char* create_bookmark()
              "%d;%d;%d;%d;%d;%d;%d;%s;%s",
              resume_index,
              id3->offset,
-             playlist_get_seed(),
+             playlist_get_seed(NULL),
              0,
              id3->elapsed,
              global_settings.repeat_mode,
              global_settings.playlist_shuffle,
-             playlist_get_name(global_temp_buffer,sizeof(global_temp_buffer)),
+             playlist_get_name(NULL, global_temp_buffer,
+                sizeof(global_temp_buffer)),
              file+1);
 
     /* checking to see if the bookmark is valid */
@@ -1090,7 +1091,7 @@ static bool system_check(void)
         /* something bad happened while getting the queue information */
         return false;
     }
-    else if (playlist_modified())
+    else if (playlist_modified(NULL))
     {
         /* can't bookmark while in the queue */
         return false;

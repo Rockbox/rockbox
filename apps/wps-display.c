@@ -499,7 +499,7 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'n':  /* Playlist Name (without path) */
                     *flags |= WPS_REFRESH_STATIC;
-                    return playlist_name(buf, buf_size);
+                    return playlist_name(NULL, buf, buf_size);
 
                 case 'e':  /* Playlist Total Entries */
                     *flags |= WPS_REFRESH_STATIC;

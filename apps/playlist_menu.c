@@ -39,7 +39,7 @@ static bool save_playlist(void)
 
     if (!kbd_input(filename, sizeof(filename)))
     {
-        playlist_save(filename);
+        playlist_save(NULL, filename);
         
         /* reload in case playlist was saved to cwd */
         reload_directory();

@@ -827,11 +827,11 @@ static bool playback_settings_menu(void)
     {
         if (global_settings.playlist_shuffle)
         {
-            playlist_randomise(current_tick, true);
+            playlist_randomise(NULL, current_tick, true);
         }
         else
         {
-            playlist_sort(true);
+            playlist_sort(NULL, true);
         }
     }
     return result;

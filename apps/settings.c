@@ -146,6 +146,9 @@ Rest of config block, only saved to disk:
       caption backlight (bit 1)
       car adapter mode (bit 2)
       line_in (Player only)  (bit 3)
+      playlist viewer icons (bit 4)
+      playlist viewer indices (bit 5)
+      playlist viewer track display (bit 6)
 0xAF  <most-recent-bookmarks, auto-bookmark, autoload>
 0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
@@ -421,7 +424,10 @@ int settings_save( void )
         ((global_settings.fade_on_stop & 1) |
          ((global_settings.caption_backlight & 1) << 1) |
          ((global_settings.car_adapter_mode  & 1) << 2) |
-         ((global_settings.line_in & 1) << 3));
+         ((global_settings.line_in & 1) << 3) |
+         ((global_settings.playlist_viewer_icons & 1) << 4) |
+         ((global_settings.playlist_viewer_indices & 1) << 5) |
+         ((global_settings.playlist_viewer_track_display & 1) << 6));
     config_block[0xaf] = ((global_settings.usemrb << 5) |
                           (global_settings.autocreatebookmark << 2) |
                           (global_settings.autoloadbookmark));
@@ -726,6 +732,12 @@ void settings_load(void)
             global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
             global_settings.car_adapter_mode  = (config_block[0xae] >> 2) & 1;
             global_settings.line_in = (config_block[0xae] >> 3) & 1;
+            global_settings.playlist_viewer_icons =
+                (config_block[0xae] >> 4) & 1;
+            global_settings.playlist_viewer_indices =
+                (config_block[0xae] >> 5) & 1;
+            global_settings.playlist_viewer_track_display =
+                (config_block[0xae] >> 6) & 1;
         }
 
         if(config_block[0xb0] != 0xff) {
@@ -1161,6 +1173,16 @@ bool settings_load_config(char* file)
             static char* options[] = {"off", "on", "unique only"};
             set_cfg_option(&global_settings.usemrb, value, options, 3);
         }
+        else if (!strcasecmp(name, "playlist viewer icons"))
+            set_cfg_bool(&global_settings.playlist_viewer_icons, value);
+        else if (!strcasecmp(name, "playlist viewer indices"))
+            set_cfg_bool(&global_settings.playlist_viewer_indices, value);
+        else if (!strcasecmp(name, "playlist viewer track display"))
+        {
+            static char* options[] = {"track name", "full path"};
+            set_cfg_option(&global_settings.playlist_viewer_track_display,
+                value, options, 2);
+        }
     }
 
     close(fd);
@@ -1494,6 +1516,19 @@ bool settings_save_config(void)
                 triopt[global_settings.recursive_dir_insert]);
     }
 
+    fprintf(fd, "#\r\n# Playlist viewer\r\n#\r\n");
+    {
+        fprintf(fd, "playlist viewer icons: %s\r\n",
+            boolopt[global_settings.playlist_viewer_icons]);
+        fprintf(fd, "playlist viewer indices: %s\r\n",
+            boolopt[global_settings.playlist_viewer_indices]);
+        {
+            static char* options[] = {"track name", "full path"};
+            fprintf(fd, "playlist viewer track display: %s\r\n",
+                options[global_settings.playlist_viewer_track_display]);
+        }
+    }
+
     close(fd);
 
     lcd_clear_display();
@@ -1596,6 +1631,9 @@ void settings_reset(void) {
     global_settings.show_icons = true;
     global_settings.recursive_dir_insert = RECURSE_OFF;
     global_settings.line_in = false;
+    global_settings.playlist_viewer_icons = true;
+    global_settings.playlist_viewer_indices = true;
+    global_settings.playlist_viewer_track_display = 0;
 }
 
 bool set_bool(char* string, bool* variable )

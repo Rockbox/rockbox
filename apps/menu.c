@@ -44,7 +44,7 @@ struct menu {
     int itemcount;
 };
 
-#define MAX_MENUS 4
+#define MAX_MENUS 5
 
 #ifdef HAVE_LCD_BITMAP
 

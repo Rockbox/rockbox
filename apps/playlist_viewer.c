@@ -28,12 +28,17 @@
 #include "icons.h"
 #include "menu.h"
 #include "plugin.h"
+#include "keyboard.h"
+#include "tree.h"
+#include "onplay.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #endif
 
 #include "lang.h"
+
+#include "playlist_viewer.h"
 
 /* Defines for LCD display purposes.  Taken from tree.c */
 #ifdef HAVE_LCD_BITMAP
@@ -46,7 +51,9 @@
 
     #define MARGIN_X        ((global_settings.scrollbar && \
                              viewer.num_tracks > viewer.num_display_lines ? \
-                             SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH + ICON_WIDTH)
+                             SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH + \
+                             (global_settings.playlist_viewer_icons ? \
+                                ICON_WIDTH : 0))
     #define MARGIN_Y        (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
     #define LINE_X          0
@@ -67,11 +74,15 @@
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
 
+/* Default playlist name for saving */
+#define DEFAULT_PLAYLIST_NAME "/viewer.m3u"
+
 /* Index of track on display line _pos */
 #define INDEX(_pos) (viewer.first_display_index - viewer.first_index + (_pos))
 
 /* Global playlist viewer settings */
 struct playlist_viewer_info {
+    struct playlist_info* playlist; /* playlist being viewed                */
     char *name_buffer;          /* Buffer used to store track names         */
     int buffer_size;            /* Size of name buffer                      */
 
@@ -103,15 +114,19 @@ struct playlist_entry {
 static struct playlist_viewer_info  viewer;
 static struct playlist_entry        tracks[MAX_PLAYLIST_ENTRIES];
 
+/* Used when viewing playlists on disk */
+static struct playlist_info         temp_playlist;
+
 #ifdef HAVE_LCD_BITMAP
 extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #endif
 
-static bool initialize(void);
+static bool initialize(char* filename, bool reload);
 static void load_playlist_entries(int start_index);
 static void load_playlist_entries_r(int end_index);
 static int  load_entry(int index, int pos, char* p, int size);
 static void format_name(char* dest, char* src);
+static void format_line(struct playlist_entry* track, char* str, int len);
 static void display_playlist(void);
 static void update_display_line(int line, bool scroll);
 static void scroll_display(int lines);
@@ -120,17 +135,73 @@ static bool update_playlist(bool force);
 #ifdef BUTTON_ON
 static int  onplay_menu(int index);
 #endif
+static bool viewer_menu(void);
+static bool show_icons(void);
+static bool show_indices(void);
+static bool track_display(void);
+static bool save_playlist(void);
 
-/* Initialize the playlist viewer */
-static bool initialize(void)
+/* Initialize the playlist viewer. */
+static bool initialize(char* filename, bool reload)
 {
-    if (!(mpeg_status() & MPEG_STATUS_PLAY))
+    char* buffer;
+    int buffer_size;
+    bool is_playing = mpeg_status() & MPEG_STATUS_PLAY;
+
+    if (!filename && !is_playing)
         /* Nothing is playing, exit */
         return false;
 
-    viewer.name_buffer = plugin_get_buffer(&viewer.buffer_size);
-    if (!viewer.name_buffer)
+    buffer = plugin_get_buffer(&buffer_size);
+    if (!buffer)
         return false;
+
+    if (!filename)
+        viewer.playlist = NULL;
+    else
+    {
+        /* Viewing playlist on disk */
+        char *dir, *file, *temp_ptr;
+        char *index_buffer = NULL;
+        int  index_buffer_size = 0;
+        
+        viewer.playlist = &temp_playlist;
+
+        /* Separate directory from filename */
+        temp_ptr = strrchr(filename+1,'/');
+        if (temp_ptr)
+        {
+            *temp_ptr = 0;
+            dir = filename;
+            file = temp_ptr + 1;
+        }
+        else
+        {
+            dir = "/";
+            file = filename+1;
+        }
+
+        if (is_playing)
+        {
+            /* Something is playing, use half the plugin buffer for playlist
+               indices */
+            index_buffer_size = buffer_size / 2;
+            index_buffer = buffer;
+        }
+
+        playlist_create_ex(viewer.playlist, dir, file, index_buffer,
+            index_buffer_size, buffer+index_buffer_size,
+            buffer_size-index_buffer_size);
+
+        if (temp_ptr)
+            *temp_ptr = '/';
+
+        buffer += index_buffer_size;
+        buffer_size -= index_buffer_size;
+    }
+
+    viewer.name_buffer = buffer;
+    viewer.buffer_size = buffer_size;
 
 #ifdef HAVE_LCD_BITMAP
     {
@@ -166,12 +237,20 @@ static bool initialize(void)
     viewer.line_height = 1;
 #endif
 
-    viewer.cursor_pos = 0;
     viewer.move_track = -1;
 
-    /* Start displaying at current playing track */
-    viewer.first_display_index = playlist_get_display_index() - 1;
-    update_first_index();
+    if (!reload)
+    {
+        viewer.cursor_pos = 0;
+
+        if (!viewer.playlist)
+            /* Start displaying at current playing track */
+            viewer.first_display_index = playlist_get_display_index() - 1;
+        else
+            viewer.first_display_index = 0;
+
+        update_first_index();
+    }
 
     if (!update_playlist(true))
         return false;
@@ -287,21 +366,19 @@ static int load_entry(int index, int pos, char* p, int size)
     struct playlist_track_info info;
     int len;
     int result = 0;
-    char name[MAX_PATH];
 
     /* Playlist viewer orders songs based on display index.  We need to
        convert to real playlist index to access track */
-    index = (index + playlist_get_first_index()) % viewer.num_tracks;
-    if (playlist_get_track_info(index, &info) < 0)
+    index = (index + playlist_get_first_index(viewer.playlist)) %
+        viewer.num_tracks;
+    if (playlist_get_track_info(viewer.playlist, index, &info) < 0)
         return -1;
     
-    format_name(name, info.filename);
-
-    len = strlen(name) + 1;
+    len = strlen(info.filename) + 1;
     
     if (len <= size)
     {
-        strcpy(p, name);
+        strcpy(p, info.filename);
         
         tracks[pos].name = p;
         tracks[pos].index = info.index;
@@ -319,18 +396,46 @@ static int load_entry(int index, int pos, char* p, int size)
 /* Format trackname for display purposes */
 static void format_name(char* dest, char* src)
 {
-    char* p = strrchr(src, '/');
-    int len;
+    switch (global_settings.playlist_viewer_track_display)
+    {
+        case 0:
+        default:
+        {
+            /* Only display the mp3 filename */
+            char* p = strrchr(src, '/');
+            int len;
+            
+            strcpy(dest, p+1);
+            len = strlen(dest);
+            
+            /* Remove the extension */
+            if (!strcasecmp(&dest[len-4], ".mp3") ||
+                !strcasecmp(&dest[len-4], ".mp2") ||
+                !strcasecmp(&dest[len-4], ".mpa"))
+                dest[len-4] = '\0';
 
-    /* Only display the mp3 filename */
-    strcpy(dest, p+1);
-    len = strlen(dest);
+            break;
+        }
+        case 1:
+            /* Full path */
+            strcpy(dest, src);
+            break;
+    }
+}
 
-    /* Remove the extension */
-    if (!strcasecmp(&dest[len-4], ".mp3") ||
-        !strcasecmp(&dest[len-4], ".mp2") ||
-        !strcasecmp(&dest[len-4], ".mpa"))
-        dest[len-4] = '\0';
+/* Format display line */
+static void format_line(struct playlist_entry* track, char* str, int len)
+{
+    char name[MAX_PATH];
+
+    format_name(name, track->name);
+
+    if (global_settings.playlist_viewer_indices)
+        /* Display playlist index */
+        snprintf(str, len, "%d. %s", track->display_index, name);
+    else
+        snprintf(str, len, "%s", name);
+
 }
 
 /* Display tracks on screen */
@@ -349,41 +454,44 @@ static void display_playlist(void)
 
     for (i=0; i<=num_display_tracks; i++)
     {
-        /* Icons */
-        if (tracks[INDEX(i)].index == viewer.current_playing_track)
+        if (global_settings.playlist_viewer_icons)
         {
-            /* Current playing track */
+            /* Icons */
+            if (tracks[INDEX(i)].index == viewer.current_playing_track)
+            {
+                /* Current playing track */
 #ifdef HAVE_LCD_BITMAP
-            int offset=0;
-            if ( viewer.line_height > 8 )
-                offset = (viewer.line_height - 8) / 2;
-            lcd_bitmap(bitmap_icons_6x8[File], 
-                CURSOR_X * 6 + CURSOR_WIDTH, 
-                MARGIN_Y+(i*viewer.line_height) + offset,
-                6, 8, true);
+                int offset=0;
+                if ( viewer.line_height > 8 )
+                    offset = (viewer.line_height - 8) / 2;
+                lcd_bitmap(bitmap_icons_6x8[File], 
+                    CURSOR_X * 6 + CURSOR_WIDTH, 
+                    MARGIN_Y+(i*viewer.line_height) + offset,
+                    6, 8, true);
 #else
-            lcd_putc(LINE_X-1, i, File);
+                lcd_putc(LINE_X-1, i, File);
 #endif
-        }
-        else if (tracks[INDEX(i)].index == viewer.move_track)
-        {
-            /* Track we are moving */
+            }
+            else if (tracks[INDEX(i)].index == viewer.move_track)
+            {
+                /* Track we are moving */
 #ifdef HAVE_LCD_BITMAP
-            lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
-                MARGIN_Y+(i*viewer.line_height), "M");
+                lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
+                    MARGIN_Y+(i*viewer.line_height), "M");
 #else
-            lcd_putc(LINE_X-1, i, 'M');
+                lcd_putc(LINE_X-1, i, 'M');
 #endif
-        }
-        else if (tracks[INDEX(i)].queued)
-        {
-            /* Queued track */
+            }
+            else if (tracks[INDEX(i)].queued)
+            {
+                /* Queued track */
 #ifdef HAVE_LCD_BITMAP
-            lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
-                MARGIN_Y+(i*viewer.line_height), "Q");
+                lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
+                    MARGIN_Y+(i*viewer.line_height), "Q");
 #else
-            lcd_putc(LINE_X-1, i, 'Q');
+                lcd_putc(LINE_X-1, i, 'Q');
 #endif
+            }
         }
 
         update_display_line(i, false);
@@ -494,10 +602,8 @@ static void update_display_line(int line, bool scroll)
 {
     char str[MAX_PATH + 16];
     
-    snprintf(str, sizeof(str), "%d. %s",
-        tracks[INDEX(line)].display_index,
-        tracks[INDEX(line)].name);
-    
+    format_line(&tracks[INDEX(line)], str, sizeof(str));
+
     if (scroll)
     {
 #ifdef HAVE_LCD_BITMAP
@@ -516,7 +622,7 @@ static void update_display_line(int line, bool scroll)
 static void update_first_index(void)
 {
     /* viewer.num_tracks may be invalid at this point */
-    int num_tracks = playlist_amount();
+    int num_tracks = playlist_amount_ex(viewer.playlist);
 
     if ((num_tracks - viewer.first_display_index) < viewer.num_display_lines)
     {
@@ -535,14 +641,17 @@ static void update_first_index(void)
 /* Update playlist in case something has changed or forced */
 static bool update_playlist(bool force)
 {
-    playlist_get_resume_info(&viewer.current_playing_track);
+    if (!viewer.playlist)
+        playlist_get_resume_info(&viewer.current_playing_track);
+    else
+        viewer.current_playing_track = -1;
         
-    if (force || playlist_amount() != viewer.num_tracks)
+    if (force || playlist_amount_ex(viewer.playlist) != viewer.num_tracks)
     {
         int index;
 
         /* Reload tracks */
-        viewer.num_tracks = playlist_amount();
+        viewer.num_tracks = playlist_amount_ex(viewer.playlist);
         if (viewer.num_tracks < 0)
             return false;
         
@@ -571,14 +680,17 @@ static bool update_playlist(bool force)
    changed. */
 static int onplay_menu(int index)
 {
-    struct menu_items menu[2]; /* increase this if you add entries! */
+    struct menu_items menu[3]; /* increase this if you add entries! */
     int m, i=0, result, ret = 0;
     bool current = (tracks[index].index == viewer.current_playing_track);
 
-    menu[i].desc = str(LANG_DELETE);
+    menu[i].desc = str(LANG_REMOVE);
     i++;
 
     menu[i].desc = str(LANG_MOVE);
+    i++;
+
+    menu[i].desc = str(LANG_FILE_OPTIONS);
     i++;
 
     m = menu_init(menu, i);
@@ -597,7 +709,7 @@ static int onplay_menu(int index)
                 if (current)
                     mpeg_stop();
 
-                playlist_delete(tracks[index].index);
+                playlist_delete(viewer.playlist, tracks[index].index);
 
                 if (current)
                 {
@@ -618,6 +730,17 @@ static int onplay_menu(int index)
                 viewer.move_track = tracks[index].index;
                 ret = 0;
                 break;
+            case 2:
+            {
+                onplay(tracks[index].name, TREE_ATTR_MPA);
+
+                if (!viewer.playlist)
+                    ret = 1;
+                else
+                    ret = 0;
+
+                break;
+            }
         }
     }
 
@@ -627,17 +750,91 @@ static int onplay_menu(int index)
 }
 #endif
 
-/* Main viewer function */
+/* Menu of viewer options.  Invoked via F1(r) or Menu(p). */
+static bool viewer_menu(void)
+{
+    int m;
+    bool result;
+
+    struct menu_items items[] = {
+        { str(LANG_SHOW_ICONS),             show_icons },
+        { str(LANG_SHOW_INDICES),           show_indices },
+        { str(LANG_TRACK_DISPLAY),          track_display },
+        { str(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
+    };
+    
+    m=menu_init( items, sizeof(items) / sizeof(*items) );
+    result = menu_run(m);
+    menu_exit(m);
+
+    settings_save();
+
+    return result;
+}
+
+/* Show icons in viewer? */
+static bool show_icons(void)
+{
+    return set_bool(str(LANG_SHOW_ICONS),
+        &global_settings.playlist_viewer_icons);
+}
+
+/* Show indices of tracks? */
+static bool show_indices(void)
+{
+    return set_bool(str(LANG_SHOW_INDICES),
+        &global_settings.playlist_viewer_indices);
+}
+
+/* How to display a track */
+static bool track_display(void)
+{
+    char* names[] = {
+        str(LANG_DISPLAY_TRACK_NAME_ONLY),
+        str(LANG_DISPLAY_FULL_PATH)
+    };
+    
+    return set_option(str(LANG_TRACK_DISPLAY), 
+        &global_settings.playlist_viewer_track_display, INT, names, 2, NULL);
+}
+
+/* Save playlist to disk */
+static bool save_playlist(void)
+{
+    char filename[MAX_PATH+1];
+
+    strncpy(filename, DEFAULT_PLAYLIST_NAME, sizeof(filename));
+
+    if (!kbd_input(filename, sizeof(filename)))
+    {
+        playlist_save(viewer.playlist, filename);
+        
+        /* reload in case playlist was saved to cwd */
+        reload_directory();
+    }
+
+    return false;
+}
+
+/* View current playlist */
 bool playlist_viewer(void)
 {
+    return playlist_viewer_ex(NULL);
+}
+
+/* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
+   view current playlist. */
+bool playlist_viewer_ex(char* filename)
+{
+    bool ret = false;       /* return value */
     bool exit=false;        /* exit viewer */
     bool update=true;       /* update display */
     bool cursor_on=true;    /* used for flashing cursor */
     int old_cursor_pos;     /* last cursor position */
     int button; 
 
-    if (!initialize())
-        return false;
+    if (!initialize(filename, false))
+        goto exit;
 
     old_cursor_pos = viewer.cursor_pos;
 
@@ -648,7 +845,7 @@ bool playlist_viewer(void)
         /* Timeout so we can determine if play status has changed */
         button = button_get_w_tmo(HZ/2);
 
-        if (!(mpeg_status() & MPEG_STATUS_PLAY))
+        if (!viewer.playlist && !(mpeg_status() & MPEG_STATUS_PLAY))
         {
             /* Play has stopped */
 #ifdef HAVE_LCD_CHARCELLS
@@ -657,7 +854,7 @@ bool playlist_viewer(void)
             splash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
 #endif
             status_set_playmode(STATUS_STOP);
-            return false;;
+            goto exit;
         }
 
         if (viewer.move_track != -1 || !cursor_on)
@@ -685,10 +882,13 @@ bool playlist_viewer(void)
 #endif
         }
 
-        playlist_get_resume_info(&track);
+        if (!viewer.playlist)
+            playlist_get_resume_info(&track);
+        else
+            track = -1;
 
         if (track != viewer.current_playing_track ||
-            playlist_amount() != viewer.num_tracks)
+            playlist_amount_ex(viewer.playlist) != viewer.num_tracks)
         {
             /* Playlist has changed (new track started?) */
             update_first_index();
@@ -769,7 +969,7 @@ bool playlist_viewer(void)
                     /* Move track */
                     int ret;
 
-                    ret = playlist_move(viewer.move_track,
+                    ret = playlist_move(viewer.playlist, viewer.move_track,
                         tracks[INDEX(viewer.cursor_pos)].index);
                     if (ret < 0)
                         splash(HZ, true, str(LANG_MOVE_FAILED));
@@ -777,13 +977,29 @@ bool playlist_viewer(void)
                     update_playlist(true);
                     viewer.move_track = -1;
                 }
-                else
+                else if (!viewer.playlist)
                 {
                     /* Stop current track and play new track */
                     mpeg_stop();
                     playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
                     status_set_playmode(STATUS_PLAY);
                     update_playlist(false);
+                }
+                else
+                {
+                    /* Play track from playlist on disk */
+                    mpeg_stop();
+
+                    /* New playlist */
+                    if (playlist_set_current(viewer.playlist) < 0)
+                        goto exit;
+
+                    playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
+                    status_set_playmode(STATUS_PLAY);
+
+                    /* Our playlist is now the current list */
+                    if (!initialize(NULL, true))
+                        goto exit;
                 }
 
                 display_playlist();
@@ -799,13 +1015,15 @@ bool playlist_viewer(void)
                 ret = onplay_menu(INDEX(viewer.cursor_pos));
 
                 if (ret < 0)
-                    /* USB attached */
-                    return true;
+                {
+                    ret = true;
+                    goto exit;
+                }
                 else if (ret > 0)
                 {
                     /* Playlist changed */
                     update_first_index();
-                    update_playlist(true);
+                    update_playlist(false);
                     if (viewer.num_tracks <= 0)
                         exit = true;
                 }
@@ -816,9 +1034,30 @@ bool playlist_viewer(void)
                 break;
             }
 #endif /* BUTTON_ON */
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1:
+#else
+            case BUTTON_MENU:
+#endif
+                if (viewer_menu())
+                {
+                    ret = true;
+                    goto exit;
+                }
+               
+                display_playlist();
+                update = true;
+                break;
+
             case SYS_USB_CONNECTED:
                 usb_screen();
-                return true;
+                ret = true;
+                goto exit;
+                break;
+
+            case BUTTON_NONE:
+                status_draw(false);
+                break;
         }
 
         if (update && !exit)
@@ -852,5 +1091,8 @@ bool playlist_viewer(void)
         }
     }
 
-    return false;
+exit:
+    if (viewer.playlist)
+        playlist_close(viewer.playlist);
+    return ret;
 }
