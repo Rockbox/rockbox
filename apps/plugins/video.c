@@ -20,18 +20,15 @@
 *
 ****************************************************************************/
 #include "plugin.h"
-#include "system.h"
+#include "../apps/recorder/widgets.h" /* not in search path, booh */
 
 #ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
-#define INT_MAX ((int)(~(unsigned)0 >> 1))
-#define INT_MIN (-INT_MAX-1)
-
 #define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
-#define FILEBUFSIZE SCREENSIZE*4 /* must result in a multiple of 512 */
+#define FILEBUFSIZE (SCREENSIZE*4) /* must result in a multiple of 512 */
 
-#define WIND_STEP 5
+#define WIND_MAX 9
 
 
 /* globals */
@@ -45,7 +42,8 @@ static enum
     exit
 } state = playing;
 
-static int playstep = 1; /* forcurrent speed and direction */
+static int playstep = 1; /* for current speed and direction */
+static int acceleration = 0;
 static long time; /* to calculate the playing time */
 
 
@@ -53,7 +51,7 @@ static long time; /* to calculate the playing time */
 int check_button(void)
 {
     int button;
-    int frame;
+    int frame; /* result: relative frame */
     bool loop;
     
     frame = playstep; /* default */
@@ -79,22 +77,37 @@ int check_button(void)
             if (state == paused)
                 frame = -1; /* single step back */
             else if (state == playing)
-                playstep = -WIND_STEP; /* FR */
+            {
+                acceleration--;
+                playstep = acceleration/4; /* FR */
+                if (playstep > -2)
+                    playstep = -2;
+                if (playstep < -WIND_MAX)
+                    playstep = -WIND_MAX;
+            }
             break;
 
         case BUTTON_RIGHT | BUTTON_REPEAT:
             if (state == paused)
                 frame = 1; /* single step */
             else if (state == playing)
-                playstep = WIND_STEP; /* FF */
+            {
+                acceleration++;
+                playstep = acceleration/4; /* FF */
+                if (playstep < 2)
+                    playstep = 2;
+                if (playstep > WIND_MAX)
+                    playstep = WIND_MAX;
+            }
             break;
 
         case BUTTON_PLAY:
-            if (state == playing && playstep == 1)
+            if (state == playing && (playstep == 1 || playstep == -1))
                 state = paused;
             else if (state == paused)
                 state = playing;
             playstep = 1;
+            acceleration = 0;
             break;
 
         case BUTTON_LEFT:
@@ -102,6 +115,7 @@ int check_button(void)
                 frame = -1; /* single step back */
             else if (state == playing)
                 playstep = -1; /* rewind */
+            acceleration = 0;
             break;
         
         case BUTTON_RIGHT:
@@ -109,15 +123,7 @@ int check_button(void)
                 frame = 1; /* single step */
             else if (state == playing)
                 playstep = 1; /* forward */
-            break;
-
-        case BUTTON_UP:
-            if (state == paused)
-                frame = INT_MAX; /* end of clip */
-            break;
-
-        case BUTTON_DOWN:
-            frame = INT_MIN; /* start of clip */
+            acceleration = 0;
             break;
 
         case BUTTON_OFF:
@@ -168,17 +174,9 @@ int show_buffer(unsigned char* p_start, int frames)
         shown++;
 
         delta = check_button();
-        if (delta == INT_MIN)
-            p_current = p_start;
-        else if (delta == INT_MAX)
-            p_current = p_end - SCREENSIZE;
-        else
-        {
-            p_current += delta * SCREENSIZE;
-            if (p_current >= p_end || p_current < p_start)
-                p_current = p_start; /* wrap */
-        }
-
+        p_current += delta * SCREENSIZE;
+        if (p_current >= p_end || p_current < p_start)
+            p_current = p_start; /* wrap */
     } while(state != stop && state != exit);
 
     return (state != exit) ? shown : -1;
@@ -188,78 +186,118 @@ int show_buffer(unsigned char* p_start, int frames)
 /* play from file, exit if OFF is pressed */
 int show_file(unsigned char* p_buffer, int fd)
 {
+	long tag[FILEBUFSIZE/512]; /* I treat the buffer as direct-mapped cache */
+	long framepos = 0; /* position of frame in file */
+	long filesize = rb->filesize(fd);
+    long filepos = 0; /* my own counting */
     int shown = 0;
-    int delta; /* next frame */
-    /* tricky buffer handling to read only whole sectors, then no copying needed */
-    unsigned char* p_file = p_buffer; /* file read */
-    unsigned char* p_screen = p_buffer; /* display */
-    unsigned char* p_end = p_buffer + FILEBUFSIZE; /* for wraparound test */
-    int needed; /* read how much data to complete a frame */
-    int got_now; /* how many gotten for this frame */
-    int read_now; /* size to read for this frame, 512 or 1024 */
 
-    do
-    {
-        needed = SCREENSIZE - (p_file - p_screen); /* minus what we have */
-        read_now = (needed + (SECTOR_SIZE-1)) & ~(SECTOR_SIZE-1); /* round up to whole sectors */
+	long readfrom;
+    long readto;
+    int read; /* amount read from disk */
+	long frame_offset; /* pos of frame in buffer */
+    long writefrom; /* round down to sector */
+	long sector; /* sector in frame buffer */
+	long pos_aligned, orig_aligned; /* round down to sector */
+    char buf[10];
+    
+    rb->memset(&tag, 0xFF, sizeof(tag)); /* invalidate cache */
 
-        got_now = rb->read(fd, p_file, read_now); /* read the sector(s) */
-        rb->lcd_blit(p_screen, 0, 0, LCD_WIDTH, LCD_HEIGHT/8, LCD_WIDTH);
+	do
+	{
+		/* load the frame into memory */
+		readfrom = readto = -1; /* invalidate */
+		frame_offset = framepos % FILEBUFSIZE; /* pos of frame in buffer */
+        writefrom = frame_offset & ~511; /* round down to sector */
+		sector = frame_offset / 512; /* sector in frame buffer */
+		orig_aligned = pos_aligned = framepos & ~511; /* down to sector */
 
-        p_screen += SCREENSIZE;
-        if (p_screen >= p_end)
-            p_screen = p_buffer; /* wrap */
+		do
+        {
+			if (tag[sector] != pos_aligned) /* in cache? */
+			{   /* not cached */
+                tag[sector] = pos_aligned;
+				if (readfrom == -1) /* not used yet? */
+                {
+					readfrom = pos_aligned; /* set start */
+                    writefrom += pos_aligned - orig_aligned;
+                }
+                readto = pos_aligned; /* set stop */
+			}
+            pos_aligned += 512;
+            sector++;
+        } while (pos_aligned < framepos + SCREENSIZE);
 
-        p_file += got_now;
-        if (p_file >= p_end)
-            p_file = p_buffer; /* wrap */
+        if (readfrom != -1)
+        {   /* need to read from disk */
+            if (filepos != readfrom)
+            {   /* need to seek */
+                filepos = rb->lseek(fd, readfrom, SEEK_SET);
+            }
+            read = readto - readfrom + 512;
+            /* read the sector(s) */
+            filepos += rb->read(fd, p_buffer + writefrom, read); 
+        }
+        else
+            read = 0;
 
-        delta = check_button();
+        if (read < SCREENSIZE) /* below average? */
+            rb->yield(); /* time to do something else */
 
-        if (read_now < SCREENSIZE) /* below average? time to do something else */
-            rb->yield(); /* yield to the other treads */
+        /* display OSD if FF/FR */
+        if (playstep != 1 && playstep != -1)
+        {
+            int w,h;
 
-        if (delta != 1)
-        {   /* need to seek */
-            long newpos;
-            
-            rb->yield(); /* yield in case we didn't do it above */
-
-            if (delta == INT_MIN)
-                newpos = 0;
-            else if (delta == INT_MAX)
-                newpos = rb->filesize(fd) - SCREENSIZE;
+            if (playstep > 0)
+                rb->snprintf(buf, sizeof(buf), "%d>>", playstep);
             else
-            {
-                bool pause = false;
-                newpos = rb->lseek(fd, 0, SEEK_CUR) - (p_file - p_screen) + (delta-1) * SCREENSIZE;
+                rb->snprintf(buf, sizeof(buf), "%d<<", -playstep);
+
+            rb->lcd_getstringsize(buf, &w, &h);
+            rb->lcd_putsxy(0, LCD_HEIGHT-h, buf);
             
-                if (newpos < 0)
-                {
-                    newpos = 0;
-                    pause = true; /* go in paused mode */
-                }
+            w++;
+            rb->slidebar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, 
+                (100 * filepos)/filesize, Grow_Right);
+            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+            rb->lcd_blit(p_buffer + frame_offset, 0, 0, 
+                LCD_WIDTH, LCD_HEIGHT/8 - 1, LCD_WIDTH);
+        }
+        else
+        {   /* display the frame normally */
+            rb->lcd_blit(p_buffer + frame_offset, 0, 0, LCD_WIDTH, 
+                LCD_HEIGHT/8, LCD_WIDTH);
+        }
 
-                if (newpos > rb->filesize(fd) - SCREENSIZE)
+		/* query keys to determine next frame */
+		framepos += check_button() * SCREENSIZE;
+        if (framepos <= 0)
+        {
+            state = paused;
+            framepos = 0;
+        }
+        else if (framepos >= filesize)
+        {
+            if (state == playing)
+            {
+                if (playstep == 1)
+                    state = stop; /* reached the end while playing normally */
+                else
                 {
-                    newpos = rb->filesize(fd) - SCREENSIZE;
-                    pause = true; /* go in paused mode */
+                    state = paused; /* it may have been FF */
+                    playstep = 1;
                 }
-
-                if (pause && state == playing)
-                    state = paused;
             }
 
-            newpos -= newpos % SCREENSIZE; /* should be "even", just to make shure */
-
-            rb->lseek(fd, newpos & ~(SECTOR_SIZE-1), SEEK_SET); /* round down to sector */
-            newpos %= FILEBUFSIZE; /* make it an offset within buffer */ 
-            p_screen = p_buffer + newpos;
-            p_file = p_buffer + (newpos & ~(SECTOR_SIZE-1));
+            framepos = filesize - SCREENSIZE;
+            /* in case the file size is no integer multiple */
+            framepos -= framepos % SCREENSIZE;
         }
 
         shown++;
-    } while (got_now >= needed && state != stop && state != exit);
+
+	} while (state != stop && state != exit);
 
     return (state != exit) ? shown : -1;
 }
@@ -353,3 +391,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #endif /* #ifdef HAVE_LCD_BITMAP */
 #endif /* #ifndef SIMULATOR */
+
