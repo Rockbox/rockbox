@@ -81,8 +81,8 @@ static struct
     { ".rock",TREE_ATTR_ROCK,Plugin   },
 #ifdef HAVE_LCD_BITMAP
     { ".fnt", TREE_ATTR_FONT,Font     },
-    { ".ch8", TREE_ATTR_CH8, -1       },
-    { ".rvf", TREE_ATTR_RVF, Text     },
+    { ".ch8", TREE_ATTR_CH8, Chip8    },
+    { ".rvf", TREE_ATTR_RVF, Video    },
 #endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
