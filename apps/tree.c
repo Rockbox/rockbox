@@ -697,10 +697,10 @@ static int onplay_screen(char* dir, char* file)
     struct entry* f = &dircache[dirstart + dircursor];
     bool isdir = f->attr & ATTR_DIRECTORY;
         
-    if ((dir[0]=='/') && (dir[1]==0))
-        snprintf(buf, sizeof buf, "%s%s", dir, file);
-    else
+    if (dir[1])
         snprintf(buf, sizeof buf, "%s/%s", dir, file);
+    else
+        snprintf(buf, sizeof buf, "/%s", file);
 
     lcd_clear_display();
 
@@ -850,11 +850,11 @@ static int onplay_screen(char* dir, char* file)
     int m_handle;
     int selected;
 
-    if ((dir[0]=='/') && (dir[1]==0))
-        snprintf(buf, sizeof buf, "%s%s", dir, file);
-    else
+    if (dir[1])
         snprintf(buf, sizeof buf, "%s/%s", dir, file);
-
+    else
+        snprintf(buf, sizeof buf, "/%s", dir, file);
+    
     if (playing) {
         items[lastitem].desc=str(LANG_QUEUE);
         ids[lastitem]=1;
@@ -1096,11 +1096,10 @@ bool dirbrowse(char *root)
 #endif
                 if ( !numentries )
                     break;
-                if ((currdir[0]=='/') && (currdir[1]==0)) {
-                    snprintf(buf,sizeof(buf),"%s%s",currdir, file->name);
-                } else {
+                if (currdir[1])
                     snprintf(buf,sizeof(buf),"%s/%s",currdir, file->name);
-                }
+                else
+                    snprintf(buf,sizeof(buf),"/%s",file->name);
 
                 if (file->attr & ATTR_DIRECTORY) {
                     memcpy(currdir,buf,sizeof(currdir));
@@ -1120,10 +1119,15 @@ bool dirbrowse(char *root)
                     lcd_stop_scroll();
                     switch ( file->attr & TREE_ATTR_MASK ) {
                         case TREE_ATTR_M3U:
-                            if ( global_settings.resume )
-                                snprintf(global_settings.resume_file,
-                                         MAX_PATH, "%s/%s",
-                                         currdir, file->name);
+                            if ( global_settings.resume ) {
+                                if (currdir[1])
+                                    snprintf(global_settings.resume_file,
+                                             MAX_PATH, "%s/%s",
+                                             currdir, file->name);
+                                else
+                                    snprintf(global_settings.resume_file,
+                                             MAX_PATH, "/%s", file->name);
+                            }
                             play_list(currdir, file->name, 0, false, 0,
                                       seed, 0, 0, -1);
                             start_index = 0;
@@ -1496,7 +1500,10 @@ static bool add_dir(char* dirname, int fd)
             if (!strcmp(entry->d_name, ".") ||
                 !strcmp(entry->d_name, ".."))
                 continue;
-            snprintf(buf, sizeof buf, "%s/%s", dirname, entry->d_name);
+            if (dirname[1])
+                snprintf(buf, sizeof buf, "%s/%s", dirname, entry->d_name);
+            else
+                snprintf(buf, sizeof buf, "/%s", entry->d_name);
             if (add_dir(buf,fd)) {
                 abort = true;
                 break;
