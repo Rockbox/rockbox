@@ -35,7 +35,7 @@ calmrisccc () {
  AR=calmrisc16-unknown-elf-ar
  AS=calmrisc16-unknown-elf-as
  OC=calmrisc16-unknown-elf-objcopy
- GCCOPTS="$CCOPTS"
+ GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
  GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
@@ -47,6 +47,22 @@ coldfirecc () {
  OC=m68k-elf-objcopy
  GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
+}
+
+whichaddr () {
+    case $archos in
+    gmini120)
+	echo ""
+	echo "Where do you want the firmware to be flashed?"
+	echo "WARNING: Do not answer this question lightly,"
+	echo "unless you don't plan to flash your gmini."
+	echo "In this case, reply '0x10000' (no quotes) and "
+	echo "re-configure when you know better."
+	loadaddress=`input`
+	;;
+    *)
+	;;
+    esac
 }
 
 whichsim () {
@@ -315,7 +331,7 @@ if [ -z "$archos" ]; then
 
    5)
     archos="gmini120"
-    target="-DARCHOS_GMINI120"
+    target="-DARCHOS_GMINI120 -DLOADADDRESS=\$(LOADADDRESS)"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="$rootdir/tools/scramble" # not correct but...
@@ -439,6 +455,7 @@ if [ -z "$debug" ]; then
   esac
 fi
 
+whichaddr
 
 if [ -z "$language" ]; then
 
@@ -480,6 +497,7 @@ sed > Makefile \
  -e "s,@FLASHFILE@,${flash},g" \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
+ -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
 <<EOF 
@@ -510,6 +528,7 @@ export AR=@AR@
 export AS=@AS@
 export OC=@OC@
 export GCCOPTS=@GCCOPTS@
+export LOADADDRESS=@LOADADDRESS@
 
 .PHONY: all clean tags zip
 

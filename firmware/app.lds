@@ -10,6 +10,81 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 INPUT(crt0.o)
 
+#if CONFIG_CPU == TCC730
+MEMORY
+{
+   FIRMWARE : ORIGIN = LOADADDRESS, LENGTH = 256K
+   FLASH (RX) : ORIGIN = 0x000000, LENGTH = 1024K
+   ICMEM (RX) : ORIGIN = 0x3FC000, LENGTH = 32K
+   IMEM1 : ORIGIN = 0x200000, LENGTH = 32K
+   IMEM2 : ORIGIN = 0x210000, LENGTH = 32K
+   IMEM3 : ORIGIN = 0x220000, LENGTH = 16K
+   IMEM4 : ORIGIN = 0x230000, LENGTH = 16K
+
+   DRAM : ORIGIN = 0x000000, LENGTH = 0x3F0000
+}
+
+SECTIONS
+{
+.text LOADADDRESS : {
+	*(.init.text)
+	*(.text) 
+	*(.icode) /* We don't put it in ICMEM coz crt1 uses LCD (now)*/
+	}> FLASH  AT> FIRMWARE 
+
+.icode 0x3FC040: {
+	*(.vectors)
+	}> ICMEM  AT> FIRMWARE
+
+
+.data 0x2000: { 
+	*(.data) 
+	. = ALIGN(2);
+	*(.rodata) 
+	. = ALIGN(2);
+	*(.rodata.str1.2)
+	. = ALIGN(2);
+	}> DRAM AT> FIRMWARE
+
+.bss ALIGN(2) : {
+	*(.bss)
+	. = ALIGN(2);
+	}> DRAM	
+
+.stack ALIGN(2) : {	
+   . = . + 0x2000;
+}> DRAM
+
+.idata 0x200000: {
+	*(.idata)
+}> DRAM
+
+
+_codesize = SIZEOF(.text);
+
+_icodecopy = LOADADDR(.icode);
+_icodestart = ADDR(.icode);
+_icodesize = SIZEOF(.icode);
+
+_datacopy = LOADADDR(.data);
+_datastart = ADDR(.data);
+_datasize = SIZEOF(.data);
+
+
+_bssstart = ADDR(.bss);
+_bsssize = (SIZEOF(.bss) + 1) & ~ 1;
+
+_stackbegin = ADDR(.stack);
+_stackend = ADDR(.stack) + SIZEOF(.stack);
+
+_idatastart = ADDR(.idata);
+
+}
+
+#else
+
+
+
 #define PLUGINSIZE 0x8000
 
 #ifdef DEBUG
@@ -123,3 +198,5 @@ SECTIONS
         pluginbuf = .;
     }
 }
+
+#endif
