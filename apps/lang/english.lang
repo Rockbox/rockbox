@@ -2656,16 +2656,6 @@ voice: "Current time:"
 new:
 
 #Filetypes
-id: LANG_FILETYPES_RESET
-desc: in the manage settings sub menu
-eng: "Reset plugin list"
-new:
-
-id: LANG_FILETYPES_RESET_WAIT
-desc: Filetype reset message
-eng: "Reset plugins, please wait"
-new:
-
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2677,8 +2667,8 @@ eng: "Filetype array full"
 new:
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
-desc: Viewer plugin name to long
-eng: "Plugin name to long"
+desc: Viewer plugin name too long
+eng: "Plugin name too long"
 new:
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
