@@ -148,23 +148,24 @@ A18. Dear Mr. Gates, you have two options.  Re-read question #17, or go buy
      your own project.
 
 Q19. When do you think there will be a version available for my Archos?
-A19. We recently released version 1.0, so head on over to 
-     http://bjorn.haxx.se/rockbox/download.html and pull it down.  This first 
-     version is more a proof-of-concept than a serious replacement for the 
-     stock firmware, so make sure you read the release notes 
-     (http://bjorn.haxx.se/rockbox/rockbox-1.0-notes.txt).  
+A19. We recently released version 1.1, so head on over to 
+     http://bjorn.haxx.se/rockbox/download.html and pull it down.  This 
+     versions major changes/improvements include:
+         - Recorder support
+         - Playlist support (max 10000 files, approx 1000 files/sec load time)
+         - Scrolling
+     Make sure to read the release notes.
+     (http://bjorn.haxx.se/rockbox/download/rockbox-1.1-notes.txt).  
 
 Q20. What do you plan to add to coming versions?
 A20. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
-     Version 1.1 
-        Playlist support, scrolling, UI improvements 
      Version 1.2 
-        Recorder support, UI improvements 
+         UI improvements 
      Version 1.3 
-        Resume, persistent settings, autobuild playlists, UI improvements 
+         Resume, persistent settings, autobuild playlists, UI improvements 
 
 Q21. I tried one of your firmware files and now I can't access my harddisk!
      When I turn on my jukebox, it says:
