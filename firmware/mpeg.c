@@ -1696,6 +1696,9 @@ static void mpeg_thread(void)
 
                 /* Don't read more than until the end of the buffer */
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
+#if MEM == 8    
+                amount_to_read = MIN(0x100000, amount_to_read);
+#endif
 
                 /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
