@@ -260,4 +260,11 @@ int talk_number(int n, bool enqueue)
     return 0;
 }
 
+int talk_spell(char* spell, bool enqueue) 
+{
+    (void)spell;
+    (void)enqueue;
+    return 0;
+}
+
 const char* dir_thumbnail_name = ".dirname.mp3";

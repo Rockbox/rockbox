@@ -1511,7 +1511,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                 else if (global_settings.talk_file == 1) /* files as numbers */
                 {
                     /* try to find a voice ID for the extension, if known */
-                    int j;
+                    unsigned int j;
                     int ext_id = -1; /* default to none */
                     for (j=0; j<sizeof(filetypes)/sizeof(*filetypes); j++)
                     {
