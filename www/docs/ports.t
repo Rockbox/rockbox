@@ -119,11 +119,6 @@
 </tr>
 <tr><th><b>PB4</b></th>
     <td><b>GP Out</b></td><td>Hard disk power (0=on) <b>NewPlayer only</b></td>
-    <td><b>&nbsp;</b></td><td>&nbsp;</td>
-    <td><b>GP In</b></td><td>FM Radio Data Out</td>
-</tr>
-<tr><th><b>PB4</b></th>
-    <td><b>GP Out</b></td><td>Hard disk power (0=on) <b>NewPlayer only</b></td>
     <td><b>GP In</b></td><td>OFF key (0=pressed)</td>
     <td><b>GP In</b></td><td>FM Radio Data Out</td>
 </tr>
