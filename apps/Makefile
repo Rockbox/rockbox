@@ -18,20 +18,27 @@ FIRMWARE := ../firmware
 INCLUDES= -I$(FIRMWARE) -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers
 
 # Pick a target to build for
-TARGET = -DARCHOS_PLAYER=1
-#TARGET = -DARCHOS_PLAYER_OLD=1
+#TARGET = -DARCHOS_PLAYER=1
+TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -Os -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) -DDEBUG
+ifdef DEBUG
+    DEFINES := -DDEBUG
+    LDS := $(FIRMWARE)/gdb.lds
+else
+    LDS := $(FIRMWARE)/app.lds
+endif
+
+CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
 AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c *.c)
-OBJS := $(SRC:%.c=%.o) $(FIRMWARE)/crt0.o
+OBJS := $(SRC:%.c=%.o)
 
 all : archos.mod # archos.asm 
 
-archos.elf : $(OBJS) $(FIRMWARE)/app.lds
-	$(CC) -nostdlib -o archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(FIRMWARE)/app.lds -Wl,-Map,archos.map
+archos.elf : $(OBJS) $(LDS) $(FIRMWARE)/librockbox.a
+	$(CC) -Os -nostdlib -o archos.elf $(OBJS) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,archos.map
 
 archos.bin : archos.elf
 	$(OC) -O binary archos.elf archos.bin
@@ -48,8 +55,6 @@ dist:
 clean:
 	-rm -f *.x *.i *.o *.elf *.bin *.map *.mod *.bak *~
 	-$(RM) -r $(DEPS)
-
-crt0.o: $(FIRMWARE)/crt0.S
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common
