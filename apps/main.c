@@ -60,7 +60,9 @@
 #include "plugin.h"
 
 
+#if (CONFIG_HWCODEC == MASNONE)
 #include "uda1380.h"
+#endif
 
 #ifdef CONFIG_TUNER
 #include "radio.h"
@@ -266,8 +268,9 @@ void init(void)
     }
 #endif /* #ifdef AUTOROCK */
 
+#if (CONFIG_HWCODEC == MASNONE)
     uda1380_init();
-
+#endif
 }
 
 int main(void)
