@@ -116,9 +116,9 @@ $(OBJDIR)/lang.o: $(OBJDIR)/build.lang $(TOOLSDIR)/genlang
 
 clean:
 	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.asm \
-	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/rockbox.map \
+	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map \
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch] \
-	$(OBJDIR)/credits.raw $(LINKFILE)
+	$(OBJDIR)/credits.raw $(LINKFILE) $(OBJDIR)/rockbox.ucl
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 	$(MAKE) -C plugins clean
 

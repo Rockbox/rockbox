@@ -31,7 +31,7 @@ no_configure:
 endif
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE)
-	$(CC) -O -nostdlib -o $@ $< -lgcc -T$(LINKFILE) -Wl,-Map,$*.map
+	$(CC) -O -nostdlib -o $@ $< -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	$(OC) -O binary $< $@
