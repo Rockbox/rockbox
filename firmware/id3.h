@@ -19,6 +19,8 @@
 #ifndef ID3_H
 #define ID3_H
 
+#define VARIABLE_BIT_RATE 1
+
 struct mp3entry {
     char path[256];
     char *title;

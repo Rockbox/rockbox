@@ -501,6 +501,7 @@ getsonglength(int fd, struct mp3entry *entry)
                 (frame[42] << 8) | frame[43];
 
             filetime = framecount * tpf;
+            entry->bitrate = VARIABLE_BIT_RATE;
         }
         /* We don't care about the file size and the TOC just yet. Maybe
            another time. */
