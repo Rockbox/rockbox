@@ -17,6 +17,7 @@
  *
  **************************************************************************/
 #include "plugin.h"
+#include "time.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -171,7 +172,6 @@ struct counter values[]={
   {"ydistt", -6},
 };
 
-#ifdef USE_CLOCK
 static unsigned char yminute[]={
 53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
 };
@@ -193,10 +193,9 @@ static void addclock(void)
     int minute;
     int pos;
 
-    hour = rtc_read(3);
-    hour = (((hour & 0x30) >> 4) * 10 + (hour & 0x0f))%12;
-    minute = rtc_read(2);
-    minute = ((minute & 0x70) >> 4) * 10 + (minute & 0x0f);
+    struct tm* current_time = rb->get_time();
+    hour = current_time->tm_hour;
+    minute = current_time->tm_min;
 
     pos = 90-minute;
     if(pos >= 60)
@@ -219,7 +218,6 @@ static void addclock(void)
                       yminute[(i+1)%60]);
     }
 }
-#endif
 
 static int scrollit(void)
 {
@@ -254,9 +252,7 @@ static int scrollit(void)
             yy += YADD;
             xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
         }
-#ifdef USE_CLOCK
         addclock();
-#endif
         rb->lcd_update();
 
         x-= XSPEED;
@@ -310,9 +306,7 @@ static int loopit(void)
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
         rb->lcd_clear_display();
-#ifdef USE_CLOCK
         addclock();
-#endif
         if(timeout) {
             switch(b) {
                 case BUTTON_LEFT:
