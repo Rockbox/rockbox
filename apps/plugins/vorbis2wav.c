@@ -30,6 +30,7 @@ static struct plugin_api* rb;
 
 /* Some standard functions and variables needed by Tremor */
 
+
 int errno;
 
 size_t strlen(const char *s) {
@@ -92,6 +93,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   int current_section;
   int eof;
   static char pcmbuf[4096];
+#if BYTE_ORDER == BIG_ENDIAN
+  int i;
+  char x;
+#endif
 
   file_info_struct file_info;
 
@@ -139,6 +144,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
       dprintf("Error decoding frame\n");
     } else {
       file_info.frames_decoded++;
+#if BYTE_ORDER == BIG_ENDIAN
+      for (i=0;i<n;i+=2) { 
+        x=pcmbuf[i]; pcmbuf[i]=pcmbuf[i+1]; pcmbuf[i+1]=x;
+      }
+#endif
       rb->write(file_info.outfile,pcmbuf,n);
       file_info.current_sample+=(n/4);
     }
