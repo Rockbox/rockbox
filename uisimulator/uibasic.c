@@ -33,7 +33,6 @@
 
 #include "version.h"
 
-#include "lcd.h"
 #include "lcd-x11.h"
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
@@ -224,11 +223,11 @@ screenhack (Display *the_dpy, Window the_window)
 
   Logf("Rockbox will kill ya!");
 
-  lcd_position(0, 6);
-  lcd_string( "Rock the box", 0);
+  lcd_position(0, 6, 0);
+  lcd_string( "Rock the box");
 
-  lcd_position(8, 24);
-  lcd_string( "Roolz", 0);
+  lcd_position(8, 24, 0);
+  lcd_string( "Roolz" );
 
   lcd_update();
 
