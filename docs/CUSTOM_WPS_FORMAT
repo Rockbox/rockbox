@@ -76,11 +76,64 @@ Conditional Tags (If/Else block):
             so the text in the if and else part can contain all % 
             commands, including conditionals.
 
+Alternating Sublines
+--------------------
+It is possible to group items on each line into 2 or more groups or "sublines".
+Each subline will be  displayed in succession on the line for a specified time,
+alternating continuously through each defined subline.
+
+Items on a line are broken into sublines with the semicolon ';' character. The
+display time for each subline defaults to 2 seconds unless modified by using
+the '%t' tag to specify an alternate time (in seconds and optional tenths of a
+second) for the subline to be displayed.
+
+Subline related special characters and tags:
+   ;  : Split items on a line into separate sublines
+  %t  : Set the subline display time. The '%t' is followed by either integer
+        seconds (%t5), or seconds and tenths of a second (%t3.5).
+
+
+Each alternating subline can still be optionally scrolled while it is being
+displayed, and scrollable formats can be displayed on the same line with
+non-scrollable formats (such as track elapsed time) as long as they are
+separated into different sublines.
+
+  Example subline definition:
+
+  %s%t4%ia;%s%it;%t3%pc %pr     : Display id3 artist for 4 seconds, 
+                                  Display id3 title for 2 seconds, 
+                                  Display current and remaining track time
+                                  for 3 seconds,
+                                  repeat...
+
+Conditionals can be used with sublines to display a different set and/or number
+of sublines on the line depending on the evaluation of the conditional.  
+
+  Example subline with conditionals:
+
+  %?it<%t8%s%it|%s%fn>;%?ia<%t3%s%ia|%t0>
+
+  The format above will do two different things depending if ID3 
+  tags are present. If the ID3 artist and title are present :
+
+     Display id3 title for 8 seconds,
+     Display id3 artist for 3 seconds,
+     repeat...
+
+  If the ID3 artist and title are not present :
+     Display the filename continuously.
+
+Note that by using a subline display time of 0 in one branch of a conditional,
+a subline can be skipped (not displayed) when that condition is met.
+
+-----------
+
 Other Tags:
   %%  : Display a '%'
   %<  : Display a '<'
   %|  : Display a '|'
   %>  : Display a '>'
+  %;  : Display a ';'
   %s  : Indicate that the line should scroll. Can occur anywhere in 
         a line (given that the text is displayed; see conditionals
         above). You can specify up to 10 scrolling lines.

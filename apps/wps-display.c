@@ -54,11 +54,16 @@
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES 10
+#define FORMAT_BUFFER_SIZE 800
 #else
 #define MAX_LINES 2
+#define FORMAT_BUFFER_SIZE 400
 #endif
-
-#define FORMAT_BUFFER_SIZE 300
+#define MAX_SUBLINES 12
+#define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* (10ths of sec) */
+#define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to 
+                                (1/HZ sec, or 100ths of sec) */
+#define SUBLINE_RESET -1
 
 #ifdef HAVE_LCD_CHARCELLS
 static unsigned char wps_progress_pat[8]={0,0,0,0,0,0,0,0};
@@ -70,8 +75,12 @@ static char map_fullbar_char(char ascii_val);
 #endif
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
-static char* format_lines[MAX_LINES];
-static unsigned char line_type[MAX_LINES];
+static char* format_lines[MAX_LINES][MAX_SUBLINES];
+static unsigned char line_type[MAX_LINES][MAX_SUBLINES];
+static unsigned char time_mult[MAX_LINES][MAX_SUBLINES];
+static long subline_expire_time[MAX_LINES]; 
+static int curr_subline[MAX_LINES];
+
 static int ff_rewind_count;
 bool wps_time_countup = true;
 static bool wps_loaded = false;
@@ -115,49 +124,76 @@ static void wps_format(char* fmt)
     char* buf = format_buffer;
     char* start_of_line = format_buffer;
     int line = 0;
+    int subline;
     
     strncpy(format_buffer, fmt, sizeof(format_buffer));
     format_buffer[sizeof(format_buffer) - 1] = 0;
-    format_lines[line] = buf;
     
+    for (line=0; line<MAX_LINES; line++)
+    {
+        for (subline=0; subline<MAX_SUBLINES; subline++)
+        {
+            format_lines[line][subline] = 0;
+            time_mult[line][subline] = 0;
+        }
+        subline_expire_time[line] = 0;
+        curr_subline[line] = SUBLINE_RESET;
+    }
+
+    line = 0;
+    subline = 0;
+    format_lines[line][subline] = buf;
+
     while ((*buf) && (line < MAX_LINES))
     {
         switch (*buf)
         {
-            case '\r':
+            /* skip % sequences so "%;" doesn't start a new subline */
+            case '%': 
+                buf++;
+                break;
+
+            case '\r': /* CR */
                 *buf = 0;
                 break;
 
             case '\n': /* LF */
                 *buf = 0;
 
-                if(*start_of_line != '#') /* A comment? */
+                if (*start_of_line != '#') /* A comment? */
                     line++;
                 
                 if (line < MAX_LINES)
                 {
                     /* the next line starts on the next byte */
-                    format_lines[line] = buf+1;
-                    start_of_line = format_lines[line];
+                    subline = 0;
+                    format_lines[line][subline] = buf+1;
+                    start_of_line = format_lines[line][subline];
+                }
+                break;
+
+            case ';': /* start a new subline */
+                *buf = 0;
+                subline++;
+                if (subline < MAX_SUBLINES)
+                {
+                    format_lines[line][subline] = buf+1;
+                }
+                else /* exceeded max sublines, skip rest of line */
+                {
+                    while (*(++buf)) 
+                    {
+                        if  ((*buf == '\r') || (*buf == '\n'))
+                        {
+                            break;
+                        }
+                    }
+                    buf--;
+                    subline = 0;
                 }
                 break;
         }
         buf++;
-    }
-
-    /* if supplied input didn't define a format line   
-       for each line on the wps, set the rest to null */
-    if (line < MAX_LINES)
-    {
-        /* if the final line didn't terminate with a newline,  
-           the line index wasn't incremented */
-        if (buf != format_lines[line])
-            line++;
-
-        for (; line < MAX_LINES; line++)
-        {
-            format_lines[line] = NULL;
-        }
     }
 }
 
@@ -169,6 +205,7 @@ void wps_reset(void)
 
 bool wps_load(char* file, bool display)
 {
+    int i, s;
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
 
@@ -187,17 +224,36 @@ bool wps_load(char* file, bool display)
         close(fd);
 
         if ( display ) {
-            int i;
+            bool any_defined_line;
             lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
             lcd_setmargins(0,0);
 #endif
-            for (i=0; i<MAX_LINES && format_lines[i]; i++)
-                lcd_puts(0,i,format_lines[i]);
-            lcd_update();
-            sleep(HZ);
+            for (s=0; s<MAX_SUBLINES; s++)
+            {
+                any_defined_line = false;
+                for (i=0; i<MAX_LINES; i++)
+                {
+                    if (format_lines[i][s]) 
+                    {
+                        if (*format_lines[i][s] == 0)
+                            lcd_puts(0,i," ");
+                        else
+                            lcd_puts(0,i,format_lines[i][s]);
+                        any_defined_line = true;
+                    }
+                    else
+                    {
+                        lcd_puts(0,i," ");
+                    }
+                }
+                if (any_defined_line)
+                {
+                    lcd_update();
+                    sleep(HZ/2);
+                }
+            }
         }
-
         wps_loaded = true;
 
         return numread > 0;
@@ -276,13 +332,18 @@ static char* get_tag(struct mp3entry* id3,
                      char* tag, 
                      char* buf, 
                      int buf_size,
+                     unsigned char* tag_len,
+                     unsigned char* subline_time_mult,
                      unsigned char* flags)
 {
     if ((0 == tag[0]) || (0 == tag[1]))
     {
+        *tag_len = 0;
         return NULL;
     }
     
+    *tag_len = 2;
+
     switch (tag[0])
     {
         case 'i':  /* ID3 Information */
@@ -510,6 +571,46 @@ static char* get_tag(struct mp3entry* id3,
                 }
             }
             break;
+
+        case 't': /* set sub line time multiplier */
+            { 
+                int d = 1;
+                int time_mult = 0;
+                bool have_point = false;
+                bool have_tenth = false;
+              
+                while (((tag[d] >= '0') && 
+                        (tag[d] <= '9')) ||
+                       (tag[d] == '.')) 
+                {
+                    if (tag[d] != '.') 
+                    {
+                        time_mult = time_mult * 10;
+                        time_mult = time_mult + tag[d] - '0';
+                        if (have_point) 
+                        {
+                            have_tenth = true;
+                            d++;
+                            break;
+                        }
+                    }
+                    else 
+                    {
+                        have_point = true;
+                    }
+                    d++;
+                }
+                
+                if (have_tenth == false)
+                    time_mult *= 10;
+                       
+                *subline_time_mult = time_mult; 
+                *tag_len = d;
+
+                buf[0] = 0;
+                return buf;
+            }
+            break;
     }
     
     return NULL;
@@ -594,13 +695,18 @@ static void format_display(char* buf,
                            int buf_size, 
                            struct mp3entry* id3, 
                            char* fmt, 
+                           unsigned char* subline_time_mult, 
                            unsigned char* flags)
 {
     char temp_buf[128];
+    char* buf_start = buf;
     char* buf_end = buf + buf_size - 1;   /* Leave room for end null */
     char* value = NULL;
     int level = 0;
-    
+    unsigned char tag_length;
+
+    *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
+
     while (fmt && *fmt && buf < buf_end)
     {
         switch (*fmt)
@@ -639,12 +745,14 @@ static void format_display(char* buf,
             case '|':
             case '<':
             case '>':
+            case ';':
                 *buf++ = *fmt++;
                 break;
         
             case '?':
                 fmt++;
-                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf), flags);
+                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf),
+                                &tag_length, subline_time_mult, flags);
             
                 while (*fmt && ('<' != *fmt))
                     fmt++;
@@ -660,8 +768,9 @@ static void format_display(char* buf,
                 break;
         
             default:
-                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf), flags);
-                fmt += 2;
+                value = get_tag(id3, fmt, temp_buf, sizeof(temp_buf),
+                                &tag_length, subline_time_mult, flags);
+                fmt += tag_length;
             
                 if (value)
                 {
@@ -673,18 +782,27 @@ static void format_display(char* buf,
     
     *buf = 0;
 
+    /* if resulting line is an empty line, set the subline time to 0 */
+    if (*buf_start == 0)
+        *subline_time_mult = 0;
+
     /* If no flags have been set, the line didn't contain any format codes.
        We still want to refresh it. */
     if(*flags == 0)
         *flags = WPS_REFRESH_STATIC;
 }
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode)
+bool wps_refresh(struct mp3entry* id3, int ffwd_offset, 
+                 unsigned char refresh_mode)
 {
     char buf[MAX_PATH];
     unsigned char flags;
     int i;
     bool update_line;
+    bool only_one_subline;
+    bool new_subline_refresh;
+    int search;
+    int search_start;
 #ifdef HAVE_LCD_BITMAP
     int h = font_get(FONT_UI)->height;
     int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
@@ -697,6 +815,16 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     */
     bool enable_pm = false;
 #endif
+
+    /* reset to first subline if refresh all flag is set */
+    if (refresh_mode == WPS_REFRESH_ALL)
+    {
+        for (i=0; i<MAX_LINES; i++)
+        {
+            curr_subline[i] = SUBLINE_RESET;
+        }
+    }
+
 #ifdef HAVE_LCD_CHARCELLS
     for (i=0; i<8; i++) {
        if (wps_progress_pat[i]==0)
@@ -714,17 +842,79 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
 
     for (i = 0; i < MAX_LINES; i++)
     {
+        new_subline_refresh = false;
+        only_one_subline = false;
+
+        /* if time to advance to next sub-line  */
+        if (TIME_AFTER(current_tick,  subline_expire_time[i] - 1) ||
+           (curr_subline[i] == SUBLINE_RESET)) 
+        {
+            /* search all sublines until the next subline with time > 0
+               is found or we get back to the subline we started with */
+            if (curr_subline[i] == SUBLINE_RESET)
+                search_start = 0;
+            else
+                search_start = curr_subline[i];
+            for (search=0; search<MAX_SUBLINES; search++) 
+            {
+                curr_subline[i]++;
+
+                /* wrap around if beyond last defined subline or MAX_SUBLINES */
+                if ((!format_lines[i][curr_subline[i]]) ||
+                    (curr_subline[i] == MAX_SUBLINES))
+                {
+                    if (curr_subline[i] == 1)
+                        only_one_subline = true;
+                    curr_subline[i] = 0;
+                }
+
+                /* if back where we started after search or
+                   only one subline is defined on the line */
+                if (((search > 0) && (curr_subline[i] == search_start)) ||
+                    only_one_subline)
+                {
+                    /* no other subline with a time > 0 exists */
+                    subline_expire_time[i] = current_tick  + 100 * HZ;
+                    break;
+                }
+                else
+                {
+                    /* get initial time multiplier and 
+                       line type flags for this subline */
+                    format_display(buf, sizeof(buf), id3, 
+                                   format_lines[i][curr_subline[i]], 
+                                   &time_mult[i][curr_subline[i]],
+                                   &line_type[i][curr_subline[i]]);
+                   
+                    /* only use this subline if subline time > 0 */
+                    if (time_mult[i][curr_subline[i]] > 0)
+                    {
+                        new_subline_refresh = true;
+                        subline_expire_time[i] = current_tick  + 
+                            BASE_SUBLINE_TIME * time_mult[i][curr_subline[i]]; 
+                        break;
+                    }
+                }
+            }
+
+        }
+        
         update_line = false;
-        if ( !format_lines[i] )
+
+        if ( !format_lines[i][curr_subline[i]] )
             break;
 
-        if ((line_type[i] & refresh_mode) || 
-            (refresh_mode == WPS_REFRESH_ALL))
+        if ((line_type[i][curr_subline[i]] & refresh_mode) || 
+            (refresh_mode == WPS_REFRESH_ALL) ||
+            new_subline_refresh)
         {
             flags = 0;
-            format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
-            line_type[i] = flags;
-            
+            format_display(buf, sizeof(buf), id3,
+                           format_lines[i][curr_subline[i]],
+                           &time_mult[i][curr_subline[i]],
+                           &flags);
+            line_type[i][curr_subline[i]] = flags;
+
 #ifdef HAVE_LCD_BITMAP
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
@@ -764,19 +954,25 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
                     draw_player_progress(id3, ff_rewind_count);
             }
 #endif
+
             if (flags & WPS_REFRESH_SCROLL) {
+
                 /* scroll line */
-                if (refresh_mode & WPS_REFRESH_SCROLL)  {
+                if ((refresh_mode & WPS_REFRESH_SCROLL) ||
+                    new_subline_refresh) {
                     lcd_puts_scroll(0, i, buf);
                     update_line = true;
                 }
             }
-            /* dynamic / static line */
-            else if ((flags & refresh_mode & WPS_REFRESH_DYNAMIC) ||
-                     (flags & refresh_mode & WPS_REFRESH_STATIC))
+            else if (flags & (WPS_REFRESH_DYNAMIC | WPS_REFRESH_STATIC))
             {
-                update_line = true;
-                lcd_puts(0, i, buf);
+                /* dynamic / static line */
+                if ((refresh_mode & (WPS_REFRESH_DYNAMIC|WPS_REFRESH_STATIC)) ||
+                    new_subline_refresh)
+                {
+                    update_line = true;
+                    lcd_puts(0, i, buf);
+                }
             }
         }
 #ifdef HAVE_LCD_BITMAP
