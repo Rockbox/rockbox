@@ -1,0 +1,15 @@
+Library: wavpack - Release 4.1 - September 14, 2004
+Imported: 2005-02-25 by Christian Gmeiner
+
+
+This directory contains a "tiny" decoder version of wavpack for version 4.x.
+
+LICENSING INFORMATION
+
+wavpack is released under the BSD License as described
+in the LICENSE file in this directory.
+
+
+IMPORT DETAILS
+
+Excluded is wvfilter.c, because it is only a test programm.
