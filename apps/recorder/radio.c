@@ -79,13 +79,10 @@ void fm_set_frequency(int freq)
 static int find_preset(int freq)
 {
     int i;
-    if(presets_loaded)
+    for(i = 0;i < MAX_PRESETS;i++)
     {
-        for(i = 0;i < MAX_PRESETS;i++)
-        {
-            if(freq == presets[i].frequency)
-                return i;
-        }
+        if(freq == presets[i].frequency)
+            return i;
     }
 
     return -1;
@@ -102,11 +99,13 @@ bool radio_screen(void)
     bool lock;
     bool stereo;
     int search_dir = 0;
+    int fw, fh;
     
     lcd_clear_display();
     lcd_setmargins(0, 8);
     status_draw(false);
     fmradio_set_status(FMRADIO_PLAYING);
+    lcd_getstringsize("A", &fw, &fh);
 
     fm_load_presets();
     
@@ -166,6 +165,10 @@ bool radio_screen(void)
         if(curr_preset >= 0)
         {
             lcd_puts_scroll(0, 1, presets[curr_preset].name);
+        }
+        else
+        {
+            lcd_clearrect(0, 8+fh*1, LCD_WIDTH, fh);
         }
         
         lcd_update();
@@ -287,7 +290,7 @@ void fm_save_presets(void)
     int fd;
     int i;
     
-    fd = open("/.rockbox/fm_presets.txt", O_WRONLY);
+    fd = creat("/.rockbox/fm_presets.txt", O_WRONLY);
     if(fd >= 0)
     {
         for(i = 0;i < MAX_PRESETS;i++)
@@ -332,7 +335,6 @@ void fm_load_presets(void)
                         strncpy(presets[i].name, name, 27);
                         presets[i].name[27] = 0;
                         i++;
-                        presets_loaded = true;
                         if(num_presets == MAX_PRESETS)
                             done = true;
                     }
@@ -343,6 +345,7 @@ void fm_load_presets(void)
             close(fd);
         }
     }
+    presets_loaded = true;
 }
 
 bool fm_preset_select(void)
