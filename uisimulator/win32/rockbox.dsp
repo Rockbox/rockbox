@@ -211,6 +211,10 @@ SOURCE=..\..\firmware\common\sprintf.c
 
 SOURCE=..\..\firmware\common\strtok.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\firmware\common\timefuncs.c
+# End Source File
 # End Group
 # Begin Group "Apps"
 
