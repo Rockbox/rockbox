@@ -73,7 +73,6 @@ static char custom_wps[64];
 
 static void draw_screen(struct mp3entry* id3)
 {
-
     int font_height;
 #ifdef LOADABLE_FONTS
     unsigned char *font = lcd_getcurrentldfont();
@@ -96,12 +95,15 @@ static void draw_screen(struct mp3entry* id3)
     else
     {
 #ifdef CUSTOM_WPS
+#ifdef HAVE_LCD_CHARCELLS
         static int last_wps = -1;
-        if ( last_wps != global_settings.wps_display &&
-             global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS ) {
+        if ((last_wps != global_settings.wps_display
+            && global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS))
+        {
             load_custom_wps();
             last_wps = global_settings.wps_display;
         }
+#endif
 #endif
         switch ( global_settings.wps_display ) {
             case PLAY_DISPLAY_TRACK_TITLE:
@@ -266,6 +268,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
 {
     char buffer[128];
     char tmpbuf[64];
+    int con_flag = 0;  /* (0)Not inside of if/else
+                          (1)Inside of If
+                          (2)Inside of Else */
+    char con_if[64];
+    char con_else[64];
     char cchr1;
     char cchr2;
     char cchr3;
@@ -384,11 +391,53 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                     case '%':  /* Displays % */
                         snprintf(tmpbuf, sizeof(tmpbuf), "%%");
                         break;
+                    case '?':  /* Conditional Display of ID3/File */
+                        switch(con_flag)
+                        {
+                            case 0:
+                                con_if[0] = 0;
+                                con_else[0] = 0;
+                                con_flag = 1;
+                                break;
+                            default:
+                                if(id3->artist && id3->title)
+                                    snprintf(tmpbuf, sizeof(tmpbuf), "%s", con_if);
+                                else
+                                    snprintf(tmpbuf, sizeof(tmpbuf), "%s", con_else);
+                                con_flag = 0;
+                                break;
+                        }
+                        break;
+                    case ':': /* Seperator for Conditional ID3/File Display */
+                        con_flag = 2;
+                        break;
                 }
-                snprintf(buffer, sizeof(buffer), "%s%s", buffer, tmpbuf);
+                switch(con_flag)
+                {
+                    case 0:
+                        snprintf(buffer, sizeof(buffer), "%s%s", buffer, tmpbuf);
+                        break;
+                    case 1:
+                        snprintf(con_if, sizeof(con_if), "%s%s", con_if, tmpbuf);
+                        break;
+                    case 2:
+                        snprintf(con_else, sizeof(con_else), "%s%s", con_else, tmpbuf);
+                        break;
+                }
                 break;
             default:
-                snprintf(buffer, sizeof(buffer), "%s%c", buffer, cchr1);
+                switch(con_flag)
+                {
+                    case 0:
+                        snprintf(buffer, sizeof(buffer), "%s%c", buffer, cchr1);
+                        break;
+                    case 1:
+                        snprintf(con_if, sizeof(con_if), "%s%c", con_if, cchr1);
+                        break;
+                    case 2:
+                        snprintf(con_else, sizeof(con_else), "%s%c", con_else, cchr1);
+                        break;
+                }
                 break;
         }
         if(seek >= strlen(wps_string))
@@ -474,17 +523,17 @@ int player_id3_show(void)
             case 0:
                 lcd_puts(0, 0, "Title");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->title);
+                        id3->title?id3->title:"<no title>");
                 break;
             case 1:
                 lcd_puts(0, 0, "Artist");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->artist);
+                        id3->artist?id3->artist:"<no artist>");
                 break;
             case 2:
                 lcd_puts(0, 0, "Album");
                 snprintf(scroll_text,sizeof(scroll_text), "%s",
-                        id3->album);
+                        id3->album?id3->album:"<no album>");
                 break;
             case 3:
                 lcd_puts(0, 0, "Length");
