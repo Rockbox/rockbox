@@ -77,6 +77,8 @@ static bool is_playing; /* we're currently playing */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
+static unsigned char curr_hd[3]; /* current frame header, for re-sync */
+
 
 /***************** Private prototypes *****************/
 
@@ -170,6 +172,9 @@ static void mp3_callback(unsigned char** start, int* size)
         play_now = MIN(queue[queue_read].len, 0xFFFF);
         *start = queue[queue_read].buf;
         *size = play_now;
+        curr_hd[0] = *start[1];
+        curr_hd[1] = *start[2];
+        curr_hd[2] = *start[3];
         queue[queue_read].buf += play_now;
         queue[queue_read].len -= play_now;
     }
@@ -187,17 +192,12 @@ static int shutup(void)
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
-    /* one silent bitswapped mp3 frame (22kHz), without bit reservoir */
-    static const unsigned char silent_frame[] = {
-        0xFF,0xCF,0x08,0x23,0x00,0x00,0x00,0xC0,0x12,0x80,0x01,0x00,0x00,
-        0x32,0x82,0xB2,0xA2,0xCC,0x74,0x9C,0xCC,0xAA,0xAA,0xAA,0xAA,0xAA,
-    };
-
-    mp3_play_pause(false); /* pause */
 
     if (!is_playing) /* has ended anyway */
         return 0;
-    
+
+    CHCR3 &= ~0x0001; /* disable the DMA */
+
     /* search next frame boundary and continue up to there */
     pos = search = mp3_get_pos();
     end = queue[queue_read].buf + queue[queue_read].len;
@@ -205,34 +205,32 @@ static int shutup(void)
     /* Find the next frame boundary */
     while (search < end) /* search the remaining data */
     {
-        if (*search++ != 0xFF) /* search for frame sync byte */
-        {
-            continue;
-        }
+        if (*search++ != 0xFF) /* quick search for frame sync byte */
+            continue; /* (this does the majority of the job) */
             
-        /* look at the (bitswapped) 2nd byte of header candidate */
-        if ((*search & 0x07) == 0x07  /* rest of frame sync */
-         && (*search & 0x18) != 0x10  /* version != reserved */
-         && (*search & 0x60) != 0x00) /* layer != reserved */
+        /* look at the (bitswapped) rest of header candidate */
+        if (search[0] == curr_hd[0] /* do the quicker checks first */
+         && search[2] == curr_hd[2]
+         && (search[1] & 0x30) == (curr_hd[1] & 0x30)) /* sample rate */
         {
             search--; /* back to the sync byte */
-            break; /* From looking at the first 2 bytes, this is a header. */
-            /* this is not a sufficient condition to find header,
-               may give "false alert" (end too early), but a start */
+            break; /* From looking at it, this is a header. */
+            /* This is not a sufficient condition to find header, may
+               give "false alert" (end too early), but a good start. */
         }
     }
-
-    queue_write = queue_read; /* reset the queue */
-    is_playing = false;
+    queue_write = queue_read + 1; /* reset the queue */
+    if (queue_write >= QUEUE_SIZE)
+        queue_write = 0;
+    queue[queue_read].len = 0;
 
     /* play old data until the frame end, to keep the MAS in sync */
     if (search-pos)
-        queue_clip(pos, search-pos, true);
+    {
+        DTCR3 = search-pos;
+        CHCR3 |= 0x0001; /* re-enable DMA */
+    }
 
-    /* If the voice clips contain dependent frames (currently they don't),
-       it may be a good idea to insert an independent dummy frame here. */
-    queue_clip((unsigned char*)silent_frame, sizeof(silent_frame), true);
-    
     return 0;
 }
 
@@ -253,6 +251,9 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
         int size_now = MIN(size, 0xFFFF); /* DMA can do no more */
         is_playing = true;
         mp3_play_data(buf, size_now, mp3_callback);
+        curr_hd[0] = buf[1];
+        curr_hd[1] = buf[2];
+        curr_hd[2] = buf[3];
         mp3_play_pause(true); /* kickoff audio */
         queue[queue_write].buf += size_now;
         queue[queue_write].len -= size_now;
@@ -458,6 +459,7 @@ int talk_number(int n, bool enqueue)
     return 0;
 }
 
+/* singular/plural aware saying of a value */
 int talk_value(int n, int unit, bool enqueue)
 {
     int unit_id;
