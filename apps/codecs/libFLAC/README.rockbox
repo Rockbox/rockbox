@@ -1,0 +1,25 @@
+Library: libFLAC-1.1.2 (Released 2005-02-05)
+Imported: 2005-02-16 by Dave Chapman
+
+
+This directory contains a local version of libFLAC for use by Rockbox
+for software decoding and encoding of FLAC files.
+
+
+LICENSING INFORMATION
+
+libFLAC (which is only one part of the FLAC distribution) is
+distributed under Xiph.Org's BSD-like license - see the files AUTHORS
+and COPYING.Xiph in this directory for details.
+
+
+IMPORT DETAILS
+
+The base version first imported into Rockbox was the libFLAC included
+in the flac-1.1.2.tar.gz distribution, downloaded on 2005-02-06 from
+Sourceforge.
+
+The contents of the flac-1.1.2/src/libFLAC directory (minus the
+autoconf/automake files and ia32/ppc specific subdirectories) was
+imported, along with the contents of the flac-1.2.2/include/FLAC
+directory, which was moved into existing libFLAC/include directory.
