@@ -498,8 +498,7 @@ static bool ask_resume(bool ask_once)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
-    strcpy(tc.currdir, dir);
-    if (ft_load(&tc, NULL) < 0)
+    if (ft_load(&tc, dir) < 0)
         return;
     lastdir[0] = 0;
 
