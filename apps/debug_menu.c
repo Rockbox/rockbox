@@ -325,7 +325,7 @@ void dbg_rtc(void)
         case BUTTON_F2:
             /* clear the user RAM space */
             for (c = 0; c <= 43; c++)
-                rtc_write(0x18 + c, 0);
+                rtc_write(0x14 + c, 0);
             break;
         case BUTTON_OFF:
         case BUTTON_LEFT:
