@@ -73,7 +73,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c
@@ -84,7 +84,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
    APPS += tetris.c sokoban.c bounce.c boxes.c icons.c bmp.c
 endif
 
-SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c mpeg.c \
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c thread.c $(APPS) $(MENUS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
@@ -212,7 +212,13 @@ $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
 $(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/sprintf.o: $(COMMON)/sprintf.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 
