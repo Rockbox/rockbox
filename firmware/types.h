@@ -17,4 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef __TYPES_H
+#define __TYPES_H
+
 typedef unsigned char bool;
+
+#endif
