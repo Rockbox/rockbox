@@ -76,7 +76,7 @@ APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c wps.c settings.c
+	playlist.c showtext.c wps.c settings.c status.c
 
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
@@ -204,6 +204,9 @@ $(OBJDIR)/chartables.o: $(FIRMWAREDIR)/chartables.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/settings.o: $(APPDIR)/settings.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/status.o: $(APPDIR)/status.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
