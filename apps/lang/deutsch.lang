@@ -1,3 +1,4 @@
+# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -1642,34 +1643,38 @@ new: "FF/RW"
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
-new: "Kompletter Pfad"
+new: "Voller Pfad"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-new: "nur Titelbezeichnung"
+new: "Nur Name"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
-new: "Dateioptionen"
+new: "Datei Optionen"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
 eng: "Remove"
-new: "Entfernen"
+### Not previously translated
+new: 
 
 id: LANG_SHOW_INDICES
 desc: in playlist viewer menu
 eng: "Show Indices"
-new: "Zeige Indizes"
+### Not previously translated
+new: 
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
-new: "Titelanzeige"
+### Not previously translated
+new: 
 
 id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
-new: "Anzeigen"
+### Not previously translated
+new: 
