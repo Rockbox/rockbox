@@ -19,7 +19,8 @@
 
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
-#include <sh7034.h>
+
+#include "sh7034.h"
 
 /*
  *   11.059,200 MHz => 90.4224537037037037037037037037037... ns
@@ -31,6 +32,21 @@
 
 //#define PHI ((int)(11.059200 MHz))
 //#define BAUDRATE 115200 /* 115200 - 9600 */
+
+#ifdef LITTLE_ENDIAN
+#define SWAB16(x) (x)
+#define SWAB32(x) (x)
+#else
+#define SWAB16(x) \
+         (((x & 0x00ff) << 8) | \
+	  ((x & 0xff00) >> 8))
+
+#define SWAB32(x) \
+         (((x & 0x000000ff) << 24) | \
+	  ((x & 0x0000ff00) << 8) | \
+	  ((x & 0x00ff0000) >> 8) | \
+	  ((x & 0xff000000) >> 24))
+#endif
 
 #define nop \
   asm volatile ("nop")
