@@ -22,14 +22,18 @@
 
 int read_rom_version(void)
 {
+#ifdef GMINI_ARCH
+    int ver = 0;
+#else
     int ver = *(short *)0x020000fe;
-
+#endif
+    
     return ver;
 }
 
 int read_hw_mask(void)
 {
-#ifdef ARCHOS_PLAYER
+#if defined(ARCHOS_PLAYER) || defined(GMINI_ARCH)
     int mask = 0; /* Fake value for simplicity */
 #else
     int mask = *(short *)0x020000fc;
