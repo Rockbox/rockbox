@@ -17,6 +17,7 @@ common/qsort.c
 common/random.c
 common/sprintf.c
 common/strcasecmp.c
+common/strcasestr.c
 common/strcat.c
 common/strchr.c
 common/strcmp.c

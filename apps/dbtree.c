@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include "file.h"
@@ -40,6 +41,7 @@
 #include "dbtree.h"
 #include "icons.h"
 #include "lang.h"
+#include "keyboard.h"
 
 #ifdef LITTLE_ENDIAN
 #include <netinet/in.h>
@@ -60,6 +62,9 @@ static int
     artistlen, initialized = 0;
 
 static int db_play_folder(struct tree_context* c);
+static int db_search(struct tree_context* c, char* string);
+
+static char searchstring[32];
 
 int db_init(void)
 {
@@ -78,45 +83,35 @@ int db_init(void)
         ptr[1] != 'D' ||
         ptr[2] != 'B')
     {
-        DEBUGF("File is not a rockbox id3 database, aborting\n");
+        splash(HZ,true,"Not a rockbox ID3 database!");
         return -1;
     }
     
     version = BE32(buf[0]) & 0xff;
     if (version != ID3DB_VERSION)
     {
-        DEBUGF("Unsupported database version %d, aborting.\n");
+        splash(HZ,true,"Unsupported database version %d!", version);
         return -1;
     }
-    DEBUGF("Version: RDB%d\n", version);
 
     songstart = BE32(buf[1]);
     songcount = BE32(buf[2]);
     songlen   = BE32(buf[3]);
-    DEBUGF("Number of songs: %d\n", songcount);
-    DEBUGF("Songstart: %x\n", songstart);
-    DEBUGF("Songlen: %d\n", songlen);
 
     albumstart = BE32(buf[4]);
     albumcount = BE32(buf[5]);
     albumlen   = BE32(buf[6]);
     songarraylen = BE32(buf[7]);
-    DEBUGF("Number of albums: %d\n", albumcount);
-    DEBUGF("Albumstart: %x\n", albumstart);
-    DEBUGF("Albumlen: %d\n", albumlen);
 
     artiststart = BE32(buf[8]);
     artistcount = BE32(buf[9]);
     artistlen   = BE32(buf[10]);
     albumarraylen = BE32(buf[11]);
-    DEBUGF("Number of artists: %d\n", artistcount);
-    DEBUGF("Artiststart: %x\n", artiststart);
-    DEBUGF("Artistlen: %d\n", artistlen);
 
     if (songstart > albumstart ||
         albumstart > artiststart)
     {
-        DEBUGF("Corrupt id3db database, aborting.\n");
+        splash(HZ,true,"Corrupt ID3 database!");
         return -1;
     }
 
@@ -157,11 +152,33 @@ int db_load(struct tree_context* c)
     
     switch (table) {
         case root: {
-            static const int tables[] = {allartists, allalbums, allsongs};
+            static const int tables[] = {allartists, allalbums, allsongs,
+                                         search };
             char* nbuf = (char*)nptr;
             char* labels[] = { str(LANG_ID3DB_ARTISTS),
                                str(LANG_ID3DB_ALBUMS),
-                               str(LANG_ID3DB_SONGS)};
+                               str(LANG_ID3DB_SONGS),
+                               str(LANG_ID3DB_SEARCH)};
+
+            for (i=0; i < 4; i++) {
+                strcpy(nbuf, labels[i]);
+                dptr[0] = (unsigned int)nbuf;
+                dptr[1] = tables[i];
+                nbuf += strlen(nbuf) + 1;
+                dptr += 2;
+            }
+            c->dirlength = c->filesindir = i;
+            return i;
+        }
+
+        case search: {
+            static const int tables[] = {searchartists,
+                                         searchalbums,
+                                         searchsongs};
+            char* nbuf = (char*)nptr;
+            char* labels[] = { str(LANG_ID3DB_SEARCH_ARTISTS),
+                               str(LANG_ID3DB_SEARCH_ALBUMS),
+                               str(LANG_ID3DB_SEARCH_SONGS)};
 
             for (i=0; i < 3; i++) {
                 strcpy(nbuf, labels[i]);
@@ -173,12 +190,26 @@ int db_load(struct tree_context* c)
             c->dirlength = c->filesindir = i;
             return i;
         }
-            
+
+        case searchartists:
+        case searchalbums:
+        case searchsongs:
+            i = db_search(c, searchstring);
+            c->dirlength = c->filesindir = i;
+            if (c->dirfull) {
+                splash(HZ, true, "%s %s",
+                       str(LANG_SHOWDIR_ERROR_BUFFER),
+                       str(LANG_SHOWDIR_ERROR_FULL));
+                c->dirfull = false;
+            }
+            else
+                splash(HZ, true, str(LANG_ID3DB_MATCHES), i);
+            return i;
+
         case allsongs:
             offset = songstart + c->firstpos * (songlen + 12);
             itemcount = songcount;
             stringlen = songlen;
-            c->dentry_size = 3;
             break;
 
         case allalbums:
@@ -229,7 +260,6 @@ int db_load(struct tree_context* c)
             offset = safeplace[0];
             itemcount = songarraylen;
             stringlen = songlen;
-            c->dentry_size = 3;
             break;
 
         default:
@@ -257,7 +287,7 @@ int db_load(struct tree_context* c)
     if (max_items > itemcount) {
         max_items = itemcount;
     }
-
+    
     for ( i=0; i < max_items; i++ ) {
         int rc, skip=0;
         int intbuf[4];
@@ -267,7 +297,6 @@ int db_load(struct tree_context* c)
                 c->dirlength = i;
                 break;
             }
-            //DEBUGF("Seeking to %x\n", safeplace[i]);
             lseek(fd, safeplace[i], SEEK_SET);
             offset = safeplace[i];
         }
@@ -286,16 +315,13 @@ int db_load(struct tree_context* c)
         switch (table) {
             case allsongs:
             case songs4album:
-                /* save offset of this song */
-                dptr[1] = offset;
-
                 rc = read(fd, intbuf, 12);
                 if (rc < 12) {
                     DEBUGF("%d read(%d) returned %d\n", i, 12, rc);
                     return -1;
                 }
                 /* save offset of filename */
-                dptr[2] = BE32(intbuf[2]);
+                dptr[1] = BE32(intbuf[2]);
                 break;
 
             case allalbums:
@@ -332,11 +358,95 @@ int db_load(struct tree_context* c)
     return i;
 }
 
+static int db_search(struct tree_context* c, char* string)
+{
+    int i, count, size, hits=0;
+    long start;
+
+    char* nptr = c->name_buffer;
+    const char* end_of_nbuf = nptr + c->name_buffer_size;
+
+    unsigned long* dptr = c->dircache;
+    const long dcachesize = global_settings.max_files_in_dir *
+        sizeof(struct entry);
+
+    switch (c->currtable) {
+        case searchartists:
+            start = artiststart;
+            count = artistcount;
+            size = artistlen + albumarraylen * 4;
+            break;
+
+        case searchalbums:
+            start = albumstart;
+            count = albumcount;
+            size = albumlen + 4 + songarraylen * 4;
+            break;
+
+        case searchsongs:
+            start = songstart;
+            count = songcount;
+            size = songlen + 12;
+            break;
+            
+        default:
+            DEBUGF("Invalid table %d\n", c->currtable);
+            return 0;
+    }
+
+    lseek(fd, start, SEEK_SET);
+
+    for (i=0; i<count; i++) {
+        if (read(fd, nptr, size) < size) {
+            DEBUGF("Short read(%d) in db_search()\n",size);
+            break;
+        }
+        if (strcasestr(nptr, string)) {
+            hits++;
+
+            dptr[0] = (unsigned long)nptr;
+            if (c->currtable == searchsongs) {
+                /* store offset of filename */
+                dptr[1] = BE32(*((long*)(nptr + songlen + 8)));
+            }
+            else
+                /* store offset of database record */
+                dptr[1] = start + i * size;
+
+            dptr += 2;
+
+            /* limit dir buffer */
+            if ((void*)(dptr + c->dentry_size) >
+                (void*)(c->dircache + dcachesize))
+            {
+                c->dirfull = true;
+                break;
+            }
+    
+            nptr += strlen(nptr) + 1;
+            while ((unsigned long)nptr & 3)
+                nptr++;
+
+            /* limit name buffer */
+            if ((void*)nptr + size > (void*)end_of_nbuf) {
+                c->dirfull = true;
+                break;
+            }
+        }
+    }
+
+    return hits;
+}
+
 int db_enter(struct tree_context* c)
 {
     int rc = 0;
-    int newextra = ((int*)c->dircache)[(c->dircursor + c->dirstart)*2 + 1];
+    int offset = (c->dircursor + c->dirstart) * c->dentry_size + 1;
+    int newextra = ((int*)c->dircache)[offset];
 
+    if (c->dirlevel >= MAX_DIR_LEVELS)
+        return 0;
+    
     c->dirpos[c->dirlevel] = c->dirstart;
     c->cursorpos[c->dirlevel] = c->dircursor;
     c->table_history[c->dirlevel] = c->currtable;
@@ -351,24 +461,36 @@ int db_enter(struct tree_context* c)
             break;
             
         case allartists:
+        case searchartists:
             c->currtable = albums4artist;
             c->currextra = newextra;
             break;
 
         case allalbums:
         case albums4artist:
+        case searchalbums:
             c->currtable = songs4album;
             c->currextra = newextra;
             break;
 
         case allsongs:
         case songs4album:
+        case searchsongs:
             c->dirlevel--;
             if (db_play_folder(c) >= 0)
                 rc = 3;
             break;
+
+        case search:
+            rc = kbd_input(searchstring, sizeof(searchstring));
+            if (rc == -1 || !searchstring[0])
+                c->dirlevel--;
+            else
+                c->currtable = newextra;
+            break;
             
         default:
+            c->dirlevel--;
             break;
     }
 
@@ -401,7 +523,7 @@ static int db_play_folder(struct tree_context* c)
     /* TODO: add support for very long tables */
     
     for (i=0; i < c->filesindir; i++) {
-        int pathoffset = ((int*)c->dircache)[i * c->dentry_size + 2];
+        int pathoffset = ((int*)c->dircache)[i * c->dentry_size + 1];
         lseek(fd, pathoffset, SEEK_SET);
         rc = read(fd, buf, sizeof(buf));
         if (rc < songlen) {
@@ -424,31 +546,17 @@ static int db_play_folder(struct tree_context* c)
 
 #ifdef HAVE_LCD_BITMAP
 const char* db_get_icon(struct tree_context* c)
-{
-    int icon;
-
-    switch (c->currtable)
-    {
-        case allsongs:
-        case songs4album:
-            icon = File;
-            break;
-
-        default:
-            icon = Folder;
-            break;
-    }
-
-    return bitmap_icons_6x8[icon];
-}
 #else
 int   db_get_icon(struct tree_context* c)
+#endif
 {
     int icon;
+
     switch (c->currtable)
     {
         case allsongs:
         case songs4album:
+        case searchsongs:
             icon = File;
             break;
 
@@ -456,6 +564,10 @@ int   db_get_icon(struct tree_context* c)
             icon = Folder;
             break;
     }
+
+#ifdef HAVE_LCD_BITMAP
+    return bitmap_icons_6x8[icon];
+#else
     return icon;
-}
 #endif
+}

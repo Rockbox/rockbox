@@ -40,6 +40,7 @@ char 	*_EXFUN(strpbrk,(const char *, const char *));
 char 	*_EXFUN(strrchr,(const char *, int));
 size_t	 _EXFUN(strspn,(const char *, const char *));
 char 	*_EXFUN(strstr,(const char *, const char *));
+char 	*_EXFUN(strcasestr,(const char *, const char *));
 
 #ifndef _REENT_ONLY
 char 	*_EXFUN(strtok,(char *, const char *));
