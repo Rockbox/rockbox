@@ -107,6 +107,7 @@ sed > Makefile \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s,@TARGET@,${target},g" \
  -e "s,@PLUGINS@,${plugins},g" \
+ -e "s,@CODECS@,${codecs},g" \
  -e "s,@SIMVER@,${simver},g" \
  -e "s,@MEMORY@,${memory},g" \
 <<EOF 
@@ -128,6 +129,7 @@ export TARGET=@TARGET@
 export LANGUAGE=@LANGUAGE@
 export VERSION=\$(shell date +%y%m%d-%H%M)
 export ENABLEDPLUGINS=@PLUGINS@
+export SOFTWARECODECS=@CODECS@
 export MEMORYSIZE=@MEMORY@
 
 .PHONY: 
@@ -312,6 +314,7 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
    3)
@@ -324,6 +327,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
    4)
@@ -336,6 +340,7 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
    5)
@@ -349,6 +354,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
+    codecs=""
     ;;
 
    6)
@@ -362,6 +368,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
+    codecs=""
     ;;
 
    7)
@@ -374,6 +381,7 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
    8)
@@ -386,6 +394,7 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
    9)
@@ -399,6 +408,7 @@ if [ -z "$archos" ]; then
     archosrom=""
     flash=""
     plugins="yes"
+    codecs="yes"
     ;;
 
    *)
@@ -411,6 +421,7 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    codecs=""
     ;;
 
   esac
@@ -518,6 +529,7 @@ sed > Makefile \
  -e "s,@ARCHOSROM@,${archosrom},g" \
  -e "s,@FLASHFILE@,${flash},g" \
  -e "s,@PLUGINS@,${plugins},g" \
+ -e "s,@CODECS@,${codecs},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
@@ -543,6 +555,7 @@ export MKFIRMWARE=@TOOL@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
 export ENABLEDPLUGINS=@PLUGINS@
+export SOFTWARECODECS=@CODECS@
 export EXTRA_DEFINES=@EXTRADEF@
 export CC=@CC@
 export LD=@LD@

@@ -22,6 +22,10 @@ ifdef ENABLEDPLUGINS
 ROCKS=rocks
 endif
 
+ifdef SOFTWARECODECS
+CODECS=build-codecs
+endif
+
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
@@ -41,12 +45,15 @@ MAXINFILE = $(OBJDIR)/romstart.temp
 MAXOUTFILE = $(OBJDIR)/romstart
 
 ifdef DEBUG
-all: $(OBJDIR)/rockbox.elf $(ROCKS)
+all: $(OBJDIR)/rockbox.elf $(CODECS) $(ROCKS)
 else
-all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(ROCKS) $(ARCHOSROM)
+all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
+
+build-codecs:
+	@$(MAKE) -C codecs
 
 rocks:
 	@$(MAKE) -C plugins/lib
@@ -151,6 +158,7 @@ clean:
 	$(LINKROM) $(OBJDIR)/rombox.ucl $(OBJDIR)/rombox.bin		\
 	$(OBJDIR)/rombox.elf $(MAXOUTFILE) $(DEPFILE)
 	@$(MAKE) -C plugins clean
+	@$(MAKE) -C codecs clean
 	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
 
 -include $(DEPFILE)
