@@ -346,7 +346,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             bufferpos += bytesread + 2;
             size -= bytesread;
         }
-        else if (!entry->artist &&
+        else if (!entry->title &&
                  (!strncmp(header, "TIT2", strlen("TIT2")) || 
                   !strncmp(header, "TT2", strlen("TT2")))) {
             bytesread = read(fd, buffer + bufferpos, framelen);
@@ -475,6 +475,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
     bytecount += entry->id3v2len;
 
     entry->bitrate = info.bitrate;
+    entry->frequency = info.frequency;
+    entry->version = info.version;
+    entry->layer = info.layer;
 
     /* If the file time hasn't been established, this may be a fixed
        rate MP3, so just use the default formula */
