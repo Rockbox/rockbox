@@ -26,6 +26,7 @@ shcc () {
  AS=sh-elf-as
  OC=sh-elf-objcopy
  GCCOPTS="$CCOPTS -m1"
+ GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
 }
 
 coldfirecc () {
@@ -35,6 +36,7 @@ coldfirecc () {
  AS=m68k-elf-as
  OC=m68k-elf-objcopy
  GCCOPTS="$CCOPTS -m5200"
+ GCCOPTIMIZE="-fomit-frame-pointer"
 }
 
 whichsim () {
@@ -385,7 +387,7 @@ if [ -z "$debug" ]; then
     *)
       debug=""
       echo "Normal build selected"
-      GCCOPTS="$GCCOPTS -fomit-frame-pointer -fschedule-insns"
+      GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
       ;;
 
   esac
