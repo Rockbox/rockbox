@@ -19,8 +19,6 @@
 #ifndef _POWERMGMT_H_
 #define _POWERMGMT_H_
 
-#ifndef SIMULATOR
-
 #ifdef HAVE_LIION /* FM Recorder, LiIon */
 #define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
 #define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
@@ -45,6 +43,7 @@
                                   * avg delta being < -0.05 V */
 #define CHARGE_END_ZEROD  50     /* stop when N minutes have passed with
                                   * avg delta being < 0.005 V */
+#ifndef SIMULATOR
 
 #ifdef HAVE_CHARGE_CTRL
 #define POWER_MESSAGE_LEN 32     /* power thread status message */
