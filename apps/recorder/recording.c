@@ -362,7 +362,7 @@ bool recording_screen(void)
             timeout = current_tick + HZ/10;
 
             seconds = mpeg_recorded_time() / HZ;
-             
+            
             update_countdown--;
             if(update_countdown == 0 || seconds > last_seconds)
             {
@@ -479,6 +479,27 @@ bool recording_screen(void)
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
                 lcd_update_rect(0, 8 + h*2, LCD_WIDTH, h);
             }
+        }
+
+        if(mpeg_status() & MPEG_STATUS_ERROR)
+        {
+            done = true;
+        }
+    }
+    
+    if(mpeg_status() & MPEG_STATUS_ERROR)
+    {
+        status_set_playmode(STATUS_STOP);
+        splash(0, 0, true, str(LANG_DISK_FULL));
+        status_draw(true);
+        lcd_update();
+        mpeg_error_clear();
+
+        while(1)
+        {
+            button = button_get(true);
+            if(button == (BUTTON_OFF | BUTTON_REL))
+                break;
         }
     }
     

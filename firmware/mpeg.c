@@ -26,6 +26,7 @@
 #include "string.h"
 #include <kernel.h>
 #include "thread.h"
+#include "errno.h"
 #include "mp3data.h"
 #include "buffer.h"
 #ifndef SIMULATOR
@@ -355,6 +356,8 @@ static void set_elapsed(struct mp3entry* id3)
 }
 
 static bool paused; /* playback is paused */
+
+static unsigned int mpeg_errno;
 
 #ifdef SIMULATOR
 static bool is_playing = false;
@@ -1952,7 +1955,20 @@ static void mpeg_thread(void)
                                        writelen);
                             
                             if(rc < 0)
-                                panicf("rec wrt: %d", rc);
+                            {
+                                if(errno == ENOSPC)
+                                {
+                                    mpeg_errno = MPEGERR_DISK_FULL;
+                                    demand_irq_enable(false);
+                                    stop_recording();
+                                    queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                                    break;
+                                }
+                                else
+                                {
+                                    panicf("rec wrt: %d", rc);
+                                }
+                            }
                             
                             rc = flush(mpeg_file);
                             if(rc < 0)
@@ -2224,6 +2240,8 @@ static void init_playback(void)
 
 void mpeg_record(char *filename)
 {
+    mpeg_errno = 0;
+    
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
     
@@ -2330,6 +2348,8 @@ void mpeg_play(int offset)
     
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
 #endif
+
+    mpeg_errno = 0;
 }
 
 void mpeg_stop(void)
@@ -2343,6 +2363,7 @@ void mpeg_stop(void)
     is_playing = false;
     playing = false;
 #endif
+    
 }
 
 void mpeg_pause(void)
@@ -2452,7 +2473,21 @@ int mpeg_status(void)
     if(is_recording)
         ret |= MPEG_STATUS_RECORD;
 #endif
+
+    if(mpeg_errno)
+        ret |= MPEG_STATUS_ERROR;
+    
     return ret;
+}
+
+unsigned int mpeg_error(void)
+{
+    return mpeg_errno;
+}
+
+void mpeg_error_clear(void)
+{
+    mpeg_errno = 0;
 }
 
 #ifndef SIMULATOR
@@ -2919,6 +2954,8 @@ static void mpeg_thread(void)
 void mpeg_init(int volume, int bass, int treble, int balance, int loudness, 
     int bass_boost, int avc, int channel_config)
 {
+    mpeg_errno = 0;
+    
 #ifdef SIMULATOR
     volume = bass = treble = balance = loudness
         = bass_boost = avc = channel_config;

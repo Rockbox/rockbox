@@ -95,6 +95,8 @@ unsigned long mpeg_num_recorded_bytes(void);
 #endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 void mpeg_set_buffer_margin(int seconds);
+unsigned int mpeg_error(void);
+void mpeg_error_clear(void);
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1
@@ -120,5 +122,8 @@ void mpeg_set_buffer_margin(int seconds);
 #define MPEG_STATUS_PLAY 1
 #define MPEG_STATUS_PAUSE 2
 #define MPEG_STATUS_RECORD 4
+#define MPEG_STATUS_ERROR 8
+
+#define MPEGERR_DISK_FULL 1
 
 #endif

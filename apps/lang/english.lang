@@ -1552,3 +1552,8 @@ id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 new:
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new:

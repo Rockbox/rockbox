@@ -348,8 +348,13 @@ static int flush_cache(int fd)
 
     rc = fat_readwrite(&(file->fatfile), 1,
                        file->cache, true );
-    if ( rc < 0 )
+
+    if ( rc < 0 ) {
+        if(file->fatfile.eof)
+            errno = ENOSPC;
+
         return rc * 10 - 2;
+    }
 
     file->dirty = false;
 
@@ -418,14 +423,19 @@ static int readwrite(int fd, void* buf, int count, bool write)
             return rc * 10 - 3;
     }
 
-    /* read whole sectors right into the supplied buffer */
+    /* read/write whole sectors right into/from the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
         int rc = fat_readwrite(&(file->fatfile), sectors, buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
-            file->fileoffset += nread;
+            if(write && file->fatfile.eof) {
+                DEBUGF("No space left on device\n");
+                errno = ENOSPC;
+            } else {
+                file->fileoffset += nread;
+            }
             file->cacheoffset = -1;
             return nread ? nread : rc * 10 - 4;
         }
