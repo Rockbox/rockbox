@@ -421,11 +421,12 @@ static int readwrite(int fd, void* buf, int count, bool write)
     /* read whole sectors right into the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        int rc = fat_readwrite(&(file->fatfile), sectors, 
-                               buf+nread, write );
+        int rc = fat_readwrite(&(file->fatfile), sectors, buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
             errno = EIO;
+            file->fileoffset += nread;
+            file->cacheoffset = -1;
             return nread ? nread : rc * 10 - 4;
         }
         else {
@@ -453,11 +454,12 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 /* sector is only partially filled. copy-back from disk */
                 int rc;
                 LDEBUGF("Copy-back tail cache\n");
-                rc = fat_readwrite(&(file->fatfile), 1,
-                                   file->cache, false );
+                rc = fat_readwrite(&(file->fatfile), 1, file->cache, false );
                 if ( rc < 0 ) {
                     DEBUGF("Failed writing\n");
                     errno = EIO;
+                    file->fileoffset += nread;
+                    file->cacheoffset = -1;
                     return nread ? nread : rc * 10 - 5;
                 }
                 /* seek back one sector to put file position right */
@@ -467,6 +469,8 @@ static int readwrite(int fd, void* buf, int count, bool write)
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
                     errno = EIO;
+                    file->fileoffset += nread;
+                    file->cacheoffset = -1;
                     return nread ? nread : rc * 10 - 6;
                 }
             }
@@ -478,6 +482,8 @@ static int readwrite(int fd, void* buf, int count, bool write)
             if (rc < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
+                file->fileoffset += nread;
+                file->cacheoffset = -1;
                 return nread ? nread : rc * 10 - 7;
             }
             memcpy( buf + nread, file->cache, count );
