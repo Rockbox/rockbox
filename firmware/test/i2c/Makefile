@@ -6,10 +6,11 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-I../.. -I../../drivers
 
-CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES)
+CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) -DDEBUG
 AFLAGS += -small -relax
 
-OBJS= crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o ../../debug.o
+OBJS= crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o ../../debug.o \
+	../../common/sprintf.o
 
 %.o: %.S
 	$(CC) -o $@ $(CFLAGS) $(INCLUDES) $(DEFS) -c $<

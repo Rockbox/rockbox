@@ -39,7 +39,7 @@ int main(void)
     debugf("Olle: %d\n", 7);
     
    i2c_init();
-   debug("I2C Init done\n");
+   debugf("I2C Init done\n");
    i=mas_readmem(MAS_BANK_D1,0xff6,(unsigned long*)buf,2);
    if (i) {
        debugf("Error - mas_readmem() returned %d\n", i);
