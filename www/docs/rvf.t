@@ -8,7 +8,7 @@ the Archos Recorder / FM Recorder / V2 line.
 
 <p> Other option is to get the GUI Video Conversion Tool from John Wunder, which
   can be downloaded from <a href="http://home.ripway.com/2004-2/66978/RockVideoRelease.zip">
-  http://home.ripway.com/2004-2/66978/RockVideoRelease.zip</a>
+  http://home.ripway.com/2004-2/66978/RockVideoRelease.zip</a>. (Windows users only)
 
 <p> See also Fabian Merki's <a
  href="http://merkisoft.ch/rockbox/">msi-rvf-gallery</a>, a Java program for
@@ -75,8 +75,8 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/video/">http://joerg.hohenso
  OPTIONAL: You can name the output differently.
  
 <li> The extracted audio file must be in mp3 format, so you have to convert the WAV file into MP3.
-     One option is using the LAME codec. You can download the win32 binary from <a
-     href="http://mitiok.cjb.net">http://mitiok.cjb.net</a>
+     One option to make this is using the LAME codec. You can download the win32 binary from <a
+     href="http://mitiok.cjb.net">http://mitiok.cjb.net</a>.
      One format used with LAME (good quality/size) is:
 <pre>
          lame --preset standard [input.wav] [output.mp3]
@@ -86,8 +86,8 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/video/">http://joerg.hohenso
          lame --preset standard filename.wav filename.mp3
 </pre>
 
- OPTIONL: You can name the output differently. Also, you can use other wav to mp3 tool, or even use
- other options in the lame command. The --preset standard will give you a VBR file, so if you want a 
+ OPTIONAL: You can name the output differently. Also, you can use other wav to mp3 tool, or even use
+ other options in the lame command. NOTE: The --preset standard will give you a VBR file, so if you want a 
  CBR file, just change the preset to --preset cbr [kbps], where [kbps] is the Constant Bit Rate desired.
  
 <li> Now we have to merge the sound with the video, so run the rvf_mux tool found
