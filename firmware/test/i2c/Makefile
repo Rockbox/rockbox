@@ -8,13 +8,13 @@ INCLUDES=-I../../common -I../.. -I../../drivers
 
 TARGET = -DARCHOS_PLAYER_OLD=1
 
-CFLAGS = -g -Wall -m1 -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
+CFLAGS = -g -Wall -m1 -save-temps -nostdlib -Wstrict-prototypes -fschedule-insns -fno-builtin $(INCLUDES) $(TARGET) -DDEBUG
 AFLAGS += -small -relax
 
 OBJS= ../../crt0.o main.o ../../drivers/i2c.o ../../drivers/mas.o \
 	../../debug.o ../../kernel.o thread.o ../../common/sprintf.o \
 	../../panic.o ../../system.o ../../drivers/led.o \
-	../../drivers/lcd.o ../../drivers/ata.o ../../drivers/fat.o \
+	../../drivers/lcd.o ata.o ../../drivers/fat.o \
 	../../common/disk.o ../../common/file.o ../../common/dir.o
 
 %.o: %.S
@@ -50,5 +50,11 @@ install:
 	mount /mnt/archos; cp archos.mod /mnt/archos; umount /mnt/archos
 
 thread.o: ../../thread.c
+	$(CC) -O $(CFLAGS) -c $<
+
+ata.o: ../../drivers/ata.c
+	$(CC) -O $(CFLAGS) -c $<
+
+main.o: main.c
 	$(CC) -O $(CFLAGS) -c $<
 
