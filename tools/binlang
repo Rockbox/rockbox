@@ -89,14 +89,18 @@ while(<LANG>) {
                 $value = $set{'eng'};
             }
 
-            $value =~ s/^\"(.*)\"/$1/g;
+            if($value =~ s/^\"(.*)\"/$1/g) {
 
-            $idnum = $idnum{$set{'id'}};
-            $idnum{$set{'id'}} = '_done_';
+                $idnum = $idnum{$set{'id'}};
+                $idnum{$set{'id'}} = '_done_';
 
-            printf OFILE ("%c%c%s\x00",
-                          ($idnum>>8), ($idnum&0xff),
-                          $value);
+                printf OFILE ("%c%c%s\x00",
+                              ($idnum>>8), ($idnum&0xff),
+                              $value);
+            }
+            else {
+                warn "String for ".$set{'id'}." misses quotes\n";
+            }
 
             undef %set;
         }

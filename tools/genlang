@@ -48,6 +48,7 @@ MOO
 
 open(LANG, "<$input");
 while(<LANG>) {
+    $line++;
     if($_ =~ / *\#/) {
         # comment
         next;
@@ -56,9 +57,15 @@ while(<LANG>) {
     $_ =~ s/\r//g;
     if($_ =~ / *([a-z]+): *(.*)/) {
         ($var, $value) = ($1, $2);
-  #      print "$var => $value\n";
+        # print "$var => $value\n";
 
         $set{$var} = $value;
+
+        if( (($var eq "new") && $value && ($value !~ /^\"(.*)\"$/)) ||
+            (($var eq "eng") && ($value !~ /^\"(.*)\"$/)) ) {
+            print "missing quotes on line $line for ".$set{'id'}."\n";
+            next;
+        }
 
         if($var eq "new") {
             # the last one for a single phrase
