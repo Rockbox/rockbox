@@ -111,6 +111,41 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     while (!done)
     {
+        if (counting)
+        {
+            stopwatch = prev_total + *rb->current_tick - start_at;
+        }
+        else
+        {
+            stopwatch = prev_total;
+        }
+
+        ticks_to_string(stopwatch,0,32,buf);
+        rb->lcd_puts(0, TIMER_Y, buf);
+
+        if(update_lap)
+        {
+            lap_start = curr_lap - lap_scroll;
+            for (lap = lap_start; lap > lap_start - LAP_LINES; lap--)
+            {
+                if (lap > 0)
+                {
+                    ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
+                    rb->lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
+                }
+                else
+                {
+                    rb->lcd_puts(0, LAP_Y + lap_start - lap,
+                                 "                  ");
+                }
+            }
+            update_lap = false;
+        }
+
+#ifdef HAVE_LCD_BITMAP
+        rb->lcd_update();
+#endif
+
         if (! counting)
         {
             button = rb->button_get(true);
@@ -187,41 +222,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
-
-        if (counting)
-        {
-            stopwatch = prev_total + *rb->current_tick - start_at;
-        }
-        else
-        {
-            stopwatch = prev_total;
-        }
-
-        ticks_to_string(stopwatch,0,32,buf);
-        rb->lcd_puts(0, TIMER_Y, buf);
-
-        if(update_lap)
-        {
-            lap_start = curr_lap - lap_scroll;
-            for (lap = lap_start; lap > lap_start - LAP_LINES; lap--)
-            {
-                if (lap > 0)
-                {
-                    ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
-                    rb->lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
-                }
-                else
-                {
-                    rb->lcd_puts(0, LAP_Y + lap_start - lap,
-                                 "                  ");
-                }
-            }
-            update_lap = false;
-        }
-
-#ifdef HAVE_LCD_BITMAP
-        rb->lcd_update();
-#endif
     }
     return PLUGIN_OK;
 }

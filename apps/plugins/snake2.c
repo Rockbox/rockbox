@@ -911,6 +911,31 @@ void game_init(void)
     
     while (1) 
     {    
+        rb->lcd_clear_display();
+        redraw();
+        /*TODO: CENTER ALL TEXT!!!!*/
+        rb->snprintf(plevel,sizeof(plevel),"Speed - %d",level);
+        rb->lcd_putsxy(LCD_WIDTH/2 - 30,5, plevel);
+#if CONFIG_KEYPAD == RECORDER_PAD
+        rb->snprintf(plevel,sizeof(plevel),"F1 - Maze %d",level_from_file);
+        rb->lcd_putsxy(18, 20, plevel);
+        if(game_type==0)
+            rb->lcd_putsxy(18, 30, "F3 - Game A");
+        else
+            rb->lcd_putsxy(18, 30, "F3 - Game B");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        rb->snprintf(plevel,sizeof(plevel),"Left - Maze %d",level_from_file);
+        rb->lcd_putsxy(18, 20, plevel);
+        if(game_type==0)
+            rb->lcd_putsxy(12, 30, "Right - Game A");
+        else
+            rb->lcd_putsxy(12, 30, "Right - Game B");
+#endif
+
+        rb->snprintf(phscore,sizeof(phscore),"Hi Score: %d",hiscore);
+        rb->lcd_putsxy(LCD_WIDTH/2 - 37,50, phscore);
+        rb->lcd_update();
+
         button=rb->button_get(true);
         switch (button)
         {
@@ -957,31 +982,6 @@ void game_init(void)
                 }
                 break;
         }
-       
-        rb->lcd_clear_display();
-        redraw();
-        /*TODO: CENTER ALL TEXT!!!!*/
-        rb->snprintf(plevel,sizeof(plevel),"Speed - %d",level);
-        rb->lcd_putsxy(LCD_WIDTH/2 - 30,5, plevel);
-#if CONFIG_KEYPAD == RECORDER_PAD
-        rb->snprintf(plevel,sizeof(plevel),"F1 - Maze %d",level_from_file);
-        rb->lcd_putsxy(18, 20, plevel);
-        if(game_type==0)
-            rb->lcd_putsxy(18, 30, "F3 - Game A");
-        else
-            rb->lcd_putsxy(18, 30, "F3 - Game B");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->snprintf(plevel,sizeof(plevel),"Left - Maze %d",level_from_file);
-        rb->lcd_putsxy(18, 20, plevel);
-        if(game_type==0)
-            rb->lcd_putsxy(12, 30, "Right - Game A");
-        else
-            rb->lcd_putsxy(12, 30, "Right - Game B");
-#endif
-
-        rb->snprintf(phscore,sizeof(phscore),"Hi Score: %d",hiscore);
-        rb->lcd_putsxy(LCD_WIDTH/2 - 37,50, phscore);
-        rb->lcd_update();
     }
 }
 
