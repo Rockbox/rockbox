@@ -20,6 +20,9 @@
 ****************************************************************************/
 #include "plugin.h"
 
+/* Only build for target */
+#ifndef SIMULATOR
+
 #ifndef UINT8
 #define UINT8 unsigned char
 #endif
@@ -662,3 +665,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 	return PLUGIN_OK;
 }
+
+#endif
