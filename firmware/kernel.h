@@ -19,6 +19,8 @@
 #ifndef _KERNEL_H_
 #define _KERNEL_H_
 
+#include <stdbool.h>
+
 /* wrap-safe macros for tick comparison */
 #define TIME_AFTER(a,b)         ((long)(b) - (long)(a) < 0)
 #define TIME_BEFORE(a,b)        TIME_AFTER(b,a)
@@ -60,6 +62,7 @@ int tick_remove_task(void (*f)(void));
 extern void queue_init(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_post(struct event_queue *q, int id, void *data);
+extern bool queue_empty(struct event_queue* q);
 
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);

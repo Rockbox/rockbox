@@ -94,6 +94,11 @@ void queue_post(struct event_queue *q, int id, void *data)
     set_irq_level(oldlevel);
 }
 
+bool queue_empty(struct event_queue* q)
+{
+    return ( q->read == q->write );
+}
+
 
 /****************************************************************************
  * Timer tick
