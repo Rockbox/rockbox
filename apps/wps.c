@@ -95,7 +95,7 @@ void player_change_volume(int button)
         }
 
         snprintf(buffer,sizeof(buffer),"Vol: %d %%       ", 
-                 global_settings.volume);
+                 mpeg_phys2val(global_settings.volume));
 
 #ifdef HAVE_LCD_CHARCELLS
         lcd_puts(0, 0, buffer);
