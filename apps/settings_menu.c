@@ -631,7 +631,7 @@ static bool scroll_speed(void)
 {
     return set_int(str(LANG_SCROLL), "Hz", UNIT_HERTZ,
                    &global_settings.scroll_speed, 
-                   &lcd_scroll_speed, 1, 1, 10 );
+                   &lcd_scroll_speed, 1, 1, 25 );
 }
 
 
