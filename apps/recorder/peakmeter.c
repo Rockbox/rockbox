@@ -67,6 +67,10 @@ static unsigned short db_min = 0;
 static unsigned short db_max = 9000;
 static unsigned short db_range = 9000;
 
+#if CONFIG_HWCODEC == MASNONE
+#define MAS_REG_DQPEAK_L 0
+#define MAS_REG_DQPEAK_R 0
+#endif
 
 #ifndef SIMULATOR
 static int peak_meter_src_l = MAS_REG_DQPEAK_L;
@@ -453,7 +457,8 @@ void peak_meter_set_use_dbfs(int use){
  *                        Pass a value dBfs * 100 when dbfs is set to true.
  *                        Pass a percent value when dbfs is set to false.
  */
-void peak_meter_init_range( bool dbfs, int range_min, int range_max) {
+void peak_meter_init_range( bool dbfs, int range_min, int range_max)
+{
     peak_meter_use_dbfs = dbfs;
     peak_meter_set_min(range_min);
     peak_meter_set_max(range_max);
@@ -482,9 +487,12 @@ void peak_meter_init_times(int release, int hold, int clip_hold) {
  * @param: bool playback - If true playback peak meter is used.
  *         If false recording peak meter is used.
  */
-void peak_meter_playback(bool playback) {
+void peak_meter_playback(bool playback)
+{
 #ifdef SIMULATOR
     (void)playback;
+#elif CONFIG_HWCODEC == MASNONE
+/* FIX: not for the sw-based ones yes */
 #else
     if (playback) {
         peak_meter_src_l = MAS_REG_DQPEAK_L;
@@ -503,10 +511,15 @@ void peak_meter_playback(bool playback) {
  * that ocurred. This function could be used by a thread for
  * busy reading the MAS.
  */
-inline void peak_meter_peek(void) {
+inline void peak_meter_peek(void)
+{
 #ifdef SIMULATOR
     int left = 8000;
     int right = 9000;
+#elif CONFIG_HWCODEC == MASNONE
+    /* FIX */
+    int left = 9000;
+    int right = 8000;
 #else
    /* read the peak values */
     int left  = mas_codec_readreg(peak_meter_src_l);
@@ -582,7 +595,8 @@ void peak_meter_init(void) {
  * since the last call of peak_meter_read_l. The value
  * is in the range 0 <= value < MAX_PEAK.
  */
-static int peak_meter_read_l (void) {
+static int peak_meter_read_l (void)
+{
     /* peak_meter_l contains the maximum of
        all peak values that were read by peak_meter_peek 
        since the last call of peak_meter_read_r */
@@ -592,6 +606,9 @@ static int peak_meter_read_l (void) {
 #endif
 
 #ifdef SIMULATOR
+    peak_meter_l = 8000;
+#elif CONFIG_HWCODEC == MASNONE
+    /* FIX */
     peak_meter_l = 8000;
 #else
     /* reset peak_meter_l so that subsequent calls of
@@ -619,6 +636,9 @@ static int peak_meter_read_r (void) {
 
 #ifdef SIMULATOR
     peak_meter_l = 8000;
+#elif CONFIG_HWCODEC == MASNONE
+    /* FIX */
+    peak_meter_r = 8000;
 #else
     /* reset peak_meter_r so that subsequent calls of
        peak_meter_peek doesn't get fooled by an old
@@ -897,4 +917,5 @@ bool peak_meter_histogram(void) {
     }
     return false;
 }
-#endif 
+#endif
+
