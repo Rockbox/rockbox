@@ -62,7 +62,7 @@ with a constant current of about 350mA. The charging is stopped for three reason
 The max duration is calculated dynamically. The time depends on how full the
 battery is when charging is started. For a nearly full battery, the max duration
 is low, for an empty one, it is a high value. The exact formula can be found in
-the source code.
+the source code. The battery capacity is also considered here.
 
 
 [DELTA PEAK - WHY DOES IT WORK?]
@@ -148,10 +148,10 @@ In simple words, it is
 
 remaining time = remaining battery energy / power consumption of AJB
 
-With using the battery courves described above and a battery capacity (a 
-constant in powermgmt.h), the remaining capacity is calculated. For the power 
-consumption, a usual constant value is used. If the LED backlight is set to 
-always on, it is also considered.
+With using the battery courves described above and the battery capacity you 
+selected in the settings menu, the remaining capacity is calculated. For the 
+power consumption, a usual constant value is used. If the LED backlight is set 
+to always on, it is also considered.
 
 
 [BATTERY LAZYNESS]
@@ -176,8 +176,6 @@ the charger is turned on):
 
 
 [WHICH CHARGING MODE TO USE]
-
-(trickle charge on and off not implemented yet!)
 
 If you use your AJB connected to the power supply the whole time, select "deep 
 discharge on" and "trickle charge off".
