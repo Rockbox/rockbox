@@ -843,8 +843,8 @@ new: "einmalig fragen"
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-voice: "Akku-Anzeige"
-new: "Akku-Anzeige"
+voice: "Batterie-Anzeige"
+new: "Batterie-Anzeige"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
@@ -1011,7 +1011,7 @@ new: "Playlisten"
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-voice: "Akkuladung:"
+voice: "Batterieladung:"
 new: "%d%% %d Std %d Min"
 
 id: LANG_SLEEP_TIMER
@@ -1077,8 +1077,8 @@ new: "Akku: Erhaltladen"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-voice: "Akkukapazität"
-new: "Akkukapazität"
+voice: "Batteriekapazität"
+new: "Batteriekapazität"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
@@ -1937,8 +1937,8 @@ new: "Status-/Verlaufsbalken"
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
 eng: "Battery"
-voice: "Akku"
-new: "Akku"
+voice: "Batterie"
+new: "Batterie"
 
 id: LANG_DISK_MENU
 desc: in the system sub menu
@@ -2911,3 +2911,21 @@ desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
 new: "%d Treffer"
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery type"
+voice: "Batterietyp"
+new: "Batterietyp"
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+voice: "Alkaline"
+new: "Alkaline"
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+voice: "Nickel-Metallhydrid"
+new: "NiMH"
