@@ -63,6 +63,7 @@ static int get_raw_button (void)
 	case XK_KP_2:
 	    return BUTTON_DOWN;
 
+#ifdef HAVE_RECORDER_KEYPAD
 	case XK_KP_Space:
 	case XK_KP_5:
 	    return BUTTON_PLAY;
@@ -81,6 +82,7 @@ static int get_raw_button (void)
 
 	case XK_KP_Subtract:
 	    return BUTTON_F3;
+#endif
 
 	default:
 	    return 0;
