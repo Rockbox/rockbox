@@ -166,10 +166,6 @@ void display_mute_text(bool muted)
 static void handle_usb(void)
 {
 #ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
-    bool laststate=statusbar(false);
-#endif
-
     backlight_time(4);
 
     /* Tell the USB thread that we are safe */
@@ -180,10 +176,6 @@ static void handle_usb(void)
     usb_wait_for_disconnect(&button_queue);
 
     backlight_time(global_settings.backlight);
-
-#ifdef HAVE_LCD_BITMAP
-    statusbar(laststate);
-#endif
 #endif
 }
 

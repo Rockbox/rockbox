@@ -245,11 +245,6 @@ void menu_exit(int m)
 
 Menu menu_run(int m)
 {
-#ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
-    bool laststate;
-#endif
-#endif
     Menu result = MENU_OK;
 
     menu_draw(m);
@@ -330,16 +325,11 @@ Menu menu_run(int m)
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
-#ifdef HAVE_LCD_BITMAP
-                laststate = statusbar(false);
-#endif
                 backlight_time(4);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&button_queue);
                 backlight_time(global_settings.backlight);
-#ifdef HAVE_LCD_BITMAP
-                statusbar(laststate);
-#else
+#ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_PARAM, true);
 #endif
                 menu_draw(m);

@@ -526,7 +526,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
             dynamic_lines[i] = flags.dynamic;
             
-#ifdef HAVE_LCD_CHARCELLS
+#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
             if (flags.player_progress)
                 draw_player_progress(id3, ff_rewind_count);
 #endif

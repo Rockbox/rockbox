@@ -732,9 +732,6 @@ bool dirbrowse(char *root)
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED: {
-#ifdef HAVE_LCD_BITMAP
-                bool laststate=statusbar(false);
-#endif
                 backlight_time(4);
 
                 /* Tell the USB thread that we are safe */
@@ -753,9 +750,6 @@ bool dirbrowse(char *root)
                 dirlevel = 0;
                 dircursor = 0;
                 start = 0;
-#ifdef HAVE_LCD_BITMAP
-                statusbar(laststate);
-#endif
             }
             break;
 #endif
