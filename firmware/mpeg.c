@@ -798,7 +798,11 @@ void mpeg_prev(void)
 
 bool mpeg_is_playing(void)
 {
+#ifndef SIMULATOR
     return playing || play_pending;
+#else
+    return false;
+#endif
 }
 
 #ifndef SIMULATOR
