@@ -74,13 +74,19 @@ DIR* opendir(const char* name)
     char* end;
     struct fat_direntry entry;
     int dd;
+    DIR* pdir = opendirs;
 #ifdef HAVE_MULTIVOLUME
     int volume;
 #endif
 
+    if ( name[0] != '/' ) {
+        DEBUGF("Only absolute paths supported right now\n");
+        return NULL;
+    }
+
     /* find a free dir descriptor */
-    for ( dd=0; dd<MAX_OPEN_DIRS; dd++ )
-        if ( !opendirs[dd].busy )
+    for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
+        if ( !pdir->busy )
             break;
 
     if ( dd == MAX_OPEN_DIRS ) {
@@ -89,26 +95,20 @@ DIR* opendir(const char* name)
         return NULL;
     }
 
-    opendirs[dd].busy = true;
-
-    if ( name[0] != '/' ) {
-        DEBUGF("Only absolute paths supported right now\n");
-        opendirs[dd].busy = false;
-        return NULL;
-    }
+    pdir->busy = true;
 
 #ifdef HAVE_MULTIVOLUME
     /* try to extract a heading volume name, if present */
     volume = strip_volume(name, namecopy);
-    opendirs[dd].volumecounter = 0;
+    pdir->volumecounter = 0;
 #else
     strncpy(namecopy,name,sizeof(namecopy)); /* just copy */
     namecopy[sizeof(namecopy)-1] = '\0';
 #endif
 
-    if ( fat_opendir(IF_MV2(volume,) &(opendirs[dd].fatdir), 0, NULL) < 0 ) {
+    if ( fat_opendir(IF_MV2(volume,) &pdir->fatdir, 0, NULL) < 0 ) {
         DEBUGF("Failed opening root dir\n");
-        opendirs[dd].busy = false;
+        pdir->busy = false;
         return NULL;
     }
 
@@ -116,32 +116,32 @@ DIR* opendir(const char* name)
           part = strtok_r(NULL, "/", &end)) {
         /* scan dir for name */
         while (1) {
-            if ((fat_getnext(&(opendirs[dd].fatdir),&entry) < 0) ||
+            if ((fat_getnext(&pdir->fatdir,&entry) < 0) ||
                 (!entry.name[0])) {
-                opendirs[dd].busy = false;
+                pdir->busy = false;
                 return NULL;
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
-                opendirs[dd].parent_dir = opendirs[dd].fatdir;
+                pdir->parent_dir = pdir->fatdir;
                 if ( fat_opendir(IF_MV2(volume,)
-                                 &(opendirs[dd].fatdir),
+                                 &pdir->fatdir,
                                  entry.firstcluster,
-                                 &(opendirs[dd].parent_dir)) < 0 ) {
+                                 &pdir->parent_dir) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",
                            part, entry.firstcluster);
-                    opendirs[dd].busy = false;
+                    pdir->busy = false;
                     return NULL;
                 }
 #ifdef HAVE_MULTIVOLUME
-                opendirs[dd].volumecounter = -1; /* n.a. to subdirs */
+                pdir->volumecounter = -1; /* n.a. to subdirs */
 #endif
                 break;
             }
         }
     }
 
-    return &opendirs[dd];
+    return pdir;
 }
 
 int closedir(DIR* dir)
