@@ -1,6 +1,10 @@
-
+#define _PAGE_ Rockbox Boots Up
+#include "head.t"
+<p>
 When Rockbox boots up, it'll display the Rockbox logo for a short time, and
 then it'll jump right into the <a href="rec-dir.html">dir browser</a> showing
 the root (toplevel) directory of your Archos.
-
-[screen dump of boot] [screen dump of toplevel dir]
+<p>
+[screen dump of boot]
+<p>
+[screen dump of toplevel dir]
