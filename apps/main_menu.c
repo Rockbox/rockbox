@@ -34,8 +34,10 @@
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
-#include "screensaver.h"
+#include "boxes.h"
+#include "sokoban.h"
 extern void tetris(void);
+extern void bounce(void);
 #endif
 
 int show_logo( void )
@@ -185,19 +187,21 @@ void main_menu(void)
 {
     int m;
     enum {
-        Tetris, Screen_Saver, Version, Sound, Scroll, Shuffle
+        Tetris, Boxes, Bounce, Sokoban, Version, Sound, Scroll, Shuffle
     };
 
     /* main menu */
     struct menu_items items[] = {
-        { Shuffle,      "Shuffle",      shuffle  },
-        { Sound,        "Sound",        sound_menu  },
+        { Shuffle,      "Shuffle",      shuffle      },
+        { Sound,        "Sound",        sound_menu   },
+        { Scroll,       "Scroll speed", scroll_speed },
 #ifdef HAVE_LCD_BITMAP
-        { Tetris,       "Tetris",       tetris      },
-        { Screen_Saver, "Screen Saver", screensaver },
+        { Tetris,       "Tetris",       tetris       },
+        { Boxes,        "Boxes",        boxes        },
+        { Bounce,       "Bounce",       bounce       },
+        { Sokoban,      "Sokoban",      sokoban },
 #endif
         { Version,      "Version",      show_credits },
-        { Scroll,       "Scroll speed", scroll_speed },
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
