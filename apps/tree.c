@@ -401,8 +401,15 @@ bool dirbrowse(char *root)
 		DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
 		usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
+		usb_display_info();
+		
 		/* Wait until the USB cable is extracted again */
 		usb_wait_for_disconnect(&button_queue);
+
+		/* Force a re-read of the root directory */
+		restore = 1;
+		strcpy(currdir, "/");
+		lastdir[0] = 0;
 		break;
         }
 
