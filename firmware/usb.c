@@ -36,12 +36,25 @@
 
 #ifndef SIMULATOR
 
+/* Messages from usb_tick */
 #define USB_INSERTED    1
 #define USB_EXTRACTED   2
 
+/* Thread states */
+#define EXTRACTING      1
+#define EXTRACTED       2
+#define INSERTED        3
+#define INSERTING       4
+
+/* The ADC tick reads one channel per tick, and we want to check 3 successive
+   readings on the USB voltage channel. This doesn't apply to the Player, but
+   debouncing the USB detection port won't hurt us either. */
+#define NUM_POLL_READINGS (NUM_ADC_CHANNELS * 3)
+static int countdown;
+
 static int usb_state;
 
-static char usb_stack[0x100];
+static char usb_stack[0x200];
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
@@ -100,7 +113,7 @@ static void usb_thread(void)
     struct event ev;
 
     waiting_for_ack = false;
-    
+
     while(1)
     {
         queue_wait(&usb_queue, &ev);
@@ -109,7 +122,8 @@ static void usb_thread(void)
             case USB_INSERTED:
                 /* Tell all threads that they have to back off the ATA.
                    We subtract one for our own thread. */
-                num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, NULL) - 1;
+                num_acks_to_expect =
+                    queue_broadcast(SYS_USB_CONNECTED, NULL) - 1;
                 waiting_for_ack = true;
                 DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
                        num_acks_to_expect);
@@ -121,12 +135,7 @@ static void usb_thread(void)
                     num_acks_to_expect--;
                     if(num_acks_to_expect == 0)
                     {
-                        /* This is where we are supposed to be cool and keep
-                           the Rockbox firmware running while the USB is enabled,
-                           maybe even play some games and stuff. However, the
-                           current firmware isn't quite ready for this yet.
-                           Let's just chicken out and reboot. */
-                        DEBUGF("All threads have acknowledged. Continuing...\n");
+                        DEBUGF("All threads have acknowledged the connect.\n");
 #ifdef USB_REALLY_BRAVE
                         usb_slave_mode(true);
                         usb_state = USB_INSERTED;
@@ -137,7 +146,8 @@ static void usb_thread(void)
                     }
                     else
                     {
-                        DEBUGF("usb: got ack, %d to go...\n", num_acks_to_expect);
+                        DEBUGF("usb: got ack, %d to go...\n",
+                               num_acks_to_expect);
                     }
                 }
                 break;
@@ -167,11 +177,13 @@ static void usb_thread(void)
                     num_acks_to_expect--;
                     if(num_acks_to_expect == 0)
                     {
-                        DEBUGF("All threads have acknowledged. We're in business.\n");
+                        DEBUGF("All threads have acknowledged. "
+                               "We're in business.\n");
                     }
                     else
                     {
-                        DEBUGF("usb: got ack, %d to go...\n", num_acks_to_expect);
+                        DEBUGF("usb: got ack, %d to go...\n",
+                               num_acks_to_expect);
                     }
                 }
                 break;
@@ -186,8 +198,7 @@ static void usb_tick(void)
     if(usb_monitor_enabled)
     {
 #ifdef ARCHOS_RECORDER
-        /* If AN2 reads more than about 500, the USB is inserted */
-        current_status = (adc_read(2) > 500);
+        current_status = (adc_read(ADC_USB_POWER) > 500)?true:false;
 #else
         current_status = (PADR & 0x8000)?false:true;
 #endif
@@ -196,10 +207,23 @@ static void usb_tick(void)
         if(current_status != last_usb_status)
         {
             last_usb_status = current_status;
-            if(current_status)
-                queue_post(&usb_queue, USB_INSERTED, NULL);
-            else
-                queue_post(&usb_queue, USB_EXTRACTED, NULL);
+            countdown = NUM_POLL_READINGS;
+        }
+        else
+        {
+            /* Count down until it gets negative */
+            if(countdown >= 0)
+                countdown--;
+
+            /* Report to the thread if we have had 3 identical status
+               readings in a row */
+            if(countdown == 0)
+            {
+                if(current_status)
+                    queue_post(&usb_queue, USB_INSERTED, NULL);
+                else
+                    queue_post(&usb_queue, USB_EXTRACTED, NULL);
+            }
         }
     }
 }
@@ -213,6 +237,7 @@ void usb_init(void)
 {
     usb_state = USB_EXTRACTED;
     usb_monitor_enabled = false;
+    countdown = -1;
     
     usb_enable(false);
 
