@@ -580,6 +580,7 @@ static bool ask_resume(bool ask_once)
                    still be pressed since booting */
             case BUTTON_ON:
             case BUTTON_ON | BUTTON_REL:
+            case BUTTON_ON | BUTTON_REPEAT:
                 break;
                 
             case SYS_USB_CONNECTED:
