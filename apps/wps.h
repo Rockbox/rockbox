@@ -21,9 +21,14 @@
 #include "id3.h"
 #include "playlist.h" 
 
+/* #define CUSTOM_WPS */
+
 extern bool keys_locked;
 
 int wps_show(void);
+
+#ifdef CUSTOM_WPS
 int wps_load_custom_config(void);
+#endif
 
 #endif

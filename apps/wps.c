@@ -201,10 +201,12 @@ static void draw_screen(struct mp3entry* id3)
                 lcd_puts_scroll(0, 0, buffer);
                 break;
             }
+#ifdef CUSTOM_WPS
             case PLAY_DISPLAY_CUSTOM_WPS:
             {
                 wps_load_custom_config();
             }
+#endif
 #endif
         }
     }
@@ -212,6 +214,7 @@ static void draw_screen(struct mp3entry* id3)
     lcd_update();
 }
 
+#ifdef CUSTOM_WPS
 int wps_load_custom_config(void)
 {
     char buffer[128];
@@ -339,7 +342,7 @@ int wps_load_custom_config(void)
     snprintf(buffer, sizeof(buffer), "%s%s", buffer, tmpbuf);
     }
 }
-
+#endif
 
 int player_id3_show(void)
 {

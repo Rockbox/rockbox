@@ -86,8 +86,13 @@ static void wps_set(void)
     char* names[] = { "ID3 Tags", "File     ", "Parse    " };
     set_option("[WPS display]", &global_settings.wps_display, names, 3 );
 #else
-    char* names[] = { "1 Line ID3", "2 Line ID3", "File      ",
-            "Parse     ", "Custom WPS " };
+    char* names[] = { "1 Line ID3", "2 Line ID3", "File      ","Parse     ",
+#ifdef CUSTOM_WPS
+ "Custom WPS " };
+#else
+ };
+#endif
+
     set_option("[WPS display]", &global_settings.wps_display, names, 5 );
 #endif
 }
