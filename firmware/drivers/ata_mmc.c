@@ -414,8 +414,12 @@ static int initialize_card(int card_no)
         return -1;                /* error response */
 
     /* initialize card */
-    i = 0;
-    while (send_cmd(CMD_SEND_OP_COND, 0, response) && (++i < 500));
+    for (i = 0; i < 100; i++)     /* timeout 1 sec */
+    {
+        sleep(1);
+        if (send_cmd(CMD_SEND_OP_COND, 0, response) == 0)
+            break;
+    }
     if (response[0] != 0x00)
         return -2;                /* not ready */
         
