@@ -29,6 +29,16 @@ shcc () {
  GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
 }
 
+calmrisccc () {
+ CC=calmrisc16-unknown-elf-gcc
+ LD=calmrisc16-unknown-elf-ld
+ AR=calmrisc16-unknown-elf-ar
+ AS=calmrisc16-unknown-elf-as
+ OC=calmrisc16-unknown-elf-objcopy
+ GCCOPTS="$CCOPTS -m1"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+}
+
 coldfirecc () {
  CC=m68k-elf-gcc
  LD=m68k-elf-ld
@@ -255,6 +265,7 @@ if [ -z "$archos" ]; then
   echo "2 - Archos Recorder"
   echo "3 - Archos FM Recorder"
   echo "4 - Archos Recorder v2"
+  echo "5 - Archos Gmini 120"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
   echo "9 - Iriver H100"
@@ -297,6 +308,19 @@ if [ -z "$archos" ]; then
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
+    ;;
+
+   5)
+    archos="gmini120"
+    target="-DARCHOS_GMINI120"
+    memory=16 # fixed size (16 is a guess, remove comment when checked)
+    calmrisccc
+    tool="$rootdir/tools/scramble" # not correct but...
+    output="rockboxgmini"
+    appextra="recorder"
+    archosrom=""
+    flash=""
+    plugins="no" # disabled for now, enable later on
     ;;
 
    7)
