@@ -71,11 +71,11 @@ $(MAXOUTFILE):
 
 $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rombox.elf"
-	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a $(DEPFILE)
 	@echo "LD rockbox.elf"
-	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
 	@echo "OBJCOPY $<"
