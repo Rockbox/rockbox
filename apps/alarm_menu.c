@@ -82,20 +82,11 @@ bool alarm_screen(void)
                 lcd_update();
                 rtc_init();
                 rtc_set_alarm(h,m);
-                /* in some cases enabling the alarm results in an activated AF flag */
-                /* this should not happen, but it does */
-                /* if you know why, tell me! */
-                /* for now, we try again forever in this case */
-                while (rtc_enable_alarm(true)) { /* error occured */
-                  sleep(HZ / 10);
-                  rtc_init();
-                  rtc_set_alarm(h,m);
-                }
-                sleep(HZ);
+                rtc_enable_alarm(true);
                 lcd_puts(0,1,str(LANG_ALARM_MOD_SHUTDOWN));
                 lcd_update();
                 sleep(HZ);
-                power_off();
+		done = true;
             } else {
                 lcd_clear_display();
                 lcd_puts(0,0,str(LANG_ALARM_MOD_ERROR));
@@ -150,6 +141,11 @@ bool alarm_screen(void)
         case BUTTON_STOP:
         case BUTTON_MENU:
 #endif
+            lcd_clear_display();
+	    lcd_puts(0,0,str(LANG_ALARM_MOD_DISABLE));
+	    lcd_update();
+	    sleep(HZ);
+            rtc_enable_alarm(false);
             done = true;
             break;
         }

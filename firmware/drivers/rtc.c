@@ -20,6 +20,7 @@
 #ifdef HAVE_RTC
 #include "i2c.h"
 #include "rtc.h"
+#include "kernel.h"
 #include <stdbool.h> 
 
 #define RTC_ADR 0xd0
@@ -31,7 +32,7 @@ void rtc_init(void)
     unsigned char data; 
 
 #ifdef HAVE_ALARM_MOD
-    /* Check + save alarm bit first, since something in rtc_init resets AF */
+    /* Check + save alarm bit first, before the power thread starts watching */
     rtc_check_alarm_started(false);
 #endif
 
@@ -67,7 +68,6 @@ void rtc_init(void)
        otherwise the player can't be turned off. */
     rtc_write(8, rtc_read(8) | 0x80);
     
-    rtc_enable_alarm(false);
 #endif
 }
 
@@ -85,11 +85,22 @@ bool rtc_check_alarm_started(bool release_alarm)
         alarm_state &= ~release_alarm;
     } else { 
         /* This call resets AF, so we store the state for later recall */ 
-        rc = alarm_state = ((rtc_read(0x0f) & 0x40) != 0);
+        rc = alarm_state = rtc_check_alarm_flag();
         run_before = true; 
     }
  
     return rc;
+}
+/*
+ * Checks the AL register.  This call resets AL once read.
+ *
+ * We're only interested if ABE is set.  AL is still raised regardless
+ * even if the unit is off when the alarm occurs.
+ */
+bool rtc_check_alarm_flag(void) 
+{
+    return ( ( (rtc_read(0x0f) & 0x40) != 0) &&
+               (rtc_read(0x0a) & 0x20)  );
 }
 
 /* set alarm time registers to the given time (repeat once per day) */
@@ -140,14 +151,21 @@ bool rtc_enable_alarm(bool enable)
     rtc_write(0x0a, data);
     
     /* check if alarm flag AF is off (as it should be) */
-    if ((rtc_read(0x0f) & 0x40) != 0) /* on */
+    /* in some cases enabling the alarm results in an activated AF flag */
+    /* this should not happen, but it does */
+    /* if you know why, tell me! */
+    /* for now, we try again forever in this case */
+    while (rtc_check_alarm_flag()) /* on */
     {
-       data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
-       rtc_write(0x0a, data);
-       return true;
-    } else {
-        return false; /* all ok */
+        data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
+        rtc_write(0x0a, data);
+	sleep(HZ / 10);
+	rtc_check_alarm_flag();
+        data |= 0xa0; /* turn bit d7=AFE and d5=ABE on */
+        rtc_write(0x0a, data);
     }
+
+    return false; /* all ok */
 }
 
 #endif /* HAVE_ALARM_MOD */

@@ -36,6 +36,7 @@
 #include "powermgmt.h"
 #include "backlight.h"
 #include "lcd.h"
+#include "rtc.h"
 #ifdef CONFIG_TUNER
 #include "fmradio.h"
 #endif
@@ -441,6 +442,15 @@ static void car_adapter_mode_processing(void)
 }
 #endif
 
+/* Check to see whether or not we've received an alarm in the last second */
+#ifdef HAVE_ALARM_MOD
+static void power_thread_rtc_process(void) 
+{
+
+    rtc_check_alarm_flag();
+}
+#endif
+
 /*
  * This function is called to do the relativly long sleep waits from within the
  * main power_thread loop while at the same time servicing any other periodic
@@ -456,6 +466,9 @@ static void power_thread_sleep(int ticks)
         ticks -= small_ticks;
 
         car_adapter_mode_processing();
+#ifdef HAVE_ALARM_MOD
+	power_thread_rtc_process();
+#endif
     }
 #else
     sleep(ticks);  /* no fast-processing functions, sleep the whole time */
@@ -491,7 +504,10 @@ static void power_thread(void)
     {
         /* never read power while disk is spinning, unless in USB mode */
         if (ata_disk_is_active() && !usb_inserted()) {
-            sleep(HZ * 2);
+#ifdef HAVE_ALARM_MOD
+	    power_thread_rtc_process();
+#endif
+            sleep(HZ);
             continue;
         }
         
@@ -876,7 +892,9 @@ void powermgmt_init(void)
 
 #endif /* SIMULATOR */
 
-void shutdown_hw(void) {
+/* Various hardware housekeeping tasks relating to shutting down the jukebox */
+void shutdown_hw(void) 
+{
 #ifndef SIMULATOR
     mpeg_stop();
     ata_flush();

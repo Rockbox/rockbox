@@ -32,6 +32,7 @@ void rtc_set_alarm(int h, int m);
 void rtc_get_alarm(int *h, int *m);
 bool rtc_enable_alarm(bool enable);
 bool rtc_check_alarm_started(bool release_alarm);
+bool rtc_check_alarm_flag(void);
 #endif /* HAVE_ALARM_MOD */
 
 #endif /* HAVE_RTC */

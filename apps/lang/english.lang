@@ -1155,7 +1155,7 @@ new:
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
+eng: "Alarm Set"
 voice: ""
 new: 
 
@@ -3002,4 +3002,10 @@ id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
+new:
+
+id: LANG_ALARM_MOD_DISABLE
+desc: Announce that the RTC alarm has been turned off
+eng: "Alarm Disabled"
+voice: "Alarm Disabled"
 new:
