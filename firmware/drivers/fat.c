@@ -392,40 +392,50 @@ static void *cache_fat_sector(int fatsector)
 {
     int secnum = fatsector + fat_bpb.bpb_rsvdseccnt;
     int cache_index = secnum & FAT_CACHE_MASK;
+    struct fat_cache_entry *fce = &fat_cache[cache_index];
+    unsigned char *sectorbuf = &fat_cache_sectors[cache_index][0];
 
     /* Delete the cache entry if it isn't the sector we want */
-    if(fat_cache[cache_index].inuse &&
-       fat_cache[cache_index].secnum != secnum)
+    if(fce->inuse && fce->secnum != secnum)
     {
         /* Write back if it is dirty */
-        if(fat_cache[cache_index].dirty)
+        if(fce->dirty)
         {
-            if(ata_write_sectors(fat_cache[cache_index].secnum +
-                                 fat_bpb.startsector, 1,
-                                 fat_cache_sectors[cache_index]))
+            if(ata_write_sectors(fce->secnum+fat_bpb.startsector, 1,
+                                 sectorbuf))
             {
                 panicf("cache_fat_sector() - Could not write sector %d\n",
                        secnum);
             }
+            if(fat_bpb.bpb_numfats > 1)
+            {
+                /* Write to the second FAT */
+                if(ata_write_sectors(fce->secnum+fat_bpb.startsector+
+                                     fat_bpb.fatsize, 1, sectorbuf))
+                {
+                    panicf("cache_fat_sector() - Could not write sector %d\n",
+                           secnum + fat_bpb.fatsize);
+                }
+            }
         }
-        fat_cache[cache_index].secnum = 8; /* Normally an unused sector */
-        fat_cache[cache_index].dirty = false;
-        fat_cache[cache_index].inuse = false;
+        fce->secnum = 8; /* Normally an unused sector */
+        fce->dirty = false;
+        fce->inuse = false;
     }
-    
+
     /* Load the sector if it is not cached */
-    if(!fat_cache[cache_index].inuse)
+    if(!fce->inuse)
     {
         if(ata_read_sectors(secnum + fat_bpb.startsector,1,
-                            fat_cache_sectors[cache_index]))
+                            sectorbuf))
         {
             DEBUGF( "cache_fat_sector() - Could not read sector %d\n", secnum);
             return NULL;
         }
-        fat_cache[cache_index].inuse = true;
-        fat_cache[cache_index].secnum = secnum;
+        fce->inuse = true;
+        fce->secnum = secnum;
     }
-    return fat_cache_sectors[cache_index];
+    return sectorbuf;
 }
 
 static int find_free_cluster(int startcluster)
