@@ -501,20 +501,24 @@ void lcd_putsxy(int x, int y, char *str, int thisfont)
             return;
 
         /* Limit to char generation table */
-        if (ch >= ASCII_MIN && ch <= ASCII_MAX)
-        {
-            if (nx == 12)
-                src = char_gen_12x16[ch-ASCII_MIN][0];
-            else if (nx == 8)
-                src = char_gen_8x12[ch-ASCII_MIN][0];
-            else
-                src = char_gen_6x8[ch-ASCII_MIN][0];
+        if ((ch < ASCII_MIN) || (ch > ASCII_MAX))
+            /* replace unsupported letters with question marks */
+            ch = '?' - ASCII_MIN;
+        else
+            ch -= ASCII_MIN;
+        
+        if (thisfont == 2)
+            src = char_gen_12x16[ch][0];
+        else if (thisfont == 1)
+            src = char_gen_8x12[ch][0];
+        else
+            src = char_gen_6x8[ch][0];
+        
+        lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, true);
+        lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, true);
 
-            lcd_bitmap (src, lcd_x, lcd_y, nx-1, ny, true);
-            lcd_bitmap (zeros, lcd_x+nx-1, lcd_y, 1, ny, true);
+        lcd_x += nx;
 
-            lcd_x += nx;
-        }
     }
 }
 
