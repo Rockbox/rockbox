@@ -48,6 +48,9 @@ static const char cfg_filename[] =  "euroconverter.cfg";
 #define CFGFILE_VERSION 0     /* Current config file version */
 #define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
 
+/* typedef for simplifying usage of long long type */
+typedef long long int longlong_t;
+
 /*Pattern for the converter*/
 static unsigned char pattern_euro[]={0x07, 0x08, 0x1E, 0x10, 0x1E, 0x08, 0x07};    /* € */
 static unsigned char pattern_home[]={0x04, 0x0A, 0x11, 0x1F, 0x11, 0x11, 0x1F};    /* Home icon*/
@@ -85,7 +88,7 @@ static int nb_digit[12]={
                         };
 
 /* max euro to have home currency */
-static long long max_euro[12]={
+static longlong_t max_euro[12]={
                                   99999999000LL,   /*FRF France      999 999.99 */
                                   99999999000LL,   /*DEM Germany     999 999.99 */
                                   99999999000LL,   /*ATS Austria     999 999.99 */
@@ -102,7 +105,7 @@ static long long max_euro[12]={
 
 /* max home to have euro currency */
 /* 92233720300000 Limitation due to the max capacity of long long (2^63)*/
-static long long max_curr[12]={
+static longlong_t max_curr[12]={
                                   99999999000LL,   /*FRF France      152449.02 */
                                   99999999000LL,   /*DEM Germany     511291.88 */
                                   99999999000LL,   /*ATS Austria     72672.83 */
@@ -152,9 +155,10 @@ static char *currency_str[12] = {
    "Greece"
 };
 
+
 static int country;     /*Country selected*/
 static int cur_pos;     /*Cursor position*/
-static long long inc;   
+static longlong_t inc;   
 
 /* Persistent settings */
 static struct configdata config[] = {
@@ -163,23 +167,23 @@ static struct configdata config[] = {
 
 
 /* 64bits*64 bits with 5 digits after the . */
-static long long mul(long long a, long long b)
+static longlong_t mymul(longlong_t a, longlong_t b)
 {
-    return((a*b)/100000);
+    return((a*b)/100000LL);
 }
 
 
 /* 64bits/64 bits with 5 digits after the . */
-static long long mydiv(long long a, long long b)
+static longlong_t mydiv(longlong_t a, longlong_t b)
 {
-    return((a*100000)/b);
+    return((a*100000LL)/b);
 }
 
 
 /* 123.45=12345000  split => i=123 f=45000*/
-static void split(long long v, long long* i, long long* f)
+static void split(longlong_t v, longlong_t* i, longlong_t* f)
 {
-    long long t;
+    longlong_t t;
 
     t=v/100000LL;
     (*i)=t;
@@ -188,10 +192,10 @@ static void split(long long v, long long* i, long long* f)
 
 
 /* result=10^n */
-static long long pow10(int n)
+static longlong_t pow10(int n)
 {
     int i;
-    long long r;
+    longlong_t r;
 
     r=1;
     for (i=0;i<n;i++)
@@ -201,10 +205,10 @@ static long long pow10(int n)
 
 
 /* round the i.f at n digit after the . */
-static void round(long long* i, long long* f, int n)
+static void round(longlong_t* i, longlong_t* f, int n)
 {
 
-    long long m;
+    longlong_t m;
     int add=0;
 
     m=(int)pow10(5-n-1);
@@ -231,10 +235,10 @@ static void round(long long* i, long long* f, int n)
     pos: false : first line 
        : true  : second line
 */
-static void display(long long euro, long long home, bool pos)
+static void display(longlong_t euro, longlong_t home, bool pos)
 {
     char c1,c2;
-    long long i,f;
+    longlong_t i,f;
     unsigned char str[20];
     unsigned char s1[20];
     unsigned char s2[20];
@@ -398,7 +402,7 @@ static void euro_exit(void *parameter)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     bool end, pos;
-    long long e,h,old_e,old_h;
+    longlong_t e,h,old_e,old_h;
     int button;
 
     /* this macro should be called as the first thing you do in the plugin.
@@ -598,7 +602,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         /*Display*/
         if (!pos)   /*Euro>home*/
-            h=mul(e,currency[country]);
+            h=mymul(e,currency[country]);
         else    /*Home>euro*/
             e=mydiv(h,currency[country]);
         display(e,h,pos);
