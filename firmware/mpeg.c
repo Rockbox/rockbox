@@ -932,8 +932,11 @@ static void mpeg_thread(void)
 
                         /* Make sure that the write pointer is at a word
                            boundary when we reach the end of the file */
-                        if(len < amount_to_read)
+                        if (len < amount_to_read) {
+                            /* skip id3v1 tag */
+                            len -= id3tags[tag_read_idx]->id3.id3v1len;
                             len = (len + 1) & 0xfffffffe;
+                        }
                         
                         mp3buf_write += len;
                         if(mp3buf_write >= mp3buflen)
