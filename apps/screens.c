@@ -519,9 +519,10 @@ void splash(char *text, /* what to say */
     lcd_update();
 
     if(ticks) {
+        int start = current_tick;
         int done = ticks + current_tick + 1;
         while (TIME_BEFORE( current_tick, done)) {
-            int button = button_get_w_tmo(ticks);
+            int button = button_get_w_tmo(ticks - (current_tick-start));
             if((button & keymask) == keymask)
                 break;
         }
