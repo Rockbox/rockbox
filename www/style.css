@@ -28,7 +28,7 @@ H3, div.h5 {
  font-size:        12pt;
 }
 
-BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT, A
+BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT
 {
  text-decoration:  none;
  font-family:      Verdana,Arial,Helvetica,sans-serif;
