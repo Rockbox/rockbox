@@ -295,7 +295,9 @@ int settings_save( void )
          ((global_settings.dirfilter & 2) << 4) |
          ((global_settings.scrollbar & 1) << 6));
 
-    config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
+    config_block[0xf] = (unsigned char)
+         ((global_settings.timeformat & 1) << 2) |
+         ((global_settings.scroll_speed    << 3));
     
     config_block[0x10] = (unsigned char)
         ((global_settings.ff_rewind_min_step & 15) << 4 |
@@ -410,7 +412,6 @@ void settings_apply(void)
  */
 void settings_load(void)
 {
-    unsigned char c;
     
     DEBUGF( "reload_all_settings()\n" );
 
@@ -462,9 +463,10 @@ void settings_load(void)
                an uninitialized entry */
         }
         
-        c = config_block[0xf] >> 3;
-        if (c != 31)
-            global_settings.scroll_speed = c;
+        if (config_block[0xf] != 0xFF) {
+            global_settings.timeformat  = (config_block[0xf] >> 2) & 1;
+            global_settings.scroll_speed = config_block[0xf] >> 3;
+        }
 
         if (config_block[0x10] != 0xFF) {
             global_settings.ff_rewind_min_step = (config_block[0x10] >> 4) & 15;
@@ -667,6 +669,7 @@ void settings_reset(void) {
     global_settings.playlist_shuffle = false;
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
+    global_settings.timeformat   = 0;
     global_settings.scroll_speed = 8;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;

@@ -23,6 +23,8 @@
 #include "sprintf.h"
 #include "rtc.h"
 
+#include "settings.h"
+
 #include "icons.h"
 
 unsigned char slider_bar[] =
@@ -277,6 +279,12 @@ void statusbar_time(int hour, int minute)
          hour <= 23 &&
          minute >= 0 && 
          minute <= 59 ) {
+        if ( global_settings.timeformat ) { /* 12 hour clock */
+            hour %= 12;
+            if ( hour == 0 ) {
+                hour +=12;
+            }
+        }
         snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
     }
     else {

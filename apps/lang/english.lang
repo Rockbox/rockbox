@@ -900,3 +900,18 @@ eng: "OFF=Cancel"
 new:
 
 id: LANG_TETRIS_LEVEL
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+new:
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 hour clock"
+new:
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 hour clock"
+new:

@@ -285,6 +285,14 @@ static bool timedate_set(void)
 #endif
     return result;
 }
+
+static bool timeformat_set(void)
+{
+    char* names[] = { str(LANG_24_HOUR_CLOCK),
+                      str(LANG_12_HOUR_CLOCK) };
+
+    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat, names, 2, NULL);
+}
 #endif
 
 static bool spindown(void)
@@ -454,6 +462,7 @@ static bool system_settings_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_TIME),        timedate_set    },
+        { str(LANG_TIMEFORMAT),  timeformat_set  },
 #endif
         { str(LANG_POWEROFF_IDLE),    poweroff_idle_timer },
         { str(LANG_RESET),       reset_settings },
