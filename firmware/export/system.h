@@ -144,6 +144,8 @@ static inline unsigned long SWAB32(unsigned long value)
     return value;
 }
 
+#define invalidate_icache()
+
 #elif CONFIG_CPU == MCF5249
 #define HIGHEST_IRQ_LEVEL (7<<8)
 static inline int set_irq_level(int level)
@@ -176,6 +178,12 @@ static inline unsigned long SWAB32(unsigned long value)
     unsigned short hi = SWAB16(value >> 16);
     unsigned short lo = SWAB16(value & 0xffff);
     return (lo << 16) | hi;
+}
+
+static inline void invalidate_icache(void)
+{
+   asm volatile ("move.l #0x81000000,%d0\n"
+		 "movec.l %d0,%cacr");
 }
 
 #elif CONFIG_CPU == TCC730
@@ -222,6 +230,8 @@ static inline unsigned long SWAB32(unsigned long value)
     unsigned long lo = SWAB16(value & 0xffff);
     return (lo << 16) | hi;
 }
+
+#define invalidate_icache()
 
 #endif
 #endif
