@@ -110,9 +110,10 @@ static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*10;
-    last_disk_activity = timeout;
-    while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY))
+    while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
+        last_disk_activity = current_tick;
         yield();
+    }
 
     if (TIME_BEFORE(current_tick, timeout))
         return 1;
@@ -129,10 +130,12 @@ static int wait_for_rdy(void)
         return 0;
 
     timeout = current_tick + HZ*10;
-    last_disk_activity = timeout;
 
-    while (TIME_BEFORE(current_tick, timeout) && !(ATA_ALT_STATUS & STATUS_RDY))
+    while (TIME_BEFORE(current_tick, timeout) &&
+           !(ATA_ALT_STATUS & STATUS_RDY)) {
+        last_disk_activity = current_tick;
         yield();
+    }
 
     if (TIME_BEFORE(current_tick, timeout))
         return STATUS_RDY;
