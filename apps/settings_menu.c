@@ -136,14 +136,14 @@ static bool flip_display(void)
 /**
  * Menu to configure the battery display on status bar
  */
-static bool battery_type(void)
+static bool battery_display(void)
 {
     static const struct opt_items names[] = {
         { STR(LANG_DISPLAY_GRAPHIC) }, 
         { STR(LANG_DISPLAY_NUMERIC) }
     };
     return set_option( str(LANG_BATTERY_DISPLAY), 
-                       &global_settings.battery_type, INT, names, 2, NULL);
+                       &global_settings.battery_display, INT, names, 2, NULL);
 }
 
 /**
@@ -1195,7 +1195,7 @@ static bool bars_settings_menu(void)
         { ID2P(LANG_BUTTON_BAR),      button_bar },
 #endif
         { ID2P(LANG_VOLUME_DISPLAY),  volume_type },
-        { ID2P(LANG_BATTERY_DISPLAY), battery_type },
+        { ID2P(LANG_BATTERY_DISPLAY), battery_display },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

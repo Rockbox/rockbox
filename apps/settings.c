@@ -202,7 +202,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(buttonbar), true, "buttonbar", off_on },
 #endif
     {1, S_O(volume_type), 0, "volume display", graphic_numeric },
-    {1, S_O(battery_type), 0, "battery display", graphic_numeric },
+    {1, S_O(battery_display), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
 #endif
     {1, S_O(show_icons), true, "show icons", off_on },

@@ -248,15 +248,15 @@ void statusbar_icon_battery(int percent, bool charging)
         fill = 100;
 
 #ifdef SIMULATOR
-    if (global_settings.battery_type && (percent > -1)) {
+    if (global_settings.battery_display && (percent > -1)) {
 #else
 #ifdef HAVE_CHARGE_CTRL /* Recorder */
     /* show graphical animation when charging instead of numbers */
-    if ((global_settings.battery_type) &&
+    if ((global_settings.battery_display) &&
         (charge_state != 1) &&
         (percent > -1)) {
 #else /* FM */
-    if (global_settings.battery_type && (percent > -1)) {
+    if (global_settings.battery_display && (percent > -1)) {
 #endif /* HAVE_CHARGE_CTRL */
 #endif
         /* Numeric display */

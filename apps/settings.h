@@ -206,7 +206,7 @@ struct user_settings
                           3=dirs+playlists, 4=ID3 database */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
-    int battery_type;  /* how battery is displayed: 0=graphic, 1=percent */
+    int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
     bool playlist_shuffle;
