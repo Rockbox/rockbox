@@ -665,6 +665,10 @@ asm (
  * _writeblock) */
 static void _invertblock(unsigned char *address, unsigned mask, unsigned bits)
 {
+    bits &= mask;
+    if (!bits)
+        return;
+
     asm volatile (
         "mov     #0,r1           \n"  /* current_plane = 0 */
 
@@ -680,7 +684,7 @@ static void _invertblock(unsigned char *address, unsigned mask, unsigned bits)
         : /* inputs */
         /* %0 */ "r"(graybuf->depth),
         /* %1 */ "r"(address),
-        /* %2 */ "r"(mask & bits),
+        /* %2 */ "r"(bits),
         /* %3 */ "r"(graybuf->plane_size)
         : /* clobbers */
         "r1", "r2", "macl"
@@ -690,13 +694,17 @@ static void _invertblock(unsigned char *address, unsigned mask, unsigned bits)
 /* Call _writeblock with the mask modified to draw foreground pixels only */
 static void _writeblockfg(unsigned char *address, unsigned mask, unsigned bits)
 {
-    _writeblock(address, mask & bits, bits);
+    mask &= bits;
+    if (mask)
+        _writeblock(address, mask, bits);
 }
 
 /* Call _writeblock with the mask modified to draw background pixels only */
 static void _writeblockbg(unsigned char *address, unsigned mask, unsigned bits)
 {
-    _writeblock(address, mask & ~bits, bits);
+    mask &= ~bits;
+    if (mask)
+        _writeblock(address, mask, bits);
 }
 
 /**** public functions ****/
