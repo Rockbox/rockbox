@@ -96,8 +96,9 @@ static unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 #endif
 
 /* All zeros and ones bitmaps for area filling */
-static unsigned char zeros[8] = { 0 };
-static unsigned char ones[8]  = { 0xff };
+static unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static unsigned char ones[8]  = { 0xff, 0xff, 0xff, 0xff,
+                                  0xff, 0xff, 0xff, 0xff};
 
 #ifdef SIMULATOR
 
