@@ -192,12 +192,6 @@ void init_oss(int sound, int sound_freq, int channels) {
   }
 }
 
-unsigned short MadFixedToUshort(mad_fixed_t Fixed)
-{
-  Fixed=Fixed>>(MAD_F_FRACBITS-15);
-  return((unsigned short)Fixed);
-}
-
 #define INPUT_BUFFER_SIZE  (5*8192)
 #define OUTPUT_BUFFER_SIZE  8192 /* Must be an integer multiple of 4. */
 int mpeg_play(char* fname)
@@ -240,7 +234,7 @@ int mpeg_play(char* fname)
 
   do
   {
-    //if (button_get()) break; /* Return if a key is pressed */
+    if (button_get()) break; /* Return if a key is pressed */
 
     if(Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN)
     {
