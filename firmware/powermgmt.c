@@ -73,9 +73,9 @@ int battery_capacity = 1500;                 /* only a default value */
 
 void set_battery_capacity(int capacity)
 {
-    int values[8] = {1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200};
-    
-    battery_capacity = values[capacity];
+    battery_capacity = capacity;
+    if ((battery_capacity > BATTERY_CAPACITY_MAX) || (battery_capacity < 1500))
+        battery_capacity = 1500;
 }
 
 #ifdef HAVE_CHARGE_CTRL

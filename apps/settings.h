@@ -85,14 +85,7 @@ struct user_settings
     bool backlight_on_when_charging;
     bool discharge; /* maintain charge of at least: false = 85%, true = 10%  */
     bool trickle_charge; /* do trickle charging: 0=off, 1=on */
-    int battery_capacity; /* 0 = 1500 mAh
-                             1 = 1600 mAh
-                             2 = 1700 mAh
-                             3 = 1800 mAh
-                             4 = 1900 mAh
-                             5 = 2000 mAh
-                             6 = 2100 mAh
-                             7 = 2200 mAh */
+    int battery_capacity; /* in mAh */
 
     /* resume settings */
 

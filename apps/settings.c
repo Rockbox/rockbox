@@ -126,6 +126,7 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 
+0xB1  (int) battery capacity
 0xB5  scroll step in pixels
 0xB6  scroll start and endpoint delay
 0xB7  bidir scroll setting (bidi if 0-200% longer than screen width)
@@ -368,6 +369,7 @@ int settings_save( void )
         config_block[0x29]=(unsigned char)(global_settings.topruntime >> 8);
     }
 
+    memcpy(&config_block[0xb1], &global_settings.battery_capacity, 4);
     config_block[0xb5]=(unsigned char)global_settings.scroll_step;
     config_block[0xb6]=(unsigned char)global_settings.scroll_delay;
     config_block[0xb7]=(unsigned char)global_settings.bidir_limit;
@@ -465,6 +467,8 @@ void settings_apply(void)
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
     enable_trickle_charge(global_settings.trickle_charge);
 #endif
+
+    set_battery_capacity(global_settings.battery_capacity);
 
 #ifdef HAVE_LCD_BITMAP
     settings_apply_pm_range();
@@ -647,6 +651,8 @@ void settings_load(void)
         if (config_block[0x29] != 0xff)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
+
+        memcpy(&global_settings.battery_capacity, &config_block[0xb1], 4);
 
         if (config_block[0xb5] != 0xff)
             global_settings.scroll_step = config_block[0xb5];
@@ -831,7 +837,7 @@ void settings_reset(void) {
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;
     global_settings.backlight_on_when_charging   = 
         DEFAULT_BACKLIGHT_ON_WHEN_CHARGING_SETTING;
-    global_settings.battery_capacity = 0; /* 1500 mAh */
+    global_settings.battery_capacity = 1500; /* mAh */
     global_settings.trickle_charge = true;
     global_settings.dirfilter   = SHOW_MUSIC;
     global_settings.sort_case   = false;
