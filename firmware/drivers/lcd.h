@@ -76,7 +76,7 @@ extern void lcd_double_height (bool on);
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
-#if defined(SIMULATOR)
+#if !defined(HAVE_LCD_BITMAP) && defined(SIMULATOR)
 #define LCD_WIDTH       16*11 /* Display width in pixels */
 #else
 #define LCD_WIDTH       112   /* Display width in pixels */
