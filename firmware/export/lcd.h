@@ -87,6 +87,7 @@ enum
 extern void lcd_define_hw_pattern (int which,char *pattern,int length);
 extern void lcd_define_pattern (int which,char *pattern);
 extern void lcd_double_height (bool on);
+extern void lcd_jump_scroll (int mode); /* 0=off, 1=once, 2=always */
 unsigned char lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned char pat);
 void lcd_allow_bidirectional_scrolling(bool on);
