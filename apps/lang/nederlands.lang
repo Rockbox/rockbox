@@ -1,4 +1,3 @@
-# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -151,7 +150,9 @@ eng: "Is battery low?"
 new: "Is de batterij leeg ?"
 
 id: LANG_TIME_SET
-desc: if save settings has failed
+### Description changed! Previous description was:
+### "if save settings has failed"
+desc: 
 eng: "ON to set"
 new: "ON om in te stellen"
 
@@ -307,7 +308,9 @@ new: "Sorteer mode"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll Speed"
+### English phrase was changed! Previous translation was made on:
+### "Scroll Speed"
+eng: "Scroll"
 new: "Scroll snelheid"
 
 id: LANG_RESET
@@ -421,17 +424,23 @@ eng: "Resume?"
 new: "Hervatten?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
+### Description changed! Previous description was:
+### "posible answers to resume question"
+desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: 
 
 id: LANG_RESUME_CONFIRM_RECORDER
-desc: posible answer to resume question
+### Description changed! Previous description was:
+### "posible answer to resume question"
+desc: possible answer to resume question
 eng: "PLAY = Yes"
 new: "PLAY = Ja"
 
 id: LANG_RESUME_CANCEL_RECORDER
-desc: posible answer to resume question
+### Description changed! Previous description was:
+### "posible answer to resume question"
+desc: possible answer to resume question
 eng: "Any Other = No"
 new: "Elke andere = Nee"
 
@@ -861,7 +870,9 @@ eng: "One"
 new: "Een"
 
 id: LANF_WEEKDAY_THURSDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Do" 
 
@@ -876,62 +887,86 @@ eng: "24 hour clock"
 new: "24 uurs klok" 
 
 id: LANG_MONTH_APRIL
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
 new: 
 
 id: LANG_MONTH_AUGUST
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
 new: 
 
 id: LANG_MONTH_DECEMBER
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 new: 
 
 id: LANG_MONTH_FEBRUARY
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
 new: 
 
 id: LANG_MONTH_JANUARY
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
 new: 
 
 id: LANG_MONTH_JULY
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
 new: 
 
 id: LANG_MONTH_JUNE
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
 new: 
 
 id: LANG_MONTH_MARCH
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
 new: "Maa" 
 
 id: LANG_MONTH_MAY
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
 new: "Mei" 
 
 id: LANG_MONTH_NOVEMBER
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
 new: 
 
 id: LANG_MONTH_OCTOBER
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
 new: "Okt" 
 
 id: LANG_MONTH_SEPTEMBER
-desc: abbreviation for monthname
+### Description changed! Previous description was:
+### "abbreviation for monthname"
+desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 new: 
 
@@ -951,32 +986,44 @@ eng: "Time Format"
 new: "Tijds Aanduiding" 
 
 id: LANG_WEEKDAY_FRIDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
 new: "Vr" 
 
 id: LANG_WEEKDAY_MONDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
 new: "Ma"
 
 id: LANG_WEEKDAY_SATURDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 new: "Za"
 
 id: LANG_WEEKDAY_SUNDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 new: "Zo" 
 
 id: LANG_WEEKDAY_TUESDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
 new: "Di"
 
 id: LANG_WEEKDAY_WEDNESDAY
-desc: abbreviation for weekday
+### Description changed! Previous description was:
+### "abbreviation for weekday"
+desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 new: "Wo" 
 
@@ -1143,4 +1190,64 @@ new:
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep timer"
-new:
+new: 
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+### Not previously translated
+new: 
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+### Not previously translated
+new: 
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+### Not previously translated
+new: 
+
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+### Not previously translated
+new: 
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-skip buffer"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
+### Not previously translated
+new: 
+
+id: LANG_TRICKLE_CHARGE
+desc: in settings_menu
+eng: "Trickle Charge"
+### Not previously translated
+new: 
