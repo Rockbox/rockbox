@@ -30,7 +30,7 @@ typedef enum {
 } Menu;
 
 struct menu_items {
-    char *desc;
+    unsigned char *desc;
     Menu (*function) (void);
 };
 
