@@ -612,11 +612,13 @@ static void mpeg_thread(void)
                 if(free_space_left <= 0)
                     free_space_left = mp3buflen + free_space_left;
 
+                /* do we have any more buffer space to fill? */
                 if(free_space_left <= MPEG_CHUNKSIZE)
                 {
                     DEBUGF("0\n");
                     filling = false;
-                    break;;
+                    ata_sleep();
+                    break;
                 }
             
                 amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);

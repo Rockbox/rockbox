@@ -64,10 +64,10 @@
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
 int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
-
 static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
+static bool sleeping = false;
 
 static int wait_for_bsy(void)
 {
@@ -112,6 +112,13 @@ int ata_read_sectors(unsigned long start,
 {
     int i;
     int ret = 0;
+
+    if ( sleeping ) {
+        if (ata_soft_reset()) {
+            mutex_unlock(&ata_mtx);
+            return -1;
+        }
+    }
 
     mutex_lock(&ata_mtx);
     
@@ -163,6 +170,13 @@ int ata_write_sectors(unsigned long start,
                       void* buf)
 {
     int i;
+
+    if ( sleeping ) {
+        if (ata_soft_reset()) {
+            mutex_unlock(&ata_mtx);
+            return -1;
+        }
+    }
 
     mutex_lock(&ata_mtx);
     
@@ -272,6 +286,28 @@ int ata_spindown(int time)
     return ret;
 }
 
+int ata_sleep(void)
+{
+    int ret = 0;
+
+    mutex_lock(&ata_mtx);
+    
+    if(!wait_for_rdy()) {
+        mutex_unlock(&ata_mtx);
+        return -1;
+    }
+
+    ATA_SELECT = ata_device;
+    ATA_COMMAND = CMD_SLEEP;
+
+    if (!wait_for_rdy())
+        ret = -1;
+
+    sleeping = true;
+    mutex_unlock(&ata_mtx);
+    return ret;
+}
+
 int ata_hard_reset(void)
 {
     int ret;
@@ -289,6 +325,7 @@ int ata_hard_reset(void)
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
 
+    sleeping = false;
     mutex_unlock(&ata_mtx);
     return ret;
 }
@@ -316,7 +353,8 @@ int ata_soft_reset(void)
 
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
-    
+
+    sleeping = false;
     mutex_unlock(&ata_mtx);
     return ret;
 }
