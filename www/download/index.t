@@ -56,7 +56,7 @@ This version is for all Archos Jukebox Recorder models.
 
 <h2>Bug reports</h2>
 
-<p>Please use our <a href="/bugs.html">bug page</a>
+<p>Please use our <a href="/bugs.shtml">bug page</a>
 for all bug reports and feature requests.
 
 <p>If you are interested in helping with the development of Rockbox, please join the mailing list.
