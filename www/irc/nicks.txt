@@ -19,3 +19,4 @@ mbr         => Markus Braun
 matsl       => Mats Lidell
 mecraw      => Lee Marlow
 hardeep     => Hardeep Sidhu
+[IDC]Dragon => Jörg Hohensohn
