@@ -40,31 +40,30 @@
 /* demonstrates showing different formats from playtune */
 void wps_show_play(char* filename)
 {
-    char buffer[256];
-    mp3entry  mp3;
-    mp3info(&mp3,filename);
+     mp3entry  mp3;
+     mp3info(&mp3,filename);
 
-    snprintf(buffer,sizeof(buffer), "%s", mp3.path);
+     lcd_clear_display();
 
-    lcd_clear_display();
-
-    switch (global_settings.wps_display)
-    {
-        case PLAY_DISPLAY_TRACK_TITLE:
-        {
-            char ch = '/';
+     switch (global_settings.wps_display)
+     {
+          case PLAY_DISPLAY_TRACK_TITLE:
+          {
+            int ch = '/';
             char* end;
-            char* szDelimit;
-            char szArtist[32];
+            char szArtist[26];
+            char szBuff[257];
+            szBuff[sizeof(szBuff)-1] = 0;
 
-            char* szTok = strtok_r(buffer, "/", &end);
+            strncpy(szBuff, filename, sizeof(szBuff));
+
+            char* szTok = strtok_r(szBuff, "/", &end);
             szTok = strtok_r(NULL, "/", &end);
 
-            /* Assume path format of: Genre/Artist/Album/Mp3_file */
+            // Assume path format of: Genre/Artist/Album/Mp3_file
             strncpy(szArtist,szTok,sizeof(szArtist));
             szArtist[sizeof(szArtist)-1] = 0;
-            szDelimit = strrchr(buffer, ch);
-
+            char* szDelimit = strrchr(filename, ch);
 #ifdef HAVE_LCD_BITMAP
             lcd_puts(0,0, szArtist?szArtist:"<nothing>");
             lcd_puts_scroll(0,LINE_Y,(++szDelimit));
@@ -72,27 +71,27 @@ void wps_show_play(char* filename)
             lcd_puts(0,0, szArtist?szArtist:"<nothing>");
             lcd_puts_scroll(0,1,(++szDelimit));
 #endif
+               break;
+         }
+         case PLAY_DISPLAY_FILENAME_SCROLL:
+         {
+               int ch = '/';
+               char* szLast = strrchr(filename, ch);
 
+               if (szLast)
+               {
+                   lcd_puts_scroll(0,0, (++szLast));
+               } else {
+                   lcd_puts_scroll(0,0, mp3.path);
+               }
 
-            break;
-        }
-        case PLAY_DISPLAY_FILENAME_SCROLL:
-        {
-            int ch = '/';
-            char* szLast = strrchr(buffer, ch);
-
-            if (szLast)
-            {
-                lcd_puts_scroll(0,0, (++szLast));
-            } else {
-                lcd_puts_scroll(0,0, buffer);
-            }
-
-            break;
-        }
-        case PLAY_DISPLAY_DEFAULT:
-        {
+               break;
+         }
+         case PLAY_DISPLAY_DEFAULT:
+         {
 #ifdef HAVE_LCD_BITMAP
+            char buffer[256];
+
             lcd_puts(0, 0, "[id3 info]");
             lcd_puts(0, LINE_Y, mp3.title?mp3.title:"");
             lcd_puts(0, LINE_Y+1, mp3.album?mp3.album:"");
