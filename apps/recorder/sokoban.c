@@ -992,6 +992,7 @@ void sokoban_loop(void) {
     update_screen();
 
     while(1) {
+        bool idle = false;
         switch ( button_get(true) ) {
 
             case BUTTON_OFF:
@@ -1001,28 +1002,23 @@ void sokoban_loop(void) {
             case BUTTON_F3:
                 /* increase level */
                 boxes_to_go=0;
+                idle=true;
                 break;
 
             case BUTTON_F2:
                 /* same level */
                 load_level(current_level);
-                lcd_clear_display();
-                update_screen();
                 moves=0;
+                idle=true;
                 break;
             
             case BUTTON_F1:
                 /* previous level */
-                if (current_level==0) {
-                    current_level=0;
-                }
-                else {
+                if (current_level)
                     current_level--;
-                }
                 load_level(current_level);
-                lcd_clear_display();
-                update_screen();
                 moves=0;
+                idle=true;
                 break;
 
             case BUTTON_LEFT:
@@ -1031,16 +1027,12 @@ void sokoban_loop(void) {
                         board[row][col-1]=5;
                         board[row][col]=current_spot;
                         current_spot=1;
-                        col--;
-                        moves++;
                         break;
 
                     case 3: /* if it is a home spot */
                         board[row][col-1]=5;
                         board[row][col]=current_spot;
                         current_spot=3;
-                        col--;
-                        moves++;
                         break;
 
                     case 4:
@@ -1050,13 +1042,6 @@ void sokoban_loop(void) {
                                 board[row][col-1]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=1;
-                                col--;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a blank to home */
@@ -1064,9 +1049,11 @@ void sokoban_loop(void) {
                                 board[row][col-1]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=1;
-                                col--;
                                 boxes_to_go--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
@@ -1078,14 +1065,7 @@ void sokoban_loop(void) {
                                 board[row][col-1]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=3;
-                                col--;
                                 boxes_to_go++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a home to home */
@@ -1093,13 +1073,20 @@ void sokoban_loop(void) {
                                 board[row][col-1]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=3;
-                                col--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
+                        break;
+
+                    default:
+                        idle = true;
+                        break;
                 }
-                lcd_clear_display();
-                update_screen();          
+                if (!idle)
+                    col--;
                 break;
 
             case BUTTON_RIGHT: /* if it is a blank spot */
@@ -1108,16 +1095,12 @@ void sokoban_loop(void) {
                         board[row][col+1]=5;
                         board[row][col]=current_spot;
                         current_spot=1;
-                        col++;
-                        moves++;
                         break;
 
                     case 3: /* if it is a home spot */
                         board[row][col+1]=5;
                         board[row][col]=current_spot;
                         current_spot=3;
-                        col++;
-                        moves++;
                         break;
 
                     case 4: 
@@ -1127,13 +1110,6 @@ void sokoban_loop(void) {
                                 board[row][col+1]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=1;
-                                col++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a blank to home */
@@ -1141,9 +1117,11 @@ void sokoban_loop(void) {
                                 board[row][col+1]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=1;
-                                col++; 
                                 boxes_to_go--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
@@ -1155,14 +1133,7 @@ void sokoban_loop(void) {
                                 board[row][col+1]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=3;
-                                col++;
                                 boxes_to_go++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3:
@@ -1170,14 +1141,20 @@ void sokoban_loop(void) {
                                 board[row][col+1]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=3;
-                                col++;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
+
+                    default:
+                        idle = true;
+                        break;
                 }
-                lcd_clear_display();
-                update_screen();          
+                if (!idle)
+                    col++;
                 break;
 
             case BUTTON_UP:
@@ -1186,16 +1163,12 @@ void sokoban_loop(void) {
                         board[row-1][col]=5;
                         board[row][col]=current_spot;
                         current_spot=1;
-                        row--;
-                        moves++;
                         break;
 
                     case 3: /* if it is a home spot */
                         board[row-1][col]=5;
                         board[row][col]=current_spot;
                         current_spot=3;
-                        row--;
-                        moves++;
                         break;
 
                     case 4:
@@ -1205,13 +1178,6 @@ void sokoban_loop(void) {
                                 board[row-1][col]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=1;
-                                row--;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2: 
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a blank to home */
@@ -1219,9 +1185,11 @@ void sokoban_loop(void) {
                                 board[row-1][col]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=1;
-                                row--; 
                                 boxes_to_go--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
@@ -1233,14 +1201,7 @@ void sokoban_loop(void) {
                                 board[row-1][col]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=3;
-                                row--;
                                 boxes_to_go++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a home to home */
@@ -1248,14 +1209,20 @@ void sokoban_loop(void) {
                                 board[row-1][col]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=3;
-                                row--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
+
+                    default:
+                        idle = true;
+                        break;
                 }
-                lcd_clear_display();
-                update_screen();
+                if (!idle)
+                    row--;
                 break;
 
             case BUTTON_DOWN:
@@ -1264,16 +1231,12 @@ void sokoban_loop(void) {
                         board[row+1][col]=5;
                         board[row][col]=current_spot;
                         current_spot=1;
-                        row++;
-                        moves++;
                         break;
 
                     case 3: /* if it is a home spot */
                         board[row+1][col]=5;
                         board[row][col]=current_spot;
                         current_spot=3;
-                        row++;
-                        moves++;
                         break;
 
                     case 4:
@@ -1283,13 +1246,6 @@ void sokoban_loop(void) {
                                 board[row+1][col]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=1;
-                                row++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a blank to home */
@@ -1297,9 +1253,11 @@ void sokoban_loop(void) {
                                 board[row+1][col]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=1;
-                                row++; 
                                 boxes_to_go--;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
                         break;
@@ -1311,14 +1269,7 @@ void sokoban_loop(void) {
                                 board[row+1][col]=board[row][col];
                                 board[row][col]=current_spot;
                                 current_spot=3;
-                                row++;
                                 boxes_to_go++;
-                                moves++;
-                                break;
-
-                            /* if there is a wall then do not move the box */
-                            case 2:
-                                /* do nothing */
                                 break;
 
                             case 3: /* if we are going from a home to home */
@@ -1326,16 +1277,33 @@ void sokoban_loop(void) {
                                 board[row+1][col]=board[row][col];
                                 board[row][col]=current_spot; 
                                 current_spot=3;
-                                row++;
-                                moves++;
+                                break;
+
+                            default:
+                                idle = true;
                                 break;
                         }
+                        break;
+
+                    default:
+                        idle = true;
+                        break;
                 }
-                lcd_clear_display();
-                update_screen();          
+                if (!idle)
+                    row++;
+                break;
+
+            default:
+                idle = true;
                 break;
         }
-      
+        
+        if (!idle) {
+            moves++;
+            lcd_clear_display();
+            update_screen();
+        }
+
         if (boxes_to_go==0) {
             moves=0;
             current_level++;
