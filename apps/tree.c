@@ -296,13 +296,14 @@ static int showdir(char *path, int start)
 
 bool ask_resume(void)
 {
+#ifdef HAVE_NEW_CHARCELL_LCD
+    lcd_double_height(false);
+#endif
+
     /* always resume? */
     if ( global_settings.resume == RESUME_ON )
         return true;
 
-#ifdef HAVE_NEW_CHARCELL_LCD
-    lcd_double_height(false);
-#endif
     lcd_clear_display();
     lcd_puts(0,0,"Resume?");
 #ifdef HAVE_LCD_CHARCELLS
