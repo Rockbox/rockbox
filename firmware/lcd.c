@@ -579,8 +579,8 @@ void lcd_invertrect (int x, int y, int nx, int ny)
         lcd_bitmap (ones, x+i, y, 1, ny, FALSE);
 }
 
-#define DRAW_PIXEL(x,y) display[x][y/8] |= (1<<(y%7))
-#define CLEAR_PIXEL(x,y) display[x][y/8] &= ~(1<<(y%7))
+#define DRAW_PIXEL(x,y) display[x][y/8] |= (1<<(y%8))
+#define CLEAR_PIXEL(x,y) display[x][y/8] &= ~(1<<(y%8))
 
 void lcd_drawline( int x1, int y1, int x2, int y2 )
 {
