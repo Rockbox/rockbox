@@ -114,7 +114,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #endif /* HAVE_RECORDER_KEYPAD */
 
 #define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
-#define TREE_ATTR_MP3 0x40 /* unused by FAT attributes */
+#define TREE_ATTR_MPA 0x40 /* unused by FAT attributes */
 
 static int build_playlist(int start_index)
 {
@@ -125,7 +125,7 @@ static int build_playlist(int start_index)
 
     for(i = 0;i < filesindir;i++)
     {
-        if(dircache[i].attr & TREE_ATTR_MP3)
+        if(dircache[i].attr & TREE_ATTR_MPA)
         {
             DEBUGF("Adding %s\n", dircache[i].name);
             playlist_add(dircache[i].name);
@@ -213,10 +213,12 @@ static int showdir(char *path, int start)
 
             dptr->attr = entry->attribute;
 
-            /* mark mp3 and m3u files as such */
+            /* mark mp? and m3u files as such */
             if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) ) {
-                if (!strcasecmp(&entry->d_name[len-4], ".mp3"))
-                    dptr->attr |= TREE_ATTR_MP3;
+                if (!strcasecmp(&entry->d_name[len-4], ".mp3") ||
+                   (!strcasecmp(&entry->d_name[len-4], ".mp2") ||
+                   (!strcasecmp(&entry->d_name[len-4], ".mpa"))
+                    dptr->attr |= TREE_ATTR_MPA;
                 else
                     if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
                         dptr->attr |= TREE_ATTR_M3U;
@@ -225,7 +227,7 @@ static int showdir(char *path, int start)
             /* filter non-mp3 or m3u files */
             if ( global_settings.mp3filter &&
                  (!(dptr->attr &
-                    (ATTR_DIRECTORY|TREE_ATTR_MP3|TREE_ATTR_M3U))) ) {
+                    (ATTR_DIRECTORY|TREE_ATTR_MPA|TREE_ATTR_M3U))) ) {
                 i--;
                 continue;
             }
@@ -281,7 +283,7 @@ static int showdir(char *path, int start)
             icon_type = Folder;
         else if ( dircache[i].attr & TREE_ATTR_M3U )
             icon_type = Playlist;
-        else if ( dircache[i].attr & TREE_ATTR_MP3 )
+        else if ( dircache[i].attr & TREE_ATTR_MPA )
             icon_type = File;
         else
             icon_type = 0;
@@ -294,7 +296,7 @@ static int showdir(char *path, int start)
 
         /* if MP3 filter is on, cut off the extension */
         if (global_settings.mp3filter && 
-            (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+            (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
         {
             char temp = dircache[i].name[len-4];
             dircache[i].name[len-4] = 0;
@@ -529,7 +531,7 @@ bool dirbrowse(char *root)
                                   0, seed );
                         start_index = 0;
                     }
-                    else if (dircache[dircursor+start].attr & TREE_ATTR_MP3 ) {
+                    else if (dircache[dircursor+start].attr & TREE_ATTR_MPA ) {
                         if ( global_settings.resume )
                             strncpy(global_settings.resume_file,
                                     currdir, MAX_PATH);
@@ -743,7 +745,7 @@ bool dirbrowse(char *root)
                 lcd_stop_scroll();
                 if (global_settings.mp3filter && 
                     (dircache[i].attr &
-                     (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+                     (TREE_ATTR_M3U|TREE_ATTR_MPA)))
                 {
                     int len = strlen(dircache[i].name);
                     char temp = dircache[i].name[len-4];
