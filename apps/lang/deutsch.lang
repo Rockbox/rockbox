@@ -547,7 +547,7 @@ new: "[Frequenz]"
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[PATH]"
-new: "[PFAD]" 
+new: "[PFAD]"
 
 id: LANG_PITCH_UP
 desc: in wps
