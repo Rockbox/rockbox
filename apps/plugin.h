@@ -291,6 +291,7 @@ struct plugin_api {
     int (*strcmp)(const char *, const char *);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
+    char *(*strncpy)(char *dst, const char *src, size_t length);
 };
 
 /* defined by the plugin loader (plugin.c) */
